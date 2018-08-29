@@ -184,7 +184,7 @@ public class StreamProcessorService {
                         siddhiAppData.setSiddhiAppRuntime(siddhiAppRuntime);
                         siddhiAppData.setInputHandlerMap(inputHandlerMap);
                         siddhiAppMap.put(siddhiAppName, siddhiAppData);
-
+                        //todo
 //                        if (haManager.isLiveStateSyncEnabled()) {
 //                            //Live State Sync Enabled of Passive Node
 //                            log.info("Live State Sync is Enabled for Passive Node. Restoring Active Node current state "

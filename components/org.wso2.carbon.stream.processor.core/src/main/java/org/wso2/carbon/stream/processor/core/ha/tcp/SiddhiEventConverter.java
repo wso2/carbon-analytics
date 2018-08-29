@@ -37,7 +37,7 @@ public class SiddhiEventConverter {
     static final Logger LOG = Logger.getLogger(SiddhiEventConverter.class);
     private static int count = 0;
 
-//    public static Event[] toConvertAndEnqueue(ByteBuffer messageBuffer, EventTreeMapManager eventQueueManager) {
+//    public static Event[] toConvertAndEnqueue(ByteBuffer messageBuffer, EventListMapManager eventQueueManager) {
 //        try {
 //            messageBuffer = decompress(messageBuffer);
 //           // int isCompressed = messageBuffer.getInt();

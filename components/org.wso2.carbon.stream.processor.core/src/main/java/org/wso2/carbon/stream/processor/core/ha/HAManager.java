@@ -25,7 +25,7 @@ import org.wso2.carbon.cluster.coordinator.service.ClusterCoordinator;
 import org.wso2.carbon.databridge.commons.ServerEventListener;
 import org.wso2.carbon.stream.processor.core.DeploymentMode;
 import org.wso2.carbon.stream.processor.core.NodeInfo;
-import org.wso2.carbon.stream.processor.core.event.queue.EventTreeMapManager;
+import org.wso2.carbon.stream.processor.core.event.queue.EventListMapManager;
 import org.wso2.carbon.stream.processor.core.ha.tcp.TCPServer;
 import org.wso2.carbon.stream.processor.core.ha.transport.TCPConnectionFactory;
 import org.wso2.carbon.stream.processor.core.ha.util.RequestUtil;
@@ -77,10 +77,10 @@ public class HAManager {
     private List<Timer> retrySiddhiAppSyncTimerList;
     private boolean isActiveNodeOutputSyncManagerStarted;
     private TCPServer tcpServerInstance = TCPServer.getInstance();
-    private EventTreeMapManager eventTreeMapManager;
+    private EventListMapManager eventListMapManager;
     private int passiveQueueCapacity;
     private DeploymentConfig deploymentConfig;
-    private BlockingQueue<ByteBuffer> eventByteBufferQueue = new LinkedBlockingQueue<ByteBuffer>(20000);
+    private BlockingQueue<ByteBuffer> eventByteBufferQueue;
     private ListeningExecutorService listeningExecutorService;
 
     private final static Map<String, Object> activeNodePropertiesMap = new HashMap<>();
@@ -101,8 +101,10 @@ public class HAManager {
         this.username = deploymentConfig.getLiveSync().getUsername();
         this.password = deploymentConfig.getLiveSync().getPassword();
         this.retrySiddhiAppSyncTimerList = new LinkedList<>();
-        this.eventTreeMapManager = new EventTreeMapManager();
+        this.eventListMapManager = new EventListMapManager();
         this.passiveQueueCapacity = deploymentConfig.getPassiveQueueCapacity();
+        this.eventByteBufferQueue = new LinkedBlockingQueue<ByteBuffer>(deploymentConfig.
+                getEventByteBufferQueueCapacity());
         this.deploymentConfig = deploymentConfig;
     }
 
@@ -155,7 +157,7 @@ public class HAManager {
         } else {
             log.info("HA Deployment: Starting up as Passive Node");
             //initialize passive queue
-            EventTreeMapManager.initializeEventTreeMap();
+            EventListMapManager.initializeEventTreeMap();
 
             //start tcp server
             tcpServerInstance.start(deploymentConfig.getTcpServer(), eventByteBufferQueue);
@@ -190,7 +192,7 @@ public class HAManager {
             //change the system clock to work with event time
             enableEventTimeClock(true);
             try {
-                eventTreeMapManager.trimAndSendToInputHandler();
+                eventListMapManager.trimAndSendToInputHandler();
             } catch (InterruptedException e) {
                 e.printStackTrace();//todo
             }
@@ -204,6 +206,8 @@ public class HAManager {
             for (ServerEventListener listener : listeners) {
                 listener.start();
             }
+            NodeInfo nodeInfo = StreamProcessorDataHolder.getNodeInfo();
+            nodeInfo.setActiveNode(isActiveNode);
         }
 
 

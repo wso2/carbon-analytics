@@ -25,17 +25,17 @@ import org.wso2.siddhi.core.stream.input.source.Source;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
-import java.util.TreeMap;
+import java.util.concurrent.ConcurrentSkipListMap;
 
-public class EventTreeMapManager {
-    private static TreeMap<Integer,QueuedEvent> eventTreeMap;
+public class EventListMapManager {
+    private static ConcurrentSkipListMap<Integer,QueuedEvent> eventListMap;
 
-    public EventTreeMapManager() {
+    public EventListMapManager() {
     }
 
-    public static TreeMap<Integer,QueuedEvent> initializeEventTreeMap() {
-        eventTreeMap = new TreeMap<Integer,QueuedEvent>();
-        return eventTreeMap;
+    public static ConcurrentSkipListMap<Integer,QueuedEvent> initializeEventTreeMap() {
+        eventListMap = new ConcurrentSkipListMap<Integer,QueuedEvent>();
+        return eventListMap;
     }
 
     public void trimAndSendToInputHandler() throws InterruptedException {
@@ -45,45 +45,49 @@ public class EventTreeMapManager {
 
         for (Map.Entry<String, SiddhiAppData> entry : siddhiAppMap.entrySet()) {
             String revision = StreamProcessorDataHolder.getSiddhiManager().
-                    getLastRevision(entry.getValue().getSiddhiApp());
+                    getLastRevision(entry.getKey());
             if(revision != null){
-                long persistedTimestamp =  Long.parseLong(revision.split("_")[0]);
+                long persistedTimestamp =  Long.parseLong(revision.split("_")[0].trim());
                 Collection<List<Source>> sourceCollection = entry.getValue().getSiddhiAppRuntime().getSources();
                 for (List<Source> sources : sourceCollection) {
                     for (Source source : sources) {
-                        for(Map.Entry<Integer,QueuedEvent> treeMapValue : eventTreeMap.entrySet()) {
-                            int key = treeMapValue.getKey();
-                            QueuedEvent queuedEvent = treeMapValue.getValue();
+                        for(Map.Entry<Integer,QueuedEvent> listMapValue : eventListMap.entrySet()) {
+                            int key = listMapValue.getKey();
+                            QueuedEvent queuedEvent = listMapValue.getValue();
                             if(queuedEvent.getSourceHandlerElementId().equals(source.getMapper().
-                                    getHandler().getElementId()) && persistedTimestamp < queuedEvent.getEvent().getTimestamp()){
+                                    getHandler().getElementId()) &&
+                                    persistedTimestamp < queuedEvent.getEvent().getTimestamp()){
                                 source.getMapper().getHandler().sendEvent(queuedEvent.getEvent());
-                                eventTreeMap.remove(key);
+                                eventListMap.remove(key);
                             }
                         }
                     }
                 }
             }
         }
-        eventTreeMap.clear();
+        eventListMap.clear();
     }
 
     public void trimQueue(String[] persistedAppDetails){
-        for(String appDetail : persistedAppDetails){
-            String[] details = appDetail.split("__");
-            String appName = details[1];
-            long timestamp = Long.valueOf(details[0]);
-            for(Map.Entry<Integer,QueuedEvent> treeMapValue : eventTreeMap.entrySet()) {
-                int key = treeMapValue.getKey();
-                QueuedEvent queuedEvent = treeMapValue.getValue();
-                if(queuedEvent.getSiddhiAppName().equals(appName) &&
-                        queuedEvent.getEvent().getTimestamp() > timestamp){
-                    eventTreeMap.remove(key);
+        if (eventListMap.size() != 0){
+            for(String appDetail : persistedAppDetails){
+                String[] details = appDetail.split("__");//todo add constants
+                String appName = details[1].trim();
+                long timestamp = Long.valueOf(details[0].trim());
+                for(Map.Entry<Integer,QueuedEvent> treeMapValue : eventListMap.entrySet()) {
+                    int key = treeMapValue.getKey();
+                    QueuedEvent queuedEvent = treeMapValue.getValue();
+                    if(queuedEvent.getSiddhiAppName().equals(appName) &&
+                            timestamp >= queuedEvent.getEvent().getTimestamp()){
+                        eventListMap.remove(key);
+
+                    }
                 }
             }
         }
     }
 
     public void addToTreeMap(int sequenceNum, QueuedEvent queuedEvent){
-        eventTreeMap.put(sequenceNum, queuedEvent);
+        eventListMap.put(sequenceNum, queuedEvent);
     }
 }

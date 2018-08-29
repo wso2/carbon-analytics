@@ -22,7 +22,7 @@ import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.ByteToMessageDecoder;
 import org.apache.log4j.Logger;
-import org.wso2.carbon.stream.processor.core.event.queue.EventTreeMapManager;
+import org.wso2.carbon.stream.processor.core.event.queue.EventListMapManager;
 import org.wso2.carbon.stream.processor.core.util.BinaryMessageConverterUtil;
 
 import java.io.UnsupportedEncodingException;
@@ -36,14 +36,14 @@ import java.util.concurrent.BlockingQueue;
  */
 public class MessageDecoder extends ByteToMessageDecoder {
     static final Logger log = Logger.getLogger(MessageDecoder.class);
-    private EventTreeMapManager eventTreeMapManager;
+    private EventListMapManager eventListMapManager;
     private BlockingQueue<ByteBuffer> byteBufferQueue;
     private static long startTime;
     private static long endTime;
     static int count = 0;
 
-    public MessageDecoder(EventTreeMapManager eventTreeMapManager, BlockingQueue<ByteBuffer> byteBufferQueue){
-        this.eventTreeMapManager = eventTreeMapManager;
+    public MessageDecoder(EventListMapManager eventListMapManager, BlockingQueue<ByteBuffer> byteBufferQueue){
+        this.eventListMapManager = eventListMapManager;
         this.byteBufferQueue = byteBufferQueue;
     }
 
@@ -75,7 +75,7 @@ public class MessageDecoder extends ByteToMessageDecoder {
             in.readBytes(bytes);
             //LOG.info("Message Received : " + new String(bytes));
 
-            if (channelId.equals("eventMessage")) {
+            if (channelId.equals("eventMessage")) { //todo constants
                 ByteBuffer messageBuffer = ByteBuffer.wrap(bytes);
                 byteBufferQueue.offer(messageBuffer);
                 count++;
@@ -88,10 +88,12 @@ public class MessageDecoder extends ByteToMessageDecoder {
                 }
                 //Event[] events = SiddhiEventConverter.toConvertAndEnqueue(ByteBuffer.wrap(bytes),eventQueueManager);
                 // LOG.info("Event Received : " + events.toString());
-            } else if (channelId.equals("controlMessage")) {
+            } else if (channelId.equals("controlMessage")) {//todo add constants
                 String message = new String(bytes);
+                message = message.replace ("[", "");
+                message = message.replace ("]", "");
                 String[] persistedApps = message.split(",");
-                eventTreeMapManager.trimQueue(persistedApps);
+                eventListMapManager.trimQueue(persistedApps);
                 log.info("Control Message Received : " + new String(bytes));
             }
         } catch (UnsupportedEncodingException e) {

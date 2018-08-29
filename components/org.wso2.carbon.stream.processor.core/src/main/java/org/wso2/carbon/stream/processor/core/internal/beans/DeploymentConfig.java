@@ -33,6 +33,7 @@ public class DeploymentConfig {
     private int sourceQueueCapacity = 20000;
     private int retryAppSyncPeriod = 60000;
     private int passiveQueueCapacity = 20000;
+    private int eventByteBufferQueueCapacity = 20000;
 
     public String getType() {
         return type;
@@ -108,5 +109,15 @@ public class DeploymentConfig {
     public void setTcpServer(TCPServerConfig tcpServer) {
 
         this.tcpServer = tcpServer;
+    }
+
+    public int getEventByteBufferQueueCapacity() {
+
+        return eventByteBufferQueueCapacity;
+    }
+
+    public void setEventByteBufferQueueCapacity(int eventByteBufferQueueCapacity) {
+
+        this.eventByteBufferQueueCapacity = eventByteBufferQueueCapacity;
     }
 }

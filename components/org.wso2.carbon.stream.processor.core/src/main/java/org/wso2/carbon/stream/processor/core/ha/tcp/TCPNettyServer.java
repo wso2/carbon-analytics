@@ -28,7 +28,7 @@ import io.netty.channel.EventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
 import org.apache.log4j.Logger;
-import org.wso2.carbon.stream.processor.core.event.queue.EventTreeMapManager;
+import org.wso2.carbon.stream.processor.core.event.queue.EventListMapManager;
 import org.wso2.carbon.stream.processor.core.event.queue.QueuedEvent;
 import org.wso2.carbon.stream.processor.core.ha.transport.handlers.MessageDecoder;
 import org.wso2.carbon.stream.processor.core.internal.beans.TCPServerConfig;
@@ -38,10 +38,10 @@ import org.wso2.siddhi.core.event.Event;
 import java.io.UnsupportedEncodingException;
 import java.nio.ByteBuffer;
 import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.ScheduledFuture;
-import java.util.concurrent.TimeUnit;
 
 /**
  * TCP Netty Server.
@@ -55,11 +55,11 @@ public class TCPNettyServer {
     private String hostAndPort;
     private TCPServerConfig serverConfig;
     private static final Logger log = Logger.getLogger(TCPNettyServer.class);
-    private EventTreeMapManager eventTreeMapManager = new EventTreeMapManager();
+    private EventListMapManager eventListMapManager = new EventListMapManager();
     private BlockingQueue<ByteBuffer> eventByteBufferQueue;
-    private ScheduledExecutorService scheduledExecutorService = Executors.newSingleThreadScheduledExecutor();
+    private ExecutorService executorService = Executors.newFixedThreadPool(5);//todo constants
     private EventBufferExtractor eventBufferExtractor = new EventBufferExtractor();
-    private ScheduledFuture eventBufferExtractorScheduleFuture;
+    private Future eventBufferExtractorFuture;
 
     public void start(TCPServerConfig serverConf, BlockingQueue<ByteBuffer> eventByteBufferQueue) {
         this.eventByteBufferQueue = eventByteBufferQueue;
@@ -77,7 +77,7 @@ public class TCPNettyServer {
                     @Override
                     protected void initChannel(Channel channel) throws Exception {
                         ChannelPipeline p = channel.pipeline();
-                        p.addLast(new MessageDecoder(eventTreeMapManager, eventByteBufferQueue));
+                        p.addLast(new MessageDecoder(eventListMapManager, eventByteBufferQueue));
                     }
                 })
                 .option(ChannelOption.TCP_NODELAY, true)
@@ -90,9 +90,7 @@ public class TCPNettyServer {
         } catch (InterruptedException e) {
             log.error("Error when booting up tcp server on '" + hostAndPort + "' " + e.getMessage(), e);
         }
-
-        eventBufferExtractorScheduleFuture = scheduledExecutorService.
-                scheduleAtFixedRate(eventBufferExtractor, 0, 5, TimeUnit.MILLISECONDS);
+        eventBufferExtractorFuture = executorService.submit(eventBufferExtractor);
     }
 
     public void shutdownGracefully() {
@@ -111,7 +109,7 @@ public class TCPNettyServer {
     }
 
     public void shutdownScheduler() {//todo check whether need to handle interrupted exception
-        eventBufferExtractorScheduleFuture.cancel(true);
+        eventBufferExtractorFuture.cancel(true);
     }
 
     /**
@@ -121,12 +119,11 @@ public class TCPNettyServer {
 
         @Override
         public void run() {
-            if (eventByteBufferQueue.peek() != null) {
-                ByteBuffer eventContent = eventByteBufferQueue.poll();
-                try {
+            try {
+                while (true) {
+                    ByteBuffer eventContent = eventByteBufferQueue.take();
                     int noOfEvents = eventContent.getInt();
                     QueuedEvent queuedEvent;
-                    // log.info("No events in the received batch :     " + noOfEvents);
                     Event[] events = new Event[noOfEvents];
                     for (int i = 0; i < noOfEvents; i++) {
                         String sourceHandlerElementId;
@@ -156,13 +153,13 @@ public class TCPNettyServer {
                         String[] attributeTypes = attributes.substring(1, attributes.length() - 1).split(", ");
                         events[i] = SiddhiEventConverter.getEvent(eventContent, attributeTypes);
                         queuedEvent = new QueuedEvent(siddhiAppName, sourceHandlerElementId, sequenceID, events[i]);
-                        eventTreeMapManager.addToTreeMap(sequenceID, queuedEvent);
-//                        log.info("RECEIVED EVENT - " + sourceHandlerElementId + "       ||      " +
-//                                events[0].toString() + " " + "   |   COUNT " + count);
+                        eventListMapManager.addToTreeMap(sequenceID, queuedEvent);
                     }
-                } catch (UnsupportedEncodingException e) {
-
                 }
+            } catch (UnsupportedEncodingException e) {
+                //todo
+            } catch (InterruptedException e) {
+                e.printStackTrace();//todo
             }
         }
     }

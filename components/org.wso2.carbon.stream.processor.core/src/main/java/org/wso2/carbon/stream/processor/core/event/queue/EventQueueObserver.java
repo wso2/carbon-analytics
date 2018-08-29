@@ -39,7 +39,7 @@
 //
 //    @Override
 //    public void run() {
-//        if (EventTreeMapManager.getEventQueue().getRemainingCapacity() < 18000) {
+//        if (EventListMapManager.getEventQueue().getRemainingCapacity() < 18000) {
 //            log.error("Event queue threshold is reached. Hence persisting the Siddhi Apps");
 //            persistSiddhiApps();
 //        }
@@ -79,7 +79,7 @@
 //            tcpNettyClient.send("controlMessage", siddhiAppRevisions.getBytes());
 //            log.info("SiddhiApp Revisions :     " + siddhiAppRevisions);
 //            log.info("Oldest Revision Timestamp :   " + getOldestRevisionTime(siddhiAppRevisionArray));
-//            EventTreeMapManager.getEventQueue().trimBasedOnTimestamp(getOldestRevisionTime(siddhiAppRevisionArray));
+//            EventListMapManager.getEventQueue().trimBasedOnTimestamp(getOldestRevisionTime(siddhiAppRevisionArray));
 //        } catch (ConnectionUnavailableException e) {
 //            log.error("Error in connecting to 'localhost' and '9892' of the Passive node");
 //        } catch (Exception e) {
