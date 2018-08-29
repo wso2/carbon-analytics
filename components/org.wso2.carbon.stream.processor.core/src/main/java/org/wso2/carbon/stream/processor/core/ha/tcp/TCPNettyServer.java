@@ -128,7 +128,7 @@ public class TCPNettyServer {
                     for (int i = 0; i < noOfEvents; i++) {
                         String sourceHandlerElementId;
                         String siddhiAppName;
-                        int sequenceID = eventContent.getInt();
+                        long sequenceID = eventContent.getLong();
                         int stringSize = eventContent.getInt();
                         if (stringSize == 0) {
                             sourceHandlerElementId = null;
