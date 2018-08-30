@@ -20,7 +20,6 @@ package org.wso2.carbon.stream.processor.core.ha;
 
 import org.apache.log4j.Logger;
 import org.wso2.carbon.stream.processor.core.event.queue.QueuedEvent;
-import org.wso2.carbon.stream.processor.core.ha.transport.TCPConnection;
 import org.wso2.carbon.stream.processor.core.ha.transport.TCPNettyClient;
 import org.wso2.carbon.stream.processor.core.util.BinaryEventConverter;
 import org.wso2.siddhi.core.exception.ConnectionUnavailableException;
@@ -29,60 +28,36 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.util.Arrays;
-import java.util.concurrent.Callable;
 import java.util.zip.Deflater;
 
-public class ActiveNodeEventDispatcher implements Callable {
+public class ActiveNodeEventDispatcher {
     private static final Logger log = Logger.getLogger(ActiveNodeEventDispatcher.class);
     private TCPNettyClient tcpNettyClient;
     private String host;
     private int port;
-    //private EventQueue<QueuedEvent> eventQueue;
     private ByteBuffer messageBuffer = ByteBuffer.wrap(new byte[1024 * 1024 * 10]);
     private byte[] data;
     private QueuedEvent queuedEvent;
-
-    ActiveNodeEventDispatcher() {
-
-    }
+    private QueuedEvent[] queuedEvents;
 
     public void setQueuedEvent(QueuedEvent queuedEvent) {
         this.queuedEvent = queuedEvent;
     }
 
-    public ActiveNodeEventDispatcher(QueuedEvent queuedEvent) {
-//        this.eventQueue = eventQueue;
-//        this.host = host;
-//        this.port = port;
-        this.queuedEvent = queuedEvent;
-        //tcpNettyClient = ((TCPConnection) Thread.currentThread()).getTcpNettyClient();
+    public void setQueuedEvents(QueuedEvent[] queuedEvents) {
+        this.queuedEvents = queuedEvents;
     }
 
     public void sendEventToPassiveNode(QueuedEvent queuedEvent) {
-        try {
-            if (!tcpNettyClient.isActive()) {
-                tcpNettyClient.connect("localhost", 9893);
-            }
-        } catch (ConnectionUnavailableException e) {
-            log.error("Error in connecting to " + host + ":" + port + ". Will retry in the next iteration");
-            return;
-        }
-        // log.info("Active Node Remaining Capacity :   " + eventQueue .getRemainingCapacity());
-        //QueuedEvent queuedEvent = eventQueue.dequeue();
         int numOfEvents = 0;
         messageBuffer.clear();
         messageBuffer.putInt(1);
-        //messageBuffer.putInt(0);
-        //while (queuedEvent != null && messageBuffer.position() < 10485760) {
         try {
             BinaryEventConverter.convertToBinaryMessage(queuedEvent, messageBuffer);
             numOfEvents++;
         } catch (IOException e) {
             log.error("Error in converting events to binary message.Will retry in the next iteration");
         }
-        // log.info("Sent - " + queuedEvent.getSourceHandlerElementId() + " |   " + queuedEvent.getEvent().toString());
-        // queuedEvent = eventQueue.dequeue();
-        //}
         messageBuffer.putInt(0, numOfEvents);
         if (numOfEvents > 0) {
             try {
@@ -95,16 +70,6 @@ public class ActiveNodeEventDispatcher implements Callable {
     }
 
     public void sendEventsToPassiveNode(QueuedEvent[] queuedEvents) {
-        try {
-            if (!tcpNettyClient.isActive()) {
-                tcpNettyClient.connect("localhost", 9893);
-            }
-        } catch (ConnectionUnavailableException e) {
-            log.error("Error in connecting to " + host + ":" + port + ". Will retry in the next iteration");
-            return;
-        }
-        // log.info("Active Node Remaining Capacity :   " + eventQueue .getRemainingCapacity());
-        //QueuedEvent queuedEvent = eventQueue.dequeue();
         int numOfEvents = 0;
         messageBuffer.clear();
         messageBuffer.putInt(1);
@@ -117,16 +82,6 @@ public class ActiveNodeEventDispatcher implements Callable {
                 log.error("Error in converting events to binary message.Will retry in the next iteration");
             }
         }
-        //while (queuedEvent != null && messageBuffer.position() < 10485760) {
-//        try {
-//            BinaryEventConverter.convertToBinaryMessage(queuedEvent, messageBuffer);
-//            numOfEvents++;
-//        } catch (IOException e) {
-//            log.error("Error in converting events to binary message.Will retry in the next iteration");
-//        }
-//        log.info("Sent - " + queuedEvent.getSourceHandlerElementId() + " |   " + queuedEvent.getEvent().toString());
-        // queuedEvent = eventQueue.dequeue();
-        //}
         messageBuffer.putInt(0, numOfEvents);
         if (numOfEvents > 0) {
             try {
@@ -169,12 +124,8 @@ public class ActiveNodeEventDispatcher implements Callable {
         //return new String(output, 0, count, "UTF-8");
     }
 
-    @Override
-    public Object call() throws Exception {
-        if (tcpNettyClient == null) {
-            tcpNettyClient = ((TCPConnection) Thread.currentThread()).getTcpNettyClient();
-        }
-        sendEventToPassiveNode(queuedEvent);
-        return null;
+    public void setTcpNettyClient(TCPNettyClient tcpNettyClient) {
+        this.tcpNettyClient = tcpNettyClient;
     }
+
 }

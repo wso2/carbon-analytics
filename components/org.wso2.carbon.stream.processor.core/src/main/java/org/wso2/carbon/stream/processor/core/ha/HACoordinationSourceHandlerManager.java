@@ -19,10 +19,12 @@
 package org.wso2.carbon.stream.processor.core.ha;
 
 import com.google.common.util.concurrent.ListeningExecutorService;
+import org.apache.commons.pool.impl.GenericKeyedObjectPool;
 import org.wso2.siddhi.core.stream.input.source.SourceHandler;
 import org.wso2.siddhi.core.stream.input.source.SourceHandlerManager;
 
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicLong;
 
 /**
  * Implementation of {@link SourceHandlerManager} used for 2 node minimum HA
@@ -33,16 +35,16 @@ public class HACoordinationSourceHandlerManager extends SourceHandlerManager {
      * Parameter that defines the size of the event queue that is stored in each {@link SourceHandler}
      */
     private int queueCapacity;
-    private ListeningExecutorService listeningExecutorService;
-    private AtomicInteger sequenceID = new AtomicInteger();
+    private GenericKeyedObjectPool tcpConnectionPool;
+    private AtomicLong sequenceID = new AtomicLong();
 
-    public HACoordinationSourceHandlerManager(int queueCapacity, ListeningExecutorService listeningExecutorService) {
+    public HACoordinationSourceHandlerManager(int queueCapacity, GenericKeyedObjectPool tcpConnectionPool) {
         this.queueCapacity = queueCapacity;
-        this.listeningExecutorService = listeningExecutorService;
+        this.tcpConnectionPool = tcpConnectionPool;
     }
 
     @Override
     public SourceHandler generateSourceHandler() {
-        return new HACoordinationSourceHandler(listeningExecutorService, sequenceID);
+        return new HACoordinationSourceHandler(tcpConnectionPool, sequenceID);
     }
 }
