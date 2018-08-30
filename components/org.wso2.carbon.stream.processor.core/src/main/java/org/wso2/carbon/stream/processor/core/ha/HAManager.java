@@ -32,7 +32,6 @@ import org.wso2.carbon.stream.processor.core.ha.util.RequestUtil;
 import org.wso2.carbon.stream.processor.core.internal.StreamProcessorDataHolder;
 import org.wso2.carbon.stream.processor.core.internal.beans.DeploymentConfig;
 import org.wso2.carbon.stream.processor.core.internal.beans.TCPClientPoolConfig;
-import org.wso2.carbon.stream.processor.core.internal.beans.TCPServerConfig;
 import org.wso2.siddhi.core.SiddhiAppRuntime;
 import org.wso2.siddhi.core.SiddhiManager;
 import org.wso2.siddhi.core.exception.CannotRestoreSiddhiAppStateException;
@@ -62,8 +61,6 @@ public class HAManager {
     private int outputSyncInterval;
     private String localHost;
     private String localPort;
-    private Timer syncAfterGracePeriodTimer;
-    private int stateSyncGracePeriod;
     private boolean isActiveNode;
     private String nodeId;
     private String clusterId;
@@ -80,10 +77,8 @@ public class HAManager {
     private boolean isActiveNodeOutputSyncManagerStarted;
     private TCPServer tcpServerInstance = TCPServer.getInstance();
     private EventListMapManager eventListMapManager;
-    private int passiveQueueCapacity;
     private DeploymentConfig deploymentConfig;
     private BlockingQueue<ByteBuffer> eventByteBufferQueue;
-    private TCPServerConfig tcpServerConfig;
     private TCPClientPoolConfig tcpClientPoolConfig;
 
     private final static Map<String, Object> activeNodePropertiesMap = new HashMap<>();
@@ -98,18 +93,15 @@ public class HAManager {
         this.localPort = String.valueOf(deploymentConfig.getLiveSync().getAdvertisedPort());
         this.liveSyncEnabled = deploymentConfig.getLiveSync().isEnabled();
         this.outputSyncInterval = deploymentConfig.getOutputSyncInterval();
-        this.stateSyncGracePeriod = deploymentConfig.getStateSyncGracePeriod();
         this.sinkQueueCapacity = deploymentConfig.getSinkQueueCapacity();
         this.sourceQueueCapacity = deploymentConfig.getSourceQueueCapacity();
         this.username = deploymentConfig.getLiveSync().getUsername();
         this.password = deploymentConfig.getLiveSync().getPassword();
         this.retrySiddhiAppSyncTimerList = new LinkedList<>();
         this.eventListMapManager = new EventListMapManager();
-        this.passiveQueueCapacity = deploymentConfig.getPassiveQueueCapacity();
         this.eventByteBufferQueue = new LinkedBlockingQueue<ByteBuffer>(deploymentConfig.
                 getEventByteBufferQueueCapacity());
         this.deploymentConfig = deploymentConfig;
-        this.tcpServerConfig = deploymentConfig.getTcpServer();
         this.tcpClientPoolConfig = deploymentConfig.getTcpClientPool();
     }
 
@@ -161,7 +153,7 @@ public class HAManager {
             EventListMapManager.initializeEventTreeMap();
 
             //start tcp server
-            tcpServerInstance.start(deploymentConfig.getTcpServer(), eventByteBufferQueue);
+            tcpServerInstance.start(deploymentConfig.getTcpServerConfigs(), eventByteBufferQueue);
         }
 
         NodeInfo nodeInfo = StreamProcessorDataHolder.getNodeInfo();
@@ -202,6 +194,7 @@ public class HAManager {
             //change the system clock to work with current time
             enableEventTimeClock(false);
             startSiddhiAppRuntimes();
+            
             //start the databridge servers
             List<ServerEventListener> listeners = StreamProcessorDataHolder.getServerListeners();
             for (ServerEventListener listener : listeners) {
@@ -210,72 +203,7 @@ public class HAManager {
             NodeInfo nodeInfo = StreamProcessorDataHolder.getNodeInfo();
             nodeInfo.setActiveNode(isActiveNode);
         }
-
-
-//        activeNodePropertiesMap.put("host", localHost);
-//        activeNodePropertiesMap.put("port", localPort);
-//        clusterCoordinator.setPropertiesMap(activeNodePropertiesMap);
-//
-//        if (passiveNodeOutputScheduledFuture != null) {
-//            passiveNodeOutputScheduledFuture.cancel(false);
-//        }
-//        if (passiveNodeOutputSchedulerService != null) {
-//            passiveNodeOutputSchedulerService.shutdown();
-//        }
-//        if (syncAfterGracePeriodTimer != null) {
-//            syncAfterGracePeriodTimer.cancel();
-//            syncAfterGracePeriodTimer.purge();
-//        }
-//        if (retrySiddhiAppSyncTimerList.size() > 0) {
-//            for (Timer timer : retrySiddhiAppSyncTimerList) {
-//                timer.cancel();
-//                timer.purge();
-//            }
-//        }
-//        if (!liveSyncEnabled && !isActiveNodeOutputSyncManagerStarted) {
-//            ScheduledExecutorService scheduledExecutorService = Executors.newSingleThreadScheduledExecutor();
-//            scheduledExecutorService.scheduleAtFixedRate(new ActiveNodeOutputSyncManager(
-//                            sinkHandlerManager, recordTableHandlerManager, clusterCoordinator), 0, outputSyncInterval,
-//                    TimeUnit.MILLISECONDS);
-//            isActiveNodeOutputSyncManagerStarted = true;
-//        }
-//        ScheduledExecutorService scheduledExecutorService = Executors.newSingleThreadScheduledExecutor();
-//        scheduledExecutorService.scheduleAtFixedRate(new ActiveNodeEventDispatcher(eventQueue, "localhost", 9892),
-//                0, 1000, TimeUnit.MILLISECONDS);
-//        NodeInfo nodeInfo = StreamProcessorDataHolder.getNodeInfo();
-//        nodeInfo.setActiveNode(isActiveNode);
     }
-
-//    /**
-//     * Implements a timer task to run after specified time interval to sync with active node
-//     *
-//     * @param gracePeriod time given for passive node to connect to all sources before re-syncing with active node
-//     * @return reference to the timer. Can be used to cancel task if needed
-//     */
-//    private Timer liveSyncAfterGracePeriod(int gracePeriod) {
-//
-//        Timer timer = new Timer();
-//        timer.schedule(new TimerTask() {
-//            @Override
-//            public void run() {
-//                log.info("Passive Node: Borrowing state from active node after " + gracePeriod / 1000 + " seconds");
-//                Map<String, SourceHandler> sourceHandlerMap = sourceHandlerManager.getRegsiteredSourceHandlers();
-//                for (SourceHandler sourceHandler : sourceHandlerMap.values()) {
-//                    if (log.isDebugEnabled()) {
-//                        log.debug("Setting source handler with ID " + sourceHandler.getElementId() +
-//                                " to collect events in buffer");
-//                    }
-//                    ((HACoordinationSourceHandler) sourceHandler).collectEvents(true);
-//                }
-//
-//                boolean isPersisted = persistActiveNode(activeNodeHost, activeNodePort);
-//                if (isPersisted) {
-//                    syncState();
-//                }
-//            }
-//        }, gracePeriod);
-//        return timer;
-//    }
 
     private void syncState() {
         ConcurrentMap<String, SiddhiAppRuntime> siddhiAppRuntimeMap

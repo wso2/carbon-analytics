@@ -102,7 +102,7 @@ public class DeploymentConfig {
         this.passiveQueueCapacity = passiveQueueCapacity;
     }
 
-    public TCPServerConfig getTcpServer() {
+    public TCPServerConfig getTcpServerConfigs() {
 
         return tcpServer;
     }

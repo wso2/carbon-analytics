@@ -87,7 +87,7 @@ public class EventListMapManager {
         }
     }
 
-    public void addToTreeMap(long sequenceNum, QueuedEvent queuedEvent){
+    public void addToEventListMap(long sequenceNum, QueuedEvent queuedEvent){
         eventListMap.put(sequenceNum, queuedEvent);
     }
 }

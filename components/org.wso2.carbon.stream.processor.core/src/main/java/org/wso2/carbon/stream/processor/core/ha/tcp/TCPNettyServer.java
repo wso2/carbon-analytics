@@ -153,13 +153,14 @@ public class TCPNettyServer {
                         String[] attributeTypes = attributes.substring(1, attributes.length() - 1).split(", ");
                         events[i] = SiddhiEventConverter.getEvent(eventContent, attributeTypes);
                         queuedEvent = new QueuedEvent(siddhiAppName, sourceHandlerElementId, sequenceID, events[i]);
-                        eventListMapManager.addToTreeMap(sequenceID, queuedEvent);
+                        eventListMapManager.addToEventListMap(sequenceID, queuedEvent);
                     }
                 }
             } catch (UnsupportedEncodingException e) {
                 //todo
             } catch (InterruptedException e) {
-                e.printStackTrace();//todo
+                Thread.currentThread().interrupt();
+                log.warn("Job is interrupted", e);
             }
         }
     }
