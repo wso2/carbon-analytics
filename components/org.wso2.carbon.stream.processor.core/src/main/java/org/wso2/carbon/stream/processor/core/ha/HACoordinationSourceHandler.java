@@ -101,6 +101,13 @@ public class HACoordinationSourceHandler extends SourceHandler {
         isActiveNode = true;
     }
 
+    /**
+     * Method to change the source handler to Passive state so that events will not be processed.
+     */
+    public void setAsPassive() {
+        isActiveNode = false;
+    }
+
     @Override
     public Map<String, Object> currentState() {
         Map<String, Object> currentState = new HashMap<>();

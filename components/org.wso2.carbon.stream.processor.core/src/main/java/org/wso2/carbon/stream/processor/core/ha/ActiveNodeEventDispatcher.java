@@ -72,7 +72,7 @@ public class ActiveNodeEventDispatcher {
     public void sendEventsToPassiveNode(QueuedEvent[] queuedEvents) {
         int numOfEvents = 0;
         messageBuffer.clear();
-        messageBuffer.putInt(1);
+        //messageBuffer.putInt(1);
         messageBuffer.putInt(0);
         for (QueuedEvent queuedEvent : queuedEvents) {
             try {

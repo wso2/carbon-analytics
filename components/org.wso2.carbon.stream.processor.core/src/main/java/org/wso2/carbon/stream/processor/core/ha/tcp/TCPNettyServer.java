@@ -108,8 +108,9 @@ public class TCPNettyServer {
 
     }
 
-    public void shutdownScheduler() {//todo check whether need to handle interrupted exception
+    public void clearResources() {//todo check whether need to handle interrupted exception
         eventBufferExtractorFuture.cancel(true);
+        eventByteBufferQueue.clear();
     }
 
     /**
@@ -122,6 +123,7 @@ public class TCPNettyServer {
             try {
                 while (true) {
                     ByteBuffer eventContent = eventByteBufferQueue.take();
+                    log.info("took from queue '" + eventByteBufferQueue.size());
                     int noOfEvents = eventContent.getInt();
                     QueuedEvent queuedEvent;
                     Event[] events = new Event[noOfEvents];

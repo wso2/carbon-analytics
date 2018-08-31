@@ -108,7 +108,7 @@ public class HAManager {
     public void start() {
         sourceHandlerManager = new HACoordinationSourceHandlerManager(sourceQueueCapacity, getTCPClientConnectionPool
                 (tcpClientPoolConfig.getHost(), tcpClientPoolConfig.getPort()));
-        sinkHandlerManager = new HACoordinationSinkHandlerManager(sinkQueueCapacity);
+        sinkHandlerManager = new HACoordinationSinkHandlerManager();
         recordTableHandlerManager = new HACoordinationRecordTableHandlerManager(sinkQueueCapacity);
 
         StreamProcessorDataHolder.setSinkHandlerManager(sinkHandlerManager);
@@ -146,7 +146,6 @@ public class HAManager {
                         TimeUnit.MILLISECONDS);
                 isActiveNodeOutputSyncManagerStarted = true;
             }
-            ScheduledExecutorService scheduledExecutorService = Executors.newSingleThreadScheduledExecutor();
         } else {
             log.info("HA Deployment: Starting up as Passive Node");
             //initialize passive queue
@@ -164,7 +163,7 @@ public class HAManager {
     }
 
     /**
-     * Stops TCP server
+     * Stops TCP server//todo
      * Sync state
      * start siddhi app runtimes
      */
@@ -181,7 +180,7 @@ public class HAManager {
                     log.warn("Error in checking byte buffer queue empty");
                 }
             }
-            tcpServerInstance.shutdownOtherResources();
+            tcpServerInstance.clearResources();
             //change the system clock to work with event time
             enableEventTimeClock(true);
             try {
@@ -194,7 +193,7 @@ public class HAManager {
             //change the system clock to work with current time
             enableEventTimeClock(false);
             startSiddhiAppRuntimes();
-            
+
             //start the databridge servers
             List<ServerEventListener> listeners = StreamProcessorDataHolder.getServerListeners();
             for (ServerEventListener listener : listeners) {
@@ -203,6 +202,17 @@ public class HAManager {
             NodeInfo nodeInfo = StreamProcessorDataHolder.getNodeInfo();
             nodeInfo.setActiveNode(isActiveNode);
         }
+    }
+
+    //comment todo
+    void changeToPassive() {
+        isActiveNode = false;
+        //todo check if any other active resources to be closed when becoming active
+        //initialize passive queue
+        EventListMapManager.initializeEventTreeMap();
+
+        //start tcp server
+        tcpServerInstance.start(deploymentConfig.getTcpServerConfigs(), eventByteBufferQueue);
     }
 
     private void syncState() {

@@ -55,8 +55,8 @@ public class TCPServer {
         }
     }
 
-    public void shutdownOtherResources() {
-        tcpNettyServer.shutdownScheduler();
+    public void clearResources() {
+        tcpNettyServer.clearResources();
     }
 
 }

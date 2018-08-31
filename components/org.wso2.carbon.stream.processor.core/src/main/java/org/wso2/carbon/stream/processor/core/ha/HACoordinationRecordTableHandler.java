@@ -214,6 +214,13 @@ public class HACoordinationRecordTableHandler extends RecordTableHandler {
     }
 
     /**
+     * Method that changes the state when node becomes passive
+     */
+    public void setAsPassive() {
+        this.isActiveNode = false;
+    }
+
+    /**
      * Update the event queue according to the last processed event timestamp of the active node in given record table.
      *
      * @param lastActiveNodeOperationTimestamp timestamp of last processed event of active nodes record table.
