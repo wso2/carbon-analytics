@@ -123,7 +123,6 @@ public class TCPNettyServer {
             try {
                 while (true) {
                     ByteBuffer eventContent = eventByteBufferQueue.take();
-                    log.info("took from queue '" + eventByteBufferQueue.size());
                     int noOfEvents = eventContent.getInt();
                     QueuedEvent queuedEvent;
                     Event[] events = new Event[noOfEvents];
