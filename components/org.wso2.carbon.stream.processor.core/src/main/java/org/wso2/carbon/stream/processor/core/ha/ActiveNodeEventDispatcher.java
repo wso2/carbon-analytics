@@ -21,6 +21,7 @@ package org.wso2.carbon.stream.processor.core.ha;
 import org.apache.log4j.Logger;
 import org.wso2.carbon.stream.processor.core.event.queue.QueuedEvent;
 import org.wso2.carbon.stream.processor.core.ha.transport.TCPNettyClient;
+import org.wso2.carbon.stream.processor.core.ha.util.HAConstants;
 import org.wso2.carbon.stream.processor.core.util.BinaryEventConverter;
 import org.wso2.siddhi.core.exception.ConnectionUnavailableException;
 
@@ -62,7 +63,7 @@ public class ActiveNodeEventDispatcher {
         if (numOfEvents > 0) {
             try {
                 data = Arrays.copyOfRange(messageBuffer.array(), 0, messageBuffer.position());
-                tcpNettyClient.send("eventMessage", data);
+                tcpNettyClient.send(HAConstants.CHANNEL_ID_MESSAGE, data);
             } catch (ConnectionUnavailableException e) {
                 log.error("Error in sending events to " + host + ":" + port + ".Will retry in the next iteration");
             }
@@ -85,7 +86,7 @@ public class ActiveNodeEventDispatcher {
         if (numOfEvents > 0) {
             try {
                 data = Arrays.copyOfRange(messageBuffer.array(), 0, messageBuffer.position());
-                tcpNettyClient.send("eventMessage", data);
+                tcpNettyClient.send(HAConstants.CHANNEL_ID_MESSAGE, data);
             } catch (ConnectionUnavailableException e) {
                 log.error("Error in sending events to " + host + ":" + port + ".Will retry in the next iteration");
             }

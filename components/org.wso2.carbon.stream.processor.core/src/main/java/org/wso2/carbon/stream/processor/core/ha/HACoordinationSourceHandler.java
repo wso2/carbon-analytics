@@ -118,12 +118,8 @@ public class HACoordinationSourceHandler extends SourceHandler {
     }
 
     @Override
-    public void restoreState(Map<String, Object> map) {//todo
-//        if (map != null) {
-//            if (map.get(CoordinationConstants.ACTIVE_PROCESSED_LAST_TIMESTAMP) != null) {
-//                processBufferedEvents((Long) map.get(CoordinationConstants.ACTIVE_PROCESSED_LAST_TIMESTAMP));
-//            }
-//        }
+    public void restoreState(Map<String, Object> map) {
+        //do nothing
     }
 
     @Override

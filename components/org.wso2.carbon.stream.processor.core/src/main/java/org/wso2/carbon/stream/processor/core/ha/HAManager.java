@@ -135,6 +135,7 @@ public class HAManager {
      */
     void changeToActive() {
         if (!isActiveNode) {
+            isActiveNode = true;
             tcpServerInstance.stop();
             syncState();
 
@@ -152,9 +153,8 @@ public class HAManager {
             try {
                 eventListMapManager.trimAndSendToInputHandler();
             } catch (InterruptedException e) {
-                e.printStackTrace();//todo
+                log.warn("Error in sending events to input handler." + e.getMessage());
             }
-            isActiveNode = true;
 
             //change the system clock to work with current time
             enableEventTimeClock(false);
@@ -175,11 +175,11 @@ public class HAManager {
 
     /**
      * Start TCP server
-     * Initialize eventByteBufferQueue
+     * Initialize eventEventListMap
      */
     void changeToPassive() {
         isActiveNode = false;
-        //initialize passive queue
+        //initialize event list map
         EventListMapManager.initializeEventListMap();
 
         //start tcp server

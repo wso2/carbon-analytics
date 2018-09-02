@@ -22,6 +22,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.wso2.carbon.stream.processor.core.ha.HAManager;
 import org.wso2.carbon.stream.processor.core.ha.transport.TCPNettyClient;
+import org.wso2.carbon.stream.processor.core.ha.util.HAConstants;
 import org.wso2.carbon.stream.processor.core.internal.StreamProcessorDataHolder;
 import org.wso2.siddhi.core.SiddhiAppRuntime;
 import org.wso2.siddhi.core.exception.ConnectionUnavailableException;
@@ -73,13 +74,13 @@ public class PersistenceManager implements Runnable {
         }
     }
 
-    private void sendControlMessageToPassiveNode(String[] siddhiRevisionArray) {//todo
+    private void sendControlMessageToPassiveNode(String[] siddhiRevisionArray) {//todo hardcoded port and host
         try {
             if (!tcpNettyClient.isActive()) {
                 tcpNettyClient.connect("localhost", 9893);
             }
             String siddhiAppRevisions = Arrays.toString(siddhiRevisionArray);
-            tcpNettyClient.send("controlMessage", siddhiAppRevisions.getBytes());
+            tcpNettyClient.send(HAConstants.CHANNEL_ID_CONTROL_MESSAGE, siddhiAppRevisions.getBytes());
         } catch (ConnectionUnavailableException e) {
             log.error("Error in connecting to 'localhost' and '9892' of the Passive node");
         }

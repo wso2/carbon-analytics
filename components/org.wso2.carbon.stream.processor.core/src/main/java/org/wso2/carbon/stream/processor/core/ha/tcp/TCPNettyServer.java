@@ -31,6 +31,7 @@ import org.apache.log4j.Logger;
 import org.wso2.carbon.stream.processor.core.event.queue.EventListMapManager;
 import org.wso2.carbon.stream.processor.core.event.queue.QueuedEvent;
 import org.wso2.carbon.stream.processor.core.ha.transport.handlers.MessageDecoder;
+import org.wso2.carbon.stream.processor.core.ha.util.HAConstants;
 import org.wso2.carbon.stream.processor.core.internal.beans.TCPServerConfig;
 import org.wso2.carbon.stream.processor.core.util.BinaryMessageConverterUtil;
 import org.wso2.siddhi.core.event.Event;
@@ -57,7 +58,8 @@ public class TCPNettyServer {
     private static final Logger log = Logger.getLogger(TCPNettyServer.class);
     private EventListMapManager eventListMapManager = new EventListMapManager();
     private BlockingQueue<ByteBuffer> eventByteBufferQueue;
-    private ExecutorService executorService = Executors.newFixedThreadPool(5);//todo constants
+    private ExecutorService eventBufferExtractorExecutorService = Executors.newFixedThreadPool(
+            HAConstants.EVENT_BUFFER_EXTRACTOR_THREAD_POOL_SIZE);
     private EventBufferExtractor eventBufferExtractor = new EventBufferExtractor();
     private Future eventBufferExtractorFuture;
 
@@ -86,11 +88,11 @@ public class TCPNettyServer {
         try {
             // Bind and start to accept incoming connections.
             channelFuture = bootstrap.bind(serverConfig.getHost(), serverConfig.getPort()).sync();
+            eventBufferExtractorFuture = eventBufferExtractorExecutorService.submit(eventBufferExtractor);
             log.info("Tcp Server started in " + hostAndPort + "");
         } catch (InterruptedException e) {
             log.error("Error when booting up tcp server on '" + hostAndPort + "' " + e.getMessage(), e);
         }
-        eventBufferExtractorFuture = executorService.submit(eventBufferExtractor);
     }
 
     public void shutdownGracefully() {
@@ -108,7 +110,7 @@ public class TCPNettyServer {
 
     }
 
-    public void clearResources() {//todo check whether need to handle interrupted exception
+    public void clearResources() {
         eventBufferExtractorFuture.cancel(true);
         eventByteBufferQueue.clear();
     }
@@ -158,10 +160,10 @@ public class TCPNettyServer {
                     }
                 }
             } catch (UnsupportedEncodingException e) {
-                //todo
+                log.error("Error when converting bytes " + e.getMessage(), e);
             } catch (InterruptedException e) {
                 Thread.currentThread().interrupt();
-                log.warn("Job is interrupted", e);
+                log.warn("EventBufferExtractor Job is interrupted");
             }
         }
     }

@@ -23,6 +23,7 @@ import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.ByteToMessageDecoder;
 import org.apache.log4j.Logger;
 import org.wso2.carbon.stream.processor.core.event.queue.EventListMapManager;
+import org.wso2.carbon.stream.processor.core.ha.util.HAConstants;
 import org.wso2.carbon.stream.processor.core.util.BinaryMessageConverterUtil;
 
 import java.io.UnsupportedEncodingException;
@@ -75,7 +76,7 @@ public class MessageDecoder extends ByteToMessageDecoder {
             in.readBytes(bytes);
             //LOG.info("Message Received : " + new String(bytes));
 
-            if (channelId.equals("eventMessage")) { //todo constants
+            if (channelId.equals(HAConstants.CHANNEL_ID_MESSAGE)) {
                 ByteBuffer messageBuffer = ByteBuffer.wrap(bytes);
                 byteBufferQueue.offer(messageBuffer);
                 count++;
@@ -88,7 +89,7 @@ public class MessageDecoder extends ByteToMessageDecoder {
                 }
                 //Event[] events = SiddhiEventConverter.toConvertAndEnqueue(ByteBuffer.wrap(bytes),eventQueueManager);
                 // LOG.info("Event Received : " + events.toString());
-            } else if (channelId.equals("controlMessage")) {//todo add constants
+            } else if (channelId.equals(HAConstants.CHANNEL_ID_CONTROL_MESSAGE)) {
                 String message = new String(bytes);
                 message = message.replace ("[", "");
                 message = message.replace ("]", "");

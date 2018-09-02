@@ -18,6 +18,7 @@
 
 package org.wso2.carbon.stream.processor.core.event.queue;
 
+import org.wso2.carbon.stream.processor.core.ha.util.HAConstants;
 import org.wso2.carbon.stream.processor.core.internal.SiddhiAppData;
 import org.wso2.carbon.stream.processor.core.internal.StreamProcessorDataHolder;
 import org.wso2.siddhi.core.stream.input.source.Source;
@@ -47,7 +48,8 @@ public class EventListMapManager {
             String revision = StreamProcessorDataHolder.getSiddhiManager().
                     getLastRevision(entry.getKey());
             if(revision != null){
-                long persistedTimestamp =  Long.parseLong(revision.split("_")[0].trim());
+                long persistedTimestamp =  Long.parseLong(revision.split(
+                        HAConstants.REVISION_SPLIT_DELIMITER)[0].trim());
                 Collection<List<Source>> sourceCollection = entry.getValue().getSiddhiAppRuntime().getSources();
                 for (List<Source> sources : sourceCollection) {
                     for (Source source : sources) {
@@ -71,12 +73,12 @@ public class EventListMapManager {
     public void trimQueue(String[] persistedAppDetails){
         if (eventListMap.size() != 0){
             for(String appDetail : persistedAppDetails){
-                String[] details = appDetail.split("__");//todo add constants
+                String[] details = appDetail.split(HAConstants.PERSISTED_APP_SPLIT_DELIMITER);
                 String appName = details[1].trim();
                 long timestamp = Long.valueOf(details[0].trim());
-                for(Map.Entry<Long,QueuedEvent> treeMapValue : eventListMap.entrySet()) {
-                    long key = treeMapValue.getKey();
-                    QueuedEvent queuedEvent = treeMapValue.getValue();
+                for(Map.Entry<Long,QueuedEvent> listMapValue : eventListMap.entrySet()) {
+                    long key = listMapValue.getKey();
+                    QueuedEvent queuedEvent = listMapValue.getValue();
                     if(queuedEvent.getSiddhiAppName().equals(appName) &&
                             timestamp >= queuedEvent.getEvent().getTimestamp()){
                         eventListMap.remove(key);
