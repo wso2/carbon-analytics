@@ -149,7 +149,7 @@ public class HAManager {
         } else {
             log.info("HA Deployment: Starting up as Passive Node");
             //initialize passive queue
-            EventListMapManager.initializeEventTreeMap();
+            EventListMapManager.initializeEventListMap();
 
             //start tcp server
             tcpServerInstance.start(deploymentConfig.getTcpServerConfigs(), eventByteBufferQueue);
@@ -163,9 +163,11 @@ public class HAManager {
     }
 
     /**
-     * Stops TCP server//todo
-     * Sync state
-     * start siddhi app runtimes
+     * Stops TCP server and other resources
+     * Sync state from persisted information
+     * Playback events
+     * Start siddhi app runtimes
+     * Start databridge servers
      */
     void changeToActive() {
         if (!isActiveNode) {
@@ -201,18 +203,26 @@ public class HAManager {
             }
             NodeInfo nodeInfo = StreamProcessorDataHolder.getNodeInfo();
             nodeInfo.setActiveNode(isActiveNode);
+            if (log.isDebugEnabled()) {
+                log.debug("Successfully Changed to Active Mode ");
+            }
         }
     }
 
-    //comment todo
+    /**
+     * Start TCP server
+     */
     void changeToPassive() {
         isActiveNode = false;
         //todo check if any other active resources to be closed when becoming active
         //initialize passive queue
-        EventListMapManager.initializeEventTreeMap();
+        EventListMapManager.initializeEventListMap();
 
         //start tcp server
         tcpServerInstance.start(deploymentConfig.getTcpServerConfigs(), eventByteBufferQueue);
+        if (log.isDebugEnabled()) {
+            log.debug("Successfully Changed to Passive Mode ");
+        }
     }
 
     private void syncState() {
@@ -232,6 +242,9 @@ public class HAManager {
                 log.error("Error in restoring Siddhi Application: " + siddhiAppRuntime.getName(), e);
             }
         });
+        if (log.isDebugEnabled()) {
+            log.debug("Successfully Synced the state ");
+        }
     }
 
     private void enableEventTimeClock(boolean enablePlayBack) {
@@ -245,6 +258,9 @@ public class HAManager {
             }
             siddhiAppRuntime.enablePlayBack(enablePlayBack, null, null);
         });
+        if (log.isDebugEnabled()) {
+            log.debug("Changed event play back mode = " + enablePlayBack);
+        }
     }
 
     private void startSiddhiAppRuntimes() {

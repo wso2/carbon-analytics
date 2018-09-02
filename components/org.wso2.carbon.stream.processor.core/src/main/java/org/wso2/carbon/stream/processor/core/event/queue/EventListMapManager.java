@@ -33,7 +33,7 @@ public class EventListMapManager {
     public EventListMapManager() {
     }
 
-    public static ConcurrentSkipListMap<Long,QueuedEvent> initializeEventTreeMap() {
+    public static ConcurrentSkipListMap<Long,QueuedEvent> initializeEventListMap() {
         eventListMap = new ConcurrentSkipListMap<Long, QueuedEvent>();
         return eventListMap;
     }
