@@ -47,7 +47,7 @@ public class HAEventListener extends MemberEventListener {
     private BackoffRetryCounter backoffRetryCounter = new BackoffRetryCounter();
 
     @Override
-    public void memberAdded(NodeDetail nodeDetail) {
+    public void memberAdded(NodeDetail nodeDetail) {//todo
       //  System.out.println("#########################################");
         ClusterCoordinator clusterCoordinator = StreamProcessorDataHolder.getClusterCoordinator();
             if (!nodeDetail.isCoordinator()) {

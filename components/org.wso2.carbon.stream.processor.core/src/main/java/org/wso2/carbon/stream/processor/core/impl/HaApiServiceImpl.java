@@ -52,7 +52,7 @@ public class HaApiServiceImpl extends HaApiService {
 
     private static final Logger log = Logger.getLogger(HaApiServiceImpl.class);
 
-    public Response haOutputSyncTimestampGet() throws NotFoundException {
+    public Response haOutputSyncTimestampGet() throws NotFoundException {//todo
 
         SinkHandlerManager sinkHandlerManager = StreamProcessorDataHolder.getSinkHandlerManager();
         Map<String, SinkHandler> registeredSinkHandlers = sinkHandlerManager.getRegisteredSinkHandlers();
@@ -90,40 +90,6 @@ public class HaApiServiceImpl extends HaApiService {
         }
         return Response.ok().entity(new OutputSyncTimestampCollection(lastPublishedTimestamps,
                 lastRecordTableOperationTimestamp)).build();
-    }
-
-    @Override
-    public Response haStateGet() throws NotFoundException, IOException {
-
-        try {
-            Map<String, SiddhiAppData> siddhiAppMap = StreamProcessorDataHolder.getStreamProcessorService().
-                    getSiddhiAppMap();
-            for (Map.Entry<String, SiddhiAppData> siddhiAppMapEntry : siddhiAppMap.entrySet()) {
-                SiddhiAppRuntime siddhiAppRuntime = siddhiAppMapEntry.getValue().getSiddhiAppRuntime();
-                if (siddhiAppRuntime != null) {
-                    PersistenceReference persistenceReference = siddhiAppRuntime.persist();
-                    Future fullStateFuture = persistenceReference.getFullStateFuture();
-                    if (fullStateFuture != null) {
-                        fullStateFuture.get(StreamProcessorDataHolder.getDeploymentConfig().getLiveSync().getStateSyncTimeout(),
-                                TimeUnit.MILLISECONDS);
-                    } else {
-                        for (Future future: persistenceReference.getIncrementalStateFuture()) {
-                            future.get(StreamProcessorDataHolder.getDeploymentConfig().getLiveSync().getStateSyncTimeout(),
-                                    TimeUnit.MILLISECONDS);
-                        }
-                    }
-                } else {
-                    log.error("Active Node: Persisting of Siddhi app " + siddhiAppMapEntry.getValue() +
-                            " not successful. Check if app deployed properly");
-                }
-            }
-        } catch (Exception e) {
-            log.error("Error while persisting siddhi applications. " + e.getMessage(), e);
-            return Response.serverError().build();
-        }
-
-        log.info("Active Node: Persisting of all Siddhi Applications on request of passive node successful");
-        return Response.ok().entity(Response.Status.OK).build();
     }
 
     @Override

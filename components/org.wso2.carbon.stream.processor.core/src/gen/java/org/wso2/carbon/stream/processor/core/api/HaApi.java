@@ -46,7 +46,7 @@ import javax.ws.rs.core.Response;
 @Api(description = "APIs for HA Deployment")
 @javax.annotation.Generated(value = "io.swagger.codegen.languages.JavaMSF4JServerCodegen",
         date = "2017-09-21T09:31:22.101Z")
-public class HaApi implements Microservice {
+public class HaApi implements Microservice {//todo check we need this API
     private final HaApiService delegate = HaApiServiceFactory.getHaApi();
 
     @GET
@@ -66,21 +66,21 @@ public class HaApi implements Microservice {
         return delegate.haOutputSyncTimestampGet();
     }
 
-    @GET
-    @Path("/state")
-    @Produces({"application/json"})
-    @ApiResponses(value = {
-            @ApiResponse(
-                    code = 200,
-                    message = "The state of all Siddhi applications successfully persisted."),
-
-            @ApiResponse(
-                    code = 500,
-                    message = "Internal error occured when persisting states of all Siddhi applications."),
-    })
-    public Response haStateGet() throws NotFoundException, IOException {
-        return delegate.haStateGet();
-    }
+//    @GET//todo
+//    @Path("/state")
+//    @Produces({"application/json"})
+//    @ApiResponses(value = {
+//            @ApiResponse(
+//                    code = 200,
+//                    message = "The state of all Siddhi applications successfully persisted."),
+//
+//            @ApiResponse(
+//                    code = 500,
+//                    message = "Internal error occured when persisting states of all Siddhi applications."),
+//    })
+//    public Response haStateGet() throws NotFoundException, IOException {
+//        return delegate.haStateGet();
+//    }
 
     @GET
     @Path("/state/{siddhiAppName}")

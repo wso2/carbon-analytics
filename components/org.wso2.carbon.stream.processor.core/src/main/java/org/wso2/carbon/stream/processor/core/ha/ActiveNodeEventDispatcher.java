@@ -92,7 +92,7 @@ public class ActiveNodeEventDispatcher {
         }
     }
 
-    public static byte[] compress(byte[] dataBytes) {
+    public static byte[] compress(byte[] dataBytes) {//todo
         //count++;
         Deflater deflater = new Deflater(Deflater.BEST_COMPRESSION);
         //byte[] dataBytes = data.getBytes("UTF-8");

@@ -34,7 +34,7 @@ import java.util.Arrays;
 /**
  * This is a Util class help to convert from Siddhi event to Binary message.
  */
-public class BinaryEventConverter {
+public class BinaryEventConverter {//todo
 
 //    public static ByteBuffer convertToBinaryMessage(QueuedEvent queuedEvent) throws IOException {
 //        Event event = queuedEvent.getEvent();

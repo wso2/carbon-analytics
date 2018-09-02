@@ -25,14 +25,8 @@ import org.wso2.carbon.config.annotation.Configuration;
 public class DeploymentConfig {
 
     private String type;
-    private LiveSyncConfig liveSync;
     private TCPServerConfig tcpServer;
-    private int outputSyncInterval = 60000;
-    private int stateSyncGracePeriod = 120000;
-    private int sinkQueueCapacity = 20000;
-    private int sourceQueueCapacity = 20000;
-    private int retryAppSyncPeriod = 60000;
-    private int passiveQueueCapacity = 20000;
+    private int recordTableQueueCapacity = 20000;
     private int eventByteBufferQueueCapacity = 20000;
     private TCPClientPoolConfig tcpClientPool;
 
@@ -42,64 +36,6 @@ public class DeploymentConfig {
 
     public void setType(String type) {
         this.type = type;
-    }
-
-    public LiveSyncConfig getLiveSync() {
-        return liveSync;
-    }
-
-    public void setLiveSync(LiveSyncConfig liveSync) {
-        this.liveSync = liveSync;
-    }
-
-    public int getOutputSyncInterval() {
-        return outputSyncInterval;
-    }
-
-    public void setOutputSyncInterval(int outputSyncInterval) {
-        this.outputSyncInterval = outputSyncInterval;
-    }
-
-    public int getStateSyncGracePeriod() {
-        return stateSyncGracePeriod;
-    }
-
-    public void setStateSyncGracePeriod(int stateSyncGracePeriod) {
-        this.stateSyncGracePeriod = stateSyncGracePeriod;
-    }
-
-    public int getSinkQueueCapacity() {
-        return sinkQueueCapacity;
-    }
-
-    public void setSinkQueueCapacity(int sinkQueueCapacity) {
-        this.sinkQueueCapacity = sinkQueueCapacity;
-    }
-
-    public int getSourceQueueCapacity() {
-        return sourceQueueCapacity;
-    }
-
-    public void setSourceQueueCapacity(int sourceQueueCapacity) {
-        this.sourceQueueCapacity = sourceQueueCapacity;
-    }
-
-    public int getRetryAppSyncPeriod() {
-        return retryAppSyncPeriod;
-    }
-
-    public void setRetryAppSyncPeriod(int retryAppSyncPeriod) {
-        this.retryAppSyncPeriod = retryAppSyncPeriod;
-    }
-
-    public int getPassiveQueueCapacity() {
-
-        return passiveQueueCapacity;
-    }
-
-    public void setPassiveQueueCapacity(int passiveQueueCapacity) {
-
-        this.passiveQueueCapacity = passiveQueueCapacity;
     }
 
     public TCPServerConfig getTcpServerConfigs() {
@@ -127,5 +63,15 @@ public class DeploymentConfig {
 
     public void setTcpClientPool(TCPClientPoolConfig tcpClientPool) {
         this.tcpClientPool = tcpClientPool;
+    }
+
+    public int getRecordTableQueueCapacity() {
+
+        return recordTableQueueCapacity;
+    }
+
+    public void setRecordTableQueueCapacity(int recordTableQueueCapacity) {
+
+        this.recordTableQueueCapacity = recordTableQueueCapacity;
     }
 }

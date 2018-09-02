@@ -33,52 +33,9 @@ import java.util.zip.Inflater;
  * This class is a implementation EventConverter to create the event from the Binary message.
  * This is used within data bridge to create the event from the row message received.
  */
-public class SiddhiEventConverter {
+public class SiddhiEventConverter {//todo
     static final Logger LOG = Logger.getLogger(SiddhiEventConverter.class);
     private static int count = 0;
-
-//    public static Event[] toConvertAndEnqueue(ByteBuffer messageBuffer, EventListMapManager eventQueueManager) {
-//        try {
-//            messageBuffer = decompress(messageBuffer);
-//           // int isCompressed = messageBuffer.getInt();
-//            int noOfEvents = messageBuffer.getInt();
-//            QueuedEvent queuedEvent;
-//            LOG.info("No events in the received batch :     " + noOfEvents);
-//            Event[] events = new Event[noOfEvents];
-//            for (int i = 0; i < noOfEvents; i++) {
-//                String sourceHandlerElementId;
-//                int stringSize = messageBuffer.getInt();
-//                if (stringSize == 0) {
-//                    sourceHandlerElementId = null;
-//                } else {
-//                    sourceHandlerElementId = BinaryMessageConverterUtil.getString(messageBuffer, stringSize);
-//                }
-//
-//                String attributes;
-//                stringSize = messageBuffer.getInt();
-//                if (stringSize == 0) {
-//                    attributes = null;
-//                } else {
-//                    attributes = BinaryMessageConverterUtil.getString(messageBuffer, stringSize);
-//                }
-//                String[] attributeTypes = attributes.substring(1, attributes.length() - 1).split(", ");
-//                events[i] = getEvent(messageBuffer, attributeTypes);
-//                queuedEvent = new QueuedEvent(sourceHandlerElementId,getEvent(messageBuffer, attributeTypes));
-//                eventQueueManager.addToQueue(queuedEvent);
-//                count++;
-//                LOG.info("RECEIVED EVENT - " + sourceHandlerElementId + "       ||      " + events[0].toString() + " " +
-//                        "   |   COUNT " + count);
-//            }
-//            return events;
-//        } catch (UnsupportedEncodingException e) {
-//            LOG.error(e.getMessage(), e);
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//        } catch (DataFormatException e) {
-//            e.printStackTrace();
-//        }
-//        return null;
-//    }
 
 
     public static ByteBuffer decompress(ByteBuffer byteBuffer) throws IOException, DataFormatException {

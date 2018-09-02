@@ -352,17 +352,6 @@ public class ServiceComponent {
                     throw new HAModeException("More than two nodes can not be used in the minimum HA mode. " +
                             "Use another clustering mode, change the groupId or disable clustering.");
                 }
-
-                if (deploymentConfig.getLiveSync().isEnabled()) {
-                    String advertisedHost = deploymentConfig.getLiveSync().getAdvertisedHost();
-                    int advertisedPort = deploymentConfig.getLiveSync().getAdvertisedPort();
-
-                    if (("").equals(advertisedHost) || advertisedPort == 0) {
-                        throw new ConfigurationException("Two Node Minimum HA live sync has been enabled but " +
-                                CoordinationConstants.ADVERTISED_HOST + " or " + CoordinationConstants.ADVERTISED_PORT
-                                + " has not been set in deployment.yaml");
-                    }
-                }
                 log.info("WSO2 Stream Processor Starting in Two Node Minimum HA Deployment");
 
                 String nodeId = configProvider.getConfigurationObject(CarbonConfiguration.class).getId();

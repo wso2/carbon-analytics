@@ -28,7 +28,6 @@ import org.wso2.carbon.stream.processor.core.event.queue.EventListMapManager;
 import org.wso2.carbon.stream.processor.core.ha.tcp.TCPServer;
 import org.wso2.carbon.stream.processor.core.ha.transport.ClientPool;
 import org.wso2.carbon.stream.processor.core.ha.transport.ClientPoolFactory;
-import org.wso2.carbon.stream.processor.core.ha.util.RequestUtil;
 import org.wso2.carbon.stream.processor.core.internal.StreamProcessorDataHolder;
 import org.wso2.carbon.stream.processor.core.internal.beans.DeploymentConfig;
 import org.wso2.carbon.stream.processor.core.internal.beans.TCPClientPoolConfig;
@@ -36,20 +35,13 @@ import org.wso2.siddhi.core.SiddhiAppRuntime;
 import org.wso2.siddhi.core.SiddhiManager;
 import org.wso2.siddhi.core.exception.CannotRestoreSiddhiAppStateException;
 
-import java.net.URI;
 import java.nio.ByteBuffer;
 import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Timer;
-import java.util.TimerTask;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ConcurrentMap;
-import java.util.concurrent.Executors;
 import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
 
 /**
  * Class that manages Active and Passive nodes in a 2 node minimum HA configuration
@@ -57,24 +49,13 @@ import java.util.concurrent.TimeUnit;
 public class HAManager {
 
     private ClusterCoordinator clusterCoordinator;
-    private boolean liveSyncEnabled;
-    private int outputSyncInterval;
-    private String localHost;
-    private String localPort;
     private boolean isActiveNode;
     private String nodeId;
     private String clusterId;
-    private int sinkQueueCapacity;
-    private int sourceQueueCapacity;
-    private String username;
-    private String password;
-    private String activeNodeHost;
-    private String activeNodePort;
+    private int recordTableQueueCapacity;
     private HACoordinationSourceHandlerManager sourceHandlerManager;
     private HACoordinationSinkHandlerManager sinkHandlerManager;
     private HACoordinationRecordTableHandlerManager recordTableHandlerManager;
-    private List<Timer> retrySiddhiAppSyncTimerList;
-    private boolean isActiveNodeOutputSyncManagerStarted;
     private TCPServer tcpServerInstance = TCPServer.getInstance();
     private EventListMapManager eventListMapManager;
     private DeploymentConfig deploymentConfig;
@@ -89,27 +70,19 @@ public class HAManager {
         this.clusterCoordinator = clusterCoordinator;
         this.nodeId = nodeId;
         this.clusterId = clusterId;
-        this.localHost = deploymentConfig.getLiveSync().getAdvertisedHost();
-        this.localPort = String.valueOf(deploymentConfig.getLiveSync().getAdvertisedPort());
-        this.liveSyncEnabled = deploymentConfig.getLiveSync().isEnabled();
-        this.outputSyncInterval = deploymentConfig.getOutputSyncInterval();
-        this.sinkQueueCapacity = deploymentConfig.getSinkQueueCapacity();
-        this.sourceQueueCapacity = deploymentConfig.getSourceQueueCapacity();
-        this.username = deploymentConfig.getLiveSync().getUsername();
-        this.password = deploymentConfig.getLiveSync().getPassword();
-        this.retrySiddhiAppSyncTimerList = new LinkedList<>();
         this.eventListMapManager = new EventListMapManager();
         this.eventByteBufferQueue = new LinkedBlockingQueue<ByteBuffer>(deploymentConfig.
                 getEventByteBufferQueueCapacity());
         this.deploymentConfig = deploymentConfig;
         this.tcpClientPoolConfig = deploymentConfig.getTcpClientPool();
+        this.recordTableQueueCapacity = deploymentConfig.getRecordTableQueueCapacity();
     }
 
     public void start() {
-        sourceHandlerManager = new HACoordinationSourceHandlerManager(sourceQueueCapacity, getTCPClientConnectionPool
+        sourceHandlerManager = new HACoordinationSourceHandlerManager(getTCPClientConnectionPool
                 (tcpClientPoolConfig.getHost(), tcpClientPoolConfig.getPort()));
         sinkHandlerManager = new HACoordinationSinkHandlerManager();
-        recordTableHandlerManager = new HACoordinationRecordTableHandlerManager(sinkQueueCapacity);
+        recordTableHandlerManager = new HACoordinationRecordTableHandlerManager(recordTableQueueCapacity);
 
         StreamProcessorDataHolder.setSinkHandlerManager(sinkHandlerManager);
         StreamProcessorDataHolder.setSourceHandlerManager(sourceHandlerManager);
@@ -135,17 +108,8 @@ public class HAManager {
 
         if (isActiveNode) {
             log.info("HA Deployment: Starting up as Active Node");
-            activeNodePropertiesMap.put("host", localHost);
-            activeNodePropertiesMap.put("port", localPort);
             clusterCoordinator.setPropertiesMap(activeNodePropertiesMap);
             isActiveNode = true;
-            if (!liveSyncEnabled) {
-                ScheduledExecutorService scheduledExecutorService = Executors.newSingleThreadScheduledExecutor();
-                scheduledExecutorService.scheduleAtFixedRate(new ActiveNodeOutputSyncManager(
-                                sinkHandlerManager, recordTableHandlerManager, clusterCoordinator), 0, outputSyncInterval,
-                        TimeUnit.MILLISECONDS);
-                isActiveNodeOutputSyncManagerStarted = true;
-            }
         } else {
             log.info("HA Deployment: Starting up as Passive Node");
             //initialize passive queue
@@ -211,10 +175,10 @@ public class HAManager {
 
     /**
      * Start TCP server
+     * Initialize eventByteBufferQueue
      */
     void changeToPassive() {
         isActiveNode = false;
-        //todo check if any other active resources to be closed when becoming active
         //initialize passive queue
         EventListMapManager.initializeEventListMap();
 
@@ -276,65 +240,6 @@ public class HAManager {
         });
     }
 
-    /**
-     * Implements a timer task to run after specified time interval to get active nodes last persisted state
-     *
-     * @param gracePeriod time given for passive node to connect to all sources before re-syncing with active node
-     * @return reference to the timer. Can be used to cancel task if needed
-     */
-    private Timer persistenceStoreSyncAfterGracePeriod(int gracePeriod) {
-        Timer timer = new Timer();
-        timer.schedule(new TimerTask() {
-            @Override
-            public void run() {
-                StreamProcessorDataHolder.getSiddhiManager().restoreLastState();
-                StreamProcessorDataHolder.getNodeInfo().setLastSyncedTimestamp(System.currentTimeMillis());
-            }
-        }, gracePeriod);
-        return timer;
-    }
-
-    /**
-     * Method to send an http request to active node to get all snapshots and last processed events timestamp
-     *
-     * @param activeNodeHost advertised host of active node
-     * @param activeNodePort advertised port of active node
-     * @return true if active node persisted state successfully
-     */
-    private boolean persistActiveNode(String activeNodeHost, String activeNodePort) {
-        String url = "http://%s:%d/ha/state";
-        URI baseURI = URI.create(String.format(url, activeNodeHost, Integer.parseInt(activeNodePort)));
-        return RequestUtil.requestAndGetStatusCode(baseURI, username, password) == 200;
-    }
-
-    /**
-     * Method to get Snapshot from Active Node for a specified Siddhi Application
-     *
-     * @param siddhiAppName the name of the Siddhi Application whose state is required from the Active Node
-     * @return true if active node persisted state successfully
-     */
-    public boolean persistActiveNode(String siddhiAppName) {
-        boolean isActive = clusterCoordinator.isLeaderNode();
-        if (!isActive) {
-            Map<String, Object> activeNodeHostAndPortMap = clusterCoordinator.getLeaderNode().getPropertiesMap();
-
-            if (activeNodeHostAndPortMap != null) {
-                activeNodeHost = (String) activeNodeHostAndPortMap.get("host");
-                activeNodePort = (String) activeNodeHostAndPortMap.get("port");
-
-                String url = "http://%s:%d/ha/state/" + siddhiAppName;
-                URI baseURI = URI.create(String.format(url, activeNodeHost, Integer.parseInt(activeNodePort)));
-                return RequestUtil.requestAndGetStatusCode(baseURI, username, password) == 200;
-            } else {
-                log.error("Leader Node Host and Port is Not Set!");
-                return false;
-            }
-        } else {
-            log.error("Illegal persistActiveNode Called from Active Node");
-            return false;
-        }
-    }
-
     private GenericKeyedObjectPool getTCPClientConnectionPool(String host, int port) {
         ClientPool clientPool = new ClientPool();
         ClientPoolFactory clientPoolFactory = new ClientPoolFactory(host, port);
@@ -345,14 +250,6 @@ public class HAManager {
 
     public boolean isActiveNode() {
         return isActiveNode;
-    }
-
-    public boolean isLiveStateSyncEnabled() {
-        return liveSyncEnabled;
-    }
-
-    public void addRetrySiddhiAppSyncTimer(Timer retrySiddhiAppSyncTimer) {
-        this.retrySiddhiAppSyncTimerList.add(retrySiddhiAppSyncTimer);
     }
 
     public static Map<String, Object> getActiveNodePropertiesMap() {

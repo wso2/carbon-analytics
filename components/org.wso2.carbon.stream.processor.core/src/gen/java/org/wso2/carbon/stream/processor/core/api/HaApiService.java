@@ -21,14 +21,12 @@ package org.wso2.carbon.stream.processor.core.api;
 import java.io.IOException;
 import javax.ws.rs.core.Response;
 
-@javax.annotation.Generated(
+@javax.annotation.Generated(//todo check whether we need this
         value = "io.swagger.codegen.languages.JavaMSF4JServerCodegen",
         date = "2017-09-21T09:31:22.101Z")
 public abstract class HaApiService {
 
     public abstract Response haOutputSyncTimestampGet() throws NotFoundException;
-
-    public abstract Response haStateGet() throws NotFoundException, IOException;
 
     public abstract Response haStateGet(String siddhiAppName) throws NotFoundException, IOException;
 }

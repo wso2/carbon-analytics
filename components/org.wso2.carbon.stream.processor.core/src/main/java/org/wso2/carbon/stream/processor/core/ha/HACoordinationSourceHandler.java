@@ -87,9 +87,7 @@ public class HACoordinationSourceHandler extends SourceHandler {
     public void sendEvent(Event[] events, InputHandler inputHandler) throws InterruptedException {
         if (isActiveNode) {
             lastProcessedEventTimestamp = events[events.length - 1].getTimestamp();
-//            for (Event event : events) {
             sendEventsToPassiveNode(events);
-//            }
             inputHandler.send(events);
         }
     }
@@ -120,7 +118,7 @@ public class HACoordinationSourceHandler extends SourceHandler {
     }
 
     @Override
-    public void restoreState(Map<String, Object> map) {
+    public void restoreState(Map<String, Object> map) {//todo
 //        if (map != null) {
 //            if (map.get(CoordinationConstants.ACTIVE_PROCESSED_LAST_TIMESTAMP) != null) {
 //                processBufferedEvents((Long) map.get(CoordinationConstants.ACTIVE_PROCESSED_LAST_TIMESTAMP));

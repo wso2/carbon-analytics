@@ -48,7 +48,7 @@ public class MessageDecoder extends ByteToMessageDecoder {
     }
 
     @Override
-    protected void decode(ChannelHandlerContext ctx, ByteBuf in, List<Object> out) {
+    protected void decode(ChannelHandlerContext ctx, ByteBuf in, List<Object> out) {//todo
         if (in.readableBytes() < 5) {
             return;
         }
