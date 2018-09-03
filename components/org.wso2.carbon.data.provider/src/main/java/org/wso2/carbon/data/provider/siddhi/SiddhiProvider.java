@@ -54,6 +54,7 @@ public class SiddhiProvider extends AbstractDataProvider {
     private static final String SIDDHI_APP = "siddhiApp";
     private static final String STORE_QUERY = "queryData";
     private static final String PULISHING_INTERVAL = "publishingInterval";
+    private static final String TIME_COLUMNS = "timeColumns";
     private static final String QUERY = "query";
     private SiddhiDataProviderConfig siddhiDataProviderConfig;
     private DataSetMetadata metadata;
@@ -113,6 +114,8 @@ public class SiddhiProvider extends AbstractDataProvider {
         renderingTypes.put(STORE_QUERY, InputFieldTypes.DYNAMIC_SIDDHI_CODE);
         renderingTypes.put(PULISHING_INTERVAL, InputFieldTypes.NUMBER);
         renderingHints.put(PULISHING_INTERVAL, "Rate at which data should be sent to the widget");
+        renderingTypes.put(TIME_COLUMNS, InputFieldTypes.TEXT_FIELD);
+        renderingHints.put(TIME_COLUMNS, "Comma separated columns of the table that contain timestamps");
         return new Gson().toJson(new Object[]{renderingTypes, new SiddhiDataProviderConfig(), renderingHints,
                 providerDescription});
     }
