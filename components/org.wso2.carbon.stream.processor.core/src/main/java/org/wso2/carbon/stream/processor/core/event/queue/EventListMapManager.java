@@ -18,11 +18,17 @@
 
 package org.wso2.carbon.stream.processor.core.event.queue;
 
+import org.apache.log4j.Logger;
+import org.wso2.carbon.stream.processor.core.ha.tcp.SiddhiEventConverter;
 import org.wso2.carbon.stream.processor.core.ha.util.HAConstants;
 import org.wso2.carbon.stream.processor.core.internal.SiddhiAppData;
 import org.wso2.carbon.stream.processor.core.internal.StreamProcessorDataHolder;
+import org.wso2.carbon.stream.processor.core.util.BinaryMessageConverterUtil;
+import org.wso2.siddhi.core.event.Event;
 import org.wso2.siddhi.core.stream.input.source.Source;
 
+import java.io.UnsupportedEncodingException;
+import java.nio.ByteBuffer;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -30,6 +36,8 @@ import java.util.concurrent.ConcurrentSkipListMap;
 
 public class EventListMapManager {
     private static ConcurrentSkipListMap<Long,QueuedEvent> eventListMap;
+    private static long lastControlMessageSequenceId;
+    private static final Logger log = Logger.getLogger(EventListMapManager.class);
 
     public EventListMapManager() {
     }
@@ -39,8 +47,64 @@ public class EventListMapManager {
         return eventListMap;
     }
 
-    public void trimAndSendToInputHandler() throws InterruptedException {
+    public synchronized void parseControlMessage(byte[] controlMessageContentByteArray) {
+        String message = new String(controlMessageContentByteArray);
+        if (message != null && !message.isEmpty()) {
+            message = message.replace ("[", "");
+            message = message.replace ("]", "");
+            String[] persistedApps = message.split(",");
+            String lastPersistedAppInfo = persistedApps[persistedApps.length];
+            lastControlMessageSequenceId = Long.valueOf(lastPersistedAppInfo.split(HAConstants.
+                    PERSISTED_APP_SPLIT_DELIMITER)[0]);
+            this.trimQueue(persistedApps);
+        }
+    }
 
+    public synchronized void parseMessage(byte[] eventContentByteArray) {
+        try {
+            ByteBuffer eventContent = ByteBuffer.wrap(eventContentByteArray);
+            int noOfEvents = eventContent.getInt();
+            QueuedEvent queuedEvent;
+            Event[] events = new Event[noOfEvents];
+            for (int i = 0; i < noOfEvents; i++) {
+                String sourceHandlerElementId;
+                String siddhiAppName;
+                long sequenceID = eventContent.getLong();
+                if (sequenceID > lastControlMessageSequenceId) {
+                    int stringSize = eventContent.getInt();
+                    if (stringSize == 0) {
+                        sourceHandlerElementId = null;
+                    } else {
+                        sourceHandlerElementId = BinaryMessageConverterUtil.getString(eventContent, stringSize);
+                    }
+
+                    int appSize = eventContent.getInt();
+                    if (appSize == 0) {
+                        siddhiAppName = null;
+                    } else {
+                        siddhiAppName = BinaryMessageConverterUtil.getString(eventContent, appSize);
+                    }
+
+                    String attributes;
+                    stringSize = eventContent.getInt();
+                    if (stringSize == 0) {
+                        attributes = null;
+                    } else {
+                        attributes = BinaryMessageConverterUtil.getString(eventContent, stringSize);
+                    }
+                    String[] attributeTypes = attributes.substring(1, attributes.length() - 1).split(", ");
+                    events[i] = SiddhiEventConverter.getEvent(eventContent, attributeTypes);
+                    queuedEvent = new QueuedEvent(siddhiAppName, sourceHandlerElementId, sequenceID, events[i]);
+                    this.addToEventListMap(sequenceID, queuedEvent);
+                }
+
+            }
+        } catch (UnsupportedEncodingException e) {
+            log.error("Error when converting bytes " + e.getMessage(), e);
+        }
+    }
+
+    public void trimAndSendToInputHandler() throws InterruptedException {
         Map<String, SiddhiAppData> siddhiAppMap = StreamProcessorDataHolder.getStreamProcessorService().
                 getSiddhiAppMap();
 
@@ -74,15 +138,14 @@ public class EventListMapManager {
         if (eventListMap.size() != 0){
             for(String appDetail : persistedAppDetails){
                 String[] details = appDetail.split(HAConstants.PERSISTED_APP_SPLIT_DELIMITER);
-                String appName = details[1].trim();
-                long timestamp = Long.valueOf(details[0].trim());
+                String appName = details[2];
+                long seqId = Long.valueOf(details[0]);
                 for(Map.Entry<Long,QueuedEvent> listMapValue : eventListMap.entrySet()) {
                     long key = listMapValue.getKey();
                     QueuedEvent queuedEvent = listMapValue.getValue();
                     if(queuedEvent.getSiddhiAppName().equals(appName) &&
-                            timestamp >= queuedEvent.getEvent().getTimestamp()){
+                            seqId > queuedEvent.getSequenceID()){
                         eventListMap.remove(key);
-
                     }
                 }
             }

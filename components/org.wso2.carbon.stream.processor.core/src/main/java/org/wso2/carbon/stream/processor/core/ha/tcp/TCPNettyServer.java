@@ -19,6 +19,7 @@
 package org.wso2.carbon.stream.processor.core.ha.tcp;
 
 import io.netty.bootstrap.ServerBootstrap;
+import io.netty.buffer.ByteBuf;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelInitializer;
@@ -29,15 +30,12 @@ import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
 import org.apache.log4j.Logger;
 import org.wso2.carbon.stream.processor.core.event.queue.EventListMapManager;
-import org.wso2.carbon.stream.processor.core.event.queue.QueuedEvent;
 import org.wso2.carbon.stream.processor.core.ha.transport.handlers.MessageDecoder;
 import org.wso2.carbon.stream.processor.core.ha.util.HAConstants;
 import org.wso2.carbon.stream.processor.core.internal.beans.TCPServerConfig;
 import org.wso2.carbon.stream.processor.core.util.BinaryMessageConverterUtil;
-import org.wso2.siddhi.core.event.Event;
 
 import java.io.UnsupportedEncodingException;
-import java.nio.ByteBuffer;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -57,13 +55,13 @@ public class TCPNettyServer {
     private TCPServerConfig serverConfig;
     private static final Logger log = Logger.getLogger(TCPNettyServer.class);
     private EventListMapManager eventListMapManager = new EventListMapManager();
-    private BlockingQueue<ByteBuffer> eventByteBufferQueue;
+    private BlockingQueue<ByteBuf> eventByteBufferQueue;
     private ExecutorService eventBufferExtractorExecutorService = Executors.newFixedThreadPool(
             HAConstants.EVENT_BUFFER_EXTRACTOR_THREAD_POOL_SIZE);
     private EventBufferExtractor eventBufferExtractor = new EventBufferExtractor();
     private Future eventBufferExtractorFuture;
 
-    public void start(TCPServerConfig serverConf, BlockingQueue<ByteBuffer> eventByteBufferQueue) {
+    public void start(TCPServerConfig serverConf, BlockingQueue<ByteBuf> eventByteBufferQueue) {
         this.eventByteBufferQueue = eventByteBufferQueue;
         serverConfig = serverConf;
         bossGroup = new NioEventLoopGroup(serverConfig.getBossThreads());
@@ -75,11 +73,10 @@ public class TCPNettyServer {
         bootstrap.group(bossGroup, workerGroup)
                 .channel(NioServerSocketChannel.class)
                 .childHandler(new ChannelInitializer() {
-
                     @Override
                     protected void initChannel(Channel channel) throws Exception {
                         ChannelPipeline p = channel.pipeline();
-                        p.addLast(new MessageDecoder(eventListMapManager, eventByteBufferQueue));
+                        p.addLast(new MessageDecoder(eventByteBufferQueue));
                     }
                 })
                 .option(ChannelOption.TCP_NODELAY, true)
@@ -119,44 +116,20 @@ public class TCPNettyServer {
      * This {@link Runnable} class is executed by the {@link ScheduledExecutorService}
      */
     private class EventBufferExtractor implements Runnable {
-
         @Override
         public void run() {
             try {
                 while (true) {
-                    ByteBuffer eventContent = eventByteBufferQueue.take();
-                    int noOfEvents = eventContent.getInt();
-                    QueuedEvent queuedEvent;
-                    Event[] events = new Event[noOfEvents];
-                    for (int i = 0; i < noOfEvents; i++) {
-                        String sourceHandlerElementId;
-                        String siddhiAppName;
-                        long sequenceID = eventContent.getLong();
-                        int stringSize = eventContent.getInt();
-                        if (stringSize == 0) {
-                            sourceHandlerElementId = null;
-                        } else {
-                            sourceHandlerElementId = BinaryMessageConverterUtil.getString(eventContent, stringSize);
-                        }
-
-                        int appSize = eventContent.getInt();
-                        if (appSize == 0) {
-                            siddhiAppName = null;
-                        } else {
-                            siddhiAppName = BinaryMessageConverterUtil.getString(eventContent, appSize);
-                        }
-
-                        String attributes;
-                        stringSize = eventContent.getInt();
-                        if (stringSize == 0) {
-                            attributes = null;
-                        } else {
-                            attributes = BinaryMessageConverterUtil.getString(eventContent, stringSize);
-                        }
-                        String[] attributeTypes = attributes.substring(1, attributes.length() - 1).split(", ");
-                        events[i] = SiddhiEventConverter.getEvent(eventContent, attributeTypes);
-                        queuedEvent = new QueuedEvent(siddhiAppName, sourceHandlerElementId, sequenceID, events[i]);
-                        eventListMapManager.addToEventListMap(sequenceID, queuedEvent);
+                    ByteBuf in = eventByteBufferQueue.take();
+                    int channelIdSize = in.readInt();
+                    String channelId = BinaryMessageConverterUtil.getString(in, channelIdSize);
+                    int dataLength = in.readInt();
+                    byte[] bytes = new byte[dataLength];
+                    in.readBytes(bytes);
+                    if (channelId.equals(HAConstants.CHANNEL_ID_CONTROL_MESSAGE)) {
+                        eventListMapManager.parseControlMessage(bytes);
+                    } else if (channelId.equals(HAConstants.CHANNEL_ID_MESSAGE)) {
+                        eventListMapManager.parseMessage(bytes);
                     }
                 }
             } catch (UnsupportedEncodingException e) {

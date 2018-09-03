@@ -55,7 +55,7 @@ public class SiddhiEventConverter {//todo
         return ByteBuffer.wrap(output);
     }
 
-    static Event getEvent(ByteBuffer byteBuffer, String[] attributeTypes) throws UnsupportedEncodingException {
+    public static Event getEvent(ByteBuffer byteBuffer, String[] attributeTypes) throws UnsupportedEncodingException {
         Event event = new Event();
         long timeStamp = byteBuffer.getLong();
         event.setTimestamp(timeStamp);

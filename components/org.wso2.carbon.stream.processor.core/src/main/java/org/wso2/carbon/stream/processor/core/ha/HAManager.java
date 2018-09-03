@@ -18,6 +18,7 @@
 
 package org.wso2.carbon.stream.processor.core.ha;
 
+import io.netty.buffer.ByteBuf;
 import org.apache.commons.pool.impl.GenericKeyedObjectPool;
 import org.apache.log4j.Logger;
 import org.wso2.carbon.cluster.coordinator.service.ClusterCoordinator;
@@ -59,7 +60,7 @@ public class HAManager {
     private TCPServer tcpServerInstance = TCPServer.getInstance();
     private EventListMapManager eventListMapManager;
     private DeploymentConfig deploymentConfig;
-    private BlockingQueue<ByteBuffer> eventByteBufferQueue;
+    private BlockingQueue<ByteBuf> eventByteBufferQueue;
     private TCPClientPoolConfig tcpClientPoolConfig;
 
     private final static Map<String, Object> activeNodePropertiesMap = new HashMap<>();
@@ -71,7 +72,7 @@ public class HAManager {
         this.nodeId = nodeId;
         this.clusterId = clusterId;
         this.eventListMapManager = new EventListMapManager();
-        this.eventByteBufferQueue = new LinkedBlockingQueue<ByteBuffer>(deploymentConfig.
+        this.eventByteBufferQueue = new LinkedBlockingQueue<>(deploymentConfig.
                 getEventByteBufferQueueCapacity());
         this.deploymentConfig = deploymentConfig;
         this.tcpClientPoolConfig = deploymentConfig.getTcpClientPoolConfig();
@@ -178,9 +179,17 @@ public class HAManager {
      */
     void changeToPassive() {
         isActiveNode = false;
+        //stop the databridge servers
+        List<ServerEventListener> listeners = StreamProcessorDataHolder.getServerListeners();
+        for (ServerEventListener listener : listeners) {
+            listener.stop();
+        }
+        stopSiddhiAppRuntimes();
         //initialize event list map
         EventListMapManager.initializeEventListMap();
 
+        NodeInfo nodeInfo = StreamProcessorDataHolder.getNodeInfo();
+        nodeInfo.setActiveNode(isActiveNode);
         //start tcp server
         tcpServerInstance.start(deploymentConfig.getTcpServerConfigs(), eventByteBufferQueue);
         if (log.isDebugEnabled()) {
@@ -236,6 +245,19 @@ public class HAManager {
                         siddhiAppRuntime.getName());
             }
             siddhiAppRuntime.start();
+        });
+    }
+
+    private void stopSiddhiAppRuntimes() {
+        ConcurrentMap<String, SiddhiAppRuntime> siddhiAppRuntimeMap
+                = StreamProcessorDataHolder.getSiddhiManager().getSiddhiAppRuntimeMap();
+
+        siddhiAppRuntimeMap.forEach((siddhiAppName, siddhiAppRuntime) -> {
+            if (log.isDebugEnabled()) {
+                log.debug("Stopping Siddhi Application " +
+                        siddhiAppRuntime.getName());
+            }
+            siddhiAppRuntime.shutdown();
         });
     }
 

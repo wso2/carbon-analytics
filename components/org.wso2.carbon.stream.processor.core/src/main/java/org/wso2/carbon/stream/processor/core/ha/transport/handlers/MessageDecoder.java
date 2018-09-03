@@ -21,14 +21,7 @@ package org.wso2.carbon.stream.processor.core.ha.transport.handlers;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.ByteToMessageDecoder;
-import org.apache.log4j.Logger;
-import org.wso2.carbon.stream.processor.core.event.queue.EventListMapManager;
-import org.wso2.carbon.stream.processor.core.ha.util.HAConstants;
-import org.wso2.carbon.stream.processor.core.util.BinaryMessageConverterUtil;
 
-import java.io.UnsupportedEncodingException;
-import java.nio.ByteBuffer;
-import java.util.Date;
 import java.util.List;
 import java.util.concurrent.BlockingQueue;
 
@@ -36,72 +29,24 @@ import java.util.concurrent.BlockingQueue;
  * Byte to message decoder.
  */
 public class MessageDecoder extends ByteToMessageDecoder {
-    static final Logger log = Logger.getLogger(MessageDecoder.class);
-    private EventListMapManager eventListMapManager;
-    private BlockingQueue<ByteBuffer> byteBufferQueue;
-    private static long startTime;
-    private static long endTime;
-    static int count = 0;
+    private BlockingQueue<ByteBuf> byteBufferQueue;
 
-    public MessageDecoder(EventListMapManager eventListMapManager, BlockingQueue<ByteBuffer> byteBufferQueue){
-        this.eventListMapManager = eventListMapManager;
+    public MessageDecoder(BlockingQueue<ByteBuf> byteBufferQueue){
         this.byteBufferQueue = byteBufferQueue;
     }
 
     @Override
-    protected void decode(ChannelHandlerContext ctx, ByteBuf in, List<Object> out) {//todo
+    protected void decode(ChannelHandlerContext ctx, ByteBuf in, List<Object> out) {
         if (in.readableBytes() < 5) {
             return;
         }
-        if (startTime == 0L) {
-            log.info("TIME START LLLLLLLLLLLLOOOOOOOOOOOOGGGGGGGGGg ");
-            startTime = new Date().getTime();
+        int protocol = in.readByte();
+        int messageSize = in.readInt();
+        if (protocol != 2 || messageSize > in.readableBytes()) {
+            in.resetReaderIndex();
+            return;
         }
-        try {
-            int protocol = in.readByte();
-            int messageSize = in.readInt();
-            if (protocol != 2 || messageSize > in.readableBytes()) {
-                in.resetReaderIndex();
-                return;
-            }
-
-            int sessionIdSize = in.readInt();
-            BinaryMessageConverterUtil.getString(in, sessionIdSize);
-
-            int channelIdSize = in.readInt();
-            String channelId = BinaryMessageConverterUtil.getString(in, channelIdSize);
-
-            int dataLength = in.readInt();
-            byte[] bytes = new byte[dataLength];
-            in.readBytes(bytes);
-            //LOG.info("Message Received : " + new String(bytes));
-
-            if (channelId.equals(HAConstants.CHANNEL_ID_MESSAGE)) {
-                ByteBuffer messageBuffer = ByteBuffer.wrap(bytes);
-                byteBufferQueue.offer(messageBuffer);
-                count++;
-                if (count % 10000 == 0) {
-                    log.info("COUNT " + count);
-                    endTime = new Date().getTime();
-                    //LOG.info("TIME START    " + time + "    TIMES   " + timeE);
-                    log.info("Server TPS:   " + (((10000 * 1000) / (endTime - startTime))));
-                    startTime = new Date().getTime();
-                }
-                //Event[] events = SiddhiEventConverter.toConvertAndEnqueue(ByteBuffer.wrap(bytes),eventQueueManager);
-                // LOG.info("Event Received : " + events.toString());
-            } else if (channelId.equals(HAConstants.CHANNEL_ID_CONTROL_MESSAGE)) {
-                String message = new String(bytes);
-                message = message.replace ("[", "");
-                message = message.replace ("]", "");
-                String[] persistedApps = message.split(",");
-                eventListMapManager.trimQueue(persistedApps);
-                log.info("Control Message Received : " + new String(bytes));
-            }
-        } catch (UnsupportedEncodingException e) {
-            log.error(e.getMessage(), e);
-        } finally {
-            in.markReaderIndex();
-        }
+        byteBufferQueue.offer(in);
+        in.markReaderIndex();
     }
-
 }
