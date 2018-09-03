@@ -47,19 +47,25 @@ public class HAEventListener extends MemberEventListener {
     private BackoffRetryCounter backoffRetryCounter = new BackoffRetryCounter();
 
     @Override
-    public void memberAdded(NodeDetail nodeDetail) {//todo
-      //  System.out.println("#########################################");
-        ClusterCoordinator clusterCoordinator = StreamProcessorDataHolder.getClusterCoordinator();
-            if (!nodeDetail.isCoordinator()) {
-       //     System.out.println("####################1111111111111#####################");
-       //     System.out.println(nodeDetail.getPropertiesMap().toString());
+    public void memberAdded(NodeDetail nodeDetail) {
+        if (!nodeDetail.isCoordinator()) {
+            SourceHandlerManager sourceHandlerManager = StreamProcessorDataHolder.getSourceHandlerManager();
+            Map<String, SourceHandler> registeredSourceHandlers = sourceHandlerManager.
+                    getRegsiteredSourceHandlers();
+            for (SourceHandler sourceHandler : registeredSourceHandlers.values()) {
+                ((HACoordinationSourceHandler) sourceHandler).setPassiveNodeAdded(true);
+            }
         }
-        // Do Nothing
     }
 
     @Override
     public void memberRemoved(NodeDetail nodeDetail) {
-        // Do Nothing
+        SourceHandlerManager sourceHandlerManager = StreamProcessorDataHolder.getSourceHandlerManager();
+        Map<String, SourceHandler> registeredSourceHandlers = sourceHandlerManager.
+                getRegsiteredSourceHandlers();
+        for (SourceHandler sourceHandler : registeredSourceHandlers.values()) {
+            ((HACoordinationSourceHandler) sourceHandler).setPassiveNodeAdded(false);
+        }
     }
 
     @Override

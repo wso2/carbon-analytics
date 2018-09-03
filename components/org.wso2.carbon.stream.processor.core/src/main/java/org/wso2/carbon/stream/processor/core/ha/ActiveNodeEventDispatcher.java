@@ -93,37 +93,6 @@ public class ActiveNodeEventDispatcher {
         }
     }
 
-    public static byte[] compress(byte[] dataBytes) {//todo
-        //count++;
-        Deflater deflater = new Deflater(Deflater.BEST_COMPRESSION);
-        //byte[] dataBytes = data.getBytes("UTF-8");
-        deflater.setInput(dataBytes);
-        ByteArrayOutputStream outputStream = new ByteArrayOutputStream(dataBytes.length);
-        deflater.finish();
-        byte[] buffer = new byte[dataBytes.length];
-        while (!deflater.finished()) {
-            int count = deflater.deflate(buffer); // returns the generated code... index
-            outputStream.write(buffer, 0, count);
-        }
-        try {
-            outputStream.close();
-        } catch (IOException e) {
-            log.error("Error in closing the output stream");
-        }
-
-
-        byte[] output = outputStream.toByteArray();
-        //String result =  Base64.encode(output);
-
-        int diff = (dataBytes.length - output.length);
-        //totalBytesSaved += diff;
-//        if (count % 10000 == 0){
-        //System.out.println("Total Bytes Saved :" + diff + "       " + output.length);
-//        }
-        return output;
-        //return new String(output, 0, count, "UTF-8");
-    }
-
     public void setTcpNettyClient(TCPNettyClient tcpNettyClient) {
         this.tcpNettyClient = tcpNettyClient;
     }

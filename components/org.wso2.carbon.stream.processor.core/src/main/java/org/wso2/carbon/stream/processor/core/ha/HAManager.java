@@ -26,8 +26,8 @@ import org.wso2.carbon.stream.processor.core.DeploymentMode;
 import org.wso2.carbon.stream.processor.core.NodeInfo;
 import org.wso2.carbon.stream.processor.core.event.queue.EventListMapManager;
 import org.wso2.carbon.stream.processor.core.ha.tcp.TCPServer;
-import org.wso2.carbon.stream.processor.core.ha.transport.ClientPool;
-import org.wso2.carbon.stream.processor.core.ha.transport.ClientPoolFactory;
+import org.wso2.carbon.stream.processor.core.ha.transport.TCPClientPool;
+import org.wso2.carbon.stream.processor.core.ha.transport.TCPClientPoolFactory;
 import org.wso2.carbon.stream.processor.core.internal.StreamProcessorDataHolder;
 import org.wso2.carbon.stream.processor.core.internal.beans.DeploymentConfig;
 import org.wso2.carbon.stream.processor.core.internal.beans.TCPClientPoolConfig;
@@ -74,13 +74,12 @@ public class HAManager {
         this.eventByteBufferQueue = new LinkedBlockingQueue<ByteBuffer>(deploymentConfig.
                 getEventByteBufferQueueCapacity());
         this.deploymentConfig = deploymentConfig;
-        this.tcpClientPoolConfig = deploymentConfig.getTcpClientPool();
+        this.tcpClientPoolConfig = deploymentConfig.getTcpClientPoolConfig();
         this.recordTableQueueCapacity = deploymentConfig.getRecordTableQueueCapacity();
     }
 
     public void start() {
-        sourceHandlerManager = new HACoordinationSourceHandlerManager(getTCPClientConnectionPool
-                (tcpClientPoolConfig.getHost(), tcpClientPoolConfig.getPort()));
+        sourceHandlerManager = new HACoordinationSourceHandlerManager(getTCPClientConnectionPool());
         sinkHandlerManager = new HACoordinationSinkHandlerManager();
         recordTableHandlerManager = new HACoordinationRecordTableHandlerManager(recordTableQueueCapacity);
 
@@ -240,10 +239,11 @@ public class HAManager {
         });
     }
 
-    private GenericKeyedObjectPool getTCPClientConnectionPool(String host, int port) {
-        ClientPool clientPool = new ClientPool();
-        ClientPoolFactory clientPoolFactory = new ClientPoolFactory(host, port);
-        return clientPool.getClientPool(clientPoolFactory, tcpClientPoolConfig.getMaxActive(), tcpClientPoolConfig
+    private GenericKeyedObjectPool getTCPClientConnectionPool() {
+        TCPClientPool tcpClientPool = new TCPClientPool();
+        TCPClientPoolFactory tcpClientPoolFactory = new TCPClientPoolFactory(deploymentConfig.getPassiveNodeHost(),
+                deploymentConfig.getPassiveNodePort());
+        return tcpClientPool.getClientPool(tcpClientPoolFactory, tcpClientPoolConfig.getMaxActive(), tcpClientPoolConfig
                 .getMaxIdle(), tcpClientPoolConfig.isTestOnBorrow(), tcpClientPoolConfig
                 .getTimeBetweenEvictionRunsMillis(), tcpClientPoolConfig.getMinEvictableIdleTimeMillis());
     }

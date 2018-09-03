@@ -24,10 +24,10 @@ import org.apache.commons.pool.impl.GenericKeyedObjectPool;
  * This class is used hold the secure/non-secure connections for an Agent.
  */
 
-public class ClientPool {
+public class TCPClientPool {
     private GenericKeyedObjectPool socketPool;
 
-    public GenericKeyedObjectPool getClientPool(ClientPoolFactory factory,
+    public GenericKeyedObjectPool getClientPool(TCPClientPoolFactory factory,
                                                 int maxActive,
                                                 int maxIdle,
                                                 boolean testOnBorrow,
@@ -38,7 +38,7 @@ public class ClientPool {
                 if (socketPool == null) {
                     socketPool = new GenericKeyedObjectPool();
                     socketPool.setFactory(factory);
-                    socketPool.setMaxTotal(10);
+                    socketPool.setMaxTotal(maxActive);
                     socketPool.setMaxActive(maxActive);
                     socketPool.setTestOnBorrow(testOnBorrow);
                     socketPool.setTimeBetweenEvictionRunsMillis(timeBetweenEvictionRunsMillis);

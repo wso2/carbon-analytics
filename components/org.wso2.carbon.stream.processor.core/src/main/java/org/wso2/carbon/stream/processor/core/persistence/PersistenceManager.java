@@ -24,6 +24,7 @@ import org.wso2.carbon.stream.processor.core.ha.HAManager;
 import org.wso2.carbon.stream.processor.core.ha.transport.TCPNettyClient;
 import org.wso2.carbon.stream.processor.core.ha.util.HAConstants;
 import org.wso2.carbon.stream.processor.core.internal.StreamProcessorDataHolder;
+import org.wso2.carbon.stream.processor.core.internal.beans.DeploymentConfig;
 import org.wso2.siddhi.core.SiddhiAppRuntime;
 import org.wso2.siddhi.core.exception.ConnectionUnavailableException;
 import org.wso2.siddhi.core.util.snapshot.PersistenceReference;
@@ -37,14 +38,17 @@ import java.util.concurrent.ConcurrentMap;
 public class PersistenceManager implements Runnable {
 
     private static final Logger log = LoggerFactory.getLogger(PersistenceManager.class);
-    TCPNettyClient tcpNettyClient = new TCPNettyClient();
+    private TCPNettyClient tcpNettyClient = new TCPNettyClient();
+    private HAManager haManager;
+    private DeploymentConfig deploymentConfig;
 
     public PersistenceManager() {
     }
 
     @Override
     public void run() {
-        HAManager haManager = StreamProcessorDataHolder.getHAManager();
+        haManager = StreamProcessorDataHolder.getHAManager();
+        deploymentConfig = StreamProcessorDataHolder.getDeploymentConfig();
         if (haManager != null) {
             if (haManager.isActiveNode()) {
                 persist();
@@ -68,21 +72,25 @@ public class PersistenceManager implements Runnable {
                         " of siddhi App " + siddhiAppRuntime.getName() + " persisted successfully");
             }
         }
-        sendControlMessageToPassiveNode(siddhiRevisionArray);
+        if (haManager != null && haManager.isActiveNode()) {
+            sendControlMessageToPassiveNode(siddhiRevisionArray);
+        }
         if (StreamProcessorDataHolder.getNodeInfo() != null) {
             StreamProcessorDataHolder.getNodeInfo().setLastPersistedTimestamp(System.currentTimeMillis());
         }
     }
 
-    private void sendControlMessageToPassiveNode(String[] siddhiRevisionArray) {//todo hardcoded port and host
+    private void sendControlMessageToPassiveNode(String[] siddhiRevisionArray) {
         try {
             if (!tcpNettyClient.isActive()) {
-                tcpNettyClient.connect("localhost", 9893);
+                tcpNettyClient.connect(deploymentConfig.getPassiveNodeHost(), deploymentConfig
+                        .getPassiveNodePort());
             }
             String siddhiAppRevisions = Arrays.toString(siddhiRevisionArray);
             tcpNettyClient.send(HAConstants.CHANNEL_ID_CONTROL_MESSAGE, siddhiAppRevisions.getBytes());
         } catch (ConnectionUnavailableException e) {
-            log.error("Error in connecting to 'localhost' and '9892' of the Passive node");
+            log.error("Error in connecting to the Passive node. { host: '" + deploymentConfig.getPassiveNodeHost() + "', " +
+                    "port: '" + deploymentConfig.getPassiveNodePort() + "'");
         }
     }
 }

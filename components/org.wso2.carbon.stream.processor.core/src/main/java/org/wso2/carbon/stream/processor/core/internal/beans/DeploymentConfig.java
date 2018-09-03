@@ -28,6 +28,8 @@ public class DeploymentConfig {
     private TCPServerConfig tcpServer;
     private int recordTableQueueCapacity = 20000;
     private int eventByteBufferQueueCapacity = 20000;
+    private String passiveNodeHost;
+    private int passiveNodePort;
     private TCPClientPoolConfig tcpClientPool;
 
     public String getType() {
@@ -57,11 +59,11 @@ public class DeploymentConfig {
         this.eventByteBufferQueueCapacity = eventByteBufferQueueCapacity;
     }
 
-    public TCPClientPoolConfig getTcpClientPool() {
+    public TCPClientPoolConfig getTcpClientPoolConfig() {
         return tcpClientPool;
     }
 
-    public void setTcpClientPool(TCPClientPoolConfig tcpClientPool) {
+    public void setTcpClientPoolConfig(TCPClientPoolConfig tcpClientPool) {
         this.tcpClientPool = tcpClientPool;
     }
 
@@ -73,5 +75,21 @@ public class DeploymentConfig {
     public void setRecordTableQueueCapacity(int recordTableQueueCapacity) {
 
         this.recordTableQueueCapacity = recordTableQueueCapacity;
+    }
+
+    public String getPassiveNodeHost() {
+        return passiveNodeHost;
+    }
+
+    public void setPassiveNodeHost(String passiveNodeHost) {
+        this.passiveNodeHost = passiveNodeHost;
+    }
+
+    public int getPassiveNodePort() {
+        return passiveNodePort;
+    }
+
+    public void setPassiveNodePort(int passiveNodePort) {
+        this.passiveNodePort = passiveNodePort;
     }
 }
