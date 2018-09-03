@@ -21,35 +21,39 @@ package org.wso2.carbon.stream.processor.core.ha.transport;
 import org.apache.commons.pool.BaseKeyedPoolableObjectFactory;
 import org.wso2.siddhi.core.exception.ConnectionUnavailableException;
 
+import java.util.concurrent.atomic.AtomicLong;
+
 /**
  * The abstract class that needs to be implemented when supporting a new non-secure transport
  * to mainly create, validate and terminate  the client to the endpoint.
  */
 
-public class TCPClientPoolFactory extends BaseKeyedPoolableObjectFactory {
+public class TCPConnectionPoolFactory extends BaseKeyedPoolableObjectFactory {
     private String hostname;
     private int port;
+    private static AtomicLong sequenceIDGenerator = new AtomicLong();
 
-    public TCPClientPoolFactory(String host, int port) {
+    public TCPConnectionPoolFactory(String host, int port) {
         this.hostname = host;
         this.port = port;
     }
 
     @Override
     public Object makeObject(Object key) throws ConnectionUnavailableException {
-        TCPNettyClient tcpNettyClient = new TCPNettyClient();
-        tcpNettyClient.connect(hostname, port);
-        return tcpNettyClient;
+        System.out.println("\n CLIENT CREATED\n");
+        TCPConnection tcpConnection = new TCPConnection(sequenceIDGenerator);
+        tcpConnection.connect(hostname, port);
+        return tcpConnection;
     }
 
     @Override
     public boolean validateObject(Object key, Object obj) {
-        return ((TCPNettyClient) obj).isActive();
+        return ((TCPConnection) obj).isActive();
     }
 
     public void destroyObject(Object key, Object obj) {
-        TCPNettyClient tcpNettyClient = ((TCPNettyClient) obj);
-        tcpNettyClient.disconnect();
-        tcpNettyClient.shutdown();
+        TCPConnection tcpConnection = ((TCPConnection) obj);
+        tcpConnection.disconnect();
+        tcpConnection.shutdown();
     }
 }

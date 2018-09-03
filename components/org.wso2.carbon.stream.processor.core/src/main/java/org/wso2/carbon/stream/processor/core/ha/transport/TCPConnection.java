@@ -34,28 +34,24 @@ import org.wso2.carbon.stream.processor.core.ha.transport.handlers.MessageEncode
 import org.wso2.siddhi.core.exception.ConnectionUnavailableException;
 
 import java.util.UUID;
+import java.util.concurrent.atomic.AtomicLong;
 
 /**
  * Tcp Netty Client.
  */
-public class TCPNettyClient {
-    private static final Logger log = Logger.getLogger(TCPNettyClient.class);
+public class TCPConnection {
+    private static final Logger log = Logger.getLogger(TCPConnection.class);
     private EventLoopGroup group;
     private Bootstrap bootstrap;
     private Channel channel;
     private String sessionId;
     private String hostAndPort;
 
-
-    public TCPNettyClient(boolean keepAlive, boolean noDelay) {
-        this(0, keepAlive, noDelay);
-    }
-
-    public TCPNettyClient() {
+    public TCPConnection(AtomicLong sequenceIDGenerator) {
         this(0, true, true);
     }
 
-    public TCPNettyClient(int numberOfThreads, boolean keepAlive, boolean noDelay) {
+    public TCPConnection(int numberOfThreads, boolean keepAlive, boolean noDelay) {
         group = new NioEventLoopGroup(numberOfThreads);
         bootstrap = new Bootstrap();
         bootstrap.group(group)

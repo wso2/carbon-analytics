@@ -27,8 +27,7 @@ import org.wso2.carbon.stream.processor.core.DeploymentMode;
 import org.wso2.carbon.stream.processor.core.NodeInfo;
 import org.wso2.carbon.stream.processor.core.event.queue.EventListMapManager;
 import org.wso2.carbon.stream.processor.core.ha.tcp.TCPServer;
-import org.wso2.carbon.stream.processor.core.ha.transport.TCPClientPool;
-import org.wso2.carbon.stream.processor.core.ha.transport.TCPClientPoolFactory;
+import org.wso2.carbon.stream.processor.core.ha.transport.TCPConnectionPoolManager;
 import org.wso2.carbon.stream.processor.core.internal.StreamProcessorDataHolder;
 import org.wso2.carbon.stream.processor.core.internal.beans.DeploymentConfig;
 import org.wso2.carbon.stream.processor.core.internal.beans.TCPClientPoolConfig;
@@ -80,7 +79,7 @@ public class HAManager {
     }
 
     public void start() {
-        sourceHandlerManager = new HACoordinationSourceHandlerManager(getTCPClientConnectionPool());
+        sourceHandlerManager = new HACoordinationSourceHandlerManager();
         sinkHandlerManager = new HACoordinationSinkHandlerManager();
         recordTableHandlerManager = new HACoordinationRecordTableHandlerManager(recordTableQueueCapacity);
 
@@ -109,6 +108,7 @@ public class HAManager {
         if (isActiveNode) {
             log.info("HA Deployment: Starting up as Active Node");
             clusterCoordinator.setPropertiesMap(activeNodePropertiesMap);
+            TCPConnectionPoolManager.initializeConnectionPool(deploymentConfig);
             isActiveNode = true;
         } else {
             log.info("HA Deployment: Starting up as Passive Node");
@@ -259,15 +259,6 @@ public class HAManager {
             }
             siddhiAppRuntime.shutdown();
         });
-    }
-
-    private GenericKeyedObjectPool getTCPClientConnectionPool() {
-        TCPClientPool tcpClientPool = new TCPClientPool();
-        TCPClientPoolFactory tcpClientPoolFactory = new TCPClientPoolFactory(deploymentConfig.getPassiveNodeHost(),
-                deploymentConfig.getPassiveNodePort());
-        return tcpClientPool.getClientPool(tcpClientPoolFactory, tcpClientPoolConfig.getMaxActive(), tcpClientPoolConfig
-                .getMaxIdle(), tcpClientPoolConfig.isTestOnBorrow(), tcpClientPoolConfig
-                .getTimeBetweenEvictionRunsMillis(), tcpClientPoolConfig.getMinEvictableIdleTimeMillis());
     }
 
     public boolean isActiveNode() {
