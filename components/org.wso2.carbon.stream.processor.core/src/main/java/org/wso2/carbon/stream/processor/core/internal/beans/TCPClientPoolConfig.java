@@ -19,33 +19,14 @@
 package org.wso2.carbon.stream.processor.core.internal.beans;
 
 public class TCPClientPoolConfig {
-    private String host;
-    private int port;
     private int maxActive = 10;
     private int maxTotal = 10;
     private boolean testOnBorrow = true;
     private int maxIdle = 10;
     private int whenExhaustedAction = 1;
     private long maxWait = 60000;
-    private long MinEvictableIdleTimeMillis = 108000;
-    private long TimeBetweenEvictionRunsMillis = 108000;
-
-    public String getHost() {
-        return host;
-    }
-
-    public void setHost(String host) {
-        this.host = host;
-    }
-
-
-    public int getPort() {
-        return port;
-    }
-
-    public void setPort(int port) {
-        this.port = port;
-    }
+    private long minEvictableIdleTimeMillis = 108000;
+    private long timeBetweenEvictionRunsMillis = 108000;
 
     public int getMaxActive() {
         return maxActive;
@@ -96,18 +77,18 @@ public class TCPClientPoolConfig {
     }
 
     public long getMinEvictableIdleTimeMillis() {
-        return MinEvictableIdleTimeMillis;
+        return minEvictableIdleTimeMillis;
     }
 
     public void setMinEvictableIdleTimeMillis(long minEvictableIdleTimeMillis) {
-        MinEvictableIdleTimeMillis = minEvictableIdleTimeMillis;
+        this.minEvictableIdleTimeMillis = minEvictableIdleTimeMillis;
     }
 
     public long getTimeBetweenEvictionRunsMillis() {
-        return TimeBetweenEvictionRunsMillis;
+        return timeBetweenEvictionRunsMillis;
     }
 
     public void setTimeBetweenEvictionRunsMillis(long timeBetweenEvictionRunsMillis) {
-        TimeBetweenEvictionRunsMillis = timeBetweenEvictionRunsMillis;
+        this.timeBetweenEvictionRunsMillis = timeBetweenEvictionRunsMillis;
     }
 }

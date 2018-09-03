@@ -20,9 +20,11 @@ package org.wso2.carbon.stream.processor.core.ha;
 
 import org.apache.commons.pool.impl.GenericKeyedObjectPool;
 import org.apache.log4j.Logger;
+import org.wso2.carbon.cluster.coordinator.service.ClusterCoordinator;
 import org.wso2.carbon.stream.processor.core.event.queue.QueuedEvent;
 import org.wso2.carbon.stream.processor.core.ha.transport.TCPNettyClient;
 import org.wso2.carbon.stream.processor.core.ha.util.CoordinationConstants;
+import org.wso2.carbon.stream.processor.core.internal.StreamProcessorDataHolder;
 import org.wso2.siddhi.core.event.Event;
 import org.wso2.siddhi.core.stream.input.InputHandler;
 import org.wso2.siddhi.core.stream.input.source.SourceHandler;
@@ -30,7 +32,6 @@ import org.wso2.siddhi.query.api.definition.StreamDefinition;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
 
 /**
@@ -46,10 +47,15 @@ public class HACoordinationSourceHandler extends SourceHandler {
     private GenericKeyedObjectPool tcpConnectionPool;
     private QueuedEvent queuedEvent = new QueuedEvent();
     private AtomicLong sequenceID;
+    private ClusterCoordinator clusterCoordinator;
+    private HAManager haManager;
+    private boolean isPassiveNodeAdded;
 
     private static final Logger log = Logger.getLogger(HACoordinationSourceHandler.class);
 
     public HACoordinationSourceHandler(GenericKeyedObjectPool tcpConnectionPool, AtomicLong sequenceID) {
+        this.clusterCoordinator = StreamProcessorDataHolder.getClusterCoordinator();
+        this.haManager = StreamProcessorDataHolder.getHAManager();
         this.tcpConnectionPool = tcpConnectionPool;
         this.sequenceID = sequenceID;
         activeNodeEventDispatcher = new ActiveNodeEventDispatcher();
@@ -71,7 +77,9 @@ public class HACoordinationSourceHandler extends SourceHandler {
     public void sendEvent(Event event, InputHandler inputHandler) throws InterruptedException {
         if (isActiveNode) {
             lastProcessedEventTimestamp = event.getTimestamp();
-            sendEventsToPassiveNode(event);
+            if (isPassiveNodeAdded) {
+                sendEventsToPassiveNode(event);
+            }
             inputHandler.send(event);
         }
     }
@@ -87,9 +95,15 @@ public class HACoordinationSourceHandler extends SourceHandler {
     public void sendEvent(Event[] events, InputHandler inputHandler) throws InterruptedException {
         if (isActiveNode) {
             lastProcessedEventTimestamp = events[events.length - 1].getTimestamp();
-            sendEventsToPassiveNode(events);
+            if (isPassiveNodeAdded) {
+                sendEventsToPassiveNode(events);
+            }
             inputHandler.send(events);
         }
+    }
+
+    public void setPassiveNodeAdded(boolean isPassiveNodeAdded) {
+        this.isPassiveNodeAdded = isPassiveNodeAdded;
     }
 
     /**
@@ -128,52 +142,63 @@ public class HACoordinationSourceHandler extends SourceHandler {
     }
 
     private void sendEventsToPassiveNode(Event event) {
-        queuedEvent.setSequenceID(sequenceID.incrementAndGet());
-        queuedEvent.setEvent(event);
-        queuedEvent.setSiddhiAppName(siddhiAppName);
-        queuedEvent.setSourceHandlerElementId(sourceHandlerElementId);
-        activeNodeEventDispatcher.setQueuedEvent(queuedEvent);
-        activeNodeEventDispatcher.setQueuedEvents(null);
-        TCPNettyClient tcpNettyClient = null;
-        try {
-            tcpNettyClient = (TCPNettyClient) tcpConnectionPool.borrowObject("ActiveNode");
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        activeNodeEventDispatcher.setTcpNettyClient(tcpNettyClient);
-        activeNodeEventDispatcher.sendEventToPassiveNode(queuedEvent);
-        try {
-            tcpConnectionPool.returnObject("ActiveNode", tcpNettyClient);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
-    private void sendEventsToPassiveNode(Event[] events) {
-        QueuedEvent[] queuedEvents = new QueuedEvent[events.length];
-        int i = 0;
-        for (Event event : events) {
+        TCPNettyClient tcpNettyClient = getTCPNettyClient();
+        if (tcpNettyClient != null) {
             queuedEvent.setSequenceID(sequenceID.incrementAndGet());
             queuedEvent.setEvent(event);
             queuedEvent.setSiddhiAppName(siddhiAppName);
             queuedEvent.setSourceHandlerElementId(sourceHandlerElementId);
-            queuedEvents[i] = queuedEvent;
-            i++;
+            activeNodeEventDispatcher.setQueuedEvent(queuedEvent);
+            activeNodeEventDispatcher.setQueuedEvents(null);
+            activeNodeEventDispatcher.setTcpNettyClient(tcpNettyClient);
+            activeNodeEventDispatcher.sendEventToPassiveNode(queuedEvent);
+            try {
+                tcpConnectionPool.returnObject("ActiveNode", tcpNettyClient);
+            } catch (Exception e) {
+                log.error("Error in returning the tcpClient connection object to the pool. ", e);
+            }
         }
-        activeNodeEventDispatcher.setQueuedEvent(null);
-        activeNodeEventDispatcher.setQueuedEvents(queuedEvents);
+    }
+
+    private void sendEventsToPassiveNode(Event[] events) {
+        TCPNettyClient tcpNettyClient = getTCPNettyClient();
+        if (tcpNettyClient != null) {
+            QueuedEvent[] queuedEvents = new QueuedEvent[events.length];
+            int i = 0;
+            for (Event event : events) {
+                queuedEvent.setSequenceID(sequenceID.incrementAndGet());
+                queuedEvent.setEvent(event);
+                queuedEvent.setSiddhiAppName(siddhiAppName);
+                queuedEvent.setSourceHandlerElementId(sourceHandlerElementId);
+                queuedEvents[i] = queuedEvent;
+                i++;
+            }
+            activeNodeEventDispatcher.setQueuedEvent(null);
+            activeNodeEventDispatcher.setQueuedEvents(queuedEvents);
+            activeNodeEventDispatcher.setTcpNettyClient(tcpNettyClient);
+            activeNodeEventDispatcher.sendEventsToPassiveNode(queuedEvents);
+            try {
+                tcpConnectionPool.returnObject("ActiveNode", tcpNettyClient);
+            } catch (Exception e) {
+                log.error("Error in returning the tcpClient connection object to the pool. ", e);
+            }
+        }
+    }
+
+    private TCPNettyClient getTCPNettyClient() {
         TCPNettyClient tcpNettyClient = null;
         try {
             tcpNettyClient = (TCPNettyClient) tcpConnectionPool.borrowObject("ActiveNode");
         } catch (Exception e) {
-            e.printStackTrace();
+            log.error("Error in obtaining a tcp connection to the passive node. Hence not sending events to the " +
+                    "passive node. " + e.getMessage());
+            try {
+                tcpConnectionPool.returnObject("ActiveNode", tcpNettyClient);
+                tcpConnectionPool.clear();
+            } catch (Exception exception) {
+                log.error("Error in returning the tcpClient connection object to the pool. ", exception);
+            }
         }
-        activeNodeEventDispatcher.setTcpNettyClient(tcpNettyClient);
-        activeNodeEventDispatcher.sendEventsToPassiveNode(queuedEvents);
-        try {
-            tcpConnectionPool.returnObject("ActiveNode", tcpNettyClient);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        return tcpNettyClient;
     }
 }

@@ -26,11 +26,11 @@ import org.wso2.siddhi.core.exception.ConnectionUnavailableException;
  * to mainly create, validate and terminate  the client to the endpoint.
  */
 
-public class ClientPoolFactory extends BaseKeyedPoolableObjectFactory {
+public class TCPClientPoolFactory extends BaseKeyedPoolableObjectFactory {
     private String hostname;
     private int port;
 
-    public ClientPoolFactory(String host, int port) {
+    public TCPClientPoolFactory(String host, int port) {
         this.hostname = host;
         this.port = port;
     }
