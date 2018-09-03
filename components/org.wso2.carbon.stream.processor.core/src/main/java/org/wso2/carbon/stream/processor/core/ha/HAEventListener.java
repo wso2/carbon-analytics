@@ -24,6 +24,7 @@ import org.wso2.carbon.cluster.coordinator.commons.MemberEventListener;
 import org.wso2.carbon.cluster.coordinator.commons.node.NodeDetail;
 import org.wso2.carbon.cluster.coordinator.service.ClusterCoordinator;
 import org.wso2.carbon.stream.processor.core.internal.StreamProcessorDataHolder;
+import org.wso2.carbon.stream.processor.core.persistence.PersistenceManager;
 import org.wso2.siddhi.core.exception.ConnectionUnavailableException;
 import org.wso2.siddhi.core.stream.input.source.SourceHandler;
 import org.wso2.siddhi.core.stream.input.source.SourceHandlerManager;
@@ -49,6 +50,7 @@ public class HAEventListener extends MemberEventListener {
     @Override
     public void memberAdded(NodeDetail nodeDetail) {
         if (!nodeDetail.isCoordinator()) {
+            new PersistenceManager().run();
             SourceHandlerManager sourceHandlerManager = StreamProcessorDataHolder.getSourceHandlerManager();
             Map<String, SourceHandler> registeredSourceHandlers = sourceHandlerManager.
                     getRegsiteredSourceHandlers();

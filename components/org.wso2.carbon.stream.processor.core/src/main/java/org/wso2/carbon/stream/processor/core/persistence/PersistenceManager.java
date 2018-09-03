@@ -18,19 +18,24 @@
 
 package org.wso2.carbon.stream.processor.core.persistence;
 
+import org.apache.commons.pool.impl.GenericKeyedObjectPool;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.wso2.carbon.stream.processor.core.ha.HAManager;
-import org.wso2.carbon.stream.processor.core.ha.transport.TCPNettyClient;
+import org.wso2.carbon.stream.processor.core.ha.transport.TCPConnectionPoolManager;
+import org.wso2.carbon.stream.processor.core.ha.transport.TCPConnectionPoolFactory;
+import org.wso2.carbon.stream.processor.core.ha.transport.TCPConnection;
 import org.wso2.carbon.stream.processor.core.ha.util.HAConstants;
 import org.wso2.carbon.stream.processor.core.internal.StreamProcessorDataHolder;
 import org.wso2.carbon.stream.processor.core.internal.beans.DeploymentConfig;
+import org.wso2.carbon.stream.processor.core.internal.beans.TCPClientPoolConfig;
 import org.wso2.siddhi.core.SiddhiAppRuntime;
 import org.wso2.siddhi.core.exception.ConnectionUnavailableException;
 import org.wso2.siddhi.core.util.snapshot.PersistenceReference;
 
 import java.util.Arrays;
 import java.util.concurrent.ConcurrentMap;
+import java.util.concurrent.atomic.AtomicLong;
 
 /**
  * Class that manages the periodic persistence of Siddhi Applications
@@ -38,9 +43,10 @@ import java.util.concurrent.ConcurrentMap;
 public class PersistenceManager implements Runnable {
 
     private static final Logger log = LoggerFactory.getLogger(PersistenceManager.class);
-    private TCPNettyClient tcpNettyClient = new TCPNettyClient();
     private HAManager haManager;
     private DeploymentConfig deploymentConfig;
+    private TCPConnection tcpConnection;
+    private AtomicLong sequenceIDGenerator;
 
     public PersistenceManager() {
     }
@@ -48,10 +54,11 @@ public class PersistenceManager implements Runnable {
     @Override
     public void run() {
         haManager = StreamProcessorDataHolder.getHAManager();
-        deploymentConfig = StreamProcessorDataHolder.getDeploymentConfig();
         if (haManager != null) {
             if (haManager.isActiveNode()) {
-                persist();
+                tcpConnection = getTCPConnection();
+                sequenceIDGenerator = TCPConnectionPoolManager.getSequenceID();
+                persistWithControlMessage();
             } //Passive node will not persist the state
         } else {
             persist();
@@ -61,11 +68,29 @@ public class PersistenceManager implements Runnable {
     private void persist() {
         ConcurrentMap<String, SiddhiAppRuntime> siddhiAppRuntimeMap = StreamProcessorDataHolder.
                 getSiddhiManager().getSiddhiAppRuntimeMap();
+        for (SiddhiAppRuntime siddhiAppRuntime : siddhiAppRuntimeMap.values()) {
+            PersistenceReference persistenceReference = siddhiAppRuntime.persist();
+            if (log.isDebugEnabled()) {
+                log.debug("Revision " + persistenceReference.getRevision() +
+                        " of siddhi App " + siddhiAppRuntime.getName() + " persisted successfully");
+            }
+        }
+        if (StreamProcessorDataHolder.getNodeInfo() != null) {
+            StreamProcessorDataHolder.getNodeInfo().setLastPersistedTimestamp(System.currentTimeMillis());
+        }
+        log.info("siddhi Apps are persisted successfully");
+    }
+
+
+    private void persistWithControlMessage() {
+        ConcurrentMap<String, SiddhiAppRuntime> siddhiAppRuntimeMap = StreamProcessorDataHolder.
+                getSiddhiManager().getSiddhiAppRuntimeMap();
         String[] siddhiRevisionArray = new String[siddhiAppRuntimeMap.size()];
         int siddhiAppCount = 0;
         for (SiddhiAppRuntime siddhiAppRuntime : siddhiAppRuntimeMap.values()) {
             PersistenceReference persistenceReference = siddhiAppRuntime.persist();
-            siddhiRevisionArray[siddhiAppCount] = persistenceReference.getRevision();
+            siddhiRevisionArray[siddhiAppCount] = sequenceIDGenerator.incrementAndGet() + HAConstants
+                    .PERSISTED_APP_SPLIT_DELIMITER + persistenceReference.getRevision();
             siddhiAppCount++;
             if (log.isDebugEnabled()) {
                 log.debug("Revision " + persistenceReference.getRevision() +
@@ -78,16 +103,34 @@ public class PersistenceManager implements Runnable {
         if (StreamProcessorDataHolder.getNodeInfo() != null) {
             StreamProcessorDataHolder.getNodeInfo().setLastPersistedTimestamp(System.currentTimeMillis());
         }
+        log.info("siddhi Apps are persisted successfully");
+    }
+
+
+    private TCPConnection getTCPConnection() {
+        deploymentConfig = StreamProcessorDataHolder.getDeploymentConfig();
+        TCPConnectionPoolManager.initializeConnectionPool(deploymentConfig);
+        GenericKeyedObjectPool tcpConnectionPool = TCPConnectionPoolManager.getConnectionPool();
+        TCPConnection tcpConnection = null;
+        try {
+            tcpConnection = (TCPConnection) tcpConnectionPool.borrowObject("ActiveNode");
+            tcpConnectionPool.returnObject("ActiveNode", tcpConnection);
+        } catch (Exception e) {
+            log.error("Error in getting a connection to the Passive node. { host: '" + deploymentConfig
+                    .getPassiveNodeHost() + "', port: '" + deploymentConfig.getPassiveNodePort() + "'");
+        }
+        return tcpConnection;
     }
 
     private void sendControlMessageToPassiveNode(String[] siddhiRevisionArray) {
         try {
-            if (!tcpNettyClient.isActive()) {
-                tcpNettyClient.connect(deploymentConfig.getPassiveNodeHost(), deploymentConfig
-                        .getPassiveNodePort());
-            }
             String siddhiAppRevisions = Arrays.toString(siddhiRevisionArray);
-            tcpNettyClient.send(HAConstants.CHANNEL_ID_CONTROL_MESSAGE, siddhiAppRevisions.getBytes());
+            if (tcpConnection != null) {
+                tcpConnection.send(HAConstants.CHANNEL_ID_CONTROL_MESSAGE, siddhiAppRevisions.getBytes());
+            } else {
+                log.error("Error in getting the TCP connection to the passive node. Hence not sending the control " +
+                        "message to the passive node");
+            }
         } catch (ConnectionUnavailableException e) {
             log.error("Error in connecting to the Passive node. { host: '" + deploymentConfig.getPassiveNodeHost() + "', " +
                     "port: '" + deploymentConfig.getPassiveNodePort() + "'");

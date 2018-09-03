@@ -20,20 +20,19 @@ package org.wso2.carbon.stream.processor.core.ha;
 
 import org.apache.log4j.Logger;
 import org.wso2.carbon.stream.processor.core.event.queue.QueuedEvent;
-import org.wso2.carbon.stream.processor.core.ha.transport.TCPNettyClient;
+import org.wso2.carbon.stream.processor.core.ha.transport.TCPConnection;
 import org.wso2.carbon.stream.processor.core.ha.util.HAConstants;
 import org.wso2.carbon.stream.processor.core.util.BinaryEventConverter;
 import org.wso2.siddhi.core.exception.ConnectionUnavailableException;
 
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.util.Arrays;
-import java.util.zip.Deflater;
+import java.util.concurrent.atomic.AtomicLong;
 
 public class ActiveNodeEventDispatcher {
     private static final Logger log = Logger.getLogger(ActiveNodeEventDispatcher.class);
-    private TCPNettyClient tcpNettyClient;
+    private TCPConnection tcpConnection;
     private String host;
     private int port;
     private ByteBuffer messageBuffer = ByteBuffer.wrap(new byte[1024 * 1024 * 10]);
@@ -63,7 +62,7 @@ public class ActiveNodeEventDispatcher {
         if (numOfEvents > 0) {
             try {
                 data = Arrays.copyOfRange(messageBuffer.array(), 0, messageBuffer.position());
-                tcpNettyClient.send(HAConstants.CHANNEL_ID_MESSAGE, data);
+                tcpConnection.send(HAConstants.CHANNEL_ID_MESSAGE, data);
             } catch (ConnectionUnavailableException e) {
                 log.error("Error in sending events to " + host + ":" + port + ".Will retry in the next iteration");
             }
@@ -86,15 +85,15 @@ public class ActiveNodeEventDispatcher {
         if (numOfEvents > 0) {
             try {
                 data = Arrays.copyOfRange(messageBuffer.array(), 0, messageBuffer.position());
-                tcpNettyClient.send(HAConstants.CHANNEL_ID_MESSAGE, data);
+                tcpConnection.send(HAConstants.CHANNEL_ID_MESSAGE, data);
             } catch (ConnectionUnavailableException e) {
                 log.error("Error in sending events to " + host + ":" + port + ".Will retry in the next iteration");
             }
         }
     }
 
-    public void setTcpNettyClient(TCPNettyClient tcpNettyClient) {
-        this.tcpNettyClient = tcpNettyClient;
+    public void setTcpConnection(TCPConnection tcpConnection) {
+        this.tcpConnection = tcpConnection;
     }
 
 }

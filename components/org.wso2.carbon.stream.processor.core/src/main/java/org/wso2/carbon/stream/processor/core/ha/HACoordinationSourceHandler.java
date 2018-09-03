@@ -22,7 +22,8 @@ import org.apache.commons.pool.impl.GenericKeyedObjectPool;
 import org.apache.log4j.Logger;
 import org.wso2.carbon.cluster.coordinator.service.ClusterCoordinator;
 import org.wso2.carbon.stream.processor.core.event.queue.QueuedEvent;
-import org.wso2.carbon.stream.processor.core.ha.transport.TCPNettyClient;
+import org.wso2.carbon.stream.processor.core.ha.transport.TCPConnection;
+import org.wso2.carbon.stream.processor.core.ha.transport.TCPConnectionPoolManager;
 import org.wso2.carbon.stream.processor.core.ha.util.CoordinationConstants;
 import org.wso2.carbon.stream.processor.core.internal.StreamProcessorDataHolder;
 import org.wso2.siddhi.core.event.Event;
@@ -53,11 +54,11 @@ public class HACoordinationSourceHandler extends SourceHandler {
 
     private static final Logger log = Logger.getLogger(HACoordinationSourceHandler.class);
 
-    public HACoordinationSourceHandler(GenericKeyedObjectPool tcpConnectionPool, AtomicLong sequenceID) {
+    public HACoordinationSourceHandler() {
         this.clusterCoordinator = StreamProcessorDataHolder.getClusterCoordinator();
         this.haManager = StreamProcessorDataHolder.getHAManager();
-        this.tcpConnectionPool = tcpConnectionPool;
-        this.sequenceID = sequenceID;
+        this.tcpConnectionPool = TCPConnectionPoolManager.getConnectionPool();
+        this.sequenceID = TCPConnectionPoolManager.getSequenceID();
         activeNodeEventDispatcher = new ActiveNodeEventDispatcher();
     }
 
@@ -142,18 +143,18 @@ public class HACoordinationSourceHandler extends SourceHandler {
     }
 
     private void sendEventsToPassiveNode(Event event) {
-        TCPNettyClient tcpNettyClient = getTCPNettyClient();
-        if (tcpNettyClient != null) {
+        TCPConnection tcpConnection = getTCPNettyClient();
+        if (tcpConnection != null) {
             queuedEvent.setSequenceID(sequenceID.incrementAndGet());
             queuedEvent.setEvent(event);
             queuedEvent.setSiddhiAppName(siddhiAppName);
             queuedEvent.setSourceHandlerElementId(sourceHandlerElementId);
             activeNodeEventDispatcher.setQueuedEvent(queuedEvent);
             activeNodeEventDispatcher.setQueuedEvents(null);
-            activeNodeEventDispatcher.setTcpNettyClient(tcpNettyClient);
+            activeNodeEventDispatcher.setTcpConnection(tcpConnection);
             activeNodeEventDispatcher.sendEventToPassiveNode(queuedEvent);
             try {
-                tcpConnectionPool.returnObject("ActiveNode", tcpNettyClient);
+                tcpConnectionPool.returnObject("ActiveNode", tcpConnection);
             } catch (Exception e) {
                 log.error("Error in returning the tcpClient connection object to the pool. ", e);
             }
@@ -161,8 +162,8 @@ public class HACoordinationSourceHandler extends SourceHandler {
     }
 
     private void sendEventsToPassiveNode(Event[] events) {
-        TCPNettyClient tcpNettyClient = getTCPNettyClient();
-        if (tcpNettyClient != null) {
+        TCPConnection tcpConnection = getTCPNettyClient();
+        if (tcpConnection != null) {
             QueuedEvent[] queuedEvents = new QueuedEvent[events.length];
             int i = 0;
             for (Event event : events) {
@@ -175,30 +176,30 @@ public class HACoordinationSourceHandler extends SourceHandler {
             }
             activeNodeEventDispatcher.setQueuedEvent(null);
             activeNodeEventDispatcher.setQueuedEvents(queuedEvents);
-            activeNodeEventDispatcher.setTcpNettyClient(tcpNettyClient);
+            activeNodeEventDispatcher.setTcpConnection(tcpConnection);
             activeNodeEventDispatcher.sendEventsToPassiveNode(queuedEvents);
             try {
-                tcpConnectionPool.returnObject("ActiveNode", tcpNettyClient);
+                tcpConnectionPool.returnObject("ActiveNode", tcpConnection);
             } catch (Exception e) {
                 log.error("Error in returning the tcpClient connection object to the pool. ", e);
             }
         }
     }
 
-    private TCPNettyClient getTCPNettyClient() {
-        TCPNettyClient tcpNettyClient = null;
+    private TCPConnection getTCPNettyClient() {
+        TCPConnection tcpConnection = null;
         try {
-            tcpNettyClient = (TCPNettyClient) tcpConnectionPool.borrowObject("ActiveNode");
+            tcpConnection = (TCPConnection) tcpConnectionPool.borrowObject("ActiveNode");
         } catch (Exception e) {
             log.error("Error in obtaining a tcp connection to the passive node. Hence not sending events to the " +
                     "passive node. " + e.getMessage());
             try {
-                tcpConnectionPool.returnObject("ActiveNode", tcpNettyClient);
+                tcpConnectionPool.returnObject("ActiveNode", tcpConnection);
                 tcpConnectionPool.clear();
             } catch (Exception exception) {
                 log.error("Error in returning the tcpClient connection object to the pool. ", exception);
             }
         }
-        return tcpNettyClient;
+        return tcpConnection;
     }
 }

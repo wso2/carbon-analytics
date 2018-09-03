@@ -29,15 +29,8 @@ import java.util.concurrent.atomic.AtomicLong;
  */
 public class HACoordinationSourceHandlerManager extends SourceHandlerManager {
 
-    private GenericKeyedObjectPool tcpConnectionPool;
-    private AtomicLong sequenceID = new AtomicLong();
-
-    public HACoordinationSourceHandlerManager(GenericKeyedObjectPool tcpConnectionPool) {
-        this.tcpConnectionPool = tcpConnectionPool;
-    }
-
     @Override
     public SourceHandler generateSourceHandler() {
-        return new HACoordinationSourceHandler(tcpConnectionPool, sequenceID);
+        return new HACoordinationSourceHandler();
     }
 }
