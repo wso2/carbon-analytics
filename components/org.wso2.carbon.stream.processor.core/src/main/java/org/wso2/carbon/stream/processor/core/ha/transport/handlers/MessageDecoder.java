@@ -56,36 +56,37 @@ public class MessageDecoder extends ByteToMessageDecoder {
             return;
         }
         byteBufferQueue.offer(in);
-        try {
-
-            int channelIdSize = in.readInt();
-            String channelId = BinaryMessageConverterUtil.getString(in, channelIdSize);
-
-            int dataLength = in.readInt();
-            byte[] bytes = new byte[dataLength];
-            in.readBytes(bytes);
-            //LOG.info("Message Received : " + new String(bytes));
-
-            if (channelId.equals(HAConstants.CHANNEL_ID_MESSAGE)) {
-                ByteBuffer messageBuffer = ByteBuffer.wrap(bytes);
-                count++;
-                if (count % 10000 == 0) {
-                    log.info("COUNT " + count);
-                    endTime = new Date().getTime();
-                    //LOG.info("TIME START    " + time + "    TIMES   " + timeE);
-                    log.info("Server TPS:   " + (((10000 * 1000) / (endTime - startTime))));
-                    startTime = new Date().getTime();
-                }
-
-            } else if (channelId.equals(HAConstants.CHANNEL_ID_CONTROL_MESSAGE)) {
-
-                log.info("Control Message Received : " + new String(bytes));
-            }
-        } catch (UnsupportedEncodingException e) {
-            e.printStackTrace();
-        } finally {
-                    in.markReaderIndex();
-        }
+//        try {
+//
+//            int channelIdSize = in.readInt();
+//            String channelId = BinaryMessageConverterUtil.getString(in, channelIdSize);
+//
+//            int dataLength = in.readInt();
+//            byte[] bytes = new byte[dataLength];
+//            in.readBytes(bytes);
+//            //LOG.info("Message Received : " + new String(bytes));
+//
+//            if (channelId.equals(HAConstants.CHANNEL_ID_MESSAGE)) {
+//                ByteBuffer messageBuffer = ByteBuffer.wrap(bytes);
+//                count++;
+//                if (count % 10000 == 0) {
+//                    log.info("COUNT " + count);
+//                    endTime = new Date().getTime();
+//                    //LOG.info("TIME START    " + time + "    TIMES   " + timeE);
+//                    log.info("Server TPS:   " + (((10000 * 1000) / (endTime - startTime))));
+//                    startTime = new Date().getTime();
+//                }
+//
+//            } else if (channelId.equals(HAConstants.CHANNEL_ID_CONTROL_MESSAGE)) {
+//
+//                log.info("Control Message Received : " + new String(bytes));
+//            }
+//        } catch (UnsupportedEncodingException e) {
+//            e.printStackTrace();
+//        } finally {
+//
+//        }
+        in.markReaderIndex();
 
     }
 }

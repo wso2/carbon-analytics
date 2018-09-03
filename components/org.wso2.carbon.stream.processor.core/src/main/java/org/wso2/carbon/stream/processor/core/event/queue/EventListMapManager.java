@@ -53,9 +53,9 @@ public class EventListMapManager {
             message = message.replace ("[", "");
             message = message.replace ("]", "");
             String[] persistedApps = message.split(",");
-            String lastPersistedAppInfo = persistedApps[persistedApps.length];
+            String lastPersistedAppInfo = persistedApps[persistedApps.length - 1];
             lastControlMessageSequenceId = Long.valueOf(lastPersistedAppInfo.split(HAConstants.
-                    PERSISTED_APP_SPLIT_DELIMITER)[0]);
+                    PERSISTED_APP_SPLIT_DELIMITER)[0].trim());
             this.trimQueue(persistedApps);
         }
     }
@@ -138,8 +138,8 @@ public class EventListMapManager {
         if (eventListMap.size() != 0){
             for(String appDetail : persistedAppDetails){
                 String[] details = appDetail.split(HAConstants.PERSISTED_APP_SPLIT_DELIMITER);
-                String appName = details[2];
-                long seqId = Long.valueOf(details[0]);
+                String appName = details[2].trim();
+                long seqId = Long.valueOf(details[0].trim());
                 for(Map.Entry<Long,QueuedEvent> listMapValue : eventListMap.entrySet()) {
                     long key = listMapValue.getKey();
                     QueuedEvent queuedEvent = listMapValue.getValue();
