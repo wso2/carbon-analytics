@@ -26,6 +26,8 @@ import org.osgi.service.component.annotations.ReferenceCardinality;
 import org.osgi.service.component.annotations.ReferencePolicy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.wso2.carbon.config.ConfigurationException;
+import org.wso2.carbon.config.provider.ConfigProvider;
 import org.wso2.carbon.deployment.engine.Artifact;
 import org.wso2.carbon.deployment.engine.ArtifactType;
 import org.wso2.carbon.deployment.engine.Deployer;
@@ -46,6 +48,8 @@ import java.io.InputStreamReader;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.charset.Charset;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 /**
  * {@code StreamProcessorDeployer} is responsible for all Siddhi Appp file deployment tasks
@@ -63,6 +67,10 @@ public class StreamProcessorDeployer implements Deployer {
     private ArtifactType artifactType = new ArtifactType<>("siddhi");
     private SimulationDependencyListener simulationDependencyListener;
     private URL directoryLocation;
+    private static ServerType serverType = ServerType.SP; // Default server type
+    private static boolean isAnalyticsEnabledOnSP = false;
+    private static boolean apimAnalyticsEnabledOnSP = false;
+    private static boolean eiAnalyticsEnabledOnSP = false;
 
     public static void deploySiddhiQLFile(File file) throws Exception {
         InputStream inputStream = null;
@@ -73,6 +81,10 @@ public class StreamProcessorDeployer implements Deployer {
             String siddhiAppFileName = file.getName();
             if (siddhiAppFileName.endsWith(SiddhiAppProcessorConstants.SIDDHI_APP_FILE_EXTENSION)) {
                 String siddhiAppFileNameWithoutExtension = getFileNameWithoutExtenson(siddhiAppFileName);
+                SiddhiAppType siddhiAppType = getArtifactType(siddhiAppFileNameWithoutExtension);
+                if (!isDeploymentAllowed(siddhiAppType)) {
+                    return;
+                }
                 String siddhiApp = getStringFromInputStream(inputStream);
                 try {
                     siddhiAppName = StreamProcessorDataHolder.getStreamProcessorService().
@@ -145,6 +157,129 @@ public class StreamProcessorDeployer implements Deployer {
         return fileName;
     }
 
+    private static SiddhiAppType getArtifactType(String fileName) {
+        fileName = fileName.toUpperCase();
+        if (fileName.startsWith(SiddhiAppProcessorConstants.APIM_SIDDHI_APP_PREFIX)) {
+            return SiddhiAppType.APIM;
+        } else if (fileName.startsWith(SiddhiAppProcessorConstants.EI_SIDDHI_APP_PREFIX)) {
+            return SiddhiAppType.EI;
+        } else if (fileName.startsWith(SiddhiAppProcessorConstants.IS_SIDDHI_APP_PREFIX)) {
+            return SiddhiAppType.IS;
+        } else {
+            return SiddhiAppType.OTHER;
+        }
+    }
+
+    private static boolean isDeploymentAllowed(SiddhiAppType siddhiAppType) {
+        switch (serverType) {
+            case SP:
+                switch (siddhiAppType) {
+                    case OTHER:
+                        return true;
+                    case APIM:
+                        if (apimAnalyticsEnabledOnSP) {
+                            return true;
+                        }
+                        break;
+                    case IS:
+                        if (isAnalyticsEnabledOnSP) {
+                            return true;
+                        }
+                        break;
+                    case EI:
+                        if (eiAnalyticsEnabledOnSP) {
+                            return true;
+                        }
+                        break;
+                }
+                break;
+            case APIM:
+                if (siddhiAppType.name().equals(SiddhiAppType.APIM.name())) {
+                    return true;
+                }
+                break;
+            case IS:
+                if (siddhiAppType.name().equals(SiddhiAppType.IS.name())) {
+                    return true;
+                }
+                break;
+            case EI:
+                if (siddhiAppType.name().equals(SiddhiAppType.EI.name())) {
+                    return true;
+                }
+                break;
+        }
+        return false;
+    }
+
+    private void setServerType() {
+        ConfigProvider configProvider = StreamProcessorDataHolder.getInstance().getConfigProvider();
+        if (configProvider != null) {
+            try {
+                String type = (String) ((Map) configProvider
+                        .getConfigurationObject("wso2.carbon")).get(SiddhiAppProcessorConstants.WSO2_SERVER_TYPE);
+                if (type != null) {
+                    switch (type) {
+                        case SiddhiAppProcessorConstants.WSO2_SERVER_TYPE_SP:
+                            serverType = ServerType.SP;
+                            break;
+                        case SiddhiAppProcessorConstants.WSO2_SERVER_TYPE_APIM_ANALYTICS:
+                            serverType = ServerType.APIM;
+                            break;
+                        case SiddhiAppProcessorConstants.WSO2_SERVER_TYPE_IS_ANALYTICS:
+                            serverType = ServerType.IS;
+                            break;
+                        case SiddhiAppProcessorConstants.WSO2_SERVER_TYPE_EI_ANALYTICS:
+                            serverType = ServerType.EI;
+                            break;
+                        default:
+                            serverType = ServerType.SP;
+                            break;
+                    }
+                    try {
+                        if (serverType.name().equals(ServerType.SP.name())) {
+                            LinkedHashMap analyticsSolutionsMap = (LinkedHashMap) configProvider.
+                                    getConfigurationObject(SiddhiAppProcessorConstants.ANALYTICS_SOLUTIONS);
+                            if (analyticsSolutionsMap != null) {
+                                Object directoryPathObject = analyticsSolutionsMap.get(
+                                        SiddhiAppProcessorConstants.IS_ANALYTICS_ENABLED);
+                                if (directoryPathObject != null) {
+                                    isAnalyticsEnabledOnSP = Boolean.parseBoolean(directoryPathObject.toString());
+                                }
+                                directoryPathObject = analyticsSolutionsMap.get(
+                                        SiddhiAppProcessorConstants.APIM_ANALYTICS_ENABLED);
+                                if (directoryPathObject != null) {
+                                    apimAnalyticsEnabledOnSP = Boolean.parseBoolean(directoryPathObject.toString());
+                                }
+                                directoryPathObject = analyticsSolutionsMap.get(
+                                        SiddhiAppProcessorConstants.EI_ANALYTICS_ENABLED);
+                                if (directoryPathObject != null) {
+                                    eiAnalyticsEnabledOnSP = Boolean.parseBoolean(directoryPathObject.toString());
+                                }
+                            }
+                        }
+                    } catch (ConfigurationException e) {
+                        log.error("Failed to read " + SiddhiAppProcessorConstants.ANALYTICS_SOLUTIONS
+                                + "'property from the deployment.yaml file. None of the analytics solutions will " +
+                                "be deployed. ", e);
+                    }
+                }
+            } catch (ConfigurationException e) {
+                log.error("Failed to read the wso2.carbon server " + SiddhiAppProcessorConstants.WSO2_SERVER_TYPE
+                        + "'property from the deployment.yaml file. Default value " + serverType.name() +
+                        " will be set.", e);
+            }
+        }
+    }
+
+    public enum SiddhiAppType {
+        EI, IS, APIM, OTHER
+    }
+
+    public enum ServerType {
+        EI, IS, APIM, SP
+    }
+
     @Activate
     protected void activate(BundleContext bundleContext) {
         // Nothing to do.
@@ -154,6 +289,7 @@ public class StreamProcessorDeployer implements Deployer {
     public void init() {
         try {
             directoryLocation = new URL("file:" + SiddhiAppProcessorConstants.SIDDHI_APP_FILES_DIRECTORY);
+            setServerType();
             log.debug("Stream Processor Deployer initiated.");
         } catch (MalformedURLException e) {
             log.error("Error while initializing directoryLocation" + SiddhiAppProcessorConstants.
@@ -296,3 +432,4 @@ public class StreamProcessorDeployer implements Deployer {
         }
     }
 }
+
