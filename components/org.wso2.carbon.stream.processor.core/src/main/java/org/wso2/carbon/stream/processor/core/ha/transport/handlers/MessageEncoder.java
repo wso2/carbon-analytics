@@ -36,10 +36,12 @@ public class MessageEncoder extends MessageToByteEncoder<EventComposite> {
         String streamId = eventComposite.getChannelId();
         int dataLength = eventComposite.getMessage().length;
 
-        int messageSize = 4 + sessionId.length() + 4 + streamId.length() + 4 + dataLength;
+        int messageSize = 1 + 4 + 4 + streamId.length() + 4 + dataLength;
 
         byteBuf.writeByte((byte) 2);  //1
         byteBuf.writeInt(messageSize); //4
+//        byteBuf.writeInt(sessionId.length()); //4
+//        byteBuf.writeBytes(sessionId.getBytes("UTF-8"));
         byteBuf.writeInt(streamId.length()); //4
         byteBuf.writeBytes(streamId.getBytes("UTF-8"));
         byteBuf.writeInt(dataLength); //4
