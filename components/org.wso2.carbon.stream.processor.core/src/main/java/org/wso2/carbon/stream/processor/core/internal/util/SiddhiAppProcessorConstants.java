@@ -37,9 +37,9 @@ public class SiddhiAppProcessorConstants {
 
     public static final String WSO2_SERVER_TYPE = "type";
     public static final String WSO2_SERVER_TYPE_SP = "wso2-sp";
-    public static final String WSO2_SERVER_TYPE_APIM_ANALYTICS = "apim.analytics";
-    public static final String WSO2_SERVER_TYPE_IS_ANALYTICS = "is.analytics";
-    public static final String WSO2_SERVER_TYPE_EI_ANALYTICS = "ei.analytics";
+    public static final String WSO2_SERVER_TYPE_APIM_ANALYTICS = "wso2-apim-analytics";
+    public static final String WSO2_SERVER_TYPE_IS_ANALYTICS = "wso2-is-analytics";
+    public static final String WSO2_SERVER_TYPE_EI_ANALYTICS = "wso2-ei-analytics";
 
     public static final String APIM_ANALYTICS_ENABLED = "APIM-analytics.enabled";
     public static final String IS_ANALYTICS_ENABLED = "IS-analytics.enabled";
