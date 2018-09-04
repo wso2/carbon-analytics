@@ -49,6 +49,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.charset.Charset;
 import java.util.LinkedHashMap;
+import java.util.Map;
 
 /**
  * {@code StreamProcessorDeployer} is responsible for all Siddhi Appp file deployment tasks
@@ -215,52 +216,57 @@ public class StreamProcessorDeployer implements Deployer {
         ConfigProvider configProvider = StreamProcessorDataHolder.getInstance().getConfigProvider();
         if (configProvider != null) {
             try {
-                LinkedHashMap analyticsSolutionsMap = (LinkedHashMap) configProvider.
-                        getConfigurationObject(SiddhiAppProcessorConstants.ANALYTICS_SOLUTIONS);
-                if (analyticsSolutionsMap != null) {
-                    Object typeObject = analyticsSolutionsMap.get(
-                            SiddhiAppProcessorConstants.WSO2_SERVER_TYPE);
-                    if (typeObject != null) {
-                        String type = typeObject.toString();
-                        switch (type) {
-                            case SiddhiAppProcessorConstants.WSO2_SERVER_TYPE_SP:
-                                serverType = ServerType.SP;
-                                break;
-                            case SiddhiAppProcessorConstants.WSO2_SERVER_TYPE_APIM_ANALYTICS:
-                                serverType = ServerType.APIM;
-                                break;
-                            case SiddhiAppProcessorConstants.WSO2_SERVER_TYPE_IS_ANALYTICS:
-                                serverType = ServerType.IS;
-                                break;
-                            case SiddhiAppProcessorConstants.WSO2_SERVER_TYPE_EI_ANALYTICS:
-                                serverType = ServerType.EI;
-                                break;
-                            default:
-                                serverType = ServerType.SP;
-                                break;
-                        }
+                String type = (String) ((Map) configProvider
+                        .getConfigurationObject("wso2.carbon")).get(SiddhiAppProcessorConstants.WSO2_SERVER_TYPE);
+                if (type != null) {
+                    switch (type) {
+                        case SiddhiAppProcessorConstants.WSO2_SERVER_TYPE_SP:
+                            serverType = ServerType.SP;
+                            break;
+                        case SiddhiAppProcessorConstants.WSO2_SERVER_TYPE_APIM_ANALYTICS:
+                            serverType = ServerType.APIM;
+                            break;
+                        case SiddhiAppProcessorConstants.WSO2_SERVER_TYPE_IS_ANALYTICS:
+                            serverType = ServerType.IS;
+                            break;
+                        case SiddhiAppProcessorConstants.WSO2_SERVER_TYPE_EI_ANALYTICS:
+                            serverType = ServerType.EI;
+                            break;
+                        default:
+                            serverType = ServerType.SP;
+                            break;
+                    }
+                    try {
                         if (serverType.name().equals(ServerType.SP.name())) {
-                            Object tempObject = analyticsSolutionsMap.get(
-                                    SiddhiAppProcessorConstants.IS_ANALYTICS_ENABLED);
-                            if (tempObject != null) {
-                                isAnalyticsEnabledOnSP = Boolean.parseBoolean(tempObject.toString());
-                            }
-                            tempObject = analyticsSolutionsMap.get(
-                                    SiddhiAppProcessorConstants.APIM_ANALYTICS_ENABLED);
-                            if (tempObject != null) {
-                                apimAnalyticsEnabledOnSP = Boolean.parseBoolean(tempObject.toString());
-                            }
-                            tempObject = analyticsSolutionsMap.get(
-                                    SiddhiAppProcessorConstants.EI_ANALYTICS_ENABLED);
-                            if (tempObject != null) {
-                                eiAnalyticsEnabledOnSP = Boolean.parseBoolean(tempObject.toString());
+                            LinkedHashMap analyticsSolutionsMap = (LinkedHashMap) configProvider.
+                                    getConfigurationObject(SiddhiAppProcessorConstants.ANALYTICS_SOLUTIONS);
+                            if (analyticsSolutionsMap != null) {
+                                Object directoryPathObject = analyticsSolutionsMap.get(
+                                        SiddhiAppProcessorConstants.IS_ANALYTICS_ENABLED);
+                                if (directoryPathObject != null) {
+                                    isAnalyticsEnabledOnSP = Boolean.parseBoolean(directoryPathObject.toString());
+                                }
+                                directoryPathObject = analyticsSolutionsMap.get(
+                                        SiddhiAppProcessorConstants.APIM_ANALYTICS_ENABLED);
+                                if (directoryPathObject != null) {
+                                    apimAnalyticsEnabledOnSP = Boolean.parseBoolean(directoryPathObject.toString());
+                                }
+                                directoryPathObject = analyticsSolutionsMap.get(
+                                        SiddhiAppProcessorConstants.EI_ANALYTICS_ENABLED);
+                                if (directoryPathObject != null) {
+                                    eiAnalyticsEnabledOnSP = Boolean.parseBoolean(directoryPathObject.toString());
+                                }
                             }
                         }
+                    } catch (ConfigurationException e) {
+                        log.error("Failed to read " + SiddhiAppProcessorConstants.ANALYTICS_SOLUTIONS
+                                + "'property from the deployment.yaml file. None of the analytics solutions will " +
+                                "be deployed. ", e);
                     }
                 }
             } catch (ConfigurationException e) {
-                log.error("Failed to read '" + SiddhiAppProcessorConstants.ANALYTICS_SOLUTIONS
-                        + "' property from the deployment.yaml file. Default server type: " + serverType.name() +
+                log.error("Failed to read the wso2.carbon server " + SiddhiAppProcessorConstants.WSO2_SERVER_TYPE
+                        + "'property from the deployment.yaml file. Default value " + serverType.name() +
                         " will be set.", e);
             }
         }
@@ -426,3 +432,4 @@ public class StreamProcessorDeployer implements Deployer {
         }
     }
 }
+
