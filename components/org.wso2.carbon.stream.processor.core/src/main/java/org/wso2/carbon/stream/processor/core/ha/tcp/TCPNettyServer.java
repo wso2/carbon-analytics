@@ -36,6 +36,7 @@ import org.wso2.carbon.stream.processor.core.internal.beans.TCPServerConfig;
 import org.wso2.carbon.stream.processor.core.util.BinaryMessageConverterUtil;
 
 import java.io.UnsupportedEncodingException;
+import java.nio.ByteBuffer;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -55,13 +56,13 @@ public class TCPNettyServer {
     private TCPServerConfig serverConfig;
     private static final Logger log = Logger.getLogger(TCPNettyServer.class);
     private EventListMapManager eventListMapManager = new EventListMapManager();
-    private BlockingQueue<ByteBuf> eventByteBufferQueue;
+    private BlockingQueue<ByteBuffer> eventByteBufferQueue;
     private ExecutorService eventBufferExtractorExecutorService = Executors.newFixedThreadPool(
             HAConstants.EVENT_BUFFER_EXTRACTOR_THREAD_POOL_SIZE);
     private EventBufferExtractor eventBufferExtractor = new EventBufferExtractor();
     private Future eventBufferExtractorFuture;
 
-    public void start(TCPServerConfig serverConf, BlockingQueue<ByteBuf> eventByteBufferQueue) {
+    public void start(TCPServerConfig serverConf, BlockingQueue<ByteBuffer> eventByteBufferQueue) {
         this.eventByteBufferQueue = eventByteBufferQueue;
         serverConfig = serverConf;
         bossGroup = new NioEventLoopGroup(serverConfig.getBossThreads());
@@ -120,12 +121,12 @@ public class TCPNettyServer {
         public void run() {
             try {
                 while (true) {
-                    ByteBuf in = eventByteBufferQueue.take();
-                    int channelIdSize = in.readInt();
+                    ByteBuffer in = eventByteBufferQueue.take();
+                    int channelIdSize = in.getInt();
                     String channelId = BinaryMessageConverterUtil.getString(in, channelIdSize);
-                    int dataLength = in.readInt();
+                    int dataLength = in.getInt();
                     byte[] bytes = new byte[dataLength];
-                    in.readBytes(bytes);
+                    in.get(bytes);
                     if (channelId.equals(HAConstants.CHANNEL_ID_CONTROL_MESSAGE)) {
                         eventListMapManager.parseControlMessage(bytes);
                     } else if (channelId.equals(HAConstants.CHANNEL_ID_MESSAGE)) {

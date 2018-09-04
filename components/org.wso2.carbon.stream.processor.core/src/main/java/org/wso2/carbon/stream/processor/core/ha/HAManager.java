@@ -59,7 +59,7 @@ public class HAManager {
     private TCPServer tcpServerInstance = TCPServer.getInstance();
     private EventListMapManager eventListMapManager;
     private DeploymentConfig deploymentConfig;
-    private BlockingQueue<ByteBuf> eventByteBufferQueue;
+    private BlockingQueue<ByteBuffer> eventByteBufferQueue;
     private TCPClientPoolConfig tcpClientPoolConfig;
 
     private final static Map<String, Object> activeNodePropertiesMap = new HashMap<>();
