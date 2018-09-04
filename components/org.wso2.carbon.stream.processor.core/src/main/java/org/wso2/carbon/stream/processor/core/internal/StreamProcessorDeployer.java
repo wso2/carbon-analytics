@@ -259,7 +259,7 @@ public class StreamProcessorDeployer implements Deployer {
                     }
                 }
             } catch (ConfigurationException e) {
-                log.error("Failed to read " + SiddhiAppProcessorConstants.ANALYTICS_SOLUTIONS
+                log.error("Failed to read '" + SiddhiAppProcessorConstants.ANALYTICS_SOLUTIONS
                         + "' property from the deployment.yaml file. Default server type: " + serverType.name() +
                         " will be set.", e);
             }
