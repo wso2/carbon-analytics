@@ -64,7 +64,7 @@ public class MessageDecoder extends ByteToMessageDecoder {
         } catch (InterruptedException e) {
             log.error("Error while waiting for the insertion of ByteBufferQueue " + e.getMessage(), e);
         }
-        //if (log.isDebugEnabled()) {
+        if (log.isDebugEnabled()) {
             synchronized (this) {
                 if (startTime == 0L) {
                     startTime = new Date().getTime();
@@ -76,7 +76,7 @@ public class MessageDecoder extends ByteToMessageDecoder {
                             (((TPS_EVENT_BATCH_THRESHOLD * 1000) / (endTime - startTime))));
                 }
             }
-        //}
+        }
         in.markReaderIndex();
     }
 }
