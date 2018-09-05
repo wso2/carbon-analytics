@@ -19,6 +19,7 @@
 package org.wso2.carbon.stream.processor.core.event.queue;
 
 import org.apache.log4j.Logger;
+import org.wso2.carbon.stream.processor.core.ha.exception.InvalidByteMessageException;
 import org.wso2.carbon.stream.processor.core.ha.tcp.SiddhiEventConverter;
 import org.wso2.carbon.stream.processor.core.ha.util.HAConstants;
 import org.wso2.carbon.stream.processor.core.internal.SiddhiAppData;
@@ -30,37 +31,35 @@ import org.wso2.siddhi.core.stream.input.source.Source;
 import java.io.UnsupportedEncodingException;
 import java.nio.ByteBuffer;
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentSkipListMap;
 
 public class EventListMapManager {
     private static ConcurrentSkipListMap<Long,QueuedEvent> eventListMap;
-    private static long lastControlMessageSequenceId;
+    private static Map<String,Long> perAppLastControlMessageSequenceNumberList = new HashMap<>();
     private static final Logger log = Logger.getLogger(EventListMapManager.class);
 
     public EventListMapManager() {
     }
 
-    public static ConcurrentSkipListMap<Long,QueuedEvent> initializeEventListMap() {
+    public static void initializeEventListMap() {
         eventListMap = new ConcurrentSkipListMap<Long, QueuedEvent>();
-        return eventListMap;
     }
 
-    public synchronized void parseControlMessage(byte[] controlMessageContentByteArray) {
+    public void parseControlMessage(byte[] controlMessageContentByteArray) {
         String message = new String(controlMessageContentByteArray);
-        if (message != null && !message.isEmpty()) {
+        if (!message.isEmpty()) {
             message = message.replace ("[", "");
             message = message.replace ("]", "");
             String[] persistedApps = message.split(",");
-            String lastPersistedAppInfo = persistedApps[persistedApps.length - 1];
-            lastControlMessageSequenceId = Long.valueOf(lastPersistedAppInfo.split(HAConstants.
-                    PERSISTED_APP_SPLIT_DELIMITER)[0].trim());
             this.trimQueue(persistedApps);
         }
     }
 
-    public synchronized void parseMessage(byte[] eventContentByteArray) {
+    public void parseMessage(byte[] eventContentByteArray) {
         try {
             ByteBuffer eventContent = ByteBuffer.wrap(eventContentByteArray);
             int noOfEvents = eventContent.getInt();
@@ -70,32 +69,35 @@ public class EventListMapManager {
                 String sourceHandlerElementId;
                 String siddhiAppName;
                 long sequenceID = eventContent.getLong();
-                if (sequenceID > lastControlMessageSequenceId) {
-                    int stringSize = eventContent.getInt();
-                    if (stringSize == 0) {
-                        sourceHandlerElementId = null;
-                    } else {
-                        sourceHandlerElementId = BinaryMessageConverterUtil.getString(eventContent, stringSize);
-                    }
+                int sourceHandlerLength = eventContent.getInt();
+                if (sourceHandlerLength == 0) {
+                    throw new InvalidByteMessageException("Invalid sourceHandlerLength size = 0");
+                } else {
+                    sourceHandlerElementId = BinaryMessageConverterUtil.getString(eventContent, sourceHandlerLength);
+                }
 
-                    int appSize = eventContent.getInt();
-                    if (appSize == 0) {
-                        siddhiAppName = null;
-                    } else {
-                        siddhiAppName = BinaryMessageConverterUtil.getString(eventContent, appSize);
-                    }
+                int appNameLength = eventContent.getInt();
+                if (appNameLength == 0) {
+                    throw new InvalidByteMessageException("Invalid appNameLength size = 0");
+                } else {
+                    siddhiAppName = BinaryMessageConverterUtil.getString(eventContent, appNameLength);
+                }
 
-                    String attributes;
-                    stringSize = eventContent.getInt();
-                    if (stringSize == 0) {
-                        attributes = null;
-                    } else {
-                        attributes = BinaryMessageConverterUtil.getString(eventContent, stringSize);
+                long lastSequenceIdForApp = perAppLastControlMessageSequenceNumberList.get(siddhiAppName);
+                synchronized (this) {
+                    if (sequenceID > lastSequenceIdForApp) {
+                        String attributes;
+                        int attributeLength = eventContent.getInt();
+                        if (attributeLength == 0) {
+                            throw new InvalidByteMessageException("Invalid attributeLength size = 0");
+                        } else {
+                            attributes = BinaryMessageConverterUtil.getString(eventContent, attributeLength);
+                        }
+                        String[] attributeTypes = attributes.substring(1, attributes.length() - 1).split(", ");
+                        events[i] = SiddhiEventConverter.getEvent(eventContent, attributeTypes);
+                        queuedEvent = new QueuedEvent(siddhiAppName, sourceHandlerElementId, sequenceID, events[i]);
+                        this.addToEventListMap(sequenceID, queuedEvent);
                     }
-                    String[] attributeTypes = attributes.substring(1, attributes.length() - 1).split(", ");
-                    events[i] = SiddhiEventConverter.getEvent(eventContent, attributeTypes);
-                    queuedEvent = new QueuedEvent(siddhiAppName, sourceHandlerElementId, sequenceID, events[i]);
-                    this.addToEventListMap(sequenceID, queuedEvent);
                 }
 
             }
@@ -108,44 +110,41 @@ public class EventListMapManager {
         Map<String, SiddhiAppData> siddhiAppMap = StreamProcessorDataHolder.getStreamProcessorService().
                 getSiddhiAppMap();
 
-        for (Map.Entry<String, SiddhiAppData> entry : siddhiAppMap.entrySet()) {
-            String revision = StreamProcessorDataHolder.getSiddhiManager().
-                    getLastRevision(entry.getKey());
-            if(revision != null){
-                long persistedTimestamp =  Long.parseLong(revision.split(
-                        HAConstants.REVISION_SPLIT_DELIMITER)[0].trim());
+        for(Map.Entry<Long,QueuedEvent> listMapValue : eventListMap.entrySet()) {
+            long key = listMapValue.getKey();
+            QueuedEvent queuedEvent = listMapValue.getValue();
+            for (Map.Entry<String, SiddhiAppData> entry : siddhiAppMap.entrySet()) {
                 Collection<List<Source>> sourceCollection = entry.getValue().getSiddhiAppRuntime().getSources();
                 for (List<Source> sources : sourceCollection) {
                     for (Source source : sources) {
-                        for(Map.Entry<Long,QueuedEvent> listMapValue : eventListMap.entrySet()) {
-                            long key = listMapValue.getKey();
-                            QueuedEvent queuedEvent = listMapValue.getValue();
-                            if(queuedEvent.getSourceHandlerElementId().equals(source.getMapper().
-                                    getHandler().getElementId()) &&
-                                    persistedTimestamp < queuedEvent.getEvent().getTimestamp()){
-                                source.getMapper().getHandler().sendEvent(queuedEvent.getEvent());
-                                eventListMap.remove(key);
-                            }
+                        if(queuedEvent.getSourceHandlerElementId().equals(source.getMapper().
+                                getHandler().getElementId())){
+                            source.getMapper().getHandler().sendEvent(queuedEvent.getEvent());
+                            eventListMap.remove(key);
                         }
                     }
                 }
             }
         }
         eventListMap.clear();
+        perAppLastControlMessageSequenceNumberList.clear();
     }
 
     public void trimQueue(String[] persistedAppDetails){
-        if (eventListMap.size() != 0){
-            for(String appDetail : persistedAppDetails){
-                String[] details = appDetail.split(HAConstants.PERSISTED_APP_SPLIT_DELIMITER);
-                String appName = details[2].trim();
-                long seqId = Long.valueOf(details[0].trim());
-                for(Map.Entry<Long,QueuedEvent> listMapValue : eventListMap.entrySet()) {
-                    long key = listMapValue.getKey();
-                    QueuedEvent queuedEvent = listMapValue.getValue();
-                    if(queuedEvent.getSiddhiAppName().equals(appName) &&
-                            seqId > queuedEvent.getSequenceID()){
-                        eventListMap.remove(key);
+        synchronized (this) {
+            if (eventListMap.size() != 0){
+                for(String appDetail : persistedAppDetails) {
+                    String[] details = appDetail.split(HAConstants.PERSISTED_APP_SPLIT_DELIMITER);
+                    long seqId = Long.valueOf(details[0].trim());
+                    String appName = details[2].trim();
+                    perAppLastControlMessageSequenceNumberList.put(appName, seqId);
+                    for (Iterator<Map.Entry<Long, QueuedEvent>> iterator = eventListMap.entrySet().iterator();
+                         iterator.hasNext();) {
+                        Map.Entry<Long, QueuedEvent> listMapValue = iterator.next();
+                        long key = listMapValue.getKey();
+                        if (appName.equals(listMapValue.getValue().getSiddhiAppName()) && seqId > key) {
+                            eventListMap.remove(key);
+                        }
                     }
                 }
             }

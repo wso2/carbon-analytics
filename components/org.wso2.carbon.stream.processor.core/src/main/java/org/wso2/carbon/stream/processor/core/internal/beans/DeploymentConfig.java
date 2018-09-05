@@ -27,7 +27,6 @@ public class DeploymentConfig {
 
     private String type;
     private TCPServerConfig tcpServer;
-    private int recordTableQueueCapacity = 20000;
     private int eventByteBufferQueueCapacity = 20000;
     private String passiveNodeHost;
     private int passiveNodePort;
@@ -67,16 +66,6 @@ public class DeploymentConfig {
 
     public void setTcpClientPoolConfig(EventSyncClientPoolConfig eventSyncClientPool) {
         this.eventSyncClientPool = eventSyncClientPool;
-    }
-
-    public int getRecordTableQueueCapacity() {
-
-        return recordTableQueueCapacity;
-    }
-
-    public void setRecordTableQueueCapacity(int recordTableQueueCapacity) {
-
-        this.recordTableQueueCapacity = recordTableQueueCapacity;
     }
 
     public String getPassiveNodeHost() {

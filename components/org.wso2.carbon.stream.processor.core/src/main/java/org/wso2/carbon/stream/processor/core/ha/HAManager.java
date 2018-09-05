@@ -50,7 +50,6 @@ public class HAManager {
     private boolean isActiveNode;
     private String nodeId;
     private String clusterId;
-    private int recordTableQueueCapacity;
     private HACoordinationSourceHandlerManager sourceHandlerManager;
     private HACoordinationSinkHandlerManager sinkHandlerManager;
     private HACoordinationRecordTableHandlerManager recordTableHandlerManager;
@@ -73,13 +72,12 @@ public class HAManager {
                 getEventByteBufferQueueCapacity());
         this.deploymentConfig = deploymentConfig;
         this.eventSyncClientPoolConfig = deploymentConfig.getTcpClientPoolConfig();
-        this.recordTableQueueCapacity = deploymentConfig.getRecordTableQueueCapacity();
     }
 
     public void start() {
         sourceHandlerManager = new HACoordinationSourceHandlerManager();
         sinkHandlerManager = new HACoordinationSinkHandlerManager();
-        recordTableHandlerManager = new HACoordinationRecordTableHandlerManager(recordTableQueueCapacity);
+        recordTableHandlerManager = new HACoordinationRecordTableHandlerManager();
 
         StreamProcessorDataHolder.setSinkHandlerManager(sinkHandlerManager);
         StreamProcessorDataHolder.setSourceHandlerManager(sourceHandlerManager);
@@ -148,6 +146,7 @@ public class HAManager {
             tcpServerInstance.clearResources();
             //change the system clock to work with event time
             enableEventTimeClock(true);
+            startSiddhiAppRuntimeWithoutSources();
             try {
                 eventListMapManager.trimAndSendToInputHandler();
             } catch (InterruptedException e) {
@@ -156,7 +155,7 @@ public class HAManager {
 
             //change the system clock to work with current time
             enableEventTimeClock(false);
-            startSiddhiAppRuntimes();
+            startSiddhiAppRuntimeSources();
 
             //start the databridge servers
             List<ServerEventListener> listeners = StreamProcessorDataHolder.getServerListeners();
@@ -164,7 +163,7 @@ public class HAManager {
                 listener.start();
             }
             NodeInfo nodeInfo = StreamProcessorDataHolder.getNodeInfo();
-            nodeInfo.setActiveNode(isActiveNode);
+            nodeInfo.setActiveNode(isActiveNode);//todo move to top
             if (log.isDebugEnabled()) {
                 log.debug("Successfully Changed to Active Mode ");
             }
@@ -224,25 +223,36 @@ public class HAManager {
         siddhiAppRuntimeMap.forEach((siddhiAppName, siddhiAppRuntime) -> {
             if (log.isDebugEnabled()) {
                 log.debug("Changing system clock for Siddhi Application " +
-                        siddhiAppRuntime.getName());
+                        siddhiAppRuntime.getName());//todo put true or false
             }
             siddhiAppRuntime.enablePlayBack(enablePlayBack, null, null);
         });
-        if (log.isDebugEnabled()) {
-            log.debug("Changed event play back mode = " + enablePlayBack);
-        }
+//        if (log.isDebugEnabled()) {
+//            log.debug("Changed event play back mode = " + enablePlayBack);
+//        }
     }
 
-    private void startSiddhiAppRuntimes() {
+    private void startSiddhiAppRuntimeWithoutSources() {
         ConcurrentMap<String, SiddhiAppRuntime> siddhiAppRuntimeMap
                 = StreamProcessorDataHolder.getSiddhiManager().getSiddhiAppRuntimeMap();
 
         siddhiAppRuntimeMap.forEach((siddhiAppName, siddhiAppRuntime) -> {
             if (log.isDebugEnabled()) {
-                log.debug("Starting Siddhi Application " +
-                        siddhiAppRuntime.getName());
+                log.debug("Starting without sources of Siddhi Application " + siddhiAppRuntime.getName());
             }
-            siddhiAppRuntime.start();
+            siddhiAppRuntime.startWithoutSources();
+        });
+    }
+
+    private void startSiddhiAppRuntimeSources() {
+        ConcurrentMap<String, SiddhiAppRuntime> siddhiAppRuntimeMap
+                = StreamProcessorDataHolder.getSiddhiManager().getSiddhiAppRuntimeMap();
+
+        siddhiAppRuntimeMap.forEach((siddhiAppName, siddhiAppRuntime) -> {
+            if (log.isDebugEnabled()) {
+                log.debug("Starting sources of Siddhi Application " + siddhiAppRuntime.getName());
+            }
+            siddhiAppRuntime.startSources();
         });
     }
 

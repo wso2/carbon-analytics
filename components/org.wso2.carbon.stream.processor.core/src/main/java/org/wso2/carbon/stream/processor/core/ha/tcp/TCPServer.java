@@ -18,7 +18,6 @@
 
 package org.wso2.carbon.stream.processor.core.ha.tcp;
 
-import io.netty.buffer.ByteBuf;
 import org.wso2.carbon.stream.processor.core.internal.beans.TCPServerConfig;
 
 import java.nio.ByteBuffer;
@@ -29,7 +28,7 @@ import java.util.concurrent.BlockingQueue;
  */
 public class TCPServer {
     private static TCPServer instance = new TCPServer();
-    private TCPNettyServer tcpNettyServer = new TCPNettyServer();
+    private EventSyncServer eventSyncServer = new EventSyncServer();
     private boolean started = false;
 
     private TCPServer() {
@@ -41,7 +40,7 @@ public class TCPServer {
 
     public void start(TCPServerConfig serverConfig, BlockingQueue<ByteBuffer> eventByteBufferQueue) {
         if (!started) {
-            tcpNettyServer.start(serverConfig, eventByteBufferQueue);
+            eventSyncServer.start(serverConfig, eventByteBufferQueue);
             started = true;
         }
     }
@@ -49,7 +48,7 @@ public class TCPServer {
     public void stop() {
         if (started) {
             try {
-                tcpNettyServer.shutdownGracefully();
+                eventSyncServer.shutdownGracefully();
             } finally {
                 started = false;
             }
@@ -57,7 +56,7 @@ public class TCPServer {
     }
 
     public void clearResources() {
-        tcpNettyServer.clearResources();
+        eventSyncServer.clearResources();
     }
 
 }

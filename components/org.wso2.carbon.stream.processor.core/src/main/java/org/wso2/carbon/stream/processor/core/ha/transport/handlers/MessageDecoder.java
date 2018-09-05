@@ -22,10 +22,7 @@ import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.ByteToMessageDecoder;
 import org.apache.log4j.Logger;
-import org.wso2.carbon.stream.processor.core.ha.util.HAConstants;
-import org.wso2.carbon.stream.processor.core.util.BinaryMessageConverterUtil;
 
-import java.io.UnsupportedEncodingException;
 import java.nio.ByteBuffer;
 import java.util.Date;
 import java.util.List;
@@ -38,9 +35,9 @@ public class MessageDecoder extends ByteToMessageDecoder {
     private BlockingQueue<ByteBuffer> byteBufferQueue;
     private static long startTime;
     private static long endTime;
-    static int count = 0;
-    static final Logger log = Logger.getLogger(MessageDecoder.class);
-    private ByteBuf byteBufCopy;
+    private static int count = 0;
+    private static final int TPS_EVENT_BATCH_THRESHOLD = 10000;
+    private static final Logger log = Logger.getLogger(MessageDecoder.class);
 
     public MessageDecoder(BlockingQueue<ByteBuffer> byteBufferQueue) {
         this.byteBufferQueue = byteBufferQueue;
@@ -51,28 +48,33 @@ public class MessageDecoder extends ByteToMessageDecoder {
         if (in.readableBytes() < 5) {
             return;
         }
-        if (startTime == 0L) {
-            startTime = new Date().getTime();
-        }
         int protocol = in.readByte();
         int messageSize = in.readInt();
         if (protocol != 2 || messageSize > in.readableBytes()) {
             in.resetReaderIndex();
             return;
         }
-        byte[] bytes = new byte[messageSize - 5];
+        byte[] bytes = new byte[messageSize - 5];//todo constant
         in.readBytes(bytes);
         in.markReaderIndex();
         in.resetReaderIndex();
-        byteBufferQueue.offer(ByteBuffer.wrap(bytes));
-
-        count++;
-        if (count % 10000 == 0) {
-            log.info("COUNT " + count);
-            endTime = new Date().getTime();
-            //LOG.info("TIME START    " + time + "    TIMES   " + timeE);
-            log.info("Server TPS:   " + (((10000 * 1000) / (endTime - startTime))));
-            startTime = new Date().getTime();
+        try {
+            byteBufferQueue.put(ByteBuffer.wrap(bytes));
+        } catch (InterruptedException e) {
+            log.error("Error while waiting for the insertion of ByteBufferQueue " + e.getMessage(), e);
+        }
+        if (log.isDebugEnabled()) {
+            synchronized (this) {
+                if (startTime == 0L) {
+                    startTime = new Date().getTime();
+                }
+                count++;
+                if (count % TPS_EVENT_BATCH_THRESHOLD == 0) {
+                    endTime = new Date().getTime();
+                    log.info("Server Event Batch TPS: " +
+                            (((TPS_EVENT_BATCH_THRESHOLD * 1000) / (endTime - startTime))));
+                }
+            }
         }
         in.markReaderIndex();
     }
