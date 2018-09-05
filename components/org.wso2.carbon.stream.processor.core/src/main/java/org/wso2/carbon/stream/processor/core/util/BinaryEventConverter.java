@@ -34,55 +34,37 @@ import java.util.Arrays;
 /**
  * This is a Util class help to convert from Siddhi event to Binary message.
  */
-public class BinaryEventConverter {//todo
+public class BinaryEventConverter {
 
-//    public static ByteBuffer convertToBinaryMessage(QueuedEvent queuedEvent) throws IOException {
-//        Event event = queuedEvent.getEvent();
-//        int messageSize = 8 + BinaryMessageConverterUtil.getSize(queuedEvent.getSourceHandlerElementId());
-//        EventMetaInfo eventMetaInfo = getEventMetaInfo(event);
-//        String attributes = Arrays.toString(eventMetaInfo.getAttributeTypeOrder());
-//        messageSize += eventMetaInfo.getEventSize() + attributes.length();
-//
-//        ByteBuffer messageBuffer = ByteBuffer.wrap(new byte[messageSize]);
-//        messageBuffer.putInt((queuedEvent.getSourceHandlerElementId()).length());
-//        messageBuffer.put(((queuedEvent.getSourceHandlerElementId()).getBytes(Charset.defaultCharset())));
-//
-//
-//        messageBuffer.putInt(attributes.length());
-//        messageBuffer.put(((attributes).getBytes(Charset.defaultCharset())));
-//        messageBuffer.putLong(event.getTimestamp());
-//        if (event.getData() != null && event.getData().length != 0) {
-//            Object[] data = event.getData();
-//            for (int i = 0; i < data.length; i++) {
-//                Object aData = data[i];
-//                BinaryMessageConverterUtil.assignData(aData, messageBuffer);
-//            }
-//        }
-//        return messageBuffer;
-//    }
-
-    public static ByteBuffer convertToBinaryMessage(QueuedEvent queuedEvent, ByteBuffer messageBuffer)
+    public static ByteBuffer convertToBinaryMessage(QueuedEvent[] queuedEvents)
             throws IOException {
-        Event event = queuedEvent.getEvent();
-        //int messageSize = 8 + BinaryMessageConverterUtil.getSize(queuedEvent.getSourceHandlerElementId());
-        EventMetaInfo eventMetaInfo = getEventMetaInfo(event);
-        String attributes = Arrays.toString(eventMetaInfo.getAttributeTypeOrder());
-        //messageSize += eventMetaInfo.getEventSize() + attributes.length();
+        ByteBuffer messageBuffer = null;
+        for (QueuedEvent queuedEvent : queuedEvents) {
+            Event event = queuedEvent.getEvent();
+            int messageSize = 4 + BinaryMessageConverterUtil.getSize(queuedEvent.getSourceHandlerElementId());
+            EventMetaInfo eventMetaInfo = getEventMetaInfo(event);
+            String attributes = Arrays.toString(eventMetaInfo.getAttributeTypeOrder());
+            messageSize += BinaryMessageConverterUtil.getSize(attributes) + BinaryMessageConverterUtil.getSize
+                    (queuedEvent.getSequenceID()) + BinaryMessageConverterUtil.getSize(queuedEvent.getSiddhiAppName())
+                    + BinaryMessageConverterUtil.getSize(queuedEvent.getEvent().getTimestamp()) + getEventSize(event);
 
-        messageBuffer.putLong(queuedEvent.getSequenceID());
-        messageBuffer.putInt((queuedEvent.getSourceHandlerElementId()).length());
-        messageBuffer.put(((queuedEvent.getSourceHandlerElementId()).getBytes(Charset.defaultCharset())));
-        messageBuffer.putInt((queuedEvent.getSiddhiAppName()).length());
-        messageBuffer.put(((queuedEvent.getSiddhiAppName()).getBytes(Charset.defaultCharset())));
+            messageBuffer = ByteBuffer.wrap(new byte[messageSize]);
+            messageBuffer.putInt(queuedEvents.length);
+            messageBuffer.putLong(queuedEvent.getSequenceID());
+            messageBuffer.putInt((queuedEvent.getSourceHandlerElementId()).length());
+            messageBuffer.put(((queuedEvent.getSourceHandlerElementId()).getBytes(Charset.defaultCharset())));
+            messageBuffer.putInt((queuedEvent.getSiddhiAppName()).length());
+            messageBuffer.put(((queuedEvent.getSiddhiAppName()).getBytes(Charset.defaultCharset())));
 
-        messageBuffer.putInt(attributes.length());
-        messageBuffer.put(((attributes).getBytes(Charset.defaultCharset())));
-        messageBuffer.putLong(event.getTimestamp());
-        if (event.getData() != null && event.getData().length != 0) {
-            Object[] data = event.getData();
-            for (int i = 0; i < data.length; i++) {
-                Object aData = data[i];
-                BinaryMessageConverterUtil.assignData(aData, messageBuffer);
+            messageBuffer.putInt(attributes.length());
+            messageBuffer.put(((attributes).getBytes(Charset.defaultCharset())));
+            messageBuffer.putLong(event.getTimestamp());
+            if (event.getData() != null && event.getData().length != 0) {
+                Object[] data = event.getData();
+                for (int i = 0; i < data.length; i++) {
+                    Object aData = data[i];
+                    BinaryMessageConverterUtil.assignData(aData, messageBuffer);
+                }
             }
         }
         return messageBuffer;

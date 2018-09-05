@@ -28,32 +28,29 @@ import java.util.concurrent.atomic.AtomicLong;
  * to mainly create, validate and terminate  the client to the endpoint.
  */
 
-public class TCPConnectionPoolFactory extends BaseKeyedPoolableObjectFactory {
+public class EventSyncConnectionPoolFactory extends BaseKeyedPoolableObjectFactory {
     private String hostname;
     private int port;
-    private static AtomicLong sequenceIDGenerator = new AtomicLong();
 
-    public TCPConnectionPoolFactory(String host, int port) {
+    public EventSyncConnectionPoolFactory(String host, int port) {
         this.hostname = host;
         this.port = port;
     }
 
     @Override
     public Object makeObject(Object key) throws ConnectionUnavailableException {
-        System.out.println("\n CLIENT CREATED\n");
-        TCPConnection tcpConnection = new TCPConnection(sequenceIDGenerator);
-        tcpConnection.connect(hostname, port);
-        return tcpConnection;
+        EventSyncConnection eventSyncConnection = new EventSyncConnection();
+        eventSyncConnection.connect(hostname, port);
+        return eventSyncConnection;
     }
 
     @Override
     public boolean validateObject(Object key, Object obj) {
-        return ((TCPConnection) obj).isActive();
+        return ((EventSyncConnection) obj).isActive();
     }
 
     public void destroyObject(Object key, Object obj) {
-        TCPConnection tcpConnection = ((TCPConnection) obj);
-        tcpConnection.disconnect();
-        tcpConnection.shutdown();
+        EventSyncConnection eventSyncConnection = ((EventSyncConnection) obj);
+        eventSyncConnection.shutdown();
     }
 }

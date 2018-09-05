@@ -17,6 +17,7 @@
 package org.wso2.carbon.stream.processor.core.internal.beans;
 
 import org.wso2.carbon.config.annotation.Configuration;
+import org.wso2.carbon.config.annotation.Element;
 
 /**
  * Bean class for the deployment configurations.
@@ -30,7 +31,8 @@ public class DeploymentConfig {
     private int eventByteBufferQueueCapacity = 20000;
     private String passiveNodeHost;
     private int passiveNodePort;
-    private TCPClientPoolConfig tcpClientPool;
+    @Element(description = "Event sync client pool configurations", required = false)
+    private EventSyncClientPoolConfig eventSyncClientPool = new EventSyncClientPoolConfig();
 
     public String getType() {
         return type;
@@ -59,12 +61,12 @@ public class DeploymentConfig {
         this.eventByteBufferQueueCapacity = eventByteBufferQueueCapacity;
     }
 
-    public TCPClientPoolConfig getTcpClientPoolConfig() {
-        return tcpClientPool;
+    public EventSyncClientPoolConfig getTcpClientPoolConfig() {
+        return eventSyncClientPool;
     }
 
-    public void setTcpClientPoolConfig(TCPClientPoolConfig tcpClientPool) {
-        this.tcpClientPool = tcpClientPool;
+    public void setTcpClientPoolConfig(EventSyncClientPoolConfig eventSyncClientPool) {
+        this.eventSyncClientPool = eventSyncClientPool;
     }
 
     public int getRecordTableQueueCapacity() {
