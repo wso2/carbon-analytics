@@ -20,7 +20,7 @@ package org.wso2.carbon.stream.processor.core.ha.transport;
 
 import org.apache.commons.pool.impl.GenericKeyedObjectPool;
 import org.wso2.carbon.stream.processor.core.internal.beans.DeploymentConfig;
-import org.wso2.carbon.stream.processor.core.internal.beans.TCPClientPoolConfig;
+import org.wso2.carbon.stream.processor.core.internal.beans.EventSyncClientPoolConfig;
 
 import java.util.concurrent.atomic.AtomicLong;
 
@@ -28,36 +28,41 @@ import java.util.concurrent.atomic.AtomicLong;
  * This class is used hold the secure/non-secure connections for an Agent.
  */
 
-public class TCPConnectionPoolManager {
+public class EventSyncConnectionPoolManager {
     private static GenericKeyedObjectPool connectionPool;
     private static AtomicLong sequenceID = new AtomicLong();
 
 
     public static void initializeConnectionPool(DeploymentConfig deploymentConfig) {
-        TCPClientPoolConfig tcpClientPoolConfig = deploymentConfig.getTcpClientPoolConfig();
-        TCPConnectionPoolFactory tcpConnectionPoolFactory = new TCPConnectionPoolFactory(deploymentConfig.getPassiveNodeHost(),
+        EventSyncClientPoolConfig eventSyncClientPoolConfig = deploymentConfig.getTcpClientPoolConfig();
+        EventSyncConnectionPoolFactory eventSyncConnectionPoolFactory = new EventSyncConnectionPoolFactory(deploymentConfig.getPassiveNodeHost(),
                 deploymentConfig.getPassiveNodePort());
-        initializeConnectionPool(tcpConnectionPoolFactory, tcpClientPoolConfig.getMaxActive(), tcpClientPoolConfig
-                .getMaxIdle(), tcpClientPoolConfig.isTestOnBorrow(), tcpClientPoolConfig
-                .getTimeBetweenEvictionRunsMillis(), tcpClientPoolConfig.getMinEvictableIdleTimeMillis());
+        initializeConnectionPool(eventSyncConnectionPoolFactory, eventSyncClientPoolConfig.getMaxActive(), eventSyncClientPoolConfig.getMaxTotal(),
+                eventSyncClientPoolConfig.getMaxIdle(), eventSyncClientPoolConfig.getMaxWait(),
+                eventSyncClientPoolConfig.getMinEvictableIdleTimeMillis());
     }
 
-    public static void initializeConnectionPool(TCPConnectionPoolFactory factory,
+    public static void initializeConnectionPool(EventSyncConnectionPoolFactory factory,
                                                 int maxActive,
+                                                int maxTotal,
                                                 int maxIdle,
-                                                boolean testOnBorrow,
-                                                long timeBetweenEvictionRunsMillis,
+                                                long maxWait,
                                                 long minEvictableIdleTimeMillis) {
+        System.out.println(maxActive + "" +
+                maxTotal + "" +
+                maxIdle + "" +
+                maxWait + "" +
+                minEvictableIdleTimeMillis);
         if (connectionPool == null) {
             connectionPool = new GenericKeyedObjectPool();
             connectionPool.setFactory(factory);
-            connectionPool.setMaxTotal(maxActive);
+            connectionPool.setMaxTotal(maxTotal);
             connectionPool.setMaxActive(maxActive);
-            connectionPool.setTestOnBorrow(testOnBorrow);
-            connectionPool.setTimeBetweenEvictionRunsMillis(timeBetweenEvictionRunsMillis);
+            connectionPool.setTestOnBorrow(true);
+            connectionPool.setTimeBetweenEvictionRunsMillis(12000);
             connectionPool.setMinEvictableIdleTimeMillis(minEvictableIdleTimeMillis);
             connectionPool.setMaxIdle(maxIdle);
-            connectionPool.setMaxWait(10000);
+            connectionPool.setMaxWait(maxWait);
             connectionPool.setWhenExhaustedAction(GenericKeyedObjectPool.WHEN_EXHAUSTED_BLOCK);
         }
     }

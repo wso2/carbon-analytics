@@ -39,19 +39,19 @@ import java.util.concurrent.atomic.AtomicLong;
 /**
  * Tcp Netty Client.
  */
-public class TCPConnection {
-    private static final Logger log = Logger.getLogger(TCPConnection.class);
+public class EventSyncConnection {
+    private static final Logger log = Logger.getLogger(EventSyncConnection.class);
     private EventLoopGroup group;
     private Bootstrap bootstrap;
     private Channel channel;
     private String sessionId;
     private String hostAndPort;
 
-    public TCPConnection(AtomicLong sequenceIDGenerator) {
+    public EventSyncConnection() {
         this(0, true, true);
     }
 
-    public TCPConnection(int numberOfThreads, boolean keepAlive, boolean noDelay) {
+    public EventSyncConnection(int numberOfThreads, boolean keepAlive, boolean noDelay) {
         group = new NioEventLoopGroup(numberOfThreads);
         bootstrap = new Bootstrap();
         bootstrap.group(group)

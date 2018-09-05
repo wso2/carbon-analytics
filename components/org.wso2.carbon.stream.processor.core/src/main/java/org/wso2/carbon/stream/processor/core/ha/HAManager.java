@@ -18,8 +18,6 @@
 
 package org.wso2.carbon.stream.processor.core.ha;
 
-import io.netty.buffer.ByteBuf;
-import org.apache.commons.pool.impl.GenericKeyedObjectPool;
 import org.apache.log4j.Logger;
 import org.wso2.carbon.cluster.coordinator.service.ClusterCoordinator;
 import org.wso2.carbon.databridge.commons.ServerEventListener;
@@ -27,10 +25,10 @@ import org.wso2.carbon.stream.processor.core.DeploymentMode;
 import org.wso2.carbon.stream.processor.core.NodeInfo;
 import org.wso2.carbon.stream.processor.core.event.queue.EventListMapManager;
 import org.wso2.carbon.stream.processor.core.ha.tcp.TCPServer;
-import org.wso2.carbon.stream.processor.core.ha.transport.TCPConnectionPoolManager;
+import org.wso2.carbon.stream.processor.core.ha.transport.EventSyncConnectionPoolManager;
 import org.wso2.carbon.stream.processor.core.internal.StreamProcessorDataHolder;
 import org.wso2.carbon.stream.processor.core.internal.beans.DeploymentConfig;
-import org.wso2.carbon.stream.processor.core.internal.beans.TCPClientPoolConfig;
+import org.wso2.carbon.stream.processor.core.internal.beans.EventSyncClientPoolConfig;
 import org.wso2.siddhi.core.SiddhiAppRuntime;
 import org.wso2.siddhi.core.SiddhiManager;
 import org.wso2.siddhi.core.exception.CannotRestoreSiddhiAppStateException;
@@ -60,7 +58,7 @@ public class HAManager {
     private EventListMapManager eventListMapManager;
     private DeploymentConfig deploymentConfig;
     private BlockingQueue<ByteBuffer> eventByteBufferQueue;
-    private TCPClientPoolConfig tcpClientPoolConfig;
+    private EventSyncClientPoolConfig eventSyncClientPoolConfig;
 
     private final static Map<String, Object> activeNodePropertiesMap = new HashMap<>();
     private static final Logger log = Logger.getLogger(HAManager.class);
@@ -74,7 +72,7 @@ public class HAManager {
         this.eventByteBufferQueue = new LinkedBlockingQueue<>(deploymentConfig.
                 getEventByteBufferQueueCapacity());
         this.deploymentConfig = deploymentConfig;
-        this.tcpClientPoolConfig = deploymentConfig.getTcpClientPoolConfig();
+        this.eventSyncClientPoolConfig = deploymentConfig.getTcpClientPoolConfig();
         this.recordTableQueueCapacity = deploymentConfig.getRecordTableQueueCapacity();
     }
 
@@ -108,7 +106,7 @@ public class HAManager {
         if (isActiveNode) {
             log.info("HA Deployment: Starting up as Active Node");
             clusterCoordinator.setPropertiesMap(activeNodePropertiesMap);
-            TCPConnectionPoolManager.initializeConnectionPool(deploymentConfig);
+            EventSyncConnectionPoolManager.initializeConnectionPool(deploymentConfig);
             isActiveNode = true;
         } else {
             log.info("HA Deployment: Starting up as Passive Node");

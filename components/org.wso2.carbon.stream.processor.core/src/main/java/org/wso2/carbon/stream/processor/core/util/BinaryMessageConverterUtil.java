@@ -32,10 +32,6 @@ import java.nio.charset.Charset;
  */
 public final class BinaryMessageConverterUtil {
 
-    private BinaryMessageConverterUtil() {
-
-    }
-
     public static int getSize(Object data) {
         if (data instanceof String) {
             return 4 + ((String) data).length();

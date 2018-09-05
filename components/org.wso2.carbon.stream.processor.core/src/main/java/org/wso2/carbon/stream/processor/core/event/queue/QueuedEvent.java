@@ -27,9 +27,6 @@ public class QueuedEvent {
     private long timestamp;
     private String siddhiAppName;
 
-    public QueuedEvent() {
-    }
-
     public QueuedEvent(String siddhiAppName, String sourceHandlerElementId, long sequenceID, Event event) {
         this.sourceHandlerElementId = sourceHandlerElementId;
         this.siddhiAppName = siddhiAppName;
