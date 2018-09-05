@@ -82,8 +82,11 @@ public class EventListMapManager {
                 } else {
                     siddhiAppName = BinaryMessageConverterUtil.getString(eventContent, appNameLength);
                 }
+                long lastSequenceIdForApp = -1;
 
-                long lastSequenceIdForApp = perAppLastControlMessageSequenceNumberList.get(siddhiAppName);
+                if (perAppLastControlMessageSequenceNumberList.size() != 0) {
+                    lastSequenceIdForApp = perAppLastControlMessageSequenceNumberList.get(siddhiAppName);
+                }
                 synchronized (this) {
                     if (sequenceID > lastSequenceIdForApp) {
                         String attributes;
@@ -114,16 +117,22 @@ public class EventListMapManager {
             long key = listMapValue.getKey();
             QueuedEvent queuedEvent = listMapValue.getValue();
             for (Map.Entry<String, SiddhiAppData> entry : siddhiAppMap.entrySet()) {
-                Collection<List<Source>> sourceCollection = entry.getValue().getSiddhiAppRuntime().getSources();
-                for (List<Source> sources : sourceCollection) {
-                    for (Source source : sources) {
-                        if(queuedEvent.getSourceHandlerElementId().equals(source.getMapper().
-                                getHandler().getElementId())){
-                            source.getMapper().getHandler().sendEvent(queuedEvent.getEvent());
-                            eventListMap.remove(key);
+                if (entry.getKey().equals(queuedEvent.getSiddhiAppName())) {
+                    Collection<List<Source>> sourceCollection = entry.getValue().getSiddhiAppRuntime().getSources();
+                    for (List<Source> sources : sourceCollection) {
+                        for (Source source : sources) {
+                            if(queuedEvent.getSourceHandlerElementId().equals(source.getMapper().
+                                    getHandler().getElementId())){
+                                source.getMapper().getHandler().sendEvent(queuedEvent.getEvent());
+                                eventListMap.remove(key);
+                                break;
+                            }
                         }
+                        break;
                     }
+                    break;
                 }
+                break;
             }
         }
         eventListMap.clear();

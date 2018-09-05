@@ -19,10 +19,11 @@ package org.wso2.carbon.stream.processor.core.ha.util;
 
 public class HAConstants {
 
-    public static final String REVISION_SPLIT_DELIMITER = "_";
     public static final int EVENT_BUFFER_EXTRACTOR_THREAD_POOL_SIZE = 5;
     public static final String CHANNEL_ID_MESSAGE = "eventMessage";
     public static final String CHANNEL_ID_CONTROL_MESSAGE = "controlMessage";
     public static final String PERSISTED_APP_SPLIT_DELIMITER = "__";
+    public static final int PROTOCOL_AND_MESSAGE_BYTE_LENGTH = 5;
+
 
 }

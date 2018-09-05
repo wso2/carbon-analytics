@@ -26,12 +26,15 @@ import org.wso2.carbon.config.annotation.Element;
 public class DeploymentConfig {
 
     private String type;
-    private TCPServerConfig tcpServer;
+    private EventSyncServerConfig eventSyncServer;
+    @Element(description = "Byte buffer queue capacity", required = false)
     private int eventByteBufferQueueCapacity = 20000;
     private String passiveNodeHost;
     private int passiveNodePort;
     @Element(description = "Event sync client pool configurations", required = false)
     private EventSyncClientPoolConfig eventSyncClientPool = new EventSyncClientPoolConfig();
+    @Element(description = "Pool of threads to retrieve bytes from byte buffer queue", required = false)
+    private int byteBufferExtractorThreadPoolSize = 5;
 
     public String getType() {
         return type;
@@ -41,14 +44,14 @@ public class DeploymentConfig {
         this.type = type;
     }
 
-    public TCPServerConfig getTcpServerConfigs() {
+    public EventSyncServerConfig eventSyncServerConfigs() {
 
-        return tcpServer;
+        return eventSyncServer;
     }
 
-    public void setTcpServer(TCPServerConfig tcpServer) {
+    public void setEventSyncServer(EventSyncServerConfig eventSyncServer) {
 
-        this.tcpServer = tcpServer;
+        this.eventSyncServer = eventSyncServer;
     }
 
     public int getEventByteBufferQueueCapacity() {
@@ -82,5 +85,15 @@ public class DeploymentConfig {
 
     public void setPassiveNodePort(int passiveNodePort) {
         this.passiveNodePort = passiveNodePort;
+    }
+
+    public int getByteBufferExtractorThreadPoolSize() {
+
+        return byteBufferExtractorThreadPoolSize;
+    }
+
+    public void setByteBufferExtractorThreadPoolSize(int byteBufferExtractorThreadPoolSize) {
+
+        this.byteBufferExtractorThreadPoolSize = byteBufferExtractorThreadPoolSize;
     }
 }

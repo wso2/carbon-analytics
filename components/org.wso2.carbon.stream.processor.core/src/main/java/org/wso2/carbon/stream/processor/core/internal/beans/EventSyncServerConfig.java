@@ -19,20 +19,21 @@
 package org.wso2.carbon.stream.processor.core.internal.beans;
 
 import org.wso2.carbon.config.annotation.Configuration;
+import org.wso2.carbon.config.annotation.Element;
 import org.wso2.carbon.stream.processor.core.internal.util.TCPServerConstants;
 
 /**
- * Bean class for the TCP Server Configurations.
+ * Bean class for the Event Sync Server Configurations.
  */
-@Configuration(description = "TCP Server Configurations")
-public class TCPServerConfig {
+@Configuration(description = "Event Sync Server Configurations")
+public class EventSyncServerConfig {
 
-    private String host = "0.0.0.0";
+    private String host = TCPServerConstants.DEFAULT_HOST;
     private int port = TCPServerConstants.DEFAULT_PORT;
+    @Element(description = "Boss threads to handle connection", required = false)
     private int bossThreads = TCPServerConstants.DEFAULT_BOSS_THREADS;
+    @Element(description = "worker threads", required = false)
     private int workerThreads = TCPServerConstants.DEFAULT_WORKER_THREADS;
-    private boolean tcpNoDelay = TCPServerConstants.DEFAULT_TCP_NO_DELAY;
-    private boolean keepAlive = TCPServerConstants.DEFAULT_KEEP_ALIVE;
 
     public String getHost() {
 
@@ -72,25 +73,5 @@ public class TCPServerConfig {
     public void setWorkerThreads(int workerThreads) {
 
         this.workerThreads = workerThreads;
-    }
-
-    public boolean isTcpNoDelay() {
-
-        return tcpNoDelay;
-    }
-
-    public void setTcpNoDelay(boolean tcpNoDelay) {
-
-        this.tcpNoDelay = tcpNoDelay;
-    }
-
-    public boolean isKeepAlive() {
-
-        return keepAlive;
-    }
-
-    public void setKeepAlive(boolean keepAlive) {
-
-        this.keepAlive = keepAlive;
     }
 }

@@ -33,13 +33,10 @@ import org.wso2.siddhi.core.SiddhiAppRuntime;
 import org.wso2.siddhi.core.SiddhiManager;
 import org.wso2.siddhi.core.exception.CannotRestoreSiddhiAppStateException;
 
-import java.nio.ByteBuffer;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ConcurrentMap;
-import java.util.concurrent.LinkedBlockingQueue;
 
 /**
  * Class that manages Active and Passive nodes in a 2 node minimum HA configuration
@@ -56,7 +53,6 @@ public class HAManager {
     private TCPServer tcpServerInstance = TCPServer.getInstance();
     private EventListMapManager eventListMapManager;
     private DeploymentConfig deploymentConfig;
-    private BlockingQueue<ByteBuffer> eventByteBufferQueue;
     private EventSyncClientPoolConfig eventSyncClientPoolConfig;
 
     private final static Map<String, Object> activeNodePropertiesMap = new HashMap<>();
@@ -68,8 +64,6 @@ public class HAManager {
         this.nodeId = nodeId;
         this.clusterId = clusterId;
         this.eventListMapManager = new EventListMapManager();
-        this.eventByteBufferQueue = new LinkedBlockingQueue<>(deploymentConfig.
-                getEventByteBufferQueueCapacity());
         this.deploymentConfig = deploymentConfig;
         this.eventSyncClientPoolConfig = deploymentConfig.getTcpClientPoolConfig();
     }
@@ -112,7 +106,7 @@ public class HAManager {
             EventListMapManager.initializeEventListMap();
 
             //start tcp server
-            tcpServerInstance.start(deploymentConfig.getTcpServerConfigs(), eventByteBufferQueue);
+            tcpServerInstance.start(deploymentConfig);
         }
 
         NodeInfo nodeInfo = StreamProcessorDataHolder.getNodeInfo();
@@ -132,11 +126,13 @@ public class HAManager {
     void changeToActive() {
         if (!isActiveNode) {
             isActiveNode = true;
+            NodeInfo nodeInfo = StreamProcessorDataHolder.getNodeInfo();
+            nodeInfo.setActiveNode(isActiveNode);
             tcpServerInstance.stop();
             syncState();
 
             //Give time for byte buffer queue to be empty
-            while (eventByteBufferQueue.peek() != null) {
+            while (tcpServerInstance.getEventSyncServer().getEventByteBufferQueue().peek() != null) {
                 try {
                     Thread.sleep(100);
                 } catch (InterruptedException e) {
@@ -162,8 +158,6 @@ public class HAManager {
             for (ServerEventListener listener : listeners) {
                 listener.start();
             }
-            NodeInfo nodeInfo = StreamProcessorDataHolder.getNodeInfo();
-            nodeInfo.setActiveNode(isActiveNode);//todo move to top
             if (log.isDebugEnabled()) {
                 log.debug("Successfully Changed to Active Mode ");
             }
@@ -188,7 +182,7 @@ public class HAManager {
         NodeInfo nodeInfo = StreamProcessorDataHolder.getNodeInfo();
         nodeInfo.setActiveNode(isActiveNode);
         //start tcp server
-        tcpServerInstance.start(deploymentConfig.getTcpServerConfigs(), eventByteBufferQueue);
+        tcpServerInstance.start(deploymentConfig);
         if (log.isDebugEnabled()) {
             log.debug("Successfully Changed to Passive Mode ");
         }
@@ -222,14 +216,11 @@ public class HAManager {
 
         siddhiAppRuntimeMap.forEach((siddhiAppName, siddhiAppRuntime) -> {
             if (log.isDebugEnabled()) {
-                log.debug("Changing system clock for Siddhi Application " +
-                        siddhiAppRuntime.getName());//todo put true or false
+                log.debug("Changed Event Play back mode '" + enablePlayBack + "' for Siddhi Application " +
+                        siddhiAppRuntime.getName());
             }
             siddhiAppRuntime.enablePlayBack(enablePlayBack, null, null);
         });
-//        if (log.isDebugEnabled()) {
-//            log.debug("Changed event play back mode = " + enablePlayBack);
-//        }
     }
 
     private void startSiddhiAppRuntimeWithoutSources() {

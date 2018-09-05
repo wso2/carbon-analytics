@@ -22,6 +22,7 @@ import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.ByteToMessageDecoder;
 import org.apache.log4j.Logger;
+import org.wso2.carbon.stream.processor.core.ha.util.HAConstants;
 
 import java.nio.ByteBuffer;
 import java.util.Date;
@@ -54,7 +55,7 @@ public class MessageDecoder extends ByteToMessageDecoder {
             in.resetReaderIndex();
             return;
         }
-        byte[] bytes = new byte[messageSize - 5];//todo constant
+        byte[] bytes = new byte[messageSize - HAConstants.PROTOCOL_AND_MESSAGE_BYTE_LENGTH];
         in.readBytes(bytes);
         in.markReaderIndex();
         in.resetReaderIndex();
@@ -63,7 +64,7 @@ public class MessageDecoder extends ByteToMessageDecoder {
         } catch (InterruptedException e) {
             log.error("Error while waiting for the insertion of ByteBufferQueue " + e.getMessage(), e);
         }
-        if (log.isDebugEnabled()) {
+        //if (log.isDebugEnabled()) {
             synchronized (this) {
                 if (startTime == 0L) {
                     startTime = new Date().getTime();
@@ -75,7 +76,7 @@ public class MessageDecoder extends ByteToMessageDecoder {
                             (((TPS_EVENT_BATCH_THRESHOLD * 1000) / (endTime - startTime))));
                 }
             }
-        }
+        //}
         in.markReaderIndex();
     }
 }

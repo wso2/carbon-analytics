@@ -18,7 +18,7 @@
 
 package org.wso2.carbon.stream.processor.core.ha.tcp;
 
-import org.wso2.carbon.stream.processor.core.internal.beans.TCPServerConfig;
+import org.wso2.carbon.stream.processor.core.internal.beans.DeploymentConfig;
 
 import java.nio.ByteBuffer;
 import java.util.concurrent.BlockingQueue;
@@ -38,9 +38,9 @@ public class TCPServer {
         return instance;
     }
 
-    public void start(TCPServerConfig serverConfig, BlockingQueue<ByteBuffer> eventByteBufferQueue) {
+    public void start(DeploymentConfig deploymentConfig) {
         if (!started) {
-            eventSyncServer.start(serverConfig, eventByteBufferQueue);
+            eventSyncServer.start(deploymentConfig);
             started = true;
         }
     }
@@ -57,6 +57,10 @@ public class TCPServer {
 
     public void clearResources() {
         eventSyncServer.clearResources();
+    }
+
+    public EventSyncServer getEventSyncServer() {
+        return eventSyncServer;
     }
 
 }
