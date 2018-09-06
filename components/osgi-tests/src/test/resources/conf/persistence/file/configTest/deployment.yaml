@@ -55,7 +55,7 @@ wso2.transport.http:
     -
       id: "http-sender"
 
-wso2.transport.http:
+stores.api:
   transportProperties:
     -
       name: "server.bootstrap.socket.timeout"
@@ -71,19 +71,15 @@ wso2.transport.http:
     -
       id: "default"
       host: "0.0.0.0"
-      port: 9090
+      port: 7070
     -
       id: "msf4j-https"
       host: "0.0.0.0"
-      port: 9443
+      port: 7443
       scheme: https
       keyStoreFile: "${carbon.home}/resources/security/wso2carbon.jks"
       keyStorePassword: wso2carbon
       certPass: wso2carbon
-
-  senderConfigurations:
-    -
-      id: "http-sender"
 
   # Configuration used for the databridge communication
 databridge.config:
