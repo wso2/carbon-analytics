@@ -24,6 +24,7 @@ import org.wso2.carbon.cluster.coordinator.commons.MemberEventListener;
 import org.wso2.carbon.cluster.coordinator.commons.node.NodeDetail;
 import org.wso2.carbon.cluster.coordinator.service.ClusterCoordinator;
 import org.wso2.carbon.stream.processor.core.internal.StreamProcessorDataHolder;
+import org.wso2.carbon.stream.processor.core.persistence.PersistenceManager;
 import org.wso2.siddhi.core.exception.ConnectionUnavailableException;
 import org.wso2.siddhi.core.stream.input.source.SourceHandler;
 import org.wso2.siddhi.core.stream.input.source.SourceHandlerManager;
@@ -48,23 +49,36 @@ public class HAEventListener extends MemberEventListener {
 
     @Override
     public void memberAdded(NodeDetail nodeDetail) {
-        // Do Nothing
+        if (!nodeDetail.isCoordinator()) {
+            new PersistenceManager().run();
+            SourceHandlerManager sourceHandlerManager = StreamProcessorDataHolder.getSourceHandlerManager();
+            Map<String, SourceHandler> registeredSourceHandlers = sourceHandlerManager.
+                    getRegsiteredSourceHandlers();
+            for (SourceHandler sourceHandler : registeredSourceHandlers.values()) {
+                ((HACoordinationSourceHandler) sourceHandler).setPassiveNodeAdded(true);
+            }
+        }
     }
 
     @Override
     public void memberRemoved(NodeDetail nodeDetail) {
-        // Do Nothing
+        SourceHandlerManager sourceHandlerManager = StreamProcessorDataHolder.getSourceHandlerManager();
+        Map<String, SourceHandler> registeredSourceHandlers = sourceHandlerManager.
+                getRegsiteredSourceHandlers();
+        for (SourceHandler sourceHandler : registeredSourceHandlers.values()) {
+            ((HACoordinationSourceHandler) sourceHandler).setPassiveNodeAdded(false);
+        }
     }
 
     @Override
     public void coordinatorChanged(NodeDetail nodeDetail) {
         ClusterCoordinator clusterCoordinator = StreamProcessorDataHolder.getClusterCoordinator();
         if (clusterCoordinator != null) {
+
+            StreamProcessorDataHolder.getHAManager().changeToActive();
             SinkHandlerManager sinkHandlerManager = StreamProcessorDataHolder.getSinkHandlerManager();
             Map<String, SinkHandler> registeredSinkHandlers = sinkHandlerManager.getRegisteredSinkHandlers();
-            SourceHandlerManager sourceHandlerManager = StreamProcessorDataHolder.getSourceHandlerManager();
-            Map<String, SourceHandler> registeredSourceHandlers = sourceHandlerManager.
-                    getRegsiteredSourceHandlers();
+
             RecordTableHandlerManager recordTableHandlerManager = StreamProcessorDataHolder.
                     getRecordTableHandlerManager();
             Map<String, RecordTableHandler> registeredRecordTableHandlers = recordTableHandlerManager.
@@ -72,13 +86,10 @@ public class HAEventListener extends MemberEventListener {
 
             if (clusterCoordinator.isLeaderNode()) {
                 log.info("HA Deployment: This Node is now the Active Node");
-                StreamProcessorDataHolder.getHAManager().changeToActive();
                 for (SinkHandler sinkHandler : registeredSinkHandlers.values()) {
                     ((HACoordinationSinkHandler) sinkHandler).setAsActive();
                 }
-                for (SourceHandler sourceHandler : registeredSourceHandlers.values()) {
-                    ((HACoordinationSourceHandler) sourceHandler).setAsActive();
-                }
+
                 for (RecordTableHandler recordTableHandler : registeredRecordTableHandlers.values()) {
                     try {
                         ((HACoordinationRecordTableHandler) recordTableHandler).setAsActive();
@@ -101,11 +112,8 @@ public class HAEventListener extends MemberEventListener {
                     HACoordinationSinkHandler handler = (HACoordinationSinkHandler) entry.getValue();
                     handler.setAsPassive();
                 }
-                for (SourceHandler sourceHandler : registeredSourceHandlers.values()) {
-                    ((HACoordinationSourceHandler) sourceHandler).setAsPassive();
-                }
                 for (RecordTableHandler recordTableHandler : registeredRecordTableHandlers.values()) {
-                    ((HACoordinationRecordTableHandler) recordTableHandler).setPassive();
+                    ((HACoordinationRecordTableHandler) recordTableHandler).setAsPassive();
                 }
             }
         }

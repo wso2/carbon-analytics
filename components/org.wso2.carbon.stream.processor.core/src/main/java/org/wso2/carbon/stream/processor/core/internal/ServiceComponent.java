@@ -28,7 +28,6 @@ import org.osgi.service.component.annotations.ReferencePolicy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.wso2.carbon.analytics.permissions.PermissionManager;
-import org.wso2.carbon.analytics.permissions.PermissionProvider;
 import org.wso2.carbon.cluster.coordinator.service.ClusterCoordinator;
 import org.wso2.carbon.config.ConfigurationException;
 import org.wso2.carbon.config.provider.ConfigProvider;
@@ -39,17 +38,16 @@ import org.wso2.carbon.kernel.config.model.CarbonConfiguration;
 import org.wso2.carbon.siddhi.metrics.core.SiddhiMetricsFactory;
 import org.wso2.carbon.siddhi.metrics.core.internal.service.MetricsServiceComponent;
 import org.wso2.carbon.stream.processor.common.EventStreamService;
-import org.wso2.carbon.stream.processor.core.SiddhiAppRuntimeService;
 import org.wso2.carbon.stream.processor.common.utils.config.FileConfigManager;
 import org.wso2.carbon.stream.processor.core.DeploymentMode;
 import org.wso2.carbon.stream.processor.core.NodeInfo;
+import org.wso2.carbon.stream.processor.core.SiddhiAppRuntimeService;
 import org.wso2.carbon.stream.processor.core.distribution.DistributionService;
 import org.wso2.carbon.stream.processor.core.ha.HAManager;
 import org.wso2.carbon.stream.processor.core.ha.exception.HAModeException;
 import org.wso2.carbon.stream.processor.core.ha.util.CoordinationConstants;
 import org.wso2.carbon.stream.processor.core.internal.beans.DeploymentConfig;
 import org.wso2.carbon.stream.processor.core.internal.util.SiddhiAppProcessorConstants;
-import org.wso2.carbon.stream.processor.core.persistence.FileSystemPersistenceStore;
 import org.wso2.carbon.stream.processor.core.persistence.PersistenceManager;
 import org.wso2.carbon.stream.processor.core.persistence.beans.PersistenceConfigurations;
 import org.wso2.carbon.stream.processor.core.persistence.exception.PersistenceStoreConfigurationException;
@@ -354,17 +352,6 @@ public class ServiceComponent {
                     throw new HAModeException("More than two nodes can not be used in the minimum HA mode. " +
                             "Use another clustering mode, change the groupId or disable clustering.");
                 }
-
-                if (deploymentConfig.getLiveSync().isEnabled()) {
-                    String advertisedHost = deploymentConfig.getLiveSync().getAdvertisedHost();
-                    int advertisedPort = deploymentConfig.getLiveSync().getAdvertisedPort();
-
-                    if (("").equals(advertisedHost) || advertisedPort == 0) {
-                        throw new ConfigurationException("Two Node Minimum HA live sync has been enabled but " +
-                                CoordinationConstants.ADVERTISED_HOST + " or " + CoordinationConstants.ADVERTISED_PORT
-                                + " has not been set in deployment.yaml");
-                    }
-                }
                 log.info("WSO2 Stream Processor Starting in Two Node Minimum HA Deployment");
 
                 String nodeId = configProvider.getConfigurationObject(CarbonConfiguration.class).getId();
@@ -447,12 +434,11 @@ public class ServiceComponent {
         }else {
             serverEventListener.start();
         }
+
     }
 
     protected void unregisterServerListener(ServerEventListener serverEventListener) {
         StreamProcessorDataHolder.removeServerListener(serverEventListener);
     }
-
-
 
 }

@@ -17,6 +17,7 @@
 package org.wso2.carbon.stream.processor.core.internal.beans;
 
 import org.wso2.carbon.config.annotation.Configuration;
+import org.wso2.carbon.config.annotation.Element;
 
 /**
  * Bean class for the deployment configurations.
@@ -25,12 +26,15 @@ import org.wso2.carbon.config.annotation.Configuration;
 public class DeploymentConfig {
 
     private String type;
-    private LiveSyncConfig liveSync;
-    private int outputSyncInterval = 60000;
-    private int stateSyncGracePeriod = 120000;
-    private int sinkQueueCapacity = 20000;
-    private int sourceQueueCapacity = 20000;
-    private int retryAppSyncPeriod = 60000;
+    private EventSyncServerConfig eventSyncServer;
+    @Element(description = "Byte buffer queue capacity", required = false)
+    private int eventByteBufferQueueCapacity = 20000;
+    private String passiveNodeHost;
+    private int passiveNodePort;
+    @Element(description = "Event sync client pool configurations", required = false)
+    private EventSyncClientPoolConfig eventSyncClientPool = new EventSyncClientPoolConfig();
+    @Element(description = "Pool of threads to retrieve bytes from byte buffer queue", required = false)
+    private int byteBufferExtractorThreadPoolSize = 5;
 
     public String getType() {
         return type;
@@ -40,51 +44,56 @@ public class DeploymentConfig {
         this.type = type;
     }
 
-    public LiveSyncConfig getLiveSync() {
-        return liveSync;
+    public EventSyncServerConfig eventSyncServerConfigs() {
+
+        return eventSyncServer;
     }
 
-    public void setLiveSync(LiveSyncConfig liveSync) {
-        this.liveSync = liveSync;
+    public void setEventSyncServer(EventSyncServerConfig eventSyncServer) {
+
+        this.eventSyncServer = eventSyncServer;
     }
 
-    public int getOutputSyncInterval() {
-        return outputSyncInterval;
+    public int getEventByteBufferQueueCapacity() {
+
+        return eventByteBufferQueueCapacity;
     }
 
-    public void setOutputSyncInterval(int outputSyncInterval) {
-        this.outputSyncInterval = outputSyncInterval;
+    public void setEventByteBufferQueueCapacity(int eventByteBufferQueueCapacity) {
+        this.eventByteBufferQueueCapacity = eventByteBufferQueueCapacity;
     }
 
-    public int getStateSyncGracePeriod() {
-        return stateSyncGracePeriod;
+    public EventSyncClientPoolConfig getTcpClientPoolConfig() {
+        return eventSyncClientPool;
     }
 
-    public void setStateSyncGracePeriod(int stateSyncGracePeriod) {
-        this.stateSyncGracePeriod = stateSyncGracePeriod;
+    public void setTcpClientPoolConfig(EventSyncClientPoolConfig eventSyncClientPool) {
+        this.eventSyncClientPool = eventSyncClientPool;
     }
 
-    public int getSinkQueueCapacity() {
-        return sinkQueueCapacity;
+    public String getPassiveNodeHost() {
+        return passiveNodeHost;
     }
 
-    public void setSinkQueueCapacity(int sinkQueueCapacity) {
-        this.sinkQueueCapacity = sinkQueueCapacity;
+    public void setPassiveNodeHost(String passiveNodeHost) {
+        this.passiveNodeHost = passiveNodeHost;
     }
 
-    public int getSourceQueueCapacity() {
-        return sourceQueueCapacity;
+    public int getPassiveNodePort() {
+        return passiveNodePort;
     }
 
-    public void setSourceQueueCapacity(int sourceQueueCapacity) {
-        this.sourceQueueCapacity = sourceQueueCapacity;
+    public void setPassiveNodePort(int passiveNodePort) {
+        this.passiveNodePort = passiveNodePort;
     }
 
-    public int getRetryAppSyncPeriod() {
-        return retryAppSyncPeriod;
+    public int getByteBufferExtractorThreadPoolSize() {
+
+        return byteBufferExtractorThreadPoolSize;
     }
 
-    public void setRetryAppSyncPeriod(int retryAppSyncPeriod) {
-        this.retryAppSyncPeriod = retryAppSyncPeriod;
+    public void setByteBufferExtractorThreadPoolSize(int byteBufferExtractorThreadPoolSize) {
+
+        this.byteBufferExtractorThreadPoolSize = byteBufferExtractorThreadPoolSize;
     }
 }

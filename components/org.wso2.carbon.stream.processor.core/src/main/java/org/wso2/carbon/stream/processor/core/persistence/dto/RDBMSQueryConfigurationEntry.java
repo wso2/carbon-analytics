@@ -36,6 +36,7 @@ public class RDBMSQueryConfigurationEntry {
     private String deleteQuery;
     private String deleteOldRevisionsQuery;
     private String countQuery;
+    private String selectAllLatestRevisionsForSiddhiAppsQuery;
 
     public String getDatabaseName() {
         return databaseName;
@@ -115,5 +116,15 @@ public class RDBMSQueryConfigurationEntry {
 
     public void setCountQuery(String countQuery) {
         this.countQuery = countQuery;
+    }
+
+    public String getSelectAllLatestRevisionsForSiddhiAppsQuery() {
+
+        return selectAllLatestRevisionsForSiddhiAppsQuery;
+    }
+
+    public void setSelectAllLatestRevisionsForSiddhiAppsQuery(String selectAllLatestRevisionsForSiddhiAppsQuery) {
+
+        this.selectAllLatestRevisionsForSiddhiAppsQuery = selectAllLatestRevisionsForSiddhiAppsQuery;
     }
 }
