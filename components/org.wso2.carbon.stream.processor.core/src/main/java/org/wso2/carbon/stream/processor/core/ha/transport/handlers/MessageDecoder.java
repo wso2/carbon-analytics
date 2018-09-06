@@ -74,6 +74,7 @@ public class MessageDecoder extends ByteToMessageDecoder {
                     endTime = new Date().getTime();
                     log.info("Server Event Batch TPS: " +
                             (((TPS_EVENT_BATCH_THRESHOLD * 1000) / (endTime - startTime))));
+                    startTime = new Date().getTime();
                 }
             }
         }

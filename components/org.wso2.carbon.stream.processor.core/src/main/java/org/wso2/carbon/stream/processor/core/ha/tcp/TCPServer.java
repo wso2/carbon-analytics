@@ -20,9 +20,6 @@ package org.wso2.carbon.stream.processor.core.ha.tcp;
 
 import org.wso2.carbon.stream.processor.core.internal.beans.DeploymentConfig;
 
-import java.nio.ByteBuffer;
-import java.util.concurrent.BlockingQueue;
-
 /**
  * Singleton tcp server.
  */

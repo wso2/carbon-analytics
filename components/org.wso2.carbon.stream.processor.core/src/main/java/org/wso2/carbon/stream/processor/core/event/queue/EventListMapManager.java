@@ -31,6 +31,7 @@ import org.wso2.siddhi.core.stream.input.source.Source;
 import java.io.UnsupportedEncodingException;
 import java.nio.ByteBuffer;
 import java.util.Collection;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -41,6 +42,10 @@ public class EventListMapManager {
     private static ConcurrentSkipListMap<Long,QueuedEvent> eventListMap;
     private static Map<String,Long> perAppLastControlMessageSequenceNumberList = new HashMap<>();
     private static final Logger log = Logger.getLogger(EventListMapManager.class);
+    private static long startTime;
+    private static long endTime;
+    private static int count = 0;
+    private static final int TPS_EVENT_THRESHOLD = 100000;
 
     public EventListMapManager() {
     }
@@ -101,6 +106,20 @@ public class EventListMapManager {
                         queuedEvent = new QueuedEvent(siddhiAppName, sourceHandlerElementId, sequenceID, events[i]);
                         this.addToEventListMap(sequenceID, queuedEvent);
                     }
+                    if (log.isDebugEnabled()) {
+                        if (startTime == 0L) {
+                            startTime = new Date().getTime();
+                        }
+                        count++;
+                        if (count % TPS_EVENT_THRESHOLD == 0) {
+                            endTime = new Date().getTime();
+                            log.info("# of events : " + count + "start timestamp : " + startTime +
+                                    " end time stamp : " + endTime + " Throughput is (events / sec) : " +
+                                    (((TPS_EVENT_THRESHOLD * 1000) / (endTime - startTime))) +
+                                    " Total Event Count : " + count);
+                            startTime = new Date().getTime();
+                        }
+                    }
                 }
 
             }
@@ -120,19 +139,22 @@ public class EventListMapManager {
                 if (entry.getKey().equals(queuedEvent.getSiddhiAppName())) {
                     Collection<List<Source>> sourceCollection = entry.getValue().getSiddhiAppRuntime().getSources();
                     for (List<Source> sources : sourceCollection) {
+                        boolean isFound = false;
                         for (Source source : sources) {
                             if(queuedEvent.getSourceHandlerElementId().equals(source.getMapper().
                                     getHandler().getElementId())){
                                 source.getMapper().getHandler().sendEvent(queuedEvent.getEvent());
                                 eventListMap.remove(key);
+                                isFound = true;
                                 break;
                             }
                         }
-                        break;
+                        if (isFound) {
+                            break;
+                        }
                     }
                     break;
                 }
-                break;
             }
         }
         eventListMap.clear();
