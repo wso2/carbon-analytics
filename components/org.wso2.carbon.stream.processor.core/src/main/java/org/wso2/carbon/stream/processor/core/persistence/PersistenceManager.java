@@ -112,7 +112,7 @@ public class PersistenceManager implements Runnable {
                         " of siddhi App " + siddhiAppRuntime.getName() + " persisted successfully");
             }
         }
-        if (haManager != null && haManager.isActiveNode() && clusterCoordinator.getAllNodeDetails().size() == 2) {
+        if (haManager != null && haManager.isActiveNode() && haManager.isPassiveNodeAdded()) {
             if (log.isDebugEnabled()) {
                 log.debug("Control Message is sent to the passive node - " + Arrays.toString(siddhiRevisionArray));
             }

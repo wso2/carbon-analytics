@@ -55,6 +55,7 @@ public class HAManager {
     private EventListMapManager eventListMapManager;
     private DeploymentConfig deploymentConfig;
     private EventSyncClientPoolConfig eventSyncClientPoolConfig;
+    private boolean passiveNodeAdded;
 
     private final static Map<String, Object> passiveNodeDetailsPropertiesMap = new HashMap<>();
     private static final Logger log = Logger.getLogger(HAManager.class);
@@ -291,5 +292,13 @@ public class HAManager {
 
     public static Map<String, Object> getPassiveNodePropertiesMap() {
         return passiveNodeDetailsPropertiesMap;
+    }
+
+    public boolean isPassiveNodeAdded() {
+        return passiveNodeAdded;
+    }
+
+    public void setPassiveNodeAdded(boolean passiveNodeAdded) {
+        this.passiveNodeAdded = passiveNodeAdded;
     }
 }
