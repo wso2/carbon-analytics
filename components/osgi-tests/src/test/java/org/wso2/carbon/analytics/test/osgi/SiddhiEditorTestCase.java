@@ -173,34 +173,6 @@ public class SiddhiEditorTestCase {
     }
 
     @Test
-    public void testListingDirectoriesInPath() throws Exception {
-        String path = "/editor/workspace/list?path=";
-        String contentType = "text/plain";
-        String method = "GET";
-
-        logger.info("Listing existing directories under the given path.");
-        HTTPResponseMessage httpResponseMessage = sendHRequest("", baseURI, path, contentType, method,
-                true, DEFAULT_USER_NAME, DEFAULT_PASSWORD);
-        Assert.assertEquals(httpResponseMessage.getResponseCode(), 200);
-        Assert.assertEquals(httpResponseMessage.getMessage(), "OK");
-        Assert.assertEquals(httpResponseMessage.getContentType(), "application/json");
-    }
-
-    @Test
-    public void testListingDirectoriesInInvalidPath() throws Exception {
-        String path = "/editor/workspace/list?path=invalidPath";
-        String contentType = "text/plain";
-        String method = "GET";
-
-        logger.info("Listing existing directories under the given path.");
-        HTTPResponseMessage httpResponseMessage = sendHRequest("", baseURI, path, contentType, method,
-                true, DEFAULT_USER_NAME, DEFAULT_PASSWORD);
-        Assert.assertEquals(httpResponseMessage.getResponseCode(), 500);
-        Assert.assertEquals(httpResponseMessage.getMessage(), "Internal Server Error");
-        Assert.assertEquals(httpResponseMessage.getContentType(), "application/json");
-    }
-
-    @Test
     public void testCheckingWhetherFileExists() throws Exception {
         String path = "/editor/workspace/exists?path=%s";
         String encodedPath = new String(Base64.getEncoder().encode("logs".getBytes()));

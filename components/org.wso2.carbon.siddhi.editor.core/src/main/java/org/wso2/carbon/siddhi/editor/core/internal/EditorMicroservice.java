@@ -260,25 +260,6 @@ public class EditorMicroservice implements Microservice {
     }
 
     @GET
-    @Path("/workspace/list")
-    @Produces("application/json")
-    public Response directoriesInPath(@QueryParam("path") String path) {
-        try {
-            return Response.status(Response.Status.OK)
-                    .entity(workspace.listDirectoriesInPath(
-                            new String(Base64.getDecoder().decode(path), Charset.defaultCharset())))
-                    .type(MediaType.APPLICATION_JSON)
-                    .build();
-        } catch (IOException e) {
-            return Response.serverError().entity("failed." + e.getMessage())
-                    .build();
-        } catch (Throwable ignored) {
-            return Response.serverError().entity("failed")
-                    .build();
-        }
-    }
-
-    @GET
     @Path("/workspace/exists")
     @Produces("application/json")
     public Response fileExists(@QueryParam("path") String path) {
