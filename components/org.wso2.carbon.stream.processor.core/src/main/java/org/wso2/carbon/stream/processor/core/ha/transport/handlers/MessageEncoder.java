@@ -34,7 +34,7 @@ public class MessageEncoder extends MessageToByteEncoder<EventComposite> {
         String streamId = eventComposite.getChannelId();
         int dataLength = eventComposite.getMessage().length;
 
-        int messageSize = 1 + 4 + 4 + streamId.length() + 4 + dataLength;
+        int messageSize = 4 + streamId.length() + 4 + dataLength;
 
         byteBuf.writeByte((byte) 2);  //1
         byteBuf.writeInt(messageSize); //4
