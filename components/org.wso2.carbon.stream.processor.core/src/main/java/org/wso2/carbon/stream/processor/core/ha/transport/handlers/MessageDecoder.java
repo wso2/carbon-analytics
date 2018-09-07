@@ -23,6 +23,7 @@ import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.ByteToMessageDecoder;
 import org.apache.log4j.Logger;
 import org.wso2.carbon.stream.processor.core.ha.util.HAConstants;
+import org.wso2.carbon.stream.processor.core.util.BinaryMessageConverterUtil;
 
 import java.nio.ByteBuffer;
 import java.util.Date;
@@ -55,7 +56,7 @@ public class MessageDecoder extends ByteToMessageDecoder {
             in.resetReaderIndex();
             return;
         }
-        byte[] bytes = new byte[messageSize - HAConstants.PROTOCOL_AND_MESSAGE_BYTE_LENGTH];
+        byte[] bytes = new byte[messageSize];
         in.readBytes(bytes);
         in.markReaderIndex();
         in.resetReaderIndex();
