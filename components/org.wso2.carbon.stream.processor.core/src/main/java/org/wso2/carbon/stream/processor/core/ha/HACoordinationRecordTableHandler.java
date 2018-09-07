@@ -41,19 +41,15 @@ public class HACoordinationRecordTableHandler extends RecordTableHandler {
 
     private boolean isActiveNode;
     private long lastEventChunkTimestamp;
-    private Queue<RecordTableData> eventQueue;
-    private int queueCapacity;
     private TableDefinition tableDefinition;
     private static final Logger log = Logger.getLogger(HACoordinationRecordTableHandler.class);
 
 
-    public HACoordinationRecordTableHandler(int queueCapacity) {
-        this.queueCapacity = queueCapacity;
+    public HACoordinationRecordTableHandler() {
     }
 
     @Override
     public void init(String elementId, TableDefinition tableDefinition) {
-        eventQueue = new LinkedBlockingQueue<>(queueCapacity);
         this.tableDefinition = tableDefinition;
     }
 
@@ -66,11 +62,6 @@ public class HACoordinationRecordTableHandler extends RecordTableHandler {
             if (log.isDebugEnabled()) {
                 log.debug("Last Timestamp for Record Table Add " + timestamp);
             }
-        } else {
-            if (eventQueue.size() == queueCapacity) {
-                eventQueue.remove();
-            }
-            eventQueue.add(new RecordTableData(timestamp, EventType.ADD, recordTableHandlerCallback, records));
         }
     }
 
@@ -84,12 +75,6 @@ public class HACoordinationRecordTableHandler extends RecordTableHandler {
             if (log.isDebugEnabled()) {
                 log.debug("Last Timestamp for Record Table Delete " + timestamp);
             }
-        } else {
-            if (eventQueue.size() == queueCapacity) {
-                eventQueue.remove();
-            }
-            eventQueue.add(new RecordTableData(timestamp, EventType.DELETE, recordTableHandlerCallback,
-                    compiledCondition, deleteConditionParameterMaps));
         }
     }
 
@@ -107,13 +92,6 @@ public class HACoordinationRecordTableHandler extends RecordTableHandler {
                 log.debug("Last Timestamp for Record Table Update " + timestamp);
             }
 
-        } else {
-            if (eventQueue.size() == queueCapacity) {
-                eventQueue.remove();
-            }
-            eventQueue.add(new RecordTableData(timestamp, EventType.UPDATE,
-                    recordTableHandlerCallback, compiledCondition, updateConditionParameterMaps, updateSetMap,
-                    updateSetParameterMaps));
         }
     }
 
@@ -131,13 +109,6 @@ public class HACoordinationRecordTableHandler extends RecordTableHandler {
             if (log.isDebugEnabled()) {
                 log.debug("Last Timestamp for Record Table UpdateAdd " + timestamp);
             }
-        } else {
-            if (eventQueue.size() == queueCapacity) {
-                eventQueue.remove();
-            }
-            eventQueue.add(new RecordTableData(timestamp, EventType.UPDATE_OR_ADD, recordTableHandlerCallback,
-                    compiledCondition, addingRecords, updateConditionParameterMaps, updateSetMap,
-                    updateSetParameterMaps));
         }
     }
 
@@ -179,54 +150,17 @@ public class HACoordinationRecordTableHandler extends RecordTableHandler {
      * All queued events are sent to the record table for appropriate processing
      */
     public void setAsActive() throws ConnectionUnavailableException {
-
         this.isActiveNode = true;
         if (log.isDebugEnabled()) {
-            log.debug("HA Deployment: Changing to active state. Executing buffered record table operations");
+            log.debug("HA Deployment: Changing to active state.");
         }
-        while (eventQueue.peek() != null) {
-            RecordTableData recordTableData = eventQueue.remove();
-            switch (recordTableData.getEventType()) {
-                case ADD:
-                    recordTableData.getRecordTableHandlerCallback().add(recordTableData.getRecords());
-                    break;
-                case DELETE:
-                    recordTableData.getRecordTableHandlerCallback().delete(recordTableData.getConditionParameterMaps(),
-                            recordTableData.getCompiledCondition());
-                    break;
-                case UPDATE:
-                    recordTableData.getRecordTableHandlerCallback().update(recordTableData.getCompiledCondition(),
-                            recordTableData.getConditionParameterMaps(), recordTableData.getSetMap(),
-                            recordTableData.getSetParameterMaps());
-                    break;
-                case UPDATE_OR_ADD:
-                    recordTableData.getRecordTableHandlerCallback().updateOrAdd(recordTableData.getCompiledCondition(),
-                            recordTableData.getConditionParameterMaps(), recordTableData.getSetMap(),
-                            recordTableData.getConditionParameterMaps(), recordTableData.getRecords());
-                    break;
-                default:
-                    break;
-            }
-        }
-        if (log.isDebugEnabled()) {
-            log.debug("HA Deployment: Changing to active state. Buffered record table operations complete");
-        }
-    }
-
-    public void setPassive() {
-        this.eventQueue.clear();
-        this.isActiveNode = false;
     }
 
     /**
-     * Update the event queue according to the last processed event timestamp of the active node in given record table.
-     *
-     * @param lastActiveNodeOperationTimestamp timestamp of last processed event of active nodes record table.
+     * Method that changes the state when node becomes passive
      */
-    public void trimRecordTableEventQueue(long lastActiveNodeOperationTimestamp) {
-        while (eventQueue.peek() != null && eventQueue.peek().getTimestamp() <= lastActiveNodeOperationTimestamp) {
-            eventQueue.remove();
-        }
+    public void setAsPassive() {
+        this.isActiveNode = false;
     }
 
     /**
@@ -240,9 +174,5 @@ public class HACoordinationRecordTableHandler extends RecordTableHandler {
 
     public String getTableId() {
         return tableDefinition.getId();
-    }
-
-    public Queue<RecordTableData> getEventQueue() {
-        return eventQueue;
     }
 }

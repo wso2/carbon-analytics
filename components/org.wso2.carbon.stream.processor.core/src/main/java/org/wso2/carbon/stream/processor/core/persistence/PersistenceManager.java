@@ -18,14 +18,27 @@
 
 package org.wso2.carbon.stream.processor.core.persistence;
 
+import org.apache.commons.pool.impl.GenericKeyedObjectPool;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.wso2.carbon.cluster.coordinator.service.ClusterCoordinator;
 import org.wso2.carbon.stream.processor.core.ha.HAManager;
+import org.wso2.carbon.stream.processor.core.ha.transport.EventSyncConnectionPoolManager;
+import org.wso2.carbon.stream.processor.core.ha.transport.EventSyncConnection;
+import org.wso2.carbon.stream.processor.core.ha.util.HAConstants;
 import org.wso2.carbon.stream.processor.core.internal.StreamProcessorDataHolder;
+import org.wso2.carbon.stream.processor.core.internal.beans.DeploymentConfig;
 import org.wso2.siddhi.core.SiddhiAppRuntime;
+import org.wso2.siddhi.core.exception.ConnectionUnavailableException;
 import org.wso2.siddhi.core.util.snapshot.PersistenceReference;
 
+import java.io.UnsupportedEncodingException;
+import java.util.Arrays;
 import java.util.concurrent.ConcurrentMap;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicLong;
 
 /**
  * Class that manages the periodic persistence of Siddhi Applications
@@ -33,16 +46,24 @@ import java.util.concurrent.ConcurrentMap;
 public class PersistenceManager implements Runnable {
 
     private static final Logger log = LoggerFactory.getLogger(PersistenceManager.class);
+    private HAManager haManager;
+    private DeploymentConfig deploymentConfig;
+    private EventSyncConnection eventSyncConnection;
+    private AtomicLong sequenceIDGenerator;
+    private ClusterCoordinator clusterCoordinator;
 
     public PersistenceManager() {
     }
 
     @Override
     public void run() {
-        HAManager haManager = StreamProcessorDataHolder.getHAManager();
+        haManager = StreamProcessorDataHolder.getHAManager();
         if (haManager != null) {
             if (haManager.isActiveNode()) {
-                persist();
+                eventSyncConnection = getTCPConnection();
+                sequenceIDGenerator = EventSyncConnectionPoolManager.getSequenceID();
+                clusterCoordinator = StreamProcessorDataHolder.getClusterCoordinator();
+                persistAndSendControlMessage();
             } //Passive node will not persist the state
         } else {
             persist();
@@ -61,6 +82,76 @@ public class PersistenceManager implements Runnable {
         }
         if (StreamProcessorDataHolder.getNodeInfo() != null) {
             StreamProcessorDataHolder.getNodeInfo().setLastPersistedTimestamp(System.currentTimeMillis());
+        }
+    }
+
+    private void persistAndSendControlMessage() {
+        ConcurrentMap<String, SiddhiAppRuntime> siddhiAppRuntimeMap = StreamProcessorDataHolder.
+                getSiddhiManager().getSiddhiAppRuntimeMap();
+        String[] siddhiRevisionArray = new String[siddhiAppRuntimeMap.size()];
+        int siddhiAppCount = 0;
+        for (SiddhiAppRuntime siddhiAppRuntime : siddhiAppRuntimeMap.values()) {
+            PersistenceReference persistenceReference = siddhiAppRuntime.persist();
+            Future fullStateFuture = persistenceReference.getFullStateFuture();
+            try {
+                if (fullStateFuture != null) {
+                    fullStateFuture.get(60000, TimeUnit.MILLISECONDS);
+                } else {
+                    for (Future future : persistenceReference.getIncrementalStateFuture()) {
+                        future.get(60000, TimeUnit.MILLISECONDS);
+                    }
+                }
+            } catch (Throwable e) {
+                log.error("Active Node: Persisting of Siddhi app is not successful. Check if app deployed properly");
+            }
+            siddhiRevisionArray[siddhiAppCount] = sequenceIDGenerator.incrementAndGet() + HAConstants
+                    .PERSISTED_APP_SPLIT_DELIMITER + persistenceReference.getRevision();
+            siddhiAppCount++;
+            if (log.isDebugEnabled()) {
+                log.debug("Revision " + persistenceReference.getRevision() +
+                        " of siddhi App " + siddhiAppRuntime.getName() + " persisted successfully");
+            }
+        }
+        if (haManager != null && haManager.isActiveNode() && haManager.isPassiveNodeAdded()) {
+            if (log.isDebugEnabled()) {
+                log.debug("Control Message is sent to the passive node - " + Arrays.toString(siddhiRevisionArray));
+            }
+            sendControlMessageToPassiveNode(siddhiRevisionArray);
+        }
+        if (StreamProcessorDataHolder.getNodeInfo() != null) {
+            StreamProcessorDataHolder.getNodeInfo().setLastPersistedTimestamp(System.currentTimeMillis());
+        }
+        log.info("siddhi Apps are persisted successfully");
+    }
+
+
+    private EventSyncConnection getTCPConnection() {
+        deploymentConfig = StreamProcessorDataHolder.getDeploymentConfig();
+        GenericKeyedObjectPool tcpConnectionPool = EventSyncConnectionPoolManager.getConnectionPool();
+        EventSyncConnection eventSyncConnection = null;
+        try {
+            eventSyncConnection = (EventSyncConnection) tcpConnectionPool.borrowObject(HAConstants.ACTIVE_NODE_CONNECTION_POOL_ID);
+            tcpConnectionPool.returnObject(HAConstants.ACTIVE_NODE_CONNECTION_POOL_ID, eventSyncConnection);
+        } catch (Exception e) {
+            log.error("Error in getting a connection to the Passive node. " + e.getMessage());
+        }
+        return eventSyncConnection;
+    }
+
+    private void sendControlMessageToPassiveNode(String[] siddhiRevisionArray) {
+        try {
+            String siddhiAppRevisions = Arrays.toString(siddhiRevisionArray);
+            if (eventSyncConnection != null) {
+                eventSyncConnection.send(HAConstants.CHANNEL_ID_CONTROL_MESSAGE,
+                        siddhiAppRevisions.getBytes(HAConstants.DEFAULT_CHARSET));
+            } else {
+                log.error("Error in getting the TCP connection to the passive node. Hence not sending the control " +
+                        "message to the passive node");
+            }
+        } catch (ConnectionUnavailableException e) {
+            log.error("Error in connecting to the Passive node. " + e.getMessage());
+        } catch (UnsupportedEncodingException e) {
+            log.error("Error when get bytes in encoding '" + HAConstants.DEFAULT_CHARSET + "' " + e.getMessage(), e);
         }
     }
 }
