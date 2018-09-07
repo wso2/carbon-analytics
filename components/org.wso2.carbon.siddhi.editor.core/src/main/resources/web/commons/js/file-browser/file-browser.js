@@ -112,7 +112,7 @@ define(['jquery', 'backbone', 'lodash', 'log', /** void module - jquery plugin *
                     return self._workspaceServiceURL + "/root";
                 } else {
                     if (self._fetchFiles) {
-                        return self._workspaceServiceURL + "/listFiles?path=" + btoa(node.id);
+                        return self._workspaceServiceURL + "/listFiles";
                     } else {
                         return self._workspaceServiceURL + "/list?path=" + btoa(node.id);
                     }

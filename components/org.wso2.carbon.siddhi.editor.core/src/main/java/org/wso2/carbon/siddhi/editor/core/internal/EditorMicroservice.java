@@ -385,10 +385,11 @@ public class EditorMicroservice implements Microservice {
     @GET
     @Path("/workspace/listFiles")
     @Produces("application/json")
-    public Response filesInPath(@QueryParam("path") String path) {
+    public Response filesInPath() {
         try {
-            java.nio.file.Path pathLocation = Paths.get(new String(Base64.getDecoder().decode(path), Charset
-                    .defaultCharset()));
+            String location = (Paths.get(Constants.RUNTIME_PATH, Constants.DIRECTORY_DEPLOYMENT,
+                    Constants.DIRECTORY_WORKSPACE)).toString();
+            java.nio.file.Path pathLocation = Paths.get(location);
             return Response.status(Response.Status.OK)
                     .entity(workspace.listFilesInPath(pathLocation))
                     .type(MediaType.APPLICATION_JSON).build();
@@ -540,7 +541,7 @@ public class EditorMicroservice implements Microservice {
                     resolvePath(Paths.get(Constants.RUNTIME_PATH,
                             Constants.DIRECTORY_DEPLOYMENT).toAbsolutePath(),
                             Paths.get(Constants.DIRECTORY_WORKSPACE + System.getProperty(FILE_SEPARATOR) +
-                                            siddhiAppName ));
+                                    siddhiAppName));
             File file = new File(location.toString());
             if (file.delete()) {
                 log.info("Siddi App: " + LogEncoder.removeCRLFCharacters(siddhiAppName) + " is deleted");
