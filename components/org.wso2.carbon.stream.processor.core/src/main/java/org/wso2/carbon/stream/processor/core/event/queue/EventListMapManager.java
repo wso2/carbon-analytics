@@ -57,11 +57,8 @@ public class EventListMapManager {
     public void parseControlMessage(byte[] controlMessageContentByteArray) throws UnsupportedEncodingException {
 
         String message = null;
-        try {
-            message = new String(controlMessageContentByteArray, HAConstants.DEFAULT_CHARSET);
-        } catch (UnsupportedEncodingException e) {
-            throw new UnsupportedEncodingException();
-        }
+        message = new String(controlMessageContentByteArray, HAConstants.DEFAULT_CHARSET);
+
         if (!message.isEmpty()) {
             message = message.replace ("[", "");
             message = message.replace ("]", "");
@@ -122,7 +119,7 @@ public class EventListMapManager {
                         count++;
                         if (count % TPS_EVENT_THRESHOLD == 0) {
                             endTime = new Date().getTime();
-                            log.info("# of events batch : " + count + "start timestamp : " + startTime +
+                            log.info("# of events batch : " + count + " start timestamp : " + startTime +
                                     " end time stamp : " + endTime + " Throughput is (events / sec) : " +
                                     (((TPS_EVENT_THRESHOLD * 1000) / (endTime - startTime))) +
                                     " Total Event Count : " + count);
@@ -145,25 +142,23 @@ public class EventListMapManager {
         for(Map.Entry<Long,QueuedEvent> listMapValue : eventListMap.entrySet()) {
             long key = listMapValue.getKey();
             QueuedEvent queuedEvent = listMapValue.getValue();
-            for (Map.Entry<String, SiddhiAppData> entry : siddhiAppMap.entrySet()) {
-                if (entry.getKey().equals(queuedEvent.getSiddhiAppName())) {
-                    Collection<List<Source>> sourceCollection = entry.getValue().getSiddhiAppRuntime().getSources();
-                    for (List<Source> sources : sourceCollection) {
-                        boolean isFound = false;
-                        for (Source source : sources) {
-                            if(queuedEvent.getSourceHandlerElementId().equals(source.getMapper().
-                                    getHandler().getElementId())){
-                                source.getMapper().getHandler().sendEvent(queuedEvent.getEvent());
-                                eventListMap.remove(key);
-                                isFound = true;
-                                break;
-                            }
-                        }
-                        if (isFound) {
+            SiddhiAppData siddhiAppData = siddhiAppMap.get(queuedEvent.getSiddhiAppName());
+            if (siddhiAppData != null) {
+                Collection<List<Source>> sourceCollection = siddhiAppData.getSiddhiAppRuntime().getSources();
+                for (List<Source> sources : sourceCollection) {
+                    boolean isFound = false;
+                    for (Source source : sources) {
+                        if(queuedEvent.getSourceHandlerElementId().equals(source.getMapper().
+                                getHandler().getElementId())){
+                            source.getMapper().getHandler().sendEvent(queuedEvent.getEvent());
+                            eventListMap.remove(key);
+                            isFound = true;
                             break;
                         }
                     }
-                    break;
+                    if (isFound) {
+                        break;
+                    }
                 }
             }
         }
