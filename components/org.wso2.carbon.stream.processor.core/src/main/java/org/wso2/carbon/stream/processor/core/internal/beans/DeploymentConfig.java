@@ -29,8 +29,6 @@ public class DeploymentConfig {
     private EventSyncServerConfig eventSyncServer;
     @Element(description = "Byte buffer queue capacity", required = false)
     private int eventByteBufferQueueCapacity = 20000;
-    private String passiveNodeHost;
-    private int passiveNodePort;
     @Element(description = "Event sync client pool configurations", required = false)
     private EventSyncClientPoolConfig eventSyncClientPool = new EventSyncClientPoolConfig();
     @Element(description = "Pool of threads to retrieve bytes from byte buffer queue", required = false)
@@ -69,22 +67,6 @@ public class DeploymentConfig {
 
     public void setTcpClientPoolConfig(EventSyncClientPoolConfig eventSyncClientPool) {
         this.eventSyncClientPool = eventSyncClientPool;
-    }
-
-    public String getPassiveNodeHost() {
-        return passiveNodeHost;
-    }
-
-    public void setPassiveNodeHost(String passiveNodeHost) {
-        this.passiveNodeHost = passiveNodeHost;
-    }
-
-    public int getPassiveNodePort() {
-        return passiveNodePort;
-    }
-
-    public void setPassiveNodePort(int passiveNodePort) {
-        this.passiveNodePort = passiveNodePort;
     }
 
     public int getByteBufferExtractorThreadPoolSize() {
