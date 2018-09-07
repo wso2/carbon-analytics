@@ -531,37 +531,6 @@ public class EditorMicroservice implements Microservice {
         }
     }
 
-    @POST
-    @Path("/workspace/import")
-    @Produces("application/json")
-    public Response importFile(String path) {
-        try {
-            JsonObject content = workspace.read(Paths.get(path));
-            String location = (Paths.get(Constants.RUNTIME_PATH,
-                    Constants.DIRECTORY_DEPLOYMENT,
-                    Constants.DIRECTORY_WORKSPACE)).toString();
-            String configName = path.substring(path.lastIndexOf(System.getProperty(FILE_SEPARATOR)) + 1);
-            String config = content.get("content").getAsString();
-            StringBuilder pathBuilder = new StringBuilder();
-            pathBuilder.append(location).append(System.getProperty(FILE_SEPARATOR)).append(configName);
-            Files.write(Paths.get(pathBuilder.toString()), config.getBytes(Charset.defaultCharset()));
-            return Response.status(Response.Status.OK)
-                    .entity(content)
-                    .type(MediaType.APPLICATION_JSON).build();
-        } catch (AccessDeniedException e) {
-            Map<String, String> errorMap = new HashMap<>(1);
-            errorMap.put("Error", "File access denied. You don't have enough permission to access");
-            return Response.serverError().entity(errorMap)
-                    .build();
-        } catch (IOException e) {
-            return Response.serverError().entity("failed." + e.getMessage())
-                    .build();
-        } catch (Throwable ignored) {
-            return Response.serverError().entity("failed")
-                    .build();
-        }
-    }
-
     @DELETE
     @Path("/workspace/delete")
     @Produces("application/json")

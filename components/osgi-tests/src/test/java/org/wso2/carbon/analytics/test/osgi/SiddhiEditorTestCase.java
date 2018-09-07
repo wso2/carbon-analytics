@@ -504,56 +504,6 @@ public class SiddhiEditorTestCase {
     }
 
     @Test
-    public void testImportingAFile() throws Exception {
-        String path = "/editor/workspace/import";
-        String contentType = "text/plain";
-        String method = "POST";
-        String userdir = System.getProperty("user.dir");
-        Path sourceFilePath = Paths.get(userdir, "deployment", "ReceiveAndCount.siddhi");
-        String sourceFile = sourceFilePath.toString();
-
-        logger.info("Importing a siddhi application from file system.");
-        HTTPResponseMessage httpResponseMessage = sendHRequest(sourceFile, baseURI, path, contentType, method,
-                true, DEFAULT_USER_NAME, DEFAULT_PASSWORD);
-        Assert.assertEquals(httpResponseMessage.getResponseCode(), 200);
-        Assert.assertEquals(httpResponseMessage.getMessage(), "OK");
-        Assert.assertEquals(httpResponseMessage.getContentType(), "application/json");
-    }
-
-    @Test
-    public void testImportingAnInvalidFile() throws Exception {
-        String path = "/editor/workspace/import";
-        String contentType = "text/plain";
-        String method = "POST";
-        String userdir = System.getProperty("user.dir");
-        Path sourceFilePath = Paths.get(userdir, "invalid.directory", "ReceiveAndCount.siddhi");
-        String sourceFile = sourceFilePath.toString();
-
-        logger.info("Importing a siddhi application from file system.");
-        HTTPResponseMessage httpResponseMessage = sendHRequest(sourceFile, baseURI, path, contentType, method,
-                true, DEFAULT_USER_NAME, DEFAULT_PASSWORD);
-        Assert.assertEquals(httpResponseMessage.getResponseCode(), 500);
-        Assert.assertEquals(httpResponseMessage.getMessage(), "Internal Server Error");
-        Assert.assertEquals(httpResponseMessage.getContentType(), "application/json");
-    }
-
-    @Test
-    public void testImportingANotExistingFile() throws Exception {
-        String path = "/editor/workspace/import";
-        String contentType = "text/plain";
-        String method = "POST";
-        String userdir = System.getProperty("user.dir");
-        Path sourceFilePath = Paths.get(userdir, "deployment", "siddhi-files", "TestInvalidSiddhiApp.siddhi");
-        String sourceFile = sourceFilePath.toString();
-
-        logger.info("Importing a siddhi application from file system.");
-        HTTPResponseMessage httpResponseMessage = sendHRequest(sourceFile, baseURI, path, contentType, method,
-                true, DEFAULT_USER_NAME, DEFAULT_PASSWORD);
-        Assert.assertEquals(httpResponseMessage.getResponseCode(), 500);
-        Assert.assertEquals(httpResponseMessage.getContentType(), "application/json");
-    }
-
-    @Test
     public void testGettingMetadata() throws Exception {
         String path = "/editor/metadata";
         String contentType = "text/plain";
