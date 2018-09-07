@@ -81,7 +81,8 @@ public class SiddhiProvider extends AbstractDataProvider {
         Attribute outputAttribute;
         for (int i = 0; i < outputAttributeList.length; i++) {
             outputAttribute = outputAttributeList[i];
-            metadata.put(i, outputAttribute.getName(), getMetadataTypes(outputAttribute.getType().toString()));
+            metadata.put(i, outputAttribute.getName(),
+                    getMetadataTypes(outputAttribute.getName(), outputAttribute.getType().toString()));
         }
         return this;
     }
@@ -179,11 +180,11 @@ public class SiddhiProvider extends AbstractDataProvider {
      * @param dataType String data type name provided by the result set metadata
      * @return String metadata type
      */
-    private DataSetMetadata.Types getMetadataTypes(String dataType) {
+    private DataSetMetadata.Types getMetadataTypes(String columnName, String dataType) {
+        if (this.timeColumns.contains(columnName.toUpperCase(Locale.ENGLISH))) {
+            return DataSetMetadata.Types.TIME;
+        }
         if (Arrays.asList(linearTypes).contains(dataType.toUpperCase(Locale.ENGLISH))) {
-            if (this.timeColumns.contains(dataType.toUpperCase(Locale.ENGLISH))) {
-                return DataSetMetadata.Types.TIME;
-            }
             return DataSetMetadata.Types.LINEAR;
         } else if (Arrays.asList(ordinalTypes).contains(dataType.toUpperCase(Locale
                 .ENGLISH))) {
