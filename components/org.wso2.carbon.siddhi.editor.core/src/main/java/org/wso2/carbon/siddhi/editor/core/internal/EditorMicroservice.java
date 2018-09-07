@@ -366,11 +366,11 @@ public class EditorMicroservice implements Microservice {
     @GET
     @Path("/workspace/listFiles")
     @Produces("application/json")
-    public Response filesInPath() {
+    public Response filesInPath(@QueryParam("path") String path) {
         try {
-            String location = (Paths.get(Constants.RUNTIME_PATH, Constants.DIRECTORY_DEPLOYMENT,
-                    Constants.DIRECTORY_WORKSPACE)).toString();
-            java.nio.file.Path pathLocation = Paths.get(location);
+            String location = (Paths.get(Constants.CARBON_HOME)).toString();
+            java.nio.file.Path pathLocation = SecurityUtil.resolvePath(Paths.get(location).toAbsolutePath(),
+                    Paths.get(new String(Base64.getDecoder().decode(path), Charset.defaultCharset())));
             return Response.status(Response.Status.OK)
                     .entity(workspace.listFilesInPath(pathLocation))
                     .type(MediaType.APPLICATION_JSON).build();
