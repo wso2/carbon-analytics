@@ -103,6 +103,32 @@ databridge.config:
         sslReceiverThreadPoolSize: '100'
         hostName: 0.0.0.0
 
+stores.api:
+  transportProperties:
+    -
+      name: "server.bootstrap.socket.timeout"
+      value: 60
+    -
+      name: "client.bootstrap.socket.timeout"
+      value: 60
+    -
+      name: "latency.metrics.enabled"
+      value: true
+
+  listenerConfigurations:
+    -
+      id: "default"
+      host: "0.0.0.0"
+      port: 7070
+    -
+      id: "msf4j-https"
+      host: "0.0.0.0"
+      port: 7443
+      scheme: https
+      keyStoreFile: "${carbon.home}/resources/security/wso2carbon.jks"
+      keyStorePassword: wso2carbon
+      certPass: wso2carbon
+
   # Configuration of the Data Agents - to publish events through databridge
 data.agent.config:
     # Data agent configurations
