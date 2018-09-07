@@ -18,6 +18,10 @@
 
 package org.wso2.carbon.stream.processor.core.persistence.dto;
 
+import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlRootElement;
+
 /**
  * Class that maps individual database entries from resources/rdbms-table-config.xml
  */
@@ -112,5 +116,4 @@ public class RDBMSQueryConfigurationEntry {
     public void setCountQuery(String countQuery) {
         this.countQuery = countQuery;
     }
-
 }

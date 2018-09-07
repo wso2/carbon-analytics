@@ -48,230 +48,231 @@ public class HACoordinationSourceHandlerTest extends PowerMockTestCase {
     }
 
     private static final String SOURCE_1 = "source-1";
+    private static final String ELEMENT_1 = "element-1";
 
     @Test
     public void testPassiveNodeEventQueue() throws InterruptedException {
 
-//        HACoordinationSourceHandler haCoordinationSourceHandler =
-//                (HACoordinationSourceHandler) new HACoordinationSourceHandlerManager(10).generateSourceHandler();
-//
-//        InputHandler inputHandler = mock(InputHandler.class);
-//        doNothing().when(inputHandler).send(any(Event.class));
-//
-//        haCoordinationSourceHandler.init(SOURCE_1, new StreamDefinition());
-//
-//        Event event = new Event();
-//        Event eventTwo = new Event();
-//        Event eventThree = new Event();
-//        Event eventFour = new Event();
-//        Event eventFive = new Event();
-//        Event eventSix = new Event();
-//        event.setTimestamp(1L);
-//        eventTwo.setTimestamp(2L);
-//        eventThree.setTimestamp(3L);
-//        eventFour.setTimestamp(4L);
-//        eventFive.setTimestamp(5L);
-//        eventSix.setTimestamp(6L);
-//
-//        haCoordinationSourceHandler.sendEvent(event, inputHandler);
-//        haCoordinationSourceHandler.sendEvent(eventTwo, inputHandler);
-//
-//        //Source should stop events from processing and start collecting
-//        haCoordinationSourceHandler.collectEvents(true);
-//        haCoordinationSourceHandler.sendEvent(eventThree, inputHandler);
-//        haCoordinationSourceHandler.sendEvent(eventFour, inputHandler);
-//
-//        Assert.assertEquals(haCoordinationSourceHandler.getPassiveNodeBufferedEvents().size(), 2);
-//        Assert.assertEquals(haCoordinationSourceHandler.getPassiveNodeBufferedEvents().peek().getTimestamp(), 3L);
+        HACoordinationSourceHandler haCoordinationSourceHandler =
+                (HACoordinationSourceHandler) new HACoordinationSourceHandlerManager(10).generateSourceHandler();
+
+        InputHandler inputHandler = mock(InputHandler.class);
+        doNothing().when(inputHandler).send(any(Event.class));
+
+        haCoordinationSourceHandler.init(SOURCE_1, ELEMENT_1, new StreamDefinition());
+
+        Event event = new Event();
+        Event eventTwo = new Event();
+        Event eventThree = new Event();
+        Event eventFour = new Event();
+        Event eventFive = new Event();
+        Event eventSix = new Event();
+        event.setTimestamp(1L);
+        eventTwo.setTimestamp(2L);
+        eventThree.setTimestamp(3L);
+        eventFour.setTimestamp(4L);
+        eventFive.setTimestamp(5L);
+        eventSix.setTimestamp(6L);
+
+        haCoordinationSourceHandler.sendEvent(event, inputHandler);
+        haCoordinationSourceHandler.sendEvent(eventTwo, inputHandler);
+
+        //Source should stop events from processing and start collecting
+        haCoordinationSourceHandler.collectEvents(true);
+        haCoordinationSourceHandler.sendEvent(eventThree, inputHandler);
+        haCoordinationSourceHandler.sendEvent(eventFour, inputHandler);
+
+        Assert.assertEquals(haCoordinationSourceHandler.getPassiveNodeBufferedEvents().size(), 2);
+        Assert.assertEquals(haCoordinationSourceHandler.getPassiveNodeBufferedEvents().peek().getTimestamp(), 3L);
 
     }
 
     @Test
     public void testPassiveNodeEventSending() throws InterruptedException {
 
-//        HACoordinationSourceHandler haCoordinationSourceHandler = spy(new HACoordinationSourceHandler(10));
-//        doNothing().when(haCoordinationSourceHandler).sendEvent(Mockito.any(Event.class));
-//
-//        InputHandler inputHandler = mock(InputHandler.class);
-//        doNothing().when(inputHandler).send(any(Event.class));
-//        when(haCoordinationSourceHandler.getInputHandler()).thenReturn(inputHandler);
-//
-//        haCoordinationSourceHandler.init(SOURCE_1, new StreamDefinition());
-//
-//        Event event = new Event();
-//        Event eventTwo = new Event();
-//        Event eventThree = new Event();
-//        Event eventFour = new Event();
-//        Event eventFive = new Event();
-//        Event eventSix = new Event();
-//        event.setTimestamp(1L);
-//        eventTwo.setTimestamp(2L);
-//        eventThree.setTimestamp(3L);
-//        eventFour.setTimestamp(4L);
-//        eventFive.setTimestamp(5L);
-//        eventSix.setTimestamp(6L);
-//
-//        haCoordinationSourceHandler.sendEvent(event, inputHandler);
-//        haCoordinationSourceHandler.sendEvent(eventTwo, inputHandler);
-//
-//        //Source should stop events from processing and start collecting
-//        haCoordinationSourceHandler.collectEvents(true);
-//        haCoordinationSourceHandler.sendEvent(eventThree, inputHandler);
-//        haCoordinationSourceHandler.sendEvent(eventFour, inputHandler);
-//
-//        Assert.assertEquals(haCoordinationSourceHandler.getPassiveNodeBufferedEvents().size(), 2);
-//        Assert.assertEquals(haCoordinationSourceHandler.getPassiveNodeBufferedEvents().peek().getTimestamp(), 3L);
-//
-//        haCoordinationSourceHandler.sendEvent(eventFive, inputHandler);
-//        haCoordinationSourceHandler.sendEvent(eventSix, inputHandler);
-//
-//        //Passive node should remove events that active node processed before snapshot was taken
-//        //and process all events after that
-//        haCoordinationSourceHandler.processBufferedEvents(4L);
-//
-//        Assert.assertEquals(haCoordinationSourceHandler.getPassiveNodeBufferedEvents().size(), 0);
+        HACoordinationSourceHandler haCoordinationSourceHandler = spy(new HACoordinationSourceHandler(10));
+        doNothing().when(haCoordinationSourceHandler).sendEvent(Mockito.any(Event.class));
+
+        InputHandler inputHandler = mock(InputHandler.class);
+        doNothing().when(inputHandler).send(any(Event.class));
+        when(haCoordinationSourceHandler.getInputHandler()).thenReturn(inputHandler);
+
+        haCoordinationSourceHandler.init(SOURCE_1, ELEMENT_1, new StreamDefinition());
+
+        Event event = new Event();
+        Event eventTwo = new Event();
+        Event eventThree = new Event();
+        Event eventFour = new Event();
+        Event eventFive = new Event();
+        Event eventSix = new Event();
+        event.setTimestamp(1L);
+        eventTwo.setTimestamp(2L);
+        eventThree.setTimestamp(3L);
+        eventFour.setTimestamp(4L);
+        eventFive.setTimestamp(5L);
+        eventSix.setTimestamp(6L);
+
+        haCoordinationSourceHandler.sendEvent(event, inputHandler);
+        haCoordinationSourceHandler.sendEvent(eventTwo, inputHandler);
+
+        //Source should stop events from processing and start collecting
+        haCoordinationSourceHandler.collectEvents(true);
+        haCoordinationSourceHandler.sendEvent(eventThree, inputHandler);
+        haCoordinationSourceHandler.sendEvent(eventFour, inputHandler);
+
+        Assert.assertEquals(haCoordinationSourceHandler.getPassiveNodeBufferedEvents().size(), 2);
+        Assert.assertEquals(haCoordinationSourceHandler.getPassiveNodeBufferedEvents().peek().getTimestamp(), 3L);
+
+        haCoordinationSourceHandler.sendEvent(eventFive, inputHandler);
+        haCoordinationSourceHandler.sendEvent(eventSix, inputHandler);
+
+        //Passive node should remove events that active node processed before snapshot was taken
+        //and process all events after that
+        haCoordinationSourceHandler.processBufferedEvents(4L);
+
+        Assert.assertEquals(haCoordinationSourceHandler.getPassiveNodeBufferedEvents().size(), 0);
 
     }
 
     @Test
     public void testActiveNodeProcessing() throws InterruptedException {
 
-//        HACoordinationSourceHandler haCoordinationSourceHandler = spy(new HACoordinationSourceHandler(10));
-//        doNothing().when(haCoordinationSourceHandler).sendEvent(Mockito.any(Event.class));
-//
-//        InputHandler inputHandler = mock(InputHandler.class);
-//        doNothing().when(inputHandler).send(any(Event.class));
-//        haCoordinationSourceHandler.setInputHandler(inputHandler);
-//
-//        haCoordinationSourceHandler.init(SOURCE_1, new StreamDefinition());
-//
-//        Event event = new Event();
-//        Event eventTwo = new Event();
-//        Event eventThree = new Event();
-//        Event eventFour = new Event();
-//        event.setTimestamp(1L);
-//        eventTwo.setTimestamp(2L);
-//        eventThree.setTimestamp(3L);
-//        eventFour.setTimestamp(4L);
-//
-//        haCoordinationSourceHandler.setAsActive();
-//
-//        //Active Should Send Events for Processing and Update the Last Published Events TS
-//        haCoordinationSourceHandler.sendEvent(event, inputHandler);
-//        haCoordinationSourceHandler.sendEvent(eventTwo, inputHandler);
-//
-//
-//        Map<String, Object> stateObject = haCoordinationSourceHandler.currentState();
-//        Assert.assertEquals((long) stateObject.get(CoordinationConstants.ACTIVE_PROCESSED_LAST_TIMESTAMP), 2L);
-//
-//        haCoordinationSourceHandler.sendEvent(eventThree, inputHandler);
-//        haCoordinationSourceHandler.sendEvent(eventFour, inputHandler);
-//
-//        stateObject = haCoordinationSourceHandler.currentState();
-//        Assert.assertEquals((long) stateObject.get(CoordinationConstants.ACTIVE_PROCESSED_LAST_TIMESTAMP), 4L);
+        HACoordinationSourceHandler haCoordinationSourceHandler = spy(new HACoordinationSourceHandler(10));
+        doNothing().when(haCoordinationSourceHandler).sendEvent(Mockito.any(Event.class));
+
+        InputHandler inputHandler = mock(InputHandler.class);
+        doNothing().when(inputHandler).send(any(Event.class));
+        haCoordinationSourceHandler.setInputHandler(inputHandler);
+
+        haCoordinationSourceHandler.init(SOURCE_1, ELEMENT_1, new StreamDefinition());
+
+        Event event = new Event();
+        Event eventTwo = new Event();
+        Event eventThree = new Event();
+        Event eventFour = new Event();
+        event.setTimestamp(1L);
+        eventTwo.setTimestamp(2L);
+        eventThree.setTimestamp(3L);
+        eventFour.setTimestamp(4L);
+
+        haCoordinationSourceHandler.setAsActive();
+
+        //Active Should Send Events for Processing and Update the Last Published Events TS
+        haCoordinationSourceHandler.sendEvent(event, inputHandler);
+        haCoordinationSourceHandler.sendEvent(eventTwo, inputHandler);
+
+
+        Map<String, Object> stateObject = haCoordinationSourceHandler.currentState();
+        Assert.assertEquals((long) stateObject.get(CoordinationConstants.ACTIVE_PROCESSED_LAST_TIMESTAMP), 2L);
+
+        haCoordinationSourceHandler.sendEvent(eventThree, inputHandler);
+        haCoordinationSourceHandler.sendEvent(eventFour, inputHandler);
+
+        stateObject = haCoordinationSourceHandler.currentState();
+        Assert.assertEquals((long) stateObject.get(CoordinationConstants.ACTIVE_PROCESSED_LAST_TIMESTAMP), 4L);
 
     }
 
     @Test
     public void testQueueCapacity() throws InterruptedException {
-//        HACoordinationSourceHandler haCoordinationSourceHandler = spy(new HACoordinationSourceHandler(5));
-//        doNothing().when(haCoordinationSourceHandler).sendEvent(Mockito.any(Event.class));
-//
-//        InputHandler inputHandler = mock(InputHandler.class);
-//        doNothing().when(inputHandler).send(any(Event.class));
-//        haCoordinationSourceHandler.setInputHandler(inputHandler);
-//
-//        haCoordinationSourceHandler.init(SOURCE_1, new StreamDefinition());
-//
-//        Event event = new Event();
-//        Event eventTwo = new Event();
-//        Event eventThree = new Event();
-//        Event eventFour = new Event();
-//        Event eventFive = new Event();
-//        Event eventSix = new Event();
-//        event.setTimestamp(1L);
-//        eventTwo.setTimestamp(2L);
-//        eventThree.setTimestamp(3L);
-//        eventFour.setTimestamp(4L);
-//        eventFive.setTimestamp(5L);
-//        eventSix.setTimestamp(6L);
-//
-//        haCoordinationSourceHandler.collectEvents(true);
-//
-//        haCoordinationSourceHandler.sendEvent(event, inputHandler);
-//        haCoordinationSourceHandler.sendEvent(eventTwo, inputHandler);
-//        haCoordinationSourceHandler.sendEvent(eventThree, inputHandler);
-//        haCoordinationSourceHandler.sendEvent(eventFour, inputHandler);
-//        haCoordinationSourceHandler.sendEvent(eventFive, inputHandler);
-//        haCoordinationSourceHandler.sendEvent(eventSix, inputHandler);
-//
-//        Assert.assertEquals(haCoordinationSourceHandler.getPassiveNodeBufferedEvents().peek().getTimestamp(), 2L);
+        HACoordinationSourceHandler haCoordinationSourceHandler = spy(new HACoordinationSourceHandler(5));
+        doNothing().when(haCoordinationSourceHandler).sendEvent(Mockito.any(Event.class));
+
+        InputHandler inputHandler = mock(InputHandler.class);
+        doNothing().when(inputHandler).send(any(Event.class));
+        haCoordinationSourceHandler.setInputHandler(inputHandler);
+
+        haCoordinationSourceHandler.init(SOURCE_1, ELEMENT_1, new StreamDefinition());
+
+        Event event = new Event();
+        Event eventTwo = new Event();
+        Event eventThree = new Event();
+        Event eventFour = new Event();
+        Event eventFive = new Event();
+        Event eventSix = new Event();
+        event.setTimestamp(1L);
+        eventTwo.setTimestamp(2L);
+        eventThree.setTimestamp(3L);
+        eventFour.setTimestamp(4L);
+        eventFive.setTimestamp(5L);
+        eventSix.setTimestamp(6L);
+
+        haCoordinationSourceHandler.collectEvents(true);
+
+        haCoordinationSourceHandler.sendEvent(event, inputHandler);
+        haCoordinationSourceHandler.sendEvent(eventTwo, inputHandler);
+        haCoordinationSourceHandler.sendEvent(eventThree, inputHandler);
+        haCoordinationSourceHandler.sendEvent(eventFour, inputHandler);
+        haCoordinationSourceHandler.sendEvent(eventFive, inputHandler);
+        haCoordinationSourceHandler.sendEvent(eventSix, inputHandler);
+
+        Assert.assertEquals(haCoordinationSourceHandler.getPassiveNodeBufferedEvents().peek().getTimestamp(), 2L);
 
     }
 
     @Test
     public void testActiveNodeArrayOfEventsProcessing() throws InterruptedException {
-//
-//        HACoordinationSourceHandler haCoordinationSourceHandler = spy(new HACoordinationSourceHandler(10));
-//        doNothing().when(haCoordinationSourceHandler).sendEvent(Mockito.any(Event.class));
-//
-//        InputHandler inputHandler = mock(InputHandler.class);
-//        doNothing().when(inputHandler).send(any(Event.class));
-//        haCoordinationSourceHandler.setInputHandler(inputHandler);
-//
-//        haCoordinationSourceHandler.init(SOURCE_1, new StreamDefinition());
-//
-//        Event event = new Event();
-//        Event eventTwo = new Event();
-//        Event eventThree = new Event();
-//        Event eventFour = new Event();
-//        event.setTimestamp(1L);
-//        eventTwo.setTimestamp(2L);
-//        eventThree.setTimestamp(3L);
-//        eventFour.setTimestamp(4L);
-//        Event[] events = {event, eventTwo, eventThree, eventFour};
-//
-//        haCoordinationSourceHandler.setAsActive();
-//        haCoordinationSourceHandler.sendEvent(events, inputHandler);
-//
-//        Map<String, Object> stateObject = haCoordinationSourceHandler.currentState();
-//        Assert.assertEquals((long) stateObject.get(CoordinationConstants.ACTIVE_PROCESSED_LAST_TIMESTAMP), 4L);
+
+        HACoordinationSourceHandler haCoordinationSourceHandler = spy(new HACoordinationSourceHandler(10));
+        doNothing().when(haCoordinationSourceHandler).sendEvent(Mockito.any(Event.class));
+
+        InputHandler inputHandler = mock(InputHandler.class);
+        doNothing().when(inputHandler).send(any(Event.class));
+        haCoordinationSourceHandler.setInputHandler(inputHandler);
+
+        haCoordinationSourceHandler.init(SOURCE_1, ELEMENT_1, new StreamDefinition());
+
+        Event event = new Event();
+        Event eventTwo = new Event();
+        Event eventThree = new Event();
+        Event eventFour = new Event();
+        event.setTimestamp(1L);
+        eventTwo.setTimestamp(2L);
+        eventThree.setTimestamp(3L);
+        eventFour.setTimestamp(4L);
+        Event[] events = {event, eventTwo, eventThree, eventFour};
+
+        haCoordinationSourceHandler.setAsActive();
+        haCoordinationSourceHandler.sendEvent(events, inputHandler);
+
+        Map<String, Object> stateObject = haCoordinationSourceHandler.currentState();
+        Assert.assertEquals((long) stateObject.get(CoordinationConstants.ACTIVE_PROCESSED_LAST_TIMESTAMP), 4L);
 
     }
 
     @Test
     public void testPassiveNodeArrayOfEventsQueue() throws InterruptedException {
 
-//        HACoordinationSourceHandler haCoordinationSourceHandler =
-//                (HACoordinationSourceHandler) new HACoordinationSourceHandlerManager(5).generateSourceHandler();
-//
-//        InputHandler inputHandler = mock(InputHandler.class);
-//        doNothing().when(inputHandler).send(any(Event.class));
-//
-//        haCoordinationSourceHandler.init(SOURCE_1, new StreamDefinition());
-//
-//        Event event = new Event();
-//        Event eventTwo = new Event();
-//        Event eventThree = new Event();
-//        Event eventFour = new Event();
-//        Event eventFive = new Event();
-//        Event eventSix = new Event();
-//        event.setTimestamp(1L);
-//        eventTwo.setTimestamp(2L);
-//        eventThree.setTimestamp(3L);
-//        eventFour.setTimestamp(4L);
-//        eventFive.setTimestamp(5L);
-//        eventSix.setTimestamp(6L);
-//
-//        Event[] eventsArrayOne = {event, eventTwo, eventThree};
-//        Event[] eventsArrayTwo = {eventFour, eventFive, eventSix};
-//
-//        haCoordinationSourceHandler.collectEvents(true);
-//        haCoordinationSourceHandler.sendEvent(eventsArrayOne, inputHandler);
-//        haCoordinationSourceHandler.sendEvent(eventsArrayTwo, inputHandler);
-//
-//        Assert.assertEquals(haCoordinationSourceHandler.getPassiveNodeBufferedEvents().size(), 5);
-//        Assert.assertEquals(haCoordinationSourceHandler.getPassiveNodeBufferedEvents().peek().getTimestamp(), 2L);
+        HACoordinationSourceHandler haCoordinationSourceHandler =
+                (HACoordinationSourceHandler) new HACoordinationSourceHandlerManager(5).generateSourceHandler();
+
+        InputHandler inputHandler = mock(InputHandler.class);
+        doNothing().when(inputHandler).send(any(Event.class));
+
+        haCoordinationSourceHandler.init(SOURCE_1, ELEMENT_1, new StreamDefinition());
+
+        Event event = new Event();
+        Event eventTwo = new Event();
+        Event eventThree = new Event();
+        Event eventFour = new Event();
+        Event eventFive = new Event();
+        Event eventSix = new Event();
+        event.setTimestamp(1L);
+        eventTwo.setTimestamp(2L);
+        eventThree.setTimestamp(3L);
+        eventFour.setTimestamp(4L);
+        eventFive.setTimestamp(5L);
+        eventSix.setTimestamp(6L);
+
+        Event[] eventsArrayOne = {event, eventTwo, eventThree};
+        Event[] eventsArrayTwo = {eventFour, eventFive, eventSix};
+
+        haCoordinationSourceHandler.collectEvents(true);
+        haCoordinationSourceHandler.sendEvent(eventsArrayOne, inputHandler);
+        haCoordinationSourceHandler.sendEvent(eventsArrayTwo, inputHandler);
+
+        Assert.assertEquals(haCoordinationSourceHandler.getPassiveNodeBufferedEvents().size(), 5);
+        Assert.assertEquals(haCoordinationSourceHandler.getPassiveNodeBufferedEvents().peek().getTimestamp(), 2L);
 
     }
 }

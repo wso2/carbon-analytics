@@ -26,8 +26,17 @@ import org.wso2.siddhi.core.stream.input.source.SourceHandlerManager;
  */
 public class HACoordinationSourceHandlerManager extends SourceHandlerManager {
 
+    /**
+     * Parameter that defines the size of the event queue that is stored in each {@link SourceHandler}
+     */
+    private int queueCapacity;
+
+    public HACoordinationSourceHandlerManager(int queueCapacity) {
+        this.queueCapacity = queueCapacity;
+    }
+
     @Override
     public SourceHandler generateSourceHandler() {
-        return new HACoordinationSourceHandler();
+        return new HACoordinationSourceHandler(queueCapacity);
     }
 }

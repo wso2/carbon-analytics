@@ -26,11 +26,17 @@ import org.wso2.siddhi.core.stream.output.sink.SinkHandlerManager;
  */
 public class HACoordinationSinkHandlerManager extends SinkHandlerManager {
 
-    public HACoordinationSinkHandlerManager() {
+    /**
+     * Parameter that defines the size of the event queue that is stored in each {@link SinkHandler}
+     */
+    private int queueCapacity;
+
+    public HACoordinationSinkHandlerManager(int queueCapacity) {
+        this.queueCapacity = queueCapacity;
     }
 
     @Override
     public SinkHandler generateSinkHandler() {
-        return new HACoordinationSinkHandler();
+        return new HACoordinationSinkHandler(queueCapacity);
     }
 }

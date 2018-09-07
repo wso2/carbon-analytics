@@ -24,11 +24,14 @@ import org.wso2.siddhi.core.table.record.RecordTableHandlerManager;
  */
 public class HACoordinationRecordTableHandlerManager extends RecordTableHandlerManager {
 
-    public HACoordinationRecordTableHandlerManager() {
+    private int queueCapacity;
+
+    public HACoordinationRecordTableHandlerManager(int queueCapacity) {
+        this.queueCapacity = queueCapacity;
     }
 
     @Override
     public RecordTableHandler generateRecordTableHandler() {
-        return new HACoordinationRecordTableHandler();
+        return new HACoordinationRecordTableHandler(queueCapacity);
     }
 }
