@@ -34,21 +34,20 @@ import org.wso2.carbon.business.rules.core.bean.scratch.BusinessRuleFromScratch;
 import org.wso2.carbon.business.rules.core.bean.template.BusinessRuleFromTemplate;
 import org.wso2.carbon.business.rules.core.datasource.configreader.DataHolder;
 import org.wso2.carbon.business.rules.core.exceptions.BusinessRuleNotFoundException;
+import org.wso2.carbon.business.rules.core.exceptions.BusinessRulesDatasourceException;
 import org.wso2.carbon.business.rules.core.exceptions.RuleTemplateScriptException;
 import org.wso2.carbon.business.rules.core.exceptions.TemplateInstanceCountViolationException;
 import org.wso2.carbon.business.rules.core.exceptions.TemplateManagerServiceException;
-import org.wso2.carbon.business.rules.core.exceptions.BusinessRulesDatasourceException;
 import org.wso2.carbon.business.rules.core.services.TemplateManagerService;
 import org.wso2.carbon.business.rules.core.util.LogEncoder;
 import org.wso2.carbon.business.rules.core.util.TemplateManagerConstants;
 import org.wso2.carbon.business.rules.core.util.TemplateManagerHelper;
 import org.wso2.msf4j.Request;
-import sun.rmi.transport.ObjectTable;
 
-import javax.ws.rs.core.Response;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import javax.ws.rs.core.Response;
 
 /**
  * Implementation of business rules REST API
@@ -243,7 +242,7 @@ public class BusinessRulesApiServiceImpl extends BusinessRulesApiService {
             return Response.ok().entity(gson.toJson(responseData)).build();
         } catch (TemplateManagerServiceException e) {
             log.error(String.format("Failed to load ruleTemplate with the uuid %s in " +
-                    "the templateGroup %s ", LogEncoder.removeCRLFCharacters(ruleTemplateID),
+                            "the templateGroup %s ", LogEncoder.removeCRLFCharacters(ruleTemplateID),
                     LogEncoder.removeCRLFCharacters(templateGroupID)), e);
             responseData.add("Failed to load");
             responseData.add("Failed to load rule template with uuid '" + ruleTemplateID + "'");

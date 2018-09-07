@@ -43,19 +43,20 @@ public class ConfigReader {
     private static final String VIEWER = "viewer";
     private static final String ID = "id";
     private static final String NAME = "name";
+    private static final String CARBON_NAMESPACE = "wso2.carbon";
 
     private static final Permission managerPermission = new Permission("BRM", "businessrules.manager");
     private static final Permission viewerPermission = new Permission("BRM", "businessrules.viewer");
 
     private static Map<String, Object> configs = readConfigs();
+    private static Map<String, Object> carbonConfigs = readCarbonConfigs();
+
     static {
         registerRoles();
     }
 
     /**
-     * Read all the configs under given namespace
-     * from deployment.yaml
-     * of related runtime
+     * Read all the configs under given namespace from deployment.yaml of related runtime
      */
     private static Map<String, Object> readConfigs() {
         try {
@@ -65,6 +66,21 @@ public class ConfigReader {
             log.error("Failed to read deployment.yaml file . ", e);
         }
         return new HashMap<>();
+    }
+
+    private static Map<String, Object> readCarbonConfigs() {
+        try {
+            return (Map<String, Object>) DataHolder.getInstance().getConfigProvider()
+                    .getConfigurationObject(CARBON_NAMESPACE);
+        } catch (Exception e) {
+            log.error("Failed to read  deployment.yaml file . ", e);
+        }
+        return new HashMap<>();
+    }
+
+    public String getSolutionType() {
+        Object solutionType = carbonConfigs.get("type");
+        return solutionType != null ? solutionType.toString() : "sp";
     }
 
     public String getUserName() {
@@ -82,8 +98,7 @@ public class ConfigReader {
     }
 
     /**
-     * Get configurations for each node
-     * defined in deployment.yaml
+     * Get configurations for each node defined in deployment.yaml
      *
      * @return Map of lists
      */
