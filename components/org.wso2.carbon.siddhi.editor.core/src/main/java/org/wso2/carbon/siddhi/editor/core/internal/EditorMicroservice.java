@@ -450,50 +450,6 @@ public class EditorMicroservice implements Microservice {
     }
 
     @POST
-    @Path("/workspace/export")
-    @Produces("application/json")
-    public Response export(String payload) {
-        try {
-            String location = "";
-            String configName = "";
-            String config = "";
-            Matcher locationMatcher = Pattern.compile("location=(.*?)&configName").matcher(payload);
-            while (locationMatcher.find()) {
-                location = locationMatcher.group(1);
-            }
-            Matcher configNameMatcher = Pattern.compile("configName=(.*?)&").matcher(payload);
-            while (configNameMatcher.find()) {
-                configName = configNameMatcher.group(1);
-            }
-            String[] splitConfigContent = payload.split("config=");
-            if (splitConfigContent.length > 1) {
-                config = splitConfigContent[1];
-            }
-            byte[] base64Config = Base64.getDecoder().decode(config);
-            byte[] base64ConfigName = Base64.getDecoder().decode(configName);
-            byte[] base64Location = Base64.getDecoder().decode(location);
-            Files.write(Paths.get(new String(base64Location, Charset.defaultCharset())
-                    + System.getProperty(FILE_SEPARATOR)
-                    + new String(base64ConfigName, Charset.defaultCharset())), base64Config);
-            JsonObject entity = new JsonObject();
-            entity.addProperty(STATUS, SUCCESS);
-            return Response.status(Response.Status.OK).entity(entity)
-                    .type(MediaType.APPLICATION_JSON).build();
-        } catch (AccessDeniedException e) {
-            Map<String, String> errorMap = new HashMap<>(1);
-            errorMap.put("Error", "File access denied. You don't have enough permission to access");
-            return Response.serverError().entity(errorMap)
-                    .build();
-        } catch (IOException e) {
-            return Response.serverError().entity("failed." + e.getMessage())
-                    .build();
-        } catch (Throwable ignored) {
-            return Response.serverError().entity("failed")
-                    .build();
-        }
-    }
-
-    @POST
     @Path("/workspace/read")
     @Produces("application/json")
     public Response read(String relativePath) {
