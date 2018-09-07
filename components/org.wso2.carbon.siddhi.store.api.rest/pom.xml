@@ -190,9 +190,6 @@
             org.wso2.carbon.siddhi.store.api.rest.*,
             !org.wso2.carbon.siddhi.store.api.rest.internal.*
         </export.package>
-        <private.package>
-            org.wso2.carbon.siddhi.store.api.rest.internal.*
-        </private.package>
         <import.package>
             org.osgi.framework.*;version="${osgi.framework.import.version.range}",
             org.wso2.carbon.kernel;version="${carbon.kernel.package.import.version.range}",

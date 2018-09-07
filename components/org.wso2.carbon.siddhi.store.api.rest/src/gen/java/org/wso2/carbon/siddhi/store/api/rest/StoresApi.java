@@ -30,7 +30,6 @@ import org.wso2.carbon.siddhi.store.api.rest.factories.StoresApiServiceFactory;
 import org.wso2.carbon.siddhi.store.api.rest.model.ModelApiResponse;
 import org.wso2.carbon.siddhi.store.api.rest.model.Query;
 import org.wso2.carbon.stream.processor.core.SiddhiAppRuntimeService;
-import org.wso2.carbon.siddhi.store.api.rest.internal.DataHolder;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.POST;
@@ -44,6 +43,7 @@ import org.wso2.transport.http.netty.config.TransportsConfiguration;
 
 @Component(
         name = "siddhi-store-query-service",
+        service = StoresApi.class,
         immediate = true
 )
 @Path("/stores")
@@ -146,7 +146,7 @@ public class StoresApi {
             unbind = "unregisterConfigProvider"
     )
     protected void registerConfigProvider(ConfigProvider configProvider) {
-        DataHolder.getInstance().setConfigProvider(configProvider);
+        SiddhiStoreDataHolder.getInstance().setConfigProvider(configProvider);
         try {
             transportsConfiguration = configProvider.getConfigurationObject("stores.api",
                     TransportsConfiguration.class);
@@ -156,7 +156,7 @@ public class StoresApi {
     }
 
     protected void unregisterConfigProvider(ConfigProvider configProvider) {
-        DataHolder.getInstance().setConfigProvider(null);
+        SiddhiStoreDataHolder.getInstance().setConfigProvider(null);
     }
 
     @Reference(
