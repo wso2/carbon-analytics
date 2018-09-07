@@ -30,6 +30,10 @@ public class EventSyncServerConfig {
 
     private String host = TCPServerConstants.DEFAULT_HOST;
     private int port = TCPServerConstants.DEFAULT_PORT;
+    @Element(description = "host to which the events by the active node must be directed,", required = false)
+    private String advertisedHost;
+    @Element(description = "port to which the events by the active node must be directed,", required = false)
+    private int advertisedPort;
     @Element(description = "Boss threads to handle connection", required = false)
     private int bossThreads = TCPServerConstants.DEFAULT_BOSS_THREADS;
     @Element(description = "worker threads", required = false)
@@ -73,5 +77,21 @@ public class EventSyncServerConfig {
     public void setWorkerThreads(int workerThreads) {
 
         this.workerThreads = workerThreads;
+    }
+
+    public String getAdvertisedHost() {
+        return advertisedHost;
+    }
+
+    public void setAdvertisedHost(String advertisedHost) {
+        this.advertisedHost = advertisedHost;
+    }
+
+    public int getAdvertisedPort() {
+        return advertisedPort;
+    }
+
+    public void setAdvertisedPort(int advertisedPort) {
+        this.advertisedPort = advertisedPort;
     }
 }

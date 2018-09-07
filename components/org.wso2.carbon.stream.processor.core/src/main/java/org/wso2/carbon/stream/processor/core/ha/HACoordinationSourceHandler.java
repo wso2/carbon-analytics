@@ -42,18 +42,16 @@ import java.util.concurrent.atomic.AtomicLong;
  * Implementation of {@link SourceHandler} used for 2 node minimum HA
  */
 public class HACoordinationSourceHandler extends SourceHandler {
-
     private long lastProcessedEventTimestamp = 0L;
     private String sourceHandlerElementId;
     private String siddhiAppName;
-    private GenericKeyedObjectPool tcpConnectionPool;
+    private GenericKeyedObjectPool eventSyncConnectionPoolFactory;
     private AtomicLong sequenceIDGenerator;
     private volatile boolean passiveNodeAdded;
 
     private static final Logger log = Logger.getLogger(HACoordinationSourceHandler.class);
 
     public HACoordinationSourceHandler() {
-        this.tcpConnectionPool = EventSyncConnectionPoolManager.getConnectionPool();
         this.sequenceIDGenerator = EventSyncConnectionPoolManager.getSequenceID();
     }
 
@@ -139,7 +137,7 @@ public class HACoordinationSourceHandler extends SourceHandler {
                 }
             }
             try {
-                tcpConnectionPool.returnObject("ActiveNode", eventSyncConnection);
+                eventSyncConnectionPoolFactory.returnObject(HAConstants.ACTIVE_NODE_CONNECTION_POOL_ID, eventSyncConnection);
             } catch (Exception e) {
                 log.error("Error in returning the tcpClient connection object to the pool. ", e);
             }
@@ -171,7 +169,7 @@ public class HACoordinationSourceHandler extends SourceHandler {
                 }
             }
             try {
-                tcpConnectionPool.returnObject("ActiveNode", eventSyncConnection);
+                eventSyncConnectionPoolFactory.returnObject(HAConstants.ACTIVE_NODE_CONNECTION_POOL_ID, eventSyncConnection);
             } catch (Exception e) {
                 log.error("Error in returning the tcpClient connection object to the pool. ", e);
             }
@@ -179,9 +177,10 @@ public class HACoordinationSourceHandler extends SourceHandler {
     }
 
     private EventSyncConnection getTCPNettyClient() {
+        eventSyncConnectionPoolFactory = EventSyncConnectionPoolManager.getConnectionPool();
         EventSyncConnection eventSyncConnection = null;
         try {
-            eventSyncConnection = (EventSyncConnection) tcpConnectionPool.borrowObject("ActiveNode");
+            eventSyncConnection = (EventSyncConnection) eventSyncConnectionPoolFactory.borrowObject(HAConstants.ACTIVE_NODE_CONNECTION_POOL_ID);
         } catch (Exception e) {
             log.error("Error in obtaining a tcp connection to the passive node. Hence not sending events to the " +
                     "passive node. " + e.getMessage());

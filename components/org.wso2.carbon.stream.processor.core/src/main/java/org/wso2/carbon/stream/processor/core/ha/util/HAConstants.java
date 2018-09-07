@@ -25,6 +25,11 @@ public class HAConstants {
     public static final String PERSISTED_APP_SPLIT_DELIMITER = "__";
     public static final int PROTOCOL_AND_MESSAGE_BYTE_LENGTH = 5;
     public static final String DEFAULT_CHARSET = "UTF-8";
+    public static final String ACTIVE_NODE_CONNECTION_POOL_ID = "activeNode_connection_pool";
+    public static final String HOST = "host";
+    public static final String PORT = "port";
+    public static final String ADVERTISED_HOST = "advertisedHost";
+    public static final String ADVERTISED_PORT = "advertisedPort";
 
 
 }

@@ -121,12 +121,11 @@ public class PersistenceManager implements Runnable {
 
     private EventSyncConnection getTCPConnection() {
         deploymentConfig = StreamProcessorDataHolder.getDeploymentConfig();
-        EventSyncConnectionPoolManager.initializeConnectionPool(deploymentConfig);
         GenericKeyedObjectPool tcpConnectionPool = EventSyncConnectionPoolManager.getConnectionPool();
         EventSyncConnection eventSyncConnection = null;
         try {
-            eventSyncConnection = (EventSyncConnection) tcpConnectionPool.borrowObject("ActiveNode");
-            tcpConnectionPool.returnObject("ActiveNode", eventSyncConnection);
+            eventSyncConnection = (EventSyncConnection) tcpConnectionPool.borrowObject(HAConstants.ACTIVE_NODE_CONNECTION_POOL_ID);
+            tcpConnectionPool.returnObject(HAConstants.ACTIVE_NODE_CONNECTION_POOL_ID, eventSyncConnection);
         } catch (Exception e) {
             log.error("Error in getting a connection to the Passive node. { host: '" + deploymentConfig
                     .getPassiveNodeHost() + "', port: '" + deploymentConfig.getPassiveNodePort() + "'");
