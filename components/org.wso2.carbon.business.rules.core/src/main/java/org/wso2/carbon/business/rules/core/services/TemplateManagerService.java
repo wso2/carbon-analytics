@@ -725,14 +725,14 @@ public class TemplateManagerService implements BusinessRulesService {
 
     public Map<String, BusinessRule> loadBusinessRules() throws TemplateManagerServiceException {
         try {
-            createTablesIfNotExsist();
+            createTablesIfNotExist();
             return queryExecutor.executeRetrieveAllBusinessRules();
         } catch (BusinessRulesDatasourceException e) {
             throw new TemplateManagerServiceException(e);
         }
     }
 
-    private void createTablesIfNotExsist() throws BusinessRulesDatasourceException {
+    private void createTablesIfNotExist() throws BusinessRulesDatasourceException {
         if (!queryExecutor.isBusinessRulesTableExist()) {
             queryExecutor.createTable();
         }
@@ -1502,7 +1502,7 @@ public class TemplateManagerService implements BusinessRulesService {
                 BusinessRuleFromTemplate businessRuleFromTemplate = replacePropertiesWithDefaultValues
                         (ruleTemplate, templateGroup.getUuid());
                 try {
-                    createTablesIfNotExsist();
+                    createTablesIfNotExist();
                     BusinessRule businessRule = queryExecutor.retrieveBusinessRule(ruleTemplate.getUuid());
 
                     if (businessRule == null) {
@@ -1520,8 +1520,7 @@ public class TemplateManagerService implements BusinessRulesService {
 
     private BusinessRuleFromTemplate replacePropertiesWithDefaultValues(RuleTemplate ruleTemplate,
                                                                         String templateGroupUUID) {
-        Map<String, String> properties = new HashMap<String, String>() {
-        };
+        Map<String, String> properties = new HashMap<>();
         for (Map.Entry<String, RuleTemplateProperty> ruleTemplatePropertyEntry : ruleTemplate.getProperties()
                 .entrySet()) {
             properties.put(ruleTemplatePropertyEntry.getKey(), ruleTemplatePropertyEntry.getValue().getDefaultValue());
