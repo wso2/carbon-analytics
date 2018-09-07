@@ -579,8 +579,8 @@ public class TemplateManagerService implements BusinessRulesService {
     }
 
     private void deployBusinessRule(BusinessRule businessRule, String nodeURL, Artifact deployableSiddhiApp,
-                                    BusinessRuleFromScratch
-                                            businessRuleFromScratch) throws SiddhiAppsApiHelperException, TemplateInstanceCountViolationException,
+                                    BusinessRuleFromScratch businessRuleFromScratch)
+            throws SiddhiAppsApiHelperException, TemplateInstanceCountViolationException,
             TemplateManagerServiceException {
         deploySiddhiApp(nodeURL, businessRuleFromScratch.getUuid(), deployableSiddhiApp);
     }
@@ -725,14 +725,14 @@ public class TemplateManagerService implements BusinessRulesService {
 
     public Map<String, BusinessRule> loadBusinessRules() throws TemplateManagerServiceException {
         try {
-            createtablesIfNotExsist();
+            createTablesIfNotExsist();
             return queryExecutor.executeRetrieveAllBusinessRules();
         } catch (BusinessRulesDatasourceException e) {
             throw new TemplateManagerServiceException(e);
         }
     }
 
-    private void createtablesIfNotExsist() throws BusinessRulesDatasourceException {
+    private void createTablesIfNotExsist() throws BusinessRulesDatasourceException {
         if (!queryExecutor.isBusinessRulesTableExist()) {
             queryExecutor.createTable();
         }
@@ -1216,7 +1216,8 @@ public class TemplateManagerService implements BusinessRulesService {
             if (!inputOutputRuleTemplates.isEmpty()) {
                 return inputOutputRuleTemplates;
             } else {
-                throw new TemplateManagerServiceException("No input / output rule template(s) found with the given uuid");
+                throw new TemplateManagerServiceException("No input / output rule template(s) found with the " +
+                        "given uuid");
             }
         } else {
             throw new TemplateManagerServiceException("No template group found with the given uuid");
@@ -1230,8 +1231,9 @@ public class TemplateManagerService implements BusinessRulesService {
      * @return true or false
      * @throws TemplateManagerServiceException : Exception occured in TemplateManagerService
      */
-    private boolean saveBusinessRuleDefinition(String businessRuleUUID, BusinessRuleFromTemplate businessRuleFromTemplate,
-                                               int deploymentStatus, int artifactCount)
+    private boolean saveBusinessRuleDefinition(String businessRuleUUID,
+                                               BusinessRuleFromTemplate businessRuleFromTemplate, int deploymentStatus,
+                                               int artifactCount)
             throws BusinessRulesDatasourceException, TemplateManagerServiceException,
             TemplateInstanceCountViolationException {
         byte[] businessRule;
@@ -1317,7 +1319,8 @@ public class TemplateManagerService implements BusinessRulesService {
      * @throws UnsupportedEncodingException     : occurs when utf-8 encoding is not supported
      * @throws BusinessRulesDatasourceException : occurs when accessing to the businessRulesDatabase
      */
-    private boolean overwriteBusinessRuleDefinition(String businessRuleUUID, BusinessRuleFromTemplate businessRuleFromTemplate,
+    private boolean overwriteBusinessRuleDefinition(String businessRuleUUID,
+                                                    BusinessRuleFromTemplate businessRuleFromTemplate,
                                                     int deploymentStatus)
             throws UnsupportedEncodingException, BusinessRulesDatasourceException {
         String businessRuleJSON = gson.toJson(businessRuleFromTemplate, BusinessRuleFromTemplate.class);
@@ -1499,12 +1502,12 @@ public class TemplateManagerService implements BusinessRulesService {
                 BusinessRuleFromTemplate businessRuleFromTemplate = replacePropertiesWithDefaultValues
                         (ruleTemplate, templateGroup.getUuid());
                 try {
-                    createtablesIfNotExsist();
+                    createTablesIfNotExsist();
                     BusinessRule businessRule = queryExecutor.retrieveBusinessRule(ruleTemplate.getUuid());
 
                     if (businessRule == null) {
-                        saveBusinessRuleDefinition(ruleTemplate.getUuid(), businessRuleFromTemplate, TemplateManagerConstants
-                                .DEPLOYED, 1);
+                        saveBusinessRuleDefinition(ruleTemplate.getUuid(), businessRuleFromTemplate,
+                                TemplateManagerConstants.DEPLOYED, 1);
                         updateArtifactCount(ruleTemplate.getUuid(), 1);
                     }
                 } catch (BusinessRulesDatasourceException | TemplateInstanceCountViolationException e) {
@@ -1519,8 +1522,8 @@ public class TemplateManagerService implements BusinessRulesService {
                                                                         String templateGroupUUID) {
         Map<String, String> properties = new HashMap<String, String>() {
         };
-        for (Map.Entry<String, RuleTemplateProperty> ruleTemplatePropertyEntry : ruleTemplate.getProperties().entrySet
-                ()) {
+        for (Map.Entry<String, RuleTemplateProperty> ruleTemplatePropertyEntry : ruleTemplate.getProperties()
+                .entrySet()) {
             properties.put(ruleTemplatePropertyEntry.getKey(), ruleTemplatePropertyEntry.getValue().getDefaultValue());
         }
         return new BusinessRuleFromTemplate(ruleTemplate.getUuid(), ruleTemplate.getName(), templateGroupUUID,
