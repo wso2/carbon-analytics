@@ -23,7 +23,6 @@ import org.slf4j.LoggerFactory;
 import org.wso2.carbon.cluster.coordinator.commons.MemberEventListener;
 import org.wso2.carbon.cluster.coordinator.commons.node.NodeDetail;
 import org.wso2.carbon.cluster.coordinator.service.ClusterCoordinator;
-import org.wso2.carbon.stream.processor.core.ha.transport.EventSyncConnectionPoolManager;
 import org.wso2.carbon.stream.processor.core.ha.util.HAConstants;
 import org.wso2.carbon.stream.processor.core.internal.StreamProcessorDataHolder;
 import org.wso2.carbon.stream.processor.core.persistence.PersistenceManager;
@@ -57,13 +56,15 @@ public class HAEventListener extends MemberEventListener {
             SourceHandlerManager sourceHandlerManager = StreamProcessorDataHolder.getSourceHandlerManager();
             Map<String, SourceHandler> registeredSourceHandlers = sourceHandlerManager.
                     getRegsiteredSourceHandlers();
+            HAManager haManager = StreamProcessorDataHolder.getHAManager();
+            haManager.setPassiveNodeAdded(true);
             for (SourceHandler sourceHandler : registeredSourceHandlers.values()) {
                 ((HACoordinationSourceHandler) sourceHandler).setPassiveNodeAdded(true);
             }
             if (!nodeDetail.isCoordinator()) {
-                StreamProcessorDataHolder.getHAManager().setPassiveNodeHostPort(getHost(nodeDetail.getPropertiesMap()
+                haManager.setPassiveNodeHostPort(getHost(nodeDetail.getPropertiesMap()
                 ), getPort(nodeDetail.getPropertiesMap()));
-                StreamProcessorDataHolder.getHAManager().initializeEventSyncConnectionPool();
+                haManager.initializeEventSyncConnectionPool();
             }
             new PersistenceManager().run();
         }
@@ -74,6 +75,7 @@ public class HAEventListener extends MemberEventListener {
         SourceHandlerManager sourceHandlerManager = StreamProcessorDataHolder.getSourceHandlerManager();
         Map<String, SourceHandler> registeredSourceHandlers = sourceHandlerManager.
                 getRegsiteredSourceHandlers();
+        StreamProcessorDataHolder.getHAManager().setPassiveNodeAdded(false);
         for (SourceHandler sourceHandler : registeredSourceHandlers.values()) {
             ((HACoordinationSourceHandler) sourceHandler).setPassiveNodeAdded(false);
         }
