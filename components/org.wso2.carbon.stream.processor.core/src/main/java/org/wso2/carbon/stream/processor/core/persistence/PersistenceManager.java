@@ -21,6 +21,7 @@ package org.wso2.carbon.stream.processor.core.persistence;
 import org.apache.commons.pool.impl.GenericKeyedObjectPool;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.wso2.carbon.cluster.coordinator.service.ClusterCoordinator;
 import org.wso2.carbon.stream.processor.core.ha.HAManager;
 import org.wso2.carbon.stream.processor.core.ha.transport.EventSyncConnectionPoolManager;
 import org.wso2.carbon.stream.processor.core.ha.transport.EventSyncConnection;
@@ -49,6 +50,7 @@ public class PersistenceManager implements Runnable {
     private DeploymentConfig deploymentConfig;
     private EventSyncConnection eventSyncConnection;
     private AtomicLong sequenceIDGenerator;
+    private ClusterCoordinator clusterCoordinator;
 
     public PersistenceManager() {
     }
@@ -60,6 +62,7 @@ public class PersistenceManager implements Runnable {
             if (haManager.isActiveNode()) {
                 eventSyncConnection = getTCPConnection();
                 sequenceIDGenerator = EventSyncConnectionPoolManager.getSequenceID();
+                clusterCoordinator = StreamProcessorDataHolder.getClusterCoordinator();
                 persistAndSendControlMessage();
             } //Passive node will not persist the state
         } else {
@@ -109,7 +112,10 @@ public class PersistenceManager implements Runnable {
                         " of siddhi App " + siddhiAppRuntime.getName() + " persisted successfully");
             }
         }
-        if (haManager != null && haManager.isActiveNode()) {
+        if (haManager != null && haManager.isActiveNode() && clusterCoordinator.getAllNodeDetails().size() == 2) {
+            if (log.isDebugEnabled()) {
+                log.debug("Control Message is sent to the passive node - " + Arrays.toString(siddhiRevisionArray));
+            }
             sendControlMessageToPassiveNode(siddhiRevisionArray);
         }
         if (StreamProcessorDataHolder.getNodeInfo() != null) {
@@ -127,8 +133,7 @@ public class PersistenceManager implements Runnable {
             eventSyncConnection = (EventSyncConnection) tcpConnectionPool.borrowObject(HAConstants.ACTIVE_NODE_CONNECTION_POOL_ID);
             tcpConnectionPool.returnObject(HAConstants.ACTIVE_NODE_CONNECTION_POOL_ID, eventSyncConnection);
         } catch (Exception e) {
-            log.error("Error in getting a connection to the Passive node. { host: '" + deploymentConfig
-                    .getPassiveNodeHost() + "', port: '" + deploymentConfig.getPassiveNodePort() + "'");
+            log.error("Error in getting a connection to the Passive node. " + e.getMessage());
         }
         return eventSyncConnection;
     }
@@ -144,8 +149,7 @@ public class PersistenceManager implements Runnable {
                         "message to the passive node");
             }
         } catch (ConnectionUnavailableException e) {
-            log.error("Error in connecting to the Passive node. { host: '" + deploymentConfig.getPassiveNodeHost() +
-                    "', " + "port: '" + deploymentConfig.getPassiveNodePort() + "'");
+            log.error("Error in connecting to the Passive node. " + e.getMessage());
         } catch (UnsupportedEncodingException e) {
             log.error("Error when get bytes in encoding '" + HAConstants.DEFAULT_CHARSET + "' " + e.getMessage(), e);
         }
