@@ -33,21 +33,20 @@ public class EventSyncConnectionPoolManager {
     private static AtomicLong sequenceID = new AtomicLong();
 
 
-    public static void initializeConnectionPool(DeploymentConfig deploymentConfig) {
+    public static void initializeConnectionPool(String host, int port, DeploymentConfig deploymentConfig) {
         EventSyncClientPoolConfig eventSyncClientPoolConfig = deploymentConfig.getTcpClientPoolConfig();
-        EventSyncConnectionPoolFactory eventSyncConnectionPoolFactory = new EventSyncConnectionPoolFactory(deploymentConfig.getPassiveNodeHost(),
-                deploymentConfig.getPassiveNodePort());
+        EventSyncConnectionPoolFactory eventSyncConnectionPoolFactory = new EventSyncConnectionPoolFactory(host, port);
         initializeConnectionPool(eventSyncConnectionPoolFactory, eventSyncClientPoolConfig.getMaxActive(), eventSyncClientPoolConfig.getMaxTotal(),
                 eventSyncClientPoolConfig.getMaxIdle(), eventSyncClientPoolConfig.getMaxWait(),
                 eventSyncClientPoolConfig.getMinEvictableIdleTimeMillis());
     }
 
     public synchronized static void initializeConnectionPool(EventSyncConnectionPoolFactory factory,
-                                                int maxActive,
-                                                int maxTotal,
-                                                int maxIdle,
-                                                long maxWait,
-                                                long minEvictableIdleTimeMillis) {
+                                                             int maxActive,
+                                                             int maxTotal,
+                                                             int maxIdle,
+                                                             long maxWait,
+                                                             long minEvictableIdleTimeMillis) {
         if (connectionPool == null) {
             connectionPool = new GenericKeyedObjectPool();
             connectionPool.setFactory(factory);

@@ -26,6 +26,7 @@ import org.wso2.carbon.stream.processor.core.NodeInfo;
 import org.wso2.carbon.stream.processor.core.event.queue.EventListMapManager;
 import org.wso2.carbon.stream.processor.core.ha.tcp.TCPServer;
 import org.wso2.carbon.stream.processor.core.ha.transport.EventSyncConnectionPoolManager;
+import org.wso2.carbon.stream.processor.core.ha.util.HAConstants;
 import org.wso2.carbon.stream.processor.core.internal.StreamProcessorDataHolder;
 import org.wso2.carbon.stream.processor.core.internal.beans.DeploymentConfig;
 import org.wso2.carbon.stream.processor.core.internal.beans.EventSyncClientPoolConfig;
@@ -55,7 +56,7 @@ public class HAManager {
     private DeploymentConfig deploymentConfig;
     private EventSyncClientPoolConfig eventSyncClientPoolConfig;
 
-    private final static Map<String, Object> activeNodePropertiesMap = new HashMap<>();
+    private final static Map<String, Object> passiveNodeDetailsPropertiesMap = new HashMap<>();
     private static final Logger log = Logger.getLogger(HAManager.class);
 
     public HAManager(ClusterCoordinator clusterCoordinator, String nodeId, String clusterId,
@@ -97,12 +98,17 @@ public class HAManager {
 
         if (isActiveNode) {
             log.info("HA Deployment: Starting up as Active Node");
-            clusterCoordinator.setPropertiesMap(activeNodePropertiesMap);
-            EventSyncConnectionPoolManager.initializeConnectionPool(deploymentConfig);
             isActiveNode = true;
         } else {
             log.info("HA Deployment: Starting up as Passive Node");
             //initialize passive queue
+            passiveNodeDetailsPropertiesMap.put(HAConstants.HOST, deploymentConfig.eventSyncServerConfigs().getHost());
+            passiveNodeDetailsPropertiesMap.put(HAConstants.PORT, deploymentConfig.eventSyncServerConfigs().getPort());
+            passiveNodeDetailsPropertiesMap.put(HAConstants.ADVERTISED_HOST, deploymentConfig.eventSyncServerConfigs()
+                    .getAdvertisedHost());
+            passiveNodeDetailsPropertiesMap.put(HAConstants.ADVERTISED_PORT, deploymentConfig.eventSyncServerConfigs()
+                    .getAdvertisedPort());
+            clusterCoordinator.setPropertiesMap(passiveNodeDetailsPropertiesMap);
             EventListMapManager.initializeEventListMap();
 
             //start tcp server
@@ -170,6 +176,13 @@ public class HAManager {
      */
     void changeToPassive() {
         isActiveNode = false;
+        passiveNodeDetailsPropertiesMap.put(HAConstants.HOST, deploymentConfig.eventSyncServerConfigs().getHost());
+        passiveNodeDetailsPropertiesMap.put(HAConstants.PORT, deploymentConfig.eventSyncServerConfigs().getPort());
+        passiveNodeDetailsPropertiesMap.put(HAConstants.ADVERTISED_HOST, deploymentConfig.eventSyncServerConfigs()
+                .getAdvertisedHost());
+        passiveNodeDetailsPropertiesMap.put(HAConstants.ADVERTISED_PORT, deploymentConfig.eventSyncServerConfigs()
+                .getAdvertisedPort());
+        clusterCoordinator.setPropertiesMap(passiveNodeDetailsPropertiesMap);
         //stop the databridge servers
         List<ServerEventListener> listeners = StreamProcessorDataHolder.getServerListeners();
         for (ServerEventListener listener : listeners) {
@@ -260,11 +273,23 @@ public class HAManager {
         });
     }
 
+    public void initializeEventSyncConnectionPool() {
+        EventSyncConnectionPoolManager.initializeConnectionPool(host, port, deploymentConfig);
+    }
+
+    String host;
+    int port;
+
+    public void setPassiveNodeHostPort(String host, int port) {
+        this.host = host;
+        this.port = port;
+    }
+
     public boolean isActiveNode() {
         return isActiveNode;
     }
 
-    public static Map<String, Object> getActiveNodePropertiesMap() {
-        return activeNodePropertiesMap;
+    public static Map<String, Object> getPassiveNodePropertiesMap() {
+        return passiveNodeDetailsPropertiesMap;
     }
 }
