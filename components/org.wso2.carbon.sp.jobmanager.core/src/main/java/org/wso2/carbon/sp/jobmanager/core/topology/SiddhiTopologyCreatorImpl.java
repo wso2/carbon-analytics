@@ -513,19 +513,16 @@ public class SiddhiTopologyCreatorImpl implements SiddhiTopologyCreator {
                 InputStreamDataHolder inputStreamDataHolder = entry.getValue();
                 if (inputStreamDataHolder.getEventHolderType().equals(EventHolder.STREAM) && inputStreamDataHolder
                         .isUserGiven()) {
-
                     createPassthrough = true;
                     String runtimeDefinition = removeMetaInfoStream(streamId,
                             inputStreamDataHolder.getStreamDefinition(), SiddhiTopologyCreatorConstants
                                     .SOURCE_IDENTIFIER);
-
                     if (siddhiQueryGroup1.getParallelism() > SiddhiTopologyCreatorConstants.DEFAULT_PARALLEL) {
                         passthroughQueriesAvailable = true;
                         passthroughQueries.addAll(generatePassthroughQueryList(
                                 streamId, inputStreamDataHolder, runtimeDefinition));
                         inputStreamDataHolder.setStreamDefinition(runtimeDefinition);
                         inputStreamDataHolder.setUserGiven(false);
-
                         InputStreamDataHolder holder1 = siddhiQueryGroup1.getInputStreams().get(streamId);
                         String consumingStream = "${" + streamId + "} " + removeMetaInfoStream(streamId,
                                 holder1.getStreamDefinition(), SiddhiTopologyCreatorConstants.SOURCE_IDENTIFIER);
@@ -550,15 +547,14 @@ public class SiddhiTopologyCreatorImpl implements SiddhiTopologyCreator {
                                 inputStreamDataHolder.setStreamDefinition(runtimeDefinition);
                                 inputStreamDataHolder.setUserGiven(false);
                                 createPassthrough = false;
-
                                 InputStreamDataHolder holder1 = siddhiQueryGroup1.getInputStreams().get(streamId);
                                 consumingStream = "${" + streamId + "} " + removeMetaInfoStream(streamId,
-                                        holder1.getStreamDefinition(), SiddhiTopologyCreatorConstants.SOURCE_IDENTIFIER);
+                                        holder1.getStreamDefinition(),
+                                        SiddhiTopologyCreatorConstants.SOURCE_IDENTIFIER);
                                 holder1.setStreamDefinition(consumingStream);
                                 holder1.setUserGiven(false);
 
                             }
-
                             InputStreamDataHolder holder2 = siddhiQueryGroup2.getInputStreams().get(streamId);
                             consumingStream = "${" + streamId + "} " + removeMetaInfoStream(streamId,
                                     holder2.getStreamDefinition(), SiddhiTopologyCreatorConstants.SOURCE_IDENTIFIER);
