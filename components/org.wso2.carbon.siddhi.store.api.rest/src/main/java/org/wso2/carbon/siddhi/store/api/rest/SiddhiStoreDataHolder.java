@@ -19,6 +19,7 @@
 
 package org.wso2.carbon.siddhi.store.api.rest;
 
+import org.wso2.carbon.analytics.msf4j.interceptor.common.AuthenticationInterceptor;
 import org.wso2.carbon.config.provider.ConfigProvider;
 import org.wso2.carbon.stream.processor.core.SiddhiAppRuntimeService;
 
@@ -28,6 +29,7 @@ import org.wso2.carbon.stream.processor.core.SiddhiAppRuntimeService;
 public class SiddhiStoreDataHolder {
     private SiddhiAppRuntimeService siddhiAppRuntimeService;
     private ConfigProvider configProvider;
+    private AuthenticationInterceptor authenticationInterceptor;
 
     private static SiddhiStoreDataHolder  instance = new SiddhiStoreDataHolder();
 
@@ -53,5 +55,13 @@ public class SiddhiStoreDataHolder {
 
     public ConfigProvider getConfigProvider() {
         return configProvider;
+    }
+
+    public AuthenticationInterceptor getAuthenticationInterceptor() {
+        return authenticationInterceptor;
+    }
+
+    public void setAuthenticationInterceptor(AuthenticationInterceptor authenticationInterceptor) {
+        this.authenticationInterceptor = authenticationInterceptor;
     }
 }
