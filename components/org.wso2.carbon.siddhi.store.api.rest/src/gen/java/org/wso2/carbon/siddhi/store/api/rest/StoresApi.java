@@ -88,7 +88,10 @@ public class StoresApi implements HAStateChangeListener {
     protected void start(BundleContext bundleContext) throws Exception {
         log.debug("Siddhi Store REST API activated.");
         microservicesRunner = new MicroservicesRunner(transportsConfiguration);
-        microservicesRunner.addGlobalRequestInterceptor(new AuthenticationInterceptor());
+        if (SiddhiStoreDataHolder.getInstance().getAuthenticationInterceptor() != null) {
+            microservicesRunner.addGlobalRequestInterceptor(SiddhiStoreDataHolder.getInstance().
+                    getAuthenticationInterceptor());
+        }
         microservicesRunner.deploy(new StoresApi());
         startStoresApiMicroservice();
     }
@@ -168,9 +171,11 @@ public class StoresApi implements HAStateChangeListener {
             unbind = "unregisterAuthenticationInterceptor"
     )
     protected void registerAuthenticationInterceptor(AuthenticationInterceptor authenticationInterceptor) {
+        SiddhiStoreDataHolder.getInstance().setAuthenticationInterceptor(authenticationInterceptor);
     }
 
     protected void unregisterAuthenticationInterceptor(AuthenticationInterceptor authenticationInterceptor) {
+        SiddhiStoreDataHolder.getInstance().setAuthenticationInterceptor(null);
     }
 
     @Override
