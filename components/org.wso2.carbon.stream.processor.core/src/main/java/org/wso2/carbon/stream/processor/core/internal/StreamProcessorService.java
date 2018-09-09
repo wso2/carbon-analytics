@@ -208,6 +208,11 @@ public class StreamProcessorService {
                 }
                 siddhiAppRuntime.start();
                 log.info("Siddhi App " + siddhiAppName + " deployed successfully");
+                siddhiAppData.setActive(true);
+                siddhiAppData.setSiddhiAppRuntime(siddhiAppRuntime);
+                siddhiAppData.setInputHandlerMap(inputHandlerMap);
+                siddhiAppData.setDeploymentTime(System.currentTimeMillis());
+                siddhiAppMap.put(siddhiAppName, siddhiAppData);
             }
         }
     }
