@@ -55,7 +55,7 @@ wso2.transport.http:
     -
       id: "http-sender"
 
-stores.api:
+siddhi.stores.query.api:
   transportProperties:
     -
       name: "server.bootstrap.socket.timeout"

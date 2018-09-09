@@ -57,6 +57,7 @@ public class StoresApi implements HAStateChangeListener {
     private static TransportsConfiguration transportsConfiguration;
     private static MicroservicesRunner microservicesRunner;
     private static volatile boolean microserviceActive;
+    private static final String ROOT_CONFIG_ELEMENT = "siddhi.stores.query.api";
 
     @POST
     @Path("/query")
@@ -152,10 +153,10 @@ public class StoresApi implements HAStateChangeListener {
     protected void registerConfigProvider(ConfigProvider configProvider) {
         SiddhiStoreDataHolder.getInstance().setConfigProvider(configProvider);
         try {
-            transportsConfiguration = configProvider.getConfigurationObject("stores.api",
+            transportsConfiguration = configProvider.getConfigurationObject(ROOT_CONFIG_ELEMENT,
                     TransportsConfiguration.class);
         } catch (ConfigurationException e) {
-            log.error("Error while loading TransportsConfiguration", e);
+            log.error("Error while loading TransportsConfiguration for " + ROOT_CONFIG_ELEMENT, e);
         }
     }
 
