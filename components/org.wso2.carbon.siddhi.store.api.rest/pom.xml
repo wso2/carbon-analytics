@@ -199,8 +199,5 @@
             org.wso2.carbon.analytics.msf4j.interceptor.common.*;version="${carbon.analytics.version.range}",
             *;resolution:=optional
         </import.package>
-        <carbon.component>
-            osgi.service; objectClass="org.wso2.msf4j.Microservice"; serviceCount="1"
-        </carbon.component>
     </properties>
 </project>

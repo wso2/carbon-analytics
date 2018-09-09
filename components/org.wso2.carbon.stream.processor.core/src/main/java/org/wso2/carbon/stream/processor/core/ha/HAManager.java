@@ -22,6 +22,7 @@ import org.apache.log4j.Logger;
 import org.wso2.carbon.cluster.coordinator.service.ClusterCoordinator;
 import org.wso2.carbon.databridge.commons.ServerEventListener;
 import org.wso2.carbon.stream.processor.core.DeploymentMode;
+import org.wso2.carbon.stream.processor.core.HAStateChangeListener;
 import org.wso2.carbon.stream.processor.core.NodeInfo;
 import org.wso2.carbon.stream.processor.core.event.queue.EventListMapManager;
 import org.wso2.carbon.stream.processor.core.ha.tcp.TCPServer;
@@ -98,8 +99,14 @@ public class HAManager {
         isActiveNode = clusterCoordinator.isLeaderNode();
 
         if (isActiveNode) {
-            log.info("HA Deployment: Starting up as Active Node");
             isActiveNode = true;
+            log.info("HA Deployment: Starting up as Active Node");
+            //notify the HAStateChangeListener as becameActive
+            List<HAStateChangeListener> haStateChangeListeners = StreamProcessorDataHolder.
+                    getHaStateChangeListenerList();
+            for (HAStateChangeListener listener : haStateChangeListeners) {
+                listener.becameActive();
+            }
         } else {
             log.info("HA Deployment: Starting up as Passive Node");
             //initialize passive queue
@@ -114,6 +121,12 @@ public class HAManager {
 
             //start tcp server
             tcpServerInstance.start(deploymentConfig);
+
+            //notify the HAStateChangeListener as becamePassive
+            List<HAStateChangeListener> listeners = StreamProcessorDataHolder.getHaStateChangeListenerList();
+            for (HAStateChangeListener listener : listeners) {
+                listener.becamePassive();
+            }
         }
 
         NodeInfo nodeInfo = StreamProcessorDataHolder.getNodeInfo();
@@ -165,6 +178,14 @@ public class HAManager {
             for (ServerEventListener listener : listeners) {
                 listener.start();
             }
+
+            //notify the HAStateChangeListener as becameActive
+            List<HAStateChangeListener> haStateChangeListeners = StreamProcessorDataHolder.
+                    getHaStateChangeListenerList();
+            for (HAStateChangeListener listener : haStateChangeListeners) {
+                listener.becameActive();
+            }
+
             if (log.isDebugEnabled()) {
                 log.debug("Successfully Changed to Active Mode ");
             }
@@ -197,6 +218,14 @@ public class HAManager {
         nodeInfo.setActiveNode(isActiveNode);
         //start tcp server
         tcpServerInstance.start(deploymentConfig);
+
+        //notify the HAStateChangeListener as becamePassive
+        List<HAStateChangeListener> haStateChangeListeners = StreamProcessorDataHolder.
+                getHaStateChangeListenerList();
+        for (HAStateChangeListener listener : haStateChangeListeners) {
+            listener.becamePassive();
+        }
+
         if (log.isDebugEnabled()) {
             log.debug("Successfully Changed to Passive Mode ");
         }

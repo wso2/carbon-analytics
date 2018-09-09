@@ -29,6 +29,7 @@ import org.wso2.carbon.config.provider.ConfigProvider;
 import org.wso2.carbon.siddhi.store.api.rest.factories.StoresApiServiceFactory;
 import org.wso2.carbon.siddhi.store.api.rest.model.ModelApiResponse;
 import org.wso2.carbon.siddhi.store.api.rest.model.Query;
+import org.wso2.carbon.stream.processor.core.HAStateChangeListener;
 import org.wso2.carbon.stream.processor.core.SiddhiAppRuntimeService;
 
 import javax.ws.rs.Consumes;
@@ -43,14 +44,14 @@ import org.wso2.transport.http.netty.config.TransportsConfiguration;
 
 @Component(
         name = "siddhi-store-query-service",
-        service = StoresApi.class,
+        service = HAStateChangeListener.class,
         immediate = true
 )
 @Path("/stores")
 @io.swagger.annotations.Api(description = "The stores API")
 @javax.annotation.Generated(value = "io.swagger.codegen.languages.JavaMSF4JServerCodegen",
         date = "2017-11-01T11:26:25.925Z")
-public class StoresApi {
+public class StoresApi implements HAStateChangeListener {
     private Logger log = LoggerFactory.getLogger(StoresApi.class);
     private final StoresApiService delegate = StoresApiServiceFactory.getStoresApi();
     private static TransportsConfiguration transportsConfiguration;
@@ -172,4 +173,13 @@ public class StoresApi {
     protected void unregisterAuthenticationInterceptor(AuthenticationInterceptor authenticationInterceptor) {
     }
 
+    @Override
+    public void becameActive() {
+        startStoresApiMicroservice();
+    }
+
+    @Override
+    public void becamePassive() {
+        stopStoresApiMicroservice();
+    }
 }
