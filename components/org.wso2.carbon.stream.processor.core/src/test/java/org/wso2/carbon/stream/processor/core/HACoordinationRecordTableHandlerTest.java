@@ -46,48 +46,9 @@
 //    }
 //
 //    @Test
-//    public void testPassiveNodeEventQueue() throws ConnectionUnavailableException {
-//        HACoordinationRecordTableHandlerManager recordTableHandlerManager = new HACoordinationRecordTableHandlerManager
-//                (10);
-//        HACoordinationRecordTableHandler recordTableHandler = (HACoordinationRecordTableHandler)
-//                recordTableHandlerManager.generateRecordTableHandler();
-//        recordTableHandler.init("element-id", TableDefinition.id("id"));
-//
-//        RecordTableHandlerCallback recordTableHandlerCallback = mock(RecordTableHandlerCallback.class);
-//        doNothing().when(recordTableHandlerCallback).add(Mockito.any());
-//        doNothing().when(recordTableHandlerCallback).delete(Mockito.any(), Mockito.any());
-//        doNothing().when(recordTableHandlerCallback).update(Mockito.any(), Mockito.any(), Mockito.any(),
-//                Mockito.any());
-//        doNothing().when(recordTableHandlerCallback).updateOrAdd(Mockito.any(), Mockito.any(), Mockito.any(),
-//                Mockito.any(), Mockito.any());
-//        when(recordTableHandlerCallback.find(Mockito.any(), Mockito.any())).thenReturn(null);
-//        when(recordTableHandlerCallback.contains(Mockito.any(), Mockito.any())).thenReturn(false);
-//
-//        //Events should be queued since passive node
-//        recordTableHandler.contains(1L, new HashMap<>(), null, recordTableHandlerCallback);
-//        recordTableHandler.find(2L, new HashMap<>(), null, recordTableHandlerCallback);
-//        recordTableHandler.add(3L, new ArrayList<>(), recordTableHandlerCallback);
-//        recordTableHandler.delete(4L, new ArrayList<>(), null, recordTableHandlerCallback);
-//        recordTableHandler.update(5L, null, new ArrayList<>(), new LinkedHashMap<>(), new ArrayList<>(),
-//                recordTableHandlerCallback);
-//        recordTableHandler.updateOrAdd(6L, null, new ArrayList<>(), new LinkedHashMap<>(), new ArrayList<>(),
-//                new ArrayList<>(), recordTableHandlerCallback);
-//
-//        Assert.assertEquals(recordTableHandler.getEventQueue().size(), 4);
-//        Assert.assertEquals(recordTableHandler.getEventQueue().peek().getTimestamp(), 3L);
-//        Assert.assertEquals(recordTableHandler.getEventQueue().poll().getEventType(), RecordTableData.EventType.ADD);
-//        Assert.assertEquals(recordTableHandler.getEventQueue().poll().getEventType(),
-//                RecordTableData.EventType.DELETE);
-//        Assert.assertEquals(recordTableHandler.getEventQueue().poll().getEventType(),
-//                RecordTableData.EventType.UPDATE);
-//        Assert.assertEquals(recordTableHandler.getEventQueue().poll().getEventType(), RecordTableData.EventType.
-//                UPDATE_OR_ADD);
-//    }
-//
-//    @Test
 //    public void testActiveNodeEventQueue() throws ConnectionUnavailableException {
 //        HACoordinationRecordTableHandlerManager recordTableHandlerManager = new HACoordinationRecordTableHandlerManager
-//                (10);
+//                ();
 //        HACoordinationRecordTableHandler recordTableHandler = (HACoordinationRecordTableHandler)
 //                recordTableHandlerManager.generateRecordTableHandler();
 //        recordTableHandler.init("element-id", TableDefinition.id("id"));

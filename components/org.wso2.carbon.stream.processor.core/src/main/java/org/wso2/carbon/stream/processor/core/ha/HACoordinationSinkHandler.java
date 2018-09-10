@@ -33,6 +33,7 @@ public class HACoordinationSinkHandler extends SinkHandler {
     private static final Logger log = Logger.getLogger(HACoordinationSinkHandler.class);
 
     private boolean isActiveNode;
+    private long lastPublishedEventTimestamp = 0L;
     private String sinkHandlerElementId;
 
 
@@ -58,6 +59,7 @@ public class HACoordinationSinkHandler extends SinkHandler {
     @Override
     public void handle(Event event, SinkHandlerCallback sinkHandlerCallback) {
         if (isActiveNode) {
+            lastPublishedEventTimestamp = event.getTimestamp();
             sinkHandlerCallback.mapAndSend(event);
         }
     }
@@ -71,6 +73,7 @@ public class HACoordinationSinkHandler extends SinkHandler {
     @Override
     public void handle(Event[] events, SinkHandlerCallback sinkHandlerCallback) {
         if (isActiveNode) {
+            lastPublishedEventTimestamp = events[events.length - 1].getTimestamp();
             sinkHandlerCallback.mapAndSend(events);
         }
     }
@@ -87,6 +90,17 @@ public class HACoordinationSinkHandler extends SinkHandler {
      */
     public void setAsPassive() {
         this.isActiveNode = false;
+    }
+
+    /**
+     * Get the timestamp of the last event published from the given sink.
+     * Will only be called when this node is the Active node and publishing events.
+     *
+     * @return Object that holds the Sink Handler Element Id and timestamp of last published event.
+     */
+    public long getActiveNodeLastPublishedTimestamp() {
+        //Since both nodes deploy same siddhi apps, every sink handler will get the same element Id in both nodes
+        return lastPublishedEventTimestamp;
     }
 
     @Override

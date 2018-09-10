@@ -185,10 +185,7 @@ public class HAManager {
             for (HAStateChangeListener listener : haStateChangeListeners) {
                 listener.becameActive();
             }
-
-            if (log.isDebugEnabled()) {
-                log.debug("Successfully Changed to Active Mode ");
-            }
+            log.info("Successfully Changed to Active Mode ");
         }
     }
 
@@ -225,10 +222,7 @@ public class HAManager {
         for (HAStateChangeListener listener : haStateChangeListeners) {
             listener.becamePassive();
         }
-
-        if (log.isDebugEnabled()) {
-            log.debug("Successfully Changed to Passive Mode ");
-        }
+        log.info("Successfully Changed to Passive Mode ");
     }
 
     private void syncState() {
