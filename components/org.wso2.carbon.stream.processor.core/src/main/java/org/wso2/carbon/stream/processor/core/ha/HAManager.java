@@ -57,6 +57,8 @@ public class HAManager {
     private DeploymentConfig deploymentConfig;
     private EventSyncClientPoolConfig eventSyncClientPoolConfig;
     private boolean passiveNodeAdded;
+    private String host;
+    private int port;
 
     private final static Map<String, Object> passiveNodeDetailsPropertiesMap = new HashMap<>();
     private static final Logger log = Logger.getLogger(HAManager.class);
@@ -301,9 +303,6 @@ public class HAManager {
         EventSyncConnectionPoolManager.initializeConnectionPool(host, port, deploymentConfig);
     }
 
-    String host;
-    int port;
-
     public void setPassiveNodeHostPort(String host, int port) {
         this.host = host;
         this.port = port;
@@ -311,10 +310,6 @@ public class HAManager {
 
     public boolean isActiveNode() {
         return isActiveNode;
-    }
-
-    public static Map<String, Object> getPassiveNodePropertiesMap() {
-        return passiveNodeDetailsPropertiesMap;
     }
 
     public boolean isPassiveNodeAdded() {
