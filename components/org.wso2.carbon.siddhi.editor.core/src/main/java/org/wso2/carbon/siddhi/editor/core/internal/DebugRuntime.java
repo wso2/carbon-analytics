@@ -169,6 +169,10 @@ public class DebugRuntime {
         }
     }
 
-    protected enum Mode {RUN, DEBUG, STOP, FAULTY}
+    public SiddhiAppRuntime getSiddhiAppRuntime() {
+        return siddhiAppRuntime;
+    }
+
+    public enum Mode {RUN, DEBUG, STOP, FAULTY}
 
 }

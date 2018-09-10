@@ -36,7 +36,7 @@
 //import org.wso2.carbon.stream.processor.common.EventStreamService;
 //import org.wso2.carbon.stream.processor.core.DeploymentMode;
 //import org.wso2.carbon.stream.processor.core.NodeInfo;
-//import org.wso2.carbon.stream.processor.core.SiddhiAppRuntimeService;
+//import org.wso2.carbon.stream.processor.common.SiddhiAppRuntimeService;
 //import org.wso2.carbon.stream.processor.core.model.OutputSyncTimestampCollection;
 //
 //import java.net.URI;

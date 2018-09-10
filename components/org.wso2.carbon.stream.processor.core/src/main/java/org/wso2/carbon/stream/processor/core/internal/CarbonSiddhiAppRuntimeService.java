@@ -21,7 +21,7 @@ package org.wso2.carbon.stream.processor.core.internal;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.wso2.carbon.stream.processor.core.SiddhiAppRuntimeService;
+import org.wso2.carbon.stream.processor.common.SiddhiAppRuntimeService;
 import org.wso2.siddhi.core.SiddhiAppRuntime;
 
 import java.util.HashMap;

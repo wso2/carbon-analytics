@@ -29,8 +29,8 @@ import org.wso2.carbon.config.provider.ConfigProvider;
 import org.wso2.carbon.siddhi.store.api.rest.factories.StoresApiServiceFactory;
 import org.wso2.carbon.siddhi.store.api.rest.model.ModelApiResponse;
 import org.wso2.carbon.siddhi.store.api.rest.model.Query;
-import org.wso2.carbon.stream.processor.core.HAStateChangeListener;
-import org.wso2.carbon.stream.processor.core.SiddhiAppRuntimeService;
+import org.wso2.carbon.stream.processor.common.HAStateChangeListener;
+import org.wso2.carbon.stream.processor.common.SiddhiAppRuntimeService;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.POST;
@@ -126,6 +126,7 @@ public class StoresApi implements HAStateChangeListener {
     @Deactivate
     protected void stop() throws Exception {
         log.debug("Siddhi Store REST API deactivated.");
+        stopStoresApiMicroservice();
     }
 
     @Reference(

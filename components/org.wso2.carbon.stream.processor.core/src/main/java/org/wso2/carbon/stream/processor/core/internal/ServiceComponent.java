@@ -40,9 +40,9 @@ import org.wso2.carbon.siddhi.metrics.core.internal.service.MetricsServiceCompon
 import org.wso2.carbon.stream.processor.common.EventStreamService;
 import org.wso2.carbon.stream.processor.common.utils.config.FileConfigManager;
 import org.wso2.carbon.stream.processor.core.DeploymentMode;
-import org.wso2.carbon.stream.processor.core.HAStateChangeListener;
+import org.wso2.carbon.stream.processor.common.HAStateChangeListener;
 import org.wso2.carbon.stream.processor.core.NodeInfo;
-import org.wso2.carbon.stream.processor.core.SiddhiAppRuntimeService;
+import org.wso2.carbon.stream.processor.common.SiddhiAppRuntimeService;
 import org.wso2.carbon.stream.processor.core.distribution.DistributionService;
 import org.wso2.carbon.stream.processor.core.ha.HAManager;
 import org.wso2.carbon.stream.processor.core.ha.exception.HAModeException;
@@ -450,7 +450,7 @@ public class ServiceComponent {
      * @param haStateChangeListener the ha state change server listeners that is registered as a service.
      */
     @Reference(
-            name = "org.wso2.carbon.stream.processor.core.HAStateChangeListener",
+            name = "org.wso2.carbon.stream.processor.common.HAStateChangeListener",
             service = HAStateChangeListener.class,
             cardinality = ReferenceCardinality.MULTIPLE,
             policy = ReferencePolicy.DYNAMIC,

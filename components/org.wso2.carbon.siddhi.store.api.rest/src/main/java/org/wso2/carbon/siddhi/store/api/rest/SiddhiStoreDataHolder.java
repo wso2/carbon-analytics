@@ -21,7 +21,7 @@ package org.wso2.carbon.siddhi.store.api.rest;
 
 import org.wso2.carbon.analytics.msf4j.interceptor.common.AuthenticationInterceptor;
 import org.wso2.carbon.config.provider.ConfigProvider;
-import org.wso2.carbon.stream.processor.core.SiddhiAppRuntimeService;
+import org.wso2.carbon.stream.processor.common.SiddhiAppRuntimeService;
 
 /**
  * This class holds the services referenced by the store api micro services {@link StoresApi}

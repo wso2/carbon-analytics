@@ -62,10 +62,6 @@
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-log4j12</artifactId>
         </dependency>
-        <dependency>
-            <groupId>org.wso2.carbon.analytics</groupId>
-            <artifactId>org.wso2.carbon.stream.processor.core</artifactId>
-        </dependency>
 
         <!--Dependencies for event simulation begins here-->
 
@@ -200,10 +196,6 @@
                                 <bundle>
                                     <symbolicName>com.google.gson</symbolicName>
                                     <version>${gson.version}</version>
-                                </bundle>
-                                <bundle>
-                                    <symbolicName>org.wso2.carbon.stream.processor.core</symbolicName>
-                                    <version>${carbon.analytics.version}</version>
                                 </bundle>
                                 <bundle>
                                     <symbolicName>json</symbolicName>
