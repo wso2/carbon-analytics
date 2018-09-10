@@ -93,7 +93,9 @@ public class EventListMapManager {
                 long lastSequenceIdForApp = -1;
 
                 if (perAppLastControlMessageSequenceNumberList.size() != 0) {
-                    lastSequenceIdForApp = perAppLastControlMessageSequenceNumberList.get(siddhiAppName);
+                    if (perAppLastControlMessageSequenceNumberList.get(siddhiAppName) != null) {
+                        lastSequenceIdForApp = perAppLastControlMessageSequenceNumberList.get(siddhiAppName);
+                    }
                 }
                 synchronized (this) {
                     //we need this block synchronized to ensure if last remembered siddhi app id is smaller than the

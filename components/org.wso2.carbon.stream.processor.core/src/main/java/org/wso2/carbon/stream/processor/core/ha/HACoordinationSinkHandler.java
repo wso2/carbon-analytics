@@ -25,8 +25,6 @@ import org.wso2.siddhi.core.stream.output.sink.SinkHandlerCallback;
 import org.wso2.siddhi.query.api.definition.StreamDefinition;
 
 import java.util.Map;
-import java.util.Queue;
-import java.util.concurrent.LinkedBlockingQueue;
 
 /**
  * Implementation of {@link SinkHandler} used for 2 node minimum HA
@@ -35,14 +33,8 @@ public class HACoordinationSinkHandler extends SinkHandler {
     private static final Logger log = Logger.getLogger(HACoordinationSinkHandler.class);
 
     private boolean isActiveNode;
-    private boolean isForcePublishing;
-    private long lastPublishedEventTimestamp = 0L;
     private String sinkHandlerElementId;
 
-    private static final String SINK = "sink";
-    private static final String DISTRIBUTION = "distribution";
-    private static final String FORCE_PUBLISH = "forcePublish";
-    private static final String TRUE = "TRUE";
 
     /**
      * Constructor.
@@ -55,7 +47,6 @@ public class HACoordinationSinkHandler extends SinkHandler {
     public void init(String sinkHandlerElementId, StreamDefinition streamDefinition,
                      SinkHandlerCallback sinkHandlerCallback) {
         this.sinkHandlerElementId = sinkHandlerElementId;
-        setForcePublishing(streamDefinition);
     }
 
     /**
@@ -66,8 +57,7 @@ public class HACoordinationSinkHandler extends SinkHandler {
      */
     @Override
     public void handle(Event event, SinkHandlerCallback sinkHandlerCallback) {
-        if (isActiveNode || isForcePublishing) {
-            lastPublishedEventTimestamp = event.getTimestamp();
+        if (isActiveNode) {
             sinkHandlerCallback.mapAndSend(event);
         }
     }
@@ -80,8 +70,7 @@ public class HACoordinationSinkHandler extends SinkHandler {
      */
     @Override
     public void handle(Event[] events, SinkHandlerCallback sinkHandlerCallback) {
-        if (isActiveNode || isForcePublishing) {
-            lastPublishedEventTimestamp = events[events.length - 1].getTimestamp();
+        if (isActiveNode) {
             sinkHandlerCallback.mapAndSend(events);
         }
     }
@@ -100,17 +89,6 @@ public class HACoordinationSinkHandler extends SinkHandler {
         this.isActiveNode = false;
     }
 
-    /**
-     * Get the timestamp of the last event published from the given sink.
-     * Will only be called when this node is the Active node and publishing events.
-     *
-     * @return Object that holds the Sink Handler Element Id and timestamp of last published event.
-     */
-    public long getActiveNodeLastPublishedTimestamp() {
-        //Since both nodes deploy same siddhi apps, every sink handler will get the same element Id in both nodes
-        return lastPublishedEventTimestamp;
-    }
-
     @Override
     public Map<String, Object> currentState() {
         // Do Nothing
@@ -127,26 +105,4 @@ public class HACoordinationSinkHandler extends SinkHandler {
         return sinkHandlerElementId;
     }
 
-    /**
-     * Method that would enable force publishing data regardless of the Node's mode,
-     * only when forcePublish is set to true
-     *
-     * @param streamDefinition the stream definition based on which, a sink is identified
-     */
-    private void setForcePublishing(StreamDefinition streamDefinition) {
-        streamDefinition.getAnnotations().forEach(streamAnnotation -> {
-            if (streamAnnotation.getName().equalsIgnoreCase(SINK)) {
-                streamAnnotation.getAnnotations().forEach(sinkAnnotation -> {
-                    if (sinkAnnotation.getName().equalsIgnoreCase(DISTRIBUTION)) {
-                        sinkAnnotation.getElements().forEach(distributedSinkElement -> {
-                            if (distributedSinkElement.getKey().equalsIgnoreCase(FORCE_PUBLISH)) {
-                                this.isForcePublishing =
-                                        distributedSinkElement.getValue().equalsIgnoreCase(TRUE);
-                            }
-                        });
-                    }
-                });
-            }
-        });
-    }
 }
