@@ -19,10 +19,12 @@
 package org.wso2.carbon.event.simulator.core.exception;
 
 
+import org.wso2.carbon.stream.processor.common.exception.ResourceNotFoundException;
+
 /**
  * customized exception class for parsing simulation and stream configurations
  */
-public class InvalidConfigException extends Exception {
+public class InvalidConfigException extends SimulationValidationException {
 
     /**
      * Throws customizes exception when parsing simulation and stream configurations
@@ -31,6 +33,16 @@ public class InvalidConfigException extends Exception {
      */
     public InvalidConfigException(String message) {
         super(message);
+    }
+
+    public InvalidConfigException(ResourceNotFoundException.ResourceType resourceType,
+                                           String resourceName, String message) {
+        super(message, resourceType, resourceName);
+    }
+
+    public InvalidConfigException(ResourceNotFoundException.ResourceType resourceType,
+                                  String resourceName, String message, Throwable cause) {
+        super(message, resourceType, resourceName, cause);
     }
 
     /**

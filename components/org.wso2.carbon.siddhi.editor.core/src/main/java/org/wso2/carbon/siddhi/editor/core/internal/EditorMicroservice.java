@@ -20,9 +20,11 @@ package org.wso2.carbon.siddhi.editor.core.internal;
 
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceRegistration;
 import org.osgi.service.component.annotations.Activate;
@@ -34,6 +36,7 @@ import org.osgi.service.component.annotations.ReferencePolicy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.wso2.carbon.config.provider.ConfigProvider;
+import org.wso2.carbon.siddhi.editor.core.EditorSiddhiAppRuntimeService;
 import org.wso2.carbon.siddhi.editor.core.Workspace;
 import org.wso2.carbon.siddhi.editor.core.commons.metadata.MetaData;
 import org.wso2.carbon.siddhi.editor.core.commons.request.ValidationRequest;
@@ -50,9 +53,14 @@ import org.wso2.carbon.siddhi.editor.core.util.LogEncoder;
 import org.wso2.carbon.siddhi.editor.core.util.MimeMapper;
 import org.wso2.carbon.siddhi.editor.core.util.SecurityUtil;
 import org.wso2.carbon.siddhi.editor.core.util.SourceEditorUtils;
-import org.wso2.carbon.siddhi.editor.core.util.eventflow.EventFlow;
-import org.wso2.carbon.siddhi.editor.core.util.eventflow.SiddhiAppMap;
+import org.wso2.carbon.siddhi.editor.core.util.designview.beans.EventFlow;
+import org.wso2.carbon.siddhi.editor.core.util.designview.codegenerator.CodeGenerator;
+import org.wso2.carbon.siddhi.editor.core.util.designview.deserializers.DeserializersRegisterer;
+import org.wso2.carbon.siddhi.editor.core.util.designview.designgenerator.DesignGenerator;
+import org.wso2.carbon.siddhi.editor.core.util.designview.exceptions.CodeGenerationException;
+import org.wso2.carbon.siddhi.editor.core.util.designview.exceptions.DesignGenerationException;
 import org.wso2.carbon.stream.processor.common.EventStreamService;
+import org.wso2.carbon.stream.processor.common.SiddhiAppRuntimeService;
 import org.wso2.carbon.stream.processor.common.utils.config.FileConfigManager;
 import org.wso2.msf4j.Microservice;
 import org.wso2.msf4j.Request;
@@ -61,6 +69,7 @@ import org.wso2.siddhi.core.SiddhiManager;
 import org.wso2.siddhi.core.debugger.SiddhiDebugger;
 import org.wso2.siddhi.core.exception.SiddhiAppCreationException;
 import org.wso2.siddhi.core.util.SiddhiComponentActivator;
+import org.wso2.siddhi.query.api.exception.SiddhiAppContextException;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -84,6 +93,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
@@ -91,7 +101,6 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
-import javax.ws.rs.Consumes;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
@@ -114,6 +123,7 @@ public class EditorMicroservice implements Microservice {
                     .build()
             );
     private ConfigProvider configProvider;
+    private ServiceRegistration siddhiAppRuntimeServiceRegistration;
 
     public EditorMicroservice() {
         workspace = new LocalFSWorkspace();
@@ -197,7 +207,17 @@ public class EditorMicroservice implements Microservice {
             }
             jsonString = new Gson().toJson(response);
         } catch (Throwable t) {
-            jsonString = new Gson().toJson(t);
+            // If the exception is a SiddhiAppCreationException and its message is null, append the stacktrace as the
+            // message.
+            if (t instanceof SiddhiAppContextException &&
+                    ((SiddhiAppContextException) t).getMessageWithOutContext() == null) {
+                SiddhiAppContextException e = (SiddhiAppContextException) t;
+                SiddhiAppCreationException appCreationException = new SiddhiAppCreationException(
+                        ExceptionUtils.getStackTrace(t), t, e.getQueryContextStartIndex(), e.getQueryContextEndIndex());
+                jsonString = new Gson().toJson(appCreationException);
+            } else {
+                jsonString = new Gson().toJson(t);
+            }
         }
         return Response.ok(jsonString, MediaType.APPLICATION_JSON)
                 .build();
@@ -243,32 +263,14 @@ public class EditorMicroservice implements Microservice {
     }
 
     @GET
-    @Path("/workspace/list")
-    @Produces("application/json")
-    public Response directoriesInPath(@QueryParam("path") String path) {
-        try {
-            return Response.status(Response.Status.OK)
-                    .entity(workspace.listDirectoriesInPath(
-                            new String(Base64.getDecoder().decode(path), Charset.defaultCharset())))
-                    .type(MediaType.APPLICATION_JSON)
-                    .build();
-        } catch (IOException e) {
-            return Response.serverError().entity("failed." + e.getMessage())
-                    .build();
-        } catch (Throwable ignored) {
-            return Response.serverError().entity("failed")
-                    .build();
-        }
-    }
-
-    @GET
     @Path("/workspace/exists")
     @Produces("application/json")
     public Response fileExists(@QueryParam("path") String path) {
         try {
             return Response.status(Response.Status.OK)
                     .entity(workspace.exists(
-                            Paths.get(new String(Base64.getDecoder().decode(path), Charset.defaultCharset()))))
+                            Paths.get(Constants.DIRECTORY_WORKSPACE + System.getProperty(FILE_SEPARATOR) +
+                                    new String(Base64.getDecoder().decode(path), Charset.defaultCharset()))))
                     .type(MediaType.APPLICATION_JSON)
                     .build();
         } catch (IOException e) {
@@ -296,8 +298,8 @@ public class EditorMicroservice implements Microservice {
 
             return Response.status(Response.Status.OK)
                     .entity(workspace.exists(SecurityUtil.resolvePath(Paths.get(location).toAbsolutePath(),
-                            Paths.get(new String(base64ConfigName,
-                                    Charset.defaultCharset())))))
+                            Paths.get(Constants.DIRECTORY_WORKSPACE + System.getProperty(FILE_SEPARATOR) +
+                                    new String(base64ConfigName, Charset.defaultCharset())))))
                     .type(MediaType.APPLICATION_JSON)
                     .build();
         } catch (IOException e) {
@@ -354,12 +356,24 @@ public class EditorMicroservice implements Microservice {
     }
 
     @GET
+    @Path("/workspace/config")
+    @Produces("application/json")
+    public Response getConfigs() {
+        JsonObject config = new JsonObject();
+        config.addProperty("fileSeparator", System.getProperty(FILE_SEPARATOR));
+        return Response.status(Response.Status.OK)
+                .entity(config)
+                .type(MediaType.APPLICATION_JSON).build();
+    }
+
+    @GET
     @Path("/workspace/listFiles")
     @Produces("application/json")
     public Response filesInPath(@QueryParam("path") String path) {
         try {
-            java.nio.file.Path pathLocation = Paths.get(new String(Base64.getDecoder().decode(path), Charset
-                    .defaultCharset()));
+            String location = (Paths.get(Constants.CARBON_HOME)).toString();
+            java.nio.file.Path pathLocation = SecurityUtil.resolvePath(Paths.get(location).toAbsolutePath(),
+                    Paths.get(new String(Base64.getDecoder().decode(path), Charset.defaultCharset())));
             return Response.status(Response.Status.OK)
                     .entity(workspace.listFilesInPath(pathLocation))
                     .type(MediaType.APPLICATION_JSON).build();
@@ -393,7 +407,8 @@ public class EditorMicroservice implements Microservice {
             byte[] base64ConfigName = Base64.getDecoder().decode(configName);
             java.nio.file.Path filePath = SecurityUtil.resolvePath(
                     Paths.get(location).toAbsolutePath(),
-                    Paths.get(new String(base64ConfigName, Charset.defaultCharset())));
+                    Paths.get(Constants.DIRECTORY_WORKSPACE + System.getProperty(FILE_SEPARATOR) +
+                            new String(base64ConfigName, Charset.defaultCharset())));
             Files.write(filePath, base64Config);
             java.nio.file.Path fileNamePath = filePath.getFileName();
             if (null != fileNamePath) {
@@ -409,50 +424,6 @@ public class EditorMicroservice implements Microservice {
             entity.addProperty("path", Constants.DIRECTORY_WORKSPACE);
             return Response.status(Response.Status.OK).entity(entity)
                     .type(MediaType.APPLICATION_JSON).build();
-        } catch (IOException e) {
-            return Response.serverError().entity("failed." + e.getMessage())
-                    .build();
-        } catch (Throwable ignored) {
-            return Response.serverError().entity("failed")
-                    .build();
-        }
-    }
-
-    @POST
-    @Path("/workspace/export")
-    @Produces("application/json")
-    public Response export(String payload) {
-        try {
-            String location = "";
-            String configName = "";
-            String config = "";
-            Matcher locationMatcher = Pattern.compile("location=(.*?)&configName").matcher(payload);
-            while (locationMatcher.find()) {
-                location = locationMatcher.group(1);
-            }
-            Matcher configNameMatcher = Pattern.compile("configName=(.*?)&").matcher(payload);
-            while (configNameMatcher.find()) {
-                configName = configNameMatcher.group(1);
-            }
-            String[] splitConfigContent = payload.split("config=");
-            if (splitConfigContent.length > 1) {
-                config = splitConfigContent[1];
-            }
-            byte[] base64Config = Base64.getDecoder().decode(config);
-            byte[] base64ConfigName = Base64.getDecoder().decode(configName);
-            byte[] base64Location = Base64.getDecoder().decode(location);
-            Files.write(Paths.get(new String(base64Location, Charset.defaultCharset())
-                    + System.getProperty(FILE_SEPARATOR)
-                    + new String(base64ConfigName, Charset.defaultCharset())), base64Config);
-            JsonObject entity = new JsonObject();
-            entity.addProperty(STATUS, SUCCESS);
-            return Response.status(Response.Status.OK).entity(entity)
-                    .type(MediaType.APPLICATION_JSON).build();
-        } catch (AccessDeniedException e) {
-            Map<String, String> errorMap = new HashMap<>(1);
-            errorMap.put("Error", "File access denied. You don't have enough permission to access");
-            return Response.serverError().entity(errorMap)
-                    .build();
         } catch (IOException e) {
             return Response.serverError().entity("failed." + e.getMessage())
                     .build();
@@ -501,47 +472,16 @@ public class EditorMicroservice implements Microservice {
         }
     }
 
-    @POST
-    @Path("/workspace/import")
-    @Produces("application/json")
-    public Response importFile(String path) {
-        try {
-            JsonObject content = workspace.read(Paths.get(path));
-            String location = (Paths.get(Constants.RUNTIME_PATH,
-                    Constants.DIRECTORY_DEPLOYMENT,
-                    Constants.DIRECTORY_WORKSPACE)).toString();
-            String configName = path.substring(path.lastIndexOf(System.getProperty(FILE_SEPARATOR)) + 1);
-            String config = content.get("content").getAsString();
-            StringBuilder pathBuilder = new StringBuilder();
-            pathBuilder.append(location).append(System.getProperty(FILE_SEPARATOR)).append(configName);
-            Files.write(Paths.get(pathBuilder.toString()), config.getBytes(Charset.defaultCharset()));
-            return Response.status(Response.Status.OK)
-                    .entity(content)
-                    .type(MediaType.APPLICATION_JSON).build();
-        } catch (AccessDeniedException e) {
-            Map<String, String> errorMap = new HashMap<>(1);
-            errorMap.put("Error", "File access denied. You don't have enough permission to access");
-            return Response.serverError().entity(errorMap)
-                    .build();
-        } catch (IOException e) {
-            return Response.serverError().entity("failed." + e.getMessage())
-                    .build();
-        } catch (Throwable ignored) {
-            return Response.serverError().entity("failed")
-                    .build();
-        }
-    }
-
     @DELETE
     @Path("/workspace/delete")
     @Produces("application/json")
-    public Response deleteFile(@QueryParam("siddhiAppName") String siddhiAppName, @QueryParam("relativePath") String
-            relativePath) {
+    public Response deleteFile(@QueryParam("siddhiAppName") String siddhiAppName) {
         try {
             java.nio.file.Path location = SecurityUtil.
                     resolvePath(Paths.get(Constants.RUNTIME_PATH,
                             Constants.DIRECTORY_DEPLOYMENT).toAbsolutePath(),
-                            Paths.get(relativePath));
+                            Paths.get(Constants.DIRECTORY_WORKSPACE + System.getProperty(FILE_SEPARATOR) +
+                                    siddhiAppName));
             File file = new File(location.toString());
             if (file.delete()) {
                 log.info("Siddi App: " + LogEncoder.removeCRLFCharacters(siddhiAppName) + " is deleted");
@@ -849,39 +789,67 @@ public class EditorMicroservice implements Microservice {
                 ).build();
     }
 
-    /**
-     * Converts a given Siddhi App string to a specific JSON format for a graph that diagrammatically
-     * display's the Siddhi App to be generated in the Editor design view.
-     *
-     * @param siddhiAppBase64 The Siddhi App (encoded to Base64) to be converted to JSON
-     * @return The JSON result in a predefined format
-     */
     @POST
-    @Path("/event-flow")
+    @Path("/design-view")
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
-    @Produces(MediaType.APPLICATION_JSON)
-    public Response constructEventFlowJsonString(String siddhiAppBase64) {
+    @Produces(MediaType.APPLICATION_FORM_URLENCODED)
+    public Response getDesignView(String siddhiAppBase64) {
         try {
+            FileConfigManager fileConfigManager = new FileConfigManager(configProvider);
+            SiddhiManager siddhiManager = new SiddhiManager();
+            siddhiManager.setConfigManager(fileConfigManager);
+            DesignGenerator designGenerator = new DesignGenerator();
+            designGenerator.setSiddhiManager(siddhiManager);
             String siddhiAppString = new String(Base64.getDecoder().decode(siddhiAppBase64), StandardCharsets.UTF_8);
+            EventFlow eventFlow = designGenerator.getEventFlow(siddhiAppString);
+            Gson gson = new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create();
+            String eventFlowJson = gson.toJson(eventFlow);
 
-            SiddhiAppMap siddhiAppMap = new SiddhiAppMap(siddhiAppString);
-            EventFlow eventFlow = new EventFlow(siddhiAppMap);
-
-            // The 'Access-Control-Allow-Origin' header must be set to '*' as this might be accessed
-            // by other domains in the future.
+            String encodedEventFlowJson =
+                    new String(Base64.getEncoder().encode(eventFlowJson.getBytes(StandardCharsets.UTF_8)),
+                            StandardCharsets.UTF_8);
             return Response.status(Response.Status.OK)
                     .header("Access-Control-Allow-Origin", "*")
-                    .entity(eventFlow.getEventFlowJSON().toString())
+                    .entity(encodedEventFlowJson)
                     .build();
         } catch (SiddhiAppCreationException e) {
-            log.error("Unable to generate graph view.", e);
+            log.error("Unable to generate design view", e);
             return Response.status(Response.Status.BAD_REQUEST)
                     .header("Access-Control-Allow-Origin", "*")
                     .entity(e.getMessage())
                     .build();
-        } catch (IllegalArgumentException e) {
-            log.error("Unable to construct event flow JSON string.", e);
+        } catch (DesignGenerationException e) {
+            log.error("Failed to convert Siddhi app code to design view", e);
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+                    .header("Access-Control-Allow-Origin", "*")
+                    .entity(e.getMessage())
+                    .build();
+        }
+    }
+
+    @POST
+    @Path("/code-view")
+    @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
+    @Produces(MediaType.APPLICATION_FORM_URLENCODED)
+    public Response getCodeView(String encodedEventFlowJson) {
+        try {
+            String eventFlowJson =
+                    new String(Base64.getDecoder().decode(encodedEventFlowJson), StandardCharsets.UTF_8);
+            Gson gson = DeserializersRegisterer.getGsonBuilder().disableHtmlEscaping().create();
+            EventFlow eventFlow = gson.fromJson(eventFlowJson, EventFlow.class);
+            CodeGenerator codeGenerator = new CodeGenerator();
+            String siddhiAppCode = codeGenerator.generateSiddhiAppCode(eventFlow);
+
+            String encodedSiddhiAppString =
+                    new String(Base64.getEncoder().encode(siddhiAppCode.getBytes(StandardCharsets.UTF_8)),
+                            StandardCharsets.UTF_8);
+            return Response.status(Response.Status.OK)
+                    .header("Access-Control-Allow-Origin", "*")
+                    .entity(encodedSiddhiAppString)
+                    .build();
+        } catch (CodeGenerationException e) {
+            log.error("Unable to generate code view", e);
+            return Response.status(Response.Status.BAD_REQUEST)
                     .header("Access-Control-Allow-Origin", "*")
                     .entity(e.getMessage())
                     .build();
@@ -904,7 +872,8 @@ public class EditorMicroservice implements Microservice {
         siddhiManager.setConfigManager(fileConfigManager);
         EditorDataHolder.setSiddhiManager(siddhiManager);
         EditorDataHolder.setBundleContext(bundleContext);
-
+        siddhiAppRuntimeServiceRegistration = bundleContext.registerService(SiddhiAppRuntimeService.class.getName(),
+                new EditorSiddhiAppRuntimeService(), null);
         serviceRegistration = bundleContext.registerService(EventStreamService.class.getName(),
                 new DebuggerEventStreamService(), null);
     }

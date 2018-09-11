@@ -49,24 +49,28 @@ body {
 }
 
 .grid-tile-h1 {
-    color: rgba(255,255,255,0.87);
+    color: rgba(255, 255, 255, 0.57);
     text-align: center;
+}
+
+.grid-tile-h1 h4 {
+    font-weight: 500;
 }
 
 .floating-button {
     position: fixed;
-    right: 100px;
+    right: 30px;
+    z-index: 9;
+    bottom: 25px;
 }
 
-.navigation-bar{
-    width: 100%;
+.navigation-bar {
     background-color: #424242;
 }
 
-.toggle{
-    float: left;
-    width: 10%;
-    margin-left: 3%;
+.toggle {
+    float: right;
+    margin: -30px 160px 0 0;
 }
 
 .active-apps {
@@ -106,7 +110,7 @@ body {
     display: inline-block;
 }
 
-.overlay{
+.overlay {
     transition: .5s ease;
     opacity: 0;
     position: absolute;
@@ -115,37 +119,34 @@ body {
     transform: translate(-50%, -50%);
     -ms-transform: translate(-50%, -50%)
 }
+
 .container:hover .overlay {
     opacity: 1;
 }
 
-.info-card{
-    background-color: #2f96b4;
+.info-card {
+    background-color: #2f96b4 !important;
     width: 40%;
-    height: 50px;
-    margin-left: 30%;
-    text-align: center;
-    margin-top: 50px;
+    padding: 15px 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
-.add-button{
-    background-color: #9d9d9d;
-    width: 15%;
-    height: 50px;
-    margin-left: 43%;
-    text-align: center;
-    margin-top: 50px;
-    padding: 20px;
+.info-card svg {
+    padding-right: 10px;
 }
-.add-button-disabled{
+
+.add-button:hover {
+    background-color: #4e4e4e !important;
+}
+
+.add-button-disabled {
     background-color: #222222;
-    width: 20%;
-    height: 50px;
-    margin-left: 40%;
     text-align: center;
-    margin-top: 50px;
     padding: 20px;
 }
+
 .worker-tooltip {
     position: relative;
     display: inline-block;
@@ -187,7 +188,8 @@ body {
     height: 60px;
 }
 
-.node-content {height: 50px;
+.node-content {
+    height: 50px;
     line-height: 30px;
 }
 
@@ -219,6 +221,11 @@ body {
     width: 500px;
 }
 
+.clusters .cluster rect {
+    fill: #696969;
+    height: 200px;
+}
+
 .edgePath path {
     stroke: #bbb;
     stroke-width: 2px;
@@ -230,5 +237,224 @@ body {
     width: 15px;
     float: left;
     margin: 1px 40px 1px 1px;
-    background-color: red
+    background-color: red;
+}
+
+.btn-primary {
+    background: #f17b31 !important;
+    color: #fff !important;
+    margin-right: 10px !important;
+}
+
+.btn-primary:hover {
+    background: #4e4e4e !important;
+}
+
+.btn-default {
+    background: none !important;
+    color: #fff !important;
+}
+
+.btn-default:hover {
+    background: #4e4e4e !important;
+}
+
+.floating-button button:hover {
+    background: #4e4e4e !important;
+}
+
+.btn-delete {
+    width: 21px !important;
+    height: 21px !important;
+}
+
+.btn-delete:hover svg {
+    fill: #aeaeae !important;
+}
+
+.node-overview p span {
+    padding: 0 5px;
+    font-size: 18px;
+}
+
+p.node-title {
+    font-size: 16px !important;
+    color: #fff !important;
+    font-weight: 500 !important;
+}
+
+p.node-last-update {
+    font-size: 12px !important;
+    color: #dedede !important;
+}
+
+.node-wrapper {
+    min-width: 350px !important;
+}
+
+.center-wrapper {
+    display: flex;
+    justify-content: center;
+    margin: 20px 0;
+}
+
+.stream-indicator {
+    height: 55px;
+    width: 40px;
+    float: left;
+    margin: -2px 15px 1px 1px;
+    background: #ccc url("../icons/streams.svg") no-repeat center center;
+}
+
+.table-indicator {
+    height: 55px;
+    width: 40px;
+    float: left;
+    margin: -2px 15px 1px 1px;
+    background: #ccc url("../icons/table.svg") no-repeat center center;
+}
+
+.trigger-indicator {
+    height: 55px;
+    width: 40px;
+    float: left;
+    margin: -2px 15px 1px 1px;
+    background: #ccc url("../icons/trigger.svg") no-repeat center center;
+}
+
+.window-indicator {
+    height: 55px;
+    width: 40px;
+    float: left;
+    margin: -2px 15px 1px 1px;
+    background: #ccc url("../icons/window.svg") no-repeat center center;
+}
+
+.query-indicator {
+    height: 55px;
+    width: 40px;
+    float: left;
+    margin: -2px 15px 1px 1px;
+    background: #ccc url("../icons/query.svg") no-repeat center center;
+}
+
+.function-indicator {
+    height: 55px;
+    width: 40px;
+    float: left;
+    margin: -2px 15px 1px 1px;
+    background: #ccc url("../icons/function.svg") no-repeat center center;
+}
+
+.aggregation-indicator {
+    height: 55px;
+    width: 40px;
+    float: left;
+    margin: -2px 15px 1px 1px;
+    background: #ccc url("../icons/aggregate.svg") no-repeat center center;
+}
+
+.partition-type-colour {
+    height: 55px;
+    width: 40px;
+    float: left;
+    margin: -2px 15px 1px 1px;
+    background: #ccc url("../icons/partition.svg") no-repeat center center;
+}
+
+.source-indicator {
+    height: 55px;
+    width: 40px;
+    float: left;
+    margin: -2px 15px 1px 1px;
+    background: #ccc url("../icons/source.svg") no-repeat center center;
+}
+
+.sink-indicator {
+    height: 55px;
+    width: 40px;
+    float: left;
+    margin: -2px 15px 1px 1px;
+    background: #ccc url("../icons/sink.svg") no-repeat center center;
+}
+
+
+.partition {
+    font-size: 30px;
+    color: #d3d3d3;
+    margin-top: 150%;
+}
+
+.legend {
+    color: #fff;
+    font-size: 14px;
+    text-align: left;
+    width: 100%;
+    max-width: 440px;
+    padding: 10px;
+    background: #333;
+    position: absolute;
+    right: 40px;
+}
+
+.legend-key {
+    padding: 0 5px;
+    display: inline-block;
+}
+
+.legend-text {
+    line-height: 24px;
+    font-size: 12px;
+}
+
+.legend-colour {
+    width: 15px;
+    height: 15px;
+    float: left;
+    margin: 5px;
+}
+
+.stream-image {
+    background: url("../icons/streams.svg");
+}
+
+.table-image {
+    background: url("../icons/table.svg");
+}
+
+.trigger-image {
+    background: url("../icons/trigger.svg");
+}
+
+.window-image {
+    background: url("../icons/window.svg");
+}
+
+.function-image {
+    background: url("../icons/function.svg");
+}
+
+.aggregation-image {
+    background: url("../icons/aggregate.svg");
+}
+
+.partition-image {
+    background: url("../icons/partition.svg");
+}
+
+.query-image {
+    background: url("../icons/query.svg");
+}
+
+.source-image {
+    background: url("../icons/source.svg");
+}
+
+.sink-image {
+    background: url("../icons/sink.svg");
+}
+.login-container h1,
+.addWorker-container h1 {
+    color: #eee !important;
+    font-weight: 400;
 }

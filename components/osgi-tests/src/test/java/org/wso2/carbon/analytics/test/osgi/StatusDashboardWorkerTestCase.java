@@ -30,7 +30,7 @@ import org.wso2.carbon.analytics.test.osgi.util.TestUtil;
 import org.wso2.carbon.container.CarbonContainerFactory;
 import org.wso2.carbon.kernel.CarbonServerInfo;
 import org.wso2.carbon.stream.processor.common.EventStreamService;
-import org.wso2.carbon.stream.processor.core.SiddhiAppRuntimeService;
+import org.wso2.carbon.stream.processor.common.SiddhiAppRuntimeService;
 import org.wso2.msf4j.MicroservicesRegistry;
 
 import javax.inject.Inject;

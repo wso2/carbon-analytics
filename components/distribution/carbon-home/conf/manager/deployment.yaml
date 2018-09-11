@@ -264,12 +264,15 @@ cluster.config:
   # Deployment Configuration for Distributed Deployment
 deployment.config:
   type: distributed
-  httpInterface:
+  httpsInterface:
     host: localhost
-    port: 9190
+    port: 9543
   heartbeatInterval: 2000
   heartbeatMaxRetry: 2
   datasource: SP_MGT_DB     # define a mysql datasource in datasources and refer it from here.
   minResourceCount: 1
   bootstrapURLs: localhost:9092   # kafka urls
-  zooKeeperURLs: localhost:2181   # zookeeper urls
+  zooKeeperConfig:
+    zooKeeperURLs: localhost:2181   # zookeeper urls
+    connectionTimeout: 10000
+    sessionTimeout: 10000

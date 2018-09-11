@@ -28,11 +28,13 @@ import org.osgi.service.component.annotations.ReferenceCardinality;
 import org.osgi.service.component.annotations.ReferencePolicy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.wso2.carbon.analytics.idp.client.core.api.AnalyticsHttpClientBuilderService;
 import org.wso2.carbon.cluster.coordinator.service.ClusterCoordinator;
 import org.wso2.carbon.config.ConfigurationException;
 import org.wso2.carbon.config.provider.ConfigProvider;
 import org.wso2.carbon.datasource.core.api.DataSourceService;
 import org.wso2.carbon.sp.jobmanager.core.CoordinatorChangeListener;
+import org.wso2.carbon.sp.jobmanager.core.allocation.ResourceAllocationAlgorithm;
 import org.wso2.carbon.sp.jobmanager.core.api.ResourceManagerApi;
 import org.wso2.carbon.sp.jobmanager.core.appcreator.SPSiddhiAppCreator;
 import org.wso2.carbon.sp.jobmanager.core.bean.ClusterConfig;
@@ -115,7 +117,8 @@ public class ServiceComponent {
             policy = ReferencePolicy.DYNAMIC,
             unbind = "unregisterConfigProvider"
     )
-    protected void registerConfigProvider(ConfigProvider configProvider) throws ResourceManagerException {
+    protected void registerConfigProvider(ConfigProvider configProvider) throws ResourceManagerException,
+            IllegalAccessException, InstantiationException {
         DeploymentConfig deploymentConfig;
         ManagerNode currentNodeConfig;
         ClusterConfig clusterConfig;
@@ -149,12 +152,29 @@ public class ServiceComponent {
                     deploymentConfig = configProvider.getConfigurationObject(DeploymentConfig.class);
                     if (deploymentConfig != null) {
                         ServiceDataHolder.setDeploymentConfig(deploymentConfig);
+                        ResourceAllocationAlgorithm resourceAllocationAlgorithm;
+                        String allocationAlgoClassName = deploymentConfig.getAllocationAlgorithm();
+                        try {
+                            resourceAllocationAlgorithm = (ResourceAllocationAlgorithm)
+                                    Class.forName(allocationAlgoClassName).newInstance();
+                            if (log.isDebugEnabled()) {
+                                log.debug(allocationAlgoClassName + " chosen as Allocation Algorithm");
+                            }
+                            ServiceDataHolder.setAllocationAlgorithm(resourceAllocationAlgorithm);
+                        } catch (ClassNotFoundException e) {
+                            throw new ResourceManagerException("Allocation Algorithm class with name "
+                                    + allocationAlgoClassName + " is invalid. ", e);
+                        }
+                        if(deploymentConfig.getHttpsInterface() == null){
+                            log.error(ResourceManagerConstants.KEY_NODE_PROTOCOL + " is not specified " +
+                                    "in deployment.yaml");
+                        }
                         String id = (String) ((Map) configProvider.getConfigurationObject("wso2.carbon"))
                                 .get("id");
                         currentNodeConfig = new ManagerNode().setId(id)
                                 .setHeartbeatInterval(deploymentConfig.getHeartbeatInterval())
                                 .setHeartbeatMaxRetry(deploymentConfig.getHeartbeatMaxRetry())
-                                .setHttpInterface(deploymentConfig.getHttpInterface());
+                                .setHttpsInterface(deploymentConfig.getHttpsInterface());
                         ServiceDataHolder.setCurrentNode(currentNodeConfig);
                         if (ResourceManagerConstants.MODE_DISTRIBUTED.equalsIgnoreCase(deploymentConfig.getType())) {
                             ServiceDataHolder.setDeploymentMode(DeploymentMode.DISTRIBUTED);
@@ -243,12 +263,12 @@ public class ServiceComponent {
                 properties.put(ResourceManagerConstants.KEY_NODE_ID, currentNode.getId());
                 properties.put(ResourceManagerConstants.KEY_NODE_INTERVAL, currentNode.getHeartbeatInterval());
                 properties.put(ResourceManagerConstants.KEY_NODE_MAX_RETRY, currentNode.getHeartbeatMaxRetry());
-                properties.put(ResourceManagerConstants.KEY_NODE_HOST, currentNode.getHttpInterface().getHost());
-                properties.put(ResourceManagerConstants.KEY_NODE_PORT, currentNode.getHttpInterface().getPort());
+                properties.put(ResourceManagerConstants.KEY_NODE_HOST, currentNode.getHttpsInterface().getHost());
+                properties.put(ResourceManagerConstants.KEY_NODE_PORT, currentNode.getHttpsInterface().getPort());
                 properties.put(ResourceManagerConstants.KEY_NODE_USERNAME,
-                        currentNode.getHttpInterface().getUsername());
+                        currentNode.getHttpsInterface().getUsername());
                 properties.put(ResourceManagerConstants.KEY_NODE_PASSWORD,
-                        currentNode.getHttpInterface().getPassword());
+                        currentNode.getHttpsInterface().getPassword());
                 clusterCoordinator.setPropertiesMap(properties);
                 clusterCoordinator.registerEventListener(new CoordinatorChangeListener());
             }
@@ -262,5 +282,28 @@ public class ServiceComponent {
      */
     protected void unregisterClusterCoordinator(ClusterCoordinator coordinationStrategy) {
         // Do nothing.
+    }
+
+    @Reference(
+            name = "carbon.anaytics.common.clientservice",
+            service = AnalyticsHttpClientBuilderService.class,
+            cardinality = ReferenceCardinality.MANDATORY,
+            policy = ReferencePolicy.DYNAMIC,
+            unbind = "unregisterAnalyticsHttpClient"
+    )
+    protected void registerAnalyticsHttpClient(AnalyticsHttpClientBuilderService service) {
+        ServiceDataHolder.setClientBuilderService(service);
+        if (log.isDebugEnabled()) {
+            log.debug("@Reference(bind) AnalyticsHttpClientBuilderService at " +
+                    AnalyticsHttpClientBuilderService.class.getName());
+        }
+    }
+
+    protected void unregisterAnalyticsHttpClient(AnalyticsHttpClientBuilderService service) {
+        if (log.isDebugEnabled()) {
+            log.debug("@Reference(unbind) AnalyticsHttpClientBuilderService at " +
+                    AnalyticsHttpClientBuilderService.class.getName());
+        }
+        ServiceDataHolder.setClientBuilderService(null);
     }
 }

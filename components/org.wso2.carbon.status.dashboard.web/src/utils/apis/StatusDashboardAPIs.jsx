@@ -17,10 +17,9 @@
  *
  */
 
-import Axios from "axios";
-
+import Axios from 'axios';
 import {MediaType} from '../Constants';
-import AuthManager from "../../auth/utils/AuthManager";
+import AuthManager from '../../auth/utils/AuthManager';
 
 export default class StatusDashboardAPIS {
 
@@ -31,7 +30,7 @@ export default class StatusDashboardAPIS {
     static getHTTPClient() {
         let httpClient = Axios.create({
             baseURL: window.location.origin + "/" + window.contextPath.substr(1) + '/apis/workers',
-            timeout: 6000,
+            timeout: 12000,
             headers: {"Authorization": "Bearer " + AuthManager.getUser().SDID}
         });
         httpClient.defaults.headers.post['Content-Type'] = MediaType.APPLICATION_JSON;
@@ -185,7 +184,8 @@ export default class StatusDashboardAPIS {
      * @param appName
      */
     static getChildAppDetails(managerId, appName) {
-        return StatusDashboardAPIS.getHTTPClient().get('/manager/' + managerId + '/siddhi-apps/' + appName + '/child-apps')
+        return StatusDashboardAPIS.getHTTPClient().get('/manager/' + managerId + '/siddhi-apps/' + appName +
+            '/child-apps')
     }
 
     /**
@@ -202,6 +202,16 @@ export default class StatusDashboardAPIS {
      * @param appName
      */
     static getKafkaDetails(managerId, appName) {
-        return StatusDashboardAPIS.getHTTPClient().get('/manager/' + managerId + '/siddhi-apps/' + appName + '/child-apps/' + 'transport')
+        return StatusDashboardAPIS.getHTTPClient().get('/manager/' + managerId + '/siddhi-apps/' + appName +
+            '/child-apps/' + 'transport')
+    }
+
+    /**
+     * This method will return details of Siddhi App elements with given name of a worker with  given worker ID.
+     * @param workerID
+     * @param appName
+     */
+    static getSiddhiAppElementsByName(workerID, appName) {
+        return StatusDashboardAPIS.getHTTPClient().get('/' + workerID + '/siddhi-apps/' + appName +'/elements');
     }
 }

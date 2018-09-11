@@ -55,7 +55,15 @@ public class StartupComponent {
     protected void setMicroservicesServer(MicroservicesServer microservicesServer) {
         microservicesServer.getListenerConfigurations().entrySet().stream().forEach(entry -> {
             if (("http").equals(entry.getValue().getScheme())) {
-                String startingURL = entry.getValue().getScheme() + "://localhost:" + entry.getValue()
+                String hostname;
+                try {
+                    hostname = HostAddressFinder.findAddress(entry.getValue().getHost());
+                } catch (SocketException e) {
+                    hostname = entry.getValue().getHost();
+                    logger.error("Error in finding address for provided hostname " + hostname + "." +
+                            e.getMessage(), e);
+                }
+                String startingURL = entry.getValue().getScheme() + "://" + hostname + ":" + entry.getValue()
                         .getPort() + "/template-editor";
                 logger.info("Template Editor Started on : " + startingURL);
             }

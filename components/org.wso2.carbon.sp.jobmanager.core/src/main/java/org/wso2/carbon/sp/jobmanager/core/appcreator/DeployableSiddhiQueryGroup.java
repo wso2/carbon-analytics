@@ -28,10 +28,14 @@ public class DeployableSiddhiQueryGroup {
 
     private String groupName;
     private List<SiddhiQuery> siddhiQueries;
+    private boolean isReceiverQueryGroup;
+    private int parallelism;
 
-    public DeployableSiddhiQueryGroup(String groupName) {
+    public DeployableSiddhiQueryGroup(String groupName, boolean receiverQueryGroup, int parallelism) {
         this.groupName = groupName;
         siddhiQueries = new ArrayList<>();
+        isReceiverQueryGroup = receiverQueryGroup;
+        this.parallelism = parallelism;
     }
 
     public List<SiddhiQuery> getSiddhiQueries() {
@@ -44,6 +48,18 @@ public class DeployableSiddhiQueryGroup {
 
     public String getGroupName() {
         return groupName;
+    }
+
+    public boolean isReceiverQueryGroup() {
+        return isReceiverQueryGroup;
+    }
+
+    public void setReceiverQueryGroup(boolean receiverQueryGroup) {
+        isReceiverQueryGroup = receiverQueryGroup;
+    }
+
+    public int getParallelism() {
+        return parallelism;
     }
 
     @Override

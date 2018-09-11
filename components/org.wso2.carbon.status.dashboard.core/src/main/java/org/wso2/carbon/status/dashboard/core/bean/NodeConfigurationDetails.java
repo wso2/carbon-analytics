@@ -30,46 +30,46 @@ public class NodeConfigurationDetails {
     private String workerId;
     private String host;
     private int port;
-
+    
     public NodeConfigurationDetails(String workerId, String host, int port) {
         this.workerId = workerId;
         this.host = host;
         this.port = port;
     }
-
+    
     public NodeConfigurationDetails() {
     }
-
+    
     public String getWorkerId() {
         return workerId;
     }
-
+    
     public void setWorkerId(String workerId) {
         this.workerId = workerId;
     }
-
+    
     public String getHost() {
         return host;
     }
-
+    
     public void setHost(String host) {
         this.host = host;
     }
-
+    
     public int getPort() {
         return port;
     }
-
+    
     public void setPort(int port) {
         this.port = port;
     }
-
+    
     public Object[] toArray() {
-        return new Object[]{workerId, host, port};
+        return new Object[] {workerId, host, port};
     }
-
+    
     public void setArrayList(List values) throws StatusDashboardValidationException {
-        Object[] objects = new Object[]{workerId, host, port};
+        Object[] objects = new Object[] {workerId, host, port};
         if (values.size() != objects.length) {
             throw new StatusDashboardValidationException("Invalid length of object which is recieved data has:" +
                     values.size() + " while bean has " + objects.length);
@@ -90,11 +90,11 @@ public class NodeConfigurationDetails {
             }
         }
     }
-
+    
     public static String getColumnLabeles() {
         return "WORKERID,HOST,PORT";
     }
-
+    
     public static String getManagerColumnLabeles() {
         return "MANAGERID,HOST,PORT";
     }

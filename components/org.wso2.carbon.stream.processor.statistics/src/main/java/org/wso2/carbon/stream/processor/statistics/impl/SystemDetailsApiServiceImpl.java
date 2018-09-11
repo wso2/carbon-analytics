@@ -40,14 +40,16 @@ public class SystemDetailsApiServiceImpl extends SystemDetailsApiService {
     private static final String PERMISSION_APP_NAME = "SAPP";
     private static final String MANAGE_SIDDHI_APP_PERMISSION_STRING = "siddhiApp.manage";
     private static final String VIEW_SIDDHI_APP_PERMISSION_STRING = "siddhiApp.view";
+    
     /**
      * Provide the worker general details.
+     *
      * @return Worker general details.
      * @throws NotFoundException thrown when API is not found.
      */
     @Override
     public Response systemDetailsGet(Request request) throws NotFoundException {
-
+        
         if (getUserName(request) != null && !(getPermissionProvider().hasPermission(getUserName(request), new
                 Permission(PERMISSION_APP_NAME, VIEW_SIDDHI_APP_PERMISSION_STRING)) || getPermissionProvider()
                 .hasPermission(getUserName(request), new Permission(PERMISSION_APP_NAME,
@@ -57,12 +59,12 @@ public class SystemDetailsApiServiceImpl extends SystemDetailsApiService {
         }
         WorkerGeneralDetails workerGeneralDetails = WorkerGeneralDetails.getInstance();
         String jsonString = new Gson().toJson(workerGeneralDetails);
-        Response.Status status= Response.Status.OK;
+        Response.Status status = Response.Status.OK;
         return Response.status(status).entity(jsonString).build();
     }
-
+    
     private static String getUserName(org.wso2.msf4j.Request request) {
-
+        
         Object username = request.getProperty("username");
         return username != null ? username.toString() : null;
     }

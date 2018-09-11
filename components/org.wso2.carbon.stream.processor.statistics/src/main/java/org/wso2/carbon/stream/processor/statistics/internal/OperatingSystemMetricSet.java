@@ -1,12 +1,12 @@
 /*
- * Copyright 2015 WSO2 Inc. (http://wso2.org)
- * 
+ * Copyright 2017 WSO2 Inc. (http://wso2.org)
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *     http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -15,12 +15,6 @@
  */
 package org.wso2.carbon.stream.processor.statistics.internal;
 
-import org.osgi.framework.BundleContext;
-import org.osgi.service.component.annotations.Activate;
-import org.osgi.service.component.annotations.Component;
-import org.osgi.service.component.annotations.Reference;
-import org.osgi.service.component.annotations.ReferenceCardinality;
-import org.osgi.service.component.annotations.ReferencePolicy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.wso2.carbon.metrics.core.MetricManagementService;
@@ -29,10 +23,10 @@ import org.wso2.carbon.stream.processor.core.NodeInfo;
 import org.wso2.carbon.stream.processor.statistics.bean.WorkerMetrics;
 import org.wso2.carbon.stream.processor.statistics.bean.WorkerStatistics;
 import org.wso2.carbon.stream.processor.statistics.internal.exception.MetricsConfigException;
-import org.wso2.carbon.stream.processor.statistics.internal.service.ConfigServiceComponent;
-import org.wso2.carbon.stream.processor.statistics.internal.service.NodeConfigServiceComponent;
-import org.wso2.carbon.stream.processor.statistics.internal.service.SiddhiAppRuntimeServiceComponent;
 
+import java.lang.management.ManagementFactory;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import javax.management.AttributeNotFoundException;
 import javax.management.InstanceNotFoundException;
 import javax.management.MBeanException;
@@ -40,19 +34,11 @@ import javax.management.MBeanServer;
 import javax.management.MalformedObjectNameException;
 import javax.management.ObjectName;
 import javax.management.ReflectionException;
-import java.lang.management.ManagementFactory;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 
 /**
  * A set of metrics for Operating System usage, including stats on load average, cpu load,
  * file descriptors etc using org.wso2.carbon.metrics.
  */
-@Component(
-        name = "org.wso2.carbon.stream.processor.statistics.internal.OperatingSystemMetricSet",
-        service = OperatingSystemMetricSet.class,
-        immediate = true
-)
 public class OperatingSystemMetricSet {
     private static final Logger LOGGER = LoggerFactory.getLogger(OperatingSystemMetricSet.class);
     private static final String LOAD_AVG_MBEAN_NAME = "org.wso2.carbon.metrics:name=jvm.os.system.load.average";
@@ -70,12 +56,6 @@ public class OperatingSystemMetricSet {
     private MBeanServer mBeanServer;
     private MetricManagementService metricManagementService;
 
-    @Activate
-    protected void start(BundleContext bundleContext) {
-        bundleContext.registerService(OperatingSystemMetricSet.class.getName(),
-                new OperatingSystemMetricSet(), null);
-    }
-
     /**
      * Get the MBean name from the deployment yaml and get access to the MBean.
      */
@@ -88,7 +68,7 @@ public class OperatingSystemMetricSet {
             isJMXEnabled = metricManagementService.isReporterRunning("JMX");
             mBeanServer = ManagementFactory.getPlatformMBeanServer();
         } catch (IllegalArgumentException e) {
-            LOGGER.warn("Worker level jmx reporting has disabled.");
+            LOGGER.warn("Worker level jmx reporting has disabled." + e.getMessage(), e);
         }
     }
 
@@ -172,7 +152,7 @@ public class OperatingSystemMetricSet {
         NodeInfo nodeInfo = StreamProcessorStatisticDataHolder.getInstance().getNodeInfo();
         SimpleDateFormat dateFormatter = new SimpleDateFormat("E, dd MMM yyyy HH:mm:ss z");
         if (nodeInfo.getMode().compareTo(DeploymentMode.SINGLE_NODE) == 0) {
-            workerStatistics.setClusterID("Non Clusters");
+            workerStatistics.setClusterID("Single Node Deployments");
             workerStatistics.setLastSyncTime("n/a");
             workerStatistics.setLastSnapshotTime(dateFormatter.format(new Date(nodeInfo.getLastPersistedTimestamp())));
         } else {
@@ -184,7 +164,6 @@ public class OperatingSystemMetricSet {
                 workerStatistics.setInSync(nodeInfo.isInSync());
                 workerStatistics.setLastSyncTime(dateFormatter.format(new Date(nodeInfo.getLastSyncedTimestamp())));
             }
-
         }
     }
 
@@ -260,50 +239,5 @@ public class OperatingSystemMetricSet {
         } else {
             LOGGER.warn("Wso2 Carbon metrics is already enabled.");
         }
-    }
-
-    @Reference(
-            name = "org.wso2.carbon.stream.processor.statistics.internal.service.ConfigServiceComponent",
-            service = ConfigServiceComponent.class,
-            cardinality = ReferenceCardinality.MANDATORY,
-            policy = ReferencePolicy.DYNAMIC,
-            unbind = "unregisterConfigServiceComponent"
-    )
-    protected void registerConfigServiceComponent(ConfigServiceComponent configServiceComponent) {
-        //to make to read the metrics MBean name
-    }
-
-    protected void unregisterConfigServiceComponent(ConfigServiceComponent configServiceComponent) {
-
-    }
-
-    @Reference(
-            name = "org.wso2.carbon.stream.processor.statistics.internal.service.NodeConfigServiceComponent",
-            service = NodeConfigServiceComponent.class,
-            cardinality = ReferenceCardinality.MANDATORY,
-            policy = ReferencePolicy.DYNAMIC,
-            unbind = "unregisterNodeConfigServiceComponent"
-    )
-    protected void registerNodeConfigServiceComponent(NodeConfigServiceComponent nodeConfigServiceComponent) {
-        //to make to read the metrics MBean name
-    }
-
-    protected void unregisterNodeConfigServiceComponent(NodeConfigServiceComponent nodeConfigServiceComponent) {
-
-    }
-
-    @Reference(
-            name = "org.wso2.carbon.stream.processor.statistics.internal.service.SiddhiAppRuntimeServiceComponent",
-            service = SiddhiAppRuntimeServiceComponent.class,
-            cardinality = ReferenceCardinality.MANDATORY,
-            policy = ReferencePolicy.DYNAMIC,
-            unbind = "unregisterSiddhiAppRuntimeServiceComponent"
-    )
-    protected void registerSiddhiAppRuntimeServiceComponent(SiddhiAppRuntimeServiceComponent serviceComponent) {
-        //to make to read the metrics MBean name
-    }
-
-    protected void unregisterSiddhiAppRuntimeServiceComponent(SiddhiAppRuntimeServiceComponent serviceComponent) {
-
     }
 }

@@ -31,8 +31,10 @@ public class DeploymentConfig implements Serializable {
     private static final long serialVersionUID = 1L;
     @Element(description = "deployment type (distributed/ha)", required = true)
     private String type;
-    @Element(description = "host:port configurations", required = true)
-    private InterfaceConfig httpInterface;
+    @Element(description = "Allocation algorithm", required = true)
+    private String allocationAlgorithm = "org.wso2.carbon.sp.jobmanager.core.allocation.RoundRobinAllocationAlgorithm";
+    @Element(description = "HTTPS host:port configurations", required = true)
+    private InterfaceConfig httpsInterface;
     private int heartbeatInterval = 10000;
     private int heartbeatMaxRetry = 2;
     private int minResourceCount = 1;
@@ -40,8 +42,14 @@ public class DeploymentConfig implements Serializable {
     private String datasource;
     @Element(description = "bootstrap urls for Kafka", required = true)
     private String bootstrapURLs;
+    /**
+     * @deprecated zooKeeperURLs is moved to {@link ZooKeeperConfig} bean
+     */
+    @Deprecated
     @Element(description = "ZooKeeper urls of Kafka cluster", required = true)
     private String zooKeeperURLs;
+    @Element(description = "ZooKeeper configurations", required = true)
+    private ZooKeeperConfig zooKeeperConfig;
 
     public String getType() {
         return type;
@@ -51,12 +59,12 @@ public class DeploymentConfig implements Serializable {
         this.type = type;
     }
 
-    public InterfaceConfig getHttpInterface() {
-        return httpInterface;
+    public InterfaceConfig getHttpsInterface() {
+        return httpsInterface;
     }
 
-    public void setHttpInterface(InterfaceConfig httpInterface) {
-        this.httpInterface = httpInterface;
+    public void setHttpsInterface(InterfaceConfig httpsInterface) {
+        this.httpsInterface = httpsInterface;
     }
 
     public int getHeartbeatInterval() {
@@ -105,5 +113,21 @@ public class DeploymentConfig implements Serializable {
 
     public void setZooKeeperURLs(String zooKeeperURLs) {
         this.zooKeeperURLs = zooKeeperURLs;
+    }
+
+    public ZooKeeperConfig getZooKeeperConfig() {
+        return zooKeeperConfig;
+    }
+
+    public void setZooKeeperConfig(ZooKeeperConfig zooKeeperConfig) {
+        this.zooKeeperConfig = zooKeeperConfig;
+    }
+
+    public String getAllocationAlgorithm() {
+        return allocationAlgorithm;
+    }
+
+    public void setAllocationAlgorithm(String allocationAlgorithm) {
+        this.allocationAlgorithm = allocationAlgorithm;
     }
 }

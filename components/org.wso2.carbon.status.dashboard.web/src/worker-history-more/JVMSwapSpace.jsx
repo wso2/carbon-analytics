@@ -17,12 +17,12 @@
  *
  */
 
-import React from "react";
+import React from 'react';
 //App Components
-import DashboardUtils from "../utils/DashboardUtils";
-import ChartCard from "../common/ChartCard";
+import DashboardUtils from '../utils/DashboardUtils';
+import ChartCard from '../common/ChartCard';
 // Material UI
-import {Card, CardHeader, CardMedia, Divider} from "material-ui";
+import {Card, CardHeader, CardMedia, Divider} from 'material-ui';
 
 const memoryMetadata = {
     names: ['Time', 'Free Swap Space', 'Total Swap Space'],
@@ -47,7 +47,7 @@ export default class JVMOsPhysicalMemory extends React.Component {
         this.setState({
             freeSwapSpace: nextprops.data[0],
             totalSwapSpace: nextprops.data[1],
-            tickCount: nextprops.data[0].length>10 ? 10 : nextprops.data[0].length
+            tickCount: nextprops.data[0].length > 10 ? 10 : nextprops.data[0].length
         });
     }
 
@@ -61,23 +61,23 @@ export default class JVMOsPhysicalMemory extends React.Component {
             width: 700,
             height: 200,
             style: {
-                tickLabelColor:'#f2f2f2',
+                tickLabelColor: '#f2f2f2',
                 legendTextColor: '#9c9898',
                 legendTitleColor: '#9c9898',
                 axisLabelColor: '#9c9898',
-                legendTextSize:12,
-                legendTitleSize:12
+                legendTextSize: 10,
+                legendTitleSize: 12
             },
-            tipTimeFormat:"%Y-%m-%d %H:%M:%S %Z",
-            legend:true,
+            tipTimeFormat: "%Y-%m-%d %H:%M:%S %Z",
+            legend: true,
             interactiveLegend: true,
             gridColor: '#f2f2f2',
-            xAxisTickCount:this.state.tickCount
+            xAxisTickCount: this.state.tickCount
         };
-        if(this.state.freePhysicalMemory.length === 0 && this.state.totalPhysicalMemory.length === 0
+        if (this.state.freePhysicalMemory.length === 0 && this.state.totalPhysicalMemory.length === 0
             && this.state.freeSwapSpace.length === 0 && this.state.totalSwapSpace.length === 0
-            && this.state.virtualMemory.length === 0){
-            return(
+            && this.state.virtualMemory.length === 0) {
+            return (
                 <div style={{paddingLeft: 10}}>
                     <Card>
                         <CardHeader
@@ -94,7 +94,7 @@ export default class JVMOsPhysicalMemory extends React.Component {
             );
         }
 
-        let data = DashboardUtils.getCombinedChartList(this.state.freeSwapSpace , this.state.totalSwapSpace);
+        let data = DashboardUtils.getCombinedChartList(this.state.freeSwapSpace, this.state.totalSwapSpace);
         return (
             <div style={{paddingLeft: 10}}>
                 <ChartCard data={data} metadata={memoryMetadata} config={memoryLineChartConfig}

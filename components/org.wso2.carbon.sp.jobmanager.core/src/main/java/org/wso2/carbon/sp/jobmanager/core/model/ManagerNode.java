@@ -28,7 +28,7 @@ import java.io.Serializable;
 public class ManagerNode implements Serializable {
     private static final long serialVersionUID = 1L;
     private String id = "wso2-sp";
-    private InterfaceConfig httpInterface;
+    private InterfaceConfig httpsInterface;
     private int heartbeatInterval = 1000;
     private int heartbeatMaxRetry = 2;
 
@@ -41,12 +41,12 @@ public class ManagerNode implements Serializable {
         return this;
     }
 
-    public InterfaceConfig getHttpInterface() {
-        return httpInterface;
+    public InterfaceConfig getHttpsInterface() {
+        return httpsInterface;
     }
 
-    public ManagerNode setHttpInterface(InterfaceConfig httpInterface) {
-        this.httpInterface = httpInterface;
+    public ManagerNode setHttpsInterface(InterfaceConfig httpsInterface) {
+        this.httpsInterface = httpsInterface;
         return this;
     }
 
@@ -71,6 +71,31 @@ public class ManagerNode implements Serializable {
     @Override
     public String toString() {
         return String.format("ManagerNode { id: %s, host: %s, port: %s }",
-                getId(), getHttpInterface().getHost(), getHttpInterface().getPort());
+                getId(), getHttpsInterface().getHost(), getHttpsInterface().getPort());
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == null) {
+            return false;
+        }
+        if (!ManagerNode.class.isAssignableFrom(obj.getClass())) {
+            return false;
+        }
+        ManagerNode that = (ManagerNode) obj;
+        if ((this.id == null) ? (that.id != null) : !this.id.equals(that.id)) {
+            return false;
+        }
+        if (!this.httpsInterface.equals(that.httpsInterface)) {
+            return false;
+        }
+        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        int result = getId() != null ? getId().hashCode() : 0;
+        result = 31 * result + getHeartbeatInterval();
+        return result;
     }
 }

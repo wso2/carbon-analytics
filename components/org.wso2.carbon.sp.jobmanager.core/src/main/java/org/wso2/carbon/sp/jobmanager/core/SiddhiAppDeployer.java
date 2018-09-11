@@ -19,13 +19,13 @@
 package org.wso2.carbon.sp.jobmanager.core;
 
 import com.google.gson.Gson;
-import okhttp3.Response;
 import org.apache.log4j.Logger;
+import org.wso2.carbon.sp.jobmanager.core.api.ResourceServiceFactory;
 import org.wso2.carbon.sp.jobmanager.core.appcreator.SiddhiQuery;
+import org.wso2.carbon.sp.jobmanager.core.impl.utils.Constants;
 import org.wso2.carbon.sp.jobmanager.core.model.ResourceNode;
-import org.wso2.carbon.sp.jobmanager.core.util.HTTPClientUtil;
+import org.wso2.carbon.sp.jobmanager.core.util.HTTPSClientUtil;
 
-import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 
@@ -34,7 +34,6 @@ import java.util.List;
  */
 public class SiddhiAppDeployer {
     private static final Logger LOG = Logger.getLogger(SiddhiAppDeployer.class);
-    private static final String SERVICE_ENDPOINT = "http://%s:%s/siddhi-apps%s";
 
     /**
      * Deploy Siddhi app and return it's name
@@ -44,37 +43,41 @@ public class SiddhiAppDeployer {
      * @return Siddhi app name.
      */
     public static String deploy(ResourceNode node, SiddhiQuery siddhiQuery) {
-        Response response = null;
+        feign.Response resourceResponse = null;
         try {
-            response = HTTPClientUtil.doPostRequest(String.format(SERVICE_ENDPOINT,
-                    node.getHttpInterface().getHost(), node.getHttpInterface().getPort(), ""),
-                    siddhiQuery.getApp(), node.getHttpInterface().getUsername(), node.getHttpInterface().getPassword());
-            if (response.code() == 201) {
-                String locationHeader = response.header("Location", null);
-                return (locationHeader != null && !locationHeader.isEmpty())
-                        ? locationHeader.substring(locationHeader.lastIndexOf('/') + 1) : null;
-            } else if (response.code() == 409) {
-                response.close();
-                response = HTTPClientUtil.doPutRequest(String.format(SERVICE_ENDPOINT,
-                        node.getHttpInterface().getHost(), node.getHttpInterface().getPort(), ""),
-                        siddhiQuery.getApp(), node.getHttpInterface().getUsername(),
-                        node.getHttpInterface().getPassword());
-                if (response.code() == 200) {
-                    return siddhiQuery.getAppName();
-                } else {
-                    return null;
+            resourceResponse = ResourceServiceFactory.getResourceHttpsClient(Constants.PROTOCOL +
+                            HTTPSClientUtil.generateURLHostPort(node.getHttpsInterface().getHost(),
+                                    String.valueOf(node.getHttpsInterface().getPort())),
+                    node.getHttpsInterface().getUsername(), node.getHttpsInterface().getPassword())
+                    .postSiddhiApp(siddhiQuery.getApp());
+            if (resourceResponse != null) {
+                if (resourceResponse.status() == 201) {
+                    String locationHeader = resourceResponse.headers().getOrDefault("Location", null).toString();
+                    return (locationHeader != null && !locationHeader.isEmpty())
+                            ? locationHeader.substring(locationHeader.lastIndexOf('/') + 1) : null;
+                } else if (resourceResponse.status() == 409) {
+                    resourceResponse.close();
+                    resourceResponse = ResourceServiceFactory.getResourceHttpsClient(Constants.PROTOCOL +
+                                    HTTPSClientUtil.generateURLHostPort(node.getHttpsInterface().getHost(),
+                                            String.valueOf(node.getHttpsInterface().getPort())),
+                            node.getHttpsInterface().getUsername(), node.getHttpsInterface().getPassword())
+                            .putSiddhiApp(siddhiQuery.getApp());
+                    if (resourceResponse.status() == 200) {
+                        return siddhiQuery.getAppName();
+                    } else {
+                        return null;
+                    }
                 }
-            } else {
-                return null;
             }
-        } catch (IOException e) {
+            return null;
+        } catch (feign.FeignException e) {
             if (LOG.isDebugEnabled()) {
                 LOG.debug("Error occurred while deploying Siddhi app to " + node, e);
             }
             return null;
         } finally {
-            if (response != null) {
-                response.close();
+            if (resourceResponse != null) {
+                resourceResponse.close();
             }
         }
     }
@@ -87,21 +90,22 @@ public class SiddhiAppDeployer {
      * @return a boolean stating whether the app get un-deployed or not.
      */
     public static boolean unDeploy(ResourceNode node, String siddhiAppName) {
-        Response response = null;
+        feign.Response resourceResponse = null;
         try {
-            response = HTTPClientUtil.doDeleteRequest(String.format(SERVICE_ENDPOINT,
-                    node.getHttpInterface().getHost(), node.getHttpInterface().getPort(), "/" + siddhiAppName),
-                    node.getHttpInterface().getUsername(), node.getHttpInterface().getPassword()
-            );
-            return response.code() == 200;
-        } catch (IOException e) {
+            resourceResponse = ResourceServiceFactory.getResourceHttpsClient(Constants.PROTOCOL +
+                            HTTPSClientUtil.generateURLHostPort(node.getHttpsInterface().getHost(),
+                                    String.valueOf(node.getHttpsInterface().getPort())),
+                    node.getHttpsInterface().getUsername(), node.getHttpsInterface().getPassword())
+                    .deleteSiddhiApp(siddhiAppName);
+            return resourceResponse.status() == 200;
+        } catch (feign.FeignException e) {
             if (LOG.isDebugEnabled()) {
                 LOG.debug("Error occurred while up-deploying Siddhi app from " + node, e);
             }
             return false;
         } finally {
-            if (response != null) {
-                response.close();
+            if (resourceResponse != null) {
+                resourceResponse.close();
             }
         }
     }
@@ -113,23 +117,24 @@ public class SiddhiAppDeployer {
      * @return list of deployed Siddhi app names.
      */
     public static List<String> getDeployedApps(ResourceNode node) {
-        Response response = null;
+        feign.Response resourceResponse = null;
         String[] apps = new String[0];
         try {
-            response = HTTPClientUtil.doGetRequest(String.format(SERVICE_ENDPOINT,
-                    node.getHttpInterface().getHost(), node.getHttpInterface().getPort(), ""),
-                    node.getHttpInterface().getUsername(), node.getHttpInterface().getPassword()
-            );
-            if (response.code() == 200) {
-                apps = new Gson().fromJson(response.body().string(), String[].class);
+            resourceResponse = ResourceServiceFactory.getResourceHttpsClient(Constants.PROTOCOL +
+                            HTTPSClientUtil.generateURLHostPort(node.getHttpsInterface().getHost(),
+                                    String.valueOf(node.getHttpsInterface().getPort())),
+                    node.getHttpsInterface().getUsername(), node.getHttpsInterface().getPassword())
+                    .getSiddhiApps();
+            if (resourceResponse.status() == 200) {
+                apps = new Gson().fromJson(resourceResponse.body().toString(), String[].class);
             }
-        } catch (Exception e) {
+        } catch (feign.FeignException e) {
             if (LOG.isDebugEnabled()) {
                 LOG.debug("Error occurred while retrieving deployed Siddhi apps from " + node, e);
             }
         } finally {
-            if (response != null) {
-                response.close();
+            if (resourceResponse != null) {
+                resourceResponse.close();
             }
         }
         return Arrays.asList(apps);

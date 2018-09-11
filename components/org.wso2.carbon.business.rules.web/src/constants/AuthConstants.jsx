@@ -18,7 +18,7 @@
  */
 
 /**
- * HTTP status codes.
+ * HTTP status codes
  */
 const HttpStatus = {
     OK: 200,
@@ -27,11 +27,11 @@ const HttpStatus = {
 };
 
 /**
- * Media types.
+ * Media types
  */
 const MediaType = {
     APPLICATION_WWW_FORM_URLENCODED: 'application/x-www-form-urlencoded',
     APPLICATION_JSON: 'application/json',
 };
 
-export {HttpStatus, MediaType};
+export { HttpStatus, MediaType };

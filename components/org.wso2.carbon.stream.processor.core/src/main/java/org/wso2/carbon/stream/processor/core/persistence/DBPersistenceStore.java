@@ -21,15 +21,18 @@ package org.wso2.carbon.stream.processor.core.persistence;
 import com.zaxxer.hikari.HikariDataSource;
 import org.apache.log4j.Logger;
 import org.wso2.carbon.datasource.core.exception.DataSourceException;
+import org.wso2.carbon.stream.processor.core.ha.util.CompressionUtil;
 import org.wso2.carbon.stream.processor.core.internal.StreamProcessorDataHolder;
 import org.wso2.carbon.stream.processor.core.persistence.exception.DatabaseUnsupportedException;
 import org.wso2.carbon.stream.processor.core.persistence.exception.DatasourceConfigurationException;
+import org.wso2.carbon.stream.processor.core.persistence.util.DBPersistenceStoreUtils;
 import org.wso2.carbon.stream.processor.core.persistence.util.ExecutionInfo;
 import org.wso2.carbon.stream.processor.core.persistence.util.PersistenceConstants;
 import org.wso2.carbon.stream.processor.core.persistence.util.RDBMSConfiguration;
 import org.wso2.carbon.stream.processor.core.persistence.dto.RDBMSQueryConfigurationEntry;
 import org.wso2.siddhi.core.util.persistence.PersistenceStore;
 
+import java.io.IOException;
 import java.sql.Blob;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
@@ -62,6 +65,14 @@ public class DBPersistenceStore implements PersistenceStore {
     public void save(String siddhiAppName, String revision, byte[] snapshot) {
         createTableIfNotExist();
 
+        byte[] compressedSnapshot;
+        try {
+            compressedSnapshot = CompressionUtil.compressGZIP(snapshot);
+        } catch (IOException e) {
+            log.error("Error occurred while trying to compress the snapshot. Failed to " +
+                    "persist revision: " + revision + " of Siddhi app: " + siddhiAppName);
+            return;
+        }
         Connection con = null;
         PreparedStatement stmt = null;
         try {
@@ -77,10 +88,10 @@ public class DBPersistenceStore implements PersistenceStore {
             stmt.setString(1, siddhiAppName);
             stmt.setString(2, revision);
             if (databaseType.equals(POSTGRES_DATABASE_TYPE)) {
-                stmt.setBlob(3, new SerialBlob(snapshot));
+                stmt.setBlob(3, new SerialBlob(compressedSnapshot));
             } else {
                 Blob blob = con.createBlob();
-                blob.setBytes(1, snapshot);
+                blob.setBytes(1, compressedSnapshot);
                 stmt.setBlob(3, blob);
             }
             stmt.executeUpdate();
@@ -92,7 +103,7 @@ public class DBPersistenceStore implements PersistenceStore {
             log.error("Error while saving revision" + revision + " of the siddhiApp " +
                     siddhiAppName + " to the database with datasource name " + datasourceName, e);
         } finally {
-            cleanupConnections(stmt, con);
+            DBPersistenceStoreUtils.cleanupConnections(stmt, con);
         }
         cleanOldRevisions(siddhiAppName);
     }
@@ -165,6 +176,7 @@ public class DBPersistenceStore implements PersistenceStore {
         PreparedStatement stmt = null;
         Connection con = null;
         byte[] blobAsBytes = null;
+        byte[] decompressedSnapshot = null;
         try {
             try {
                 con = datasource.getConnection();
@@ -188,6 +200,12 @@ public class DBPersistenceStore implements PersistenceStore {
                     }
                     int blobLength = (int) blobSnapshot.length();
                     blobAsBytes = blobSnapshot.getBytes(1, blobLength);
+                    try {
+                        decompressedSnapshot = CompressionUtil.decompressGZIP(blobAsBytes);
+                    } catch (IOException e) {
+                        throw new RuntimeException("Error occurred while trying to decompress the snapshot. " +
+                                "Failed to load revision: " + revision + " of Siddhi app: " + siddhiAppName, e);
+                    }
                 }
             }
         } catch (SQLException e) {
@@ -196,7 +214,7 @@ public class DBPersistenceStore implements PersistenceStore {
         } finally {
             cleanupConnections(stmt, con);
         }
-        return blobAsBytes;
+        return decompressedSnapshot;
     }
 
     @Override
@@ -245,7 +263,9 @@ public class DBPersistenceStore implements PersistenceStore {
         executionInfo.setPreparedTableExistenceCheckStatement(databaseQueryEntries.getIsTableExistQuery());
         executionInfo.setPreparedSelectStatement(databaseQueryEntries.getSelectTableQuery());
         executionInfo.setPreparedSelectLastStatement(databaseQueryEntries.getSelectLastQuery());
+        executionInfo.setPreparedSelectRevisionsStatement(databaseQueryEntries.getSelectRevisionsQuery());
         executionInfo.setPreparedDeleteStatement(databaseQueryEntries.getDeleteQuery());
+        executionInfo.setPreparedDeleteOldRevisionsStatement(databaseQueryEntries.getDeleteOldRevisionsQuery());
         executionInfo.setPreparedCountStatement(databaseQueryEntries.getCountQuery());
 
     }

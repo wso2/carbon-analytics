@@ -17,6 +17,7 @@
  */
 package org.wso2.carbon.sp.distributed.resource.core.bean;
 
+import org.wso2.carbon.stream.processor.statistics.bean.WorkerMetrics;
 
 import java.io.Serializable;
 
@@ -30,14 +31,24 @@ public class NodeConfig implements Serializable {
      */
     private String id = "wso2-sp";
     /**
-     * Advertised Host:port configurations of the node.
+     * Advertised HTTPS Host:port configurations of the node.
      */
-    private HTTPInterfaceConfig httpInterface;
+    private HTTPSInterfaceConfig httpsInterface;
     /**
      * State of the node representing whether the node is NEW or EXISTS.
      * EXISTS means there're deployed artifacts.
      */
     private String state;
+
+    /**
+     * Keep the real time metrics details of the resource node.
+     */
+    private WorkerMetrics workerMetrics;
+
+    /**
+     * Specify whether the resource node is type, ReceiverNode
+     */
+    private boolean isReceiverNode;
 
     /**
      * Getter for the node id.
@@ -60,29 +71,29 @@ public class NodeConfig implements Serializable {
     }
 
     /**
-     * Getter for the httpInterface of the node.
+     * Getter for the httpsInterface of the node.
      *
-     * @return httpInterface.
+     * @return httpsInterface.
      */
-    public HTTPInterfaceConfig getHttpInterface() {
-        return httpInterface;
+    public HTTPSInterfaceConfig getHttpsInterface() {
+        return httpsInterface;
     }
 
     /**
-     * Setter for the httpInterface of the node.
+     * Setter for the httpsInterface of the node.
      *
-     * @param httpInterface httpInterface of the node.
+     * @param httpsInterface httpsInterface of the node.
      * @return current {@link NodeConfig}
      */
-    public NodeConfig setHttpInterface(HTTPInterfaceConfig httpInterface) {
-        this.httpInterface = httpInterface;
+    public NodeConfig setHttpsInterface(HTTPSInterfaceConfig httpsInterface) {
+        this.httpsInterface = httpsInterface;
         return this;
     }
 
     /**
      * Getter for the state of the node.
      *
-     * @return httpInterface.
+     * @return httpsInterface.
      */
     public String getState() {
         return state;
@@ -98,10 +109,27 @@ public class NodeConfig implements Serializable {
         return this;
     }
 
+    public WorkerMetrics getWorkerMetrics() {
+        return workerMetrics;
+    }
+
+    public void setWorkerMetrics(WorkerMetrics workerMetrics) {
+        this.workerMetrics = workerMetrics;
+    }
+
+    public boolean isReceiverNode() {
+        return isReceiverNode;
+    }
+
+    public NodeConfig setReceiverNode(boolean receiverNode) {
+        isReceiverNode = receiverNode;
+        return this;
+    }
+
     @Override
     public String toString() {
         return String.format("Node { id: %s, host: %s, port: %s, state: %s }",
-                id, httpInterface.getHost(), httpInterface.getPort(), state);
+                id, httpsInterface.getHost(), httpsInterface.getPort(), state);
     }
 
     @Override
@@ -116,15 +144,15 @@ public class NodeConfig implements Serializable {
         if (getId() != null ? !getId().equals(that.getId()) : that.getId() != null) {
             return false;
         }
-        return getHttpInterface() != null
-                ? getHttpInterface().equals(that.getHttpInterface())
-                : that.getHttpInterface() == null;
+        return getHttpsInterface() != null
+                ? getHttpsInterface().equals(that.getHttpsInterface())
+                : that.getHttpsInterface() == null;
     }
 
     @Override
     public int hashCode() {
         int result = getId() != null ? getId().hashCode() : 0;
-        result = 31 * result + (getHttpInterface() != null ? getHttpInterface().hashCode() : 0);
+        result = 31 * result + (getHttpsInterface() != null ? getHttpsInterface().hashCode() : 0);
         return result;
     }
 }

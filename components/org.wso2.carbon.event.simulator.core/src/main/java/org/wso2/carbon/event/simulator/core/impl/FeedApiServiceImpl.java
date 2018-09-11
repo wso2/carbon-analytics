@@ -20,15 +20,12 @@ package org.wso2.carbon.event.simulator.core.impl;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
-import org.wso2.carbon.analytics.msf4j.interceptor.common.util.InterceptorConstants;
 import org.wso2.carbon.analytics.permissions.PermissionProvider;
 import org.wso2.carbon.analytics.permissions.bean.Permission;
 import org.wso2.carbon.event.simulator.core.api.FeedApiService;
 import org.wso2.carbon.event.simulator.core.api.NotFoundException;
-import org.wso2.carbon.event.simulator.core.exception.FileAlreadyExistsException;
-import org.wso2.carbon.event.simulator.core.exception.FileOperationsException;
-import org.wso2.carbon.event.simulator.core.exception.InsufficientAttributesException;
-import org.wso2.carbon.event.simulator.core.exception.InvalidConfigException;
+import org.wso2.carbon.event.simulator.core.exception.*;
+import org.wso2.carbon.event.simulator.core.internal.util.CommonOperations;
 import org.wso2.carbon.event.simulator.core.internal.util.EventSimulatorConstants;
 import org.wso2.carbon.event.simulator.core.internal.util.SimulationConfigUploader;
 import org.wso2.carbon.event.simulator.core.service.EventSimulator;
@@ -63,7 +60,7 @@ public class FeedApiServiceImpl extends FeedApiService {
                     simulationConfigUploader.getSimulationName(simulationConfiguration))) {
                 try {
                     EventSimulator.validateSimulationConfig(simulationConfiguration, false);
-                } catch (ResourceNotFoundException e) {
+                } catch (SimulationValidationException e) {
                     //do nothing
                 }
                 simulationConfigUploader.uploadSimulationConfig(simulationConfiguration,
@@ -88,7 +85,7 @@ public class FeedApiServiceImpl extends FeedApiService {
                                 + "'"))
                         .build();
             }
-        } catch (InvalidConfigException | InsufficientAttributesException | FileOperationsException |
+        } catch (SimulationValidationException | FileOperationsException |
                 FileAlreadyExistsException e) {
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
                     .header("Access-Control-Allow-Origin", "*")
@@ -100,6 +97,7 @@ public class FeedApiServiceImpl extends FeedApiService {
     public Response deleteFeedSimulation(String simulationName) throws NotFoundException {
         boolean deleted = false;
         try {
+            CommonOperations.validatePath(simulationName);
             deleted = SimulationConfigUploader.
                     getConfigUploader().
                     deleteSimulationConfig(simulationName,
@@ -268,9 +266,10 @@ public class FeedApiServiceImpl extends FeedApiService {
         }
     }
 
-    public Response updateFeedSimulation(String simulationName,
-                                         String simulationConfigDetails) throws NotFoundException {
+    public Response updateFeedSimulation(String simulationName, String simulationConfigDetails)
+            throws NotFoundException, FileOperationsException {
         SimulationConfigUploader simulationConfigUploader = SimulationConfigUploader.getConfigUploader();
+        CommonOperations.validatePath(simulationName);
         if (simulationConfigUploader.checkSimulationExists(
                 simulationName,
                 Paths.get(Utils.getRuntimePath().toString(),
@@ -278,7 +277,7 @@ public class FeedApiServiceImpl extends FeedApiService {
                           EventSimulatorConstants.DIRECTORY_SIMULATION_CONFIGS).toString())) {
             try {
                 EventSimulator.validateSimulationConfig(simulationConfigDetails, false);
-            } catch (ResourceNotFoundException | InvalidConfigException | InsufficientAttributesException e) {
+            } catch (SimulationValidationException e) {
                 return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
                         .header("Access-Control-Allow-Origin", "*")
                         .entity(new ResponseMapper(Response.Status.INTERNAL_SERVER_ERROR, e.getMessage()))
@@ -622,7 +621,8 @@ public class FeedApiServiceImpl extends FeedApiService {
     }
 
     @Override
-    public Response updateFeedSimulation(String simulationName, String body, Request request) throws NotFoundException {
+    public Response updateFeedSimulation(String simulationName, String body, Request request)
+            throws NotFoundException, FileOperationsException {
         if (getUserName(request) != null && !getPermissionProvider().hasPermission(getUserName(request), new
                 Permission(PERMISSION_APP_NAME, MANAGE_SIMULATOR_PERMISSION_STRING))) {
             return Response.status(Response.Status.UNAUTHORIZED).entity("Insufficient permission to perform the action")

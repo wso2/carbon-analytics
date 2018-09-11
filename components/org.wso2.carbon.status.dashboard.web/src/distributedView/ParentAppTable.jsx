@@ -18,6 +18,7 @@
  */
 
 import React from "react";
+import {Link} from 'react-router-dom';
 
 //Material UI
 import {Table, TableBody, TableHeader, TableHeaderColumn, TableRow, TableRowColumn} from 'material-ui/Table';
@@ -119,9 +120,12 @@ export default class ParentAppTable extends React.Component {
                         </div>
 
                     ) : (
-                        <div style={{height: 24, color: 'white'}}>
-                            {row.host + ":" + row.port}
-                        </div>
+                        <Link style={{textDecoration: 'none'}}
+                              to={window.contextPath + '/worker/' + row.host + "_" + row.port}>
+                            <div style={{height: 24, color: 'white'}}>
+                                {row.host + ":" + row.port}
+                            </div>
+                        </Link>
 
                     )}
                 </TableRowColumn>
@@ -142,7 +146,7 @@ export default class ParentAppTable extends React.Component {
                             </TableHeaderColumn>
                             <TableHeaderColumn style={{color: '#f6f6f6', width: '100px'}}><h3>Child App Status</h3>
                             </TableHeaderColumn>
-                            <TableHeaderColumn style={{color: '#f6f6f6', width: '100px'}}><h3>Worker Node</h3>
+                            <TableHeaderColumn style={{color: '#f6f6f6', width: '100px'}}><h3>Worker Node </h3>
                             </TableHeaderColumn>
                         </TableRow>
                     </TableHeader>

@@ -17,7 +17,7 @@
  */
 
 /**
- * Has values for all the constants related to Business Rules web app
+ * Constants related to the Business Rules Manager web app
  */
 const BusinessRulesConstants = {
     // Rule Template types
@@ -35,12 +35,12 @@ const BusinessRulesConstants = {
     BUSINESS_RULE_TYPE_SCRATCH: 'scratch',
 
     // Business Rule from scratch property types
-    BUSINESS_RULE_FROM_SCRATCH_PROPERTY_TYPE_INPUT: 'inputData',
-    BUSINESS_RULE_FROM_SCRATCH_PROPERTY_TYPE_OUTPUT: 'outputData',
-    BUSINESS_RULE_FROM_SCRATCH_PROPERTY_TYPE_RULE_COMPONENTS: 'ruleComponents',
-    BUSINESS_RULE_FROM_SCRATCH_RULE_COMPONENT_PROPERTY_TYPE_FILTER_RULES: 'filterRules',
-    BUSINESS_RULE_FROM_SCRATCH_RULE_COMPONENT_PROPERTY_TYPE_RULE_LOGIC: 'ruleLogic',
-    BUSINESS_RULE_FROM_SCRATCH_RULE_PROPERTY_TYPE_OUTPUT_MAPPINGS: 'outputMappings',
+    INPUT_DATA_KEY: 'inputData',
+    OUTPUT_DATA_KEY: 'outputData',
+    RULE_COMPONENTS_KEY: 'ruleComponents',
+    FILTER_RULES_KEY: 'filterRules',
+    RULE_LOGIC_KEY: 'ruleLogic',
+    OUTPUT_MAPPINGS_KEY: 'outputMappings',
 
     BUSINESS_RULE_NAME_REGEX: /[a-zA-Z][a-zA-Z0-9\s_-]*/g,
 
@@ -51,11 +51,15 @@ const BusinessRulesConstants = {
     // Business Rule Filter Rule operators
     BUSINESS_RULE_FILTER_RULE_OPERATORS: ['<', '<=', '>', '>=', '==', '!='],
 
-    // Business Rule deployment statuses
-    BUSINESS_RULE_STATUS_DEPLOYED: 3,
-    BUSINESS_RULE_STATUS_DEPLOYMENT_FAILED: 1, // Tried to save & deploy, but only save was successful
-    BUSINESS_RULE_STATUS_NOT_DEPLOYED: 0, // Tried only to save, and was successful
     SCRIPT_EXECUTION_ERROR: 7, // Script execution has been failed in the backend, due to the provided value(s)
+
+    // User Permissions
+    USER_PERMISSIONS: {
+        MANAGER: 0,
+        VIEWER: 1,
+        UNSET: -1,
+        NONE: -2,
+    },
 
     // Business Rule deployment statuses
     BUSINESS_RULE_STATUSES: [
@@ -68,29 +72,25 @@ const BusinessRulesConstants = {
     ],
 
     // Siddhi App deployment statuses
-    SIDDHI_APP_DEPLOYMENT_STATUSES: [
+    SIDDHI_APP_DEPLOYMENT_STATUSES: {
+        DEPLOYED: 1,
+        NOT_DEPLOYED: 0,
+        UNREACHABLE: -1,
+    },
+
+    SIDDHI_APP_DEPLOYMENT_STATUS_TEXTS: [
         'Unreachable', // -1
         'Not Deployed', // 0
-        'Deployed' // 1
+        'Deployed', // 1
     ],
 
-    BUSINESS_RULE_STATUS_DEPLOYED_STRING: 'Deployed',
-    BUSINESS_RULE_STATUS_NOT_DEPLOYED_STRING: 'Not Deployed',
-    BUSINESS_RULE_STATUS_DEPLOYMENT_FAILED_STRING: 'Deployment Failed',
-
-    // Each possible mode of loading Business Rules Manager landing page after an action
-    LOAD_BUSINESS_RULES_MANAGER_STATUSES: [
-        'After re-deployment', // 0
-        'After BusinessRuleFromScratch Creation', // 1
-        'After BusinessRuleFromScratch Updation', // 2
-        'After BusinessRuleFromTemplate Creation', // 3
-        'After BusinessRuleFromTemplate Updation', // 4
-        'After deletion' // 5
-        // Else, normal mode
-    ],
+    ERROR_CODES: {
+        UNKNOWN: 0,
+        NONE: -1,
+    },
 
     // URL for APIs
-    BASE_URL: window.location.origin
+    BASE_URL: window.location.origin,
 };
 
 export default BusinessRulesConstants;

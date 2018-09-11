@@ -17,18 +17,21 @@
  *
  */
 
-import React, { Component } from 'react';
-import { Link } from 'react-router-dom';
+import React, {Component} from 'react';
+import {Link} from 'react-router-dom';
 // Material UI
-import { AppBar, FlatButton, IconButton, IconMenu, MenuItem } from 'material-ui';
+import {AppBar, FlatButton, IconButton, IconMenu, MenuItem} from 'material-ui';
 import AccountCircle from 'material-ui/svg-icons/action/account-circle';
 // App Components
 import AuthManager from '../auth/utils/AuthManager';
 import Logo from '../images/wso2-logo.svg';
 
-const title = {color: '#b9b9b9', fontSize: 18, height: 40, lineHeight: 3};
-const appBar = {backgroundColor: '#1a1a1a'};
-const accName = {float: 'left', paddingTop: 15};
+const title = {color: '#EEE', fontSize: 16, height: 40, lineHeight: '40px'};
+const appBar = {backgroundColor: '#263238', height:40, display:'flex', alignItems:'center'};
+const logoStyle = {margin: '0 15px 0 0', height: 17};
+const accName = {display: 'flex', alignItems: 'center', color: '#EEE', textTransform: 'capitalize'};
+const btnStyle = {width: 'initial', height: 40, padding: '0 0 0 10px'};
+
 /**
  * Header component.
  */
@@ -40,7 +43,7 @@ export default class Header extends Component {
      */
     renderRightLinks() {
         if (this.props.hideUserSettings) {
-            return <div />;
+            return <div/>;
         }
 
         // If the user is not set show the login button. Else show account information.
@@ -49,22 +52,22 @@ export default class Header extends Component {
             return (
                 <FlatButton
                     label="Login"
-                    containerElement={<Link to={`${window.contextPath}/login?referrer=${window.location.pathname}`} />}
+                    containerElement={<Link to={`${window.contextPath}/login?referrer=${window.location.pathname}`}/>}
                 />
             );
         }
 
         return (
-            <div>
-                <span style={accName}>{user.username}</span>
+            <div style={accName}>
+                <span>{user.username}</span>
                 <IconMenu
-                    iconButtonElement={<IconButton><AccountCircle /></IconButton>}
-                    targetOrigin={{ horizontal: 'right', vertical: 'bottom' }}
-                    anchorOrigin={{ horizontal: 'right', vertical: 'top' }}
+                    iconButtonElement={<IconButton style={btnStyle}><AccountCircle/></IconButton>}
+                    targetOrigin={{horizontal: 'right', vertical: 'bottom'}}
+                    anchorOrigin={{horizontal: 'right', vertical: 'top'}}
                 >
                     <MenuItem
                         primaryText="Logout"
-                        containerElement={<Link to={`${window.contextPath}/logout`} />}
+                        containerElement={<Link to={`${window.contextPath}/logout`}/>}
                     />
                 </IconMenu>
             </div>
@@ -81,9 +84,10 @@ export default class Header extends Component {
             <AppBar
                 style={appBar}
                 title="Stream Processor Status Dashboard"
-                iconElementLeft={<img height='24' src={Logo}/>}
+                iconElementLeft={<img height='17' src={Logo}/>}
                 titleStyle={title}
-                iconStyleLeft={{margin:'15px 15px 0 0'}}
+                iconStyleLeft={logoStyle}
+                iconStyleRight={{margin: 0}}
                 iconElementRight={this.renderRightLinks()}
             />
         );

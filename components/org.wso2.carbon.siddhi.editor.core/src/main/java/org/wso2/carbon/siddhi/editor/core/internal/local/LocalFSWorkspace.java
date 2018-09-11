@@ -183,7 +183,7 @@ public class LocalFSWorkspace implements Workspace {
         Path path = root.getFileName();
         rootObj.addProperty("text", path != null ?
                                     path.toString() : root.toString());
-        rootObj.addProperty("id", root.toAbsolutePath().toString());
+        rootObj.addProperty("id", Paths.get(Constants.CARBON_HOME).relativize(root).toString());
         if (Files.isDirectory(root) && checkChildren) {
             rootObj.addProperty("type", "folder");
             try {

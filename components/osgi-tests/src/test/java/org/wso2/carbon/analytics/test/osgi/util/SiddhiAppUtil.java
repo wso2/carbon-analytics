@@ -39,6 +39,7 @@ public class SiddhiAppUtil {
             "Define stream BarStream (symbol string, max long);";
 
     private static final String SIDDHIAPP_QUERY = "" +
+            "@info(name = 'query1')  " +
             "from FooStream#window.length(5) " +
             "select symbol, max(volume) as max " +
             "group by symbol " +

@@ -17,12 +17,12 @@
  *
  */
 
-import React from "react";
+import React from 'react';
 //App Components
-import DashboardUtils from "../utils/DashboardUtils";
-import ChartCard from "../common/ChartCard";
+import DashboardUtils from '../utils/DashboardUtils';
+import ChartCard from '../common/ChartCard';
 // Material UI
-import {Card, CardHeader, CardMedia, Divider} from "material-ui";
+import {Card, CardHeader, CardMedia, Divider} from 'material-ui';
 
 const cpuMetadata = {names: ['Time', 'System Load Avg'], types: ['time', 'linear', 'linear']};
 
@@ -41,7 +41,7 @@ export default class JVMLoad extends React.Component {
     componentWillReceiveProps(nextprops) {
         this.setState({
             jvmOsSystemLoadAverage: nextprops.data[0],
-            tickCount: nextprops.data[0].length>10 ? 10 : nextprops.data[0].length
+            tickCount: nextprops.data[0].length > 10 ? 10 : nextprops.data[0].length
         });
     }
 
@@ -54,30 +54,31 @@ export default class JVMLoad extends React.Component {
             width: 700,
             height: 200,
             style: {
-                tickLabelColor:'#f2f2f2',
+                tickLabelColor: '#f2f2f2',
                 legendTextColor: '#9c9898',
                 legendTitleColor: '#9c9898',
                 axisLabelColor: '#9c9898',
-                legendTextSize:12,
-                legendTitleSize:12
+                legendTextSize: 10,
+                legendTitleSize: 12
             },
-            legend:true,
+            legend: true,
             interactiveLegend: true,
-            tipTimeFormat:"%Y-%m-%d %H:%M:%S %Z",
+            tipTimeFormat: "%Y-%m-%d %H:%M:%S %Z",
             gridColor: '#f2f2f2',
-            xAxisTickCount:this.state.tickCount
+            xAxisTickCount: this.state.tickCount
         };
-        if(this.state.jvmOsSystemLoadAverage.length === 0){
-            return(
-                <div style={{paddingLeft: 10}}>
+        if (this.state.jvmOsSystemLoadAverage.length === 0) {
+            return (
+                <div>
                     <Card>
                         <CardHeader
                             title="JVM CPU Load"
                         />
                         <Divider/>
                         <CardMedia>
-                            <div style={{backgroundColor: '#131313'}}>
-                                <h4 style={{marginTop: 0}}>No Data Available</h4>
+                            <div style={{backgroundColor: '#131313', textAlign: 'center', lineHeight: '60px',
+                                color: '#9c9898'}}>
+                                No Data Available
                             </div>
                         </CardMedia>
                     </Card>
@@ -87,7 +88,7 @@ export default class JVMLoad extends React.Component {
 
         let y = DashboardUtils.getYDomain(this.state.jvmOsSystemLoadAverage);
         return (
-            <div style={{paddingLeft: 10}}>
+            <div>
                 <ChartCard data={this.state.jvmOsSystemLoadAverage} yDomain={y}
                            metadata={cpuMetadata} config={cpuLineChartConfig} title="System Load Average"/>
             </div>

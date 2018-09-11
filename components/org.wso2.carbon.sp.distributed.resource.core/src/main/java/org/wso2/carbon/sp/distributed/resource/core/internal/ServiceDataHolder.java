@@ -18,12 +18,14 @@
 
 package org.wso2.carbon.sp.distributed.resource.core.internal;
 
+import org.wso2.carbon.analytics.idp.client.core.api.AnalyticsHttpClientBuilderService;
 import org.wso2.carbon.config.provider.ConfigProvider;
 import org.wso2.carbon.sp.distributed.resource.core.bean.DeploymentConfig;
-import org.wso2.carbon.sp.distributed.resource.core.bean.HTTPInterfaceConfig;
+import org.wso2.carbon.sp.distributed.resource.core.bean.HTTPSInterfaceConfig;
 import org.wso2.carbon.sp.distributed.resource.core.bean.ManagerNodeConfig;
 import org.wso2.carbon.sp.distributed.resource.core.bean.NodeConfig;
 import org.wso2.carbon.stream.processor.core.util.DeploymentMode;
+import org.wso2.carbon.stream.processor.statistics.internal.OperatingSystemMetricSet;
 
 import java.util.Collections;
 import java.util.LinkedHashSet;
@@ -35,7 +37,10 @@ public class ServiceDataHolder {
     private static ManagerNodeConfig leaderNodeConfig;
     private static NodeConfig currentNodeConfig;
     private static DeploymentMode deploymentMode;
-    private static Set<HTTPInterfaceConfig> resourceManagers = Collections.synchronizedSet(new LinkedHashSet<>());
+    private static OperatingSystemMetricSet operatingSystemMetricSet;
+    private static AnalyticsHttpClientBuilderService clientBuilderService;
+
+    private static Set<HTTPSInterfaceConfig> resourceManagers = Collections.synchronizedSet(new LinkedHashSet<>());
 
     public static ConfigProvider getConfigProvider() {
         return configProvider;
@@ -77,11 +82,27 @@ public class ServiceDataHolder {
         ServiceDataHolder.deploymentMode = deploymentMode;
     }
 
-    public static Set<HTTPInterfaceConfig> getResourceManagers() {
+    public static Set<HTTPSInterfaceConfig> getResourceManagers() {
         return resourceManagers;
     }
 
-    public static void setResourceManagers(Set<HTTPInterfaceConfig> resourceManagers) {
+    public static void setResourceManagers(Set<HTTPSInterfaceConfig> resourceManagers) {
         ServiceDataHolder.resourceManagers = resourceManagers;
+    }
+
+    public static OperatingSystemMetricSet getOperatingSystemMetricSet() {
+        return operatingSystemMetricSet;
+    }
+
+    public static void setOperatingSystemMetricSet(OperatingSystemMetricSet operatingSystemMetricSet) {
+        ServiceDataHolder.operatingSystemMetricSet = operatingSystemMetricSet;
+    }
+
+    public static AnalyticsHttpClientBuilderService getClientBuilderService() {
+        return ServiceDataHolder.clientBuilderService;
+    }
+
+    public static void setClientBuilderService(AnalyticsHttpClientBuilderService clientBuilderService) {
+        ServiceDataHolder.clientBuilderService = clientBuilderService;
     }
 }

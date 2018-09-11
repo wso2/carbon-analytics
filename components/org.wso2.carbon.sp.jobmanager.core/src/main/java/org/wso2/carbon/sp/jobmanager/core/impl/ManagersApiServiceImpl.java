@@ -36,6 +36,7 @@ import org.wso2.carbon.sp.jobmanager.core.bean.KafkaTransportDetails;
 import org.wso2.carbon.sp.jobmanager.core.impl.utils.Constants;
 import org.wso2.carbon.sp.jobmanager.core.internal.ServiceDataHolder;
 import org.wso2.carbon.sp.jobmanager.core.model.ManagerDetails;
+import org.wso2.carbon.sp.jobmanager.core.model.ManagerNode;
 import org.wso2.carbon.sp.jobmanager.core.model.SiddhiAppDetails;
 import org.wso2.carbon.sp.jobmanager.core.model.SiddhiAppHolder;
 import org.wso2.msf4j.Request;
@@ -104,50 +105,55 @@ public class ManagersApiServiceImpl extends ManagersApiService {
      */
 
     public Response getSiddhiAppDetails() {
-        Map<String, List<SiddhiAppHolder>> deployedSiddhiAppHolder = ServiceDataHolder.getResourcePool()
-                .getSiddhiAppHoldersMap();
-        Map<String, List<SiddhiAppHolder>> waitingToDeploy = ServiceDataHolder.getResourcePool()
-                .getAppsWaitingForDeploy();
+        if(ServiceDataHolder.getResourcePool() != null) {
+            Map<String, List<SiddhiAppHolder>> deployedSiddhiAppHolder = ServiceDataHolder.getResourcePool()
+                    .getSiddhiAppHoldersMap();
+            Map<String, List<SiddhiAppHolder>> waitingToDeploy = ServiceDataHolder.getResourcePool()
+                    .getAppsWaitingForDeploy();
 
-        if (deployedSiddhiAppHolder.isEmpty() && waitingToDeploy.isEmpty()) {
-            logger.info("There is no siddhi apps");
-            return Response.ok().entity("There is no siddhi app  in the manager node").build();
-        } else {
-            List<SiddhiAppDetails> appList = new ArrayList<>();
-            for (Map.Entry<String, List<SiddhiAppHolder>> en : waitingToDeploy.entrySet()) {
-                for (SiddhiAppHolder childApp : en.getValue()) {
-                    SiddhiAppDetails appHolder = new SiddhiAppDetails();
-                    appHolder.setParentAppName(childApp.getParentAppName());
-                    appHolder.setAppName(childApp.getAppName());
-                    appHolder.setGroupName(childApp.getGroupName());
-                    appHolder.setSiddhiApp(childApp.getSiddhiApp());
-                    appList.add(appHolder);
-                }
-            }
-            for (Map.Entry<String, List<SiddhiAppHolder>> en : deployedSiddhiAppHolder.entrySet()) {
-                for (SiddhiAppHolder childApp : en.getValue()) {
-                    SiddhiAppDetails appHolder = new SiddhiAppDetails();
-                    appHolder.setParentAppName(childApp.getParentAppName());
-                    appHolder.setAppName(childApp.getAppName());
-                    appHolder.setGroupName(childApp.getGroupName());
-                    appHolder.setSiddhiApp(childApp.getSiddhiApp());
-
-                    if (childApp.getDeployedNode() != null) {
-                        appHolder.setId(childApp.getDeployedNode().getId());
-                        appHolder.setState(childApp.getDeployedNode().getState());
-                        appHolder.setHost(childApp.getDeployedNode().getHttpInterface().getHost());
-                        appHolder.setPort(Integer.toString(childApp.getDeployedNode()
-                                .getHttpInterface().getPort()));
-                        appHolder.setFailedPingAttempts(Integer.toString(childApp.getDeployedNode()
-                                .getFailedPingAttempts()));
-                        appHolder.setLastPingTimestamp(Long.toString(childApp.getDeployedNode()
-                                .getLastPingTimestamp()));
+            if (deployedSiddhiAppHolder.isEmpty() && waitingToDeploy.isEmpty()) {
+                logger.info("There is no siddhi apps");
+                return Response.ok().entity("There is no siddhi app  in the manager node").build();
+            } else {
+                List<SiddhiAppDetails> appList = new ArrayList<>();
+                for (Map.Entry<String, List<SiddhiAppHolder>> en : waitingToDeploy.entrySet()) {
+                    for (SiddhiAppHolder childApp : en.getValue()) {
+                        SiddhiAppDetails appHolder = new SiddhiAppDetails();
+                        appHolder.setParentAppName(childApp.getParentAppName());
+                        appHolder.setAppName(childApp.getAppName());
+                        appHolder.setGroupName(childApp.getGroupName());
+                        appHolder.setSiddhiApp(childApp.getSiddhiApp());
+                        appList.add(appHolder);
                     }
-                    appList.add(appHolder);
                 }
-            }
+                for (Map.Entry<String, List<SiddhiAppHolder>> en : deployedSiddhiAppHolder.entrySet()) {
+                    for (SiddhiAppHolder childApp : en.getValue()) {
+                        SiddhiAppDetails appHolder = new SiddhiAppDetails();
+                        appHolder.setParentAppName(childApp.getParentAppName());
+                        appHolder.setAppName(childApp.getAppName());
+                        appHolder.setGroupName(childApp.getGroupName());
+                        appHolder.setSiddhiApp(childApp.getSiddhiApp());
 
-            return Response.ok().entity(appList).build();
+                        if (childApp.getDeployedNode() != null) {
+                            appHolder.setId(childApp.getDeployedNode().getId());
+                            appHolder.setState(childApp.getDeployedNode().getState());
+                            appHolder.setHost(childApp.getDeployedNode().getHttpsInterface().getHost());
+                            appHolder.setPort(Integer.toString(childApp.getDeployedNode()
+                                    .getHttpsInterface().getPort()));
+                            appHolder.setFailedPingAttempts(Integer.toString(childApp.getDeployedNode()
+                                    .getFailedPingAttempts()));
+                            appHolder.setLastPingTimestamp(Long.toString(childApp.getDeployedNode()
+                                    .getLastPingTimestamp()));
+                        }
+                        appList.add(appHolder);
+                    }
+                }
+                return Response.ok().entity(appList).build();
+            }
+        } else {
+            return Response.status(Response.Status.NO_CONTENT).entity(
+                    new ApiResponseMessage(ApiResponseMessage.ERROR, "There is no siddhi apps found in the "
+                            + "node")).build();
         }
     }
 
@@ -209,8 +215,8 @@ public class ManagersApiServiceImpl extends ManagersApiService {
                 appHolder.setSiddhiApp(siddhiAppHolder.getSiddhiApp());
                 appHolder.setId(siddhiAppHolder.getDeployedNode().getId());
                 appHolder.setState(siddhiAppHolder.getDeployedNode().getState());
-                appHolder.setHost(siddhiAppHolder.getDeployedNode().getHttpInterface().getHost());
-                appHolder.setPort(Integer.toString(siddhiAppHolder.getDeployedNode().getHttpInterface().getPort()));
+                appHolder.setHost(siddhiAppHolder.getDeployedNode().getHttpsInterface().getHost());
+                appHolder.setPort(Integer.toString(siddhiAppHolder.getDeployedNode().getHttpsInterface().getPort()));
                 appHolder.setFailedPingAttempts(
                         Integer.toString(siddhiAppHolder.getDeployedNode().getFailedPingAttempts()));
                 appHolder.setLastPingTimestamp(Long.toString(siddhiAppHolder.getDeployedNode().getLastPingTimestamp()));
@@ -251,9 +257,9 @@ public class ManagersApiServiceImpl extends ManagersApiService {
                 KafkaTransportDetails kafkaTransport = new KafkaTransportDetails();
                 kafkaTransport.setAppName(siddhiAppHolder.getAppName());
                 kafkaTransport.setSiddhiApp(siddhiAppHolder.getSiddhiApp());
-                kafkaTransport.setDeployedHost(siddhiAppHolder.getDeployedNode().getHttpInterface().getHost());
+                kafkaTransport.setDeployedHost(siddhiAppHolder.getDeployedNode().getHttpsInterface().getHost());
                 kafkaTransport.setDeployedPort(Integer.toString(siddhiAppHolder.getDeployedNode()
-                        .getHttpInterface().getPort()));
+                        .getHttpsInterface().getPort()));
                 getSourceSinkDetails(siddhiAppHolder, kafkaTransport, kafkaDetails);
             }));
             return Response.ok().entity(kafkaDetails).build();
@@ -261,6 +267,21 @@ public class ManagersApiServiceImpl extends ManagersApiService {
             return Response.status(Response.Status.NO_CONTENT).entity(
                     new ApiResponseMessage(ApiResponseMessage.ERROR, "There is no siddhi app  in the manager "
                             + "node")).build();
+        }
+    }
+
+    /**
+     * This method checks whether the Current Manager node is the active node.
+     *
+     * @return
+     */
+    public Response isActive() {
+        ManagerNode current = ServiceDataHolder.getCurrentNode();
+        if (current.equals(ServiceDataHolder.getLeaderNode())) {
+            return Response.ok().entity(String.format("Current node: %s is the active manager.", current.getId())).build();
+        } else {
+            return Response.status(Response.Status.NOT_FOUND).entity(
+                    new ApiResponseMessage(ApiResponseMessage.ERROR, "Not the active node")).build();
         }
     }
 
@@ -414,6 +435,20 @@ public class ManagersApiServiceImpl extends ManagersApiService {
                     + "details").build();
         } else {
             return getKafkaDetails(appName);
+        }
+    }
+
+    @Override
+    public Response isActive(Request request) throws NotFoundException {
+        if (getUserName(request) != null && !(getPermissionProvider().hasPermission(getUserName(request), new
+                Permission(Constants.PERMISSION_APP_NAME, VIEW_SIDDHI_APP_PERMISSION_STRING)) ||
+                getPermissionProvider()
+                        .hasPermission(getUserName(request), new Permission(Constants.PERMISSION_APP_NAME,
+                                MANAGE_SIDDHI_APP_PERMISSION_STRING)))) {
+            return Response.status(Response.Status.FORBIDDEN).entity("Insufficient permissions to check cluster "
+                    + "leader.").build();
+        } else {
+            return isActive();
         }
     }
 

@@ -15,6 +15,8 @@
 */
 package org.wso2.carbon.data.provider.rdbms.config;
 
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
 import org.wso2.carbon.data.provider.ProviderConfig;
 
 /**
@@ -22,7 +24,7 @@ import org.wso2.carbon.data.provider.ProviderConfig;
  */
 public class RDBMSDataProviderConf implements ProviderConfig {
     private String datasourceName;
-    private String query;
+    private JsonElement queryData;
     private String tableName;
     private String incrementalColumn;
     private String timeColumns;
@@ -39,7 +41,7 @@ public class RDBMSDataProviderConf implements ProviderConfig {
         this.publishingLimit = 30;
         this.purgingLimit = 30;
         this.datasourceName = "";
-        this.query = "";
+        this.queryData = new JsonObject();
         this.tableName = "";
         this.incrementalColumn = "";
         this.timeColumns = "";
@@ -49,8 +51,8 @@ public class RDBMSDataProviderConf implements ProviderConfig {
         return datasourceName;
     }
 
-    public String getQuery() {
-        return query;
+    public JsonElement getQuery() {
+        return queryData;
     }
 
     public String getTableName() {

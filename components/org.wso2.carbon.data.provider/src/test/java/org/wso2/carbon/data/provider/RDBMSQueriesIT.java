@@ -352,7 +352,10 @@ public class RDBMSQueriesIT {
                 "\"providerName\": \"RDBMSBatchDataProvider\"," +
                 "\"dataProviderConfiguration\": {" +
                 "\"datasourceName\": \"DEMO_DB\"," +
-                "\"query\": \"select * from Foo_Table\"," +
+                "\"queryData\": {\"queryFunction\":\"this.getQuery = function (username,country){return \\\"Select *" +
+                " from TRANSACTIONS_TABLE where country = '\\\"+country+\\\"'\\\";}\",\"query\":" +
+                "\"select * from Foo_Table\",\"customWidgetInputs\":[{\"name\":\"country\",\"defaultValue\":" +
+                "\"Ireland\"}],\"systemWidgetInputs\":[{\"name\":\"username\",\"defaultValue\":\"admin\"}]}," +
                 "\"tableName\": \"Foo_Table\"," +
                 "\"incrementalColumn\": \"recipe_id\"," +
                 "\"publishingInterval\": 1000," +
@@ -405,7 +408,10 @@ public class RDBMSQueriesIT {
                 "\"providerName\": \"RDBMSStreamingDataProvider\"," +
                 "\"dataProviderConfiguration\": {" +
                 "\"datasourceName\": \"DEMO_DB\"," +
-                "\"query\": \"select * from Foo_Table\"," +
+                "\"queryData\": {\"queryFunction\":\"this.getQuery = function (username,country){" +
+                "return \\\"Select * from TRANSACTIONS_TABLE where country = '\\\"+country+\\\"'\\\";}\",\"query\":" +
+                "\"select * from Foo_Table\",\"customWidgetInputs\":[{\"name\":\"country\",\"defaultValue\":" +
+                "\"Ireland\"}],\"systemWidgetInputs\":[{\"name\":\"username\",\"defaultValue\":\"admin\"}]}," +
                 "\"tableName\": \"Foo_Table\"," +
                 "\"incrementalColumn\": \"recipe_id\"," +
                 "\"publishingInterval\": 1000," +
@@ -458,7 +464,10 @@ public class RDBMSQueriesIT {
                 "\"providerName\": \"RDBMSStreamingDataProvider\"," +
                 "\"dataProviderConfiguration\": {" +
                 "\"datasourceName\": \"DEMO_DB\"," +
-                "\"query\": \"select * from Foo_Table\"," +
+                "\"queryData\": {\"queryFunction\":\"this.getQuery = function (username,country){" +
+                "return \\\"Select * from TRANSACTIONS_TABLE where country = '\\\"+country+\\\"'\\\";}\",\"query\":" +
+                "\"select * from Foo_Table\",\"customWidgetInputs\":[{\"name\":\"country\",\"defaultValue\":" +
+                "\"Ireland\"}],\"systemWidgetInputs\":[{\"name\":\"username\",\"defaultValue\":\"admin\"}]}," +
                 "\"tableName\": \"Foo_Table\"," +
                 "\"incrementalColumn\": \"recipe_id\"," +
                 "\"publishingInterval\": 3," +
@@ -516,7 +525,10 @@ public class RDBMSQueriesIT {
                 "\"providerName\": \"RDBMSBatchDataProvider\"," +
                 "\"dataProviderConfiguration\": {" +
                 "\"datasourceName\": \"DEMO_DB\"," +
-                "\"query\": \"select * from Foo_Table\"," +
+                "\"queryData\": {\"queryFunction\":\"this.getQuery = function (username,country){" +
+                "return \\\"Select * from TRANSACTIONS_TABLE where country = '\\\"+country+\\\"'\\\";}\",\"query\":" +
+                "\"select * from Foo_Table\",\"customWidgetInputs\":[{\"name\":\"country\",\"defaultValue\":" +
+                "\"Ireland\"}],\"systemWidgetInputs\":[{\"name\":\"username\",\"defaultValue\":\"admin\"}]}," +
                 "\"tableName\": \"Foo_Table\"," +
                 "\"incrementalColumn\": \"recipe_id\"," +
                 "\"publishingInterval\": 3," +

@@ -25,6 +25,7 @@ import org.wso2.carbon.event.simulator.core.exception.FileAlreadyExistsException
 import org.wso2.carbon.event.simulator.core.exception.FileOperationsException;
 import org.wso2.carbon.event.simulator.core.exception.InvalidConfigException;
 import org.wso2.carbon.event.simulator.core.util.LogEncoder;
+import org.wso2.carbon.stream.processor.common.exception.ResourceNotFoundException;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -68,6 +69,7 @@ public class SimulationConfigUploader {
     public void uploadSimulationConfig(String simulationConfig, String destination) throws FileOperationsException,
             InvalidConfigException, FileAlreadyExistsException {
         String simulationName = getSimulationName(simulationConfig);
+        CommonOperations.validatePath(simulationName);
         try (BufferedWriter writer = Files.newBufferedWriter(Paths.get(destination, (simulationName + "." +
                 EventSimulatorConstants.SIMULATION_FILE_EXTENSION)))) {
             writer.write(simulationConfig);
@@ -122,6 +124,7 @@ public class SimulationConfigUploader {
      */
     public String getSimulationConfig(String simulationName, String destination) throws FileOperationsException {
         try {
+            CommonOperations.validatePath(simulationName);
             return new String(Files.readAllBytes(Paths.get(destination, (simulationName + "." +
                     EventSimulatorConstants.SIMULATION_FILE_EXTENSION))),
                     StandardCharsets.UTF_8);
@@ -150,12 +153,18 @@ public class SimulationConfigUploader {
                     return configuration.getJSONObject(EventSimulatorConstants.EVENT_SIMULATION_PROPERTIES)
                             .getString(EventSimulatorConstants.EVENT_SIMULATION_NAME);
                 } else {
-                    throw new InvalidConfigException("Simulation name is required for event simulation. Invalid " +
-                            "simulation configuration provided : " + configuration.toString());
+                    throw new InvalidConfigException(
+                                    ResourceNotFoundException.ResourceType.SIMULATION,
+                                    EventSimulatorConstants.EVENT_SIMULATION_NAME,
+                                    "Simulation name is required for event simulation. Invalid " +
+                                    "simulation configuration provided : " + configuration.toString());
                 }
             } else {
-                throw new InvalidConfigException("Simulation properties are required for event simulation. Invalid " +
-                        "simulation configuration provided : " + configuration.toString());
+                throw new InvalidConfigException(
+                                ResourceNotFoundException.ResourceType.SIMULATION,
+                                EventSimulatorConstants.PROPERTIES_RESOURCE_NAME,
+                                "Simulation properties are required for event simulation. Invalid " +
+                                "simulation configuration provided : " + configuration.toString());
             }
         } catch (JSONException e) {
             throw new InvalidConfigException("Invalid simulation configuration provided : " + simulationConfig, e);

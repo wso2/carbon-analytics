@@ -23,9 +23,11 @@ import {Link, Redirect} from 'react-router-dom';
 import StatusDashboardAPIS from '../utils/apis/StatusDashboardAPIs';
 import {HttpStatus} from '../utils/Constants';
 import Header from '../common/Header';
+import '../../public/css/dashboard.css';
 // Material UI
 import HomeButton from 'material-ui/svg-icons/action/home';
 import {Dialog, FlatButton, RaisedButton, Snackbar, TextField} from 'material-ui';
+import {Button, Typography} from 'material-ui-next';
 // CSS
 import '../../public/css/dashboard.css';
 import AuthenticationAPI from '../utils/apis/AuthenticationAPI';
@@ -42,6 +44,20 @@ const successMessageStyle = {backgroundColor: "#4CAF50", color: "white"};
 const buttonStyle = {marginLeft: 10, width: '30%', fontSize: '8px'};
 const popupButtonStyle = {marginLeft: 25, width: '30%', fontSize: '8px'};
 const textField = {width: 650};
+
+const styles = {
+    root: {display: 'flex', flexWrap: 'wrap', justifyContent: 'space-around', backgroundColor: '#222222'},
+    gridList: {width: '100%', padding: '40px 24px', margin: 0},
+    h3Title: {color: '#dedede', marginLeft: '24px', fontWeight: '400'},
+    titleStyle: {fontSize: 18, lineHeight: 1.5, color: '#FF3D00'},
+    headerStyle: {height: 30, backgroundColor: '#242424'},
+    paper: {height: 50, width: 500, textAlign: 'center'},
+    divider: {backgroundColor: '#9E9E9E', width: 'calc(100% - 48px)', margin: '-22px 24px 0 24px'},
+    navBtn: {color: '#BDBDBD', padding: '0 10px', verticalAlign: 'middle', textTransform: 'capitalize'},
+    navBtnActive: {color: '#f17b31', display: 'inline-block', verticalAlign: 'middle', textTransform: 'capitalize',
+        padding: '0 10px'},
+    navBar: {padding: '0 15px'},
+};
 
 /**
  * class which manages add worker functionality.
@@ -122,14 +138,11 @@ export default class AddWorker extends React.Component {
 
         let that = this;
         let nodeID = this.refs.host.input.value + "_" + this.refs.port.input.value;
-        console.log(this.refs.host.input.value, this.refs.port.input.value);
-
 
         if (this.refs.port.input.value > 0 && this.refs.port.input.value <= 65535) {
             StatusDashboardAPIS.getRuntimeEnv(nodeID)
                 .then((response) => {
                     if (response.status = HttpStatus.OK) {
-                        console.log(response.data);
                         if (response.data === "manager") {
                             that._addManager(nodeID);
                         } else if (response.data === "worker") {
@@ -164,7 +177,7 @@ export default class AddWorker extends React.Component {
                     } else {
                         this.setState({
                             isApiCalled: true,
-                            statusMessage: "Unknown error occurred!"
+                            statusMessage: error.response.data.message
                         })
                     }
                 }
@@ -236,7 +249,7 @@ export default class AddWorker extends React.Component {
                 } else {
                     this.setState({
                         isApiCalled: true,
-                        statusMessage: "Unknown error occurred!"
+                        statusMessage: error.response.data.message
                     })
                 }
             }
@@ -296,7 +309,7 @@ export default class AddWorker extends React.Component {
                 } else {
                     this.setState({
                         isApiCalled: true,
-                        statusMessage: "Unknown error occurred!"
+                        statusMessage: error.response.data.message
                     })
                 }
             }
@@ -424,15 +437,17 @@ export default class AddWorker extends React.Component {
                     </Dialog>
 
                     <Header/>
-                    <div className="navigation-bar">
-                        <Link to={window.contextPath}><FlatButton label="Overview >"
-                                                                  icon={<HomeButton color="black"/>}/>
+                    <div style={styles.navBar} className="navigation-bar">
+                        <Link style={{textDecoration: 'none'}} to={window.contextPath}>
+                            <Button style={styles.navBtn}>
+                                <HomeButton style={{paddingRight: 8, color: '#BDBDBD'}}/>
+                                Overview >
+                            </Button>
                         </Link>
-                        <RaisedButton label="Add New" disabled disabledLabelColor='white'
-                                      disabledBackgroundColor='#f17b31'/>
+                        <Typography style={styles.navBtnActive}>Add New</Typography>
                     </div>
                     <MuiThemeProvider muiTheme={muiTheme}>
-                        <div>
+                        <div className="addWorker-container">
                             <FormPanel title={"Let's add a new node"} onSubmit={this._handleSubmit} width={650}>
                                 <TextField floatingLabelFocusStyle={{color: '#f17b31'}}
                                            underlineFocusStyle={{borderColor: '#f17b31'}}

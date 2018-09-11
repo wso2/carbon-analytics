@@ -25,8 +25,6 @@ import org.wso2.siddhi.core.stream.output.sink.SinkHandlerCallback;
 import org.wso2.siddhi.query.api.definition.StreamDefinition;
 
 import java.util.Map;
-import java.util.Queue;
-import java.util.concurrent.LinkedBlockingQueue;
 
 /**
  * Implementation of {@link SinkHandler} used for 2 node minimum HA
@@ -35,127 +33,63 @@ public class HACoordinationSinkHandler extends SinkHandler {
     private static final Logger log = Logger.getLogger(HACoordinationSinkHandler.class);
 
     private boolean isActiveNode;
-    private boolean isForcePublishing;
     private long lastPublishedEventTimestamp = 0L;
-    private Queue<Event> passiveNodeProcessedEvents;
     private String sinkHandlerElementId;
-    private boolean isQueueFlushing;
-    private final Object lockObject = new Object();
-    private SinkHandlerCallback sinkHandlerCallBack;
 
-    private static final String SINK = "sink";
-    private static final String DISTRIBUTION = "distribution";
-    private static final String FORCE_PUBLISH = "forcePublish";
-    private static final String TRUE = "TRUE";
-
-    private final int queueCapacity;
 
     /**
      * Constructor.
      *
-     * @param queueCapacity is the size of the queue that would hold events in the Passive Node
      */
-    public HACoordinationSinkHandler(int queueCapacity) {
-        this.queueCapacity = queueCapacity;
-        passiveNodeProcessedEvents = new LinkedBlockingQueue<>(queueCapacity);
+    public HACoordinationSinkHandler() {
     }
 
     @Override
     public void init(String sinkHandlerElementId, StreamDefinition streamDefinition,
                      SinkHandlerCallback sinkHandlerCallback) {
         this.sinkHandlerElementId = sinkHandlerElementId;
-        this.sinkHandlerCallBack = sinkHandlerCallback;
-        setForcePublishing(streamDefinition);
     }
 
     /**
      * Method that would publish events if this is the Active Node.
-     * Will buffer all events if this is the Passive Node.
      *
      * @param event the event to be published.
      * @param sinkHandlerCallback callback that would publish events.
      */
     @Override
     public void handle(Event event, SinkHandlerCallback sinkHandlerCallback) {
-        if (isActiveNode || isForcePublishing) {
-            if (isQueueFlushing) {
-                synchronized (lockObject) {
-                    try {
-                        lockObject.wait();
-                    } catch (InterruptedException e) {
-                        log.error("Error in waiting for buffered events to publish when changing from passive node " +
-                                "to active node.", e);
-                    }
-                }
-            }
+        if (isActiveNode) {
             lastPublishedEventTimestamp = event.getTimestamp();
             sinkHandlerCallback.mapAndSend(event);
-        } else {
-            synchronized (this) {
-                boolean eventBuffered = passiveNodeProcessedEvents.offer(event);
-                if (!eventBuffered) { //Handles if the queue is full
-                    passiveNodeProcessedEvents.remove();
-                    passiveNodeProcessedEvents.add(event);
-                }
-            }
         }
     }
 
     /**
      * Method that would publish events if this is the Active Node.
-     * Will buffer all events if this is the Passive Node.
      *
      * @param events the event array to be published.
      * @param sinkHandlerCallback callback that would publish events.
      */
     @Override
     public void handle(Event[] events, SinkHandlerCallback sinkHandlerCallback) {
-        if (isActiveNode || isForcePublishing) {
-            if (isQueueFlushing) {
-                synchronized (lockObject) {
-                    try {
-                        lockObject.wait();
-                    } catch (InterruptedException e) {
-                        log.error("Error in waiting for buffered events to publish when changing from passive node " +
-                                "to active node.", e);
-                    }
-                }
-            }
+        if (isActiveNode) {
             lastPublishedEventTimestamp = events[events.length - 1].getTimestamp();
             sinkHandlerCallback.mapAndSend(events);
-        } else {
-            synchronized (this) {
-                int sizeAfterUpdate = passiveNodeProcessedEvents.size() + events.length;
-                if (sizeAfterUpdate >= queueCapacity) {
-                    for (int i = queueCapacity; i < sizeAfterUpdate; i++) {
-                        passiveNodeProcessedEvents.remove();
-                    }
-                }
-                for (Event event : events) {
-                    passiveNodeProcessedEvents.add(event);
-                }
-            }
         }
     }
 
     /**
      * Method to change the sink handler to Active state so that publishing of events is commenced.
-     * The currently buffered events will be published since it holds the events that the active node may not
-     * have published yet. This might lead to event duplication but guarantees no events are dropped.
-     * Will only be called when this node is the Passive Node.
      */
     public void setAsActive() {
-        //When passive node becomes active, queued events should be published before any other events are processed
-        this.isQueueFlushing = true;
         this.isActiveNode = true;
-        Event event;
-        while ((event = passiveNodeProcessedEvents.poll()) != null) {
-            sinkHandlerCallBack.mapAndSend(event);
-        }
-        this.isQueueFlushing = false;
-        synchronized (lockObject) {
-            lockObject.notifyAll();
-        }
+    }
+
+    /**
+     * Method to change the sink handler to Passive so that events will not be published.
+     */
+    public void setAsPassive() {
+        this.isActiveNode = false;
     }
 
     /**
@@ -167,22 +101,6 @@ public class HACoordinationSinkHandler extends SinkHandler {
     public long getActiveNodeLastPublishedTimestamp() {
         //Since both nodes deploy same siddhi apps, every sink handler will get the same element Id in both nodes
         return lastPublishedEventTimestamp;
-    }
-
-    /**
-     * Method that removes the events from the queue that the active node has already published
-     *
-     * @param activeLastPublishedTimestamp timestamp of the last event the active node published from the given sink
-     */
-    public void trimPassiveNodeEventQueue(long activeLastPublishedTimestamp) {
-        while (passiveNodeProcessedEvents.peek() != null &&
-                passiveNodeProcessedEvents.peek().getTimestamp() <= activeLastPublishedTimestamp) {
-            passiveNodeProcessedEvents.remove();
-        }
-    }
-
-    public Queue<Event> getPassiveNodeProcessedEvents() {
-        return passiveNodeProcessedEvents;
     }
 
     @Override
@@ -201,26 +119,4 @@ public class HACoordinationSinkHandler extends SinkHandler {
         return sinkHandlerElementId;
     }
 
-    /**
-     * Method that would enable force publishing data regardless of the Node's mode,
-     * only when forcePublish is set to true
-     *
-     * @param streamDefinition the stream definition based on which, a sink is identified
-     */
-    private void setForcePublishing(StreamDefinition streamDefinition) {
-        streamDefinition.getAnnotations().forEach(streamAnnotation -> {
-            if (streamAnnotation.getName().equalsIgnoreCase(SINK)) {
-                streamAnnotation.getAnnotations().forEach(sinkAnnotation -> {
-                    if (sinkAnnotation.getName().equalsIgnoreCase(DISTRIBUTION)) {
-                        sinkAnnotation.getElements().forEach(distributedSinkElement -> {
-                            if (distributedSinkElement.getKey().equalsIgnoreCase(FORCE_PUBLISH)) {
-                                this.isForcePublishing =
-                                        distributedSinkElement.getValue().equalsIgnoreCase(TRUE);
-                            }
-                        });
-                    }
-                });
-            }
-        });
-    }
 }

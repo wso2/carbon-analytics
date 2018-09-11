@@ -31,4 +31,6 @@ import javax.ws.rs.core.Response;
         date = "2018-02-03T14:53:27.713Z")
 public abstract class WorkersApiService {
     public abstract Response getWorkers(Request request) throws NotFoundException;
+
+    public abstract Response getClusteredWorkerNodeDetails(Request request) throws NotFoundException;
 }

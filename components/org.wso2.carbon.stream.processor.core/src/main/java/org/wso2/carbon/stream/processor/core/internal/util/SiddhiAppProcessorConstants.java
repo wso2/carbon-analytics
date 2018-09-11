@@ -33,6 +33,21 @@ public class SiddhiAppProcessorConstants {
     public static final String WSO2_ARTIFACT_DEPLOYMENT_NS = "wso2.artifact.deployment";
     public static final String WSO2_ARTIFACT_DEPLOYMENT_REPOSITORY_LOCATION = "repositoryLocation";
 
+    public static final String ANALYTICS_SOLUTIONS = "analytics.solutions";
+
+    public static final String WSO2_SERVER_TYPE = "type";
+    public static final String WSO2_SERVER_TYPE_SP = "wso2-sp";
+    public static final String WSO2_SERVER_TYPE_APIM_ANALYTICS = "wso2-apim-analytics";
+    public static final String WSO2_SERVER_TYPE_IS_ANALYTICS = "wso2-is-analytics";
+    public static final String WSO2_SERVER_TYPE_EI_ANALYTICS = "wso2-ei-analytics";
+
+    public static final String APIM_ANALYTICS_ENABLED = "APIM-analytics.enabled";
+    public static final String IS_ANALYTICS_ENABLED = "IS-analytics.enabled";
+    public static final String EI_ANALYTICS_ENABLED = "EI-analytics.enabled";
+
+    public static final String APIM_SIDDHI_APP_PREFIX = "APIM_";
+    public static final String IS_SIDDHI_APP_PREFIX = "IS_";
+    public static final String EI_SIDDHI_APP_PREFIX = "EI_";
 
     /**
      * Runtime modes of Stream Processor engine

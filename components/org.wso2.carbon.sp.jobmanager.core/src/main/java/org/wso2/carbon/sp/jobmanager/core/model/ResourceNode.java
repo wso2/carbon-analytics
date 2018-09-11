@@ -29,9 +29,15 @@ public class ResourceNode implements Serializable {
     private static final long serialVersionUID = 7198320219118722368L;
     private String id;
     private String state;
-    private InterfaceConfig httpInterface;
+    private InterfaceConfig httpsInterface;
+    private boolean isReceiverNode = false;
+    private boolean metricsUpdated = false;
     private long lastPingTimestamp;
     private int failedPingAttempts;
+    private double processCPU;
+    private double systemCPU;
+    private double loadAverage;
+    private double memoryUsage;
 
     public ResourceNode(String id) {
         this.id = id;
@@ -55,13 +61,12 @@ public class ResourceNode implements Serializable {
         this.state = state;
     }
 
-
-    public InterfaceConfig getHttpInterface() {
-        return httpInterface;
+    public InterfaceConfig getHttpsInterface() {
+        return httpsInterface;
     }
 
-    public void setHttpInterface(InterfaceConfig httpInterface) {
-        this.httpInterface = httpInterface;
+    public void setHttpsInterface(InterfaceConfig httpsInterface) {
+        this.httpsInterface = httpsInterface;
     }
 
     public long getLastPingTimestamp() {
@@ -72,6 +77,14 @@ public class ResourceNode implements Serializable {
         this.lastPingTimestamp = System.currentTimeMillis();
     }
 
+    public void updateResourceMetrics(WorkerMetrics workerMetrics) {
+        metricsUpdated = true;
+        processCPU = workerMetrics.getProcessCPU();
+        systemCPU = workerMetrics.getSystemCPU();
+        loadAverage = workerMetrics.getLoadAverage();
+        memoryUsage = workerMetrics.getTotalMemory();
+    }
+
     public int getFailedPingAttempts() {
         return failedPingAttempts;
     }
@@ -80,14 +93,39 @@ public class ResourceNode implements Serializable {
         failedPingAttempts = 0;
     }
 
+    public boolean isReceiverNode() {
+        return isReceiverNode;
+    }
+
+    public void setReceiverNode(boolean receiverNode) {
+        isReceiverNode = receiverNode;
+    }
+
     public void incrementFailedPingAttempts() {
         failedPingAttempts += 1;
     }
 
+    public boolean isMetricsUpdated() {
+        return metricsUpdated;
+    }
+
+    public double getProcessCPU() {
+        return processCPU;
+    }
+
+    public double getSystemCPU() {
+        return systemCPU;
+    }
+
+    public double getLoadAverage() {
+        return loadAverage;
+    }
+
+
     @Override
     public String toString() {
         return String.format("ResourceNode { id: %s, host: %s, port: %s }",
-                getId(), getHttpInterface().getHost(), getHttpInterface().getPort());
+                getId(), getHttpsInterface().getHost(), getHttpsInterface().getPort());
     }
 
     @Override
@@ -106,15 +144,18 @@ public class ResourceNode implements Serializable {
         if (getState() != null ? !getState().equals(that.getState()) : that.getState() != null) {
             return false;
         }
-        return getHttpInterface() != null
-                ? getHttpInterface().equals(that.getHttpInterface()) : that.getHttpInterface() == null;
+        if (isReceiverNode() != that.isReceiverNode) {
+            return false;
+        }
+        return getHttpsInterface() != null
+                ? getHttpsInterface().equals(that.getHttpsInterface()) : that.getHttpsInterface() == null;
     }
 
     @Override
     public int hashCode() {
         // Do not consider lastPingTimestamp and failedPingAttempts for the hash method.
         int result = getId() != null ? getId().hashCode() : 0;
-        result = 31 * result + (getHttpInterface() != null ? getHttpInterface().hashCode() : 0);
+        result = 31 * result + (getHttpsInterface() != null ? getHttpsInterface().hashCode() : 0);
         return result;
     }
 }

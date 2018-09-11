@@ -53,6 +53,7 @@ public class ResourceManagerApiServiceImpl extends ResourceManagerApiService {
 
     @Override
     public Response updateHeartbeat(NodeConfig nodeConfig) {
+        boolean isReceiverNode = nodeConfig.isReceiverNode();
         if (ServiceDataHolder.getCoordinator() == null) { // When clustering is disabled
             ManagerNode leaderNode = ServiceDataHolder.getLeaderNode();
             if (leaderNode == null) {
@@ -89,24 +90,29 @@ public class ResourceManagerApiServiceImpl extends ResourceManagerApiService {
                 for (NodeDetail nodeDetail : clusterCoordinator.getAllNodeDetails()) {
                     if (nodeDetail.getPropertiesMap() != null) {
                         Map<String, Object> propertiesMap = nodeDetail.getPropertiesMap();
-                        String httpInterfaceHost = (String) propertiesMap.get(ResourceManagerConstants.KEY_NODE_HOST);
-                        int httpInterfacePort = (int) propertiesMap.get(ResourceManagerConstants.KEY_NODE_PORT);
-                        String httpInterfaceUsername = (String) propertiesMap.get(
+                        String httpsInterfaceHost = (String) propertiesMap.get(ResourceManagerConstants.KEY_NODE_HOST);
+                        int httpsInterfacePort = (int) propertiesMap.get(ResourceManagerConstants.KEY_NODE_PORT);
+                        String httpsInterfaceUsername = (String) propertiesMap.get(
                                 ResourceManagerConstants.KEY_NODE_USERNAME);
-                        String httpInterfacePassword = (String) propertiesMap.get(
+                        String httpsInterfacePassword = (String) propertiesMap.get(
                                 ResourceManagerConstants.KEY_NODE_PASSWORD);
                         InterfaceConfig interfaceConfig = new InterfaceConfig();
-                        interfaceConfig.setHost(httpInterfaceHost);
-                        interfaceConfig.setPort(httpInterfacePort);
-                        interfaceConfig.setUsername(httpInterfaceUsername);
-                        interfaceConfig.setPassword(httpInterfacePassword);
+                        interfaceConfig.setHost(httpsInterfaceHost);
+                        interfaceConfig.setPort(httpsInterfacePort);
+                        interfaceConfig.setUsername(httpsInterfaceUsername);
+                        interfaceConfig.setPassword(httpsInterfacePassword);
                         connectedManagers.add(interfaceConfig);
                     }
                 }
             } else {
-                connectedManagers.add(TypeConverter.convert(ServiceDataHolder.getCurrentNode().getHttpInterface()));
+                connectedManagers.add(TypeConverter.convert(ServiceDataHolder.getCurrentNode().getHttpsInterface()));
             }
-            ResourceNode existingResourceNode = resourcePool.getResourceNodeMap().get(nodeConfig.getId());
+            ResourceNode existingResourceNode;
+            if (isReceiverNode) {
+                existingResourceNode = resourcePool.getReceiverNodeMap().get(nodeConfig.getId());
+            } else {
+                existingResourceNode = resourcePool.getResourceNodeMap().get(nodeConfig.getId());
+            }
             HeartbeatResponse.JoinedStateEnum joinedState = (existingResourceNode == null)
                     ? HeartbeatResponse.JoinedStateEnum.NEW
                     : HeartbeatResponse.JoinedStateEnum.EXISTS;
@@ -114,12 +120,23 @@ public class ResourceManagerApiServiceImpl extends ResourceManagerApiService {
             if (existingResourceNode == null) {
                 ResourceNode resourceNode = new ResourceNode(nodeConfig.getId());
                 resourceNode.setState(HeartbeatResponse.JoinedStateEnum.EXISTS.toString());
-                resourceNode.setHttpInterface(TypeConverter.convert(nodeConfig.getHttpInterface()));
-                resourcePool.addResourceNode(resourceNode);
+                resourceNode.setHttpsInterface(TypeConverter.convert(nodeConfig.getHttpsInterface()));
+                if (nodeConfig.getWorkerMetrics() != null) {
+                    resourceNode.updateResourceMetrics(nodeConfig.getWorkerMetrics());
+                }
+                if (isReceiverNode) {
+                    resourceNode.setReceiverNode(true);
+                    resourcePool.addReceiverNode(resourceNode);
+                } else {
+                    resourcePool.addResourceNode(resourceNode);
+                }
             } else {
-                InterfaceConfig existingIFace = TypeConverter.convert(existingResourceNode.getHttpInterface());
-                InterfaceConfig currentIFace = nodeConfig.getHttpInterface();
+                InterfaceConfig existingIFace = TypeConverter.convert(existingResourceNode.getHttpsInterface());
+                InterfaceConfig currentIFace = nodeConfig.getHttpsInterface();
                 if (currentIFace.equals(existingIFace)) {
+                    if (nodeConfig.getWorkerMetrics() != null) {
+                        existingResourceNode.updateResourceMetrics(nodeConfig.getWorkerMetrics());
+                    }
                     existingResourceNode.updateLastPingTimestamp();
                     boolean redeploy = false;
                     if (ResourceManagerConstants.STATE_NEW.equalsIgnoreCase(existingResourceNode.getState())) {
@@ -136,7 +153,7 @@ public class ResourceManagerApiServiceImpl extends ResourceManagerApiService {
                             joinedState = HeartbeatResponse.JoinedStateEnum.EXISTS;
                         }
                     }
-                    resourcePool.notifyResourceNode(nodeConfig.getId(), redeploy);
+                    resourcePool.notifyResourceNode(nodeConfig.getId(), redeploy, isReceiverNode);
                 } else {
                     // If existing node and the current node have the same nodeId, but different interfaces,
                     // Then reject new node from joining the resource pool.

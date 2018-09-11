@@ -20,6 +20,7 @@
 import React from 'react';
 import {Link} from 'react-router-dom';
 //Material UI
+import {Typography} from 'material-ui-next';
 import {GridList} from 'material-ui/GridList';
 import Info from 'material-ui/svg-icons/action/info';
 import HomeButton from 'material-ui/svg-icons/action/home';
@@ -37,12 +38,19 @@ import {HttpStatus} from '../utils/Constants';
 
 const styles = {
     root: {display: 'flex', flexWrap: 'wrap', justifyContent: 'space-around', backgroundColor: '#222222'},
-    gridList: {width: '90%', height: '100%', overflowY: 'auto', padding: 40},
-    h3: {color: 'white', marginLeft: '4%', backgroundColor: '#222222'},
+    gridList: {width: '100%', padding: '40px 24px', margin: 0},
+    h3: {color: '#dedede', marginLeft: '24px', fontWeight: '400'},
     titleStyle: {fontSize: 18, lineHeight: 1.5, color: '#FF3D00'},
     headerStyle: {height: 30, backgroundColor: '#242424'},
     paper: {height: 50, width: 500, textAlign: 'center'},
-    background: {backgroundColor: '#222222'}
+    background: {backgroundColor: '#222222'},
+    divider: {
+        backgroundColor: '#9E9E9E',
+        width: 'calc(100% - 48px)',
+        margin: '-10px 24px 0 24px',
+        marginLeft: '25px',
+        marginTop: '10px'
+    },
 };
 const errorTitleStyles = {
     color: "#c7cad1",
@@ -225,15 +233,18 @@ export default class DistributedOverview extends React.Component {
             }
         } else if (this.state.isApiCalled && DistributedOverview.hasApps(this.state.clustersList)) {
             return <div style={styles.background}>
-                <div style={{height: 20, padding: 20, backgroundColor: '#222222'}}>
-
-                </div>
-
-                <div>
-                    <h3 style={styles.h3}>Parent Siddhi Application</h3>
-                    <Divider inset={true} style={{width: '90%'}}/>
+                <div style={{padding: '24px'}}>
+                    <Typography variant="display2" className={'node-title'} style={{
+                        marginTop: '20px',
+                        color: '#dedede',
+                        marginLeft: '24px',
+                        backgroundColor: '#222222',
+                        fontSize: '1.6rem'
+                    }}>Parent Siddhi Application</Typography>
+                    <Divider inset={true} style={styles.divider}/>
                     <div style={styles.root}>
-                        <GridList cols={3} padding={50} cellHeight={300} style={styles.gridList}>
+                        <GridList className={'node-wrapper'} cols={3} cellHeight='100%'
+                                  style={styles.gridList}>
                             {Object.keys(appList).map(key => {
                                 return (
 

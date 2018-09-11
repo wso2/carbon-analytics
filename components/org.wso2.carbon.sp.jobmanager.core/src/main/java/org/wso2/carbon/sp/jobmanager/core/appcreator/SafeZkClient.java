@@ -43,15 +43,16 @@ class SafeZkClient {
      * @param zooKeeperServerUrls server URL
      * @return a new Zookeeper client
      */
-    public ZkUtils createZkClient(String[] zooKeeperServerUrls, boolean isSecureKafkaCluster) {
+    public ZkUtils createZkClient(String[] zooKeeperServerUrls, boolean isSecureKafkaCluster, int sessionTimeout,
+                                  int connectionTimeout) {
         for (String zooKeeperServerUrl : zooKeeperServerUrls) {
             try {
                 zkClient = new ZkClient(
-                        zooKeeperServerUrl, 10000, 5000, ZKStringSerializer$.MODULE$);
+                        zooKeeperServerUrl, sessionTimeout, connectionTimeout, ZKStringSerializer$.MODULE$);
                 zkUtils = new ZkUtils(zkClient, new ZkConnection(zooKeeperServerUrl), isSecureKafkaCluster);
                 break;
             } catch (ZkTimeoutException e) {
-                log.error("Zookeeper server at " + zooKeeperServerUrl + " can not be reached.");
+                log.error("Zookeeper server at " + zooKeeperServerUrl + " can not be reached.", e);
             }
         }
         if (zkUtils != null) {

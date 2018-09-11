@@ -17,111 +17,118 @@
  *
  */
 
-import React from "react";
-import {Link} from "react-router-dom";
+import React from 'react';
+import {Link, Redirect} from 'react-router-dom';
 //App Components
-import StatusDashboardAPIS from "../utils/apis/StatusDashboardAPIs";
-import ChartCard from "../common/ChartCard";
-import Header from "../common/Header";
+import StatusDashboardAPIS from '../utils/apis/StatusDashboardAPIs';
+import ChartCard from '../common/ChartCard';
+import Header from '../common/Header';
 import {ComponentType} from '../utils/Constants';
 //Material UI
-import {Toolbar, ToolbarGroup} from "material-ui/Toolbar";
-import HomeButton from "material-ui/svg-icons/action/home";
-import {Card, CardHeader, CardMedia, Divider, FlatButton, RaisedButton} from "material-ui";
-import DashboardUtils from "../utils/DashboardUtils";
-import { Redirect } from 'react-router-dom';
-import AuthenticationAPI from "../utils/apis/AuthenticationAPI";
-import AuthManager from "../auth/utils/AuthManager";
-import Error403 from "../error-pages/Error403";
-const styles = {button: {margin: 12, backgroundColor: '#f17b31',fontSize:10}};
-const toolBar = {width: '50%', marginLeft: '50%', padding: 20, backgroundColor: '#424242'};
+import {Toolbar, ToolbarGroup} from 'material-ui/Toolbar';
+import HomeButton from 'material-ui/svg-icons/action/home';
+import {Card, CardHeader, CardMedia, Divider, FlatButton, RaisedButton} from 'material-ui';
+import {Button, Typography} from 'material-ui-next';
+import AuthenticationAPI from '../utils/apis/AuthenticationAPI';
+import AuthManager from '../auth/utils/AuthManager';
+import Error403 from '../error-pages/Error403';
+
+const styles = {
+    navBar: {padding: '0 15px'},
+    navBtn: {color: '#BDBDBD', padding: '0 10px', verticalAlign: 'middle', textTransform: 'capitalize'},
+    navBtnActive: {color: '#f17b31', display: 'inline-block', verticalAlign: 'middle', textTransform: 'capitalize',
+        padding: '0 10px'},
+    titleStyle: {fontSize: '1.6rem', margin: '20px 0 0 24px', color: '#dedede', textTransform: 'capitalize'},
+    button: {margin: 0, fontSize: 10, borderLeft: '1px solid #4c4c4c', borderRadius: 0}
+};
+const toolBar = {position: 'absolute', top: 85, right: 15, padding: 0, backgroundColor: 'transparent'};
 
 const latencyMetadata = {
-    names: ['Time', 'Count', 'Max', 'Mean', 'Min', 'Standard Deviation', '75th Percentile', '95th Percentile', '99th Percentile', '99.9th Percentile',
-        'Mean Rate', 'M1 Rate', 'M5 Rate', 'M15 Rate'],
+    names: ['Time', 'Max', 'Mean', 'Min', 'Standard Deviation', '75th Percentile', '95th Percentile',
+        '99th Percentile', '99.9th Percentile', 'Mean Rate', '1 Minute Rate', '5 Minutes Rate', '15 Minutes Rate'],
     types: ['time', 'linear', 'linear', 'linear', 'linear', 'linear', 'linear', 'linear', 'linear', 'linear', 'linear',
-        'linear', 'linear', 'linear']
+        'linear', 'linear']
 };
 const latencyLineChartConfig = {
     x: 'Time',
-    charts: [{type: 'area', y: 'Count', fill: '#058DC7',  style: {markRadius: 2}},
-        {type: 'area', y: 'Max', fill: '#50B432',  style: {markRadius: 2}},
-        {type: 'area', y: 'Mean', fill: '#f17b31',  style: {markRadius: 2}},
-        {type: 'area', y: 'Min', fill: '#8c51a5',  style: {markRadius: 2}},
-        {type: 'area', y: 'Standard Deviation', fill: '#FFEB3B',  style: {markRadius: 2}},
-        {type: 'area', y: '75th Percentile', fill: '#70dbed',  style: {markRadius: 2}},
-        {type: 'area', y: '95th Percentile', fill: '#ffb873',  style: {markRadius: 2}},
+    charts: [
+        {type: 'area', y: 'Max', fill: '#50B432', style: {markRadius: 2}},
+        {type: 'area', y: 'Mean', fill: '#f17b31', style: {markRadius: 2}},
+        {type: 'area', y: 'Min', fill: '#8c51a5', style: {markRadius: 2}},
+        {type: 'area', y: 'Standard Deviation', fill: '#FFEB3B', style: {markRadius: 2}},
+        {type: 'area', y: '75th Percentile', fill: '#70dbed', style: {markRadius: 2}},
+        {type: 'area', y: '95th Percentile', fill: '#ffb873', style: {markRadius: 2}},
         {type: 'area', y: '99th Percentile', fill: '#95dd87', style: {markRadius: 2}},
-        {type: 'area', y: '99.9th Percentile',fill: '#890f02', style: {markRadius: 2}},
-        {type: 'area', y: 'Mean Rate', fill: '#ff918f',style: {markRadius: 2}},
-        {type: 'area', y: 'M1 Rate', fill: '#b76969', style: {markRadius: 2}},
-        {type: 'area', y: 'M5 Rate', fill: '#aea2e0', style: {markRadius: 2}},
-        {type: 'area', y: 'M15 Rate',fill: '#FFEB3B', style: {markRadius: 2}}
+        {type: 'area', y: '99.9th Percentile', fill: '#890f02', style: {markRadius: 2}},
+        {type: 'area', y: 'Mean Rate', fill: '#ff918f', style: {markRadius: 2}},
+        {type: 'area', y: '1 Minute Rate', fill: '#b76969', style: {markRadius: 2}},
+        {type: 'area', y: '5 Minutes Rate', fill: '#aea2e0', style: {markRadius: 2}},
+        {type: 'area', y: '15 Minutes Rate', fill: '#FFEB3B', style: {markRadius: 2}}
     ],
     width: 800,
     height: 250,
     style: {
-        tickLabelColor:'#f2f2f2',
+        tickLabelColor: '#f2f2f2',
         legendTextColor: '#9c9898',
         legendTitleColor: '#9c9898',
         axisLabelColor: '#9c9898',
-        legendTextSize:8,
-        legendTitleSize:8
+        legendTextSize: 8,
+        legendTitleSize: 8
     },
-    tipTimeFormat:"%Y-%m-%d %H:%M:%S %Z",
-    legend:true,
+    tipTimeFormat: "%Y-%m-%d %H:%M:%S %Z",
+    legend: true,
     interactiveLegend: true,
     gridColor: '#f2f2f2',
-    xAxisTickCount:10
+    xAxisTickCount: 10
 };
 const memoryMetadata = {names: ['Time', 'Memory'], types: ['time', 'linear']};
 const memoryLineChartConfig = {
     x: 'Time',
-    charts: [{type: 'area', y: 'Memory', fill: '#f17b31',  style: {markRadius: 2}}],
+    charts: [{type: 'area', y: 'Memory', fill: '#f17b31', style: {markRadius: 2}}],
     width: 800,
     height: 250,
     style: {
-        tickLabelColor:'#f2f2f2',
+        tickLabelColor: '#f2f2f2',
         legendTextColor: '#9c9898',
         legendTitleColor: '#9c9898',
         axisLabelColor: '#9c9898',
-        legendTextSize:12,
-        legendTitleSize:12
+        legendTextSize: 10,
+        legendTitleSize: 12
     },
-    tipTimeFormat:"%Y-%m-%d %H:%M:%S %Z",
-    legend:true,
+    tipTimeFormat: "%Y-%m-%d %H:%M:%S %Z",
+    legend: true,
     interactiveLegend: true,
     gridColor: '#f2f2f2',
-    xAxisTickCount:10
+    xAxisTickCount: 10
 };
 const tpMetadata = {
-    names: ['Time', 'Count', 'Mean Rate', 'M1 Rate', 'M5 Rate', 'M15 Rate'],
-    types: ['time', 'linear', 'linear', 'linear', 'linear', 'linear']
+    names: ['Time', 'Mean', '1 Minute', '5 Minutes', '15 Minutes'],
+    types: ['time', 'linear', 'linear', 'linear', 'linear']
 };
 
 const tpLineChartConfig = {
     x: 'Time',
-    charts: [{type: 'area', y: 'Count', fill: '#058DC7', style: {markRadius: 2}},
-        {type: 'area', y: 'Mean Rate', fill: '#50B432', style: {markRadius: 2}},
-        {type: 'area', y: 'M1 Rate', fill: '#f17b31', style: {markRadius: 2}},
-        {type: 'area', y: 'M5 Rate', fill: '#8c51a5', style: {markRadius: 2}},
-        {type: 'area', y: 'M15 Rate', fill: '#FFEB3B', style: {markRadius: 2}}
+    charts: [
+        {type: 'area', y: 'Mean', fill: '#50B432', style: {markRadius: 2}},
+        {type: 'area', y: '1 Minute', fill: '#f17b31', style: {markRadius: 2}},
+        {type: 'area', y: '5 Minutes', fill: '#8c51a5', style: {markRadius: 2}},
+        {type: 'area', y: '15 Minutes', fill: '#FFEB3B', style: {markRadius: 2}}
     ],
     width: 800,
     height: 250,
     style: {
-        tickLabelColor:'#f2f2f2',
+        tickLabelColor: '#f2f2f2',
         legendTextColor: '#9c9898',
         legendTitleColor: '#9c9898',
         axisLabelColor: '#9c9898',
-        legendTextSize:12,
-        legendTitleSize:12
+        legendTextSize: 10,
+        legendTitleSize: 12
     },
-    tipTimeFormat:"%Y-%m-%d %H:%M:%S %Z",
-    legend:true,
+    tipTimeFormat: "%Y-%m-%d %H:%M:%S %Z",
+    legend: true,
     interactiveLegend: true,
     gridColor: '#f2f2f2',
-    xAxisTickCount:10
+    xAxisTickCount: 10
 };
 /**
  * class which manages Siddhi App component history.
@@ -222,7 +229,7 @@ export default class ComponentHistory extends React.Component {
                 }
             }).catch((error) => {
             let message;
-            if(error.response != null) {
+            if (error.response != null) {
                 if (error.response.status === 401) {
                     message = "Authentication fail. Please login again.";
                     this.setState({
@@ -248,7 +255,7 @@ export default class ComponentHistory extends React.Component {
                 });
             }).catch((error) => {
             let message;
-            if(error.response != null) {
+            if (error.response != null) {
                 if (error.response.status === 401) {
                     message = "Authentication fail. Please login again.";
                     this.setState({
@@ -277,10 +284,10 @@ export default class ComponentHistory extends React.Component {
             return <div/>;
         }
         else if ((this.state.componentType === ComponentType.QUERIES || this.state.componentType
-            === ComponentType.STORE_QUERIES ||
-            this.state.componentType === ComponentType.TABLES || this.state.componentType
-            === ComponentType.SINK_MAPPERS ||
-            this.state.componentType === ComponentType.SOURCE_MAPPERS) && this.state.latency.length === 0) {
+                === ComponentType.STORE_QUERIES ||
+                this.state.componentType === ComponentType.TABLES || this.state.componentType
+                === ComponentType.SINK_MAPPERS ||
+                this.state.componentType === ComponentType.SOURCE_MAPPERS) && this.state.latency.length === 0) {
             return (
                 <Card><CardHeader title="Latency(milliseconds)"/><Divider/>
                     <CardMedia>
@@ -307,7 +314,7 @@ export default class ComponentHistory extends React.Component {
             return <div/>;
         }
         else if ((this.state.componentType === ComponentType.QUERIES || this.state.componentType
-            === ComponentType.TABLES) && this.state.memory.length === 0) {
+                === ComponentType.TABLES) && this.state.memory.length === 0) {
             return (
                 <Card><CardHeader title="Memory(bytes)"/><Divider/>
                     <CardMedia>
@@ -331,10 +338,11 @@ export default class ComponentHistory extends React.Component {
             === ComponentType.SINK_MAPPERS) {
             return <div/>;
         }
-        else if ((this.state.componentType === ComponentType.STREAMS || this.state.componentType
-            === ComponentType.TRIGGER
-            || this.state.componentType === ComponentType.TABLES || this.state.componentType === ComponentType.SOURCES
-            || this.state.componentType === ComponentType.SINKS) && this.state.throughput.length === 0) {
+        else if ((this.state.componentType === ComponentType.STREAMS ||
+                this.state.componentType === ComponentType.TRIGGER
+                || this.state.componentType === ComponentType.TABLES ||
+                this.state.componentType === ComponentType.SOURCES
+                || this.state.componentType === ComponentType.SINKS) && this.state.throughput.length === 0) {
             return (
                 <Card><CardHeader title="Throughput(events/second)"/><Divider/>
                     <CardMedia>
@@ -368,16 +376,10 @@ export default class ComponentHistory extends React.Component {
             );
         } else {
             return (
-                <div style={{width: '90%', marginLeft: '10px', paddingTop: 60}}>
-                    <div style={{padding: 30}}>
-                        {this.renderLatencyChart()}
-                    </div>
-                    <div style={{padding: 30}}>
-                        {this.renderMemoryChart()}
-                    </div>
-                    <div style={{padding: 30}}>
-                        {this.renderThroughputChart()}
-                    </div>
+                <div style={{padding: '30px 24px'}}>
+                    {this.renderLatencyChart()}
+                    {this.renderMemoryChart()}
+                    {this.renderThroughputChart()}
                 </div>
             );
         }
@@ -389,26 +391,35 @@ export default class ComponentHistory extends React.Component {
                 <Redirect to={{pathname: `${window.contextPath}/logout`}}/>
             );
         }
-        if(this.state.hasViewerPermission) {
+        if (this.state.hasViewerPermission) {
             return (
                 <div style={{backgroundColor: '#222222'}}>
                     <Header/>
-                    <div className="navigation-bar">
-                        <Link to={window.contextPath}><FlatButton label="Overview >"
-                                                                  icon={<HomeButton color="black"/>}/></Link>
-                        <Link to={window.contextPath + '/worker/' + this.props.match.params.id }>
-                            <FlatButton label={this.state.workerID + " >"}/></Link>
-                        <Link
-                            to={window.contextPath + '/worker/' + this.props.match.params.id + '/siddhi-apps/' +
-                            this.props.match.params.appName + "/" + this.state.statsEnable}>
-                            <FlatButton label={this.props.match.params.appName + " >"}/>
+                    <div style={styles.navBar} className="navigation-bar">
+                        <Link style={{textDecoration: 'none'}} to={window.contextPath}>
+                            <Button style={styles.navBtn}>
+                                <HomeButton style={{paddingRight: 8, color: '#BDBDBD'}}/>
+                                Overview >
+                            </Button>
                         </Link>
-                        <RaisedButton label={this.props.match.params.componentId} disabled disabledLabelColor='white'
-                                      disabledBackgroundColor='#f17b31'/>
+                        <Link style={{textDecoration: 'none'}} to={window.contextPath + '/worker/' +
+                        this.props.match.params.id}>
+                            <Button style={styles.navBtn}>
+                                {this.state.workerID} >
+                            </Button>
+                        </Link>
+                        <Link style={{textDecoration: 'none'}} to={window.contextPath + '/worker/' +
+                        this.props.match.params.id + '/siddhi-apps/' + this.props.match.params.appName + '/' +
+                        this.state.statsEnable}>
+                            <Button style={styles.navBtn}>
+                                {this.props.match.params.appName} >
+                            </Button>
+                        </Link>
+                        <Typography style={styles.navBtnActive}>{this.props.match.params.componentId}</Typography>
                     </div>
-                    <div className="worker-h1">
-                        <h2 style={{marginLeft: 40}}> {this.props.match.params.componentId} Metrics </h2>
-                    </div>
+                    <Typography variant="title" style={styles.titleStyle}>
+                        {this.props.match.params.componentId} Metrics
+                    </Typography>
                     <Toolbar style={toolBar}>
                         <ToolbarGroup firstChild={true}>
                             <RaisedButton label="Last 5 Minutes" backgroundColor={this.setColor('5min')}

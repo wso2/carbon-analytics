@@ -42,4 +42,6 @@ public abstract class ManagersApiService {
     public abstract Response getRolesByUsername(Request request, String permisstionString);
 
     public abstract Response getKafkaDetails(String appName, Request request) throws NotFoundException;
+
+    public abstract Response isActive(Request request) throws NotFoundException;
 }

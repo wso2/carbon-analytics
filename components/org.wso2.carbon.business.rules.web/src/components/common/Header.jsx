@@ -16,7 +16,8 @@
  *  under the License.
  */
 
-import React from 'react';
+import React, { Component } from 'react';
+import PropTypes from 'prop-types';
 import { Link } from 'react-router-dom';
 // Material UI Components
 import Typography from 'material-ui/Typography';
@@ -28,27 +29,42 @@ import AccountCircle from 'material-ui-icons/AccountCircle';
 import HomeIcon from 'material-ui-icons/Home';
 import Menu, { MenuItem } from 'material-ui/Menu';
 import Logo from '../../images/wso2-logo.svg';
-// App Utilities
+// Auth Utils
 import AuthManager from '../../utils/AuthManager';
 // CSS
 import '../../index.css';
 
-// Styles related to this component
+/**
+ * Styles related to this component
+ */
 const styles = {
-    headerStyle: {
-        color: 'white',
-        backgroundColor: '#212121',
-        // width: '100%',
-        // margin: 0
-    }
+    title: {
+        color: '#EEE',
+        fontSize: 16,
+        height: 40,
+        lineHeight: '40px',
+        marginLeft: 15,
+        flex: 1
+    },
+    appBar: {
+        backgroundColor: '#263238',
+        height:40
+    },
+    toolBar: {
+        height: 40,
+        minHeight: '40px'
+    },
 };
 
 /**
- * App context.
+ * App context
  */
 const appContext = window.contextPath;
 
-class Header extends React.Component {
+/**
+ * Represents the Header
+ */
+export default class Header extends Component {
     constructor() {
         super();
         this.state = {
@@ -57,13 +73,13 @@ class Header extends React.Component {
     }
 
     /**
-     * Renders right side elements of the header
-     * @returns {*}
+     * Renders the right side elements of the header
+     * @returns {HTMLElement}       Div with right side elements of the header
      */
     renderRightLinks() {
         const homeButton = (
             <Link
-                style={{textDecoration: 'none'}}
+                style={{ textDecoration: 'none' }}
                 to={`${appContext}/businessRulesManager`}
             >
                 <IconButton color="contrast">
@@ -78,12 +94,12 @@ class Header extends React.Component {
         // Show account icon / login button depending on logged in status
         const user = AuthManager.getUser();
         if (!user) {
-            if(window.location.pathname === appContext + '/login') {
+            if (window.location.pathname === appContext + '/login') {
                 return (<div />);
             }
             return (
                 <Link
-                    style={{textDecoration: 'none'}}
+                    style={{ textDecoration: 'none' }}
                     to={`${appContext}/login?referrer=${window.location.pathname}`}
                 >
                     <Button color="contrast">Login</Button>
@@ -101,7 +117,7 @@ class Header extends React.Component {
                     <IconButton
                         aria-owns={open ? 'menu-appbar' : null}
                         aria-haspopup="true"
-                        onClick={event => {
+                        onClick={(event) => {
                             this.setState({ anchorEl: event.currentTarget });
                         }}
                         color="contrast"
@@ -122,14 +138,14 @@ class Header extends React.Component {
                     }}
                     open={this.state.anchorEl !== null}
                     onRequestClose={() => {
-                        this.setState({ anchorEl: null })
+                        this.setState({ anchorEl: null });
                     }}
                 >
-                    <MenuItem>
-                        <Link to={`${appContext}/logout`} style={{ textDecoration: 'none', color: 'black' }}>
+                    <Link to={`${appContext}/logout`} style={{ textDecoration: 'none', color: 'black' }}>
+                        <MenuItem>
                             Log out
-                        </Link>
-                    </MenuItem>
+                        </MenuItem>
+                    </Link>
                 </Menu>
             </div>
         );
@@ -137,15 +153,12 @@ class Header extends React.Component {
 
     render() {
         return (
-            <AppBar position="static" style={styles.headerStyle}>
-                <Toolbar>
-                    <Link to={`${appContext}/businessRulesManager`} style={{ textDecoration: 'none' }}>
-                        <img height="35" src={Logo} style={{ cursor: 'pointer' }}/>
+            <AppBar position="static" style={styles.appBar}>
+                <Toolbar style={styles.toolBar}>
+                    <Link to={`${appContext}/businessRulesManager`} style={{ textDecoration: 'none', height: 17 }}>
+                        <img height="17" src={Logo} style={{ cursor: 'pointer' }} />
                     </Link>
-                    &nbsp;
-                    &nbsp;
-                    &nbsp;
-                    <Typography type="subheading" color="inherit" style={{ flex: 1 }}>
+                    <Typography type="subheading" style={styles.title}>
                         Business Rules Manager
                     </Typography>
                     {this.renderRightLinks()}
@@ -155,4 +168,12 @@ class Header extends React.Component {
     }
 }
 
-export default Header;
+Header.propTypes = {
+    hideUserSettings: PropTypes.bool,
+    hideHomeButton: PropTypes.bool,
+};
+
+Header.defaultProps = {
+    hideUserSettings: false,
+    hideHomeButton: false,
+};

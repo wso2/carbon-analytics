@@ -46,23 +46,23 @@ import java.util.Map;
         immediate = true
 )
 public class MonitoringRESTApiProvider implements RestApiProvider {
-
+    
     public static final String STATUS_DASHBOARD_APP_NAME = "monitoring";
     private static final Logger logger = LoggerFactory.getLogger(MonitoringRESTApiProvider.class);
-
+    
     private MonitoringApiService dashboardDataProvider;
-
+    
     @Activate
     protected void activate(BundleContext bundleContext) {
         logger.debug("{} activated.", this.getClass().getName());
     }
-
+    
     @Deactivate
     protected void deactivate(BundleContext bundleContext) {
         logger.debug("{} deactivated.", this.getClass().getName());
     }
-
-
+    
+    
     @Reference(
             service = MonitoringApiService.class,
             cardinality = ReferenceCardinality.MANDATORY,
@@ -74,21 +74,21 @@ public class MonitoringRESTApiProvider implements RestApiProvider {
             logger.debug("@Reference(bind) ServicePermissionGrantService");
         }
         this.dashboardDataProvider = monitoringApiService;
-
+        
     }
-
+    
     public void unregisterWorkersApiServiceImpl(MonitoringApiService monitoringApiService) {
         if (logger.isDebugEnabled()) {
             logger.debug("@Reference(unbind) ServicePermissionGrantService");
         }
         this.dashboardDataProvider = null;
     }
-
+    
     @Override
     public String getAppName() {
         return STATUS_DASHBOARD_APP_NAME;
     }
-
+    
     @Override
     public Map<String, Microservice> getMicroservices(App app) {
         Map<String, Microservice> microservices = new HashMap<>(2);

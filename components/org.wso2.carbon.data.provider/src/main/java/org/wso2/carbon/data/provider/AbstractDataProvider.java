@@ -70,6 +70,7 @@ public abstract class AbstractDataProvider implements DataProvider {
     @Override
     public void start() {
         dataPublishingExecutorService.scheduleAtFixedRate(() -> {
+
             publish(this.topic, this.sessionId);
         }, 0, publishingInterval, TimeUnit.SECONDS);
         if (isPurgingEnable) {
@@ -80,13 +81,11 @@ public abstract class AbstractDataProvider implements DataProvider {
     }
 
     public void publishToEndPoint(ArrayList<Object[]> data, String sessionId, String topic) {
-        if (data.size() > 0) {
-            DataModel dataModel = new DataModel(getMetadata(), data.toArray(new Object[0][0]), -1, topic);
-            try {
-                DataProviderEndPoint.sendText(sessionId, new Gson().toJson(dataModel));
-            } catch (IOException e) {
-                LOGGER.error("Failed to deliver message to client " + e.getMessage(), e);
-            }
+        DataModel dataModel = new DataModel(getMetadata(), data.toArray(new Object[0][0]), -1, topic);
+        try {
+            DataProviderEndPoint.sendText(sessionId, new Gson().toJson(dataModel));
+        } catch (IOException e) {
+            LOGGER.error("Failed to deliver message to client " + e.getMessage(), e);
         }
     }
 

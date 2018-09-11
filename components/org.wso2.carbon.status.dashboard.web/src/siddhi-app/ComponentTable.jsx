@@ -17,17 +17,17 @@
  *
  */
 
-import React from "react";
-import {Link} from "react-router-dom";
+import React from 'react';
+import {Link} from 'react-router-dom';
 //App Components
-import DashboardUtils from "../utils/DashboardUtils";
+import DashboardUtils from '../utils/DashboardUtils';
 import VizG from 'react-vizgrammar';
 //Material UI
-import {Table, TableBody, TableFooter, TableHeader, TableHeaderColumn, TableRow, TableRowColumn} from "material-ui";
-import StatusDashboardOverViewAPI from "../utils/apis/StatusDashboardOverViewAPI";
+import {Table, TableBody, TableFooter, TableHeader, TableHeaderColumn, TableRow, TableRowColumn} from 'material-ui';
+import StatusDashboardOverViewAPI from '../utils/apis/StatusDashboardOverViewAPI';
 
 const styles = {
-    header: {color: '#dedede'},
+    header: {color: '#dedede', fontSize: 14, fontWeight: 500},
     tableRow: {
         borderLeft: '1px solid rgb(120, 120, 120)'
     },
@@ -39,9 +39,9 @@ const styles = {
 const metadata = {names: ['Time', 'value'], types: ['time', 'linear']};
 const sparkLineConfig = {
     x: 'Time',
-    charts: [{type: 'spark-area', y: 'value', fill: '#f17b31',fillOpacity:'0.1'}],
-    strokeWidth:1,
-    fillOpacity:0.1
+    charts: [{type: 'spark-area', y: 'value', fill: '#f17b31', fillOpacity: '0.1'}],
+    strokeWidth: 1,
+    fillOpacity: 0.1
 };
 
 /**
@@ -73,9 +73,10 @@ export default class ComponentTable extends React.Component {
                 <Table>
                     <TableHeader displaySelectAll={false}
                                  adjustForCheckbox={false}>
-                        <TableRow >
+                        <TableRow>
                             <TableHeaderColumn style={styles.header}>Type</TableHeaderColumn>
                             <TableHeaderColumn style={styles.header}>Name</TableHeaderColumn>
+                            <TableHeaderColumn style={styles.header}>Total Events(events)</TableHeaderColumn>
                             <TableHeaderColumn style={styles.header}>Metric Type</TableHeaderColumn>
                             <TableHeaderColumn style={styles.header}>Value</TableHeaderColumn>
                         </TableRow>
@@ -94,10 +95,11 @@ export default class ComponentTable extends React.Component {
             <Table selectable={false}>
                 <TableHeader displaySelectAll={false}
                              adjustForCheckbox={false}>
-                    <TableRow >
-                        <TableHeaderColumn style={styles.header}>Type</TableHeaderColumn>
-                        <TableHeaderColumn style={styles.header}>Name</TableHeaderColumn>
-                        <TableHeaderColumn style={styles.header}>Metric Type</TableHeaderColumn>
+                    <TableRow>
+                        <TableHeaderColumn width={'25%'} style={styles.header}>Type</TableHeaderColumn>
+                        <TableHeaderColumn width={'25%'} style={styles.header}>Name</TableHeaderColumn>
+                        <TableHeaderColumn width={'11.4%'} style={styles.header}>Total Events(events)</TableHeaderColumn>
+                        <TableHeaderColumn width={'19.25%'} style={styles.header}>Metric Type</TableHeaderColumn>
                         <TableHeaderColumn style={styles.header}>Value</TableHeaderColumn>
                     </TableRow>
                 </TableHeader>
@@ -108,7 +110,7 @@ export default class ComponentTable extends React.Component {
                                 borderBottom: '2px solid rgb(200, 200, 200)',
                             }}>
                                 <TableRowColumn
-                                    style={{fontSize: '20px', width: '25%'}}>{component.type}</TableRowColumn>
+                                    style={{width: '25%'}}>{component.type}</TableRowColumn>
                                 <TableRowColumn style={{paddingLeft: 0, paddingRight: 0, width: '75%'}}>
                                     {component.data.map((components, index) => {
                                         if (index + 1 === component.data.length) {
@@ -123,7 +125,15 @@ export default class ComponentTable extends React.Component {
                                                                style={{backgroundColor: '#131313', cursor: 'pointer'}}>
                                                         <TableRow style={styles.tableRow}>
                                                             <TableRowColumn
-                                                                style={{width: '33.33%'}}>{components.name}</TableRowColumn>
+                                                                style={{
+                                                                    width: '33.33%',
+                                                                    borderLeft: '1px solid white'
+                                                                }}>{components.name}</TableRowColumn>
+                                                            <TableRowColumn
+                                                                style={{
+                                                                    width: '15%',
+                                                                    borderLeft: '1px solid white'
+                                                                }}>{components.totalEvents}</TableRowColumn>
                                                             <TableRowColumn style={{paddingLeft: 0, paddingRight: 0}}>
                                                                 {components.metrics.map((metric, index) => {
                                                                     if (index + 1 === components.metrics.length) {
@@ -172,24 +182,31 @@ export default class ComponentTable extends React.Component {
                                                                                                                             width: '50%',
                                                                                                                             float: 'right'
                                                                                                                         }}>
-                                                                                                                        <div style={{width: '100px', height: '48px'}}>
-                                                                                                                        <VizG
-                                                                                                                            data={metric.attribute.recentValues}
-                                                                                                                            metadata={metadata}
-                                                                                                                            config={sparkLineConfig}
-                                                                                                                            yDomain={DashboardUtils.getYDomain(metric.attribute.recentValues)}
-                                                                                                                            width={100}
-                                                                                                                            height={50}
-                                                                                                                        />
+                                                                                                                        <div
+                                                                                                                            style={{
+                                                                                                                                width: '100px',
+                                                                                                                                height: '48px'
+                                                                                                                            }}>
+                                                                                                                            <VizG
+                                                                                                                                data={metric.attribute.recentValues}
+                                                                                                                                metadata={metadata}
+                                                                                                                                config={sparkLineConfig}
+                                                                                                                                yDomain={DashboardUtils.getYDomain(metric.attribute.recentValues)}
+                                                                                                                                width={100}
+                                                                                                                                height={50}
+                                                                                                                            />
                                                                                                                         </div>
                                                                                                                     </div>
                                                                                                                 </Link>
                                                                                                             </div>
-
                                                                                                         </TableRowColumn>
-                                                                                                    </TableRow></TableBody></Table>}
+                                                                                                    </TableRow>
+                                                                                                </TableBody>
+                                                                                            </Table>}
                                                                                         </TableRowColumn>
-                                                                                    </TableRow></TableBody></Table>
+                                                                                    </TableRow>
+                                                                                </TableBody>
+                                                                            </Table>
                                                                         )
                                                                     }
                                                                     return (
@@ -232,28 +249,37 @@ export default class ComponentTable extends React.Component {
                                                                                                             width: '50%',
                                                                                                             float: 'right'
                                                                                                         }}>
-                                                                                                            <div style={{width: '100px', height: '48px'}}>
-                                                                                                            <VizG
-                                                                                                                data={metric.attribute.recentValues}
-                                                                                                                metadata={metadata}
-                                                                                                                config={sparkLineConfig}
-                                                                                                                yDomain={DashboardUtils.getYDomain(metric.attribute.recentValues)}
-                                                                                                                width={100}
-                                                                                                                height={50}
-                                                                                                            />
+                                                                                                            <div
+                                                                                                                style={{
+                                                                                                                    width: '100px',
+                                                                                                                    height: '48px'
+                                                                                                                }}>
+                                                                                                                <VizG
+                                                                                                                    data={metric.attribute.recentValues}
+                                                                                                                    metadata={metadata}
+                                                                                                                    config={sparkLineConfig}
+                                                                                                                    yDomain={DashboardUtils.getYDomain(metric.attribute.recentValues)}
+                                                                                                                    width={100}
+                                                                                                                    height={50}
+                                                                                                                />
                                                                                                             </div>
                                                                                                         </div>
                                                                                                     </Link>
                                                                                                 </div>
-
                                                                                             </TableRowColumn>
-                                                                                        </TableRow></TableBody></Table>}
+                                                                                        </TableRow>
+                                                                                    </TableBody>
+                                                                                    </Table>}
                                                                                 </TableRowColumn>
-                                                                            </TableRow></TableBody></Table>
+                                                                            </TableRow>
+                                                                        </TableBody>
+                                                                        </Table>
                                                                     )
                                                                 })}
                                                             </TableRowColumn>
-                                                        </TableRow></TableBody></Table>
+                                                        </TableRow>
+                                                    </TableBody>
+                                                </Table>
                                             )
                                         }
                                         return (
@@ -267,7 +293,15 @@ export default class ComponentTable extends React.Component {
                                                            style={{backgroundColor: '#131313', cursor: 'pointer'}}>
                                                     <TableRow style={styles.rowColumn}>
                                                         <TableRowColumn
-                                                            style={{width: '33.33%'}}>{components.name}</TableRowColumn>
+                                                            style={{
+                                                                width: '33.33%',
+                                                                borderLeft: '1px solid white'
+                                                            }}>{components.name}</TableRowColumn>
+                                                        <TableRowColumn
+                                                            style={{
+                                                                width: '15%',
+                                                                borderLeft: '1px solid white'
+                                                            }}>{components.totalEvents}</TableRowColumn>
                                                         <TableRowColumn style={{paddingLeft: 0, paddingRight: 0}}>
                                                             {components.metrics.map((metric, index) => {
                                                                 if (index + 1 === components.metrics.length) {
@@ -310,24 +344,32 @@ export default class ComponentTable extends React.Component {
                                                                                                             width: '50%',
                                                                                                             float: 'right'
                                                                                                         }}>
-                                                                                                            <div style={{width: '100px', height: '48px'}}>
-                                                                                                            <VizG
-                                                                                                                data={metric.attribute.recentValues}
-                                                                                                                metadata={metadata}
-                                                                                                                config={sparkLineConfig}
-                                                                                                                yDomain={DashboardUtils.getYDomain(metric.attribute.recentValues)}
-                                                                                                                width={100}
-                                                                                                                height={50}
-                                                                                                            />
+                                                                                                            <div
+                                                                                                                style={{
+                                                                                                                    width: '100px',
+                                                                                                                    height: '48px'
+                                                                                                                }}>
+                                                                                                                <VizG
+                                                                                                                    data={metric.attribute.recentValues}
+                                                                                                                    metadata={metadata}
+                                                                                                                    config={sparkLineConfig}
+                                                                                                                    yDomain={DashboardUtils.getYDomain(metric.attribute.recentValues)}
+                                                                                                                    width={100}
+                                                                                                                    height={50}
+                                                                                                                />
                                                                                                             </div>
                                                                                                         </div>
                                                                                                     </Link>
                                                                                                 </div>
 
                                                                                             </TableRowColumn>
-                                                                                        </TableRow></TableBody></Table>}
+                                                                                        </TableRow>
+                                                                                    </TableBody>
+                                                                                    </Table>}
                                                                                 </TableRowColumn>
-                                                                            </TableRow></TableBody></Table>
+                                                                            </TableRow>
+                                                                        </TableBody>
+                                                                        </Table>
                                                                     )
                                                                 }
                                                                 return (
@@ -368,22 +410,26 @@ export default class ComponentTable extends React.Component {
                                                                                                     width: '50%',
                                                                                                     float: 'right'
                                                                                                 }}>
-                                                                                                    <div style={{width: '100px', height: '48px'}}>
-                                                                                                    <VizG
-                                                                                                        data={metric.attribute.recentValues}
-                                                                                                        metadata={metadata}
-                                                                                                        config={sparkLineConfig}
-                                                                                                        yDomain={DashboardUtils.getYDomain(metric.attribute.recentValues)}
-                                                                                                        width={100}
-                                                                                                        height={50}
-                                                                                                    />
+                                                                                                    <div style={{
+                                                                                                        width: '100px',
+                                                                                                        height: '48px'
+                                                                                                    }}>
+                                                                                                        <VizG
+                                                                                                            data={metric.attribute.recentValues}
+                                                                                                            metadata={metadata}
+                                                                                                            config={sparkLineConfig}
+                                                                                                            yDomain={DashboardUtils.getYDomain(metric.attribute.recentValues)}
+                                                                                                            width={100}
+                                                                                                            height={50}
+                                                                                                        />
                                                                                                     </div>
                                                                                                 </div>
                                                                                             </Link>
                                                                                         </div>
-
                                                                                     </TableRowColumn>
-                                                                                </TableRow></TableBody></Table>}
+                                                                                </TableRow>
+                                                                                </TableBody>
+                                                                                </Table>}
                                                                             </TableRowColumn>
                                                                         </TableRow>
                                                                     </TableBody></Table>

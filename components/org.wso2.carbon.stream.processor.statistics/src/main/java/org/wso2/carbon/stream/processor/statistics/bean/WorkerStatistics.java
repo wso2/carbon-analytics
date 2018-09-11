@@ -17,11 +17,14 @@
  */
 package org.wso2.carbon.stream.processor.statistics.bean;
 
+import java.io.Serializable;
+
 /**
  * This is the bean class which keep the statistical details other than metrics.
  */
-public class WorkerStatistics {
+public class WorkerStatistics implements Serializable {
 
+    private static final long serialVersionUID = -300492616653467677L;
     private WorkerMetrics workerMetrics;
     private String haStatus;
     private String runningStatus;
@@ -81,9 +84,13 @@ public class WorkerStatistics {
         this.runningStatus = runningStatus;
     }
 
-    public String getOsName() {return osName;}
+    public String getOsName() {
+        return osName;
+    }
 
-    public void setOsName(String osName) {this.osName = osName;}
+    public void setOsName(String osName) {
+        this.osName = osName;
+    }
 
     public String getLastSnapshotTime() {
         return lastSnapshotTime;

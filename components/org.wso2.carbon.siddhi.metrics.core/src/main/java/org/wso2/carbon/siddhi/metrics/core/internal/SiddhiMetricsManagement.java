@@ -62,7 +62,7 @@ public class SiddhiMetricsManagement {
     public void startMetrics(String siddhiAppName) {
         List<String> registeredComponent = componentMap.get(siddhiAppName);
         if (registeredComponent != null) {
-            for (String component:registeredComponent) {
+            for (String component : registeredComponent) {
                 this.metricManagementService.setMetricLevel(component, INFO);
             }
         }
@@ -70,17 +70,18 @@ public class SiddhiMetricsManagement {
 
     public void stopMetrics(String siddhiAppName) {
         List<String> registeredComponents = componentMap.get(siddhiAppName);
-        for (String component:registeredComponents) {
+        for (String component : registeredComponents) {
             this.metricManagementService.setMetricLevel(component, OFF);
         }
-
     }
 
     public void cleanUpMetrics(String siddhiAppName) {
-        List<String> registeredComponents = componentMap.get(siddhiAppName);
-        for (String component:registeredComponents) {
-            metricService.remove(component);
+        if (componentMap.containsKey(siddhiAppName)) {
+            List<String> registeredComponents = componentMap.get(siddhiAppName);
+            for (String component : registeredComponents) {
+                metricService.remove(component);
+            }
+            componentMap.remove(siddhiAppName);
         }
-        componentMap.remove(siddhiAppName);
     }
 }

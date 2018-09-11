@@ -300,7 +300,7 @@ define(["ace/ace", "jquery", "./constants", "./utils", "./completion-engine", ".
                                 self.state.semanticErrorList = [({
                                     row: 0,
                                     // Change attribute "text" to "html" if html is sent from server
-                                    text: utils.wordWrap(response.message, 120),
+                                    html: utils.wordWrap(response.message, 120),
                                     type: "error"
                                 })];
 
@@ -314,7 +314,7 @@ define(["ace/ace", "jquery", "./constants", "./utils", "./completion-engine", ".
                                 self.state.semanticErrorList = [({
                                     row: response.queryContextStartIndex[0] - 1,
                                     // Change attribute "text" to "html" if html is sent from server
-                                    text: utils.wordWrap(response.message, 120),
+                                    html: utils.wordWrap(response.message, 120),
                                     type: "error"
                                 })];
 

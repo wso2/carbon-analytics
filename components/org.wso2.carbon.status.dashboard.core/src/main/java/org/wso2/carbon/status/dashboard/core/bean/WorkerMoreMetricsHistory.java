@@ -66,7 +66,7 @@ public class WorkerMoreMetricsHistory {
     private MetricsLineCharts jvmThreadsTerminatedCount;
     private MetricsLineCharts jvmThreadsTimedWaitingCount;
     private MetricsLineCharts jvmThreadsWaitingCount;
-
+    
     public WorkerMoreMetricsHistory() {
         jvmClassLoadingLoadedCurrent = new MetricsLineCharts();
         jvmClassLoadingLoadedTotal = new MetricsLineCharts();
@@ -110,331 +110,331 @@ public class WorkerMoreMetricsHistory {
         jvmThreadsTimedWaitingCount = new MetricsLineCharts();
         jvmThreadsWaitingCount = new MetricsLineCharts();
     }
-
+    
     public MetricsLineCharts getJvmClassLoadingLoadedCurrent() {
         return jvmClassLoadingLoadedCurrent;
     }
-
+    
     public void setJvmClassLoadingLoadedCurrent(List<List<Object>> jvmClassLoadingLoadedCurrent) {
         this.jvmClassLoadingLoadedCurrent.setData(jvmClassLoadingLoadedCurrent);
     }
-
+    
     public MetricsLineCharts getJvmClassLoadingLoadedTotal() {
         return jvmClassLoadingLoadedTotal;
     }
-
+    
     public void setJvmClassLoadingLoadedTotal(List<List<Object>> jvmClassLoadingLoadedTotal) {
         this.jvmClassLoadingLoadedTotal.setData(jvmClassLoadingLoadedTotal);
     }
-
+    
     public MetricsLineCharts getJvmClassLoadingUnloadedTotal() {
         return jvmClassLoadingUnloadedTotal;
     }
-
+    
     public void setJvmClassLoadingUnloadedTotal(List<List<Object>> jvmClassLoadingUnloadedTotal) {
         this.jvmClassLoadingUnloadedTotal.setData(jvmClassLoadingUnloadedTotal);
     }
-
+    
     public MetricsLineCharts getJvmGcPsMarksweepCount() {
         return jvmGcPsMarksweepCount;
     }
-
+    
     public void setJvmGcPsMarksweepCount(List<List<Object>> jvmGcPsMarksweepCount) {
         this.jvmGcPsMarksweepCount.setData(jvmGcPsMarksweepCount);
     }
-
+    
     public MetricsLineCharts getJvmGcPsMarksweepTime() {
         return jvmGcPsMarksweepTime;
     }
-
+    
     public void setJvmGcPsMarksweepTime(List<List<Object>> jvmGcPsMarksweepTime) {
         this.jvmGcPsMarksweepTime.setData(jvmGcPsMarksweepTime);
     }
-
+    
     public MetricsLineCharts getJvmGcPsScavengeCount() {
         return jvmGcPsScavengeCount;
     }
-
+    
     public void setJvmGcPsScavengeCount(List<List<Object>> jvmGcPsScavengeCount) {
         this.jvmGcPsScavengeCount.setData(jvmGcPsScavengeCount);
     }
-
+    
     public MetricsLineCharts getJvmGcPsScavengeTime() {
         return jvmGcPsScavengeTime;
     }
-
+    
     public void setJvmGcPsScavengeTime(List<List<Object>> jvmGcPsScavengeTime) {
         this.jvmGcPsScavengeTime.setData(jvmGcPsScavengeTime);
     }
-
+    
     public MetricsLineCharts getJvmMemoryHeapCommitted() {
         return jvmMemoryHeapCommitted;
     }
-
+    
     public void setJvmMemoryHeapCommitted(List<List<Object>> jvmMemoryHeapCommitted) {
         this.jvmMemoryHeapCommitted.setData(jvmMemoryHeapCommitted);
     }
-
+    
     public MetricsLineCharts getJvmMemoryHeapInit() {
         return jvmMemoryHeapInit;
     }
-
+    
     public void setJvmMemoryHeapInit(List<List<Object>> jvmMemoryHeapInit) {
         this.jvmMemoryHeapInit.setData(jvmMemoryHeapInit);
     }
-
+    
     public MetricsLineCharts getJvmMemoryHeapMax() {
         return jvmMemoryHeapMax;
     }
-
+    
     public void setJvmMemoryHeapMax(List<List<Object>> jvmMemoryHeapMax) {
         this.jvmMemoryHeapMax.setData(jvmMemoryHeapMax);
     }
-
+    
     public MetricsLineCharts getJvmMemoryHeapUsage() {
         return jvmMemoryHeapUsage;
     }
-
+    
     public void setJvmMemoryHeapUsage(List<List<Object>> jvmMemoryHeapUsage) {
         this.jvmMemoryHeapUsage.setData(jvmMemoryHeapUsage);
     }
-
+    
     public MetricsLineCharts getJvmMemoryHeapUsed() {
         return jvmMemoryHeapUsed;
     }
-
+    
     public void setJvmMemoryHeapUsed(List<List<Object>> jvmMemoryHeapUsed) {
         this.jvmMemoryHeapUsed.setData(jvmMemoryHeapUsed);
     }
-
+    
     public MetricsLineCharts getJvmMemoryNonHeapCommitted() {
         return jvmMemoryNonHeapCommitted;
     }
-
+    
     public void setJvmMemoryNonHeapCommitted(List<List<Object>> jvmMemoryNonHeapCommitted) {
         this.jvmMemoryNonHeapCommitted.setData(jvmMemoryNonHeapCommitted);
     }
-
+    
     public MetricsLineCharts getJvmMemoryNonHeapInit() {
         return jvmMemoryNonHeapInit;
     }
-
+    
     public void setJvmMemoryNonHeapInit(List<List<Object>> jvmMemoryNonHeapInit) {
         this.jvmMemoryNonHeapInit.setData(jvmMemoryNonHeapInit);
     }
-
+    
     public MetricsLineCharts getJvmMemoryNonHeapMax() {
         return jvmMemoryNonHeapMax;
     }
-
+    
     public void setJvmMemoryNonHeapMax(List<List<Object>> jvmMemoryNonHeapMax) {
         this.jvmMemoryNonHeapMax.setData(jvmMemoryNonHeapMax);
     }
-
+    
     public MetricsLineCharts getJvmMemoryNonHeapUsage() {
         return jvmMemoryNonHeapUsage;
     }
-
+    
     public void setJvmMemoryNonHeapUsage(List<List<Object>> jvmMemoryNonHeapUsage) {
         this.jvmMemoryNonHeapUsage.setData(jvmMemoryNonHeapUsage);
     }
-
+    
     public MetricsLineCharts getJvmMemoryNonHeapUsed() {
         return jvmMemoryNonHeapUsed;
     }
-
+    
     public void setJvmMemoryNonHeapUsed(List<List<Object>> jvmMemoryNonHeapUsed) {
         this.jvmMemoryNonHeapUsed.setData(jvmMemoryNonHeapUsed);
     }
-
+    
     public MetricsLineCharts getJvmMemoryTotalCommitted() {
         return jvmMemoryTotalCommitted;
     }
-
+    
     public void setJvmMemoryTotalCommitted(List<List<Object>> jvmMemoryTotalCommitted) {
         this.jvmMemoryTotalCommitted.setData(jvmMemoryTotalCommitted);
     }
-
+    
     public MetricsLineCharts getJvmMemoryTotalInit() {
         return jvmMemoryTotalInit;
     }
-
+    
     public void setJvmMemoryTotalInit(List<List<Object>> jvmMemoryTotalInit) {
         this.jvmMemoryTotalInit.setData(jvmMemoryTotalInit);
     }
-
+    
     public MetricsLineCharts getJvmMemoryTotalMax() {
         return jvmMemoryTotalMax;
     }
-
+    
     public void setJvmMemoryTotalMax(List<List<Object>> jvmMemoryTotalMax) {
         this.jvmMemoryTotalMax.setData(jvmMemoryTotalMax);
     }
-
+    
     public MetricsLineCharts getJvmMemoryTotalUsed() {
         return jvmMemoryTotalUsed;
     }
-
+    
     public void setJvmMemoryTotalUsed(List<List<Object>> jvmMemoryTotalUsed) {
         this.jvmMemoryTotalUsed.setData(jvmMemoryTotalUsed);
     }
-
+    
     public MetricsLineCharts getJvmOsCpuLoadProcess() {
         return jvmOsCpuLoadProcess;
     }
-
+    
     public void setJvmOsCpuLoadProcess(List<List<Object>> jvmOsCpuLoadProcess) {
         this.jvmOsCpuLoadProcess.setData(jvmOsCpuLoadProcess);
     }
-
+    
     public MetricsLineCharts getJvmOsCpuLoadSystem() {
         return jvmOsCpuLoadSystem;
     }
-
+    
     public void setJvmOsCpuLoadSystem(List<List<Object>> jvmOsCpuLoadSystem) {
         this.jvmOsCpuLoadSystem.setData(jvmOsCpuLoadSystem);
     }
-
+    
     public MetricsLineCharts getJvmOsFileDescriptorMaxCount() {
         return jvmOsFileDescriptorMaxCount;
     }
-
+    
     public void setJvmOsFileDescriptorMaxCount(List<List<Object>> jvmOsFileDescriptorMaxCount) {
         this.jvmOsFileDescriptorMaxCount.setData(jvmOsFileDescriptorMaxCount);
     }
-
+    
     public MetricsLineCharts getJvmOsFileDescriptorOpenCount() {
         return jvmOsFileDescriptorOpenCount;
     }
-
+    
     public void setJvmOsFileDescriptorOpenCount(List<List<Object>> jvmOsFileDescriptorOpenCount) {
         this.jvmOsFileDescriptorOpenCount.setData(jvmOsFileDescriptorOpenCount);
     }
-
+    
     public MetricsLineCharts getJvmOsPhysicalMemoryFreeSize() {
         return jvmOsPhysicalMemoryFreeSize;
     }
-
+    
     public void setJvmOsPhysicalMemoryFreeSize(List<List<Object>> jvmOsPhysicalMemoryFreeSize) {
         this.jvmOsPhysicalMemoryFreeSize.setData(jvmOsPhysicalMemoryFreeSize);
     }
-
+    
     public MetricsLineCharts getJvmOsPhysicalMemoryTotalSize() {
         return jvmOsPhysicalMemoryTotalSize;
     }
-
+    
     public void setJvmOsPhysicalMemoryTotalSize(List<List<Object>> jvmOsPhysicalMemoryTotalSize) {
         this.jvmOsPhysicalMemoryTotalSize.setData(jvmOsPhysicalMemoryTotalSize);
     }
-
+    
     public MetricsLineCharts getJvmOsSwapSpaceFreeSize() {
         return jvmOsSwapSpaceFreeSize;
     }
-
+    
     public void setJvmOsSwapSpaceFreeSize(List<List<Object>> jvmOsSwapSpaceFreeSize) {
         this.jvmOsSwapSpaceFreeSize.setData(jvmOsSwapSpaceFreeSize);
     }
-
+    
     public MetricsLineCharts getJvmOsSwapSpaceTotalSize() {
         return jvmOsSwapSpaceTotalSize;
     }
-
+    
     public void setJvmOsSwapSpaceTotalSize(List<List<Object>> jvmOsSwapSpaceTotalSize) {
         this.jvmOsSwapSpaceTotalSize.setData(jvmOsSwapSpaceTotalSize);
     }
-
+    
     public MetricsLineCharts getJvmOsSystemLoadAverage() {
         return jvmOsSystemLoadAverage;
     }
-
+    
     public void setJvmOsSystemLoadAverage(List<List<Object>> jvmOsSystemLoadAverage) {
         this.jvmOsSystemLoadAverage.setData(jvmOsSystemLoadAverage);
     }
-
+    
     public MetricsLineCharts getJvmOsVirtualMemoryCommittedSize() {
         return jvmOsVirtualMemoryCommittedSize;
     }
-
+    
     public void setJvmOsVirtualMemoryCommittedSize(List<List<Object>> jvmOsVirtualMemoryCommittedSize) {
         this.jvmOsVirtualMemoryCommittedSize.setData(jvmOsVirtualMemoryCommittedSize);
     }
-
+    
     public MetricsLineCharts getJvmThreadsCount() {
         return jvmThreadsCount;
     }
-
+    
     public void setJvmThreadsCount(List<List<Object>> jvmThreadsCount) {
         this.jvmThreadsCount.setData(jvmThreadsCount);
     }
-
+    
     public MetricsLineCharts getJvmThreadsDaemonCount() {
         return jvmThreadsDaemonCount;
     }
-
+    
     public void setJvmThreadsDaemonCount(List<List<Object>> jvmThreadsDaemonCount) {
         this.jvmThreadsDaemonCount.setData(jvmThreadsDaemonCount);
     }
-
+    
     public MetricsLineCharts getJvmMemoryPoolsSize() {
         return jvmMemoryPoolsSize;
     }
-
+    
     public void setJvmMemoryPoolsSize(List<List<Object>> data) {
         this.jvmMemoryPoolsSize.setData(data);
     }
-
+    
     public MetricsLineCharts getJvmThreadsBlockedCount() {
         return jvmThreadsBlockedCount;
     }
-
+    
     public void setJvmThreadsBlockedCount(List<List<Object>> data) {
         this.jvmThreadsBlockedCount.setData(data);
     }
-
+    
     public MetricsLineCharts getJvmThreadsDeadlockCount() {
         return jvmThreadsDeadlockCount;
     }
-
+    
     public void setJvmThreadsDeadlockCount(List<List<Object>> data) {
         this.jvmThreadsDeadlockCount.setData(data);
     }
-
+    
     public MetricsLineCharts getJvmThreadsNewCount() {
         return jvmThreadsNewCount;
     }
-
+    
     public void setJvmThreadsNewCount(List<List<Object>> data) {
         this.jvmThreadsNewCount.setData(data);
     }
-
+    
     public MetricsLineCharts getJvmThreadsRunnableCount() {
         return jvmThreadsRunnableCount;
     }
-
+    
     public void setJvmThreadsRunnableCount(List<List<Object>> data) {
         this.jvmThreadsRunnableCount.setData(data);
     }
-
+    
     public MetricsLineCharts getJvmThreadsTerminatedCount() {
         return jvmThreadsTerminatedCount;
     }
-
+    
     public void setJvmThreadsTerminatedCount(List<List<Object>> data) {
         this.jvmThreadsTerminatedCount.setData(data);
     }
-
+    
     public MetricsLineCharts getJvmThreadsTimedWaitingCount() {
         return jvmThreadsTimedWaitingCount;
     }
-
+    
     public void setJvmThreadsTimedWaitingCount(List<List<Object>> data) {
         this.jvmThreadsTimedWaitingCount.setData(data);
     }
-
+    
     public MetricsLineCharts getJvmThreadsWaitingCount() {
         return jvmThreadsWaitingCount;
     }
-
+    
     public void setJvmThreadsWaitingCount(List<List<Object>> data) {
         this.jvmThreadsWaitingCount.setData(data);
     }

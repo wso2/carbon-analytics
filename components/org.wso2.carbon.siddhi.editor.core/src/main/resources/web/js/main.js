@@ -16,11 +16,11 @@
  * under the License.
  */
 
-define(['require', 'log', 'jquery', 'lodash', 'backbone', 'menu_bar', 'tool_bar', 'command', 'workspace', 
-        'app/tab/service-tab-list', 'app/tool-palette/tool-palette', 'event_simulator', 
-        'app/output-console/service-console-list-manager', 'nano_scroller'],
+define(['require', 'log', 'jquery', 'lodash', 'backbone', 'menu_bar', 'tool_bar', 'command', 'workspace',
+        'app/tab/service-tab-list', 'event_simulator', 'app/output-console/service-console-list-manager',
+        'nano_scroller'],
 
-    function (require, log, $, _, Backbone, MenuBar, ToolBar, CommandManager, Workspace, TabController, ToolPalette, 
+    function (require, log, $, _, Backbone, MenuBar, ToolBar, CommandManager, Workspace, TabController,
               EventSimulator, OutputController) {
 
         var Application = Backbone.View.extend(
@@ -35,14 +35,13 @@ define(['require', 'log', 'jquery', 'lodash', 'backbone', 'menu_bar', 'tool_bar'
                 initialize: function (config) {
                     this.config = config;
                     var self = this;
+                    var pathSeparator;
                     this.initComponents();
                     $(".nano").nanoScroller();
                     $( "#service-tabs-wrapper" ).on( "resize", function( event, ui ) {
                           if(self.tabController.activeTab._title != "welcome-page"){
                               if (self.tabController.activeTab.getSiddhiFileEditor().isInSourceView()) {
                                   self.tabController.activeTab.getSiddhiFileEditor().getSourceView().editorResize();
-                              } else {
-                                  self.tabController.activeTab.getSiddhiFileEditor().getEventFlow().graphResize();
                               }
                           }
                     } );
@@ -68,13 +67,6 @@ define(['require', 'log', 'jquery', 'lodash', 'backbone', 'menu_bar', 'tool_bar'
 
                     this.browserStorage = new Workspace.BrowserStorage('spToolingTempStorage');
 
-                    //init tool palette
-                    var toolPaletteOpts = _.get(this.config, "tab_controller.tool_palette");
-                    _.set(toolPaletteOpts, 'application', this);
-
-
-                    this.toolPalette = new ToolPalette(toolPaletteOpts);
-
                     //init tab controller
                     var tabControlOpts = _.get(this.config, "tab_controller");
                     _.set(tabControlOpts, 'application', this);
@@ -83,8 +75,6 @@ define(['require', 'log', 'jquery', 'lodash', 'backbone', 'menu_bar', 'tool_bar'
                     _.set(outputConsoleControlOpts, 'application', this);
                     this.outputController = new OutputController(outputConsoleControlOpts);
 
-                    // tab controller will take care of rendering tool palette
-                    _.set(tabControlOpts, 'toolPalette', this.toolPalette);
                     this.tabController = new TabController(tabControlOpts);
                     this.workspaceManager.listenToTabController();
 
@@ -147,7 +137,12 @@ define(['require', 'log', 'jquery', 'lodash', 'backbone', 'menu_bar', 'tool_bar'
                 },
 
                 getPathSeperator: function(){
-                    return _.isEqual(this.getOperatingSystem(), 'Windows') ? '\\' : '/' ;
+                    if(this.pathSeparator != undefined) {
+                        return this.pathSeparator;
+                    } else {
+                        this.pathSeparator = this.workspaceExplorer._serviceClient.readPathSeparator();
+                        return this.pathSeparator;
+                    }
                 },
 
                 applicationConstants: function() {
