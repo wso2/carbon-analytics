@@ -25,7 +25,7 @@ import org.wso2.carbon.config.provider.ConfigProvider;
 import org.wso2.carbon.databridge.commons.ServerEventListener;
 import org.wso2.carbon.datasource.core.api.DataSourceService;
 import org.wso2.carbon.kernel.CarbonRuntime;
-import org.wso2.carbon.stream.processor.core.HAStateChangeListener;
+import org.wso2.carbon.stream.processor.common.HAStateChangeListener;
 import org.wso2.carbon.stream.processor.core.NodeInfo;
 import org.wso2.carbon.stream.processor.core.distribution.DistributionService;
 import org.wso2.carbon.stream.processor.core.ha.HAManager;

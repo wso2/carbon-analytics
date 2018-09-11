@@ -22,7 +22,7 @@ import org.apache.log4j.Logger;
 import org.wso2.carbon.cluster.coordinator.service.ClusterCoordinator;
 import org.wso2.carbon.databridge.commons.ServerEventListener;
 import org.wso2.carbon.stream.processor.core.DeploymentMode;
-import org.wso2.carbon.stream.processor.core.HAStateChangeListener;
+import org.wso2.carbon.stream.processor.common.HAStateChangeListener;
 import org.wso2.carbon.stream.processor.core.NodeInfo;
 import org.wso2.carbon.stream.processor.core.event.queue.EventListMapManager;
 import org.wso2.carbon.stream.processor.core.ha.tcp.TCPServer;
