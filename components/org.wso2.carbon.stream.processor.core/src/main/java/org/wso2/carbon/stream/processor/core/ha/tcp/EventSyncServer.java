@@ -21,13 +21,10 @@ package org.wso2.carbon.stream.processor.core.ha.tcp;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
-import io.netty.channel.ChannelHandlerContext;
-import io.netty.channel.ChannelInboundHandlerAdapter;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.ChannelOption;
 import io.netty.channel.ChannelPipeline;
 import io.netty.channel.EventLoopGroup;
-import io.netty.channel.SimpleChannelInboundHandler;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
 import org.apache.log4j.Logger;
@@ -142,8 +139,14 @@ public class EventSyncServer {
                         byte[] bytes = new byte[dataLength];
                         in.get(bytes);
                         if (channelId.equals(HAConstants.CHANNEL_ID_CONTROL_MESSAGE)) {
+                            if (log.isDebugEnabled()) {
+                                log.debug("Received a control message");
+                            }
                             eventListMapManager.parseControlMessage(bytes);
                         } else if (channelId.equals(HAConstants.CHANNEL_ID_MESSAGE)) {
+                            if (log.isDebugEnabled()) {
+                                log.debug("Received a event message");
+                            }
                             eventListMapManager.parseMessage(bytes);
                         }
                     } catch (UnsupportedEncodingException e) {

@@ -61,7 +61,8 @@ public class HAEventListener extends MemberEventListener {
             for (SourceHandler sourceHandler : registeredSourceHandlers.values()) {
                 ((HACoordinationSourceHandler) sourceHandler).setPassiveNodeAdded(true);
             }
-            if (!nodeDetail.isCoordinator()) {
+            if (!nodeDetail.getNodeId().equals(clusterCoordinator.getLeaderNode().getNodeId()) && nodeDetail
+                    .getPropertiesMap() != null) {
                 haManager.setPassiveNodeHostPort(getHost(nodeDetail.getPropertiesMap()
                 ), getPort(nodeDetail.getPropertiesMap()));
                 haManager.initializeEventSyncConnectionPool();
@@ -135,11 +136,11 @@ public class HAEventListener extends MemberEventListener {
     }
 
     private String getHost(Map nodePropertiesMap) {
-        String host = (String) nodePropertiesMap.get(HAConstants.ADVERTISED_HOST);
+        Object host = nodePropertiesMap.get(HAConstants.ADVERTISED_HOST);
         if (host == null) {
-            host = (String) nodePropertiesMap.get(HAConstants.HOST);
+            host = nodePropertiesMap.get(HAConstants.HOST);
         }
-        return host;
+        return (String) host;
     }
 
     private int getPort(Map nodePropertiesMap) {
