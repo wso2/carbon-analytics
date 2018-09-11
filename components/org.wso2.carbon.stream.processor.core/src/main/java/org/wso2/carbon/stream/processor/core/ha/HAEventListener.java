@@ -80,7 +80,7 @@ public class HAEventListener extends MemberEventListener {
             for (RecordTableHandler recordTableHandler : registeredRecordTableHandlers.values()) {
                 try {
                     ((HACoordinationRecordTableHandler) recordTableHandler).setAsActive();
-                } catch (ConnectionUnavailableException e) {
+                } catch (Throwable e) {
                     backoffRetryCounter.reset();
                     log.error("HA Deployment: Error in connecting to table " + ((HACoordinationRecordTableHandler)
                             recordTableHandler).getTableId() + " while changing from passive" +
