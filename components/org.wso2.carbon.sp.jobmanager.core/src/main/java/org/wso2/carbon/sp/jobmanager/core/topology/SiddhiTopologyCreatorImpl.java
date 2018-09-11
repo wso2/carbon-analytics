@@ -514,10 +514,28 @@ public class SiddhiTopologyCreatorImpl implements SiddhiTopologyCreator {
                 if (inputStreamDataHolder.getEventHolderType().equals(EventHolder.STREAM) && inputStreamDataHolder
                         .isUserGiven()) {
                     createPassthrough = true;
+                    String runtimeDefinition = removeMetaInfoStream(streamId,
+                            inputStreamDataHolder.getStreamDefinition(), SiddhiTopologyCreatorConstants
+                                    .SOURCE_IDENTIFIER);
+                    if (siddhiQueryGroup1.getParallelism() > SiddhiTopologyCreatorConstants.DEFAULT_PARALLEL) {
+                        passthroughQueriesAvailable = true;
+                        passthroughQueries.addAll(generatePassthroughQueryList(
+                                streamId, inputStreamDataHolder, runtimeDefinition));
+                        inputStreamDataHolder.setStreamDefinition(runtimeDefinition);
+                        inputStreamDataHolder.setUserGiven(false);
+                        InputStreamDataHolder holder1 = siddhiQueryGroup1.getInputStreams().get(streamId);
+                        String consumingStream = "${" + streamId + "} " + removeMetaInfoStream(streamId,
+                                holder1.getStreamDefinition(), SiddhiTopologyCreatorConstants.SOURCE_IDENTIFIER);
+                        holder1.setStreamDefinition(consumingStream);
+                        holder1.setUserGiven(false);
+                        createPassthrough = false;
+                    }
+
                     for (SiddhiQueryGroup siddhiQueryGroup2 : siddhiQueryGroupsList.subList(i + 1,
                             siddhiQueryGroupsList.size())) {
                         if (siddhiQueryGroup2.getInputStreams().containsKey(streamId)) {
-                            String runtimeDefinition = removeMetaInfoStream(streamId,
+                            String consumingStream = "";
+                            runtimeDefinition = removeMetaInfoStream(streamId,
                                     inputStreamDataHolder.getStreamDefinition(), SiddhiTopologyCreatorConstants
                                             .SOURCE_IDENTIFIER);
                             passthroughQueriesAvailable = true;
@@ -529,14 +547,14 @@ public class SiddhiTopologyCreatorImpl implements SiddhiTopologyCreator {
                                 inputStreamDataHolder.setStreamDefinition(runtimeDefinition);
                                 inputStreamDataHolder.setUserGiven(false);
                                 createPassthrough = false;
+                                InputStreamDataHolder holder1 = siddhiQueryGroup1.getInputStreams().get(streamId);
+                                consumingStream = "${" + streamId + "} " + removeMetaInfoStream(streamId,
+                                        holder1.getStreamDefinition(),
+                                        SiddhiTopologyCreatorConstants.SOURCE_IDENTIFIER);
+                                holder1.setStreamDefinition(consumingStream);
+                                holder1.setUserGiven(false);
 
                             }
-                            InputStreamDataHolder holder1 = siddhiQueryGroup1.getInputStreams().get(streamId);
-                            String consumingStream = "${" + streamId + "} " + removeMetaInfoStream(streamId,
-                                    holder1.getStreamDefinition(), SiddhiTopologyCreatorConstants.SOURCE_IDENTIFIER);
-                            holder1.setStreamDefinition(consumingStream);
-                            holder1.setUserGiven(false);
-
                             InputStreamDataHolder holder2 = siddhiQueryGroup2.getInputStreams().get(streamId);
                             consumingStream = "${" + streamId + "} " + removeMetaInfoStream(streamId,
                                     holder2.getStreamDefinition(), SiddhiTopologyCreatorConstants.SOURCE_IDENTIFIER);
@@ -564,7 +582,7 @@ public class SiddhiTopologyCreatorImpl implements SiddhiTopologyCreator {
         for (Annotation annotation : definition.getAnnotations()) {
             int parallelism = getSourceParallelism(annotation);
             SiddhiQueryGroup passthroughQueryGroup = createPassthroughQueryGroup(inputStreamDataHolder,
-                                                                                 runtimeDefinition, parallelism);
+                    runtimeDefinition, parallelism);
             passthroughQueryGroup.setReceiverQueryGroup(true);
             passthroughQueryGroupList.add(passthroughQueryGroup);
         }
@@ -620,7 +638,7 @@ public class SiddhiTopologyCreatorImpl implements SiddhiTopologyCreator {
         String passthroughExecGroupName = siddhiTopologyDataHolder.getSiddhiAppName() + "-" +
                 SiddhiTopologyCreatorConstants.PASSTHROUGH + "-" + new Random().nextInt(99999);
         SiddhiQueryGroup siddhiQueryGroup = new SiddhiQueryGroup(passthroughExecGroupName,
-                                                                 parallelism);
+                parallelism);
         String streamId = inputStreamDataHolder.getStreamName();
         Map<String, String> valuesMap = new HashMap();
         String inputStreamID = SiddhiTopologyCreatorConstants.PASSTHROUGH + inputStreamDataHolder.getStreamName();
@@ -633,12 +651,12 @@ public class SiddhiTopologyCreatorImpl implements SiddhiTopologyCreator {
         String outputStreamDefinition = "${" + streamId + "} " + runtimeDefinition;
         siddhiQueryGroup.getInputStreams()
                 .put(inputStreamID, new InputStreamDataHolder(inputStreamID,
-                                                              inputStreamDefinition, EventHolder.STREAM, true,
-                                                              new SubscriptionStrategyDataHolder(
-                                                                      SiddhiTopologyCreatorConstants.DEFAULT_PARALLEL,
-                                                                      TransportStrategy.ALL, null)));
+                        inputStreamDefinition, EventHolder.STREAM, true,
+                        new SubscriptionStrategyDataHolder(
+                                SiddhiTopologyCreatorConstants.DEFAULT_PARALLEL,
+                                TransportStrategy.ALL, null)));
         siddhiQueryGroup.getOutputStreams().put(streamId, new OutputStreamDataHolder(streamId, outputStreamDefinition,
-                                                                                     EventHolder.STREAM, false));
+                EventHolder.STREAM, false));
         return siddhiQueryGroup;
     }
 
