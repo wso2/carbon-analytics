@@ -423,12 +423,12 @@ public class StreamProcessorDeployer implements Deployer {
             unbind = "unsetMicroservicesServer")
     protected void setMicroservicesServer(MicroservicesServer microservicesServer) {
         if(log.isDebugEnabled()) {
-            log.info("@(bind) MicroservicesServer ");
+            log.debug("@(bind) MicroservicesServer ");
         }
     }
     protected void unsetMicroservicesServer(MicroservicesServer microservicesServer) {
         if(log.isDebugEnabled()) {
-            log.info(" @(unbind) MicroservicesServer ");
+            log.debug(" @(unbind) MicroservicesServer ");
         }
     }
 }

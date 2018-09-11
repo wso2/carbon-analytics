@@ -1,5 +1,5 @@
 /*
- *   Copyright (c) 2017, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+ *   Copyright (c) 2018, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
  *
  *   WSO2 Inc. licenses this file to you under the Apache License,
  *   Version 2.0 (the "License"); you may not use this file except
@@ -16,17 +16,19 @@
  *   under the License.
  *
  */
-
-package org.wso2.carbon.stream.processor.core;
-
-import org.wso2.siddhi.core.SiddhiAppRuntime;
-
-import java.util.Map;
+package org.wso2.carbon.stream.processor.common;
 
 /**
- * This represents the interface which defines the apis for SiddhiApp Runtimes
+ * This represents the interface which defines the apis for HA State Change Notifier
  */
-public interface SiddhiAppRuntimeService {
-    Map<String, SiddhiAppRuntime> getActiveSiddhiAppRuntimes();
-    void enableSiddhiAppStatistics(boolean statsEnabled);
+public interface HAStateChangeListener {
+    /**
+     * The state change lister function when the current node became active
+     */
+    public void becameActive();
+
+    /**
+     * The state change lister function when the current node became passive
+     */
+    public void becamePassive();
 }

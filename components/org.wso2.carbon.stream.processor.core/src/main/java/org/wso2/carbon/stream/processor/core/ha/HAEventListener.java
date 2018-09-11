@@ -61,7 +61,8 @@ public class HAEventListener extends MemberEventListener {
             for (SourceHandler sourceHandler : registeredSourceHandlers.values()) {
                 ((HACoordinationSourceHandler) sourceHandler).setPassiveNodeAdded(true);
             }
-            if (!nodeDetail.isCoordinator()) {
+            if (!nodeDetail.getNodeId().equals(clusterCoordinator.getLeaderNode().getNodeId()) && nodeDetail
+                    .getPropertiesMap() != null) {
                 haManager.setPassiveNodeHostPort(getHost(nodeDetail.getPropertiesMap()
                 ), getPort(nodeDetail.getPropertiesMap()));
                 haManager.initializeEventSyncConnectionPool();
@@ -94,6 +95,7 @@ public class HAEventListener extends MemberEventListener {
                     getRecordTableHandlerManager();
             Map<String, RecordTableHandler> registeredRecordTableHandlers = recordTableHandlerManager.
                     getRegisteredRecordTableHandlers();
+          
             if (clusterCoordinator.isLeaderNode()) {
                 if (clusterCoordinator.getAllNodeDetails().size() == 2) {
                     NodeDetail passiveNode = getPassiveNode();
@@ -108,7 +110,7 @@ public class HAEventListener extends MemberEventListener {
                 for (RecordTableHandler recordTableHandler : registeredRecordTableHandlers.values()) {
                     try {
                         ((HACoordinationRecordTableHandler) recordTableHandler).setAsActive();
-                    } catch (ConnectionUnavailableException e) {
+                    } catch (Throwable e) {
                         backoffRetryCounter.reset();
                         log.error("HA Deployment: Error in connecting to table " + ((HACoordinationRecordTableHandler)
                                 recordTableHandler).getTableId() + " while changing from passive" +
@@ -135,11 +137,11 @@ public class HAEventListener extends MemberEventListener {
     }
 
     private String getHost(Map nodePropertiesMap) {
-        String host = (String) nodePropertiesMap.get(HAConstants.ADVERTISED_HOST);
+        Object host = nodePropertiesMap.get(HAConstants.ADVERTISED_HOST);
         if (host == null) {
-            host = (String) nodePropertiesMap.get(HAConstants.HOST);
+            host = nodePropertiesMap.get(HAConstants.HOST);
         }
-        return host;
+        return (String) host;
     }
 
     private int getPort(Map nodePropertiesMap) {

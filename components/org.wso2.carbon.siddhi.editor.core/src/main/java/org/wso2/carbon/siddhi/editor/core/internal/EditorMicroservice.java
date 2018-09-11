@@ -36,6 +36,7 @@ import org.osgi.service.component.annotations.ReferencePolicy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.wso2.carbon.config.provider.ConfigProvider;
+import org.wso2.carbon.siddhi.editor.core.EditorSiddhiAppRuntimeService;
 import org.wso2.carbon.siddhi.editor.core.Workspace;
 import org.wso2.carbon.siddhi.editor.core.commons.metadata.MetaData;
 import org.wso2.carbon.siddhi.editor.core.commons.request.ValidationRequest;
@@ -59,6 +60,7 @@ import org.wso2.carbon.siddhi.editor.core.util.designview.designgenerator.Design
 import org.wso2.carbon.siddhi.editor.core.util.designview.exceptions.CodeGenerationException;
 import org.wso2.carbon.siddhi.editor.core.util.designview.exceptions.DesignGenerationException;
 import org.wso2.carbon.stream.processor.common.EventStreamService;
+import org.wso2.carbon.stream.processor.common.SiddhiAppRuntimeService;
 import org.wso2.carbon.stream.processor.common.utils.config.FileConfigManager;
 import org.wso2.msf4j.Microservice;
 import org.wso2.msf4j.Request;
@@ -121,6 +123,7 @@ public class EditorMicroservice implements Microservice {
                     .build()
             );
     private ConfigProvider configProvider;
+    private ServiceRegistration siddhiAppRuntimeServiceRegistration;
 
     public EditorMicroservice() {
         workspace = new LocalFSWorkspace();
@@ -869,7 +872,8 @@ public class EditorMicroservice implements Microservice {
         siddhiManager.setConfigManager(fileConfigManager);
         EditorDataHolder.setSiddhiManager(siddhiManager);
         EditorDataHolder.setBundleContext(bundleContext);
-
+        siddhiAppRuntimeServiceRegistration = bundleContext.registerService(SiddhiAppRuntimeService.class.getName(),
+                new EditorSiddhiAppRuntimeService(), null);
         serviceRegistration = bundleContext.registerService(EventStreamService.class.getName(),
                 new DebuggerEventStreamService(), null);
     }
