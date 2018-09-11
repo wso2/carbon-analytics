@@ -1508,7 +1508,7 @@ public class TemplateManagerService implements BusinessRulesService {
                     if (businessRule == null) {
                         saveBusinessRuleDefinition(ruleTemplate.getUuid(), businessRuleFromTemplate,
                                 TemplateManagerConstants.DEPLOYED, 1);
-                        updateArtifactCount(ruleTemplate.getUuid(), 1);
+                        insertRuleTemplate(ruleTemplate.getUuid());
                     }
                 } catch (BusinessRulesDatasourceException | TemplateInstanceCountViolationException e) {
                     throw new TemplateManagerServiceException("Saving APIM analytics feature business rule '" +
