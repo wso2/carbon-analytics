@@ -64,7 +64,7 @@ public class SiddhiStoreAPITestcase {
     private static final String APP_NAME = "StoreApiTest";
     private static final String SIDDHI_EXTENSION = ".siddhi";
     private static final String STORE_API_BUNDLE_NAME = "org.wso2.carbon.siddhi.store.api.rest";
-    private static final int HTTP_PORT = 9090;
+    private static final int HTTP_PORT = 7070;
     private static final String HOSTNAME = TestConstants.HOSTNAME_LOCALHOST;
     private static final String API_CONTEXT_PATH = "/stores/query";
     private static final String CONTENT_TYPE_JSON = TestConstants.CONTENT_TYPE_JSON;
@@ -149,7 +149,6 @@ public class SiddhiStoreAPITestcase {
         for (Event event : events) {
             eventStreamService.pushEvent(APP_NAME, "SmartHomeData", event);
         }
-        TestUtil.waitForMicroServiceDeployment(microservicesRegistry, "/stores", Duration.TEN_SECONDS);
         testHttpResponse(body, events, expectedResponseCode, expectedResponse, HOSTNAME, HTTP_PORT,
                 Duration.TEN_SECONDS);
     }
