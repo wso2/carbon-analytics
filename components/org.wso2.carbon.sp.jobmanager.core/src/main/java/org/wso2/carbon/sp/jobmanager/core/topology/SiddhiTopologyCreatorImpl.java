@@ -117,7 +117,6 @@ public class SiddhiTopologyCreatorImpl implements SiddhiTopologyCreator {
 
                 //store partition details
                 storePartitionInfo((Partition) executionElement, execGroupName);
-
                 //for a partition iterate over containing queries to identify required inputStreams and OutputStreams
                 for (Query query : ((Partition) executionElement).getQueryList()) {
                     if (AnnotationHelper.getAnnotation(SiddhiTopologyCreatorConstants.DISTRIBUTED_IDENTIFIER,
@@ -776,11 +775,20 @@ public class SiddhiTopologyCreatorImpl implements SiddhiTopologyCreator {
                 }
                 siddhiTopologyDataHolder.getPartitionKeyGroupMap().put(streamID + partitionKey, execGroupName);
                 siddhiTopologyDataHolder.getPartitionKeyMap().put(streamID, partitionKey);
-
+                updateInputStreamDataHolders(streamID, partitionKey);
             } else {
                 //Not yet supported
                 throw new SiddhiAppValidationException("Unsupported: "
                         + execGroupName + " Range PartitionType not Supported in Distributed SetUp");
+            }
+        }
+    }
+
+    private void updateInputStreamDataHolders(String streamID, String partitionKey) {
+        for (SiddhiQueryGroup siddhiQueryGroup : siddhiTopologyDataHolder.getSiddhiQueryGroupMap().values()) {
+            InputStreamDataHolder holder = siddhiQueryGroup.getInputStreams().get(streamID);
+            if (holder != null && holder.getSubscriptionStrategy().getStrategy() != TransportStrategy.FIELD_GROUPING) {
+                holder.getSubscriptionStrategy().setPartitionKey(partitionKey);
             }
         }
     }
