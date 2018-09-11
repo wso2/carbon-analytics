@@ -54,7 +54,7 @@ public class CarbonSiddhiAppRuntimeService implements SiddhiAppRuntimeService {
                     siddhiRuntimeEntry.getValue().isStatsEnabled())) {
                 siddhiRuntimeEntry.getValue().enableStats(statsEnabled);
                 if (log.isDebugEnabled()) {
-                    log.info("Stats has been sucessfull updated for siddhi app :" + siddhiRuntimeEntry.getKey());
+                    log.debug("Stats has been sucessfull updated for siddhi app :" + siddhiRuntimeEntry.getKey());
                 }
             }
         }

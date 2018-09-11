@@ -139,8 +139,14 @@ public class EventSyncServer {
                         byte[] bytes = new byte[dataLength];
                         in.get(bytes);
                         if (channelId.equals(HAConstants.CHANNEL_ID_CONTROL_MESSAGE)) {
+                            if (log.isDebugEnabled()) {
+                                log.debug("Received a control message");
+                            }
                             eventListMapManager.parseControlMessage(bytes);
                         } else if (channelId.equals(HAConstants.CHANNEL_ID_MESSAGE)) {
+                            if (log.isDebugEnabled()) {
+                                log.debug("Received a event message");
+                            }
                             eventListMapManager.parseMessage(bytes);
                         }
                     } catch (UnsupportedEncodingException e) {
