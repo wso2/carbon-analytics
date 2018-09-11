@@ -71,7 +71,9 @@ public class SPSiddhiAppCreator extends AbstractSiddhiAppCreator {
             Map<String, String> sinkList = new HashMap<>();
             Map<String, Integer> partitionKeys = new HashMap<>();
             Map<String, Integer> topicParallelismMap = new HashMap<>();
-            for (PublishingStrategyDataHolder holder : outputStream.getPublishingStrategyList()) {
+            List<PublishingStrategyDataHolder> publishingStrategyList =  outputStream.getPublishingStrategyList();
+            publishingStrategyList.sort(new PublishingStrategyComparator().reversed());
+            for (PublishingStrategyDataHolder holder : publishingStrategyList) {
                 sinkValuesMap.put(ResourceManagerConstants.TOPIC_LIST, siddhiAppName + "." +
                         outputStream.getStreamName() + (holder.getGroupingField() == null ? "" : ("." + holder
                         .getGroupingField())));
