@@ -28,7 +28,7 @@ import org.osgi.service.component.annotations.ReferencePolicy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.wso2.carbon.config.ConfigurationException;
-import org.wso2.carbon.stream.processor.core.SiddhiAppRuntimeService;
+import org.wso2.carbon.stream.processor.common.SiddhiAppRuntimeService;
 import org.wso2.carbon.stream.processor.statistics.internal.StreamProcessorStatisticDataHolder;
 
 /**

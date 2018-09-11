@@ -25,6 +25,7 @@ import org.wso2.carbon.config.provider.ConfigProvider;
 import org.wso2.carbon.databridge.commons.ServerEventListener;
 import org.wso2.carbon.datasource.core.api.DataSourceService;
 import org.wso2.carbon.kernel.CarbonRuntime;
+import org.wso2.carbon.stream.processor.common.HAStateChangeListener;
 import org.wso2.carbon.stream.processor.core.NodeInfo;
 import org.wso2.carbon.stream.processor.core.distribution.DistributionService;
 import org.wso2.carbon.stream.processor.core.ha.HAManager;
@@ -61,6 +62,10 @@ public class StreamProcessorDataHolder {
     private SiddhiAppProcessorConstants.RuntimeMode runtimeMode = SiddhiAppProcessorConstants.RuntimeMode.ERROR;
     private BundleContext bundleContext;
     private ConfigProvider configProvider;
+    /**
+     * List used to hold all the registered hs state change listeners.
+     */
+    private static List<HAStateChangeListener> haStateChangeListenerList = new ArrayList<>();
 
     /**
      * List used to hold all the registered subscribers.
@@ -182,6 +187,18 @@ public class StreamProcessorDataHolder {
 
     public static void removeServerListener(ServerEventListener serverListener) {
         serverListeners.remove(serverListener);
+    }
+
+    public static void setHAStateChangeListener(HAStateChangeListener haStateChangeListener) {
+        haStateChangeListenerList.add(haStateChangeListener);
+    }
+
+    public static void removeHAStateChangeListener(HAStateChangeListener haStateChangeListener) {
+        haStateChangeListenerList.remove(haStateChangeListener);
+    }
+
+    public static List<HAStateChangeListener> getHaStateChangeListenerList() {
+        return haStateChangeListenerList;
     }
 
     public static List<ServerEventListener> getServerListeners() {

@@ -33,7 +33,7 @@ import org.wso2.carbon.container.CarbonContainerFactory;
 import org.wso2.carbon.kernel.CarbonServerInfo;
 import org.wso2.carbon.siddhi.store.api.rest.ApiResponseMessage;
 import org.wso2.carbon.stream.processor.common.EventStreamService;
-import org.wso2.carbon.stream.processor.core.SiddhiAppRuntimeService;
+import org.wso2.carbon.stream.processor.common.SiddhiAppRuntimeService;
 import org.wso2.carbon.stream.processor.statistics.bean.WorkerMetrics;
 import org.wso2.carbon.stream.processor.statistics.bean.WorkerStatistics;
 import org.wso2.msf4j.MicroservicesRegistry;

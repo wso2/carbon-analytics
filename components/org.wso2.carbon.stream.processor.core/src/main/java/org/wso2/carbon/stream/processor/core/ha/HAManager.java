@@ -22,6 +22,7 @@ import org.apache.log4j.Logger;
 import org.wso2.carbon.cluster.coordinator.service.ClusterCoordinator;
 import org.wso2.carbon.databridge.commons.ServerEventListener;
 import org.wso2.carbon.stream.processor.core.DeploymentMode;
+import org.wso2.carbon.stream.processor.common.HAStateChangeListener;
 import org.wso2.carbon.stream.processor.core.NodeInfo;
 import org.wso2.carbon.stream.processor.core.event.queue.EventListMapManager;
 import org.wso2.carbon.stream.processor.core.ha.tcp.TCPServer;
@@ -56,6 +57,8 @@ public class HAManager {
     private DeploymentConfig deploymentConfig;
     private EventSyncClientPoolConfig eventSyncClientPoolConfig;
     private boolean passiveNodeAdded;
+    private String host;
+    private int port;
 
     private final static Map<String, Object> passiveNodeDetailsPropertiesMap = new HashMap<>();
     private static final Logger log = Logger.getLogger(HAManager.class);
@@ -98,8 +101,14 @@ public class HAManager {
         isActiveNode = clusterCoordinator.isLeaderNode();
 
         if (isActiveNode) {
-            log.info("HA Deployment: Starting up as Active Node");
             isActiveNode = true;
+            log.info("HA Deployment: Starting up as Active Node");
+            //notify the HAStateChangeListener as becameActive
+            List<HAStateChangeListener> haStateChangeListeners = StreamProcessorDataHolder.
+                    getHaStateChangeListenerList();
+            for (HAStateChangeListener listener : haStateChangeListeners) {
+                listener.becameActive();
+            }
         } else {
             log.info("HA Deployment: Starting up as Passive Node");
             //initialize passive queue
@@ -114,6 +123,12 @@ public class HAManager {
 
             //start tcp server
             tcpServerInstance.start(deploymentConfig);
+
+            //notify the HAStateChangeListener as becamePassive
+            List<HAStateChangeListener> listeners = StreamProcessorDataHolder.getHaStateChangeListenerList();
+            for (HAStateChangeListener listener : listeners) {
+                listener.becamePassive();
+            }
         }
 
         NodeInfo nodeInfo = StreamProcessorDataHolder.getNodeInfo();
@@ -165,9 +180,14 @@ public class HAManager {
             for (ServerEventListener listener : listeners) {
                 listener.start();
             }
-            if (log.isDebugEnabled()) {
-                log.debug("Successfully Changed to Active Mode ");
+
+            //notify the HAStateChangeListener as becameActive
+            List<HAStateChangeListener> haStateChangeListeners = StreamProcessorDataHolder.
+                    getHaStateChangeListenerList();
+            for (HAStateChangeListener listener : haStateChangeListeners) {
+                listener.becameActive();
             }
+            log.info("Successfully Changed to Active Mode ");
         }
     }
 
@@ -197,9 +217,14 @@ public class HAManager {
         nodeInfo.setActiveNode(isActiveNode);
         //start tcp server
         tcpServerInstance.start(deploymentConfig);
-        if (log.isDebugEnabled()) {
-            log.debug("Successfully Changed to Passive Mode ");
+
+        //notify the HAStateChangeListener as becamePassive
+        List<HAStateChangeListener> haStateChangeListeners = StreamProcessorDataHolder.
+                getHaStateChangeListenerList();
+        for (HAStateChangeListener listener : haStateChangeListeners) {
+            listener.becamePassive();
         }
+        log.info("Successfully Changed to Passive Mode ");
     }
 
     private void syncState() {
@@ -278,9 +303,6 @@ public class HAManager {
         EventSyncConnectionPoolManager.initializeConnectionPool(host, port, deploymentConfig);
     }
 
-    String host;
-    int port;
-
     public void setPassiveNodeHostPort(String host, int port) {
         this.host = host;
         this.port = port;
@@ -288,10 +310,6 @@ public class HAManager {
 
     public boolean isActiveNode() {
         return isActiveNode;
-    }
-
-    public static Map<String, Object> getPassiveNodePropertiesMap() {
-        return passiveNodeDetailsPropertiesMap;
     }
 
     public boolean isPassiveNodeAdded() {

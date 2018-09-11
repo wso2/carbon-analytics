@@ -402,7 +402,7 @@ public class SiddhiAppsApiServiceImpl extends SiddhiAppsApiService {
                     siddiAppData.getSiddhiAppRuntime().isStatsEnabled())) {
                 siddiAppData.getSiddhiAppRuntime().enableStats(statsEnabled);
                 if (log.isDebugEnabled()) {
-                    log.info("Stats has been sucessfull updated for siddhi app :" + siddhiAppEntry.getKey());
+                    log.debug("Stats has been sucessfull updated for siddhi app :" + siddhiAppEntry.getKey());
                 }
             }
         }
