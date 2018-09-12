@@ -178,8 +178,8 @@ public class EventListMapManager {
                     long seqId = Long.parseLong(details[0].trim());
                     String appName = details[2].trim();
                     if (perAppLastControlMessageSequenceNumberList.get(appName) != null) {
-                        long existing = perAppLastControlMessageSequenceNumberList.get(appName);
-                        if (existing < seqId) {
+                        long existingId = perAppLastControlMessageSequenceNumberList.get(appName);
+                        if (existingId < seqId) {
                             perAppLastControlMessageSequenceNumberList.put(appName, seqId);
                         }
                     } else {
