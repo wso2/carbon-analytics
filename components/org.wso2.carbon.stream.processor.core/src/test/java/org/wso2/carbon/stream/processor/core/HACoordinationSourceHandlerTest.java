@@ -56,6 +56,7 @@ public class HACoordinationSourceHandlerTest extends PowerMockTestCase {
         InputHandler inputHandler = mock(InputHandler.class);
         doNothing().when(inputHandler).send(any(Event.class));
         haCoordinationSourceHandler.setInputHandler(inputHandler);
+        haCoordinationSourceHandler.setAsActive();
 
         haCoordinationSourceHandler.init("A", SOURCE_1, new StreamDefinition());
 
@@ -93,6 +94,7 @@ public class HACoordinationSourceHandlerTest extends PowerMockTestCase {
         InputHandler inputHandler = mock(InputHandler.class);
         doNothing().when(inputHandler).send(any(Event.class));
         haCoordinationSourceHandler.setInputHandler(inputHandler);
+        haCoordinationSourceHandler.setAsActive();
 
         haCoordinationSourceHandler.init("A", SOURCE_1, new StreamDefinition());
 
