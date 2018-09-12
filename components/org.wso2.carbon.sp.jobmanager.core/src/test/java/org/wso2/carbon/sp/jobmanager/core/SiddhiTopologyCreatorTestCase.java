@@ -92,10 +92,8 @@ public class SiddhiTopologyCreatorTestCase {
 
         String siddhiApp = "@App:name('TestPlan1') \n"
                 + "@source(type='kafka', topic.list='custom_topic', group.id='1', threading.option='single.thread', "
-                + "bootstrap.servers='localhost:9092', @map(type='xml')) "
+                + "bootstrap.servers='localhost:9092', @map(type='xml'))"
                 + "Define stream stockStream(symbol string, price float, quantity int, tier string);\n"
-                + "@Sink(type='email', @map(type='json'), username='wso2', address='test@wso2.com',password='****',"
-                + "host='smtp.gmail.com',subject='Event from SP',to='towso2@gmail.com')\n"
                 + "Define stream takingOverStream(symbol string, overtakingSymbol string, avgPrice double);\n"
                 + "Define stream companyTriggerStream(symbol string);\n"
                 + "@Store(type='rdbms', jdbc.url='jdbc:mysql://localhost:3306/cepDB',jdbc.driver.name='', "
@@ -1004,8 +1002,7 @@ public class SiddhiTopologyCreatorTestCase {
         }
     }
 
-
-    /**
+     /**
      * when a user defined sink stream is used as in an internal source stream, a placeholder corresponding to the
      * streamID will be added to the respective sink so that the placeholder will bridge the stream to the required
      * source.
@@ -1350,6 +1347,159 @@ public class SiddhiTopologyCreatorTestCase {
         Assert.assertTrue(queryGroupList.get(2).getGroupName().contains(SiddhiTopologyCreatorConstants.PASSTHROUGH),
                 "Two passthrough queries should be present in separate groups");
         Assert.assertTrue(queryGroupList.get(2).isReceiverQueryGroup(), "Receiver type should be set");
+
+    }
+
+    /**
+     * Test pass-through creation when multiple subscriptions R/R and Field grouping exist for user given stream.
+     */
+    @Test(dependsOnMethods = "testUsergivenParallelSources")
+    public void testPassthoughWithMultipleSubscription() {
+        String siddhiApp = "@App:name('TestPlan13')\n" +
+
+                "@source(type = 'http', receiver.url='http://localhost:8080/SweetProductionEP', @map(type = 'json'))\n"+
+                "define stream Test1Stream (name string, amount double);\n"+
+                "@sink(type='log')\n"+
+                "define stream Test2Stream (name string, amount double);\n"+
+                "@info(name = 'query2')@dist(parallel='1', execGroup='001')\n"+
+                " from Test1Stream\n"+
+                "select *\n"+
+                "insert into Test3Stream;\n"+
+                "@info(name = 'query1')@dist(parallel='3', execGroup='002')\n"+
+                "Partition with (name of Test1Stream)\n"+
+                "Begin\n"+
+                "from Test1Stream\n"+
+                "select name,amount\n"+
+                "insert into Test2Stream;\n"+
+                "end;";
+
+        SiddhiTopologyCreatorImpl siddhiTopologyCreator = new SiddhiTopologyCreatorImpl();
+        SiddhiTopology topology = siddhiTopologyCreator.createTopology(siddhiApp);
+        SiddhiAppCreator appCreator = new SPSiddhiAppCreator();
+        List<DeployableSiddhiQueryGroup> queryGroupList = appCreator.createApps(topology);
+        Assert.assertTrue(queryGroupList.size() == 3, "Three query groups should be created");
+        Assert.assertTrue(queryGroupList.get(0).getGroupName().contains(SiddhiTopologyCreatorConstants.PASSTHROUGH),
+                          "Passthrough queries should be present in separate groups");
+        Assert.assertTrue(queryGroupList.get(0).isReceiverQueryGroup(), "Receiver type should be set");
+
+        Assert.assertTrue(queryGroupList.get(0).getSiddhiQueries().get(0).getApp()
+                                  .contains("@source(type = 'http', receiver"
+                                                    + ".url='http://localhost:8080/SweetProductionEP', @map(type = "
+                                                    + "'json'))\n"
+                                                    + "define stream passthroughTest1Stream (name string, amount "
+                                                    + "double);\n"
+                                                    + "@sink(type='kafka', topic='TestPlan13.Test1Stream.name' , "
+                                                    + "bootstrap.servers='localhost:9092', @map(type='xml'), "
+                                                    + "@distribution(strategy='partitioned', partitionKey='name', "
+                                                    + "@destination(partition.no = '0'),@destination(partition.no = "
+                                                    + "'1'),@destination(partition.no = '2') )) \n"
+                                                    + "define stream Test1Stream (name string, amount double);\n"
+                                                    + "from passthroughTest1Stream select * insert into Test1Stream;"),
+                          "Incorrect Query created");
+
+        Assert.assertTrue(queryGroupList.get(1).getSiddhiQueries().get(0).getApp()
+                                  .contains("@source(type='kafka', topic.list='TestPlan13.Test1Stream"
+                                                    + ".name', group.id='TestPlan13-001-0', threading.option='single"
+                                                    + ".thread', bootstrap.servers='localhost:9092', @map(type='xml')"
+                                                    + ") \n"
+                                                    + "define stream Test1Stream (name string, amount double);\n"
+                                                    + "define stream Test3Stream (name string, amount double);\n"
+                                                    + "@info(name = 'query2')\n"
+                                                    + " from Test1Stream\n"
+                                                    + "select *\n"
+                                                    + "insert into Test3Stream;"),"Incorrect Query Created");
+
+        Assert.assertTrue(queryGroupList.get(2).getSiddhiQueries().get(0).getApp()
+                                  .contains("@source(type='kafka', topic.list='TestPlan13.Test1Stream"
+                                                    + ".name', group.id='TestPlan13-002', threading.option='partition"
+                                                    + ".wise', bootstrap.servers='localhost:9092', partition.no"
+                                                    + ".list='0',@map(type='xml')) \n"
+                                                    + "define stream Test1Stream (name string, amount double);\n"
+                                                    + "@sink(type='log')\n"
+                                                    + "define stream Test2Stream (name string, amount double);\n"
+                                                    + "@info(name = 'query1')\n"
+                                                    + "Partition with (name of Test1Stream)\n"
+                                                    + "Begin\n"
+                                                    + "from Test1Stream\n"
+                                                    + "select name,amount\n"
+                                                    + "insert into Test2Stream;\n"
+                                                    + "end;"),"Incorrect Query Created");
+
+    }
+
+    /**
+     * when user given sources are located in one execGroup which has a parallelilsm > 1 then a passthrough query will
+     * be added in a new execGroup.Newly created execGroup will be moved to as the first element of already created
+     * passthrough queries
+     */
+    @Test(dependsOnMethods = "testPassthoughWithMultipleSubscription")
+    public void testUsergivenSourceSingleGroup() {
+        String siddhiApp = "@App:name('MB-Testcase-ptTest')\n" +
+                "@App:description('Testing the MB implementation with passthrough fix.')\n"+
+                "@source(type = 'http', receiver.url='http://localhost:8080/SweetProductionEP', @map(type = 'json'))\n"+
+                "define stream Test1Stream (name string, amount double);\n"+
+                "@sink(type='log')\n"+
+                "define stream Test2Stream (name string, amount double);\n"+
+                "@info(name = 'query1')@dist(parallel='3', execGroup='001')\n"+
+                "Partition with (name of Test1Stream)\n"+
+                "Begin\n"+
+                "from Test1Stream\n"+
+                "select name,amount\n"+
+                "insert into Test2Stream;\n"+
+                "end";
+
+        SiddhiTopologyCreatorImpl siddhiTopologyCreator = new SiddhiTopologyCreatorImpl();
+        SiddhiTopology topology = siddhiTopologyCreator.createTopology(siddhiApp);
+        SiddhiAppCreator appCreator = new SPSiddhiAppCreator();
+        List<DeployableSiddhiQueryGroup> queryGroupList = appCreator.createApps(topology);
+        Assert.assertTrue(queryGroupList.size() == 2, "Four query groups should be created");
+        Assert.assertTrue(queryGroupList.get(0).getGroupName().contains(SiddhiTopologyCreatorConstants.PASSTHROUGH),
+                          "Two passthrough queries should be present in separate groups");
+        Assert.assertTrue(queryGroupList.get(0).isReceiverQueryGroup(), "Receiver type should be set");
+
+        Assert.assertTrue(queryGroupList.get(0).getSiddhiQueries().get(0).getApp()
+                                  .contains("@source(type = 'http'," +
+                                                    " receiver.url='http://localhost:8080/SweetProductionEP', @map"
+                                                    + "(type = 'json'))\n"
+                                                    +
+                                                    "define stream passthroughTest1Stream (name string, amount "
+                                                    + "double);\n"
+                                                    +
+                                                    "@sink(type='kafka', topic='MB-Testcase-ptTest.Test1Stream.name' ,"
+                                                    +
+                                                    " bootstrap.servers='localhost:9092', @map(type='xml'), "
+                                                    + "@distribution(strategy='partitioned',"
+                                                    +
+                                                    " partitionKey='name', @destination(partition.no = '0'),"
+                                                    + "@destination(partition.no = '1'),"
+                                                    +
+                                                    "@destination(partition.no = '2') )) \n" +
+                                                    "define stream Test1Stream (name string, amount double);\n" +
+                                                    "from passthroughTest1Stream select * insert into Test1Stream;"),
+                          "Incorrect Query created");
+
+        Assert.assertTrue(queryGroupList.get(1).getSiddhiQueries().get(0).getApp()
+                                  .contains("@App:name('" +
+                                                    "MB-Testcase-ptTest-001-1') \n" +
+                                                    "@source(type='kafka', topic.list='MB-Testcase-ptTest.Test1Stream"
+                                                    + ".name',"
+                                                    +
+                                                    " group.id='MB-Testcase-ptTest-001', threading.option='partition"
+                                                    + ".wise',"
+                                                    +
+                                                    " bootstrap.servers='localhost:9092', partition.no.list='0',@map"
+                                                    + "(type='xml')) \n"
+                                                    +
+                                                    "define stream Test1Stream (name string, amount double);\n" +
+                                                    "@sink(type='log')\n" +
+                                                    "define stream Test2Stream (name string, amount double);\n" +
+                                                    "@info(name = 'query1')\n" +
+                                                    "Partition with (name of Test1Stream)\n" +
+                                                    "Begin\n" +
+                                                    "from Test1Stream\n" +
+                                                    "select name,amount\n" +
+                                                    "insert into Test2Stream;\n" +
+                                                    "end;"), "Incorrect Query Created");
 
     }
 
