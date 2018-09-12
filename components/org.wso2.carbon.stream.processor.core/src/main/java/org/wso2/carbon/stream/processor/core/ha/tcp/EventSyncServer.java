@@ -63,7 +63,6 @@ public class EventSyncServer {
     private ExecutorService eventBufferExtractorExecutorService = Executors.newFixedThreadPool(
             HAConstants.EVENT_BUFFER_EXTRACTOR_THREAD_POOL_SIZE);
     private EventBufferExtractor eventBufferExtractor = new EventBufferExtractor();
-    private List<Future> futureList = new ArrayList<>();
 
     public void start(DeploymentConfig deploymentConfig) {
         this.eventByteBufferQueue = new LinkedBlockingQueue<>(deploymentConfig.
@@ -91,7 +90,7 @@ public class EventSyncServer {
             // Bind and start to accept incoming connections.
             channelFuture = bootstrap.bind(serverConfig.getHost(), serverConfig.getPort()).sync();
             for(int i = 0; i < HAConstants.EVENT_BUFFER_EXTRACTOR_THREAD_POOL_SIZE; i++) {
-                futureList.add(eventBufferExtractorExecutorService.submit(eventBufferExtractor));
+                eventBufferExtractorExecutorService.submit(eventBufferExtractor);
             }
             log.info("EventSyncServer started in " + hostAndPort + "");
         } catch (InterruptedException e) {
@@ -116,9 +115,7 @@ public class EventSyncServer {
 
     public void clearResources() {
         eventBufferExtractor.run = false;
-        for (Future future : futureList) {
-            future.cancel(true);
-        }
+        eventBufferExtractorExecutorService.shutdownNow();
         eventByteBufferQueue.clear();
     }
 

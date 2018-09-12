@@ -149,7 +149,8 @@ public class PersistenceManager implements Runnable {
                         "message to the passive node");
             }
         } catch (ConnectionUnavailableException e) {
-            log.error("Error in connecting to the Passive node. " + e.getMessage());
+            log.error("Error in connecting to the Passive node. Hence not sending the control message to the passive" +
+                    " node");
         } catch (UnsupportedEncodingException e) {
             log.error("Error when get bytes in encoding '" + HAConstants.DEFAULT_CHARSET + "' " + e.getMessage(), e);
         }
