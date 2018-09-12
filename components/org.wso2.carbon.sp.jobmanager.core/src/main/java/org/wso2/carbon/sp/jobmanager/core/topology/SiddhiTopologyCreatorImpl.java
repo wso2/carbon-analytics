@@ -522,11 +522,11 @@ public class SiddhiTopologyCreatorImpl implements SiddhiTopologyCreator {
                                 streamId, inputStreamDataHolder, runtimeDefinition));
                         inputStreamDataHolder.setStreamDefinition(runtimeDefinition);
                         inputStreamDataHolder.setUserGiven(false);
-                        InputStreamDataHolder holder1 = siddhiQueryGroup1.getInputStreams().get(streamId);
+                        InputStreamDataHolder holder = siddhiQueryGroup1.getInputStreams().get(streamId);
                         String consumingStream = "${" + streamId + "} " + removeMetaInfoStream(streamId,
-                                holder1.getStreamDefinition(), SiddhiTopologyCreatorConstants.SOURCE_IDENTIFIER);
-                        holder1.setStreamDefinition(consumingStream);
-                        holder1.setUserGiven(false);
+                                holder.getStreamDefinition(), SiddhiTopologyCreatorConstants.SOURCE_IDENTIFIER);
+                        holder.setStreamDefinition(consumingStream);
+                        holder.setUserGiven(false);
                         createPassthrough = false;
                     }
 
