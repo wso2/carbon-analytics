@@ -81,7 +81,7 @@ public class SPSiddhiAppCreator extends AbstractSiddhiAppCreator {
                         continue;
                     }
                     //Remove if there is any previous R/R or ALL publishing
-                    sinkValuesMap.remove(siddhiAppName + "." + outputStream.getStreamName());
+                    sinkList.remove(siddhiAppName + "." + outputStream.getStreamName());
                     partitionKeys.put(holder.getGroupingField(), holder.getParallelism());
                     sinkValuesMap.put(ResourceManagerConstants.PARTITION_KEY, holder.getGroupingField());
                     List<String> destinations = new ArrayList<>(holder.getParallelism());

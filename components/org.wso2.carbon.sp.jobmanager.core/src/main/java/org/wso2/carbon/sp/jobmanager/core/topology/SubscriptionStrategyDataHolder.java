@@ -49,4 +49,8 @@ public class SubscriptionStrategyDataHolder {
     public void setOfferedParallelism(int offeredParallelism) {
         this.offeredParallelism = offeredParallelism;
     }
+
+    public void setPartitionKey(String partitionKey) {
+        this.partitionKey = partitionKey;
+    }
 }

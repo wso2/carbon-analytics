@@ -78,8 +78,7 @@ public class TemplateManagerService implements BusinessRulesService {
         if (!configReader.getSolutionType().equals("sp")) {
             loadAndSaveAnalyticsSolutions(configReader.getSolutionType());
         }
-        this.availableBusinessRules = loadBusinessRules();
-        updateStatuses();
+        loadBusinessRules();
     }
 
     public int createBusinessRuleFromTemplate(BusinessRuleFromTemplate businessRuleFromTemplate, Boolean shouldDeploy)
@@ -423,7 +422,7 @@ public class TemplateManagerService implements BusinessRulesService {
 
     public int deleteBusinessRule(String uuid, Boolean forceDeleteEnabled) throws BusinessRuleNotFoundException,
             TemplateManagerServiceException {
-        this.availableBusinessRules = loadBusinessRules();
+        this.availableBusinessRules = loadBusinessRulesFromDB();
         BusinessRule businessRule = findBusinessRule(uuid);
         boolean isSuccessfullyUndeployed;
         int status = TemplateManagerConstants.SUCCESSFULLY_DELETED;
@@ -723,7 +722,21 @@ public class TemplateManagerService implements BusinessRulesService {
         return templateGroups;
     }
 
-    public Map<String, BusinessRule> loadBusinessRules() throws TemplateManagerServiceException {
+    /**
+     * This method loads all the available business ruels from the database and update their deployment status.
+     *
+     * @return Map that contains loaded business ruels and their uuids
+     * @throws TemplateManagerServiceException
+     */
+    public Map<String, BusinessRule> loadBusinessRules() throws  TemplateManagerServiceException {
+        availableBusinessRules = loadBusinessRulesFromDB();
+        if (availableBusinessRules != null && availableBusinessRules.size() > 0) {
+            updateStatuses();
+        }
+        return availableBusinessRules;
+    }
+
+    private  Map<String, BusinessRule> loadBusinessRulesFromDB() throws TemplateManagerServiceException {
         try {
             createTablesIfNotExist();
             return queryExecutor.executeRetrieveAllBusinessRules();
@@ -741,6 +754,13 @@ public class TemplateManagerService implements BusinessRulesService {
         }
     }
 
+    /**
+     * This method is used to get business rules from the database with their statuses
+     * which are recorded to the database
+     *
+     * @return A list of business ruels with their statuses which are recordsd in to the database.
+     * @throws TemplateManagerServiceException
+     */
     public List<Object[]> loadBusinessRulesWithStatus() throws TemplateManagerServiceException {
         try {
             return queryExecutor.executeRetrieveAllBusinessRulesWithStatus();
@@ -749,6 +769,13 @@ public class TemplateManagerService implements BusinessRulesService {
         }
     }
 
+    /**
+     * This method is used to load a given business rule form the database
+     *
+     * @param businessRuleUUID uuid of the business rule which needs to be loaded.
+     * @return Businsess rule instance which is requested.
+     * @throws TemplateManagerServiceException
+     */
     public BusinessRule loadBusinessRule(String businessRuleUUID) throws TemplateManagerServiceException {
         try {
             return queryExecutor.retrieveBusinessRule(businessRuleUUID);
@@ -825,7 +852,7 @@ public class TemplateManagerService implements BusinessRulesService {
 
     private void updateStatuses() throws TemplateManagerServiceException {
         try {
-            Map<String, BusinessRule> businessRules = loadBusinessRules();
+            Map<String, BusinessRule> businessRules = loadBusinessRulesFromDB();
             for (Map.Entry entry : businessRules.entrySet()) {
                 BusinessRule businessRule = (BusinessRule) entry.getValue();
                 int status = getDeploymentState(businessRule);
@@ -1508,7 +1535,7 @@ public class TemplateManagerService implements BusinessRulesService {
                     if (businessRule == null) {
                         saveBusinessRuleDefinition(ruleTemplate.getUuid(), businessRuleFromTemplate,
                                 TemplateManagerConstants.DEPLOYED, 1);
-                        updateArtifactCount(ruleTemplate.getUuid(), 1);
+                        insertRuleTemplate(ruleTemplate.getUuid());
                     }
                 } catch (BusinessRulesDatasourceException | TemplateInstanceCountViolationException e) {
                     throw new TemplateManagerServiceException("Saving APIM analytics feature business rule '" +

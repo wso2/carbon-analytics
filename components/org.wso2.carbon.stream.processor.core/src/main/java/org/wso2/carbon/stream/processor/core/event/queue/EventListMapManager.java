@@ -93,7 +93,9 @@ public class EventListMapManager {
                 long lastSequenceIdForApp = -1;
 
                 if (perAppLastControlMessageSequenceNumberList.size() != 0) {
-                    lastSequenceIdForApp = perAppLastControlMessageSequenceNumberList.get(siddhiAppName);
+                    if (perAppLastControlMessageSequenceNumberList.get(siddhiAppName) != null) {
+                        lastSequenceIdForApp = perAppLastControlMessageSequenceNumberList.get(siddhiAppName);
+                    }
                 }
                 synchronized (this) {
                     //we need this block synchronized to ensure if last remembered siddhi app id is smaller than the
@@ -119,7 +121,7 @@ public class EventListMapManager {
                         count++;
                         if (count % TPS_EVENT_THRESHOLD == 0) {
                             endTime = new Date().getTime();
-                            log.info("# of events batch : " + count + " start timestamp : " + startTime +
+                            log.debug("# of events batch : " + count + " start timestamp : " + startTime +
                                     " end time stamp : " + endTime + " Throughput is (events / sec) : " +
                                     (((TPS_EVENT_THRESHOLD * 1000) / (endTime - startTime))) +
                                     " Total Event Count : " + count);
@@ -175,7 +177,15 @@ public class EventListMapManager {
                     String[] details = appDetail.split(HAConstants.PERSISTED_APP_SPLIT_DELIMITER);
                     long seqId = Long.parseLong(details[0].trim());
                     String appName = details[2].trim();
-                    perAppLastControlMessageSequenceNumberList.put(appName, seqId);
+                    if (perAppLastControlMessageSequenceNumberList.get(appName) != null) {
+                        long existId = perAppLastControlMessageSequenceNumberList.get(appName);
+                        if (existId < seqId) {
+                            perAppLastControlMessageSequenceNumberList.put(appName, seqId);
+                        }
+                    } else {
+                        perAppLastControlMessageSequenceNumberList.put(appName, seqId);
+                    }
+
                     for (Iterator<Map.Entry<Long, QueuedEvent>> iterator = eventListMap.entrySet().iterator();
                          iterator.hasNext();) {
                         Map.Entry<Long, QueuedEvent> listMapValue = iterator.next();

@@ -182,7 +182,7 @@ public class HACoordinationSourceHandler extends SourceHandler {
         try {
             eventSyncConnection = (EventSyncConnection) eventSyncConnectionPoolFactory.borrowObject(HAConstants.ACTIVE_NODE_CONNECTION_POOL_ID);
         } catch (Exception e) {
-            log.error("Error in obtaining a tcp connection to the passive node. Hence not sending events to the " +
+            log.warn("Error in obtaining a tcp connection to the passive node. Hence not sending events to the " +
                     "passive node. " + e.getMessage());
         }
         return eventSyncConnection;

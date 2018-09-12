@@ -73,6 +73,7 @@ public class SiddhiProvider extends AbstractDataProvider {
                 .split(","));
         super.init(topic, sessionId, siddhiDataProviderConfig);
         SiddhiAppRuntime siddhiAppRuntime = getSiddhiAppRuntime();
+        siddhiAppRuntime.setPurgingEnabled(false);
         siddhiAppRuntime.start();
         StoreQuery storeQuery = SiddhiCompiler.parseStoreQuery(siddhiDataProviderConfig.getQueryData()
                 .getAsJsonObject().get(QUERY).getAsString());

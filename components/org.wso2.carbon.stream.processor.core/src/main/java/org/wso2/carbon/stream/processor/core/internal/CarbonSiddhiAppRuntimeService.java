@@ -21,7 +21,7 @@ package org.wso2.carbon.stream.processor.core.internal;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.wso2.carbon.stream.processor.core.SiddhiAppRuntimeService;
+import org.wso2.carbon.stream.processor.common.SiddhiAppRuntimeService;
 import org.wso2.siddhi.core.SiddhiAppRuntime;
 
 import java.util.HashMap;
@@ -54,7 +54,7 @@ public class CarbonSiddhiAppRuntimeService implements SiddhiAppRuntimeService {
                     siddhiRuntimeEntry.getValue().isStatsEnabled())) {
                 siddhiRuntimeEntry.getValue().enableStats(statsEnabled);
                 if (log.isDebugEnabled()) {
-                    log.info("Stats has been sucessfull updated for siddhi app :" + siddhiRuntimeEntry.getKey());
+                    log.debug("Stats has been sucessfull updated for siddhi app :" + siddhiRuntimeEntry.getKey());
                 }
             }
         }
