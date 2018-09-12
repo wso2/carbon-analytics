@@ -1509,7 +1509,7 @@
     </dependencyManagement>
 
     <properties>
-        <carbon.analytics.version>2.0.414-SNAPSHOT</carbon.analytics.version>
+        <carbon.analytics.version>2.0.419-SNAPSHOT</carbon.analytics.version>
         <siddhi.version>4.2.19</siddhi.version>
         <siddhi.bundle.version>4.2.19</siddhi.bundle.version>
         <siddhi.version.range>[4.0.0, 5.0.0)</siddhi.version.range>
