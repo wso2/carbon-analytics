@@ -111,6 +111,7 @@ public class StreamProcessorService {
 
             if (haManager != null) {
                 Collection<List<Sink>> sinkCollection = siddhiAppRuntime.getSinks();
+                Collection<List<Source>> sourceCollection = siddhiAppRuntime.getSources();
                 if (haManager.isActiveNode()) {
                     //Active Node
                     if (StreamProcessorDataHolder.isPersistenceEnabled()) {
@@ -131,6 +132,13 @@ public class StreamProcessorService {
                         log.info(
                                 "Periodic Persistence is Disabled. It is recommended to enable this feature when " +
                                         "using 2 Node Minimum HA");
+                    }
+
+                    log.info("Setting SourceHandlers of " + siddhiAppName + " to Active");
+                    for (List<Source> sources : sourceCollection) {
+                        for (Source source : sources) {
+                            ((HACoordinationSourceHandler) source.getMapper().getHandler()).setAsActive();
+                        }
                     }
 
                     log.info("Setting SinksHandlers of " + siddhiAppName + " to Active");
@@ -174,6 +182,13 @@ public class StreamProcessorService {
                     for (List<Sink> sinks : sinkCollection) {
                         for (Sink sink : sinks) {
                             ((HACoordinationSinkHandler) sink.getHandler()).setAsPassive();
+                        }
+                    }
+
+                    log.info("Setting SourceHandlers of " + siddhiAppName + " to Passive");
+                    for (List<Source> sources : sourceCollection) {
+                        for (Source source : sources) {
+                            ((HACoordinationSourceHandler) source.getMapper().getHandler()).setAsPassive();
                         }
                     }
 
