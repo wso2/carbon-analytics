@@ -282,7 +282,7 @@ public class SiddhiTopologyCreatorTestCase {
 
 
     /**
-     * Sequence can can reside in an execGroup with parallel > 1 if the used stream is a (Partitioned/Inner) Stream
+     * Sequence can can reside in an execGroup with parallel > 1 if the used stream is a (Partitioned/Inner) Stream.
      */
     @Test(dependsOnMethods = "testPartitionWithWindow")
     public void testPartitionWithSequence() {
@@ -356,7 +356,7 @@ public class SiddhiTopologyCreatorTestCase {
     }
 
     /**
-     * Pattern can reside in an execGroup with parallel > 1 if the used stream is a (Partitioned/Inner) Stream
+     * Pattern can reside in an execGroup with parallel > 1 if the used stream is a (Partitioned/Inner) Stream.
      */
     @Test(dependsOnMethods = "testPartitionWithSequence")
     public void testPartitionWithPattern() {
@@ -449,7 +449,7 @@ public class SiddhiTopologyCreatorTestCase {
 
 
     /**
-     * A join can exist with Parallel >1 if the joined stream consists at least one Partitioned Stream
+     * A join can exist with Parallel >1 if the joined stream consists at least one Partitioned Stream.
      * The partitioned streams in the join will subscribe with {@link TransportStrategy#FIELD_GROUPING}
      * The unpartitioned streams in the join will subscribe with {@link TransportStrategy#ALL}
      */
@@ -1294,8 +1294,8 @@ public class SiddhiTopologyCreatorTestCase {
             siddhiTopologyCreator.createTopology(siddhiApp);
             Assert.fail();
         } catch (SiddhiAppCreationException e) {
-            Assert.assertTrue(e.getMessage().contains("Topic(s) custom_topic14 creation failed. User has disabled topic" +
-                    " creation by setting transportChannelCreationEnabled property to false"));
+            Assert.assertTrue(e.getMessage().contains("Topic(s) custom_topic14 creation failed. User has "
+                    + "disabled topic creation by setting transportChannelCreationEnabled property to false"));
             throw e;
         }
     }
@@ -1355,23 +1355,23 @@ public class SiddhiTopologyCreatorTestCase {
      */
     @Test(dependsOnMethods = "testUsergivenParallelSources")
     public void testPassthoughWithMultipleSubscription() {
-        String siddhiApp = "@App:name('TestPlan13')\n" +
-
-                "@source(type = 'http', receiver.url='http://localhost:8080/SweetProductionEP', @map(type = 'json'))\n"+
-                "define stream Test1Stream (name string, amount double);\n"+
-                "@sink(type='log')\n"+
-                "define stream Test2Stream (name string, amount double);\n"+
-                "@info(name = 'query2')@dist(parallel='1', execGroup='001')\n"+
-                " from Test1Stream\n"+
-                "select *\n"+
-                "insert into Test3Stream;\n"+
-                "@info(name = 'query1')@dist(parallel='3', execGroup='002')\n"+
-                "Partition with (name of Test1Stream)\n"+
-                "Begin\n"+
-                "from Test1Stream\n"+
-                "select name,amount\n"+
-                "insert into Test2Stream;\n"+
-                "end;";
+        String siddhiApp = "@App:name('TestPlan13')\n"
+                + "@source(type = 'http', receiver.url='http://localhost:8080/SweetProductionEP',"
+                + " @map(type = 'json'))\n"
+                + "define stream Test1Stream (name string, amount double);\n"
+                + "@sink(type='log')\n"
+                + "define stream Test2Stream (name string, amount double);\n"
+                + "@info(name = 'query2')@dist(parallel='1', execGroup='001')\n"
+                + " from Test1Stream\n"
+                + "select *\n"
+                + "insert into Test3Stream;\n"
+                + "@info(name = 'query1')@dist(parallel='3', execGroup='002')\n"
+                + "Partition with (name of Test1Stream)\n"
+                + "Begin\n"
+                + "from Test1Stream\n"
+                + "select name,amount\n"
+                + "insert into Test2Stream;\n"
+                + "end;";
 
         SiddhiTopologyCreatorImpl siddhiTopologyCreator = new SiddhiTopologyCreatorImpl();
         SiddhiTopology topology = siddhiTopologyCreator.createTopology(siddhiApp);
@@ -1407,7 +1407,7 @@ public class SiddhiTopologyCreatorTestCase {
                                                     + "@info(name = 'query2')\n"
                                                     + " from Test1Stream\n"
                                                     + "select *\n"
-                                                    + "insert into Test3Stream;"),"Incorrect partial "
+                                                    + "insert into Test3Stream;"), "Incorrect partial "
                                                     + "Siddhi application Created");
 
         Assert.assertTrue(queryGroupList.get(2).getSiddhiQueries().get(0).getApp()
@@ -1424,7 +1424,7 @@ public class SiddhiTopologyCreatorTestCase {
                                                     + "from Test1Stream\n"
                                                     + "select name,amount\n"
                                                     + "insert into Test2Stream;\n"
-                                                    + "end;"),"Incorrect partial Siddhi application Created");
+                                                    + "end;"), "Incorrect partial Siddhi application Created");
 
     }
 
@@ -1435,19 +1435,20 @@ public class SiddhiTopologyCreatorTestCase {
      */
     @Test(dependsOnMethods = "testPassthoughWithMultipleSubscription")
     public void testUsergivenSourceSingleGroup() {
-        String siddhiApp = "@App:name('MB-Testcase-ptTest')\n" +
-                "@App:description('Testing the MB implementation with passthrough fix.')\n"+
-                "@source(type = 'http', receiver.url='http://localhost:8080/SweetProductionEP', @map(type = 'json'))\n"+
-                "define stream Test1Stream (name string, amount double);\n"+
-                "@sink(type='log')\n"+
-                "define stream Test2Stream (name string, amount double);\n"+
-                "@info(name = 'query1')@dist(parallel='3', execGroup='001')\n"+
-                "Partition with (name of Test1Stream)\n"+
-                "Begin\n"+
-                "from Test1Stream\n"+
-                "select name,amount\n"+
-                "insert into Test2Stream;\n"+
-                "end";
+        String siddhiApp = "@App:name('MB-Testcase-ptTest')\n"
+                + "@App:description('Testing the MB implementation with passthrough fix.')\n"
+                + "@source(type = 'http', receiver.url='http://localhost:8080/SweetProductionEP',"
+                + " @map(type = 'json'))\n"
+                + "define stream Test1Stream (name string, amount double);\n"
+                + "@sink(type='log')\n"
+                + "define stream Test2Stream (name string, amount double);\n"
+                + "@info(name = 'query1')@dist(parallel='3', execGroup='001')\n"
+                + "Partition with (name of Test1Stream)\n"
+                + "Begin\n"
+                + "from Test1Stream\n"
+                + "select name,amount\n"
+                + "insert into Test2Stream;\n"
+                + "end";
 
         SiddhiTopologyCreatorImpl siddhiTopologyCreator = new SiddhiTopologyCreatorImpl();
         SiddhiTopology topology = siddhiTopologyCreator.createTopology(siddhiApp);
