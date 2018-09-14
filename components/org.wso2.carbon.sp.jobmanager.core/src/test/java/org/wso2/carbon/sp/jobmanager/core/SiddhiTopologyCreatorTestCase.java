@@ -1435,8 +1435,8 @@ public class SiddhiTopologyCreatorTestCase {
      */
     @Test(dependsOnMethods = "testPassthoughWithMultipleSubscription")
     public void testUsergivenSourceSingleGroup() {
-        String siddhiApp = "@App:name('MB-Testcase-ptTest')\n"
-                + "@App:description('Testing the MB implementation with passthrough fix.')\n"
+        String siddhiApp = "@App:name('TestPlan14')\n"
+                + "@App:description('Testing the implementation against passthrough fix.')\n"
                 + "@source(type = 'http', receiver.url='http://localhost:8080/SweetProductionEP',"
                 + " @map(type = 'json'))\n"
                 + "define stream Test1Stream (name string, amount double);\n"
@@ -1467,7 +1467,7 @@ public class SiddhiTopologyCreatorTestCase {
                                                     "define stream passthroughTest1Stream (name string, amount "
                                                     + "double);\n"
                                                     +
-                                                    "@sink(type='kafka', topic='MB-Testcase-ptTest.Test1Stream.name' ,"
+                                                    "@sink(type='kafka', topic='TestPlan14.Test1Stream.name' ,"
                                                     +
                                                     " bootstrap.servers='localhost:9092', @map(type='xml'), "
                                                     + "@distribution(strategy='partitioned',"
@@ -1482,11 +1482,11 @@ public class SiddhiTopologyCreatorTestCase {
 
         Assert.assertTrue(queryGroupList.get(1).getSiddhiQueries().get(0).getApp()
                                   .contains("@App:name('" +
-                                                    "MB-Testcase-ptTest-001-1') \n" +
-                                                    "@source(type='kafka', topic.list='MB-Testcase-ptTest.Test1Stream"
+                                                    "TestPlan14-001-1') \n" +
+                                                    "@source(type='kafka', topic.list='TestPlan14.Test1Stream"
                                                     + ".name',"
                                                     +
-                                                    " group.id='MB-Testcase-ptTest-001', threading.option='partition"
+                                                    " group.id='TestPlan14-001', threading.option='partition"
                                                     + ".wise',"
                                                     +
                                                     " bootstrap.servers='localhost:9092', partition.no.list='0',@map"
