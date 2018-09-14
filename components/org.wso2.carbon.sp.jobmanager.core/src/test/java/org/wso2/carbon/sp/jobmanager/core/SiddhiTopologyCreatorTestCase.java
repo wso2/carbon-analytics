@@ -1379,7 +1379,7 @@ public class SiddhiTopologyCreatorTestCase {
         List<DeployableSiddhiQueryGroup> queryGroupList = appCreator.createApps(topology);
         Assert.assertTrue(queryGroupList.size() == 3, "Three query groups should be created");
         Assert.assertTrue(queryGroupList.get(0).getGroupName().contains(SiddhiTopologyCreatorConstants.PASSTHROUGH),
-                          "Passthrough queries should be present in separate groups");
+                          "Passthrough query should be present in a separate group");
         Assert.assertTrue(queryGroupList.get(0).isReceiverQueryGroup(), "Receiver type should be set");
 
         Assert.assertTrue(queryGroupList.get(0).getSiddhiQueries().get(0).getApp()
@@ -1395,7 +1395,7 @@ public class SiddhiTopologyCreatorTestCase {
                                                     + "'1'),@destination(partition.no = '2') )) \n"
                                                     + "define stream Test1Stream (name string, amount double);\n"
                                                     + "from passthroughTest1Stream select * insert into Test1Stream;"),
-                          "Incorrect Query created");
+                                            "Incorrect partial Siddhi application created");
 
         Assert.assertTrue(queryGroupList.get(1).getSiddhiQueries().get(0).getApp()
                                   .contains("@source(type='kafka', topic.list='TestPlan13.Test1Stream"
@@ -1407,7 +1407,8 @@ public class SiddhiTopologyCreatorTestCase {
                                                     + "@info(name = 'query2')\n"
                                                     + " from Test1Stream\n"
                                                     + "select *\n"
-                                                    + "insert into Test3Stream;"),"Incorrect Query Created");
+                                                    + "insert into Test3Stream;"),"Incorrect partial "
+                                                    + "Siddhi application Created");
 
         Assert.assertTrue(queryGroupList.get(2).getSiddhiQueries().get(0).getApp()
                                   .contains("@source(type='kafka', topic.list='TestPlan13.Test1Stream"
@@ -1423,7 +1424,7 @@ public class SiddhiTopologyCreatorTestCase {
                                                     + "from Test1Stream\n"
                                                     + "select name,amount\n"
                                                     + "insert into Test2Stream;\n"
-                                                    + "end;"),"Incorrect Query Created");
+                                                    + "end;"),"Incorrect partial Siddhi application Created");
 
     }
 
@@ -1452,9 +1453,9 @@ public class SiddhiTopologyCreatorTestCase {
         SiddhiTopology topology = siddhiTopologyCreator.createTopology(siddhiApp);
         SiddhiAppCreator appCreator = new SPSiddhiAppCreator();
         List<DeployableSiddhiQueryGroup> queryGroupList = appCreator.createApps(topology);
-        Assert.assertTrue(queryGroupList.size() == 2, "Four query groups should be created");
+        Assert.assertTrue(queryGroupList.size() == 2, "Two query groups should be created");
         Assert.assertTrue(queryGroupList.get(0).getGroupName().contains(SiddhiTopologyCreatorConstants.PASSTHROUGH),
-                          "Two passthrough queries should be present in separate groups");
+                          "passthrough query should be present in separate group");
         Assert.assertTrue(queryGroupList.get(0).isReceiverQueryGroup(), "Receiver type should be set");
 
         Assert.assertTrue(queryGroupList.get(0).getSiddhiQueries().get(0).getApp()
@@ -1476,7 +1477,7 @@ public class SiddhiTopologyCreatorTestCase {
                                                     "@destination(partition.no = '2') )) \n" +
                                                     "define stream Test1Stream (name string, amount double);\n" +
                                                     "from passthroughTest1Stream select * insert into Test1Stream;"),
-                          "Incorrect Query created");
+                          "Incorrect Partial Siddhi application created");
 
         Assert.assertTrue(queryGroupList.get(1).getSiddhiQueries().get(0).getApp()
                                   .contains("@App:name('" +
@@ -1499,7 +1500,7 @@ public class SiddhiTopologyCreatorTestCase {
                                                     "from Test1Stream\n" +
                                                     "select name,amount\n" +
                                                     "insert into Test2Stream;\n" +
-                                                    "end;"), "Incorrect Query Created");
+                                                    "end;"), "Incorrect partial Siddhi application Created");
 
     }
 
