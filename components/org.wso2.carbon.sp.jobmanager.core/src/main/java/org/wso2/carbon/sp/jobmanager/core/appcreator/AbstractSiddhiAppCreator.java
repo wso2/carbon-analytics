@@ -18,12 +18,16 @@
 
 package org.wso2.carbon.sp.jobmanager.core.appcreator;
 
+import org.apache.commons.text.StrSubstitutor;
 import org.wso2.carbon.sp.jobmanager.core.SiddhiAppCreator;
 import org.wso2.carbon.sp.jobmanager.core.topology.SiddhiQueryGroup;
 import org.wso2.carbon.sp.jobmanager.core.topology.SiddhiTopology;
+import org.wso2.carbon.sp.jobmanager.core.util.ResourceManagerConstants;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Abstract implementation of {@link SiddhiAppCreator}. Developers can use this extension point to implement custom
@@ -54,5 +58,56 @@ public abstract class AbstractSiddhiAppCreator implements SiddhiAppCreator {
      * @return List of valid concrete Siddhi Apps as String.
      */
     protected abstract List<SiddhiQuery> createApps(String siddhiAppName, SiddhiQueryGroup queryGroup);
+
+    protected List<Integer> getPartitionNumbers(int appParallelism, int availablePartitionCount, int currentAppNum) {
+        List<Integer> partitionNumbers = new ArrayList<>();
+        if (availablePartitionCount == appParallelism) {
+            partitionNumbers.add(currentAppNum);
+            return partitionNumbers;
+        } else {
+            //availablePartitionCount < appParallelism scenario cannot occur according to design. Hence if
+            // availablePartitionCount > appParallelism
+            //// TODO: 10/19/17 improve logic
+            int partitionsPerNode = availablePartitionCount / appParallelism;
+            if (currentAppNum + 1 == appParallelism) { //if last app
+                int remainingPartitions = availablePartitionCount - ((appParallelism - 1) * partitionsPerNode);
+                for (int j = 0; j < remainingPartitions; j++) {
+                    partitionNumbers.add((currentAppNum * partitionsPerNode) + j);
+                }
+                return partitionNumbers;
+            } else {
+                for (int j = 0; j < partitionsPerNode; j++) {
+                    partitionNumbers.add((currentAppNum * partitionsPerNode) + j);
+                }
+                return partitionNumbers;
+            }
+        }
+    }
+
+    protected List<SiddhiQuery> generateQueryList(String queryTemplate, String parentAppName, String queryGroupName, int
+            parallelism) {
+        List<SiddhiQuery> queries = new ArrayList<>(parallelism);
+        for (int i = 0; i < parallelism; i++) {
+            Map<String, String> valuesMap = new HashMap<>(1);
+            String appName = queryGroupName + "-" + (i + 1);
+            valuesMap.put(ResourceManagerConstants.APP_NAME, appName);
+            StrSubstitutor substitutor = new StrSubstitutor(valuesMap);
+            queries.add(new SiddhiQuery(appName, substitutor.replace(queryTemplate), false));
+        }
+        return queries;
+    }
+
+    protected void updateQueryList(List<SiddhiQuery> queryList, Map<String, String> valuesMap) {
+        StrSubstitutor substitutor = new StrSubstitutor(valuesMap);
+        for (SiddhiQuery query : queryList) {
+            String updatedQuery = substitutor.replace(query.getApp());
+            query.setApp(updatedQuery);
+        }
+    }
+
+    protected String getUpdatedQuery(String query, Map<String, String> valuesMap) {
+        StrSubstitutor substitutor = new StrSubstitutor(valuesMap);
+        return substitutor.replace(query);
+    }
 
 }
