@@ -53,7 +53,7 @@ public class SPSiddhiAppCreator extends AbstractSiddhiAppCreator {
     protected List<SiddhiQuery> createApps(String siddhiAppName, SiddhiQueryGroup queryGroup) {
         String groupName = queryGroup.getName();
         String queryTemplate = queryGroup.getSiddhiApp();
-        List<SiddhiQuery> queryList = generateQueryList(queryTemplate, siddhiAppName, groupName, queryGroup
+        List<SiddhiQuery> queryList = generateQueryList(queryTemplate, groupName, queryGroup
                 .getParallelism());
         processInputStreams(siddhiAppName, groupName, queryList, queryGroup.getInputStreams().values());
         processOutputStreams(siddhiAppName, groupName, queryList, queryGroup.getOutputStreams().values());
@@ -157,8 +157,8 @@ public class SPSiddhiAppCreator extends AbstractSiddhiAppCreator {
                     log.info("Added " + partitions + " partitions to topic " + topic);
                 } else if (existingPartitions > partitions) {
                     if (transportChannelCreationEnabled) {
-                        log.info("Topic " + topic + " has higher number of partitions than expected partition count. Hence"
-                                + " have to delete the topic and recreate with " + partitions + "partitions.");
+                        log.info("Topic " + topic + " has higher number of partitions than expected partition count. "
+                                + "Hence have to delete the topic and recreate with " + partitions + "partitions.");
                         AdminUtils.deleteTopic(zkUtils, topic);
                         long startTime = System.currentTimeMillis();
                         while (AdminUtils.topicExists(zkUtils, topic)) {

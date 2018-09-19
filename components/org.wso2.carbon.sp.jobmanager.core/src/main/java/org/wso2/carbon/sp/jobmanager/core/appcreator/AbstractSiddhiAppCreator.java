@@ -84,8 +84,7 @@ public abstract class AbstractSiddhiAppCreator implements SiddhiAppCreator {
         }
     }
 
-    protected List<SiddhiQuery> generateQueryList(String queryTemplate, String parentAppName, String queryGroupName, int
-            parallelism) {
+    protected List<SiddhiQuery> generateQueryList(String queryTemplate, String queryGroupName, int parallelism) {
         List<SiddhiQuery> queries = new ArrayList<>(parallelism);
         for (int i = 0; i < parallelism; i++) {
             Map<String, String> valuesMap = new HashMap<>(1);
