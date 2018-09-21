@@ -157,31 +157,58 @@ export default class LandingPage extends Component {
       });
   }
 
-  /**
-   * Deletes the business rule, that has the given UUID
-   * @param {String} businessRuleUUID     UUID of the business rule
-   */
-  deleteBusinessRule(businessRuleUUID) {
-    this.toggleDeleteDialog();
-    new BusinessRulesAPI(BusinessRulesConstants.BASE_URL)
-      .deleteBusinessRule(businessRuleUUID, false)
-      .then((deleteResponse) => {
-        this.toggleSnackbar(deleteResponse.data[1]);
-        this.loadAvailableBusinessRules();
-      })
-      .catch(() => {
-        this.toggleSnackbar(
-          <FormattedMessage
-            id="landing.failedToDeleteRule"
-            defaultMessage="Failed to delete the business rule "
-            values={{
-              businessRuleUUID,
-            }}
-          />,
-        );
-        this.loadAvailableBusinessRules();
-      });
-  }
+    /**
+     * Un-deploys the business rule, that has the given UUID
+     * @param {String} businessRuleUUID     UUID of the business rule
+     */
+    undeployBusinessRule(businessRuleUUID) {
+        new BusinessRulesAPI(BusinessRulesConstants.BASE_URL)
+            .undeployBusinessRule(businessRuleUUID)
+            .then((undeployResponse) => {
+                this.toggleSnackbar(undeployResponse.data[1]);
+                // set state temporary until next refresh cycle
+                let { businessRules } = this.state;
+
+                console.log(businessRules);
+                businessRules.forEach(b => {
+                    if (b[0].uuid === businessRuleUUID) {
+                        b[1] = 1;
+                        return;
+                    }
+                });
+                this.setState({businessRules});
+            })
+            .catch(() => {
+                this.toggleSnackbar(`Failed to undeploy the business rule '${businessRuleUUID}'`);
+                this.loadAvailableBusinessRules();
+            });
+    }
+
+    /**
+     * Deletes the business rule, that has the given UUID
+     * @param {String} businessRuleUUID     UUID of the business rule
+     */
+    deleteBusinessRule(businessRuleUUID) {
+        this.toggleDeleteDialog();
+        new BusinessRulesAPI(BusinessRulesConstants.BASE_URL)
+            .deleteBusinessRule(businessRuleUUID, false)
+            .then((deleteResponse) => {
+                this.toggleSnackbar(deleteResponse.data[1]);
+                this.loadAvailableBusinessRules();
+            })
+            .catch(() => {
+                this.toggleSnackbar(
+                    <FormattedMessage
+                        id="landing.failedToDeleteRule"
+                        defaultMessage="Failed to delete the business rule "
+                        values={{
+                            businessRuleUUID,
+                        }}
+                    />,
+                );
+                this.loadAvailableBusinessRules();
+            });
+    }
 
   /**
    * Displays the deployment information of the given business rule
@@ -207,49 +234,48 @@ export default class LandingPage extends Component {
       });
   }
 
-  /**
-   * Toggles the visibility of deployment info
-   */
-  toggleDeploymentInfoView() {
-    const state = this.state;
-    state.deploymentInfoDialog.isVisible = !state.deploymentInfoDialog
-      .isVisible;
-    this.setState(state);
-  }
-
-  /**
-   * Displays the snackbar with the given message (if any), otherwise hides it
-   * @param {String} message      Snackbar message
-   */
-  toggleSnackbar(message) {
-    if (message) {
-      this.setState({
-        displaySnackbar: true,
-        snackbarMessage: message,
-      });
-    } else {
-      this.setState({
-        displaySnackbar: false,
-      });
+    /**
+     * Toggles the visibility of deployment info
+     */
+    toggleDeploymentInfoView() {
+        const state = this.state;
+        state.deploymentInfoDialog.isVisible = !state.deploymentInfoDialog.isVisible;
+        this.setState(state);
     }
-  }
 
-  /**
-   * Displays the delete dialog for the business rule with the given UUID (if any),
-   * otherwise hides it
-   * @param {Object} businessRule     Business rule object
-   */
-  toggleDeleteDialog(businessRule) {
-    const state = this.state;
-    if (businessRule) {
-      state.deleteDialog.businessRule = businessRule;
-      state.deleteDialog.isVisible = true;
-    } else {
-      state.deleteDialog.businessRule = {};
-      state.deleteDialog.isVisible = false;
+    /**
+     * Displays the snackbar with the given message (if any), otherwise hides it
+     * @param {String} message      Snackbar message
+     */
+    toggleSnackbar(message) {
+        if (message) {
+            this.setState({
+                displaySnackbar: true,
+                snackbarMessage: message,
+            });
+        } else {
+            this.setState({
+                displaySnackbar: false,
+            });
+        }
     }
-    this.setState(state);
-  }
+
+    /**
+     * Displays the delete dialog for the business rule with the given UUID (if any),
+     * otherwise hides it
+     * @param {Object} businessRule     Business rule object
+     */
+    toggleDeleteDialog(businessRule) {
+        const state = this.state;
+        if (businessRule) {
+            state.deleteDialog.businessRule = businessRule;
+            state.deleteDialog.isVisible = true;
+        } else {
+            state.deleteDialog.businessRule = {};
+            state.deleteDialog.isVisible = false;
+        }
+        this.setState(state);
+    }
 
   /**
    * Returns message for getting started
@@ -354,12 +380,10 @@ export default class LandingPage extends Component {
                   type={businessRuleAndStatus[0].type}
                   status={businessRuleAndStatus[1]}
                   permissions={this.state.permissions}
-                  onRedeploy={() => this.redeployBusinessRule(businessRuleAndStatus[0].uuid)
-                  }
-                  onDeleteRequest={() => this.toggleDeleteDialog(businessRuleAndStatus[0])
-                  }
-                  onDeploymentInfoRequest={() => this.showDeploymentInfo(businessRuleAndStatus)
-                  }
+                  onRedeploy={() => this.redeployBusinessRule(businessRuleAndStatus[0].uuid)}
+                  onUndeployRequest={() => this.undeployBusinessRule(businessRuleAndStatus[0].uuid)}
+                  onDeleteRequest={() => this.toggleDeleteDialog(businessRuleAndStatus[0])}
+                  onDeploymentInfoRequest={() => this.showDeploymentInfo(businessRuleAndStatus)}
                 />
               ))}
             </TableBody>
@@ -370,24 +394,21 @@ export default class LandingPage extends Component {
     return this.displayGetStarted();
   }
 
-  /**
-   * Displays the create button, for creating a business rule
-   * @returns {Component}       Create Button
-   */
-  displayCreateFloatButton() {
-    return (
-      <div style={styles.floatingButton}>
-        <Link
-          to={`${appContext}/businessRuleCreator`}
-          style={{ textDecoration: 'none' }}
-        >
-          <Button fab color="primary" aria-label="Add">
-            <AddIcon />
-          </Button>
-        </Link>
-      </div>
-    );
-  }
+    /**
+     * Displays the create button, for creating a business rule
+     * @returns {Component}       Create Button
+     */
+    displayCreateFloatButton() {
+        return (
+            <div style={styles.floatingButton}>
+                <Link to={`${appContext}/businessRuleCreator`} style={{ textDecoration: 'none' }}>
+                    <Button fab color="primary" aria-label="Add">
+                        <AddIcon />
+                    </Button>
+                </Link>
+            </div>
+        );
+    }
 
   /**
    * Returns Snackbar component
@@ -456,20 +477,20 @@ export default class LandingPage extends Component {
     return null;
   }
 
-  /**
-   * Returns Deployment Info dialog
-   * @returns {Component}     DeploymentInfo component
-   */
-  displayDeploymentInfoDialog() {
-    return (
-      <DeploymentInfo
-        businessRule={this.state.deploymentInfoDialog.businessRule}
-        info={this.state.deploymentInfoDialog.info}
-        open={this.state.deploymentInfoDialog.isVisible}
-        onRequestClose={() => this.toggleDeploymentInfoView()}
-      />
-    );
-  }
+    /**
+     * Returns Deployment Info dialog
+     * @returns {Component}     DeploymentInfo component
+     */
+    displayDeploymentInfoDialog() {
+        return (
+            <DeploymentInfo
+                businessRule={this.state.deploymentInfoDialog.businessRule}
+                info={this.state.deploymentInfoDialog.info}
+                open={this.state.deploymentInfoDialog.isVisible}
+                onRequestClose={() => this.toggleDeploymentInfoView()}
+            />
+        );
+    }
 
   /**
    * Displays content of the page
@@ -504,19 +525,19 @@ export default class LandingPage extends Component {
       }
       return <ErrorDisplay errorCode={this.state.errorCode} />;
 
-    } 
+    }
       return <ProgressDisplay />;
-    
+
   }
 
-  render() {
-    return (
-      <div>
-        <Header hideHomeButton />
-        <br />
-        <br />
-        {this.displayContent()}
-      </div>
-    );
-  }
+    render() {
+        return (
+            <div>
+                <Header hideHomeButton />
+                <br />
+                <br />
+                {this.displayContent()}
+            </div>
+        );
+    }
 }

@@ -27,6 +27,7 @@ import DeleteIcon from 'material-ui-icons/Delete';
 import { TableCell, TableRow } from 'material-ui/Table';
 import Tooltip from 'material-ui/Tooltip';
 import VisibilityIcon from 'material-ui-icons/Visibility';
+import UndeployButton from 'material-ui-icons/RemoveCircle';
 import DnsIcon from 'material-ui-icons/Dns';
 // App Constants
 import BusinessRulesConstants from '../../../../constants/BusinessRulesConstants';
@@ -76,6 +77,14 @@ export default class BusinessRule extends Component {
     }
 
     /**
+     * Handles Un-deploy button click
+     */
+    handleUndeployButtonClick() {
+        this.props.onUndeployRequest();
+    }
+
+
+    /**
      * Returns the Deploy button, with the given title
      * @param {String} title        Title of the deploy button, denoting its action
      * @returns {Component}         Tooltip Component, containing IconButton
@@ -95,6 +104,20 @@ export default class BusinessRule extends Component {
     }
 
     /**
+     * Returns the Un-deploy button
+     * @returns {Component}     Tooltip Component, containing IconButton
+     */
+    displayRuleUndeployButton() {
+        return (
+            <Tooltip id="tooltip-right" title="Un-deploy" placement="bottom">
+                <IconButton aria-label="Undeploy" onClick={() => this.handleUndeployButtonClick()}>
+                    <UndeployButton />
+                </IconButton>
+            </Tooltip>
+        );
+    }
+
+    /**
      * Returns the Deploy button
      * @returns {Component}     Retry Deploy button
      */
@@ -107,6 +130,21 @@ export default class BusinessRule extends Component {
             case 2:
             case 4:
                 return this.displayDescribedDeployButton('Re-Deploy');
+            default:
+                return null;
+        }
+    }
+
+    /**
+     * Returns the un-deploy button
+     * @returns {Component}  Un-deploy button
+     */
+    displayUndeployButton() {
+        switch (this.props.status) {
+            case 0:
+            case 2:
+            case 3:
+                return this.displayRuleUndeployButton();
             default:
                 return null;
         }
@@ -202,6 +240,8 @@ export default class BusinessRule extends Component {
                     &nbsp;
                     {this.displayDeleteButton()}
                     &nbsp;
+                    {this.displayUndeployButton()}
+                    &nbsp;
                     {this.displayDeployButton()}
                 </TableCell>
             );
@@ -248,5 +288,6 @@ BusinessRule.propTypes = {
     ]).isRequired,
     onRedeploy: PropTypes.func.isRequired,
     onDeleteRequest: PropTypes.func.isRequired,
+    onUndeployRequest: PropTypes.func.isRequired,
     onDeploymentInfoRequest: PropTypes.func.isRequired,
 };

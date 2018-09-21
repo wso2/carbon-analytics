@@ -28,6 +28,7 @@ import org.wso2.carbon.business.rules.core.api.BusinessRulesApiService;
 import org.wso2.carbon.business.rules.core.api.NotFoundException;
 import org.wso2.carbon.business.rules.core.bean.BusinessRule;
 import org.wso2.carbon.business.rules.core.bean.RuleTemplate;
+import org.wso2.carbon.business.rules.core.bean.Template;
 import org.wso2.carbon.business.rules.core.bean.TemplateGroup;
 import org.wso2.carbon.business.rules.core.bean.TemplateManagerInstance;
 import org.wso2.carbon.business.rules.core.bean.scratch.BusinessRuleFromScratch;
@@ -400,20 +401,26 @@ public class BusinessRulesApiServiceImpl extends BusinessRulesApiService {
     }
 
     @Override
-    public Response redeployBusinessRule(Request request, String businessRuleInstanceID) throws NotFoundException {
+    public Response deployOrUndeployBusinessRule(Request request, String businessRuleInstanceID,
+                                                 boolean shouldUndeploy) throws NotFoundException {
         if (!hasPermission(request, RequestMethod.REDEPLOY_BUSINESS_RULE)) {
             return Response.status(Response.Status.UNAUTHORIZED).build();
         }
+
         TemplateManagerService templateManagerService = TemplateManagerInstance.getInstance();
         Gson gson = new GsonBuilder().disableHtmlEscaping().setPrettyPrinting().create();
         int status;
         List<Object> responseData = new ArrayList<Object>();
         try {
-            status = templateManagerService.redeployBusinessRule(businessRuleInstanceID);
+            status = templateManagerService.deployOrUndeployBusinessRule(businessRuleInstanceID, shouldUndeploy);
             switch (status) {
                 case (TemplateManagerConstants.DEPLOYED):
                     responseData.add("Deployment Successful");
                     responseData.add("Successfully deployed the business rule");
+                    break;
+                case (TemplateManagerConstants.SUCCESSFULLY_UNDEPLOYED):
+                    responseData.add("Undeployment Successful");
+                    responseData.add("Successfully un-deployed the business rule");
                     break;
                 case (TemplateManagerConstants.PARTIALLY_UNDEPLOYED):
                     responseData.add("Partially Deployed");
@@ -429,10 +436,17 @@ public class BusinessRulesApiServiceImpl extends BusinessRulesApiService {
             }
             responseData.add(status);
             return Response.ok().entity(gson.toJson(responseData)).build();
+        } catch (BusinessRuleNotFoundException e) {
+            log.error(String.format("Failed to undeploy the business rule %s ",
+                    LogEncoder.removeCRLFCharacters(businessRuleInstanceID)), e);
+            responseData.add("Business Rule Not Found");
+            responseData.add("Could not find business rule with uuid '" + businessRuleInstanceID + "'");
+            responseData.add(TemplateManagerConstants.ERROR);
+            return Response.ok().entity(gson.toJson(responseData)).build();
         } catch (TemplateManagerServiceException e) {
             log.error(String.format("Failed to re-deploy the business rule with uuid %s ",
                     LogEncoder.removeCRLFCharacters(businessRuleInstanceID)), e);
-            responseData.add("Re-deployment failure");
+            responseData.add("Re-deployment fail-ure");
             responseData.add("Failed to re-deploy the business rule with uuid '" + businessRuleInstanceID + "'");
             responseData.add(new String[]{});
             return Response.ok().entity(gson.toJson(responseData)).build();

@@ -69,6 +69,8 @@ public class TemplateManagerConstants {
     public static final int SUCCESSFULLY_DELETED = 6;
     public static final int SCRIPT_EXECUTION_ERROR = 7;
 
+    public static final int SUCCESSFULLY_UNDEPLOYED = 8;
+
     // Directory locations
     private static final String CARBON_RUNTIME = Utils.getRuntimePath().toString();
     public static final String TEMPLATES_DIRECTORY = CARBON_RUNTIME + "/resources/businessRules/templates/";

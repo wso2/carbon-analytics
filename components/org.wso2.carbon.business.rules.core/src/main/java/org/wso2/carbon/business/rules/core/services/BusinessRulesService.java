@@ -38,7 +38,8 @@ public interface BusinessRulesService {
      * @return BusinessRule
      * @throws TemplateManagerServiceException
      */
-    BusinessRule findBusinessRule(String businessRuleUUID) throws TemplateManagerServiceException, BusinessRuleNotFoundException;
+    BusinessRule findBusinessRule(String businessRuleUUID)
+            throws TemplateManagerServiceException, BusinessRuleNotFoundException;
 
     /**
      * Deletes the Business Rule that has the given UUID
@@ -46,7 +47,10 @@ public interface BusinessRulesService {
      *
      * @param uuid UUID of the saved Business Rule definition
      */
-    int deleteBusinessRule(String uuid, Boolean forceDeleteEnabled) throws SiddhiAppsApiHelperException, BusinessRuleNotFoundException, TemplateManagerServiceException;
+    int deleteBusinessRule(String uuid, Boolean forceDeleteEnabled)
+            throws SiddhiAppsApiHelperException, BusinessRuleNotFoundException, TemplateManagerServiceException;
+
+    int deployOrUndeployBusinessRule(String businessRulesUUID, boolean shouldUndeploy) throws TemplateInstanceCountViolationException, TemplateManagerServiceException, RuleTemplateScriptException, BusinessRuleNotFoundException;
 
     /**
      * Creates a Business Rule instance from the specifications of the given Business Rule
@@ -55,7 +59,8 @@ public interface BusinessRulesService {
      * @param businessRuleFromTemplate business rule object
      */
     int createBusinessRuleFromTemplate(BusinessRuleFromTemplate businessRuleFromTemplate, Boolean shouldDeploy)
-            throws TemplateManagerServiceException, RuleTemplateScriptException, TemplateInstanceCountViolationException;
+            throws TemplateManagerServiceException, RuleTemplateScriptException,
+            TemplateInstanceCountViolationException;
 
     /**
      * Overwrites the Business Rule which has the given UUID, with the given Business Rule
@@ -65,7 +70,8 @@ public interface BusinessRulesService {
      * @param businessRuleFromTemplate business rule from template object
      */
     int editBusinessRuleFromTemplate(String uuid, BusinessRuleFromTemplate businessRuleFromTemplate,
-                                     Boolean shouldDeploy) throws TemplateManagerServiceException, RuleTemplateScriptException;
+                                     Boolean shouldDeploy)
+            throws TemplateManagerServiceException, RuleTemplateScriptException;
 
     int createBusinessRuleFromScratch(BusinessRuleFromScratch businessRuleFromScratch, Boolean toDeploy) throws
             TemplateManagerServiceException, RuleTemplateScriptException, TemplateInstanceCountViolationException;
