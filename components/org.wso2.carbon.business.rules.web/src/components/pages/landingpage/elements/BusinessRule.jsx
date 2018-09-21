@@ -104,24 +104,6 @@ export default class BusinessRule extends Component {
     }
 
     /**
-     * Returns the Un-deploy button
-     * @returns {Component}     Tooltip Component, containing IconButton
-     */
-    displayRuleUndeployButton() {
-        return (
-            <Tooltip id="tooltip-right" title="Un-deploy" placement="bottom">
-                <IconButton
-                    color="primary"
-                    aria-label="Un-deploy"
-                    onClick={() => this.handleUnDeployButtonClick()}
-                >
-                    <UndeployButton />
-                </IconButton>
-            </Tooltip>
-        );
-    }
-
-    /**
      * Returns the Deploy button
      * @returns {Component}     Retry Deploy button
      */
@@ -140,15 +122,24 @@ export default class BusinessRule extends Component {
     }
 
     /**
-     * Returns the un-deploy button
-     * @returns {Component}  Un-deploy button
+     * Returns the Un-deploy button
+     * @returns {Component}     Tooltip Component, containing IconButton
      */
     displayUndeployButton() {
         switch (this.props.status) {
             case 0:
             case 2:
             case 3:
-                return this.displayRuleUndeployButton();
+                return (
+                    <Tooltip id="tooltip-right" title="Un-deploy" placement="bottom">
+                        <IconButton
+                            aria-label="Un-deploy"
+                            onClick={() => this.handleUnDeployButtonClick()}
+                        >
+                            <UndeployButton />
+                        </IconButton>
+                    </Tooltip>
+                );
             default:
                 return null;
         }
