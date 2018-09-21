@@ -446,7 +446,7 @@ public class BusinessRulesApiServiceImpl extends BusinessRulesApiService {
         } catch (TemplateManagerServiceException e) {
             log.error(String.format("Failed to re-deploy the business rule with uuid %s ",
                     LogEncoder.removeCRLFCharacters(businessRuleInstanceID)), e);
-            responseData.add("Re-deployment fail-ure");
+            responseData.add("Re-deployment failure");
             responseData.add("Failed to re-deploy the business rule with uuid '" + businessRuleInstanceID + "'");
             responseData.add(new String[]{});
             return Response.ok().entity(gson.toJson(responseData)).build();
