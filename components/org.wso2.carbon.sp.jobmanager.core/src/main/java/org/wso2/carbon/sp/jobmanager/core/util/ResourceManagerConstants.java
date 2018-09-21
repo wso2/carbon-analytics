@@ -88,8 +88,8 @@ public class ResourceManagerConstants {
     public static final String DEFAULT_MB_TOPIC_SINK_TEMPLATE = "@sink(type='jms',"
             + "factory.initial='org.wso2.andes.jndi.PropertiesFileInitialContextFactory',"
             + "provider.url='../../resources/jndi.properties',connection.factory.type='topic',"
-            + "destination = '${" + MB_DESTINATION  +  "}', connection.factory.jndi.name=" +
-            "'TopicConnectionFactory',@map(type='" + MAPPING + "'))";
+            + "destination = '${" + MB_DESTINATION  +  "}', connection.factory.jndi.name="
+            + "'TopicConnectionFactory',@map(type='" + MAPPING + "'))";
 
     public static final String DEFAULT_MB_QUEUE_SINK_TEMPLATE = "@sink(type='jms',"
             + "factory.initial='org.wso2.andes.jndi.PropertiesFileInitialContextFactory',"
