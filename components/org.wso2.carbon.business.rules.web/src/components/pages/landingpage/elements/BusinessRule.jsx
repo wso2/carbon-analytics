@@ -66,7 +66,7 @@ export default class BusinessRule extends Component {
      * Handles Re-deploy button click
      */
     handleReDeployButtonClick() {
-        this.props.onRedeploy();
+        this.props.onRedeployRequest();
     }
 
     /**
@@ -79,7 +79,7 @@ export default class BusinessRule extends Component {
     /**
      * Handles Un-deploy button click
      */
-    handleUndeployButtonClick() {
+    handleUnDeployButtonClick() {
         this.props.onUndeployRequest();
     }
 
@@ -110,7 +110,11 @@ export default class BusinessRule extends Component {
     displayRuleUndeployButton() {
         return (
             <Tooltip id="tooltip-right" title="Un-deploy" placement="bottom">
-                <IconButton aria-label="Undeploy" onClick={() => this.handleUndeployButtonClick()}>
+                <IconButton
+                    color="primary"
+                    aria-label="Un-deploy"
+                    onClick={() => this.handleUnDeployButtonClick()}
+                >
                     <UndeployButton />
                 </IconButton>
             </Tooltip>
@@ -286,7 +290,7 @@ BusinessRule.propTypes = {
         BusinessRulesConstants.USER_PERMISSIONS.NONE,
         BusinessRulesConstants.USER_PERMISSIONS.UNSET,
     ]).isRequired,
-    onRedeploy: PropTypes.func.isRequired,
+    onRedeployRequest: PropTypes.func.isRequired,
     onDeleteRequest: PropTypes.func.isRequired,
     onUndeployRequest: PropTypes.func.isRequired,
     onDeploymentInfoRequest: PropTypes.func.isRequired,
