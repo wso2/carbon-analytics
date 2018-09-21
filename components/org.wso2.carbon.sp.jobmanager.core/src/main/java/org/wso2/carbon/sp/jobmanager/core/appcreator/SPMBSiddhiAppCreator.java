@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+ * Copyright (c) 2018, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
  *
  * WSO2 Inc. licenses this file to you under the Apache License,
  * Version 2.0 (the "License"); you may not use this file except
@@ -60,8 +60,8 @@ public class SPMBSiddhiAppCreator extends AbstractSiddhiAppCreator {
      * @param queryList     Contains the query of the current execution group replicated
      *                      to the parallelism of the group.
      * @param outputStreams Collection of current execution group's output streams
-     *
-     * Assign the jms transport headers for each instance siddhi applications output streams for given execution group
+     * Assign the jms transport headers for each instance siddhi applications output streams
+     *                     for given execution group
      */
     private void processOutputStreams(String siddhiAppName, List<SiddhiQuery> queryList,
                                       Collection<OutputStreamDataHolder> outputStreams) {
@@ -75,16 +75,18 @@ public class SPMBSiddhiAppCreator extends AbstractSiddhiAppCreator {
 
             for (PublishingStrategyDataHolder holder : outputStream.getPublishingStrategyList()) {
                 sinkValuesMap.put(ResourceManagerConstants.MB_DESTINATION, siddhiAppName + "_" +
-                        outputStream.getStreamName() + (holder.getGroupingField() == null ? "" : ("_" + holder
-                        .getGroupingField())));
+                        outputStream.getStreamName() + (holder.getGroupingField() == null ? ""
+                        : ("_" + holder.getGroupingField())));
                 if (holder.getStrategy() == TransportStrategy.FIELD_GROUPING) {
                     if (partitionKeys.get(holder.getGroupingField()) != null &&
-                            partitionKeys.get(holder.getGroupingField()) > holder.getParallelism()) {
+                            partitionKeys.get(holder.getGroupingField()) > holder.getParallelism())
+                    {
                         continue;
                     }
 
                     partitionKeys.put(holder.getGroupingField(), holder.getParallelism());
-                    sinkValuesMap.put(ResourceManagerConstants.PARTITION_KEY, holder.getGroupingField());
+                    sinkValuesMap.put(ResourceManagerConstants.PARTITION_KEY,
+                            holder.getGroupingField());
                     List<String> destinations = new ArrayList<>(holder.getParallelism());
 
                     for (int i = 0; i < holder.getParallelism(); i++) {
@@ -92,32 +94,39 @@ public class SPMBSiddhiAppCreator extends AbstractSiddhiAppCreator {
                         destinationMap.put(ResourceManagerConstants.PARTITION_TOPIC,
                                 sinkValuesMap.get(ResourceManagerConstants.MB_DESTINATION)
                                         + "_" + String.valueOf(i));
-                        destinations.add(getUpdatedQuery(ResourceManagerConstants.DESTINATION_TOPIC, destinationMap));
+                        destinations.add(getUpdatedQuery(ResourceManagerConstants.DESTINATION_TOPIC,
+                                destinationMap));
                     }
 
                     sinkValuesMap.put(ResourceManagerConstants.DESTINATIONS,
                             StringUtils.join(destinations, ","));
-                    String sinkString = getUpdatedQuery(ResourceManagerConstants.PARTITIONED_MB_SINK_TEMPLATE,
+                    String sinkString =
+                            getUpdatedQuery(ResourceManagerConstants.PARTITIONED_MB_SINK_TEMPLATE,
                             sinkValuesMap);
-                    sinkList.put(sinkValuesMap.get(ResourceManagerConstants.MB_DESTINATION), sinkString);
+                    sinkList.put(sinkValuesMap.get(ResourceManagerConstants.MB_DESTINATION),
+                            sinkString);
 
                 } else if (holder.getStrategy() == TransportStrategy.ROUND_ROBIN) {
                         //if holder uses RR as strategy then unique topic name will be defined
-                        sinkValuesMap.put(ResourceManagerConstants.MB_DESTINATION, siddhiAppName + "_" +
-                                outputStream.getStreamName() + "_" + String.valueOf(rrHolderCount));
+                        sinkValuesMap.put(ResourceManagerConstants.MB_DESTINATION, siddhiAppName
+                                + "_" + outputStream.getStreamName() + "_"
+                                + String.valueOf(rrHolderCount));
                         rrHolderCount++;
-                        String sinkString = getUpdatedQuery(ResourceManagerConstants.DEFAULT_MB_QUEUE_SINK_TEMPLATE,
-                                sinkValuesMap);
-                        sinkList.put(sinkValuesMap.get(ResourceManagerConstants.MB_DESTINATION), sinkString);
+                        String sinkString = getUpdatedQuery(ResourceManagerConstants
+                                        .DEFAULT_MB_QUEUE_SINK_TEMPLATE, sinkValuesMap);
+                        sinkList.put(sinkValuesMap.get(ResourceManagerConstants.MB_DESTINATION)
+                                , sinkString);
 
                 } else if (holder.getStrategy() == TransportStrategy.ALL) {
-                    String sinkString = getUpdatedQuery(ResourceManagerConstants.DEFAULT_MB_TOPIC_SINK_TEMPLATE,
-                            sinkValuesMap);
-                    sinkList.put(sinkValuesMap.get(ResourceManagerConstants.MB_DESTINATION), sinkString);
+                    String sinkString = getUpdatedQuery(ResourceManagerConstants
+                                    .DEFAULT_MB_TOPIC_SINK_TEMPLATE, sinkValuesMap);
+                    sinkList.put(sinkValuesMap.get(ResourceManagerConstants.MB_DESTINATION)
+                            , sinkString);
                 }
             }
             Map<String, String> queryValuesMap = new HashMap<>(1);
-            queryValuesMap.put(outputStream.getStreamName(), StringUtils.join(sinkList.values(),  "\n"));
+            queryValuesMap.put(outputStream.getStreamName(),
+                    StringUtils.join(sinkList.values(),  "\n"));
             updateQueryList(queryList, queryValuesMap);
         }
     }
@@ -128,7 +137,6 @@ public class SPMBSiddhiAppCreator extends AbstractSiddhiAppCreator {
      * @param queryList     Contains the query of the current execution group replicated
      *                      to the parallelism of the group.
      * @param inputStreams  Collection of current execution group's input streams
-     *
      * Assign the jms transport headers for each instance siddhi applications input
      *                      streams for a given execution group
      */
@@ -137,31 +145,34 @@ public class SPMBSiddhiAppCreator extends AbstractSiddhiAppCreator {
         Map<String, String> sourceValuesMap = new HashMap<>();
         for (InputStreamDataHolder inputStream : inputStreams) {
 
-            SubscriptionStrategyDataHolder subscriptionStrategy = inputStream.getSubscriptionStrategy();
+            SubscriptionStrategyDataHolder subscriptionStrategy = inputStream
+                    .getSubscriptionStrategy();
             sourceValuesMap.put(ResourceManagerConstants.MB_DESTINATION, siddhiAppName + "_" +
-                    inputStream.getStreamName() + (inputStream.getSubscriptionStrategy().getPartitionKey() ==
-                    null ? "" : ("_" + inputStream.getSubscriptionStrategy().getPartitionKey())));
+                    inputStream.getStreamName() + (inputStream.getSubscriptionStrategy()
+                    .getPartitionKey() == null ? "" : ("_" + inputStream.getSubscriptionStrategy()
+                    .getPartitionKey())));
             if (!inputStream.isUserGiven()) {
                 if (subscriptionStrategy.getStrategy() == TransportStrategy.FIELD_GROUPING) {
 
                     for (int i = 0; i < queryList.size(); i++) {
                         List<String> sourceQueries = new ArrayList<>();
-                        List<Integer> partitionNumbers = getPartitionNumbers(queryList.size(), subscriptionStrategy
+                        List<Integer> partitionNumbers = getPartitionNumbers(queryList.size(),
+                                subscriptionStrategy
                                 .getOfferedParallelism(), i);
                         for (int topicCount : partitionNumbers) {
                             String topicName = siddhiAppName + "_" + inputStream.getStreamName()
                                     + "_" + inputStream.getSubscriptionStrategy().getPartitionKey()
                                     + "_" + Integer.toString(topicCount);
                             sourceValuesMap.put(ResourceManagerConstants.MB_DESTINATION, topicName);
-                            String sourceQuery =
-                                    getUpdatedQuery(ResourceManagerConstants.DEFAULT_MB_TOPIC_SOURCE_TEMPLATE,
-                                            sourceValuesMap);
+                            String sourceQuery = getUpdatedQuery(ResourceManagerConstants
+                                            .DEFAULT_MB_TOPIC_SOURCE_TEMPLATE, sourceValuesMap);
                             sourceQueries.add(sourceQuery);
                         }
                         String combinedQueryHeader = StringUtils.join(sourceQueries, "\n");
                         Map<String, String> queryValuesMap = new HashMap<>(1);
                         queryValuesMap.put(inputStream.getStreamName(), combinedQueryHeader);
-                        String updatedQuery = getUpdatedQuery(queryList.get(i).getApp(), queryValuesMap);
+                        String updatedQuery = getUpdatedQuery(queryList.get(i).getApp()
+                                , queryValuesMap);
                         queryList.get(i).setApp(updatedQuery);
                     }
                 } else if (subscriptionStrategy.getStrategy() == TransportStrategy.ROUND_ROBIN) {
@@ -176,18 +187,18 @@ public class SPMBSiddhiAppCreator extends AbstractSiddhiAppCreator {
                     queueCount += 1;
                     rrTrackerMap.put(inputStream.getStreamName(), queueCount);
                     sourceValuesMap.put(ResourceManagerConstants.MB_DESTINATION, queueName);
-                    String sourceString = getUpdatedQuery(ResourceManagerConstants.DEFAULT_MB_QUEUE_SOURCE_TEMPLATE,
-                            sourceValuesMap);
+                    String sourceString = getUpdatedQuery(ResourceManagerConstants
+                                    .DEFAULT_MB_QUEUE_SOURCE_TEMPLATE, sourceValuesMap);
                     Map<String, String> queryValuesMap = new HashMap<>(1);
                     queryValuesMap.put(inputStream.getStreamName(), sourceString);
                     updateQueryList(queryList, queryValuesMap);
                 } else {
-                    sourceValuesMap.put(ResourceManagerConstants.MB_DESTINATION, siddhiAppName + "_" +
-                            inputStream.getStreamName());
+                    sourceValuesMap.put(ResourceManagerConstants.MB_DESTINATION, siddhiAppName
+                            + "_" + inputStream.getStreamName());
 
                     for (SiddhiQuery aQueryList : queryList) {
-                        String sourceString = getUpdatedQuery(ResourceManagerConstants.DEFAULT_MB_TOPIC_SOURCE_TEMPLATE,
-                                sourceValuesMap);
+                        String sourceString = getUpdatedQuery(ResourceManagerConstants
+                                        .DEFAULT_MB_TOPIC_SOURCE_TEMPLATE, sourceValuesMap);
                         Map<String, String> queryValuesMap = new HashMap<>(1);
                         queryValuesMap.put(inputStream.getStreamName(), sourceString);
                         String updatedQuery = getUpdatedQuery(aQueryList.getApp(), queryValuesMap);
