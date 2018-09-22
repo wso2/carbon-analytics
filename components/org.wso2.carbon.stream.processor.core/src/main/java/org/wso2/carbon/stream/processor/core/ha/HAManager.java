@@ -28,6 +28,7 @@ import org.wso2.carbon.stream.processor.core.event.queue.EventListMapManager;
 import org.wso2.carbon.stream.processor.core.ha.tcp.TCPServer;
 import org.wso2.carbon.stream.processor.core.ha.transport.EventSyncConnectionPoolManager;
 import org.wso2.carbon.stream.processor.core.ha.util.HAConstants;
+import org.wso2.carbon.stream.processor.core.internal.SiddhiAppData;
 import org.wso2.carbon.stream.processor.core.internal.StreamProcessorDataHolder;
 import org.wso2.carbon.stream.processor.core.internal.beans.DeploymentConfig;
 import org.wso2.carbon.stream.processor.core.internal.beans.EventSyncClientPoolConfig;
@@ -148,6 +149,7 @@ public class HAManager {
     void changeToActive() {
         if (!isActiveNode) {
             isActiveNode = true;
+            changeSiddhiAppState(true);
             NodeInfo nodeInfo = StreamProcessorDataHolder.getNodeInfo();
             nodeInfo.setActiveNode(isActiveNode);
             tcpServerInstance.stop();
@@ -197,6 +199,7 @@ public class HAManager {
      */
     void changeToPassive() {
         isActiveNode = false;
+        changeSiddhiAppState(false);
         passiveNodeDetailsPropertiesMap.put(HAConstants.HOST, deploymentConfig.eventSyncServerConfigs().getHost());
         passiveNodeDetailsPropertiesMap.put(HAConstants.PORT, deploymentConfig.eventSyncServerConfigs().getPort());
         passiveNodeDetailsPropertiesMap.put(HAConstants.ADVERTISED_HOST, deploymentConfig.eventSyncServerConfigs()
@@ -296,6 +299,19 @@ public class HAManager {
                         siddhiAppRuntime.getName());
             }
             siddhiAppRuntime.shutdown();
+        });
+    }
+
+    private void changeSiddhiAppState(boolean state) {
+        Map<String, SiddhiAppData> siddhiAppMap = StreamProcessorDataHolder.getStreamProcessorService().
+                getSiddhiAppMap();
+
+        siddhiAppMap.forEach((siddhiAppName, siddhiAppData) -> {
+            if (log.isDebugEnabled()) {
+                log.debug("Changed Siddhi Application " + siddhiAppName + " state to " +
+                        state);
+            }
+            siddhiAppData.setActive(state);
         });
     }
 

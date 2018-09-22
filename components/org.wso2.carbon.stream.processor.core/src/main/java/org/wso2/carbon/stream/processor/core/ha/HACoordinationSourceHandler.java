@@ -42,6 +42,8 @@ import java.util.concurrent.atomic.AtomicLong;
  * Implementation of {@link SourceHandler} used for 2 node minimum HA
  */
 public class HACoordinationSourceHandler extends SourceHandler {
+
+    private boolean isActiveNode;
     private long lastProcessedEventTimestamp = 0L;
     private String sourceHandlerElementId;
     private String siddhiAppName;
@@ -69,11 +71,13 @@ public class HACoordinationSourceHandler extends SourceHandler {
      */
     @Override
     public void sendEvent(Event event, InputHandler inputHandler) throws InterruptedException {
-        lastProcessedEventTimestamp = event.getTimestamp();
-        if (passiveNodeAdded) {
-            sendEventsToPassiveNode(event);
+        if (isActiveNode) {
+            lastProcessedEventTimestamp = event.getTimestamp();
+            if (passiveNodeAdded) {
+                sendEventsToPassiveNode(event);
+            }
+            inputHandler.send(event);
         }
-        inputHandler.send(event);
     }
 
     /**
@@ -85,15 +89,31 @@ public class HACoordinationSourceHandler extends SourceHandler {
      */
     @Override
     public void sendEvent(Event[] events, InputHandler inputHandler) throws InterruptedException {
-        lastProcessedEventTimestamp = events[events.length - 1].getTimestamp();
-        if (passiveNodeAdded) {
-            sendEventsToPassiveNode(events);
+        if (isActiveNode) {
+            lastProcessedEventTimestamp = events[events.length - 1].getTimestamp();
+            if (passiveNodeAdded) {
+                sendEventsToPassiveNode(events);
+            }
+            inputHandler.send(events);
         }
-        inputHandler.send(events);
     }
 
     public void setPassiveNodeAdded(boolean passiveNodeAdded) {
         this.passiveNodeAdded = passiveNodeAdded;
+    }
+
+    /**
+     * Method to change the source handler to Active state so that timestamp of event being processed is saved.
+     */
+    public void setAsActive() {
+        isActiveNode = true;
+    }
+
+    /**
+     * Method to change the source handler to Passive state so that events will not be processed.
+     */
+    public void setAsPassive() {
+        isActiveNode = false;
     }
 
     @Override

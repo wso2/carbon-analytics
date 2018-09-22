@@ -27,7 +27,7 @@
     <groupId>org.wso2.carbon.analytics</groupId>
     <artifactId>org.wso2.carbon.analytics.parent</artifactId>
     <packaging>pom</packaging>
-    <version>2.0.417-SNAPSHOT</version>
+    <version>2.0.424-SNAPSHOT</version>
     <name>WSO2 Carbon Analytics - Parent</name>
     <modules>
         <module>components/org.wso2.carbon.stream.processor.common</module>
@@ -1509,11 +1509,11 @@
     </dependencyManagement>
 
     <properties>
-        <carbon.analytics.version>2.0.417-SNAPSHOT</carbon.analytics.version>
-        <siddhi.version>4.2.18</siddhi.version>
-        <siddhi.bundle.version>4.2.18</siddhi.bundle.version>
+        <carbon.analytics.version>2.0.424-SNAPSHOT</carbon.analytics.version>
+        <siddhi.version>4.2.20</siddhi.version>
+        <siddhi.bundle.version>4.2.20</siddhi.bundle.version>
         <siddhi.version.range>[4.0.0, 5.0.0)</siddhi.version.range>
-        <carbon.analytics-common.version>6.0.68</carbon.analytics-common.version>
+        <carbon.analytics-common.version>6.0.70</carbon.analytics-common.version>
         <carbon.analytics-common.version.range>[6.0.66, 6.1.0)</carbon.analytics-common.version.range>
         <carbon.analytics.version.range>[2.0.0, 3.0.0)</carbon.analytics.version.range>
 
@@ -1722,7 +1722,7 @@
 
         <siddhi.map.json.version>4.0.31</siddhi.map.json.version>
         <siddhi.map.binary.version>1.0.15</siddhi.map.binary.version>
-        <siddhi.map.xml.version>4.0.18</siddhi.map.xml.version>
+        <siddhi.map.xml.version>4.0.19</siddhi.map.xml.version>
 
         <siddhi.store.rdbms.version>4.0.33</siddhi.store.rdbms.version>
         <siddhi.store.solr.version>1.0.21</siddhi.store.solr.version>
