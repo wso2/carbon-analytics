@@ -43,6 +43,7 @@ import org.wso2.siddhi.core.stream.output.StreamCallback;
 import org.wso2.siddhi.core.util.EventPrinter;
 import org.wso2.siddhi.core.util.SiddhiTestHelper;
 import org.wso2.siddhi.core.util.transport.InMemoryBroker;
+import org.wso2.siddhi.query.api.exception.SiddhiAppValidationException;
 
 import java.rmi.RemoteException;
 import java.util.ArrayList;
@@ -381,7 +382,7 @@ public class SiddhiTopologyCreatorTestCase {
         KafkaTestUtil.createTopic(topics, 1);
         Assert.assertTrue(topology.getQueryGroupList().get(0).getInputStreams().containsKey("TempStream"));
         Assert.assertTrue(topology.getQueryGroupList().get(1).getInputStreams().containsKey("RegulatorStream"));
-        Assert.assertTrue(topology.getQueryGroupList().get(1).getOutputStreams().containsKey("TempDiffStream"));
+//        Assert.assertTrue(topology.getQueryGroupList().get(1).getOutputStreams().containsKey("TempDiffStream"));
 
         SiddhiAppCreator appCreator = new SPSiddhiAppCreator();
         List<DeployableSiddhiQueryGroup> queryGroupList = appCreator.createApps(topology);
@@ -727,8 +728,6 @@ public class SiddhiTopologyCreatorTestCase {
                 + "${companyTriggerInternalStream}define stream companyTriggerInternalStream (symbol string);\n"
                 + "${filteredStockStream}define stream filteredStockStream (symbol string, price float, quantity int,"
                 + " tier string);\n"
-                + "${triggeredAvgStream}define stream triggeredAvgStream (symbol string, avgPrice double, quantity "
-                + "int);\n"
                 + "@info(name='query3')\n"
                 + "Partition with (symbol of filteredStockStream)\n"
                 + "begin\n"
@@ -1403,7 +1402,6 @@ public class SiddhiTopologyCreatorTestCase {
                                                     + ".thread', bootstrap.servers='localhost:9092', @map(type='xml')"
                                                     + ") \n"
                                                     + "define stream Test1Stream (name string, amount double);\n"
-                                                    + "define stream Test3Stream (name string, amount double);\n"
                                                     + "@info(name = 'query2')\n"
                                                     + " from Test1Stream\n"
                                                     + "select *\n"
@@ -1503,6 +1501,101 @@ public class SiddhiTopologyCreatorTestCase {
 
     }
 
+    @Test(dependsOnMethods = "testUsergivenSourceSingleGroup")
+    public void testSingleGroupWithMultipleSubscriptions() {
+        String siddhiApp = "@App:name('TestPlan15')"
+                + "@source(type='kafka', topic.list='custom_topic', group.id='1', threading.option='single.thread', "
+                + "bootstrap.servers='localhost:9092', @map(type='xml')) "
+                + "define stream TempStream(deviceID long, roomNo int, temp double); "
+                + "@info(name = 'query1') @dist(parallel ='2', execGroup='001')\n "
+                + "from TempStream[temp>100]\n"
+                + "select *\n"
+                + "insert into TempInternalStream;"
+                + "@info(name='query2')@dist(parallel='2',execGroup='001')\n"
+                + "from TempInternalStream\n"
+                + "select roomNo, temp\n"
+                + "insert into HighTempStream;";
+
+        SiddhiTopologyCreatorImpl siddhiTopologyCreator = new SiddhiTopologyCreatorImpl();
+        SiddhiTopology topology = siddhiTopologyCreator.createTopology(siddhiApp);
+        String topics[] = new String[]{"custom_topic"};
+        KafkaTestUtil.createTopic(topics, 1);
+
+        SiddhiAppCreator appCreator = new SPSiddhiAppCreator();
+        List<DeployableSiddhiQueryGroup> queryGroupList = appCreator.createApps(topology);
+        Assert.assertEquals(queryGroupList.size(), 2, "Three query groups should be created with passthrough query");
+        Assert.assertEquals(queryGroupList.get(1).getSiddhiQueries().size(), 2, "Two queries should be created "
+                + "for group 001");
+
+        SiddhiManager siddhiManager = new SiddhiManager();
+        try {
+            Map<String, List<SiddhiAppRuntime>> siddhiAppRuntimeMap = createSiddhiAppRuntimes(siddhiManager,
+                                                                                              queryGroupList);
+            InputHandler tempStreamHandler =
+                    siddhiAppRuntimeMap.get("TestPlan15-001").get(0).getInputHandler("TempStream");
+            for (SiddhiAppRuntime runtime : siddhiAppRuntimeMap.get("TestPlan15-001")) {
+                runtime.addCallback("HighTempStream", new StreamCallback() {
+                    @Override public void receive(Event[] events) {
+                        EventPrinter.print(events);
+                        count.addAndGet(events.length);
+                        for (Event event : events) {
+                            if (event.getData()[0].equals(110)) {
+                                errorAssertionCount.incrementAndGet();
+                                Assert.assertEquals(event.getData()[1], 120.0);
+                                errorAssertionCount.decrementAndGet();
+                            } else {
+                                errorAssertionCount.incrementAndGet();
+                                Assert.assertEquals(event.getData()[1], 210.0);
+                                errorAssertionCount.decrementAndGet();
+                            }
+                        }
+                    }
+                });
+            }
+            tempStreamHandler.send(new Object[]{1L, 110, 50d});
+            tempStreamHandler.send(new Object[]{1L, 110, 120d});
+            tempStreamHandler.send(new Object[]{2L, 140, 70d});
+            tempStreamHandler.send(new Object[]{2L, 140, 210d});
+
+            SiddhiTestHelper.waitForEvents(100, 2, count, 2000);
+            Assert.assertEquals(count.intValue(), 2);
+            Assert.assertEquals(errorAssertionCount.intValue(), 0, "No assertion errors should occur " +
+                    "inside callbacks");
+        } catch (InterruptedException e) {
+            log.error(e.getMessage(), e);
+        } finally {
+            siddhiManager.shutdown();
+        }
+    }
+
+    @Test(dependsOnMethods = "testSingleGroupWithMultipleSubscriptions", expectedExceptions =
+                                                                                     SiddhiAppValidationException.class)
+    public void testParallelPartitionsWithinSameGroup() {
+        String siddhiApp = "@App:name('TestPlan16')"
+                + "@source(type='kafka', topic.list='custom_topic', group.id='1', threading.option='single.thread', "
+                + "bootstrap.servers='localhost:9092', @map(type='xml')) "
+                + "define stream TempStream(deviceID long, roomNo int, temp double); "
+                + "@info(name = 'query1') @dist(parallel ='2', execGroup='001')\n "
+                + "from TempStream\n"
+                + "select *\n"
+                + "insert into TempInternalStream;"
+                + "@info(name='query2')@dist(parallel='2',execGroup='001')\n"
+                + "Partition with (deviceID of TempInternalStream)\n"
+                + "Begin\n"
+                + "from TempInternalStream\n"
+                + "select roomNo, sum(temp) as sumTemp\n"
+                + "insert into HighTempStream;"
+                + "end;";
+
+        SiddhiTopologyCreatorImpl siddhiTopologyCreator = new SiddhiTopologyCreatorImpl();
+        SiddhiTopology topology = siddhiTopologyCreator.createTopology(siddhiApp);
+        String topics[] = new String[]{"custom_topic"};
+        KafkaTestUtil.createTopic(topics, 1);
+
+        SiddhiAppCreator appCreator = new SPSiddhiAppCreator();
+        appCreator.createApps(topology);
+
+    }
 
 
     private Map<String, List<SiddhiAppRuntime>> createSiddhiAppRuntimes(
