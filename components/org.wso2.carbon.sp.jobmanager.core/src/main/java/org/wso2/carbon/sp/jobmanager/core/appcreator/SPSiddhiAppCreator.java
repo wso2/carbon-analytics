@@ -59,6 +59,13 @@ public class SPSiddhiAppCreator extends AbstractSiddhiAppCreator {
                 .getParallelism());
         processInputStreams(siddhiAppName, groupName, queryList, queryGroup.getInputStreams().values());
         processOutputStreams(siddhiAppName, groupName, queryList, queryGroup.getOutputStreams().values());
+        if (log.isDebugEnabled()) {
+            log.debug("Following query list is created for the Siddhi Query Group " + queryGroup.getName() + " "
+                              + "representing Siddhi App " + siddhiAppName + ".");
+            for (SiddhiQuery siddhiQuery : queryList) {
+                log.debug(siddhiQuery.getApp());
+            }
+        }
         return queryList;
     }
 
