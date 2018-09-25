@@ -41,7 +41,7 @@ public class SPMBSiddhiAppCreator extends AbstractSiddhiAppCreator {
     private static final Logger log = Logger.getLogger(SPMBSiddhiAppCreator.class);
     private static final int TIMEOUT = 120;
     private Map<String, Integer> rrTrackerMap = new HashMap<>();
-    private int rrHolderCount = 0;
+
 
     @Override
     protected List<SiddhiQuery> createApps(String siddhiAppName, SiddhiQueryGroup queryGroup) {
@@ -67,6 +67,7 @@ public class SPMBSiddhiAppCreator extends AbstractSiddhiAppCreator {
                                       Collection<OutputStreamDataHolder> outputStreams) {
         //Store the data for sink stream header
         Map<String, String> sinkValuesMap = new HashMap<>();
+        int rrHolderCount = 0;
         for (OutputStreamDataHolder outputStream : outputStreams) {
             //Contains the header string for each stream
             Map<String, String> sinkList = new HashMap<>();

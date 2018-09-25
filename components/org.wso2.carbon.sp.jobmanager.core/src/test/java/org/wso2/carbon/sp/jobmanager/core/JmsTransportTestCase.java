@@ -42,6 +42,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
+import javax.jms.JMSException;
+import javax.naming.NamingException;
 
 /**
  * Contains the test cases for JMS transport tests
@@ -337,8 +339,6 @@ public class JmsTransportTestCase {
             SiddhiTopology topology = siddhiTopologyCreator.createTopology(siddhiApp);
         } catch (SiddhiAppValidationException e) {
             log.error(e.getMessage(), e);
-        } finally {
-            System.out.println("Testing finished");
         }
     }
 
@@ -422,7 +422,7 @@ public class JmsTransportTestCase {
                         "<events><event><deviceID>2</deviceID><roomNo>101</roomNo>"
                         + "<isOn>false</isOn></event></events>");
             } catch (Exception e) {
-                System.out.println(e.getMessage());
+                log.error(e.getMessage(), e);
             }
 
             SiddhiTestHelper.waitForEvents(2000, 2, count, 3000);
@@ -537,7 +537,7 @@ public class JmsTransportTestCase {
                         "<events><event><deviceID>2</deviceID><roomNo>101</roomNo>"
                         + "<isOn>false</isOn></event></events>");
             } catch (Exception e) {
-                System.out.println(e.getMessage());
+                log.error(e.getMessage(), e);
             }
 
             SiddhiTestHelper.waitForEvents(2000, 2, count, 3000);
@@ -1410,8 +1410,6 @@ public class JmsTransportTestCase {
         } catch (SiddhiAppValidationException e) {
             Assert.assertTrue(e.getMessage().contains("Unsupported:@dist annotation inside "
                     + "partition queries"));
-        } finally {
-            System.out.println("Testing finished");
         }
     }
 
@@ -1455,8 +1453,6 @@ public class JmsTransportTestCase {
             Assert.fail();
         } catch (SiddhiAppValidationException e) {
             Assert.assertTrue(e.getMessage().contains("not assigned constant @dist(parallel)"));
-        } finally {
-            System.out.println("Testing finished");
         }
     }
 
@@ -1500,8 +1496,6 @@ public class JmsTransportTestCase {
             Assert.fail();
         } catch (SiddhiAppValidationException e) {
             Assert.assertTrue(e.getMessage().contains("not assigned constant @dist(parallel)"));
-        } finally {
-            System.out.println("Testing finished");
         }
     }
 
@@ -1547,8 +1541,6 @@ public class JmsTransportTestCase {
         } catch (SiddhiAppValidationException e) {
             Assert.assertTrue(e.getMessage().contains("In-Memory Table referenced from more than "
                     + "one execGroup: execGroup"));
-        } finally {
-            System.out.println("Testing finished");
         }
     }
 
@@ -1585,8 +1577,6 @@ public class JmsTransportTestCase {
             Assert.fail();
         } catch (SiddhiAppValidationException e) {
             Assert.assertTrue(e.getMessage().contains("with In-Memory Table  having parallel >1"));
-        } finally {
-            System.out.println("Testing finished");
         }
     }
 
@@ -1624,8 +1614,6 @@ public class JmsTransportTestCase {
         } catch (SiddhiAppValidationException e) {
             Assert.assertTrue(e.getMessage().contains("Window queries used with parallel "
                     + "greater than 1 outside partitioned stream"));
-        } finally {
-            System.out.println("Testing finished");
         }
     }
 
@@ -1663,8 +1651,6 @@ public class JmsTransportTestCase {
         } catch (SiddhiAppValidationException e) {
             Assert.assertTrue(e.getMessage().contains("Window queries used with parallel greater "
                     + "than 1 outside partitioned stream"));
-        } finally {
-            System.out.println("Testing finished");
         }
     }
 
@@ -1691,11 +1677,8 @@ public class JmsTransportTestCase {
             SiddhiTopology topology = siddhiTopologyCreator.createTopology(siddhiApp);
             Assert.fail();
         } catch (SiddhiAppValidationException e) {
-            System.out.println(e.getMessage());
             Assert.assertTrue(e.getMessage().contains("Join queries used with parallel greater "
                     + "than 1 outside partitioned stream"));
-        } finally {
-            System.out.println("Testing finished");
         }
     }
 
@@ -1749,8 +1732,6 @@ public class JmsTransportTestCase {
         } catch (SiddhiAppValidationException e) {
             Assert.assertTrue(e.getMessage().contains("Unsupported in distributed setup :More "
                     + "than 1 partition residing on the same execGroup"));
-        } finally {
-            System.out.println("Testing finished");
         }
     }
 
@@ -1806,11 +1787,179 @@ public class JmsTransportTestCase {
         } catch (SiddhiAppValidationException e) {
             Assert.assertTrue(e.getMessage().contains("Range PartitionType not Supported in "
                     + "Distributed SetUp"));
-        } finally {
-            System.out.println("Testing finished");
         }
     }
 
+    /**
+     * If a siddhi application contains multiple query qroups with same input stream with
+     * {@link TransportStrategy#ROUND_ROBIN} then separate queues should created for them.
+     */
+    @Test(dependsOnMethods = "testRangePartition")
+    public void testMultipleRRstrategy() {
+        String siddhiApp = "@App:name('TestPlan25')\n"
+                + "@App:description('Testing the MB implementation with multiple RR strategies.')\n"
+                + "@source(type = 'http', receiver.url='http://localhost:5005/SweetProductionEP',"
+                + " @map(type = 'json'))\n"
+                + "define stream Test1Stream (name string, amount double);\n"
+                + "define stream Test2Stream (name string, amount double);\n"
+                + "@Sink(type='log')\n"
+                + "define stream Test3Stream (name string, amount double);\n"
+                + "define stream Test4Stream (name string, amount double);\n"
+                + "define stream Test5Stream (name string, amount double);\n"
+                + "@info(name = 'query1')@dist(parallel='1', execGroup='001')\n"
+                + "from Test1Stream\n"
+                + "select name,amount\n"
+                + "insert into Test2Stream;\n"
+                + "@info(name = 'query2')@dist(parallel='4',execGroup='002')\n"
+                + "from Test2Stream\n"
+                + "select name,amount\n"
+                + "insert into Test3Stream;\n"
+                + "@info(name = 'query3')@dist(parallel='3',execGroup='003')\n"
+                + "from Test2Stream\n"
+                + "select name,amount\n"
+                + "insert into Test4Stream;\n"
+                + "@info(name = 'query4')@dist(parallel='2',execGroup='004')\n"
+                + "from Test2Stream\n"
+                + "select name,amount\n"
+                + "insert into Test5Stream;\n";
+
+        SiddhiTopologyCreatorImpl siddhiTopologyCreator = new SiddhiTopologyCreatorImpl();
+        SiddhiTopology topology = siddhiTopologyCreator.createTopology(siddhiApp);
+        SiddhiAppCreator appCreator = new SPMBSiddhiAppCreator();
+        List<DeployableSiddhiQueryGroup> queryGroupList = appCreator.createApps(topology);
+
+        Assert.assertTrue(queryGroupList.get(0).getSiddhiQueries().get(0).getApp()
+                        .contains("@App:name('TestPlan25-001-1') \n"
+                                + "@source(type = 'http', receiver.url='http://localhost:5005"
+                                + "/SweetProductionEP', @map(type = 'json'))\n"
+                                + "define stream Test1Stream (name string, amount double);\n"
+                                + "@sink(type='jms',factory.initial='org.wso2.andes.jndi"
+                                + ".PropertiesFileInitialContextFactory',provider.url='../.."
+                                + "/resources/jndi.properties',connection.factory.type='queue'"
+                                + ",destination = 'TestPlan25_Test2Stream_2', connection.factory"
+                                + ".jndi.name='QueueConnectionFactory',@map(type='xml'))\n"
+                                + "@sink(type='jms',factory.initial='org.wso2.andes.jndi"
+                                + ".PropertiesFileInitialContextFactory',provider.url='../.."
+                                + "/resources/jndi.properties',connection.factory.type='queue'"
+                                + ",destination = 'TestPlan25_Test2Stream_0', "
+                                + "connection.factory.jndi.name='QueueConnectionFactory',"
+                                + "@map(type='xml'))\n"
+                                + "@sink(type='jms',factory.initial='org.wso2.andes.jndi"
+                                + ".PropertiesFileInitialContextFactory',provider.url='../.."
+                                + "/resources/jndi.properties',connection.factory.type='queue',"
+                                + "destination = 'TestPlan25_Test2Stream_1', connection.factory"
+                                + ".jndi.name='QueueConnectionFactory',@map(type='xml'))"
+                                + "define stream Test2Stream (name string, amount double);\n"
+                                + "@info(name = 'query1')\n"
+                                + "from Test1Stream\n"
+                                + "select name,amount\n"
+                                + "insert into Test2Stream;"),
+                "Incorrect Partial Siddhi application created");
+        Assert.assertTrue(queryGroupList.get(1).getSiddhiQueries().get(0).getApp()
+                        .contains("@App:name('TestPlan25-002-1') \n"
+                                + "@source(type='jms',factory.initial='org.wso2.andes.jndi"
+                                + ".PropertiesFileInitialContextFactory',provider.url="
+                                + "'../../resources/jndi.properties',connection.factory.type="
+                                + "'queue',destination ='TestPlan25_Test2Stream_0',"
+                                + "connection.factory.jndi.name='QueueConnectionFactory',"
+                                + "@map(type ='xml'))"
+                                + "define stream Test2Stream (name string, amount double);\n"
+                                + "@Sink(type='log')\n"
+                                + "define stream Test3Stream (name string, amount double);\n"
+                                + "@info(name = 'query2')\n"
+                                + "from Test2Stream\n"
+                                + "select name,amount\n"
+                                + "insert into Test3Stream;"),
+                "Incorrect Partial Siddhi application created");
+        Assert.assertTrue(queryGroupList.get(1).getSiddhiQueries().get(3).getApp()
+                        .contains("@App:name('TestPlan25-002-4') \n"
+                                + "@source(type='jms',factory.initial='org.wso2.andes.jndi"
+                                + ".PropertiesFileInitialContextFactory',provider.url="
+                                + "'../../resources/jndi.properties',connection.factory.type="
+                                + "'queue',destination ='TestPlan25_Test2Stream_0',"
+                                + "connection.factory.jndi.name='QueueConnectionFactory',"
+                                + "@map(type ='xml'))"
+                                + "define stream Test2Stream (name string, amount double);\n"
+                                + "@Sink(type='log')\n"
+                                + "define stream Test3Stream (name string, amount double);\n"
+                                + "@info(name = 'query2')\n"
+                                + "from Test2Stream\n"
+                                + "select name,amount\n"
+                                + "insert into Test3Stream;"),
+                "Incorrect Partial Siddhi application created");
+        Assert.assertTrue(queryGroupList.get(2).getSiddhiQueries().get(0).getApp()
+                        .contains("@App:name('TestPlan25-003-1') \n"
+                                + "@source(type='jms',factory.initial='org.wso2.andes.jndi"
+                                + ".PropertiesFileInitialContextFactory',provider.url="
+                                + "'../../resources/jndi.properties',connection.factory.type="
+                                + "'queue',destination ='TestPlan25_Test2Stream_1',"
+                                + "connection.factory.jndi.name='QueueConnectionFactory',"
+                                + "@map(type ='xml'))"
+                                + "define stream Test2Stream (name string, amount double);\n"
+                                + "define stream Test4Stream (name string, amount double);\n"
+                                + "@info(name = 'query3')\n"
+                                + "from Test2Stream\n"
+                                + "select name,amount\n"
+                                + "insert into Test4Stream;\n"),
+                "Incorrect Partial Siddhi application created");
+        Assert.assertTrue(queryGroupList.get(3).getSiddhiQueries().get(1).getApp()
+                        .contains("@App:name('TestPlan25-004-2') \n"
+                                + "@source(type='jms',factory.initial='org.wso2.andes.jndi"
+                                + ".PropertiesFileInitialContextFactory',provider.url="
+                                + "'../../resources/jndi.properties',connection.factory.type="
+                                + "'queue',destination ='TestPlan25_Test2Stream_2',"
+                                + "connection.factory.jndi.name='QueueConnectionFactory',"
+                                + "@map(type ='xml'))"
+                                + "define stream Test2Stream (name string, amount double);\n"
+                                + "define stream Test5Stream (name string, amount double);\n"
+                                + "@info(name = 'query4')\n"
+                                + "from Test2Stream\n"
+                                + "select name,amount\n"
+                                + "insert into Test5Stream;\n"),
+                "Incorrect Partial Siddhi application created");
+
+        SiddhiManager siddhiManager = new SiddhiManager();
+        try {
+            Map<String, List<SiddhiAppRuntime>> siddhiAppRuntimeMap =
+                    createSiddhiAppRuntimes(siddhiManager, queryGroupList);
+            for (SiddhiAppRuntime runtime : siddhiAppRuntimeMap.get("TestPlan25-003")) {
+
+                runtime.addCallback("Test4Stream", new StreamCallback() {
+                    @Override
+                    public void receive(Event[] events) {
+                        EventPrinter.print(events);
+                        count.addAndGet(events.length);
+                    }
+                });
+            }
+
+            try {
+                jmsQueuePublisher.sendMessages("TestPlan25_Test2Stream_1",
+                        "<events><event><name> WSO2</name><amount>100.25</amount>"
+                                + "</event></events>");
+                jmsQueuePublisher.sendMessages("TestPlan25_Test2Stream_1",
+                        "<events><event><name> WSO2</name><amount>147.25</amount>"
+                                + "</event></events>");
+                jmsQueuePublisher.sendMessages("TestPlan25_Test2Stream_1",
+                        "<events><event><name> ABC</name><amount>102.25</amount>"
+                                + "</event></events>");
+                jmsQueuePublisher.sendMessages("TestPlan25_Test2Stream_1",
+                        "<events><event><name> ABC</name><amount>187.25</amount>"
+                                + "</event></events>");
+            } catch (NamingException | JMSException e) {
+                log.error(e.getMessage(), e);
+            }
+
+            SiddhiTestHelper.waitForEvents(5000, 4, count, 8000);
+            Assert.assertEquals(count.intValue(), 4);
+
+        } catch (InterruptedException e) {
+            log.error(e.getMessage(), e);
+        } finally {
+            siddhiManager.shutdown();
+        }
+
+    }
 
     private Map<String, List<SiddhiAppRuntime>> createSiddhiAppRuntimes(
             SiddhiManager siddhiManager, List<DeployableSiddhiQueryGroup> queryGroupList) {
