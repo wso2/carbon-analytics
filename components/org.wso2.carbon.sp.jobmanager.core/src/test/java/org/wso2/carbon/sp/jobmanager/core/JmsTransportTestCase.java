@@ -22,14 +22,17 @@ import org.testng.Assert;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 import org.wso2.carbon.sp.jobmanager.core.appcreator.DeployableSiddhiQueryGroup;
-import org.wso2.carbon.sp.jobmanager.core.appcreator.SPMBSiddhiAppCreator;
+import org.wso2.carbon.sp.jobmanager.core.appcreator.JMSSiddhiAppCreator;
 import org.wso2.carbon.sp.jobmanager.core.appcreator.SiddhiQuery;
+import org.wso2.carbon.sp.jobmanager.core.internal.ServiceDataHolder;
 import org.wso2.carbon.sp.jobmanager.core.topology.SiddhiTopology;
 import org.wso2.carbon.sp.jobmanager.core.topology.SiddhiTopologyCreatorImpl;
 import org.wso2.carbon.sp.jobmanager.core.util.*;
+import org.wso2.carbon.sp.jobmanager.core.bean.DeploymentConfig;
 import org.wso2.siddhi.core.SiddhiAppRuntime;
 import org.wso2.siddhi.core.SiddhiManager;
 import org.wso2.siddhi.core.event.Event;
+import org.wso2.siddhi.core.query.output.callback.QueryCallback;
 import org.wso2.siddhi.core.stream.input.InputHandler;
 import org.wso2.siddhi.core.stream.output.StreamCallback;
 import org.wso2.siddhi.core.util.EventPrinter;
@@ -42,8 +45,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
-import javax.jms.JMSException;
-import javax.naming.NamingException;
 
 /**
  * Contains the test cases for JMS transport tests
@@ -52,13 +53,17 @@ public class JmsTransportTestCase {
     private static final Logger log = Logger.getLogger(JmsTransportTestCase.class);
     private AtomicInteger count;
     private AtomicInteger errorAssertionCount;
-    private JmsQueuePublisherTestUtil jmsQueuePublisher;
-    private JmsTopicPublisherTestUtil jmsTopicPublisher;
+    private static final String PROVIDER_URL = "vm://localhost";
+    private static final String INITIAL_FACTORY = "org.apache.activemq.jndi"
+            + ".ActiveMQInitialContextFactory";
 
     @BeforeMethod
-    public void setUp() {
-        jmsQueuePublisher = new JmsQueuePublisherTestUtil();
-        jmsTopicPublisher = new JmsTopicPublisherTestUtil();
+    public void setUp()
+    {
+        DeploymentConfig deploymentConfig = new DeploymentConfig();
+        deploymentConfig.setFactoryInitial(INITIAL_FACTORY);
+        deploymentConfig.setProviderUrl(PROVIDER_URL);
+        ServiceDataHolder.setDeploymentConfig(deploymentConfig);
         count = new AtomicInteger(0);
         errorAssertionCount = new AtomicInteger(0);
     }
@@ -110,7 +115,7 @@ public class JmsTransportTestCase {
 
         SiddhiTopologyCreatorImpl siddhiTopologyCreator = new SiddhiTopologyCreatorImpl();
         SiddhiTopology topology = siddhiTopologyCreator.createTopology(siddhiApp);
-        SiddhiAppCreator appCreator = new SPMBSiddhiAppCreator();
+        SiddhiAppCreator appCreator = new JMSSiddhiAppCreator();
         List<DeployableSiddhiQueryGroup> queryGroupList = appCreator.createApps(topology);
         for (DeployableSiddhiQueryGroup group : queryGroupList) {
             for (SiddhiQuery query : group.getSiddhiQueries()) {
@@ -124,7 +129,6 @@ public class JmsTransportTestCase {
      * Filter query can reside in an execGroup with parallel > 1 and the corresponding stream
      * will have {@link TransportStrategy#ROUND_ROBIN}.
      */
-
     @Test(dependsOnMethods = "testSiddhiTopologyCreator")
     public void testFilterQuery() {
         String siddhiApp = "@App:name('TestPlan2')"
@@ -144,7 +148,7 @@ public class JmsTransportTestCase {
         Assert.assertEquals(topology.getQueryGroupList().get(1).getInputStreams()
                 .get("TempInternalStream").getSubscriptionStrategy()
                 .getStrategy(), TransportStrategy.ROUND_ROBIN);
-        SiddhiAppCreator appCreator = new SPMBSiddhiAppCreator();
+        SiddhiAppCreator appCreator = new JMSSiddhiAppCreator();
         List<DeployableSiddhiQueryGroup> queryGroupList = appCreator.createApps(topology);
         SiddhiManager siddhiManager = new SiddhiManager();
         try {
@@ -200,7 +204,7 @@ public class JmsTransportTestCase {
         Assert.assertEquals(topology.getQueryGroupList().get(1).getInputStreams()
                 .get("TempInternalStream").getSubscriptionStrategy()
                 .getStrategy(), TransportStrategy.FIELD_GROUPING);
-        SiddhiAppCreator appCreator = new SPMBSiddhiAppCreator();
+        SiddhiAppCreator appCreator = new JMSSiddhiAppCreator();
         List<DeployableSiddhiQueryGroup> queryGroupList = appCreator.createApps(topology);
         SiddhiManager siddhiManager = new SiddhiManager();
         try {
@@ -259,7 +263,7 @@ public class JmsTransportTestCase {
                 + "@info(name ='query2') @dist(execGroup='group2', parallel='2')\n"
                 + "partition with ( deviceID of TempInternalStream )\n"
                 + "begin\n"
-                + "from every e1=TempInternalStream, e2=TempInternalStream[e1.temp <= temp]+,"
+                + "from every e1=TempInternalStream, e2=TempInternalStream[e1.temp <= temp],"
                 + "e3=TempInternalStream[e2[last].temp > temp]\n"
                 + "select e1.deviceID, e1.temp as initialTemp, e2[last].temp as peakTemp\n"
                 + "insert into PeakTempStream;\n"
@@ -267,7 +271,7 @@ public class JmsTransportTestCase {
 
         SiddhiTopologyCreatorImpl siddhiTopologyCreator = new SiddhiTopologyCreatorImpl();
         SiddhiTopology topology = siddhiTopologyCreator.createTopology(siddhiApp);
-        SiddhiAppCreator appCreator = new SPMBSiddhiAppCreator();
+        SiddhiAppCreator appCreator = new JMSSiddhiAppCreator();
         List<DeployableSiddhiQueryGroup> queryGroupList = appCreator.createApps(topology);
         SiddhiManager siddhiManager = new SiddhiManager();
         try {
@@ -382,7 +386,7 @@ public class JmsTransportTestCase {
                 .get("TempInternalStream").getSubscriptionStrategy()
                 .getOfferedParallelism(), 2);
 
-        SiddhiAppCreator appCreator = new SPMBSiddhiAppCreator();
+        SiddhiAppCreator appCreator = new JMSSiddhiAppCreator();
         List<DeployableSiddhiQueryGroup> queryGroupList = appCreator.createApps(topology);
         SiddhiManager siddhiManager = new SiddhiManager();
         try {
@@ -414,16 +418,23 @@ public class JmsTransportTestCase {
             tempStreamHandler.send(new Object[]{1, 100, 40});
             tempStreamHandler.send(new Object[]{2, 101, 45});
             Thread.sleep(1000);
-            try {
-                jmsTopicPublisher.publishMessage("TestPlan6_RegulatorStream",
-                        "<events><event><deviceID>1</deviceID><roomNo>100</roomNo>"
-                        + "<isOn>false</isOn></event></events>)");
-                jmsTopicPublisher.publishMessage("TestPlan6_RegulatorStream",
-                        "<events><event><deviceID>2</deviceID><roomNo>101</roomNo>"
-                        + "<isOn>false</isOn></event></events>");
-            } catch (Exception e) {
-                log.error(e.getMessage(), e);
-            }
+
+            List<String> messageList = new ArrayList<>(2);
+            messageList.add("<events>"
+                    + "   <event>"
+                    + "       <deviceID>1</deviceID>"
+                    + "       <roomNo>100</roomNo>"
+                    + "       <isOn>false</isOn>"
+                    + "   </event>"
+                    + "   <event>"
+                    + "       <deviceID>2</deviceID>"
+                    + "       <roomNo>101</roomNo>"
+                    + "       <isOn>false</isOn>"
+                    + "   </event>"
+                    + "</events>");
+
+            publishEvents("TestPlan6_RegulatorStream", null, "activemq",
+                    "text", messageList);
 
             SiddhiTestHelper.waitForEvents(2000, 2, count, 3000);
             Assert.assertEquals(count.intValue(), 2);
@@ -479,7 +490,7 @@ public class JmsTransportTestCase {
                 .get("TempInternalStream").getSubscriptionStrategy()
                 .getOfferedParallelism(), 2);
 
-        SiddhiAppCreator appCreator = new SPMBSiddhiAppCreator();
+        SiddhiAppCreator appCreator = new JMSSiddhiAppCreator();
         List<DeployableSiddhiQueryGroup> queryGroupList = appCreator.createApps(topology);
         SiddhiManager siddhiManager = new SiddhiManager();
         try {
@@ -529,16 +540,17 @@ public class JmsTransportTestCase {
             tempStreamHandler.send(new Object[]{1, 100, 40});
             tempStreamHandler.send(new Object[]{2, 101, 45});
             Thread.sleep(1000);
-            try {
-                jmsTopicPublisher.publishMessage("TestPlan7_RegulatorStream",
-                        "<events><event><deviceID>1</deviceID><roomNo>100</roomNo>"
-                        + "<isOn>false</isOn></event></events>");
-                jmsTopicPublisher.publishMessage("TestPlan7_RegulatorStream",
-                        "<events><event><deviceID>2</deviceID><roomNo>101</roomNo>"
-                        + "<isOn>false</isOn></event></events>");
-            } catch (Exception e) {
-                log.error(e.getMessage(), e);
-            }
+
+            List<String> messageList = new ArrayList<>(2);
+            messageList.add("<events>"
+                    + "   <event><deviceID>1</deviceID><roomNo>100</roomNo>\n"
+                    + "                        <isOn>false</isOn></event>"
+                    + "   <event><deviceID>2</deviceID><roomNo>101</roomNo>\n"
+                    + "                        <isOn>false</isOn></event>"
+                    + "</events>");
+
+            publishEvents("TestPlan7_RegulatorStream", null, "activemq",
+                    "text", messageList);
 
             SiddhiTestHelper.waitForEvents(2000, 2, count, 3000);
             Assert.assertEquals(count.intValue(), 2);
@@ -654,7 +666,7 @@ public class JmsTransportTestCase {
                 + "Insert into triggeredAvgStream;\n"
                 + "End;\n");
 
-        SiddhiAppCreator appCreator = new SPMBSiddhiAppCreator();
+        SiddhiAppCreator appCreator = new JMSSiddhiAppCreator();
         List<DeployableSiddhiQueryGroup> queryGroupList = appCreator.createApps(topology);
 
         SiddhiManager siddhiManager = new SiddhiManager();
@@ -769,7 +781,7 @@ public class JmsTransportTestCase {
                 .get("filteredStockStream").getPublishingStrategyList().get(1)
                 .getGroupingField(), "tier");
 
-        SiddhiAppCreator appCreator = new SPMBSiddhiAppCreator();
+        SiddhiAppCreator appCreator = new JMSSiddhiAppCreator();
         List<DeployableSiddhiQueryGroup> queryGroupList = appCreator.createApps(topology);
         SiddhiManager siddhiManager = new SiddhiManager();
         try {
@@ -899,7 +911,7 @@ public class JmsTransportTestCase {
         };
 
         InMemoryBroker.subscribe(subscriptionTakingOver);
-        SiddhiAppCreator appCreator = new SPMBSiddhiAppCreator();
+        SiddhiAppCreator appCreator = new JMSSiddhiAppCreator();
         List<DeployableSiddhiQueryGroup> queryGroupList = appCreator.createApps(topology);
         SiddhiManager siddhiManager = new SiddhiManager();
         try {
@@ -930,7 +942,7 @@ public class JmsTransportTestCase {
      * corresponding to the streamID will be added to the respective sink so that the placeholder
      * will bridge the stream to the required source.
      */
-    @Test(dependsOnMethods = "testUserDefinedSink")
+    @Test(dependsOnMethods = "testPartitionWithMultiKey")
     public void testSinkStreamForSource() {
         String siddhiApp = "@App:name('TestPlan11')\n"
                 + "Define stream stockStream(symbol string, price float, quantity int,"
@@ -1029,7 +1041,7 @@ public class JmsTransportTestCase {
         InMemoryBroker.subscribe(subscriptionTakingOver);
         InMemoryBroker.subscribe(subscriptionTakingOverTable);
 
-        SiddhiAppCreator appCreator = new SPMBSiddhiAppCreator();
+        SiddhiAppCreator appCreator = new JMSSiddhiAppCreator();
         List<DeployableSiddhiQueryGroup> queryGroupList = appCreator.createApps(topology);
         SiddhiManager siddhiManager = new SiddhiManager();
         try {
@@ -1097,7 +1109,7 @@ public class JmsTransportTestCase {
 
         SiddhiTopologyCreatorImpl siddhiTopologyCreator = new SiddhiTopologyCreatorImpl();
         SiddhiTopology topology = siddhiTopologyCreator.createTopology(siddhiApp);
-        SiddhiAppCreator appCreator = new SPMBSiddhiAppCreator();
+        SiddhiAppCreator appCreator = new JMSSiddhiAppCreator();
         List<DeployableSiddhiQueryGroup> queryGroupList = appCreator.createApps(topology);
         Assert.assertTrue(queryGroupList.size() == 4,
                 "Four query groups should be created");
@@ -1183,7 +1195,7 @@ public class JmsTransportTestCase {
 
         SiddhiTopologyCreatorImpl siddhiTopologyCreator = new SiddhiTopologyCreatorImpl();
         SiddhiTopology topology = siddhiTopologyCreator.createTopology(siddhiApp);
-        SiddhiAppCreator appCreator = new SPMBSiddhiAppCreator();
+        SiddhiAppCreator appCreator = new JMSSiddhiAppCreator();
         List<DeployableSiddhiQueryGroup> queryGroupList = appCreator.createApps(topology);
         Assert.assertTrue(queryGroupList.size() == 5,
                 "Five query groups should be created");
@@ -1230,7 +1242,7 @@ public class JmsTransportTestCase {
 
         SiddhiTopologyCreatorImpl siddhiTopologyCreator = new SiddhiTopologyCreatorImpl();
         SiddhiTopology topology = siddhiTopologyCreator.createTopology(siddhiApp);
-        SiddhiAppCreator appCreator = new SPMBSiddhiAppCreator();
+        SiddhiAppCreator appCreator = new JMSSiddhiAppCreator();
         List<DeployableSiddhiQueryGroup> queryGroupList = appCreator.createApps(topology);
         Assert.assertTrue(queryGroupList.size() == 3,
                 "Three query groups should be created");
@@ -1246,17 +1258,15 @@ public class JmsTransportTestCase {
                                 + " @map(type = 'json'))\n"
                                 + "define stream passthroughTest1Stream (name string, amount "
                                 + "double);\n"
-                                + "@sink(type='jms',factory.initial='org.wso2.andes.jndi"
-                                + ".PropertiesFileInitialContextFactory',"
-                                + "provider.url='../../resources/jndi.properties'"
+                                + "@sink(type='jms',factory.initial='" + INITIAL_FACTORY +  "',"
+                                + "provider.url='" + PROVIDER_URL + "'"
                                 + ",connection.factory.type='topic',destination = "
                                 + "'TestPlan13_Test1Stream',"
                                 + " connection.factory.jndi.name='TopicConnectionFactory',"
                                 + "@map(type='xml'))\n"
                                 + "@sink(type='jms',"
-                                + "factory.initial='org.wso2.andes.jndi"
-                                + ".PropertiesFileInitialContextFactory',"
-                                + "provider.url='../../resources/jndi.properties',"
+                                + "factory.initial='" + INITIAL_FACTORY +  "',"
+                                + "provider.url='" + PROVIDER_URL + "',"
                                 + "@distribution(strategy='partitioned',"
                                 + " partitionKey='name',@destination(destination = "
                                 + "'TestPlan13_Test1Stream_name_0')"
@@ -1271,9 +1281,8 @@ public class JmsTransportTestCase {
 
         Assert.assertTrue(queryGroupList.get(1).getSiddhiQueries().get(0).getApp()
                         .contains("@App:name('TestPlan13-001-1') \n"
-                                + "@source(type='jms',factory.initial='org.wso2.andes"
-                                + ".jndi.PropertiesFileInitialContextFactory'"
-                                + ",provider.url='../../resources/jndi.properties',"
+                                + "@source(type='jms',factory.initial='" + INITIAL_FACTORY + "'"
+                                + ",provider.url='" + PROVIDER_URL + "',"
                                 + "connection.factory.type='topic',"
                                 + "destination ='TestPlan13_Test1Stream' ,"
                                 + " connection.factory.jndi.name='TopicConnectionFactory',"
@@ -1289,8 +1298,8 @@ public class JmsTransportTestCase {
         Assert.assertTrue(queryGroupList.get(2).getSiddhiQueries().get(0).getApp()
                         .contains("@App:name('TestPlan13-002-1') \n" + "@source(type='jms'"
                                 + ",factory.initial"
-                                + "='org.wso2.andes.jndi.PropertiesFileInitialContextFactory'"
-                                + ",provider.url='../../resources/jndi.properties',"
+                                + "='" + INITIAL_FACTORY + "'"
+                                + ",provider.url='" + PROVIDER_URL + "',"
                                 + "connection.factory.type='topic',"
                                 + "destination ='TestPlan13_Test1Stream_name_0' ,"
                                 + " connection.factory.jndi.name='TopicConnectionFactory',"
@@ -1332,7 +1341,7 @@ public class JmsTransportTestCase {
 
         SiddhiTopologyCreatorImpl siddhiTopologyCreator = new SiddhiTopologyCreatorImpl();
         SiddhiTopology topology = siddhiTopologyCreator.createTopology(siddhiApp);
-        SiddhiAppCreator appCreator = new SPMBSiddhiAppCreator();
+        SiddhiAppCreator appCreator = new JMSSiddhiAppCreator();
         List<DeployableSiddhiQueryGroup> queryGroupList = appCreator.createApps(topology);
 
         Assert.assertTrue(queryGroupList.size() == 2,
@@ -1347,9 +1356,9 @@ public class JmsTransportTestCase {
                                 + "/SweetProductionEP', @map(type = 'json'))\n"
                                 + "define stream passthroughTest1Stream (name string, "
                                 + "amount double);\n"
-                                + "@sink(type='jms',factory.initial='org.wso2.andes.jndi"
-                                + ".PropertiesFileInitialContextFactory',"
-                                + "provider.url='../../resources/jndi.properties'"
+                                + "@sink(type='jms',factory.initial='org.apache.activemq.jndi"
+                                + ".ActiveMQInitialContextFactory',"
+                                + "provider.url='vm://localhost'"
                                 + ",@distribution(strategy='partitioned', partitionKey='name',"
                                 + "@destination(destination = 'TestPlan14_Test1Stream_name_0'),"
                                 + "@destination(destination = 'TestPlan14_Test1Stream_name_1'),"
@@ -1362,9 +1371,9 @@ public class JmsTransportTestCase {
                 "Incorrect Partial Siddhi application created");
         Assert.assertTrue(queryGroupList.get(1).getSiddhiQueries().get(0).getApp()
                        .contains("@App:name('TestPlan14-001-1') \n"
-                                + "@source(type='jms',factory.initial='org.wso2.andes.jndi"
-                                + ".PropertiesFileInitialContextFactory',"
-                                + "provider.url='../../resources/jndi.properties'"
+                                + "@source(type='jms',factory.initial='org.apache.activemq.jndi"
+                                + ".ActiveMQInitialContextFactory',"
+                                + "provider.url='vm://localhost'"
                                 + ",connection.factory.type='topic',destination ="
                                 + "'TestPlan14_Test1Stream_name_0' ,"
                                 + " connection.factory.jndi.name='TopicConnectionFactory',"
@@ -1383,418 +1392,10 @@ public class JmsTransportTestCase {
     }
 
     /**
-     * If a query inside the partition contains @dist annotation then SiddhiAppValidationException
-     * should have been thrown
-     */
-    @Test(dependsOnMethods = "testUsergivenSourceSingleGroup")
-    public void testPartitionWithDistAnnotation() {
-        String siddhiApp = "@App:name('TestPlan15')\n"
-                + "define stream TempStream(deviceID long, roomNo int, temp double); "
-                + "@info(name = 'query1') @dist(parallel ='1', execGroup='group1')\n "
-                + "from TempStream\n"
-                + "select *\n"
-                + "insert into TempInternalStream;"
-                + "@info(name = 'query2') @dist(parallel ='2', execGroup='group2')\n "
-                + "partition with ( deviceID of TempInternalStream )\n"
-                + "begin\n"
-                + "@info(name = 'query3') @dist(parallel ='2', execGroup='group3')\n"
-                + "from TempInternalStream#window.lengthBatch(2)\n"
-                + "select deviceID, roomNo, max(temp) as maxTemp\n"
-                + "insert into DeviceTempStream\n"
-                + "end;";
-
-        SiddhiTopologyCreatorImpl siddhiTopologyCreator = new SiddhiTopologyCreatorImpl();
-        try {
-            SiddhiTopology topology = siddhiTopologyCreator.createTopology(siddhiApp);
-            Assert.fail();
-        } catch (SiddhiAppValidationException e) {
-            Assert.assertTrue(e.getMessage().contains("Unsupported:@dist annotation inside "
-                    + "partition queries"));
-        }
-    }
-
-    /**
-     * If queries belongs to same execution groups contain multiple parallelism count then
-     * SiddhiAppValidationException should have been thrown
-     */
-    @Test(dependsOnMethods = "testPartitionWithDistAnnotation")
-    public void testGroupsWithInconsistentParalleleism() {
-        String siddhiApp = "@App:name('TestPlan16')\n"
-                + "@App:description('Testing the MB implementation with multiple RR strategies.')\n"
-                + "@source(type = 'http', topic = 'device-power', @map(type = 'json'))\n"
-                + "define stream Test1Stream (name string, amount double);\n"
-                + "define stream Test2Stream (name string, amount double);\n"
-                + "@Sink(type='email', @map(type='json'), username='wso2', address='test@wso2.com',"
-                + "password='****',host='smtp.gmail.com',subject='Event from SP',"
-                + "to='towso2@gmail.com')\n"
-                + "define stream Test3Stream (name string, amount double);\n"
-                + "define stream Test4Stream (name string, amount double);\n"
-                + "define stream Test5Stream (name string, amount double);\n"
-                + "@info(name = 'query1')@dist(parallel='3', execGroup='001')\n"
-                + "from Test1Stream\n"
-                + "select name,amount\n"
-                + "insert into Test2Stream;\n"
-                + "@info(name = 'query2')@dist(parallel='4',execGroup='002')\n"
-                + "from Test2Stream\n"
-                + "select name,amount\n"
-                + "insert into Test3Stream;\n"
-                + "@info(name = 'query3')@dist(parallel='3',execGroup='002')\n"
-                + "from Test2Stream\n"
-                + "select name,amount\n"
-                + "insert into Test4Stream;\n"
-                + "@info(name = 'query4')@dist(parallel='2',execGroup='004')\n"
-                + "from Test2Stream\n"
-                + "select name,amount\n"
-                + "insert into Test5Stream;\n";
-
-        SiddhiTopologyCreatorImpl siddhiTopologyCreator = new SiddhiTopologyCreatorImpl();
-        try {
-            SiddhiTopology topology = siddhiTopologyCreator.createTopology(siddhiApp);
-            Assert.fail();
-        } catch (SiddhiAppValidationException e) {
-            Assert.assertTrue(e.getMessage().contains("not assigned constant @dist(parallel)"));
-        }
-    }
-
-    /**
-     * If queries belongs to same execution groups contain multiple parallelism count then
-     * SiddhiAppValidationException should have been thrown
-     */
-    @Test(dependsOnMethods = "testGroupsWithInconsistentParalleleism")
-    public void testConflictingTransportStrategies() {
-        String siddhiApp = "@App:name('TestPlan17')\n"
-                + "@App:description('Testing the MB implementation with multiple RR strategies.')\n"
-                + "@source(type = 'http', topic = 'device-power', @map(type = 'json'))\n"
-                + "define stream Test1Stream (name string, amount double);\n"
-                + "define stream Test2Stream (name string, amount double);\n"
-                + "@Sink(type='email', @map(type='json'), username='wso2', address='test@wso2.com'"
-                + ",password='****',host='smtp.gmail.com',subject='Event from SP',"
-                + "to='towso2@gmail.com')\n"
-                + "define stream Test3Stream (name string, amount double);\n"
-                + "define stream Test4Stream (name string, amount double);\n"
-                + "define stream Test5Stream (name string, amount double);\n"
-                + "@info(name = 'query1')@dist(parallel='3', execGroup='001')\n"
-                + "from Test1Stream\n"
-                + "select name,amount\n"
-                + "insert into Test2Stream;\n"
-                + "@info(name = 'query2')@dist(parallel='4',execGroup='002')\n"
-                + "from Test2Stream\n"
-                + "select name,amount\n"
-                + "insert into Test3Stream;\n"
-                + "@info(name = 'query3')@dist(parallel='3',execGroup='002')\n"
-                + "from Test2Stream\n"
-                + "select name,amount\n"
-                + "insert into Test4Stream;\n"
-                + "@info(name = 'query4')@dist(parallel='2',execGroup='004')\n"
-                + "from Test2Stream\n"
-                + "select name,amount\n"
-                + "insert into Test5Stream;\n";
-
-        SiddhiTopologyCreatorImpl siddhiTopologyCreator = new SiddhiTopologyCreatorImpl();
-        try {
-            SiddhiTopology topology = siddhiTopologyCreator.createTopology(siddhiApp);
-            Assert.fail();
-        } catch (SiddhiAppValidationException e) {
-            Assert.assertTrue(e.getMessage().contains("not assigned constant @dist(parallel)"));
-        }
-    }
-
-    /**
-     * If an in memory table referenced from multiple execution groups then
-     * SiddhiAppValidationException should have been thrown.
-     */
-    @Test(dependsOnMethods = "testConflictingTransportStrategies")
-    public void testMultipleInMemoryTableReference() {
-        String siddhiApp = "@App:name('TestPlan18')\n"
-                + "@App:description('Testing the MB implementation with multiple RR strategies.')\n"
-                + "@source(type = 'http', topic = 'device-power', @map(type = 'json'))\n"
-                + "define stream Test1Stream (name string, amount double);\n"
-                + "define table filteredTable (name string, amount double);\n"
-                + "define stream Test2Stream (name string, amount double);\n"
-                + "@Sink(type='email', @map(type='json'), username='wso2', address='test@wso2.com'"
-                + ",password='****',"
-                + "host='smtp.gmail.com',subject='Event from SP',to='towso2@gmail.com')\n"
-                + "define stream Test3Stream (name string, amount double);\n"
-                + "define stream Test4Stream (name string, amount double);\n"
-                + "define stream Test5Stream (name string, amount double);\n"
-                + "@info(name = 'query1')@dist(parallel='3', execGroup='001')\n"
-                + "from Test1Stream\n"
-                + "select name,amount\n"
-                + "insert into Test2Stream;\n"
-                + "@info(name = 'query2')@dist(parallel='1',execGroup='002')\n"
-                + "from Test2Stream\n"
-                + "select name,amount\n"
-                +  "insert into filteredTable;\n"
-                + "@info(name = 'query3')@dist(parallel='1',execGroup='003')\n"
-                + "from Test2Stream\n"
-                +  "select name,amount\n"
-                + "insert into filteredTable;\n"
-                + "@info(name = 'query4')@dist(parallel='2',execGroup='004')\n"
-                + "from Test2Stream\n"
-                + "select name,amount\n"
-                + "insert into Test5Stream;\n";
-
-        SiddhiTopologyCreatorImpl siddhiTopologyCreator = new SiddhiTopologyCreatorImpl();
-        try {
-            SiddhiTopology topology = siddhiTopologyCreator.createTopology(siddhiApp);
-            Assert.fail();
-        } catch (SiddhiAppValidationException e) {
-            Assert.assertTrue(e.getMessage().contains("In-Memory Table referenced from more than "
-                    + "one execGroup: execGroup"));
-        }
-    }
-
-    /**
-     * If an in memory table referenced from an execution group which parallelism > 1 then
-     * SiddhiAppValidationException should have been thrown
-     */
-    @Test(dependsOnMethods = "testMultipleInMemoryTableReference")
-    public void testInMemoryParallelExecGroup() {
-        String siddhiApp = "@App:name('TestPlan19')\n"
-                + "@App:description('Testing the MB implementation with multiple RR strategies.')\n"
-                + "@source(type = 'http', topic = 'device-power', @map(type = 'json'))\n"
-                + "define stream Test1Stream (name string, amount double);\n"
-                + "define table filteredTable (name string, amount double);\n"
-                + "define stream Test2Stream (name string, amount double);\n"
-                + "@Sink(type='email', @map(type='json'), username='wso2', address='test@wso2.com',"
-                + "password='****',host='smtp.gmail.com',subject='Event from SP',"
-                + "to='towso2@gmail.com')\n"
-                + "define stream Test3Stream (name string, amount double);\n"
-                + "define stream Test4Stream (name string, amount double);\n"
-                + "define stream Test5Stream (name string, amount double);\n"
-                + "@info(name = 'query1')@dist(parallel='3', execGroup='001')\n"
-                + "from Test1Stream\n"
-                + "select name,amount\n"
-                + "insert into Test2Stream;\n"
-                + "@info(name = 'query2')@dist(parallel='3',execGroup='002')\n"
-                + "from Test2Stream\n"
-                + "select name,amount\n"
-                + "insert into filteredTable;\n";
-
-        SiddhiTopologyCreatorImpl siddhiTopologyCreator = new SiddhiTopologyCreatorImpl();
-        try {
-            SiddhiTopology topology = siddhiTopologyCreator.createTopology(siddhiApp);
-            Assert.fail();
-        } catch (SiddhiAppValidationException e) {
-            Assert.assertTrue(e.getMessage().contains("with In-Memory Table  having parallel >1"));
-        }
-    }
-
-    /**
-     * If siddhi window defined in a query which have parallelism > 1 and does not belongs
-     * to a partition then SiddhiAppValidationException will be thrown.
-     */
-    @Test(dependsOnMethods = "testInMemoryParallelExecGroup")
-    public void testWindowInParallelExecGroup() {
-        String siddhiApp = "@App:name('TestPlan20')\n"
-                + "@App:description('Testing the MB implementation with multiple RR strategies.')\n"
-                + "@source(type = 'http', topic = 'device-power', @map(type = 'json'))\n"
-                + "define stream Test1Stream (name string, amount double);\n"
-                + "define table filteredTable (name string, amount double);\n"
-                + "define stream Test2Stream (name string, amount double);\n"
-                + "@Sink(type='email', @map(type='json'), username='wso2', address='test@wso2.com',"
-                + "password='****',host='smtp.gmail.com',subject='Event from SP',"
-                + "to='towso2@gmail.com')\n"
-                + "define stream Test3Stream (name string, amount double);\n"
-                + "define stream Test4Stream (name string, amount double);\n"
-                + "define stream Test5Stream (name string, amount double);\n"
-                + "@info(name = 'query1')@dist(parallel='3', execGroup='001')\n"
-                + "from Test1Stream#window.time(1 minute)\n"
-                + "select name,amount\n"
-                + "insert into Test2Stream;\n"
-                + "@info(name = 'query2')@dist(parallel='3',execGroup='002')\n"
-                + "from Test2Stream\n"
-                + "select name,amount\n"
-                + "insert into filteredTable;\n";
-
-        SiddhiTopologyCreatorImpl siddhiTopologyCreator = new SiddhiTopologyCreatorImpl();
-        try {
-            SiddhiTopology topology = siddhiTopologyCreator.createTopology(siddhiApp);
-            Assert.fail();
-        } catch (SiddhiAppValidationException e) {
-            Assert.assertTrue(e.getMessage().contains("Window queries used with parallel "
-                    + "greater than 1 outside partitioned stream"));
-        }
-    }
-
-    /**
-     * If siddhi window defined in a query which have parallelism > 1 and does not belongs to
-     * a partition then SiddhiAppValidationException will be thrown.
-     */
-    @Test(dependsOnMethods = "testWindowInParallelExecGroup")
-    public void testMultipleWindowReference() {
-        String siddhiApp = "@App:name('TestPlan21')\n"
-                + "@App:description('Testing the MB implementation with multiple RR strategies.')\n"
-                + "@source(type = 'http', topic = 'device-power', @map(type = 'json'))\n"
-                + "define stream Test1Stream (name string, amount double);\n"
-                + "define table filteredTable (name string, amount double);\n"
-                + "define stream Test2Stream (name string, amount double);\n"
-                + "@Sink(type='email', @map(type='json'), username='wso2', address='test@wso2.com'"
-                + ",password='****',host='smtp.gmail.com',subject='Event from SP',"
-                + "to='towso2@gmail.com')\n"
-                + "define stream Test3Stream (name string, amount double);\n"
-                + "define stream Test4Stream (name string, amount double);\n"
-                + "define stream Test5Stream (name string, amount double);\n"
-                + "@info(name = 'query1')@dist(parallel='3', execGroup='001')\n"
-                + "from Test1Stream#window.time(1 minute)\n"
-                + "select name,amount\n"
-                + "insert into Test2Stream;\n"
-                + "@info(name = 'query2')@dist(parallel='3',execGroup='002')\n"
-                + "from Test1Stream#window.time(1 minute)\n"
-                + "select name,amount\n"
-                + "insert into Test3Stream;\n";
-
-        SiddhiTopologyCreatorImpl siddhiTopologyCreator = new SiddhiTopologyCreatorImpl();
-        try {
-            SiddhiTopology topology = siddhiTopologyCreator.createTopology(siddhiApp);
-            Assert.fail();
-        } catch (SiddhiAppValidationException e) {
-            Assert.assertTrue(e.getMessage().contains("Window queries used with parallel greater "
-                    + "than 1 outside partitioned stream"));
-        }
-    }
-
-    /**
-     * If an execution group contains joins while the parallelism > 1 the
-     * SiddhiAppValidationException will be thrown
-     */
-    @Test(dependsOnMethods = "testMultipleWindowReference")
-    public void testJoinsWithParallel() {
-        String siddhiApp = "@App:name('TestPlan22')\n"
-                + "@App:description('Testing the MB implementation with multiple RR strategies.')\n"
-                + "@source(type = 'http', topic = 'device-power', @map(type = 'json'))\n"
-                + "define stream TempStream(deviceID long, roomNo int, temp double);\n"
-                + "define stream RegulatorStream(deviceID long, roomNo int, isOn bool);\n"
-                + "@info(name = 'query1')@dist(parallel='3', execGroup='001')\n"
-                + "from TempStream[temp > 30.0]#window.time(1 min) as T\n"
-                + "join RegulatorStream[isOn == false]#window.length(1) as R\n"
-                + "on T.roomNo == R.roomNo\n"
-                + "select T.roomNo, R.deviceID, 'start' as action\n"
-                + "insert into RegulatorActionStream;";
-
-        SiddhiTopologyCreatorImpl siddhiTopologyCreator = new SiddhiTopologyCreatorImpl();
-        try {
-            SiddhiTopology topology = siddhiTopologyCreator.createTopology(siddhiApp);
-            Assert.fail();
-        } catch (SiddhiAppValidationException e) {
-            Assert.assertTrue(e.getMessage().contains("Join queries used with parallel greater "
-                    + "than 1 outside partitioned stream"));
-        }
-    }
-
-    /**
-     * If an execution group contains more than one partitions with same partitionkey then
-     * SiddhiValidationException will be thrown
-     */
-    @Test(dependsOnMethods = "testJoinsWithParallel")
-    public void testMultiplePartitionExecGroup() {
-        String siddhiApp = "@App:name('TestPlan23')\n"
-                + "@App:description('Testing the MB implementation with multiple FGs ALLs and "
-                + "RRs strategies.')\n"
-                + "@source(type = 'http', topic = 'device-power', @map(type = 'json'))\n"
-                + "define stream Test1Stream (name string, amount double,value double);\n"
-                + "define stream Test2Stream (name string, amount double, value double);\n"
-                + "@Sink(type='email', @map(type='json'), username='wso2', address='test@wso2.com',"
-                + "password='****',host='smtp.gmail.com',subject='Event from SP',"
-                + "to='towso2@gmail.com')\n"
-                + "define stream Test3Stream (name string, amount double, value double);\n"
-                + "define stream Test4Stream (name string, amount double, value double);\n"
-                + "define stream Test5Stream (name string, amount double, value double);\n"
-                + "@info(name = 'query1')@dist(parallel='1', execGroup='001')\n"
-                + "from Test1Stream\n"
-                + "select name,amount,value\n"
-                + "insert into Test2Stream;\n"
-                + "@info(name = 'partition1')@dist(parallel='2',execGroup='002')\n"
-                + "partition with (name of Test2Stream)\n"
-                + "begin\n"
-                + "@info(name = 'avg-calculator1')\n"
-                + "from Test2Stream\n"
-                + "select name,amount,value\n"
-                + "insert into Test3Stream;\n"
-                + "end;\n"
-                + "@info(name = 'partition2')@dist(parallel='2',execGroup='002')\n"
-                + "partition with (name of Test2Stream)\n"
-                + "begin\n"
-                + "@info(name = 'avg-calculator2')\n"
-                + "from Test2Stream\n"
-                + "select name,amount,value\n"
-                + "insert into Test4Stream;\n"
-                + "end;\n"
-                + "@info(name = 'query2')@dist(parallel = '3',execGroup='004')\n"
-                + "from Test2Stream\n"
-                + "select name,amount,value\n"
-                + "insert into Test5Stream;\n";
-
-        SiddhiTopologyCreatorImpl siddhiTopologyCreator = new SiddhiTopologyCreatorImpl();
-        try {
-            SiddhiTopology topology = siddhiTopologyCreator.createTopology(siddhiApp);
-            Assert.fail();
-        } catch (SiddhiAppValidationException e) {
-            Assert.assertTrue(e.getMessage().contains("Unsupported in distributed setup :More "
-                    + "than 1 partition residing on the same execGroup"));
-        }
-    }
-
-    /**
-     * If a siddhi application contains range type partitioning then SiddhiAppValidationException
-     * will be thrown as that feature is not supported still
-     */
-    @Test(dependsOnMethods = "testMultiplePartitionExecGroup")
-    public void testRangePartition() {
-        String siddhiApp = "@App:name('TestPlan24')\n"
-                + "@App:description('Testing the MB implementation with multiple FGs ALLs and "
-                + "RRs strategies.')\n"
-                + "@source(type = 'http', topic = 'device-power', @map(type = 'json'))\n"
-                + "define stream Test1Stream (name string, amount double,value double);\n"
-                + "define stream Test2Stream (name string, amount double, value double);\n"
-                + "@Sink(type='email', @map(type='json'), username='wso2', address='test@wso2.com',"
-                + "password='****',host='smtp.gmail.com',subject='Event from SP',"
-                + "to='towso2@gmail.com')\n"
-                + "define stream Test3Stream (name string, amount double, value double);\n"
-                + "define stream Test4Stream (name string, amount double, value double);\n"
-                + "define stream Test5Stream (name string, amount double, value double);\n"
-                + "@info(name = 'query1')@dist(parallel='1', execGroup='001')\n"
-                + "from Test1Stream\n"
-                + "select name,amount,value\n"
-                + "insert into Test2Stream;\n"
-                + "@info(name = 'partition1')@dist(parallel='2',execGroup='002')\n"
-                + "partition with ( amount >= 1030 as 'high' or \n"
-                + "                 amount < 1030 and amount >= 330 as 'middle' or \n"
-                + "                 amount < 330 as 'low' of Test2Stream)\n"
-                + "begin\n"
-                + "@info(name = 'avg-calculator1')\n"
-                + "from Test2Stream\n"
-                + "select name,amount,value\n"
-                + "insert into Test3Stream;\n"
-                + "end;\n"
-                + "@info(name = 'partition2')@dist(parallel='2',execGroup='003')\n"
-                + "partition with (name of Test2Stream)\n"
-                + "begin\n"
-                + "@info(name = 'avg-calculator2')\n"
-                + "from Test2Stream\n"
-                + "select name,amount,value\n"
-                + "insert into Test4Stream;\n"
-                + "end;\n"
-                + "@info(name = 'query2')@dist(parallel = '3',execGroup='004')\n"
-                + "from Test2Stream\n"
-                + "select name,amount,value\n"
-                + "insert into Test5Stream;\n";
-
-        SiddhiTopologyCreatorImpl siddhiTopologyCreator = new SiddhiTopologyCreatorImpl();
-        try {
-            SiddhiTopology topology = siddhiTopologyCreator.createTopology(siddhiApp);
-            Assert.fail();
-        } catch (SiddhiAppValidationException e) {
-            Assert.assertTrue(e.getMessage().contains("Range PartitionType not Supported in "
-                    + "Distributed SetUp"));
-        }
-    }
-
-    /**
      * If a siddhi application contains multiple query qroups with same input stream with
      * {@link TransportStrategy#ROUND_ROBIN} then separate queues should created for them.
      */
-    @Test(dependsOnMethods = "testRangePartition")
+    @Test(dependsOnMethods = "testUsergivenSourceSingleGroup")
     public void testMultipleRRstrategy() {
         String siddhiApp = "@App:name('TestPlan25')\n"
                 + "@App:description('Testing the MB implementation with multiple RR strategies.')\n"
@@ -1825,7 +1426,7 @@ public class JmsTransportTestCase {
 
         SiddhiTopologyCreatorImpl siddhiTopologyCreator = new SiddhiTopologyCreatorImpl();
         SiddhiTopology topology = siddhiTopologyCreator.createTopology(siddhiApp);
-        SiddhiAppCreator appCreator = new SPMBSiddhiAppCreator();
+        SiddhiAppCreator appCreator = new JMSSiddhiAppCreator();
         List<DeployableSiddhiQueryGroup> queryGroupList = appCreator.createApps(topology);
 
         Assert.assertTrue(queryGroupList.get(0).getSiddhiQueries().get(0).getApp()
@@ -1833,20 +1434,20 @@ public class JmsTransportTestCase {
                                 + "@source(type = 'http', receiver.url='http://localhost:5005"
                                 + "/SweetProductionEP', @map(type = 'json'))\n"
                                 + "define stream Test1Stream (name string, amount double);\n"
-                                + "@sink(type='jms',factory.initial='org.wso2.andes.jndi"
-                                + ".PropertiesFileInitialContextFactory',provider.url='../.."
-                                + "/resources/jndi.properties',connection.factory.type='queue'"
+                                + "@sink(type='jms',factory.initial='" + INITIAL_FACTORY + "'"
+                                + ",provider.url='" + PROVIDER_URL + "',connection.factory.type="
+                                + "'queue'"
                                 + ",destination = 'TestPlan25_Test2Stream_2', connection.factory"
                                 + ".jndi.name='QueueConnectionFactory',@map(type='xml'))\n"
-                                + "@sink(type='jms',factory.initial='org.wso2.andes.jndi"
-                                + ".PropertiesFileInitialContextFactory',provider.url='../.."
-                                + "/resources/jndi.properties',connection.factory.type='queue'"
+                                + "@sink(type='jms',factory.initial='" + INITIAL_FACTORY
+                                + "',provider.url='" + PROVIDER_URL
+                                + "',connection.factory.type='queue'"
                                 + ",destination = 'TestPlan25_Test2Stream_0', "
                                 + "connection.factory.jndi.name='QueueConnectionFactory',"
                                 + "@map(type='xml'))\n"
-                                + "@sink(type='jms',factory.initial='org.wso2.andes.jndi"
-                                + ".PropertiesFileInitialContextFactory',provider.url='../.."
-                                + "/resources/jndi.properties',connection.factory.type='queue',"
+                                + "@sink(type='jms',factory.initial='" + INITIAL_FACTORY
+                                + "',provider.url='" + PROVIDER_URL
+                                + "',connection.factory.type='queue',"
                                 + "destination = 'TestPlan25_Test2Stream_1', connection.factory"
                                 + ".jndi.name='QueueConnectionFactory',@map(type='xml'))"
                                 + "define stream Test2Stream (name string, amount double);\n"
@@ -1857,9 +1458,9 @@ public class JmsTransportTestCase {
                 "Incorrect Partial Siddhi application created");
         Assert.assertTrue(queryGroupList.get(1).getSiddhiQueries().get(0).getApp()
                         .contains("@App:name('TestPlan25-002-1') \n"
-                                + "@source(type='jms',factory.initial='org.wso2.andes.jndi"
-                                + ".PropertiesFileInitialContextFactory',provider.url="
-                                + "'../../resources/jndi.properties',connection.factory.type="
+                                + "@source(type='jms',factory.initial='" + INITIAL_FACTORY
+                                + "',provider.url="
+                                + "'" + PROVIDER_URL + "',connection.factory.type="
                                 + "'queue',destination ='TestPlan25_Test2Stream_0',"
                                 + "connection.factory.jndi.name='QueueConnectionFactory',"
                                 + "@map(type ='xml'))"
@@ -1873,9 +1474,9 @@ public class JmsTransportTestCase {
                 "Incorrect Partial Siddhi application created");
         Assert.assertTrue(queryGroupList.get(1).getSiddhiQueries().get(3).getApp()
                         .contains("@App:name('TestPlan25-002-4') \n"
-                                + "@source(type='jms',factory.initial='org.wso2.andes.jndi"
-                                + ".PropertiesFileInitialContextFactory',provider.url="
-                                + "'../../resources/jndi.properties',connection.factory.type="
+                                + "@source(type='jms',factory.initial='"
+                                + INITIAL_FACTORY + "',provider.url="
+                                + "'" + PROVIDER_URL + "',connection.factory.type="
                                 + "'queue',destination ='TestPlan25_Test2Stream_0',"
                                 + "connection.factory.jndi.name='QueueConnectionFactory',"
                                 + "@map(type ='xml'))"
@@ -1889,9 +1490,9 @@ public class JmsTransportTestCase {
                 "Incorrect Partial Siddhi application created");
         Assert.assertTrue(queryGroupList.get(2).getSiddhiQueries().get(0).getApp()
                         .contains("@App:name('TestPlan25-003-1') \n"
-                                + "@source(type='jms',factory.initial='org.wso2.andes.jndi"
-                                + ".PropertiesFileInitialContextFactory',provider.url="
-                                + "'../../resources/jndi.properties',connection.factory.type="
+                                + "@source(type='jms',factory.initial='"
+                                + INITIAL_FACTORY + "',provider.url="
+                                + "'" + PROVIDER_URL + "',connection.factory.type="
                                 + "'queue',destination ='TestPlan25_Test2Stream_1',"
                                 + "connection.factory.jndi.name='QueueConnectionFactory',"
                                 + "@map(type ='xml'))"
@@ -1904,9 +1505,9 @@ public class JmsTransportTestCase {
                 "Incorrect Partial Siddhi application created");
         Assert.assertTrue(queryGroupList.get(3).getSiddhiQueries().get(1).getApp()
                         .contains("@App:name('TestPlan25-004-2') \n"
-                                + "@source(type='jms',factory.initial='org.wso2.andes.jndi"
-                                + ".PropertiesFileInitialContextFactory',provider.url="
-                                + "'../../resources/jndi.properties',connection.factory.type="
+                                + "@source(type='jms',factory.initial='"
+                                + INITIAL_FACTORY + "',provider.url="
+                                + "'" + PROVIDER_URL + "',connection.factory.type="
                                 + "'queue',destination ='TestPlan25_Test2Stream_2',"
                                 + "connection.factory.jndi.name='QueueConnectionFactory',"
                                 + "@map(type ='xml'))"
@@ -1924,34 +1525,34 @@ public class JmsTransportTestCase {
                     createSiddhiAppRuntimes(siddhiManager, queryGroupList);
             for (SiddhiAppRuntime runtime : siddhiAppRuntimeMap.get("TestPlan25-003")) {
 
-                runtime.addCallback("Test4Stream", new StreamCallback() {
+                runtime.addCallback("query3", new QueryCallback() {
                     @Override
-                    public void receive(Event[] events) {
-                        EventPrinter.print(events);
-                        count.addAndGet(events.length);
+                    public void receive(long timeStamp, Event[] inEvents, Event[] removeEvents) {
+                        EventPrinter.print(timeStamp, inEvents, removeEvents);
+                        for (Event event : inEvents) {
+                            count.incrementAndGet();
+                        }
                     }
                 });
             }
 
-            try {
-                jmsQueuePublisher.sendMessages("TestPlan25_Test2Stream_1",
-                        "<events><event><name> WSO2</name><amount>100.25</amount>"
-                                + "</event></events>");
-                jmsQueuePublisher.sendMessages("TestPlan25_Test2Stream_1",
-                        "<events><event><name> WSO2</name><amount>147.25</amount>"
-                                + "</event></events>");
-                jmsQueuePublisher.sendMessages("TestPlan25_Test2Stream_1",
-                        "<events><event><name> ABC</name><amount>102.25</amount>"
-                                + "</event></events>");
-                jmsQueuePublisher.sendMessages("TestPlan25_Test2Stream_1",
-                        "<events><event><name> ABC</name><amount>187.25</amount>"
-                                + "</event></events>");
-            } catch (NamingException | JMSException e) {
-                log.error(e.getMessage(), e);
-            }
+            List<String> messageList = new ArrayList<>(2);
+            messageList.add("<events>\n"
+                    + "    <event>\n"
+                    + "        <name>John</name>\n"
+                    + "        <amount>22</amount>\n"
+                    + "        </event>\n"
+                    + "    <event>\n"
+                    + "        <name>Mike</name>\n"
+                    + "        <amount>24</amount>\n"
+                    + "    </event>\n"
+                    + "</events>");
 
-            SiddhiTestHelper.waitForEvents(5000, 4, count, 8000);
-            Assert.assertEquals(count.intValue(), 4);
+            publishEvents(null, "TestPlan25_Test2Stream_1", "activemq",
+                    "text", messageList);
+
+            SiddhiTestHelper.waitForEvents(2000, 2, count, 2000);
+            Assert.assertEquals(count.intValue(), 2);
 
         } catch (InterruptedException e) {
             log.error(e.getMessage(), e);
@@ -1981,5 +1582,11 @@ public class JmsTransportTestCase {
             siddhiAppRuntimeMap.put(group.getGroupName(), runtimeList);
         }
         return siddhiAppRuntimeMap;
+    }
+
+    private void publishEvents(String topicName, String queueName, String broker, String format,
+                               List<String> messageList) throws InterruptedException {
+        JMSClientPublisher jmsClientPublisher = new JMSClientPublisher();
+        jmsClientPublisher.sendJMSEvents(messageList, topicName, queueName, format, broker, PROVIDER_URL);
     }
 }
