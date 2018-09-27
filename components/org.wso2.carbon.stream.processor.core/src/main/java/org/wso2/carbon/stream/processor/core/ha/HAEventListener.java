@@ -100,6 +100,9 @@ public class HAEventListener extends MemberEventListener {
                     getRegisteredRecordTableHandlers();
           
             if (clusterCoordinator.isLeaderNode()) {
+                for (SourceHandler sourceHandler : registeredSourceHandlers.values()) {
+                    ((HACoordinationSourceHandler) sourceHandler).setAsActive();
+                }
                 StreamProcessorDataHolder.getHAManager().changeToActive();
                 if (clusterCoordinator.getAllNodeDetails().size() == 2) {
                     NodeDetail passiveNode = getPassiveNode();
@@ -109,10 +112,6 @@ public class HAEventListener extends MemberEventListener {
                 }
                 for (SinkHandler sinkHandler : registeredSinkHandlers.values()) {
                     ((HACoordinationSinkHandler) sinkHandler).setAsActive();
-                }
-
-                for (SourceHandler sourceHandler : registeredSourceHandlers.values()) {
-                    ((HACoordinationSourceHandler) sourceHandler).setAsActive();
                 }
 
                 for (RecordTableHandler recordTableHandler : registeredRecordTableHandlers.values()) {
