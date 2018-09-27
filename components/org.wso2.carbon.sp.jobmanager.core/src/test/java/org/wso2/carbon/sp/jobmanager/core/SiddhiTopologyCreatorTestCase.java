@@ -1520,7 +1520,7 @@ public class SiddhiTopologyCreatorTestCase {
         String topics[] = new String[]{"custom_topic"};
         KafkaTestUtil.createTopic(topics, 1);
 
-        SiddhiAppCreator appCreator = new SPSiddhiAppCreator();
+        SiddhiAppCreator appCreator = new KafkaSiddhiAppCreator();
         List<DeployableSiddhiQueryGroup> queryGroupList = appCreator.createApps(topology);
         Assert.assertEquals(queryGroupList.size(), 2, "Three query groups should be created with passthrough query");
         Assert.assertEquals(queryGroupList.get(1).getSiddhiQueries().size(), 2, "Two queries should be created "
@@ -1591,7 +1591,7 @@ public class SiddhiTopologyCreatorTestCase {
         String topics[] = new String[]{"custom_topic"};
         KafkaTestUtil.createTopic(topics, 1);
 
-        SiddhiAppCreator appCreator = new SPSiddhiAppCreator();
+        SiddhiAppCreator appCreator = new KafkaSiddhiAppCreator();
         appCreator.createApps(topology);
 
     }

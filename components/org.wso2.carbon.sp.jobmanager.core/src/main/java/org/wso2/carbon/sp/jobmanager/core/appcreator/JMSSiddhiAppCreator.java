@@ -54,6 +54,14 @@ public class JMSSiddhiAppCreator extends AbstractSiddhiAppCreator {
         providerUrl = ServiceDataHolder.getDeploymentConfig().getProviderUrl();
         processInputStreams(siddhiAppName, queryList, queryGroup.getInputStreams().values());
         processOutputStreams(siddhiAppName, queryList, queryGroup.getOutputStreams().values());
+        if (log.isDebugEnabled()) {
+            log.debug("Following query list is created for the Siddhi Query Group "
+                    + queryGroup.getName() + " " + "representing Siddhi App "
+                    + siddhiAppName + ".");
+            for (SiddhiQuery siddhiQuery : queryList) {
+                log.debug(siddhiQuery.getApp());
+            }
+        }
         return queryList;
     }
 
@@ -138,10 +146,7 @@ public class JMSSiddhiAppCreator extends AbstractSiddhiAppCreator {
             updateQueryList(queryList, queryValuesMap);
 
         }
-        log.debug("Partial apps for the execution group are : ");
-        for (SiddhiQuery aQueryList : queryList) {
-            log.debug(aQueryList.getApp());
-        }
+
     }
 
     /**
@@ -222,10 +227,7 @@ public class JMSSiddhiAppCreator extends AbstractSiddhiAppCreator {
                 }
             }
         }
-        log.debug("Partial apps for the execution group are : ");
-        for (SiddhiQuery aQueryList : queryList) {
-            log.debug(aQueryList.getApp());
-        }
+
     }
 
     /**
