@@ -63,8 +63,7 @@ public class JMSSiddhiAppCreator extends AbstractSiddhiAppCreator {
      * @param queryList     Contains the query of the current execution group replicated
      *                      to the parallelism of the group.
      * @param outputStreams Collection of current execution group's output streams
-     * Assign the jms transport headers for each instance siddhi applications output streams
-     *                     for given execution group
+     * Assigns the jms sink configurations for output streams.
      */
     private void processOutputStreams(String siddhiAppName, List<SiddhiQuery> queryList,
                                       Collection<OutputStreamDataHolder> outputStreams) {
@@ -151,8 +150,7 @@ public class JMSSiddhiAppCreator extends AbstractSiddhiAppCreator {
      * @param queryList     Contains the query of the current execution group replicated
      *                      to the parallelism of the group.
      * @param inputStreams  Collection of current execution group's input streams
-     * Assign the jms transport headers for each instance siddhi applications input
-     *                      streams for a given execution group
+     * Assigns the jms source configurations for input streams.
      */
     private void processInputStreams(String siddhiAppName, List<SiddhiQuery> queryList,
                                      Collection<InputStreamDataHolder> inputStreams) {
