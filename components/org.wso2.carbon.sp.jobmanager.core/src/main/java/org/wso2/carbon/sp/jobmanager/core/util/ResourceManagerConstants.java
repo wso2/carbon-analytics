@@ -70,41 +70,44 @@ public class ResourceManagerConstants {
 
     public static final String MB_DESTINATION = "mbDestination";
 
+    public static final String FACTORY_INITIAL = "factoryinitial";
+
+    public static final String PROVIDER_URL = "providerurl";
+
     public static final String DESTINATION_TOPIC = "@destination(destination = '${"
             + PARTITION_TOPIC + "}')";
 
     public static final String DEFAULT_MB_TOPIC_SOURCE_TEMPLATE = "@source(type='jms',"
-            + "factory.initial='org.wso2.andes.jndi.PropertiesFileInitialContextFactory',"
-            + "provider.url='../../resources/jndi.properties',connection.factory.type='topic',"
+            + "factory.initial='${" + FACTORY_INITIAL + "}',"
+            + "provider.url='${" + PROVIDER_URL + "}',connection.factory.type='topic',"
             + "destination ='${" + MB_DESTINATION  +  "}' , connection.factory.jndi.name="
             + "'TopicConnectionFactory',@map(type='" + MAPPING + "'))";
 
     public static final String DEFAULT_MB_QUEUE_SOURCE_TEMPLATE = "@source(type='jms',"
-            + "factory.initial='org.wso2.andes.jndi.PropertiesFileInitialContextFactory',"
-            + "provider.url='../../resources/jndi.properties',connection.factory.type='queue',"
-            + "destination ='${" + MB_DESTINATION + "}',connection.factory.jndi.name="
+            + "factory.initial='${" + FACTORY_INITIAL + "}',"
+            + "provider.url='${"  + PROVIDER_URL + "}',connection.factory.type='queue',"
+            + "destination ='${" + MB_DESTINATION  +  "}',connection.factory.jndi.name="
             + "'QueueConnectionFactory',@map(type ='" + MAPPING + "'))";
 
     public static final String DEFAULT_MB_TOPIC_SINK_TEMPLATE = "@sink(type='jms',"
-            + "factory.initial='org.wso2.andes.jndi.PropertiesFileInitialContextFactory',"
-            + "provider.url='../../resources/jndi.properties',connection.factory.type='topic',"
+            + "factory.initial='${" + FACTORY_INITIAL + "}',"
+            + "provider.url='${"  + PROVIDER_URL + "}',connection.factory.type='topic',"
             + "destination = '${" + MB_DESTINATION  +  "}', connection.factory.jndi.name="
             + "'TopicConnectionFactory',@map(type='" + MAPPING + "'))";
 
     public static final String DEFAULT_MB_QUEUE_SINK_TEMPLATE = "@sink(type='jms',"
-            + "factory.initial='org.wso2.andes.jndi.PropertiesFileInitialContextFactory',"
-            + "provider.url='../../resources/jndi.properties',connection.factory.type='queue',"
+            + "factory.initial='${" + FACTORY_INITIAL + "}',"
+            + "provider.url='${" + PROVIDER_URL + "}',connection.factory.type='queue',"
             + "destination = '${" + MB_DESTINATION  +  "}', connection.factory.jndi.name="
             + "'QueueConnectionFactory',@map(type='" + MAPPING + "'))";
 
     public static final String PARTITIONED_MB_SINK_TEMPLATE = "@sink(type='jms',"
-            + "factory.initial='org.wso2.andes.jndi.PropertiesFileInitialContextFactory',"
-            + "provider.url='../../resources/jndi.properties',"
-            + "@distribution(strategy='partitioned', partitionKey='${" + PARTITION_KEY + "}',"
+            + "factory.initial='${" + FACTORY_INITIAL + "}',"
+            + "provider.url='${" + PROVIDER_URL
+            + "}',@distribution(strategy='partitioned', partitionKey='${" + PARTITION_KEY + "}',"
             + "${" + DESTINATIONS + "}),connection.factory.type='topic',"
             + "connection.factory.jndi.name='TopicConnectionFactory',"
             + "@map(type='" + MAPPING + "'))";
-
 
     public static final String DESTINATION = "@destination(partition.no = '${" + PARTITION_NO
             + "}')";
