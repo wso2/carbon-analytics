@@ -20,6 +20,7 @@ package org.wso2.carbon.sp.jobmanager.core.appcreator;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
+import org.wso2.carbon.sp.jobmanager.core.internal.ServiceDataHolder;
 import org.wso2.carbon.sp.jobmanager.core.topology.InputStreamDataHolder;
 import org.wso2.carbon.sp.jobmanager.core.topology.OutputStreamDataHolder;
 import org.wso2.carbon.sp.jobmanager.core.topology.PublishingStrategyDataHolder;
@@ -37,11 +38,11 @@ import java.util.Map;
 /**
  * Creates distributed siddhi application.
  */
-public class SPMBSiddhiAppCreator extends AbstractSiddhiAppCreator {
-    private static final Logger log = Logger.getLogger(SPMBSiddhiAppCreator.class);
-    private static final int TIMEOUT = 120;
-    private Map<String, Integer> rrTrackerMap = new HashMap<>();
-
+public class JMSSiddhiAppCreator extends AbstractSiddhiAppCreator {
+    private static final Logger log = Logger.getLogger(JMSSiddhiAppCreator.class);
+    private Map<String, Integer> roundRobinTrackerMap = new HashMap<>();
+    private String providerUrl;
+    private String factoryInitial;
 
     @Override
     protected List<SiddhiQuery> createApps(String siddhiAppName, SiddhiQueryGroup queryGroup) {
@@ -49,6 +50,8 @@ public class SPMBSiddhiAppCreator extends AbstractSiddhiAppCreator {
         String queryTemplate = queryGroup.getSiddhiApp();
         List<SiddhiQuery> queryList = generateQueryList(queryTemplate, groupName, queryGroup
                 .getParallelism());
+        factoryInitial = ServiceDataHolder.getDeploymentConfig().getFactoryInitial();
+        providerUrl = ServiceDataHolder.getDeploymentConfig().getProviderUrl();
         processInputStreams(siddhiAppName, queryList, queryGroup.getInputStreams().values());
         processOutputStreams(siddhiAppName, queryList, queryGroup.getOutputStreams().values());
         return queryList;
@@ -67,7 +70,10 @@ public class SPMBSiddhiAppCreator extends AbstractSiddhiAppCreator {
                                       Collection<OutputStreamDataHolder> outputStreams) {
         //Store the data for sink stream header
         Map<String, String> sinkValuesMap = new HashMap<>();
-        int rrHolderCount = 0;
+        int roundRobinHolderCount = 0;
+        sinkValuesMap.put(ResourceManagerConstants.PROVIDER_URL, providerUrl);
+        sinkValuesMap.put(ResourceManagerConstants.FACTORY_INITIAL, factoryInitial);
+
         for (OutputStreamDataHolder outputStream : outputStreams) {
             //Contains the header string for each stream
             Map<String, String> sinkList = new HashMap<>();
@@ -75,13 +81,14 @@ public class SPMBSiddhiAppCreator extends AbstractSiddhiAppCreator {
             Map<String, Integer> partitionKeys = new HashMap<>();
 
             for (PublishingStrategyDataHolder holder : outputStream.getPublishingStrategyList()) {
-                sinkValuesMap.put(ResourceManagerConstants.MB_DESTINATION, siddhiAppName + "_" +
-                        outputStream.getStreamName() + (holder.getGroupingField() == null ? ""
-                        : ("_" + holder.getGroupingField())));
+                sinkValuesMap.put(ResourceManagerConstants.MB_DESTINATION,
+                        getTopicName(siddhiAppName, outputStream.getStreamName(),
+                                holder.getGroupingField()));
+
                 if (holder.getStrategy() == TransportStrategy.FIELD_GROUPING) {
                     if (partitionKeys.get(holder.getGroupingField()) != null &&
-                            partitionKeys.get(holder.getGroupingField()) > holder.getParallelism())
-                    {
+                            partitionKeys.get(holder.getGroupingField()) > holder
+                                    .getParallelism()) {
                         continue;
                     }
 
@@ -109,10 +116,11 @@ public class SPMBSiddhiAppCreator extends AbstractSiddhiAppCreator {
 
                 } else if (holder.getStrategy() == TransportStrategy.ROUND_ROBIN) {
                         //if holder uses RR as strategy then unique topic name will be defined
-                        sinkValuesMap.put(ResourceManagerConstants.MB_DESTINATION, siddhiAppName
-                                + "_" + outputStream.getStreamName() + "_"
-                                + String.valueOf(rrHolderCount));
-                        rrHolderCount++;
+                        sinkValuesMap.put(ResourceManagerConstants.MB_DESTINATION,
+                                getQueueName(siddhiAppName, outputStream.getStreamName(),
+                                        roundRobinHolderCount));
+                        roundRobinHolderCount++;
+
                         String sinkString = getUpdatedQuery(ResourceManagerConstants
                                         .DEFAULT_MB_QUEUE_SINK_TEMPLATE, sinkValuesMap);
                         sinkList.put(sinkValuesMap.get(ResourceManagerConstants.MB_DESTINATION)
@@ -127,8 +135,13 @@ public class SPMBSiddhiAppCreator extends AbstractSiddhiAppCreator {
             }
             Map<String, String> queryValuesMap = new HashMap<>(1);
             queryValuesMap.put(outputStream.getStreamName(),
-                    StringUtils.join(sinkList.values(),  "\n"));
+                    StringUtils.join(sinkList.values(), System.lineSeparator()));
             updateQueryList(queryList, queryValuesMap);
+
+        }
+        log.debug("Partial apps for the execution group are : ");
+        for (SiddhiQuery aQueryList : queryList) {
+            log.debug(aQueryList.getApp());
         }
     }
 
@@ -148,10 +161,12 @@ public class SPMBSiddhiAppCreator extends AbstractSiddhiAppCreator {
 
             SubscriptionStrategyDataHolder subscriptionStrategy = inputStream
                     .getSubscriptionStrategy();
-            sourceValuesMap.put(ResourceManagerConstants.MB_DESTINATION, siddhiAppName + "_" +
-                    inputStream.getStreamName() + (inputStream.getSubscriptionStrategy()
-                    .getPartitionKey() == null ? "" : ("_" + inputStream.getSubscriptionStrategy()
-                    .getPartitionKey())));
+            sourceValuesMap.put(ResourceManagerConstants.FACTORY_INITIAL, factoryInitial);
+            sourceValuesMap.put(ResourceManagerConstants.PROVIDER_URL, providerUrl);
+            sourceValuesMap.put(ResourceManagerConstants.MB_DESTINATION, getTopicName(siddhiAppName,
+                    inputStream.getStreamName(), inputStream.getSubscriptionStrategy()
+                            .getPartitionKey()));
+
             if (!inputStream.isUserGiven()) {
                 if (subscriptionStrategy.getStrategy() == TransportStrategy.FIELD_GROUPING) {
 
@@ -160,39 +175,39 @@ public class SPMBSiddhiAppCreator extends AbstractSiddhiAppCreator {
                         List<Integer> partitionNumbers = getPartitionNumbers(queryList.size(),
                                 subscriptionStrategy
                                 .getOfferedParallelism(), i);
+
                         for (int topicCount : partitionNumbers) {
-                            String topicName = siddhiAppName + "_" + inputStream.getStreamName()
-                                    + "_" + inputStream.getSubscriptionStrategy().getPartitionKey()
-                                    + "_" + Integer.toString(topicCount);
+                            String topicName = getTopicName(siddhiAppName, inputStream
+                                    .getStreamName(), inputStream.getSubscriptionStrategy()
+                                    .getPartitionKey()) + "_" + Integer.toString(topicCount);
+
                             sourceValuesMap.put(ResourceManagerConstants.MB_DESTINATION, topicName);
                             String sourceQuery = getUpdatedQuery(ResourceManagerConstants
                                             .DEFAULT_MB_TOPIC_SOURCE_TEMPLATE, sourceValuesMap);
                             sourceQueries.add(sourceQuery);
                         }
-                        String combinedQueryHeader = StringUtils.join(sourceQueries, "\n");
+
+                        String combinedQueryHeader = StringUtils.join(sourceQueries,
+                                System.lineSeparator());
                         Map<String, String> queryValuesMap = new HashMap<>(1);
                         queryValuesMap.put(inputStream.getStreamName(), combinedQueryHeader);
                         String updatedQuery = getUpdatedQuery(queryList.get(i).getApp()
                                 , queryValuesMap);
                         queryList.get(i).setApp(updatedQuery);
                     }
-                } else if (subscriptionStrategy.getStrategy() == TransportStrategy.ROUND_ROBIN) {
-                    String queueName;
-                    int queueCount = 0;
-                    if (rrTrackerMap.get(inputStream.getStreamName()) != null) {
-                        queueCount = rrTrackerMap.get(inputStream.getStreamName());
-                    }
 
-                    queueName = siddhiAppName + "_" + inputStream.getStreamName() + "_"
-                            + Integer.toString(queueCount);
-                    queueCount += 1;
-                    rrTrackerMap.put(inputStream.getStreamName(), queueCount);
+                } else if (subscriptionStrategy.getStrategy() == TransportStrategy.ROUND_ROBIN) {
+                    String streamName = inputStream.getStreamName();
+                    String queueName = getQueueName(siddhiAppName, streamName,
+                            getQueueNumber(streamName));
+
                     sourceValuesMap.put(ResourceManagerConstants.MB_DESTINATION, queueName);
                     String sourceString = getUpdatedQuery(ResourceManagerConstants
                                     .DEFAULT_MB_QUEUE_SOURCE_TEMPLATE, sourceValuesMap);
                     Map<String, String> queryValuesMap = new HashMap<>(1);
                     queryValuesMap.put(inputStream.getStreamName(), sourceString);
                     updateQueryList(queryList, queryValuesMap);
+
                 } else {
                     sourceValuesMap.put(ResourceManagerConstants.MB_DESTINATION, siddhiAppName
                             + "_" + inputStream.getStreamName());
@@ -205,8 +220,56 @@ public class SPMBSiddhiAppCreator extends AbstractSiddhiAppCreator {
                         String updatedQuery = getUpdatedQuery(aQueryList.getApp(), queryValuesMap);
                         aQueryList.setApp(updatedQuery);
                     }
+
                 }
             }
         }
+        log.debug("Partial apps for the execution group are : ");
+        for (SiddhiQuery aQueryList : queryList) {
+            log.debug(aQueryList.getApp());
+        }
+    }
+
+    /**
+     *@param siddhiAppName   Name of the userdefined siddhi app
+     * @param streamName      Currently processing stream name
+     * @param groupingField   Partition key field, if available otherwise null
+     * @return  created topic name
+     *
+     * Creates the topic name from above parameters
+     */
+    private String getTopicName(String siddhiAppName, String streamName, String groupingField) {
+        return siddhiAppName + "_" + streamName + (groupingField == null ? ""
+                : ("_" + groupingField));
+    }
+
+    /**
+     *
+     * @param siddhiAppName  Name of the userdefined siddhi app
+     * @param streamName     Currently processing stream name
+     * @param queueCount     tracks the current queue count
+     * @return  created queue name
+     *
+     * creates the queue name from above parameters
+     */
+    private String getQueueName(String siddhiAppName, String streamName, int queueCount) {
+        return siddhiAppName + "_" + streamName + "_" + Integer.toString(queueCount);
+    }
+
+    /**
+     * @param streamName    Currently processing stream name
+     * @return  queue number to be used
+     *
+     * provides the queue number to be used by a particular input stream and update the queue count
+     * for that stream @roundRobinTrackerMap
+     */
+    private int getQueueNumber(String streamName) {
+        int queueCount = 0;
+        if (roundRobinTrackerMap.get(streamName) != null) {
+            queueCount = roundRobinTrackerMap.get(streamName);
+            queueCount += 1;
+        }
+        roundRobinTrackerMap.put(streamName, queueCount);
+        return queueCount;
     }
 }
