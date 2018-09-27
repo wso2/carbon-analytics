@@ -45,8 +45,8 @@ import java.util.concurrent.TimeUnit;
 /**
  * Creates distributed siddhi application.
  */
-public class SPSiddhiAppCreator extends AbstractSiddhiAppCreator {
-    private static final Logger log = Logger.getLogger(SPSiddhiAppCreator.class);
+public class KafkaSiddhiAppCreator extends AbstractSiddhiAppCreator {
+    private static final Logger log = Logger.getLogger(KafkaSiddhiAppCreator.class);
     private static final int TIMEOUT = 120;
 
     @Override
