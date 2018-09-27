@@ -50,6 +50,26 @@ public class DeploymentConfig implements Serializable {
     private String zooKeeperURLs;
     @Element(description = "ZooKeeper configurations", required = true)
     private ZooKeeperConfig zooKeeperConfig;
+    @Element(description = "JMS Factory initial configuration", required = true)
+    private String factoryInitial;
+    @Element(description = "provider url configuration for siddhi-jms-io")
+    private String providerUrl;
+
+    public String getProviderUrl() {
+        return providerUrl;
+    }
+
+    public void setProviderUrl(String providerUrl) {
+        this.providerUrl = providerUrl;
+    }
+
+    public String getFactoryInitial() {
+        return factoryInitial;
+    }
+
+    public void setFactoryInitial(String factoryInitial) {
+        this.factoryInitial = factoryInitial;
+    }
 
     public String getType() {
         return type;
