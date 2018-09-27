@@ -277,4 +277,4 @@ deployment.config:
     connectionTimeout: 10000
     sessionTimeout: 10000
   factoryInitial: org.wso2.andes.jndi.PropertiesFileInitialContextFactory    #factory.initial field name for siddhi-jms-io
-  providerUrl: vm://localhost
+  providerUrl: ../../resources/jndi.properties
