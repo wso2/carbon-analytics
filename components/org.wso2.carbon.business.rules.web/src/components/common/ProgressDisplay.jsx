@@ -21,24 +21,30 @@ import React, { Component } from 'react';
 import { CircularProgress } from 'material-ui/Progress';
 import { Typography } from 'material-ui';
 import Paper from 'material-ui/Paper';
+// Localization
+import { FormattedMessage } from 'react-intl';
 // Styles
 import Styles from '../../style/Styles';
 import '../../index.css';
+
 
 /**
  * Represents the progress display, shown while loading a page
  */
 export default class ProgressDisplay extends Component {
-    render() {
-        return (
-            <center>
-                <Paper style={Styles.messageContainer}>
-                    <CircularProgress size={50} />
-                    <Typography type="subheading">
-                        Please wait
-                    </Typography>
-                </Paper>
-            </center>
-        );
-    }
+  render() {
+    return (
+      <center>
+        <Paper style={Styles.messageContainer}>
+          <CircularProgress size={50} />
+          <Typography type="subheading">
+            <FormattedMessage
+              id="progress.subheading"
+              defaultMessage="Please Wait"
+            />
+          </Typography>
+        </Paper>
+      </center>
+    );
+  }
 }
