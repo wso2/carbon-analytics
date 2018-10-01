@@ -16,81 +16,9 @@
  * under the License.
  */
 
-define(['require', 'log', 'jquery', 'lodash', 'attribute', 'stream', 'designViewUtils', 'jsonValidator'],
-    function (require, log, $, _, Attribute, Stream, DesignViewUtils, JSONValidator) {
-
-        var streamSchema = {
-            type: "object",
-            title: "Stream",
-            properties: {
-                annotations: {
-                    propertyOrder: 1,
-                    type: "array",
-                    format: "table",
-                    title: "Annotations",
-                    uniqueItems: true,
-                    minItems: 1,
-                    items: {
-                        type: "object",
-                        title: "Annotation",
-                        options: {
-                            disable_properties: true
-                        },
-                        properties: {
-                            annotation: {
-                                title: "Annotation",
-                                type: "string",
-                                minLength: 1
-                            }
-                        }
-                    }
-                },
-                name: {
-                    type: "string",
-                    title: "Name",
-                    minLength: 1,
-                    required: true,
-                    propertyOrder: 2
-                },
-                attributes: {
-                    required: true,
-                    propertyOrder: 3,
-                    type: "array",
-                    format: "table",
-                    title: "Attributes",
-                    uniqueItems: true,
-                    minItems: 1,
-                    items: {
-                        type: "object",
-                        title: 'Attribute',
-                        options: {
-                            disable_properties: true
-                        },
-                        properties: {
-                            name: {
-                                title: 'Name',
-                                type: "string",
-                                minLength: 1
-                            },
-                            type: {
-                                title: 'Type',
-                                type: "string",
-                                enum: [
-                                    "string",
-                                    "int",
-                                    "long",
-                                    "float",
-                                    "double",
-                                    "bool",
-                                    "object"
-                                ],
-                                default: "string"
-                            }
-                        }
-                    }
-                }
-            }
-        };
+define(['require', 'log', 'jquery', 'lodash', 'attribute', 'stream', 'designViewUtils', 'jsonValidator', 'handlebar',
+    'js_tree'],
+    function (require, log, $, _, Attribute, Stream, DesignViewUtils, JSONValidator, Handlebars, jstree) {
 
         /**
          * @class StreamForm Creates a forms to collect data from a stream
@@ -110,6 +38,324 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'stream', 'designView
             }
         };
 
+        //attribute delete button action
+        var delAttribute = function () {
+            $(this).closest('li').remove();
+            changeAtrributeNavigation();
+        };
+
+        //attribute add button action
+        var addAttribute = function () {
+            $("#attribute-div").append('<li class="attribute"><div class="attr-content">' +
+                '<input type="text"  class="attr-name"/> &nbsp; ' +
+                '<select class="attr-type">' +
+                '<option value="string">string</option>' +
+                '<option value="int">int</option>' +
+                '<option value="long">long</option>' +
+                '<option value="float">float</option>' +
+                '<option value="double">double</option>' +
+                '<option value="bool">bool</option>' +
+                '<option value="object">object</option>' +
+                '</select>' +
+                '</div> <div class="attr-nav"> </div></li>');
+            changeAtrributeNavigation();
+        };
+
+        //attribute move up button action
+        var moveUpAttribute = function () {
+            var $current = $(this).closest('li')
+            var $previous = $current.prev('li');
+            if ($previous.length !== 0) {
+                $current.insertBefore($previous);
+            }
+            changeAtrributeNavigation();
+            return false;
+        };
+
+        //attribute move down function
+        var moveDownAttribute = function () {
+            var $current = $(this).closest('li')
+            var $next = $current.next('li');
+            if ($next.length !== 0) {
+                $current.insertAfter($next);
+            }
+            changeAtrributeNavigation();
+            return false;
+        };
+
+        var isPredefinedAnnotation = function (annotationName) {
+
+            var predefinedAnnotationList = loadPredefinedAnnotations();
+            var predefinedObject = null;
+            _.forEach(predefinedAnnotationList, function (predefinedAnnotation) {
+                if (predefinedAnnotation.name == annotationName) {
+                    predefinedObject = predefinedAnnotation
+                    return;
+                }
+            });
+            return predefinedObject;
+        };
+
+        var validatePredefinedAnnotations = function () {
+
+            var predefinedAnnotationjsTreeList = $('#annotation-div').jstree('get_checked');
+            var predefinedAnnotationList = loadPredefinedAnnotations();
+            var isValid = false;
+            mainLoop:
+            for (var jsTreePredefinedAnnotation of predefinedAnnotationjsTreeList) {
+                var node_info = $('#annotation-div').jstree("get_node", jsTreePredefinedAnnotation);
+                var predefinedObject = isPredefinedAnnotation(node_info.text.trim())
+                if (predefinedObject != null) {
+                    for (var jsTreePredefinedAnnotationElement of node_info.children) {
+                        var annotation_key_info = $('#annotation-div').jstree("get_node",
+                            jsTreePredefinedAnnotationElement);
+                        var annotation_value_info = $('#annotation-div').jstree("get_node", annotation_key_info
+                            .children[0])
+                        for (var predefinedObjectElement of predefinedObject.elements) {
+                            if (annotation_key_info.text.trim() == predefinedObjectElement.key) {
+                                if (predefinedObjectElement.ismandaory == "true") {
+                                    if (annotation_value_info.text.trim() == "") {
+                                        DesignViewUtils.prototype.errorAlert("Propery '" + predefinedObjectElement.key +
+                                            "' is mandaory");
+                                        isValid = true;
+                                        break mainLoop;
+                                    }
+                                }
+                            }
+                        }
+
+                    }
+                }
+
+            }
+            return isValid;
+        };
+
+        var checkPredefinedAnnotations = function (checkedAnnotations) {
+
+            _.forEach(checkedAnnotations, function (annotationName) {
+                $('#annotation-div').jstree("search", annotationName)
+            });
+
+        };
+
+        var annotation = "";
+        var buildAnnotationString = function () {
+
+            var annotationList = [];
+            var parentAnnotations = $('#annotation-div').jstree(true)._model.data['#'].children;
+            var returned = false;
+            parentAnnotations.forEach(function (node) {
+                var node_info = $('#annotation-div').jstree("get_node", node);
+                var childArray = node_info.children
+                if (childArray.length != 0) {
+                    annotation += "@" + node_info.text.trim() + "( "
+                    traverseChildAnnotations(childArray)
+                    annotation = annotation.substring(0, annotation.length - 1);
+                    annotation += ")"
+                    annotationList.push(annotation);
+                    annotation = "";
+                }
+            });
+            if (returned) {
+                annotation = "";
+                return;
+            }
+            return annotationList;
+        };
+
+        var traverseChildAnnotations = function (childAnnotations) {
+
+            childAnnotations.forEach(function (node) {
+
+                node_info = $('#annotation-div').jstree("get_node", node);
+                if ((node_info.original != null && node_info.original.class == "annotation") ||
+                    (node_info.li_attr != null && node_info.li_attr.class == "annotation")) {
+                    if (node_info.children.length != 0) {
+                        annotation += "@" + node_info.text.trim() + "( "
+                        traverseChildAnnotations(node_info.children)
+                        annotation = annotation.substring(0, annotation.length - 1);
+                        annotation += "),"
+
+                    }
+                }
+                else {
+                    //do the validation if the value is empty dont append the key and value
+                    annotation += node_info.text.trim() + "="
+                    var node_value = $('#annotation-div').jstree("get_node", node_info.children[0]).text.trim();
+                    annotation += "'" + node_value + "' ,"
+                }
+            });
+        };
+
+        var loadPredefinedAnnotations = function () {
+            var predefinedAnnotationList = [];
+            var asyncAnnotationObject = {
+                name: "Async", class: "predefined", ismandaory: "false",
+                elements: [{ key: "buffer.size", value: "256", ismandaory: "true" }, {
+                    key: "workers", value: "2", ismandaory: "true"
+                },
+                { key: "batch.size.max", value: "5", ismandaory: "true" }]
+            };
+            predefinedAnnotationList.push(asyncAnnotationObject);
+            return predefinedAnnotationList;
+        };
+
+        var loadAnnotation = function () {
+            //initialise jstree
+            $("#annotation-div").jstree({
+                "core": {
+                    "check_callback": true
+                },
+                "themes": {
+                    "theme": "default",
+                    "url": "editor/commons/lib/js-tree-v3.3.2/themes/default7777777/style.css"
+                },
+                "checkbox": {
+                    "three_state": false,
+                    "whole_node": false,//Used to check/uncheck node only if clicked on checkbox icon, and not on the whole node including label
+                    "tie_selection": false
+                },
+                "search": {
+                    "case_insensitive": true
+                },
+
+                "plugins": ["themes", "checkbox", "search"]
+
+            }).on('search.jstree', function (nodes, data, res) {
+
+                $("#annotation-div").jstree(true).check_node(data.res[0])
+            })
+            var tree = $('#annotation-div').jstree(true);
+            //to add key-value for annotation node
+            $("#btn-add-key-val").on("click", function () {
+                var selectedNode = $("#annotation-div").jstree("get_selected");
+                var node_info = $('#annotation-div').jstree("get_node", selectedNode[0]);
+
+                //                if ((node_info.original != null && node_info.original.class == "annotation") ||
+                //                    (node_info.data != null && (node_info.data.jstree.class == "annotation") )) {
+                tree.create_node(selectedNode,
+                    {
+                        text: "property", class: "annotation-key", state: { "opened": true },
+                        "a_attr": { "class": "annotation-key" }, icon: "/editor/commons/images/properties.png",
+                        children: [{
+                            text: "value", class: "annotation-value", "a_attr": { "class": "annotation-value" },
+                            icon: "/editor/commons/images/value.png"
+                        }]
+                    }
+                );
+
+                tree.deselect_all();
+            });
+
+            //to add annotation node
+            $("#btn-add-annotation").on("click", function () {
+                var selectedNode = $("#annotation-div").jstree("get_selected");
+                if (selectedNode == "") {
+                    selectedNode = "#"
+                }
+                tree.create_node(selectedNode, {
+                    text: "Annotation", class: "annotation", state: { "opened": true },
+                    "a_attr": { "class": "annotation" }, icon: "/editor/commons/images/annotation.png",
+                    children: [{
+                        text: "property", class: "annotation-key", icon: "/editor/commons/images/properties.png",
+                        "a_attr": { "class": "annotation-key" },
+                        children: [{
+                            text: "value", class: "annotation-value", "a_attr": { "class": "annotation-value" },
+                            icon: "/editor/commons/images/value.png"
+                        }]
+                    }]
+
+                });
+                tree.deselect_all();
+            });
+
+            //to delete a annotation or a key-value node
+            $("#btn-del-annotation").on("click", function () {
+                var selectedNode = $("#annotation-div").jstree("get_selected");
+                var node_info = $('#annotation-div').jstree("get_node", selectedNode[0]);
+
+                //                if ((node_info.original != null && node_info.original.class != "annotation-value") ||
+                //                    (node_info.data != null && node_info.data.jstree.class != "annotation-value")) {
+                tree.delete_node([selectedNode]);
+                //      }
+                tree.deselect_all();
+            })
+
+            //to edit the selected node
+            $('#annotation-div').on("select_node.jstree", function (e, data) {
+                var node_info = $('#annotation-div').jstree("get_node", data.node)
+                console.log(node_info)
+                if (node_info.li_attr != null && (node_info.li_attr.class == "predefined-annotation" ||
+                    node_info.li_attr.class == "predefined-key")) {
+                    // tree.edit(data.node);
+                    //					$("#btn-del-annotation").show();
+                    //					$("#btn-add-annotation").hide();
+                    //					$("#btn-add-key-val").hide();
+
+                }
+                else if ((node_info.original != null && (node_info.original.class == "annotation-key")) ||
+                    (node_info.li_attr != null && (node_info.li_attr.class == "annotation-key"))) {
+                    tree.edit(data.node);
+                    $("#btn-del-annotation").show();
+                    $("#btn-add-annotation").hide();
+                    $("#btn-add-key-val").hide();
+                }
+                else if ((node_info.original != null && (node_info.original.class == "annotation-value")) ||
+                    (node_info.li_attr != null && (node_info.li_attr.class == "annotation-value"))) {
+                    $("#btn-del-annotation").hide();
+                    $("#btn-add-annotation").hide();
+                    $("#btn-add-key-val").hide();
+                    tree.edit(data.node);
+                }
+                else {
+                    $("#btn-del-annotation").show();
+                    $("#btn-add-annotation").show();
+                    $("#btn-add-key-val").show();
+                    tree.edit(data.node);
+                }
+            });
+
+            $(document).on('click', function (e) {
+                if ($(e.target).closest('.jstree').length) {
+                    $("#btn-del-annotation").hide();
+                    $("#btn-add-annotation").show();
+                    $("#btn-add-key-val").hide();
+                    tree.deselect_all();
+                }
+            });
+
+        };
+
+        //to manage the attribute navigations
+        var changeAtrributeNavigation = function () {
+            $('.attr-nav').empty();
+            var attrLength = $('#attribute-div li').length;
+            if (attrLength == 1) {
+                $('.attribute:eq(0)').find('.attr-nav').empty();
+            }
+            if (attrLength == 2) {
+                $('.attribute:eq(0)').find('.attr-nav').append('<button type="button" class="reorder-down">' +
+                    '<img src="/editor/commons/images/down.png"></button>');
+                $('.attribute:eq(1)').find('.attr-nav').append('<button type="button" class="reorder-up">' +
+                    '<img src="/editor/commons/images/up.png"></button><button type="button"' +
+                    'class="btn-del-attr"><img src="/editor/commons/images/delete.png"></button>');
+            }
+            if (attrLength > 2) {
+                var lastIndex = attrLength - 1;
+                for (var i = 0; i < attrLength; i++) {
+                    $('.attribute:eq(' + i + ')').find('.attr-nav').append('<button type="button"' +
+                        'class="reorder-up"><img src="/editor/commons/images/up.png"></button>' +
+                        '<button type="button" class="reorder-down"><img src="/editor/commons/images/down.png">' +
+                        '</button> <button type="button" class="btn-del-attr">' +
+                        '<img src="/editor/commons/images/delete.png"></button>');
+                }
+                $('.attribute:eq(0)').find('.attr-nav button:eq(0)').remove();
+                $('.attribute:eq(0)').find('.attr-nav button:eq(1)').remove();
+                $('.attribute:eq(' + lastIndex + ')').find('.attr-nav button:eq(1)').remove();
+            }
+        };
+
         /**
          * @function generate form when defining a form
          * @param i id for the element
@@ -119,56 +365,124 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'stream', 'designView
         StreamForm.prototype.generateDefineForm = function (i, formConsole, formContainer) {
             var self = this;
             var propertyDiv = $('<div id="property-header"><h3>Stream Configuration</h3></div>' +
-                '<div id="define-stream" class="define-stream"></div>');
+                '<div id="stream-form"> <h3>Name: </h3> <input type="text" id="streamName"> <div ' +
+                'id="define-attribute"></div><div id="define-annotation"></div>' +
+                '<button id="submit" type="button" class="btn btn-default">Submit </button></div>');
             formContainer.append(propertyDiv);
+            self.designViewContainer.addClass('disableContainer');
+            self.toggleViewButton.addClass('disableContainer');
 
-            // generate the form to define a stream
-            var editor = new JSONEditor($(formContainer).find('#define-stream')[0], {
-                schema: streamSchema,
-                show_errors: "always",
-                disable_properties: false,
-                disable_array_delete_all_rows: true,
-                disable_array_delete_last_row: true,
-                display_required_only: true,
-                no_additional_properties: true
-            });
 
-            formContainer.append('<div id="submit"><button type="button" class="btn btn-default">Submit</button></div>');
+            var attributeFormTemplate = Handlebars.compile($('#attribute-form-template').html());
+            var wrappedHtml = attributeFormTemplate("");
+            $('#define-attribute').html(wrappedHtml);
 
+            var raw_partial = document.getElementById('recursiveAnnotationPartial').innerHTML;
+            Handlebars.registerPartial('recursiveAnnotation', raw_partial);
+            var predefinedAnnotations = loadPredefinedAnnotations();
+
+            var annotationFormTemplate = Handlebars.compile($('#annotation-form-template').html());
+            var wrappedHtml = annotationFormTemplate(predefinedAnnotations);
+            $('#define-annotation').html(wrappedHtml);
+
+            //add event listeners for the buttons
+            $("#btn-add-attribute").click(addAttribute)
+            $("#attribute-div").on('click', '.btn-del-attr', delAttribute)
+            $("#attribute-div").on('click', '.reorder-up', moveUpAttribute)
+            $("#attribute-div").on('click', '.reorder-down', moveDownAttribute)
+            //onload of the attribute div arrange the navigations of the attribute
+            $('#attribute-div').ready(changeAtrributeNavigation);
+            $('#stream-form-template').ready(loadAnnotation);
+
+            var streamName = "";
             // 'Submit' button action
-            var submitButtonElement = $(formContainer).find('#submit')[0];
-            submitButtonElement.addEventListener('click', function () {
+            $('#submit').on('click', function () {
 
-                var errors = editor.validate();
-                if (errors.length) {
+                streamName = $('#streamName').val();
+
+                //to check if stream name is already existing
+                var isStreamNameUsed = self.formUtils.isDefinitionElementNameUsed(streamName);
+                if (isStreamNameUsed) {
+                    DesignViewUtils.prototype.errorAlert("Stream name \"" + streamName + "\" is already used.");
                     return;
                 }
-                var isStreamNameUsed = self.formUtils.isDefinitionElementNameUsed(editor.getValue().name);
-                if (isStreamNameUsed) {
-                    DesignViewUtils.prototype
-                        .errorAlert("Stream name \"" + editor.getValue().name + "\" is already used.");
+                // to check if stream name is empty
+                if (streamName == "") {
+                    DesignViewUtils.prototype.errorAlert("Stream name is required");
+                    return;
+                }
+                //to check if stream name contains white spaces
+                if ((streamName.indexOf(' ') >= 0) && (streamName.indexOf(' ') != streamName.length - 1)) {
+                    DesignViewUtils.prototype.errorAlert("Stream name \"" + streamName + "\" " +
+                        "cannot have white space.");
+                    return;
+                }
+                //to check if stream name starts with an alphabetic character
+                if (!(/^([a-zA-Z])$/).test(streamName.charAt(0))) {
+                    DesignViewUtils.prototype.errorAlert("Stream name \"" + streamName + "\" " +
+                        "must start with an alphabetic character.");
+                    return;
+                }
+
+                //validate the attribute names
+                var attrError = false;
+                $('.attr-name').each(function () {
+                    var attributeName = $(this).val();
+                    if (attributeName != "") {
+                        if ((attributeName.indexOf(' ') >= 0) && (attributeName.indexOf(' ') != attributeName.length - 1)) {
+                            DesignViewUtils.prototype.errorAlert("Attribute name \"" + attributeName + "\" " +
+                                "cannot have white space.");
+                            attrError = true;
+                            return;
+                        }
+                        if ((!(/^([a-zA-Z])$/).test(attributeName.charAt(0))) && (attributeName.trim().length > 0)) {
+                            DesignViewUtils.prototype.errorAlert("Attribute name \"" + attributeName + "\" " +
+                                "must start with an alphabetic character.");
+                            attrError = true;
+                            return;
+                        }
+                    }
+                });
+                if (attrError) {
                     return;
                 }
 
                 // set the isDesignViewContentChanged to true
                 self.configurationData.setIsDesignViewContentChanged(true);
 
-                // add the new out stream to the stream array
+                //add the new out stream to the stream array
                 var streamOptions = {};
+                var attributeLength = 0;
                 _.set(streamOptions, 'id', i);
-                _.set(streamOptions, 'name', editor.getValue().name);
+                _.set(streamOptions, 'name', $('#streamName').val());
                 var stream = new Stream(streamOptions);
-                _.forEach(editor.getValue().attributes, function (attribute) {
-                    var attributeObject = new Attribute(attribute);
-                    stream.addAttribute(attributeObject);
+                $('.attribute .attr-content').each(function () {
+                    var nameValue = $(this).find('.attr-name').val().trim();
+                    var typeValue = $(this).find('.attr-type').val();
+                    if (nameValue != "") {
+                        attributeLength++;
+                        var attributeObject = new Attribute({ name: nameValue, type: typeValue });
+                        stream.addAttribute(attributeObject);
+                    }
                 });
-                _.forEach(editor.getValue().annotations, function (annotation) {
-                    stream.addAnnotation(annotation.annotation);
+                if (attributeLength == 0) {
+                    DesignViewUtils.prototype.errorAlert("Minimum one attribute is required");
+                    return;
+                }
+
+                if (validatePredefinedAnnotations()) {
+                    return;
+                }
+
+                var annotationList = buildAnnotationString();
+                annotationList.forEach(function (annotation) {
+                    stream.addAnnotation(annotation);
                 });
+
                 self.configurationData.getSiddhiAppConfig().addStream(stream);
 
                 var textNode = $('#' + i).find('.streamNameNode');
-                textNode.html(editor.getValue().name);
+                textNode.html(streamName);
 
                 // If this is an inner stream perform validation
                 var streamSavedInsideAPartition
@@ -184,8 +498,8 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'stream', 'designView
                 self.designViewContainer.removeClass('disableContainer');
                 self.toggleViewButton.removeClass('disableContainer');
 
-            });
-            return editor.getValue().name;
+            }); //closure of the submit button
+            return streamName;
         };
 
         /**
@@ -195,9 +509,12 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'stream', 'designView
          * @param formContainer Container which holds the form
          */
         StreamForm.prototype.generatePropertiesForm = function (element, formConsole, formContainer) {
+
             var self = this;
             var propertyDiv = $('<div id="property-header"><h3>Stream Configuration</h3></div>' +
-                '<div id="define-stream" class="define-stream"></div>');
+                '<div id="stream-form"> <h3>Name: </h3> <input type="text" id="streamName"> <div ' +
+                'id="define-attribute"></div><div id="define-annotation"></div>' +
+                '<button id="submit" type="button" class="btn btn-default">Submit </button></div>');
             formContainer.append(propertyDiv);
             self.designViewContainer.addClass('disableContainer');
             self.toggleViewButton.addClass('disableContainer');
@@ -220,43 +537,68 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'stream', 'designView
                 };
                 attributes.push(attributeObject);
             });
-            var savedAnnotations = clickedElement.getAnnotationList();
+
+            var savedAnnotations = clickedElement.getAnnotationListObjects();
             var annotations = [];
-            _.forEach(savedAnnotations, function (savedAnnotation) {
-                annotations.push({annotation: savedAnnotation});
+            var checkedAnnotations = [];
+            var predefinedAnnotationList = loadPredefinedAnnotations();
+            _.forEach(predefinedAnnotationList, function (predefinedAnnotation) {
+                var foundPredefined = false;
+                _.forEach(savedAnnotations, function (savedAnnotation) {
+                    if (savedAnnotation.name == predefinedAnnotation.name) {
+                        checkedAnnotations.push(savedAnnotation.name);
+                        foundPredefined = true;
+                        //predefinedAnnotation.class = "jstree-checked"
+                        //put a tick for the annotation
+                        _.forEach(predefinedAnnotation.elements, function (predefinedAnnotationElement) {
+                            _.forEach(savedAnnotation.elements, function (savedAnnotationElement) {
+                                if (predefinedAnnotationElement.key == savedAnnotationElement.key) {
+                                    predefinedAnnotationElement.value = savedAnnotationElement.value
+
+                                }
+                            })
+                        })
+
+                        annotations.push(predefinedAnnotation)
+                    }
+                    else {
+
+                        annotations.push(savedAnnotation)
+                    }
+                });
+
+                if (!foundPredefined)
+                    annotations.push(predefinedAnnotation)
             });
 
-            var fillWith = {
-                annotations: annotations,
-                name: name,
-                attributes: attributes
-            };
-            fillWith = self.formUtils.cleanJSONObject(fillWith);
-            var editor = new JSONEditor($(formContainer).find('#define-stream')[0], {
-                schema: streamSchema,
-                show_errors: "always",
-                disable_properties: false,
-                disable_array_delete_all_rows: true,
-                disable_array_delete_last_row: true,
-                display_required_only: true,
-                no_additional_properties: true,
-                startval: fillWith
-            });
-            formContainer.append(self.formUtils.buildFormButtons(true));
+            $('#streamName').val(name);
+            var attributeFormTemplate = Handlebars.compile($('#attribute-form-template').html());
+            var wrappedHtml = attributeFormTemplate(attributes);
+            $('#define-attribute').html(wrappedHtml);
 
-            // 'Submit' button action
-            var submitButtonElement = $(formContainer).find('#btn-submit')[0];
-            submitButtonElement.addEventListener('click', function () {
+            var raw_partial = document.getElementById('recursiveAnnotationPartial').innerHTML;
+            Handlebars.registerPartial('recursiveAnnotation', raw_partial);
+            var annotationFormTemplate = Handlebars.compile($('#annotation-form-template').html());
+            var wrappedHtml = annotationFormTemplate(annotations);
+            $('#define-annotation').html(wrappedHtml);
+            loadAnnotation();
+            checkPredefinedAnnotations(checkedAnnotations);
+            validatePredefinedAnnotations();
 
-                var errors = editor.validate();
-                if (errors.length) {
-                    return;
-                }
+            $("#btn-add-attribute").click(addAttribute)
+            $("#attribute-div").on('click', '.btn-del-attr', delAttribute)
+            $("#attribute-div").on('click', '.reorder-up', moveUpAttribute)
+            $("#attribute-div").on('click', '.reorder-down', moveDownAttribute)
+            //onload of the attribute div arrange the navigations of the attribute
+            $('#attribute-div').ready(changeAtrributeNavigation);
+            //$('#stream-form-template').ready(loadAnnotation(json));
+            //formContainer.append(self.formUtils.buildFormButtons(true));
 
+            $('#submit').on('click', function () {
                 // set the isDesignViewContentChanged to true
                 self.configurationData.setIsDesignViewContentChanged(true);
 
-                var config = editor.getValue();
+                var configName = $('#streamName').val();
                 var streamName;
                 var firstCharacterInStreamName;
                 var isStreamNameUsed;
@@ -267,12 +609,12 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'stream', 'designView
                 var isStreamSavedInsideAPartition
                     = self.configurationData.getSiddhiAppConfig().getStreamSavedInsideAPartition(id);
                 if (!isStreamSavedInsideAPartition) {
-                    firstCharacterInStreamName = (config.name).charAt(0);
+                    firstCharacterInStreamName = (configName).charAt(0);
                     if (firstCharacterInStreamName === '#') {
                         DesignViewUtils.prototype.errorAlert("'#' is used to define inner streams only.");
                         return;
                     } else {
-                        streamName = config.name;
+                        streamName = configName;
                     }
                     isStreamNameUsed
                         = self.formUtils.isDefinitionElementNameUsed(streamName, id);
@@ -281,11 +623,11 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'stream', 'designView
                         return;
                     }
                 } else {
-                    firstCharacterInStreamName = (config.name).charAt(0);
+                    firstCharacterInStreamName = (configName).charAt(0);
                     if (firstCharacterInStreamName !== '#') {
-                        streamName = '#' + config.name;
+                        streamName = '#' + configName;
                     } else {
-                        streamName = config.name;
+                        streamName = configName;
                     }
                     var partitionWhereStreamIsSaved
                         = self.configurationData.getSiddhiAppConfig().getPartitionWhereStreamIsSaved(id);
@@ -299,27 +641,72 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'stream', 'designView
                     }
                 }
 
-                self.designViewContainer.removeClass('disableContainer');
-                self.toggleViewButton.removeClass('disableContainer');
-
                 var previouslySavedName = clickedElement.getName();
                 // update connection related to the element if the name is changed
                 if (previouslySavedName !== streamName) {
+                    //check if stream name is empty
+                    if (streamName == "") {
+                        DesignViewUtils.prototype
+                            .errorAlert("Stream name is required");
+                        return;
+                    }
+                    if ((streamName.indexOf(' ') >= 0) && (streamName.indexOf(' ') != streamName.length - 1)) {
+                        DesignViewUtils.prototype.errorAlert("Stream name \"" + streamName + "\" " +
+                            "cannot have white space.");
+                        return;
+                    }
+                    if (!(/^([a-zA-Z])$/).test(streamName.charAt(0))) {
+                        DesignViewUtils.prototype.errorAlert("Stream name \"" + streamName + "\" " +
+                            "must start with an alphabetic character.");
+                        return;
+                    }
                     // update selected stream model
                     clickedElement.setName(streamName);
                     self.formUtils.updateConnectionsAfterDefinitionElementNameChange(id);
                 }
                 // removing all elements from attribute list
                 clickedElement.clearAttributeList();
-                // adding new attributes to the attribute list
-                _.forEach(config.attributes, function (attribute) {
-                    var attributeObject = new Attribute(attribute);
-                    clickedElement.addAttribute(attributeObject);
+
+                //validate the attribute names
+                $('.attr-name').each(function () {
+                    var attributeName = $(this).val().trim();
+                    if (attributeName != "") {
+                        if ((attributeName.indexOf(' ') >= 0) && (attributeName.indexOf(' ') != attributeName.length - 1)) {
+                            DesignViewUtils.prototype.errorAlert("Attribute name \"" + attributeName + "\" " +
+                                "cannot have white space.");
+                            return;
+                        }
+
+                        if ((!(/^([a-zA-Z])$/).test(attributeName.charAt(0))) && (attributeName.trim().length > 0)) {
+                            DesignViewUtils.prototype.errorAlert("Attribute name \"" + attributeName + "\" " +
+                                "must start with an alphabetic character.");
+                            return;
+                        }
+                    }
                 });
 
+                var attributeLength = 0;
+                $('.attribute .attr-content').each(function () {
+                    var nameValue = $(this).find('.attr-name').val().trim();
+                    var typeValue = $(this).find('.attr-type').val();
+                    if (nameValue != "") {
+                        attributeLength++;
+                        var attributeObject = new Attribute({ name: nameValue, type: typeValue });
+                        clickedElement.addAttribute(attributeObject);
+                    }
+                });
+                if (attributeLength == 0) {
+                    DesignViewUtils.prototype.errorAlert("Minimum one attribute is required");
+                    return;
+                }
+
                 clickedElement.clearAnnotationList();
-                _.forEach(config.annotations, function (annotation) {
-                    clickedElement.addAnnotation(annotation.annotation);
+                if (validatePredefinedAnnotations()) {
+                    return;
+                }
+                var annotationList = buildAnnotationString();
+                annotationList.forEach(function (annotation) {
+                    clickedElement.addAnnotation(annotation);
                 });
 
                 var textNode = $(element).parent().find('.streamNameNode');
@@ -333,20 +720,13 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'stream', 'designView
                     JSONValidator.prototype.validateInnerStream(clickedElement, self.jsPlumbInstance, true);
                 }
 
-                // close the form window
-                self.consoleListManager.removeFormConsole(formConsole);
-            });
-
-            // 'Cancel' button action
-            var cancelButtonElement = $(formContainer).find('#btn-cancel')[0];
-            cancelButtonElement.addEventListener('click', function () {
                 self.designViewContainer.removeClass('disableContainer');
                 self.toggleViewButton.removeClass('disableContainer');
-
                 // close the form window
                 self.consoleListManager.removeFormConsole(formConsole);
-            });
-        };
 
+            });
+
+        };
         return StreamForm;
     });
