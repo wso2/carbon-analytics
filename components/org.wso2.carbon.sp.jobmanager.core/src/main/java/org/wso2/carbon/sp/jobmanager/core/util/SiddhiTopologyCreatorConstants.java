@@ -32,6 +32,8 @@ public class SiddhiTopologyCreatorConstants {
 
     public static final String PERSISTENCETABLE_IDENTIFIER = "store";
 
+    public static final String TYPE_IDENTIFIER = "type";
+
     public static final String DEFAULT_SIDDHIAPP_NAME = "SiddhiApp";
 
     public static final String DISTRIBUTED_IDENTIFIER = "dist";
@@ -39,6 +41,8 @@ public class SiddhiTopologyCreatorConstants {
     public static final String PARALLEL_IDENTIFIER = "parallel";
 
     public static final String EXECGROUP_IDENTIFIER = "execGroup";
+
+    public static final String INFO_IDENTIFIER = "info";
 
     public static final String SIDDHIAPP_NAME_IDENTIFIER = "name";
 
@@ -50,4 +54,10 @@ public class SiddhiTopologyCreatorConstants {
             + " into " + "${" + OUTPUTSTREAMID + "}";
     public static final String TRANSPORT_CHANNEL_CREATION_IDENTIFIER = "transportChannelCreationEnabled";
     public static final String PASSTHROUGH = "passthrough";
+
+    public static final String AGGREGATION = "aggregation";
+
+    public static final String INMEMORY = "in-memory";
+
+    public static final String EXECUTION_ELEMENT = "Query/Partition";
 }

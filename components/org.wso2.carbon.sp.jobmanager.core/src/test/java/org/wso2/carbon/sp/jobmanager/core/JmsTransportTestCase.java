@@ -1565,6 +1565,220 @@ public class JmsTransportTestCase {
 
     }
 
+    /**
+     * Each aggregations should be placed in a separate execution group. If any other quries or
+     * partitions use that aggregation then they also added to the same execution group along with
+     * the aggregation.
+     */
+    @Test//(dependsOnMethods = "testMultipleRRstrategy")
+    public void testAggregationWithJoins(){
+        String siddhiApp = "@App:name('TestPlan16')\n"
+                +"@App:description('Queries and partitions joins with aggregation')\n"
+
+                +"@source(type = 'http', receiver.url='http://localhost:8080/SweetProductionEP', @map(type = 'json'))\n"
+                +"define stream TradeStream (symbol string, price double, volume long, timestamp long);\n"
+
+                +"@source(type = 'http', receiver.url='http://localhost:8080/Stocks', @map(type = 'json'))\n"
+                +"define stream StockStream (symbol string, value int, timestamp long);\n"
+
+                +"@source(type = 'http', receiver.url='http://localhost:8080/values', @map(type = 'json'))\n"
+                +"define stream flowStream (symbol string, amount int,rate double, timestamp long);\n"
+
+                +"@sink(type='log')\n"
+                +"define stream filteredStockStream (symbol string, value int, timestamp long);\n"
+
+                +"@sink(type='log')\n"
+                +"define stream AggregateStockStream (symbol string, total double, avgPrice double);\n"
+
+                +"@sink(type='log')\n"
+                +"define stream avgPriceStream (symbol string, avgValue double);\n"
+
+
+                +"@dist(parallel='2')\n"
+                +"@store(type='rdbms', jdbc.url=\"jdbc: mysql://localhost:3306/SweetFactoryDB \", "
+                + "username=\"root\", password=\"root\" ,"
+                + " jdbc.driver.name =\"com.mysql.jdbc.Driver\") \n"
+                +"define aggregation filteredStockAggregation\n"
+                +"from filteredStockStream\n"
+                +"select symbol, avg(value) as avgValue, sum(value) as total\n"
+                +"group by symbol\n"
+                +"aggregate by timestamp every sec ... year;\n"
+
+
+                +"@dist(parallel='3')\n"
+                +"@store(type='rdbms', jdbc.url=\"jdbc: mysql://localhost:3306/SweetFactoryDB \", "
+                + "username=\"root\", password=\"root\" ,"
+                + " jdbc.driver.name =\"com.mysql.jdbc.Driver\") \n"
+                +"define aggregation TradeAggregation\n"
+                +"from TradeStream\n"
+                +"select symbol, avg(price) as avgPrice, sum(price) as total\n"
+                +"group by symbol\n"
+                +"aggregate by timestamp every sec ... year;\n"
+
+
+                +"@info(name = 'aggregation-join')@dist(execGroup='001', parallel = '3')\n"
+                +"from StockStream as S join TradeAggregation as T\n"
+                +"on S.symbol == T.symbol\n"
+                +"within \"2014-02-15 00:00:00 +05:30\", \"2014-03-16 00:00:00 +05:30\" \n"
+                +"per \"days\"\n"
+                +"select S.symbol, T.total, T.avgPrice \n"
+                +"insert into AggregateStockStream;\n"
+
+
+                +"@info(name = 'stock-filter')@dist(execGroup='002', parallel = '2')\n"
+                +"from StockStream[value >100]\n"
+                +"select *\n"
+                +"insert into \n"
+                +"filteredStockStream;\n"
+
+
+                +"@info(name='query4')@dist(parallel='3', execGroup='003')\n"
+                +"Partition with (symbol of flowStream)\n"
+                +"begin\n"
+                +"@info(name = 'partition-join')\n"
+                +"From flowStream as P join filteredStockAggregation as Q\n"
+                +"on P.symbol == Q.symbol\n"
+                +"within \"2014-02-15 00:00:00 +05:30\", \"2014-03-16 00:00:00 +05:30\" \n"
+                +"per \"days\"\n"
+                +"select P.symbol, Q.avgValue\n"
+                +"Insert into avgPriceStream;\n"
+                +"End;";
+
+        SiddhiTopologyCreatorImpl siddhiTopologyCreator = new SiddhiTopologyCreatorImpl();
+        SiddhiTopology topology = siddhiTopologyCreator.createTopology(siddhiApp);
+        SiddhiAppCreator appCreator = new JMSSiddhiAppCreator();
+        List<DeployableSiddhiQueryGroup> queryGroupList = appCreator.createApps(topology);
+
+        Assert.assertEquals(queryGroupList.size(),4);
+        Assert.assertTrue(queryGroupList.get(0).getGroupName().contains("passthrough"));
+        Assert.assertTrue(queryGroupList.get(1).getGroupName().contains("passthrough"));
+        Assert.assertTrue(queryGroupList.get(2).getGroupName().contains("passthrough"));
+        Assert.assertTrue(queryGroupList.get(4).getGroupName().contains("aggregation"));
+        Assert.assertTrue(queryGroupList.get(5).getGroupName().contains("aggregation"));
+    }
+
+    /**
+     * If an aggregation has in-memory store and parallelism > 1 then SiddhiAppValidationException
+     * Will be thrown
+     */
+    @Test//(dependsOnMethods = "testAggregationWithJoins")
+    public void testInMemoryParallelism() {
+        String siddhiApp = "@App:name('TestPlan17')\n"
+                +"@App:description('Aggregation with inmemory parallelism')\n"
+                +"@source(type = 'http', receiver.url='http://localhost:8080/SweetProductionEP', @map(type = 'json'))\n"
+                +"define stream TradeStream (symbol string, price double, volume long, timestamp long);\n"
+                +"@source(type = 'http', receiver.url='http://localhost:8080/Stocks', @map(type = 'json'))\n"
+                +"define stream StockStream (symbol string, value int, timestamp long);\n"
+                +"@source(type = 'http', receiver.url='http://localhost:8080/values', @map(type = 'json'))\n"
+                +"define stream flowStream (symbol string, amount int,rate double, timestamp long);\n"
+                +"@sink(type='log')\n"
+                +"define stream filteredStockStream (symbol string, value int, timestamp long);\n"
+                +"@dist(parallel='2')\n"
+                +"define aggregation filteredStockAggregation\n"
+                +"from filteredStockStream\n"
+                +"select symbol, avg(value) as avgValue, sum(value) as total\n"
+                +"group by symbol\n"
+                +"aggregate by timestamp every sec ... year;\n"
+                +"@dist(parallel='1')\n"
+                +"define aggregation TradeAggregation\n"
+                +"from TradeStream\n"
+                +"select symbol, avg(price) as avgPrice, sum(price) as total\n"
+                +"group by symbol\n"
+                +"aggregate by timestamp every sec ... year;\n"
+                +"@info(name = 'aggregation-join')@dist(execGroup='001', parallel = '1')\n"
+                +"from StockStream as S join TradeAggregation as T\n"
+                +"on S.symbol == T.symbol\n"
+                +"within \"2014-02-15 00:00:00 +05:30\", \"2014-03-16 00:00:00 +05:30\" \n"
+                +"per \"days\"\n"
+                +"select S.symbol, T.total, T.avgPrice \n"
+                +"insert into AggregateStockStream;\n"
+                +"@info(name = 'stock-filter')@dist(execGroup='002', parallel = '1')\n"
+                +"from StockStream[value >100]\n"
+                +"select *\n"
+                +"insert into \n"
+                +"filteredStockStream;\n"
+                +"@info(name='query4')@dist(parallel='1', execGroup='003')\n"
+                +"Partition with (symbol of flowStream)\n"
+                +"begin\n"
+                +"From flowStream as P join filteredStockAggregation as Q\n"
+                +"on P.symbol == Q.symbol\n"
+                +"within \"2014-02-15 00:00:00 +05:30\", \"2014-03-16 00:00:00 +05:30\" \n"
+                +"per \"days\"\n"
+                +"select P.symbol, Q.avgValue\n"
+                +"Insert into avgPriceStream;\n"
+                +"End;";
+
+        SiddhiTopologyCreatorImpl siddhiTopologyCreator = new SiddhiTopologyCreatorImpl();
+        try{
+            SiddhiTopology topology = siddhiTopologyCreator.createTopology(siddhiApp);
+            Assert.fail();
+        }catch (Exception e){
+            Assert.assertTrue(e.getMessage().contains("cannot have in-memory store while "
+                    + "parallelism > 1"));
+        }
+
+    }
+
+    /**
+     * If an aggregation and a query/partition which joins with the aggregation should have
+     * identical parallelism values. Else SiddhiAppValidation Exception will be thrown.
+     */
+    @Test//(dependsOnMethods = "testInMemoryParallelism")
+    public void testJoinCandidatesParallelism(){
+        String siddhiApp = "@App:name('TestPlan18')\n"
+                +"@App:description('Aggregation with inmemory parallelism')\n"
+                +"@source(type = 'http', receiver.url='http://localhost:8080/SweetProductionEP', @map(type = 'json'))\n"
+                +"define stream TradeStream (symbol string, price double, volume long, timestamp long);\n"
+                +"@source(type = 'http', receiver.url='http://localhost:8080/Stocks', @map(type = 'json'))\n"
+                +"define stream StockStream (symbol string, value int, timestamp long);\n"
+                +"@source(type = 'http', receiver.url='http://localhost:8080/values', @map(type = 'json'))\n"
+                +"define stream flowStream (symbol string, amount int,rate double, timestamp long);\n"
+                +"@sink(type='log')\n"
+                +"define stream filteredStockStream (symbol string, value int, timestamp long);\n"
+                +"@dist(parallel='1')\n"
+                +"define aggregation filteredStockAggregation\n"
+                +"from filteredStockStream\n"
+                +"select symbol, avg(value) as avgValue, sum(value) as total\n"
+                +"group by symbol\n"
+                +"aggregate by timestamp every sec ... year;\n"
+                +"@dist(parallel='1')\n"
+                +"define aggregation TradeAggregation\n"
+                +"from TradeStream\n"
+                +"select symbol, avg(price) as avgPrice, sum(price) as total\n"
+                +"group by symbol\n"
+                +"aggregate by timestamp every sec ... year;\n"
+                +"@info(name = 'aggregation-join')@dist(execGroup='001', parallel = '1')\n"
+                +"from StockStream as S join TradeAggregation as T\n"
+                +"on S.symbol == T.symbol\n"
+                +"within \"2014-02-15 00:00:00 +05:30\", \"2014-03-16 00:00:00 +05:30\" \n"
+                +"per \"days\"\n"
+                +"select S.symbol, T.total, T.avgPrice \n"
+                +"insert into AggregateStockStream;\n"
+                +"@info(name = 'stock-filter')@dist(execGroup='002', parallel = '1')\n"
+                +"from StockStream[value >100]\n"
+                +"select *\n"
+                +"insert into \n"
+                +"filteredStockStream;\n"
+                +"@info(name='query4')@dist(parallel='2', execGroup='003')\n"
+                +"Partition with (symbol of flowStream)\n"
+                +"begin\n"
+                +"From flowStream as P join filteredStockAggregation as Q\n"
+                +"on P.symbol == Q.symbol\n"
+                +"within \"2014-02-15 00:00:00 +05:30\", \"2014-03-16 00:00:00 +05:30\" \n"
+                +"per \"days\"\n"
+                +"select P.symbol, Q.avgValue\n"
+                +"Insert into avgPriceStream;\n"
+                +"End;";
+
+        SiddhiTopologyCreatorImpl siddhiTopologyCreator = new SiddhiTopologyCreatorImpl();
+        try{
+            SiddhiTopology topology = siddhiTopologyCreator.createTopology(siddhiApp);
+            Assert.fail();
+        }catch (Exception e){
+            Assert.assertTrue(e.getMessage().contains("has different parallelism"));
+        }
+    }
+
     private Map<String, List<SiddhiAppRuntime>> createSiddhiAppRuntimes(
             SiddhiManager siddhiManager, List<DeployableSiddhiQueryGroup> queryGroupList) {
         Map<String, List<SiddhiAppRuntime>> siddhiAppRuntimeMap = new HashMap<>(queryGroupList

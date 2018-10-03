@@ -117,4 +117,8 @@ public class SiddhiQueryGroup {
     public void setReceiverQueryGroup(boolean receiverQueryGroup) {
         isReceiverQueryGroup = receiverQueryGroup;
     }
+
+    public void setParallelism(int parallelism) {
+        this.parallelism = parallelism;
+    }
 }
