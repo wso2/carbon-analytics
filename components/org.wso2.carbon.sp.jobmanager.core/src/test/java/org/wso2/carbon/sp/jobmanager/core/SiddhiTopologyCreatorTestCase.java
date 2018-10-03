@@ -1615,41 +1615,4 @@ public class SiddhiTopologyCreatorTestCase {
         }
         return siddhiAppRuntimeMap;
     }
-
-    //@Test
-//    public void testPassthrough(){
-//        String siddhiApp = "@App:name('TestPlan25')\n"
-//                + "@App:description('Testing the MB implementation with multiple RR strategies.')\n"
-//                + "@source(type = 'http', receiver.url='http://localhost:5005/SweetProductionEP',"
-//                + " @map(type = 'json'))\n"
-//                + "define stream Test1Stream (name string, amount double);\n"
-//
-//
-//                + "@Sink(type='log')\n"
-//                + "define stream Test2Stream (name string, amount double);\n"
-//
-//                + "@info(name = 'query1')@dist(parallel='1', execGroup='001')\n"
-//                + "from Test1Stream\n"
-//                + "select name,amount\n"
-//                + "insert into Test2Stream;\n"
-//
-//
-//                + "@info(name = 'query2')@dist(parallel='4',execGroup='002')\n"
-//                + "from Test2Stream\n"
-//                + "select name,amount\n"
-//                + "insert into Test3Stream;";
-//
-//        SiddhiTopologyCreatorImpl siddhiTopologyCreator = new SiddhiTopologyCreatorImpl();
-//        SiddhiTopology topology = siddhiTopologyCreator.createTopology(siddhiApp);
-//        SiddhiAppCreator appCreator = new SPSiddhiAppCreator();
-//        List<DeployableSiddhiQueryGroup> queryGroupList = appCreator.createApps(topology);
-//        for (DeployableSiddhiQueryGroup group : queryGroupList) {
-//            for (SiddhiQuery query : group.getSiddhiQueries()) {
-//                SiddhiManager siddhiManager = new SiddhiManager();
-//                siddhiManager.createSiddhiAppRuntime(query.getApp());
-//            }
-//        }
-//
-//
-//    }
 }
