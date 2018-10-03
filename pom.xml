@@ -1771,7 +1771,7 @@
         <open.tracing.version>0.31.0</open.tracing.version>
 
         <!-- jms test dependencies version-->
-        <siddhi.io.jms.version>1.0.28</siddhi.io.jms.version>
+        <siddhi.io.jms.version>1.0.31</siddhi.io.jms.version>
         <andes.client.version>4.0.0</andes.client.version>
         <commons.lang.version>2.6</commons.lang.version>
         <org.apache.geronimo.specs.version>1.1.1</org.apache.geronimo.specs.version>
