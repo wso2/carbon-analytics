@@ -1612,7 +1612,7 @@ public class SiddhiTopologyCreatorTestCase {
 
         SiddhiTopologyCreatorImpl siddhiTopologyCreator = new SiddhiTopologyCreatorImpl();
         SiddhiTopology topology = siddhiTopologyCreator.createTopology(siddhiApp);
-        SiddhiAppCreator appCreator = new SPSiddhiAppCreator();
+        SiddhiAppCreator appCreator = new KafkaSiddhiAppCreator();
         List<DeployableSiddhiQueryGroup> queryGroupList = appCreator.createApps(topology);
         SiddhiManager siddhiManager = new SiddhiManager();
         try{
@@ -1657,7 +1657,7 @@ public class SiddhiTopologyCreatorTestCase {
 
         SiddhiTopologyCreatorImpl siddhiTopologyCreator=new SiddhiTopologyCreatorImpl();
         SiddhiTopology topology = siddhiTopologyCreator.createTopology(siddhiApp);
-        SiddhiAppCreator appCreator = new SPSiddhiAppCreator();
+        SiddhiAppCreator appCreator = new KafkaSiddhiAppCreator();
         List<DeployableSiddhiQueryGroup> queryGroupList = appCreator.createApps(topology);
         SiddhiManager siddhiManager = new SiddhiManager();
 
@@ -1705,7 +1705,7 @@ public class SiddhiTopologyCreatorTestCase {
 
 
 
-        SiddhiAppCreator appCreator = new SPSiddhiAppCreator();
+        SiddhiAppCreator appCreator = new KafkaSiddhiAppCreator();
         List<DeployableSiddhiQueryGroup> queryGroupList = appCreator.createApps(topology);
 
         Assert.assertTrue(queryGroupList.size()==2,"Two Query Groups should be created.");
