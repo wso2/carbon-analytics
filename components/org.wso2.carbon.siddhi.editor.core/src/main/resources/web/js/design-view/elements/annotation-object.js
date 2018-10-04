@@ -27,17 +27,17 @@ define (
 	 */
 
 	 var AnnotationObject = function (options) {
-	 		if (!arguments.length){
-				this.elements = [];
-				this.annotations = [];
-	 		}
-	 		else {
-				if (options !== undefined) {
-					this.name = options.name;
-					this.elements = options.elements;
-					this.annotations = options.annotations;
-				}
+		if (!arguments.length){
+			this.elements = [];
+			this.annotations = [];
+		}
+		else {
+			if (options !== undefined) {
+				this.name = options.name;
+				this.elements = options.elements;
+				this.annotations = options.annotations;
 			}
+		}
 	 };
 
 	 AnnotationObject.prototype.getName = function () {
