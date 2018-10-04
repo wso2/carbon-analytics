@@ -18,6 +18,7 @@
 
 package org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements;
 
+import org.wso2.siddhi.query.api.annotation.Annotation;
 import java.util.List;
 import java.util.Map;
 
@@ -28,17 +29,20 @@ public class StreamConfig extends SiddhiElementConfig {
     private String name;
     private List<AttributeConfig> attributeList;
     private List<String> annotationList;
+    private List<Annotation> annotationListObjects;
     private String partitionId;
     private Map<String, String> connectorsAndStreams;
 
     public StreamConfig(String id,
                         String name,
                         List<AttributeConfig> attributeList,
-                        List<String> annotationList) {
+                        List<String> annotationList,
+                        List<Annotation> annotationListObjects) {
         super(id);
         this.name = name;
         this.attributeList = attributeList;
         this.annotationList = annotationList;
+        this.annotationListObjects = annotationListObjects;
     }
 
     public String getName() {
@@ -47,6 +51,12 @@ public class StreamConfig extends SiddhiElementConfig {
 
     public List<AttributeConfig> getAttributeList() {
         return attributeList;
+    }
+
+    public List<Annotation> getAnnotationListObjects() { return  annotationListObjects; }
+
+    public void setAnnotationListObjects(List<Annotation> annotationListObjects) {
+        this.annotationListObjects = annotationListObjects;
     }
 
     public List<String> getAnnotationList() {

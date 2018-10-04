@@ -44,9 +44,14 @@ define(['require', 'elementUtils'],
                 this.previousCommentSegment = options.previousCommentSegment;
                 this.name = options.name;
             }
+			this.annotationListObjects = [];
             this.attributeList = [];
             this.annotationList = [];
         };
+
+        Stream.prototype.addAnnotationObject = function (annotation) {
+				this.annotationListObjects.push(annotation)
+        }
 
         Stream.prototype.addAttribute = function (attribute) {
             this.attributeList.push(attribute);
@@ -55,6 +60,10 @@ define(['require', 'elementUtils'],
         Stream.prototype.addAnnotation = function (annotation) {
             this.annotationList.push(annotation);
         };
+
+        Stream.prototype.clearAnnotationListObjects = function () {
+			ElementUtils.prototype.removeAllElements(this.annotationListObjects);
+		};
 
         Stream.prototype.clearAnnotationList = function () {
             ElementUtils.prototype.removeAllElements(this.annotationList);
@@ -79,6 +88,10 @@ define(['require', 'elementUtils'],
         Stream.prototype.getAnnotationList = function () {
             return this.annotationList;
         };
+		//mine
+        Stream.prototype.getAnnotationListObjects = function () {
+			return this.annotationListObjects;
+		};
 
         Stream.prototype.setId = function (id) {
             this.id = id;
