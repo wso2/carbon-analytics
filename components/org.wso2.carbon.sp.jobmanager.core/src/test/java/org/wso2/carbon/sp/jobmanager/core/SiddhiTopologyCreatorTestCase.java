@@ -1598,6 +1598,157 @@ public class SiddhiTopologyCreatorTestCase {
 
     }
 
+    @Test(dependsOnMethods = "testParallelPartitionsWithinSameGroup")
+    public void testTriggersWithJoin(){
+        String siddhiApp = "@App:name('TestPlan17')"
+                + "@source(type='kafka', topic.list='custom_topic', group.id='1', threading.option='single.thread', "
+                + "bootstrap.servers='localhost:9092', @map(type='xml')) "
+                + "define stream TempStream(deviceID long, roomNo int, temp double); "
+                + "define trigger OneSecTriggerStream at every 1 sec; "
+                + "@info(name = 'query1') @dist(parallel ='1', execGroup='001')\n "
+                + "from OneSecTriggerStream join TempStream#window.length(1)\n"
+                + "select *\n"
+                + "insert into TempEveryOneSec;";
+
+        SiddhiTopologyCreatorImpl siddhiTopologyCreator = new SiddhiTopologyCreatorImpl();
+        SiddhiTopology topology = siddhiTopologyCreator.createTopology(siddhiApp);
+        SiddhiAppCreator appCreator = new KafkaSiddhiAppCreator();
+        List<DeployableSiddhiQueryGroup> queryGroupList = appCreator.createApps(topology);
+        SiddhiManager siddhiManager = new SiddhiManager();
+        try{
+            Map<String, List<SiddhiAppRuntime>> siddhiAppRuntimeMap = createSiddhiAppRuntimes(siddhiManager,
+                    queryGroupList);
+            InputHandler tempStreamHandler =
+                    siddhiAppRuntimeMap.get("TestPlan17-001").get(0).getInputHandler("TempStream");
+
+            SiddhiAppRuntime runtime = siddhiAppRuntimeMap.get("TestPlan17-001").get(0);
+            runtime.addCallback("TempEveryOneSec", new StreamCallback() {
+                @Override
+                public void receive(Event[] events) {
+                    EventPrinter.print(events);
+                    count.addAndGet(events.length);
+                }
+            });
+
+            tempStreamHandler.send(new Object[]{1, 110, 80});
+
+            SiddhiTestHelper.waitForEvents(100, 1, count, 3000);
+            Assert.assertEquals(count.intValue(), 1);
+        }catch (InterruptedException e) {
+            log.error(e.getMessage(), e);
+        } finally {
+            siddhiManager.shutdown();
+        }
+    }
+
+    @Test(dependsOnMethods = "testTriggersWithJoin")
+    public void TestTriggerAtStart(){
+        String siddhiApp = "@App:name('TestPlan18')"
+                + "define trigger StartTriggerStream at 'start'; "
+                + "define trigger SecTriggerStream at every 1 sec; "
+                + "@info(name = 'query1') @dist(parallel ='1', execGroup='001')\n "
+                + "from StartTriggerStream\n"
+                + "select *\n"
+                + "insert into TmpOnceStream;"
+                + "@info(name = 'query2') @dist(parallel ='1', execGroup='001')\n "
+                + "from SecTriggerStream join TmpOnceStream#window.length(1) as T\n"
+                + "select T.triggered_time\n"
+                + "insert into OnceStream;";
+
+        SiddhiTopologyCreatorImpl siddhiTopologyCreator=new SiddhiTopologyCreatorImpl();
+        SiddhiTopology topology = siddhiTopologyCreator.createTopology(siddhiApp);
+        SiddhiAppCreator appCreator = new KafkaSiddhiAppCreator();
+        List<DeployableSiddhiQueryGroup> queryGroupList = appCreator.createApps(topology);
+        SiddhiManager siddhiManager = new SiddhiManager();
+
+        try{
+            Map<String, List<SiddhiAppRuntime>> siddhiAppRuntimeMap = createSiddhiAppRuntimes(siddhiManager,
+                    queryGroupList);
+
+            SiddhiAppRuntime runtime = siddhiAppRuntimeMap.get("TestPlan18-001").get(0);
+            runtime.addCallback("OnceStream", new StreamCallback() {
+                @Override
+                public void receive(Event[] events) {
+                    EventPrinter.print(events);
+                    count.addAndGet(events.length);
+                }
+            });
+
+            SiddhiTestHelper.waitForEvents(100, 1, count, 3000);
+            Assert.assertEquals(count.intValue(), 1);
+        }catch (InterruptedException e) {
+            log.error(e.getMessage(), e);
+        } finally {
+            siddhiManager.shutdown();
+        }
+
+    }
+
+    @Test(dependsOnMethods = "TestTriggerAtStart")
+    public void testTriggersInExecutionGroups() {
+        String siddhiApp = "@App:name('TestPlan19') "
+                + "@source(type='kafka', topic.list='custom_topic', group.id='1', threading.option='single.thread', "
+                + "bootstrap.servers='localhost:9092', @map(type='xml')) "
+                + "define stream TempStream(deviceID long, roomNo int, temp double); "
+                + "define trigger TriggerStream at every 1 sec; "
+                + "@info(name = 'query1') @dist(parallel ='2', execGroup='001')\n "
+                + "from TriggerStream\n"
+                + "select *\n"
+                + "insert into OnceStream1;"
+                + "@info(name = 'query2') @dist(parallel ='1', execGroup='002')\n "
+                + "from TriggerStream join TempStream#window.length(1)\n"
+                + "select *\n"
+                + "insert into OnceStream2";
+
+        SiddhiTopologyCreatorImpl siddhiTopologyCreator = new SiddhiTopologyCreatorImpl();
+        SiddhiTopology topology = siddhiTopologyCreator.createTopology(siddhiApp);
+
+
+
+        SiddhiAppCreator appCreator = new KafkaSiddhiAppCreator();
+        List<DeployableSiddhiQueryGroup> queryGroupList = appCreator.createApps(topology);
+
+        Assert.assertTrue(queryGroupList.size()==2,"Two Query Groups should be created.");
+        Assert.assertTrue(queryGroupList.get(0).getSiddhiQueries().size()==2,"Two queries should be " +
+                "created for group: 001");
+        Assert.assertTrue(queryGroupList.get(1).getSiddhiQueries().size()==1,"One query should be " +
+                "created for group: 002");
+
+        Assert.assertTrue(queryGroupList.get(0).getSiddhiQueries().get(0).getApp().contains("define trigger " +
+                "TriggerStream at every 1 sec;"),"Incorrect Query Created");
+        Assert.assertTrue(queryGroupList.get(0).getSiddhiQueries().get(1).getApp().contains("define trigger " +
+                "TriggerStream at every 1 sec;"),"Incorrect Query Created");
+        Assert.assertTrue(queryGroupList.get(1).getSiddhiQueries().get(0).getApp().contains("define trigger " +
+                "TriggerStream at every 1 sec;"),"Incorrect Query Created");
+
+        SiddhiManager siddhiManager = new SiddhiManager();
+
+        try{
+            Map<String, List<SiddhiAppRuntime>> siddhiAppRuntimeMap = createSiddhiAppRuntimes(siddhiManager,
+                    queryGroupList);
+
+            SiddhiAppRuntime runtime = siddhiAppRuntimeMap.get("TestPlan19-002").get(0);
+            InputHandler tempStreamHandler =
+                    siddhiAppRuntimeMap.get("TestPlan19-002").get(0).getInputHandler("TempStream");
+            runtime.addCallback("OnceStream2", new StreamCallback() {
+                @Override
+                public void receive(Event[] events) {
+                    EventPrinter.print(events);
+                    count.addAndGet(events.length);
+                }
+            });
+            tempStreamHandler.send(new Object[]{1, 110, 80});
+            SiddhiTestHelper.waitForEvents(100, 1, count, 3000);
+            Assert.assertEquals(count.intValue(), 1);
+        }catch (InterruptedException e) {
+            log.error(e.getMessage(), e);
+        } finally {
+            siddhiManager.shutdown();
+        }
+
+    }
+
+
     private Map<String, List<SiddhiAppRuntime>> createSiddhiAppRuntimes(
             SiddhiManager siddhiManager, List<DeployableSiddhiQueryGroup> queryGroupList) {
         Map<String, List<SiddhiAppRuntime>> siddhiAppRuntimeMap = new HashMap<>(queryGroupList.size());
