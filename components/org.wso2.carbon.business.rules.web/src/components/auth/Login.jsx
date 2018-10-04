@@ -132,6 +132,29 @@ export default class Login extends Component {
     if (this.state.authenticated) {
       return <Redirect to={this.state.referrer} />;
     }
+    // const praivacy_policy = (<Link external="https://webmaker.org/en-US/terms">term</Link>);
+    const cookiePolicy = (
+      <a
+        style={styles.cookiePolicyAnchor}
+        href="/policies/cookie-policy"
+        target="_blank"
+      >
+        <FormattedMessage id="login.CookiePolicy.anchor" defaultMessage="Cookie Policy" />
+      </a>
+    );
+
+    const privacyPolicy = (
+      <a
+        style={styles.cookiePolicyAnchor}
+        href="/policies/privacy-policy"
+        target="_blank"
+      >
+        <FormattedMessage
+          id="login.privacy.policy.title"
+          defaultMessage="Privacy Policy"
+        />
+      </a>
+    );
 
     return (
       <div>
@@ -222,24 +245,10 @@ export default class Login extends Component {
             <div style={styles.cookiePolicy}>
               <div>
                 <FormattedMessage
-                  id="login.cookie.policy.before"
+                  id="login.cookie.policy"
                   defaultMessage=" After a successful sign in, we use a cookie in your browser to
-                track your session.&nbsp; You can refer our&nbsp;"
-                />
-                <a
-                  style={styles.cookiePolicyAnchor}
-                  href="/policies/cookie-policy"
-                  target="_blank"
-                >
-                  <FormattedMessage
-                    id="login.cookie.policy"
-                    defaultMessage="Cookie Policy"
-                  />
-                </a>
-                {' '}
-                <FormattedMessage
-                  id="login.cookie.policy.after"
-                  defaultMessage=" for more details."
+                track your session. You can refer our {cookiePolicy} for more details."
+                  values={{ cookiePolicy }}
                 />
               </div>
             </div>
@@ -247,20 +256,10 @@ export default class Login extends Component {
             <div style={styles.cookiePolicy}>
               <div>
                 <FormattedMessage
-                  id="login.privacy.policy.before"
-                  defaultMessage="By signing in, you agree to our "
+                  id="login.privacy.policy.description"
+                  defaultMessage="By signing in, you agree to our {privacyPolicy}"
+                  values={{ privacyPolicy }}
                 />
-                <a
-                  style={styles.cookiePolicyAnchor}
-                  href="/policies/privacy-policy"
-                  target="_blank"
-                >
-                  <FormattedMessage
-                    id="login.privacy.policy"
-                    defaultMessage="Privacy Policy"
-                  />
-                </a>
-                .
               </div>
             </div>
           </FormPanel>
