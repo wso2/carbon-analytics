@@ -15,48 +15,48 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-define (
-	function () {
+define(
+    function () {
 
-	/**
+        /**
 
-	 * @class AnnotationObject
-	 * @constructor
-	 * @class AnnotationObject  Creates an object to hold an annotation object
-	 * @param {Object} options Rendering options for the view
-	 */
+         * @class AnnotationObject
+         * @constructor
+         * @class AnnotationObject  Creates an object to hold an annotation object
+         * @param {Object} options Rendering options for the view
+         */
 
-	 var AnnotationObject = function (options) {
-		if (!arguments.length){
-			this.elements = [];
-			this.annotations = [];
-		}
-		else {
-			if (options !== undefined) {
-				this.name = options.name;
-				this.elements = options.elements;
-				this.annotations = options.annotations;
-			}
-		}
-	 };
+        var AnnotationObject = function (options) {
+            if (!arguments.length) {
+                this.elements = [];
+                this.annotations = [];
+            }
+            else {
+                if (options !== undefined) {
+                    this.name = options.name;
+                    this.elements = options.elements;
+                    this.annotations = options.annotations;
+                }
+            }
+        };
 
-	 AnnotationObject.prototype.getName = function () {
-		 return this.name;
-	 };
+        AnnotationObject.prototype.getName = function () {
+            return this.name;
+        };
 
-	 AnnotationObject.prototype.setName = function (name) {
-		this.name = name;
-	 };
+        AnnotationObject.prototype.setName = function (name) {
+            this.name = name;
+        };
 
-	 AnnotationObject.prototype.addElement = function (element) {
-		this.elements.push(element)
-     };
+        AnnotationObject.prototype.addElement = function (element) {
+            this.elements.push(element)
+        };
 
-     AnnotationObject.prototype.addAnnotation = function (annotation) {
-		this.annotations.push(annotation)
-     };
+        AnnotationObject.prototype.addAnnotation = function (annotation) {
+            this.annotations.push(annotation)
+        };
 
-	return AnnotationObject;
+        return AnnotationObject;
 
-	});
+    });
 
