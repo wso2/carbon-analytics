@@ -141,9 +141,9 @@ export default class Header extends Component {
                         this.setState({ anchorEl: null });
                     }}
                 >
-                    <Link to={`${appContext}/logout`} style={{ textDecoration: 'none', color: 'black' }}>
+                    <Link className="logout-btn" to={`${appContext}/logout`} style={{ textDecoration: 'none', color: 'black' }}>
                         <MenuItem>
-                            Log out
+                            Logout
                         </MenuItem>
                     </Link>
                 </Menu>
