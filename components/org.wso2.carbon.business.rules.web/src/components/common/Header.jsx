@@ -143,7 +143,7 @@ export default class Header extends Component {
                 >
                     <Link to={`${appContext}/logout`} style={{ textDecoration: 'none', color: 'black' }}>
                         <MenuItem>
-                            Log out
+                            Logout
                         </MenuItem>
                     </Link>
                 </Menu>
