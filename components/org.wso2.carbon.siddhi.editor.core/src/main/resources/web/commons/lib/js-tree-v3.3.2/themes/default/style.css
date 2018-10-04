@@ -22,7 +22,6 @@
 .jstree-anchor:focus {
   outline: 0;
 }
-
 .jstree-anchor:link,
 .jstree-anchor:visited,
 .jstree-anchor:hover,
@@ -328,10 +327,7 @@
   -webkit-filter: grayscale(100%);
   /* Chrome 19+ & Safari 6+ */
 }
-
 .jstree-default .jstree-search   {
-
-
 }
 .jstree-default .jstree-no-checkboxes .jstree-checkbox {
   display: none !important;

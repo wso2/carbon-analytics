@@ -28,24 +28,17 @@ define (
 
 	 var AnnotationObject = function (options) {
 	 		if (!arguments.length){
-	 		this.elements = [];
-	 		this.annotations = [];
+				this.elements = [];
+				this.annotations = [];
 	 		}
 	 		else {
-			if (options !== undefined) {
-				this.name = options.name;
-				this.elements = options.elements;
-				this.annotations = options.annotations;
-			}
+				if (options !== undefined) {
+					this.name = options.name;
+					this.elements = options.elements;
+					this.annotations = options.annotations;
+				}
 			}
 	 };
-
-//	 var AnnotationObject = function () {
-//	 	this.name = "";
-//	 	this.elements = [];
-//	 	this.annotations = [];
-//
-//	 };
 
 	 AnnotationObject.prototype.getName = function () {
 		 return this.name;
@@ -56,11 +49,11 @@ define (
 	 };
 
 	 AnnotationObject.prototype.addElement = function (element) {
-     		this.elements.push(element)
+		this.elements.push(element)
      };
 
      AnnotationObject.prototype.addAnnotation = function (annotation) {
-          		this.annotations.push(annotation)
+		this.annotations.push(annotation)
      };
 
 	return AnnotationObject;

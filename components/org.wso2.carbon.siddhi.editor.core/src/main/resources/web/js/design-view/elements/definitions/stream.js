@@ -50,7 +50,7 @@ define(['require', 'elementUtils'],
         };
 
         Stream.prototype.addAnnotationObject = function (annotation) {
-				this.annotationListObjects.push(annotation)
+			this.annotationListObjects.push(annotation)
         }
 
         Stream.prototype.addAttribute = function (attribute) {
@@ -88,7 +88,7 @@ define(['require', 'elementUtils'],
         Stream.prototype.getAnnotationList = function () {
             return this.annotationList;
         };
-		//mine
+
         Stream.prototype.getAnnotationListObjects = function () {
 			return this.annotationListObjects;
 		};

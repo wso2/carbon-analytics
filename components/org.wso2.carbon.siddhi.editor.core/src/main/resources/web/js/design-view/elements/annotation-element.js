@@ -29,7 +29,6 @@ define (
 	 var AnnotationElement = function (key, value) {
 	 	this.key = key;
 	 	this.value = value;
-
 	 };
 
 	 AnnotationElement.prototype.getKey = function () {
@@ -47,7 +46,6 @@ define (
 	 AnnotationElement.prototype.setValue = function (value) {
 		this.value = value;
 	 };
-
 
 	return AnnotationElement;
 
