@@ -44,6 +44,7 @@ define(['require', 'elementUtils'],
                 this.previousCommentSegment = options.previousCommentSegment;
                 this.name = options.name;
             }
+
 			this.annotationListObjects = [];
             this.attributeList = [];
             this.annotationList = [];

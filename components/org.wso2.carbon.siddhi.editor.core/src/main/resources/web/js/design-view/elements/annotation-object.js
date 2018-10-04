@@ -59,3 +59,4 @@ define (
 	return AnnotationObject;
 
 	});
+

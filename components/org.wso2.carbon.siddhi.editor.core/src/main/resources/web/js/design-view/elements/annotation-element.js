@@ -50,3 +50,4 @@ define (
 	return AnnotationElement;
 
 	});
+	
