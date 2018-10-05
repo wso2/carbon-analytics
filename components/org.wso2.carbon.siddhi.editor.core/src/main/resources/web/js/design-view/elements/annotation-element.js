@@ -15,39 +15,40 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-define (
-	function () {
+define(
+    function () {
 
-	/**
+        /**
 
-	 * @class AnnotationObject
-	 * @constructor
-	 * @class AnnotationObject  Creates an object to hold an annotation object
-	 * @param {Object} options Rendering options for the view
-	 */
+         * @class AnnotationElement
+         * @constructor
+         * @class AnnotationElement Creates an object to hold an annotation element
+         * @param {key} to store the property of the annotation element
+         * @param {value} to store the property's value of the annotation element
+         */
 
-	 var AnnotationElement = function (key, value) {
-	 	this.key = key;
-	 	this.value = value;
-	 };
+        var AnnotationElement = function (key, value) {
+            this.key = key;
+            this.value = value;
+        };
 
-	 AnnotationElement.prototype.getKey = function () {
-		 return this.key;
-	 };
+        AnnotationElement.prototype.getKey = function () {
+            return this.key;
+        };
 
-	 AnnotationElement.prototype.setKey = function (key) {
-		this.key = key;
-	 };
+        AnnotationElement.prototype.setKey = function (key) {
+            this.key = key;
+        };
 
-	AnnotationElement.prototype.getValue = function () {
-		 return this.value;
-	 };
+        AnnotationElement.prototype.getValue = function () {
+            return this.value;
+        };
 
-	 AnnotationElement.prototype.setValue = function (value) {
-		this.value = value;
-	 };
+        AnnotationElement.prototype.setValue = function (value) {
+            this.value = value;
+        };
 
-	return AnnotationElement;
+        return AnnotationElement;
 
-	});
-	
+    });
+

@@ -22,7 +22,7 @@ define(
 
          * @class AnnotationObject
          * @constructor
-         * @class AnnotationObject  Creates an object to hold an annotation object
+         * @class AnnotationObject creates an object to hold an annotation object
          * @param {Object} options Rendering options for the view
          */
 
