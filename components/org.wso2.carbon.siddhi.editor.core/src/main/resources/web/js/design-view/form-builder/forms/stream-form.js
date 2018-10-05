@@ -320,7 +320,6 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'stream', 'designView
             //to hide/show the buttons corresponding to the node selected
             $('#annotation-div').on("select_node.jstree", function (e, data) {
                 var node_info = $('#annotation-div').jstree("get_node", data.node)
-                console.log(node_info)
                 if ((node_info.original != undefined && (node_info.original.class == "annotation")) ||
                     (node_info.li_attr != undefined && (node_info.li_attr.class == "annotation"))) {
                     tree.edit(data.node)
@@ -402,7 +401,6 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'stream', 'designView
             self.designViewContainer.addClass('disableContainer');
             self.toggleViewButton.addClass('disableContainer');
 
-
             var attributeFormTemplate = Handlebars.compile($('#attribute-form-template').html());
             var wrappedHtml = attributeFormTemplate("");
             $('#define-attribute').html(wrappedHtml);
@@ -423,7 +421,6 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'stream', 'designView
             //onload of the attribute div arrange the navigations of the attribute
             $('#attribute-div').ready(changeAtrributeNavigation);
             $('#stream-form-template').ready(loadAnnotation);
-
 
             var streamName = "";
             // 'Submit' button action
@@ -626,8 +623,6 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'stream', 'designView
             $("#attribute-div").on('click', '.reorder-down', moveDownAttribute)
             //onload of the attribute div arrange the navigations of the attribute
             $('#attribute-div').ready(changeAtrributeNavigation);
-            //$('#stream-form-template').ready(loadAnnotation(json));
-            //formContainer.append(self.formUtils.buildFormButtons(true));
 
             $('#submit').on('click', function () {
                 // set the isDesignViewContentChanged to true
