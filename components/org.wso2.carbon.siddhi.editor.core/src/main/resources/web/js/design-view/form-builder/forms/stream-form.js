@@ -64,7 +64,7 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'stream', 'designView
 
         //attribute move up button action
         var moveUpAttribute = function () {
-        
+
             var $current = $(this).closest('li')
             var $previous = $current.prev('li');
             if ($previous.length !== 0) {
@@ -191,17 +191,17 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'stream', 'designView
                 node_info = $('#annotation-div').jstree("get_node", node);
                 //if the child is a sub annotation
                 if ((node_info.original != undefined && node_info.original.class == "annotation") ||
-                   (node_info.li_attr != undefined && (node_info.li_attr.class == "annotation" ||
-                    node_info.li_attr.class == "predefined-annotation"))) {
-						if (node_info.children.length != 0) {
-							annotation += "@" + node_info.text.trim() + "( "
-							var childAnnotation = new AnnotationObject();
-							childAnnotation.setName(node_info.text.trim())
-							traverseChildAnnotations(node_info.children, childAnnotation)
-							annotationObject.addAnnotation(childAnnotation)
-							annotation = annotation.substring(0, annotation.length - 1);
-							annotation += "),"
-						}
+                    (node_info.li_attr != undefined && (node_info.li_attr.class == "annotation" ||
+                        node_info.li_attr.class == "predefined-annotation"))) {
+                    if (node_info.children.length != 0) {
+                        annotation += "@" + node_info.text.trim() + "( "
+                        var childAnnotation = new AnnotationObject();
+                        childAnnotation.setName(node_info.text.trim())
+                        traverseChildAnnotations(node_info.children, childAnnotation)
+                        annotationObject.addAnnotation(childAnnotation)
+                        annotation = annotation.substring(0, annotation.length - 1);
+                        annotation += "),"
+                    }
                 }
                 //if the child is a property
                 else {
@@ -382,7 +382,7 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'stream', 'designView
             self.designViewContainer.addClass('disableContainer');
             self.toggleViewButton.addClass('disableContainer');
 
-		    var predefinedAnnotationList = self.configurationData.application.config.stream_predefined_annotations
+            var predefinedAnnotationList = self.configurationData.application.config.stream_predefined_annotations
 
             var attributeFormTemplate = Handlebars.compile($('#attribute-form-template').html());
             var wrappedHtml = attributeFormTemplate("");
@@ -554,7 +554,7 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'stream', 'designView
                 attributes.push(attributeObject);
             });
 
-			//load the saved annotations
+            //load the saved annotations
             var savedAnnotations = clickedElement.getAnnotationListObjects();
             var annotations = [];
             var checkedAnnotations = [];
@@ -563,13 +563,13 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'stream', 'designView
                 var foundPredefined = false;
                 _.forEach(savedAnnotations, function (savedAnnotation) {
                     if (savedAnnotation.name == predefinedAnnotation.name) {
-                    	//if an optional annotation is found push it to the checkedAnnotations[]
+                        //if an optional annotation is found push it to the checkedAnnotations[]
                         checkedAnnotations.push(savedAnnotation.name);
                         foundPredefined = true;
                         _.forEach(predefinedAnnotation.elements, function (predefinedAnnotationElement) {
                             _.forEach(savedAnnotation.elements, function (savedAnnotationElement) {
                                 if (predefinedAnnotationElement.key == savedAnnotationElement.key) {
-                                	//if an optional property is found push it to the checkedAnnotations[]
+                                    //if an optional property is found push it to the checkedAnnotations[]
                                     checkedAnnotations.push(savedAnnotationElement.key);
                                     predefinedAnnotationElement.value = savedAnnotationElement.value
                                 }
@@ -678,26 +678,26 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'stream', 'designView
                 clickedElement.clearAttributeList();
 
                 //validate the attribute names
-                 var attrError = false;
+                var attrError = false;
                 $('.attr-name').each(function () {
                     var attributeName = $(this).val().trim();
                     if (attributeName != "") {
                         if ((attributeName.indexOf(' ') >= 0) && (attributeName.indexOf(' ') != attributeName.length - 1)) {
                             DesignViewUtils.prototype.errorAlert("Attribute name \"" + attributeName + "\" " +
                                 "cannot have white space.");
-                             attrError = true;
+                            attrError = true;
                             return;
                         }
 
                         if ((!(/^([a-zA-Z])$/).test(attributeName.charAt(0))) && (attributeName.trim().length > 0)) {
                             DesignViewUtils.prototype.errorAlert("Attribute name \"" + attributeName + "\" " +
                                 "must start with an alphabetic character.");
-                             attrError = true;
+                            attrError = true;
                             return;
                         }
                     }
                 });
-                if(attrError) { return; }
+                if (attrError) { return; }
 
                 var attributeLength = 0;
                 $('.attribute .attr-content').each(function () {
