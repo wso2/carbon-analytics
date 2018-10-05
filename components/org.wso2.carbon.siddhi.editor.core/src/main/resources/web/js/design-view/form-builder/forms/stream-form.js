@@ -64,6 +64,7 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'stream', 'designView
 
         //attribute move up button action
         var moveUpAttribute = function () {
+        
             var $current = $(this).closest('li')
             var $previous = $current.prev('li');
             if ($previous.length !== 0) {
@@ -75,6 +76,7 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'stream', 'designView
 
         //attribute move down function
         var moveDownAttribute = function () {
+
             var $current = $(this).closest('li')
             var $next = $current.next('li');
             if ($next.length !== 0) {
@@ -85,9 +87,8 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'stream', 'designView
         };
 
         // to check if an annotation is predefined using the annotation name
-        var isPredefinedAnnotation = function (annotationName) {
+        var isPredefinedAnnotation = function (predefinedAnnotationList, annotationName) {
 
-            var predefinedAnnotationList = loadPredefinedAnnotations();
             var predefinedObject = null;
             _.forEach(predefinedAnnotationList, function (predefinedAnnotation) {
                 if (predefinedAnnotation.name == annotationName) {
@@ -100,14 +101,14 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'stream', 'designView
 
         //to validate the predefined annotations.
         //adds the jstree nodes to annotationNodes[] which needs to be built as an annotation string
-        var validatePredefinedAnnotations = function (annotationNodes) {
+        var validatePredefinedAnnotations = function (predefinedAnnotationList, annotationNodes) {
             //gets all the parent nodes
             var jsTreeAnnotationList = $('#annotation-div').jstree(true)._model.data['#'].children;
             var isValid = false;
             mainLoop:
             for (var jsTreeAnnotation of jsTreeAnnotationList) {
                 var node_info = $('#annotation-div').jstree("get_node", jsTreeAnnotation);
-                var predefinedObject = isPredefinedAnnotation(node_info.text.trim())
+                var predefinedObject = isPredefinedAnnotation(predefinedAnnotationList, node_info.text.trim())
                 if (predefinedObject != null) {
                     //check if predefined annotation is mandatory or optional and checked
                     if ((predefinedObject.isMandatory == "true") || (predefinedObject.isMandatory == "false" && node_info
@@ -143,11 +144,9 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'stream', 'designView
                         annotationNodes.push(jsTreeAnnotation)
                     }
                 }
-
                 else {
                     annotationNodes.push(jsTreeAnnotation)
                 }
-
             }
             return isValid;
         };
@@ -159,13 +158,13 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'stream', 'designView
                 //search the property which needs a check using its name
                 $('#annotation-div').jstree("search", checkedboxName)
             });
-
         };
 
         //build the annotation string and adds it to the annotationStringList[]
         //creates the annotation object and adds it to the annotationObjectList[]
         var annotation = "";
         var buildAnnotation = function (annotationNodes, annotationStringList, annotationObjectList) {
+
             _.forEach(annotationNodes, function (node) {
                 var node_info = $('#annotation-div').jstree("get_node", node);
                 var childArray = node_info.children
@@ -182,7 +181,6 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'stream', 'designView
                     annotation = "";
                 }
             });
-
         };
 
         //to traverse the children of the parent annotaions
@@ -193,17 +191,17 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'stream', 'designView
                 node_info = $('#annotation-div').jstree("get_node", node);
                 //if the child is a sub annotation
                 if ((node_info.original != undefined && node_info.original.class == "annotation") ||
-                    (node_info.li_attr != undefined && (node_info.li_attr.class == "annotation" || node_info.li_attr.class ==
-                    "predefined-annotation"))) {
-                    if (node_info.children.length != 0) {
-                        annotation += "@" + node_info.text.trim() + "( "
-                        var childAnnotation = new AnnotationObject();
-                        childAnnotation.setName(node_info.text.trim())
-                        traverseChildAnnotations(node_info.children, childAnnotation)
-                        annotationObject.addAnnotation(childAnnotation)
-                        annotation = annotation.substring(0, annotation.length - 1);
-                        annotation += "),"
-                    }
+                   (node_info.li_attr != undefined && (node_info.li_attr.class == "annotation" ||
+                    node_info.li_attr.class == "predefined-annotation"))) {
+						if (node_info.children.length != 0) {
+							annotation += "@" + node_info.text.trim() + "( "
+							var childAnnotation = new AnnotationObject();
+							childAnnotation.setName(node_info.text.trim())
+							traverseChildAnnotations(node_info.children, childAnnotation)
+							annotationObject.addAnnotation(childAnnotation)
+							annotation = annotation.substring(0, annotation.length - 1);
+							annotation += "),"
+						}
                 }
                 //if the child is a property
                 else {
@@ -221,23 +219,6 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'stream', 'designView
                     }
                 }
             });
-        };
-
-        //defined predefined annotations
-        var loadPredefinedAnnotations = function () {
-            var predefinedAnnotationList = [];
-            var asyncAnnotationObject = {
-                name: "Async", class: "predefined-annotation optional-annotation",
-                isMandatory: "false",
-                elements: [{
-                    key: "buffer.size", value: "256", isMandatory: "true",
-                    class: "predefined-key mandatory-key"
-                },
-                { key: "workers", value: "2", isMandatory: "false", class: "predefined-key optional-key" },
-                { key: "batch.size.max", value: "5", isMandatory: "true", class: "predefined-key optional-key" }]
-            };
-            predefinedAnnotationList.push(asyncAnnotationObject);
-            return predefinedAnnotationList;
         };
 
         //initialises jstree
@@ -401,16 +382,17 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'stream', 'designView
             self.designViewContainer.addClass('disableContainer');
             self.toggleViewButton.addClass('disableContainer');
 
+		    var predefinedAnnotationList = self.configurationData.application.config.stream_predefined_annotations
+
             var attributeFormTemplate = Handlebars.compile($('#attribute-form-template').html());
             var wrappedHtml = attributeFormTemplate("");
             $('#define-attribute').html(wrappedHtml);
 
             var raw_partial = document.getElementById('recursiveAnnotationPartial').innerHTML;
             Handlebars.registerPartial('recursiveAnnotation', raw_partial);
-            var predefinedAnnotations = loadPredefinedAnnotations();
 
             var annotationFormTemplate = Handlebars.compile($('#annotation-form-template').html());
-            var wrappedHtml = annotationFormTemplate(predefinedAnnotations);
+            var wrappedHtml = annotationFormTemplate(predefinedAnnotationList);
             $('#define-annotation').html(wrappedHtml);
 
             //add event listeners for the attribute div buttons
@@ -471,9 +453,7 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'stream', 'designView
                         }
                     }
                 });
-                if (attrError) {
-                    return;
-                }
+                if (attrError) { return; }
 
                 // set the isDesignViewContentChanged to true
                 self.configurationData.setIsDesignViewContentChanged(true);
@@ -502,7 +482,7 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'stream', 'designView
                 var annotationStringList = [];
                 var annotationObject = [];
                 //validate the annotations
-                if (validatePredefinedAnnotations(annotationNodes)) {
+                if (validatePredefinedAnnotations(predefinedAnnotationList, annotationNodes)) {
                     return;
                 }
                 buildAnnotation(annotationNodes, annotationStringList, annotationObject);
@@ -578,8 +558,8 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'stream', 'designView
             var savedAnnotations = clickedElement.getAnnotationListObjects();
             var annotations = [];
             var checkedAnnotations = [];
-            var predefinedAnnotations = loadPredefinedAnnotations();
-            _.forEach(predefinedAnnotations, function (predefinedAnnotation) {
+            var predefinedAnnotationList = self.configurationData.application.config.stream_predefined_annotations
+            _.forEach(predefinedAnnotationList, function (predefinedAnnotation) {
                 var foundPredefined = false;
                 _.forEach(savedAnnotations, function (savedAnnotation) {
                     if (savedAnnotation.name == predefinedAnnotation.name) {
@@ -698,22 +678,26 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'stream', 'designView
                 clickedElement.clearAttributeList();
 
                 //validate the attribute names
+                 var attrError = false;
                 $('.attr-name').each(function () {
                     var attributeName = $(this).val().trim();
                     if (attributeName != "") {
                         if ((attributeName.indexOf(' ') >= 0) && (attributeName.indexOf(' ') != attributeName.length - 1)) {
                             DesignViewUtils.prototype.errorAlert("Attribute name \"" + attributeName + "\" " +
                                 "cannot have white space.");
+                             attrError = true;
                             return;
                         }
 
                         if ((!(/^([a-zA-Z])$/).test(attributeName.charAt(0))) && (attributeName.trim().length > 0)) {
                             DesignViewUtils.prototype.errorAlert("Attribute name \"" + attributeName + "\" " +
                                 "must start with an alphabetic character.");
+                             attrError = true;
                             return;
                         }
                     }
                 });
+                if(attrError) { return; }
 
                 var attributeLength = 0;
                 $('.attribute .attr-content').each(function () {
@@ -736,7 +720,8 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'stream', 'designView
 
                 clickedElement.clearAnnotationList();
                 clickedElement.clearAnnotationListObjects();
-                if (validatePredefinedAnnotations(annotationNodes)) {
+
+                if (validatePredefinedAnnotations(predefinedAnnotationList, annotationNodes)) {
                     return;
                 }
                 buildAnnotation(annotationNodes, annotationStringList, annotationObject);
@@ -747,7 +732,6 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'stream', 'designView
                 _.forEach(annotationObject, function (annotation) {
                     clickedElement.addAnnotationObject(annotation);
                 });
-
 
                 var textNode = $(element).parent().find('.streamNameNode');
                 textNode.html(streamName);

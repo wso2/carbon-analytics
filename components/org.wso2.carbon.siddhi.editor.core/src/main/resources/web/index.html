@@ -4,7 +4,7 @@
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link href="/editor/commons/images/favicon.png" rel="icon" type="image/png" sizes="16x16" />
+    <link href="/editor/commons/images/favicon.png" rel="icon" type="image/png" sizes="16x16"/>
     <script src="/editor/commons/lib/css-browser-selector_0.4.0/css_browser_selector.js"></script>
     <link href="/editor/commons/lib/font-wso2-1.2.2/css/font-wso2.min.css" rel="stylesheet" type="text/css"/>
     <link rel="stylesheet" type="text/css" href="/editor/commons/lib/bootstrap_v3.3.6/css/bootstrap.css"/>
@@ -1093,10 +1093,10 @@
         </ul>
     </li>
     {{else}}
-    <li data-jstree='{"icon":"/editor/commons/images/annotation.png"}' class ="annotation">{{name}}
+    <li data-jstree='{"icon":"/editor/commons/images/annotation.png"}' class="annotation">{{name}}
         <ul>
             {{#each elements}}
-            <li data-jstree='{"icon":"/editor/commons/images/properties.png"}'class="annotation-key">{{key}}
+            <li data-jstree='{"icon":"/editor/commons/images/properties.png"}' class="annotation-key">{{key}}
                 <ul>
                     <li data-jstree='{"icon":"/editor/commons/images/value.png"}' class="annotation-value">{{value}}
                     </li>
@@ -1398,9 +1398,36 @@
                     "artifacts/PatternMatching/PatternMatching.siddhi",
                     "artifacts/AggregateDataIncrementally/AggregateDataIncrementally.siddhi"]
             },
+            stream_predefined_annotations: [
+            {
+                name: 'Async',
+                class: 'predefined-annotation optional-annotation',
+                isMandatory: 'false',
+                elements: [
+                    {
+                        key: 'buffer.size',
+                        value: '256',
+                        class: 'predefined-key mandatory-key',
+                        isMandatory: 'true'
+                    },
+                    {
+                        key: 'workers',
+                        value: '2',
+                        class: 'predefined-key mandatory-key',
+                        isMandatory: 'true'
+                    },
+                    {
+                        key: 'batch.size.max',
+                        value: '5',
+                        class: 'predefined-key mandatory-key',
+                        isMandatory: 'true'
+                    },
+                ]
+            }
+            ],
             services:   {
                 workspace:  {
-                    endpoint: window.location.protocol + "//" + window.location.host + '/editor/workspace'
+                       endpoint: window.location.protocol + "//" + window.location.host + '/editor/workspace'
                 }
             },
             alerts: {
@@ -1722,6 +1749,7 @@
         app.render();
         app.displayInitialView();
     });
+
 
 
 </script>
