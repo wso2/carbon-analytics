@@ -19,7 +19,6 @@ define(
     function () {
 
         /**
-
          * @class AnnotationElement
          * @constructor
          * @class AnnotationElement Creates an object to hold an annotation element
