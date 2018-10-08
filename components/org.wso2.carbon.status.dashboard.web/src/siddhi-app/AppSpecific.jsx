@@ -230,7 +230,25 @@ export default class WorkerSpecific extends React.Component {
                             totalMem: response.data[0].memory.data
                         });
                     });
-            });
+            }).catch((error) => {
+            let message;
+            if (error.response !== null) {
+                if (error.response.status === 500) {
+                    message = "Authentication fail. Please login again.";
+                    this.setState({
+                        appText: "Unable to fetch Siddhi App!",
+                        latency: [],
+                        throughputAll: [],
+                        totalMem: []
+                    })
+                } else {
+                    message = "Unable to fetch Siddhi App! : " + error.response.data;
+                }
+                this.setState({
+                    message: message
+                })
+            }
+        });
     }
 
     renderLatencyChart() {

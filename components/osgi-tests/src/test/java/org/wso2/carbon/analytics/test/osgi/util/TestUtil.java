@@ -19,7 +19,7 @@ package org.wso2.carbon.analytics.test.osgi.util;
 import io.netty.handler.codec.http.HttpMethod;
 import org.awaitility.Duration;
 import org.wso2.carbon.stream.processor.common.EventStreamService;
-import org.wso2.carbon.stream.processor.core.SiddhiAppRuntimeService;
+import org.wso2.carbon.stream.processor.common.SiddhiAppRuntimeService;
 import org.wso2.msf4j.MicroservicesRegistry;
 import org.wso2.siddhi.core.SiddhiAppRuntime;
 

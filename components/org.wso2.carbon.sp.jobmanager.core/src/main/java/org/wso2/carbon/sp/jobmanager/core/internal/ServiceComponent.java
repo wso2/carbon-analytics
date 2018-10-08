@@ -36,7 +36,7 @@ import org.wso2.carbon.datasource.core.api.DataSourceService;
 import org.wso2.carbon.sp.jobmanager.core.CoordinatorChangeListener;
 import org.wso2.carbon.sp.jobmanager.core.allocation.ResourceAllocationAlgorithm;
 import org.wso2.carbon.sp.jobmanager.core.api.ResourceManagerApi;
-import org.wso2.carbon.sp.jobmanager.core.appcreator.SPSiddhiAppCreator;
+import org.wso2.carbon.sp.jobmanager.core.appcreator.KafkaSiddhiAppCreator;
 import org.wso2.carbon.sp.jobmanager.core.bean.ClusterConfig;
 import org.wso2.carbon.sp.jobmanager.core.bean.DeploymentConfig;
 import org.wso2.carbon.sp.jobmanager.core.deployment.DeploymentManagerImpl;
@@ -82,7 +82,7 @@ public class ServiceComponent {
                     new ResourceManagerApi(), null);
             distributionServiceRegistration = bundleContext.registerService(
                     DistributionService.class.getName(),
-                    new DistributionManagerServiceImpl(new SPSiddhiAppCreator(),
+                    new DistributionManagerServiceImpl(new KafkaSiddhiAppCreator(),
                             ServiceDataHolder.getDeploymentManager()),
                     null);
         }
@@ -165,7 +165,7 @@ public class ServiceComponent {
                             throw new ResourceManagerException("Allocation Algorithm class with name "
                                     + allocationAlgoClassName + " is invalid. ", e);
                         }
-                        if(deploymentConfig.getHttpsInterface() == null){
+                        if (deploymentConfig.getHttpsInterface() == null) {
                             log.error(ResourceManagerConstants.KEY_NODE_PROTOCOL + " is not specified " +
                                     "in deployment.yaml");
                         }

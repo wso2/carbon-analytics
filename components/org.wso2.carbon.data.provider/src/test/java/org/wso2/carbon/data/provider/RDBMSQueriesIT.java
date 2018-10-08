@@ -102,11 +102,12 @@ public class RDBMSQueriesIT {
             queries.setVersion("default");
             queries.setType("H2");
             Map queriesMap = new HashMap();
-            queriesMap.put("record_delete", "DELETE TOP {{LIMIT_VALUE}} FROM {{TABLE_NAME}}" +
-                    " {{INCREMENTAL_COLUMN}} ASC LIMIT {{LIMIT_VALUE}}");
+            queriesMap.put("record_limit", "{{CUSTOM_QUERY}} ORDER BY {{INCREMENTAL_COLUMN}} DESC " +
+                    "LIMIT {{LIMIT_VALUE}}");
+            queriesMap.put("record_greater_than", "SELECT * FROM ({{CUSTOM_QUERY}} ORDER BY {{INCREMENTAL_COLUMN}} " +
+                    "DESC ) WHERE {{INCREMENTAL_COLUMN}} > {{LAST_RECORD_VALUE}}");
             queriesMap.put("total_record_count", "SELECT COUNT(*) FROM {{TABLE_NAME}}");
-            queriesMap.put("record_limit", " ORDER BY {{INCREMENTAL_COLUMN}} ASC LIMIT {{LIMIT_VALUE}}");
-            queriesMap.put("record_greater_than", " WHERE {{INCREMENTAL_COLUMN}} > {{LAST_RECORD_VALUE}}");
+            queriesMap.put("record_delete", "DELETE TOP {{LIMIT_VALUE}} FROM {{TABLE_NAME}}");
             queries.setMappings(queriesMap);
             ArrayList arrayList = new ArrayList();
             arrayList.add(queries);

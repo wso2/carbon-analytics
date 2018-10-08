@@ -36,6 +36,7 @@ import org.osgi.service.component.annotations.ReferencePolicy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.wso2.carbon.config.provider.ConfigProvider;
+import org.wso2.carbon.siddhi.editor.core.EditorSiddhiAppRuntimeService;
 import org.wso2.carbon.siddhi.editor.core.Workspace;
 import org.wso2.carbon.siddhi.editor.core.commons.metadata.MetaData;
 import org.wso2.carbon.siddhi.editor.core.commons.request.ValidationRequest;
@@ -59,6 +60,7 @@ import org.wso2.carbon.siddhi.editor.core.util.designview.designgenerator.Design
 import org.wso2.carbon.siddhi.editor.core.util.designview.exceptions.CodeGenerationException;
 import org.wso2.carbon.siddhi.editor.core.util.designview.exceptions.DesignGenerationException;
 import org.wso2.carbon.stream.processor.common.EventStreamService;
+import org.wso2.carbon.stream.processor.common.SiddhiAppRuntimeService;
 import org.wso2.carbon.stream.processor.common.utils.config.FileConfigManager;
 import org.wso2.msf4j.Microservice;
 import org.wso2.msf4j.Request;
@@ -121,6 +123,7 @@ public class EditorMicroservice implements Microservice {
                     .build()
             );
     private ConfigProvider configProvider;
+    private ServiceRegistration siddhiAppRuntimeServiceRegistration;
 
     public EditorMicroservice() {
         workspace = new LocalFSWorkspace();
@@ -260,32 +263,14 @@ public class EditorMicroservice implements Microservice {
     }
 
     @GET
-    @Path("/workspace/list")
-    @Produces("application/json")
-    public Response directoriesInPath(@QueryParam("path") String path) {
-        try {
-            return Response.status(Response.Status.OK)
-                    .entity(workspace.listDirectoriesInPath(
-                            new String(Base64.getDecoder().decode(path), Charset.defaultCharset())))
-                    .type(MediaType.APPLICATION_JSON)
-                    .build();
-        } catch (IOException e) {
-            return Response.serverError().entity("failed." + e.getMessage())
-                    .build();
-        } catch (Throwable ignored) {
-            return Response.serverError().entity("failed")
-                    .build();
-        }
-    }
-
-    @GET
     @Path("/workspace/exists")
     @Produces("application/json")
     public Response fileExists(@QueryParam("path") String path) {
         try {
             return Response.status(Response.Status.OK)
                     .entity(workspace.exists(
-                            Paths.get(new String(Base64.getDecoder().decode(path), Charset.defaultCharset()))))
+                            Paths.get(Constants.DIRECTORY_WORKSPACE + System.getProperty(FILE_SEPARATOR) +
+                                    new String(Base64.getDecoder().decode(path), Charset.defaultCharset()))))
                     .type(MediaType.APPLICATION_JSON)
                     .build();
         } catch (IOException e) {
@@ -313,8 +298,8 @@ public class EditorMicroservice implements Microservice {
 
             return Response.status(Response.Status.OK)
                     .entity(workspace.exists(SecurityUtil.resolvePath(Paths.get(location).toAbsolutePath(),
-                            Paths.get(new String(base64ConfigName,
-                                    Charset.defaultCharset())))))
+                            Paths.get(Constants.DIRECTORY_WORKSPACE + System.getProperty(FILE_SEPARATOR) +
+                                    new String(base64ConfigName, Charset.defaultCharset())))))
                     .type(MediaType.APPLICATION_JSON)
                     .build();
         } catch (IOException e) {
@@ -371,12 +356,24 @@ public class EditorMicroservice implements Microservice {
     }
 
     @GET
+    @Path("/workspace/config")
+    @Produces("application/json")
+    public Response getConfigs() {
+        JsonObject config = new JsonObject();
+        config.addProperty("fileSeparator", System.getProperty(FILE_SEPARATOR));
+        return Response.status(Response.Status.OK)
+                .entity(config)
+                .type(MediaType.APPLICATION_JSON).build();
+    }
+
+    @GET
     @Path("/workspace/listFiles")
     @Produces("application/json")
     public Response filesInPath(@QueryParam("path") String path) {
         try {
-            java.nio.file.Path pathLocation = Paths.get(new String(Base64.getDecoder().decode(path), Charset
-                    .defaultCharset()));
+            String location = (Paths.get(Constants.CARBON_HOME)).toString();
+            java.nio.file.Path pathLocation = SecurityUtil.resolvePath(Paths.get(location).toAbsolutePath(),
+                    Paths.get(new String(Base64.getDecoder().decode(path), Charset.defaultCharset())));
             return Response.status(Response.Status.OK)
                     .entity(workspace.listFilesInPath(pathLocation))
                     .type(MediaType.APPLICATION_JSON).build();
@@ -410,7 +407,8 @@ public class EditorMicroservice implements Microservice {
             byte[] base64ConfigName = Base64.getDecoder().decode(configName);
             java.nio.file.Path filePath = SecurityUtil.resolvePath(
                     Paths.get(location).toAbsolutePath(),
-                    Paths.get(new String(base64ConfigName, Charset.defaultCharset())));
+                    Paths.get(Constants.DIRECTORY_WORKSPACE + System.getProperty(FILE_SEPARATOR) +
+                            new String(base64ConfigName, Charset.defaultCharset())));
             Files.write(filePath, base64Config);
             java.nio.file.Path fileNamePath = filePath.getFileName();
             if (null != fileNamePath) {
@@ -426,50 +424,6 @@ public class EditorMicroservice implements Microservice {
             entity.addProperty("path", Constants.DIRECTORY_WORKSPACE);
             return Response.status(Response.Status.OK).entity(entity)
                     .type(MediaType.APPLICATION_JSON).build();
-        } catch (IOException e) {
-            return Response.serverError().entity("failed." + e.getMessage())
-                    .build();
-        } catch (Throwable ignored) {
-            return Response.serverError().entity("failed")
-                    .build();
-        }
-    }
-
-    @POST
-    @Path("/workspace/export")
-    @Produces("application/json")
-    public Response export(String payload) {
-        try {
-            String location = "";
-            String configName = "";
-            String config = "";
-            Matcher locationMatcher = Pattern.compile("location=(.*?)&configName").matcher(payload);
-            while (locationMatcher.find()) {
-                location = locationMatcher.group(1);
-            }
-            Matcher configNameMatcher = Pattern.compile("configName=(.*?)&").matcher(payload);
-            while (configNameMatcher.find()) {
-                configName = configNameMatcher.group(1);
-            }
-            String[] splitConfigContent = payload.split("config=");
-            if (splitConfigContent.length > 1) {
-                config = splitConfigContent[1];
-            }
-            byte[] base64Config = Base64.getDecoder().decode(config);
-            byte[] base64ConfigName = Base64.getDecoder().decode(configName);
-            byte[] base64Location = Base64.getDecoder().decode(location);
-            Files.write(Paths.get(new String(base64Location, Charset.defaultCharset())
-                    + System.getProperty(FILE_SEPARATOR)
-                    + new String(base64ConfigName, Charset.defaultCharset())), base64Config);
-            JsonObject entity = new JsonObject();
-            entity.addProperty(STATUS, SUCCESS);
-            return Response.status(Response.Status.OK).entity(entity)
-                    .type(MediaType.APPLICATION_JSON).build();
-        } catch (AccessDeniedException e) {
-            Map<String, String> errorMap = new HashMap<>(1);
-            errorMap.put("Error", "File access denied. You don't have enough permission to access");
-            return Response.serverError().entity(errorMap)
-                    .build();
         } catch (IOException e) {
             return Response.serverError().entity("failed." + e.getMessage())
                     .build();
@@ -518,47 +472,16 @@ public class EditorMicroservice implements Microservice {
         }
     }
 
-    @POST
-    @Path("/workspace/import")
-    @Produces("application/json")
-    public Response importFile(String path) {
-        try {
-            JsonObject content = workspace.read(Paths.get(path));
-            String location = (Paths.get(Constants.RUNTIME_PATH,
-                    Constants.DIRECTORY_DEPLOYMENT,
-                    Constants.DIRECTORY_WORKSPACE)).toString();
-            String configName = path.substring(path.lastIndexOf(System.getProperty(FILE_SEPARATOR)) + 1);
-            String config = content.get("content").getAsString();
-            StringBuilder pathBuilder = new StringBuilder();
-            pathBuilder.append(location).append(System.getProperty(FILE_SEPARATOR)).append(configName);
-            Files.write(Paths.get(pathBuilder.toString()), config.getBytes(Charset.defaultCharset()));
-            return Response.status(Response.Status.OK)
-                    .entity(content)
-                    .type(MediaType.APPLICATION_JSON).build();
-        } catch (AccessDeniedException e) {
-            Map<String, String> errorMap = new HashMap<>(1);
-            errorMap.put("Error", "File access denied. You don't have enough permission to access");
-            return Response.serverError().entity(errorMap)
-                    .build();
-        } catch (IOException e) {
-            return Response.serverError().entity("failed." + e.getMessage())
-                    .build();
-        } catch (Throwable ignored) {
-            return Response.serverError().entity("failed")
-                    .build();
-        }
-    }
-
     @DELETE
     @Path("/workspace/delete")
     @Produces("application/json")
-    public Response deleteFile(@QueryParam("siddhiAppName") String siddhiAppName, @QueryParam("relativePath") String
-            relativePath) {
+    public Response deleteFile(@QueryParam("siddhiAppName") String siddhiAppName) {
         try {
             java.nio.file.Path location = SecurityUtil.
                     resolvePath(Paths.get(Constants.RUNTIME_PATH,
                             Constants.DIRECTORY_DEPLOYMENT).toAbsolutePath(),
-                            Paths.get(relativePath));
+                            Paths.get(Constants.DIRECTORY_WORKSPACE + System.getProperty(FILE_SEPARATOR) +
+                                    siddhiAppName));
             File file = new File(location.toString());
             if (file.delete()) {
                 log.info("Siddi App: " + LogEncoder.removeCRLFCharacters(siddhiAppName) + " is deleted");
@@ -949,7 +872,8 @@ public class EditorMicroservice implements Microservice {
         siddhiManager.setConfigManager(fileConfigManager);
         EditorDataHolder.setSiddhiManager(siddhiManager);
         EditorDataHolder.setBundleContext(bundleContext);
-
+        siddhiAppRuntimeServiceRegistration = bundleContext.registerService(SiddhiAppRuntimeService.class.getName(),
+                new EditorSiddhiAppRuntimeService(), null);
         serviceRegistration = bundleContext.registerService(EventStreamService.class.getName(),
                 new DebuggerEventStreamService(), null);
     }

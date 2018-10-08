@@ -58,6 +58,7 @@ import org.wso2.carbon.status.dashboard.core.dbhandler.StatusDashboardMetricsDBH
 import org.wso2.carbon.status.dashboard.core.exception.RDBMSTableException;
 import org.wso2.carbon.status.dashboard.core.exception.StatusDashboardRuntimeException;
 import org.wso2.carbon.status.dashboard.core.impl.utils.Constants;
+import org.wso2.carbon.status.dashboard.core.impl.utils.MonitoringApiUtil;
 import org.wso2.carbon.status.dashboard.core.internal.ApiResponseMessageWithCode;
 import org.wso2.carbon.status.dashboard.core.internal.MonitoringDataHolder;
 import org.wso2.carbon.status.dashboard.core.internal.WorkerStateHolder;
@@ -890,7 +891,7 @@ public class MonitoringApiServiceImpl extends MonitoringApiService {
     }
 
     /**
-     * This method return the both siddi apptext view and flow chart.PS: Currently implemetented till text view.
+     * This method return the both siddi apptext view
      *
      * @param id      workerid of the siddhi app
      * @param appName siddhiapp name
@@ -918,7 +919,8 @@ public class MonitoringApiServiceImpl extends MonitoringApiService {
                                         "Requested Response is null"));
                         return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(jsonString).build();
                     } else {
-                        String responseAppBody = siddhiAppResponce.body().toString();
+                        String responseAppBody = MonitoringApiUtil
+                                .processResponseBody(siddhiAppResponce.body());
                         if (siddhiAppResponce.status() == 200) {
                             return Response.ok().entity(responseAppBody).build();
                         } else if (siddhiAppResponce.status() == 401) {
@@ -933,6 +935,11 @@ public class MonitoringApiServiceImpl extends MonitoringApiService {
                             toJson(new ApiResponseMessageWithCode(ApiResponseMessageWithCode.SERVER_CONNECTION_ERROR,
                                     e.getMessage()));
                     return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(jsonString).build();
+                } catch (IOException e) {
+                    logger.error("Unable to decode siddhi app '" + appName + "'.", e);
+                    return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+                            .entity("Unable to decode siddhi app. Please try again.")
+                            .build();
                 }
             }
             logger.error("Inproper format of worker ID:" + id);

@@ -40,6 +40,7 @@ import org.wso2.siddhi.query.compiler.exception.SiddhiParserException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
@@ -53,6 +54,7 @@ public class SiddhiProvider extends AbstractDataProvider {
     private static final String SIDDHI_APP = "siddhiApp";
     private static final String STORE_QUERY = "queryData";
     private static final String PULISHING_INTERVAL = "publishingInterval";
+    private static final String TIME_COLUMNS = "timeColumns";
     private static final String QUERY = "query";
     private SiddhiDataProviderConfig siddhiDataProviderConfig;
     private DataSetMetadata metadata;
@@ -60,14 +62,18 @@ public class SiddhiProvider extends AbstractDataProvider {
     private SiddhiAppRuntime siddhiAppRuntime;
     private String[] linearTypes = new String[]{"INT", "LONG", "FLOAT", "DOUBLE"};
     private String[] ordinalTypes = new String[]{"STRING", "BOOL"};
+    private List<String> timeColumns;
 
     @Override
     public DataProvider init(String topic, String sessionId, JsonElement jsonElement) throws DataProviderException {
         this.siddhiDataProviderConfig = new Gson().fromJson(jsonElement, SiddhiDataProviderConfig.class);
         siddhiDataProviderConfig.setQueryData(((JsonObject) jsonElement).get(STORE_QUERY));
         siddhiDataProviderConfig.setSiddhiAppContext(((JsonObject) jsonElement).get(SIDDHI_APP).getAsString());
+        this.timeColumns = Arrays.asList(this.siddhiDataProviderConfig.getTimeColumns().toUpperCase(Locale.ENGLISH)
+                .split(","));
         super.init(topic, sessionId, siddhiDataProviderConfig);
         SiddhiAppRuntime siddhiAppRuntime = getSiddhiAppRuntime();
+        siddhiAppRuntime.setPurgingEnabled(false);
         siddhiAppRuntime.start();
         StoreQuery storeQuery = SiddhiCompiler.parseStoreQuery(siddhiDataProviderConfig.getQueryData()
                 .getAsJsonObject().get(QUERY).getAsString());
@@ -76,7 +82,8 @@ public class SiddhiProvider extends AbstractDataProvider {
         Attribute outputAttribute;
         for (int i = 0; i < outputAttributeList.length; i++) {
             outputAttribute = outputAttributeList[i];
-            metadata.put(i, outputAttribute.getName(), getMetadataTypes(outputAttribute.getType().toString()));
+            metadata.put(i, outputAttribute.getName(),
+                    getMetadataTypes(outputAttribute.getName(), outputAttribute.getType().toString()));
         }
         return this;
     }
@@ -109,6 +116,8 @@ public class SiddhiProvider extends AbstractDataProvider {
         renderingTypes.put(STORE_QUERY, InputFieldTypes.DYNAMIC_SIDDHI_CODE);
         renderingTypes.put(PULISHING_INTERVAL, InputFieldTypes.NUMBER);
         renderingHints.put(PULISHING_INTERVAL, "Rate at which data should be sent to the widget");
+        renderingTypes.put(TIME_COLUMNS, InputFieldTypes.TEXT_FIELD);
+        renderingHints.put(TIME_COLUMNS, "Comma separated columns of the table that contain timestamps");
         return new Gson().toJson(new Object[]{renderingTypes, new SiddhiDataProviderConfig(), renderingHints,
                 providerDescription});
     }
@@ -118,8 +127,10 @@ public class SiddhiProvider extends AbstractDataProvider {
         Event[] events = siddhiAppRuntime.query(siddhiDataProviderConfig.getQueryData().getAsJsonObject().get
                 (QUERY).getAsString());
         ArrayList<Object[]> data = new ArrayList<>();
-        for (Event event : events) {
-            data.add(event.getData());
+        if (events != null) {
+            for (Event event : events) {
+                data.add(event.getData());
+            }
         }
         publishToEndPoint(data, sessionId, topic);
     }
@@ -170,7 +181,10 @@ public class SiddhiProvider extends AbstractDataProvider {
      * @param dataType String data type name provided by the result set metadata
      * @return String metadata type
      */
-    private DataSetMetadata.Types getMetadataTypes(String dataType) {
+    private DataSetMetadata.Types getMetadataTypes(String columnName, String dataType) {
+        if (this.timeColumns.contains(columnName.toUpperCase(Locale.ENGLISH))) {
+            return DataSetMetadata.Types.TIME;
+        }
         if (Arrays.asList(linearTypes).contains(dataType.toUpperCase(Locale.ENGLISH))) {
             return DataSetMetadata.Types.LINEAR;
         } else if (Arrays.asList(ordinalTypes).contains(dataType.toUpperCase(Locale

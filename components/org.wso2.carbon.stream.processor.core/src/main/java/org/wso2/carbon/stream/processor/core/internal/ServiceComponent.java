@@ -28,27 +28,27 @@ import org.osgi.service.component.annotations.ReferencePolicy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.wso2.carbon.analytics.permissions.PermissionManager;
-import org.wso2.carbon.analytics.permissions.PermissionProvider;
 import org.wso2.carbon.cluster.coordinator.service.ClusterCoordinator;
 import org.wso2.carbon.config.ConfigurationException;
 import org.wso2.carbon.config.provider.ConfigProvider;
+import org.wso2.carbon.databridge.commons.ServerEventListener;
 import org.wso2.carbon.datasource.core.api.DataSourceService;
 import org.wso2.carbon.kernel.CarbonRuntime;
 import org.wso2.carbon.kernel.config.model.CarbonConfiguration;
 import org.wso2.carbon.siddhi.metrics.core.SiddhiMetricsFactory;
 import org.wso2.carbon.siddhi.metrics.core.internal.service.MetricsServiceComponent;
 import org.wso2.carbon.stream.processor.common.EventStreamService;
-import org.wso2.carbon.stream.processor.core.SiddhiAppRuntimeService;
 import org.wso2.carbon.stream.processor.common.utils.config.FileConfigManager;
 import org.wso2.carbon.stream.processor.core.DeploymentMode;
+import org.wso2.carbon.stream.processor.common.HAStateChangeListener;
 import org.wso2.carbon.stream.processor.core.NodeInfo;
+import org.wso2.carbon.stream.processor.common.SiddhiAppRuntimeService;
 import org.wso2.carbon.stream.processor.core.distribution.DistributionService;
 import org.wso2.carbon.stream.processor.core.ha.HAManager;
 import org.wso2.carbon.stream.processor.core.ha.exception.HAModeException;
 import org.wso2.carbon.stream.processor.core.ha.util.CoordinationConstants;
 import org.wso2.carbon.stream.processor.core.internal.beans.DeploymentConfig;
 import org.wso2.carbon.stream.processor.core.internal.util.SiddhiAppProcessorConstants;
-import org.wso2.carbon.stream.processor.core.persistence.FileSystemPersistenceStore;
 import org.wso2.carbon.stream.processor.core.persistence.PersistenceManager;
 import org.wso2.carbon.stream.processor.core.persistence.beans.PersistenceConfigurations;
 import org.wso2.carbon.stream.processor.core.persistence.exception.PersistenceStoreConfigurationException;
@@ -353,17 +353,6 @@ public class ServiceComponent {
                     throw new HAModeException("More than two nodes can not be used in the minimum HA mode. " +
                             "Use another clustering mode, change the groupId or disable clustering.");
                 }
-
-                if (deploymentConfig.getLiveSync().isEnabled()) {
-                    String advertisedHost = deploymentConfig.getLiveSync().getAdvertisedHost();
-                    int advertisedPort = deploymentConfig.getLiveSync().getAdvertisedPort();
-
-                    if (("").equals(advertisedHost) || advertisedPort == 0) {
-                        throw new ConfigurationException("Two Node Minimum HA live sync has been enabled but " +
-                                CoordinationConstants.ADVERTISED_HOST + " or " + CoordinationConstants.ADVERTISED_PORT
-                                + " has not been set in deployment.yaml");
-                    }
-                }
                 log.info("WSO2 Stream Processor Starting in Two Node Minimum HA Deployment");
 
                 String nodeId = configProvider.getConfigurationObject(CarbonConfiguration.class).getId();
@@ -421,6 +410,58 @@ public class ServiceComponent {
 
     protected void unsetPermissionManager(PermissionManager permissionManager) {
         StreamProcessorDataHolder.setPermissionProvider(null);
+    }
+
+    /**
+     * Get the ServerEventListener service.
+     * This is the bind method that gets called for ServerEventListener service
+     * registration that satisfy the policy.
+     *
+     * @param serverEventListener the server listeners that is registered as a service.
+     */
+    @Reference(
+            name = "org.wso2.carbon.databridge.commons.ServerEventListener",
+            service = ServerEventListener.class,
+            cardinality = ReferenceCardinality.MULTIPLE,
+            policy = ReferencePolicy.DYNAMIC,
+            unbind = "unregisterServerListener"
+    )
+    protected void registerServerListener(ServerEventListener serverEventListener) {
+        StreamProcessorDataHolder.setServerListener(serverEventListener);
+        if(StreamProcessorDataHolder.getHAManager() != null){
+            if(StreamProcessorDataHolder.getHAManager().isActiveNode()) {
+                serverEventListener.start();
+            }
+        }else {
+            serverEventListener.start();
+        }
+
+    }
+
+    protected void unregisterServerListener(ServerEventListener serverEventListener) {
+        StreamProcessorDataHolder.removeServerListener(serverEventListener);
+    }
+
+    /**
+     * Get the HAStateChangeListener service.
+     * This is the bind method that gets called for HAStateChangeListener service
+     * registration that satisfy the policy.
+     *
+     * @param haStateChangeListener the ha state change server listeners that is registered as a service.
+     */
+    @Reference(
+            name = "org.wso2.carbon.stream.processor.common.HAStateChangeListener",
+            service = HAStateChangeListener.class,
+            cardinality = ReferenceCardinality.MULTIPLE,
+            policy = ReferencePolicy.DYNAMIC,
+            unbind = "unregisterHAStateChangeListener"
+    )
+    protected void registerHAStateChangeListener(HAStateChangeListener haStateChangeListener) {
+        StreamProcessorDataHolder.setHAStateChangeListener(haStateChangeListener);
+    }
+
+    protected void unregisterHAStateChangeListener(HAStateChangeListener haStateChangeListener) {
+        StreamProcessorDataHolder.removeHAStateChangeListener(haStateChangeListener);
     }
 
 }
