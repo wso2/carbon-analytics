@@ -53,7 +53,9 @@ public class StreamConfig extends SiddhiElementConfig {
         return attributeList;
     }
 
-    public List<Annotation> getAnnotationListObjects() { return  annotationListObjects; }
+    public List<Annotation> getAnnotationListObjects() {
+        return  annotationListObjects;
+    }
 
     public void setAnnotationListObjects(List<Annotation> annotationListObjects) {
         this.annotationListObjects = annotationListObjects;
