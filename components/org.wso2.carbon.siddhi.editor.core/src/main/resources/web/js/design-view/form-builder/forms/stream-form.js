@@ -543,7 +543,7 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'stream', 'designView
             var name = clickedElement.getName();
             //load the saved attributes
             var savedAttributes = clickedElement.getAttributeList();
-            
+
             //load the saved annotations
             var savedAnnotations = clickedElement.getAnnotationListObjects();
             var annotations = [];
@@ -575,9 +575,9 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'stream', 'designView
                         annotations.push(savedAnnotation)
                     }
                 });
-
-                if (!foundPredefined)
+                if (!foundPredefined) {
                     annotations.push(predefinedAnnotation)
+                }
             });
 
             $('#streamName').val(name);
@@ -585,7 +585,7 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'stream', 'designView
             var wrappedHtml = attributeFormTemplate(savedAttributes);
             $('#define-attribute').html(wrappedHtml);
 
-			//to select the options(type) of the saved attributes
+            //to select the options(type) of the saved attributes
             var i = 0;
             $('.attribute .attr-content').each(function () {
                 $(this).find('.attr-type option').filter(function () {
