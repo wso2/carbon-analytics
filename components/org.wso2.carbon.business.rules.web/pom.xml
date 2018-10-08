@@ -125,10 +125,6 @@
             </resource>
             <resource>
                 <directory>${basedir}/public/locales</directory>
-                <includes>
-                    <include>en.json</include>
-                    <include>fr.json</include>
-                </includes>
                 <targetPath>locales</targetPath>
             </resource>
         </resources>
