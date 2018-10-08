@@ -111,7 +111,7 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'stream', 'designView
                 var predefinedObject = isPredefinedAnnotation(predefinedAnnotationList, node_info.text.trim())
                 if (predefinedObject != null) {
                     //check if predefined annotation is mandatory or optional and checked
-                    if ((predefinedObject.isMandatory == "true") || (predefinedObject.isMandatory == "false" && node_info
+                    if ((predefinedObject.isMandatory) || (!predefinedObject.isMandatory && node_info
                         .state.checked == true)) {
                         //validate the elements of the jstree predefined Annotations
                         for (var jsTreePredefinedAnnotationElement of node_info.children) {
@@ -129,7 +129,7 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'stream', 'designView
                             //traverse through the predefined object's element to check if it is mandatory
                             for (var predefinedObjectElement of predefinedObject.elements) {
                                 if (annotation_key_info.text.trim() == predefinedObjectElement.key) {
-                                    if (predefinedObjectElement.isMandatory == "true") {
+                                    if (predefinedObjectElement.isMandatory) {
                                         if (annotation_value_info.text.trim() == "") {
                                             DesignViewUtils.prototype.errorAlert("Propery '" + predefinedObjectElement.key +
                                                 "' is mandaory");
@@ -139,7 +139,6 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'stream', 'designView
                                     }
                                 }
                             }
-
                         }
                         annotationNodes.push(jsTreeAnnotation)
                     }
@@ -187,7 +186,6 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'stream', 'designView
         var traverseChildAnnotations = function (children, annotationObject) {
 
             children.forEach(function (node) {
-
                 node_info = $('#annotation-div').jstree("get_node", node);
                 //if the child is a sub annotation
                 if ((node_info.original != undefined && node_info.original.class == "annotation") ||
@@ -376,8 +374,8 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'stream', 'designView
             var self = this;
             var propertyDiv = $('<div id="property-header"><h3>Stream Configuration</h3></div>' +
                 '<div id="stream-form"> <h3>Name: </h3> <input type="text" id="streamName"> <div ' +
-                'id="define-attribute"></div><div id="define-annotation"></div>' +
-                '<br><button id="submit" type="button" class="btn btn-default">Submit </button></div>');
+                'id="define-attribute"></div><button id="submit" type="button" class="btn toggle-view-button">Submit' +
+                '</button><div id="define-annotation"> </div> </div>');
             formContainer.append(propertyDiv);
             self.designViewContainer.addClass('disableContainer');
             self.toggleViewButton.addClass('disableContainer');
@@ -385,7 +383,7 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'stream', 'designView
             var predefinedAnnotationList = self.configurationData.application.config.stream_predefined_annotations
 
             var attributeFormTemplate = Handlebars.compile($('#attribute-form-template').html());
-            var wrappedHtml = attributeFormTemplate("");
+            var wrappedHtml = attributeFormTemplate([{ name: "", type: "string" }]);
             $('#define-attribute').html(wrappedHtml);
 
             var raw_partial = document.getElementById('recursiveAnnotationPartial').innerHTML;
@@ -528,8 +526,8 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'stream', 'designView
             var self = this;
             var propertyDiv = $('<div id="property-header"><h3>Stream Configuration</h3></div>' +
                 '<div id="stream-form"> <h3>Name: </h3> <input type="text" id="streamName"> <div ' +
-                'id="define-attribute"></div><div id="define-annotation"> </div>' +
-                '<br><button id="submit" type="button" class="btn btn-default">Submit </button></div>');
+                'id="define-attribute"></div><button id="submit" type="button" class="btn toggle-view-button">Submit' +
+                '</button><div id="define-annotation"> </div> </div>');
             formContainer.append(propertyDiv);
             self.designViewContainer.addClass('disableContainer');
             self.toggleViewButton.addClass('disableContainer');
@@ -545,15 +543,7 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'stream', 'designView
             var name = clickedElement.getName();
             //load the saved attributes
             var savedAttributes = clickedElement.getAttributeList();
-            var attributes = [];
-            _.forEach(savedAttributes, function (savedAttribute) {
-                var attributeObject = {
-                    name: savedAttribute.getName(),
-                    type: (savedAttribute.getType()).toLowerCase()
-                };
-                attributes.push(attributeObject);
-            });
-
+            
             //load the saved annotations
             var savedAnnotations = clickedElement.getAnnotationListObjects();
             var annotations = [];
@@ -564,20 +554,26 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'stream', 'designView
                 _.forEach(savedAnnotations, function (savedAnnotation) {
                     if (savedAnnotation.name == predefinedAnnotation.name) {
                         //if an optional annotation is found push it to the checkedAnnotations[]
-                        checkedAnnotations.push(savedAnnotation.name);
+                        if (!predefinedAnnotation.isMandatory) {
+                            checkedAnnotations.push(savedAnnotation.name);
+                        }
                         foundPredefined = true;
                         _.forEach(predefinedAnnotation.elements, function (predefinedAnnotationElement) {
                             _.forEach(savedAnnotation.elements, function (savedAnnotationElement) {
                                 if (predefinedAnnotationElement.key == savedAnnotationElement.key) {
                                     //if an optional property is found push it to the checkedAnnotations[]
-                                    checkedAnnotations.push(savedAnnotationElement.key);
+                                    if (!predefinedAnnotationElement.isMandatory) {
+                                        checkedAnnotations.push(savedAnnotationElement.key);
+                                    }
                                     predefinedAnnotationElement.value = savedAnnotationElement.value
                                 }
                             })
                         })
                         annotations.push(predefinedAnnotation)
                     }
-                    else { annotations.push(savedAnnotation) }
+                    else {
+                        annotations.push(savedAnnotation)
+                    }
                 });
 
                 if (!foundPredefined)
@@ -586,8 +582,17 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'stream', 'designView
 
             $('#streamName').val(name);
             var attributeFormTemplate = Handlebars.compile($('#attribute-form-template').html());
-            var wrappedHtml = attributeFormTemplate(attributes);
+            var wrappedHtml = attributeFormTemplate(savedAttributes);
             $('#define-attribute').html(wrappedHtml);
+
+			//to select the options(type) of the saved attributes
+            var i = 0;
+            $('.attribute .attr-content').each(function () {
+                $(this).find('.attr-type option').filter(function () {
+                    return ($(this).text() == (savedAttributes[i].getType()).toLowerCase());
+                }).prop('selected', true);
+                i++;
+            });
 
             var raw_partial = document.getElementById('recursiveAnnotationPartial').innerHTML;
             Handlebars.registerPartial('recursiveAnnotation', raw_partial);

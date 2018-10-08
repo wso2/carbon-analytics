@@ -1015,23 +1015,6 @@
                 <div class="attr-content">
                     <input type="text" value="{{name}}" class="attr-name"/> &nbsp;
                     <select class="attr-type">
-                        <option value="{{type}}" hidden="hidden">{{type}}</option>
-                        <option value="string" select="selected">string</option>
-                        <option value="int">int</option>
-                        <option value="long">long</option>
-                        <option value="float">float</option>
-                        <option value="double">double</option>
-                        <option value="bool">bool</option>
-                        <option value="object">object</option>
-                    </select>
-                </div>
-                <div class="attr-nav"></div>
-            </li>
-            {{else}}
-            <li class="attribute">
-                <div class="attr-content">
-                    <input type="text" class="attr-name"/> &nbsp;
-                    <select class="attr-type">
                         <option value="string">string</option>
                         <option value="int">int</option>
                         <option value="long">long</option>
@@ -1046,8 +1029,7 @@
             {{/each}}
         </div>
     </ul>
-    <br>
-    <button id="btn-add-attribute" class="btn btn-default"> + Attribute</button> <br> <br>
+    <br> <button id="btn-add-attribute" class="btn btn-default"> + Attribute</button> <br> <br>
 
 </script>
 
@@ -1055,15 +1037,13 @@
 
     <h3>Annotations</h3>
     <div id="annotation-div">
-
         {{#if this}}
         <ul>
             {{#each this}}
-            {{> recursiveAnnotation this}}
+                {{> recursiveAnnotation this}}
             {{/each}}
         </ul>
         {{/if}}
-
     </div>
     <br>
     <button id="btn-add-annotation" class="btn btn-default"> + Annotation</button>
@@ -1073,7 +1053,7 @@
 </script>
 
 <script id="recursiveAnnotationPartial" type="text/template">
-    {{#if class}}
+    {{#if isPredefined}}
     <li data-jstree='{"icon":"/editor/commons/images/annotation.png"}' class="{{class}}">{{name}}
         <ul>
             {{#each elements}}
@@ -1084,14 +1064,6 @@
                 </ul>
             </li>
             {{/each}}
-
-            {{#if annotations}}
-                {{#each annotations}}
-                    {{> recursiveAnnotation this}}
-                {{/each}}
-            {{/if}}
-        </ul>
-    </li>
     {{else}}
     <li data-jstree='{"icon":"/editor/commons/images/annotation.png"}' class="annotation">{{name}}
         <ul>
@@ -1103,6 +1075,7 @@
                 </ul>
             </li>
             {{/each}}
+    {{/if}}
 
             {{#if annotations}}
                 {{#each annotations}}
@@ -1111,7 +1084,6 @@
             {{/if}}
         </ul>
     </li>
-    {{/if}}
 
 </script>
 
@@ -1400,27 +1372,28 @@
             },
             stream_predefined_annotations: [
             {
+                isPredefined: true,
                 name: 'Async',
                 class: 'predefined-annotation optional-annotation',
-                isMandatory: 'false',
+                isMandatory: false,
                 elements: [
                     {
                         key: 'buffer.size',
                         value: '256',
                         class: 'predefined-key mandatory-key',
-                        isMandatory: 'true'
+                        isMandatory: true
                     },
                     {
                         key: 'workers',
                         value: '2',
                         class: 'predefined-key mandatory-key',
-                        isMandatory: 'true'
+                        isMandatory: true
                     },
                     {
                         key: 'batch.size.max',
                         value: '5',
                         class: 'predefined-key mandatory-key',
-                        isMandatory: 'true'
+                        isMandatory: true
                     },
                 ]
             }

@@ -656,3 +656,10 @@ a.list-group-item, button.list-group-item {
 .mandatory-annotation > a > i.jstree-checkbox, .mandatory-annotation > .jstree-clicked > i.jstree-checkbox  {
 	display:none;
 }
+
+#define-annotation {
+	position: absolute;
+	width: 300px;
+	left: 900px;
+	top: -50px;
+}
