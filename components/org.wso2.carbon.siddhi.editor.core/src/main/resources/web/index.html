@@ -1028,7 +1028,8 @@
             {{/each}}
         </div>
     </ul>
-    <br> <button id="btn-add-attribute" class="btn btn-default"> + Attribute</button> <br> <br>
+    <br>
+    <button id="btn-add-attribute" class="btn btn-default"> + Attribute</button> <br> <br>
 </script>
 
 <script id="annotation-form-template" type="text/x-handlebars-template">
@@ -1051,36 +1052,37 @@
 
 <script id="recursiveAnnotationPartial" type="text/template">
     {{#if isPredefined}}
-    <li data-jstree='{"icon":"/editor/commons/images/annotation.png"}' class="{{class}}">{{name}}
-        <ul>
-            {{#each elements}}
-            <li data-jstree='{"icon":"/editor/commons/images/properties.png"}' class="{{class}}">{{key}}
-                <ul>
-                    <li data-jstree='{"icon":"/editor/commons/images/value.png"}' class="annotation-value">{{value}}
-                    </li>
-                </ul>
-            </li>
-            {{/each}}
+        <li data-jstree='{"icon":"/editor/commons/images/annotation.png"}' class="{{class}}">{{name}}
+            <ul>
+                {{#each elements}}
+                <li data-jstree='{"icon":"/editor/commons/images/properties.png"}' class="{{class}}">{{key}}
+                    <ul>
+                        <li data-jstree='{"icon":"/editor/commons/images/value.png"}' class="annotation-value">{{value}}
+                        </li>
+                    </ul>
+                </li>
+                {{/each}}
     {{else}}
-    <li data-jstree='{"icon":"/editor/commons/images/annotation.png"}' class="annotation">{{name}}
-        <ul>
-            {{#each elements}}
-            <li data-jstree='{"icon":"/editor/commons/images/properties.png"}' class="annotation-key">{{key}}
-                <ul>
-                    <li data-jstree='{"icon":"/editor/commons/images/value.png"}' class="annotation-value">{{value}}
-                    </li>
-                </ul>
-            </li>
-            {{/each}}
+        <li data-jstree='{"icon":"/editor/commons/images/annotation.png"}' class="annotation">{{name}}
+            <ul>
+                {{#each elements}}
+                <li data-jstree='{"icon":"/editor/commons/images/properties.png"}' class="annotation-key">{{key}}
+                    <ul>
+                        <li data-jstree='{"icon":"/editor/commons/images/value.png"}' class="annotation-value">
+                            {{value}}
+                        </li>
+                    </ul>
+                </li>
+                {{/each}}
     {{/if}}
 
-            {{#if annotations}}
-                {{#each annotations}}
-                    {{> recursiveAnnotation this}}
-                {{/each}}
-            {{/if}}
-        </ul>
-    </li>
+        {{#if annotations}}
+            {{#each annotations}}
+                {{> recursiveAnnotation this}}
+            {{/each}}
+        {{/if}}
+            </ul>
+        </li>
 </script>
 
 
@@ -1396,7 +1398,7 @@
             ],
             services:   {
                 workspace:  {
-                       endpoint: window.location.protocol + "//" + window.location.host + '/editor/workspace'
+                   endpoint: window.location.protocol + "//" + window.location.host + '/editor/workspace'
                 }
             },
             alerts: {
