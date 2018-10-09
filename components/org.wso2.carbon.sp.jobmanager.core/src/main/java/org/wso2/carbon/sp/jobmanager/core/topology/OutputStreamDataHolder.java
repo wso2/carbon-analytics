@@ -32,6 +32,7 @@ public class OutputStreamDataHolder {
     private EventHolder eventHolderType;
     private List<PublishingStrategyDataHolder> publishingStrategyList;
     private boolean isUserGiven;
+    private boolean isInnerGroupStream;
 
     public OutputStreamDataHolder(String streamName, String streamDefinition, EventHolder eventHolderType,
                                   boolean isUserGiven) {
@@ -40,6 +41,7 @@ public class OutputStreamDataHolder {
         this.eventHolderType = eventHolderType;
         this.isUserGiven = isUserGiven;
         this.publishingStrategyList = new ArrayList<>();
+        isInnerGroupStream = false;
     }
 
     public String getStreamDefinition() {
@@ -68,6 +70,14 @@ public class OutputStreamDataHolder {
 
     public EventHolder getEventHolderType() {
         return eventHolderType;
+    }
+
+    public boolean isInnerGroupStream() {
+        return isInnerGroupStream;
+    }
+
+    public void setInnerGroupStream(boolean innerGroupStream) {
+        isInnerGroupStream = innerGroupStream;
     }
 }
 

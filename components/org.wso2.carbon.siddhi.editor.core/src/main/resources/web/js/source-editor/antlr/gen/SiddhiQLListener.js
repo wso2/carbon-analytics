@@ -722,12 +722,30 @@ SiddhiQLListener.prototype.exitLimit = function (ctx) {
 };
 
 
+// Enter a parse tree produced by SiddhiQLParser#offset.
+SiddhiQLListener.prototype.enterOffset = function (ctx) {
+};
+
+// Exit a parse tree produced by SiddhiQLParser#offset.
+SiddhiQLListener.prototype.exitOffset = function (ctx) {
+};
+
+
 // Enter a parse tree produced by SiddhiQLParser#query_output.
 SiddhiQLListener.prototype.enterQuery_output = function (ctx) {
 };
 
 // Exit a parse tree produced by SiddhiQLParser#query_output.
 SiddhiQLListener.prototype.exitQuery_output = function (ctx) {
+};
+
+
+// Enter a parse tree produced by SiddhiQLParser#store_query_output.
+SiddhiQLListener.prototype.enterStore_query_output = function (ctx) {
+};
+
+// Exit a parse tree produced by SiddhiQLParser#store_query_output.
+SiddhiQLListener.prototype.exitStore_query_output = function (ctx) {
 };
 
 

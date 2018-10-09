@@ -50,6 +50,7 @@ import org.wso2.siddhi.query.compiler.SiddhiCompiler;
 
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -138,8 +139,54 @@ public class SiddhiTopologyCreatorImpl implements SiddhiTopologyCreator {
         //prior to assigning publishing strategies checking if a user given source stream is used in multiple execGroups
         checkUserGivenSourceDistribution();
         assignPublishingStrategyOutputStream();
+        cleanInnerGroupStreams(siddhiTopologyDataHolder.getSiddhiQueryGroupMap().values());
+        if (log.isDebugEnabled()) {
+            log.debug("Topology was created with " + siddhiTopologyDataHolder.getSiddhiQueryGroupMap().values().size
+                    () + " query groups. Following are the partial Siddhi apps.");
+            for (SiddhiQueryGroup debugSiddhiQueryGroup : siddhiTopologyDataHolder.getSiddhiQueryGroupMap().values()) {
+                log.debug(debugSiddhiQueryGroup.getSiddhiApp());
+            }
+        }
         return new SiddhiTopology(siddhiTopologyDataHolder.getSiddhiAppName(), new ArrayList<>
                 (siddhiTopologyDataHolder.getSiddhiQueryGroupMap().values()), transportChannelCreationEnabled);
+    }
+
+    /**
+     * Clean input and output streams of the group by removing streams that are only used within that group and
+     * validate partitions within groups with parallelism greater than one.
+     * @param siddhiQueryGroups Collection of Siddhi Query Groups
+     */
+    private void cleanInnerGroupStreams(Collection<SiddhiQueryGroup> siddhiQueryGroups) {
+        for (SiddhiQueryGroup siddhiQueryGroup : siddhiQueryGroups) {
+            for (InputStreamDataHolder inputStreamDataHolder : siddhiQueryGroup.getInputStreams().values()) {
+                if (inputStreamDataHolder.isInnerGroupStream()) {
+                    for (ExecutionElement element : siddhiApp.getExecutionElementList()) {
+                        if(element instanceof Partition && ((Partition) element).getQueryList().get(0).getInputStream()
+                                .getAllStreamIds().contains(inputStreamDataHolder.getStreamName()) &&
+                                siddhiQueryGroup.getParallelism() > SiddhiTopologyCreatorConstants.DEFAULT_PARALLEL) {
+                            throw new SiddhiAppValidationException("Partial Siddhi App " +
+                                                                           siddhiQueryGroup.getName() + " has a "
+                                                                           + "partition which consumes from another "
+                                                                           + "query inside the same query group with "
+                                                                           + "parallelism greater than one. "
+                                                                           + "Partitions can only have parallelism "
+                                                                           + "greater than one if and only if they "
+                                                                           + "are consuming from user given stream or"
+                                                                           + " stream from another group. Hence "
+                                                                           + "failing the deployment of Siddhi App.");
+
+                        }
+                    }
+                }
+            }
+            siddhiQueryGroup.getInputStreams()
+                    .entrySet().removeIf(stringInputStreamDataHolderEntry -> stringInputStreamDataHolderEntry.getValue()
+                    .isInnerGroupStream());
+            siddhiQueryGroup.getOutputStreams()
+                    .entrySet().removeIf(
+                    stringOutputStreamDataHolderEntry -> stringOutputStreamDataHolderEntry.getValue()
+                            .isInnerGroupStream());
+        }
     }
 
 
@@ -340,7 +387,7 @@ public class SiddhiTopologyCreatorImpl implements SiddhiTopologyCreator {
             streamDefinition = ExceptionUtil.getContext(queryContextStartIndex, queryContextEndIndex,
                     siddhiTopologyDataHolder.getUserDefinedSiddhiApp());
             isUserGivenTransport = isUserGivenTransport(streamDefinition);
-            if (!isUserGivenTransport) {
+            if (!isUserGivenTransport && !siddhiApp.getTriggerDefinitionMap().containsKey(streamId)) {
                 streamDefinition = "${" + streamId + "}" + streamDefinition;
             }
             streamDataHolder =
@@ -675,9 +722,11 @@ public class SiddhiTopologyCreatorImpl implements SiddhiTopologyCreator {
 
                 if (outputStreamDataHolder.getEventHolderType().equals(EventHolder.STREAM)) {
                     Map<String, List<SubscriptionStrategyDataHolder>> fieldGroupingSubscriptions = new HashMap<>();
+                    boolean isInnerGroupStream = true;
                     for (SiddhiQueryGroup siddhiQueryGroup2 : siddhiQueryGroupsList.subList(i + 1,
                             siddhiQueryGroupsList.size())) {
                         if (siddhiQueryGroup2.getInputStreams().containsKey(streamId)) {
+                            isInnerGroupStream = false;
                             InputStreamDataHolder inputStreamDataHolder = siddhiQueryGroup2.getInputStreams()
                                     .get(streamId);
 
@@ -719,6 +768,13 @@ public class SiddhiTopologyCreatorImpl implements SiddhiTopologyCreator {
                             }
 
                         }
+                    }
+                    if (isInnerGroupStream && !outputStreamDataHolder.isUserGiven()) {
+                        siddhiQueryGroup1.getOutputStreams().get(streamId).setInnerGroupStream(true);
+                        if (siddhiQueryGroup1.getInputStreams().get(streamId) != null) {
+                            siddhiQueryGroup1.getInputStreams().get(streamId).setInnerGroupStream(true);
+                        }
+
                     }
                     for (Entry<String, List<SubscriptionStrategyDataHolder>> subscriptionParentEntry :
                             fieldGroupingSubscriptions.entrySet()) {
