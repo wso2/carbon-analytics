@@ -23,6 +23,8 @@ import DashboardUtils from '../utils/DashboardUtils';
 import ChartCard from '../common/ChartCard';
 // Material UI
 import {Card, CardHeader, CardMedia, Divider} from 'material-ui';
+// Localization
+import { FormattedMessage } from 'react-intl';
 
 const metadata = {
     names: ['Time', 'Heap Init', 'Heap Used', 'Heap Committed', 'Heap Max', 'Heap Usage'],
@@ -93,9 +95,11 @@ export default class HeapMemory extends React.Component {
                         />
                         <Divider/>
                         <CardMedia>
-                            <div style={{backgroundColor: '#131313', textAlign: 'center', lineHeight: '60px',
-                                color: '#9c9898'}}>
-                                No Data Available
+                            <div style={{
+                                backgroundColor: '#131313', textAlign: 'center', lineHeight: '60px',
+                                color: '#9c9898'
+                            }}>
+                                <FormattedMessage id='noData' defaultMessage='No Data Available' />
                             </div>
                         </CardMedia>
                     </Card>

@@ -25,6 +25,7 @@ import getMuiTheme from 'material-ui/styles/getMuiTheme';
 import {Card, CardText, CardTitle, RaisedButton} from 'material-ui';
 import {Link} from 'react-router-dom';
 import FormPanel from '../common/FormPanel';
+import { FormattedMessage } from 'react-intl';
 
 const muiTheme = getMuiTheme(darkBaseTheme);
 const buttonStyle = {position: 'center', width: '15%', fontSize: '12px', backgroundColor: '#f17b31'};
@@ -58,12 +59,12 @@ class Error403 extends Component {
                     <FormPanel title={""} width={650}>
                         <div style={errorContainerStyles}>
                             <i class="fw fw-security fw-inverse fw-5x"></i>
-                            <h1 style={errorTitleStyles}>Page Forbidden!</h1>
-                            <text style={errorMessageStyles}>You have no permission to access this page.</text>
+                            <h1 style={errorTitleStyles}><FormattedMessage id='error.403.pageForbidden' defaultMessage='Page Forbidden!' /></h1>
+                            <text style={errorMessageStyles}><FormattedMessage id='error.403.description' defaultMessage='You have no permission to access this page.' /></text>
                             <br/>
                             <br/>
                             <Link to={`${window.contextPath}/logout`}>
-                                <RaisedButton backgroundColor='#f17b31' style={buttonStyle} label="Login"/>
+                                <RaisedButton backgroundColor='#f17b31' style={buttonStyle} label={<FormattedMessage id='error.403.login' defaultMessage='Login' />} />
                             </Link>
                         </div>
                     </FormPanel>

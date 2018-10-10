@@ -29,6 +29,8 @@ import AuthManager from './utils/AuthManager';
 import FormPanel from '../common/FormPanel';
 import Header from '../common/Header';
 import '../../public/css/dashboard.css';
+//Localization
+import { FormattedMessage } from 'react-intl';
 
 const muiTheme = getMuiTheme(darkBaseTheme);
 const titleStyle = {textAlign: 'center', marginTop: 50, color: '#9c9898'};
@@ -102,8 +104,8 @@ export default class Login extends Component {
             .authenticate(this.state.username, this.state.password, this.state.rememberMe)
             .then(() => this.setState({authenticated: true}))
             .catch((error) => {
-                const errorMessage = error.response && error.response.status === 401 ? "Invalid username/password!":
-                    "Unknown error occurred!";
+                const errorMessage = error.response && error.response.status === 401 ? thisn.context.intl.formatMessage({ id: 'login.invalidUsername', defaultMessage: 'Invalid username/password!' }) :
+                    this.context.intl.formatMessage({ id: 'login.unknownError', defaultMessage: 'Unknown error occurred!' });
                 this.setState({
                     username: '',
                     password: '',
@@ -130,14 +132,15 @@ export default class Login extends Component {
             <MuiThemeProvider muiTheme={muiTheme}>
                 <div className={'login-container'}>
                     <Header title={window.contextPath.substr(1)} hideUserSettings/>
-                    <FormPanel title={"Login"}
-                               onSubmit={this.authenticate}>
+                    <FormPanel 
+                        title={<FormattedMessage id='login.title' defaultMessage='Login' />} 
+                        onSubmit={this.authenticate}>                  
                         <TextField
                             floatingLabelFocusStyle={{color: '#f17b31'}}
                             underlineFocusStyle={{borderColor: '#f17b31'}}
                             //style={textField}
                             fullWidth
-                            floatingLabelText={"Username"}
+                            floatingLabelText={<FormattedMessage id='login.username' defaultMessage='Username' />}
                             autoComplete="off"
                             value={this.state.username}
                             onChange={(e) => {
@@ -152,7 +155,7 @@ export default class Login extends Component {
                             fullWidth
                             type='password'
                             autoComplete='off'
-                            floatingLabelText={'Password'}
+                            floatingLabelText={<FormattedMessage id='login.password' defaultMessage='Password' />}
                             floatingLabelFocusStyle={{color: '#f17b31'}}
                             underlineFocusStyle={{borderColor: '#f17b31'}}
                             //style={textField}
@@ -166,7 +169,7 @@ export default class Login extends Component {
                         />
                         <br/>
                         <Checkbox
-                            label={'Remember Me'}
+                            label={<FormattedMessage id='login.rememberMe' defaultMessage='Remember Me' />}
                             checked={this.state.rememberMe}
                             iconStyle={{fill: '#f17b31'}}
                             onCheck={(e, checked) => {
@@ -181,7 +184,7 @@ export default class Login extends Component {
                         <RaisedButton
                             type='submit'
                             disabled={this.state.username === '' || this.state.password === ''}
-                            label={'Login'}
+                            label={<FormattedMessage id='login.loginButton' defaultMessage='Login' />}
                             style={buttonStyle}
                             backgroundColor='#f17b31'
                             disabledBackgroundColor='rgb(51, 51, 51)'
@@ -190,26 +193,26 @@ export default class Login extends Component {
                         <br/>
                         <div style={styles.cookiePolicy}>
                             <div>
-                                After a successful sign in, we use a cookie in your browser to track your session.&nbsp;
-                                You can refer our&nbsp;
+                                <FormattedMessage id='login.cookieMsg' defaultMessage=' After a successful sign in, we use a cookie in your browser to track your session. You can refer our ' />
                                 <a
                                     style={styles.cookiePolicyAnchor}
                                     href='/policies/cookie-policy'
                                     target='_blank'
                                 >
-                                    Cookie Policy
-                                </a> for more details.
+                                    <FormattedMessage id='login.cookiePolicy' defaultMessage='Cookie Policy' />
+                                </a>
+                                <FormattedMessage id='login.formoreDetails' defaultMessage=' for more details.' />
                             </div>
                         </div>
                         <br/>
                         <div style={styles.cookiePolicy}>
                             <div>
-                                By signing in, you agree to our&nbsp;
+                                <FormattedMessage id='login.bysigningUp' defaultMessage='By signing in, you agree to our ' />
                                 <a
                                     style={styles.cookiePolicyAnchor}
                                     href='/policies/privacy-policy'
                                     target='_blank'>
-                                    Privacy Policy
+                                    <FormattedMessage id='login.privacyPolicy' defaultMessage='Privacy Policy' />
                                 </a>.
                             </div>
                         </div>
