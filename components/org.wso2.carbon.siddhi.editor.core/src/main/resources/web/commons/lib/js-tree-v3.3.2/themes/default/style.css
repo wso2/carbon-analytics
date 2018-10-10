@@ -22,7 +22,6 @@
 .jstree-anchor:focus {
   outline: 0;
 }
-.jstree-anchor,
 .jstree-anchor:link,
 .jstree-anchor:visited,
 .jstree-anchor:hover,
@@ -290,7 +289,7 @@
   transition: background-color 0.15s, box-shadow 0.15s;
 }
 .jstree-default .jstree-hovered {
-  background: #e7f4f9;
+  background: black;
   border-radius: 2px;
   box-shadow: inset 0 0 1px #cccccc;
 }
@@ -300,7 +299,8 @@
   box-shadow: inset 0 0 1px #cccccc;
 }
 .jstree-default .jstree-clicked {
-  background: #beebff;
+  background: #5F5B5A;
+  color:black;
   border-radius: 2px;
   box-shadow: inset 0 0 1px #999999;
 }
@@ -327,10 +327,7 @@
   -webkit-filter: grayscale(100%);
   /* Chrome 19+ & Safari 6+ */
 }
-.jstree-default .jstree-search {
-  font-style: italic;
-  color: #8b0000;
-  font-weight: bold;
+.jstree-default .jstree-search   {
 }
 .jstree-default .jstree-no-checkboxes .jstree-checkbox {
   display: none !important;
@@ -896,10 +893,10 @@
     line-height: 40px;
     font-weight: bold;
     font-size: 1.1em;
-    text-shadow: 1px 1px white;
+    text-shadow: 1px 1px black;
   }
   #jstree-dnd.jstree-dnd-responsive > i {
-    background: transparent;
+    background: black;
     width: 40px;
     height: 40px;
   }

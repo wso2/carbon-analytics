@@ -19,14 +19,15 @@
 define(['require', 'log', 'lodash', 'jquery', 'configurationData', 'appData', 'partition', 'query', 'stream', 'table',
         'window', 'trigger', 'aggregation', 'aggregateByTimePeriod', 'windowFilterProjectionQueryInput',
         'queryWindowOrFunction', 'edge', 'querySelect', 'queryOrderByValue', 'queryOutput', 'queryOutputInsert',
-        'queryOutputDelete', 'queryOutputUpdate', 'queryOutputUpdateOrInsertInto', 'attribute', 'joinQueryInput',
-        'joinQuerySource', 'patternOrSequenceQueryInput', 'patternOrSequenceQueryCondition', 'sourceOrSinkAnnotation',
-        'mapAnnotation', 'functionDefinition', 'streamHandler', 'storeAnnotation', 'partitionWith', 'designViewUtils',
-        'payloadOrAttribute'],
+        'queryOutputDelete', 'queryOutputUpdate', 'queryOutputUpdateOrInsertInto', 'attribute','annotationObject',
+        'joinQueryInput','joinQuerySource', 'patternOrSequenceQueryInput', 'patternOrSequenceQueryCondition',
+         'sourceOrSinkAnnotation','mapAnnotation', 'functionDefinition', 'streamHandler', 'storeAnnotation',
+         'partitionWith', 'designViewUtils','payloadOrAttribute'],
     function (require, log, _, $, ConfigurationData, AppData, Partition, Query, Stream, Table, Window, Trigger,
               Aggregation, AggregateByTimePeriod, WindowFilterProjectionQueryInput, QueryWindowOrFunction, Edge,
               QuerySelect, QueryOrderByValue, QueryOutput, QueryOutputInsert, QueryOutputDelete, QueryOutputUpdate,
-              QueryOutputUpdateOrInsertInto, Attribute, JoinQueryInput, JoinQuerySource, PatternOrSequenceQueryInput,
+              QueryOutputUpdateOrInsertInto, Attribute, AnnotationObject, JoinQueryInput, JoinQuerySource,
+              PatternOrSequenceQueryInput,
               PatternOrSequenceQueryCondition, SourceOrSinkAnnotation, MapAnnotation, FunctionDefinition, StreamHandler,
               StoreAnnotation, PartitionWith, DesignViewUtils, PayloadOrAttribute) {
 
@@ -177,6 +178,7 @@ define(['require', 'log', 'lodash', 'jquery', 'configurationData', 'appData', 'p
                 var streamObject = new Stream(stream);
                 addAnnotationsForElement(stream, streamObject);
                 addAttributesForElement(stream, streamObject);
+                addAnnotationObjectForElement(stream, streamObject)
                 streamObject.setId(newIdBeginningPhrase + streamObject.getId());
                 mainObject.addStream(streamObject);
             });
@@ -426,6 +428,14 @@ define(['require', 'log', 'lodash', 'jquery', 'configurationData', 'appData', 'p
                 };
                 mainObject.addEdge(new Edge(edgeOptions));
             });
+        }
+
+        //adds annotation object from a json object for an element object
+        function addAnnotationObjectForElement(element, newElementObject) {
+        	_.forEach(element.annotationListObjects, function (annotation) {
+        		var annotationObject = new AnnotationObject(annotation);
+        		newElementObject.addAnnotationObject(annotationObject)
+        	});
         }
 
         // adds annotations from a json object for an element object

@@ -605,3 +605,61 @@ a.list-group-item, button.list-group-item {
     border: 1px solid #FF0000;
     box-shadow: 0 0 1px 2px #FF0000;
 }
+
+.attr-nav {
+    color: black;
+    position:relative;
+    left: 230px;
+    top: -23px;
+}
+#stream-form{
+	position:absolute;
+}
+
+.attr-type {
+    height:23px;
+}
+
+.attr-content, #streamName{
+    color: black;
+}
+
+#annotation-div {
+	color: white;
+}
+
+.annotation > a > i.jstree-checkbox, .annotation > .jstree-clicked > i.jstree-checkbox,
+.annotation > i.jstree-checkbox   {
+	display:none;
+}
+
+.annotation-key > a > i.jstree-checkbox, .annotation-key > .jstree-clicked > i.jstree-checkbox,
+.annotation-key > i.jstree-checkbox   {
+	display:none;
+}
+.annotation-value > a > i.jstree-checkbox, .annotation-value > .jstree-clicked > i.jstree-checkbox,
+.annotation-value > i.jstree-checkbox   {
+	display:none;
+}
+
+.mandatory-key > a > i.jstree-checkbox, .mandatory-key > .jstree-clicked > i.jstree-checkbox  {
+	display:none;
+}
+
+.mandatory-annotation > a > i.jstree-checkbox, .mandatory-annotation > .jstree-clicked > i.jstree-checkbox  {
+	display:none;
+}
+
+.mandatory-annotation > a.jstree-hovered, .mandatory-key > a.jstree-hovered, .optional-annotation > a.jstree-hovered,
+.optional-key > a.jstree-hovered {
+	cursor: context;
+	background: transparent;
+	border-radius: 0px;
+}
+
+#define-annotation {
+	position: absolute;
+	width: 300px;
+	left: 900px;
+	top: -50px;
+}
