@@ -26,14 +26,14 @@ define(
          */
 
         var AnnotationObject = function (options) {
-			if (options !== undefined) {
-				this.name = options.name;
-				this.elements = options.elements;
-				this.annotations = options.annotations;
-			} else {
-				this.elements = [];
-				this.annotations = [];
-			}
+            if (options !== undefined) {
+                this.name = options.name;
+                this.elements = options.elements;
+                this.annotations = options.annotations;
+            } else {
+                this.elements = [];
+                this.annotations = [];
+            }
         };
 
         AnnotationObject.prototype.getName = function () {
@@ -55,4 +55,3 @@ define(
         return AnnotationObject;
 
     });
-
