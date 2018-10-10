@@ -39,7 +39,7 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'stream', 'designView
             }
         };
 
-        const REGEX = /^([a-zA-Z])$/;
+        const alphabeticValidatorRegex = /^([a-zA-Z])$/;
 
         //attribute delete button action
         var delAttribute = function () {
@@ -125,7 +125,7 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'stream', 'designView
                         isErrorOccurred = true;
                         return;
                     }
-                    if (!REGEX.test(attributeName.charAt(0))) {
+                    if (!alphabeticValidatorRegex.test(attributeName.charAt(0))) {
                         DesignViewUtils.prototype.errorAlert("Attribute name \"" + attributeName + "\" " +
                             "must start with an alphabetic character.");
                         isErrorOccurred = true;
@@ -440,7 +440,7 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'stream', 'designView
                     return;
                 }
                 //to check if stream name starts with an alphabetic character
-                if (!(REGEX).test(streamName.charAt(0))) {
+                if (!(alphabeticValidatorRegex).test(streamName.charAt(0))) {
                     DesignViewUtils.prototype.errorAlert("Stream name \"" + streamName + "\" " +
                         "must start with an alphabetic character.");
                     return;
@@ -666,7 +666,7 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'stream', 'designView
                             "cannot have white space.");
                         return;
                     }
-                    if (!REGEX.test(streamName.charAt(0))) {
+                    if (!alphabeticValidatorRegex.test(streamName.charAt(0))) {
                         DesignViewUtils.prototype.errorAlert("Stream name \"" + streamName + "\" " +
                             "must start with an alphabetic character.");
                         return;
