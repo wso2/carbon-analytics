@@ -104,7 +104,7 @@ export default class Login extends Component {
             .authenticate(this.state.username, this.state.password, this.state.rememberMe)
             .then(() => this.setState({authenticated: true}))
             .catch((error) => {
-                const errorMessage = error.response && error.response.status === 401 ? thisn.context.intl.formatMessage({ id: 'login.invalidUsername', defaultMessage: 'Invalid username/password!' }) :
+                const errorMessage = error.response && error.response.status === 401 ? this.context.intl.formatMessage({ id: 'login.invalidUsername', defaultMessage: 'Invalid username/password!' }) :
                     this.context.intl.formatMessage({ id: 'login.unknownError', defaultMessage: 'Unknown error occurred!' });
                 this.setState({
                     username: '',
