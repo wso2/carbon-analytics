@@ -614,6 +614,7 @@ a.list-group-item, button.list-group-item {
 	color: black;
 	width: 200px;
 }
+
 .attr-type{
     height: 23px;
     color: black;
@@ -621,7 +622,7 @@ a.list-group-item, button.list-group-item {
 
 .reorder-down, .reorder-up, .btn-del-attr{
 	height: 23.5px;
-	margin-bottom: 5px;
+	margin-bottom: -5px;
 }
 
 .attr-nav, .attr-content {
