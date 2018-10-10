@@ -699,7 +699,7 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'stream', 'designView
 
                 var annotationNodes = [];
                 var annotationStringList = [];
-                var annotationObject = [];
+                var annotationObjectList = [];
 
                 if (validatePredefinedAnnotations(predefinedAnnotationList, annotationNodes)) {
                     return;
@@ -708,12 +708,12 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'stream', 'designView
                 clickedElement.clearAnnotationList();
 				clickedElement.clearAnnotationListObjects();
 
-                buildAnnotation(annotationNodes, annotationStringList, annotationObject);
+                buildAnnotation(annotationNodes, annotationStringList, annotationObjectList);
 
                 _.forEach(annotationStringList, function (annotation) {
                     clickedElement.addAnnotation(annotation);
                 });
-                _.forEach(annotationObject, function (annotation) {
+                _.forEach(annotationObjectList, function (annotation) {
                     clickedElement.addAnnotationObject(annotation);
                 });
 
