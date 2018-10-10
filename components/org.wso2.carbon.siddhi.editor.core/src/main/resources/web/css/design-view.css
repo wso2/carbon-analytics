@@ -646,15 +646,15 @@ a.list-group-item, button.list-group-item {
 	display:none;
 }
 
-
-.predefined-annotation > a.jstree-hovered, .predefined-key > a.jstree-hovered{
-	cursor: context-menu;
-	background: transparent;
-	border-radius: 0px;
-}
-
 .mandatory-annotation > a > i.jstree-checkbox, .mandatory-annotation > .jstree-clicked > i.jstree-checkbox  {
 	display:none;
+}
+
+.mandatory-annotation > a.jstree-hovered, .mandatory-key > a.jstree-hovered, .optional-annotation > a.jstree-hovered,
+.optional-key > a.jstree-hovered {
+	cursor: context;
+	background: transparent;
+	border-radius: 0px;
 }
 
 #define-annotation {

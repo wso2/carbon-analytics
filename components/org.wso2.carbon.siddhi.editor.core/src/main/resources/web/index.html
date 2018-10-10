@@ -1051,7 +1051,7 @@
 </script>
 
 <script id="recursiveAnnotationPartial" type="text/template">
-    {{#if isPredefined}}
+    {{#if predefined}}
         <li data-jstree='{"icon":"/editor/commons/images/annotation.png"}' class="{{class}}">{{name}}
             <ul>
                 {{#each elements}}
@@ -1370,27 +1370,27 @@
             },
             stream_predefined_annotations: [
             {
-                isPredefined: true,
+                predefined: true,
                 name: 'Async',
-                class: 'predefined-annotation optional-annotation',
+                class: 'optional-annotation',
                 isMandatory: false,
                 elements: [
                     {
                         key: 'buffer.size',
                         value: '256',
-                        class: 'predefined-key mandatory-key',
+                        class: 'mandatory-key',
                         isMandatory: true
                     },
                     {
                         key: 'workers',
                         value: '2',
-                        class: 'predefined-key mandatory-key',
+                        class: 'mandatory-key',
                         isMandatory: true
                     },
                     {
                         key: 'batch.size.max',
                         value: '5',
-                        class: 'predefined-key mandatory-key',
+                        class: 'mandatory-key',
                         isMandatory: true
                     },
                 ]
