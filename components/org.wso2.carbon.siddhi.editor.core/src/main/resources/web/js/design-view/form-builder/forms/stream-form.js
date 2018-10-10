@@ -567,8 +567,7 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'stream', 'designView
                             })
                         })
                         annotations.push(predefinedAnnotation)
-                    }
-                    else {
+                    } else {
                         annotations.push(savedAnnotation)
                     }
                 });
@@ -706,7 +705,7 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'stream', 'designView
                 }
 
                 clickedElement.clearAnnotationList();
-				clickedElement.clearAnnotationListObjects();
+                clickedElement.clearAnnotationListObjects();
 
                 buildAnnotation(annotationNodes, annotationStringList, annotationObjectList);
 
