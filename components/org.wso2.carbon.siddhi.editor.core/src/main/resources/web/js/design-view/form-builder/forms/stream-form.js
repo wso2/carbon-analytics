@@ -386,10 +386,10 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'stream', 'designView
          */
         StreamForm.prototype.generateDefineForm = function (i, formConsole, formContainer) {
             var self = this;
-            var propertyDiv = $('<div id="property-header"><h3>Stream Configuration</h3></div>' +
-                '<div id="stream-form"> <h3>Name: </h3> <input type="text" id="streamName"> <div ' +
+            var propertyDiv = $('<div class = "stream-form-container"><div id="property-header"><h3>Stream' +
+                'Configuration</h3></div> <h3>Name: </h3> <input type="text" id="streamName"> <div ' +
                 'id="define-attribute"></div><button id="submit" type="button" class="btn toggle-view-button">Submit' +
-                '</button><div id="define-annotation"> </div> </div>');
+                '</button></div> <div class= "stream-form-container" id="define-annotation"> </div>');
             formContainer.append(propertyDiv);
             self.designViewContainer.addClass('disableContainer');
             self.toggleViewButton.addClass('disableContainer');
@@ -414,7 +414,7 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'stream', 'designView
             $("#attribute-div").on('click', '.reorder-down', moveDownAttribute)
             //onload of the attribute div arrange the navigations of the attribute
             $('#attribute-div').ready(changeAtrributeNavigation);
-            $('#stream-form-template').ready(loadAnnotation);
+            $('#annotation-div').ready(loadAnnotation);
 
             var streamName = "";
             // 'Submit' button action
@@ -520,10 +520,10 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'stream', 'designView
         StreamForm.prototype.generatePropertiesForm = function (element, formConsole, formContainer) {
 
             var self = this;
-            var propertyDiv = $('<div id="property-header"><h3>Stream Configuration</h3></div>' +
-                '<div id="stream-form"> <h3>Name: </h3> <input type="text" id="streamName"> <div ' +
+            var propertyDiv = $('<div class= "stream-form-container"><div id="property-header"><h3>Stream' +
+                'Configuration</h3></div> <h3>Name: </h3> <input type="text" id="streamName"> <div ' +
                 'id="define-attribute"></div><button id="submit" type="button" class="btn toggle-view-button">Submit' +
-                '</button><div id="define-annotation"> </div> </div>');
+                '</button></div> <div class = "stream-form-container" id="define-annotation"> </div>');
             formContainer.append(propertyDiv);
             self.designViewContainer.addClass('disableContainer');
             self.toggleViewButton.addClass('disableContainer');
