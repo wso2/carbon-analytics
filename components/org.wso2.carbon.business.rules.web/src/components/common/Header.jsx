@@ -89,9 +89,48 @@ export default class Header extends Component {
         </IconButton>
       </Link>
     );
-
-    if (this.props.hideUserSettings) {
-      return <div />;
+        return (
+            <div>
+                <Toolbar>
+                    {!this.props.hideHomeButton ? (homeButton) : (null)}
+                    <Typography type="body1" style={{ color: 'inherit' }}>
+                        {user.username}
+                    </Typography>
+                    <IconButton
+                        aria-owns={open ? 'menu-appbar' : null}
+                        aria-haspopup="true"
+                        onClick={(event) => {
+                            this.setState({ anchorEl: event.currentTarget });
+                        }}
+                        color="contrast"
+                    >
+                        <AccountCircle />
+                    </IconButton>
+                </Toolbar>
+                <Menu
+                    id="menu-appbar"
+                    anchorEl={this.state.anchorEl}
+                    anchorOrigin={{
+                        vertical: 'top',
+                        horizontal: 'right',
+                    }}
+                    transformOrigin={{
+                        vertical: 'top',
+                        horizontal: 'right',
+                    }}
+                    open={this.state.anchorEl !== null}
+                    onRequestClose={() => {
+                        this.setState({ anchorEl: null });
+                    }}
+                >
+                    <Link className="logout-btn" to={`${appContext}/logout`} style={{ textDecoration: 'none', color: 'black' }}>
+                        <MenuItem>
+                            Logout
+                        </MenuItem>
+                    </Link>
+                </Menu>
+            </div>
+        );
     }
     // Show account icon / login button depending on logged in status
     const user = AuthManager.getUser();

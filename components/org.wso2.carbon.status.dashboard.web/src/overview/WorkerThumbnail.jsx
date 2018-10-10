@@ -198,13 +198,17 @@ export default class WorkerThumbnail extends React.Component {
                         </GridTile>
                         <GridTile>
                             <div className="grid-tile-h1" style={{marginTop: 30}}>
-                                <h1 className="active-apps">
-                                    {this.props.worker.serverDetails.siddhiAppStatus.activeAppCount}
-                                </h1>
+                                <Tooltip title="Active Apps">
+                                    <h1 className="active-apps">
+                                        {this.props.worker.serverDetails.siddhiAppStatus.activeAppCount}
+                                    </h1>
+                                </Tooltip>
                                 <h1 style={{display: 'inline'}}> | </h1>
-                                <h1 className="inactive-apps">
-                                    {this.props.worker.serverDetails.siddhiAppStatus.inactiveAppCount}
-                                </h1>
+                                <Tooltip title="Inactive Apps">
+                                    <h1 className="inactive-apps">
+                                        {this.props.worker.serverDetails.siddhiAppStatus.inactiveAppCount}
+                                    </h1>
+                                </Tooltip>
                             </div>
                             <div style={styles.legendContainer}>
                                 <Typography style={styles.overviewLegend} align={'center'}>
@@ -333,12 +337,17 @@ export default class WorkerThumbnail extends React.Component {
 
                             <GridTile>
                                 <div className="grid-tile-h1" style={{marginTop: 30}}>
-                                    <h1 className="active-apps">
-                                        {this.props.worker.serverDetails.siddhiAppStatus.activeAppCount}</h1>
+                                    <Tooltip title="Active Apps">
+                                        <h1 className="active-apps">
+                                            {this.props.worker.serverDetails.siddhiAppStatus.activeAppCount}
+                                        </h1>
+                                    </Tooltip>
                                     <h1 style={{display: 'inline'}}> | </h1>
-                                    <h1 className="inactive-apps">
-                                        {this.props.worker.serverDetails.siddhiAppStatus.inactiveAppCount}
-                                    </h1>
+                                    <Tooltip title="Inactive Apps">
+                                        <h1 className="inactive-apps">
+                                            {this.props.worker.serverDetails.siddhiAppStatus.inactiveAppCount}
+                                        </h1>
+                                    </Tooltip>
                                 </div>
                                 <div style={styles.legendContainer}>
                                     <Typography style={styles.overviewLegend} align={'center'}>

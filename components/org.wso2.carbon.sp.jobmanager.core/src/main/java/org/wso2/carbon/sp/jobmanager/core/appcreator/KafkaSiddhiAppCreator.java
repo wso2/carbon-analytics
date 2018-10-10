@@ -21,10 +21,8 @@ package org.wso2.carbon.sp.jobmanager.core.appcreator;
 import kafka.admin.AdminUtils;
 import kafka.utils.ZkUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.text.StrSubstitutor;
 import org.apache.log4j.Logger;
 import org.wso2.carbon.sp.jobmanager.core.bean.ZooKeeperConfig;
-import org.wso2.carbon.sp.jobmanager.core.exception.ResourceManagerException;
 import org.wso2.carbon.sp.jobmanager.core.internal.ServiceDataHolder;
 import org.wso2.carbon.sp.jobmanager.core.topology.InputStreamDataHolder;
 import org.wso2.carbon.sp.jobmanager.core.topology.OutputStreamDataHolder;
@@ -47,18 +45,25 @@ import java.util.concurrent.TimeUnit;
 /**
  * Creates distributed siddhi application.
  */
-public class SPSiddhiAppCreator extends AbstractSiddhiAppCreator {
-    private static final Logger log = Logger.getLogger(SPSiddhiAppCreator.class);
+public class KafkaSiddhiAppCreator extends AbstractSiddhiAppCreator {
+    private static final Logger log = Logger.getLogger(KafkaSiddhiAppCreator.class);
     private static final int TIMEOUT = 120;
 
     @Override
     protected List<SiddhiQuery> createApps(String siddhiAppName, SiddhiQueryGroup queryGroup) {
         String groupName = queryGroup.getName();
         String queryTemplate = queryGroup.getSiddhiApp();
-        List<SiddhiQuery> queryList = generateQueryList(queryTemplate, siddhiAppName, groupName, queryGroup
+        List<SiddhiQuery> queryList = generateQueryList(queryTemplate, groupName, queryGroup
                 .getParallelism());
         processInputStreams(siddhiAppName, groupName, queryList, queryGroup.getInputStreams().values());
         processOutputStreams(siddhiAppName, groupName, queryList, queryGroup.getOutputStreams().values());
+        if (log.isDebugEnabled()) {
+            log.debug("Following query list is created for the Siddhi Query Group " + queryGroup.getName() + " "
+                              + "representing Siddhi App " + siddhiAppName + ".");
+            for (SiddhiQuery siddhiQuery : queryList) {
+                log.debug(siddhiQuery.getApp());
+            }
+        }
         return queryList;
     }
 
@@ -159,8 +164,8 @@ public class SPSiddhiAppCreator extends AbstractSiddhiAppCreator {
                     log.info("Added " + partitions + " partitions to topic " + topic);
                 } else if (existingPartitions > partitions) {
                     if (transportChannelCreationEnabled) {
-                        log.info("Topic " + topic + " has higher number of partitions than expected partition count. Hence"
-                                + " have to delete the topic and recreate with " + partitions + "partitions.");
+                        log.info("Topic " + topic + " has higher number of partitions than expected partition count. "
+                                + "Hence have to delete the topic and recreate with " + partitions + "partitions.");
                         AdminUtils.deleteTopic(zkUtils, topic);
                         long startTime = System.currentTimeMillis();
                         while (AdminUtils.topicExists(zkUtils, topic)) {
@@ -255,55 +260,5 @@ public class SPSiddhiAppCreator extends AbstractSiddhiAppCreator {
             }
         }
     }
-
-    private List<Integer> getPartitionNumbers(int appParallelism, int availablePartitionCount, int currentAppNum) {
-        List<Integer> partitionNumbers = new ArrayList<>();
-        if (availablePartitionCount == appParallelism) {
-            partitionNumbers.add(currentAppNum);
-            return partitionNumbers;
-        } else {
-            //availablePartitionCount < appParallelism scenario cannot occur according to design. Hence if
-            // availablePartitionCount > appParallelism
-            //// TODO: 10/19/17 improve logic
-            int partitionsPerNode = availablePartitionCount / appParallelism;
-            if (currentAppNum + 1 == appParallelism) { //if last app
-                int remainingPartitions = availablePartitionCount - ((appParallelism - 1) * partitionsPerNode);
-                for (int j = 0; j < remainingPartitions; j++) {
-                    partitionNumbers.add((currentAppNum * partitionsPerNode) + j);
-                }
-                return partitionNumbers;
-            } else {
-                for (int j = 0; j < partitionsPerNode; j++) {
-                    partitionNumbers.add((currentAppNum * partitionsPerNode) + j);
-                }
-                return partitionNumbers;
-            }
-        }
-    }
-
-    private List<SiddhiQuery> generateQueryList(String queryTemplate, String parentAppName, String queryGroupName, int
-            parallelism) {
-        List<SiddhiQuery> queries = new ArrayList<>(parallelism);
-        for (int i = 0; i < parallelism; i++) {
-            Map<String, String> valuesMap = new HashMap<>(1);
-            String appName = queryGroupName + "-" + (i + 1);
-            valuesMap.put(ResourceManagerConstants.APP_NAME, appName);
-            StrSubstitutor substitutor = new StrSubstitutor(valuesMap);
-            queries.add(new SiddhiQuery(appName, substitutor.replace(queryTemplate),false));
-        }
-        return queries;
-    }
-
-    private void updateQueryList(List<SiddhiQuery> queryList, Map<String, String> valuesMap) {
-        StrSubstitutor substitutor = new StrSubstitutor(valuesMap);
-        for (SiddhiQuery query : queryList) {
-            String updatedQuery = substitutor.replace(query.getApp());
-            query.setApp(updatedQuery);
-        }
-    }
-
-    private String getUpdatedQuery(String query, Map<String, String> valuesMap) {
-        StrSubstitutor substitutor = new StrSubstitutor(valuesMap);
-        return substitutor.replace(query);
-    }
 }
+
