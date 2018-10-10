@@ -131,7 +131,6 @@ export default class Header extends Component {
                 </Menu>
             </div>
         );
-    }
     // Show account icon / login button depending on logged in status
     const user = AuthManager.getUser();
     if (!user) {
