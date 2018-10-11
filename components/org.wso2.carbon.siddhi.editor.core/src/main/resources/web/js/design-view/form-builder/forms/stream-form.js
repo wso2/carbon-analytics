@@ -50,7 +50,7 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'stream', 'designView
         //attribute add button action
         var addAttribute = function () {
             $("#attribute-div").append('<li class="attribute"><div class="attr-content">' +
-                '<input type="text"  class="attr-name"/> &nbsp; ' +
+                '<input type="text" value="" class="attr-name"/> ' +
                 '<select class="attr-type">' +
                 '<option value="string">string</option>' +
                 '<option value="int">int</option>' +
@@ -92,24 +92,22 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'stream', 'designView
                 $('.attribute:eq(0)').find('.attr-nav').empty();
             }
             if (attrLength == 2) {
-                $('.attribute:eq(0)').find('.attr-nav').append('<button type="button" class="reorder-down">' +
-                    '<img src="/editor/commons/images/down.png"></button>');
-                $('.attribute:eq(1)').find('.attr-nav').append('<button type="button" class="reorder-up">' +
-                    '<img src="/editor/commons/images/up.png"></button><button type="button"' +
-                    'class="btn-del-attr"><img src="/editor/commons/images/delete.png"></button>');
+                $('.attribute:eq(0)').find('.attr-nav').append('<a class = "reorder-down"><i class="fw fw-sort-down">' +
+                    '</i></a>');
+                $('.attribute:eq(1)').find('.attr-nav').append('<a class="reorder-up"> <i class="fw fw-sort-up "></i>' +
+                    '</a><a class = "btn-del-attr"><i class="fw fw-cancel"></i></a>');
             }
             if (attrLength > 2) {
                 var lastIndex = attrLength - 1;
                 for (var i = 0; i < attrLength; i++) {
-                    $('.attribute:eq(' + i + ')').find('.attr-nav').append('<button type="button"' +
-                        'class="reorder-up"><img src="/editor/commons/images/up.png"></button>' +
-                        '<button type="button" class="reorder-down"><img src="/editor/commons/images/down.png">' +
-                        '</button> <button type="button" class="btn-del-attr">' +
-                        '<img src="/editor/commons/images/delete.png"></button>');
+                    $('.attribute:eq(' + i + ')').find('.attr-nav').append('<a class="reorder-up"> ' +
+                        '<i class="fw fw-sort-up"></i></a>' +
+                        '<a class = "reorder-down"><i class="fw fw-sort-down"> </i></a>' +
+                        '<a class = "btn-del-attr"><i class="fw fw-cancel"></i></a>');
                 }
-                $('.attribute:eq(0)').find('.attr-nav button:eq(0)').remove();
-                $('.attribute:eq(0)').find('.attr-nav button:eq(1)').remove();
-                $('.attribute:eq(' + lastIndex + ')').find('.attr-nav button:eq(1)').remove();
+                $('.attribute:eq(0)').find('.attr-nav a:eq(0)').remove();
+                $('.attribute:eq(0)').find('.attr-nav a:eq(1)').remove();
+                $('.attribute:eq(' + lastIndex + ')').find('.attr-nav a:eq(1)').remove();
             }
         };
 
@@ -386,10 +384,10 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'stream', 'designView
          */
         StreamForm.prototype.generateDefineForm = function (i, formConsole, formContainer) {
             var self = this;
-            var propertyDiv = $('<div id="property-header"><h3>Stream Configuration</h3></div>' +
-                '<div id="stream-form"> <h3>Name: </h3> <input type="text" id="streamName"> <div ' +
+            var propertyDiv = $('<div class = "stream-form-container"><div id="property-header"><h3>Stream' +
+                'Configuration</h3></div> <h3>Name: </h3> <input type="text" id="streamName"> <div ' +
                 'id="define-attribute"></div><button id="submit" type="button" class="btn toggle-view-button">Submit' +
-                '</button><div id="define-annotation"> </div> </div>');
+                '</button></div> <div class= "stream-form-container" id="define-annotation"> </div>');
             formContainer.append(propertyDiv);
             self.designViewContainer.addClass('disableContainer');
             self.toggleViewButton.addClass('disableContainer');
@@ -414,7 +412,7 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'stream', 'designView
             $("#attribute-div").on('click', '.reorder-down', moveDownAttribute)
             //onload of the attribute div arrange the navigations of the attribute
             $('#attribute-div').ready(changeAtrributeNavigation);
-            $('#stream-form-template').ready(loadAnnotation);
+            $('#annotation-div').ready(loadAnnotation);
 
             var streamName = "";
             // 'Submit' button action
@@ -520,10 +518,10 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'stream', 'designView
         StreamForm.prototype.generatePropertiesForm = function (element, formConsole, formContainer) {
 
             var self = this;
-            var propertyDiv = $('<div id="property-header"><h3>Stream Configuration</h3></div>' +
-                '<div id="stream-form"> <h3>Name: </h3> <input type="text" id="streamName"> <div ' +
+            var propertyDiv = $('<div class= "stream-form-container"><div id="property-header"><h3>Stream' +
+                'Configuration</h3></div> <h3>Name: </h3> <input type="text" id="streamName"> <div ' +
                 'id="define-attribute"></div><button id="submit" type="button" class="btn toggle-view-button">Submit' +
-                '</button><div id="define-annotation"> </div> </div>');
+                '</button></div> <div class = "stream-form-container" id="define-annotation"> </div>');
             formContainer.append(propertyDiv);
             self.designViewContainer.addClass('disableContainer');
             self.toggleViewButton.addClass('disableContainer');

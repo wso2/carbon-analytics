@@ -606,26 +606,64 @@ a.list-group-item, button.list-group-item {
     box-shadow: 0 0 1px 2px #FF0000;
 }
 
-.attr-nav {
-    color: black;
-    position:relative;
-    left: 230px;
-    top: -23px;
-}
 #stream-form{
 	position:absolute;
 }
 
-.attr-type {
-    height:23px;
+#streamName, .attr-name {
+	width: 200px;
+	border: 0;
+	line-height: 25px;
+	padding: 0 5px;
+	color: black;
 }
 
-.attr-content, #streamName{
+.attr-type {
+    border: 0;
+	line-height: 25px;
+	margin-left: 10px;
+	height: 25px;
     color: black;
 }
 
-#annotation-div {
-	color: white;
+.attr-nav {
+	margin-left: 10px;
+}
+
+.attribute > .attr-nav > a  {
+	float:left;
+	display: inline-block;
+	height: 25px;
+	padding: 0 5px;
+	margin-left: 10px;
+	background: #BDBDBD;
+	color: black;
+}
+
+.attribute > .attr-nav > a > .fw-sort-down{
+	font-size: 20px;
+	margin-top: -2px;
+}
+
+.attribute > .attr-nav > a > .fw-sort-up {
+	font-size: 20px;
+	margin-top: 6px
+}
+
+.attribute > .attr-nav > a > .fw-cancel {
+	font-size: 11px;
+	margin-top: 5px;
+}
+
+.attr-nav, .attr-content {
+	display:inline-block;
+	float:left;
+}
+
+.attribute{
+	margin-bottom: 10px;
+	line-height: 25px;
+	height: 25px;
 }
 
 .annotation > a > i.jstree-checkbox, .annotation > .jstree-clicked > i.jstree-checkbox,
@@ -658,8 +696,11 @@ a.list-group-item, button.list-group-item {
 }
 
 #define-annotation {
-	position: absolute;
-	width: 300px;
-	left: 900px;
-	top: -50px;
+	color: white;
+	margin-left: 280px;
+}
+
+.stream-form-container {
+	float:left;
+	display:inline-block;
 }
