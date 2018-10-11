@@ -4,7 +4,7 @@
     "login.password": "Mot de passe",
     "login.rememberMe": "Souviens-toi de moi",
     "login.loginButton": "S'identifier",
-    "login.cookieMsg": "  After a successful sign in, we use a cookie in your browser to track your session. You can refer our {cookiePolicy} for more details.",
+    "login.cookieMsg": "Après une connexion réussie, nous utilisons un cookie dans votre navigateur pour suivre votre session. Vous pouvez consulter notre {cookiePolicy} pour plus de détails.",
     "login.cookiePolicy": "Politique de cookies",
     "login.bysigningUp": "En vous connectant, vous acceptez notre ",
     "login.privacyPolicy": "Politique de confidentialité",
