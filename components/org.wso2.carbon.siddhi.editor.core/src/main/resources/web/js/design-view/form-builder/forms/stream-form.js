@@ -92,18 +92,18 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'stream', 'designView
                 $('.attribute:eq(0)').find('.attr-nav').empty();
             }
             if (attrLength == 2) {
-                $('.attribute:eq(0)').find('.attr-nav').append('<a class = "reorder-down"><i class="fw fw-sort-down">'+
-                '</i></a>');
-                $('.attribute:eq(1)').find('.attr-nav').append('<a class="reorder-up"> <i class="fw fw-sort-up "></i>'+
-                '</a><a class = "btn-del-attr"><i class="fw fw-cancel"></i></a>');
+                $('.attribute:eq(0)').find('.attr-nav').append('<a class = "reorder-down"><i class="fw fw-sort-down">' +
+                    '</i></a>');
+                $('.attribute:eq(1)').find('.attr-nav').append('<a class="reorder-up"> <i class="fw fw-sort-up "></i>' +
+                    '</a><a class = "btn-del-attr"><i class="fw fw-cancel"></i></a>');
             }
             if (attrLength > 2) {
                 var lastIndex = attrLength - 1;
                 for (var i = 0; i < attrLength; i++) {
-                    $('.attribute:eq(' + i + ')').find('.attr-nav').append('<a class="reorder-up"> '+
-                    '<i class="fw fw-sort-up"></i></a>' +
-                     '<a class = "reorder-down"><i class="fw fw-sort-down"> </i></a>' +
-                      '<a class = "btn-del-attr"><i class="fw fw-cancel"></i></a>');
+                    $('.attribute:eq(' + i + ')').find('.attr-nav').append('<a class="reorder-up"> ' +
+                        '<i class="fw fw-sort-up"></i></a>' +
+                        '<a class = "reorder-down"><i class="fw fw-sort-down"> </i></a>' +
+                        '<a class = "btn-del-attr"><i class="fw fw-cancel"></i></a>');
                 }
                 $('.attribute:eq(0)').find('.attr-nav a:eq(0)').remove();
                 $('.attribute:eq(0)').find('.attr-nav a:eq(1)').remove();
