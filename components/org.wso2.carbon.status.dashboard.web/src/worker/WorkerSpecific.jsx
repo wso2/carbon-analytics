@@ -36,6 +36,9 @@ import Settings from 'material-ui/svg-icons/action/settings';
 import AuthenticationAPI from '../utils/apis/AuthenticationAPI';
 import AuthManager from '../auth/utils/AuthManager';
 import Error403 from '../error-pages/Error403';
+// Localization
+import { FormattedMessage } from 'react-intl';
+import PropTypes from 'prop-types';
 
 const messageBoxStyle = {textAlign: "center", color: "white"};
 const errorMessageStyle = {backgroundColor: "#FF5722", color: "white"};
@@ -86,17 +89,17 @@ export default class WorkerSpecific extends React.Component {
             let message;
             if (error.response != null) {
                 if (error.response.status === 401) {
-                    message = "Authentication fail. Please login again.";
+                    message = this.context.intl.formatMessage({ id: 'authenticationFail', defaultMessage: 'Authentication fail. Please login again.' });
                     this.setState({
                         sessionInvalid: true
                     })
                 } else if (error.response.status === 403) {
-                    message = "User Have No Permission to view this page.";
+                    message = this.context.intl.formatMessage({ id: 'noViewPermission', defaultMessage: 'User Have No Permission to view this page.' });
                     this.setState({
                         hasViewerPermission: false
                     })
                 } else {
-                    message = "Unknown error occurred! : " + error.response.data;
+                    message = this.context.intl.formatMessage({ id: 'unknownError', defaultMessage: 'Unknown error occurred! : {data}', values: { data: error.response.data } });
                 }
                 this.setState({
                     message: message
@@ -112,17 +115,17 @@ export default class WorkerSpecific extends React.Component {
             let message;
             if (error.response != null) {
                 if (error.response.status === 401) {
-                    message = "Authentication fail. Please login again.";
+                    message = this.context.intl.formatMessage({ id: 'authenticationFail', defaultMessage: 'Authentication fail. Please login again.' });
                     this.setState({
                         sessionInvalid: true
                     })
                 } else if (error.response.status === 403) {
-                    message = "User Have No Viewer Permission to view this page.";
+                    message = this.context.intl.formatMessage({ id: 'noViewerPermission', defaultMessage: 'User Have No Viewer Permission to view this page.' });
                     this.setState({
                         hasViewerPermission: false
                     })
                 } else {
-                    message = "Unknown error occurred! : " + error.response.data;
+                    message = this.context.intl.formatMessage({ id: 'unknownError', defaultMessage: 'Unknown error occurred! : {data}', values: { data: error.response.data } });
                 }
                 this.setState({
                     message: message
@@ -153,13 +156,21 @@ export default class WorkerSpecific extends React.Component {
         StatusDashboardAPIS.deleteWorkerByID(this.props.match.params.id)
             .then((response) => {
                 if (response.status === 200) {
-                    that._showMessage("Worker '" + workerIDD + "' is deleted successfully !!");
+                    that._showMessage(this.context.intl.formatMessage({
+                        id: 'workerSpecific.workerDeletedSuccessfull',
+                        defaultMessage: 'Worker   {workerIDD} is deleted successfully !!',
+                        values: { workerIDD: workerIDD }
+                    }));
                     that.setState({
                         redirectDelete: true
                     });
                 }
                 else {
-                    that._showError("Worker '" + workerIDD + "' is not deleted successfully. Try again");
+                    that._showError(this.context.intl.formatMessage({
+                        id: 'workerSpecific.workerDeleteError',
+                        defaultMessage: 'Worker {workerIDD}  is not deleted successfully. Try again',
+                        values: { workerIDD: workerIDD }
+                    }));
                 }
             })
     }
@@ -175,7 +186,7 @@ export default class WorkerSpecific extends React.Component {
                 <div style={{right: 0, marginRight: 12, position: 'absolute', top: '85px'}}>
                     <ListItem
                         style={{color: 'white'}}
-                        primaryText="Settings"
+                        primaryText={<FormattedMessage id='workerSpecific.settings' defaultMessage='Settings' />}
                         leftIcon={<Settings style={{paddingLeft: '22px'}}/>}
                         onClick={(event) => {
                             this.setState({popOver: true, anchorEl: event.currentTarget})
@@ -191,7 +202,7 @@ export default class WorkerSpecific extends React.Component {
                             <ListItem
                                 style={{color: 'white'}}
                                 key={1}
-                                primaryText="Delete Worker"
+                                primaryText={<FormattedMessage id='workerSpecific.deleteWorker' defaultMessage='Delete Worker' />}
                                 leftIcon={<Delete style={{paddingLeft: '22px'}}/>}
                                 onClick={() => {
                                     this.setState({open: true})
@@ -227,12 +238,12 @@ export default class WorkerSpecific extends React.Component {
         if (this.state.hasViewerPermission) {
             let actionsButtons = [
                 <FlatButton
-                    label="Yes"
+                    label={<FormattedMessage id='yes' defaultMessage='Yes' />}
                     backgroundColor='#f17b31'
                     onClick={this._handleDelete}
                 />,
                 <FlatButton
-                    label="No"
+                    label={<FormattedMessage id='no' defaultMessage='No' />}
                     onClick={() => {
                         this.setState({open: false})
                     }}
@@ -244,14 +255,14 @@ export default class WorkerSpecific extends React.Component {
             return (
                 <div style={{backgroundColor: '#222222'}}>
                     <Dialog
-                        title="Confirmation"
+                        title={<FormattedMessage id='workerspecific.confirmation' defaultMessage='Confirmation' />}
                         actions={actionsButtons}
                         modal={true}
                         open={this.state.open}
                         onRequestClose={() => {
                             this.setState({open: false})
                         }}>
-                        {"Do you want to delete worker '" + this.state.workerID + "' ?"}
+                        {<FormattedMessage id='workerSpecific.deleteWorkerConfirmation' defaultMessage='Do you want to delete worker {workerID} ?' values={{ workerID: this.state.workerID }} />}
                     </Dialog>
 
                     <Header/>
@@ -259,7 +270,7 @@ export default class WorkerSpecific extends React.Component {
                         <Link style={{textDecoration: 'none'}} to={window.contextPath}>
                             <Button style={styles.navBtn}>
                                 <HomeButton style={{paddingRight: 8, color: '#BDBDBD'}}/>
-                                Overview >
+                                <FormattedMessage id='overview' defaultMessage='Overview >' />
                             </Button>
                         </Link>
                         <Typography style={styles.navBtnActive}>{this.state.workerID}</Typography>
@@ -292,6 +303,9 @@ export default class WorkerSpecific extends React.Component {
             return <Error403/>;
         }
     }
+}
 
+WorkerSpecific.contextTypes = {
+    intl: PropTypes.object.isRequired
 }
 

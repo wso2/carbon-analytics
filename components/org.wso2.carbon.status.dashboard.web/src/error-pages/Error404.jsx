@@ -25,6 +25,7 @@ import getMuiTheme from 'material-ui/styles/getMuiTheme';
 import {Link} from 'react-router-dom';
 import {Card, CardHeader, CardMedia, CardText, CardTitle, RaisedButton} from 'material-ui';
 import FormPanel from '../common/FormPanel';
+import { FormattedMessage } from 'react-intl';
 
 const muiTheme = getMuiTheme(darkBaseTheme);
 const buttonStyle = {position: 'center', marginTop: 60, width: '15%', fontSize: '12px', backgroundColor: '#f17b31'};
@@ -58,15 +59,15 @@ class Error404 extends Component {
                     <FormPanel title={""} width={650}>
                         <div style={errorContainerStyles}>
                             <h1 style={errorTitleStyles}>
-                                Page Not Found!
+                                <FormattedMessage id='error.404.notFound' defaultMessage='Page Not Found!' />
                             </h1>
-                            <text style={errorMessageStyles}>The page you looking for was moved, renamed, <br/>removed
-                                                             or might never existed.
+                            <text style={errorMessageStyles}>
+                                <FormattedMessage id='error.404.description' defaultMessage='The page you looking for was moved, renamed,{br} removed or might never existed. ' values={{ br: <br /> }} />
                             </text>
                             <Link to={window.contextPath}>
                                 <br/>
                                 <br/>
-                                <RaisedButton backgroundColor='#f17b31' style={buttonStyle} label="Home"/></Link>
+                                <RaisedButton backgroundColor='#f17b31' style={buttonStyle} label={<FormattedMessage id='error.404.home' defaultMessage='Home' />} /></Link>
                         </div>
                     </FormPanel>
                 </CardText>

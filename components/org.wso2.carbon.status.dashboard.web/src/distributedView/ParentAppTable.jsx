@@ -26,6 +26,7 @@ import Pagination from 'material-ui-pagination';
 import Circle from 'material-ui/svg-icons/av/fiber-manual-record';
 import {TableFooter} from 'material-ui/Table/index';
 import StatusDashboardAPIS from '../utils/apis/StatusDashboardAPIs';
+import { FormattedMessage } from "react-intl";
 
 const dataConstants = {PAGE_LENGTH: 5};
 
@@ -140,13 +141,13 @@ export default class ParentAppTable extends React.Component {
                     <TableHeader displaySelectAll={false}
                                  adjustForCheckbox={false}>
                         <TableRow>
-                            <TableHeaderColumn style={{color: '#f6f6f6', width: '100px'}}><h3>Child Apps</h3>
+                            <TableHeaderColumn style={{ color: '#f6f6f6', width: '100px' }}><h3><FormattedMessage id='parentApp.childApp' defaultMessage='Child Apps' /></h3>
                             </TableHeaderColumn>
-                            <TableHeaderColumn style={{color: '#f6f6f6', width: '100px'}}><h3>Group Name</h3>
+                            <TableHeaderColumn style={{ color: '#f6f6f6', width: '100px' }}><h3><FormattedMessage id='parentApp.groupName' defaultMessage='Group Name' /></h3>
                             </TableHeaderColumn>
-                            <TableHeaderColumn style={{color: '#f6f6f6', width: '100px'}}><h3>Child App Status</h3>
+                            <TableHeaderColumn style={{ color: '#f6f6f6', width: '100px' }}><h3><FormattedMessage id='parentApp.childAppStatus' defaultMessage='Child App Status' /></h3>
                             </TableHeaderColumn>
-                            <TableHeaderColumn style={{color: '#f6f6f6', width: '100px'}}><h3>Worker Node </h3>
+                            <TableHeaderColumn style={{ color: '#f6f6f6', width: '100px' }}><h3><FormattedMessage id='parentApp.workerNode' defaultMessage='Worker Node' /> </h3>
                             </TableHeaderColumn>
                         </TableRow>
                     </TableHeader>

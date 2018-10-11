@@ -18,6 +18,7 @@
  */
 
 import React from 'react';
+import PropTypes from 'prop-types';
 import * as d3 from 'd3';
 import * as dagreD3 from 'dagre-d3';
 
@@ -147,7 +148,7 @@ export default class KafkaFlow extends React.Component {
                     this.setState({
                         isApiCalled: true,
                         sessionInvalid: true,
-                        statusMessage: "Authentication fail. Please login again."
+                        statusMessage: this.context.intl.formatMessage({ id: 'authenticationFail', defaultMessage: 'Authentication fail. Please login again.' })
                     })
                 } else if (error.response.status === 403) {
                     this.setState({
@@ -158,7 +159,7 @@ export default class KafkaFlow extends React.Component {
                     this.setState({
                         isError: true,
                         isApiCalled: true,
-                        statusMessage: "Unknown error occurred! : " + JSON.stringify(error.response.data)
+                        statusMessage: this.context.intl.formatMessage({ id: 'unknownError', defaultMessage: 'Unknown error occurred! : {data}', values: { data: JSON.stringify(error.response.data) } })
                     });
                 }
             }
@@ -199,4 +200,8 @@ export default class KafkaFlow extends React.Component {
             </svg>
         );
     }
+}
+
+KafkaFlow.contextTypes = {
+    intl: PropTypes.object.isRequired
 }

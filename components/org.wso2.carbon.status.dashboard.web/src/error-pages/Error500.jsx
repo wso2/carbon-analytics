@@ -26,6 +26,7 @@ import getMuiTheme from 'material-ui/styles/getMuiTheme';
 import {Link} from 'react-router-dom';
 import {Card, CardHeader, CardMedia, CardText, CardTitle, RaisedButton} from 'material-ui';
 import FormPanel from '../common/FormPanel';
+import { FormattedMessage } from 'react-intl';
 
 const muiTheme = getMuiTheme(darkBaseTheme);
 const buttonStyle = {position: 'center', marginTop: 60, width: '15%', fontSize: '12px', backgroundColor: '#f17b31'};
@@ -67,15 +68,15 @@ class Error500 extends Component {
                         <div style={errorContainerStyles}>
                             <i class="fw fw-error  fw-inverse fw-5x"></i>
                             <h1 style={errorTitleStyles}>
-                                Internal Server Error!
+                                <FormattedMessage id='error.500.internalServer' defaultMessage='Internal Server Error!' />
                             </h1>
-                            <text style={errorMessageStyles}>There is a problem with the resource you are looking for,
-                                <br/> and it cannot be displayed.
+                            <text style={errorMessageStyles}>
+                                <FormattedMessage id='error.500.description' defaultMessage='There is a problem with the resource you are looking for,{br} and it cannot be displayed.' values={{ br: (<br />) }} />
                             </text>
                             <br/>
                             <br/>
                             <Link to={`${window.contextPath}/logout`}>
-                                <RaisedButton backgroundColor='#f17b31' style={buttonStyle} label="Login"/>
+                                <RaisedButton backgroundColor='#f17b31' style={buttonStyle} label={<FormattedMessage id='error.500.login' defaultMessage='Login' />} />
                             </Link>
                         </div>
                     </FormPanel>

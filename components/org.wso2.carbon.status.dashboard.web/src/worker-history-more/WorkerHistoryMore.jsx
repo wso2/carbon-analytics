@@ -36,6 +36,8 @@ import JVMGarbageCOllector from './JVMGarbageCOllector';
 import JVMOsLoad from './JVMOsLoad';
 import JVMLoad from './JVMLoad';
 import JVMOTotalMemory from './JVMTotalMemory';
+// Localization
+import { FormattedMessage } from 'react-intl';
 
 const styles = {
     navBar: {padding: '0 15px'},
@@ -282,8 +284,8 @@ export default class WorkerHistoryMore extends React.Component {
                 <div style={styles.navBar} className="navigation-bar">
                     <Link  style={{textDecoration: 'none'}} to={window.contextPath}>
                         <Button style={styles.navBtn}>
-                            <HomeButton style={{paddingRight: 8, color: '#BDBDBD'}}/>
-                            Overview >
+                            <HomeButton style={{ paddingRight: 8, color: '#BDBDBD' }} />
+                            <FormattedMessage id='overview' defaultMessage='Overview >' />
                         </Button>
                     </Link>
                     <Link  style={{textDecoration: 'none'}} to={window.contextPath + '/worker/' +
@@ -295,13 +297,13 @@ export default class WorkerHistoryMore extends React.Component {
                     <Link  style={{textDecoration: 'none'}} to={window.contextPath + '/worker/history/' +
                         this.props.match.params.id}>
                         <Button style={styles.navBtn}>
-                            Metrics >
+                            <FormattedMessage id='metrics>' defaultMessage='Metrics >' />
                         </Button>
                     </Link>
                     <Typography style={styles.navBtnActive}>More</Typography>
                 </div>
                 <Typography variant="title" style={styles.titleStyle}>
-                    {this.state.workerID} Metrics
+                    {this.state.workerID} <FormattedMessage id='metrics' defaultMessage='Metrics ' />
                 </Typography>
 
                 {this.renderCharts()}

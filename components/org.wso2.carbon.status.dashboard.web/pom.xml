@@ -117,6 +117,10 @@
                 </includes>
                 <targetPath>pages</targetPath>
             </resource>
+            <resource>
+                <directory>${basedir}/public/locales</directory>                
+                <targetPath>locales</targetPath>
+            </resource>
         </resources>
     </build>
 
