@@ -128,6 +128,22 @@ export default class Login extends Component {
             );
         }
 
+        const cookiePolicy = (
+            <a
+            style={styles.cookiePolicyAnchor}
+            href='/policies/cookie-policy'
+            target='_blank'>
+                <FormattedMessage id='login.cookiePolicy' defaultMessage='Cookie Policy' />
+            </a>);
+
+        const privacyPolicy = (
+            <a
+                style={styles.cookiePolicyAnchor}
+                href='/policies/privacy-policy'
+                target='_blank'>
+                    <FormattedMessage id='login.privacyPolicy' defaultMessage='Privacy Policy' />
+            </a>
+        )    
         return (
             <MuiThemeProvider muiTheme={muiTheme}>
                 <div className={'login-container'}>
@@ -193,27 +209,13 @@ export default class Login extends Component {
                         <br/>
                         <div style={styles.cookiePolicy}>
                             <div>
-                                <FormattedMessage id='login.cookieMsg' defaultMessage=' After a successful sign in, we use a cookie in your browser to track your session. You can refer our ' />
-                                <a
-                                    style={styles.cookiePolicyAnchor}
-                                    href='/policies/cookie-policy'
-                                    target='_blank'
-                                >
-                                    <FormattedMessage id='login.cookiePolicy' defaultMessage='Cookie Policy' />
-                                </a>
-                                <FormattedMessage id='login.formoreDetails' defaultMessage=' for more details.' />
+                                <FormattedMessage id='login.cookieMsg' defaultMessage='After a successful sign in, we use a cookie in your browser to track your session. You can refer our {cookiePolicy} for more details.' values={{cookiePolicy:cookiePolicy}} />                                
                             </div>
                         </div>
                         <br/>
                         <div style={styles.cookiePolicy}>
                             <div>
-                                <FormattedMessage id='login.bysigningUp' defaultMessage='By signing in, you agree to our ' />
-                                <a
-                                    style={styles.cookiePolicyAnchor}
-                                    href='/policies/privacy-policy'
-                                    target='_blank'>
-                                    <FormattedMessage id='login.privacyPolicy' defaultMessage='Privacy Policy' />
-                                </a>.
+                                <FormattedMessage id='login.bysigningUp' defaultMessage='By signing in, you agree to our {privacyPolicy}' values={{privacyPolicy:privacyPolicy}} />                                
                             </div>
                         </div>
                     </FormPanel>
