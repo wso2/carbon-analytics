@@ -611,26 +611,59 @@ a.list-group-item, button.list-group-item {
 }
 
 #streamName, .attr-name {
-	color: black;
 	width: 200px;
+	border: 0;
+	line-height: 25px;
+	padding: 0 5px;
+	color: black;
 }
 
-.attr-type{
-    height: 23px;
+.attr-type {
+    border: 0;
+	line-height: 25px;
+	margin-left: 10px;
+	height: 25px;
     color: black;
 }
 
-.reorder-down, .reorder-up, .btn-del-attr{
-	height: 23.5px;
-	margin-bottom: -5px;
+.attr-nav {
+	margin-left: 10px;
+}
+
+.attribute > .attr-nav > a  {
+	float:left;
+	display: inline-block;
+	height: 25px;
+	padding: 0 5px;
+	margin-left: 10px;
+	background: #BDBDBD;
+	color: black;
+}
+
+.attribute > .attr-nav > a > .fw-sort-down{
+	font-size: 20px;
+	margin-top: -2px;
+}
+
+.attribute > .attr-nav > a > .fw-sort-up {
+	font-size: 20px;
+	margin-top: 6px
+}
+
+.attribute > .attr-nav > a > .fw-cancel {
+	font-size: 11px;
+	margin-top: 5px;
 }
 
 .attr-nav, .attr-content {
-	display:inline-block
+	display:inline-block;
+	float:left;
 }
 
 .attribute{
 	margin-bottom: 10px;
+	line-height: 25px;
+	height: 25px;
 }
 
 .annotation > a > i.jstree-checkbox, .annotation > .jstree-clicked > i.jstree-checkbox,
