@@ -89,48 +89,9 @@ export default class Header extends Component {
         </IconButton>
       </Link>
     );
-        return (
-            <div>
-                <Toolbar>
-                    {!this.props.hideHomeButton ? (homeButton) : (null)}
-                    <Typography type="body1" style={{ color: 'inherit' }}>
-                        {user.username}
-                    </Typography>
-                    <IconButton
-                        aria-owns={open ? 'menu-appbar' : null}
-                        aria-haspopup="true"
-                        onClick={(event) => {
-                            this.setState({ anchorEl: event.currentTarget });
-                        }}
-                        color="contrast"
-                    >
-                        <AccountCircle />
-                    </IconButton>
-                </Toolbar>
-                <Menu
-                    id="menu-appbar"
-                    anchorEl={this.state.anchorEl}
-                    anchorOrigin={{
-                        vertical: 'top',
-                        horizontal: 'right',
-                    }}
-                    transformOrigin={{
-                        vertical: 'top',
-                        horizontal: 'right',
-                    }}
-                    open={this.state.anchorEl !== null}
-                    onRequestClose={() => {
-                        this.setState({ anchorEl: null });
-                    }}
-                >
-                    <Link className="logout-btn" to={`${appContext}/logout`} style={{ textDecoration: 'none', color: 'black' }}>
-                        <MenuItem>
-                            Logout
-                        </MenuItem>
-                    </Link>
-                </Menu>
-            </div>
-        );
+
+    if (this.props.hideUserSettings) {
+      return <div />;
     }
     // Show account icon / login button depending on logged in status
     const user = AuthManager.getUser();
@@ -150,50 +111,49 @@ export default class Header extends Component {
 
     return (
       <div>
-        <Toolbar>
-          {!this.props.hideHomeButton ? homeButton : null}
-          <Typography type="body1" style={{ color: 'inherit' }}>
-            {user.username}
-          </Typography>
-          <IconButton
-            aria-owns={open ? 'menu-appbar' : null}
-            aria-haspopup="true"
-            onClick={(event) => {
-              this.setState({ anchorEl: event.currentTarget });
-            }}
-            color="contrast"
+          <Toolbar>
+              {!this.props.hideHomeButton ? (homeButton) : (null)}
+              <Typography type="body1" style={{ color: 'inherit' }}>
+                  {user.username}
+              </Typography>
+              <IconButton
+                  aria-owns={open ? 'menu-appbar' : null}
+                  aria-haspopup="true"
+                  onClick={(event) => {
+                      this.setState({ anchorEl: event.currentTarget });
+                  }}
+                  color="contrast"
+              >
+                  <AccountCircle />
+              </IconButton>
+          </Toolbar>
+          <Menu
+              id="menu-appbar"
+              anchorEl={this.state.anchorEl}
+              anchorOrigin={{
+                  vertical: 'top',
+                  horizontal: 'right',
+              }}
+              transformOrigin={{
+                  vertical: 'top',
+                  horizontal: 'right',
+              }}
+              open={this.state.anchorEl !== null}
+              onRequestClose={() => {
+                  this.setState({ anchorEl: null });
+              }}
           >
-            <AccountCircle />
-          </IconButton>
-        </Toolbar>
-        <Menu
-          id="menu-appbar"
-          anchorEl={this.state.anchorEl}
-          anchorOrigin={{
-            vertical: 'top',
-            horizontal: 'right',
-          }}
-          transformOrigin={{
-            vertical: 'top',
-            horizontal: 'right',
-          }}
-          open={this.state.anchorEl !== null}
-          onRequestClose={() => {
-            this.setState({ anchorEl: null });
-          }}
-        >
-          <Link
-            to={`${appContext}/logout`}
-            style={{ textDecoration: 'none', color: 'black' }}
-          >
-            <MenuItem>
-              <FormattedMessage id="header.logout" defaultMessage="Log out" />
-            </MenuItem>
-          </Link>
-        </Menu>
+              <Link className="logout-btn" 
+                to={`${appContext}/logout`} 
+                style={{ textDecoration: 'none', color: 'black' }}>
+                  <MenuItem>
+                    <FormattedMessage id="header.logout" defaultMessage="Log out" />
+                  </MenuItem>
+              </Link>
+          </Menu>
       </div>
-    );
-  }
+  );
+}
 
   render() {
     return (
