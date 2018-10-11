@@ -16,7 +16,7 @@
     "addWorker.mayExists": "Erreur lors de l'ajout de worker !. Le travailleur peut exister ou une erreur inattendue s'est produite.",
     "addworker.invaliedPort": "Dans le numéro de port valide. Réessayer",
     "addworker.successfulReachManager": "Atteint avec succès le manager : {workerID}",
-    "addworker.errotTesting": "Erreur lors du test de la connexion! ",
+    "addworker.errorTesting": "Erreur lors du test de la connexion! ",
     "addworker.successfulReachWorker": "Atteint avec succès le travailleur : {workerID}",
     "addworker.unreachableNode": "Nœud inaccessible Réessayer !",
     "addworker.somethingWrong": "Quelque chose a mal tourné s'il vous plaît vérifier ",

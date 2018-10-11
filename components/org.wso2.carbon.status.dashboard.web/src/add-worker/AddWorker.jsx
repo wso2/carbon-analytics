@@ -212,7 +212,7 @@ class AddWorker extends React.Component {
                                     that._showError(response.data.message)
                                 }
                             }).catch((error) => {
-                                that._showError(<FormattedMessage id='addworker.errotTesting' defaultMessage='Error while testing the connection! ' />);
+                                that._showError(<FormattedMessage id='addworker.errorTesting' defaultMessage='Error while testing the connection! ' />);
                         });
                     } else if (response.data === "worker") {
                         StatusDashboardAPIS.testConnection(workerID)
@@ -223,7 +223,7 @@ class AddWorker extends React.Component {
                                     that._showError(response.data.message)
                                 }
                             }).catch((error) => {
-                                that._showError(<FormattedMessage id='addworker.errotTesting' defaultMessage='Error while testing the connection!! ' />);
+                                that._showError(<FormattedMessage id='addworker.errorTesting' defaultMessage='Error while testing the connection!! ' />);
                         });
                     } else {
                         that._showError(<FormattedMessage id='addworker.unreachableNode' defaultMessage='Unreachable Node. Try Again !' />);
