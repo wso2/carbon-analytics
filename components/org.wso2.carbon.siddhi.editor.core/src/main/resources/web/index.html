@@ -4,7 +4,7 @@
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link href="/editor/commons/images/favicon.png" rel="icon" type="image/png" sizes="16x16" />
+    <link href="/editor/commons/images/favicon.png" rel="icon" type="image/png" sizes="16x16"/>
     <script src="/editor/commons/lib/css-browser-selector_0.4.0/css_browser_selector.js"></script>
     <link href="/editor/commons/lib/font-wso2-1.2.2/css/font-wso2.min.css" rel="stylesheet" type="text/css"/>
     <link rel="stylesheet" type="text/css" href="/editor/commons/lib/bootstrap_v3.3.6/css/bootstrap.css"/>
@@ -95,72 +95,73 @@
 
             <!-- Start: file explorer and editor area row -->
 
-                <!-- Start: left container -->
-                <div class="left-container">
-                    <!-- Start: left tool bar -->
-                    <div class="left-tool-bar" data-toggle="tooltip">
-                        <ul class="nav nav-tabs" role="tablist">
-                            <li>
-                                <a href="#workspace-explorer" role="tab" data-toggle="tab"
-                                   class="workspace-explorer-activate-btn">
-                                    <i class="fw fw-file-browse fw-lg"></i>
-                                </a>
-                            </li>
-                            <li>
-                                <a href="#event-simulator" role="tab" data-toggle="tab"
-                                   class="event-simulator-activate-btn">
-                                    <i class="fw fw-event-simulator fw-lg"></i>
-                                </a>
-                            </li>
-                            <li>
-                                <a href="#output-console"  class="output-console-activate-btn">
-                                    <i class="fw fw-console fw-lg"></i>
-                                </a>
-                            </li>
-                        </ul>
-                    </div>
-                    <!-- End: left tool bar -->
-                    <!-- Start: left side-bar -->
-                    <div class="sidebar-left tab-content">
-                    </div>
-                    <div class="sidebar-left-separator" draggable="true"></div>
-                    <!-- End: left side-bar -->
+            <!-- Start: left container -->
+            <div class="left-container">
+                <!-- Start: left tool bar -->
+                <div class="left-tool-bar" data-toggle="tooltip">
+                    <ul class="nav nav-tabs" role="tablist">
+                        <li>
+                            <a href="#workspace-explorer" role="tab" data-toggle="tab"
+                               class="workspace-explorer-activate-btn">
+                                <i class="fw fw-file-browse fw-lg"></i>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="#event-simulator" role="tab" data-toggle="tab"
+                               class="event-simulator-activate-btn">
+                                <i class="fw fw-event-simulator fw-lg"></i>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="#output-console" class="output-console-activate-btn">
+                                <i class="fw fw-console fw-lg"></i>
+                            </a>
+                        </li>
+                    </ul>
                 </div>
-                <!-- End: left container -->
-                <!-- Start: right container -->
-                <div class="panel-container-vertical" id="right-container">
-                    <!-- Start: service tabs wrapper container-->
-                    <div class="container-fluid main-panel" id="service-tabs-wrapper">
-                        <!-- Start: service tabs wrapper row -->
-                            <!-- Start: service tabs -->
-                            <div id="tabs-container" class="col-sm-12">
-                                <div class="tab-headers tab-headers-bar">
-                                </div>
-                                <div id="tab-content-wrapper" class="grid-background">
-                                    <div class="tab-content tab-content-default "></div>
-                                </div>
-                            </div>
-                        <!-- End: service tabs -->
-                    </div>
-                    <!-- End: service tabs wrapper row -->
-                    <div class="splitter-horizontal"></div>
-                    <div id="console-container" class="col-sm-12 hide console-container">
-                        <div class="output-headers output-headers-bar">
-                            <button type="button" class="close pull-right output-console-activate-btn"><i
-                                    class="fw fw-cancel"></i></button>
+                <!-- End: left tool bar -->
+                <!-- Start: left side-bar -->
+                <div class="sidebar-left tab-content">
+                </div>
+                <div class="sidebar-left-separator" draggable="true"></div>
+                <!-- End: left side-bar -->
+            </div>
+            <!-- End: left container -->
+            <!-- Start: right container -->
+            <div class="panel-container-vertical" id="right-container">
+                <!-- Start: service tabs wrapper container-->
+                <div class="container-fluid main-panel" id="service-tabs-wrapper">
+                    <!-- Start: service tabs wrapper row -->
+                    <!-- Start: service tabs -->
+                    <div id="tabs-container" class="col-sm-12">
+                        <div class="tab-headers tab-headers-bar">
                         </div>
-                        <div class="nano console-wrap">
-                            <div class="output-console-content-wrapper nano-content">
-                                <div class="consoleToolbar">
-                                    <a href="#" class="clear-console-btn" data-placement="right" data-toggle="tooltip" title="Clear">
-                                        <i class="fw fw-clear"></i>
-                                    </a>
-                                </div>
-                            </div>
+                        <div id="tab-content-wrapper" class="grid-background">
+                            <div class="tab-content tab-content-default "></div>
                         </div>
                     </div>
+                    <!-- End: service tabs -->
                 </div>
-                <!-- End: service tabs wrapper container-->
+                <!-- End: service tabs wrapper row -->
+                <div class="splitter-horizontal"></div>
+                <div id="console-container" class="col-sm-12 hide console-container">
+                    <div class="output-headers output-headers-bar">
+                        <button type="button" class="close pull-right output-console-activate-btn"><i
+                                class="fw fw-cancel"></i></button>
+                    </div>
+                    <div class="nano console-wrap">
+                        <div class="output-console-content-wrapper nano-content">
+                            <div class="consoleToolbar">
+                                <a href="#" class="clear-console-btn" data-placement="right" data-toggle="tooltip"
+                                   title="Clear">
+                                    <i class="fw fw-clear"></i>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- End: service tabs wrapper container-->
 
             <!-- End: right container -->
         </div>
@@ -178,8 +179,8 @@
 
 <!-- Start: Template for a console -->
 <div id="console-template">
-        <div class="output-console-content output-console-content-default">
-        </div>
+    <div class="output-console-content output-console-content-default">
+    </div>
 </div>
 <!-- End: Template for console -->
 <div class="hidden">
@@ -536,7 +537,7 @@
             <div class="form-group" data-name="attributes">
             </div>
             <div class="alert alert-warning hidden" role="alert">
-                <div data-name ="siddhi-app-name-mode">
+                <div data-name="siddhi-app-name-mode">
                 </div>
                 <div class="form-group clearfix" data-name="run-debug-buttons">
                 </div>
@@ -663,7 +664,7 @@
 <div class="sourceConfigForm" id="csvSourceConfig_dynamicId" data-type="csv" data-uuid="{{dynamicId}}"
      style="display:none;">
     <div class="form-group">
-        <label >
+        <label>
             Siddhi App Name<span class="required_astrix"> *</span>
         </label>
         <select id="siddhi-app-name_{{dynamicId}}" name="siddhi-app-name" class="form-control">
@@ -674,7 +675,7 @@
 
     <div class="dynamicToggleFormContent" style="display: none;">
         <div class="form-group">
-            <label >
+            <label>
                 Stream Name<span class="required_astrix"> *</span>
             </label>
             <select name="stream-name" class="form-control">
@@ -682,12 +683,13 @@
         </div>
 
         <div class="form-group">
-            <label >
+            <label>
                 CSV file<span class="required_astrix"> *</span>
             </label>
             <select id="file-name_{{dynamicId}}" name="file-name" class="form-control"></select>
             <button type="button" class="btn btn-secondary" id="upload-csv-file_{{dynamicId}}" name="upload-csv-file">
-                Upload</button>
+                Upload
+            </button>
         </div>
 
         <div class="form-group">
@@ -702,7 +704,7 @@
         </div>
         <div class="feedAdvanceContent clearfix" id="csvAdvanceContent_{{dynamicId}}" style="display: none;">
             <div class="form-inline clearfix">
-                <div class="form-group col-md-6" >
+                <div class="form-group col-md-6">
                     <label class="custom-radio two-line-radio">
                         <input type="radio" name="timestamp-option" value="attribute">
                         <span class="helper">CSV event record timestamp index</span>
@@ -742,7 +744,7 @@
      style="display:none">
 
     <div class="form-group">
-        <label >
+        <label>
             Siddhi App Name<span class="required_astrix"> *</span>
         </label>
         <select id="siddhi-app-name_{{dynamicId}}" name="siddhi-app-name" class="form-control">
@@ -752,7 +754,7 @@
     </div>
 
     <div class="form-group">
-        <label >
+        <label>
             Stream Name<span class="required_astrix"> *</span>
 
         </label>
@@ -778,7 +780,7 @@
     </div>
 
     <div class="form-group">
-        <label >
+        <label>
             Username<span class="required_astrix"> *</span>
         </label>
         <input type="text" class="form-control required-for-db-connection"
@@ -786,7 +788,7 @@
     </div>
 
     <div class="form-group">
-        <label >
+        <label>
             Password<span class="required_astrix"> *</span>
         </label>
         <input type="password" class="form-control required-for-db-connection"
@@ -801,7 +803,7 @@
     </div>
 
     <div class="form-group">
-        <label >
+        <label>
             Table name<span class="required_astrix"> *</span>
         </label>
         <select name="table-name" class="form-control">
@@ -835,10 +837,10 @@
 <div class="hidden">
     <div class="sourceConfigForm" id="randomSourceConfig_dynamicId" data-type="random" data-uuid="{{dynamicId}}">
         <div class="form-group">
-            <label >
+            <label>
                 Siddhi App Name<span class="required_astrix"> *</span>
             </label>
-            <select id ="siddhi-app-name_{{dynamicId}}" name="siddhi-app-name"  class="form-control">
+            <select id="siddhi-app-name_{{dynamicId}}" name="siddhi-app-name" class="form-control">
             </select>
             <div id="siddhi-app-name-mode">
             </div>
@@ -846,7 +848,7 @@
 
         <div class="dynamicToggleFormContent" style="display: none;">
             <div class="form-group">
-                <label >
+                <label>
                     Stream Name<span class="required_astrix"> *</span>
                 </label>
                 <select name="stream-name" class="form-control">
@@ -858,7 +860,7 @@
             </div>
             <div class="feedAdvanceContent" id="randomAdvanceContent_dynamicId" style="display: none;">
                 <div class="form-group">
-                    <label >
+                    <label>
                         Increment Event’s Timestamp by(ms)
                     </label>
                     <input type="text" class="form-control" name="timestamp-interval"
@@ -1003,6 +1005,87 @@
     </div>
 </div>
 
+<script id="attribute-form-template" type="text/x-handlebars-template">
+    <h3>Attributes</h3>
+    <ul>
+        <div id="attribute-div">
+            {{#each this}}
+            <li class="attribute">
+                <div class="attr-content">
+                    <input type="text" value="{{name}}" class="attr-name"/> &nbsp;
+                    <select class="attr-type">
+                        <option value="string">string</option>
+                        <option value="int">int</option>
+                        <option value="long">long</option>
+                        <option value="float">float</option>
+                        <option value="double">double</option>
+                        <option value="bool">bool</option>
+                        <option value="object">object</option>
+                    </select>
+                </div>
+                <div class="attr-nav"></div>
+            </li>
+            {{/each}}
+        </div>
+    </ul>
+    <br>
+    <button id="btn-add-attribute" class="btn btn-default"> + Attribute</button> <br> <br>
+</script>
+
+<script id="annotation-form-template" type="text/x-handlebars-template">
+    <h3>Annotations</h3>
+    <div id="annotation-div">
+        {{#if this}}
+        <ul>
+            {{#each this}}
+                {{> recursiveAnnotation this}}
+            {{/each}}
+        </ul>
+        {{/if}}
+    </div>
+    <br>
+    <button id="btn-add-annotation" class="btn btn-default"> + Annotation</button>
+    <button id="btn-add-key-val" class="btn btn-default" style="display: none"> + Property</button>
+    <button id="btn-del-annotation" class="btn btn-default" style="display: none"> Delete</button>
+    <br>
+</script>
+
+<script id="recursiveAnnotationPartial" type="text/template">
+    {{#if predefined}}
+        <li data-jstree='{"icon":"/editor/commons/images/annotation.png"}' class="{{class}}">{{name}}
+            <ul>
+                {{#each elements}}
+                <li data-jstree='{"icon":"/editor/commons/images/properties.png"}' class="{{class}}">{{key}}
+                    <ul>
+                        <li data-jstree='{"icon":"/editor/commons/images/value.png"}' class="annotation-value">{{value}}
+                        </li>
+                    </ul>
+                </li>
+                {{/each}}
+    {{else}}
+        <li data-jstree='{"icon":"/editor/commons/images/annotation.png"}' class="annotation">{{name}}
+            <ul>
+                {{#each elements}}
+                <li data-jstree='{"icon":"/editor/commons/images/properties.png"}' class="annotation-key">{{key}}
+                    <ul>
+                        <li data-jstree='{"icon":"/editor/commons/images/value.png"}' class="annotation-value">
+                            {{value}}
+                        </li>
+                    </ul>
+                </li>
+                {{/each}}
+    {{/if}}
+
+        {{#if annotations}}
+            {{#each annotations}}
+                {{> recursiveAnnotation this}}
+            {{/each}}
+        {{/if}}
+            </ul>
+        </li>
+</script>
+
+
 <!--Start: Settings Modal-->
 <div class="modal fade modalSettings" id="modalSettings" tabindex="-1" role="dialog">
     <div class="modal-dialog" role="document">
@@ -1015,7 +1098,7 @@
             <div class="modal-body add-margin-top-2x add-margin-bottom-2x">
                 <form>
                     <h4>Source View</h4>
-                    <hr />
+                    <hr/>
                     <div class="form-group">
                         <label for="sourceViewTheme">Theme</label>
                         <select class="form-control" id="sourceViewTheme">
@@ -1100,6 +1183,7 @@
             /////////////////////////
             // third party modules //
             ////////////////////////
+            handlebar: "commons/lib/handlebar/handlebars-v4.0.11",
             jquery: "commons/lib/jquery_v1.9.1/jquery-1.9.1.min",
             jquery_ui: "commons/lib/jquery-ui_v1.12.1/jquery-ui",
             bootstrap: "commons/lib/theme-wso2-2.0.0/js/bootstrap.min",
@@ -1213,7 +1297,9 @@
             query: "js/design-view/elements/queries/query",
             edge: "js/design-view/configuration-data/edge",
             annotation: "js/design-view/elements/annotation",
-            attribute: "js/design-view/elements/attribute"
+            attribute: "js/design-view/elements/attribute",
+            annotationObject: "js/design-view/elements/annotation-object",
+            annotationElement: "js/design-view/elements/annotation-element"
             // element data holding objects ends here
         },
         map: {
@@ -1282,9 +1368,37 @@
                     "artifacts/PatternMatching/PatternMatching.siddhi",
                     "artifacts/AggregateDataIncrementally/AggregateDataIncrementally.siddhi"]
             },
+            stream_predefined_annotations: [
+            {
+                predefined: true,
+                name: 'Async',
+                class: 'optional-annotation',
+                isMandatory: false,
+                elements: [
+                    {
+                        key: 'buffer.size',
+                        value: '256',
+                        class: 'mandatory-key',
+                        isMandatory: true
+                    },
+                    {
+                        key: 'workers',
+                        value: '2',
+                        class: 'mandatory-key',
+                        isMandatory: true
+                    },
+                    {
+                        key: 'batch.size.max',
+                        value: '5',
+                        class: 'mandatory-key',
+                        isMandatory: true
+                    },
+                ]
+            }
+            ],
             services:   {
                 workspace:  {
-                    endpoint: window.location.protocol + "//" + window.location.host + '/editor/workspace'
+                   endpoint: window.location.protocol + "//" + window.location.host + '/editor/workspace'
                 }
             },
             alerts: {
@@ -1487,6 +1601,7 @@
                     }
                 }
             },
+
             tab_controller: {
                 container: "#tabs-container",
                 headers: {
@@ -1605,6 +1720,9 @@
         app.render();
         app.displayInitialView();
     });
+
+
+
 </script>
 </body>
 

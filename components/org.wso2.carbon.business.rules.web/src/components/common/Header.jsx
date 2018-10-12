@@ -93,6 +93,7 @@ export default class Header extends Component {
     if (this.props.hideUserSettings) {
       return <div />;
     }
+
     // Show account icon / login button depending on logged in status
     const user = AuthManager.getUser();
     if (!user) {

@@ -37,11 +37,13 @@ public class StreamDefinitionConfigGenerator extends CodeSegmentsPreserver {
      */
     public StreamConfig generateStreamConfig(StreamDefinition streamDefinition) {
         List<String> annotationConfigs = new ArrayList<>();
+        List<Annotation> annotationListObjects = new ArrayList<>();
         List<String> streamElementAnnotationNames = new ArrayList<>(Arrays.asList("SOURCE", "SINK", "STORE"));
         AnnotationConfigGenerator annotationConfigGenerator = new AnnotationConfigGenerator();
         for (Annotation annotation : streamDefinition.getAnnotations()) {
             if (!streamElementAnnotationNames.contains(annotation.getName().toUpperCase())) {
                 // Since these annotations represent the stream itself
+                annotationListObjects.add(annotation);
                 annotationConfigs.add(annotationConfigGenerator.generateAnnotationConfig(annotation));
             }
         }
@@ -49,7 +51,7 @@ public class StreamDefinitionConfigGenerator extends CodeSegmentsPreserver {
         StreamConfig streamConfig = new StreamConfig(streamDefinition.getId(),
                 streamDefinition.getId(),
                 attributeConfigListGenerator.generateAttributeConfigList(streamDefinition.getAttributeList()),
-                annotationConfigs);
+                annotationConfigs,annotationListObjects);
         preserveCodeSegmentsOf(annotationConfigGenerator, attributeConfigListGenerator);
         preserveAndBindCodeSegment(streamDefinition, streamConfig);
 
