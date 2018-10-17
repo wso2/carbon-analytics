@@ -35,14 +35,9 @@ public class SiddhiAppDeployerFactory {
      * @param password      Password
      * @return              SiddhiAppDeployerServiceStub instance which functions as the HTTPS client
      */
-    public static SiddhiAppDeployerServiceStub getSiddhiAppDeployerHttpsClient(String httpsUrl,
-                                                                               String username,
+    public static SiddhiAppDeployerServiceStub getSiddhiAppDeployerHttpsClient(String httpsUrl, String username,
                                                                                String password) {
-        return DataHolder.getInstance().getClientBuilderService().build(username,
-                password,
-                CLIENT_CONNECTION_TIMEOUT,
-                CLIENT_READ_TIMEOUT,
-                SiddhiAppDeployerServiceStub.class,
-                httpsUrl);
+        return DataHolder.getInstance().getClientBuilderService().build(username, password, CLIENT_CONNECTION_TIMEOUT,
+                CLIENT_READ_TIMEOUT, SiddhiAppDeployerServiceStub.class, httpsUrl);
     }
 }
