@@ -36,7 +36,7 @@ public class BusinessRulesQueryConfigs {
     private String datasource;
     private String username;
     private String password;
-    private List<Map<String, List<String>>> deploymentConfigs;
+    private List<Map<String, List<String>>> deployment_configs;
     private Map<String, Object> roles;
 
     public List<Queries> getQueries() {
@@ -56,11 +56,11 @@ public class BusinessRulesQueryConfigs {
     }
 
     public List<Map<String, List<String>>> getDeployment_configs() {
-        return deploymentConfigs;
+        return deployment_configs;
     }
 
-    public void setDeploymentConfigs(List<Map<String, List<String>>> deploymentConfigs) {
-        this.deploymentConfigs = deploymentConfigs;
+    public void setDeploymentConfigs(List<Map<String, List<String>>> deployment_configs) {
+        this.deployment_configs = deployment_configs;
     }
 
     public String getPassword() {
