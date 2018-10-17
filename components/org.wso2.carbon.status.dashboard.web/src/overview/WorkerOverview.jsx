@@ -96,7 +96,7 @@ export default class WorkerOverview extends React.Component {
             counter: 0,
             hasManagerPermission: false,
             hasViewPermission: true,
-            statusMessage: this.context.intl.formatMessage({ id: 'workerOverview.noNodes', defaultMessage: 'Currently there are no nodes to display' }),            
+            statusMessage: 'Currently there are no nodes to display',
             isError: false,
             btnType: <SyncDisabled color='#BDBDBD'/>
 
