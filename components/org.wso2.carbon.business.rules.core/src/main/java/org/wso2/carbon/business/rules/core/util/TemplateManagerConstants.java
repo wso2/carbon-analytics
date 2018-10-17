@@ -50,6 +50,7 @@ public class TemplateManagerConstants {
     public static final String RULE_TEMPLATE_TYPE_TEMPLATE = "template";
     // Business Rule types
     public static final String BUSINESS_RULE_TYPE_TEMPLATE = "template";
+    public static final String BUSINESS_RULE_TYPE_SCRATCH = "scratch";
 
     public static final String INSTANCE_COUNT_ONE = "one";
     public static final String INSTANCE_COUNT_MANY = "many";
