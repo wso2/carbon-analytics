@@ -78,7 +78,6 @@ const buttonStyle = {marginLeft: 50, width: '35%', fontSize: '12px', backgroundC
  * class which manages overview page.
  */
 export default class WorkerOverview extends React.Component {
-
     constructor() {
         super();
         this.state = {
@@ -96,7 +95,11 @@ export default class WorkerOverview extends React.Component {
             counter: 0,
             hasManagerPermission: false,
             hasViewPermission: true,
-            statusMessage: 'Currently there are no nodes to display',
+            statusMessage: (
+                <FormattedMessage
+                    id="workerOverview.noNodes"
+                    defaultMessage="Currently there are no nodes to display"
+                />),
             isError: false,
             btnType: <SyncDisabled color='#BDBDBD'/>
 
@@ -740,5 +743,5 @@ export default class WorkerOverview extends React.Component {
 }
 
 WorkerOverview.contextTypes = {
-    intl: PropTypes.object.issRequired
-}
+  intl: PropTypes.object.isRequired
+};

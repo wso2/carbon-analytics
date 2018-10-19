@@ -498,7 +498,7 @@ export default class WorkerSpecific extends React.Component {
         let warningMessage;
         if (!this.state.statsEnabled) {
             warningMessage = <div>
-                <FormattedMessage id='metricsDisabled' defaultMessage='Metrics are disabled!' />
+                <FormattedMessage id='appSpecific.metricsDisabled' defaultMessage='Metrics are disabled!' />
             </div>
         } else {
             warningMessage = <div/>
