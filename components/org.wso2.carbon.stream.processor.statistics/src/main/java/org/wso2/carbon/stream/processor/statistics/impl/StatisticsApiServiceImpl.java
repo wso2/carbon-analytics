@@ -69,8 +69,8 @@ public class StatisticsApiServiceImpl extends StatisticsApiService {
         } catch (MetricsConfigException e) {
             String message = e.getMessage();
             WorkerStatistics workerStatistics = operatingSystemMetricSet.getDefault();
-            if (("Wso2 Carbon metrics is not enabled.".equalsIgnoreCase(message)) ||
-                    ("JMX reporter has been disabled at WSO2 carbon metrics.").equalsIgnoreCase(message)) {
+            if (("Metrics are disabled.".equalsIgnoreCase(message)) ||
+                    ("JMX reporter has been disabled at WSO2 metrics.").equalsIgnoreCase(message)) {
                 workerStatistics.setMessage(message);
                 String osMetricsJSON = gson.toJson(workerStatistics);
                 return Response.status(Response.Status.OK).entity(osMetricsJSON).build();
