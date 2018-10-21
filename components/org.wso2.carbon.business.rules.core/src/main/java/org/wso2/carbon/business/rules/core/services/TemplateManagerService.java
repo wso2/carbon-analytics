@@ -61,6 +61,7 @@ import java.util.stream.Collectors;
  */
 public class TemplateManagerService implements BusinessRulesService {
     private static final Logger log = LoggerFactory.getLogger(TemplateManagerService.class);
+    private static final int DEFAULT_ARTIFACT_COUNT = 1;
     private static SiddhiAppApiHelper siddhiAppApiHelper = new SiddhiAppApiHelper();
     // Available Template Groups from the directory
     private Map<String, TemplateGroup> availableTemplateGroups;
@@ -99,7 +100,7 @@ public class TemplateManagerService implements BusinessRulesService {
         // Save business rule definition with errors
         try {
             // Save business rule definition with errors
-            saveBusinessRuleDefinition(businessRuleUUID, businessRuleFromTemplate, status, 1);
+            saveBusinessRuleDefinition(businessRuleUUID, businessRuleFromTemplate, status, DEFAULT_ARTIFACT_COUNT);
             insertRuleTemplate(businessRuleFromTemplate.getRuleTemplateUUID());
             log.info(String.format("Business rule %s saved into the database.", businessRuleFromTemplate.getName()));
         } catch (BusinessRulesDatasourceException e) {
@@ -1495,12 +1496,13 @@ public class TemplateManagerService implements BusinessRulesService {
 
                     if (businessRule == null) {
                         saveBusinessRuleDefinition(ruleTemplate.getUuid(), businessRuleFromTemplate,
-                                TemplateManagerConstants.DEPLOYED, 1);
+                                TemplateManagerConstants.DEPLOYED, DEFAULT_ARTIFACT_COUNT);
                         insertRuleTemplate(ruleTemplate.getUuid());
                     }
                 } catch (BusinessRulesDatasourceException | TemplateInstanceCountViolationException e) {
-                    throw new TemplateManagerServiceException("Saving APIM analytics feature business rule '" +
-                            businessRuleFromTemplate.getName() + "' to the database is failed. ", e);
+                    throw new TemplateManagerServiceException("Saving business rule '" +
+                            businessRuleFromTemplate.getName() + "' to the database is failed for solution type "
+                            + solutionType, e);
                 }
             }
         }
