@@ -48,6 +48,15 @@ public class TemplateManagerConstants {
     public static final String RULE_TEMPLATE_TYPE_INPUT = "input";
     public static final String RULE_TEMPLATE_TYPE_OUTPUT = "output";
     public static final String RULE_TEMPLATE_TYPE_TEMPLATE = "template";
+    //Business Rule parameters
+    public static final String BUSINESS_RULE_TYPE = "type";
+    public static final String BUSINESS_RULE_UUID = "uuid";
+    public static final String BUSINESS_RULE_NAME = "name";
+    public static final String BUSINESS_RULE_PROPERTIES = "properties";
+    public static final String BUSINESS_RULE_TEMPLATE_GROUP_UUID = "templateGroupUUID";
+    public static final String BUSINESS_RULE_RULE_TEMPLATE_UUID = "ruleTemplateUUID";
+    public static final String BUSINESS_RULE_INPUT_RULE_TEMPLATE_UUID = "inputRuleTemplateUUID";
+    public static final String BUSINESS_RULE_OUTPUT_RULE_TEMPLATE_UUID = "outputRuleTemplateUUID";
     // Business Rule types
     public static final String BUSINESS_RULE_TYPE_TEMPLATE = "template";
     public static final String BUSINESS_RULE_TYPE_SCRATCH = "scratch";

@@ -189,21 +189,28 @@ public class QueryExecutor {
                 JsonObject jsonObject = gson.fromJson(new String(bdata, Charset.forName("UTF-8")), JsonObject
                         .class).getAsJsonObject();
 
-                String name = jsonObject.get("name").getAsString();
-                String templateGroupUUID = jsonObject.get("templateGroupUUID").getAsString();
-                String type = jsonObject.get("type").getAsString();
+                String name = jsonObject.get(TemplateManagerConstants.BUSINESS_RULE_NAME).getAsString();
+                String templateGroupUUID = jsonObject.get(
+                        TemplateManagerConstants.BUSINESS_RULE_TEMPLATE_GROUP_UUID).getAsString();
+                String type = jsonObject.get(TemplateManagerConstants.BUSINESS_RULE_TYPE).getAsString();
                 BusinessRule businessRule;
                 if (TemplateManagerConstants.BUSINESS_RULE_TYPE_SCRATCH.equalsIgnoreCase(type)) {
-                    String inputRuleTemplateUUID = jsonObject.get("inputRuleTemplateUUID").getAsString();
-                    String outputRuleTemplateUUID = jsonObject.get("outputRuleTemplateUUID").getAsString();
-                    BusinessRuleFromScratchProperty properties = gson.fromJson(jsonObject.get("properties"),
+                    String inputRuleTemplateUUID = jsonObject.get(
+                            TemplateManagerConstants.BUSINESS_RULE_INPUT_RULE_TEMPLATE_UUID).getAsString();
+                    String outputRuleTemplateUUID = jsonObject.get(
+                            TemplateManagerConstants.BUSINESS_RULE_OUTPUT_RULE_TEMPLATE_UUID).getAsString();
+                    BusinessRuleFromScratchProperty properties = gson.fromJson(jsonObject.get
+                                    (TemplateManagerConstants.BUSINESS_RULE_PROPERTIES),
                             BusinessRuleFromScratchProperty.class);
                     businessRule = new BusinessRuleFromScratch(uuid, name, templateGroupUUID, type,
                             inputRuleTemplateUUID, outputRuleTemplateUUID, properties);
                     return businessRule;
                 } else if (TemplateManagerConstants.BUSINESS_RULE_TYPE_TEMPLATE.equalsIgnoreCase(type)) {
-                    String ruleTemplateUUID = jsonObject.get("ruleTemplateUUID").getAsString();
-                    Map<String, String> properties = gson.fromJson(jsonObject.get("properties"), HashMap.class);
+                    String ruleTemplateUUID = jsonObject.get(
+                            TemplateManagerConstants.BUSINESS_RULE_RULE_TEMPLATE_UUID).getAsString();
+                    Map<String, String> properties = gson.fromJson(jsonObject.get(
+                            TemplateManagerConstants.BUSINESS_RULE_PROPERTIES), HashMap
+                            .class);
                     businessRule = new BusinessRuleFromTemplate(uuid, name, templateGroupUUID, type,
                             ruleTemplateUUID, properties);
                     return businessRule;
@@ -235,22 +242,27 @@ public class QueryExecutor {
                 JsonObject jsonObject = gson.fromJson(new String(bdata, Charset.forName("UTF-8")),
                         JsonObject.class).getAsJsonObject();
 
-                String uuid = jsonObject.get("uuid").getAsString();
-                String name = jsonObject.get("name").getAsString();
-                String templateGroupUUID = jsonObject.get("templateGroupUUID").getAsString();
-                String type = jsonObject.get("type").getAsString();
+                String uuid = jsonObject.get(TemplateManagerConstants.BUSINESS_RULE_UUID).getAsString();
+                String name = jsonObject.get(TemplateManagerConstants.BUSINESS_RULE_NAME).getAsString();
+                String templateGroupUUID = jsonObject.get(
+                        TemplateManagerConstants.BUSINESS_RULE_TEMPLATE_GROUP_UUID).getAsString();
+                String type = jsonObject.get(TemplateManagerConstants.BUSINESS_RULE_TYPE).getAsString();
 
                 if (TemplateManagerConstants.BUSINESS_RULE_TYPE_SCRATCH.equalsIgnoreCase(type)) {
-                    String inputRuleTemplateUUID = jsonObject.get("inputRuleTemplateUUID").getAsString();
-                    String outputRuleTemplateUUID = jsonObject.get("outputRuleTemplateUUID").getAsString();
-                    BusinessRuleFromScratchProperty properties = gson.fromJson(jsonObject.get("properties"),
-                            BusinessRuleFromScratchProperty.class);
+                    String inputRuleTemplateUUID = jsonObject.get(
+                            TemplateManagerConstants.BUSINESS_RULE_INPUT_RULE_TEMPLATE_UUID).getAsString();
+                    String outputRuleTemplateUUID = jsonObject.get(
+                            TemplateManagerConstants.BUSINESS_RULE_OUTPUT_RULE_TEMPLATE_UUID).getAsString();
+                    BusinessRuleFromScratchProperty properties = gson.fromJson(jsonObject.get(
+                            TemplateManagerConstants.BUSINESS_RULE_PROPERTIES), BusinessRuleFromScratchProperty.class);
                     BusinessRule businessRule = new BusinessRuleFromScratch(uuid, name, templateGroupUUID, type,
                             inputRuleTemplateUUID, outputRuleTemplateUUID, properties);
                     map.put(businessRuleUUID, businessRule);
                 } else if (TemplateManagerConstants.BUSINESS_RULE_TYPE_TEMPLATE.equalsIgnoreCase(type)) {
-                    String ruleTemplateUUID = jsonObject.get("ruleTemplateUUID").getAsString();
-                    Map<String, String> properties = gson.fromJson(jsonObject.get("properties"), HashMap.class);
+                    String ruleTemplateUUID = jsonObject.get(
+                            TemplateManagerConstants.BUSINESS_RULE_RULE_TEMPLATE_UUID).getAsString();
+                    Map<String, String> properties = gson.fromJson(jsonObject.get(
+                            TemplateManagerConstants.BUSINESS_RULE_PROPERTIES), HashMap.class);
                     BusinessRule businessRule = new BusinessRuleFromTemplate(uuid, name, templateGroupUUID, type,
                             ruleTemplateUUID, properties);
                     map.put(businessRuleUUID, businessRule);
@@ -282,23 +294,28 @@ public class QueryExecutor {
                 JsonObject jsonObject = gson.fromJson(new String(bdata, Charset.forName("UTF-8")),
                         JsonObject.class).getAsJsonObject();
 
-                String uuid = jsonObject.get("uuid").getAsString();
-                String name = jsonObject.get("name").getAsString();
-                String templateGroupUUID = jsonObject.get("templateGroupUUID").getAsString();
-                String type = jsonObject.get("type").getAsString();
+                String uuid = jsonObject.get(TemplateManagerConstants.BUSINESS_RULE_UUID).getAsString();
+                String name = jsonObject.get(TemplateManagerConstants.BUSINESS_RULE_NAME).getAsString();
+                String templateGroupUUID = jsonObject.get(
+                        TemplateManagerConstants.BUSINESS_RULE_TEMPLATE_GROUP_UUID).getAsString();
+                String type = jsonObject.get(TemplateManagerConstants.BUSINESS_RULE_TYPE).getAsString();
 
                 if (TemplateManagerConstants.BUSINESS_RULE_TYPE_SCRATCH.equalsIgnoreCase(type)) {
-                    String inputRuleTemplateUUID = jsonObject.get("inputRuleTemplateUUID").getAsString();
-                    String outputRuleTemplateUUID = jsonObject.get("outputRuleTemplateUUID").getAsString();
-                    BusinessRuleFromScratchProperty properties = gson.fromJson(jsonObject.get("properties"),
-                            BusinessRuleFromScratchProperty.class);
+                    String inputRuleTemplateUUID = jsonObject.get(
+                            TemplateManagerConstants.BUSINESS_RULE_INPUT_RULE_TEMPLATE_UUID).getAsString();
+                    String outputRuleTemplateUUID = jsonObject.get(
+                            TemplateManagerConstants.BUSINESS_RULE_OUTPUT_RULE_TEMPLATE_UUID).getAsString();
+                    BusinessRuleFromScratchProperty properties = gson.fromJson(jsonObject.get(
+                            TemplateManagerConstants.BUSINESS_RULE_PROPERTIES), BusinessRuleFromScratchProperty.class);
                     BusinessRule businessRule = new BusinessRuleFromScratch(uuid, name, templateGroupUUID, type,
                             inputRuleTemplateUUID, outputRuleTemplateUUID, properties);
                     Object[] objects = {businessRule, deploymentStatus};
                     list.add(objects);
                 } else if (TemplateManagerConstants.BUSINESS_RULE_TYPE_TEMPLATE.equalsIgnoreCase(type)) {
-                    String ruleTemplateUUID = jsonObject.get("ruleTemplateUUID").getAsString();
-                    Map<String, String> properties = gson.fromJson(jsonObject.get("properties"), HashMap.class);
+                    String ruleTemplateUUID = jsonObject.get(
+                            TemplateManagerConstants.BUSINESS_RULE_RULE_TEMPLATE_UUID).getAsString();
+                    Map<String, String> properties = gson.fromJson(jsonObject.get(
+                            TemplateManagerConstants.BUSINESS_RULE_PROPERTIES), HashMap.class);
                     BusinessRule businessRule = new BusinessRuleFromTemplate(uuid, name, templateGroupUUID, type,
                             ruleTemplateUUID, properties);
                     Object[] objects = new Object[2];

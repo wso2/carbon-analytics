@@ -86,8 +86,8 @@ public class BusinessRulesApiServiceImpl extends BusinessRulesApiService {
         String businessRuleName = null;
         try {
             // Check the business rule type of the json object
-            if ((TemplateManagerConstants
-                    .BUSINESS_RULE_TYPE_TEMPLATE).equalsIgnoreCase(businessRuleJson.get("type").getAsString())) {
+            if ((TemplateManagerConstants.BUSINESS_RULE_TYPE_TEMPLATE).equalsIgnoreCase(businessRuleJson.
+                    get(TemplateManagerConstants.BUSINESS_RULE_TYPE).getAsString())) {
                 // Convert to business rule from template and create
                 BusinessRuleFromTemplate businessRuleFromTemplate = TemplateManagerHelper
                         .jsonToBusinessRuleFromTemplate(businessRule);
@@ -463,8 +463,8 @@ public class BusinessRulesApiServiceImpl extends BusinessRulesApiService {
         JsonObject businessRuleJson = gson.fromJson(businessRuleDefinition, JsonObject.class);
         int status;
         try {
-            if ((TemplateManagerConstants.BUSINESS_RULE_TYPE_TEMPLATE).equalsIgnoreCase(businessRuleJson.get("type")
-                    .getAsString())) {
+            if ((TemplateManagerConstants.BUSINESS_RULE_TYPE_TEMPLATE).equalsIgnoreCase(businessRuleJson.get
+                    (TemplateManagerConstants.BUSINESS_RULE_TYPE).getAsString())) {
                 BusinessRuleFromTemplate businessRuleFromTemplate = TemplateManagerHelper
                         .jsonToBusinessRuleFromTemplate(businessRuleDefinition);
                 status = templateManagerService.editBusinessRuleFromTemplate(businessRuleInstanceID,
