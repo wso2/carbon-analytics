@@ -204,9 +204,8 @@ public class TemplateManagerHelper {
         if (!(ruleTemplate.getType().toLowerCase().equals(TemplateManagerConstants.RULE_TEMPLATE_TYPE_TEMPLATE) ||
                 ruleTemplate.getType().toLowerCase().equals(TemplateManagerConstants.RULE_TEMPLATE_TYPE_INPUT) ||
                 ruleTemplate.getType().toLowerCase().equals(TemplateManagerConstants.RULE_TEMPLATE_TYPE_OUTPUT))) {
-            throw new TemplateManagerHelperException("Invalid rule template - " +
-                    "invalid rule template type for rule template " +
-                    "" + ruleTemplate.getUuid());
+            throw new TemplateManagerHelperException("Invalid rule template - invalid rule template type for " +
+                    "rule template " + ruleTemplate.getUuid());
         }
         if (ruleTemplate.getTemplates() == null) {
             throw new TemplateManagerHelperException("Invalid rule template - there should be at least one " +
@@ -310,10 +309,9 @@ public class TemplateManagerHelper {
                         "template within a rule template of type " + ruleTemplateType);
             }
             if (!template.getType().equals(TemplateManagerConstants.TEMPLATE_TYPE_SIDDHI_APP)) {
-                throw new TemplateManagerHelperException("Invalid template. " + template.getType() +
-                        " is not a valid template type for a template within a rule template" +
-                        "of type " + ruleTemplateType + ". Template type must be '" +
-                        TemplateManagerConstants.TEMPLATE_TYPE_SIDDHI_APP + "'");
+                throw new TemplateManagerHelperException("Invalid template. " + template.getType() + " is not a valid" +
+                        " template type for a template within a rule template of type " + ruleTemplateType + ". " +
+                        "Template type must be '" + TemplateManagerConstants.TEMPLATE_TYPE_SIDDHI_APP + "'");
             }
         } else {
             // If ruleTemplate type 'template'
@@ -325,16 +323,14 @@ public class TemplateManagerHelper {
                 }
             };
             if (template.getExposedStreamDefinition() != null) {
-                throw new TemplateManagerHelperException("Invalid template. " +
-                        "exposedStreamDefinition should not exist for " +
-                        "template within a rule template of type " + ruleTemplateType);
+                throw new TemplateManagerHelperException("Invalid template. exposedStreamDefinition should not exist " +
+                        "for template within a rule template of type " + ruleTemplateType);
             }
             if (!validTemplateTypes.contains(template.getType())) {
                 // Only siddhiApps are there for now
-                throw new TemplateManagerHelperException("Invalid template. " + template.getType() +
-                        " is not a valid template type for a template within a rule template" +
-                        "of type " + ruleTemplateType + ". Template type must be '" +
-                        TemplateManagerConstants.TEMPLATE_TYPE_SIDDHI_APP + "'");
+                throw new TemplateManagerHelperException("Invalid template. " + template.getType() + " is not a valid" +
+                        " template type for a template within a rule template of type " + ruleTemplateType + ". " +
+                        "Template type must be '" + TemplateManagerConstants.TEMPLATE_TYPE_SIDDHI_APP + "'");
             }
         }
     }
@@ -408,7 +404,6 @@ public class TemplateManagerHelper {
         if (siddhiAppNameMatcher.find()) {
             return siddhiAppNameMatcher.group(1);
         }
-
         throw new TemplateManagerHelperException("Invalid SiddhiApp Name Found");
     }
 
@@ -460,7 +455,6 @@ public class TemplateManagerHelper {
             regexMatcher.appendReplacement(replacedString, elementReplacement);
         }
         regexMatcher.appendTail(replacedString);
-
         return replacedString.toString();
     }
 
@@ -474,10 +468,8 @@ public class TemplateManagerHelper {
     public static Map<String, String> getScriptGeneratedVariables(String script) throws RuleTemplateScriptException {
         ScriptEngineManager manager = new ScriptEngineManager();
         ScriptEngine engine = manager.getEngineByName("JavaScript");
-
         ScriptContext scriptContext = new SimpleScriptContext();
         scriptContext.setBindings(engine.createBindings(), ScriptContext.ENGINE_SCOPE);
-
         try {
             // Run script
             engine.eval(script);
