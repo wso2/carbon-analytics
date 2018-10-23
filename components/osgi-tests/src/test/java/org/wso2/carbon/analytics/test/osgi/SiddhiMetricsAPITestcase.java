@@ -229,8 +229,8 @@ public class SiddhiMetricsAPITestcase {
         Assert.assertEquals(httpResponseMessage.getResponseCode(), 200);
         ApiResponseMessage msg = gson.fromJson((String) httpResponseMessage.getSuccessContent(), ApiResponseMessage
                 .class);
-        Assert.assertTrue(msg.getMessage().equals("WSO2 Carbon metrics is not enabled.") ||
-                msg.getMessage().equals("MX reporter has been disabled at WSO2 carbon metrics."));
+        Assert.assertTrue(msg.getMessage().equals("Metrics are disabled.") ||
+                msg.getMessage().equals("JMX reporter has been disabled at WSO2 metrics."));
     }
 
     private HTTPResponseMessage getRealTimeStatsAndReturnResponse() {

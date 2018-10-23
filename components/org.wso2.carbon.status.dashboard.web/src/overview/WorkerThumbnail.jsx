@@ -188,12 +188,16 @@ export default class WorkerThumbnail extends React.Component {
                     <GridList cols={2} cellHeight={98} style={styles.gridList}>
                         <GridTile>
                             <div style={{height: '100%', display: 'flex', alignItems: 'center'}}>
-                                <h4 style={{
-                                    textAlign: 'center',
-                                    color: '#dedede',
-                                    padding: 0,
-                                    margin: '0 20px'
-                                }}>{this.props.worker.statusMessage}</h4>
+                                <Tooltip title="To enable metrics, set the enabled property to true under wso2.metrics
+                                in the < SP_HOME>/conf/worker/deployment.yaml  file. ">
+                                    <h4 style={{
+                                        textAlign: 'center',
+                                        color: '#dedede',
+                                        padding: 0,
+                                        margin: '0 20px',
+                                        width: '100%'
+                                    }}>{this.props.worker.statusMessage}</h4>
+                                </Tooltip>
                             </div>
                         </GridTile>
                         <GridTile>
