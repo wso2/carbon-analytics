@@ -1410,14 +1410,11 @@ public class AnalyticsDataServiceTest implements GroupEventListener {
         this.cleanupTable(tenantId, tableName);
     }
 
-
     @Test(dependsOnMethods = "testFacetSplitterForField")
     public void testDrillDownRangeCount() throws AnalyticsException, InterruptedException {
         logger.info("Starting Test testDrillDownRangeCount");
-
         int tenantId = 50;
         String tableName = "TableYY";
-
         if (createNewTable(tenantId, tableName)) {
             AnalyticsDrillDownRequest analyticsDrillDownRequest = new AnalyticsDrillDownRequest();
             analyticsDrillDownRequest.setTableName(tableName);
@@ -1439,14 +1436,12 @@ public class AnalyticsDataServiceTest implements GroupEventListener {
             this.service.drillDownRangeCount(tenantId, analyticsDrillDownRequest);
             this.cleanupTable(tenantId, tableName);
             logger.info(this.service.tableExists(tenantId, tableName));
-
         }
     }
 
     @Test(dependsOnMethods = "testDrillDownRangeCount")
     public void testCreateMergedSchema() throws AnalyticsException, InterruptedException {
         logger.info("Starting Test testTenantId");
-
         int tenantId = 50;
         String tableName = "TableXY";
         this.cleanupTable(tenantId, tableName);
@@ -1454,7 +1449,6 @@ public class AnalyticsDataServiceTest implements GroupEventListener {
         columns.add(new ColumnDefinition("Title", ColumnType.STRING, true, false));
         columns.add(new ColumnDefinition("Author", ColumnType.FACET, false, false));
         columns.add(new ColumnDefinition("Count", ColumnType.INTEGER, false, true));
-
         List<String> primaryKeys = new ArrayList<>();
         primaryKeys.add("Title");
         AnalyticsSchema schema = new AnalyticsSchema(columns, primaryKeys);
@@ -1466,13 +1460,11 @@ public class AnalyticsDataServiceTest implements GroupEventListener {
         values.put("Author", "E.Hemingway");
         values.put("Count", "42");
         Record record1 = new Record(tenantId, tableName, values);
-
         values = new HashMap<>();
         values.put("Title", "Divergent");
         values.put("Author", "Veronica Roth");
         values.put("Count", "485");
         Record record2 = new Record(tenantId, tableName, values);
-
         records.add(record1);
         records.add(record2);
         this.service.put(records);
@@ -1490,13 +1482,11 @@ public class AnalyticsDataServiceTest implements GroupEventListener {
         Assert.assertEquals(mergedSchema.getPrimaryKeys().size(), 2);
         this.cleanupTable(tenantId, tableName);
         logger.info(this.service.tableExists(tenantId, tableName));
-
     }
 
     @Test(dependsOnMethods = "testCreateMergedSchema")
     public void testSortData() throws AnalyticsException, InterruptedException {
         logger.info("Starting Test testSortData");
-
         int tenantId = 10;
         String tableName = "TableXY";
         this.cleanupTable(tenantId, tableName);
@@ -1508,7 +1498,6 @@ public class AnalyticsDataServiceTest implements GroupEventListener {
         columns.add(new ColumnDefinition("Price", ColumnType.FLOAT, true, true));
         columns.add(new ColumnDefinition("NoOfCopies", ColumnType.INTEGER, true, true));
         columns.add(new ColumnDefinition("Rating", ColumnType.DOUBLE, true, true));
-
         this.service.createTable(tenantId, tableName);
         this.service.setTableSchema(tenantId, tableName, new AnalyticsSchema(columns, null));
         List<Record> records = new ArrayList<>();
@@ -1521,7 +1510,6 @@ public class AnalyticsDataServiceTest implements GroupEventListener {
         values.put("NoOfCopies", "5090");
         values.put("Rating", "3.8");
         Record record1 = new Record(tenantId, tableName, values);
-
         values = new HashMap<>();
         values.put("Title", "Divergent");
         values.put("Author", "Veronica_Roth");
@@ -1531,7 +1519,6 @@ public class AnalyticsDataServiceTest implements GroupEventListener {
         values.put("NoOfCopies", "6700000");
         values.put("Rating", "4.2");
         Record record2 = new Record(tenantId, tableName, values);
-
         values = new HashMap<>();
         values.put("Title", "Insurgent");
         values.put("Author", "Veronica_Roth");
@@ -1541,7 +1528,6 @@ public class AnalyticsDataServiceTest implements GroupEventListener {
         values.put("NoOfCopies", "11600000");
         values.put("Rating", "4.8");
         Record record3 = new Record(tenantId, tableName, values);
-
         values = new HashMap<>();
         values.put("Title", "Allegiant");
         values.put("Author", "Veronica_Roth");
@@ -1551,16 +1537,13 @@ public class AnalyticsDataServiceTest implements GroupEventListener {
         values.put("NoOfCopies", "11000000");
         values.put("Rating", "4.4");
         Record record4 = new Record(tenantId, tableName, values);
-
         records.add(record1);
         records.add(record2);
         records.add(record3);
         records.add(record4);
         this.service.put(records);
         this.service.waitForIndexing(DEFAULT_WAIT_TIME);
-
         long recordCount = this.service.getRecordCount(tenantId, tableName, Long.MIN_VALUE, Long.MAX_VALUE);
-
         Assert.assertEquals(recordCount, 4);
         SortByField sortByField = new SortByField();
         sortByField.setFieldName("Author");
@@ -1577,9 +1560,7 @@ public class AnalyticsDataServiceTest implements GroupEventListener {
         Assert.assertEquals(sortedResults.size(), 4);
         this.cleanupTable(tenantId, tableName);
         logger.info(this.service.tableExists(tenantId, tableName));
-
     }
-
 
     @Test(dependsOnMethods = "testSortData")
     public void testReIndex() throws AnalyticsException, InterruptedException {
@@ -1603,31 +1584,23 @@ public class AnalyticsDataServiceTest implements GroupEventListener {
         values.put("Author", "E.Hemingway");
         values.put("Published_Date", "1926,08,09");
         Record record1 = new Record(tenantId, tableName, values);
-
         values = new HashMap<>();
         values.put("Title", "Divergent");
         values.put("Author", "Veronica_Roth");
         values.put("Published_Date", "2011,04,25");
         Record record2 = new Record(tenantId, tableName, values);
-
         records.add(record1);
         records.add(record2);
         this.service.put(records);
         this.service.waitForIndexing(DEFAULT_WAIT_TIME);
-
         List<SearchResultEntry> beforeReIndex = this.service.search(tenantId, tableName, "*:*", 0, 2);
         Assert.assertEquals(beforeReIndex.size(), 2);
-
         this.service.clearIndexData(tenantId, tableName);
-
         List<SearchResultEntry> nonIndexed = this.service.search(tenantId, tableName, "*:*", 0, 2);
         Assert.assertEquals(nonIndexed.size(), 0);
-
         this.service.reIndex(tenantId, tableName, Long.MIN_VALUE, Long.MAX_VALUE);
         this.service.waitForIndexing(DEFAULT_WAIT_TIME);
-
         List<SearchResultEntry> afterIndex = new ArrayList<>();
-
         int count = 0;
         while (count < 10) {
             Thread.sleep(2000);
@@ -1638,7 +1611,6 @@ public class AnalyticsDataServiceTest implements GroupEventListener {
             }
             count++;
         }
-
         Assert.assertEquals(afterIndex.size(), 2);
         this.cleanupTable(tenantId, tableName);
     }
@@ -1648,26 +1620,19 @@ public class AnalyticsDataServiceTest implements GroupEventListener {
         logger.info("Starting Test testGlobalTenantId");
         int tenantId = Constants.GLOBAL_TENANT_TABLE_ACCESS_TENANT_ID;
         String tableName = "GlobalTable";
-
         this.cleanupTable(tenantId, tableName);
-
         List<ColumnDefinition> columnDefinitions = new ArrayList<>();
         columnDefinitions.add(new ColumnDefinition("Author", ColumnType.STRING, true, false));
         columnDefinitions.add(new ColumnDefinition("Title", ColumnType.STRING, true, false));
         AnalyticsSchema schema = new AnalyticsSchema(columnDefinitions, null);
         this.service.createTable(tenantId, tableName);
         this.service.setTableSchema(tenantId, tableName, schema);
-
         String tableTwoName = "GlobalTable2";
         AnalyticsSchema schema1 = new AnalyticsSchema();
-
         this.service.createTableIfNotExists(tenantId, this.service.listRecordStoreNames().get(0), tableTwoName);
-
         this.cleanupTable(tenantId, tableName);
         this.cleanupTable(tenantId, tableTwoName);
-
     }
-
 
     @Test(enabled = false)
     @Override
