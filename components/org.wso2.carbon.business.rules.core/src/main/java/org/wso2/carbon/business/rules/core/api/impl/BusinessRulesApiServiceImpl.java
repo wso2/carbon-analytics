@@ -405,10 +405,9 @@ public class BusinessRulesApiServiceImpl extends BusinessRulesApiService {
         }
         TemplateManagerService templateManagerService = TemplateManagerInstance.getInstance();
         Gson gson = new GsonBuilder().disableHtmlEscaping().setPrettyPrinting().create();
-        int status;
         List<Object> responseData = new ArrayList<Object>();
         try {
-            status = templateManagerService.redeployBusinessRule(businessRuleInstanceID);
+            int status = templateManagerService.redeployBusinessRule(businessRuleInstanceID);
             switch (status) {
                 case (TemplateManagerConstants.DEPLOYED):
                     responseData.add("Deployment Successful");

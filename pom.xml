@@ -901,7 +901,6 @@
                 <type>zip</type>
             </dependency>
 
-
             <!-- Siddhi Editor related -->
             <dependency>
                 <groupId>org.wso2.carbon.analytics</groupId>
@@ -938,7 +937,6 @@
                 <version>${carbon.analytics.version}</version>
                 <type>zip</type>
             </dependency>
-
 
             <!--siddhi dependencies start-->
 
