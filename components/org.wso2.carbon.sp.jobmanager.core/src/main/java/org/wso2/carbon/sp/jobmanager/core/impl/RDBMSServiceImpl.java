@@ -68,19 +68,20 @@ public class RDBMSServiceImpl {
     public RDBMSServiceImpl() {
         List<Queries> deploymentQueries = ServiceDataHolder.getDeploymentConfig().getQueries();
         List<Queries> componentQueries = new ArrayList<Queries>();
-        URL url = this.getClass().getClassLoader().getResource("queries.yaml");
+        URL url = this.getClass().getClassLoader().getResource(ResourceManagerConstants.QUERY_YAML_FILE_NAME);
         if (url != null) {
             DeploymentConfig componentConfigurations = null;
             try {
                 componentConfigurations = readYamlContent(url.openStream());
             } catch (IOException e) {
-                throw new RuntimeException("Unable to read queries.yaml file.");
+                throw new ResourceManagerException("Unable to read " + ResourceManagerConstants.QUERY_YAML_FILE_NAME +
+                        " file.");
             }
             if (componentConfigurations != null) {
                 componentQueries = componentConfigurations.getQueries();
             }
         } else {
-            throw new RuntimeException("Unable to load queries.yaml file from resources.");
+            throw new ResourceManagerException("Unable to load queries.yaml file from resources.");
         }
         String datasourceName = ServiceDataHolder.getDeploymentConfig().getDatasource();
         if (datasourceName == null) {
@@ -99,9 +100,11 @@ public class RDBMSServiceImpl {
         Connection conn = null;
         try {
             conn = this.datasource.getConnection();
-            queries = QueryProvider.mergeMapping(conn.getMetaData().getDatabaseProductName(), conn.getMetaData().getDatabaseProductVersion(), componentQueries, deploymentQueries);
+            queries = QueryProvider.mergeMapping(conn.getMetaData().getDatabaseProductName(),
+                    conn.getMetaData().getDatabaseProductVersion(), componentQueries, deploymentQueries);
         } catch (QueryMappingNotAvailableException e) {
-            throw new ResourceManagerException("Error in getting the mapping query. Please check queries under deployment.config in deployment.yaml", e);
+            throw new ResourceManagerException("Error in getting the mapping query. Please check queries under " +
+                    "deployment.config in deployment.yaml", e);
         } catch (SQLException e) {
             throw new ResourceManagerException("Error when getting connection for SP_MGT_DB datasource", e);
         } finally {

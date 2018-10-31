@@ -143,4 +143,6 @@ public class ResourceManagerConstants {
 
     public static final String PS_SELECT_RESOURCE_MAPPING_ROW = "ps_select_resource_mapping_row";
 
+    public static final String QUERY_YAML_FILE_NAME = "queries.yaml";
+
 }

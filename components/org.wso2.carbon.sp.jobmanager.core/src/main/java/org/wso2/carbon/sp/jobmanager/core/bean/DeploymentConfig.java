@@ -24,6 +24,7 @@ import org.wso2.carbon.database.query.manager.config.Queries;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * This class represents the deployment configuration for distributed deployment.
@@ -57,7 +58,7 @@ public class DeploymentConfig implements Serializable {
     @Element(description = "provider url configuration for siddhi-jms-io")
     private String providerUrl;
     @Element(description = "Database queries template array list.")
-    private ArrayList<Queries> queries = new ArrayList<>();
+    private List<Queries> queries = new ArrayList<>();
 
     public String getProviderUrl() {
         return providerUrl;
@@ -155,11 +156,11 @@ public class DeploymentConfig implements Serializable {
         this.allocationAlgorithm = allocationAlgorithm;
     }
 
-    public ArrayList<Queries> getQueries() {
+    public List<Queries> getQueries() {
         return queries;
     }
 
-    public void setQueries(ArrayList<Queries> queries) {
+    public void setQueries(List<Queries> queries) {
         this.queries = queries;
     }
 
