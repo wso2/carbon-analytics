@@ -17,14 +17,15 @@
  */
 package org.wso2.carbon.business.rules.core.deployer;
 
-import feign.Response;
-import feign.RetryableException;
 import org.json.JSONObject;
 import org.wso2.carbon.business.rules.core.datasource.configreader.ConfigReader;
 import org.wso2.carbon.business.rules.core.deployer.api.SiddhiAppApiHelperService;
 import org.wso2.carbon.business.rules.core.deployer.util.HTTPSClientUtil;
 import org.wso2.carbon.business.rules.core.exceptions.SiddhiAppDeployerServiceStubException;
 import org.wso2.carbon.business.rules.core.exceptions.SiddhiAppsApiHelperException;
+
+import feign.Response;
+import feign.RetryableException;
 
 /**
  * Consists of methods for additional features for the exposed Siddhi App Api
@@ -51,13 +52,16 @@ public class SiddhiAppApiHelper implements SiddhiAppApiHelperService {
                     return true;
                 case 400:
                     throw new SiddhiAppsApiHelperException("A validation error occurred during " +
-                            "saving the siddhi app '" + siddhiApp + "' on the node '" + hostAndPort + "'");
+                            "saving the siddhi app '" + siddhiApp +
+                            "' on the node '" + hostAndPort + "'");
                 case 409:
                     throw new SiddhiAppsApiHelperException("A Siddhi Application with " +
-                            "the given name already exists in the node '" + hostAndPort + "'");
+                            "the given name already exists  " +
+                            "in the node '" + hostAndPort + "'");
                 case 500:
                     throw new SiddhiAppsApiHelperException("Unexpected error occurred during " +
-                            "saving the siddhi app '" + siddhiApp + "' on the node '" + hostAndPort + "'");
+                            "saving the siddhi app '" + siddhiApp + "' " +
+                            "on the node '" + hostAndPort + "'");
                 default:
                     throw new SiddhiAppsApiHelperException("Unexpected status code '" + status + "' received when " +
                             "trying to deploy the siddhi app '" + siddhiApp + "' on node '" + hostAndPort + "'");
@@ -148,7 +152,7 @@ public class SiddhiAppApiHelper implements SiddhiAppApiHelperService {
         }
     }
 
-    private void closeResponse(Response response) {
+    private void closeResponse(feign.Response response) {
         if (response != null) {
             response.close();
         }

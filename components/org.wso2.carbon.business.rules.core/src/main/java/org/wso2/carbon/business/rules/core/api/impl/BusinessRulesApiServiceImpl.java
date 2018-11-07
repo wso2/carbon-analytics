@@ -28,6 +28,7 @@ import org.wso2.carbon.business.rules.core.api.BusinessRulesApiService;
 import org.wso2.carbon.business.rules.core.api.NotFoundException;
 import org.wso2.carbon.business.rules.core.bean.BusinessRule;
 import org.wso2.carbon.business.rules.core.bean.RuleTemplate;
+import org.wso2.carbon.business.rules.core.bean.Template;
 import org.wso2.carbon.business.rules.core.bean.TemplateGroup;
 import org.wso2.carbon.business.rules.core.bean.TemplateManagerInstance;
 import org.wso2.carbon.business.rules.core.bean.scratch.BusinessRuleFromScratch;
@@ -86,8 +87,8 @@ public class BusinessRulesApiServiceImpl extends BusinessRulesApiService {
         String businessRuleName = null;
         try {
             // Check the business rule type of the json object
-            if ((TemplateManagerConstants.BUSINESS_RULE_TYPE_TEMPLATE).equalsIgnoreCase(businessRuleJson.
-                    get(TemplateManagerConstants.BUSINESS_RULE_TYPE).getAsString())) {
+            if (businessRuleJson.get("type").toString().equals("\"" + TemplateManagerConstants
+                    .BUSINESS_RULE_TYPE_TEMPLATE + "\"")) {
                 // Convert to business rule from template and create
                 BusinessRuleFromTemplate businessRuleFromTemplate = TemplateManagerHelper
                         .jsonToBusinessRuleFromTemplate(businessRule);
@@ -311,6 +312,7 @@ public class BusinessRulesApiServiceImpl extends BusinessRulesApiService {
         TemplateManagerService templateManagerService = TemplateManagerInstance.getInstance();
         List<Object> responseData = new ArrayList<Object>();
         Gson gson = new GsonBuilder().disableHtmlEscaping().setPrettyPrinting().create();
+
         try {
             // Get template groups and store without UUIDs
             Map<String, TemplateGroup> templateGroups = templateManagerService.getTemplateGroups();
@@ -399,33 +401,59 @@ public class BusinessRulesApiServiceImpl extends BusinessRulesApiService {
     }
 
     @Override
-    public Response redeployBusinessRule(Request request, String businessRuleInstanceID) throws NotFoundException {
+    public Response deployOrUndeployBusinessRule(Request request, String businessRuleInstanceID,
+                                                 boolean shouldUndeploy) throws NotFoundException {
         if (!hasPermission(request, RequestMethod.REDEPLOY_BUSINESS_RULE)) {
             return Response.status(Response.Status.UNAUTHORIZED).build();
         }
+
         TemplateManagerService templateManagerService = TemplateManagerInstance.getInstance();
         Gson gson = new GsonBuilder().disableHtmlEscaping().setPrettyPrinting().create();
+        int status;
         List<Object> responseData = new ArrayList<Object>();
         try {
-            int status = templateManagerService.redeployBusinessRule(businessRuleInstanceID);
+            status = templateManagerService.deployOrUndeployBusinessRule(businessRuleInstanceID, shouldUndeploy);
             switch (status) {
                 case (TemplateManagerConstants.DEPLOYED):
                     responseData.add("Deployment Successful");
                     responseData.add("Successfully deployed the business rule");
                     break;
-                case (TemplateManagerConstants.PARTIALLY_UNDEPLOYED):
+                case (TemplateManagerConstants.SAVED):
+                    responseData.add("Deployment Successful");
+                    responseData.add("Successfully undeployed the business rule");
+                    break;
+                case (TemplateManagerConstants.SUCCESSFULLY_UNDEPLOYED):
+                    responseData.add("Undeployment Successful");
+                    responseData.add("Successfully undeployed the business rule");
+                    break;
+                case (TemplateManagerConstants.PARTIALLY_DEPLOYED):
                     responseData.add("Partially Deployed");
                     responseData.add("Partially deployed the business rule");
+                    break;
+                case (TemplateManagerConstants.PARTIALLY_UNDEPLOYED):
+                    responseData.add("Partially Undeployed");
+                    responseData.add("Partially undeployed the business rule");
                     break;
                 case (TemplateManagerConstants.DEPLOYMENT_FAILURE):
                     responseData.add("Deployment Failure");
                     responseData.add("Failed to deploy the business rule");
+                    break;
+                case (TemplateManagerConstants.UNDEPLOYMENT_FAILURE):
+                    responseData.add("Undeployment Failure");
+                    responseData.add("Failed to undeploy the business rule");
                     break;
                 default:
                     responseData.add("Deployment Error");
                     responseData.add("Failed to deploy the business rule");
             }
             responseData.add(status);
+            return Response.ok().entity(gson.toJson(responseData)).build();
+        } catch (BusinessRuleNotFoundException e) {
+            log.error(String.format("Failed to undeploy the business rule %s ",
+                    LogEncoder.removeCRLFCharacters(businessRuleInstanceID)), e);
+            responseData.add("Business Rule Not Found");
+            responseData.add("Could not find business rule with uuid '" + businessRuleInstanceID + "'");
+            responseData.add(TemplateManagerConstants.ERROR);
             return Response.ok().entity(gson.toJson(responseData)).build();
         } catch (TemplateManagerServiceException e) {
             log.error(String.format("Failed to re-deploy the business rule with uuid %s ",
@@ -439,14 +467,6 @@ public class BusinessRulesApiServiceImpl extends BusinessRulesApiService {
             responseData.add(e.getMessage());
             responseData.add(TemplateManagerConstants.SCRIPT_EXECUTION_ERROR);
             return Response.serverError().entity(gson.toJson(responseData)).build();
-        } catch (TemplateInstanceCountViolationException e) {
-            log.error(String.format("Failed to deploy business rule %s ",
-                    LogEncoder.removeCRLFCharacters(businessRuleInstanceID)), e);
-            responseData.add("Selected rule template can be instantiated only once.");
-            responseData.add("Selected rule template can be instantiated only once. Please delete the existing rule " +
-                    "created from the selected rule template before deploying this busienss rule.");
-            responseData.add(TemplateManagerConstants.ERROR);
-            return Response.ok().entity(gson.toJson(responseData)).build();
         }
     }
 
@@ -462,8 +482,8 @@ public class BusinessRulesApiServiceImpl extends BusinessRulesApiService {
         JsonObject businessRuleJson = gson.fromJson(businessRuleDefinition, JsonObject.class);
         int status;
         try {
-            if ((TemplateManagerConstants.BUSINESS_RULE_TYPE_TEMPLATE).equalsIgnoreCase(businessRuleJson.get
-                    (TemplateManagerConstants.BUSINESS_RULE_TYPE).getAsString())) {
+            if (businessRuleJson.get("type").toString().equals("\"" +
+                    TemplateManagerConstants.BUSINESS_RULE_TYPE_TEMPLATE + "\"")) {
                 BusinessRuleFromTemplate businessRuleFromTemplate = TemplateManagerHelper
                         .jsonToBusinessRuleFromTemplate(businessRuleDefinition);
                 status = templateManagerService.editBusinessRuleFromTemplate(businessRuleInstanceID,
@@ -491,6 +511,14 @@ public class BusinessRulesApiServiceImpl extends BusinessRulesApiService {
                 case (TemplateManagerConstants.DEPLOYMENT_FAILURE):
                     responseData.add("Deployment Failure");
                     responseData.add("Failed to deploy the business rule");
+                    break;
+                case (TemplateManagerConstants.UNDEPLOYMENT_FAILURE):
+                    responseData.add("Undeployment Failure");
+                    responseData.add("Failed to undeploy the business rule");
+                    break;
+                case (TemplateManagerConstants.PARTIALLY_UNDEPLOYED):
+                    responseData.add("PARTIALLY UNDEPLOYED");
+                    responseData.add("Partially undeploy the business rule ");
                     break;
                 default:
                     responseData.add("Error Saving");

@@ -25,8 +25,7 @@ import org.wso2.carbon.business.rules.core.exceptions.TemplateManagerHelperExcep
 import java.io.File;
 
 public class TestUtil {
-    public static int validateBusinessRules(String dirUri) throws TemplateManagerHelperException,
-            RuleTemplateScriptException {
+    public static int ValidateBusinessRules(String dirUri) throws TemplateManagerHelperException, RuleTemplateScriptException {
         File directory = new File(dirUri);
         int count = 0;
         File[] files = directory.listFiles();

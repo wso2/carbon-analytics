@@ -18,9 +18,6 @@
 
 package org.wso2.carbon.business.rules.core.util;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import com.google.gson.JsonObject;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.text.StrSubstitutor;
 import org.wso2.carbon.business.rules.core.bean.RuleTemplate;
@@ -38,19 +35,29 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.io.PrintWriter;
 import java.io.Reader;
+import java.io.StringWriter;
+import java.io.Writer;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Consumer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
 import javax.script.ScriptContext;
 import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
 import javax.script.ScriptException;
 import javax.script.SimpleScriptContext;
+
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonObject;
 
 /**
  * Consists of methods for additional features for the exposed Template Manager service
@@ -127,8 +134,12 @@ public class TemplateManagerHelper {
     }
 
     /**
-     * Checks whether a given TemplateGroup object has valid content Validation criteria : - name is available - uuid is
-     * available - At least one ruleTemplate is available - Each available RuleTemplate should be valid
+     * Checks whether a given TemplateGroup object has valid content
+     * Validation criteria :
+     * - name is available
+     * - uuid is available
+     * - At least one ruleTemplate is available
+     * - Each available RuleTemplate should be valid
      *
      * @param templateGroup template group object
      * @throws TemplateManagerHelperException template manager exceptions
@@ -163,10 +174,15 @@ public class TemplateManagerHelper {
     /**
      * Checks whether a given RuleTemplate object has valid content
      * <p>
-     * Validation Criteria : - name is available - uuid is available - instanceCount is either 'one' or 'many' - type is
-     * either 'template', 'input' or 'output' - Only one template available if type is 'input' or 'output'; otherwise at
-     * least one template available - Validate each template - Templated elements from the templates, should be
-     * specified in either properties or script - Validate all properties
+     * Validation Criteria :
+     * - name is available
+     * - uuid is available
+     * - instanceCount is either 'one' or 'many'
+     * - type is either 'template', 'input' or 'output'
+     * - Only one template available if type is 'input' or 'output'; otherwise at least one template available
+     * - Validate each template
+     * - Templated elements from the templates, should be specified in either properties or script
+     * - Validate all properties
      *
      * @param ruleTemplate rule template object
      * @throws TemplateManagerHelperException template manager exceptions
@@ -204,8 +220,9 @@ public class TemplateManagerHelper {
         if (!(ruleTemplate.getType().toLowerCase().equals(TemplateManagerConstants.RULE_TEMPLATE_TYPE_TEMPLATE) ||
                 ruleTemplate.getType().toLowerCase().equals(TemplateManagerConstants.RULE_TEMPLATE_TYPE_INPUT) ||
                 ruleTemplate.getType().toLowerCase().equals(TemplateManagerConstants.RULE_TEMPLATE_TYPE_OUTPUT))) {
-            throw new TemplateManagerHelperException("Invalid rule template - invalid rule template type for " +
-                    "rule template " + ruleTemplate.getUuid());
+            throw new TemplateManagerHelperException("Invalid rule template - " +
+                    "invalid rule template type for rule template " +
+                    "" + ruleTemplate.getUuid());
         }
         if (ruleTemplate.getTemplates() == null) {
             throw new TemplateManagerHelperException("Invalid rule template - there should be at least one " +
@@ -215,8 +232,8 @@ public class TemplateManagerHelper {
                 ruleTemplate.getType().toLowerCase().equals(TemplateManagerConstants.RULE_TEMPLATE_TYPE_OUTPUT)) {
             if (ruleTemplate.getTemplates().size() != 1) {
                 throw new TemplateManagerHelperException("Invalid rule template - " +
-                        "there should be exactly one template for " + ruleTemplate.getType() + " type rule template - "
-                        + ruleTemplate.getUuid());
+                        "there should be exactly one template for " +
+                        ruleTemplate.getType() + " type rule template - " + ruleTemplate.getUuid());
             }
         } else {
             if (ruleTemplate.getTemplates().size() == 0) {
@@ -237,8 +254,8 @@ public class TemplateManagerHelper {
     }
 
     /**
-     * Checks whether all the templated elements of all the templates under the given rule template, are having
-     * replacement values either in properties, or in script
+     * Checks whether all the templated elements of all the templates under the given rule template,
+     * are having replacement values either in properties, or in script
      *
      * @param ruleTemplate
      * @throws TemplateManagerHelperException
@@ -267,8 +284,8 @@ public class TemplateManagerHelper {
             try {
                 replaceTemplateString(template.getContent(), propertyReplacements);
             } catch (TemplateManagerHelperException e) {
-                throw new TemplateManagerHelperException("Invalid template. All the templated elements are not having "
-                        + "replacements", e);
+                throw new TemplateManagerHelperException("Invalid template. All the templated elements are not having " +
+                        "replacements", e);
             }
         }
     }
@@ -276,16 +293,17 @@ public class TemplateManagerHelper {
     /**
      * Checks whether a given Template is valid
      * <p>
-     * Validation Criteria : - type is available - content is available - type should be 'siddhiApp' ('gadget' and
-     * 'dashboard' are not considered for now) - exposedStremDefinition available if ruleTemplateType is either 'input'
-     * or 'output', otherwise not available
+     * Validation Criteria :
+     * - type is available
+     * - content is available
+     * - type should be 'siddhiApp' ('gadget' and 'dashboard' are not considered for now)
+     * - exposedStremDefinition available if ruleTemplateType is either 'input' or 'output', otherwise not available
      *
      * @param template
      * @param ruleTemplateType
      * @throws TemplateManagerHelperException
      */
-    private static void validateTemplate(Template template, String ruleTemplateType)
-            throws TemplateManagerHelperException {
+    private static void validateTemplate(Template template, String ruleTemplateType) throws TemplateManagerHelperException {
         if (template.getType() == null) {
             throw new TemplateManagerHelperException("Invalid template. Template type not found");
         }
@@ -309,9 +327,10 @@ public class TemplateManagerHelper {
                         "template within a rule template of type " + ruleTemplateType);
             }
             if (!template.getType().equals(TemplateManagerConstants.TEMPLATE_TYPE_SIDDHI_APP)) {
-                throw new TemplateManagerHelperException("Invalid template. " + template.getType() + " is not a valid" +
-                        " template type for a template within a rule template of type " + ruleTemplateType + ". " +
-                        "Template type must be '" + TemplateManagerConstants.TEMPLATE_TYPE_SIDDHI_APP + "'");
+                throw new TemplateManagerHelperException("Invalid template. " + template.getType() +
+                        " is not a valid template type for a template within a rule template" +
+                        "of type " + ruleTemplateType + ". Template type must be '" +
+                        TemplateManagerConstants.TEMPLATE_TYPE_SIDDHI_APP + "'");
             }
         } else {
             // If ruleTemplate type 'template'
@@ -322,15 +341,18 @@ public class TemplateManagerHelper {
                     add(TemplateManagerConstants.TEMPLATE_TYPE_DASHBOARD);
                 }
             };
+
             if (template.getExposedStreamDefinition() != null) {
-                throw new TemplateManagerHelperException("Invalid template. exposedStreamDefinition should not exist " +
-                        "for template within a rule template of type " + ruleTemplateType);
+                throw new TemplateManagerHelperException("Invalid template. " +
+                        "exposedStreamDefinition should not exist for " +
+                        "template within a rule template of type " + ruleTemplateType);
             }
             if (!validTemplateTypes.contains(template.getType())) {
                 // Only siddhiApps are there for now
-                throw new TemplateManagerHelperException("Invalid template. " + template.getType() + " is not a valid" +
-                        " template type for a template within a rule template of type " + ruleTemplateType + ". " +
-                        "Template type must be '" + TemplateManagerConstants.TEMPLATE_TYPE_SIDDHI_APP + "'");
+                throw new TemplateManagerHelperException("Invalid template. " + template.getType() +
+                        " is not a valid template type for a template within a rule template" +
+                        "of type " + ruleTemplateType + ". Template type must be '" +
+                        TemplateManagerConstants.TEMPLATE_TYPE_SIDDHI_APP + "'");
             }
         }
     }
@@ -338,8 +360,12 @@ public class TemplateManagerHelper {
     /**
      * Validates given properties
      * <p>
-     * Validation Criteria : - Definition is available - Field name is available - Description is available - No null
-     * options available (In case of options are present) - No empty options available (In case of options are present)
+     * Validation Criteria :
+     * - Definition is available
+     * - Field name is available
+     * - Description is available
+     * - No null options available (In case of options are present)
+     * - No empty options available (In case of options are present)
      *
      * @param properties
      * @throws TemplateManagerHelperException
@@ -404,6 +430,7 @@ public class TemplateManagerHelper {
         if (siddhiAppNameMatcher.find()) {
             return siddhiAppNameMatcher.group(1);
         }
+
         throw new TemplateManagerHelperException("Invalid SiddhiApp Name Found");
     }
 
@@ -440,21 +467,23 @@ public class TemplateManagerHelper {
     public static String replaceRegex(String templateString, String regexPatternString,
                                       Map<String, String> replacementValues) throws TemplateManagerHelperException {
         StringBuffer replacedString = new StringBuffer();
+
         Pattern regexPattern = Pattern.compile(regexPatternString);
         Matcher regexMatcher = regexPattern.matcher(templateString);
+
         // When an element with regex is is found
         while (regexMatcher.find()) {
             String elementToReplace = regexMatcher.group(1);
             String elementReplacement = replacementValues.get(elementToReplace);
             // No replacement found in the given map
             if (elementReplacement == null) {
-                throw new TemplateManagerHelperException("No matching replacement found for the value - " +
-                        elementToReplace);
+                throw new TemplateManagerHelperException("No matching replacement found for the value - " + elementToReplace);
             }
             // Replace element with regex, with the found replacement
             regexMatcher.appendReplacement(replacedString, elementReplacement);
         }
         regexMatcher.appendTail(replacedString);
+
         return replacedString.toString();
     }
 
@@ -468,8 +497,10 @@ public class TemplateManagerHelper {
     public static Map<String, String> getScriptGeneratedVariables(String script) throws RuleTemplateScriptException {
         ScriptEngineManager manager = new ScriptEngineManager();
         ScriptEngine engine = manager.getEngineByName("JavaScript");
+
         ScriptContext scriptContext = new SimpleScriptContext();
         scriptContext.setBindings(engine.createBindings(), ScriptContext.ENGINE_SCOPE);
+
         try {
             // Run script
             engine.eval(script);

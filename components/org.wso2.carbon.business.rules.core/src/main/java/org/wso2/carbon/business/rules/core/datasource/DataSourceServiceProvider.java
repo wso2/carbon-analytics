@@ -17,7 +17,6 @@
  */
 package org.wso2.carbon.business.rules.core.datasource;
 
-import com.zaxxer.hikari.HikariDataSource;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.FrameworkUtil;
 import org.osgi.framework.ServiceReference;
@@ -35,7 +34,10 @@ import java.io.IOException;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.SQLException;
+
 import javax.sql.DataSource;
+
+import com.zaxxer.hikari.HikariDataSource;
 
 /**
  * Data Source Service Provider class
@@ -58,6 +60,7 @@ public class DataSourceServiceProvider {
     private Connection initConnection() {
         BundleContext bundleContext = FrameworkUtil.getBundle(DataSourceService.class).getBundleContext();
         ServiceReference serviceRef = bundleContext.getServiceReference(DataSourceService.class.getName());
+
         ConfigReader configReader = new ConfigReader();
         String datasourceName = configReader.getDatasourceName();
         if (serviceRef == null) {

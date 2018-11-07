@@ -23,7 +23,6 @@ import org.slf4j.LoggerFactory;
 import org.wso2.carbon.analytics.permissions.PermissionProvider;
 import org.wso2.carbon.analytics.permissions.bean.Permission;
 import org.wso2.carbon.analytics.permissions.bean.Role;
-import org.wso2.carbon.business.rules.core.datasource.DatasourceConstants;
 
 import java.util.HashMap;
 import java.util.List;
@@ -45,8 +44,6 @@ public class ConfigReader {
     private static final String ID = "id";
     private static final String NAME = "name";
     private static final String CARBON_NAMESPACE = "wso2.carbon";
-    private static final String ADMIN = "admin";
-    private static final String CARBON_CONFIGS_TYPE = "type";
 
     private static final Permission managerPermission = new Permission("BRM", "businessrules.manager");
     private static final Permission viewerPermission = new Permission("BRM", "businessrules.viewer");
@@ -82,18 +79,18 @@ public class ConfigReader {
     }
 
     public String getSolutionType() {
-        Object solutionType = carbonConfigs.get(CARBON_CONFIGS_TYPE);
-        return solutionType != null ? solutionType.toString() : DatasourceConstants.SP;
+        Object solutionType = carbonConfigs.get("type");
+        return solutionType != null ? solutionType.toString() : "sp";
     }
 
     public String getUserName() {
         Object username = configs.get(USER_NAME);
-        return username != null ? username.toString() : ADMIN;
+        return username != null ? username.toString() : "admin";
     }
 
     public String getPassword() {
         Object password = configs.get(PASSWORD);
-        return password != null ? password.toString() : ADMIN;
+        return password != null ? password.toString() : "admin";
     }
 
     public String getDatasourceName() {
@@ -125,6 +122,7 @@ public class ConfigReader {
             if (roles != null) {
                 List<Map<String, List>> managers = (List<Map<String, List>>) roles.get(MANAGER);
                 List<Map<String, List>> viewers = (List<Map<String, List>>) roles.get(VIEWER);
+
                 PermissionProvider permissionProvider = DataHolder.getInstance().getPermissionProvider();
                 if (!permissionProvider.isPermissionExists(managerPermission)) {
                     permissionProvider.addPermission(managerPermission);
@@ -132,6 +130,7 @@ public class ConfigReader {
                 if (!permissionProvider.isPermissionExists(viewerPermission)) {
                     permissionProvider.addPermission(viewerPermission);
                 }
+
                 for (Map manager : managers) {
                     String name = manager.get(NAME).toString();
                     if (!permissionProvider.hasPermission(name, managerPermission)) {
