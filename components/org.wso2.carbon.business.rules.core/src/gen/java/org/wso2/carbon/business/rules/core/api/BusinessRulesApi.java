@@ -71,7 +71,7 @@ public class BusinessRulesApi implements Microservice {
             throws NotFoundException {
         return delegate.createBusinessRule(request, businessRule, shouldDeploy);
     }
-    
+
     @DELETE
     @Path("/instances/{businessRuleInstanceID}")
 
@@ -215,7 +215,7 @@ public class BusinessRulesApi implements Microservice {
             throws NotFoundException {
         return delegate.loadDeploymentInfo(request, businessRuleInstanceID);
     }
-///////////
+    
     @POST
     @Path("/instances/{businessRuleInstanceID}")
     @Consumes({"application/json"})
