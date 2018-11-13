@@ -61,6 +61,7 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
                 throw errorMessage;
             }
             this.options = options;
+            this.rawExtensions = options.rawExtensions;
             this.configurationData = this.options.configurationData;
             this.container = this.options.container;
             this.application = this.options.application;

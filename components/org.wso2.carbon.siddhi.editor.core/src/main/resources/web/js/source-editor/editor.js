@@ -98,6 +98,7 @@ define(["ace/ace", "jquery", "./constants", "./utils", "./completion-engine", ".
             self.state = new State();
 
             self.completionEngine = new CompletionEngine();
+            self.rawExtensions = CompletionEngine.rawExtensions;
 
             // Attaching editor's onChange event handler
             aceEditor.getSession().on('change', editorChangeHandler);
@@ -144,6 +145,10 @@ define(["ace/ace", "jquery", "./constants", "./utils", "./completion-engine", ".
             self.getDebugger = function () {
                 return self.debugger;
             };
+
+             self.getRawExtensions = function () {
+				return self.rawExtensions;
+			};
 
             /**
              * Returns the ace editor object
@@ -360,7 +365,6 @@ define(["ace/ace", "jquery", "./constants", "./utils", "./completion-engine", ".
                     }
                     return streams;
                 }
-
                 /**
                  * Get the attribute list from the attribute definitions list returned from the server
                  * This is used for transforming server's aggregation definitions to completion engine's aggregation

@@ -156,6 +156,7 @@ define(['require', 'jquery', 'backbone', 'lodash', 'log', 'design_view', "./sour
                     var application = self.options.application;
                     var designView = new DesignView(self.options, application, this.jsPlumbInstance);
                     this._designView = designView;
+                    designView.setRawExtensions(this._sourceView.getRawExtensions())
                     designView.renderToolPalette();
 
                     var toggleViewButton = this._$parent_el.find(_.get(this.options, 'toggle_controls.toggle_view'));
@@ -194,6 +195,9 @@ define(['require', 'jquery', 'backbone', 'lodash', 'log', 'design_view', "./sour
                              * Removed attributes are used only for front end use only.
                              * */
                             function removeUnnecessaryFieldsFromJSON(object) {
+                            	if (object.hasOwnProperty('rawExtensions')) {
+									delete object['rawExtensions'];
+								}
                                 if (object.hasOwnProperty('application')) {
                                     delete object['application'];
                                 }

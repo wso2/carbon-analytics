@@ -43,6 +43,14 @@ define(['require', 'log', 'lodash', 'jquery', 'configurationData', 'appData', 'p
             this.application = application;
         };
 
+         InitialiseDataStructure.prototype.setRawExtension = function (rawExtensions) {
+         	this.rawExtensions = rawExtensions;
+         };
+
+         InitialiseDataStructure.prototype.getRawExtension = function (rawExtensions) {
+			return this.rawExtensions;
+		  };
+
         /**
          * @function Initializes the AppData object with th provided configuration
          * @param {Object} configurationJSON configuration data to initialise the data structure
@@ -52,8 +60,7 @@ define(['require', 'log', 'lodash', 'jquery', 'configurationData', 'appData', 'p
             var currentTabId = self._$parent_el.attr('id');
             self.newIdBeginningPhrase = currentTabId + "_element_";
             self.appData = new AppData();
-            self.configurationData = new ConfigurationData(self.appData, self.application);
-
+            self.configurationData = new ConfigurationData(self.appData, self.application, self.getRawExtension());
             // set the app name
             self.appData.setSiddhiAppName(configurationJSON.siddhiAppConfig.siddhiAppName);
             // set the app desc

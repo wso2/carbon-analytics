@@ -188,6 +188,7 @@ define(['require', 'log', 'jquery', 'lodash', 'designViewUtils'],
         JSONValidator.prototype.validateSourceOrSinkAnnotation = function (annotation, type, doNotShowErrorMessages) {
             var errorMessage;
             removeTooltipErrorMessage(annotation.id);
+            removeWarningHighlighter(annotation.id);
             if (!annotation.connectedElementName) {
                 errorMessage = type + ' annotation does not contain a connected stream';
                 highlightErrorElement(annotation.id, errorMessage);
@@ -611,6 +612,13 @@ define(['require', 'log', 'jquery', 'lodash', 'designViewUtils'],
             var element = $('#' + errorElementId);
             element.prop('title', '');
         }
+
+		function removeWarningHighlighter(warningElementId){
+			var element = $('#' + warningElementId);
+			if(element.hasClass('not-connected-source-sink')) {
+				element.removeClass('not-connected-source-sink');
+			}
+		}
 
         return JSONValidator;
     });
