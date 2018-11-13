@@ -475,6 +475,9 @@ h3,
 .design-view-form-content h3 {
     font-size: 14px;
 }
+.design-view-form-content h4 {
+	font-size: 12px;
+}
 
 .design-view-form-content .form-control {
     max-width: 500px;
@@ -599,108 +602,339 @@ a.list-group-item, button.list-group-item {
     display: none;
 }
 
-#
+.not-connected-source-sink {
+	border: 1px solid yellow;
+	box-shadow: 0 0 1px 2px yellow;
+}
 
 .error-element {
     border: 1px solid #FF0000;
     box-shadow: 0 0 1px 2px #FF0000;
 }
 
-#stream-form{
+.js-tree-error-node {
+	border: 1px solid red;
+	background: red;
+}
+
+.source-sink-form-container input[type="text"].required-input-field,
+.stream-form-container input[type="text"].required-input-field,
+.table-form-container input[type="text"].required-input-field {
+	border: 1px solid #FF0000;
+}
+
+#stream-form {
 	position:absolute;
 }
 
-#streamName, .attr-name {
-	width: 200px;
-	border: 0;
-	line-height: 25px;
+.stream-form-container .error-message,
+.table-form-container #tableNameErrorMessage,
+.table-form-container #define-attribute .error-message {
+	color: red;
+	padding-top: 3px;
+}
+
+.source-sink-form-container .error-message,
+.table-form-container #define-store-options .error-message,
+.design-view-form-content #define-table-annotation .error-message {
+	color: red;
+	padding: 3px;
+	margin-left: 20px;
+}
+
+.stream-form-container input[type="text"],
+.source-sink-form-container input[type="text"],
+.table-form-container input[type="text"] {
+	border: 1px solid #716e6e;
+	line-height: 20px;
 	padding: 0 5px;
-	color: black;
+	color: #ccc;
+	background: #424242;
 }
 
-.attr-type {
-    border: 0;
-	line-height: 25px;
+.source-sink-form-container input[type="text"].option-value,
+.table-form-container input[type="text"].option-value {
+	width: calc(90% - 30px);
+	margin-bottom: 2px;
+	margin-left: 20px;
+}
+
+.table-form-container input[type="text"].annotation-value {
+ 	margin-bottom: 2px;
+	margin-left: 20px;
+ }
+
+.stream-form-container .attr-nav,
+.table-form-container .attr-nav {
 	margin-left: 10px;
-	height: 25px;
-    color: black;
 }
 
-.attr-nav {
-	margin-left: 10px;
-}
-
-.attribute > .attr-nav > a  {
-	float:left;
+.stream-form-container .attribute .attr-nav  a,
+.table-form-container .attribute .attr-nav  a {
+	float: left;
 	display: inline-block;
-	height: 25px;
+	height: 22px;
 	padding: 0 5px;
-	margin-left: 10px;
-	background: #BDBDBD;
-	color: black;
+	margin-left: 3px;
+	margin-top: 2px;
+	background: #424242;
+	color: #ccc;
+	border: 1px solid #716e6e;
 }
 
-.attribute > .attr-nav > a > .fw-sort-down{
-	font-size: 20px;
-	margin-top: -2px;
+.source-sink-form-container .btn-del-option,
+.table-form-container .btn-del-option,
+.table-form-container .btn-del-annot-value {
+	display: inline-block;
+	height: 21px;
+	padding: 0 8px;
+	background: #424242;
+	margin-left: 3px;
+	border: 1px solid #716e6e;
 }
 
-.attribute > .attr-nav > a > .fw-sort-up {
-	font-size: 20px;
-	margin-top: 6px
+.source-sink-form-container input[type="text"].attr-key,
+.source-sink-form-container #attributeMap-type:disabled,
+.table-form-container #store-type:disabled {
+	cursor: not-allowed;
+	background: #1d1d1d;
+	border: 1px solid #545353;
 }
 
-.attribute > .attr-nav > a > .fw-cancel {
-	font-size: 11px;
-	margin-top: 5px;
+.stream-form-container .attribute .attr-nav a .fw-sort-down,
+.table-form-container .attribute .attr-nav a .fw-sort-down {
+	font-size: 16px;
+	margin-top: -3px;
+	color: #ccc;
 }
 
-.attr-nav, .attr-content {
+.stream-form-container .attribute .attr-nav a .fw-sort-up,
+.table-form-container .attribute .attr-nav a .fw-sort-up {
+	font-size: 16px;
+	margin-top: 6px;
+	color: #ccc;
+}
+
+.clearfix {
+	display: block;
+    content: "";
+    clear: both;
+}
+
+.stream-form-container .attribute .attr-nav a .fw-delete,
+.table-form-container .attribute .attr-nav a .fw-delete,
+.source-sink-form-container .fw-delete,
+.table-form-container .fw-delete {
+	font-size: 12px;
+	margin-top: 3px;
+	color: #ccc;
+}
+
+.stream-form-container .attr-nav, .stream-form-container .attr-content,
+.table-form-container .attr-nav, .table-form-container .attr-content{
 	display:inline-block;
 	float:left;
 }
 
-.attribute{
-	margin-bottom: 10px;
-	line-height: 25px;
-	height: 25px;
+.stream-form-container .attribute,
+.source-sink-form-container .attribute,
+.table-form-container .attribute{
+	margin-bottom: 5px;
 }
 
-.annotation > a > i.jstree-checkbox, .annotation > .jstree-clicked > i.jstree-checkbox,
+.annotation > a > i.jstree-checkbox,
+.annotation > .jstree-clicked > i.jstree-checkbox,
 .annotation > i.jstree-checkbox   {
 	display:none;
 }
 
-.annotation-key > a > i.jstree-checkbox, .annotation-key > .jstree-clicked > i.jstree-checkbox,
+.annotation-key > a > i.jstree-checkbox,
+.annotation-key > .jstree-clicked > i.jstree-checkbox,
 .annotation-key > i.jstree-checkbox   {
 	display:none;
 }
-.annotation-value > a > i.jstree-checkbox, .annotation-value > .jstree-clicked > i.jstree-checkbox,
+.annotation-value > a > i.jstree-checkbox,
+.annotation-value > .jstree-clicked > i.jstree-checkbox,
 .annotation-value > i.jstree-checkbox   {
 	display:none;
 }
 
-.mandatory-key > a > i.jstree-checkbox, .mandatory-key > .jstree-clicked > i.jstree-checkbox  {
+.mandatory-key > a > i.jstree-checkbox,
+.mandatory-key > .jstree-clicked > i.jstree-checkbox  {
 	display:none;
 }
 
-.mandatory-annotation > a > i.jstree-checkbox, .mandatory-annotation > .jstree-clicked > i.jstree-checkbox  {
+.mandatory-annotation > a > i.jstree-checkbox,
+.mandatory-annotation > .jstree-clicked > i.jstree-checkbox  {
 	display:none;
 }
 
-.mandatory-annotation > a.jstree-hovered, .mandatory-key > a.jstree-hovered, .optional-annotation > a.jstree-hovered,
+.mandatory-annotation > a.jstree-hovered,
+.mandatory-key > a.jstree-hovered, .optional-annotation > a.jstree-hovered,
 .optional-key > a.jstree-hovered {
 	cursor: context;
 	background: transparent;
 	border-radius: 0px;
 }
 
-#define-annotation {
-	color: white;
-	margin-left: 280px;
+.stream-form-container #define-annotation {
+	color: #ccc;
+}
+
+.table-form-container #define-annotation {
+	width: 30%;
+}
+
+.source-sink-form-container .cust-option-key,
+.table-form-container .cust-option-key {
+	margin-left:20px;
+}
+.source-sink-form-container .cust-option-value,
+.table-form-container .cust-option-value {
+	margin-left: 10px;
 }
 
 .stream-form-container {
 	float:left;
 	display:inline-block;
+	width:50%;
+	padding: 5px;
+}
+
+.source-sink-form-container,
+.table-form-container {
+	float:left;
+    display:inline-block;
+    padding: 5px;
+}
+
+.design-view-form-content .source-div,
+.design-view-form-content .sink-div {
+	width: 45%;
+}
+
+.design-view-form-content .table-div {
+	width: 25%;
+}
+
+.design-view-form-content .mapper-div {
+	width: 25% ;
+}
+
+.design-view-form-content .store-div {
+	width: 40%;
+	margin-top: 20px;
+}
+
+.design-view-form-content #define-table-annotation {
+	width: 30%;
+	margin-top: 10px;
+	margin-left: 20px;
+}
+
+.table-form-container #table-annotations .table-annotation {
+	margin-bottom: 10px;
+}
+
+.attribute-map-div {
+	width: 30%;
+	margin-top: 48px;
+}
+
+.table-form-container #store-options,
+.source-sink-form-container #source-options,
+.source-sink-form-container #sink-options {
+	display: flex;
+}
+
+.table-form-container .sub-store-options-div,
+.source-sink-form-container .sub-source-options-div,
+.source-sink-form-container .sub-sink-options-div {
+	width: 50%;
+}
+
+.stream-form-container #btn-submit,
+.source-sink-form-container #btn-submit,
+.table-form-container #btn-submit {
+	margin-top: 15px;
+}
+
+.source-sink-form-container input[type="checkbox"],
+.table-form-container input[type="checkbox"] {
+	margin: 0px 5px 0px 0;
+	vertical-align: middle;
+}
+
+.source-sink-form-container #attribute-key-label,
+.table-form-container #attribute-key-label {
+	margin-left: 75px;
+	margin-right: 100px;
+}
+
+.source-sink-map-options .option .option-desc,
+ #define-store-options .option .option-desc {
+	font-size: 10px;
+	margin-left: 3px;
+	color: #b7f1eb;
+}
+
+.source-sink-map-options .cust-options .option,
+#define-store-options .cust-options .option {
+	margin-bottom: 2px;
+}
+
+.source-sink-map-options .option .option-desc-content,
+#define-store-options .option .option-desc-content {
+	 font-family: Arial;
+	 background: #252525;
+	 width: 250px;
+	 color: #eee;
+	 text-align: left;
+	 border-radius: 6px;
+	 padding: 5 5px;
+	 /* Position the tooltip */
+	 position: absolute;
+	 z-index: 1;
+}
+
+.source-sink-form-container .btn-default,
+.stream-form-container .btn-default,
+.table-form-container .btn-default {
+	color: #ccc;
+    background: #2c2c2c;
+	margin-top: 15px;
+}
+
+.table-form-container #table-annotations .btn-add-annot-value {
+	margin-top: 0px;
+    margin-bottom: 10px;
+}
+
+.source-sink-form-container .mandatory-option-symbol,
+ .table-form-container .mandatory-option-symbol{
+	margin-right: 12px;
+}
+
+.source-sink-form-container select,
+.stream-form-container select,
+.table-form-container select {
+	color: #ccc;
+	background: #424242;
+	border: 1px solid #716e6e;
+	height: 22px;
+	margin-top: 2px;
+}
+
+.source-sink-form-container .optional-option:hover,
+.table-form-container .optional-option:hover,
+.source-sink-form-container #attribute-map-label:hover {
+	cursor: pointer;
+}
+
+.source-sink-form-container .attribute-labels {
+	margin-top: 10px;
+}
+
+.design-view-form-content label {
+   word-break: break-all;
 }
