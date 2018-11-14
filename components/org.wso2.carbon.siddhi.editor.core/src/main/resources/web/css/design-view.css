@@ -860,7 +860,8 @@ a.list-group-item, button.list-group-item {
 }
 
 .source-sink-form-container input[type="checkbox"],
-.table-form-container input[type="checkbox"] {
+.table-form-container input[type="checkbox"],
+.table-form-container input[type="radio"]{
 	margin: 0px 5px 0px 0;
 	vertical-align: middle;
 }
@@ -927,7 +928,9 @@ a.list-group-item, button.list-group-item {
 
 .source-sink-form-container .optional-option:hover,
 .table-form-container .optional-option:hover,
-.source-sink-form-container #attribute-map-label:hover {
+.source-sink-form-container #attribute-map-label:hover,
+.table-form-container .rdbms-type,
+.table-form-container #table-annotations .annotation-name {
 	cursor: pointer;
 }
 
@@ -937,4 +940,9 @@ a.list-group-item, button.list-group-item {
 
 .design-view-form-content label {
    word-break: break-all;
+}
+
+.table-form-container .rdbms-type {
+	margin-right: 10px;
+	margin-top: 10px;
 }

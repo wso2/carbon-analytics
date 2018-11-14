@@ -39,6 +39,7 @@ define(['log', 'jquery', 'lodash', 'attribute', 'table', 'storeAnnotation', 'des
 
         const alphabeticValidatorRegex = /^([a-zA-Z])$/;
         const defaultStoreType = "in-memory";
+        const rdbmsStoreType = "rdbms";
 
         /** Handlebar helper to render heading for the form */
         Handlebars.registerHelper('addTitle', function (id) {
@@ -191,7 +192,7 @@ define(['log', 'jquery', 'lodash', 'attribute', 'table', 'storeAnnotation', 'des
                 var optionName = $(this).find('.option-name').text().trim();
                 var optionValue = $(this).find('.option-value').val().trim();
                 var predefined_option_object = getOption(optionName, predefinedOptions);
-                if (!predefined_option_object.optional) {
+                if ($(this).find('.option-name').hasClass('mandatory-option')) {
                     if (optionValue == "") {
                         $(this).find('.error-message').text('this option is mandatory');
                         $(this)[0].scrollIntoView();
@@ -636,7 +637,104 @@ define(['log', 'jquery', 'lodash', 'attribute', 'table', 'storeAnnotation', 'des
                     annotationList.push(annotation);
                 }
             });
+        };
 
+        /**
+         * Function to render the html to display the radio options for selecting the rdbms type
+         */
+        var renderRdbmsTypes = function () {
+            var rdbmsTypeDiv = '<div class="clearfix"> <label class = "rdbms-type">' +
+                '<input type= "radio" name ="radioOpt" value="inline-config"> Inline-config' +
+                '</label> <label class = "rdbms-type">  ' +
+                '<input type = "radio" name = "radioOpt" value = "datasource"> Datasource </label>' +
+                '<label class = "rdbms-type"> <input type = "radio" name = "radioOpt" value="jndi"> Jndi-resource ' +
+                '</label></div> ';
+            $('#define-rdbms-type').html(rdbmsTypeDiv);
+        };
+
+        /**
+         * Function to select the options according to the selected rdbms type
+         * @param {Object} predefined_options all the options of rdbms with the user given values
+         * @return {Object} rdbms_options
+         */
+        var getRdbmsOptions = function (predefined_options) {
+            var rdbms_options = [];
+            var selectedRdbmsType = $('input[name=radioOpt]:checked', '#define-rdbms-type').val();
+            if (selectedRdbmsType == "datasource") {
+                _.forEach(predefined_options, function (predefinedOption) {
+                    if (predefinedOption.key.toLowerCase() === "datasource") {
+                        rdbms_options.push({
+                            key: predefinedOption.key, value: predefinedOption.value, description: predefinedOption
+                                .description, optional: false, defaultValue: predefinedOption.defaultValue
+                        })
+                    } else if (predefinedOption.key.toLowerCase() === "pool.properties" ||
+                        predefinedOption.key.toLowerCase() === "table.name" ||
+                        predefinedOption.key.toLowerCase() === "field.length") {
+                        rdbms_options.push({
+                            key: predefinedOption.key, value: predefinedOption.value, description: predefinedOption
+                                .description, optional: predefinedOption.optional, defaultValue: predefinedOption
+                                    .defaultValue
+                        })
+                    }
+                });
+            } else if (selectedRdbmsType == "inline-config") {
+                _.forEach(predefined_options, function (predefinedOption) {
+                    if (predefinedOption.key.toLowerCase() === "username" ||
+                        predefinedOption.key.toLowerCase() === "password" ||
+                        predefinedOption.key.toLowerCase() === "jdbc.url" ||
+                        predefinedOption.key.toLowerCase() === "jdbc.driver.name" ||
+                        predefinedOption.key.toLowerCase() === "pool.properties" ||
+                        predefinedOption.key.toLowerCase() === "table.name" ||
+                        predefinedOption.key.toLowerCase() === "field.length") {
+                        rdbms_options.push({
+                            key: predefinedOption.key, value: predefinedOption.value, description: predefinedOption
+                                .description, optional: predefinedOption.optional, defaultValue: predefinedOption
+                                    .defaultValue
+                        })
+                    }
+                });
+            } else {
+                _.forEach(predefined_options, function (predefinedOption) {
+                    if (predefinedOption.key.toLowerCase() === "jndi.resource") {
+                        rdbms_options.push({
+                            key: predefinedOption.key, value: predefinedOption.value, description: predefinedOption
+                                .description, optional: false, defaultValue: predefinedOption.defaultValue
+                        })
+                    } else if (predefinedOption.key.toLowerCase() === "table.name" ||
+                        predefinedOption.key.toLowerCase() === "field.length") {
+                        rdbms_options.push({
+                            key: predefinedOption.key, value: predefinedOption.value, description: predefinedOption
+                                .description, optional: predefinedOption.optional, defaultValue: predefinedOption
+                                    .defaultValue
+                        })
+                    }
+
+                });
+
+            }
+            return rdbms_options;
+        };
+
+        /**
+         * Function to check the radio button of the selected rdbms type
+         * @param {Object} rdbmsOptions all the options of rdbms with the user given values
+         */
+        var checkRdbmsType = function (rdbmsOptions) {
+            var isFound = false;
+            for (var option of rdbmsOptions) {
+                if (option.key.toLowerCase() == "datasource" && option.value != "") {
+                    $("#define-rdbms-type input[name=radioOpt][value='datasource']").prop("checked", true);
+                    isFound = true;
+                    break;
+                } else if (option.key.toLowerCase() == "jndi.resource" && option.value != "") {
+                    $("#define-rdbms-type input[name=radioOpt][value='jndi']").prop("checked", true);
+                    isFound = true;
+                    break;
+                }
+            }
+            if (!isFound) {
+                $("#define-rdbms-type input[name=radioOpt][value='inline-config']").prop("checked", true);
+            }
         };
 
         /**
@@ -651,8 +749,8 @@ define(['log', 'jquery', 'lodash', 'attribute', 'table', 'storeAnnotation', 'des
                 ' Configuration </h3> </div> <h4> Name: </h4> <input type="text" id="tableName" class = "clearfix">' +
                 '<label class="error-message" id="tableNameErrorMessage"> </label> <div id = "define-attribute"> </div>' +
                 '<button id = "btn-submit" type = "button" class = "btn toggle-view-button"> Submit </button> </div> ' +
-                '<div class = "table-form-container store-div"> <div id = "define-store"> </div>  ' +
-                '<div id="define-store-options"> </div> </div> ' +
+                '<div class = "table-form-container store-div"> <div id = "define-store"> </div> ' +
+                '<div id="define-rdbms-type"> </div> <div id="define-store-options"> </div> </div> ' +
                 '<div class = "table-form-container" id = "define-table-annotation"> </div>');
             formContainer.append(propertyDiv);
             self.designViewContainer.addClass('disableContainer');
@@ -682,6 +780,11 @@ define(['log', 'jquery', 'lodash', 'attribute', 'table', 'storeAnnotation', 'des
             deleteAnnotationValue();
             showHideAnnotationContent();
 
+            $('#define-rdbms-type').on('change', '[name=radioOpt]', function () {
+                var dataStoreOptions = getRdbmsOptions(storeOptionsWithValues);
+                renderOptions(dataStoreOptions, customizedStoreOptions, "store")
+            });
+
             //render the store type template
             var storeFormTemplate = Handlebars.compile($('#source-sink-map-store-form-template').html());
             var wrappedHtml = storeFormTemplate({ id: "store", types: predefined_stores });
@@ -702,7 +805,17 @@ define(['log', 'jquery', 'lodash', 'attribute', 'table', 'storeAnnotation', 'des
                     storeOptions = getSelectedTypeOptions(this.value, predefined_stores);
                     storeOptionsWithValues = createOptionObjectWithValues(storeOptions);
                     customizedStoreOptions = [];
-                    renderOptions(storeOptionsWithValues, customizedStoreOptions, "store");
+                    if (this.value === rdbmsStoreType) {
+                        renderRdbmsTypes();
+                        //as default select the data-store type
+                        $("#define-rdbms-type input[name=radioOpt][value='inline-config']").prop("checked", true);
+                        var dataStoreOptions = getRdbmsOptions(storeOptionsWithValues);
+                        renderOptions(dataStoreOptions, customizedStoreOptions, "store")
+                        $('#define-rdbms-type').show();
+                    } else {
+                        renderOptions(storeOptionsWithValues, customizedStoreOptions, "store");
+                        $('#define-rdbms-type').hide();
+                    }
                     $('#define-table-annotation').show();
                 } else {
                     $('#define-store-options').empty();
@@ -839,7 +952,7 @@ define(['log', 'jquery', 'lodash', 'attribute', 'table', 'storeAnnotation', 'des
                 '<label class="error-message" id="tableNameErrorMessage"> </label> <div id = "define-attribute"> </div>' +
                 '<button id = "btn-submit" type = "button" class = "btn toggle-view-button"> Submit </button> </div> ' +
                 '<div class = "table-form-container store-div"> <div id = "define-store"> </div>  ' +
-                '<div id="define-store-options"> </div> </div> ' +
+                '<div id="define-rdbms-type"> </div> <div id="define-store-options"> </div> </div> ' +
                 '<div class = "table-form-container" id = "define-table-annotation"> </div>');
             formContainer.append(propertyDiv);
             self.designViewContainer.addClass('disableContainer');
@@ -892,7 +1005,7 @@ define(['log', 'jquery', 'lodash', 'attribute', 'table', 'storeAnnotation', 'des
 
             var savedAnnotations = clickedElement.getAnnotationList();
             if (savedAnnotations == undefined || savedAnnotations.length == 0) {
-			 	var tableAnnotations = self.configurationData.application.config.table_predefined_annotations;
+                var tableAnnotations = self.configurationData.application.config.table_predefined_annotations;
             } else {
                 var tableAnnotations = self.configurationData.application.config.table_predefined_annotations;
                 mapAnnotationValues(tableAnnotations, savedAnnotations)
@@ -908,6 +1021,11 @@ define(['log', 'jquery', 'lodash', 'attribute', 'table', 'storeAnnotation', 'des
             var storeFormTemplate = Handlebars.compile($('#source-sink-map-store-form-template').html());
             var wrappedHtml = storeFormTemplate({ id: "store", types: predefined_stores });
             $('#define-store').html(wrappedHtml);
+
+            $('#define-rdbms-type').on('change', '[name=radioOpt]', function () {
+                var dataStoreOptions = getRdbmsOptions(storeOptionsWithValues);
+                renderOptions(dataStoreOptions, customizedStoreOptions, "store")
+            });
 
             //if store is defined
             if (clickedElement.getStore() !== undefined) {
@@ -927,7 +1045,14 @@ define(['log', 'jquery', 'lodash', 'attribute', 'table', 'storeAnnotation', 'des
                 $('#define-store #store-type').val(savedStoreType);
                 customizedStoreOptions = getCustomizedOptions(storeOptions, savedStoreOptions);
                 storeOptionsWithValues = mapUserOptionValues(storeOptions, savedStoreOptions);
-                renderOptions(storeOptionsWithValues, customizedStoreOptions, "store");
+                if (savedStoreType == rdbmsStoreType) {
+                    renderRdbmsTypes();
+                    checkRdbmsType(storeOptionsWithValues);
+                    var dataStoreOptions = getRdbmsOptions(storeOptionsWithValues);
+                    renderOptions(dataStoreOptions, customizedStoreOptions, "store");
+                } else {
+                    renderOptions(storeOptionsWithValues, customizedStoreOptions, "store");
+                }
                 $('#define-table-annotation').show();
             } else {
                 $('#define-store #store-type').val(defaultStoreType);
@@ -939,17 +1064,35 @@ define(['log', 'jquery', 'lodash', 'attribute', 'table', 'storeAnnotation', 'des
                 if (this.value === defaultStoreType) {
                     $('#define-store-options').empty();
                     $('#define-table-annotation').hide();
+                    $('#define-rdbms-type').hide();
                 } else if (clickedElement.getStore() !== undefined && savedStoreType === this.value) {
                     storeOptions = getSelectedTypeOptions(this.value, predefined_stores);
                     customizedStoreOptions = getCustomizedOptions(storeOptions, savedStoreOptions);
                     storeOptionsWithValues = mapUserOptionValues(storeOptions, savedStoreOptions);
-                    renderOptions(storeOptionsWithValues, customizedStoreOptions, "store");
+                    if (this.value == rdbmsStoreType) {
+                        renderRdbmsTypes();
+                        var dataStoreOptions = getRdbmsOptions(storeOptionsWithValues);
+                        checkRdbmsType(dataStoreOptions);
+                        renderOptions(dataStoreOptions, customizedStoreOptions, "store");
+                    } else {
+                        renderOptions(storeOptionsWithValues, customizedStoreOptions, "store");
+                    }
                     $('#define-table-annotation').show();
                 } else {
                     storeOptions = getSelectedTypeOptions(this.value, predefined_stores);
                     storeOptionsWithValues = createOptionObjectWithValues(storeOptions);
                     customizedStoreOptions = [];
-                    renderOptions(storeOptionsWithValues, customizedStoreOptions, "store");
+                    if (this.value == rdbmsStoreType) {
+                        renderRdbmsTypes();
+                        //as default select the data-store type
+                        $("#define-rdbms-type input[name=radioOpt][value='inline-config']").prop("checked", true);
+                        var dataStoreOptions = getRdbmsOptions(storeOptionsWithValues);
+                        renderOptions(dataStoreOptions, customizedStoreOptions, "store")
+                        $('#define-rdbms-type').show();
+                    } else {
+                        $('#define-rdbms-type').hide();
+                        renderOptions(storeOptionsWithValues, customizedStoreOptions, "store");
+                    }
                     $('#define-table-annotation').show();
                 }
             });
