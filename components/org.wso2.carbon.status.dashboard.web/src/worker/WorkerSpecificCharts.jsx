@@ -25,6 +25,8 @@ import DashboardUtils from '../utils/DashboardUtils';
 import VizG from 'react-vizgrammar';
 //Material UI
 import {CardMedia, CardTitle, Checkbox, GridList, GridTile, IconButton} from 'material-ui';
+//Localization
+import { FormattedMessage } from 'react-intl';
 
 const loadMetadata = {names: ['Time', 'Load Average'], types: ['time', 'linear']};
 const loadLineChartConfig = {
@@ -190,7 +192,7 @@ export default class WorkerSpecificCharts extends React.Component {
 
         if (this.state.systemCpu.length === 0 && this.state.processCpu.length === 0) {
             return (
-                <GridTile className="container" title="CPU Usage" titlePosition="top" titleBackground='#303030'>
+                <GridTile className="container" title={<FormattedMessage id='workerSpecific.cpuUsage' defaultMessage='CPU Usage' />} titlePosition="top" titleBackground='#303030' >
                     <div style={{
                         marginTop: 50,
                         backgroundColor: '#131313',
@@ -198,17 +200,17 @@ export default class WorkerSpecificCharts extends React.Component {
                         textAlign: 'center',
                         height: 370,
                         color: '#303030'
-                    }}><h2>No Data Available</h2></div>
-                </GridTile>
+                    }}><h2><FormattedMessage id='noData' defaultMessage='No Data Available' /></h2></div>
+                </GridTile >
             );
         }
         else {
             yLimit = DashboardUtils.initCombinedYDomain(this.state.systemCpu, this.state.processCpu);
         }
         return (
-            <GridTile className="container" title="CPU Usage" titlePosition="top" titleBackground='#303030'>
-                <div className="overlay" style={{color: '#303030', paddingTop: 40, textAlign: 'right'}}>
-                    <h3>Click for more details</h3>
+            <GridTile className="container" title={<FormattedMessage id='workerSpecific.cpuUsage' defaultMessage='CPU Usage' />} titlePosition="top" titleBackground='#303030'>
+                <div className="overlay" style={{ color: '#303030', paddingTop: 40, textAlign: 'right' }}>
+                    <h3><FormattedMessage id='clickForMore' defaultMessage='Click for more details' /></h3>
                 </div>
                 <div style={{
                     display: 'flex',
@@ -309,7 +311,7 @@ export default class WorkerSpecificCharts extends React.Component {
 
         if (this.state.usedMem.length === 0 && this.state.totalMem.length === 0) {
             return (
-                <GridTile className="container" title="Memory Usage" titlePosition="top" titleBackground='#303030'>
+                <GridTile className="container" title={<FormattedMessage id='workerSpecific.memoryUsage' defaultMessage='Memory Usage' />} titlePosition="top" titleBackground='#303030' >
                     <div style={{
                         marginTop: 50,
                         color: '#303030',
@@ -317,8 +319,8 @@ export default class WorkerSpecificCharts extends React.Component {
                         padding: 30,
                         textAlign: 'center',
                         height: 370
-                    }}><h2>No Data Available</h2></div>
-                </GridTile>
+                    }}><h2><FormattedMessage id='noData' defaultMessage='No Data Available' /></h2></div>
+                </GridTile >
             );
         }
         else {
@@ -326,9 +328,9 @@ export default class WorkerSpecificCharts extends React.Component {
         }
 
         return (
-            <GridTile className="container" title="Memory Used(bytes)" titlePosition="top" titleBackground='#303030'>
-                <div className="overlay" style={{color: '#303030', paddingTop: 40, textAlign: 'right'}}>
-                    <h3>Click for more details</h3>
+            <GridTile className="container" title={<FormattedMessage id='workerSpecific.memoryUsed' defaultMessage='Memory Used(bytes)' />} titlePosition="top" titleBackground='#303030'>
+                <div className="overlay" style={{ color: '#303030', paddingTop: 40, textAlign: 'right' }}>
+                    <h3><FormattedMessage id='clickForMore' defaultMessage='Click for more details' /></h3>
                 </div>
                 <div style={{
                     display: 'flex',
@@ -339,7 +341,7 @@ export default class WorkerSpecificCharts extends React.Component {
                 }}>
                     <div>
                         <Checkbox
-                            label="Used Memory"
+                            label={<FormattedMessage id='workerSpecific.usedMemory' defaultMessage='Used Memory' />}
                             onCheck={(e, checked) => this.setState({usedMemoryChecked: checked})}
                             checked={this.state.usedMemoryChecked}
                             iconStyle={{fill: '#f17b31'}}
@@ -348,7 +350,7 @@ export default class WorkerSpecificCharts extends React.Component {
                     </div>
                     <div>
                         <Checkbox
-                            label="Total Memory"
+                            label={<FormattedMessage id='workerSpecific.totalMemory' defaultMessage='Total Memory' />}
                             onCheck={(e, checked) => this.setState({totalMemoryChecked: checked})}
                             checked={this.state.totalMemoryChecked}
                             iconStyle={{fill: '#3366cc'}}
@@ -357,8 +359,8 @@ export default class WorkerSpecificCharts extends React.Component {
                     </div>
                 </div>
                 <Link key="memory" to={window.contextPath + '/worker/history/' + this.state.workerId}>
-                    <div style={{backgroundColor: '#131313', paddingTop: 18, height: '370px'}}>
-                        <div style={{backgroundColor: '#131313', height: 200, width: '100%'}}>
+                    <div style={{ backgroundColor: '#131313', paddingTop: 18, height: '370px' }}>
+                        <div style={{ backgroundColor: '#131313', height: 200, width: '100%' }}>
                             <VizG
                                 data={data}
                                 metadata={metadata} config={config}
@@ -377,7 +379,7 @@ export default class WorkerSpecificCharts extends React.Component {
         let yLimit;
         if (this.state.loadAvg.length === 0) {
             return (
-                <GridTile title="System Load Average" titlePosition="top" titleBackground='#303030'>
+                <GridTile title={<FormattedMessage id='workerSpecific.systemLoad' defaultMessage='System Load Average' />} titlePosition="top" titleBackground='#303030'>
                     <div style={{
                         marginTop: 50,
                         color: '#303030',
@@ -385,7 +387,7 @@ export default class WorkerSpecificCharts extends React.Component {
                         padding: 30,
                         textAlign: 'center',
                         height: 370
-                    }}><h2>No Data Available</h2></div>
+                    }}><h2><FormattedMessage id='noData' defaultMessage='No Data Available' /></h2></div>
                 </GridTile>
             );
         }
@@ -393,9 +395,9 @@ export default class WorkerSpecificCharts extends React.Component {
             yLimit = DashboardUtils.getYDomain(this.state.loadAvg);
         }
         return (
-            <GridTile className="container" title="System Load Average" titlePosition="top" titleBackground='#303030'>
-                <div className="overlay" style={{color: '#303030', paddingTop: 20, textAlign: 'right'}}>
-                    <h3>Click for more details</h3>
+            <GridTile className="container" title={<FormattedMessage id='workerSpecific.systemLoad' defaultMessage='System Load Average' />} titlePosition="top" titleBackground='#303030'>
+                <div className="overlay" style={{ color: '#303030', paddingTop: 20, textAlign: 'right' }}>
+                    <h3><FormattedMessage id='clickForMore' defaultMessage='Click for more details' /></h3>
                 </div>
                 <Link key="loadAverage"
                       to={window.contextPath + '/worker/history/' + this.state.workerId}>
@@ -419,8 +421,8 @@ export default class WorkerSpecificCharts extends React.Component {
         let yLimit;
         if (this.state.throughputAll.length === 0) {
             return (
-                <GridTile className="container" title="Overall Throughput(events/second)" titlePosition="top"
-                          titleBackground='#303030'>
+                <GridTile className="container" title={<FormattedMessage id='workerSpecific.overallThorughput' defaultMessage='Overall Throughput(events/second)' />} titlePosition="top"
+                    titleBackground='#303030'>
                     <div style={{
                         marginTop: 50,
                         color: '#303030',
@@ -428,7 +430,7 @@ export default class WorkerSpecificCharts extends React.Component {
                         paddingTop: 30,
                         textAlign: 'center',
                         height: 370
-                    }}><h2>No Data Available</h2></div>
+                    }}><h2><FormattedMessage id='noData' defaultMessage='No Data Available' /></h2></div>
                 </GridTile>
             );
         }
@@ -437,10 +439,10 @@ export default class WorkerSpecificCharts extends React.Component {
         }
         return (
 
-            <GridTile className="container" title="Overall Throughput(events/second)" titlePosition="top"
-                      titleBackground='#303030'>
-                <div className="overlay" style={{color: '#303030', paddingTop: 20, textAlign: 'right'}}>
-                    <h3>Click for more details</h3>
+            <GridTile className="container" title={<FormattedMessage id='workerSpecific.overallThorughput' defaultMessage='Overall Throughput(events/second)' />} titlePosition="top"
+                titleBackground='#303030'>
+                <div className="overlay" style={{ color: '#303030', paddingTop: 20, textAlign: 'right' }}>
+                    <h3><FormattedMessage id='clickForMore' defaultMessage='Click for more details' /></h3>
                 </div>
                 <Link key="throughput" to={window.contextPath + '/worker/history/' + this.state.workerId}>
                     <div style={{backgroundColor: '#131313', paddingTop: 10, height: '370px'}}>

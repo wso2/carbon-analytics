@@ -19,6 +19,7 @@
 
 import React from 'react';
 import {Link, Redirect} from 'react-router-dom';
+import PropTypes from 'prop-types';
 //Material UI
 import {GridList, Toggle} from 'material-ui';
 import Info from 'material-ui/svg-icons/action/info';
@@ -39,6 +40,8 @@ import Error500 from '../error-pages/Error500';
 import {HttpStatus} from '../utils/Constants';
 import ManagerThumbnail from './ManagerThumbnail';
 import '../../public/css/dashboard.css';
+//Localization
+import { FormattedMessage } from 'react-intl';
 
 const styles = {
     root: {display: 'flex', flexWrap: 'wrap', justifyContent: 'space-around', backgroundColor: '#222222'},
@@ -75,7 +78,6 @@ const buttonStyle = {marginLeft: 50, width: '35%', fontSize: '12px', backgroundC
  * class which manages overview page.
  */
 export default class WorkerOverview extends React.Component {
-
     constructor() {
         super();
         this.state = {
@@ -93,7 +95,11 @@ export default class WorkerOverview extends React.Component {
             counter: 0,
             hasManagerPermission: false,
             hasViewPermission: true,
-            statusMessage: "Currently there are no nodes to display",
+            statusMessage: (
+                <FormattedMessage
+                    id="workerOverview.noNodes"
+                    defaultMessage="Currently there are no nodes to display"
+                />),
             isError: false,
             btnType: <SyncDisabled color='#BDBDBD'/>
 
@@ -115,19 +121,19 @@ export default class WorkerOverview extends React.Component {
                 if (error.response.status === 401) {
                     this.setState({
                         sessionInvalid: true,
-                        statusMessage: "Authentication fail. Please login again.",
+                            statusMessage: this.context.intl.formatMessage({ id: 'authenticationFail', defaultMessage: 'Authentication fail. Please login again.' }),
                         isApiCalled: true
                     })
                 } else if (error.response.status === 403) {
                     this.setState({
                         hasViewPermission: false,
-                        statusMessage: "User Have No Permission to view this page.",
+                            statusMessage: this.context.intl.formatMessage({ id: 'noViewPermission', defaultMessage: 'User Have No Permission to view this page.' }),
                         isApiCalled: true
                     })
                 } else {
                     this.setState({
                         isError: true,
-                        statusMessage: "Unknown error occurred! : " + JSON.stringify(error.response.data),
+                            statusMessage: this.context.intl.formatMessage({ id: 'unknownError', defaultMessage: 'Unknown error occurred! : {data}', values: { data: JSON.stringify(error.response.data) } }),
                         isApiCalled: true
                     })
                 }
@@ -140,8 +146,7 @@ export default class WorkerOverview extends React.Component {
                 this.setState({
                     clustersList: response.data,
                     isApiCalled: true,
-                    statusMessage: !WorkerOverview.hasNodes(this.state.clustersList) ? "Currently there are no" +
-                        " nodes to display" : ''
+                    statusMessage: !WorkerOverview.hasNodes(this.state.clustersList) ? this.context.intl.formatMessage({ id: 'workerOverview.noNodes', defaultMessage: 'Currently there are no nodes to display' }) : ''
                 });
             }).catch((error) => {
             if (error.response != null) {
@@ -149,18 +154,18 @@ export default class WorkerOverview extends React.Component {
                     this.setState({
                         isApiCalled: true,
                         sessionInvalid: true,
-                        statusMessage: "Authentication fail. Please login again."
+                            statusMessage: this.context.intl.formatMessage({ id: 'authenticationFail', defaultMessage: 'Authentication fail. Please login again.' })
                     })
                 } else if (error.response.status === 403) {
                     this.setState({
                         isApiCalled: true,
-                        statusMessage: "User Have No Permission to view this page."
+                            statusMessage: this.context.intl.formatMessage({ id: 'noViewPermission', defaultMessage: 'User Have No Permission to view this page.' })
                     });
                 } else {
                     this.setState({
                         isError: true,
                         isApiCalled: true,
-                        statusMessage: "Unknown error occurred! : " + JSON.stringify(error.response.data)
+                            statusMessage: this.context.intl.formatMessage({ id: 'unknownError', defaultMessage: 'Unknown error occurred! : {data}', values: { data: JSON.stringify(error.response.data) } })
                     });
                 }
             }
@@ -173,7 +178,7 @@ export default class WorkerOverview extends React.Component {
                         managerClusterList: response.data,
                         isManagerApiCalled: true,
                         statusMessage: !WorkerOverview.hasNodes(this.state.managerClusterList) ?
-                            "Currently there are no nodes to display" : ''
+                            this.context.intl.formatMessage({ id: 'workerOverview.noNodes', defaultMessage: 'Currently there are no nodes to display' }) : ''
                     });
                 } else {
                     console.log("manager connection failed")
@@ -185,7 +190,7 @@ export default class WorkerOverview extends React.Component {
                     this.setState({
                         isManagerApiCalled: true,
                         sessionInvalid: true,
-                        statusMessage: "Authentication failed. Please login again."
+                            statusMessage: this.context.intl.formatMessage({ id: 'authenticationFail', defaultMessage: 'Authentication fail. Please login again.' })
                     })
                 } else if (error.response.status === 403) {
                     this.setState({
@@ -196,7 +201,7 @@ export default class WorkerOverview extends React.Component {
                     this.state({
                         isError: true,
                         isManagerApiCalled: true,
-                        statusMessage: "Unknown error occurred! : " + JSON.stringify(error.response.data)
+                            statusMessage: this.context.intl.formatMessage({ id: 'unknownError', defaultMessage: 'Unknown error occurred! : {data}', values: { data: JSON.stringify(error.response.data) } })
                     });
                 }
             }
@@ -221,13 +226,13 @@ export default class WorkerOverview extends React.Component {
                     this.setState({
                         isApiCalled: true,
                         sessionInvalid: true,
-                        statusMessage: "Authentication fail. Please login again."
+                        statusMessage: this.context.intl.formatMessage({ id: 'authenticationFail', defaultMessage: 'Authentication fail. Please login again.' })
                     })
                 } else {
                     this.setState({
                         isError: true,
                         isApiCalled: true,
-                        statusMessage: "Unknown error occurred! : " + JSON.stringify(error.response.data)
+                        statusMessage: this.context.intl.formatMessage({ id: 'unknownError', defaultMessage: 'Unknown error occurred! : {data}', values: { data: JSON.stringify(error.response.data) } })
                     });
                 }
             });
@@ -244,7 +249,7 @@ export default class WorkerOverview extends React.Component {
                 <div>
                     <Link style={{textDecoration: 'none'}} to={window.contextPath + '/add-worker'}>
                         <Button className={'add-button'} style={styles.addBtn}>
-                            <ContentAdd/> Add New Node
+                            <ContentAdd /><FormattedMessage id='workerOveriew.addNewNode' defaultMessage='Add New Node' />
                         </Button>
                     </Link>
                 </div>
@@ -384,15 +389,15 @@ export default class WorkerOverview extends React.Component {
                                 <FormPanel title={""} width={650}>
                                     <div style={errorContainerStyles}>
                                         <i class="fw fw-security fw-inverse fw-5x"></i>
-                                        <h1 style={errorTitleStyles}>Page Forbidden!</h1>
+                                        <h1 style={errorTitleStyles}><FormattedMessage id='workerOverview.pageForbidden' defaultMessage='Page Forbidden!' /></h1>
                                         <text style={errorMessageStyles}>
-                                            You have no permission to access this page.
+                                            <FormattedMessage id='workerOverview.noPermisison' defaultMessage='You have no permission to access this page.' />
                                         </text>
                                         <br/>
                                         <br/>
                                         <Link to={`${window.contextPath}/logout`}>
                                             <Button variant="raised" backgroundColor='#f17b31'
-                                                    style={buttonStyle}>Login</Button>
+                                                style={buttonStyle}><FormattedMessage id='workerOverview.login' defaultMessage='Login' /></Button>
                                         </Link>
                                     </div>
                                 </FormPanel>
@@ -415,7 +420,7 @@ export default class WorkerOverview extends React.Component {
                                 {this.state.btnType}
                                 <Typography style={{
                                     color: '#E0E0E0'
-                                }}>Auto-Sync</Typography>
+                                }}><FormattedMessage id='workerOverview.autoSync' defaultMessage='Auto-Sync' /></Typography>
                             </Button>
 
                         </div>
@@ -430,10 +435,13 @@ export default class WorkerOverview extends React.Component {
                                         marginLeft: '24px',
                                         fontWeight: '400',
                                         fontSize: '1.25rem'
-                                    }}>HA
-                                        Deployments</Typography>
-                                    <h3 style={styles.h3Title}>Group Id: {id}</h3>
-                                    <Divider inset={true} style={styles.divider}/>
+                                    }}>
+                                        <FormattedMessage id='workerOverview.haDeployments' defaultMessage='HA Deployments' />
+                                    </Typography>
+                                    <h3 style={styles.h3Title}>
+                                        <FormattedMessage id='workerOverview.groupId' defaultMessage='Group Id:' /> {id}
+                                    </h3>
+                                    <Divider inset={true} style={styles.divider} />
                                     <div style={styles.root}>
                                         <GridList className={'node-wrapper'} cols={3} cellHeight='100%'
                                                   style={styles.gridList}>
@@ -472,15 +480,20 @@ export default class WorkerOverview extends React.Component {
 
                     <Typography variant="headline" className={'app-title'}
                                 style={{color: '#dedede', marginLeft: '24px', fontWeight: '400', fontSize: '1.25rem'}}>Distributed
-                        Deployments</Typography>
+                        <FormattedMessage id='workerOverview.distributedDeployments' defaultMessage='Distributed Deployments' />
+                    </Typography>
 
                     {Object.keys(managerList).map((id, workerList) => {
                         if (id !== "Never Reached" && id !== "Not-Reachable") {
                             return (
                                 <div>
-                                    <h3 style={styles.h3Title}>Group Id : {id}</h3>
+                                    <h3 style={styles.h3Title}>
+                                        <FormattedMessage id='workerOverview.groupId' defaultMessage='Group Id: ' />{id}
+                                    </h3>
                                     <Divider inset={true} style={styles.divider}/>
-                                    <h4 style={styles.h3Title}>Managers</h4>
+                                    <h4 style={styles.h3Title}>
+                                        <FormattedMessage id='workerOverview.managers' defaultMessage='Managers' />
+                                    </h4>
                                     <div style={styles.root}>
                                         <GridList className={'node-wrapper'} cols={3} cellHeight='100%'
                                                   style={styles.gridList}>
@@ -498,8 +511,10 @@ export default class WorkerOverview extends React.Component {
                         } else {
                             return (
                                 <div>
-                                    <h3 style={styles.h3Title}>Managers</h3>
-                                    <Divider inset={true} style={styles.divider}/>
+                                    <h3 style={styles.h3Title}>
+                                        <FormattedMessage id='workerOverview.managers' defaultMessage='Managers' />
+                                    </h3>
+                                    <Divider inset={true} style={styles.divider} />
                                     <div style={styles.root}>
                                         <GridList className={'node-wrapper'} cols={3} cellHeight='100%'
                                                   style={styles.gridList}>
@@ -532,7 +547,9 @@ export default class WorkerOverview extends React.Component {
                                 {this.state.btnType}
                                 <Typography style={{
                                     color: '#E0E0E0'
-                                }}>Auto-Sync</Typography>
+                                }}>
+                                    <FormattedMessage id='workerOverview.autoSync' defaultMessage='Auto-Sync' />
+                                </Typography>
                             </Button>
                         </div>
                     </div>
@@ -546,8 +563,9 @@ export default class WorkerOverview extends React.Component {
                                         marginLeft: '24px',
                                         fontWeight: '400',
                                         fontSize: '1.25rem'
-                                    }}>HA
-                                        Deployments</Typography>
+                                    }}>
+                                        <FormattedMessage id='workerOverview.haDeployments' defaultMessage='HA Deployments' />
+                                    </Typography>
                                     <h3 style={styles.h3Title}>{id}</h3>
                                     <Divider inset={true} style={styles.divider}/>
                                     <div style={styles.root}>
@@ -599,22 +617,28 @@ export default class WorkerOverview extends React.Component {
                                 {this.state.btnType}
                                 <Typography style={{
                                     color: '#E0E0E0'
-                                }}>Auto-Sync</Typography>
+                                }}>
+                                    <FormattedMessage id='workerOverview.autoSync' defaultMessage='Auto-Sync' />
+                                </Typography>
                             </Button>
                         </div>
                     </div>
                     <Typography variant="headline" className={'app-title'}
-                                style={{color: '#dedede', marginLeft: '24px', fontWeight: '400', fontSize: '1.25rem'}}>Distributed
-                        Deployments</Typography>
+                        style={{ color: '#dedede', marginLeft: '24px', fontWeight: '400', fontSize: '1.25rem' }}>
+                        <FormattedMessage id='workerOverview.distributedDeployments' defaultMessage='Distributed Deployments' />
+                    </Typography>
 
                     {Object.keys(managerList).map((id, workerList) => {
                         if (id !== "Never Reached" && id !== "Not-Reachable") {
                             return (
                                 <div>
-                                    <h3 style={styles.h3Title}>Group Id : {id}</h3>
+                                    <h3 style={styles.h3Title}>
+                                        <FormattedMessage id='workerOverview.groupId' defaultMessage='Group Id:' />  {id}
+                                    </h3>
                                     <Divider inset={true} style={styles.divider}/>
-
-                                    <h4 style={styles.h3Title}>Managers</h4>
+                                    <h4 style={styles.h3Title}>
+                                        <FormattedMessage id='workerOverview.managers' defaultMessage='Managers' />
+                                    </h4>
                                     <div style={styles.root}>
                                         <GridList className={'node-wrapper'} cols={3} cellHeight='100%'
                                                   style={styles.gridList}>
@@ -679,21 +703,24 @@ export default class WorkerOverview extends React.Component {
                     <div style={styles.navBar} className="navigation-bar">
                         <Button style={styles.navBtn}>
                             <HomeButton style={{paddingRight: 8, color: '#BDBDBD'}}/>
-                            Overview
+                            <FormattedMessage id='workerOverview.overview' defaultMessage='Overview' />
                         </Button>
                     </div>
                     <Typography variant="title" style={styles.titleStyle}>
-                        Node Overview
+                        <FormattedMessage id='workerOverview.nodeOverview' defaultMessage='Node Overview' />
                     </Typography>
                     <div style={{marginTop: '-26px', marginRight: '24px', fontSize: '0.875rem'}}>
                         <Link style={{textDecoration: 'none', color: '#f17b31', float: 'right', paddingLeft: 10}}
-                              to={window.contextPath}>Node View</Link>
+                            to={window.contextPath}>
+                            <FormattedMessage id='workerOverview.nodeView' defaultMessage='Node View' />
+                        </Link>
 
                         <Typography style={{float: 'right', color: '#757575'}}>|</Typography>
 
                         <Link style={{textDecoration: 'none', color: '#dedede', float: 'right', paddingRight: 10}}
                               to={window.contextPath + "/siddhi-apps"}>
-                            App View</Link>
+                            <FormattedMessage id='workerOverview.appView' defaultMessage='App view' />
+                        </Link>
                     </div>
                     {this.renderWorkers(this.state.clustersList, this.state.managerClusterList)}
                 </div>
@@ -714,3 +741,7 @@ export default class WorkerOverview extends React.Component {
         return false;
     }
 }
+
+WorkerOverview.contextTypes = {
+  intl: PropTypes.object.isRequired
+};

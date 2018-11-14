@@ -22,6 +22,8 @@ import { Link } from 'react-router-dom';
 import Button from 'material-ui/Button';
 import Typography from 'material-ui/Typography';
 import Paper from 'material-ui/Paper';
+// Localization
+import { FormattedMessage } from 'react-intl';
 // Styles
 import Styles from '../../../style/Styles';
 import '../../../index.css';
@@ -35,24 +37,30 @@ const appContext = window.contextPath;
  * Represents an Access Denied Error message display
  */
 class AccessDenied extends React.Component {
-    render() {
-        return (
-            <Paper style={Styles.messageContainer}>
-                <Typography type="title">
-                    Access Denied
-                </Typography>
-                <Typography type="subheading">
-                    Please login with valid permissions
-                </Typography>
-                <br />
-                <Link to={`${appContext}/logout`} style={{ textDecoration: 'none' }}>
-                    <Button color="primary">
-                        Login
-                    </Button>
-                </Link>
-            </Paper>
-        );
-    }
+  render() {
+    return (
+      <Paper style={Styles.messageContainer}>
+        <Typography type="title">
+          <FormattedMessage
+            id="error.accessdenied.title"
+            defaultMessage="Access Denied"
+          />
+        </Typography>
+        <Typography type="subheading">
+          <FormattedMessage
+            id="error.accessdenied.subheading"
+            defaultMessage="Please login with valid permissions"
+          />
+        </Typography>
+        <br />
+        <Link to={`${appContext}/logout`} style={{ textDecoration: 'none' }}>
+          <Button color="primary">
+            <FormattedMessage id="login.button" defaultMessage="Login" />
+          </Button>
+        </Link>
+      </Paper>
+    );
+  }
 }
 
 export default AccessDenied;

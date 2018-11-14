@@ -259,7 +259,6 @@ define(['jquery', 'backbone', 'log', 'lodash', 'ace/range', 'render_json'], func
         render: function () {
             var self = this;
             var debuggerModel = this._console;
-            //var appName = this._appName;
             var debuggerModalName = debuggerModel.find(".appName");
             self._debugStarted = true;
 

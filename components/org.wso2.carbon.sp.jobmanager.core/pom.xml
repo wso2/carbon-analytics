@@ -21,7 +21,7 @@
     <parent>
         <groupId>org.wso2.carbon.analytics</groupId>
         <artifactId>org.wso2.carbon.analytics.parent</artifactId>
-        <version>2.0.431-SNAPSHOT</version>
+        <version>2.0.443-SNAPSHOT</version>
         <relativePath>../../pom.xml</relativePath>
     </parent>
 
@@ -332,13 +332,10 @@
     <properties>
         <private.package>
             org.I0Itec.zkclient.*,
-            scala.*
         </private.package>
         <import.package>
             !org.I0Itec.zkclient,
             !org.I0Itec.zkclient.*,
-            !scala.*,
-            !scala,
             org.wso2.carbon.kernel;version="${carbon.kernel.package.import.version.range}",
             org.wso2.msf4j.*;version="${msf4j.import.version.range}",
             javax.ws.rs.*;version="0.0.0",
@@ -348,9 +345,11 @@
         <export.package>
             org.I0Itec.zkclient,
             org.I0Itec.zkclient.*,
-            scala.*,
             org.wso2.carbon.sp.jobmanager.core.*
         </export.package>
+        <Embed-Dependency>
+            scala;scope=compile;inline=false;
+        </Embed-Dependency>
         <DynamicImport-Package>*</DynamicImport-Package>
         <carbon.component>
             osgi.service; objectClass="org.wso2.msf4j.Microservice"; serviceCount="2"

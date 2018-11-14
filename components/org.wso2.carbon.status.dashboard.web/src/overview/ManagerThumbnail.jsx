@@ -19,6 +19,7 @@
 
 import React from 'react';
 import {Link} from 'react-router-dom';
+import PropTypes from 'prop-types';
 //Material UI
 import {Button, CardActions, IconButton, Snackbar, Tooltip, Typography} from "material-ui-next";
 import {Dialog, GridList, GridTile} from "material-ui";
@@ -35,6 +36,8 @@ import AuthManager from '../auth/utils/AuthManager';
 import Clock from './Clock';
 import StatusDashboardOverViewAPI from "../utils/apis/StatusDashboardOverViewAPI";
 import WorkerThumbnail from "./WorkerThumbnail";
+//Localization
+import { FormattedMessage } from 'react-intl';
 
 const messageBoxStyle = {textAlign: "center", color: "white"};
 const errorMessageStyle = {backgroundColor: "#FF5722", color: "white"};
@@ -96,7 +99,9 @@ export default class ManagerThumbnail extends React.Component {
                         resourceClustersList: response.data,
                     });
                 } else {
-                    that.showError("Manager '" + this.props.worker.workerId + "' is not rendered successfully !!");
+                    that.showError(
+                        this.context.intl.formatMessage({ id: 'managerThumbnail.notRendered', defaultMessage: 'Manager {workerId} is not rendered successfully !!', values: { workerId: this.props.worker.workerId } })
+                    );
                 }
 
             }).catch((error) => {
@@ -105,18 +110,18 @@ export default class ManagerThumbnail extends React.Component {
                     this.setState({
                         isApiCalled: true,
                         sessionInvalid: true,
-                        statusMessage: "Authentication fail. Please login again."
+                            statusMessage: this.context.intl.formatMessage({ id: 'authenticationFail', defaultMessage: 'Authentication fail. Please login again.' })
                     })
                 } else if (error.response.status === 403) {
                     this.setState({
                         isApiCalled: true,
-                        statusMessage: "User Have No Permission to view this page."
+                            statusMessage: this.context.intl.formatMessage({ id: 'noViewPermission', defaultMessage: 'User Have No Permission to view this page.' })
                     });
                 } else {
                     this.setState({
                         isError: true,
                         isApiCalled: true,
-                        statusMessage: "Unknown error occurred! : " + JSON.stringify(error.response.data)
+                            statusMessage: this.context.intl.formatMessage({ id: 'unknownError', defaultMessage: 'Unknown error occurred! : {data}', values: { data: JSON.stringify(error.response.data) } })
                     });
                 }
             }
@@ -159,14 +164,14 @@ export default class ManagerThumbnail extends React.Component {
             .then((response) => {
                 if (response.status === HttpStatus.OK) {
                     that.setState({open: false});
-                    that.showMessage("Manager '" + this.props.worker.workerId + "' is deleted successfully !!");
+                    that.showMessage(<FormattedMessage id='managerThumbnail.manegerDeletedSuccessfully' defaultMessage='Manager {workerID} is deleted successfully !!' values={{ workerID: this.props.worker.workerId }} />);
                     setTimeout(function () {
                         window.location.href = window.contextPath;
                     }, 1000)
                 }
                 else {
                     that.setState({open: false});
-                    that.showError("Manager '" + this.props.worker.workerId + "' is not deleted successfully !!");
+                    that.showError(this.context.intl.formatMessage({ id: 'managerThumbnail.managerNotDeletedSuccessfully', defaultMessage: 'Manager {workerID} is not deleted successfully !!', values: { workerID: this.props.worker.workerId } }));
                 }
             });
 
@@ -192,7 +197,7 @@ export default class ManagerThumbnail extends React.Component {
     renderDeleteManager() {
         if (this.state.hasPermission) {
             return (
-                <Tooltip id="tooltip-icon" title="Delete Manager">
+                <Tooltip id="tooltip-icon" title={<FormattedMessage id='managerThumbnail.deleteManager' defaultMessage='Delete Manager' />}>
                     <IconButton className={'btn-delete'} iconStyle={styles.smallIcon}
                                 style={{zIndex: 1}} onClick={() => {
                         this.setState({open: true})
@@ -212,7 +217,7 @@ export default class ManagerThumbnail extends React.Component {
                     if (id === 'ResourceCluster') {
                         return (
                             <div>
-                                <h4 style={styles.h3Title}>Workers</h4>
+                                <h4 style={styles.h3Title}><FormattedMessage id='managerThumbnail.workers' defaultMessage='Workers' /></h4>
                                 <div style={styles.root}>
 
                                     <GridList cols={3} cellHeight='100%' style={styles.overviewGridList}>
@@ -250,8 +255,9 @@ export default class ManagerThumbnail extends React.Component {
             if (this.props.worker.statusMessage == null) {
                 gridTiles = <div>
                     <GridList cols={1} cellHeight={98} style={styles.gridList}>
-                        <h2 style={{textAlign: 'center', color: '#dedede', padding: 0, margin: 12}}>Manager is not
-                            reachable!</h2>
+                        <h2 style={{ textAlign: 'center', color: '#dedede', padding: 0, margin: 12 }}>
+                            <FormattedMessage id='managerThumbnail.notReachable' defaultMessage='Manager is not reachable!' />
+                        </h2>
                     </GridList>
                 </div>;
                 lastUpdated = "N/A";
@@ -259,8 +265,8 @@ export default class ManagerThumbnail extends React.Component {
             } else {
                 gridTiles = <div>
                     <GridList cols={1} cellHeight={98} style={styles.gridList}>
-                        <h2 style={{textAlign: 'center', color: 'white', padding: 15}}>Manager is not reachable!
-                            <br/>
+                        <h2 style={{ textAlign: 'center', color: 'white', padding: 15 }}>
+                            <FormattedMessage id='managerThumbnail.notReachable' defaultMessage='Manager is not reachable!' />
                             <text style={{textAlign: 'center', fontSize: 12, color: '#dedede'}}>
                                 {this.props.worker.statusMessage}
                             </text>
@@ -348,7 +354,7 @@ export default class ManagerThumbnail extends React.Component {
             localStorage.setItem(constants.load, this.props.worker.serverDetails.workerMetrics.loadAverage);
 
             if (this.props.worker.serverDetails.osName === "windows") {
-                loadAvg = <h4 style={{margin: 0}}>N/A in Windows</h4>;
+                loadAvg = <h4 style={{ margin: 0 }}><FormattedMessage id='managerThumbnail.notAvailableInWindows' defaultMessage='N/A in Windows' /></h4>;
                 loadTrendImg = <div/>;
             } else {
                 loadAvg = <h1>
@@ -370,9 +376,9 @@ export default class ManagerThumbnail extends React.Component {
                                         color="#19cdd7"/>
                                     <div style={styles.legendContainer}>
                                         <Typography style={styles.overviewLegend} align={'center'}>
-                                            CPU Usage
-                                            {cpuTrend === constants.up ? <span style={{color: 'red'}}>˄</span> :
-                                                <span style={{color: 'green'}}>˅</span>}
+                                            <FormattedMessage id='managerThumbnail.cpuUsage' defaultMessage='CPU Usage' />
+                                            {cpuTrend === constants.up ? <span style={{ color: 'red' }}>˄</span> :
+                                                <span style={{ color: 'green' }}>˅</span>}
                                         </Typography>
                                     </div>
                                 </GridTile>
@@ -383,9 +389,9 @@ export default class ManagerThumbnail extends React.Component {
                                         color="#f17b31"/>
                                     <div style={styles.legendContainer}>
                                         <Typography style={styles.overviewLegend} align={'center'}>
-                                            Memory Usage
-                                            {memoryTrend === constants.up ? <span style={{color: 'red'}}>˄</span> :
-                                                <span style={{color: 'green'}}>˅</span>}
+                                            <FormattedMessage id='managerThumbnail.memoryUsage' defaultMessage='Memory Usage' />
+                                            {memoryTrend === constants.up ? <span style={{ color: 'red' }}>˄</span> :
+                                                <span style={{ color: 'green' }}>˅</span>}
                                         </Typography></div>
                                 </GridTile>
 
@@ -398,7 +404,7 @@ export default class ManagerThumbnail extends React.Component {
                                         {loadAvg}</div>
                                     <div style={styles.legendContainer}>
                                         <Typography style={styles.overviewLegend} align={'center'}>
-                                            Load Average
+                                            <FormattedMessage id='managerThumbnail.loadAvg' defaultMessage='Load Average' />
                                             {loadTrendImg}
                                         </Typography>
                                     </div>
@@ -420,7 +426,7 @@ export default class ManagerThumbnail extends React.Component {
                                     </div>
                                     <div style={styles.legendContainer}>
                                         <Typography style={styles.overviewLegend} align={'center'}>
-                                            Siddhi Apps
+                                            <FormattedMessage id='managerThumbnail.siddhiApps' defaultMessage='Siddhi Apps' />
                                         </Typography>
                                     </div>
                                 </GridTile>
@@ -437,7 +443,7 @@ export default class ManagerThumbnail extends React.Component {
                                     color="#19cdd7"/>
                                 <div style={styles.legendContainer}>
                                     <Typography style={styles.overviewLegend} align={'center'}>
-                                        CPU Usage
+                                        <FormattedMessage id='managerThumbnail.cpuUsage' defaultMessage='CPU Usage' />
                                         {cpuTrend === constants.up ? <span style={{color: 'red'}}>˄</span> :
                                             <span style={{color: 'green'}}>˅</span>}
                                     </Typography>
@@ -450,7 +456,7 @@ export default class ManagerThumbnail extends React.Component {
                                     color="#f17b31"/>
                                 <div style={styles.legendContainer}>
                                     <Typography style={styles.overviewLegend} align={'center'}>
-                                        Memory Usage
+                                        <FormattedMessage id='managerThumbnail.memoryUsage' defaultMessage='Memory Usage' />
                                         {memoryTrend === constants.up ? <span style={{color: 'red'}}>˄</span> :
                                             <span style={{color: 'green'}}>˅</span>}
                                     </Typography></div>
@@ -464,7 +470,7 @@ export default class ManagerThumbnail extends React.Component {
                                     {loadAvg}</div>
                                 <div style={styles.legendContainer}>
                                     <Typography style={styles.overviewLegend} align={'center'}>
-                                        Load Average
+                                        <FormattedMessage id='managerThumbnail.loadAvg' defaultMessage='Load Average' />
                                         {loadTrendImg}
                                     </Typography>
                                 </div>
@@ -475,7 +481,9 @@ export default class ManagerThumbnail extends React.Component {
                                         textAlign: 'center',
                                         color: 'white',
                                         padding: 20
-                                    }}>Siddhi Apps are disabled</h4>
+                                    }}>
+                                        <FormattedMessage id='managerThumbnail.siddhiAppsDisabled' defaultMessage='Siddhi Apps are disabled' />
+                                    </h4>
                                 </div>
                             </GridTile>
                         </GridList>
@@ -513,13 +521,17 @@ export default class ManagerThumbnail extends React.Component {
                 variant="raised"
                 className="btn-primary"
                 onClick={this.deleteManager}
-            >Yes</Button>,
+            >
+                <FormattedMessage id='yes' defaultMessage='Yes' />
+            </Button>,
             <Button
                 onClick={() => {
                     this.setState({open: false})
                 }}
                 className="btn-default"
-            >NO</Button>,
+            >
+                <FormattedMessage id='no' defaultMessage='No' />
+            </Button>,
         ];
         let titleBg = items[2] === 'red' ? '#570404' : '#424242';
         return (
@@ -532,7 +544,7 @@ export default class ManagerThumbnail extends React.Component {
                     onRequestClose={() => {
                         this.setState({open: false})
                     }}>
-                    {"Do you want to delete manager '" + this.state.workerID + "' ?"}
+                    {<FormattedMessage id='managerThumbnail.deleteConfirmation' defaultMessage='Do you want to delete manager {workerId} ?' values={{ workerId: this.state.workerID }} />}
                 </Dialog>
 
                 <GridTile style={{background: 'black', marginBottom:'30px'}}>
@@ -546,8 +558,8 @@ export default class ManagerThumbnail extends React.Component {
                             <Typography className={'node-title'}>
                                 {this.state.workerID}</Typography>
                             <Typography className={'node-last-update'}>
-                                <span>Last Updated: {this.renderTime(items[1])}
-                                    <div style={{float: 'right', display: 'inline'}}><strong>{items[3]}</strong>
+                                <span><FormattedMessage id='managerThumbnail.lastUpdate' defaultMessage='Last Updated:' /> {this.renderTime(items[1])}
+                                    <div style={{ float: 'right', display: 'inline' }}><strong>{items[3]}</strong>
                                     </div>
                                 </span>
                             </Typography>
@@ -573,4 +585,8 @@ export default class ManagerThumbnail extends React.Component {
             </div>
         );
     }
+}
+
+ManagerThumbnail.contextTypes = {
+    intl: PropTypes.object.isRequired
 }
