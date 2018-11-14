@@ -418,17 +418,29 @@ public class BusinessRulesApiServiceImpl extends BusinessRulesApiService {
                     responseData.add("Deployment Successful");
                     responseData.add("Successfully deployed the business rule");
                     break;
+                case (TemplateManagerConstants.SAVED):
+                    responseData.add("Deployment Successful");
+                    responseData.add("Successfully undeployed the business rule");
+                    break;
                 case (TemplateManagerConstants.SUCCESSFULLY_UNDEPLOYED):
                     responseData.add("Undeployment Successful");
-                    responseData.add("Successfully un-deployed the business rule");
+                    responseData.add("Successfully undeployed the business rule");
                     break;
-                case (TemplateManagerConstants.PARTIALLY_UNDEPLOYED):
+                case (TemplateManagerConstants.PARTIALLY_DEPLOYED):
                     responseData.add("Partially Deployed");
                     responseData.add("Partially deployed the business rule");
+                    break;
+                case (TemplateManagerConstants.PARTIALLY_UNDEPLOYED):
+                    responseData.add("Partially Undeployed");
+                    responseData.add("Partially undeployed the business rule");
                     break;
                 case (TemplateManagerConstants.DEPLOYMENT_FAILURE):
                     responseData.add("Deployment Failure");
                     responseData.add("Failed to deploy the business rule");
+                    break;
+                case (TemplateManagerConstants.UNDEPLOYMENT_FAILURE):
+                    responseData.add("Undeployment Failure");
+                    responseData.add("Failed to undeploy the business rule");
                     break;
                 default:
                     responseData.add("Deployment Error");
@@ -455,14 +467,6 @@ public class BusinessRulesApiServiceImpl extends BusinessRulesApiService {
             responseData.add(e.getMessage());
             responseData.add(TemplateManagerConstants.SCRIPT_EXECUTION_ERROR);
             return Response.serverError().entity(gson.toJson(responseData)).build();
-        } catch (TemplateInstanceCountViolationException e) {
-            log.error(String.format("Failed to deploy business rule %s ",
-                    LogEncoder.removeCRLFCharacters(businessRuleInstanceID)), e);
-            responseData.add("Selected rule template can be instantiated only once.");
-            responseData.add("Selected rule template can be instantiated only once. Please delete the existing rule " +
-                    "created from the selected rule template before deploying this busienss rule.");
-            responseData.add(TemplateManagerConstants.ERROR);
-            return Response.ok().entity(gson.toJson(responseData)).build();
         }
     }
 
@@ -507,6 +511,14 @@ public class BusinessRulesApiServiceImpl extends BusinessRulesApiService {
                 case (TemplateManagerConstants.DEPLOYMENT_FAILURE):
                     responseData.add("Deployment Failure");
                     responseData.add("Failed to deploy the business rule");
+                    break;
+                case (TemplateManagerConstants.UNDEPLOYMENT_FAILURE):
+                    responseData.add("Undeployment Failure");
+                    responseData.add("Failed to undeploy the business rule");
+                    break;
+                case (TemplateManagerConstants.PARTIALLY_UNDEPLOYED):
+                    responseData.add("PARTIALLY UNDEPLOYED");
+                    responseData.add("Partially undeploy the business rule ");
                     break;
                 default:
                     responseData.add("Error Saving");

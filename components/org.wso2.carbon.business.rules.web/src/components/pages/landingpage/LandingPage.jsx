@@ -228,7 +228,7 @@ export default class LandingPage extends Component {
                 }
             });
     }
-
+    
     /**
      * Deletes the business rule, that has the given UUID
      * @param {String} businessRuleUUID     UUID of the business rule
@@ -240,6 +240,7 @@ export default class LandingPage extends Component {
             .then((deleteResponse) => {
                 this.toggleSnackbar(deleteResponse.data[1]);
                 this.updateBusinessRuleStatus(businessRuleIndex, this.getBusinessRuleStatusCode(deleteResponse.data));
+                this.loadAvailableBusinessRules();
             })
             .catch((error) => {
                 this.checkAuthorizationOnError(error);

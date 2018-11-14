@@ -72,26 +72,6 @@ public class BusinessRulesApi implements Microservice {
         return delegate.createBusinessRule(request, businessRule, shouldDeploy);
     }
 
-//    @POST
-//    @Path("/instances/{businessRuleInstanceID}")
-//    @Produces({"application/json"})
-//    @io.swagger.annotations.ApiOperation(value = "Undeploys a business rule",
-//            notes = "Undeploys the given business rule from the workers on which it has been deployed.",
-//            response = Object.class, responseContainer = "List", tags = {"business-rules",})
-//    @io.swagger.annotations.ApiResponses(value = {
-//            @io.swagger.annotations.ApiResponse(code = 200, message = "Business rule undeployment is successful",
-//                    response = Object.class,
-//                    responseContainer = "List"),
-//
-//            @io.swagger.annotations.ApiResponse(code = 405, message = "Business rule undeployment failed",
-//                    response = Object.class, responseContainer = "List")})
-//    public Response undeployBusinessRule(@Context Request request,
-//                                         @ApiParam(value = "ID of the business rule to be undeployed", required = true)
-//                                         @PathParam("businessRuleInstanceID") String businessRuleInstanceID)
-//            throws NotFoundException {
-//        return delegate.undeployBusinessRule(request, businessRuleInstanceID);
-//    }
-
     @DELETE
     @Path("/instances/{businessRuleInstanceID}")
 
