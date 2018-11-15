@@ -17,7 +17,7 @@
  */
 define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dropElements', 'dagre', 'edge',
         'windowFilterProjectionQueryInput', 'joinQueryInput', 'patternOrSequenceQueryInput', 'queryOutput',
-        'partitionWith', 'jsonValidator'],
+        'partitionWith', 'jsonValidator','bootstrap'],
 
     function (require, log, $, Backbone, _, DesignViewUtils, DropElements, dagre, Edge,
               WindowFilterProjectionQueryInput, JoinQueryInput, PatternOrSequenceQueryInput, QueryOutput,
@@ -913,22 +913,75 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
                         checkJSONValidityOfElement(self, targetId, true);
                     }
 
+
                     var connectionObject = connection.connection;
+                    var conId=connectionObject.id;
+
                     // add a overlay of a close icon for connection. connection can be detached by clicking on it
                     var close_icon_overlay = connectionObject.addOverlay([
                         "Custom", {
                             create: function () {
-                                return $('<span><i class="fw fw-delete"></i></span>');
+                                return $('<span><i class="fw fw-delete" id="' + conId + '"></i></span>');
                             },
                             location: 0.60,
                             id: "close",
                             events: {
-                                click: function () {
-                                    self.jsPlumbInstance.deleteConnection(connectionObject);
+                                click: function (overlay, evt) {
+//                                    console.log(connectionObject);
+//                                    console.log(overlay);
+//                                    console.log(evt);
+//                                    console.log(conId);
+                                    popOverForConnector();
+                                   // self.jsPlumbInstance.deleteConnection(connectionObject);
                                 }
                             }
                         }
                     ]);
+                   function popOverForConnector(){
+                             $('#' + conId).popover({
+                                     trigger:'focus',
+                                     html: true,
+                                     title: 'Delete'+'<a class="close">&times;</a>',
+                                     content: function () {
+                                            return $('.pop-over').html();
+                                    }
+                            });
+
+                           $('#' + conId).popover("show");
+                           fadeInFunction();
+
+               // Custom jQuery to hide popover on click of the close button
+
+                            $("#" + conId).siblings(".popover").on("click", ".popover-footer .btn.yes" , function(){
+                                 if(connectionObject.connector !== null){
+                                    self.jsPlumbInstance.deleteConnection(connectionObject);
+                                 }
+                                 fadeOutFunction();
+                                $(this).parents(".popover").popover('hide');
+                            });
+                             $("#" + conId).siblings(".popover").on("click", ".popover-footer .btn.no" , function(){
+                                fadeOutFunction();
+                                $(this).parents(".popover").popover('hide');
+                            });
+
+                             $("#" + conId).siblings(".popover").on("click", ".close" , function(){
+                                fadeOutFunction();
+                                $(this).parents(".popover").popover('hide');
+                            });
+
+//                        if (confirm('Are you sure?')) {
+//                            self.jsPlumbInstance.deleteConnection(connectionObject);
+//                        }
+
+                    }
+                     function fadeInFunction(){
+                          $(".fullscreen-container").fadeTo(200, 1);
+                           }
+
+                    function fadeOutFunction(){
+                           $(".fullscreen-container").fadeOut(200);
+                            }
+
 
                     if (isConnectionMadeInsideAPartition) {
                         close_icon_overlay.setVisible(false);
@@ -938,17 +991,21 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
                         });
                         // hide the close icon when the mouse is not on the connection path
                         connectionObject.bind('mouseleave', function () {
-                            close_icon_overlay.setVisible(false);
+                            if($("#" + conId).siblings(".popover").length == 0){
+                               close_icon_overlay.setVisible(false);
+                           }
                         });
                     } else {
-                        close_icon_overlay.setVisible(false);
+                       close_icon_overlay.setVisible(false);
                         // show the close icon when mouse is over the connection
                         connectionObject.bind('mouseover', function () {
                             close_icon_overlay.setVisible(true);
                         });
                         // hide the close icon when the mouse is not on the connection path
                         connectionObject.bind('mouseout', function () {
-                            close_icon_overlay.setVisible(false);
+                            if($("#" + conId).siblings(".popover").length == 0){
+                              close_icon_overlay.setVisible(false);
+                            }
                         });
                     }
                 });
@@ -1376,6 +1433,8 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
 
             self.drawGraphFromAppData();
         };
+
+
 
         DesignGrid.prototype.drawGraphFromAppData = function () {
             var self = this;
