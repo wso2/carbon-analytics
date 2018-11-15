@@ -87,8 +87,8 @@ public class BusinessRulesApiServiceImpl extends BusinessRulesApiService {
         String businessRuleName = null;
         try {
             // Check the business rule type of the json object
-            if (businessRuleJson.get("type").toString().equals("\"" + TemplateManagerConstants
-                    .BUSINESS_RULE_TYPE_TEMPLATE + "\"")) {
+            if ((TemplateManagerConstants.BUSINESS_RULE_TYPE_TEMPLATE).equalsIgnoreCase(businessRuleJson.
+                    get(TemplateManagerConstants.BUSINESS_RULE_TYPE).getAsString())) {
                 // Convert to business rule from template and create
                 BusinessRuleFromTemplate businessRuleFromTemplate = TemplateManagerHelper
                         .jsonToBusinessRuleFromTemplate(businessRule);
@@ -312,7 +312,6 @@ public class BusinessRulesApiServiceImpl extends BusinessRulesApiService {
         TemplateManagerService templateManagerService = TemplateManagerInstance.getInstance();
         List<Object> responseData = new ArrayList<Object>();
         Gson gson = new GsonBuilder().disableHtmlEscaping().setPrettyPrinting().create();
-
         try {
             // Get template groups and store without UUIDs
             Map<String, TemplateGroup> templateGroups = templateManagerService.getTemplateGroups();
@@ -409,10 +408,11 @@ public class BusinessRulesApiServiceImpl extends BusinessRulesApiService {
 
         TemplateManagerService templateManagerService = TemplateManagerInstance.getInstance();
         Gson gson = new GsonBuilder().disableHtmlEscaping().setPrettyPrinting().create();
-        int status;
         List<Object> responseData = new ArrayList<Object>();
         try {
+
             status = templateManagerService.deployOrUndeployBusinessRule(businessRuleInstanceID, shouldUndeploy);
+
             switch (status) {
                 case (TemplateManagerConstants.DEPLOYED):
                     responseData.add("Deployment Successful");
@@ -482,8 +482,8 @@ public class BusinessRulesApiServiceImpl extends BusinessRulesApiService {
         JsonObject businessRuleJson = gson.fromJson(businessRuleDefinition, JsonObject.class);
         int status;
         try {
-            if (businessRuleJson.get("type").toString().equals("\"" +
-                    TemplateManagerConstants.BUSINESS_RULE_TYPE_TEMPLATE + "\"")) {
+            if ((TemplateManagerConstants.BUSINESS_RULE_TYPE_TEMPLATE).equalsIgnoreCase(businessRuleJson.get
+                    (TemplateManagerConstants.BUSINESS_RULE_TYPE).getAsString())) {
                 BusinessRuleFromTemplate businessRuleFromTemplate = TemplateManagerHelper
                         .jsonToBusinessRuleFromTemplate(businessRuleDefinition);
                 status = templateManagerService.editBusinessRuleFromTemplate(businessRuleInstanceID,

@@ -23,8 +23,8 @@ import org.wso2.carbon.config.annotation.Configuration;
 import org.wso2.carbon.config.annotation.Element;
 import org.wso2.carbon.database.query.manager.config.Queries;
 
-import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Configuration bean class for business rules manager query configurations.
@@ -32,18 +32,18 @@ import java.util.HashMap;
 @Configuration(namespace = "wso2.business.rules.manager", description = "WSO2 Business Rules Manager Query Provider")
 public class BusinessRulesQueryConfigs {
     @Element(description = "Database query map")
-    private ArrayList<Queries> queries;
+    private List<Queries> queries;
     private String datasource;
     private String username;
     private String password;
-    private ArrayList<HashMap<String, ArrayList<String>>> deployment_configs;
-    private HashMap<String, Object> roles;
+    private List<Map<String, List<String>>> deployment_configs;
+    private Map<String, Object> roles;
 
-    public ArrayList<Queries> getQueries() {
+    public List<Queries> getQueries() {
         return queries;
     }
 
-    public void setQueries(ArrayList<Queries> queries) {
+    public void setQueries(List<Queries> queries) {
         this.queries = queries;
     }
 
@@ -55,11 +55,11 @@ public class BusinessRulesQueryConfigs {
         this.datasource = datasource;
     }
 
-    public ArrayList<HashMap<String, ArrayList<String>>> getDeployment_configs() {
+    public List<Map<String, List<String>>> getDeployment_configs() {
         return deployment_configs;
     }
 
-    public void setDeployment_configs(ArrayList<HashMap<String, ArrayList<String>>> deployment_configs) {
+    public void setDeploymentConfigs(List<Map<String, List<String>>> deployment_configs) {
         this.deployment_configs = deployment_configs;
     }
 
@@ -79,11 +79,11 @@ public class BusinessRulesQueryConfigs {
         this.username = username;
     }
 
-    public HashMap<String, Object> getRoles() {
+    public Map<String, Object> getRoles() {
         return roles;
     }
 
-    public void setRoles(HashMap<String, Object> roles) {
+    public void setRoles(Map<String, Object> roles) {
         this.roles = roles;
     }
 }
