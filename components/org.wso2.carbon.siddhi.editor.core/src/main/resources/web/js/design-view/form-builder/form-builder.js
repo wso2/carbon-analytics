@@ -263,25 +263,25 @@ define(['require', 'log', 'jquery', 'lodash', 'formUtils', 'streamForm', 'tableF
          * @param i id for the element
          * @returns user given stream name
          */
-        FormBuilder.prototype.DefineStream = function (i) {
-            var self = this;
-            var formConsole = this.createTabForForm(i, constants.STREAM);
-            var formContainer = formConsole.getContentContainer();
-
-            var formOptions = {};
-            _.set(formOptions, 'configurationData', self.configurationData);
-            _.set(formOptions, 'application', self.application);
-            _.set(formOptions, 'formUtils', self.formUtils);
-            _.set(formOptions, 'jsPlumbInstance', self.jsPlumbInstance);
-            var streamForm = new StreamForm(formOptions);
-            return streamForm.generateDefineForm(i, formConsole, formContainer);
-        };
+//        FormBuilder.prototype.DefineStream = function (i) {
+//            var self = this;
+//            var formConsole = this.createTabForForm(i, constants.STREAM);
+//            var formContainer = formConsole.getContentContainer();
+//
+//            var formOptions = {};
+//            _.set(formOptions, 'configurationData', self.configurationData);
+//            _.set(formOptions, 'application', self.application);
+//            _.set(formOptions, 'formUtils', self.formUtils);
+//            _.set(formOptions, 'jsPlumbInstance', self.jsPlumbInstance);
+//            var streamForm = new StreamForm(formOptions);
+//            return streamForm.generateDefineForm(i, formConsole, formContainer);
+//        };
 
         /**
          * @function generate the property window for an existing stream
          * @param element selected element(stream)
          */
-        FormBuilder.prototype.GeneratePropertiesFormForStreams = function (element) {
+        FormBuilder.prototype.GeneratePropertiesFormForStreams = function (id, element) {
             var self = this;
             var formConsole = this.createTabForForm();
             var formContainer = formConsole.getContentContainer();
@@ -292,6 +292,13 @@ define(['require', 'log', 'jquery', 'lodash', 'formUtils', 'streamForm', 'tableF
             _.set(formOptions, 'formUtils', self.formUtils);
             _.set(formOptions, 'jsPlumbInstance', self.jsPlumbInstance);
             var streamForm = new StreamForm(formOptions);
+            if (element == undefined) {
+				var streamOptions = {};
+				_.set(streamOptions, 'id', id);
+				_.set(streamOptions, 'name', undefined);
+				element = new Stream(streamOptions);
+				self.configurationData.getSiddhiAppConfig().addStream(element);
+			}
             streamForm.generatePropertiesForm(element, formConsole, formContainer);
         };
 

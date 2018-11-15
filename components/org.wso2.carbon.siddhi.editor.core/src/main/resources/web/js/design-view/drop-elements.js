@@ -229,7 +229,8 @@ define(['require', 'log', 'lodash', 'jquery', 'partition', 'stream', 'query', 'f
                 if (isGenerateStreamFromQueryOutput) {
                     name = streamName;
                 } else {
-                    name = self.formBuilder.DefineStream(i);
+                	var element = undefined;
+                    self.formBuilder.GeneratePropertiesFormForStreams(i, element);
                 }
             }
             var node = $('<div>' + name + '</div>');
@@ -250,7 +251,13 @@ define(['require', 'log', 'lodash', 'jquery', 'partition', 'stream', 'query', 'f
 
             var settingsIconElement = $('#' + settingsIconId)[0];
             settingsIconElement.addEventListener('click', function () {
-                self.formBuilder.GeneratePropertiesFormForStreams(this);
+            	var clickedElement = self.configurationData.getSiddhiAppConfig().getStream(i);
+				if (!clickedElement) {
+					var errorMessage = 'unable to find clicked element';
+					log.error(errorMessage);
+					throw errorMessage;
+				}
+                self.formBuilder.GeneratePropertiesFormForStreams(i, clickedElement);
             });
 
             var finalElement = newAgent;
