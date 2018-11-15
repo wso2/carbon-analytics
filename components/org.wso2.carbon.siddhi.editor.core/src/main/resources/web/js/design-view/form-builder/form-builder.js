@@ -168,29 +168,29 @@ define(['require', 'log', 'jquery', 'lodash', 'formUtils', 'streamForm', 'tableF
             appAnnotationForm.generatePropertiesForm(element, formConsole, formContainer);
         };
 
-        /**
-         * @function generate the form to define the source once it is dropped on the canvas
-         * @param i id for the element
-         * @returns user given source name
-         */
-        FormBuilder.prototype.DefineSource = function (i) {
-            var self = this;
-            var formConsole = this.createTabForForm(i, constants.SOURCE);
-            var formContainer = formConsole.getContentContainer();
-
-            var formOptions = {};
-            _.set(formOptions, 'configurationData', self.configurationData);
-            _.set(formOptions, 'application', self.application);
-            _.set(formOptions, 'formUtils', self.formUtils);
-            var sourceForm = new SourceForm(formOptions);
-            sourceForm.generateDefineForm(i, formConsole, formContainer);
-        };
+//        /**
+//         * @function generate the form to define the source once it is dropped on the canvas
+//         * @param i id for the element
+//         * @returns user given source name
+//         */
+//        FormBuilder.prototype.DefineSource = function (i) {
+//            var self = this;
+//            var formConsole = this.createTabForForm(i, constants.SOURCE);
+//            var formContainer = formConsole.getContentContainer();
+//
+//            var formOptions = {};
+//            _.set(formOptions, 'configurationData', self.configurationData);
+//            _.set(formOptions, 'application', self.application);
+//            _.set(formOptions, 'formUtils', self.formUtils);
+//            var sourceForm = new SourceForm(formOptions);
+//            sourceForm.generateDefineForm(i, formConsole, formContainer);
+//        };
 
         /**
          * @function generate the property window for an existing source
          * @param element selected element(source)
          */
-        FormBuilder.prototype.GeneratePropertiesFormForSources = function (element) {
+        FormBuilder.prototype.GeneratePropertiesFormForSources = function (id, element) {
             var self = this;
             var formConsole = this.createTabForForm();
             var formContainer = formConsole.getContentContainer();
@@ -200,6 +200,16 @@ define(['require', 'log', 'jquery', 'lodash', 'formUtils', 'streamForm', 'tableF
             _.set(formOptions, 'application', self.application);
             _.set(formOptions, 'formUtils', self.formUtils);
             var sourceForm = new SourceForm(formOptions);
+            if (element == undefined) {
+				var sourceOptions = {};
+				_.set(sourceOptions, 'id', id);
+				_.set(sourceOptions, 'annotationType', 'SOURCE');
+				_.set(sourceOptions, 'type', undefined);
+				_.set(sourceOptions, 'options', undefined);
+				_.set(sourceOptions, 'map', undefined);
+				element = new SourceOrSinkAnnotation(sourceOptions);
+				self.configurationData.getSiddhiAppConfig().addSource(element);
+			}
             sourceForm.generatePropertiesForm(element, formConsole, formContainer);
         };
 

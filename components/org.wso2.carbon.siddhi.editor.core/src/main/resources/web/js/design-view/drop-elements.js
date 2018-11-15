@@ -69,9 +69,10 @@ define(['require', 'log', 'lodash', 'jquery', 'partition', 'stream', 'query', 'f
             if (isCodeToDesignMode) {
                 name = sourceName;
             } else {
-                name = self.formBuilder.DefineSource(i);
+                var element = undefined;
+				self.formBuilder.GeneratePropertiesFormForSources(i, element);
             }
-            var node = $('<div>' + name + '</div>');
+            var node = $('<div> ' + name + ' </div>');
             newAgent.append(node);
             node.attr('id', i + "-nodeInitial");
             node.attr('class', "sourceNameNode");
@@ -87,7 +88,13 @@ define(['require', 'log', 'lodash', 'jquery', 'partition', 'stream', 'query', 'f
 
             var settingsIconElement = $('#' + settingsIconId)[0];
             settingsIconElement.addEventListener('click', function () {
-                self.formBuilder.GeneratePropertiesFormForSources(this);
+                var clickedElement = self.configurationData.getSiddhiAppConfig().getSource(i);
+				if (!clickedElement) {
+					var errorMessage = 'unable to find clicked element';
+					log.error(errorMessage);
+					throw errorMessage;
+				}
+				self.formBuilder.GeneratePropertiesFormForSources(i, clickedElement);
             });
 
             var finalElement = newAgent;
