@@ -21,7 +21,6 @@ define(['log', 'jquery', 'lodash', 'sourceOrSinkAnnotation', 'mapAnnotation', 'p
     function (log, $, _, SourceOrSinkAnnotation, MapAnnotation, PayloadOrAttribute, JSONValidator, Handlebars,
         DesignViewUtils) {
 
-
         /**
          * @class SinkForm Creates a forms to collect data from a sink
          * @constructor
@@ -495,70 +494,25 @@ define(['log', 'jquery', 'lodash', 'sourceOrSinkAnnotation', 'mapAnnotation', 'p
         };
 
         /**
-         * @function generate form when defining a form
-         * @param i id for the element
-         * @param formConsole Console which holds the form
-         * @param formContainer Container which holds the form
-         */
-        SinkForm.prototype.generateDefineForm = function (i, formConsole, formContainer) {
-            var self = this;
-
-            // create an empty sink object and add it to the sink array
-            var sinkOptions = {};
-            _.set(sinkOptions, 'id', i);
-            _.set(sinkOptions, 'annotationType', 'SINK');
-            _.set(sinkOptions, 'type', undefined);
-            _.set(sinkOptions, 'options', undefined);
-            _.set(sinkOptions, 'map', undefined);
-            var sink = new SourceOrSinkAnnotation(sinkOptions);
-
-            self.configurationData.getSiddhiAppConfig().addSink(sink);
-            // perform JSON validation
-            if (!JSONValidator.prototype.validateSourceOrSinkAnnotation(sink, 'Sink', true)) {
-                DesignViewUtils.prototype.errorAlert("To edit sink configuration, please connect to a stream");
-                if ($('#' + i).hasClass('error-element')) {
-                    $('#' + i).removeClass('error-element');
-                }
-                $('#' + i).addClass("not-connected-source-sink")
-            }
-
-            // close the form window
-            self.consoleListManager.removeFormConsole(formConsole);
-
-            self.designViewContainer.removeClass('disableContainer');
-            self.toggleViewButton.removeClass('disableContainer');
-
-            return "undefined";
-        };
-
-        /**
          * @function generate properties form for a sink
          * @param element selected element(sink)
          * @param formConsole Console which holds the form
          * @param formContainer Container which holds the form
          */
-        SinkForm.prototype.generatePropertiesForm = function (element, formConsole, formContainer) {
+        SinkForm.prototype.generatePropertiesForm = function (clickedElement, formConsole, formContainer) {
             var self = this;
-            var id = $(element).parent().attr('id');
-
-            // retrieve the source information from the collection
-            var clickedElement = self.configurationData.getSiddhiAppConfig().getSink(id);
-            var streamList = self.configurationData.getSiddhiAppConfig().getStreamList();
-            var connectedElement = clickedElement.connectedElementName;
-
-            if (!clickedElement) {
-                var errorMessage = 'unable to find clicked element';
-                log.error(errorMessage);
-                throw errorMessage;
-            }
+            var id = clickedElement.id;
             var isSinkConnected = true;
-            if ($('#' + id).hasClass('error-element') || $('#' + id).hasClass('not-connected-source-sink')) {
+            if ($('#' + id).hasClass('error-element')) {
                 isSinkConnected = false;
-                DesignViewUtils.prototype.errorAlert("To edit source configuration, please connect to a stream");
-            } else if (!JSONValidator.prototype.validateSourceOrSinkAnnotation(clickedElement, 'Source', true)) {
-                // perform JSON validation to check if source contains a connectedElement.
+                DesignViewUtils.prototype.errorAlert("To edit sink configuration, please connect to a stream");
+            } else if (!JSONValidator.prototype.validateSourceOrSinkAnnotation(clickedElement, 'Sink', true)) {
+                // perform JSON validation to check if sink contains a connectedElement.
                 isSinkConnected = false;
-                DesignViewUtils.prototype.errorAlert("To edit source configuration, please connect to a stream");
+                if ($('#' + id).hasClass('error-element')) {
+                    $('#' + id).removeClass('error-element');
+                }
+                $('#' + id).addClass('incomplete-element');
             }
             if (!isSinkConnected) {
                 // close the form window
@@ -566,10 +520,8 @@ define(['log', 'jquery', 'lodash', 'sourceOrSinkAnnotation', 'mapAnnotation', 'p
                 self.designViewContainer.removeClass('disableContainer');
                 self.toggleViewButton.removeClass('disableContainer');
             } else {
-                //remove element error class
-                if ($('#' + id).hasClass('not-connected-source-sink')) {
-                    $('#' + id).removeClass('not-connected-source-sink');
-                }
+                var streamList = self.configurationData.getSiddhiAppConfig().getStreamList();
+                var connectedElement = clickedElement.connectedElementName;
                 var predefined_sinks = this.configurationData.rawExtensions["sink"].sort(sortUsingProperty("name"));
                 var predefined_sink_maps = this.configurationData.rawExtensions["sinkMaps"]
                     .sort(sortUsingProperty("name"));
@@ -906,6 +858,10 @@ define(['log', 'jquery', 'lodash', 'sourceOrSinkAnnotation', 'mapAnnotation', 'p
 
                     var textNode = $('#' + id).find('.sinkNameNode');
                     textNode.html(selectedSinkType);
+                    if ($('#' + id).hasClass('incomplete-element')) {
+                        $('#' + id).removeClass('incomplete-element');
+                    }
+                    $('#' + id).prop('title', '');
 
                     // set the isDesignViewContentChanged to true
                     self.configurationData.setIsDesignViewContentChanged(true);

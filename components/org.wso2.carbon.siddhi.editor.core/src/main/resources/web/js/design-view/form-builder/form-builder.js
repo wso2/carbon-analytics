@@ -18,10 +18,11 @@
 
 define(['require', 'log', 'jquery', 'lodash', 'formUtils', 'streamForm', 'tableForm', 'windowForm', 'aggregationForm',
         'triggerForm', 'windowFilterProjectionQueryForm', 'patternQueryForm', 'joinQueryForm', 'partitionForm',
-        'sequenceQueryForm', 'sourceForm', 'sinkForm', 'functionForm', 'appAnnotationForm'],
+        'sequenceQueryForm', 'sourceForm', 'sinkForm', 'functionForm', 'appAnnotationForm','sourceOrSinkAnnotation',
+        'stream'],
     function (require, log, $, _, FormUtils, StreamForm, TableForm, WindowForm, AggregationForm, TriggerForm,
               WindowFilterProjectionQueryForm, PatternQueryForm, JoinQueryForm, PartitionForm, SequenceQueryForm,
-              SourceForm, SinkForm, FunctionForm, AppAnnotationForm) {
+              SourceForm, SinkForm, FunctionForm, AppAnnotationForm, SourceOrSinkAnnotation, Stream) {
 
         // common properties for the JSON editor
         JSONEditor.defaults.options.theme = 'bootstrap3';
@@ -202,29 +203,29 @@ define(['require', 'log', 'jquery', 'lodash', 'formUtils', 'streamForm', 'tableF
             sourceForm.generatePropertiesForm(element, formConsole, formContainer);
         };
 
-        /**
-         * @function generate the form to define the sink once it is dropped on the canvas
-         * @param i id for the element
-         * @returns user given sink name
-         */
-        FormBuilder.prototype.DefineSink = function (i) {
-            var self = this;
-            var formConsole = this.createTabForForm(i, constants.SINK);
-            var formContainer = formConsole.getContentContainer();
-
-            var formOptions = {};
-            _.set(formOptions, 'configurationData', self.configurationData);
-            _.set(formOptions, 'application', self.application);
-            _.set(formOptions, 'formUtils', self.formUtils);
-            var sinkForm = new SinkForm(formOptions);
-            sinkForm.generateDefineForm(i, formConsole, formContainer);
-        };
+//        /**
+//         * @function generate the form to define the sink once it is dropped on the canvas
+//         * @param i id for the element
+//         * @returns user given sink name
+//         */
+//        FormBuilder.prototype.DefineSink = function (i) {
+//            var self = this;
+//            var formConsole = this.createTabForForm(i, constants.SINK);
+//            var formContainer = formConsole.getContentContainer();
+//
+//            var formOptions = {};
+//            _.set(formOptions, 'configurationData', self.configurationData);
+//            _.set(formOptions, 'application', self.application);
+//            _.set(formOptions, 'formUtils', self.formUtils);
+//            var sinkForm = new SinkForm(formOptions);
+//            sinkForm.generateDefineForm(i, formConsole, formContainer);
+//        };
 
         /**
          * @function generate the property window for an existing sink
          * @param element selected element(sink)
          */
-        FormBuilder.prototype.GeneratePropertiesFormForSinks = function (element) {
+        FormBuilder.prototype.GeneratePropertiesFormForSinks = function (id, element) {
             var self = this;
             var formConsole = this.createTabForForm();
             var formContainer = formConsole.getContentContainer();
@@ -234,6 +235,16 @@ define(['require', 'log', 'jquery', 'lodash', 'formUtils', 'streamForm', 'tableF
             _.set(formOptions, 'application', self.application);
             _.set(formOptions, 'formUtils', self.formUtils);
             var sinkForm = new SinkForm(formOptions);
+            if (element == undefined) {
+				var sinkOptions = {};
+				_.set(sinkOptions, 'id', id);
+				_.set(sinkOptions, 'annotationType', 'SINK');
+				_.set(sinkOptions, 'type', undefined);
+				_.set(sinkOptions, 'options', undefined);
+				_.set(sinkOptions, 'map', undefined);
+				element = new SourceOrSinkAnnotation(sinkOptions);
+				self.configurationData.getSiddhiAppConfig().addSink(element);
+            }
             sinkForm.generatePropertiesForm(element, formConsole, formContainer);
         };
 

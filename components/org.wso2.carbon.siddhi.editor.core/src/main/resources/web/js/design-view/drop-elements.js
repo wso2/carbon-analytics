@@ -137,7 +137,8 @@ define(['require', 'log', 'lodash', 'jquery', 'partition', 'stream', 'query', 'f
             if (isCodeToDesignMode) {
                 name = sinkName;
             } else {
-                name = self.formBuilder.DefineSink(i);
+            	var element = undefined;
+                self.formBuilder.GeneratePropertiesFormForSinks(i, element);
             }
             var node = $('<div>' + name + '</div>');
             newAgent.append(node);
@@ -155,7 +156,13 @@ define(['require', 'log', 'lodash', 'jquery', 'partition', 'stream', 'query', 'f
 
             var settingsIconElement = $('#' + settingsIconId)[0];
             settingsIconElement.addEventListener('click', function () {
-                self.formBuilder.GeneratePropertiesFormForSinks(this);
+            	var clickedElement = self.configurationData.getSiddhiAppConfig().getSink(i);
+            	if (!clickedElement) {
+					var errorMessage = 'unable to find clicked element';
+					log.error(errorMessage);
+					throw errorMessage;
+				}
+                self.formBuilder.GeneratePropertiesFormForSinks(i, clickedElement);
             });
 
             var finalElement = newAgent;
