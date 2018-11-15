@@ -602,7 +602,7 @@ a.list-group-item, button.list-group-item {
     display: none;
 }
 
-.not-connected-source-sink {
+.incomplete-element {
 	border: 1px solid yellow;
 	box-shadow: 0 0 1px 2px yellow;
 }
