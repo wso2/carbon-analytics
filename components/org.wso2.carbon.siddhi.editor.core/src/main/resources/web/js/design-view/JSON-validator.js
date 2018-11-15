@@ -46,7 +46,7 @@ define(['require', 'log', 'jquery', 'lodash', 'designViewUtils'],
             });
 
             // exit from the validate method
-            if(!isValid) {
+            if (!isValid) {
                 DesignViewUtils.prototype.errorAlert(commonErrorMessage);
                 return isValid;
             }
@@ -60,7 +60,7 @@ define(['require', 'log', 'jquery', 'lodash', 'designViewUtils'],
             });
 
             // exit from the validate method
-            if(!isValid) {
+            if (!isValid) {
                 DesignViewUtils.prototype.errorAlert(commonErrorMessage);
                 return isValid;
             }
@@ -74,7 +74,7 @@ define(['require', 'log', 'jquery', 'lodash', 'designViewUtils'],
             });
 
             // exit from the validate method
-            if(!isValid) {
+            if (!isValid) {
                 DesignViewUtils.prototype.errorAlert(commonErrorMessage);
                 return isValid;
             }
@@ -88,7 +88,7 @@ define(['require', 'log', 'jquery', 'lodash', 'designViewUtils'],
             });
 
             // exit from the validate method
-            if(!isValid) {
+            if (!isValid) {
                 DesignViewUtils.prototype.errorAlert(commonErrorMessage);
                 return isValid;
             }
@@ -102,7 +102,7 @@ define(['require', 'log', 'jquery', 'lodash', 'designViewUtils'],
             });
 
             // exit from the validate method
-            if(!isValid) {
+            if (!isValid) {
                 DesignViewUtils.prototype.errorAlert(commonErrorMessage);
                 return isValid;
             }
@@ -116,7 +116,7 @@ define(['require', 'log', 'jquery', 'lodash', 'designViewUtils'],
             });
 
             // exit from the validate method
-            if(!isValid) {
+            if (!isValid) {
                 DesignViewUtils.prototype.errorAlert(commonErrorMessage);
                 return isValid;
             }
@@ -130,7 +130,7 @@ define(['require', 'log', 'jquery', 'lodash', 'designViewUtils'],
             });
 
             // exit from the validate method
-            if(!isValid) {
+            if (!isValid) {
                 DesignViewUtils.prototype.errorAlert(commonErrorMessage);
                 return isValid;
             }
@@ -143,7 +143,7 @@ define(['require', 'log', 'jquery', 'lodash', 'designViewUtils'],
                 }
             });
 
-            if(!isValid) {
+            if (!isValid) {
                 DesignViewUtils.prototype.errorAlert(commonErrorMessage);
             }
 
@@ -163,7 +163,7 @@ define(['require', 'log', 'jquery', 'lodash', 'designViewUtils'],
             var errorMessage;
             removeTooltipErrorMessage(innerStream.id);
             // check whether it has a connection in because there cannot be a inner stream without a 'connection-in'
-            var inConnections = jsPlumbInstance.getConnections({target: innerStream.id + '-in'});
+            var inConnections = jsPlumbInstance.getConnections({ target: innerStream.id + '-in' });
             if (inConnections.length === 0) {
                 errorMessage = 'Inner stream does not contain a connection input from an inner query';
                 highlightErrorElement(innerStream.id, errorMessage);
@@ -188,15 +188,22 @@ define(['require', 'log', 'jquery', 'lodash', 'designViewUtils'],
         JSONValidator.prototype.validateSourceOrSinkAnnotation = function (annotation, type, doNotShowErrorMessages) {
             var errorMessage;
             removeTooltipErrorMessage(annotation.id);
-            removeWarningHighlighter(annotation.id);
             if (!annotation.connectedElementName) {
                 errorMessage = type + ' annotation does not contain a connected stream';
-                highlightErrorElement(annotation.id, errorMessage);
+                addToolTipErrorMessage(annotation.id, errorMessage)
+                if (annotation.getType() !== undefined) {
+                    errorMessage = type + ' annotation does not contain a connected stream';
+                    highlightErrorElement(annotation.id, errorMessage);
+                }
                 if (!doNotShowErrorMessages) {
                     DesignViewUtils.prototype.errorAlert(errorMessage);
                 }
                 return false;
             } else {
+                if (annotation.getType() === undefined) {
+                    errorMessage = type + ' annotation form is incomplete'
+                    addToolTipErrorMessage(annotation.id, errorMessage)
+                }
                 removeErrorHighlighter(annotation.id);
                 return true;
             }
@@ -399,7 +406,7 @@ define(['require', 'log', 'jquery', 'lodash', 'designViewUtils'],
                     DesignViewUtils.prototype.errorAlert(errorMessage);
                 }
                 return false;
-            } else if (query.queryInput.conditionList.length === 0){
+            } else if (query.queryInput.conditionList.length === 0) {
                 errorMessage = 'Condition list in query input of ' + type + ' form cannot be blank';
                 highlightErrorElement(query.id, errorMessage);
                 if (!doNotShowErrorMessages) {
@@ -426,7 +433,7 @@ define(['require', 'log', 'jquery', 'lodash', 'designViewUtils'],
          * @returns {boolean} validity of the json
          */
         JSONValidator.prototype.validateQuerySelectSection = function (select, type, elementId,
-                                                                       doNotShowErrorMessages) {
+            doNotShowErrorMessages) {
             var isValid = true;
             var errorMessage;
             if (!select) {
@@ -436,7 +443,7 @@ define(['require', 'log', 'jquery', 'lodash', 'designViewUtils'],
                 if (!doNotShowErrorMessages) {
                     DesignViewUtils.prototype.errorAlert(errorMessage);
                 }
-            } else if(select.type === 'USER_DEFINED') {
+            } else if (select.type === 'USER_DEFINED') {
                 _.forEach(select.value, function (value) {
                     if (!value.expression || value.expression === '') {
                         isValid = false;
@@ -463,7 +470,7 @@ define(['require', 'log', 'jquery', 'lodash', 'designViewUtils'],
          * @returns {boolean} validity of the json
          */
         JSONValidator.prototype.validateQueryOutputSection = function (output, type, elementId,
-                                                                       doNotShowErrorMessages) {
+            doNotShowErrorMessages) {
             var isValid = true;
             var errorMessage;
             if (!output) {
@@ -480,7 +487,7 @@ define(['require', 'log', 'jquery', 'lodash', 'designViewUtils'],
                 if (!doNotShowErrorMessages) {
                     DesignViewUtils.prototype.errorAlert(errorMessage);
                 }
-            } else if(!output.type || !output.output) {
+            } else if (!output.type || !output.output) {
                 isValid = false;
                 errorMessage = 'Output section of ' + type + ' form is not filled';
                 highlightErrorElement(elementId, errorMessage);
@@ -608,17 +615,22 @@ define(['require', 'log', 'jquery', 'lodash', 'designViewUtils'],
             }
         }
 
+        function addToolTipErrorMessage(errorElementId, errorMessage) {
+            var element = $('#' + errorElementId);
+            element.prop('title', errorMessage);
+        }
+
         function removeTooltipErrorMessage(errorElementId) {
             var element = $('#' + errorElementId);
             element.prop('title', '');
         }
 
-		function removeWarningHighlighter(warningElementId){
-			var element = $('#' + warningElementId);
-			if(element.hasClass('not-connected-source-sink')) {
-				element.removeClass('not-connected-source-sink');
-			}
-		}
+//        function removeWarningHighlighter(warningElementId) {
+//            var element = $('#' + warningElementId);
+//            if (element.hasClass('not-connected-element')) {
+//                element.removeClass('not-connected-element');
+//            }
+//        }
 
         return JSONValidator;
     });
