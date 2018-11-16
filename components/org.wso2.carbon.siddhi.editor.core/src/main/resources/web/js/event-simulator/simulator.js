@@ -640,6 +640,7 @@ define(['jquery', 'log', './simulator-rest-client', 'lodash', './open-siddhi-app
 
 //    used to create options for available siddhi apps and streams
     self.generateOptions = function (dataArray,initialOptionValue) {
+        dataArray.sort();
         var dataOption =
             '<option value = "{{dataName}}">' +
             '   {{dataName}}' +
