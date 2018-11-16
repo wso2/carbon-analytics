@@ -438,8 +438,9 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'stream', 'designView
                 var wrappedHtml = attributeFormTemplate([{ name: "", type: "string" }]);
                 $('#define-attribute').html(wrappedHtml);
                 $('#' + id).addClass('incomplete-element');
-
+                $('#' + id).prop('title', 'Form is incomplete');
             } else {
+            	$('#' + id).addClass('currently-selected-element');
                 //add the saved name to the input field
                 $('#streamName').val(name);
                 //load the saved attributes
@@ -558,19 +559,20 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'stream', 'designView
                     }
                 }
 
+                //check if stream name is empty
+				if (streamName == "") {
+					$('#streamName').addClass('required-input-field');
+					$('#streamName')[0].scrollIntoView();
+					$('#streamNameErrorMessage').text("Stream name is required.")
+					return;
+				}
+
                 var previouslySavedName = clickedElement.getName();
                 if (previouslySavedName === undefined) {
                     previouslySavedName = "";
                 }
                 // update connection related to the element if the name is changed
                 if (previouslySavedName !== streamName) {
-                    //check if stream name is empty
-                    if (streamName == "") {
-                        $('#streamName').addClass('required-input-field');
-                        $('#streamName')[0].scrollIntoView();
-                        $('#streamNameErrorMessage').text("Stream name is required.")
-                        return;
-                    }
                     if ((streamName.indexOf(' ') >= 0)) {
                         $('#streamName').addClass('required-input-field');
                         $('#streamName')[0].scrollIntoView();
@@ -643,6 +645,7 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'stream', 'designView
                 if ($('#' + id).hasClass('incomplete-element')) {
                     $('#' + id).removeClass('incomplete-element');
                 }
+                $('#' + id).prop('title', '');
 
                 self.designViewContainer.removeClass('disableContainer');
                 self.toggleViewButton.removeClass('disableContainer');

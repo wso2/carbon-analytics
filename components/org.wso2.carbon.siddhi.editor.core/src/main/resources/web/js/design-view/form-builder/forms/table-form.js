@@ -757,8 +757,9 @@ define(['log', 'jquery', 'lodash', 'attribute', 'table', 'storeAnnotation', 'des
                 var wrappedHtml = attributeFormTemplate([{ name: "", type: "string" }]);
                 $('#define-attribute').html(wrappedHtml);
                 $('#' + id).addClass('incomplete-element');
-
+			 	$('#' + id).prop('title', 'Form is incomplete');
             } else {
+            	$('#' + id).addClass('currently-selected-element');
                 $('#tableName').val(name);
                 var savedAttributes = clickedElement.getAttributeList();
 
@@ -882,6 +883,13 @@ define(['log', 'jquery', 'lodash', 'attribute', 'table', 'storeAnnotation', 'des
 
                 var tableName = $('#tableName').val().trim();
 
+				// to check if stream name is empty
+				if (tableName == "") {
+					$('#tableName').addClass('required-input-field');
+					$('#tableName')[0].scrollIntoView();
+					$('#tableNameErrorMessage').text("Table name is required");
+					return;
+				}
                 var previouslySavedName = clickedElement.getName();
                 if (previouslySavedName === undefined) {
                     previouslySavedName = "";
@@ -893,13 +901,6 @@ define(['log', 'jquery', 'lodash', 'attribute', 'table', 'storeAnnotation', 'des
                         $('#tableName').addClass('required-input-field');
                         $('#tableName')[0].scrollIntoView();
                         $('#tableNameErrorMessage').text("Table name is already used.");
-                        return;
-                    }
-                    // to check if stream name is empty
-                    if (tableName == "") {
-                        $('#tableName').addClass('required-input-field');
-                        $('#tableName')[0].scrollIntoView();
-                        $('#tableNameErrorMessage').text("Table name is required");
                         return;
                     }
                     //to check if stream name contains white spaces
@@ -984,7 +985,7 @@ define(['log', 'jquery', 'lodash', 'attribute', 'table', 'storeAnnotation', 'des
                 if ($('#' + id).hasClass('incomplete-element')) {
                     $('#' + id).removeClass('incomplete-element');
                 }
-
+				 $('#' + id).prop('title', '');
                 // close the form window
                 self.consoleListManager.removeFormConsole(formConsole);
 

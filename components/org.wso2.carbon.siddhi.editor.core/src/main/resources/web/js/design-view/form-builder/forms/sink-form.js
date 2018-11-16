@@ -647,6 +647,7 @@ define(['log', 'jquery', 'lodash', 'sourceOrSinkAnnotation', 'mapAnnotation', 'p
 
                 // if sink type is defined
                 if (type !== undefined) {
+                	$('#' + id).addClass('currently-selected-element');
                     $('#define-sink').find('#sink-type option').filter(function () {
                         return ($(this).val().toLowerCase() == (type.toLowerCase()));
                     }).prop('selected', true);

@@ -619,6 +619,7 @@ define(['log', 'jquery', 'lodash', 'sourceOrSinkAnnotation', 'mapAnnotation', 'p
 
                 // if source type is defined
                 if (type !== undefined) {
+                	$('#' + id).addClass('currently-selected-element');
                     $('#define-source').find('#source-type option').filter(function () {
                         return ($(this).val().toLowerCase() == (type.toLowerCase()));
                     }).prop('selected', true);

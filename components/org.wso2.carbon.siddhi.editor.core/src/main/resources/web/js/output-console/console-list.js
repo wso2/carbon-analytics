@@ -255,6 +255,7 @@ define(['log', 'jquery', 'lodash', 'backbone', 'console'], function (log, $, _, 
                 _.remove(this._consoles, console);
                 console.getHeader().remove();
                 console.remove();
+                $('.currently-selected-element').removeClass('currently-selected-element')
                 this.trigger("console-removed", console);
 
                 // setting the global console as the next active console
