@@ -901,7 +901,7 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
                         }
                     }
 
-                    // do not check for json validity if the design is still generating from the data sent from backend
+//                  do not check for json validity if the design is still generating from the data sent from backend
                     if (!self.configurationData.getIsStillDrawingGraph()) {
                         if (sourceType === 'PARTITION') {
                             sourceId = sourceElement.parent().attr('id');
@@ -912,7 +912,6 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
                         checkJSONValidityOfElement(self, sourceId, true);
                         checkJSONValidityOfElement(self, targetId, true);
                     }
-
 
                     var connectionObject = connection.connection;
                     var conId=connectionObject.id;
@@ -927,12 +926,7 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
                             id: "close",
                             events: {
                                 click: function (overlay, evt) {
-//                                    console.log(connectionObject);
-//                                    console.log(overlay);
-//                                    console.log(evt);
-//                                    console.log(conId);
                                     popOverForConnector();
-                                   // self.jsPlumbInstance.deleteConnection(connectionObject);
                                 }
                             }
                         }
@@ -946,11 +940,10 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
                                             return $('.pop-over').html();
                                     }
                             });
-
                            $('#' + conId).popover("show");
                            fadeInFunction();
 
-               // Custom jQuery to hide popover on click of the close button
+//                 Custom jQuery to hide popover on click of the close button
 
                             $("#" + conId).siblings(".popover").on("click", ".popover-footer .btn.yes" , function(){
                                  if(connectionObject.connector !== null){
@@ -968,11 +961,6 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
                                 fadeOutFunction();
                                 $(this).parents(".popover").popover('hide');
                             });
-
-//                        if (confirm('Are you sure?')) {
-//                            self.jsPlumbInstance.deleteConnection(connectionObject);
-//                        }
-
                     }
                      function fadeInFunction(){
                           $(".fullscreen-container").fadeTo(200, 1);
@@ -982,14 +970,13 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
                            $(".fullscreen-container").fadeOut(200);
                             }
 
-
                     if (isConnectionMadeInsideAPartition) {
                         close_icon_overlay.setVisible(false);
                         // show the close icon when mouse is over the connection
                         connectionObject.bind('mouseenter', function () {
                             close_icon_overlay.setVisible(true);
                         });
-                        // hide the close icon when the mouse is not on the connection path
+//                      hide the close icon when the mouse is not on the connection path
                         connectionObject.bind('mouseleave', function () {
                             if($("#" + conId).siblings(".popover").length == 0){
                                close_icon_overlay.setVisible(false);
@@ -1010,8 +997,7 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
                     }
                 });
             }
-
-            // Update the model before detaching a connection
+//          Update the model before detaching a connection
             function updateModelOnBeforeConnectionDetach() {
                 self.jsPlumbInstance.bind('beforeDetach', function (connection) {
                     var target = connection.targetId;

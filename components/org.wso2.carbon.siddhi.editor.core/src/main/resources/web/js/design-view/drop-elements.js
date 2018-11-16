@@ -83,7 +83,7 @@ define(['require', 'log', 'lodash', 'jquery', 'partition', 'stream', 'query', 'f
             var settingsIconId = "" + i + "-dropSourceSettingsId";
             var prop = $('<i id="' + settingsIconId + '" ' +
                 'class="fw fw-settings element-prop-icon collapse"></i>');
-            newAgent.append(node).append('<i class="fw fw-delete element-close-icon collapse" tabindex="0"></i>').append(prop);
+            newAgent.append(node).append('<i class="fw fw-delete element-close-icon collapse"></i>').append(prop);
 
             var settingsIconElement = $('#' + settingsIconId)[0];
             settingsIconElement.addEventListener('click', function () {
@@ -151,7 +151,7 @@ define(['require', 'log', 'lodash', 'jquery', 'partition', 'stream', 'query', 'f
             var settingsIconId = "" + i + "-dropSinkSettingsId";
             var prop = $('<i id="' + settingsIconId + '" ' +
                 'class="fw fw-settings element-prop-icon collapse"></i>');
-            newAgent.append(node).append('<i class="fw fw-delete element-close-icon collapse" tabindex="0"></i>').append(prop);
+            newAgent.append(node).append('<i class="fw fw-delete element-close-icon collapse"></i>').append(prop);
 
             var settingsIconElement = $('#' + settingsIconId)[0];
             settingsIconElement.addEventListener('click', function () {
@@ -232,7 +232,7 @@ define(['require', 'log', 'lodash', 'jquery', 'partition', 'stream', 'query', 'f
             var settingsIconId = "" + i + "-dropStreamSettingsId";
             var prop = $('<i id="' + settingsIconId + '" ' +
                 'class="fw fw-settings element-prop-icon collapse"></i>');
-            newAgent.append(node).append('<i class="fw fw-delete element-close-icon collapse" tabindex="0"></i>').append(prop);
+            newAgent.append(node).append('<i class="fw fw-delete element-close-icon collapse"></i>').append(prop);
 
             var settingsIconElement = $('#' + settingsIconId)[0];
             settingsIconElement.addEventListener('click', function () {
@@ -368,7 +368,7 @@ define(['require', 'log', 'lodash', 'jquery', 'partition', 'stream', 'query', 'f
             var settingsIconId = "" + i + "-dropTableSettingsId";
             var prop = $('<i id="' + settingsIconId + '" ' +
                 'class="fw fw-settings element-prop-icon collapse"></i>');
-            newAgent.append(node).append('<i class="fw fw-delete element-close-icon collapse"tabindex="0"></i>').append(prop);
+            newAgent.append(node).append('<i class="fw fw-delete element-close-icon collapse"></i>').append(prop);
 
             var settingsIconElement = $('#' + settingsIconId)[0];
             settingsIconElement.addEventListener('click', function () {
@@ -448,7 +448,7 @@ define(['require', 'log', 'lodash', 'jquery', 'partition', 'stream', 'query', 'f
             var settingsIconId = "" + i + "-dropWindowSettingsId";
             var prop = $('<i id="' + settingsIconId + '" ' +
                 'class="fw fw-settings element-prop-icon collapse"></i>');
-            newAgent.append(node).append('<i class="fw fw-delete element-close-icon collapse"tabindex="0"></i>').append(prop);
+            newAgent.append(node).append('<i class="fw fw-delete element-close-icon collapse"></i>').append(prop);
 
             var settingsIconElement = $('#' + settingsIconId)[0];
             settingsIconElement.addEventListener('click', function () {
@@ -528,7 +528,7 @@ define(['require', 'log', 'lodash', 'jquery', 'partition', 'stream', 'query', 'f
             var settingsIconId = "" + i + "-dropTriggerSettingsId";
             var prop = $('<i id="' + settingsIconId + '" ' +
                 'class="fw fw-settings element-prop-icon collapse"></i>');
-            newAgent.append(node).append('<i class="fw fw-delete element-close-icon collapse" tabindex="0"></i>').append(prop);
+            newAgent.append(node).append('<i class="fw fw-delete element-close-icon collapse"></i>').append(prop);
 
             var settingsIconElement = $('#' + settingsIconId)[0];
             settingsIconElement.addEventListener('click', function () {
@@ -619,7 +619,7 @@ define(['require', 'log', 'lodash', 'jquery', 'partition', 'stream', 'query', 'f
             var settingsIconId = "" + i + "-dropAggregationSettingsId";
             var prop = $('<i id="' + settingsIconId + '" ' +
                 'class="fw fw-settings element-prop-icon collapse"></i>');
-            newAgent.append(node).append('<i class="fw fw-delete element-close-icon collapse" tabindex="0"></i>').append(prop);
+            newAgent.append(node).append('<i class="fw fw-delete element-close-icon collapse"></i>').append(prop);
 
             var settingsIconElement = $('#' + settingsIconId)[0];
             settingsIconElement.addEventListener('click', function () {
@@ -700,7 +700,7 @@ define(['require', 'log', 'lodash', 'jquery', 'partition', 'stream', 'query', 'f
             var settingsIconId = "" + i + "-dropFunctionSettingsId";
             var prop = $('<i id="' + settingsIconId + '" ' +
                 'class="fw fw-settings element-prop-icon collapse"></i>');
-            newAgent.append(node).append('<i class="fw fw-delete element-close-icon collapse" tabindex="0"></i>').append(prop);
+            newAgent.append(node).append('<i class="fw fw-delete element-close-icon collapse"></i>').append(prop);
 
             var settingsIconElement = $('#' + settingsIconId)[0];
             settingsIconElement.addEventListener('click', function () {
@@ -759,7 +759,7 @@ define(['require', 'log', 'lodash', 'jquery', 'partition', 'stream', 'query', 'f
             var settingsIconId = "" + i + "-dropQuerySettingsId";
             var propertiesIcon = $('<i id="' + settingsIconId + '" ' +
                 'class="fw fw-settings element-prop-icon collapse"></i>');
-            newAgent.append(node).append('<i class="fw fw-delete element-close-icon collapse" tabindex="0"></i>')
+            newAgent.append(node).append('<i class="fw fw-delete element-close-icon collapse"></i>')
                 .append(propertiesIcon);
 
             var settingsIconElement = $('#' + settingsIconId)[0];
@@ -843,7 +843,7 @@ define(['require', 'log', 'lodash', 'jquery', 'partition', 'stream', 'query', 'f
             var settingsIconId = "" + i + "-dropPatternQuerySettingsId";
             var prop = $('<i id="' + settingsIconId + '" ' +
                 'class="fw fw-settings element-prop-icon collapse"></i>');
-            newAgent.append(node).append('<i class="fw fw-delete element-close-icon collapse" tabindex="0"></i>').append(prop);
+            newAgent.append(node).append('<i class="fw fw-delete element-close-icon collapse"></i>').append(prop);
 
             var settingsIconElement = $('#' + settingsIconId)[0];
             settingsIconElement.addEventListener('click', function () {
@@ -930,7 +930,7 @@ define(['require', 'log', 'lodash', 'jquery', 'partition', 'stream', 'query', 'f
             var settingsIconId = "" + i + "-dropSequenceQuerySettingsId";
             var prop = $('<i id="' + settingsIconId + '" ' +
                 'class="fw fw-settings element-prop-icon collapse"></i>');
-            newAgent.append(node).append('<i class="fw fw-delete element-close-icon collapse" tabindex="0"></i>').append(prop);
+            newAgent.append(node).append('<i class="fw fw-delete element-close-icon collapse"></i>').append(prop);
 
             var settingsIconElement = $('#' + settingsIconId)[0];
             settingsIconElement.addEventListener('click', function () {
@@ -1010,7 +1010,7 @@ define(['require', 'log', 'lodash', 'jquery', 'partition', 'stream', 'query', 'f
             var settingsIconId = "" + i + "-dropJoinQuerySettingsId";
             var propertiesIcon = $('<i id="' + settingsIconId + '" ' +
                 'class="fw fw-settings element-prop-icon collapse"></i>');
-            newAgent.append(node).append('<i class="fw fw-delete element-close-icon collapse" tabindex="0"></i>')
+            newAgent.append(node).append('<i class="fw fw-delete element-close-icon collapse"></i>')
                 .append(propertiesIcon);
 
             var settingsIconElement = $('#' + settingsIconId)[0];
@@ -1071,7 +1071,7 @@ define(['require', 'log', 'lodash', 'jquery', 'partition', 'stream', 'query', 'f
             var settingsIconId = "" + i + "-dropPartitionSettingsId";
             var propertiesIcon = $('<i id="' + settingsIconId + '" ' +
                 'class="fw fw-settings partition-element-prop-icon collapse"></i>');
-            newAgent.append(node).append('<i class="fw fw-delete partition-element-close-icon collapse" tabindex="0"></i>')
+            newAgent.append(node).append('<i class="fw fw-delete partition-element-close-icon collapse"></i>')
                 .append(propertiesIcon);
 
             var settingsIconElement = $('#' + settingsIconId)[0];
@@ -1165,7 +1165,6 @@ define(['require', 'log', 'lodash', 'jquery', 'partition', 'stream', 'query', 'f
                     }
 //          Pop-over element for displaying the popover when delete button clicked
              function showPopOver(dataObj,element,name){
-
                 $(dataObj).popover({
                              trigger:'focus',
                              html: true,
@@ -1174,7 +1173,6 @@ define(['require', 'log', 'lodash', 'jquery', 'partition', 'stream', 'query', 'f
                                      return $('.pop-over').html();
                              }
                          });
-
                           $(dataObj).popover("show");
                           fadeInFunction();
 
@@ -1183,7 +1181,6 @@ define(['require', 'log', 'lodash', 'jquery', 'partition', 'stream', 'query', 'f
                          $(this).parents(".popover").popover('hide');
                          removeClassFromElement();
                          });
-
 
                     $(element).on("click", ".close" , function(){
                           fadeOutFunction();
@@ -1204,12 +1201,10 @@ define(['require', 'log', 'lodash', 'jquery', 'partition', 'stream', 'query', 'f
              }
 
 //              Adding a class for the generating element for visibility
-
                  function addClassToElement(){
                      var className1=document.getElementById(newElement[0].id);
                      className1.classList.add("popover-show");
                  }
-
                  function removeClassFromElement(){
                      var className2=document.getElementById(newElement[0].id);
                      className2.classList.remove("popover-show");
@@ -1221,12 +1216,10 @@ define(['require', 'log', 'lodash', 'jquery', 'partition', 'stream', 'query', 'f
                          });
 
 //          Deleting the element
-
             function deleteElement(){
                     // set the isDesignViewContentChanged to true
                     self.configurationData.setIsDesignViewContentChanged(true);
                     var elementId =newElement[0].id;
-
                 /*
                 * before deleting the element data from the data store structure, it is mandatory to delete the element
                 * from jsPlumb because it will fire the 'beforeDetach' and 'connectionDetached' events and it will
@@ -1249,7 +1242,6 @@ define(['require', 'log', 'lodash', 'jquery', 'partition', 'stream', 'query', 'f
                     if (self.jsPlumbInstance.getGroupFor(newElement)) {
                         self.jsPlumbInstance.removeFromGroup(newElement);
                     }
-
                     if (newElement.hasClass('streamDrop')) {
                         self.configurationData.getSiddhiAppConfig().removeStream(elementId);
                     } else if (newElement.hasClass('tableDrop')) {
@@ -1284,22 +1276,15 @@ define(['require', 'log', 'lodash', 'jquery', 'partition', 'stream', 'query', 'f
 
                     self.configurationData.getSiddhiAppConfig()
                         .setFinalElementCount(self.configurationData.getSiddhiAppConfig().getFinalElementCount() - 1);
-
-                      fadeOutFunction();
-                      $(this).parents(".popover").popover('hide');
+                         fadeOutFunction();
+                         $(this).parents(".popover").popover('hide');
             }
-
-
 //             register event listener to remove the element when the close icon is clicked
-
                     newElement.on('click', '.partition-element-close-icon', function () {
                         addClassToElement();
                         showPopOver(this,newElement,"partitionElement");
                     });
-
-
                 function  deletePartition(){
-
                  // set the isDesignViewContentChanged to true
                     self.configurationData.setIsDesignViewContentChanged(true);
 
@@ -1329,16 +1314,13 @@ define(['require', 'log', 'lodash', 'jquery', 'partition', 'stream', 'query', 'f
                     if (self.jsPlumbInstance.getGroupFor(newElement)) {
                         self.jsPlumbInstance.removeFromGroup(newElement);
                     }
-
                     if (newElement.hasClass('partitionDrop')) {
                         self.configurationData.getSiddhiAppConfig().removePartition(elementId);
                     }
-
                     self.configurationData.getSiddhiAppConfig()
                         .setFinalElementCount(self.configurationData.getSiddhiAppConfig().getFinalElementCount()
                             - noOfElementsInsidePartition);
                 }
         };
-
         return DropElements;
     });
