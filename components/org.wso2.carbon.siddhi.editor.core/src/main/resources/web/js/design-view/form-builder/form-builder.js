@@ -19,10 +19,10 @@
 define(['require', 'log', 'jquery', 'lodash', 'formUtils', 'streamForm', 'tableForm', 'windowForm', 'aggregationForm',
         'triggerForm', 'windowFilterProjectionQueryForm', 'patternQueryForm', 'joinQueryForm', 'partitionForm',
         'sequenceQueryForm', 'sourceForm', 'sinkForm', 'functionForm', 'appAnnotationForm','sourceOrSinkAnnotation',
-        'stream'],
+        'stream', 'table'],
     function (require, log, $, _, FormUtils, StreamForm, TableForm, WindowForm, AggregationForm, TriggerForm,
               WindowFilterProjectionQueryForm, PatternQueryForm, JoinQueryForm, PartitionForm, SequenceQueryForm,
-              SourceForm, SinkForm, FunctionForm, AppAnnotationForm, SourceOrSinkAnnotation, Stream) {
+              SourceForm, SinkForm, FunctionForm, AppAnnotationForm, SourceOrSinkAnnotation, Stream, Table) {
 
         // common properties for the JSON editor
         JSONEditor.defaults.options.theme = 'bootstrap3';
@@ -302,29 +302,29 @@ define(['require', 'log', 'jquery', 'lodash', 'formUtils', 'streamForm', 'tableF
             streamForm.generatePropertiesForm(element, formConsole, formContainer);
         };
 
-        /**
-         * @function generate the form to define the table once it is dropped on the canvas
-         * @param i id for the element
-         * @returns user given table name
-         */
-        FormBuilder.prototype.DefineTable = function (i) {
-            var self = this;
-            var formConsole = this.createTabForForm(i, constants.TABLE);
-            var formContainer = formConsole.getContentContainer();
-
-            var formOptions = {};
-            _.set(formOptions, 'configurationData', self.configurationData);
-            _.set(formOptions, 'application', self.application);
-            _.set(formOptions, 'formUtils', self.formUtils);
-            var tableForm = new TableForm(formOptions);
-            return tableForm.generateDefineForm(i, formConsole, formContainer);
-        };
+//        /**
+//         * @function generate the form to define the table once it is dropped on the canvas
+//         * @param i id for the element
+//         * @returns user given table name
+//         */
+//        FormBuilder.prototype.DefineTable = function (i) {
+//            var self = this;
+//            var formConsole = this.createTabForForm(i, constants.TABLE);
+//            var formContainer = formConsole.getContentContainer();
+//
+//            var formOptions = {};
+//            _.set(formOptions, 'configurationData', self.configurationData);
+//            _.set(formOptions, 'application', self.application);
+//            _.set(formOptions, 'formUtils', self.formUtils);
+//            var tableForm = new TableForm(formOptions);
+//            return tableForm.generateDefineForm(i, formConsole, formContainer);
+//        };
 
         /**
          * @function generate the property window for an existing table
          * @param element selected element(table)
          */
-        FormBuilder.prototype.GeneratePropertiesFormForTables = function (element) {
+        FormBuilder.prototype.GeneratePropertiesFormForTables = function (id, element) {
             var self = this;
             var formConsole = this.createTabForForm();
             var formContainer = formConsole.getContentContainer();
@@ -334,6 +334,13 @@ define(['require', 'log', 'jquery', 'lodash', 'formUtils', 'streamForm', 'tableF
             _.set(formOptions, 'application', self.application);
             _.set(formOptions, 'formUtils', self.formUtils);
             var tableForm = new TableForm(formOptions);
+            if (element == undefined) {
+				var tableOptions = {};
+				_.set(tableOptions, 'id', id);
+				_.set(tableOptions, 'name', undefined);
+				element = new Table(tableOptions);
+				self.configurationData.getSiddhiAppConfig().addTable(element);
+			}
             tableForm.generatePropertiesForm(element, formConsole, formContainer);
         };
 

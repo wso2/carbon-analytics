@@ -737,207 +737,207 @@ define(['log', 'jquery', 'lodash', 'attribute', 'table', 'storeAnnotation', 'des
             }
         };
 
-        /**
-         * @function generate form when defining a form
-         * @param i id for the element
-         * @param formConsole Console which holds the form
-         * @param formContainer Container which holds the form
-         */
-        TableForm.prototype.generateDefineForm = function (i, formConsole, formContainer) {
-            var self = this;
-            var propertyDiv = $('<div class = "table-form-container table-div"> <div id="property-header"> <h3> Table' +
-                ' Configuration </h3> </div> <h4> Name: </h4> <input type="text" id="tableName" class = "clearfix">' +
-                '<label class="error-message" id="tableNameErrorMessage"> </label> <div id = "define-attribute"> </div>' +
-                '<button id = "btn-submit" type = "button" class = "btn toggle-view-button"> Submit </button> </div> ' +
-                '<div class = "table-form-container store-div"> <div id = "define-store"> </div> ' +
-                '<div id="define-rdbms-type"> </div> <div id="define-store-options"> </div> </div> ' +
-                '<div class = "table-form-container" id = "define-table-annotation"> </div>');
-            formContainer.append(propertyDiv);
-            self.designViewContainer.addClass('disableContainer');
-            self.toggleViewButton.addClass('disableContainer');
-
-            var predefined_stores = this.configurationData.rawExtensions["store"].sort(sortUsingProperty("name"));
-            addDefaultStoreType(predefined_stores);
-            var customizedStoreOptions = [];
-            var storeOptions = [];
-            var storeOptionsWithValues = [];
-
-            //render the attribute form template
-            var attributeFormTemplate = Handlebars.compile($('#attribute-form-template').html());
-            var wrappedHtml = attributeFormTemplate([{ name: "", type: "string" }]);
-            $('#define-attribute').html(wrappedHtml);
-
-            //load the event listeners
-            $("#btn-add-attribute").click(addAttribute);
-            $("#attribute-div").on('click', '.btn-del-attr', delAttribute);
-            $("#attribute-div").on('click', '.reorder-up', moveUpAttribute);
-            $("#attribute-div").on('click', '.reorder-down', moveDownAttribute);
-            showHideOptionDescription();
-            changeOptionCheckbox();
-            addCustomizedOption();
-            deleteCustomizedOption();
-            addAnnotationValue();
-            deleteAnnotationValue();
-            showHideAnnotationContent();
-
-            $('#define-rdbms-type').on('change', '[name=radioOpt]', function () {
-                var dataStoreOptions = getRdbmsOptions(storeOptionsWithValues);
-                renderOptions(dataStoreOptions, customizedStoreOptions, "store")
-            });
-
-            //render the store type template
-            var storeFormTemplate = Handlebars.compile($('#source-sink-map-store-form-template').html());
-            var wrappedHtml = storeFormTemplate({ id: "store", types: predefined_stores });
-            $('#define-store').html(wrappedHtml);
-            $('#define-store #store-type').val(defaultStoreType);
-
-            //render the table annotation template
-            var tableAnnotations = self.configurationData.application.config.table_predefined_annotations;
-            var annotationFormTemplate = Handlebars.compile($('#table-store-annotation-template').html());
-            var wrappedHtml = annotationFormTemplate(tableAnnotations);
-            $('#define-table-annotation').html(wrappedHtml);
-            changeAnnotValueDelButtons();
-            $('#define-table-annotation').hide();
-
-            //onchange of the store type select box
-            $('#define-store').on('change', '#store-type', function () {
-                if (this.value !== defaultStoreType) {
-                    storeOptions = getSelectedTypeOptions(this.value, predefined_stores);
-                    storeOptionsWithValues = createOptionObjectWithValues(storeOptions);
-                    customizedStoreOptions = [];
-                    if (this.value === rdbmsStoreType) {
-                        renderRdbmsTypes();
-                        //as default select the data-store type
-                        $("#define-rdbms-type input[name=radioOpt][value='inline-config']").prop("checked", true);
-                        var dataStoreOptions = getRdbmsOptions(storeOptionsWithValues);
-                        renderOptions(dataStoreOptions, customizedStoreOptions, "store")
-                        $('#define-rdbms-type').show();
-                    } else {
-                        renderOptions(storeOptionsWithValues, customizedStoreOptions, "store");
-                        $('#define-rdbms-type').hide();
-                    }
-                    $('#define-table-annotation').show();
-                } else {
-                    $('#define-store-options').empty();
-                    $('#define-table-annotation').hide();
-                }
-            });
-
-            // 'Submit' button action
-            var submitButtonElement = $(formContainer).find('#btn-submit')[0];
-            submitButtonElement.addEventListener('click', function () {
-
-                //clear the error classes
-                $('.error-message').text("");
-                $('#tableNameErrorMessage').text("");
-                $('.required-input-field').removeClass('required-input-field');
-
-                var tableName = $('#tableName').val().trim();
-                //to check if table name is already used
-                var isTableNameUsed = self.formUtils.isDefinitionElementNameUsed(tableName);
-                if (isTableNameUsed) {
-                    $('#tableName').addClass('required-input-field');
-                    $('#tableName')[0].scrollIntoView();
-                    $('#tableNameErrorMessage').text("Table name is already used.");
-                    return;
-                }
-                // to check if table name is empty
-                if (tableName == "") {
-                    $('#tableName').addClass('required-input-field');
-                    $('#tableName')[0].scrollIntoView();
-                    $('#tableNameErrorMessage').text("Table name is required");
-                    return;
-                }
-                //to check if table name contains white spaces
-                if (tableName.indexOf(' ') >= 0) {
-                    $('#tableName').addClass('required-input-field');
-                    $('#tableName')[0].scrollIntoView();
-                    $('#tableNameErrorMessage').text("Table name cannot have white space.");
-                    return;
-                }
-                //to check if table name starts with an alphabetic character
-                if (!(alphabeticValidatorRegex).test(tableName.charAt(0))) {
-                    $('#tableName').addClass('required-input-field');
-                    $('#tableName')[0].scrollIntoView();
-                    $('#tableNameErrorMessage').text("Table name must start with an alphabetic character.");
-                    return;
-                }
-
-                // create the table options
-                var tableOptions = {};
-                _.set(tableOptions, 'id', i);
-                _.set(tableOptions, 'name', tableName);
-                _.set(tableOptions, 'store', undefined);
-
-                // add the store annotations
-                var selectedStoreType = $('#define-store #store-type').val();
-                if (selectedStoreType !== defaultStoreType) {
-                    var optionsMap = {};
-                    if (validateOptions(optionsMap, storeOptions)) {
-                        return;
-                    }
-                    if (validateCustomizedOptions(optionsMap)) {
-                        return;
-                    }
-                    var storeAnnotationOptions = {};
-                    _.set(storeAnnotationOptions, 'type', selectedStoreType);
-                    _.set(storeAnnotationOptions, 'options', optionsMap);
-                    var storeAnnotation = new StoreAnnotation(storeAnnotationOptions);
-                    _.set(tableOptions, 'store', storeAnnotation);
-                } else {
-                    _.set(tableOptions, 'store', undefined);
-                }
-                // add the new table to the table array
-                var table = new Table(tableOptions);
-
-                var attributeNameList = [];
-                if (validateAttributeNames(attributeNameList)) { return; }
-
-                if (attributeNameList.length == 0) {
-                    $('.attribute:eq(0)').find('.attr-name').addClass('required-input-field');
-                    $('.attribute:eq(0)').find('.attr-name')[0].scrollIntoView();
-                    $('.attribute:eq(0)').find('.error-message').text("Minimum one attribute is required");
-                    return;
-                } else {
-                    //add the attributes to the table
-                    $('.attribute .attr-content').each(function () {
-                        var nameValue = $(this).find('.attr-name').val().trim();
-                        var typeValue = $(this).find('.attr-type').val();
-                        if (nameValue != "") {
-                            var attributeObject = new Attribute({ name: nameValue, type: typeValue });
-                            table.addAttribute(attributeObject);
-                        }
-                    });
-                }
-
-                if (validateAnnotations()) {
-                    return;
-                } else {
-                    // add the annotations to the table
-                    var annotationList = [];
-                    buildAnnotations(annotationList);
-                    _.forEach(annotationList, function (annotation) {
-                        table.addAnnotation(annotation);
-                    });
-                }
-
-                self.configurationData.getSiddhiAppConfig().addTable(table);
-
-                // set the isDesignViewContentChanged to true
-                self.configurationData.setIsDesignViewContentChanged(true);
-
-                var textNode = $('#' + i).find('.tableNameNode');
-                textNode.html(tableName);
-
-                // close the form window
-                self.consoleListManager.removeFormConsole(formConsole);
-
-                self.designViewContainer.removeClass('disableContainer');
-                self.toggleViewButton.removeClass('disableContainer');
-            });
-
-            return tableName;
-        };
+//        /**
+//         * @function generate form when defining a form
+//         * @param i id for the element
+//         * @param formConsole Console which holds the form
+//         * @param formContainer Container which holds the form
+//         */
+//        TableForm.prototype.generateDefineForm = function (i, formConsole, formContainer) {
+//            var self = this;
+//            var propertyDiv = $('<div class = "table-form-container table-div"> <div id="property-header"> <h3> Table' +
+//                ' Configuration </h3> </div> <h4> Name: </h4> <input type="text" id="tableName" class = "clearfix">' +
+//                '<label class="error-message" id="tableNameErrorMessage"> </label> <div id = "define-attribute"> </div>' +
+//                '<button id = "btn-submit" type = "button" class = "btn toggle-view-button"> Submit </button> </div> ' +
+//                '<div class = "table-form-container store-div"> <div id = "define-store"> </div> ' +
+//                '<div id="define-rdbms-type"> </div> <div id="define-store-options"> </div> </div> ' +
+//                '<div class = "table-form-container" id = "define-table-annotation"> </div>');
+//            formContainer.append(propertyDiv);
+//            self.designViewContainer.addClass('disableContainer');
+//            self.toggleViewButton.addClass('disableContainer');
+//
+//            var predefined_stores = this.configurationData.rawExtensions["store"].sort(sortUsingProperty("name"));
+//            addDefaultStoreType(predefined_stores);
+//            var customizedStoreOptions = [];
+//            var storeOptions = [];
+//            var storeOptionsWithValues = [];
+//
+//            //render the attribute form template
+//            var attributeFormTemplate = Handlebars.compile($('#attribute-form-template').html());
+//            var wrappedHtml = attributeFormTemplate([{ name: "", type: "string" }]);
+//            $('#define-attribute').html(wrappedHtml);
+//
+//            //load the event listeners
+//            $("#btn-add-attribute").click(addAttribute);
+//            $("#attribute-div").on('click', '.btn-del-attr', delAttribute);
+//            $("#attribute-div").on('click', '.reorder-up', moveUpAttribute);
+//            $("#attribute-div").on('click', '.reorder-down', moveDownAttribute);
+//            showHideOptionDescription();
+//            changeOptionCheckbox();
+//            addCustomizedOption();
+//            deleteCustomizedOption();
+//            addAnnotationValue();
+//            deleteAnnotationValue();
+//            showHideAnnotationContent();
+//
+//            $('#define-rdbms-type').on('change', '[name=radioOpt]', function () {
+//                var dataStoreOptions = getRdbmsOptions(storeOptionsWithValues);
+//                renderOptions(dataStoreOptions, customizedStoreOptions, "store")
+//            });
+//
+//            //render the store type template
+//            var storeFormTemplate = Handlebars.compile($('#source-sink-map-store-form-template').html());
+//            var wrappedHtml = storeFormTemplate({ id: "store", types: predefined_stores });
+//            $('#define-store').html(wrappedHtml);
+//            $('#define-store #store-type').val(defaultStoreType);
+//
+//            //render the table annotation template
+//            var tableAnnotations = self.configurationData.application.config.table_predefined_annotations;
+//            var annotationFormTemplate = Handlebars.compile($('#table-store-annotation-template').html());
+//            var wrappedHtml = annotationFormTemplate(tableAnnotations);
+//            $('#define-table-annotation').html(wrappedHtml);
+//            changeAnnotValueDelButtons();
+//            $('#define-table-annotation').hide();
+//
+//            //onchange of the store type select box
+//            $('#define-store').on('change', '#store-type', function () {
+//                if (this.value !== defaultStoreType) {
+//                    storeOptions = getSelectedTypeOptions(this.value, predefined_stores);
+//                    storeOptionsWithValues = createOptionObjectWithValues(storeOptions);
+//                    customizedStoreOptions = [];
+//                    if (this.value === rdbmsStoreType) {
+//                        renderRdbmsTypes();
+//                        //as default select the data-store type
+//                        $("#define-rdbms-type input[name=radioOpt][value='inline-config']").prop("checked", true);
+//                        var dataStoreOptions = getRdbmsOptions(storeOptionsWithValues);
+//                        renderOptions(dataStoreOptions, customizedStoreOptions, "store")
+//                        $('#define-rdbms-type').show();
+//                    } else {
+//                        renderOptions(storeOptionsWithValues, customizedStoreOptions, "store");
+//                        $('#define-rdbms-type').hide();
+//                    }
+//                    $('#define-table-annotation').show();
+//                } else {
+//                    $('#define-store-options').empty();
+//                    $('#define-table-annotation').hide();
+//                }
+//            });
+//
+//            // 'Submit' button action
+//            var submitButtonElement = $(formContainer).find('#btn-submit')[0];
+//            submitButtonElement.addEventListener('click', function () {
+//
+//                //clear the error classes
+//                $('.error-message').text("");
+//                $('#tableNameErrorMessage').text("");
+//                $('.required-input-field').removeClass('required-input-field');
+//
+//                var tableName = $('#tableName').val().trim();
+//                //to check if table name is already used
+//                var isTableNameUsed = self.formUtils.isDefinitionElementNameUsed(tableName);
+//                if (isTableNameUsed) {
+//                    $('#tableName').addClass('required-input-field');
+//                    $('#tableName')[0].scrollIntoView();
+//                    $('#tableNameErrorMessage').text("Table name is already used.");
+//                    return;
+//                }
+//                // to check if table name is empty
+//                if (tableName == "") {
+//                    $('#tableName').addClass('required-input-field');
+//                    $('#tableName')[0].scrollIntoView();
+//                    $('#tableNameErrorMessage').text("Table name is required");
+//                    return;
+//                }
+//                //to check if table name contains white spaces
+//                if (tableName.indexOf(' ') >= 0) {
+//                    $('#tableName').addClass('required-input-field');
+//                    $('#tableName')[0].scrollIntoView();
+//                    $('#tableNameErrorMessage').text("Table name cannot have white space.");
+//                    return;
+//                }
+//                //to check if table name starts with an alphabetic character
+//                if (!(alphabeticValidatorRegex).test(tableName.charAt(0))) {
+//                    $('#tableName').addClass('required-input-field');
+//                    $('#tableName')[0].scrollIntoView();
+//                    $('#tableNameErrorMessage').text("Table name must start with an alphabetic character.");
+//                    return;
+//                }
+//
+//                // create the table options
+//                var tableOptions = {};
+//                _.set(tableOptions, 'id', i);
+//                _.set(tableOptions, 'name', tableName);
+//                _.set(tableOptions, 'store', undefined);
+//
+//                // add the store annotations
+//                var selectedStoreType = $('#define-store #store-type').val();
+//                if (selectedStoreType !== defaultStoreType) {
+//                    var optionsMap = {};
+//                    if (validateOptions(optionsMap, storeOptions)) {
+//                        return;
+//                    }
+//                    if (validateCustomizedOptions(optionsMap)) {
+//                        return;
+//                    }
+//                    var storeAnnotationOptions = {};
+//                    _.set(storeAnnotationOptions, 'type', selectedStoreType);
+//                    _.set(storeAnnotationOptions, 'options', optionsMap);
+//                    var storeAnnotation = new StoreAnnotation(storeAnnotationOptions);
+//                    _.set(tableOptions, 'store', storeAnnotation);
+//                } else {
+//                    _.set(tableOptions, 'store', undefined);
+//                }
+//                // add the new table to the table array
+//                var table = new Table(tableOptions);
+//
+//                var attributeNameList = [];
+//                if (validateAttributeNames(attributeNameList)) { return; }
+//
+//                if (attributeNameList.length == 0) {
+//                    $('.attribute:eq(0)').find('.attr-name').addClass('required-input-field');
+//                    $('.attribute:eq(0)').find('.attr-name')[0].scrollIntoView();
+//                    $('.attribute:eq(0)').find('.error-message').text("Minimum one attribute is required");
+//                    return;
+//                } else {
+//                    //add the attributes to the table
+//                    $('.attribute .attr-content').each(function () {
+//                        var nameValue = $(this).find('.attr-name').val().trim();
+//                        var typeValue = $(this).find('.attr-type').val();
+//                        if (nameValue != "") {
+//                            var attributeObject = new Attribute({ name: nameValue, type: typeValue });
+//                            table.addAttribute(attributeObject);
+//                        }
+//                    });
+//                }
+//
+//                if (validateAnnotations()) {
+//                    return;
+//                } else {
+//                    // add the annotations to the table
+//                    var annotationList = [];
+//                    buildAnnotations(annotationList);
+//                    _.forEach(annotationList, function (annotation) {
+//                        table.addAnnotation(annotation);
+//                    });
+//                }
+//
+//                self.configurationData.getSiddhiAppConfig().addTable(table);
+//
+//                // set the isDesignViewContentChanged to true
+//                self.configurationData.setIsDesignViewContentChanged(true);
+//
+//                var textNode = $('#' + i).find('.tableNameNode');
+//                textNode.html(tableName);
+//
+//                // close the form window
+//                self.consoleListManager.removeFormConsole(formConsole);
+//
+//                self.designViewContainer.removeClass('disableContainer');
+//                self.toggleViewButton.removeClass('disableContainer');
+//            });
+//
+//            return tableName;
+//        };
 
         /**
          * @function generate properties form for a table
@@ -945,7 +945,7 @@ define(['log', 'jquery', 'lodash', 'attribute', 'table', 'storeAnnotation', 'des
          * @param formConsole Console which holds the form
          * @param formContainer Container which holds the form
          */
-        TableForm.prototype.generatePropertiesForm = function (element, formConsole, formContainer) {
+        TableForm.prototype.generatePropertiesForm = function (clickedElement, formConsole, formContainer) {
             var self = this;
             var propertyDiv = $('<div class = "table-form-container table-div"> <div id="property-header"> <h3> Table' +
                 ' Configuration </h3> </div> <h4> Name: </h4> <input type="text" id="tableName" class = "clearfix">' +
@@ -958,14 +958,8 @@ define(['log', 'jquery', 'lodash', 'attribute', 'table', 'storeAnnotation', 'des
             self.designViewContainer.addClass('disableContainer');
             self.toggleViewButton.addClass('disableContainer');
 
-            var id = $(element).parent().attr('id');
-            // retrieve the table information from the collection
-            var clickedElement = self.configurationData.getSiddhiAppConfig().getTable(id);
-            if (!clickedElement) {
-                var errorMessage = 'unable to find clicked element';
-                log.error(errorMessage);
-                throw errorMessage;
-            }
+            var id = clickedElement.id;
+
             var predefined_stores = this.configurationData.rawExtensions["store"].sort(sortUsingProperty("name"));
             addDefaultStoreType(predefined_stores);
             var customizedStoreOptions = [];
@@ -986,22 +980,29 @@ define(['log', 'jquery', 'lodash', 'attribute', 'table', 'storeAnnotation', 'des
             showHideAnnotationContent();
 
             var name = clickedElement.getName();
-            var savedAttributes = clickedElement.getAttributeList();
+            if (name === undefined) {
+				var attributeFormTemplate = Handlebars.compile($('#attribute-form-template').html());
+				var wrappedHtml = attributeFormTemplate([{ name: "", type: "string" }]);
+				$('#define-attribute').html(wrappedHtml);
+				$('#' + id).addClass('incomplete-element');
 
-            $('#tableName').val(name);
-            //render the attribute form template
-            var attributeFormTemplate = Handlebars.compile($('#attribute-form-template').html());
-            var wrappedHtml = attributeFormTemplate(savedAttributes);
-            $('#define-attribute').html(wrappedHtml);
+			} else {
+				$('#tableName').val(name);
+				var savedAttributes = clickedElement.getAttributeList();
 
-            //to select the attribute-type of the saved attributes
-            var i = 0;
-            $('.attribute .attr-content').each(function () {
-                $(this).find('.attr-type option').filter(function () {
-                    return ($(this).text() == (savedAttributes[i].getType()).toLowerCase());
-                }).prop('selected', true);
-                i++;
-            });
+				//render the attribute form template
+				var attributeFormTemplate = Handlebars.compile($('#attribute-form-template').html());
+				var wrappedHtml = attributeFormTemplate(savedAttributes);
+				$('#define-attribute').html(wrappedHtml);
+				//to select the attribute-type of the saved attributes
+				var i = 0;
+				$('.attribute .attr-content').each(function () {
+					$(this).find('.attr-type option').filter(function () {
+						return ($(this).text() == (savedAttributes[i].getType()).toLowerCase());
+					}).prop('selected', true);
+					i++;
+				});
+			}
 
             var savedAnnotations = clickedElement.getAnnotationList();
             if (savedAnnotations == undefined || savedAnnotations.length == 0) {
@@ -1109,6 +1110,9 @@ define(['log', 'jquery', 'lodash', 'attribute', 'table', 'storeAnnotation', 'des
                 var tableName = $('#tableName').val().trim();
 
                 var previouslySavedName = clickedElement.getName();
+                if(previouslySavedName === undefined ) {
+                	previouslySavedName = "";
+                }
 
                 if (previouslySavedName !== tableName) {
                     var isTableNameUsed = self.formUtils.isDefinitionElementNameUsed(tableName);
@@ -1204,6 +1208,9 @@ define(['log', 'jquery', 'lodash', 'attribute', 'table', 'storeAnnotation', 'des
 
                 var textNode = $('#' + id).find('.tableNameNode');
                 textNode.html(tableName);
+                if ($('#' + id).hasClass('incomplete-element')) {
+					$('#' + id).removeClass('incomplete-element');
+				}
 
                 // close the form window
                 self.consoleListManager.removeFormConsole(formConsole);

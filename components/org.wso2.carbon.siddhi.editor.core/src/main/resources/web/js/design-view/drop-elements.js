@@ -375,7 +375,8 @@ define(['require', 'log', 'lodash', 'jquery', 'partition', 'stream', 'query', 'f
             if (isCodeToDesignMode) {
                 name = tableName;
             } else {
-                name = self.formBuilder.DefineTable(i);
+               var element = undefined;
+			   self.formBuilder.GeneratePropertiesFormForTables(i, element);
             }
             var node = $('<div>' + name + '</div>');
             newAgent.append(node);
@@ -393,7 +394,13 @@ define(['require', 'log', 'lodash', 'jquery', 'partition', 'stream', 'query', 'f
 
             var settingsIconElement = $('#' + settingsIconId)[0];
             settingsIconElement.addEventListener('click', function () {
-                self.formBuilder.GeneratePropertiesFormForTables(this);
+                var clickedElement = self.configurationData.getSiddhiAppConfig().getTable(i);
+				if (!clickedElement) {
+					var errorMessage = 'unable to find clicked element';
+					log.error(errorMessage);
+					throw errorMessage;
+				}
+				self.formBuilder.GeneratePropertiesFormForTables(i, clickedElement);
             });
 
             var finalElement = newAgent;
