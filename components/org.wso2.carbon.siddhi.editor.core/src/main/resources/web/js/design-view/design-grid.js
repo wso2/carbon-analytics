@@ -900,8 +900,7 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
                             }
                         }
                     }
-
-//                  do not check for json validity if the design is still generating from the data sent from backend
+//              do not check for json validity if the design is still generating from the data sent from backend
                     if (!self.configurationData.getIsStillDrawingGraph()) {
                         if (sourceType === 'PARTITION') {
                             sourceId = sourceElement.parent().attr('id');
@@ -912,11 +911,9 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
                         checkJSONValidityOfElement(self, sourceId, true);
                         checkJSONValidityOfElement(self, targetId, true);
                     }
-
                     var connectionObject = connection.connection;
                     var conId=connectionObject.id;
-
-                    // add a overlay of a close icon for connection. connection can be detached by clicking on it
+//                 add a overlay of a close icon for connection. connection can be detached by clicking on it
                     var close_icon_overlay = connectionObject.addOverlay([
                         "Custom", {
                             create: function () {
@@ -942,9 +939,7 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
                             });
                            $('#' + conId).popover("show");
                            fadeInFunction();
-
 //                 Custom jQuery to hide popover on click of the close button
-
                             $("#" + conId).siblings(".popover").on("click", ".popover-footer .btn.yes" , function(){
                                  if(connectionObject.connector !== null){
                                     self.jsPlumbInstance.deleteConnection(connectionObject);
@@ -976,7 +971,7 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
                         connectionObject.bind('mouseenter', function () {
                             close_icon_overlay.setVisible(true);
                         });
-//                      hide the close icon when the mouse is not on the connection path
+//                  hide the close icon when the mouse is not on the connection path
                         connectionObject.bind('mouseleave', function () {
                             if($("#" + conId).siblings(".popover").length == 0){
                                close_icon_overlay.setVisible(false);
@@ -1056,8 +1051,7 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
                     }
                 });
             }
-
-            // Update the model when a connection is detached
+//          Update the model when a connection is detached
             function updateModelOnConnectionDetach() {
                 self.jsPlumbInstance.bind('connectionDetached', function (connection) {
 

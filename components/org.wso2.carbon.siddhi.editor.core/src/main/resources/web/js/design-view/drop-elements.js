@@ -1145,7 +1145,6 @@ define(['require', 'log', 'lodash', 'jquery', 'partition', 'stream', 'query', 'f
                 element.find('.partition-element-prop-icon').show();
                 element.find('.partition-element-close-icon').show();
             });
-
             //register event listener to hide configuration icons when mouse is out from the element
             newElement.on("mouseleave", function () {
                 var element = $(this);
@@ -1154,12 +1153,10 @@ define(['require', 'log', 'lodash', 'jquery', 'partition', 'stream', 'query', 'f
                 element.find('.partition-element-prop-icon').hide();
                 element.find('.partition-element-close-icon').hide();
             });
-
 //          This function will highlight the popover while fading the background
             function fadeInFunction(){
                   $(".fullscreen-container").fadeTo(200, 1);
                    }
-
             function fadeOutFunction(){
                    $(".fullscreen-container").fadeOut(200);
                     }
@@ -1173,8 +1170,8 @@ define(['require', 'log', 'lodash', 'jquery', 'partition', 'stream', 'query', 'f
                                      return $('.pop-over').html();
                              }
                          });
-                          $(dataObj).popover("show");
-                          fadeInFunction();
+                      $(dataObj).popover("show");
+                      fadeInFunction();
 
                       $(element).on("click", ".popover-footer .btn.no" , function(){
                          fadeOutFunction();
@@ -1182,14 +1179,14 @@ define(['require', 'log', 'lodash', 'jquery', 'partition', 'stream', 'query', 'f
                          removeClassFromElement();
                          });
 
-                    $(element).on("click", ".close" , function(){
+                      $(element).on("click", ".close" , function(){
                           fadeOutFunction();
                           $(this).parents(".popover").popover('hide');
                           removeClassFromElement();
                          });
 
-                    $(element).off('click', '.popover-footer .btn.yes');
-                    $(element).on("click", ".popover-footer .btn.yes",function(){
+                      $(element).off('click', '.popover-footer .btn.yes');
+                      $(element).on("click", ".popover-footer .btn.yes",function(){
                             if(name=="dropElement"){
                                 deleteElement();
                             }else if(name=="partitionElement"){
@@ -1199,8 +1196,7 @@ define(['require', 'log', 'lodash', 'jquery', 'partition', 'stream', 'query', 'f
                             fadeOutFunction();
                     });
              }
-
-//              Adding a class for the generating element for visibility
+//      Adding a class for the generating element for visibility
                  function addClassToElement(){
                      var className1=document.getElementById(newElement[0].id);
                      className1.classList.add("popover-show");
@@ -1210,14 +1206,13 @@ define(['require', 'log', 'lodash', 'jquery', 'partition', 'stream', 'query', 'f
                      className2.classList.remove("popover-show");
                  }
 
-            newElement.on('click', '.element-close-icon', function (){
-                              addClassToElement();
-                              showPopOver(this,newElement,"dropElement");
+                 newElement.on('click', '.element-close-icon', function (){
+                     addClassToElement();
+                     showPopOver(this,newElement,"dropElement");
                          });
-
-//          Deleting the element
+//      Deleting the element
             function deleteElement(){
-                    // set the isDesignViewContentChanged to true
+                // set the isDesignViewContentChanged to true
                     self.configurationData.setIsDesignViewContentChanged(true);
                     var elementId =newElement[0].id;
                 /*
@@ -1279,7 +1274,7 @@ define(['require', 'log', 'lodash', 'jquery', 'partition', 'stream', 'query', 'f
                          fadeOutFunction();
                          $(this).parents(".popover").popover('hide');
             }
-//             register event listener to remove the element when the close icon is clicked
+//   register event listener to remove the element when the close icon is clicked
                     newElement.on('click', '.partition-element-close-icon', function () {
                         addClassToElement();
                         showPopOver(this,newElement,"partitionElement");
