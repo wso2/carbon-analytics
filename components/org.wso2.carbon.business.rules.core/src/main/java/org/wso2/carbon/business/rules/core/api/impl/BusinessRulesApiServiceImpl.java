@@ -57,10 +57,8 @@ import javax.ws.rs.core.Response;
         date = "2017-10-13T06:19:32.032Z")
 public class BusinessRulesApiServiceImpl extends BusinessRulesApiService {
     private static final Logger log = LoggerFactory.getLogger(BusinessRulesApiServiceImpl.class);
-    private static final Permission managerPermission = new Permission("BRM",
-            "businessrules.manager");
-    private static final Permission viewerPermission = new Permission("BRM",
-            "businessrules.viewer");
+    private static final Permission managerPermission = new Permission("BRM", "businessrules.manager");
+    private static final Permission viewerPermission = new Permission("BRM", "businessrules.viewer");
     private static final String USER_NAME = "username";
 
     private static enum RequestMethod {
@@ -421,7 +419,7 @@ public class BusinessRulesApiServiceImpl extends BusinessRulesApiService {
                     responseData.add("Successfully deployed the business rule");
                     break;
                 case (TemplateManagerConstants.SAVED):
-                    responseData.add("Saved Successful");
+                    responseData.add("Saving Successful");
                     responseData.add("Successfully saved the business rule");
                     break;
                 case (TemplateManagerConstants.SUCCESSFULLY_UNDEPLOYED):
@@ -446,8 +444,7 @@ public class BusinessRulesApiServiceImpl extends BusinessRulesApiService {
                     break;
                 default:
                     responseData.add("Deployment Error");
-                    responseData.add("Failed to deploy the business rule. There is no appropriate business rule" +
-                            " state transforation");
+                    responseData.add("Failed to deploy the business rule.");
             }
             responseData.add(status);
             return Response.ok().entity(gson.toJson(responseData)).build();
