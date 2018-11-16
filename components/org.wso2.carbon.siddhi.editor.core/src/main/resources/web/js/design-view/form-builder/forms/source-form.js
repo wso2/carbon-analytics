@@ -477,9 +477,16 @@ define(['log', 'jquery', 'lodash', 'sourceOrSinkAnnotation', 'mapAnnotation', 'p
          * @param formConsole Console which holds the form
          * @param formContainer Container which holds the form
          */
-        SourceForm.prototype.generatePropertiesForm = function (clickedElement, formConsole, formContainer) {
+        SourceForm.prototype.generatePropertiesForm = function (element, formConsole, formContainer) {
             var self = this;
-			var id = clickedElement.id;
+			var id = $(element).parent().attr('id');
+            var clickedElement = self.configurationData.getSiddhiAppConfig().getSource(id);
+			if (!clickedElement) {
+				var errorMessage = 'unable to find clicked element';
+				log.error(errorMessage);
+				throw errorMessage;
+			}
+
             var isSourceConnected = true;
             if ($('#' + id).hasClass('error-element')) {
                 isSourceConnected = false;
@@ -487,10 +494,6 @@ define(['log', 'jquery', 'lodash', 'sourceOrSinkAnnotation', 'mapAnnotation', 'p
             } else if (!JSONValidator.prototype.validateSourceOrSinkAnnotation(clickedElement, 'Source', true)) {
                 // perform JSON validation to check if sink contains a connectedElement.
                 isSourceConnected = false;
-                if ($('#' + id).hasClass('error-element')) {
-                    $('#' + id).removeClass('error-element');
-                }
-                $('#' + id).addClass('incomplete-element');
             }
             if (!isSourceConnected) {
                 // close the form window

@@ -17,8 +17,9 @@
  */
 
 define(['require', 'log', 'lodash', 'jquery', 'partition', 'stream', 'query', 'formBuilder', 'aggregation',
-        'jsonValidator'],
-    function (require, log, _, $, Partition, Stream, Query, FormBuilder, Aggregation, JSONValidator) {
+    'jsonValidator', 'sourceOrSinkAnnotation', 'stream', 'table'],
+    function (require, log, _, $, Partition, Stream, Query, FormBuilder, Aggregation, JSONValidator,
+        SourceOrSinkAnnotation, Stream, Table) {
 
         /**
          * @class DesignView
@@ -69,8 +70,15 @@ define(['require', 'log', 'lodash', 'jquery', 'partition', 'stream', 'query', 'f
             if (isCodeToDesignMode) {
                 name = sourceName;
             } else {
-                var element = undefined;
-				self.formBuilder.GeneratePropertiesFormForSources(i, element);
+                name = i;
+                var sourceOptions = {};
+                _.set(sourceOptions, 'id', i);
+                _.set(sourceOptions, 'annotationType', 'SOURCE');
+                _.set(sourceOptions, 'type', undefined);
+                var source = new SourceOrSinkAnnotation(sourceOptions);
+                self.configurationData.getSiddhiAppConfig().addSource(source);
+
+                JSONValidator.prototype.validateSourceOrSinkAnnotation(source, 'Source', true)
             }
             var node = $('<div> ' + name + ' </div>');
             newAgent.append(node);
@@ -88,13 +96,7 @@ define(['require', 'log', 'lodash', 'jquery', 'partition', 'stream', 'query', 'f
 
             var settingsIconElement = $('#' + settingsIconId)[0];
             settingsIconElement.addEventListener('click', function () {
-                var clickedElement = self.configurationData.getSiddhiAppConfig().getSource(i);
-				if (!clickedElement) {
-					var errorMessage = 'unable to find clicked element';
-					log.error(errorMessage);
-					throw errorMessage;
-				}
-				self.formBuilder.GeneratePropertiesFormForSources(i, clickedElement);
+                self.formBuilder.GeneratePropertiesFormForSources(this);
             });
 
             var finalElement = newAgent;
@@ -144,8 +146,15 @@ define(['require', 'log', 'lodash', 'jquery', 'partition', 'stream', 'query', 'f
             if (isCodeToDesignMode) {
                 name = sinkName;
             } else {
-            	var element = undefined;
-                self.formBuilder.GeneratePropertiesFormForSinks(i, element);
+                name = i;
+                var sinkOptions = {};
+                _.set(sinkOptions, 'id', i);
+                _.set(sinkOptions, 'annotationType', 'SOURCE');
+                _.set(sinkOptions, 'type', undefined);
+                var sink = new SourceOrSinkAnnotation(sinkOptions);
+                self.configurationData.getSiddhiAppConfig().addSink(sink);
+
+                JSONValidator.prototype.validateSourceOrSinkAnnotation(sink, 'Sink', true)
             }
             var node = $('<div>' + name + '</div>');
             newAgent.append(node);
@@ -163,13 +172,7 @@ define(['require', 'log', 'lodash', 'jquery', 'partition', 'stream', 'query', 'f
 
             var settingsIconElement = $('#' + settingsIconId)[0];
             settingsIconElement.addEventListener('click', function () {
-            	var clickedElement = self.configurationData.getSiddhiAppConfig().getSink(i);
-            	if (!clickedElement) {
-					var errorMessage = 'unable to find clicked element';
-					log.error(errorMessage);
-					throw errorMessage;
-				}
-                self.formBuilder.GeneratePropertiesFormForSinks(i, clickedElement);
+                self.formBuilder.GeneratePropertiesFormForSinks(this);
             });
 
             var finalElement = newAgent;
@@ -214,7 +217,7 @@ define(['require', 'log', 'lodash', 'jquery', 'partition', 'stream', 'query', 'f
          * @param streamName name of the stream
          */
         DropElements.prototype.dropStream = function (newAgent, i, top, left, isCodeToDesignMode,
-                                                      isGenerateStreamFromQueryOutput, streamName) {
+            isGenerateStreamFromQueryOutput, streamName) {
             /*
              The node hosts a text node where the Stream's name input by the user will be held.
              Rather than simply having a `newAgent.text(streamName)` statement, as the text function tends to
@@ -229,8 +232,14 @@ define(['require', 'log', 'lodash', 'jquery', 'partition', 'stream', 'query', 'f
                 if (isGenerateStreamFromQueryOutput) {
                     name = streamName;
                 } else {
-                	var element = undefined;
-                    self.formBuilder.GeneratePropertiesFormForStreams(i, element);
+                    name = i;
+                    var streamOptions = {};
+                    _.set(streamOptions, 'id', i);
+                    _.set(streamOptions, 'name', undefined);
+                    var stream = new Stream(streamOptions);
+                    self.configurationData.getSiddhiAppConfig().addStream(stream);
+
+                    JSONValidator.prototype.validateStreamOrTable(stream, "Stream", true)
                 }
             }
             var node = $('<div>' + name + '</div>');
@@ -251,13 +260,7 @@ define(['require', 'log', 'lodash', 'jquery', 'partition', 'stream', 'query', 'f
 
             var settingsIconElement = $('#' + settingsIconId)[0];
             settingsIconElement.addEventListener('click', function () {
-            	var clickedElement = self.configurationData.getSiddhiAppConfig().getStream(i);
-				if (!clickedElement) {
-					var errorMessage = 'unable to find clicked element';
-					log.error(errorMessage);
-					throw errorMessage;
-				}
-                self.formBuilder.GeneratePropertiesFormForStreams(i, clickedElement);
+                self.formBuilder.GeneratePropertiesFormForStreams(this);
             });
 
             var finalElement = newAgent;
@@ -307,7 +310,7 @@ define(['require', 'log', 'lodash', 'jquery', 'partition', 'stream', 'query', 'f
          * @param streamAttributes  projections list for output stream
          */
         DropElements.prototype.dropStreamFromQuery = function (queryModel, position, queryId, outStream,
-                                                               streamAttributes) {
+            streamAttributes) {
             var self = this;
             var isStreamNameUsed = false;
             var elementID;
@@ -375,8 +378,14 @@ define(['require', 'log', 'lodash', 'jquery', 'partition', 'stream', 'query', 'f
             if (isCodeToDesignMode) {
                 name = tableName;
             } else {
-               var element = undefined;
-			   self.formBuilder.GeneratePropertiesFormForTables(i, element);
+                name = i;
+                var tableOptions = {};
+                _.set(tableOptions, 'id', i);
+                _.set(tableOptions, 'name', undefined);
+                var table = new Table(tableOptions);
+                self.configurationData.getSiddhiAppConfig().addTable(table);
+
+                JSONValidator.prototype.validateStreamOrTable(table, "Table", true)
             }
             var node = $('<div>' + name + '</div>');
             newAgent.append(node);
@@ -394,13 +403,7 @@ define(['require', 'log', 'lodash', 'jquery', 'partition', 'stream', 'query', 'f
 
             var settingsIconElement = $('#' + settingsIconId)[0];
             settingsIconElement.addEventListener('click', function () {
-                var clickedElement = self.configurationData.getSiddhiAppConfig().getTable(i);
-				if (!clickedElement) {
-					var errorMessage = 'unable to find clicked element';
-					log.error(errorMessage);
-					throw errorMessage;
-				}
-				self.formBuilder.GeneratePropertiesFormForTables(i, clickedElement);
+                self.formBuilder.GeneratePropertiesFormForTables(this);
             });
 
             var finalElement = newAgent;
@@ -611,7 +614,7 @@ define(['require', 'log', 'lodash', 'jquery', 'partition', 'stream', 'query', 'f
          * @param aggregationName name of the aggregation
          */
         DropElements.prototype.dropAggregation = function (newAgent, i, top, left, isCodeToDesignMode,
-                                                           aggregationName) {
+            aggregationName) {
             /*
              The node hosts a text node where the Aggregation's name input by the user will be held.
              Rather than simply having a `newAgent.text(aggregationName)` statement, as the text function tends to
@@ -764,7 +767,7 @@ define(['require', 'log', 'lodash', 'jquery', 'partition', 'stream', 'query', 'f
          * @param isCodeToDesignMode whether code to design mode is enable or not
          */
         DropElements.prototype.dropWindowFilterProjectionQuery = function (newAgent, i, dropType, top, left, text,
-                                                                           isCodeToDesignMode) {
+            isCodeToDesignMode) {
             /*
              A text node division will be appended to the newAgent element so that the element name can be changed in
              the text node and doesn't need to be appended to the newAgent Element every time the user changes it
@@ -841,7 +844,7 @@ define(['require', 'log', 'lodash', 'jquery', 'partition', 'stream', 'query', 'f
          * @param patternQueryName name of the patternQuery
          */
         DropElements.prototype.dropPatternQuery = function (newAgent, i, top, left, isCodeToDesignMode,
-                                                            patternQueryName) {
+            patternQueryName) {
 
             /*
              A text node division will be appended to the newAgent element so that the element name can be changed in
@@ -927,7 +930,7 @@ define(['require', 'log', 'lodash', 'jquery', 'partition', 'stream', 'query', 'f
          * @param sequenceQueryName name of the sequenceQuery
          */
         DropElements.prototype.dropSequenceQuery = function (newAgent, i, top, left, isCodeToDesignMode,
-                                                             sequenceQueryName) {
+            sequenceQueryName) {
 
             /*
              A text node division will be appended to the newAgent element so that the element name can be changed in
@@ -948,7 +951,7 @@ define(['require', 'log', 'lodash', 'jquery', 'partition', 'stream', 'query', 'f
 
                 // perform JSON validation
                 JSONValidator.prototype
-                    .validatePatternOrSequenceQuery(sequenceQuery,'Sequence Query', true);
+                    .validatePatternOrSequenceQuery(sequenceQuery, 'Sequence Query', true);
             }
 
             /*
@@ -1198,8 +1201,8 @@ define(['require', 'log', 'lodash', 'jquery', 'partition', 'stream', 'query', 'f
                 * query, from clause in the query will be updated as undefined.
                 * */
                 setTimeout(function () {
-                    var outConnections = self.jsPlumbInstance.getConnections({source: elementId + '-out'});
-                    var inConnections = self.jsPlumbInstance.getConnections({target: elementId + '-in'});
+                    var outConnections = self.jsPlumbInstance.getConnections({ source: elementId + '-out' });
+                    var inConnections = self.jsPlumbInstance.getConnections({ target: elementId + '-in' });
 
                     _.forEach(outConnections, function (connection) {
                         self.jsPlumbInstance.deleteConnection(connection);
@@ -1263,8 +1266,8 @@ define(['require', 'log', 'lodash', 'jquery', 'partition', 'stream', 'query', 'f
                 var partitionConnectionPoints = newElement.find('.partition-connector-in-part');
 
                 _.forEach(partitionConnectionPoints, function (partitionConnectionPoint) {
-                    var outConnections = self.jsPlumbInstance.getConnections({source: partitionConnectionPoint});
-                    var inConnections = self.jsPlumbInstance.getConnections({target: partitionConnectionPoint});
+                    var outConnections = self.jsPlumbInstance.getConnections({ source: partitionConnectionPoint });
+                    var inConnections = self.jsPlumbInstance.getConnections({ target: partitionConnectionPoint });
 
                     _.forEach(outConnections, function (connection) {
                         self.jsPlumbInstance.deleteConnection(connection);

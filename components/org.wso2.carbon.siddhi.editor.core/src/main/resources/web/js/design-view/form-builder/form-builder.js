@@ -18,11 +18,10 @@
 
 define(['require', 'log', 'jquery', 'lodash', 'formUtils', 'streamForm', 'tableForm', 'windowForm', 'aggregationForm',
         'triggerForm', 'windowFilterProjectionQueryForm', 'patternQueryForm', 'joinQueryForm', 'partitionForm',
-        'sequenceQueryForm', 'sourceForm', 'sinkForm', 'functionForm', 'appAnnotationForm','sourceOrSinkAnnotation',
-        'stream', 'table'],
+        'sequenceQueryForm', 'sourceForm', 'sinkForm', 'functionForm', 'appAnnotationForm'],
     function (require, log, $, _, FormUtils, StreamForm, TableForm, WindowForm, AggregationForm, TriggerForm,
               WindowFilterProjectionQueryForm, PatternQueryForm, JoinQueryForm, PartitionForm, SequenceQueryForm,
-              SourceForm, SinkForm, FunctionForm, AppAnnotationForm, SourceOrSinkAnnotation, Stream, Table) {
+              SourceForm, SinkForm, FunctionForm, AppAnnotationForm) {
 
         // common properties for the JSON editor
         JSONEditor.defaults.options.theme = 'bootstrap3';
@@ -171,9 +170,8 @@ define(['require', 'log', 'jquery', 'lodash', 'formUtils', 'streamForm', 'tableF
         /**
          * @function generate the property window for an existing source
          * @param element selected element(source)
-         * @param id selected element's id
          */
-        FormBuilder.prototype.GeneratePropertiesFormForSources = function (id, element) {
+        FormBuilder.prototype.GeneratePropertiesFormForSources = function (element) {
             var self = this;
             var formConsole = this.createTabForForm();
             var formContainer = formConsole.getContentContainer();
@@ -183,25 +181,14 @@ define(['require', 'log', 'jquery', 'lodash', 'formUtils', 'streamForm', 'tableF
             _.set(formOptions, 'application', self.application);
             _.set(formOptions, 'formUtils', self.formUtils);
             var sourceForm = new SourceForm(formOptions);
-            if (element == undefined) {
-				var sourceOptions = {};
-				_.set(sourceOptions, 'id', id);
-				_.set(sourceOptions, 'annotationType', 'SOURCE');
-				_.set(sourceOptions, 'type', undefined);
-				_.set(sourceOptions, 'options', undefined);
-				_.set(sourceOptions, 'map', undefined);
-				element = new SourceOrSinkAnnotation(sourceOptions);
-				self.configurationData.getSiddhiAppConfig().addSource(element);
-			}
             sourceForm.generatePropertiesForm(element, formConsole, formContainer);
         };
 
         /**
          * @function generate the property window for an existing sink
          * @param element selected element(sink)
-         * @param id selected element's id
          */
-        FormBuilder.prototype.GeneratePropertiesFormForSinks = function (id, element) {
+        FormBuilder.prototype.GeneratePropertiesFormForSinks = function (element) {
             var self = this;
             var formConsole = this.createTabForForm();
             var formContainer = formConsole.getContentContainer();
@@ -211,25 +198,14 @@ define(['require', 'log', 'jquery', 'lodash', 'formUtils', 'streamForm', 'tableF
             _.set(formOptions, 'application', self.application);
             _.set(formOptions, 'formUtils', self.formUtils);
             var sinkForm = new SinkForm(formOptions);
-            if (element == undefined) {
-				var sinkOptions = {};
-				_.set(sinkOptions, 'id', id);
-				_.set(sinkOptions, 'annotationType', 'SINK');
-				_.set(sinkOptions, 'type', undefined);
-				_.set(sinkOptions, 'options', undefined);
-				_.set(sinkOptions, 'map', undefined);
-				element = new SourceOrSinkAnnotation(sinkOptions);
-				self.configurationData.getSiddhiAppConfig().addSink(element);
-            }
             sinkForm.generatePropertiesForm(element, formConsole, formContainer);
         };
 
         /**
          * @function generate the property window for an existing stream
          * @param element selected element(stream)
-         * @param id selected element's id
          */
-        FormBuilder.prototype.GeneratePropertiesFormForStreams = function (id, element) {
+        FormBuilder.prototype.GeneratePropertiesFormForStreams = function (element) {
             var self = this;
             var formConsole = this.createTabForForm();
             var formContainer = formConsole.getContentContainer();
@@ -240,22 +216,14 @@ define(['require', 'log', 'jquery', 'lodash', 'formUtils', 'streamForm', 'tableF
             _.set(formOptions, 'formUtils', self.formUtils);
             _.set(formOptions, 'jsPlumbInstance', self.jsPlumbInstance);
             var streamForm = new StreamForm(formOptions);
-            if (element == undefined) {
-				var streamOptions = {};
-				_.set(streamOptions, 'id', id);
-				_.set(streamOptions, 'name', undefined);
-				element = new Stream(streamOptions);
-				self.configurationData.getSiddhiAppConfig().addStream(element);
-			}
             streamForm.generatePropertiesForm(element, formConsole, formContainer);
         };
 
         /**
          * @function generate the property window for an existing table
          * @param element selected element(table)
-         * @param id selected element's id
          */
-        FormBuilder.prototype.GeneratePropertiesFormForTables = function (id, element) {
+        FormBuilder.prototype.GeneratePropertiesFormForTables = function (element) {
             var self = this;
             var formConsole = this.createTabForForm();
             var formContainer = formConsole.getContentContainer();
@@ -265,13 +233,6 @@ define(['require', 'log', 'jquery', 'lodash', 'formUtils', 'streamForm', 'tableF
             _.set(formOptions, 'application', self.application);
             _.set(formOptions, 'formUtils', self.formUtils);
             var tableForm = new TableForm(formOptions);
-            if (element == undefined) {
-				var tableOptions = {};
-				_.set(tableOptions, 'id', id);
-				_.set(tableOptions, 'name', undefined);
-				element = new Table(tableOptions);
-				self.configurationData.getSiddhiAppConfig().addTable(element);
-			}
             tableForm.generatePropertiesForm(element, formConsole, formContainer);
         };
 

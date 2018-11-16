@@ -368,9 +368,16 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'stream', 'designView
          * @param formConsole Console which holds the form
          * @param formContainer Container which holds the form
          */
-        StreamForm.prototype.generatePropertiesForm = function (clickedElement, formConsole, formContainer) {
+        StreamForm.prototype.generatePropertiesForm = function (element, formConsole, formContainer) {
 
             var self = this;
+            var id = $(element).parent().attr('id');
+            var clickedElement = self.configurationData.getSiddhiAppConfig().getStream(id);
+            if (!clickedElement) {
+                var errorMessage = 'unable to find clicked element';
+                log.error(errorMessage);
+                throw errorMessage;
+            }
             var propertyDiv = $('<div class = "stream-form-container"><div id="property-header"><h3>Stream' +
                 ' Configuration</h3></div> <h4>Name: </h4> <input type="text" id="streamName" class="clearfix">' +
                 '<label class="error-message" id="streamNameErrorMessage"></label> <div id="define-attribute"></div>' +
@@ -380,7 +387,6 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'stream', 'designView
             self.designViewContainer.addClass('disableContainer');
             self.toggleViewButton.addClass('disableContainer');
 
-            var id = clickedElement.id;
             var annotations = [];
             var predefinedAnnotationList = self.configurationData.application.config.stream_predefined_annotations;
             var checkedAnnotations = [];
@@ -437,10 +443,8 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'stream', 'designView
                 var attributeFormTemplate = Handlebars.compile($('#attribute-form-template').html());
                 var wrappedHtml = attributeFormTemplate([{ name: "", type: "string" }]);
                 $('#define-attribute').html(wrappedHtml);
-                $('#' + id).addClass('incomplete-element');
-                $('#' + id).prop('title', 'Form is incomplete');
             } else {
-            	$('#' + id).addClass('currently-selected-element');
+                $('#' + id).addClass('currently-selected-element');
                 //add the saved name to the input field
                 $('#streamName').val(name);
                 //load the saved attributes
@@ -560,12 +564,12 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'stream', 'designView
                 }
 
                 //check if stream name is empty
-				if (streamName == "") {
-					$('#streamName').addClass('required-input-field');
-					$('#streamName')[0].scrollIntoView();
-					$('#streamNameErrorMessage').text("Stream name is required.")
-					return;
-				}
+                if (streamName == "") {
+                    $('#streamName').addClass('required-input-field');
+                    $('#streamName')[0].scrollIntoView();
+                    $('#streamNameErrorMessage').text("Stream name is required.")
+                    return;
+                }
 
                 var previouslySavedName = clickedElement.getName();
                 if (previouslySavedName === undefined) {

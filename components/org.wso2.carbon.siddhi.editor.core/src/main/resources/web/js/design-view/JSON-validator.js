@@ -190,10 +190,10 @@ define(['require', 'log', 'jquery', 'lodash', 'designViewUtils'],
             removeTooltipErrorMessage(annotation.id);
             if (!annotation.connectedElementName) {
                 errorMessage = type + ' annotation does not contain a connected stream';
-                addToolTipErrorMessage(annotation.id, errorMessage)
                 if (annotation.getType() !== undefined) {
-                    errorMessage = type + ' annotation does not contain a connected stream';
                     highlightErrorElement(annotation.id, errorMessage);
+                } else {
+                    highlightIncompleteElement(annotation.id, errorMessage)
                 }
                 if (!doNotShowErrorMessages) {
                     DesignViewUtils.prototype.errorAlert(errorMessage);
@@ -202,9 +202,29 @@ define(['require', 'log', 'jquery', 'lodash', 'designViewUtils'],
             } else {
                 if (annotation.getType() === undefined) {
                     errorMessage = type + ' annotation form is incomplete'
-                    addToolTipErrorMessage(annotation.id, errorMessage)
+                    highlightIncompleteElement(annotation.id, errorMessage);
                 }
                 removeErrorHighlighter(annotation.id);
+                return true;
+            }
+        };
+
+		/**
+         * @function Validates a given stream or a table annotation
+         * @param element element json
+         * @param type stream or table
+         * @param doNotShowErrorMessages If true error messages will not be shown as alerts. Only the validity will be
+         * returned
+         * @returns {boolean} validity of the json
+         */
+        JSONValidator.prototype.validateStreamOrTable = function (element, type, doNotShowErrorMessages) {
+            var errorMessage;
+            if (!element.getName()) {
+                errorMessage = type + ' form is incomplete'
+                highlightIncompleteElement(element.id, errorMessage);
+                return false;
+            } else {
+                removeTooltipErrorMessage(element.id);
                 return true;
             }
         };
@@ -604,6 +624,13 @@ define(['require', 'log', 'jquery', 'lodash', 'designViewUtils'],
         function highlightErrorElement(errorElementId, errorMessage) {
             var element = $('#' + errorElementId);
             element.addClass('error-element');
+            // set error message as the tooltip message
+            element.prop('title', errorMessage);
+        }
+
+        function highlightIncompleteElement(errorElementId, errorMessage) {
+            var element = $('#' + errorElementId);
+            element.addClass('incomplete-element');
             // set error message as the tooltip message
             element.prop('title', errorMessage);
         }

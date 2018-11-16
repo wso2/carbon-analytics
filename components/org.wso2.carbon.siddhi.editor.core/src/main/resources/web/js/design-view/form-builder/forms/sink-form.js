@@ -499,9 +499,16 @@ define(['log', 'jquery', 'lodash', 'sourceOrSinkAnnotation', 'mapAnnotation', 'p
          * @param formConsole Console which holds the form
          * @param formContainer Container which holds the form
          */
-        SinkForm.prototype.generatePropertiesForm = function (clickedElement, formConsole, formContainer) {
+        SinkForm.prototype.generatePropertiesForm = function (element, formConsole, formContainer) {
             var self = this;
-            var id = clickedElement.id;
+            var id = $(element).parent().attr('id');
+            var clickedElement = self.configurationData.getSiddhiAppConfig().getSink(id);
+            if (!clickedElement) {
+                var errorMessage = 'unable to find clicked element';
+                log.error(errorMessage);
+                throw errorMessage;
+            }
+
             var isSinkConnected = true;
             if ($('#' + id).hasClass('error-element')) {
                 isSinkConnected = false;
@@ -509,10 +516,6 @@ define(['log', 'jquery', 'lodash', 'sourceOrSinkAnnotation', 'mapAnnotation', 'p
             } else if (!JSONValidator.prototype.validateSourceOrSinkAnnotation(clickedElement, 'Sink', true)) {
                 // perform JSON validation to check if sink contains a connectedElement.
                 isSinkConnected = false;
-                if ($('#' + id).hasClass('error-element')) {
-                    $('#' + id).removeClass('error-element');
-                }
-                $('#' + id).addClass('incomplete-element');
             }
             if (!isSinkConnected) {
                 // close the form window
@@ -647,7 +650,7 @@ define(['log', 'jquery', 'lodash', 'sourceOrSinkAnnotation', 'mapAnnotation', 'p
 
                 // if sink type is defined
                 if (type !== undefined) {
-                	$('#' + id).addClass('currently-selected-element');
+                    $('#' + id).addClass('currently-selected-element');
                     $('#define-sink').find('#sink-type option').filter(function () {
                         return ($(this).val().toLowerCase() == (type.toLowerCase()));
                     }).prop('selected', true);
