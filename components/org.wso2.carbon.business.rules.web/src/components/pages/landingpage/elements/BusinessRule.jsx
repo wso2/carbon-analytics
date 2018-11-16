@@ -83,7 +83,6 @@ export default class BusinessRule extends Component {
         this.props.onUndeployRequest();
     }
 
-
     /**
      * Returns the Deploy button, with the given title
      * @param {String} title        Title of the deploy button, denoting its action
@@ -131,7 +130,6 @@ export default class BusinessRule extends Component {
             case 1:
                 return this.displayDescribedDeployButton('Deploy');
             case 3:
-                
             case 2:
                 return this.displayDescribedDeployButton('Retry Deploy');
             case 4:
@@ -233,9 +231,6 @@ export default class BusinessRule extends Component {
             </Tooltip>
         );
     }
-
-
-
 
     /**
      * Returns Action Buttons of the business rule

@@ -957,7 +957,6 @@ public class TemplateManagerService implements BusinessRulesService {
 
     private boolean isDeployedInNode(String nodeURL, String siddhiAppName) throws SiddhiAppsApiHelperException {
         String status = siddhiAppApiHelper.getStatus(nodeURL, siddhiAppName);
-        System.err.println("********* siddhiApp " + siddhiAppName + ",  status : " + status);
         return ("active".equalsIgnoreCase(status));
     }
 

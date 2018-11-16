@@ -50,7 +50,9 @@ public interface BusinessRulesService {
     int deleteBusinessRule(String uuid, Boolean forceDeleteEnabled)
             throws SiddhiAppsApiHelperException, BusinessRuleNotFoundException, TemplateManagerServiceException;
 
-    int deployOrUndeployBusinessRule(String businessRulesUUID, boolean shouldUndeploy) throws TemplateInstanceCountViolationException, TemplateManagerServiceException, RuleTemplateScriptException, BusinessRuleNotFoundException;
+    int deployOrUndeployBusinessRule(String businessRulesUUID, boolean shouldUndeploy) throws
+            TemplateInstanceCountViolationException, TemplateManagerServiceException, RuleTemplateScriptException,
+            BusinessRuleNotFoundException;
 
 
     /**
@@ -71,7 +73,8 @@ public interface BusinessRulesService {
      * @param businessRuleFromTemplate business rule from template object
      */
     int editBusinessRuleFromTemplate(String uuid, BusinessRuleFromTemplate businessRuleFromTemplate,
-                                     Boolean shouldDeploy) throws TemplateManagerServiceException, RuleTemplateScriptException;
+                                     Boolean shouldDeploy) throws TemplateManagerServiceException,
+            RuleTemplateScriptException;
 
 
     int createBusinessRuleFromScratch(BusinessRuleFromScratch businessRuleFromScratch, Boolean toDeploy) throws

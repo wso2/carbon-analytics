@@ -97,5 +97,4 @@ const BusinessRulesConstants = {
     // URL for APIs
     BASE_URL: window.location.origin,
 };
-
 export default BusinessRulesConstants;
