@@ -168,27 +168,10 @@ define(['require', 'log', 'jquery', 'lodash', 'formUtils', 'streamForm', 'tableF
             appAnnotationForm.generatePropertiesForm(element, formConsole, formContainer);
         };
 
-//        /**
-//         * @function generate the form to define the source once it is dropped on the canvas
-//         * @param i id for the element
-//         * @returns user given source name
-//         */
-//        FormBuilder.prototype.DefineSource = function (i) {
-//            var self = this;
-//            var formConsole = this.createTabForForm(i, constants.SOURCE);
-//            var formContainer = formConsole.getContentContainer();
-//
-//            var formOptions = {};
-//            _.set(formOptions, 'configurationData', self.configurationData);
-//            _.set(formOptions, 'application', self.application);
-//            _.set(formOptions, 'formUtils', self.formUtils);
-//            var sourceForm = new SourceForm(formOptions);
-//            sourceForm.generateDefineForm(i, formConsole, formContainer);
-//        };
-
         /**
          * @function generate the property window for an existing source
          * @param element selected element(source)
+         * @param id selected element's id
          */
         FormBuilder.prototype.GeneratePropertiesFormForSources = function (id, element) {
             var self = this;
@@ -213,27 +196,10 @@ define(['require', 'log', 'jquery', 'lodash', 'formUtils', 'streamForm', 'tableF
             sourceForm.generatePropertiesForm(element, formConsole, formContainer);
         };
 
-//        /**
-//         * @function generate the form to define the sink once it is dropped on the canvas
-//         * @param i id for the element
-//         * @returns user given sink name
-//         */
-//        FormBuilder.prototype.DefineSink = function (i) {
-//            var self = this;
-//            var formConsole = this.createTabForForm(i, constants.SINK);
-//            var formContainer = formConsole.getContentContainer();
-//
-//            var formOptions = {};
-//            _.set(formOptions, 'configurationData', self.configurationData);
-//            _.set(formOptions, 'application', self.application);
-//            _.set(formOptions, 'formUtils', self.formUtils);
-//            var sinkForm = new SinkForm(formOptions);
-//            sinkForm.generateDefineForm(i, formConsole, formContainer);
-//        };
-
         /**
          * @function generate the property window for an existing sink
          * @param element selected element(sink)
+         * @param id selected element's id
          */
         FormBuilder.prototype.GeneratePropertiesFormForSinks = function (id, element) {
             var self = this;
@@ -259,27 +225,9 @@ define(['require', 'log', 'jquery', 'lodash', 'formUtils', 'streamForm', 'tableF
         };
 
         /**
-         * @function generate the form to define the stream once it is dropped on the canvas
-         * @param i id for the element
-         * @returns user given stream name
-         */
-//        FormBuilder.prototype.DefineStream = function (i) {
-//            var self = this;
-//            var formConsole = this.createTabForForm(i, constants.STREAM);
-//            var formContainer = formConsole.getContentContainer();
-//
-//            var formOptions = {};
-//            _.set(formOptions, 'configurationData', self.configurationData);
-//            _.set(formOptions, 'application', self.application);
-//            _.set(formOptions, 'formUtils', self.formUtils);
-//            _.set(formOptions, 'jsPlumbInstance', self.jsPlumbInstance);
-//            var streamForm = new StreamForm(formOptions);
-//            return streamForm.generateDefineForm(i, formConsole, formContainer);
-//        };
-
-        /**
          * @function generate the property window for an existing stream
          * @param element selected element(stream)
+         * @param id selected element's id
          */
         FormBuilder.prototype.GeneratePropertiesFormForStreams = function (id, element) {
             var self = this;
@@ -302,27 +250,10 @@ define(['require', 'log', 'jquery', 'lodash', 'formUtils', 'streamForm', 'tableF
             streamForm.generatePropertiesForm(element, formConsole, formContainer);
         };
 
-//        /**
-//         * @function generate the form to define the table once it is dropped on the canvas
-//         * @param i id for the element
-//         * @returns user given table name
-//         */
-//        FormBuilder.prototype.DefineTable = function (i) {
-//            var self = this;
-//            var formConsole = this.createTabForForm(i, constants.TABLE);
-//            var formContainer = formConsole.getContentContainer();
-//
-//            var formOptions = {};
-//            _.set(formOptions, 'configurationData', self.configurationData);
-//            _.set(formOptions, 'application', self.application);
-//            _.set(formOptions, 'formUtils', self.formUtils);
-//            var tableForm = new TableForm(formOptions);
-//            return tableForm.generateDefineForm(i, formConsole, formContainer);
-//        };
-
         /**
          * @function generate the property window for an existing table
          * @param element selected element(table)
+         * @param id selected element's id
          */
         FormBuilder.prototype.GeneratePropertiesFormForTables = function (id, element) {
             var self = this;

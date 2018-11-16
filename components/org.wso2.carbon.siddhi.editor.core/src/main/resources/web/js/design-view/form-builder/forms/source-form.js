@@ -471,42 +471,6 @@ define(['log', 'jquery', 'lodash', 'sourceOrSinkAnnotation', 'mapAnnotation', 'p
             return isError;
         };
 
-//        /**
-//         * @function generate form when defining a form
-//         * @param i id for the element
-//         * @param formConsole Console which holds the form
-//         * @param formContainer Container which holds the form
-//         */
-//        SourceForm.prototype.generateDefineForm = function (i, formConsole, formContainer) {
-//            var self = this;
-//
-//            // create an empty source object and add it to the source array
-//            var sourceOptions = {};
-//            _.set(sourceOptions, 'id', i);
-//            _.set(sourceOptions, 'annotationType', 'SOURCE');
-//            _.set(sourceOptions, 'type', undefined);
-//            _.set(sourceOptions, 'options', undefined);
-//            _.set(sourceOptions, 'map', undefined);
-//            var source = new SourceOrSinkAnnotation(sourceOptions);
-//
-//            self.configurationData.getSiddhiAppConfig().addSource(source);
-//            // perform JSON validation
-//            if (!JSONValidator.prototype.validateSourceOrSinkAnnotation(source, 'Source', true)) {
-//                DesignViewUtils.prototype.errorAlert("To edit source configuration, please connect to a stream");
-//                if ($('#' + i).hasClass('error-element')) {
-//                    $('#' + i).removeClass('error-element');
-//                }
-//                $('#' + i).addClass("not-connected-source-sink");
-//            }
-//
-//            // close the form window
-//            self.consoleListManager.removeFormConsole(formConsole);
-//
-//            self.designViewContainer.removeClass('disableContainer');
-//            self.toggleViewButton.removeClass('disableContainer');
-//            return "undefined";
-//        };
-
         /**
          * @function generate properties form for a source
          * @param element selected element(source)
@@ -534,8 +498,6 @@ define(['log', 'jquery', 'lodash', 'sourceOrSinkAnnotation', 'mapAnnotation', 'p
                 self.designViewContainer.removeClass('disableContainer');
                 self.toggleViewButton.removeClass('disableContainer');
             } else {
-
-
 			    var streamList = self.configurationData.getSiddhiAppConfig().getStreamList();
 				var connectedElement = clickedElement.connectedElementName;
                 var predefined_sources = this.configurationData.rawExtensions["source"].sort(sortUsingProperty("name"));

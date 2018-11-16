@@ -625,12 +625,5 @@ define(['require', 'log', 'jquery', 'lodash', 'designViewUtils'],
             element.prop('title', '');
         }
 
-//        function removeWarningHighlighter(warningElementId) {
-//            var element = $('#' + warningElementId);
-//            if (element.hasClass('not-connected-element')) {
-//                element.removeClass('not-connected-element');
-//            }
-//        }
-
         return JSONValidator;
     });
