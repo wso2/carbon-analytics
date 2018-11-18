@@ -553,7 +553,7 @@ body.sticky-footer {
 }
 
 /*Popover element changes*/
-.popOver{
+.popOver {
     width: 92px;
     top: -54.5px;
     left: 53px;
@@ -561,18 +561,19 @@ body.sticky-footer {
     z-index: 100;
 }
 
-h3.popover-title{
+h3.popover-title {
     color: black;
     font-weight: 300;
 }
 
-.btn.no{
-    background-color:#f57e30;
+.btn.no {
+    background-color: #f57e30;
     color: white;
 }
-.btn.yes{
-    background-color:white;
-    color:#000000;
+
+.btn.yes {
+    background-color: white;
+    color: #000000;
 }
 
 .fullscreen-container {
@@ -594,12 +595,12 @@ h3.popover-title{
     z-index: 100;
 }
 
-.jtk-draggable.popover-show,.jtk-droppable.popover-show,.jtk-group-expanded.popover-show {
+.jtk-draggable.popover-show, .jtk-droppable.popover-show, .jtk-group-expanded.popover-show {
     z-index: 100;
 }
 
 /*Hiding the 'properties' icon when click the delete button*/
-.popover-show .element-prop-icon,.popover-show .partition-element-prop-icon {
+.popover-show .element-prop-icon, .popover-show .partition-element-prop-icon {
     display: none !important;
 }
 

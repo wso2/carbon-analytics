@@ -1153,135 +1153,143 @@ define(['require', 'log', 'lodash', 'jquery', 'partition', 'stream', 'query', 'f
                 element.find('.partition-element-prop-icon').hide();
                 element.find('.partition-element-close-icon').hide();
             });
+
 //          This function will highlight the popover while fading the background
-            function fadeInFunction(){
-                  $(".fullscreen-container").fadeTo(200, 1);
-                   }
-            function fadeOutFunction(){
-                   $(".fullscreen-container").fadeOut(200);
-                    }
+            function fadeInFunction() {
+                $(".fullscreen-container").fadeTo(200, 1);
+            }
+
+            function fadeOutFunction() {
+                $(".fullscreen-container").fadeOut(200);
+            }
+
 //          Pop-over element for displaying the popover when delete button clicked
-             function showPopOver(dataObj,element,name){
+            function showPopOver(dataObj, element, name) {
                 $(dataObj).popover({
-                             trigger:'focus',
-                             html: true,
-                             title: 'Delete'+'<a class="close">&times;</a>',
-                             content: function () {
-                                     return $('.pop-over').html();
-                             }
-                         });
-                      $(dataObj).popover("show");
-                      fadeInFunction();
+                    trigger: 'focus',
+                    html: true,
+                    title: 'Delete' + '<a class="close">&times;</a>',
+                    content: function () {
+                        return $('.pop-over').html();
+                    }
+                });
+                $(dataObj).popover("show");
+                fadeInFunction();
 
-                      $(element).on("click", ".popover-footer .btn.no" , function(){
-                         fadeOutFunction();
-                         $(this).parents(".popover").popover('hide');
-                         removeClassFromElement();
-                         });
+                $(element).on("click", ".popover-footer .btn.no", function () {
+                    fadeOutFunction();
+                    $(this).parents(".popover").popover('hide');
+                    removeClassFromElement();
+                });
 
-                      $(element).on("click", ".close" , function(){
-                          fadeOutFunction();
-                          $(this).parents(".popover").popover('hide');
-                          removeClassFromElement();
-                         });
+                $(element).on("click", ".close", function () {
+                    fadeOutFunction();
+                    $(this).parents(".popover").popover('hide');
+                    removeClassFromElement();
+                });
 
-                      $(element).off('click', '.popover-footer .btn.yes');
-                      $(element).on("click", ".popover-footer .btn.yes",function(){
-                            if(name=="dropElement"){
-                                deleteElement();
-                            }else if(name=="partitionElement"){
-                                deletePartition();
-                            }
-                            $(this).parents(".popover").popover('hide');
-                            fadeOutFunction();
-                    });
-             }
+                $(element).off('click', '.popover-footer .btn.yes');
+                $(element).on("click", ".popover-footer .btn.yes", function () {
+                    if (name == "dropElement") {
+                        deleteElement();
+                    } else if (name == "partitionElement") {
+                        deletePartition();
+                    }
+                    $(this).parents(".popover").popover('hide');
+                    fadeOutFunction();
+                });
+            }
+
 //      Adding a class for the generating element for visibility
-                 function addClassToElement(){
-                     var className1=document.getElementById(newElement[0].id);
-                     className1.classList.add("popover-show");
-                 }
-                 function removeClassFromElement(){
-                     var className2=document.getElementById(newElement[0].id);
-                     className2.classList.remove("popover-show");
-                 }
+            function addClassToElement() {
+                var className1 = document.getElementById(newElement[0].id);
+                className1.classList.add("popover-show");
+            }
 
-                 newElement.on('click', '.element-close-icon', function (){
-                     addClassToElement();
-                     showPopOver(this,newElement,"dropElement");
-                         });
+            function removeClassFromElement() {
+                var className2 = document.getElementById(newElement[0].id);
+                className2.classList.remove("popover-show");
+            }
+
+            newElement.on('click', '.element-close-icon', function () {
+                addClassToElement();
+                showPopOver(this, newElement, "dropElement");
+            });
+
 //      Deleting the element
-            function deleteElement(){
+            function deleteElement() {
                 // set the isDesignViewContentChanged to true
-                    self.configurationData.setIsDesignViewContentChanged(true);
-                    var elementId =newElement[0].id;
+                self.configurationData.setIsDesignViewContentChanged(true);
+                var elementId = newElement[0].id;
                 /*
                 * before deleting the element data from the data store structure, it is mandatory to delete the element
                 * from jsPlumb because it will fire the 'beforeDetach' and 'connectionDetached' events and it will
                 * update the other elements data connected to current element. ex: when a stream is deleted from a
                 * query, from clause in the query will be updated as undefined.
                 * */
-                    setTimeout(function () {
-                        var outConnections = self.jsPlumbInstance.getConnections({source: elementId + '-out'});
-                        var inConnections = self.jsPlumbInstance.getConnections({target: elementId + '-in'});
+                setTimeout(function () {
+                    var outConnections = self.jsPlumbInstance.getConnections({source: elementId + '-out'});
+                    var inConnections = self.jsPlumbInstance.getConnections({target: elementId + '-in'});
 
-                        _.forEach(outConnections, function (connection) {
-                            self.jsPlumbInstance.deleteConnection(connection);
-                        });
-                        _.forEach(inConnections, function (connection) {
-                            self.jsPlumbInstance.deleteConnection(connection);
-                        });
-                    }, 100);
-
-                    self.jsPlumbInstance.remove(newElement, true);
-                    if (self.jsPlumbInstance.getGroupFor(newElement)) {
-                        self.jsPlumbInstance.removeFromGroup(newElement);
-                    }
-                    if (newElement.hasClass('streamDrop')) {
-                        self.configurationData.getSiddhiAppConfig().removeStream(elementId);
-                    } else if (newElement.hasClass('tableDrop')) {
-                        self.configurationData.getSiddhiAppConfig().removeTable(elementId);
-                    } else if (newElement.hasClass('windowDrop')) {
-                        self.configurationData.getSiddhiAppConfig().removeWindow(elementId);
-                    } else if (newElement.hasClass('triggerDrop')) {
-                        self.configurationData.getSiddhiAppConfig().removeTrigger(elementId);
-                    } else if (newElement.hasClass('aggregationDrop')) {
-                        self.configurationData.getSiddhiAppConfig().removeAggregation(elementId);
-                    } else if (newElement.hasClass('functionDrop')) {
-                        self.configurationData.getSiddhiAppConfig().removeFunction(elementId);
-                    } else if (newElement.hasClass('projectionQueryDrop')) {
-                        self.configurationData.getSiddhiAppConfig().removeWindowFilterProjectionQuery(elementId);
-                    } else if (newElement.hasClass('filterQueryDrop')) {
-                        self.configurationData.getSiddhiAppConfig().removeWindowFilterProjectionQuery(elementId);
-                    } else if (newElement.hasClass('windowQueryDrop')) {
-                        self.configurationData.getSiddhiAppConfig().removeWindowFilterProjectionQuery(elementId);
-                    } else if (newElement.hasClass('functionQueryDrop')) {
-                        self.configurationData.getSiddhiAppConfig().removeWindowFilterProjectionQuery(elementId);
-                    } else if (newElement.hasClass('patternQueryDrop')) {
-                        self.configurationData.getSiddhiAppConfig().removePatternQuery(elementId);
-                    } else if (newElement.hasClass('sequenceQueryDrop')) {
-                        self.configurationData.getSiddhiAppConfig().removeSequenceQuery(elementId);
-                    } else if (newElement.hasClass('joinQueryDrop')) {
-                        self.configurationData.getSiddhiAppConfig().removeJoinQuery(elementId);
-                    } else if (newElement.hasClass('sourceDrop')) {
-                        self.configurationData.getSiddhiAppConfig().removeSource(elementId);
-                    } else if (newElement.hasClass('sinkDrop')) {
-                        self.configurationData.getSiddhiAppConfig().removeSink(elementId);
-                    }
-
-                    self.configurationData.getSiddhiAppConfig()
-                        .setFinalElementCount(self.configurationData.getSiddhiAppConfig().getFinalElementCount() - 1);
-                         fadeOutFunction();
-                         $(this).parents(".popover").popover('hide');
-            }
-//   register event listener to remove the element when the close icon is clicked
-                    newElement.on('click', '.partition-element-close-icon', function () {
-                        addClassToElement();
-                        showPopOver(this,newElement,"partitionElement");
+                    _.forEach(outConnections, function (connection) {
+                        self.jsPlumbInstance.deleteConnection(connection);
                     });
-                function  deletePartition(){
-                 // set the isDesignViewContentChanged to true
-                    self.configurationData.setIsDesignViewContentChanged(true);
+                    _.forEach(inConnections, function (connection) {
+                        self.jsPlumbInstance.deleteConnection(connection);
+                    });
+                }, 100);
+
+                self.jsPlumbInstance.remove(newElement, true);
+                if (self.jsPlumbInstance.getGroupFor(newElement)) {
+                    self.jsPlumbInstance.removeFromGroup(newElement);
+                }
+                if (newElement.hasClass('streamDrop')) {
+                    self.configurationData.getSiddhiAppConfig().removeStream(elementId);
+                } else if (newElement.hasClass('tableDrop')) {
+                    self.configurationData.getSiddhiAppConfig().removeTable(elementId);
+                } else if (newElement.hasClass('windowDrop')) {
+                    self.configurationData.getSiddhiAppConfig().removeWindow(elementId);
+                } else if (newElement.hasClass('triggerDrop')) {
+                    self.configurationData.getSiddhiAppConfig().removeTrigger(elementId);
+                } else if (newElement.hasClass('aggregationDrop')) {
+                    self.configurationData.getSiddhiAppConfig().removeAggregation(elementId);
+                } else if (newElement.hasClass('functionDrop')) {
+                    self.configurationData.getSiddhiAppConfig().removeFunction(elementId);
+                } else if (newElement.hasClass('projectionQueryDrop')) {
+                    self.configurationData.getSiddhiAppConfig().removeWindowFilterProjectionQuery(elementId);
+                } else if (newElement.hasClass('filterQueryDrop')) {
+                    self.configurationData.getSiddhiAppConfig().removeWindowFilterProjectionQuery(elementId);
+                } else if (newElement.hasClass('windowQueryDrop')) {
+                    self.configurationData.getSiddhiAppConfig().removeWindowFilterProjectionQuery(elementId);
+                } else if (newElement.hasClass('functionQueryDrop')) {
+                    self.configurationData.getSiddhiAppConfig().removeWindowFilterProjectionQuery(elementId);
+                } else if (newElement.hasClass('patternQueryDrop')) {
+                    self.configurationData.getSiddhiAppConfig().removePatternQuery(elementId);
+                } else if (newElement.hasClass('sequenceQueryDrop')) {
+                    self.configurationData.getSiddhiAppConfig().removeSequenceQuery(elementId);
+                } else if (newElement.hasClass('joinQueryDrop')) {
+                    self.configurationData.getSiddhiAppConfig().removeJoinQuery(elementId);
+                } else if (newElement.hasClass('sourceDrop')) {
+                    self.configurationData.getSiddhiAppConfig().removeSource(elementId);
+                } else if (newElement.hasClass('sinkDrop')) {
+                    self.configurationData.getSiddhiAppConfig().removeSink(elementId);
+                }
+
+                self.configurationData.getSiddhiAppConfig()
+                    .setFinalElementCount(self.configurationData.getSiddhiAppConfig().getFinalElementCount() - 1);
+                fadeOutFunction();
+                $(this).parents(".popover").popover('hide');
+            }
+
+//   register event listener to remove the element when the close icon is clicked
+            newElement.on('click', '.partition-element-close-icon', function () {
+                addClassToElement();
+                showPopOver(this, newElement, "partitionElement");
+            });
+
+            function deletePartition() {
+                // set the isDesignViewContentChanged to true
+                self.configurationData.setIsDesignViewContentChanged(true);
 
                     var elementId = newElement[0].id;
                     var partition = self.configurationData.getSiddhiAppConfig().getPartition(elementId);
