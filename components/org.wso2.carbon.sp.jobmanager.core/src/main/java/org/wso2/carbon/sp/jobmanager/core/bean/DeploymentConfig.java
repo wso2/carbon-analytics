@@ -59,8 +59,30 @@ public class DeploymentConfig implements Serializable {
     private String providerUrl;
     @Element(description = "Database queries template array list.")
     private List<Queries> queries = new ArrayList<>();
+    @Element(description = "Nats based url of nats cluster")
+    private String natsServerUrl;
+    @Element(description = "Id of the created nats cluster")
+    private String clusterId;
+
+
+    public String getNatsServerUrl() {
+        return natsServerUrl;
+    }
+
+    public void setNatsServerUrl(String natsServerUrl) {
+        this.natsServerUrl = natsServerUrl;
+    }
+
+    public String getClusterId() {
+        return clusterId;
+    }
+
+    public void setClusterId(String clusterId) {
+        this.clusterId = clusterId;
+    }
 
     public String getProviderUrl() {
+
         return providerUrl;
     }
 

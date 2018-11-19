@@ -115,4 +115,18 @@ public abstract class AbstractSiddhiAppCreator implements SiddhiAppCreator {
         return substitutor.replace(query);
     }
 
+    /**
+     *@param siddhiAppName   Name of the userdefined siddhi app
+     * @param streamName      Currently processing stream name
+     * @param groupingField   Partition key field, if available otherwise null
+     * @return  created topic name
+     *
+     * Creates the topic name from above parameters
+     */
+    protected String getTopicName(String siddhiAppName, String streamName, String groupingField) {
+        return siddhiAppName + "_" + streamName + (groupingField == null ? ""
+                : ("_" + groupingField));
+    }
+
+
 }
