@@ -108,9 +108,7 @@ define(['require', 'log', 'jquery', 'lodash', 'functionDefinition', 'designViewU
             });
 
             formContainer.append('<div id="submit"><button type="button" class="btn btn-default">Submit</button></div>');
-			$('#' + id).addClass('currently-selected-element');
-			$('#' + i).addClass('incomplete-element');
-			$('#' + i).prop('title', 'Form is incomplete');
+
             // 'Submit' button action
             var submitButtonElement = $(formContainer).find('#submit')[0];
             submitButtonElement.addEventListener('click', function () {
@@ -141,10 +139,6 @@ define(['require', 'log', 'jquery', 'lodash', 'functionDefinition', 'designViewU
 
                 var textNode = $('#' + i).find('.functionNameNode');
                 textNode.html(editor.getValue().name);
-                if ($('#' + i).hasClass('incomplete-element')) {
-					$('#' + i).removeClass('incomplete-element');
-				}
-				$('#' + i).prop('title', '');
 
                 // close the form window
                 self.consoleListManager.removeFormConsole(formConsole);
@@ -171,7 +165,6 @@ define(['require', 'log', 'jquery', 'lodash', 'functionDefinition', 'designViewU
             self.toggleViewButton.addClass('disableContainer');
 
             var id = $(element).parent().attr('id');
-            $('#' + id).addClass('currently-selected-element');
             // retrieve the function information from the collection
             var clickedElement = self.configurationData.getSiddhiAppConfig().getFunction(id);
             if (!clickedElement) {
