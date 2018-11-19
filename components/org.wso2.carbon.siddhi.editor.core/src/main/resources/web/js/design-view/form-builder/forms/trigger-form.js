@@ -90,9 +90,7 @@ define(['require', 'log', 'jquery', 'lodash', 'trigger', 'designViewUtils'],
             var propertyDiv = $('<div id="property-header"><h3>Trigger Configuration</h3></div>' +
                 '<div id="define-trigger" class="define-trigger"></div>');
             formContainer.append(propertyDiv);
-			$('#' + id).addClass('currently-selected-element');
-			$('#' + i).addClass('incomplete-element');
-			$('#' + i).prop('title', 'Form is incomplete');
+
             // generate the form to define a trigger
             var editor = new JSONEditor($(formContainer).find('#define-trigger')[0], {
                 schema: triggerSchema,
@@ -137,10 +135,6 @@ define(['require', 'log', 'jquery', 'lodash', 'trigger', 'designViewUtils'],
 
                 var textNode = $('#' + i).find('.triggerNameNode');
                 textNode.html(editor.getValue().name);
-				if ($('#' + i).hasClass('incomplete-element')) {
-					$('#' + i).removeClass('incomplete-element');
-				}
-				$('#' + i).prop('title', '');
 
                 // close the form window
                 self.consoleListManager.removeFormConsole(formConsole);
@@ -166,7 +160,6 @@ define(['require', 'log', 'jquery', 'lodash', 'trigger', 'designViewUtils'],
             self.toggleViewButton.addClass('disableContainer');
 
             var id = $(element).parent().attr('id');
-            $('#' + id).addClass('currently-selected-element');
             // retrieve the trigger information from the collection
             var clickedElement = self.configurationData.getSiddhiAppConfig().getTrigger(id);
             if (!clickedElement) {
