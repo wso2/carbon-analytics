@@ -51,7 +51,6 @@ public class DeploymentManagerImpl implements DeploymentManager, ResourcePoolCha
     private final Lock lock = new ReentrantLock();
     private ResourceAllocationAlgorithm resourceAllocationAlgorithm = ServiceDataHolder.getAllocationAlgorithm();
     private ResourceAllocationAlgorithm receiverAllocationAlgorithm = new RoundRobinAllocationAlgorithm();
-
     @Override
     public DeploymentStatus deploy(DistributedSiddhiQuery distributedSiddhiQuery) {
         Map<String, List<SiddhiAppHolder>> deployedSiddhiAppHoldersMap = ServiceDataHolder

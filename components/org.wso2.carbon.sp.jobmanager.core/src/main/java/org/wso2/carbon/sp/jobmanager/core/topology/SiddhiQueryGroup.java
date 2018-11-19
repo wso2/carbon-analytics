@@ -33,6 +33,11 @@ public class SiddhiQueryGroup {
     private String siddhiApp;
     private Map<String, InputStreamDataHolder> inputStreams;
     private Map<String, OutputStreamDataHolder> outputStreams;
+
+    public List<String> getQueryList() {
+        return queryList;
+    }
+
     private List<String> queryList;
     private boolean isReceiverQueryGroup;
 
@@ -89,6 +94,10 @@ public class SiddhiQueryGroup {
         queryList.add(query);
     }
 
+    public void addQueryAtFirst(String query){
+        queryList.add(0,query);
+    }
+
     public void addOutputStream(String key, OutputStreamDataHolder outputStreamDataHolder) {
         if (outputStreamDataHolder != null) {
             outputStreams.put(key, outputStreamDataHolder);
@@ -116,5 +125,9 @@ public class SiddhiQueryGroup {
 
     public void setReceiverQueryGroup(boolean receiverQueryGroup) {
         isReceiverQueryGroup = receiverQueryGroup;
+    }
+
+    public void setParallelism(int parallelism) {
+        this.parallelism = parallelism;
     }
 }

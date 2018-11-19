@@ -33,6 +33,7 @@ public class OutputStreamDataHolder {
     private List<PublishingStrategyDataHolder> publishingStrategyList;
     private boolean isUserGiven;
     private boolean isInnerGroupStream;
+    private boolean isSinkBridgeAdded;
 
     public OutputStreamDataHolder(String streamName, String streamDefinition, EventHolder eventHolderType,
                                   boolean isUserGiven) {
@@ -42,6 +43,7 @@ public class OutputStreamDataHolder {
         this.isUserGiven = isUserGiven;
         this.publishingStrategyList = new ArrayList<>();
         isInnerGroupStream = false;
+        isSinkBridgeAdded = false;
     }
 
     public String getStreamDefinition() {
@@ -78,6 +80,14 @@ public class OutputStreamDataHolder {
 
     public void setInnerGroupStream(boolean innerGroupStream) {
         isInnerGroupStream = innerGroupStream;
+    }
+
+    public boolean isSinkBridgeAdded() {
+        return isSinkBridgeAdded ;
+    }
+
+    public void setSinkBridgeAdded(boolean sinkBridgeAdded) {
+        isSinkBridgeAdded = sinkBridgeAdded;
     }
 }
 

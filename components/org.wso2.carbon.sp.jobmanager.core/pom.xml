@@ -282,6 +282,11 @@
             <groupId>org.wso2.extension.siddhi.io.jms</groupId>
             <artifactId>siddhi-io-jms</artifactId>
         </dependency>
+        <dependency>
+            <groupId>mysql</groupId>
+            <artifactId>mysql-connector-java</artifactId>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
     <build>
         <plugins>
