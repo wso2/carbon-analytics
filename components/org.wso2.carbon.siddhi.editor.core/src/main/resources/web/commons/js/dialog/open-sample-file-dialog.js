@@ -65,7 +65,7 @@ define(['require', 'lodash','jquery', 'log', 'backbone', 'file_browser', 'worksp
                     "<span aria-hidden='true'>&times;</span>" +
                     "</button>" +
                     "<h4 class='modal-title file-dialog-title'>Import Sample</h4>" +
-                    "<hr class='style1'>"+
+                    "<hr class='style1'>" +
                     "</div>" +
                     "<div class='modal-body'>" +
                     "<div class='container-fluid'>" +
@@ -124,42 +124,41 @@ define(['require', 'lodash','jquery', 'log', 'backbone', 'file_browser', 'worksp
                 var openSampleConfigModal = sampleFileOpen.filter("#openSampleConfigModal");
                 var openFileWizardError = sampleFileOpen.find("#openFileWizardError");
                 var location = sampleFileOpen.find("input").filter("#location");
-                var locationSearch= sampleFileOpen.find("input").filter("#locationSearch");
+                var locationSearch = sampleFileOpen.find("input").filter("#locationSearch");
 
-                var treeContainer  = sampleFileOpen.find("div").filter("#sampleTable");
+                var treeContainer = sampleFileOpen.find("div").filter("#sampleTable");
                 var bodyUlSampleContent = $('<ul class="recent-files clearfix"></ul>');
                 bodyUlSampleContent.attr('id', "sampleList");
-                var browserStorage = app.browserStorage;
                 var workspaceServiceURL = app.config.services.workspace.endpoint;
                 var getSampleDescServiceURL = workspaceServiceURL + "/listFiles/samples/descriptions";
-                var samplesWithDes={};
+                var samplesWithDes = {};
 
-                 $.ajax({
+                $.ajax({
                     type: "GET",
                     contentType: "json",
                     url: getSampleDescServiceURL,
                     async: false,
-                    success: function(data) {
-                        samplesWithDes=data;
+                    success: function (data) {
+                        samplesWithDes = data;
                     },
-                    error: function(e) {
+                    error: function (e) {
                         alertError("Unable to read a sample file.");
                         throw "Unable to read a sample file.";
                     }
 
                 });
 
-                samplesWithDes.forEach(function(sample){
-                    var sampleName=sample.path;
+                samplesWithDes.forEach(function (sample) {
+                    var sampleName = sample.path;
                     var config =
                         {
-                            "sampleName":  ((sampleName.substring(sampleName.lastIndexOf('/')+1)).split(".siddhi"))[0],
-                            "sampleDes":sample.description,
+                            "sampleName": ((sampleName.substring(sampleName.lastIndexOf('/') + 1)).split(".siddhi"))[0],
+                            "sampleDes": sample.description,
                             "parentContainer": bodyUlSampleContent,
                             "firstItem": true,
                             "clickEventCallback": function (event) {
                                 event.preventDefault();
-                                var payload=sampleName;
+                                var payload = sampleName;
                                 openSample(payload);
                             }
                         };
@@ -168,8 +167,8 @@ define(['require', 'lodash','jquery', 'log', 'backbone', 'file_browser', 'worksp
                     treeContainer.append(bodyUlSampleContent);
                 });
 
-                locationSearch.keyup(function(){
-                    var searchText= locationSearch.val();
+                locationSearch.keyup(function () {
+                    var searchText = locationSearch.val();
                     searchSample(bodyUlSampleContent, searchText);
                 });
 
@@ -246,8 +245,8 @@ define(['require', 'lodash','jquery', 'log', 'backbone', 'file_browser', 'worksp
                     });
                 };
 
-                 function openSample(payload) {
-                    var fileRelativeLocation = "artifacts" +self.app.getPathSeperator() +payload
+                function openSample(payload) {
+                    var fileRelativeLocation = "artifacts" + self.app.getPathSeperator() + payload;
                     var workspaceServiceURL = app.config.services.workspace.endpoint;
                     var openSampleServiceURL = workspaceServiceURL + "/read/sample";
                     var browserStorage = app.browserStorage;
@@ -262,7 +261,7 @@ define(['require', 'lodash','jquery', 'log', 'backbone', 'file_browser', 'worksp
                             if (xhr.status == 200) {
                                 var file = new File({
                                     content: data.content
-                                },{
+                                }, {
                                     storage: browserStorage
                                 });
                                 openSampleConfigModal.modal('hide');
@@ -274,9 +273,9 @@ define(['require', 'lodash','jquery', 'log', 'backbone', 'file_browser', 'worksp
                         },
                         error: function (res, errorCode, error) {
                             var msg = _.isString(error) ? error : res.statusText;
-                            if(isJsonString(res.responseText)){
+                            if (isJsonString(res.responseText)) {
                                 var resObj = JSON.parse(res.responseText);
-                                if(_.has(resObj, 'Error')){
+                                if (_.has(resObj, 'Error')) {
                                     msg = _.get(resObj, 'Error');
                                 }
                             }
@@ -286,21 +285,21 @@ define(['require', 'lodash','jquery', 'log', 'backbone', 'file_browser', 'worksp
                     });
                 };
 
-                function searchSample(sampleContent,searchText){
+                function searchSample(sampleContent, searchText) {
                     var filter = searchText.toUpperCase();
                     var sampleElements = sampleContent[0].getElementsByTagName("li");
-                    var noResultsElement  = sampleFileOpen.find("div").filter("#noResults");
-                    var unmatchedCount=0;
+                    var noResultsElement = sampleFileOpen.find("div").filter("#noResults");
+                    var unmatchedCount = 0;
                     for (var i = 0; i < sampleElements.length; i++) {
                         var sampleElement = sampleElements[i].getElementsByTagName("a")[0];
-                        if (sampleElement.innerText.toUpperCase().indexOf(filter) > -1){
+                        if (sampleElement.innerText.toUpperCase().indexOf(filter) > -1) {
                             sampleElements[i].style.display = "";
                         } else {
                             sampleElements[i].style.display = "none";
-                            unmatchedCount+=1;
+                            unmatchedCount += 1;
                         }
                     }
-                    var isMatched= (unmatchedCount===sampleElements.length);
+                    var isMatched = (unmatchedCount === sampleElements.length);
                     noResultsElement.toggle(isMatched);
                 }
             },

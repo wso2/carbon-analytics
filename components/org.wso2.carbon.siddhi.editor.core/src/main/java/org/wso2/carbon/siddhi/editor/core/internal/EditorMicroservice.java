@@ -960,7 +960,7 @@ public class EditorMicroservice implements Microservice {
         String regex = "@[Aa][Pp][Pp]:[Dd][Ee][Ss][Cc][Rr][Ii][Pp][Tt][Ii][Oo][Nn]\\(['|\"](.*?)['|\"]\\)";
         Pattern pattern = Pattern.compile(regex);
         try {
-            Map<String,String> sampleMap=new HashMap<>();
+            Map<String, String> sampleMap = new HashMap<>();
             List<java.nio.file.Path> collect = Files.walk(pathLocation)
                     .filter(s -> s.toString().endsWith(".siddhi"))
                     .sorted()
@@ -973,12 +973,12 @@ public class EditorMicroservice implements Microservice {
                     String description = matcher.group();
                     descriptionText = description.substring(description.indexOf("(") + 1, description.lastIndexOf(")"));
                 }
-                java.nio.file.Path relativeSamplePath=pathLocation.relativize(path);
-                sampleMap.put(relativeSamplePath.toString(),descriptionText);
+                java.nio.file.Path relativeSamplePath = pathLocation.relativize(path);
+                sampleMap.put(relativeSamplePath.toString(), descriptionText);
             }
             EditorDataHolder.setSiddhiSampleMap(sampleMap);
         } catch (IOException e) {
-            log.error("Error while reading the sample descriptions.",e);
+            log.error("Error while reading the sample descriptions.", e);
         }
     }
 }

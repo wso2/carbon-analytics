@@ -16,14 +16,11 @@
  * under the License.
  */
 
-define(['require', 'jquery', 'lodash','log'], function (require, $,  _,log) {
-
-    var ServiceView = function(config){
+define(['require', 'jquery', 'lodash', 'log'], function (require, $, _, log) {
+    var ServiceView = function (config) {
         this._config = config;
     };
-
     ServiceView.prototype.constructor = ServiceView;
-
     ServiceView.prototype.render = function () {
         var config = this._config;
         var errMsg;
@@ -34,24 +31,19 @@ define(['require', 'jquery', 'lodash','log'], function (require, $,  _,log) {
         }
         // get parent container which is innerSamples div
         var parentContainer = _.get(config, 'parentContainer');
-
         this._sampleName = config.sampleName;
         this._content = config.sampleDes;
 
         //create the parent for drawn svg
         var sampleLi = $("<li class='col-md-6'></li>");
-
         var linkSample = $("<a href='#' style='height: 100px;display: block;'></a>");
         linkSample.text(this._sampleName);
         linkSample.bind('click', config.clickEventCallback);
 
-        var description = "<span class='description'>" + this._content +"</span>";
+        var description = "<span class='description'>" + this._content + "</span>";
         linkSample.append(description);
-
         sampleLi.append(linkSample);
         parentContainer.append(sampleLi);
     };
-
     return ServiceView;
-
 });
