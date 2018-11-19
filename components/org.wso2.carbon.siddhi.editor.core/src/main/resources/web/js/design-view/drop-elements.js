@@ -149,7 +149,7 @@ define(['require', 'log', 'lodash', 'jquery', 'partition', 'stream', 'query', 'f
                 name = i;
                 var sinkOptions = {};
                 _.set(sinkOptions, 'id', i);
-                _.set(sinkOptions, 'annotationType', 'SOURCE');
+                _.set(sinkOptions, 'annotationType', 'SINK');
                 _.set(sinkOptions, 'type', undefined);
                 var sink = new SourceOrSinkAnnotation(sinkOptions);
                 self.configurationData.getSiddhiAppConfig().addSink(sink);

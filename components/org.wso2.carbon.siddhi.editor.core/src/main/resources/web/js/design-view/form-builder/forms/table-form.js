@@ -73,25 +73,6 @@ define(['log', 'jquery', 'lodash', 'attribute', 'table', 'storeAnnotation', 'des
             return div.inverse(this);
         });
 
-        /**
-		* Function to sort alphabetically an array of objects by some specific key.
-		* @param {String} property Key of the object to sort.
-		*/
-        var sortUsingProperty = function (property) {
-            var sortOrder = 1;
-            if (property[0] === "-") {
-                sortOrder = -1;
-                property = property.substr(1);
-            }
-            return function (a, b) {
-                if (sortOrder == -1) {
-                    return b[property].localeCompare(a[property]);
-                } else {
-                    return a[property].localeCompare(b[property]);
-                }
-            }
-        };
-
         /** Function to manage the attribute navigations */
         var changeAtrributeNavigation = function () {
             $('.attr-nav').empty();
@@ -146,7 +127,7 @@ define(['log', 'jquery', 'lodash', 'attribute', 'table', 'storeAnnotation', 'des
             $('#define-store-options .option').each(function () {
                 var optionName = $(this).find('.option-name').text().trim();
                 var optionValue = $(this).find('.option-value').val().trim();
-                var predefined_option_object = getOption(optionName, predefinedOptions);
+                var predefinedOptionObject = getOption(optionName, predefinedOptions);
                 if ($(this).find('.option-name').hasClass('mandatory-option')) {
                     if (optionValue == "") {
                         $(this).find('.error-message').text('this option is mandatory');
@@ -155,7 +136,7 @@ define(['log', 'jquery', 'lodash', 'attribute', 'table', 'storeAnnotation', 'des
                         isError = true;
                         return false;
                     } else {
-                        var dataType = predefined_option_object.type[0];
+                        var dataType = predefinedOptionObject.type[0];
                         if (validateDataType(dataType, optionValue)) {
                             $(this).find('.error-message').text('Invalid data-type. ' + dataType + ' required.');
                             $(this)[0].scrollIntoView();
@@ -174,7 +155,7 @@ define(['log', 'jquery', 'lodash', 'attribute', 'table', 'storeAnnotation', 'des
                             isError = true;
                             return false;
                         } else {
-                            var dataType = predefined_option_object.type[0];
+                            var dataType = predefinedOptionObject.type[0];
                             if (validateDataType(dataType, optionValue)) {
                                 $(this).find('.error-message').text('Invalid data-type. ' + dataType + ' required.');
                                 $(this)[0].scrollIntoView();
@@ -203,13 +184,13 @@ define(['log', 'jquery', 'lodash', 'attribute', 'table', 'storeAnnotation', 'des
                     var custOptValue = $(this).find('.cust-option-value').val().trim();
                     if ((custOptName != "") || (custOptValue != "")) {
                         if (custOptName == "") {
-                            $(this).find('.error-message').text('Option key is not filled.');
+                            $(this).find('.error-message').text('Option key is required.');
                             $(this)[0].scrollIntoView();
                             $(this).find('.cust-option-key').addClass('required-input-field');
                             isError = true;
                             return false;
                         } else if (custOptValue == "") {
-                            $(this).find('.error-message').text('Option value is not filled.');
+                            $(this).find('.error-message').text('Option value is required.');
                             $(this)[0].scrollIntoView();
                             $(this).find('.cust-option-value').addClass('required-input-field');
                             isError = true;
@@ -363,24 +344,25 @@ define(['log', 'jquery', 'lodash', 'attribute', 'table', 'storeAnnotation', 'des
         var changeCustOptDiv = function () {
             var storeCustOptionList = $('.table-form-container #customized-store-options').
                 find('.cust-options li');
+            var storeDivParent = $('.table-form-container #customized-store-options');
             if (storeCustOptionList.length > 0) {
-                $('.table-form-container #customized-store-options').find('h3').show();
-                $('.table-form-container #customized-store-options').find('.btn-add-options').html('Add more');
+                storeDivParent.find('h3').show();
+                storeDivParent.find('.btn-add-options').html('Add more');
             } else {
-                $('.table-form-container #customized-store-options').find('h3').hide();
-                $('.table-form-container #customized-store-options').find('.btn-add-options').
+                storeDivParent.find('h3').hide();
+                storeDivParent.find('.btn-add-options').
                     html('Add customized option');
             }
         };
 
         /**
          * Function to add a default store type to the predefined stores
-         * @param {Object} predefined_stores predefined store types
+         * @param {Object} predefinedStores predefined store types
          */
-        var addDefaultStoreType = function (predefined_stores) {
+        var addDefaultStoreType = function (predefinedStores) {
             //first check if in-memory is already present in the predefined stores array
             var found = false;
-            for (var store of predefined_stores) {
+            for (var store of predefinedStores) {
                 if (store.name === defaultStoreType) {
                     found = true;
                     break;
@@ -391,7 +373,7 @@ define(['log', 'jquery', 'lodash', 'attribute', 'table', 'storeAnnotation', 'des
                     name: defaultStoreType,
                     parameters: []
                 };
-                predefined_stores.push(inMemoryType);
+                predefinedStores.push(inMemoryType);
             }
         };
 
@@ -618,11 +600,7 @@ define(['log', 'jquery', 'lodash', 'attribute', 'table', 'storeAnnotation', 'des
             var self = this;
             var id = $(element).parent().attr('id');
             var clickedElement = self.configurationData.getSiddhiAppConfig().getTable(id);
-            if (!clickedElement) {
-                var errorMessage = 'unable to find clicked element';
-                log.error(errorMessage);
-                throw errorMessage;
-            }
+
             var propertyDiv = $('<div class = "table-form-container table-div"> <div id="property-header"> <h3> Table' +
                 ' Configuration </h3> </div> <h4> Name: </h4> <input type="text" id="tableName" class = "clearfix">' +
                 '<label class="error-message" id="tableNameErrorMessage"> </label> <div id = "define-attribute"> </div>' +
@@ -634,8 +612,8 @@ define(['log', 'jquery', 'lodash', 'attribute', 'table', 'storeAnnotation', 'des
             self.designViewContainer.addClass('disableContainer');
             self.toggleViewButton.addClass('disableContainer');
 
-            var predefined_stores = this.configurationData.rawExtensions["store"].sort(sortUsingProperty("name"));
-            addDefaultStoreType(predefined_stores);
+            var predefinedStores =  _.orderBy(this.configurationData.rawExtensions["store"], ['name'],['asc']);
+            addDefaultStoreType(predefinedStores);
             var customizedStoreOptions = [];
             var storeOptions = [];
             var storeOptionsWithValues = [];
@@ -757,12 +735,10 @@ define(['log', 'jquery', 'lodash', 'attribute', 'table', 'storeAnnotation', 'des
             });
 
             var name = clickedElement.getName();
-            var store;
-            if (name === undefined) {
+            if (!name) {
                 var attributeFormTemplate = Handlebars.compile($('#attribute-form-template').html());
                 var wrappedHtml = attributeFormTemplate([{ name: "", type: "string" }]);
                 $('#define-attribute').html(wrappedHtml);
-                store = undefined;
             } else {
                 $('#' + id).addClass('currently-selected-element');
                 $('#tableName').val(name);
@@ -784,7 +760,7 @@ define(['log', 'jquery', 'lodash', 'attribute', 'table', 'storeAnnotation', 'des
             }
 
             var savedAnnotations = clickedElement.getAnnotationList();
-            if (savedAnnotations == undefined || savedAnnotations.length == 0) {
+            if (!savedAnnotations || savedAnnotations.length == 0) {
                 var tableAnnotations = self.configurationData.application.config.table_predefined_annotations;
             } else {
                 var tableAnnotations = self.configurationData.application.config.table_predefined_annotations;
@@ -799,7 +775,7 @@ define(['log', 'jquery', 'lodash', 'attribute', 'table', 'storeAnnotation', 'des
 
             //render the template to  generate the store types
             var storeFormTemplate = Handlebars.compile($('#source-sink-map-store-form-template').html());
-            var wrappedHtml = storeFormTemplate({ id: "store", types: predefined_stores });
+            var wrappedHtml = storeFormTemplate({ id: "store", types: predefinedStores });
             $('#define-store').html(wrappedHtml);
 
             $('#define-rdbms-type').on('change', '[name=radioOpt]', function () {
@@ -808,10 +784,10 @@ define(['log', 'jquery', 'lodash', 'attribute', 'table', 'storeAnnotation', 'des
             });
 
             //if store is defined
-            if (clickedElement.getStore() !== undefined) {
+            if (clickedElement.getStore()) {
                 var savedStoreAnnotation = clickedElement.getStore();
                 var savedStoreType = savedStoreAnnotation.getType().toLowerCase();
-                storeOptions = getSelectedTypeOptions(savedStoreType, predefined_stores);
+                storeOptions = getSelectedTypeOptions(savedStoreType, predefinedStores);
                 var savedStoreAnnotationOptions = savedStoreAnnotation.getOptions();
                 var savedStoreOptions = [];
                 for (var key in savedStoreAnnotationOptions) {
@@ -845,8 +821,8 @@ define(['log', 'jquery', 'lodash', 'attribute', 'table', 'storeAnnotation', 'des
                     $('#define-store-options').empty();
                     $('#define-table-annotation').hide();
                     $('#define-rdbms-type').hide();
-                } else if (clickedElement.getStore() !== undefined && savedStoreType === this.value) {
-                    storeOptions = getSelectedTypeOptions(this.value, predefined_stores);
+                } else if (clickedElement.getStore() && savedStoreType === this.value) {
+                    storeOptions = getSelectedTypeOptions(this.value, predefinedStores);
                     customizedStoreOptions = getCustomizedOptions(storeOptions, savedStoreOptions);
                     storeOptionsWithValues = mapUserOptionValues(storeOptions, savedStoreOptions);
                     if (this.value == rdbmsStoreType) {
@@ -861,7 +837,7 @@ define(['log', 'jquery', 'lodash', 'attribute', 'table', 'storeAnnotation', 'des
                     }
                     $('#define-table-annotation').show();
                 } else {
-                    storeOptions = getSelectedTypeOptions(this.value, predefined_stores);
+                    storeOptions = getSelectedTypeOptions(this.value, predefinedStores);
                     storeOptionsWithValues = createOptionObjectWithValues(storeOptions);
                     customizedStoreOptions = [];
                     if (this.value == rdbmsStoreType) {
@@ -898,7 +874,7 @@ define(['log', 'jquery', 'lodash', 'attribute', 'table', 'storeAnnotation', 'des
                     return;
                 }
                 var previouslySavedName = clickedElement.getName();
-                if (previouslySavedName === undefined) {
+                if (!previouslySavedName) {
                     previouslySavedName = "";
                 }
 

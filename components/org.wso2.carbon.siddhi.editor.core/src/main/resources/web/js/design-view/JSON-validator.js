@@ -190,7 +190,7 @@ define(['require', 'log', 'jquery', 'lodash', 'designViewUtils'],
             removeTooltipErrorMessage(annotation.id);
             if (!annotation.connectedElementName) {
                 errorMessage = type + ' annotation does not contain a connected stream';
-                if (annotation.getType() !== undefined) {
+                if (annotation.type) {
                     highlightErrorElement(annotation.id, errorMessage);
                 } else {
                     highlightIncompleteElement(annotation.id, errorMessage)
@@ -200,7 +200,7 @@ define(['require', 'log', 'jquery', 'lodash', 'designViewUtils'],
                 }
                 return false;
             } else {
-                if (annotation.getType() === undefined) {
+                if (!annotation.type) {
                     errorMessage = type + ' annotation form is incomplete'
                     highlightIncompleteElement(annotation.id, errorMessage);
                 }
@@ -219,7 +219,7 @@ define(['require', 'log', 'jquery', 'lodash', 'designViewUtils'],
          */
         JSONValidator.prototype.validateStreamOrTable = function (element, type, doNotShowErrorMessages) {
             var errorMessage;
-            if (!element.getName()) {
+            if (!element.name) {
                 errorMessage = type + ' form is incomplete'
                 highlightIncompleteElement(element.id, errorMessage);
                 return false;
