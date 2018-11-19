@@ -79,7 +79,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.AccessDeniedException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -892,7 +891,7 @@ public class EditorMicroservice implements Microservice {
                 new EditorSiddhiAppRuntimeService(), null);
         serviceRegistration = bundleContext.registerService(EventStreamService.class.getName(),
                 new DebuggerEventStreamService(), null);
-        getSampleFiles();
+        loadSampleFiles();
     }
 
     /**
@@ -949,7 +948,7 @@ public class EditorMicroservice implements Microservice {
         this.configProvider = null;
     }
 
-    protected void getSampleFiles() {
+    protected void loadSampleFiles() {
         String location = (Paths.get(Constants.CARBON_HOME, Constants.DIRECTORY_SAMPLE,
                 Constants.DIRECTORY_ARTIFACTS)).toString();
         String relativePath = "";
