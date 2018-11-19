@@ -26,6 +26,7 @@ import ToolTip from 'react-tooltip';
 import CircleBorder from 'material-ui/svg-icons/av/fiber-manual-record';
 import AuthenticationAPI from '../utils/apis/AuthenticationAPI';
 import AuthManager from '../auth/utils/AuthManager';
+import { FormattedMessage } from 'react-intl';
 
 const styles = {
     gridList: {width: '100%', height: 150, margin: 0},
@@ -82,7 +83,7 @@ export default class DistributedViewAppThumbnail extends React.Component {
     }
 
     componentWillReceiveProps(nextProps) {
-        this.setState({distributedApp: nextProps.distributedApp});
+        this.setState({ distributedApp: nextProps.distributedApp });
     }
 
 
@@ -100,11 +101,11 @@ export default class DistributedViewAppThumbnail extends React.Component {
                             </div>
                             <div style={styles.legendContainer}>
                                 <Typography style={styles.overviewLegend} align={'center'}>
-                                    Groups
+                                    <FormattedMessage id='distributedviewthumbnail.groups' defaultMessage='Groups' />
                                 </Typography>
                             </div>
                             <ToolTip id='groups' aria-haspopup='true' role='example'>
-                                <p>Indicates number of groups in the parent siddhi application</p>
+                                <p><FormattedMessage id='distributedviewthumbnail.numberOfSiddhiApps' defaultMessage='Indicates number of groups in the parent siddhi application' /></p>
                             </ToolTip>
 
                         </GridTile>
@@ -119,14 +120,14 @@ export default class DistributedViewAppThumbnail extends React.Component {
                             </div>
                             <div style={styles.legendContainer}>
                                 <Typography style={styles.overviewLegend} align={'center'}>
-                                    Child Apps
+                                    <FormattedMessage id='distributedviewthumbnail.childApps' defaultMessage='Child Apps' />
                                 </Typography>
                             </div>
                             <ToolTip id='deployedChildApps' aria-haspopup='true' role='example'>
-                                <p>Indicates number of deployed child apps</p>
+                                <p> <FormattedMessage id='distributedviewthumbnail.noOfDeployedChildApps' defaultMessage='Indicates number of deployed child apps' /></p>
                             </ToolTip>
                             <ToolTip id='notDeployedChildApps' aria-haspopup='true' role='example'>
-                                <p>Indicates number of un-deployed child apps</p>
+                                <p> <FormattedMessage id='distributedviewthumbnail.noOfUndeployedChildApps' defaultMessage='Indicates number of un-deployed child apps' /></p>
                             </ToolTip>
                         </GridTile>
                         <GridTile>
@@ -141,15 +142,14 @@ export default class DistributedViewAppThumbnail extends React.Component {
                             </div>
                             <div style={styles.legendContainer}>
                                 <Typography style={styles.overviewLegend} align={'center'}>
-                                    Worker Nodes
+                                    <FormattedMessage id='distributedviewthumbnail.workerNodes' defaultMessage='Worker Nodes' />
                                 </Typography>
                             </div>
                             <ToolTip id='usedWorkerNodes' aria-haspopup='true' role='example'>
-                                <p>Indicates number of worker nodes used in the <br/> particular parent siddhi
-                                    applications deployment</p>
+                                <p><FormattedMessage id='distributedviewthumbnail.tooltip.numberOfNodesIndicator' defaultMessage='Indicates number of worker nodes used in the {br} particular parent siddhi applications deployment ' values={{ br: (<br />) }} /></p>
                             </ToolTip>
                             <ToolTip id='totalWorkerNodes' aria-haspopup='true' role='example'>
-                                <p>Indicates total number of worker nodes in the resource cluster</p>
+                                <p><FormattedMessage id='distributedviewthumbnail.totalNumberOfNodes' defaultMessage='Indicates total number of worker nodes in the resource cluster' /></p>
                             </ToolTip>
                         </GridTile>
                     </GridList>

@@ -19,6 +19,8 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { Link } from 'react-router-dom';
+// Localization
+import { FormattedMessage } from 'react-intl';
 // Material UI Components
 import Typography from 'material-ui/Typography';
 import AppBar from 'material-ui/AppBar';
@@ -38,22 +40,22 @@ import '../../index.css';
  * Styles related to this component
  */
 const styles = {
-    title: {
-        color: '#EEE',
-        fontSize: 16,
-        height: 40,
-        lineHeight: '40px',
-        marginLeft: 15,
-        flex: 1
-    },
-    appBar: {
-        backgroundColor: '#263238',
-        height:40
-    },
-    toolBar: {
-        height: 40,
-        minHeight: '40px'
-    },
+  title: {
+    color: '#EEE',
+    fontSize: 16,
+    height: 40,
+    lineHeight: '40px',
+    marginLeft: 15,
+    flex: 1,
+  },
+  appBar: {
+    backgroundColor: '#263238',
+    height: 40,
+  },
+  toolBar: {
+    height: 40,
+    minHeight: '40px',
+  },
 };
 
 /**
@@ -65,115 +67,124 @@ const appContext = window.contextPath;
  * Represents the Header
  */
 export default class Header extends Component {
-    constructor() {
-        super();
-        this.state = {
-            anchorEl: null,
-        };
+  constructor() {
+    super();
+    this.state = {
+      anchorEl: null,
+    };
+  }
+
+  /**
+   * Renders the right side elements of the header
+   * @returns {HTMLElement}       Div with right side elements of the header
+   */
+  renderRightLinks() {
+    const homeButton = (
+      <Link
+        style={{ textDecoration: 'none' }}
+        to={`${appContext}/businessRulesManager`}
+      >
+        <IconButton color="contrast">
+          <HomeIcon />
+        </IconButton>
+      </Link>
+    );
+
+    if (this.props.hideUserSettings) {
+      return <div />;
     }
 
-    /**
-     * Renders the right side elements of the header
-     * @returns {HTMLElement}       Div with right side elements of the header
-     */
-    renderRightLinks() {
-        const homeButton = (
-            <Link
-                style={{ textDecoration: 'none' }}
-                to={`${appContext}/businessRulesManager`}
-            >
-                <IconButton color="contrast">
-                    <HomeIcon />
-                </IconButton>
-            </Link>
-        );
-
-        if (this.props.hideUserSettings) {
-            return (<div />);
-        }
-        // Show account icon / login button depending on logged in status
-        const user = AuthManager.getUser();
-        if (!user) {
-            if (window.location.pathname === appContext + '/login') {
-                return (<div />);
-            }
-            return (
-                <Link
-                    style={{ textDecoration: 'none' }}
-                    to={`${appContext}/login?referrer=${window.location.pathname}`}
-                >
-                    <Button color="contrast">Login</Button>
-                </Link>
-            );
-        }
-
-        return (
-            <div>
-                <Toolbar>
-                    {!this.props.hideHomeButton ? (homeButton) : (null)}
-                    <Typography type="body1" style={{ color: 'inherit' }}>
-                        {user.username}
-                    </Typography>
-                    <IconButton
-                        aria-owns={open ? 'menu-appbar' : null}
-                        aria-haspopup="true"
-                        onClick={(event) => {
-                            this.setState({ anchorEl: event.currentTarget });
-                        }}
-                        color="contrast"
-                    >
-                        <AccountCircle />
-                    </IconButton>
-                </Toolbar>
-                <Menu
-                    id="menu-appbar"
-                    anchorEl={this.state.anchorEl}
-                    anchorOrigin={{
-                        vertical: 'top',
-                        horizontal: 'right',
-                    }}
-                    transformOrigin={{
-                        vertical: 'top',
-                        horizontal: 'right',
-                    }}
-                    open={this.state.anchorEl !== null}
-                    onRequestClose={() => {
-                        this.setState({ anchorEl: null });
-                    }}
-                >
-                    <Link to={`${appContext}/logout`} style={{ textDecoration: 'none', color: 'black' }}>
-                        <MenuItem>
-                            Log out
-                        </MenuItem>
-                    </Link>
-                </Menu>
-            </div>
-        );
+    // Show account icon / login button depending on logged in status
+    const user = AuthManager.getUser();
+    if (!user) {
+      if (window.location.pathname === `${appContext}/login`) {
+        return <div />;
+      }
+      return (
+        <Link
+          style={{ textDecoration: 'none' }}
+          to={`${appContext}/login?referrer=${window.location.pathname}`}
+        >
+          <Button color="contrast">Login</Button>
+        </Link>
+      );
     }
 
-    render() {
-        return (
-            <AppBar position="static" style={styles.appBar}>
-                <Toolbar style={styles.toolBar}>
-                    <Link to={`${appContext}/businessRulesManager`} style={{ textDecoration: 'none', height: 17 }}>
-                        <img height="17" src={Logo} style={{ cursor: 'pointer' }} />
-                    </Link>
-                    <Typography type="subheading" style={styles.title}>
-                        Business Rules Manager
-                    </Typography>
-                    {this.renderRightLinks()}
-                </Toolbar>
-            </AppBar>
-        );
-    }
+    return (
+      <div>
+          <Toolbar>
+              {!this.props.hideHomeButton ? (homeButton) : (null)}
+              <Typography type="body1" style={{ color: 'inherit' }}>
+                  {user.username}
+              </Typography>
+              <IconButton
+                  aria-owns={open ? 'menu-appbar' : null}
+                  aria-haspopup="true"
+                  onClick={(event) => {
+                      this.setState({ anchorEl: event.currentTarget });
+                  }}
+                  color="contrast"
+              >
+                  <AccountCircle />
+              </IconButton>
+          </Toolbar>
+          <Menu
+              id="menu-appbar"
+              anchorEl={this.state.anchorEl}
+              anchorOrigin={{
+                  vertical: 'top',
+                  horizontal: 'right',
+              }}
+              transformOrigin={{
+                  vertical: 'top',
+                  horizontal: 'right',
+              }}
+              open={this.state.anchorEl !== null}
+              onRequestClose={() => {
+                  this.setState({ anchorEl: null });
+              }}
+          >
+              <Link className="logout-btn" 
+                to={`${appContext}/logout`} 
+                style={{ textDecoration: 'none', color: 'black' }}>
+                  <MenuItem>
+                    <FormattedMessage id="header.logout" defaultMessage="Log out" />
+                  </MenuItem>
+              </Link>
+          </Menu>
+      </div>
+  );
+}
+
+  render() {
+    return (
+      <AppBar position="static" style={styles.appBar}>
+        <Toolbar style={styles.toolBar}>
+          <Link
+            to={`${appContext}/businessRulesManager`}
+            style={{ textDecoration: 'none', height: 17 }}
+          >
+            <img height="17" src={Logo} style={{ cursor: 'pointer' }} />
+          </Link>
+          <Typography type="subheading" style={styles.title}>
+            <FormattedMessage
+              id="header.title"
+              defaultMessage="Business Rules Manager"
+            />
+          </Typography>
+          {this.renderRightLinks()}
+        </Toolbar>
+      </AppBar>
+    );
+  }
 }
 
 Header.propTypes = {
-    hideUserSettings: PropTypes.bool,
-    hideHomeButton: PropTypes.bool,
+  hideUserSettings: PropTypes.bool,
+  hideHomeButton: PropTypes.bool,
 };
 
 Header.defaultProps = {
-    hideUserSettings: false,
-    hideHomeButton: false,
+  hideUserSettings: false,
+  hideHomeButton: false,
 };

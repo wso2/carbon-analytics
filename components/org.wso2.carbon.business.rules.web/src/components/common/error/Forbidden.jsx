@@ -22,9 +22,12 @@ import { Link } from 'react-router-dom';
 import Button from 'material-ui/Button';
 import Typography from 'material-ui/Typography';
 import Paper from 'material-ui/Paper';
+// Localization
+import { FormattedMessage } from 'react-intl';
 // Styles
 import Styles from '../../../style/Styles';
 import '../../../index.css';
+
 
 /**
  * App context
@@ -35,24 +38,30 @@ const appContext = window.contextPath;
  * Represents a Forbidden Error message display
  */
 class Forbidden extends React.Component {
-    render() {
-        return (
-            <Paper style={Styles.messageContainer}>
-                <Typography type="title">
-                    Forbidden
-                </Typography>
-                <Typography type="subheading">
-                    Please login with enough permissions
-                </Typography>
-                <br />
-                <Link to={`${appContext}/logout`} style={{ textDecoration: 'none' }}>
-                    <Button color="primary">
-                        Login
-                    </Button>
-                </Link>
-            </Paper>
-        );
-    }
+  render() {
+    return (
+      <Paper style={Styles.messageContainer}>
+        <Typography type="title">
+          <FormattedMessage
+            id="error.forbidden.title"
+            defaultMessage="Forbidden"
+          />
+        </Typography>
+        <Typography type="subheading">
+          <FormattedMessage
+            id="error.forbidden.subheading"
+            defaultMessage="Please login with enough permissions"
+          />
+        </Typography>
+        <br />
+        <Link to={`${appContext}/logout`} style={{ textDecoration: 'none' }}>
+          <Button color="primary">
+            <FormattedMessage id="login.button" defaultMessage="Login" />
+          </Button>
+        </Link>
+      </Paper>
+    );
+  }
 }
 
 export default Forbidden;

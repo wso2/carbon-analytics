@@ -34,7 +34,9 @@ import OverviewChart from './OverviewChart';
 import AuthenticationAPI from '../utils/apis/AuthenticationAPI';
 import AuthManager from '../auth/utils/AuthManager';
 import Clock from './Clock';
-
+// Localization
+import { FormattedMessage } from 'react-intl';
+import { PropTypes } from 'prop-types'
 const styles = {
     gridList: {width: '100%', height: 150, margin: 0},
     smallIcon: {width: 20, height: 20, zIndex: 1, padding: 5},
@@ -101,14 +103,18 @@ export default class WorkerThumbnail extends React.Component {
             .then((response) => {
                 if (response.status === HttpStatus.OK) {
                     that.setState({open: false});
-                    that.showMessage("Worker '" + this.props.worker.workerId + "' is deleted successfully !!");
+                    that.showMessage(<FormattedMessage id='workerThumbnail.workerDeleted' defaultMessage='Worker {workerId} is deleted successfully !!' values={{ workerId: this.props.worker.workerId }} />);
                     setTimeout(function () {
                         window.location.href = window.contextPath;
                     }, 1000)
                 }
                 else {
                     that.setState({open: false});
-                    that.showError("Worker '" + this.props.worker.workerId + "' is not deleted successfully !!");
+                    that.showErrorthis.context.intl.formatMessage({
+                        id: 'workerThumbnail.workerNotDeleted',
+                        defaultMessage: 'Worker {workerId} is not deleted successfully !!',
+                        values: { workerId: this.props.worker.workerId }
+                    });
                 }
             });
 
@@ -134,7 +140,7 @@ export default class WorkerThumbnail extends React.Component {
     renderDeleteWorker() {
         if (this.state.hasPermission) {
             return (
-                <Tooltip id="tooltip-icon" title="Delete Worker">
+                <Tooltip id="tooltip-icon" title={<FormattedMessage id='workerThumbnail.deleteWorker' defaultMessage='Delete Worker' />}>
                     <IconButton className={'btn-delete'} iconStyle={styles.smallIcon}
                                 style={{zIndex: 1}} onClick={() => {
                         this.setState({open: true})
@@ -153,8 +159,8 @@ export default class WorkerThumbnail extends React.Component {
             if (this.props.worker.statusMessage == null) {
                 gridTiles = <div>
                     <GridList cols={1} cellHeight={98} style={styles.gridList}>
-                        <h2 style={{textAlign: 'center', color: '#dedede', padding: 0, margin: 12}}>
-                            Worker is not reachable!</h2>
+                        <h2 style={{ textAlign: 'center', color: '#dedede', padding: 0, margin: 12 }}>
+                            <FormattedMessage id='workerThumbnail.workerNotReachable' defaultMessage='Worker is not reachable!' /></h2>
                     </GridList>
                 </div>;
                 lastUpdated = "N/A";
@@ -162,8 +168,8 @@ export default class WorkerThumbnail extends React.Component {
             } else {
                 gridTiles = <div>
                     <GridList cols={1} cellHeight={98} style={styles.gridList}>
-                        <h2 style={{textAlign: 'center', color: '#dedede', padding: 0, margin: 12}}>
-                            Worker is not reachable!
+                        <h2 style={{ textAlign: 'center', color: '#dedede', padding: 0, margin: 12 }}>
+                            <FormattedMessage id='workerThumbnail.workerNotReachable' defaultMessage='Worker is not reachable!' />
                             <br/>
                             <text style={{textAlign: 'center', fontSize: 12, color: '#dedede'}}>
                                 {this.props.worker.statusMessage}
@@ -182,23 +188,31 @@ export default class WorkerThumbnail extends React.Component {
                     <GridList cols={2} cellHeight={98} style={styles.gridList}>
                         <GridTile>
                             <div style={{height: '100%', display: 'flex', alignItems: 'center'}}>
-                                <h4 style={{
-                                    textAlign: 'center',
-                                    color: '#dedede',
-                                    padding: 0,
-                                    margin: '0 20px'
-                                }}>{this.props.worker.statusMessage}</h4>
+                                <Tooltip title="To enable metrics, set the enabled property to true under wso2.metrics
+                                in the < SP_HOME>/conf/worker/deployment.yaml  file. ">
+                                    <h4 style={{
+                                        textAlign: 'center',
+                                        color: '#dedede',
+                                        padding: 0,
+                                        margin: '0 20px',
+                                        width: '100%'
+                                    }}>{this.props.worker.statusMessage}</h4>
+                                </Tooltip>
                             </div>
                         </GridTile>
                         <GridTile>
                             <div className="grid-tile-h1" style={{marginTop: 30}}>
-                                <h1 className="active-apps">
-                                    {this.props.worker.serverDetails.siddhiAppStatus.activeAppCount}
-                                </h1>
+                                <Tooltip title="Active Apps">
+                                    <h1 className="active-apps">
+                                        {this.props.worker.serverDetails.siddhiAppStatus.activeAppCount}
+                                    </h1>
+                                </Tooltip>
                                 <h1 style={{display: 'inline'}}> | </h1>
-                                <h1 className="inactive-apps">
-                                    {this.props.worker.serverDetails.siddhiAppStatus.inactiveAppCount}
-                                </h1>
+                                <Tooltip title="Inactive Apps">
+                                    <h1 className="inactive-apps">
+                                        {this.props.worker.serverDetails.siddhiAppStatus.inactiveAppCount}
+                                    </h1>
+                                </Tooltip>
                             </div>
                             <div style={styles.legendContainer}>
                                 <Typography style={styles.overviewLegend} align={'center'}>
@@ -269,7 +283,7 @@ export default class WorkerThumbnail extends React.Component {
             localStorage.setItem(constants.load, this.props.worker.serverDetails.workerMetrics.loadAverage);
 
             if (this.props.worker.serverDetails.osName === "windows") {
-                loadAvg = <h4 style={{margin: 0}}>N/A in Windows</h4>;
+                loadAvg = <h4 style={{ margin: 0 }}><FormattedMessage id='workerThumbnail.naInWindows' defaultMessage='N/A in Windows' /></h4>;
                 loadTrendImg = <div/>;
             } else {
                 loadAvg = <h1 style={{margin: 0}}>
@@ -327,12 +341,17 @@ export default class WorkerThumbnail extends React.Component {
 
                             <GridTile>
                                 <div className="grid-tile-h1" style={{marginTop: 30}}>
-                                    <h1 className="active-apps">
-                                        {this.props.worker.serverDetails.siddhiAppStatus.activeAppCount}</h1>
+                                    <Tooltip title="Active Apps">
+                                        <h1 className="active-apps">
+                                            {this.props.worker.serverDetails.siddhiAppStatus.activeAppCount}
+                                        </h1>
+                                    </Tooltip>
                                     <h1 style={{display: 'inline'}}> | </h1>
-                                    <h1 className="inactive-apps">
-                                        {this.props.worker.serverDetails.siddhiAppStatus.inactiveAppCount}
-                                    </h1>
+                                    <Tooltip title="Inactive Apps">
+                                        <h1 className="inactive-apps">
+                                            {this.props.worker.serverDetails.siddhiAppStatus.inactiveAppCount}
+                                        </h1>
+                                    </Tooltip>
                                 </div>
                                 <div style={styles.legendContainer}>
                                     <Typography style={styles.overviewLegend} align={'center'}>
@@ -374,26 +393,26 @@ export default class WorkerThumbnail extends React.Component {
                 variant="raised"
                 className="btn-primary"
                 onClick={this.deleteWorker}
-            >Yes</Button>,
+            ><FormattedMessage id='yes' defaultMessage='Yes' /></Button>,
             <Button
                 onClick={() => {
                     this.setState({open: false})
                 }}
                 className="btn-default"
-            >NO</Button>,
+            ><FormattedMessage id='no' defaultMessage='NO' /></Button>,
         ];
         let titleBg = items[2] === 'red' ? '#570404' : '#424242';
         return (
             <div>
                 <Dialog
-                    title="Confirmation"
+                    title='Confirmation'
                     actions={actionsButtons}
                     modal={true}
                     open={this.state.open}
                     onRequestClose={() => {
                         this.setState({open: false})
                     }}>
-                    {"Do you want to delete worker '" + this.state.workerID + "' ?"}
+                    {<FormattedMessage id='workerThumbnail.delteConfirm' defaultMessage='Do you want to delete worker {workerID} ?' values={{ workerID: this.state.workerID }} />}
                 </Dialog>
 
                 <GridTile style={{background: 'black',marginBottom:'30px'}}>
@@ -407,8 +426,8 @@ export default class WorkerThumbnail extends React.Component {
                             <Typography className={'node-title'}>
                                 {this.state.workerID}</Typography>
                             <Typography className={'node-last-update'}>
-                                <span>Last Updated: {this.renderTime(items[1])}
-                                    <div style={{float: 'right', display: 'inline'}}><strong>{items[3]}</strong>
+                                <span><FormattedMessage id='workerThumbnail.lastUpdated' defaultMessage='Last Updated:' /> {this.renderTime(items[1])}
+                                    <div style={{ float: 'right', display: 'inline' }}><strong>{items[3]}</strong>
                                     </div>
                                 </span>
                             </Typography>
@@ -430,4 +449,8 @@ export default class WorkerThumbnail extends React.Component {
             </div>
         );
     }
+}
+
+WorkerThumbnail.contextTypes = {
+    intl: PropTypes.object.isRequired
 }

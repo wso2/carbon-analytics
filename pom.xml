@@ -27,7 +27,7 @@
     <groupId>org.wso2.carbon.analytics</groupId>
     <artifactId>org.wso2.carbon.analytics.parent</artifactId>
     <packaging>pom</packaging>
-    <version>2.0.427-SNAPSHOT</version>
+    <version>2.0.446-SNAPSHOT</version>
     <name>WSO2 Carbon Analytics - Parent</name>
     <modules>
         <module>components/org.wso2.carbon.stream.processor.common</module>
@@ -901,7 +901,6 @@
                 <type>zip</type>
             </dependency>
 
-
             <!-- Siddhi Editor related -->
             <dependency>
                 <groupId>org.wso2.carbon.analytics</groupId>
@@ -938,7 +937,6 @@
                 <version>${carbon.analytics.version}</version>
                 <type>zip</type>
             </dependency>
-
 
             <!--siddhi dependencies start-->
 
@@ -1505,15 +1503,43 @@
                 <artifactId>org.wso2.carbon.databridge.commons</artifactId>
                 <version>${carbon.analytics-common.version}</version>
             </dependency>
+
+            <!-- jms test case dependencies-->
+            <dependency>
+                <groupId>org.wso2.andes.wso2</groupId>
+                <artifactId>andes-client</artifactId>
+                <version>${andes.client.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.wso2.extension.siddhi.io.jms</groupId>
+                <artifactId>siddhi-io-jms</artifactId>
+                <version>${siddhi.io.jms.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>commons-lang</groupId>
+                <artifactId>commons-lang</artifactId>
+                <version>${commons.lang.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.geronimo.specs</groupId>
+                <artifactId>geronimo-jms_1.1_spec</artifactId>
+                <version>${org.apache.geronimo.specs.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.fusesource.hawtbuf</groupId>
+                <artifactId>hawtbuf</artifactId>
+                <version>${org.fusesource.hawtbuf.version}</version>
+            </dependency>
+
         </dependencies>
     </dependencyManagement>
 
     <properties>
-        <carbon.analytics.version>2.0.427-SNAPSHOT</carbon.analytics.version>
-        <siddhi.version>4.2.21</siddhi.version>
-        <siddhi.bundle.version>4.2.21</siddhi.bundle.version>
+        <carbon.analytics.version>2.0.446-SNAPSHOT</carbon.analytics.version>
+        <siddhi.version>4.2.33</siddhi.version>
+        <siddhi.bundle.version>4.2.33</siddhi.bundle.version>
         <siddhi.version.range>[4.0.0, 5.0.0)</siddhi.version.range>
-        <carbon.analytics-common.version>6.0.70</carbon.analytics-common.version>
+        <carbon.analytics-common.version>6.0.71</carbon.analytics-common.version>
         <carbon.analytics-common.version.range>[6.0.66, 6.1.0)</carbon.analytics-common.version.range>
         <carbon.analytics.version.range>[2.0.0, 3.0.0)</carbon.analytics.version.range>
 
@@ -1741,5 +1767,12 @@
         <ojdbc6.version>12.1.0.1-atlassian-hosted</ojdbc6.version>
 
         <open.tracing.version>0.31.0</open.tracing.version>
+
+        <!-- jms test dependencies version-->
+        <siddhi.io.jms.version>1.0.31</siddhi.io.jms.version>
+        <andes.client.version>4.0.0</andes.client.version>
+        <commons.lang.version>2.6</commons.lang.version>
+        <org.apache.geronimo.specs.version>1.1.1</org.apache.geronimo.specs.version>
+        <org.fusesource.hawtbuf.version>1.11</org.fusesource.hawtbuf.version>
     </properties>
 </project>

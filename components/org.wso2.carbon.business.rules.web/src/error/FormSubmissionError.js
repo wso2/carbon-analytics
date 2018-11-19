@@ -20,20 +20,20 @@
  * The Error which is thrown when a Form for a business rule is submitted with erroneous properties
  */
 export default class FormSubmissionError extends Error {
-    /**
+  /**
      * Constructs a FormSubmissionError with the given states of the fields after the error,
      * and the remaining params including the message
      * @param {object} fieldErrorStates     Object containing States of the form fields after the error
      * @param {params} params               Rest of the params, including the error message
      */
-    constructor(fieldErrorStates, ...params) {
-        // Pass remaining arguments to the parent constructor
-        super(...params);
+  constructor(fieldErrorStates, ...params) {
+    // Pass remaining arguments to the parent constructor
+    super(...params);
 
-        // Maintains proper stack trace for where this error was thrown
-        if (Error.captureStackTrace) {
-            Error.captureStackTrace(this, FormSubmissionError);
-        }
-        this.fieldErrorStates = fieldErrorStates;
+    // Maintains proper stack trace for where this error was thrown
+    if (Error.captureStackTrace) {
+      Error.captureStackTrace(this, FormSubmissionError);
     }
+    this.fieldErrorStates = fieldErrorStates;
+  }
 }

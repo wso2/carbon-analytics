@@ -20,6 +20,8 @@ import React, { Component } from 'react';
 // Material UI Components
 import Typography from 'material-ui/Typography';
 import Grid from 'material-ui/Grid';
+// Localization
+import { FormattedMessage } from 'react-intl';
 // App Components
 import Header from '../../common/Header';
 import ModeButton from './ModeButton';
@@ -33,54 +35,75 @@ import '../../../index.css';
  * Represents the page that allows to select a mode for creating a business rule
  */
 export default class ModeSelector extends Component {
-    /**
-     * Displays content of the page
-     * @returns {HTMLElement}       Content of the page
-     */
-    displayContent() {
-        return (
-            <div>
-                <center>
-                    <Typography type="headline">
-                        Choose an option
-                    </Typography>
-                    <br />
-                    <br />
-                    <Grid container style={Styles.grid.root}>
-                        <Grid item xs={12}>
-                            <Grid container justify="center" spacing={40}>
-                                <Grid item>
-                                    <ModeButton
-                                        mode={BusinessRulesConstants.BUSINESS_RULE_TYPE_TEMPLATE}
-                                        title="From Template"
-                                        description="Create a business rule based on an existing template"
-                                    />
-                                </Grid>
-                                <Grid item>
-                                    <ModeButton
-                                        mode={BusinessRulesConstants.BUSINESS_RULE_TYPE_SCRATCH}
-                                        title="From Scratch"
-                                        description={
-                                            'Create a business rules with templates for input & output, ' +
-                                            'and customized filters'}
-                                    />
-                                </Grid>
-                            </Grid>
-                        </Grid>
-                    </Grid>
-                </center>
-            </div>
-        );
-    }
+  /**
+   * Displays content of the page
+   * @returns {HTMLElement}       Content of the page
+   */
+  displayContent() {
+    return (
+      <div>
+        <center>
+          <Typography type="headline">
+            <FormattedMessage
+              id="model.selector.chooseOption"
+              defaultMessage="Choose an option"
+            />
+          </Typography>
+          <br />
+          <br />
+          <Grid container style={Styles.grid.root}>
+            <Grid item xs={12}>
+              <Grid container justify="center" spacing={40}>
+                <Grid item>
+                  <ModeButton
+                    mode={BusinessRulesConstants.BUSINESS_RULE_TYPE_TEMPLATE}
+                    title={(
+                      <FormattedMessage
+                        id="model.selector.fromTemplate"
+                        defaultMessage="From Template"
+                      />
+                    )}
+                    description={(
+                      <FormattedMessage
+                        id="model.selector.descriptionForExisting"
+                        defaultMessage="Create a business rule based on an existing template"
+                      />
+                    )}
+                  />
+                </Grid>
+                <Grid item>
+                  <ModeButton
+                    mode={BusinessRulesConstants.BUSINESS_RULE_TYPE_SCRATCH}
+                    title={(
+                      <FormattedMessage
+                        id="model.selector.fromScratch"
+                        defaultMessage="From Scratch"
+                      />
+                    )}
+                    description={(
+                      <FormattedMessage
+                        id="model.selector.descriptionForScratch"
+                        defaultMessage="Create a business rules with templates for input & output,and customized filters"
+                      />
+                    )}
+                  />
+                </Grid>
+              </Grid>
+            </Grid>
+          </Grid>
+        </center>
+      </div>
+    );
+  }
 
-    render() {
-        return (
-            <div>
-                <Header />
-                <br />
-                <br />
-                {this.displayContent()}
-            </div>
-        );
-    }
+  render() {
+    return (
+      <div>
+        <Header />
+        <br />
+        <br />
+        {this.displayContent()}
+      </div>
+    );
+  }
 }

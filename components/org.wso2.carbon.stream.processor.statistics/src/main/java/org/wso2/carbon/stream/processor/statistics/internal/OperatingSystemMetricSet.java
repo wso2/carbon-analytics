@@ -130,10 +130,10 @@ public class OperatingSystemMetricSet {
                             " metrics. ", e);
                 }
             } else {
-                throw new MetricsConfigException("JMX reporter has been disabled at WSO2 carbon metrics.");
+                throw new MetricsConfigException("JMX reporter has been disabled at WSO2 metrics.");
             }
         } else {
-            throw new MetricsConfigException("WSO2 Carbon metrics is not enabled.");
+            throw new MetricsConfigException("Metrics are disabled.");
         }
 
         WorkerMetrics workerMetrics = new WorkerMetrics();
@@ -215,7 +215,7 @@ public class OperatingSystemMetricSet {
             StreamProcessorStatisticDataHolder.getInstance().getSiddhiAppRuntimeService()
                     .enableSiddhiAppStatistics(false);
         } else {
-            LOGGER.warn("Wso2 Carbon metrics is already disabled.");
+            LOGGER.warn("Wso2 metrics is already disabled.");
         }
     }
 
@@ -237,7 +237,7 @@ public class OperatingSystemMetricSet {
             StreamProcessorStatisticDataHolder.getInstance().getSiddhiAppRuntimeService()
                     .enableSiddhiAppStatistics(true);
         } else {
-            LOGGER.warn("Wso2 Carbon metrics is already enabled.");
+            LOGGER.warn("Wso2 metrics is already enabled.");
         }
     }
 }

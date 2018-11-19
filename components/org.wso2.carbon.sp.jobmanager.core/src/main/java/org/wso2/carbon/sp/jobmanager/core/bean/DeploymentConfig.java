@@ -20,8 +20,11 @@ package org.wso2.carbon.sp.jobmanager.core.bean;
 
 import org.wso2.carbon.config.annotation.Configuration;
 import org.wso2.carbon.config.annotation.Element;
+import org.wso2.carbon.database.query.manager.config.Queries;
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * This class represents the deployment configuration for distributed deployment.
@@ -50,6 +53,28 @@ public class DeploymentConfig implements Serializable {
     private String zooKeeperURLs;
     @Element(description = "ZooKeeper configurations", required = true)
     private ZooKeeperConfig zooKeeperConfig;
+    @Element(description = "JMS Factory initial configuration", required = true)
+    private String factoryInitial;
+    @Element(description = "provider url configuration for siddhi-jms-io")
+    private String providerUrl;
+    @Element(description = "Database queries template array list.")
+    private List<Queries> queries = new ArrayList<>();
+
+    public String getProviderUrl() {
+        return providerUrl;
+    }
+
+    public void setProviderUrl(String providerUrl) {
+        this.providerUrl = providerUrl;
+    }
+
+    public String getFactoryInitial() {
+        return factoryInitial;
+    }
+
+    public void setFactoryInitial(String factoryInitial) {
+        this.factoryInitial = factoryInitial;
+    }
 
     public String getType() {
         return type;
@@ -130,4 +155,13 @@ public class DeploymentConfig implements Serializable {
     public void setAllocationAlgorithm(String allocationAlgorithm) {
         this.allocationAlgorithm = allocationAlgorithm;
     }
+
+    public List<Queries> getQueries() {
+        return queries;
+    }
+
+    public void setQueries(List<Queries> queries) {
+        this.queries = queries;
+    }
+
 }

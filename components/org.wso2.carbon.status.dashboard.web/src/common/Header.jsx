@@ -25,6 +25,7 @@ import AccountCircle from 'material-ui/svg-icons/action/account-circle';
 // App Components
 import AuthManager from '../auth/utils/AuthManager';
 import Logo from '../images/wso2-logo.svg';
+import { FormattedMessage } from 'react-intl';
 
 const title = {color: '#EEE', fontSize: 16, height: 40, lineHeight: '40px'};
 const appBar = {backgroundColor: '#263238', height:40, display:'flex', alignItems:'center'};
@@ -51,7 +52,7 @@ export default class Header extends Component {
         if (!user) {
             return (
                 <FlatButton
-                    label="Login"
+                    label={<FormattedMessage id='header.login' defaultMessage='Login' />}
                     containerElement={<Link to={`${window.contextPath}/login?referrer=${window.location.pathname}`}/>}
                 />
             );
@@ -66,7 +67,7 @@ export default class Header extends Component {
                     anchorOrigin={{horizontal: 'right', vertical: 'top'}}
                 >
                     <MenuItem
-                        primaryText="Logout"
+                        primaryText={<FormattedMessage id='logout' defaultMessage='Logout' />}
                         containerElement={<Link to={`${window.contextPath}/logout`}/>}
                     />
                 </IconMenu>
@@ -83,7 +84,7 @@ export default class Header extends Component {
         return (
             <AppBar
                 style={appBar}
-                title="Stream Processor Status Dashboard"
+                title={<FormattedMessage id='header.title' defaultMessage='Stream Processor Status Dashboard' />}
                 iconElementLeft={<img height='17' src={Logo}/>}
                 titleStyle={title}
                 iconStyleLeft={logoStyle}

@@ -20,26 +20,35 @@ import React from 'react';
 // Material UI Components
 import Typography from 'material-ui/Typography';
 import Paper from 'material-ui/Paper';
+// Localization
+import { FormattedMessage } from 'react-intl';
 // Styles
 import Styles from '../../../style/Styles';
 import '../../../index.css';
+
 
 /**
  * Represents an Internal Server Error message display
  */
 class InternalServerError extends React.Component {
-    render() {
-        return (
-            <Paper style={Styles.messageContainer}>
-                <Typography type="title">
-                    Internal Server Error
-                </Typography>
-                <Typography type="subheading">
-                    The server has failed to process your request
-                </Typography>
-            </Paper>
-        );
-    }
+  render() {
+    return (
+      <Paper style={Styles.messageContainer}>
+        <Typography type="title">
+          <FormattedMessage
+            id="error.server.title"
+            defaultMessage="Internal Server Error"
+          />
+        </Typography>
+        <Typography type="subheading">
+          <FormattedMessage
+            id="error.server.subheading"
+            defaultMessage="The server has failed to process your request"
+          />
+        </Typography>
+      </Paper>
+    );
+  }
 }
 
 export default InternalServerError;

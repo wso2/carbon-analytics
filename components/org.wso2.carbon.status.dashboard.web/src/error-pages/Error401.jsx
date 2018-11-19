@@ -24,6 +24,7 @@ import darkBaseTheme from 'material-ui/styles/baseThemes/darkBaseTheme';
 import getMuiTheme from 'material-ui/styles/getMuiTheme';
 import {RaisedButton} from 'material-ui';
 import {Link} from 'react-router-dom';
+import { FormattedMessage } from 'react-intl';
 
 const muiTheme = getMuiTheme(darkBaseTheme);
 const buttonStyle = {marginLeft: 60, width: 100, fontSize: '12px', backgroundColor: '#f17b31'};
@@ -50,11 +51,11 @@ class Error401 extends Component {
             <Header/>
             <div style={errorContainerStyles}>
                 <i class="fw fw-security fw-inverse fw-5x"></i>
-                <h1 style={errorTitleStyles}>Unauthorized!</h1>
-                <h1 style={errorMessageStyles}>You are not authorized to access this page.<br/> Please retry with login.
+                <h1 style={errorTitleStyles}><FormattedMessage id='error.401.unauthorized' defaultMessage='Unauthorized!' /></h1>
+                <h1 style={errorMessageStyles}><FormattedMessage id='error.401.desciption' defaultMessage='You are not authorized to access this page.{br}Please retry with login.' values={{br:(<br/>)}} />
                 </h1>
                 <Link to={`${window.contextPath}/logout`}>
-                    <RaisedButton backgroundColor='#f17b31' style={buttonStyle} label="Back"/>
+                    <RaisedButton backgroundColor='#f17b31' style={buttonStyle} label={<FormattedMessage id='error.401.back' defaultMessage='Back' />} />
                 </Link>
             </div>
         </MuiThemeProvider>;

@@ -30,6 +30,8 @@ import { MenuItem } from 'material-ui/Menu';
 import { IconButton } from 'material-ui';
 import Paper from 'material-ui/Paper';
 import Typography from 'material-ui/Typography';
+// Localization
+import { FormattedMessage } from 'react-intl';
 // App Components
 import AutoCompleteProperty from './filtercomponent/AutoCompleteProperty';
 // App Utils
@@ -45,178 +47,244 @@ import '../../../../../index.css';
  * Represents the Output Component of the business rule from scratch form
  */
 export default class OutputComponent extends Component {
-    constructor() {
-        super();
-        this.state = {
-            value: '',
-            suggestions: [],
-        };
-    }
+  constructor() {
+    super();
+    this.state = {
+      value: '',
+      suggestions: [],
+    };
+  }
 
-    /**
-     * Displays Rule Template selection
-     * @returns {Component}     Select Component
-     */
-    displayRuleTemplateSelection() {
-        return (
-            <FormControl
-                disabled={this.props.mode === BusinessRulesConstants.BUSINESS_RULE_FORM_MODE_VIEW}
+  /**
+   * Displays Rule Template selection
+   * @returns {Component}     Select Component
+   */
+  displayRuleTemplateSelection() {
+    return (
+      <FormControl
+        disabled={
+          this.props.mode
+          === BusinessRulesConstants.BUSINESS_RULE_FORM_MODE_VIEW
+        }
+      >
+        <InputLabel htmlFor="inputRuleTemplate">
+          <FormattedMessage
+            id="component.output.ruleTemplate"
+            defaultMessage="Rule Template"
+          />
+        </InputLabel>
+        <Select
+          value={
+            !BusinessRulesUtilityFunctions.isEmpty(
+              this.props.selectedOutputRuleTemplate,
+            )
+              ? this.props.selectedOutputRuleTemplate.uuid
+              : ''
+          }
+          onChange={e => this.props.handleOutputRuleTemplateSelected(e)}
+          input={<Input id="inputRuleTemplate" />}
+        >
+          {this.props.outputRuleTemplates.map(outputRuleTemplate => (
+            <MenuItem
+              key={outputRuleTemplate.uuid}
+              value={outputRuleTemplate.uuid}
             >
-                <InputLabel htmlFor="inputRuleTemplate">Rule Template</InputLabel>
-                <Select
-                    value={(!BusinessRulesUtilityFunctions.isEmpty(this.props.selectedOutputRuleTemplate)) ?
-                        this.props.selectedOutputRuleTemplate.uuid : ''
-                    }
-                    onChange={e => this.props.handleOutputRuleTemplateSelected(e)}
-                    input={<Input id="inputRuleTemplate" />}
-                >
-                    {this.props.outputRuleTemplates.map(outputRuleTemplate =>
-                        (<MenuItem key={outputRuleTemplate.uuid} value={outputRuleTemplate.uuid}>
-                            {outputRuleTemplate.name}
-                        </MenuItem>))}
-                </Select>
-                <FormHelperText>
-                    {(!BusinessRulesUtilityFunctions.isEmpty(this.props.selectedOutputRuleTemplate)) ?
-                        this.props.selectedOutputRuleTemplate.description :
-                        (BusinessRulesMessages.SELECT_RULE_TEMPLATE)
-                    }
-                </FormHelperText>
-            </FormControl>
-        );
+              {outputRuleTemplate.name}
+            </MenuItem>
+          ))}
+        </Select>
+        <FormHelperText>
+          {!BusinessRulesUtilityFunctions.isEmpty(
+            this.props.selectedOutputRuleTemplate,
+          )
+            ? this.props.selectedOutputRuleTemplate.description
+            : BusinessRulesMessages.SELECT_RULE_TEMPLATE}
+        </FormHelperText>
+      </FormControl>
+    );
+  }
+
+  /**
+   * Returns output property configurations
+   * @returns {HTMLElement}       Property Components
+   */
+  displayProperties() {
+    if (
+      !BusinessRulesUtilityFunctions.isEmpty(
+        this.props.selectedOutputRuleTemplate,
+      )
+    ) {
+      return (
+        <div>
+          <Typography type="subheading">
+            <FormattedMessage
+              id="component.output.configurations"
+              defaultMessage="Configurations"
+            />
+          </Typography>
+          {this.props.getPropertyComponents(
+            BusinessRulesConstants.OUTPUT_DATA_KEY,
+            this.props.mode,
+          )}
+        </div>
+      );
     }
+    return null;
+  }
 
-    /**
-     * Returns output property configurations
-     * @returns {HTMLElement}       Property Components
-     */
-    displayProperties() {
-        if (!BusinessRulesUtilityFunctions.isEmpty(this.props.selectedOutputRuleTemplate)) {
-            return (
-                <div>
-                    <Typography type="subheading">
-                        Configurations
-                    </Typography>
-                    {this.props.getPropertyComponents(BusinessRulesConstants.OUTPUT_DATA_KEY, this.props.mode)}
-                </div>
-            );
-        }
-        return null;
-    }
+  /**
+   * Returns output mapping configurations
+   * @returns {HTMLElement}       Components for Output mapping
+   */
+  displayOutputMappings() {
+    if (
+      !BusinessRulesUtilityFunctions.isEmpty(
+        this.props.selectedOutputRuleTemplate,
+      )
+      && !BusinessRulesUtilityFunctions.isEmpty(
+        this.props.selectedInputRuleTemplate,
+      )
+    ) {
+      const exposedOutputStreamFieldNames = this.props.getFieldNames(
+        this.props.selectedOutputRuleTemplate.templates[0]
+          .exposedStreamDefinition,
+      );
 
-    /**
-     * Returns output mapping configurations
-     * @returns {HTMLElement}       Components for Output mapping
-     */
-    displayOutputMappings() {
-        if (!BusinessRulesUtilityFunctions.isEmpty(this.props.selectedOutputRuleTemplate) &&
-            !BusinessRulesUtilityFunctions.isEmpty(this.props.selectedInputRuleTemplate)) {
-            const exposedOutputStreamFieldNames =
-                this.props.getFieldNames(
-                    this.props.selectedOutputRuleTemplate.templates[0].exposedStreamDefinition);
-
-            return (
-                <div>
-                    <Typography type="subheading">
-                        Mappings
-                    </Typography>
-                    <br />
-                    <div style={{ width: '100%' }}>
-                        <div style={{ float: 'left', width: '40%', height: 30 }}>
-                            <Typography type="caption">Input</Typography>
-                        </div>
-                        <div style={{ float: 'left', width: '20%', height: 30 }}>
-                            <Typography />
-                        </div>
-                        <div style={{ float: 'left', width: '40%', height: 30 }}>
-                            <Typography type="caption">Output</Typography>
-                        </div>
-                        {exposedOutputStreamFieldNames.map(fieldName =>
-                            (<div key={fieldName} style={{ width: '100%' }}>
-                                <AutoCompleteProperty
-                                    elements={this.props.inputStreamFields}
-                                    disabled={this.props.mode === BusinessRulesConstants.BUSINESS_RULE_FORM_MODE_VIEW}
-                                    error={
-                                        !BusinessRulesUtilityFunctions.isEmpty(this.props.mappingErrorStates) ?
-                                            this.props.mappingErrorStates[fieldName] : false
-                                    }
-                                    value={this.props.businessRuleProperties.outputMappings[fieldName] || ''}
-                                    onChange={v => this.props.handleOutputMappingChange(v, fieldName)}
-                                />
-                                <div style={{ float: 'left', width: '20%', height: 70 }}>
-                                    <center>
-                                        <Typography type="subheading">As</Typography>
-                                    </center>
-                                </div>
-                                <div style={{ float: 'left', width: '40%', height: 70 }}>
-                                    <Typography type="subheading">{fieldName}</Typography>
-                                </div>
-                            </div>))}
-                    </div>
-                </div>
-            );
-        }
-        return null;
-    }
-
-    render() {
-        return (
-            <div>
-                <AppBar position="static" color="default">
-                    <Toolbar>
-                        <Typography
-                            type="subheading"
-                            style={this.props.isErroneous ?
-                                Styles.businessRuleForm.fromScratch.component.erroneousTitle : {}}
-                        >
-                            Output
-                        </Typography>
-                        <IconButton
-                            onClick={() => this.props.toggleExpansion()}
-                        >
-                            <ExpandMoreIcon />
-                        </IconButton>
-                    </Toolbar>
-                </AppBar>
-                <Paper>
-                    <Collapse in={this.props.isExpanded} transitionDuration="auto" unmountOnExit>
-                        <div style={Styles.businessRuleForm.fromScratch.component.contentContainer}>
-                            <br />
-                            <center>
-                                {this.displayRuleTemplateSelection()}
-                            </center>
-                            <br />
-                            <br />
-                            <br />
-                            {this.displayProperties()}
-                            <br />
-                            <br />
-                            {this.displayOutputMappings()}
-                            <br />
-                        </div>
-                    </Collapse>
-                </Paper>
+      return (
+        <div>
+          <Typography type="subheading">
+            <FormattedMessage
+              id="component.output.mappings"
+              defaultMessage="Mappings"
+            />
+          </Typography>
+          <br />
+          <div style={{ width: '100%' }}>
+            <div style={{ float: 'left', width: '40%', height: 30 }}>
+              <Typography type="caption">
+                <FormattedMessage
+                  id="component.output.input"
+                  defaultMessage="Input"
+                />
+              </Typography>
             </div>
-        );
+            <div style={{ float: 'left', width: '20%', height: 30 }}>
+              <Typography />
+            </div>
+            <div style={{ float: 'left', width: '40%', height: 30 }}>
+              <Typography type="caption">
+                <FormattedMessage
+                  id="component.output"
+                  defaultMessage="Output"
+                />
+              </Typography>
+            </div>
+            {exposedOutputStreamFieldNames.map(fieldName => (
+              <div key={fieldName} style={{ width: '100%' }}>
+                <AutoCompleteProperty
+                  elements={this.props.inputStreamFields}
+                  disabled={
+                    this.props.mode
+                    === BusinessRulesConstants.BUSINESS_RULE_FORM_MODE_VIEW
+                  }
+                  error={
+                    !BusinessRulesUtilityFunctions.isEmpty(
+                      this.props.mappingErrorStates,
+                    )
+                      ? this.props.mappingErrorStates[fieldName]
+                      : false
+                  }
+                  value={
+                    this.props.businessRuleProperties.outputMappings[
+                    fieldName
+                    ] || ''
+                  }
+                  onChange={v => this.props.handleOutputMappingChange(v, fieldName)
+                  }
+                />
+                <div style={{ float: 'left', width: '20%', height: 70 }}>
+                  <center>
+                    <Typography type="subheading">As</Typography>
+                  </center>
+                </div>
+                <div style={{ float: 'left', width: '40%', height: 70 }}>
+                  <Typography type="subheading">{fieldName}</Typography>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      );
     }
+    return null;
+  }
+
+  render() {
+    return (
+      <div>
+        <AppBar position="static" color="default">
+          <Toolbar>
+            <Typography
+              type="subheading"
+              style={
+                this.props.isErroneous
+                  ? Styles.businessRuleForm.fromScratch.component.erroneousTitle
+                  : {}
+              }
+            >
+              <FormattedMessage id="component.output" defaultMessage="Output" />
+            </Typography>
+            <IconButton onClick={() => this.props.toggleExpansion()}>
+              <ExpandMoreIcon />
+            </IconButton>
+          </Toolbar>
+        </AppBar>
+        <Paper>
+          <Collapse
+            in={this.props.isExpanded}
+            transitionDuration="auto"
+            unmountOnExit
+          >
+            <div
+              style={
+                Styles.businessRuleForm.fromScratch.component.contentContainer
+              }
+            >
+              <br />
+              <center>{this.displayRuleTemplateSelection()}</center>
+              <br />
+              <br />
+              <br />
+              {this.displayProperties()}
+              <br />
+              <br />
+              {this.displayOutputMappings()}
+              <br />
+            </div>
+          </Collapse>
+        </Paper>
+      </div>
+    );
+  }
 }
 
 OutputComponent.propTypes = {
-    getFieldNames: PropTypes.func.isRequired,
-    selectedInputRuleTemplate: PropTypes.object.isRequired,
-    mode: PropTypes.oneOf([
-        BusinessRulesConstants.BUSINESS_RULE_FORM_MODE_CREATE,
-        BusinessRulesConstants.BUSINESS_RULE_FORM_MODE_EDIT,
-        BusinessRulesConstants.BUSINESS_RULE_FORM_MODE_VIEW,
-    ]).isRequired,
-    selectedOutputRuleTemplate: PropTypes.object.isRequired,
-    handleOutputRuleTemplateSelected: PropTypes.func.isRequired,
-    outputRuleTemplates: PropTypes.arrayOf(PropTypes.object).isRequired,
-    getPropertyComponents: PropTypes.func.isRequired,
-    inputStreamFields: PropTypes.arrayOf(PropTypes.string).isRequired,
-    mappingErrorStates: PropTypes.object.isRequired,
-    businessRuleProperties: PropTypes.object.isRequired,
-    handleOutputMappingChange: PropTypes.func.isRequired,
-    toggleExpansion: PropTypes.func.isRequired,
-    isExpanded: PropTypes.bool.isRequired,
-    isErroneous: PropTypes.bool.isRequired,
+  getFieldNames: PropTypes.func.isRequired,
+  selectedInputRuleTemplate: PropTypes.object.isRequired,
+  mode: PropTypes.oneOf([
+    BusinessRulesConstants.BUSINESS_RULE_FORM_MODE_CREATE,
+    BusinessRulesConstants.BUSINESS_RULE_FORM_MODE_EDIT,
+    BusinessRulesConstants.BUSINESS_RULE_FORM_MODE_VIEW,
+  ]).isRequired,
+  selectedOutputRuleTemplate: PropTypes.object.isRequired,
+  handleOutputRuleTemplateSelected: PropTypes.func.isRequired,
+  outputRuleTemplates: PropTypes.arrayOf(PropTypes.object).isRequired,
+  getPropertyComponents: PropTypes.func.isRequired,
+  inputStreamFields: PropTypes.arrayOf(PropTypes.string).isRequired,
+  mappingErrorStates: PropTypes.object.isRequired,
+  businessRuleProperties: PropTypes.object.isRequired,
+  handleOutputMappingChange: PropTypes.func.isRequired,
+  toggleExpansion: PropTypes.func.isRequired,
+  isExpanded: PropTypes.bool.isRequired,
+  isErroneous: PropTypes.bool.isRequired,
 };

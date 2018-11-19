@@ -387,7 +387,7 @@ public class SiddhiTopologyCreatorImpl implements SiddhiTopologyCreator {
             streamDefinition = ExceptionUtil.getContext(queryContextStartIndex, queryContextEndIndex,
                     siddhiTopologyDataHolder.getUserDefinedSiddhiApp());
             isUserGivenTransport = isUserGivenTransport(streamDefinition);
-            if (!isUserGivenTransport) {
+            if (!isUserGivenTransport && !siddhiApp.getTriggerDefinitionMap().containsKey(streamId)) {
                 streamDefinition = "${" + streamId + "}" + streamDefinition;
             }
             streamDataHolder =

@@ -20,26 +20,35 @@ import React from 'react';
 // Material UI Components
 import Typography from 'material-ui/Typography';
 import Paper from 'material-ui/Paper';
+// Localization
+import { FormattedMessage } from 'react-intl';
 // Styles
 import Styles from '../../../style/Styles';
 import '../../../index.css';
+
 
 /**
  * Represents an Unknown Error message display
  */
 class UnknownError extends React.Component {
-    render() {
-        return (
-            <Paper style={Styles.messageContainer}>
-                <Typography type="title">
-                    Unknown Error
-                </Typography>
-                <Typography type="subheading">
-                    Something went wrong while processing your request
-                </Typography>
-            </Paper>
-        );
-    }
+  render() {
+    return (
+      <Paper style={Styles.messageContainer}>
+        <Typography type="title">
+          <FormattedMessage
+            id="error.unknown.title"
+            defaultMessage="Unknown Error"
+          />
+        </Typography>
+        <Typography type="subheading">
+          <FormattedMessage
+            id="error.unknown.subheading"
+            defaultMessage="Something went wrong while processing your request"
+          />
+        </Typography>
+      </Paper>
+    );
+  }
 }
 
 export default UnknownError;

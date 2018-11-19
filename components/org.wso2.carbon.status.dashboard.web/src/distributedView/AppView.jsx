@@ -20,6 +20,7 @@
 import React from 'react';
 import {Link} from 'react-router-dom';
 import SyntaxHighlighter from 'react-syntax-highlighter';
+import PropTypes from 'prop-types';
 
 //App Components
 import StatusDashboardAPIS from "../utils/apis/StatusDashboardAPIs";
@@ -36,6 +37,8 @@ import {Redirect} from 'react-router-dom';
 import Error403 from '../error-pages/Error403';
 import {HttpStatus} from '../utils/Constants';
 import KafkaFlow from './KafkaFlow';
+//Localization
+import { FormattedMessage } from 'react-intl';
 
 const styles = {
     navBar: {padding: '0 15px'},
@@ -125,17 +128,17 @@ export default class AppView extends React.Component {
             let message;
             if (error.response != null) {
                 if (error.response.status === 401) {
-                    message = "Authentication fail. Please login again.";
+                    message = this.context.intl.formatMessage({ id: 'authenticationFail', defaultMessage: 'Authentication fail. Please login again.' });
                     this.setState({
                         sessionInvalid: true
                     })
                 } else if (error.response.status === 403) {
-                    message = "User Have No Manager Permission to view this page.";
+                    message = this.context.intl.formatMessage({ id: 'noManagerPermission', defaultMessage: 'User Have No Manager Permission to view this page.' });
                     this.setState({
                         hasManagerPermission: false
                     })
                 } else {
-                    message = "Unknown error occurred! : " + error.response.data;
+                    message = this.context.intl.formatMessage({ id: 'appview.unknowenError', defaultMessage: 'Unknown error occurred! :  {date}', values: { date: error.response.date } });
                 }
                 this.setState({
                     message: message
@@ -151,17 +154,17 @@ export default class AppView extends React.Component {
             let message;
             if (error.response != null) {
                 if (error.response.status === 401) {
-                    message = "Authentication fail. Please login again.";
+                    message = this.context.intl.formatMessage({ id: 'authenticationFail', defaultMessage: 'Authentication fail. Please login again.' });
                     this.setState({
                         sessionInvalid: true
                     })
                 } else if (error.response.status === 403) {
-                    message = "User Have No Viewer Permission to view this page.";
+                    message = this.context.intl.formatMessage({ id: 'noViewerPermission', defaultMessage: 'User Have No Viewer Permission to view this page.' });
                     this.setState({
                         hasViewerPermission: false
                     })
                 } else {
-                    message = "Unknown error occurred! : " + error.response.data;
+                    message = this.context.intl.formatMessage({ id: 'appview.unknownError', defaultMessage: 'Unknown error occurred! :  {date}', values: { date: error.response.date } });
                 }
                 this.setState({
                     message: message
@@ -182,7 +185,7 @@ export default class AppView extends React.Component {
                     this.setState({
                         isApiCalled: true,
                         sessionInvalid: true,
-                        statusMessage: "Authentication fail. Please login again."
+                        statusMessage: this.context.intl.formatMessage({ id: 'authenticationFail', defaultMessage: 'Authentication fail. Please login again.' })
                     })
                 } else if (error.response.status === 403) {
                     this.setState({
@@ -193,7 +196,7 @@ export default class AppView extends React.Component {
                     this.setState({
                         isError: true,
                         isApiCalled: true,
-                        statusMessage: "Unknown error occurred! : " + JSON.stringify(error.response.data)
+                        statusMessage: this.context.intl.formatMessage({ id: 'appview.unknownError', defaultMessage: 'Unknown error occurred! : {date} ', values: { date: JSON.stringify(error.response.data) } })
                     });
                 }
             }
@@ -228,12 +231,12 @@ export default class AppView extends React.Component {
         //when state changes the width changes
         let actionsButtons = [
             <FlatButton
-                label="Yes"
+                label={<FormattedMessage id='yes' defaultMessage='Yes' />}
                 backgroundColor='#f17b31'
                 onClick={this.handleToggle}
             />,
             <FlatButton
-                label="No"
+                label={<FormattedMessage id='no' defaultMessage='No' />}
                 onClick={() => {
                     this.setState({open: false})
                 }}
@@ -256,7 +259,7 @@ export default class AppView extends React.Component {
                         <Link style={{textDecoration: 'none'}} to={window.contextPath}>
                             <Button style={styles.navBtn}>
                                 <HomeButton style={{paddingRight: 8, color: '#BDBDBD'}}/>
-                                Overview >
+                                <FormattedMessage id='overview' defaultMessage='Overview >' />
                             </Button>
                         </Link>
                         <Link style={{textDecoration: 'none'}} to={window.contextPath + "/" +
@@ -274,8 +277,8 @@ export default class AppView extends React.Component {
 
                 <div style={{padding: 10, paddingLeft: 40, width: '90%', height: '50%', backgroundColor: "#222222"}}>
                     <Card style={{backgroundColor: "#282828", height: '50%'}}>
-                        <CardHeader title="Code View" subtitle={this.props.match.params.appName}
-                                    titleStyle={{fontSize: 24, backgroundColor: "#282828"}}
+                        <CardHeader title={<FormattedMessage id='appview.codeView' defaultMessage='Code View' />} subtitle={this.props.match.params.appName}
+                            titleStyle={{ fontSize: 24, backgroundColor: "#282828" }}
                         />
                         <Divider/>
 
@@ -287,8 +290,8 @@ export default class AppView extends React.Component {
                 </div>
                 <div style={{padding: 10, paddingLeft: 40, width: '90%', height: '100%', backgroundColor: "#222222"}}>
                     <Card style={{backgroundColor: "#282828", height: '100%'}}>
-                        <CardHeader title="Distributed Siddhi App Deployment"
-                                    titleStyle={{fontSize: 24, backgroundColor: "#282828"}}
+                        <CardHeader title={<FormattedMessage id='appview.distributedSiddhiApp' defaultMessage='Distributed Siddhi App Deployment' />}
+                            titleStyle={{ fontSize: 24, backgroundColor: "#282828" }}
                         />
 
                         <Divider/>
@@ -323,7 +326,7 @@ export default class AppView extends React.Component {
                                     <span className='legend-text' style={{
                                         lineHeight: 2,
                                         fontSize: 12
-                                    }}> Child Apps</span>
+                                    }}><FormattedMessage id='appview.childApps' defaultMessage=' Child Apps' /></span>
 
                                 </li>
                                 <li className='legend-key' style={{
@@ -340,7 +343,7 @@ export default class AppView extends React.Component {
                                     <span className='legend-text' style={{
                                         lineHeight: 2,
                                         fontSize: 12
-                                    }}> Kafka-Topics</span>
+                                    }}><FormattedMessage id='appview.kafkatopics' defaultMessage='Kafka-Topics' /> </span>
                                 </li>
                             </ul>
                             <KafkaFlow id={this.props.match.params.id} appName={this.props.match.params.appName}/>
@@ -348,7 +351,7 @@ export default class AppView extends React.Component {
                     </Card>
                 </div>
                 <div style={{width: '90%', marginLeft: 40}}>
-                    <h3 style={{color: 'white'}}> Child App Details</h3>
+                    <h3 style={{ color: 'white' }}><FormattedMessage id='appview.childAppDetails' defaultMessage='Child App Details' /> </h3>
                     <ParentAppTable id={this.props.match.params.id} appName={this.props.match.params.appName}/>
                 </div>
                 <Snackbar contentStyle={messageBoxStyle} bodyStyle={this.state.messageStyle}
@@ -364,4 +367,8 @@ export default class AppView extends React.Component {
             </div>
         );
     }
+}
+
+AppView.contextTypes = {
+    intl: PropTypes.object.isRequired
 }

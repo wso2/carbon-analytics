@@ -20,6 +20,7 @@
 import React from 'react';
 import {Link, Redirect} from 'react-router-dom';
 import SyntaxHighlighter from 'react-syntax-highlighter';
+import PropTypes from 'prop-types';
 //App Components
 import StatusDashboardAPIS from '../utils/apis/StatusDashboardAPIs';
 import {HttpStatus} from '../utils/Constants';
@@ -37,6 +38,8 @@ import AuthManager from '../auth/utils/AuthManager';
 import Error403 from '../error-pages/Error403';
 import StatusDashboardOverViewAPI from '../utils/apis/StatusDashboardOverViewAPI';
 import AppEventFlow from "./AppEventFlow";
+// Localization
+import { FormattedMessage } from 'react-intl';
 
 const styles = {
     root: {display: 'flex', flexWrap: 'wrap', justifyContent: 'space-around'},
@@ -90,9 +93,6 @@ const tpLineChartConfig = {
 const messageBoxStyle = {textAlign: "center", color: "white"};
 const errorMessageStyle = {backgroundColor: "#FF5722", color: "white"};
 const successMessageStyle = {backgroundColor: "#4CAF50", color: "white"};
-const enableMessage = "Do you want to enable Siddhi App metrics?";
-const disableMessage = "Disabling metrics of a SiddhiApp will cause a data loss. \n " +
-    "Are you sure you want to disable metrics?";
 const codeViewStyle = {
     "hljs": {
         "display": "block",
@@ -173,18 +173,20 @@ export default class WorkerSpecific extends React.Component {
             let message;
             if (error.response != null) {
                 if (error.response.status === 401) {
-                    message = "Authentication fail. Please login again.";
-                    this.setState({
-                        sessionInvalid: true
+                    message = this.context.intl.formatMessage({
+                        id: 'authenticationFail', defaultMessage: 'Authentication fail. Please login again.'
+                    });                    
+                        this.setState({
+                            sessionInvalid: true
                     })
                 } else if (error.response.status === 403) {
-                    message = "User Have No Manager Permission to view this page.";
+                    message = this.context.intl.formatMessage({ id: 'noManagerPermission', defaultMessage: 'User Have No Manager Permission to view this page.' });
                     this.setState({
                         hasManagerPermission: false
                     })
                 } else {
-                    message = "Unknown error occurred! : " + error.response.data;
-                }
+                    message = this.context.intl.formatMessage({ id: 'unknownError', defaultMessage: 'Unknown error occurred! : {data}', values: { data: error.response.data } });
+                    }
                 this.setState({
                     message: message
                 })
@@ -199,17 +201,19 @@ export default class WorkerSpecific extends React.Component {
             let message;
             if (error.response != null) {
                 if (error.response.status === 401) {
-                    message = "Authentication fail. Please login again.";
+                    message = this.context.intl.formatMessage({
+                        id: 'authenticationFail', defaultMessage: 'Authentication fail. Please login again.'
+                    });
                     this.setState({
                         sessionInvalid: true
                     })
                 } else if (error.response.status === 403) {
-                    message = "User Have No Viewer Permission to view this page.";
+                    message = this.context.intl.formatMessage({ id: 'noViewerPermission', defaultMessage: 'User Have No Viewer Permission to view this page.' });
                     this.setState({
                         hasViewerPermission: false
                     })
                 } else {
-                    message = "Unknown error occurred! : " + error.response.data;
+                        message = message = this.context.intl.formatMessage({ id: 'unknownError', defaultMessage: 'Unknown error occurred! : {data}', values: { data: error.response.data } });
                 }
                 this.setState({
                     message: message
@@ -234,15 +238,17 @@ export default class WorkerSpecific extends React.Component {
             let message;
             if (error.response !== null) {
                 if (error.response.status === 500) {
-                    message = "Authentication fail. Please login again.";
+                    message = this.context.intl.formatMessage({
+                        id: 'authenticationFail', defaultMessage: 'Authentication fail. Please login again.'
+                    });
                     this.setState({
-                        appText: "Unable to fetch Siddhi App!",
+                        appText: this.context.intl.formatMessage({ id: 'appSpeicific.unableToFetchSiddhiApp', defaultMessage: 'Unable to fetch Siddhi App!' }),
                         latency: [],
                         throughputAll: [],
                         totalMem: []
                     })
                 } else {
-                    message = "Unable to fetch Siddhi App! : " + error.response.data;
+                    message = this.context.intl.formatMessage({ id: 'appSpeicific.unableToFetchSiddhiAppWithData', defaultMessage: 'Unable to fetch Siddhi App! : {data}', values: { data: error.response.data } });
                 }
                 this.setState({
                     message: message
@@ -254,7 +260,7 @@ export default class WorkerSpecific extends React.Component {
     renderLatencyChart() {
         if (this.state.latency.length === 0) {
             return (
-                <GridTile title="Latency (milliseconds)" titlePosition="top" titleBackground='#303030'>
+                <GridTile title={<FormattedMessage id='appSpecific.latencyMiliseconds' defaultMessage='Latency (milliseconds)' />} titlePosition="top" titleBackground='#303030'>
                     <div style={{
                         color: 'rgba(255, 255, 255, 0.2)',
                         marginTop: 50,
@@ -262,15 +268,15 @@ export default class WorkerSpecific extends React.Component {
                         padding: 30,
                         textAlign: 'center',
                         height: 300
-                    }}><h2>No Data Available</h2></div>
+                    }}><h2><FormattedMessage id='noData' defaultMessage='No Data Available' /></h2></div>
                 </GridTile>
             );
         }
         return (
-            <GridTile className="container" title="Latency(milliseconds)" titlePosition="top" titleBackground='#303030'>
+            <GridTile className="container" title={<FormattedMessage id='appSpecific.latencyMiliseconds' defaultMessage='Latency (milliseconds)' />} titlePosition="top" titleBackground='#303030'>
                 <div className="overlay"
                      style={{color: 'rgba(255, 255, 255, 0.2)', paddingTop: 20, textAlign: 'right'}}>
-                    <h4>Click for more details</h4>
+                    <h4><FormattedMessage id='appSpecific.clickForMore' defaultMessage='Click for more details' /></h4>
                 </div>
                 <div style={{marginTop: 30, backgroundColor: '#131313', padding: 20}}>
                     <Link
@@ -291,7 +297,7 @@ export default class WorkerSpecific extends React.Component {
     renderThroughputChart() {
         if (this.state.throughputAll.length === 0) {
             return (
-                <GridTile title="Overall Throughput (events/second)" titlePosition="top" titleBackground='#303030'>
+                <GridTile title={<FormattedMessage id='appSpecific.overallThroughput' defaultMessage='Overall Throughput (events/second)' />} titlePosition="top" titleBackground='#303030'>
                     <div style={{
                         color: 'rgba(255, 255, 255, 0.2)',
                         marginTop: 50,
@@ -299,7 +305,7 @@ export default class WorkerSpecific extends React.Component {
                         padding: 30,
                         textAlign: 'center',
                         height: 300
-                    }}><h2>No Data Available</h2></div>
+                    }}><h2><FormattedMessage id='noData' defaultMessage='No Data Available' /></h2></div>
                 </GridTile>
             );
         }
@@ -308,7 +314,7 @@ export default class WorkerSpecific extends React.Component {
                       titleBackground='#303030'>
                 <div className="overlay"
                      style={{color: 'rgba(255, 255, 255, 0.2)', paddingTop: 20, textAlign: 'right'}}>
-                    <h4>Click for more details</h4>
+                    <h4><FormattedMessage id='appSpecific.clickForMore' defaultMessage='Click for more details' /></h4>
                 </div>
                 <div style={{marginTop: 30, backgroundColor: '#131313', padding: 20}}>
                     <Link
@@ -329,7 +335,7 @@ export default class WorkerSpecific extends React.Component {
     renderMemoryChart() {
         if (this.state.totalMem.length === 0) {
             return (
-                <GridTile title="Memory Used (bytes)" titlePosition="top" titleBackground='#303030'>
+                <GridTile title={<FormattedMessage id='appSpecific.memoryUsed' defaultMessage='Memory Used (bytes)' />} titlePosition="top" titleBackground='#303030'>
                     <div style={{
                         marginTop: 50,
                         backgroundColor: '#131313',
@@ -337,16 +343,16 @@ export default class WorkerSpecific extends React.Component {
                         textAlign: 'center',
                         height: 300,
                         color: 'rgba(255, 255, 255, 0.2)'
-                    }}><h2>No Data Available</h2></div>
+                    }}><h2><FormattedMessage id='noData' defaultMessage='No Data Available' /></h2></div>
                 </GridTile>
             );
         }
         return (
-            <GridTile className="container" title="Memory Used(bytes)" titlePosition="top"
-                      titleBackground='#303030'>
+            <GridTile className="container" title={<FormattedMessage id='appSpecific.memoryUsed' defaultMessage='Memory Used (bytes)' />} titlePosition="top"
+                titleBackground='#303030'>
                 <div className="overlay"
                      style={{color: 'rgba(255, 255, 255, 0.2)', paddingTop: 20, textAlign: 'right'}}>
-                    <h4>Click for more details</h4>
+                    <h4><FormattedMessage id='appSpecific.clickForMore' defaultMessage='Click for more details' /></h4>
                 </div>
                 <div style={{marginTop: 30, backgroundColor: '#131313', padding: 20}}>
                     <Link
@@ -371,11 +377,22 @@ export default class WorkerSpecific extends React.Component {
      * @returns {XML}
      */
     renderToggle() {
+        const enableMessage = this.context.intl.formatMessage(
+            {
+                id: 'appSpecific.enableAppMetrics',
+                defaultMessage: 'Do you want to enable Siddhi App metrics?'
+            });
+        const disableMessage = this.context.intl.formatMessage({
+            id: 'appSpecific.disableMetrics',
+            defaultMessage: 'Disabling metrics of a SiddhiApp will cause a data loss.{br} Are you sure you want to disable metrics?',
+            values: { br: (<br />) }
+        })
+
         if (this.state.hasManagerPermission) {
             return (
                 <div style={{position: 'absolute', right: 24, top: 100}}>
                     <Toggle labelPosition="left"
-                            label="Metrics"
+                            label={<FormattedMessage id='metrics' defaultMessage='Metrics' />}
                             labelStyle={{color: 'white'}}
                             thumbStyle={{backgroundColor: 'grey'}}
                             thumbSwitchedStyle={{backgroundColor: '#f17b31'}}
@@ -396,7 +413,7 @@ export default class WorkerSpecific extends React.Component {
             return (
                 <div style={{float: 'right', padding: 20, paddingRight: 20, display: 'none'}}>
                     <Toggle labelPosition="left"
-                            label="Metrics"
+                            label={<FormattedMessage id='metrics' defaultMessage='Metrics' />}
                             labelStyle={{color: 'white'}}
                             thumbStyle={{backgroundColor: 'grey'}}
                             thumbSwitchedStyle={{backgroundColor: '#f17b31'}}
@@ -424,8 +441,8 @@ export default class WorkerSpecific extends React.Component {
         StatusDashboardOverViewAPI.enableSiddhiAppStats(this.state.id, this.state.appName, statEnable)
             .then((response) => {
                 if (response.status === HttpStatus.OK) {
-                    that.showMessage("Successfully Changed statistics state of Sidhhi App!");
-                    that.setState({statsEnabled: !this.state.statsEnabled, open: false});
+                    that.showMessage(this.context.intl.formatMessage({ id: 'appSpecific.statisticsStateChanged', defaultMessage: 'Successfully Changed statistics state of Sidhhi App!' }));
+                    that.setState({ statsEnabled: !this.state.statsEnabled, open: false });
                     setTimeout(function () {
                         window.location.href = window.contextPath + '/worker/' + that.state.id
                             + "/siddhi-apps/" + that.state.appName + "/" + that.state.statsEnabled;
@@ -433,8 +450,8 @@ export default class WorkerSpecific extends React.Component {
                 }
             }).catch((error) => {
             that.setState({open: false});
-            that.showError("Error while changing statistics configuration!!");
-        });
+                that.showError(this.context.intl.formatMessage({ id: 'appSpecific.error.changingStatistics', defaultMessage: 'Error while changing statistics configuration!!' }));
+            });
     }
 
     showError(message) {
@@ -465,13 +482,13 @@ export default class WorkerSpecific extends React.Component {
         //when state changes the width changes
         let actionsButtons = [
             <FlatButton
-                label="Yes"
+                label={<FormattedMessage id='yes' defaultMessage='Yes' />}
                 backgroundColor='#f17b31'
                 onClick={this.handleToggle}
                 //disabled={!this.state.hasManagerPermission}
             />,
             <FlatButton
-                label="No"
+                label={<FormattedMessage id='no' defaultMessage='No' />}
                 //disabled={!this.state.hasManagerPermission}
                 onClick={() => {
                     this.setState({open: false})
@@ -481,7 +498,7 @@ export default class WorkerSpecific extends React.Component {
         let warningMessage;
         if (!this.state.statsEnabled) {
             warningMessage = <div>
-                Metrics are disabled!
+                <FormattedMessage id='appSpecific.metricsDisabled' defaultMessage='Metrics are disabled!' />
             </div>
         } else {
             warningMessage = <div/>
@@ -502,7 +519,7 @@ export default class WorkerSpecific extends React.Component {
                         <Link style={{textDecoration: 'none'}} to={window.contextPath}>
                             <Button style={styles.navBtn}>
                                 <HomeButton style={{paddingRight: 8, color: '#BDBDBD'}}/>
-                                Overview >
+                                <FormattedMessage id='overview' defaultMessage='Overview >' />
                             </Button>
                         </Link>
                         <Link style={{textDecoration: 'none'}} to={window.contextPath + '/worker/' +
@@ -530,8 +547,8 @@ export default class WorkerSpecific extends React.Component {
 
                 <div style={{padding: 24, height: '50%', backgroundColor: "#222222"}}>
                     <Card style={{backgroundColor: "#282828", height: '50%'}}>
-                        <CardHeader title="Code View"
-                                    titleStyle={{fontSize: 24, backgroundColor: "#282828"}}
+                        <CardHeader title={<FormattedMessage id='appSpecific.codeView' defaultMessage='Code View' />}
+                            titleStyle={{ fontSize: 24, backgroundColor: "#282828" }}
                         />
                         <Divider/>
 
@@ -544,8 +561,8 @@ export default class WorkerSpecific extends React.Component {
 
                 <div style={{padding: 24, height: '50%', backgroundColor: "#222222"}}>
                     <Card style={{backgroundColor: "#282828", height: '50%'}}>
-                        <CardHeader title="Design View"
-                                    titleStyle={{fontSize: 24, backgroundColor: "#282828"}}
+                        <CardHeader title={<FormattedMessage id='appSpecific.designView' defaultMessage='Design View' />}
+                            titleStyle={{ fontSize: 24, backgroundColor: "#282828" }}
                         />
                         <Divider/>
 
@@ -555,46 +572,46 @@ export default class WorkerSpecific extends React.Component {
                                     <span class="legend-colour source-image">
 
                                     </span>
-                                    <span class="legend-text">Source</span>
+                                    <span class="legend-text"><FormattedMessage id='appSpecific.source' defaultMessage='Source' /></span>
                                 </li>
                                 <li class="legend-key ">
                                     <span class="legend-colour sink-image">
 
                                     </span>
-                                    <span class="legend-text">Sink</span>
+                                    <span class="legend-text"><FormattedMessage id='appSpecific.sink' defaultMessage='Sink' /></span>
                                 </li>
                                 <li class="legend-key ">
                                     <span class="legend-colour stream-image">
                                     </span>
-                                    <span class="legend-text">Stream</span>
+                                    <span class="legend-text"><FormattedMessage id='appSpecific.stream' defaultMessage='Stream' /></span>
                                 </li>
                                 <li class="legend-key ">
                                     <span class="legend-colour table-image"></span>
-                                    <span class="legend-text">Table</span>
+                                    <span class="legend-text"><FormattedMessage id='appSpecific.table' defaultMessage='Table' /></span>
                                 </li>
                                 <li class="legend-key ">
                                     <span class="legend-colour window-image"></span>
-                                    <span class="legend-text">Window</span>
+                                    <span class="legend-text"><FormattedMessage id='appSpecific.window' defaultMessage='Window' /></span>
                                 </li>
                                 <li class="legend-key ">
                                     <span class="legend-colour trigger-image"></span>
-                                    <span class="legend-text">Trigger</span>
+                                    <span class="legend-text"><FormattedMessage id='appSpecific.trigger' defaultMessage='Trigger' /></span>
                                 </li>
                                 <li class="legend-key ">
                                     <span class="legend-colour aggregation-image"></span>
-                                    <span class="legend-text">Aggregation</span>
+                                    <span class="legend-text"><FormattedMessage id='appSpecific.aggregation' defaultMessage='Aggregation' /></span>
                                 </li>
                                 <li class="legend-key ">
                                     <span class="legend-colour function-image"></span>
-                                    <span class="legend-text">Function</span>
+                                    <span class="legend-text"><FormattedMessage id='appSpecific.function' defaultMessage='Function' /></span>
                                 </li>
                                 <li class="legend-key ">
                                     <span class="legend-colour query-image"></span>
-                                    <span class="legend-text">Query</span>
+                                    <span class="legend-text"><FormattedMessage id='appSpecific.query' defaultMessage='Query' /></span>
                                 </li>
                                 <li class="legend-key ">
                                     <span class="legend-colour partition-image"></span>
-                                    <span class="legend-text">Partition</span>
+                                    <span class="legend-text"><FormattedMessage id='appSpecific.partition' defaultMessage='Partition' /></span>
                                 </li>
                             </ul>
 
@@ -604,7 +621,9 @@ export default class WorkerSpecific extends React.Component {
                 </div>
 
                 <div style={{padding: 24}}>
-                    <h3 style={{color: 'white'}}> Siddhi App Component Statistics</h3>
+                    <h3 style={{ color: 'white' }}>
+                        <FormattedMessage id='appSpecific.siddhiAppComponent' defaultMessage='Siddhi App Component Statistics' />
+                    </h3>
                     <ComponentTable id={this.props.match.params.id} appName={this.props.match.params.appName}
                                     statsEnabled={this.state.statsEnabled}/>
                 </div>
@@ -626,3 +645,6 @@ export default class WorkerSpecific extends React.Component {
 }
 
 
+WorkerSpecific.contextTypes = {
+    intl: PropTypes.object.isRequired
+}

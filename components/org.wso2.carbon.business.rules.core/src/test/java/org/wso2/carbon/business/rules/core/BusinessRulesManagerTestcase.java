@@ -18,6 +18,7 @@
 
 package org.wso2.carbon.business.rules.core;
 
+import com.google.gson.JsonObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testng.Assert;
@@ -27,15 +28,12 @@ import org.wso2.carbon.business.rules.core.bean.scratch.BusinessRuleFromScratch;
 import org.wso2.carbon.business.rules.core.bean.template.BusinessRuleFromTemplate;
 import org.wso2.carbon.business.rules.core.exceptions.RuleTemplateScriptException;
 import org.wso2.carbon.business.rules.core.exceptions.TemplateManagerHelperException;
-import org.wso2.carbon.business.rules.core.util.TemplateManagerConstants;
 import org.wso2.carbon.business.rules.core.util.TemplateManagerHelper;
 import org.wso2.carbon.business.rules.core.util.TestUtil;
 
 import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
-
-import com.google.gson.JsonObject;
 
 public class BusinessRulesManagerTestcase {
     private final Logger log = LoggerFactory.getLogger(BusinessRulesManagerTestcase.class);
@@ -47,7 +45,7 @@ public class BusinessRulesManagerTestcase {
                 .getFile();
         int count = 0;
         try {
-            count = TestUtil.ValidateBusinessRules(dir);
+            count = TestUtil.validateBusinessRules(dir);
         } catch (RuleTemplateScriptException e) {
             log.error("Invalid template group found. Hence failing the test.", e);
             Assert.fail("Invalid template group found. Hence failing the test.");
@@ -147,7 +145,7 @@ public class BusinessRulesManagerTestcase {
                 .getFile();
         int count = 0;
         try {
-            count = TestUtil.ValidateBusinessRules(dir);
+            count = TestUtil.validateBusinessRules(dir);
         } catch (RuleTemplateScriptException e) {
             log.error("Invalid template group. Hence failing the test.", e);
             Assert.fail("Invalid template group. Hence failing the test.");
@@ -218,7 +216,7 @@ public class BusinessRulesManagerTestcase {
                 .getFile();
         int count = 0;
         try {
-            count = TestUtil.ValidateBusinessRules(dir);
+            count = TestUtil.validateBusinessRules(dir);
         } catch (RuleTemplateScriptException | TemplateManagerHelperException e) {
             log.error("Invalid template group found. Hence failing the test.", e);
             Assert.fail("Invalid template group found. Hence failing the test.");
@@ -372,7 +370,7 @@ public class BusinessRulesManagerTestcase {
                 .getFile();
         int count = 0;
         try {
-            count = TestUtil.ValidateBusinessRules(dir);
+            count = TestUtil.validateBusinessRules(dir);
         } catch (RuleTemplateScriptException | TemplateManagerHelperException e) {
             log.error("Invalid template group found. Hence failing the test.", e);
             Assert.fail("Invalid template group found. Hence failing the test.");
@@ -406,7 +404,8 @@ public class BusinessRulesManagerTestcase {
             log.error("Failed to process a valid script. Hence failing the test", e);
             Assert.fail("Failed to process a valid script. Hence failing the test");
         } catch (TemplateManagerHelperException e) {
-            Assert.assertEquals(e.getMessage(), "Invalid rule template - there should be exactly one template for input type rule template - stock-exchange-input");
+            Assert.assertEquals(e.getMessage(), "Invalid rule template - there should be exactly one " +
+                    "template for input type rule template - stock-exchange-input");
         }
     }
 
@@ -538,7 +537,7 @@ public class BusinessRulesManagerTestcase {
                 .getFile();
         int count = 0;
         try {
-            count = TestUtil.ValidateBusinessRules(dir);
+            count = TestUtil.validateBusinessRules(dir);
         } catch (RuleTemplateScriptException | TemplateManagerHelperException e) {
             log.error("Invalid template group found. Hence failing the test.", e);
             Assert.fail("Invalid template group found. Hence failing the test.");

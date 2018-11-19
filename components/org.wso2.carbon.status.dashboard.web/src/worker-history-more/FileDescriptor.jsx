@@ -23,6 +23,7 @@ import DashboardUtils from '../utils/DashboardUtils';
 import ChartCard from '../common/ChartCard';
 // Material UI
 import {Card, CardHeader, CardMedia, Divider} from 'material-ui';
+import { FormattedMessage } from 'react-intl';
 
 const metadata = {names: ['Time', 'Open Count', 'Max Count'], types: ['time', 'linear', 'linear']};
 
@@ -75,13 +76,15 @@ export default class FileDescriptor extends React.Component {
                 <div>
                     <Card>
                         <CardHeader
-                            title="File Descriptor"
+                            title={<FormattedMessage id='fileDescriptor' defaultMessage='File Descriptor' />}
                         />
                         <Divider/>
                         <CardMedia>
-                            <div style={{backgroundColor: '#131313', textAlign: 'center', lineHeight: '60px',
-                                color: '#9c9898'}}>
-                                No Data Available
+                            <div style={{
+                                backgroundColor: '#131313', textAlign: 'center', lineHeight: '60px',
+                                color: '#9c9898'
+                            }}>
+                                <FormattedMessage id='appSpecific.noData' defaultMessage='No Data Available' />
                             </div>
                         </CardMedia>
                     </Card>
@@ -94,7 +97,7 @@ export default class FileDescriptor extends React.Component {
             <div>
                 <ChartCard data={DashboardUtils.getCombinedChartList(this.state.jvmOsFileDescriptorOpenCount,
                     this.state.jvmOsFileDescriptorMaxCount)}
-                           metadata={metadata} config={chartConfig} title="File Descriptor" yDomain={intY}/>
+                    metadata={metadata} config={chartConfig} title={<FormattedMessage id='fileDescriptor' defaultMessage='File Descriptor' />} yDomain={intY} />
             </div>
         );
     }

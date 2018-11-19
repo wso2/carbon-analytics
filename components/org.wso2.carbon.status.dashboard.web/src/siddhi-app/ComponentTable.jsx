@@ -25,6 +25,7 @@ import VizG from 'react-vizgrammar';
 //Material UI
 import {Table, TableBody, TableFooter, TableHeader, TableHeaderColumn, TableRow, TableRowColumn} from 'material-ui';
 import StatusDashboardOverViewAPI from '../utils/apis/StatusDashboardOverViewAPI';
+import { FormattedMessage } from 'react-intl';
 
 const styles = {
     header: {color: '#dedede', fontSize: 14, fontWeight: 500},
@@ -74,17 +75,27 @@ export default class ComponentTable extends React.Component {
                     <TableHeader displaySelectAll={false}
                                  adjustForCheckbox={false}>
                         <TableRow>
-                            <TableHeaderColumn style={styles.header}>Type</TableHeaderColumn>
-                            <TableHeaderColumn style={styles.header}>Name</TableHeaderColumn>
-                            <TableHeaderColumn style={styles.header}>Total Events(events)</TableHeaderColumn>
-                            <TableHeaderColumn style={styles.header}>Metric Type</TableHeaderColumn>
-                            <TableHeaderColumn style={styles.header}>Value</TableHeaderColumn>
+                            <TableHeaderColumn style={styles.header}>
+                                <FormattedMessage id='componentTable.type' defaultMessage='Type' />
+                            </TableHeaderColumn>
+                            <TableHeaderColumn style={styles.header}>
+                                <FormattedMessage id='componentTable.name' defaultMessage='Name' />
+                            </TableHeaderColumn>
+                            <TableHeaderColumn style={styles.header}>
+                                <FormattedMessage id='componentTable.totalEvents' defaultMessage='Total Events(events)' />
+                            </TableHeaderColumn>
+                            <TableHeaderColumn style={styles.header}>
+                                <FormattedMessage id='componentTable.metricType' defaultMessage='Metric Type' />
+                            </TableHeaderColumn>
+                            <TableHeaderColumn style={styles.header}>
+                                <FormattedMessage id='componentTable.value' defaultMessage='Value' />
+                            </TableHeaderColumn>
                         </TableRow>
                     </TableHeader>
                     <TableBody displayRowCheckbox={false} style={{backgroundColor: '#131313'}}>
                         <TableRow>
                             <TableRowColumn style={{fontSize: 16, textAlign: 'center'}}>
-                                No Data Available
+                                <FormattedMessage id='noData' defaultMessage='No Data Available' />
                             </TableRowColumn>
                         </TableRow>
                     </TableBody>
@@ -96,11 +107,21 @@ export default class ComponentTable extends React.Component {
                 <TableHeader displaySelectAll={false}
                              adjustForCheckbox={false}>
                     <TableRow>
-                        <TableHeaderColumn width={'25%'} style={styles.header}>Type</TableHeaderColumn>
-                        <TableHeaderColumn width={'25%'} style={styles.header}>Name</TableHeaderColumn>
-                        <TableHeaderColumn width={'11.4%'} style={styles.header}>Total Events(events)</TableHeaderColumn>
-                        <TableHeaderColumn width={'19.25%'} style={styles.header}>Metric Type</TableHeaderColumn>
-                        <TableHeaderColumn style={styles.header}>Value</TableHeaderColumn>
+                        <TableHeaderColumn width={'25%'} style={styles.header}>
+                            <FormattedMessage id='componentTable.type' defaultMessage='Type' />
+                        </TableHeaderColumn>
+                        <TableHeaderColumn width={'25%'} style={styles.header}>
+                            <FormattedMessage id='componentTable.name' defaultMessage='Name' />
+                        </TableHeaderColumn>
+                        <TableHeaderColumn width={'11.4%'} style={styles.header}>
+                            <FormattedMessage id='componentTable.totalEvents' defaultMessage='Total Events(events)' />
+                        </TableHeaderColumn>
+                        <TableHeaderColumn width={'19.25%'} style={styles.header}>
+                            <FormattedMessage id='componentTable.metricType' defaultMessage='Metric Type' />
+                        </TableHeaderColumn>
+                        <TableHeaderColumn style={styles.header}>
+                            <FormattedMessage id='componentTable.value' defaultMessage='Value' />
+                        </TableHeaderColumn>
                     </TableRow>
                 </TableHeader>
                 <TableBody displayRowCheckbox={false} style={{backgroundColor: '#131313'}}>

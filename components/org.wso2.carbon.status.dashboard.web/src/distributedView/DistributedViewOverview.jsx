@@ -19,6 +19,7 @@
 
 import React from 'react';
 import {Link} from 'react-router-dom';
+import PropTypes from 'prop-types';
 //Material UI
 import {Typography} from 'material-ui-next';
 import {GridList} from 'material-ui/GridList';
@@ -35,6 +36,8 @@ import {Redirect} from 'react-router-dom';
 import FormPanel from '../common/FormPanel';
 import Error500 from '../error-pages/Error500';
 import {HttpStatus} from '../utils/Constants';
+// Localization
+import { FormattedMessage } from 'react-intl';
 
 const styles = {
     root: {display: 'flex', flexWrap: 'wrap', justifyContent: 'space-around', backgroundColor: '#222222'},
@@ -84,7 +87,7 @@ export default class DistributedOverview extends React.Component {
             counter: 0,
             hasManagerPermission: false,
             hasViewPermission: true,
-            statusMessage: "Currently there are no siddhi application to display",
+            statusMessage: this.context.intl.formatMessage({ id: 'distributedOverview', defaultMessage: 'Currently there are no siddhi application to display' }),
             isError: false
 
         };
@@ -103,19 +106,19 @@ export default class DistributedOverview extends React.Component {
                 if (error.response.status === 401) {
                     this.setState({
                         sessionInvalid: true,
-                        statusMessage: "Authentication fail. Please login again.",
+                        statusMessage: this.context.intl.formatMessage({ id: 'authenticationFail', defaultMessage: 'Authentication fail. Please login again.' }),
                         isApiCalled: true
                     })
                 } else if (error.response.status === 403) {
                     this.setState({
                         hasViewPermission: false,
-                        statusMessage: "User Have No Permission to view this page.",
+                        statusMessage: this.context.intl.formatMessage({ id: 'noViewPermission', defaultMessage: 'User Have No Permission to view this page.' }),
                         isApiCalled: true
                     })
                 } else {
                     this.setState({
                         isError: true,
-                        statusMessage: "Unknown error occurred! : " + JSON.stringify(error.response.data),
+                        statusMessage: this.context.intl.formatMessage({ id: 'unknownError', defaultMessage: 'Unknown error occurred! : {data}', values: { data: JSON.stringify(error.response.data) } }),
                         isApiCalled: true
                     })
                 }
@@ -129,8 +132,7 @@ export default class DistributedOverview extends React.Component {
                     this.setState({
                         clustersList: response.data,
                         isApiCalled: true,
-                        statusMessage: response.data === null ? "Currently there are no" +
-                            " apps to display" : ''
+                        statusMessage: response.data === null ? this.context.intl.formatMessage({ id: 'distributedOverview.currentyNoApps', defaultMessage: 'Currently there are no apps to display' }) : ''
                     });
                 }
             }).catch((error) => {
@@ -139,18 +141,18 @@ export default class DistributedOverview extends React.Component {
                     this.setState({
                         isApiCalled: true,
                         sessionInvalid: true,
-                        statusMessage: "Authentication fail. Please login again."
+                        statusMessage: this.context.intl.formatMessage({ id: 'authenticationFail', defaultMessage: 'Authentication fail. Please login again.' })
                     })
                 } else if (error.response.status === 403) {
                     this.setState({
                         isApiCalled: true,
-                        statusMessage: "User Have No Permission to view this page."
+                        statusMessage: this.context.intl.formatMessage({ id: 'noViewPermission', defaultMessage: 'User Have No Permission to view this page.' })
                     });
                 } else {
                     this.setState({
                         isError: true,
                         isApiCalled: true,
-                        statusMessage: "Unknown error occurred! : " + JSON.stringify(error.response.data)
+                        statusMessage: this.context.intl.formatMessage({ id: 'unknownError', defaultMessage: 'Unknown error occurred! : {data}', values: { data: JSON.stringify(error.response.data) } })
                     });
                 }
             }
@@ -174,13 +176,13 @@ export default class DistributedOverview extends React.Component {
                     this.setState({
                         isApiCalled: true,
                         sessionInvalid: true,
-                        statusMessage: "Authentication fail. Please login again."
+                        statusMessage: this.context.intl.formatMessage({ id: 'authenticationFail', defaultMessage: 'Authentication fail. Please login again.' })
                     })
                 } else {
                     this.setState({
                         isError: true,
                         isApiCalled: true,
-                        statusMessage: "Unknown error occurred! : " + JSON.stringify(error.response.data)
+                        statusMessage: this.context.intl.formatMessage({ id: 'unknownError', defaultMessage: 'Unknown error occurred! : {data}', values: { data: JSON.stringify(error.response.data) } })
                     });
                 }
             });
@@ -199,7 +201,7 @@ export default class DistributedOverview extends React.Component {
                     <div style={styles.background}>
                         <div className="info-card" style={{backgroundColor: '#f17b31'}}>
                             <FlatButton
-                                label={"Currently there are no siddhi apps deployed in the node"}
+                                label={<FormattedMessage id='distributedOverview.noDeployedSiddhiApps' defaultMessage='Currently there are no siddhi apps deployed in the node' />}
                                 icon={<Info/>}
                                 style={{marginTop: 10, backgroundColor: '#f17b31'}}
                             />
@@ -217,12 +219,12 @@ export default class DistributedOverview extends React.Component {
                                 <FormPanel title={""} width={650}>
                                     <div style={errorContainerStyles}>
                                         <i class="fw fw-security fw-inverse fw-5x"></i>
-                                        <h1 style={errorTitleStyles}>Page Forbidden!</h1>
-                                        <text style={errorMessageStyles}>You have no permission to access this page.
+                                        <h1 style={errorTitleStyles}><FormattedMessage id='distributedOverview.pageForbidden' defaultMessage='Page Forbidden!' /></h1>
+                                        <text style={errorMessageStyles}><FormattedMessage id='distributedOverview.noPermission' defaultMessage='You have no permission to access this page.' />
                                         </text>
                                         <br/> <br/>
                                         <Link to={`${window.contextPath}/logout`}>
-                                            <RaisedButton backgroundColor='#f17b31' style={buttonStyle} label="Login"/>
+                                            <RaisedButton backgroundColor='#f17b31' style={buttonStyle} label={<FormattedMessage id='distributedOverview.login' defaultMessage='Login' />} />
                                         </Link>
                                     </div>
                                 </FormPanel>
@@ -240,7 +242,7 @@ export default class DistributedOverview extends React.Component {
                         marginLeft: '24px',
                         backgroundColor: '#222222',
                         fontSize: '1.6rem'
-                    }}>Parent Siddhi Application</Typography>
+                    }}><FormattedMessage id='distributedOverview.parentSiddhiApp' defaultMessage='Parent Siddhi Application' /></Typography>
                     <Divider inset={true} style={styles.divider}/>
                     <div style={styles.root}>
                         <GridList className={'node-wrapper'} cols={3} cellHeight='100%'
@@ -283,7 +285,7 @@ export default class DistributedOverview extends React.Component {
                 <div style={styles.background}>
                     <Header/>
                     <div className="navigation-bar">
-                        <Link to={window.contextPath}> <FlatButton label="Overview" icon={<HomeButton color="black"/>}/></Link>
+                        <Link to={window.contextPath}> <FlatButton label={<FormattedMessage id='overview' defaultMessage='Overview >' />} icon={<HomeButton color="black" />} /></Link>
                         {/*<Link to={window.contextPath + '/worker/' + this.props.match.params.id }>*/}
 
                         <RaisedButton label={this.props.match.params.id} disabled disabledLabelColor='white'
@@ -309,4 +311,9 @@ export default class DistributedOverview extends React.Component {
         }
         return false;
     }
+}
+
+DistributedOverview.contextTypes = {
+    intl: PropTypes.object.isRequired
+
 }

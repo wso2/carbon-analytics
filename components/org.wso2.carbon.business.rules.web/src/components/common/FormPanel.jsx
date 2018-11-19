@@ -27,36 +27,36 @@ import Paper from 'material-ui/Paper';
  * Represents the panel which consists forms
  */
 export default class FormPanel extends Component {
-    render() {
-        const wrapperStyles = {
-            margin: '0 auto',
-            width: this.props.width,
-            paddingTop: this.props.paddingTop,
-            paddingBottom: 15,
-        };
+  render() {
+    const wrapperStyles = {
+      margin: '0 auto',
+      width: this.props.width,
+      paddingTop: this.props.paddingTop,
+      paddingBottom: 15,
+    };
 
-        return (
-            <div style={wrapperStyles}>
-                <Paper style={{ padding: 50 }}>
-                    <form method="post" onSubmit={this.props.onSubmit}>
-                        <Typography type="headline">{this.props.title}</Typography>
-                        {this.props.children}
+    return (
+          <div style={wrapperStyles}>
+              <Paper style={{ padding: 50 }}>
+                  <form method="post" onSubmit={this.props.onSubmit}>
+                      <Typography type="headline">{this.props.title}</Typography>
+                      {this.props.children}
                     </form>
                 </Paper>
             </div>
-        );
-    }
+    );
+  }
 }
 
 FormPanel.propTypes = {
-    title: PropTypes.string,
-    onSubmit: PropTypes.func.isRequired,
-    width: PropTypes.number,
-    paddingTop: PropTypes.number,
+  title: PropTypes.string,
+  onSubmit: PropTypes.func.isRequired,
+  width: PropTypes.number,
+  paddingTop: PropTypes.number,
 };
 
 FormPanel.defaultProps = {
-    title: '',
-    width: 450,
-    paddingTop: 60,
+  title: '',
+  width: 450,
+  paddingTop: 60,
 };
