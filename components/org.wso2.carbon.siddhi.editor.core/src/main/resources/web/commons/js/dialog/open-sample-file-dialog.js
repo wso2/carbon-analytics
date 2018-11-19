@@ -16,8 +16,8 @@
  * under the License.
  */
 
-define(['require', 'lodash','jquery', 'log', 'backbone', 'file_browser', 'workspace/file'],
-    function (require, _, $, log, Backbone, FileBrowser, File) {
+define(['require', 'lodash','jquery', 'log', 'backbone', 'file_browser', 'workspace/file', 'sample_view'],
+    function (require, _, $, log, Backbone, FileBrowser, File, SampleView) {
     var OpenSampleFileDialog = Backbone.View.extend(
         /** @lends SaveToFileDialog.prototype */
         {
@@ -71,14 +71,13 @@ define(['require', 'lodash','jquery', 'log', 'backbone', 'file_browser', 'worksp
                     "<div class='container-fluid'>" +
                     "<form class='form-horizontal' onsubmit='return false'>" +
                     "<div class='form-group'>" +
-                    "<label for='location' class='col-sm-2 file-dialog-label'>Sample Name :</label>" +
-                    "<div class='col-sm-9'>" +
-                    "<input type='text' class='file-dialog-form-control' id='location' readonly>" +
-                    "</div>" +
+                    "<label for='locationSearch' class='col-sm-2 file-dialog-label'>Search :</label>" +
+                    "<input type='text' class='search-file-dialog-form-control' id='locationSearch'>" +
                     "</div>" +
                     "<div class='form-group'>" +
                     "<div class='file-dialog-form-scrollable-block'>" +
-                    "<div id='fileTree'>" +
+                    "<div id='noResults' style='display:none;'>No results found</div>" +
+                    "<div id='sampleTable' class='samples-pane'>" +
                     "</div>" +
                     "<div id='file-browser-error' class='alert alert-danger' style='display: none;'>" +
                     "</div>" +
@@ -86,9 +85,6 @@ define(['require', 'lodash','jquery', 'log', 'backbone', 'file_browser', 'worksp
                     "</div>" +
                     "<div class='form-group'>" +
                     "<div class='file-dialog-form-btn'>" +
-                    "<button id='openButton' disabled type='button' class='btn btn-primary'>open" +
-                    "</button>" +
-                    "<div class='divider'/>" +
                     "<button type='button' class='btn btn-default' data-dismiss='modal'>cancel</button>" +
                     "</div>" +
                     "</div>" +
@@ -128,66 +124,54 @@ define(['require', 'lodash','jquery', 'log', 'backbone', 'file_browser', 'worksp
                 var openSampleConfigModal = sampleFileOpen.filter("#openSampleConfigModal");
                 var openFileWizardError = sampleFileOpen.find("#openFileWizardError");
                 var location = sampleFileOpen.find("input").filter("#location");
+                var locationSearch= sampleFileOpen.find("input").filter("#locationSearch");
 
-                var treeContainer  = sampleFileOpen.find("div").filter("#fileTree");
-                fileBrowser = new FileBrowser({container: treeContainer, application:app, fetchFiles:true,
-                showWorkspace:false,showSamples:true});
+                var treeContainer  = sampleFileOpen.find("div").filter("#sampleTable");
+                var bodyUlSampleContent = $('<ul class="recent-files clearfix"></ul>');
+                bodyUlSampleContent.attr('id', "sampleList");
+                var browserStorage = app.browserStorage;
+                var workspaceServiceURL = app.config.services.workspace.endpoint;
+                var getSampleDescServiceURL = workspaceServiceURL + "/listFiles/samples/descriptions";
+                var samplesWithDes={};
 
-                fileBrowser.render();
-                this._fileBrowser = fileBrowser;
-
-                //Gets the selected location from tree and sets the value as location
-                this.listenTo(fileBrowser, 'selected', function (selectedLocation) {
-                    var pathAttributes = selectedLocation.split(self.pathSeparator);
-                    var fileName = _.last(pathAttributes);
-                    var sampleOpenButton = sampleFileOpen.find("button").filter("#openButton");
-                    self._artifactName = pathAttributes[pathAttributes.length - 2];
-
-                    if(selectedLocation && fileName.lastIndexOf(".siddhi") != -1){
-                        location.val(fileName);
-                        sampleOpenButton.prop({
-                            disabled: false
-                        });
-                    } else {
-                        location.val('');
-                        sampleOpenButton.prop({
-                            disabled: true
-                        });
-                    }
-                });
-
-                sampleFileOpen.find("button").filter("#openButton").click(function () {
-
-                    var _location = location.val();
-                    if (_.isEmpty(_location)) {
-                        openFileWizardError.text("Invalid Value for Location.");
-                        openFileWizardError.show();
-                        return;
-                    }
-
-                    var pathAttributes = _location.split(self.pathSeparator);
-                    var fileName = _.last(pathAttributes);
-
-                    var tabList = self.app.tabController.getTabList();
-                    var fileAlreadyOpened = false;
-                    var openedTab;
-
-                    _.each(tabList, function(tab) {
-                        if(tab.getTitle() == fileName){
-                            fileAlreadyOpened = true;
-                            openedTab = tab;
-                        }
-                    })
-
-                    if(fileAlreadyOpened){
-                        self.app.tabController.setActiveTab(openedTab);
-                        openSampleConfigModal.modal('hide');
-                    } else {
-                        openSampleConfiguration({location: location});
+                 $.ajax({
+                    type: "GET",
+                    contentType: "json",
+                    url: getSampleDescServiceURL,
+                    async: false,
+                    success: function(data) {
+                        samplesWithDes=data;
+                    },
+                    error: function(e) {
+                        alertError("Unable to read a sample file.");
+                        throw "Unable to read a sample file.";
                     }
 
                 });
 
+                samplesWithDes.forEach(function(sample){
+                    var sampleName=sample.path;
+                    var config =
+                        {
+                            "sampleName":  ((sampleName.substring(sampleName.lastIndexOf('/')+1)).split(".siddhi"))[0],
+                            "sampleDes":sample.description,
+                            "parentContainer": bodyUlSampleContent,
+                            "firstItem": true,
+                            "clickEventCallback": function (event) {
+                                event.preventDefault();
+                                var payload=sampleName;
+                                openSample(payload);
+                            }
+                        };
+                    samplePreview = new SampleView(config);
+                    samplePreview.render();
+                    treeContainer.append(bodyUlSampleContent);
+                });
+
+                locationSearch.keyup(function(){
+                    var searchText= locationSearch.val();
+                    searchSample(bodyUlSampleContent, searchText);
+                });
 
                 $(this.dialog_container).append(sampleFileOpen);
                 openFileWizardError.hide();
@@ -261,6 +245,64 @@ define(['require', 'lodash','jquery', 'log', 'backbone', 'file_browser', 'worksp
                         }
                     });
                 };
+
+                 function openSample(payload) {
+                    var fileRelativeLocation = "artifacts" +self.app.getPathSeperator() +payload
+                    var workspaceServiceURL = app.config.services.workspace.endpoint;
+                    var openSampleServiceURL = workspaceServiceURL + "/read/sample";
+                    var browserStorage = app.browserStorage;
+
+                    $.ajax({
+                        url: openSampleServiceURL,
+                        type: "POST",
+                        data: fileRelativeLocation,
+                        contentType: "text/plain; charset=utf-8",
+                        async: false,
+                        success: function (data, textStatus, xhr) {
+                            if (xhr.status == 200) {
+                                var file = new File({
+                                    content: data.content
+                                },{
+                                    storage: browserStorage
+                                });
+                                openSampleConfigModal.modal('hide');
+                                app.commandManager.dispatch("create-new-tab", {tabOptions: {file: file}});
+                            } else {
+                                openFileWizardError.text(data.Error);
+                                openFileWizardError.show();
+                            }
+                        },
+                        error: function (res, errorCode, error) {
+                            var msg = _.isString(error) ? error : res.statusText;
+                            if(isJsonString(res.responseText)){
+                                var resObj = JSON.parse(res.responseText);
+                                if(_.has(resObj, 'Error')){
+                                    msg = _.get(resObj, 'Error');
+                                }
+                            }
+                            openFileWizardError.text(msg);
+                            openFileWizardError.show();
+                        }
+                    });
+                };
+
+                function searchSample(sampleContent,searchText){
+                    var filter = searchText.toUpperCase();
+                    var sampleElements = sampleContent[0].getElementsByTagName("li");
+                    var noResultsElement  = sampleFileOpen.find("div").filter("#noResults");
+                    var unmatchedCount=0;
+                    for (var i = 0; i < sampleElements.length; i++) {
+                        var sampleElement = sampleElements[i].getElementsByTagName("a")[0];
+                        if (sampleElement.innerText.toUpperCase().indexOf(filter) > -1){
+                            sampleElements[i].style.display = "";
+                        } else {
+                            sampleElements[i].style.display = "none";
+                            unmatchedCount+=1;
+                        }
+                    }
+                    var isMatched= (unmatchedCount===sampleElements.length);
+                    noResultsElement.toggle(isMatched);
+                }
             },
         });
 

@@ -22,6 +22,7 @@ import com.google.gson.JsonObject;
 
 import java.io.IOException;
 import java.nio.file.Path;
+import java.util.Map;
 
 /**
  * Interface for the workspace related functionality.
@@ -102,4 +103,11 @@ public interface Workspace {
      */
     void log(String logger, String timestamp, String level, String URL, String message, String layout)
             throws IOException;
+
+    /**
+     * List the samples in the given path with descriptions
+     * @param sampleMap provided sample map
+     * @return samples with descriptions
+     */
+    JsonArray listSamplesInPath(Map<String, String> sampleMap);
 }

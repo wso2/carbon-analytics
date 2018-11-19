@@ -93,6 +93,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
@@ -349,6 +350,21 @@ public class EditorMicroservice implements Microservice {
         } catch (IOException e) {
             return Response.serverError().entity("failed." + e.getMessage())
                     .build();
+        } catch (Throwable ignored) {
+            return Response.serverError().entity("failed")
+                    .build();
+        }
+    }
+
+    @GET
+    @Path("/workspace/listFiles/samples/descriptions")
+    @Produces("application/json")
+    public Response filesInSamplePathWithDescription() {
+        try {
+            Map<String, String> siddhiSampleMap = EditorDataHolder.getSiddhiSampleMap();
+            return Response.status(Response.Status.OK)
+                    .entity(workspace.listSamplesInPath(siddhiSampleMap))
+                    .type(MediaType.APPLICATION_JSON).build();
         } catch (Throwable ignored) {
             return Response.serverError().entity("failed")
                     .build();
@@ -876,6 +892,7 @@ public class EditorMicroservice implements Microservice {
                 new EditorSiddhiAppRuntimeService(), null);
         serviceRegistration = bundleContext.registerService(EventStreamService.class.getName(),
                 new DebuggerEventStreamService(), null);
+        getSampleFiles();
     }
 
     /**
@@ -930,5 +947,38 @@ public class EditorMicroservice implements Microservice {
 
     protected void unregisterConfigProvider(ConfigProvider configProvider) {
         this.configProvider = null;
+    }
+
+    protected void getSampleFiles() {
+        String location = (Paths.get(Constants.CARBON_HOME, Constants.DIRECTORY_SAMPLE,
+                Constants.DIRECTORY_ARTIFACTS)).toString();
+        String relativePath = "";
+        java.nio.file.Path pathLocation = SecurityUtil.resolvePath(Paths.get(location).toAbsolutePath(),
+                Paths.get(new String(Base64.getDecoder().
+                        decode(relativePath), Charset.defaultCharset())));
+
+        String regex = "@[Aa][Pp][Pp]:[Dd][Ee][Ss][Cc][Rr][Ii][Pp][Tt][Ii][Oo][Nn]\\(['|\"](.*?)['|\"]\\)";
+        Pattern pattern = Pattern.compile(regex);
+        try {
+            Map<String,String> sampleMap=new HashMap<>();
+            List<java.nio.file.Path> collect = Files.walk(pathLocation)
+                    .filter(s -> s.toString().endsWith(".siddhi"))
+                    .sorted()
+                    .collect(Collectors.toList());
+            for (java.nio.file.Path path : collect) {
+                String fileContent = new String(Files.readAllBytes(path), Charset.defaultCharset());
+                Matcher matcher = pattern.matcher(fileContent);
+                String descriptionText = "";
+                if (matcher.find()) {
+                    String description = matcher.group();
+                    descriptionText = description.substring(description.indexOf("(") + 1, description.lastIndexOf(")"));
+                }
+                java.nio.file.Path relativeSamplePath=pathLocation.relativize(path);
+                sampleMap.put(relativeSamplePath.toString(),descriptionText);
+            }
+            EditorDataHolder.setSiddhiSampleMap(sampleMap);
+        } catch (IOException e) {
+            log.error("Error while reading the sample descriptions.",e);
+        }
     }
 }
