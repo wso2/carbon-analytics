@@ -62,7 +62,6 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'aggregation', 'aggre
                 log.error(errorMessage);
                 throw errorMessage;
             }
-			$('#' + id).addClass('currently-selected-element');
 
             if (!clickedElement.getFrom()) {
                 DesignViewUtils.prototype.warnAlert('Connect an input stream element');
@@ -636,10 +635,6 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'aggregation', 'aggre
 
                     var textNode = $(element).parent().find('.aggregationNameNode');
                     textNode.html(configInput.name);
-                    if ($('#' + id).hasClass('incomplete-element')) {
-						$('#' + id).removeClass('incomplete-element');
-					}
-					$('#' + id).prop('title', '');
 
                     // perform JSON validation
                     JSONValidator.prototype.validateAggregation(clickedElement);
