@@ -21,7 +21,7 @@ package org.wso2.carbon.sp.jobmanager.core.model;
 import java.io.Serializable;
 
 /**
- * Represents a deployed child Siddhi app
+ * Represents a deployed child Siddhi app.
  */
 public class SiddhiAppHolder implements Serializable {
     private static final long serialVersionUID = 3345845929151967554L;
@@ -30,14 +30,18 @@ public class SiddhiAppHolder implements Serializable {
     private String appName;
     private String siddhiApp;
     private ResourceNode deployedNode;
+    private boolean isReceiverQueryGroup;
+    private int parallelism;
 
     public SiddhiAppHolder(String parentAppName, String groupName, String appName, String siddhiApp,
-                           ResourceNode deployedNode) {
+                           ResourceNode deployedNode, Boolean isReceiverQueryGroup, int parallelism) {
         this.parentAppName = parentAppName;
         this.groupName = groupName;
         this.appName = appName;
         this.siddhiApp = siddhiApp;
         this.deployedNode = deployedNode;
+        this.isReceiverQueryGroup = isReceiverQueryGroup;
+        this.parallelism = parallelism;
     }
 
     public String getParentAppName() {
@@ -80,6 +84,18 @@ public class SiddhiAppHolder implements Serializable {
         this.groupName = groupName;
     }
 
+    public boolean isReceiverQueryGroup() {
+        return isReceiverQueryGroup;
+    }
+
+    public void setReceiverQueryGroup(boolean receiverQueryGroup) {
+        isReceiverQueryGroup = receiverQueryGroup;
+    }
+
+    public int getParallelism() {
+        return parallelism;
+    }
+
     @Override
     public String toString() {
         return String.format("SiddhiApp { parentName: %s, groupName: %s, appName: %s }",
@@ -108,6 +124,9 @@ public class SiddhiAppHolder implements Serializable {
         if (getAppName() != null
                 ? !getAppName().equals(that.getAppName())
                 : that.getAppName() != null) {
+            return false;
+        }
+        if (isReceiverQueryGroup != that.isReceiverQueryGroup()) {
             return false;
         }
         return getSiddhiApp() != null

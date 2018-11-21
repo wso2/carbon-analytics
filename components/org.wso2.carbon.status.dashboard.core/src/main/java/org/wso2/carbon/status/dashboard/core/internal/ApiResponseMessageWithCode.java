@@ -25,17 +25,17 @@ import javax.xml.bind.annotation.XmlTransient;
 @javax.annotation.Generated(value = "io.swagger.codegen.languages.JavaMSF4JServerCodegen",
         date = "2017-03-15T08:56:59.657Z")
 public class ApiResponseMessageWithCode {
-
+    
     public static final int DATA_NOT_FOUND = 800103;
     public static final int SERVER_CONNECTION_ERROR = 800104;
-
-    int code;
-    String type;
-    String message;
-
+    
+    private int code;
+    private String type;
+    private String message;
+    
     public ApiResponseMessageWithCode() {
     }
-
+    
     public ApiResponseMessageWithCode(int code, String message) {
         this.code = code;
         switch (code) {
@@ -51,28 +51,28 @@ public class ApiResponseMessageWithCode {
         }
         this.message = message;
     }
-
+    
     @XmlTransient
     public int getCode() {
         return code;
     }
-
+    
     public void setCode(int code) {
         this.code = code;
     }
-
+    
     public String getType() {
         return type;
     }
-
+    
     public void setType(String type) {
         this.type = type;
     }
-
+    
     public String getMessage() {
         return message;
     }
-
+    
     public void setMessage(String message) {
         this.message = message;
     }

@@ -300,7 +300,7 @@ define(["ace/ace", "jquery", "./constants", "./utils", "./completion-engine", ".
                                 self.state.semanticErrorList = [({
                                     row: 0,
                                     // Change attribute "text" to "html" if html is sent from server
-                                    text: utils.wordWrap(response.message, 120),
+                                    html: utils.wordWrap(response.message, 120),
                                     type: "error"
                                 })];
 
@@ -314,7 +314,7 @@ define(["ace/ace", "jquery", "./constants", "./utils", "./completion-engine", ".
                                 self.state.semanticErrorList = [({
                                     row: response.queryContextStartIndex[0] - 1,
                                     // Change attribute "text" to "html" if html is sent from server
-                                    text: utils.wordWrap(response.message, 120),
+                                    html: utils.wordWrap(response.message, 120),
                                     type: "error"
                                 })];
 
@@ -489,11 +489,15 @@ define(["ace/ace", "jquery", "./constants", "./utils", "./completion-engine", ".
              *
              * @param {string} editorText Text in the editor after the change
              */
+            var editorChangeDelayTimer;
             self.onEditorChange = function (editorText) {
-                worker.postMessage(JSON.stringify({
-                    type: constants.worker.EDITOR_CHANGE_EVENT,
-                    data: editorText
-                }));
+                clearTimeout(editorChangeDelayTimer);
+                editorChangeDelayTimer = setTimeout(function () {
+                    worker.postMessage(JSON.stringify({
+                        type: constants.worker.EDITOR_CHANGE_EVENT,
+                        data: editorText
+                    }));
+                }, 2000);
             };
 
             /**

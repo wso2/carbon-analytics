@@ -19,7 +19,7 @@
 package org.wso2.carbon.sp.jobmanager.core.util;
 
 /**
- * This class contains constants needed for the Topology creation
+ * This class contains constants needed for the Topology creation.
  */
 public class SiddhiTopologyCreatorConstants {
     public static final Integer DEFAULT_PARALLEL = 1;
@@ -46,8 +46,8 @@ public class SiddhiTopologyCreatorConstants {
 
     public static final String OUTPUTSTREAMID = "outputStreamID";
 
-    public static final String DEFAULT_INPUTSTREAM_NAME = "InputStream";
-
     public static final String DEFAULT_PASSTROUGH_QUERY_TEMPLATE = "from ${" + INPUTSTREAMID + "} select * " + "insert"
             + " into " + "${" + OUTPUTSTREAMID + "}";
+    public static final String TRANSPORT_CHANNEL_CREATION_IDENTIFIER = "transportChannelCreationEnabled";
+    public static final String PASSTHROUGH = "passthrough";
 }

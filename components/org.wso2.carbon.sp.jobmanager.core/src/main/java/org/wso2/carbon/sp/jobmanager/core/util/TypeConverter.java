@@ -23,7 +23,7 @@ import org.wso2.carbon.sp.jobmanager.core.model.ManagerNode;
 import org.wso2.carbon.sp.jobmanager.core.model.ManagerNodeConfig;
 
 /**
- * This class is to convert Types
+ * This class is to convert Types.
  */
 public class TypeConverter {
 
@@ -50,7 +50,7 @@ public class TypeConverter {
     public static ManagerNodeConfig convert(ManagerNode node) {
         ManagerNodeConfig config = new ManagerNodeConfig();
         config.setId(node.getId());
-        config.setHttpInterface(convert(node.getHttpInterface()));
+        config.setHttpsInterface(convert(node.getHttpsInterface()));
         config.setHeartbeatInterval(node.getHeartbeatInterval());
         config.setHeartbeatMaxRetry(node.getHeartbeatMaxRetry());
         return config;
@@ -59,7 +59,7 @@ public class TypeConverter {
     public static ManagerNode convert(ManagerNodeConfig config) {
         ManagerNode node = new ManagerNode();
         node.setId(config.getId());
-        node.setHttpInterface(convert(config.getHttpInterface()));
+        node.setHttpsInterface(convert(config.getHttpsInterface()));
         node.setHeartbeatInterval(config.getHeartbeatInterval());
         node.setHeartbeatMaxRetry(config.getHeartbeatMaxRetry());
         return node;

@@ -31,7 +31,8 @@ import io.swagger.annotations.ApiModelProperty;
  * Deployment details of the managers and the resource pool
  */
 @ApiModel(description = "Deployment details of the managers and the resource pool")
-@javax.annotation.Generated(value = "io.swagger.codegen.languages.JavaMSF4JServerCodegen", date = "2017-10-23T12:20:42.963Z")
+@javax.annotation.Generated(value = "io.swagger.codegen.languages.JavaMSF4JServerCodegen",
+        date = "2017-10-23T12:20:42.963Z")
 public class Deployment {
     @JsonProperty("leader")
     private ManagerNodeConfig leader = null;

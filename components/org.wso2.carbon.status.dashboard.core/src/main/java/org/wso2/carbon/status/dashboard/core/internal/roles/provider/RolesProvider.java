@@ -40,11 +40,9 @@ public class RolesProvider {
 
     public RolesProvider(DeploymentConfigs dashboardConfigurations) {
         this.dashboardConfigurations = dashboardConfigurations;
-
     }
 
     /**
-     *
      * @param client
      * @return
      */
@@ -59,7 +57,6 @@ public class RolesProvider {
     }
 
     /**
-     *
      * @param client
      * @return
      */
@@ -74,7 +71,6 @@ public class RolesProvider {
     }
 
     /**
-     *
      * @param client
      * @return
      */
@@ -89,7 +85,6 @@ public class RolesProvider {
     }
 
     /**
-     *
      * @param client
      */
     private void readSysAdminConfigs(IdPClient client) {
@@ -108,7 +103,6 @@ public class RolesProvider {
     }
 
     /**
-     *
      * @param client
      */
     private void nonAdminConfigs(IdPClient client) {
@@ -141,6 +135,4 @@ public class RolesProvider {
         }
         return roleList;
     }
-
-
 }

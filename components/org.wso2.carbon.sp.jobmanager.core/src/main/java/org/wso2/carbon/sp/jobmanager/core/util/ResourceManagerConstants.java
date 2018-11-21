@@ -47,22 +47,70 @@ public class ResourceManagerConstants {
     public static final String PARTITION_NO = "partitionNo";
     public static final String MAPPING = "xml";
 
-    public static final String DEFAULT_KAFKA_SOURCE_TEMPLATE = "@source(type='kafka', topic.list='${" + TOPIC_LIST +
-            "}', group.id='${" + CONSUMER_GROUP_ID + "}', threading.option='single.thread', bootstrap.servers='${"
+    public static final String DEFAULT_KAFKA_SOURCE_TEMPLATE = "@source(type='kafka', topic.list="
+            + "'${" + TOPIC_LIST + "}', group.id='${" + CONSUMER_GROUP_ID + "}',"
+            + " threading.option='single.thread', bootstrap.servers='${"
             + BOOTSTRAP_SERVER_URL + "}', @map(type='" + MAPPING + "'))";
     public static final String PARTITIONED_KAFKA_SOURCE_TEMPLATE =
-            "@source(type='kafka', topic.list='${" + TOPIC_LIST + "}', group.id='${" + CONSUMER_GROUP_ID + "}', "
-                    + "threading.option='partition.wise', bootstrap.servers='${" + BOOTSTRAP_SERVER_URL + "}', "
+            "@source(type='kafka', topic.list='${" + TOPIC_LIST + "}', group.id='${"
+                    + CONSUMER_GROUP_ID + "}', threading.option='partition.wise',"
+                    + " bootstrap.servers='${" + BOOTSTRAP_SERVER_URL + "}', "
                     + "partition.no.list='${" + PARTITION_LIST + "}',@map(type='" + MAPPING + "'))";
 
-    public static final String DEFAULT_KAFKA_SINK_TEMPLATE = "@sink(type='kafka', topic='${" + TOPIC_LIST +
-            "}' , bootstrap.servers='${" + BOOTSTRAP_SERVER_URL + "}', @map(type='" + MAPPING + "'))";
+    public static final String DEFAULT_KAFKA_SINK_TEMPLATE = "@sink(type='kafka', topic='${"
+            + TOPIC_LIST + "}' , bootstrap.servers='${" + BOOTSTRAP_SERVER_URL + "}', @map(type='"
+            + MAPPING + "'))";
 
-    public static final String PARTITIONED_KAFKA_SINK_TEMPLATE = "@sink(type='kafka', topic='${" + TOPIC_LIST +
-            "}' , bootstrap.servers='${" + BOOTSTRAP_SERVER_URL + "}', @map(type='" + MAPPING + "'), @distribution"
-            + "(strategy='partitioned', partitionKey='${" + PARTITION_KEY + "}', ${" + DESTINATIONS + "} ))";
+    public static final String PARTITIONED_KAFKA_SINK_TEMPLATE = "@sink(type='kafka', topic='${"
+            + TOPIC_LIST + "}' , bootstrap.servers='${" + BOOTSTRAP_SERVER_URL + "}', @map(type='"
+            + MAPPING + "'), @distribution(strategy='partitioned', partitionKey='${"
+            + PARTITION_KEY + "}', ${" + DESTINATIONS + "} ))";
 
-    public static final String DESTINATION = "@destination(partition.no = '${" + PARTITION_NO + "}')";
+    public static final String PARTITION_TOPIC = "partitionTopic";
+
+    public static final String MB_DESTINATION = "mbDestination";
+
+    public static final String FACTORY_INITIAL = "factoryinitial";
+
+    public static final String PROVIDER_URL = "providerurl";
+
+    public static final String DESTINATION_TOPIC = "@destination(destination = '${"
+            + PARTITION_TOPIC + "}')";
+
+    public static final String DEFAULT_MB_TOPIC_SOURCE_TEMPLATE = "@source(type='jms',"
+            + "factory.initial='${" + FACTORY_INITIAL + "}',"
+            + "provider.url='${" + PROVIDER_URL + "}',connection.factory.type='topic',"
+            + "destination ='${" + MB_DESTINATION  +  "}' , connection.factory.jndi.name="
+            + "'TopicConnectionFactory',@map(type='" + MAPPING + "'))";
+
+    public static final String DEFAULT_MB_QUEUE_SOURCE_TEMPLATE = "@source(type='jms',"
+            + "factory.initial='${" + FACTORY_INITIAL + "}',"
+            + "provider.url='${"  + PROVIDER_URL + "}',connection.factory.type='queue',"
+            + "destination ='${" + MB_DESTINATION  +  "}',connection.factory.jndi.name="
+            + "'QueueConnectionFactory',@map(type ='" + MAPPING + "'))";
+
+    public static final String DEFAULT_MB_TOPIC_SINK_TEMPLATE = "@sink(type='jms',"
+            + "factory.initial='${" + FACTORY_INITIAL + "}',"
+            + "provider.url='${"  + PROVIDER_URL + "}',connection.factory.type='topic',"
+            + "destination = '${" + MB_DESTINATION  +  "}', connection.factory.jndi.name="
+            + "'TopicConnectionFactory',@map(type='" + MAPPING + "'))";
+
+    public static final String DEFAULT_MB_QUEUE_SINK_TEMPLATE = "@sink(type='jms',"
+            + "factory.initial='${" + FACTORY_INITIAL + "}',"
+            + "provider.url='${" + PROVIDER_URL + "}',connection.factory.type='queue',"
+            + "destination = '${" + MB_DESTINATION  +  "}', connection.factory.jndi.name="
+            + "'QueueConnectionFactory',@map(type='" + MAPPING + "'))";
+
+    public static final String PARTITIONED_MB_SINK_TEMPLATE = "@sink(type='jms',"
+            + "factory.initial='${" + FACTORY_INITIAL + "}',"
+            + "provider.url='${" + PROVIDER_URL
+            + "}',@distribution(strategy='partitioned', partitionKey='${" + PARTITION_KEY + "}',"
+            + "${" + DESTINATIONS + "}),connection.factory.type='topic',"
+            + "connection.factory.jndi.name='TopicConnectionFactory',"
+            + "@map(type='" + MAPPING + "'))";
+
+    public static final String DESTINATION = "@destination(partition.no = '${" + PARTITION_NO
+            + "}')";
 
     public static final String KEY_NODE_ID = "managerNodeId";
 
@@ -70,28 +118,31 @@ public class ResourceManagerConstants {
 
     public static final String KEY_NODE_INTERVAL = "heartbeatInterval";
 
-    public static final String KEY_NODE_HOST = "httpInterfaceHost";
+    public static final String KEY_NODE_PROTOCOL = "httpsInterface";
 
-    public static final String KEY_NODE_PORT = "httpInterfacePort";
+    public static final String KEY_NODE_HOST = "httpsInterfaceHost";
 
-    public static final String KEY_NODE_USERNAME = "httpInterfaceUsername";
+    public static final String KEY_NODE_PORT = "httpsInterfacePort";
 
-    public static final String KEY_NODE_PASSWORD = "httpInterfacePassword";
+    public static final String KEY_NODE_USERNAME = "httpsInterfaceUsername";
 
-    public static final String TASK_UPSERT_RESOURCE_MAPPING = "Inserting/Updating resource mapping group";
+    public static final String KEY_NODE_PASSWORD = "httpsInterfacePassword";
+
+    public static final String TASK_UPSERT_RESOURCE_MAPPING = "Inserting/Updating resource mapping "
+            + "group";
 
     public static final String TASK_GET_RESOURCE_MAPPING = "Getting resource mapping group";
 
-    public static final String CREATE_RESOURCE_MAPPING_TABLE =
-            "CREATE TABLE IF NOT EXISTS RESOURCE_POOL_TABLE (\n"
-                    + "                        GROUP_ID VARCHAR(512) NOT NULL,\n"
-                    + "                        RESOURCE_MAPPING BLOB NOT NULL,\n"
-                    + "                        PRIMARY KEY (GROUP_ID)\n" + ");\n";
+    public static final String CREATE_RESOURCE_MAPPING_TABLE = "create_resource_mapping_table";
 
-    public static final String PS_REPLACE_RESOURCE_MAPPING_ROW =
-            "REPLACE INTO RESOURCE_POOL_TABLE (GROUP_ID, RESOURCE_MAPPING) VALUES (?,?);";
+    public static final String CHECK_FOR_RESOURCE_MAPPING_TABLE = "check_for_resource_mapping_table";
 
-    public static final String PS_SELECT_RESOURCE_MAPPING_ROW =
-            "SELECT GROUP_ID, RESOURCE_MAPPING FROM RESOURCE_POOL_TABLE WHERE GROUP_ID =?";
+    public static final String PS_DELETE_RESOURCE_MAPPING_ROW = "ps_delete_resource_mapping_row";
+
+    public static final String PS_INSERT_RESOURCE_MAPPING_ROW = "ps_insert_resource_mapping_row";
+
+    public static final String PS_SELECT_RESOURCE_MAPPING_ROW = "ps_select_resource_mapping_row";
+
+    public static final String QUERY_YAML_FILE_NAME = "queries.yaml";
 
 }

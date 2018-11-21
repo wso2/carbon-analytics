@@ -19,18 +19,18 @@ package org.wso2.carbon.stream.processor.statistics.impl.exception;
  * Execption class that used when there is an error in reading real-time from metrics MBean.
  */
 public class SystemMetricsExtractionException extends Exception {
-
+    
     public SystemMetricsExtractionException() {
     }
-
+    
     public SystemMetricsExtractionException(String message) {
         super(message);
     }
-
+    
     public SystemMetricsExtractionException(String message, Throwable cause) {
         super(message, cause);
     }
-
+    
     public SystemMetricsExtractionException(Throwable cause) {
         super(cause);
     }

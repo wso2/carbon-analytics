@@ -15,12 +15,13 @@
  * specific language governing permissions and limitations
  * under the License.
  */
+
 package org.wso2.carbon.sp.jobmanager.core.topology;
 
 import org.wso2.carbon.sp.jobmanager.core.util.EventHolder;
 
 /**
- * Data Holder to hold required details of Input Streams in {@link SiddhiTopology}
+ * Data Holder to hold required details of Input Streams in {@link SiddhiTopology}.
  */
 public class InputStreamDataHolder {
     private String streamName;
@@ -28,6 +29,7 @@ public class InputStreamDataHolder {
     private EventHolder eventHolderType;
     private boolean isUserGiven;
     private SubscriptionStrategyDataHolder subscriptionStrategy;
+    private boolean isInnerGroupStream;
 
     public InputStreamDataHolder(String streamName, String streamDefinition, EventHolder eventHolderType,
                                  boolean isUserGiven, SubscriptionStrategyDataHolder subscriptionStrategy) {
@@ -36,6 +38,7 @@ public class InputStreamDataHolder {
         this.eventHolderType = eventHolderType;
         this.isUserGiven = isUserGiven;
         this.subscriptionStrategy = subscriptionStrategy;
+        isInnerGroupStream = false;
     }
 
     public String getStreamDefinition() {
@@ -64,5 +67,13 @@ public class InputStreamDataHolder {
 
     public EventHolder getEventHolderType() {
         return eventHolderType;
+    }
+
+    public boolean isInnerGroupStream() {
+        return isInnerGroupStream;
+    }
+
+    public void setInnerGroupStream(boolean innerGroupStream) {
+        isInnerGroupStream = innerGroupStream;
     }
 }

@@ -79,19 +79,26 @@ define(['log', 'jquery', 'lodash', 'backbone', 'console'], function (log, $, _, 
 
             hideConsoleComponents: function () {
                 var self = this;
-                var consoleHeaderContainer = self._$parent_el
+                var consoleHeaderContainer = self._$parent_el;
                 var serviceWrapper =  $('#service-tabs-wrapper');
                 consoleHeaderContainer.addClass('hide');
                 serviceWrapper.css('height', '100%');
                 if (serviceWrapper.is('.ui-resizable')){
                     serviceWrapper.resizable( "destroy" );
+                    /*
+                    * when resizable method in #service-tabs-wrapper's resizable method is destroyed
+                    * it affects to it's child elements as well. So partitions in the design view also gets affected by
+                    * this and partition's resize handles are also disappears. In order to add them back initialise them
+                    * again.
+                    * */
+                    var partitions = $('.partitionDrop');
+                    partitions.resizable( "destroy" );
+                    partitions.resizable();
                 }
                 var activeTab = self.options.application.tabController.activeTab;
                 if (activeTab !== undefined && activeTab.getTitle() != "welcome-page") {
                     if (activeTab.getSiddhiFileEditor().isInSourceView()) {
                         activeTab.getSiddhiFileEditor().getSourceView().editorResize();
-                    } else {
-                        activeTab.getSiddhiFileEditor().getEventFlow().graphResize();
                     }
                 }
             },
@@ -108,12 +115,18 @@ define(['log', 'jquery', 'lodash', 'backbone', 'console'], function (log, $, _, 
                     resize: function( event, ui ) {
                     }
                 });
+                /*
+                * when resizable method in #service-tabs-wrapper's resizable method is given a custom implementation
+                * it affects to it's child elements as well. So partitions in the design view also gets affected by
+                * this and partition's resize handles are also disappears. In order to add them back initialise them
+                * again.
+                * */
+                $('.partitionDrop').resizable();
                 var activeTab = self.options.application.tabController.activeTab;
                 if (activeTab.getTitle() != "welcome-page") {
-                    if (activeTab.getSiddhiFileEditor().isInSourceView()) {
+                    if (activeTab.getSiddhiFileEditor().isInSourceView() !== undefined
+                        && activeTab.getSiddhiFileEditor().isInSourceView()) {
                         activeTab.getSiddhiFileEditor().getSourceView().editorResize();
-                    } else {
-                        activeTab.getSiddhiFileEditor().getEventFlow().graphResize();
                     }
                 }
             },
@@ -185,7 +198,7 @@ define(['log', 'jquery', 'lodash', 'backbone', 'console'], function (log, $, _, 
             },
             /**
              * gets Console
-             * @param {string} console id
+             * @param {string} consoleId id of the console
              * @returns {*}
              */
             getConsole: function (consoleId) {
@@ -229,16 +242,40 @@ define(['log', 'jquery', 'lodash', 'backbone', 'console'], function (log, $, _, 
                 }
             },
             /**
+             * removes a form console
+             * @param {Console} console the form console instance
+             * @fires ConsoleList#console-removed
+             */
+            removeFormConsole: function (console) {
+                if (!_.includes(this._consoles, console)) {
+                    var errMsg = 'console : ' + console.id + 'is not part of this console list.';
+                    log.error(errMsg);
+                    throw errMsg;
+                }
+                _.remove(this._consoles, console);
+                console.getHeader().remove();
+                console.remove();
+                this.trigger("console-removed", console);
+
+                // setting the global console as the next active console
+                var nextConsole = this.getGlobalConsole();
+                this.setActiveConsole(nextConsole);
+                this.hideAllConsoles();
+            },
+            /**
              * set selected console
-             * @param {Console} tab the console instance
+             * @param {Console} console the console instance
              * @fires ConsoleList#active-console-changed
              */
             setActiveConsole: function (console) {
 
                 //set the corresponding active console for Tab
-                if (console._type == "CONSOLE") {
+                if (console._type === "CONSOLE") {
                     $(".consoleToolbar").removeClass("hidden");
                     this.options.application.tabController.getActiveTab()._lastActiveConsole = "CONSOLE";
+                } else if (console._type === "FORM"){
+                    $(".consoleToolbar").addClass("hidden");
+                    this.options.application.tabController.getActiveTab()._lastActiveConsole = "FORM";
                 } else {
                     $(".consoleToolbar").addClass("hidden");
                     this.options.application.tabController.getActiveTab()._lastActiveConsole = "DEBUG";
@@ -289,7 +326,7 @@ define(['log', 'jquery', 'lodash', 'backbone', 'console'], function (log, $, _, 
             showActiveConsole: function (activeConsole) {
                 activeConsole.show(true);
                 _.each(this._consoles, function (console) {
-                    if (console._type != "CONSOLE" && console._uniqueId != activeConsole._uniqueId) {
+                    if (console._type !== "CONSOLE" && console._uniqueId !== activeConsole._uniqueId) {
                         console.hide();
                     }
                 });
@@ -300,14 +337,22 @@ define(['log', 'jquery', 'lodash', 'backbone', 'console'], function (log, $, _, 
                 });
             },
             enableConsoleByTitle: function (title,type) {
-                var globalConsole;
                 var exist = false;
                 var self = this;
-                var globalConsole = this._consoles[_.findIndex(this._consoles, function(o) { return o._type ==
-                    'CONSOLE'; })]
+                var globalConsole = this._consoles[_.findIndex(this._consoles, function(o) { return o._type ===
+                    'CONSOLE'; })];
                 _.each(this._consoles, function (console) {
-                    if(console._type == type){
-                        if (console._appName == title) {
+                    if(console._type === type){
+                        if (console._appName === title) {
+                            /*
+                            * If the user has closed the output console in a previous tab and switches back to the
+                            * design view of a tab(earlier a form was kept opened in the output console in this tab and
+                            * now it is hidden because user has closed the output console in the previous tab) now we
+                            * need to enable the output console.
+                            * */
+                            if (type === 'FORM') {
+                                self.showConsoleComponents();
+                            }
                             console.show(true);
                             self.setActiveConsole(console);
                             globalConsole._isActive = false;
@@ -393,6 +438,42 @@ define(['log', 'jquery', 'lodash', 'backbone', 'console'], function (log, $, _, 
                     // activate by default
                     this.setActiveConsole(newConsole);
                 }
+                this.showActiveConsole(newConsole);
+                this.showConsoleComponents();
+                this.getConsoleActivateBtn().parent('li').addClass('active');
+                return newConsole;
+            },
+
+            /**
+             * Creates a new console tab for a form.
+             * @param opts
+             *          switchToNewConsole: indicate whether to switch to new console of type after creation
+             *          consoleOptions: constructor args for the console
+             * @returns {Console} created console instance
+             * @event ConsoleList#console-added
+             * @fires ConsoleList#active-console-changed
+             */
+            newFormConsole: function (opts) {
+                var consoleOptions = _.get(opts, 'consoleOptions') || {};
+                _.set(consoleOptions, 'application', this.options.application);
+                _.assign(consoleOptions, _.get(this.options, 'consoles.console'));
+                _.set(consoleOptions, 'consoles_container', _.get(this.options, 'consoles.container'));
+                _.set(consoleOptions, 'parent', this);
+                var consoleType = _.get(consoleOptions, '_type');
+                var uniqueTabId = _.get(consoleOptions, 'uniqueTabId');
+                var newConsole = this.getConsoleForType(consoleType, uniqueTabId);
+                var currentFocusedFile = _.get(opts, 'consoleOptions.currentFocusedFile');
+
+                if (newConsole === undefined) {
+                    newConsole = new this.ConsoleModel(consoleOptions);
+                    if (consoleType === "FORM") {
+                        _.set(newConsole, '_title', _.get(consoleOptions, 'title') + " - " + _.get(consoleOptions, 'appName'));
+                        this.addConsole(newConsole);
+                        this.options.application.tabController.getActiveTab()._lastActiveConsole = "FORM";
+
+                    }
+                }
+                this.setActiveConsole(newConsole);
                 this.showActiveConsole(newConsole);
                 this.showConsoleComponents();
                 this.getConsoleActivateBtn().parent('li').addClass('active');

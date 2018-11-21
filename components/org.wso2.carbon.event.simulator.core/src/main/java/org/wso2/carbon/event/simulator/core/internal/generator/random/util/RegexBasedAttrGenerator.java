@@ -26,6 +26,7 @@ import org.wso2.carbon.event.simulator.core.internal.bean.RegexBasedAttributeDTO
 import org.wso2.carbon.event.simulator.core.internal.generator.random.RandomAttrGenAbstractImpl;
 import org.wso2.carbon.event.simulator.core.internal.generator.random.RandomAttributeGenerator;
 import org.wso2.carbon.event.simulator.core.internal.util.EventSimulatorConstants;
+import org.wso2.carbon.stream.processor.common.exception.ResourceNotFoundException;
 import org.wso2.siddhi.query.api.definition.Attribute;
 
 import com.mifmif.common.regex.Generex;
@@ -65,19 +66,29 @@ public class RegexBasedAttrGenerator extends RandomAttrGenAbstractImpl {
                         EventSimulatorConstants.REGEX_BASED_ATTRIBUTE_PATTERN) + "' provided for " +
                         RandomAttributeGenerator.RandomDataGeneratorType.REGEX_BASED + " attribute generation." +
                         " Invalid attribute configuration : " + attributeConfig.toString() + "'. ", e);
-                throw new InvalidConfigException("Invalid regular expression '" + attributeConfig.getString(
-                        EventSimulatorConstants.REGEX_BASED_ATTRIBUTE_PATTERN) + "' provided for " +
-                        RandomAttributeGenerator.RandomDataGeneratorType.REGEX_BASED + " attribute generation. " +
-                        "Invalid attribute configuration : " + attributeConfig.toString() + "'. ", e);
+                throw new InvalidConfigException(
+                                ResourceNotFoundException.ResourceType.RANDOM_SIMULATION,
+                                EventSimulatorConstants.REGEX_BASED_ATTRIBUTE_PATTERN,
+                                "Invalid regular expression '" + attributeConfig.getString(
+                                EventSimulatorConstants.REGEX_BASED_ATTRIBUTE_PATTERN) + "' provided for " +
+                                RandomAttributeGenerator.RandomDataGeneratorType.REGEX_BASED + " attribute " +
+                                "generation. Invalid attribute configuration : " + attributeConfig.toString() + "'. ",
+                        e);
             } catch (NumberFormatException e) {
-                throw new InvalidConfigException("Regex pattern '" + regexPattern +
-                        "' cannot be parsed to attribute type '" + attributeType + "'. Invalid " +
-                        "attribute configuration provided : " + attributeConfig.toString());
+                throw new InvalidConfigException(
+                                ResourceNotFoundException.ResourceType.RANDOM_SIMULATION,
+                                EventSimulatorConstants.REGEX_BASED_ATTRIBUTE_PATTERN,
+                                "Regex pattern '" + regexPattern +
+                                "' cannot be parsed to attribute type '" + attributeType + "'. Invalid " +
+                                "attribute configuration provided : " + attributeConfig.toString());
             }
         } else {
-            throw new InvalidConfigException("Pattern is required for " +
-                    RandomAttributeGenerator.RandomDataGeneratorType.REGEX_BASED + " simulation. Invalid attribute " +
-                    "configuration : " + attributeConfig.toString());
+            throw new InvalidConfigException(
+                            ResourceNotFoundException.ResourceType.RANDOM_SIMULATION,
+                            EventSimulatorConstants.REGEX_BASED_ATTRIBUTE_PATTERN,
+                            "Pattern is required for " +
+                            RandomAttributeGenerator.RandomDataGeneratorType.REGEX_BASED +
+                            " simulation. Invalid attribute configuration : " + attributeConfig.toString());
         }
     }
 

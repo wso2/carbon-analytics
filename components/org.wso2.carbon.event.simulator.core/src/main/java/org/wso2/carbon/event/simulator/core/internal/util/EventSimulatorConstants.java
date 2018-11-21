@@ -39,6 +39,9 @@ public class EventSimulatorConstants {
     public static final String SIMULATION_TIME_INTERVAL = "timeInterval";
     public static final String NUMBER_OF_EVENTS_REQUIRED = "noOfEvents";
 
+    public static final String JSON_CONFIGURATION_RESOURCE_NAME = "JSON configuration";
+    public static final String PROPERTIES_RESOURCE_NAME = "properties";
+
 
     //Feed Simulation stream Configuration constants
 

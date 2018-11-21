@@ -2,7 +2,7 @@
  *  Copyright (c) 2017, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
  *
  *  WSO2 Inc. licenses this file to you under the Apache License,
- *  Version 2.0 (the "License"); you may not use this file except
+ *  Version 2.0 (the 'License'); you may not use this file except
  *  in compliance with the License.
  *  You may obtain a copy of the License at
  *
@@ -10,24 +10,27 @@
  *
  *  Unless required by applicable law or agreed to in writing,
  *  software distributed under the License is distributed on an
- *  "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ *  'AS IS' BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
  *  KIND, either express or implied.  See the License for the
  *  specific language governing permissions and limitations
  *  under the License.
  *
  */
 
-import {Checkbox, RaisedButton, Snackbar, TextField} from "material-ui";
-import {darkBaseTheme, getMuiTheme, MuiThemeProvider} from "material-ui/styles";
-import Qs from "qs";
-import React, {Component} from "react";
-import {Redirect} from "react-router-dom";
-import PropTypes from "prop-types";
+import {Checkbox, RaisedButton, Snackbar, TextField} from 'material-ui';
+import {darkBaseTheme, getMuiTheme, MuiThemeProvider} from 'material-ui/styles';
+import Qs from 'qs';
+import React, {Component} from 'react';
+import {Redirect} from 'react-router-dom';
+import PropTypes from 'prop-types';
 
 
-import AuthManager from "./utils/AuthManager";
-import FormPanel from "../common/FormPanel";
-import Header from "../common/Header";
+import AuthManager from './utils/AuthManager';
+import FormPanel from '../common/FormPanel';
+import Header from '../common/Header';
+import '../../public/css/dashboard.css';
+//Localization
+import { FormattedMessage } from 'react-intl';
 
 const muiTheme = getMuiTheme(darkBaseTheme);
 const titleStyle = {textAlign: 'center', marginTop: 50, color: '#9c9898'};
@@ -39,9 +42,11 @@ const buttonStyle = {marginLeft: '35%', width: '40%'};
 const styles = {
     messageBox: {textAlign: 'center', color: 'white'},
     errorMessage: {backgroundColor: '#333333', color: 'white', border: '2px solid #e74c3c'},
-    cookiePolicy: {padding: '10px', backgroundColor: '#fcf8e3', fontFamily: muiTheme.fontFamily,
-        border: '1px solid #faebcc', color: '#8a6d3b'},
-    cookiePolicyAnchor: {fontWeight: 'bold', color: '#8a6d3b'}
+    cookiePolicy: {
+        padding: '10px', fontFamily: muiTheme.fontFamily,
+        border: '1px solid #8a6d3b', color: '#8a6d3b'
+    },
+    cookiePolicyAnchor: {fontWeight: '400', color: '#0D47A1', fontStyle: 'italic' }
 };
 
 /**
@@ -65,7 +70,7 @@ export default class Login extends Component {
         this.authenticate = this.authenticate.bind(this);
     }
 
-    componentWillMount(){
+    componentWillMount() {
         if (AuthManager.isRememberMeSet() && !AuthManager.isLoggedIn()) {
             AuthManager.authenticateWithRefreshToken()
                 .then(() => this.setState({authenticated: true}));
@@ -99,8 +104,8 @@ export default class Login extends Component {
             .authenticate(this.state.username, this.state.password, this.state.rememberMe)
             .then(() => this.setState({authenticated: true}))
             .catch((error) => {
-                const errorMessage = error.response && error.response.status === 401 ? "Invalid username/password!":
-                    "Unknown error occurred!";
+                const errorMessage = error.response && error.response.status === 401 ? this.context.intl.formatMessage({ id: 'login.invalidUsername', defaultMessage: 'Invalid username/password!' }) :
+                    this.context.intl.formatMessage({ id: 'login.unknownError', defaultMessage: 'Unknown error occurred!' });
                 this.setState({
                     username: '',
                     password: '',
@@ -123,18 +128,35 @@ export default class Login extends Component {
             );
         }
 
+        const cookiePolicy = (
+            <a
+            style={styles.cookiePolicyAnchor}
+            href='/policies/cookie-policy'
+            target='_blank'>
+                <FormattedMessage id='login.cookiePolicy' defaultMessage='Cookie Policy' />
+            </a>);
+
+        const privacyPolicy = (
+            <a
+                style={styles.cookiePolicyAnchor}
+                href='/policies/privacy-policy'
+                target='_blank'>
+                    <FormattedMessage id='login.privacyPolicy' defaultMessage='Privacy Policy' />
+            </a>
+        )    
         return (
             <MuiThemeProvider muiTheme={muiTheme}>
-                <div>
+                <div className={'login-container'}>
                     <Header title={window.contextPath.substr(1)} hideUserSettings/>
-                    <FormPanel title={"Login"}
-                               onSubmit={this.authenticate}>
+                    <FormPanel 
+                        title={<FormattedMessage id='login.title' defaultMessage='Login' />} 
+                        onSubmit={this.authenticate}>                  
                         <TextField
                             floatingLabelFocusStyle={{color: '#f17b31'}}
                             underlineFocusStyle={{borderColor: '#f17b31'}}
                             //style={textField}
                             fullWidth
-                            floatingLabelText={"Username"}
+                            floatingLabelText={<FormattedMessage id='login.username' defaultMessage='Username' />}
                             autoComplete="off"
                             value={this.state.username}
                             onChange={(e) => {
@@ -144,12 +166,12 @@ export default class Login extends Component {
                                 });
                             }}
                         />
-                        <br />
+                        <br/>
                         <TextField
                             fullWidth
-                            type="password"
-                            autoComplete="off"
-                            floatingLabelText={"Password"}
+                            type='password'
+                            autoComplete='off'
+                            floatingLabelText={<FormattedMessage id='login.password' defaultMessage='Password' />}
                             floatingLabelFocusStyle={{color: '#f17b31'}}
                             underlineFocusStyle={{borderColor: '#f17b31'}}
                             //style={textField}
@@ -161,9 +183,9 @@ export default class Login extends Component {
                                 });
                             }}
                         />
-                        <br />
+                        <br/>
                         <Checkbox
-                            label={"Remember Me"}
+                            label={<FormattedMessage id='login.rememberMe' defaultMessage='Remember Me' />}
                             checked={this.state.rememberMe}
                             iconStyle={{fill: '#f17b31'}}
                             onCheck={(e, checked) => {
@@ -172,48 +194,35 @@ export default class Login extends Component {
                                 });
                             }}
                             style={{'margin': '30px 0'}}
+                            labelStyle={{color: '#BDBDBD'}}
                         />
-                        <br />
+                        <br/>
                         <RaisedButton
-                            type="submit"
+                            type='submit'
                             disabled={this.state.username === '' || this.state.password === ''}
-                            label={"Login"}
+                            label={<FormattedMessage id='login.loginButton' defaultMessage='Login' />}
                             style={buttonStyle}
                             backgroundColor='#f17b31'
-                            disabledBackgroundColor="rgb(51, 51, 51)"
+                            disabledBackgroundColor='rgb(51, 51, 51)'
                         />
-                        <br />
-                        <br />
+                        <br/>
+                        <br/>
                         <div style={styles.cookiePolicy}>
                             <div>
-                                After a successful sign in, we use a cookie in your browser to track your session.&nbsp;
-                                You can refer our&nbsp;
-                                <a
-                                    style={styles.cookiePolicyAnchor}
-                                    href="/policies/cookie-policy"
-                                    target="_blank"
-                                >
-                                    Cookie Policy
-                                </a> for more details.
+                                <FormattedMessage id='login.cookieMsg' defaultMessage='After a successful sign in, we use a cookie in your browser to track your session. You can refer our {cookiePolicy} for more details.' values={{cookiePolicy:cookiePolicy}} />                                
                             </div>
                         </div>
-                        <br />
+                        <br/>
                         <div style={styles.cookiePolicy}>
                             <div>
-                                By signing in, you agree to our&nbsp;
-                                <a
-                                    style={styles.cookiePolicyAnchor}
-                                    href="/policies/privacy-policy"
-                                    target="_blank">
-                                    Privacy Policy
-                                </a>.
+                                <FormattedMessage id='login.bysigningUp' defaultMessage='By signing in, you agree to our {privacyPolicy}' values={{privacyPolicy:privacyPolicy}} />                                
                             </div>
                         </div>
                     </FormPanel>
                     <Snackbar
                         message={this.state.error}
                         open={this.state.showError}
-                        autoHideDuration="4000"
+                        autoHideDuration='4000'
                         contentStyle={styles.messageBox}
                         bodyStyle={styles.errorMessage}
                         onRequestClose={() => this.setState({error: '', showError: false})}

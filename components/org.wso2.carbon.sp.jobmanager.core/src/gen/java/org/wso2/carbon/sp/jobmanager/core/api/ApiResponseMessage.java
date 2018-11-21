@@ -21,7 +21,8 @@ package org.wso2.carbon.sp.jobmanager.core.api;
 import javax.xml.bind.annotation.XmlTransient;
 
 @javax.xml.bind.annotation.XmlRootElement
-@javax.annotation.Generated(value = "io.swagger.codegen.languages.JavaMSF4JServerCodegen", date = "2017-10-21T09:39:46.914Z")
+@javax.annotation.Generated(value = "io.swagger.codegen.languages.JavaMSF4JServerCodegen",
+        date = "2017-10-21T09:39:46.914Z")
 public class ApiResponseMessage {
     public static final int ERROR = 1;
     public static final int WARNING = 2;

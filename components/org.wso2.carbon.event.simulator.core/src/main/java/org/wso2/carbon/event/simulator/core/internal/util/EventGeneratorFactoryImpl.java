@@ -21,6 +21,7 @@ package org.wso2.carbon.event.simulator.core.internal.util;
 import org.json.JSONObject;
 import org.wso2.carbon.event.simulator.core.exception.InsufficientAttributesException;
 import org.wso2.carbon.event.simulator.core.exception.InvalidConfigException;
+import org.wso2.carbon.event.simulator.core.exception.SimulationValidationException;
 import org.wso2.carbon.event.simulator.core.internal.generator.EventGenerator;
 import org.wso2.carbon.event.simulator.core.internal.generator.csv.core.CSVEventGenerator;
 import org.wso2.carbon.event.simulator.core.internal.generator.database.core.DatabaseEventGenerator;
@@ -48,7 +49,7 @@ public class EventGeneratorFactoryImpl implements EventGeneratorFactory {
     @Override
     public EventGenerator createEventGenerator(JSONObject sourceConfig, long startTimestamp, long endTimestamp,
                                                String simulationName)
-            throws InvalidConfigException, ResourceNotFoundException {
+            throws SimulationValidationException {
         if (checkAvailability(sourceConfig, EventSimulatorConstants.EVENT_SIMULATION_TYPE)) {
             EventGenerator.GeneratorType generatorType;
             try {
@@ -56,11 +57,13 @@ public class EventGeneratorFactoryImpl implements EventGeneratorFactory {
                         getString(EventSimulatorConstants.EVENT_SIMULATION_TYPE));
             } catch (IllegalArgumentException e) {
                 throw new InvalidConfigException(
-                        "Simulation type must be either '" + EventGenerator.GeneratorType.CSV_SIMULATION + "' or '"
-                                + EventGenerator.GeneratorType.DATABASE_SIMULATION + "' or '"
-                                + EventGenerator.GeneratorType.RANDOM_DATA_SIMULATION
-                                + "'. Invalid source configuration in "  + simulationName + "' simulation.\n"
-                                + SourceConfigLogger.getLoggedEnabledSourceConfig(sourceConfig));
+                                ResourceNotFoundException.ResourceType.SIMULATION,
+                                sourceConfig.getString(EventSimulatorConstants.EVENT_SIMULATION_TYPE),
+                                "Simulation type must be either '" + EventGenerator.GeneratorType.CSV_SIMULATION +
+                                "' or '" + EventGenerator.GeneratorType.DATABASE_SIMULATION + "' or '" +
+                                EventGenerator.GeneratorType.RANDOM_DATA_SIMULATION + "'. Invalid source " +
+                                "configuration in "  + simulationName + "' simulation.\n" +
+                                SourceConfigLogger.getLoggedEnabledSourceConfig(sourceConfig));
             }
             //initialize generators for sources
             EventGenerator eventGenerator = null;
@@ -81,11 +84,14 @@ public class EventGeneratorFactoryImpl implements EventGeneratorFactory {
             return eventGenerator;
         } else {
             throw new InvalidConfigException(
-                    "Simulation type must be specified as either '" + EventGenerator.GeneratorType.CSV_SIMULATION
-                            + "' or '" + EventGenerator.GeneratorType.DATABASE_SIMULATION + "' or '"
-                            + EventGenerator.GeneratorType.RANDOM_DATA_SIMULATION
-                            + "'. Invalid source configuration in "  + simulationName + "' simulation.\n"
-                            + SourceConfigLogger.getLoggedEnabledSourceConfig(sourceConfig));
+                            ResourceNotFoundException.ResourceType.SIMULATION,
+                            sourceConfig.getString(EventSimulatorConstants.EVENT_SIMULATION_TYPE),
+                            "Simulation type must be specified as either '" +
+                            EventGenerator.GeneratorType.CSV_SIMULATION + "' or '" +
+                            EventGenerator.GeneratorType.DATABASE_SIMULATION + "' or '" +
+                            EventGenerator.GeneratorType.RANDOM_DATA_SIMULATION + "'. Invalid source configuration " +
+                            "in "  + simulationName + "' simulation.\n" +
+                            SourceConfigLogger.getLoggedEnabledSourceConfig(sourceConfig));
         }
     }
 
@@ -101,8 +107,7 @@ public class EventGeneratorFactoryImpl implements EventGeneratorFactory {
      */
     @Override
     public void validateGeneratorConfiguration(JSONObject sourceConfig, String simulationName)
-            throws InvalidConfigException,
-            InsufficientAttributesException, ResourceNotFoundException {
+            throws SimulationValidationException {
         if (checkAvailability(sourceConfig, EventSimulatorConstants.EVENT_SIMULATION_TYPE)) {
             EventGenerator.GeneratorType generatorType;
             try {
@@ -110,11 +115,14 @@ public class EventGeneratorFactoryImpl implements EventGeneratorFactory {
                         getString(EventSimulatorConstants.EVENT_SIMULATION_TYPE));
             } catch (IllegalArgumentException e) {
                 throw new InvalidConfigException(
-                        "Simulation type must be either '" + EventGenerator.GeneratorType.CSV_SIMULATION + "' or '"
-                                + EventGenerator.GeneratorType.DATABASE_SIMULATION + "' or '"
-                                + EventGenerator.GeneratorType.RANDOM_DATA_SIMULATION
-                                + "'. Invalid source configuration in "  + simulationName + "' simulation.\n"
-                                + SourceConfigLogger.getLoggedEnabledSourceConfig(sourceConfig));
+                                ResourceNotFoundException.ResourceType.SIMULATION,
+                                sourceConfig.getString(EventSimulatorConstants.EVENT_SIMULATION_TYPE),
+                                "Simulation type must be either '" +
+                                EventGenerator.GeneratorType.CSV_SIMULATION +  "' or '" +
+                                EventGenerator.GeneratorType.DATABASE_SIMULATION + "' or '" +
+                                EventGenerator.GeneratorType.RANDOM_DATA_SIMULATION + "'. Invalid source " +
+                                "configuration in "  + simulationName + "' simulation.\n" +
+                                SourceConfigLogger.getLoggedEnabledSourceConfig(sourceConfig));
             }
             switch (generatorType) {
                 case CSV_SIMULATION:
@@ -129,11 +137,14 @@ public class EventGeneratorFactoryImpl implements EventGeneratorFactory {
             }
         } else {
             throw new InvalidConfigException(
-                    "Simulation type must be specified either '" + EventGenerator.GeneratorType.CSV_SIMULATION
-                            + "' or '" + EventGenerator.GeneratorType.DATABASE_SIMULATION + "' or '"
-                            + EventGenerator.GeneratorType.RANDOM_DATA_SIMULATION
-                            + "'. Invalid source configuration in " + simulationName + "' simulation.\n"
-                            + SourceConfigLogger.getLoggedEnabledSourceConfig(sourceConfig));
+                            ResourceNotFoundException.ResourceType.SIMULATION,
+                            sourceConfig.getString(EventSimulatorConstants.EVENT_SIMULATION_TYPE),
+                            "Simulation type must be specified either '" +
+                            EventGenerator.GeneratorType.CSV_SIMULATION + "' or '" +
+                            EventGenerator.GeneratorType.DATABASE_SIMULATION + "' or '" +
+                            EventGenerator.GeneratorType.RANDOM_DATA_SIMULATION + "'. Invalid source " +
+                            "configuration in " + simulationName + "' simulation.\n" +
+                            SourceConfigLogger.getLoggedEnabledSourceConfig(sourceConfig));
         }
     }
 }

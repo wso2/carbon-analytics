@@ -194,8 +194,12 @@ define(['ace/ace', 'jquery', 'lodash', 'log','dialogs','./service-client','welco
             };
 
             this.handleFormat = function () {
-                if(app.tabController.getActiveTab().getTitle() !== "welcome-page"){
-                    app.tabController.getActiveTab().getSiddhiFileEditor().getSourceView().format();
+                if(app.tabController.getActiveTab().getTitle() !== "welcome-page") {
+                    if (app.tabController.getActiveTab().getSiddhiFileEditor().isInSourceView()) {
+                        app.tabController.getActiveTab().getSiddhiFileEditor().getSourceView().format();
+                    } else {
+                        app.tabController.getActiveTab().getSiddhiFileEditor().getDesignView().autoAlign();
+                    }
                 }
             };
 
@@ -239,6 +243,7 @@ define(['ace/ace', 'jquery', 'lodash', 'log','dialogs','./service-client','welco
             this.manageConsoles = function(evt){
                 if(app.outputController !== undefined){
                     app.outputController.showConsoleByTitle(evt.newActiveTab._title,"DEBUG");
+                    app.outputController.showConsoleByTitle(evt.newActiveTab._title,"FORM");
                     //app.outputController.toggleOutputConsole();
                 }
             };
@@ -253,11 +258,16 @@ define(['ace/ace', 'jquery', 'lodash', 'log','dialogs','./service-client','welco
                 }
 
                 if(file !== undefined){
-                    file = activeTab.getFile();
-                    if(file.isDirty()){
-                        exportMenuItem.disable();
-                    } else if(file.isPersisted()){
-                        exportMenuItem.enable();
+                    var fileEditor = activeTab.getSiddhiFileEditor();
+                    if (fileEditor === undefined || fileEditor.isInSourceView()) {
+                        file = activeTab.getFile();
+                        if(file.isDirty()){
+                            exportMenuItem.disable();
+                        } else if(file.isPersisted()){
+                            exportMenuItem.enable();
+                        } else {
+                            exportMenuItem.disable();
+                        }
                     } else {
                         exportMenuItem.disable();
                     }
@@ -273,7 +283,7 @@ define(['ace/ace', 'jquery', 'lodash', 'log','dialogs','./service-client','welco
                     redoMenuItem = app.menuBar.getMenuItemByID('edit.redo'),
                     findMenuItem = app.menuBar.getMenuItemByID('edit.find'),
                     findAndReplaceMenuItem = app.menuBar.getMenuItemByID('edit.findAndReplace'),
-                    reformatCodeMenuItem = app.menuBar.getMenuItemByID('edit.format'),
+                    formatMenuItem = app.menuBar.getMenuItemByID('edit.format'),
                     file = undefined;
 
                 if(activeTab.getTitle() != "welcome-page"){
@@ -283,25 +293,36 @@ define(['ace/ace', 'jquery', 'lodash', 'log','dialogs','./service-client','welco
                 if(file !== undefined){
                     var fileEditor = activeTab.getSiddhiFileEditor();
                     if(!_.isUndefined(fileEditor)){
-                        var undoManager = fileEditor.getUndoManager();
-                        findMenuItem.enable();
-                        findAndReplaceMenuItem.enable();
-                        reformatCodeMenuItem.enable();
-                        if (undoManager.hasUndo() && undoManager.undoStackTop().canUndo()) {
-                            undoMenuItem.enable();
-                            undoMenuItem.addLabelSuffix(
-                                undoManager.undoStackTop().getTitle());
+                        if (fileEditor.isInSourceView()) {
+                            findMenuItem.enable();
+                            findAndReplaceMenuItem.enable();
+                            formatMenuItem.updateLabel("Reformat Code");
+                            formatMenuItem.enable();
+
+                            var undoManager = fileEditor.getUndoManager();
+                            if (undoManager.hasUndo() && undoManager.undoStackTop().canUndo()) {
+                                undoMenuItem.enable();
+                                undoMenuItem.addLabelSuffix(
+                                    undoManager.undoStackTop().getTitle());
+                            } else {
+                                undoMenuItem.disable();
+                                undoMenuItem.clearLabelSuffix();
+                            }
+                            if (undoManager.hasRedo() && undoManager.redoStackTop().canRedo()) {
+                                redoMenuItem.enable();
+                                redoMenuItem.addLabelSuffix(
+                                    undoManager.redoStackTop().getTitle());
+                            } else {
+                                redoMenuItem.disable();
+                                redoMenuItem.clearLabelSuffix();
+                            }
                         } else {
                             undoMenuItem.disable();
-                            undoMenuItem.clearLabelSuffix();
-                        }
-                        if (undoManager.hasRedo() && undoManager.redoStackTop().canRedo()) {
-                            redoMenuItem.enable();
-                            redoMenuItem.addLabelSuffix(
-                                undoManager.redoStackTop().getTitle());
-                        } else {
                             redoMenuItem.disable();
-                            redoMenuItem.clearLabelSuffix();
+                            findMenuItem.disable();
+                            findAndReplaceMenuItem.disable();
+                            formatMenuItem.updateLabel("Auto-Align");
+                            formatMenuItem.enable();
                         }
                     }
                 } else {
@@ -311,7 +332,7 @@ define(['ace/ace', 'jquery', 'lodash', 'log','dialogs','./service-client','welco
                     redoMenuItem.clearLabelSuffix();
                     findMenuItem.disable();
                     findAndReplaceMenuItem.disable();
-                    reformatCodeMenuItem.disable();
+                    formatMenuItem.disable();
                 }
             };
 
@@ -326,13 +347,19 @@ define(['ace/ace', 'jquery', 'lodash', 'log','dialogs','./service-client','welco
                 }
 
                 if(file !== undefined){
-                    file = activeTab.getFile();
-                    if(file.isDirty()){
-                        saveMenuItem.enable();
-                        saveAsMenuItem.enable();
+                    var fileEditor = activeTab.getSiddhiFileEditor();
+                    if (fileEditor === undefined || fileEditor.isInSourceView()) {
+                        file = activeTab.getFile();
+                        if(file.isDirty()){
+                            saveMenuItem.enable();
+                            saveAsMenuItem.enable();
+                        } else {
+                            saveMenuItem.disable();
+                            saveAsMenuItem.enable();
+                        }
                     } else {
                         saveMenuItem.disable();
-                        saveAsMenuItem.enable();
+                        saveAsMenuItem.disable();
                     }
                 } else {
                     saveMenuItem.disable();
@@ -375,46 +402,63 @@ define(['ace/ace', 'jquery', 'lodash', 'log','dialogs','./service-client','welco
                 }
 
                 if(file !== undefined){
-                    file = activeTab.getFile();
-                    if(file.isDirty()){
-                        runMenuItem.disable();
-                        debugMenuItem.disable();
-                        stopMenuItem.disable();
-                        toolBar.disableRunButton();
-                        toolBar.disableDebugButton();
-                        toolBar.disableStopButton();
-                    } else {
-                        if(file.getRunStatus() || file.getDebugStatus()){
+                    var fileEditor = activeTab.getSiddhiFileEditor();
+                    if (fileEditor === undefined || fileEditor.isInSourceView()) {
+                        file = activeTab.getFile();
+                        if(file.isDirty()){
                             runMenuItem.disable();
                             debugMenuItem.disable();
-                            stopMenuItem.enable();
+                            stopMenuItem.disable();
                             toolBar.disableRunButton();
                             toolBar.disableDebugButton();
+                            toolBar.disableStopButton();
+                            toolBar.enableRevertButton();
+                        } else {
+                            toolBar.disableRevertButton();
+                            if(file.getRunStatus() || file.getDebugStatus()){
+                                runMenuItem.disable();
+                                debugMenuItem.disable();
+                                stopMenuItem.enable();
+                                toolBar.disableRunButton();
+                                toolBar.disableDebugButton();
+                                toolBar.enableStopButton();
+                            } else if(!file.getRunStatus()){
+                                if(!file.getDebugStatus()){
+                                    runMenuItem.enable();
+                                    debugMenuItem.enable();
+                                    stopMenuItem.disable();
+                                    toolBar.enableRunButton();
+                                    toolBar.enableDebugButton();
+                                    toolBar.disableStopButton();
+                                } else{
+                                    stopMenuItem.enable();
+                                    toolBar.enableStopButton();
+                                }
+                            } else if(!file.getDebugStatus()){
+                                if(!file.getRunStatus()){
+                                    runMenuItem.enable();
+                                    debugMenuItem.enable();
+                                    stopMenuItem.disable();
+                                    toolBar.enableRunButton();
+                                    toolBar.enableDebugButton();
+                                    toolBar.disableStopButton();
+                                } else{
+                                    stopMenuItem.enable();
+                                    toolBar.enableStopButton();
+                                }
+                            }
+                        }
+                    } else {
+                        runMenuItem.disable();
+                        debugMenuItem.disable();
+                        toolBar.disableRunButton();
+                        toolBar.disableDebugButton();
+                        if (file.getRunStatus() || file.getDebugStatus()) {
+                            stopMenuItem.enable();
                             toolBar.enableStopButton();
-                        } else if(!file.getRunStatus()){
-                            if(!file.getDebugStatus()){
-                                runMenuItem.enable();
-                                debugMenuItem.enable();
-                                stopMenuItem.disable();
-                                toolBar.enableRunButton();
-                                toolBar.enableDebugButton();
-                                toolBar.disableStopButton();
-                            } else{
-                                stopMenuItem.enable();
-                                toolBar.enableStopButton();
-                            }
-                        } else if(!file.getDebugStatus()){
-                            if(!file.getRunStatus()){
-                                runMenuItem.enable();
-                                debugMenuItem.enable();
-                                stopMenuItem.disable();
-                                toolBar.enableRunButton();
-                                toolBar.enableDebugButton();
-                                toolBar.disableStopButton();
-                            } else{
-                                stopMenuItem.enable();
-                                toolBar.enableStopButton();
-                            }
+                        } else {
+                            stopMenuItem.disable();
+                            toolBar.disableStopButton();
                         }
                     }
                 } else {
@@ -501,7 +545,6 @@ define(['ace/ace', 'jquery', 'lodash', 'log','dialogs','./service-client','welco
                     this._importFileDialog = new Dialogs.import_file_dialog(app);
                 }
                 this._importFileDialog.render();
-                this._importFileDialog.show();
             };
 
             this.exportFileExportDialog = function exportFileExportDialog() {
@@ -593,6 +636,17 @@ define(['ace/ace', 'jquery', 'lodash', 'log','dialogs','./service-client','welco
             this.closeTab = function closeTab(options){
                 var tab = app.tabController.getActiveTab();
                 app.tabController.removeTab(tab)
+            };
+
+            this.revertAppContent = function revertAppContent(){
+                var tab = app.tabController.getActiveTab();
+                var file = tab.getFile();
+                if(file !== undefined && file.isDirty()){
+                    var toolBar = app.toolBar;
+                    app.commandManager.dispatch("reload-file", tab.getTitle());
+                    toolBar.disableRevertButton();
+                    self.updateRunMenuItem();
+                }
             };
 
             function checkEndsWithSiddhi(string) {

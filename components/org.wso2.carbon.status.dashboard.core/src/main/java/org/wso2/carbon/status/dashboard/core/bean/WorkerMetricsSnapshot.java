@@ -16,6 +16,7 @@
  *  under the License.
  *
  */
+
 package org.wso2.carbon.status.dashboard.core.bean;
 
 import org.wso2.carbon.status.dashboard.core.model.ServerDetails;
@@ -34,7 +35,6 @@ public class WorkerMetricsSnapshot {
 
     public void updateRunningStatus(String status) {
         serverDetails.setRunningStatus(status);
-
     }
 
     public ServerDetails getServerDetails() {

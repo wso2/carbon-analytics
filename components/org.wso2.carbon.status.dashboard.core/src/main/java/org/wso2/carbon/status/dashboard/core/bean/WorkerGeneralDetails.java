@@ -16,8 +16,8 @@
  *  under the License.
  *
  */
-package org.wso2.carbon.status.dashboard.core.bean;
 
+package org.wso2.carbon.status.dashboard.core.bean;
 
 import org.wso2.carbon.status.dashboard.core.exception.StatusDashboardValidationException;
 
@@ -42,140 +42,139 @@ public class WorkerGeneralDetails {
     private String userCountry;
     private String repoLocation;
     private String serverStartTime;
-
+    
     public WorkerGeneralDetails() {
     }
-
+    
     public String getJavaRuntimeName() {
         return javaRuntimeName;
     }
-
+    
     public void setJavaRuntimeName(String javaRuntimeName) {
         this.javaRuntimeName = javaRuntimeName;
     }
-
+    
     public String getJavaVMVersion() {
         return javaVMVersion;
     }
-
+    
     public void setJavaVMVersion(String javaVMVersion) {
         this.javaVMVersion = javaVMVersion;
     }
-
+    
     public String getJavaVMVendor() {
         return javaVMVendor;
     }
-
+    
     public void setJavaVMVendor(String javaVMVendor) {
         this.javaVMVendor = javaVMVendor;
     }
-
+    
     public String getJavaHome() {
         return javaHome;
     }
-
+    
     public void setJavaHome(String javaHome) {
         this.javaHome = javaHome;
     }
-
+    
     public String getJavaVersion() {
         return javaVersion;
     }
-
+    
     public void setJavaVersion(String javaVersion) {
         this.javaVersion = javaVersion;
     }
-
+    
     public String getOsName() {
         return osName;
     }
-
+    
     public void setOsName(String osName) {
         this.osName = osName;
     }
-
+    
     public String getOsVersion() {
         return osVersion;
     }
-
+    
     public void setOsVersion(String osVersion) {
         this.osVersion = osVersion;
     }
-
+    
     public String getUserHome() {
         return userHome;
     }
-
+    
     public void setUserHome(String userHome) {
         this.userHome = userHome;
     }
-
+    
     public String getUserTimezone() {
         return userTimezone;
     }
-
+    
     public void setUserTimezone(String userTimezone) {
         this.userTimezone = userTimezone;
     }
-
+    
     public String getUserName() {
         return userName;
     }
-
+    
     public void setUserName(String userName) {
         this.userName = userName;
     }
-
+    
     public String getUserCountry() {
         return userCountry;
     }
-
+    
     public void setUserCountry(String userCountry) {
         this.userCountry = userCountry;
     }
-
+    
     public String getRepoLocation() {
         return repoLocation;
     }
-
+    
     public void setRepoLocation(String repoLocation) {
         this.repoLocation = repoLocation;
     }
-
+    
     public String getServerStartTime() {
         return serverStartTime;
     }
-
+    
     public void setServerStartTime(String serverStartTime) {
         this.serverStartTime = serverStartTime;
     }
-
+    
     public String getCarbonId() {
         return carbonId;
     }
-
+    
     public void setCarbonId(String carbonId) {
         this.carbonId = carbonId;
     }
-
+    
     public String getWorkerId() {
         return workerId;
     }
-
+    
     public void setWorkerId(String workerId) {
         this.workerId = workerId;
     }
-
+    
     public Object[] toArray() {
-        return new Object[]{carbonId, workerId, javaRuntimeName, javaVMVersion, javaVMVendor, javaHome, javaVersion,
+        return new Object[] {carbonId, workerId, javaRuntimeName, javaVMVersion, javaVMVendor, javaHome, javaVersion,
                 osName,
                 osVersion, userHome, userTimezone, userName, userCountry, repoLocation, serverStartTime};
-
     }
-
+    
     public void setArrayList(List values) throws StatusDashboardValidationException {
-
-        Object[] objects = new Object[]{carbonId, workerId, javaRuntimeName, javaVMVersion, javaVMVendor,
+        
+        Object[] objects = new Object[] {carbonId, workerId, javaRuntimeName, javaVMVersion, javaVMVendor,
                 javaHome, javaVersion, osName, osVersion, userHome, userTimezone, userName, userCountry,
                 repoLocation, serverStartTime};
         if (values.size() != objects.length) {
@@ -232,13 +231,11 @@ public class WorkerGeneralDetails {
                     throw new StatusDashboardValidationException("Invalid length of object");
             }
         }
-
-
     }
-
+    
     public static String getColumnLabeles() {
         return "CARBONID,WORKERID,JAVARUNTIMENAME,JAVAVMVERSION,JAVAVMVENDOR,JAVAHOME,JAVAVERSION,OSNAME," +
                 "OSVERSION,USERHOME,USERTIMEZONE,USERNAME,USERCOUNTRY,REPOLOCATION,SERVERSTARTTIME";
     }
-
+    
 }

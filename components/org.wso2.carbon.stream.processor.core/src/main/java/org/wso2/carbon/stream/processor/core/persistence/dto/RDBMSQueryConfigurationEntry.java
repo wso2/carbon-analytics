@@ -18,10 +18,6 @@
 
 package org.wso2.carbon.stream.processor.core.persistence.dto;
 
-import javax.xml.bind.annotation.XmlAttribute;
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlRootElement;
-
 /**
  * Class that maps individual database entries from resources/rdbms-table-config.xml
  */
@@ -32,7 +28,9 @@ public class RDBMSQueryConfigurationEntry {
     private String isTableExistQuery;
     private String selectTableQuery;
     private String selectLastQuery;
+    private String selectRevisionsQuery;
     private String deleteQuery;
+    private String deleteOldRevisionsQuery;
     private String countQuery;
 
     public String getDatabaseName() {
@@ -83,12 +81,28 @@ public class RDBMSQueryConfigurationEntry {
         this.selectLastQuery = selectLastQuery;
     }
 
+    public String getSelectRevisionsQuery() {
+        return selectRevisionsQuery;
+    }
+
+    public void setSelectRevisionsQuery(String selectRevisionsQuery) {
+        this.selectRevisionsQuery = selectRevisionsQuery;
+    }
+
     public String getDeleteQuery() {
         return deleteQuery;
     }
 
     public void setDeleteQuery(String deleteQuery) {
         this.deleteQuery = deleteQuery;
+    }
+
+    public String getDeleteOldRevisionsQuery() {
+        return deleteOldRevisionsQuery;
+    }
+
+    public void setDeleteOldRevisionsQuery(String deleteOldRevisionsQuery) {
+        this.deleteOldRevisionsQuery = deleteOldRevisionsQuery;
     }
 
     public String getCountQuery() {
@@ -98,4 +112,5 @@ public class RDBMSQueryConfigurationEntry {
     public void setCountQuery(String countQuery) {
         this.countQuery = countQuery;
     }
+
 }

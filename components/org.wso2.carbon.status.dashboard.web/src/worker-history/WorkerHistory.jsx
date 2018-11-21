@@ -19,30 +19,49 @@
 /**
  * class which manages worker specific details.
  */
-import React from "react";
-import {Link} from "react-router-dom";
+import React from 'react';
+import {Link, Redirect} from 'react-router-dom';
 //App Components
-import StatusDashboardAPIS from "../utils/apis/StatusDashboardAPIs";
-import ChartCard from "../common/ChartCard";
-import DashboardUtils from "../utils/DashboardUtils";
-import Header from "../common/Header";
+import StatusDashboardAPIS from '../utils/apis/StatusDashboardAPIs';
+import ChartCard from '../common/ChartCard';
+import DashboardUtils from '../utils/DashboardUtils';
+import Header from '../common/Header';
 //Material UI
-import RaisedButton from "material-ui/RaisedButton";
-import {Toolbar, ToolbarGroup} from "material-ui/Toolbar";
-import HomeButton from "material-ui/svg-icons/action/home";
-import {Card, CardHeader, CardMedia, Divider, FlatButton} from "material-ui";
-import { Redirect } from 'react-router-dom';
-import AuthenticationAPI from "../utils/apis/AuthenticationAPI";
-import Error403 from "../error-pages/Error403";
-import AuthManager from "../auth/utils/AuthManager";
-const styles = {button: {margin: 12, backgroundColor: '#f17b31',fontSize:10}};
+import RaisedButton from 'material-ui/RaisedButton';
+import {Toolbar, ToolbarGroup} from 'material-ui/Toolbar';
+import HomeButton from 'material-ui/svg-icons/action/home';
+import {Card, CardHeader, CardMedia, Divider} from 'material-ui';
+import {Button, Typography} from 'material-ui-next';
+import AuthenticationAPI from '../utils/apis/AuthenticationAPI';
+import Error403 from '../error-pages/Error403';
+import AuthManager from '../auth/utils/AuthManager';
+// Localization 
+import { FormattedMessage } from 'react-intl';
+import PropTypes from 'prop-types';
+
+const styles = {
+    navBar: {padding: '0 15px'},
+    navBtn: {color: '#BDBDBD', padding: '0 10px', verticalAlign: 'middle', textTransform: 'capitalize'},
+    navBtnActive: {color: '#f17b31', display: 'inline-block', verticalAlign: 'middle', textTransform: 'capitalize',
+        padding: '0 10px'},
+    titleStyle: {fontSize: '1.6rem', margin: '20px 0 0 24px', color: '#dedede'},
+    button: {margin: 0, fontSize: 10, borderLeft: '1px solid #4c4c4c', borderRadius: 0}
+};
 const cpuMetadata = {names: ['Time', 'System CPU', 'Process CPU'], types: ['time', 'linear', 'linear']};
-const memoryMetadata = {names: ['Time', 'Used Memory', 'Init Memory', 'Committed Memory', 'Total Memory'],
-    types: ['time', 'linear', 'linear', 'linear', 'linear']};
+const memoryMetadata = {
+    names: ['Time', 'Used Memory', 'Init Memory', 'Committed Memory', 'Total Memory'],
+    types: ['time', 'linear', 'linear', 'linear', 'linear']
+};
 const loadAvgMetadata = {names: ['Time', 'Load Average'], types: ['time', 'linear']};
 const throughputMetadata = {names: ['Time', 'Throughput(events/second)'], types: ['time', 'linear']};
-
-
+const noData = [
+    <div style={{
+        backgroundColor: '#131313', textAlign: 'center', lineHeight: '60px',
+        color: '#9c9898'
+    }}>
+        <FormattedMessage id='noData' defaultMessage='No Data Available' />
+    </div>
+];
 
 /**
  * class which manages worker history details.
@@ -109,23 +128,23 @@ export default class WorkerHistory extends React.Component {
                     throughputAll: response.data.throughput.data,
                     isApiWaiting: false,
                     //assume all have same polling interval
-                    tickCount:response.data.systemCPU.data.length>10 ? 10 : response.data.systemCPU.data.length
+                    tickCount: response.data.systemCPU.data.length > 10 ? 10 : response.data.systemCPU.data.length
                 });
             }).catch((error) => {
             let message;
-            if(error.response != null) {
+            if (error.response != null) {
                 if (error.response.status === 401) {
-                    message = "Authentication fail. Please login again.";
+                    message = this.context.intl.formatMessage({ id: 'authenticationFail', defaultMessage: 'Authentication fail. Please login again.' });
                     this.setState({
                         sessionInvalid: true
                     })
                 } else if (error.response.status === 403) {
-                    message = "User Have No Viewer Permission to view this page.";
+                    message = this.context.intl.formatMessage({ id: 'noViewerPermission', defaultMessage: 'User Have No Viewer Permission to view this page.' });
                     this.setState({
                         hasViewerPermission: false
                     })
                 } else {
-                    message = "Unknown error occurred! : " + error.response.data;
+                    message = this.context.intl.formatMessage({ id: 'unknownError', defaultMessage: 'Unknown error occurred! : {data}', values: { data: error.response.data } });
                 }
             }
         });
@@ -139,19 +158,19 @@ export default class WorkerHistory extends React.Component {
                 });
             }).catch((error) => {
             let message;
-            if(error.response != null) {
+            if (error.response != null) {
                 if (error.response.status === 401) {
-                    message = "Authentication fail. Please login again.";
+                    message = this.context.intl.formatMessage({ id: 'authenticationFail', defaultMessage: 'Authentication fail. Please login again.' });
                     this.setState({
                         sessionInvalid: true
                     })
                 } else if (error.response.status === 403) {
-                    message = "User Have No Viewer Permission to view this page.";
+                    message = this.context.intl.formatMessage({ id: 'noViewerPermission', defaultMessage: 'User Have No Viewer Permission to view this page.' });
                     this.setState({
                         hasViewerPermission: false
                     })
                 } else {
-                    message = "Unknown error occurred! : " + error.response.data;
+                    message = this.context.intl.formatMessage({ id: 'unknownError', defaultMessage: 'Unknown error occurred! : {data}', values: { data: error.response.data } });
                 }
             }
         });
@@ -169,149 +188,145 @@ export default class WorkerHistory extends React.Component {
                 {type: 'area', y: 'Process CPU', style: {markRadius: 2}}],
             width: 800,
             height: 250,
-            legend:true,
+            legend: true,
             interactiveLegend: true,
             gridColor: 'white',
-            xAxisTickCount:this.state.tickCount,
-            tipTimeFormat:"%Y-%m-%d %H:%M:%S %Z",
+            xAxisTickCount: this.state.tickCount,
+            tipTimeFormat: "%Y-%m-%d %H:%M:%S %Z",
             style: {
-                tickLabelColor:'white',
+                tickLabelColor: 'white',
                 legendTextColor: '#9c9898',
                 legendTitleColor: '#9c9898',
                 axisLabelColor: '#9c9898',
-                legendTextSize:12,
-                legendTitleSize:12
+                legendTextSize: 10,
+                legendTitleSize: 12
             }
         };
         if (this.state.systemCpu.length === 0 && this.state.processCpu.length === 0) {
             return (
-                <Card><CardHeader title="CPU Usage"/><Divider/>
+                <Card><CardHeader title={<FormattedMessage id='workerHistory.cpuUsage' defaultMessage='CPU Usage' />} /><Divider />
                     <CardMedia>
-                        <div style={{backgroundColor: '#131313'}}>
-                            <h4 style={{marginTop: 0}}>No Data Available</h4>
-                        </div>
+                        {noData}
                     </CardMedia>
                 </Card>
             );
         }
-        let intY= DashboardUtils.initCombinedYDomain(this.state.systemCpu, this.state.processCpu);
+        let intY = DashboardUtils.initCombinedYDomain(this.state.systemCpu, this.state.processCpu);
         return (
             <ChartCard
                 data={DashboardUtils.getCombinedChartList(this.state.systemCpu, this.state.processCpu)} yDomain={intY}
-                metadata={cpuMetadata} config={cpuLineChartConfig} title="CPU Usage"/>
+                metadata={cpuMetadata} config={cpuLineChartConfig} title={<FormattedMessage id='workerHistory.cpuUsage' defaultMessage='CPU Usage' />} />
         );
     }
 
     renderMemoryChart() {
         const memoryLineChartConfig = {
             x: 'Time',
-            charts: [{type: 'area', y: 'Used Memory',fill: '#058DC7',style: {markRadius: 2}},
-                {type: 'area', y: 'Init Memory', fill: '#50B432', style: { markRadius: 2}},
-                {type: 'area', y: 'Committed Memory', fill: '#f17b31', style: { markRadius: 2}},
+            charts: [{type: 'area', y: 'Used Memory', fill: '#058DC7', style: {markRadius: 2}},
+                {type: 'area', y: 'Init Memory', fill: '#50B432', style: {markRadius: 2}},
+                {type: 'area', y: 'Committed Memory', fill: '#f17b31', style: {markRadius: 2}},
                 {type: 'area', y: 'Total Memory', fill: '#8c51a5', style: {markRadius: 2}}],
             width: 800,
             height: 250,
-            legend:true,interactiveLegend: true,
+            legend: true, interactiveLegend: true,
             gridColor: 'white',
-            xAxisTickCount:this.state.tickCount,
-            tipTimeFormat:"%Y-%m-%d %H:%M:%S %Z",
+            xAxisTickCount: this.state.tickCount,
+            tipTimeFormat: "%Y-%m-%d %H:%M:%S %Z",
             style: {
-                tickLabelColor:'white',
+                tickLabelColor: 'white',
                 legendTextColor: '#9c9898',
                 legendTitleColor: '#9c9898',
                 axisLabelColor: '#9c9898',
-                legendTextSize:12,
-                legendTitleSize:12
+                legendTextSize: 10,
+                legendTitleSize: 12
             }
         };
         if (this.state.usedMem.length === 0 && this.state.totalMem.length === 0 && this.state.initMem.length === 0
             && this.state.committedMem.length === 0) {
             return (
-                <Card><CardHeader title="Memory Usage"/><Divider/>
+                <Card><CardHeader title={<FormattedMessage id='workerHistory.memoryUsage' defaultMessage='Memory Usage' />} /><Divider />
                     <CardMedia>
-                        <div style={{backgroundColor: '#131313'}}>
-                            <h4 style={{marginTop: 0}}>No Data Available</h4>
-                        </div>
+                        {noData}
                     </CardMedia>
                 </Card>
             );
         }
         let data1 = DashboardUtils.getCombinedChartList(this.state.usedMem, this.state.initMem);
-        let intY= DashboardUtils.initCombinedYDomain(this.state.usedMem, this.state.initMem);
+        let intY = DashboardUtils.initCombinedYDomain(this.state.usedMem, this.state.initMem);
         let data2 = DashboardUtils.getCombinedChartList(data1, this.state.committedMem);
-        let y2=DashboardUtils.getCombinedYDomain(this.state.committedMem,intY);
+        let y2 = DashboardUtils.getCombinedYDomain(this.state.committedMem, intY);
         let data = DashboardUtils.getCombinedChartList(data2, this.state.totalMem);
-        let y3=DashboardUtils.getCombinedYDomain(this.state.totalMem,y2);
+        let y3 = DashboardUtils.getCombinedYDomain(this.state.totalMem, y2);
         return (
             <ChartCard data={data} yDomain={y3}
-                       metadata={memoryMetadata} config={memoryLineChartConfig} title="Memory Usage"/>
+                metadata={memoryMetadata} config={memoryLineChartConfig} title={<FormattedMessage id='workerHistory.memoryUsage' defaultMessage='Memory Usage' />} />
         );
     }
 
     renderLoadAverageChart() {
         const loadAvgLineChartConfig = {
-            x: 'Time', charts: [{type: 'area', y: 'Load Average',  style: {markRadius: 2}}], width: 800, height: 250,
-            legend:true,
+            x: 'Time', charts: [{type: 'area', y: 'Load Average', style: {markRadius: 2}}], width: 800, height: 250,
+            legend: true,
             interactiveLegend: true,
             gridColor: 'white',
-            xAxisTickCount:this.state.tickCount,
-            tipTimeFormat:"%Y-%m-%d %H:%M:%S %Z",
+            xAxisTickCount: this.state.tickCount,
+            tipTimeFormat: "%Y-%m-%d %H:%M:%S %Z",
             style: {
-                tickLabelColor:'white',
+                tickLabelColor: 'white',
                 legendTextColor: '#9c9898',
                 legendTitleColor: '#9c9898',
                 axisLabelColor: '#9c9898',
-                legendTextSize:12,
-                legendTitleSize:12
+                legendTextSize: 10,
+                legendTitleSize: 12
             }
         };
         if (this.state.loadAvg.length === 0) {
             return (
-                <Card><CardHeader title="Load Average"/><Divider/>
+                <Card><CardHeader title={<FormattedMessage id='workerHistory.loadAvg' defaultMessage='Load Average' />} /><Divider />
                     <CardMedia>
-                        <div style={{backgroundColor: '#131313'}}>
-                            <h4 style={{marginTop: 0}}>No Data Available</h4>
-                        </div>
+                        {noData}
                     </CardMedia>
                 </Card>
             );
         }
         return (
             <ChartCard data={this.state.loadAvg} metadata={loadAvgMetadata} config={loadAvgLineChartConfig}
-                       title="Load Average"/>
+                title={<FormattedMessage id='workerHistory.loadAvg' defaultMessage='Load Average' />} />
         );
     }
 
     renderThroughputChart() {
         const throughputChartConfig = {
-                x: 'Time', charts: [{type: 'area', y: 'Throughput(events/second)',  style: {markRadius: 2}}], width: 800, height: 250,
-                legend:true,interactiveLegend: true,
-                gridColor: 'white',
-                xAxisTickCount:this.state.tickCount,
-                tipTimeFormat:"%Y-%m-%d %H:%M:%S %Z",
-                style: {
-                    tickLabelColor:'white',
-                    legendTextColor: '#9c9898',
-                    legendTitleColor: '#9c9898',
-                    axisLabelColor: '#9c9898',
-                    legendTextSize:12,
-                    legendTitleSize:12
-                }
+            x: 'Time',
+            charts: [{type: 'area', y: 'Throughput(events/second)', style: {markRadius: 2}}],
+            width: 800,
+            height: 250,
+            legend: true,
+            interactiveLegend: true,
+            gridColor: 'white',
+            xAxisTickCount: this.state.tickCount,
+            tipTimeFormat: "%Y-%m-%d %H:%M:%S %Z",
+            style: {
+                tickLabelColor: 'white',
+                legendTextColor: '#9c9898',
+                legendTitleColor: '#9c9898',
+                axisLabelColor: '#9c9898',
+                legendTextSize: 10,
+                legendTitleSize: 12
+            }
         };
         if (this.state.throughputAll.length === 0) {
             return (
-                <Card><CardHeader title="Throughput"/><Divider/>
+                <Card><CardHeader title={<FormattedMessage id='workerHistory.throughput' defaultMessage='Throughput' />} /><Divider />
                     <CardMedia>
-                        <div style={{backgroundColor: '#131313'}}>
-                            <h4 style={{marginTop: 0}}>No Data Available</h4>
-                        </div>
+                        {noData}
                     </CardMedia>
                 </Card>
             );
         }
         return (
             <ChartCard data={this.state.throughputAll} metadata={throughputMetadata} config={throughputChartConfig}
-                       title="Overall Throughput(events/second)"/>
+                title={<FormattedMessage id='workerHistory.overallThroughput' defaultMessage='Overall Throughput(events/second)' />} />
         );
     }
 
@@ -332,29 +347,16 @@ export default class WorkerHistory extends React.Component {
             );
         } else {
             return (
-                <div style={{width: '90%', marginLeft: '10px'}}>
-                    <div style={{padding: 30}}>
-                        {this.renderCpuChart()}
-                    </div>
-
-                    <div style={{padding: 30}}>
-                        {this.renderMemoryChart()}
-                    </div>
-
-                    <div style={{padding: 30}}>
-                        {this.renderLoadAverageChart()}
-                    </div>
-
-                    <div style={{padding: 30}}>
-                        {this.renderThroughputChart()}
-                    </div>
-
-                    <div style={{marginLeft: '89%'}}>
-                        <Link to={window.contextPath + '/worker/history/' + this.props.match.params.id + '/more'}>
-                            <RaisedButton label="More Details" style={styles.button}
-                                          backgroundColor='#f17b31'/>
-                        </Link>
-                    </div>
+                <div style={{padding: '30px 24px'}}>
+                    {this.renderCpuChart()}
+                    {this.renderMemoryChart()}
+                    {this.renderLoadAverageChart()}
+                    {this.renderThroughputChart()}
+                    <Link style={{float: 'right', margin: '20px 0'}} to={window.contextPath + '/worker/history/' +
+                        this.props.match.params.id + '/more'}>
+                        <RaisedButton label={<FormattedMessage id='workerHistory.moreDetails' defaultMessage='More Details' />} style={styles.button}
+                            backgroundColor='#f17b31' />
+                    </Link>
                 </div>
             );
         }
@@ -366,37 +368,44 @@ export default class WorkerHistory extends React.Component {
                 <Redirect to={{pathname: `${window.contextPath}/logout`}}/>
             );
         }
-        if(this.state.hasViewerPermission) {
+        if (this.state.hasViewerPermission) {
             return (
                 <div style={{backgroundColor: '#222222'}}>
                     <Header/>
-                    <div className="navigation-bar">
-                        <Link to={window.contextPath}><FlatButton label="Overview >"
-                                                                  icon={<HomeButton color="black"/>}/>
+                    <div style={styles.navBar} className="navigation-bar">
+                        <Link style={{textDecoration: 'none'}} to={window.contextPath}>
+                            <Button style={styles.navBtn}>
+                                <HomeButton style={{paddingRight: 8, color: '#BDBDBD'}}/>
+                                <FormattedMessage id='overview' defaultMessage='OVerview >' />
+                            </Button>
                         </Link>
-                        <Link to={window.contextPath + '/worker/' + this.props.match.params.id }>
-                            <FlatButton label={this.state.workerID + " >"}/></Link>
-                        <RaisedButton label="Metrics" disabled disabledLabelColor='white'
-                                      disabledBackgroundColor='#f17b31'/>
+                        <Link style={{textDecoration: 'none'}} to={window.contextPath + '/worker/' +
+                            this.props.match.params.id}>
+                            <Button style={styles.navBtn}>
+                                {this.state.workerID} >
+                            </Button>
+                        </Link>
+                        <Typography style={styles.navBtnActive}><FormattedMessage id='metrics' defaultMessage='Metrics' /></Typography>
                     </div>
-                    <div className="worker-h1">
-                        <h2 style={{marginLeft: 40}}> {this.state.workerID} Metrics </h2>
-                    </div>
-                    <Toolbar style={{width: '50%', marginLeft: '50%', padding: 20, backgroundColor: '#424242'}}>
+                    <Typography variant="title" style={styles.titleStyle}>
+                        {this.state.workerID} <FormattedMessage id='metrics' defaultMessage='Metrics' />
+                    </Typography>
+                    <Toolbar style={{position: 'absolute', top: 85, right: 15, padding: 0,
+                        backgroundColor: 'transparent'}}>
                         <ToolbarGroup firstChild={true}>
-                            <RaisedButton label="Last 5 Minutes" backgroundColor={this.setColor('5min')}
-                                          onClick={() => this.handleChange('5min')}
-                                          style={styles.button}/>
-                            <RaisedButton label="Last 1 Hour" backgroundColor={this.setColor('1hr')}
-                                          onClick={() => this.handleChange('1hr')}
-                                          style={styles.button}/>
-                            <RaisedButton label="Last 6 Hours" backgroundColor={this.setColor('6hr')}
-                                          onClick={() => this.handleChange('6hr')}
-                                          style={styles.button}/>
-                            <RaisedButton label="Last Day" backgroundColor={this.setColor('24hr')}
-                                          onClick={() => this.handleChange('24hr')} style={styles.button}/>
-                            <RaisedButton label="Last Week" backgroundColor={this.setColor('1wk')}
-                                          onClick={() => this.handleChange('1wk')} style={styles.button}/>
+                            <RaisedButton label={<FormattedMessage id='5Minutes' defaultMessage='Last 5 Minutes' />} backgroundColor={this.setColor('5min')}
+                                onClick={() => this.handleChange('5min')}
+                                style={styles.button} />
+                            <RaisedButton label={<FormattedMessage id='1Hour' defaultMessage='Last 1 Hour' />} backgroundColor={this.setColor('1hr')}
+                                onClick={() => this.handleChange('1hr')}
+                                style={styles.button} />
+                            <RaisedButton label={<FormattedMessage id='6Hour' defaultMessage='Last 6 Hours' />} backgroundColor={this.setColor('6hr')}
+                                onClick={() => this.handleChange('6hr')}
+                                style={styles.button} />
+                            <RaisedButton label={<FormattedMessage id='lastDay' defaultMessage='Last Day' />} backgroundColor={this.setColor('24hr')}
+                                onClick={() => this.handleChange('24hr')} style={styles.button} />
+                            <RaisedButton label={<FormattedMessage id='lastWeek' defaultMessage='Last Week' />} backgroundColor={this.setColor('1wk')}
+                                onClick={() => this.handleChange('1wk')} style={styles.button} />
                         </ToolbarGroup>
                     </Toolbar>
                     {this.renderCharts()}
@@ -406,4 +415,8 @@ export default class WorkerHistory extends React.Component {
             return <Error403/>;
         }
     }
+}
+
+WorkerHistory.contextTypes = {
+    intl: PropTypes.object.isRequired
 }

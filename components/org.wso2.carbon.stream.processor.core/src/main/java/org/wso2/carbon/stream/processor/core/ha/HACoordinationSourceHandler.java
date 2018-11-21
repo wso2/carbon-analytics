@@ -18,17 +18,25 @@
 
 package org.wso2.carbon.stream.processor.core.ha;
 
+import org.apache.commons.pool.impl.GenericKeyedObjectPool;
 import org.apache.log4j.Logger;
+import org.wso2.carbon.stream.processor.core.event.queue.QueuedEvent;
+import org.wso2.carbon.stream.processor.core.ha.transport.EventSyncConnection;
+import org.wso2.carbon.stream.processor.core.ha.transport.EventSyncConnectionPoolManager;
 import org.wso2.carbon.stream.processor.core.ha.util.CoordinationConstants;
+import org.wso2.carbon.stream.processor.core.ha.util.HAConstants;
+import org.wso2.carbon.stream.processor.core.util.BinaryEventConverter;
 import org.wso2.siddhi.core.event.Event;
+import org.wso2.siddhi.core.exception.ConnectionUnavailableException;
 import org.wso2.siddhi.core.stream.input.InputHandler;
 import org.wso2.siddhi.core.stream.input.source.SourceHandler;
 import org.wso2.siddhi.query.api.definition.StreamDefinition;
 
+import java.io.IOException;
+import java.nio.ByteBuffer;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Queue;
-import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.atomic.AtomicLong;
 
 /**
  * Implementation of {@link SourceHandler} used for 2 node minimum HA
@@ -36,27 +44,27 @@ import java.util.concurrent.LinkedBlockingQueue;
 public class HACoordinationSourceHandler extends SourceHandler {
 
     private boolean isActiveNode;
-    private boolean collectEvents;
     private long lastProcessedEventTimestamp = 0L;
-    private Queue<Event> passiveNodeBufferedEvents;
     private String sourceHandlerElementId;
+    private String siddhiAppName;
+    private GenericKeyedObjectPool eventSyncConnectionPoolFactory;
+    private AtomicLong sequenceIDGenerator;
+    private volatile boolean passiveNodeAdded;
 
-    private final int queueCapacity;
     private static final Logger log = Logger.getLogger(HACoordinationSourceHandler.class);
 
-    public HACoordinationSourceHandler(int queueCapacity) {
-        this.queueCapacity = queueCapacity;
-        passiveNodeBufferedEvents = new LinkedBlockingQueue<>(queueCapacity);
+    public HACoordinationSourceHandler() {
+        this.sequenceIDGenerator = EventSyncConnectionPoolManager.getSequenceID();
     }
 
     @Override
-    public void init(String sourceElementId, StreamDefinition streamDefinition) {
+    public void init(String siddhiAppName, String sourceElementId, StreamDefinition streamDefinition) {
         this.sourceHandlerElementId = sourceElementId;
+        this.siddhiAppName = siddhiAppName;
     }
 
     /**
      * Method that would process events if this is the Active Node.
-     * If Passive Node, events will be buffered during the state syncing state.
      *
      * @param event        the event being sent to processing.
      * @param inputHandler callback that would send events for processing.
@@ -65,19 +73,10 @@ public class HACoordinationSourceHandler extends SourceHandler {
     public void sendEvent(Event event, InputHandler inputHandler) throws InterruptedException {
         if (isActiveNode) {
             lastProcessedEventTimestamp = event.getTimestamp();
-            inputHandler.send(event);
-        } else {
-            synchronized (this) {
-                if (collectEvents) {
-                    boolean eventBuffered = passiveNodeBufferedEvents.offer(event);
-                    if (!eventBuffered) {
-                        passiveNodeBufferedEvents.remove();
-                        passiveNodeBufferedEvents.add(event);
-                    }
-                } else {
-                    inputHandler.send(event);
-                }
+            if (passiveNodeAdded) {
+                sendEventsToPassiveNode(event);
             }
+            inputHandler.send(event);
         }
     }
 
@@ -92,58 +91,15 @@ public class HACoordinationSourceHandler extends SourceHandler {
     public void sendEvent(Event[] events, InputHandler inputHandler) throws InterruptedException {
         if (isActiveNode) {
             lastProcessedEventTimestamp = events[events.length - 1].getTimestamp();
-            inputHandler.send(events);
-        } else {
-            if (collectEvents) {
-                synchronized (this) {
-                    int sizeAfterUpdate = passiveNodeBufferedEvents.size() + events.length;
-                    if (sizeAfterUpdate >= queueCapacity) {
-                        for (int i = queueCapacity; i < sizeAfterUpdate; i++) {
-                            passiveNodeBufferedEvents.remove();
-                        }
-                    }
-                    for (Event event : events) {
-                        passiveNodeBufferedEvents.add(event);
-                    }
-                }
-            } else {
-                inputHandler.send(events);
+            if (passiveNodeAdded) {
+                sendEventsToPassiveNode(events);
             }
+            inputHandler.send(events);
         }
     }
 
-    /**
-     * This method will trim the passive nodes buffer and and send the remaining events for processing
-     *
-     * @param activeLastProcessedEventTimestamp the point to which the passive nodes buffer should be trimmed
-     */
-    public void processBufferedEvents(long activeLastProcessedEventTimestamp) {
-
-        while (passiveNodeBufferedEvents.peek() != null &&
-                passiveNodeBufferedEvents.peek().getTimestamp() <= activeLastProcessedEventTimestamp) {
-            passiveNodeBufferedEvents.remove();
-        }
-        while (passiveNodeBufferedEvents.peek() != null) {
-            try {
-                getInputHandler().send(passiveNodeBufferedEvents.poll());
-            } catch (InterruptedException e) {
-                log.error("Error esending Passive Node Events after State Sync. ", e);
-            }
-        }
-        collectEvents(false);
-        if (log.isDebugEnabled()) {
-            log.debug("Setting Source Handler with ID " + sourceHandlerElementId + " to stop collecting events" +
-                    " in buffer");
-        }
-
-        //Recheck if queue is not empty due to other thread updating the queue and send events
-        while (passiveNodeBufferedEvents.peek() != null) {
-            try {
-                getInputHandler().send(passiveNodeBufferedEvents.poll());
-            } catch (InterruptedException e) {
-                log.error("Error Resending Passive Node Events after State Sync. ", e);
-            }
-        }
+    public void setPassiveNodeAdded(boolean passiveNodeAdded) {
+        this.passiveNodeAdded = passiveNodeAdded;
     }
 
     /**
@@ -154,23 +110,15 @@ public class HACoordinationSourceHandler extends SourceHandler {
     }
 
     /**
-     * Will indicate the passive node to start collecting events
-     *
-     * @param collectEvents should be true only when passive node requests the state of active node.
-     * Since state syncing takes time events should be collected to ensure that no events are lost during
-     * the state sync
+     * Method to change the source handler to Passive state so that events will not be processed.
      */
-    public void collectEvents(boolean collectEvents) {
-        this.collectEvents = collectEvents;
-    }
-
-    public Queue<Event> getPassiveNodeBufferedEvents() {
-        return passiveNodeBufferedEvents;
+    public void setAsPassive() {
+        isActiveNode = false;
     }
 
     @Override
     public Map<String, Object> currentState() {
-        HashMap<String, Object> currentState = new HashMap<>();
+        Map<String, Object> currentState = new HashMap<>();
         currentState.put(CoordinationConstants.ACTIVE_PROCESSED_LAST_TIMESTAMP, lastProcessedEventTimestamp);
         if (log.isDebugEnabled()) {
             log.debug("Active Node: Saving state of Source Handler with Id " + getElementId() + " with timestamp "
@@ -181,15 +129,82 @@ public class HACoordinationSourceHandler extends SourceHandler {
 
     @Override
     public void restoreState(Map<String, Object> map) {
-        if (map != null) {
-            if (map.get(CoordinationConstants.ACTIVE_PROCESSED_LAST_TIMESTAMP) != null) {
-                processBufferedEvents((Long) map.get(CoordinationConstants.ACTIVE_PROCESSED_LAST_TIMESTAMP));
-            }
-        }
+        //do nothing
     }
 
     @Override
     public String getElementId() {
         return sourceHandlerElementId;
+    }
+
+    private void sendEventsToPassiveNode(Event event) {
+        EventSyncConnection eventSyncConnection = getTCPNettyClient();
+        ByteBuffer messageBuffer = null;
+        if (eventSyncConnection != null) {
+            QueuedEvent queuedEvent = new QueuedEvent(siddhiAppName, sourceHandlerElementId, sequenceIDGenerator
+                    .incrementAndGet(), event);
+            try {
+                messageBuffer = BinaryEventConverter.convertToBinaryMessage(new QueuedEvent[]{queuedEvent});
+            } catch (IOException e) {
+                log.error("Error in converting events to binary message.Hence not sending message to the passive node");
+                return;
+            }
+            if (messageBuffer != null) {
+                try {
+                    eventSyncConnection.send(HAConstants.CHANNEL_ID_MESSAGE, messageBuffer.array());
+                } catch (ConnectionUnavailableException e) {
+                    log.error("Error in sending events to the passive node. " + e.getMessage());
+                }
+            }
+            try {
+                eventSyncConnectionPoolFactory.returnObject(HAConstants.ACTIVE_NODE_CONNECTION_POOL_ID, eventSyncConnection);
+            } catch (Exception e) {
+                log.error("Error in returning the tcpClient connection object to the pool. ", e);
+            }
+        }
+    }
+
+    private void sendEventsToPassiveNode(Event[] events) {
+        EventSyncConnection eventSyncConnection = getTCPNettyClient();
+        ByteBuffer messageBuffer = null;
+        if (eventSyncConnection != null) {
+            QueuedEvent[] queuedEvents = new QueuedEvent[events.length];
+            int i = 0;
+            for (Event event : events) {
+                QueuedEvent queuedEvent = new QueuedEvent(siddhiAppName, sourceHandlerElementId, sequenceIDGenerator
+                        .incrementAndGet(), event);
+                queuedEvents[i] = queuedEvent;
+                i++;
+            }
+            try {
+                messageBuffer = BinaryEventConverter.convertToBinaryMessage(queuedEvents);
+            } catch (IOException e) {
+                log.error("Error in converting events to binary message.Hence not sending message to the passive node");
+            }
+            if (messageBuffer != null) {
+                try {
+                    eventSyncConnection.send(HAConstants.CHANNEL_ID_MESSAGE, messageBuffer.array());
+                } catch (ConnectionUnavailableException e) {
+                    log.error("Error in sending events to the passive node. " + e.getMessage());
+                }
+            }
+            try {
+                eventSyncConnectionPoolFactory.returnObject(HAConstants.ACTIVE_NODE_CONNECTION_POOL_ID, eventSyncConnection);
+            } catch (Exception e) {
+                log.error("Error in returning the tcpClient connection object to the pool. ", e);
+            }
+        }
+    }
+
+    private EventSyncConnection getTCPNettyClient() {
+        eventSyncConnectionPoolFactory = EventSyncConnectionPoolManager.getConnectionPool();
+        EventSyncConnection eventSyncConnection = null;
+        try {
+            eventSyncConnection = (EventSyncConnection) eventSyncConnectionPoolFactory.borrowObject(HAConstants.ACTIVE_NODE_CONNECTION_POOL_ID);
+        } catch (Exception e) {
+            log.warn("Error in obtaining a tcp connection to the passive node. Hence not sending events to the " +
+                    "passive node. " + e.getMessage());
+        }
+        return eventSyncConnection;
     }
 }

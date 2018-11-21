@@ -48,7 +48,6 @@ import static org.wso2.carbon.data.provider.utils.DataProviderValueHolder.getDat
  * Data provider web socket endpoint.
  */
 @Component(
-        name = "org.wso2.carbon.analytics.data.provider.endpoint",
         service = WebSocketEndpoint.class,
         immediate = true
 )

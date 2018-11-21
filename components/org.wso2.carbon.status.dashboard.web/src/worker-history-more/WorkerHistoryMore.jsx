@@ -17,27 +17,35 @@
  *
  */
 
-import React from "react";
-import {Link} from "react-router-dom";
+import React from 'react';
+import {Link, Redirect} from 'react-router-dom';
 //Material UI
-import {FlatButton, GridList, GridTile, RaisedButton} from "material-ui";
-import HomeButton from "material-ui/svg-icons/action/home";
+import {Button, Typography} from 'material-ui-next';
+import HomeButton from 'material-ui/svg-icons/action/home';
 //App Components
-import StatusDashboardAPIS from "../utils/apis/StatusDashboardAPIs";
-import JVMLoading from "./JVMClassLoading";
-import JVMOsPhysicalMemory from "./JVMOsPhysicalMemory";
-import JVMThread from "./JVMThread";
-import HeapMemory from "./HeapMemory";
-import NonHeapMemory from "./NonHeapMemory";
-import FileDescriptor from "./FileDescriptor";
-import Header from "../common/Header";
-import JVMSwap from "./JVMSwap";
-import JVMGarbageCOllector from "./JVMGarbageCOllector";
-import JVMOsLoad from "./JVMOsLoad";
-import { Redirect } from 'react-router-dom';
-import JVMLoad from "./JVMLoad";
-import JVMOTotalMemory from "./JVMTotalMemory";
-const cardStyle = {padding: 30, width: '90%'};
+import StatusDashboardAPIS from '../utils/apis/StatusDashboardAPIs';
+import JVMLoading from './JVMClassLoading';
+import JVMOsPhysicalMemory from './JVMOsPhysicalMemory';
+import JVMThread from './JVMThread';
+import HeapMemory from './HeapMemory';
+import NonHeapMemory from './NonHeapMemory';
+import FileDescriptor from './FileDescriptor';
+import Header from '../common/Header';
+import JVMSwap from './JVMSwap';
+import JVMGarbageCOllector from './JVMGarbageCOllector';
+import JVMOsLoad from './JVMOsLoad';
+import JVMLoad from './JVMLoad';
+import JVMOTotalMemory from './JVMTotalMemory';
+// Localization
+import { FormattedMessage } from 'react-intl';
+
+const styles = {
+    navBar: {padding: '0 15px'},
+    navBtn: {color: '#BDBDBD', padding: '0 10px', verticalAlign: 'middle', textTransform: 'capitalize'},
+    navBtnActive: {color: '#f17b31', display: 'inline-block', verticalAlign: 'middle', textTransform: 'capitalize',
+        padding: '0 10px'},
+    titleStyle: {fontSize: '1.6rem', margin: '20px 0 0 24px', color: '#dedede'},
+};
 /**
  * class to manage worker history details.
  */
@@ -49,28 +57,28 @@ export default class WorkerHistoryMore extends React.Component {
             jvmClassLoadingLoadedCurrent: [],
             jvmClassLoadingLoadedTotal: [],
             jvmClassLoadingUnloadedTotal: [],
-            jvmGcPsMarksweepCount:[],
-            jvmGcPsMarksweepTime:[],
-            jvmGcPsScavengeCount:[],
-            jvmGcPsScavengeTime:[],
+            jvmGcPsMarksweepCount: [],
+            jvmGcPsMarksweepTime: [],
+            jvmGcPsScavengeCount: [],
+            jvmGcPsScavengeTime: [],
             jvmMemoryHeapInit: [],
             jvmMemoryHeapUsed: [],
             jvmMemoryHeapCommitted: [],
             jvmMemoryHeapMax: [],
-            jvmMemoryHeapUsage:[],
+            jvmMemoryHeapUsage: [],
             jvmMemoryNonHeapInit: [],
             jvmMemoryNonHeapUsed: [],
             jvmMemoryNonHeapCommitted: [],
             jvmMemoryNonHeapMax: [],
-            jvmMemoryNonHeapUsage:[],
-            jvmMemoryTotalCommitted:[],
-            jvmMemoryTotalInit:[],
-            jvmMemoryTotalMax:[],
-            jvmMemoryTotalUsed:[],
-            jvmMemoryPoolsSize:[],
+            jvmMemoryNonHeapUsage: [],
+            jvmMemoryTotalCommitted: [],
+            jvmMemoryTotalInit: [],
+            jvmMemoryTotalMax: [],
+            jvmMemoryTotalUsed: [],
+            jvmMemoryPoolsSize: [],
             jvmOsCpuLoadProcess: [],
             jvmOsCpuLoadSystem: [],
-            jvmOsSystemLoadAverage:[],
+            jvmOsSystemLoadAverage: [],
             jvmOsPhysicalMemoryFreeSize: [],
             jvmOsPhysicalMemoryTotalSize: [],
             jvmOsVirtualMemoryCommittedSize: [],
@@ -78,15 +86,15 @@ export default class WorkerHistoryMore extends React.Component {
             jvmOsSwapSpaceTotalSize: [],
             jvmThreadsCount: [],
             jvmThreadsDaemonCount: [],
-            jvmThreadsBlockedCount:[],
-            jvmThreadsDeadlockCount:[],
-            jvmThreadsNewCount:[],
-            jvmThreadsRunnableCount:[],
-            jvmThreadsTerminatedCount:[],
-            jvmThreadsTimedWaitingCount:[],
-            jvmThreadsWaitingCount:[],
+            jvmThreadsBlockedCount: [],
+            jvmThreadsDeadlockCount: [],
+            jvmThreadsNewCount: [],
+            jvmThreadsRunnableCount: [],
+            jvmThreadsTerminatedCount: [],
+            jvmThreadsTimedWaitingCount: [],
+            jvmThreadsWaitingCount: [],
             jvmOsFileDescriptorOpenCount: [],
-            jvmOsFileDescriptorMaxCount:[],
+            jvmOsFileDescriptorMaxCount: [],
             sessionInvalid: false,
             isApiWaiting: true,
         };
@@ -123,26 +131,26 @@ export default class WorkerHistoryMore extends React.Component {
                     jvmMemoryNonHeapCommitted: response.data.jvmMemoryNonHeapCommitted.data,
                     jvmMemoryNonHeapMax: response.data.jvmMemoryNonHeapMax.data,
                     jvmOsFileDescriptorOpenCount: response.data.jvmOsFileDescriptorOpenCount.data,
-                    jvmOsFileDescriptorMaxCount:response.data.jvmOsFileDescriptorMaxCount.data,
-                    jvmThreadsBlockedCount:response.data.jvmThreadsBlockedCount.data,
-                    jvmThreadsDeadlockCount:response.data.jvmThreadsDeadlockCount.data,
-                    jvmThreadsNewCount:response.data.jvmThreadsNewCount.data,
-                    jvmThreadsRunnableCount:response.data.jvmThreadsRunnableCount.data,
-                    jvmThreadsTerminatedCount:response.data.jvmThreadsTerminatedCount.data,
-                    jvmThreadsTimedWaitingCount:response.data.jvmThreadsTimedWaitingCount.data,
-                    jvmThreadsWaitingCount:response.data.jvmThreadsWaitingCount.data,
-                    jvmGcPsMarksweepCount:response.data.jvmGcPsMarksweepCount.data,
-                    jvmGcPsMarksweepTime:response.data.jvmGcPsMarksweepTime.data,
-                    jvmGcPsScavengeCount:response.data.jvmGcPsScavengeCount.data,
-                    jvmGcPsScavengeTime:response.data.jvmGcPsScavengeTime.data,
-                    jvmOsSystemLoadAverage:response.data.jvmOsSystemLoadAverage.data,
-                    jvmMemoryHeapUsage:response.data.jvmMemoryHeapUsage.data,
-                    jvmMemoryNonHeapUsage:response.data.jvmMemoryNonHeapUsage.data,
-                    jvmMemoryTotalCommitted:response.data.jvmMemoryTotalCommitted.data,
-                    jvmMemoryTotalInit:response.data.jvmMemoryTotalInit.data,
-                    jvmMemoryTotalMax:response.data.jvmMemoryTotalMax.data,
-                    jvmMemoryTotalUsed:response.data.jvmMemoryTotalUsed.data,
-                    jvmMemoryPoolsSize:response.data.jvmMemoryPoolsSize.data,
+                    jvmOsFileDescriptorMaxCount: response.data.jvmOsFileDescriptorMaxCount.data,
+                    jvmThreadsBlockedCount: response.data.jvmThreadsBlockedCount.data,
+                    jvmThreadsDeadlockCount: response.data.jvmThreadsDeadlockCount.data,
+                    jvmThreadsNewCount: response.data.jvmThreadsNewCount.data,
+                    jvmThreadsRunnableCount: response.data.jvmThreadsRunnableCount.data,
+                    jvmThreadsTerminatedCount: response.data.jvmThreadsTerminatedCount.data,
+                    jvmThreadsTimedWaitingCount: response.data.jvmThreadsTimedWaitingCount.data,
+                    jvmThreadsWaitingCount: response.data.jvmThreadsWaitingCount.data,
+                    jvmGcPsMarksweepCount: response.data.jvmGcPsMarksweepCount.data,
+                    jvmGcPsMarksweepTime: response.data.jvmGcPsMarksweepTime.data,
+                    jvmGcPsScavengeCount: response.data.jvmGcPsScavengeCount.data,
+                    jvmGcPsScavengeTime: response.data.jvmGcPsScavengeTime.data,
+                    jvmOsSystemLoadAverage: response.data.jvmOsSystemLoadAverage.data,
+                    jvmMemoryHeapUsage: response.data.jvmMemoryHeapUsage.data,
+                    jvmMemoryNonHeapUsage: response.data.jvmMemoryNonHeapUsage.data,
+                    jvmMemoryTotalCommitted: response.data.jvmMemoryTotalCommitted.data,
+                    jvmMemoryTotalInit: response.data.jvmMemoryTotalInit.data,
+                    jvmMemoryTotalMax: response.data.jvmMemoryTotalMax.data,
+                    jvmMemoryTotalUsed: response.data.jvmMemoryTotalUsed.data,
+                    jvmMemoryPoolsSize: response.data.jvmMemoryPoolsSize.data,
                     isApiWaiting: false
                 });
             }).catch((error) => {
@@ -173,32 +181,32 @@ export default class WorkerHistoryMore extends React.Component {
             );
         } else {
             return (
-                <div>
-                    <div style={cardStyle}>
+                <div style={{padding: '20px 24px'}}>
+                    <div>
                         <JVMLoading
                             data={[this.state.jvmClassLoadingLoadedTotal,
                                 this.state.jvmClassLoadingLoadedCurrent,
                                 this.state.jvmClassLoadingUnloadedTotal]}/>
                     </div>
-                    <div style={cardStyle}>
+                    <div>
                         <JVMOsLoad data={[
                             this.state.jvmOsCpuLoadProcess,
                             this.state.jvmOsCpuLoadSystem
                         ]}/>
                     </div>
-                    <div style={cardStyle}>
+                    <div>
                         <JVMLoad data={[
                             this.state.jvmOsSystemLoadAverage
                         ]}/>
                     </div>
-                    <div style={cardStyle}>
+                    <div>
                         <JVMOsPhysicalMemory
                             data={[
                                 this.state.jvmOsPhysicalMemoryFreeSize,
                                 this.state.jvmOsPhysicalMemoryTotalSize,
                                 this.state.jvmOsVirtualMemoryCommittedSize]}/>
                     </div>
-                    <div style={cardStyle}>
+                    <div>
                         <JVMOTotalMemory
                             data={[
                                 this.state.jvmMemoryTotalCommitted,
@@ -206,14 +214,14 @@ export default class WorkerHistoryMore extends React.Component {
                                 this.state.jvmMemoryTotalMax,
                                 this.state.jvmMemoryTotalUsed]}/>
                     </div>
-                    <div style={cardStyle}>
+                    <div>
                         <JVMSwap
                             data={[
                                 this.state.jvmOsSwapSpaceFreeSize,
                                 this.state.jvmOsSwapSpaceTotalSize]}/>
                     </div>
-                    <div style={cardStyle}>
-                        <JVMThread  data={[
+                    <div>
+                        <JVMThread data={[
                             this.state.jvmThreadsCount,
                             this.state.jvmThreadsDaemonCount,
                             this.state.jvmThreadsBlockedCount,
@@ -226,8 +234,8 @@ export default class WorkerHistoryMore extends React.Component {
                         ]}
                         />
                     </div>
-                    <div style={cardStyle}>
-                        <HeapMemory   data={[
+                    <div>
+                        <HeapMemory data={[
                             this.state.jvmMemoryHeapInit,
                             this.state.jvmMemoryHeapUsed,
                             this.state.jvmMemoryHeapCommitted,
@@ -235,7 +243,7 @@ export default class WorkerHistoryMore extends React.Component {
                             this.state.jvmMemoryHeapUsage
                         ]}/>
                     </div>
-                    <div style={cardStyle}>
+                    <div>
                         <NonHeapMemory data={[
                             this.state.jvmMemoryNonHeapInit,
                             this.state.jvmMemoryNonHeapUsed,
@@ -245,7 +253,7 @@ export default class WorkerHistoryMore extends React.Component {
 
                         ]}/>
                     </div>
-                    <div style={cardStyle}>
+                    <div>
                         <JVMGarbageCOllector data={[
                             this.state.jvmGcPsMarksweepCount,
                             this.state.jvmGcPsMarksweepTime,
@@ -253,7 +261,7 @@ export default class WorkerHistoryMore extends React.Component {
                             this.state.jvmGcPsScavengeTime
                         ]}/>
                     </div>
-                    <div style={cardStyle}>
+                    <div>
                         <FileDescriptor data={[
                             this.state.jvmOsFileDescriptorOpenCount,
                             this.state.jvmOsFileDescriptorMaxCount]}
@@ -263,6 +271,7 @@ export default class WorkerHistoryMore extends React.Component {
             );
         }
     }
+
     render() {
         if (this.state.sessionInvalid) {
             return (
@@ -271,20 +280,31 @@ export default class WorkerHistoryMore extends React.Component {
         }
         return (
             <div>
-                <div className="navigation-bar">
-                    <Header/>
-                    <Link to={window.contextPath}><FlatButton label="Overview >"
-                                                                         icon={<HomeButton color="black"/>}/></Link>
-                    <Link to={window.contextPath + '/worker/' + this.props.match.params.id }>
-                        <FlatButton label={this.state.workerID + " >"}/></Link>
-                    <Link to={window.contextPath + '/worker/history/' + this.props.match.params.id }><FlatButton
-                        label="Metrics >"/></Link>
-                    <RaisedButton label= "More" disabled disabledLabelColor='white'
-                                  disabledBackgroundColor='#f17b31'/>
+                <Header/>
+                <div style={styles.navBar} className="navigation-bar">
+                    <Link  style={{textDecoration: 'none'}} to={window.contextPath}>
+                        <Button style={styles.navBtn}>
+                            <HomeButton style={{ paddingRight: 8, color: '#BDBDBD' }} />
+                            <FormattedMessage id='overview' defaultMessage='Overview >' />
+                        </Button>
+                    </Link>
+                    <Link  style={{textDecoration: 'none'}} to={window.contextPath + '/worker/' +
+                        this.props.match.params.id}>
+                        <Button style={styles.navBtn}>
+                            {this.state.workerID} >
+                        </Button>
+                    </Link>
+                    <Link  style={{textDecoration: 'none'}} to={window.contextPath + '/worker/history/' +
+                        this.props.match.params.id}>
+                        <Button style={styles.navBtn}>
+                            <FormattedMessage id='metrics>' defaultMessage='Metrics >' />
+                        </Button>
+                    </Link>
+                    <Typography style={styles.navBtnActive}>More</Typography>
                 </div>
-                <div className="worker-h1">
-                    <h2 style={{marginLeft: 40}}> {this.state.workerID} Metrics </h2>
-                </div>
+                <Typography variant="title" style={styles.titleStyle}>
+                    {this.state.workerID} <FormattedMessage id='metrics' defaultMessage='Metrics ' />
+                </Typography>
 
                 {this.renderCharts()}
             </div>

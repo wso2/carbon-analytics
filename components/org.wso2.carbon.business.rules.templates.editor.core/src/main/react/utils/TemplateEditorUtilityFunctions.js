@@ -136,11 +136,12 @@ class TemplateEditorUtilityFunctions {
      */
     static isSkeletonValid(templateGroupDefinition) {
         let validator = new Validator();
+        validator.addSchema(TemplateEditorConstants.TEMPLATE_GROUP_SCHEMA, '/templateGroupSchema');
         validator.addSchema(TemplateEditorConstants.RULE_TEMPLATE_SCHEMA, '/ruleTemplateSchema');
         validator.addSchema(TemplateEditorConstants.TEMPLATE_SCHEMA, '/templateSchema');
         validator.addSchema(TemplateEditorConstants.PROPERTY_SCHEMA, '/propertySchema');
         let validatorResult =
-            validator.validate(templateGroupDefinition, TemplateEditorConstants.TEMPLATE_GROUP_SCHEMA);
+            validator.validate(templateGroupDefinition, TemplateEditorConstants.TEMPLATE_GROUP_WRAPPER_SCHEMA);
         if (validatorResult.errors.length > 0) {
             throw validatorResult.errors[0].stack;
         }

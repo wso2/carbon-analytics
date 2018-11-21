@@ -16,6 +16,7 @@
  *  under the License.
  *
  */
+
 package org.wso2.carbon.status.dashboard.core.impl.utils;
 
 /**
@@ -56,7 +57,6 @@ public class Constants {
     public static final String WORKER_JVM_THREADS_COUNT = "jvm.threads.count";
     public static final String WORKER_JVM_THREADS_DAEMON_COUNT = "jvm.threads.daemon.count";
 
-
     //Default not open
     public static final String WORKER_JVM_MEMORY_POOL = "jvm.memory.pools";
     public static final String WORKER_JVM_BLOCKED_THREADS_COUNT = "jvm.threads.blocked.count";
@@ -83,10 +83,25 @@ public class Constants {
     public static final String URL_PARAM_SPLITTER = "&";
     public static final String WORKER_METRIC_TYPE = "WORKER";
     public static final String SELECT_ALL_EXPRESSION = "*";
-    public static final String NON_CLUSTERS_ID = "Non Clusters";
+    public static final String NON_CLUSTERS_ID = "Single Node Deployments";
     public static final String NOT_REACHABLE_ID = "Not-Reachable";
     public static final String NEVER_REACHED = "Never Reached";
     public static final int DEFAULT_TIME_INTERVAL_MILLIS = 300000;
+
+    public static final String MANAGER_HOST_PORT = "MANAGERID";
+    public static final String WORKER_HOST_PORT = "WORKERID";
+    public static final String NODE_HOST_NAME = "HOST";
+    public static final String NODE_PORT_VALUE = "PORT";
+    public static final String DATA_TYPE_INTEGER = "integerType";
+    public static final String DATA_TYPE_STRING = "stringType";
+    public static final String DATA_TYPE_DOUBLE = "doubleType";
+    public static final String DATA_TYPE_LONG = "longType";
+    public static final String DATA_TYPE_FLOAT = "floatType";
+    public static final String DATA_TYPE_BOOL = "booleanType";
+    public static final String ACTIVE_APP_STATUS = "active";
+    public static final String PASSIVE_APP_STATUS = "passive";
+
+    public static final int HOUR = 3600000;
 
     private Constants() {
         //preventing initialization

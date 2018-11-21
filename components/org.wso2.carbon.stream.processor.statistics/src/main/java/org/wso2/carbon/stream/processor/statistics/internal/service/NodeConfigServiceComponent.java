@@ -38,18 +38,18 @@ import org.wso2.carbon.stream.processor.statistics.internal.StreamProcessorStati
         immediate = true
 )
 public class NodeConfigServiceComponent {
-
+    
     public NodeConfigServiceComponent() {
     }
-
+    
     @Activate
     protected void start(BundleContext bundleContext) {
     }
-
+    
     @Deactivate
     protected void stop() {
     }
-
+    
     /**
      * Get the NodeInfo service.
      * This is the bind method that gets called for NodeInfo service registration that satisfy the policy.
@@ -63,11 +63,11 @@ public class NodeConfigServiceComponent {
             policy = ReferencePolicy.DYNAMIC,
             unbind = "unregisterHAInfoProvider"
     )
-    protected void registerHAInfoProvider(NodeInfo nodeInfo){
+    protected void registerHAInfoProvider(NodeInfo nodeInfo) {
         StreamProcessorStatisticDataHolder.getInstance().setNodeInfo(nodeInfo);
     }
-
-    protected void unregisterHAInfoProvider(NodeInfo nodeInfo){
+    
+    protected void unregisterHAInfoProvider(NodeInfo nodeInfo) {
         StreamProcessorStatisticDataHolder.getInstance().setNodeInfo(null);
     }
 }

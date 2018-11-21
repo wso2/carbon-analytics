@@ -16,6 +16,7 @@
  *  under the License.
  *
  */
+
 package org.wso2.carbon.status.dashboard.core.bean.table;
 
 import org.apache.commons.lang3.text.WordUtils;
@@ -26,26 +27,26 @@ import org.apache.commons.lang3.text.WordUtils;
 public class MetricElement {
     private String type;
     private Attribute attribute = new Attribute();
-
+    
     public MetricElement() {
     }
-
+    
     public String getType() {
         return type;
     }
-
+    
     public void setType(String type) {
         this.type = WordUtils.capitalize(type);
     }
-
+    
     public Attribute getAttribute() {
         return attribute;
     }
-
+    
     public void addAttributes(Attribute attribute) {
         this.attribute = attribute;
     }
-
+    
     public void setAttributes(Attribute attributes) {
         this.attribute = attributes;
     }

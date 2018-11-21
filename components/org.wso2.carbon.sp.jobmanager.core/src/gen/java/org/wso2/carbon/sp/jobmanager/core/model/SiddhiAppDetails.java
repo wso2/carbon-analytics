@@ -28,7 +28,7 @@ import java.util.Objects;
  * ChildApps class that holds the details of the child app and the status of the child apps
  */
 @javax.annotation.Generated(value = "io.swagger.codegen.languages.JavaMSF4JServerCodegen",
-                            date = "2018-02-03T14:53:27.713Z")
+        date = "2018-02-03T14:53:27.713Z")
 
 public class SiddhiAppDetails {
     @JsonProperty("parentAppName")
@@ -199,7 +199,7 @@ public class SiddhiAppDetails {
     @Override
     public int hashCode() {
         return Objects.hash(parentAppName, groupName, appName, siddhiApp, id, state, host, port, lastPingTimestamp,
-                            failedPingAttempts, appStatus);
+                failedPingAttempts, appStatus);
     }
 
     @Override

@@ -18,7 +18,8 @@
 
 package org.wso2.carbon.sp.jobmanager.core.api;
 
-@javax.annotation.Generated(value = "io.swagger.codegen.languages.JavaMSF4JServerCodegen", date = "2017-10-21T09:39:46.914Z")
+@javax.annotation.Generated(value = "io.swagger.codegen.languages.JavaMSF4JServerCodegen",
+        date = "2017-10-21T09:39:46.914Z")
 public class NotFoundException extends ApiException {
     private int code;
 

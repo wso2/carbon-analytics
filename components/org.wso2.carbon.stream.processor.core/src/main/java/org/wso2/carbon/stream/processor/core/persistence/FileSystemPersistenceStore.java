@@ -20,6 +20,7 @@ package org.wso2.carbon.stream.processor.core.persistence;
 
 import com.google.common.io.Files;
 import org.apache.log4j.Logger;
+import org.wso2.carbon.stream.processor.core.ha.util.CompressionUtil;
 import org.wso2.carbon.stream.processor.core.persistence.util.PersistenceConstants;
 import org.wso2.siddhi.core.util.persistence.PersistenceStore;
 
@@ -39,9 +40,17 @@ public class FileSystemPersistenceStore implements PersistenceStore {
     @Override
     public void save(String siddhiAppName, String revision, byte[] snapshot) {
         File file = new File(folder + File.separator + siddhiAppName + File.separator + revision);
+        byte[] compressedSnapshot;
+        try {
+            compressedSnapshot = CompressionUtil.compressGZIP(snapshot);
+        } catch (IOException e) {
+            log.error("Error occurred while trying to compress the snapshot. Failed to " +
+                    "persist revision: " + revision + " of Siddhi app: " + siddhiAppName);
+            return;
+        }
         try {
             Files.createParentDirs(file);
-            Files.write(snapshot, file);
+            Files.write(compressedSnapshot, file);
             cleanOldRevisions(siddhiAppName);
             if (log.isDebugEnabled()) {
                 log.debug("Periodic persistence of " + siddhiAppName + " persisted successfully.");
@@ -91,7 +100,14 @@ public class FileSystemPersistenceStore implements PersistenceStore {
         try {
             byte[] bytes = Files.toByteArray(file);
             log.info("State loaded for " + siddhiAppName + " revision " + revision + " from the file system.");
-            return bytes;
+            byte[] decompressedSnapshot;
+            try {
+                decompressedSnapshot = CompressionUtil.decompressGZIP(bytes);
+            } catch (IOException e) {
+                throw new RuntimeException("Error occurred while trying to decompress the snapshot. Failed to " +
+                        "load revision: " + revision + " of Siddhi app: " + siddhiAppName, e);
+            }
+            return decompressedSnapshot;
         } catch (IOException e) {
             log.error("Cannot load the revision " + revision + " of SiddhiApp: " + siddhiAppName +
                     " from file system.", e);

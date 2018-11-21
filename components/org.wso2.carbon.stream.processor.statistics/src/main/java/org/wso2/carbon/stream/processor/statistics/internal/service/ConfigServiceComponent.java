@@ -42,19 +42,19 @@ import org.wso2.carbon.stream.processor.statistics.internal.StreamProcessorStati
 )
 public class ConfigServiceComponent {
     private static final Logger LOGGER = LoggerFactory.getLogger(ConfigServiceComponent.class);
-
+    
     public ConfigServiceComponent() {
     }
-
+    
     @Activate
     protected void start(BundleContext bundleContext) {
-
+    
     }
-
+    
     @Deactivate
     protected void stop() {
     }
-
+    
     /**
      * Get the ConfigProvider service.
      * This is the bind method that gets called for ConfigProvider service registration that satisfy the policy.
@@ -71,7 +71,7 @@ public class ConfigServiceComponent {
     protected void registerConfigProvider(ConfigProvider configProvider) throws ConfigurationException {
         StreamProcessorStatisticDataHolder.getInstance().setConfigProvider(configProvider);
     }
-
+    
     /**
      * This is the unbind method for the above reference that gets called for ConfigProvider instance un-registrations.
      *
@@ -80,7 +80,7 @@ public class ConfigServiceComponent {
     protected void unregisterConfigProvider(ConfigProvider configProvider) {
         StreamProcessorStatisticDataHolder.getInstance().setConfigProvider(null);
     }
-
+    
     /**
      * Get the carbon metrics MetricManagementService service.
      * This is the bind method that gets called for ConfigProvider service registration that satisfy the policy.
@@ -97,7 +97,7 @@ public class ConfigServiceComponent {
     protected void setMetricManagementService(MetricManagementService metricManagementService) {
         StreamProcessorStatisticDataHolder.getInstance().setMetricsManagementService(metricManagementService);
     }
-
+    
     /**
      * This is the unbind method for unbound carbon metrics MetricManagementService.
      *

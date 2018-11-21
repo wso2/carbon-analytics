@@ -2,7 +2,7 @@
  *  Copyright (c) 2017, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
  *
  *  WSO2 Inc. licenses this file to you under the Apache License,
- *  Version 2.0 (the "License"); you may not use this file except
+ *  Version 2.0 (the 'License'); you may not use this file except
  *  in compliance with the License.
  *  You may obtain a copy of the License at
  *
@@ -10,7 +10,7 @@
  *
  *  Unless required by applicable law or agreed to in writing,
  *  software distributed under the License is distributed on an
- *  "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ *  'AS IS' BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
  *  KIND, either express or implied.  See the License for the
  *  specific language governing permissions and limitations
  *  under the License.
@@ -18,19 +18,23 @@
  */
 
 import Qs from 'qs';
-import React, { Component } from 'react';
-import { Redirect, Route, Switch } from 'react-router-dom';
+import React, {Component} from 'react';
+import {Redirect, Route, Switch} from 'react-router-dom';
 //App Components
 import AuthManager from './utils/AuthManager';
-import WorkerOverview from "../overview/WorkerOverview";
-import AppSpecific from "../siddhi-app/AppSpecific";
-import AppHistory from "../siddhi-app/AppHistory";
-import ComponentHistory from "../siddhi-app/ComponentHistory";
-import AddWorker from "../add-worker/AddWorker";
-import WorkerHistory from "../worker-history/WorkerHistory";
-import WorkerHistoryMore from "../worker-history-more/WorkerHistoryMore";
-import WorkerSpecific from "../worker/WorkerSpecific";
-import Error404 from "../error-pages/Error404";
+import WorkerOverview from '../overview/WorkerOverview';
+import AppSpecific from '../siddhi-app/AppSpecific';
+import AppHistory from '../siddhi-app/AppHistory';
+import ComponentHistory from '../siddhi-app/ComponentHistory';
+import AddWorker from '../add-worker/AddWorker';
+import WorkerHistory from '../worker-history/WorkerHistory';
+import WorkerHistoryMore from '../worker-history-more/WorkerHistoryMore';
+import WorkerSpecific from '../worker/WorkerSpecific';
+import Error404 from '../error-pages/Error404';
+import DistributedOverview from '../distributedView/DistributedViewOverview';
+import AppView from '../distributedView/AppView';
+import SiddhiAppTable from '../overview/SiddhiAppTable';
+
 /**
  * App context.
  */
@@ -42,7 +46,7 @@ const appContext = window.contextPath;
 export default class SecuredRouter extends Component {
 
     componentWillMount() {
-        setInterval(function() {
+        setInterval(function () {
             if (AuthManager.getUser()) {
                 const expiresOn = new Date(AuthManager.getUser().expires);
                 const skew = 100;
@@ -61,12 +65,11 @@ export default class SecuredRouter extends Component {
     render() {
         // If the user is not logged in, redirect to the login page.
         if (!AuthManager.isLoggedIn()) {
-            const params = Qs.stringify({ referrer: this.props.location.pathname });
+            const params = Qs.stringify({referrer: this.props.location.pathname});
             return (
-                <Redirect to={{ pathname: `${appContext}/login`, search: params }} />
+                <Redirect to={{pathname: `${appContext}/login`, search: params}}/>
             );
         }
-
         return (
             <Switch>
                 <Route exact path={appContext} component={WorkerOverview}/>
@@ -78,10 +81,13 @@ export default class SecuredRouter extends Component {
                 <Route exact path={appContext + '/worker/:id/siddhi-apps/:appName/components/:componentType/' +
                 ':componentId/history/:isStatsEnabled'}
                        component={ComponentHistory}/>
-                <Route exact path={appContext +'/add-worker'} component={AddWorker}/>
+                <Route exact path={appContext + '/add-worker'} component={AddWorker}/>
                 <Route exact path={appContext + '/worker/:id'} component={WorkerSpecific}/>
                 <Route exact path={appContext + '/worker/history/:id'} component={WorkerHistory}/>
                 <Route exact path={appContext + '/worker/history/:id/more'} component={WorkerHistoryMore}/>
+                <Route exact path={appContext + '/:id/siddhi-apps'} component={DistributedOverview}/>
+                <Route exact path={appContext + '/:id/siddhi-apps/:appName'} component={AppView}/>
+                <Route exact path={appContext + '/siddhi-apps'} component={SiddhiAppTable}/>
                 <Route component={Error404}/>
             </Switch>
         );

@@ -33,7 +33,7 @@ import org.wso2.carbon.container.CarbonContainerFactory;
 import org.wso2.carbon.kernel.CarbonServerInfo;
 import org.wso2.carbon.siddhi.store.api.rest.ApiResponseMessage;
 import org.wso2.carbon.stream.processor.common.EventStreamService;
-import org.wso2.carbon.stream.processor.core.SiddhiAppRuntimeService;
+import org.wso2.carbon.stream.processor.common.SiddhiAppRuntimeService;
 import org.wso2.carbon.stream.processor.statistics.bean.WorkerMetrics;
 import org.wso2.carbon.stream.processor.statistics.bean.WorkerStatistics;
 import org.wso2.msf4j.MicroservicesRegistry;
@@ -164,7 +164,7 @@ public class SiddhiMetricsAPITestcase {
         Assert.assertTrue(workerMetrics.getProcessCPU() > 0);
         Assert.assertTrue(workerMetrics.getSystemCPU() > 0);
         Assert.assertTrue(workerMetrics.getTotalMemory() > 0);
-        Assert.assertTrue(workerStatistics.getClusterID().equalsIgnoreCase("Non Clusters"));
+        Assert.assertTrue(workerStatistics.getClusterID().equalsIgnoreCase("Single Node Deployments"));
         Assert.assertTrue(workerStatistics.getRunningStatus().equalsIgnoreCase("Reachable"));
         Assert.assertTrue(workerStatistics.isStatsEnabled());
         Assert.assertTrue(!workerStatistics.isInSync());
@@ -229,8 +229,8 @@ public class SiddhiMetricsAPITestcase {
         Assert.assertEquals(httpResponseMessage.getResponseCode(), 200);
         ApiResponseMessage msg = gson.fromJson((String) httpResponseMessage.getSuccessContent(), ApiResponseMessage
                 .class);
-        Assert.assertTrue(msg.getMessage().equals("WSO2 Carbon metrics is not enabled.") ||
-                msg.getMessage().equals("MX reporter has been disabled at WSO2 carbon metrics."));
+        Assert.assertTrue(msg.getMessage().equals("Metrics are disabled.") ||
+                msg.getMessage().equals("JMX reporter has been disabled at WSO2 metrics."));
     }
 
     private HTTPResponseMessage getRealTimeStatsAndReturnResponse() {

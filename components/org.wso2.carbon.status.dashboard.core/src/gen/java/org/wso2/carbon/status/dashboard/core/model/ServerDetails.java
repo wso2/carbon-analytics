@@ -16,6 +16,7 @@
  *  under the License.
  *
  */
+
 package org.wso2.carbon.status.dashboard.core.model;
 
 /**
@@ -23,7 +24,7 @@ package org.wso2.carbon.status.dashboard.core.model;
  */
 public class ServerDetails {
 
-    private SiddhiApps siddhiApps;
+    private SiddhiAppStatus siddhiAppStatus;
     private WorkerMetrics workerMetrics;
     private String haStatus;
     private boolean isStatsEnabled;
@@ -45,12 +46,12 @@ public class ServerDetails {
         this.workerMetrics = workerMetrics;
     }
 
-    public SiddhiApps getSiddhiApps() {
-        return siddhiApps;
+    public SiddhiAppStatus getSiddhiApps() {
+        return siddhiAppStatus;
     }
 
     public void setSiddhiApps(int active, int inactive) {
-        this.siddhiApps = new SiddhiApps(active, inactive);
+        this.siddhiAppStatus = new SiddhiAppStatus(active, inactive);
     }
 
     public boolean isStatEnabled() {
@@ -65,8 +66,8 @@ public class ServerDetails {
         return haStatus;
     }
 
-    public void setHAStatus(String HAStatus) {
-        this.haStatus = HAStatus;
+    public void setHAStatus(String hastatus) {
+        this.haStatus = hastatus;
     }
 
     public String getClusterId() {

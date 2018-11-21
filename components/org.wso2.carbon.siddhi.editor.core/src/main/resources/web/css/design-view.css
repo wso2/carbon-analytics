@@ -1,0 +1,706 @@
+/*
+ * Copyright (c) 2018, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+ *
+ * WSO2 Inc. licenses this file to you under the Apache License,
+ * Version 2.0 (the "License"); you may not use this file except
+ * in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied. See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+ */
+
+.source-view-enabled {
+    height: 100%;
+}
+
+.design-view-container {
+    height: 100%;
+    display: flex;
+}
+
+.toggle-controls-container {
+    position: absolute;
+    bottom: 2%;
+    right: 2%;
+    z-index: 23;
+}
+
+.toggle-view-button {
+    transition: 0.15s;
+    font-weight: bold;
+    color: #333;
+    background-color: #f57e30;
+}
+
+.toggle-view-button:hover {
+    color: #fff;
+    transition: 0.15s;
+}
+
+.toggle-button-text {
+    padding-left: 5px;
+}
+
+.grid-container {
+    /* Temp */
+    width: calc(100% - 67px);
+    position: relative;
+    overflow: auto;
+    background: linear-gradient(-90deg, rgba(0, 0, 0, .001) 1px, transparent 1px),
+    linear-gradient(rgba(0, 0, 0, .03) 1px, transparent 1px),
+    linear-gradient(-90deg, rgba(0, 0, 0, .001) 1px, transparent 1px),
+    linear-gradient(rgba(0, 0, 0, .001) 1px, transparent 1px),
+    linear-gradient(transparent 3px, transparent 3px, transparent 78px, transparent 78px),
+    linear-gradient(-90deg, transparent 1px, transparent 1px),
+    linear-gradient(-90deg, transparent 3px, transparent 3px, transparent 78px, transparent 78px),
+    linear-gradient(transparent 1px, transparent 1px), transparent;
+    background-size: 10px 10px,
+    10px 10px,
+    10px 10px,
+    10px 10px,
+    10px 10px,
+    10px 10px,
+    10px 10px,
+    10px 10px;
+    background-color: #e7eaeb;
+}
+
+.sourceDrop {
+    background-image: url("../images/source.svg");
+}
+
+.sinkDrop {
+    background-image: url("../images/sink.svg");
+}
+
+.streamDrop {
+    background-image: url("../images/streams.svg");
+}
+
+.tableDrop {
+    background-image: url("../images/table.svg");
+}
+
+.windowDrop {
+    background-image: url("../images/window.svg");
+}
+
+.triggerDrop {
+    background-image: url("../images/trigger.svg");
+}
+
+.aggregationDrop {
+    background-image: url("../images/aggregate.svg");
+}
+
+.functionDrop {
+    background-image: url("../images/function.svg");
+}
+
+.projectionQueryDrop {
+    background-image: url("../images/query.svg");
+}
+
+.filterQueryDrop {
+    background-image: url("../images/filter-query.svg");
+}
+
+.windowQueryDrop {
+    background-image: url("../images/window-query.svg");
+}
+
+.functionQueryDrop {
+    background-image: url("../images/function-query.svg");
+}
+
+.joinQueryDrop {
+    background-image: url("../images/join-query.svg");
+}
+
+.patternQueryDrop {
+    background-image: url("../images/pattern-query.svg");
+}
+
+.sequenceQueryDrop {
+    background-image: url("../images/sequence-query.svg");
+}
+
+/*
+    Dropped Elements corresponding to their toolbox elements
+*/
+
+.streamDrop, .tableDrop, .windowDrop, .triggerDrop, .aggregationDrop, .projectionQueryDrop, .filterQueryDrop,
+.windowQueryDrop, .functionQueryDrop, .joinQueryDrop, .patternQueryDrop, .sequenceQueryDrop, .sourceDrop, .sinkDrop,
+.functionDrop {
+    opacity: 0.8;
+    width: 60px;
+    height: 60px;
+    cursor: pointer;
+    text-align: center;
+    z-index: 20;
+    position: absolute;
+    background-color: #fff;
+    background-size: 40px 40px;
+    background-repeat: no-repeat;
+    background-position: 10px 10px;
+    color: black;
+    font-family: helvetica, sans-serif;
+    font-size: 0.9em;
+    -webkit-transition: -webkit-box-shadow 0.15s ease-in;
+    -moz-transition: -moz-box-shadow 0.15s ease-in;
+    -o-transition: -o-box-shadow 0.15s ease-in;
+    transition: box-shadow 0.15s ease-in;
+    border: 1px solid #ccc;
+}
+
+.partitionDrop {
+    border: 1px solid #346789;
+    width: 250px;
+    height: 250px;
+    border-radius: 0.5em;
+    opacity: 0.8;
+    cursor: move;
+    text-align: center;
+    z-index: 1;
+    position: absolute;
+    background-color: transparent;
+    color: black;
+    font-family: helvetica, sans-serif;
+    font-size: 0.9em;
+    -webkit-transition: -webkit-box-shadow 0.15s ease-in;
+    -moz-transition: -moz-box-shadow 0.15s ease-in;
+    -o-transition: -o-box-shadow 0.15s ease-in;
+    transition: box-shadow 0.15s ease-in;
+    box-sizing: border-box;
+}
+
+/*
+    Element Divisions added as classes when the element is appended
+*/
+.title {
+    padding: 10px;
+    cursor: move;
+}
+
+.connection {
+    -moz-border-radius: 5px;
+    -webkit-border-radius: 5px;
+    border-radius: 5px;
+    font-size: 10px;
+    text-align: center;
+    cursor: pointer;
+    width: 10px;
+    height: 10px;
+    margin-left: -10px;
+    border: 1px solid #000;
+    background-color: #424242;
+}
+
+.property {
+    float: left;
+    margin-top: 10px;
+    background: #f4f4f4;
+    border: 1px solid #aaaaaa;
+    height: 800px;
+    overflow-y: scroll;
+    overflow-x: scroll;
+}
+
+/*
+*Styles for the configuration icons
+*/
+.element-prop-icon, .element-close-icon {
+    float: right;
+    width: 26px;
+    height: 26px;
+    margin-top: -95px;
+    cursor: pointer;
+    color: #616161;
+    border-radius: 40px;
+    font-size: 14px;
+}
+
+.element-prop-icon {
+    margin-right: 25px;
+}
+
+.element-close-icon {
+    margin-right: 5px;
+}
+
+input{
+. form-control input-md;
+    font-family: inherit;
+    font-size: inherit;
+    color: inherit;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+}
+
+.disableContainer {
+    pointer-events: none;
+    opacity: 0.4;
+}
+
+table {
+    border: 2px solid transparent;
+}
+
+td {
+    padding: 5px;
+    border: 1px solid transparent;
+}
+
+.queryDiv {
+    margin: 20px 0 20px 0;
+    width: 600px;
+    box-shadow: 3px 4px 5px 6px #707070;
+}
+
+.simpleQueryLabel, .windowStreamLabel {
+    background-color: #565656;
+    text-align: center;
+    margin: 20px 0 20px 0;
+    color: transparent;
+    text-shadow: 0 2px 3px rgba(255, 255, 255, 0.3);
+    -webkit-background-clip: text;
+}
+
+.connectorInStream, .connectorInTable, .connectorInWindow, .connectorInTrigger, .connectorInAggregation,
+.connectorInQuery, .connectorInPatternQuery, .connectorInSequenceQuery, .connectorInJoinQuery, .connectorInSink {
+    float: left;
+    margin-top: -53px;
+    margin-left: -5px;
+}
+
+.connectorOutStream, .connectorOutTable, .connectorOutWindow, .connectorOutTrigger, .connectorOutAggregation,
+.connectorOutQuery, .connectorOutPatternQuery, .connectorOutSequenceQuery, .connectorOutJoinQuery, .connectorOutSource {
+    float: right;
+    margin-top: -53px;
+    margin-right: -5px;
+}
+
+.connectorIn {
+    float: left;
+    margin-top: -47%;
+    margin-left: -13px;
+}
+
+.connectorOut {
+    float: right;
+    margin-top: -47%;
+    margin-right: -13px;
+}
+
+.partition-connector-in-part {
+    margin-left: -5px;
+    margin-top: 20px;
+    width: 15px;
+    height: 15px;
+    border: 1px solid #424242;
+    background-color: #424242;
+}
+
+.connectorStream {
+    float: right;
+    margin-top: 25%;
+    margin-right: -10%;
+}
+
+.aggregationNameNode, .triggerNameNode, .windowNameNode, .tableNameNode, .streamNameNode, .queryNameNode,
+.patternQueryNameNode, .joinQueryNameNode, .sequenceQueryNameNode, .sourceNameNode, .sinkNameNode, .functionNameNode {
+    font-weight: 600;
+    width: 120px;
+    margin-left: -30px;
+    margin-top: 60px;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    overflow: hidden;
+}
+
+.streamDrop:hover .streamNameNode, .windowDrop:hover .windowNameNode, .sequenceQueryDrop:hover .sequenceQueryNameNode,
+.triggerDrop:hover .triggerNameNode, .aggregationDrop:hover .aggregationNameNode, .functionDrop:hover .functionNameNode,
+.projectionQueryDrop:hover .queryNameNode, .filterQueryDrop:hover .queryNameNode, .windowQueryDrop:hover .queryNameNode,
+.joinQueryDrop:hover .joinQueryNameNode, .patternQueryDrop:hover .patternQueryNameNode, .tableDrop:hover .tableNameNode,
+.sourceDrop:hover .sourceNameNode, .sinkDrop:hover .sinkNameNode, .functionQueryDrop:hover .queryNameNode {
+    overflow: initial;
+}
+
+.partition-element-prop-icon, .partition-element-close-icon {
+    float: right;
+    width: 20px;
+    height: 20px;
+    margin-top: 10px;
+    cursor: pointer;
+    color: #616161;
+    font-size: 14px;
+}
+
+.partition-element-prop-icon {
+    margin-right: 0;
+}
+
+.partition-element-close-icon {
+    margin-right: 6px;
+}
+
+/* Window Stream */
+
+.checkboxStyleWindow {
+    float: right;
+    width: 20px;
+    height: 20px;
+    background-color: transparent;
+    border: 1px solid transparent;
+    margin-top: -82px;
+    margin-right: 0;
+    cursor: pointer;
+    color: red;
+    border-radius: 40px;
+    padding-left: 10px;
+    padding-top: 4px;
+}
+
+.design-view-form-content .well {
+    background: transparent;
+    padding: 0;
+}
+
+.design-view-form-content {
+    padding: 10px;
+}
+
+select.form-control,
+.btn-group > div {
+    background: #2f2f2f !important;
+}
+
+.design-view-form-content th {
+    color: #BDBDBD;
+}
+
+.grid-container > div {
+    opacity: 0.7;
+}
+
+.design-view-form-content button i {
+    font-size: 1.1rem;
+}
+
+.section-seperator {
+    border-bottom: 1px solid #424242;
+}
+
+.query-form-actions {
+    margin-top: 10px;
+}
+
+.design-view-form-content .table-bordered > tbody > tr > td,
+.design-view-form-content .table-bordered,
+.design-view-form-content .table-bordered > thead > tr > th {
+    border: 0;
+}
+
+.design-view-form-content,
+h3,
+.control-label {
+    color: #BDBDBD;
+}
+
+.frm-qry {
+    margin-bottom: 20px;
+}
+
+.frm-agr thead tr th:nth-of-type(2) {
+    width: 30%;
+}
+
+.frm-agr table {
+    width: 100% !important;
+}
+
+.form-control[disabled] {
+    opacity: 0.3;
+}
+
+.loading-screen {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    z-index: 22;
+    background-color: #282828;
+    color: #fff;
+    font-size: 40px;
+    text-align: center;
+    padding: 20% 0;
+}
+
+.app-annotations-button {
+    position: fixed;
+    top: 79px;
+    right: 15px;
+    font-size: 20px;
+    color: #757575;
+    transition: 0.15s;
+}
+
+.app-annotations-button:hover {
+    color: black;
+}
+
+.siddhi-app-name-node {
+    position: fixed;
+    right: 60px;
+    top: 77px;
+    opacity: 1 !important;
+    font-size: 16px;
+}
+
+#siddhi-app-desc-node{
+    position: fixed;
+    right: 60px;
+    top: 97px;
+    opacity: 1 !important;
+    font-size: 14px;
+}
+
+.design-view-form-content h3 {
+    font-size: 14px;
+}
+
+.design-view-form-content .form-control {
+    max-width: 500px;
+}
+
+.list-group-item {
+    background: #37474F;
+    color: #E0E0E0;
+    border: 0;
+    margin-bottom: 0;
+}
+
+.list-group-item.active, .list-group-item.active:hover, .list-group-item.active:focus {
+    background: #9E9E9E;
+    border: 0;
+    color: #212121;
+    font-weight: 500;;
+}
+
+a.list-group-item, button.list-group-item {
+    color: #E0E0E0;
+}
+
+.design-view-form-content .btn {
+    font-size: 12px;
+}
+
+.design-view-form-content select,
+.design-view-form-content p {
+    font-size: 12px;
+}
+
+/* JSONEditor overrides */
+/* Set widths */
+.define-appconfig [data-schemapath="root.annotations"] table,
+.define-source [data-schemapath="root.annotationOptions"] table,
+.define-source [data-schemapath="root.map.annotationOptions"] table,
+.define-source [data-schemapath="root.map.attributeValues"] table,
+.define-sink [data-schemapath="root.annotationOptions"] table,
+.define-sink [data-schemapath="root.map.annotationOptions"] table,
+.define-source [data-schemapath="root.map.attributeValues"] table,
+.define-stream [data-schemapath="root.annotations"] table,
+.define-stream [data-schemapath="root.attributes"] table,
+.define-table [data-schemapath="root.annotations"] table,
+.define-table [data-schemapath="root.storeAnnotation.storeOptions"] table,
+.define-table [data-schemapath="root.attributes"] table,
+.define-window [data-schemapath="root.annotations"] table,
+.define-window [data-schemapath="root.attributes"] table,
+.define-window [data-schemapath="root.parameters"] table,
+.define-trigger [data-schemapath="root.annotations"] table,
+.define-partition [data-schemapath="root.annotations"] table,
+.define-partition [data-schemapath="root.partitionKeys"] table
+{
+    width: 650px;
+}
+
+/* 1 column */
+.define-appconfig [data-schemapath="root.annotations"] table tr td:first-child,
+.define-source [data-schemapath="root.annotationOptions"] table tr td:first-child,
+.define-source [data-schemapath="root.map.annotationOptions"] table tr td:first-child,
+.define-sink [data-schemapath="root.annotationOptions"] table tr td:first-child,
+.define-sink [data-schemapath="root.map.annotationOptions"] table tr td:first-child,
+.define-stream [data-schemapath="root.annotations"] table tr td:first-child,
+.define-table [data-schemapath="root.annotations"] table tr td:first-child,
+.define-window [data-schemapath="root.annotations"] table tr td:first-child,
+.define-window [data-schemapath="root.parameters"] table tr td:first-child,
+.define-trigger [data-schemapath="root.annotations"] table tr td:first-child,
+.define-partition [data-schemapath="root.annotations"] table tr td:first-child
+{
+    width: 508px;
+}
+
+/* 2 column */
+.define-source [data-schemapath="root.map.attributeValues"] table tr td:nth-child(1),
+.define-source [data-schemapath="root.map.attributeValues"] table tr td:nth-child(2),
+.define-sink [data-schemapath="root.map.attributeOrPayloadValues"] table tr td:nth-child(1),
+.define-sink [data-schemapath="root.map.attributeOrPayloadValues"] table tr td:nth-child(2),
+.define-table [data-schemapath="root.storeAnnotation.storeOptions"] table tr td:nth-child(1),
+.define-table [data-schemapath="root.storeAnnotation.storeOptions"] table tr td:nth-child(2),
+.define-trigger [data-schemapath="root.annotations"] table tr td:nth-child(1),
+.define-trigger [data-schemapath="root.annotations"] table tr td:nth-child(2),
+.define-partition [data-schemapath="root.partitionKeys"] table tr td:nth-child(1),
+.define-partition [data-schemapath="root.partitionKeys"] table tr td:nth-child(2)
+{
+    width: 254px;
+}
+
+/* 2 column with type field */
+.define-stream [data-schemapath="root.attributes"] table tr td:nth-child(1),
+.define-table [data-schemapath="root.attributes"] table tr td:nth-child(1),
+.define-window [data-schemapath="root.attributes"] table tr td:nth-child(1)
+{
+    width: 428px;
+}
+
+.define-stream [data-schemapath="root.attributes"] table tr td:nth-child(2),
+.define-table [data-schemapath="root.attributes"] table tr td:nth-child(2),
+.define-window [data-schemapath="root.attributes"] table tr td:nth-child(2)
+{
+    width: 80px;
+}
+
+/* Hide duplicate labels */
+.define-appconfig [data-schemapath="root.annotations"] table thead,
+.define-source [data-schemapath="root.annotationOptions"] table thead,
+.define-source [data-schemapath="root.map.annotationOptions"] table thead,
+.define-sink [data-schemapath="root.annotationOptions"] table thead,
+.define-sink [data-schemapath="root.map.annotationOptions"] table thead,
+.define-stream [data-schemapath="root.annotations"] table thead,
+.define-table [data-schemapath="root.annotations"] table thead,
+.define-window [data-schemapath="root.annotations"] table thead,
+.define-window [data-schemapath="root.parameters"] table thead,
+.define-trigger [data-schemapath="root.annotations"] table thead,
+.define-partition [data-schemapath="root.annotations"] table thead,
+.define-windowFilterProjection-query [data-schemapath="root.annotations"] table thead,
+.define-windowFilterProjection-query [data-schemapath="root.streamHandlerList.0.streamHandler.parameters"] table thead,
+.define-aggregation [data-schemapath="root.annotations"] table thead,
+.define-aggregation [data-schemapath="root.aggregateByTimePeriod"] table thead,
+.define-pattern-query [data-schemapath="root.annotations"] table thead,
+.define-sequence-query [data-schemapath="root.annotations"] table thead
+{
+    display: none;
+}
+
+#
+
+.error-element {
+    border: 1px solid #FF0000;
+    box-shadow: 0 0 1px 2px #FF0000;
+}
+
+#stream-form{
+	position:absolute;
+}
+
+#streamName, .attr-name {
+	width: 200px;
+	border: 0;
+	line-height: 25px;
+	padding: 0 5px;
+	color: black;
+}
+
+.attr-type {
+    border: 0;
+	line-height: 25px;
+	margin-left: 10px;
+	height: 25px;
+    color: black;
+}
+
+.attr-nav {
+	margin-left: 10px;
+}
+
+.attribute > .attr-nav > a  {
+	float:left;
+	display: inline-block;
+	height: 25px;
+	padding: 0 5px;
+	margin-left: 10px;
+	background: #BDBDBD;
+	color: black;
+}
+
+.attribute > .attr-nav > a > .fw-sort-down{
+	font-size: 20px;
+	margin-top: -2px;
+}
+
+.attribute > .attr-nav > a > .fw-sort-up {
+	font-size: 20px;
+	margin-top: 6px
+}
+
+.attribute > .attr-nav > a > .fw-cancel {
+	font-size: 11px;
+	margin-top: 5px;
+}
+
+.attr-nav, .attr-content {
+	display:inline-block;
+	float:left;
+}
+
+.attribute{
+	margin-bottom: 10px;
+	line-height: 25px;
+	height: 25px;
+}
+
+.annotation > a > i.jstree-checkbox, .annotation > .jstree-clicked > i.jstree-checkbox,
+.annotation > i.jstree-checkbox   {
+	display:none;
+}
+
+.annotation-key > a > i.jstree-checkbox, .annotation-key > .jstree-clicked > i.jstree-checkbox,
+.annotation-key > i.jstree-checkbox   {
+	display:none;
+}
+.annotation-value > a > i.jstree-checkbox, .annotation-value > .jstree-clicked > i.jstree-checkbox,
+.annotation-value > i.jstree-checkbox   {
+	display:none;
+}
+
+.mandatory-key > a > i.jstree-checkbox, .mandatory-key > .jstree-clicked > i.jstree-checkbox  {
+	display:none;
+}
+
+.mandatory-annotation > a > i.jstree-checkbox, .mandatory-annotation > .jstree-clicked > i.jstree-checkbox  {
+	display:none;
+}
+
+.mandatory-annotation > a.jstree-hovered, .mandatory-key > a.jstree-hovered, .optional-annotation > a.jstree-hovered,
+.optional-key > a.jstree-hovered {
+	cursor: context;
+	background: transparent;
+	border-radius: 0px;
+}
+
+#define-annotation {
+	color: white;
+	margin-left: 280px;
+}
+
+.stream-form-container {
+	float:left;
+	display:inline-block;
+}

@@ -34,7 +34,6 @@ import static org.wso2.carbon.data.provider.rdbms.utils.RDBMSProviderConstants.L
  * RDBMS streaming data provider instance.
  */
 @Component(
-        name = "rdbms-streaming-data-provider",
         service = DataProvider.class,
         immediate = true
 )
@@ -89,7 +88,7 @@ public class RDBMSStreamingDataProvider extends AbstractRDBMSDataProvider {
                         }
                         data.add(rowData);
                     }
-                    if (!data.isEmpty()) {
+                    if (!data.isEmpty() || lastRecordValue == 0) {
                         publishToEndPoint(data, sessionId, topic);
                     }
                 } catch (SQLException e) {

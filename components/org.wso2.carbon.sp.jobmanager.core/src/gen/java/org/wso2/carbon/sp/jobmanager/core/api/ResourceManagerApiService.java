@@ -22,7 +22,8 @@ import org.wso2.carbon.sp.jobmanager.core.model.NodeConfig;
 
 import javax.ws.rs.core.Response;
 
-@javax.annotation.Generated(value = "io.swagger.codegen.languages.JavaMSF4JServerCodegen", date = "2017-10-21T09:39:46.914Z")
+@javax.annotation.Generated(value = "io.swagger.codegen.languages.JavaMSF4JServerCodegen",
+        date = "2017-10-21T09:39:46.914Z")
 
 /**
  * Manage Resource Manager node.

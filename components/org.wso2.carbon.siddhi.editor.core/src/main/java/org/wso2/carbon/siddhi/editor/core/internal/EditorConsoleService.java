@@ -107,7 +107,7 @@ public class EditorConsoleService implements WebSocketEndpoint {
                 session.getBasicRemote().sendText(jsonString);
                 session.close();
             } catch (IOException e) {
-                LOGGER.error(e.getMessage());
+                LOGGER.error("Inturrupted while awaiting for Session termination" + e.getMessage(), e);
             }
         }
     }

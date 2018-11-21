@@ -286,7 +286,7 @@ wso2.business.rules.manager:
   deployment_configs:
     -
      #ip:port of the node
-     localhost:9090:
+     localhost:9443:
        # uuids of rule templates which are needed to be deployed on the node given above
        - stock-data-analysis
        - stock-exchange-input
@@ -294,27 +294,6 @@ wso2.business.rules.manager:
        - identifying-continuous-production-decrease
   username: admin
   password: admin
-
-  queries:
-    -
-     mappings:
-        CREATE_BUSINESS_RULES_TABLE:
-        ADD_BUSINESS_RULE:
-        UPDATE_BUSINESS_RULE:
-        UPDATE_DEPLOYMENT_STATUS:
-        UPDATE_ARTIFACT_COUNT:
-        RETRIEVE_BUSINESS_RULE:
-        RETRIEVE_ALL:
-        RETRIEVE_ARTIFACT_COUNT:
-        RETRIEVE_DEPLOYMENT_STATUS:
-        DELETE_BUSINESS_RULE:
-        CREATE_RULE_TEMPLATES_TABLE:
-        ADD_RULE_TEMPLATE:
-        RETRIEVE_ALL_RULE_TEMPLATES:
-        DELETE_RULE_TEMPLATE:
-
-     type: default
-     version: default
 
 wso2.transport.http:
   transportProperties:

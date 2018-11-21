@@ -176,7 +176,7 @@ define(["jquery"], function (jQuery) {
     self.retrieveTableNames = function (connectionDetails, successCallback, errorCallback) {
         if (connectionDetails !== null && connectionDetails.length > 0) {
             jQuery.ajax({
-                async: true,
+                async: false,
                 url: self.simulatorUrl + "/connectToDatabase/retrieveTableNames",
                 type: self.HTTP_POST,
                 dataType: "json",

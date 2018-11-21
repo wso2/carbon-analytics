@@ -41,9 +41,9 @@ describe('StatusDashboard',
                 "lastUpdate":1512020345075,
                 "statusMessage":"Success",
                 "serverDetails":{
-                    "siddhiApps":{
-                        "active":12,
-                        "inactive":1
+                    "siddhiAppStatus":{
+                        "activeAppCount":12,
+                        "inactiveAppCount":1
                     },
                     "workerMetrics":{
                         "processCPU":0.0066552049248516446,

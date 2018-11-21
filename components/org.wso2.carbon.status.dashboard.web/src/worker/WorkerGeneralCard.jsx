@@ -17,17 +17,19 @@
  *
  */
 
-import React from "react";
+import React from 'react';
 //App Components
 //Material UI
-import {Card, CardText, CardTitle, Divider, FontIcon} from "material-ui";
-import {Table, TableBody, TableRow, TableRowColumn} from "material-ui/Table/index";
-import CircleBorder from "material-ui/svg-icons/av/fiber-manual-record";
-import StatusDashboardOverViewAPI from "../utils/apis/StatusDashboardOverViewAPI";
+import { Card, CardText, CardTitle, Divider, FontIcon } from 'material-ui';
+import {Table, TableBody, TableRow, TableRowColumn} from 'material-ui/Table/index';
+import CircleBorder from 'material-ui/svg-icons/av/fiber-manual-record';
+import StatusDashboardOverViewAPI from '../utils/apis/StatusDashboardOverViewAPI';
+//Localization
+import { FormattedMessage } from 'react-intl';
 
 const styles = {
-    borderBottom: {borderBottomColor:'rgba(215,215,215,0.05)'},
-    rowColor: {color: 'rgba(255,255,255,0.87)'}, length: {width: 200}
+    borderBottom: {borderBottomColor: 'rgba(215,215,215,0.05)'},
+    rowColor: {color: 'rgba(255,255,255,0.87)'}, length: {width: 150}
 };
 
 /**
@@ -65,13 +67,13 @@ export default class WorkerGeneralCard extends React.Component {
             });
     }
 
-    getSnapshotTime(){
-        if(this.state.haDetails.clusterID === "Non Clusters" ||
-            (this.state.haDetails.clusterID !== "Non Clusters" && this.state.haDetails.haStatus === "Active")){
+    getSnapshotTime() {
+        if (this.state.haDetails.clusterID === "Non Clusters" ||
+            (this.state.haDetails.clusterID !== "Non Clusters" && this.state.haDetails.haStatus === "Active")) {
             return (
                 <TableRow style={styles.borderBottom}>
                     <TableRowColumn style={styles.length}>
-                        Last Snapshot Time
+                        <FormattedMessage id='workerGeneral.lastSnapshotTime' defaultMessage='Last Snapshot Time' />
                     </TableRowColumn>
                     <TableRowColumn style={styles.rowColor} title={this.state.haDetails.lastSnapshotTime}>
                         {this.state.haDetails.lastSnapshotTime}
@@ -80,16 +82,16 @@ export default class WorkerGeneralCard extends React.Component {
             );
         }
         return (
-            <div />
+            <div/>
         );
     }
 
-    getSyncTime(){
-        if(this.state.haDetails.clusterID !== "Non Clusters" && this.state.haDetails.haStatus === "Passive"){
+    getSyncTime() {
+        if (this.state.haDetails.clusterID !== "Non Clusters" && this.state.haDetails.haStatus === "Passive") {
             return (
                 <TableRow style={styles.borderBottom}>
                     <TableRowColumn style={styles.length}>
-                        Last Sync Time
+                        <FormattedMessage id='workerGeneral.lastSyncTime' defaultMessage='Last Sync Time' />
                     </TableRowColumn>
                     <TableRowColumn style={styles.rowColor} title={this.state.haDetails.lastSyncTime}>
                         {this.state.haDetails.lastSyncTime}
@@ -98,16 +100,16 @@ export default class WorkerGeneralCard extends React.Component {
             );
         }
         return (
-            <div />
+            <div/>
         );
     }
 
-    getClusterId(){
-        if(this.state.haDetails.clusterID !== "Non Clusters"){
+    getClusterId() {
+        if (this.state.haDetails.clusterID !== "Non Clusters") {
             return (
                 <TableRow style={styles.borderBottom}>
                     <TableRowColumn style={styles.length}>
-                        Cluster ID
+                        <FormattedMessage id='workerGeneral.clusterID' defaultMessage='Cluster ID' />
                     </TableRowColumn>
                     <TableRowColumn style={styles.rowColor} title={this.state.haDetails.clusterID}>
                         {this.state.haDetails.clusterID}
@@ -116,16 +118,16 @@ export default class WorkerGeneralCard extends React.Component {
             );
         }
         return (
-            <div />
+            <div/>
         );
     }
 
     render() {
-        if(!this.state.isApiCalled){
-            return(
-                <div style={{paddingLeft: 20, width: '30%', float: 'left', boxSizing: 'border-box'}}>
+        if (!this.state.isApiCalled) {
+            return (
+                <div style={{paddingLeft: 24, width: '30%', float: 'left', boxSizing: 'border-box'}}>
                     <Card style={{height: 660}}>
-                        <CardTitle title="Server General Details"/>
+                        <CardTitle title={<FormattedMessage id='workerGeneral.serverDetails' defaultMessage='Server General Details' />} />
                         <Divider/>
                         <CardText style={{textAlign: 'left'}}>
                             <div style={{
@@ -140,13 +142,13 @@ export default class WorkerGeneralCard extends React.Component {
             );
         }
         return (
-            <div style={{paddingLeft: 20, width: '30%', float: 'left', boxSizing: 'border-box'}}>
+            <div style={{paddingLeft: 24, width: '30%', float: 'left', boxSizing: 'border-box'}}>
                 <Card style={{height: 660}}>
-                    <CardTitle title="Server General Details"/>
-                    <Divider/>
-                    <CardText style={{textAlign: 'left'}}>
+                    <CardTitle titleStyle={{ fontSize: 16, lineHeight: '48px', color: '#fff' }}
+                        style={{ padding: '0 16px' }} title={<FormattedMessage id='workerGeneral.serverDetails' defaultMessage='Server General Details' />} />
+                    <CardText style={{textAlign: 'left', padding: 0}}>
                         <Table
-                            height={560}
+                            height={612}
                             fixedHeader={false}
                             fixedFooter={false}
                             selectable={false}
@@ -158,7 +160,7 @@ export default class WorkerGeneralCard extends React.Component {
                             >
                                 <TableRow style={styles.borderBottom}>
                                     <TableRowColumn style={styles.length}>
-                                        Started
+                                        <FormattedMessage id='workerGeneral.started' defaultMessage='Started' />
                                     </TableRowColumn>
                                     <TableRowColumn style={styles.rowColor}
                                                     title={this.state.generalDetails.serverStartTime}>
@@ -167,33 +169,35 @@ export default class WorkerGeneralCard extends React.Component {
                                 </TableRow>
                                 <TableRow style={styles.borderBottom}>
                                     <TableRowColumn style={styles.length}>
-                                        Repository Location
+                                        <FormattedMessage id='workerGeneral.repoLocation' defaultMessage='Repository Location' />
                                     </TableRowColumn>
                                     <TableRowColumn style={styles.rowColor}
-                                                    title={this.state.generalDetails.repoLocation}>
+                                        title={this.state.generalDetails.repoLocation}>
                                         {this.state.generalDetails.repoLocation}
                                     </TableRowColumn>
                                 </TableRow>
                                 <TableRow style={styles.borderBottom}>
                                     <TableRowColumn style={styles.length}>
-                                        Type
+                                        <FormattedMessage id='workerGeneral.type' defaultMessage='Type' />
                                     </TableRowColumn>
                                     <TableRowColumn style={styles.rowColor}>
                                         {this.state.haDetails.clusterID
-                                        !== "Non Clusters" ? "HA Cluster" : "Single Node"}
+                                            !== "Non Clusters" ? "HA Cluster" : "Single Node"}
                                     </TableRowColumn>
                                 </TableRow>
                                 <TableRow style={styles.borderBottom}>
                                     <TableRowColumn style={styles.length}>
-                                        Status
+                                        <FormattedMessage id='workerGeneral.status' defaultMessage='Status' />
                                     </TableRowColumn>
                                     <TableRowColumn style={styles.rowColor}>
                                         {this.state.haDetails.runningStatus === "Reachable" ?
                                             <FontIcon style={{fontSize: '13px'}}>
-                                                <CircleBorder style={{height: '13px'}} color='green'/> Running
-                                            </FontIcon>:
+                                                <CircleBorder style={{height: '13px'}} color='green'/>
+                                                <FormattedMessage id='workerGeneral.running' defaultMessage='Running' />
+                                            </FontIcon> :
                                             <FontIcon style={{fontSize: '13px'}}>
-                                                <CircleBorder style={{height: '13px'}} color='red'/> Not Reachable
+                                                <CircleBorder style={{height: '13px'}} color='red'/> 
+                                                <FormattedMessage id='workerGeneral.notReachable' defaultMessage='Not Reachable' />
                                             </FontIcon>}
                                     </TableRowColumn>
                                 </TableRow>
@@ -202,7 +206,7 @@ export default class WorkerGeneralCard extends React.Component {
                                 {this.getSnapshotTime()}
                                 <TableRow style={styles.borderBottom}>
                                     <TableRowColumn style={styles.length}>
-                                        Operating System
+                                        <FormattedMessage id='workerGeneral.operatingSystem' defaultMessage='Operating System' />
                                     </TableRowColumn>
                                     <TableRowColumn style={styles.rowColor} title={this.state.generalDetails.osName}>
                                         {this.state.generalDetails.osName}
@@ -210,7 +214,7 @@ export default class WorkerGeneralCard extends React.Component {
                                 </TableRow>
                                 <TableRow style={styles.borderBottom}>
                                     <TableRowColumn style={styles.length}>
-                                        OS version
+                                        <FormattedMessage id='workerGeneral.OSVersion' defaultMessage='OS version' />
                                     </TableRowColumn>
                                     <TableRowColumn style={styles.rowColor} title={this.state.generalDetails.osVersion}>
                                         {this.state.generalDetails.osVersion}
@@ -218,7 +222,7 @@ export default class WorkerGeneralCard extends React.Component {
                                 </TableRow>
                                 <TableRow style={styles.borderBottom}>
                                     <TableRowColumn style={styles.length}>
-                                        User Home
+                                        <FormattedMessage id='workerGeneral.userHome' defaultMessage='User Home' />
                                     </TableRowColumn>
                                     <TableRowColumn style={styles.rowColor} title={this.state.generalDetails.userHome}>
                                         {this.state.generalDetails.userHome}
@@ -226,31 +230,34 @@ export default class WorkerGeneralCard extends React.Component {
                                 </TableRow>
                                 <TableRow style={styles.borderBottom}>
                                     <TableRowColumn style={styles.length}>
-                                        Country
+                                        <FormattedMessage id='workerGeneral.country' defaultMessage='Country' />
                                     </TableRowColumn>
-                                    <TableRowColumn style={styles.rowColor} title={this.state.generalDetails.userCountry}>
+                                    <TableRowColumn style={styles.rowColor}
+                                                    title={this.state.generalDetails.userCountry}>
                                         {this.state.generalDetails.userCountry}
                                     </TableRowColumn>
                                 </TableRow>
                                 <TableRow style={styles.borderBottom}>
                                     <TableRowColumn style={styles.length}>
-                                        Time Zone
+                                        <FormattedMessage id='workerGeneral.timeZone' defaultMessage='Time Zone' />
                                     </TableRowColumn>
-                                    <TableRowColumn style={styles.rowColor} title={this.state.generalDetails.userTimezone}>
+                                    <TableRowColumn style={styles.rowColor}
+                                                    title={this.state.generalDetails.userTimezone}>
                                         {this.state.generalDetails.userTimezone}
                                     </TableRowColumn>
                                 </TableRow>
                                 <TableRow style={styles.borderBottom}>
                                     <TableRowColumn style={styles.length}>
-                                        Java Version
+                                        <FormattedMessage id='workerGeneral.javaVersion' defaultMessage='Java Version' />
                                     </TableRowColumn>
-                                    <TableRowColumn style={styles.rowColor} title={this.state.generalDetails.javaVersion}>
+                                    <TableRowColumn style={styles.rowColor}
+                                                    title={this.state.generalDetails.javaVersion}>
                                         {this.state.generalDetails.javaVersion}
                                     </TableRowColumn>
                                 </TableRow>
                                 <TableRow style={styles.borderBottom}>
                                     <TableRowColumn style={styles.length}>
-                                        Java Home
+                                        <FormattedMessage id='workerGeneral.javaHome' defaultMessage='Java Home' />
                                     </TableRowColumn>
                                     <TableRowColumn style={styles.rowColor} title={this.state.generalDetails.javaHome}>
                                         {this.state.generalDetails.javaHome}
@@ -258,7 +265,7 @@ export default class WorkerGeneralCard extends React.Component {
                                 </TableRow>
                                 <TableRow style={styles.borderBottom}>
                                     <TableRowColumn style={styles.length}>
-                                        Java Runtime Name
+                                        <FormattedMessage id='workerGeneral.JRName' defaultMessage='Java Runtime Name' />
                                     </TableRowColumn>
                                     <TableRowColumn style={styles.rowColor}
                                                     title={this.state.generalDetails.javaRuntimeName}>

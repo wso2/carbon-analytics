@@ -32,7 +32,6 @@ import java.util.ArrayList;
  * RDBMS batch data provider instance.
  */
 @Component(
-        name = "rdbms-batch-data-provider",
         service = DataProvider.class,
         immediate = true
 )

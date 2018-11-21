@@ -1,72 +1,55 @@
 queries:
   -
-   mappings:
-      tableCreateQuery:
-      tableCheckQuery:
-      recordInsertQuery:
-      recordDeleteQuery:
-      doubleType:
-      floatType:
-      integerType:
-      longType:
-      stringType:
-      booleanType:
-
-   type: default
-   version: default
+    mappings:
+      check_for_resource_mapping_table: ~
+      create_resource_mapping_table: ~
+      ps_delete_resource_mapping_row: ~
+      ps_insert_resource_mapping_row: ~
+      ps_select_resource_mapping_row: ~
+    type: default
+    version: default
   -
-   mappings:
-      tableCreateQuery: CREATE TABLE IF NOT EXISTS MANAGER_CONFIGURATION(MANAGERID VARCHAR(255) PRIMARY KEY, PORT INTEGER, HOST VARCHAR(255))
-      tableCheckQuery: SELECT 1 FROM MANAGER_CONFIGURATION LIMIT 1
-      recordInsertQuery: INSERT INTO MANAGERID (MANAGERID,PORT,HOST) VALUES (?,?,?)
-      recordDeleteQuery: DELETE FROM MANAGER_CONFIGURATION WHERE MANAGERID=?
-      doubleType: DECIMAL
-      floatType: FLOAT
-      integerType: INTEGER
-      longType: BIGINT
-      stringType: "VARCHAR(255)"
-      booleanType:  "TINYINT(1)"
-   type: H2
-   version: default
+    mappings:
+      check_for_resource_mapping_table: "SELECT 1 FROM RESOURCE_POOL_TABLE"
+      create_resource_mapping_table: "CREATE TABLE RESOURCE_POOL_TABLE (GROUP_ID VARCHAR(512) NOT NULL, RESOURCE_MAPPING BLOB NOT NULL, PRIMARY KEY (GROUP_ID))"
+      ps_delete_resource_mapping_row: "DELETE FROM RESOURCE_POOL_TABLE WHERE GROUP_ID = ?"
+      ps_insert_resource_mapping_row: "INSERT INTO RESOURCE_POOL_TABLE (GROUP_ID, RESOURCE_MAPPING) VALUES (?,?)"
+      ps_select_resource_mapping_row: "SELECT GROUP_ID, RESOURCE_MAPPING FROM RESOURCE_POOL_TABLE WHERE GROUP_ID =?"
+    type: H2
+    version: default
   -
-   mappings:
-      tableCreateQuery: CREATE TABLE IF NOT EXISTS MANAGER_CONFIGURATION(MANAGERID VARCHAR(255) PRIMARY KEY, PORT INTEGER, HOST VARCHAR(255))
-      tableCheckQuery: SELECT 1 FROM MANAGER_CONFIGURATION LIMIT 1
-      recordInsertQuery: INSERT INTO MANAGER_CONFIGURATION (MANAGERID,PORT,HOST) VALUES (?,?,?)
-      recordDeleteQuery: DELETE FROM MANAGER_CONFIGURATION WHERE MANAGERID=?
-      doubleType: DECIMAL
-      floatType: FLOAT
-      integerType: INTEGER
-      longType: BIGINT
-      stringType: "VARCHAR(255)"
-      booleanType:  "TINYINT(1)"
-   type: MySQL
-   version: default
+    mappings:
+      check_for_resource_mapping_table: "SELECT 1 FROM RESOURCE_POOL_TABLE"
+      create_resource_mapping_table: "CREATE TABLE RESOURCE_POOL_TABLE (GROUP_ID VARCHAR(512) NOT NULL, RESOURCE_MAPPING BLOB NOT NULL, PRIMARY KEY (GROUP_ID))"
+      ps_delete_resource_mapping_row: "DELETE FROM RESOURCE_POOL_TABLE WHERE GROUP_ID = ?"
+      ps_insert_resource_mapping_row: "INSERT INTO RESOURCE_POOL_TABLE (GROUP_ID, RESOURCE_MAPPING) VALUES (?,?)"
+      ps_select_resource_mapping_row: "SELECT GROUP_ID, RESOURCE_MAPPING FROM RESOURCE_POOL_TABLE WHERE GROUP_ID =?"
+    type: MySQL
+    version: default
   -
-   mappings:
-      tableCreateQuery: CREATE TABLE MANAGER_CONFIGURATION(MANAGERID VARCHAR(255) PRIMARY KEY, PORT INTEGER, HOST VARCHAR(255))
-      tableCheckQuery: SELECT TOP 1 1 from MANAGER_CONFIGURATION
-      recordInsertQuery: INSERT INTO MANAGER_CONFIGURATION (MANAGERID,PORT,HOST) VALUES (?,?,?)
-      recordDeleteQuery: DELETE FROM MANAGER_CONFIGURATION WHERE MANAGERID=?
-      doubleType: "FLOAT(32)"
-      floatType: REAL
-      integerType: INTEGER
-      longType: BIGINT
-      stringType: "VARCHAR(255)"
-      booleanType:  BIT
-   type: Microsoft SQL Server
-   version: default
+    mappings:
+      check_for_resource_mapping_table: "SELECT 1 FROM resource_pool_table"
+      create_resource_mapping_table: "CREATE TABLE resource_pool_table (group_id text PRIMARY KEY, resource_mapping bytea NOT NULL)"
+      ps_delete_resource_mapping_row: "DELETE FROM resource_pool_table WHERE GROUP_ID = ?"
+      ps_insert_resource_mapping_row: "INSERT INTO resource_pool_table (GROUP_ID, RESOURCE_MAPPING) VALUES (?,?)"
+      ps_select_resource_mapping_row: "SELECT GROUP_ID, RESOURCE_MAPPING FROM resource_pool_table WHERE GROUP_ID =?"
+    type: PostgreSQL
+    version: default
   -
-   mappings:
-      tableCreateQuery: CREATE TABLE MANAGER_CONFIGURATION(MANAGERID VARCHAR(255) PRIMARY KEY, PORT INTEGER, HOST VARCHAR(255))
-      tableCheckQuery: SELECT 1 FROM MANAGER_CONFIGURATION WHERE rownum=1
-      recordInsertQuery: INSERT INTO MANAGER_CONFIGURATION (MANAGERID,PORT,HOST) VALUES (?,?,?)
-      recordDeleteQuery: DELETE FROM MANAGER_CONFIGURATION WHERE MANAGERID=?
-      doubleType: "NUMBER(19,4)"
-      floatType:  "NUMBER(19,4)"
-      integerType: "NUMBER(10)"
-      longType: "NUMBER(19)"
-      stringType: "VARCHAR(255)"
-      booleanType:  "NUMBER(1)"
-   type: Oracle
-   version: default
+    mappings:
+      check_for_resource_mapping_table: "SELECT 1 FROM RESOURCE_POOL_TABLE"
+      create_resource_mapping_table: "CREATE TABLE RESOURCE_POOL_TABLE (GROUP_ID VARCHAR(512) NOT NULL, RESOURCE_MAPPING BLOB NOT NULL, PRIMARY KEY (GROUP_ID))"
+      ps_delete_resource_mapping_row: "DELETE FROM RESOURCE_POOL_TABLE WHERE GROUP_ID = ?"
+      ps_insert_resource_mapping_row: "INSERT INTO RESOURCE_POOL_TABLE (GROUP_ID, RESOURCE_MAPPING) VALUES (?,?)"
+      ps_select_resource_mapping_row: "SELECT GROUP_ID, RESOURCE_MAPPING FROM RESOURCE_POOL_TABLE WHERE GROUP_ID =?"
+    type: Oracle
+    version: default
+  -
+    mappings:
+      check_for_resource_mapping_table: "SELECT 1 FROM RESOURCE_POOL_TABLE"
+      create_resource_mapping_table: "CREATE TABLE  RESOURCE_POOL_TABLE (GROUP_ID VARCHAR(512) NOT NULL, RESOURCE_MAPPING varbinary(MAX) NOT NULL, PRIMARY KEY (GROUP_ID))"
+      ps_delete_resource_mapping_row: "DELETE FROM RESOURCE_POOL_TABLE WHERE GROUP_ID = ?"
+      ps_insert_resource_mapping_row: "INSERT INTO RESOURCE_POOL_TABLE (GROUP_ID, RESOURCE_MAPPING) VALUES (?,?)"
+      ps_select_resource_mapping_row: "SELECT GROUP_ID, RESOURCE_MAPPING FROM RESOURCE_POOL_TABLE WHERE GROUP_ID =?"
+    type: Microsoft SQL Server
+    version: default

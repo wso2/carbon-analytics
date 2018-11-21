@@ -17,7 +17,7 @@
  *
  */
 
-import React, {Component} from "react";
+import React, {Component} from 'react';
 
 /**
  * class to get charts to the worker overview page.

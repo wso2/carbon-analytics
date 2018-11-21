@@ -16,6 +16,7 @@
  *  under the License.
  *
  */
+
 package org.wso2.carbon.status.dashboard.core.configuration;
 
 import org.slf4j.Logger;
@@ -32,18 +33,18 @@ import java.io.InputStream;
  * Class use for loading the deafault values from YML file.
  */
 public class DefaultConfigurationBuilder {
-
+    
     private static final Logger log = LoggerFactory.getLogger(DefaultConfigurationBuilder.class);
-
+    
     private static DefaultConfigurationBuilder instance = new DefaultConfigurationBuilder();
-
+    
     public static DefaultConfigurationBuilder getInstance() {
         return instance;
     }
-
+    
     private DefaultConfigurationBuilder() {
     }
-
+    
     /**
      * Get the Environment {@code DashboardsConfiguration}
      * <p>

@@ -23,6 +23,7 @@ import org.slf4j.LoggerFactory;
 import org.wso2.carbon.analytics.permissions.PermissionProvider;
 import org.wso2.carbon.analytics.permissions.bean.Permission;
 import org.wso2.carbon.analytics.permissions.bean.Role;
+import org.wso2.carbon.business.rules.core.datasource.DatasourceConstants;
 
 import java.util.HashMap;
 import java.util.List;
@@ -43,19 +44,22 @@ public class ConfigReader {
     private static final String VIEWER = "viewer";
     private static final String ID = "id";
     private static final String NAME = "name";
+    private static final String CARBON_NAMESPACE = "wso2.carbon";
+    private static final String ADMIN = "admin";
+    private static final String CARBON_CONFIGS_TYPE = "type";
 
     private static final Permission managerPermission = new Permission("BRM", "businessrules.manager");
     private static final Permission viewerPermission = new Permission("BRM", "businessrules.viewer");
 
     private static Map<String, Object> configs = readConfigs();
+    private static Map<String, Object> carbonConfigs = readCarbonConfigs();
+
     static {
         registerRoles();
     }
 
     /**
-     * Read all the configs under given namespace
-     * from deployment.yaml
-     * of related runtime
+     * Read all the configs under given namespace from deployment.yaml of related runtime
      */
     private static Map<String, Object> readConfigs() {
         try {
@@ -67,14 +71,29 @@ public class ConfigReader {
         return new HashMap<>();
     }
 
+    private static Map<String, Object> readCarbonConfigs() {
+        try {
+            return (Map<String, Object>) DataHolder.getInstance().getConfigProvider()
+                    .getConfigurationObject(CARBON_NAMESPACE);
+        } catch (Exception e) {
+            log.error("Failed to read  deployment.yaml file . ", e);
+        }
+        return new HashMap<>();
+    }
+
+    public String getSolutionType() {
+        Object solutionType = carbonConfigs.get(CARBON_CONFIGS_TYPE);
+        return solutionType != null ? solutionType.toString() : DatasourceConstants.SP;
+    }
+
     public String getUserName() {
         Object username = configs.get(USER_NAME);
-        return username != null ? username.toString() : "admin";
+        return username != null ? username.toString() : ADMIN;
     }
 
     public String getPassword() {
         Object password = configs.get(PASSWORD);
-        return password != null ? password.toString() : "admin";
+        return password != null ? password.toString() : ADMIN;
     }
 
     public String getDatasourceName() {
@@ -82,8 +101,7 @@ public class ConfigReader {
     }
 
     /**
-     * Get configurations for each node
-     * defined in deployment.yaml
+     * Get configurations for each node defined in deployment.yaml
      *
      * @return Map of lists
      */
@@ -107,7 +125,6 @@ public class ConfigReader {
             if (roles != null) {
                 List<Map<String, List>> managers = (List<Map<String, List>>) roles.get(MANAGER);
                 List<Map<String, List>> viewers = (List<Map<String, List>>) roles.get(VIEWER);
-
                 PermissionProvider permissionProvider = DataHolder.getInstance().getPermissionProvider();
                 if (!permissionProvider.isPermissionExists(managerPermission)) {
                     permissionProvider.addPermission(managerPermission);
@@ -115,7 +132,6 @@ public class ConfigReader {
                 if (!permissionProvider.isPermissionExists(viewerPermission)) {
                     permissionProvider.addPermission(viewerPermission);
                 }
-
                 for (Map manager : managers) {
                     String name = manager.get(NAME).toString();
                     if (!permissionProvider.hasPermission(name, managerPermission)) {

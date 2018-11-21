@@ -30,6 +30,7 @@ import org.wso2.carbon.business.rules.core.bean.TemplateGroup;
 import org.wso2.carbon.business.rules.core.bean.scratch.BusinessRuleFromScratch;
 import org.wso2.carbon.business.rules.core.bean.scratch.BusinessRuleFromScratchProperty;
 import org.wso2.carbon.business.rules.core.bean.template.BusinessRuleFromTemplate;
+import org.wso2.carbon.business.rules.core.datasource.DatasourceConstants;
 import org.wso2.carbon.business.rules.core.datasource.QueryExecutor;
 import org.wso2.carbon.business.rules.core.datasource.configreader.ConfigReader;
 import org.wso2.carbon.business.rules.core.deployer.SiddhiAppApiHelper;
@@ -43,6 +44,7 @@ import org.wso2.carbon.business.rules.core.exceptions.TemplateManagerServiceExce
 import org.wso2.carbon.business.rules.core.util.LogEncoder;
 import org.wso2.carbon.business.rules.core.util.TemplateManagerConstants;
 import org.wso2.carbon.business.rules.core.util.TemplateManagerHelper;
+
 import java.io.File;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
@@ -50,13 +52,16 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
+import java.util.stream.Collectors;
 
 /**
- * The exposed Template Manager service, which contains methods related to
- * Business Rules from template, and Business Rules from scratch
+ * The exposed Template Manager service, which contains methods related to Business Rules from template, and Business
+ * Rules from scratch
  */
 public class TemplateManagerService implements BusinessRulesService {
     private static final Logger log = LoggerFactory.getLogger(TemplateManagerService.class);
+    private static final int DEFAULT_ARTIFACT_COUNT = 1;
     private static SiddhiAppApiHelper siddhiAppApiHelper = new SiddhiAppApiHelper();
     // Available Template Groups from the directory
     private Map<String, TemplateGroup> availableTemplateGroups;
@@ -68,12 +73,14 @@ public class TemplateManagerService implements BusinessRulesService {
     public TemplateManagerService() throws TemplateManagerServiceException, RuleTemplateScriptException {
         this.gson = new GsonBuilder().disableHtmlEscaping().setPrettyPrinting().create();
         this.queryExecutor = new QueryExecutor();
-        // Load & store available Template Groups & Business Rules at the time of instantiation
-        this.availableTemplateGroups = loadTemplateGroups();
-        this.availableBusinessRules = loadBusinessRules();
         ConfigReader configReader = new ConfigReader();
         this.nodes = configReader.getNodes();
-        updateStatuses();
+        // Load & store available Template Groups & Business Rules at the time of instantiation
+        this.availableTemplateGroups = loadTemplateGroups();
+        if (!configReader.getSolutionType().equalsIgnoreCase(DatasourceConstants.SP)) {
+            loadAndSaveAnalyticsSolutions(configReader.getSolutionType());
+        }
+        loadBusinessRules();
     }
 
     public int createBusinessRuleFromTemplate(BusinessRuleFromTemplate businessRuleFromTemplate, Boolean shouldDeploy)
@@ -93,7 +100,7 @@ public class TemplateManagerService implements BusinessRulesService {
         // Save business rule definition with errors
         try {
             // Save business rule definition with errors
-            saveBusinessRuleDefinition(businessRuleUUID, businessRuleFromTemplate, status, status);
+            saveBusinessRuleDefinition(businessRuleUUID, businessRuleFromTemplate, status, DEFAULT_ARTIFACT_COUNT);
             insertRuleTemplate(businessRuleFromTemplate.getRuleTemplateUUID());
             log.info(String.format("Business rule %s saved into the database.", businessRuleFromTemplate.getName()));
         } catch (BusinessRulesDatasourceException e) {
@@ -106,7 +113,7 @@ public class TemplateManagerService implements BusinessRulesService {
 
         if (nodeList == null) {
             log.error(String.format("Failed to find configurations of nodes for " +
-                    "ruleTemplate %s while deploying the business rule %s ",
+                            "ruleTemplate %s while deploying the business rule %s ",
                     LogEncoder.removeCRLFCharacters(ruleTemplateUUID),
                     LogEncoder.removeCRLFCharacters(businessRuleFromTemplate.getUuid())));
             return TemplateManagerConstants.ERROR;
@@ -117,7 +124,7 @@ public class TemplateManagerService implements BusinessRulesService {
             int deployedNodesCount = 0;
             for (String nodeURL : nodeList) {
                 try {
-                    deployBusinessRule(businessRuleFromTemplate, nodeURL, constructedArtifacts);
+                    deployBusinessRule(nodeURL, constructedArtifacts);
                     deployedNodesCount += 1;
                 } catch (SiddhiAppsApiHelperException e) {
                     log.error(String.format("Failed to deploy business rule %s ",
@@ -163,14 +170,12 @@ public class TemplateManagerService implements BusinessRulesService {
                     "' to the database is failed. ", e);
         }
         updateArtifactCount(businessRuleUUID, constructedArtifacts.size());
-
         // Get nodes where business rule should be deployed
         nodeList = getNodeListForBusinessRuleFromScratch(businessRuleFromScratch);
         if (nodeList == null) {
             log.error("Failed to find configurations of nodes for deploying business rules.");
             return TemplateManagerConstants.ERROR;
         }
-
         if (toDeploy) {
             int deployedNodesCount = 0;
             Artifact deployableSiddhiApp;
@@ -180,10 +185,9 @@ public class TemplateManagerService implements BusinessRulesService {
                 log.error("Creating siddhi app for the business rule is failed.", e);
                 return TemplateManagerConstants.ERROR;
             }
-
             for (String nodeURL : nodeList) {
                 try {
-                    deployBusinessRule(businessRuleFromScratch, nodeURL, deployableSiddhiApp, businessRuleFromScratch);
+                    deployBusinessRule(nodeURL, deployableSiddhiApp, businessRuleFromScratch);
                     deployedNodesCount += 1;
                 } catch (SiddhiAppsApiHelperException e) {
                     log.error(String.format("Deploying siddhi app %s for business rule" +
@@ -191,7 +195,6 @@ public class TemplateManagerService implements BusinessRulesService {
                             LogEncoder.removeCRLFCharacters(businessRuleFromScratch.getUuid())), e);
                 }
             }
-
             if (deployedNodesCount == nodeList.size()) {
                 status = TemplateManagerConstants.DEPLOYED;
             } else if (deployedNodesCount == 0) {
@@ -225,12 +228,10 @@ public class TemplateManagerService implements BusinessRulesService {
             throw new TemplateManagerServiceException("Saving business rule '" +
                     businessRuleFromTemplate.getName() + "' to the database is failed. ", e);
         }
-
         if (nodeList == null) {
             log.error("Failed to find configurations of nodes for deploying business rules.");
             return TemplateManagerConstants.ERROR;
         }
-
         int deployedNodesCount = 0;
         if (shouldDeploy) {
             for (String nodeURL : nodeList) {
@@ -248,7 +249,6 @@ public class TemplateManagerService implements BusinessRulesService {
                     deployedNodesCount += 1;
                 }
             }
-
             if (deployedNodesCount == nodeList.size()) {
                 status = TemplateManagerConstants.DEPLOYED;
             } else if (deployedNodesCount == 0) {
@@ -263,11 +263,15 @@ public class TemplateManagerService implements BusinessRulesService {
 
     public int editBusinessRuleFromScratch(String uuid, BusinessRuleFromScratch businessRuleFromScratch, Boolean
             toDeploy) throws RuleTemplateScriptException, TemplateManagerServiceException {
-
         List<String> nodeList;
         String businessRuleUUID = businessRuleFromScratch.getUuid();
         // Get nodes where business rule should be deployed
         nodeList = getNodeListForBusinessRuleFromScratch(businessRuleFromScratch);
+        if (nodeList == null) {
+            log.error(String.format("Failed to find configurations of nodes for deploying business rule %s .",
+                    removeCRLFCharacters(uuid)));
+            return TemplateManagerConstants.ERROR;
+        }
         Map<String, Artifact> derivedArtifacts;
         Artifact deployableSiddhiApp;
         try {
@@ -279,7 +283,6 @@ public class TemplateManagerService implements BusinessRulesService {
             return TemplateManagerConstants.ERROR;
         }
         int status = TemplateManagerConstants.SAVED;
-
         try {
             overwriteBusinessRuleDefinition(uuid, businessRuleFromScratch, status);
             log.info(String.format("Business rule %s updated in the database.",
@@ -288,14 +291,6 @@ public class TemplateManagerService implements BusinessRulesService {
             throw new TemplateManagerServiceException("Saving business rule '" +
                     businessRuleFromScratch.getName() + "' to the database is failed. ", e);
         }
-
-
-        if (nodeList == null) {
-            log.error(String.format("Failed to find configurations of nodes for deploying business rule %s .",
-                    removeCRLFCharacters(uuid)));
-            return TemplateManagerConstants.ERROR;
-        }
-
         if (toDeploy) {
             int deployedNodesCount = 0;
             for (String nodeURL : nodeList) {
@@ -304,12 +299,11 @@ public class TemplateManagerService implements BusinessRulesService {
                     deployedNodesCount += 1;
                 } catch (SiddhiAppsApiHelperException e) {
                     log.error(String.format("Deploying siddhi app for the business rule %s on node %s is failed." +
-                            " Hence stopping deploying the business rule.",
+                                    " Hence stopping deploying the business rule.",
                             removeCRLFCharacters(businessRuleFromScratch.getUuid()),
                             removeCRLFCharacters(nodeURL)), e);
                 }
             }
-
             if (deployedNodesCount == nodeList.size()) {
                 status = TemplateManagerConstants.DEPLOYED;
             } else if (deployedNodesCount == 0) {
@@ -334,8 +328,8 @@ public class TemplateManagerService implements BusinessRulesService {
     /**
      * Gets deployment information of the business rule with the given UUID
      *
-     * @param businessRuleUUID                  UUID of the business rule
-     * @return                                  List of nodes and Siddhi app deployment statuses
+     * @param businessRuleUUID UUID of the business rule
+     * @return List of nodes and Siddhi app deployment statuses
      * @throws TemplateManagerServiceException  Exception occurred in Template Manager Service
      * @throws BusinessRulesDatasourceException Exception occurred within the data source
      */
@@ -356,9 +350,10 @@ public class TemplateManagerService implements BusinessRulesService {
 
     /**
      * Gets deployment status of the Siddhi apps belonging to the given business rules, in the given list of nodes
-     * @param deployingNodes                    Nodes in which, Siddhi apps of the given BR should be deployed
-     * @param businessRule                      Business rule object
-     * @return                                  Map of Siddhi apps and their deployment statuses
+     *
+     * @param deployingNodes Nodes in which, Siddhi apps of the given BR should be deployed
+     * @param businessRule   Business rule object
+     * @return Map of Siddhi apps and their deployment statuses
      * @throws BusinessRulesDatasourceException Exception occurred within the data source
      */
     private List<Map<String, Object>> getNodeWiseDeploymentStatuses(List<String> deployingNodes,
@@ -390,15 +385,13 @@ public class TemplateManagerService implements BusinessRulesService {
     }
 
     /**
-     * Gets deployment state of the given Siddhi app, in the given node.
-     * 1    - Deployed
-     * 0    - Not Deployed
-     * -1   - Not Reachable
+     * Gets deployment state of the given Siddhi app, in the given node. 1    - Deployed 0    - Not Deployed -1   - Not
+     * Reachable
      *
-     * @param nodeURL               URL of the node in which, the deployment status is checked
-     * @param siddhiAppName         Name of the Siddhi app, that is checked for deployment
-     * @param businessRuleStatus    Status of the business rule, which consists the Siddhi app
-     * @return                      Deployment status of the Siddhi app
+     * @param nodeURL            URL of the node in which, the deployment status is checked
+     * @param siddhiAppName      Name of the Siddhi app, that is checked for deployment
+     * @param businessRuleStatus Status of the business rule, which consists the Siddhi app
+     * @return Deployment status of the Siddhi app
      */
     private int getDeploymentStatus(String nodeURL, String siddhiAppName, int businessRuleStatus) {
         if (businessRuleStatus == TemplateManagerConstants.SAVED) {
@@ -419,25 +412,22 @@ public class TemplateManagerService implements BusinessRulesService {
 
     public int deleteBusinessRule(String uuid, Boolean forceDeleteEnabled) throws BusinessRuleNotFoundException,
             TemplateManagerServiceException {
-        this.availableBusinessRules = loadBusinessRules();
+        this.availableBusinessRules = loadBusinessRulesFromDB();
         BusinessRule businessRule = findBusinessRule(uuid);
         boolean isSuccessfullyUndeployed;
         int status = TemplateManagerConstants.SUCCESSFULLY_DELETED;
         List<String> ruleTemplateIDs = new ArrayList<>();
-
         // If found Business Rule is from Template
         if (businessRule instanceof BusinessRuleFromTemplate) {
             ruleTemplateIDs.add(((BusinessRuleFromTemplate) businessRule).getRuleTemplateUUID());
             BusinessRuleFromTemplate businessRuleFromTemplate = (BusinessRuleFromTemplate) businessRule;
             Collection<Template> templates;
             templates = getTemplates(businessRuleFromTemplate);
-
             List<String> nodeList = getNodesList(businessRuleFromTemplate.getRuleTemplateUUID());
             if (nodeList == null) {
                 throw new TemplateManagerServiceException("Failed to find configurations of nodes for deploying " +
                         "business rules.");
             }
-
             int currentState;
             try {
                 currentState = getDeploymentState(businessRule);
@@ -445,7 +435,6 @@ public class TemplateManagerService implements BusinessRulesService {
                 throw new TemplateManagerServiceException("Failed to get status of the business rule '" + uuid
                         + "'. ", e);
             }
-
             if (currentState != TemplateManagerConstants.SAVED) {
                 for (String nodeURL : nodeList) {
                     for (int i = 0; i < templates.size(); i++) {
@@ -459,9 +448,9 @@ public class TemplateManagerService implements BusinessRulesService {
                             }
                         } catch (SiddhiAppsApiHelperException e) {
                             log.error(String.format("Failed to undeploy siddhi app of %s of the businessRule %s " +
-                                    "from node %s ", removeCRLFCharacters(siddhiAppName),
-                                                    removeCRLFCharacters(businessRule.getUuid()),
-                                                    removeCRLFCharacters(nodeURL)), e);
+                                            "from node %s ", removeCRLFCharacters(siddhiAppName),
+                                    removeCRLFCharacters(businessRule.getUuid()),
+                                    removeCRLFCharacters(nodeURL)), e);
                             status = TemplateManagerConstants.PARTIALLY_UNDEPLOYED;
                             break;
                         }
@@ -471,14 +460,12 @@ public class TemplateManagerService implements BusinessRulesService {
         } else {
             BusinessRuleFromScratch businessRuleFromScratch = (BusinessRuleFromScratch) businessRule;
             List<String> nodeList = getNodeListForBusinessRuleFromScratch(businessRuleFromScratch);
-            ruleTemplateIDs.add(businessRuleFromScratch.getInputRuleTemplateUUID());
-            ruleTemplateIDs.add(businessRuleFromScratch.getOutputRuleTemplateUUID());
-
             if (nodeList == null) {
                 throw new TemplateManagerServiceException("Failed to find configurations of nodes " +
                         "for deploying business rules.");
             }
-
+            ruleTemplateIDs.add(businessRuleFromScratch.getInputRuleTemplateUUID());
+            ruleTemplateIDs.add(businessRuleFromScratch.getOutputRuleTemplateUUID());
             int currentState;
             try {
                 currentState = getDeploymentState(businessRule);
@@ -486,7 +473,6 @@ public class TemplateManagerService implements BusinessRulesService {
                 throw new TemplateManagerServiceException("Failed to get status of the business rule '" + uuid
                         + "'. ", e);
             }
-
             if (currentState != TemplateManagerConstants.SAVED) {
                 for (String nodeURL : nodeList) {
                     try {
@@ -504,7 +490,6 @@ public class TemplateManagerService implements BusinessRulesService {
                 }
             }
         }
-
         if (status == TemplateManagerConstants.PARTIALLY_UNDEPLOYED) {
             try {
                 queryExecutor.executeUpdateDeploymentStatusQuery(uuid, status);
@@ -513,7 +498,6 @@ public class TemplateManagerService implements BusinessRulesService {
                         "on the database after trying to undeploy.", removeCRLFCharacters(uuid)), e);
             }
         }
-
         try {
             removeBusinessRuleDefinition(uuid);
             log.info(String.format("Business rule %s deleted from the database.",
@@ -522,42 +506,58 @@ public class TemplateManagerService implements BusinessRulesService {
             throw new TemplateManagerServiceException("Failed to delete business rule with uuid '" +
                     uuid + "'. ", e);
         }
-
         for (String ruleTemplatUUID : ruleTemplateIDs) {
             deleteRuleTemplate(ruleTemplatUUID);
         }
         return status;
     }
 
-    private List<String> getNodeListForBusinessRuleFromScratch(BusinessRuleFromScratch businessRuleFromScratch) {
-        String inputTemplateUUID = businessRuleFromScratch.getInputRuleTemplateUUID();
-        String outputTemplateUUID = businessRuleFromScratch.getOutputRuleTemplateUUID();
-        List<String> nodeList = getNodesList(inputTemplateUUID);
-        List<String> outputNodeList = getNodesList(outputTemplateUUID);
-        String businessRuleUUID = businessRuleFromScratch.getUuid();
-        if (nodeList != null && outputNodeList != null) {
-            nodeList.removeAll(outputNodeList);
-            nodeList.addAll(outputNodeList);
-            return nodeList;
-        } else {
-            log.error(String.format("Failed to find configurations of nodes for deploying business rule %s ",
-                    removeCRLFCharacters(businessRuleUUID)));
-            return null;
-        }
+    /**
+     * Returns whether the given node list has at least one element, and qualifies for deployment
+     *
+     * @param nodeList : List of node host and ports
+     * @return : Whether the given node list has at least one element
+     */
+    private boolean hasAtLeastOneNode(List<String> nodeList) {
+        return (nodeList != null && !nodeList.isEmpty());
     }
 
-    private void deployBusinessRule(BusinessRule businessRule, String nodeURL, Map<String, Artifact> derivedArtifacts)
-            throws SiddhiAppsApiHelperException, TemplateInstanceCountViolationException,
-            TemplateManagerServiceException {
+    /**
+     * Gets list of node host and port, in which, the given BusinessRuleFromScratch object should be deployed
+     *
+     * @param businessRuleFromScratch : Business rule from scratch object
+     * @return : List of node host and ports to deploy, when valid, otherwise null
+     */
+    private List<String> getNodeListForBusinessRuleFromScratch(BusinessRuleFromScratch businessRuleFromScratch) {
+        List<String> inputNodeList = getNodesList(businessRuleFromScratch.getInputRuleTemplateUUID());
+        List<String> outputNodeList = getNodesList(businessRuleFromScratch.getOutputRuleTemplateUUID());
+
+        if (hasAtLeastOneNode(inputNodeList) && hasAtLeastOneNode(outputNodeList)) {
+            inputNodeList.removeAll(outputNodeList);
+            inputNodeList.addAll(outputNodeList);
+            return inputNodeList;
+        }
+        if (hasAtLeastOneNode(inputNodeList)) {
+            return inputNodeList;
+        }
+        if (hasAtLeastOneNode(outputNodeList)) {
+            return outputNodeList;
+        }
+        log.error(String.format("Failed to find configurations of nodes for deploying business rule %s ",
+                removeCRLFCharacters(businessRuleFromScratch.getUuid())));
+        return null;
+    }
+
+    private void deployBusinessRule(String nodeURL, Map<String, Artifact> derivedArtifacts)
+            throws SiddhiAppsApiHelperException {
         for (Map.Entry template : derivedArtifacts.entrySet()) {
             deployArtifact(nodeURL, template.getKey().toString(), (Artifact) template.getValue());
         }
     }
 
-    private void deployBusinessRule(BusinessRule businessRule, String nodeURL, Artifact deployableSiddhiApp,
-                                    BusinessRuleFromScratch
-            businessRuleFromScratch) throws SiddhiAppsApiHelperException, TemplateInstanceCountViolationException,
-            TemplateManagerServiceException {
+    private void deployBusinessRule(String nodeURL, Artifact deployableSiddhiApp,
+                                    BusinessRuleFromScratch businessRuleFromScratch)
+            throws SiddhiAppsApiHelperException {
         deploySiddhiApp(nodeURL, businessRuleFromScratch.getUuid(), deployableSiddhiApp);
     }
 
@@ -574,10 +574,8 @@ public class TemplateManagerService implements BusinessRulesService {
         } catch (BusinessRulesDatasourceException e) {
             throw new TemplateManagerServiceException("Failed to get business rule.", e);
         }
-
         if (businessRule instanceof BusinessRuleFromScratch) {
             BusinessRuleFromScratch businessRuleFromScratch = (BusinessRuleFromScratch) businessRule;
-
             List<String> nodeList;
             nodeList = getNodeListForBusinessRuleFromScratch(businessRuleFromScratch);
             if (nodeList == null) {
@@ -608,7 +606,6 @@ public class TemplateManagerService implements BusinessRulesService {
                             removeCRLFCharacters(businessRuleUUID)), e);
                 }
             }
-
             if (deployedNodesCount == nodeList.size()) {
                 status = TemplateManagerConstants.DEPLOYED;
             } else if (deployedNodesCount == 0) {
@@ -626,14 +623,12 @@ public class TemplateManagerService implements BusinessRulesService {
                 log.error("Failed to find configurations of nodes for deploying business rules.");
                 return TemplateManagerConstants.ERROR;
             }
-
             try {
                 derivedArtifacts = constructArtifacts(businessRuleFromTemplate);
             } catch (TemplateManagerHelperException e) {
                 log.error("Deriving artifacts for business rule while redeploying is failed. ", e);
                 return TemplateManagerConstants.ERROR;
             }
-
             int deployedNodesCount = 0;
             for (String nodeURL : nodeList) {
                 try {
@@ -699,20 +694,45 @@ public class TemplateManagerService implements BusinessRulesService {
         return templateGroups;
     }
 
+    /**
+     * This method loads all the available business ruels from the database and update their deployment status.
+     *
+     * @return Map that contains loaded business ruels and their uuids
+     * @throws TemplateManagerServiceException
+     */
     public Map<String, BusinessRule> loadBusinessRules() throws TemplateManagerServiceException {
+        availableBusinessRules = loadBusinessRulesFromDB();
+        if (availableBusinessRules != null && availableBusinessRules.size() > 0) {
+            updateStatuses();
+        }
+        return availableBusinessRules;
+    }
+
+    private Map<String, BusinessRule> loadBusinessRulesFromDB() throws TemplateManagerServiceException {
         try {
-            if (!queryExecutor.isBusinessRulesTableExist()) {
-                queryExecutor.createTable();
-            }
-            if (!queryExecutor.isRuleTemplatesTableExist()) {
-                queryExecutor.createRuleTemplatesTable();
-            }
+            createTablesIfNotExist();
             return queryExecutor.executeRetrieveAllBusinessRules();
         } catch (BusinessRulesDatasourceException e) {
             throw new TemplateManagerServiceException(e);
         }
     }
 
+    private void createTablesIfNotExist() throws BusinessRulesDatasourceException {
+        if (!queryExecutor.isBusinessRulesTableExist()) {
+            queryExecutor.createTable();
+        }
+        if (!queryExecutor.isRuleTemplatesTableExist()) {
+            queryExecutor.createRuleTemplatesTable();
+        }
+    }
+
+    /**
+     * This method is used to get business rules from the database with their statuses which are recorded to the
+     * database
+     *
+     * @return A list of business ruels with their statuses which are recordsd in to the database.
+     * @throws TemplateManagerServiceException
+     */
     public List<Object[]> loadBusinessRulesWithStatus() throws TemplateManagerServiceException {
         try {
             return queryExecutor.executeRetrieveAllBusinessRulesWithStatus();
@@ -721,6 +741,13 @@ public class TemplateManagerService implements BusinessRulesService {
         }
     }
 
+    /**
+     * This method is used to load a given business rule form the database
+     *
+     * @param businessRuleUUID uuid of the business rule which needs to be loaded.
+     * @return Businsess rule instance which is requested.
+     * @throws TemplateManagerServiceException
+     */
     public BusinessRule loadBusinessRule(String businessRuleUUID) throws TemplateManagerServiceException {
         try {
             return queryExecutor.retrieveBusinessRule(businessRuleUUID);
@@ -797,7 +824,7 @@ public class TemplateManagerService implements BusinessRulesService {
 
     private void updateStatuses() throws TemplateManagerServiceException {
         try {
-            Map<String, BusinessRule> businessRules = loadBusinessRules();
+            Map<String, BusinessRule> businessRules = loadBusinessRulesFromDB();
             for (Map.Entry entry : businessRules.entrySet()) {
                 BusinessRule businessRule = (BusinessRule) entry.getValue();
                 int status = getDeploymentState(businessRule);
@@ -854,13 +881,13 @@ public class TemplateManagerService implements BusinessRulesService {
     }
 
     /**
-     * Gets deployment state of the Siddhi app with the given name, which belongs to the business rule with the
-     * given UUID, under the given node
+     * Gets deployment state of the Siddhi app with the given name, which belongs to the business rule with the given
+     * UUID, under the given node
      *
-     * @param businessRuleUUID                  UUID of the business rule
-     * @param nodeURL                           URL of the node in which, deployment is checked
-     * @param siddhiAppName                     Name of the Siddhi app, which should be checked for deployment status
-     * @return                                  Siddhi app's deployment status
+     * @param businessRuleUUID UUID of the business rule
+     * @param nodeURL          URL of the node in which, deployment is checked
+     * @param siddhiAppName    Name of the Siddhi app, which should be checked for deployment status
+     * @return Siddhi app's deployment status
      * @throws BusinessRulesDatasourceException Exception in business rule data source
      */
     private Integer getSiddhiAppDeploymentState(String businessRuleUUID, String nodeURL, String siddhiAppName)
@@ -886,10 +913,9 @@ public class TemplateManagerService implements BusinessRulesService {
     }
 
     /**
-     * Derives Artifacts from Templates in the given BusinessRuleFromTemplate.
-     * - RuleTemplate is found, and its templated properties are replaced with the values
-     * directly specified in the properties map,
-     * and the values generated from the script - referring to the specified properties
+     * Derives Artifacts from Templates in the given BusinessRuleFromTemplate. - RuleTemplate is found, and its
+     * templated properties are replaced with the values directly specified in the properties map, and the values
+     * generated from the script - referring to the specified properties
      *
      * @param businessRuleFromTemplate : businessRule derived from a ruleTemplate
      * @return Templates with replaced properties in the content, denoted by their UUIDs
@@ -910,7 +936,6 @@ public class TemplateManagerService implements BusinessRulesService {
                     getScriptGeneratedVariables(runnableScript);
             replacementValues.putAll(scriptGeneratedVariables);
         }
-
         Map<String, Artifact> constructedArtifacts = new HashMap<>();
         int i = 0;
         for (Template template : templatesToBeUsed) {
@@ -979,21 +1004,19 @@ public class TemplateManagerService implements BusinessRulesService {
                                                BusinessRuleFromScratch businessRuleFromScratch) throws
             TemplateManagerHelperException, TemplateManagerServiceException {
         // Get input & Output rule template collection
-        Collection<RuleTemplate> inputOutputRuleTemplates = getInputOutputRuleTemplates(businessRuleFromScratch);
+        List<RuleTemplate> inputOutputRuleTemplates = getInputOutputRuleTemplates(businessRuleFromScratch);
         // Get properties
         BusinessRuleFromScratchProperty property = businessRuleFromScratch.getProperties();
         // Get ruleComponents
         Map<String, String[]> ruleComponents = property.getRuleComponents();
         // Get filterRules
         String[] filterRules = ruleComponents.get("filterRules");
-
         String finalRuleLogic;
         if (filterRules.length == 0) {
             finalRuleLogic = "";
         } else {
             // Get ruleLogic
             String[] ruleLogic = ruleComponents.get("ruleLogic");
-
             // Replace ruleLogic templated values with filter rules
             Map<String, String> replacementValues = new HashMap<>();
             for (int i = 0; i < filterRules.length; i++) {
@@ -1007,7 +1030,6 @@ public class TemplateManagerService implements BusinessRulesService {
         }
         // Get Output mapping attributes
         Map<String, String> outputMappingMap = property.getOutputMappings();
-
         String[] outputMappingMapKeySet = outputMappingMap.keySet().toArray(new String[0]);
         StringBuilder mapping = new StringBuilder();
         // Generate output mapping string
@@ -1015,7 +1037,6 @@ public class TemplateManagerService implements BusinessRulesService {
             mapping.append(outputMappingMap.get(anOutputMappingMapKeySet))
                     .append(" as ").append(anOutputMappingMapKeySet).append(", ");
         }
-
         String mappingString = mapping.toString().replaceAll(", $", "");
         // Get ruleTemplates
         RuleTemplate[] ruleTemplates = inputOutputRuleTemplates.toArray(new RuleTemplate[0]);
@@ -1029,10 +1050,8 @@ public class TemplateManagerService implements BusinessRulesService {
         String inputStreamName = inputTemplateStreamDefinition.split("\\s+")[2].split("\\(")[0];
         // Get output stream name
         String outputStreamName = outputTemplateStreamDefinition.split("\\s+")[2].split("\\(")[0];
-
         Map<String, String> replacement = new HashMap<>();
         String siddhiAppTemplate = TemplateManagerConstants.SIDDHI_APP_TEMPLATE;
-
         // Generate replacement values for template
         replacement.put("inputTemplate", derivedTemplates.get("inputArtifact").getContent());
         replacement.put("outputTemplate", derivedTemplates.get("outputArtifact").getContent());
@@ -1049,7 +1068,6 @@ public class TemplateManagerService implements BusinessRulesService {
         return new Artifact(appType, content, null);
     }
 
-
     /**
      * Gives the list of Templates, that should be used by the given BusinessRuleFromTemplate
      *
@@ -1060,7 +1078,6 @@ public class TemplateManagerService implements BusinessRulesService {
             throws TemplateManagerServiceException {
         RuleTemplate ruleTemplate = getRuleTemplate(businessRuleFromTemplate);
         // Get Templates from the found Rule Template
-
         return ruleTemplate.getTemplates();
     }
 
@@ -1071,11 +1088,11 @@ public class TemplateManagerService implements BusinessRulesService {
      * @return Collection of Templates
      * @throws TemplateManagerServiceException : Exception occurred in TemplateManagerService
      */
-    private Collection<Template> getTemplates(BusinessRuleFromScratch businessRuleFromScratch) throws
+    private List<Template> getTemplates(BusinessRuleFromScratch businessRuleFromScratch) throws
             TemplateManagerServiceException {
-        Collection<RuleTemplate> inputOutputRuleTemplates = getInputOutputRuleTemplates(businessRuleFromScratch);
+        List<RuleTemplate> inputOutputRuleTemplates = getInputOutputRuleTemplates(businessRuleFromScratch);
         // To store templates, from Input & Output Rule Templates
-        Collection<Template> templates = new ArrayList<>();
+        List<Template> templates = new ArrayList<>();
         for (RuleTemplate ruleTemplate : inputOutputRuleTemplates) {
             // Only one Template will be present in a Rule Template
             ArrayList<Template> templateInRuleTemplate = (ArrayList<Template>) ruleTemplate.getTemplates();
@@ -1159,21 +1176,20 @@ public class TemplateManagerService implements BusinessRulesService {
     }
 
     /**
-     * Gives input & output Rule Templates in a list, specified in the given Business Rule from scratch
-     * First member of list denotes Input Rule Template
-     * Second member of list denotes Output Rule Template
+     * Gives input & output Rule Templates in a list, specified in the given Business Rule from scratch First member of
+     * list denotes Input Rule Template Second member of list denotes Output Rule Template
      *
      * @param businessRuleFromScratch : businessRule derived from scratch
      * @return : Collection of RuleTemplates
      * @throws TemplateManagerServiceException : Exception occurred in TemplateManagerService
      */
-    private Collection<RuleTemplate> getInputOutputRuleTemplates(BusinessRuleFromScratch businessRuleFromScratch) throws
+    private List<RuleTemplate> getInputOutputRuleTemplates(BusinessRuleFromScratch businessRuleFromScratch) throws
             TemplateManagerServiceException {
         // Find the Rule Template, specified in the Business Rule
         String templateGroupUUID = businessRuleFromScratch.getTemplateGroupUUID();
         TemplateGroup templateGroup = this.availableTemplateGroups.get(templateGroupUUID);
         // Store input & output rule templates
-        Collection<RuleTemplate> inputOutputRuleTemplates = new ArrayList<>();
+        List<RuleTemplate> inputOutputRuleTemplates = new ArrayList<>();
         String[] inputAndOutputRuleTemplateUUIDs = new String[2];
         inputAndOutputRuleTemplateUUIDs[0] = businessRuleFromScratch.getInputRuleTemplateUUID();
         inputAndOutputRuleTemplateUUIDs[1] = businessRuleFromScratch.getOutputRuleTemplateUUID();
@@ -1190,7 +1206,8 @@ public class TemplateManagerService implements BusinessRulesService {
             if (!inputOutputRuleTemplates.isEmpty()) {
                 return inputOutputRuleTemplates;
             } else {
-                throw new TemplateManagerServiceException("No input / output rule template(s) found with the given uuid");
+                throw new TemplateManagerServiceException("No input / output rule template(s) found with the " +
+                        "given uuid");
             }
         } else {
             throw new TemplateManagerServiceException("No template group found with the given uuid");
@@ -1204,8 +1221,9 @@ public class TemplateManagerService implements BusinessRulesService {
      * @return true or false
      * @throws TemplateManagerServiceException : Exception occured in TemplateManagerService
      */
-    private boolean saveBusinessRuleDefinition(String businessRuleUUID, BusinessRuleFromTemplate businessRuleFromTemplate,
-                                               int deploymentStatus, int artifactCount)
+    private boolean saveBusinessRuleDefinition(String businessRuleUUID,
+                                               BusinessRuleFromTemplate businessRuleFromTemplate, int deploymentStatus,
+                                               int artifactCount)
             throws BusinessRulesDatasourceException, TemplateManagerServiceException,
             TemplateInstanceCountViolationException {
         byte[] businessRule;
@@ -1214,7 +1232,8 @@ public class TemplateManagerService implements BusinessRulesService {
             businessRule = TemplateManagerHelper.businessRuleFromTemplateToJson(businessRuleFromTemplate)
                     .getBytes("UTF-8");
         } catch (UnsupportedEncodingException e) {
-            throw new TemplateManagerServiceException("Failed to convert business rule to json.", e);
+            throw new TemplateManagerServiceException("Failed to convert business rule " + businessRuleUUID +
+                    " to json.", e);
         }
         // convert String into InputStream
         return queryExecutor.executeInsertQuery(businessRuleUUID, businessRule, deploymentStatus, artifactCount);
@@ -1290,7 +1309,8 @@ public class TemplateManagerService implements BusinessRulesService {
      * @throws UnsupportedEncodingException     : occurs when utf-8 encoding is not supported
      * @throws BusinessRulesDatasourceException : occurs when accessing to the businessRulesDatabase
      */
-    private boolean overwriteBusinessRuleDefinition(String businessRuleUUID, BusinessRuleFromTemplate businessRuleFromTemplate,
+    private boolean overwriteBusinessRuleDefinition(String businessRuleUUID,
+                                                    BusinessRuleFromTemplate businessRuleFromTemplate,
                                                     int deploymentStatus)
             throws UnsupportedEncodingException, BusinessRulesDatasourceException {
         String businessRuleJSON = gson.toJson(businessRuleFromTemplate, BusinessRuleFromTemplate.class);
@@ -1381,10 +1401,15 @@ public class TemplateManagerService implements BusinessRulesService {
             String node = object.toString();
             Object templates = nodes.get(node);
             if (templates instanceof List) {
-                for (Object uuid : (List) templates) {
-                    if (ruleTemplateUUID.equals(uuid.toString())) {
-                        nodeList.add(node);
-                        break;
+                List templateList = (List) templates;
+                if (!templateList.contains(ruleTemplateUUID.toString())) {
+                    return new ArrayList<String>(nodes.keySet());
+                } else {
+                    for (Object uuid : templateList) {
+                        if (ruleTemplateUUID.equals(uuid.toString())) {
+                            nodeList.add(node);
+                            break;
+                        }
                     }
                 }
             }
@@ -1399,23 +1424,21 @@ public class TemplateManagerService implements BusinessRulesService {
             BusinessRuleFromTemplate businessRuleFromTemplate = (BusinessRuleFromTemplate) businessRule;
             String instanceLimit = getRuleTemplate(businessRuleFromTemplate).getInstanceCount();
             count = getInstanceCount(businessRuleFromTemplate.getRuleTemplateUUID());
-            if ("one".equalsIgnoreCase(instanceLimit) && count >= 1) {
+            if (TemplateManagerConstants.ONE.equalsIgnoreCase(instanceLimit) && count >= 1) {
                 throw new TemplateInstanceCountViolationException("Rule Template '" +
-                        ((BusinessRuleFromTemplate) businessRule).getRuleTemplateUUID() + "' can be instantiated " +
-                        "only once and has already been instantiated.");
+                        (businessRuleFromTemplate.getRuleTemplateUUID() + "' can be instantiated " +
+                                "only once and has already been instantiated."));
             }
         } else if (businessRule instanceof BusinessRuleFromScratch) {
             BusinessRuleFromScratch businessRuleFromScratch = (BusinessRuleFromScratch) businessRule;
-            List<RuleTemplate> ruleTemplates =
-                    (List<RuleTemplate>) getInputOutputRuleTemplates(businessRuleFromScratch);
+            List<RuleTemplate> ruleTemplates = getInputOutputRuleTemplates(businessRuleFromScratch);
             String instanceLimit;
             for (RuleTemplate ruleTemplate : ruleTemplates) {
-                instanceLimit = (ruleTemplate.getInstanceCount());
+                instanceLimit = ruleTemplate.getInstanceCount();
                 count = getInstanceCount(ruleTemplate.getUuid());
-                if ("one".equalsIgnoreCase(instanceLimit) && count >= 1) {
-                    throw new TemplateInstanceCountViolationException("Rule Template '" +
-                            (ruleTemplate.getUuid() + "' can be instantiated " +
-                                    "only once and has already been instantiated."));
+                if (TemplateManagerConstants.ONE.equalsIgnoreCase(instanceLimit) && count >= 1) {
+                    throw new TemplateInstanceCountViolationException("Rule Template '" + (ruleTemplate.getUuid() +
+                            "' can be instantiated only once and has already been instantiated."));
                 }
             }
         }
@@ -1457,6 +1480,40 @@ public class TemplateManagerService implements BusinessRulesService {
             str = str.replace('\n', '_').replace('\r', '_');
         }
         return str;
+    }
+
+    private void loadAndSaveAnalyticsSolutions(String solutionType) throws TemplateManagerServiceException {
+        if (Objects.nonNull(availableTemplateGroups.get(solutionType))) {
+            TemplateGroup templateGroup = availableTemplateGroups.get(solutionType);
+            List<RuleTemplate> ruleTemplates = templateGroup.getRuleTemplates();
+
+            for (RuleTemplate ruleTemplate : ruleTemplates) {
+                BusinessRuleFromTemplate businessRuleFromTemplate = replacePropertiesWithDefaultValues
+                        (ruleTemplate, templateGroup.getUuid());
+                try {
+                    createTablesIfNotExist();
+                    BusinessRule businessRule = queryExecutor.retrieveBusinessRule(ruleTemplate.getUuid());
+
+                    if (businessRule == null) {
+                        saveBusinessRuleDefinition(ruleTemplate.getUuid(), businessRuleFromTemplate,
+                                TemplateManagerConstants.DEPLOYED, DEFAULT_ARTIFACT_COUNT);
+                        insertRuleTemplate(ruleTemplate.getUuid());
+                    }
+                } catch (BusinessRulesDatasourceException | TemplateInstanceCountViolationException e) {
+                    throw new TemplateManagerServiceException("Saving business rule '" +
+                            businessRuleFromTemplate.getName() + "' to the database is failed for solution type "
+                            + solutionType, e);
+                }
+            }
+        }
+    }
+
+    private BusinessRuleFromTemplate replacePropertiesWithDefaultValues(RuleTemplate ruleTemplate,
+                                                                        String templateGroupUUID) {
+        Map<String, String> properties = ruleTemplate.getProperties().entrySet().stream().collect(Collectors.toMap(
+                Map.Entry::getKey, e -> e.getValue().getDefaultValue()));
+        return new BusinessRuleFromTemplate(ruleTemplate.getUuid(), ruleTemplate.getName(), templateGroupUUID,
+                ruleTemplate.getType(), ruleTemplate.getUuid(), properties);
     }
 
 }

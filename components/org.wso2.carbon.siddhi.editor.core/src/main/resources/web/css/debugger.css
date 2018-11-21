@@ -164,7 +164,6 @@ div > .col-xs-12 {
 .btn-group > .btn, .btn-group-vertical > .btn {
     position: relative;
     float: left;
-    padding-left: 30px;
     font-weight: 300;
 }
 

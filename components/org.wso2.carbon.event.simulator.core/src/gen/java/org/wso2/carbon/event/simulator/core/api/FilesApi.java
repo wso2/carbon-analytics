@@ -6,6 +6,7 @@ import org.osgi.service.component.annotations.Deactivate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.wso2.carbon.analytics.msf4j.interceptor.common.AuthenticationInterceptor;
+import org.wso2.carbon.event.simulator.core.exception.FileOperationsException;
 import org.wso2.carbon.event.simulator.core.factories.FilesApiServiceFactory;
 import org.wso2.carbon.event.simulator.core.internal.util.EventSimulatorConstants;
 import org.wso2.carbon.event.simulator.core.model.InlineResponse2001;
@@ -64,7 +65,7 @@ public class FilesApi implements Microservice {
     public Response deleteFile(
             @Context Request request,
             @ApiParam(value = "CSV File for name to delete", required = true)
-            @PathParam("fileName") String fileName) throws NotFoundException {
+            @PathParam("fileName") String fileName) throws NotFoundException, FileOperationsException {
         return delegate.deleteFile(fileName, request);
     }
 
@@ -103,7 +104,7 @@ public class FilesApi implements Microservice {
             @PathParam("fileName") String fileName,
             @FormDataParam("file") InputStream fileInputStream,
             @FormDataParam("file") FileInfo fileDetail)
-            throws NotFoundException {
+            throws NotFoundException, FileOperationsException {
         return delegate.updateFile(fileName, fileInputStream, fileDetail, request);
     }
 
@@ -122,7 +123,7 @@ public class FilesApi implements Microservice {
     public Response uploadFile(
             @Context Request request,
             @FormDataParam("file") InputStream fileInputStream,
-            @FormDataParam("file") FileInfo fileDetail) throws NotFoundException {
+            @FormDataParam("file") FileInfo fileDetail) throws NotFoundException, FileOperationsException {
         return delegate.uploadFile(fileInputStream, fileDetail, request);
     }
 

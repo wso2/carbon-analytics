@@ -18,8 +18,11 @@
 
 package org.wso2.carbon.sp.jobmanager.core.internal;
 
+import org.wso2.carbon.analytics.idp.client.core.api.AnalyticsHttpClientBuilderService;
+import org.wso2.carbon.analytics.permissions.PermissionProvider;
 import org.wso2.carbon.cluster.coordinator.service.ClusterCoordinator;
 import org.wso2.carbon.datasource.core.api.DataSourceService;
+import org.wso2.carbon.sp.jobmanager.core.allocation.ResourceAllocationAlgorithm;
 import org.wso2.carbon.sp.jobmanager.core.bean.ClusterConfig;
 import org.wso2.carbon.sp.jobmanager.core.bean.DeploymentConfig;
 import org.wso2.carbon.sp.jobmanager.core.deployment.DeploymentManagerImpl;
@@ -48,8 +51,10 @@ public class ServiceDataHolder {
     private static ResourcePool resourcePool;
     private static DeploymentManagerImpl deploymentManager;
     private static boolean leader;
-    //newly added
+    private static PermissionProvider permissionProvider;
     private static Map<String, String> userDefinedSiddhiApp;
+    private static ResourceAllocationAlgorithm allocationAlgorithm;
+    private static AnalyticsHttpClientBuilderService clientBuilderService;
 
     public static ScheduledExecutorService getExecutorService() {
         return EXECUTOR_SERVICE;
@@ -149,5 +154,29 @@ public class ServiceDataHolder {
 
     public static void setUserDefinedSiddhiApp(Map<String, String> userDefinedSiddhiApp) {
         ServiceDataHolder.userDefinedSiddhiApp = userDefinedSiddhiApp;
+    }
+
+    public static PermissionProvider getPermissionProvider() {
+        return permissionProvider;
+    }
+
+    public static void setPermissionProvider(PermissionProvider permissionProvider) {
+        ServiceDataHolder.permissionProvider = permissionProvider;
+    }
+
+    public static ResourceAllocationAlgorithm getAllocationAlgorithm() {
+        return allocationAlgorithm;
+    }
+
+    public static void setAllocationAlgorithm(ResourceAllocationAlgorithm allocationAlgorithm) {
+        ServiceDataHolder.allocationAlgorithm = allocationAlgorithm;
+    }
+
+    public static AnalyticsHttpClientBuilderService getClientBuilderService() {
+        return ServiceDataHolder.clientBuilderService;
+    }
+
+    public static void setClientBuilderService(AnalyticsHttpClientBuilderService clientBuilderService) {
+        ServiceDataHolder.clientBuilderService = clientBuilderService;
     }
 }

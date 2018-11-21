@@ -200,7 +200,7 @@ public class SingleEventGenerator {
             singleEventSimulationDTO.setTimestamp(timestamp);
             singleEventSimulationDTO.setAttributeValues(dataValues.toArray());
             return singleEventSimulationDTO;
-        }catch (JsonProcessingException e) {
+        } catch (JsonProcessingException e) {
             log.error("Error occurred when processing single event simulation configuration. ", e);
             throw new InvalidConfigException("Error occurred when processing single event simulation configuration. ",
                     e);

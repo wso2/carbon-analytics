@@ -37,10 +37,22 @@ import '../index.css';
  * Styles related to this component
  */
 const styles = {
-    header: {
-        color: 'white',
-        backgroundColor: '#212121',
-    }
+    title: {
+        color: '#EEE',
+        fontSize: 16,
+        height: 40,
+        lineHeight: '40px',
+        marginLeft: 15,
+        flex: 1
+    },
+    appBar: {
+        backgroundColor: '#263238',
+        height:40
+    },
+    toolBar: {
+        height: 40,
+        minHeight: '40px'
+    },
 };
 
 /**
@@ -49,13 +61,10 @@ const styles = {
 class Header extends React.Component {
     render() {
         return (
-            <AppBar position="static" style={styles.header}>
-                <Toolbar>
-                    <img height="35" src={Logo} />
-                    &nbsp;
-                    &nbsp;
-                    &nbsp;
-                    <Typography type="subheading" color="inherit" style={{ flex: 1 }}>
+            <AppBar position="static" style={styles.appBar}>
+                <Toolbar style={styles.toolBar}>
+                    <img height="17" src={Logo} />
+                    <Typography type="subheading" color="inherit" style={styles.title}>
                         Business Rules Template Editor
                     </Typography>
                     <Tooltip title="New">
