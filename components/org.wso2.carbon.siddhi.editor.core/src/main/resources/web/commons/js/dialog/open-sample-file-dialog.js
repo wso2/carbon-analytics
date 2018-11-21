@@ -72,10 +72,10 @@ define(['require', 'lodash','jquery', 'log', 'backbone', 'file_browser', 'worksp
                     "<form class='form-horizontal' onsubmit='return false'>" +
                     "<div class='form-group'>" +
                     "<label for='locationSearch' class='col-sm-2 file-dialog-label'>Search :</label>" +
-                    "<input type='text' class='search-file-dialog-form-control' id='locationSearch'>" +
+                    "<input type='text' class='search-file-dialog-form-control' id='locationSearch' autofocus>" +
                     "</div>" +
                     "<div class='form-group'>" +
-                    "<div class='file-dialog-form-scrollable-block'>" +
+                    "<div class='file-dialog-form-scrollable-block' style='padding: 10px 4px; margin-left:35px;'>" +
                     "<div id='noResults' style='display:none;'>No results found</div>" +
                     "<div id='sampleTable' class='samples-pane'>" +
                     "</div>" +
