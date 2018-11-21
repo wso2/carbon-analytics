@@ -67,7 +67,7 @@ public class JMSSiddhiAppCreator extends AbstractSiddhiAppCreator {
 
     /**
      *
-     * @param siddhiAppName Name of the initial user defined siddhi application
+     * @param siddhiAppName Name of the initial user defined siddhi application.
      * @param queryList     Contains the query of the current execution group replicated
      *                      to the parallelism of the group.
      * @param outputStreams Collection of current execution group's output streams

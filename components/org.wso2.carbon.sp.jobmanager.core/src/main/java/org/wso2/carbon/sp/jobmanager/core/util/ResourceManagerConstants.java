@@ -118,27 +118,23 @@ public class ResourceManagerConstants {
 
     public static final String PARTITIONED_NATS_SINK_TEMPLATE = "@sink(type='nats',"
             + "cluster.id='${" + CLUSTER_ID + "}',"
-            + "client.id='${"  + CLIENT_ID + "}',"
             + "@distribution(strategy='partitioned', partitionKey='${" + PARTITION_KEY + "}',"
             + "${" + DESTINATIONS + "}), bootstrap.servers="
             + "'${" + NATS_SERVER_URL + "}',@map(type='" + MAPPING + "'))";
 
     public static final String DEFAULT_NATS_SINK_TEMPLATE = "@sink(type='nats',"
             + "cluster.id='${" + CLUSTER_ID + "}',"
-            + "client.id='${"  + CLIENT_ID + "}',"
             + "destination = '${" + TOPIC_LIST +  "}', bootstrap.servers="
             + "'${" + NATS_SERVER_URL + "}',@map(type='" + MAPPING + "'))";
 
     public static final String DEFAULT_NATS_SOURCE_TEMPLATE = "@source(type='nats',"
             + "cluster.id='${" + CLUSTER_ID + "}',"
-            + "client.id='${"  + CLIENT_ID + "}',"
             + "destination = '${" + TOPIC_LIST +  "}', bootstrap.servers="
             + "'${" + NATS_SERVER_URL + "}',@map(type='" + MAPPING + "'))";
 
     public static final String RR_NATS_SOURCE_TEMPLATE = "@source(type='nats',"
             + "cluster.id='${" + CLUSTER_ID + "}',"
             + "queue.group.name='${"  + QUEUE_GROUP_NAME + "}',"
-            + "client.id='${"  + CLIENT_ID + "}',"
             + "destination = '${" + TOPIC_LIST +  "}', bootstrap.servers="
             + "'${" + NATS_SERVER_URL + "}',@map(type='" + MAPPING + "'))";
 
