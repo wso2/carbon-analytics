@@ -912,12 +912,12 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
                         checkJSONValidityOfElement(self, targetId, true);
                     }
                     var connectionObject = connection.connection;
-                    var conId = connectionObject.id;
-//                 add a overlay of a close icon for connection. connection can be detached by clicking on it
+//                 Add a overlay of a close icon for connection. connection can be detached by clicking on it
                     var close_icon_overlay = connectionObject.addOverlay([
                         "Custom", {
                             create: function () {
-                                return $('<span><i class="fw fw-delete" id="' + conId + '"></i></span>');
+                                return $('<span><i class="fw fw-delete" id="' + connectionObject.id +
+                                    '"data-toggle="popover"></i></span>');
                             },
                             location: 0.60,
                             id: "close",
@@ -930,40 +930,49 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
                     ]);
 
                     function popOverForConnector() {
-                        $('#' + conId).popover({
+                        $('#' + connectionObject.id).popover({
                             trigger: 'focus',
+                            title: 'Are you sure you want to delete?',
                             html: true,
-                            title: 'Delete' + '<a class="close">&times;</a>',
                             content: function () {
                                 return $('.pop-over').html();
                             }
                         });
-                        $('#' + conId).popover("show");
-                        fadeInFunction();
+                        $('#' + connectionObject.id).popover("show");
+                        fadeInCanvas();
 //                 Custom jQuery to hide popover on click of the close button
-                        $("#" + conId).siblings(".popover").on("click", ".popover-footer .btn.yes", function () {
-                            if (connectionObject.connector !== null) {
-                                self.jsPlumbInstance.deleteConnection(connectionObject);
-                            }
-                            fadeOutFunction();
-                            $(this).parents(".popover").popover('hide');
-                        });
-                        $("#" + conId).siblings(".popover").on("click", ".popover-footer .btn.no", function () {
-                            fadeOutFunction();
-                            $(this).parents(".popover").popover('hide');
-                        });
+                        $("#" + connectionObject.id).siblings(".popover").on("click", ".popover-footer .btn.yes",
+                            function () {
+                                if (connectionObject.connector !== null) {
+                                    self.jsPlumbInstance.deleteConnection(connectionObject);
+                                }
+                                fadeOutCanvas();
+                                $(this).parents(".popover").popover('hide');
+                            });
+                        $("#" + connectionObject.id).siblings(".popover").on("click", ".popover-footer .btn.no",
+                            function () {
+                                fadeOutCanvas();
+                                $(this).parents(".popover").popover('hide');
+                                close_icon_overlay.setVisible(false);
+                            });
 
-                        $("#" + conId).siblings(".popover").on("click", ".close", function () {
-                            fadeOutFunction();
-                            $(this).parents(".popover").popover('hide');
+                        $('.fullscreen-container').on('click', function (e) {
+                            $('[data-toggle="popover"]').each(function () {
+                                if (!$(this).is(e.target) && $(this).has(e.target).length === 0 && $('.popover').has(
+                                    e.target).length === 0) {
+                                    $(this).popover('hide');
+                                    fadeOutCanvas();
+                                    close_icon_overlay.setVisible(false);
+                                }
+                            });
                         });
                     }
 
-                    function fadeInFunction() {
+                    function fadeInCanvas() {
                         $(".fullscreen-container").fadeTo(200, 1);
                     }
 
-                    function fadeOutFunction() {
+                    function fadeOutCanvas() {
                         $(".fullscreen-container").fadeOut(200);
                     }
 
@@ -975,7 +984,7 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
                         });
 //                  hide the close icon when the mouse is not on the connection path
                         connectionObject.bind('mouseleave', function () {
-                            if ($("#" + conId).siblings(".popover").length == 0) {
+                            if ($("#" + connectionObject.id).siblings(".popover").length == 0) {
                                 close_icon_overlay.setVisible(false);
                             }
                         });
@@ -985,9 +994,9 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
                         connectionObject.bind('mouseover', function () {
                             close_icon_overlay.setVisible(true);
                         });
-                        // hide the close icon when the mouse is not on the connection path
+                        // hide the close icon when the mouse is not on the connection path when there is no popover
                         connectionObject.bind('mouseout', function () {
-                            if ($("#" + conId).siblings(".popover").length == 0) {
+                            if ($("#" + connectionObject.id).siblings(".popover").length == 0) {
                                 close_icon_overlay.setVisible(false);
                             }
                         });

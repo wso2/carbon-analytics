@@ -139,7 +139,7 @@
 .streamDrop, .tableDrop, .windowDrop, .triggerDrop, .aggregationDrop, .projectionQueryDrop, .filterQueryDrop,
 .windowQueryDrop, .functionQueryDrop, .joinQueryDrop, .patternQueryDrop, .sequenceQueryDrop, .sourceDrop, .sinkDrop,
 .functionDrop {
-    opacity: 0.8;
+    opacity: 1;
     width: 60px;
     height: 60px;
     cursor: pointer;
@@ -165,7 +165,7 @@
     width: 250px;
     height: 250px;
     border-radius: 0.5em;
-    opacity: 0.8;
+    opacity: 1;
     cursor: move;
     text-align: center;
     z-index: 1;
@@ -334,7 +334,7 @@ td {
     overflow: initial;
 }
 
-.partition-element-prop-icon, .partition-element-close-icon {
+.partition-element-prop-icon, .partition {
     float: right;
     width: 20px;
     height: 20px;
@@ -348,7 +348,7 @@ td {
     margin-right: 0;
 }
 
-.partition-element-close-icon {
+.partition {
     margin-right: 6px;
 }
 
@@ -388,7 +388,7 @@ select.form-control,
 }
 
 .grid-container > div {
-    opacity: 0.7;
+    opacity: 1.0;
 }
 
 .design-view-form-content button i {
