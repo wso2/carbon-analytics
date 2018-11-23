@@ -19,7 +19,7 @@
  * This will set the options of ACE editor, attach client side parser and attach SiddhiCompletion Engine with the editor
  */
 define(["ace/ace", "jquery", "./constants", "./utils", "./completion-engine", "./token-tooltip",
-        "ace/ext/language_tools", "./debug-rest-client", "log", 'ace/range'],
+    "ace/ext/language_tools", "./debug-rest-client", "log", 'ace/range'],
     function (ace, $, constants, utils, CompletionEngine, aceTokenTooltip, aceExtLangTools, DebugRESTClient, log, AceRange) {
 
         "use strict";   // JS strict mode
@@ -146,9 +146,9 @@ define(["ace/ace", "jquery", "./constants", "./utils", "./completion-engine", ".
                 return self.debugger;
             };
 
-             self.getRawExtensions = function () {
-				return self.rawExtensions;
-			};
+            self.getRawExtensions = function () {
+                return self.rawExtensions;
+            };
 
             /**
              * Returns the ace editor object
@@ -285,7 +285,7 @@ define(["ace/ace", "jquery", "./constants", "./utils", "./completion-engine", ".
                             }
 
                             self.completionEngine.partitionsList = [];
-                            if(response.innerStreams != undefined){
+                            if (response.innerStreams != undefined) {
                                 for (var i = 0; i < response.innerStreams.length; i++) {
                                     var innerStreams = getStreamsFromStreamDefinitions(response.innerStreams[i], true);
                                     self.completionEngine.partitionsList.push(innerStreams);
@@ -300,7 +300,7 @@ define(["ace/ace", "jquery", "./constants", "./utils", "./completion-engine", ".
                              * Error found in Siddhi app
                              */
 
-                            if(response.queryContextStartIndex === undefined){
+                            if (response.queryContextStartIndex === undefined) {
                                 // Update the semanticErrorList
                                 self.state.semanticErrorList = [({
                                     row: 0,
@@ -314,7 +314,7 @@ define(["ace/ace", "jquery", "./constants", "./utils", "./completion-engine", ".
                                     self.state.semanticErrorList
                                         .concat(self.state.syntaxErrorList)
                                 );
-                            } else{
+                            } else {
                                 // Update the semanticErrorList
                                 self.state.semanticErrorList = [({
                                     row: response.queryContextStartIndex[0] - 1,

@@ -17,19 +17,19 @@
  */
 
 define(['require', 'log', 'lodash', 'jquery', 'configurationData', 'appData', 'partition', 'query', 'stream', 'table',
-        'window', 'trigger', 'aggregation', 'aggregateByTimePeriod', 'windowFilterProjectionQueryInput',
-        'queryWindowOrFunction', 'edge', 'querySelect', 'queryOrderByValue', 'queryOutput', 'queryOutputInsert',
-        'queryOutputDelete', 'queryOutputUpdate', 'queryOutputUpdateOrInsertInto', 'attribute','annotationObject',
-        'joinQueryInput','joinQuerySource', 'patternOrSequenceQueryInput', 'patternOrSequenceQueryCondition',
-         'sourceOrSinkAnnotation','mapAnnotation', 'functionDefinition', 'streamHandler', 'storeAnnotation',
-         'partitionWith', 'designViewUtils','payloadOrAttribute'],
+    'window', 'trigger', 'aggregation', 'aggregateByTimePeriod', 'windowFilterProjectionQueryInput',
+    'queryWindowOrFunction', 'edge', 'querySelect', 'queryOrderByValue', 'queryOutput', 'queryOutputInsert',
+    'queryOutputDelete', 'queryOutputUpdate', 'queryOutputUpdateOrInsertInto', 'attribute', 'annotationObject',
+    'joinQueryInput', 'joinQuerySource', 'patternOrSequenceQueryInput', 'patternOrSequenceQueryCondition',
+    'sourceOrSinkAnnotation', 'mapAnnotation', 'functionDefinition', 'streamHandler', 'storeAnnotation',
+    'partitionWith', 'designViewUtils', 'payloadOrAttribute'],
     function (require, log, _, $, ConfigurationData, AppData, Partition, Query, Stream, Table, Window, Trigger,
-              Aggregation, AggregateByTimePeriod, WindowFilterProjectionQueryInput, QueryWindowOrFunction, Edge,
-              QuerySelect, QueryOrderByValue, QueryOutput, QueryOutputInsert, QueryOutputDelete, QueryOutputUpdate,
-              QueryOutputUpdateOrInsertInto, Attribute, AnnotationObject, JoinQueryInput, JoinQuerySource,
-              PatternOrSequenceQueryInput,
-              PatternOrSequenceQueryCondition, SourceOrSinkAnnotation, MapAnnotation, FunctionDefinition, StreamHandler,
-              StoreAnnotation, PartitionWith, DesignViewUtils, PayloadOrAttribute) {
+        Aggregation, AggregateByTimePeriod, WindowFilterProjectionQueryInput, QueryWindowOrFunction, Edge,
+        QuerySelect, QueryOrderByValue, QueryOutput, QueryOutputInsert, QueryOutputDelete, QueryOutputUpdate,
+        QueryOutputUpdateOrInsertInto, Attribute, AnnotationObject, JoinQueryInput, JoinQuerySource,
+        PatternOrSequenceQueryInput,
+        PatternOrSequenceQueryCondition, SourceOrSinkAnnotation, MapAnnotation, FunctionDefinition, StreamHandler,
+        StoreAnnotation, PartitionWith, DesignViewUtils, PayloadOrAttribute) {
 
         /**
          * @class InitialiseDataStructure
@@ -43,13 +43,13 @@ define(['require', 'log', 'lodash', 'jquery', 'configurationData', 'appData', 'p
             this.application = application;
         };
 
-         InitialiseDataStructure.prototype.setRawExtension = function (rawExtensions) {
-         	this.rawExtensions = rawExtensions;
-         };
+        InitialiseDataStructure.prototype.setRawExtension = function (rawExtensions) {
+            this.rawExtensions = rawExtensions;
+        };
 
-         InitialiseDataStructure.prototype.getRawExtension = function (rawExtensions) {
-			return this.rawExtensions;
-		  };
+        InitialiseDataStructure.prototype.getRawExtension = function (rawExtensions) {
+            return this.rawExtensions;
+        };
 
         /**
          * @function Initializes the AppData object with th provided configuration
@@ -439,10 +439,10 @@ define(['require', 'log', 'lodash', 'jquery', 'configurationData', 'appData', 'p
 
         //adds annotation object from a json object for an element object
         function addAnnotationObjectForElement(element, newElementObject) {
-        	_.forEach(element.annotationListObjects, function (annotation) {
-        		var annotationObject = new AnnotationObject(annotation);
-        		newElementObject.addAnnotationObject(annotationObject)
-        	});
+            _.forEach(element.annotationListObjects, function (annotation) {
+                var annotationObject = new AnnotationObject(annotation);
+                newElementObject.addAnnotationObject(annotationObject)
+            });
         }
 
         // adds annotations from a json object for an element object
