@@ -17,10 +17,10 @@
  */
 
 define(['require', 'jquery', 'backbone', 'lodash', 'log', 'design_view', "./source", '../constants',
-        'undo_manager', 'launcher', 'app/debugger/debugger', 'designViewUtils'],
+    'undo_manager', 'launcher', 'app/debugger/debugger', 'designViewUtils'],
 
     function (require, $, Backbone, _, log, DesignView, SourceView, constants, UndoManager, Launcher,
-              DebugManager, DesignViewUtils) {
+        DebugManager, DesignViewUtils) {
 
         var ServicePreview = Backbone.View.extend(
             /** @lends ServicePreview.prototype */
@@ -195,9 +195,9 @@ define(['require', 'jquery', 'backbone', 'lodash', 'log', 'design_view', "./sour
                              * Removed attributes are used only for front end use only.
                              * */
                             function removeUnnecessaryFieldsFromJSON(object) {
-                            	if (object.hasOwnProperty('rawExtensions')) {
-									delete object['rawExtensions'];
-								}
+                                if (object.hasOwnProperty('rawExtensions')) {
+                                    delete object['rawExtensions'];
+                                }
                                 if (object.hasOwnProperty('application')) {
                                     delete object['application'];
                                 }
