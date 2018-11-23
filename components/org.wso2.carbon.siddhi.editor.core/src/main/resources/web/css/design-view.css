@@ -626,13 +626,14 @@ a.list-group-item, button.list-group-item {
 }
 
 .stream-form-container .error-message,
+.source-sink-form-container #attribute-map-content .error-message,
 .table-form-container #tableNameErrorMessage,
 .table-form-container #define-attribute .error-message {
 	color: red;
 	padding-top: 3px;
 }
 
-.source-sink-form-container .error-message,
+.source-sink-form-container .source-sink-map-options .error-message,
 .table-form-container #define-store-options .error-message,
 .design-view-form-content #define-table-annotation .error-message {
 	color: red;

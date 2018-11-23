@@ -434,7 +434,7 @@ define(['log', 'jquery', 'lodash', 'sourceOrSinkAnnotation', 'mapAnnotation', 'p
                 } else {
                     if ($(this).find('.option-checkbox').is(":checked")) {
                         if (optionValue == "") {
-                            $(this).find('.error-message').text('this option is not filled');
+                            $(this).find('.error-message').text('Option value is required.');
                             $(this)[0].scrollIntoView();
                             $(this).find('.option-value').addClass('required-input-field');
                             isError = true;
@@ -471,7 +471,7 @@ define(['log', 'jquery', 'lodash', 'sourceOrSinkAnnotation', 'mapAnnotation', 'p
             var isSourceConnected = true;
             if ($('#' + id).hasClass('error-element')) {
                 isSourceConnected = false;
-                DesignViewUtils.prototype.errorAlert("To edit source configuration, please connect to a stream");
+                DesignViewUtils.prototype.errorAlert("Please connect to a stream");
             } else if (!JSONValidator.prototype.validateSourceOrSinkAnnotation(clickedElement, 'Source', true)) {
                 // perform JSON validation to check if sink contains a connectedElement.
                 isSourceConnected = false;
