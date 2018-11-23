@@ -130,7 +130,7 @@ define(['log', 'jquery', 'lodash', 'attribute', 'table', 'storeAnnotation', 'des
                 var predefinedOptionObject = getOption(optionName, predefinedOptions);
                 if ($(this).find('.option-name').hasClass('mandatory-option')) {
                     if (optionValue == "") {
-                        $(this).find('.error-message').text('this option is mandatory');
+                        $(this).find('.error-message').text('Option Value is required.');
                         $(this)[0].scrollIntoView();
                         $(this).find('.option-value').addClass('required-input-field');
                         isError = true;
@@ -149,7 +149,7 @@ define(['log', 'jquery', 'lodash', 'attribute', 'table', 'storeAnnotation', 'des
                 } else {
                     if ($(this).find('.option-checkbox').is(":checked")) {
                         if (optionValue == "") {
-                            $(this).find('.error-message').text('this option is not filled');
+                            $(this).find('.error-message').text('Option Value is required.');
                             $(this)[0].scrollIntoView();
                             $(this).find('.option-value').addClass('required-input-field');
                             isError = true;
@@ -461,7 +461,7 @@ define(['log', 'jquery', 'lodash', 'attribute', 'table', 'storeAnnotation', 'des
                     });
                     if (annotationValues.length == 0) {
                         $(this).find('.annotation-value:eq(0)').addClass('required-input-field');
-                        $(this).find('.error-message:eq(0)').text("Value is not filled");
+                        $(this).find('.error-message:eq(0)').text("Value is required.");
                         isErrorOccurred = true;
                         return false;
                     }

@@ -734,7 +734,7 @@ define(['log', 'jquery', 'lodash', 'sourceOrSinkAnnotation', 'mapAnnotation', 'p
                                 var key = $(this).find('.attr-key').val().trim();
                                 var value = $(this).find('.attr-value').val().trim();
                                 if (value == "") {
-                                    $(this).find('.error-message').text('Attribute value is not filled.');
+                                    $(this).find('.error-message').text('Value is required.');
                                     $(this)[0].scrollIntoView();
                                     $(this).find('.attr-value').addClass('required-input-field');
                                     isError = true;
