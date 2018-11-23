@@ -922,7 +922,7 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
                             location: 0.60,
                             id: "close",
                             events: {
-                                click: function (overlay, evt) {
+                                click: function () {
                                     popOverForConnector();
                                 }
                             }
@@ -955,7 +955,8 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
                                 $(this).parents(".popover").popover('hide');
                                 close_icon_overlay.setVisible(false);
                             });
-
+//                      Dismiss the pop-over by clicking outside
+                        $('.fullscreen-container').off('click');
                         $('.fullscreen-container').on('click', function (e) {
                             $('[data-toggle="popover"]').each(function () {
                                 if (!$(this).is(e.target) && $(this).has(e.target).length === 0 && $('.popover').has(

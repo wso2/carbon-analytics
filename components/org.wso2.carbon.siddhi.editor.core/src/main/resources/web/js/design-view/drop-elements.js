@@ -1177,7 +1177,6 @@ define(['require', 'log', 'lodash', 'jquery', 'partition', 'stream', 'query', 'f
 
 //          Pop-over element for displaying the popover when delete button clicked
             function showPopOver(dataObj, element) {
-
                 $(dataObj).popover({
                     trigger: 'focus',
                     title: 'Are you sure you want to delete?',
@@ -1186,7 +1185,6 @@ define(['require', 'log', 'lodash', 'jquery', 'partition', 'stream', 'query', 'f
                         return $('.pop-over').html();
                     }
                 });
-
                 $(dataObj).popover("show")
                 fadeInCanvas();
                 $(element).on("click", ".popover-footer .btn.no", function () {
@@ -1205,7 +1203,7 @@ define(['require', 'log', 'lodash', 'jquery', 'partition', 'stream', 'query', 'f
                     $(this).parents(".popover").popover('hide');
                     fadeOutCanvas();
                 });
-
+//              Dismiss the pop-over by clicking outside
                 $('.fullscreen-container').off('click');
                 $('.fullscreen-container').on('click', function (e) {
                     $('[data-toggle="popover"]').each(function () {

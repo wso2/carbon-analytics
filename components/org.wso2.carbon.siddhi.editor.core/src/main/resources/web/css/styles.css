@@ -573,7 +573,7 @@ h3.popover-title {
 
 }
 
-.btn.no:hover{
+.btn.no:hover {
     color: white;
 }
 
@@ -616,4 +616,3 @@ h3.popover-title {
 .selected-element .element-prop-icon, .selected-element .partition-element-prop-icon {
     display: none !important;
 }
-
