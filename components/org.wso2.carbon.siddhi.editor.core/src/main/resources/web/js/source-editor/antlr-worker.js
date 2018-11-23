@@ -249,17 +249,20 @@ var SiddhiEditor = {};
             // Adding the syntax errors identified into the editor gutter
             renderer.notifyParseTreeWalkingCompletion(walker.syntaxErrorList);
 
-            // Walking the parse tree to generate completion data
-            var dataPopulationListener = new DataPopulationListener(walker);
-            antlr4.tree.ParseTreeWalker.DEFAULT.walk(dataPopulationListener, lastParseTree);
+            // If there are no syntax errors, walk the parse tree to generate completion data
+            if (walker.syntaxErrorList.length == 0) {
+                var dataPopulationListener = new DataPopulationListener(walker);
+                antlr4.tree.ParseTreeWalker.DEFAULT.walk(dataPopulationListener, lastParseTree);
 
-            // Notify the main js and clear completion data
-            renderer.notifyDataPopulationCompletion(
-                walker.completionData,
-                walker.incompleteData,
-                walker.statementsList,
-                walker.queries
-            );
+                // Notify the main js
+                renderer.notifyDataPopulationCompletion(
+                    walker.completionData,
+                    walker.incompleteData,
+                    walker.statementsList,
+                    walker.queries
+                );
+            }
+            // Clear data
             clearData();
         };
 
