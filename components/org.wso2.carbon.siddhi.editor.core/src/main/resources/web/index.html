@@ -254,6 +254,7 @@
             <!-- End: tool-palette -->
             <!-- Start: design-view-grid-container -->
             <div id="grid-container" class="grid-container"></div>
+            <div class = "overlayed-container"></div>
             <!-- End: design-view-grid-container -->
         </div>
         <!-- End: design view container -->
@@ -1058,9 +1059,8 @@
                 {{#each elements}}
                 <li data-jstree = '{"icon":"/editor/commons/images/properties.png"}' class="{{class}}"> {{key}}
                     <ul>
-                        <li data-jstree = '{"icon":"/editor/commons/images/value.png"}' class = "annotation-value">
-                            {{value}}
-                        </li>
+                        <li data-jstree = '{"icon":"/editor/commons/images/value.png"}'
+                            class = "annotation-value"> {{value}} </li>
                     </ul>
                 </li>
                 {{/each}}
@@ -1070,9 +1070,8 @@
                 {{#each elements}}
                 <li data-jstree = '{"icon":"/editor/commons/images/properties.png"}' class = "annotation-key"> {{key}}
                     <ul>
-                        <li data-jstree = '{"icon":"/editor/commons/images/value.png"}' class = "annotation-value">
-                            {{value}}
-                        </li>
+                        <li data-jstree = '{"icon":"/editor/commons/images/value.png"}'
+                            class = "annotation-value"> {{value}} </li>
                     </ul>
                 </li>
                 {{/each}}

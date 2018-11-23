@@ -551,3 +551,18 @@ body.sticky-footer {
 .table .table {
   background-color: transparent;
 }
+
+.selected-element {
+	z-index:500 !important;
+}
+
+.overlayed-container {
+	display: none;
+	position: fixed;
+	top: 0px;
+	bottom: 0px;
+	left: 0px;
+	right: 0px;
+	z-index: 90;
+	background: rgba(90, 90, 90, 0.5);
+}
