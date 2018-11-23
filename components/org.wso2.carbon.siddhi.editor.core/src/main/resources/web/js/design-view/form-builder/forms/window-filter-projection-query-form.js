@@ -17,11 +17,11 @@
  */
 
 define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert', 'queryOutputDelete',
-        'queryOutputUpdate', 'queryOutputUpdateOrInsertInto', 'queryWindowOrFunction', 'queryOrderByValue',
-        'streamHandler', 'designViewUtils', 'jsonValidator'],
+    'queryOutputUpdate', 'queryOutputUpdateOrInsertInto', 'queryWindowOrFunction', 'queryOrderByValue',
+    'streamHandler', 'designViewUtils', 'jsonValidator'],
     function (require, log, $, _, QuerySelect, QueryOutputInsert, QueryOutputDelete, QueryOutputUpdate,
-              QueryOutputUpdateOrInsertInto, QueryWindowOrFunction, QueryOrderByValue, StreamHandler, DesignViewUtils,
-              JSONValidator) {
+        QueryOutputUpdateOrInsertInto, QueryWindowOrFunction, QueryOrderByValue, StreamHandler, DesignViewUtils,
+        JSONValidator) {
 
         var constants = {
             PROJECTION: 'projectionQueryDrop',
@@ -54,7 +54,7 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
          * @param formContainer Container which holds the form
          */
         WindowFilterProjectionQueryForm.prototype.generatePropertiesForm = function (element, formConsole,
-                                                                                     formContainer) {
+            formContainer) {
             var self = this;
             var propertyDiv = $('<div id="property-header"><h3>Query Configuration </h3></div>' +
                 '<div class="define-windowFilterProjection-query"></div>');
@@ -132,7 +132,7 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
                 var savedAnnotations = clickedElement.getAnnotationList();
                 var annotations = [];
                 _.forEach(savedAnnotations, function (savedAnnotation) {
-                    annotations.push({annotation: savedAnnotation});
+                    annotations.push({ annotation: savedAnnotation });
                 });
 
                 var queryName = clickedElement.getQueryName();
@@ -317,7 +317,7 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
                     var streamHandlerWindowObject = {
                         streamHandler: {
                             windowName: ' ',
-                            parameters: [{parameter: ' '}]
+                            parameters: [{ parameter: ' ' }]
                         }
                     };
                     streamHandlerList.push(streamHandlerWindowObject);
@@ -325,7 +325,7 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
                     var streamHandlerFunctionObject = {
                         streamHandler: {
                             functionName: ' ',
-                            parameters: [{parameter: ' '}]
+                            parameters: [{ parameter: ' ' }]
                         }
                     };
                     streamHandlerList.push(streamHandlerFunctionObject);
@@ -683,11 +683,11 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
 
                 formContainer.find('.define-windowFilterProjection-query')
                     .append('<div class="col-md-12 section-seperator frm-qry"><div class="col-md-4">' +
-                    '<div class="row"><div id="form-query-name"></div>'+
-                    '<div id="form-query-annotation" class="col-md-12 section-seperator"></div></div>' +
-                    '<div class="row"><div id="form-query-input" class="col-md-12"></div></div></div>' +
-                    '<div id="form-query-select" class="col-md-4"></div>' +
-                    '<div id="form-query-output" class="col-md-4"></div></div>');
+                        '<div class="row"><div id="form-query-name"></div>' +
+                        '<div id="form-query-annotation" class="col-md-12 section-seperator"></div></div>' +
+                        '<div class="row"><div id="form-query-input" class="col-md-12"></div></div></div>' +
+                        '<div id="form-query-select" class="col-md-4"></div>' +
+                        '<div id="form-query-output" class="col-md-4"></div></div>');
 
                 var editorAnnotation = new JSONEditor($(formContainer).find('#form-query-annotation')[0], {
                     schema: {
@@ -727,14 +727,14 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
                 });
 
                 var editorQueryName = new JSONEditor($(formContainer).find('#form-query-name')[0], {
-                schema: {
-                       required: true,
-                       title: "Name",
-                       type: "string",
-                       default: "query"
-                },
-                startval: queryName,
-                show_errors: "always"
+                    schema: {
+                        required: true,
+                        title: "Name",
+                        type: "string",
+                        default: "query"
+                    },
+                    startval: queryName,
+                    show_errors: "always"
                 });
 
                 var editorInput = new JSONEditor($(formContainer).find('#form-query-input')[0], {
@@ -1150,8 +1150,8 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
                     var isQueryNameUsed
                         = self.formUtils.isQueryDefinitionNameUsed(queryNameConfig, clickedElement.getId());
                     if (isQueryNameUsed) {
-                           DesignViewUtils.prototype.errorAlert("Query name \"" + queryNameConfig + "\" is already"
-                                                                                                +" defined.");
+                        DesignViewUtils.prototype.errorAlert("Query name \"" + queryNameConfig + "\" is already"
+                            + " defined.");
                         return;
                     }
 
@@ -1286,7 +1286,7 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
                         // update selected query
                         clickedElement.addQueryName(queryNameConfig);
                         if (queryNameConfig == "") {
-                             queryNameConfig = "Query";
+                            queryNameConfig = "Query";
                         }
                         var textNode = $('#' + clickedElement.getId()).find('.queryNameNode');
                         textNode.html(queryNameConfig);
@@ -1331,8 +1331,8 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
                         queryOutput.setType(outputType);
                     }
 
-					$('#' + id).removeClass('incomplete-element');
-					$('#' + id).prop('title', '');
+                    $('#' + id).removeClass('incomplete-element');
+                    $('#' + id).prop('title', '');
 
                     // perform JSON validation
                     JSONValidator.prototype.validateWindowFilterProjectionQuery(clickedElement);

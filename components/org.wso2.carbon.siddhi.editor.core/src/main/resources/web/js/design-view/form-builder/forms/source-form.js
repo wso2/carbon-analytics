@@ -526,7 +526,7 @@ define(['log', 'jquery', 'lodash', 'sourceOrSinkAnnotation', 'mapAnnotation', 'p
                         $(this).parents(".option").find(".option-value").show();
                     } else {
                         $(this).parents(".option").find(".option-value").hide();
-						$(this).parents(".option").find(".option-value").removeClass("required-input-field");
+                        $(this).parents(".option").find(".option-value").removeClass("required-input-field");
                         $(this).parents(".option").find(".error-message").text("");
                     }
                 });
@@ -763,7 +763,7 @@ define(['log', 'jquery', 'lodash', 'sourceOrSinkAnnotation', 'mapAnnotation', 'p
                     var textNode = $('#' + id).find('.sourceNameNode');
                     textNode.html(selectedSourceType);
 
-					$('#' + id).removeClass('incomplete-element');
+                    $('#' + id).removeClass('incomplete-element');
                     $('#' + id).prop('title', '');
 
                     // set the isDesignViewContentChanged to true

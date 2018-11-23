@@ -17,11 +17,11 @@
  */
 
 define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert', 'queryOutputDelete',
-        'queryOutputUpdate', 'queryOutputUpdateOrInsertInto', 'queryWindowOrFunction', 'queryOrderByValue',
-        'joinQuerySource', 'streamHandler', 'designViewUtils', 'jsonValidator'],
+    'queryOutputUpdate', 'queryOutputUpdateOrInsertInto', 'queryWindowOrFunction', 'queryOrderByValue',
+    'joinQuerySource', 'streamHandler', 'designViewUtils', 'jsonValidator'],
     function (require, log, $, _, QuerySelect, QueryOutputInsert, QueryOutputDelete, QueryOutputUpdate,
-              QueryOutputUpdateOrInsertInto, QueryWindowOrFunction, QueryOrderByValue, joinQuerySource, StreamHandler,
-              DesignViewUtils, JSONValidator) {
+        QueryOutputUpdateOrInsertInto, QueryWindowOrFunction, QueryOrderByValue, joinQuerySource, StreamHandler,
+        DesignViewUtils, JSONValidator) {
 
         var constants = {
             LEFT_SOURCE: 'Left Source',
@@ -96,7 +96,7 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
                 var savedAnnotations = clickedElement.getAnnotationList();
                 var annotations = [];
                 _.forEach(savedAnnotations, function (savedAnnotation) {
-                    annotations.push({annotation: savedAnnotation});
+                    annotations.push({ annotation: savedAnnotation });
                 });
 
                 var leftSourceSavedData = clickedElement.getQueryInput().getLeft();
@@ -576,7 +576,7 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
                 }
 
                 formContainer.append('<div class="col-md-12 section-seperator frm-qry"><div class="col-md-4">' +
-                    '<div class="row"><div id="form-query-name"></div>'+
+                    '<div class="row"><div id="form-query-name"></div>' +
                     '<div class="row"><div id="form-query-annotation" class="col-md-12 section-seperator"></div></div>' +
                     '<div class="row"><div id="form-query-input" class="col-md-12"></div></div></div>' +
                     '<div id="form-query-select" class="col-md-4"></div>' +
@@ -621,10 +621,10 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
 
                 var editorQueryName = new JSONEditor($(formContainer).find('#form-query-name')[0], {
                     schema: {
-                           required: true,
-                           title: "Name",
-                           type: "string",
-                           default: "query"
+                        required: true,
+                        title: "Name",
+                        type: "string",
+                        default: "query"
                     },
                     startval: queryName,
                     show_errors: "always"
@@ -1128,7 +1128,7 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
                         = self.formUtils.isQueryDefinitionNameUsed(queryNameConfig, clickedElement.getId());
                     if (isQueryNameUsed) {
                         DesignViewUtils.prototype.errorAlert("Query name \"" + queryNameConfig + "\" is already"
-                                                                                                +" defined.");
+                            + " defined.");
                         return;
                     }
 
@@ -1403,8 +1403,8 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
                         queryOutput.setType(outputType);
                     }
 
-					$('#' + id).removeClass('incomplete-element');
-					$('#' + id).prop('title', '');
+                    $('#' + id).removeClass('incomplete-element');
+                    $('#' + id).prop('title', '');
 
                     // perform JSON validation
                     JSONValidator.prototype.validateJoinQuery(clickedElement);
@@ -1438,7 +1438,7 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
          * @returns fullJoinSchema join source schema
          */
         JoinQueryForm.prototype.getJoinSourceSchema = function (sourceType, sourceName, secondarySourceName, sourceSide,
-                                                                savedJoinSourceData) {
+            savedJoinSourceData) {
             var self = this;
             // starting values for the join source
             var fillSourceWith = {};
@@ -1490,7 +1490,7 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
                     var connectedStreamOrTriggerName = (inputElement.element).getFrom();
                     inputElement
                         = self.configurationData.getSiddhiAppConfig()
-                        .getDefinitionElementByName(connectedStreamOrTriggerName, self.partitionId);
+                            .getDefinitionElementByName(connectedStreamOrTriggerName, self.partitionId);
                     if (inputElement.type === 'STREAM') {
                         inputElementAttributeList = (inputElement.element).getAttributeList();
                         _.forEach(inputElementAttributeList, function (attribute) {

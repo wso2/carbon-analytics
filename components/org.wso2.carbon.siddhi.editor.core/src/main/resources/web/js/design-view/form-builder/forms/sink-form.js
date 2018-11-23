@@ -507,12 +507,12 @@ define(['log', 'jquery', 'lodash', 'sourceOrSinkAnnotation', 'mapAnnotation', 'p
                 self.designViewContainer.removeClass('disableContainer');
                 self.toggleViewButton.removeClass('disableContainer');
             } else {
-            	$('#' + id).addClass('selected-element');
-            	$(".overlayed-container").fadeTo(200, 1);
+                $('#' + id).addClass('selected-element');
+                $(".overlayed-container").fadeTo(200, 1);
                 var streamList = self.configurationData.getSiddhiAppConfig().getStreamList();
                 var connectedElement = clickedElement.connectedElementName;
-                var predefinedSinks =  _.orderBy(this.configurationData.rawExtensions["sink"], ['name'],['asc']);
-                var predefinedSinkMaps = _.orderBy(this.configurationData.rawExtensions["sinkMaps"], ['name'],['asc']);
+                var predefinedSinks = _.orderBy(this.configurationData.rawExtensions["sink"], ['name'], ['asc']);
+                var predefinedSinkMaps = _.orderBy(this.configurationData.rawExtensions["sinkMaps"], ['name'], ['asc']);
                 var streamAttributes = getConnectStreamAttributes(streamList, connectedElement);
                 var propertyDiv = $('<div class="source-sink-form-container sink-div"><div id="define-sink"></div>' +
                     '<div class = "source-sink-map-options" id="sink-options-div"></div>' +
@@ -844,7 +844,7 @@ define(['log', 'jquery', 'lodash', 'sourceOrSinkAnnotation', 'mapAnnotation', 'p
                     var textNode = $('#' + id).find('.sinkNameNode');
                     textNode.html(selectedSinkType);
 
-					$('#' + id).removeClass('incomplete-element');
+                    $('#' + id).removeClass('incomplete-element');
                     $('#' + id).prop('title', '');
 
                     // set the isDesignViewContentChanged to true

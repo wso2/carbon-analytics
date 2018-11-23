@@ -600,8 +600,8 @@ define(['log', 'jquery', 'lodash', 'attribute', 'table', 'storeAnnotation', 'des
             var self = this;
             var id = $(element).parent().attr('id');
             var clickedElement = self.configurationData.getSiddhiAppConfig().getTable(id);
-			$('#' + id).addClass('selected-element');
-			$(".overlayed-container").fadeTo(200, 1);
+            $('#' + id).addClass('selected-element');
+            $(".overlayed-container").fadeTo(200, 1);
             var propertyDiv = $('<div class = "table-form-container table-div"> <div id="property-header"> <h3> Table' +
                 ' Configuration </h3> </div> <h4> Name: </h4> <input type="text" id="tableName" class = "clearfix">' +
                 '<label class="error-message" id="tableNameErrorMessage"> </label> <div id = "define-attribute"> </div>' +
@@ -613,7 +613,7 @@ define(['log', 'jquery', 'lodash', 'attribute', 'table', 'storeAnnotation', 'des
             self.designViewContainer.addClass('disableContainer');
             self.toggleViewButton.addClass('disableContainer');
 
-            var predefinedStores =  _.orderBy(this.configurationData.rawExtensions["store"], ['name'],['asc']);
+            var predefinedStores = _.orderBy(this.configurationData.rawExtensions["store"], ['name'], ['asc']);
             addDefaultStoreType(predefinedStores);
             var customizedStoreOptions = [];
             var storeOptions = [];

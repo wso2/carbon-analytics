@@ -108,10 +108,10 @@ define(['require', 'log', 'jquery', 'lodash', 'functionDefinition', 'designViewU
             });
 
             formContainer.append('<div id="submit"><button type="button" class="btn btn-default">Submit</button></div>');
-			$('#' + i).addClass('selected-element');
-			$(".overlayed-container").fadeTo(200, 1);
-			$('#' + i).addClass('incomplete-element');
-			$('#' + i).prop('title', 'Form is incomplete');
+            $('#' + i).addClass('selected-element');
+            $(".overlayed-container").fadeTo(200, 1);
+            $('#' + i).addClass('incomplete-element');
+            $('#' + i).prop('title', 'Form is incomplete');
             // 'Submit' button action
             var submitButtonElement = $(formContainer).find('#submit')[0];
             submitButtonElement.addEventListener('click', function () {
@@ -143,8 +143,8 @@ define(['require', 'log', 'jquery', 'lodash', 'functionDefinition', 'designViewU
                 var textNode = $('#' + i).find('.functionNameNode');
                 textNode.html(editor.getValue().name);
 
-				$('#' + i).removeClass('incomplete-element');
-				$('#' + i).prop('title', '');
+                $('#' + i).removeClass('incomplete-element');
+                $('#' + i).prop('title', '');
 
                 // close the form window
                 self.consoleListManager.removeFormConsole(formConsole);

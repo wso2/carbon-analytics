@@ -91,9 +91,9 @@ define(['require', 'log', 'jquery', 'lodash', 'trigger', 'designViewUtils'],
                 '<div id="define-trigger" class="define-trigger"></div>');
             formContainer.append(propertyDiv);
             $(".overlayed-container").fadeTo(200, 1);
-			$('#' + i).addClass('selected-element');
-			$('#' + i).addClass('incomplete-element');
-			$('#' + i).prop('title', 'Form is incomplete');
+            $('#' + i).addClass('selected-element');
+            $('#' + i).addClass('incomplete-element');
+            $('#' + i).prop('title', 'Form is incomplete');
 
             // generate the form to define a trigger
             var editor = new JSONEditor($(formContainer).find('#define-trigger')[0], {
@@ -140,8 +140,8 @@ define(['require', 'log', 'jquery', 'lodash', 'trigger', 'designViewUtils'],
                 var textNode = $('#' + i).find('.triggerNameNode');
                 textNode.html(editor.getValue().name);
 
-				$('#' + i).removeClass('incomplete-element');
-				$('#' + i).prop('title', '');
+                $('#' + i).removeClass('incomplete-element');
+                $('#' + i).prop('title', '');
 
                 // close the form window
                 self.consoleListManager.removeFormConsole(formConsole);
@@ -181,7 +181,7 @@ define(['require', 'log', 'jquery', 'lodash', 'trigger', 'designViewUtils'],
             var savedAnnotations = clickedElement.getAnnotationList();
             var annotations = [];
             _.forEach(savedAnnotations, function (savedAnnotation) {
-                annotations.push({annotation: savedAnnotation});
+                annotations.push({ annotation: savedAnnotation });
             });
             var fillWith = {
                 annotations: annotations,

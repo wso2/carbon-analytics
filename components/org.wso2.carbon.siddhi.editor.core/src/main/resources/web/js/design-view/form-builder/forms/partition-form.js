@@ -72,7 +72,7 @@ define(['require', 'log', 'jquery', 'lodash', 'partitionWith', 'designViewUtils'
                 var savedAnnotations = partitionElement.getAnnotationList();
                 var annotations = [];
                 _.forEach(savedAnnotations, function (savedAnnotation) {
-                    annotations.push({annotation: savedAnnotation});
+                    annotations.push({ annotation: savedAnnotation });
                 });
 
                 var partitionKeys = [];
@@ -191,8 +191,8 @@ define(['require', 'log', 'jquery', 'lodash', 'partitionWith', 'designViewUtils'
                         partitionElement.addAnnotation(annotation.annotation);
                     });
 
-					$('#' + id).removeClass('incomplete-element');
-					$('#' + id).prop('title', '');
+                    $('#' + id).removeClass('incomplete-element');
+                    $('#' + id).prop('title', '');
 
                     // perform JSON validation
                     JSONValidator.prototype.validatePartition(partitionElement, self.jsPlumbInstance, true);

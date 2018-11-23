@@ -155,9 +155,9 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'window', 'designView
             var propertyDiv = $('<div id="property-header"><h3>Window Configuration</h3></div>' +
                 '<div id="define-window" class="define-window"></div>');
             formContainer.append(propertyDiv);
-			$('#' + i).addClass('selected-element');
-			$("#" + i).addClass('incomplete-element')
-			$(".overlayed-container").fadeTo(200, 1);
+            $('#' + i).addClass('selected-element');
+            $("#" + i).addClass('incomplete-element')
+            $(".overlayed-container").fadeTo(200, 1);
             // generate the form to define a window
             var editor = new JSONEditor($(formContainer).find('#define-window')[0], {
                 schema: windowSchema,
@@ -223,8 +223,8 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'window', 'designView
                 var textNode = $('#' + i).find('.windowNameNode');
                 textNode.html(editor.getValue().name);
 
-				$('#' + i).removeClass('incomplete-element');
-				$('#' + i).prop('title', '');
+                $('#' + i).removeClass('incomplete-element');
+                $('#' + i).prop('title', '');
 
                 // close the form window
                 self.consoleListManager.removeFormConsole(formConsole);
@@ -272,7 +272,7 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'window', 'designView
             var savedAnnotations = clickedElement.getAnnotationList();
             var annotations = [];
             _.forEach(savedAnnotations, function (savedAnnotation) {
-                annotations.push({annotation: savedAnnotation});
+                annotations.push({ annotation: savedAnnotation });
             });
             var functionName = clickedElement.getFunction();
             var savedParameterValues = clickedElement.getParameters();
