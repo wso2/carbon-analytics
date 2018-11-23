@@ -507,6 +507,8 @@ define(['log', 'jquery', 'lodash', 'sourceOrSinkAnnotation', 'mapAnnotation', 'p
                 self.designViewContainer.removeClass('disableContainer');
                 self.toggleViewButton.removeClass('disableContainer');
             } else {
+            	$('#' + id).addClass('selected-element');
+            	$(".overlayed-container").fadeTo(200, 1);
                 var streamList = self.configurationData.getSiddhiAppConfig().getStreamList();
                 var connectedElement = clickedElement.connectedElementName;
                 var predefinedSinks =  _.orderBy(this.configurationData.rawExtensions["sink"], ['name'],['asc']);
@@ -631,7 +633,6 @@ define(['log', 'jquery', 'lodash', 'sourceOrSinkAnnotation', 'mapAnnotation', 'p
 
                 // if sink type is defined
                 if (type) {
-                    $('#' + id).addClass('currently-selected-element');
                     $('#define-sink').find('#sink-type option').filter(function () {
                         return ($(this).val().toLowerCase() == (type.toLowerCase()));
                     }).prop('selected', true);
@@ -842,9 +843,8 @@ define(['log', 'jquery', 'lodash', 'sourceOrSinkAnnotation', 'mapAnnotation', 'p
 
                     var textNode = $('#' + id).find('.sinkNameNode');
                     textNode.html(selectedSinkType);
-                    if ($('#' + id).hasClass('incomplete-element')) {
-                        $('#' + id).removeClass('incomplete-element');
-                    }
+
+					$('#' + id).removeClass('incomplete-element');
                     $('#' + id).prop('title', '');
 
                     // set the isDesignViewContentChanged to true

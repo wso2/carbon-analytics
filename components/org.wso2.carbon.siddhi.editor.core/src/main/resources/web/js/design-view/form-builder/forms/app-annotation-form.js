@@ -49,6 +49,7 @@ define(['require', 'log', 'jquery', 'lodash'],
             // design view container and toggle view button are enabled
             self.designViewContainer.addClass('disableContainer');
             self.toggleViewButton.addClass('disableContainer');
+            $(".overlayed-container").fadeTo(200, 1);
 
             var siddhiAppConfig = self.configurationData.getSiddhiAppConfig();
             var siddhiAppName = siddhiAppConfig.getSiddhiAppName();

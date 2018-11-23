@@ -63,6 +63,8 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
             self.toggleViewButton.addClass('disableContainer');
 
             var id = $(element).parent().attr('id');
+            $('#' + id).addClass('selected-element');
+            $(".overlayed-container").fadeTo(200, 1);
             var clickedElement = self.configurationData.getSiddhiAppConfig().getWindowFilterProjectionQuery(id);
             if (!clickedElement.getQueryInput() || !clickedElement.getQueryInput().getFrom()) {
                 DesignViewUtils.prototype.warnAlert('Connect an input element');
@@ -1328,6 +1330,9 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
                         queryOutput.setOutput(outputObject);
                         queryOutput.setType(outputType);
                     }
+
+					$('#' + id).removeClass('incomplete-element');
+					$('#' + id).prop('title', '');
 
                     // perform JSON validation
                     JSONValidator.prototype.validateWindowFilterProjectionQuery(clickedElement);

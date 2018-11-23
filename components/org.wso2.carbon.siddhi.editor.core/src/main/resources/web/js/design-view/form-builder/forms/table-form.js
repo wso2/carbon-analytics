@@ -600,7 +600,8 @@ define(['log', 'jquery', 'lodash', 'attribute', 'table', 'storeAnnotation', 'des
             var self = this;
             var id = $(element).parent().attr('id');
             var clickedElement = self.configurationData.getSiddhiAppConfig().getTable(id);
-
+			$('#' + id).addClass('selected-element');
+			$(".overlayed-container").fadeTo(200, 1);
             var propertyDiv = $('<div class = "table-form-container table-div"> <div id="property-header"> <h3> Table' +
                 ' Configuration </h3> </div> <h4> Name: </h4> <input type="text" id="tableName" class = "clearfix">' +
                 '<label class="error-message" id="tableNameErrorMessage"> </label> <div id = "define-attribute"> </div>' +
@@ -740,7 +741,6 @@ define(['log', 'jquery', 'lodash', 'attribute', 'table', 'storeAnnotation', 'des
                 var wrappedHtml = attributeFormTemplate([{ name: "", type: "string" }]);
                 $('#define-attribute').html(wrappedHtml);
             } else {
-                $('#' + id).addClass('currently-selected-element');
                 $('#tableName').val(name);
                 var savedAttributes = clickedElement.getAttributeList();
 

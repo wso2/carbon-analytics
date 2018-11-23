@@ -378,6 +378,8 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'stream', 'designView
                 log.error(errorMessage);
                 throw errorMessage;
             }
+			$('#' + id).addClass('selected-element');
+			$(".overlayed-container").fadeTo(200, 1);
             var propertyDiv = $('<div class = "stream-form-container"><div id="property-header"><h3>Stream' +
                 ' Configuration</h3></div> <h4>Name: </h4> <input type="text" id="streamName" class="clearfix">' +
                 '<label class="error-message" id="streamNameErrorMessage"></label> <div id="define-attribute"></div>' +
@@ -444,7 +446,6 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'stream', 'designView
                 var wrappedHtml = attributeFormTemplate([{ name: "", type: "string" }]);
                 $('#define-attribute').html(wrappedHtml);
             } else {
-                $('#' + id).addClass('currently-selected-element');
                 //add the saved name to the input field
                 $('#streamName').val(name);
                 //load the saved attributes
@@ -482,7 +483,7 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'stream', 'designView
                                         if (!predefinedAnnotationElement.isMandatory) {
                                             checkedAnnotations.push(savedAnnotationElement.key);
                                         }
-                                        predefinedAnnotationElement.value = savedAnnotationElement.value
+                                        predefinedAnnotationElement.value = savedAnnotationElement.value;
                                     }
                                 })
                             })
@@ -646,9 +647,8 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'stream', 'designView
 
                 var textNode = $('#' + id).find('.streamNameNode');
                 textNode.html(streamName);
-                if ($('#' + id).hasClass('incomplete-element')) {
-                    $('#' + id).removeClass('incomplete-element');
-                }
+
+				$('#' + id).removeClass('incomplete-element');
                 $('#' + id).prop('title', '');
 
                 self.designViewContainer.removeClass('disableContainer');

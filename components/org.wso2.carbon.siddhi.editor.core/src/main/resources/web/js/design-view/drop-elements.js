@@ -630,12 +630,12 @@ define(['require', 'log', 'lodash', 'jquery', 'partition', 'stream', 'query', 'f
                 //add the new aggregation element to aggregation list
                 var aggregationOptions = {};
                 _.set(aggregationOptions, 'id', i);
-                _.set(aggregationOptions, 'name', i);
+                _.set(aggregationOptions, 'name', undefined);
                 var aggregation = new Aggregation(aggregationOptions);
                 self.configurationData.getSiddhiAppConfig().addAggregation(aggregation);
 
                 // perform JSON validation
-                JSONValidator.prototype.validateAggregation(aggregation);
+                JSONValidator.prototype.validateAggregation(aggregation, true);
             }
 
             var node = $('<div>' + name + '</div>');

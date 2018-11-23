@@ -57,6 +57,8 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
             self.toggleViewButton.addClass('disableContainer');
 
             var id = $(element).parent().attr('id');
+            $('#' + id).addClass('selected-element');
+            $(".overlayed-container").fadeTo(200, 1);
             var clickedElement = self.configurationData.getSiddhiAppConfig().getPatternQuery(id);
             if (!clickedElement.getQueryInput()
                 || clickedElement.getQueryInput().getConnectedElementNameList().length === 0) {
@@ -1144,6 +1146,9 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
                         queryOutput.setOutput(outputObject);
                         queryOutput.setType(outputType);
                     }
+
+					$('#' + id).removeClass('incomplete-element');
+					$('#' + id).prop('title', '');
 
                     // perform JSON validation
                     JSONValidator.prototype.validatePatternOrSequenceQuery(clickedElement, 'Pattern Query');
