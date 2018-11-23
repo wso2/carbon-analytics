@@ -16,7 +16,7 @@
  * under the License.
  */
 
-.source-view-enabled {
+ .source-view-enabled {
     height: 100%;
 }
 
@@ -606,8 +606,8 @@ a.list-group-item, button.list-group-item {
 }
 
 .error-element {
-    border: 1px solid #FF0000;
-    box-shadow: 0 0 1px 2px #FF0000;
+	border: 1px solid #FF0000;
+	box-shadow: 0 0 1px 2px #FF0000;
 }
 
 .js-tree-error-node {
@@ -716,8 +716,8 @@ a.list-group-item, button.list-group-item {
 
 .clearfix {
 	display: block;
-    content: "";
-    clear: both;
+	content: "";
+	clear: both;
 }
 
 .stream-form-container .attribute .attr-nav a .fw-delete,
@@ -788,9 +788,9 @@ a.list-group-item, button.list-group-item {
 
 .stream-form-container  .jstree-clicked {
 	background: #5F5B5A;
-    color:black;
-    border-radius: 2px;
-    box-shadow: inset 0 0 1px #999999;
+	color:black;
+	border-radius: 2px;
+	box-shadow: inset 0 0 1px #999999;
 }
 
 .stream-form-container .jstree-hovered {
@@ -824,8 +824,8 @@ a.list-group-item, button.list-group-item {
 .source-sink-form-container,
 .table-form-container {
 	float:left;
-    display:inline-block;
-    padding: 5px;
+	display:inline-block;
+	padding: 5px;
 }
 
 .design-view-form-content .source-div,
@@ -922,13 +922,13 @@ a.list-group-item, button.list-group-item {
 .stream-form-container .btn-default,
 .table-form-container .btn-default {
 	color: #ccc;
-    background: #2c2c2c;
+	background: #2c2c2c;
 	margin-top: 15px;
 }
 
 .table-form-container #table-annotations .btn-add-annot-value {
 	margin-top: 0px;
-    margin-bottom: 10px;
+	margin-bottom: 10px;
 }
 
 .source-sink-form-container .mandatory-option-symbol,
