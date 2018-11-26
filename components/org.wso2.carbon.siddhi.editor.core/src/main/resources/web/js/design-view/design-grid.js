@@ -61,6 +61,7 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
                 throw errorMessage;
             }
             this.options = options;
+            this.rawExtensions = options.rawExtensions;
             this.configurationData = this.options.configurationData;
             this.container = this.options.container;
             this.application = this.options.application;
@@ -1913,10 +1914,6 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
             var elementId;
             if (isCodeToDesignMode !== undefined && !isCodeToDesignMode) {
                 elementId = self.getNewAgentId();
-                // design view container is disabled to prevent the user from dropping any elements before initializing
-                // a source element
-                self.designViewContainer.addClass('disableContainer');
-                self.toggleViewButton.addClass('disableContainer');
             } else if (isCodeToDesignMode !== undefined && isCodeToDesignMode) {
                 if (sourceId !== undefined) {
                     elementId = sourceId;
@@ -1942,10 +1939,6 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
             var elementId;
             if (isCodeToDesignMode !== undefined && !isCodeToDesignMode) {
                 elementId = self.getNewAgentId();
-                // design view container is disabled to prevent the user from dropping any elements before initializing
-                // a sink element
-                self.designViewContainer.addClass('disableContainer');
-                self.toggleViewButton.addClass('disableContainer');
             } else if (isCodeToDesignMode !== undefined && isCodeToDesignMode) {
                 if (sinkId !== undefined) {
                     elementId = sinkId;
@@ -1970,10 +1963,6 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
             var elementId;
             if (isCodeToDesignMode !== undefined && !isCodeToDesignMode) {
                 elementId = self.getNewAgentId();
-                // design view container is disabled to prevent the user from dropping any elements before initializing
-                // a stream element
-                self.designViewContainer.addClass('disableContainer');
-                self.toggleViewButton.addClass('disableContainer');
             } else if (isCodeToDesignMode !== undefined && isCodeToDesignMode) {
                 if (streamId !== undefined) {
                     elementId = streamId;
@@ -1999,10 +1988,6 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
             var elementId;
             if (isCodeToDesignMode !== undefined && !isCodeToDesignMode) {
                 elementId = self.getNewAgentId();
-                // design view container is disabled to prevent the user from dropping any elements before initializing
-                // a stream element
-                self.designViewContainer.addClass('disableContainer');
-                self.toggleViewButton.addClass('disableContainer');
             } else if (isCodeToDesignMode !== undefined && isCodeToDesignMode) {
                 if (tableId !== undefined) {
                     elementId = tableId;

@@ -30,6 +30,7 @@ public class ParameterMetaData {
     private List<DataType> type;
     private Boolean optional;
     private String description;
+    private String defaultValue;
 
     public String getName() {
         return name;
@@ -61,5 +62,13 @@ public class ParameterMetaData {
 
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    public void setDefaultValue(String defaultValue) {
+        this.defaultValue = defaultValue;
+    }
+
+    public  String getDefaultValue() {
+        return  this.defaultValue;
     }
 }
