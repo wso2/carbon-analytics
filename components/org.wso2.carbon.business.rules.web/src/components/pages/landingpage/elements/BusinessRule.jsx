@@ -120,45 +120,40 @@ export default class BusinessRule extends Component {
         );
     }
 
-    /**
-     * Returns the Deploy button
-     * @returns {Component}     Retry Deploy button
-     */
-    displayDeployButton() {
-        switch (this.props.status) {
-            
-            case 1:
-                return this.displayDescribedDeployButton('Deploy');
-            case 3:
-            case 2:
-                return this.displayDescribedDeployButton('Retry Deploy');
-            case 4:
-                return this.displayDescribedDeployButton('Retry Deploy');
-            case 8:
-                return this.displayDescribedDeployButton('Deploy');
-            default:
-                return null;
-        }
+    displayDescribedRetryUnDeployButton(title) {
+        return (
+            <Tooltip id="tooltip-right" title={title} placement="bottom">
+                <IconButton
+                    aria-label={title}
+                    onClick={() => this.handleUnDeployButtonClick()}
+                >
+                    <RefreshIcon />
+                </IconButton>
+            </Tooltip>
+        );
     }
 
-    /**
-     * Returns the Un-deploy button
-     * @returns {Component}     Tooltip Component, containing IconButton
-     */
-    displayUndeployButton() {
+    displayButton() {
         switch (this.props.status) {
             case 0:
-            return this.displayDescribedUnDeployButton('Un-deploy');
+                return this.displayDescribedUnDeployButton('Un-deploy');
+            case 1:
+                return this.displayDescribedDeployButton('Deploy');
             case 2:
+                return this.displayDescribedDeployButton('Retry Deploy');
             case 3:
-                 return this.displayDescribedUnDeployButton('Retry undeploy');
-             case 9:    
-                return this.displayDescribedUnDeployButton('Retry Undeploy');
+                 return this.displayDescribedRetryUnDeployButton('Retry undeploy');
+            case 4:
+                return this.displayDescribedDeployButton('Retry Deploy');    
+            case 8:
+                return this.displayDescribedDeployButton('Deploy');     
+            case 9:    
+                return this.displayDescribedRetryUnDeployButton('Retry Undeploy');
             default:
                 return null;
         }
     }
-
+    
     /**
      * Returns the Deployment Info button
      * @returns {Component}     Tooltip Component, containing IconButton
@@ -249,9 +244,7 @@ export default class BusinessRule extends Component {
                     &nbsp;
                     {this.displayDeleteButton()}
                     &nbsp;
-                    {this.displayUndeployButton()}
-                    &nbsp;
-                    {this.displayDeployButton()}
+                    {this.displayButton()}
                 </TableCell>
             );
         } else {

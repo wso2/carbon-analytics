@@ -641,14 +641,14 @@ public class TemplateManagerService implements BusinessRulesService {
                 return TemplateManagerConstants.ERROR;
             }
             int deployedNodesCount = 0;
-            for (String nodeURL : nodeList) {
-                try {
-                    updateDeployedArtifacts(nodeURL, derivedArtifacts);
-                    deployedNodesCount += 1;
-                } catch (SiddhiAppsApiHelperException e) {
-                    log.error(String.format("Failed to update the deployed artifact for business rule %s ",
-                            removeCRLFCharacters(businessRuleUUID)), e);
-                }
+                for (String nodeURL : nodeList) {
+                    try {
+                        updateDeployedArtifacts(nodeURL, derivedArtifacts);
+                        deployedNodesCount += 1;
+                    } catch (SiddhiAppsApiHelperException e) {
+                        log.error(String.format("Failed to update the deployed artifact for business rule %s ",
+                                removeCRLFCharacters(businessRuleUUID)), e);
+                    }
             }
             // Set status with respect to deployed node count
             if (deployedNodesCount == nodeList.size()) {
@@ -695,7 +695,7 @@ public class TemplateManagerService implements BusinessRulesService {
                         businessRulesUUID + "'. ", e);
             }
             int nodeURLCount = 0;
-            if (currentState != TemplateManagerConstants.SAVED) {
+            if (currentState == TemplateManagerConstants.DEPLOYED ) {
                 for (String nodeURL : nodeList) {
                     outerloop:
                     for (int i = 0; i < templates.size(); i++) {
@@ -719,6 +719,8 @@ public class TemplateManagerService implements BusinessRulesService {
                     }
                     nodeURLCount = nodeURLCount + 1;
                 }
+            } else {
+                status = TemplateManagerConstants.PARTIALLY_UNDEPLOYED;
             }
             if (nodeURLCount == nodeList.size()) {
                 status = TemplateManagerConstants.SAVED;
@@ -738,7 +740,7 @@ public class TemplateManagerService implements BusinessRulesService {
                         businessRulesUUID + "'. ", e);
             }
             int nodeURLCount = 0;
-            if (currentState != TemplateManagerConstants.SAVED) {
+            if (currentState == TemplateManagerConstants.DEPLOYED) {
                 for (String nodeURL : nodeList) {
                     try {
                         isSuccessfullyUndeployed = undeploySiddhiApp(nodeURL, businessRuleFromScratch.getUuid());
@@ -756,6 +758,8 @@ public class TemplateManagerService implements BusinessRulesService {
                     }
                     nodeURLCount = nodeURLCount + 1;
                 }
+            } else {
+                status = TemplateManagerConstants.PARTIALLY_UNDEPLOYED;
             }
             if (nodeURLCount == nodeList.size()) {
                 status = TemplateManagerConstants.SAVED;
@@ -973,19 +977,20 @@ public class TemplateManagerService implements BusinessRulesService {
         if (nodeList == null) {
             return TemplateManagerConstants.ERROR;
         }
+        outerloop:
         for (String nodeURL : nodeList) {
             if (businessRule instanceof BusinessRuleFromScratch) {
                 Integer queriedState = getSiddhiAppDeploymentState(businessRule.getUuid(), nodeURL,
                         businessRule.getUuid());
                 if (queriedState != null) {
-                    return queriedState;
+                    break outerloop;
                 }
             } else {
                 for (int i = 0; i < artifactCount; i++) {
                     String siddhiAppName = businessRule.getUuid() + "_" + i;
                     Integer queriedState = getSiddhiAppDeploymentState(businessRule.getUuid(), nodeURL, siddhiAppName);
                     if (queriedState != null) {
-                        return queriedState;
+                        break outerloop;
                     }
                 }
             }
