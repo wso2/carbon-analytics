@@ -554,6 +554,14 @@ define(['ace/ace', 'jquery', 'lodash', 'log','dialogs','./service-client','welco
                 this._exportFileDialog.render();
             };
 
+            this.exportAsDocker = function() {
+                if (_.isNil(this._dockerExportDialog)) {
+                    this._dockerExportDialog = new Dialogs.docker_export_dialog(app);
+                }
+                this._dockerExportDialog.render();
+                this._dockerExportDialog.show();
+            };
+
             this.handleExport = function(options) {
                 var activeTab = app.tabController.getActiveTab();
                 var file = activeTab.getFile();
@@ -671,6 +679,8 @@ define(['ace/ace', 'jquery', 'lodash', 'log','dialogs','./service-client','welco
 
             // Export file export dialog
             app.commandManager.registerHandler('export-file-export-dialog', this.exportFileExportDialog, this);
+
+            app.commandManager.registerHandler('export-docker', this.exportAsDocker, this);
 
             app.commandManager.registerHandler('open-replace-file-confirm-dialog', this.openReplaceFileConfirmDialog,
                 this);

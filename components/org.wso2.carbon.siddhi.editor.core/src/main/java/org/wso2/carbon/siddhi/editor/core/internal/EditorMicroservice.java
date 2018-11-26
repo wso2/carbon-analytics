@@ -39,12 +39,14 @@ import org.wso2.carbon.config.provider.ConfigProvider;
 import org.wso2.carbon.siddhi.editor.core.EditorSiddhiAppRuntimeService;
 import org.wso2.carbon.siddhi.editor.core.Workspace;
 import org.wso2.carbon.siddhi.editor.core.commons.metadata.MetaData;
+import org.wso2.carbon.siddhi.editor.core.commons.request.DockerDownloadRequest;
 import org.wso2.carbon.siddhi.editor.core.commons.request.ValidationRequest;
 import org.wso2.carbon.siddhi.editor.core.commons.response.DebugRuntimeResponse;
 import org.wso2.carbon.siddhi.editor.core.commons.response.GeneralResponse;
 import org.wso2.carbon.siddhi.editor.core.commons.response.MetaDataResponse;
 import org.wso2.carbon.siddhi.editor.core.commons.response.Status;
 import org.wso2.carbon.siddhi.editor.core.commons.response.ValidationSuccessResponse;
+import org.wso2.carbon.siddhi.editor.core.exception.DockerGenerationException;
 import org.wso2.carbon.siddhi.editor.core.internal.local.LocalFSWorkspace;
 import org.wso2.carbon.siddhi.editor.core.util.Constants;
 import org.wso2.carbon.siddhi.editor.core.util.DebugCallbackEvent;
@@ -868,6 +870,36 @@ public class EditorMicroservice implements Microservice {
             return Response.status(Response.Status.BAD_REQUEST)
                     .header("Access-Control-Allow-Origin", "*")
                     .entity(e.getMessage())
+                    .build();
+        }
+    }
+
+    /**
+     * Download set of Siddhi files as a docker-compose artifacts archive.
+     *
+     * @param query JSON string with selected artifacts.
+     * @return Docker artifacts
+     */
+    @GET
+    @Path("/docker/download")
+    public Response downloadAsDocker(@QueryParam("q") String query) {
+        Gson gson = new Gson();
+        DockerDownloadRequest request = gson.fromJson(query, DockerDownloadRequest.class);
+
+        // Create zip archive and download
+        DockerUtils dockerUtils = new DockerUtils(configProvider);
+        try {
+            File zipFile = dockerUtils.createArchive(request.getProfile(), request.getFiles());
+            return Response
+                    .status(Response.Status.OK)
+                    .entity(zipFile)
+                    .header("Content-Disposition", "attachment; filename=docker-artifacts.zip")
+                    .build();
+
+        } catch (DockerGenerationException e) {
+            log.error("Cannot generate docker-artifacts archive.", e);
+            return Response
+                    .status(Response.Status.INTERNAL_SERVER_ERROR)
                     .build();
         }
     }
