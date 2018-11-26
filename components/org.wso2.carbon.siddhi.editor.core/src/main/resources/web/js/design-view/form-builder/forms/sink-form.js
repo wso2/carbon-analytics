@@ -246,20 +246,27 @@ define(['log', 'jquery', 'lodash', 'sourceOrSinkAnnotation', 'mapAnnotation', 'p
                 } else {
                     $('#define-attribute #attributeMap-type').val('payloadMap');
                 }
-                for (var streamAttribute of streamAttributes) {
+                for (streamAttribute of streamAttributes) {
+                    attributes.push({ key: streamAttribute.key, value: "" });
+                }
+                for (var mappedAttribute of attributes) {
                     for (var attribute in attributeValues) {
-                        if (streamAttribute.key === attribute) {
-                            attributes.push({ key: attribute, value: attributeValues[attribute] });
+                        if (mappedAttribute.key === attribute) {
+                            mappedAttribute.value = attributeValues[attribute]
                             break;
                         }
                     }
                 }
             } else if (annotationType === constAttribute && attributeType === constList) {
                 $('#define-attribute #attributeMap-type').val('attributeMap');
+                for (streamAttribute of streamAttributes) {
+                    attributes.push({ key: streamAttribute.key, value: "" });
+                }
+
                 var i = 0;
                 for (var attribute in attributeValues) {
                     if (i < streamAttributes.length) {
-                        attributes.push({ key: streamAttributes[i].key, value: attributeValues[attribute] });
+                        attributes[i].value = attributeValues[attribute];
                         i++;
                     }
                 }
@@ -800,7 +807,8 @@ define(['log', 'jquery', 'lodash', 'sourceOrSinkAnnotation', 'mapAnnotation', 'p
                                     var key = $(this).find('.attr-key').val().trim();
                                     var value = $(this).find('.attr-value').val().trim();
                                     if (value == "") {
-                                        $(this).find('.error-message').text('Value is required.')
+                                        $(this).find('.error-message').text('Attribute Value is ' +
+                                            'required')
                                         $(this)[0].scrollIntoView();
                                         $(this).find('.attr-value').addClass('required-input-field');
                                         isError = true;
@@ -816,7 +824,8 @@ define(['log', 'jquery', 'lodash', 'sourceOrSinkAnnotation', 'mapAnnotation', 'p
                                 var value = $('#mapper-attributes .attribute .attr-value:first').val().trim();
                                 //validate the single payload attribute value if it is empty
                                 if (value == "") {
-                                    $('#mapper-attributes .attribute .error-message:first').text('Value is required.')
+                                    $('#mapper-attributes .attribute .error-message:first').text('Payload Value is ' +
+                                        'required')
                                     $('#mapper-attributes .attribute .attr-value:first')[0].scrollIntoView();
                                     $('#mapper-attributes .attribute .attr-value:first').addClass('required-input-field');
                                     isError = true;

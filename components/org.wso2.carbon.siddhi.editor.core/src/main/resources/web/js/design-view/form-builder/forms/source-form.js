@@ -238,24 +238,29 @@ define(['log', 'jquery', 'lodash', 'sourceOrSinkAnnotation', 'mapAnnotation', 'p
                 var attributeValues = savedMapperAttributes.getValue();
             }
             if (attributeType === constList) {
+                for (streamAttribute of streamAttributes) {
+                    attributes.push({ key: streamAttribute.key, value: "" });
+                }
                 var i = 0;
                 for (var attribute in attributeValues) {
                     if (i < streamAttributes.length) {
-                        attributes.push({ key: streamAttributes[i].key, value: attributeValues[attribute] });
+                        attributes[i].value = attributeValues[attribute];
                         i++;
                     }
                 }
             } else if (attributeType === constMap) {
-                for (var streamAttribute of streamAttributes) {
+                for (streamAttribute of streamAttributes) {
+                    attributes.push({ key: streamAttribute.key, value: "" });
+                }
+                for (var mappedAttribute of attributes) {
                     for (var attribute in attributeValues) {
-                        if (streamAttribute.key === attribute) {
-                            attributes.push({ key: attribute, value: attributeValues[attribute] });
+                        if (mappedAttribute.key === attribute) {
+                            mappedAttribute.value = attributeValues[attribute]
                             break;
                         }
                     }
                 }
-            }
-            else {
+            } else {
                 for (var streamAttribute of streamAttributes) {
                     attributes.push({ key: streamAttribute.key, value: "" });
                 }
@@ -734,7 +739,7 @@ define(['log', 'jquery', 'lodash', 'sourceOrSinkAnnotation', 'mapAnnotation', 'p
                                 var key = $(this).find('.attr-key').val().trim();
                                 var value = $(this).find('.attr-value').val().trim();
                                 if (value == "") {
-                                    $(this).find('.error-message').text('Value is required.');
+                                    $(this).find('.error-message').text('Attribute Value is required.');
                                     $(this)[0].scrollIntoView();
                                     $(this).find('.attr-value').addClass('required-input-field');
                                     isError = true;
