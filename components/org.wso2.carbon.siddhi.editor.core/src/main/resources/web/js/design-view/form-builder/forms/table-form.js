@@ -461,7 +461,7 @@ define(['log', 'jquery', 'lodash', 'attribute', 'table', 'storeAnnotation', 'des
                     });
                     if (annotationValues.length == 0) {
                         $(this).find('.annotation-value:eq(0)').addClass('required-input-field');
-                        $(this).find('.error-message:eq(0)').text("Value is required.");
+                        $(this).find('.error-message:eq(0)').text("Minimum one value is required");
                         isErrorOccurred = true;
                         return false;
                     }
