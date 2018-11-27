@@ -939,19 +939,19 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
                             }
                         });
                         $('#' + connectionObject.id).popover("show");
-                        fadeInCanvas();
+                        $(".fullscreen-container").fadeTo(200, 1);
 //                 Custom jQuery to hide popover on click of the close button
                         $("#" + connectionObject.id).siblings(".popover").on("click", ".popover-footer .btn.yes",
                             function () {
                                 if (connectionObject.connector !== null) {
                                     self.jsPlumbInstance.deleteConnection(connectionObject);
                                 }
-                                fadeOutCanvas();
+                                $(".fullscreen-container").fadeOut(200);
                                 $(this).parents(".popover").popover('hide');
                             });
                         $("#" + connectionObject.id).siblings(".popover").on("click", ".popover-footer .btn.no",
                             function () {
-                                fadeOutCanvas();
+                                $(".fullscreen-container").fadeOut(200);
                                 $(this).parents(".popover").popover('hide');
                                 close_icon_overlay.setVisible(false);
                             });
@@ -962,21 +962,12 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
                                 if (!$(this).is(e.target) && $(this).has(e.target).length === 0 && $('.popover').has(
                                     e.target).length === 0) {
                                     $(this).popover('hide');
-                                    fadeOutCanvas();
+                                    $(".fullscreen-container").fadeOut(200);
                                     close_icon_overlay.setVisible(false);
                                 }
                             });
                         });
                     }
-
-                    function fadeInCanvas() {
-                        $(".fullscreen-container").fadeTo(200, 1);
-                    }
-
-                    function fadeOutCanvas() {
-                        $(".fullscreen-container").fadeOut(200);
-                    }
-
                     if (isConnectionMadeInsideAPartition) {
                         close_icon_overlay.setVisible(false);
                         // show the close icon when mouse is over the connection

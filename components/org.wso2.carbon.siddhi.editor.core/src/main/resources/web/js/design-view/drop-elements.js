@@ -1166,15 +1166,6 @@ define(['require', 'log', 'lodash', 'jquery', 'partition', 'stream', 'query', 'f
                 element.find('.partition-element-prop-icon').hide();
             });
 
-//          This function will highlight the popover while fading the background
-            function fadeInCanvas() {
-                $(".fullscreen-container").fadeTo(200, 1);
-            }
-
-            function fadeOutCanvas() {
-                $(".fullscreen-container").fadeOut(200);
-            }
-
 //          Pop-over element for displaying the popover when delete button clicked
             function showPopOver(dataObj, element) {
                 $(dataObj).popover({
@@ -1186,9 +1177,9 @@ define(['require', 'log', 'lodash', 'jquery', 'partition', 'stream', 'query', 'f
                     }
                 });
                 $(dataObj).popover("show")
-                fadeInCanvas();
+                $(".fullscreen-container").fadeTo(200, 1);
                 $(element).on("click", ".popover-footer .btn.no", function () {
-                    fadeOutCanvas();
+                    $(".fullscreen-container").fadeOut(200);
                     $(this).parents(".popover").popover('hide');
                     $('#' + newElement[0].id).removeClass("selected-element");
                 });
@@ -1201,7 +1192,7 @@ define(['require', 'log', 'lodash', 'jquery', 'partition', 'stream', 'query', 'f
                         deleteElement();
                     }
                     $(this).parents(".popover").popover('hide');
-                    fadeOutCanvas();
+                    $(".fullscreen-container").fadeOut(200);
                 });
 //              Dismiss the pop-over by clicking outside
                 $('.fullscreen-container').off('click');
@@ -1210,7 +1201,7 @@ define(['require', 'log', 'lodash', 'jquery', 'partition', 'stream', 'query', 'f
                         if (!$(this).is(e.target) && $(this).has(e.target).length === 0 && $('.popover').has(
                             e.target).length === 0) {
                             $(this).popover('hide');
-                            fadeOutCanvas();
+                            $(".fullscreen-container").fadeOut(200);
                             $('#' + newElement[0].id).removeClass("selected-element");
                         }
                     });
@@ -1220,9 +1211,7 @@ define(['require', 'log', 'lodash', 'jquery', 'partition', 'stream', 'query', 'f
             newElement.on('click', '.element-close-icon', function () {
                 $('#' + newElement[0].id).addClass("selected-element");
                 showPopOver(this, newElement);
-
             });
-
             // Deleting the element
             function deleteElement() {
                 // set the isDesignViewContentChanged to true
@@ -1284,7 +1273,7 @@ define(['require', 'log', 'lodash', 'jquery', 'partition', 'stream', 'query', 'f
 
                 self.configurationData.getSiddhiAppConfig()
                     .setFinalElementCount(self.configurationData.getSiddhiAppConfig().getFinalElementCount() - 1);
-                fadeOutCanvas();
+                $(".fullscreen-container").fadeOut(200);
                 $(this).parents(".popover").popover('hide');
             }
 
