@@ -1341,6 +1341,43 @@
 </div>
 
 
+<!--Start: Docker Export Modal-->
+<div class="modal fade modalDockerExport" id="modalDockerExport" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content clearfix">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <i class="fw fw-cancel about-dialog-close"></i></button>
+                <h3 class="modal-title" id="aboutDockerExportLabel">Export as Docker</h3>
+            </div>
+            <div class="modal-body add-margin-top-2x add-margin-bottom-2x">
+                <form>
+                    <h4>Export as Docker</h4>
+                    <hr/>
+                    <div class="form-group">
+                        <label for="dockerProfile">Profile:</label>
+                        <select class="form-control" id="dockerProfile">
+                            <option value="editor">Editor</option>
+                            <option value="worker">Worker</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="dockerProfile">Files to be included:</label>
+                        <div id="file-tree" class="docker-export-file-tree"></div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal" id="exportButton"
+                        disabled="disabled">Export</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<iframe id="frm-download" style="display: none;"></iframe>
+
+
 <script src="/editor/commons/lib/requirejs-2.3.2/require.js"></script>
 <script type="text/javascript">
     requirejs.config({
@@ -1703,6 +1740,10 @@
             settings_dialog:{
                 selector: "#modalSettings",
                 submit_button: "#saveSettingsButton"
+            },
+            docker_export_dialog: {
+                selector: '#modalDockerExport',
+                submitButton: '#exportButton'
             },
             output_controller: {
                 container: "#console-container",
