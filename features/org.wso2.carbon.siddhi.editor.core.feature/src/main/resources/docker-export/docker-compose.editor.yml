@@ -25,4 +25,4 @@ services:
       timeout: 120s
       retries: 5
     volumes:
-      - ./siddhi-files:/home/wso2carbon/siddhi-files
+      - ./siddhi-files:/home/wso2carbon/wso2-artifact-volume/wso2/editor/deployment/workspace
