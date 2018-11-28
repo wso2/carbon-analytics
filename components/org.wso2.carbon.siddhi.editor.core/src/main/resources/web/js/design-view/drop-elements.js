@@ -17,7 +17,7 @@
  */
 
 define(['require', 'log', 'lodash', 'jquery', 'partition', 'stream', 'query', 'formBuilder', 'aggregation',
-    'jsonValidator', 'sourceOrSinkAnnotation', 'stream', 'table', 'bootstrap'],
+    'jsonValidator', 'sourceOrSinkAnnotation', 'stream', 'table',],
     function (require, log, _, $, Partition, Stream, Query, FormBuilder, Aggregation, JSONValidator,
         SourceOrSinkAnnotation, Stream, Table) {
 
