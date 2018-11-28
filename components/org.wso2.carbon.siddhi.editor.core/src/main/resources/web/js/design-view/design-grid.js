@@ -17,7 +17,7 @@
  */
 define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dropElements', 'dagre', 'edge',
         'windowFilterProjectionQueryInput', 'joinQueryInput', 'patternOrSequenceQueryInput', 'queryOutput',
-        'partitionWith', 'jsonValidator', 'bootstrap'],
+        'partitionWith', 'jsonValidator'],
 
     function (require, log, $, Backbone, _, DesignViewUtils, DropElements, dagre, Edge,
               WindowFilterProjectionQueryInput, JoinQueryInput, PatternOrSequenceQueryInput, QueryOutput,

@@ -1208,7 +1208,7 @@ define(['require', 'log', 'lodash', 'jquery', 'partition', 'stream', 'query', 'f
                         return $('.pop-over').html();
                     }
                 });
-                $(dataObj).popover("show")
+                $(dataObj).popover("show");
                 $(".overlayed-container ").fadeTo(200, 1);
                 $(element).on("click", ".popover-footer .btn.no", function () {
                     $(".overlayed-container ").fadeOut(200);
