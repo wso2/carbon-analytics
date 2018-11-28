@@ -632,3 +632,7 @@ h3.popover-title {
 .selected-element .element-prop-icon, .selected-element .partition-element-prop-icon {
   display: none !important;
 }
+
+.selected-element .element-close-icon {
+    display: inline !important;
+}

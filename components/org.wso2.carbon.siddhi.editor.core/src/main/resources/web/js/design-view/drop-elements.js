@@ -1235,6 +1235,7 @@ define(['require', 'log', 'lodash', 'jquery', 'partition', 'stream', 'query', 'f
                             $(this).popover('hide');
                             $(".overlayed-container ").fadeOut(200);
                             $('#' + newElement[0].id).removeClass("selected-element");
+                            $('#' + newElement[0].id).children().removeClass("selected-element");
                         }
                     });
                 });
