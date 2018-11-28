@@ -271,7 +271,7 @@ a.ui-button:active, .ui-button:active,
   font-size: 1.4rem;
 }
 
-/* Cross platform */ 
+/* Cross platform */
 
 @media (min-width: 1440px) and (max-width: 1679px) {
   html {
@@ -518,6 +518,11 @@ margin-bottom: 5px;
   margin-bottom: 15px;
 }
 
+/* Export as docker modal */
+.modalDockerExport .modal-dialog {
+  width: 500px;
+}
+
 body.sticky-footer {
   padding-bottom: 20px;
 }
@@ -564,5 +569,12 @@ body.sticky-footer {
 	left: 0px;
 	right: 0px;
 	z-index: 90;
-	background: rgba(90, 90, 90, 0.5);
+  background: rgba(90, 90, 90, 0.5);
+}
+
+.docker-export-file-tree {
+  border: 1px solid #444;
+  height: 200px;
+  padding: 5px;
+  background-color: #2C2C2C;
 }
