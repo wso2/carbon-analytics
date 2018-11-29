@@ -1377,6 +1377,57 @@
 
 <iframe id="frm-download" style="display: none;"></iframe>
 
+<div class="modal fade modalSampleEvent" id="modalSampleEvent" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content clearfix">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <i class="fw fw-cancel  about-dialog-close"></i></button>
+                <h3 class="modal-title" id="sampleEvent">Generate sample event</h3>
+            </div>
+            <div class="modal-body add-margin-top-2x add-margin-bottom-2x">
+                <form id="sampleEventForm">
+                    <div class="form-group">
+                        <label>
+                            Siddhi App Name
+                        </label>
+                        <select name="siddhi-app-name" id="sample-event-siddhi-app-name" class="form-control">
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>
+                            Stream Name
+                        </label>
+                        <select name="stream-name" class="form-control">
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>
+                            Event Format
+                        </label>
+                        <select class="form-control" name="event-format">
+                            <option value="json" selected="selected">JSON</option>
+                            <option value="xml">XML</option>
+                            <option value="text">text</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <button type="submit" class="btn btn-primary" name="generateSampleEvent"
+                                id="generateSampleEventButton">
+                            Generate
+                        </button>
+                    </div>
+                    <div class="form-group">
+                        <textarea class="form-control" name="generatedSampleEvent"
+                                  style="height: 250px">Select App, Stream and event type to get the sample event here..
+                        </textarea>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
 
 <script src="/editor/commons/lib/requirejs-2.3.2/require.js"></script>
 <script type="text/javascript">
@@ -1430,6 +1481,7 @@
             file_menu: "commons/js/menu-bar/file-menu",
             edit_menu: "commons/js/menu-bar/edit-menu",
             run_menu: "commons/js/menu-bar/run-menu",
+            tools_menu: "commons/js/menu-bar/tools-menu",
             menu_item: "commons/js/menu-bar/menu-item",
             file_browser: "commons/js/file-browser/file-browser",
             undo_manager: "commons/js/undo-manager/undo-manager",
@@ -1744,6 +1796,10 @@
             docker_export_dialog: {
                 selector: '#modalDockerExport',
                 submitButton: '#exportButton'
+            },
+            sample_event_dialog:{
+                selector: "#modalSampleEvent",
+                submit_button: "#generateSampleEventButton"
             },
             output_controller: {
                 container: "#console-container",

@@ -25,6 +25,7 @@ import com.google.gson.JsonObject;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
+import org.json.JSONObject;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceRegistration;
 import org.osgi.service.component.annotations.Activate;
@@ -53,6 +54,7 @@ import org.wso2.carbon.siddhi.editor.core.util.DebugCallbackEvent;
 import org.wso2.carbon.siddhi.editor.core.util.DebugStateHolder;
 import org.wso2.carbon.siddhi.editor.core.util.LogEncoder;
 import org.wso2.carbon.siddhi.editor.core.util.MimeMapper;
+import org.wso2.carbon.siddhi.editor.core.util.SampleEventGenerator;
 import org.wso2.carbon.siddhi.editor.core.util.SecurityUtil;
 import org.wso2.carbon.siddhi.editor.core.util.SourceEditorUtils;
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.EventFlow;
@@ -71,6 +73,7 @@ import org.wso2.siddhi.core.SiddhiManager;
 import org.wso2.siddhi.core.debugger.SiddhiDebugger;
 import org.wso2.siddhi.core.exception.SiddhiAppCreationException;
 import org.wso2.siddhi.core.util.SiddhiComponentActivator;
+import org.wso2.siddhi.query.api.definition.StreamDefinition;
 import org.wso2.siddhi.query.api.exception.SiddhiAppContextException;
 
 import java.io.File;
@@ -81,7 +84,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.AccessDeniedException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -99,6 +101,7 @@ import java.util.stream.Collectors;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
+import javax.ws.rs.NotFoundException;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
@@ -901,6 +904,48 @@ public class EditorMicroservice implements Microservice {
             return Response
                     .status(Response.Status.INTERNAL_SERVER_ERROR)
                     .build();
+        }
+    }
+
+    /**
+     * Get sample event for a particular event stream.
+     *
+     * @param appName Siddhi app name.
+     * @param streamName Stream name.
+     * @param eventType The event type os the requested event (json, xml, text).
+     * @return Sample event
+     */
+    @GET
+    @Path("/siddhi-apps/{appName}/streams/{streamName}/event/{type}")
+    @Produces({"text/plain"})
+    public Response getDefaultSampleStreamEvent(@PathParam("appName") String appName,
+                                                @PathParam("streamName") String streamName,
+                                                @PathParam("type") String eventType)
+            throws NotFoundException {
+        SiddhiAppRuntime siddhiAppRuntime = EditorDataHolder.getSiddhiManager().getSiddhiAppRuntime(appName);
+        JSONObject errorResponse = new JSONObject();
+        if (siddhiAppRuntime == null) {
+            errorResponse.put("error", "There is no Siddhi App exist with provided name : " + appName);
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(errorResponse.toString()).build();
+        } else {
+            StreamDefinition streamDefinition = siddhiAppRuntime.getStreamDefinitionMap().get(streamName);
+            if (streamDefinition == null) {
+                errorResponse.put("error", "There is no Stream called " + streamName + " in " +
+                        appName + " Siddhi App.");
+                return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(errorResponse.toString()).build();
+            } else {
+                if (eventType.equals(Constants.XML_EVENT)) {
+                    return Response.ok().entity(SampleEventGenerator.generateXMLEvent(streamDefinition)).build();
+                } else if (eventType.equals(Constants.JSON_EVENT)) {
+                    return Response.ok().entity(SampleEventGenerator.generateJSONEvent(streamDefinition)).build();
+                } else if (eventType.equals(Constants.TEXT_EVENT)) {
+                    return Response.ok().entity(SampleEventGenerator.generateTextEvent(streamDefinition)).build();
+                } else {
+                    errorResponse.put("error", "Invalid type: " + eventType + " given to retrieve the sample event.");
+                    return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(errorResponse.toString()).
+                            build();
+                }
+            }
         }
     }
 
