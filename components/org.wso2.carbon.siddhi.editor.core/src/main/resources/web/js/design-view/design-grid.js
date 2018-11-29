@@ -61,6 +61,7 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
                 throw errorMessage;
             }
             this.options = options;
+            this.rawExtensions = options.rawExtensions;
             this.configurationData = this.options.configurationData;
             this.container = this.options.container;
             this.application = this.options.application;
@@ -918,17 +919,59 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
                     var close_icon_overlay = connectionObject.addOverlay([
                         "Custom", {
                             create: function () {
-                                return $('<span><i class="fw fw-delete"></i></span>');
+                                return $(
+                                    '<span><i class="fw fw-delete" id="' + connectionObject.id +
+                                    '"data-toggle="popover"></i></span>');
                             },
                             location: 0.60,
                             id: "close",
                             events: {
                                 click: function () {
-                                    self.jsPlumbInstance.deleteConnection(connectionObject);
+                                    popOverForConnector();
                                 }
                             }
                         }
                     ]);
+
+                    function popOverForConnector() {
+                        $('#' + connectionObject.id).popover({
+                            trigger: 'focus',
+                            title: 'Are you sure you want to delete?',
+                            html: true,
+                            content: function () {
+                                return $('.pop-over').html();
+                            }
+                        });
+                        $('#' + connectionObject.id).popover("show");
+                        $(".overlayed-container ").fadeTo(200, 1);
+                        // Custom jQuery to hide popover on click of the close button
+                        $("#" + connectionObject.id).siblings(".popover").on("click", ".popover-footer .btn.yes",
+                            function () {
+                                if (connectionObject.connector !== null) {
+                                    self.jsPlumbInstance.deleteConnection(connectionObject);
+                                }
+                                $(".overlayed-container ").fadeOut(200);
+                                $(this).parents(".popover").popover('hide');
+                            });
+                        $("#" + connectionObject.id).siblings(".popover").on("click", ".popover-footer .btn.no",
+                            function () {
+                                $(".overlayed-container ").fadeOut(200);
+                                $(this).parents(".popover").popover('hide');
+                                close_icon_overlay.setVisible(false);
+                            });
+                        // Dismiss the pop-over by clicking outside
+                        $('.overlayed-container ').off('click');
+                        $('.overlayed-container ').on('click', function (e) {
+                            $('[data-toggle="popover"]').each(function () {
+                                if (!$(this).is(e.target) && $(this).has(e.target).length === 0 && $('.popover').has(
+                                    e.target).length === 0) {
+                                    $(this).popover('hide');
+                                    $(".overlayed-container ").fadeOut(200);
+                                    close_icon_overlay.setVisible(false);
+                                }
+                            });
+                        });
+                    }
 
                     if (isConnectionMadeInsideAPartition) {
                         close_icon_overlay.setVisible(false);
@@ -938,7 +981,9 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
                         });
                         // hide the close icon when the mouse is not on the connection path
                         connectionObject.bind('mouseleave', function () {
-                            close_icon_overlay.setVisible(false);
+                            if ($("#" + connectionObject.id).siblings(".popover").length == 0) {
+                                close_icon_overlay.setVisible(false);
+                            }
                         });
                     } else {
                         close_icon_overlay.setVisible(false);
@@ -948,7 +993,9 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
                         });
                         // hide the close icon when the mouse is not on the connection path
                         connectionObject.bind('mouseout', function () {
-                            close_icon_overlay.setVisible(false);
+                            if ($("#" + connectionObject.id).siblings(".popover").length == 0) {
+                                close_icon_overlay.setVisible(false);
+                            }
                         });
                     }
                 });
@@ -1913,10 +1960,6 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
             var elementId;
             if (isCodeToDesignMode !== undefined && !isCodeToDesignMode) {
                 elementId = self.getNewAgentId();
-                // design view container is disabled to prevent the user from dropping any elements before initializing
-                // a source element
-                self.designViewContainer.addClass('disableContainer');
-                self.toggleViewButton.addClass('disableContainer');
             } else if (isCodeToDesignMode !== undefined && isCodeToDesignMode) {
                 if (sourceId !== undefined) {
                     elementId = sourceId;
@@ -1942,10 +1985,6 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
             var elementId;
             if (isCodeToDesignMode !== undefined && !isCodeToDesignMode) {
                 elementId = self.getNewAgentId();
-                // design view container is disabled to prevent the user from dropping any elements before initializing
-                // a sink element
-                self.designViewContainer.addClass('disableContainer');
-                self.toggleViewButton.addClass('disableContainer');
             } else if (isCodeToDesignMode !== undefined && isCodeToDesignMode) {
                 if (sinkId !== undefined) {
                     elementId = sinkId;
@@ -1970,10 +2009,6 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
             var elementId;
             if (isCodeToDesignMode !== undefined && !isCodeToDesignMode) {
                 elementId = self.getNewAgentId();
-                // design view container is disabled to prevent the user from dropping any elements before initializing
-                // a stream element
-                self.designViewContainer.addClass('disableContainer');
-                self.toggleViewButton.addClass('disableContainer');
             } else if (isCodeToDesignMode !== undefined && isCodeToDesignMode) {
                 if (streamId !== undefined) {
                     elementId = streamId;
@@ -1999,10 +2034,6 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
             var elementId;
             if (isCodeToDesignMode !== undefined && !isCodeToDesignMode) {
                 elementId = self.getNewAgentId();
-                // design view container is disabled to prevent the user from dropping any elements before initializing
-                // a stream element
-                self.designViewContainer.addClass('disableContainer');
-                self.toggleViewButton.addClass('disableContainer');
             } else if (isCodeToDesignMode !== undefined && isCodeToDesignMode) {
                 if (tableId !== undefined) {
                     elementId = tableId;

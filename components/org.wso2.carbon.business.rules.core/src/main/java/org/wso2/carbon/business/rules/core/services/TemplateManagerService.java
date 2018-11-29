@@ -1024,8 +1024,7 @@ public class TemplateManagerService implements BusinessRulesService {
             }
             // Final rule logic
             finalRuleLogic = TemplateManagerHelper.replaceRegex(ruleLogic[0], TemplateManagerConstants
-                            .SIDDHI_APP_RULE_LOGIC_PATTERN,
-                    replacementValues);
+                    .SIDDHI_APP_RULE_LOGIC_PATTERN, replacementValues);
             finalRuleLogic = "[" + finalRuleLogic + "]";
         }
         // Get Output mapping attributes
@@ -1117,8 +1116,7 @@ public class TemplateManagerService implements BusinessRulesService {
         String siddhiAppContent = TemplateManagerHelper
                 .replaceTemplateString(templatedSiddhiAppContent, templatedElementValues);
         // No exposed stream definition for SiddhiApp of type 'template'. Only present in types 'input' and 'output'
-        return new Artifact(TemplateManagerConstants.TEMPLATE_TYPE_SIDDHI_APP,
-                siddhiAppContent, null);
+        return new Artifact(TemplateManagerConstants.TEMPLATE_TYPE_SIDDHI_APP, siddhiAppContent, null);
     }
 
     /**
@@ -1140,8 +1138,7 @@ public class TemplateManagerService implements BusinessRulesService {
         siddhiAppContent = TemplateManagerHelper
                 .replaceTemplateString(templatedSiddhiAppContent, templatedElementValues);
         // No exposed stream definition for a Artifact, It is only a parameter for Template.
-        return new Artifact(TemplateManagerConstants.TEMPLATE_TYPE_SIDDHI_APP,
-                siddhiAppContent, null);
+        return new Artifact(TemplateManagerConstants.TEMPLATE_TYPE_SIDDHI_APP, siddhiAppContent, null);
     }
 
     /**

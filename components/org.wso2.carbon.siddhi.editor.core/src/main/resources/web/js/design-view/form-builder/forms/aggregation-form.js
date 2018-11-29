@@ -17,9 +17,9 @@
  */
 
 define(['require', 'log', 'jquery', 'lodash', 'attribute', 'aggregation', 'aggregateByTimePeriod', 'querySelect',
-        'elementUtils', 'storeAnnotation', 'designViewUtils', 'jsonValidator'],
+    'elementUtils', 'storeAnnotation', 'designViewUtils', 'jsonValidator'],
     function (require, log, $, _, Attribute, Aggregation, AggregateByTimePeriod, QuerySelect, ElementUtils,
-              StoreAnnotation, DesignViewUtils, JSONValidator) {
+        StoreAnnotation, DesignViewUtils, JSONValidator) {
 
         /**
          * @class AggregationForm Creates a forms to collect data from a aggregation
@@ -63,6 +63,9 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'aggregation', 'aggre
                 throw errorMessage;
             }
 
+            $('#' + id).addClass('selected-element');
+            $(".overlayed-container").fadeTo(200, 1);
+
             if (!clickedElement.getFrom()) {
                 DesignViewUtils.prototype.warnAlert('Connect an input stream element');
                 self.designViewContainer.removeClass('disableContainer');
@@ -75,7 +78,7 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'aggregation', 'aggre
                 var savedAnnotations = clickedElement.getAnnotationList();
                 var annotations = [];
                 _.forEach(savedAnnotations, function (savedAnnotation) {
-                    annotations.push({annotation: savedAnnotation});
+                    annotations.push({ annotation: savedAnnotation });
                 });
 
                 var storeAnnotation = {};
@@ -174,10 +177,10 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'aggregation', 'aggre
 
                 formContainer.find('.define-aggregation')
                     .append('<div class="col-md-12 section-seperator frm-qry"><div class="col-md-4">' +
-                    '<div class="row"><div id="form-aggregation-annotation" class="col-md-12 section-seperator frm-agr"></div></div>' +
-                    '<div class="row"><div id="form-aggregation-input" class="col-md-12"></div></div></div>' +
-                    '<div id="form-aggregation-select" class="col-md-4 frm-agr"></div>' +
-                    '<div id="form-aggregation-aggregate" class="col-md-4"></div></div>');
+                        '<div class="row"><div id="form-aggregation-annotation" class="col-md-12 section-seperator frm-agr"></div></div>' +
+                        '<div class="row"><div id="form-aggregation-input" class="col-md-12"></div></div></div>' +
+                        '<div id="form-aggregation-select" class="col-md-4 frm-agr"></div>' +
+                        '<div id="form-aggregation-aggregate" class="col-md-4"></div></div>');
 
                 var possibleGroupByAttributes = [];
                 var savedSource = self.configurationData.getSiddhiAppConfig().getDefinitionElementByName(from);
@@ -635,6 +638,9 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'aggregation', 'aggre
 
                     var textNode = $(element).parent().find('.aggregationNameNode');
                     textNode.html(configInput.name);
+
+                    $('#' + id).removeClass('incomplete-element');
+                    $('#' + id).prop('title', '');
 
                     // perform JSON validation
                     JSONValidator.prototype.validateAggregation(clickedElement);

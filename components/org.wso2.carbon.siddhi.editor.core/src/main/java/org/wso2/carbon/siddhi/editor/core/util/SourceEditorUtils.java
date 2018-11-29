@@ -449,6 +449,7 @@ public class SourceEditorUtils {
                     parameterMetaData.setType(Arrays.asList(parameter.type()));
                     parameterMetaData.setOptional(parameter.optional());
                     parameterMetaData.setDescription(parameter.description());
+                    parameterMetaData.setDefaultValue(parameter.defaultValue());
                     parameterMetaDataList.add(parameterMetaData);
                 }
                 processorMetaData.setParameters(parameterMetaDataList);
