@@ -171,7 +171,7 @@ public class NatsAppCreatorTestCase {
             tempStreamHandler.send(new Object[]{1, 140, 70});
             tempStreamHandler.send(new Object[]{1, 140, 30});
 
-            SiddhiTestHelper.waitForEvents(2000, 3, count, 2000);
+            SiddhiTestHelper.waitForEvents(100, 3, count, 200);
             Assert.assertEquals(count.intValue(), 3);
         } catch (InterruptedException e) {
             log.error(e.getMessage(), e);
@@ -238,7 +238,7 @@ public class NatsAppCreatorTestCase {
             tempStreamHandler.send(new Object[]{1, 140, 80});
             tempStreamHandler.send(new Object[]{2, 140, 30});
 
-            SiddhiTestHelper.waitForEvents(2000, 2, count, 3000);
+            SiddhiTestHelper.waitForEvents(100, 2, count, 200);
             Assert.assertEquals(count.intValue(), 2);
             Assert.assertEquals(errorAssertionCount.intValue(), 0,
                     "No assertion errors should occur inside callbacks");
@@ -310,7 +310,7 @@ public class NatsAppCreatorTestCase {
             tempStreamHandler.send(new Object[]{2, 140, 100});
             tempStreamHandler.send(new Object[]{2, 140, 30});
 
-            SiddhiTestHelper.waitForEvents(2500, 2, count, 3000);
+            SiddhiTestHelper.waitForEvents(100, 2, count, 200);
             Assert.assertEquals(count.intValue(), 2);
             Assert.assertEquals(errorAssertionCount.intValue(), 0,
                     "No assertion errors should occur inside callbacks");
@@ -327,7 +327,7 @@ public class NatsAppCreatorTestCase {
      * {@link TransportStrategy#FIELD_GROUPING}. The un-partitioned streams in the join will
      * subscribe with {@link TransportStrategy#ALL}
      */
-    @Test//(dependsOnMethods = "testPartitionWithSequence")
+    @Test(dependsOnMethods = "testPartitionWithSequence")
     public void testJoinWithPartition() {
         String siddhiApp = "@App:name('TestPlan5') "
                 + "define stream TempStream(deviceID long, roomNo int, temp double); "
@@ -408,7 +408,7 @@ public class NatsAppCreatorTestCase {
                     + "   </event>"
                     + "</events>");
 
-            SiddhiTestHelper.waitForEvents(2000, 2, count, 3000);
+            SiddhiTestHelper.waitForEvents(100, 2, count, 200);
             Assert.assertEquals(count.intValue(), 2);
             Assert.assertEquals(errorAssertionCount.intValue(), 0,
                     "No assertion errors should occur inside callbacks");
@@ -519,7 +519,7 @@ public class NatsAppCreatorTestCase {
                     + "                        <isOn>false</isOn></event>"
                     + "</events>");
 
-            SiddhiTestHelper.waitForEvents(2000, 2, count, 3000);
+            SiddhiTestHelper.waitForEvents(100, 2, count, 200);
             Assert.assertEquals(count.intValue(), 2);
             Assert.assertEquals(errorAssertionCount.intValue(), 0,
                     "No assertion errors should occur inside callbacks");
@@ -678,8 +678,8 @@ public class NatsAppCreatorTestCase {
             Thread.sleep(1000);
             triggerStreamHandler.send(new Object[]{"WSO2"});
 
-            SiddhiTestHelper.waitForEvents(1000, 1, count, 2000);
-            SiddhiTestHelper.waitForEvents(1000, 2, dumbStreamCount, 2000);
+            SiddhiTestHelper.waitForEvents(100, 1, count, 200);
+            SiddhiTestHelper.waitForEvents(100, 2, dumbStreamCount, 200);
             Assert.assertEquals(count.intValue(), 1);
             Assert.assertEquals(dumbStreamCount.intValue(), 2);
             Assert.assertEquals(errorAssertionCount.intValue(), 0,
@@ -805,9 +805,9 @@ public class NatsAppCreatorTestCase {
             Thread.sleep(1000);
             triggerStreamHandler.send(new Object[]{"WSO2"});
 
-            SiddhiTestHelper.waitForEvents(2000, 1, count, 3000);
-            SiddhiTestHelper.waitForEvents(2000, 2, dumbStreamCount,
-                    3000);
+            SiddhiTestHelper.waitForEvents(100, 1, count, 200);
+            SiddhiTestHelper.waitForEvents(100, 2, dumbStreamCount,
+                    200);
             Assert.assertEquals(count.intValue(), 1);
             Assert.assertEquals(dumbStreamCount.intValue(), 2);
             Assert.assertEquals(errorAssertionCount.intValue(), 0,
@@ -903,7 +903,7 @@ public class NatsAppCreatorTestCase {
             stockStreamHandler.send(new Object[]{"ABC", 300F, 2, "language"});
             stockStreamHandler.send(new Object[]{"ABC", 200F, 2, "language"});
 
-            SiddhiTestHelper.waitForEvents(1500, 3, count, 2000);
+            SiddhiTestHelper.waitForEvents(100, 3, count, 200);
             Assert.assertEquals(count.intValue(), 3);
             Assert.assertEquals(errorAssertionCount.intValue(), 0,
                     "No assertion errors should occur inside callbacks");
@@ -1033,7 +1033,7 @@ public class NatsAppCreatorTestCase {
             stockStreamHandler.send(new Object[]{"ABC", 300F, 2, "language"});
             stockStreamHandler.send(new Object[]{"ABC", 200F, 2, "language"});
 
-            SiddhiTestHelper.waitForEvents(5000, 3, count, 8000);
+            SiddhiTestHelper.waitForEvents(200, 3, count, 500);
             Assert.assertEquals(count.intValue(), 4);
             Assert.assertEquals(errorAssertionCount.intValue(), 0,
                     "No assertion errors should "
@@ -1125,7 +1125,7 @@ public class NatsAppCreatorTestCase {
                     + " \"price\":225.0, \"quantity\":20,\"tier\":\"middleware\"}}");
 
             Thread.sleep(5000);
-            SiddhiTestHelper.waitForEvents(8000, 1, count, 10000);
+            SiddhiTestHelper.waitForEvents(200, 1, count, 1000);
             Assert.assertEquals(count.intValue(), 1);
             Assert.assertEquals(errorAssertionCount.intValue(), 0,
                     "No assertion errors should occur inside callbacks");
