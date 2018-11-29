@@ -39,24 +39,24 @@ define(([],function (){
                 },
                 disabled: false
             },
-            {
-                id: "deploy",
-                label: "Deploy",
-                command: {
-                    id: "deploy",
-                    shortcuts: {
-                        mac: {
-                            key: "command+shift+z",
-                            label: "\u2318\u21E7Z"
-                        },
-                        other: {
-                            key: "ctrl+shift+z",
-                            label: "Ctrl+Shift+Z"
-                        }
-                    }
-                },
-                disabled: true
-            },
+            // {
+            //     id: "deploy",
+            //     label: "Deploy",
+            //     command: {
+            //         id: "deploy",
+            //         shortcuts: {
+            //             mac: {
+            //                 key: "command+shift+z",
+            //                 label: "\u2318\u21E7Z"
+            //             },
+            //             other: {
+            //                 key: "ctrl+shift+z",
+            //                 label: "Ctrl+Shift+Z"
+            //             }
+            //         }
+            //     },
+            //     disabled: true
+            // },
             {
                 id: "sampleEvent",
                 label: "Sample Event",
@@ -73,26 +73,26 @@ define(([],function (){
                         }
                     }
                 },
-                disabled: true
-            },
-            {
-                id: "queryStoreApi",
-                label: "Query Store API",
-                command: {
-                    id: "query_store-api",
-                    labels:{
-                        mac: {
-                            //key: "command+option+f",
-                            label: "\u2318\u2325f"
-                        },
-                        other: {
-                            //key: "ctrl+h",
-                            label: "Ctrl+H"
-                        }
-                    }
-                },
                 disabled: false
             }
+            // {
+            //     id: "queryStoreApi",
+            //     label: "Query Store API",
+            //     command: {
+            //         id: "query_store-api",
+            //         labels:{
+            //             mac: {
+            //                 //key: "command+option+f",
+            //                 label: "\u2318\u2325f"
+            //             },
+            //             other: {
+            //                 //key: "ctrl+h",
+            //                 label: "Ctrl+H"
+            //             }
+            //         }
+            //     },
+            //     disabled: false
+            // }
         ]
 
     };
