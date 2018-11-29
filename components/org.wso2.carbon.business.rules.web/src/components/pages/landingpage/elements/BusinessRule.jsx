@@ -124,6 +124,7 @@ export default class BusinessRule extends Component {
         return (
             <Tooltip id="tooltip-right" title={title} placement="bottom">
                 <IconButton
+                    color="primary"
                     aria-label={title}
                     onClick={() => this.handleUnDeployButtonClick()}
                 >
