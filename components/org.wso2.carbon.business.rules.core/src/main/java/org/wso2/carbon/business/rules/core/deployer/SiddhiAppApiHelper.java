@@ -51,20 +51,23 @@ public class SiddhiAppApiHelper implements SiddhiAppApiHelperService {
                     return true;
                 case 400:
                     throw new SiddhiAppsApiHelperException("A validation error occurred during " +
-                            "saving the siddhi app '" + siddhiApp + "' on the node '" + hostAndPort + "'");
+                            "saving the siddhi app '" + siddhiApp + "' on the node '" + hostAndPort + "'", status);
                 case 409:
                     throw new SiddhiAppsApiHelperException("A Siddhi Application with " +
-                            "the given name already exists in the node '" + hostAndPort + "'");
+                            "the given name already exists in the node '" + hostAndPort + "'", status);
                 case 500:
                     throw new SiddhiAppsApiHelperException("Unexpected error occurred during " +
-                            "saving the siddhi app '" + siddhiApp + "' on the node '" + hostAndPort + "'");
+                            "saving the siddhi app '" + siddhiApp + "' on the node '" + hostAndPort + "'", status);
                 default:
                     throw new SiddhiAppsApiHelperException("Unexpected status code '" + status + "' received when " +
-                            "trying to deploy the siddhi app '" + siddhiApp + "' on node '" + hostAndPort + "'");
+                            "trying to deploy the siddhi app '" + siddhiApp + "' on node '" + hostAndPort + "'", status);
             }
         } catch (SiddhiAppDeployerServiceStubException e) {
             throw new SiddhiAppsApiHelperException("Failed to deploy siddhi app '" + siddhiApp + "' on the node '" +
                     hostAndPort + "'. ", e);
+        } catch (RetryableException e) {
+            throw new SiddhiAppsApiHelperException("Cannot connect to the worker node (" + hostAndPort + ") for " +
+                    "retrieving status of the siddhi app " + siddhiApp + ".", e);
         } finally {
             closeResponse(response);
         }
@@ -83,11 +86,11 @@ public class SiddhiAppApiHelper implements SiddhiAppApiHelperService {
                     return statusMessage.getString(SiddhiAppApiConstants.STATUS);
                 case 404:
                     throw new SiddhiAppsApiHelperException("Specified siddhi app '" + siddhiAppName + "' " +
-                            "is not found on the node '" + hostAndPort + "'");
+                            "is not found on the node '" + hostAndPort + "'", status);
                 default:
                     throw new SiddhiAppsApiHelperException("Unexpected status code '" + status + "' received when " +
                             "requesting the status of siddhi app '" + siddhiAppName + "' from the node '" +
-                            hostAndPort + "'");
+                            hostAndPort + "'", status);
             }
         } catch (SiddhiAppDeployerServiceStubException e) {
             throw new SiddhiAppsApiHelperException("URI generated for node url '" + hostAndPort + "' is invalid.", e);
@@ -110,15 +113,18 @@ public class SiddhiAppApiHelper implements SiddhiAppApiHelperService {
                     return true;
                 case 404:
                     throw new SiddhiAppsApiHelperException("Specified siddhi app '" + siddhiAppName +
-                            "' is not found on the node '" + hostAndPort + "'");
+                            "' is not found on the node '" + hostAndPort + "'", status);
                 default:
                     throw new SiddhiAppsApiHelperException("Unexpected status code '" + status + "' received when " +
                             "trying to delete the siddhi app '" + siddhiAppName + "' from the node '" +
-                            hostAndPort + "'");
+                            hostAndPort + "'", status);
             }
         } catch (SiddhiAppDeployerServiceStubException e) {
             throw new SiddhiAppsApiHelperException("Failed to delete siddhi app '" + siddhiAppName +
                     "' from the node '" + hostAndPort + "'. ", e);
+        } catch (RetryableException e) {
+            throw new SiddhiAppsApiHelperException("Cannot connect to the worker node (" + hostAndPort + ") for " +
+                    "retrieving status of the siddhi app " + siddhiAppName + ".", e);
         } finally {
             closeResponse(response);
         }
@@ -134,15 +140,18 @@ public class SiddhiAppApiHelper implements SiddhiAppApiHelperService {
                 case 400:
                     throw new SiddhiAppsApiHelperException("Failed to update the siddhi app '" + siddhiApp +
                             "' on node '" + hostAndPort + "' due to a validation error occurred " +
-                            "when updating the siddhi app");
+                            "when updating the siddhi app", status);
                 case 500:
                     throw new SiddhiAppsApiHelperException("Failed to update the siddhi app '" + siddhiApp +
                             "' on node '" + hostAndPort + "' due to an unexpected error occurred during updating the " +
-                            "siddhi app");
+                            "siddhi app", status);
             }
         } catch (SiddhiAppDeployerServiceStubException e) {
             throw new SiddhiAppsApiHelperException("Failed to update the siddhi app '" + siddhiApp + "' on node '"
                     + hostAndPort + "'. ", e);
+        } catch (RetryableException e) {
+            throw new SiddhiAppsApiHelperException("Cannot connect to the worker node (" + hostAndPort + ") for " +
+                    "retrieving status of the siddhi app " + siddhiApp + ".", e);
         } finally {
             closeResponse(response);
         }
