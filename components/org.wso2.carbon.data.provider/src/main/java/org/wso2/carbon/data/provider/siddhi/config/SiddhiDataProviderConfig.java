@@ -18,8 +18,10 @@
 
 package org.wso2.carbon.data.provider.siddhi.config;
 
+import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import org.wso2.carbon.data.provider.ProviderConfig;
 
 import java.util.List;
@@ -33,8 +35,10 @@ public class SiddhiDataProviderConfig implements ProviderConfig {
 
 
     public SiddhiDataProviderConfig() {
-        this.queryData = new JsonObject();
-        this.siddhiApp = "";
+        this.queryData = new JsonParser().parse("{\"queryFunctionImpl\":\"return 'from TRANSACTIONS_TABLE select *'" +
+                ";\"}");
+        this.siddhiApp = "@store(type=\"rdbms\", datasource=\"SAMPLE_DB\")\n" +
+                "define table TRANSACTIONS_TABLE (CREDITCARDNO string, COUNTRY string, TRANSACTION string, AMOUNT int);";
         this.publishingInterval = 5;
         this.timeColumns = "";
     }

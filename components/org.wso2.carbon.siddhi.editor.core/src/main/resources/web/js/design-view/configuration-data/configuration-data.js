@@ -26,7 +26,7 @@ define(['require', 'elementUtils'],
          * @param {Object} siddhiAppConfig Siddhi App Data
          * @param {object} application Current Application data
          */
-        var ConfigurationData = function (siddhiAppConfig, application) {
+        var ConfigurationData = function (siddhiAppConfig, application, rawExtensions) {
             this.siddhiAppConfig = siddhiAppConfig;
             this.edgeList = [];
             // checks whether still the graph is drawing from the JSON sent from backend when switching from code
@@ -34,6 +34,7 @@ define(['require', 'elementUtils'],
             this.isStillDrawingGraph = false;
             this.isDesignViewContentChanged = false;
             this.application = application;
+            this.rawExtensions = rawExtensions;
         };
 
         ConfigurationData.prototype.addEdge = function (edge) {

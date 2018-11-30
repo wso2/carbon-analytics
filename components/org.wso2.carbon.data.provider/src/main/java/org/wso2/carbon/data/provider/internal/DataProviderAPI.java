@@ -100,11 +100,8 @@ public class DataProviderAPI implements Microservice {
                     .build();
         } catch (DataProviderException | IllegalAccessException | InstantiationException e) {
             log.error("Cannot validate configurations '{}' for data provider '{}'.", dataProviderConfig,
-                      replaceCRLFCharacters(providerName), e);
-            return Response.serverError()
-                    .entity("Server error occurred when validating configuration for data provider '" + providerName +
-                            "'.")
-                    .build();
+                    replaceCRLFCharacters(providerName), e);
+            return Response.serverError().entity(e.getMessage()).build();
         }
     }
 

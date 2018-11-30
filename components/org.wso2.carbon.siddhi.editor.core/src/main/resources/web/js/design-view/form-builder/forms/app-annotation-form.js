@@ -44,11 +44,12 @@ define(['require', 'log', 'jquery', 'lodash'],
          */
         AppAnnotationForm.prototype.generatePropertiesForm = function (element, formConsole, formContainer) {
             var self = this;
-            var div = $('<div />').attr({id: 'define-appconfig', class: 'define-appconfig'});
+            var div = $('<div />').attr({ id: 'define-appconfig', class: 'define-appconfig' });
             formContainer.append(div);
             // design view container and toggle view button are enabled
             self.designViewContainer.addClass('disableContainer');
             self.toggleViewButton.addClass('disableContainer');
+            $(".overlayed-container").fadeTo(200, 1);
 
             var siddhiAppConfig = self.configurationData.getSiddhiAppConfig();
             var siddhiAppName = siddhiAppConfig.getSiddhiAppName();
@@ -56,7 +57,7 @@ define(['require', 'log', 'jquery', 'lodash'],
             var savedAppAnnotations = siddhiAppConfig.getAppAnnotationList();
             var annotations = [];
             _.forEach(savedAppAnnotations, function (savedAnnotation) {
-                annotations.push({annotation:savedAnnotation});
+                annotations.push({ annotation: savedAnnotation });
             });
 
             var fillWith = {

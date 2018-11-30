@@ -100,7 +100,7 @@ export default class BusinessRulesAPI {
      * @returns {AxiosPromise}      Existing business rules
      */
     getBusinessRules() {
-        return this.getHTTPClient().get('/instances');
+        return this.getHTTPClient().get('/instances?x=' + Math.round(Math.random() * 1000000));
     }
 
     /**
@@ -150,6 +150,15 @@ export default class BusinessRulesAPI {
      * @returns {AxiosPromise}              Response after re-deploying the business rule
      */
     redeployBusinessRule(businessRuleID) {
-        return this.getHTTPClient().post('/instances/' + businessRuleID);
+        return this.getHTTPClient().post('/instances/' + businessRuleID + '?shouldUndeploy=false');
+    }
+
+    /**
+     * Un-deploys the business rule, that has the given ID
+     * @param {String} businessRuleID       ID of the business rule
+     * @returns {AxiosPromise}              Response after re-deploying the business rule
+     */
+    undeployBusinessRule(businessRuleID) {
+        return this.getHTTPClient().post('/instances/' + businessRuleID + '?shouldUndeploy=true');
     }
 }

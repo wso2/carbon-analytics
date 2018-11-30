@@ -54,6 +54,8 @@ define(['require', 'log', 'jquery', 'lodash', 'partitionWith', 'designViewUtils'
             self.toggleViewButton.addClass('disableContainer');
 
             var id = $(element).parent().attr('id');
+            $('#' + id).addClass('selected-element');
+            $(".overlayed-container").fadeTo(200, 1);
             var partitionElement = self.configurationData.getSiddhiAppConfig().getPartition(id);
             var partitionWithList = partitionElement.getPartitionWith();
 
@@ -70,7 +72,7 @@ define(['require', 'log', 'jquery', 'lodash', 'partitionWith', 'designViewUtils'
                 var savedAnnotations = partitionElement.getAnnotationList();
                 var annotations = [];
                 _.forEach(savedAnnotations, function (savedAnnotation) {
-                    annotations.push({annotation: savedAnnotation});
+                    annotations.push({ annotation: savedAnnotation });
                 });
 
                 var partitionKeys = [];
@@ -188,6 +190,9 @@ define(['require', 'log', 'jquery', 'lodash', 'partitionWith', 'designViewUtils'
                     _.forEach(config.annotations, function (annotation) {
                         partitionElement.addAnnotation(annotation.annotation);
                     });
+
+                    $('#' + id).removeClass('incomplete-element');
+                    $('#' + id).prop('title', '');
 
                     // perform JSON validation
                     JSONValidator.prototype.validatePartition(partitionElement, self.jsPlumbInstance, true);

@@ -254,6 +254,15 @@
             <!-- End: tool-palette -->
             <!-- Start: design-view-grid-container -->
             <div id="grid-container" class="grid-container"></div>
+            <!-- Start: pop-over-design-view -->
+            <div class="hide pop-over">
+                <div class="popover-footer">
+                    <button class="btn btn-primary btn-xs yes">Yes</button>
+                    <button class="btn btn-primary btn-xs no">No</button>
+                </div>
+            </div>
+            <!-- End: pop-over-design-view -->
+            <div class = "overlayed-container"></div>
             <!-- End: design-view-grid-container -->
         </div>
         <!-- End: design view container -->
@@ -1005,36 +1014,38 @@
     </div>
 </div>
 
-<script id="attribute-form-template" type="text/x-handlebars-template">
-    <h3>Attributes</h3>
+<script id = "attribute-form-template" type = "text/x-handlebars-template">
+    <h4>Attributes</h4>
     <ul>
-        <div id="attribute-div">
+        <div id = "attribute-div">
             {{#each this}}
-            <li class="attribute">
-                <div class="attr-content">
-                    <input type="text" value="{{name}}" class="attr-name"/> &nbsp;
-                    <select class="attr-type">
-                        <option value="string">string</option>
-                        <option value="int">int</option>
-                        <option value="long">long</option>
-                        <option value="float">float</option>
-                        <option value="double">double</option>
-                        <option value="bool">bool</option>
-                        <option value="object">object</option>
-                    </select>
+            <li class = "attribute clearfix">
+                <div class = "clearfix">
+                    <div class = "attr-content">
+                        <input type = "text" value = "{{name}}" class = "attr-name"/>
+                        <select class = "attr-type">
+                            <option value = "string"> string </option>
+                            <option value = "int"> int </option>
+                            <option value = "long"> long </option>
+                            <option value = "float"> float </option>
+                            <option value = "double"> double </option>
+                            <option value = "bool"> bool </option>
+                            <option value = "object"> object </option>
+                        </select>
+                    </div>
+                    <div class = "attr-nav"></div>
                 </div>
-                <div class="attr-nav"></div>
+                <label class = "error-message"></label>
             </li>
             {{/each}}
         </div>
     </ul>
-    <br>
-    <button id="btn-add-attribute" class="btn btn-default"> + Attribute</button> <br> <br>
+    <button id="btn-add-attribute" class="btn btn-default"> + Attribute </button>
 </script>
 
-<script id="annotation-form-template" type="text/x-handlebars-template">
-    <h3>Annotations</h3>
-    <div id="annotation-div">
+<script id = "annotation-form-template" type = "text/x-handlebars-template">
+    <h4>Annotations</h4>
+    <div id = "annotation-div">
         {{#if this}}
         <ul>
             {{#each this}}
@@ -1044,33 +1055,31 @@
         {{/if}}
     </div>
     <br>
-    <button id="btn-add-annotation" class="btn btn-default"> + Annotation</button>
-    <button id="btn-add-key-val" class="btn btn-default" style="display: none"> + Property</button>
-    <button id="btn-del-annotation" class="btn btn-default" style="display: none"> Delete</button>
-    <br>
+    <button id = "btn-add-annotation" class = "btn btn-default"> + Annotation </button>
+    <button id = "btn-add-key-val" class = "btn btn-default" style = "display: none"> + Property </button>
+    <button id = "btn-del-annotation" class = "btn btn-default" style = "display: none"> Delete </button>
 </script>
 
-<script id="recursiveAnnotationPartial" type="text/template">
+<script id = "recursiveAnnotationPartial" type = "text/template">
     {{#if predefined}}
-        <li data-jstree='{"icon":"/editor/commons/images/annotation.png"}' class="{{class}}">{{name}}
+        <li data-jstree = '{"icon":"/editor/commons/images/annotation.png"}' class = "{{class}}"> {{name}}
             <ul>
                 {{#each elements}}
-                <li data-jstree='{"icon":"/editor/commons/images/properties.png"}' class="{{class}}">{{key}}
+                <li data-jstree = '{"icon":"/editor/commons/images/properties.png"}' class="{{class}}"> {{key}}
                     <ul>
-                        <li data-jstree='{"icon":"/editor/commons/images/value.png"}' class="annotation-value">{{value}}
-                        </li>
+                        <li data-jstree = '{"icon":"/editor/commons/images/value.png"}'
+                            class = "annotation-value"> {{value}} </li>
                     </ul>
                 </li>
                 {{/each}}
     {{else}}
-        <li data-jstree='{"icon":"/editor/commons/images/annotation.png"}' class="annotation">{{name}}
+        <li data-jstree = '{"icon":"/editor/commons/images/annotation.png"}' class = "annotation"> {{name}}
             <ul>
                 {{#each elements}}
-                <li data-jstree='{"icon":"/editor/commons/images/properties.png"}' class="annotation-key">{{key}}
+                <li data-jstree = '{"icon":"/editor/commons/images/properties.png"}' class = "annotation-key"> {{key}}
                     <ul>
-                        <li data-jstree='{"icon":"/editor/commons/images/value.png"}' class="annotation-value">
-                            {{value}}
-                        </li>
+                        <li data-jstree = '{"icon":"/editor/commons/images/value.png"}'
+                            class = "annotation-value"> {{value}} </li>
                     </ul>
                 </li>
                 {{/each}}
@@ -1085,6 +1094,166 @@
         </li>
 </script>
 
+<script id="source-sink-map-store-form-template" type="text/template">
+    {{#ifSourceOrSink id}}
+        <h3>{{addTitle id}} Configuration</h3>
+        <label class="clearfix"> * Type </label>
+        <select id="{{id}}-type">
+            <option style = "display:none" disabled selected value > -- select a type -- </option>
+    {{else}}
+             {{#ifId id "map"}}
+                <h3> Mapping </h3>
+             {{/ifId}}
+              <label class="clearfix"> {{addTitle id}} Type </label>
+              <select id="{{id}}-type">
+    {{/ifSourceOrSink}}
+
+            {{#each types}}
+                <option value="{{name}}">{{name}}</option>
+            {{/each}}
+    </select>
+</script>
+
+<script id = "source-sink-store-options-template" type = "text/template">
+    {{#if options}}
+        <h3> Options </h3>
+        <div id = "{{id}}-options">
+            {{#ifSourceOrSinkOrStore id}}
+                <div class = "sub-{{id}}-options-div">
+            {{/ifSourceOrSinkOrStore}}
+            {{#each options}}
+                <div class = "option">
+                {{#if optional}}
+                    {{#if value}}
+                        <div class = "clearfix">
+                            <label class = "option-name optional-option">
+                                <input type = "checkbox" class = "option-checkbox" checked> {{key}}
+                            </label>
+                            <i class = "fw fw-info option-desc">
+                                <span style = "display:none" class = "option-desc-content"> {{description}} </span>
+                            </i>
+                        </div>
+                        <div class = "clearix">
+                            <input class = "option-value" type = "text" value = "{{value}}">
+                        </div>
+                    {{else}}
+                        <div class="clearfix">
+                            <label class = "option-name optional-option">
+                                <input type = "checkbox" class = "option-checkbox"> {{key}}
+                            </label>
+                            <i class = "fw fw-info option-desc">
+                                <span style = "display:none" class="option-desc-content"> {{description}} </span>
+                            </i>
+                        </div>
+                        <div class="clearix">
+                            <input class = "option-value" type = "text" value="{{defaultValue}}" style ="display:none">
+                        </div>
+                    {{/if}}
+                        <label class = "error-message"></label>
+                {{else}}
+                    <div class="clearfix">
+                        <label class = "mandatory-option-symbol"> * </label>
+                        <label class = "option-name mandatory-option">
+                            {{key}}
+                        </label>
+                        <i class="fw fw-info option-desc">
+                            <span style="display:none" class="option-desc-content"> {{description}} </span>
+                        </i>
+                    </div>
+                    <div class = "clearix">
+                        <input class = "option-value" type = "text" value = "{{value}}">
+                    </div>
+                    <label class = "error-message"></label>
+                {{/if}}
+                </div>
+            {{#ifSourceOrSinkOrStore ../id}}
+                {{#if (isDivisor (sum @index 1) ../options)}}
+                    </div>
+                    <div class = "sub-{{../id}}-options-div">
+                {{/if}}
+            {{/ifSourceOrSinkOrStore}}
+            {{/each}}
+            {{#ifSourceOrSinkOrStore id}}
+                </div>
+            {{/ifSourceOrSinkOrStore}}
+    {{/if}}
+    </div>
+    <div class = "customized-options" id = "customized-{{id}}-options">
+        <h3> <i> Customized Options </i> </h3>
+        <ul class = "cust-options">
+            {{#each customizedOptions}}
+                <li class="option">
+                    <div class = "clearfix">
+                        <label> option.key </label>
+                        <input type="text" class="cust-option-key" value="{{key}}">
+                    </div>
+                    <div class = "clearfix">
+                        <label> option.value </label>
+                        <input type = "text" class = "cust-option-value" value = "{{value}}">
+                        <a class = "btn-del-option"> <i class = "fw fw-delete"> </i></a>
+                    </div>
+                    <label class = "error-message"></label>
+                </li>
+            {{/each}}
+        </ul>
+        <button type = "button" class = "btn btn-default btn-add-options" id = "btn-add-{{id}}-options"> </button>
+    </div>
+</script>
+
+<script id = "source-sink-map-attribute-template" type = "text/template">
+    <div id = "mapper-attributes">
+        <div class = "attribute-labels clearfix">
+                {{#if this.0.key }} <label id = "attribute-key-label"> Key </label> {{/if}}
+                <label id = "attribute-value-label"> Value </label>
+        </div>
+        {{#each this}}
+        <div class = "attribute">
+                <div class = "clearfix">
+                {{#if key }} <input type = "text" value = "{{key}}" class = "attr-key" readonly/> {{/if}}
+                <input type = "text" value = "{{value}}" class = "attr-value"/>
+                </div>
+                <label class = "error-message"></label>
+        </div>
+        {{/each}}
+    </div>
+</script>
+
+<script id = "table-store-annotation-template" type = "text/template">
+    <h4> Annotations </h4>
+    <div id = "table-annotations">
+            {{#each this}}
+                <div class = "clearfix table-annotation">
+                    <div class="clearfix">
+                        <label class = "annotation-name">
+                            {{#if isChecked}}
+                                <input type = "checkbox" class="annotation-checkbox" checked> @{{name}}
+                            {{else}}
+                                <input type = "checkbox" class="annotation-checkbox"> @{{name}}
+                            {{/if}}
+                        </label>
+                    </div>
+                    {{#if isChecked}}
+                        <div class="annotation-content">
+                     {{else}}
+                            <div class="annotation-content" style="display:none">
+                    {{/if}}
+                        <ul>
+                        {{#each values}}
+                            <li class = "clearfix table-annotation-value">
+                                <div class="clearfix">
+                                    <input type = "text" value = "{{value}}" class = "annotation-value"/>
+                                    <a class = "btn-del-annot-value"> <i class = "fw fw-delete"> </i></a>
+                                </div>
+                                <label class="error-message"></label>
+                            </li>
+                        {{/each}}
+                        </ul>
+                        <button type = "button" class = "btn btn-default btn-add-annot-value"> + Value </button>
+                    </div>
+                </div>
+            {{/each}}
+    </div>
+</script>
 
 <!--Start: Settings Modal-->
 <div class="modal fade modalSettings" id="modalSettings" tabindex="-1" role="dialog">
@@ -1172,6 +1341,94 @@
 </div>
 
 
+<!--Start: Docker Export Modal-->
+<div class="modal fade modalDockerExport" id="modalDockerExport" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content clearfix">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <i class="fw fw-cancel about-dialog-close"></i></button>
+                <h3 class="modal-title" id="aboutDockerExportLabel">Export as Docker</h3>
+            </div>
+            <div class="modal-body add-margin-top-2x add-margin-bottom-2x">
+                <form>
+                    <h4>Export as Docker</h4>
+                    <hr/>
+                    <div class="form-group">
+                        <label for="dockerProfile">Profile:</label>
+                        <select class="form-control" id="dockerProfile">
+                            <option value="editor">Editor</option>
+                            <option value="worker">Worker</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="dockerProfile">Files to be included:</label>
+                        <div id="file-tree" class="docker-export-file-tree"></div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal" id="exportButton"
+                        disabled="disabled">Export</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<iframe id="frm-download" style="display: none;"></iframe>
+
+<div class="modal fade modalSampleEvent" id="modalSampleEvent" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content clearfix">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <i class="fw fw-cancel  about-dialog-close"></i></button>
+                <h3 class="modal-title" id="sampleEvent">Generate sample event</h3>
+            </div>
+            <div class="modal-body add-margin-top-2x add-margin-bottom-2x">
+                <form id="sampleEventForm">
+                    <div class="form-group">
+                        <label>
+                            Siddhi App Name
+                        </label>
+                        <select name="siddhi-app-name" id="sample-event-siddhi-app-name" class="form-control">
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>
+                            Stream Name
+                        </label>
+                        <select name="stream-name" class="form-control">
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>
+                            Event Format
+                        </label>
+                        <select class="form-control" name="event-format">
+                            <option value="json" selected="selected">JSON</option>
+                            <option value="xml">XML</option>
+                            <option value="text">text</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <button type="submit" class="btn btn-primary" name="generateSampleEvent"
+                                id="generateSampleEventButton">
+                            Generate
+                        </button>
+                    </div>
+                    <div class="form-group">
+                        <textarea class="form-control" name="generatedSampleEvent"
+                                  style="height: 250px">Select App, Stream and event type to get the sample event here..
+                        </textarea>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+
 <script src="/editor/commons/lib/requirejs-2.3.2/require.js"></script>
 <script type="text/javascript">
     requirejs.config({
@@ -1225,6 +1482,7 @@
             file_menu: "commons/js/menu-bar/file-menu",
             edit_menu: "commons/js/menu-bar/edit-menu",
             run_menu: "commons/js/menu-bar/run-menu",
+            tools_menu: "commons/js/menu-bar/tools-menu",
             menu_item: "commons/js/menu-bar/menu-item",
             file_browser: "commons/js/file-browser/file-browser",
             undo_manager: "commons/js/undo-manager/undo-manager",
@@ -1398,6 +1656,22 @@
                 ]
             }
             ],
+            table_predefined_annotations: [
+            {
+                name: "primaryKey",
+                values: [{
+                    value: ""
+                }],
+                isChecked: false
+            },
+            {
+                name: "index",
+                values: [{
+                    value: ""
+                }],
+                isChecked: false
+            }
+            ],
             services:   {
                 workspace:  {
                    endpoint: window.location.protocol + "//" + window.location.host + '/editor/workspace'
@@ -1519,6 +1793,14 @@
             settings_dialog:{
                 selector: "#modalSettings",
                 submit_button: "#saveSettingsButton"
+            },
+            docker_export_dialog: {
+                selector: '#modalDockerExport',
+                submitButton: '#exportButton'
+            },
+            sample_event_dialog:{
+                selector: "#modalSampleEvent",
+                submit_button: "#generateSampleEventButton"
             },
             output_controller: {
                 container: "#console-container",

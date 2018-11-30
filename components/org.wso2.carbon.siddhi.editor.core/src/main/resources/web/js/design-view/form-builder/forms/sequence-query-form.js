@@ -17,12 +17,12 @@
  */
 
 define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert', 'queryOutputDelete',
-        'queryOutputUpdate', 'queryOutputUpdateOrInsertInto', 'queryOrderByValue',
-        'patternOrSequenceQueryCondition', 'streamHandler', 'queryWindowOrFunction', 'designViewUtils',
-        'jsonValidator'],
+    'queryOutputUpdate', 'queryOutputUpdateOrInsertInto', 'queryOrderByValue',
+    'patternOrSequenceQueryCondition', 'streamHandler', 'queryWindowOrFunction', 'designViewUtils',
+    'jsonValidator'],
     function (require, log, $, _, QuerySelect, QueryOutputInsert, QueryOutputDelete, QueryOutputUpdate,
-              QueryOutputUpdateOrInsertInto, QueryOrderByValue, PatternOrSequenceQueryCondition, StreamHandler,
-              QueryWindowOrFunction, DesignViewUtils, JSONValidator) {
+        QueryOutputUpdateOrInsertInto, QueryOrderByValue, PatternOrSequenceQueryCondition, StreamHandler,
+        QueryWindowOrFunction, DesignViewUtils, JSONValidator) {
 
         /**
          * @class SequenceQueryForm Creates a forms to collect data from a sequence query
@@ -56,6 +56,8 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
             self.toggleViewButton.addClass('disableContainer');
 
             var id = $(element).parent().attr('id');
+            $('#' + id).addClass('selected-element');
+            $(".overlayed-container").fadeTo(200, 1);
             var clickedElement = self.configurationData.getSiddhiAppConfig().getSequenceQuery(id);
             if (!clickedElement.getQueryInput()
                 || clickedElement.getQueryInput().getConnectedElementNameList().length === 0) {
@@ -77,7 +79,7 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
                 var savedAnnotations = clickedElement.getAnnotationList();
                 var annotations = [];
                 _.forEach(savedAnnotations, function (savedAnnotation) {
-                    annotations.push({annotation: savedAnnotation});
+                    annotations.push({ annotation: savedAnnotation });
                 });
 
                 var queryName = clickedElement.getQueryName();
@@ -382,11 +384,11 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
 
                 formContainer.find('.define-sequence-query')
                     .append('<div class="col-md-12 section-seperator frm-qry"><div class="col-md-4">' +
-                    '<div class="row"><div id="form-query-name"></div>'+
-                    '<div class="row"><div id="form-query-annotation" class="col-md-12 section-seperator"></div></div>' +
-                    '<div class="row"><div id="form-query-input" class="col-md-12"></div></div></div>' +
-                    '<div id="form-query-select" class="col-md-4"></div>' +
-                    '<div id="form-query-output" class="col-md-4"></div></div>');
+                        '<div class="row"><div id="form-query-name"></div>' +
+                        '<div class="row"><div id="form-query-annotation" class="col-md-12 section-seperator"></div></div>' +
+                        '<div class="row"><div id="form-query-input" class="col-md-12"></div></div></div>' +
+                        '<div id="form-query-select" class="col-md-4"></div>' +
+                        '<div id="form-query-output" class="col-md-4"></div></div>');
 
                 var editorAnnotation = new JSONEditor($(formContainer).find('#form-query-annotation')[0], {
                     schema: {
@@ -427,11 +429,11 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
 
                 var editorQueryName = new JSONEditor($(formContainer).find('#form-query-name')[0], {
                     schema: {
-                           required: true,
-                           title: "Name",
-                           type: "string",
-                           default: "query"
-                     },
+                        required: true,
+                        title: "Name",
+                        type: "string",
+                        default: "query"
+                    },
                     startval: queryName,
                     show_errors: "always"
                 });
@@ -977,8 +979,8 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
                     var isQueryNameUsed
                         = self.formUtils.isQueryDefinitionNameUsed(queryNameConfig, clickedElement.getId());
                     if (isQueryNameUsed) {
-                           DesignViewUtils.prototype.errorAlert("Query name \"" + queryNameConfig + "\" is already"
-                                                                                                +" defined.");
+                        DesignViewUtils.prototype.errorAlert("Query name \"" + queryNameConfig + "\" is already"
+                            + " defined.");
                         return;
                     }
 
@@ -1135,6 +1137,9 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
                         queryOutput.setOutput(outputObject);
                         queryOutput.setType(outputType);
                     }
+
+                    $('#' + id).removeClass('incomplete-element');
+                    $('#' + id).prop('title', '');
 
                     // perform JSON validation
                     JSONValidator.prototype.validatePatternOrSequenceQuery(clickedElement, 'Sequence Query');
