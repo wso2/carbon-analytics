@@ -52,8 +52,8 @@ public abstract class BusinessRulesApiService {
     public abstract Response loadDeploymentInfo(Request request, String businessRuleInstanceID
     ) throws NotFoundException;
 
-    public abstract Response redeployBusinessRule(Request request, String businessRuleInstanceID
-    ) throws NotFoundException;
+    public abstract Response deployOrUndeployBusinessRule(Request request, String businessRuleInstanceID,
+                                                          boolean shouldUndeploy) throws NotFoundException;
 
     public abstract Response updateBusinessRule(Request request, Object businessRule
             , String businessRuleInstanceID, Boolean deploy

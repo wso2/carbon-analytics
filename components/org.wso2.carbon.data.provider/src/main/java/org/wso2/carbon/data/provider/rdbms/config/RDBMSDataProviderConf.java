@@ -17,6 +17,7 @@ package org.wso2.carbon.data.provider.rdbms.config;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import org.wso2.carbon.data.provider.ProviderConfig;
 
 /**
@@ -40,10 +41,10 @@ public class RDBMSDataProviderConf implements ProviderConfig {
         this.isPurgingEnable = false;
         this.publishingLimit = 30;
         this.purgingLimit = 30;
-        this.datasourceName = "";
-        this.queryData = new JsonObject();
-        this.tableName = "";
-        this.incrementalColumn = "";
+        this.datasourceName = "SAMPLE_DB";
+        this.queryData = new JsonParser().parse("{\"queryFunctionImpl\":\"return 'select * from TRANSACTIONS_TABLE';\"}");
+        this.tableName = "TRANSACTIONS_TABLE";
+        this.incrementalColumn = "AMOUNT";
         this.timeColumns = "";
     }
 

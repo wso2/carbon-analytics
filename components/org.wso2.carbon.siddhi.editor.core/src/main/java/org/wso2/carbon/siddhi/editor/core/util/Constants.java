@@ -57,6 +57,19 @@ public class Constants {
     static final Map<String, Class<?>> SUPER_CLASS_MAP;
     static final Map<String, String> PACKAGE_NAME_MAP;
 
+    public static final String XML_EVENT = "xml";
+    public static final String JSON_EVENT = "json";
+    public static final String TEXT_EVENT = "text";
+    public static final String SAMPLE_EVENTS_PARENT_TAG = "events";
+    public static final String SAMPLE_EVENT_PARENT_TAG = "event";
+    public static final String ATTR_TYPE_FLOAT = "float";
+    public static final String ATTR_TYPE_DOUBLE = "double";
+    public static final String ATTR_TYPE_INTEGER = "int";
+    public static final String ATTR_TYPE_LONG = "long";
+    public static final String ATTR_TYPE_STRING = "string";
+    public static final String ATTR_TYPE_BOOL = "bool";
+    public static final String EVENT_ATTRIBUTE_VALUE_SEPARATOR = ":";
+
     static {
         // Populating the processor super class map
         SUPER_CLASS_MAP = new HashMap<>();

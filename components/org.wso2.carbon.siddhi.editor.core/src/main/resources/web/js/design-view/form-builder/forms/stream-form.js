@@ -41,50 +41,7 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'stream', 'designView
 
         const alphabeticValidatorRegex = /^([a-zA-Z])$/;
 
-        //attribute delete button action
-        var delAttribute = function () {
-            $(this).closest('li').remove();
-            changeAtrributeNavigation();
-        };
-
-        //attribute add button action
-        var addAttribute = function () {
-            $("#attribute-div").append('<li class="attribute"><div class="attr-content">' +
-                '<input type="text" value="" class="attr-name"/> ' +
-                '<select class="attr-type">' +
-                '<option value="string">string</option>' +
-                '<option value="int">int</option>' +
-                '<option value="long">long</option>' +
-                '<option value="float">float</option>' +
-                '<option value="double">double</option>' +
-                '<option value="bool">bool</option>' +
-                '<option value="object">object</option>' +
-                '</select>' +
-                '</div> <div class="attr-nav"> </div></li>');
-            changeAtrributeNavigation();
-        };
-
-        //attribute move up button action
-        var moveUpAttribute = function () {
-            var $current = $(this).closest('li')
-            var $previous = $current.prev('li');
-            if ($previous.length !== 0) {
-                $current.insertBefore($previous);
-            }
-            changeAtrributeNavigation();
-        };
-
-        //attribute move down function
-        var moveDownAttribute = function () {
-            var $current = $(this).closest('li')
-            var $next = $current.next('li');
-            if ($next.length !== 0) {
-                $current.insertAfter($next);
-            }
-            changeAtrributeNavigation();
-        };
-
-        //to manage the attribute navigations
+        /** Function to manage the attribute navigations */
         var changeAtrributeNavigation = function () {
             $('.attr-nav').empty();
             var attrLength = $('#attribute-div li').length;
@@ -93,9 +50,9 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'stream', 'designView
             }
             if (attrLength == 2) {
                 $('.attribute:eq(0)').find('.attr-nav').append('<a class = "reorder-down"><i class="fw fw-sort-down">' +
-                    '</i></a>');
+                    '</i></a><a class = "btn-del-attr"><i class="fw fw-delete"></i></a>');
                 $('.attribute:eq(1)').find('.attr-nav').append('<a class="reorder-up"> <i class="fw fw-sort-up "></i>' +
-                    '</a><a class = "btn-del-attr"><i class="fw fw-cancel"></i></a>');
+                    '</a><a class = "btn-del-attr"><i class="fw fw-delete"></i></a>');
             }
             if (attrLength > 2) {
                 var lastIndex = attrLength - 1;
@@ -103,29 +60,35 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'stream', 'designView
                     $('.attribute:eq(' + i + ')').find('.attr-nav').append('<a class="reorder-up"> ' +
                         '<i class="fw fw-sort-up"></i></a>' +
                         '<a class = "reorder-down"><i class="fw fw-sort-down"> </i></a>' +
-                        '<a class = "btn-del-attr"><i class="fw fw-cancel"></i></a>');
+                        '<a class = "btn-del-attr"><i class="fw fw-delete"></i></a>');
                 }
                 $('.attribute:eq(0)').find('.attr-nav a:eq(0)').remove();
-                $('.attribute:eq(0)').find('.attr-nav a:eq(1)').remove();
                 $('.attribute:eq(' + lastIndex + ')').find('.attr-nav a:eq(1)').remove();
             }
         };
 
-        //validate the attribute names
+        /**
+         * Function to validate the attribute names
+         * @param {Object} attributeNameList to add the valid attribute names
+         * @return {boolean} isErrorOccurred
+         */
         var validateAttributeNames = function (attributeNameList) {
             var isErrorOccurred = false;
             $('.attr-name').each(function () {
                 var attributeName = $(this).val().trim();
                 if (attributeName != "") {
                     if (attributeName.indexOf(' ') >= 0) {
-                        DesignViewUtils.prototype.errorAlert("Attribute name \"" + attributeName + "\" " +
-                            "cannot have white space.");
+                        $(this).parents(".attribute").find(".error-message").text("Name can not have white space")
+                        $(this)[0].scrollIntoView();
+                        $(this).addClass('required-input-field')
                         isErrorOccurred = true;
                         return;
                     }
                     if (!alphabeticValidatorRegex.test(attributeName.charAt(0))) {
-                        DesignViewUtils.prototype.errorAlert("Attribute name \"" + attributeName + "\" " +
-                            "must start with an alphabetic character.");
+                        $(this).parents(".attribute").find(".error-message").text("Name must start with an" +
+                            " alphabetical character");
+                        $(this)[0].scrollIntoView();
+                        $(this).addClass('required-input-field')
                         isErrorOccurred = true;
                         return;
                     }
@@ -135,7 +98,12 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'stream', 'designView
             return isErrorOccurred;
         };
 
-        // to check if an annotation is predefined using the annotation name
+        /**
+         * Function to check if an annotation is predefined using the annotation name
+         * @param {Object} predefinedAnnotationList list of predefined annotations
+         * @param {String} annotationName the name which needs to be checked
+         * @return {Object} predefinedObject
+         */
         var isPredefinedAnnotation = function (predefinedAnnotationList, annotationName) {
             var predefinedObject = null;
             _.forEach(predefinedAnnotationList, function (predefinedAnnotation) {
@@ -147,8 +115,13 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'stream', 'designView
             return predefinedObject;
         };
 
-        //to validate the predefined annotations.
-        //adds the jstree nodes to annotationNodes[] which needs to be built as an annotation string
+        /**
+         * To validate the predefined annotations
+         * To store the annotation nodes which needs to be built as a string
+         * @param {Object} predefinedAnnotationList List of predefined annotations
+         * @param {Object} annotationNodes array to add the nodes which needs to be built as a string
+         * @return {boolean} isErrorOccurred
+         */
         var validatePredefinedAnnotations = function (predefinedAnnotationList, annotationNodes) {
             //gets all the parent nodes
             var jsTreeAnnotationList = $('#annotation-div').jstree(true)._model.data['#'].children;
@@ -181,8 +154,7 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'stream', 'designView
                                     if (predefinedObjectElement.isMandatory) {
                                         if (annotation_value_info.text.trim() == "") {
                                             DesignViewUtils.prototype.errorAlert("Property '" + predefinedObjectElement
-                                                .key +
-                                                "' is mandatory");
+                                                .key + "' is mandatory");
                                             isErrorOccurred = true;
                                             break mainLoop;
                                         }
@@ -199,7 +171,10 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'stream', 'designView
             return isErrorOccurred;
         };
 
-        //to check the user previously selected optional annotations/properties
+        /**
+         * Function to check the predefined saved annotations
+         * @param {Object} checkedBoxes array of saved annotation names
+         */
         var checkPredefinedAnnotations = function (checkedBoxes) {
             var jsTreeNodes = $('#annotation-div').jstree(true).get_json('#', { 'flat': true });
             for (var checkedBoxName of checkedBoxes) {
@@ -212,8 +187,13 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'stream', 'designView
             }
         };
 
-        //build the annotation string and adds it to the annotationStringList[]
-        //creates the annotation object and adds it to the annotationObjectList[]
+        /**
+         * Function to build the annotations as a string
+         * Function to create the annotation objects
+         * @param {Object} annotationNodes array of nodes which needs to be constructed
+         * @param {Object} annotationStringList array to add the built annotation strings
+         * @param {Object} annotationObjectList array to add the created annotation objects
+         */
         var annotation = "";
         var buildAnnotation = function (annotationNodes, annotationStringList, annotationObjectList) {
             _.forEach(annotationNodes, function (node) {
@@ -234,7 +214,11 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'stream', 'designView
             });
         };
 
-        //to traverse the children of the parent annotaions
+        /**
+         * Function to traverse the children of the parent annotaions
+         * @param {Object} children the children of a parent annotation node
+         * @param {Object} annotationObject the parent's annotation object
+         */
         var traverseChildAnnotations = function (children, annotationObject) {
             children.forEach(function (node) {
                 node_info = $('#annotation-div').jstree("get_node", node);
@@ -268,8 +252,10 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'stream', 'designView
             });
         };
 
-        //initialises jstree
-        //add event listeners for the annotation-div
+        /**
+         * Function to initialize the jstree
+         * Function to add the event listeners for the jstree -div
+         */
         var loadAnnotation = function () {
             //initialise jstree
             $("#annotation-div").jstree({
@@ -377,139 +363,6 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'stream', 'designView
         };
 
         /**
-         * @function generate form when defining a form
-         * @param i id for the element
-         * @param formConsole Console which holds the form
-         * @param formContainer Container which holds the form
-         */
-        StreamForm.prototype.generateDefineForm = function (i, formConsole, formContainer) {
-            var self = this;
-            var propertyDiv = $('<div class = "stream-form-container"><div id="property-header"><h3>Stream' +
-                'Configuration</h3></div> <h3>Name: </h3> <input type="text" id="streamName"> <div ' +
-                'id="define-attribute"></div><button id="submit" type="button" class="btn toggle-view-button">Submit' +
-                '</button></div> <div class= "stream-form-container" id="define-annotation"> </div>');
-            formContainer.append(propertyDiv);
-            self.designViewContainer.addClass('disableContainer');
-            self.toggleViewButton.addClass('disableContainer');
-
-            var predefinedAnnotationList = self.configurationData.application.config.stream_predefined_annotations
-
-            var attributeFormTemplate = Handlebars.compile($('#attribute-form-template').html());
-            var wrappedHtml = attributeFormTemplate([{ name: "", type: "string" }]);
-            $('#define-attribute').html(wrappedHtml);
-
-            var raw_partial = document.getElementById('recursiveAnnotationPartial').innerHTML;
-            Handlebars.registerPartial('recursiveAnnotation', raw_partial);
-
-            var annotationFormTemplate = Handlebars.compile($('#annotation-form-template').html());
-            var wrappedHtml = annotationFormTemplate(predefinedAnnotationList);
-            $('#define-annotation').html(wrappedHtml);
-
-            //add event listeners for the attribute div buttons
-            $("#btn-add-attribute").click(addAttribute)
-            $("#attribute-div").on('click', '.btn-del-attr', delAttribute)
-            $("#attribute-div").on('click', '.reorder-up', moveUpAttribute)
-            $("#attribute-div").on('click', '.reorder-down', moveDownAttribute)
-            //onload of the attribute div arrange the navigations of the attribute
-            $('#attribute-div').ready(changeAtrributeNavigation);
-            $('#annotation-div').ready(loadAnnotation);
-
-            var streamName = "";
-            // 'Submit' button action
-            $('#submit').on('click', function () {
-
-                streamName = $('#streamName').val().trim();
-
-                //to check if stream name is already existing
-                var isStreamNameUsed = self.formUtils.isDefinitionElementNameUsed(streamName);
-                if (isStreamNameUsed) {
-                    DesignViewUtils.prototype.errorAlert("Stream name \"" + streamName + "\" is already used.");
-                    return;
-                }
-                // to check if stream name is empty
-                if (streamName == "") {
-                    DesignViewUtils.prototype.errorAlert("Stream name is required");
-                    return;
-                }
-                //to check if stream name contains white spaces
-                if (streamName.indexOf(' ') >= 0) {
-                    DesignViewUtils.prototype.errorAlert("Stream name \"" + streamName + "\" " +
-                        "cannot have white space.");
-                    return;
-                }
-                //to check if stream name starts with an alphabetic character
-                if (!(alphabeticValidatorRegex).test(streamName.charAt(0))) {
-                    DesignViewUtils.prototype.errorAlert("Stream name \"" + streamName + "\" " +
-                        "must start with an alphabetic character.");
-                    return;
-                }
-
-                // set the isDesignViewContentChanged to true
-                self.configurationData.setIsDesignViewContentChanged(true);
-
-                //add the new out stream to the stream array
-                var streamOptions = {};
-                _.set(streamOptions, 'id', i);
-                _.set(streamOptions, 'name', $('#streamName').val());
-                var stream = new Stream(streamOptions);
-
-                var attributeNameList = [];
-                if (validateAttributeNames(attributeNameList)) { return }
-
-                if (attributeNameList.length == 0) {
-                    DesignViewUtils.prototype.errorAlert("Minimum one attribute is required");
-                    return;
-                } else {
-                    $('.attribute .attr-content').each(function () {
-                        var nameValue = $(this).find('.attr-name').val().trim();
-                        var typeValue = $(this).find('.attr-type').val();
-                        if (nameValue != "") {
-                            var attributeObject = new Attribute({ name: nameValue, type: typeValue });
-                            stream.addAttribute(attributeObject)
-                        }
-                    });
-                }
-
-                var annotationNodes = [];
-                var annotationStringList = [];
-                var annotationObjectList = [];
-                //validate the annotations
-                if (validatePredefinedAnnotations(predefinedAnnotationList, annotationNodes)) {
-                    return;
-                }
-                buildAnnotation(annotationNodes, annotationStringList, annotationObjectList);
-
-                _.forEach(annotationStringList, function (annotation) {
-                    stream.addAnnotation(annotation);
-                });
-                _.forEach(annotationObjectList, function (annotation) {
-                    stream.addAnnotationObject(annotation)
-                });
-
-                self.configurationData.getSiddhiAppConfig().addStream(stream);
-
-                var textNode = $('#' + i).find('.streamNameNode');
-                textNode.html(streamName);
-
-                // If this is an inner stream perform validation
-                var streamSavedInsideAPartition
-                    = self.configurationData.getSiddhiAppConfig().getStreamSavedInsideAPartition(i);
-                // if streamSavedInsideAPartition is undefined then the stream is not inside a partition
-                if (streamSavedInsideAPartition !== undefined) {
-                    JSONValidator.prototype.validateInnerStream(stream, self.jsPlumbInstance, true);
-                }
-
-                // close the form window
-                self.consoleListManager.removeFormConsole(formConsole);
-
-                self.designViewContainer.removeClass('disableContainer');
-                self.toggleViewButton.removeClass('disableContainer');
-
-            }); //closure of the submit button
-            return streamName;
-        };
-
-        /**
          * @function generate properties form for a stream
          * @param element selected element(stream)
          * @param formConsole Console which holds the form
@@ -518,75 +371,132 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'stream', 'designView
         StreamForm.prototype.generatePropertiesForm = function (element, formConsole, formContainer) {
 
             var self = this;
-            var propertyDiv = $('<div class= "stream-form-container"><div id="property-header"><h3>Stream' +
-                'Configuration</h3></div> <h3>Name: </h3> <input type="text" id="streamName"> <div ' +
-                'id="define-attribute"></div><button id="submit" type="button" class="btn toggle-view-button">Submit' +
-                '</button></div> <div class = "stream-form-container" id="define-annotation"> </div>');
-            formContainer.append(propertyDiv);
-            self.designViewContainer.addClass('disableContainer');
-            self.toggleViewButton.addClass('disableContainer');
-
             var id = $(element).parent().attr('id');
-            // retrieve the stream information from the collection
             var clickedElement = self.configurationData.getSiddhiAppConfig().getStream(id);
             if (!clickedElement) {
                 var errorMessage = 'unable to find clicked element';
                 log.error(errorMessage);
                 throw errorMessage;
             }
-            var name = clickedElement.getName();
-            //load the saved attributes
-            var savedAttributes = clickedElement.getAttributeList();
+            $('#' + id).addClass('selected-element');
+            $(".overlayed-container").fadeTo(200, 1);
+            var propertyDiv = $('<div class = "stream-form-container"><div id="property-header"><h3>Stream' +
+                ' Configuration</h3></div> <h4>Name: </h4> <input type="text" id="streamName" class="clearfix">' +
+                '<label class="error-message" id="streamNameErrorMessage"></label> <div id="define-attribute"></div>' +
+                '<button id="btn-submit" type="button" class="btn toggle-view-button">' +
+                'Submit </button></div> <div class= "stream-form-container" id="define-annotation"> </div>');
+            formContainer.append(propertyDiv);
+            self.designViewContainer.addClass('disableContainer');
+            self.toggleViewButton.addClass('disableContainer');
 
-            //load the saved annotations
-            var savedAnnotations = clickedElement.getAnnotationListObjects();
             var annotations = [];
+            var predefinedAnnotationList = self.configurationData.application.config.stream_predefined_annotations;
             var checkedAnnotations = [];
-            var predefinedAnnotationList = self.configurationData.application.config.stream_predefined_annotations
-            _.forEach(predefinedAnnotationList, function (predefinedAnnotation) {
-                var foundPredefined = false;
-                _.forEach(savedAnnotations, function (savedAnnotation) {
-                    if (savedAnnotation.name.toLowerCase() == predefinedAnnotation.name.toLowerCase()) {
-                        //if an optional annotation is found push it to the checkedAnnotations[]
-                        if (!predefinedAnnotation.isMandatory) {
-                            checkedAnnotations.push(savedAnnotation.name);
-                        }
-                        foundPredefined = true;
-                        _.forEach(predefinedAnnotation.elements, function (predefinedAnnotationElement) {
-                            _.forEach(savedAnnotation.elements, function (savedAnnotationElement) {
-                                if (predefinedAnnotationElement.key.toLowerCase() == savedAnnotationElement.key
-                                    .toLowerCase()) {
-                                    //if an optional property is found push it to the checkedAnnotations[]
-                                    if (!predefinedAnnotationElement.isMandatory) {
-                                        checkedAnnotations.push(savedAnnotationElement.key);
+
+            //To add attribute
+            $("#define-attribute").on('click', '#btn-add-attribute', function () {
+                $("#attribute-div").append('<li class="attribute clearfix"><div class="clearfix"> ' +
+                    '<div class="attr-content">' +
+                    '<input type="text" value="" class="attr-name"/> ' +
+                    '<select class="attr-type">' +
+                    '<option value="string">string</option>' +
+                    '<option value="int">int</option>' +
+                    '<option value="long">long</option>' +
+                    '<option value="float">float</option>' +
+                    '<option value="double">double</option>' +
+                    '<option value="bool">bool</option>' +
+                    '<option value="object">object</option>' +
+                    '</select>' +
+                    '</div> <div class="attr-nav"> </div></div>' +
+                    '<label class="error-message"></label></li>');
+                changeAtrributeNavigation();
+            });
+
+            //To delete attribute
+            $("#define-attribute").on('click', '#attribute-div .btn-del-attr', function () {
+                $(this).closest('li').remove();
+                changeAtrributeNavigation();
+            });
+
+            //To reorder up the attribute
+            $("#define-attribute").on('click', ' #attribute-div .reorder-up', function () {
+                var $current = $(this).closest('li');
+                var $previous = $current.prev('li');
+                if ($previous.length !== 0) {
+                    $current.insertBefore($previous);
+                }
+                changeAtrributeNavigation();
+
+            });
+
+            //To reorder down the attribute
+            $("#define-attribute").on('click', ' #attribute-div .reorder-down', function () {
+                var $current = $(this).closest('li');
+                var $next = $current.next('li');
+                if ($next.length !== 0) {
+                    $current.insertAfter($next);
+                }
+                changeAtrributeNavigation();
+            });
+
+            var name = clickedElement.getName();
+            if (name === undefined) {
+                annotations = predefinedAnnotationList;
+                var attributeFormTemplate = Handlebars.compile($('#attribute-form-template').html());
+                var wrappedHtml = attributeFormTemplate([{ name: "", type: "string" }]);
+                $('#define-attribute').html(wrappedHtml);
+            } else {
+                //add the saved name to the input field
+                $('#streamName').val(name);
+                //load the saved attributes
+                var savedAttributes = clickedElement.getAttributeList();
+                var attributeFormTemplate = Handlebars.compile($('#attribute-form-template').html());
+                var wrappedHtml = attributeFormTemplate(savedAttributes);
+                $('#define-attribute').html(wrappedHtml);
+                changeAtrributeNavigation();
+
+                //to select the options(type) of the saved attributes
+                var i = 0;
+                $('.attribute .attr-content').each(function () {
+                    $(this).find('.attr-type option').filter(function () {
+                        return ($(this).val() == (savedAttributes[i].getType()).toLowerCase());
+                    }).prop('selected', true);
+                    i++;
+                });
+
+                //load the saved annotations
+                var savedAnnotations = clickedElement.getAnnotationListObjects();
+                _.forEach(predefinedAnnotationList, function (predefinedAnnotation) {
+                    var foundPredefined = false;
+                    _.forEach(savedAnnotations, function (savedAnnotation) {
+                        if (savedAnnotation.name.toLowerCase() == predefinedAnnotation.name.toLowerCase()) {
+                            //if an optional annotation is found push it to the checkedAnnotations[]
+                            if (!predefinedAnnotation.isMandatory) {
+                                checkedAnnotations.push(savedAnnotation.name);
+                            }
+                            foundPredefined = true;
+                            _.forEach(predefinedAnnotation.elements, function (predefinedAnnotationElement) {
+                                _.forEach(savedAnnotation.elements, function (savedAnnotationElement) {
+                                    if (predefinedAnnotationElement.key.toLowerCase() == savedAnnotationElement.key
+                                        .toLowerCase()) {
+                                        //if an optional property is found push it to the checkedAnnotations[]
+                                        if (!predefinedAnnotationElement.isMandatory) {
+                                            checkedAnnotations.push(savedAnnotationElement.key);
+                                        }
+                                        predefinedAnnotationElement.value = savedAnnotationElement.value;
                                     }
-                                    predefinedAnnotationElement.value = savedAnnotationElement.value
-                                }
+                                })
                             })
-                        })
+                            annotations.push(predefinedAnnotation)
+                        } else {
+                            annotations.push(savedAnnotation)
+                        }
+                    });
+                    if (!foundPredefined) {
                         annotations.push(predefinedAnnotation)
-                    } else {
-                        annotations.push(savedAnnotation)
                     }
                 });
-                if (!foundPredefined) {
-                    annotations.push(predefinedAnnotation)
-                }
-            });
-
-            $('#streamName').val(name);
-            var attributeFormTemplate = Handlebars.compile($('#attribute-form-template').html());
-            var wrappedHtml = attributeFormTemplate(savedAttributes);
-            $('#define-attribute').html(wrappedHtml);
-
-            //to select the options(type) of the saved attributes
-            var i = 0;
-            $('.attribute .attr-content').each(function () {
-                $(this).find('.attr-type option').filter(function () {
-                    return ($(this).text() == (savedAttributes[i].getType()).toLowerCase());
-                }).prop('selected', true);
-                i++;
-            });
+            }
 
             var raw_partial = document.getElementById('recursiveAnnotationPartial').innerHTML;
             Handlebars.registerPartial('recursiveAnnotation', raw_partial);
@@ -596,14 +506,13 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'stream', 'designView
             loadAnnotation();
             checkPredefinedAnnotations(checkedAnnotations);
 
-            $("#btn-add-attribute").click(addAttribute)
-            $("#attribute-div").on('click', '.btn-del-attr', delAttribute)
-            $("#attribute-div").on('click', '.reorder-up', moveUpAttribute)
-            $("#attribute-div").on('click', '.reorder-down', moveDownAttribute)
-            //onload of the attribute div arrange the navigations of the attribute
-            $('#attribute-div').ready(changeAtrributeNavigation);
 
-            $('#submit').on('click', function () {
+            //submit button action
+            var submitButtonElement = $(formContainer).find('#btn-submit')[0];
+            submitButtonElement.addEventListener('click', function () {
+                $('.error-message').text("")
+                $('.required-input-field').removeClass('required-input-field');
+                $('#streamNameErrorMessage').text("")
                 // set the isDesignViewContentChanged to true
                 self.configurationData.setIsDesignViewContentChanged(true);
 
@@ -620,7 +529,9 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'stream', 'designView
                 if (!isStreamSavedInsideAPartition) {
                     firstCharacterInStreamName = (configName).charAt(0);
                     if (firstCharacterInStreamName === '#') {
-                        DesignViewUtils.prototype.errorAlert("'#' is used to define inner streams only.");
+                        $('#streamName').addClass('required-input-field');
+                        $('#streamName')[0].scrollIntoView();
+                        $('#streamNameErrorMessage').text("'#' is used to define inner streams only.")
                         return;
                     } else {
                         streamName = configName;
@@ -628,7 +539,9 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'stream', 'designView
                     isStreamNameUsed
                         = self.formUtils.isDefinitionElementNameUsed(streamName, id);
                     if (isStreamNameUsed) {
-                        DesignViewUtils.prototype.errorAlert("Stream name \"" + streamName + "\" is already defined.");
+                        $('#streamName').addClass('required-input-field');
+                        $('#streamName')[0].scrollIntoView();
+                        $('#streamNameErrorMessage').text("Stream name is already defined.")
                         return;
                     }
                 } else {
@@ -644,29 +557,37 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'stream', 'designView
                     isStreamNameUsed
                         = self.formUtils.isStreamDefinitionNameUsedInPartition(partitionId, streamName, id);
                     if (isStreamNameUsed) {
-                        DesignViewUtils.prototype
-                            .errorAlert("Stream name \"" + streamName + "\" is already defined in the partition.");
+                        $('#streamName').addClass('required-input-field');
+                        $('#streamName')[0].scrollIntoView();
+                        $('#streamNameErrorMessage').text("Stream name is already defined in the partition.")
                         return;
                     }
                 }
 
-                var previouslySavedName = clickedElement.getName().trim();
+                //check if stream name is empty
+                if (streamName == "") {
+                    $('#streamName').addClass('required-input-field');
+                    $('#streamName')[0].scrollIntoView();
+                    $('#streamNameErrorMessage').text("Stream name is required.")
+                    return;
+                }
+
+                var previouslySavedName = clickedElement.getName();
+                if (previouslySavedName === undefined) {
+                    previouslySavedName = "";
+                }
                 // update connection related to the element if the name is changed
                 if (previouslySavedName !== streamName) {
-                    //check if stream name is empty
-                    if (streamName == "") {
-                        DesignViewUtils.prototype
-                            .errorAlert("Stream name is required");
-                        return;
-                    }
                     if ((streamName.indexOf(' ') >= 0)) {
-                        DesignViewUtils.prototype.errorAlert("Stream name \"" + streamName + "\" " +
-                            "cannot have white space.");
+                        $('#streamName').addClass('required-input-field');
+                        $('#streamName')[0].scrollIntoView();
+                        $('#streamNameErrorMessage').text("Stream name cannot have white space.")
                         return;
                     }
                     if (!alphabeticValidatorRegex.test(streamName.charAt(0))) {
-                        DesignViewUtils.prototype.errorAlert("Stream name \"" + streamName + "\" " +
-                            "must start with an alphabetic character.");
+                        $('#streamName').addClass('required-input-field');
+                        $('#streamName')[0].scrollIntoView();
+                        $('#streamNameErrorMessage').text("Stream name must start with an alphabetic character.")
                         return;
                     }
                     // update selected stream model
@@ -678,7 +599,9 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'stream', 'designView
                 if (validateAttributeNames(attributeNameList)) { return }
 
                 if (attributeNameList.length == 0) {
-                    DesignViewUtils.prototype.errorAlert("Minimum one attribute is required");
+                    $('.attribute:eq(0)').find('.attr-name').addClass('required-input-field');
+                    $('.attribute:eq(0)').find('.attr-name')[0].scrollIntoView();
+                    $('.attribute:eq(0)').find('.error-message').text("Minimum one attribute is required")
                     return;
                 } else {
                     //clear the previously saved attribute list
@@ -714,9 +637,6 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'stream', 'designView
                     clickedElement.addAnnotationObject(annotation);
                 });
 
-                var textNode = $(element).parent().find('.streamNameNode');
-                textNode.html(streamName);
-
                 // If this is an inner stream perform validation
                 var streamSavedInsideAPartition
                     = self.configurationData.getSiddhiAppConfig().getStreamSavedInsideAPartition(id);
@@ -724,6 +644,12 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'stream', 'designView
                 if (streamSavedInsideAPartition !== undefined) {
                     JSONValidator.prototype.validateInnerStream(clickedElement, self.jsPlumbInstance, true);
                 }
+
+                var textNode = $('#' + id).find('.streamNameNode');
+                textNode.html(streamName);
+
+                $('#' + id).removeClass('incomplete-element');
+                $('#' + id).prop('title', '');
 
                 self.designViewContainer.removeClass('disableContainer');
                 self.toggleViewButton.removeClass('disableContainer');

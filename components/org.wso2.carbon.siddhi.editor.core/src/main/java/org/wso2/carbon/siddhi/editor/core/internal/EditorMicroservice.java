@@ -25,6 +25,7 @@ import com.google.gson.JsonObject;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
+import org.json.JSONObject;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceRegistration;
 import org.osgi.service.component.annotations.Activate;
@@ -39,18 +40,21 @@ import org.wso2.carbon.config.provider.ConfigProvider;
 import org.wso2.carbon.siddhi.editor.core.EditorSiddhiAppRuntimeService;
 import org.wso2.carbon.siddhi.editor.core.Workspace;
 import org.wso2.carbon.siddhi.editor.core.commons.metadata.MetaData;
+import org.wso2.carbon.siddhi.editor.core.commons.request.DockerDownloadRequest;
 import org.wso2.carbon.siddhi.editor.core.commons.request.ValidationRequest;
 import org.wso2.carbon.siddhi.editor.core.commons.response.DebugRuntimeResponse;
 import org.wso2.carbon.siddhi.editor.core.commons.response.GeneralResponse;
 import org.wso2.carbon.siddhi.editor.core.commons.response.MetaDataResponse;
 import org.wso2.carbon.siddhi.editor.core.commons.response.Status;
 import org.wso2.carbon.siddhi.editor.core.commons.response.ValidationSuccessResponse;
+import org.wso2.carbon.siddhi.editor.core.exception.DockerGenerationException;
 import org.wso2.carbon.siddhi.editor.core.internal.local.LocalFSWorkspace;
 import org.wso2.carbon.siddhi.editor.core.util.Constants;
 import org.wso2.carbon.siddhi.editor.core.util.DebugCallbackEvent;
 import org.wso2.carbon.siddhi.editor.core.util.DebugStateHolder;
 import org.wso2.carbon.siddhi.editor.core.util.LogEncoder;
 import org.wso2.carbon.siddhi.editor.core.util.MimeMapper;
+import org.wso2.carbon.siddhi.editor.core.util.SampleEventGenerator;
 import org.wso2.carbon.siddhi.editor.core.util.SecurityUtil;
 import org.wso2.carbon.siddhi.editor.core.util.SourceEditorUtils;
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.EventFlow;
@@ -69,6 +73,7 @@ import org.wso2.siddhi.core.SiddhiManager;
 import org.wso2.siddhi.core.debugger.SiddhiDebugger;
 import org.wso2.siddhi.core.exception.SiddhiAppCreationException;
 import org.wso2.siddhi.core.util.SiddhiComponentActivator;
+import org.wso2.siddhi.query.api.definition.StreamDefinition;
 import org.wso2.siddhi.query.api.exception.SiddhiAppContextException;
 
 import java.io.File;
@@ -79,7 +84,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.AccessDeniedException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -93,9 +97,11 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
+import javax.ws.rs.NotFoundException;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
@@ -349,6 +355,21 @@ public class EditorMicroservice implements Microservice {
         } catch (IOException e) {
             return Response.serverError().entity("failed." + e.getMessage())
                     .build();
+        } catch (Throwable ignored) {
+            return Response.serverError().entity("failed")
+                    .build();
+        }
+    }
+
+    @GET
+    @Path("/workspace/listFiles/samples/descriptions")
+    @Produces("application/json")
+    public Response filesInSamplePathWithDescription() {
+        try {
+            Map<String, String> siddhiSampleMap = EditorDataHolder.getSiddhiSampleMap();
+            return Response.status(Response.Status.OK)
+                    .entity(workspace.listSamplesInPath(siddhiSampleMap))
+                    .type(MediaType.APPLICATION_JSON).build();
         } catch (Throwable ignored) {
             return Response.serverError().entity("failed")
                     .build();
@@ -857,6 +878,78 @@ public class EditorMicroservice implements Microservice {
     }
 
     /**
+     * Download set of Siddhi files as a docker-compose artifacts archive.
+     *
+     * @param query JSON string with selected artifacts.
+     * @return Docker artifacts
+     */
+    @GET
+    @Path("/docker/download")
+    public Response downloadAsDocker(@QueryParam("q") String query) {
+        Gson gson = new Gson();
+        DockerDownloadRequest request = gson.fromJson(query, DockerDownloadRequest.class);
+
+        // Create zip archive and download
+        DockerUtils dockerUtils = new DockerUtils(configProvider);
+        try {
+            File zipFile = dockerUtils.createArchive(request.getProfile(), request.getFiles());
+            return Response
+                    .status(Response.Status.OK)
+                    .entity(zipFile)
+                    .header("Content-Disposition", "attachment; filename=docker-artifacts.zip")
+                    .build();
+
+        } catch (DockerGenerationException e) {
+            log.error("Cannot generate docker-artifacts archive.", e);
+            return Response
+                    .status(Response.Status.INTERNAL_SERVER_ERROR)
+                    .build();
+        }
+    }
+
+    /**
+     * Get sample event for a particular event stream.
+     *
+     * @param appName Siddhi app name.
+     * @param streamName Stream name.
+     * @param eventType The event type os the requested event (json, xml, text).
+     * @return Sample event
+     */
+    @GET
+    @Path("/siddhi-apps/{appName}/streams/{streamName}/event/{type}")
+    @Produces({"text/plain"})
+    public Response getDefaultSampleStreamEvent(@PathParam("appName") String appName,
+                                                @PathParam("streamName") String streamName,
+                                                @PathParam("type") String eventType)
+            throws NotFoundException {
+        SiddhiAppRuntime siddhiAppRuntime = EditorDataHolder.getSiddhiManager().getSiddhiAppRuntime(appName);
+        JSONObject errorResponse = new JSONObject();
+        if (siddhiAppRuntime == null) {
+            errorResponse.put("error", "There is no Siddhi App exist with provided name : " + appName);
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(errorResponse.toString()).build();
+        } else {
+            StreamDefinition streamDefinition = siddhiAppRuntime.getStreamDefinitionMap().get(streamName);
+            if (streamDefinition == null) {
+                errorResponse.put("error", "There is no Stream called " + streamName + " in " +
+                        appName + " Siddhi App.");
+                return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(errorResponse.toString()).build();
+            } else {
+                if (eventType.equals(Constants.XML_EVENT)) {
+                    return Response.ok().entity(SampleEventGenerator.generateXMLEvent(streamDefinition)).build();
+                } else if (eventType.equals(Constants.JSON_EVENT)) {
+                    return Response.ok().entity(SampleEventGenerator.generateJSONEvent(streamDefinition)).build();
+                } else if (eventType.equals(Constants.TEXT_EVENT)) {
+                    return Response.ok().entity(SampleEventGenerator.generateTextEvent(streamDefinition)).build();
+                } else {
+                    errorResponse.put("error", "Invalid type: " + eventType + " given to retrieve the sample event.");
+                    return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(errorResponse.toString()).
+                            build();
+                }
+            }
+        }
+    }
+
+    /**
      * This is the activation method of EditorMicroservice. This will be called when its references are
      * satisfied.
      *
@@ -876,6 +969,7 @@ public class EditorMicroservice implements Microservice {
                 new EditorSiddhiAppRuntimeService(), null);
         serviceRegistration = bundleContext.registerService(EventStreamService.class.getName(),
                 new DebuggerEventStreamService(), null);
+        loadSampleFiles();
     }
 
     /**
@@ -930,5 +1024,38 @@ public class EditorMicroservice implements Microservice {
 
     protected void unregisterConfigProvider(ConfigProvider configProvider) {
         this.configProvider = null;
+    }
+
+    protected void loadSampleFiles() {
+        String location = (Paths.get(Constants.CARBON_HOME, Constants.DIRECTORY_SAMPLE,
+                Constants.DIRECTORY_ARTIFACTS)).toString();
+        String relativePath = "";
+        java.nio.file.Path pathLocation = SecurityUtil.resolvePath(Paths.get(location).toAbsolutePath(),
+                Paths.get(new String(Base64.getDecoder().
+                        decode(relativePath), Charset.defaultCharset())));
+
+        String regex = "@[Aa][Pp][Pp]:[Dd][Ee][Ss][Cc][Rr][Ii][Pp][Tt][Ii][Oo][Nn]\\(['|\"](.*?)['|\"]\\)";
+        Pattern pattern = Pattern.compile(regex);
+        try {
+            Map<String, String> sampleMap = new HashMap<>();
+            List<java.nio.file.Path> collect = Files.walk(pathLocation)
+                    .filter(s -> s.toString().endsWith(".siddhi"))
+                    .sorted()
+                    .collect(Collectors.toList());
+            for (java.nio.file.Path path : collect) {
+                String fileContent = new String(Files.readAllBytes(path), Charset.defaultCharset());
+                Matcher matcher = pattern.matcher(fileContent);
+                String descriptionText = "";
+                if (matcher.find()) {
+                    String description = matcher.group();
+                    descriptionText = description.substring(description.indexOf("(") + 1, description.lastIndexOf(")"));
+                }
+                java.nio.file.Path relativeSamplePath = pathLocation.relativize(path);
+                sampleMap.put(relativeSamplePath.toString(), descriptionText);
+            }
+            EditorDataHolder.setSiddhiSampleMap(sampleMap);
+        } catch (IOException e) {
+            log.error("Error while reading the sample descriptions.", e);
+        }
     }
 }
