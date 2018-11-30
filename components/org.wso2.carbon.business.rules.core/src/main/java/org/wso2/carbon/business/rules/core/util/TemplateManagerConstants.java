@@ -35,7 +35,8 @@ public class TemplateManagerConstants {
     Pattern of Template names
     @App:name("SiddhiAppName")
     */
-    public static final String SIDDHI_APP_NAME_REGEX_PATTERN = "@(A|a)pp:name\\([\\\",\\\'](\\S+)[\\\",\\\']\\)";
+    public static final String SIDDHI_APP_NAME_REGEX_PATTERN =
+            "@(A|a)pp:name\\([\\\",\\']((\\S+)|(\\S+ *\\S+)*)[\\\",\\']\\)";
     // @App:name("SiddhiAppName")
     public static final String SIDDHI_APP_RULE_LOGIC_PATTERN = "(\\d{1,})";
     // Template / Artifact types
