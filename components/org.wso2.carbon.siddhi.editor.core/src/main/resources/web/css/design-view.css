@@ -967,7 +967,7 @@ a.list-group-item, button.list-group-item {
 	margin-top: 10px;
 }
 
-#selector{
+.selector{
     position: fixed;
     background: rgba(0, 0, 255, 0.1) none repeat scroll 0% 0%;
     border: 1px solid rgba(0, 0, 255, 0.45);

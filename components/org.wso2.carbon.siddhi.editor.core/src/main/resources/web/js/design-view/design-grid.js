@@ -41,7 +41,8 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
             SEQUENCE: 'sequenceQueryDrop',
             PARTITION: 'partitionDrop',
             PARTITION_CONNECTION_POINT: 'partition-connector-in-part',
-            SELECTOR: 'selector'
+            SELECTOR: 'selector',
+            MULTI_SELECTOR:'multi-selector'
         };
 
         /**
@@ -2338,26 +2339,26 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
 
         DesignGrid.prototype.enableMultipleSelection = function () {
             var self = this;
-            var selector = $('<div>').attr('id', constants.SELECTOR);
+            var selector = $('<div>').attr('id',constants.MULTI_SELECTOR).addClass(constants.SELECTOR);
             self.canvas.append(selector);
 
             new DragSelect({
-                selectables: document.querySelectorAll(".jtk-draggable"),
-                selector: document.getElementById("selector"),
-                multiSelectKeys: ["ctrlKey", "shiftKey"],
+                selectables: document.querySelectorAll('.jtk-draggable'),
+                selector: document.getElementById(constants.MULTI_SELECTOR),
+                multiSelectKeys: ['ctrlKey', 'shiftKey'],
                 onElementSelect: function (element) {
                     if (!self.selectedObjects.includes(element)) {
                         self.jsPlumbInstance.addToDragSelection(element);
-                        $(element).css("border-color", "#4af");
-                        $(element).css("box-shadow", "0 0 1px 2px #4af");
+                        $(element).css('border-color', '#4af');
+                        $(element).css('box-shadow', '0 0 1px 2px #4af');
                         self.selectedObjects.push(element);
                     }
                 },
                 onElementUnselect: function (element) {
                     self.jsPlumbInstance.clearDragSelection();
                     self.selectedObjects.forEach(function (object) {
-                        $(object).css("border-color", "#ccc");
-                        $(object).css("box-shadow", "none");
+                        $(object).css('border-color', '#ccc');
+                        $(object).css('box-shadow', 'none');
                     });
                     self.selectedObjects = [];
                 }
