@@ -2339,30 +2339,32 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
             var self = this;
             var selector = document.createElement('div');
             selector.setAttribute("id", "selector");
-            selector.style.position = 'absolute';
-            selector.style.background = 'rgba(0, 0, 255, 0.1)';
-            selector.style.border = '1px solid rgba(0, 0, 255, 0.45)';
-            selector.style.display = 'none';
-            selector.style.pointerEvents = 'none'; // fix for issue #8 (ie11+)
+            selector.style.position = "fixed";
+            selector.style.background = "rgba(0, 0, 255, 0.1)";
+            selector.style.border = "1px solid rgba(0, 0, 255, 0.45)";
+            selector.style.display = "none";
+            selector.style.pointerEvents = "none"; // for (ie11+)
             selector.style.left = "0px";
             selector.style.top = "0px";
             self.canvas.append(selector);
 
             new DragSelect({
-                selectables: document.querySelectorAll('.jtk-draggable'),
+                selectables: document.querySelectorAll(".jtk-draggable"),
                 selector: document.getElementById("selector"),
-                multiSelectKeys: ['ctrlKey', 'shiftKey', 'metaKey'],
+                multiSelectKeys: ["ctrlKey", "shiftKey"],
                 onElementSelect: function (element) {
                     if (!self.selectableObjects.includes(element)) {
                         self.jsPlumbInstance.addToDragSelection(element);
                         $(element).css("border-color", "#4af");
+                        $(element).css("box-shadow", "0 0 1px 2px #4af");
                         self.selectableObjects.push(element);
                     }
                 },
-                onElementUnselect: function (e) {
+                onElementUnselect: function (element) {
                     self.jsPlumbInstance.clearDragSelection();
                     self.selectableObjects.forEach(function (object) {
-                        $(object).css("border-color", "grey");
+                        $(object).css("border-color", "#ccc");
+                        $(object).css("box-shadow", "none");
                         var objectIndex = self.selectableObjects.indexOf(object);
                         self.selectableObjects.splice(objectIndex, 1);
                     });
