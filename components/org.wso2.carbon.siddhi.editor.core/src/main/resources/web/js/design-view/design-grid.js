@@ -17,7 +17,7 @@
  */
 define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dropElements', 'dagre', 'edge',
         'windowFilterProjectionQueryInput', 'joinQueryInput', 'patternOrSequenceQueryInput', 'queryOutput',
-        'partitionWith', 'jsonValidator'],
+        'partitionWith', 'jsonValidator', 'dragSelect'],
 
     function (require, log, $, Backbone, _, DesignViewUtils, DropElements, dagre, Edge,
               WindowFilterProjectionQueryInput, JoinQueryInput, PatternOrSequenceQueryInput, QueryOutput,
@@ -69,6 +69,7 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
             this.designViewContainer = $('#design-container-' + this.currentTabId);
             this.toggleViewButton = $('#toggle-view-button-' + this.currentTabId);
             this.designGridContainer = $('#design-grid-container-' + this.currentTabId);
+            this.selectableObjects = [];
         };
 
         DesignGrid.prototype.render = function () {
@@ -1375,6 +1376,8 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
             addMemberToPartitionGroup(self);
 
             self.drawGraphFromAppData();
+
+            self.multipleSelection();
         };
 
         DesignGrid.prototype.drawGraphFromAppData = function () {
@@ -1934,6 +1937,7 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
             self.configurationData.getSiddhiAppConfig()
                 .setFinalElementCount(self.configurationData.getSiddhiAppConfig().getFinalElementCount() + 1);
             self.dropElements.registerElementEventListeners(newAgent);
+            self.multipleSelection();
         };
 
         DesignGrid.prototype.handleSinkAnnotation = function (mouseTop, mouseLeft, isCodeToDesignMode, sinkName,
@@ -1963,6 +1967,7 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
             self.configurationData.getSiddhiAppConfig()
                 .setFinalElementCount(self.configurationData.getSiddhiAppConfig().getFinalElementCount() + 1);
             self.dropElements.registerElementEventListeners(newAgent);
+            self.multipleSelection();
         };
 
         DesignGrid.prototype.handleStream = function (mouseTop, mouseLeft, isCodeToDesignMode, streamId, streamName) {
@@ -1992,6 +1997,7 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
             self.configurationData.getSiddhiAppConfig()
                 .setFinalElementCount(self.configurationData.getSiddhiAppConfig().getFinalElementCount() + 1);
             self.dropElements.registerElementEventListeners(newAgent);
+            self.multipleSelection();
         };
 
         DesignGrid.prototype.handleTable = function (mouseTop, mouseLeft, isCodeToDesignMode, tableId, tableName) {
@@ -2020,6 +2026,7 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
             self.configurationData.getSiddhiAppConfig()
                 .setFinalElementCount(self.configurationData.getSiddhiAppConfig().getFinalElementCount() + 1);
             self.dropElements.registerElementEventListeners(newAgent);
+            self.multipleSelection();
         };
 
         DesignGrid.prototype.handleWindow = function (mouseTop, mouseLeft, isCodeToDesignMode, windowId, windowName) {
@@ -2048,6 +2055,7 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
             self.configurationData.getSiddhiAppConfig()
                 .setFinalElementCount(self.configurationData.getSiddhiAppConfig().getFinalElementCount() + 1);
             self.dropElements.registerElementEventListeners(newAgent);
+            self.multipleSelection();
         };
 
         DesignGrid.prototype.handleTrigger = function (mouseTop, mouseLeft, isCodeToDesignMode, triggerId,
@@ -2077,6 +2085,7 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
             self.configurationData.getSiddhiAppConfig()
                 .setFinalElementCount(self.configurationData.getSiddhiAppConfig().getFinalElementCount() + 1);
             self.dropElements.registerElementEventListeners(newAgent);
+            self.multipleSelection();
         };
 
         DesignGrid.prototype.handleAggregation = function (mouseTop, mouseLeft, isCodeToDesignMode, aggregationId,
@@ -2103,6 +2112,7 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
             self.configurationData.getSiddhiAppConfig()
                 .setFinalElementCount(self.configurationData.getSiddhiAppConfig().getFinalElementCount() + 1);
             self.dropElements.registerElementEventListeners(newAgent);
+            self.multipleSelection();
         };
 
         DesignGrid.prototype.handleFunction = function (mouseTop, mouseLeft, isCodeToDesignMode, functionId,
@@ -2132,6 +2142,7 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
             self.configurationData.getSiddhiAppConfig()
                 .setFinalElementCount(self.configurationData.getSiddhiAppConfig().getFinalElementCount() + 1);
             self.dropElements.registerElementEventListeners(newAgent);
+            self.multipleSelection();
         };
 
 
@@ -2159,6 +2170,7 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
             self.configurationData.getSiddhiAppConfig()
                 .setFinalElementCount(self.configurationData.getSiddhiAppConfig().getFinalElementCount() + 1);
             self.dropElements.registerElementEventListeners(newAgent);
+            self.multipleSelection();
         };
 
         DesignGrid.prototype.handleJoinQuery = function (mouseTop, mouseLeft, isCodeToDesignMode, joinQueryName,
@@ -2185,6 +2197,7 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
             self.configurationData.getSiddhiAppConfig()
                 .setFinalElementCount(self.configurationData.getSiddhiAppConfig().getFinalElementCount() + 1);
             self.dropElements.registerElementEventListeners(newAgent);
+            self.multipleSelection();
         };
 
         DesignGrid.prototype.handlePatternQuery = function (mouseTop, mouseLeft, isCodeToDesignMode, patternQueryName,
@@ -2211,6 +2224,7 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
             self.configurationData.getSiddhiAppConfig()
                 .setFinalElementCount(self.configurationData.getSiddhiAppConfig().getFinalElementCount() + 1);
             self.dropElements.registerElementEventListeners(newAgent);
+            self.multipleSelection();
         };
 
         DesignGrid.prototype.handleSequenceQuery = function (mouseTop, mouseLeft, isCodeToDesignMode, sequenceQueryName,
@@ -2237,6 +2251,7 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
             self.configurationData.getSiddhiAppConfig()
                 .setFinalElementCount(self.configurationData.getSiddhiAppConfig().getFinalElementCount() + 1);
             self.dropElements.registerElementEventListeners(newAgent);
+            self.multipleSelection();
         };
 
         DesignGrid.prototype.handlePartition = function (mouseTop, mouseLeft, isCodeToDesignMode, partitionId) {
@@ -2261,6 +2276,7 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
             self.configurationData.getSiddhiAppConfig()
                 .setFinalElementCount(self.configurationData.getSiddhiAppConfig().getFinalElementCount() + 1);
             self.dropElements.registerElementEventListeners(newAgent);
+            self.multipleSelection();
         };
 
         DesignGrid.prototype.generateNextNewAgentId = function () {
@@ -2286,6 +2302,41 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
                 return Math.max(a, b);
             });
             return partitionId + '_pc' + (maxId + 1);
+        };
+
+        DesignGrid.prototype.multipleSelection = function () {
+            var self = this;
+            var selector = document.createElement('div');
+            selector.setAttribute("id", "selector");
+            selector.style.position = 'absolute';
+            selector.style.background = 'rgba(0, 0, 255, 0.1)';
+            selector.style.border = '1px solid rgba(0, 0, 255, 0.45)';
+            selector.style.display = 'none';
+            selector.style.pointerEvents = 'none'; // fix for issue #8 (ie11+)
+            selector.style.left = "0px";
+            selector.style.top = "0px";
+            self.canvas.append(selector);
+
+            new DragSelect({
+                selectables: document.querySelectorAll('.jtk-draggable'),
+                selector: document.getElementById("selector"),
+                multiSelectKeys: ['ctrlKey', 'shiftKey', 'metaKey'],
+                onElementSelect: function (element) {
+                    if (!self.selectableObjects.includes(element)) {
+                        self.jsPlumbInstance.addToDragSelection(element);
+                        $(element).css("border-color", "#4af");
+                        self.selectableObjects.push(element);
+                    }
+                },
+                onElementUnselect: function (e) {
+                    self.jsPlumbInstance.clearDragSelection();
+                    self.selectableObjects.forEach(function (object) {
+                        $(object).css("border-color", "grey");
+                        var objectIndex = self.selectableObjects.indexOf(object);
+                        self.selectableObjects.splice(objectIndex, 1);
+                    });
+                }
+            });
         };
 
         return DesignGrid;
