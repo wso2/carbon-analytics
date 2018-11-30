@@ -40,7 +40,8 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
             PATTERN: 'patternQueryDrop',
             SEQUENCE: 'sequenceQueryDrop',
             PARTITION: 'partitionDrop',
-            PARTITION_CONNECTION_POINT: 'partition-connector-in-part'
+            PARTITION_CONNECTION_POINT: 'partition-connector-in-part',
+            SELECTOR: 'selector'
         };
 
         /**
@@ -2337,15 +2338,7 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
 
         DesignGrid.prototype.multipleSelection = function () {
             var self = this;
-            var selector = document.createElement('div');
-            selector.setAttribute("id", "selector");
-            selector.style.position = "fixed";
-            selector.style.background = "rgba(0, 0, 255, 0.1)";
-            selector.style.border = "1px solid rgba(0, 0, 255, 0.45)";
-            selector.style.display = "none";
-            selector.style.pointerEvents = "none"; // for (ie11+)
-            selector.style.left = "0px";
-            selector.style.top = "0px";
+            var selector = $('<div>').attr('id', constants.SELECTOR);
             self.canvas.append(selector);
 
             new DragSelect({
