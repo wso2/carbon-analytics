@@ -753,7 +753,7 @@ define(['log', 'jquery', 'lodash', 'attribute', 'table', 'storeAnnotation', 'des
                 var i = 0;
                 $('.attribute .attr-content').each(function () {
                     $(this).find('.attr-type option').filter(function () {
-                        return ($(this).text() == (savedAttributes[i].getType()).toLowerCase());
+                        return ($(this).val() == (savedAttributes[i].getType()).toLowerCase());
                     }).prop('selected', true);
                     i++;
                 });
