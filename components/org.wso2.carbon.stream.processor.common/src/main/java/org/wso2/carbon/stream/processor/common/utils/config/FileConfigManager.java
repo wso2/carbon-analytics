@@ -24,7 +24,7 @@ import org.wso2.carbon.config.provider.ConfigProvider;
 import org.wso2.siddhi.core.util.SiddhiConstants;
 import org.wso2.siddhi.core.util.config.ConfigManager;
 import org.wso2.siddhi.core.util.config.ConfigReader;
-
+import org.wso2.carbon.kernel.config.model.CarbonConfiguration;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -58,6 +58,32 @@ public class FileConfigManager implements ConfigManager {
                 }
             } catch (ConfigurationException e) {
                 LOGGER.error("Could not initiate the siddhi configuration object, " + e.getMessage(), e);
+            }
+            if (namespace.equalsIgnoreCase("wso2.carbon")) {
+                try {
+                    CarbonConfiguration carbonConfiguration =
+                            configProvider.getConfigurationObject(CarbonConfiguration.class);
+                    if (carbonConfiguration != null && name.equalsIgnoreCase("id")) {
+                        if (carbonConfiguration.getId() != null) {
+                            return new FileConfigReader(carbonConfiguration.getId());
+                        }
+                    }
+                } catch (ConfigurationException e) {
+                    LOGGER.error("Could not initiate the wso2.carbon configuration object, " + e.getMessage(), e);
+                }
+            } else if (namespace.equalsIgnoreCase("cluster.config")) {
+                try {
+                    ClusterConfiguration clusterConfig =
+                            configProvider.getConfigurationObject(ClusterConfiguration.class);
+                    if (clusterConfig != null && (name.equalsIgnoreCase("groupId") || name.equalsIgnoreCase(
+                            "enabled"))) {
+                        if (clusterConfig.getGroupId() != null) {
+                            return new FileConfigReader(clusterConfig.isEnabled(), clusterConfig.getGroupId());
+                        }
+                    }
+                } catch (ConfigurationException e) {
+                    LOGGER.error("Could not initiate the cluster.config configuration object, " + e.getMessage(), e);
+                }
             }
         }
         if (LOGGER.isDebugEnabled()) {

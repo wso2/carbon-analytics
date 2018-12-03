@@ -29,9 +29,23 @@ import java.util.Map;
 public class FileConfigReader implements ConfigReader {
     static final Logger LOGGER = Logger.getLogger(FileConfigReader.class);
     Map<String, String> propertyMap;
+    String nodeId;
+    String groupId;
+    boolean enabled;
 
     public FileConfigReader(Map<String, String> propertyMap) {
         this.propertyMap = propertyMap;
+    }
+
+    public FileConfigReader(String nodeId) {
+        this.nodeId = nodeId;
+        this.propertyMap = null;
+    }
+
+    public FileConfigReader(boolean enabled, String groupId) {
+        this.enabled = enabled;
+        this.groupId = groupId;
+        this.propertyMap = null;
     }
 
     @Override
@@ -41,6 +55,12 @@ public class FileConfigReader implements ConfigReader {
             if (null != property && !property.isEmpty()) {
                 return property;
             }
+        } else if (name.equalsIgnoreCase("id") && this.nodeId != null) {
+            return nodeId;
+        } else if (name.equalsIgnoreCase("enabled")) {
+            return String.valueOf(enabled);
+        } else if (name.equalsIgnoreCase("groupId") && this.groupId != null) {
+            return groupId;
         }
         if (LOGGER.isDebugEnabled()) {
             LOGGER.debug("Couldn't find a matching property for name: " + name + ", returning a default value: " +
@@ -54,7 +74,14 @@ public class FileConfigReader implements ConfigReader {
         if (null != propertyMap) {
             return propertyMap;
         } else {
-            return new HashMap<>();
+            Map<String, String> configs = new HashMap<>();
+            if (this.nodeId != null) {
+                configs.put("id", this.nodeId);
+            } else if (this.groupId != null) {
+                configs.put("enabled", String.valueOf(this.enabled));
+                configs.put("groupId", this.groupId);
+            }
+            return configs;
         }
     }
 }
