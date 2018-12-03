@@ -597,6 +597,16 @@ define(['ace/ace', 'jquery', 'lodash', 'log','dialogs','./service-client','welco
                 this._openSampleFileDialog.show();
             };
 
+            this.queryStoreApi = function queryStoreApi(options){
+                if(_.isNil(this._queryStoreApi)){
+                    var opts = _.cloneDeep(_.get(app.config, 'query_store_api'));
+                    _.set(opts, "application", app);
+                    this._queryStoreApi = new Dialogs.query_store_api(opts);
+                }
+                this._queryStoreApi.render();
+                this._queryStoreApi.show();
+            };
+
             this.openCloseFileConfirmDialog = function(options) {
                 if(_.isNil(this._closeFileConfirmDialog)){
                     this._closeFileConfirmDialog = new Dialogs.CloseConfirmDialog();
@@ -733,6 +743,7 @@ define(['ace/ace', 'jquery', 'lodash', 'log','dialogs','./service-client','welco
 
             // Open Sample file open dialog
             app.commandManager.registerHandler('open-sample-file-open-dialog', this.openSampleFileOpenDialog, this);
+            app.commandManager.registerHandler('query_store-api', this.queryStoreApi, this);
         }
     });
 

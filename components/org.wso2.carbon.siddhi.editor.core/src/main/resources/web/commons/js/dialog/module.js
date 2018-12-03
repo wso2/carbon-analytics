@@ -18,10 +18,11 @@
 
 define(['./save-to-file-dialog','./replace-confirm-dialog','./open-file-dialog','./close-confirm-dialog',
         './import-file-dialog', './export-file-dialog','./settings-dialog','./close-all-confirm-dialog',
-        './delete-confirm-dialog','./open-sample-file-dialog', './docker-export-dialog', './sample-event-dialog'],
+        './delete-confirm-dialog','./open-sample-file-dialog', './docker-export-dialog', './sample-event-dialog',
+        './query-store-dialog'],
     function (SaveToFileDialog,ReplaceConfirmDialog,OpenFileDialog,CloseConfirmDialog,ImportFileDialog,
               ExportFileDialog,SettingsDialog,CloseAllConfirmDialog,DeleteConfirmDialog,OpenSampleFileDialog,
-              DockerExportDialog, SampleEventDialog) {
+              DockerExportDialog, SampleEventDialog, QueryStoreApi) {
     return {
         save_to_file_dialog: SaveToFileDialog,
         open_file_dialog: OpenFileDialog,
@@ -34,6 +35,7 @@ define(['./save-to-file-dialog','./replace-confirm-dialog','./open-file-dialog',
         DeleteConfirmDialog: DeleteConfirmDialog,
         open_sample_file_dialog: OpenSampleFileDialog,
         docker_export_dialog: DockerExportDialog,
-        sample_event_dialog: SampleEventDialog
+        sample_event_dialog: SampleEventDialog,
+        query_store_api: QueryStoreApi
     };
 });

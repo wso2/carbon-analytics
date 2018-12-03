@@ -42,7 +42,7 @@
 
 .file-dialog-form-btn{
     float: right;
-    margin-right: 43px;
+    margin-right: 15px;
 }
 
 .folder-dialog-form-btn{
@@ -64,9 +64,8 @@
 
 hr.style1 {
     border-top: 1px solid #2C2C2C;
-    width: 92%;
-    margin-left: 20px;
-    padding: 5px;
+    width: 100%;
+    padding: 0 0 5px;
 }
 
 .file-dialog{
@@ -74,8 +73,7 @@ hr.style1 {
 }
 
 .file-dialog-title{
-    margin-bottom: 15px;
-    margin-left: 20px
+    padding:0 0 10px 20px;
 }
 
 .file-dialog-label{

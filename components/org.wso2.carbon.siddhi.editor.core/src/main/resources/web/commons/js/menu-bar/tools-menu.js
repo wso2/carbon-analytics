@@ -74,25 +74,25 @@ define(([],function (){
                     }
                 },
                 disabled: false
+            },
+            {
+                id: "queryStoreApi",
+                label: "Siddhi Store Query",
+                command: {
+                    id: "query_store-api",
+                    labels:{
+                        mac: {
+                            //key: "command+option+f",
+                            label: "\u2318\u2325f"
+                        },
+                        other: {
+                            //key: "ctrl+h",
+                            label: "Ctrl+H"
+                        }
+                    }
+                },
+                disabled: false
             }
-            // {
-            //     id: "queryStoreApi",
-            //     label: "Query Store API",
-            //     command: {
-            //         id: "query_store-api",
-            //         labels:{
-            //             mac: {
-            //                 //key: "command+option+f",
-            //                 label: "\u2318\u2325f"
-            //             },
-            //             other: {
-            //                 //key: "ctrl+h",
-            //                 label: "Ctrl+H"
-            //             }
-            //         }
-            //     },
-            //     disabled: false
-            // }
         ]
 
     };
