@@ -1086,7 +1086,7 @@
         </li>
 </script>
 
-<script id="source-sink-map-store-form-template" type="text/template">
+<script id="type-selection-form-template" type="text/template">
     {{#ifSourceOrSink id}}
         <h3>{{addTitle id}} Configuration</h3>
         <label class="clearfix"> * Type </label>
@@ -1125,7 +1125,7 @@
                                 <span style = "display:none" class = "option-desc-content"> {{description}} </span>
                             </i>
                         </div>
-                        <div class = "clearix">
+                        <div class = "clearfix">
                             <input class = "option-value" type = "text" value = "{{value}}">
                         </div>
                     {{else}}
@@ -1137,7 +1137,7 @@
                                 <span style = "display:none" class="option-desc-content"> {{description}} </span>
                             </i>
                         </div>
-                        <div class="clearix">
+                        <div class="clearfix">
                             <input class = "option-value" type = "text" value="{{defaultValue}}" style ="display:none">
                         </div>
                     {{/if}}
@@ -1152,7 +1152,7 @@
                             <span style="display:none" class="option-desc-content"> {{description}} </span>
                         </i>
                     </div>
-                    <div class = "clearix">
+                    <div class = "clearfix">
                         <input class = "option-value" type = "text" value = "{{value}}">
                     </div>
                     <label class = "error-message"></label>

@@ -86,7 +86,7 @@ define(['log', 'jquery', 'lodash', 'sourceOrSinkAnnotation', 'mapAnnotation', 'p
          */
         var renderMap = function (predefinedSourceMaps) {
             if (!$.trim($('#define-map').html()).length) {
-                var mapFormTemplate = Handlebars.compile($('#source-sink-map-store-form-template').html());
+                var mapFormTemplate = Handlebars.compile($('#type-selection-form-template').html());
                 var wrappedHtml = mapFormTemplate({ id: "map", types: predefinedSourceMaps });
                 $('#define-map').html(wrappedHtml);
                 $('#define-map #map-type').val('passThrough');
@@ -538,7 +538,7 @@ define(['log', 'jquery', 'lodash', 'sourceOrSinkAnnotation', 'mapAnnotation', 'p
                 var map = clickedElement.getMap();
 
                 //render the template to select the source type
-                var sourceFormTemplate = Handlebars.compile($('#source-sink-map-store-form-template').html());
+                var sourceFormTemplate = Handlebars.compile($('#type-selection-form-template').html());
                 var wrappedHtml = sourceFormTemplate({ id: "source", types: predefinedSources });
                 $('#define-source').html(wrappedHtml);
 

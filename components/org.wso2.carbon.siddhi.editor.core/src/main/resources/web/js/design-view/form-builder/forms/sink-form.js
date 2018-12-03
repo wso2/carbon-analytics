@@ -88,7 +88,7 @@ define(['log', 'jquery', 'lodash', 'sourceOrSinkAnnotation', 'mapAnnotation', 'p
          */
         var renderMap = function (predefinedSinkMaps) {
             if (!$.trim($('#define-map').html()).length) {
-                var mapFormTemplate = Handlebars.compile($('#source-sink-map-store-form-template').html());
+                var mapFormTemplate = Handlebars.compile($('#type-selection-form-template').html());
                 var wrappedHtml = mapFormTemplate({ id: "map", types: predefinedSinkMaps });
                 $('#define-map').html(wrappedHtml);
                 $('#define-map #map-type').val('passThrough');
@@ -423,7 +423,6 @@ define(['log', 'jquery', 'lodash', 'sourceOrSinkAnnotation', 'mapAnnotation', 'p
                     option = optionName + " = '" + optionValue + "'";
                     selectedOptions.push(option);
                 } else {
-                    //constant error messages
                     if ($(this).find('.option-checkbox').is(":checked")) {
                         if (optionValue == "") {
                             $(this).find('.error-message').text('Option value is required.');
@@ -572,7 +571,7 @@ define(['log', 'jquery', 'lodash', 'sourceOrSinkAnnotation', 'mapAnnotation', 'p
                 var map = clickedElement.getMap();
 
                 //render the template to select the sink type
-                var sinkFormTemplate = Handlebars.compile($('#source-sink-map-store-form-template').html());
+                var sinkFormTemplate = Handlebars.compile($('#type-selection-form-template').html());
                 var wrappedHtml = sinkFormTemplate({ id: "sink", types: predefinedSinks });
                 $('#define-sink').html(wrappedHtml);
 

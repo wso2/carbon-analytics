@@ -743,7 +743,7 @@ define(['log', 'jquery', 'lodash', 'attribute', 'table', 'storeAnnotation', 'des
             changeAnnotValueDelButtons();
 
             //render the template to  generate the store types
-            var storeFormTemplate = Handlebars.compile($('#source-sink-map-store-form-template').html());
+            var storeFormTemplate = Handlebars.compile($('#type-selection-form-template').html());
             var wrappedHtml = storeFormTemplate({ id: "store", types: predefinedStores });
             $('#define-store').html(wrappedHtml);
 
