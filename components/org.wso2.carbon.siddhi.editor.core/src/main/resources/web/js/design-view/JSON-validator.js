@@ -217,7 +217,7 @@ define(['require', 'log', 'jquery', 'lodash', 'designViewUtils'],
          * returned
          * @returns {boolean} validity of the json
          */
-        JSONValidator.prototype.validateStreamOrTable = function (element, type, doNotShowErrorMessages) {
+        JSONValidator.prototype.validateStreamOrTableOrWindow = function (element, type, doNotShowErrorMessages) {
             var errorMessage;
             if (!element.name) {
                 errorMessage = type + ' form is incomplete'

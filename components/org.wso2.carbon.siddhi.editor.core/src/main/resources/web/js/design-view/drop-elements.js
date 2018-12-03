@@ -17,9 +17,9 @@
  */
 
 define(['require', 'log', 'lodash', 'jquery', 'partition', 'stream', 'query', 'formBuilder', 'aggregation',
-    'jsonValidator', 'sourceOrSinkAnnotation', 'stream', 'table'],
+    'jsonValidator', 'sourceOrSinkAnnotation', 'stream', 'table', 'window'],
     function (require, log, _, $, Partition, Stream, Query, FormBuilder, Aggregation, JSONValidator,
-        SourceOrSinkAnnotation, Stream, Table) {
+        SourceOrSinkAnnotation, Stream, Table, Window) {
 
         /**
          * @class DesignView
@@ -239,7 +239,7 @@ define(['require', 'log', 'lodash', 'jquery', 'partition', 'stream', 'query', 'f
                     var stream = new Stream(streamOptions);
                     self.configurationData.getSiddhiAppConfig().addStream(stream);
 
-                    JSONValidator.prototype.validateStreamOrTable(stream, "Stream", true)
+                    JSONValidator.prototype.validateStreamOrTableOrWindow(stream, "Stream", true)
                 }
             }
             var node = $('<div>' + name + '</div>');
@@ -385,7 +385,7 @@ define(['require', 'log', 'lodash', 'jquery', 'partition', 'stream', 'query', 'f
                 var table = new Table(tableOptions);
                 self.configurationData.getSiddhiAppConfig().addTable(table);
 
-                JSONValidator.prototype.validateStreamOrTable(table, "Table", true)
+                JSONValidator.prototype.validateStreamOrTableOrWindow(table, "Table", true)
             }
             var node = $('<div>' + name + '</div>');
             newAgent.append(node);
@@ -465,7 +465,14 @@ define(['require', 'log', 'lodash', 'jquery', 'partition', 'stream', 'query', 'f
             if (isCodeToDesignMode) {
                 name = windowName;
             } else {
-                name = self.formBuilder.DefineWindow(i);
+                name = i;
+				var windowOptions = {};
+				_.set(windowOptions, 'id', i);
+				_.set(windowOptions, 'name', undefined);
+				var window = new Window(windowOptions);
+				self.configurationData.getSiddhiAppConfig().addWindow(window);
+
+				JSONValidator.prototype.validateStreamOrTableOrWindow(window, "Window", true)
             }
             var node = $('<div>' + name + '</div>');
             newAgent.append(node);
