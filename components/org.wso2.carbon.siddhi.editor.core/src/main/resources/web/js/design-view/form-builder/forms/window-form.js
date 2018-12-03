@@ -16,116 +16,8 @@
  * under the License.
  */
 
-define(['require', 'log', 'jquery', 'lodash', 'attribute', 'window', 'designViewUtils'],
-    function (require, log, $, _, Attribute, Window, DesignViewUtils) {
-
-        var windowSchema = {
-            type: "object",
-            title: "Window",
-            properties: {
-                annotations: {
-                    propertyOrder: 1,
-                    type: "array",
-                    format: "table",
-                    title: "Annotations",
-                    uniqueItems: true,
-                    minItems: 1,
-                    items: {
-                        type: "object",
-                        title: "Annotation",
-                        options: {
-                            disable_properties: true
-                        },
-                        properties: {
-                            annotation: {
-                                title: "Annotation",
-                                type: "string",
-                                minLength: 1
-                            }
-                        }
-                    }
-                },
-                name: {
-                    type: "string",
-                    title: "Name",
-                    minLength: 1,
-                    required: true,
-                    propertyOrder: 2
-                },
-                attributes: {
-                    required: true,
-                    propertyOrder: 3,
-                    type: "array",
-                    format: "table",
-                    title: "Attributes",
-                    uniqueItems: true,
-                    minItems: 1,
-                    items: {
-                        type: "object",
-                        title: 'Attribute',
-                        properties: {
-                            name: {
-                                title: "Name",
-                                type: "string",
-                                minLength: 1
-                            },
-                            type: {
-                                title: "Type",
-                                type: "string",
-                                enum: [
-                                    "string",
-                                    "int",
-                                    "long",
-                                    "float",
-                                    "double",
-                                    "bool",
-                                    "object"
-                                ],
-                                default: "string"
-                            }
-                        }
-                    }
-                },
-                functionName: {
-                    type: "string",
-                    title: "Window Function Name",
-                    minLength: 1,
-                    required: true,
-                    propertyOrder: 4
-                },
-                parameters: {
-                    required: true,
-                    propertyOrder: 5,
-                    type: "array",
-                    format: "table",
-                    title: "Parameters",
-                    uniqueItems: true,
-                    minItems: 1,
-                    items: {
-                        type: "object",
-                        title: 'Parameter',
-                        properties: {
-                            parameterValue: {
-                                title: "Parameter",
-                                type: "string",
-                                minLength: 1
-                            }
-                        }
-                    }
-                },
-                outputEventType: {
-                    type: "string",
-                    title: "Output Event Type",
-                    propertyOrder: 6,
-                    enum: [
-                        "current events",
-                        "expired events",
-                        "all events"
-                    ],
-                    default: "current events"
-                }
-            }
-        };
+define(['require', 'log', 'jquery', 'lodash', 'attribute', 'designViewUtils', 'handlebar'],
+    function (require, log, $, _, Attribute, DesignViewUtils, Handlebars) {
 
         /**
          * @class WindowForm Creates a forms to collect data from a window
@@ -144,95 +36,495 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'window', 'designView
             }
         };
 
-        /**
-         * @function generate form when defining a form
-         * @param i id for the element
-         * @param formConsole Console which holds the form
-         * @param formContainer Container which holds the form
-         */
-        WindowForm.prototype.generateDefineForm = function (i, formConsole, formContainer) {
-            var self = this;
-            var propertyDiv = $('<div id="property-header"><h3>Window Configuration</h3></div>' +
-                '<div id="define-window" class="define-window"></div>');
-            formContainer.append(propertyDiv);
-            $('#' + i).addClass('selected-element');
-            $("#" + i).addClass('incomplete-element')
-            $(".overlayed-container").fadeTo(200, 1);
-            // generate the form to define a window
-            var editor = new JSONEditor($(formContainer).find('#define-window')[0], {
-                schema: windowSchema,
-                show_errors: "always",
-                disable_properties: false,
-                disable_array_delete_all_rows: true,
-                disable_array_delete_last_row: true,
-                display_required_only: true,
-                no_additional_properties: true
+        const alphabeticValidatorRegex = /^([a-zA-Z])$/;
+        const sort = "sort";
+        const frequent = "frequent";
+        const lossyFrequent = "lossyFrequent";
+
+
+        /** Function to manage the attribute navigations */
+        var changeAtrributeNavigation = function () {
+            $('.attr-nav').empty();
+            var attrLength = $('#attribute-div li').length;
+            if (attrLength == 1) {
+                $('.attribute:eq(0)').find('.attr-nav').empty();
+            }
+            if (attrLength == 2) {
+                $('.attribute:eq(0)').find('.attr-nav').append('<a class = "reorder-down"><i class="fw fw-sort-down">' +
+                    '</i></a><a class = "btn-del-attr"><i class="fw fw-delete"></i></a>');
+                $('.attribute:eq(1)').find('.attr-nav').append('<a class="reorder-up"> <i class="fw fw-sort-up "></i>' +
+                    '</a><a class = "btn-del-attr"><i class="fw fw-delete"></i></a>');
+            }
+            if (attrLength > 2) {
+                var lastIndex = attrLength - 1;
+                for (var i = 0; i < attrLength; i++) {
+                    $('.attribute:eq(' + i + ')').find('.attr-nav').append('<a class="reorder-up"> ' +
+                        '<i class="fw fw-sort-up"></i></a>' +
+                        '<a class = "reorder-down"><i class="fw fw-sort-down"> </i></a>' +
+                        '<a class = "btn-del-attr"><i class="fw fw-delete"></i></a>');
+                }
+                $('.attribute:eq(0)').find('.attr-nav a:eq(0)').remove();
+                $('.attribute:eq(' + lastIndex + ')').find('.attr-nav a:eq(1)').remove();
+            }
+        };
+
+		/**
+		 * Function to validate the attribute names
+		 * @param {Object} attributeNameList to add the valid attribute names
+		 * @return {boolean} isErrorOccurred
+		 */
+        var validateAttributeNames = function (attributeNameList) {
+            var isErrorOccurred = false;
+            $('.attr-name').each(function () {
+                var attributeName = $(this).val().trim();
+                if (attributeName != "") {
+                    if (attributeName.indexOf(' ') >= 0) {
+                        $(this).parents(".attribute").find(".error-message").text("Name can not have white space")
+                        $(this)[0].scrollIntoView();
+                        $(this).addClass('required-input-field')
+                        isErrorOccurred = true;
+                        return;
+                    }
+                    if (!alphabeticValidatorRegex.test(attributeName.charAt(0))) {
+                        $(this).parents(".attribute").find(".error-message").text("Name must start with an" +
+                            " alphabetical character");
+                        $(this)[0].scrollIntoView();
+                        $(this).addClass('required-input-field')
+                        isErrorOccurred = true;
+                        return;
+                    }
+                    attributeNameList.push(attributeName)
+                }
             });
+            return isErrorOccurred;
+        };
 
-            formContainer.append('<div id="submit"><button type="button" class="btn btn-default">Submit</button></div>');
-
-            // 'Submit' button action
-            var submitButtonElement = $(formContainer).find('#submit')[0];
-            submitButtonElement.addEventListener('click', function () {
-
-                var errors = editor.validate();
-                if (errors.length) {
-                    return;
+        /**
+		 * Function to obtain a particular parameter from predefined parameters
+		 * @param {String} parameterName parameter which needs to be found
+		 * @param {Object} predefinedParameters set of predefined parameters
+		 * @return {Object} parameter
+		 */
+        var getParameter = function (parameterName, predefinedParameters) {
+            var parameter = null;
+            for (var predefinedParameter of predefinedParameters) {
+                if (predefinedParameter.name.toLowerCase() == parameterName.toLowerCase()) {
+                    parameter = predefinedParameter;
+                    break;
                 }
-                var isWindowNameUsed = self.formUtils.isDefinitionElementNameUsed(editor.getValue().name);
-                if (isWindowNameUsed) {
-                    DesignViewUtils.prototype
-                        .errorAlert("Window name \"" + editor.getValue().name + "\" is already used.");
-                    return;
+            }
+            return parameter;
+        };
+
+		/**
+		 * Function to render the parameter for the selected window function using handlebars
+		 * @param {Object} parameterArray Saved parameters
+		 * @param {Object} windowFunctionName selected window processor type
+		 * @param {String} id Id for the div to embed the parameters
+		 */
+        var renderParameters = function (parameterArray, windowFunctionName, id) {
+            parameterArray.sort(function (val1, val2) {
+                if (val1.optional && !val2.optional) return 1;
+                else if (!val1.optional && val2.optional) return -1;
+                else return 0;
+            });
+            var parameterTemplate = Handlebars.compile($('#window-function-parameters-template').html());
+            var wrappedHtml = parameterTemplate({
+                id: id,
+                windowFunctionName: windowFunctionName,
+                parameters: parameterArray
+            });
+            $('#defineFunctionParameters').html(wrappedHtml);
+        };
+
+		/**
+		 * Function to get the parameters of the selected window function
+		 * @param {String} selectedType Selected window function type
+		 * @param {object} types Predefined window types
+		 * @return {object} parameters
+		 */
+        var getSelectedTypeParameters = function (selectedType, types) {
+            var parameters = [];
+            for (type of types) {
+                if (type.name.toLowerCase() == selectedType.toLowerCase()) {
+                    parameters = type.parameters;
+                    break;
                 }
+            }
+            return parameters;
+        };
 
-                // set the isDesignViewContentChanged to true
-                self.configurationData.setIsDesignViewContentChanged(true);
-
-                // add the new out window to the window array
-                var windowOptions = {};
-                _.set(windowOptions, 'id', i);
-                _.set(windowOptions, 'name', editor.getValue().name);
-                _.set(windowOptions, 'function', editor.getValue().functionName);
-                var parameters = [];
-                _.forEach(editor.getValue().parameters, function (parameter) {
-                    parameters.push(parameter.parameterValue);
+		/**
+		 * Function to create parameter object with an additional empty value attribute
+		 * @param {Object} parameterArray Predefined parameters without the attribute 'value'
+		 * @return {Object} parameters
+		 */
+        var createParameterWithValues = function (parameterArray) {
+            var parameters = [];
+            _.forEach(parameterArray, function (parameter) {
+                parameters.push({
+                    name: parameter.name, value: "", description: parameter.description, optional: parameter.optional,
+                    defaultValue: parameter.defaultValue
                 });
-                _.set(windowOptions, 'parameters', parameters);
-                if (editor.getValue().outputEventType !== undefined) {
-                    if (editor.getValue().outputEventType === "all events") {
-                        _.set(windowOptions, 'outputEventType', 'ALL_EVENTS');
-                    } else if (editor.getValue().outputEventType === "current events") {
-                        _.set(windowOptions, 'outputEventType', 'CURRENT_EVENTS');
-                    } else if (editor.getValue().outputEventType === "expired events") {
-                        _.set(windowOptions, 'outputEventType', 'EXPIRED_EVENTS');
+            });
+            return parameters;
+        };
+
+        /**
+        * Function to map the saved parameter values to the parameter object
+        * @param {Object} predefinedParameters Predefined parameters of a particular window type
+        * @param {Object} savedParameterValues Saved parameter values
+        * @return {Object} parameters
+        */
+        var mapUserParameterValues = function (predefinedParameters, savedParameterValues) {
+            var parameters = [];
+            for (var i = 0; i < predefinedParameters.length; i++) {
+                var timeStamp = "";
+                if (i < savedParameterValues.length) {
+                    var parameterValue = savedParameterValues[i];
+                    if (predefinedParameters[i].type.includes("STRING")) {
+                        parameterValue = parameterValue.slice(1, parameterValue.length - 1)
+                    }
+                    parameters.push({
+                        name: predefinedParameters[i].name, value: parameterValue, description:
+                            predefinedParameters[i].description, optional: predefinedParameters[i].optional,
+                        defaultValue: predefinedParameters[i].defaultValue, timeStamp: timeStamp
+                    });
+                } else {
+                    parameters.push({
+                        name: predefinedParameters[i].name, value: "", description: predefinedParameters[i]
+                            .description, optional: predefinedParameters[i].optional,
+                        defaultValue: predefinedParameters[i].defaultValue, timeStamp: timeStamp
+                    });
+                }
+            }
+            return parameters;
+        };
+
+        /** Function to render the output event types */
+        var renderOutputEventTypes = function () {
+            var outputEventDiv = '<div class = "clearfix"> <label>Event Type </label></div>' +
+                '<div class = "clearfix" ><select id="event-type">' +
+                '<option value = "all_events"> all events </option>' +
+                '<option value = "current_events"> current events </option>' +
+                '<option value = "expired_events"> expired events </option>' +
+                '</select> </div>'
+            $('#defineOutputEvents').html(outputEventDiv);
+        };
+
+        /**
+        * Function to validate the data type of the parameters
+        * @param {String} dataType data-type of the parameter
+        * @param {String} parameterValue value of the parameter value
+        * @return {boolean} invalidDataType
+        */
+        var validateDataType = function (dataTypes, parameterValue) {
+            var invalidDataType;
+            intLongRegexMatch = /^[-+]?\d+$/;
+            doubleFloatRegexMatch = /^[+-]?([0-9]*[.])?[0-9]+$/;
+            _.forEach(dataTypes, function (dataType) {
+                if (dataType === "INT" || dataType === "LONG") {
+                    if (!parameterValue.match(intLongRegexMatch)) {
+                        invalidDataType = true;
+                    } else {
+                        invalidDataType = false;
+                    }
+                } else if (dataType === "DOUBLE" || dataType === "FLOAT") {
+                    if (!parameterValue.match(doubleFloatRegexMatch)) {
+                        invalidDataType = true;
+                    } else {
+                        invalidDataType = false;
+                    }
+                } else if (dataType === "BOOL") {
+                    if (!(parameterValue.toLowerCase() === "false" || parameterValue.toLowerCase() === "true")) {
+                        invalidDataType = true;
+                    } else {
+                        invalidDataType = false;
+                    }
+                } else if (dataType === "TIME") {
+                    if (!parameterValue.match(alphabeticValidatorRegex)) {
+                        invalidDataType = true;
+                    } else {
+                        invalidDataType = false;
+                    }
+                }
+            });
+            return invalidDataType;
+        };
+
+        /**
+         * Function to validate the parameter values
+         * @param {Object} parent the parameter div
+         * @param {Object} predefinedParameters predefined parameters
+         * @return {boolean} valid or invalid parameter value
+         */
+        var validateParameterValues = function (parent, predefinedParameter) {
+            var parameterName = $(parent).find('.parameter-name').text().trim();
+            var parameterValue = $(parent).find('.parameter-value').val().trim();
+            if (!predefinedParameter.optional) {
+                if (parameterValue == "") {
+                    $(parent).find('.error-message').text('Parameter Value is required.');
+                    $(parent)[0].scrollIntoView();
+                    $(parent).find('.parameter-value').addClass('required-input-field');
+                    return false;
+                } else {
+                    var dataType = predefinedParameter.type;
+                    if (validateDataType(dataType, parameterValue)) {
+                        $(parent).find('.error-message').text('Invalid data-type. ');
+                        $(parent)[0].scrollIntoView();
+                        $(parent).find('.parameter-value').addClass('required-input-field');
+                        return false;
+                    }
+                }
+            } else {
+                if ($(parent).find('.parameter-checkbox').is(":checked")) {
+                    if (parameterValue == "") {
+                        $(parent).find('.error-message').text('Parameter Value is required.');
+                        $(parent)[0].scrollIntoView();
+                        $(parent).find('.parameter-value').addClass('required-input-field');
+                        return false;
+                    } else {
+                        var dataType = predefinedParameter.type;
+                        if (validateDataType(dataType, parameterValue)) {
+                            $(parent).find('.error-message').text('Invalid data-type');
+                            $(parent)[0].scrollIntoView();
+                            $(parent).find('.parameter-value').addClass('required-input-field');
+                            return false;
+                        }
+                    }
+                }
+            }
+            return true;
+        };
+
+        /**
+         * Function to build the parameter values
+         * @param {Object} parameterValues array to add the parameters
+         * @param {Object} predefinedParameters predefined parameters
+         * @return {boolean} isError
+         */
+        var buildParameterValues = function (parameterValues, predefinedParameters) {
+            var isError = false;
+            $('.parameter').each(function () {
+                var parameterValue = $(this).find('.parameter-value').val().trim();
+                var parameterName = $(this).find('.parameter-name').text().trim();;
+                var predefinedParameter = getParameter(parameterName, predefinedParameters);
+                if (validateParameterValues(this, predefinedParameters)) {
+                    if (predefinedParameter.type.includes("STRING")) {
+                        parameterValue = "'" + parameterValue + "'";
+                    }
+                    parameterValues.push(parameterValue)
+                } else {
+                    isError = true;
+                    return false;
+                }
+            });
+            return isError;
+        };
+
+        /**
+         * Function to build parameters for frequent and lossyFrequent type
+         * @param {Object} parameterValues array to add the parameters
+         * @param {Object} predefinedParameters predefined parameters
+         * @return {boolean} isError
+         */
+        var buildParameterValuesFrequentOrLossyFrequent = function (parameterValues, predefinedParameters) {
+            var isError = false;
+            $('.parameter').each(function () {
+                var parameterValue = $(this).find('.parameter-value').val().trim();
+                var parameterName = $(this).find('.parameter-name').text().trim();
+                var predefinedParameter = getParameter(parameterName, predefinedParameters);
+                if (validateParameterValues(this, predefinedParameter)) {
+                    if (parameterName === "attribute") {
+                        var attributeArray = parameterValue.split(',');
+                        _.forEach(attributeArray, function (attribute) {
+                            parameterValues.push(attribute.trim())
+                        });
+                    } else {
+                        if (predefinedParameter.type.includes("STRING")) {
+                            parameterValue = "'" + parameterValue + "'";
+                        }
+                        parameterValues.push(parameterValue)
                     }
                 } else {
-                    _.set(windowOptions, 'outputEventType', 'ALL_EVENTS');
+                    isError = true;
+                    return false;
                 }
-                var window = new Window(windowOptions);
-                _.forEach(editor.getValue().attributes, function (attribute) {
-                    var attributeObject = new Attribute(attribute);
-                    window.addAttribute(attributeObject);
-                });
-                _.forEach(editor.getValue().annotations, function (annotation) {
-                    window.addAnnotation(annotation.annotation);
-                });
-                self.configurationData.getSiddhiAppConfig().addWindow(window);
-
-                var textNode = $('#' + i).find('.windowNameNode');
-                textNode.html(editor.getValue().name);
-
-                $('#' + i).removeClass('incomplete-element');
-                $('#' + i).prop('title', '');
-
-                // close the form window
-                self.consoleListManager.removeFormConsole(formConsole);
-
-                self.designViewContainer.removeClass('disableContainer');
-                self.toggleViewButton.removeClass('disableContainer');
             });
-            return editor.getValue().name;
+            return isError;
+        };
+
+        /**
+         * Function to build parameters for sort type
+         * @param {Object} parameterValues array to add the parameters
+         * @param {Object} predefinedParameters predefined parameters
+         * @return {boolean} isError
+         */
+        var buildParameterValuesSort = function (parameterValues, predefinedParameters) {
+            var isError = false;
+            $('.parameter').each(function () {
+                var parameterValue = $(this).find('.parameter-value').val().trim();
+                var parameterName = $(this).find('.parameter-name').text().trim();;
+                if (parameterName === "window.length") {
+                    if (validateParameterValues(this, predefinedParameters)) {
+                        parameterValues.push(parameterValue)
+                    } else {
+                        isError = true;
+                        return false;
+                    }
+                } else if (parameterName === "attribute") {
+                    if (validateParameterValues(this, predefinedParameters)) {
+                        var attributeArray = parameterValue.split(',');
+                        _.forEach(attributeArray, function (attribute) {
+                            parameterValues.push(attribute.trim())
+                        });
+                    } else {
+                        isError = true;
+                        return false;
+                    }
+                } else {
+                    if ($('#attribute-parameter').find('.parameter-checkbox').is(":checked")) {
+                        if (validateParameterValues(this, predefinedParameters)) {
+                            if (parameterValue.toLowerCase() === "asc" ||
+                                parameterValue.toLowerCase() === "desc") {
+                                parameterValue = "'" + parameterValue + "'";
+                                parameterValues.push(parameterValue)
+                            } else {
+                                $(this).find('.error-message').text("asc or desc is required.");
+                                $(this)[0].scrollIntoView();
+                                $(this).find('.parameter-value').addClass('required-input-field');
+                                isError = true;
+                                return false;
+                            }
+                        } else {
+                            isError = true;
+                            return false;
+                        }
+                    }
+                }
+            });
+            return isError;
+        };
+
+        /**
+         * Function to map the user saved parameters of lossyFrequent
+         * @param {Object} predefinedParameters predefined parameters
+         * @param {Object} savedParameterValues user saved parameters
+         * @return {Object} parameters
+         */
+        var mapParameterValuesLossyFrequent = function (predefinedParameters, savedParameterValues) {
+            var parameters = [];
+            var attributes = "";
+            //add the two mandatory params of the saved values to the predefined param objects
+            for (var i = 0; i <= 1; i++) {
+                parameters.push({
+                    name: predefinedParameters[i].name, value: savedParameterValues[i], description:
+                        predefinedParameters[i].description, optional: predefinedParameters[i].optional,
+                    defaultValue: predefinedParameters[i].defaultValue
+                });
+            }
+            // add the attributes
+            for (var i = 2; i < savedParameterValues.length; i++) {
+                attributes += savedParameterValues[i] + ", "
+            }
+            //cutting off the last white space and the comma
+            attributes = attributes.substring(0, attributes.length - 2);
+            //add the attributes to the third obj of the predefined parameter
+            parameters.push({
+                name: predefinedParameters[2].name, value: attributes, description:
+                    predefinedParameters[2].description, optional: predefinedParameters[2].optional,
+                defaultValue: predefinedParameters[2].defaultValue
+            });
+            return parameters;
+        };
+
+        /**
+         * Function to map the user saved parameters of frequent
+         * @param {Object} predefinedParameters predefined parameters
+         * @param {Object} savedParameterValues user saved parameters
+         * @return {Object} parameters
+         */
+        var mapParameterValuesFrequent = function (predefinedParameters, savedParameterValues) {
+            var parameters = [];
+            var attributes = "";
+            //add the first saved param to predefined param's first index (event.count)
+            parameters.push({
+                name: predefinedParameters[0].name, value: savedParameterValues[0], description:
+                    predefinedParameters[0].description, optional: predefinedParameters[0].optional,
+                defaultValue: predefinedParameters[0].defaultValue
+            });
+            // add the attributes
+            for (var i = 1; i < savedParameterValues.length; i++) {
+                attributes += savedParameterValues[i] + ", "
+            }
+            //cutting off the last white space and the comma
+            attributes = attributes.substring(0, attributes.length - 2);
+            //add the attributes to second obj of the predefined parameter
+            parameters.push({
+                name: predefinedParameters[1].name, value: attributes, description:
+                    predefinedParameters[1].description, optional: predefinedParameters[1].optional,
+                defaultValue: predefinedParameters[1].defaultValue
+            });
+            return parameters;
+        };
+
+        /**
+         * Function to map the user saved parameters of sort
+         * @param {Object} predefinedParameters predefined parameters
+         * @param {Object} savedParameterValues user saved parameters
+         * @return {Object} parameters
+         */
+        var mapParameterValuesSort = function (predefinedParameters, savedParameterValues) {
+            var parameters = [];
+            var attributes = "";
+            var order = "";
+            var length = "";
+            if (savedParameterValues.length != 0) {
+                length = savedParameterValues[0];
+            }
+            //add the first saved param to predefined param's first index (window.length)
+            parameters.push({
+                name: predefinedParameters[0].name, value: length, description:
+                    predefinedParameters[0].description, optional: predefinedParameters[0].optional,
+                defaultValue: predefinedParameters[0].defaultValue
+            });
+            // to determine the attributes and order
+            if (savedParameterValues.length > 1) {
+                for (var i = 1; i < savedParameterValues.length; i++) {
+                    if (savedParameterValues[i].indexOf("'") >= 0 || savedParameterValues[i].indexOf('"') >= 0) {
+                        order = savedParameterValues[i];
+                        order = order.slice(1, order.length - 1)
+                    } else {
+                        //attributes
+                        attributes += savedParameterValues[i] + ", ";
+
+                    }
+                }
+                //cutting off the last white space and the comma
+                attributes = attributes.substring(0, attributes.length - 2);
+            }
+            //add the attributes to second obj of the predefined parameter
+            parameters.push({
+                name: predefinedParameters[1].name, value: attributes, description:
+                    predefinedParameters[1].description, optional: predefinedParameters[1].optional,
+                defaultValue: predefinedParameters[1].defaultValue
+            });
+            //add the order to the third obj of the predefined parameter
+            parameters.push({
+                name: predefinedParameters[2].name, value: order, description:
+                    predefinedParameters[2].description, optional: predefinedParameters[2].optional,
+                defaultValue: "'asc'"
+            });
+            return parameters;
+        };
+
+        /** Function to show and hide the order parameter of sort type */
+        var showHideOrderForSort = function () {
+            if ($('#window-parameters #attribute-parameter').find('.parameter-checkbox').is(":checked")) {
+                $('#window-parameters #order-parameter').show();
+            } else {
+                $('#window-parameters #order-parameter').hide();
+            }
         };
 
         /**
@@ -243,154 +535,306 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'window', 'designView
          */
         WindowForm.prototype.generatePropertiesForm = function (element, formConsole, formContainer) {
             var self = this;
-            var propertyDiv = $('<div id="property-header"><h3>Window Configuration</h3></div>' +
-                '<div id="define-window" class="define-window"></div>');
+            var id = $(element).parent().attr('id');
+
+            // retrieve the window information from the collection
+            var clickedElement = self.configurationData.getSiddhiAppConfig().getWindow(id);
+            var propertyDiv = $('<div class = "window-form-container"><div id="property-header"><h3>Window' +
+                ' Configuration</h3></div> <h4>Name: </h4> <input type="text" id="windowName" class="clearfix">' +
+                '<label class="error-message" id="windowNameErrorMessage"></label> <div id="define-attribute"></div>' +
+                '<button id="btn-submit" type="button" class="btn toggle-view-button">' +
+                'Submit </button></div> <div class= "window-form-container"> ' +
+                '<div id = "defineFunctionName"> </div> <div id="defineFunctionParameters"> </div>' +
+                '</div> <div class = "window-form-container"> <div id="defineOutputEvents"> </div> </div>' +
+                '<div class = "window-form-container"> <div id="define-annotation"> </div></div>');
             formContainer.append(propertyDiv);
+
+            //to pop-up the clicked element
+            $('#' + id).addClass('selected-element');
+            $(".overlayed-container").fadeTo(200, 1);
             self.designViewContainer.addClass('disableContainer');
             self.toggleViewButton.addClass('disableContainer');
 
-            var id = $(element).parent().attr('id');
-            $('#' + id).addClass('selected-element');
-            $(".overlayed-container").fadeTo(200, 1);
-            // retrieve the window information from the collection
-            var clickedElement = self.configurationData.getSiddhiAppConfig().getWindow(id);
-            if (!clickedElement) {
-                var errorMessage = 'unable to find clicked element';
-                log.error(errorMessage);
-                throw errorMessage;
-            }
-            var name = clickedElement.getName();
-            var savedAttributes = clickedElement.getAttributeList();
-            var attributes = [];
-            _.forEach(savedAttributes, function (savedAttribute) {
-                var attributeObject = {
-                    name: savedAttribute.getName(),
-                    type: (savedAttribute.getType()).toLowerCase()
-                };
-                attributes.push(attributeObject);
+            //declaration and initialization of variables
+            var predefinedWindowFunctionNames = _.orderBy(this.configurationData.rawExtensions["windowFunctionNames"],
+                ['name'], ['asc']);
+            var functionParameters = [];
+            var functionParametersWithValues = [];
+            var selectedWindowType;
+
+            //event listener to show parameter description
+            $('#defineFunctionParameters').on('mouseover', '.parameter-desc', function () {
+                $(this).find('.parameter-desc-content').show();
             });
-            var savedAnnotations = clickedElement.getAnnotationList();
-            var annotations = [];
-            _.forEach(savedAnnotations, function (savedAnnotation) {
-                annotations.push({ annotation: savedAnnotation });
+
+            //event listener to hide parameter description
+            $('#defineFunctionParameters').on('mouseout', '.parameter-desc', function () {
+                $(this).find('.parameter-desc-content').hide();
             });
-            var functionName = clickedElement.getFunction();
+
+            //event listener when the parameter checkbox is changed
+            $('#defineFunctionParameters').on('change', '.parameter-checkbox', function () {
+                var parameterParent = $(this).parents(".parameter");
+                if ($(this).is(':checked')) {
+                    parameterParent.find(".optional-param-content").show();
+                } else {
+                    parameterParent.find(".optional-param-content").hide();
+                    parameterParent.find(".parameter-value").removeClass("required-input-field");
+                    parameterParent.find(".error-message").text("");
+                }
+                //check for sort type's parameter (order & attribute params)
+                if (selectedType === sort) {
+                    showHideOrderForSort();
+                }
+            });
+
+            //To add attribute
+            $("#define-attribute").on('click', '#btn-add-attribute', function () {
+                $("#attribute-div").append('<li class="attribute clearfix"><div class="clearfix"> ' +
+                    '<div class="attr-content">' +
+                    '<input type="text" value="" class="attr-name"/> ' +
+                    '<select class="attr-type">' +
+                    '<option value="string">string</option>' +
+                    '<option value="int">int</option>' +
+                    '<option value="long">long</option>' +
+                    '<option value="float">float</option>' +
+                    '<option value="double">double</option>' +
+                    '<option value="bool">bool</option>' +
+                    '<option value="object">object</option>' +
+                    '</select>' +
+                    '</div> <div class="attr-nav"> </div></div>' +
+                    '<label class="error-message"></label></li>');
+                changeAtrributeNavigation();
+            });
+
+            //To delete attribute
+            $("#define-attribute").on('click', '#attribute-div .btn-del-attr', function () {
+                $(this).closest('li').remove();
+                changeAtrributeNavigation();
+            });
+
+            //To reorder up the attribute
+            $("#define-attribute").on('click', ' #attribute-div .reorder-up', function () {
+                var $current = $(this).closest('li');
+                var $previous = $current.prev('li');
+                if ($previous.length !== 0) {
+                    $current.insertBefore($previous);
+                }
+                changeAtrributeNavigation();
+            });
+
+            //To reorder down the attribute
+            $("#define-attribute").on('click', ' #attribute-div .reorder-down', function () {
+                var $current = $(this).closest('li');
+                var $next = $current.next('li');
+                if ($next.length !== 0) {
+                    $current.insertAfter($next);
+                }
+                changeAtrributeNavigation();
+            });
+
+            var name = clickedElement.getName().trim();
+            var functionName = clickedElement.getFunction().toLowerCase();
             var savedParameterValues = clickedElement.getParameters();
+            var windowFunctionNameTemplate = Handlebars.compile($('#type-selection-form-template').html());
+            var wrappedHtml = windowFunctionNameTemplate({ id: "window", types: predefinedWindowFunctionNames });
+            $('#defineFunctionName').html(wrappedHtml);
+            renderOutputEventTypes();
 
-            var parameters = [];
-            _.forEach(savedParameterValues, function (savedParameterValue) {
-                var parameterObject = {
-                    parameterValue: savedParameterValue
-                };
-                parameters.push(parameterObject);
-            });
+            if (!name) {
+                var attributeFormTemplate = Handlebars.compile($('#attribute-form-template').html());
+                var wrappedHtml = attributeFormTemplate([{ name: "" }]);
+                $('#define-attribute').html(wrappedHtml);
+                selectedWindowType = $('#defineFunctionName #window-type').val();
+                functionParameters = getSelectedTypeParameters(selectedWindowType, predefinedWindowFunctionNames);
+                functionParametersWithValues = createParameterWithValues(functionParameters);
+                renderParameters(functionParametersWithValues, selectedWindowType, "window")
+            } else {
+                $('#windowName').val(name);
+                selectedType = functionName;
+                $('#defineFunctionName').find('#window-type option').filter(function () {
+                    return ($(this).val().toLowerCase() == (functionName));
+                }).prop('selected', true);
+                functionParameters = getSelectedTypeParameters(functionName, predefinedWindowFunctionNames);
+                if (functionName === sort.toLowerCase()) {
+                    functionParametersWithValues = mapParameterValuesSort(functionParameters, savedParameterValues);
+                    renderParameters(functionParametersWithValues, selectedType, "window");
+                    showHideOrderForSort();
+                } else if (functionName === frequent.toLowerCase()) {
+                    functionParametersWithValues = mapParameterValuesFrequent(functionParameters,
+                        savedParameterValues);
+                    renderParameters(functionParametersWithValues, selectedType, "window");
+                } else if (functionName === lossyFrequent.toLowerCase()) {
+                    functionParametersWithValues = mapParameterValuesLossyFrequent(functionParameters,
+                        savedParameterValues);
+                    renderParameters(functionParametersWithValues, selectedType, "window");
+                } else {
+                    functionParametersWithValues = mapUserParameterValues(functionParameters, savedParameterValues);
+                    renderParameters(functionParametersWithValues, selectedType, "window");
+                }
 
-            var outputEventType = '';
-            var savedOutputEventType = clickedElement.getOutputEventType();
-            if (!savedOutputEventType) {
-                outputEventType = 'all events';
-            } else if (savedOutputEventType === 'ALL_EVENTS') {
-                outputEventType = 'all events';
-            } else if (savedOutputEventType === 'CURRENT_EVENTS') {
-                outputEventType = 'current events';
-            } else if (savedOutputEventType === 'EXPIRED_EVENTS') {
-                outputEventType = 'expired events';
+                var savedAttributes = clickedElement.getAttributeList();
+                var attributeFormTemplate = Handlebars.compile($('#attribute-form-template').html());
+                var wrappedHtml = attributeFormTemplate(savedAttributes);
+                $('#define-attribute').html(wrappedHtml);
+                changeAtrributeNavigation();
+
+                //to select the type of the saved attributes
+                var i = 0;
+                $('.attribute .attr-content').each(function () {
+                    $(this).find('.attr-type option').filter(function () {
+                        return ($(this).val() == (savedAttributes[i].getType()).toLowerCase());
+                    }).prop('selected', true);
+                    i++;
+                });
+
+                var savedOutputEventType = clickedElement.getOutputEventType().toLowerCase();
+                $('#defineOutputEvents').find('#event-type option').filter(function () {
+                    return ($(this).val().toLowerCase() == (savedOutputEventType));
+                }).prop('selected', true);
+
+                //                var savedAnnotations = clickedElement.getAnnotationList();
+                //                var annotations = [];
+                //                _.forEach(savedAnnotations, function (savedAnnotation) {
+                //                    annotations.push({ annotation: savedAnnotation });
+                //                });
+                //                var functionName = clickedElement.getFunction();
             }
-            var fillWith = {
-                annotations: annotations,
-                name: name,
-                attributes: attributes,
-                functionName: functionName,
-                parameters: parameters,
-                outputEventType: outputEventType
-            };
-            fillWith = self.formUtils.cleanJSONObject(fillWith);
-            var editor = new JSONEditor($(formContainer).find('#define-window')[0], {
-                schema: windowSchema,
-                show_errors: "always",
-                disable_properties: false,
-                disable_array_delete_all_rows: true,
-                disable_array_delete_last_row: true,
-                display_required_only: true,
-                no_additional_properties: true,
-                startval: fillWith
+
+            $('#window-type').change(function () {
+                functionParameters = getSelectedTypeParameters(this.value, predefinedWindowFunctionNames);
+                selectedType = this.value.toLowerCase();
+                if (savedParameterValues && selectedType == functionName.toLowerCase()) {
+                    if (selectedType === sort.toLowerCase()) {
+                        functionParametersWithValues = mapParameterValuesSort(functionParameters, savedParameterValues);
+                        renderParameters(functionParametersWithValues, selectedType, "window")
+                    } else if (selectedType === frequent.toLowerCase()) {
+                        functionParametersWithValues = mapParameterValuesFrequent(functionParameters,
+                            savedParameterValues);
+                        renderParameters(functionParametersWithValues, selectedType, "window")
+                    } else if (selectedType === lossyFrequent.toLowerCase()) {
+                        functionParametersWithValues = mapParameterValuesLossyFrequent(functionParameters,
+                            savedParameterValues);
+                        renderParameters(functionParametersWithValues, selectedType, "window")
+                    } else {
+                        functionParametersWithValues = mapUserParameterValues(functionParameters, savedParameterValues);
+                        renderParameters(functionParametersWithValues, selectedType, "window");
+                        selectTimeStamp(functionParametersWithValues)
+                    }
+                } else {
+                    functionParametersWithValues = createParameterWithValues(functionParameters);
+                    renderParameters(functionParametersWithValues, selectedType, "window");
+                }
+                if (selectedType === sort) {
+                    showHideOrderForSort();
+                }
             });
-            formContainer.append(self.formUtils.buildFormButtons(true));
 
             // 'Submit' button action
             var submitButtonElement = $(formContainer).find('#btn-submit')[0];
             submitButtonElement.addEventListener('click', function () {
 
-                var errors = editor.validate();
-                if (errors.length) {
+                //clear the error messages
+                $('.error-message').text("")
+                $('.required-input-field').removeClass('required-input-field');
+
+                var windowName = $('#windowName').val().trim();
+                //check if window name is empty
+                if (windowName == "") {
+                    $('#windowName').addClass('required-input-field');
+                    $('#windowName')[0].scrollIntoView();
+                    $('#windowNameErrorMessage').text("Window name is required.")
                     return;
                 }
-                var isWindowNameUsed = self.formUtils.isDefinitionElementNameUsed(editor.getValue().name,
-                    clickedElement.getId());
+
+                var previouslySavedName = clickedElement.getName();
+                if (previouslySavedName === undefined) {
+                    previouslySavedName = "";
+                }
+                var isWindowNameUsed = self.formUtils.isDefinitionElementNameUsed(windowName, id);
                 if (isWindowNameUsed) {
-                    DesignViewUtils.prototype
-                        .errorAlert("Window name \"" + editor.getValue().name + "\" is already used.");
+                    $('#windowName').addClass('required-input-field');
+                    $('#windowName')[0].scrollIntoView();
+                    $('#windowNameErrorMessage').text("Window name is already used")
                     return;
                 }
+
+                if (previouslySavedName !== windowName) {
+                    //validate window name
+                    if ((windowName.indexOf(' ') >= 0)) {
+                        $('#windowName').addClass('required-input-field');
+                        $('#windowName')[0].scrollIntoView();
+                        $('#windowNameErrorMessage').text("Window name cannot have white space.")
+                        return;
+                    }
+                    if (!alphabeticValidatorRegex.test(windowName.charAt(0))) {
+                        $('#windowName').addClass('required-input-field');
+                        $('#windowName')[0].scrollIntoView();
+                        $('#windowNameErrorMessage').text("Window name must start with an alphabetic character.")
+                        return;
+                    }
+                    // update connection related to the element if the name is changed
+                    clickedElement.setName(windowName);
+                    self.formUtils.updateConnectionsAfterDefinitionElementNameChange(id);
+                }
+
+                var attributeNameList = [];
+                if (validateAttributeNames(attributeNameList)) { return; }
+
+                if (attributeNameList.length == 0) {
+                    $('.attribute:eq(0)').find('.attr-name').addClass('required-input-field');
+                    $('.attribute:eq(0)').find('.attr-name')[0].scrollIntoView();
+                    $('.attribute:eq(0)').find('.error-message').text("Minimum one attribute is required")
+                    return;
+                } else {
+                    //clear the previously saved attribute list
+                    clickedElement.clearAttributeList();
+                    //add the attributes to the attribute list
+                    $('.attribute .attr-content').each(function () {
+                        var nameValue = $(this).find('.attr-name').val().trim();
+                        var typeValue = $(this).find('.attr-type').val();
+                        if (nameValue != "") {
+                            var attributeObject = new Attribute({ name: nameValue, type: typeValue });
+                            clickedElement.addAttribute(attributeObject)
+                        }
+                    });
+                }
+
+                var functionName = $('#defineFunctionName #window-type').val();
+                clickedElement.setFunction(functionName);
+
+                var parameters = [];
+                var isError = false;
+                if (functionName.toLowerCase() === sort) {
+                    isError = buildParameterValuesSort(parameters, functionParameters)
+                } else if (functionName.toLowerCase() === frequent ||
+                    functionName === lossyFrequent) {
+                    isError = buildParameterValuesFrequentOrLossyFrequent(parameters, functionParameters);
+                } else {
+                    isError = buildParameterValues(parameters, functionParameters)
+                }
+
+                if (isError) {
+                    return;
+                } else {
+                    clickedElement.setParameters(parameters);
+                }
+
+                var outputEventType = $('#defineOutputEvents #event-type').val().toUpperCase();
+                clickedElement.setOutputEventType(outputEventType);
+
+                // clickedElement.clearAnnotationList();
+                // _.forEach(config.annotations, function (annotation) {
+                //     clickedElement.addAnnotation(annotation.annotation);
+                // });
+
                 self.designViewContainer.removeClass('disableContainer');
                 self.toggleViewButton.removeClass('disableContainer');
 
                 // set the isDesignViewContentChanged to true
                 self.configurationData.setIsDesignViewContentChanged(true);
-
-                var config = editor.getValue();
-
-                var previouslySavedName = clickedElement.getName();
-                // update connection related to the element if the name is changed
-                if (previouslySavedName !== config.name) {
-                    // update selected window model
-                    clickedElement.setName(config.name);
-                    self.formUtils.updateConnectionsAfterDefinitionElementNameChange(id);
-                }
-
-                clickedElement.setFunction(config.functionName);
-                var parameters = [];
-                _.forEach(config.parameters, function (parameter) {
-                    parameters.push(parameter.parameterValue);
-                });
-                clickedElement.setParameters(parameters);
-                clickedElement.setOutputEventType(config.outputEventType);
-                if (config.outputEventType !== undefined) {
-                    if (config.outputEventType === "all events") {
-                        clickedElement.setOutputEventType('ALL_EVENTS');
-                    } else if (config.outputEventType === "current events") {
-                        clickedElement.setOutputEventType('CURRENT_EVENTS');
-                    } else if (config.outputEventType === "expired events") {
-                        clickedElement.setOutputEventType('EXPIRED_EVENTS');
-                    }
-                } else {
-                    clickedElement.setOutputEventType('ALL_EVENTS');
-                }
-                // removing all elements from attribute list
-                clickedElement.clearAttributeList();
-                // adding new attributes to the attribute list
-                _.forEach(config.attributes, function (attribute) {
-                    var attributeObject = new Attribute(attribute);
-                    clickedElement.addAttribute(attributeObject);
-                });
-
-                clickedElement.clearAnnotationList();
-                _.forEach(config.annotations, function (annotation) {
-                    clickedElement.addAnnotation(annotation.annotation);
-                });
-
                 var textNode = $(element).parent().find('.windowNameNode');
-                textNode.html(config.name);
-
-                // close the form window
-                self.consoleListManager.removeFormConsole(formConsole);
-            });
-
-            // 'Cancel' button action
-            var cancelButtonElement = $(formContainer).find('#btn-cancel')[0];
-            cancelButtonElement.addEventListener('click', function () {
-                self.designViewContainer.removeClass('disableContainer');
-                self.toggleViewButton.removeClass('disableContainer');
+                textNode.html(windowName);
 
                 // close the form window
                 self.consoleListManager.removeFormConsole(formConsole);

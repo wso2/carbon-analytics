@@ -2888,7 +2888,8 @@ define(["ace/ace", "jquery", "./constants", "./utils", "ace/snippets", "ace/rang
             sink: {},
             source: {},
             sourceMaps: {},
-            sinkMaps: {}
+            sinkMaps: {},
+            windowFunctionNames: {}
         };
 
         CompletionEngine.isDynamicExtensionsLoaded = false;
@@ -2955,6 +2956,7 @@ define(["ace/ace", "jquery", "./constants", "./utils", "ace/snippets", "ace/rang
                             CompletionEngine.rawExtensions.sourceMaps = response
                             .extensions["sourceMapper"]["sourceMaps"];
                             CompletionEngine.rawExtensions.sinkMaps = response.extensions["sinkMapper"]["sinkMaps"];
+                            CompletionEngine.rawExtensions.windowFunctionNames = response.inBuilt["windowProcessors"];
                             for (var namespace in response.extensions) {
                                 if (response.extensions.hasOwnProperty(namespace)) {
                                     var processors = {};

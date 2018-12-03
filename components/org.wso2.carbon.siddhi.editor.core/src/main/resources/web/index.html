@@ -1247,6 +1247,60 @@
     </div>
 </script>
 
+<script id="window-function-parameters-template" type = "text/template">
+    {{#if parameters}}
+    <h3> Parameters </h3>
+    <div id = "{{id}}-parameters">
+    {{#each parameters}}
+        <div class = "parameter" id="{{name}}-parameter">
+        {{#if optional}}
+            {{#if value}}
+                <div class = "clearfix">
+                    <label class = "parameter-name optional-parameter">
+                        <input type = "checkbox" class = "parameter-checkbox" checked> {{name}}
+                    </label>
+                    <i class = "fw fw-info parameter-desc">
+                        <span style = "display:none" class = "parameter-desc-content"> {{description}} </span>
+                    </i>
+                </div>
+                <div class = "clearfix optional-param-content">
+                    <input class = "parameter-value" type = "text" value = "{{value}}">
+                </div>
+            {{else}}
+                <div class="clearfix">
+                    <label class = "parameter-name optional-parameter">
+                        <input type = "checkbox" class = "parameter-checkbox"> {{name}}
+                    </label>
+                    <i class = "fw fw-info parameter-desc">
+                        <span style = "display:none" class="parameter-desc-content"> {{description}} </span>
+                    </i>
+                </div>
+                <div class="clearfix optional-param-content" style ="display:none">
+                    <input class = "parameter-value" type = "text" value="{{defaultValue}}">
+                </div>
+            {{/if}}
+                <label class = "error-message"></label>
+        {{else}}
+            <div class="clearfix">
+                <label class = "mandatory-parameter-symbol"> * </label>
+                <label class = "parameter-name mandatory-parameter">
+                    {{name}}
+                </label>
+                <i class="fw fw-info parameter-desc">
+                    <span style="display:none" class="parameter-desc-content"> {{description}} </span>
+                </i>
+            </div>
+            <div class = "clearfix">
+                <input class = "parameter-value" type = "text" value = "{{value}}">
+            </div>
+            <label class = "error-message"></label>
+        {{/if}}
+        </div>
+    {{/each}}
+    </div>
+    {{/if}}
+</script>
+
 <!--Start: Settings Modal-->
 <div class="modal fade modalSettings" id="modalSettings" tabindex="-1" role="dialog">
     <div class="modal-dialog" role="document">
