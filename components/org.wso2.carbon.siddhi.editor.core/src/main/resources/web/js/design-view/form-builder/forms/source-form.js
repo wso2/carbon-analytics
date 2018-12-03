@@ -41,46 +41,6 @@ define(['log', 'jquery', 'lodash', 'sourceOrSinkAnnotation', 'mapAnnotation', 'p
         const constMap = "map";
         const constList = "list";
 
-        /** Generates the current index of the option being rendered */
-        Handlebars.registerHelper('sum', function () {
-            return Array.prototype.slice.call(arguments, 0, -1).reduce((acc, num) => acc += num);
-        });
-
-        /** Handlebar helper to check if the index is equivalent to half the length of the option's array */
-        Handlebars.registerHelper('isDivisor', function (index, options) {
-            var divLength = Math.ceil(options.length / 2);
-            return index === divLength;
-        });
-
-        /** Handlebar helper to render heading for the form */
-        Handlebars.registerHelper('addTitle', function (id) {
-            return id.charAt(0).toUpperCase() + id.slice(1);
-        });
-
-        /** Handlebar helper to compare if the id is "source" or "sink" */
-        Handlebars.registerHelper('ifSourceOrSink', function (id, div) {
-            if (id === "source" || id === "sink") {
-                return div.fn(this);
-            }
-            return div.inverse(this);
-        });
-
-        /** Handlebar helper to compare if the id is "source" or "sink" or "store" */
-        Handlebars.registerHelper('ifSourceOrSinkOrStore', function (id, div) {
-            if (id === "source" || id === "sink" || id === "store") {
-                return div.fn(this);
-            }
-            return div.inverse(this);
-        });
-
-        /** Handlebar helper to check id is equivalent to a given string */
-        Handlebars.registerHelper('ifId', function (id, name, div) {
-            if (id === name) {
-                return div.fn(this);
-            }
-            return div.inverse(this);
-        });
-
         /**
          * Function to get the options of the selected source/map type
          * @param {String} selectedType Selected source/map type
