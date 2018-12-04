@@ -82,7 +82,7 @@ public class TableConfig extends SiddhiElementConfig {
     }
 
     public void setAnnotationListObjects(List<Annotation> annotationListObjects) {
-        this.annotationList = annotationList;
+        this.annotationListObjects = annotationListObjects;
     }
 
 }
