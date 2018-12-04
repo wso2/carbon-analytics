@@ -1537,7 +1537,7 @@
 
     <properties>
         <carbon.analytics.version>2.0.427-SNAPSHOT</carbon.analytics.version>
-        <siddhi.version>4.2.21</siddhi.version>
+        <siddhi.version>4.2.35</siddhi.version>
         <siddhi.bundle.version>4.2.21</siddhi.bundle.version>
         <siddhi.version.range>[4.0.0, 5.0.0)</siddhi.version.range>
         <carbon.analytics-common.version>6.0.70</carbon.analytics-common.version>
@@ -1775,5 +1775,6 @@
         <commons.lang.version>2.6</commons.lang.version>
         <org.apache.geronimo.specs.version>1.1.1</org.apache.geronimo.specs.version>
         <org.fusesource.hawtbuf.version>1.11</org.fusesource.hawtbuf.version>
+        <org.h2.driver.version>1.4.197</org.h2.driver.version>
     </properties>
 </project>

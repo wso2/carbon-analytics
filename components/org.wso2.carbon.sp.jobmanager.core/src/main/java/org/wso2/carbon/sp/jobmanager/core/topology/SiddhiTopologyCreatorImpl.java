@@ -61,9 +61,9 @@ public class SiddhiTopologyCreatorImpl implements SiddhiTopologyCreator {
     private SiddhiTopologyDataHolder siddhiTopologyDataHolder;
     private SiddhiApp siddhiApp;
     private SiddhiAppRuntime siddhiAppRuntime;
+    //holds the mapping between in-memory aggregation id and set of elements which joins with the aggregations
     private Map<String, Set<ExecutionElement>> inMemoryAggregationJoins = new HashMap<>();
     private String userDefinedSiddhiApp;
-    private Map<String, Set<String>> joinableInMemoryAggregationList;
 
     @Override
     public SiddhiTopology createTopology(String userDefinedSiddhiApp) {
@@ -77,10 +77,11 @@ public class SiddhiTopologyCreatorImpl implements SiddhiTopologyCreator {
         this.siddhiTopologyDataHolder = new SiddhiTopologyDataHolder(siddhiAppName, userDefinedSiddhiApp);
         String defaultExecGroupName = siddhiAppName + "-" + UUID.randomUUID();
         boolean transportChannelCreationEnabled = isTransportChannelCreationEnabled(siddhiApp.getAnnotations());
-
+        Set<String> inMemoryAggregationIds = getInmemoryAggregationIds();
         for (ExecutionElement executionElement : siddhiApp.getExecutionElementList()) {
             parallel = getExecGroupParallel(executionElement);
-            if (isJoinWithInMemoryAggregation(executionElement)) {
+            if (inMemoryAggregationIds.size() > 0 && isJoinWithInMemoryAggregation(executionElement,
+                    inMemoryAggregationIds)) {
                 continue;
             }
             execGroupName = getExecGroupName(executionElement, siddhiAppName, defaultExecGroupName);
@@ -88,9 +89,7 @@ public class SiddhiTopologyCreatorImpl implements SiddhiTopologyCreator {
             addExecutionElement(executionElement, siddhiQueryGroup, execGroupName);
         }
 
-        reduceAggregationJoins();
-        addAggregationDefinitionToQueryGroups();
-        checkForAggregationQueryGroupCreation();
+        createAggregationQueryGroups(inMemoryAggregationIds.size());
         //prior to assigning publishing strategies checking if a user given source stream is used in multiple execGroups
         checkUserGivenSourceDistribution();
         assignPublishingStrategyOutputStream();
@@ -105,6 +104,20 @@ public class SiddhiTopologyCreatorImpl implements SiddhiTopologyCreator {
         }
         return new SiddhiTopology(siddhiTopologyDataHolder.getSiddhiAppName(), new ArrayList<>
                 (siddhiTopologyDataHolder.getSiddhiQueryGroupMap().values()), transportChannelCreationEnabled);
+    }
+
+    /**
+     * Adds aggregation definition to corresponding query groups, Create query groups for in-memory aggregations and
+     * unused aggregations.
+     * @param inMemoryAggregationCount Number of in-memory aggregations in the user given siddhi app.
+     */
+    private void createAggregationQueryGroups(int inMemoryAggregationCount) {
+        Map<String, Set<String>> aggregationGroups = new HashMap<>();
+        if (inMemoryAggregationCount > 1) {
+            aggregationGroups = reduceAggregationJoins();
+        }
+        addAggregationDefinitionToQueryGroups();
+        checkForAggregationQueryGroupCreation(aggregationGroups);
     }
 
     /**
@@ -677,33 +690,33 @@ public class SiddhiTopologyCreatorImpl implements SiddhiTopologyCreator {
      * If the given execution element contains a join with in-memory aggregation then a mapping between the
      * aggregationId and execution element will be created.
      * @param executionElement  Execution element to be checked for in-memory aggregation joins.
+     * @param inMemoryAggregationIds Set of in memory aggregation ids in the siddhi app.
      * @return True if the given execution element contains join with in-memory aggregations.
      */
-    private boolean isJoinWithInMemoryAggregation(ExecutionElement executionElement) {
-        boolean isAggregation = false;
-        Set<String> inMemoryAggregationIds = getInmemoryAggregationIds();
+    private boolean isJoinWithInMemoryAggregation(ExecutionElement executionElement, Set<String>
+            inMemoryAggregationIds) {
+        boolean isInMemoryAggregationJoin = false;
+        List<String> streamIdsList;
         if (executionElement instanceof Query) {
-            for (String aggregationId: inMemoryAggregationIds) {
-                if (!isAggregation) {
-                    isAggregation = addToAggregationJoins(executionElement, aggregationId, null);
-                } else {
-                    addToAggregationJoins(executionElement, aggregationId, null);
+            streamIdsList =  ((Query) executionElement).getInputStream().getUniqueStreamIds();
+            for (String streamId : streamIdsList) {
+                if (inMemoryAggregationIds.contains(streamId)) {
+                    isInMemoryAggregationJoin = true;
+                    addToAggregationJoins(executionElement, streamId, null);
                 }
             }
-
         } else if (executionElement instanceof Partition) {
-
-            for (String aggregationId: inMemoryAggregationIds) {
-                for (ExecutionElement innerPartitionElement : ((Partition) executionElement).getQueryList()) {
-                    if (!isAggregation) {
-                        isAggregation = addToAggregationJoins(innerPartitionElement, aggregationId, executionElement);
-                    } else {
-                        addToAggregationJoins(innerPartitionElement, aggregationId, executionElement);
+            for (ExecutionElement innerPartitionElement : ((Partition) executionElement).getQueryList()) {
+                streamIdsList =  ((Query) innerPartitionElement).getInputStream().getUniqueStreamIds();
+                for (String streamId : streamIdsList) {
+                    if (inMemoryAggregationIds.contains(streamId)) {
+                        isInMemoryAggregationJoin = true;
+                        addToAggregationJoins(innerPartitionElement, streamId, executionElement);
                     }
                 }
             }
         }
-        return isAggregation;
+        return isInMemoryAggregationJoin;
     }
 
     /**
@@ -712,7 +725,7 @@ public class SiddhiTopologyCreatorImpl implements SiddhiTopologyCreator {
     private Set<String> getInmemoryAggregationIds() {
         Set<String> inMemoryAggregationIds = new HashSet<>();
         for (String aggregationId : siddhiApp.getAggregationDefinitionMap().keySet()) {
-            if (isInmemoryStore(aggregationId)) {
+            if (isInMemoryStore(aggregationId)) {
                 inMemoryAggregationIds.add(aggregationId);
             }
         }
@@ -726,39 +739,32 @@ public class SiddhiTopologyCreatorImpl implements SiddhiTopologyCreator {
      * @param aggregationId Aggregation which part of the join.
      * @param parentElement If the given query belongs to a partition, then this will contains the {@link Partition}
      *                      else will be null
-     * @return True if given query contains joins with aggregations.
      */
-    private boolean addToAggregationJoins(ExecutionElement executionElement, String aggregationId, ExecutionElement
+    private void addToAggregationJoins(ExecutionElement executionElement, String aggregationId, ExecutionElement
             parentElement) {
         int executionElementParallel;
-        boolean isAggregation = false;
         ExecutionElement elementToAdd = executionElement;
-        Set<ExecutionElement> exeElementList = new HashSet<>();
-        if (((Query) executionElement).getInputStream().getUniqueStreamIds()
-                .contains(aggregationId)) {
-            isAggregation = true;
-            if (parentElement != null) {
-                elementToAdd = parentElement;
-                executionElementParallel = getExecGroupParallel(parentElement);
-            } else {
-                executionElementParallel = getExecGroupParallel(executionElement);
-            }
-
-            if (inMemoryAggregationJoins.get(aggregationId) != null) {
-                if (!inMemoryAggregationJoins.get(aggregationId).contains(elementToAdd)) {
-                    inMemoryAggregationJoins.get(aggregationId).add(elementToAdd);
-                }
-            } else {
-                exeElementList.add(elementToAdd);
-                inMemoryAggregationJoins.put(aggregationId, exeElementList);
-            }
-
-            if (executionElementParallel > SiddhiTopologyCreatorConstants.DEFAULT_PARALLEL) {
-                throw new SiddhiAppValidationException("Query element : " + getElementName(executionElement) + " has "
-                        + "parallelism > 1 while joining with an in-memory aggregation : " + aggregationId);
-            }
+        Set<ExecutionElement> exeElementSet = new HashSet<>();
+        if (parentElement != null) {
+            elementToAdd = parentElement;
+            executionElementParallel = getExecGroupParallel(parentElement);
+        } else {
+            executionElementParallel = getExecGroupParallel(executionElement);
         }
-        return isAggregation;
+
+        if (inMemoryAggregationJoins.get(aggregationId) != null) {
+            if (!inMemoryAggregationJoins.get(aggregationId).contains(elementToAdd)) {
+                inMemoryAggregationJoins.get(aggregationId).add(elementToAdd);
+            }
+        } else {
+            exeElementSet.add(elementToAdd);
+            inMemoryAggregationJoins.put(aggregationId, exeElementSet);
+        }
+
+        if (executionElementParallel > SiddhiTopologyCreatorConstants.DEFAULT_PARALLEL) {
+            throw new SiddhiAppValidationException("Query element : " + getElementName(executionElement) + " has "
+                    + "parallelism > 1 while joining with an in-memory aggregation : " + aggregationId);
+        }
     }
 
     /**
@@ -766,7 +772,7 @@ public class SiddhiTopologyCreatorImpl implements SiddhiTopologyCreator {
      * aggregations will be mapped with one of those aggregationId and remaining aggregations will be mapped with the
      * selected aggregation id.
      */
-    private void reduceAggregationJoins() {
+    private Map<String, Set<String>> reduceAggregationJoins() {
         boolean isUpdated = true;
         //Aggregation id -> list of aggregationIds mapping to combine all into one siddhi query group.
         Map<String, Set<String>> aggregationGroups = new HashMap<>();
@@ -815,7 +821,7 @@ public class SiddhiTopologyCreatorImpl implements SiddhiTopologyCreator {
             }
 
         }
-        joinableInMemoryAggregationList = aggregationGroups;
+        return aggregationGroups;
     }
 
     /**
@@ -852,8 +858,7 @@ public class SiddhiTopologyCreatorImpl implements SiddhiTopologyCreator {
 
                     siddhiQueryGroup.addQueryAtFirst(aggregationQueryDefinition);
                     SubscriptionStrategyDataHolder subscriptionStrategyDataHolder = new
-                            SubscriptionStrategyDataHolder(parallelism, findStreamSubscriptionStrategy(true,
-                            inputStreamId, parallelism, siddhiQueryGroup.getName()), null);
+                            SubscriptionStrategyDataHolder(parallelism, TransportStrategy.ALL, null);
                     InputStreamDataHolder inputStreamDataHolder  = new InputStreamDataHolder(substitudeStreamId,
                             streamDefinition, streamDataHolder.getEventHolderType(), false,
                             subscriptionStrategyDataHolder);
@@ -867,12 +872,13 @@ public class SiddhiTopologyCreatorImpl implements SiddhiTopologyCreator {
     /**
      * Iterate through the aggregation definitions and initialize the {@link SiddhiQueryGroup} creation.
      */
-    private void checkForAggregationQueryGroupCreation() {
+    private void checkForAggregationQueryGroupCreation(Map<String, Set<String>> filteredInMemoryAggregationMap) {
         for (Map.Entry<String, AggregationDefinition> aggregationDefinitionEntry : siddhiApp
                 .getAggregationDefinitionMap().entrySet()) {
             String aggregationId = aggregationDefinitionEntry.getKey();
-            if (!extractUsedAggregations().contains(aggregationId)) {
-                SiddhiQueryGroup aggregationQueryGroup = createAggregationQueryGroup(aggregationId);
+            if (!extractUsedAggregations(filteredInMemoryAggregationMap).contains(aggregationId)) {
+                SiddhiQueryGroup aggregationQueryGroup = createAggregationQueryGroup(aggregationId,
+                        filteredInMemoryAggregationMap);
                 siddhiTopologyDataHolder.getSiddhiQueryGroupMap().put(aggregationQueryGroup.getName(),
                         aggregationQueryGroup);
             }
@@ -884,31 +890,33 @@ public class SiddhiTopologyCreatorImpl implements SiddhiTopologyCreator {
      * @param aggregationId Id of the aggregation which will be included in the newly created {@link SiddhiQueryGroup}.
      * @return Created SiddhiQueryGroup
      */
-    private SiddhiQueryGroup createAggregationQueryGroup(String aggregationId) {
+    private SiddhiQueryGroup createAggregationQueryGroup(String aggregationId, Map<String, Set<String>>
+            filteredInMemoryAggregationMap) {
         String aggregationExecutionGroupName = siddhiTopologyDataHolder.getSiddhiAppName() + "_" +
                 SiddhiTopologyCreatorConstants.AGGREGATION + "-" + new Random().nextInt(99999);
         SiddhiQueryGroup siddhiQueryGroup = new SiddhiQueryGroup(aggregationExecutionGroupName,
                 SiddhiTopologyCreatorConstants.DEFAULT_PARALLEL);
 
-        addAggregations(aggregationId, siddhiQueryGroup);
+        addAggregations(aggregationId, siddhiQueryGroup, filteredInMemoryAggregationMap);
         addExecutionElements(aggregationId, siddhiQueryGroup, aggregationExecutionGroupName);
         return siddhiQueryGroup;
     }
 
     /**
      * Adds aggregations to the created siddhiQueryGroup. The given aggregation and the other aggregations gathered
-     * from {@link #joinableInMemoryAggregationList} mapping will be added to the siddhiQueryGroup.
+     * from filteredInMemoryAggregationMap mapping will be added to the siddhiQueryGroup.
      * @param aggregationsId Id of the aggregation which will be used to get the joined execution elements and other
      *                       joined aggregations from {@link #inMemoryAggregationJoins} and
-     *                       {@link #joinableInMemoryAggregationList} respectively.
+     *                       filteredInMemoryAggregationMap respectively.
      * @param siddhiQueryGroup SiddhiQueryGroup which aggregations and execution elements will be added.
      */
-    private void addAggregations(String aggregationsId, SiddhiQueryGroup siddhiQueryGroup) {
+    private void addAggregations(String aggregationsId, SiddhiQueryGroup siddhiQueryGroup, Map<String, Set<String>>
+            filteredInMemoryAggregationMap) {
         List<String> joinableAggregations = new ArrayList<>();
         joinableAggregations.add(aggregationsId);
 
-        if ((joinableInMemoryAggregationList.get(aggregationsId) != null)) {
-            joinableAggregations.addAll(joinableInMemoryAggregationList.get(aggregationsId));
+        if ((filteredInMemoryAggregationMap.get(aggregationsId) != null)) {
+            joinableAggregations.addAll(filteredInMemoryAggregationMap.get(aggregationsId));
         }
 
         for (String aggregationId : joinableAggregations) {
@@ -1005,7 +1013,7 @@ public class SiddhiTopologyCreatorImpl implements SiddhiTopologyCreator {
      * @param aggregationId Id of the aggregation which Store value to be checked.
      * @return True if the given aggregation uses in-memory store.
      */
-    private boolean isInmemoryStore(String aggregationId) {
+    private boolean isInMemoryStore(String aggregationId) {
         String storeType = SiddhiTopologyCreatorConstants.INMEMORY;
         for (Annotation annotation : siddhiApp.getAggregationDefinitionMap().get(aggregationId).getAnnotations()) {
             if (annotation.getName().equals(SiddhiTopologyCreatorConstants.PERSISTENCETABLE_IDENTIFIER)) {
@@ -1035,9 +1043,9 @@ public class SiddhiTopologyCreatorImpl implements SiddhiTopologyCreator {
     /**
      * @return All the aggregations used to execution elements join.
      */
-    private List<String> extractUsedAggregations() {
+    private List<String> extractUsedAggregations(Map<String, Set<String>> filteredInMemoryAggregationMap) {
         List<String> usedAggregations = new ArrayList<>();
-        for (Set<String> joinableAggregations : joinableInMemoryAggregationList.values()) {
+        for (Set<String> joinableAggregations : filteredInMemoryAggregationMap.values()) {
             usedAggregations.addAll(joinableAggregations);
         }
         return usedAggregations;
@@ -1048,6 +1056,8 @@ public class SiddhiTopologyCreatorImpl implements SiddhiTopologyCreator {
      * @param aggregationDefinition Aggregation definition of which meta info to be removed.
      * @return String definition after the removal of @dist annotation.
      */
+    //This method is not necessary for the current design of aggregation distribution. But this left here considering
+    // the future works on adding parallel annotation to aggregations.
     private String removeMetaInfoAggregation(AggregationDefinition aggregationDefinition) {
         int[] queryContextStartIndex;
         int[] queryContextEndIndex;

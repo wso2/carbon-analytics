@@ -37,7 +37,11 @@ import org.wso2.siddhi.core.stream.output.StreamCallback;
 import org.wso2.siddhi.core.util.EventPrinter;
 import org.wso2.siddhi.core.util.SiddhiTestHelper;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
@@ -49,6 +53,8 @@ public class DistributedAggregationTestCase {
     private AtomicInteger errorAssertionCount;
     private static final String PROVIDER_URL = "vm://localhost";
     private static final String INITIAL_FACTORY = "org.apache.activemq.jndi.ActiveMQInitialContextFactory";
+    private static final String JDBC_URL = "jdbc:h2:./target/testdb";
+    private static final String JDBC_DRIVER_NAME = "org.h2.Driver";
 
     @BeforeMethod
     public void setUp() {
@@ -73,18 +79,15 @@ public class DistributedAggregationTestCase {
                 + "@source(type = 'http', receiver.url='http://localhost:8080/Stocks', @map(type = 'json'))\n"
                 + "define stream StockStream (symbol string, value int, timestamp long);\n"
                 + "@dist(parallel='1')\n"
-                + "@store(type='rdbms', jdbc.url=\"jdbc: mysql://localhost:3306/SweetFactoryDB \", "
-                + "username=\"root\", password=\"root\" ,"
-                + " jdbc.driver.name =\"com.mysql.jdbc.Driver\") \n"
+                + "@store(type='rdbms', jdbc.url= '" + JDBC_URL + "', username='root', password= 'root', jdbc"
+                + ".driver.name= '" + JDBC_DRIVER_NAME + "')"
                 + "define aggregation StockAggregation\n"
                 + "from StockStream\n"
                 + "select symbol, avg(value) as avgValue, sum(value) as total\n"
                 + "group by symbol\n"
                 + "aggregate by timestamp every sec ... year;\n"
-                + "@dist(parallel='3')\n"
-                + "@store(type='rdbms', jdbc.url=\"jdbc: mysql://localhost:3306/SweetFactoryDB \", "
-                + "username=\"root\", password=\"root\" ,"
-                + " jdbc.driver.name =\"com.mysql.jdbc.Driver\") \n"
+                + "@store(type='rdbms', jdbc.url= '" + JDBC_URL + "', username='root', password= 'root', jdbc"
+                + ".driver.name= '" + JDBC_DRIVER_NAME + "')"
                 + "define aggregation TradeAggregation\n"
                 + "from TradeStream\n"
                 + "select symbol, avg(price) as avgPrice, sum(price) as total\n"
@@ -118,9 +121,8 @@ public class DistributedAggregationTestCase {
                 + "define stream stockStream (symbol string, price float, lastClosingPrice float, volume long , "
                 + "quantity int, timestamp string);"
                 + "@dist(parallel='2')\n"
-                + "@store(type='rdbms', jdbc.url='jdbc:mysql://localhost:3306/SweetFactoryDB', "
-                + "username=\"root\", password='',"
-                + "jdbc.driver.name =\"com.mysql.jdbc.Driver\") \n"
+                + "@store(type='rdbms', jdbc.url= '" + JDBC_URL + "', username='root', password= 'root', jdbc"
+                + ".driver.name= '" + JDBC_DRIVER_NAME + "')"
                 + "define aggregation stockAggregation "
                 + "from stockStream "
                 + "select symbol, avg(price) as avgPrice, sum(price) as totalPrice, (price * quantity) "
@@ -213,9 +215,8 @@ public class DistributedAggregationTestCase {
                 + "define stream stockStream (symbol string, price float, lastClosingPrice float, volume long , "
                 + "quantity int, timestamp string);"
                 + "@dist(parallel='2')\n"
-                + "@store(type='rdbms', jdbc.url='jdbc:mysql://localhost:3306/SweetFactoryDB', "
-                + "username=\"root\", password='',"
-                + "jdbc.driver.name =\"com.mysql.jdbc.Driver\") \n"
+                + "@store(type='rdbms', jdbc.url= '" + JDBC_URL + "', username='root', password= 'root', jdbc"
+                + ".driver.name= '" + JDBC_DRIVER_NAME + "')"
                 + "define aggregation stockAggregation "
                 + "from stockStream "
                 + "select symbol, avg(price) as avgPrice, sum(price) as totalPrice, (price * quantity) "
@@ -319,27 +320,24 @@ public class DistributedAggregationTestCase {
                 + "@sink(type='log')\n"
                 + "define stream Test6Stream (symbol string, avgPrice double);\n"
                 + "@dist(parallel='2')\n"
-                + "@store(type='rdbms', jdbc.url=\"jdbc:mysql://localhost:3306/SweetFactoryDB\", "
-                + "username=\"root\", password=\"\" ,"
-                + "jdbc.driver.name =\"com.mysql.jdbc.Driver\") \n"
+                + "@store(type='rdbms', jdbc.url= '" + JDBC_URL + "', username='root', password= 'root', jdbc"
+                + ".driver.name= '" + JDBC_DRIVER_NAME + "')"
                 + "define aggregation AggregationTest1\n"
                 + "from Test2Stream\n"
                 + "select symbol, avg(price) as avgPrice, sum(volume) as totalVolume\n"
                 + "group by symbol\n"
                 + "aggregate by timestamp every sec ... year;\n"
                 + "@dist(parallel='3')\n"
-                + "@store(type='rdbms', jdbc.url=\"jdbc:mysql://localhost:3306/SweetFactoryDB\", "
-                + "username=\"root\", password=\"\" ,"
-                + "jdbc.driver.name =\"com.mysql.jdbc.Driver\") \n"
+                + "@store(type='rdbms', jdbc.url= '" + JDBC_URL + "', username='root', password= 'root', jdbc"
+                + ".driver.name= '" + JDBC_DRIVER_NAME + "')"
                 + "define aggregation AggregationTest2\n"
                 + "from Test4Stream\n"
                 + "select symbol, avg(price) as avgPrice, sum(volume) as totalVolume\n"
                 + "group by symbol\n"
                 + "aggregate by timestamp every sec ... year;\n"
                 + "@dist(parallel='2')\n"
-                + "@store(type='rdbms', jdbc.url=\"jdbc:mysql://localhost:3306/SweetFactoryDB\", "
-                + "username=\"root\", password=\"\" ,"
-                + "jdbc.driver.name =\"com.mysql.jdbc.Driver\") \n"
+                + "@store(type='rdbms', jdbc.url= '" + JDBC_URL + "', username='root', password= 'root', jdbc"
+                + ".driver.name= '" + JDBC_DRIVER_NAME + "')"
                 + "define aggregation AggregetionTest3\n"
                 + "from Test3Stream\n"
                 + "select symbol, avg(price) as avgPrice, sum(volume) as totalVolume\n"
@@ -470,8 +468,9 @@ public class DistributedAggregationTestCase {
                                 + "define stream Test1Stream (symbol string, price double, volume long,"
                                 + " timestamp long);\n"
                                 + "\n"
-                                + "@store(type='rdbms', jdbc.url=\"jdbc:mysql://localhost:3306/SweetFactoryDB\","
-                                + " username=\"root\", password=\"\" ,jdbc.driver.name =\"com.mysql.jdbc.Driver\") \n"
+                                + "@store(type='rdbms', jdbc.url= '" + JDBC_URL + "', username='root', password= "
+                                + "'root', jdbc"
+                                + ".driver.name= '" + JDBC_DRIVER_NAME + "')"
                                 + "define aggregation AggregationTest1\n"
                                 + "from Test2Stream_TestPlan4_002\n"
                                 + "select symbol, avg(price) as avgPrice, sum(volume) as totalVolume\n"
@@ -500,8 +499,9 @@ public class DistributedAggregationTestCase {
                                 + "@sink(type='log')\n"
                                 + "define stream Test5Stream (symbol string, avgPrice double, totalVolume long);\n"
                                 + "\n"
-                                + "@store(type='rdbms', jdbc.url=\"jdbc:mysql://localhost:3306/SweetFactoryDB\","
-                                + " username=\"root\", password=\"\" ,jdbc.driver.name =\"com.mysql.jdbc.Driver\") \n"
+                                + "@store(type='rdbms', jdbc.url= '" + JDBC_URL + "', username='root', password= "
+                                + "'root', jdbc"
+                                + ".driver.name= '" + JDBC_DRIVER_NAME + "')"
                                 + "define aggregation AggregationTest1\n"
                                 + "from Test2Stream_TestPlan4_003\n"
                                 + "select symbol, avg(price) as avgPrice, sum(volume) as totalVolume\n"
@@ -533,8 +533,9 @@ public class DistributedAggregationTestCase {
                                 + "@sink(type='log')\n"
                                 + "define stream Test6Stream (symbol string, avgPrice double);\n"
                                 + "\n"
-                                + "@store(type='rdbms', jdbc.url=\"jdbc:mysql://localhost:3306/SweetFactoryDB\","
-                                + " username=\"root\", password=\"\" ,jdbc.driver.name =\"com.mysql.jdbc.Driver\") \n"
+                                + "@store(type='rdbms', jdbc.url= '" + JDBC_URL + "', username='root', password= "
+                                + "'root',"
+                                + " jdbc.driver.name= '" + JDBC_DRIVER_NAME + "')"
                                 + "define aggregation AggregationTest2\n"
                                 + "from Test4Stream_TestPlan4_004\n"
                                 + "select symbol, avg(price) as avgPrice, sum(volume) as totalVolume\n"
@@ -563,8 +564,9 @@ public class DistributedAggregationTestCase {
                                 + "@sink(type='log')\n"
                                 + "define stream Test6Stream (symbol string, avgPrice double);\n"
                                 + "\n"
-                                + "@store(type='rdbms', jdbc.url=\"jdbc:mysql://localhost:3306/SweetFactoryDB\","
-                                + " username=\"root\", password=\"\" ,jdbc.driver.name =\"com.mysql.jdbc.Driver\") \n"
+                                + "@store(type='rdbms', jdbc.url= '" + JDBC_URL + "', username='root', password= "
+                                + "'root', jdbc"
+                                + ".driver.name= '" + JDBC_DRIVER_NAME + "')"
                                 + "define aggregation AggregationTest2\n"
                                 + "from Test4Stream_TestPlan4_004\n"
                                 + "select symbol, avg(price) as avgPrice, sum(volume) as totalVolume\n"
@@ -585,8 +587,8 @@ public class DistributedAggregationTestCase {
                                 + "define stream Test2Stream (symbol string, price double, volume long, "
                                 + "timestamp long);\n"
                                 + "\n"
-                                + "@store(type='rdbms', jdbc.url=\"jdbc:mysql://localhost:3306/SweetFactoryDB\","
-                                + " username=\"root\", password=\"\" ,jdbc.driver.name =\"com.mysql.jdbc.Driver\") \n"
+                                + "@store(type='rdbms', jdbc.url= '" + JDBC_URL + "', username='root', password= "
+                                + "'root', jdbc.driver.name= '" + JDBC_DRIVER_NAME + "')"
                                 + "define aggregation AggregationTest1\n"
                                 + "from Test2Stream\n"
                                 + "select symbol, avg(price) as avgPrice, sum(volume) as totalVolume\n"
@@ -602,8 +604,9 @@ public class DistributedAggregationTestCase {
                                 + "define stream Test3Stream (symbol string, price double, volume long,"
                                 + " timestamp long);\n"
                                 + "\n"
-                                + "@store(type='rdbms', jdbc.url=\"jdbc:mysql://localhost:3306/SweetFactoryDB\","
-                                + " username=\"root\", password=\"\" ,jdbc.driver.name =\"com.mysql.jdbc.Driver\") \n"
+                                + "@store(type='rdbms', jdbc.url= '" + JDBC_URL + "', username='root', password= "
+                                + "'root', jdbc"
+                                + ".driver.name= '" + JDBC_DRIVER_NAME + "')"
                                 + "define aggregation AggregetionTest3\n"
                                 + "from Test3Stream\n"
                                 + "select symbol, avg(price) as avgPrice, sum(volume) as totalVolume\n"
@@ -618,8 +621,8 @@ public class DistributedAggregationTestCase {
                                 + "define stream Test4Stream (symbol string, price double, volume long,"
                                 + " timestamp long);\n"
                                 + "\n"
-                                + "@store(type='rdbms', jdbc.url=\"jdbc:mysql://localhost:3306/SweetFactoryDB\","
-                                + " username=\"root\", password=\"\" ,jdbc.driver.name =\"com.mysql.jdbc.Driver\") \n"
+                                + "@store(type='rdbms', jdbc.url= '" + JDBC_URL + "', username='root', password= "
+                                + "'root', jdbc.driver.name= '" + JDBC_DRIVER_NAME + "')"
                                 + "define aggregation AggregationTest2\n"
                                 + "from Test4Stream\n"
                                 + "select symbol, avg(price) as avgPrice, sum(volume) as totalVolume\n"
@@ -773,7 +776,7 @@ public class DistributedAggregationTestCase {
      * If a siddhi query joins with an in-memory aggregation then that aggregation should be in the same
      * {@link SiddhiQueryGroup} where the query resides.
      */
-    @Test(dependsOnMethods = "testInmemoryJoinPartitionParallelism")
+    @Test//(dependsOnMethods = "testInmemoryJoinPartitionParallelism")
     public void testQueryJoinInmemoryAggregation() {
         String siddhiApp = "@App:name('TestPlan7')\n"
                 + "@source(type = 'http', receiver.url='http://localhost:8080/SweetProduction', @map(type"
@@ -1127,64 +1130,6 @@ public class DistributedAggregationTestCase {
                                 + "Test4Stream;"),
                 "Incorrect Partial Siddhi application created");
 
-        Assert.assertTrue(queryGroupList.get(3).getSiddhiQueries().get(0).getApp()
-                        .contains("@source(type='jms',factory.initial='org.apache.activemq.jndi"
-                                + ".ActiveMQInitialContextFactory',provider.url='vm://localhost',"
-                                + "connection.factory.type='topic',destination ='TestPlan9_Test3Stream' , "
-                                + "connection.factory.jndi.name='TopicConnectionFactory',@map(type='xml')) \n"
-                                + "define stream Test3Stream (symbol string, price double, volume long, "
-                                + "timestamp long);\n"
-                                + "@source(type='jms',factory.initial='org.apache.activemq.jndi"
-                                + ".ActiveMQInitialContextFactory',provider.url='vm://localhost',"
-                                + "connection.factory.type='topic',destination ='TestPlan9_Test1Stream' , "
-                                + "connection.factory.jndi.name='TopicConnectionFactory',@map(type='xml')) \n"
-                                + "define stream Test1Stream (symbol string, price double, volume long, "
-                                + "timestamp long);\n"
-                                + "@source(type='jms',factory.initial='org.apache.activemq.jndi"
-                                + ".ActiveMQInitialContextFactory',provider.url='vm://localhost',"
-                                + "connection.factory.type='topic',destination ='TestPlan9_Test4Stream' , "
-                                + "connection.factory.jndi.name='TopicConnectionFactory',@map(type='xml')) \n"
-                                + "define stream Test4Stream (symbol string, price double, volume long, "
-                                + "timestamp long);\n"
-                                + "@source(type = 'http', receiver.url='http://localhost:8080/Stocks', "
-                                + "@map(type = 'json'))\n"
-                                + "define stream Test2Stream (symbol string, price double, volume long, "
-                                + "timestamp long);\n"
-                                + "define aggregation AggregationTest1\n"
-                                + "from Test2Stream\n"
-                                + "select symbol, avg(price) as avgPrice, sum(volume) as totalVolume\n"
-                                + "group by symbol\n"
-                                + "aggregate by timestamp every sec ... year;\n"
-                                + "define aggregation AggregationTest3\n"
-                                + "from Test3Stream\n"
-                                + "select symbol, avg(price) as avgPrice, sum(volume) as totalVolume\n"
-                                + "group by symbol\n"
-                                + "aggregate by timestamp every sec ... year;\n"
-                                + "@info(name = 'query-join1')\n"
-                                + "from Test1Stream as P join AggregationTest1 as Q\n"
-                                + "on P.symbol == Q.symbol\n"
-                                + "within \"2014-02-15 00:00:00 +05:30\", \"2014-03-16 00:00:00 +05:30\"\n"
-                                + "per \"days\"\n"
-                                + "select P.symbol, Q.avgPrice, Q.totalVolume\n"
-                                + "Insert into Test5stream;\n"
-                                + "@info(name='partition-join')\n"
-                                + "Partition with (symbol of Test4Stream)\n"
-                                + "begin\n"
-                                + "From Test4Stream as P join AggregationTest1 as Q\n"
-                                + "on P.symbol == Q.symbol\n"
-                                + "within \"2014-02-15 00:00:00 +05:30\", \"2014-03-16 00:00:00 +05:30\"\n"
-                                + "per \"days\"\n"
-                                + "select P.symbol, Q.totalVolume\n"
-                                + "Insert into Test7Stream;\n"
-                                + "From Test4Stream as M join AggregationTest3 as S\n"
-                                + "on M.symbol == S.symbol\n"
-                                + "within \"2014-02-15 00:00:00 +05:30\", \"2014-03-16 00:00:00 +05:30\" \n"
-                                + "per \"days\"\n"
-                                + "select M.symbol, S.totalVolume\n"
-                                + "Insert into Test7Stream;\n"
-                                + "End;"),
-                "Incorrect Partial Siddhi application created");
-
         Assert.assertTrue(queryGroupList.get(4).getSiddhiQueries().get(0).getApp()
                         .contains("@source(type='jms',factory.initial='org.apache.activemq.jndi"
                                 + ".ActiveMQInitialContextFactory',provider.url='vm://localhost',"
@@ -1212,6 +1157,444 @@ public class DistributedAggregationTestCase {
                                 + "Insert into Test6stream;"),
                 "Incorrect Partial Siddhi application created");
     }
+
+    /**
+     * Test the behavior when multiple queries joins with single aggregation.
+     */
+    @Test
+    public void testSingleAggregatioinMultipleQueryJoins() throws InterruptedException {
+        String siddhiApp = "@App:name('TestPlan10')"
+                + "@App:description('Incremental aggregation distributed test cases.')\n"
+                + "@source(type = 'http', receiver.url='http://localhost:8080/SweetProductionEP', "
+                + "@map(type = 'json'))\n"
+                + "define stream Test1Stream (symbol string, price float, lastClosingPrice float, volume long , "
+                + "quantity int, timestamp long);\n"
+                + "@source(type = 'http', receiver.url='http://localhost:8080/Stocks', @map(type = 'json'))\n"
+                + "define stream Test2Stream (symbol string, price double, volume long, timestamp long);\n"
+                + "@sink(type='log')\n"
+                + "define stream Test4Stream (symbol string, avgPrice double, totalPrice double, lastTradeValue "
+                + "float);\n"
+                + "@source(type = 'http', receiver.url='http://localhost:8080/product', @map(type = 'json'))\n"
+                + "define stream Test3Stream (symbol string, price double, volume long, timestamp long);\n"
+                + "@store(type='rdbms', jdbc.url= '" + JDBC_URL + "', username='root', password= 'root', jdbc.driver"
+                + ".name= '" + JDBC_DRIVER_NAME + "')\n"
+                + "define aggregation queryAggregationTest1\n"
+                + "from Test1Stream \n"
+                + "select symbol, avg(price) as avgPrice, sum(price) as totalPrice, (price * quantity)"
+                + "as lastTradeValue\n"
+                + "group by symbol\n"
+                + "aggregate by timestamp every sec...hour ;\n"
+                + "@info(name = 'query-join1')@dist(execGroup='001', parallel = '2')\n"
+                + "from Test3Stream as P join queryAggregationTest1 as Q\n"
+                + "on P.symbol == Q.symbol\n"
+                + "within '2017-06-** **:**:**'\n"
+                + "per \"seconds\"\n"
+                + "select P.symbol, Q.avgPrice, Q.totalPrice, Q.lastTradeValue\n"
+                + "Insert into Test4Stream;\n"
+                + "@info(name = 'query-join2')@dist(execGroup='002', parallel = '2')\n"
+                + "from Test2Stream as P join queryAggregationTest1 as Q \n"
+                + "on P.symbol == Q.symbol\n"
+                + "within \"2014-02-15 00:00:00 +05:30\", \"2018-12-16 00:00:00 +05:30\"\n"
+                + "per \"seconds\"\n"
+                + "select P.symbol, Q.avgPrice, Q.totalPrice, Q.lastTradeValue\n"
+                + "Insert into Test4Stream;";
+
+        SiddhiTopologyCreatorImpl siddhiTopologyCreator = new SiddhiTopologyCreatorImpl();
+        SiddhiTopology topology = siddhiTopologyCreator.createTopology(siddhiApp);
+        SiddhiAppCreator appCreator = new JMSSiddhiAppCreator();
+        List<DeployableSiddhiQueryGroup> queryGroupList = appCreator.createApps(topology);
+        SiddhiManager siddhiManager = new SiddhiManager();
+
+        Assert.assertEquals(queryGroupList.size(), 5);
+        Assert.assertTrue(queryGroupList.get(0).getGroupName().contains("passthrough"));
+        Assert.assertTrue(queryGroupList.get(1).getGroupName().contains("passthrough"));
+        Assert.assertTrue(queryGroupList.get(2).getGroupName().contains("001"));
+        Assert.assertTrue(queryGroupList.get(3).getGroupName().contains("002"));
+        Assert.assertTrue(queryGroupList.get(4).getGroupName().contains("aggregation"));
+
+        Map<String, List<SiddhiAppRuntime>> siddhiAppRuntimeMap =
+                createSiddhiAppRuntimes(siddhiManager, queryGroupList);
+        InputHandler test1StreamInputHandler = siddhiAppRuntimeMap.get(queryGroupList.get(4).getGroupName()).get(0)
+                .getInputHandler("Test1Stream");
+        InputHandler test3StreamInputHandler = siddhiAppRuntimeMap.get(queryGroupList.get(2).getGroupName()).get(0)
+                .getInputHandler("Test3Stream");
+        InputHandler test2StreamInputHandler = siddhiAppRuntimeMap.get(queryGroupList.get(3).getGroupName()).get(0)
+                .getInputHandler("Test2Stream");
+
+
+        test1StreamInputHandler.send(new Object[]{"WSO2", 50f, 60f, 90L, 6, 1496289950000L});
+        test1StreamInputHandler.send(new Object[]{"WSO2", 70f, null, 40L, 10, 1496289950000L});
+
+        test1StreamInputHandler.send(new Object[]{"WSO2", 60f, 44f, 200L, 56, 1496289952000L});
+        test1StreamInputHandler.send(new Object[]{"WSO2", 100f, null, 200L, 16, 1496289952000L});
+
+        test1StreamInputHandler.send(new Object[]{"IBM", 100f, null, 200L, 26, 1496289954000L});
+        test1StreamInputHandler.send(new Object[]{"IBM", 100f, null, 200L, 96, 1496289954000L});
+        Thread.sleep(100);
+
+        ArrayList<Event> query1EventsList = new ArrayList<>();
+        for (SiddhiAppRuntime runtime : siddhiAppRuntimeMap.get(queryGroupList.get(2).getGroupName())) {
+            runtime.addCallback("Test4Stream", new StreamCallback() {
+                @Override
+                public void receive(Event[] events) {
+                    EventPrinter.print(events);
+                    count.addAndGet(events.length);
+                    for (Event event : events) {
+                        query1EventsList.add(event);
+                        errorAssertionCount.incrementAndGet();
+                        errorAssertionCount.decrementAndGet();
+                    }
+                }
+            });
+        }
+
+        ArrayList<Event> query2EventsList = new ArrayList<>();
+        for (SiddhiAppRuntime runtime : siddhiAppRuntimeMap.get(queryGroupList.get(3).getGroupName())) {
+            runtime.addCallback("Test4Stream", new StreamCallback() {
+                @Override
+                public void receive(Event[] events) {
+                    EventPrinter.print(events);
+                    count.addAndGet(events.length);
+                    for (Event event : events) {
+                        query2EventsList.add(event);
+                        errorAssertionCount.incrementAndGet();
+                        errorAssertionCount.decrementAndGet();
+                    }
+                }
+            });
+        }
+
+        Thread.sleep(1000);
+        test3StreamInputHandler.send(new Object[]{"IBM", 100.25, 200L, 1496289954000L});
+        test3StreamInputHandler.send(new Object[]{"WSO2", 100.25, 200L, 1496289954000L});
+
+        Assert.assertEquals(query1EventsList.size(), 3);
+        List<Object[]> query1EventsOutputList = new ArrayList<>();
+        for (Event event : query1EventsList) {
+            query1EventsOutputList.add(event.getData());
+        }
+        List<Object[]> expected = Arrays.asList(
+                new Object[]{"WSO2", 80.0, 160.0, 1600f},
+                new Object[]{"WSO2", 60.0, 120.0, 700f},
+                new Object[]{"IBM", 100.0, 200.0, 9600f}
+        );
+        Assert.assertTrue(SiddhiTestHelper.isUnsortedEventsMatch(query1EventsOutputList, expected));
+
+        test2StreamInputHandler.send(new Object[]{"IBM", 100.25, 200L, 1496289954000L});
+        test2StreamInputHandler.send(new Object[]{"WSO2", 100.25, 200L, 1496289954000L});
+
+        Assert.assertEquals(query2EventsList.size(), 3);
+        List<Object[]> query2EventsOutputList = new ArrayList<>();
+        for (Event event : query2EventsList) {
+            query2EventsOutputList.add(event.getData());
+        }
+        Assert.assertTrue(SiddhiTestHelper.isUnsortedEventsMatch(query2EventsOutputList, expected));
+        siddhiManager.shutdown();
+    }
+
+    /**
+     * Test the aggregation behaviour when multiple partitions joins with single aggregation.
+     */
+    @Test
+    public void testSingleAggregationMultiplePartitionJoins() throws InterruptedException {
+        String siddhiApp = "@App:name('TestPlan11')\n"
+                + "@App:description('Incremental aggregation distributed test cases.')\n"
+                + "@source(type = 'http', receiver.url='http://localhost:8080/SweetProductionEP', "
+                + "@map(type = 'json'))\n"
+                + "define stream Test1Stream (symbol string, price float, lastClosingPrice float, volume long ,"
+                + " quantity int, timestamp long);\n"
+                + "@source(type = 'http', receiver.url='http://localhost:8080/Stocks', @map(type = 'json'))\n"
+                + "define stream Test2Stream (symbol string, price double, volume long, timestamp long);\n"
+                + "@source(type = 'http', receiver.url='http://localhost:8080/product', @map(type = 'json'))\n"
+                + "define stream Test3Stream (symbol string, price double, volume long, timestamp long);\n"
+                + "@store(type='rdbms', jdbc.url= '" + JDBC_URL + "', username='root', password= 'root', "
+                + "jdbc.driver.name= '" + JDBC_DRIVER_NAME + "')\n"
+                + "define aggregation partitionAggregationTest1\n"
+                + "from Test1Stream\n"
+                + "select symbol, avg(price) as avgPrice, sum(price) as totalPrice, (price * quantity)\n"
+                + "as lastTradeValue\n"
+                + "group by symbol\n"
+                + "aggregate by timestamp every sec...hour ;\n"
+                + "@info(name='partition-join1')@dist(parallel='3', execGroup='001')\n"
+                + "Partition with (symbol of Test3Stream)\n"
+                + "begin\n"
+                + "From Test3Stream as P join partitionAggregationTest1 as Q\n"
+                + "on P.symbol == Q.symbol\n"
+                + "within '2017-06-** **:**:**'\n"
+                + "per \"seconds\"\n"
+                + "select P.symbol, Q.avgPrice, Q.totalPrice, Q.lastTradeValue\n"
+                + "Insert into Test4Stream;\n"
+                + "End;\n"
+                + "@info(name='partition-join2')@dist(parallel='2', execGroup='002')\n"
+                + "Partition with (symbol of Test2Stream)\n"
+                + "begin\n"
+                + "From Test2Stream as P join partitionAggregationTest1 as Q\n"
+                + "on P.symbol == Q.symbol\n"
+                + "within '2017-06-** **:**:**'\n"
+                + "per \"seconds\"\n"
+                + "select P.symbol, Q.avgPrice, Q.totalPrice, Q.lastTradeValue\n"
+                + "Insert into Test4Stream;\n"
+                + "End;";
+
+        SiddhiTopologyCreatorImpl siddhiTopologyCreator = new SiddhiTopologyCreatorImpl();
+        SiddhiTopology topology = siddhiTopologyCreator.createTopology(siddhiApp);
+        SiddhiAppCreator appCreator = new JMSSiddhiAppCreator();
+        List<DeployableSiddhiQueryGroup> queryGroupList = appCreator.createApps(topology);
+        SiddhiManager siddhiManager = new SiddhiManager();
+
+        Assert.assertEquals(queryGroupList.size(), 5);
+        Assert.assertTrue(queryGroupList.get(0).getGroupName().contains("passthrough"));
+        Assert.assertTrue(queryGroupList.get(1).getGroupName().contains("passthrough"));
+        Assert.assertTrue(queryGroupList.get(2).getGroupName().contains("001"));
+        Assert.assertTrue(queryGroupList.get(3).getGroupName().contains("002"));
+        Assert.assertTrue(queryGroupList.get(4).getGroupName().contains("aggregation"));
+
+        Map<String, List<SiddhiAppRuntime>> siddhiAppRuntimeMap =
+                createSiddhiAppRuntimes(siddhiManager, queryGroupList);
+        InputHandler test1StreamInputHandler = siddhiAppRuntimeMap.get(queryGroupList.get(4).getGroupName()).get(0)
+                .getInputHandler("Test1Stream");
+        InputHandler test3StreamInputHandler = siddhiAppRuntimeMap.get(queryGroupList.get(2).getGroupName()).get(0)
+                .getInputHandler("Test3Stream");
+        InputHandler test2StreamInputHandler = siddhiAppRuntimeMap.get(queryGroupList.get(3).getGroupName()).get(0)
+                .getInputHandler("Test2Stream");
+
+
+        test1StreamInputHandler.send(new Object[]{"WSO2", 50f, 60f, 90L, 6, 1496289950000L});
+        test1StreamInputHandler.send(new Object[]{"WSO2", 70f, null, 40L, 10, 1496289950000L});
+
+        test1StreamInputHandler.send(new Object[]{"WSO2", 60f, 44f, 200L, 56, 1496289952000L});
+        test1StreamInputHandler.send(new Object[]{"WSO2", 100f, null, 200L, 16, 1496289952000L});
+
+        test1StreamInputHandler.send(new Object[]{"IBM", 100f, null, 200L, 26, 1496289954000L});
+        test1StreamInputHandler.send(new Object[]{"IBM", 100f, null, 200L, 96, 1496289954000L});
+        Thread.sleep(100);
+
+        ArrayList<Event> partition1EventsList = new ArrayList<>();
+        for (SiddhiAppRuntime runtime : siddhiAppRuntimeMap.get(queryGroupList.get(2).getGroupName())) {
+            runtime.addCallback("Test4Stream", new StreamCallback() {
+                @Override
+                public void receive(Event[] events) {
+                    EventPrinter.print(events);
+                    count.addAndGet(events.length);
+                    for (Event event : events) {
+                        partition1EventsList.add(event);
+                        errorAssertionCount.incrementAndGet();
+                        errorAssertionCount.decrementAndGet();
+                    }
+                }
+            });
+        }
+
+        ArrayList<Event> partition2EventsList = new ArrayList<>();
+        for (SiddhiAppRuntime runtime : siddhiAppRuntimeMap.get(queryGroupList.get(3).getGroupName())) {
+            runtime.addCallback("Test4Stream", new StreamCallback() {
+                @Override
+                public void receive(Event[] events) {
+                    EventPrinter.print(events);
+                    count.addAndGet(events.length);
+                    for (Event event : events) {
+                        partition2EventsList.add(event);
+                        errorAssertionCount.incrementAndGet();
+                        errorAssertionCount.decrementAndGet();
+                    }
+                }
+            });
+        }
+
+        Thread.sleep(1000);
+        test3StreamInputHandler.send(new Object[]{"IBM", 100.25, 200L, 1496289954000L});
+        test3StreamInputHandler.send(new Object[]{"WSO2", 100.25, 200L, 1496289954000L});
+
+        Assert.assertEquals(partition1EventsList.size(), 3);
+        List<Object[]> query1EventsOutputList = new ArrayList<>();
+        for (Event event : partition1EventsList) {
+            query1EventsOutputList.add(event.getData());
+        }
+        List<Object[]> expected = Arrays.asList(
+                new Object[]{"WSO2", 80.0, 160.0, 1600f},
+                new Object[]{"WSO2", 60.0, 120.0, 700f},
+                new Object[]{"IBM", 100.0, 200.0, 9600f}
+        );
+        Assert.assertTrue(SiddhiTestHelper.isUnsortedEventsMatch(query1EventsOutputList, expected));
+
+        test2StreamInputHandler.send(new Object[]{"IBM", 100.25, 200L, 1496289954000L});
+        test2StreamInputHandler.send(new Object[]{"WSO2", 100.25, 200L, 1496289954000L});
+
+        Assert.assertEquals(partition2EventsList.size(), 3);
+        List<Object[]> query2EventsOutputList = new ArrayList<>();
+        for (Event event : partition2EventsList) {
+            query2EventsOutputList.add(event.getData());
+        }
+        Assert.assertTrue(SiddhiTestHelper.isUnsortedEventsMatch(query2EventsOutputList, expected));
+        siddhiManager.shutdown();
+    }
+
+    /**
+     * Test the behavior when multiple queries resides in a single partition join with distinct aggregations.
+     */
+    @Test
+    public void testMultipleAggregationsSinglePartitionJoin() throws InterruptedException {
+        String siddhiApp = "@App:name('TestPlan12')\n"
+                + "@App:description('Incremental aggregation distribution test cases.')\n"
+                + "@source(type = 'http', receiver.url='http://localhost:8080/SweetProductionEP', "
+                + "@map(type = 'json'))\n"
+                + "define stream Test1Stream (symbol string, price float, lastClosingPrice float, volume long , "
+                + "quantity int, timestamp long);\n"
+                + "@source(type = 'http', receiver.url='http://localhost:8080/Stocks', @map(type = 'json'))\n"
+                + "define stream Test2Stream (symbol string, price float, count int, timestamp long);\n"
+                + "@source(type = 'http', receiver.url='http://localhost:8080/product', @map(type = 'json'))\n"
+                + "define stream Test3Stream (symbol string, price double, volume long, timestamp long);\n"
+                + "@source(type = 'http', receiver.url='http://localhost:8080/shortsum', @map(type = 'json'))\n"
+                + "define stream Test4Stream (symbol string, price double, volume long, timestamp long);\n"
+                + "@sink(type='log')\n"
+                + "define stream Test5Stream (symbol string, avgPrice double, totalPrice double, lastTradeValue "
+                + "float);\n"
+                + "@sink(type='log')\n"
+                + "define stream Test6Stream (symbol string, avgPrice double, totalPrice double, totalCount long);\n"
+                + "@store(type='rdbms', jdbc.url= '" + JDBC_URL + "', username='root', password= 'root', jdbc.driver"
+                + ".name= '" + JDBC_DRIVER_NAME + "')\n"
+                + "define aggregation partitionAggregationTest01\n"
+                + "from Test1Stream\n"
+                + "select symbol, avg(price) as avgPrice, sum(price) as totalPrice, (price * quantity)\n"
+                + "as lastTradeValue\n"
+                + "group by symbol\n"
+                + "aggregate by timestamp every sec...hour ;\n"
+                + "@store(type='rdbms', jdbc.url= '" + JDBC_URL + "', username='root', password= 'root', "
+                + "jdbc.driver.name= '" + JDBC_DRIVER_NAME + "')\n"
+                + "define aggregation partitionAggregationTest02\n"
+                + "from Test2Stream\n"
+                + "select symbol, avg(price) as avgPrice, sum(price) as totalPrice, sum(count) as totalCount\n"
+                + "group by symbol\n"
+                + "aggregate by timestamp every sec...hour ;\n"
+                + "@info(name='partition-join')@dist(parallel='3', execGroup='001')\n"
+                + "Partition with (symbol of Test4Stream)\n"
+                + "begin\n"
+                + "From Test4Stream as M join partitionAggregationTest02 as S\n"
+                + "on M.symbol == S.symbol\n"
+                + "within '2017-06-** **:**:**'\n"
+                + "per \"seconds\"\n"
+                + "select M.symbol, S.avgPrice, S.totalPrice, S.totalCount\n"
+                + "Insert into Test6Stream;\n"
+                + "From Test3Stream as P join partitionAggregationTest01 as Q\n"
+                + "on P.symbol == Q.symbol\n"
+                + "within '2017-06-** **:**:**'\n"
+                + "per \"seconds\"\n"
+                + "select P.symbol, Q.avgPrice, Q.totalPrice, Q.lastTradeValue\n"
+                + "Insert into Test5Stream;\n"
+                + "End;";
+
+        SiddhiTopologyCreatorImpl siddhiTopologyCreator = new SiddhiTopologyCreatorImpl();
+        SiddhiTopology topology = siddhiTopologyCreator.createTopology(siddhiApp);
+        SiddhiAppCreator appCreator = new JMSSiddhiAppCreator();
+        List<DeployableSiddhiQueryGroup> queryGroupList = appCreator.createApps(topology);
+        SiddhiManager siddhiManager = new SiddhiManager();
+
+        Assert.assertEquals(queryGroupList.size(), 5);
+        Assert.assertTrue(queryGroupList.get(0).getGroupName().contains("passthrough"));
+        Assert.assertTrue(queryGroupList.get(0).getGroupName().contains("passthrough"));
+        Assert.assertTrue(queryGroupList.get(2).getGroupName().contains("001"));
+        Assert.assertTrue(queryGroupList.get(3).getGroupName().contains("aggregation"));
+        Assert.assertTrue(queryGroupList.get(4).getGroupName().contains("aggregation"));
+
+        Map<String, List<SiddhiAppRuntime>> siddhiAppRuntimeMap =
+                createSiddhiAppRuntimes(siddhiManager, queryGroupList);
+        InputHandler test1StreamInputHandler = siddhiAppRuntimeMap.get(queryGroupList.get(3).getGroupName()).get(0)
+                .getInputHandler("Test1Stream");
+        InputHandler test2StreamInputHandler = siddhiAppRuntimeMap.get(queryGroupList.get(4).getGroupName()).get(0)
+                .getInputHandler("Test2Stream");
+        InputHandler test3StreamInputHandler = siddhiAppRuntimeMap.get(queryGroupList.get(2).getGroupName()).get(0)
+                .getInputHandler("Test3Stream");
+        InputHandler test4StreamInputHandler = siddhiAppRuntimeMap.get(queryGroupList.get(2).getGroupName()).get(0)
+                .getInputHandler("Test4Stream");
+
+
+        test1StreamInputHandler.send(new Object[]{"WSO2", 50f, 60f, 90L, 6, 1496289950000L});
+        test1StreamInputHandler.send(new Object[]{"WSO2", 70f, null, 40L, 10, 1496289950000L});
+
+        test1StreamInputHandler.send(new Object[]{"WSO2", 60f, 44f, 200L, 56, 1496289952000L});
+        test1StreamInputHandler.send(new Object[]{"WSO2", 100f, null, 200L, 16, 1496289952000L});
+
+        test1StreamInputHandler.send(new Object[]{"IBM", 100f, null, 200L, 26, 1496289954000L});
+        test1StreamInputHandler.send(new Object[]{"IBM", 100f, null, 200L, 96, 1496289954000L});
+
+        test2StreamInputHandler.send(new Object[]{"WSO2", 50f, 5, 1496289950000L});
+        test2StreamInputHandler.send(new Object[]{"WSO2", 70f, 7, 1496289950000L});
+
+        test2StreamInputHandler.send(new Object[]{"WSO2", 60f, 8, 1496289952000L});
+        test2StreamInputHandler.send(new Object[]{"WSO2", 100f, 13, 1496289952000L});
+
+        test2StreamInputHandler.send(new Object[]{"IBM", 100f, 9, 1496289954000L});
+        test2StreamInputHandler.send(new Object[]{"IBM", 100f, 6, 1496289954000L});
+
+        Thread.sleep(1000);
+
+        ArrayList<Event> partitionQuery1EventsList = new ArrayList<>();
+        for (SiddhiAppRuntime runtime : siddhiAppRuntimeMap.get(queryGroupList.get(2).getGroupName())) {
+            runtime.addCallback("Test5Stream", new StreamCallback() {
+                @Override
+                public void receive(Event[] events) {
+                    EventPrinter.print(events);
+                    count.addAndGet(events.length);
+                    for (Event event : events) {
+                        partitionQuery1EventsList.add(event);
+                        errorAssertionCount.incrementAndGet();
+                        errorAssertionCount.decrementAndGet();
+                    }
+                }
+            });
+        }
+
+        ArrayList<Event> partitionQuery2EventsList = new ArrayList<>();
+        for (SiddhiAppRuntime runtime : siddhiAppRuntimeMap.get(queryGroupList.get(2).getGroupName())) {
+            runtime.addCallback("Test6Stream", new StreamCallback() {
+                @Override
+                public void receive(Event[] events) {
+                    EventPrinter.print(events);
+                    count.addAndGet(events.length);
+                    for (Event event : events) {
+                        partitionQuery2EventsList.add(event);
+                        errorAssertionCount.incrementAndGet();
+                        errorAssertionCount.decrementAndGet();
+                    }
+                }
+            });
+        }
+
+        test4StreamInputHandler.send(new Object[]{"IBM", 100.25, 200L, 1496289954000L});
+        test3StreamInputHandler.send(new Object[]{"IBM", 100.25, 200L, 1496289954000L});
+        test3StreamInputHandler.send(new Object[]{"WSO2", 100.25, 200L, 1496289954000L});
+        test4StreamInputHandler.send(new Object[]{"WSO2", 100.25, 200L, 1496289954000L});
+        Thread.sleep(1000);
+
+        List<Object[]> query1EventsOutputList = new ArrayList<>();
+        for (Event event : partitionQuery1EventsList) {
+            query1EventsOutputList.add(event.getData());
+        }
+        List<Object[]> partitionQuery1Expected = Arrays.asList(
+                new Object[]{"WSO2", 80.0, 160.0, 1600f},
+                new Object[]{"WSO2", 60.0, 120.0, 700f},
+                new Object[]{"IBM", 100.0, 200.0, 9600f}
+        );
+
+        List<Object[]> partitionQuery2Expected = Arrays.asList(
+                new Object[]{"WSO2", 80.0, 160.0, 21L},
+                new Object[]{"WSO2", 60.0, 120.0, 12L},
+                new Object[]{"IBM", 100.0, 200.0, 15L}
+        );
+
+
+        List<Object[]> query2EventsOutputList = new ArrayList<>();
+        for (Event event : partitionQuery2EventsList) {
+            query2EventsOutputList.add(event.getData());
+        }
+
+        Assert.assertEquals(partitionQuery1EventsList.size(), 3);
+        Assert.assertEquals(partitionQuery2EventsList.size(), 3);
+        Assert.assertTrue(SiddhiTestHelper.isUnsortedEventsMatch(query1EventsOutputList, partitionQuery1Expected));
+        Assert.assertTrue(SiddhiTestHelper.isUnsortedEventsMatch(query2EventsOutputList, partitionQuery2Expected));
+        siddhiManager.shutdown();
+    }
+
 
     private Map<String, List<SiddhiAppRuntime>> createSiddhiAppRuntimes(
             SiddhiManager siddhiManager, List<DeployableSiddhiQueryGroup> queryGroupList) {
