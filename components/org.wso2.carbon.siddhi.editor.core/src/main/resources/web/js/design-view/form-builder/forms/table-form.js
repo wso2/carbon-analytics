@@ -386,26 +386,12 @@ define(['log', 'jquery', 'lodash', 'attribute', 'table', 'storeAnnotation', 'des
         var mapAnnotationValues = function (predefined_annotations, predefinedSavedAnnotations) {
             for (var savedAnnotation of predefinedSavedAnnotations) {
                 for (var predefined_annotation of predefined_annotations) {
-                    //                    var start_pos_name = savedAnnotation.indexOf('@') + 1;
-                    //                    var end_pos_name = savedAnnotation.indexOf('(', start_pos_name);
-                    //                    var savedAnnotName = savedAnnotation.substring(start_pos_name, end_pos_name).trim().
-                    //                        toLowerCase();
                     if (savedAnnotation.name.toLowerCase() === predefined_annotation.name.toLowerCase()) {
                         predefined_annotation.isChecked = true;
-                        //                        var start_pos_value = savedAnnotation.indexOf('(') + 1;
-                        //                        var end_pos_value = savedAnnotation.indexOf(')', start_pos_value);
-                        //                        var savedAnnotValues = savedAnnotation.substring(start_pos_value, end_pos_value);
                         predefined_annotation.values = [];
                         for (element of savedAnnotation.elements) {
                             predefined_annotation.values.push({ value: element.value });
                         }
-                        //                        var values = savedAnnotValues.split(',');
-                        //
-                        //                        for (var val of values) {
-                        //                            val = val.trim();
-                        //                            val = val.substring(1, val.length - 1);
-                        //                            predefined_annotation.values.push({ value: val });
-                        //                        }
                         break;
                     }
                 }
@@ -447,7 +433,7 @@ define(['log', 'jquery', 'lodash', 'attribute', 'table', 'storeAnnotation', 'des
         /**
          * Function to build the table annotation as a string
          * @param {Object} annotationList array to add the built string annotations
-        */
+         */
         var buildAnnotations = function (annotationList, annotationObjectList) {
             $('#define-predefined-annotations .table-annotation').each(function () {
                 var annotationObject = new AnnotationObject();
@@ -570,6 +556,12 @@ define(['log', 'jquery', 'lodash', 'attribute', 'table', 'storeAnnotation', 'des
             }
         };
 
+		/**
+		* Function to obtain the user defined annotations from the saved annotations
+		* @param {Object} savedAnnotationObjects saved annotation objects
+		* @param {Object} tableAnnotations predefined table annotations
+		* @return {Object} userAnnotations
+		*/
         var getUserAnnotations = function (savedAnnotationObjects, tableAnnotations) {
             var userAnnotations = [];
             _.forEach(savedAnnotationObjects, function (savedAnnotation) {
@@ -584,7 +576,6 @@ define(['log', 'jquery', 'lodash', 'attribute', 'table', 'storeAnnotation', 'des
                     userAnnotations.push(savedAnnotation);
                 }
             });
-
             return userAnnotations;
         };
 
@@ -698,11 +689,11 @@ define(['log', 'jquery', 'lodash', 'attribute', 'table', 'storeAnnotation', 'des
         };
 
         /**
-      * Function to build the annotations as a string
-      * Function to create the annotation objects
-      * @param {Object} annotationStringList array to add the built annotation strings
-      * @param {Object} annotationObjectList array to add the created annotation objects
-      */
+         * Function to build the annotations as a string
+         * Function to create the annotation objects
+         * @param {Object} annotationStringList array to add the built annotation strings
+         * @param {Object} annotationObjectList array to add the created annotation objects
+         */
         var annotation = "";
         var buildUserAnnotations = function (annotationStringList, annotationObjectList) {
             var jsTreeNodes = $('#annotation-div').jstree(true)._model.data['#'].children;
