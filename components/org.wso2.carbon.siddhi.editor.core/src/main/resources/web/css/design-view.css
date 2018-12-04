@@ -633,7 +633,7 @@ a.list-group-item, button.list-group-item {
 
 .source-sink-form-container .source-sink-map-options .error-message,
 .table-form-container #define-store-options .error-message,
-.table-form-container #define-table-annotation .error-message,
+.table-form-container .define-table-annotation .error-message,
 .window-form-container #defineFunctionParameters .error-message {
 	color: red;
 	padding: 3px;
@@ -729,69 +729,67 @@ a.list-group-item, button.list-group-item {
 	margin-bottom: 5px;
 }
 
-.stream-form-container .annotation > a > i.jstree-checkbox,
-.stream-form-container .annotation > .jstree-clicked > i.jstree-checkbox,
-.stream-form-container .annotation > i.jstree-checkbox   {
+.design-view-form-content .annotation > a > i.jstree-checkbox,
+.design-view-form-content .annotation > .jstree-clicked > i.jstree-checkbox,
+.design-view-form-content .annotation > i.jstree-checkbox   {
 	display:none;
 }
 
-.stream-form-container .annotation-key > a > i.jstree-checkbox,
-.stream-form-container .annotation-key > .jstree-clicked > i.jstree-checkbox,
-.stream-form-container .annotation-key > i.jstree-checkbox   {
+.design-view-form-content .annotation-key > a > i.jstree-checkbox,
+.design-view-form-content .annotation-key > .jstree-clicked > i.jstree-checkbox,
+.design-view-form-content .annotation-key > i.jstree-checkbox   {
 	display:none;
 }
 
-.stream-form-container .annotation-value > a > i.jstree-checkbox,
-.stream-form-container .annotation-value > .jstree-clicked > i.jstree-checkbox,
-.stream-form-container .annotation-value > i.jstree-checkbox   {
+.design-view-form-content .annotation-value > a > i.jstree-checkbox,
+.design-view-form-content .annotation-value > .jstree-clicked > i.jstree-checkbox,
+.design-view-form-content .annotation-value > i.jstree-checkbox   {
 	display:none;
 }
 
-.stream-form-container .mandatory-key > a > i.jstree-checkbox,
-.stream-form-container .mandatory-key > .jstree-clicked > i.jstree-checkbox  {
+.design-view-form-content .mandatory-key > a > i.jstree-checkbox,
+.design-view-form-content .mandatory-key > .jstree-clicked > i.jstree-checkbox  {
 	display:none;
 }
 
-.stream-form-container .mandatory-annotation > a > i.jstree-checkbox,
-.stream-form-container .mandatory-annotation > .jstree-clicked > i.jstree-checkbox  {
+.design-view-form-content .mandatory-annotation > a > i.jstree-checkbox,
+.design-view-form-content .mandatory-annotation > .jstree-clicked > i.jstree-checkbox  {
 	display:none;
 }
 
-.stream-form-container .mandatory-annotation > a.jstree-hovered,
-.stream-form-container .optional-key > a.jstree-hovered,
-.stream-form-container .annotation-value > a.jstree-hovered {
+.design-view-form-content .mandatory-annotation > a.jstree-hovered,
+.design-view-form-content .optional-key > a.jstree-hovered,
+.design-view-form-content .annotation-value > a.jstree-hovered {
 	cursor: context;
 	color: #ccc;
 	background: transparent;
 	border-radius: 0px;
 }
 
-.stream-form-container .optional-annotation > a.jstree-hovered,
-.stream-form-container .mandatory-key > a.jstree-hovered{
+.design-view-form-content .optional-annotation > a.jstree-hovered,
+.design-view-form-content .mandatory-key > a.jstree-hovered{
 	cursor: default;
 	color: #ccc;
 	background: transparent;
 	border-radius: 0px;
 }
 
-.stream-form-container  .jstree-clicked {
+.design-view-form-content  .jstree-clicked {
 	background: #5F5B5A;
 	color:black;
 	border-radius: 2px;
 	box-shadow: inset 0 0 1px #999999;
 }
 
-.stream-form-container .jstree-hovered {
+.design-view-form-content .jstree-hovered {
 	background: transparent;
 }
 
-.stream-form-container #define-annotation {
+.design-view-form-content #define-annotation {
 	color: #ccc;
 }
 
-.table-form-container #define-annotation {
-	width: 30%;
-}
+
 
 .design-view-form-content .cust-option-key {
 	margin-left:20px;
@@ -847,7 +845,7 @@ a.list-group-item, button.list-group-item {
 	margin-top: 20px;
 }
 
-.design-view-form-content #define-table-annotation {
+.design-view-form-content .define-table-annotation {
 	width: 30%;
 	margin-top: 10px;
 	margin-left: 20px;
@@ -923,6 +921,7 @@ a.list-group-item, button.list-group-item {
 .table-form-container #table-annotations .btn-add-annot-value {
 	margin-top: 0px;
 	margin-bottom: 10px;
+	margin-left: 160px;
 }
 
 .design-view-form-content .mandatory-option-symbol,

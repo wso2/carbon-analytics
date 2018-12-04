@@ -41,12 +41,14 @@ public class TableConfigGenerator extends CodeSegmentsPreserver {
         StoreConfigGenerator storeConfigGenerator = new StoreConfigGenerator();
         AnnotationConfigGenerator annotationConfigGenerator = new AnnotationConfigGenerator();
         StoreConfig storeConfig = null;
+        List<Annotation> annotationListObjects = new ArrayList<>();
         List<String> annotationList = new ArrayList<>();
         for (Annotation annotation : tableDefinition.getAnnotations()) {
             if (annotation.getName().equalsIgnoreCase("STORE")) {
                 storeConfig = storeConfigGenerator.generateStoreConfig(annotation);
             } else {
                 annotationList.add(annotationConfigGenerator.generateAnnotationConfig(annotation));
+                annotationListObjects.add(annotation);
             }
         }
         AttributeConfigListGenerator attributeConfigListGenerator = new AttributeConfigListGenerator();
@@ -55,7 +57,8 @@ public class TableConfigGenerator extends CodeSegmentsPreserver {
                 tableDefinition.getId(),
                 attributeConfigListGenerator.generateAttributeConfigList(tableDefinition.getAttributeList()),
                 storeConfig,
-                annotationList);
+                annotationList,
+                annotationListObjects);
         preserveCodeSegmentsOf(storeConfigGenerator, annotationConfigGenerator, attributeConfigListGenerator);
         preserveAndBindCodeSegment(tableDefinition, tableConfig);
 

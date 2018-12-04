@@ -46,9 +46,14 @@ define(['require', 'elementUtils'],
                 this.name = options.name;
                 this.store = options.store;
             }
+            this.annotationListObjects = [];
             this.attributeList = [];
             this.annotationList = [];
         };
+
+        Table.prototype.addAnnotationObject = function (annotation) {
+            this.annotationListObjects.push(annotation)
+        }
 
         Table.prototype.addAttribute = function (attribute) {
             this.attributeList.push(attribute);
@@ -64,6 +69,14 @@ define(['require', 'elementUtils'],
 
         Table.prototype.clearAttributeList = function () {
             ElementUtils.prototype.removeAllElements(this.attributeList);
+        };
+
+        Table.prototype.clearAnnotationListObjects = function () {
+            ElementUtils.prototype.removeAllElements(this.annotationListObjects);
+        };
+
+        Table.prototype.getAnnotationListObjects = function () {
+            return this.annotationListObjects;
         };
 
         Table.prototype.getId = function () {
