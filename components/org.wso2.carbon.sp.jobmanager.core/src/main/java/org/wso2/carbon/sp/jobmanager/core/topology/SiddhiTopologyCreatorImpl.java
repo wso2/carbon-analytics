@@ -49,8 +49,18 @@ import org.wso2.siddhi.query.api.util.AnnotationHelper;
 import org.wso2.siddhi.query.api.util.ExceptionUtil;
 import org.wso2.siddhi.query.compiler.SiddhiCompiler;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Random;
+import java.util.Set;
+import java.util.UUID;
 
 /**
  * Consumes a Siddhi App and produce a {@link SiddhiTopology} based on distributed annotations.
