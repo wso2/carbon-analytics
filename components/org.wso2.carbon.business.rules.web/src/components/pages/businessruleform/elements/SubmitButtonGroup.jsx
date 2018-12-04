@@ -20,52 +20,57 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 // Material UI Components
 import Button from 'material-ui/Button';
+// Localization
+import { FormattedMessage } from 'react-intl';
 
 /**
  * Styles related to this component
  */
 const styles = {
-    button: {
-        marginRight: 10,
-    },
+  button: {
+    marginRight: 10,
+  },
 };
 
 /**
  * Represents the group of Save, Save and Deploy and Cancel buttons on a business rule form
  */
 export default class SubmitButtonGroup extends Component {
-    render() {
-        return (
-            <div>
-                <Button
-                    raised
-                    color="default"
-                    style={styles.button}
-                    onClick={() => this.props.onSubmit(false)}
-                >
-                    Save
-                </Button>
-                <Button
-                    raised
-                    color="primary"
-                    style={styles.button}
-                    onClick={() => this.props.onSubmit(true)}
-                >
-                    Save & Deploy
-                </Button>
-                <Button
-                    color="default"
-                    style={styles.button}
-                    onClick={() => this.props.onCancel()}
-                >
-                    Cancel
-                </Button>
-            </div>
-        );
-    }
+  render() {
+    return (
+      <div>
+        <Button
+          raised
+          color="default"
+          style={styles.button}
+          onClick={() => this.props.onSubmit(false)}
+        >
+          <FormattedMessage id="submit.button.save" defaultMessage="Save" />
+        </Button>
+        <Button
+          raised
+          color="primary"
+          style={styles.button}
+          onClick={() => this.props.onSubmit(true)}
+        >
+          <FormattedMessage
+            id="submit.button.saveDeploy"
+            defaultMessage="Save & Deploy"
+          />
+        </Button>
+        <Button
+          color="default"
+          style={styles.button}
+          onClick={() => this.props.onCancel()}
+        >
+          <FormattedMessage id="submit.button.cancel" defaultMessage="Cancel" />
+        </Button>
+      </div>
+    );
+  }
 }
 
 SubmitButtonGroup.propTypes = {
-    onSubmit: PropTypes.func.isRequired,
-    onCancel: PropTypes.func.isRequired,
+  onSubmit: PropTypes.func.isRequired,
+  onCancel: PropTypes.func.isRequired,
 };

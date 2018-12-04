@@ -69,6 +69,11 @@ const BusinessRulesConstants = {
         'Partially Undeployed', // 3
         'Deployment Failure', // 4
         'Error', // 5
+        'Deleted', // 6
+        'Sript Error', // 7
+        'Undeployed', // 8
+        'Undeployed failure', //9
+    
     ],
 
     // Siddhi App deployment statuses
@@ -92,5 +97,4 @@ const BusinessRulesConstants = {
     // URL for APIs
     BASE_URL: window.location.origin,
 };
-
 export default BusinessRulesConstants;

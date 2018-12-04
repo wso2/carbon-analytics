@@ -21,7 +21,7 @@
 <svg version="1.1" id="partition" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
 	 viewBox="0 0 14 14" style="enable-background:new 0 0 14 14;" xml:space="preserve">
 <style type="text/css">
-	.st0{fill:none;stroke:#000000;stroke-width:2;stroke-miterlimit:2;stroke-dasharray:2;}
+	.st0{fill:none;stroke:#00BCD4;stroke-width:2;stroke-miterlimit:2;stroke-dasharray:2;}
 </style>
 <path class="st0" d="M0,1h14.1581879 M0,13h14.1581879 M1,9.9852962v-7.977015 M13,9.9852962v-7.977015"/>
 </svg>

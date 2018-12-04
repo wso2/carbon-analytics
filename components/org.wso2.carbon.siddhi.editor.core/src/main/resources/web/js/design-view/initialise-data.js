@@ -17,18 +17,19 @@
  */
 
 define(['require', 'log', 'lodash', 'jquery', 'configurationData', 'appData', 'partition', 'query', 'stream', 'table',
-        'window', 'trigger', 'aggregation', 'aggregateByTimePeriod', 'windowFilterProjectionQueryInput',
-        'queryWindowOrFunction', 'edge', 'querySelect', 'queryOrderByValue', 'queryOutput', 'queryOutputInsert',
-        'queryOutputDelete', 'queryOutputUpdate', 'queryOutputUpdateOrInsertInto', 'attribute', 'joinQueryInput',
-        'joinQuerySource', 'patternOrSequenceQueryInput', 'patternOrSequenceQueryCondition', 'sourceOrSinkAnnotation',
-        'mapAnnotation', 'functionDefinition', 'streamHandler', 'storeAnnotation', 'partitionWith', 'designViewUtils',
-        'payloadOrAttribute'],
+    'window', 'trigger', 'aggregation', 'aggregateByTimePeriod', 'windowFilterProjectionQueryInput',
+    'queryWindowOrFunction', 'edge', 'querySelect', 'queryOrderByValue', 'queryOutput', 'queryOutputInsert',
+    'queryOutputDelete', 'queryOutputUpdate', 'queryOutputUpdateOrInsertInto', 'attribute', 'annotationObject',
+    'joinQueryInput', 'joinQuerySource', 'patternOrSequenceQueryInput', 'patternOrSequenceQueryCondition',
+    'sourceOrSinkAnnotation', 'mapAnnotation', 'functionDefinition', 'streamHandler', 'storeAnnotation',
+    'partitionWith', 'designViewUtils', 'payloadOrAttribute'],
     function (require, log, _, $, ConfigurationData, AppData, Partition, Query, Stream, Table, Window, Trigger,
-              Aggregation, AggregateByTimePeriod, WindowFilterProjectionQueryInput, QueryWindowOrFunction, Edge,
-              QuerySelect, QueryOrderByValue, QueryOutput, QueryOutputInsert, QueryOutputDelete, QueryOutputUpdate,
-              QueryOutputUpdateOrInsertInto, Attribute, JoinQueryInput, JoinQuerySource, PatternOrSequenceQueryInput,
-              PatternOrSequenceQueryCondition, SourceOrSinkAnnotation, MapAnnotation, FunctionDefinition, StreamHandler,
-              StoreAnnotation, PartitionWith, DesignViewUtils, PayloadOrAttribute) {
+        Aggregation, AggregateByTimePeriod, WindowFilterProjectionQueryInput, QueryWindowOrFunction, Edge,
+        QuerySelect, QueryOrderByValue, QueryOutput, QueryOutputInsert, QueryOutputDelete, QueryOutputUpdate,
+        QueryOutputUpdateOrInsertInto, Attribute, AnnotationObject, JoinQueryInput, JoinQuerySource,
+        PatternOrSequenceQueryInput,
+        PatternOrSequenceQueryCondition, SourceOrSinkAnnotation, MapAnnotation, FunctionDefinition, StreamHandler,
+        StoreAnnotation, PartitionWith, DesignViewUtils, PayloadOrAttribute) {
 
         /**
          * @class InitialiseDataStructure
@@ -42,6 +43,14 @@ define(['require', 'log', 'lodash', 'jquery', 'configurationData', 'appData', 'p
             this.application = application;
         };
 
+        InitialiseDataStructure.prototype.setRawExtension = function (rawExtensions) {
+            this.rawExtensions = rawExtensions;
+        };
+
+        InitialiseDataStructure.prototype.getRawExtension = function (rawExtensions) {
+            return this.rawExtensions;
+        };
+
         /**
          * @function Initializes the AppData object with th provided configuration
          * @param {Object} configurationJSON configuration data to initialise the data structure
@@ -51,8 +60,7 @@ define(['require', 'log', 'lodash', 'jquery', 'configurationData', 'appData', 'p
             var currentTabId = self._$parent_el.attr('id');
             self.newIdBeginningPhrase = currentTabId + "_element_";
             self.appData = new AppData();
-            self.configurationData = new ConfigurationData(self.appData, self.application);
-
+            self.configurationData = new ConfigurationData(self.appData, self.application, self.getRawExtension());
             // set the app name
             self.appData.setSiddhiAppName(configurationJSON.siddhiAppConfig.siddhiAppName);
             // set the app desc
@@ -177,6 +185,7 @@ define(['require', 'log', 'lodash', 'jquery', 'configurationData', 'appData', 'p
                 var streamObject = new Stream(stream);
                 addAnnotationsForElement(stream, streamObject);
                 addAttributesForElement(stream, streamObject);
+                addAnnotationObjectForElement(stream, streamObject)
                 streamObject.setId(newIdBeginningPhrase + streamObject.getId());
                 mainObject.addStream(streamObject);
             });
@@ -425,6 +434,14 @@ define(['require', 'log', 'lodash', 'jquery', 'configurationData', 'appData', 'p
                     childType: edge.childType
                 };
                 mainObject.addEdge(new Edge(edgeOptions));
+            });
+        }
+
+        //adds annotation object from a json object for an element object
+        function addAnnotationObjectForElement(element, newElementObject) {
+            _.forEach(element.annotationListObjects, function (annotation) {
+                var annotationObject = new AnnotationObject(annotation);
+                newElementObject.addAnnotationObject(annotationObject)
             });
         }
 

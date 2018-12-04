@@ -35,7 +35,8 @@ public class TemplateManagerConstants {
     Pattern of Template names
     @App:name("SiddhiAppName")
     */
-    public static final String SIDDHI_APP_NAME_REGEX_PATTERN = "@(A|a)pp:name\\([\\\",\\\'](\\S+)[\\\",\\\']\\)";
+    public static final String SIDDHI_APP_NAME_REGEX_PATTERN =
+            "@(A|a)pp:name\\([\\\",\\']((\\S+)|(\\S+ *\\S+)*)[\\\",\\']\\)";
     // @App:name("SiddhiAppName")
     public static final String SIDDHI_APP_RULE_LOGIC_PATTERN = "(\\d{1,})";
     // Template / Artifact types
@@ -48,8 +49,18 @@ public class TemplateManagerConstants {
     public static final String RULE_TEMPLATE_TYPE_INPUT = "input";
     public static final String RULE_TEMPLATE_TYPE_OUTPUT = "output";
     public static final String RULE_TEMPLATE_TYPE_TEMPLATE = "template";
+    //Business Rule parameters
+    public static final String BUSINESS_RULE_TYPE = "type";
+    public static final String BUSINESS_RULE_UUID = "uuid";
+    public static final String BUSINESS_RULE_NAME = "name";
+    public static final String BUSINESS_RULE_PROPERTIES = "properties";
+    public static final String BUSINESS_RULE_TEMPLATE_GROUP_UUID = "templateGroupUUID";
+    public static final String BUSINESS_RULE_RULE_TEMPLATE_UUID = "ruleTemplateUUID";
+    public static final String BUSINESS_RULE_INPUT_RULE_TEMPLATE_UUID = "inputRuleTemplateUUID";
+    public static final String BUSINESS_RULE_OUTPUT_RULE_TEMPLATE_UUID = "outputRuleTemplateUUID";
     // Business Rule types
     public static final String BUSINESS_RULE_TYPE_TEMPLATE = "template";
+    public static final String BUSINESS_RULE_TYPE_SCRATCH = "scratch";
 
     public static final String INSTANCE_COUNT_ONE = "one";
     public static final String INSTANCE_COUNT_MANY = "many";
@@ -62,12 +73,15 @@ public class TemplateManagerConstants {
     public static final int DEPLOYMENT_FAILURE = 4;
     public static final int ERROR = 5;
 
+
     public static final int SIDDHI_APP_UNREACHABLE = -1;
     public static final int SIDDHI_APP_NOT_DEPLOYED = 0;
     public static final int SIDDHI_APP_DEPLOYED = 1;
 
     public static final int SUCCESSFULLY_DELETED = 6;
     public static final int SCRIPT_EXECUTION_ERROR = 7;
+    public static final int SUCCESSFULLY_UNDEPLOYED = 8;
+    public static final int UNDEPLOYMENT_FAILURE = 9;
 
     // Directory locations
     private static final String CARBON_RUNTIME = Utils.getRuntimePath().toString();

@@ -30,6 +30,8 @@ import HomeButton from 'material-ui/svg-icons/action/home';
 import StatusDashboardOverViewAPI from "../utils/apis/StatusDashboardOverViewAPI";
 import {Button, Divider, Typography} from "material-ui-next";
 import {Link} from "react-router-dom";
+//Localization
+import { FormattedMessage } from "react-intl";
 
 const dataConstants = {PAGE_LENGTH: 7};
 
@@ -270,16 +272,18 @@ export default class SiddhiAppTable extends React.Component {
             <TableHeader displaySelectAll={false}
                          adjustForCheckbox={false}>
                 <TableRow>
-                    <TableHeaderColumn style={{color: '#f6f6f6', width: '100px'}}><h3>Siddhi
-                        Application</h3>
+                    <TableHeaderColumn style={{ color: '#f6f6f6', width: '100px' }}>
+                        <h3><FormattedMessage id='siddhiAppTable.siddhiApplication' defaultMessage='Siddhi application' /></h3>
                     </TableHeaderColumn>
-                    <TableHeaderColumn style={{color: '#f6f6f6', width: '100px'}}><h3>Status</h3>
+                    <TableHeaderColumn style={{ color: '#f6f6f6', width: '100px' }}>
+                        <h3><FormattedMessage id='siddhiAppTable.status' defaultMessage='Status' /></h3>
                     </TableHeaderColumn>
-                    <TableHeaderColumn style={{color: '#f6f6f6', width: '100px'}}><h3>Deployed Time</h3>
+                    <TableHeaderColumn style={{ color: '#f6f6f6', width: '100px' }}>
+                        <h3><FormattedMessage id='siddhiAppTable.deployeTime' defaultMessage='Deployed Time' /></h3>
                     </TableHeaderColumn>
 
-                    <TableHeaderColumn style={{color: '#f6f6f6', width: '100px'}}><h3>Deployed
-                        Node </h3>
+                    <TableHeaderColumn style={{ color: '#f6f6f6', width: '100px' }}>
+                        <h3><FormattedMessage id='siddhiAppTable.deployedNode' defaultMessage='Deployed Node' /> </h3>
                     </TableHeaderColumn>
                 </TableRow>
             </TableHeader>
@@ -293,23 +297,23 @@ export default class SiddhiAppTable extends React.Component {
                 <div style={styles.navBar} className="navigation-bar">
                     <Button style={styles.navBtn}>
                         <HomeButton style={{paddingRight: 8, color: '#BDBDBD'}}/>
-                        Overview
+                        <FormattedMessage id='siddhiAppTable.overview' defaultMessage='Overview' />
                     </Button>
                 </div>
 
                 <Typography variant="title" style={styles.titleStyle}>
-                    App Overview
+                    <FormattedMessage id='siddhiAppTable.appOverview' defaultMessage='App Overview' />
                 </Typography>
 
                 <div style={{marginTop: '-26px', marginRight: '24px', fontSize: '0.875rem'}}>
                     <Link style={{textDecoration: 'none', color: '#dedede', float: 'right', paddingLeft: 10}}
-                          to={window.contextPath}>Node View</Link>
+                        to={window.contextPath}><FormattedMessage id='siddhiAppTable.nodeView' defaultMessage='Node View' /></Link>
 
                     <Typography style={{float: 'right', color: '#757575'}}>|</Typography>
 
                     <Link style={{textDecoration: 'none', color: '#f17b31', float: 'right', paddingRight: 10}}
                           to={window.contextPath + "/siddhi-apps"}>
-                        App View</Link>
+                        <FormattedMessage id='siddhiAppTable.appView' defaultMessage='App View' /></Link>
                 </div>
             </div>
         )
@@ -322,9 +326,9 @@ export default class SiddhiAppTable extends React.Component {
                 <div style={{backgroundColor: '#222222'}}>
                     {SiddhiAppTable.renderPageHeader()}
 
-                    <Typography variant="headline" className={'app-title'} style={styles.h3Title}>Single Node
-                        Deployment</Typography>
-                    <Divider inset={true} style={styles.divider}/>
+                    <Typography variant="headline" className={'app-title'} style={styles.h3Title}>
+                        <FormattedMessage id='siddhiAppTable.singleNodeDeployment' defaultMessage='Single Node Deployment' />
+                    </Typography>
                     <div style={{padding: '40px 24px'}}>
 
                         <Table>
@@ -354,9 +358,9 @@ export default class SiddhiAppTable extends React.Component {
                             />
                         </div>
                     </div>
-
-                    <Typography variant="headline" className={'app-title'} style={styles.h3Title}>HA
-                        Deployment</Typography>
+                    <Typography variant="headline" className={'app-title'} style={styles.h3Title}>
+                        <FormattedMessage id='siddhiAppTable.haDeployment' defaultMessage='HA Deployment' />
+                    </Typography>
                     <Divider inset={true} style={styles.divider}/>
                     <div style={{padding: '40px 24px'}}>
 
@@ -387,8 +391,9 @@ export default class SiddhiAppTable extends React.Component {
                             />
                         </div>
                     </div>
-                    <Typography variant="headline" className={'app-title'} style={styles.h3Title}>Distributed
-                        Deployment</Typography>
+                    <Typography variant="headline" className={'app-title'} style={styles.h3Title}>
+                        <FormattedMessage id='siddhiAppTable.distributedDeployment' defaultMessage='Distributed Deployment' />
+                    </Typography>
                     <Divider inset={true} style={styles.divider}/>
                     <div style={{padding: '40px 24px'}}>
                         <Table>
@@ -425,8 +430,9 @@ export default class SiddhiAppTable extends React.Component {
             return (
                 <div style={{backgroundColor: '#222222'}}>
                     {SiddhiAppTable.renderPageHeader()}
-                    <Typography variant="headline" className={'app-title'} style={styles.h3Title}>Single Node
-                        Deployment</Typography>
+                    <Typography variant="headline" className={'app-title'} style={styles.h3Title}>
+                        <FormattedMessage id='siddhiAppTable.singleNodeDeployment' defaultMessage='Single Node Deployment' />
+                    </Typography>
                     <Divider inset={true} style={styles.divider}/>
                     <div style={{padding: '40px 24px'}}>
 
@@ -465,9 +471,9 @@ export default class SiddhiAppTable extends React.Component {
             return (
                 <div style={{backgroundColor: '#222222'}}>
                     {SiddhiAppTable.renderPageHeader()}
-                    <Typography variant="headline" className={'app-title'} style={styles.h3Title}>Distributed
-                        Deployment</Typography>
-                    <Divider inset={true} style={styles.divider}/>
+                    <Typography variant="headline" className={'app-title'} style={styles.h3Title}>
+                        <FormattedMessage id='siddhiAppTable.distributedDeployment' defaultMessage='Distributed Deployment' />
+                    </Typography>
                     <div style={{padding: '40px 24px'}}>
 
                         <Table>
@@ -506,9 +512,9 @@ export default class SiddhiAppTable extends React.Component {
             return (
                 <div style={{backgroundColor: '#222222'}}>
                     {SiddhiAppTable.renderPageHeader()}
-                    <Typography variant="headline" className={'app-title'} style={styles.h3Title}>HA
-                        Deployment</Typography>
-                    <Divider inset={true} style={styles.divider}/>
+                    <Typography variant="headline" className={'app-title'} style={styles.h3Title}>
+                        <FormattedMessage id='siddhiAppTable.haDeployment' defaultMessage='HA Deployment' />
+                    </Typography>
                     <div style={{padding: '40px 24px'}}>
 
                         <Table>
@@ -547,8 +553,9 @@ export default class SiddhiAppTable extends React.Component {
                 <div style={{backgroundColor: '#222222'}}>
                     {SiddhiAppTable.renderPageHeader()}
 
-                    <Typography variant="headline" className={'app-title'} style={styles.h3Title}>Single Node
-                        Deployment</Typography>
+                    <Typography variant="headline" className={'app-title'} style={styles.h3Title}>
+                        <FormattedMessage id='siddhiAppTable.singleNodeDeployment' defaultMessage='Single Node Deployment' />
+                    </Typography>
                     <Divider inset={true} style={styles.divider}/>
                     <div style={{padding: '40px 24px'}}>
 
@@ -580,8 +587,9 @@ export default class SiddhiAppTable extends React.Component {
                         </div>
                     </div>
 
-                    <Typography variant="headline" className={'app-title'} style={styles.h3Title}>Distributed
-                        Deployment</Typography>
+                    <Typography variant="headline" className={'app-title'} style={styles.h3Title}>
+                        <FormattedMessage id='siddhiAppTable.distributedDeployment' defaultMessage='Distributed Deployment' />
+                    </Typography>
                     <Divider inset={true} style={styles.divider}/>
                     <div style={{padding: '40px 24px'}}>
 
@@ -620,8 +628,9 @@ export default class SiddhiAppTable extends React.Component {
                 <div style={{backgroundColor: '#222222'}}>
                     {SiddhiAppTable.renderPageHeader()}
 
-                    <Typography variant="headline" className={'app-title'} style={styles.h3Title}>Single Node
-                        Deployment</Typography>
+                    <Typography variant="headline" className={'app-title'} style={styles.h3Title}>
+                        <FormattedMessage id='siddhiAppTable.singleNodeDeployment' defaultMessage='Single Node Deployment' />
+                    </Typography>
                     <Divider inset={true} style={styles.divider}/>
                     <div style={{padding: '40px 24px'}}>
 
@@ -653,8 +662,9 @@ export default class SiddhiAppTable extends React.Component {
                         </div>
                     </div>
 
-                    <Typography variant="headline" className={'app-title'} style={styles.h3Title}>HA
-                        Deployment</Typography>
+                    <Typography variant="headline" className={'app-title'} style={styles.h3Title}>
+                        <FormattedMessage id='siddhiAppTable.haDeployment' defaultMessage='HA Deployment' />
+                    </Typography>
                     <Divider inset={true} style={styles.divider}/>
                     <div style={{ padding: '40px 24px'}}>
 
@@ -694,8 +704,9 @@ export default class SiddhiAppTable extends React.Component {
                 <div style={{backgroundColor: '#222222'}}>
                     {SiddhiAppTable.renderPageHeader()}
 
-                    <Typography variant="headline" className={'app-title'} style={styles.h3Title}>HA
-                        Deployment</Typography>
+                    <Typography variant="headline" className={'app-title'} style={styles.h3Title}>
+                        <FormattedMessage id='siddhiAppTable.haDeployment' defaultMessage='HA Deployment' />
+                    </Typography>
                     <Divider inset={true} style={styles.divider}/>
                     <div style={{padding: '40px 24px'}}>
 
@@ -726,8 +737,9 @@ export default class SiddhiAppTable extends React.Component {
                             />
                         </div>
                     </div>
-                    <Typography variant="headline" className={'app-title'} style={styles.h3Title}>Distributed
-                        Deployment</Typography>
+                    <Typography variant="headline" className={'app-title'} style={styles.h3Title}>
+                        <FormattedMessage id='siddhiAppTable.distributedDeployment' defaultMessage='Distributed Deployment' />
+                    </Typography>
                     <Divider inset={true} style={styles.divider}/>
                     <div style={{padding: '40px 24px'}}>
 
@@ -769,7 +781,7 @@ export default class SiddhiAppTable extends React.Component {
                             <div className="info-card">
                                 <Typography style={styles.alignCenter}>
                                     <Info/>
-                                    There is no siddhi apps deployed
+                                    <FormattedMessage id='siddhiAppTable.noSiddhiApp' defaultMessage='There is no siddhi apps deployed' />
                                 </Typography>
                             </div>
                         </div>

@@ -31,22 +31,22 @@ const appContext = window.contextPath;
  * Logout Component
  */
 export default class Logout extends Component {
-    constructor(props) {
-        super(props);
-        this.state = {
-            redirectToLogin: false,
-        }
-    }
+  constructor(props) {
+    super(props);
+    this.state = {
+      redirectToLogin: false,
+    };
+  }
 
-    componentDidMount() {
-        AuthManager.logout()
-            .then(() => this.setState({ redirectToLogin: true }));
-    }
+  componentDidMount() {
+    AuthManager.logout()
+      .then(() => this.setState({ redirectToLogin: true }));
+  }
 
-    render() {
-        if (this.state.redirectToLogin) {
-            return <Redirect to={{ pathname: '/login' }} />;
-        }
-        return null;
+  render() {
+    if (this.state.redirectToLogin) {
+      return <Redirect to={{ pathname: '/login' }} />;
     }
+    return null;
+  }
 }

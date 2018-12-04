@@ -28,6 +28,8 @@ import Pagination from 'material-ui-pagination';
 import Circle from 'material-ui/svg-icons/av/fiber-manual-record';
 import {TableFooter} from 'material-ui/Table/index';
 import StatusDashboardOverViewAPI from '../utils/apis/StatusDashboardOverViewAPI';
+//Localization
+import { FormattedMessage } from 'react-intl';
 
 const dataConstants = {PAGE_LENGTH: 5};
 const metadata = {names: ['Time', 'value'], types: ['linear', 'linear']};
@@ -161,7 +163,7 @@ export default class AppTable extends React.Component {
                                 </Link>
                             </div>
                         </TableRowColumn>)
-                        : (<TableRowColumn>No data available</TableRowColumn>)
+                        : (<TableRowColumn><FormattedMessage id='noData' defaultMessage='No data available' /></TableRowColumn>)
                     : (<TableRowColumn>-</TableRowColumn>)
                 }
 
@@ -185,7 +187,7 @@ export default class AppTable extends React.Component {
                                 </div>
                             </Link>
                         </TableRowColumn>)
-                        : (<TableRowColumn>No data available</TableRowColumn>)
+                        : (<TableRowColumn><FormattedMessage id='noData' defaultMessage='No data available' /></TableRowColumn>)
                     : (<TableRowColumn>-</TableRowColumn>)
                 }
 
@@ -210,7 +212,7 @@ export default class AppTable extends React.Component {
                                 </div>
                             </Link>
                         </TableRowColumn>)
-                        : (<TableRowColumn>No data available</TableRowColumn>)
+                        : (<TableRowColumn><FormattedMessage id='noData' defaultMessage='No data available' /></TableRowColumn>)
                     : (<TableRowColumn>-</TableRowColumn>)
                 }
             </TableRow>
@@ -224,17 +226,23 @@ export default class AppTable extends React.Component {
                     <TableHeader displaySelectAll={false}
                                  adjustForCheckbox={false}>
                         <TableRow>
-                            <TableHeaderColumn style={{color: '#f6f6f6', width: '400px'}}><h3>App Name</h3>
+                            <TableHeaderColumn style={{ color: '#f6f6f6', width: '400px' }}>
+                                <h3><FormattedMessage id='appTable.name' defaultMessage='App Name' /></h3>
                             </TableHeaderColumn>
-                            <TableHeaderColumn style={{color: '#f6f6f6', width: '100px'}}><h3>Status</h3>
+                            <TableHeaderColumn style={{ color: '#f6f6f6', width: '100px' }}>
+                                <h3><FormattedMessage id='appTable.status' defaultMessage='Status' /></h3>
                             </TableHeaderColumn>
-                            <TableHeaderColumn style={{color: '#f6f6f6', width: '100px'}}><h3>Age</h3>
+                            <TableHeaderColumn style={{ color: '#f6f6f6', width: '100px' }}>
+                                <h3><FormattedMessage id='appTable.age' defaultMessage='Age' /></h3>
                             </TableHeaderColumn>
-                            <TableHeaderColumn style={{color: '#f6f6f6'}}><h3>Latency (milliseconds)</h3>
+                            <TableHeaderColumn style={{ color: '#f6f6f6' }}>
+                                <h3><FormattedMessage id='appTable.latencyInMillis' defaultMessage='Latency (milliseconds)' /></h3>
                             </TableHeaderColumn>
-                            <TableHeaderColumn style={{color: '#f6f6f6'}}><h3>Throughput (events/second)</h3>
+                            <TableHeaderColumn style={{ color: '#f6f6f6' }}
+                            ><h3><FormattedMessage id='appTable.throughput' defaultMessage='Throughput (events/second)' /></h3>
                             </TableHeaderColumn>
-                            <TableHeaderColumn style={{color: '#f6f6f6'}}><h3>Memory</h3></TableHeaderColumn>
+                            <TableHeaderColumn style={{ color: '#f6f6f6' }}>
+                                <h3><FormattedMessage id='appTable.memory' defaultMessage='Memory' /></h3></TableHeaderColumn>
                         </TableRow>
                     </TableHeader>
                     <TableBody displayRowCheckbox={false} style={{backgroundColor: '#131313'}}>

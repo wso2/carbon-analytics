@@ -1,3 +1,6 @@
+import { FormattedMessage } from 'react-intl';
+
+
 /*
  *  Copyright (c) 2018, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
  *
@@ -20,14 +23,26 @@
  * Has values for all the string constants related to displaying messages to the user
  */
 const BusinessRulesMessages = {
-    // Business Rule form (common)
-    SELECT_RULE_TEMPLATE: 'Please select a rule template',
-    BUSINESS_RULE_NAME_FIELD_NAME: 'Business rule name',
-    BUSINESS_RULE_NAME_FIELD_DESCRIPTION: 'Please enter a unique name',
+  // Business Rule form (common)
+  SELECT_RULE_TEMPLATE:
+  <FormattedMessage
+    id="business.rules.messages.ruletemplate"
+    defaultMessage="Please select a rule template"
+  />,
+  BUSINESS_RULE_NAME_FIELD_NAME:
+  <FormattedMessage
+    id="business.rules.messages.rulename"
+    defaultMessage="Business rule name"
+  />,
+  BUSINESS_RULE_NAME_FIELD_DESCRIPTION: 'Please enter a unique name',
 
-    // Business Rule from scratch form
-    // Filter component
-    RULE_LOGIC_HELPER_TEXT: 'Enter the Rule Logic, referring filter rule numbers. Eg: (1 OR 2) AND (NOT(3))',
+  // Business Rule from scratch form
+  // Filter component
+  RULE_LOGIC_HELPER_TEXT:
+  <FormattedMessage
+    id="business.rules.messages.rulelogic"
+    defaultMessage="Enter the Rule Logic, referring filter rule numbers. Eg: (1 OR 2) AND (NOT(3))"
+  />
+  ,
 };
-
 export default BusinessRulesMessages;

@@ -19,6 +19,7 @@
 import React from 'react';
 import * as d3 from 'd3';
 import * as dagreD3 from 'dagre-d3';
+import PropTypes from 'prop-types';
 
 import StatusDashboardAPIS from '../utils/apis/StatusDashboardAPIs';
 
@@ -302,18 +303,18 @@ export default class AppEventFlow extends React.Component {
                         this.setState({
                             isApiCalled: true,
                             sessionInvalid: true,
-                            statusMessage: "Authentication fail. Please login again."
+                            statusMessage: this.context.intl.formatMessage({ id: 'authenticationFail', defualtMessage: 'Authentication fail. Please login again.' })
                         })
                     } else if (error.response.status === 403) {
                         this.setState({
                             isApiCalled: true,
-                            statusMessage: "User Have No Permission to view this page."
+                            statusMessage: this.context.intl.formatMessage({ id: 'noViewPermission', defualtMessage: 'User Have No Permission to view this page.' })
                         });
                     } else {
                         this.setState({
                             isError: true,
                             isApiCalled: true,
-                            statusMessage: "Unknown error occurred! : " + JSON.stringify(error.response.data)
+                            statusMessage: this.context.intl.formatMessage({ id: 'unknownError', defualtMessage: 'Unknown error occurred! : {data}', values: { data: JSON.stringify(error.response.data) } })
                         });
                     }
                 }
@@ -353,4 +354,8 @@ export default class AppEventFlow extends React.Component {
             </svg>
         );
     }
+}
+
+AppEventFlow.contextTypes = {
+    intl: PropTypes.object.isRequired
 }

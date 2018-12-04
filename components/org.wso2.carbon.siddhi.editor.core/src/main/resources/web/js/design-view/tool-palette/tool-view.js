@@ -33,15 +33,14 @@ define(['require', 'jquery', 'backbone', 'lodash'], function (require, $, Backbo
             this.$el.replaceWith(element);
             this.setElement(element);
             this.$el.tooltip();
-            parent.append(this.$el);
-            var className = '.' + this.model.get("className");
-            $(className).draggable({
+            $(this.$el).draggable({
                 helper: 'clone',
                 cursor: 'pointer',
                 zIndex: 10001,
                 tolerance: 'fit',
                 revert: true
             });
+            parent.append(this.$el);
 
             return this;
         }

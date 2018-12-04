@@ -17,7 +17,7 @@
  */
 define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dropElements', 'dagre', 'edge',
         'windowFilterProjectionQueryInput', 'joinQueryInput', 'patternOrSequenceQueryInput', 'queryOutput',
-        'partitionWith', 'jsonValidator'],
+        'partitionWith', 'jsonValidator', 'dragSelect'],
 
     function (require, log, $, Backbone, _, DesignViewUtils, DropElements, dagre, Edge,
               WindowFilterProjectionQueryInput, JoinQueryInput, PatternOrSequenceQueryInput, QueryOutput,
@@ -40,7 +40,9 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
             PATTERN: 'patternQueryDrop',
             SEQUENCE: 'sequenceQueryDrop',
             PARTITION: 'partitionDrop',
-            PARTITION_CONNECTION_POINT: 'partition-connector-in-part'
+            PARTITION_CONNECTION_POINT: 'partition-connector-in-part',
+            SELECTOR: 'selector',
+            MULTI_SELECTOR:'multi-selector'
         };
 
         /**
@@ -61,6 +63,7 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
                 throw errorMessage;
             }
             this.options = options;
+            this.rawExtensions = options.rawExtensions;
             this.configurationData = this.options.configurationData;
             this.container = this.options.container;
             this.application = this.options.application;
@@ -69,6 +72,7 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
             this.designViewContainer = $('#design-container-' + this.currentTabId);
             this.toggleViewButton = $('#toggle-view-button-' + this.currentTabId);
             this.designGridContainer = $('#design-grid-container-' + this.currentTabId);
+            this.selectedObjects = [];
         };
 
         DesignGrid.prototype.render = function () {
@@ -918,17 +922,59 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
                     var close_icon_overlay = connectionObject.addOverlay([
                         "Custom", {
                             create: function () {
-                                return $('<span><i class="fw fw-delete"></i></span>');
+                                return $(
+                                    '<span><i class="fw fw-delete" id="' + connectionObject.id +
+                                    '"data-toggle="popover"></i></span>');
                             },
                             location: 0.60,
                             id: "close",
                             events: {
                                 click: function () {
-                                    self.jsPlumbInstance.deleteConnection(connectionObject);
+                                    popOverForConnector();
                                 }
                             }
                         }
                     ]);
+
+                    function popOverForConnector() {
+                        $('#' + connectionObject.id).popover({
+                            trigger: 'focus',
+                            title: 'Are you sure you want to delete?',
+                            html: true,
+                            content: function () {
+                                return $('.pop-over').html();
+                            }
+                        });
+                        $('#' + connectionObject.id).popover("show");
+                        $(".overlayed-container ").fadeTo(200, 1);
+                        // Custom jQuery to hide popover on click of the close button
+                        $("#" + connectionObject.id).siblings(".popover").on("click", ".popover-footer .btn.yes",
+                            function () {
+                                if (connectionObject.connector !== null) {
+                                    self.jsPlumbInstance.deleteConnection(connectionObject);
+                                }
+                                $(".overlayed-container ").fadeOut(200);
+                                $(this).parents(".popover").popover('hide');
+                            });
+                        $("#" + connectionObject.id).siblings(".popover").on("click", ".popover-footer .btn.no",
+                            function () {
+                                $(".overlayed-container ").fadeOut(200);
+                                $(this).parents(".popover").popover('hide');
+                                close_icon_overlay.setVisible(false);
+                            });
+                        // Dismiss the pop-over by clicking outside
+                        $('.overlayed-container ').off('click');
+                        $('.overlayed-container ').on('click', function (e) {
+                            $('[data-toggle="popover"]').each(function () {
+                                if (!$(this).is(e.target) && $(this).has(e.target).length === 0 && $('.popover').has(
+                                    e.target).length === 0) {
+                                    $(this).popover('hide');
+                                    $(".overlayed-container ").fadeOut(200);
+                                    close_icon_overlay.setVisible(false);
+                                }
+                            });
+                        });
+                    }
 
                     if (isConnectionMadeInsideAPartition) {
                         close_icon_overlay.setVisible(false);
@@ -938,7 +984,9 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
                         });
                         // hide the close icon when the mouse is not on the connection path
                         connectionObject.bind('mouseleave', function () {
-                            close_icon_overlay.setVisible(false);
+                            if ($("#" + connectionObject.id).siblings(".popover").length == 0) {
+                                close_icon_overlay.setVisible(false);
+                            }
                         });
                     } else {
                         close_icon_overlay.setVisible(false);
@@ -948,7 +996,9 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
                         });
                         // hide the close icon when the mouse is not on the connection path
                         connectionObject.bind('mouseout', function () {
-                            close_icon_overlay.setVisible(false);
+                            if ($("#" + connectionObject.id).siblings(".popover").length == 0) {
+                                close_icon_overlay.setVisible(false);
+                            }
                         });
                     }
                 });
@@ -1375,6 +1425,8 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
             addMemberToPartitionGroup(self);
 
             self.drawGraphFromAppData();
+
+            self.enableMultipleSelection();
         };
 
         DesignGrid.prototype.drawGraphFromAppData = function () {
@@ -1913,10 +1965,6 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
             var elementId;
             if (isCodeToDesignMode !== undefined && !isCodeToDesignMode) {
                 elementId = self.getNewAgentId();
-                // design view container is disabled to prevent the user from dropping any elements before initializing
-                // a source element
-                self.designViewContainer.addClass('disableContainer');
-                self.toggleViewButton.addClass('disableContainer');
             } else if (isCodeToDesignMode !== undefined && isCodeToDesignMode) {
                 if (sourceId !== undefined) {
                     elementId = sourceId;
@@ -1934,6 +1982,7 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
             self.configurationData.getSiddhiAppConfig()
                 .setFinalElementCount(self.configurationData.getSiddhiAppConfig().getFinalElementCount() + 1);
             self.dropElements.registerElementEventListeners(newAgent);
+            self.enableMultipleSelection();
         };
 
         DesignGrid.prototype.handleSinkAnnotation = function (mouseTop, mouseLeft, isCodeToDesignMode, sinkName,
@@ -1942,10 +1991,6 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
             var elementId;
             if (isCodeToDesignMode !== undefined && !isCodeToDesignMode) {
                 elementId = self.getNewAgentId();
-                // design view container is disabled to prevent the user from dropping any elements before initializing
-                // a sink element
-                self.designViewContainer.addClass('disableContainer');
-                self.toggleViewButton.addClass('disableContainer');
             } else if (isCodeToDesignMode !== undefined && isCodeToDesignMode) {
                 if (sinkId !== undefined) {
                     elementId = sinkId;
@@ -1963,6 +2008,7 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
             self.configurationData.getSiddhiAppConfig()
                 .setFinalElementCount(self.configurationData.getSiddhiAppConfig().getFinalElementCount() + 1);
             self.dropElements.registerElementEventListeners(newAgent);
+            self.enableMultipleSelection();
         };
 
         DesignGrid.prototype.handleStream = function (mouseTop, mouseLeft, isCodeToDesignMode, streamId, streamName) {
@@ -1970,10 +2016,6 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
             var elementId;
             if (isCodeToDesignMode !== undefined && !isCodeToDesignMode) {
                 elementId = self.getNewAgentId();
-                // design view container is disabled to prevent the user from dropping any elements before initializing
-                // a stream element
-                self.designViewContainer.addClass('disableContainer');
-                self.toggleViewButton.addClass('disableContainer');
             } else if (isCodeToDesignMode !== undefined && isCodeToDesignMode) {
                 if (streamId !== undefined) {
                     elementId = streamId;
@@ -1992,6 +2034,7 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
             self.configurationData.getSiddhiAppConfig()
                 .setFinalElementCount(self.configurationData.getSiddhiAppConfig().getFinalElementCount() + 1);
             self.dropElements.registerElementEventListeners(newAgent);
+            self.enableMultipleSelection();
         };
 
         DesignGrid.prototype.handleTable = function (mouseTop, mouseLeft, isCodeToDesignMode, tableId, tableName) {
@@ -1999,10 +2042,6 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
             var elementId;
             if (isCodeToDesignMode !== undefined && !isCodeToDesignMode) {
                 elementId = self.getNewAgentId();
-                // design view container is disabled to prevent the user from dropping any elements before initializing
-                // a stream element
-                self.designViewContainer.addClass('disableContainer');
-                self.toggleViewButton.addClass('disableContainer');
             } else if (isCodeToDesignMode !== undefined && isCodeToDesignMode) {
                 if (tableId !== undefined) {
                     elementId = tableId;
@@ -2020,6 +2059,7 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
             self.configurationData.getSiddhiAppConfig()
                 .setFinalElementCount(self.configurationData.getSiddhiAppConfig().getFinalElementCount() + 1);
             self.dropElements.registerElementEventListeners(newAgent);
+            self.enableMultipleSelection();
         };
 
         DesignGrid.prototype.handleWindow = function (mouseTop, mouseLeft, isCodeToDesignMode, windowId, windowName) {
@@ -2048,6 +2088,7 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
             self.configurationData.getSiddhiAppConfig()
                 .setFinalElementCount(self.configurationData.getSiddhiAppConfig().getFinalElementCount() + 1);
             self.dropElements.registerElementEventListeners(newAgent);
+            self.enableMultipleSelection();
         };
 
         DesignGrid.prototype.handleTrigger = function (mouseTop, mouseLeft, isCodeToDesignMode, triggerId,
@@ -2077,6 +2118,7 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
             self.configurationData.getSiddhiAppConfig()
                 .setFinalElementCount(self.configurationData.getSiddhiAppConfig().getFinalElementCount() + 1);
             self.dropElements.registerElementEventListeners(newAgent);
+            self.enableMultipleSelection();
         };
 
         DesignGrid.prototype.handleAggregation = function (mouseTop, mouseLeft, isCodeToDesignMode, aggregationId,
@@ -2103,6 +2145,7 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
             self.configurationData.getSiddhiAppConfig()
                 .setFinalElementCount(self.configurationData.getSiddhiAppConfig().getFinalElementCount() + 1);
             self.dropElements.registerElementEventListeners(newAgent);
+            self.enableMultipleSelection();
         };
 
         DesignGrid.prototype.handleFunction = function (mouseTop, mouseLeft, isCodeToDesignMode, functionId,
@@ -2132,6 +2175,7 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
             self.configurationData.getSiddhiAppConfig()
                 .setFinalElementCount(self.configurationData.getSiddhiAppConfig().getFinalElementCount() + 1);
             self.dropElements.registerElementEventListeners(newAgent);
+            self.enableMultipleSelection();
         };
 
 
@@ -2159,6 +2203,7 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
             self.configurationData.getSiddhiAppConfig()
                 .setFinalElementCount(self.configurationData.getSiddhiAppConfig().getFinalElementCount() + 1);
             self.dropElements.registerElementEventListeners(newAgent);
+            self.enableMultipleSelection();
         };
 
         DesignGrid.prototype.handleJoinQuery = function (mouseTop, mouseLeft, isCodeToDesignMode, joinQueryName,
@@ -2185,6 +2230,7 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
             self.configurationData.getSiddhiAppConfig()
                 .setFinalElementCount(self.configurationData.getSiddhiAppConfig().getFinalElementCount() + 1);
             self.dropElements.registerElementEventListeners(newAgent);
+            self.enableMultipleSelection();
         };
 
         DesignGrid.prototype.handlePatternQuery = function (mouseTop, mouseLeft, isCodeToDesignMode, patternQueryName,
@@ -2211,6 +2257,7 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
             self.configurationData.getSiddhiAppConfig()
                 .setFinalElementCount(self.configurationData.getSiddhiAppConfig().getFinalElementCount() + 1);
             self.dropElements.registerElementEventListeners(newAgent);
+            self.enableMultipleSelection();
         };
 
         DesignGrid.prototype.handleSequenceQuery = function (mouseTop, mouseLeft, isCodeToDesignMode, sequenceQueryName,
@@ -2237,6 +2284,7 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
             self.configurationData.getSiddhiAppConfig()
                 .setFinalElementCount(self.configurationData.getSiddhiAppConfig().getFinalElementCount() + 1);
             self.dropElements.registerElementEventListeners(newAgent);
+            self.enableMultipleSelection();
         };
 
         DesignGrid.prototype.handlePartition = function (mouseTop, mouseLeft, isCodeToDesignMode, partitionId) {
@@ -2261,6 +2309,7 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
             self.configurationData.getSiddhiAppConfig()
                 .setFinalElementCount(self.configurationData.getSiddhiAppConfig().getFinalElementCount() + 1);
             self.dropElements.registerElementEventListeners(newAgent);
+            self.enableMultipleSelection();
         };
 
         DesignGrid.prototype.generateNextNewAgentId = function () {
@@ -2286,6 +2335,34 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
                 return Math.max(a, b);
             });
             return partitionId + '_pc' + (maxId + 1);
+        };
+
+        DesignGrid.prototype.enableMultipleSelection = function () {
+            var self = this;
+            var selector = $('<div>').attr('id',constants.MULTI_SELECTOR).addClass(constants.SELECTOR);
+            self.canvas.append(selector);
+
+            new DragSelect({
+                selectables: document.querySelectorAll('.jtk-draggable'),
+                selector: document.getElementById(constants.MULTI_SELECTOR),
+                multiSelectKeys: ['ctrlKey', 'shiftKey'],
+                onElementSelect: function (element) {
+                    if (!self.selectedObjects.includes(element)) {
+                        self.jsPlumbInstance.addToDragSelection(element);
+                        $(element).css('border-color', '#4af');
+                        $(element).css('box-shadow', '0 0 1px 2px #4af');
+                        self.selectedObjects.push(element);
+                    }
+                },
+                onElementUnselect: function (element) {
+                    self.jsPlumbInstance.clearDragSelection();
+                    self.selectedObjects.forEach(function (object) {
+                        $(object).css('border-color', '#ccc');
+                        $(object).css('box-shadow', 'none');
+                    });
+                    self.selectedObjects = [];
+                }
+            });
         };
 
         return DesignGrid;

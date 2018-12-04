@@ -19,6 +19,7 @@
 
 import React from 'react';
 import {Link, Redirect} from 'react-router-dom';
+import PropTypes from 'prop-types';
 //App Components
 import StatusDashboardAPIS from '../utils/apis/StatusDashboardAPIs';
 import ChartCard from '../common/ChartCard';
@@ -32,6 +33,8 @@ import RaisedButton from 'material-ui/RaisedButton';
 import AuthenticationAPI from '../utils/apis/AuthenticationAPI';
 import AuthManager from '../auth/utils/AuthManager';
 import Error403 from '../error-pages/Error403';
+//Localization
+import { FormattedMessage } from 'react-intl';
 
 const styles = {
     navBar: {padding: '0 15px'},
@@ -115,20 +118,22 @@ export default class AppSpecific extends React.Component {
             let message;
             if (error.response != null) {
                 if (error.response.status === 401) {
-                    message = "Authentication fail. Please login again.";
+                    message = this.context.intl.formatMessage({ id: 'authenticationFail', defaultMessage: 'Authentication fail. Please login again.' });
                     this.setState({
                         sessionInvalid: true
                     })
                 } else if (error.response.status === 403) {
-                    message = "User Have No Viewer Permission to view this page.";
+                    message = this.context.intl.formatMessage({ id: 'noViewerPermission' ,defaultMessage:'User Have No Viewer Permission to view this page.'});
                     this.setState({
                         hasViewerPermission: false
                     })
                 } else {
-                    message = "Unknown error occurred! : " + error.response.data;
+                    message = this.context.intl.formatMessage({
+                        id: 'unknownError', defaultMessage: 'Unknown error occurred! : {data}', values: { data: error.response.data }
+                    });
+                    }
                 }
-            }
-        });
+            });
     }
 
     componentWillMount() {
@@ -141,20 +146,22 @@ export default class AppSpecific extends React.Component {
             let message;
             if (error.response != null) {
                 if (error.response.status === 401) {
-                    message = "Authentication fail. Please login again.";
+                    message = this.context.intl.formatMessage({ id:'authenticationFail' ,defaultMessage:'Authentication fail. Please login again'});
                     this.setState({
                         sessionInvalid: true
                     })
                 } else if (error.response.status === 403) {
-                    message = "User Have No Viewer Permission to view this page.";
+                    message = this.context.intl.formatMessage({ id: 'noViewerPermission', defaultMessage: 'User Have No Viewer Permission to view this page.' });
                     this.setState({
                         hasViewerPermission: false
                     })
                 } else {
-                    message = "Unknown error occurred! : " + error.response.data;
+                    message = this.context.intl.formatMessage({
+                        id: 'unknownError', defaultMessage: 'Unknown error occurred! : {data}', values: { data: error.response.data }
+                    });
+                    }
                 }
-            }
-        });
+            });
         this.handleApi(this.state.period);
     }
 
@@ -181,10 +188,10 @@ export default class AppSpecific extends React.Component {
         };
         if (this.state.latency.length === 0) {
             return (
-                <Card><CardHeader title="Latency"/><Divider/>
+                <Card><CardHeader title={<FormattedMessage id='appHistory.latency' defaultMessage='Latency' />} /><Divider />
                     <CardMedia>
-                        <div style={{backgroundColor: '#131313'}}>
-                            <h2>No Data Available</h2>
+                        <div style={{ backgroundColor: '#131313' }}>
+                            <h2><FormattedMessage id='noData' defaultMessage='No Data Available' /></h2>
                         </div>
                     </CardMedia>
                 </Card>
@@ -192,7 +199,7 @@ export default class AppSpecific extends React.Component {
         }
         return (
             <ChartCard data={this.state.latency} metadata={latencyMetadata} config={latencyLineChartConfig}
-                       title="Latency"/>
+                title={<FormattedMessage id='appHistory.latency' defaultMessage='Latency' />} />
         );
     }
 
@@ -218,10 +225,10 @@ export default class AppSpecific extends React.Component {
         };
         if (this.state.memory.length === 0) {
             return (
-                <Card><CardHeader title="Memory Usage"/><Divider/>
+                <Card><CardHeader title={<FormattedMessage id='appHistory.memoryUsage' defaultMessage='Memory Usage' />} /><Divider />
                     <CardMedia>
-                        <div style={{backgroundColor: '#131313'}}>
-                            <h2>No Data Available</h2>
+                        <div style={{ backgroundColor: '#131313' }}>
+                            <h2><FormattedMessage id='noData' defaultMessage='No Data Available' /></h2>
                         </div>
                     </CardMedia>
                 </Card>
@@ -229,7 +236,7 @@ export default class AppSpecific extends React.Component {
         }
         return (
             <ChartCard data={this.state.memory} metadata={memoryMetadata} config={memoryLineChartConfig}
-                       title="Memory Usage"/>
+                title={<FormattedMessage id='appHistory.memoryUsage' defaultMessage='Memory Usage' />} />
         );
     }
 
@@ -256,10 +263,10 @@ export default class AppSpecific extends React.Component {
         };
         if (this.state.throughputAll.length === 0) {
             return (
-                <Card><CardHeader title="Throughput"/><Divider/>
+                <Card><CardHeader title={<FormattedMessage id='appHistory.throughput' defaultMessage='Throughput' />} /><Divider />
                     <CardMedia>
                         <div style={{backgroundColor: '#131313'}}>
-                            <h2>No Data Available</h2>
+                            <h2><FormattedMessage id='noData' defaultMessage='No Data Available' /></h2>
                         </div>
                     </CardMedia>
                 </Card>
@@ -267,7 +274,7 @@ export default class AppSpecific extends React.Component {
         }
         return (
             <ChartCard data={this.state.throughputAll} metadata={tpMetadata} config={tpLineChartConfig}
-                       title="Throughput"/>
+                title={<FormattedMessage id='appHistory.throughput' defaultMessage='Throughput' />} />
         );
     }
 
@@ -315,7 +322,7 @@ export default class AppSpecific extends React.Component {
                         <Link style={{textDecoration: 'none'}} to={window.contextPath}>
                             <Button style={styles.navBtn}>
                                 <HomeButton style={{paddingRight: 8, color: '#BDBDBD'}}/>
-                                Overview >
+                                <FormattedMessage id='overview' defaultMessage='Overview >' />
                             </Button>
                         </Link>
                         <Link style={{textDecoration: 'none'}} to={window.contextPath + '/worker/' +
@@ -331,10 +338,12 @@ export default class AppSpecific extends React.Component {
                                 {this.props.match.params.appName} >
                             </Button>
                         </Link>
-                        <Typography style={styles.navBtnActive}>Metrics</Typography>
+                        <Typography style={styles.navBtnActive}>
+                            <FormattedMessage id='metrics' defaultMessage='Metrics' />
+                        </Typography>
                     </div>
                     <Typography variant="title" style={styles.titleStyle}>
-                        {this.state.workerID} : {this.state.appName} Metrics
+                        {this.state.workerID} : {this.state.appName} <FormattedMessage id='metrics' defaultMessage='Metrics' />
                     </Typography>
                     <Toolbar style={toolBar}>
                         <ToolbarGroup firstChild={true}>
@@ -362,5 +371,9 @@ export default class AppSpecific extends React.Component {
             return <Error403/>;
         }
     }
+}
+
+AppSpecific.contextTypes = {
+    intl: PropTypes.object.isRequired
 }
 

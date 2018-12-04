@@ -4,7 +4,7 @@
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link href="/editor/commons/images/favicon.png" rel="icon" type="image/png" sizes="16x16" />
+    <link href="/editor/commons/images/favicon.png" rel="icon" type="image/png" sizes="16x16"/>
     <script src="/editor/commons/lib/css-browser-selector_0.4.0/css_browser_selector.js"></script>
     <link href="/editor/commons/lib/font-wso2-1.2.2/css/font-wso2.min.css" rel="stylesheet" type="text/css"/>
     <link rel="stylesheet" type="text/css" href="/editor/commons/lib/bootstrap_v3.3.6/css/bootstrap.css"/>
@@ -95,72 +95,73 @@
 
             <!-- Start: file explorer and editor area row -->
 
-                <!-- Start: left container -->
-                <div class="left-container">
-                    <!-- Start: left tool bar -->
-                    <div class="left-tool-bar" data-toggle="tooltip">
-                        <ul class="nav nav-tabs" role="tablist">
-                            <li>
-                                <a href="#workspace-explorer" role="tab" data-toggle="tab"
-                                   class="workspace-explorer-activate-btn">
-                                    <i class="fw fw-file-browse fw-lg"></i>
-                                </a>
-                            </li>
-                            <li>
-                                <a href="#event-simulator" role="tab" data-toggle="tab"
-                                   class="event-simulator-activate-btn">
-                                    <i class="fw fw-event-simulator fw-lg"></i>
-                                </a>
-                            </li>
-                            <li>
-                                <a href="#output-console"  class="output-console-activate-btn">
-                                    <i class="fw fw-console fw-lg"></i>
-                                </a>
-                            </li>
-                        </ul>
-                    </div>
-                    <!-- End: left tool bar -->
-                    <!-- Start: left side-bar -->
-                    <div class="sidebar-left tab-content">
-                    </div>
-                    <div class="sidebar-left-separator" draggable="true"></div>
-                    <!-- End: left side-bar -->
+            <!-- Start: left container -->
+            <div class="left-container">
+                <!-- Start: left tool bar -->
+                <div class="left-tool-bar" data-toggle="tooltip">
+                    <ul class="nav nav-tabs" role="tablist">
+                        <li>
+                            <a href="#workspace-explorer" role="tab" data-toggle="tab"
+                               class="workspace-explorer-activate-btn">
+                                <i class="fw fw-file-browse fw-lg"></i>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="#event-simulator" role="tab" data-toggle="tab"
+                               class="event-simulator-activate-btn">
+                                <i class="fw fw-event-simulator fw-lg"></i>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="#output-console" class="output-console-activate-btn">
+                                <i class="fw fw-console fw-lg"></i>
+                            </a>
+                        </li>
+                    </ul>
                 </div>
-                <!-- End: left container -->
-                <!-- Start: right container -->
-                <div class="panel-container-vertical" id="right-container">
-                    <!-- Start: service tabs wrapper container-->
-                    <div class="container-fluid main-panel" id="service-tabs-wrapper">
-                        <!-- Start: service tabs wrapper row -->
-                            <!-- Start: service tabs -->
-                            <div id="tabs-container" class="col-sm-12">
-                                <div class="tab-headers tab-headers-bar">
-                                </div>
-                                <div id="tab-content-wrapper" class="grid-background">
-                                    <div class="tab-content tab-content-default "></div>
-                                </div>
-                            </div>
-                        <!-- End: service tabs -->
-                    </div>
-                    <!-- End: service tabs wrapper row -->
-                    <div class="splitter-horizontal"></div>
-                    <div id="console-container" class="col-sm-12 hide console-container">
-                        <div class="output-headers output-headers-bar">
-                            <button type="button" class="close pull-right output-console-activate-btn"><i
-                                    class="fw fw-cancel"></i></button>
+                <!-- End: left tool bar -->
+                <!-- Start: left side-bar -->
+                <div class="sidebar-left tab-content">
+                </div>
+                <div class="sidebar-left-separator" draggable="true"></div>
+                <!-- End: left side-bar -->
+            </div>
+            <!-- End: left container -->
+            <!-- Start: right container -->
+            <div class="panel-container-vertical" id="right-container">
+                <!-- Start: service tabs wrapper container-->
+                <div class="container-fluid main-panel" id="service-tabs-wrapper">
+                    <!-- Start: service tabs wrapper row -->
+                    <!-- Start: service tabs -->
+                    <div id="tabs-container" class="col-sm-12">
+                        <div class="tab-headers tab-headers-bar">
                         </div>
-                        <div class="nano console-wrap">
-                            <div class="output-console-content-wrapper nano-content">
-                                <div class="consoleToolbar">
-                                    <a href="#" class="clear-console-btn" data-placement="right" data-toggle="tooltip" title="Clear">
-                                        <i class="fw fw-clear"></i>
-                                    </a>
-                                </div>
-                            </div>
+                        <div id="tab-content-wrapper" class="grid-background">
+                            <div class="tab-content tab-content-default "></div>
                         </div>
                     </div>
+                    <!-- End: service tabs -->
                 </div>
-                <!-- End: service tabs wrapper container-->
+                <!-- End: service tabs wrapper row -->
+                <div class="splitter-horizontal"></div>
+                <div id="console-container" class="col-sm-12 hide console-container">
+                    <div class="output-headers output-headers-bar">
+                        <button type="button" class="close pull-right output-console-activate-btn"><i
+                                class="fw fw-cancel"></i></button>
+                    </div>
+                    <div class="nano console-wrap">
+                        <div class="output-console-content-wrapper nano-content">
+                            <div class="consoleToolbar">
+                                <a href="#" class="clear-console-btn" data-placement="right" data-toggle="tooltip"
+                                   title="Clear">
+                                    <i class="fw fw-clear"></i>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- End: service tabs wrapper container-->
 
             <!-- End: right container -->
         </div>
@@ -178,8 +179,8 @@
 
 <!-- Start: Template for a console -->
 <div id="console-template">
-        <div class="output-console-content output-console-content-default">
-        </div>
+    <div class="output-console-content output-console-content-default">
+    </div>
 </div>
 <!-- End: Template for console -->
 <div class="hidden">
@@ -253,6 +254,15 @@
             <!-- End: tool-palette -->
             <!-- Start: design-view-grid-container -->
             <div id="grid-container" class="grid-container"></div>
+            <!-- Start: pop-over-design-view -->
+            <div class="hide pop-over">
+                <div class="popover-footer">
+                    <button class="btn btn-primary btn-xs yes">Yes</button>
+                    <button class="btn btn-primary btn-xs no">No</button>
+                </div>
+            </div>
+            <!-- End: pop-over-design-view -->
+            <div class = "overlayed-container"></div>
             <!-- End: design-view-grid-container -->
         </div>
         <!-- End: design view container -->
@@ -536,7 +546,7 @@
             <div class="form-group" data-name="attributes">
             </div>
             <div class="alert alert-warning hidden" role="alert">
-                <div data-name ="siddhi-app-name-mode">
+                <div data-name="siddhi-app-name-mode">
                 </div>
                 <div class="form-group clearfix" data-name="run-debug-buttons">
                 </div>
@@ -663,7 +673,7 @@
 <div class="sourceConfigForm" id="csvSourceConfig_dynamicId" data-type="csv" data-uuid="{{dynamicId}}"
      style="display:none;">
     <div class="form-group">
-        <label >
+        <label>
             Siddhi App Name<span class="required_astrix"> *</span>
         </label>
         <select id="siddhi-app-name_{{dynamicId}}" name="siddhi-app-name" class="form-control">
@@ -674,7 +684,7 @@
 
     <div class="dynamicToggleFormContent" style="display: none;">
         <div class="form-group">
-            <label >
+            <label>
                 Stream Name<span class="required_astrix"> *</span>
             </label>
             <select name="stream-name" class="form-control">
@@ -682,12 +692,13 @@
         </div>
 
         <div class="form-group">
-            <label >
+            <label>
                 CSV file<span class="required_astrix"> *</span>
             </label>
             <select id="file-name_{{dynamicId}}" name="file-name" class="form-control"></select>
             <button type="button" class="btn btn-secondary" id="upload-csv-file_{{dynamicId}}" name="upload-csv-file">
-                Upload</button>
+                Upload
+            </button>
         </div>
 
         <div class="form-group">
@@ -702,7 +713,7 @@
         </div>
         <div class="feedAdvanceContent clearfix" id="csvAdvanceContent_{{dynamicId}}" style="display: none;">
             <div class="form-inline clearfix">
-                <div class="form-group col-md-6" >
+                <div class="form-group col-md-6">
                     <label class="custom-radio two-line-radio">
                         <input type="radio" name="timestamp-option" value="attribute">
                         <span class="helper">CSV event record timestamp index</span>
@@ -742,7 +753,7 @@
      style="display:none">
 
     <div class="form-group">
-        <label >
+        <label>
             Siddhi App Name<span class="required_astrix"> *</span>
         </label>
         <select id="siddhi-app-name_{{dynamicId}}" name="siddhi-app-name" class="form-control">
@@ -752,7 +763,7 @@
     </div>
 
     <div class="form-group">
-        <label >
+        <label>
             Stream Name<span class="required_astrix"> *</span>
 
         </label>
@@ -778,7 +789,7 @@
     </div>
 
     <div class="form-group">
-        <label >
+        <label>
             Username<span class="required_astrix"> *</span>
         </label>
         <input type="text" class="form-control required-for-db-connection"
@@ -786,7 +797,7 @@
     </div>
 
     <div class="form-group">
-        <label >
+        <label>
             Password<span class="required_astrix"> *</span>
         </label>
         <input type="password" class="form-control required-for-db-connection"
@@ -801,7 +812,7 @@
     </div>
 
     <div class="form-group">
-        <label >
+        <label>
             Table name<span class="required_astrix"> *</span>
         </label>
         <select name="table-name" class="form-control">
@@ -814,7 +825,7 @@
             <label class="custom-radio">
                 <input type="radio" name="timestamp-option" value="attribute">
                 <span class="helper">Timestamp Attribute</span>
-                <select name="timestamp-attribute" class="form-control" disabled></select>
+                <select name="timestamp-attribute" class="form-control feed-attribute-db" disabled></select>
                 <!--<input type="text" class="form-control" name="timestamp-attribute" disabled>-->
             </label>
         </div>
@@ -835,10 +846,10 @@
 <div class="hidden">
     <div class="sourceConfigForm" id="randomSourceConfig_dynamicId" data-type="random" data-uuid="{{dynamicId}}">
         <div class="form-group">
-            <label >
+            <label>
                 Siddhi App Name<span class="required_astrix"> *</span>
             </label>
-            <select id ="siddhi-app-name_{{dynamicId}}" name="siddhi-app-name"  class="form-control">
+            <select id="siddhi-app-name_{{dynamicId}}" name="siddhi-app-name" class="form-control">
             </select>
             <div id="siddhi-app-name-mode">
             </div>
@@ -846,7 +857,7 @@
 
         <div class="dynamicToggleFormContent" style="display: none;">
             <div class="form-group">
-                <label >
+                <label>
                     Stream Name<span class="required_astrix"> *</span>
                 </label>
                 <select name="stream-name" class="form-control">
@@ -858,7 +869,7 @@
             </div>
             <div class="feedAdvanceContent" id="randomAdvanceContent_dynamicId" style="display: none;">
                 <div class="form-group">
-                    <label >
+                    <label>
                         Increment Event’s Timestamp by(ms)
                     </label>
                     <input type="text" class="form-control" name="timestamp-interval"
@@ -1003,6 +1014,247 @@
     </div>
 </div>
 
+<script id = "attribute-form-template" type = "text/x-handlebars-template">
+    <h4>Attributes</h4>
+    <ul>
+        <div id = "attribute-div">
+            {{#each this}}
+            <li class = "attribute clearfix">
+                <div class = "clearfix">
+                    <div class = "attr-content">
+                        <input type = "text" value = "{{name}}" class = "attr-name"/>
+                        <select class = "attr-type">
+                            <option value = "string"> string </option>
+                            <option value = "int"> int </option>
+                            <option value = "long"> long </option>
+                            <option value = "float"> float </option>
+                            <option value = "double"> double </option>
+                            <option value = "bool"> bool </option>
+                            <option value = "object"> object </option>
+                        </select>
+                    </div>
+                    <div class = "attr-nav"></div>
+                </div>
+                <label class = "error-message"></label>
+            </li>
+            {{/each}}
+        </div>
+    </ul>
+    <button id="btn-add-attribute" class="btn btn-default"> + Attribute </button>
+</script>
+
+<script id = "annotation-form-template" type = "text/x-handlebars-template">
+    <h4>Annotations</h4>
+    <div id = "annotation-div">
+        {{#if this}}
+        <ul>
+            {{#each this}}
+                {{> recursiveAnnotation this}}
+            {{/each}}
+        </ul>
+        {{/if}}
+    </div>
+    <br>
+    <button id = "btn-add-annotation" class = "btn btn-default"> + Annotation </button>
+    <button id = "btn-add-key-val" class = "btn btn-default" style = "display: none"> + Property </button>
+    <button id = "btn-del-annotation" class = "btn btn-default" style = "display: none"> Delete </button>
+</script>
+
+<script id = "recursiveAnnotationPartial" type = "text/template">
+    {{#if predefined}}
+        <li data-jstree = '{"icon":"/editor/commons/images/annotation.png"}' class = "{{class}}"> {{name}}
+            <ul>
+                {{#each elements}}
+                <li data-jstree = '{"icon":"/editor/commons/images/properties.png"}' class="{{class}}"> {{key}}
+                    <ul>
+                        <li data-jstree = '{"icon":"/editor/commons/images/value.png"}'
+                            class = "annotation-value"> {{value}} </li>
+                    </ul>
+                </li>
+                {{/each}}
+    {{else}}
+        <li data-jstree = '{"icon":"/editor/commons/images/annotation.png"}' class = "annotation"> {{name}}
+            <ul>
+                {{#each elements}}
+                <li data-jstree = '{"icon":"/editor/commons/images/properties.png"}' class = "annotation-key"> {{key}}
+                    <ul>
+                        <li data-jstree = '{"icon":"/editor/commons/images/value.png"}'
+                            class = "annotation-value"> {{value}} </li>
+                    </ul>
+                </li>
+                {{/each}}
+    {{/if}}
+
+        {{#if annotations}}
+            {{#each annotations}}
+                {{> recursiveAnnotation this}}
+            {{/each}}
+        {{/if}}
+            </ul>
+        </li>
+</script>
+
+<script id="source-sink-map-store-form-template" type="text/template">
+    {{#ifSourceOrSink id}}
+        <h3>{{addTitle id}} Configuration</h3>
+        <label class="clearfix"> * Type </label>
+        <select id="{{id}}-type">
+            <option style = "display:none" disabled selected value > -- select a type -- </option>
+    {{else}}
+             {{#ifId id "map"}}
+                <h3> Mapping </h3>
+             {{/ifId}}
+              <label class="clearfix"> {{addTitle id}} Type </label>
+              <select id="{{id}}-type">
+    {{/ifSourceOrSink}}
+
+            {{#each types}}
+                <option value="{{name}}">{{name}}</option>
+            {{/each}}
+    </select>
+</script>
+
+<script id = "source-sink-store-options-template" type = "text/template">
+    {{#if options}}
+        <h3> Options </h3>
+        <div id = "{{id}}-options">
+            {{#ifSourceOrSinkOrStore id}}
+                <div class = "sub-{{id}}-options-div">
+            {{/ifSourceOrSinkOrStore}}
+            {{#each options}}
+                <div class = "option">
+                {{#if optional}}
+                    {{#if value}}
+                        <div class = "clearfix">
+                            <label class = "option-name optional-option">
+                                <input type = "checkbox" class = "option-checkbox" checked> {{key}}
+                            </label>
+                            <i class = "fw fw-info option-desc">
+                                <span style = "display:none" class = "option-desc-content"> {{description}} </span>
+                            </i>
+                        </div>
+                        <div class = "clearix">
+                            <input class = "option-value" type = "text" value = "{{value}}">
+                        </div>
+                    {{else}}
+                        <div class="clearfix">
+                            <label class = "option-name optional-option">
+                                <input type = "checkbox" class = "option-checkbox"> {{key}}
+                            </label>
+                            <i class = "fw fw-info option-desc">
+                                <span style = "display:none" class="option-desc-content"> {{description}} </span>
+                            </i>
+                        </div>
+                        <div class="clearix">
+                            <input class = "option-value" type = "text" value="{{defaultValue}}" style ="display:none">
+                        </div>
+                    {{/if}}
+                        <label class = "error-message"></label>
+                {{else}}
+                    <div class="clearfix">
+                        <label class = "mandatory-option-symbol"> * </label>
+                        <label class = "option-name mandatory-option">
+                            {{key}}
+                        </label>
+                        <i class="fw fw-info option-desc">
+                            <span style="display:none" class="option-desc-content"> {{description}} </span>
+                        </i>
+                    </div>
+                    <div class = "clearix">
+                        <input class = "option-value" type = "text" value = "{{value}}">
+                    </div>
+                    <label class = "error-message"></label>
+                {{/if}}
+                </div>
+            {{#ifSourceOrSinkOrStore ../id}}
+                {{#if (isDivisor (sum @index 1) ../options)}}
+                    </div>
+                    <div class = "sub-{{../id}}-options-div">
+                {{/if}}
+            {{/ifSourceOrSinkOrStore}}
+            {{/each}}
+            {{#ifSourceOrSinkOrStore id}}
+                </div>
+            {{/ifSourceOrSinkOrStore}}
+    {{/if}}
+    </div>
+    <div class = "customized-options" id = "customized-{{id}}-options">
+        <h3> <i> Customized Options </i> </h3>
+        <ul class = "cust-options">
+            {{#each customizedOptions}}
+                <li class="option">
+                    <div class = "clearfix">
+                        <label> option.key </label>
+                        <input type="text" class="cust-option-key" value="{{key}}">
+                    </div>
+                    <div class = "clearfix">
+                        <label> option.value </label>
+                        <input type = "text" class = "cust-option-value" value = "{{value}}">
+                        <a class = "btn-del-option"> <i class = "fw fw-delete"> </i></a>
+                    </div>
+                    <label class = "error-message"></label>
+                </li>
+            {{/each}}
+        </ul>
+        <button type = "button" class = "btn btn-default btn-add-options" id = "btn-add-{{id}}-options"> </button>
+    </div>
+</script>
+
+<script id = "source-sink-map-attribute-template" type = "text/template">
+    <div id = "mapper-attributes">
+        <div class = "attribute-labels clearfix">
+                {{#if this.0.key }} <label id = "attribute-key-label"> Key </label> {{/if}}
+                <label id = "attribute-value-label"> Value </label>
+        </div>
+        {{#each this}}
+        <div class = "attribute">
+                <div class = "clearfix">
+                {{#if key }} <input type = "text" value = "{{key}}" class = "attr-key" readonly/> {{/if}}
+                <input type = "text" value = "{{value}}" class = "attr-value"/>
+                </div>
+                <label class = "error-message"></label>
+        </div>
+        {{/each}}
+    </div>
+</script>
+
+<script id = "table-store-annotation-template" type = "text/template">
+    <h4> Annotations </h4>
+    <div id = "table-annotations">
+            {{#each this}}
+                <div class = "clearfix table-annotation">
+                    <div class="clearfix">
+                        <label class = "annotation-name">
+                            {{#if isChecked}}
+                                <input type = "checkbox" class="annotation-checkbox" checked> @{{name}}
+                            {{else}}
+                                <input type = "checkbox" class="annotation-checkbox"> @{{name}}
+                            {{/if}}
+                        </label>
+                    </div>
+                    {{#if isChecked}}
+                        <div class="annotation-content">
+                     {{else}}
+                            <div class="annotation-content" style="display:none">
+                    {{/if}}
+                        <ul>
+                        {{#each values}}
+                            <li class = "clearfix table-annotation-value">
+                                <div class="clearfix">
+                                    <input type = "text" value = "{{value}}" class = "annotation-value"/>
+                                    <a class = "btn-del-annot-value"> <i class = "fw fw-delete"> </i></a>
+                                </div>
+                                <label class="error-message"></label>
+                            </li>
+                        {{/each}}
+                        </ul>
+                        <button type = "button" class = "btn btn-default btn-add-annot-value"> + Value </button>
+                    </div>
+                </div>
+            {{/each}}
+    </div>
+</script>
+
 <!--Start: Settings Modal-->
 <div class="modal fade modalSettings" id="modalSettings" tabindex="-1" role="dialog">
     <div class="modal-dialog" role="document">
@@ -1015,7 +1267,7 @@
             <div class="modal-body add-margin-top-2x add-margin-bottom-2x">
                 <form>
                     <h4>Source View</h4>
-                    <hr />
+                    <hr/>
                     <div class="form-group">
                         <label for="sourceViewTheme">Theme</label>
                         <select class="form-control" id="sourceViewTheme">
@@ -1089,6 +1341,94 @@
 </div>
 
 
+<!--Start: Docker Export Modal-->
+<div class="modal fade modalDockerExport" id="modalDockerExport" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content clearfix">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <i class="fw fw-cancel about-dialog-close"></i></button>
+                <h3 class="modal-title" id="aboutDockerExportLabel">Export as Docker</h3>
+            </div>
+            <div class="modal-body add-margin-top-2x add-margin-bottom-2x">
+                <form>
+                    <h4>Export as Docker</h4>
+                    <hr/>
+                    <div class="form-group">
+                        <label for="dockerProfile">Profile:</label>
+                        <select class="form-control" id="dockerProfile">
+                            <option value="editor">Editor</option>
+                            <option value="worker">Worker</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="dockerProfile">Files to be included:</label>
+                        <div id="file-tree" class="docker-export-file-tree"></div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal" id="exportButton"
+                        disabled="disabled">Export</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<iframe id="frm-download" style="display: none;"></iframe>
+
+<div class="modal fade modalSampleEvent" id="modalSampleEvent" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content clearfix">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <i class="fw fw-cancel  about-dialog-close"></i></button>
+                <h3 class="modal-title" id="sampleEvent">Generate sample event</h3>
+            </div>
+            <div class="modal-body add-margin-top-2x add-margin-bottom-2x">
+                <form id="sampleEventForm">
+                    <div class="form-group">
+                        <label>
+                            Siddhi App Name
+                        </label>
+                        <select name="siddhi-app-name" id="sample-event-siddhi-app-name" class="form-control">
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>
+                            Stream Name
+                        </label>
+                        <select name="stream-name" class="form-control">
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>
+                            Event Format
+                        </label>
+                        <select class="form-control" name="event-format">
+                            <option value="json" selected="selected">JSON</option>
+                            <option value="xml">XML</option>
+                            <option value="text">text</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <button type="submit" class="btn btn-primary" name="generateSampleEvent"
+                                id="generateSampleEventButton">
+                            Generate
+                        </button>
+                    </div>
+                    <div class="form-group">
+                        <textarea class="form-control" name="generatedSampleEvent"
+                                  style="height: 250px">Select App, Stream and event type to get the sample event here..
+                        </textarea>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+
 <script src="/editor/commons/lib/requirejs-2.3.2/require.js"></script>
 <script type="text/javascript">
     requirejs.config({
@@ -1100,10 +1440,12 @@
             /////////////////////////
             // third party modules //
             ////////////////////////
+            handlebar: "commons/lib/handlebar/handlebars-v4.0.11",
             jquery: "commons/lib/jquery_v1.9.1/jquery-1.9.1.min",
             jquery_ui: "commons/lib/jquery-ui_v1.12.1/jquery-ui",
             bootstrap: "commons/lib/theme-wso2-2.0.0/js/bootstrap.min",
             dagre: "commons/lib/dagre-0.7.4/dagre.min",
+            dragSelect: "commons/lib/dragSelect/ds.min",
             jquery_validate: "commons/lib/jquery_validate/jquery.validate.min",
             jquery_timepicker: "commons/lib/jquery_timepicker/jquery-ui-timepicker-addon",
             log4javascript: "commons/lib/log4javascript-1.4.13/log4javascript",
@@ -1140,6 +1482,7 @@
             file_menu: "commons/js/menu-bar/file-menu",
             edit_menu: "commons/js/menu-bar/edit-menu",
             run_menu: "commons/js/menu-bar/run-menu",
+            tools_menu: "commons/js/menu-bar/tools-menu",
             menu_item: "commons/js/menu-bar/menu-item",
             file_browser: "commons/js/file-browser/file-browser",
             undo_manager: "commons/js/undo-manager/undo-manager",
@@ -1149,6 +1492,7 @@
             source_modify_operation: "commons/js/undo-manager/source-modify-operation",
             undoable_operation: "commons/js/undo-manager/undoable-operation",
             sample_preview: "js/sample-preview/sample-preview-view",
+            sample_view: "js/sample-view/sample-view",
             output_console_list: "js/output-console/console-list",
             console: "js/output-console/console",
             service_console: "js/output-console/service-console-manager",
@@ -1213,7 +1557,9 @@
             query: "js/design-view/elements/queries/query",
             edge: "js/design-view/configuration-data/edge",
             annotation: "js/design-view/elements/annotation",
-            attribute: "js/design-view/elements/attribute"
+            attribute: "js/design-view/elements/attribute",
+            annotationObject: "js/design-view/elements/annotation-object",
+            annotationElement: "js/design-view/elements/annotation-element"
             // element data holding objects ends here
         },
         map: {
@@ -1282,9 +1628,53 @@
                     "artifacts/PatternMatching/PatternMatching.siddhi",
                     "artifacts/AggregateDataIncrementally/AggregateDataIncrementally.siddhi"]
             },
+            stream_predefined_annotations: [
+            {
+                predefined: true,
+                name: 'Async',
+                class: 'optional-annotation',
+                isMandatory: false,
+                elements: [
+                    {
+                        key: 'buffer.size',
+                        value: '256',
+                        class: 'mandatory-key',
+                        isMandatory: true
+                    },
+                    {
+                        key: 'workers',
+                        value: '2',
+                        class: 'mandatory-key',
+                        isMandatory: true
+                    },
+                    {
+                        key: 'batch.size.max',
+                        value: '5',
+                        class: 'mandatory-key',
+                        isMandatory: true
+                    },
+                ]
+            }
+            ],
+            table_predefined_annotations: [
+            {
+                name: "primaryKey",
+                values: [{
+                    value: ""
+                }],
+                isChecked: false
+            },
+            {
+                name: "index",
+                values: [{
+                    value: ""
+                }],
+                isChecked: false
+            }
+            ],
             services:   {
                 workspace:  {
-                    endpoint: window.location.protocol + "//" + window.location.host + '/editor/workspace'
+                   endpoint: window.location.protocol + "//" + window.location.host + '/editor/workspace'
                 }
             },
             alerts: {
@@ -1404,6 +1794,14 @@
                 selector: "#modalSettings",
                 submit_button: "#saveSettingsButton"
             },
+            docker_export_dialog: {
+                selector: '#modalDockerExport',
+                submitButton: '#exportButton'
+            },
+            sample_event_dialog:{
+                selector: "#modalSampleEvent",
+                submit_button: "#generateSampleEventButton"
+            },
             output_controller: {
                 container: "#console-container",
                 activateBtn: '.output-console-activate-btn',
@@ -1487,6 +1885,7 @@
                     }
                 }
             },
+
             tab_controller: {
                 container: "#tabs-container",
                 headers: {
@@ -1605,6 +2004,9 @@
         app.render();
         app.displayInitialView();
     });
+
+
+
 </script>
 </body>
 

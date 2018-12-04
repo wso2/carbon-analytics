@@ -19,7 +19,7 @@
  * This will set the options of ACE editor, attach client side parser and attach SiddhiCompletion Engine with the editor
  */
 define(["ace/ace", "jquery", "./constants", "./utils", "./completion-engine", "./token-tooltip",
-        "ace/ext/language_tools", "./debug-rest-client", "log", 'ace/range'],
+    "ace/ext/language_tools", "./debug-rest-client", "log", 'ace/range'],
     function (ace, $, constants, utils, CompletionEngine, aceTokenTooltip, aceExtLangTools, DebugRESTClient, log, AceRange) {
 
         "use strict";   // JS strict mode
@@ -98,6 +98,7 @@ define(["ace/ace", "jquery", "./constants", "./utils", "./completion-engine", ".
             self.state = new State();
 
             self.completionEngine = new CompletionEngine();
+            self.rawExtensions = CompletionEngine.rawExtensions;
 
             // Attaching editor's onChange event handler
             aceEditor.getSession().on('change', editorChangeHandler);
@@ -143,6 +144,10 @@ define(["ace/ace", "jquery", "./constants", "./utils", "./completion-engine", ".
 
             self.getDebugger = function () {
                 return self.debugger;
+            };
+
+            self.getRawExtensions = function () {
+                return self.rawExtensions;
             };
 
             /**
@@ -280,7 +285,7 @@ define(["ace/ace", "jquery", "./constants", "./utils", "./completion-engine", ".
                             }
 
                             self.completionEngine.partitionsList = [];
-                            if(response.innerStreams != undefined){
+                            if (response.innerStreams != undefined) {
                                 for (var i = 0; i < response.innerStreams.length; i++) {
                                     var innerStreams = getStreamsFromStreamDefinitions(response.innerStreams[i], true);
                                     self.completionEngine.partitionsList.push(innerStreams);
@@ -295,7 +300,7 @@ define(["ace/ace", "jquery", "./constants", "./utils", "./completion-engine", ".
                              * Error found in Siddhi app
                              */
 
-                            if(response.queryContextStartIndex === undefined){
+                            if (response.queryContextStartIndex === undefined) {
                                 // Update the semanticErrorList
                                 self.state.semanticErrorList = [({
                                     row: 0,
@@ -309,7 +314,7 @@ define(["ace/ace", "jquery", "./constants", "./utils", "./completion-engine", ".
                                     self.state.semanticErrorList
                                         .concat(self.state.syntaxErrorList)
                                 );
-                            } else{
+                            } else {
                                 // Update the semanticErrorList
                                 self.state.semanticErrorList = [({
                                     row: response.queryContextStartIndex[0] - 1,
@@ -360,7 +365,6 @@ define(["ace/ace", "jquery", "./constants", "./utils", "./completion-engine", ".
                     }
                     return streams;
                 }
-
                 /**
                  * Get the attribute list from the attribute definitions list returned from the server
                  * This is used for transforming server's aggregation definitions to completion engine's aggregation
@@ -489,11 +493,15 @@ define(["ace/ace", "jquery", "./constants", "./utils", "./completion-engine", ".
              *
              * @param {string} editorText Text in the editor after the change
              */
+            var editorChangeDelayTimer;
             self.onEditorChange = function (editorText) {
-                worker.postMessage(JSON.stringify({
-                    type: constants.worker.EDITOR_CHANGE_EVENT,
-                    data: editorText
-                }));
+                clearTimeout(editorChangeDelayTimer);
+                editorChangeDelayTimer = setTimeout(function () {
+                    worker.postMessage(JSON.stringify({
+                        type: constants.worker.EDITOR_CHANGE_EVENT,
+                        data: editorText
+                    }));
+                }, 2000);
             };
 
             /**

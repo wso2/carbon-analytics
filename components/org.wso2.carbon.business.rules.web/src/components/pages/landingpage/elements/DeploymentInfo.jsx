@@ -29,6 +29,8 @@ import DoneIcon from 'material-ui-icons/Done';
 import RemoveIcon from 'material-ui-icons/Remove';
 import PriorityHighIcon from 'material-ui-icons/PriorityHigh';
 import Tooltip from 'material-ui/Tooltip';
+// Localization
+import { FormattedMessage } from 'react-intl';
 // App Utils
 import BusinessRulesUtilityFunctions from '../../../../utils/BusinessRulesUtilityFunctions';
 // App Constants
@@ -40,156 +42,174 @@ import '../../../../index.css';
  * Styles related to this component
  */
 const styles = {
-    root: {
-        display: 'flex',
-        justifyContent: 'center',
-        flexWrap: 'wrap',
-    },
-    card: {
-        minWidth: 300,
-        maxWidth: 360,
-        margin: 15,
-    },
-    chip: {
-        margin: 10,
-    },
-    deployedAvatar: {
-        color: '#FFF',
-        backgroundColor: '#4CAF50',
-    },
-    notDeployedAvatar: {
-        color: '#FFF',
-        backgroundColor: '#795548',
-    },
-    unreachableAvatar: {
-        color: '#FFF',
-        backgroundColor: '#F44336',
-    },
-    spacing: '0',
+  root: {
+    display: 'flex',
+    justifyContent: 'center',
+    flexWrap: 'wrap',
+  },
+  card: {
+    minWidth: 300,
+    maxWidth: 360,
+    margin: 15,
+  },
+  chip: {
+    margin: 10,
+  },
+  deployedAvatar: {
+    color: '#FFF',
+    backgroundColor: '#4CAF50',
+  },
+  notDeployedAvatar: {
+    color: '#FFF',
+    backgroundColor: '#795548',
+  },
+  unreachableAvatar: {
+    color: '#FFF',
+    backgroundColor: '#F44336',
+  },
+  spacing: '0',
 };
 
 /**
  * Represents the deployment information display of a business rule
  */
 export default class DeploymentInfo extends Component {
-    /**
-     * Renders a Siddhi app's status, in the node with the given Host and Port
-     * @param {String} hostAndPort      Host and the Port of the node
-     * @param {number} status           Number, which depicts the deployment status of the siddhi app
-     * @returns {Component}             Representation of a Siddhi app's deployment status
-     */
-    static displaySiddhiApp(hostAndPort, status) {
-        let statusIcon;
-        let avatarStyle;
-        switch (status) {
-            case BusinessRulesConstants.SIDDHI_APP_DEPLOYMENT_STATUSES.DEPLOYED:
-                statusIcon = <DoneIcon />;
-                avatarStyle = styles.deployedAvatar;
-                break;
-            case BusinessRulesConstants.SIDDHI_APP_DEPLOYMENT_STATUSES.NOT_DEPLOYED:
-                statusIcon = <RemoveIcon />;
-                avatarStyle = styles.notDeployedAvatar;
-                break;
-            default:
-                statusIcon = <PriorityHighIcon />;
-                avatarStyle = styles.unreachableAvatar;
-        }
-        return (
-            <Tooltip
-                id="tooltip-bottom"
-                title={BusinessRulesConstants.SIDDHI_APP_DEPLOYMENT_STATUS_TEXTS[status + 1]}
-                placement="bottom"
-            >
-                <Chip
-                    avatar={
-                        <Avatar style={avatarStyle}>
-                            {statusIcon}
-                        </Avatar>
-                    }
-                    label={hostAndPort}
-                    style={styles.chip}
-                />
-            </Tooltip>);
+  /**
+   * Renders a Siddhi app's status, in the node with the given Host and Port
+   * @param {String} hostAndPort      Host and the Port of the node
+   * @param {number} status           Number, which depicts the deployment status of the siddhi app
+   * @returns {Component}             Representation of a Siddhi app's deployment status
+   */
+  static displaySiddhiApp(hostAndPort, status) {
+    let statusIcon;
+    let avatarStyle;
+    switch (status) {
+      case BusinessRulesConstants.SIDDHI_APP_DEPLOYMENT_STATUSES.DEPLOYED:
+        statusIcon = <DoneIcon />;
+        avatarStyle = styles.deployedAvatar;
+        break;
+      case BusinessRulesConstants.SIDDHI_APP_DEPLOYMENT_STATUSES.NOT_DEPLOYED:
+        statusIcon = <RemoveIcon />;
+        avatarStyle = styles.notDeployedAvatar;
+        break;
+      default:
+        statusIcon = <PriorityHighIcon />;
+        avatarStyle = styles.unreachableAvatar;
     }
-
-    /**
-     * Renders a node, consisting Siddhi apps
-     * @param {Object} node     Configs of a node
-     * @returns {Component}     Grid containing Siddhi apps
-     */
-    displayNode(node) {
-        return (
-            <Grid item key={node.nodeURL}>
-                <Card style={styles.card}>
-                    <CardContent>
-                        <Typography type="subheading">
-                            {node.nodeURL}
-                        </Typography>
-                        <br />
-                        <div style={styles.root}>
-                            {Object.keys(node.siddhiAppStatuses).map(siddhiAppName =>
-                                (DeploymentInfo.displaySiddhiApp(siddhiAppName,
-                                    node.siddhiAppStatuses[siddhiAppName])))}
-                        </div>
-                    </CardContent>
-                </Card>
-            </Grid>
-        );
-    }
-
-    /**
-     * Displays content of the Dialog
-     * @returns {HTMLElement}       Div containing contents of the dialog
-     */
-    displayContent() {
-        if (!BusinessRulesUtilityFunctions.isEmpty(this.props.businessRule)) {
-            return (
-                <div>
-                    <DialogTitle>
-                        Deployment Information
-                        <Typography type="body2">
-                            {`${this.props.businessRule[0].name} ` +
-                            `(${BusinessRulesConstants.BUSINESS_RULE_STATUSES[this.props.businessRule[1]]})`}
-                        </Typography>
-                    </DialogTitle>
-                    <DialogContent>
-                        <Grid container style={styles.root}>
-                            <Grid item xs={12}>
-                                <Grid container justify="center" spacing={Number(styles.spacing)}>
-                                    {this.props.info.map(node => (this.displayNode(node)))}
-                                </Grid>
-                            </Grid>
-                        </Grid>
-                    </DialogContent>
-                </div>
-            );
+    return (
+      <Tooltip
+        id="tooltip-bottom"
+        title={
+          BusinessRulesConstants.SIDDHI_APP_DEPLOYMENT_STATUS_TEXTS[status + 1]
         }
-        return (
-            <div>
-                <DialogTitle>
-                    Unable to load Deployment Information
-                </DialogTitle>
-                <DialogContent>
-                    <Typography type="subheading">
-                        Unable to load Deployment Information
-                    </Typography>
-                </DialogContent>
+        placement="bottom"
+      >
+        <Chip
+          avatar={<Avatar style={avatarStyle}>{statusIcon}</Avatar>}
+          label={hostAndPort}
+          style={styles.chip}
+        />
+      </Tooltip>
+    );
+  }
+
+  /**
+   * Renders a node, consisting Siddhi apps
+   * @param {Object} node     Configs of a node
+   * @returns {Component}     Grid containing Siddhi apps
+   */
+  displayNode(node) {
+    return (
+      <Grid item key={node.nodeURL}>
+        <Card style={styles.card}>
+          <CardContent>
+            <Typography type="subheading">{node.nodeURL}</Typography>
+            <br />
+            <div style={styles.root}>
+              {Object.keys(node.siddhiAppStatuses).map(siddhiAppName => DeploymentInfo.displaySiddhiApp(
+                siddhiAppName,
+                node.siddhiAppStatuses[siddhiAppName],
+              ))}
             </div>
-        );
-    }
+          </CardContent>
+        </Card>
+      </Grid>
+    );
+  }
 
-    render() {
-        return (
-            <Dialog open={this.props.open} onRequestClose={() => this.props.onRequestClose()}>
-                {this.displayContent()}
-            </Dialog>
-        );
+  /**
+   * Displays content of the Dialog
+   * @returns {HTMLElement}       Div containing contents of the dialog
+   */
+  displayContent() {
+    if (!BusinessRulesUtilityFunctions.isEmpty(this.props.businessRule)) {
+      return (
+        <div>
+          <DialogTitle>
+            <FormattedMessage
+              id="deployment.deploymentInfo"
+              defaultMessage="Deployment Information"
+            />
+            <Typography type="body2">
+              {`${this.props.businessRule[0].name} `
+                + `(${
+                BusinessRulesConstants.BUSINESS_RULE_STATUSES[
+                this.props.businessRule[1]
+                ]
+                })`}
+            </Typography>
+          </DialogTitle>
+          <DialogContent>
+            <Grid container style={styles.root}>
+              <Grid item xs={12}>
+                <Grid
+                  container
+                  justify="center"
+                  spacing={Number(styles.spacing)}
+                >
+                  {this.props.info.map(node => this.displayNode(node))}
+                </Grid>
+              </Grid>
+            </Grid>
+          </DialogContent>
+        </div>
+      );
     }
+    return (
+      <div>
+        <DialogTitle>
+          <FormattedMessage
+            id="deployment.unableToLoad"
+            defaultMessage="Unable to load Deployment Information"
+          />
+        </DialogTitle>
+        <DialogContent>
+          <Typography type="subheading">
+            <FormattedMessage
+              id="deployment.unableToLoad"
+              defaultMessage="Unable to load Deployment Information"
+            />
+          </Typography>
+        </DialogContent>
+      </div>
+    );
+  }
+
+  render() {
+    return (
+      <Dialog
+        open={this.props.open}
+        onRequestClose={() => this.props.onRequestClose()}
+      >
+        {this.displayContent()}
+      </Dialog>
+    );
+  }
 }
 
 DeploymentInfo.propTypes = {
-    open: PropTypes.bool.isRequired,
-    onRequestClose: PropTypes.func.isRequired,
-    info: PropTypes.object.isRequired,
-    businessRule: PropTypes.object.isRequired,
+  open: PropTypes.bool.isRequired,
+  onRequestClose: PropTypes.func.isRequired,
+  info: PropTypes.object.isRequired,
+  businessRule: PropTypes.object.isRequired,
 };

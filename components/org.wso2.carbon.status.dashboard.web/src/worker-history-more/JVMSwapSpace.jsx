@@ -23,6 +23,8 @@ import DashboardUtils from '../utils/DashboardUtils';
 import ChartCard from '../common/ChartCard';
 // Material UI
 import {Card, CardHeader, CardMedia, Divider} from 'material-ui';
+// Localization
+import { FormattedMessage } from 'react-intl';
 
 const memoryMetadata = {
     names: ['Time', 'Free Swap Space', 'Total Swap Space'],
@@ -86,7 +88,7 @@ export default class JVMOsPhysicalMemory extends React.Component {
                         <Divider/>
                         <CardMedia>
                             <div style={{backgroundColor: '#131313'}}>
-                                <h4 style={{marginTop: 0}}>No Data Available</h4>
+                                <h4 style={{ marginTop: 0 }}><FormattedMessage id='noData' defaultMessage='No Data Available' /></h4>
                             </div>
                         </CardMedia>
                     </Card>

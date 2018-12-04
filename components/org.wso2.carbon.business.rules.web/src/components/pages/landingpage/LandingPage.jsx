@@ -20,13 +20,25 @@ import React, { Component } from 'react';
 import { Link } from 'react-router-dom';
 // Material UI Components
 import Typography from 'material-ui/Typography';
-import Table, { TableBody, TableCell, TableHead, TableRow } from 'material-ui/Table';
+import Table, {
+  TableBody,
+  TableCell,
+  TableHead,
+  TableRow,
+} from 'material-ui/Table';
 import Button from 'material-ui/Button';
 import AddIcon from 'material-ui-icons/Add';
-import Dialog, { DialogActions, DialogContent, DialogContentText, DialogTitle } from 'material-ui/Dialog';
+import Dialog, {
+  DialogActions,
+  DialogContent,
+  DialogContentText,
+  DialogTitle,
+} from 'material-ui/Dialog';
 import Paper from 'material-ui/Paper';
 import Snackbar from 'material-ui/Snackbar';
 import Slide from 'material-ui/transitions/Slide';
+// Localization
+import { FormattedMessage } from 'react-intl';
 // App Components
 import BusinessRule from './elements/BusinessRule';
 import DeploymentInfo from './elements/DeploymentInfo';
@@ -47,15 +59,15 @@ import '../../../index.css';
  * Styles related to this component
  */
 const styles = {
-    container: {
-        maxWidth: 1020,
-    },
-    floatingButton: {
-        position: 'fixed',
-        right: '20%',
-        zIndex: 9,
-        top: '10%',
-    },
+  container: {
+    maxWidth: 1020,
+  },
+  floatingButton: {
+    position: 'fixed',
+    right: '20%',
+    zIndex: 9,
+    top: '10%',
+  },
 };
 
 /**
@@ -80,6 +92,7 @@ export default class LandingPage extends Component {
             // Dialog for deleting a business rule
             deleteDialog: {
                 businessRule: {},
+                businessRuleIndex: -1,
                 isVisible: false,
             },
 
@@ -123,36 +136,129 @@ export default class LandingPage extends Component {
     }
 
     /**
+     * Checks whether the given error has been occurred due to authorization,
+     * and updates the error code necessarily in the state, if so
+     * @param {Object} error     Error object
+     */
+    checkAuthorizationOnError(error) {
+        if (error.response.status === 401) {
+            this.setState({
+                errorCode: BusinessRulesUtilityFunctions.getErrorDisplayCode(error),
+            });
+        }
+    }
+
+    /**
+     * Updates the status of the business rule - which is denoted with the given index in the array from the state,
+     * with the given status
+     * @param {number} businessRuleIndex     Index of the business rule in the array, in the state
+     * @param {number} status                Status of the business rule
+     */
+    updateBusinessRuleStatus(businessRuleIndex, status) {
+        let businessRules = this.state.businessRules;
+        businessRules[businessRuleIndex][1] = status;
+        this.setState({ businessRules });
+    }
+
+    /**
+     * Gets the status code of a business rule, based on the given response data
+     * @param {Array} responseData      Response data array which is either from a Response or an Error
+     * @returns {number}                Status code for the business rule
+     */
+    getBusinessRuleStatusCode(responseData) {
+        if (Array.isArray(responseData[2])) {
+            return BusinessRulesConstants.BUSINESS_RULE_STATUSES[4];
+        }
+        if (responseData[2] === BusinessRulesConstants.SCRIPT_EXECUTION_ERROR) {
+            return BusinessRulesConstants.BUSINESS_RULE_STATUSES[5];
+        }
+        return responseData[2];
+    }
+
+    /**
      * Re-deploys the business rule, that has the given UUID
      * @param {String} businessRuleUUID     UUID of the business rule
+     * @param businessRuleIndex             Index of the business rule in the array, in the state
      */
-    redeployBusinessRule(businessRuleUUID) {
+    redeployBusinessRule(businessRuleUUID, businessRuleIndex) {
         new BusinessRulesAPI(BusinessRulesConstants.BASE_URL)
             .redeployBusinessRule(businessRuleUUID)
             .then((redeployResponse) => {
                 this.toggleSnackbar(redeployResponse.data[1]);
-                this.loadAvailableBusinessRules();
+                this.updateBusinessRuleStatus(businessRuleIndex, this.getBusinessRuleStatusCode(redeployResponse.data));
             })
-            .catch(() => {
-                this.toggleSnackbar(`Failed to deploy the business rule '${businessRuleUUID}'`);
-                this.loadAvailableBusinessRules();
+            .catch((error) => {
+                this.checkAuthorizationOnError(error);
+                this.toggleSnackbar(
+                    <FormattedMessage
+                        id="landing.failedToDeploy"
+                        defaultMessage="Failed to deploy the business rule {businessRuleUUID}"
+                        values={{ businessRuleUUID }}
+                    />,
+                );
+                if (error.response.data) {
+                    this.updateBusinessRuleStatus(
+                        businessRuleIndex, this.getBusinessRuleStatusCode(error.response.data));
+                } else {
+                    this.updateBusinessRuleStatus(businessRuleIndex, BusinessRulesConstants.BUSINESS_RULE_STATUSES[5]);
+                }
             });
     }
 
     /**
+     * Un-deploys the business rule, that has the given UUID
+     * @param {String} businessRuleUUID     UUID of the business rule
+     * @param {number} businessRuleIndex    Index of the business rule in the array, in the state
+     */
+    undeployBusinessRule(businessRuleUUID, businessRuleIndex) {
+        new BusinessRulesAPI(BusinessRulesConstants.BASE_URL)
+            .undeployBusinessRule(businessRuleUUID)
+            .then((undeployResponse) => {
+                this.toggleSnackbar(undeployResponse.data[1]);
+                this.updateBusinessRuleStatus(businessRuleIndex, this.getBusinessRuleStatusCode(undeployResponse.data));
+            })
+            .catch((error) => {
+                this.checkAuthorizationOnError(error);
+                this.toggleSnackbar(`Failed to un-deploy the business rule '${businessRuleUUID}'`);
+                if (error.response.data) {
+                    this.updateBusinessRuleStatus(
+                        businessRuleIndex, this.getBusinessRuleStatusCode(error.response.data));
+                } else {
+                    this.updateBusinessRuleStatus(businessRuleIndex, BusinessRulesConstants.BUSINESS_RULE_STATUSES[5]);
+                }
+            });
+    }
+    
+    /**
      * Deletes the business rule, that has the given UUID
      * @param {String} businessRuleUUID     UUID of the business rule
+     * @param {number} businessRuleIndex    Index of the business rule in the array, in the state
      */
-    deleteBusinessRule(businessRuleUUID) {
+    deleteBusinessRule(businessRuleUUID, businessRuleIndex) {
         this.toggleDeleteDialog();
         new BusinessRulesAPI(BusinessRulesConstants.BASE_URL).deleteBusinessRule(businessRuleUUID, false)
             .then((deleteResponse) => {
                 this.toggleSnackbar(deleteResponse.data[1]);
+                this.updateBusinessRuleStatus(businessRuleIndex, this.getBusinessRuleStatusCode(deleteResponse.data));
                 this.loadAvailableBusinessRules();
             })
-            .catch(() => {
-                this.toggleSnackbar(`Failed to delete the business rule '${businessRuleUUID}'`);
-                this.loadAvailableBusinessRules();
+            .catch((error) => {
+                this.checkAuthorizationOnError(error);
+                this.toggleSnackbar(
+                    <FormattedMessage
+                        id="landing.failedToDeleteRule"
+                        defaultMessage="Failed to delete the business rule "
+                        values={{
+                            businessRuleUUID,
+                        }}
+                    />,
+                );
+                if (error.response.data) {
+                    this.updateBusinessRuleStatus(
+                        businessRuleIndex, this.getBusinessRuleStatusCode(error.response.data));
+                } else {
+                    this.updateBusinessRuleStatus(businessRuleIndex, BusinessRulesConstants.BUSINESS_RULE_STATUSES[5]);
+                }
             });
     }
 
@@ -170,7 +276,12 @@ export default class LandingPage extends Component {
                 this.toggleDeploymentInfoView();
             })
             .catch(() => {
-                this.toggleSnackbar('Unable to retrieve deployment info');
+                this.toggleSnackbar(
+                    <FormattedMessage
+                        id="landing.unableToRetreve"
+                        defaultMessage="Unable to retrieve deployment info"
+                    />,
+                );
             });
     }
 
@@ -203,12 +314,14 @@ export default class LandingPage extends Component {
     /**
      * Displays the delete dialog for the business rule with the given UUID (if any),
      * otherwise hides it
-     * @param {Object} businessRule     Business rule object
+     * @param {Object} businessRule         Business rule object
+     * @param {number} businessRuleIndex    Index of the business rule in the array, in the state
      */
-    toggleDeleteDialog(businessRule) {
+    toggleDeleteDialog(businessRule, businessRuleIndex) {
         const state = this.state;
         if (businessRule) {
             state.deleteDialog.businessRule = businessRule;
+            state.deleteDialog.businessRuleIndex = businessRuleIndex;
             state.deleteDialog.isVisible = true;
         } else {
             state.deleteDialog.businessRule = {};
@@ -222,41 +335,57 @@ export default class LandingPage extends Component {
      * @returns {Component}     Component with the message for getting started
      */
     displayGetStarted() {
-        if (this.state.permissions === BusinessRulesConstants.USER_PERMISSIONS.MANAGER) {
+        if (
+            this.state.permissions === BusinessRulesConstants.USER_PERMISSIONS.MANAGER
+        ) {
             return (
                 <Paper style={Styles.messageContainer}>
                     <Typography type="title">
-                        No business rules found
+                        <FormattedMessage
+                            id="landing.title"
+                            defaultMessage="No business rules found"
+                        />
                     </Typography>
                     <Typography type="subheading">
-                        Get started by creating one
+                        <FormattedMessage
+                            id="landing.subheading"
+                            defaultMessage=" Get started by creating one"
+                        />
                     </Typography>
                     <br />
-                    <Link to={`${appContext}/businessRuleCreator`} style={{ textDecoration: 'none' }}>
+                    <Link
+                        to={`${appContext}/businessRuleCreator`}
+                        style={{ textDecoration: 'none' }}
+                    >
                         <Button raised color="primary">
-                            Create
-                        </Button>
-                    </Link>
-                </Paper>
-            );
-        } else {
-            return (
-                <Paper style={Styles.messageContainer}>
-                    <Typography type="title">
-                        No business rules found
-                    </Typography>
-                    <Typography type="subheading">
-                        Login with suitable permissions to create one
-                    </Typography>
-                    <br />
-                    <Link to={`${appContext}/logout`} style={{ textDecoration: 'none' }}>
-                        <Button color="primary">
-                            Login
+                            <FormattedMessage id="landing.create" defaultMessage="Create" />
                         </Button>
                     </Link>
                 </Paper>
             );
         }
+        return (
+            <Paper style={Styles.messageContainer}>
+                <Typography type="title">
+                    <FormattedMessage
+                        id="landing.title"
+                        defaultMessage="No business rules found"
+                    />
+                </Typography>
+                <Typography type="subheading">
+                    <FormattedMessage
+                        id="landing.permission.subheading"
+                        defaultMessage="Login with suitable permissions to create one"
+                    />
+                </Typography>
+                <br />
+                <Link to={`${appContext}/logout`} style={{ textDecoration: 'none' }}>
+                    <Button color="primary">
+                        <FormattedMessage id="login.title" defaultMessage="Login" />
+                    </Button>
+                </Link>
+            </Paper>
+        );
     }
 
     /**
@@ -273,13 +402,28 @@ export default class LandingPage extends Component {
                     <Table>
                         <TableHead>
                             <TableRow>
-                                <TableCell>Business Rule</TableCell>
-                                <TableCell>Status</TableCell>
-                                <TableCell>Actions</TableCell>
+                                <TableCell>
+                                    <FormattedMessage
+                                        id="landing.table.businessrule"
+                                        defaultMessage="Business Rule"
+                                    />
+                                </TableCell>
+                                <TableCell>
+                                    <FormattedMessage
+                                        id="landing.table.status"
+                                        defaultMessage="Status"
+                                    />
+                                </TableCell>
+                                <TableCell>
+                                    <FormattedMessage
+                                        id="landing.table.actions"
+                                        defaultMessage="Actions"
+                                    />
+                                </TableCell>
                             </TableRow>
                         </TableHead>
                         <TableBody>
-                            {this.state.businessRules.map(businessRuleAndStatus =>
+                            {this.state.businessRules.map((businessRuleAndStatus, index) =>
                                 (<BusinessRule
                                     key={businessRuleAndStatus[0].uuid}
                                     name={businessRuleAndStatus[0].name}
@@ -287,10 +431,14 @@ export default class LandingPage extends Component {
                                     type={businessRuleAndStatus[0].type}
                                     status={businessRuleAndStatus[1]}
                                     permissions={this.state.permissions}
-                                    onRedeploy={() => this.redeployBusinessRule(businessRuleAndStatus[0].uuid)}
-                                    onDeleteRequest={() => this.toggleDeleteDialog(businessRuleAndStatus[0])}
+                                    onRedeployRequest={() =>
+                                        this.redeployBusinessRule(businessRuleAndStatus[0].uuid, index)}
+                                    onDeleteRequest={() => this.toggleDeleteDialog(businessRuleAndStatus[0], index)}
+                                    onUndeployRequest={() =>
+                                        this.undeployBusinessRule(businessRuleAndStatus[0].uuid, index)}
                                     onDeploymentInfoRequest={() => this.showDeploymentInfo(businessRuleAndStatus)}
-                                />))}
+                                  />
+                                ))}
                         </TableBody>
                     </Table>
                 </div>
@@ -347,19 +495,30 @@ export default class LandingPage extends Component {
             return (
                 <Dialog open={this.state.deleteDialog.isVisible} onRequestClose={() => this.toggleDeleteDialog()}>
                     <DialogTitle>
-                        Confirm Delete
+                        <FormattedMessage
+                            id="landing.confrimDelete"
+                            defaultMessage="Confirm Delete"
+                        />
                     </DialogTitle>
                     <DialogContent>
                         <DialogContentText>
-                            {'Do you really want to delete the business rule ' +
-                            `'${this.state.deleteDialog.businessRule.name}'?`}
+                            <FormattedMessage
+                                id="landing.confirmDelete"
+                                defaultMessage="Do you really want to delete the business rule {ruleName} "
+                                values={{
+                                    ruleName: this.state.deleteDialog.businessRule.name,
+                                }}
+                            />
                         </DialogContentText>
                     </DialogContent>
                     <DialogActions>
                         <Button
-                            onClick={() => this.deleteBusinessRule(this.state.deleteDialog.businessRule.uuid)}
+                            onClick={() =>
+                                this.deleteBusinessRule(
+                                    this.state.deleteDialog.businessRule.uuid,
+                                    this.state.deleteDialog.businessRuleIndex)}
                         >
-                            Delete
+                            <FormattedMessage id="landing.delete" defaultMessage="Delete" />
                         </Button>
                     </DialogActions>
                 </Dialog>
@@ -383,39 +542,43 @@ export default class LandingPage extends Component {
         );
     }
 
-    /**
-     * Displays content of the page
-     * @returns {HTMLElement}       Content of the page
-     */
-    displayContent() {
-        if (this.state.hasLoaded) {
-            if (this.state.errorCode === BusinessRulesConstants.ERROR_CODES.NONE) {
-                return (
-                    <div>
-                        {this.displaySnackbar()}
-                        {this.displayDeleteConfirmationDialog()}
-                        {this.displayDeploymentInfoDialog()}
-                        <center>
-                            <div>
-                                {(this.state.businessRules.length > 0) ?
-                                    (<Typography type="headline">
-                                        Business Rules
-                                    </Typography>) :
-                                    (<div />)
-                                }
-                            </div>
-                            <br />
-                            {this.displayAvailableBusinessRules()}
-                        </center>
-                    </div>
-                );
-            } else {
-                return <ErrorDisplay errorCode={this.state.errorCode} />;
-            }
-        } else {
-            return <ProgressDisplay />;
-        }
+  /**
+   * Displays content of the page
+   * @returns {HTMLElement}       Content of the page
+   */
+  displayContent() {
+    if (this.state.hasLoaded) {
+      if (this.state.errorCode === BusinessRulesConstants.ERROR_CODES.NONE) {
+        return (
+          <div>
+            {this.displaySnackbar()}
+            {this.displayDeleteConfirmationDialog()}
+            {this.displayDeploymentInfoDialog()}
+            <center>
+              <div>
+                {this.state.businessRules.length > 0 ? (
+                  <Typography type="headline">
+                    <FormattedMessage
+                      id="landing.businessRules.heading"
+                      defaultMessage="Business Rules"
+                    />
+                  </Typography>
+                ) : (
+                    <div />
+                  )}
+              </div>
+              <br />
+              {this.displayAvailableBusinessRules()}
+            </center>
+          </div>
+        );
+      }
+      return <ErrorDisplay errorCode={this.state.errorCode} />;
+
     }
+      return <ProgressDisplay />;
+
+  }
 
     render() {
         return (

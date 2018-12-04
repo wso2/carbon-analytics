@@ -32,6 +32,9 @@ import {Button, Typography} from 'material-ui-next';
 import AuthenticationAPI from '../utils/apis/AuthenticationAPI';
 import AuthManager from '../auth/utils/AuthManager';
 import Error403 from '../error-pages/Error403';
+//Localization
+import { FormattedMessage } from 'react-intl';
+import PropTypes from 'prop-types';
 
 const styles = {
     navBar: {padding: '0 15px'},
@@ -231,17 +234,17 @@ export default class ComponentHistory extends React.Component {
             let message;
             if (error.response != null) {
                 if (error.response.status === 401) {
-                    message = "Authentication fail. Please login again.";
+                        message = this.context.intl.formatMessage({ id: 'authenticationFail', defaultMessage: 'Authentication fail. Please login again.' });
                     this.setState({
                         sessionInvalid: true
                     })
                 } else if (error.response.status === 403) {
-                    message = "User Have No Viewer Permission to view this page.";
+                        message = this.context.intl.formatMessage({ id: 'noViewerPermission', defaultMessage: 'User Have No Viewer Permission to view this page.' });
                     this.setState({
                         hasViewerPermission: false
                     })
                 } else {
-                    message = "Unknown error occurred! : " + error.response.data;
+                        message = this.context.intl.formatMessage({ id: 'unknownError', defaultMessage: 'Unknown error occurred! : {data}', values: { data: error.response.data } });
                 }
             }
         });
@@ -257,17 +260,17 @@ export default class ComponentHistory extends React.Component {
             let message;
             if (error.response != null) {
                 if (error.response.status === 401) {
-                    message = "Authentication fail. Please login again.";
+                        message = this.context.intl.formatMessage({ id: 'authenticationFail', defaultMessage: 'Authentication fail. Please login again.' });
                     this.setState({
                         sessionInvalid: true
                     })
                 } else if (error.response.status === 403) {
-                    message = "User Have No Viewer Permission to view this page.";
+                        message = this.context.intl.formatMessage({ id: 'noViewerPermission', defaultMessage: 'User Have No Viewer Permission to view this page.' });
                     this.setState({
                         hasViewerPermission: false
                     })
                 } else {
-                    message = "Unknown error occurred! : " + error.response.data;
+                        message = this.context.intl.formatMessage({ id: 'componentHistory.unknownErro', defaultMessage: 'Unknown error occurred! : {data}', values: { data: error.response.data } });
                 }
             }
         });
@@ -289,10 +292,10 @@ export default class ComponentHistory extends React.Component {
                 === ComponentType.SINK_MAPPERS ||
                 this.state.componentType === ComponentType.SOURCE_MAPPERS) && this.state.latency.length === 0) {
             return (
-                <Card><CardHeader title="Latency(milliseconds)"/><Divider/>
+                <Card><CardHeader title={<FormattedMessage id='componentHistory.latencyInMilli' defaultMessage='Latency(milliseconds)' />} /><Divider />
                     <CardMedia>
                         <div style={{backgroundColor: '#131313'}}>
-                            <h4 style={{marginTop: 0}}>No Data Available</h4>
+                            <h4 style={{ marginTop: 0 }}><FormattedMessage id='noData' defaultMessage='No Data Available' /></h4>
                         </div>
                     </CardMedia>
                 </Card>
@@ -300,7 +303,7 @@ export default class ComponentHistory extends React.Component {
         }
         return (
             <ChartCard data={this.state.latency} metadata={latencyMetadata} config={latencyLineChartConfig}
-                       title="Latency(milliseconds)"/>
+                title={<FormattedMessage id='componentHistory.latencyInMilli' defaultMessage='Latency(milliseconds)' />} />
         );
     }
 
@@ -316,10 +319,10 @@ export default class ComponentHistory extends React.Component {
         else if ((this.state.componentType === ComponentType.QUERIES || this.state.componentType
                 === ComponentType.TABLES) && this.state.memory.length === 0) {
             return (
-                <Card><CardHeader title="Memory(bytes)"/><Divider/>
+                <Card><CardHeader title={<FormattedMessage id='componentHistory.memoryInBytes' defaultMessage='Memory(bytes)' />} /><Divider />
                     <CardMedia>
                         <div style={{backgroundColor: '#131313'}}>
-                            <h4 style={{marginTop: 0}}>No Data Available</h4>
+                            <h4 style={{marginTop: 0}}><FormattedMessage id='noData' defaultMessage='No Data Available'/></h4>
                         </div>
                     </CardMedia>
                 </Card>
@@ -327,7 +330,7 @@ export default class ComponentHistory extends React.Component {
         }
         return (
             <ChartCard data={this.state.memory} metadata={memoryMetadata} config={memoryLineChartConfig}
-                       title="Memory"/>
+                title={<FormattedMessage id='componentHistory.memory' defaultMessage='Memory' />} />
         );
     }
 
@@ -344,10 +347,10 @@ export default class ComponentHistory extends React.Component {
                 this.state.componentType === ComponentType.SOURCES
                 || this.state.componentType === ComponentType.SINKS) && this.state.throughput.length === 0) {
             return (
-                <Card><CardHeader title="Throughput(events/second)"/><Divider/>
+                <Card><CardHeader title={<FormattedMessage id='componentHistory.throughputTitle' defaultMessage='Throughput(events/second)' />} /><Divider />
                     <CardMedia>
                         <div style={{backgroundColor: '#131313'}}>
-                            <h4 style={{marginTop: 0}}>No Data Available</h4>
+                            <h4 style={{ marginTop: 0 }}><FormattedMessage id='noData' defaultMessage='No Data Available' /></h4>
                         </div>
                     </CardMedia>
                 </Card>
@@ -355,7 +358,7 @@ export default class ComponentHistory extends React.Component {
         }
         return (
             <ChartCard data={this.state.throughput} metadata={tpMetadata} config={tpLineChartConfig}
-                       title="Throughput"/>
+                title={<FormattedMessage id='componentHistory.throughput' defaultMessage='Throughput' />} />
         );
     }
 
@@ -399,7 +402,7 @@ export default class ComponentHistory extends React.Component {
                         <Link style={{textDecoration: 'none'}} to={window.contextPath}>
                             <Button style={styles.navBtn}>
                                 <HomeButton style={{paddingRight: 8, color: '#BDBDBD'}}/>
-                                Overview >
+                                <FormattedMessage id='overview' defaultMessage='Overview' />>
                             </Button>
                         </Link>
                         <Link style={{textDecoration: 'none'}} to={window.contextPath + '/worker/' +
@@ -418,25 +421,25 @@ export default class ComponentHistory extends React.Component {
                         <Typography style={styles.navBtnActive}>{this.props.match.params.componentId}</Typography>
                     </div>
                     <Typography variant="title" style={styles.titleStyle}>
-                        {this.props.match.params.componentId} Metrics
+                        {this.props.match.params.componentId} <FormattedMessage id='metrics' defaultMessage='Metrics' />
                     </Typography>
                     <Toolbar style={toolBar}>
                         <ToolbarGroup firstChild={true}>
-                            <RaisedButton label="Last 5 Minutes" backgroundColor={this.setColor('5min')}
-                                          onClick={() => this.handleChange("5min")}
-                                          style={styles.button}/>
-                            <RaisedButton label="Last 1 Hour" backgroundColor={this.setColor('1hr')}
-                                          onClick={() => this.handleChange("1hr")}
-                                          style={styles.button}/>
-                            <RaisedButton label="Last 6 Hours" backgroundColor={this.setColor('6hr')}
-                                          onClick={() => this.handleChange("6hr")}
-                                          style={styles.button}/>
-                            <RaisedButton label="Last Day" backgroundColor={this.setColor('24hr')}
-                                          onClick={() => this.handleChange("24hr")}
-                                          style={styles.button}/>
-                            <RaisedButton label="Last Week" backgroundColor={this.setColor('1wk')}
-                                          onClick={() => this.handleChange("1wk")}
-                                          style={styles.button}/>
+                            <RaisedButton label={<FormattedMessage id='5Minutes' defaultMessage='Last 5 Minutes' />} backgroundColor={this.setColor('5min')}
+                                onClick={() => this.handleChange("5min")}
+                                style={styles.button} />
+                            <RaisedButton label={<FormattedMessage id='1Hour' defaultMessage='Last 1 Hour' />} backgroundColor={this.setColor('1hr')}
+                                onClick={() => this.handleChange("1hr")}
+                                style={styles.button} />
+                            <RaisedButton label={<FormattedMessage id='6Hour' defaultMessage='Last 6 Hours' />} backgroundColor={this.setColor('6hr')}
+                                onClick={() => this.handleChange("6hr")}
+                                style={styles.button} />
+                            <RaisedButton label={<FormattedMessage id='lastDay' defaultMessage='Last Day' />} backgroundColor={this.setColor('24hr')}
+                                onClick={() => this.handleChange("24hr")}
+                                style={styles.button} />
+                            <RaisedButton label={<FormattedMessage id='lastWeek' defaultMessage='Last Week' />} backgroundColor={this.setColor('1wk')}
+                                onClick={() => this.handleChange("1wk")}
+                                style={styles.button} />
                         </ToolbarGroup>
                     </Toolbar>
                     {this.renderCharts()}
@@ -446,4 +449,8 @@ export default class ComponentHistory extends React.Component {
             return <Error403/>;
         }
     }
+}
+
+ComponentHistory.contextTypes = {
+    intl: PropTypes.object.isRequired
 }
