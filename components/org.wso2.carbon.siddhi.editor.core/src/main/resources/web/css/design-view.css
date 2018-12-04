@@ -795,10 +795,6 @@ a.list-group-item, button.list-group-item {
 	margin-left:20px;
 }
 
-.window-form-container {
-	margin-left: 22px;
-}
-
 .design-view-form-content .cust-option-value {
 	margin-left: 10px;
 }
@@ -819,7 +815,7 @@ a.list-group-item, button.list-group-item {
 }
 
 .window-form-container {
-	width: 30%;
+	width: 25%;
 }
 
 .window-form-container #defineFunctionName,

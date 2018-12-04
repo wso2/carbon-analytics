@@ -16,8 +16,9 @@
  * under the License.
  */
 
-define(['require', 'log', 'jquery', 'lodash', 'attribute', 'designViewUtils', 'handlebar'],
-    function (require, log, $, _, Attribute, DesignViewUtils, Handlebars) {
+define(['require', 'log', 'jquery', 'lodash', 'attribute', 'designViewUtils', 'handlebar', 'annotationObject',
+    'annotationElement'],
+    function (require, log, $, _, Attribute, DesignViewUtils, Handlebars, AnnotationObject, AnnotationElement) {
 
         /**
          * @class WindowForm Creates a forms to collect data from a window
@@ -528,6 +529,180 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'designViewUtils', 'h
         };
 
         /**
+        * Function to initialize the jstree
+        * Function to add the event listeners for the jstree -div
+        */
+        var loadAnnotation = function () {
+            //initialise jstree
+            $("#annotation-div").jstree({
+                "core": {
+                    "check_callback": true
+                },
+                "themes": {
+                    "theme": "default",
+                    "url": "editor/commons/lib/js-tree-v3.3.2/themes/default/style.css"
+                },
+                "checkbox": {
+                    "three_state": false,
+                    "whole_node": false,
+                    "tie_selection": false
+                },
+                "plugins": ["themes", "checkbox"]
+            });
+
+            var tree = $('#annotation-div').jstree(true);
+
+            //to add key-value for annotation node
+            $("#btn-add-key-val").on("click", function () {
+                var selectedNode = $("#annotation-div").jstree("get_selected");
+                tree.create_node(selectedNode,
+                    {
+                        text: "property", class: "annotation-key", state: { "opened": true },
+                        "a_attr": { "class": "annotation-key" }, icon: "/editor/commons/images/properties.png",
+                        children: [{
+                            text: "value", class: "annotation-value", "a_attr": { "class": "annotation-value" },
+                            icon: "/editor/commons/images/value.png"
+                        }]
+                    }
+                );
+                tree.open_node(selectedNode);
+                tree.deselect_all();
+            });
+
+            //to add annotation node
+            $("#btn-add-annotation").on("click", function () {
+                var selectedNode = $("#annotation-div").jstree("get_selected");
+                if (selectedNode == "") {
+                    selectedNode = "#"
+                }
+                tree.create_node(selectedNode, {
+                    text: "Annotation", class: "annotation", state: { "opened": true },
+                    "a_attr": { "class": "annotation" }, icon: "/editor/commons/images/annotation.png",
+                    children: [{
+                        text: "property", class: "annotation-key", icon: "/editor/commons/images/properties.png",
+                        "a_attr": { "class": "annotation-key" },
+                        children: [{
+                            text: "value", class: "annotation-value", "a_attr": { "class": "annotation-value" },
+                            icon: "/editor/commons/images/value.png"
+                        }]
+                    }]
+
+                });
+                tree.open_node(selectedNode);
+                tree.deselect_all();
+            });
+
+            //to delete an annotation or a key-value node
+            $("#btn-del-annotation").on("click", function () {
+                var selectedNode = $("#annotation-div").jstree("get_selected");
+                tree.delete_node([selectedNode]);
+                tree.deselect_all();
+            })
+
+            //to edit the selected node
+            //to hide/show the buttons corresponding to the node selected
+            $('#annotation-div').on("select_node.jstree", function (e, data) {
+                var node_info = $('#annotation-div').jstree("get_node", data.node)
+                if ((node_info.original != undefined && (node_info.original.class == "annotation")) ||
+                    (node_info.li_attr != undefined && (node_info.li_attr.class == "annotation"))) {
+                    tree.edit(data.node)
+                    $("#btn-del-annotation").show();
+                    $("#btn-add-annotation").show();
+                    $("#btn-add-key-val").show();
+
+                } else if ((node_info.original != undefined && (node_info.original.class == "annotation-key")) ||
+                    (node_info.li_attr != undefined && (node_info.li_attr.class == "annotation-key"))) {
+                    tree.edit(data.node);
+                    $("#btn-del-annotation").show();
+                    $("#btn-add-annotation").hide();
+                    $("#btn-add-key-val").hide();
+
+                } else if ((node_info.original != undefined && (node_info.original.class == "annotation-value")) ||
+                    (node_info.li_attr != undefined && (node_info.li_attr.class == "annotation-value"))) {
+                    $("#btn-del-annotation").hide();
+                    $("#btn-add-annotation").hide();
+                    $("#btn-add-key-val").hide();
+                    tree.edit(data.node);
+                }
+            });
+
+            //to unselect the nodes when user clicks other than the nodes in jstree
+            $(document).on('click', function (e) {
+                if ($(e.target).closest('.jstree').length) {
+                    $("#btn-del-annotation").hide();
+                    $("#btn-add-annotation").show();
+                    $("#btn-add-key-val").hide();
+                    tree.deselect_all();
+                }
+            });
+        };
+
+        /**
+        * Function to build the annotations as a string
+        * Function to create the annotation objects
+        * @param {Object} annotationStringList array to add the built annotation strings
+        * @param {Object} annotationObjectList array to add the created annotation objects
+        */
+        var annotation = "";
+        var buildAnnotation = function (annotationStringList, annotationObjectList) {
+            var jsTreeNodes = $('#annotation-div').jstree(true)._model.data['#'].children;
+            _.forEach(jsTreeNodes, function (node) {
+                var node_info = $('#annotation-div').jstree("get_node", node);
+                var childArray = node_info.children
+                if (childArray.length != 0) {
+                    annotation += "@" + node_info.text.trim() + "( "
+                    //create annotation object
+                    var annotationObject = new AnnotationObject();
+                    annotationObject.setName(node_info.text.trim())
+                    traverseChildAnnotations(childArray, annotationObject)
+                    annotation = annotation.substring(0, annotation.length - 1);
+                    annotation += ")"
+                    annotationObjectList.push(annotationObject)
+                    annotationStringList.push(annotation);
+                    annotation = "";
+                }
+            });
+        };
+
+        /**
+         * Function to traverse the children of the parent annotaions
+         * @param {Object} children the children of a parent annotation node
+         * @param {Object} annotationObject the parent's annotation object
+         */
+        var traverseChildAnnotations = function (children, annotationObject) {
+            children.forEach(function (node) {
+                node_info = $('#annotation-div').jstree("get_node", node);
+                //if the child is a sub annotation
+                if ((node_info.original != undefined && node_info.original.class == "annotation") ||
+                    (node_info.li_attr != undefined && (node_info.li_attr.class == "annotation" ||
+                        node_info.li_attr.class == "optional-annotation" || node_info.li_attr.class ==
+                        "mandatory-annotation"))) {
+                    if (node_info.children.length != 0) {
+                        annotation += "@" + node_info.text.trim() + "( "
+                        var childAnnotation = new AnnotationObject();
+                        childAnnotation.setName(node_info.text.trim())
+                        traverseChildAnnotations(node_info.children, childAnnotation)
+                        annotationObject.addAnnotation(childAnnotation)
+                        annotation = annotation.substring(0, annotation.length - 1);
+                        annotation += "),"
+                    }
+                } else {
+                    //if the child is a property
+                    if (node_info.li_attr.class != undefined && (node_info.li_attr.class == "optional-key")
+                        && node_info.state.checked == false) {
+                        //not to add the child property if it hasn't been checked(predefined optional-key only)
+                    } else {
+                        annotation += node_info.text.trim() + "="
+                        var node_value = $('#annotation-div').jstree("get_node", node_info.children[0]).text.trim();
+                        annotation += "'" + node_value + "' ,";
+                        var element = new AnnotationElement(node_info.text.trim(), node_value)
+                        annotationObject.addElement(element);
+                    }
+                }
+            });
+        };
+
+        /**
          * @function generate properties form for a window
          * @param element selected element(window)
          * @param formConsole Console which holds the form
@@ -693,12 +868,14 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'designViewUtils', 'h
                     return ($(this).val().toLowerCase() == (savedOutputEventType));
                 }).prop('selected', true);
 
-                //                var savedAnnotations = clickedElement.getAnnotationList();
-                //                var annotations = [];
-                //                _.forEach(savedAnnotations, function (savedAnnotation) {
-                //                    annotations.push({ annotation: savedAnnotation });
-                //                });
-                //                var functionName = clickedElement.getFunction();
+                var savedAnnotationObjects = clickedElement.getAnnotationListObjects();
+                //render the user defined annotations form template
+                var raw_partial = document.getElementById('recursiveAnnotationPartial').innerHTML;
+                Handlebars.registerPartial('recursiveAnnotation', raw_partial);
+                var annotationFormTemplate = Handlebars.compile($('#annotation-form-template').html());
+                var wrappedHtml = annotationFormTemplate(savedAnnotationObjects);
+                $('#define-annotation').html(wrappedHtml);
+                loadAnnotation();
             }
 
             $('#window-type').change(function () {
@@ -823,10 +1000,19 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'designViewUtils', 'h
                 var outputEventType = $('#defineOutputEvents #event-type').val().toUpperCase();
                 clickedElement.setOutputEventType(outputEventType);
 
-                // clickedElement.clearAnnotationList();
-                // _.forEach(config.annotations, function (annotation) {
-                //     clickedElement.addAnnotation(annotation.annotation);
-                // });
+                clickedElement.clearAnnotationList();
+                clickedElement.clearAnnotationListObjects();
+                var annotationStringList = [];
+                var annotationObjectList = [];
+
+                buildAnnotation(annotationStringList, annotationObjectList);
+
+                _.forEach(annotationStringList, function (annotation) {
+                    clickedElement.addAnnotation(annotation);
+                });
+                _.forEach(annotationObjectList, function (annotation) {
+                    clickedElement.addAnnotationObject(annotation);
+                });
 
                 self.designViewContainer.removeClass('disableContainer');
                 self.toggleViewButton.removeClass('disableContainer');
@@ -843,3 +1029,4 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'designViewUtils', 'h
 
         return WindowForm;
     });
+

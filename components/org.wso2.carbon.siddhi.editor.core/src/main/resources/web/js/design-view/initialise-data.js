@@ -212,6 +212,7 @@ define(['require', 'log', 'lodash', 'jquery', 'configurationData', 'appData', 'p
             _.forEach(windowList, function (window) {
                 var windowObject = new Window(window);
                 addAnnotationsForElement(window, windowObject);
+                addAnnotationObjectForElement(window, windowObject);
                 addAttributesForElement(window, windowObject);
                 windowObject.setId(newIdBeginningPhrase + windowObject.getId());
                 mainObject.addWindow(windowObject);
