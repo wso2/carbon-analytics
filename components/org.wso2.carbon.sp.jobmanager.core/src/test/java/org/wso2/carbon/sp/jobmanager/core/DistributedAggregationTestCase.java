@@ -776,7 +776,7 @@ public class DistributedAggregationTestCase {
      * If a siddhi query joins with an in-memory aggregation then that aggregation should be in the same
      * {@link SiddhiQueryGroup} where the query resides.
      */
-    @Test//(dependsOnMethods = "testInmemoryJoinPartitionParallelism")
+    @Test(dependsOnMethods = "testInmemoryJoinPartitionParallelism")
     public void testQueryJoinInmemoryAggregation() {
         String siddhiApp = "@App:name('TestPlan7')\n"
                 + "@source(type = 'http', receiver.url='http://localhost:8080/SweetProduction', @map(type"
@@ -1161,7 +1161,7 @@ public class DistributedAggregationTestCase {
     /**
      * Test the behavior when multiple queries joins with single aggregation.
      */
-    @Test
+    @Test(dependsOnMethods = "testMultipleInmemoryJoinsSingleGroup")
     public void testSingleAggregatioinMultipleQueryJoins() throws InterruptedException {
         String siddhiApp = "@App:name('TestPlan10')"
                 + "@App:description('Incremental aggregation distributed test cases.')\n"
@@ -1295,7 +1295,7 @@ public class DistributedAggregationTestCase {
     /**
      * Test the aggregation behaviour when multiple partitions joins with single aggregation.
      */
-    @Test
+    @Test(dependsOnMethods = "testSingleAggregatioinMultipleQueryJoins")
     public void testSingleAggregationMultiplePartitionJoins() throws InterruptedException {
         String siddhiApp = "@App:name('TestPlan11')\n"
                 + "@App:description('Incremental aggregation distributed test cases.')\n"
@@ -1432,7 +1432,7 @@ public class DistributedAggregationTestCase {
     /**
      * Test the behavior when multiple queries resides in a single partition join with distinct aggregations.
      */
-    @Test
+    @Test(dependsOnMethods = "testSingleAggregationMultiplePartitionJoins")
     public void testMultipleAggregationsSinglePartitionJoin() throws InterruptedException {
         String siddhiApp = "@App:name('TestPlan12')\n"
                 + "@App:description('Incremental aggregation distribution test cases.')\n"
