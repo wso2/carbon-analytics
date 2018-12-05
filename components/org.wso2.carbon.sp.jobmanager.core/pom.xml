@@ -282,6 +282,11 @@
             <groupId>org.wso2.extension.siddhi.io.jms</groupId>
             <artifactId>siddhi-io-jms</artifactId>
         </dependency>
+        <dependency>
+            <groupId>com.h2database</groupId>
+            <artifactId>h2</artifactId>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
     <build>
         <plugins>

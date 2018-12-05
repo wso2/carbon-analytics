@@ -19,6 +19,7 @@
 package org.wso2.carbon.sp.jobmanager.core.topology;
 
 import org.wso2.carbon.sp.jobmanager.core.util.EventHolder;
+import org.wso2.carbon.sp.jobmanager.core.util.SiddhiTopologyCreatorConstants;
 
 /**
  * Data Holder to hold required details of Input Streams in {@link SiddhiTopology}.
@@ -75,5 +76,9 @@ public class InputStreamDataHolder {
 
     public void setInnerGroupStream(boolean innerGroupStream) {
         isInnerGroupStream = innerGroupStream;
+    }
+
+    public boolean isUserGivenSource(){
+        return streamDefinition.toLowerCase().contains(SiddhiTopologyCreatorConstants.SOURCE_IDENTIFIER);
     }
 }
