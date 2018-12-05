@@ -460,7 +460,7 @@ define(['log', 'jquery', 'lodash', 'sourceOrSinkAnnotation', 'mapAnnotation', 'p
                             return false;
                         }
                     }
-                    option = optionName + " = '" + optionValue + "'";
+                    option = optionName + " = \"" + optionValue + "\"";
                     selectedOptions.push(option);
                 } else {
                     //constant error messages
@@ -481,7 +481,7 @@ define(['log', 'jquery', 'lodash', 'sourceOrSinkAnnotation', 'mapAnnotation', 'p
                                 return false;
                             }
                         }
-                        option = optionName + " = '" + optionValue + "'";
+                        option = optionName + " = \"" + optionValue + "\"";
                         selectedOptions.push(option);
                     }
                 }

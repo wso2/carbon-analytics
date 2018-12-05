@@ -154,9 +154,15 @@ public class SourceSinkCodeGenerator {
         StringBuilder mapperListAttributeStringBuilder = new StringBuilder();
         int valuesLeft = mapperListAttribute.getValue().size();
         for (String value : mapperListAttribute.getValue()) {
-            mapperListAttributeStringBuilder.append(SiddhiCodeBuilderConstants.DOUBLE_QUOTE)
-                    .append(value)
-                    .append(SiddhiCodeBuilderConstants.DOUBLE_QUOTE);
+            if (value.contains("\"")) {
+                mapperListAttributeStringBuilder.append(SiddhiCodeBuilderConstants.ESCAPE_SEQUENCE)
+                        .append(value)
+                        .append(SiddhiCodeBuilderConstants.ESCAPE_SEQUENCE);
+            } else {
+                mapperListAttributeStringBuilder.append(SiddhiCodeBuilderConstants.DOUBLE_QUOTE)
+                        .append(value)
+                        .append(SiddhiCodeBuilderConstants.DOUBLE_QUOTE);
+            }
             if (valuesLeft != 1) {
                 mapperListAttributeStringBuilder.append(SiddhiCodeBuilderConstants.COMMA);
             }
@@ -181,16 +187,22 @@ public class SourceSinkCodeGenerator {
         int mapEntriesLeft = mapperMapAttribute.getValue().size();
         for (Map.Entry<String, String> entry : mapperMapAttribute.getValue().entrySet()) {
             mapperMapAttributeStringBuilder.append(entry.getKey())
-                    .append(SiddhiCodeBuilderConstants.EQUAL)
-                    .append(SiddhiCodeBuilderConstants.SINGLE_QUOTE)
-                    .append(entry.getValue())
-                    .append(SiddhiCodeBuilderConstants.SINGLE_QUOTE);
+                    .append(SiddhiCodeBuilderConstants.EQUAL);
+            String value = entry.getValue();
+            if (value.contains("\"")) {
+                mapperMapAttributeStringBuilder.append(SiddhiCodeBuilderConstants.ESCAPE_SEQUENCE)
+                        .append(value)
+                        .append(SiddhiCodeBuilderConstants.ESCAPE_SEQUENCE);
+            } else {
+                mapperMapAttributeStringBuilder.append(SiddhiCodeBuilderConstants.DOUBLE_QUOTE)
+                        .append(value)
+                        .append(SiddhiCodeBuilderConstants.DOUBLE_QUOTE);
+            }
             if (mapEntriesLeft != 1) {
                 mapperMapAttributeStringBuilder.append(SiddhiCodeBuilderConstants.COMMA);
             }
             mapEntriesLeft--;
         }
-
         return mapperMapAttributeStringBuilder.toString();
     }
 
