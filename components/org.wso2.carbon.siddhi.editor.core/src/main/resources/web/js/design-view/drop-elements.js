@@ -70,7 +70,6 @@ define(['require', 'log', 'lodash', 'jquery', 'partition', 'stream', 'query', 'f
             if (isCodeToDesignMode) {
                 name = sourceName;
             } else {
-                name = i;
                 var sourceOptions = {};
                 _.set(sourceOptions, 'id', i);
                 _.set(sourceOptions, 'annotationType', 'SOURCE');
@@ -146,7 +145,6 @@ define(['require', 'log', 'lodash', 'jquery', 'partition', 'stream', 'query', 'f
             if (isCodeToDesignMode) {
                 name = sinkName;
             } else {
-                name = i;
                 var sinkOptions = {};
                 _.set(sinkOptions, 'id', i);
                 _.set(sinkOptions, 'annotationType', 'SINK');
@@ -232,7 +230,6 @@ define(['require', 'log', 'lodash', 'jquery', 'partition', 'stream', 'query', 'f
                 if (isGenerateStreamFromQueryOutput) {
                     name = streamName;
                 } else {
-                    name = i;
                     var streamOptions = {};
                     _.set(streamOptions, 'id', i);
                     _.set(streamOptions, 'name', undefined);
@@ -378,7 +375,6 @@ define(['require', 'log', 'lodash', 'jquery', 'partition', 'stream', 'query', 'f
             if (isCodeToDesignMode) {
                 name = tableName;
             } else {
-                name = i;
                 var tableOptions = {};
                 _.set(tableOptions, 'id', i);
                 _.set(tableOptions, 'name', undefined);
@@ -465,7 +461,6 @@ define(['require', 'log', 'lodash', 'jquery', 'partition', 'stream', 'query', 'f
             if (isCodeToDesignMode) {
                 name = windowName;
             } else {
-                name = i;
 				var windowOptions = {};
 				_.set(windowOptions, 'id', i);
 				_.set(windowOptions, 'name', undefined);
