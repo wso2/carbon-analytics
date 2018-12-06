@@ -31,6 +31,7 @@ import org.wso2.carbon.siddhi.store.api.rest.model.Record;
 import org.wso2.carbon.stream.processor.common.SiddhiAppRuntimeService;
 import org.wso2.siddhi.core.SiddhiAppRuntime;
 import org.wso2.siddhi.core.event.Event;
+import org.wso2.siddhi.query.api.definition.Attribute;
 
 import javax.ws.rs.core.Response;
 import java.util.ArrayList;
@@ -65,6 +66,9 @@ public class StoresApiServiceImpl extends StoresApiService {
             try {
                 Event[] events = siddhiAppRuntime.query(body.getQuery());
                 List<Record> records = getRecords(events);
+                if (body.isIncludeHeader()) {
+                    records.add(0, getHeaderRecord(siddhiAppRuntime.getStoreQueryOutputAttributes(body.getQuery())));
+                }
                 ModelApiResponse response = new ModelApiResponse();
                 response.setRecords(records);
                 return Response.ok().entity(response).build();
@@ -77,6 +81,16 @@ public class StoresApiServiceImpl extends StoresApiService {
                                                        "Cannot query: " + e.getMessage())).build();
             }
         }
+    }
+
+    private Record getHeaderRecord(Attribute[] attributes) {
+        List<String> attrNames = new ArrayList<>();
+        for (Attribute attribute : attributes) {
+            attrNames.add(attribute.getName());
+        }
+        Record record = new Record();
+        record.addAll(attrNames);
+        return record;
     }
 
     private List<Record> getRecords(Event[] events) {
