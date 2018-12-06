@@ -18,5 +18,9 @@
   -->
 
 <FindBugsFilter>
-
+    <Match>
+        <Class name="org.wso2.carbon.sp.jobmanager.core.topology.SiddhiTopologyCreatorImpl" />
+        <Method name="addAggregationDefinitionToQueryGroups" />
+        <Bug pattern="DMI_ENTRY_SETS_MAY_REUSE_ENTRY_OBJECTS" />
+    </Match>
 </FindBugsFilter>
