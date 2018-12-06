@@ -212,12 +212,12 @@ define(['require', 'log', 'jquery', 'lodash', 'designViewUtils'],
 		/**
          * @function Validates a given element
          * @param element element json
-         * @param type stream or table or window or trigger
+         * @param type stream or table or window or trigger or function
          * @param doNotShowErrorMessages If true error messages will not be shown as alerts. Only the validity will be
          * returned
          * @returns {boolean} validity of the json
          */
-        JSONValidator.prototype.validateStreamOrTableOrWindowOrTrigger = function (element, type,
+        JSONValidator.prototype.validateForElementName = function (element, type,
             doNotShowErrorMessages) {
             var errorMessage;
             if (!element.name) {

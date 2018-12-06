@@ -236,7 +236,7 @@ define(['require', 'log', 'lodash', 'jquery', 'partition', 'stream', 'query', 'f
                     var stream = new Stream(streamOptions);
                     self.configurationData.getSiddhiAppConfig().addStream(stream);
 
-                    JSONValidator.prototype.validateStreamOrTableOrWindowOrTrigger(stream, "Stream", true)
+                    JSONValidator.prototype.validateForElementName(stream, "Stream", true)
                 }
             }
             var node = $('<div>' + name + '</div>');
@@ -381,7 +381,7 @@ define(['require', 'log', 'lodash', 'jquery', 'partition', 'stream', 'query', 'f
                 var table = new Table(tableOptions);
                 self.configurationData.getSiddhiAppConfig().addTable(table);
 
-                JSONValidator.prototype.validateStreamOrTableOrWindowOrTrigger(table, "Table", true)
+                JSONValidator.prototype.validateForElementName(table, "Table", true)
             }
             var node = $('<div>' + name + '</div>');
             newAgent.append(node);
@@ -467,7 +467,7 @@ define(['require', 'log', 'lodash', 'jquery', 'partition', 'stream', 'query', 'f
                 var window = new Window(windowOptions);
                 self.configurationData.getSiddhiAppConfig().addWindow(window);
 
-                JSONValidator.prototype.validateStreamOrTableOrWindowOrTrigger(window, "Window", true)
+                JSONValidator.prototype.validateForElementName(window, "Window", true)
             }
             var node = $('<div>' + name + '</div>');
             newAgent.append(node);
@@ -553,7 +553,7 @@ define(['require', 'log', 'lodash', 'jquery', 'partition', 'stream', 'query', 'f
                 var trigger = new Trigger(triggerOptions);
                 self.configurationData.getSiddhiAppConfig().addTrigger(trigger);
 
-                JSONValidator.prototype.validateStreamOrTableOrWindowOrTrigger(trigger, "Trigger", true)
+                JSONValidator.prototype.validateForElementName(trigger, "Trigger", true)
             }
             var node = $('<div>' + name + '</div>');
             newAgent.append(node);
