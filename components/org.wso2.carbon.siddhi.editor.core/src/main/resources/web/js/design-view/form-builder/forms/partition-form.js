@@ -192,7 +192,6 @@ define(['require', 'log', 'jquery', 'lodash', 'partitionWith', 'designViewUtils'
                     });
 
                     $('#' + id).removeClass('incomplete-element');
-                    $('#' + id).prop('title', '');
 
                     // perform JSON validation
                     JSONValidator.prototype.validatePartition(partitionElement, self.jsPlumbInstance, true);
@@ -200,6 +199,26 @@ define(['require', 'log', 'jquery', 'lodash', 'partitionWith', 'designViewUtils'
                     // design view container and toggle view button are enabled
                     self.designViewContainer.removeClass('disableContainer');
                     self.toggleViewButton.removeClass('disableContainer');
+
+                    //Send SiddhiApp Config to the backend and get tooltip
+                    var sendingString = JSON.stringify(self.configurationData.siddhiAppConfig);
+                    var response = self.formUtils.getTooltips(sendingString);
+                    var tooltipList=[];
+                    if (response.status === "success") {
+                        tooltipList = response.tooltipList;
+                    } else {
+                        console.log(response.errorMessage);
+                    }
+
+                    var partitionToolTip = '';
+                    for (var i in tooltipList) {
+                        if (tooltipList[i].id === id) {
+                            partitionToolTip = tooltipList[i].text;
+                            break;
+                        }
+                    }
+
+                    $('#' + id).prop('title', partitionToolTip);
 
                     // close the form window
                     self.consoleListManager.removeFormConsole(formConsole);

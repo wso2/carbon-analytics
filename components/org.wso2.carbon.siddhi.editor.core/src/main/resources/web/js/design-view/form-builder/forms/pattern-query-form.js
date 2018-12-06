@@ -1148,13 +1148,32 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
                     }
 
                     $('#' + id).removeClass('incomplete-element');
-                    $('#' + id).prop('title', '');
 
                     // perform JSON validation
                     JSONValidator.prototype.validatePatternOrSequenceQuery(clickedElement, 'Pattern Query');
 
                     self.designViewContainer.removeClass('disableContainer');
                     self.toggleViewButton.removeClass('disableContainer');
+
+                    //Send SiddhiApp Config to the backend and get tooltip
+                    var sendingString = JSON.stringify(self.configurationData.siddhiAppConfig);
+                    var response = self.formUtils.getTooltips(sendingString);
+                    var tooltipList=[];
+                    if (response.status === "success") {
+                        tooltipList = response.tooltipList;
+                    } else {
+                        console.log(response.errorMessage);
+                    }
+
+                    var queryToolTip = '';
+                    for (var i in tooltipList) {
+                        if (tooltipList[i].id === id) {
+                            queryToolTip = tooltipList[i].text;
+                            break;
+                        }
+                    }
+
+                    $('#' + id).prop('title', queryToolTip);
 
                     // close the form window
                     self.consoleListManager.removeFormConsole(formConsole);

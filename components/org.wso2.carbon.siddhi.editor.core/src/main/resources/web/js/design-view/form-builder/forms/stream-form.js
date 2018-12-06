@@ -647,12 +647,31 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'stream', 'designView
 
                 var textNode = $('#' + id).find('.streamNameNode');
                 textNode.html(streamName);
-
                 $('#' + id).removeClass('incomplete-element');
-                $('#' + id).prop('title', '');
 
                 self.designViewContainer.removeClass('disableContainer');
                 self.toggleViewButton.removeClass('disableContainer');
+
+                //Send SiddhiApp Config to the backend and get tooltip
+                var sendingString = JSON.stringify(self.configurationData.siddhiAppConfig);
+                var response = self.formUtils.getTooltips(sendingString);
+                var tooltipList=[];
+                if (response.status === "success") {
+                    tooltipList = response.tooltipList;
+                } else {
+                    console.log(response.errorMessage);
+                }
+
+                var streamToolTip = '';
+                for (var i in tooltipList) {
+                    if (tooltipList[i].id === id) {
+                        streamToolTip = tooltipList[i].text;
+                        break;
+                    }
+                }
+
+                $('#' + id).prop('title', streamToolTip);
+
                 // close the form window
                 self.consoleListManager.removeFormConsole(formConsole);
 

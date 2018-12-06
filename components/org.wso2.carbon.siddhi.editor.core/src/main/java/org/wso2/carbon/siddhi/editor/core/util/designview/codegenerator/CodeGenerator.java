@@ -19,6 +19,7 @@
 package org.wso2.carbon.siddhi.editor.core.util.designview.codegenerator;
 
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.EventFlow;
+import org.wso2.carbon.siddhi.editor.core.util.designview.beans.ToolTip;
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.SiddhiAppConfig;
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.FunctionConfig;
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.StreamConfig;
@@ -30,34 +31,26 @@ import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhiel
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.query.QueryConfig;
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.sourcesink.SourceSinkConfig;
 import org.wso2.carbon.siddhi.editor.core.util.designview.codegenerator.elements.ExecutionElementConfig;
-import org.wso2.carbon.siddhi.editor.core.util.designview.codegenerator.generators.AggregationCodeGenerator;
-import org.wso2.carbon.siddhi.editor.core.util.designview.codegenerator.generators.FunctionCodeGenerator;
-import org.wso2.carbon.siddhi.editor.core.util.designview.codegenerator.generators.PartitionCodeGenerator;
-import org.wso2.carbon.siddhi.editor.core.util.designview.codegenerator.generators.SourceSinkCodeGenerator;
-import org.wso2.carbon.siddhi.editor.core.util.designview.codegenerator.generators.StreamCodeGenerator;
-import org.wso2.carbon.siddhi.editor.core.util.designview.codegenerator.generators.SubElementCodeGenerator;
-import org.wso2.carbon.siddhi.editor.core.util.designview.codegenerator.generators.TableCodeGenerator;
-import org.wso2.carbon.siddhi.editor.core.util.designview.codegenerator.generators.TriggerCodeGenerator;
-import org.wso2.carbon.siddhi.editor.core.util.designview.codegenerator.generators.WindowCodeGenerator;
+import org.wso2.carbon.siddhi.editor.core.util.designview.codegenerator.generators.*;
 import org.wso2.carbon.siddhi.editor.core.util.designview.codegenerator.generators.query.QueryCodeGenerator;
+import org.wso2.carbon.siddhi.editor.core.util.designview.codegenerator.generators.query.QueryToolTipGenerator;
 import org.wso2.carbon.siddhi.editor.core.util.designview.constants.CodeGeneratorConstants;
 import org.wso2.carbon.siddhi.editor.core.util.designview.constants.SiddhiCodeBuilderConstants;
 import org.wso2.carbon.siddhi.editor.core.util.designview.constants.query.QueryListType;
 import org.wso2.carbon.siddhi.editor.core.util.designview.exceptions.CodeGenerationException;
 import org.wso2.carbon.siddhi.editor.core.util.designview.utilities.CodeGeneratorUtils;
-
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
 /**
- * Generate's the code for a Siddhi application
+ * Generates the code for a Siddhi application
  */
 public class CodeGenerator {
 
     /**
-     * Generate's the Siddhi app code as a string of a given EventFlow object
+     * Generates the Siddhi app code as a string of a given EventFlow object
      *
      * @param eventFlow The EventFlow object
      * @return The Siddhi application code as a string of the given EventFlow object
@@ -98,7 +91,48 @@ public class CodeGenerator {
     }
 
     /**
-     * Generate's the Siddhi code representation of a Siddhi app's app name
+     * Generates list of tooltips for a given SiddhiAppconfig object
+     *
+     * @param siddhiAppConfig
+     * @return
+     * @throws CodeGenerationException
+     */
+    public List<ToolTip> generateSiddhiAppToolTips(SiddhiAppConfig siddhiAppConfig) throws CodeGenerationException {
+        SiddhiAppConfig siddhiApp = siddhiAppConfig;
+
+        List<QueryConfig> queries = new ArrayList<>();
+        for (List<QueryConfig> queryList : siddhiApp.getQueryLists().values()) {
+            queries.addAll(queryList);
+        }
+        for (PartitionConfig partition : siddhiApp.getPartitionList()) {
+            for (List<QueryConfig> queryList : partition.getQueryLists().values()) {
+                queries.addAll(queryList);
+            }
+        }
+        List<StreamConfig> streamsToBeGenerated = CodeGeneratorUtils.getStreamsToBeGenerated(siddhiApp.getStreamList(),
+                siddhiApp.getSourceList(), siddhiApp.getSinkList(), queries);
+        List<String> definitionsToBeGenerated = CodeGeneratorUtils.getDefinitionNames(streamsToBeGenerated,
+                siddhiApp.getTableList(), siddhiApp.getWindowList(), siddhiApp.getTriggerList(),
+                siddhiApp.getAggregationList(), siddhiApp.getPartitionList());
+        List<String> allDefinitions = CodeGeneratorUtils.getDefinitionNames(siddhiApp.getStreamList(),
+                siddhiApp.getTableList(), siddhiApp.getWindowList(), siddhiApp.getTriggerList(),
+                siddhiApp.getAggregationList(), siddhiApp.getPartitionList());
+
+        List <ToolTip> toolTipList = new ArrayList<>();
+        toolTipList.addAll(generateStreamSinkSourceToolTips(streamsToBeGenerated, siddhiApp.getSourceList(),
+                siddhiApp.getSinkList()));
+        toolTipList.addAll(generateTableTooltips(siddhiApp.getTableList()));
+        toolTipList.addAll(generateWindowToolTipList(siddhiApp.getWindowList()));
+        toolTipList.addAll(generateTriggerToolTip(siddhiApp.getTriggerList()));
+        toolTipList.addAll(generateAggregationToolTips(siddhiApp.getAggregationList()));
+        toolTipList.addAll(generateFunctionToolTips(siddhiApp.getFunctionList()));
+        toolTipList.addAll(generateExcecutionElementTooltips(siddhiApp.getQueryLists(), siddhiApp.getPartitionList(),
+                definitionsToBeGenerated, allDefinitions));
+
+        return toolTipList;
+    }
+    /**
+     * Generates the Siddhi code representation of a Siddhi app's app name
      *
      * @param appName The Siddhi app's app name
      * @return The Siddhi code representation of a Siddhi app name annotation
@@ -119,7 +153,7 @@ public class CodeGenerator {
     }
 
     /**
-     * Generate's the Siddhi code representation of a Siddhi app's app description
+     * Generates the Siddhi code representation of a Siddhi app's app description
      *
      * @param appDescription The Siddhi app's app description
      * @return The Siddhi code representation of a Siddhi app description annotation
@@ -140,7 +174,7 @@ public class CodeGenerator {
     }
 
     /**
-     * Generate's the Siddhi code representation of a Siddhi app's stream definitions
+     * Generates the Siddhi code representation of a Siddhi app's stream definitions
      *
      * @param streamList The list of streams to be defined in a Siddhi app
      * @param sourceList The list of source annotations in a Siddhi app
@@ -184,9 +218,53 @@ public class CodeGenerator {
     }
 
     /**
-     * Generate's the Siddhi code representation of a Siddhi app's table definitions
+     * Generates tooltips for sources, sinks, streams in a siddhi app
      *
-     * @param tableList The list of tables to be defined in a Siddhi app
+     * @param streamList The list of streams in a Siddhi app
+     * @param sourceList The list of source annotations in a Siddhi app
+     * @param sinkList   The list of sink annotations in a Siddhi app
+     * @return List of tooltips for streams, sources and sinks
+     * @throws CodeGenerationException Error while generating the code
+     */
+    private List<ToolTip> generateStreamSinkSourceToolTips (List<StreamConfig> streamList,
+                                                            List<SourceSinkConfig> sourceList,
+                                                            List<SourceSinkConfig> sinkList)
+            throws CodeGenerationException {
+        List<ToolTip> streamSourceSinkToolTipList = new ArrayList<>();
+
+        if (streamList == null || streamList.isEmpty()) {
+            return streamSourceSinkToolTipList;
+        }
+        List<SourceSinkConfig> sourcesAndSinks = new LinkedList<>();
+        sourcesAndSinks.addAll(sourceList);
+        sourcesAndSinks.addAll(sinkList);
+
+        StreamToolTipGenerator streamToolTipGenerator = new StreamToolTipGenerator();
+        SourceSinkToolTipGenerator sourceSinkToolTipGenerator = new SourceSinkToolTipGenerator();
+
+        for (StreamConfig stream : streamList) {
+            CodeGeneratorUtils.NullValidator.validateConfigObject(stream);
+            if (stream.getPartitionId() != null && !stream.getPartitionId().isEmpty()) {
+                continue;
+            }
+
+            for (SourceSinkConfig sourceSink : sourcesAndSinks) {
+                if (stream.getName().equals(sourceSink.getConnectedElementName())) {
+                    streamSourceSinkToolTipList.add(new ToolTip(sourceSink.getId(),
+                            sourceSinkToolTipGenerator.generateSourceSink(sourceSink)));
+                }
+            }
+            streamSourceSinkToolTipList.add(new ToolTip(stream.getId(), streamToolTipGenerator.generateStream(stream)));
+        }
+
+        return streamSourceSinkToolTipList;
+    }
+
+
+    /**
+     * Generates the Siddhi code representation of a Siddhi app's table definitions
+     *
+     * @param tableList The list of tables defined in a Siddhi app
      * @return The Siddhi code representation of all the tables in a Siddhi app
      * @throws CodeGenerationException Error while generating the code
      */
@@ -209,7 +287,27 @@ public class CodeGenerator {
     }
 
     /**
-     * Generate's the Siddhi code representation of a Siddhi app's window definitions
+     * Generates tooltips for tables in a siddhi app
+     *
+     * @param tableList The list of tables to be defined in a Siddhi app
+     * @return List of tooltips for tables
+     * @throws CodeGenerationException Error while generating the code
+     */
+    private List<ToolTip> generateTableTooltips(List<TableConfig> tableList) throws CodeGenerationException {
+        List <ToolTip> tableTooltipList = new ArrayList<>();
+        if (tableList == null || tableList.isEmpty()) {
+            return tableTooltipList;
+        }
+        TableToolTipGenerator tableToolTipGenerator = new TableToolTipGenerator();
+        for (TableConfig table : tableList) {
+            tableTooltipList.add(new ToolTip(table.getId(),tableToolTipGenerator.generateTable(table)));
+        }
+
+        return tableTooltipList;
+    }
+
+    /**
+     * Generates the Siddhi code representation of a Siddhi app's window definitions
      *
      * @param windowList The list of windows to be defined in a Siddhi app
      * @return The Siddhi code representation of all the windows in a Siddhi app
@@ -234,7 +332,28 @@ public class CodeGenerator {
     }
 
     /**
-     * Generate's the Siddhi code representation of a Siddhi app's trigger definitions
+     * Generates tooltips for windows in a siddhi app
+     *
+     * @param windowList The list of windows defined in a Siddhi app
+     * @return List of tooltips for windows
+     * @throws CodeGenerationException Error while generating the code
+     */
+    private List <ToolTip> generateWindowToolTipList (List<WindowConfig> windowList) throws CodeGenerationException {
+        List <ToolTip> windowToolTipList = new ArrayList<>();
+        if (windowList == null || windowList.isEmpty()) {
+            return windowToolTipList;
+        }
+
+        WindowToolTipGenerator windowToolTipGenerator = new WindowToolTipGenerator();
+        for (WindowConfig window : windowList) {
+            windowToolTipList.add(new ToolTip(window.getId(), windowToolTipGenerator.generateWindow(window)));
+        }
+
+        return windowToolTipList;
+    }
+
+    /**
+     * Generates the Siddhi code representation of a Siddhi app's trigger definitions
      *
      * @param triggerList The list of triggers to be defined in a Siddhi app
      * @return The Siddhi code representation of all the triggers in a Siddhi app
@@ -259,7 +378,28 @@ public class CodeGenerator {
     }
 
     /**
-     * Generate's the Siddhi code representation of a Siddhi app's aggregation definitions
+     * Generates list of tooltips for triggers
+     *
+     * @param triggerList The list of triggers defined in a Siddhi app
+     * @return List of tooltips for triggers
+     * @throws CodeGenerationException Error while generating the code
+     */
+    private List<ToolTip> generateTriggerToolTip (List<TriggerConfig> triggerList) throws CodeGenerationException {
+        List <ToolTip> triggerToolTipList = new ArrayList<>();
+        if (triggerList == null || triggerList.isEmpty()) {
+            return triggerToolTipList;
+        }
+
+        TriggerToolTipGenerator triggerToolTipGenerator = new TriggerToolTipGenerator();
+        for (TriggerConfig trigger : triggerList) {
+            triggerToolTipList.add(new ToolTip(trigger.getId(), triggerToolTipGenerator.generateTrigger(trigger)));
+        }
+
+        return triggerToolTipList;
+    }
+
+    /**
+     * Generates the Siddhi code representation of a Siddhi app's aggregation definitions
      *
      * @param aggregationList The list of aggregations to be defined in a Siddhi app
      * @return The Siddhi code representation of all the aggregations in a Siddhi app
@@ -284,7 +424,30 @@ public class CodeGenerator {
     }
 
     /**
-     * Generate's the Siddhi code representation of a Siddhi app's function definitions
+     * Generates list of tooltips for aggregations
+     *
+     * @param aggregationList The list of aggregations defined in a Siddhi app
+     * @return List of tooltips for aggregations
+     * @throws CodeGenerationException Error while generating the code
+     */
+    private List<ToolTip> generateAggregationToolTips (List<AggregationConfig> aggregationList)
+            throws CodeGenerationException{
+        List <ToolTip> aggregationToolTipList = new ArrayList<>();
+        if (aggregationList == null || aggregationList.isEmpty()) {
+            return aggregationToolTipList;
+        }
+
+        AggregationToolTipGenerator aggregationToolTipGenerator = new AggregationToolTipGenerator();
+        for (AggregationConfig aggregation : aggregationList) {
+            aggregationToolTipList.add(new ToolTip(aggregation.getId(),
+                    aggregationToolTipGenerator.generateAggregation(aggregation)));
+        }
+
+        return aggregationToolTipList;
+    }
+
+    /**
+     * Generates the Siddhi code representation of a Siddhi app's function definitions
      *
      * @param functionList The list of functions to be defined in a Siddhi app
      * @return The Siddhi code representation of all the functions in a Siddhi app
@@ -309,7 +472,28 @@ public class CodeGenerator {
     }
 
     /**
-     * Generate's the Siddhi code representation of a Siddhi app's execution elements (queries and partitions)
+     * Generates list of tooltips for functions
+     *
+     * @param functionList The list of functions defined in a Siddhi app
+     * @return List of tooltips for functions
+     * @throws CodeGenerationException Error while generating the code
+     */
+    private List<ToolTip> generateFunctionToolTips(List<FunctionConfig> functionList) throws CodeGenerationException{
+        List <ToolTip> functionTooltipList = new ArrayList<>();
+        if (functionList == null || functionList.isEmpty()) {
+            return functionTooltipList;
+        }
+
+        FunctionToolTipGenerator functionToolTipGenerator = new FunctionToolTipGenerator();
+        for (FunctionConfig function : functionList) {
+            functionTooltipList.add(new ToolTip(function.getId(),functionToolTipGenerator.generateFunction(function) ));
+        }
+
+        return functionTooltipList;
+    }
+
+    /**
+     * Generates the Siddhi code representation of a Siddhi app's execution elements (queries and partitions)
      *
      * @param queryLists               The list of queries in a Siddhi app
      * @param partitions               The list of partitions in a Siddhi app
@@ -340,7 +524,8 @@ public class CodeGenerator {
                 executionElementStringBuilder.append(queryCodeGenerator.generateQuery(query));
             } else if (executionElement.getType().equalsIgnoreCase(CodeGeneratorConstants.PARTITION)) {
                 PartitionConfig partition = (PartitionConfig) executionElement.getValue();
-                executionElementStringBuilder.append(partitionCodeGenerator.generatePartition(partition, allDefinitions));
+                executionElementStringBuilder.append(partitionCodeGenerator.generatePartition(partition,
+                        allDefinitions));
             } else {
                 throw new CodeGenerationException("Unidentified ExecutionElement type: " + executionElement.getType());
             }
@@ -348,6 +533,51 @@ public class CodeGenerator {
         }
 
         return executionElementStringBuilder.toString();
+    }
+
+    /**
+     * Generates list of tooltips for execution elements (queries and partitions)
+     *
+     * @param queryLists               The list of queries in a Siddhi app
+     * @param partitions               The list of partitions in a Siddhi app
+     * @param definitionsToBeGenerated The names of all the definition elements that are to be defined in the app
+     * @param allDefinitions           The names of all the definition elements in the Siddhi app
+     * @return List of tooltips for  queries and partitions in a Siddhi app
+     * @throws CodeGenerationException Error while generating the code
+     */
+    private List<ToolTip> generateExcecutionElementTooltips(Map<QueryListType, List<QueryConfig>> queryLists,
+                                                            List<PartitionConfig> partitions,
+                                                            List<String> definitionsToBeGenerated,
+                                                            List<String> allDefinitions)
+            throws CodeGenerationException {
+        List <ToolTip> excecutionElementTooltipList = new ArrayList<>();
+
+        List<QueryConfig> queries = new LinkedList<>();
+        for (List<QueryConfig> queryList : queryLists.values()) {
+            queries.addAll(queryList);
+        }
+
+        List<ExecutionElementConfig> executionElements =
+                CodeGeneratorUtils.convertToExecutionElements(queries, partitions);
+        QueryToolTipGenerator queryToolTipGenerator = new QueryToolTipGenerator();
+        PartitionToolTipGenerator partitionToolTipGenerator = new PartitionToolTipGenerator();
+        for (ExecutionElementConfig executionElement :
+                CodeGeneratorUtils.reorderExecutionElements(executionElements, definitionsToBeGenerated)) {
+            if (executionElement.getType().equalsIgnoreCase(CodeGeneratorConstants.QUERY)) {
+                QueryConfig query = (QueryConfig) executionElement.getValue();
+                excecutionElementTooltipList.add(new ToolTip(query.getId(),
+                        queryToolTipGenerator.generateQuery(query)));
+            } else if (executionElement.getType().equalsIgnoreCase(CodeGeneratorConstants.PARTITION)) {
+                PartitionConfig partition = (PartitionConfig) executionElement.getValue();
+                excecutionElementTooltipList.add(new ToolTip(partition.getId(),
+                        partitionToolTipGenerator.generatePartition(partition, allDefinitions)));
+            } else {
+                throw new CodeGenerationException("Unidentified ExecutionElement type: " + executionElement.getType());
+            }
+
+        }
+
+        return excecutionElementTooltipList;
     }
 
 }

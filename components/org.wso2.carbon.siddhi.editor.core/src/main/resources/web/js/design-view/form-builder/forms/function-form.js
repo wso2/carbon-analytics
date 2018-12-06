@@ -144,7 +144,26 @@ define(['require', 'log', 'jquery', 'lodash', 'functionDefinition', 'designViewU
                 textNode.html(editor.getValue().name);
 
                 $('#' + i).removeClass('incomplete-element');
-                $('#' + i).prop('title', '');
+
+                //Send SiddhiApp Config to the backend and get tooltip
+                var sendingString = JSON.stringify(self.configurationData.siddhiAppConfig);
+                var response = self.formUtils.getTooltips(sendingString);
+                var tooltipList=[];
+                if (response.status === "success") {
+                    tooltipList = response.tooltipList;
+                } else {
+                    console.log(response.errorMessage);
+                }
+
+                var functionToolTip = '';
+                for (var x in tooltipList) {
+                    if (tooltipList[x].id === i) {
+                        functionToolTip = tooltipList[x].text;
+                        break;
+                    }
+                }
+
+                $('#' + i).prop('title', functionToolTip);
 
                 // close the form window
                 self.consoleListManager.removeFormConsole(formConsole);
@@ -242,6 +261,26 @@ define(['require', 'log', 'jquery', 'lodash', 'functionDefinition', 'designViewU
 
                 var textNode = $(element).parent().find('.functionNameNode');
                 textNode.html(config.name);
+
+                //Send SiddhiApp Config to the backend and get tooltip
+                var sendingString = JSON.stringify(self.configurationData.siddhiAppConfig);
+                var response = self.formUtils.getTooltips(sendingString);
+                var tooltipList=[];
+                if (response.status === "success") {
+                    tooltipList = response.tooltipList;
+                } else {
+                    console.log(response.errorMessage);
+                }
+
+                var functionToolTip = '';
+                for (var i in tooltipList) {
+                    if (tooltipList[i].id === id) {
+                        functionToolTip = tooltipList[i].text;
+                        break;
+                    }
+                }
+
+                $('#' + id).prop('title', functionToolTip);
 
                 // close the form window
                 self.consoleListManager.removeFormConsole(formConsole);

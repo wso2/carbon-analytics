@@ -769,13 +769,32 @@ define(['log', 'jquery', 'lodash', 'sourceOrSinkAnnotation', 'mapAnnotation', 'p
                     textNode.html(selectedSourceType);
 
                     $('#' + id).removeClass('incomplete-element');
-                    $('#' + id).prop('title', '');
 
                     // set the isDesignViewContentChanged to true
                     self.configurationData.setIsDesignViewContentChanged(true);
 
                     self.designViewContainer.removeClass('disableContainer');
                     self.toggleViewButton.removeClass('disableContainer');
+
+                    //Send SiddhiApp Config to the backend and get tooltip
+                    var sendingString = JSON.stringify(self.configurationData.siddhiAppConfig);
+                    var response = self.formUtils.getTooltips(sendingString);
+                    var tooltipList=[];
+                    if (response.status === "success") {
+                        tooltipList = response.tooltipList;
+                    } else {
+                        console.log(response.errorMessage);
+                    }
+
+                    var sourceToolTip = '';
+                    for (var i in tooltipList) {
+                        if (tooltipList[i].id === id) {
+                            sourceToolTip = tooltipList[i].text;
+                            break;
+                        }
+                    }
+
+                    $('#' + id).prop('title', sourceToolTip);
 
                     // close the form window
                     self.consoleListManager.removeFormConsole(formConsole);

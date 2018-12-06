@@ -212,5 +212,28 @@ define(['require', 'lodash'],
             });
         };
 
+        FormUtils.prototype.getTooltips = function (designViewJSON) {
+            var self = this;
+            var result = {};
+            self.tooltipsURL = window.location.protocol + "//" + window.location.host + "/editor/tooltips";
+            $.ajax({
+                type: "POST",
+                url: self.tooltipsURL,
+                data: window.btoa(designViewJSON),
+                async: false,
+                success: function (response) {
+                    result = {status: "success", tooltipList: response};
+                },
+                error: function (error) {
+                    if (error.responseText) {
+                        result = {status: "fail", errorMessage: error.responseText};
+                    } else {
+                        result = {status: "fail", errorMessage: "Error Occurred while processing your request"};
+                    }
+                }
+            });
+            return result;
+        };
+
         return FormUtils;
     });

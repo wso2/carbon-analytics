@@ -141,7 +141,26 @@ define(['require', 'log', 'jquery', 'lodash', 'trigger', 'designViewUtils'],
                 textNode.html(editor.getValue().name);
 
                 $('#' + i).removeClass('incomplete-element');
-                $('#' + i).prop('title', '');
+
+                //Send SiddhiApp Config to the backend and get tooltip
+                var sendingString = JSON.stringify(self.configurationData.siddhiAppConfig);
+                var response = self.formUtils.getTooltips(sendingString);
+                var tooltipList=[];
+                if (response.status === "success") {
+                    tooltipList = response.tooltipList;
+                } else {
+                    console.log(response.errorMessage);
+                }
+
+                var triggerToolTip = '';
+                for (var x in tooltipList) {
+                    if (tooltipList[x].id === i) {
+                        triggerToolTip = tooltipList[x].text;
+                        break;
+                    }
+                }
+
+                $('#' + i).prop('title', triggerToolTip);
 
                 // close the form window
                 self.consoleListManager.removeFormConsole(formConsole);
@@ -241,6 +260,26 @@ define(['require', 'log', 'jquery', 'lodash', 'trigger', 'designViewUtils'],
 
                 var textNode = $(element).parent().find('.triggerNameNode');
                 textNode.html(config.name);
+
+                //Send SiddhiApp Config to the backend and get tooltip
+                var sendingString = JSON.stringify(self.configurationData.siddhiAppConfig);
+                var response = self.formUtils.getTooltips(sendingString);
+                var tooltipList=[];
+                if (response.status === "success") {
+                    tooltipList = response.tooltipList;
+                } else {
+                    console.log(response.errorMessage);
+                }
+
+                var triggerToolTip = '';
+                for (var i in tooltipList) {
+                    if (tooltipList[i].id === id) {
+                        triggerToolTip = tooltipList[i].text;
+                        break;
+                    }
+                }
+
+                $('#' + id).prop('title', triggerToolTip);
 
                 // close the form window
                 self.consoleListManager.removeFormConsole(formConsole);

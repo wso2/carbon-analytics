@@ -156,7 +156,7 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'window', 'designView
                 '<div id="define-window" class="define-window"></div>');
             formContainer.append(propertyDiv);
             $('#' + i).addClass('selected-element');
-            $("#" + i).addClass('incomplete-element')
+            $("#" + i).addClass('incomplete-element');
             $(".overlayed-container").fadeTo(200, 1);
             // generate the form to define a window
             var editor = new JSONEditor($(formContainer).find('#define-window')[0], {
@@ -224,7 +224,26 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'window', 'designView
                 textNode.html(editor.getValue().name);
 
                 $('#' + i).removeClass('incomplete-element');
-                $('#' + i).prop('title', '');
+
+                //Send SiddhiApp Config to the backend and get tooltip
+                var sendingString = JSON.stringify(self.configurationData.siddhiAppConfig);
+                var response = self.formUtils.getTooltips(sendingString);
+                var tooltipList=[];
+                if (response.status === "success") {
+                    tooltipList = response.tooltipList;
+                } else {
+                    console.log(response.errorMessage);
+                }
+
+                var windowToolTip = '';
+                for (var x in tooltipList) {
+                    if (tooltipList[x].id === i) {
+                        windowToolTip = tooltipList[x].text;
+                        break;
+                    }
+                }
+
+                $('#' + i).prop('title', windowToolTip);
 
                 // close the form window
                 self.consoleListManager.removeFormConsole(formConsole);
@@ -381,6 +400,26 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'window', 'designView
 
                 var textNode = $(element).parent().find('.windowNameNode');
                 textNode.html(config.name);
+
+                //Send SiddhiApp Config to the backend and get tooltip
+                var sendingString = JSON.stringify(self.configurationData.siddhiAppConfig);
+                var response = self.formUtils.getTooltips(sendingString);
+                var tooltipList=[];
+                if (response.status === "success") {
+                    tooltipList = response.tooltipList;
+                } else {
+                    console.log(response.errorMessage);
+                }
+
+                var windowToolTip = '';
+                for (var i in tooltipList) {
+                    if (tooltipList[i].id === id) {
+                        windowToolTip = tooltipList[i].text;
+                        break;
+                    }
+                }
+
+                $('#' + id).prop('title', windowToolTip);
 
                 // close the form window
                 self.consoleListManager.removeFormConsole(formConsole);

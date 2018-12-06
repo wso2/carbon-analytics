@@ -968,7 +968,27 @@ define(['log', 'jquery', 'lodash', 'attribute', 'table', 'storeAnnotation', 'des
                 if ($('#' + id).hasClass('incomplete-element')) {
                     $('#' + id).removeClass('incomplete-element');
                 }
-                $('#' + id).prop('title', '');
+
+                //Send SiddhiApp Config to the backend and get tooltip
+                var sendingString = JSON.stringify(self.configurationData.siddhiAppConfig);
+                var response = self.formUtils.getTooltips(sendingString);
+                var tooltipList=[];
+                if (response.status === "success") {
+                    tooltipList = response.tooltipList;
+                } else {
+                    console.log(response.errorMessage);
+                }
+
+                var tableToolTip = '';
+                for (var i in tooltipList) {
+                    if (tooltipList[i].id === id) {
+                        tableToolTip = tooltipList[i].text;
+                        break;
+                    }
+                }
+
+                $('#' + id).prop('title', tableToolTip);
+
                 // close the form window
                 self.consoleListManager.removeFormConsole(formConsole);
 
