@@ -619,14 +619,11 @@ a.list-group-item, button.list-group-item {
 	border: 1px solid #FF0000;
 }
 
-#stream-form {
-	position:absolute;
-}
-
 .stream-form-container .error-message,
 .source-sink-form-container #attribute-map-content .error-message,
 .table-form-container #tableNameErrorMessage, .table-form-container #define-attribute .error-message,
-.window-form-container #windowNameErrorMessage, .window-form-container #define-attribute .error-message {
+.window-form-container #windowNameErrorMessage, .window-form-container #define-attribute .error-message,
+.trigger-form-container .error-message {
 	color: red;
 	padding-top: 3px;
 }
@@ -789,8 +786,6 @@ a.list-group-item, button.list-group-item {
 	color: #ccc;
 }
 
-
-
 .design-view-form-content .cust-option-key {
 	margin-left:20px;
 }
@@ -799,7 +794,8 @@ a.list-group-item, button.list-group-item {
 	margin-left: 10px;
 }
 
-.stream-form-container {
+.stream-form-container,
+.trigger-form-container {
 	float:left;
 	display:inline-block;
 	width:50%;
@@ -808,7 +804,8 @@ a.list-group-item, button.list-group-item {
 
 .source-sink-form-container,
 .table-form-container,
-.window-form-container {
+.window-form-container,
+.trigger-form-container {
 	float:left;
 	display:inline-block;
 	padding: 5px;
@@ -816,6 +813,14 @@ a.list-group-item, button.list-group-item {
 
 .window-form-container {
 	width: 25%;
+}
+
+.trigger-form-container {
+	width: 25%;
+}
+
+.trigger-form-container #define-trigger-at {
+	margin-bottom: 10px;
 }
 
 .window-form-container #defineFunctionName,

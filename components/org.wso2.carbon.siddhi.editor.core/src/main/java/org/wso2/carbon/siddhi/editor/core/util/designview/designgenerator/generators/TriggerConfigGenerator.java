@@ -48,11 +48,14 @@ public class TriggerConfigGenerator extends CodeSegmentsPreserver {
      */
     public TriggerConfig generateTriggerConfig(TriggerDefinition triggerDefinition) throws DesignGenerationException {
         String at = "";
+        String atOrAtEvery = "";
         if (triggerDefinition.getAtEvery() != null) {
             at = "every " + ConfigBuildingUtilities.getDefinition(triggerDefinition, siddhiAppString)
                     .split(EVERY_SPLIT_KEYWORD)[1];
+            atOrAtEvery = "atEvery";
         } else if (triggerDefinition.getAt() != null) {
             at = triggerDefinition.getAt();
+            atOrAtEvery = "at";
         }
         AnnotationConfigGenerator annotationConfigGenerator = new AnnotationConfigGenerator();
 
@@ -61,6 +64,7 @@ public class TriggerConfigGenerator extends CodeSegmentsPreserver {
                         triggerDefinition.getId(),
                         triggerDefinition.getId(),
                         at,
+                        atOrAtEvery,
                         annotationConfigGenerator
                                 .generateAnnotationConfigList(
                                         getTriggerStream(triggerDefinition.getId()).getAnnotations()));

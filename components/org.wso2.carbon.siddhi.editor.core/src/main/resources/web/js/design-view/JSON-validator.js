@@ -210,14 +210,15 @@ define(['require', 'log', 'jquery', 'lodash', 'designViewUtils'],
         };
 
 		/**
-         * @function Validates a given stream or a table annotation
+         * @function Validates a given element
          * @param element element json
-         * @param type stream or table
+         * @param type stream or table or window or trigger
          * @param doNotShowErrorMessages If true error messages will not be shown as alerts. Only the validity will be
          * returned
          * @returns {boolean} validity of the json
          */
-        JSONValidator.prototype.validateStreamOrTableOrWindow = function (element, type, doNotShowErrorMessages) {
+        JSONValidator.prototype.validateStreamOrTableOrWindowOrTrigger = function (element, type,
+            doNotShowErrorMessages) {
             var errorMessage;
             if (!element.name) {
                 errorMessage = type + ' form is incomplete'

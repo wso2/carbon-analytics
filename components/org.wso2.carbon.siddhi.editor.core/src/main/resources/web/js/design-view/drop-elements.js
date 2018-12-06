@@ -17,9 +17,9 @@
  */
 
 define(['require', 'log', 'lodash', 'jquery', 'partition', 'stream', 'query', 'formBuilder', 'aggregation',
-    'jsonValidator', 'sourceOrSinkAnnotation', 'stream', 'table', 'window'],
+    'jsonValidator', 'sourceOrSinkAnnotation', 'stream', 'table', 'window', 'trigger'],
     function (require, log, _, $, Partition, Stream, Query, FormBuilder, Aggregation, JSONValidator,
-        SourceOrSinkAnnotation, Stream, Table, Window) {
+        SourceOrSinkAnnotation, Stream, Table, Window, Trigger) {
 
         /**
          * @class DesignView
@@ -236,7 +236,7 @@ define(['require', 'log', 'lodash', 'jquery', 'partition', 'stream', 'query', 'f
                     var stream = new Stream(streamOptions);
                     self.configurationData.getSiddhiAppConfig().addStream(stream);
 
-                    JSONValidator.prototype.validateStreamOrTableOrWindow(stream, "Stream", true)
+                    JSONValidator.prototype.validateStreamOrTableOrWindowOrTrigger(stream, "Stream", true)
                 }
             }
             var node = $('<div>' + name + '</div>');
@@ -381,7 +381,7 @@ define(['require', 'log', 'lodash', 'jquery', 'partition', 'stream', 'query', 'f
                 var table = new Table(tableOptions);
                 self.configurationData.getSiddhiAppConfig().addTable(table);
 
-                JSONValidator.prototype.validateStreamOrTableOrWindow(table, "Table", true)
+                JSONValidator.prototype.validateStreamOrTableOrWindowOrTrigger(table, "Table", true)
             }
             var node = $('<div>' + name + '</div>');
             newAgent.append(node);
@@ -461,13 +461,13 @@ define(['require', 'log', 'lodash', 'jquery', 'partition', 'stream', 'query', 'f
             if (isCodeToDesignMode) {
                 name = windowName;
             } else {
-				var windowOptions = {};
-				_.set(windowOptions, 'id', i);
-				_.set(windowOptions, 'name', undefined);
-				var window = new Window(windowOptions);
-				self.configurationData.getSiddhiAppConfig().addWindow(window);
+                var windowOptions = {};
+                _.set(windowOptions, 'id', i);
+                _.set(windowOptions, 'name', undefined);
+                var window = new Window(windowOptions);
+                self.configurationData.getSiddhiAppConfig().addWindow(window);
 
-				JSONValidator.prototype.validateStreamOrTableOrWindow(window, "Window", true)
+                JSONValidator.prototype.validateStreamOrTableOrWindowOrTrigger(window, "Window", true)
             }
             var node = $('<div>' + name + '</div>');
             newAgent.append(node);
@@ -547,7 +547,13 @@ define(['require', 'log', 'lodash', 'jquery', 'partition', 'stream', 'query', 'f
             if (isCodeToDesignMode) {
                 name = triggerName;
             } else {
-                name = self.formBuilder.DefineTrigger(i);
+                var triggerOptions = {};
+                _.set(triggerOptions, 'id', i);
+                _.set(triggerOptions, 'name', undefined);
+                var trigger = new Trigger(triggerOptions);
+                self.configurationData.getSiddhiAppConfig().addTrigger(trigger);
+
+                JSONValidator.prototype.validateStreamOrTableOrWindowOrTrigger(trigger, "Trigger", true)
             }
             var node = $('<div>' + name + '</div>');
             newAgent.append(node);

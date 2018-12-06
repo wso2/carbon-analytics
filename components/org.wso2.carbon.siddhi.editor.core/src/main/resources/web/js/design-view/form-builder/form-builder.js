@@ -237,24 +237,6 @@ define(['require', 'log', 'jquery', 'lodash', 'formUtils', 'streamForm', 'tableF
         };
 
         /**
-         * @function generate the form to define the window once it is dropped on the canvas
-         * @param i id for the element
-         * @returns user given window name
-         */
-        FormBuilder.prototype.DefineWindow = function (i) {
-            var self = this;
-            var formConsole = this.createTabForForm(i, constants.WINDOW);
-            var formContainer = formConsole.getContentContainer();
-
-            var formOptions = {};
-            _.set(formOptions, 'configurationData', self.configurationData);
-            _.set(formOptions, 'application', self.application);
-            _.set(formOptions, 'formUtils', self.formUtils);
-            var windowForm = new WindowForm(formOptions);
-            return windowForm.generateDefineForm(i, formConsole, formContainer);
-        };
-
-        /**
          * @function generate the form for an existing window
          * @param element selected element(window)
          */
@@ -269,24 +251,6 @@ define(['require', 'log', 'jquery', 'lodash', 'formUtils', 'streamForm', 'tableF
             _.set(formOptions, 'formUtils', self.formUtils);
             var windowForm = new WindowForm(formOptions);
             windowForm.generatePropertiesForm(element, formConsole, formContainer);
-        };
-
-        /**
-         * @function generate the form to define the trigger once it is dropped on the canvas
-         * @param i id for the element
-         * @returns user given trigger name
-         */
-        FormBuilder.prototype.DefineTrigger = function (i) {
-            var self = this;
-            var formConsole = this.createTabForForm(i, constants.TRIGGER);
-            var formContainer = formConsole.getContentContainer();
-
-            var formOptions = {};
-            _.set(formOptions, 'configurationData', self.configurationData);
-            _.set(formOptions, 'application', self.application);
-            _.set(formOptions, 'formUtils', self.formUtils);
-            var triggerForm = new TriggerForm(formOptions);
-            return triggerForm.generateDefineForm(i, formConsole, formContainer);
         };
 
         /**
@@ -446,3 +410,4 @@ define(['require', 'log', 'jquery', 'lodash', 'formUtils', 'streamForm', 'tableF
 
         return FormBuilder;
     });
+

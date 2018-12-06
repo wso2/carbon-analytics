@@ -26,12 +26,14 @@ import java.util.List;
 public class TriggerConfig extends SiddhiElementConfig {
     private String name;
     private String at;
+    private String atOrAtEvery;
     private List<String> annotationList;
 
-    public TriggerConfig(String id, String name, String at, List<String> annotationList) {
+    public TriggerConfig(String id, String name, String at, String atOrAtEvery, List<String> annotationList) {
         super(id);
         this.name = name;
         this.at = at;
+        this.atOrAtEvery = atOrAtEvery;
         this.annotationList = annotationList;
     }
 
@@ -45,5 +47,9 @@ public class TriggerConfig extends SiddhiElementConfig {
 
     public List<String> getAnnotationList() {
         return annotationList;
+    }
+
+    public  String getAtOrAtEvery() {
+        return this.atOrAtEvery;
     }
 }

@@ -31,7 +31,8 @@ define(['require', 'elementUtils'],
                 id*: '',
                 previousCommentSegment:'',
                 name*: '',
-                at*: ‘’
+                at*: ‘’,
+                atEvery*: '',
                 annotationList: [annotation1, annotation2, ...]
             */
             if (options !== undefined) {
@@ -39,6 +40,7 @@ define(['require', 'elementUtils'],
                 this.previousCommentSegment = options.previousCommentSegment;
                 this.name = options.name;
                 this.at = options.at;
+                this.atOrAtEvery = options.atOrAtEvery;
             }
             this.annotationList = [];
         };
@@ -63,6 +65,10 @@ define(['require', 'elementUtils'],
             return this.at;
         };
 
+        Trigger.prototype.getAtOrAtEvery = function () {
+            return this.atOrAtEvery;
+        };
+
         Trigger.prototype.getAnnotationList = function () {
             return this.annotationList;
         };
@@ -77,6 +83,10 @@ define(['require', 'elementUtils'],
 
         Trigger.prototype.setAt = function (at) {
             this.at = at;
+        };
+
+        Trigger.prototype.setAtOrAtEvery = function (atOrAtEvery) {
+            this.atOrAtEvery = atOrAtEvery;
         };
 
         Trigger.prototype.setAnnotationList = function (annotationList) {
