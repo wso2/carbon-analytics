@@ -883,7 +883,7 @@ public class EditorMicroservice implements Microservice {
     @Path("/tooltips")
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     @Produces(MediaType.APPLICATION_JSON)
-    public Response getToolTips2(String encodedSiddhiAppConfigJson) {
+    public Response getToolTips(String encodedSiddhiAppConfigJson) {
         try {
             String siddhiAppConfigJson =
                     new String(Base64.getDecoder().decode(encodedSiddhiAppConfigJson), StandardCharsets.UTF_8);
