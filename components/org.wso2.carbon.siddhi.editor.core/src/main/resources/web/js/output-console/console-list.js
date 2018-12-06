@@ -255,6 +255,8 @@ define(['log', 'jquery', 'lodash', 'backbone', 'console'], function (log, $, _, 
                 _.remove(this._consoles, console);
                 console.getHeader().remove();
                 console.remove();
+                $('.selected-element').removeClass('selected-element');
+                $(".overlayed-container").fadeOut(200);
                 this.trigger("console-removed", console);
 
                 // setting the global console as the next active console

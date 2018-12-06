@@ -230,9 +230,10 @@ public class BusinessRulesApi implements Microservice {
                     response = Object.class, responseContainer = "List")})
     public Response redeployBusinessRule(@Context Request request,
                                          @ApiParam(value = "UUID of the business rule which needed to be re-deployed.",
-            required = true) @PathParam("businessRuleInstanceID") String businessRuleInstanceID)
+            required = true) @PathParam("businessRuleInstanceID") String businessRuleInstanceID,
+                                         @DefaultValue("false") @QueryParam("shouldUndeploy") Boolean shouldUndeploy)
             throws NotFoundException {
-        return delegate.redeployBusinessRule(request, businessRuleInstanceID);
+        return delegate.deployOrUndeployBusinessRule(request, businessRuleInstanceID, shouldUndeploy);
     }
 
     @PUT

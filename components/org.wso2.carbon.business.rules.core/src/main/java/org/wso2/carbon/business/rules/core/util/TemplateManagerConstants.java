@@ -35,7 +35,8 @@ public class TemplateManagerConstants {
     Pattern of Template names
     @App:name("SiddhiAppName")
     */
-    public static final String SIDDHI_APP_NAME_REGEX_PATTERN = "@(A|a)pp:name\\([\\\",\\\'](\\S+)[\\\",\\\']\\)";
+    public static final String SIDDHI_APP_NAME_REGEX_PATTERN =
+            "@(A|a)pp:name\\([\\\",\\']((\\S+)|(\\S+ *\\S+)*)[\\\",\\']\\)";
     // @App:name("SiddhiAppName")
     public static final String SIDDHI_APP_RULE_LOGIC_PATTERN = "(\\d{1,})";
     // Template / Artifact types
@@ -72,12 +73,15 @@ public class TemplateManagerConstants {
     public static final int DEPLOYMENT_FAILURE = 4;
     public static final int ERROR = 5;
 
+
     public static final int SIDDHI_APP_UNREACHABLE = -1;
     public static final int SIDDHI_APP_NOT_DEPLOYED = 0;
     public static final int SIDDHI_APP_DEPLOYED = 1;
 
     public static final int SUCCESSFULLY_DELETED = 6;
     public static final int SCRIPT_EXECUTION_ERROR = 7;
+    public static final int SUCCESSFULLY_UNDEPLOYED = 8;
+    public static final int UNDEPLOYMENT_FAILURE = 9;
 
     // Directory locations
     private static final String CARBON_RUNTIME = Utils.getRuntimePath().toString();

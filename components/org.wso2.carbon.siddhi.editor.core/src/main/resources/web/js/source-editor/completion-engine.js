@@ -281,6 +281,10 @@ define(["ace/ace", "jquery", "./constants", "./utils", "ace/snippets", "ace/rang
                 handler: ["stream", "table", "trigger", "function", "window", "aggregation"]
             },
             {
+                regex: "define\\s+stream\\s+[^\\s]*$",
+                handler: "$defineStream"
+            },
+            {
                 regex: "define\\s+(stream|table|window)\\s+" + regex.identifier + "\\s*\\((\\s*" +
                 regex.identifier + "\\s+(" + regex.dataTypes + ")\\s*,)*\\s*" +
                 regex.identifier + "\\s+[^\\s" +
@@ -864,6 +868,27 @@ define(["ace/ace", "jquery", "./constants", "./utils", "ace/snippets", "ace/rang
             self.$startOfStatement = function () {
                 addCompletions(["define", "from", "partition"].map(function (completion) {
                     return {value: completion + " "};
+                }));
+            };
+
+            /*
+            * Load completions for stream definition
+            */
+            self.$defineStream = function () {
+                addCompletions(Object.keys(self.streamsList).map(function (stream) {
+                    var attributesDefinition = "";
+                    for ( var attribute in self.streamsList[stream].attributes) {
+                        attributesDefinition += attribute + " ";
+                        attributesDefinition += self.streamsList[stream].attributes[attribute].toLowerCase() + ", ";
+                    }
+
+                    attributesDefinition = "(" + attributesDefinition.slice(0,attributesDefinition.length - 2) + ");";
+                    return {
+                        value: stream + attributesDefinition,
+                        type: constants.typeToDisplayNameMap[constants.STREAMS],
+                        description: self.streamsList[stream].description,
+                        priority: 6
+                    }
                 }));
             };
 
@@ -2886,7 +2911,9 @@ define(["ace/ace", "jquery", "./constants", "./utils", "ace/snippets", "ace/rang
         CompletionEngine.rawExtensions = {
             store: {},
             sink: {},
-            source: {}
+            source: {},
+            sourceMaps: {},
+            sinkMaps: {}
         };
 
         CompletionEngine.isDynamicExtensionsLoaded = false;
@@ -2950,6 +2977,9 @@ define(["ace/ace", "jquery", "./constants", "./utils", "ace/snippets", "ace/rang
                             CompletionEngine.rawExtensions.store = response.extensions["store"]["stores"];
                             CompletionEngine.rawExtensions.sink = response.extensions["sink"]["sinks"];
                             CompletionEngine.rawExtensions.source = response.extensions["source"]["sources"];
+                            CompletionEngine.rawExtensions.sourceMaps = response
+                            .extensions["sourceMapper"]["sourceMaps"];
+                            CompletionEngine.rawExtensions.sinkMaps = response.extensions["sinkMapper"]["sinkMaps"];
                             for (var namespace in response.extensions) {
                                 if (response.extensions.hasOwnProperty(namespace)) {
                                     var processors = {};

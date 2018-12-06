@@ -178,7 +178,7 @@ paths:
         - business-rules
       summary: Creates a business rule
       description: Redeploys the specified business rule instance.
-      operationId: redeployBusinessRule
+      operationId: deployOrUndeployBusinessRule
       consumes:
         - application/json
       parameters:

@@ -50,6 +50,14 @@ define(['require', 'log', 'lodash', 'jquery', 'tool_palette/tool-palette', 'desi
             this.jsPlumbInstance = jsPlumbInstance;
         };
 
+        DesignView.prototype.setRawExtensions = function (rawExtensions) {
+        	this.rawExtensions = rawExtensions;
+        }
+
+        DesignView.prototype.getRawExtensions = function () {
+        	return this.rawExtensions;
+        }
+
         /**
          * @function Renders tool palette in the design container
          */
@@ -82,6 +90,7 @@ define(['require', 'log', 'lodash', 'jquery', 'tool_palette/tool-palette', 'desi
         DesignView.prototype.renderDesignGrid = function (configurationJSON) {
             var self = this;
             var initialiseData = new InitialiseData(self._$parent_el, self.application);
+            initialiseData.setRawExtension(self.rawExtensions);
             this.configurationData = initialiseData.initialiseSiddhiAppData(configurationJSON);
             var designViewGridOpts = {};
             _.set(designViewGridOpts, 'container', this.designViewGridContainer);
@@ -234,6 +243,5 @@ define(['require', 'log', 'lodash', 'jquery', 'tool_palette/tool-palette', 'desi
             });
             return result;
         };
-
         return DesignView;
     });

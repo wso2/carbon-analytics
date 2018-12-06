@@ -496,8 +496,6 @@ public class CodeGeneratorUtils {
         public static void validateConfigObject(StoreConfig store) throws CodeGenerationException {
             if (store.getType() == null || store.getType().isEmpty()) {
                 throw new CodeGenerationException("The 'type' value of a given store element is empty");
-            } else if (store.getOptions() == null || store.getOptions().isEmpty()) {
-                throw new CodeGenerationException("The options map of a given store element is empty");
             }
         }
 

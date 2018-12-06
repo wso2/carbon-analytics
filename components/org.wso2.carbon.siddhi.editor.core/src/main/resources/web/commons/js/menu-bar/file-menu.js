@@ -148,6 +148,14 @@ define(([],function (){
                 disabled: false
             },
             {
+                id: "exportAsDocker",
+                label: "Export as Docker",
+                command: {
+                    id: "export-docker"
+                },
+                disabled: false
+            },
+            {
                 id: "close",
                 label: "Close File",
                 command: {

@@ -27,6 +27,7 @@ import DeleteIcon from 'material-ui-icons/Delete';
 import { TableCell, TableRow } from 'material-ui/Table';
 import Tooltip from 'material-ui/Tooltip';
 import VisibilityIcon from 'material-ui-icons/Visibility';
+import UndeployButton from 'material-ui-icons/RemoveCircle';
 import DnsIcon from 'material-ui-icons/Dns';
 // App Constants
 import BusinessRulesConstants from '../../../../constants/BusinessRulesConstants';
@@ -65,7 +66,7 @@ export default class BusinessRule extends Component {
      * Handles Re-deploy button click
      */
     handleReDeployButtonClick() {
-        this.props.onRedeploy();
+        this.props.onRedeployRequest();
     }
 
     /**
@@ -73,6 +74,13 @@ export default class BusinessRule extends Component {
      */
     handleDeleteButtonClick() {
         this.props.onDeleteRequest();
+    }
+
+    /**
+     * Handles Un-deploy button click
+     */
+    handleUnDeployButtonClick() {
+        this.props.onUndeployRequest();
     }
 
     /**
@@ -95,23 +103,58 @@ export default class BusinessRule extends Component {
     }
 
     /**
-     * Returns the Deploy button
-     * @returns {Component}     Retry Deploy button
+     * Returns the undeploy button, with the given title
+     * @param {String} title        Title of the deploy button, denoting its action
+     * @returns {Component}         Tooltip Component, containing IconButton
      */
-    displayDeployButton() {
+    displayDescribedUnDeployButton(title) {
+        return (
+            <Tooltip id="tooltip-right" title={title} placement="bottom">
+                <IconButton
+                    aria-label={title}
+                    onClick={() => this.handleUnDeployButtonClick()}
+                >
+                    <UndeployButton />
+                </IconButton>
+            </Tooltip>
+        );
+    }
+
+    displayDescribedRetryUnDeployButton(title) {
+        return (
+            <Tooltip id="tooltip-right" title={title} placement="bottom">
+                <IconButton
+                    color="primary"
+                    aria-label={title}
+                    onClick={() => this.handleUnDeployButtonClick()}
+                >
+                    <RefreshIcon />
+                </IconButton>
+            </Tooltip>
+        );
+    }
+
+    displayButton() {
         switch (this.props.status) {
+            case 0:
+                return this.displayDescribedUnDeployButton('Un-deploy');
             case 1:
                 return this.displayDescribedDeployButton('Deploy');
-            case 3:
-                return this.displayDescribedDeployButton('Retry Un-Deploy');
             case 2:
+                return this.displayDescribedDeployButton('Retry Deploy');
+            case 3:
+                 return this.displayDescribedRetryUnDeployButton('Retry undeploy');
             case 4:
-                return this.displayDescribedDeployButton('Re-Deploy');
+                return this.displayDescribedDeployButton('Retry Deploy');    
+            case 8:
+                return this.displayDescribedDeployButton('Deploy');     
+            case 9:    
+                return this.displayDescribedRetryUnDeployButton('Retry Undeploy');
             default:
                 return null;
         }
     }
-
+    
     /**
      * Returns the Deployment Info button
      * @returns {Component}     Tooltip Component, containing IconButton
@@ -202,7 +245,7 @@ export default class BusinessRule extends Component {
                     &nbsp;
                     {this.displayDeleteButton()}
                     &nbsp;
-                    {this.displayDeployButton()}
+                    {this.displayButton()}
                 </TableCell>
             );
         } else {
@@ -246,7 +289,8 @@ BusinessRule.propTypes = {
         BusinessRulesConstants.USER_PERMISSIONS.NONE,
         BusinessRulesConstants.USER_PERMISSIONS.UNSET,
     ]).isRequired,
-    onRedeploy: PropTypes.func.isRequired,
+    onRedeployRequest: PropTypes.func.isRequired,
     onDeleteRequest: PropTypes.func.isRequired,
+    onUndeployRequest: PropTypes.func.isRequired,
     onDeploymentInfoRequest: PropTypes.func.isRequired,
 };

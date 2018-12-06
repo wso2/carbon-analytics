@@ -22,6 +22,8 @@ package org.wso2.carbon.business.rules.core.exceptions;
  * Exceptions related to SiddhiAppsApi related operations
  */
 public class SiddhiAppsApiHelperException extends Exception {
+    private int status;
+
     /**
      * Constructs a new exception with the specified detail message.  The
      * cause is not initialized, and may subsequently be initialized by
@@ -30,8 +32,9 @@ public class SiddhiAppsApiHelperException extends Exception {
      * @param message the detail message. The detail message is saved for
      *                later retrieval by the {@link #getMessage()} method.
      */
-    public SiddhiAppsApiHelperException(String message) {
+    public SiddhiAppsApiHelperException(String message, int status) {
         super(message);
+        this.status = status;
     }
 
     /**
@@ -50,5 +53,9 @@ public class SiddhiAppsApiHelperException extends Exception {
      */
     public SiddhiAppsApiHelperException(String message, Throwable cause) {
         super(message, cause);
+    }
+
+    public int getStatus() {
+        return this.status;
     }
 }

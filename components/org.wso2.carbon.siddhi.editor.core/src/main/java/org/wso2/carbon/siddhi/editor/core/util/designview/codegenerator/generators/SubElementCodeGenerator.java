@@ -138,20 +138,23 @@ public class SubElementCodeGenerator {
 
         storeStringBuilder.append(SiddhiCodeBuilderConstants.STORE_ANNOTATION)
                 .append(store.getType())
-                .append(SiddhiCodeBuilderConstants.SINGLE_QUOTE)
-                .append(SiddhiCodeBuilderConstants.COMMA);
+                .append(SiddhiCodeBuilderConstants.SINGLE_QUOTE);
         Map<String, String> options = store.getOptions();
-        int optionsLeft = options.size();
-        for (Map.Entry<String, String> entry : options.entrySet()) {
-            storeStringBuilder.append(entry.getKey())
-                    .append(SiddhiCodeBuilderConstants.EQUAL)
-                    .append(SiddhiCodeBuilderConstants.SINGLE_QUOTE)
-                    .append(entry.getValue())
-                    .append(SiddhiCodeBuilderConstants.SINGLE_QUOTE);
-            if (optionsLeft != 1) {
-                storeStringBuilder.append(SiddhiCodeBuilderConstants.COMMA);
+
+        if (options != null && options.size() !=0) {
+            storeStringBuilder.append(SiddhiCodeBuilderConstants.COMMA);
+            int optionsLeft = options.size();
+            for (Map.Entry<String, String> entry : options.entrySet()) {
+                storeStringBuilder.append(entry.getKey())
+                        .append(SiddhiCodeBuilderConstants.EQUAL)
+                        .append(SiddhiCodeBuilderConstants.SINGLE_QUOTE)
+                        .append(entry.getValue())
+                        .append(SiddhiCodeBuilderConstants.SINGLE_QUOTE);
+                if (optionsLeft != 1) {
+                    storeStringBuilder.append(SiddhiCodeBuilderConstants.COMMA);
+                }
+                optionsLeft--;
             }
-            optionsLeft--;
         }
         storeStringBuilder.append(SiddhiCodeBuilderConstants.CLOSE_BRACKET);
 

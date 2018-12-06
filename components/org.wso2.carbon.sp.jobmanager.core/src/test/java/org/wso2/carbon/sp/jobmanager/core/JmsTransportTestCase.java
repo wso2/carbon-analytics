@@ -24,11 +24,11 @@ import org.testng.annotations.Test;
 import org.wso2.carbon.sp.jobmanager.core.appcreator.DeployableSiddhiQueryGroup;
 import org.wso2.carbon.sp.jobmanager.core.appcreator.JMSSiddhiAppCreator;
 import org.wso2.carbon.sp.jobmanager.core.appcreator.SiddhiQuery;
+import org.wso2.carbon.sp.jobmanager.core.bean.DeploymentConfig;
 import org.wso2.carbon.sp.jobmanager.core.internal.ServiceDataHolder;
 import org.wso2.carbon.sp.jobmanager.core.topology.SiddhiTopology;
 import org.wso2.carbon.sp.jobmanager.core.topology.SiddhiTopologyCreatorImpl;
 import org.wso2.carbon.sp.jobmanager.core.util.*;
-import org.wso2.carbon.sp.jobmanager.core.bean.DeploymentConfig;
 import org.wso2.siddhi.core.SiddhiAppRuntime;
 import org.wso2.siddhi.core.SiddhiManager;
 import org.wso2.siddhi.core.event.Event;
@@ -47,19 +47,17 @@ import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
- * Contains the test cases for JMS transport tests
+ * Contains the test cases for JMS transport tests.
  */
 public class JmsTransportTestCase {
     private static final Logger log = Logger.getLogger(JmsTransportTestCase.class);
     private AtomicInteger count;
     private AtomicInteger errorAssertionCount;
     private static final String PROVIDER_URL = "vm://localhost";
-    private static final String INITIAL_FACTORY = "org.apache.activemq.jndi"
-            + ".ActiveMQInitialContextFactory";
+    private static final String INITIAL_FACTORY = "org.apache.activemq.jndi.ActiveMQInitialContextFactory";
 
     @BeforeMethod
-    public void setUp()
-    {
+    public void setUp() {
         DeploymentConfig deploymentConfig = new DeploymentConfig();
         deploymentConfig.setFactoryInitial(INITIAL_FACTORY);
         deploymentConfig.setProviderUrl(PROVIDER_URL);
@@ -321,7 +319,7 @@ public class JmsTransportTestCase {
 
     /**
      * If a siddhi app contains patterns while the corresponding execution group's
-     * parallelism > 1 then SiddhiAppValidationException will be thrown
+     * parallelism > 1 then SiddhiAppValidationException will be thrown.
      */
     @Test(dependsOnMethods = "testPartitionWithSequence")
     public void testPartitionWithPattern() {
@@ -340,7 +338,7 @@ public class JmsTransportTestCase {
 
         SiddhiTopologyCreatorImpl siddhiTopologyCreator = new SiddhiTopologyCreatorImpl();
         try {
-            SiddhiTopology topology = siddhiTopologyCreator.createTopology(siddhiApp);
+            siddhiTopologyCreator.createTopology(siddhiApp);
         } catch (SiddhiAppValidationException e) {
             log.error(e.getMessage(), e);
         }
@@ -401,15 +399,9 @@ public class JmsTransportTestCase {
                         EventPrinter.print(events);
                         count.addAndGet(events.length);
                         for (Event event : events) {
-                            if ((long) event.getData()[1] == 1) {
-                                errorAssertionCount.incrementAndGet();
-                                Assert.assertEquals(event.getData()[2], "start");
-                                errorAssertionCount.decrementAndGet();
-                            } else {
-                                errorAssertionCount.incrementAndGet();
-                                Assert.assertEquals(event.getData()[2], "start");
-                                errorAssertionCount.decrementAndGet();
-                            }
+                            errorAssertionCount.incrementAndGet();
+                            Assert.assertEquals(event.getData()[2], "start");
+                            errorAssertionCount.decrementAndGet();
                         }
                     }
                 });
@@ -449,7 +441,7 @@ public class JmsTransportTestCase {
 
     /**
      * A partitioned stream used outside the Partition but inside the same execGroup will
-     * have the Subscription strategy of {@link TransportStrategy#FIELD_GROUPING}
+     * have the Subscription strategy of {@link TransportStrategy#FIELD_GROUPING}.
      */
     @Test(dependsOnMethods = "testJoinWithPartition")
     public void testPartitionStrategy() {
@@ -505,15 +497,9 @@ public class JmsTransportTestCase {
                         EventPrinter.print(events);
                         count.addAndGet(events.length);
                         for (Event event : events) {
-                            if ((long) event.getData()[1] == 1) {
-                                errorAssertionCount.incrementAndGet();
-                                Assert.assertEquals(event.getData()[2], "start");
-                                errorAssertionCount.decrementAndGet();
-                            } else {
-                                errorAssertionCount.incrementAndGet();
-                                Assert.assertEquals(event.getData()[2], "start");
-                                errorAssertionCount.decrementAndGet();
-                            }
+                            errorAssertionCount.incrementAndGet();
+                            Assert.assertEquals(event.getData()[2], "start");
+                            errorAssertionCount.decrementAndGet();
                         }
                     }
                 });
@@ -849,7 +835,7 @@ public class JmsTransportTestCase {
 
     /**
      * user given Sink used in (parallel/multiple execGroups) will get assigned to a all the
-     * execGroups after Topology creation
+     * execGroups after Topology creation.
      */
     @Test(dependsOnMethods = "testPartitionWithMultiKey")
     public void testUserDefinedSink() {
@@ -1072,7 +1058,7 @@ public class JmsTransportTestCase {
     /**
      * when user given sources are located in more than 1 execGroup then a passthrough query
      * will be added in a new execGroup.Newly created execGroup will be moved to as the first
-     * element of already created passthrough queries
+     * element of already created passthrough queries.
      */
     @Test(dependsOnMethods = "testSinkStreamForSource")
     public void testUsergivenSourceNoGroup() {
@@ -1319,7 +1305,7 @@ public class JmsTransportTestCase {
     /**
      * when user given sources are located in one execGroup which has a parallelilsm > 1 then a
      * passthrough query will be added in a new execGroup.Newly created execGroup will be moved
-     * to as the first element of already created passthrough queries
+     * to as the first element of already created passthrough queries.
      */
     @Test(dependsOnMethods = "testPassthoughWithMultipleSubscription")
     public void testUsergivenSourceSingleGroup() {
@@ -1588,8 +1574,9 @@ public class JmsTransportTestCase {
     }
 
     private void publishEvents(String topicName, String queueName, String broker, String format,
-                               List<String> messageList) throws InterruptedException {
+                               List<String> messageList) {
         JMSClientPublisher jmsClientPublisher = new JMSClientPublisher();
         jmsClientPublisher.sendJMSEvents(messageList, topicName, queueName, format, broker, PROVIDER_URL);
     }
+
 }
