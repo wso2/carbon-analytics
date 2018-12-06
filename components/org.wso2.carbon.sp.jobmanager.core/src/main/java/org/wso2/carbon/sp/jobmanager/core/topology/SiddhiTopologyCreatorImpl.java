@@ -846,7 +846,9 @@ public class SiddhiTopologyCreatorImpl implements SiddhiTopologyCreator {
         Set<String> aggregationIds = siddhiApp.getAggregationDefinitionMap().keySet();
 
         for (SiddhiQueryGroup siddhiQueryGroup : siddhiQueryGroupsList) {
-            inputStreamsMap.addAll(siddhiQueryGroup.getInputStreams().entrySet());
+            for (Map.Entry<String, InputStreamDataHolder> entry : siddhiQueryGroup.getInputStreams().entrySet()) {
+                inputStreamsMap.add(entry);
+            }
             for (Map.Entry<String, InputStreamDataHolder> entry : inputStreamsMap) {
                 String inputStreamId = entry.getKey();
                 if (aggregationIds.contains(inputStreamId)) {
