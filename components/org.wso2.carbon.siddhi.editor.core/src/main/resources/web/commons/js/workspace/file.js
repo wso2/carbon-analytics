@@ -27,9 +27,9 @@ define(['jquery', 'lodash', 'backbone', 'log'], function ($, _, Backbone, log) {
                 lastPersisted: _.now(),
                 isDirty: true,
                 debugStatus: false,
-                runStatus: false
+                runStatus: false,
+                hashCode: undefined,
             },
-
             initialize: function (attrs, options) {
                 var errMsg;
                 if (!this.get('isPersisted')){
@@ -42,13 +42,32 @@ define(['jquery', 'lodash', 'backbone', 'log'], function ($, _, Backbone, log) {
                     this._storage .create(this);
                 }
             },
+            generateHash: function (hashCode) {
+                var newHash = 0, l = hashCode.length, i = 0;
+                if (l > 0)
+                    while (i < l)
+                        newHash = (newHash << 5) - newHash + hashCode.charCodeAt(i++) | 0;
+                return newHash;
+            },
 
-            save: function(){
+            save: function(isTrue){
                 if(!_.isNil(this._storage.get(this.id))){
+                    if (isTrue == true) {
+                        this.setHash(this.generateHash(this.getContent().trim()));
+                        console.log(this.getHash());
+                    }
+                    if (this.getContent() == undefined) {
+                        this.setHash(this.getContent());
+                    }
                     this._storage.update(this);
                 } else {
                     this._storage.create(this);
                 }
+                return this;
+            },
+
+            setHash: function (hashCode) {
+                this.set('hashCode', hashCode);
                 return this;
             },
 
@@ -96,6 +115,10 @@ define(['jquery', 'lodash', 'backbone', 'log'], function ($, _, Backbone, log) {
             setContent: function(name){
                 this.set('content', name);
                 return this;
+            },
+
+            getHash: function () {
+                return this.get('hashCode');
             },
 
             getPath: function(){

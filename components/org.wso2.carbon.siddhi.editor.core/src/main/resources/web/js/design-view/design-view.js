@@ -101,6 +101,14 @@ define(['require', 'log', 'lodash', 'jquery', 'tool_palette/tool-palette', 'desi
             this.designViewGrid.render();
         };
 
+        DesignView.prototype.setHashCode = function (hashCode) {
+            this.designViewHashCode = hashCode;
+        }
+
+        DesignView.prototype.getHashCode = function () {
+            return this.designViewHashCode;
+        }
+
         DesignView.prototype.autoAlign = function () {
             if (!_.isUndefined(this.designViewGrid)) {
                 this.designViewGrid.autoAlignElements();
