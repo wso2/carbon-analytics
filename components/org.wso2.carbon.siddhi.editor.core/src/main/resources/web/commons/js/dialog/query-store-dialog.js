@@ -17,7 +17,7 @@
  */
 
 define(['require', 'lodash','jquery', 'log', 'backbone', '../../../js/event-simulator/simulator-rest-client',
-        './query-store-rest-client'],
+        './query-store-rest-client', 'datatables', 'datatables_bootstrap', 'datatables_wso2'],
     function (require, _, $, log, Backbone, SimulatorRestClient, QueryStoreRestClient) {
     var QueryStoreApi = Backbone.View.extend(
         /** @lends SaveToFileDialog.prototype */
@@ -66,17 +66,36 @@ define(['require', 'lodash','jquery', 'log', 'backbone', '../../../js/event-simu
                         storeQueryModal.find("textarea[id='curlEditor']").val(),
                         function (data) {
                             var rows = [];
-                            data.records.forEach(function(childArray){
-                                var columns = [];
+                            var headerRow = [];
+                            var queryData = storeQueryModal.find("table[id='query_data']");
+                            data.records.forEach(function(childArray, index){
+                                if (index === 0) {
+                                    var headerColumns = [];
 
-                                childArray.forEach(function(value) {
-                                    columns.push('<td>' + value + '</td>');
-                                });
+                                    childArray.forEach(function(value) {
+                                        headerColumns.push('<th>' + value + '</th>');
+                                    });
 
-                                rows.push('<tr>' + columns + '</tr>');
+                                    headerRow.push('<tr>' + headerColumns + '</tr>');
+
+                                } else {
+                                    var columns = [];
+
+                                    childArray.forEach(function(value) {
+                                        columns.push('<td>' + value + '</td>');
+                                    });
+
+                                    rows.push('<tr>' + columns + '</tr>');
+                                }
                             });
 
+                            if ($.fn.DataTable.isDataTable(queryData)) {
+                                queryData.DataTable().clear().destroy();
+                            }
+                            storeQueryModal.find("div[id='simulator_output'] thead").html(headerRow);
                             storeQueryModal.find("div[id='simulator_output'] tbody").html(rows);
+                            queryData.DataTable();
+                            queryData.removeClass('hidden');
                         },
                         function (data) {
                             self.alertError("Error when executing query on Siddhi Store. Reason: " + data.responseText);

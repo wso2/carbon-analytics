@@ -1567,7 +1567,7 @@ pre.renderjson {
 }
 
 textarea.form-control.curl-editor {
-    height: 100px;
+    height: 65px;
 }
 
 .store-query .form-horizontal {
@@ -1606,7 +1606,7 @@ textarea.form-control.curl-editor {
 }
 
 .table-striped > tbody > tr:nth-of-type(2n+1) {
-    background-color: #383838;
+    background-color: #313131;
 }
 
 .table-bordered > thead > tr > th,
@@ -1640,7 +1640,7 @@ table.dataTable thead .sorting::after {
 }
 
 .table-hover > tbody > tr:hover {
-    background-color: #383838;
+    background-color: #313131;
 }
 
 .table.table-hover > tbody > tr:hover td:not(.dataTables_empty) {
@@ -1655,4 +1655,13 @@ table.dataTable thead .sorting::after {
 
 div.dataTables_wrapper div.dataTables_info {
     padding-top: 4px;
+}
+
+.modal-dialog.store-query {
+    margin: 60px auto 0;
+}
+
+div.dataTables_wrapper div.dataTables_info {
+    padding: 7px;
+    border-left: 1px solid #494949;
 }
