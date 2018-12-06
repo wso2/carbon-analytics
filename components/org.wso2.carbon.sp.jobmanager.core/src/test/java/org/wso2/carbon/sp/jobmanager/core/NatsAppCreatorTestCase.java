@@ -19,7 +19,9 @@
 package org.wso2.carbon.sp.jobmanager.core;
 
 import org.apache.log4j.Logger;
+import org.testcontainers.containers.GenericContainer;
 import org.testng.Assert;
+import org.testng.annotations.BeforeClass;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 import org.wso2.carbon.sp.jobmanager.core.appcreator.DeployableSiddhiQueryGroup;
@@ -56,18 +58,30 @@ public class NatsAppCreatorTestCase {
     private AtomicInteger count;
     private AtomicInteger errorAssertionCount;
     private static final String CLUSTER_ID = "test-cluster";
-    private static final String NATS_SERVER_URL = "nats://localhost:4222";
+    private static String NATS_SERVER_URL = "nats://localhost:";
     private NatsClient natsClient;
+    private int port;
 
-    @BeforeMethod
-    public void setUp() {
+    @BeforeClass
+    private void initializeDockerContainer() throws InterruptedException {
+        GenericContainer simpleWebServer
+                = new GenericContainer("nats-streaming:0.11.2");
+        simpleWebServer.setPrivilegedMode(true);
+        simpleWebServer.start();
+        port = simpleWebServer.getMappedPort(4222);
+        NATS_SERVER_URL += port;
         DeploymentConfig deploymentConfig = new DeploymentConfig();
         deploymentConfig.setClusterId(CLUSTER_ID);
         deploymentConfig.setNatsServerUrl(NATS_SERVER_URL);
+        natsClient = new NatsClient(CLUSTER_ID, NATS_SERVER_URL);
         ServiceDataHolder.setDeploymentConfig(deploymentConfig);
+        Thread.sleep(500);
+    }
+
+    @BeforeMethod
+    public void setUp() {
         count = new AtomicInteger(0);
         errorAssertionCount = new AtomicInteger(0);
-        natsClient = new NatsClient(CLUSTER_ID, NATS_SERVER_URL);
     }
 
     /** Test the topology creation for a particular siddhi app includes nats transport.
@@ -1169,53 +1183,15 @@ public class NatsAppCreatorTestCase {
         Assert.assertTrue(queryGroupList.get(0).getGroupName().contains(SiddhiTopologyCreatorConstants.PASSTHROUGH),
                 "Passthrough query should be present in a separate group");
         Assert.assertTrue(queryGroupList.get(0).isReceiverQueryGroup(), "Receiver type should be set");
-
-
-        Assert.assertTrue(queryGroupList.get(0).getSiddhiQueries().get(0).getApp()
-                        .contains("@source(type = 'http', receiver.url='http://localhost:8080/SweetProductionEP', "
-                                + "@map(type = 'json'))\n"
-                                + "define stream passthroughTest1Stream (name string, amount double);\n"
-                                + "@sink(type='nats',cluster.id='test-cluster',destination = 'TestPlan12_Test1Stream', "
-                                + "bootstrap.servers='nats://localhost:4222',@map(type='xml'))\n"
-                                + "@sink(type='nats',cluster.id='test-cluster',@distribution(strategy='partitioned', "
-                                + "partitionKey='name',@destination(destination = 'TestPlan12_Test1Stream_name_0'),"
-                                + "@destination(destination = 'TestPlan12_Test1Stream_name_1'),"
-                                + "@destination(destination = 'TestPlan12_Test1Stream_name_2')), "
-                                + "bootstrap.servers='nats://localhost:4222',@map(type='xml')) \n"
-                                + "define stream Test1Stream (name string, amount double);\n"
-                                + "from passthroughTest1Stream select * insert into Test1Stream;"),
-                "Incorrect partial Siddhi application created");
-
-        Assert.assertTrue(queryGroupList.get(1).getSiddhiQueries().get(0).getApp()
-                        .contains("@App:name('TestPlan12-001-1') \n"
-                                + "@source(type='nats',cluster.id='test-cluster',destination = "
-                                + "'TestPlan12_Test1Stream', "
-                                + "bootstrap.servers='nats://localhost:4222',@map(type='xml')) \n"
-                                + "define stream Test1Stream (name string, amount double);\n"
-                                + "@info(name = 'query2')\n"
-                                + " from Test1Stream\n"
-                                + "select *\n"
-                                + "insert into Test3Stream;"),
-                "Incorrect partial Siddhi application Created");
-
-        Assert.assertTrue(queryGroupList.get(2).getSiddhiQueries().get(0).getApp()
-                .contains("@App:name('TestPlan12-002-1') \n"
-                                + "@source(type='nats',cluster.id='test-cluster',destination = "
-                                + "'TestPlan12_Test1Stream_name_0', "
-                                + "bootstrap.servers='nats://localhost:4222',@map(type='xml')) \n"
-                                + "define stream Test1Stream (name string, amount double);\n"
-                                + "@sink(type='log')\n"
-                                + "define stream Test2Stream (name string, amount double);\n"
-                                + "@info(name = 'query1')\n"
-                                + "Partition with (name of Test1Stream)\n"
-                                + "Begin\n"
-                                + "from Test1Stream\n"
-                                + "select name,amount\n"
-                                + "insert into Test2Stream;\n"
-                                + "end;"), "Incorrect partial Siddhi application Created");
-
+        Assert.assertEquals(topology.getQueryGroupList().get(0).getOutputStreams().get("Test1Stream")
+                .getPublishingStrategyList().get(0).getStrategy(), TransportStrategy.ALL);
+        Assert.assertEquals(topology.getQueryGroupList().get(0).getOutputStreams().get("Test1Stream")
+                .getPublishingStrategyList().get(1).getStrategy(), TransportStrategy.FIELD_GROUPING);
+        Assert.assertEquals(topology.getQueryGroupList().get(1).getInputStreams().get("Test1Stream")
+                .getSubscriptionStrategy().getStrategy(), TransportStrategy.ALL);
+        Assert.assertEquals(topology.getQueryGroupList().get(2).getInputStreams().get("Test1Stream")
+                .getSubscriptionStrategy().getStrategy(), TransportStrategy.FIELD_GROUPING);
     }
-
 
     private Map<String, List<SiddhiAppRuntime>> createSiddhiAppRuntimes(
             SiddhiManager siddhiManager, List<DeployableSiddhiQueryGroup> queryGroupList) {

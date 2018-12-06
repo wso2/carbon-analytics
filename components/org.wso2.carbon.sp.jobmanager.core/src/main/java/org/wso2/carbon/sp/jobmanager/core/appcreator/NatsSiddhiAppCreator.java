@@ -89,6 +89,7 @@ public class NatsSiddhiAppCreator extends AbstractSiddhiAppCreator {
                             partitionKeys.get(holder.getGroupingField()) > holder.getParallelism()) {
                         continue;
                     }
+
                     partitionKeys.put(holder.getGroupingField(), holder.getParallelism());
                     sinkValuesMap.put(ResourceManagerConstants.PARTITION_KEY, holder.getGroupingField());
                     List<String> destinations = new ArrayList<>(holder.getParallelism());
@@ -135,7 +136,6 @@ public class NatsSiddhiAppCreator extends AbstractSiddhiAppCreator {
                                      Collection<InputStreamDataHolder> inputStreams) {
         Map<String, String> sourceValuesMap = new HashMap<>();
         for (InputStreamDataHolder inputStream : inputStreams) {
-
             SubscriptionStrategyDataHolder subscriptionStrategy = inputStream.getSubscriptionStrategy();
             sourceValuesMap.put(ResourceManagerConstants.CLUSTER_ID, clusterId);
             sourceValuesMap.put(ResourceManagerConstants.NATS_SERVER_URL, natsServerUrl);
@@ -148,7 +148,6 @@ public class NatsSiddhiAppCreator extends AbstractSiddhiAppCreator {
                         List<String> sourceQueries = new ArrayList<>();
                         List<Integer> partitionNumbers = getPartitionNumbers(queryList.size(), subscriptionStrategy
                                         .getOfferedParallelism(), i);
-                        // TODO: 11/19/18 add multiple topic sub to nats and update
                         for (int topicCount : partitionNumbers) {
                             String topicName = getTopicName(siddhiAppName, inputStream.getStreamName(),
                                     inputStream.getSubscriptionStrategy().getPartitionKey()) + "_"
