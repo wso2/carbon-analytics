@@ -21,7 +21,9 @@ package org.wso2.carbon.siddhi.editor.core.internal;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
@@ -36,6 +38,7 @@ import org.osgi.service.component.annotations.ReferenceCardinality;
 import org.osgi.service.component.annotations.ReferencePolicy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.wso2.carbon.analytics.idp.client.core.api.AnalyticsHttpClientBuilderService;
 import org.wso2.carbon.config.provider.ConfigProvider;
 import org.wso2.carbon.siddhi.editor.core.EditorSiddhiAppRuntimeService;
 import org.wso2.carbon.siddhi.editor.core.Workspace;
@@ -48,6 +51,7 @@ import org.wso2.carbon.siddhi.editor.core.commons.response.MetaDataResponse;
 import org.wso2.carbon.siddhi.editor.core.commons.response.Status;
 import org.wso2.carbon.siddhi.editor.core.commons.response.ValidationSuccessResponse;
 import org.wso2.carbon.siddhi.editor.core.exception.DockerGenerationException;
+import org.wso2.carbon.siddhi.editor.core.exception.SiddhiStoreQueryHelperException;
 import org.wso2.carbon.siddhi.editor.core.internal.local.LocalFSWorkspace;
 import org.wso2.carbon.siddhi.editor.core.util.Constants;
 import org.wso2.carbon.siddhi.editor.core.util.DebugCallbackEvent;
@@ -57,6 +61,7 @@ import org.wso2.carbon.siddhi.editor.core.util.MimeMapper;
 import org.wso2.carbon.siddhi.editor.core.util.SampleEventGenerator;
 import org.wso2.carbon.siddhi.editor.core.util.SecurityUtil;
 import org.wso2.carbon.siddhi.editor.core.util.SourceEditorUtils;
+import org.wso2.carbon.siddhi.editor.core.util.restclients.storequery.StoreQueryAPIHelper;
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.EventFlow;
 import org.wso2.carbon.siddhi.editor.core.util.designview.codegenerator.CodeGenerator;
 import org.wso2.carbon.siddhi.editor.core.util.designview.deserializers.DeserializersRegisterer;
@@ -130,6 +135,7 @@ public class EditorMicroservice implements Microservice {
             );
     private ConfigProvider configProvider;
     private ServiceRegistration siddhiAppRuntimeServiceRegistration;
+    private static StoreQueryAPIHelper storeQueryAPIHelper  = null; //= new StoreQueryAPIHelper();
 
     public EditorMicroservice() {
         workspace = new LocalFSWorkspace();
@@ -245,7 +251,35 @@ public class EditorMicroservice implements Microservice {
             return Response.serverError().entity("failed")
                     .build();
         }
+    }
 
+    @POST
+    @Path("/stores/query")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response executeStoreQuery(JsonElement element) {
+        if (storeQueryAPIHelper == null) {
+            storeQueryAPIHelper = new StoreQueryAPIHelper(this.configProvider);
+        }
+
+        try {
+            feign.Response response = storeQueryAPIHelper.executeStoreQuery(element.toString());
+            String payload = response.body().toString();
+            // If the response HTTP status code is OK, return the response.
+            if (response.status() == 200) {
+                return Response.ok().entity(payload).build();
+            }
+
+            // If the error response code is sent, extract the original error message and response back.
+            JsonObject errorObj = new JsonParser().parse(payload).getAsJsonObject();
+            if (errorObj.get("message") != null) {
+                return Response.serverError().entity(errorObj.get("message")).build();
+            }
+            return Response.serverError().entity(payload).build();
+        } catch (SiddhiStoreQueryHelperException e) {
+            log.error("Cannot execute the store query.", e);
+            return Response.serverError().entity("Failed executing the Siddhi query.").build();
+        }
     }
 
     @GET
@@ -1057,5 +1091,20 @@ public class EditorMicroservice implements Microservice {
         } catch (IOException e) {
             log.error("Error while reading the sample descriptions.", e);
         }
+    }
+
+    @Reference(
+            name = "carbon.anaytics.common.clientservice",
+            service = AnalyticsHttpClientBuilderService.class,
+            cardinality = ReferenceCardinality.MANDATORY,
+            policy = ReferencePolicy.DYNAMIC,
+            unbind = "unregisterAnalyticsHttpClient"
+    )
+    protected void registerAnalyticsHttpClient(AnalyticsHttpClientBuilderService service) {
+        EditorDataHolder.getInstance().setClientBuilderService(service);
+    }
+
+    protected void unregisterAnalyticsHttpClient(AnalyticsHttpClientBuilderService service) {
+        EditorDataHolder.getInstance().setClientBuilderService(null);
     }
 }
