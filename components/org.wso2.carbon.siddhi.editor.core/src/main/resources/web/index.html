@@ -1342,7 +1342,7 @@
     </div>
 </div>
 <!--Start: Store Query Modal-->
-<div class="modal fade" id="storeQueryModal" tabindex="-1" role="dialog">
+<div class="modal fade" id="modalStoreQuery" tabindex="-1" role="dialog">
     <div class="modal-dialog store-query" role="document">
         <div class="modal-content">
             <div class="modal-header">
@@ -1375,6 +1375,9 @@
                                 <div class="divider"></div>
                                 <button type="button" class="btn btn-default" data-dismiss="modal">cancel</button>
                             </div>
+                        </div>
+                        <div class="form-group" style="padding-left: 15px;">
+                            <div id="error-box" class="alert alert-danger" style="display: none;"></div>
                         </div>
                         <div id="simulator_output">
                             <table id="query_data" class="table table-striped table-hover table-bordered data-table
@@ -1858,7 +1861,7 @@
                 submit_button: "#generateSampleEventButton"
             },
             query_store_api:{
-                selector: "#storeQueryModal",
+                selector: "#modalStoreQuery",
                 submit_button: "#executeQuery"
             },
             output_controller: {

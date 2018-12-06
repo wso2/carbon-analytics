@@ -19,7 +19,7 @@
 package org.wso2.carbon.siddhi.editor.core.exception;
 
 /**
- * Exceptions related to SiddhiAppDeployerServiceStub
+ * Exceptions related to SiddhiAppDeployerServiceStub.
  */
 public class SiddhiStoreQueryServiceStubException extends Exception {
     /**

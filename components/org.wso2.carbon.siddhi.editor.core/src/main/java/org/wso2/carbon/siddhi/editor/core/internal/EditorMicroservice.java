@@ -135,7 +135,7 @@ public class EditorMicroservice implements Microservice {
             );
     private ConfigProvider configProvider;
     private ServiceRegistration siddhiAppRuntimeServiceRegistration;
-    private static StoreQueryAPIHelper storeQueryAPIHelper  = null; //= new StoreQueryAPIHelper();
+    private StoreQueryAPIHelper storeQueryAPIHelper;
 
     public EditorMicroservice() {
         workspace = new LocalFSWorkspace();
@@ -259,7 +259,7 @@ public class EditorMicroservice implements Microservice {
     @Produces(MediaType.APPLICATION_JSON)
     public Response executeStoreQuery(JsonElement element) {
         if (storeQueryAPIHelper == null) {
-            storeQueryAPIHelper = new StoreQueryAPIHelper(this.configProvider);
+            storeQueryAPIHelper = new StoreQueryAPIHelper(configProvider);
         }
 
         try {

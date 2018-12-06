@@ -76,10 +76,10 @@ define(([],function (){
                 disabled: false
             },
             {
-                id: "queryStoreApi",
+                id: "queryStore",
                 label: "Siddhi Store Query",
                 command: {
-                    id: "query_store-api",
+                    id: "query-store",
                     labels:{
                         mac: {
                             //key: "command+option+f",

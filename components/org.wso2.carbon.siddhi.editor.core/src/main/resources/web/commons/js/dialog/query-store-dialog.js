@@ -19,14 +19,14 @@
 define(['require', 'lodash','jquery', 'log', 'backbone', '../../../js/event-simulator/simulator-rest-client',
         './query-store-rest-client', 'datatables', 'datatables_bootstrap', 'datatables_wso2'],
     function (require, _, $, log, Backbone, SimulatorRestClient, QueryStoreRestClient) {
-    var QueryStoreApi = Backbone.View.extend(
-        /** @lends SaveToFileDialog.prototype */
+    var QueryStoreDialog = Backbone.View.extend(
+        /** @lends QueryStoreDialog.prototype */
         {
             /**
              * @augments Backbone.View
              * @constructs
              * @class queryStore
-             * @param {Object} config configuration options for the SaveToFileDialog
+             * @param {Object} config configuration options for the QueryStoreDialog
              */
             initialize: function (options) {
                 this._options = options;
@@ -39,24 +39,41 @@ define(['require', 'lodash','jquery', 'log', 'backbone', '../../../js/event-simu
             },
 
             render: function () {
-
                 var app = this.application,
                     options = this._options;
-                this.notification_container = $("#notification-container");
+
                 if (!_.isNil(this._storeQueryModal)) {
                     this._storeQueryModal.remove();
                 }
-                var storeQueryModal = $(_.get(options, 'selector')).clone();
+
+                var storeQueryModal = $(options.selector).clone();
                 this._storeQueryModal = storeQueryModal;
+                var errorBox = storeQueryModal.find('#error-box');
+                var resultBox = storeQueryModal.find('#simulator_output');
+
+                var showError = function(message) {
+                    errorBox.text(message).show();
+                };
+
+                var clearError = function() {
+                    errorBox.hide();
+                };
+
                 SimulatorRestClient.retrieveSiddhiAppNames(
                     function (data) {
-                        var initialOptionValue = '<option selected="selected" value = "-1" ' +
-                            'disabled>-- Please Select a Siddhi App --</option>';
-                        var siddhiApps = self.generateOptions(data, initialOptionValue, "siddhiAppName");
-                        storeQueryModal.find("select[name='siddhi-app-name']").html(siddhiApps);
+                        var template = '<option value="{{dataName}}">{{dataName}}</option>';
+                        var options =
+                            '<option selected="selected" value = "-1" disabled>-- Please Select a Siddhi App --</option>';
+                        if (data) {
+                            data.sort();
+                            for (var i = 0; i < data.length; i++) {
+                                options += template.replaceAll('{{dataName}}', data[i].siddhiAppName);
+                            }
+                        }
+                        storeQueryModal.find("select[name='siddhi-app-name']").html(options);
                     },
                     function (data) {
-                        self.alertError("Error when retrieving siddhi apps. Reason: " + data);
+                        showError("Error when retrieving siddhi apps. Reason: " + data);
                     }
                 );
 
@@ -70,21 +87,18 @@ define(['require', 'lodash','jquery', 'log', 'backbone', '../../../js/event-simu
                             var queryData = storeQueryModal.find("table[id='query_data']");
                             data.records.forEach(function(childArray, index){
                                 if (index === 0) {
+                                    // add header row
                                     var headerColumns = [];
-
                                     childArray.forEach(function(value) {
                                         headerColumns.push('<th>' + value + '</th>');
                                     });
-
                                     headerRow.push('<tr>' + headerColumns + '</tr>');
-
                                 } else {
+                                    // add data rows
                                     var columns = [];
-
                                     childArray.forEach(function(value) {
                                         columns.push('<td>' + value + '</td>');
                                     });
-
                                     rows.push('<tr>' + columns + '</tr>');
                                 }
                             });
@@ -92,58 +106,27 @@ define(['require', 'lodash','jquery', 'log', 'backbone', '../../../js/event-simu
                             if ($.fn.DataTable.isDataTable(queryData)) {
                                 queryData.DataTable().clear().destroy();
                             }
-                            storeQueryModal.find("div[id='simulator_output'] thead").html(headerRow);
-                            storeQueryModal.find("div[id='simulator_output'] tbody").html(rows);
+                            clearError();
+                            resultBox.find('thead').html(headerRow);
+                            resultBox.find('tbody').html(rows);
                             queryData.DataTable();
                             queryData.removeClass('hidden');
                         },
                         function (data) {
-                            self.alertError("Error when executing query on Siddhi Store. Reason: " + data.responseText);
+                            var queryData = storeQueryModal.find("table[id='query_data']");
+                            if ($.fn.DataTable.isDataTable(queryData)) {
+                                queryData.DataTable().clear().destroy();
+                            }
+                            resultBox.find('thead').html('');
+                            resultBox.find('tbody').html('');
+                            queryData.addClass('hidden');
+
+                            showError("Error when executing query on Siddhi Store. Reason: " + data.responseText);
                         }
                     );
                     event.preventDefault();
                 });
             }
         });
-
-        self.generateOptions = function (dataArray, initialOptionValue, componentName) {
-            var dataOption =
-                '<option value = "{{dataName}}">' +
-                '{{dataName}}' +
-                '</option>';
-            var result = '';
-            if (initialOptionValue !== undefined) {
-                result += initialOptionValue;
-            }
-            if (dataArray) {
-                dataArray.sort();
-                for (var i = 0; i < dataArray.length; i++) {
-                    if (componentName) {
-                        result += dataOption.replaceAll('{{dataName}}', dataArray[i][componentName]);
-                    } else {
-                        result += dataOption.replaceAll('{{dataName}}', dataArray[i]);
-                    }
-                }
-            }
-            return result;
-        };
-
-        self.alertError = function (errorMessage) {
-            var errorNotification = getErrorNotification(errorMessage);
-            $("#notification-container").append(errorNotification);
-            errorNotification.fadeTo(2000, 200).slideUp(1000, function () {
-                errorNotification.slideUp(1000);
-            });
-        };
-
-        function getErrorNotification(errorMessage) {
-            return $(
-                "<div style='z-index: 9999;' style='line-height: 20%;' class='alert alert-danger' id='error-alert'>" +
-                "<span class='notification'>" +
-                errorMessage +
-                "</span>" +
-                "</div>");
-        }
-
-    return QueryStoreApi;
+    return QueryStoreDialog;
 });

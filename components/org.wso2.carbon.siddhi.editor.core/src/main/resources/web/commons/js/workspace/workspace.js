@@ -597,7 +597,7 @@ define(['ace/ace', 'jquery', 'lodash', 'log','dialogs','./service-client','welco
                 this._openSampleFileDialog.show();
             };
 
-            this.queryStoreApi = function queryStoreApi(options){
+            this.openQueryStore = function openQueryStore(options){
                 if(_.isNil(this._queryStoreApi)){
                     var opts = _.cloneDeep(_.get(app.config, 'query_store_api'));
                     _.set(opts, "application", app);
@@ -743,7 +743,7 @@ define(['ace/ace', 'jquery', 'lodash', 'log','dialogs','./service-client','welco
 
             // Open Sample file open dialog
             app.commandManager.registerHandler('open-sample-file-open-dialog', this.openSampleFileOpenDialog, this);
-            app.commandManager.registerHandler('query_store-api', this.queryStoreApi, this);
+            app.commandManager.registerHandler('query-store', this.openQueryStore, this);
         }
     });
 
