@@ -288,24 +288,6 @@ define(['require', 'log', 'jquery', 'lodash', 'formUtils', 'streamForm', 'tableF
         };
 
         /**
-         * @function generate the form to define the function once it is dropped on the canvas
-         * @param i id for the element
-         * @returns user given function name
-         */
-        FormBuilder.prototype.DefineFunction = function (i) {
-            var self = this;
-            var formConsole = this.createTabForForm(i, constants.FUNCTION);
-            var formContainer = formConsole.getContentContainer();
-
-            var formOptions = {};
-            _.set(formOptions, 'configurationData', self.configurationData);
-            _.set(formOptions, 'application', self.application);
-            _.set(formOptions, 'formUtils', self.formUtils);
-            var functionForm = new FunctionForm(formOptions);
-            return functionForm.generateDefineForm(i, formConsole, formContainer);
-        };
-
-        /**
          * @function generate the form for an existing function
          * @param element selected element(function)
          */

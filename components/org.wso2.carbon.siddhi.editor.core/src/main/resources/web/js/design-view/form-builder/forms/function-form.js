@@ -16,58 +16,8 @@
  * under the License.
  */
 
-define(['require', 'log', 'jquery', 'lodash', 'functionDefinition', 'designViewUtils'],
-    function (require, log, $, _, FunctionDefinition, DesignViewUtils) {
-
-        var functionSchema = {
-            type: "object",
-            title: "Function",
-            properties: {
-                name: {
-                    type: "string",
-                    title: "Name",
-                    minLength: 1,
-                    required: true,
-                    propertyOrder: 1
-                },
-                scriptType: {
-                    propertyOrder: 2,
-                    required: true,
-                    type: "string",
-                    title: "Script Type",
-                    enum: [
-                        "Javascript",
-                        "R",
-                        "Scala"
-                    ],
-                    default: "Javascript"
-                },
-                returnType: {
-                    propertyOrder: 3,
-                    required: true,
-                    type: "string",
-                    title: "Return Type",
-                    enum: [
-                        "int",
-                        "long",
-                        "double",
-                        "float",
-                        "string",
-                        "bool",
-                        "object"
-                    ],
-                    default: "int"
-                },
-                body: {
-                    propertyOrder: 4,
-                    required: true,
-                    type: "string",
-                    title: "Script Body",
-                    format: "textarea",
-                    minLength: 1
-                }
-            }
-        };
+define(['require', 'log', 'jquery', 'lodash', 'designViewUtils'],
+    function (require, log, $, _, DesignViewUtils) {
 
         /**
          * @class FunctionForm Creates a forms to collect data from a function
@@ -86,74 +36,29 @@ define(['require', 'log', 'jquery', 'lodash', 'functionDefinition', 'designViewU
             }
         };
 
-        /**
-         * @function generate form when defining a form
-         * @param i id for the element
-         * @param formConsole Console which holds the form
-         * @param formContainer Container which holds the form
-         */
-        FunctionForm.prototype.generateDefineForm = function (i, formConsole, formContainer) {
-            var self = this;
-            var propertyDiv = $('<div id="property-header"><h3>Function Configuration</h3></div>' +
-                '<div id="define-function" class="define-function"></div>');
-            formContainer.append(propertyDiv);
+        const alphabeticValidatorRegex = /^([a-zA-Z])$/;
 
-            // generate the form to define a function
-            var editor = new JSONEditor($(formContainer).find('#define-function')[0], {
-                schema: functionSchema,
-                show_errors: "always",
-                disable_properties: true,
-                display_required_only: true,
-                no_additional_properties: true
-            });
-
-            formContainer.append('<div id="submit"><button type="button" class="btn btn-default">Submit</button></div>');
-            $('#' + i).addClass('selected-element');
-            $(".overlayed-container").fadeTo(200, 1);
-            $('#' + i).addClass('incomplete-element');
-            $('#' + i).prop('title', 'Form is incomplete');
-            // 'Submit' button action
-            var submitButtonElement = $(formContainer).find('#submit')[0];
-            submitButtonElement.addEventListener('click', function () {
-
-                var errors = editor.validate();
-                if (errors.length) {
-                    return;
-                }
-                var isFunctionNameUsed = self.formUtils.isFunctionDefinitionElementNameUsed(editor.getValue().name);
-                if (isFunctionNameUsed) {
-                    DesignViewUtils.prototype
-                        .errorAlert("Function name \"" + editor.getValue().name + "\" is already used.");
-                    return;
-                }
-
-                // set the isDesignViewContentChanged to true
-                self.configurationData.setIsDesignViewContentChanged(true);
-
-                // add the new out function to the function array
-                var functionOptions = {};
-                _.set(functionOptions, 'id', i);
-                _.set(functionOptions, 'name', editor.getValue().name);
-                _.set(functionOptions, 'scriptType', (editor.getValue().scriptType).toUpperCase());
-                _.set(functionOptions, 'returnType', (editor.getValue().returnType).toUpperCase());
-                _.set(functionOptions, 'body', editor.getValue().body);
-                var functionObject = new FunctionDefinition(functionOptions);
-                self.configurationData.getSiddhiAppConfig().addFunction(functionObject);
-
-                var textNode = $('#' + i).find('.functionNameNode');
-                textNode.html(editor.getValue().name);
-
-                $('#' + i).removeClass('incomplete-element');
-                $('#' + i).prop('title', '');
-
-                // close the form window
-                self.consoleListManager.removeFormConsole(formConsole);
-
-                self.designViewContainer.removeClass('disableContainer');
-                self.toggleViewButton.removeClass('disableContainer');
-            });
-            return editor.getValue().name;
+        var renderScriptType = function () {
+            var scriptDiv = '<h4> Script Type: </h4> <select id = "script-type">' +
+                '<option value = "Javascript"> Javascript </option>' +
+                '<option value = "Scala"> Scala </option>' +
+                '<option value = "R"> R </option>' +
+                '</select>';
+            $('#function-script-type').html(scriptDiv);
         };
+
+        var renderReturnType = function () {
+            var returnDiv = '<h4> Return Type: </h4> <select id = "return-type">' +
+                '<option value = "int"> int </option>' +
+                '<option value = "long"> long </option>' +
+                '<option value = "double"> double </option>' +
+                '<option value = "float"> float </option>' +
+                '<option value = "string"> string </option>' +
+                '<option value = "bool"> bool </option>' +
+                '<option value = "object"> object </option>' +
+                '</select>';
+            $('#function-return-type').html(returnDiv);
+        }
 
         /**
          * @function generate properties form for a function
@@ -164,98 +69,119 @@ define(['require', 'log', 'jquery', 'lodash', 'functionDefinition', 'designViewU
         FunctionForm.prototype.generatePropertiesForm = function (element, formConsole, formContainer) {
             var self = this;
             var propertyDiv = $('<div id="property-header"><h3>Function Configuration</h3></div>' +
-                '<div id="define-function" class="define-function"></div>');
+                '<div class = "function-form-container"> <div id = "define-function-name"> <h4> Name </h4> ' +
+                '<input type="text" id="functionName" class="clearfix"><label class = "error-message"> </label></div>' +
+                '<div id = "function-script-type"> </div> <div id= "function-return-type"> </div>' +
+                '<button id="btn-submit" type="button" class="btn toggle-view-button"> Submit </button>' +
+                '</div> <div class = "function-form-container"> <div id="define-script-body"> <h4> Script Body: </h4> ' +
+                '<textarea id= "script-body-content" rows="5" cols="50"> </textarea> <label class = "error-message">' +
+                '</label> </div> </div>');
             formContainer.append(propertyDiv);
 
+            var id = $(element).parent().attr('id');
             self.designViewContainer.addClass('disableContainer');
             self.toggleViewButton.addClass('disableContainer');
-
-            var id = $(element).parent().attr('id');
             $('#' + id).addClass('selected-element');
             $(".overlayed-container").fadeTo(200, 1);
+
             // retrieve the function information from the collection
             var clickedElement = self.configurationData.getSiddhiAppConfig().getFunction(id);
-            if (!clickedElement) {
-                var errorMessage = 'unable to find clicked element';
-                log.error(errorMessage);
-                throw errorMessage;
-            }
+
             var name = clickedElement.getName();
-            var scriptType = (clickedElement.getScriptType()).toLowerCase();
-            if (scriptType === 'javascript') {
-                scriptType = 'Javascript';
-            } else if (scriptType === "r") {
-                scriptType = 'R';
-            } else if (scriptType === "scala") {
-                scriptType = 'Scala';
-            } else {
-                console.log("Unknown script type received!")
+            renderScriptType();
+            renderReturnType();
+            if (name) {
+                var scriptType = (clickedElement.getScriptType()).toLowerCase();
+                var returnType = (clickedElement.getReturnType()).toLowerCase();
+                var body = clickedElement.getBody().trim();
+
+                //populate the saved values
+                $('#functionName').val(name.trim());
+                $('#function-script-type').find('#script-type option').filter(function () {
+                    return ($(this).val().toLowerCase() == (scriptType.toLowerCase()));
+                }).prop('selected', true);
+                $('#function-return-type').find('#return-type option').filter(function () {
+                    return ($(this).val().toLowerCase() == (returnType.toLowerCase()));
+                }).prop('selected', true);
+                $('#script-body-content').val(body);
+
             }
-            var returnType = (clickedElement.getReturnType()).toLowerCase();
-            var body = clickedElement.getBody();
-
-            var fillWith = {
-                name: name,
-                scriptType: scriptType,
-                returnType: returnType,
-                body: body
-            };
-
-            var editor = new JSONEditor($(formContainer).find('#define-function')[0], {
-                schema: functionSchema,
-                startval: fillWith,
-                show_errors: "always",
-                disable_properties: true,
-                display_required_only: true,
-                no_additional_properties: true
-            });
-            formContainer.append(self.formUtils.buildFormButtons(true));
 
             // 'Submit' button action
             var submitButtonElement = $(formContainer).find('#btn-submit')[0];
             submitButtonElement.addEventListener('click', function () {
 
-                var errors = editor.validate();
-                if (errors.length) {
+                //clear the error classes
+                $('.error-message').text("");
+                $('.required-input-field').removeClass('required-input-field');
+
+                var functionName = $('#functionName').val().trim();
+                var functionNameErrorMessage = $('#define-function-name').find('.error-message');
+                var previouslySavedName = clickedElement.getName();
+
+                if (functionName === "") {
+                    $('#functionName').addClass('required-input-field');
+                    $('#functionName')[0].scrollIntoView();
+                    functionNameErrorMessage.text("Function name is required.")
                     return;
                 }
-                var isFunctionNameUsed = self.formUtils.isFunctionDefinitionElementNameUsed(editor.getValue().name,
-                    clickedElement.getId());
-                if (isFunctionNameUsed) {
-                    DesignViewUtils.prototype
-                        .errorAlert("Function name \"" + editor.getValue().name + "\" is already used.");
+
+                if (!previouslySavedName) {
+                    previouslySavedName = "";
+                }
+
+                if (previouslySavedName !== functionName) {
+                    var isFunctionNameUsed = self.formUtils.isFunctionDefinitionElementNameUsed(functionName, id);
+                    if (isFunctionNameUsed) {
+                        $('#functionName').addClass('required-input-field');
+                        $('#functionName')[0].scrollIntoView();
+                        functionNameErrorMessage.text("Function name is already used.");
+                        return;
+                    }
+
+                    //to check if function name contains white spaces
+                    if (functionName.indexOf(' ') >= 0) {
+                        $('#functionName').addClass('required-input-field');
+                        $('#functionName')[0].scrollIntoView();
+                        functionNameErrorMessage.text("Function name cannot have white space.");
+                        return;
+                    }
+                    //to check if function name starts with an alphabetic character
+                    if (!(alphabeticValidatorRegex).test(functionName.charAt(0))) {
+                        $('#functionName').addClass('required-input-field');
+                        $('#functionName')[0].scrollIntoView();
+                        functionNameErrorMessage.text("Function name must start with an alphabetic character.");
+                        return;
+                    }
+                    // update selected trigger model
+                    clickedElement.setName(functionName);
+                    self.formUtils.updateConnectionsAfterDefinitionElementNameChange(id);
+                }
+                var scriptBody = $('#script-body-content').val().trim();
+                if (scriptBody === "") {
+                    $('#script-body-content').addClass('required-input-field');
+                    $('#script-body-content')[0].scrollIntoView();
+                    $('#define-script-body').find('.error-message').text("Script body is required.");
                     return;
                 }
+                var scriptType = $('#script-type').val();
+                var returnType = $('#return-type').val();
+                clickedElement.setScriptType(scriptType.toUpperCase());
+                clickedElement.setReturnType(returnType.toUpperCase());
+                clickedElement.setBody(scriptBody);
+
+                var textNode = $(element).parent().find('.functionNameNode');
+                textNode.html(functionName);
+
                 self.designViewContainer.removeClass('disableContainer');
                 self.toggleViewButton.removeClass('disableContainer');
 
                 // set the isDesignViewContentChanged to true
                 self.configurationData.setIsDesignViewContentChanged(true);
-
-                var config = editor.getValue();
-
-                // update selected function model
-                clickedElement.setName(config.name);
-                clickedElement.setScriptType((config.scriptType).toUpperCase());
-                clickedElement.setReturnType((config.returnType).toUpperCase());
-                clickedElement.setBody(config.body);
-
-                var textNode = $(element).parent().find('.functionNameNode');
-                textNode.html(config.name);
-
                 // close the form window
                 self.consoleListManager.removeFormConsole(formConsole);
             });
 
-            // 'Cancel' button action
-            var cancelButtonElement = $(formContainer).find('#btn-cancel')[0];
-            cancelButtonElement.addEventListener('click', function () {
-                self.designViewContainer.removeClass('disableContainer');
-                self.toggleViewButton.removeClass('disableContainer');
-
-                // close the form window
-                self.consoleListManager.removeFormConsole(formConsole);
-            });
         };
 
         return FunctionForm;

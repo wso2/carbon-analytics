@@ -17,9 +17,9 @@
  */
 
 define(['require', 'log', 'lodash', 'jquery', 'partition', 'stream', 'query', 'formBuilder', 'aggregation',
-    'jsonValidator', 'sourceOrSinkAnnotation', 'stream', 'table', 'window', 'trigger'],
+    'jsonValidator', 'sourceOrSinkAnnotation', 'stream', 'table', 'window', 'trigger', 'functionDefinition'],
     function (require, log, _, $, Partition, Stream, Query, FormBuilder, Aggregation, JSONValidator,
-        SourceOrSinkAnnotation, Stream, Table, Window, Trigger) {
+        SourceOrSinkAnnotation, Stream, Table, Window, Trigger, FunctionDefinition) {
 
         /**
          * @class DesignView
@@ -634,7 +634,6 @@ define(['require', 'log', 'lodash', 'jquery', 'partition', 'stream', 'query', 'f
             if (isCodeToDesignMode) {
                 name = aggregationName;
             } else {
-                name = i;
                 //add the new aggregation element to aggregation list
                 var aggregationOptions = {};
                 _.set(aggregationOptions, 'id', i);
@@ -725,7 +724,16 @@ define(['require', 'log', 'lodash', 'jquery', 'partition', 'stream', 'query', 'f
             if (isCodeToDesignMode) {
                 name = functionName;
             } else {
-                name = self.formBuilder.DefineFunction(i);
+                //add the new function element to function list
+				var functionOptions = {};
+				_.set(functionOptions, 'id', i);
+				_.set(functionOptions, 'name', undefined);
+				var functionObject = new FunctionDefinition(functionOptions);
+				self.configurationData.getSiddhiAppConfig().addFunction(functionObject);
+
+				//perform json validation
+				JSONValidator.prototype.validateForElementName(functionObject, "Function", true)
+
             }
             var node = $('<div>' + name + '</div>');
             newAgent.append(node);
