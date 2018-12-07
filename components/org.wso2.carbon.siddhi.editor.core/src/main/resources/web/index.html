@@ -1209,8 +1209,12 @@
         {{#each this}}
         <div class = "attribute">
                 <div class = "clearfix">
-                {{#if key }} <input type = "text" value = "{{key}}" class = "attr-key" readonly/> {{/if}}
-                <input type = "text" value = "{{value}}" class = "attr-value"/>
+                    {{#if key }}
+                        <input type = "text" value = "{{key}}" class = "attr-key" readonly/>
+                        <input type = "text" value = "{{value}}" class = "attr-value"/>
+                    {{else}}
+                        <textarea class = "attr-value"> {{value}} </textarea>
+                    {{/if}}
                 </div>
                 <label class = "error-message"></label>
         </div>
