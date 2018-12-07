@@ -312,10 +312,10 @@ public class SubElementCodeGenerator {
     }
 
     /**
-     *Converts an element in string format to another string with escape characters
-     * which is the siddhi app code representation of the element.
-     * @param elementStr The element in String format. E.g. title = "The wonder of "foo""
-     * @return The code representation of element. E.g. title = """The wonder of "foo""""
+     *Converts an org.wso2.siddhi.query.api.annotation.Element in string format to another string with escape characters
+     * which is the siddhi app code representation of the Element.
+     * @param elementStr The Element in String format. E.g. title = "The wonder of "foo""
+     * @return The code representation of the Element. E.g. title = """The wonder of "foo""""
      */
     private static String toStringWithEscapeChars(String elementStr) {
         String key = null, value;
