@@ -891,6 +891,7 @@ public class EditorMicroservice implements Microservice {
             SiddhiAppConfig siddhiAppConfig = gson.fromJson(siddhiAppConfigJson, SiddhiAppConfig.class);
             CodeGenerator codeGenerator = new CodeGenerator();
             List <ToolTip> toolTipList= codeGenerator.generateSiddhiAppToolTips(siddhiAppConfig);
+
             String jsonString = new Gson().toJson(toolTipList);
             return Response.status(Response.Status.OK)
                     .entity(jsonString)

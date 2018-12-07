@@ -18,7 +18,6 @@
 
 package org.wso2.carbon.siddhi.editor.core.util.designview.beans;
 
-import java.util.Objects;
 
 /**
  * Represents a structure for tooltips
@@ -51,25 +50,4 @@ public class ToolTip {
         this.text = text;
     }
 
-    @Override
-    public String toString() {
-        return "ToolTip{" +
-                "id='" + id + '\'' +
-                ", text='" + text + '\'' +
-                '}';
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        ToolTip toolTip = (ToolTip) o;
-        return Objects.equals(id, toolTip.id) &&
-                Objects.equals(text, toolTip.text);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, text);
-    }
 }
