@@ -28,9 +28,11 @@ import org.wso2.carbon.siddhi.store.api.rest.StoresApiService;
 import org.wso2.carbon.siddhi.store.api.rest.model.ModelApiResponse;
 import org.wso2.carbon.siddhi.store.api.rest.model.Query;
 import org.wso2.carbon.siddhi.store.api.rest.model.Record;
+import org.wso2.carbon.siddhi.store.api.rest.model.RecordDetail;
 import org.wso2.carbon.stream.processor.common.SiddhiAppRuntimeService;
 import org.wso2.siddhi.core.SiddhiAppRuntime;
 import org.wso2.siddhi.core.event.Event;
+import org.wso2.siddhi.query.api.definition.Attribute;
 
 import javax.ws.rs.core.Response;
 import java.util.ArrayList;
@@ -67,6 +69,10 @@ public class StoresApiServiceImpl extends StoresApiService {
                 List<Record> records = getRecords(events);
                 ModelApiResponse response = new ModelApiResponse();
                 response.setRecords(records);
+                if (body.isDetails()) {
+                    Attribute[] attributes = siddhiAppRuntime.getStoreQueryOutputAttributes(body.getQuery());
+                    response.setDetails(getRecordDetails(attributes));
+                }
                 return Response.ok().entity(response).build();
             } catch (Exception e) {
                 log.error("Error while querying for siddhiApp: " + removeCRLFCharacters(body.getAppName()) +
@@ -77,6 +83,22 @@ public class StoresApiServiceImpl extends StoresApiService {
                                                        "Cannot query: " + e.getMessage())).build();
             }
         }
+    }
+
+    /**
+     * Get record details.
+     *
+     * @param attributes Set of attributes
+     * @return List of record details
+     */
+    private List<RecordDetail> getRecordDetails(Attribute[] attributes) {
+        List<RecordDetail> details = new ArrayList<>();
+        for (Attribute attribute : attributes) {
+            details.add(new RecordDetail()
+                    .name(attribute.getName())
+                    .dataType(attribute.getType().toString()));
+        }
+        return details;
     }
 
     private List<Record> getRecords(Event[] events) {

@@ -1561,3 +1561,107 @@ span.fw-stack.fw-lg {
 pre.renderjson {
     background-color: transparent !important;
 }
+
+.store-query .modal-body .col-sm-12 {
+    padding: 0 15px;
+}
+
+textarea.form-control.curl-editor {
+    height: 65px;
+}
+
+.store-query .form-horizontal {
+    max-width: initial;
+}
+
+.modal-header {
+    padding: 15px 0 5px;
+}
+
+.close:hover {
+    color: #a5a5a5;
+}
+
+.modal-body {
+    padding: 0 20px;
+}
+
+.table-bordered {
+    border: 1px solid #424242;
+}
+
+.table-bordered > tbody > tr > td,
+.table-bordered > thead > tr > th{
+    border-right: 1px solid #424242;
+}
+
+.table-bordered > thead > tr > th {
+    color: #299ee5;
+    font-weight: 500
+}
+
+.table {
+    background: #242424;
+    color: #b7b7b7
+}
+
+.table-striped > tbody > tr:nth-of-type(2n+1) {
+    background-color: #313131;
+}
+
+.table-bordered > thead > tr > th,
+.table-bordered > thead > tr > td,
+.table-bordered > tbody > tr > th,
+.table-bordered > tbody > tr > td,
+.table-bordered > tfoot > tr > th,
+.table-bordered > tfoot > tr > td {
+    border: 1px solid #424242;
+}
+
+.table > caption + thead > tr:first-child > th,
+.table > caption + thead > tr:first-child > td,
+.table > colgroup + thead > tr:first-child > th,
+.table > colgroup + thead > tr:first-child > td,
+.table > thead:first-child > tr:first-child > th,
+.table > thead:first-child > tr:first-child > td {
+    border-bottom: 0 none;
+}
+
+table.dataTable thead .sorting::after,
+table.dataTable thead .sorting_asc::after,
+table.dataTable thead .sorting_desc::after,
+table.dataTable thead .sorting_asc_disabled::after,
+table.dataTable thead .sorting_desc_disabled::after {
+    opacity: 1;
+}
+
+table.dataTable thead .sorting::after {
+    opacity: 0.3;
+}
+
+.table-hover > tbody > tr:hover {
+    background-color: #313131;
+}
+
+.table.table-hover > tbody > tr:hover td:not(.dataTables_empty) {
+    background: #383838 !important;
+}
+
+.table > tbody > tr > td {
+    padding: 2px 8px;
+}
+
+.dataTablesBottom {color:#b7b7b7 }
+
+div.dataTables_wrapper div.dataTables_info {
+    padding-top: 4px;
+}
+
+.modal-dialog.store-query {
+    margin: 60px auto 0;
+}
+
+div.dataTables_wrapper div.dataTables_info {
+    padding: 7px;
+    border-left: 1px solid #494949;
+}

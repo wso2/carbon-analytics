@@ -19,6 +19,7 @@
 package org.wso2.carbon.siddhi.editor.core.internal;
 
 import org.osgi.framework.BundleContext;
+import org.wso2.carbon.analytics.idp.client.core.api.AnalyticsHttpClientBuilderService;
 import org.wso2.siddhi.core.SiddhiManager;
 
 import java.util.Collections;
@@ -35,6 +36,7 @@ public class EditorDataHolder {
     private static DebugProcessorService debugProcessorService;
     private static Map<String, DebugRuntime> siddhiAppMap = new ConcurrentHashMap<>();
     private static Map<String, String> siddhiSampleMap = Collections.emptyMap();
+    private AnalyticsHttpClientBuilderService clientBuilderService;
 
     private EditorDataHolder() {
 
@@ -78,5 +80,23 @@ public class EditorDataHolder {
 
     public static void setSiddhiSampleMap(Map<String, String> siddhiSampleMap) {
         EditorDataHolder.siddhiSampleMap = siddhiSampleMap;
+    }
+
+    /**
+     * Get an instance of Analytics HTTP client builder service.
+     *
+     * @return An instance of AnalyticsHttpClientBuilderService
+     */
+    public AnalyticsHttpClientBuilderService getClientBuilderService() {
+        return clientBuilderService;
+    }
+
+    /**
+     * Set an instance of Analytics HTTP client builder service.
+     *
+     * @param clientBuilderService An object of AnalyticsHttpClientBuilderService
+     */
+    public void setClientBuilderService(AnalyticsHttpClientBuilderService clientBuilderService) {
+        this.clientBuilderService = clientBuilderService;
     }
 }
