@@ -32,10 +32,19 @@ public class Query {
     private String query = null;
     @JsonProperty("appName")
     private String appName = null;
+    @JsonProperty("details")
+    private boolean details = false;
 
     public Query query(String appName, String query) {
         this.query = query;
         this.appName = appName;
+        return this;
+    }
+
+    public Query query(String appName, String query, boolean details) {
+        this.query = query;
+        this.appName = appName;
+        this.details = details;
         return this;
     }
 
@@ -60,6 +69,14 @@ public class Query {
         this.query = query;
     }
 
+    public boolean isDetails() {
+        return details;
+    }
+
+    public void setDetails(boolean details) {
+        this.details = details;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) {
@@ -75,6 +92,9 @@ public class Query {
             return false;
         }
         if (!appName.equals(query1.appName)) {
+            return false;
+        }
+        if (details != query1.details) {
             return false;
         }
 

@@ -2531,6 +2531,7 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
             new DragSelect({
                 selectables: document.querySelectorAll('.jtk-draggable'),
                 selector: document.getElementById(constants.MULTI_SELECTOR),
+                area: document.getElementById('design-grid-container-' + self.currentTabId),
                 multiSelectKeys: ['ctrlKey', 'shiftKey'],
                 onElementSelect: function (element) {
                     if (!self.selectedObjects.includes(element)) {

@@ -176,10 +176,19 @@ define(['require', 'jquery', 'backbone', 'lodash', 'log', 'design_view', "./sour
                                 // The following code has been added to the setTimeout() method because
                                 // the code needs to run asynchronously for the loading screen
                                 setTimeout(function () {
-                                    designView.emptyDesignViewGridContainer();
-                                    designContainer.show();
-                                    designView.renderDesignGrid(self.JSONObject);
-                                    loadingScreen.hide();
+                                    var fileHashCode = application.tabController.getActiveTab().getFile().attributes.hashCode;
+                                    var renderedAppContentHashCode = designView.getHashCode();
+                                    if (fileHashCode != renderedAppContentHashCode || fileHashCode == undefined &&
+                                        renderedAppContentHashCode == undefined) {
+                                        designView.setHashCode(fileHashCode);
+                                        designView.emptyDesignViewGridContainer();
+                                        designContainer.show();
+                                        designView.renderDesignGrid(self.JSONObject);
+                                        loadingScreen.hide();
+                                    } else {
+                                        designContainer.show();
+                                        loadingScreen.hide();
+                                    }
                                     // NOTE - This trigger should be always handled at the end of setTimeout()
                                     self.trigger("view-switch");
                                 }, 100);
@@ -238,7 +247,6 @@ define(['require', 'jquery', 'backbone', 'lodash', 'log', 'design_view', "./sour
 
                             if (!isDesignViewContentChanged) {
                                 designContainer.hide();
-                                designView.emptyDesignViewGridContainer();
                                 sourceContainer.show();
                                 self.trigger("view-switch");
                                 toggleViewButton.html("<i class=\"fw fw-design-view fw-rotate-90\"></i>" +

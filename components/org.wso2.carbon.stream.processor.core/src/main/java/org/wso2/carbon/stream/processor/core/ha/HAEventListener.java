@@ -26,7 +26,6 @@ import org.wso2.carbon.cluster.coordinator.service.ClusterCoordinator;
 import org.wso2.carbon.stream.processor.core.ha.util.HAConstants;
 import org.wso2.carbon.stream.processor.core.internal.StreamProcessorDataHolder;
 import org.wso2.carbon.stream.processor.core.persistence.PersistenceManager;
-import org.wso2.siddhi.core.exception.ConnectionUnavailableException;
 import org.wso2.siddhi.core.stream.input.source.SourceHandler;
 import org.wso2.siddhi.core.stream.input.source.SourceHandlerManager;
 import org.wso2.siddhi.core.stream.output.sink.SinkHandler;
@@ -98,10 +97,16 @@ public class HAEventListener extends MemberEventListener {
                     getRecordTableHandlerManager();
             Map<String, RecordTableHandler> registeredRecordTableHandlers = recordTableHandlerManager.
                     getRegisteredRecordTableHandlers();
-          
+
             if (clusterCoordinator.isLeaderNode()) {
                 for (SourceHandler sourceHandler : registeredSourceHandlers.values()) {
-                    ((HACoordinationSourceHandler) sourceHandler).setAsActive();
+                    try {
+                        ((HACoordinationSourceHandler) sourceHandler).setAsActive();
+                    } catch (Throwable t) {
+                        log.error("HA Deployment: Error when connecting to source " + sourceHandler.getElementId() +
+                                " while changing from passive state to active, skipping the source. ", t);
+                        continue;
+                    }
                 }
                 StreamProcessorDataHolder.getHAManager().changeToActive();
                 if (clusterCoordinator.getAllNodeDetails().size() == 2) {
@@ -111,7 +116,13 @@ public class HAEventListener extends MemberEventListener {
                     StreamProcessorDataHolder.getHAManager().initializeEventSyncConnectionPool();
                 }
                 for (SinkHandler sinkHandler : registeredSinkHandlers.values()) {
-                    ((HACoordinationSinkHandler) sinkHandler).setAsActive();
+                    try {
+                        ((HACoordinationSinkHandler) sinkHandler).setAsActive();
+                    } catch (Throwable t) {
+                        log.error("HA Deployment: Error when connecting to sink " + sinkHandler.getElementId() +
+                                " while changing from passive state to active, skipping the sink. ", t);
+                        continue;
+                    }
                 }
 
                 for (RecordTableHandler recordTableHandler : registeredRecordTableHandlers.values()) {

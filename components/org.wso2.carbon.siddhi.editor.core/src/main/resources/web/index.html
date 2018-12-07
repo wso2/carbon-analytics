@@ -12,6 +12,9 @@
     <link href="/editor/commons/lib/jquery-ui_v1.12.1/jquery-ui.css" rel="stylesheet" type="text/css"/>
     <link href="/editor/commons/lib/js-tree-v3.3.2/themes/default/style.css" rel="stylesheet" type="text/css"/>
     <link href="/editor/commons/lib/nanoscroller_0.8.7/nanoscroller.css" rel="stylesheet" type="text/css"/>
+    <link href="/editor/commons/lib/data-table/dataTables.bootstrap.min.css" rel="stylesheet" type="text/css"/>
+    <link href="/editor/commons/lib/theme-wso2-2.0.0/extensions/datatables/css/dataTables.wso2.css" rel="stylesheet"
+          type="text/css"/>
     <link href="/editor/commons/css/layout.css" rel="stylesheet" type="text/css"/>
     <link href="/editor/commons/css/styles.css" rel="stylesheet" type="text/css"/>
     <link href="/editor/commons/css/welcome-screen.css" rel="stylesheet" type="text/css"/>
@@ -1262,12 +1265,11 @@
             <div class="modal-header">
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                     <i class="fw fw-cancel  about-dialog-close"></i></button>
-                <h3 class="modal-title" id="aboutSettingsLabel">Settings</h3>
+                <h3 class="modal-title file-dialog-title" id="aboutSettingsLabel">Settings - Source View</h3>
+                <hr class="style1"/>
             </div>
             <div class="modal-body add-margin-top-2x add-margin-bottom-2x">
                 <form>
-                    <h4>Source View</h4>
-                    <hr/>
                     <div class="form-group">
                         <label for="sourceViewTheme">Theme</label>
                         <select class="form-control" id="sourceViewTheme">
@@ -1335,6 +1337,59 @@
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-default" data-dismiss="modal" id="saveSettingsButton">OK</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!--Start: Store Query Modal-->
+<div class="modal fade" id="modalStoreQuery" tabindex="-1" role="dialog">
+    <div class="modal-dialog store-query" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><i
+                        class="fw fw-cancel  about-dialog-close"></i></button>
+                <h4 class="modal-title file-dialog-title">Siddhi Store Query</h4>
+                <hr class="style1">
+            </div>
+            <div class="modal-body">
+                <div class="container-fluid">
+                    <form id="storeQueryForm" class="form-horizontal" onsubmit="return false">
+                        <div class="form-group">
+                            <label class="col-sm-12">
+                                Siddhi App Name
+                            </label>
+                            <div class="col-sm-12">
+                                <select name="siddhi-app-name" id="store-query-siddhi-app-name" class="form-control">
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="location" class="col-sm-12">Query</label>
+                            <div class="col-sm-12">
+                                <textarea id="curlEditor" class="curl-editor form-control"></textarea>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="file-dialog-form-btn">
+                                <button id="executeQuery" type="submit" class="btn btn-primary">Execute</button>
+                                <div class="divider"></div>
+                                <button type="button" class="btn btn-default" data-dismiss="modal">cancel</button>
+                            </div>
+                        </div>
+                        <div class="form-group" style="padding-left: 15px;">
+                            <div id="error-box" class="alert alert-danger" style="display: none;"></div>
+                        </div>
+                        <div id="simulator_output">
+                            <table id="query_data" class="table table-striped table-hover table-bordered data-table
+                            compact hidden">
+                            <thead>
+                            </thead>
+                            <tbody>
+                            </tbody>
+                            </table>
+                        </div>
+                    </form>
+                </div>
             </div>
         </div>
     </div>
@@ -1428,7 +1483,6 @@
     </div>
 </div>
 
-
 <script src="/editor/commons/lib/requirejs-2.3.2/require.js"></script>
 <script type="text/javascript">
     requirejs.config({
@@ -1462,6 +1516,9 @@
             theme_wso2: "commons/lib/theme-wso2-2.0.0/js/theme-wso2.min",
             ace: "commons/lib/ace-editor",
             overlay_scroller: "commons/lib/overlay_scroll/js/jquery.overlayScrollbars.min",
+            datatables: "commons/lib/data-table/jquery.dataTables.min",
+            datatables_bootstrap: "commons/lib/data-table/dataTables.bootstrap.min",
+            datatables_wso2: "commons/lib/theme-wso2-2.0.0/extensions/datatables/js/dataTables.wso2",
             //beautify: "commons/lib/beautify",
             ///////////////////////
             // custom modules ////
@@ -1566,7 +1623,8 @@
             "*": {
                 // use lodash instead of underscore
                 underscore: "lodash",
-                jQuery: "jquery"
+                jQuery: "jquery",
+                'datatables.net': "datatables"
             }
         },
         packages: [
@@ -1801,6 +1859,10 @@
             sample_event_dialog:{
                 selector: "#modalSampleEvent",
                 submit_button: "#generateSampleEventButton"
+            },
+            query_store_api:{
+                selector: "#modalStoreQuery",
+                submit_button: "#executeQuery"
             },
             output_controller: {
                 container: "#console-container",
