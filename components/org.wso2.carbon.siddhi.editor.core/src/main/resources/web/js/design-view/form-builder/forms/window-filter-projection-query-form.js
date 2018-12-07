@@ -17,11 +17,11 @@
  */
 
 define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert', 'queryOutputDelete',
-    'queryOutputUpdate', 'queryOutputUpdateOrInsertInto', 'queryWindowOrFunction', 'queryOrderByValue',
-    'streamHandler', 'designViewUtils', 'jsonValidator'],
+        'queryOutputUpdate', 'queryOutputUpdateOrInsertInto', 'queryWindowOrFunction', 'queryOrderByValue',
+        'streamHandler', 'designViewUtils', 'jsonValidator'],
     function (require, log, $, _, QuerySelect, QueryOutputInsert, QueryOutputDelete, QueryOutputUpdate,
-        QueryOutputUpdateOrInsertInto, QueryWindowOrFunction, QueryOrderByValue, StreamHandler, DesignViewUtils,
-        JSONValidator) {
+              QueryOutputUpdateOrInsertInto, QueryWindowOrFunction, QueryOrderByValue, StreamHandler, DesignViewUtils,
+              JSONValidator) {
 
         var constants = {
             PROJECTION: 'projectionQueryDrop',
@@ -54,7 +54,7 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
          * @param formContainer Container which holds the form
          */
         WindowFilterProjectionQueryForm.prototype.generatePropertiesForm = function (element, formConsole,
-            formContainer) {
+                                                                                     formContainer) {
             var self = this;
             var propertyDiv = $('<div id="property-header"><h3>Query Configuration </h3></div>' +
                 '<div class="define-windowFilterProjection-query"></div>');

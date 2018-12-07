@@ -33,9 +33,9 @@ define(['jquery', './modal-dialog'], function ($, ModalDialog) {
         }
 
         var close = $("<button type='button' class='btn btn-default" +
-                            " close-all-file-confirm-dialog-btn'>Close</button>");
+            " close-all-file-confirm-dialog-btn'>Close</button>");
         var cancelBtn = $("<button type='button' class='btn btn-default'" +
-                          " data-dismiss='modal'>Cancel</button>");
+            " data-dismiss='modal'>Cancel</button>");
         this._close = close;
 
         this.getFooter().empty();
@@ -54,7 +54,7 @@ define(['jquery', './modal-dialog'], function ($, ModalDialog) {
         var body = this.getBody();
         body.empty();
         body.append($("<p><br>Files contains changes, do you want to close them ? Your changes will " +
-         "be lost if you close all without saving.</p>"))
+            "be lost if you close all without saving.</p>"))
 
         this._close.unbind('click');
 

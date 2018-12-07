@@ -51,9 +51,9 @@ define(['require', 'log', 'lodash', 'jquery', 'event_channel', 'app/source-edito
             var self = this;
             $(this._container).show();
             var editorFontSize = (this._storage.get("pref:sourceViewFontSize") != null) ?
-                    this._storage.get("pref:sourceViewFontSize"): _.get(this._options, 'font_size');
+                this._storage.get("pref:sourceViewFontSize"): _.get(this._options, 'font_size');
             var editorTheme = (this._storage.get("pref:sourceViewTheme") != null) ? this._storage.get
-                ("pref:sourceViewTheme"): _.get(this._options, 'theme');
+            ("pref:sourceViewTheme"): _.get(this._options, 'theme');
 
             self._editor.setFontSize(editorFontSize);
             self._editor.setTheme(editorTheme);
@@ -115,7 +115,7 @@ define(['require', 'log', 'lodash', 'jquery', 'event_channel', 'app/source-edito
         };
 
         SourceView.prototype.getRawExtensions = function (){
-        	return this._mainEditor.getRawExtensions();
+            return this._mainEditor.getRawExtensions();
         };
 
         /**

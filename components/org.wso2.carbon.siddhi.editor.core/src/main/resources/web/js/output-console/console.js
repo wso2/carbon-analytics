@@ -50,7 +50,7 @@ define(['log', 'backbone','lodash', 'jquery'], function (log, Backbone, _, $) {
                 this._appName = _.get(options, 'appName') + ".siddhi";
 
                 if (_.has(options, 'parent')){
-                  this.setParent(_.get(options, 'parent'));
+                    this.setParent(_.get(options, 'parent'));
                 }
 
                 // create the console template

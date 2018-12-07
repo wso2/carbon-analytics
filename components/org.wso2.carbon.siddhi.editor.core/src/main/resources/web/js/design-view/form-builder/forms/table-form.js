@@ -17,7 +17,7 @@
  */
 
 define(['log', 'jquery', 'lodash', 'attribute', 'table', 'storeAnnotation', 'designViewUtils', 'handlebar',
-    'js_tree'],
+        'js_tree'],
     function (log, $, _, Attribute, Table, StoreAnnotation, DesignViewUtils, Handlebars, jstree) {
 
         /**
@@ -99,12 +99,12 @@ define(['log', 'jquery', 'lodash', 'attribute', 'table', 'storeAnnotation', 'des
             }
         };
 
-		/**
-		 * Function to obtain a particular option from predefined option
-		 * @param {String} optionName option which needs to be found
-		 * @param {Object} predefinedOptions set of predefined option
-		 * @return {Object} option
-		 */
+        /**
+         * Function to obtain a particular option from predefined option
+         * @param {String} optionName option which needs to be found
+         * @param {Object} predefinedOptions set of predefined option
+         * @return {Object} option
+         */
         var getOption = function (optionName, predefinedOptions) {
             var option = null;
             for (var predefinedOption of predefinedOptions) {
@@ -116,12 +116,12 @@ define(['log', 'jquery', 'lodash', 'attribute', 'table', 'storeAnnotation', 'des
             return option;
         };
 
-		/**
-		 * Function to validate the predefined options
-		 * @param {Object} selectedOptions array to add the options which needs to be saved
-		 * @param {Object} predefinedOptions
-		 * @return {boolean} isError
-		 */
+        /**
+         * Function to validate the predefined options
+         * @param {Object} selectedOptions array to add the options which needs to be saved
+         * @param {Object} predefinedOptions
+         * @return {boolean} isError
+         */
         var validateOptions = function (optionsMap, predefinedOptions) {
             var isError = false;
             $('#define-store-options .option').each(function () {
@@ -172,10 +172,10 @@ define(['log', 'jquery', 'lodash', 'attribute', 'table', 'storeAnnotation', 'des
         };
 
         /**
-        * Function to validate the customized options
-        * @param {Object} selectedOptions options which needs to be saved
-        * @return {boolean} isError
-        */
+         * Function to validate the customized options
+         * @param {Object} selectedOptions options which needs to be saved
+         * @return {boolean} isError
+         */
         var validateCustomizedOptions = function (optionsMap) {
             var isError = false;
             if ($('#customized-store-options ul').has('li').length != 0) {
@@ -204,12 +204,12 @@ define(['log', 'jquery', 'lodash', 'attribute', 'table', 'storeAnnotation', 'des
             return isError;
         };
 
-		/**
-        * Function to validate the data type of the options
-        * @param {String} dataType data-type of the option
-        * @param {String} optionValue value of the option
-        * @return {boolean} invalidDataType
-		*/
+        /**
+         * Function to validate the data type of the options
+         * @param {String} dataType data-type of the option
+         * @param {String} optionValue value of the option
+         * @return {boolean} invalidDataType
+         */
         var validateDataType = function (dataType, optionValue) {
             var invalidDataType = false;
             intLongRegexMatch = /^[-+]?\d+$/;
@@ -231,11 +231,11 @@ define(['log', 'jquery', 'lodash', 'attribute', 'table', 'storeAnnotation', 'des
             return invalidDataType;
         };
 
-		/**
-		 * Function to create option object with an additional empty value attribute
-		 * @param {Object} optionArray Predefined options without the attribute 'value'
-		 * @return {Object} options
-		 */
+        /**
+         * Function to create option object with an additional empty value attribute
+         * @param {Object} optionArray Predefined options without the attribute 'value'
+         * @return {Object} options
+         */
         var createOptionObjectWithValues = function (optionArray) {
             var options = [];
             _.forEach(optionArray, function (option) {
@@ -248,11 +248,11 @@ define(['log', 'jquery', 'lodash', 'attribute', 'table', 'storeAnnotation', 'des
         };
 
         /**
-		 * Function to map the saved option values to the option object
-		 * @param {Object} predefinedOptions Predefined options of a particular source/map annotation type
-		 * @param {Object} savedOptions Saved options
-		 * @return {Object} options
-		*/
+         * Function to map the saved option values to the option object
+         * @param {Object} predefinedOptions Predefined options of a particular source/map annotation type
+         * @param {Object} savedOptions Saved options
+         * @return {Object} options
+         */
         var mapUserOptionValues = function (predefinedOptions, savedOptions) {
             var options = [];
             _.forEach(predefinedOptions, function (predefinedOption) {
@@ -279,11 +279,11 @@ define(['log', 'jquery', 'lodash', 'attribute', 'table', 'storeAnnotation', 'des
         };
 
         /**
-		 * Function to obtain the customized option entered by the user in the source view
-		 * @param {Object} predefinedOptions Predefined options of a particular store annotation type
-		 * @param {Object} savedOptions saved store options
-		 * @return {Object} customizedOptions
-		 */
+         * Function to obtain the customized option entered by the user in the source view
+         * @param {Object} predefinedOptions Predefined options of a particular store annotation type
+         * @param {Object} savedOptions saved store options
+         * @return {Object} customizedOptions
+         */
         var getCustomizedOptions = function (predefinedOptions, savedOptions) {
             var customizedOptions = [];
             _.forEach(savedOptions, function (savedOption) {
@@ -301,12 +301,12 @@ define(['log', 'jquery', 'lodash', 'attribute', 'table', 'storeAnnotation', 'des
             return customizedOptions;
         };
 
-		/**
-		 * Function to render the options for the selected store type using handlebars
-		 * @param {Object} optionsArray Saved options
-		 * @param {Object} customizedMapperOptions Options typed by the user which aren't one of the predefined option
-		 * @param {String} id Id for the div to embed the options
-		 */
+        /**
+         * Function to render the options for the selected store type using handlebars
+         * @param {Object} optionsArray Saved options
+         * @param {Object} customizedMapperOptions Options typed by the user which aren't one of the predefined option
+         * @param {String} id Id for the div to embed the options
+         */
         var renderOptions = function (optionsArray, customizedOptions, id) {
             optionsArray.sort(function (val1, val2) {
                 if (val1.optional && !val2.optional) return 1;
@@ -323,12 +323,12 @@ define(['log', 'jquery', 'lodash', 'attribute', 'table', 'storeAnnotation', 'des
             changeCustOptDiv();
         };
 
-		/**
-		 * Function to get the options of the selected store type
-		 * @param {String} selectedType Selected store type
-		 * @param {object} types Predefined store types
-		 * @return {object} options
-		 */
+        /**
+         * Function to get the options of the selected store type
+         * @param {String} selectedType Selected store type
+         * @param {object} types Predefined store types
+         * @return {object} options
+         */
         var getSelectedTypeOptions = function (selectedType, types) {
             var options = [];
             for (type of types) {
@@ -343,7 +343,7 @@ define(['log', 'jquery', 'lodash', 'attribute', 'table', 'storeAnnotation', 'des
         /** Function to change the heading and the button text of the customized options div */
         var changeCustOptDiv = function () {
             var storeCustOptionList = $('.table-form-container #customized-store-options').
-                find('.cust-options li');
+            find('.cust-options li');
             var storeDivParent = $('.table-form-container #customized-store-options');
             if (storeCustOptionList.length > 0) {
                 storeDivParent.find('h3').show();
@@ -351,7 +351,7 @@ define(['log', 'jquery', 'lodash', 'attribute', 'table', 'storeAnnotation', 'des
             } else {
                 storeDivParent.find('h3').hide();
                 storeDivParent.find('.btn-add-options').
-                    html('Add customized option');
+                html('Add customized option');
             }
         };
 
@@ -419,7 +419,7 @@ define(['log', 'jquery', 'lodash', 'attribute', 'table', 'storeAnnotation', 'des
                     var start_pos_name = savedAnnotation.indexOf('@') + 1;
                     var end_pos_name = savedAnnotation.indexOf('(', start_pos_name);
                     var savedAnnotName = savedAnnotation.substring(start_pos_name, end_pos_name).trim().
-                        toLowerCase();
+                    toLowerCase();
                     if (savedAnnotName === predefined_annotation.name.toLowerCase()) {
                         predefined_annotation.isChecked = true;
                         var start_pos_value = savedAnnotation.indexOf('(') + 1;
@@ -473,7 +473,7 @@ define(['log', 'jquery', 'lodash', 'attribute', 'table', 'storeAnnotation', 'des
         /**
          * Function to build the table annotation as a string
          * @param {Object} annotationList array to add the built string annotations
-        */
+         */
         var buildAnnotations = function (annotationList) {
             $('#define-table-annotation .table-annotation').each(function () {
                 if ($(this).find('.annotation-checkbox').is(':checked')) {
@@ -526,7 +526,7 @@ define(['log', 'jquery', 'lodash', 'attribute', 'table', 'storeAnnotation', 'des
                         rdbms_options.push({
                             key: predefinedOption.key, value: predefinedOption.value, description: predefinedOption
                                 .description, optional: predefinedOption.optional, defaultValue: predefinedOption
-                                    .defaultValue
+                                .defaultValue
                         })
                     }
                 });
@@ -542,7 +542,7 @@ define(['log', 'jquery', 'lodash', 'attribute', 'table', 'storeAnnotation', 'des
                         rdbms_options.push({
                             key: predefinedOption.key, value: predefinedOption.value, description: predefinedOption
                                 .description, optional: predefinedOption.optional, defaultValue: predefinedOption
-                                    .defaultValue
+                                .defaultValue
                         })
                     }
                 });
@@ -558,7 +558,7 @@ define(['log', 'jquery', 'lodash', 'attribute', 'table', 'storeAnnotation', 'des
                         rdbms_options.push({
                             key: predefinedOption.key, value: predefinedOption.value, description: predefinedOption
                                 .description, optional: predefinedOption.optional, defaultValue: predefinedOption
-                                    .defaultValue
+                                .defaultValue
                         })
                     }
 
@@ -711,7 +711,7 @@ define(['log', 'jquery', 'lodash', 'attribute', 'table', 'storeAnnotation', 'des
             //To add annotation value
             $('#define-table-annotation').on('click', '.btn-add-annot-value', function () {
                 $(this).parents(".table-annotation").find("ul").append
-                    ('<li class = "clearfix table-annotation-value"> <div class="clearfix"> ' +
+                ('<li class = "clearfix table-annotation-value"> <div class="clearfix"> ' +
                     '<input type = "text" value = "" class = "annotation-value"/> ' +
                     '<a class = "btn-del-annot-value"> <i class = "fw fw-delete"> </i> </a> </div> ' +
                     '<label class="error-message"></label> </li>');

@@ -144,9 +144,9 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
                 self.canvas.droppable
                 ({
                     accept: '.stream-drag, .table-drag, .window-drag, .trigger-drag, .aggregation-drag,' +
-                    '.projection-query-drag, .filter-query-drag, .join-query-drag, .window-query-drag,' +
-                    '.pattern-query-drag, .sequence-query-drag, .partition-drag, .source-drag, .sink-drag, ' +
-                    '.function-drag, .function-query-drag',
+                        '.projection-query-drag, .filter-query-drag, .join-query-drag, .window-query-drag,' +
+                        '.pattern-query-drag, .sequence-query-drag, .partition-drag, .source-drag, .sink-drag, ' +
+                        '.function-drag, .function-query-drag',
                     containment: 'grid-container',
 
                     /**
@@ -705,7 +705,7 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
 
                     } else if (targetElement.hasClass(constants.SINK) && sourceElement.hasClass(constants.STREAM)) {
                         connectedElementName = self.configurationData.getSiddhiAppConfig().getStream(sourceId)
-                                .getName();
+                            .getName();
                         self.configurationData.getSiddhiAppConfig().getSink(targetId)
                             .setConnectedElementName(connectedElementName);
 

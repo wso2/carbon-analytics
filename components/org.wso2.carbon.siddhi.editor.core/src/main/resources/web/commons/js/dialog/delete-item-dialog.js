@@ -51,14 +51,14 @@ define(['require', 'jquery', 'lodash', './modal-dialog', 'log'], function (requi
         this.clearError();
         var modalBody =
             $("<div class='delete-item-dialog'>" +
-                   "<div class='icon'>" +
-                        "<i class='fw fw-warning fw-5x'></i>" +
-                   "</div>" +
-                   "<div class='text'>" +
-                            "<h3> Are you sure you want to delete the selected item?</h3>" +
-                            "<p>You are deleting:</br>" +  data.path + "</p>" +
-                   "</div>" +
-            "</div>");
+                "<div class='icon'>" +
+                "<i class='fw fw-warning fw-5x'></i>" +
+                "</div>" +
+                "<div class='text'>" +
+                "<h3> Are you sure you want to delete the selected item?</h3>" +
+                "<p>You are deleting:</br>" +  data.path + "</p>" +
+                "</div>" +
+                "</div>");
         body.append(modalBody);
 
         this.show();

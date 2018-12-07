@@ -17,9 +17,9 @@
  */
 
 define(['log', 'jquery', 'lodash', 'sourceOrSinkAnnotation', 'mapAnnotation', 'payloadOrAttribute',
-    'jsonValidator', 'handlebar', 'designViewUtils'],
+        'jsonValidator', 'handlebar', 'designViewUtils'],
     function (log, $, _, SourceOrSinkAnnotation, MapAnnotation, PayloadOrAttribute, JSONValidator, Handlebars,
-        DesignViewUtils) {
+              DesignViewUtils) {
 
         /**
          * @class SinkForm Creates a forms to collect data from a sink
@@ -141,7 +141,7 @@ define(['log', 'jquery', 'lodash', 'sourceOrSinkAnnotation', 'mapAnnotation', 'p
          * @param {Object} predefinedOptions Predefined options of a particular sink/map annotation type
          * @param {Object} savedOptions Saved options
          * @return {Object} options
-        */
+         */
         var mapUserOptionValues = function (predefinedOptions, savedOptions) {
             var options = [];
             _.forEach(predefinedOptions, function (predefinedOption) {
@@ -379,11 +379,11 @@ define(['log', 'jquery', 'lodash', 'sourceOrSinkAnnotation', 'mapAnnotation', 'p
         };
 
         /**
-        * Function to validate the data type of the options
-        * @param {String} dataType data-type of the option
-        * @param {String} optionValue value of the option
-        * @return {boolean} invalidDataType
-        */
+         * Function to validate the data type of the options
+         * @param {String} dataType data-type of the option
+         * @param {String} optionValue value of the option
+         * @return {boolean} invalidDataType
+         */
         var validateDataType = function (dataType, optionValue) {
             var invalidDataType = false;
             intLongRegexMatch = /^[-+]?\d+$/;
@@ -408,7 +408,7 @@ define(['log', 'jquery', 'lodash', 'sourceOrSinkAnnotation', 'mapAnnotation', 'p
         /** Function to change the heading and the button text of the customized options div */
         var changeCustOptDiv = function () {
             var sourceCustOptionList = $('.source-sink-map-options #customized-sink-options').
-                find('.cust-options li');
+            find('.cust-options li');
             var sourceDivParent = $('.source-sink-map-options #customized-sink-options');
             if (sourceCustOptionList.length > 0) {
                 sourceDivParent.find('h3').show();
@@ -418,7 +418,7 @@ define(['log', 'jquery', 'lodash', 'sourceOrSinkAnnotation', 'mapAnnotation', 'p
                 sourceDivParent.find('.btn-add-options').html('Add customized option');
             }
             var mapperCustOptionList = $('.source-sink-map-options #customized-mapper-options').
-                find('.cust-options li');
+            find('.cust-options li');
             var mapperDivParent = $('.source-sink-map-options #customized-mapper-options');
             if (mapperCustOptionList.length > 0) {
                 mapperDivParent.find('h3').show();

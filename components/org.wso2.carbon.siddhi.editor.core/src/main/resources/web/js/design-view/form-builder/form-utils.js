@@ -124,19 +124,19 @@ define(['require', 'lodash'],
             var sequenceQueryList = self.configurationData.getSiddhiAppConfig().getSequenceQueryList();
             var patternQueryList = self.configurationData.getSiddhiAppConfig().getPatternQueryList();
             var WindowFilterProjectionQueryList = self.configurationData.getSiddhiAppConfig()
-                                                            .getWindowFilterProjectionQueryList();
+                .getWindowFilterProjectionQueryList();
             var listNames = [joinQueryList, sequenceQueryList, patternQueryList, WindowFilterProjectionQueryList];
-           _.forEach(listNames, function (list) {
-               _.forEach(list, function (element) {
-                   if (element.getQueryName() === elementName) {
-                       if (!(skipElementID !== undefined && skipElementID === element.getId())) {
-                           isNameUsed = true;
-                       }
-                   }
-               });
-           });
+            _.forEach(listNames, function (list) {
+                _.forEach(list, function (element) {
+                    if (element.getQueryName() === elementName) {
+                        if (!(skipElementID !== undefined && skipElementID === element.getId())) {
+                            isNameUsed = true;
+                        }
+                    }
+                });
+            });
 
-          return isNameUsed;
+            return isNameUsed;
         };
 
         /**

@@ -19,7 +19,7 @@
  * This will set the options of ACE editor, attach client side parser and attach SiddhiCompletion Engine with the editor
  */
 define(["ace/ace", "jquery", "./constants", "./utils", "./completion-engine", "./token-tooltip",
-    "ace/ext/language_tools", "./debug-rest-client", "log", 'ace/range'],
+        "ace/ext/language_tools", "./debug-rest-client", "log", 'ace/range'],
     function (ace, $, constants, utils, CompletionEngine, aceTokenTooltip, aceExtLangTools, DebugRESTClient, log, AceRange) {
 
         "use strict";   // JS strict mode

@@ -51,11 +51,11 @@ define(['require', 'log', 'lodash', 'jquery', 'tool_palette/tool-palette', 'desi
         };
 
         DesignView.prototype.setRawExtensions = function (rawExtensions) {
-        	this.rawExtensions = rawExtensions;
+            this.rawExtensions = rawExtensions;
         }
 
         DesignView.prototype.getRawExtensions = function () {
-        	return this.rawExtensions;
+            return this.rawExtensions;
         }
 
         /**

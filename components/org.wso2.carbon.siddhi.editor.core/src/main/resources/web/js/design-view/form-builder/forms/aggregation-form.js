@@ -17,9 +17,9 @@
  */
 
 define(['require', 'log', 'jquery', 'lodash', 'attribute', 'aggregation', 'aggregateByTimePeriod', 'querySelect',
-    'elementUtils', 'storeAnnotation', 'designViewUtils', 'jsonValidator'],
+        'elementUtils', 'storeAnnotation', 'designViewUtils', 'jsonValidator'],
     function (require, log, $, _, Attribute, Aggregation, AggregateByTimePeriod, QuerySelect, ElementUtils,
-        StoreAnnotation, DesignViewUtils, JSONValidator) {
+              StoreAnnotation, DesignViewUtils, JSONValidator) {
 
         /**
          * @class AggregationForm Creates a forms to collect data from a aggregation
