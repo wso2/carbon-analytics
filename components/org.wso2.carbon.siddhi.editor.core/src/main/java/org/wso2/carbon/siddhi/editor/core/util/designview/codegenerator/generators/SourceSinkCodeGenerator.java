@@ -61,7 +61,7 @@ public class SourceSinkCodeGenerator {
 
         if (sourceSink.getOptions() != null && !sourceSink.getOptions().isEmpty()) {
             sourceSinkStringBuilder.append(SiddhiCodeBuilderConstants.COMMA)
-                    .append(SubElementCodeGenerator.generateParameterList(sourceSink.getOptions()));
+                    .append(SubElementCodeGenerator.generateElementList(sourceSink.getOptions()));
         }
 
         if (sourceSink.getMap() != null) {
@@ -91,7 +91,7 @@ public class SourceSinkCodeGenerator {
 
         if (mapper.getOptions() != null && !mapper.getOptions().isEmpty()) {
             mapperStringBuilder.append(SiddhiCodeBuilderConstants.COMMA)
-                    .append(SubElementCodeGenerator.generateParameterList(mapper.getOptions()));
+                    .append(SubElementCodeGenerator.generateElementList(mapper.getOptions()));
         }
 
         if (mapper.getPayloadOrAttribute() != null) {
@@ -154,7 +154,7 @@ public class SourceSinkCodeGenerator {
         StringBuilder mapperListAttributeStringBuilder = new StringBuilder();
         int valuesLeft = mapperListAttribute.getValue().size();
         for (String value : mapperListAttribute.getValue()) {
-            if (value.contains("\"")) {
+            if (value.contains("\"") || value.contains("\n")) {
                 mapperListAttributeStringBuilder.append(SiddhiCodeBuilderConstants.ESCAPE_SEQUENCE)
                         .append(value)
                         .append(SiddhiCodeBuilderConstants.ESCAPE_SEQUENCE);
@@ -189,7 +189,7 @@ public class SourceSinkCodeGenerator {
             mapperMapAttributeStringBuilder.append(entry.getKey())
                     .append(SiddhiCodeBuilderConstants.EQUAL);
             String value = entry.getValue();
-            if (value.contains("\"")) {
+            if (value.contains("\"") || value.contains("\n")) {
                 mapperMapAttributeStringBuilder.append(SiddhiCodeBuilderConstants.ESCAPE_SEQUENCE)
                         .append(value)
                         .append(SiddhiCodeBuilderConstants.ESCAPE_SEQUENCE);
