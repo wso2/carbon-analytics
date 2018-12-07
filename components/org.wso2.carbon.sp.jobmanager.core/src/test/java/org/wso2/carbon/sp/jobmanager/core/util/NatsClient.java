@@ -63,7 +63,6 @@ public class NatsClient {
         this.natsUrl = natsUrl;
     }
 
-
     public void connect() {
         streamingConnectionFactory = new StreamingConnectionFactory(this.cluserId, this.clientId);
         streamingConnectionFactory.setNatsUrl(this.natsUrl);
