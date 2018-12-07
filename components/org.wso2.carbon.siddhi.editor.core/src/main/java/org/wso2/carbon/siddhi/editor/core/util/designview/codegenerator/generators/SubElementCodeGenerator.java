@@ -28,7 +28,6 @@ import org.wso2.carbon.siddhi.editor.core.util.designview.constants.CodeGenerato
 import org.wso2.carbon.siddhi.editor.core.util.designview.constants.SiddhiCodeBuilderConstants;
 import org.wso2.carbon.siddhi.editor.core.util.designview.exceptions.CodeGenerationException;
 import org.wso2.carbon.siddhi.editor.core.util.designview.utilities.CodeGeneratorUtils;
-import org.wso2.siddhi.query.api.annotation.Element;
 
 import java.util.List;
 import java.util.Map;
@@ -200,7 +199,7 @@ public class SubElementCodeGenerator {
         StringBuilder parametersStringBuilder = new StringBuilder();
         int parametersLeft = elements.size();
         for (String parameter : elements) {
-            parametersStringBuilder.append(Element.toStringWithEscapeChars(parameter));
+            parametersStringBuilder.append(toStringWithEscapeChars(parameter));
             if (parametersLeft != 1) {
                 parametersStringBuilder.append(SiddhiCodeBuilderConstants.COMMA);
             }
@@ -312,4 +311,40 @@ public class SubElementCodeGenerator {
     private SubElementCodeGenerator() {
     }
 
+    /**
+     *Converts an element in string format to another string with escape characters
+     * which is the siddhi app code representation of the element.
+     * @param elementStr The element in String format. E.g. title = "The wonder of "foo""
+     * @return The code representation of element. E.g. title = """The wonder of "foo""""
+     */
+    private static String toStringWithEscapeChars(String elementStr) {
+        String key = null, value;
+        if (elementStr == null || elementStr.isEmpty()) {
+            throw new IllegalArgumentException("Input string is either null or empty.");
+        }
+        String[] keyValuePair = elementStr.split(SiddhiCodeBuilderConstants.ELEMENT_KEY_VALUE_SEPARATOR);
+        if (keyValuePair.length == 1) {
+            value = keyValuePair[0].trim().substring(1, keyValuePair[0].length() - 1);
+        } else if (keyValuePair.length == 2) {
+            key = keyValuePair[0];
+            value = keyValuePair[1].trim().substring(1, keyValuePair[1].length() - 1);
+        } else {
+            throw new IllegalArgumentException("Could not convert to Element object. String format is invalid: "
+                    + elementStr);
+        }
+
+        StringBuilder valueWithQuotes = new StringBuilder();
+        if (value != null && (value.contains("\"") || value.contains("\n"))) {
+            valueWithQuotes.append(SiddhiCodeBuilderConstants.ESCAPE_SEQUENCE).append(value)
+                    .append(SiddhiCodeBuilderConstants.ESCAPE_SEQUENCE);
+        } else {
+            valueWithQuotes.append(SiddhiCodeBuilderConstants.DOUBLE_QUOTE).append(value)
+                    .append(SiddhiCodeBuilderConstants.DOUBLE_QUOTE);
+        }
+        if (key != null) {
+            return key + SiddhiCodeBuilderConstants.ELEMENT_KEY_VALUE_SEPARATOR + valueWithQuotes.toString();
+        } else {
+            return valueWithQuotes.toString();
+        }
+    }
 }

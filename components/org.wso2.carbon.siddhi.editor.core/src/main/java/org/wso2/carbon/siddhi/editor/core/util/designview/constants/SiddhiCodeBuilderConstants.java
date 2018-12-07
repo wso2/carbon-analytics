@@ -111,6 +111,8 @@ public class SiddhiCodeBuilderConstants {
     public static final String BEGIN = "begin";
     public static final String END = "end";
 
+    public static final String ELEMENT_KEY_VALUE_SEPARATOR = " = ";
+
     private SiddhiCodeBuilderConstants() {
     }
 
