@@ -308,7 +308,7 @@ define(['require', 'lodash', 'jquery', 'log', 'backbone', 'file_browser', 'boots
                                     .setPersisted(true)
                                     .setLastPersisted(_.now())
                                     .setDirty(false)
-                                    .save();
+                                    .save(true);
                                 app.commandManager.dispatch("open-folder", data.path);
                                 if(!app.workspaceExplorer.isActive()){
                                     app.commandManager.dispatch("toggle-file-explorer");
