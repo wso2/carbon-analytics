@@ -28,6 +28,7 @@ import org.wso2.carbon.siddhi.editor.core.util.designview.constants.CodeGenerato
 import org.wso2.carbon.siddhi.editor.core.util.designview.constants.SiddhiCodeBuilderConstants;
 import org.wso2.carbon.siddhi.editor.core.util.designview.exceptions.CodeGenerationException;
 import org.wso2.carbon.siddhi.editor.core.util.designview.utilities.CodeGeneratorUtils;
+import org.wso2.siddhi.query.api.annotation.Element;
 
 import java.util.List;
 import java.util.Map;
@@ -176,6 +177,30 @@ public class SubElementCodeGenerator {
         int parametersLeft = parameters.size();
         for (String parameter : parameters) {
             parametersStringBuilder.append(parameter);
+            if (parametersLeft != 1) {
+                parametersStringBuilder.append(SiddhiCodeBuilderConstants.COMMA);
+            }
+            parametersLeft--;
+        }
+
+        return parametersStringBuilder.toString();
+    }
+
+    /**
+     * Generate's the Siddhi code representation of a element list
+     *
+     * @param elements The elements list
+     * @return The Siddhi code representation of the given elements list
+     */
+    public static String generateElementList(List<String> elements) {
+        if (elements == null || elements.isEmpty()) {
+            return SiddhiCodeBuilderConstants.EMPTY_STRING;
+        }
+
+        StringBuilder parametersStringBuilder = new StringBuilder();
+        int parametersLeft = elements.size();
+        for (String parameter : elements) {
+            parametersStringBuilder.append(Element.toStringWithEscapeChars(parameter));
             if (parametersLeft != 1) {
                 parametersStringBuilder.append(SiddhiCodeBuilderConstants.COMMA);
             }

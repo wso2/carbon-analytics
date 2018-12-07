@@ -325,7 +325,7 @@ define(['log', 'jquery', 'lodash', 'sourceOrSinkAnnotation', 'mapAnnotation', 'p
                             isError = true;
                             return false;
                         } else {
-                            option = custOptName + " = '" + custOptValue + "'";
+                            option = custOptName + " = \"" + custOptValue + "\"";
                             selectedOptions.push(option);
                         }
                     }
@@ -434,7 +434,7 @@ define(['log', 'jquery', 'lodash', 'sourceOrSinkAnnotation', 'mapAnnotation', 'p
                             return false;
                         }
                     }
-                    option = optionName + " = '" + optionValue + "'";
+                    option = optionName + " = \"" + optionValue + "\"";
                     selectedOptions.push(option);
                 } else {
                     if ($(this).find('.option-checkbox').is(":checked")) {
@@ -454,7 +454,7 @@ define(['log', 'jquery', 'lodash', 'sourceOrSinkAnnotation', 'mapAnnotation', 'p
                                 return false;
                             }
                         }
-                        option = optionName + " = '" + optionValue + "'";
+                        option = optionName + " = \"" + optionValue + "\"";
                         selectedOptions.push(option);
                     }
                 }
