@@ -808,7 +808,7 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'designViewUtils', 'h
                 changeAtrributeNavigation();
             });
 
-            var name = clickedElement.getName().trim();
+            var name = clickedElement.getName();
             var functionName = clickedElement.getFunction().toLowerCase();
             var savedParameterValues = clickedElement.getParameters();
             var windowFunctionNameTemplate = Handlebars.compile($('#type-selection-form-template').html());
@@ -825,7 +825,7 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'designViewUtils', 'h
                 functionParametersWithValues = createParameterWithValues(functionParameters);
                 renderParameters(functionParametersWithValues, selectedWindowType, "window")
             } else {
-                $('#windowName').val(name);
+                $('#windowName').val(name.trim());
                 selectedType = functionName;
                 $('#defineFunctionName').find('#window-type option').filter(function () {
                     return ($(this).val().toLowerCase() == (functionName));

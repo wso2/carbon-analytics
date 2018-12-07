@@ -126,7 +126,7 @@ define(['require', 'log', 'jquery', 'lodash', 'trigger', 'designViewUtils'],
 
             //if name is defined
             if (name) {
-                $('#triggerName').val(name);
+                $('#triggerName').val(name.trim());
 
                 var atOrAtEvery = clickedElement.getAtOrAtEvery().trim();
                 var at = clickedElement.getAt().trim();
@@ -168,12 +168,12 @@ define(['require', 'log', 'jquery', 'lodash', 'trigger', 'designViewUtils'],
                 $('.required-input-field').removeClass('required-input-field');
 
                 var triggerName = $('#triggerName').val().trim();
-
+				var triggerNameErrorMessage = $('#define-trigger-name').find('.error-message');
                 // to check if trigger name is empty
                 if (triggerName == "") {
                     $('#triggerName').addClass('required-input-field');
                     $('#triggerName')[0].scrollIntoView();
-                    $('#define-trigger-name').find('.error-message').text("Trigger name is required.");
+                    triggerNameErrorMessage.text("Trigger name is required.");
                     return;
                 }
                 var previouslySavedName = clickedElement.getName();
@@ -189,22 +189,21 @@ define(['require', 'log', 'jquery', 'lodash', 'trigger', 'designViewUtils'],
                     if (isTriggerNameUsed) {
                         $('#triggerName').addClass('required-input-field');
                         $('#triggerName')[0].scrollIntoView();
-                        $('#define-trigger-name').find('.error-message').text("Trigger name is already used.");
+                        triggerNameErrorMessage.text("Trigger name is already used.");
                         return;
                     }
                     //to check if trigger name contains white spaces
                     if (triggerName.indexOf(' ') >= 0) {
                         $('#triggerName').addClass('required-input-field');
                         $('#triggerName')[0].scrollIntoView();
-                        $('#define-trigger-name').find('.error-message').text("Trigger name cannot have white space.");
+                        triggerNameErrorMessage.text("Trigger name cannot have white space.");
                         return;
                     }
                     //to check if trigger name starts with an alphabetic character
                     if (!(alphabeticValidatorRegex).test(triggerName.charAt(0))) {
                         $('#triggerName').addClass('required-input-field');
                         $('#triggerName')[0].scrollIntoView();
-                        $('#define-trigger-name').find('.error-message').text("Trigger name must start with an " +
-                            "alphabetic character.");
+                        triggerNameErrorMessage.text("Trigger name must start with an alphabetic character.");
                         return;
                     }
                     // update selected trigger model
