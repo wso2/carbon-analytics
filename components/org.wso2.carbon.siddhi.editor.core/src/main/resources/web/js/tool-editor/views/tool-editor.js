@@ -177,17 +177,16 @@ define(['require', 'jquery', 'backbone', 'lodash', 'log', 'design_view', "./sour
                                 // the code needs to run asynchronously for the loading screen
                                 setTimeout(function () {
                                     var fileHashCode = application.tabController.getActiveTab().getFile().attributes.hashCode;
-                                    var designViewHash = designView.getHashCode();
-                                    if (fileHashCode != designViewHash || (fileHashCode == undefined && designViewHash == undefined)) {
+                                    var renderedAppContentHashCode = designView.getHashCode();
+                                    if (fileHashCode != renderedAppContentHashCode || fileHashCode == undefined &&
+                                        renderedAppContentHashCode == undefined) {
                                         designView.setHashCode(fileHashCode);
                                         designView.emptyDesignViewGridContainer();
                                         designContainer.show();
                                         designView.renderDesignGrid(self.JSONObject);
-                                        loadingScreen.hide();
-                                    } else {
-                                        designContainer.show();
-                                        loadingScreen.hide();
                                     }
+                                    designContainer.show();
+                                    loadingScreen.hide();
                                     // NOTE - This trigger should be always handled at the end of setTimeout()
                                     self.trigger("view-switch");
                                 }, 100);

@@ -102,11 +102,11 @@ define(['require', 'log', 'lodash', 'jquery', 'tool_palette/tool-palette', 'desi
         };
 
         DesignView.prototype.setHashCode = function (hashCode) {
-            this.designViewHashCode = hashCode;
+            this.renderedAppContentHashCode = hashCode;
         }
 
         DesignView.prototype.getHashCode = function () {
-            return this.designViewHashCode;
+            return this.renderedAppContentHashCode;
         }
 
         DesignView.prototype.autoAlign = function () {

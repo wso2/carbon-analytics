@@ -43,20 +43,23 @@ define(['jquery', 'lodash', 'backbone', 'log'], function ($, _, Backbone, log) {
                 }
             },
             generateHash: function (hashCode) {
-                var newHash = 0, l = hashCode.length, i = 0;
-                if (l > 0)
-                    while (i < l)
+                var newHash = 0;
+                var l = hashCode.length;
+                var i = 0;
+                if (l > 0) {
+                    while (i < l) {
                         newHash = (newHash << 5) - newHash + hashCode.charCodeAt(i++) | 0;
+                    }
+                }
                 return newHash;
             },
 
-            save: function(isTrue){
+            save: function(isTriggeredBySaveFlow){
                 if(!_.isNil(this._storage.get(this.id))){
-                    if (isTrue == true) {
+                    if (isTriggeredBySaveFlow == true) {
                         this.setHash(this.generateHash(this.getContent().trim()));
-                        console.log(this.getHash());
                     }
-                    if (this.getContent() == undefined) {
+                    if (!this.getContent()) {
                         this.setHash(this.getContent());
                     }
                     this._storage.update(this);
