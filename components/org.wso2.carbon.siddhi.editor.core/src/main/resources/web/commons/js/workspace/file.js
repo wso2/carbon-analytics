@@ -59,9 +59,6 @@ define(['jquery', 'lodash', 'backbone', 'log'], function ($, _, Backbone, log) {
                     if (isTriggeredBySaveFlow == true) {
                         this.setHash(this.generateHash(this.getContent().trim()));
                     }
-                    if (!this.getContent()) {
-                        this.setHash(this.getContent());
-                    }
                     this._storage.update(this);
                 } else {
                     this._storage.create(this);
