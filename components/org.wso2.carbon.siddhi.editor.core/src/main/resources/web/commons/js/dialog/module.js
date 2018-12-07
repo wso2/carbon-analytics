@@ -18,9 +18,10 @@
 
 define(['./save-to-file-dialog','./replace-confirm-dialog','./open-file-dialog','./close-confirm-dialog',
         './import-file-dialog', './export-file-dialog','./settings-dialog','./close-all-confirm-dialog',
-        './delete-confirm-dialog','./open-sample-file-dialog'],
+        './delete-confirm-dialog','./open-sample-file-dialog', './docker-export-dialog', './sample-event-dialog'],
     function (SaveToFileDialog,ReplaceConfirmDialog,OpenFileDialog,CloseConfirmDialog,ImportFileDialog,
-        ExportFileDialog,SettingsDialog,CloseAllConfirmDialog,DeleteConfirmDialog,OpenSampleFileDialog) {
+              ExportFileDialog,SettingsDialog,CloseAllConfirmDialog,DeleteConfirmDialog,OpenSampleFileDialog,
+              DockerExportDialog, SampleEventDialog) {
     return {
         save_to_file_dialog: SaveToFileDialog,
         open_file_dialog: OpenFileDialog,
@@ -31,6 +32,8 @@ define(['./save-to-file-dialog','./replace-confirm-dialog','./open-file-dialog',
         settings_dialog: SettingsDialog,
         CloseAllConfirmDialog: CloseAllConfirmDialog,
         DeleteConfirmDialog: DeleteConfirmDialog,
-        open_sample_file_dialog: OpenSampleFileDialog
+        open_sample_file_dialog: OpenSampleFileDialog,
+        docker_export_dialog: DockerExportDialog,
+        sample_event_dialog: SampleEventDialog
     };
 });

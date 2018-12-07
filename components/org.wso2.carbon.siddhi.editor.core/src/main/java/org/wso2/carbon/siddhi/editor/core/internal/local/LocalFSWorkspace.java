@@ -35,6 +35,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Comparator;
 import java.util.Iterator;
+import java.util.Map;
 
 /**
  * Workspace implementation for local file system.
@@ -232,5 +233,16 @@ public class LocalFSWorkspace implements Workspace {
         result.addProperty("file", path.toString());
         result.addProperty("exists", exists);
         return result;
+    }
+
+    public JsonArray listSamplesInPath(Map<String, String> sampleMap) {
+        JsonArray samples = new JsonArray();
+        sampleMap.entrySet().stream().forEach(entry -> {
+            JsonObject sampleObject = new JsonObject();
+            sampleObject.addProperty("path", entry.getKey());
+            sampleObject.addProperty("description", entry.getValue());
+            samples.add(sampleObject);
+        });
+        return samples;
     }
 }

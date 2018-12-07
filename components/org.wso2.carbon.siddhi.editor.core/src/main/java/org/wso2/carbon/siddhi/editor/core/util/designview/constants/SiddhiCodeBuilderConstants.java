@@ -32,6 +32,7 @@ public class SiddhiCodeBuilderConstants {
     public static final char SEMI_COLON = ';';
     public static final char SINGLE_QUOTE = '\'';
     public static final char DOUBLE_QUOTE = '\"';
+    public static final String ESCAPE_SEQUENCE = "\"\"\"";
     public static final char SPACE = ' ';
     public static final char HASH = '#';
     // Brackets

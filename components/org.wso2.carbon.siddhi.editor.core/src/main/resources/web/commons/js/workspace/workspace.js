@@ -208,6 +208,17 @@ define(['ace/ace', 'jquery', 'lodash', 'log','dialogs','./service-client','welco
                 launcher.runApplication(self);
             };
 
+            this.handleSampleEvent = function(options) {
+                if(_.isNil(this._sample_event_dialog)){
+                    var opts = _.cloneDeep(_.get(app.config, 'sample_event_dialog'));
+                    _.set(opts, "application", app);
+                    this._sample_event_dialog = new Dialogs.sample_event_dialog(opts);
+                }
+                // This dialog need to be re-rendered so that it comes on top of save file dialog.
+                this._sample_event_dialog.render();
+                this._sample_event_dialog.show();
+            };
+
             this.handleStop = function(options) {
                 var launcher = app.tabController.getActiveTab().getSiddhiFileEditor().getLauncher();
                 if(options === undefined){
@@ -554,6 +565,14 @@ define(['ace/ace', 'jquery', 'lodash', 'log','dialogs','./service-client','welco
                 this._exportFileDialog.render();
             };
 
+            this.exportAsDocker = function() {
+                if (_.isNil(this._dockerExportDialog)) {
+                    this._dockerExportDialog = new Dialogs.docker_export_dialog(app);
+                }
+                this._dockerExportDialog.render();
+                this._dockerExportDialog.show();
+            };
+
             this.handleExport = function(options) {
                 var activeTab = app.tabController.getActiveTab();
                 var file = activeTab.getFile();
@@ -672,10 +691,14 @@ define(['ace/ace', 'jquery', 'lodash', 'log','dialogs','./service-client','welco
             // Export file export dialog
             app.commandManager.registerHandler('export-file-export-dialog', this.exportFileExportDialog, this);
 
+            app.commandManager.registerHandler('export-docker', this.exportAsDocker, this);
+
             app.commandManager.registerHandler('open-replace-file-confirm-dialog', this.openReplaceFileConfirmDialog,
                 this);
 
             app.commandManager.registerHandler('open-close-file-confirm-dialog', this.openCloseFileConfirmDialog, this);
+
+            app.commandManager.registerHandler('sample-event', this.handleSampleEvent);
 
             app.commandManager.registerHandler('run', this.handleRun);
 

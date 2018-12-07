@@ -420,7 +420,7 @@ define(['log', 'jquery', 'lodash', 'sourceOrSinkAnnotation', 'mapAnnotation', 'p
                             return false;
                         }
                     }
-                    option = optionName + " = '" + optionValue + "'";
+                    option = optionName + " = \"" + optionValue + "\"";
                     selectedOptions.push(option);
                 } else {
                     if ($(this).find('.option-checkbox').is(":checked")) {
@@ -440,7 +440,7 @@ define(['log', 'jquery', 'lodash', 'sourceOrSinkAnnotation', 'mapAnnotation', 'p
                                 return false;
                             }
                         }
-                        option = optionName + " = '" + optionValue + "'";
+                        option = optionName + " = \"" + optionValue + "\"";
                         selectedOptions.push(option);
                     }
                 }

@@ -254,6 +254,14 @@
             <!-- End: tool-palette -->
             <!-- Start: design-view-grid-container -->
             <div id="grid-container" class="grid-container"></div>
+            <!-- Start: pop-over-design-view -->
+            <div class="hide pop-over">
+                <div class="popover-footer">
+                    <button class="btn btn-primary btn-xs yes">Yes</button>
+                    <button class="btn btn-primary btn-xs no">No</button>
+                </div>
+            </div>
+            <!-- End: pop-over-design-view -->
             <div class = "overlayed-container"></div>
             <!-- End: design-view-grid-container -->
         </div>
@@ -1387,6 +1395,94 @@
 </div>
 
 
+<!--Start: Docker Export Modal-->
+<div class="modal fade modalDockerExport" id="modalDockerExport" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content clearfix">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <i class="fw fw-cancel about-dialog-close"></i></button>
+                <h3 class="modal-title" id="aboutDockerExportLabel">Export as Docker</h3>
+            </div>
+            <div class="modal-body add-margin-top-2x add-margin-bottom-2x">
+                <form>
+                    <h4>Export as Docker</h4>
+                    <hr/>
+                    <div class="form-group">
+                        <label for="dockerProfile">Profile:</label>
+                        <select class="form-control" id="dockerProfile">
+                            <option value="editor">Editor</option>
+                            <option value="worker">Worker</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="dockerProfile">Files to be included:</label>
+                        <div id="file-tree" class="docker-export-file-tree"></div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal" id="exportButton"
+                        disabled="disabled">Export</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<iframe id="frm-download" style="display: none;"></iframe>
+
+<div class="modal fade modalSampleEvent" id="modalSampleEvent" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content clearfix">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <i class="fw fw-cancel  about-dialog-close"></i></button>
+                <h3 class="modal-title" id="sampleEvent">Generate sample event</h3>
+            </div>
+            <div class="modal-body add-margin-top-2x add-margin-bottom-2x">
+                <form id="sampleEventForm">
+                    <div class="form-group">
+                        <label>
+                            Siddhi App Name
+                        </label>
+                        <select name="siddhi-app-name" id="sample-event-siddhi-app-name" class="form-control">
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>
+                            Stream Name
+                        </label>
+                        <select name="stream-name" class="form-control">
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>
+                            Event Format
+                        </label>
+                        <select class="form-control" name="event-format">
+                            <option value="json" selected="selected">JSON</option>
+                            <option value="xml">XML</option>
+                            <option value="text">text</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <button type="submit" class="btn btn-primary" name="generateSampleEvent"
+                                id="generateSampleEventButton">
+                            Generate
+                        </button>
+                    </div>
+                    <div class="form-group">
+                        <textarea class="form-control" name="generatedSampleEvent"
+                                  style="height: 250px">Select App, Stream and event type to get the sample event here..
+                        </textarea>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+
 <script src="/editor/commons/lib/requirejs-2.3.2/require.js"></script>
 <script type="text/javascript">
     requirejs.config({
@@ -1403,6 +1499,7 @@
             jquery_ui: "commons/lib/jquery-ui_v1.12.1/jquery-ui",
             bootstrap: "commons/lib/theme-wso2-2.0.0/js/bootstrap.min",
             dagre: "commons/lib/dagre-0.7.4/dagre.min",
+            dragSelect: "commons/lib/dragSelect/ds.min",
             jquery_validate: "commons/lib/jquery_validate/jquery.validate.min",
             jquery_timepicker: "commons/lib/jquery_timepicker/jquery-ui-timepicker-addon",
             log4javascript: "commons/lib/log4javascript-1.4.13/log4javascript",
@@ -1439,6 +1536,7 @@
             file_menu: "commons/js/menu-bar/file-menu",
             edit_menu: "commons/js/menu-bar/edit-menu",
             run_menu: "commons/js/menu-bar/run-menu",
+            tools_menu: "commons/js/menu-bar/tools-menu",
             menu_item: "commons/js/menu-bar/menu-item",
             file_browser: "commons/js/file-browser/file-browser",
             undo_manager: "commons/js/undo-manager/undo-manager",
@@ -1448,6 +1546,7 @@
             source_modify_operation: "commons/js/undo-manager/source-modify-operation",
             undoable_operation: "commons/js/undo-manager/undoable-operation",
             sample_preview: "js/sample-preview/sample-preview-view",
+            sample_view: "js/sample-view/sample-view",
             output_console_list: "js/output-console/console-list",
             console: "js/output-console/console",
             service_console: "js/output-console/service-console-manager",
@@ -1748,6 +1847,14 @@
             settings_dialog:{
                 selector: "#modalSettings",
                 submit_button: "#saveSettingsButton"
+            },
+            docker_export_dialog: {
+                selector: '#modalDockerExport',
+                submitButton: '#exportButton'
+            },
+            sample_event_dialog:{
+                selector: "#modalSampleEvent",
+                submit_button: "#generateSampleEventButton"
             },
             output_controller: {
                 container: "#console-container",

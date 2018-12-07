@@ -48,6 +48,7 @@ define(['jquery', 'backbone', 'lodash', 'log', /** void module - jquery plugin *
             this._root = _.get(config, 'root');
             this._showWorkspace = _.get(config, 'showWorkspace');
             this._showSamples = _.get(config, 'showSamples');
+            this._multiSelect = _.get(config, 'multiSelect', false);
 
             this._treeConfig = {
                 'core': {
@@ -58,7 +59,7 @@ define(['jquery', 'backbone', 'lodash', 'log', /** void module - jquery plugin *
                             return {'id': node.id};
                         }
                     },
-                    'multiple': false,
+                    'multiple': this._multiSelect,
                     'check_callback': false,
                     'force_text': true,
                     'expand_selected_onload': true,
@@ -86,6 +87,9 @@ define(['jquery', 'backbone', 'lodash', 'log', /** void module - jquery plugin *
             };
 
             this._plugins = ['types', 'wholerow', 'sort'];
+            if (this._multiSelect) {
+                this._plugins.push('checkbox');
+            }
             this._contextMenuProvider = _.get(config, 'contextMenuProvider');
             if(!_.isNil(this._contextMenuProvider)){
                 this._plugins.push('contextmenu');
@@ -146,17 +150,25 @@ define(['jquery', 'backbone', 'lodash', 'log', /** void module - jquery plugin *
             return this._$parent_el.jstree(true).get_node(id);
         },
 
+        getSelected: function() {
+            return this._$parent_el.jstree(true).get_selected(true);
+        },
+
         render: function () {
             var self = this;
             this._$parent_el
                 .jstree(self._treeConfig).on('changed.jstree', function (e, data) {
                 if (data && data.selected && data.selected.length) {
-                    self.selected = data.selected[0];
-                    self.trigger("selected", data.selected[0]);
-                }
-                else {
+                    if (self._multiSelect) {
+                        self.selected = data.selected;
+                        self.trigger("selected", data.selected);
+                    } else {
+                        self.selected = data.selected[0];
+                        self.trigger("selected", data.selected[0]);
+                    }
+                } else {
                     self.selected = false;
-                    self.trigger("selected", null);
+                    self.trigger("selected", self._multiSelect ? [] : null);
                 }
             }).on('open_node.jstree', function (e, data) {
                 data.instance.set_icon(data.node, "fw fw-folder");

@@ -45,6 +45,4 @@ const BusinessRulesMessages = {
   />
   ,
 };
-
-
 export default BusinessRulesMessages;
