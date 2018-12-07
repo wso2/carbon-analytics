@@ -25,7 +25,7 @@ define(["jquery"], function (jQuery) {
             type: "POST",
             contentType: "application/json",
             url: self.siddhiStoreUrl,
-            data: "{\"appName\": \"" + appName + "\", \"query\": \"" + query + "\", \"includeHeader\": true }",
+            data: "{\"appName\": \"" + appName + "\", \"query\": \"" + query + "\", \"details\": true }",
             success: function (data) {
                 if (typeof successCallback === 'function') {
                     successCallback(data);

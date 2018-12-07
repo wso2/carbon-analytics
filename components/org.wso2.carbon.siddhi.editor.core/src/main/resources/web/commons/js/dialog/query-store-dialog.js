@@ -82,27 +82,24 @@ define(['require', 'lodash','jquery', 'log', 'backbone', '../../../js/event-simu
                         storeQueryModal.find("select[name='siddhi-app-name']").val(),
                         storeQueryModal.find("textarea[id='curlEditor']").val(),
                         function (data) {
+                            // Add header row
+                            var headerColumns = [];
+                            data.details.forEach(function(header) {
+                                headerColumns.push('<th>' + header.name + '</th>');
+                            });
+                            var headerRow = '<tr>' + headerColumns + '</tr>';
+
+                            // Add data rows
                             var rows = [];
-                            var headerRow = [];
-                            var queryData = storeQueryModal.find("table[id='query_data']");
-                            data.records.forEach(function(childArray, index){
-                                if (index === 0) {
-                                    // add header row
-                                    var headerColumns = [];
-                                    childArray.forEach(function(value) {
-                                        headerColumns.push('<th>' + value + '</th>');
-                                    });
-                                    headerRow.push('<tr>' + headerColumns + '</tr>');
-                                } else {
-                                    // add data rows
-                                    var columns = [];
-                                    childArray.forEach(function(value) {
-                                        columns.push('<td>' + value + '</td>');
-                                    });
-                                    rows.push('<tr>' + columns + '</tr>');
-                                }
+                            data.records.forEach(function(record){
+                                var columns = [];
+                                record.forEach(function(value) {
+                                    columns.push('<td>' + value + '</td>');
+                                });
+                                rows.push('<tr>' + columns + '</tr>');
                             });
 
+                            var queryData = storeQueryModal.find("table[id='query_data']");
                             if ($.fn.DataTable.isDataTable(queryData)) {
                                 queryData.DataTable().clear().destroy();
                             }

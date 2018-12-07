@@ -32,8 +32,8 @@ public class Query {
     private String query = null;
     @JsonProperty("appName")
     private String appName = null;
-    @JsonProperty("includeHeader")
-    private boolean includeHeader = false;
+    @JsonProperty("details")
+    private boolean details = false;
 
     public Query query(String appName, String query) {
         this.query = query;
@@ -41,10 +41,10 @@ public class Query {
         return this;
     }
 
-    public Query query(String appName, String query, boolean includeHeader) {
+    public Query query(String appName, String query, boolean details) {
         this.query = query;
         this.appName = appName;
-        this.includeHeader = includeHeader;
+        this.details = details;
         return this;
     }
 
@@ -69,12 +69,12 @@ public class Query {
         this.query = query;
     }
 
-    public boolean isIncludeHeader() {
-        return includeHeader;
+    public boolean isDetails() {
+        return details;
     }
 
-    public void setIncludeHeader(boolean includeHeader) {
-        this.includeHeader = includeHeader;
+    public void setDetails(boolean details) {
+        this.details = details;
     }
 
     @Override
@@ -94,7 +94,7 @@ public class Query {
         if (!appName.equals(query1.appName)) {
             return false;
         }
-        if (includeHeader != query1.includeHeader) {
+        if (details != query1.details) {
             return false;
         }
 
