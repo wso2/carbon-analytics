@@ -64,7 +64,6 @@ public class DeploymentConfig implements Serializable {
     @Element(description = "Id of the created nats cluster")
     private String clusterId;
 
-
     public String getNatsServerUrl() {
         return natsServerUrl;
     }

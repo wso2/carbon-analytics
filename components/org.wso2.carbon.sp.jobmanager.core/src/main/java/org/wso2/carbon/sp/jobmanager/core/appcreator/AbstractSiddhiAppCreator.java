@@ -127,6 +127,4 @@ public abstract class AbstractSiddhiAppCreator implements SiddhiAppCreator {
         return siddhiAppName + "_" + streamName + (groupingField == null ? ""
                 : ("_" + groupingField));
     }
-
-
 }
