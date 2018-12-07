@@ -1049,7 +1049,7 @@
         {{#if this}}
         <ul>
             {{#each this}}
-                {{> recursiveAnnotation this}}
+            {{> recursiveAnnotation this}}
             {{/each}}
         </ul>
         {{/if}}
@@ -1062,138 +1062,138 @@
 
 <script id = "recursiveAnnotationPartial" type = "text/template">
     {{#if predefined}}
-        <li data-jstree = '{"icon":"/editor/commons/images/annotation.png"}' class = "{{class}}"> {{name}}
-            <ul>
-                {{#each elements}}
-                <li data-jstree = '{"icon":"/editor/commons/images/properties.png"}' class="{{class}}"> {{key}}
-                    <ul>
-                        <li data-jstree = '{"icon":"/editor/commons/images/value.png"}'
-                            class = "annotation-value"> {{value}} </li>
-                    </ul>
-                </li>
-                {{/each}}
-    {{else}}
-        <li data-jstree = '{"icon":"/editor/commons/images/annotation.png"}' class = "annotation"> {{name}}
-            <ul>
-                {{#each elements}}
-                <li data-jstree = '{"icon":"/editor/commons/images/properties.png"}' class = "annotation-key"> {{key}}
-                    <ul>
-                        <li data-jstree = '{"icon":"/editor/commons/images/value.png"}'
-                            class = "annotation-value"> {{value}} </li>
-                    </ul>
-                </li>
-                {{/each}}
-    {{/if}}
-
-        {{#if annotations}}
-            {{#each annotations}}
-                {{> recursiveAnnotation this}}
+    <li data-jstree = '{"icon":"/editor/commons/images/annotation.png"}' class = "{{class}}"> {{name}}
+        <ul>
+            {{#each elements}}
+            <li data-jstree = '{"icon":"/editor/commons/images/properties.png"}' class="{{class}}"> {{key}}
+                <ul>
+                    <li data-jstree = '{"icon":"/editor/commons/images/value.png"}'
+                        class = "annotation-value"> {{value}} </li>
+                </ul>
+            </li>
             {{/each}}
-        {{/if}}
-            </ul>
-        </li>
+            {{else}}
+            <li data-jstree = '{"icon":"/editor/commons/images/annotation.png"}' class = "annotation"> {{name}}
+                <ul>
+                    {{#each elements}}
+                    <li data-jstree = '{"icon":"/editor/commons/images/properties.png"}' class = "annotation-key"> {{key}}
+                        <ul>
+                            <li data-jstree = '{"icon":"/editor/commons/images/value.png"}'
+                                class = "annotation-value"> {{value}} </li>
+                        </ul>
+                    </li>
+                    {{/each}}
+                    {{/if}}
+
+                    {{#if annotations}}
+                    {{#each annotations}}
+                    {{> recursiveAnnotation this}}
+                    {{/each}}
+                    {{/if}}
+                </ul>
+            </li>
 </script>
 
 <script id="source-sink-map-store-form-template" type="text/template">
     {{#ifSourceOrSink id}}
-        <h3>{{addTitle id}} Configuration</h3>
-        <label class="clearfix"> * Type </label>
+    <h3>{{addTitle id}} Configuration</h3>
+    <label class="clearfix"> * Type </label>
+    <select id="{{id}}-type">
+        <option style = "display:none" disabled selected value > -- select a type -- </option>
+        {{else}}
+        {{#ifId id "map"}}
+        <h3> Mapping </h3>
+        {{/ifId}}
+        <label class="clearfix"> {{addTitle id}} Type </label>
         <select id="{{id}}-type">
-            <option style = "display:none" disabled selected value > -- select a type -- </option>
-    {{else}}
-             {{#ifId id "map"}}
-                <h3> Mapping </h3>
-             {{/ifId}}
-              <label class="clearfix"> {{addTitle id}} Type </label>
-              <select id="{{id}}-type">
-    {{/ifSourceOrSink}}
+            {{/ifSourceOrSink}}
 
             {{#each types}}
-                <option value="{{name}}">{{name}}</option>
+            <option value="{{name}}">{{name}}</option>
             {{/each}}
-    </select>
+        </select>
 </script>
 
 <script id = "source-sink-store-options-template" type = "text/template">
     {{#if options}}
-        <h3> Options </h3>
-        <div id = "{{id}}-options">
-            {{#ifSourceOrSinkOrStore id}}
-                <div class = "sub-{{id}}-options-div">
+    <h3> Options </h3>
+    <div id = "{{id}}-options">
+        {{#ifSourceOrSinkOrStore id}}
+        <div class = "sub-{{id}}-options-div">
             {{/ifSourceOrSinkOrStore}}
             {{#each options}}
-                <div class = "option">
+            <div class = "option">
                 {{#if optional}}
-                    {{#if value}}
-                        <div class = "clearfix">
-                            <label class = "option-name optional-option">
-                                <input type = "checkbox" class = "option-checkbox" checked> {{key}}
-                            </label>
-                            <i class = "fw fw-info option-desc">
-                                <span style = "display:none" class = "option-desc-content"> {{description}} </span>
-                            </i>
-                        </div>
-                        <div class = "clearix">
-                            <input class = "option-value" type = "text" value = "{{value}}">
-                        </div>
-                    {{else}}
-                        <div class="clearfix">
-                            <label class = "option-name optional-option">
-                                <input type = "checkbox" class = "option-checkbox"> {{key}}
-                            </label>
-                            <i class = "fw fw-info option-desc">
-                                <span style = "display:none" class="option-desc-content"> {{description}} </span>
-                            </i>
-                        </div>
-                        <div class="clearix">
-                            <input class = "option-value" type = "text" value="{{defaultValue}}" style ="display:none">
-                        </div>
-                    {{/if}}
-                        <label class = "error-message"></label>
-                {{else}}
-                    <div class="clearfix">
-                        <label class = "mandatory-option-symbol"> * </label>
-                        <label class = "option-name mandatory-option">
-                            {{key}}
-                        </label>
-                        <i class="fw fw-info option-desc">
-                            <span style="display:none" class="option-desc-content"> {{description}} </span>
-                        </i>
-                    </div>
-                    <div class = "clearix">
-                        <input class = "option-value" type = "text" value = "{{value}}">
-                    </div>
-                    <label class = "error-message"></label>
-                {{/if}}
+                {{#if value}}
+                <div class = "clearfix">
+                    <label class = "option-name optional-option">
+                        <input type = "checkbox" class = "option-checkbox" checked> {{key}}
+                    </label>
+                    <i class = "fw fw-info option-desc">
+                        <span style = "display:none" class = "option-desc-content"> {{description}} </span>
+                    </i>
                 </div>
-            {{#ifSourceOrSinkOrStore ../id}}
-                {{#if (isDivisor (sum @index 1) ../options)}}
-                    </div>
-                    <div class = "sub-{{../id}}-options-div">
+                <div class = "clearix">
+                    <input class = "option-value" type = "text" value = "{{value}}">
+                </div>
+                {{else}}
+                <div class="clearfix">
+                    <label class = "option-name optional-option">
+                        <input type = "checkbox" class = "option-checkbox"> {{key}}
+                    </label>
+                    <i class = "fw fw-info option-desc">
+                        <span style = "display:none" class="option-desc-content"> {{description}} </span>
+                    </i>
+                </div>
+                <div class="clearix">
+                    <input class = "option-value" type = "text" value="{{defaultValue}}" style ="display:none">
+                </div>
                 {{/if}}
+                <label class = "error-message"></label>
+                {{else}}
+                <div class="clearfix">
+                    <label class = "mandatory-option-symbol"> * </label>
+                    <label class = "option-name mandatory-option">
+                        {{key}}
+                    </label>
+                    <i class="fw fw-info option-desc">
+                        <span style="display:none" class="option-desc-content"> {{description}} </span>
+                    </i>
+                </div>
+                <div class = "clearix">
+                    <input class = "option-value" type = "text" value = "{{value}}">
+                </div>
+                <label class = "error-message"></label>
+                {{/if}}
+            </div>
+            {{#ifSourceOrSinkOrStore ../id}}
+            {{#if (isDivisor (sum @index 1) ../options)}}
+        </div>
+        <div class = "sub-{{../id}}-options-div">
+            {{/if}}
             {{/ifSourceOrSinkOrStore}}
             {{/each}}
             {{#ifSourceOrSinkOrStore id}}
-                </div>
-            {{/ifSourceOrSinkOrStore}}
-    {{/if}}
+        </div>
+        {{/ifSourceOrSinkOrStore}}
+        {{/if}}
     </div>
     <div class = "customized-options" id = "customized-{{id}}-options">
         <h3> <i> Customized Options </i> </h3>
         <ul class = "cust-options">
             {{#each customizedOptions}}
-                <li class="option">
-                    <div class = "clearfix">
-                        <label> option.key </label>
-                        <input type="text" class="cust-option-key" value="{{key}}">
-                    </div>
-                    <div class = "clearfix">
-                        <label> option.value </label>
-                        <input type = "text" class = "cust-option-value" value = "{{value}}">
-                        <a class = "btn-del-option"> <i class = "fw fw-delete"> </i></a>
-                    </div>
-                    <label class = "error-message"></label>
-                </li>
+            <li class="option">
+                <div class = "clearfix">
+                    <label> option.key </label>
+                    <input type="text" class="cust-option-key" value="{{key}}">
+                </div>
+                <div class = "clearfix">
+                    <label> option.value </label>
+                    <input type = "text" class = "cust-option-value" value = "{{value}}">
+                    <a class = "btn-del-option"> <i class = "fw fw-delete"> </i></a>
+                </div>
+                <label class = "error-message"></label>
+            </li>
             {{/each}}
         </ul>
         <button type = "button" class = "btn btn-default btn-add-options" id = "btn-add-{{id}}-options"> </button>
@@ -1203,20 +1203,20 @@
 <script id = "source-sink-map-attribute-template" type = "text/template">
     <div id = "mapper-attributes">
         <div class = "attribute-labels clearfix">
-                {{#if this.0.key }} <label id = "attribute-key-label"> Key </label> {{/if}}
-                <label id = "attribute-value-label"> Value </label>
+            {{#if this.0.key }} <label id = "attribute-key-label"> Key </label> {{/if}}
+            <label id = "attribute-value-label"> Value </label>
         </div>
         {{#each this}}
         <div class = "attribute">
-                <div class = "clearfix">
-                    {{#if key }}
-                    <input type="text" value="{{key}}" class="attr-key" readonly/>
-                    <input type="text" value="{{value}}" class="attr-value"/>
-                    {{else}}
-                    <textarea class="attr-value"> {{value}} </textarea>
-                    {{/if}}
-                </div>
-                <label class = "error-message"></label>
+            <div class = "clearfix">
+                {{#if key }}
+                <input type="text" value="{{key}}" class="attr-key" readonly/>
+                <input type="text" value="{{value}}" class="attr-value"/>
+                {{else}}
+                <textarea class="attr-value"> {{value}} </textarea>
+                {{/if}}
+            </div>
+            <label class = "error-message"></label>
         </div>
         {{/each}}
     </div>
@@ -1225,38 +1225,38 @@
 <script id = "table-store-annotation-template" type = "text/template">
     <h4> Annotations </h4>
     <div id = "table-annotations">
-            {{#each this}}
-                <div class = "clearfix table-annotation">
-                    <div class="clearfix">
-                        <label class = "annotation-name">
-                            {{#if isChecked}}
-                                <input type = "checkbox" class="annotation-checkbox" checked> @{{name}}
-                            {{else}}
-                                <input type = "checkbox" class="annotation-checkbox"> @{{name}}
-                            {{/if}}
-                        </label>
-                    </div>
+        {{#each this}}
+        <div class = "clearfix table-annotation">
+            <div class="clearfix">
+                <label class = "annotation-name">
                     {{#if isChecked}}
-                        <div class="annotation-content">
-                     {{else}}
-                            <div class="annotation-content" style="display:none">
+                    <input type = "checkbox" class="annotation-checkbox" checked> @{{name}}
+                    {{else}}
+                    <input type = "checkbox" class="annotation-checkbox"> @{{name}}
                     {{/if}}
-                        <ul>
+                </label>
+            </div>
+            {{#if isChecked}}
+            <div class="annotation-content">
+                {{else}}
+                <div class="annotation-content" style="display:none">
+                    {{/if}}
+                    <ul>
                         {{#each values}}
-                            <li class = "clearfix table-annotation-value">
-                                <div class="clearfix">
-                                    <input type = "text" value = "{{value}}" class = "annotation-value"/>
-                                    <a class = "btn-del-annot-value"> <i class = "fw fw-delete"> </i></a>
-                                </div>
-                                <label class="error-message"></label>
-                            </li>
+                        <li class = "clearfix table-annotation-value">
+                            <div class="clearfix">
+                                <input type = "text" value = "{{value}}" class = "annotation-value"/>
+                                <a class = "btn-del-annot-value"> <i class = "fw fw-delete"> </i></a>
+                            </div>
+                            <label class="error-message"></label>
+                        </li>
                         {{/each}}
-                        </ul>
-                        <button type = "button" class = "btn btn-default btn-add-annot-value"> + Value </button>
-                    </div>
+                    </ul>
+                    <button type = "button" class = "btn btn-default btn-add-annot-value"> + Value </button>
                 </div>
+            </div>
             {{/each}}
-    </div>
+        </div>
 </script>
 
 <!--Start: Settings Modal-->
@@ -1633,52 +1633,52 @@
                     "artifacts/AggregateDataIncrementally/AggregateDataIncrementally.siddhi"]
             },
             stream_predefined_annotations: [
-            {
-                predefined: true,
-                name: 'Async',
-                class: 'optional-annotation',
-                isMandatory: false,
-                elements: [
-                    {
-                        key: 'buffer.size',
-                        value: '256',
-                        class: 'mandatory-key',
-                        isMandatory: true
-                    },
-                    {
-                        key: 'workers',
-                        value: '2',
-                        class: 'mandatory-key',
-                        isMandatory: true
-                    },
-                    {
-                        key: 'batch.size.max',
-                        value: '5',
-                        class: 'mandatory-key',
-                        isMandatory: true
-                    },
-                ]
-            }
+                {
+                    predefined: true,
+                    name: 'Async',
+                    class: 'optional-annotation',
+                    isMandatory: false,
+                    elements: [
+                        {
+                            key: 'buffer.size',
+                            value: '256',
+                            class: 'mandatory-key',
+                            isMandatory: true
+                        },
+                        {
+                            key: 'workers',
+                            value: '2',
+                            class: 'mandatory-key',
+                            isMandatory: true
+                        },
+                        {
+                            key: 'batch.size.max',
+                            value: '5',
+                            class: 'mandatory-key',
+                            isMandatory: true
+                        },
+                    ]
+                }
             ],
             table_predefined_annotations: [
-            {
-                name: "primaryKey",
-                values: [{
-                    value: ""
-                }],
-                isChecked: false
-            },
-            {
-                name: "index",
-                values: [{
-                    value: ""
-                }],
-                isChecked: false
-            }
+                {
+                    name: "primaryKey",
+                    values: [{
+                        value: ""
+                    }],
+                    isChecked: false
+                },
+                {
+                    name: "index",
+                    values: [{
+                        value: ""
+                    }],
+                    isChecked: false
+                }
             ],
             services:   {
                 workspace:  {
-                   endpoint: window.location.protocol + "//" + window.location.host + '/editor/workspace'
+                    endpoint: window.location.protocol + "//" + window.location.host + '/editor/workspace'
                 }
             },
             alerts: {

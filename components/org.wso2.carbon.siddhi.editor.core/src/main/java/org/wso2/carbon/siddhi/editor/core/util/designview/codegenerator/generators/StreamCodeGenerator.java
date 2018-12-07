@@ -24,12 +24,12 @@ import org.wso2.carbon.siddhi.editor.core.util.designview.exceptions.CodeGenerat
 import org.wso2.carbon.siddhi.editor.core.util.designview.utilities.CodeGeneratorUtils;
 
 /**
- * Generate's the code for a Siddhi stream element
+ * Generates the code for a Siddhi stream element
  */
 public class StreamCodeGenerator {
 
     /**
-     * Generate's the Siddhi code representation of a StreamConfig object
+     * Generates the Siddhi code representation of a StreamConfig object
      *
      * @param stream The StreamConfig object
      * @return The Siddhi code representation of the given StreamConfig object

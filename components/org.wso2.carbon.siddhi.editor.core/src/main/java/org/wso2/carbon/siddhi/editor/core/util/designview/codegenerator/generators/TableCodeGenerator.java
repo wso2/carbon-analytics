@@ -24,12 +24,12 @@ import org.wso2.carbon.siddhi.editor.core.util.designview.exceptions.CodeGenerat
 import org.wso2.carbon.siddhi.editor.core.util.designview.utilities.CodeGeneratorUtils;
 
 /**
- * Generate's the code for a Siddhi table element
+ * Generates the code for a Siddhi table element
  */
 public class TableCodeGenerator {
 
     /**
-     * Generate's the Siddhi code representation of a TableConfig object
+     * Generates the Siddhi code representation of a TableConfig object
      *
      * @param table The TableConfig object
      * @return The Siddhi code representation of the given TableConfig object

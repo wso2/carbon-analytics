@@ -25,12 +25,12 @@ import org.wso2.carbon.siddhi.editor.core.util.designview.exceptions.CodeGenerat
 import org.wso2.carbon.siddhi.editor.core.util.designview.utilities.CodeGeneratorUtils;
 
 /**
- * Generate's the code for a Siddhi window element
+ * Generates the code for a Siddhi window element
  */
 public class WindowCodeGenerator {
 
     /**
-     * Generate's the Siddhi code representation of a WindowConfig object
+     * Generates the Siddhi code representation of a WindowConfig object
      *
      * @param window The WindowConfig object
      * @return The Siddhi code representation of the given WindowConfig object
