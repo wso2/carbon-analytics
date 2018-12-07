@@ -37,7 +37,12 @@ public class TriggerCodeGenerator {
      */
     public String generateTrigger(TriggerConfig trigger) throws CodeGenerationException {
         CodeGeneratorUtils.NullValidator.validateConfigObject(trigger);
-
+        //to append quotes to start and cronExpression
+        if (trigger.getAtOrAtEvery().equalsIgnoreCase(SiddhiCodeBuilderConstants.AT )) {
+            String triggerAt = trigger.getAt();
+            triggerAt = SiddhiCodeBuilderConstants.SINGLE_QUOTE  + triggerAt + SiddhiCodeBuilderConstants.SINGLE_QUOTE;
+            trigger.setAt(triggerAt);
+        }
         return SubElementCodeGenerator.generateComment(trigger.getPreviousCommentSegment()) +
                 SubElementCodeGenerator.generateAnnotations(trigger.getAnnotationList()) +
                 SiddhiCodeBuilderConstants.DEFINE_TRIGGER +

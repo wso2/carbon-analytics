@@ -49,7 +49,11 @@ public class TriggerConfig extends SiddhiElementConfig {
         return annotationList;
     }
 
-    public  String getAtOrAtEvery() {
+    public String getAtOrAtEvery() {
         return this.atOrAtEvery;
+    }
+
+    public void setAt (String at) {
+        this.at = at;
     }
 }

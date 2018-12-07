@@ -60,10 +60,10 @@ define(['require', 'log', 'jquery', 'lodash', 'trigger', 'designViewUtils'],
          */
         var renderAtContent = function (selectedAtType) {
             if (selectedAtType === start) {
-                //show no textbox
+                //show no text-box
                 $('#trigger-at-content').html("");
             } else {
-                //render a textbox to put the atEvery or cron-expression value
+                //render a text-box to put the atEvery or cron-expression value
                 $('#trigger-at-content').html('<input type="text" class="clearfix"> ' +
                     '<label class="error-message" > </label>');
             }
@@ -132,7 +132,7 @@ define(['require', 'log', 'jquery', 'lodash', 'trigger', 'designViewUtils'],
                 var at = clickedElement.getAt().trim();
                 if (atOrAtEvery === "at") {
                     if (at.indexOf("'") >= 0 || at.indexOf('"') >= 0) {
-                        //to remove the string quotations from the start and cron expression
+                        //to remove the string quote from the start and cron expression
                         at = at.slice(1, at.length - 1);
                     }
                 } else {
@@ -223,10 +223,10 @@ define(['require', 'log', 'jquery', 'lodash', 'trigger', 'designViewUtils'],
                     }
                 }
                 if (selectedAtType === start) {
-                    at = "'" + "start" + "'";
+                    at = start
                     atOrAtEvery = "at"
                 } else if (selectedAtType === cronExpression) {
-                    at = "'" + at + "'";
+                    at = at;
                     atOrAtEvery = "at";
                 } else {
                     at = "every " + at;
