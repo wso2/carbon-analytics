@@ -976,3 +976,9 @@ a.list-group-item, button.list-group-item {
     left: 0px;
     top: 0px;
 }
+
+textarea {
+    width: 95%;
+    background: #424242;
+    min-height: 65px;
+}

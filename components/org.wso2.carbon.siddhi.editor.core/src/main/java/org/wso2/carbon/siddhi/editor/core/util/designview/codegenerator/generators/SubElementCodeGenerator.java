@@ -33,12 +33,12 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Generates the code for a sub-element of a Siddhi element
+ * Generate's the code for a sub-element of a Siddhi element
  */
 public class SubElementCodeGenerator {
 
     /**
-     * Generates the Siddhi code representation of a CommentCodeSegment object
+     * Generate's the Siddhi code representation of a CommentCodeSegment object
      *
      * @param comment The CommentCodeSegment object
      * @return The Siddhi code representation of the given CommentCodeSegment object
@@ -54,7 +54,7 @@ public class SubElementCodeGenerator {
     }
 
     /**
-     * Generates the Siddhi code representation of the query's name
+     * Generate's the Siddhi code representation of the query's name
      *
      * @param queryName The Siddhi query's name
      * @return The Siddhi code representation of a Siddhi query name annotation
@@ -75,7 +75,7 @@ public class SubElementCodeGenerator {
     }
 
     /**
-     * Generates the Siddhi code representation of a AttributeConfig list
+     * Generate's the Siddhi code representation of a AttributeConfig list
      *
      * @param attributes The AttributeConfig list
      * @return The Siddhi code representation of the given AttributeConfig list
@@ -103,7 +103,7 @@ public class SubElementCodeGenerator {
     }
 
     /**
-     * Generates the Siddhi code representation of a annotations list
+     * Generate's the Siddhi code representation of a annotations list
      *
      * @param annotations The annotations list
      * @return The Siddhi code representation of the given annotations list
@@ -118,13 +118,11 @@ public class SubElementCodeGenerator {
             annotationsStringBuilder.append(annotation);
         }
 
-        annotationsStringBuilder.append(SiddhiCodeBuilderConstants.NEW_LINE);
-
         return annotationsStringBuilder.toString();
     }
 
     /**
-     * Generates the Siddhi code representation of a StoreConfig object
+     * Generate's the Siddhi code representation of a StoreConfig object
      *
      * @param store The StoreConfig object
      * @return The Siddhi code representation of the given StoreConfig object
@@ -164,7 +162,7 @@ public class SubElementCodeGenerator {
     }
 
     /**
-     * Generates the Siddhi code representation of a parameters list
+     * Generate's the Siddhi code representation of a parameters list
      *
      * @param parameters The parameters list
      * @return The Siddhi code representation of the given parameters list
@@ -188,7 +186,31 @@ public class SubElementCodeGenerator {
     }
 
     /**
-     * Generates the Siddhi code representation of a StreamHandlerConfig list
+     * Generate's the Siddhi code representation of a element list
+     *
+     * @param elements The elements list
+     * @return The Siddhi code representation of the given elements list
+     */
+    public static String generateElementList(List<String> elements) {
+        if (elements == null || elements.isEmpty()) {
+            return SiddhiCodeBuilderConstants.EMPTY_STRING;
+        }
+
+        StringBuilder parametersStringBuilder = new StringBuilder();
+        int parametersLeft = elements.size();
+        for (String parameter : elements) {
+            parametersStringBuilder.append(toStringWithEscapeChars(parameter));
+            if (parametersLeft != 1) {
+                parametersStringBuilder.append(SiddhiCodeBuilderConstants.COMMA);
+            }
+            parametersLeft--;
+        }
+
+        return parametersStringBuilder.toString();
+    }
+
+    /**
+     * Generate's the Siddhi code representation of a StreamHandlerConfig list
      *
      * @param streamHandlerList The StreamHandlerConfig list
      * @return The Siddhi code representation of the given StreamHandlerConfig list
@@ -209,7 +231,7 @@ public class SubElementCodeGenerator {
     }
 
     /**
-     * Generates the Siddhi code representation of a StreamHandlerConfig object
+     * Generate's the Siddhi code representation of a StreamHandlerConfig object
      *
      * @param streamHandler The StreamHandlerConfig object
      * @return The Siddhi code representation of the given StreamHandlerConfig object
@@ -253,7 +275,7 @@ public class SubElementCodeGenerator {
     }
 
     /**
-     * Generates the Siddhi code representation of a output event type
+     * Generate's the Siddhi code representation of a output event type
      *
      * @param eventType The output event type
      * @return The Siddhi code representation of the given output event type
@@ -289,4 +311,40 @@ public class SubElementCodeGenerator {
     private SubElementCodeGenerator() {
     }
 
+    /**
+     *Converts an org.wso2.siddhi.query.api.annotation.Element in string format to another string with escape characters
+     * which is the siddhi app code representation of the Element.
+     * @param elementStr The Element in String format. E.g. title = "The wonder of "foo""
+     * @return The code representation of the Element. E.g. title = """The wonder of "foo""""
+     */
+    private static String toStringWithEscapeChars(String elementStr) {
+        String key = null, value;
+        if (elementStr == null || elementStr.isEmpty()) {
+            throw new IllegalArgumentException("Input string is either null or empty.");
+        }
+        String[] keyValuePair = elementStr.split(SiddhiCodeBuilderConstants.ELEMENT_KEY_VALUE_SEPARATOR);
+        if (keyValuePair.length == 1) {
+            value = keyValuePair[0].trim().substring(1, keyValuePair[0].length() - 1);
+        } else if (keyValuePair.length == 2) {
+            key = keyValuePair[0];
+            value = keyValuePair[1].trim().substring(1, keyValuePair[1].length() - 1);
+        } else {
+            throw new IllegalArgumentException("Could not convert to Element object. String format is invalid: "
+                    + elementStr);
+        }
+
+        StringBuilder valueWithQuotes = new StringBuilder();
+        if (value != null && (value.contains("\"") || value.contains("\n"))) {
+            valueWithQuotes.append(SiddhiCodeBuilderConstants.ESCAPE_SEQUENCE).append(value)
+                    .append(SiddhiCodeBuilderConstants.ESCAPE_SEQUENCE);
+        } else {
+            valueWithQuotes.append(SiddhiCodeBuilderConstants.DOUBLE_QUOTE).append(value)
+                    .append(SiddhiCodeBuilderConstants.DOUBLE_QUOTE);
+        }
+        if (key != null) {
+            return key + SiddhiCodeBuilderConstants.ELEMENT_KEY_VALUE_SEPARATOR + valueWithQuotes.toString();
+        } else {
+            return valueWithQuotes.toString();
+        }
+    }
 }
