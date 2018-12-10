@@ -148,7 +148,9 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'designViewUtils', 'h
             var parameters = [];
             for (type of types) {
                 if (type.name.toLowerCase() == selectedType.toLowerCase()) {
-                    parameters = type.parameters;
+                    if (type.parameters) {
+                        parameters = type.parameters;
+                    }
                     break;
                 }
             }
@@ -221,35 +223,41 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'designViewUtils', 'h
         */
         var validateDataType = function (dataTypes, parameterValue) {
             var invalidDataType;
-            intLongRegexMatch = /^[-+]?\d+$/;
-            doubleFloatRegexMatch = /^[+-]?([0-9]*[.])?[0-9]+$/;
-            _.forEach(dataTypes, function (dataType) {
+            const intLongRegexMatch = /^[-+]?\d+$/;
+            const doubleFloatRegexMatch = /^[+-]?([0-9]*[.])?[0-9]+$/;
+            const timeRegexMatch = /^[_A-z0-9]*((-|\s)*[_A-z0-9])*$/g;
+
+            for (var dataType of dataTypes) {
                 if (dataType === "INT" || dataType === "LONG") {
                     if (!parameterValue.match(intLongRegexMatch)) {
                         invalidDataType = true;
                     } else {
                         invalidDataType = false;
+                        break;
                     }
                 } else if (dataType === "DOUBLE" || dataType === "FLOAT") {
                     if (!parameterValue.match(doubleFloatRegexMatch)) {
                         invalidDataType = true;
                     } else {
                         invalidDataType = false;
+                        break;
                     }
                 } else if (dataType === "BOOL") {
                     if (!(parameterValue.toLowerCase() === "false" || parameterValue.toLowerCase() === "true")) {
                         invalidDataType = true;
                     } else {
                         invalidDataType = false;
+                        break;
                     }
                 } else if (dataType === "TIME") {
-                    if (!parameterValue.match(alphabeticValidatorRegex)) {
+                    if (!parameterValue.match(timeRegexMatch)) {
                         invalidDataType = true;
                     } else {
                         invalidDataType = false;
+                        break;
                     }
                 }
-            });
+            }
             return invalidDataType;
         };
 
@@ -307,17 +315,20 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'designViewUtils', 'h
         var buildParameterValues = function (parameterValues, predefinedParameters) {
             var isError = false;
             $('.parameter').each(function () {
-                var parameterValue = $(this).find('.parameter-value').val().trim();
-                var parameterName = $(this).find('.parameter-name').text().trim();;
-                var predefinedParameter = getParameter(parameterName, predefinedParameters);
-                if (validateParameterValues(this, predefinedParameters)) {
-                    if (predefinedParameter.type.includes("STRING")) {
-                        parameterValue = "'" + parameterValue + "'";
+                if ($(this).find('.parameter-name').hasClass('mandatory-parameter') || ($(this).find('.parameter-name')
+                    .hasClass('optional-parameter') && $(this).find('.parameter-checkbox').is(":checked"))) {
+                    var parameterValue = $(this).find('.parameter-value').val().trim();
+                    var parameterName = $(this).find('.parameter-name').text().trim();;
+                    var predefinedParameter = getParameter(parameterName, predefinedParameters);
+                    if (validateParameterValues(this, predefinedParameter)) {
+                        if (predefinedParameter.type.includes("STRING")) {
+                            parameterValue = "'" + parameterValue + "'";
+                        }
+                        parameterValues.push(parameterValue)
+                    } else {
+                        isError = true;
+                        return false;
                     }
-                    parameterValues.push(parameterValue)
-                } else {
-                    isError = true;
-                    return false;
                 }
             });
             return isError;
@@ -332,24 +343,27 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'designViewUtils', 'h
         var buildParameterValuesFrequentOrLossyFrequent = function (parameterValues, predefinedParameters) {
             var isError = false;
             $('.parameter').each(function () {
-                var parameterValue = $(this).find('.parameter-value').val().trim();
-                var parameterName = $(this).find('.parameter-name').text().trim();
-                var predefinedParameter = getParameter(parameterName, predefinedParameters);
-                if (validateParameterValues(this, predefinedParameter)) {
-                    if (parameterName === "attribute") {
-                        var attributeArray = parameterValue.split(',');
-                        _.forEach(attributeArray, function (attribute) {
-                            parameterValues.push(attribute.trim())
-                        });
-                    } else {
-                        if (predefinedParameter.type.includes("STRING")) {
-                            parameterValue = "'" + parameterValue + "'";
+                if ($(this).find('.parameter-name').hasClass('mandatory-parameter') || ($(this).find('.parameter-name')
+                    .hasClass('optional-parameter') && $(this).find('.parameter-checkbox').is(":checked"))) {
+                    var parameterValue = $(this).find('.parameter-value').val().trim();
+                    var parameterName = $(this).find('.parameter-name').text().trim();
+                    var predefinedParameter = getParameter(parameterName, predefinedParameters);
+                    if (validateParameterValues(this, predefinedParameter)) {
+                        if (parameterName === "attribute") {
+                            var attributeArray = parameterValue.split(',');
+                            _.forEach(attributeArray, function (attribute) {
+                                parameterValues.push(attribute.trim())
+                            });
+                        } else {
+                            if (predefinedParameter.type.includes("STRING")) {
+                                parameterValue = "'" + parameterValue + "'";
+                            }
+                            parameterValues.push(parameterValue)
                         }
-                        parameterValues.push(parameterValue)
+                    } else {
+                        isError = true;
+                        return false;
                     }
-                } else {
-                    isError = true;
-                    return false;
                 }
             });
             return isError;
@@ -366,26 +380,30 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'designViewUtils', 'h
             $('.parameter').each(function () {
                 var parameterValue = $(this).find('.parameter-value').val().trim();
                 var parameterName = $(this).find('.parameter-name').text().trim();;
+                var predefinedParameter = getParameter(parameterName, predefinedParameters);
                 if (parameterName === "window.length") {
-                    if (validateParameterValues(this, predefinedParameters)) {
+                    if (validateParameterValues(this, predefinedParameter)) {
                         parameterValues.push(parameterValue)
                     } else {
                         isError = true;
                         return false;
                     }
                 } else if (parameterName === "attribute") {
-                    if (validateParameterValues(this, predefinedParameters)) {
-                        var attributeArray = parameterValue.split(',');
-                        _.forEach(attributeArray, function (attribute) {
-                            parameterValues.push(attribute.trim())
-                        });
-                    } else {
-                        isError = true;
-                        return false;
+                    if ($('#attribute-parameter').find('.parameter-checkbox').is(":checked")) {
+                        if (validateParameterValues(this, predefinedParameter)) {
+                            var attributeArray = parameterValue.split(',');
+                            _.forEach(attributeArray, function (attribute) {
+                                parameterValues.push(attribute.trim())
+                            });
+                        } else {
+                            isError = true;
+                            return false;
+                        }
                     }
                 } else {
-                    if ($('#attribute-parameter').find('.parameter-checkbox').is(":checked")) {
-                        if (validateParameterValues(this, predefinedParameters)) {
+                    if (($('#attribute-parameter').find('.parameter-checkbox').is(":checked")) && ($
+                        ('#order-parameter').find('.parameter-checkbox').is(":checked"))) {
+                        if (validateParameterValues(this, predefinedParameter)) {
                             if (parameterValue.toLowerCase() === "asc" ||
                                 parameterValue.toLowerCase() === "desc") {
                                 parameterValue = "'" + parameterValue + "'";
@@ -514,7 +532,7 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'designViewUtils', 'h
             parameters.push({
                 name: predefinedParameters[2].name, value: order, description:
                     predefinedParameters[2].description, optional: predefinedParameters[2].optional,
-                defaultValue: "'asc'"
+                defaultValue: predefinedParameters[2].defaultValue
             });
             return parameters;
         };
@@ -736,6 +754,7 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'designViewUtils', 'h
             var functionParameters = [];
             var functionParametersWithValues = [];
             var selectedWindowType;
+            var annotations = [];
 
             //event listener to show parameter description
             $('#defineFunctionParameters').on('mouseover', '.parameter-desc', function () {
@@ -809,8 +828,6 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'designViewUtils', 'h
             });
 
             var name = clickedElement.getName();
-            var functionName = clickedElement.getFunction().toLowerCase();
-            var savedParameterValues = clickedElement.getParameters();
             var windowFunctionNameTemplate = Handlebars.compile($('#type-selection-form-template').html());
             var wrappedHtml = windowFunctionNameTemplate({ id: "window", types: predefinedWindowFunctionNames });
             $('#defineFunctionName').html(wrappedHtml);
@@ -825,6 +842,9 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'designViewUtils', 'h
                 functionParametersWithValues = createParameterWithValues(functionParameters);
                 renderParameters(functionParametersWithValues, selectedWindowType, "window")
             } else {
+                var functionName = clickedElement.getFunction().toLowerCase();
+                var savedParameterValues = clickedElement.getParameters();
+
                 $('#windowName').val(name.trim());
                 selectedType = functionName;
                 $('#defineFunctionName').find('#window-type option').filter(function () {
@@ -869,14 +889,16 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'designViewUtils', 'h
                 }).prop('selected', true);
 
                 var savedAnnotationObjects = clickedElement.getAnnotationListObjects();
-                //render the user defined annotations form template
-                var raw_partial = document.getElementById('recursiveAnnotationPartial').innerHTML;
-                Handlebars.registerPartial('recursiveAnnotation', raw_partial);
-                var annotationFormTemplate = Handlebars.compile($('#annotation-form-template').html());
-                var wrappedHtml = annotationFormTemplate(savedAnnotationObjects);
-                $('#define-annotation').html(wrappedHtml);
-                loadAnnotation();
+                annotations = savedAnnotationObjects;
             }
+
+            //render the user defined annotations form template
+            var raw_partial = document.getElementById('recursiveAnnotationPartial').innerHTML;
+            Handlebars.registerPartial('recursiveAnnotation', raw_partial);
+            var annotationFormTemplate = Handlebars.compile($('#annotation-form-template').html());
+            var wrappedHtml = annotationFormTemplate(annotations);
+            $('#define-annotation').html(wrappedHtml);
+            loadAnnotation();
 
             $('#window-type').change(function () {
                 functionParameters = getSelectedTypeParameters(this.value, predefinedWindowFunctionNames);
@@ -1014,6 +1036,8 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'designViewUtils', 'h
                     clickedElement.addAnnotationObject(annotation);
                 });
 
+                $('#' + id).removeClass('incomplete-element');
+                $('#' + id).prop('title', '');
                 self.designViewContainer.removeClass('disableContainer');
                 self.toggleViewButton.removeClass('disableContainer');
 
