@@ -173,6 +173,8 @@ define(['require', 'log', 'jquery', 'lodash', 'designViewUtils'],
                 var textNode = $(element).parent().find('.functionNameNode');
                 textNode.html(functionName);
 
+				$('#' + id).removeClass('incomplete-element');
+				$('#' + id).prop('title', '');
                 self.designViewContainer.removeClass('disableContainer');
                 self.toggleViewButton.removeClass('disableContainer');
 

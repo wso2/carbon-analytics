@@ -45,8 +45,7 @@ define(['require', 'log', 'jquery', 'lodash', 'trigger', 'designViewUtils'],
          * Function to render the drop down for trigger-at
          */
         var renderAt = function () {
-            var atPropertyDiv = '<div class = "clearfix"> <h4> At </h4> </div>' +
-                '<select id = "at-type">' +
+            var atPropertyDiv = '<h4> At </h4> <select id = "at-type">' +
                 '<option value = "' + start + '"> start </option>' +
                 '<option value = "' + cronExpression + '"> cron expression </option>' +
                 '<option value = "' + every + '"> every </option>' +
