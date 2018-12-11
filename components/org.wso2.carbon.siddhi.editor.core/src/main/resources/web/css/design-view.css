@@ -624,12 +624,23 @@ a.list-group-item, button.list-group-item {
 	padding-top: 3px;
 }
 
+.design-view-form-content .customized-options .error-message,
+.design-view-form-content .source-sink-map-options .customized-options .error-message {
+	margin-left: 75px;
+}
+
+.design-view-form-content .partition-form-container #partition-by-stream-name-label {
+	margin-left: 120px;
+}
+
+.design-view-form-content .partition-form-container .partition-by-expression {
+	margin-right: 10px;
+}
+
 .source-sink-form-container .source-sink-map-options .error-message,
-.table-form-container #define-store-options .error-message,
-.table-form-container .define-table-annotation .error-message,
+.table-form-container #store-options .error-message,
+.table-form-container #define-predefined-annotations .error-message,
 .window-form-container #defineFunctionParameters .error-message {
-	color: red;
-	padding: 3px;
 	margin-left: 20px;
 }
 
@@ -683,7 +694,8 @@ a.list-group-item, button.list-group-item {
 
 .source-sink-form-container input[type="text"].attr-key,
 .source-sink-form-container #attributeMap-type:disabled,
-.table-form-container #store-type:disabled {
+.table-form-container #store-type:disabled,
+.partition-form-container #define-partition-keys .partition-by-stream-name {
 	cursor: not-allowed;
 	background: #1d1d1d;
 	border: 1px solid #545353;
@@ -791,7 +803,8 @@ a.list-group-item, button.list-group-item {
 	margin-left: 10px;
 }
 
-.stream-form-container {
+.stream-form-container,
+.partition-form-container {
 	width:50%;
 }
 
@@ -800,7 +813,8 @@ a.list-group-item, button.list-group-item {
 .table-form-container,
 .window-form-container,
 .trigger-form-container,
-.function-form-container {
+.function-form-container,
+.partition-form-container {
 	float:left;
 	display:inline-block;
 	padding: 5px;
@@ -814,6 +828,7 @@ a.list-group-item, button.list-group-item {
 
 .trigger-form-container #define-trigger-at {
 	margin-top: -3px;
+	margin-bottom: 10px;
 }
 
 .window-form-container #defineFunctionName,
@@ -866,8 +881,10 @@ a.list-group-item, button.list-group-item {
 	width: 50%;
 }
 
-.design-view-form-content #btn-submit {
+.design-view-form-content #btn-submit,
+.design-view-form-content #btn-cancel {
 	margin-top: 15px;
+	margin-right: 10px;
 }
 
 .design-view-form-content input[type="checkbox"],
