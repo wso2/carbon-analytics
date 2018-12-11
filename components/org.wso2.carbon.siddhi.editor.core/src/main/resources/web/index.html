@@ -1313,6 +1313,26 @@
     {{/if}}
 </script>
 
+<script id="partition-by-template" type = "text/template">
+    <h4> Partition By </h4>
+    <div class="clearfix">
+        <label id = "partition-by-expression-label"> Expression </label>
+        <label id = "partition-by-stream-name-label"> Stream Name </label>
+    </div>
+    <div id = "partition-by-content">
+        {{#each this}}
+        <div class="partition-key">
+            <div class="clearfix">
+                <input type="text" class="partition-by-expression" value="{{this.expression}}">
+                <input type="text" class="partition-by-stream-name" value="{{this.streamName}}" readonly>
+            </div>
+            <label class="error-message"></label>
+        </div>
+        {{/each}}
+    </div>
+
+
+</script>
 <!--Start: Settings Modal-->
 <div class="modal fade modalSettings" id="modalSettings" tabindex="-1" role="dialog">
     <div class="modal-dialog" role="document">
