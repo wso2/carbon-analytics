@@ -111,6 +111,7 @@
     width: 25px;
     height: 100%;
     position: fixed;
+    border-top: 1px solid #424242;
 }
 
 .debuggerToolbar span {
@@ -173,6 +174,7 @@
 .output-console-content-wrapper {
     margin-bottom: 10px;
     height: 100%;
+    border-top: 3px solid #424242;
 }
 
 .clear-console-btn {
@@ -191,4 +193,13 @@ a.clear-console-btn:hover {
 .query-state,
 .event-state {
   height: 100%;
+}
+
+.output-console-activate-btn.close {
+    opacity: 0.7;
+}
+
+.output-console-activate-btn.close:hover,
+.output-console-activate-btn.close:focus {
+    opacity: 1;
 }
