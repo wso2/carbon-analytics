@@ -482,7 +482,8 @@ define(['log', 'jquery', 'lodash', 'sourceOrSinkAnnotation', 'mapAnnotation', 'p
                 var streamAttributes = getConnectStreamAttributes(streamList, connectedElement);
                 var propertyDiv = $('<div class="source-sink-form-container sink-div"><div id="define-sink"></div>' +
                     '<div class = "source-sink-map-options" id="sink-options-div"></div>' +
-                    '<button type="submit" id ="btn-submit" class="btn toggle-view-button"> Submit </button> </div>' +
+                    '<button type="submit" id ="btn-submit" class="btn toggle-view-button"> Submit </button>' +
+                    '<button id="btn-cancel" type="button" class="btn btn-default"> Cancel </button> </div>' +
                     '<div class="source-sink-form-container mapper-div"> <div id="define-map"> </div>' +
                     '<div class="source-sink-map-options" id="mapper-options-div"></div>' +
                     '</div> <div class= "source-sink-form-container attribute-map-div"><div id="define-attribute">' +
@@ -710,46 +711,39 @@ define(['log', 'jquery', 'lodash', 'sourceOrSinkAnnotation', 'mapAnnotation', 'p
                     //clear the error classes
                     $('.error-message').text("")
                     $('.required-input-field').removeClass('required-input-field');
+                    var isErrorOccurred = false;
 
                     var selectedSinkType = $('#define-sink #sink-type').val();
                     if (selectedSinkType === null) {
                         DesignViewUtils.prototype.errorAlert("Select a sink type to submit");
+                        isErrorOccurred = true;
                         return;
                     } else {
                         var annotationOptions = [];
-                        clickedElement.setType(selectedSinkType);
                         if (validateOptions(annotationOptions, sinkOptions, "sink-options")) {
+                            isErrorOccurred = true;
                             return;
                         }
                         if (validateCustomizedOptions(annotationOptions, "sink-options")) {
+                            isErrorOccurred = true;
                             return;
-                        }
-                        if (annotationOptions.length == 0) {
-                            clickedElement.setOptions(undefined);
-                        } else {
-                            clickedElement.setOptions(annotationOptions);
                         }
 
                         var selectedMapType = $('#define-map #map-type').val();
                         var mapperAnnotationOptions = [];
-                        var mapper = {};
-                        _.set(mapper, 'type', selectedMapType);
+
                         if (validateOptions(mapperAnnotationOptions, mapperOptions, "mapper-options")) {
+                            isErrorOccurred = true;
                             return;
                         }
                         if (validateCustomizedOptions(mapperAnnotationOptions, "mapper-options")) {
+                            isErrorOccurred = true;
                             return;
-                        }
-                        if (mapperAnnotationOptions.length == 0) {
-                            _.set(mapper, 'options', undefined);
-                        } else {
-                            _.set(mapper, 'options', mapperAnnotationOptions);
                         }
 
                         if ($('#define-attribute #attributeMap-checkBox').is(":checked")) {
                             //if attribute section is checked
                             var mapperAttributeValuesArray = {};
-                            var isError = false;
                             var attributeType;
                             var annotationType;
                             var selAttributeType = $('#define-attribute #attributeMap-type').val();
@@ -770,7 +764,7 @@ define(['log', 'jquery', 'lodash', 'sourceOrSinkAnnotation', 'mapAnnotation', 'p
                                             'required')
                                         $(this)[0].scrollIntoView();
                                         $(this).find('.attr-value').addClass('required-input-field');
-                                        isError = true;
+                                        isErrorOccurred = true;
                                         return false;
                                     } else {
                                         mapperAttributeValuesArray[key] = value;
@@ -787,40 +781,65 @@ define(['log', 'jquery', 'lodash', 'sourceOrSinkAnnotation', 'mapAnnotation', 'p
                                         'required')
                                     $('#mapper-attributes .attribute .attr-value:first')[0].scrollIntoView();
                                     $('#mapper-attributes .attribute .attr-value:first').addClass('required-input-field');
-                                    isError = true;
+                                    isErrorOccurred = true;
                                 } else {
                                     mapperAttributeValuesArray.push(value);
                                 }
                             }
-                            if (isError) {
-                                return;
-                            } else {
-                                payloadOrAttributeOptions = {};
-                                _.set(payloadOrAttributeOptions, 'annotationType', annotationType);
-                                _.set(payloadOrAttributeOptions, 'type', attributeType);
-                                _.set(payloadOrAttributeOptions, 'value', mapperAttributeValuesArray);
-                                var payloadOrAttributeObject = new PayloadOrAttribute(payloadOrAttributeOptions);
-                                _.set(mapper, 'payloadOrAttribute', payloadOrAttributeObject);
-                            }
+                        }
+                    }
+
+                    if (!isErrorOccurred) {
+                        clickedElement.setType(selectedSinkType);
+                        if (annotationOptions.length == 0) {
+                            clickedElement.setOptions(undefined);
+                        } else {
+                            clickedElement.setOptions(annotationOptions);
+                        }
+
+                        var mapper = {};
+                        _.set(mapper, 'type', selectedMapType);
+                        if (mapperAnnotationOptions.length == 0) {
+                            _.set(mapper, 'options', undefined);
+                        } else {
+                            _.set(mapper, 'options', mapperAnnotationOptions);
+                        }
+
+                        if ($('#define-attribute #attributeMap-checkBox').is(":checked")) {
+                            payloadOrAttributeOptions = {};
+                            _.set(payloadOrAttributeOptions, 'annotationType', annotationType);
+                            _.set(payloadOrAttributeOptions, 'type', attributeType);
+                            _.set(payloadOrAttributeOptions, 'value', mapperAttributeValuesArray);
+                            var payloadOrAttributeObject = new PayloadOrAttribute(payloadOrAttributeOptions);
+                            _.set(mapper, 'payloadOrAttribute', payloadOrAttributeObject);
                         } else {
                             _.set(mapper, 'payloadOrAttribute', undefined);
                         }
                         var mapperObject = new MapAnnotation(mapper);
                         clickedElement.setMap(mapperObject);
+
+                        var textNode = $('#' + id).find('.sinkNameNode');
+                        textNode.html(selectedSinkType);
+
+                        $('#' + id).removeClass('incomplete-element');
+                        $('#' + id).prop('title', '');
+
+                        // set the isDesignViewContentChanged to true
+                        self.configurationData.setIsDesignViewContentChanged(true);
+
+                        self.designViewContainer.removeClass('disableContainer');
+                        self.toggleViewButton.removeClass('disableContainer');
+
+                        // close the form window
+                        self.consoleListManager.removeFormConsole(formConsole);
                     }
+                });
 
-                    var textNode = $('#' + id).find('.sinkNameNode');
-                    textNode.html(selectedSinkType);
-
-                    $('#' + id).removeClass('incomplete-element');
-                    $('#' + id).prop('title', '');
-
-                    // set the isDesignViewContentChanged to true
-                    self.configurationData.setIsDesignViewContentChanged(true);
-
+                // 'Cancel' button action
+                var cancelButtonElement = $(formContainer).find('#btn-cancel')[0];
+                cancelButtonElement.addEventListener('click', function () {
                     self.designViewContainer.removeClass('disableContainer');
                     self.toggleViewButton.removeClass('disableContainer');
-
                     // close the form window
                     self.consoleListManager.removeFormConsole(formConsole);
                 });

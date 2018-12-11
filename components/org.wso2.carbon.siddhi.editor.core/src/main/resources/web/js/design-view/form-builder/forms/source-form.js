@@ -457,7 +457,8 @@ define(['log', 'jquery', 'lodash', 'sourceOrSinkAnnotation', 'mapAnnotation', 'p
 
                 var propertyDiv = $('<div class="source-sink-form-container source-div"><div id="define-source"></div>' +
                     '<div class = "source-sink-map-options" id="source-options-div"></div>' +
-                    '<button type="submit" id ="btn-submit" class="btn toggle-view-button"> Submit </button> </div>' +
+                    '<button type="submit" id ="btn-submit" class="btn toggle-view-button"> Submit </button>' +
+                    '<button id="btn-cancel" type="button" class="btn btn-default"> Cancel </button> </div>' +
                     '<div class="source-sink-form-container mapper-div"> <div id="define-map"> </div> ' +
                     '<div class="source-sink-map-options" id="mapper-options-div">' +
                     '</div> </div> <div class= "source-sink-form-container attribute-map-div">' +
@@ -654,46 +655,37 @@ define(['log', 'jquery', 'lodash', 'sourceOrSinkAnnotation', 'mapAnnotation', 'p
                     //clear the errors
                     $('.error-message').text("")
                     $('.required-input-field').removeClass('required-input-field');
+                    var isErrorOccurred = false;
 
                     var selectedSourceType = $('#define-source #source-type').val();
                     if (selectedSourceType === null) {
-                        DesignViewUtils.prototype.errorAlert("Select a source type to submit");
+                        DesignViewUtils.prototype.errorAlert("Select a source type to submit.");
+                        isErrorOccurred = true;
                         return;
                     } else {
                         var annotationOptions = [];
-                        clickedElement.setType(selectedSourceType);
                         if (validateOptions(annotationOptions, sourceOptions, "source-options")) {
+                            isErrorOccurred = true;
                             return;
                         }
                         if (validateCustomizedOptions(annotationOptions, "source-options")) {
+                            isErrorOccurred = true;
                             return;
                         }
-                        if (annotationOptions.length == 0) {
-                            clickedElement.setOptions(undefined);
-                        } else {
-                            clickedElement.setOptions(annotationOptions);
-                        }
-
                         var selectedMapType = $('#define-map #map-type').val();
                         var mapperAnnotationOptions = [];
-                        var mapper = {};
-                        _.set(mapper, 'type', selectedMapType);
                         if (validateOptions(mapperAnnotationOptions, mapperOptions, "mapper-options")) {
+                            isErrorOccurred = true;
                             return;
                         }
                         if (validateCustomizedOptions(mapperAnnotationOptions, "mapper-options")) {
+                            isErrorOccurred = true;
                             return;
-                        }
-                        if (mapperAnnotationOptions.length == 0) {
-                            _.set(mapper, 'options', undefined);
-                        } else {
-                            _.set(mapper, 'options', mapperAnnotationOptions);
                         }
 
                         if ($('#define-attribute #attributeMap-checkBox').is(":checked")) {
                             //if attribute section is checked
                             var mapperAttributeValuesArray = {};
-                            var isError = false;
                             $('#mapper-attributes .attribute').each(function () {
                                 //validate mapper  attributes if value is not filled
                                 var key = $(this).find('.attr-key').val().trim();
@@ -702,41 +694,67 @@ define(['log', 'jquery', 'lodash', 'sourceOrSinkAnnotation', 'mapAnnotation', 'p
                                     $(this).find('.error-message').text('Attribute Value is required.');
                                     $(this)[0].scrollIntoView();
                                     $(this).find('.attr-value').addClass('required-input-field');
-                                    isError = true;
+                                    isErrorOccurred = true;
                                     return false;
                                 } else {
                                     mapperAttributeValuesArray[key] = value;
                                 }
                             });
-                            if (isError) {
-                                return;
-                            } else {
-                                payloadOrAttributeOptions = {};
-                                _.set(payloadOrAttributeOptions, 'annotationType', 'ATTRIBUTES');
-                                _.set(payloadOrAttributeOptions, 'type', "MAP");
-                                _.set(payloadOrAttributeOptions, 'value', mapperAttributeValuesArray);
-                                var payloadOrAttributeObject = new PayloadOrAttribute(payloadOrAttributeOptions);
-                                _.set(mapper, 'payloadOrAttribute', payloadOrAttributeObject);
-                            }
+                        }
+                    }
+
+                    if (!isErrorOccurred) {
+                        clickedElement.setType(selectedSourceType);
+                        var textNode = $('#' + id).find('.sourceNameNode');
+                        textNode.html(selectedSourceType);
+
+                        if (annotationOptions.length == 0) {
+                            clickedElement.setOptions(undefined);
+                        } else {
+                            clickedElement.setOptions(annotationOptions);
+                        }
+
+                        var mapper = {};
+                        _.set(mapper, 'type', selectedMapType);
+                        if (mapperAnnotationOptions.length == 0) {
+                            _.set(mapper, 'options', undefined);
+                        } else {
+                            _.set(mapper, 'options', mapperAnnotationOptions);
+                        }
+
+                        if ($('#define-attribute #attributeMap-checkBox').is(":checked")) {
+                            payloadOrAttributeOptions = {};
+                            _.set(payloadOrAttributeOptions, 'annotationType', 'ATTRIBUTES');
+                            _.set(payloadOrAttributeOptions, 'type', "MAP");
+                            _.set(payloadOrAttributeOptions, 'value', mapperAttributeValuesArray);
+                            var payloadOrAttributeObject = new PayloadOrAttribute(payloadOrAttributeOptions);
+                            _.set(mapper, 'payloadOrAttribute', payloadOrAttributeObject);
                         } else {
                             _.set(mapper, 'payloadOrAttribute', undefined);
                         }
+
                         var mapperObject = new MapAnnotation(mapper);
                         clickedElement.setMap(mapperObject);
+
+                        $('#' + id).removeClass('incomplete-element');
+                        $('#' + id).prop('title', '');
+
+                        // set the isDesignViewContentChanged to true
+                        self.configurationData.setIsDesignViewContentChanged(true);
+
+                        self.designViewContainer.removeClass('disableContainer');
+                        self.toggleViewButton.removeClass('disableContainer');
+
+                        // close the form window
+                        self.consoleListManager.removeFormConsole(formConsole);
                     }
+                });
 
-                    var textNode = $('#' + id).find('.sourceNameNode');
-                    textNode.html(selectedSourceType);
-
-                    $('#' + id).removeClass('incomplete-element');
-                    $('#' + id).prop('title', '');
-
-                    // set the isDesignViewContentChanged to true
-                    self.configurationData.setIsDesignViewContentChanged(true);
-
+                // 'Cancel' button action
+                var cancelButtonElement = $(formContainer).find('#btn-cancel')[0];
+                cancelButtonElement.addEventListener('click', function () {
                     self.designViewContainer.removeClass('disableContainer');
                     self.toggleViewButton.removeClass('disableContainer');
-
                     // close the form window
                     self.consoleListManager.removeFormConsole(formConsole);
                 });

@@ -736,10 +736,11 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'designViewUtils', 'h
                 ' Configuration</h3></div> <h4>Name: </h4> <input type="text" id="windowName" class="clearfix">' +
                 '<label class="error-message" id="windowNameErrorMessage"></label> <div id="define-attribute"></div>' +
                 '<button id="btn-submit" type="button" class="btn toggle-view-button">' +
-                'Submit </button></div> <div class= "window-form-container"> ' +
+                'Submit </button> <button id="btn-cancel" type="button" class="btn btn-default"> Cancel </button> ' +
+                '</div> <div class= "window-form-container"> ' +
                 '<div id = "defineFunctionName"> </div> <div id="defineFunctionParameters"> </div>' +
                 '</div> <div class = "window-form-container"> <div id="defineOutputEvents"> </div> </div>' +
-                '<div class = "window-form-container"> <div id="define-annotation"> </div></div>');
+                '<div class = "window-form-container"> <div id="define-annotation"> </div> </div>');
             formContainer.append(propertyDiv);
 
             //to pop-up the clicked element
@@ -936,6 +937,7 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'designViewUtils', 'h
                 //clear the error messages
                 $('.error-message').text("")
                 $('.required-input-field').removeClass('required-input-field');
+                var isErrorOccurred = false;
 
                 var windowName = $('#windowName').val().trim();
                 //check if window name is empty
@@ -943,6 +945,7 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'designViewUtils', 'h
                     $('#windowName').addClass('required-input-field');
                     $('#windowName')[0].scrollIntoView();
                     $('#windowNameErrorMessage').text("Window name is required.")
+                    isErrorOccurred = true;
                     return;
                 }
 
@@ -954,7 +957,8 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'designViewUtils', 'h
                 if (isWindowNameUsed) {
                     $('#windowName').addClass('required-input-field');
                     $('#windowName')[0].scrollIntoView();
-                    $('#windowNameErrorMessage').text("Window name is already used")
+                    $('#windowNameErrorMessage').text("Window name is already used.")
+                    isErrorOccurred = true;
                     return;
                 }
 
@@ -964,44 +968,33 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'designViewUtils', 'h
                         $('#windowName').addClass('required-input-field');
                         $('#windowName')[0].scrollIntoView();
                         $('#windowNameErrorMessage').text("Window name cannot have white space.")
+                        isErrorOccurred = true;
                         return;
                     }
                     if (!alphabeticValidatorRegex.test(windowName.charAt(0))) {
                         $('#windowName').addClass('required-input-field');
                         $('#windowName')[0].scrollIntoView();
                         $('#windowNameErrorMessage').text("Window name must start with an alphabetic character.")
+                        isErrorOccurred = true;
                         return;
                     }
-                    // update connection related to the element if the name is changed
-                    clickedElement.setName(windowName);
-                    self.formUtils.updateConnectionsAfterDefinitionElementNameChange(id);
                 }
 
                 var attributeNameList = [];
-                if (validateAttributeNames(attributeNameList)) { return; }
+                if (validateAttributeNames(attributeNameList)) {
+                    isErrorOccurred = true;
+                    return;
+                }
 
                 if (attributeNameList.length == 0) {
                     $('.attribute:eq(0)').find('.attr-name').addClass('required-input-field');
                     $('.attribute:eq(0)').find('.attr-name')[0].scrollIntoView();
-                    $('.attribute:eq(0)').find('.error-message').text("Minimum one attribute is required")
+                    $('.attribute:eq(0)').find('.error-message').text("Minimum one attribute is required.");
+                    isErrorOccurred = true;
                     return;
-                } else {
-                    //clear the previously saved attribute list
-                    clickedElement.clearAttributeList();
-                    //add the attributes to the attribute list
-                    $('.attribute .attr-content').each(function () {
-                        var nameValue = $(this).find('.attr-name').val().trim();
-                        var typeValue = $(this).find('.attr-type').val();
-                        if (nameValue != "") {
-                            var attributeObject = new Attribute({ name: nameValue, type: typeValue });
-                            clickedElement.addAttribute(attributeObject)
-                        }
-                    });
                 }
 
                 var functionName = $('#defineFunctionName #window-type').val();
-                clickedElement.setFunction(functionName);
-
                 var parameters = [];
                 var isError = false;
                 if (functionName.toLowerCase() === sort) {
@@ -1014,38 +1007,70 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'designViewUtils', 'h
                 }
 
                 if (isError) {
+                    isErrorOccurred = true;
                     return;
-                } else {
-                    clickedElement.setParameters(parameters);
                 }
 
-                var outputEventType = $('#defineOutputEvents #event-type').val().toUpperCase();
-                clickedElement.setOutputEventType(outputEventType);
+                if (!isErrorOccurred) {
+                    if (previouslySavedName !== windowName) {
+                        // update connection related to the element if the name is changed
+                        clickedElement.setName(windowName);
+                        self.formUtils.updateConnectionsAfterDefinitionElementNameChange(id);
 
-                clickedElement.clearAnnotationList();
-                clickedElement.clearAnnotationListObjects();
-                var annotationStringList = [];
-                var annotationObjectList = [];
+                        var textNode = $(element).parent().find('.windowNameNode');
+                        textNode.html(windowName);
+                    }
 
-                buildAnnotation(annotationStringList, annotationObjectList);
+                    clickedElement.setFunction(functionName);
+                    clickedElement.setParameters(parameters);
 
-                _.forEach(annotationStringList, function (annotation) {
-                    clickedElement.addAnnotation(annotation);
-                });
-                _.forEach(annotationObjectList, function (annotation) {
-                    clickedElement.addAnnotationObject(annotation);
-                });
+                    //clear the previously saved attribute list
+                    clickedElement.clearAttributeList();
+                    //add the attributes to the attribute list
+                    $('.attribute .attr-content').each(function () {
+                        var nameValue = $(this).find('.attr-name').val().trim();
+                        var typeValue = $(this).find('.attr-type').val();
+                        if (nameValue != "") {
+                            var attributeObject = new Attribute({ name: nameValue, type: typeValue });
+                            clickedElement.addAttribute(attributeObject)
+                        }
+                    });
 
-                $('#' + id).removeClass('incomplete-element');
-                $('#' + id).prop('title', '');
+                    var outputEventType = $('#defineOutputEvents #event-type').val().toUpperCase();
+                    clickedElement.setOutputEventType(outputEventType);
+
+                    clickedElement.clearAnnotationList();
+                    clickedElement.clearAnnotationListObjects();
+                    var annotationStringList = [];
+                    var annotationObjectList = [];
+
+                    buildAnnotation(annotationStringList, annotationObjectList);
+                    _.forEach(annotationStringList, function (annotation) {
+                        clickedElement.addAnnotation(annotation);
+                    });
+                    _.forEach(annotationObjectList, function (annotation) {
+                        clickedElement.addAnnotationObject(annotation);
+                    });
+
+                    $('#' + id).removeClass('incomplete-element');
+                    $('#' + id).prop('title', '');
+                    self.designViewContainer.removeClass('disableContainer');
+                    self.toggleViewButton.removeClass('disableContainer');
+
+                    // set the isDesignViewContentChanged to true
+                    self.configurationData.setIsDesignViewContentChanged(true);
+
+                    // close the form window
+                    self.consoleListManager.removeFormConsole(formConsole);
+
+                }
+            });
+
+            // 'Cancel' button action
+            var cancelButtonElement = $(formContainer).find('#btn-cancel')[0];
+            cancelButtonElement.addEventListener('click', function () {
                 self.designViewContainer.removeClass('disableContainer');
                 self.toggleViewButton.removeClass('disableContainer');
-
-                // set the isDesignViewContentChanged to true
-                self.configurationData.setIsDesignViewContentChanged(true);
-                var textNode = $(element).parent().find('.windowNameNode');
-                textNode.html(windowName);
-
                 // close the form window
                 self.consoleListManager.removeFormConsole(formConsole);
             });

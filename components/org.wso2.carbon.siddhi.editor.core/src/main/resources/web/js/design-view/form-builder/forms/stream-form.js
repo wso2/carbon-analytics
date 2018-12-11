@@ -383,8 +383,9 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'stream', 'designView
             var propertyDiv = $('<div class = "stream-form-container"><div id="property-header"><h3>Stream' +
                 ' Configuration</h3></div> <h4>Name: </h4> <input type="text" id="streamName" class="clearfix">' +
                 '<label class="error-message" id="streamNameErrorMessage"></label> <div id="define-attribute"></div>' +
-                '<button id="btn-submit" type="button" class="btn toggle-view-button">' +
-                'Submit </button></div> <div class= "stream-form-container" id="define-annotation"> </div>');
+                '<button id="btn-submit" type="button" class="btn toggle-view-button"> Submit </button>' +
+                '<button id="btn-cancel" type="button" class="btn btn-default"> Cancel </button>' +
+                '</div> <div class= "stream-form-container" id="define-annotation"> </div>');
             formContainer.append(propertyDiv);
             self.designViewContainer.addClass('disableContainer');
             self.toggleViewButton.addClass('disableContainer');
@@ -513,13 +514,12 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'stream', 'designView
                 $('.error-message').text("")
                 $('.required-input-field').removeClass('required-input-field');
                 $('#streamNameErrorMessage').text("")
-                // set the isDesignViewContentChanged to true
-                self.configurationData.setIsDesignViewContentChanged(true);
 
                 var configName = $('#streamName').val().trim();
                 var streamName;
                 var firstCharacterInStreamName;
                 var isStreamNameUsed;
+                var isErrorOccurred = false;
                 /*
                 * check whether the stream is inside a partition and if yes check whether it begins with '#'.
                 *  If not add '#' to the beginning of the stream name.
@@ -532,6 +532,7 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'stream', 'designView
                         $('#streamName').addClass('required-input-field');
                         $('#streamName')[0].scrollIntoView();
                         $('#streamNameErrorMessage').text("'#' is used to define inner streams only.")
+                        isErrorOccurred = true;
                         return;
                     } else {
                         streamName = configName;
@@ -542,6 +543,7 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'stream', 'designView
                         $('#streamName').addClass('required-input-field');
                         $('#streamName')[0].scrollIntoView();
                         $('#streamNameErrorMessage').text("Stream name is already defined.")
+                        isErrorOccurred = true;
                         return;
                     }
                 } else {
@@ -560,6 +562,7 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'stream', 'designView
                         $('#streamName').addClass('required-input-field');
                         $('#streamName')[0].scrollIntoView();
                         $('#streamNameErrorMessage').text("Stream name is already defined in the partition.")
+                        isErrorOccurred = true;
                         return;
                     }
                 }
@@ -569,6 +572,7 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'stream', 'designView
                     $('#streamName').addClass('required-input-field');
                     $('#streamName')[0].scrollIntoView();
                     $('#streamNameErrorMessage').text("Stream name is required.")
+                    isErrorOccurred = true;
                     return;
                 }
 
@@ -582,28 +586,59 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'stream', 'designView
                         $('#streamName').addClass('required-input-field');
                         $('#streamName')[0].scrollIntoView();
                         $('#streamNameErrorMessage').text("Stream name cannot have white space.")
+                        isErrorOccurred = true;
                         return;
                     }
                     if (!alphabeticValidatorRegex.test(streamName.charAt(0))) {
                         $('#streamName').addClass('required-input-field');
                         $('#streamName')[0].scrollIntoView();
                         $('#streamNameErrorMessage').text("Stream name must start with an alphabetic character.")
+                        isErrorOccurred = true;
                         return;
                     }
-                    // update selected stream model
-                    clickedElement.setName(streamName);
-                    self.formUtils.updateConnectionsAfterDefinitionElementNameChange(id);
                 }
 
                 var attributeNameList = [];
-                if (validateAttributeNames(attributeNameList)) { return }
+                if (validateAttributeNames(attributeNameList)) {
+                    isErrorOccurred = true;
+                    return;
+                }
 
                 if (attributeNameList.length == 0) {
                     $('.attribute:eq(0)').find('.attr-name').addClass('required-input-field');
                     $('.attribute:eq(0)').find('.attr-name')[0].scrollIntoView();
-                    $('.attribute:eq(0)').find('.error-message').text("Minimum one attribute is required")
+                    $('.attribute:eq(0)').find('.error-message').text("Minimum one attribute is required.")
+                    isErrorOccurred = true;
                     return;
-                } else {
+                }
+
+                if (validatePredefinedAnnotations(predefinedAnnotationList, annotationNodes)) {
+                    isErrorOccurred = true;
+                    return;
+                }
+
+                // If this is an inner stream perform validation
+                var streamSavedInsideAPartition
+                    = self.configurationData.getSiddhiAppConfig().getStreamSavedInsideAPartition(id);
+                // if streamSavedInsideAPartition is undefined then the stream is not inside a partition
+                if (streamSavedInsideAPartition !== undefined) {
+                    var isValid = JSONValidator.prototype.validateInnerStream(clickedElement, self.jsPlumbInstance, true);
+                    if (!isValid) {
+                        isErrorOccurred = true;
+                        return;
+                    }
+                }
+
+                if (!isErrorOccurred) {
+                    if (previouslySavedName !== streamName) {
+                        // update selected stream model
+                        clickedElement.setName(streamName);
+                        self.formUtils.updateConnectionsAfterDefinitionElementNameChange(id);
+
+                        var textNode = $('#' + id).find('.streamNameNode');
+                        textNode.html(streamName);
+                    }
+
                     //clear the previously saved attribute list
                     clickedElement.clearAttributeList();
                     //add the attributes to the attribute list
@@ -615,47 +650,42 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'stream', 'designView
                             clickedElement.addAttribute(attributeObject)
                         }
                     });
+
+                    var annotationNodes = [];
+                    var annotationStringList = [];
+                    var annotationObjectList = [];
+                    //clear the saved annotations
+                    clickedElement.clearAnnotationList();
+                    clickedElement.clearAnnotationListObjects();
+                    buildAnnotation(annotationNodes, annotationStringList, annotationObjectList);
+
+                    _.forEach(annotationStringList, function (annotation) {
+                        clickedElement.addAnnotation(annotation);
+                    });
+                    _.forEach(annotationObjectList, function (annotation) {
+                        clickedElement.addAnnotationObject(annotation);
+                    });
+
+                    $('#' + id).removeClass('incomplete-element');
+                    $('#' + id).prop('title', '');
+                    // set the isDesignViewContentChanged to true
+                    self.configurationData.setIsDesignViewContentChanged(true);
+
+                    self.designViewContainer.removeClass('disableContainer');
+                    self.toggleViewButton.removeClass('disableContainer');
+                    // close the form window
+                    self.consoleListManager.removeFormConsole(formConsole);
+
                 }
+            });
 
-                var annotationNodes = [];
-                var annotationStringList = [];
-                var annotationObjectList = [];
-
-                if (validatePredefinedAnnotations(predefinedAnnotationList, annotationNodes)) {
-                    return;
-                }
-
-                clickedElement.clearAnnotationList();
-                clickedElement.clearAnnotationListObjects();
-
-                buildAnnotation(annotationNodes, annotationStringList, annotationObjectList);
-
-                _.forEach(annotationStringList, function (annotation) {
-                    clickedElement.addAnnotation(annotation);
-                });
-                _.forEach(annotationObjectList, function (annotation) {
-                    clickedElement.addAnnotationObject(annotation);
-                });
-
-                // If this is an inner stream perform validation
-                var streamSavedInsideAPartition
-                    = self.configurationData.getSiddhiAppConfig().getStreamSavedInsideAPartition(id);
-                // if streamSavedInsideAPartition is undefined then the stream is not inside a partition
-                if (streamSavedInsideAPartition !== undefined) {
-                    JSONValidator.prototype.validateInnerStream(clickedElement, self.jsPlumbInstance, true);
-                }
-
-                var textNode = $('#' + id).find('.streamNameNode');
-                textNode.html(streamName);
-
-                $('#' + id).removeClass('incomplete-element');
-                $('#' + id).prop('title', '');
-
+            // 'Cancel' button action
+            var cancelButtonElement = $(formContainer).find('#btn-cancel')[0];
+            cancelButtonElement.addEventListener('click', function () {
                 self.designViewContainer.removeClass('disableContainer');
                 self.toggleViewButton.removeClass('disableContainer');
                 // close the form window
                 self.consoleListManager.removeFormConsole(formConsole);
-
             });
 
         };

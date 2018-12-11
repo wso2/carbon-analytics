@@ -94,7 +94,7 @@ define(['log', 'jquery', 'lodash', 'attribute', 'table', 'storeAnnotation', 'des
 		 */
         var validateOptions = function (optionsMap, predefinedOptions) {
             var isError = false;
-            $('#define-store-options .option').each(function () {
+            $('#define-store-options #store-options .option').each(function () {
                 var optionName = $(this).find('.option-name').text().trim();
                 var optionValue = $(this).find('.option-value').val().trim();
                 var predefinedOptionObject = getOption(optionName, predefinedOptions);
@@ -379,7 +379,7 @@ define(['log', 'jquery', 'lodash', 'attribute', 'table', 'storeAnnotation', 'des
         };
 
         /**
-         * Function to map the values of saved annotation to predefined annotatio object
+         * Function to map the values of saved annotation to predefined annotation object
          * @param {Object} predefined_annotations
          * @param {Object} savedAnnotations
          */
@@ -768,7 +768,8 @@ define(['log', 'jquery', 'lodash', 'attribute', 'table', 'storeAnnotation', 'des
             var propertyDiv = $('<div class = "table-form-container table-div"> <div id="property-header"> <h3> Table' +
                 ' Configuration </h3> </div> <h4> Name: </h4> <input type="text" id="tableName" class = "clearfix">' +
                 '<label class="error-message" id="tableNameErrorMessage"> </label> <div id = "define-attribute"> </div>' +
-                '<button id = "btn-submit" type = "button" class = "btn toggle-view-button"> Submit </button> </div> ' +
+                '<button id = "btn-submit" type = "button" class = "btn toggle-view-button"> Submit </button>' +
+                '<button id="btn-cancel" type="button" class="btn btn-default"> Cancel </button> </div> ' +
                 '<div class = "table-form-container store-div"> <div id = "define-store"> </div>  ' +
                 '<div id="define-rdbms-type"> </div> <div id="define-store-options"> </div> </div> ' +
                 '<div class = "table-form-container define-table-annotation">' +
@@ -1036,6 +1037,7 @@ define(['log', 'jquery', 'lodash', 'attribute', 'table', 'storeAnnotation', 'des
                 $('.error-message').text("");
                 $('#tableNameErrorMessage').text("");
                 $('.required-input-field').removeClass('required-input-field');
+                var isErrorOccurred = false;
 
                 var tableName = $('#tableName').val().trim();
 
@@ -1043,7 +1045,8 @@ define(['log', 'jquery', 'lodash', 'attribute', 'table', 'storeAnnotation', 'des
                 if (tableName == "") {
                     $('#tableName').addClass('required-input-field');
                     $('#tableName')[0].scrollIntoView();
-                    $('#tableNameErrorMessage').text("Table name is required");
+                    $('#tableNameErrorMessage').text("Table name is required.");
+                    isErrorOccurred = true;
                     return;
                 }
                 var previouslySavedName = clickedElement.getName();
@@ -1057,6 +1060,7 @@ define(['log', 'jquery', 'lodash', 'attribute', 'table', 'storeAnnotation', 'des
                         $('#tableName').addClass('required-input-field');
                         $('#tableName')[0].scrollIntoView();
                         $('#tableNameErrorMessage').text("Table name is already used.");
+                        isErrorOccurred = true;
                         return;
                     }
                     //to check if stream name contains white spaces
@@ -1064,6 +1068,7 @@ define(['log', 'jquery', 'lodash', 'attribute', 'table', 'storeAnnotation', 'des
                         $('#tableName').addClass('required-input-field');
                         $('#tableName')[0].scrollIntoView();
                         $('#tableNameErrorMessage').text("Table name cannot have white space.");
+                        isErrorOccurred = true;
                         return;
                     }
                     //to check if stream name starts with an alphabetic character
@@ -1071,42 +1076,64 @@ define(['log', 'jquery', 'lodash', 'attribute', 'table', 'storeAnnotation', 'des
                         $('#tableName').addClass('required-input-field');
                         $('#tableName')[0].scrollIntoView();
                         $('#tableNameErrorMessage').text("Table name must start with an alphabetic character.");
+                        isErrorOccurred = true;
                         return;
                     }
-                    // update selected table model
-                    clickedElement.setName(tableName);
-                    // update connection related to the element if the name is changed
-                    self.formUtils.updateConnectionsAfterDefinitionElementNameChange(id);
                 }
 
-                //add the store annotation
+                //store annotation
                 var selectedStoreType = $('#define-store #store-type').val();
                 if (selectedStoreType !== defaultStoreType) {
                     var optionsMap = {};
                     if (validateOptions(optionsMap, storeOptions)) {
+                        isErrorOccurred = true;
                         return;
                     }
                     if (validateCustomizedOptions(optionsMap)) {
+                        isErrorOccurred = true;
                         return;
                     }
-                    var storeAnnotationOptions = {};
-                    _.set(storeAnnotationOptions, 'type', selectedStoreType);
-                    _.set(storeAnnotationOptions, 'options', optionsMap);
-                    var storeAnnotation = new StoreAnnotation(storeAnnotationOptions);
-                    clickedElement.setStore(storeAnnotation);
-                } else {
-                    clickedElement.setStore(undefined);
                 }
 
                 var attributeNameList = [];
-                if (validateAttributeNames(attributeNameList)) { return; }
+                if (validateAttributeNames(attributeNameList)) {
+                    isErrorOccurred = true;
+                    return;
+                }
 
                 if (attributeNameList.length == 0) {
                     $('.attribute:eq(0)').find('.attr-name').addClass('required-input-field');
                     $('.attribute:eq(0)').find('.attr-name')[0].scrollIntoView();
-                    $('.attribute:eq(0)').find('.error-message').text("Minimum one attribute is required");
+                    $('.attribute:eq(0)').find('.error-message').text("Minimum one attribute is required.");
+                    isErrorOccurred = true;
                     return;
-                } else {
+                }
+
+                if (validateAnnotations()) {
+                    isErrorOccurred = true;
+                    return;
+                }
+
+                if (!isErrorOccurred) {
+                    if (previouslySavedName !== tableName) {
+                        // update selected table model
+                        clickedElement.setName(tableName);
+                        // update connection related to the element if the name is changed
+                        self.formUtils.updateConnectionsAfterDefinitionElementNameChange(id);
+
+                        var textNode = $('#' + id).find('.tableNameNode');
+                        textNode.html(tableName);
+                    }
+                    if (selectedStoreType !== defaultStoreType) {
+                        var storeAnnotationOptions = {};
+                        _.set(storeAnnotationOptions, 'type', selectedStoreType);
+                        _.set(storeAnnotationOptions, 'options', optionsMap);
+                        var storeAnnotation = new StoreAnnotation(storeAnnotationOptions);
+                        clickedElement.setStore(storeAnnotation);
+                    } else {
+                        clickedElement.setStore(undefined);
+                    }
+
                     //clear the saved attributes
                     clickedElement.clearAttributeList()
                     //add the attributes
@@ -1118,13 +1145,9 @@ define(['log', 'jquery', 'lodash', 'attribute', 'table', 'storeAnnotation', 'des
                             clickedElement.addAttribute(attributeObject);
                         }
                     });
-                }
 
-                var annotationList = [];
-                var annotationObjectList = [];
-                if (validateAnnotations()) {
-                    return;
-                } else {
+                    var annotationList = [];
+                    var annotationObjectList = [];
                     //clear the annotationlist
                     clickedElement.clearAnnotationList();
                     clickedElement.clearAnnotationListObjects();
@@ -1137,22 +1160,27 @@ define(['log', 'jquery', 'lodash', 'attribute', 'table', 'storeAnnotation', 'des
                     _.forEach(annotationObjectList, function (annotation) {
                         clickedElement.addAnnotationObject(annotation);
                     });
-                }
 
-                // set the isDesignViewContentChanged to true
-                self.configurationData.setIsDesignViewContentChanged(true);
+                    // set the isDesignViewContentChanged to true
+                    self.configurationData.setIsDesignViewContentChanged(true);
 
-                var textNode = $('#' + id).find('.tableNameNode');
-                textNode.html(tableName);
-                if ($('#' + id).hasClass('incomplete-element')) {
                     $('#' + id).removeClass('incomplete-element');
-                }
-                $('#' + id).prop('title', '');
-                // close the form window
-                self.consoleListManager.removeFormConsole(formConsole);
+                    $('#' + id).prop('title', '');
+                    // close the form window
+                    self.consoleListManager.removeFormConsole(formConsole);
 
+                    self.designViewContainer.removeClass('disableContainer');
+                    self.toggleViewButton.removeClass('disableContainer');
+                }
+            });
+
+            // 'Cancel' button action
+            var cancelButtonElement = $(formContainer).find('#btn-cancel')[0];
+            cancelButtonElement.addEventListener('click', function () {
                 self.designViewContainer.removeClass('disableContainer');
                 self.toggleViewButton.removeClass('disableContainer');
+                // close the form window
+                self.consoleListManager.removeFormConsole(formConsole);
             });
         };
 

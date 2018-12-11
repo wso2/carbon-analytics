@@ -107,7 +107,8 @@ define(['require', 'log', 'jquery', 'lodash', 'trigger', 'designViewUtils'],
             var propertyDiv = $('<div id="property-header"><h3>Trigger Configuration</h3></div>' +
                 '<div class ="trigger-form-container"> <div id="define-trigger-name"> <h4>Name: </h4>' +
                 '<input type="text" id="triggerName" class="clearfix"> <label class="error-message" > </label> </div>' +
-                '<button id="btn-submit" type="button" class="btn toggle-view-button"> Submit </button> </div>' +
+                '<button id="btn-submit" type="button" class="btn toggle-view-button"> Submit </button> ' +
+                '<button id="btn-cancel" type="button" class="btn btn-default"> Cancel </button> </div>' +
                 '<div class = "trigger-form-container"> <div id= "define-trigger-at"> </div>' +
                 '<div id = "trigger-at-content" ></div> </div>');
             formContainer.append(propertyDiv);
@@ -165,14 +166,16 @@ define(['require', 'log', 'jquery', 'lodash', 'trigger', 'designViewUtils'],
                 //clear the error classes
                 $('.error-message').text("");
                 $('.required-input-field').removeClass('required-input-field');
+                var isErrorOccurred = false;
 
                 var triggerName = $('#triggerName').val().trim();
-				var triggerNameErrorMessage = $('#define-trigger-name').find('.error-message');
+                var triggerNameErrorMessage = $('#define-trigger-name').find('.error-message');
                 // to check if trigger name is empty
                 if (triggerName == "") {
                     $('#triggerName').addClass('required-input-field');
                     $('#triggerName')[0].scrollIntoView();
                     triggerNameErrorMessage.text("Trigger name is required.");
+                    isErrorOccurred = true;
                     return;
                 }
                 var previouslySavedName = clickedElement.getName();
@@ -189,6 +192,7 @@ define(['require', 'log', 'jquery', 'lodash', 'trigger', 'designViewUtils'],
                         $('#triggerName').addClass('required-input-field');
                         $('#triggerName')[0].scrollIntoView();
                         triggerNameErrorMessage.text("Trigger name is already used.");
+                        isErrorOccurred = true;
                         return;
                     }
                     //to check if trigger name contains white spaces
@@ -196,6 +200,7 @@ define(['require', 'log', 'jquery', 'lodash', 'trigger', 'designViewUtils'],
                         $('#triggerName').addClass('required-input-field');
                         $('#triggerName')[0].scrollIntoView();
                         triggerNameErrorMessage.text("Trigger name cannot have white space.");
+                        isErrorOccurred = true;
                         return;
                     }
                     //to check if trigger name starts with an alphabetic character
@@ -203,48 +208,63 @@ define(['require', 'log', 'jquery', 'lodash', 'trigger', 'designViewUtils'],
                         $('#triggerName').addClass('required-input-field');
                         $('#triggerName')[0].scrollIntoView();
                         triggerNameErrorMessage.text("Trigger name must start with an alphabetic character.");
+                        isErrorOccurred = true;
                         return;
                     }
-                    // update selected trigger model
-                    clickedElement.setName(triggerName);
-                    self.formUtils.updateConnectionsAfterDefinitionElementNameChange(id);
                 }
 
                 var selectedAtType = $('#at-type').val();
                 var at;
-                var atOrAtEvery;
                 if (selectedAtType !== start) {
                     at = $('#trigger-at-content input[type="text"]').val().trim();
                     if (at === "") {
                         $('#trigger-at-content').find('.error-message').text("Value is required");
+                        isErrorOccurred = true;
                         return;
                     }
                 }
-                if (selectedAtType === start) {
-                    at = start
-                    atOrAtEvery = "at"
-                } else if (selectedAtType === cronExpression) {
-                    at = at;
-                    atOrAtEvery = "at";
-                } else {
-                    at = "every " + at;
-                    atOrAtEvery = "atEvery";
+
+                if (!isErrorOccurred) {
+                    if (previouslySavedName !== triggerName) {
+                        // update selected trigger model
+                        clickedElement.setName(triggerName);
+                        self.formUtils.updateConnectionsAfterDefinitionElementNameChange(id);
+
+                        var textNode = $(element).parent().find('.triggerNameNode');
+                        textNode.html(triggerName);
+                    }
+                    var atOrAtEvery;
+                    if (selectedAtType === start) {
+                        at = start
+                        atOrAtEvery = "at"
+                    } else if (selectedAtType === cronExpression) {
+                        at = at;
+                        atOrAtEvery = "at";
+                    } else {
+                        at = "every " + at;
+                        atOrAtEvery = "atEvery";
+                    }
+                    clickedElement.setAt(at);
+                    clickedElement.setAtOrAtEvery(atOrAtEvery);
+
+                    self.designViewContainer.removeClass('disableContainer');
+                    self.toggleViewButton.removeClass('disableContainer');
+                    $('#' + id).removeClass('incomplete-element');
+                    $('#' + id).prop('title', '');
+
+                    // set the isDesignViewContentChanged to true
+                    self.configurationData.setIsDesignViewContentChanged(true);
+
+                    // close the form window
+                    self.consoleListManager.removeFormConsole(formConsole);
                 }
+            });
 
-                clickedElement.setAt(at);
-                clickedElement.setAtOrAtEvery(atOrAtEvery);
-
-                var textNode = $(element).parent().find('.triggerNameNode');
-                textNode.html(triggerName);
-
+            // 'Cancel' button action
+            var cancelButtonElement = $(formContainer).find('#btn-cancel')[0];
+            cancelButtonElement.addEventListener('click', function () {
                 self.designViewContainer.removeClass('disableContainer');
                 self.toggleViewButton.removeClass('disableContainer');
-                $('#' + id).removeClass('incomplete-element');
-                $('#' + id).prop('title', '');
-
-                // set the isDesignViewContentChanged to true
-                self.configurationData.setIsDesignViewContentChanged(true);
-
                 // close the form window
                 self.consoleListManager.removeFormConsole(formConsole);
             });

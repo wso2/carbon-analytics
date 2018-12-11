@@ -73,7 +73,8 @@ define(['require', 'log', 'jquery', 'lodash', 'designViewUtils'],
                 '<input type="text" id="functionName" class="clearfix"><label class = "error-message"> </label></div>' +
                 '<div id = "function-script-type"> </div> <div id= "function-return-type"> </div>' +
                 '<button id="btn-submit" type="button" class="btn toggle-view-button"> Submit </button>' +
-                '</div> <div class = "function-form-container"> <div id="define-script-body"> <h4> Script Body: </h4> ' +
+                '<button id="btn-cancel" type="button" class="btn btn-default"> Cancel </button> </div>' +
+                '<div class = "function-form-container"> <div id="define-script-body"> <h4> Script Body: </h4> ' +
                 '<textarea id= "script-body-content" rows="5" cols="50"> </textarea> <label class = "error-message">' +
                 '</label> </div> </div>');
             formContainer.append(propertyDiv);
@@ -114,6 +115,7 @@ define(['require', 'log', 'jquery', 'lodash', 'designViewUtils'],
                 //clear the error classes
                 $('.error-message').text("");
                 $('.required-input-field').removeClass('required-input-field');
+                var isErrorOccured = false;
 
                 var functionName = $('#functionName').val().trim();
                 var functionNameErrorMessage = $('#define-function-name').find('.error-message');
@@ -123,6 +125,7 @@ define(['require', 'log', 'jquery', 'lodash', 'designViewUtils'],
                     $('#functionName').addClass('required-input-field');
                     $('#functionName')[0].scrollIntoView();
                     functionNameErrorMessage.text("Function name is required.")
+                    isErrorOccurred = true;
                     return;
                 }
 
@@ -136,6 +139,7 @@ define(['require', 'log', 'jquery', 'lodash', 'designViewUtils'],
                         $('#functionName').addClass('required-input-field');
                         $('#functionName')[0].scrollIntoView();
                         functionNameErrorMessage.text("Function name is already used.");
+                        isErrorOccurred = true;
                         return;
                     }
 
@@ -144,6 +148,7 @@ define(['require', 'log', 'jquery', 'lodash', 'designViewUtils'],
                         $('#functionName').addClass('required-input-field');
                         $('#functionName')[0].scrollIntoView();
                         functionNameErrorMessage.text("Function name cannot have white space.");
+                        isErrorOccurred = true;
                         return;
                     }
                     //to check if function name starts with an alphabetic character
@@ -151,35 +156,51 @@ define(['require', 'log', 'jquery', 'lodash', 'designViewUtils'],
                         $('#functionName').addClass('required-input-field');
                         $('#functionName')[0].scrollIntoView();
                         functionNameErrorMessage.text("Function name must start with an alphabetic character.");
+                        isErrorOccurred = true;
                         return;
                     }
-                    // update selected trigger model
-                    clickedElement.setName(functionName);
-                    self.formUtils.updateConnectionsAfterDefinitionElementNameChange(id);
                 }
                 var scriptBody = $('#script-body-content').val().trim();
                 if (scriptBody === "") {
                     $('#script-body-content').addClass('required-input-field');
                     $('#script-body-content')[0].scrollIntoView();
                     $('#define-script-body').find('.error-message').text("Script body is required.");
+                    isErrorOccurred = true;
                     return;
                 }
-                var scriptType = $('#script-type').val();
-                var returnType = $('#return-type').val();
-                clickedElement.setScriptType(scriptType.toUpperCase());
-                clickedElement.setReturnType(returnType.toUpperCase());
-                clickedElement.setBody(scriptBody);
 
-                var textNode = $(element).parent().find('.functionNameNode');
-                textNode.html(functionName);
+                if (!isErrorOccured) {
+                    if (previouslySavedName !== functionName) {
+                        // update selected trigger model
+                        clickedElement.setName(functionName);
+                        self.formUtils.updateConnectionsAfterDefinitionElementNameChange(id);
+                        var textNode = $(element).parent().find('.functionNameNode');
+                        textNode.html(functionName);
+                    }
+                    var scriptType = $('#script-type').val();
+                    var returnType = $('#return-type').val();
+                    clickedElement.setScriptType(scriptType.toUpperCase());
+                    clickedElement.setReturnType(returnType.toUpperCase());
+                    clickedElement.setBody(scriptBody);
 
-				$('#' + id).removeClass('incomplete-element');
-				$('#' + id).prop('title', '');
+                    $('#' + id).removeClass('incomplete-element');
+                    $('#' + id).prop('title', '');
+                    self.designViewContainer.removeClass('disableContainer');
+                    self.toggleViewButton.removeClass('disableContainer');
+
+                    // set the isDesignViewContentChanged to true
+                    self.configurationData.setIsDesignViewContentChanged(true);
+                    // close the form window
+                    self.consoleListManager.removeFormConsole(formConsole);
+                }
+
+            });
+
+            // 'Cancel' button action
+            var cancelButtonElement = $(formContainer).find('#btn-cancel')[0];
+            cancelButtonElement.addEventListener('click', function () {
                 self.designViewContainer.removeClass('disableContainer');
                 self.toggleViewButton.removeClass('disableContainer');
-
-                // set the isDesignViewContentChanged to true
-                self.configurationData.setIsDesignViewContentChanged(true);
                 // close the form window
                 self.consoleListManager.removeFormConsole(formConsole);
             });
