@@ -16,9 +16,9 @@
  * under the License.
  */
 
-define(['require', 'log', 'jquery', 'lodash', 'attribute', 'stream', 'designViewUtils', 'jsonValidator', 'handlebar',
+define(['require', 'log', 'jquery', 'lodash', 'attribute', 'designViewUtils', 'jsonValidator', 'handlebar',
     'js_tree', 'annotationObject', 'annotationElement'],
-    function (require, log, $, _, Attribute, Stream, DesignViewUtils, JSONValidator, Handlebars, jstree,
+    function (require, log, $, _, Attribute, DesignViewUtils, JSONValidator, Handlebars, jstree,
         AnnotationObject, AnnotationElement) {
 
         /**
@@ -39,10 +39,10 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'stream', 'designView
             }
         };
 
-        const alphabeticValidatorRegex = /^([a-zA-Z])$/;
+        const ALPHABETIC_VALIDATOR_REGEX = /^([a-zA-Z])$/;
 
         /** Function to manage the attribute navigations */
-        var changeAtrributeNavigation = function () {
+        var changeAttributeNavigation = function () {
             $('.attr-nav').empty();
             var attrLength = $('#attribute-div li').length;
             if (attrLength == 1) {
@@ -77,25 +77,51 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'stream', 'designView
             $('.attr-name').each(function () {
                 var attributeName = $(this).val().trim();
                 if (attributeName != "") {
-                    if (attributeName.indexOf(' ') >= 0) {
-                        $(this).parents(".attribute").find(".error-message").text("Name can not have white space")
-                        $(this)[0].scrollIntoView();
-                        $(this).addClass('required-input-field')
+                    var isError = validateName(this, "Attribute", attributeName);
+                    if (!isError) {
+                        attributeNameList.push(attributeName)
+                    } else {
                         isErrorOccurred = true;
-                        return;
                     }
-                    if (!alphabeticValidatorRegex.test(attributeName.charAt(0))) {
-                        $(this).parents(".attribute").find(".error-message").text("Name must start with an" +
-                            " alphabetical character");
-                        $(this)[0].scrollIntoView();
-                        $(this).addClass('required-input-field')
-                        isErrorOccurred = true;
-                        return;
-                    }
-                    attributeNameList.push(attributeName)
                 }
             });
             return isErrorOccurred;
+        };
+
+        /**
+         * Common method to validate the names [attribute name or stream name]
+         * @param {Object} id object which needs to be validated
+         * @param {String} type Stream or Attribute
+         * @param {String} name the name to be validated
+         * @return {boolean}
+         */
+        var validateName = function (id, type, name) {
+            var errorMessageParent;
+            if (type === "Attribute") {
+                errorMessageParent = $(id).parents(".attribute").find(".error-message");
+            } else {
+                errorMessageParent = $('#streamNameErrorMessage');
+            }
+            if (name.indexOf(' ') >= 0) {
+                errorMessageParent.text(type + " name can not have white space.")
+                addErrorClass(id);
+                return true;
+            }
+            if (!ALPHABETIC_VALIDATOR_REGEX.test(name.charAt(0))) {
+                errorMessageParent.text(type + " name must start with an alphabetical character.");
+                addErrorClass(id);
+                return true;
+            }
+            return false;
+        };
+
+        /**
+         * Function to add the error class
+         * @param {Object} id object where the errors needs to be displayed
+         */
+        var addErrorClass = function (id) {
+            $(id)[0].scrollIntoView();
+            $(id).addClass('required-input-field')
         };
 
         /**
@@ -410,13 +436,13 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'stream', 'designView
                     '</select>' +
                     '</div> <div class="attr-nav"> </div></div>' +
                     '<label class="error-message"></label></li>');
-                changeAtrributeNavigation();
+                changeAttributeNavigation();
             });
 
             //To delete attribute
             $("#define-attribute").on('click', '#attribute-div .btn-del-attr', function () {
                 $(this).closest('li').remove();
-                changeAtrributeNavigation();
+                changeAttributeNavigation();
             });
 
             //To reorder up the attribute
@@ -426,7 +452,7 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'stream', 'designView
                 if ($previous.length !== 0) {
                     $current.insertBefore($previous);
                 }
-                changeAtrributeNavigation();
+                changeAttributeNavigation();
 
             });
 
@@ -437,7 +463,7 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'stream', 'designView
                 if ($next.length !== 0) {
                     $current.insertAfter($next);
                 }
-                changeAtrributeNavigation();
+                changeAttributeNavigation();
             });
 
             var name = clickedElement.getName();
@@ -454,7 +480,7 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'stream', 'designView
                 var attributeFormTemplate = Handlebars.compile($('#attribute-form-template').html());
                 var wrappedHtml = attributeFormTemplate(savedAttributes);
                 $('#define-attribute').html(wrappedHtml);
-                changeAtrributeNavigation();
+                changeAttributeNavigation();
 
                 //to select the options(type) of the saved attributes
                 var i = 0;
@@ -529,8 +555,7 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'stream', 'designView
                 if (!isStreamSavedInsideAPartition) {
                     firstCharacterInStreamName = (configName).charAt(0);
                     if (firstCharacterInStreamName === '#') {
-                        $('#streamName').addClass('required-input-field');
-                        $('#streamName')[0].scrollIntoView();
+                        addErrorClass("#streamName");
                         $('#streamNameErrorMessage').text("'#' is used to define inner streams only.")
                         isErrorOccurred = true;
                         return;
@@ -540,8 +565,7 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'stream', 'designView
                     isStreamNameUsed
                         = self.formUtils.isDefinitionElementNameUsed(streamName, id);
                     if (isStreamNameUsed) {
-                        $('#streamName').addClass('required-input-field');
-                        $('#streamName')[0].scrollIntoView();
+                        addErrorClass("#streamName");
                         $('#streamNameErrorMessage').text("Stream name is already defined.")
                         isErrorOccurred = true;
                         return;
@@ -559,8 +583,7 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'stream', 'designView
                     isStreamNameUsed
                         = self.formUtils.isStreamDefinitionNameUsedInPartition(partitionId, streamName, id);
                     if (isStreamNameUsed) {
-                        $('#streamName').addClass('required-input-field');
-                        $('#streamName')[0].scrollIntoView();
+                        addErrorClass("#streamName");
                         $('#streamNameErrorMessage').text("Stream name is already defined in the partition.")
                         isErrorOccurred = true;
                         return;
@@ -569,8 +592,7 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'stream', 'designView
 
                 //check if stream name is empty
                 if (streamName == "") {
-                    $('#streamName').addClass('required-input-field');
-                    $('#streamName')[0].scrollIntoView();
+                    addErrorClass("#streamName");
                     $('#streamNameErrorMessage').text("Stream name is required.")
                     isErrorOccurred = true;
                     return;
@@ -582,17 +604,7 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'stream', 'designView
                 }
                 // update connection related to the element if the name is changed
                 if (previouslySavedName !== streamName) {
-                    if ((streamName.indexOf(' ') >= 0)) {
-                        $('#streamName').addClass('required-input-field');
-                        $('#streamName')[0].scrollIntoView();
-                        $('#streamNameErrorMessage').text("Stream name cannot have white space.")
-                        isErrorOccurred = true;
-                        return;
-                    }
-                    if (!alphabeticValidatorRegex.test(streamName.charAt(0))) {
-                        $('#streamName').addClass('required-input-field');
-                        $('#streamName')[0].scrollIntoView();
-                        $('#streamNameErrorMessage').text("Stream name must start with an alphabetic character.")
+                    if (validateName("#streamName", "Stream", streamName)) {
                         isErrorOccurred = true;
                         return;
                     }
@@ -605,8 +617,7 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'stream', 'designView
                 }
 
                 if (attributeNameList.length == 0) {
-                    $('.attribute:eq(0)').find('.attr-name').addClass('required-input-field');
-                    $('.attribute:eq(0)').find('.attr-name')[0].scrollIntoView();
+                    addErrorClass($('.attribute:eq(0)').find('.attr-name'));
                     $('.attribute:eq(0)').find('.error-message').text("Minimum one attribute is required.")
                     isErrorOccurred = true;
                     return;
@@ -623,7 +634,7 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'stream', 'designView
                 // if streamSavedInsideAPartition is undefined then the stream is not inside a partition
                 if (streamSavedInsideAPartition !== undefined) {
                     var isValid = JSONValidator.prototype.validateInnerStream(clickedElement, self.jsPlumbInstance,
-                    false);
+                        false);
                     if (!isValid) {
                         isErrorOccurred = true;
                         return;
