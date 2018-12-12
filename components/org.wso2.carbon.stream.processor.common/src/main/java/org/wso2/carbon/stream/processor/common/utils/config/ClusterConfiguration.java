@@ -7,9 +7,9 @@ import org.wso2.carbon.kernel.config.model.CarbonConfiguration;
 import java.util.Map;
 
 /**
- * {@code CarbonConfiguration} is a bean class for carbon level configuration.
+ * {@code ClusterConfiguration} is a bean class for cluster configurations.
  */
-@Configuration(namespace = "cluster.config", description = "WSO2 carbon configuration")
+@Configuration(namespace = "cluster.config", description = "WSO2 cluster configurations")
 public class ClusterConfiguration {
 
     @Element(description = "Cluster enabled status", required = false)
