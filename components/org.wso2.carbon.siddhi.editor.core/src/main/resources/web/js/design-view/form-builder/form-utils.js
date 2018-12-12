@@ -93,7 +93,7 @@ define(['require', 'lodash', 'handlebar'],
          * @return {boolean}
          */
         FormUtils.prototype.isStreamDefinitionNameUsedInPartition = function (partitionId, elementName,
-                                                                              skipElementID) {
+            skipElementID) {
             var self = this;
             var isNameUsed = false;
             var partition = self.configurationData.getSiddhiAppConfig().getPartition(partitionId);
@@ -124,19 +124,19 @@ define(['require', 'lodash', 'handlebar'],
             var sequenceQueryList = self.configurationData.getSiddhiAppConfig().getSequenceQueryList();
             var patternQueryList = self.configurationData.getSiddhiAppConfig().getPatternQueryList();
             var WindowFilterProjectionQueryList = self.configurationData.getSiddhiAppConfig()
-                                                            .getWindowFilterProjectionQueryList();
+                .getWindowFilterProjectionQueryList();
             var listNames = [joinQueryList, sequenceQueryList, patternQueryList, WindowFilterProjectionQueryList];
-           _.forEach(listNames, function (list) {
-               _.forEach(list, function (element) {
-                   if (element.getQueryName() === elementName) {
-                       if (!(skipElementID !== undefined && skipElementID === element.getId())) {
-                           isNameUsed = true;
-                       }
-                   }
-               });
-           });
+            _.forEach(listNames, function (list) {
+                _.forEach(list, function (element) {
+                    if (element.getQueryName() === elementName) {
+                        if (!(skipElementID !== undefined && skipElementID === element.getId())) {
+                            isNameUsed = true;
+                        }
+                    }
+                });
+            });
 
-          return isNameUsed;
+            return isNameUsed;
         };
 
         /**
@@ -187,8 +187,8 @@ define(['require', 'lodash', 'handlebar'],
         FormUtils.prototype.updateConnectionsAfterDefinitionElementNameChange = function (elementId) {
             var self = this;
 
-            var outConnections = self.jsPlumbInstance.getConnections({source: elementId + '-out'});
-            var inConnections = self.jsPlumbInstance.getConnections({target: elementId + '-in'});
+            var outConnections = self.jsPlumbInstance.getConnections({ source: elementId + '-out' });
+            var inConnections = self.jsPlumbInstance.getConnections({ target: elementId + '-in' });
 
             _.forEach(outConnections, function (connection) {
                 self.jsPlumbInstance.deleteConnection(connection);
@@ -214,47 +214,46 @@ define(['require', 'lodash', 'handlebar'],
 
         /** Register classes for Handlebars */
 
-		/** Generates the current index of the option being rendered */
-			Handlebars.registerHelper('sum', function () {
-				return Array.prototype.slice.call(arguments, 0, -1).reduce((acc, num) => acc += num);
-			});
+        /** Generates the current index of the option being rendered */
+        Handlebars.registerHelper('sum', function () {
+            return Array.prototype.slice.call(arguments, 0, -1).reduce((acc, num) => acc += num);
+        });
 
-			/** Handlebar helper to check if the index is equivalent to half the length of the option's array */
-			Handlebars.registerHelper('isDivisor', function (index, options) {
-				var divLength = Math.ceil(options.length / 2);
-				return index === divLength;
-			});
+        /** Handlebar helper to check if the index is equivalent to half the length of the option's array */
+        Handlebars.registerHelper('isDivisor', function (index, options) {
+            var divLength = Math.ceil(options.length / 2);
+            return index === divLength;
+        });
 
-			/** Handlebar helper to render heading for the form */
-			Handlebars.registerHelper('addTitle', function (id) {
-				return id.charAt(0).toUpperCase() + id.slice(1);
-			});
+        /** Handlebar helper to render heading for the form */
+        Handlebars.registerHelper('addTitle', function (id) {
+            return id.charAt(0).toUpperCase() + id.slice(1);
+        });
 
-			/** Handlebar helper to compare if the id is "source" or "sink" */
-			Handlebars.registerHelper('ifSourceOrSink', function (id, div) {
-				if (id === "source" || id === "sink") {
-					return div.fn(this);
-				}
-				return div.inverse(this);
-			});
+        /** Handlebar helper to compare if the id is "source" or "sink" */
+        Handlebars.registerHelper('ifSourceOrSink', function (id, div) {
+            if (id === "source" || id === "sink") {
+                return div.fn(this);
+            }
+            return div.inverse(this);
+        });
 
-			/** Handlebar helper to compare if the id is "source" or "sink" or "store" */
-			Handlebars.registerHelper('ifSourceOrSinkOrStore', function (id, div) {
-				if (id === "source" || id === "sink" || id === "store") {
-					return div.fn(this);
-				}
-				return div.inverse(this);
-			});
+        /** Handlebar helper to compare if the id is "source" or "sink" or "store" */
+        Handlebars.registerHelper('ifSourceOrSinkOrStore', function (id, div) {
+            if (id === "source" || id === "sink" || id === "store") {
+                return div.fn(this);
+            }
+            return div.inverse(this);
+        });
 
-			/** Handlebar helper to check id is equivalent to a given string */
-			Handlebars.registerHelper('ifId', function (id, name, div) {
-				if (id === name) {
-					return div.fn(this);
-				}
-				return div.inverse(this);
-			});
-
-		/** End of register classes */
+        /** Handlebar helper to check id is equivalent to a given string */
+        Handlebars.registerHelper('ifId', function (id, name, div) {
+            if (id === name) {
+                return div.fn(this);
+            }
+            return div.inverse(this);
+        });
+        /** End of register classes */
 
         return FormUtils;
     });
