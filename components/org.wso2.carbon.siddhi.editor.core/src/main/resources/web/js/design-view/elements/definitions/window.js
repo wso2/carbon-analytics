@@ -46,7 +46,7 @@ define(['require', 'elementUtils'],
                 this.id = options.id;
                 this.previousCommentSegment = options.previousCommentSegment;
                 this.name = options.name;
-                this.function = options.function;
+                this.type = options.type;
                 this.parameters = options.parameters;
                 this.outputEventType
                     = (options.outputEventType !== undefined) ? (options.outputEventType).toUpperCase() : undefined;
@@ -92,8 +92,8 @@ define(['require', 'elementUtils'],
             return this.attributeList;
         };
 
-        Window.prototype.getFunction = function () {
-            return this.function;
+        Window.prototype.getType = function () {
+            return this.type;
         };
 
         Window.prototype.getParameters = function () {
@@ -124,8 +124,8 @@ define(['require', 'elementUtils'],
             this.attributeList = attributeList;
         };
 
-        Window.prototype.setFunction = function (functionName) {
-            this.function = functionName;
+        Window.prototype.setType = function (type) {
+            this.type = type;
         };
 
         Window.prototype.setParameters = function (parameters) {

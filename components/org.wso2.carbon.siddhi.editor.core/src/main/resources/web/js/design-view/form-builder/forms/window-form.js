@@ -37,14 +37,13 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'designViewUtils', 'h
             }
         };
 
-        const alphabeticValidatorRegex = /^([a-zA-Z])$/;
-        const sort = "sort";
-        const frequent = "frequent";
-        const lossyFrequent = "lossyFrequent";
-
+        const ALPHABETIC_VALIDATOR_REGEX = /^([a-zA-Z])$/;
+        const SORT = "sort";
+        const FREQUENT = "frequent";
+        const LOSSY_FREQUENT = "lossyfrequent";
 
         /** Function to manage the attribute navigations */
-        var changeAtrributeNavigation = function () {
+        var changeAttributeNavigation = function () {
             $('.attr-nav').empty();
             var attrLength = $('#attribute-div li').length;
             if (attrLength == 1) {
@@ -79,25 +78,51 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'designViewUtils', 'h
             $('.attr-name').each(function () {
                 var attributeName = $(this).val().trim();
                 if (attributeName != "") {
-                    if (attributeName.indexOf(' ') >= 0) {
-                        $(this).parents(".attribute").find(".error-message").text("Name can not have white space")
-                        $(this)[0].scrollIntoView();
-                        $(this).addClass('required-input-field')
+                    var isError = validateName(this, "Attribute", attributeName);
+                    if (!isError) {
+                        attributeNameList.push(attributeName)
+                    } else {
                         isErrorOccurred = true;
-                        return;
                     }
-                    if (!alphabeticValidatorRegex.test(attributeName.charAt(0))) {
-                        $(this).parents(".attribute").find(".error-message").text("Name must start with an" +
-                            " alphabetical character");
-                        $(this)[0].scrollIntoView();
-                        $(this).addClass('required-input-field')
-                        isErrorOccurred = true;
-                        return;
-                    }
-                    attributeNameList.push(attributeName)
                 }
             });
             return isErrorOccurred;
+        };
+
+        /**
+         * Common method to validate the names [attribute name or window name]
+         * @param {Object} id object which needs to be validated
+         * @param {String} type Window or Attribute
+         * @param {String} name the name to be validated
+         * @return {boolean}
+         */
+        var validateName = function (id, type, name) {
+            var errorMessageParent;
+            if (type === "Attribute") {
+                errorMessageParent = $(id).parents(".attribute").find(".error-message");
+            } else {
+                errorMessageParent = $('#windowNameErrorMessage');
+            }
+            if (name.indexOf(' ') >= 0) {
+                errorMessageParent.text(type + " name can not have white space.")
+                addErrorClass(id);
+                return true;
+            }
+            if (!ALPHABETIC_VALIDATOR_REGEX.test(name.charAt(0))) {
+                errorMessageParent.text(type + " name must start with an alphabetical character.");
+                addErrorClass(id);
+                return true;
+            }
+            return false;
+        };
+
+        /**
+         * Function to add the error class
+         * @param {Object} id object where the errors needs to be displayed
+         */
+        var addErrorClass = function (id) {
+            $(id)[0].scrollIntoView();
+            $(id).addClass('required-input-field')
         };
 
         /**
@@ -120,10 +145,10 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'designViewUtils', 'h
 		/**
 		 * Function to render the parameter for the selected window function using handlebars
 		 * @param {Object} parameterArray Saved parameters
-		 * @param {Object} windowFunctionName selected window processor type
+		 * @param {Object} windowType selected window processor type
 		 * @param {String} id Id for the div to embed the parameters
 		 */
-        var renderParameters = function (parameterArray, windowFunctionName, id) {
+        var renderParameters = function (parameterArray, windowType, id) {
             parameterArray.sort(function (val1, val2) {
                 if (val1.optional && !val2.optional) return 1;
                 else if (!val1.optional && val2.optional) return -1;
@@ -132,7 +157,7 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'designViewUtils', 'h
             var parameterTemplate = Handlebars.compile($('#window-function-parameters-template').html());
             var wrappedHtml = parameterTemplate({
                 id: id,
-                windowFunctionName: windowFunctionName,
+                windowFunctionName: windowType,
                 parameters: parameterArray
             });
             $('#defineFunctionParameters').html(wrappedHtml);
@@ -204,12 +229,35 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'designViewUtils', 'h
             return parameters;
         };
 
+        /**
+         * Function to select the parameter mapping method
+         * @param {String} selectedType selected window type
+         * @param {Object} functionParameters parameters of the selected window type
+         * @param {Object} savedParameterValues saved parameter values 
+         * @param {Object} functionParametersWithValues array to hold the parameter of the mapped value
+         */
+        var callToMapParameters = function (selectedType, functionParameters, savedParameterValues,
+            functionParametersWithValues) {
+            if (selectedType === SORT) {
+                functionParametersWithValues = mapParameterValuesSort(functionParameters, savedParameterValues);
+            } else if (selectedType === FREQUENT) {
+                functionParametersWithValues = mapParameterValuesFrequent(functionParameters,
+                    savedParameterValues);
+            } else if (selectedType === LOSSY_FREQUENT) {
+                functionParametersWithValues = mapParameterValuesLossyFrequent(functionParameters,
+                    savedParameterValues);
+            } else {
+                functionParametersWithValues = mapUserParameterValues(functionParameters, savedParameterValues);
+            }
+            renderParameters(functionParametersWithValues, selectedType, "window");
+        };
+
         /** Function to render the output event types */
         var renderOutputEventTypes = function () {
             var outputEventDiv = '<div class = "clearfix"> <label>Event Type </label></div>' +
                 '<div class = "clearfix" ><select id="event-type">' +
-                '<option value = "all_events"> all events </option>' +
                 '<option value = "current_events"> current events </option>' +
+                '<option value = "all_events"> all events </option>' +
                 '<option value = "expired_events"> expired events </option>' +
                 '</select> </div>'
             $('#defineOutputEvents').html(outputEventDiv);
@@ -223,10 +271,9 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'designViewUtils', 'h
         */
         var validateDataType = function (dataTypes, parameterValue) {
             var invalidDataType;
-            const intLongRegexMatch = /^[-+]?\d+$/;
-            const doubleFloatRegexMatch = /^[+-]?([0-9]*[.])?[0-9]+$/;
-            const timeRegexMatch = /^[_A-z0-9]*((-|\s)*[_A-z0-9])*$/g;
-
+            var intLongRegexMatch = /^[-+]?\d+$/;
+            var doubleFloatRegexMatch = /^[+-]?([0-9]*[.])?[0-9]+$/;
+            var timeRegexMatch = /^[_A-z0-9]*((-|\s)*[_A-z0-9])*$/g;
             for (var dataType of dataTypes) {
                 if (dataType === "INT" || dataType === "LONG") {
                     if (!parameterValue.match(intLongRegexMatch)) {
@@ -262,107 +309,104 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'designViewUtils', 'h
         };
 
         /**
-         * Function to validate the parameter values
-         * @param {Object} parent the parameter div
-         * @param {Object} predefinedParameters predefined parameters
-         * @return {boolean} valid or invalid parameter value
-         */
-        var validateParameterValues = function (parent, predefinedParameter) {
-            var parameterName = $(parent).find('.parameter-name').text().trim();
-            var parameterValue = $(parent).find('.parameter-value').val().trim();
-            if (!predefinedParameter.optional) {
-                if (parameterValue == "") {
-                    $(parent).find('.error-message').text('Parameter Value is required.');
-                    $(parent)[0].scrollIntoView();
-                    $(parent).find('.parameter-value').addClass('required-input-field');
-                    return false;
-                } else {
-                    var dataType = predefinedParameter.type;
-                    if (validateDataType(dataType, parameterValue)) {
-                        $(parent).find('.error-message').text('Invalid data-type. ');
-                        $(parent)[0].scrollIntoView();
-                        $(parent).find('.parameter-value').addClass('required-input-field');
-                        return false;
-                    }
-                }
-            } else {
-                if ($(parent).find('.parameter-checkbox').is(":checked")) {
-                    if (parameterValue == "") {
-                        $(parent).find('.error-message').text('Parameter Value is required.');
-                        $(parent)[0].scrollIntoView();
-                        $(parent).find('.parameter-value').addClass('required-input-field');
-                        return false;
-                    } else {
-                        var dataType = predefinedParameter.type;
-                        if (validateDataType(dataType, parameterValue)) {
-                            $(parent).find('.error-message').text('Invalid data-type');
-                            $(parent)[0].scrollIntoView();
-                            $(parent).find('.parameter-value').addClass('required-input-field');
-                            return false;
-                        }
-                    }
-                }
-            }
-            return true;
-        };
-
-        /**
          * Function to build the parameter values
          * @param {Object} parameterValues array to add the parameters
          * @param {Object} predefinedParameters predefined parameters
          * @return {boolean} isError
          */
         var buildParameterValues = function (parameterValues, predefinedParameters) {
-            var isError = false;
             $('.parameter').each(function () {
                 if ($(this).find('.parameter-name').hasClass('mandatory-parameter') || ($(this).find('.parameter-name')
                     .hasClass('optional-parameter') && $(this).find('.parameter-checkbox').is(":checked"))) {
                     var parameterValue = $(this).find('.parameter-value').val().trim();
                     var parameterName = $(this).find('.parameter-name').text().trim();;
                     var predefinedParameter = getParameter(parameterName, predefinedParameters);
-                    if (validateParameterValues(this, predefinedParameter)) {
-                        if (predefinedParameter.type.includes("STRING")) {
-                            parameterValue = "'" + parameterValue + "'";
-                        }
-                        parameterValues.push(parameterValue)
-                    } else {
-                        isError = true;
-                        return false;
+                    if (predefinedParameter.type.includes("STRING")) {
+                        parameterValue = "'" + parameterValue + "'";
                     }
+                    parameterValues.push(parameterValue)
                 }
             });
-            return isError;
         };
 
         /**
          * Function to build parameters for frequent and lossyFrequent type
          * @param {Object} parameterValues array to add the parameters
          * @param {Object} predefinedParameters predefined parameters
-         * @return {boolean} isError
          */
         var buildParameterValuesFrequentOrLossyFrequent = function (parameterValues, predefinedParameters) {
-            var isError = false;
             $('.parameter').each(function () {
                 if ($(this).find('.parameter-name').hasClass('mandatory-parameter') || ($(this).find('.parameter-name')
                     .hasClass('optional-parameter') && $(this).find('.parameter-checkbox').is(":checked"))) {
                     var parameterValue = $(this).find('.parameter-value').val().trim();
                     var parameterName = $(this).find('.parameter-name').text().trim();
                     var predefinedParameter = getParameter(parameterName, predefinedParameters);
-                    if (validateParameterValues(this, predefinedParameter)) {
-                        if (parameterName === "attribute") {
-                            var attributeArray = parameterValue.split(',');
-                            _.forEach(attributeArray, function (attribute) {
-                                parameterValues.push(attribute.trim())
-                            });
-                        } else {
-                            if (predefinedParameter.type.includes("STRING")) {
-                                parameterValue = "'" + parameterValue + "'";
-                            }
-                            parameterValues.push(parameterValue)
-                        }
+
+                    if (parameterName === "attribute") {
+                        var attributeArray = parameterValue.split(',');
+                        _.forEach(attributeArray, function (attribute) {
+                            parameterValues.push(attribute.trim())
+                        });
                     } else {
+                        if (predefinedParameter.type.includes("STRING")) {
+                            parameterValue = "'" + parameterValue + "'";
+                        }
+                        parameterValues.push(parameterValue)
+                    }
+                }
+            });
+        };
+
+        /**
+         * Function to build parameters for sort type
+         * @param {Object} parameterValues array to add the parameters
+         * @param {Object} predefinedParameters predefined parameters
+         */
+        var buildParameterValuesSort = function (parameterValues, predefinedParameters) {
+            $('.parameter').each(function () {
+                var parameterValue = $(this).find('.parameter-value').val().trim();
+                var parameterName = $(this).find('.parameter-name').text().trim();;
+                var predefinedParameter = getParameter(parameterName, predefinedParameters);
+                if (parameterName === "window.length") {
+                    parameterValues.push(parameterValue)
+                } else if (parameterName === "attribute") {
+                    if ($('#attribute-parameter').find('.parameter-checkbox').is(":checked")) {
+                        var attributeArray = parameterValue.split(',');
+                        _.forEach(attributeArray, function (attribute) {
+                            parameterValues.push(attribute.trim())
+                        });
+                    }
+                } else {
+                    if (($('#attribute-parameter').find('.parameter-checkbox').is(":checked")) && ($
+                        ('#order-parameter').find('.parameter-checkbox').is(":checked"))) {
+                        parameterValue = "'" + parameterValue + "'";
+                        parameterValues.push(parameterValue)
+                    }
+                }
+            });
+        };
+        /**
+         * Function for generic validation of parameter values
+         * @param {Object} predefinedParameters predefined parameters of the selected window type
+         * @return {boolean} isError
+         */
+        var validateParameters = function (predefinedParameters) {
+            var isError = false;
+            $('.parameter').each(function () {
+                var parameterValue = $(this).find('.parameter-value').val().trim();
+                var parameterName = $(this).find('.parameter-name').text().trim();;
+                var predefinedParameter = getParameter(parameterName, predefinedParameters);
+                if (!predefinedParameter.optional) {
+                    if (!checkParameterValue(parameterValue, predefinedParameter, this)) {
                         isError = true;
                         return false;
+                    }
+                } else {
+                    if ($(this).find('.parameter-checkbox').is(":checked")) {
+                        if (!checkParameterValue(parameterValue, predefinedParameter, this)) {
+                            isError = true;
+                            return false;
+                        }
                     }
                 }
             });
@@ -370,59 +414,32 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'designViewUtils', 'h
         };
 
         /**
-         * Function to build parameters for sort type
-         * @param {Object} parameterValues array to add the parameters
-         * @param {Object} predefinedParameters predefined parameters
-         * @return {boolean} isError
+         * Function to check the given parameter value
+         * @param {String} parameterValue value which needs to be validated
+         * @param {Object} predefinedParameter predefined parameter object
+         * @param {Object} parent div of the html to locate the parameter
+         * @return {boolean}
          */
-        var buildParameterValuesSort = function (parameterValues, predefinedParameters) {
-            var isError = false;
-            $('.parameter').each(function () {
-                var parameterValue = $(this).find('.parameter-value').val().trim();
-                var parameterName = $(this).find('.parameter-name').text().trim();;
-                var predefinedParameter = getParameter(parameterName, predefinedParameters);
-                if (parameterName === "window.length") {
-                    if (validateParameterValues(this, predefinedParameter)) {
-                        parameterValues.push(parameterValue)
-                    } else {
-                        isError = true;
-                        return false;
-                    }
-                } else if (parameterName === "attribute") {
-                    if ($('#attribute-parameter').find('.parameter-checkbox').is(":checked")) {
-                        if (validateParameterValues(this, predefinedParameter)) {
-                            var attributeArray = parameterValue.split(',');
-                            _.forEach(attributeArray, function (attribute) {
-                                parameterValues.push(attribute.trim())
-                            });
-                        } else {
-                            isError = true;
-                            return false;
-                        }
-                    }
-                } else {
-                    if (($('#attribute-parameter').find('.parameter-checkbox').is(":checked")) && ($
-                        ('#order-parameter').find('.parameter-checkbox').is(":checked"))) {
-                        if (validateParameterValues(this, predefinedParameter)) {
-                            if (parameterValue.toLowerCase() === "asc" ||
-                                parameterValue.toLowerCase() === "desc") {
-                                parameterValue = "'" + parameterValue + "'";
-                                parameterValues.push(parameterValue)
-                            } else {
-                                $(this).find('.error-message').text("asc or desc is required.");
-                                $(this)[0].scrollIntoView();
-                                $(this).find('.parameter-value').addClass('required-input-field');
-                                isError = true;
-                                return false;
-                            }
-                        } else {
-                            isError = true;
-                            return false;
-                        }
-                    }
+        var checkParameterValue = function (parameterValue, predefinedParameter, parent) {
+            if (parameterValue === "") {
+                $(parent).find('.error-message').text('Parameter Value is required.');
+                addErrorClass($(parent).find('.parameter-value'));
+                return false;
+            } else {
+                var dataType = predefinedParameter.type;
+                if (validateDataType(dataType, parameterValue)) {
+                    var errorMessage = "Invalid data-type. ";
+                    _.forEach(dataType, function (type) {
+                        errorMessage += type + " or ";
+                    });
+                    errorMessage = errorMessage.substring(0, errorMessage.length - 4);
+                    errorMessage += " is required";
+                    $(parent).find('.error-message').text(errorMessage);
+                    addErrorClass($(parent).find('.parameter-value'));
+                    return false;
                 }
-            });
-            return isError;
+            }
+            return true;
         };
 
         /**
@@ -778,7 +795,7 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'designViewUtils', 'h
                     parameterParent.find(".error-message").text("");
                 }
                 //check for sort type's parameter (order & attribute params)
-                if (selectedType === sort) {
+                if (selectedType === SORT) {
                     showHideOrderForSort();
                 }
             });
@@ -799,13 +816,13 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'designViewUtils', 'h
                     '</select>' +
                     '</div> <div class="attr-nav"> </div></div>' +
                     '<label class="error-message"></label></li>');
-                changeAtrributeNavigation();
+                changeAttributeNavigation();
             });
 
             //To delete attribute
             $("#define-attribute").on('click', '#attribute-div .btn-del-attr', function () {
                 $(this).closest('li').remove();
-                changeAtrributeNavigation();
+                changeAttributeNavigation();
             });
 
             //To reorder up the attribute
@@ -815,7 +832,7 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'designViewUtils', 'h
                 if ($previous.length !== 0) {
                     $current.insertBefore($previous);
                 }
-                changeAtrributeNavigation();
+                changeAttributeNavigation();
             });
 
             //To reorder down the attribute
@@ -825,7 +842,7 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'designViewUtils', 'h
                 if ($next.length !== 0) {
                     $current.insertAfter($next);
                 }
-                changeAtrributeNavigation();
+                changeAttributeNavigation();
             });
 
             var name = clickedElement.getName();
@@ -835,6 +852,7 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'designViewUtils', 'h
             renderOutputEventTypes();
 
             if (!name) {
+                //name is undefined - fresh form
                 var attributeFormTemplate = Handlebars.compile($('#attribute-form-template').html());
                 var wrappedHtml = attributeFormTemplate([{ name: "" }]);
                 $('#define-attribute').html(wrappedHtml);
@@ -843,37 +861,25 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'designViewUtils', 'h
                 functionParametersWithValues = createParameterWithValues(functionParameters);
                 renderParameters(functionParametersWithValues, selectedWindowType, "window")
             } else {
-                var functionName = clickedElement.getFunction().toLowerCase();
+                var windowType = clickedElement.getType().toLowerCase();
                 var savedParameterValues = clickedElement.getParameters();
 
                 $('#windowName').val(name.trim());
-                selectedType = functionName;
+                selectedType = windowType;
                 $('#defineFunctionName').find('#window-type option').filter(function () {
-                    return ($(this).val().toLowerCase() == (functionName));
+                    return ($(this).val().toLowerCase() == (windowType));
                 }).prop('selected', true);
-                functionParameters = getSelectedTypeParameters(functionName, predefinedWindowFunctionNames);
-                if (functionName === sort.toLowerCase()) {
-                    functionParametersWithValues = mapParameterValuesSort(functionParameters, savedParameterValues);
-                    renderParameters(functionParametersWithValues, selectedType, "window");
+                functionParameters = getSelectedTypeParameters(windowType, predefinedWindowFunctionNames);
+                callToMapParameters(selectedType, functionParameters, savedParameterValues, functionParametersWithValues)
+                if (selectedType === SORT) {
                     showHideOrderForSort();
-                } else if (functionName === frequent.toLowerCase()) {
-                    functionParametersWithValues = mapParameterValuesFrequent(functionParameters,
-                        savedParameterValues);
-                    renderParameters(functionParametersWithValues, selectedType, "window");
-                } else if (functionName === lossyFrequent.toLowerCase()) {
-                    functionParametersWithValues = mapParameterValuesLossyFrequent(functionParameters,
-                        savedParameterValues);
-                    renderParameters(functionParametersWithValues, selectedType, "window");
-                } else {
-                    functionParametersWithValues = mapUserParameterValues(functionParameters, savedParameterValues);
-                    renderParameters(functionParametersWithValues, selectedType, "window");
                 }
 
                 var savedAttributes = clickedElement.getAttributeList();
                 var attributeFormTemplate = Handlebars.compile($('#attribute-form-template').html());
                 var wrappedHtml = attributeFormTemplate(savedAttributes);
                 $('#define-attribute').html(wrappedHtml);
-                changeAtrributeNavigation();
+                changeAttributeNavigation();
 
                 //to select the type of the saved attributes
                 var i = 0;
@@ -904,28 +910,13 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'designViewUtils', 'h
             $('#window-type').change(function () {
                 functionParameters = getSelectedTypeParameters(this.value, predefinedWindowFunctionNames);
                 selectedType = this.value.toLowerCase();
-                if (savedParameterValues && selectedType == functionName.toLowerCase()) {
-                    if (selectedType === sort.toLowerCase()) {
-                        functionParametersWithValues = mapParameterValuesSort(functionParameters, savedParameterValues);
-                        renderParameters(functionParametersWithValues, selectedType, "window")
-                    } else if (selectedType === frequent.toLowerCase()) {
-                        functionParametersWithValues = mapParameterValuesFrequent(functionParameters,
-                            savedParameterValues);
-                        renderParameters(functionParametersWithValues, selectedType, "window")
-                    } else if (selectedType === lossyFrequent.toLowerCase()) {
-                        functionParametersWithValues = mapParameterValuesLossyFrequent(functionParameters,
-                            savedParameterValues);
-                        renderParameters(functionParametersWithValues, selectedType, "window")
-                    } else {
-                        functionParametersWithValues = mapUserParameterValues(functionParameters, savedParameterValues);
-                        renderParameters(functionParametersWithValues, selectedType, "window");
-                        selectTimeStamp(functionParametersWithValues)
-                    }
+                if (savedParameterValues && selectedType == windowType.toLowerCase()) {
+                    callToMapParameters(selectedType, functionParameters, savedParameterValues, functionParametersWithValues)
                 } else {
                     functionParametersWithValues = createParameterWithValues(functionParameters);
                     renderParameters(functionParametersWithValues, selectedType, "window");
                 }
-                if (selectedType === sort) {
+                if (selectedType === SORT) {
                     showHideOrderForSort();
                 }
             });
@@ -942,8 +933,7 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'designViewUtils', 'h
                 var windowName = $('#windowName').val().trim();
                 //check if window name is empty
                 if (windowName == "") {
-                    $('#windowName').addClass('required-input-field');
-                    $('#windowName')[0].scrollIntoView();
+                    addErrorClass("#windowName");
                     $('#windowNameErrorMessage').text("Window name is required.")
                     isErrorOccurred = true;
                     return;
@@ -955,31 +945,18 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'designViewUtils', 'h
                 }
                 var isWindowNameUsed = self.formUtils.isDefinitionElementNameUsed(windowName, id);
                 if (isWindowNameUsed) {
-                    $('#windowName').addClass('required-input-field');
-                    $('#windowName')[0].scrollIntoView();
+                    addErrorClass("#windowName");
                     $('#windowNameErrorMessage').text("Window name is already used.")
                     isErrorOccurred = true;
                     return;
                 }
-
                 if (previouslySavedName !== windowName) {
                     //validate window name
-                    if ((windowName.indexOf(' ') >= 0)) {
-                        $('#windowName').addClass('required-input-field');
-                        $('#windowName')[0].scrollIntoView();
-                        $('#windowNameErrorMessage').text("Window name cannot have white space.")
-                        isErrorOccurred = true;
-                        return;
-                    }
-                    if (!alphabeticValidatorRegex.test(windowName.charAt(0))) {
-                        $('#windowName').addClass('required-input-field');
-                        $('#windowName')[0].scrollIntoView();
-                        $('#windowNameErrorMessage').text("Window name must start with an alphabetic character.")
+                    if (validateName("#windowName", "Window", windowName)) {
                         isErrorOccurred = true;
                         return;
                     }
                 }
-
                 var attributeNameList = [];
                 if (validateAttributeNames(attributeNameList)) {
                     isErrorOccurred = true;
@@ -987,26 +964,15 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'designViewUtils', 'h
                 }
 
                 if (attributeNameList.length == 0) {
-                    $('.attribute:eq(0)').find('.attr-name').addClass('required-input-field');
-                    $('.attribute:eq(0)').find('.attr-name')[0].scrollIntoView();
+                    addErrorClass($('.attribute:eq(0)').find('.attr-name'))
                     $('.attribute:eq(0)').find('.error-message').text("Minimum one attribute is required.");
                     isErrorOccurred = true;
                     return;
                 }
 
-                var functionName = $('#defineFunctionName #window-type').val();
+                var windowType = $('#defineFunctionName #window-type').val();
                 var parameters = [];
-                var isError = false;
-                if (functionName.toLowerCase() === sort) {
-                    isError = buildParameterValuesSort(parameters, functionParameters)
-                } else if (functionName.toLowerCase() === frequent ||
-                    functionName === lossyFrequent) {
-                    isError = buildParameterValuesFrequentOrLossyFrequent(parameters, functionParameters);
-                } else {
-                    isError = buildParameterValues(parameters, functionParameters)
-                }
-
-                if (isError) {
+                if (validateParameters(functionParameters)) {
                     isErrorOccurred = true;
                     return;
                 }
@@ -1021,7 +987,16 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'designViewUtils', 'h
                         textNode.html(windowName);
                     }
 
-                    clickedElement.setFunction(functionName);
+                    if (windowType.toLowerCase() === SORT) {
+                        buildParameterValuesSort(parameters, functionParameters)
+                    } else if (windowType.toLowerCase() === FREQUENT ||
+                        windowType.toLowerCase() === LOSSY_FREQUENT) {
+                        buildParameterValuesFrequentOrLossyFrequent(parameters, functionParameters);
+                    } else {
+                        buildParameterValues(parameters, functionParameters)
+                    }
+
+                    clickedElement.setType(windowType);
                     clickedElement.setParameters(parameters);
 
                     //clear the previously saved attribute list

@@ -530,7 +530,7 @@ public class CodeGeneratorUtils {
                 throw new CodeGenerationException("A given window element is empty");
             } else if (window.getName() == null || window.getName().isEmpty()) {
                 throw new CodeGenerationException("The name of a given window element is empty");
-            } else if (window.getFunction() == null || window.getFunction().isEmpty()) {
+            } else if (window.getType() == null || window.getType().isEmpty()) {
                 throw new CodeGenerationException("The function name of the window " + window.getName() + " is empty");
             }
         }

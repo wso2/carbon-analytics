@@ -50,7 +50,7 @@ public class WindowCodeGenerator {
                 .append(SubElementCodeGenerator.generateAttributes(window.getAttributeList()))
                 .append(SiddhiCodeBuilderConstants.CLOSE_BRACKET)
                 .append(SiddhiCodeBuilderConstants.SPACE)
-                .append(window.getFunction())
+                .append(window.getType())
                 .append(SiddhiCodeBuilderConstants.OPEN_BRACKET)
                 .append(SubElementCodeGenerator.generateParameterList(window.getParameters()))
                 .append(SiddhiCodeBuilderConstants.CLOSE_BRACKET);

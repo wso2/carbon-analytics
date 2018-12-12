@@ -27,7 +27,7 @@ import java.util.List;
 public class WindowConfig extends SiddhiElementConfig {
     private String name;
     private List<AttributeConfig> attributeList;
-    private String function;
+    private String type;
     private List<String> parameters;
     private String outputEventType;
     private List<String> annotationList;
@@ -36,7 +36,7 @@ public class WindowConfig extends SiddhiElementConfig {
     public WindowConfig(String id,
                         String name,
                         List<AttributeConfig> attributeList,
-                        String function,
+                        String type,
                         List<String> parameters,
                         String outputEventType,
                         List<String> annotationList,
@@ -44,7 +44,7 @@ public class WindowConfig extends SiddhiElementConfig {
         super(id);
         this.name = name;
         this.attributeList = attributeList;
-        this.function = function;
+        this.type = type;
         this.parameters = parameters;
         this.outputEventType = outputEventType;
         this.annotationList = annotationList;
@@ -59,8 +59,8 @@ public class WindowConfig extends SiddhiElementConfig {
         return attributeList;
     }
 
-    public String getFunction() {
-        return function;
+    public String getType() {
+        return type;
     }
 
     public List<String> getParameters() {
