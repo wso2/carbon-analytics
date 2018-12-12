@@ -90,31 +90,26 @@ public class FileConfigManager implements ConfigManager {
                 LOGGER.error("Could not initiate the siddhi configuration object, " + e.getMessage(), e);
             }
 
-            if (name.equalsIgnoreCase("wso2.carbon")) {
-                try {
-                    CarbonConfiguration carbonConfiguration =
-                            configProvider.getConfigurationObject(CarbonConfiguration.class);
-                    if (carbonConfiguration != null && carbonConfiguration.getId() != null) {
-                        Map<String, String> configs = new HashMap<>();
-                        configs.put("id", carbonConfiguration.getId());
-                        return configs;
-                    }
-                } catch (ConfigurationException e) {
-                    LOGGER.error("Could not initiate the wso2.carbon configuration object, " + e.getMessage(), e);
-                }
-            } else if (name.equalsIgnoreCase("cluster.config")) {
+            if (name.equalsIgnoreCase("shardId")) {
                 try {
                     ClusterConfiguration clusterConfig =
                             configProvider.getConfigurationObject(ClusterConfiguration.class);
                     if (clusterConfig != null) {
                         if (clusterConfig.getGroupId() != null && clusterConfig.isEnabled()) {
                             Map<String, String> configs = new HashMap<>();
-                            configs.put("groupId", clusterConfig.getGroupId());
+                            configs.put("shardId", clusterConfig.getGroupId());
                             return configs;
                         }
                     }
+                    CarbonConfiguration carbonConfiguration =
+                            configProvider.getConfigurationObject(CarbonConfiguration.class);
+                    if (carbonConfiguration != null && carbonConfiguration.getId() != null) {
+                        Map<String, String> configs = new HashMap<>();
+                        configs.put("shardId", carbonConfiguration.getId());
+                        return configs;
+                    }
                 } catch (ConfigurationException e) {
-                    LOGGER.error("Could not initiate the cluster.config configuration object, " + e.getMessage(), e);
+                    LOGGER.error("Could not initiate the wso2.carbon configuration object, " + e.getMessage(), e);
                 }
             }
         }
