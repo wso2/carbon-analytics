@@ -640,7 +640,6 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'aggregation', 'aggre
                     textNode.html(configInput.name);
 
                     $('#' + id).removeClass('incomplete-element');
-                    $('#' + id).prop('title', '');
 
                     // perform JSON validation
                     JSONValidator.prototype.validateAggregation(clickedElement);
@@ -648,6 +647,26 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'aggregation', 'aggre
                     // design view container and toggle view button are enabled
                     self.designViewContainer.removeClass('disableContainer');
                     self.toggleViewButton.removeClass('disableContainer');
+
+                    //Send SiddhiApp Config to the backend and get tooltip
+                    var sendingString = JSON.stringify(self.configurationData.siddhiAppConfig);
+                    var response = self.formUtils.getTooltips(sendingString);
+                    var tooltipList=[];
+                    if (response.status === "success") {
+                        tooltipList = response.tooltipList;
+                    } else {
+                        console.log(response.errorMessage);
+                    }
+
+                    var aggregationToolTip = '';
+                    for (var i in tooltipList) {
+                        if (tooltipList[i].id === id) {
+                            aggregationToolTip = tooltipList[i].text;
+                            break;
+                        }
+                    }
+
+                    $('#' + id).prop('title', aggregationToolTip);
 
                     // close the form aggregation
                     self.consoleListManager.removeFormConsole(formConsole);

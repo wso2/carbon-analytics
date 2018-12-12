@@ -121,12 +121,12 @@ public class CodeGenerator {
         List <ToolTip> toolTipList = new ArrayList<>();
         toolTipList.addAll(generateStreamSinkSourceToolTips(streamsToBeGenerated, siddhiApp.getSourceList(),
                 siddhiApp.getSinkList()));
-        toolTipList.addAll(generateTableTooltips(siddhiApp.getTableList()));
-        toolTipList.addAll(generateWindowToolTipList(siddhiApp.getWindowList()));
-        toolTipList.addAll(generateTriggerToolTip(siddhiApp.getTriggerList()));
+        toolTipList.addAll(generateTableToolTips(siddhiApp.getTableList()));
+        toolTipList.addAll(generateWindowToolTips(siddhiApp.getWindowList()));
+        toolTipList.addAll(generateTriggerToolTips(siddhiApp.getTriggerList()));
         toolTipList.addAll(generateAggregationToolTips(siddhiApp.getAggregationList()));
         toolTipList.addAll(generateFunctionToolTips(siddhiApp.getFunctionList()));
-        toolTipList.addAll(generateExcecutionElementTooltips(siddhiApp.getQueryLists(), siddhiApp.getPartitionList(),
+        toolTipList.addAll(generateExcecutionElementToolTips(siddhiApp.getQueryLists(), siddhiApp.getPartitionList(),
                 definitionsToBeGenerated, allDefinitions));
 
         return toolTipList;
@@ -293,7 +293,7 @@ public class CodeGenerator {
      * @return List of tooltips for tables
      * @throws CodeGenerationException Error while generating the code
      */
-    private List<ToolTip> generateTableTooltips(List<TableConfig> tableList) throws CodeGenerationException {
+    private List<ToolTip> generateTableToolTips(List<TableConfig> tableList) throws CodeGenerationException {
         List <ToolTip> tableTooltipList = new ArrayList<>();
         if (tableList == null || tableList.isEmpty()) {
             return tableTooltipList;
@@ -338,7 +338,7 @@ public class CodeGenerator {
      * @return List of tooltips for windows
      * @throws CodeGenerationException Error while generating the code
      */
-    private List <ToolTip> generateWindowToolTipList (List<WindowConfig> windowList) throws CodeGenerationException {
+    private List <ToolTip> generateWindowToolTips(List<WindowConfig> windowList) throws CodeGenerationException {
         List <ToolTip> windowToolTipList = new ArrayList<>();
         if (windowList == null || windowList.isEmpty()) {
             return windowToolTipList;
@@ -384,7 +384,7 @@ public class CodeGenerator {
      * @return List of tooltips for triggers
      * @throws CodeGenerationException Error while generating the code
      */
-    private List<ToolTip> generateTriggerToolTip (List<TriggerConfig> triggerList) throws CodeGenerationException {
+    private List<ToolTip> generateTriggerToolTips(List<TriggerConfig> triggerList) throws CodeGenerationException {
         List <ToolTip> triggerToolTipList = new ArrayList<>();
         if (triggerList == null || triggerList.isEmpty()) {
             return triggerToolTipList;
@@ -545,7 +545,7 @@ public class CodeGenerator {
      * @return List of tooltips for  queries and partitions in a Siddhi app
      * @throws CodeGenerationException Error while generating the code
      */
-    private List<ToolTip> generateExcecutionElementTooltips(Map<QueryListType, List<QueryConfig>> queryLists,
+    private List<ToolTip> generateExcecutionElementToolTips(Map<QueryListType, List<QueryConfig>> queryLists,
                                                             List<PartitionConfig> partitions,
                                                             List<String> definitionsToBeGenerated,
                                                             List<String> allDefinitions)
