@@ -230,7 +230,7 @@ define(['log', 'lodash', 'jquery', 'event_channel', './file'],
                     data = response;
                     file.setDirty(false)
                         .setLastPersisted(_.now())
-                        .save();
+                        .save(true);
                     log.debug("File " + file.getName() + ' saved successfully at '+ file.getPath());
                 },
                 error: function(xhr, textStatus, errorThrown){

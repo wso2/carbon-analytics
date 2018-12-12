@@ -312,7 +312,7 @@ define(['log', 'jquery', 'lodash', 'sourceOrSinkAnnotation', 'mapAnnotation', 'p
                             isError = true;
                             return false;
                         } else {
-                            option = custOptName + " = '" + custOptValue + "'";
+                            option = custOptName + " = \"" + custOptValue + "\"";
                             selectedOptions.push(option);
                         }
                     }

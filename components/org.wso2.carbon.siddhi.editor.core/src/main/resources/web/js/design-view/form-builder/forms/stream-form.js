@@ -622,7 +622,8 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'stream', 'designView
                     = self.configurationData.getSiddhiAppConfig().getStreamSavedInsideAPartition(id);
                 // if streamSavedInsideAPartition is undefined then the stream is not inside a partition
                 if (streamSavedInsideAPartition !== undefined) {
-                    var isValid = JSONValidator.prototype.validateInnerStream(clickedElement, self.jsPlumbInstance, true);
+                    var isValid = JSONValidator.prototype.validateInnerStream(clickedElement, self.jsPlumbInstance,
+                    false);
                     if (!isValid) {
                         isErrorOccurred = true;
                         return;

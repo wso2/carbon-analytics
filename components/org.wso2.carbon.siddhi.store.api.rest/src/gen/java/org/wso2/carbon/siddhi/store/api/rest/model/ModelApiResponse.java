@@ -34,9 +34,16 @@ import io.swagger.annotations.ApiModelProperty;
 public class ModelApiResponse {
     @JsonProperty("records")
     private List<Record> records = null;
+    @JsonProperty("details")
+    private List<RecordDetail> details = null;
 
     public ModelApiResponse records(List<Record> records) {
         this.records = records;
+        return this;
+    }
+
+    public ModelApiResponse details(List<RecordDetail> details) {
+        this.details = details;
         return this;
     }
 
@@ -45,6 +52,14 @@ public class ModelApiResponse {
             this.records = new ArrayList<Record>();
         }
         this.records.add(recordsItem);
+        return this;
+    }
+
+    public ModelApiResponse addRecordDetailItem(RecordDetail recordDetail) {
+        if (this.details == null) {
+            this.details = new ArrayList<>();
+        }
+        this.details.add(recordDetail);
         return this;
     }
 
@@ -62,6 +77,13 @@ public class ModelApiResponse {
         this.records = records;
     }
 
+    public List<RecordDetail> getDetails() {
+        return details;
+    }
+
+    public void setDetails(List<RecordDetail> details) {
+        this.details = details;
+    }
 
     @Override
     public boolean equals(Object o) {
@@ -72,12 +94,19 @@ public class ModelApiResponse {
             return false;
         }
         ModelApiResponse _apiResponse = (ModelApiResponse) o;
-        return Objects.equals(this.records, _apiResponse.records);
+
+        if (!Objects.equals(this.records, _apiResponse.records)) {
+            return false;
+        }
+        if (!Objects.equals(this.details, _apiResponse.details)) {
+            return false;
+        }
+        return true;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(records);
+        return Objects.hash(records) * 31 + Objects.hash(details);
     }
 
     @Override
@@ -86,6 +115,7 @@ public class ModelApiResponse {
         sb.append("class ModelApiResponse {\n");
 
         sb.append("    records: ").append(toIndentedString(records)).append("\n");
+        sb.append("    details: ").append(toIndentedString(details)).append("\n");
         sb.append("}");
         return sb.toString();
     }
