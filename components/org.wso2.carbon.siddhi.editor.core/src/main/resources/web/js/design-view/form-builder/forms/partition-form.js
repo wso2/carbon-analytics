@@ -341,7 +341,7 @@ define(['require', 'log', 'jquery', 'lodash', 'partitionWith', 'designViewUtils'
                             });
 
                             // perform JSON validation
-                            JSONValidator.prototype.validatePartition(clickedElement, self.jsPlumbInstance, true);
+                            JSONValidator.prototype.validatePartition(clickedElement, self.jsPlumbInstance, false);
 
                             clickedElement.clearAnnotationList();
                             clickedElement.clearAnnotationListObjects();
