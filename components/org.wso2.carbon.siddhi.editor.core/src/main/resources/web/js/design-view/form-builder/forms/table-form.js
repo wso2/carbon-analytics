@@ -38,13 +38,13 @@ define(['log', 'jquery', 'lodash', 'attribute', 'table', 'storeAnnotation', 'des
             }
         };
 
-        const alphabeticValidatorRegex = /^([a-zA-Z])$/;
-        const defaultStoreType = "in-memory";
-        const rdbmsStoreType = "rdbms";
+        const ALPHABETIC_VALIDATOR_REGEX = /^([a-zA-Z])$/;
+        const DEFAULT_STORE_TYPE = "in-memory";
+        const RDBMS_STORE_TYPE = "rdbms";
 
 
         /** Function to manage the attribute navigations */
-        var changeAtrributeNavigation = function () {
+        var changeAttributeNavigation = function () {
             $('.attr-nav').empty();
             var attrLength = $('#attribute-div li').length;
             if (attrLength == 1) {
@@ -333,14 +333,14 @@ define(['log', 'jquery', 'lodash', 'attribute', 'table', 'storeAnnotation', 'des
             //first check if in-memory is already present in the predefined stores array
             var found = false;
             for (var store of predefinedStores) {
-                if (store.name === defaultStoreType) {
+                if (store.name === DEFAULT_STORE_TYPE) {
                     found = true;
                     break;
                 }
             }
             if (!found) {
                 var inMemoryType = {
-                    name: defaultStoreType,
+                    name: DEFAULT_STORE_TYPE,
                     parameters: []
                 };
                 predefinedStores.push(inMemoryType);
@@ -357,27 +357,52 @@ define(['log', 'jquery', 'lodash', 'attribute', 'table', 'storeAnnotation', 'des
             $('.attr-name').each(function () {
                 var attributeName = $(this).val().trim();
                 if (attributeName != "") {
-                    if (attributeName.indexOf(' ') >= 0) {
-                        $(this).parents(".attribute").find(".error-message").text("Name can not have white space");
-                        $(this)[0].scrollIntoView();
-                        $(this).addClass('required-input-field');
+                    var isError = validateName(this, "Attribute", attributeName);
+                    if (!isError) {
+                        attributeNameList.push(attributeName)
+                    } else {
                         isErrorOccurred = true;
-                        return;
                     }
-                    if (!alphabeticValidatorRegex.test(attributeName.charAt(0))) {
-                        $(this).parents(".attribute").find(".error-message").text("Name must start with an" +
-                            " alphabetical character");
-                        $(this)[0].scrollIntoView();
-                        $(this).addClass('required-input-field');
-                        isErrorOccurred = true;
-                        return;
-                    }
-                    attributeNameList.push(attributeName);
                 }
             });
             return isErrorOccurred;
         };
 
+		/**
+         * Common method to validate the names [attribute name or table name]
+         * @param {Object} id object which needs to be validated
+         * @param {String} type Table or Attribute
+         * @param {String} name the name to be validated
+         * @return {boolean}
+         */
+        var validateName = function (id, type, name) {
+            var errorMessageParent;
+            if (type === "Attribute") {
+                errorMessageParent = $(id).parents(".attribute").find(".error-message");
+            } else {
+                errorMessageParent = $('#tableNameErrorMessage');
+            }
+            if (name.indexOf(' ') >= 0) {
+                errorMessageParent.text(type + " name can not have white space.")
+                addErrorClass(id);
+                return true;
+            }
+            if (!ALPHABETIC_VALIDATOR_REGEX.test(name.charAt(0))) {
+                errorMessageParent.text(type + " name must start with an alphabetical character.");
+                addErrorClass(id);
+                return true;
+            }
+            return false;
+        };
+
+        /**
+         * Function to add the error class
+         * @param {Object} id object where the errors needs to be displayed
+         */
+        var addErrorClass = function (id) {
+            $(id)[0].scrollIntoView();
+            $(id).addClass('required-input-field')
+        };
         /**
          * Function to map the values of saved annotation to predefined annotation object
          * @param {Object} predefined_annotations
@@ -802,13 +827,13 @@ define(['log', 'jquery', 'lodash', 'attribute', 'table', 'storeAnnotation', 'des
                     '</select>' +
                     '</div> <div class="attr-nav"> </div></div>' +
                     '<label class="error-message"></label></li>');
-                changeAtrributeNavigation();
+                changeAttributeNavigation();
             });
 
             //To delete attribute
             $("#define-attribute").on('click', '#attribute-div .btn-del-attr', function () {
                 $(this).closest('li').remove();
-                changeAtrributeNavigation();
+                changeAttributeNavigation();
             });
 
             //To reorder up the attribute
@@ -818,8 +843,7 @@ define(['log', 'jquery', 'lodash', 'attribute', 'table', 'storeAnnotation', 'des
                 if ($previous.length !== 0) {
                     $current.insertBefore($previous);
                 }
-                changeAtrributeNavigation();
-
+                changeAttributeNavigation();
             });
 
             //To reorder down the attribute
@@ -829,7 +853,7 @@ define(['log', 'jquery', 'lodash', 'attribute', 'table', 'storeAnnotation', 'des
                 if ($next.length !== 0) {
                     $current.insertAfter($next);
                 }
-                changeAtrributeNavigation();
+                changeAttributeNavigation();
             });
 
             //To show option description
@@ -913,7 +937,7 @@ define(['log', 'jquery', 'lodash', 'attribute', 'table', 'storeAnnotation', 'des
                 var attributeFormTemplate = Handlebars.compile($('#attribute-form-template').html());
                 var wrappedHtml = attributeFormTemplate(savedAttributes);
                 $('#define-attribute').html(wrappedHtml);
-                changeAtrributeNavigation();
+                changeAttributeNavigation();
                 //to select the attribute-type of the saved attributes
                 var i = 0;
                 $('.attribute .attr-content').each(function () {
@@ -975,7 +999,7 @@ define(['log', 'jquery', 'lodash', 'attribute', 'table', 'storeAnnotation', 'des
                 $('#define-store #store-type').val(savedStoreType);
                 customizedStoreOptions = getCustomizedOptions(storeOptions, savedStoreOptions);
                 storeOptionsWithValues = mapUserOptionValues(storeOptions, savedStoreOptions);
-                if (savedStoreType == rdbmsStoreType) {
+                if (savedStoreType == RDBMS_STORE_TYPE) {
                     renderRdbmsTypes();
                     checkRdbmsType(storeOptionsWithValues);
                     var dataStoreOptions = getRdbmsOptions(storeOptionsWithValues);
@@ -985,13 +1009,13 @@ define(['log', 'jquery', 'lodash', 'attribute', 'table', 'storeAnnotation', 'des
                 }
                 $('#define-predefined-annotations').show();
             } else {
-                $('#define-store #store-type').val(defaultStoreType);
+                $('#define-store #store-type').val(DEFAULT_STORE_TYPE);
                 $('#define-predefined-annotations').hide();
             }
 
             //onchange of the store type select box
             $('#define-store').on('change', '#store-type', function () {
-                if (this.value === defaultStoreType) {
+                if (this.value === DEFAULT_STORE_TYPE) {
                     $('#define-store-options').empty();
                     $('#define-predefined-annotations').hide();
                     $('#define-rdbms-type').hide();
@@ -999,7 +1023,7 @@ define(['log', 'jquery', 'lodash', 'attribute', 'table', 'storeAnnotation', 'des
                     storeOptions = getSelectedTypeOptions(this.value, predefinedStores);
                     customizedStoreOptions = getCustomizedOptions(storeOptions, savedStoreOptions);
                     storeOptionsWithValues = mapUserOptionValues(storeOptions, savedStoreOptions);
-                    if (this.value == rdbmsStoreType) {
+                    if (this.value == RDBMS_STORE_TYPE) {
                         $('#define-rdbms-type').show();
                         renderRdbmsTypes();
                         var dataStoreOptions = getRdbmsOptions(storeOptionsWithValues);
@@ -1014,7 +1038,7 @@ define(['log', 'jquery', 'lodash', 'attribute', 'table', 'storeAnnotation', 'des
                     storeOptions = getSelectedTypeOptions(this.value, predefinedStores);
                     storeOptionsWithValues = createOptionObjectWithValues(storeOptions);
                     customizedStoreOptions = [];
-                    if (this.value == rdbmsStoreType) {
+                    if (this.value == RDBMS_STORE_TYPE) {
                         renderRdbmsTypes();
                         //as default select the data-store type
                         $("#define-rdbms-type input[name=radioOpt][value='inline-config']").prop("checked", true);
@@ -1041,10 +1065,9 @@ define(['log', 'jquery', 'lodash', 'attribute', 'table', 'storeAnnotation', 'des
 
                 var tableName = $('#tableName').val().trim();
 
-                // to check if stream name is empty
+                // to check if table name is empty
                 if (tableName == "") {
-                    $('#tableName').addClass('required-input-field');
-                    $('#tableName')[0].scrollIntoView();
+                    addErrorClass("#tableName");
                     $('#tableNameErrorMessage').text("Table name is required.");
                     isErrorOccurred = true;
                     return;
@@ -1057,25 +1080,12 @@ define(['log', 'jquery', 'lodash', 'attribute', 'table', 'storeAnnotation', 'des
                 if (previouslySavedName !== tableName) {
                     var isTableNameUsed = self.formUtils.isDefinitionElementNameUsed(tableName);
                     if (isTableNameUsed) {
-                        $('#tableName').addClass('required-input-field');
-                        $('#tableName')[0].scrollIntoView();
+                        addErrorClass("#tableName");
                         $('#tableNameErrorMessage').text("Table name is already used.");
                         isErrorOccurred = true;
                         return;
                     }
-                    //to check if stream name contains white spaces
-                    if (tableName.indexOf(' ') >= 0) {
-                        $('#tableName').addClass('required-input-field');
-                        $('#tableName')[0].scrollIntoView();
-                        $('#tableNameErrorMessage').text("Table name cannot have white space.");
-                        isErrorOccurred = true;
-                        return;
-                    }
-                    //to check if stream name starts with an alphabetic character
-                    if (!(alphabeticValidatorRegex).test(tableName.charAt(0))) {
-                        $('#tableName').addClass('required-input-field');
-                        $('#tableName')[0].scrollIntoView();
-                        $('#tableNameErrorMessage').text("Table name must start with an alphabetic character.");
+                    if (validateName("#tableName", "Table", tableName)) {
                         isErrorOccurred = true;
                         return;
                     }
@@ -1083,7 +1093,7 @@ define(['log', 'jquery', 'lodash', 'attribute', 'table', 'storeAnnotation', 'des
 
                 //store annotation
                 var selectedStoreType = $('#define-store #store-type').val();
-                if (selectedStoreType !== defaultStoreType) {
+                if (selectedStoreType !== DEFAULT_STORE_TYPE) {
                     var optionsMap = {};
                     if (validateOptions(optionsMap, storeOptions)) {
                         isErrorOccurred = true;
@@ -1102,8 +1112,7 @@ define(['log', 'jquery', 'lodash', 'attribute', 'table', 'storeAnnotation', 'des
                 }
 
                 if (attributeNameList.length == 0) {
-                    $('.attribute:eq(0)').find('.attr-name').addClass('required-input-field');
-                    $('.attribute:eq(0)').find('.attr-name')[0].scrollIntoView();
+                    addErrorClass($('.attribute:eq(0)').find('.attr-name'));
                     $('.attribute:eq(0)').find('.error-message').text("Minimum one attribute is required.");
                     isErrorOccurred = true;
                     return;
@@ -1124,7 +1133,7 @@ define(['log', 'jquery', 'lodash', 'attribute', 'table', 'storeAnnotation', 'des
                         var textNode = $('#' + id).find('.tableNameNode');
                         textNode.html(tableName);
                     }
-                    if (selectedStoreType !== defaultStoreType) {
+                    if (selectedStoreType !== DEFAULT_STORE_TYPE) {
                         var storeAnnotationOptions = {};
                         _.set(storeAnnotationOptions, 'type', selectedStoreType);
                         _.set(storeAnnotationOptions, 'options', optionsMap);
