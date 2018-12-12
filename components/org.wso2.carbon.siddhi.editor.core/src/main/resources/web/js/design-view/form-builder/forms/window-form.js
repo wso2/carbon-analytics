@@ -943,14 +943,15 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'designViewUtils', 'h
                 if (previouslySavedName === undefined) {
                     previouslySavedName = "";
                 }
-                var isWindowNameUsed = self.formUtils.isDefinitionElementNameUsed(windowName, id);
-                if (isWindowNameUsed) {
-                    addErrorClass("#windowName");
-                    $('#windowNameErrorMessage').text("Window name is already used.")
-                    isErrorOccurred = true;
-                    return;
-                }
+
                 if (previouslySavedName !== windowName) {
+                    var isWindowNameUsed = self.formUtils.isDefinitionElementNameUsed(windowName, id);
+                    if (isWindowNameUsed) {
+                        addErrorClass("#windowName");
+                        $('#windowNameErrorMessage').text("Window name is already used.")
+                        isErrorOccurred = true;
+                        return;
+                    }
                     //validate window name
                     if (validateName("#windowName", "Window", windowName)) {
                         isErrorOccurred = true;
