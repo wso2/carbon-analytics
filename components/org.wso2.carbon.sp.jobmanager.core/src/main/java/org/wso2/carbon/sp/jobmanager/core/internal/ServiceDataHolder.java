@@ -23,7 +23,7 @@ import org.wso2.carbon.analytics.permissions.PermissionProvider;
 import org.wso2.carbon.cluster.coordinator.service.ClusterCoordinator;
 import org.wso2.carbon.datasource.core.api.DataSourceService;
 import org.wso2.carbon.sp.jobmanager.core.allocation.ResourceAllocationAlgorithm;
-import org.wso2.carbon.sp.jobmanager.core.bean.ClusterConfig;
+import org.wso2.carbon.stream.processor.common.utils.config.ClusterConfig;
 import org.wso2.carbon.sp.jobmanager.core.bean.DeploymentConfig;
 import org.wso2.carbon.sp.jobmanager.core.deployment.DeploymentManagerImpl;
 import org.wso2.carbon.sp.jobmanager.core.impl.RDBMSServiceImpl;
