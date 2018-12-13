@@ -69,7 +69,7 @@ define(['log', 'jquery', 'lodash', 'attribute', 'table', 'storeAnnotation', 'des
             }
         };
 
-		/**
+        /**
 		 * Function to obtain a particular option from predefined option
 		 * @param {String} optionName option which needs to be found
 		 * @param {Object} predefinedOptions set of predefined option
@@ -88,53 +88,27 @@ define(['log', 'jquery', 'lodash', 'attribute', 'table', 'storeAnnotation', 'des
 
 		/**
 		 * Function to validate the predefined options
-		 * @param {Object} selectedOptions array to add the options which needs to be saved
-		 * @param {Object} predefinedOptions
+         * @param {Object} predefinedOptions set of predefined option
 		 * @return {boolean} isError
 		 */
-        var validateOptions = function (optionsMap, predefinedOptions) {
+        var validateOptions = function (predefinedOptions) {
             var isError = false;
             $('#define-store-options #store-options .option').each(function () {
-                var optionName = $(this).find('.option-name').text().trim();
+                var option = $(this).find('.option-name');
+                var optionName = option.text().trim();
                 var optionValue = $(this).find('.option-value').val().trim();
-                var predefinedOptionObject = getOption(optionName, predefinedOptions);
+                var predefinedOptionObject = getOption(optionName, predefinedOptions)
                 if ($(this).find('.option-name').hasClass('mandatory-option')) {
-                    if (optionValue == "") {
-                        $(this).find('.error-message').text('Option Value is required.');
-                        $(this)[0].scrollIntoView();
-                        $(this).find('.option-value').addClass('required-input-field');
+                    if (!checkOptionValue(optionValue, predefinedOptionObject, this)) {
                         isError = true;
                         return false;
-                    } else {
-                        var dataType = predefinedOptionObject.type[0];
-                        if (validateDataType(dataType, optionValue)) {
-                            $(this).find('.error-message').text('Invalid data-type. ' + dataType + ' required.');
-                            $(this)[0].scrollIntoView();
-                            $(this).find('.option-value').addClass('required-input-field');
-                            isError = true;
-                            return false;
-                        }
                     }
-                    optionsMap[optionName] = optionValue;
                 } else {
                     if ($(this).find('.option-checkbox').is(":checked")) {
-                        if (optionValue == "") {
-                            $(this).find('.error-message').text('Option Value is required.');
-                            $(this)[0].scrollIntoView();
-                            $(this).find('.option-value').addClass('required-input-field');
+                        if (!checkOptionValue(optionValue, predefinedOptionObject, this)) {
                             isError = true;
                             return false;
-                        } else {
-                            var dataType = predefinedOptionObject.type[0];
-                            if (validateDataType(dataType, optionValue)) {
-                                $(this).find('.error-message').text('Invalid data-type. ' + dataType + ' required.');
-                                $(this)[0].scrollIntoView();
-                                $(this).find('.option-value').addClass('required-input-field');
-                                isError = true;
-                                return false;
-                            }
                         }
-                        optionsMap[optionName] = optionValue;
                     }
                 }
             });
@@ -143,10 +117,9 @@ define(['log', 'jquery', 'lodash', 'attribute', 'table', 'storeAnnotation', 'des
 
         /**
         * Function to validate the customized options
-        * @param {Object} selectedOptions options which needs to be saved
         * @return {boolean} isError
         */
-        var validateCustomizedOptions = function (optionsMap) {
+        var validateCustomizedOptions = function () {
             var isError = false;
             if ($('#customized-store-options ul').has('li').length != 0) {
                 $('#customized-store-options .option').each(function () {
@@ -154,24 +127,79 @@ define(['log', 'jquery', 'lodash', 'attribute', 'table', 'storeAnnotation', 'des
                     var custOptValue = $(this).find('.cust-option-value').val().trim();
                     if ((custOptName != "") || (custOptValue != "")) {
                         if (custOptName == "") {
+                            addErrorClass($(this).find('.cust-option-key'))
                             $(this).find('.error-message').text('Option key is required.');
-                            $(this)[0].scrollIntoView();
-                            $(this).find('.cust-option-key').addClass('required-input-field');
                             isError = true;
                             return false;
                         } else if (custOptValue == "") {
                             $(this).find('.error-message').text('Option value is required.');
-                            $(this)[0].scrollIntoView();
-                            $(this).find('.cust-option-value').addClass('required-input-field');
+                            addErrorClass($(this).find('.cust-option-value'));
                             isError = true;
                             return false;
-                        } else {
-                            optionsMap[custOptName] = custOptValue;
                         }
                     }
                 });
             }
             return isError;
+        };
+
+        /**
+        * Function to build the options
+        * @param {Object} selectedOptions array to add the built option
+        */
+        var buildOptions = function (selectedOptions) {
+            var option;
+            $('#define-store-options #store-options .option').each(function () {
+                var option = $(this).find('.option-name');
+                var optionName = option.text().trim();
+                var optionValue = $(this).find('.option-value').val().trim();
+                if (option.hasClass('mandatory-option')) {
+                    selectedOptions[optionName] = optionValue;
+                } else {
+                    if ($(this).find('.option-checkbox').is(":checked")) {
+                        selectedOptions[optionName] = optionValue;
+                    }
+                }
+            });
+        };
+
+        /**
+         * Function to build the customized options
+         * @param {Object} selectedOptions array to add the built option
+         */
+        var buildCustomizedOption = function (selectedOptions) {
+            var option = "";
+            if ($('#customized-store-options ul').has('li').length != 0) {
+                $('#customized-store-options .option').each(function () {
+                    var custOptName = $(this).find('.cust-option-key').val().trim();
+                    var custOptValue = $(this).find('.cust-option-value').val().trim();
+                    if ((custOptName != "") && (custOptValue != "")) {
+                        selectedOptions[custOptName] = custOptValue;
+                    }
+                });
+            }
+        };
+
+        /**
+		 * Function to check if a particular option value is valid
+		 * @param {String} optionValue value which needs to be validated
+		 * @param {Object} predefinedOptionObject predefined object of the option
+		 * @param {Object} parent div of the particular option
+		 */
+        var checkOptionValue = function (optionValue, predefinedOptionObject, parent) {
+            if (optionValue == "") {
+                $(parent).find('.error-message').text('Option value is required.');
+                addErrorClass($(parent).find('.option-value'));
+                return false;
+            } else {
+                var dataType = predefinedOptionObject.type[0];
+                if (validateDataType(dataType, optionValue)) {
+                    $(parent).find('.error-message').text('Invalid data-type. ' + dataType + ' required.');
+                    addErrorClass($(parent).find('.option-value'));
+                    return false;
+                }
+            }
+            return true;
         };
 
 		/**
@@ -1007,17 +1035,14 @@ define(['log', 'jquery', 'lodash', 'attribute', 'table', 'storeAnnotation', 'des
                 } else {
                     renderOptions(storeOptionsWithValues, customizedStoreOptions, "store");
                 }
-                $('#define-predefined-annotations').show();
             } else {
                 $('#define-store #store-type').val(DEFAULT_STORE_TYPE);
-                $('#define-predefined-annotations').hide();
             }
 
             //onchange of the store type select box
             $('#define-store').on('change', '#store-type', function () {
                 if (this.value === DEFAULT_STORE_TYPE) {
                     $('#define-store-options').empty();
-                    $('#define-predefined-annotations').hide();
                     $('#define-rdbms-type').hide();
                 } else if (clickedElement.getStore() && savedStoreType === this.value) {
                     storeOptions = getSelectedTypeOptions(this.value, predefinedStores);
@@ -1033,7 +1058,6 @@ define(['log', 'jquery', 'lodash', 'attribute', 'table', 'storeAnnotation', 'des
                         $('#define-rdbms-type').hide();
                         renderOptions(storeOptionsWithValues, customizedStoreOptions, "store");
                     }
-                    $('#define-predefined-annotations').show();
                 } else {
                     storeOptions = getSelectedTypeOptions(this.value, predefinedStores);
                     storeOptionsWithValues = createOptionObjectWithValues(storeOptions);
@@ -1049,7 +1073,6 @@ define(['log', 'jquery', 'lodash', 'attribute', 'table', 'storeAnnotation', 'des
                         $('#define-rdbms-type').hide();
                         renderOptions(storeOptionsWithValues, customizedStoreOptions, "store");
                     }
-                    $('#define-predefined-annotations').show();
                 }
             });
 
@@ -1094,12 +1117,11 @@ define(['log', 'jquery', 'lodash', 'attribute', 'table', 'storeAnnotation', 'des
                 //store annotation
                 var selectedStoreType = $('#define-store #store-type').val();
                 if (selectedStoreType !== DEFAULT_STORE_TYPE) {
-                    var optionsMap = {};
-                    if (validateOptions(optionsMap, storeOptions)) {
+                    if (validateOptions(storeOptions)) {
                         isErrorOccurred = true;
                         return;
                     }
-                    if (validateCustomizedOptions(optionsMap)) {
+                    if (validateCustomizedOptions()) {
                         isErrorOccurred = true;
                         return;
                     }
@@ -1134,6 +1156,9 @@ define(['log', 'jquery', 'lodash', 'attribute', 'table', 'storeAnnotation', 'des
                         textNode.html(tableName);
                     }
                     if (selectedStoreType !== DEFAULT_STORE_TYPE) {
+                        var optionsMap = {};
+                        buildOptions(optionsMap);
+                        buildCustomizedOption(optionsMap);
                         var storeAnnotationOptions = {};
                         _.set(storeAnnotationOptions, 'type', selectedStoreType);
                         _.set(storeAnnotationOptions, 'options', optionsMap);
