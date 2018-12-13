@@ -1205,23 +1205,33 @@
 
 <script id = "source-sink-map-attribute-template" type = "text/template">
     <div id = "mapper-attributes">
+        {{#ifId id "sink"}}
+            <div class="clearfix" id="stream-attributes"></div>
+        {{/ifId}}
         <div class = "attribute-labels clearfix">
-                {{#if this.0.key }} <label id = "attribute-key-label"> Key </label> {{/if}}
+                {{#if attributes.0.key }} <label id = "attribute-key-label"> Key </label> {{/if}}
                 <label id = "attribute-value-label"> Value </label>
         </div>
-        {{#each this}}
-        <div class = "attribute">
-                <div class = "clearfix">
-                    {{#if key }}
-                        <input type = "text" value = "{{key}}" class = "attr-key" readonly/>
-                        <input type = "text" value = "{{value}}" class = "attr-value"/>
-                    {{else}}
-                        <textarea class = "attr-value"> {{value}} </textarea>
-                    {{/if}}
-                </div>
-                <label class = "error-message"></label>
-        </div>
+        <div id="attributes">
+        {{#each attributes}}
+            <div class = "attribute">
+                    <div class = "clearfix">
+                        {{#if key}}
+                            {{#ifId ../id "sink"}}
+                                <input type = "text" value = "{{key}}" class = "attr-key"/>
+                            {{else}}
+                                <input type = "text" value = "{{key}}" class = "readonly-attr attr-key" readonly/>
+                            {{/ifId}}
+                            <input type = "text" value = "{{value}}" class = "attr-value"/>
+                        {{else}}
+                            <textarea class = "attr-value"> {{value}} </textarea>
+                        {{/if}}
+                    </div>
+                    <label class = "error-message"></label>
+            </div>
         {{/each}}
+        </div>
+        <button type="button" class="btn btn-default" id="btn-add-payload-map" style="display:none"> + Key Value</button>
     </div>
 </script>
 

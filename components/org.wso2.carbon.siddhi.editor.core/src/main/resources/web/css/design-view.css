@@ -692,7 +692,7 @@ a.list-group-item, button.list-group-item {
 	border: 1px solid #716e6e;
 }
 
-.source-sink-form-container input[type="text"].attr-key,
+.source-sink-form-container input[type="text"].readonly-attr,
 .source-sink-form-container #attributeMap-type:disabled,
 .table-form-container #store-type:disabled,
 .partition-form-container #define-partition-keys .partition-by-stream-name {
@@ -907,6 +907,10 @@ a.list-group-item, button.list-group-item {
 
 .design-view-form-content .cust-options .option {
 	margin-bottom: 2px;
+}
+
+.design-view-form-content .source-sink-form-container #stream-attributes {
+	margin-top: 10px;
 }
 
 .design-view-form-content .option .option-desc-content,

@@ -38,10 +38,8 @@ define(['log', 'jquery', 'lodash', 'sourceOrSinkAnnotation', 'mapAnnotation', 'p
             }
         };
 
-        const constAttribute = "attributes";
-        const constPayload = "payload";
-        const constMap = "map";
-        const constList = "list";
+        const PAYLOAD_MAP = "payload";
+        const PAYLOAD_LIST = "list";
 
         /**
          * Function to get the options of the selected sink/map type
@@ -138,7 +136,6 @@ define(['log', 'jquery', 'lodash', 'sourceOrSinkAnnotation', 'mapAnnotation', 'p
                 var attributeDiv = $('<div class="clearfix"> <label id="attribute-map-label">' +
                     '<input type="checkbox" id="attributeMap-checkBox"> Payload or Attribute Mapping' +
                     '</label> </div> <div class = "clearfix"> <select id = "attributeMap-type" disabled>' +
-                    '<option value = "attributeMap"> Enter attributes as key/value pairs </option>' +
                     '<option value = "payloadMap"> Enter payload as key/value pairs </option>' +
                     '<option value = "payloadList"> Enter a single payload attribute </option>' +
                     '</select></div>');
@@ -189,68 +186,46 @@ define(['log', 'jquery', 'lodash', 'sourceOrSinkAnnotation', 'mapAnnotation', 'p
         };
 
         /**
+		 * Function to add the error class
+		 * @param {Object} id object where the errors needs to be displayed
+		 */
+        var addErrorClass = function (id) {
+            $(id)[0].scrollIntoView();
+            $(id).addClass('required-input-field')
+        };
+
+        /**
          * Function to create attribute-map object with the saved attribute-map
          * @param {Object} savedMapperAttributes Saved attribute-map
-         * @param {Object} streamAttributes Attributes of the connected stream
          * @return {Object} attributes
          */
-        var createAttributeObjectList = function (savedMapperAttributes, streamAttributes) {
+        var createAttributeObjectList = function (savedMapperAttributes) {
             var attributeType = savedMapperAttributes.getType().toLowerCase();
-            var annotationType = savedMapperAttributes.getAnnotationType().toLowerCase();
             var attributeValues = savedMapperAttributes.getValue();
             var attributes = [];
-            if ((annotationType === constAttribute && attributeType === constMap) || (annotationType === constPayload &&
-                attributeType === constMap)) {
-                if (annotationType === constAttribute) {
-                    $('#define-attribute #attributeMap-type').val('attributeMap');
-                } else {
-                    $('#define-attribute #attributeMap-type').val('payloadMap');
-                }
-                for (streamAttribute of streamAttributes) {
-                    attributes.push({ key: streamAttribute.key, value: "" });
-                }
-                for (var mappedAttribute of attributes) {
-                    for (var attribute in attributeValues) {
-                        if (mappedAttribute.key === attribute) {
-                            mappedAttribute.value = attributeValues[attribute]
-                            break;
-                        }
-                    }
-                }
-            } else if (annotationType === constAttribute && attributeType === constList) {
-                $('#define-attribute #attributeMap-type').val('attributeMap');
-                for (streamAttribute of streamAttributes) {
-                    attributes.push({ key: streamAttribute.key, value: "" });
-                }
-
-                var i = 0;
-                for (var attribute in attributeValues) {
-                    if (i < streamAttributes.length) {
-                        attributes[i].value = attributeValues[attribute];
-                        i++;
-                    }
-                }
-            } else if (annotationType === constPayload && attributeType === constList) {
+            if (attributeType === PAYLOAD_LIST) {
                 $('#define-attribute #attributeMap-type').val('payloadList');
                 attributes.push({ value: attributeValues[0] });
+            } else {
+                $('#define-attribute #attributeMap-type').val('payloadMap');
+                for (var attribute in attributeValues) {
+                    attributes.push({ key: attribute, value: attributeValues[attribute] });
+                }
             }
             return attributes;
         };
 
         /**
          * Function to create attribute-map objects with empty values
-         * @param {Object} streamAttributes Attributes if the connected stream
          * @return {Object} attributes
          */
-        var initialiseAttributeContent = function (streamAttributes) {
+        var initialiseAttributeContent = function () {
             var selectedAttributeType = $('#define-attribute #attributeMap-type').val();
             var attributes = [];
-            if (selectedAttributeType === 'attributeMap' || selectedAttributeType === 'payloadMap') {
-                for (var streamAttribute of streamAttributes) {
-                    attributes.push({ key: streamAttribute.key, value: "" });
-                }
-            } else {
+            if (selectedAttributeType === "payloadList") {
                 attributes.push({ value: "" });
+            } else {
+                attributes.push({ key: " ", value: "" });
             }
             return attributes;
         };
@@ -258,11 +233,23 @@ define(['log', 'jquery', 'lodash', 'sourceOrSinkAnnotation', 'mapAnnotation', 'p
         /**
          * Function to render the attribute-map div using handlebars
          * @param {Object} attributes which needs to be mapped on to the template
+         * @param {Object} streamAttributes to display the stream attributes
          */
-        var renderAttributeMappingContent = function (attributes) {
+        var renderAttributeMappingContent = function (attributes, streamAttributes) {
             var attributeMapFormTemplate = Handlebars.compile($('#source-sink-map-attribute-template').html());
-            var wrappedHtml = attributeMapFormTemplate(attributes);
+            var wrappedHtml = attributeMapFormTemplate({ id: "sink", attributes: attributes });
             $('#attribute-map-content').html(wrappedHtml);
+            var streamAttributeMessage = "Stream Attributes are: ";
+            _.forEach(streamAttributes, function (attribute) {
+                streamAttributeMessage += attribute.key + ", ";
+            });
+            streamAttributeMessage = streamAttributeMessage.substring(0, streamAttributeMessage.length - 2);
+            $('#stream-attributes').html(streamAttributeMessage);
+            if (!attributes[0].key) {
+                $('#btn-add-payload-map').hide()
+            } else {
+                $('#btn-add-payload-map').show()
+            }
         }
 
         /**
@@ -291,9 +278,8 @@ define(['log', 'jquery', 'lodash', 'sourceOrSinkAnnotation', 'mapAnnotation', 'p
          * @param {String} id to identify the div in the html to traverse
          * @return {boolean} isError
          */
-        var validateCustomizedOptions = function (selectedOptions, id) {
+        var validateCustomizedOptions = function (id) {
             var isError = false;
-            var option = "";
             if ($('#customized-' + id + ' ul').has('li').length != 0) {
                 $('#customized-' + id + ' .option').each(function () {
                     var custOptName = $(this).find('.cust-option-key').val().trim();
@@ -301,19 +287,14 @@ define(['log', 'jquery', 'lodash', 'sourceOrSinkAnnotation', 'mapAnnotation', 'p
                     if ((custOptName != "") || (custOptValue != "")) {
                         if (custOptName == "") {
                             $(this).find('.error-message').text('Option key is required.');
-                            $(this)[0].scrollIntoView();
-                            $(this).find('.cust-option-key').addClass('required-input-field');
+                            addErrorClass($(this).find('.cust-option-key'))
                             isError = true;
                             return false;
                         } else if (custOptValue == "") {
                             $(this).find('.error-message').text('Option value is required.');
-                            $(this)[0].scrollIntoView();
-                            $(this).find('.cust-option-value').addClass('required-input-field');
+                            addErrorClass($(this).find('.cust-option-value'));
                             isError = true;
                             return false;
-                        } else {
-                            option = custOptName + " = \"" + custOptValue + "\"";
-                            selectedOptions.push(option);
                         }
                     }
                 });
@@ -391,61 +372,95 @@ define(['log', 'jquery', 'lodash', 'sourceOrSinkAnnotation', 'mapAnnotation', 'p
 
         /**
          * Function to validate the predefined options
-         * @param {Object} selectedOptions array to add the options which needs to be saved
          * @param {Object} predefinedOptions
          * @param {String} id to identify the div in the html to traverse
          * @return {boolean} isError
          */
-        var validateOptions = function (selectedOptions, predefinedOptions, id) {
+        var validateOptions = function (predefinedOptions, id) {
             var isError = false;
-            var option = "";
             $('.source-sink-map-options #' + id + ' .option').each(function () {
                 var optionName = $(this).find('.option-name').text().trim();
                 var optionValue = $(this).find('.option-value').val().trim();
                 var predefinedOptionObject = getOption(optionName, predefinedOptions);
                 if (!predefinedOptionObject.optional) {
-                    if (optionValue == "") {
-                        $(this).find('.error-message').text('Option value is required.');
-                        $(this)[0].scrollIntoView();
-                        $(this).find('.option-value').addClass('required-input-field');
+                    if (!checkOptionValue(optionValue, predefinedOptionObject, this)) {
                         isError = true;
                         return false;
-                    } else {
-                        var dataType = predefinedOptionObject.type[0];
-                        if (validateDataType(dataType, optionValue)) {
-                            $(this).find('.error-message').text('Invalid data-type. ' + dataType + ' required.');
-                            $(this)[0].scrollIntoView();
-                            $(this).find('.option-value').addClass('required-input-field');
+                    }
+                } else {
+                    if ($(this).find('.option-checkbox').is(":checked")) {
+                        if (!checkOptionValue(optionValue, predefinedOptionObject, this)) {
                             isError = true;
                             return false;
                         }
                     }
+                }
+            });
+            return isError;
+        };
+
+        /**
+         * Function to check if a particular option value is valid
+         * @param {String} optionValue value which needs to be validated
+         * @param {Object} predefinedOptionObject predefined object of the option
+         * @param {Object} parent div of the particular option
+         */
+        var checkOptionValue = function (optionValue, predefinedOptionObject, parent) {
+            if (optionValue == "") {
+                $(parent).find('.error-message').text('Option value is required.');
+                addErrorClass($(parent).find('.option-value'));
+                return false;
+            } else {
+                var dataType = predefinedOptionObject.type[0];
+                if (validateDataType(dataType, optionValue)) {
+                    $(parent).find('.error-message').text('Invalid data-type. ' + dataType + ' required.');
+                    addErrorClass($(parent).find('.option-value'));
+                    return false;
+                }
+            }
+            return true;
+        };
+
+        /**
+         * Function to build the options
+         * @param {Object} predefinedOptions predefined options
+         * @param {Object} selectedOptions array to add the built option 
+         * @param {String} id div of the options which needs to be built [mapper or sink]
+         */
+        var buildOptions = function (predefinedOptions, selectedOptions, id) {
+            var option;
+            $('.source-sink-map-options #' + id + ' .option').each(function () {
+                var optionName = $(this).find('.option-name').text().trim();
+                var optionValue = $(this).find('.option-value').val().trim();
+                var predefinedOptionObject = getOption(optionName, predefinedOptions);
+                if (!predefinedOptionObject.optional) {
                     option = optionName + " = \"" + optionValue + "\"";
                     selectedOptions.push(option);
                 } else {
                     if ($(this).find('.option-checkbox').is(":checked")) {
-                        if (optionValue == "") {
-                            $(this).find('.error-message').text('Option value is required.');
-                            $(this)[0].scrollIntoView();
-                            $(this).find('.option-value').addClass('required-input-field');
-                            isError = true;
-                            return false;
-                        } else {
-                            var dataType = predefinedOptionObject.type[0];
-                            if (validateDataType(dataType, optionValue)) {
-                                $(this).find('.error-message').text('Invalid data-type. ' + dataType + ' required.');
-                                $(this)[0].scrollIntoView();
-                                $(this).find('.option-value').addClass('required-input-field');
-                                isError = true;
-                                return false;
-                            }
-                        }
                         option = optionName + " = \"" + optionValue + "\"";
                         selectedOptions.push(option);
                     }
                 }
             });
-            return isError;
+        };
+        /**
+         * Function to build the customized options
+         * @param {Object} selectedOptions array to add the built option 
+         * @param {String} id div of the options which needs to be built [mapper or sink]
+         */
+        var buildCustomizedOption = function (selectedOptions, id) {
+            var option = "";
+            if ($('#customized-' + id + ' ul').has('li').length != 0) {
+                $('#customized-' + id + ' .option').each(function () {
+                    var custOptName = $(this).find('.cust-option-key').val().trim();
+                    var custOptValue = $(this).find('.cust-option-value').val().trim();
+                    if ((custOptName != "") && (custOptValue != "")) {
+                        option = custOptName + " = \"" + custOptValue + "\"";
+                        selectedOptions.push(option);
+                    }
+                });
+            }
         };
 
         /**
@@ -553,17 +568,26 @@ define(['log', 'jquery', 'lodash', 'sourceOrSinkAnnotation', 'mapAnnotation', 'p
                     if ($(this).is(':checked')) {
                         var attributes = [];
                         if (map && map.getPayloadOrAttribute()) {
-                            attributes = createAttributeObjectList(savedMapperAttributes, streamAttributes);
+                            attributes = createAttributeObjectList(savedMapperAttributes);
                         } else {
-                            attributes = initialiseAttributeContent(streamAttributes);
+                            attributes = initialiseAttributeContent();
                         }
                         $('#attribute-map-content').show();
-                        renderAttributeMappingContent(attributes)
+                        renderAttributeMappingContent(attributes, streamAttributes)
                         $('#define-attribute #attributeMap-type').prop('disabled', false);
                     } else {
                         $('#attribute-map-content').hide();
                         $("#define-attribute #attributeMap-type").prop('disabled', 'disabled');
                     }
+                });
+
+                //onclick of the payload key value add button
+                $('#attribute-map-content').on('click', '#btn-add-payload-map', function () {
+                    var payloadMapDiv = '<div class= "attribute"> <div class= "clearfix">' +
+                        '<input type = "text" value = "" class = "attr-key"/> ' +
+                        ' <input type = "text" value = "" class = "attr-value"/>' +
+                        '</div> <label class = "error-message"></label> </div>';
+                    $('#attribute-map-content').find('#attributes').append(payloadMapDiv);
                 });
 
                 //get the clicked element's information
@@ -651,8 +675,8 @@ define(['log', 'jquery', 'lodash', 'sourceOrSinkAnnotation', 'mapAnnotation', 'p
                     if (savedMapperAttributes) {
                         $('#define-attribute #attributeMap-checkBox').prop('checked', true);
                         $('#define-attribute #attributeMap-type').prop('disabled', false);
-                        attributes = createAttributeObjectList(savedMapperAttributes, streamAttributes);
-                        renderAttributeMappingContent(attributes);
+                        attributes = createAttributeObjectList(savedMapperAttributes);
+                        renderAttributeMappingContent(attributes, streamAttributes);
                     }
                 }
 
@@ -675,9 +699,9 @@ define(['log', 'jquery', 'lodash', 'sourceOrSinkAnnotation', 'mapAnnotation', 'p
                     } else if (map && savedMapperAttributes) {
                         renderAttributeMapping();
                         $('#define-attribute #attributeMap-checkBox').prop('checked', true);
-                        attributes = createAttributeObjectList(savedMapperAttributes, streamAttributes);
+                        attributes = createAttributeObjectList(savedMapperAttributes);
                     }
-                    renderAttributeMappingContent(attributes);
+                    renderAttributeMappingContent(attributes, streamAttributes);
                 });
 
                 //onchange of attribute type selection
@@ -685,23 +709,19 @@ define(['log', 'jquery', 'lodash', 'sourceOrSinkAnnotation', 'mapAnnotation', 'p
                     var attributes = [];
                     if (map && savedMapperAttributes) {
                         var attributeType = savedMapperAttributes.getType().toLowerCase();
-                        var annotationType = savedMapperAttributes.getAnnotationType().toLowerCase();
                         var selAttributeType = "";
-                        if ((annotationType === constAttribute && attributeType === constMap) ||
-                            (annotationType === constAttribute && attributeType === constList)) {
-                            selAttributeType = "attributeMap"
-                        } else if ((annotationType === constPayload && attributeType === constMap)) {
-                            selAttributeType = "payloadMap"
-                        } else {
+                        if (attributeType === PAYLOAD_LIST) {
                             selAttributeType = "payloadList"
+                        } else {
+                            selAttributeType = "payloadMap"
                         }
                     }
                     if (map && savedMapperAttributes && selAttributeType === this.value) {
-                        attributes = createAttributeObjectList(savedMapperAttributes, streamAttributes);
+                        attributes = createAttributeObjectList(savedMapperAttributes);
                     } else {
                         attributes = initialiseAttributeContent(streamAttributes);
                     }
-                    renderAttributeMappingContent(attributes)
+                    renderAttributeMappingContent(attributes, streamAttributes)
                 });
 
                 //onclick of submit
@@ -719,68 +739,68 @@ define(['log', 'jquery', 'lodash', 'sourceOrSinkAnnotation', 'mapAnnotation', 'p
                         isErrorOccurred = true;
                         return;
                     } else {
-                        var annotationOptions = [];
-                        if (validateOptions(annotationOptions, sinkOptions, "sink-options")) {
+                        if (validateOptions(sinkOptions, "sink-options")) {
                             isErrorOccurred = true;
                             return;
                         }
-                        if (validateCustomizedOptions(annotationOptions, "sink-options")) {
+                        if (validateCustomizedOptions("sink-options")) {
                             isErrorOccurred = true;
                             return;
                         }
 
                         var selectedMapType = $('#define-map #map-type').val();
-                        var mapperAnnotationOptions = [];
 
-                        if (validateOptions(mapperAnnotationOptions, mapperOptions, "mapper-options")) {
+                        if (validateOptions(mapperOptions, "mapper-options")) {
                             isErrorOccurred = true;
                             return;
                         }
-                        if (validateCustomizedOptions(mapperAnnotationOptions, "mapper-options")) {
+                        if (validateCustomizedOptions("mapper-options")) {
                             isErrorOccurred = true;
                             return;
                         }
 
                         if ($('#define-attribute #attributeMap-checkBox').is(":checked")) {
                             //if attribute section is checked
-                            var mapperAttributeValuesArray = {};
                             var attributeType;
-                            var annotationType;
                             var selAttributeType = $('#define-attribute #attributeMap-type').val();
                             // to identify the selected attribute type and annotation type for attribute-mapper annotation
-                            if (selAttributeType === "attributeMap" || selAttributeType === "payloadMap") {
+                            if (selAttributeType === "payloadMap") {
+                                var isEmptyList = false
+                                var mapperAttributeValuesArray = {};
                                 attributeType = "MAP";
-                                if (selAttributeType === "attributeMap") {
-                                    annotationType = "ATTRIBUTES"
-                                } else {
-                                    annotationType = "PAYLOAD"
-                                }
                                 //validate attribute value if it is not filled
                                 $('#mapper-attributes .attribute').each(function () {
                                     var key = $(this).find('.attr-key').val().trim();
                                     var value = $(this).find('.attr-value').val().trim();
-                                    if (value == "") {
-                                        $(this).find('.error-message').text('Attribute Value is ' +
-                                            'required')
-                                        $(this)[0].scrollIntoView();
-                                        $(this).find('.attr-value').addClass('required-input-field');
-                                        isErrorOccurred = true;
-                                        return false;
-                                    } else {
-                                        mapperAttributeValuesArray[key] = value;
+                                    if (key != "" || value != "") {
+                                        if (key == "") {
+                                            $(this).find('.error-message').text('Payload key is required.')
+                                            addErrorClass($(this).find('.attr-key'));
+                                            isErrorOccurred = true;
+                                            return false;
+                                        } else if (value == "") {
+                                            $(this).find('.error-message').text('Payload value is required.')
+                                            addErrorClass($(this).find('.attr-value'));
+                                            isErrorOccurred = true;
+                                            return false;
+                                        } else {
+                                            mapperAttributeValuesArray[key] = value;
+                                        }
                                     }
                                 });
+                                if (_.isEmpty(mapperAttributeValuesArray)) {
+                                    isEmptyList = true;
+                                }
+
                             } else {
                                 var mapperAttributeValuesArray = [];
-                                attributeType = "LIST"
-                                annotationType = "PAYLOAD"
+                                attributeType = "LIST";
                                 var value = $('#mapper-attributes .attribute .attr-value:first').val().trim();
                                 //validate the single payload attribute value if it is empty
                                 if (value == "") {
+                                    addErrorClass($('#mapper-attributes .attribute .error-message:first'));
                                     $('#mapper-attributes .attribute .error-message:first').text('Payload Value is ' +
                                         'required')
-                                    $('#mapper-attributes .attribute .attr-value:first')[0].scrollIntoView();
-                                    $('#mapper-attributes .attribute .attr-value:first').addClass('required-input-field');
                                     isErrorOccurred = true;
                                 } else {
                                     mapperAttributeValuesArray.push(value);
@@ -791,6 +811,9 @@ define(['log', 'jquery', 'lodash', 'sourceOrSinkAnnotation', 'mapAnnotation', 'p
 
                     if (!isErrorOccurred) {
                         clickedElement.setType(selectedSinkType);
+                        var annotationOptions = [];
+                        buildOptions(sinkOptions, annotationOptions, "sink-options");
+                        buildCustomizedOption(annotationOptions, "sink-options");
                         if (annotationOptions.length == 0) {
                             clickedElement.setOptions(undefined);
                         } else {
@@ -798,6 +821,9 @@ define(['log', 'jquery', 'lodash', 'sourceOrSinkAnnotation', 'mapAnnotation', 'p
                         }
 
                         var mapper = {};
+                        var mapperAnnotationOptions = [];
+                        buildOptions(mapperOptions, mapperAnnotationOptions, "mapper-options");
+                        buildCustomizedOption(mapperAnnotationOptions, "mapper-options");
                         _.set(mapper, 'type', selectedMapType);
                         if (mapperAnnotationOptions.length == 0) {
                             _.set(mapper, 'options', undefined);
@@ -805,9 +831,9 @@ define(['log', 'jquery', 'lodash', 'sourceOrSinkAnnotation', 'mapAnnotation', 'p
                             _.set(mapper, 'options', mapperAnnotationOptions);
                         }
 
-                        if ($('#define-attribute #attributeMap-checkBox').is(":checked")) {
+                        if ($('#define-attribute #attributeMap-checkBox').is(":checked") && !isEmptyList) {
                             payloadOrAttributeOptions = {};
-                            _.set(payloadOrAttributeOptions, 'annotationType', annotationType);
+                            _.set(payloadOrAttributeOptions, 'annotationType', 'PAYLOAD');
                             _.set(payloadOrAttributeOptions, 'type', attributeType);
                             _.set(payloadOrAttributeOptions, 'value', mapperAttributeValuesArray);
                             var payloadOrAttributeObject = new PayloadOrAttribute(payloadOrAttributeOptions);
