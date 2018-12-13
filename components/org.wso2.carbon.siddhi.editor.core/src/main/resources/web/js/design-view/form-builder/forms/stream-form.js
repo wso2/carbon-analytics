@@ -411,7 +411,7 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'designViewUtils', 'j
                 '<label class="error-message" id="streamNameErrorMessage"></label> <div id="define-attribute"></div>' +
                 '<button id="btn-submit" type="button" class="btn toggle-view-button"> Submit </button>' +
                 '<button id="btn-cancel" type="button" class="btn btn-default"> Cancel </button>' +
-                '</div> <div class= "stream-form-container" id="define-annotation"> </div>');
+                '</div> <div class= "stream-form-container"> <div id="define-annotation"> </div> </div>');
             formContainer.append(propertyDiv);
             self.designViewContainer.addClass('disableContainer');
             self.toggleViewButton.addClass('disableContainer');
@@ -623,6 +623,7 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'designViewUtils', 'j
                     return;
                 }
 
+				var annotationNodes = [];
                 if (validatePredefinedAnnotations(predefinedAnnotationList, annotationNodes)) {
                     isErrorOccurred = true;
                     return;
@@ -663,7 +664,6 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'designViewUtils', 'j
                         }
                     });
 
-                    var annotationNodes = [];
                     var annotationStringList = [];
                     var annotationObjectList = [];
                     //clear the saved annotations
