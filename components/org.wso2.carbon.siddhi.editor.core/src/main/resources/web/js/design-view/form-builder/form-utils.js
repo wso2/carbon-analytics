@@ -16,8 +16,8 @@
  * under the License.
  */
 
-define(['require', 'lodash'],
-    function (require, _) {
+define(['require', 'lodash', 'appData'],
+    function (require, _, AppData) {
 
         /**
          * @class FormUtils Contains utility methods for forms
@@ -212,7 +212,11 @@ define(['require', 'lodash'],
             });
         };
 
-        FormUtils.prototype.getTooltips = function (designViewJSON) {
+        /**
+         * Generate tooltip for partition
+         * @param designViewJSON sidhhiAppConfig
+         */
+        FormUtils.prototype.getPartitionTooltip = function (designViewJSON) {
             var self = this;
             var result = {};
             self.tooltipsURL = window.location.protocol + "//" + window.location.host + "/editor/tooltips";
@@ -229,6 +233,88 @@ define(['require', 'lodash'],
                         result = {status: "fail", errorMessage: error.responseText};
                     } else {
                         result = {status: "fail", errorMessage: "Error Occurred while processing your request"};
+                    }
+                }
+            });
+            return result;
+        };
+
+        /**
+         * Generate tooltip for siddhi app elements
+         *
+         * @param element JSON object of the element
+         * @param type type of the element
+         * @returns {string} tooltip
+         */
+        FormUtils.prototype.getTooltip = function (element, type) {
+            var appData = new AppData();
+
+            switch (type) {
+                case "aggregation" :
+                    appData.addAggregation(element);
+                    break;
+
+                case "function" :
+                    appData.addFunction(element);
+                    break;
+
+                case "join-query" :
+                    appData.addJoinQuery(element);
+                    break;
+
+                case "pattern-query" :
+                    appData.addPatternQuery(element);
+                    break;
+
+                case "sequence-query" :
+                    appData.addSequenceQuery(element);
+                    break;
+
+                case "sink" :
+                    appData.addSink(element);
+                    break;
+
+                case "source" :
+                    appData.addSource(element);
+                    break;
+
+                case "stream" :
+                    appData.addStream(element);
+                    break;
+
+                case "table" :
+                    appData.addTable(element);
+                    break;
+
+                case "trigger" :
+                    appData.addTrigger(element);
+                    break;
+
+                case "window-filter-projection-query" :
+                    appData.addWindowFilterProjectionQuery(element);
+                    break;
+
+                case "window" :
+                    appData.addWindow(element);
+                    break;
+            }
+
+            var self = this;
+            var result = '';
+            self.tooltipsURL = window.location.protocol + "//" + window.location.host + "/editor/tooltips";
+            $.ajax({
+                type: "POST",
+                url: self.tooltipsURL,
+                data: window.btoa(JSON.stringify(appData)),
+                async: false,
+                success: function (response) {
+                    result = response[0].text;
+                },
+                error: function (error) {
+                    if (error.responseText) {
+                        console.log(error.responseText);
+                    } else {
+                        console.log("Error occured while processing the request");
                     }
                 }
             });

@@ -145,24 +145,8 @@ define(['require', 'log', 'jquery', 'lodash', 'functionDefinition', 'designViewU
 
                 $('#' + i).removeClass('incomplete-element');
 
-                //Send SiddhiApp Config to the backend and get tooltip
-                var sendingString = JSON.stringify(self.configurationData.siddhiAppConfig);
-                var response = self.formUtils.getTooltips(sendingString);
-                var tooltipList=[];
-                if (response.status === "success") {
-                    tooltipList = response.tooltipList;
-                } else {
-                    console.log(response.errorMessage);
-                }
-
-                var functionToolTip = '';
-                for (var x in tooltipList) {
-                    if (tooltipList[x].id === i) {
-                        functionToolTip = tooltipList[x].text;
-                        break;
-                    }
-                }
-
+                //Send function element to the backend and generate tooltip
+                var functionToolTip = self.formUtils.getTooltip(functionObject, "function");
                 $('#' + i).prop('title', functionToolTip);
 
                 // close the form window
@@ -262,24 +246,8 @@ define(['require', 'log', 'jquery', 'lodash', 'functionDefinition', 'designViewU
                 var textNode = $(element).parent().find('.functionNameNode');
                 textNode.html(config.name);
 
-                //Send SiddhiApp Config to the backend and get tooltip
-                var sendingString = JSON.stringify(self.configurationData.siddhiAppConfig);
-                var response = self.formUtils.getTooltips(sendingString);
-                var tooltipList=[];
-                if (response.status === "success") {
-                    tooltipList = response.tooltipList;
-                } else {
-                    console.log(response.errorMessage);
-                }
-
-                var functionToolTip = '';
-                for (var i in tooltipList) {
-                    if (tooltipList[i].id === id) {
-                        functionToolTip = tooltipList[i].text;
-                        break;
-                    }
-                }
-
+                //Send function element to the backend and generate tooltip
+                var functionToolTip = self.formUtils.getTooltip(clickedElement, "function");
                 $('#' + id).prop('title', functionToolTip);
 
                 // close the form window

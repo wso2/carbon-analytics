@@ -2552,6 +2552,11 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
             });
         };
 
+        /**
+         * Generate tooltips for all the elements
+         *
+         * @param designViewJSON siddhiAppConfig
+         */
         DesignGrid.prototype.getTooltips = function (designViewJSON) {
             var self = this;
             var result = {};

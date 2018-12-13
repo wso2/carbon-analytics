@@ -142,24 +142,8 @@ define(['require', 'log', 'jquery', 'lodash', 'trigger', 'designViewUtils'],
 
                 $('#' + i).removeClass('incomplete-element');
 
-                //Send SiddhiApp Config to the backend and get tooltip
-                var sendingString = JSON.stringify(self.configurationData.siddhiAppConfig);
-                var response = self.formUtils.getTooltips(sendingString);
-                var tooltipList=[];
-                if (response.status === "success") {
-                    tooltipList = response.tooltipList;
-                } else {
-                    console.log(response.errorMessage);
-                }
-
-                var triggerToolTip = '';
-                for (var x in tooltipList) {
-                    if (tooltipList[x].id === i) {
-                        triggerToolTip = tooltipList[x].text;
-                        break;
-                    }
-                }
-
+                //Send trigger element to the backend and generate tooltip
+                var triggerToolTip = self.formUtils.getTooltip(trigger, "trigger");
                 $('#' + i).prop('title', triggerToolTip);
 
                 // close the form window
@@ -261,24 +245,8 @@ define(['require', 'log', 'jquery', 'lodash', 'trigger', 'designViewUtils'],
                 var textNode = $(element).parent().find('.triggerNameNode');
                 textNode.html(config.name);
 
-                //Send SiddhiApp Config to the backend and get tooltip
-                var sendingString = JSON.stringify(self.configurationData.siddhiAppConfig);
-                var response = self.formUtils.getTooltips(sendingString);
-                var tooltipList=[];
-                if (response.status === "success") {
-                    tooltipList = response.tooltipList;
-                } else {
-                    console.log(response.errorMessage);
-                }
-
-                var triggerToolTip = '';
-                for (var i in tooltipList) {
-                    if (tooltipList[i].id === id) {
-                        triggerToolTip = tooltipList[i].text;
-                        break;
-                    }
-                }
-
+                //Send trigger element to the backend and generate tooltip
+                var triggerToolTip = self.formUtils.getTooltip(clickedElement, "trigger");
                 $('#' + id).prop('title', triggerToolTip);
 
                 // close the form window

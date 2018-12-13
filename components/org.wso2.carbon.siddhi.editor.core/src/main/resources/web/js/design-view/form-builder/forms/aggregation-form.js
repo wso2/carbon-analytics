@@ -648,24 +648,8 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'aggregation', 'aggre
                     self.designViewContainer.removeClass('disableContainer');
                     self.toggleViewButton.removeClass('disableContainer');
 
-                    //Send SiddhiApp Config to the backend and get tooltip
-                    var sendingString = JSON.stringify(self.configurationData.siddhiAppConfig);
-                    var response = self.formUtils.getTooltips(sendingString);
-                    var tooltipList=[];
-                    if (response.status === "success") {
-                        tooltipList = response.tooltipList;
-                    } else {
-                        console.log(response.errorMessage);
-                    }
-
-                    var aggregationToolTip = '';
-                    for (var i in tooltipList) {
-                        if (tooltipList[i].id === id) {
-                            aggregationToolTip = tooltipList[i].text;
-                            break;
-                        }
-                    }
-
+                    //Send aggregation element to the backend and generate tooltip
+                    var aggregationToolTip = self.formUtils.getTooltip(clickedElement, "aggregation");
                     $('#' + id).prop('title', aggregationToolTip);
 
                     // close the form aggregation

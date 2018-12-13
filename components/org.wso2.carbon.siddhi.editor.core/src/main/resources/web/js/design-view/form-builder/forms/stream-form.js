@@ -652,24 +652,8 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'stream', 'designView
                 self.designViewContainer.removeClass('disableContainer');
                 self.toggleViewButton.removeClass('disableContainer');
 
-                //Send SiddhiApp Config to the backend and get tooltip
-                var sendingString = JSON.stringify(self.configurationData.siddhiAppConfig);
-                var response = self.formUtils.getTooltips(sendingString);
-                var tooltipList=[];
-                if (response.status === "success") {
-                    tooltipList = response.tooltipList;
-                } else {
-                    console.log(response.errorMessage);
-                }
-
-                var streamToolTip = '';
-                for (var i in tooltipList) {
-                    if (tooltipList[i].id === id) {
-                        streamToolTip = tooltipList[i].text;
-                        break;
-                    }
-                }
-
+                //Send stream element to the backend and generate tooltip
+                var streamToolTip = self.formUtils.getTooltip(clickedElement, "stream");
                 $('#' + id).prop('title', streamToolTip);
 
                 // close the form window

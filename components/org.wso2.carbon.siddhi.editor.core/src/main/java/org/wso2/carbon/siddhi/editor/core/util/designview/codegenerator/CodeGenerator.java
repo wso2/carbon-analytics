@@ -100,26 +100,12 @@ public class CodeGenerator {
     public List<ToolTip> generateSiddhiAppToolTips(SiddhiAppConfig siddhiAppConfig) throws CodeGenerationException {
         SiddhiAppConfig siddhiApp = siddhiAppConfig;
 
-        List<QueryConfig> queries = new ArrayList<>();
-        for (List<QueryConfig> queryList : siddhiApp.getQueryLists().values()) {
-            queries.addAll(queryList);
-        }
-        for (PartitionConfig partition : siddhiApp.getPartitionList()) {
-            for (List<QueryConfig> queryList : partition.getQueryLists().values()) {
-                queries.addAll(queryList);
-            }
-        }
-        List<StreamConfig> streamsToBeGenerated = CodeGeneratorUtils.getStreamsToBeGenerated(siddhiApp.getStreamList(),
-                siddhiApp.getSourceList(), siddhiApp.getSinkList(), queries);
-        List<String> definitionsToBeGenerated = CodeGeneratorUtils.getDefinitionNames(streamsToBeGenerated,
-                siddhiApp.getTableList(), siddhiApp.getWindowList(), siddhiApp.getTriggerList(),
-                siddhiApp.getAggregationList(), siddhiApp.getPartitionList());
         List<String> allDefinitions = CodeGeneratorUtils.getDefinitionNames(siddhiApp.getStreamList(),
                 siddhiApp.getTableList(), siddhiApp.getWindowList(), siddhiApp.getTriggerList(),
                 siddhiApp.getAggregationList(), siddhiApp.getPartitionList());
 
         List <ToolTip> toolTipList = new ArrayList<>();
-        toolTipList.addAll(generateStreamSinkSourceToolTips(streamsToBeGenerated, siddhiApp.getSourceList(),
+        toolTipList.addAll(generateStreamSinkSourceToolTips(siddhiApp.getStreamList(), siddhiApp.getSourceList(),
                 siddhiApp.getSinkList()));
         toolTipList.addAll(generateTableToolTips(siddhiApp.getTableList()));
         toolTipList.addAll(generateWindowToolTips(siddhiApp.getWindowList()));
@@ -127,7 +113,7 @@ public class CodeGenerator {
         toolTipList.addAll(generateAggregationToolTips(siddhiApp.getAggregationList()));
         toolTipList.addAll(generateFunctionToolTips(siddhiApp.getFunctionList()));
         toolTipList.addAll(generateExcecutionElementToolTips(siddhiApp.getQueryLists(), siddhiApp.getPartitionList(),
-                definitionsToBeGenerated, allDefinitions));
+                allDefinitions));
 
         return toolTipList;
     }
@@ -231,11 +217,7 @@ public class CodeGenerator {
                                                             List<SourceSinkConfig> sinkList)
             throws CodeGenerationException {
         List<ToolTip> streamSourceSinkToolTipList = new ArrayList<>();
-
-        if (streamList == null || streamList.isEmpty()) {
-            return streamSourceSinkToolTipList;
-        }
-        List<SourceSinkConfig> sourcesAndSinks = new LinkedList<>();
+        List<SourceSinkConfig> sourcesAndSinks = new ArrayList<>();
         sourcesAndSinks.addAll(sourceList);
         sourcesAndSinks.addAll(sinkList);
 
@@ -244,17 +226,13 @@ public class CodeGenerator {
 
         for (StreamConfig stream : streamList) {
             CodeGeneratorUtils.NullValidator.validateConfigObject(stream);
-            if (stream.getPartitionId() != null && !stream.getPartitionId().isEmpty()) {
-                continue;
-            }
-
-            for (SourceSinkConfig sourceSink : sourcesAndSinks) {
-                if (stream.getName().equals(sourceSink.getConnectedElementName())) {
-                    streamSourceSinkToolTipList.add(new ToolTip(sourceSink.getId(),
-                            sourceSinkToolTipGenerator.generateSourceSink(sourceSink)));
-                }
-            }
             streamSourceSinkToolTipList.add(new ToolTip(stream.getId(), streamToolTipGenerator.generateStream(stream)));
+        }
+
+        for (SourceSinkConfig sourceSink : sourcesAndSinks) {
+            streamSourceSinkToolTipList.add(new ToolTip(sourceSink.getId(),
+                    sourceSinkToolTipGenerator.generateSourceSink(sourceSink)));
+
         }
 
         return streamSourceSinkToolTipList;
@@ -540,14 +518,12 @@ public class CodeGenerator {
      *
      * @param queryLists               The list of queries in a Siddhi app
      * @param partitions               The list of partitions in a Siddhi app
-     * @param definitionsToBeGenerated The names of all the definition elements that are to be defined in the app
      * @param allDefinitions           The names of all the definition elements in the Siddhi app
      * @return List of tooltips for  queries and partitions in a Siddhi app
      * @throws CodeGenerationException Error while generating the code
      */
     private List<ToolTip> generateExcecutionElementToolTips(Map<QueryListType, List<QueryConfig>> queryLists,
                                                             List<PartitionConfig> partitions,
-                                                            List<String> definitionsToBeGenerated,
                                                             List<String> allDefinitions)
             throws CodeGenerationException {
         List <ToolTip> excecutionElementTooltipList = new ArrayList<>();
@@ -561,8 +537,8 @@ public class CodeGenerator {
                 CodeGeneratorUtils.convertToExecutionElements(queries, partitions);
         QueryToolTipGenerator queryToolTipGenerator = new QueryToolTipGenerator();
         PartitionToolTipGenerator partitionToolTipGenerator = new PartitionToolTipGenerator();
-        for (ExecutionElementConfig executionElement :
-                CodeGeneratorUtils.reorderExecutionElements(executionElements, definitionsToBeGenerated)) {
+        for (ExecutionElementConfig executionElement : executionElements) {
+
             if (executionElement.getType().equalsIgnoreCase(CodeGeneratorConstants.QUERY)) {
                 QueryConfig query = (QueryConfig) executionElement.getValue();
                 excecutionElementTooltipList.add(new ToolTip(query.getId(),

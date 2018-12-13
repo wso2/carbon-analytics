@@ -1338,23 +1338,8 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
                     self.designViewContainer.removeClass('disableContainer');
                     self.toggleViewButton.removeClass('disableContainer');
 
-                    //Send SiddhiApp Config to the backend and get tooltip
-                    var sendingString = JSON.stringify(self.configurationData.siddhiAppConfig);
-                    var response = self.formUtils.getTooltips(sendingString);
-                    var tooltipList=[];
-                    if (response.status === "success") {
-                        tooltipList = response.tooltipList;
-                    } else {
-                        console.log(response.errorMessage);
-                    }
-
-                    var queryToolTip = '';
-                    for (var i in tooltipList) {
-                        if (tooltipList[i].id === id) {
-                            queryToolTip = tooltipList[i].text;
-                            break;
-                        }
-                    }
+                    //Send query element to the backend and generate tooltip
+                    var queryToolTip = self.formUtils.getTooltip(clickedElement, "window-filter-projection-query");
                     $('#' + id).prop('title', queryToolTip);
 
                     // close the form window

@@ -202,7 +202,7 @@ define(['require', 'log', 'jquery', 'lodash', 'partitionWith', 'designViewUtils'
 
                     //Send SiddhiApp Config to the backend and get tooltip
                     var sendingString = JSON.stringify(self.configurationData.siddhiAppConfig);
-                    var response = self.formUtils.getTooltips(sendingString);
+                    var response = self.formUtils.getPartitionTooltip(sendingString);
                     var tooltipList=[];
                     if (response.status === "success") {
                         tooltipList = response.tooltipList;

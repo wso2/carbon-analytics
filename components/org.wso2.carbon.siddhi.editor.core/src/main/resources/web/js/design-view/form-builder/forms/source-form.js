@@ -776,24 +776,8 @@ define(['log', 'jquery', 'lodash', 'sourceOrSinkAnnotation', 'mapAnnotation', 'p
                     self.designViewContainer.removeClass('disableContainer');
                     self.toggleViewButton.removeClass('disableContainer');
 
-                    //Send SiddhiApp Config to the backend and get tooltip
-                    var sendingString = JSON.stringify(self.configurationData.siddhiAppConfig);
-                    var response = self.formUtils.getTooltips(sendingString);
-                    var tooltipList=[];
-                    if (response.status === "success") {
-                        tooltipList = response.tooltipList;
-                    } else {
-                        console.log(response.errorMessage);
-                    }
-
-                    var sourceToolTip = '';
-                    for (var i in tooltipList) {
-                        if (tooltipList[i].id === id) {
-                            sourceToolTip = tooltipList[i].text;
-                            break;
-                        }
-                    }
-
+                    //Send source element to the backend and generate tooltip
+                    var sourceToolTip = self.formUtils.getTooltip(clickedElement, "source");
                     $('#' + id).prop('title', sourceToolTip);
 
                     // close the form window
