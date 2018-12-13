@@ -91,20 +91,23 @@ public class FileConfigManager implements ConfigManager {
             }
 
             if (name.equalsIgnoreCase("shardId")) {
+                Map<String, String> configs = new HashMap<>();
                 try {
-                    ClusterConfiguration clusterConfig =
-                            configProvider.getConfigurationObject(ClusterConfiguration.class);
+                    ClusterConfig clusterConfig =
+                            configProvider.getConfigurationObject(ClusterConfig.class);
                     if (clusterConfig != null) {
                         if (clusterConfig.getGroupId() != null && clusterConfig.isEnabled()) {
-                            Map<String, String> configs = new HashMap<>();
                             configs.put("shardId", clusterConfig.getGroupId());
                             return configs;
                         }
                     }
+                } catch (ConfigurationException e) {
+                    LOGGER.error("Could not initiate the cluster.config configuration object, " + e.getMessage(), e);
+                }
+                try {
                     CarbonConfiguration carbonConfiguration =
                             configProvider.getConfigurationObject(CarbonConfiguration.class);
                     if (carbonConfiguration != null && carbonConfiguration.getId() != null) {
-                        Map<String, String> configs = new HashMap<>();
                         configs.put("shardId", carbonConfiguration.getId());
                         return configs;
                     }

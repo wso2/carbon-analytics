@@ -37,7 +37,7 @@ import org.wso2.carbon.sp.jobmanager.core.CoordinatorChangeListener;
 import org.wso2.carbon.sp.jobmanager.core.allocation.ResourceAllocationAlgorithm;
 import org.wso2.carbon.sp.jobmanager.core.api.ResourceManagerApi;
 import org.wso2.carbon.sp.jobmanager.core.appcreator.KafkaSiddhiAppCreator;
-import org.wso2.carbon.sp.jobmanager.core.bean.ClusterConfig;
+import org.wso2.carbon.stream.processor.common.utils.config.ClusterConfig;
 import org.wso2.carbon.sp.jobmanager.core.bean.DeploymentConfig;
 import org.wso2.carbon.sp.jobmanager.core.deployment.DeploymentManagerImpl;
 import org.wso2.carbon.sp.jobmanager.core.exception.ResourceManagerException;
