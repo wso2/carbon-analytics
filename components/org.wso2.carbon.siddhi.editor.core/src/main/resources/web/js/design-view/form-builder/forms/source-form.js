@@ -38,8 +38,8 @@ define(['log', 'jquery', 'lodash', 'sourceOrSinkAnnotation', 'mapAnnotation', 'p
             }
         };
 
-        const constMap = "map";
-        const constList = "list";
+        const MAP = "map";
+        const LIST = "list";
 
         /**
          * Function to get the options of the selected source/map type
@@ -197,7 +197,7 @@ define(['log', 'jquery', 'lodash', 'sourceOrSinkAnnotation', 'mapAnnotation', 'p
                 attributeType = savedMapperAttributes.getType().toLowerCase();
                 var attributeValues = savedMapperAttributes.getValue();
             }
-            if (attributeType === constList) {
+            if (attributeType === LIST) {
                 for (streamAttribute of streamAttributes) {
                     attributes.push({ key: streamAttribute.key, value: "" });
                 }
@@ -208,7 +208,7 @@ define(['log', 'jquery', 'lodash', 'sourceOrSinkAnnotation', 'mapAnnotation', 'p
                         i++;
                     }
                 }
-            } else if (attributeType === constMap) {
+            } else if (attributeType === MAP) {
                 for (streamAttribute of streamAttributes) {
                     attributes.push({ key: streamAttribute.key, value: "" });
                 }
@@ -229,12 +229,21 @@ define(['log', 'jquery', 'lodash', 'sourceOrSinkAnnotation', 'mapAnnotation', 'p
         };
 
         /**
+		 * Function to add the error class
+		 * @param {Object} id object where the errors needs to be displayed
+		 */
+        var addErrorClass = function (id) {
+            $(id)[0].scrollIntoView();
+            $(id).addClass('required-input-field')
+        };
+
+        /**
          * Function to render the attribute-map div using handlebars
          * @param {Object} attributes which needs to be mapped on to the template
          */
         var renderAttributeMappingContent = function (attributes) {
             var attributeMapFormTemplate = Handlebars.compile($('#source-sink-map-attribute-template').html());
-            var wrappedHtml = attributeMapFormTemplate(attributes);
+            var wrappedHtml = attributeMapFormTemplate({ id: "source", attributes: attributes });
             $('#attribute-map-content').html(wrappedHtml);
         };
 
@@ -264,9 +273,8 @@ define(['log', 'jquery', 'lodash', 'sourceOrSinkAnnotation', 'mapAnnotation', 'p
          * @param {String} id to identify the div in the html to traverse
          * @return {boolean} isError
          */
-        var validateCustomizedOptions = function (selectedOptions, id) {
+        var validateCustomizedOptions = function (id) {
             var isError = false;
-            var option = "";
             if ($('#customized-' + id + ' ul').has('li').length != 0) {
                 $('#customized-' + id + ' .option').each(function () {
                     var custOptName = $(this).find('.cust-option-key').val().trim();
@@ -274,19 +282,14 @@ define(['log', 'jquery', 'lodash', 'sourceOrSinkAnnotation', 'mapAnnotation', 'p
                     if ((custOptName != "") || (custOptValue != "")) {
                         if (custOptName == "") {
                             $(this).find('.error-message').text('Option key is required.');
-                            $(this)[0].scrollIntoView();
-                            $(this).find('.cust-option-key').addClass('required-input-field');
+                            addErrorClass($(this).find('.cust-option-key'))
                             isError = true;
                             return false;
                         } else if (custOptValue == "") {
                             $(this).find('.error-message').text('Option value is required.');
-                            $(this)[0].scrollIntoView();
-                            $(this).find('.cust-option-value').addClass('required-input-field');
+                            addErrorClass($(this).find('.cust-option-value'));
                             isError = true;
                             return false;
-                        } else {
-                            option = custOptName + " = \"" + custOptValue + "\"";
-                            selectedOptions.push(option);
                         }
                     }
                 });
@@ -365,61 +368,96 @@ define(['log', 'jquery', 'lodash', 'sourceOrSinkAnnotation', 'mapAnnotation', 'p
 
         /**
          * Function to validate the predefined options
-         * @param {Object} selectedOptions array to add the options which needs to be saved
          * @param {Object} predefinedOptions
          * @param {String} id to identify the div in the html to traverse
          * @return {boolean} isError
          */
-        var validateOptions = function (selectedOptions, predefinedOptions, id) {
+        var validateOptions = function (predefinedOptions, id) {
             var isError = false;
-            var option = "";
             $('.source-sink-map-options #' + id + ' .option').each(function () {
                 var optionName = $(this).find('.option-name').text().trim();
                 var optionValue = $(this).find('.option-value').val().trim();
                 var predefinedOptionObject = getOption(optionName, predefinedOptions);
                 if (!predefinedOptionObject.optional) {
-                    if (optionValue == "") {
-                        $(this).find('.error-message').text('Option value is required.');
-                        $(this)[0].scrollIntoView();
-                        $(this).find('.option-value').addClass('required-input-field');
+                    if (!checkOptionValue(optionValue, predefinedOptionObject, this)) {
                         isError = true;
                         return false;
-                    } else {
-                        var dataType = predefinedOptionObject.type[0];
-                        if (validateDataType(dataType, optionValue)) {
-                            $(this).find('.error-message').text('Invalid data-type. ' + dataType + ' required.');
-                            $(this)[0].scrollIntoView();
-                            $(this).find('.option-value').addClass('required-input-field');
+                    }
+                } else {
+                    if ($(this).find('.option-checkbox').is(":checked")) {
+                        if (!checkOptionValue(optionValue, predefinedOptionObject, this)) {
                             isError = true;
                             return false;
                         }
                     }
+                }
+            });
+            return isError;
+        };
+
+        /**
+         * Function to check if a particular option value is valid
+         * @param {String} optionValue value which needs to be validated
+         * @param {Object} predefinedOptionObject predefined object of the option
+         * @param {Object} parent div of the particular option
+         */
+        var checkOptionValue = function (optionValue, predefinedOptionObject, parent) {
+            if (optionValue == "") {
+                $(parent).find('.error-message').text('Option value is required.');
+                addErrorClass($(parent).find('.option-value'));
+                return false;
+            } else {
+                var dataType = predefinedOptionObject.type[0];
+                if (validateDataType(dataType, optionValue)) {
+                    $(parent).find('.error-message').text('Invalid data-type. ' + dataType + ' required.');
+                    addErrorClass($(parent).find('.option-value'));
+                    return false;
+                }
+            }
+            return true;
+        };
+
+        /**
+         * Function to build the options
+         * @param {Object} predefinedOptions predefined options
+         * @param {Object} selectedOptions array to add the built option 
+         * @param {String} id div of the options which needs to be built [mapper or source]
+         */
+        var buildOptions = function (predefinedOptions, selectedOptions, id) {
+            var option;
+            $('.source-sink-map-options #' + id + ' .option').each(function () {
+                var optionName = $(this).find('.option-name').text().trim();
+                var optionValue = $(this).find('.option-value').val().trim();
+                var predefinedOptionObject = getOption(optionName, predefinedOptions);
+                if (!predefinedOptionObject.optional) {
                     option = optionName + " = \"" + optionValue + "\"";
                     selectedOptions.push(option);
                 } else {
                     if ($(this).find('.option-checkbox').is(":checked")) {
-                        if (optionValue == "") {
-                            $(this).find('.error-message').text('Option value is required.');
-                            $(this)[0].scrollIntoView();
-                            $(this).find('.option-value').addClass('required-input-field');
-                            isError = true;
-                            return false;
-                        } else {
-                            var dataType = predefinedOptionObject.type[0];
-                            if (validateDataType(dataType, optionValue)) {
-                                $(this).find('.error-message').text('Invalid data-type. ' + dataType + ' required.');
-                                $(this)[0].scrollIntoView();
-                                $(this).find('.option-value').addClass('required-input-field');
-                                isError = true;
-                                return false;
-                            }
-                        }
                         option = optionName + " = \"" + optionValue + "\"";
                         selectedOptions.push(option);
                     }
                 }
             });
-            return isError;
+        };
+
+        /**
+         * Function to build the customized options
+         * @param {Object} selectedOptions array to add the built option 
+         * @param {String} id div of the options which needs to be built [mapper or source]
+         */
+        var buildCustomizedOption = function (selectedOptions, id) {
+            var option = "";
+            if ($('#customized-' + id + ' ul').has('li').length != 0) {
+                $('#customized-' + id + ' .option').each(function () {
+                    var custOptName = $(this).find('.cust-option-key').val().trim();
+                    var custOptValue = $(this).find('.cust-option-value').val().trim();
+                    if ((custOptName != "") && (custOptValue != "")) {
+                        option = custOptName + " = \"" + custOptValue + "\"";
+                        selectedOptions.push(option);
+                    }
+                });
+            }
         };
 
         /**
@@ -438,7 +476,7 @@ define(['log', 'jquery', 'lodash', 'sourceOrSinkAnnotation', 'mapAnnotation', 'p
                 isSourceConnected = false;
                 DesignViewUtils.prototype.errorAlert("Please connect to a stream");
             } else if (!JSONValidator.prototype.validateSourceOrSinkAnnotation(clickedElement, 'Source', true)) {
-                // perform JSON validation to check if sink contains a connectedElement.
+                // perform JSON validation to check if source contains a connectedElement.
                 isSourceConnected = false;
             }
             if (!isSourceConnected) {
@@ -663,22 +701,21 @@ define(['log', 'jquery', 'lodash', 'sourceOrSinkAnnotation', 'mapAnnotation', 'p
                         isErrorOccurred = true;
                         return;
                     } else {
-                        var annotationOptions = [];
-                        if (validateOptions(annotationOptions, sourceOptions, "source-options")) {
+                        if (validateOptions(sourceOptions, "source-options")) {
                             isErrorOccurred = true;
                             return;
                         }
-                        if (validateCustomizedOptions(annotationOptions, "source-options")) {
+                        if (validateCustomizedOptions("source-options")) {
                             isErrorOccurred = true;
                             return;
                         }
                         var selectedMapType = $('#define-map #map-type').val();
                         var mapperAnnotationOptions = [];
-                        if (validateOptions(mapperAnnotationOptions, mapperOptions, "mapper-options")) {
+                        if (validateOptions(mapperOptions, "mapper-options")) {
                             isErrorOccurred = true;
                             return;
                         }
-                        if (validateCustomizedOptions(mapperAnnotationOptions, "mapper-options")) {
+                        if (validateCustomizedOptions("mapper-options")) {
                             isErrorOccurred = true;
                             return;
                         }
@@ -692,8 +729,7 @@ define(['log', 'jquery', 'lodash', 'sourceOrSinkAnnotation', 'mapAnnotation', 'p
                                 var value = $(this).find('.attr-value').val().trim();
                                 if (value == "") {
                                     $(this).find('.error-message').text('Attribute Value is required.');
-                                    $(this)[0].scrollIntoView();
-                                    $(this).find('.attr-value').addClass('required-input-field');
+                                    addErrorClass($(this).find('.attr-value'));
                                     isErrorOccurred = true;
                                     return false;
                                 } else {
@@ -708,6 +744,9 @@ define(['log', 'jquery', 'lodash', 'sourceOrSinkAnnotation', 'mapAnnotation', 'p
                         var textNode = $('#' + id).find('.sourceNameNode');
                         textNode.html(selectedSourceType);
 
+                        var annotationOptions = [];
+                        buildOptions(sourceOptions, annotationOptions, "source-options");
+                        buildCustomizedOption(annotationOptions, "source-options");
                         if (annotationOptions.length == 0) {
                             clickedElement.setOptions(undefined);
                         } else {
@@ -715,6 +754,9 @@ define(['log', 'jquery', 'lodash', 'sourceOrSinkAnnotation', 'mapAnnotation', 'p
                         }
 
                         var mapper = {};
+                        var mapperAnnotationOptions = [];
+                        buildOptions(mapperOptions, mapperAnnotationOptions, "mapper-options");
+                        buildCustomizedOption(mapperAnnotationOptions, "mapper-options");
                         _.set(mapper, 'type', selectedMapType);
                         if (mapperAnnotationOptions.length == 0) {
                             _.set(mapper, 'options', undefined);
