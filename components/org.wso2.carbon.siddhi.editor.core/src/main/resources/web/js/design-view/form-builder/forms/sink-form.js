@@ -51,8 +51,11 @@ define(['log', 'jquery', 'lodash', 'sourceOrSinkAnnotation', 'mapAnnotation', 'p
             var options = [];
             for (type of types) {
                 if (type.name.toLowerCase() == selectedType.toLowerCase()) {
-                    options = type.parameters;
+                    if (type.parameters) {
+                        options = type.parameters;
+                    }
                     break;
+
                 }
             }
             return options;
@@ -153,10 +156,10 @@ define(['log', 'jquery', 'lodash', 'sourceOrSinkAnnotation', 'mapAnnotation', 'p
             var customizedOptions = [];
             _.forEach(savedOptions, function (savedOption) {
                 var foundSavedOption = false;
+                var optionKey = savedOption.split('=')[0];
+                var optionValue = savedOption.split('=')[1].trim();
+                optionValue = optionValue.substring(1, optionValue.length - 1);
                 for (var predefinedOption of predefinedOptions) {
-                    var optionKey = savedOption.split('=')[0];
-                    var optionValue = savedOption.split('=')[1].trim();
-                    optionValue = optionValue.substring(1, optionValue.length - 1);
                     if (predefinedOption.name.toLowerCase() == optionKey.toLowerCase().trim()) {
                         foundSavedOption = true;
                         break;
