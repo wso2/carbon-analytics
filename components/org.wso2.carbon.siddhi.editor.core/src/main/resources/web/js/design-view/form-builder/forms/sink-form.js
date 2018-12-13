@@ -189,9 +189,9 @@ define(['log', 'jquery', 'lodash', 'sourceOrSinkAnnotation', 'mapAnnotation', 'p
         };
 
         /**
-		 * Function to add the error class
-		 * @param {Object} id object where the errors needs to be displayed
-		 */
+         * Function to add the error class
+         * @param {Object} id object where the errors needs to be displayed
+         */
         var addErrorClass = function (id) {
             $(id)[0].scrollIntoView();
             $(id).addClass('required-input-field')
@@ -447,6 +447,7 @@ define(['log', 'jquery', 'lodash', 'sourceOrSinkAnnotation', 'mapAnnotation', 'p
                 }
             });
         };
+
         /**
          * Function to build the customized options
          * @param {Object} selectedOptions array to add the built option 

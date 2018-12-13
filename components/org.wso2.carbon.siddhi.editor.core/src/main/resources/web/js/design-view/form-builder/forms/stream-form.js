@@ -399,11 +399,6 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'designViewUtils', 'j
             var self = this;
             var id = $(element).parent().attr('id');
             var clickedElement = self.configurationData.getSiddhiAppConfig().getStream(id);
-            if (!clickedElement) {
-                var errorMessage = 'unable to find clicked element';
-                log.error(errorMessage);
-                throw errorMessage;
-            }
             $('#' + id).addClass('selected-element');
             $(".overlayed-container").fadeTo(200, 1);
             var propertyDiv = $('<div class = "stream-form-container"><div id="property-header"><h3>Stream' +
@@ -623,7 +618,7 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'designViewUtils', 'j
                     return;
                 }
 
-				var annotationNodes = [];
+                var annotationNodes = [];
                 if (validatePredefinedAnnotations(predefinedAnnotationList, annotationNodes)) {
                     isErrorOccurred = true;
                     return;

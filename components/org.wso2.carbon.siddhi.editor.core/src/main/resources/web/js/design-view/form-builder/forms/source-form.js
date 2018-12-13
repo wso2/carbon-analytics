@@ -131,9 +131,9 @@ define(['log', 'jquery', 'lodash', 'sourceOrSinkAnnotation', 'mapAnnotation', 'p
             return options;
         };
 
-		/**
-		 * Function to render the html to display the select options for attribute mapping
-		 */
+	    /**
+	    * Function to render the html to display the select options for attribute mapping
+	    */
         var renderAttributeMapping = function () {
             if (!$.trim($('#define-attribute').html()).length) {
                 var attributeDiv = $('<div class="clearfix"> <label id="attribute-map-label">' +
@@ -232,9 +232,9 @@ define(['log', 'jquery', 'lodash', 'sourceOrSinkAnnotation', 'mapAnnotation', 'p
         };
 
         /**
-		 * Function to add the error class
-		 * @param {Object} id object where the errors needs to be displayed
-		 */
+         * Function to add the error class
+         * @param {Object} id object where the errors needs to be displayed
+         */
         var addErrorClass = function (id) {
             $(id)[0].scrollIntoView();
             $(id).addClass('required-input-field')
@@ -317,12 +317,12 @@ define(['log', 'jquery', 'lodash', 'sourceOrSinkAnnotation', 'mapAnnotation', 'p
             return option;
         };
 
-		/**
+	    /**
         * Function to validate the data type of the options
         * @param {String} dataType data-type of the option
         * @param {String} optionValue value of the option
         * @return {boolean} invalidDataType
-		*/
+	    */
         var validateDataType = function (dataType, optionValue) {
             var invalidDataType = false;
             intLongRegexMatch = /^[-+]?\d+$/;

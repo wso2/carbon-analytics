@@ -68,11 +68,11 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'designViewUtils', 'h
             }
         };
 
-		/**
-		 * Function to validate the attribute names
-		 * @param {Object} attributeNameList to add the valid attribute names
-		 * @return {boolean} isErrorOccurred
-		 */
+        /**
+         * Function to validate the attribute names
+         * @param {Object} attributeNameList to add the valid attribute names
+         * @return {boolean} isErrorOccurred
+         */
         var validateAttributeNames = function (attributeNameList) {
             var isErrorOccurred = false;
             $('.attr-name').each(function () {
@@ -126,11 +126,11 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'designViewUtils', 'h
         };
 
         /**
-		 * Function to obtain a particular parameter from predefined parameters
-		 * @param {String} parameterName parameter which needs to be found
-		 * @param {Object} predefinedParameters set of predefined parameters
-		 * @return {Object} parameter
-		 */
+         * Function to obtain a particular parameter from predefined parameters
+         * @param {String} parameterName parameter which needs to be found
+         * @param {Object} predefinedParameters set of predefined parameters
+         * @return {Object} parameter
+         */
         var getParameter = function (parameterName, predefinedParameters) {
             var parameter = null;
             for (var predefinedParameter of predefinedParameters) {
@@ -142,12 +142,12 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'designViewUtils', 'h
             return parameter;
         };
 
-		/**
-		 * Function to render the parameter for the selected window function using handlebars
-		 * @param {Object} parameterArray Saved parameters
-		 * @param {Object} windowType selected window processor type
-		 * @param {String} id Id for the div to embed the parameters
-		 */
+        /**
+        * Function to render the parameter for the selected window function using handlebars
+        * @param {Object} parameterArray Saved parameters
+        * @param {Object} windowType selected window processor type
+        * @param {String} id Id for the div to embed the parameters
+        */
         var renderParameters = function (parameterArray, windowType, id) {
             parameterArray.sort(function (val1, val2) {
                 if (val1.optional && !val2.optional) return 1;
@@ -163,12 +163,12 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'designViewUtils', 'h
             $('#defineFunctionParameters').html(wrappedHtml);
         };
 
-		/**
-		 * Function to get the parameters of the selected window function
-		 * @param {String} selectedType Selected window function type
-		 * @param {object} types Predefined window types
-		 * @return {object} parameters
-		 */
+        /**
+         * Function to get the parameters of the selected window function
+         * @param {String} selectedType Selected window function type
+         * @param {object} types Predefined window types
+         * @return {object} parameters
+         */
         var getSelectedTypeParameters = function (selectedType, types) {
             var parameters = [];
             for (type of types) {
@@ -182,11 +182,11 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'designViewUtils', 'h
             return parameters;
         };
 
-		/**
-		 * Function to create parameter object with an additional empty value attribute
-		 * @param {Object} parameterArray Predefined parameters without the attribute 'value'
-		 * @return {Object} parameters
-		 */
+        /**
+        * Function to create parameter object with an additional empty value attribute
+        * @param {Object} parameterArray Predefined parameters without the attribute 'value'
+        * @return {Object} parameters
+        */
         var createParameterWithValues = function (parameterArray) {
             var parameters = [];
             _.forEach(parameterArray, function (parameter) {
@@ -385,6 +385,7 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'designViewUtils', 'h
                 }
             });
         };
+
         /**
          * Function for generic validation of parameter values
          * @param {Object} predefinedParameters predefined parameters of the selected window type
