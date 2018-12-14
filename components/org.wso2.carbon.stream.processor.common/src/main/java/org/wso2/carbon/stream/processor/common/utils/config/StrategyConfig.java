@@ -16,7 +16,7 @@
  * under the License.
  */
 
-package org.wso2.carbon.sp.jobmanager.core.bean;
+package org.wso2.carbon.stream.processor.common.utils.config;
 
 import org.wso2.carbon.config.annotation.Configuration;
 
