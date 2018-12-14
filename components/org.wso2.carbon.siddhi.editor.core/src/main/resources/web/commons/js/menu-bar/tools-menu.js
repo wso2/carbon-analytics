@@ -22,6 +22,24 @@ define(([],function (){
         label: "Tools",
         items: [
             {
+                id: "toggleFileExplorer",
+                label: "File Explorer",
+                command: {
+                    id: "toggle-file-explorer",
+                    shortcuts: {
+                        mac: {
+                            key: "command+shift+e",
+                            label: "\u2318\u21E7E"
+                        },
+                        other: {
+                            key: "ctrl+shift+e",
+                            label: "Ctrl+Shift+E"
+                        }
+                    }
+                },
+                disabled: false
+            },
+            {
                 id: "toggleEventSimulator",
                 label: "Event Simulator",
                 command: {
@@ -39,37 +57,55 @@ define(([],function (){
                 },
                 disabled: false
             },
-            // {
-            //     id: "deploy",
-            //     label: "Deploy",
-            //     command: {
-            //         id: "deploy",
-            //         shortcuts: {
-            //             mac: {
-            //                 key: "command+shift+z",
-            //                 label: "\u2318\u21E7Z"
-            //             },
-            //             other: {
-            //                 key: "ctrl+shift+z",
-            //                 label: "Ctrl+Shift+Z"
-            //             }
-            //         }
-            //     },
-            //     disabled: true
-            // },
+            {
+                id: "toggleConsole",
+                label: "Console",
+                command: {
+                    id: "toggle-output-console",
+                    shortcuts: {
+                        mac: {
+                            key: "command+shift+k",
+                            label: "\u2318\u21E7K"
+                        },
+                        other: {
+                            key: "ctrl+shift+k",
+                            label: "Ctrl+Shift+K"
+                        }
+                    }
+                },
+                disabled: false
+            },
+            {
+                id: "toggleFileExplorer",
+                label: "File Explorer",
+                command: {
+                    id: "toggle-file-explorer",
+                    shortcuts: {
+                        mac: {
+                            key: "command+shift+e",
+                            label: "\u2318\u21E7E"
+                        },
+                        other: {
+                            key: "ctrl+shift+e",
+                            label: "Ctrl+Shift+E"
+                        }
+                    }
+                },
+                disabled: false
+            },
             {
                 id: "sampleEvent",
-                label: "Sample Event",
+                label: "Sample Event Generator",
                 command: {
                     id: "sample-event",
                     labels: {
                         mac: {
-                            //key: "command+f",
-                            label: "\u2318F"
+                            key: "command+shift+g",
+                            label: "\u2318\u21E7G"
                         },
                         other: {
-                            //key: "ctrl+f",
-                            label: "Ctrl+F"
+                            key: "ctrl+shift+g",
+                            label: "Ctrl+Shift+G"
                         }
                     }
                 },
@@ -82,12 +118,12 @@ define(([],function (){
                     id: "query-store",
                     labels:{
                         mac: {
-                            //key: "command+option+f",
-                            label: "\u2318\u2325f"
+                            key: "command+shift+q",
+                            label: "\u2318\u21E7Q"
                         },
                         other: {
-                            //key: "ctrl+h",
-                            label: "Ctrl+H"
+                            key: "ctrl+shift+q",
+                            label: "Ctrl+Shift+Q"
                         }
                     }
                 },

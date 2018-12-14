@@ -181,9 +181,9 @@ define(['log', 'jquery', 'backbone', 'lodash', './explorer-item', './service-cli
             activateBtn.attr("data-placement", "right").attr("data-container", "body");
 
             if (this.application.isRunningOnMacOS()) {
-                activateBtn.attr("title", "Open File Explorer (" + _.get(self._options, 'command.shortcuts.mac.label') + ") ").tooltip();
+                activateBtn.attr("title", "File Explorer (" + _.get(self._options, 'command.shortcuts.mac.label') + ") ").tooltip();
             } else {
-                activateBtn.attr("title", "Open File Explorer  (" + _.get(self._options, 'command.shortcuts.other.label') + ") ").tooltip();
+                activateBtn.attr("title", "File Explorer  (" + _.get(self._options, 'command.shortcuts.other.label') + ") ").tooltip();
             }
 
             this._verticalSeparator.on('drag', function(event){
