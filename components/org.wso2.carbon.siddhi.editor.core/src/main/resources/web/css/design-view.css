@@ -660,6 +660,12 @@ a.list-group-item, button.list-group-item {
 	margin-left: 20px;
 }
 
+.trigger-form-container #trigger-at-content .description {
+	font-size: 12px;
+	margin-left: 5px;
+	color: #ccc;
+}
+
 .table-form-container input[type="text"].annotation-value {
  	margin-bottom: 2px;
 	margin-left: 20px;
@@ -791,7 +797,8 @@ a.list-group-item, button.list-group-item {
 	background: transparent;
 }
 
-.design-view-form-content #define-annotation {
+.design-view-form-content  .stream-form-container #define-annotation {
+	margin-top:10px;
 	color: #ccc;
 }
 
@@ -832,7 +839,8 @@ a.list-group-item, button.list-group-item {
 }
 
 .window-form-container #defineFunctionName,
-.window-form-container #defineOutputEvents {
+.window-form-container #defineOutputEvents,
+.window-form-container #define-annotation {
 	margin-top:18px;
 }
 
@@ -898,11 +906,14 @@ a.list-group-item, button.list-group-item {
 	margin-right: 100px;
 }
 
-.design-view-form-content .option .option-desc,
-.design-view-form-content .parameter .parameter-desc {
+.design-view-form-content .fw-info {
 	font-size: 10px;
 	margin-left: 3px;
 	color: #b7f1eb;
+}
+
+.design-view-form-content .trigger-form-container .fw-info {
+	font-size: 12px;
 }
 
 .design-view-form-content .cust-options .option {
@@ -914,7 +925,8 @@ a.list-group-item, button.list-group-item {
 }
 
 .design-view-form-content .option .option-desc-content,
-.design-view-form-content .parameter .parameter-desc-content {
+.design-view-form-content .parameter .parameter-desc-content,
+.trigger-form-container #define-trigger-at .at-description {
 	 font-family: Arial;
 	 background: #252525;
 	 width: 250px;
