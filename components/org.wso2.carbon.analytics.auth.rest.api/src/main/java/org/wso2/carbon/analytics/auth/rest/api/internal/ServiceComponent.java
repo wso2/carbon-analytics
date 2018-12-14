@@ -30,7 +30,6 @@ import org.wso2.carbon.analytics.idp.client.core.api.IdPClient;
  * Service component to get IdPClient OSGi service.
  */
 @Component(
-        name = "ServiceComponentAuthRestAPI",
         service = ServiceComponent.class,
         immediate = true
 )

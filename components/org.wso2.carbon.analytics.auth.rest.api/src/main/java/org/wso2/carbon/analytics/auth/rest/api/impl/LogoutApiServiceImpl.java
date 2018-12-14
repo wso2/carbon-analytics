@@ -17,12 +17,15 @@
  */
 package org.wso2.carbon.analytics.auth.rest.api.impl;
 
+import org.osgi.framework.BundleContext;
+import org.osgi.service.component.annotations.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.wso2.carbon.analytics.auth.rest.api.LogoutApiService;
 import org.wso2.carbon.analytics.auth.rest.api.NotFoundException;
 import org.wso2.carbon.analytics.auth.rest.api.dto.ErrorDTO;
 import org.wso2.carbon.analytics.auth.rest.api.internal.DataHolder;
+import org.wso2.carbon.analytics.auth.rest.api.internal.ServiceComponent;
 import org.wso2.carbon.analytics.auth.rest.api.util.AuthRESTAPIConstants;
 import org.wso2.carbon.analytics.auth.rest.api.util.AuthUtil;
 import org.wso2.carbon.analytics.idp.client.core.exception.IdPClientException;
@@ -41,6 +44,30 @@ import javax.ws.rs.core.Response;
 public class LogoutApiServiceImpl extends LogoutApiService {
 
     private static final Logger LOG = LoggerFactory.getLogger(LogoutApiServiceImpl.class);
+
+    @Reference(
+            service = ServiceComponent.class,
+            cardinality = ReferenceCardinality.MANDATORY,
+            policy = ReferencePolicy.DYNAMIC,
+            unbind = "unRegisterServiceComponet"
+    )
+    public void registerServiceComponet(ServiceComponent serviceComponent) {
+        LOG.debug("@Reference(bind) ServiceComponent which sets IdP Client");
+    }
+
+    public void unRegisterServiceComponet(ServiceComponent serviceComponent) {
+        LOG.debug("@Reference(bind) ServiceComponent which sets IdP Client was removed");
+    }
+
+    @Activate
+    protected void start(BundleContext bundleContext) {
+        LOG.debug("Logout API started");
+    }
+
+    @Deactivate
+    protected void stop() {
+        LOG.debug("Logout API stopped");
+    }
 
     @Override
     public Response logoutAppNamePost(String appName
