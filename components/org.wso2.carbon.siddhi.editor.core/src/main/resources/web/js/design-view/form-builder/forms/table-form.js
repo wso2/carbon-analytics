@@ -976,17 +976,12 @@ define(['log', 'jquery', 'lodash', 'attribute', 'storeAnnotation', 'designViewUt
             var savedAnnotations = clickedElement.getAnnotationList();
             var savedAnnotationObjects = clickedElement.getAnnotationListObjects();
             var userAnnotations = [];
-            var tableAnnotations = predefinedTableAnnotations;
+            var tableAnnotations = JSON.parse(JSON.stringify(predefinedTableAnnotations));
             if (savedAnnotations && savedAnnotations.length != 0) {
                 userAnnotations = getUserAnnotations(savedAnnotationObjects, tableAnnotations);
                 mapAnnotationValues(tableAnnotations, savedAnnotationObjects)
-            } else {
-                _.forEach(predefinedTableAnnotations, function (annotation) {
-                    annotation.isChecked = false;
-                    annotation.values = [{ value: "" }];
-                })
-                tableAnnotations = predefinedTableAnnotations;
-            }
+           }
+           
             //render the predefined table annotation form template
             var annotationFormTemplate = Handlebars.compile($('#table-store-annotation-template').html());
             var wrappedHtml = annotationFormTemplate(tableAnnotations);
