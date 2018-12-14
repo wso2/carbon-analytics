@@ -40,6 +40,15 @@ define(['require', 'log', 'jquery', 'lodash', 'partitionWith', 'designViewUtils'
         };
 
         /**
+         * Function to add the error class
+         * @param {Object} id object where the errors needs to be displayed
+         */
+        var addErrorClass = function (id) {
+            $(id)[0].scrollIntoView();
+            $(id).addClass('required-input-field')
+        };
+
+        /**
          * Function to initialize the jstree
          * Function to add the event listeners for the jstree -div
          */
@@ -149,11 +158,11 @@ define(['require', 'log', 'jquery', 'lodash', 'partitionWith', 'designViewUtils'
         };
 
         /**
-		* Function to build the annotations as a string
-		* Function to create the annotation objects
-		* @param {Object} annotationStringList array to add the built annotation strings
-		* @param {Object} annotationObjectList array to add the created annotation objects
-		*/
+        * Function to build the annotations as a string
+        * Function to create the annotation objects
+        * @param {Object} annotationStringList array to add the built annotation strings
+        * @param {Object} annotationObjectList array to add the created annotation objects
+        */
         var annotation = "";
         var buildAnnotation = function (annotationStringList, annotationObjectList) {
             var jsTreeNodes = $('#annotation-div').jstree(true)._model.data['#'].children;
@@ -265,8 +274,7 @@ define(['require', 'log', 'jquery', 'lodash', 'partitionWith', 'designViewUtils'
                     self.consoleListManager.removeFormConsole(formConsole);
 
                     $("#" + id).addClass('incomplete-element');
-                    $('#' + id).prop('title', 'Fill the connected stream.');
-
+                    $('#' + id).prop('title', 'To edit partition configuration, fill the connected stream.');
                 } else {
                     $('#' + id).addClass('selected-element');
                     $(".overlayed-container").fadeTo(200, 1);
@@ -318,8 +326,7 @@ define(['require', 'log', 'jquery', 'lodash', 'partitionWith', 'designViewUtils'
                         $('#partition-by-content .partition-key').each(function () {
                             var expression = $(this).find('.partition-by-expression').val().trim();
                             if (expression === "") {
-                                $(this)[0].scrollIntoView();
-                                $(this).find('.partition-by-expression').addClass('required-input-field');
+                                addErrorClass($(this).find('.partition-by-expression'));
                                 $(this).find('.error-message').text("Expression value is required.")
                                 isErrorOccurred = true;
                                 return false;
