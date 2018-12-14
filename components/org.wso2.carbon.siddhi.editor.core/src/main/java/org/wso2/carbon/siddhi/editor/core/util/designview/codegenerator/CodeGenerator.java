@@ -33,7 +33,6 @@ import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhiel
 import org.wso2.carbon.siddhi.editor.core.util.designview.codegenerator.elements.ExecutionElementConfig;
 import org.wso2.carbon.siddhi.editor.core.util.designview.codegenerator.generators.*;
 import org.wso2.carbon.siddhi.editor.core.util.designview.codegenerator.generators.query.QueryCodeGenerator;
-import org.wso2.carbon.siddhi.editor.core.util.designview.codegenerator.generators.query.QueryToolTipGenerator;
 import org.wso2.carbon.siddhi.editor.core.util.designview.constants.CodeGeneratorConstants;
 import org.wso2.carbon.siddhi.editor.core.util.designview.constants.SiddhiCodeBuilderConstants;
 import org.wso2.carbon.siddhi.editor.core.util.designview.constants.query.QueryListType;
@@ -191,11 +190,11 @@ public class CodeGenerator {
 
             for (SourceSinkConfig sourceSink : sourcesAndSinks) {
                 if (stream.getName().equals(sourceSink.getConnectedElementName())) {
-                    streamListStringBuilder.append(sourceSinkCodeGenerator.generateSourceSink(sourceSink));
+                    streamListStringBuilder.append(sourceSinkCodeGenerator.generateSourceSink(sourceSink,false));
                 }
             }
 
-            streamListStringBuilder.append(streamCodeGenerator.generateStream(stream));
+            streamListStringBuilder.append(streamCodeGenerator.generateStream(stream, false));
         }
 
         streamListStringBuilder.append(SiddhiCodeBuilderConstants.NEW_LINE);
@@ -221,18 +220,18 @@ public class CodeGenerator {
         sourcesAndSinks.addAll(sourceList);
         sourcesAndSinks.addAll(sinkList);
 
-        StreamToolTipGenerator streamToolTipGenerator = new StreamToolTipGenerator();
-        SourceSinkToolTipGenerator sourceSinkToolTipGenerator = new SourceSinkToolTipGenerator();
+        StreamCodeGenerator streamCodeGenerator = new StreamCodeGenerator();
+        SourceSinkCodeGenerator sourceSinkCodeGenerator = new SourceSinkCodeGenerator();
 
         for (StreamConfig stream : streamList) {
             CodeGeneratorUtils.NullValidator.validateConfigObject(stream);
-            streamSourceSinkToolTipList.add(new ToolTip(stream.getId(), streamToolTipGenerator.generateStream(stream)));
+            streamSourceSinkToolTipList.add(new ToolTip(stream.getId(),
+                    streamCodeGenerator.generateStream(stream, true)));
         }
 
         for (SourceSinkConfig sourceSink : sourcesAndSinks) {
             streamSourceSinkToolTipList.add(new ToolTip(sourceSink.getId(),
-                    sourceSinkToolTipGenerator.generateSourceSink(sourceSink)));
-
+                    sourceSinkCodeGenerator.generateSourceSink(sourceSink, true)));
         }
 
         return streamSourceSinkToolTipList;
@@ -256,7 +255,7 @@ public class CodeGenerator {
 
         TableCodeGenerator tableCodeGenerator = new TableCodeGenerator();
         for (TableConfig table : tableList) {
-            tableListStringBuilder.append(tableCodeGenerator.generateTable(table));
+            tableListStringBuilder.append(tableCodeGenerator.generateTable(table, false));
         }
 
         tableListStringBuilder.append(SiddhiCodeBuilderConstants.NEW_LINE);
@@ -276,9 +275,9 @@ public class CodeGenerator {
         if (tableList == null || tableList.isEmpty()) {
             return tableTooltipList;
         }
-        TableToolTipGenerator tableToolTipGenerator = new TableToolTipGenerator();
+        TableCodeGenerator tableCodeGenerator = new TableCodeGenerator();
         for (TableConfig table : tableList) {
-            tableTooltipList.add(new ToolTip(table.getId(),tableToolTipGenerator.generateTable(table)));
+            tableTooltipList.add(new ToolTip(table.getId(),tableCodeGenerator.generateTable(table, true)));
         }
 
         return tableTooltipList;
@@ -301,7 +300,7 @@ public class CodeGenerator {
 
         WindowCodeGenerator windowCodeGenerator = new WindowCodeGenerator();
         for (WindowConfig window : windowList) {
-            windowListStringBuilder.append(windowCodeGenerator.generateWindow(window));
+            windowListStringBuilder.append(windowCodeGenerator.generateWindow(window, false));
         }
 
         windowListStringBuilder.append(SiddhiCodeBuilderConstants.NEW_LINE);
@@ -322,9 +321,10 @@ public class CodeGenerator {
             return windowToolTipList;
         }
 
-        WindowToolTipGenerator windowToolTipGenerator = new WindowToolTipGenerator();
+        WindowCodeGenerator windowCodeGenerator = new WindowCodeGenerator();
         for (WindowConfig window : windowList) {
-            windowToolTipList.add(new ToolTip(window.getId(), windowToolTipGenerator.generateWindow(window)));
+            windowToolTipList.add(new ToolTip(window.getId(),
+                    windowCodeGenerator.generateWindow(window, true)));
         }
 
         return windowToolTipList;
@@ -347,7 +347,7 @@ public class CodeGenerator {
 
         TriggerCodeGenerator triggerCodeGenerator = new TriggerCodeGenerator();
         for (TriggerConfig trigger : triggerList) {
-            triggerListStringBuilder.append(triggerCodeGenerator.generateTrigger(trigger));
+            triggerListStringBuilder.append(triggerCodeGenerator.generateTrigger(trigger, false));
         }
 
         triggerListStringBuilder.append(SiddhiCodeBuilderConstants.NEW_LINE);
@@ -368,9 +368,10 @@ public class CodeGenerator {
             return triggerToolTipList;
         }
 
-        TriggerToolTipGenerator triggerToolTipGenerator = new TriggerToolTipGenerator();
+        TriggerCodeGenerator triggerToolTipGenerator = new TriggerCodeGenerator();
         for (TriggerConfig trigger : triggerList) {
-            triggerToolTipList.add(new ToolTip(trigger.getId(), triggerToolTipGenerator.generateTrigger(trigger)));
+            triggerToolTipList.add(new ToolTip(trigger.getId(),
+                    triggerToolTipGenerator.generateTrigger(trigger, true)));
         }
 
         return triggerToolTipList;
@@ -393,7 +394,7 @@ public class CodeGenerator {
 
         AggregationCodeGenerator aggregationCodeGenerator = new AggregationCodeGenerator();
         for (AggregationConfig aggregation : aggregationList) {
-            aggregationListStringBuilder.append(aggregationCodeGenerator.generateAggregation(aggregation));
+            aggregationListStringBuilder.append(aggregationCodeGenerator.generateAggregation(aggregation, false));
         }
 
         aggregationListStringBuilder.append(SiddhiCodeBuilderConstants.NEW_LINE);
@@ -415,10 +416,10 @@ public class CodeGenerator {
             return aggregationToolTipList;
         }
 
-        AggregationToolTipGenerator aggregationToolTipGenerator = new AggregationToolTipGenerator();
+        AggregationCodeGenerator aggregationCodeGenerator = new AggregationCodeGenerator();
         for (AggregationConfig aggregation : aggregationList) {
             aggregationToolTipList.add(new ToolTip(aggregation.getId(),
-                    aggregationToolTipGenerator.generateAggregation(aggregation)));
+                    aggregationCodeGenerator.generateAggregation(aggregation, true)));
         }
 
         return aggregationToolTipList;
@@ -441,7 +442,7 @@ public class CodeGenerator {
 
         FunctionCodeGenerator functionCodeGenerator = new FunctionCodeGenerator();
         for (FunctionConfig function : functionList) {
-            functionListStringBuilder.append(functionCodeGenerator.generateFunction(function));
+            functionListStringBuilder.append(functionCodeGenerator.generateFunction(function, false));
         }
 
         functionListStringBuilder.append(SiddhiCodeBuilderConstants.NEW_LINE);
@@ -462,9 +463,10 @@ public class CodeGenerator {
             return functionTooltipList;
         }
 
-        FunctionToolTipGenerator functionToolTipGenerator = new FunctionToolTipGenerator();
+        FunctionCodeGenerator functionCodeGenerator = new FunctionCodeGenerator();
         for (FunctionConfig function : functionList) {
-            functionTooltipList.add(new ToolTip(function.getId(),functionToolTipGenerator.generateFunction(function) ));
+            functionTooltipList.add(new ToolTip(function.getId(),
+                    functionCodeGenerator.generateFunction(function, true)));
         }
 
         return functionTooltipList;
@@ -499,11 +501,11 @@ public class CodeGenerator {
                 CodeGeneratorUtils.reorderExecutionElements(executionElements, definitionsToBeGenerated)) {
             if (executionElement.getType().equalsIgnoreCase(CodeGeneratorConstants.QUERY)) {
                 QueryConfig query = (QueryConfig) executionElement.getValue();
-                executionElementStringBuilder.append(queryCodeGenerator.generateQuery(query));
+                executionElementStringBuilder.append(queryCodeGenerator.generateQuery(query, false));
             } else if (executionElement.getType().equalsIgnoreCase(CodeGeneratorConstants.PARTITION)) {
                 PartitionConfig partition = (PartitionConfig) executionElement.getValue();
                 executionElementStringBuilder.append(partitionCodeGenerator.generatePartition(partition,
-                        allDefinitions));
+                        allDefinitions, false));
             } else {
                 throw new CodeGenerationException("Unidentified ExecutionElement type: " + executionElement.getType());
             }
@@ -535,22 +537,21 @@ public class CodeGenerator {
 
         List<ExecutionElementConfig> executionElements =
                 CodeGeneratorUtils.convertToExecutionElements(queries, partitions);
-        QueryToolTipGenerator queryToolTipGenerator = new QueryToolTipGenerator();
-        PartitionToolTipGenerator partitionToolTipGenerator = new PartitionToolTipGenerator();
-        for (ExecutionElementConfig executionElement : executionElements) {
+        QueryCodeGenerator queryCodeGenerator = new QueryCodeGenerator();
+        PartitionCodeGenerator partitionCodeGenerator = new PartitionCodeGenerator();
 
+        for (ExecutionElementConfig executionElement : executionElements) {
             if (executionElement.getType().equalsIgnoreCase(CodeGeneratorConstants.QUERY)) {
                 QueryConfig query = (QueryConfig) executionElement.getValue();
                 excecutionElementTooltipList.add(new ToolTip(query.getId(),
-                        queryToolTipGenerator.generateQuery(query)));
+                        queryCodeGenerator.generateQuery(query, true)));
             } else if (executionElement.getType().equalsIgnoreCase(CodeGeneratorConstants.PARTITION)) {
                 PartitionConfig partition = (PartitionConfig) executionElement.getValue();
                 excecutionElementTooltipList.add(new ToolTip(partition.getId(),
-                        partitionToolTipGenerator.generatePartition(partition, allDefinitions)));
+                        partitionCodeGenerator.generatePartition(partition, allDefinitions, true)));
             } else {
                 throw new CodeGenerationException("Unidentified ExecutionElement type: " + executionElement.getType());
             }
-
         }
 
         return excecutionElementTooltipList;

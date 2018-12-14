@@ -35,19 +35,24 @@ public class TriggerCodeGenerator {
      * @return The Siddhi code representation of the given TriggerConfig object
      * @throws CodeGenerationException Error when generating the code
      */
-    public String generateTrigger(TriggerConfig trigger) throws CodeGenerationException {
+    public String generateTrigger(TriggerConfig trigger, boolean isToolTip) throws CodeGenerationException {
         CodeGeneratorUtils.NullValidator.validateConfigObject(trigger);
+        StringBuilder triggerStringBuilder = new StringBuilder();
+        if (!isToolTip) {
+            triggerStringBuilder.append(SubElementCodeGenerator.generateComment(trigger.getPreviousCommentSegment()));
+        }
 
-        return SubElementCodeGenerator.generateComment(trigger.getPreviousCommentSegment()) +
-                SubElementCodeGenerator.generateAnnotations(trigger.getAnnotationList()) +
-                SiddhiCodeBuilderConstants.DEFINE_TRIGGER +
-                SiddhiCodeBuilderConstants.SPACE +
-                trigger.getName() +
-                SiddhiCodeBuilderConstants.SPACE +
-                SiddhiCodeBuilderConstants.AT +
-                SiddhiCodeBuilderConstants.SPACE +
-                trigger.getAt() +
-                SiddhiCodeBuilderConstants.SEMI_COLON;
+        triggerStringBuilder.append(SubElementCodeGenerator.generateAnnotations(trigger.getAnnotationList()))
+                .append(SiddhiCodeBuilderConstants.DEFINE_TRIGGER)
+                .append(SiddhiCodeBuilderConstants.SPACE)
+                .append(trigger.getName())
+                .append(SiddhiCodeBuilderConstants.SPACE)
+                .append(SiddhiCodeBuilderConstants.AT)
+                .append(SiddhiCodeBuilderConstants.SPACE)
+                .append(trigger.getAt())
+                .append(SiddhiCodeBuilderConstants.SEMI_COLON);
+
+        return  triggerStringBuilder.toString();
     }
 
 }

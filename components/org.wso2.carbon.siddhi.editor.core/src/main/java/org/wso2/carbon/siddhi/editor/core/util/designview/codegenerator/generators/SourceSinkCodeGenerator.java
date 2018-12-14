@@ -42,12 +42,15 @@ public class SourceSinkCodeGenerator {
      * @return The Siddhi code representation of the given SourceSinkConfig object
      * @throws CodeGenerationException Error when generating the code
      */
-    public String generateSourceSink(SourceSinkConfig sourceSink) throws CodeGenerationException {
+    public String generateSourceSink(SourceSinkConfig sourceSink, boolean isToolTip) throws CodeGenerationException {
         CodeGeneratorUtils.NullValidator.validateConfigObject(sourceSink);
 
         StringBuilder sourceSinkStringBuilder = new StringBuilder();
-        sourceSinkStringBuilder.append(
-                SubElementCodeGenerator.generateComment(sourceSink.getPreviousCommentSegment()));
+        if (!isToolTip) {
+            sourceSinkStringBuilder.append(
+                    SubElementCodeGenerator.generateComment(sourceSink.getPreviousCommentSegment()));
+        }
+
         if (sourceSink.getAnnotationType().equalsIgnoreCase(CodeGeneratorConstants.SOURCE)) {
             sourceSinkStringBuilder.append(SiddhiCodeBuilderConstants.SOURCE_ANNOTATION);
         } else if (sourceSink.getAnnotationType().equalsIgnoreCase(CodeGeneratorConstants.SINK)) {
@@ -85,7 +88,8 @@ public class SourceSinkCodeGenerator {
         CodeGeneratorUtils.NullValidator.validateConfigObject(mapper);
 
         StringBuilder mapperStringBuilder = new StringBuilder();
-        mapperStringBuilder.append(SiddhiCodeBuilderConstants.MAP_ANNOTATION)
+        mapperStringBuilder.append(SiddhiCodeBuilderConstants.NEW_LINE)
+                .append(SiddhiCodeBuilderConstants.MAP_ANNOTATION)
                 .append(mapper.getType())
                 .append(SiddhiCodeBuilderConstants.SINGLE_QUOTE);
 

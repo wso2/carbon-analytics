@@ -35,20 +35,25 @@ public class TableCodeGenerator {
      * @return The Siddhi code representation of the given TableConfig object
      * @throws CodeGenerationException Error when generating the code
      */
-    public String generateTable(TableConfig table) throws CodeGenerationException {
+    public String generateTable(TableConfig table, boolean isToolTip) throws CodeGenerationException {
         CodeGeneratorUtils.NullValidator.validateConfigObject(table);
+        StringBuilder tableStringBuilder = new StringBuilder();
+        if (!isToolTip) {
+            tableStringBuilder.append(SubElementCodeGenerator.generateComment(table.getPreviousCommentSegment()));
+        }
 
-        return SubElementCodeGenerator.generateComment(table.getPreviousCommentSegment()) +
-                SubElementCodeGenerator.generateStore(table.getStore()) +
-                SubElementCodeGenerator.generateAnnotations(table.getAnnotationList()) +
-                SiddhiCodeBuilderConstants.DEFINE_TABLE +
-                SiddhiCodeBuilderConstants.SPACE +
-                table.getName() +
-                SiddhiCodeBuilderConstants.SPACE +
-                SiddhiCodeBuilderConstants.OPEN_BRACKET +
-                SubElementCodeGenerator.generateAttributes(table.getAttributeList()) +
-                SiddhiCodeBuilderConstants.CLOSE_BRACKET +
-                SiddhiCodeBuilderConstants.SEMI_COLON;
+        tableStringBuilder.append(SubElementCodeGenerator.generateStore(table.getStore()))
+                .append(SubElementCodeGenerator.generateAnnotations(table.getAnnotationList()))
+                .append(SiddhiCodeBuilderConstants.DEFINE_TABLE)
+                .append(SiddhiCodeBuilderConstants.SPACE)
+                .append(table.getName())
+                .append(SiddhiCodeBuilderConstants.SPACE)
+                .append(SiddhiCodeBuilderConstants.OPEN_BRACKET)
+                .append(SubElementCodeGenerator.generateAttributes(table.getAttributeList()))
+                .append(SiddhiCodeBuilderConstants.CLOSE_BRACKET)
+                .append(SiddhiCodeBuilderConstants.SEMI_COLON);
+
+        return  tableStringBuilder.toString();
     }
 
 }

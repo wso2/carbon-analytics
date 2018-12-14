@@ -43,26 +43,29 @@ public class AggregationCodeGenerator {
      * @return The Siddhi code representation of the given AggregationConfig object
      * @throws CodeGenerationException Error when generating the code
      */
-    public String generateAggregation(AggregationConfig aggregation) throws CodeGenerationException {
+    public String generateAggregation(AggregationConfig aggregation, boolean isToolip) throws CodeGenerationException {
         CodeGeneratorUtils.NullValidator.validateConfigObject(aggregation);
 
         StringBuilder aggregationStringBuilder = new StringBuilder();
+        if (!isToolip) {
+            aggregationStringBuilder
+                    .append(SubElementCodeGenerator.generateComment(aggregation.getPreviousCommentSegment()));
+        }
+
         aggregationStringBuilder
-                .append(SubElementCodeGenerator.generateComment(aggregation.getPreviousCommentSegment()))
                 .append(SubElementCodeGenerator.generateStore(aggregation.getStore()))
                 .append(generateAggregationAnnotations(aggregation.getAnnotationList()))
+                .append(SiddhiCodeBuilderConstants.NEW_LINE)
                 .append(SiddhiCodeBuilderConstants.DEFINE_AGGREGATION)
                 .append(SiddhiCodeBuilderConstants.SPACE)
                 .append(aggregation.getName())
-                .append(SiddhiCodeBuilderConstants.SPACE)
+                .append(SiddhiCodeBuilderConstants.NEW_LINE)
                 .append(SiddhiCodeBuilderConstants.FROM)
                 .append(SiddhiCodeBuilderConstants.SPACE)
                 .append(aggregation.getFrom())
-                .append(SiddhiCodeBuilderConstants.SPACE)
                 .append(QuerySelectCodeGenerator.generateQuerySelect(aggregation.getSelect()))
-                .append(SiddhiCodeBuilderConstants.SPACE)
                 .append(QuerySubElementCodeGenerator.generateQueryGroupBy(aggregation.getGroupBy()))
-                .append(SiddhiCodeBuilderConstants.SPACE)
+                .append(SiddhiCodeBuilderConstants.NEW_LINE)
                 .append(SiddhiCodeBuilderConstants.AGGREGATE);
 
         if (aggregation.getAggregateByAttribute() != null && !aggregation.getAggregateByAttribute().isEmpty()) {

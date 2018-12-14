@@ -35,25 +35,30 @@ public class FunctionCodeGenerator {
      * @return The Siddhi code representation of the given FunctionConfig object
      * @throws CodeGenerationException Error when generating the code
      */
-    public String generateFunction(FunctionConfig function) throws CodeGenerationException {
+    public String generateFunction(FunctionConfig function, boolean isToolTip) throws CodeGenerationException {
         CodeGeneratorUtils.NullValidator.validateConfigObject(function);
+        StringBuilder functionStringBuilder = new StringBuilder();
+        if (!isToolTip) {
+            functionStringBuilder.append(SubElementCodeGenerator.generateComment(function.getPreviousCommentSegment()));
+        }
+        functionStringBuilder.append(SiddhiCodeBuilderConstants.DEFINE_FUNCTION)
+                .append(SiddhiCodeBuilderConstants.SPACE)
+                .append(function.getName())
+                .append(SiddhiCodeBuilderConstants.OPEN_SQUARE_BRACKET)
+                .append(function.getScriptType())
+                .append(SiddhiCodeBuilderConstants.CLOSE_SQUARE_BRACKET )
+                .append(SiddhiCodeBuilderConstants.SPACE)
+                .append(SiddhiCodeBuilderConstants.RETURN)
+                .append(SiddhiCodeBuilderConstants.SPACE )
+                .append(function.getReturnType().toLowerCase())
+                .append(SiddhiCodeBuilderConstants.SPACE)
+                .append(SiddhiCodeBuilderConstants.OPEN_CURLY_BRACKET)
+                .append(SiddhiCodeBuilderConstants.NEW_LINE)
+                .append(function.getBody().trim())
+                .append(SiddhiCodeBuilderConstants.NEW_LINE)
+                .append(SiddhiCodeBuilderConstants.CLOSE_CURLY_BRACKET)
+                .append(SiddhiCodeBuilderConstants.SEMI_COLON);
 
-        return SubElementCodeGenerator.generateComment(function.getPreviousCommentSegment()) +
-                SiddhiCodeBuilderConstants.DEFINE_FUNCTION +
-                SiddhiCodeBuilderConstants.SPACE +
-                function.getName() +
-                SiddhiCodeBuilderConstants.OPEN_SQUARE_BRACKET +
-                function.getScriptType() +
-                SiddhiCodeBuilderConstants.CLOSE_SQUARE_BRACKET +
-                SiddhiCodeBuilderConstants.SPACE +
-                SiddhiCodeBuilderConstants.RETURN +
-                SiddhiCodeBuilderConstants.SPACE +
-                function.getReturnType().toLowerCase() +
-                SiddhiCodeBuilderConstants.SPACE +
-                SiddhiCodeBuilderConstants.OPEN_CURLY_BRACKET +
-                function.getBody().trim() +
-                SiddhiCodeBuilderConstants.CLOSE_CURLY_BRACKET +
-                SiddhiCodeBuilderConstants.SEMI_COLON;
+        return functionStringBuilder.toString();
     }
-
 }

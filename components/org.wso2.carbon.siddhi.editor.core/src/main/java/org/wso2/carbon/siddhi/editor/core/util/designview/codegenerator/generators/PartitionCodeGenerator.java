@@ -42,14 +42,16 @@ public class PartitionCodeGenerator {
      * @return The Siddhi code representation of the given PartitionConfig object
      * @throws CodeGenerationException Error when generating the code
      */
-    public String generatePartition(PartitionConfig partition, List<String> definitionNames)
+    public String generatePartition(PartitionConfig partition, List<String> definitionNames, boolean isToolTip)
             throws CodeGenerationException {
         CodeGeneratorUtils.NullValidator.validateConfigObject(partition);
 
         StringBuilder partitionStringBuilder = new StringBuilder();
-
-        partitionStringBuilder.append(SubElementCodeGenerator.generateComment(partition.getPreviousCommentSegment()))
-                .append(SubElementCodeGenerator.generateAnnotations(partition.getAnnotationList()))
+        if (!isToolTip) {
+            partitionStringBuilder
+                    .append(SubElementCodeGenerator.generateComment(partition.getPreviousCommentSegment()));
+        }
+        partitionStringBuilder.append(SubElementCodeGenerator.generateAnnotations(partition.getAnnotationList()))
                 .append(SiddhiCodeBuilderConstants.PARTITION_WITH)
                 .append(SiddhiCodeBuilderConstants.OPEN_BRACKET)
                 .append(generatePartitionWith(partition.getPartitionWith()))
@@ -67,7 +69,7 @@ public class PartitionCodeGenerator {
             QueryCodeGenerator queryCodeGenerator = new QueryCodeGenerator();
             int queriesLeft = queries.size();
             for (QueryConfig query : CodeGeneratorUtils.reorderQueries(queries, definitionNames)) {
-                partitionStringBuilder.append(queryCodeGenerator.generateQuery(query));
+                partitionStringBuilder.append(queryCodeGenerator.generateQuery(query, isToolTip));
                 if (queriesLeft != 1) {
                     partitionStringBuilder.append(SiddhiCodeBuilderConstants.NEW_LINE);
                 }

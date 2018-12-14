@@ -35,19 +35,24 @@ public class StreamCodeGenerator {
      * @return The Siddhi code representation of the given StreamConfig object
      * @throws CodeGenerationException Error when generating the code
      */
-    public String generateStream(StreamConfig stream) throws CodeGenerationException {
+    public String generateStream(StreamConfig stream, boolean isToolTip) throws CodeGenerationException {
         CodeGeneratorUtils.NullValidator.validateConfigObject(stream);
+        StringBuilder streamStringBuilder = new StringBuilder();
+        if (!isToolTip) {
+            streamStringBuilder.append(SubElementCodeGenerator.generateComment(stream.getPreviousCommentSegment()));
+        }
 
-        return SubElementCodeGenerator.generateComment(stream.getPreviousCommentSegment()) +
-                SubElementCodeGenerator.generateAnnotations(stream.getAnnotationList()) +
-                SiddhiCodeBuilderConstants.DEFINE_STREAM +
-                SiddhiCodeBuilderConstants.SPACE +
-                stream.getName() +
-                SiddhiCodeBuilderConstants.SPACE +
-                SiddhiCodeBuilderConstants.OPEN_BRACKET +
-                SubElementCodeGenerator.generateAttributes(stream.getAttributeList()) +
-                SiddhiCodeBuilderConstants.CLOSE_BRACKET +
-                SiddhiCodeBuilderConstants.SEMI_COLON;
+        streamStringBuilder.append(SubElementCodeGenerator.generateAnnotations(stream.getAnnotationList()))
+                .append(SiddhiCodeBuilderConstants.DEFINE_STREAM)
+                .append(SiddhiCodeBuilderConstants.SPACE )
+                .append(stream.getName())
+                .append(SiddhiCodeBuilderConstants.SPACE)
+                .append(SiddhiCodeBuilderConstants.OPEN_BRACKET)
+                .append(SubElementCodeGenerator.generateAttributes(stream.getAttributeList()))
+                .append(SiddhiCodeBuilderConstants.CLOSE_BRACKET)
+                .append(SiddhiCodeBuilderConstants.SEMI_COLON);
+
+        return streamStringBuilder.toString();
     }
 
 }

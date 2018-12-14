@@ -36,27 +36,30 @@ public class WindowCodeGenerator {
      * @return The Siddhi code representation of the given WindowConfig object
      * @throws CodeGenerationException Error when generating the code
      */
-    public String generateWindow(WindowConfig window) throws CodeGenerationException {
+    public String generateWindow(WindowConfig window, boolean isToolTip) throws CodeGenerationException {
         CodeGeneratorUtils.NullValidator.validateConfigObject(window);
 
         StringBuilder windowStringBuilder = new StringBuilder();
-        windowStringBuilder.append(SubElementCodeGenerator.generateComment(window.getPreviousCommentSegment()))
-                .append(SubElementCodeGenerator.generateAnnotations(window.getAnnotationList()))
+        if (!isToolTip) {
+            windowStringBuilder.append(SubElementCodeGenerator.generateComment(window.getPreviousCommentSegment()));
+        }
+        windowStringBuilder.append(SubElementCodeGenerator.generateAnnotations(window.getAnnotationList()))
                 .append(SiddhiCodeBuilderConstants.DEFINE_WINDOW)
                 .append(SiddhiCodeBuilderConstants.SPACE)
                 .append(window.getName())
-                .append(SiddhiCodeBuilderConstants.SPACE)
+                .append(SiddhiCodeBuilderConstants.NEW_LINE)
                 .append(SiddhiCodeBuilderConstants.OPEN_BRACKET)
                 .append(SubElementCodeGenerator.generateAttributes(window.getAttributeList()))
                 .append(SiddhiCodeBuilderConstants.CLOSE_BRACKET)
-                .append(SiddhiCodeBuilderConstants.SPACE)
+                .append(SiddhiCodeBuilderConstants.NEW_LINE)
                 .append(window.getFunction())
+                .append(SiddhiCodeBuilderConstants.NEW_LINE)
                 .append(SiddhiCodeBuilderConstants.OPEN_BRACKET)
                 .append(SubElementCodeGenerator.generateParameterList(window.getParameters()))
                 .append(SiddhiCodeBuilderConstants.CLOSE_BRACKET);
 
         if (window.getOutputEventType() != null && !window.getOutputEventType().isEmpty()) {
-            windowStringBuilder.append(SiddhiCodeBuilderConstants.SPACE)
+            windowStringBuilder.append(SiddhiCodeBuilderConstants.NEW_LINE)
                     .append(SiddhiCodeBuilderConstants.OUTPUT)
                     .append(SiddhiCodeBuilderConstants.SPACE);
             switch (window.getOutputEventType().toUpperCase()) {
