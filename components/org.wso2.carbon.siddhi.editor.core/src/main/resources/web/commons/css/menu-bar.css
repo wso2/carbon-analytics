@@ -68,7 +68,8 @@
 }
 
 .shortcut-label {
-    margin-left: 30px;
+    margin-left: 5px;
+    color: #9f9f9f;
 }
 
 .menu-item-disabled > a > .shortcut-label {
@@ -89,7 +90,7 @@
 .file-dropdown-menu {
     background-color: #333;
     margin-top: 0;
-    width: 210px;
+    width: 255px;
 }
 .menu-bar .menu-group li.menu-item-disabled > a {
     color: #777;
