@@ -96,7 +96,7 @@ public class CodeGenerator {
      * @return
      * @throws CodeGenerationException
      */
-    public List<ToolTip> generateSiddhiAppToolTips(SiddhiAppConfig siddhiAppConfig) throws CodeGenerationException {
+    public List <ToolTip> generateSiddhiAppToolTips(SiddhiAppConfig siddhiAppConfig) throws CodeGenerationException {
         SiddhiAppConfig siddhiApp = siddhiAppConfig;
 
         List<String> allDefinitions = CodeGeneratorUtils.getDefinitionNames(siddhiApp.getStreamList(),
