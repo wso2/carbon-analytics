@@ -16,8 +16,8 @@
  * under the License.
  */
 
-define(['require', 'log', 'jquery', 'lodash', 'trigger', 'designViewUtils'],
-    function (require, log, $, _, Trigger, DesignViewUtils) {
+define(['require', 'log', 'jquery', 'lodash', 'trigger', 'designViewUtils', 'constants'],
+    function (require, log, $, _, Trigger, DesignViewUtils, Constants) {
 
         /**
          * @class TriggerForm Creates a forms to collect data from a trigger
@@ -36,20 +36,18 @@ define(['require', 'log', 'jquery', 'lodash', 'trigger', 'designViewUtils'],
             }
         };
 
-        const alphabeticValidatorRegex = /^([a-zA-Z])$/;
-        const start = "start";
-        const cronExpression = "cronExpression";
-        const every = "every";
 
         /**
          * Function to render the drop down for trigger-at
+         * @param {Object} triggerCriteria array of trigger criteria [at]
          */
-        var renderAt = function () {
-            var atPropertyDiv = '<h4> At </h4> <select id = "at-type">' +
-                '<option value = "' + start + '"> start </option>' +
-                '<option value = "' + cronExpression + '"> cron expression </option>' +
-                '<option value = "' + every + '"> every </option>' +
-                '</select>';
+        var renderAt = function (triggerCriteria) {
+            var atPropertyDiv = '<h4> Trigger Criteria </h4> <select id = "at-type">';
+            _.forEach(triggerCriteria, function (triggerAt) {
+                atPropertyDiv += '<option value = "' + triggerAt.name + '">' + triggerAt.name + '</option>';
+            });
+            atPropertyDiv += '</select> <i class = "fw fw-info"> ' +
+                '<span style = "display:none" class = "at-description"> {{description}} </span> </i>';
             $('#define-trigger-at').html(atPropertyDiv);
         };
 
@@ -58,14 +56,28 @@ define(['require', 'log', 'jquery', 'lodash', 'trigger', 'designViewUtils'],
          * @param {String} selectedAtType selected at type from the select-box
          */
         var renderAtContent = function (selectedAtType) {
-            if (selectedAtType === start) {
+            if (selectedAtType === Constants.START) {
                 //show no text-box
-                $('#trigger-at-content').html("");
+                $('#trigger-at-content').html('');
             } else {
                 //render a text-box to put the atEvery or cron-expression value
                 $('#trigger-at-content').html('<input type="text" class="clearfix"> ' +
                     '<label class="error-message" > </label>');
             }
+        };
+
+        /**
+         * Function to obtain a particular trigger object from the predefined triggers
+         * @param {Object} triggerCriteria predefined trigger criteria
+         * @param {String} selectedCriteria selected trigger criteria
+         * @return {Object} triggerCriteriaObject
+         */
+        var getTriggerCriteria = function (triggerCriteria, selectedCriteria) {
+            var triggerCriteriaObject =
+                _.find(triggerCriteria, function (criteria) {
+                    return criteria.name == selectedCriteria
+                });
+            return triggerCriteriaObject;
         };
 
         /**
@@ -76,24 +88,43 @@ define(['require', 'log', 'jquery', 'lodash', 'trigger', 'designViewUtils'],
          */
         var determineAt = function (at, atOrAtEvery) {
             var selectedAtType;
-            if (atOrAtEvery === "at") {
+            if (atOrAtEvery === Constants.AT) {
                 //check if at-type is start
-                if (at.toLowerCase() === start) {
-                    selectedAtType = start;
+                if (at.toLowerCase() === Constants.START) {
+                    selectedAtType = Constants.START;
                     renderAtContent(selectedAtType);
                     return selectedAtType;
                 } else {
                     //cron expression
-                    selectedAtType = cronExpression;
+                    selectedAtType = Constants.CRON_EXPRESSION;
                     renderAtContent(selectedAtType);
                     return selectedAtType;
                 }
             } else {
                 //atEvery
-                selectedAtType = every;
+                selectedAtType = Constants.EVERY;
                 renderAtContent(selectedAtType);
                 return selectedAtType;
             }
+        };
+
+        /**
+         * Function to add the error class
+         * @param {Object} id object where the errors needs to be displayed
+         */
+        var addErrorClass = function (id) {
+            $(id)[0].scrollIntoView();
+            $(id).addClass('required-input-field')
+        };
+
+        /**
+        * Function to show the trigger criteria description
+        * @param {Object} triggerCriteria predefined trigger criteria
+        * @param {String} selected trigger criteria
+        */
+        var showTriggerCriteriaDescription = function (triggerCriteria, selectedCriteria) {
+            var triggerCriteriaObject = getTriggerCriteria(triggerCriteria, selectedCriteria);
+            $('#define-trigger-at .at-description').text(triggerCriteriaObject.description);
         };
 
         /**
@@ -122,15 +153,26 @@ define(['require', 'log', 'jquery', 'lodash', 'trigger', 'designViewUtils'],
             // retrieve the trigger information from the collection
             var clickedElement = self.configurationData.getSiddhiAppConfig().getTrigger(id);
             var name = clickedElement.getName();
-            renderAt();
+            var triggerCriteria = self.configurationData.application.config.trigger;
+            renderAt(triggerCriteria);
 
-            //if name is defined
+            //Event listener to show the at description
+            $('#define-trigger-at').on('mouseover', '.fw-info', function () {
+                $(this).find('.at-description').show();
+            });
+
+            //Event listener to hide the at description
+            $('#define-trigger-at').on('mouseout', '.fw-info', function () {
+                $(this).find('.at-description').hide();
+            });
+
+
             if (name) {
+                //if the trigger object is already edited
                 $('#triggerName').val(name.trim());
-
                 var atOrAtEvery = clickedElement.getAtOrAtEvery().trim();
                 var at = clickedElement.getAt().trim();
-                if (atOrAtEvery === "at") {
+                if (atOrAtEvery === Constants.AT) {
                     if (at.indexOf("'") >= 0 || at.indexOf('"') >= 0) {
                         //to remove the string quote from the start and cron expression
                         at = at.slice(1, at.length - 1);
@@ -138,7 +180,7 @@ define(['require', 'log', 'jquery', 'lodash', 'trigger', 'designViewUtils'],
                 } else {
                     //remove every from atEvery's value
                     var replaceEvery = at;
-                    at = replaceEvery.replace("every", '');
+                    at = replaceEvery.replace(Constants.EVERY, '');
                 }
                 at = at.trim();
                 var selectedAtType = determineAt(at, atOrAtEvery);
@@ -147,14 +189,21 @@ define(['require', 'log', 'jquery', 'lodash', 'trigger', 'designViewUtils'],
                 }).prop('selected', true);
 
                 $('#trigger-at-content input[type="text"]').val(at);
+                showTriggerCriteriaDescription(triggerCriteria, selectedAtType)
             }
 
             //onchange of the at-type selection
             $('#at-type').change(function () {
                 renderAtContent(this.value);
-                if (at && this.value.toLowerCase() === selectedAtType.toLowerCase()) {
-                    if (this.value !== "start") {
+                showTriggerCriteriaDescription(triggerCriteria, this.value)
+                if (at && this.value === selectedAtType) {
+                    if (this.value !== Constants.START) {
                         $('#trigger-at-content input[type="text"]').val(at);
+                    }
+                } else {
+                    if (this.value !== Constants.START) {
+                        var triggerCriteriaObject = getTriggerCriteria(triggerCriteria, this.value);
+                        $('#trigger-at-content input[type="text"]').val(triggerCriteriaObject.defaultValue);
                     }
                 }
             });
@@ -172,8 +221,7 @@ define(['require', 'log', 'jquery', 'lodash', 'trigger', 'designViewUtils'],
                 var triggerNameErrorMessage = $('#define-trigger-name').find('.error-message');
                 // to check if trigger name is empty
                 if (triggerName == "") {
-                    $('#triggerName').addClass('required-input-field');
-                    $('#triggerName')[0].scrollIntoView();
+                    addErrorClass('#triggerName');
                     triggerNameErrorMessage.text("Trigger name is required.");
                     isErrorOccurred = true;
                     return;
@@ -189,24 +237,21 @@ define(['require', 'log', 'jquery', 'lodash', 'trigger', 'designViewUtils'],
                     var isTriggerNameUsed = self.formUtils.isDefinitionElementNameUsed(triggerName,
                         clickedElement.getId());
                     if (isTriggerNameUsed) {
-                        $('#triggerName').addClass('required-input-field');
-                        $('#triggerName')[0].scrollIntoView();
+                        addErrorClass('#triggerName');
                         triggerNameErrorMessage.text("Trigger name is already used.");
                         isErrorOccurred = true;
                         return;
                     }
                     //to check if trigger name contains white spaces
                     if (triggerName.indexOf(' ') >= 0) {
-                        $('#triggerName').addClass('required-input-field');
-                        $('#triggerName')[0].scrollIntoView();
+                        addErrorClass('#triggerName');
                         triggerNameErrorMessage.text("Trigger name cannot have white space.");
                         isErrorOccurred = true;
                         return;
                     }
                     //to check if trigger name starts with an alphabetic character
-                    if (!(alphabeticValidatorRegex).test(triggerName.charAt(0))) {
-                        $('#triggerName').addClass('required-input-field');
-                        $('#triggerName')[0].scrollIntoView();
+                    if (!(Constants.ALPHABETIC_VALIDATOR_REGEX).test(triggerName.charAt(0))) {
+                        addErrorClass('#triggerName');
                         triggerNameErrorMessage.text("Trigger name must start with an alphabetic character.");
                         isErrorOccurred = true;
                         return;
@@ -215,9 +260,10 @@ define(['require', 'log', 'jquery', 'lodash', 'trigger', 'designViewUtils'],
 
                 var selectedAtType = $('#at-type').val();
                 var at;
-                if (selectedAtType !== start) {
+                if (selectedAtType !== Constants.START) {
                     at = $('#trigger-at-content input[type="text"]').val().trim();
                     if (at === "") {
+                        addErrorClass($('#trigger-at-content input[type="text"]'));
                         $('#trigger-at-content').find('.error-message').text("Value is required");
                         isErrorOccurred = true;
                         return;
@@ -234,15 +280,15 @@ define(['require', 'log', 'jquery', 'lodash', 'trigger', 'designViewUtils'],
                         textNode.html(triggerName);
                     }
                     var atOrAtEvery;
-                    if (selectedAtType === start) {
-                        at = start
-                        atOrAtEvery = "at"
-                    } else if (selectedAtType === cronExpression) {
+                    if (selectedAtType === Constants.START) {
+                        at = Constants.START
+                        atOrAtEvery = Constants.AT
+                    } else if (selectedAtType === Constants.CRON_EXPRESSION) {
                         at = at;
-                        atOrAtEvery = "at";
+                        atOrAtEvery = Constants.AT;
                     } else {
-                        at = "every " + at;
-                        atOrAtEvery = "atEvery";
+                        at = Constants.EVERY + " " + at;
+                        atOrAtEvery = Constants.EVERY;
                     }
                     clickedElement.setAt(at);
                     clickedElement.setAtOrAtEvery(atOrAtEvery);
@@ -272,3 +318,4 @@ define(['require', 'log', 'jquery', 'lodash', 'trigger', 'designViewUtils'],
 
         return TriggerForm;
     });
+
