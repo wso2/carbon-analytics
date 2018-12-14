@@ -16,8 +16,9 @@
  * under the License.
  */
 
-define(['require', 'lodash', 'appData'],
-    function (require, _, AppData) {
+define(['require', 'lodash', 'appData', 'log'],
+    function (require, _, AppData, log) {
+
 
         /**
          * @class FormUtils Contains utility methods for forms
@@ -312,9 +313,9 @@ define(['require', 'lodash', 'appData'],
                 },
                 error: function (error) {
                     if (error.responseText) {
-                        console.log(error.responseText);
+                        log.error(error.responseText);
                     } else {
-                        console.log("Error occured while processing the request");
+                        log.error("Error occured while processing the request");
                     }
                 }
             });

@@ -1439,7 +1439,7 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
             if (response.status === "success") {
                 tooltipList = response.tooltipList;
             } else {
-                console.log(response.errorMessage);
+                log.error(response.errorMessage);
             }
 
             // set isStillDrawingGraph to true since the graph drawing has begun
@@ -1453,11 +1453,11 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
                 var mouseTop = lastArrayEntry * 100 - self.canvas.offset().top + self.canvas.scrollTop() - 40;
                 var mouseLeft = lastArrayEntry * 200 - self.canvas.offset().left + self.canvas.scrollLeft() - 60;
                 var sourceToolTip = '';
-                for (var i in tooltipList) {
-                    if (tooltipList[i].id === sourceId) {
-                        sourceToolTip = tooltipList[i].text;
-                        break;
-                    }
+                var toolTipObject = _.find(tooltipList, function (toolTip) {
+                    return toolTip.id === sourceId;
+                });
+                if (toolTipObject !== undefined) {
+                    sourceToolTip = toolTipObject.text;
                 }
                 self.handleSourceAnnotation(mouseTop, mouseLeft, true, sourceName, sourceId, sourceToolTip);
             });
@@ -1470,11 +1470,11 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
                 var mouseTop = lastArrayEntry * 100 - self.canvas.offset().top + self.canvas.scrollTop() - 40;
                 var mouseLeft = lastArrayEntry * 200 - self.canvas.offset().left + self.canvas.scrollLeft() - 60;
                 var sinkToolTip = '';
-                for (var i in tooltipList) {
-                    if (tooltipList[i].id === sinkId) {
-                        sinkToolTip = tooltipList[i].text;
-                        break;
-                    }
+                var toolTipObject = _.find(tooltipList, function (toolTip) {
+                    return toolTip.id === sinkId;
+                });
+                if (toolTipObject !== undefined) {
+                    sinkToolTip = toolTipObject.text;
                 }
                 self.handleSinkAnnotation(mouseTop, mouseLeft, true, sinkName, sinkId, sinkToolTip);
             });
@@ -1487,11 +1487,11 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
                 var mouseTop = lastArrayEntry * 100 - self.canvas.offset().top + self.canvas.scrollTop() - 40;
                 var mouseLeft = lastArrayEntry * 200 - self.canvas.offset().left + self.canvas.scrollLeft() - 60;
                 var streamToolTip = '';
-                for (var i in tooltipList) {
-                    if (tooltipList[i].id === streamId) {
-                        streamToolTip = tooltipList[i].text;
-                        break;
-                    }
+                var toolTipObject = _.find(tooltipList, function (toolTip) {
+                        return toolTip.id === streamId;
+                    });
+                if (toolTipObject !== undefined) {
+                    streamToolTip = toolTipObject.text;
                 }
                 self.handleStream(mouseTop, mouseLeft, true, streamId, streamName, streamToolTip);
             });
@@ -1505,11 +1505,11 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
                 var mouseTop = lastArrayEntry * 100 - self.canvas.offset().top + self.canvas.scrollTop() - 40;
                 var mouseLeft = lastArrayEntry * 200 - self.canvas.offset().left + self.canvas.scrollLeft() - 60;
                 var tableToolTip = '';
-                for (var i in tooltipList) {
-                    if (tooltipList[i].id === tableId) {
-                        tableToolTip = tooltipList[i].text;
-                        break;
-                    }
+                var toolTipObject = _.find(tooltipList, function (toolTip) {
+                    return toolTip.id === tableId;
+                });
+                if (toolTipObject !== undefined) {
+                    tableToolTip = toolTipObject.text;
                 }
                 self.handleTable(mouseTop, mouseLeft, true, tableId, tableName, tableToolTip);
             });
@@ -1523,11 +1523,11 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
                 var mouseTop = lastArrayEntry * 100 - self.canvas.offset().top + self.canvas.scrollTop() - 40;
                 var mouseLeft = lastArrayEntry * 200 - self.canvas.offset().left + self.canvas.scrollLeft() - 60;
                 var windowToolTip = '';
-                for (var i in tooltipList) {
-                    if (tooltipList[i].id === windowId) {
-                        windowToolTip = tooltipList[i].text;
-                        break;
-                    }
+                var toolTipObject = _.find(tooltipList, function (toolTip) {
+                    return toolTip.id === windowId;
+                });
+                if (toolTipObject !== undefined) {
+                    windowToolTip = toolTipObject.text;
                 }
                 self.handleWindow(mouseTop, mouseLeft, true, windowId, windowName, windowToolTip);
             });
@@ -1541,11 +1541,11 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
                 var mouseTop = lastArrayEntry * 100 - self.canvas.offset().top + self.canvas.scrollTop() - 40;
                 var mouseLeft = lastArrayEntry * 200 - self.canvas.offset().left + self.canvas.scrollLeft() - 60;
                 var triggerToolTip = '';
-                for (var i in tooltipList) {
-                    if (tooltipList[i].id === triggerId) {
-                        triggerToolTip = tooltipList[i].text;
-                        break;
-                    }
+                var toolTipObject = _.find(tooltipList, function (toolTip) {
+                    return toolTip.id === triggerId;
+                });
+                if (toolTipObject !== undefined) {
+                    triggerToolTip = toolTipObject.text;
                 }
                 self.handleTrigger(mouseTop, mouseLeft, true, triggerId, triggerName, triggerToolTip);
             });
@@ -1559,11 +1559,11 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
                 var mouseTop = lastArrayEntry * 100 - self.canvas.offset().top + self.canvas.scrollTop() - 40;
                 var mouseLeft = lastArrayEntry * 200 - self.canvas.offset().left + self.canvas.scrollLeft() - 60;
                 var aggregationToolTip = '';
-                for (var i in tooltipList) {
-                    if (tooltipList[i].id === aggregationId) {
-                        aggregationToolTip = tooltipList[i].text;
-                        break;
-                    }
+                var toolTipObject = _.find(tooltipList, function (toolTip) {
+                    return toolTip.id === aggregationId;
+                });
+                if (toolTipObject !== undefined) {
+                    aggregationToolTip = toolTipObject.text;
                 }
                 self.handleAggregation(mouseTop, mouseLeft, true, aggregationId, aggregationName, aggregationToolTip);
             });
@@ -1577,11 +1577,11 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
                 var mouseTop = lastArrayEntry * 100 - self.canvas.offset().top + self.canvas.scrollTop() - 40;
                 var mouseLeft = lastArrayEntry * 200 - self.canvas.offset().left + self.canvas.scrollLeft() - 60;
                 var functionToolTip = '';
-                for (var i in tooltipList) {
-                    if (tooltipList[i].id === functionId) {
-                        functionToolTip = tooltipList[i].text;
-                        break;
-                    }
+                var toolTipObject = _.find(tooltipList, function (toolTip) {
+                    return toolTip.id === functionId;
+                });
+                if (toolTipObject !== undefined) {
+                    functionToolTip = toolTipObject.text;
                 }
                 self.handleFunction(mouseTop, mouseLeft, true, functionId, functionName, functionToolTip);
             });
@@ -1595,11 +1595,11 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
                 var mouseTop = lastArrayEntry * 100 - self.canvas.offset().top + self.canvas.scrollTop() - 40;
                 var mouseLeft = lastArrayEntry * 200 - self.canvas.offset().left + self.canvas.scrollLeft() - 60;
                 var patternQueryToolTip = '';
-                for (var i in tooltipList) {
-                    if (tooltipList[i].id === patternQueryId) {
-                        patternQueryToolTip = tooltipList[i].text;
-                        break;
-                    }
+                var toolTipObject = _.find(tooltipList, function (toolTip) {
+                    return toolTip.id === patternQueryId;
+                });
+                if (toolTipObject !== undefined) {
+                    patternQueryToolTip = toolTipObject.text;
                 }
                 self.handlePatternQuery(mouseTop, mouseLeft, true, patternQueryName, patternQueryId,
                     patternQueryToolTip);
@@ -1614,11 +1614,11 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
                 var mouseTop = lastArrayEntry * 100 - self.canvas.offset().top + self.canvas.scrollTop() - 40;
                 var mouseLeft = lastArrayEntry * 200 - self.canvas.offset().left + self.canvas.scrollLeft() - 60;
                 var sequenceQueryToolTip = '';
-                for (var i in tooltipList) {
-                    if (tooltipList[i].id === sequenceQueryId) {
-                        sequenceQueryToolTip = tooltipList[i].text;
-                        break;
-                    }
+                var toolTipObject = _.find(tooltipList, function (toolTip) {
+                    return toolTip.id === sequenceQueryId;
+                });
+                if (toolTipObject !== undefined) {
+                    sequenceQueryToolTip = toolTipObject.text;
                 }
                 self.handleSequenceQuery(mouseTop, mouseLeft, true, sequenceQueryName, sequenceQueryId,
                     sequenceQueryToolTip);
@@ -1646,11 +1646,11 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
                     var mouseTop = lastArrayEntry * 100 - self.canvas.offset().top + self.canvas.scrollTop() - 40;
                     var mouseLeft = lastArrayEntry * 200 - self.canvas.offset().left + self.canvas.scrollLeft() - 60;
                     var queryToolTip = '';
-                    for (var i in tooltipList) {
-                        if (tooltipList[i].id === queryId) {
-                            queryToolTip = tooltipList[i].text;
-                            break;
-                        }
+                    var toolTipObject = _.find(tooltipList, function (toolTip) {
+                        return toolTip.id === queryId;
+                    });
+                    if (toolTipObject !== undefined) {
+                        queryToolTip = toolTipObject.text;
                     }
                     self.handleWindowFilterProjectionQuery(queryType, mouseTop, mouseLeft, true, queryName, queryId,
                         queryToolTip);
@@ -1665,11 +1665,11 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
                 var mouseTop = lastArrayEntry * 100 - self.canvas.offset().top + self.canvas.scrollTop() - 40;
                 var mouseLeft = lastArrayEntry * 200 - self.canvas.offset().left + self.canvas.scrollLeft() - 60;
                 var joinQueryToolTip = '';
-                for (var i in tooltipList) {
-                    if (tooltipList[i].id === joinQueryId) {
-                        joinQueryToolTip = tooltipList[i].text;
-                        break;
-                    }
+                var toolTipObject = _.find(tooltipList, function (toolTip) {
+                    return toolTip.id === joinQueryId;
+                });
+                if (toolTipObject !== undefined) {
+                    joinQueryToolTip = toolTipObject.text;
                 }
                 self.handleJoinQuery(mouseTop, mouseLeft, true, joinQueryName, joinQueryId, joinQueryToolTip);
             });
@@ -1682,11 +1682,11 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
                 var mouseTop = lastArrayEntry * 100 - self.canvas.offset().top + self.canvas.scrollTop() - 40;
                 var mouseLeft = lastArrayEntry * 200 - self.canvas.offset().left + self.canvas.scrollLeft() - 60;
                 var partitionToolTip = '';
-                for (var i in tooltipList) {
-                    if (tooltipList[i].id === partitionId) {
-                        partitionToolTip = tooltipList[i].text;
-                        break;
-                    }
+                var toolTipObject = _.find(tooltipList, function (toolTip) {
+                    return toolTip.id === partitionId;
+                });
+                if (toolTipObject !== undefined) {
+                    partitionToolTip = toolTipObject.text;
                 }
                 self.handlePartition(mouseTop, mouseLeft, true, partitionId, partitionToolTip);
 
@@ -1700,11 +1700,11 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
                     var mouseTop = lastArrayEntry * 100 - self.canvas.offset().top + self.canvas.scrollTop() - 40;
                     var mouseLeft = lastArrayEntry * 200 - self.canvas.offset().left + self.canvas.scrollLeft() - 60;
                     var streamToolTip = '';
-                    for (var i in tooltipList) {
-                        if (tooltipList[i].id === streamId) {
-                            streamToolTip = tooltipList[i].text;
-                            break;
-                        }
+                    var toolTipObject = _.find(tooltipList, function (toolTip) {
+                        return toolTip.id === streamId;
+                    });
+                    if (toolTipObject !== undefined) {
+                        streamToolTip = toolTipObject.text;
                     }
                     self.handleStream(mouseTop, mouseLeft, true, streamId, streamName, streamToolTip);
 
@@ -1721,11 +1721,11 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
                     var mouseTop = lastArrayEntry * 100 - self.canvas.offset().top + self.canvas.scrollTop() - 40;
                     var mouseLeft = lastArrayEntry * 200 - self.canvas.offset().left + self.canvas.scrollLeft() - 60;
                     var patternQueryToolTip = '';
-                    for (var i in tooltipList) {
-                        if (tooltipList[i].id === patternQueryId) {
-                            patternQueryToolTip = tooltipList[i].text;
-                            break;
-                        }
+                    var toolTipObject = _.find(tooltipList, function (toolTip) {
+                        return toolTip.id === patternQueryId;
+                    });
+                    if (toolTipObject !== undefined) {
+                        patternQueryToolTip = toolTipObject.text;
                     }
                     self.handlePatternQuery(mouseTop, mouseLeft, true, patternQueryName, patternQueryId,
                         patternQueryToolTip);
@@ -1743,11 +1743,11 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
                     var mouseTop = lastArrayEntry * 100 - self.canvas.offset().top + self.canvas.scrollTop() - 40;
                     var mouseLeft = lastArrayEntry * 200 - self.canvas.offset().left + self.canvas.scrollLeft() - 60;
                     var sequenceQueryToolTip = '';
-                    for (var i in tooltipList) {
-                        if (tooltipList[i].id === sequenceQueryId) {
-                            sequenceQueryToolTip = tooltipList[i].text;
-                            break;
-                        }
+                    var toolTipObject = _.find(tooltipList, function (toolTip) {
+                        return toolTip.id === sequenceQueryId;
+                    });
+                    if (toolTipObject !== undefined) {
+                        sequenceQueryToolTip = toolTipObject.text;
                     }
                     self.handleSequenceQuery(mouseTop, mouseLeft, true, sequenceQueryName, sequenceQueryId,
                         sequenceQueryToolTip);
@@ -1780,11 +1780,11 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
                         var mouseLeft
                             = lastArrayEntry * 200 - self.canvas.offset().left + self.canvas.scrollLeft() - 60;
                         var queryToolTip = '';
-                        for (var i in tooltipList) {
-                            if (tooltipList[i].id === queryId) {
-                                queryToolTip = tooltipList[i].text;
-                                break;
-                            }
+                        var toolTipObject = _.find(tooltipList, function (toolTip) {
+                            return toolTip.id === queryId;
+                        });
+                        if (toolTipObject !== undefined) {
+                            queryToolTip = toolTipObject.text;
                         }
                         self.handleWindowFilterProjectionQuery(
                             queryType, mouseTop, mouseLeft, true, queryName, queryId, queryToolTip);
@@ -1802,11 +1802,11 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
                     var mouseTop = lastArrayEntry * 100 - self.canvas.offset().top + self.canvas.scrollTop() - 40;
                     var mouseLeft = lastArrayEntry * 200 - self.canvas.offset().left + self.canvas.scrollLeft() - 60;
                     var joinQueryToolTip = '';
-                    for (var i in tooltipList) {
-                        if (tooltipList[i].id === joinQueryId) {
-                            joinQueryToolTip = tooltipList[i].text;
-                            break;
-                        }
+                    var toolTipObject = _.find(tooltipList, function (toolTip) {
+                        return toolTip.id === joinQueryId;
+                    });
+                    if (toolTipObject !== undefined) {
+                        joinQueryToolTip = toolTipObject.text;
                     }
                     self.handleJoinQuery(mouseTop, mouseLeft, true, joinQueryName, joinQueryId, joinQueryToolTip);
 

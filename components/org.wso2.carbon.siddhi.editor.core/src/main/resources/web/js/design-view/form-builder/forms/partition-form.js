@@ -207,15 +207,15 @@ define(['require', 'log', 'jquery', 'lodash', 'partitionWith', 'designViewUtils'
                     if (response.status === "success") {
                         tooltipList = response.tooltipList;
                     } else {
-                        console.log(response.errorMessage);
+                        log.error(response.errorMessage);
                     }
 
                     var partitionToolTip = '';
-                    for (var i in tooltipList) {
-                        if (tooltipList[i].id === id) {
-                            partitionToolTip = tooltipList[i].text;
-                            break;
-                        }
+                    var toolTipObject = _.find(tooltipList, function (toolTip) {
+                        return toolTip.id === id;
+                    });
+                    if (toolTipObject !== undefined) {
+                        partitionToolTip = toolTipObject.text;
                     }
 
                     $('#' + id).prop('title', partitionToolTip);
