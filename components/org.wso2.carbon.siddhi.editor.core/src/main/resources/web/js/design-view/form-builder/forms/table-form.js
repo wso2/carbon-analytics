@@ -16,10 +16,10 @@
  * under the License.
  */
 
-define(['log', 'jquery', 'lodash', 'attribute', 'table', 'storeAnnotation', 'designViewUtils', 'handlebar',
-    'js_tree', 'annotationObject', 'annotationElement'],
-    function (log, $, _, Attribute, Table, StoreAnnotation, DesignViewUtils, Handlebars, jstree,
-        AnnotationObject, AnnotationElement) {
+define(['log', 'jquery', 'lodash', 'attribute', 'storeAnnotation', 'designViewUtils', 'handlebar',
+    'js_tree', 'annotationObject', 'annotationElement', 'constants'],
+    function (log, $, _, Attribute, StoreAnnotation, DesignViewUtils, Handlebars, jstree,
+        AnnotationObject, AnnotationElement, Constants) {
 
         /**
          * @class TableForm Creates a forms to collect data from a table
@@ -37,11 +37,6 @@ define(['log', 'jquery', 'lodash', 'attribute', 'table', 'storeAnnotation', 'des
                 this.toggleViewButton = $('#toggle-view-button-' + currentTabId);
             }
         };
-
-        const ALPHABETIC_VALIDATOR_REGEX = /^([a-zA-Z])$/;
-        const DEFAULT_STORE_TYPE = "in-memory";
-        const RDBMS_STORE_TYPE = "rdbms";
-
 
         /** Function to manage the attribute navigations */
         var changeAttributeNavigation = function () {
@@ -361,14 +356,14 @@ define(['log', 'jquery', 'lodash', 'attribute', 'table', 'storeAnnotation', 'des
             //first check if in-memory is already present in the predefined stores array
             var found = false;
             for (var store of predefinedStores) {
-                if (store.name === DEFAULT_STORE_TYPE) {
+                if (store.name === Constants.DEFAULT_STORE_TYPE) {
                     found = true;
                     break;
                 }
             }
             if (!found) {
                 var inMemoryType = {
-                    name: DEFAULT_STORE_TYPE,
+                    name: Constants.DEFAULT_STORE_TYPE,
                     parameters: []
                 };
                 predefinedStores.push(inMemoryType);
@@ -415,7 +410,7 @@ define(['log', 'jquery', 'lodash', 'attribute', 'table', 'storeAnnotation', 'des
                 addErrorClass(id);
                 return true;
             }
-            if (!ALPHABETIC_VALIDATOR_REGEX.test(name.charAt(0))) {
+            if (!Constants.ALPHABETIC_VALIDATOR_REGEX.test(name.charAt(0))) {
                 errorMessageParent.text(type + " name must start with an alphabetical character.");
                 addErrorClass(id);
                 return true;
@@ -834,6 +829,7 @@ define(['log', 'jquery', 'lodash', 'attribute', 'table', 'storeAnnotation', 'des
 
             var predefinedStores = _.orderBy(this.configurationData.rawExtensions["store"], ['name'], ['asc']);
             addDefaultStoreType(predefinedStores);
+            var predefinedTableAnnotations = self.configurationData.application.config.table_predefined_annotations;
             var customizedStoreOptions = [];
             var storeOptions = [];
             var storeOptionsWithValues = [];
@@ -980,10 +976,16 @@ define(['log', 'jquery', 'lodash', 'attribute', 'table', 'storeAnnotation', 'des
             var savedAnnotations = clickedElement.getAnnotationList();
             var savedAnnotationObjects = clickedElement.getAnnotationListObjects();
             var userAnnotations = [];
-            var tableAnnotations = self.configurationData.application.config.table_predefined_annotations;
-            if (savedAnnotations || savedAnnotations.length != 0) {
+            var tableAnnotations = predefinedTableAnnotations;
+            if (savedAnnotations && savedAnnotations.length != 0) {
                 userAnnotations = getUserAnnotations(savedAnnotationObjects, tableAnnotations);
                 mapAnnotationValues(tableAnnotations, savedAnnotationObjects)
+            } else {
+                _.forEach(predefinedTableAnnotations, function (annotation) {
+                    annotation.isChecked = false;
+                    annotation.values = [{ value: "" }];
+                })
+                tableAnnotations = predefinedTableAnnotations;
             }
             //render the predefined table annotation form template
             var annotationFormTemplate = Handlebars.compile($('#table-store-annotation-template').html());
@@ -1010,8 +1012,9 @@ define(['log', 'jquery', 'lodash', 'attribute', 'table', 'storeAnnotation', 'des
                 renderOptions(dataStoreOptions, customizedStoreOptions, "store")
             });
 
-            //if store is defined
+
             if (clickedElement.getStore()) {
+                //if table object is already edited
                 var savedStoreAnnotation = clickedElement.getStore();
                 var savedStoreType = savedStoreAnnotation.getType().toLowerCase();
                 storeOptions = getSelectedTypeOptions(savedStoreType, predefinedStores);
@@ -1028,7 +1031,7 @@ define(['log', 'jquery', 'lodash', 'attribute', 'table', 'storeAnnotation', 'des
                 $('#define-store #store-type').val(savedStoreType);
                 customizedStoreOptions = getCustomizedOptions(storeOptions, savedStoreOptions);
                 storeOptionsWithValues = mapUserOptionValues(storeOptions, savedStoreOptions);
-                if (savedStoreType == RDBMS_STORE_TYPE) {
+                if (savedStoreType == Constants.RDBMS_STORE_TYPE) {
                     renderRdbmsTypes();
                     checkRdbmsType(storeOptionsWithValues);
                     var dataStoreOptions = getRdbmsOptions(storeOptionsWithValues);
@@ -1037,19 +1040,20 @@ define(['log', 'jquery', 'lodash', 'attribute', 'table', 'storeAnnotation', 'des
                     renderOptions(storeOptionsWithValues, customizedStoreOptions, "store");
                 }
             } else {
-                $('#define-store #store-type').val(DEFAULT_STORE_TYPE);
+                //if table form is freshly opened [ new table object]
+                $('#define-store #store-type').val(Constants.DEFAULT_STORE_TYPE);
             }
 
             //onchange of the store type select box
             $('#define-store').on('change', '#store-type', function () {
-                if (this.value === DEFAULT_STORE_TYPE) {
+                if (this.value === Constants.DEFAULT_STORE_TYPE) {
                     $('#define-store-options').empty();
                     $('#define-rdbms-type').hide();
                 } else if (clickedElement.getStore() && savedStoreType === this.value) {
                     storeOptions = getSelectedTypeOptions(this.value, predefinedStores);
                     customizedStoreOptions = getCustomizedOptions(storeOptions, savedStoreOptions);
                     storeOptionsWithValues = mapUserOptionValues(storeOptions, savedStoreOptions);
-                    if (this.value == RDBMS_STORE_TYPE) {
+                    if (this.value == Constants.RDBMS_STORE_TYPE) {
                         $('#define-rdbms-type').show();
                         renderRdbmsTypes();
                         var dataStoreOptions = getRdbmsOptions(storeOptionsWithValues);
@@ -1063,7 +1067,7 @@ define(['log', 'jquery', 'lodash', 'attribute', 'table', 'storeAnnotation', 'des
                     storeOptions = getSelectedTypeOptions(this.value, predefinedStores);
                     storeOptionsWithValues = createOptionObjectWithValues(storeOptions);
                     customizedStoreOptions = [];
-                    if (this.value == RDBMS_STORE_TYPE) {
+                    if (this.value == Constants.RDBMS_STORE_TYPE) {
                         renderRdbmsTypes();
                         //as default select the data-store type
                         $("#define-rdbms-type input[name=radioOpt][value='inline-config']").prop("checked", true);
@@ -1117,7 +1121,7 @@ define(['log', 'jquery', 'lodash', 'attribute', 'table', 'storeAnnotation', 'des
 
                 //store annotation
                 var selectedStoreType = $('#define-store #store-type').val();
-                if (selectedStoreType !== DEFAULT_STORE_TYPE) {
+                if (selectedStoreType !== Constants.DEFAULT_STORE_TYPE) {
                     if (validateOptions(storeOptions)) {
                         isErrorOccurred = true;
                         return;
@@ -1156,7 +1160,7 @@ define(['log', 'jquery', 'lodash', 'attribute', 'table', 'storeAnnotation', 'des
                         var textNode = $('#' + id).find('.tableNameNode');
                         textNode.html(tableName);
                     }
-                    if (selectedStoreType !== DEFAULT_STORE_TYPE) {
+                    if (selectedStoreType !== Constants.DEFAULT_STORE_TYPE) {
                         var optionsMap = {};
                         buildOptions(optionsMap);
                         buildCustomizedOption(optionsMap);

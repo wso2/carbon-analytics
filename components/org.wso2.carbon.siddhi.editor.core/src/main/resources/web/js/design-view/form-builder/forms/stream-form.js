@@ -17,9 +17,9 @@
  */
 
 define(['require', 'log', 'jquery', 'lodash', 'attribute', 'designViewUtils', 'jsonValidator', 'handlebar',
-    'js_tree', 'annotationObject', 'annotationElement'],
+    'js_tree', 'annotationObject', 'annotationElement', 'constants'],
     function (require, log, $, _, Attribute, DesignViewUtils, JSONValidator, Handlebars, jstree,
-        AnnotationObject, AnnotationElement) {
+        AnnotationObject, AnnotationElement, Constants) {
 
         /**
          * @class StreamForm Creates a forms to collect data from a stream
@@ -38,8 +38,6 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'designViewUtils', 'j
                 this.toggleViewButton = $('#toggle-view-button-' + currentTabId);
             }
         };
-
-        const ALPHABETIC_VALIDATOR_REGEX = /^([a-zA-Z])$/;
 
         /** Function to manage the attribute navigations */
         var changeAttributeNavigation = function () {
@@ -107,7 +105,7 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'designViewUtils', 'j
                 addErrorClass(id);
                 return true;
             }
-            if (!ALPHABETIC_VALIDATOR_REGEX.test(name.charAt(0))) {
+            if (!Constants.ALPHABETIC_VALIDATOR_REGEX.test(name.charAt(0))) {
                 errorMessageParent.text(type + " name must start with an alphabetical character.");
                 addErrorClass(id);
                 return true;
@@ -462,12 +460,14 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'designViewUtils', 'j
             });
 
             var name = clickedElement.getName();
-            if (name === undefined) {
+            if (!name) {
+                //if stream form is freshly opened [new object]
                 annotations = predefinedAnnotationList;
                 var attributeFormTemplate = Handlebars.compile($('#attribute-form-template').html());
                 var wrappedHtml = attributeFormTemplate([{ name: "", type: "string" }]);
                 $('#define-attribute').html(wrappedHtml);
             } else {
+                //if the stream object is already edited
                 //add the saved name to the input field
                 $('#streamName').val(name);
                 //load the saved attributes

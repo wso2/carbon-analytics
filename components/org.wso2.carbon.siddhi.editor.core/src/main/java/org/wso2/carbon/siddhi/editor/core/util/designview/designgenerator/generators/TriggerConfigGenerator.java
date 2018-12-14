@@ -23,6 +23,7 @@ import org.wso2.carbon.siddhi.editor.core.util.designview.exceptions.DesignGener
 import org.wso2.carbon.siddhi.editor.core.util.designview.utilities.ConfigBuildingUtilities;
 import org.wso2.siddhi.query.api.definition.StreamDefinition;
 import org.wso2.siddhi.query.api.definition.TriggerDefinition;
+import org.wso2.carbon.siddhi.editor.core.util.designview.constants.SiddhiCodeBuilderConstants;
 
 import java.util.Map;
 
@@ -52,10 +53,10 @@ public class TriggerConfigGenerator extends CodeSegmentsPreserver {
         if (triggerDefinition.getAtEvery() != null) {
             at = "every " + ConfigBuildingUtilities.getDefinition(triggerDefinition, siddhiAppString)
                     .split(EVERY_SPLIT_KEYWORD)[1];
-            atOrAtEvery = "atEvery";
+            atOrAtEvery = SiddhiCodeBuilderConstants.EVERY;
         } else if (triggerDefinition.getAt() != null) {
             at = triggerDefinition.getAt();
-            atOrAtEvery = "at";
+            atOrAtEvery = SiddhiCodeBuilderConstants.AT;
         }
         AnnotationConfigGenerator annotationConfigGenerator = new AnnotationConfigGenerator();
 

@@ -17,8 +17,8 @@
  */
 
 define(['require', 'log', 'jquery', 'lodash', 'attribute', 'designViewUtils', 'handlebar', 'annotationObject',
-    'annotationElement'],
-    function (require, log, $, _, Attribute, DesignViewUtils, Handlebars, AnnotationObject, AnnotationElement) {
+    'annotationElement', 'constants'],
+    function (require, log, $, _, Attribute, DesignViewUtils, Handlebars, AnnotationObject, AnnotationElement, Constants) {
 
         /**
          * @class WindowForm Creates a forms to collect data from a window
@@ -36,11 +36,6 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'designViewUtils', 'h
                 this.toggleViewButton = $('#toggle-view-button-' + currentTabId);
             }
         };
-
-        const ALPHABETIC_VALIDATOR_REGEX = /^([a-zA-Z])$/;
-        const SORT = "sort";
-        const FREQUENT = "frequent";
-        const LOSSY_FREQUENT = "lossyfrequent";
 
         /** Function to manage the attribute navigations */
         var changeAttributeNavigation = function () {
@@ -108,7 +103,7 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'designViewUtils', 'h
                 addErrorClass(id);
                 return true;
             }
-            if (!ALPHABETIC_VALIDATOR_REGEX.test(name.charAt(0))) {
+            if (!Constants.ALPHABETIC_VALIDATOR_REGEX.test(name.charAt(0))) {
                 errorMessageParent.text(type + " name must start with an alphabetical character.");
                 addErrorClass(id);
                 return true;
@@ -233,17 +228,17 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'designViewUtils', 'h
          * Function to select the parameter mapping method
          * @param {String} selectedType selected window type
          * @param {Object} functionParameters parameters of the selected window type
-         * @param {Object} savedParameterValues saved parameter values 
+         * @param {Object} savedParameterValues saved parameter values
          * @param {Object} functionParametersWithValues array to hold the parameter of the mapped value
          */
         var callToMapParameters = function (selectedType, functionParameters, savedParameterValues,
             functionParametersWithValues) {
-            if (selectedType === SORT) {
+            if (selectedType === Constants.SORT) {
                 functionParametersWithValues = mapParameterValuesSort(functionParameters, savedParameterValues);
-            } else if (selectedType === FREQUENT) {
+            } else if (selectedType === Constants.FREQUENT) {
                 functionParametersWithValues = mapParameterValuesFrequent(functionParameters,
                     savedParameterValues);
-            } else if (selectedType === LOSSY_FREQUENT) {
+            } else if (selectedType === Constants.LOSSY_FREQUENT) {
                 functionParametersWithValues = mapParameterValuesLossyFrequent(functionParameters,
                     savedParameterValues);
             } else {
@@ -796,7 +791,7 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'designViewUtils', 'h
                     parameterParent.find(".error-message").text("");
                 }
                 //check for sort type's parameter (order & attribute params)
-                if (selectedType === SORT) {
+                if (selectedType === Constants.SORT) {
                     showHideOrderForSort();
                 }
             });
@@ -853,7 +848,7 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'designViewUtils', 'h
             renderOutputEventTypes();
 
             if (!name) {
-                //name is undefined - fresh form
+                //if window form is freshly opened[unedited window object]
                 var attributeFormTemplate = Handlebars.compile($('#attribute-form-template').html());
                 var wrappedHtml = attributeFormTemplate([{ name: "" }]);
                 $('#define-attribute').html(wrappedHtml);
@@ -862,6 +857,7 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'designViewUtils', 'h
                 functionParametersWithValues = createParameterWithValues(functionParameters);
                 renderParameters(functionParametersWithValues, selectedWindowType, "window")
             } else {
+                //if window object is already edited
                 var windowType = clickedElement.getType().toLowerCase();
                 var savedParameterValues = clickedElement.getParameters();
 
@@ -872,7 +868,7 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'designViewUtils', 'h
                 }).prop('selected', true);
                 functionParameters = getSelectedTypeParameters(windowType, predefinedWindowFunctionNames);
                 callToMapParameters(selectedType, functionParameters, savedParameterValues, functionParametersWithValues)
-                if (selectedType === SORT) {
+                if (selectedType === Constants.SORT) {
                     showHideOrderForSort();
                 }
 
@@ -917,7 +913,7 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'designViewUtils', 'h
                     functionParametersWithValues = createParameterWithValues(functionParameters);
                     renderParameters(functionParametersWithValues, selectedType, "window");
                 }
-                if (selectedType === SORT) {
+                if (selectedType === Constants.SORT) {
                     showHideOrderForSort();
                 }
             });
@@ -989,10 +985,10 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'designViewUtils', 'h
                         textNode.html(windowName);
                     }
 
-                    if (windowType.toLowerCase() === SORT) {
+                    if (windowType.toLowerCase() === Constants.SORT) {
                         buildParameterValuesSort(parameters, functionParameters)
-                    } else if (windowType.toLowerCase() === FREQUENT ||
-                        windowType.toLowerCase() === LOSSY_FREQUENT) {
+                    } else if (windowType.toLowerCase() === Constants.FREQUENT ||
+                        windowType.toLowerCase() === Constants.LOSSY_FREQUENT) {
                         buildParameterValuesFrequentOrLossyFrequent(parameters, functionParameters);
                     } else {
                         buildParameterValues(parameters, functionParameters)

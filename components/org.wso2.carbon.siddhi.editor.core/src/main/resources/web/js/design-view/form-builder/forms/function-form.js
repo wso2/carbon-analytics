@@ -16,8 +16,8 @@
  * under the License.
  */
 
-define(['require', 'log', 'jquery', 'lodash', 'designViewUtils'],
-    function (require, log, $, _, DesignViewUtils) {
+define(['require', 'log', 'jquery', 'lodash', 'designViewUtils', 'constants'],
+    function (require, log, $, _, DesignViewUtils, Constants) {
 
         /**
          * @class FunctionForm Creates a forms to collect data from a function
@@ -36,8 +36,7 @@ define(['require', 'log', 'jquery', 'lodash', 'designViewUtils'],
             }
         };
 
-        const alphabeticValidatorRegex = /^([a-zA-Z])$/;
-
+        /** Function to render the script types */
         var renderScriptType = function () {
             var scriptDiv = '<h4> Script Type: </h4> <select id = "script-type">' +
                 '<option value = "Javascript"> Javascript </option>' +
@@ -47,6 +46,16 @@ define(['require', 'log', 'jquery', 'lodash', 'designViewUtils'],
             $('#function-script-type').html(scriptDiv);
         };
 
+        /**
+         * Function to add the error class
+         * @param {Object} id object where the errors needs to be displayed
+         */
+        var addErrorClass = function (id) {
+            $(id)[0].scrollIntoView();
+            $(id).addClass('required-input-field')
+        };
+
+        /** Function to render the return type of the script */
         var renderReturnType = function () {
             var returnDiv = '<h4> Return Type: </h4> <select id = "return-type">' +
                 '<option value = "int"> int </option>' +
@@ -92,6 +101,7 @@ define(['require', 'log', 'jquery', 'lodash', 'designViewUtils'],
             renderScriptType();
             renderReturnType();
             if (name) {
+                //if the function object is already edited
                 var scriptType = (clickedElement.getScriptType()).toLowerCase();
                 var returnType = (clickedElement.getReturnType()).toLowerCase();
                 var body = clickedElement.getBody().trim();
@@ -115,16 +125,15 @@ define(['require', 'log', 'jquery', 'lodash', 'designViewUtils'],
                 //clear the error classes
                 $('.error-message').text("");
                 $('.required-input-field').removeClass('required-input-field');
-                var isErrorOccured = false;
+                var isErrorOccurred = false;
 
                 var functionName = $('#functionName').val().trim();
                 var functionNameErrorMessage = $('#define-function-name').find('.error-message');
                 var previouslySavedName = clickedElement.getName();
 
                 if (functionName === "") {
-                    $('#functionName').addClass('required-input-field');
-                    $('#functionName')[0].scrollIntoView();
-                    functionNameErrorMessage.text("Function name is required.")
+                    addErrorClass($('#functionName'));
+                    functionNameErrorMessage.text("Function name is required.");
                     isErrorOccurred = true;
                     return;
                 }
@@ -136,8 +145,7 @@ define(['require', 'log', 'jquery', 'lodash', 'designViewUtils'],
                 if (previouslySavedName !== functionName) {
                     var isFunctionNameUsed = self.formUtils.isFunctionDefinitionElementNameUsed(functionName, id);
                     if (isFunctionNameUsed) {
-                        $('#functionName').addClass('required-input-field');
-                        $('#functionName')[0].scrollIntoView();
+                        addErrorClass($('#functionName'));
                         functionNameErrorMessage.text("Function name is already used.");
                         isErrorOccurred = true;
                         return;
@@ -145,16 +153,14 @@ define(['require', 'log', 'jquery', 'lodash', 'designViewUtils'],
 
                     //to check if function name contains white spaces
                     if (functionName.indexOf(' ') >= 0) {
-                        $('#functionName').addClass('required-input-field');
-                        $('#functionName')[0].scrollIntoView();
+                        addErrorClass($('#functionName'))
                         functionNameErrorMessage.text("Function name cannot have white space.");
                         isErrorOccurred = true;
                         return;
                     }
                     //to check if function name starts with an alphabetic character
-                    if (!(alphabeticValidatorRegex).test(functionName.charAt(0))) {
-                        $('#functionName').addClass('required-input-field');
-                        $('#functionName')[0].scrollIntoView();
+                    if (!(Constants.ALPHABETIC_VALIDATOR_REGEX).test(functionName.charAt(0))) {
+                        addErrorClass($('#functionName'))
                         functionNameErrorMessage.text("Function name must start with an alphabetic character.");
                         isErrorOccurred = true;
                         return;
@@ -162,14 +168,13 @@ define(['require', 'log', 'jquery', 'lodash', 'designViewUtils'],
                 }
                 var scriptBody = $('#script-body-content').val().trim();
                 if (scriptBody === "") {
-                    $('#script-body-content').addClass('required-input-field');
-                    $('#script-body-content')[0].scrollIntoView();
+                    addErrorClass($('#script-body-content'));
                     $('#define-script-body').find('.error-message').text("Script body is required.");
                     isErrorOccurred = true;
                     return;
                 }
 
-                if (!isErrorOccured) {
+                if (!isErrorOccurred) {
                     if (previouslySavedName !== functionName) {
                         // update selected trigger model
                         clickedElement.setName(functionName);

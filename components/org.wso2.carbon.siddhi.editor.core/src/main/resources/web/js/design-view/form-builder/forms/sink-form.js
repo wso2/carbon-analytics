@@ -17,9 +17,9 @@
  */
 
 define(['log', 'jquery', 'lodash', 'sourceOrSinkAnnotation', 'mapAnnotation', 'payloadOrAttribute',
-    'jsonValidator', 'handlebar', 'designViewUtils'],
+    'jsonValidator', 'handlebar', 'designViewUtils', 'constants'],
     function (log, $, _, SourceOrSinkAnnotation, MapAnnotation, PayloadOrAttribute, JSONValidator, Handlebars,
-        DesignViewUtils) {
+        DesignViewUtils, Constants) {
 
         /**
          * @class SinkForm Creates a forms to collect data from a sink
@@ -37,9 +37,6 @@ define(['log', 'jquery', 'lodash', 'sourceOrSinkAnnotation', 'mapAnnotation', 'p
                 this.toggleViewButton = $('#toggle-view-button-' + currentTabId);
             }
         };
-
-        const PAYLOAD_MAP = "payload";
-        const PAYLOAD_LIST = "list";
 
         /**
          * Function to get the options of the selected sink/map type
@@ -206,7 +203,7 @@ define(['log', 'jquery', 'lodash', 'sourceOrSinkAnnotation', 'mapAnnotation', 'p
             var attributeType = savedMapperAttributes.getType().toLowerCase();
             var attributeValues = savedMapperAttributes.getValue();
             var attributes = [];
-            if (attributeType === PAYLOAD_LIST) {
+            if (attributeType === Constants.LIST) {
                 $('#define-attribute #attributeMap-type').val('payloadList');
                 attributes.push({ value: attributeValues[0] });
             } else {
@@ -427,7 +424,7 @@ define(['log', 'jquery', 'lodash', 'sourceOrSinkAnnotation', 'mapAnnotation', 'p
         /**
          * Function to build the options
          * @param {Object} predefinedOptions predefined options
-         * @param {Object} selectedOptions array to add the built option 
+         * @param {Object} selectedOptions array to add the built option
          * @param {String} id div of the options which needs to be built [mapper or sink]
          */
         var buildOptions = function (predefinedOptions, selectedOptions, id) {
@@ -450,7 +447,7 @@ define(['log', 'jquery', 'lodash', 'sourceOrSinkAnnotation', 'mapAnnotation', 'p
 
         /**
          * Function to build the customized options
-         * @param {Object} selectedOptions array to add the built option 
+         * @param {Object} selectedOptions array to add the built option
          * @param {String} id div of the options which needs to be built [mapper or sink]
          */
         var buildCustomizedOption = function (selectedOptions, id) {
@@ -626,8 +623,8 @@ define(['log', 'jquery', 'lodash', 'sourceOrSinkAnnotation', 'mapAnnotation', 'p
                     }
                 });
 
-                // if sink type is defined
                 if (type) {
+                    //if sink object is already edited
                     $('#define-sink').find('#sink-type option').filter(function () {
                         return ($(this).val().toLowerCase() == (type.toLowerCase()));
                     }).prop('selected', true);
@@ -652,8 +649,8 @@ define(['log', 'jquery', 'lodash', 'sourceOrSinkAnnotation', 'mapAnnotation', 'p
                     }
                 }
 
-                //if map is defined
                 if (map) {
+                    //if map is filled
                     renderMap(predefinedSinkMaps);
                     renderAttributeMapping();
                     var mapperType = map.getType();
@@ -714,7 +711,7 @@ define(['log', 'jquery', 'lodash', 'sourceOrSinkAnnotation', 'mapAnnotation', 'p
                     if (map && savedMapperAttributes) {
                         var attributeType = savedMapperAttributes.getType().toLowerCase();
                         var selAttributeType = "";
-                        if (attributeType === PAYLOAD_LIST) {
+                        if (attributeType === Constants.LIST) {
                             selAttributeType = "payloadList"
                         } else {
                             selAttributeType = "payloadMap"
@@ -771,7 +768,7 @@ define(['log', 'jquery', 'lodash', 'sourceOrSinkAnnotation', 'mapAnnotation', 'p
                             if (selAttributeType === "payloadMap") {
                                 var isEmptyList = false
                                 var mapperAttributeValuesArray = {};
-                                attributeType = "MAP";
+                                attributeType = Constants.MAP;
                                 //validate attribute value if it is not filled
                                 $('#mapper-attributes .attribute').each(function () {
                                     var key = $(this).find('.attr-key').val().trim();
@@ -798,7 +795,7 @@ define(['log', 'jquery', 'lodash', 'sourceOrSinkAnnotation', 'mapAnnotation', 'p
 
                             } else {
                                 var mapperAttributeValuesArray = [];
-                                attributeType = "LIST";
+                                attributeType = Constants.LIST
                                 var value = $('#mapper-attributes .attribute .attr-value:first').val().trim();
                                 //validate the single payload attribute value if it is empty
                                 if (value == "") {

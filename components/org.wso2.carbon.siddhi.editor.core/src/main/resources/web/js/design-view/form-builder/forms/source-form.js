@@ -17,9 +17,9 @@
  */
 
 define(['log', 'jquery', 'lodash', 'sourceOrSinkAnnotation', 'mapAnnotation', 'payloadOrAttribute',
-    'jsonValidator', 'handlebar', 'designViewUtils'],
+    'jsonValidator', 'handlebar', 'designViewUtils', 'constants'],
     function (log, $, _, SourceOrSinkAnnotation, MapAnnotation, PayloadOrAttribute, JSONValidator, Handlebars,
-        DesignViewUtils) {
+        DesignViewUtils, Constants) {
 
         /**
          * @class SourceForm Creates a forms to collect data from a source
@@ -37,9 +37,6 @@ define(['log', 'jquery', 'lodash', 'sourceOrSinkAnnotation', 'mapAnnotation', 'p
                 this.toggleViewButton = $('#toggle-view-button-' + currentTabId);
             }
         };
-
-        const MAP = "map";
-        const LIST = "list";
 
         /**
          * Function to get the options of the selected source/map type
@@ -200,7 +197,7 @@ define(['log', 'jquery', 'lodash', 'sourceOrSinkAnnotation', 'mapAnnotation', 'p
                 attributeType = savedMapperAttributes.getType().toLowerCase();
                 var attributeValues = savedMapperAttributes.getValue();
             }
-            if (attributeType === LIST) {
+            if (attributeType === Constants.LIST) {
                 for (streamAttribute of streamAttributes) {
                     attributes.push({ key: streamAttribute.key, value: "" });
                 }
@@ -211,7 +208,7 @@ define(['log', 'jquery', 'lodash', 'sourceOrSinkAnnotation', 'mapAnnotation', 'p
                         i++;
                     }
                 }
-            } else if (attributeType === MAP) {
+            } else if (attributeType === Constants.MAP) {
                 for (streamAttribute of streamAttributes) {
                     attributes.push({ key: streamAttribute.key, value: "" });
                 }
@@ -318,10 +315,10 @@ define(['log', 'jquery', 'lodash', 'sourceOrSinkAnnotation', 'mapAnnotation', 'p
         };
 
 	    /**
-        * Function to validate the data type of the options
-        * @param {String} dataType data-type of the option
-        * @param {String} optionValue value of the option
-        * @return {boolean} invalidDataType
+		* Function to validate the data type of the options
+		* @param {String} dataType data-type of the option
+		* @param {String} optionValue value of the option
+		* @return {boolean} invalidDataType
 	    */
         var validateDataType = function (dataType, optionValue) {
             var invalidDataType = false;
@@ -423,7 +420,7 @@ define(['log', 'jquery', 'lodash', 'sourceOrSinkAnnotation', 'mapAnnotation', 'p
         /**
          * Function to build the options
          * @param {Object} predefinedOptions predefined options
-         * @param {Object} selectedOptions array to add the built option 
+         * @param {Object} selectedOptions array to add the built option
          * @param {String} id div of the options which needs to be built [mapper or source]
          */
         var buildOptions = function (predefinedOptions, selectedOptions, id) {
@@ -446,7 +443,7 @@ define(['log', 'jquery', 'lodash', 'sourceOrSinkAnnotation', 'mapAnnotation', 'p
 
         /**
          * Function to build the customized options
-         * @param {Object} selectedOptions array to add the built option 
+         * @param {Object} selectedOptions array to add the built option
          * @param {String} id div of the options which needs to be built [mapper or source]
          */
         var buildCustomizedOption = function (selectedOptions, id) {
@@ -606,8 +603,8 @@ define(['log', 'jquery', 'lodash', 'sourceOrSinkAnnotation', 'mapAnnotation', 'p
                     }
                 });
 
-                // if source type is defined
                 if (type) {
+                    //if source object is already edited
                     $('#define-source').find('#source-type option').filter(function () {
                         return ($(this).val().toLowerCase() == (type.toLowerCase()));
                     }).prop('selected', true);
@@ -770,7 +767,7 @@ define(['log', 'jquery', 'lodash', 'sourceOrSinkAnnotation', 'mapAnnotation', 'p
                         if ($('#define-attribute #attributeMap-checkBox').is(":checked")) {
                             payloadOrAttributeOptions = {};
                             _.set(payloadOrAttributeOptions, 'annotationType', 'ATTRIBUTES');
-                            _.set(payloadOrAttributeOptions, 'type', "MAP");
+                            _.set(payloadOrAttributeOptions, 'type', Constants.MAP);
                             _.set(payloadOrAttributeOptions, 'value', mapperAttributeValuesArray);
                             var payloadOrAttributeObject = new PayloadOrAttribute(payloadOrAttributeOptions);
                             _.set(mapper, 'payloadOrAttribute', payloadOrAttributeObject);
