@@ -40,6 +40,8 @@ define(['jquery', 'lodash', 'backbone', 'log'], function ($, _, Backbone, log) {
                     }
                     this._storage = _.get(options, 'storage');
                     this._storage .create(this);
+                } else {
+                    this.setHash(this.generateHash(this.getContent().trim()));
                 }
             },
             generateHash: function (hashCode) {
