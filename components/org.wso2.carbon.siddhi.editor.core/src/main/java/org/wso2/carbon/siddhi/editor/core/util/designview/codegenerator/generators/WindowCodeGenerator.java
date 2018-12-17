@@ -44,6 +44,7 @@ public class WindowCodeGenerator {
             windowStringBuilder.append(SubElementCodeGenerator.generateComment(window.getPreviousCommentSegment()));
         }
         windowStringBuilder.append(SubElementCodeGenerator.generateAnnotations(window.getAnnotationList()))
+                .append(SiddhiCodeBuilderConstants.NEW_LINE)
                 .append(SiddhiCodeBuilderConstants.DEFINE_WINDOW)
                 .append(SiddhiCodeBuilderConstants.SPACE)
                 .append(window.getName())

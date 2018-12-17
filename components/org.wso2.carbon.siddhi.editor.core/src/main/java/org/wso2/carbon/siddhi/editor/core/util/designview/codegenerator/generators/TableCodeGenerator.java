@@ -44,6 +44,7 @@ public class TableCodeGenerator {
 
         tableStringBuilder.append(SubElementCodeGenerator.generateStore(table.getStore()))
                 .append(SubElementCodeGenerator.generateAnnotations(table.getAnnotationList()))
+                .append(SiddhiCodeBuilderConstants.NEW_LINE)
                 .append(SiddhiCodeBuilderConstants.DEFINE_TABLE)
                 .append(SiddhiCodeBuilderConstants.SPACE)
                 .append(table.getName())

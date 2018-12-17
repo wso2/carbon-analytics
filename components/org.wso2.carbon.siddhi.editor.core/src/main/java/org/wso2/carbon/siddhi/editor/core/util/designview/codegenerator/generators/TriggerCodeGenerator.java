@@ -43,6 +43,7 @@ public class TriggerCodeGenerator {
         }
 
         triggerStringBuilder.append(SubElementCodeGenerator.generateAnnotations(trigger.getAnnotationList()))
+                .append(SiddhiCodeBuilderConstants.NEW_LINE)
                 .append(SiddhiCodeBuilderConstants.DEFINE_TRIGGER)
                 .append(SiddhiCodeBuilderConstants.SPACE)
                 .append(trigger.getName())
