@@ -597,7 +597,7 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'designViewUtils', 'j
                 if (previouslySavedName === undefined) {
                     previouslySavedName = "";
                 }
-                // update connection related to the element if the name is changed
+
                 if (previouslySavedName !== streamName) {
                     if (validateName("#streamName", "Stream", streamName)) {
                         isErrorOccurred = true;
@@ -641,6 +641,7 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'designViewUtils', 'j
                     if (previouslySavedName !== streamName) {
                         // update selected stream model
                         clickedElement.setName(streamName);
+                        // update connection related to the element if the name is changed
                         self.formUtils.updateConnectionsAfterDefinitionElementNameChange(id);
 
                         var textNode = $('#' + id).find('.streamNameNode');
