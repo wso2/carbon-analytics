@@ -16,8 +16,8 @@
  * under the License.
  */
 
-define(['require', 'log', 'jquery', 'lodash', 'trigger', 'designViewUtils'],
-    function (require, log, $, _, Trigger, DesignViewUtils) {
+define(['require', 'log', 'jquery', 'lodash', 'trigger', 'designViewUtils', 'constants'],
+    function (require, log, $, _, Trigger, DesignViewUtils, Constants) {
 
         var triggerSchema = {
             type: "object",
@@ -143,7 +143,7 @@ define(['require', 'log', 'jquery', 'lodash', 'trigger', 'designViewUtils'],
                 $('#' + i).removeClass('incomplete-element');
 
                 //Send trigger element to the backend and generate tooltip
-                var triggerToolTip = self.formUtils.getTooltip(trigger, "trigger");
+                var triggerToolTip = self.formUtils.getTooltip(trigger, Constants.TRIGGER);
                 $('#' + i).prop('title', triggerToolTip);
 
                 // close the form window
@@ -246,7 +246,7 @@ define(['require', 'log', 'jquery', 'lodash', 'trigger', 'designViewUtils'],
                 textNode.html(config.name);
 
                 //Send trigger element to the backend and generate tooltip
-                var triggerToolTip = self.formUtils.getTooltip(clickedElement, "trigger");
+                var triggerToolTip = self.formUtils.getTooltip(clickedElement, Constants.TRIGGER);
                 $('#' + id).prop('title', triggerToolTip);
 
                 // close the form window

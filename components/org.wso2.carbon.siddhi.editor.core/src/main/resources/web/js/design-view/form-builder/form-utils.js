@@ -16,8 +16,8 @@
  * under the License.
  */
 
-define(['require', 'lodash', 'appData', 'log'],
-    function (require, _, AppData, log) {
+define(['require', 'lodash', 'appData', 'log', 'constants'],
+    function (require, _, AppData, log, Constants) {
 
 
         /**
@@ -224,56 +224,56 @@ define(['require', 'lodash', 'appData', 'log'],
             var appData = new AppData();
 
             switch (type) {
-                case "aggregation" :
+                case Constants.AGGREGATION :
                     appData.addAggregation(element);
                     break;
 
-                case "function" :
+                case Constants.FUNCTION :
                     appData.addFunction(element);
                     break;
 
-                case "join-query" :
+                case Constants.JOIN_QUERY :
                     appData.addJoinQuery(element);
                     break;
 
-                case "partition" :
+                case Constants.PARTITION :
                     appData.addPartition(element);
                     break;
 
-                case "pattern-query" :
+                case Constants.PATTERN_QUERY :
                     appData.addPatternQuery(element);
                     break;
 
-                case "sequence-query" :
+                case Constants.SEQUENCE_QUERY :
                     appData.addSequenceQuery(element);
                     break;
 
-                case "sink" :
+                case Constants.SINK :
                     appData.addSink(element);
                     break;
 
-                case "source" :
+                case Constants.SOURCE :
                     appData.addSource(element);
                     break;
 
-                case "stream" :
+                case Constants.STREAM :
                     appData.addStream(element);
                     break;
 
-                case "table" :
+                case Constants.TABLE :
                     appData.addTable(element);
                     break;
 
-                case "trigger" :
+                case Constants.TRIGGER :
                     appData.addTrigger(element);
                     break;
 
-                case "window-filter-projection-query" :
-                    appData.addWindowFilterProjectionQuery(element);
+                case Constants.WINDOW :
+                    appData.addWindow(element);
                     break;
 
-                case "window" :
-                    appData.addWindow(element);
+                case Constants.WINDOW_FILTER_PROJECTION_QUERY :
+                    appData.addWindowFilterProjectionQuery(element);
                     break;
             }
 

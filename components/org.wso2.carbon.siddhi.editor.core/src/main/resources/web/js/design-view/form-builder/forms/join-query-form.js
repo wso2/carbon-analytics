@@ -18,10 +18,10 @@
 
 define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert', 'queryOutputDelete',
         'queryOutputUpdate', 'queryOutputUpdateOrInsertInto', 'queryWindowOrFunction', 'queryOrderByValue',
-        'joinQuerySource', 'streamHandler', 'designViewUtils', 'jsonValidator'],
+        'joinQuerySource', 'streamHandler', 'designViewUtils', 'jsonValidator', 'constants'],
     function (require, log, $, _, QuerySelect, QueryOutputInsert, QueryOutputDelete, QueryOutputUpdate,
               QueryOutputUpdateOrInsertInto, QueryWindowOrFunction, QueryOrderByValue, joinQuerySource, StreamHandler,
-              DesignViewUtils, JSONValidator) {
+              DesignViewUtils, JSONValidator, Constants) {
 
         var constants = {
             LEFT_SOURCE: 'Left Source',
@@ -1412,7 +1412,7 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
                     self.toggleViewButton.removeClass('disableContainer');
 
                     //Send join-query element to the backend and generate tooltip
-                    var queryToolTip = self.formUtils.getTooltip(clickedElement, "join-query");
+                    var queryToolTip = self.formUtils.getTooltip(clickedElement, Constants.JOIN_QUERY);
                     $('#' + id).prop('title', queryToolTip);
 
                     // close the form window

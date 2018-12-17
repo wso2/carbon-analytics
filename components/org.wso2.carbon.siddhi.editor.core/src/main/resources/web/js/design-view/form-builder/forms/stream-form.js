@@ -17,9 +17,9 @@
  */
 
 define(['require', 'log', 'jquery', 'lodash', 'attribute', 'stream', 'designViewUtils', 'jsonValidator', 'handlebar',
-        'js_tree', 'annotationObject', 'annotationElement'],
+        'js_tree', 'annotationObject', 'annotationElement', 'constants'],
     function (require, log, $, _, Attribute, Stream, DesignViewUtils, JSONValidator, Handlebars, jstree,
-              AnnotationObject, AnnotationElement) {
+              AnnotationObject, AnnotationElement, Constants) {
 
         /**
          * @class StreamForm Creates a forms to collect data from a stream
@@ -653,7 +653,7 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'stream', 'designView
                 self.toggleViewButton.removeClass('disableContainer');
 
                 //Send stream element to the backend and generate tooltip
-                var streamToolTip = self.formUtils.getTooltip(clickedElement, "stream");
+                var streamToolTip = self.formUtils.getTooltip(clickedElement, Constants.STREAM);
                 $('#' + id).prop('title', streamToolTip);
 
                 // close the form window

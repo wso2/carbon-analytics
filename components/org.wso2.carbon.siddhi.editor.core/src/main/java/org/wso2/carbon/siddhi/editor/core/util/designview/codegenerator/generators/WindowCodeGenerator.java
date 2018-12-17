@@ -33,14 +33,15 @@ public class WindowCodeGenerator {
      * Generates the Siddhi code representation of a WindowConfig object
      *
      * @param window The WindowConfig object
+     * @param isGeneratingToolTip If it is generating a tooltip or not
      * @return The Siddhi code representation of the given WindowConfig object
      * @throws CodeGenerationException Error when generating the code
      */
-    public String generateWindow(WindowConfig window, boolean isToolTip) throws CodeGenerationException {
+    public String generateWindow(WindowConfig window, boolean isGeneratingToolTip) throws CodeGenerationException {
         CodeGeneratorUtils.NullValidator.validateConfigObject(window);
 
         StringBuilder windowStringBuilder = new StringBuilder();
-        if (!isToolTip) {
+        if (!isGeneratingToolTip) {
             windowStringBuilder.append(SubElementCodeGenerator.generateComment(window.getPreviousCommentSegment()));
         }
         windowStringBuilder.append(SubElementCodeGenerator.generateAnnotations(window.getAnnotationList()))

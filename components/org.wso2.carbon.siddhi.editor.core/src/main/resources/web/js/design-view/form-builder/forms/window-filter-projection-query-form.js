@@ -18,10 +18,10 @@
 
 define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert', 'queryOutputDelete',
         'queryOutputUpdate', 'queryOutputUpdateOrInsertInto', 'queryWindowOrFunction', 'queryOrderByValue',
-        'streamHandler', 'designViewUtils', 'jsonValidator'],
+        'streamHandler', 'designViewUtils', 'jsonValidator', 'constants'],
     function (require, log, $, _, QuerySelect, QueryOutputInsert, QueryOutputDelete, QueryOutputUpdate,
               QueryOutputUpdateOrInsertInto, QueryWindowOrFunction, QueryOrderByValue, StreamHandler, DesignViewUtils,
-              JSONValidator) {
+              JSONValidator, Constants) {
 
         var constants = {
             PROJECTION: 'projectionQueryDrop',
@@ -1339,7 +1339,8 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
                     self.toggleViewButton.removeClass('disableContainer');
 
                     //Send query element to the backend and generate tooltip
-                    var queryToolTip = self.formUtils.getTooltip(clickedElement, "window-filter-projection-query");
+                    var queryToolTip = self.formUtils.getTooltip(clickedElement,
+                        Constants.WINDOW_FILTER_PROJECTION_QUERY);
                     $('#' + id).prop('title', queryToolTip);
 
                     // close the form window

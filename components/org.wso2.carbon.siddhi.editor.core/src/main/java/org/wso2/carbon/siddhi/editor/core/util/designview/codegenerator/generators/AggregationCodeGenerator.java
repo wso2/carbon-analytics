@@ -40,14 +40,16 @@ public class AggregationCodeGenerator {
      * Generates the Siddhi code representation of a AggregationConfig object
      *
      * @param aggregation The AggregationConfig object
+     * @param isGeneratingToolTip If it is generating a tooltip or not
      * @return The Siddhi code representation of the given AggregationConfig object
      * @throws CodeGenerationException Error when generating the code
      */
-    public String generateAggregation(AggregationConfig aggregation, boolean isToolip) throws CodeGenerationException {
+    public String generateAggregation(AggregationConfig aggregation, boolean isGeneratingToolTip)
+            throws CodeGenerationException {
         CodeGeneratorUtils.NullValidator.validateConfigObject(aggregation);
 
         StringBuilder aggregationStringBuilder = new StringBuilder();
-        if (!isToolip) {
+        if (!isGeneratingToolTip) {
             aggregationStringBuilder
                     .append(SubElementCodeGenerator.generateComment(aggregation.getPreviousCommentSegment()));
         }

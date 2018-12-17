@@ -32,13 +32,14 @@ public class TriggerCodeGenerator {
      * Generates the Siddhi code representation of a TriggerConfig object
      *
      * @param trigger The TriggerConfig object
+     * @param isGeneratingToolTip If it is generating a tooltip or not
      * @return The Siddhi code representation of the given TriggerConfig object
      * @throws CodeGenerationException Error when generating the code
      */
-    public String generateTrigger(TriggerConfig trigger, boolean isToolTip) throws CodeGenerationException {
+    public String generateTrigger(TriggerConfig trigger, boolean isGeneratingToolTip) throws CodeGenerationException {
         CodeGeneratorUtils.NullValidator.validateConfigObject(trigger);
         StringBuilder triggerStringBuilder = new StringBuilder();
-        if (!isToolTip) {
+        if (!isGeneratingToolTip) {
             triggerStringBuilder.append(SubElementCodeGenerator.generateComment(trigger.getPreviousCommentSegment()));
         }
 

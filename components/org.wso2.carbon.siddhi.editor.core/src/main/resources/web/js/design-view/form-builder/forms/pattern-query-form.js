@@ -19,10 +19,10 @@
 define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert', 'queryOutputDelete',
         'queryOutputUpdate', 'queryOutputUpdateOrInsertInto', 'queryOrderByValue',
         'patternOrSequenceQueryCondition', 'streamHandler', 'queryWindowOrFunction', 'designViewUtils',
-        'jsonValidator'],
+        'jsonValidator', 'constants'],
     function (require, log, $, _, QuerySelect, QueryOutputInsert, QueryOutputDelete, QueryOutputUpdate,
               QueryOutputUpdateOrInsertInto, QueryOrderByValue, PatternOrSequenceQueryCondition, StreamHandler,
-              QueryWindowOrFunction, DesignViewUtils, JSONValidator) {
+              QueryWindowOrFunction, DesignViewUtils, JSONValidator, Constants) {
 
         /**
          * @class PatternQueryForm Creates a forms to collect data from a pattern query
@@ -1156,7 +1156,7 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
                     self.toggleViewButton.removeClass('disableContainer');
 
                     //Send pattern-query element to the backend and generate tooltip
-                    var queryToolTip = self.formUtils.getTooltip(clickedElement, "pattern-query");
+                    var queryToolTip = self.formUtils.getTooltip(clickedElement, Constants.PATTERN_QUERY);
                     $('#' + id).prop('title', queryToolTip);
 
                     // close the form window

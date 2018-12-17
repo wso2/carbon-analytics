@@ -16,8 +16,8 @@
  * under the License.
  */
 
-define(['require', 'log', 'jquery', 'lodash', 'attribute', 'window', 'designViewUtils'],
-    function (require, log, $, _, Attribute, Window, DesignViewUtils) {
+define(['require', 'log', 'jquery', 'lodash', 'attribute', 'window', 'designViewUtils', 'constants'],
+    function (require, log, $, _, Attribute, Window, DesignViewUtils, Constants) {
 
         var windowSchema = {
             type: "object",
@@ -226,7 +226,7 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'window', 'designView
                 $('#' + i).removeClass('incomplete-element');
 
                 //Send window element to the backend and generate tooltip
-                var windowToolTip = self.formUtils.getTooltip(window, "window");
+                var windowToolTip = self.formUtils.getTooltip(window, Constants.WINDOW);
                 $('#' + i).prop('title', windowToolTip);
 
                 // close the form window
@@ -386,7 +386,7 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'window', 'designView
                 textNode.html(config.name);
 
                 //Send window element to the backend and generate tooltip
-                var windowToolTip = self.formUtils.getTooltip(clickedElement, "window");
+                var windowToolTip = self.formUtils.getTooltip(clickedElement, Constants.WINDOW);
                 $('#' + id).prop('title', windowToolTip);
 
                 // close the form window

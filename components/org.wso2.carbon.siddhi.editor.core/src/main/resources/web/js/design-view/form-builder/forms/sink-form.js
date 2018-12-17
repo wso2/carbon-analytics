@@ -17,9 +17,9 @@
  */
 
 define(['log', 'jquery', 'lodash', 'sourceOrSinkAnnotation', 'mapAnnotation', 'payloadOrAttribute',
-        'jsonValidator', 'handlebar', 'designViewUtils'],
+        'jsonValidator', 'handlebar', 'designViewUtils', 'constants'],
     function (log, $, _, SourceOrSinkAnnotation, MapAnnotation, PayloadOrAttribute, JSONValidator, Handlebars,
-              DesignViewUtils) {
+              DesignViewUtils, Constants) {
 
         /**
          * @class SinkForm Creates a forms to collect data from a sink
@@ -862,7 +862,7 @@ define(['log', 'jquery', 'lodash', 'sourceOrSinkAnnotation', 'mapAnnotation', 'p
                     self.toggleViewButton.removeClass('disableContainer');
 
                     //Send sink element to the backend and generate tooltip
-                    var sinkToolTip = self.formUtils.getTooltip(clickedElement, "sink");
+                    var sinkToolTip = self.formUtils.getTooltip(clickedElement, Constants.SINK);
                     $('#' + id).prop('title', sinkToolTip);
 
                     // close the form window

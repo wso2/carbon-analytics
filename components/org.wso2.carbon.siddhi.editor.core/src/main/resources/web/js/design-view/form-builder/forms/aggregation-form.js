@@ -17,9 +17,9 @@
  */
 
 define(['require', 'log', 'jquery', 'lodash', 'attribute', 'aggregation', 'aggregateByTimePeriod', 'querySelect',
-        'elementUtils', 'storeAnnotation', 'designViewUtils', 'jsonValidator'],
+        'elementUtils', 'storeAnnotation', 'designViewUtils', 'jsonValidator', 'constants'],
     function (require, log, $, _, Attribute, Aggregation, AggregateByTimePeriod, QuerySelect, ElementUtils,
-              StoreAnnotation, DesignViewUtils, JSONValidator) {
+              StoreAnnotation, DesignViewUtils, JSONValidator, Constants) {
 
         /**
          * @class AggregationForm Creates a forms to collect data from a aggregation
@@ -649,7 +649,7 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'aggregation', 'aggre
                     self.toggleViewButton.removeClass('disableContainer');
 
                     //Send aggregation element to the backend and generate tooltip
-                    var aggregationToolTip = self.formUtils.getTooltip(clickedElement, "aggregation");
+                    var aggregationToolTip = self.formUtils.getTooltip(clickedElement, Constants.AGGREGATION);
                     $('#' + id).prop('title', aggregationToolTip);
 
                     // close the form aggregation

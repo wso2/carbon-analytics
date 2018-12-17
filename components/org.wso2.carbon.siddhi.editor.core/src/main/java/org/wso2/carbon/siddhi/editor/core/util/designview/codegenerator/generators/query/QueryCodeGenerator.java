@@ -37,14 +37,15 @@ public class QueryCodeGenerator {
      * Generates the Siddhi code representation of a QueryConfig object
      *
      * @param query The QueryConfig object
+     * @param isGeneratingToolTip If it is generating a tooltip or not
      * @return The Siddhi code representation of the given QueryConfig object
      * @throws CodeGenerationException Error when generating the code
      */
-    public String generateQuery(QueryConfig query, boolean isToolTip) throws CodeGenerationException {
+    public String generateQuery(QueryConfig query, boolean isGeneratingToolTip) throws CodeGenerationException {
         CodeGeneratorUtils.NullValidator.validateConfigObject(query);
 
         StringBuilder queryStringBuilder = new StringBuilder();
-        if (!isToolTip) {
+        if (!isGeneratingToolTip) {
             queryStringBuilder.append(SubElementCodeGenerator.generateComment(query.getPreviousCommentSegment()));
         }
         queryStringBuilder.append(SubElementCodeGenerator.generateAnnotations(query.getAnnotationList()))

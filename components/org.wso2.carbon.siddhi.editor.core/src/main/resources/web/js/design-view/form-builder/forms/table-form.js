@@ -17,8 +17,8 @@
  */
 
 define(['log', 'jquery', 'lodash', 'attribute', 'table', 'storeAnnotation', 'designViewUtils', 'handlebar',
-        'js_tree'],
-    function (log, $, _, Attribute, Table, StoreAnnotation, DesignViewUtils, Handlebars, jstree) {
+        'js_tree', 'constants'],
+    function (log, $, _, Attribute, Table, StoreAnnotation, DesignViewUtils, Handlebars, jstree, Constants) {
 
         /**
          * @class TableForm Creates a forms to collect data from a table
@@ -970,7 +970,7 @@ define(['log', 'jquery', 'lodash', 'attribute', 'table', 'storeAnnotation', 'des
                 }
 
                 //Send table element to the backend and generate tooltip
-                var tableToolTip = self.formUtils.getTooltip(clickedElement, "table");
+                var tableToolTip = self.formUtils.getTooltip(clickedElement, Constants.TABLE);
                 $('#' + id).prop('title', tableToolTip);
 
                 // close the form window

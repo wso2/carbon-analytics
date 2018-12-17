@@ -32,13 +32,15 @@ public class FunctionCodeGenerator {
      * Generates the Siddhi code representation of a FunctionConfig object
      *
      * @param function The FunctionConfig object
+     * @param isGeneratingToolTip If it is generating a tooltip or not
      * @return The Siddhi code representation of the given FunctionConfig object
      * @throws CodeGenerationException Error when generating the code
      */
-    public String generateFunction(FunctionConfig function, boolean isToolTip) throws CodeGenerationException {
+    public String generateFunction(FunctionConfig function, boolean isGeneratingToolTip)
+            throws CodeGenerationException {
         CodeGeneratorUtils.NullValidator.validateConfigObject(function);
         StringBuilder functionStringBuilder = new StringBuilder();
-        if (!isToolTip) {
+        if (!isGeneratingToolTip) {
             functionStringBuilder.append(SubElementCodeGenerator.generateComment(function.getPreviousCommentSegment()));
         }
         functionStringBuilder.append(SiddhiCodeBuilderConstants.DEFINE_FUNCTION)

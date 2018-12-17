@@ -39,15 +39,16 @@ public class PartitionCodeGenerator {
      *
      * @param partition       The PartitionConfig object
      * @param definitionNames The names of all the Siddhi definition objects (including inner streams)
+     * @param isGeneratingToolTip If it is generating a tooltip or not
      * @return The Siddhi code representation of the given PartitionConfig object
      * @throws CodeGenerationException Error when generating the code
      */
-    public String generatePartition(PartitionConfig partition, List<String> definitionNames, boolean isToolTip)
-            throws CodeGenerationException {
+    public String generatePartition(PartitionConfig partition, List<String> definitionNames,
+                                    boolean isGeneratingToolTip) throws CodeGenerationException {
         CodeGeneratorUtils.NullValidator.validateConfigObject(partition);
 
         StringBuilder partitionStringBuilder = new StringBuilder();
-        if (!isToolTip) {
+        if (!isGeneratingToolTip) {
             partitionStringBuilder
                     .append(SubElementCodeGenerator.generateComment(partition.getPreviousCommentSegment()));
         }
@@ -72,7 +73,7 @@ public class PartitionCodeGenerator {
             int queriesLeft = queries.size();
             for (QueryConfig query : CodeGeneratorUtils.reorderQueries(queries, definitionNames)) {
                 partitionStringBuilder.append(SiddhiCodeBuilderConstants.NEW_LINE)
-                        .append(queryCodeGenerator.generateQuery(query, isToolTip));
+                        .append(queryCodeGenerator.generateQuery(query, isGeneratingToolTip));
                 if (queriesLeft != 1) {
                     partitionStringBuilder.append(SiddhiCodeBuilderConstants.NEW_LINE);
                 }

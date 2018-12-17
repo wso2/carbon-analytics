@@ -16,8 +16,8 @@
  * under the License.
  */
 
-define(['require', 'log', 'jquery', 'lodash', 'functionDefinition', 'designViewUtils'],
-    function (require, log, $, _, FunctionDefinition, DesignViewUtils) {
+define(['require', 'log', 'jquery', 'lodash', 'functionDefinition', 'designViewUtils', 'constants'],
+    function (require, log, $, _, FunctionDefinition, DesignViewUtils, Constants) {
 
         var functionSchema = {
             type: "object",
@@ -146,7 +146,7 @@ define(['require', 'log', 'jquery', 'lodash', 'functionDefinition', 'designViewU
                 $('#' + i).removeClass('incomplete-element');
 
                 //Send function element to the backend and generate tooltip
-                var functionToolTip = self.formUtils.getTooltip(functionObject, "function");
+                var functionToolTip = self.formUtils.getTooltip(functionObject, Constants.FUNCTION);
                 $('#' + i).prop('title', functionToolTip);
 
                 // close the form window
@@ -247,7 +247,7 @@ define(['require', 'log', 'jquery', 'lodash', 'functionDefinition', 'designViewU
                 textNode.html(config.name);
 
                 //Send function element to the backend and generate tooltip
-                var functionToolTip = self.formUtils.getTooltip(clickedElement, "function");
+                var functionToolTip = self.formUtils.getTooltip(clickedElement, Constants.FUNCTION);
                 $('#' + id).prop('title', functionToolTip);
 
                 // close the form window

@@ -32,13 +32,14 @@ public class StreamCodeGenerator {
      * Generates the Siddhi code representation of a StreamConfig object
      *
      * @param stream The StreamConfig object
+     * @param isGeneratingToolTip If it is generating a tooltip or not
      * @return The Siddhi code representation of the given StreamConfig object
      * @throws CodeGenerationException Error when generating the code
      */
-    public String generateStream(StreamConfig stream, boolean isToolTip) throws CodeGenerationException {
+    public String generateStream(StreamConfig stream, boolean isGeneratingToolTip) throws CodeGenerationException {
         CodeGeneratorUtils.NullValidator.validateConfigObject(stream);
         StringBuilder streamStringBuilder = new StringBuilder();
-        if (!isToolTip) {
+        if (!isGeneratingToolTip) {
             streamStringBuilder.append(SubElementCodeGenerator.generateComment(stream.getPreviousCommentSegment()));
         }
 
