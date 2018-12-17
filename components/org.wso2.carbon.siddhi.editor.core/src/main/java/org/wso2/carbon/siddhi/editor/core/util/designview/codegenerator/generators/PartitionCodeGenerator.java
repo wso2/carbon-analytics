@@ -52,13 +52,15 @@ public class PartitionCodeGenerator {
                     .append(SubElementCodeGenerator.generateComment(partition.getPreviousCommentSegment()));
         }
         partitionStringBuilder.append(SubElementCodeGenerator.generateAnnotations(partition.getAnnotationList()))
+                .append(SiddhiCodeBuilderConstants.NEW_LINE)
                 .append(SiddhiCodeBuilderConstants.PARTITION_WITH)
+                .append(SiddhiCodeBuilderConstants.SPACE)
                 .append(SiddhiCodeBuilderConstants.OPEN_BRACKET)
                 .append(generatePartitionWith(partition.getPartitionWith()))
                 .append(SiddhiCodeBuilderConstants.CLOSE_BRACKET)
-                .append(SiddhiCodeBuilderConstants.SPACE)
+                .append(SiddhiCodeBuilderConstants.NEW_LINE)
                 .append(SiddhiCodeBuilderConstants.BEGIN)
-                .append(SiddhiCodeBuilderConstants.SPACE);
+                .append(SiddhiCodeBuilderConstants.NEW_LINE);
 
         List<QueryConfig> queries = new LinkedList<>();
         for (List<QueryConfig> queryList : partition.getQueryLists().values()) {
@@ -69,7 +71,8 @@ public class PartitionCodeGenerator {
             QueryCodeGenerator queryCodeGenerator = new QueryCodeGenerator();
             int queriesLeft = queries.size();
             for (QueryConfig query : CodeGeneratorUtils.reorderQueries(queries, definitionNames)) {
-                partitionStringBuilder.append(queryCodeGenerator.generateQuery(query, isToolTip));
+                partitionStringBuilder.append(SiddhiCodeBuilderConstants.NEW_LINE)
+                        .append(queryCodeGenerator.generateQuery(query, isToolTip));
                 if (queriesLeft != 1) {
                     partitionStringBuilder.append(SiddhiCodeBuilderConstants.NEW_LINE);
                 }
@@ -77,7 +80,9 @@ public class PartitionCodeGenerator {
             }
         }
 
-        partitionStringBuilder.append(SiddhiCodeBuilderConstants.END)
+        partitionStringBuilder.append(SiddhiCodeBuilderConstants.NEW_LINE)
+                .append(SiddhiCodeBuilderConstants.NEW_LINE)
+                .append(SiddhiCodeBuilderConstants.END)
                 .append(SiddhiCodeBuilderConstants.SEMI_COLON)
                 .append(SiddhiCodeBuilderConstants.NEW_LINE);
 

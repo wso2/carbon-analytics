@@ -214,33 +214,6 @@ define(['require', 'lodash', 'appData', 'log'],
         };
 
         /**
-         * Generate tooltip for partition
-         * @param designViewJSON sidhhiAppConfig
-         */
-        FormUtils.prototype.getPartitionTooltip = function (designViewJSON) {
-            var self = this;
-            var result = {};
-            self.tooltipsURL = window.location.protocol + "//" + window.location.host + "/editor/tooltips";
-            $.ajax({
-                type: "POST",
-                url: self.tooltipsURL,
-                data: window.btoa(designViewJSON),
-                async: false,
-                success: function (response) {
-                    result = {status: "success", tooltipList: response};
-                },
-                error: function (error) {
-                    if (error.responseText) {
-                        result = {status: "fail", errorMessage: error.responseText};
-                    } else {
-                        result = {status: "fail", errorMessage: "Error Occurred while processing your request"};
-                    }
-                }
-            });
-            return result;
-        };
-
-        /**
          * Generate tooltip for siddhi app elements
          *
          * @param element JSON object of the element
@@ -261,6 +234,10 @@ define(['require', 'lodash', 'appData', 'log'],
 
                 case "join-query" :
                     appData.addJoinQuery(element);
+                    break;
+
+                case "partition" :
+                    appData.addPartition(element);
                     break;
 
                 case "pattern-query" :
@@ -309,7 +286,12 @@ define(['require', 'lodash', 'appData', 'log'],
                 data: window.btoa(JSON.stringify(appData)),
                 async: false,
                 success: function (response) {
-                    result = response[0].text;
+                    var toolTipObject = _.find(response, function (toolTip) {
+                        return toolTip.id === element.getId();
+                    });
+                    if (toolTipObject !== undefined) {
+                        result = toolTipObject.text;
+                    }
                 },
                 error: function (error) {
                     if (error.responseText) {

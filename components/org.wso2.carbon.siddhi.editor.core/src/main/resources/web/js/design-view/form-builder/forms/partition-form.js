@@ -200,24 +200,8 @@ define(['require', 'log', 'jquery', 'lodash', 'partitionWith', 'designViewUtils'
                     self.designViewContainer.removeClass('disableContainer');
                     self.toggleViewButton.removeClass('disableContainer');
 
-                    //Send SiddhiApp Config to the backend and get tooltip
-                    var sendingString = JSON.stringify(self.configurationData.siddhiAppConfig);
-                    var response = self.formUtils.getPartitionTooltip(sendingString);
-                    var tooltipList=[];
-                    if (response.status === "success") {
-                        tooltipList = response.tooltipList;
-                    } else {
-                        log.error(response.errorMessage);
-                    }
-
-                    var partitionToolTip = '';
-                    var toolTipObject = _.find(tooltipList, function (toolTip) {
-                        return toolTip.id === id;
-                    });
-                    if (toolTipObject !== undefined) {
-                        partitionToolTip = toolTipObject.text;
-                    }
-
+                    //Send partition element to the backend and generate tooltip
+                    var partitionToolTip = self.formUtils.getTooltip(partitionElement, "partition");
                     $('#' + id).prop('title', partitionToolTip);
 
                     // close the form window

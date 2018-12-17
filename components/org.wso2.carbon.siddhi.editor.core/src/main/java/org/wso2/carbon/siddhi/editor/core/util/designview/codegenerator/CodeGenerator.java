@@ -99,10 +99,6 @@ public class CodeGenerator {
     public List <ToolTip> generateSiddhiAppToolTips(SiddhiAppConfig siddhiAppConfig) throws CodeGenerationException {
         SiddhiAppConfig siddhiApp = siddhiAppConfig;
 
-        List<String> allDefinitions = CodeGeneratorUtils.getDefinitionNames(siddhiApp.getStreamList(),
-                siddhiApp.getTableList(), siddhiApp.getWindowList(), siddhiApp.getTriggerList(),
-                siddhiApp.getAggregationList(), siddhiApp.getPartitionList());
-
         List <ToolTip> toolTipList = new ArrayList<>();
         toolTipList.addAll(generateStreamSinkSourceToolTips(siddhiApp.getStreamList(), siddhiApp.getSourceList(),
                 siddhiApp.getSinkList()));
@@ -111,8 +107,7 @@ public class CodeGenerator {
         toolTipList.addAll(generateTriggerToolTips(siddhiApp.getTriggerList()));
         toolTipList.addAll(generateAggregationToolTips(siddhiApp.getAggregationList()));
         toolTipList.addAll(generateFunctionToolTips(siddhiApp.getFunctionList()));
-        toolTipList.addAll(generateExcecutionElementToolTips(siddhiApp.getQueryLists(), siddhiApp.getPartitionList(),
-                allDefinitions));
+        toolTipList.addAll(generateExcecutionElementToolTips(siddhiApp.getQueryLists(), siddhiApp.getPartitionList()));
 
         return toolTipList;
     }
@@ -520,13 +515,11 @@ public class CodeGenerator {
      *
      * @param queryLists               The list of queries in a Siddhi app
      * @param partitions               The list of partitions in a Siddhi app
-     * @param allDefinitions           The names of all the definition elements in the Siddhi app
      * @return List of tooltips for  queries and partitions in a Siddhi app
      * @throws CodeGenerationException Error while generating the code
      */
     private List<ToolTip> generateExcecutionElementToolTips(Map<QueryListType, List<QueryConfig>> queryLists,
-                                                            List<PartitionConfig> partitions,
-                                                            List<String> allDefinitions)
+                                                            List<PartitionConfig> partitions)
             throws CodeGenerationException {
         List <ToolTip> excecutionElementTooltipList = new ArrayList<>();
 
@@ -547,8 +540,15 @@ public class CodeGenerator {
                         queryCodeGenerator.generateQuery(query, true)));
             } else if (executionElement.getType().equalsIgnoreCase(CodeGeneratorConstants.PARTITION)) {
                 PartitionConfig partition = (PartitionConfig) executionElement.getValue();
+                List<String> alldefinitions = new ArrayList<>();
+                for (List<QueryConfig> queryList : partition.getQueryLists().values()) {
+                    for (QueryConfig query : queryList) {
+                        alldefinitions.addAll(CodeGeneratorUtils.getInputStreams(query));
+                        alldefinitions.add(query.getQueryOutput().getTarget());
+                    }
+                }
                 excecutionElementTooltipList.add(new ToolTip(partition.getId(),
-                        partitionCodeGenerator.generatePartition(partition, allDefinitions, true)));
+                        partitionCodeGenerator.generatePartition(partition, alldefinitions, true)));
             } else {
                 throw new CodeGenerationException("Unidentified ExecutionElement type: " + executionElement.getType());
             }
