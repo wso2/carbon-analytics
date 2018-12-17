@@ -1202,6 +1202,7 @@ define(['require', 'log', 'lodash', 'jquery', 'partition', 'stream', 'query', 'f
             function showPopOver(dataObj, element) {
                 $(dataObj).popover({
                     trigger: 'focus',
+                    placement:'auto',
                     title: 'Are you sure you want to delete?',
                     html: true,
                     content: function () {
