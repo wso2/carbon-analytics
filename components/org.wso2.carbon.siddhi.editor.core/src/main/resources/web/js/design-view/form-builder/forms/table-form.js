@@ -380,7 +380,7 @@ define(['log', 'jquery', 'lodash', 'attribute', 'storeAnnotation', 'designViewUt
             $('.attr-name').each(function () {
                 var attributeName = $(this).val().trim();
                 if (attributeName != "") {
-                    var isError = validateName(this, "Attribute", attributeName);
+                    var isError = validateName(this, Constants.ATTRIBUTE, attributeName);
                     if (!isError) {
                         attributeNameList.push(attributeName)
                     } else {
@@ -400,7 +400,7 @@ define(['log', 'jquery', 'lodash', 'attribute', 'storeAnnotation', 'designViewUt
          */
         var validateName = function (id, type, name) {
             var errorMessageParent;
-            if (type === "Attribute") {
+            if (type === Constants.ATTRIBUTE) {
                 errorMessageParent = $(id).parents(".attribute").find(".error-message");
             } else {
                 errorMessageParent = $('#tableNameErrorMessage');
@@ -926,9 +926,9 @@ define(['log', 'jquery', 'lodash', 'attribute', 'storeAnnotation', 'designViewUt
             $('#define-predefined-annotations').on('click', '.btn-add-annot-value', function () {
                 $(this).parents(".table-annotation").find("ul").append
                     ('<li class = "clearfix table-annotation-value"> <div class="clearfix"> ' +
-                    '<input type = "text" value = "" class = "annotation-value"/> ' +
-                    '<a class = "btn-del-annot-value"> <i class = "fw fw-delete"> </i> </a> </div> ' +
-                    '<label class="error-message"></label> </li>');
+                        '<input type = "text" value = "" class = "annotation-value"/> ' +
+                        '<a class = "btn-del-annot-value"> <i class = "fw fw-delete"> </i> </a> </div> ' +
+                        '<label class="error-message"></label> </li>');
             });
 
             //To delete annotation value
@@ -980,8 +980,8 @@ define(['log', 'jquery', 'lodash', 'attribute', 'storeAnnotation', 'designViewUt
             if (savedAnnotations && savedAnnotations.length != 0) {
                 userAnnotations = getUserAnnotations(savedAnnotationObjects, tableAnnotations);
                 mapAnnotationValues(tableAnnotations, savedAnnotationObjects)
-           }
-           
+            }
+
             //render the predefined table annotation form template
             var annotationFormTemplate = Handlebars.compile($('#table-store-annotation-template').html());
             var wrappedHtml = annotationFormTemplate(tableAnnotations);
@@ -1108,7 +1108,7 @@ define(['log', 'jquery', 'lodash', 'attribute', 'storeAnnotation', 'designViewUt
                         isErrorOccurred = true;
                         return;
                     }
-                    if (validateName("#tableName", "Table", tableName)) {
+                    if (validateName("#tableName", Constants.TABLE, tableName)) {
                         isErrorOccurred = true;
                         return;
                     }

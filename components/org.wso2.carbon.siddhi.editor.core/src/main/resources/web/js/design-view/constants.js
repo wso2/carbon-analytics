@@ -37,8 +37,18 @@ define(function () {
         LOSSY_FREQUENT: "lossyfrequent",
         DEFAULT_STORE_TYPE: "in-memory",
         RDBMS_STORE_TYPE: "rdbms",
+        DEFAULT_MAPPER_TYPE: "passThrough",
+        ATTRIBUTE: "attribute",
         MAP: "map",
-        LIST: "list"
+        LIST: "list",
+        MAPPER: "mapper",
+        SINK: "sink",
+        SOURCE: "source",
+        TABLE: "table",
+        STREAM: "stream",
+        WINDOW: "window",
+        TRIGGER: "trigger",
+        PARTITION: "partition"
     };
 
     return constants;

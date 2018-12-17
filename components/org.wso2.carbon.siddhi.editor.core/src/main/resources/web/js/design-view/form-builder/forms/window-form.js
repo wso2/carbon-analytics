@@ -73,7 +73,7 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'designViewUtils', 'h
             $('.attr-name').each(function () {
                 var attributeName = $(this).val().trim();
                 if (attributeName != "") {
-                    var isError = validateName(this, "Attribute", attributeName);
+                    var isError = validateName(this, Constants.ATTRIBUTE, attributeName);
                     if (!isError) {
                         attributeNameList.push(attributeName)
                     } else {
@@ -93,7 +93,7 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'designViewUtils', 'h
          */
         var validateName = function (id, type, name) {
             var errorMessageParent;
-            if (type === "Attribute") {
+            if (type === Constants.ATTRIBUTE) {
                 errorMessageParent = $(id).parents(".attribute").find(".error-message");
             } else {
                 errorMessageParent = $('#windowNameErrorMessage');
@@ -244,7 +244,7 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'designViewUtils', 'h
             } else {
                 functionParametersWithValues = mapUserParameterValues(functionParameters, savedParameterValues);
             }
-            renderParameters(functionParametersWithValues, selectedType, "window");
+            renderParameters(functionParametersWithValues, selectedType, Constants.WINDOW);
         };
 
         /** Function to render the output event types */
@@ -843,7 +843,7 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'designViewUtils', 'h
 
             var name = clickedElement.getName();
             var windowFunctionNameTemplate = Handlebars.compile($('#type-selection-form-template').html());
-            var wrappedHtml = windowFunctionNameTemplate({ id: "window", types: predefinedWindowFunctionNames });
+            var wrappedHtml = windowFunctionNameTemplate({ id: Constants.WINDOW, types: predefinedWindowFunctionNames });
             $('#defineFunctionName').html(wrappedHtml);
             renderOutputEventTypes();
 
@@ -855,7 +855,7 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'designViewUtils', 'h
                 selectedWindowType = $('#defineFunctionName #window-type').val();
                 functionParameters = getSelectedTypeParameters(selectedWindowType, predefinedWindowFunctionNames);
                 functionParametersWithValues = createParameterWithValues(functionParameters);
-                renderParameters(functionParametersWithValues, selectedWindowType, "window")
+                renderParameters(functionParametersWithValues, selectedWindowType, Constants.WINDOW)
             } else {
                 //if window object is already edited
                 var windowType = clickedElement.getType().toLowerCase();
@@ -911,7 +911,7 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'designViewUtils', 'h
                     callToMapParameters(selectedType, functionParameters, savedParameterValues, functionParametersWithValues)
                 } else {
                     functionParametersWithValues = createParameterWithValues(functionParameters);
-                    renderParameters(functionParametersWithValues, selectedType, "window");
+                    renderParameters(functionParametersWithValues, selectedType, Constants.WINDOW);
                 }
                 if (selectedType === Constants.SORT) {
                     showHideOrderForSort();
@@ -950,7 +950,7 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'designViewUtils', 'h
                         return;
                     }
                     //validate window name
-                    if (validateName("#windowName", "Window", windowName)) {
+                    if (validateName("#windowName", Constants.WINDOW, windowName)) {
                         isErrorOccurred = true;
                         return;
                     }

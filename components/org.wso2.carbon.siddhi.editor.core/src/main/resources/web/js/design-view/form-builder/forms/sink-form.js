@@ -90,7 +90,7 @@ define(['log', 'jquery', 'lodash', 'sourceOrSinkAnnotation', 'mapAnnotation', 'p
                 var wrappedHtml = mapFormTemplate({ id: "map", types: predefinedSinkMaps });
                 $('#define-map').html(wrappedHtml);
                 $('#define-map #map-type').val('passThrough');
-                $('#define-map #map-type option:contains("passThrough")').text('passThrough (default)');
+                $('#define-map #map-type option:contains("' + Constants.DEFAULT_MAPPER_TYPE + '")').text('passThrough (default)');
             }
         };
 
@@ -237,7 +237,7 @@ define(['log', 'jquery', 'lodash', 'sourceOrSinkAnnotation', 'mapAnnotation', 'p
          */
         var renderAttributeMappingContent = function (attributes, streamAttributes) {
             var attributeMapFormTemplate = Handlebars.compile($('#source-sink-map-attribute-template').html());
-            var wrappedHtml = attributeMapFormTemplate({ id: "sink", attributes: attributes });
+            var wrappedHtml = attributeMapFormTemplate({ id: Constants.SINK, attributes: attributes });
             $('#attribute-map-content').html(wrappedHtml);
             var streamAttributeMessage = "Stream Attributes are: ";
             _.forEach(streamAttributes, function (attribute) {
@@ -479,7 +479,7 @@ define(['log', 'jquery', 'lodash', 'sourceOrSinkAnnotation', 'mapAnnotation', 'p
             if ($('#' + id).hasClass('error-element')) {
                 isSinkConnected = false;
                 DesignViewUtils.prototype.errorAlert("Please connect to a stream");
-            } else if (!JSONValidator.prototype.validateSourceOrSinkAnnotation(clickedElement, 'Sink', true)) {
+            } else if (!JSONValidator.prototype.validateSourceOrSinkAnnotation(clickedElement, Constants.SINK, true)) {
                 // perform JSON validation to check if sink contains a connectedElement.
                 isSinkConnected = false;
             }
@@ -598,7 +598,7 @@ define(['log', 'jquery', 'lodash', 'sourceOrSinkAnnotation', 'mapAnnotation', 'p
 
                 //render the template to select the sink type
                 var sinkFormTemplate = Handlebars.compile($('#type-selection-form-template').html());
-                var wrappedHtml = sinkFormTemplate({ id: "sink", types: predefinedSinks });
+                var wrappedHtml = sinkFormTemplate({ id: Constants.SINK, types: predefinedSinks });
                 $('#define-sink').html(wrappedHtml);
 
                 //onchange of the sink-type selection
@@ -612,13 +612,13 @@ define(['log', 'jquery', 'lodash', 'sourceOrSinkAnnotation', 'mapAnnotation', 'p
                         sinkOptionsWithValues = createOptionObjectWithValues(sinkOptions);
                         customizedSinkOptions = [];
                     }
-                    renderOptions(sinkOptionsWithValues, customizedSinkOptions, "sink");
+                    renderOptions(sinkOptionsWithValues, customizedSinkOptions, Constants.SINK);
                     if (!map) {
                         renderMap(predefinedSinkMaps);
                         customizedMapperOptions = [];
-                        mapperOptions = getSelectedTypeOptions("passThrough", predefinedSinkMaps);
+                        mapperOptions = getSelectedTypeOptions(Constants.DEFAULT_MAPPER_TYPE, predefinedSinkMaps);
                         mapperOptionsWithValues = createOptionObjectWithValues(mapperOptions);
-                        renderOptions(mapperOptionsWithValues, customizedMapperOptions, "mapper")
+                        renderOptions(mapperOptionsWithValues, customizedMapperOptions, Constants.MAPPER)
                         renderAttributeMapping();
                     }
                 });
@@ -638,13 +638,13 @@ define(['log', 'jquery', 'lodash', 'sourceOrSinkAnnotation', 'mapAnnotation', 'p
                         sinkOptionsWithValues = createOptionObjectWithValues(sinkOptions);
                         customizedSinkOptions = [];
                     }
-                    renderOptions(sinkOptionsWithValues, customizedSinkOptions, "sink");
+                    renderOptions(sinkOptionsWithValues, customizedSinkOptions, Constants.SINK);
                     if (!map) {
                         renderMap(predefinedSinkMaps);
                         customizedMapperOptions = [];
-                        mapperOptions = getSelectedTypeOptions("passThrough", predefinedSinkMaps);
+                        mapperOptions = getSelectedTypeOptions(Constants.DEFAULT_MAPPER_TYPE, predefinedSinkMaps);
                         mapperOptionsWithValues = createOptionObjectWithValues(mapperOptions);
-                        renderOptions(mapperOptionsWithValues, customizedMapperOptions, "mapper")
+                        renderOptions(mapperOptionsWithValues, customizedMapperOptions, Constants.MAPPER)
                         renderAttributeMapping();
                     }
                 }
@@ -671,7 +671,7 @@ define(['log', 'jquery', 'lodash', 'sourceOrSinkAnnotation', 'mapAnnotation', 'p
                             mapperOptionsWithValues = createOptionObjectWithValues(mapperOptions);
                             customizedMapperOptions = [];
                         }
-                        renderOptions(mapperOptionsWithValues, customizedMapperOptions, "mapper");
+                        renderOptions(mapperOptionsWithValues, customizedMapperOptions, Constants.MAPPER);
                     }
                     if (savedMapperAttributes) {
                         $('#define-attribute #attributeMap-checkBox').prop('checked', true);
@@ -693,7 +693,7 @@ define(['log', 'jquery', 'lodash', 'sourceOrSinkAnnotation', 'mapAnnotation', 'p
                         mapperOptionsWithValues = createOptionObjectWithValues(mapperOptions);
                         customizedMapperOptions = [];
                     }
-                    renderOptions(mapperOptionsWithValues, customizedMapperOptions, "mapper");
+                    renderOptions(mapperOptionsWithValues, customizedMapperOptions, Constants.MAPPER);
                     if (!map || (map && !savedMapperAttributes)) {
                         renderAttributeMapping();
                         attributes = initialiseAttributeContent(streamAttributes)

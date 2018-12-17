@@ -90,7 +90,7 @@ define(['log', 'jquery', 'lodash', 'sourceOrSinkAnnotation', 'mapAnnotation', 'p
                 var wrappedHtml = mapFormTemplate({ id: "map", types: predefinedSourceMaps });
                 $('#define-map').html(wrappedHtml);
                 $('#define-map #map-type').val('passThrough');
-                $('#define-map #map-type option:contains("passThrough")').text('passThrough (default)');
+                $('#define-map #map-type option:contains("' + Constants.DEFAULT_MAPPER_TYPE + '")').text('passThrough (default)');
             }
         };
 
@@ -243,7 +243,7 @@ define(['log', 'jquery', 'lodash', 'sourceOrSinkAnnotation', 'mapAnnotation', 'p
          */
         var renderAttributeMappingContent = function (attributes) {
             var attributeMapFormTemplate = Handlebars.compile($('#source-sink-map-attribute-template').html());
-            var wrappedHtml = attributeMapFormTemplate({ id: "source", attributes: attributes });
+            var wrappedHtml = attributeMapFormTemplate({ id: Constants.SOURCE, attributes: attributes });
             $('#attribute-map-content').html(wrappedHtml);
         };
 
@@ -475,7 +475,7 @@ define(['log', 'jquery', 'lodash', 'sourceOrSinkAnnotation', 'mapAnnotation', 'p
             if ($('#' + id).hasClass('error-element')) {
                 isSourceConnected = false;
                 DesignViewUtils.prototype.errorAlert("Please connect to a stream");
-            } else if (!JSONValidator.prototype.validateSourceOrSinkAnnotation(clickedElement, 'Source', true)) {
+            } else if (!JSONValidator.prototype.validateSourceOrSinkAnnotation(clickedElement, Constants.SOURCE, true)) {
                 // perform JSON validation to check if source contains a connectedElement.
                 isSourceConnected = false;
             }
@@ -578,7 +578,7 @@ define(['log', 'jquery', 'lodash', 'sourceOrSinkAnnotation', 'mapAnnotation', 'p
 
                 //render the template to select the source type
                 var sourceFormTemplate = Handlebars.compile($('#type-selection-form-template').html());
-                var wrappedHtml = sourceFormTemplate({ id: "source", types: predefinedSources });
+                var wrappedHtml = sourceFormTemplate({ id: Constants.SOURCE, types: predefinedSources });
                 $('#define-source').html(wrappedHtml);
 
                 //onchange of the source-type selection
@@ -592,13 +592,13 @@ define(['log', 'jquery', 'lodash', 'sourceOrSinkAnnotation', 'mapAnnotation', 'p
                         sourceOptionsWithValues = createOptionObjectWithValues(sourceOptions);
                         customizedSourceOptions = [];
                     }
-                    renderOptions(sourceOptionsWithValues, customizedSourceOptions, "source");
+                    renderOptions(sourceOptionsWithValues, customizedSourceOptions, Constants.SOURCE);
                     if (!map) {
                         renderMap(predefinedSourceMaps);
                         customizedMapperOptions = [];
-                        mapperOptions = getSelectedTypeOptions("passThrough", predefinedSourceMaps);
+                        mapperOptions = getSelectedTypeOptions(Constants.DEFAULT_MAPPER_TYPE, predefinedSourceMaps);
                         mapperOptionsWithValues = createOptionObjectWithValues(mapperOptions);
-                        renderOptions(mapperOptionsWithValues, customizedMapperOptions, "mapper")
+                        renderOptions(mapperOptionsWithValues, customizedMapperOptions, Constants.MAPPER)
                         renderAttributeMapping();
                     }
                 });
@@ -618,13 +618,13 @@ define(['log', 'jquery', 'lodash', 'sourceOrSinkAnnotation', 'mapAnnotation', 'p
                         sourceOptionsWithValues = createOptionObjectWithValues(sourceOptions);
                         customizedSourceOptions = [];
                     }
-                    renderOptions(sourceOptionsWithValues, customizedSourceOptions, "source");
+                    renderOptions(sourceOptionsWithValues, customizedSourceOptions, Constants.SOURCE);
                     if (!map) {
                         renderMap(predefinedSourceMaps);
                         customizedMapperOptions = [];
-                        mapperOptions = getSelectedTypeOptions("passThrough", predefinedSourceMaps);
+                        mapperOptions = getSelectedTypeOptions(Constants.DEFAULT_MAPPER_TYPE, predefinedSourceMaps);
                         mapperOptionsWithValues = createOptionObjectWithValues(mapperOptions);
-                        renderOptions(mapperOptionsWithValues, customizedMapperOptions, "mapper")
+                        renderOptions(mapperOptionsWithValues, customizedMapperOptions, Constants.MAPPER)
                         renderAttributeMapping();
                     }
                 }
@@ -651,7 +651,7 @@ define(['log', 'jquery', 'lodash', 'sourceOrSinkAnnotation', 'mapAnnotation', 'p
                             mapperOptionsWithValues = createOptionObjectWithValues(mapperOptions);
                             customizedMapperOptions = [];
                         }
-                        renderOptions(mapperOptionsWithValues, customizedMapperOptions, "mapper");
+                        renderOptions(mapperOptionsWithValues, customizedMapperOptions, Constants.MAPPER);
                     }
                     if (savedMapperAttributes) {
                         $('#define-attribute #attributeMap-checkBox').prop('checked', true);
@@ -673,7 +673,7 @@ define(['log', 'jquery', 'lodash', 'sourceOrSinkAnnotation', 'mapAnnotation', 'p
                         mapperOptionsWithValues = createOptionObjectWithValues(mapperOptions);
                         customizedMapperOptions = [];
                     }
-                    renderOptions(mapperOptionsWithValues, customizedMapperOptions, "mapper")
+                    renderOptions(mapperOptionsWithValues, customizedMapperOptions, Constants.MAPPER)
                     if (!map || (map && !savedMapperAttributes)) {
                         //if saved mapper attributes are undefined
                         renderAttributeMapping();

@@ -75,7 +75,7 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'designViewUtils', 'j
             $('.attr-name').each(function () {
                 var attributeName = $(this).val().trim();
                 if (attributeName != "") {
-                    var isError = validateName(this, "Attribute", attributeName);
+                    var isError = validateName(this, Constants.ATTRIBUTE, attributeName);
                     if (!isError) {
                         attributeNameList.push(attributeName)
                     } else {
@@ -95,7 +95,7 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'designViewUtils', 'j
          */
         var validateName = function (id, type, name) {
             var errorMessageParent;
-            if (type === "Attribute") {
+            if (type === Constants.ATTRIBUTE) {
                 errorMessageParent = $(id).parents(".attribute").find(".error-message");
             } else {
                 errorMessageParent = $('#streamNameErrorMessage');
@@ -599,7 +599,7 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'designViewUtils', 'j
                 }
 
                 if (previouslySavedName !== streamName) {
-                    if (validateName("#streamName", "Stream", streamName)) {
+                    if (validateName("#streamName", Constants.STREAM, streamName)) {
                         isErrorOccurred = true;
                         return;
                     }
