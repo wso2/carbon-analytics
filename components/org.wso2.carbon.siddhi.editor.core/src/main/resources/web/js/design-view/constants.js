@@ -36,7 +36,6 @@ define(function () {
         TRIGGER : "trigger",
         WINDOW : "window",
         WINDOW_FILTER_PROJECTION_QUERY : "window-filter-projection-query"
-
     };
 
     return constants;
