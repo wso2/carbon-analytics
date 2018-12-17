@@ -30,33 +30,38 @@ import java.util.LinkedList;
 import java.util.List;
 
 /**
- * Generate's the code for a Siddhi partition element
+ * Generates the code for a Siddhi partition element
  */
 public class PartitionCodeGenerator {
 
     /**
-     * Generate's the Siddhi code representation of a PartitionConfig object
+     * Generates the Siddhi code representation of a PartitionConfig object
      *
      * @param partition       The PartitionConfig object
      * @param definitionNames The names of all the Siddhi definition objects (including inner streams)
+     * @param isGeneratingToolTip If it is generating a tooltip or not
      * @return The Siddhi code representation of the given PartitionConfig object
      * @throws CodeGenerationException Error when generating the code
      */
-    public String generatePartition(PartitionConfig partition, List<String> definitionNames)
-            throws CodeGenerationException {
+    public String generatePartition(PartitionConfig partition, List<String> definitionNames,
+                                    boolean isGeneratingToolTip) throws CodeGenerationException {
         CodeGeneratorUtils.NullValidator.validateConfigObject(partition);
 
         StringBuilder partitionStringBuilder = new StringBuilder();
-
-        partitionStringBuilder.append(SubElementCodeGenerator.generateComment(partition.getPreviousCommentSegment()))
-                .append(SubElementCodeGenerator.generateAnnotations(partition.getAnnotationList()))
+        if (!isGeneratingToolTip) {
+            partitionStringBuilder
+                    .append(SubElementCodeGenerator.generateComment(partition.getPreviousCommentSegment()));
+        }
+        partitionStringBuilder.append(SubElementCodeGenerator.generateAnnotations(partition.getAnnotationList()))
+                .append(SiddhiCodeBuilderConstants.NEW_LINE)
                 .append(SiddhiCodeBuilderConstants.PARTITION_WITH)
+                .append(SiddhiCodeBuilderConstants.SPACE)
                 .append(SiddhiCodeBuilderConstants.OPEN_BRACKET)
                 .append(generatePartitionWith(partition.getPartitionWith()))
                 .append(SiddhiCodeBuilderConstants.CLOSE_BRACKET)
-                .append(SiddhiCodeBuilderConstants.SPACE)
+                .append(SiddhiCodeBuilderConstants.NEW_LINE)
                 .append(SiddhiCodeBuilderConstants.BEGIN)
-                .append(SiddhiCodeBuilderConstants.SPACE);
+                .append(SiddhiCodeBuilderConstants.NEW_LINE);
 
         List<QueryConfig> queries = new LinkedList<>();
         for (List<QueryConfig> queryList : partition.getQueryLists().values()) {
@@ -67,7 +72,8 @@ public class PartitionCodeGenerator {
             QueryCodeGenerator queryCodeGenerator = new QueryCodeGenerator();
             int queriesLeft = queries.size();
             for (QueryConfig query : CodeGeneratorUtils.reorderQueries(queries, definitionNames)) {
-                partitionStringBuilder.append(queryCodeGenerator.generateQuery(query));
+                partitionStringBuilder.append(SiddhiCodeBuilderConstants.NEW_LINE)
+                        .append(queryCodeGenerator.generateQuery(query, isGeneratingToolTip));
                 if (queriesLeft != 1) {
                     partitionStringBuilder.append(SiddhiCodeBuilderConstants.NEW_LINE);
                 }
@@ -75,7 +81,9 @@ public class PartitionCodeGenerator {
             }
         }
 
-        partitionStringBuilder.append(SiddhiCodeBuilderConstants.END)
+        partitionStringBuilder.append(SiddhiCodeBuilderConstants.NEW_LINE)
+                .append(SiddhiCodeBuilderConstants.NEW_LINE)
+                .append(SiddhiCodeBuilderConstants.END)
                 .append(SiddhiCodeBuilderConstants.SEMI_COLON)
                 .append(SiddhiCodeBuilderConstants.NEW_LINE);
 
@@ -83,7 +91,7 @@ public class PartitionCodeGenerator {
     }
 
     /**
-     * Generate's the Siddhi code representation of a partition's PartitionWithElement list
+     * Generates the Siddhi code representation of a partition's PartitionWithElement list
      *
      * @param partitionWith The PartitionWithElement list
      * @return The Siddhi code representation of the given PartitionWithElement list
@@ -106,7 +114,7 @@ public class PartitionCodeGenerator {
     }
 
     /**
-     * Generate's the Siddhi code representation of a PartitionWithElement object
+     * Generates the Siddhi code representation of a PartitionWithElement object
      *
      * @param partitionWithElement The PartitionWithElement object
      * @return The Siddhi code representation of the given PartitionWithElement object

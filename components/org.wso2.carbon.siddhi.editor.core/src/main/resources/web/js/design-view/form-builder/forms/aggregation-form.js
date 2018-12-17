@@ -17,9 +17,9 @@
  */
 
 define(['require', 'log', 'jquery', 'lodash', 'attribute', 'aggregation', 'aggregateByTimePeriod', 'querySelect',
-    'elementUtils', 'storeAnnotation', 'designViewUtils', 'jsonValidator'],
+        'elementUtils', 'storeAnnotation', 'designViewUtils', 'jsonValidator', 'constants'],
     function (require, log, $, _, Attribute, Aggregation, AggregateByTimePeriod, QuerySelect, ElementUtils,
-        StoreAnnotation, DesignViewUtils, JSONValidator) {
+              StoreAnnotation, DesignViewUtils, JSONValidator, Constants) {
 
         /**
          * @class AggregationForm Creates a forms to collect data from a aggregation
@@ -640,7 +640,6 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'aggregation', 'aggre
                     textNode.html(configInput.name);
 
                     $('#' + id).removeClass('incomplete-element');
-                    $('#' + id).prop('title', '');
 
                     // perform JSON validation
                     JSONValidator.prototype.validateAggregation(clickedElement);
@@ -648,6 +647,10 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'aggregation', 'aggre
                     // design view container and toggle view button are enabled
                     self.designViewContainer.removeClass('disableContainer');
                     self.toggleViewButton.removeClass('disableContainer');
+
+                    //Send aggregation element to the backend and generate tooltip
+                    var aggregationToolTip = self.formUtils.getTooltip(clickedElement, Constants.AGGREGATION);
+                    $('#' + id).prop('title', aggregationToolTip);
 
                     // close the form aggregation
                     self.consoleListManager.removeFormConsole(formConsole);

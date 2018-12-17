@@ -17,11 +17,11 @@
  */
 
 define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert', 'queryOutputDelete',
-    'queryOutputUpdate', 'queryOutputUpdateOrInsertInto', 'queryWindowOrFunction', 'queryOrderByValue',
-    'streamHandler', 'designViewUtils', 'jsonValidator'],
+        'queryOutputUpdate', 'queryOutputUpdateOrInsertInto', 'queryWindowOrFunction', 'queryOrderByValue',
+        'streamHandler', 'designViewUtils', 'jsonValidator', 'constants'],
     function (require, log, $, _, QuerySelect, QueryOutputInsert, QueryOutputDelete, QueryOutputUpdate,
-        QueryOutputUpdateOrInsertInto, QueryWindowOrFunction, QueryOrderByValue, StreamHandler, DesignViewUtils,
-        JSONValidator) {
+              QueryOutputUpdateOrInsertInto, QueryWindowOrFunction, QueryOrderByValue, StreamHandler, DesignViewUtils,
+              JSONValidator, Constants) {
 
         var constants = {
             PROJECTION: 'projectionQueryDrop',
@@ -54,7 +54,7 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
          * @param formContainer Container which holds the form
          */
         WindowFilterProjectionQueryForm.prototype.generatePropertiesForm = function (element, formConsole,
-            formContainer) {
+                                                                                     formContainer) {
             var self = this;
             var propertyDiv = $('<div id="property-header"><h3>Query Configuration </h3></div>' +
                 '<div class="define-windowFilterProjection-query"></div>');
@@ -1332,13 +1332,16 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
                     }
 
                     $('#' + id).removeClass('incomplete-element');
-                    $('#' + id).prop('title', '');
-
                     // perform JSON validation
                     JSONValidator.prototype.validateWindowFilterProjectionQuery(clickedElement);
 
                     self.designViewContainer.removeClass('disableContainer');
                     self.toggleViewButton.removeClass('disableContainer');
+
+                    //Send query element to the backend and generate tooltip
+                    var queryToolTip = self.formUtils.getTooltip(clickedElement,
+                        Constants.WINDOW_FILTER_PROJECTION_QUERY);
+                    $('#' + id).prop('title', queryToolTip);
 
                     // close the form window
                     self.consoleListManager.removeFormConsole(formConsole);

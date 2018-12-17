@@ -24,36 +24,43 @@ import org.wso2.carbon.siddhi.editor.core.util.designview.exceptions.CodeGenerat
 import org.wso2.carbon.siddhi.editor.core.util.designview.utilities.CodeGeneratorUtils;
 
 /**
- * Generate's the code for a Siddhi function element
+ * Generates the code for a Siddhi function element
  */
 public class FunctionCodeGenerator {
 
     /**
-     * Generate's the Siddhi code representation of a FunctionConfig object
+     * Generates the Siddhi code representation of a FunctionConfig object
      *
      * @param function The FunctionConfig object
+     * @param isGeneratingToolTip If it is generating a tooltip or not
      * @return The Siddhi code representation of the given FunctionConfig object
      * @throws CodeGenerationException Error when generating the code
      */
-    public String generateFunction(FunctionConfig function) throws CodeGenerationException {
+    public String generateFunction(FunctionConfig function, boolean isGeneratingToolTip)
+            throws CodeGenerationException {
         CodeGeneratorUtils.NullValidator.validateConfigObject(function);
+        StringBuilder functionStringBuilder = new StringBuilder();
+        if (!isGeneratingToolTip) {
+            functionStringBuilder.append(SubElementCodeGenerator.generateComment(function.getPreviousCommentSegment()));
+        }
+        functionStringBuilder.append(SiddhiCodeBuilderConstants.DEFINE_FUNCTION)
+                .append(SiddhiCodeBuilderConstants.SPACE)
+                .append(function.getName())
+                .append(SiddhiCodeBuilderConstants.OPEN_SQUARE_BRACKET)
+                .append(function.getScriptType())
+                .append(SiddhiCodeBuilderConstants.CLOSE_SQUARE_BRACKET )
+                .append(SiddhiCodeBuilderConstants.SPACE)
+                .append(SiddhiCodeBuilderConstants.RETURN)
+                .append(SiddhiCodeBuilderConstants.SPACE )
+                .append(function.getReturnType().toLowerCase())
+                .append(SiddhiCodeBuilderConstants.SPACE)
+                .append(SiddhiCodeBuilderConstants.OPEN_CURLY_BRACKET)
+                .append(SiddhiCodeBuilderConstants.NEW_LINE)
+                .append(function.getBody().trim())
+                .append(SiddhiCodeBuilderConstants.NEW_LINE)
+                .append(SiddhiCodeBuilderConstants.CLOSE_CURLY_BRACKET)
+                .append(SiddhiCodeBuilderConstants.SEMI_COLON);
 
-        return SubElementCodeGenerator.generateComment(function.getPreviousCommentSegment()) +
-                SiddhiCodeBuilderConstants.DEFINE_FUNCTION +
-                SiddhiCodeBuilderConstants.SPACE +
-                function.getName() +
-                SiddhiCodeBuilderConstants.OPEN_SQUARE_BRACKET +
-                function.getScriptType() +
-                SiddhiCodeBuilderConstants.CLOSE_SQUARE_BRACKET +
-                SiddhiCodeBuilderConstants.SPACE +
-                SiddhiCodeBuilderConstants.RETURN +
-                SiddhiCodeBuilderConstants.SPACE +
-                function.getReturnType().toLowerCase() +
-                SiddhiCodeBuilderConstants.SPACE +
-                SiddhiCodeBuilderConstants.OPEN_CURLY_BRACKET +
-                function.getBody().trim() +
-                SiddhiCodeBuilderConstants.CLOSE_CURLY_BRACKET +
-                SiddhiCodeBuilderConstants.SEMI_COLON;
+        return functionStringBuilder.toString();
     }
-
 }

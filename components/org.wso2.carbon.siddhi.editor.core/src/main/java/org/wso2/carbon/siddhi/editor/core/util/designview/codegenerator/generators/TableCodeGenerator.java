@@ -24,31 +24,38 @@ import org.wso2.carbon.siddhi.editor.core.util.designview.exceptions.CodeGenerat
 import org.wso2.carbon.siddhi.editor.core.util.designview.utilities.CodeGeneratorUtils;
 
 /**
- * Generate's the code for a Siddhi table element
+ * Generates the code for a Siddhi table element
  */
 public class TableCodeGenerator {
 
     /**
-     * Generate's the Siddhi code representation of a TableConfig object
+     * Generates the Siddhi code representation of a TableConfig object
      *
      * @param table The TableConfig object
+     * @param isGeneratingToolTip If it is generating a tooltip or not
      * @return The Siddhi code representation of the given TableConfig object
      * @throws CodeGenerationException Error when generating the code
      */
-    public String generateTable(TableConfig table) throws CodeGenerationException {
+    public String generateTable(TableConfig table, boolean isGeneratingToolTip) throws CodeGenerationException {
         CodeGeneratorUtils.NullValidator.validateConfigObject(table);
+        StringBuilder tableStringBuilder = new StringBuilder();
+        if (!isGeneratingToolTip) {
+            tableStringBuilder.append(SubElementCodeGenerator.generateComment(table.getPreviousCommentSegment()));
+        }
 
-        return SubElementCodeGenerator.generateComment(table.getPreviousCommentSegment()) +
-                SubElementCodeGenerator.generateStore(table.getStore()) +
-                SubElementCodeGenerator.generateAnnotations(table.getAnnotationList()) +
-                SiddhiCodeBuilderConstants.DEFINE_TABLE +
-                SiddhiCodeBuilderConstants.SPACE +
-                table.getName() +
-                SiddhiCodeBuilderConstants.SPACE +
-                SiddhiCodeBuilderConstants.OPEN_BRACKET +
-                SubElementCodeGenerator.generateAttributes(table.getAttributeList()) +
-                SiddhiCodeBuilderConstants.CLOSE_BRACKET +
-                SiddhiCodeBuilderConstants.SEMI_COLON;
+        tableStringBuilder.append(SubElementCodeGenerator.generateStore(table.getStore()))
+                .append(SubElementCodeGenerator.generateAnnotations(table.getAnnotationList()))
+                .append(SiddhiCodeBuilderConstants.NEW_LINE)
+                .append(SiddhiCodeBuilderConstants.DEFINE_TABLE)
+                .append(SiddhiCodeBuilderConstants.SPACE)
+                .append(table.getName())
+                .append(SiddhiCodeBuilderConstants.SPACE)
+                .append(SiddhiCodeBuilderConstants.OPEN_BRACKET)
+                .append(SubElementCodeGenerator.generateAttributes(table.getAttributeList()))
+                .append(SiddhiCodeBuilderConstants.CLOSE_BRACKET)
+                .append(SiddhiCodeBuilderConstants.SEMI_COLON);
+
+        return  tableStringBuilder.toString();
     }
 
 }

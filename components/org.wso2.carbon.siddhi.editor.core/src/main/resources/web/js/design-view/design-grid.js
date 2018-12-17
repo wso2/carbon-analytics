@@ -144,9 +144,9 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
                 self.canvas.droppable
                 ({
                     accept: '.stream-drag, .table-drag, .window-drag, .trigger-drag, .aggregation-drag,' +
-                    '.projection-query-drag, .filter-query-drag, .join-query-drag, .window-query-drag,' +
-                    '.pattern-query-drag, .sequence-query-drag, .partition-drag, .source-drag, .sink-drag, ' +
-                    '.function-drag, .function-query-drag',
+                        '.projection-query-drag, .filter-query-drag, .join-query-drag, .window-query-drag,' +
+                        '.pattern-query-drag, .sequence-query-drag, .partition-drag, .source-drag, .sink-drag, ' +
+                        '.function-drag, .function-query-drag',
                     containment: 'grid-container',
 
                     /**
@@ -705,7 +705,7 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
 
                     } else if (targetElement.hasClass(constants.SINK) && sourceElement.hasClass(constants.STREAM)) {
                         connectedElementName = self.configurationData.getSiddhiAppConfig().getStream(sourceId)
-                                .getName();
+                            .getName();
                         self.configurationData.getSiddhiAppConfig().getSink(targetId)
                             .setConnectedElementName(connectedElementName);
 
@@ -1432,6 +1432,16 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
         DesignGrid.prototype.drawGraphFromAppData = function () {
             var self = this;
 
+            //Send SiddhiApp Config to the backend and get tooltips
+            var sendingString = JSON.stringify(self.configurationData.siddhiAppConfig);
+            var response = this.getTooltips(sendingString);
+            var tooltipList=[];
+            if (response.status === "success") {
+                tooltipList = response.tooltipList;
+            } else {
+                log.error(response.errorMessage);
+            }
+
             // set isStillDrawingGraph to true since the graph drawing has begun
             self.configurationData.setIsStillDrawingGraph(true);
 
@@ -1442,7 +1452,14 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
                 var lastArrayEntry = parseInt(array[array.length - 1]);
                 var mouseTop = lastArrayEntry * 100 - self.canvas.offset().top + self.canvas.scrollTop() - 40;
                 var mouseLeft = lastArrayEntry * 200 - self.canvas.offset().left + self.canvas.scrollLeft() - 60;
-                self.handleSourceAnnotation(mouseTop, mouseLeft, true, sourceName, sourceId);
+                var sourceToolTip = '';
+                var toolTipObject = _.find(tooltipList, function (toolTip) {
+                    return toolTip.id === sourceId;
+                });
+                if (toolTipObject !== undefined) {
+                    sourceToolTip = toolTipObject.text;
+                }
+                self.handleSourceAnnotation(mouseTop, mouseLeft, true, sourceName, sourceId, sourceToolTip);
             });
 
             _.forEach(self.configurationData.getSiddhiAppConfig().getSinkList(), function (sink) {
@@ -1452,7 +1469,14 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
                 var lastArrayEntry = parseInt(array[array.length - 1]);
                 var mouseTop = lastArrayEntry * 100 - self.canvas.offset().top + self.canvas.scrollTop() - 40;
                 var mouseLeft = lastArrayEntry * 200 - self.canvas.offset().left + self.canvas.scrollLeft() - 60;
-                self.handleSinkAnnotation(mouseTop, mouseLeft, true, sinkName, sinkId);
+                var sinkToolTip = '';
+                var toolTipObject = _.find(tooltipList, function (toolTip) {
+                    return toolTip.id === sinkId;
+                });
+                if (toolTipObject !== undefined) {
+                    sinkToolTip = toolTipObject.text;
+                }
+                self.handleSinkAnnotation(mouseTop, mouseLeft, true, sinkName, sinkId, sinkToolTip);
             });
 
             _.forEach(self.configurationData.getSiddhiAppConfig().getStreamList(), function (stream) {
@@ -1462,7 +1486,14 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
                 var lastArrayEntry = parseInt(array[array.length - 1]);
                 var mouseTop = lastArrayEntry * 100 - self.canvas.offset().top + self.canvas.scrollTop() - 40;
                 var mouseLeft = lastArrayEntry * 200 - self.canvas.offset().left + self.canvas.scrollLeft() - 60;
-                self.handleStream(mouseTop, mouseLeft, true, streamId, streamName);
+                var streamToolTip = '';
+                var toolTipObject = _.find(tooltipList, function (toolTip) {
+                        return toolTip.id === streamId;
+                    });
+                if (toolTipObject !== undefined) {
+                    streamToolTip = toolTipObject.text;
+                }
+                self.handleStream(mouseTop, mouseLeft, true, streamId, streamName, streamToolTip);
             });
 
             _.forEach(self.configurationData.getSiddhiAppConfig().getTableList(), function (table) {
@@ -1473,7 +1504,14 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
                 var lastArrayEntry = parseInt(array[array.length - 1]);
                 var mouseTop = lastArrayEntry * 100 - self.canvas.offset().top + self.canvas.scrollTop() - 40;
                 var mouseLeft = lastArrayEntry * 200 - self.canvas.offset().left + self.canvas.scrollLeft() - 60;
-                self.handleTable(mouseTop, mouseLeft, true, tableId, tableName);
+                var tableToolTip = '';
+                var toolTipObject = _.find(tooltipList, function (toolTip) {
+                    return toolTip.id === tableId;
+                });
+                if (toolTipObject !== undefined) {
+                    tableToolTip = toolTipObject.text;
+                }
+                self.handleTable(mouseTop, mouseLeft, true, tableId, tableName, tableToolTip);
             });
 
             _.forEach(self.configurationData.getSiddhiAppConfig().getWindowList(), function (window) {
@@ -1484,7 +1522,14 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
                 var lastArrayEntry = parseInt(array[array.length - 1]);
                 var mouseTop = lastArrayEntry * 100 - self.canvas.offset().top + self.canvas.scrollTop() - 40;
                 var mouseLeft = lastArrayEntry * 200 - self.canvas.offset().left + self.canvas.scrollLeft() - 60;
-                self.handleWindow(mouseTop, mouseLeft, true, windowId, windowName);
+                var windowToolTip = '';
+                var toolTipObject = _.find(tooltipList, function (toolTip) {
+                    return toolTip.id === windowId;
+                });
+                if (toolTipObject !== undefined) {
+                    windowToolTip = toolTipObject.text;
+                }
+                self.handleWindow(mouseTop, mouseLeft, true, windowId, windowName, windowToolTip);
             });
 
             _.forEach(self.configurationData.getSiddhiAppConfig().getTriggerList(), function (trigger) {
@@ -1495,7 +1540,14 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
                 var lastArrayEntry = parseInt(array[array.length - 1]);
                 var mouseTop = lastArrayEntry * 100 - self.canvas.offset().top + self.canvas.scrollTop() - 40;
                 var mouseLeft = lastArrayEntry * 200 - self.canvas.offset().left + self.canvas.scrollLeft() - 60;
-                self.handleTrigger(mouseTop, mouseLeft, true, triggerId, triggerName);
+                var triggerToolTip = '';
+                var toolTipObject = _.find(tooltipList, function (toolTip) {
+                    return toolTip.id === triggerId;
+                });
+                if (toolTipObject !== undefined) {
+                    triggerToolTip = toolTipObject.text;
+                }
+                self.handleTrigger(mouseTop, mouseLeft, true, triggerId, triggerName, triggerToolTip);
             });
 
             _.forEach(self.configurationData.getSiddhiAppConfig().getAggregationList(), function (aggregation) {
@@ -1506,7 +1558,14 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
                 var lastArrayEntry = parseInt(array[array.length - 1]);
                 var mouseTop = lastArrayEntry * 100 - self.canvas.offset().top + self.canvas.scrollTop() - 40;
                 var mouseLeft = lastArrayEntry * 200 - self.canvas.offset().left + self.canvas.scrollLeft() - 60;
-                self.handleAggregation(mouseTop, mouseLeft, true, aggregationId, aggregationName);
+                var aggregationToolTip = '';
+                var toolTipObject = _.find(tooltipList, function (toolTip) {
+                    return toolTip.id === aggregationId;
+                });
+                if (toolTipObject !== undefined) {
+                    aggregationToolTip = toolTipObject.text;
+                }
+                self.handleAggregation(mouseTop, mouseLeft, true, aggregationId, aggregationName, aggregationToolTip);
             });
 
             _.forEach(self.configurationData.getSiddhiAppConfig().getFunctionList(), function (functionObject) {
@@ -1517,7 +1576,14 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
                 var lastArrayEntry = parseInt(array[array.length - 1]);
                 var mouseTop = lastArrayEntry * 100 - self.canvas.offset().top + self.canvas.scrollTop() - 40;
                 var mouseLeft = lastArrayEntry * 200 - self.canvas.offset().left + self.canvas.scrollLeft() - 60;
-                self.handleFunction(mouseTop, mouseLeft, true, functionId, functionName);
+                var functionToolTip = '';
+                var toolTipObject = _.find(tooltipList, function (toolTip) {
+                    return toolTip.id === functionId;
+                });
+                if (toolTipObject !== undefined) {
+                    functionToolTip = toolTipObject.text;
+                }
+                self.handleFunction(mouseTop, mouseLeft, true, functionId, functionName, functionToolTip);
             });
 
             _.forEach(self.configurationData.getSiddhiAppConfig().getPatternQueryList(), function (patternQuery) {
@@ -1528,7 +1594,15 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
                 var lastArrayEntry = parseInt(array[array.length - 1]);
                 var mouseTop = lastArrayEntry * 100 - self.canvas.offset().top + self.canvas.scrollTop() - 40;
                 var mouseLeft = lastArrayEntry * 200 - self.canvas.offset().left + self.canvas.scrollLeft() - 60;
-                self.handlePatternQuery(mouseTop, mouseLeft, true, patternQueryName, patternQueryId);
+                var patternQueryToolTip = '';
+                var toolTipObject = _.find(tooltipList, function (toolTip) {
+                    return toolTip.id === patternQueryId;
+                });
+                if (toolTipObject !== undefined) {
+                    patternQueryToolTip = toolTipObject.text;
+                }
+                self.handlePatternQuery(mouseTop, mouseLeft, true, patternQueryName, patternQueryId,
+                    patternQueryToolTip);
             });
 
             _.forEach(self.configurationData.getSiddhiAppConfig().getSequenceQueryList(), function (sequenceQuery) {
@@ -1539,7 +1613,15 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
                 var lastArrayEntry = parseInt(array[array.length - 1]);
                 var mouseTop = lastArrayEntry * 100 - self.canvas.offset().top + self.canvas.scrollTop() - 40;
                 var mouseLeft = lastArrayEntry * 200 - self.canvas.offset().left + self.canvas.scrollLeft() - 60;
-                self.handleSequenceQuery(mouseTop, mouseLeft, true, sequenceQueryName, sequenceQueryId);
+                var sequenceQueryToolTip = '';
+                var toolTipObject = _.find(tooltipList, function (toolTip) {
+                    return toolTip.id === sequenceQueryId;
+                });
+                if (toolTipObject !== undefined) {
+                    sequenceQueryToolTip = toolTipObject.text;
+                }
+                self.handleSequenceQuery(mouseTop, mouseLeft, true, sequenceQueryName, sequenceQueryId,
+                    sequenceQueryToolTip);
             });
 
             _.forEach(self.configurationData.getSiddhiAppConfig().getWindowFilterProjectionQueryList(),
@@ -1563,7 +1645,15 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
                     var lastArrayEntry = parseInt(array[array.length - 1]);
                     var mouseTop = lastArrayEntry * 100 - self.canvas.offset().top + self.canvas.scrollTop() - 40;
                     var mouseLeft = lastArrayEntry * 200 - self.canvas.offset().left + self.canvas.scrollLeft() - 60;
-                    self.handleWindowFilterProjectionQuery(queryType, mouseTop, mouseLeft, true, queryName, queryId);
+                    var queryToolTip = '';
+                    var toolTipObject = _.find(tooltipList, function (toolTip) {
+                        return toolTip.id === queryId;
+                    });
+                    if (toolTipObject !== undefined) {
+                        queryToolTip = toolTipObject.text;
+                    }
+                    self.handleWindowFilterProjectionQuery(queryType, mouseTop, mouseLeft, true, queryName, queryId,
+                        queryToolTip);
                 });
 
             _.forEach(self.configurationData.getSiddhiAppConfig().getJoinQueryList(), function (joinQuery) {
@@ -1574,7 +1664,14 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
                 var lastArrayEntry = parseInt(array[array.length - 1]);
                 var mouseTop = lastArrayEntry * 100 - self.canvas.offset().top + self.canvas.scrollTop() - 40;
                 var mouseLeft = lastArrayEntry * 200 - self.canvas.offset().left + self.canvas.scrollLeft() - 60;
-                self.handleJoinQuery(mouseTop, mouseLeft, true, joinQueryName, joinQueryId);
+                var joinQueryToolTip = '';
+                var toolTipObject = _.find(tooltipList, function (toolTip) {
+                    return toolTip.id === joinQueryId;
+                });
+                if (toolTipObject !== undefined) {
+                    joinQueryToolTip = toolTipObject.text;
+                }
+                self.handleJoinQuery(mouseTop, mouseLeft, true, joinQueryName, joinQueryId, joinQueryToolTip);
             });
 
             _.forEach(self.configurationData.getSiddhiAppConfig().getPartitionList(), function (partition) {
@@ -1584,7 +1681,14 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
                 var lastArrayEntry = parseInt(array[array.length - 1]);
                 var mouseTop = lastArrayEntry * 100 - self.canvas.offset().top + self.canvas.scrollTop() - 40;
                 var mouseLeft = lastArrayEntry * 200 - self.canvas.offset().left + self.canvas.scrollLeft() - 60;
-                self.handlePartition(mouseTop, mouseLeft, true, partitionId);
+                var partitionToolTip = '';
+                var toolTipObject = _.find(tooltipList, function (toolTip) {
+                    return toolTip.id === partitionId;
+                });
+                if (toolTipObject !== undefined) {
+                    partitionToolTip = toolTipObject.text;
+                }
+                self.handlePartition(mouseTop, mouseLeft, true, partitionId, partitionToolTip);
 
                 var jsPlumbPartitionGroup = self.jsPlumbInstance.getGroup(partitionId);
 
@@ -1595,7 +1699,14 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
                     var lastArrayEntry = parseInt(array[array.length - 1]);
                     var mouseTop = lastArrayEntry * 100 - self.canvas.offset().top + self.canvas.scrollTop() - 40;
                     var mouseLeft = lastArrayEntry * 200 - self.canvas.offset().left + self.canvas.scrollLeft() - 60;
-                    self.handleStream(mouseTop, mouseLeft, true, streamId, streamName);
+                    var streamToolTip = '';
+                    var toolTipObject = _.find(tooltipList, function (toolTip) {
+                        return toolTip.id === streamId;
+                    });
+                    if (toolTipObject !== undefined) {
+                        streamToolTip = toolTipObject.text;
+                    }
+                    self.handleStream(mouseTop, mouseLeft, true, streamId, streamName, streamToolTip);
 
                     var streamElement = $('#' + streamId)[0];
                     self.jsPlumbInstance.addToGroup(jsPlumbPartitionGroup, streamElement);
@@ -1609,7 +1720,15 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
                     var lastArrayEntry = parseInt(array[array.length - 1]);
                     var mouseTop = lastArrayEntry * 100 - self.canvas.offset().top + self.canvas.scrollTop() - 40;
                     var mouseLeft = lastArrayEntry * 200 - self.canvas.offset().left + self.canvas.scrollLeft() - 60;
-                    self.handlePatternQuery(mouseTop, mouseLeft, true, patternQueryName, patternQueryId);
+                    var patternQueryToolTip = '';
+                    var toolTipObject = _.find(tooltipList, function (toolTip) {
+                        return toolTip.id === patternQueryId;
+                    });
+                    if (toolTipObject !== undefined) {
+                        patternQueryToolTip = toolTipObject.text;
+                    }
+                    self.handlePatternQuery(mouseTop, mouseLeft, true, patternQueryName, patternQueryId,
+                        patternQueryToolTip);
 
                     var patternElement = $('#' + patternQueryId)[0];
                     self.jsPlumbInstance.addToGroup(jsPlumbPartitionGroup, patternElement);
@@ -1623,7 +1742,15 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
                     var lastArrayEntry = parseInt(array[array.length - 1]);
                     var mouseTop = lastArrayEntry * 100 - self.canvas.offset().top + self.canvas.scrollTop() - 40;
                     var mouseLeft = lastArrayEntry * 200 - self.canvas.offset().left + self.canvas.scrollLeft() - 60;
-                    self.handleSequenceQuery(mouseTop, mouseLeft, true, sequenceQueryName, sequenceQueryId);
+                    var sequenceQueryToolTip = '';
+                    var toolTipObject = _.find(tooltipList, function (toolTip) {
+                        return toolTip.id === sequenceQueryId;
+                    });
+                    if (toolTipObject !== undefined) {
+                        sequenceQueryToolTip = toolTipObject.text;
+                    }
+                    self.handleSequenceQuery(mouseTop, mouseLeft, true, sequenceQueryName, sequenceQueryId,
+                        sequenceQueryToolTip);
 
                     var sequenceElement = $('#' + sequenceQueryId)[0];
                     self.jsPlumbInstance.addToGroup(jsPlumbPartitionGroup, sequenceElement);
@@ -1652,8 +1779,15 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
                             = lastArrayEntry * 100 - self.canvas.offset().top + self.canvas.scrollTop() - 40;
                         var mouseLeft
                             = lastArrayEntry * 200 - self.canvas.offset().left + self.canvas.scrollLeft() - 60;
+                        var queryToolTip = '';
+                        var toolTipObject = _.find(tooltipList, function (toolTip) {
+                            return toolTip.id === queryId;
+                        });
+                        if (toolTipObject !== undefined) {
+                            queryToolTip = toolTipObject.text;
+                        }
                         self.handleWindowFilterProjectionQuery(
-                            queryType, mouseTop, mouseLeft, true, queryName, queryId);
+                            queryType, mouseTop, mouseLeft, true, queryName, queryId, queryToolTip);
 
                         var queryElement = $('#' + queryId)[0];
                         self.jsPlumbInstance.addToGroup(jsPlumbPartitionGroup, queryElement);
@@ -1667,7 +1801,14 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
                     var lastArrayEntry = parseInt(array[array.length - 1]);
                     var mouseTop = lastArrayEntry * 100 - self.canvas.offset().top + self.canvas.scrollTop() - 40;
                     var mouseLeft = lastArrayEntry * 200 - self.canvas.offset().left + self.canvas.scrollLeft() - 60;
-                    self.handleJoinQuery(mouseTop, mouseLeft, true, joinQueryName, joinQueryId);
+                    var joinQueryToolTip = '';
+                    var toolTipObject = _.find(tooltipList, function (toolTip) {
+                        return toolTip.id === joinQueryId;
+                    });
+                    if (toolTipObject !== undefined) {
+                        joinQueryToolTip = toolTipObject.text;
+                    }
+                    self.handleJoinQuery(mouseTop, mouseLeft, true, joinQueryName, joinQueryId, joinQueryToolTip);
 
                     var joinElement = $('#' + joinQueryId)[0];
                     self.jsPlumbInstance.addToGroup(jsPlumbPartitionGroup, joinElement);
@@ -1960,7 +2101,7 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
         };
 
         DesignGrid.prototype.handleSourceAnnotation = function (mouseTop, mouseLeft, isCodeToDesignMode, sourceName,
-                                                                sourceId) {
+                                                                sourceId, sourceToolTip) {
             var self = this;
             var elementId;
             if (isCodeToDesignMode !== undefined && !isCodeToDesignMode) {
@@ -1976,6 +2117,9 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
                 console.log("isCodeToDesignMode parameter is undefined");
             }
             var newAgent = $('<div>').attr('id', elementId).addClass(constants.SOURCE);
+            if (isCodeToDesignMode) {
+                newAgent.attr('title', sourceToolTip);
+            }
             self.canvas.append(newAgent);
             // Drop the source element. Inside this a it generates the source definition form.
             self.dropElements.dropSource(newAgent, elementId, mouseTop, mouseLeft, isCodeToDesignMode, sourceName);
@@ -1986,7 +2130,7 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
         };
 
         DesignGrid.prototype.handleSinkAnnotation = function (mouseTop, mouseLeft, isCodeToDesignMode, sinkName,
-                                                              sinkId) {
+                                                              sinkId, sinkToolTip) {
             var self = this;
             var elementId;
             if (isCodeToDesignMode !== undefined && !isCodeToDesignMode) {
@@ -2002,6 +2146,9 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
                 console.log("isCodeToDesignMode parameter is undefined");
             }
             var newAgent = $('<div>').attr('id', elementId).addClass(constants.SINK);
+            if (isCodeToDesignMode) {
+                newAgent.attr('title', sinkToolTip);
+            }
             self.canvas.append(newAgent);
             // Drop the sink element. Inside this a it generates the sink definition form.
             self.dropElements.dropSink(newAgent, elementId, mouseTop, mouseLeft, isCodeToDesignMode, sinkName);
@@ -2011,7 +2158,8 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
             self.enableMultipleSelection();
         };
 
-        DesignGrid.prototype.handleStream = function (mouseTop, mouseLeft, isCodeToDesignMode, streamId, streamName) {
+        DesignGrid.prototype.handleStream = function (mouseTop, mouseLeft, isCodeToDesignMode, streamId, streamName,
+                                                      streamToolTip) {
             var self = this;
             var elementId;
             if (isCodeToDesignMode !== undefined && !isCodeToDesignMode) {
@@ -2027,6 +2175,9 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
                 console.log("isCodeToDesignMode parameter is undefined");
             }
             var newAgent = $('<div>').attr('id', elementId).addClass(constants.STREAM);
+            if (isCodeToDesignMode) {
+                newAgent.attr('title', streamToolTip);
+            }
             self.canvas.append(newAgent);
             // Drop the stream element. Inside this a it generates the stream definition form.
             self.dropElements.dropStream(newAgent, elementId, mouseTop, mouseLeft, isCodeToDesignMode,
@@ -2037,7 +2188,8 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
             self.enableMultipleSelection();
         };
 
-        DesignGrid.prototype.handleTable = function (mouseTop, mouseLeft, isCodeToDesignMode, tableId, tableName) {
+        DesignGrid.prototype.handleTable = function (mouseTop, mouseLeft, isCodeToDesignMode, tableId, tableName,
+                                                     tableToolTip) {
             var self = this;
             var elementId;
             if (isCodeToDesignMode !== undefined && !isCodeToDesignMode) {
@@ -2053,6 +2205,9 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
                 console.log("isCodeToDesignMode parameter is undefined");
             }
             var newAgent = $('<div>').attr('id', elementId).addClass(constants.TABLE);
+            if (isCodeToDesignMode) {
+                newAgent.attr('title', tableToolTip);
+            }
             self.canvas.append(newAgent);
             // Drop the Table element. Inside this a it generates the table definition form.
             self.dropElements.dropTable(newAgent, elementId, mouseTop, mouseLeft, isCodeToDesignMode, tableName);
@@ -2062,7 +2217,8 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
             self.enableMultipleSelection();
         };
 
-        DesignGrid.prototype.handleWindow = function (mouseTop, mouseLeft, isCodeToDesignMode, windowId, windowName) {
+        DesignGrid.prototype.handleWindow = function (mouseTop, mouseLeft, isCodeToDesignMode, windowId, windowName,
+                                                      windowToolTip) {
             var self = this;
             var elementId;
             if (isCodeToDesignMode !== undefined && !isCodeToDesignMode) {
@@ -2082,6 +2238,9 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
                 console.log("isCodeToDesignMode parameter is undefined");
             }
             var newAgent = $('<div>').attr('id', elementId).addClass(constants.WINDOW);
+            if (isCodeToDesignMode) {
+                newAgent.attr('title', windowToolTip);
+            }
             self.canvas.append(newAgent);
             // Drop the Table element. Inside this a it generates the table definition form.
             self.dropElements.dropWindow(newAgent, elementId, mouseTop, mouseLeft, isCodeToDesignMode, windowName);
@@ -2092,7 +2251,7 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
         };
 
         DesignGrid.prototype.handleTrigger = function (mouseTop, mouseLeft, isCodeToDesignMode, triggerId,
-                                                       triggerName) {
+                                                       triggerName, triggerToolTip) {
             var self = this;
             var elementId;
             if (isCodeToDesignMode !== undefined && !isCodeToDesignMode) {
@@ -2112,6 +2271,9 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
                 console.log("isCodeToDesignMode parameter is undefined");
             }
             var newAgent = $('<div>').attr('id', elementId).addClass(constants.TRIGGER);
+            if (isCodeToDesignMode) {
+                newAgent.attr('title', triggerToolTip);
+            }
             self.canvas.append(newAgent);
             // Drop the Trigger element. Inside this a it generates the trigger definition form.
             self.dropElements.dropTrigger(newAgent, elementId, mouseTop, mouseLeft, isCodeToDesignMode, triggerName);
@@ -2122,7 +2284,7 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
         };
 
         DesignGrid.prototype.handleAggregation = function (mouseTop, mouseLeft, isCodeToDesignMode, aggregationId,
-                                                           aggregationName) {
+                                                           aggregationName, aggregationToolTip) {
             var self = this;
             var elementId;
             if (isCodeToDesignMode !== undefined && !isCodeToDesignMode) {
@@ -2138,6 +2300,9 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
                 console.log("isCodeToDesignMode parameter is undefined");
             }
             var newAgent = $('<div>').attr('id', elementId).addClass(constants.AGGREGATION);
+            if (isCodeToDesignMode) {
+                newAgent.attr('title', aggregationToolTip);
+            }
             self.canvas.append(newAgent);
             // Drop the Aggregation element. Inside this a it generates the aggregation definition form.
             self.dropElements.dropAggregation(newAgent, elementId, mouseTop, mouseLeft, isCodeToDesignMode,
@@ -2149,7 +2314,7 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
         };
 
         DesignGrid.prototype.handleFunction = function (mouseTop, mouseLeft, isCodeToDesignMode, functionId,
-                                                        functionName) {
+                                                        functionName, functionToolTip) {
             var self = this;
             var elementId;
             if (isCodeToDesignMode !== undefined && !isCodeToDesignMode) {
@@ -2169,6 +2334,9 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
                 console.log("isCodeToDesignMode parameter is undefined");
             }
             var newAgent = $('<div>').attr('id', elementId).addClass(constants.FUNCTION);
+            if (isCodeToDesignMode) {
+                newAgent.attr('title', functionToolTip);
+            }
             self.canvas.append(newAgent);
             // Drop the Function element. Inside this a it generates the function definition form.
             self.dropElements.dropFunction(newAgent, elementId, mouseTop, mouseLeft, isCodeToDesignMode, functionName);
@@ -2180,7 +2348,8 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
 
 
         DesignGrid.prototype.handleWindowFilterProjectionQuery = function (type, mouseTop, mouseLeft,
-                                                                           isCodeToDesignMode, queryName, queryId) {
+                                                                           isCodeToDesignMode, queryName, queryId,
+                                                                           queryToolTip) {
             var self = this;
             var elementId;
             if (isCodeToDesignMode !== undefined && !isCodeToDesignMode) {
@@ -2196,6 +2365,9 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
                 console.log("isCodeToDesignMode parameter is undefined");
             }
             var newAgent = $('<div>').attr('id', elementId).addClass(type);
+            if (isCodeToDesignMode) {
+                newAgent.attr('title', queryToolTip);
+            }
             self.canvas.append(newAgent);
             // Drop the element instantly since its projections will be set only when the user requires it
             self.dropElements.dropWindowFilterProjectionQuery(newAgent, elementId, type, mouseTop, mouseLeft, queryName,
@@ -2207,7 +2379,7 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
         };
 
         DesignGrid.prototype.handleJoinQuery = function (mouseTop, mouseLeft, isCodeToDesignMode, joinQueryName,
-                                                         joinQueryId) {
+                                                         joinQueryId, joinQueryToolTip) {
             var self = this;
             var elementId;
             if (isCodeToDesignMode !== undefined && !isCodeToDesignMode) {
@@ -2223,6 +2395,10 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
                 console.log("isCodeToDesignMode parameter is undefined");
             }
             var newAgent = $('<div>').attr('id', elementId).addClass(constants.JOIN);
+            if (isCodeToDesignMode) {
+                newAgent.attr('title', joinQueryToolTip);
+            }
+
             self.canvas.append(newAgent);
             // Drop the element instantly since its projections will be set only when the user requires it
             self.dropElements.dropJoinQuery(newAgent, elementId, mouseTop, mouseLeft, joinQueryName,
@@ -2234,7 +2410,7 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
         };
 
         DesignGrid.prototype.handlePatternQuery = function (mouseTop, mouseLeft, isCodeToDesignMode, patternQueryName,
-                                                            patternQueryId) {
+                                                            patternQueryId, patternQueryToolTip) {
             var self = this;
             var elementId;
             if (isCodeToDesignMode !== undefined && !isCodeToDesignMode) {
@@ -2250,6 +2426,9 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
                 console.log("isCodeToDesignMode parameter is undefined");
             }
             var newAgent = $('<div>').attr('id', elementId).addClass(constants.PATTERN);
+            if (isCodeToDesignMode) {
+                newAgent.attr('title', patternQueryToolTip);
+            }
             self.canvas.append(newAgent);
             // Drop the element instantly since its projections will be set only when the user requires it
             self.dropElements.dropPatternQuery(newAgent, elementId, mouseTop, mouseLeft, isCodeToDesignMode,
@@ -2261,7 +2440,7 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
         };
 
         DesignGrid.prototype.handleSequenceQuery = function (mouseTop, mouseLeft, isCodeToDesignMode, sequenceQueryName,
-                                                             sequenceQueryId) {
+                                                             sequenceQueryId, sequenceQueryToolTip) {
             var self = this;
             var elementId;
             if (isCodeToDesignMode !== undefined && !isCodeToDesignMode) {
@@ -2277,6 +2456,9 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
                 console.log("isCodeToDesignMode parameter is undefined");
             }
             var newAgent = $('<div>').attr('id', elementId).addClass(constants.SEQUENCE);
+            if (isCodeToDesignMode) {
+                newAgent.attr('title', sequenceQueryToolTip);
+            }
             self.canvas.append(newAgent);
             // Drop the element instantly since its projections will be set only when the user requires it
             self.dropElements.dropSequenceQuery(newAgent, elementId, mouseTop, mouseLeft, isCodeToDesignMode,
@@ -2287,7 +2469,8 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
             self.enableMultipleSelection();
         };
 
-        DesignGrid.prototype.handlePartition = function (mouseTop, mouseLeft, isCodeToDesignMode, partitionId) {
+        DesignGrid.prototype.handlePartition = function (mouseTop, mouseLeft, isCodeToDesignMode, partitionId,
+                                                         partitionToolTip) {
             var self = this;
             var elementId;
             if (isCodeToDesignMode !== undefined && !isCodeToDesignMode) {
@@ -2303,6 +2486,9 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
                 console.log("isCodeToDesignMode parameter is undefined");
             }
             var newAgent = $('<div>').attr('id', elementId).addClass(constants.PARTITION);
+            if (isCodeToDesignMode) {
+                newAgent.attr('title', partitionToolTip);
+            }
             self.canvas.append(newAgent);
             // Drop the element instantly since its projections will be set only when the user requires it
             self.dropElements.dropPartition(newAgent, elementId, mouseTop, mouseLeft, isCodeToDesignMode);
@@ -2364,6 +2550,34 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
                     self.selectedObjects = [];
                 }
             });
+        };
+
+        /**
+         * Generate tooltips for all the elements
+         *
+         * @param designViewJSON siddhiAppConfig
+         */
+        DesignGrid.prototype.getTooltips = function (designViewJSON) {
+            var self = this;
+            var result = {};
+            self.tooltipsURL = window.location.protocol + "//" + window.location.host + "/editor/tooltips";
+            $.ajax({
+                type: "POST",
+                url: self.tooltipsURL,
+                data: window.btoa(designViewJSON),
+                async: false,
+                success: function (response) {
+                    result = {status: "success", tooltipList: response};
+                },
+                error: function (error) {
+                    if (error.responseText) {
+                        result = {status: "fail", errorMessage: error.responseText};
+                    } else {
+                        result = {status: "fail", errorMessage: "Error Occurred while processing your request"};
+                    }
+                }
+            });
+            return result;
         };
 
         return DesignGrid;

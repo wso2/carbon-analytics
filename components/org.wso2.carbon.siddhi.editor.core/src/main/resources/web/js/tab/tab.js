@@ -46,7 +46,7 @@ define(['log', 'backbone'], function (log, Backbone) {
                 this._lastActiveConsole = undefined;
 
                 if (_.has(options, 'parent')){
-                   this.setParent(_.get(options, 'parent'));
+                    this.setParent(_.get(options, 'parent'));
                 }
 
                 // create the tab template

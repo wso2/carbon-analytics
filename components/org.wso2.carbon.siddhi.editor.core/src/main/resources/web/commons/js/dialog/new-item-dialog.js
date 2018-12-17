@@ -61,16 +61,16 @@ define(['require', 'jquery', 'lodash', './modal-dialog', 'log'], function (requi
         this.getSubmitBtn().unbind('click');
         this.clearError();
         var modalBody = $("<hr class='file-dialog-hr'>"+
-                            "<div class='container-fluid'>" +
-                            "<form class='form-horizontal' onsubmit='return false'>" +
-                                "<div class='form-group'>" +
-                                    "<label for='item-name' class='col-sm-2 file-dialog-form-label'>Enter Name</label>" +
-                                    "<div class='file-dialog-input-field'>" +
-                                          "<input type='text' id='item-name' class='file-dialog-form-control item-name' placeholder='name'>" +
-                                    "</div>" +
-                                "</div>"+
-                            "</form>"+
-                           "</div>" );
+            "<div class='container-fluid'>" +
+            "<form class='form-horizontal' onsubmit='return false'>" +
+            "<div class='form-group'>" +
+            "<label for='item-name' class='col-sm-2 file-dialog-form-label'>Enter Name</label>" +
+            "<div class='file-dialog-input-field'>" +
+            "<input type='text' id='item-name' class='file-dialog-form-control item-name' placeholder='name'>" +
+            "</div>" +
+            "</div>"+
+            "</form>"+
+            "</div>" );
         body.append(modalBody);
         this.show();
         var self = this,
@@ -85,7 +85,7 @@ define(['require', 'jquery', 'lodash', './modal-dialog', 'log'], function (requi
         });
         input.keyup(function(e){
             if(e.keyCode == 13) {
-               self.onSubmit(data, input.val());
+                self.onSubmit(data, input.val());
             } else {
                 self.clearError();
             }

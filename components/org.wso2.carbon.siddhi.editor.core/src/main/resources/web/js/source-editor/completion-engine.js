@@ -286,9 +286,9 @@ define(["ace/ace", "jquery", "./constants", "./utils", "ace/snippets", "ace/rang
             },
             {
                 regex: "define\\s+(stream|table|window)\\s+" + regex.identifier + "\\s*\\((\\s*" +
-                regex.identifier + "\\s+(" + regex.dataTypes + ")\\s*,)*\\s*" +
-                regex.identifier + "\\s+[^\\s" +
-                "\\),]*$",
+                    regex.identifier + "\\s+(" + regex.dataTypes + ")\\s*,)*\\s*" +
+                    regex.identifier + "\\s+[^\\s" +
+                    "\\),]*$",
                 handler: suggestions.dataTypes
             },
             {
@@ -313,31 +313,31 @@ define(["ace/ace", "jquery", "./constants", "./utils", "ace/snippets", "ace/rang
             },
             {
                 regex: "define\\s+window\\s+" + regex.identifier + "\\s*\\((\\s*" +
-                regex.identifier + "\\s+(" + regex.dataTypes + ")\\s*,)*\\s*" +
-                regex.identifier + "\\s+(" + regex.dataTypes + ")\\s*" +
-                "\\)\\s+[a-zA-Z_0-9]*$",
+                    regex.identifier + "\\s+(" + regex.dataTypes + ")\\s*,)*\\s*" +
+                    regex.identifier + "\\s+(" + regex.dataTypes + ")\\s*" +
+                    "\\)\\s+[a-zA-Z_0-9]*$",
                 handler: "$defineWindowStatementWindowType"
             },
             {
                 regex: "define\\s+window\\s+(" + regex.identifier + ")\\s*\\((\\s*" +
-                regex.identifier + "\\s+(" + regex.dataTypes + ")\\s*,)*\\s*" +
-                regex.identifier + "\\s+(" + regex.dataTypes + ")\\s*" +
-                "\\)\\s+(" + regex.identifier + ":)?" + regex.identifier + "\\s*" +
-                "\\((\\s*" + regex.identifier + "\\s*,)*\\s*[^\\s\\)]*$",
+                    regex.identifier + "\\s+(" + regex.dataTypes + ")\\s*,)*\\s*" +
+                    regex.identifier + "\\s+(" + regex.dataTypes + ")\\s*" +
+                    "\\)\\s+(" + regex.identifier + ":)?" + regex.identifier + "\\s*" +
+                    "\\((\\s*" + regex.identifier + "\\s*,)*\\s*[^\\s\\)]*$",
                 handler: "$defineWindowStatementWindowParameters"
             },
             {
                 regex: "define\\s+window\\s+" + regex.identifier + "\\s*\\((\\s*" +
-                regex.identifier + "\\s+(" + regex.dataTypes + ")\\s*,)*\\s*" +
-                regex.identifier + "\\s+(" + regex.dataTypes + ")\\s*" +
-                "\\)\\s+(" + regex.identifier + ":)?" + regex.identifier + "\\s*\\(.*\\)\\s+[^\\s]*$",
+                    regex.identifier + "\\s+(" + regex.dataTypes + ")\\s*,)*\\s*" +
+                    regex.identifier + "\\s+(" + regex.dataTypes + ")\\s*" +
+                    "\\)\\s+(" + regex.identifier + ":)?" + regex.identifier + "\\s*\\(.*\\)\\s+[^\\s]*$",
                 handler: ["output"]
             },
             {
                 regex: "define\\s+window\\s+" + regex.identifier + "\\s*\\((\\s*" +
-                regex.identifier + "\\s+(" + regex.dataTypes + ")\\s*,)*\\s*" +
-                regex.identifier + "\\s+(" + regex.dataTypes + ")\\s*" +
-                "\\)\\s+(" + regex.identifier + ":)?" + regex.identifier + "\\s*\\(.*\\)\\s+output\\s+[^\\s]*$",
+                    regex.identifier + "\\s+(" + regex.dataTypes + ")\\s*,)*\\s*" +
+                    regex.identifier + "\\s+(" + regex.dataTypes + ")\\s*" +
+                    "\\)\\s+(" + regex.identifier + ":)?" + regex.identifier + "\\s*\\(.*\\)\\s+output\\s+[^\\s]*$",
                 handler: suggestions.outputEventTypes.map(function (completion) {
                     return Object.assign({}, completion, {
                         value: completion.value + " events;"
@@ -350,20 +350,20 @@ define(["ace/ace", "jquery", "./constants", "./utils", "ace/snippets", "ace/rang
             },
             {
                 regex:"(define\\s+aggregation)\\s+([a-zA-Z_][a-zA-Z_0-9]*)" +
-                "(?:\\s+(from)\\s+((?:.(?!select|group\\s+by|aggregate\\s+by|aggregate|every))*))" +
-                "(?:\\s+(select)\\s+((?:.(?!group\\s+by|aggregate\\s+by|aggregate|every))*))" +
-                "(?:\\s+(group\\s+by)\\s+((?:.(?!aggregate\\s+by|aggregate|every))*))?" +
-                "(?:\\s+(aggregate)\\s+)$",
+                    "(?:\\s+(from)\\s+((?:.(?!select|group\\s+by|aggregate\\s+by|aggregate|every))*))" +
+                    "(?:\\s+(select)\\s+((?:.(?!group\\s+by|aggregate\\s+by|aggregate|every))*))" +
+                    "(?:\\s+(group\\s+by)\\s+((?:.(?!aggregate\\s+by|aggregate|every))*))?" +
+                    "(?:\\s+(aggregate)\\s+)$",
                 handler:["by","every"]
             },
             {
                 regex:"(define\\s+aggregation)\\s+([a-zA-Z_][a-zA-Z_0-9]*)" +
-                "(?:\\s+(from)\\s+((?:.(?!select|group\\s+by|aggregate\\s+by|aggregate|every))*))" +
-                "(?:\\s+(select)\\s+((?:.(?!group\\s+by|aggregate\\s+by|aggregate|every))*))" +
-                "(?:\\s+(group\\s+by)\\s+((?:.(?!aggregate\\s+by|aggregate|every))*))?" +
-                "(?:\\s+(aggregate)\\s+)" +
-                "(?:(by)((?:.(?!every))*)\\s+)?" +
-                "(?:(every)\\s+)$",
+                    "(?:\\s+(from)\\s+((?:.(?!select|group\\s+by|aggregate\\s+by|aggregate|every))*))" +
+                    "(?:\\s+(select)\\s+((?:.(?!group\\s+by|aggregate\\s+by|aggregate|every))*))" +
+                    "(?:\\s+(group\\s+by)\\s+((?:.(?!aggregate\\s+by|aggregate|every))*))?" +
+                    "(?:\\s+(aggregate)\\s+)" +
+                    "(?:(by)((?:.(?!every))*)\\s+)?" +
+                    "(?:(every)\\s+)$",
                 handler:suggestions.aggregationTimeValueTypes.map(function (type) {
                     return Object.assign({}, type, {
                         value: type.value + " "
@@ -372,12 +372,12 @@ define(["ace/ace", "jquery", "./constants", "./utils", "ace/snippets", "ace/rang
             },
             {
                 regex:"(define\\s+aggregation)\\s+([a-zA-Z_][a-zA-Z_0-9]*)" +
-                "(?:\\s+(from)\\s+((?:.(?!select|group\\s+by|aggregate\\s+by|aggregate|every))*))?" +
-                "(?:\\s+(select)\\s+((?:.(?!group\\s+by|aggregate\\s+by|aggregate|every))*))?" +
-                "(?:\\s+(group\\s+by)\\s+((?:.(?!aggregate\\s+by|aggregate|every))*))?" +
-                "(?:\\s+(aggregate)\\s+)?" +
-                "(?:(by)((?:.(?!every))*)\\s+)?" +
-                "(?:(every)\\s+((?:.(?!;))*.?))?$",
+                    "(?:\\s+(from)\\s+((?:.(?!select|group\\s+by|aggregate\\s+by|aggregate|every))*))?" +
+                    "(?:\\s+(select)\\s+((?:.(?!group\\s+by|aggregate\\s+by|aggregate|every))*))?" +
+                    "(?:\\s+(group\\s+by)\\s+((?:.(?!aggregate\\s+by|aggregate|every))*))?" +
+                    "(?:\\s+(aggregate)\\s+)?" +
+                    "(?:(by)((?:.(?!every))*)\\s+)?" +
+                    "(?:(every)\\s+((?:.(?!;))*.?))?$",
                 handler:"$aggregationDefinition"
             },
             /*
@@ -387,17 +387,17 @@ define(["ace/ace", "jquery", "./constants", "./utils", "ace/snippets", "ace/rang
             // Query rule
             {
                 regex: "(@\\s*[a-zA-Z]*\\s*\\(([^)]+)\\)\\s*)*?" +
-                "(from)\\s+" +
-                "(" +
-                "(?:.(?!select|group\\s+by|having|output|insert|delete|update or insert into|update))*)" +
-                "(?:\\s+(select)\\s+((?:.(?!group\\s+by|having|order\\s+by|limit|output|insert|delete|update\\s+or\\s+insert\\s+into|update))*)" +
-                "(?:\\s+(group\\s+by)\\s+((?:.(?!having|order\\s+by|limit|output|insert|delete|update\\s+or\\s+insert\\s+into|update))*))?" +
-                "(?:\\s+(having)\\s+((?:.(?!order\\s+by|limit|output|insert|delete|update\\s+or\\s+insert\\s+into|update))*))?" +
-                "(?:\\s+(order\\s+by)\\s+((?:.(?!limit|output|insert|delete|update\\s+or\\s+insert\\s+into|update))*))?" +
-                "(?:\\s+(limit)\\s+((?:.(?!output|insert|delete|update\\s+or\\s+insert\\s+into|update))*))?" +
-                ")?" +
-                "(?:\\s+(output)\\s+((?:.(?!insert|delete|update\\s+or\\s+insert\\s+into|update))*))?" +
-                "(?:\\s+((?:insert|delete|update\\s+or\\s+insert\\s+into|update))\\s+((?:.(?!;))*.?))?$",
+                    "(from)\\s+" +
+                    "(" +
+                    "(?:.(?!select|group\\s+by|having|output|insert|delete|update or insert into|update))*)" +
+                    "(?:\\s+(select)\\s+((?:.(?!group\\s+by|having|order\\s+by|limit|output|insert|delete|update\\s+or\\s+insert\\s+into|update))*)" +
+                    "(?:\\s+(group\\s+by)\\s+((?:.(?!having|order\\s+by|limit|output|insert|delete|update\\s+or\\s+insert\\s+into|update))*))?" +
+                    "(?:\\s+(having)\\s+((?:.(?!order\\s+by|limit|output|insert|delete|update\\s+or\\s+insert\\s+into|update))*))?" +
+                    "(?:\\s+(order\\s+by)\\s+((?:.(?!limit|output|insert|delete|update\\s+or\\s+insert\\s+into|update))*))?" +
+                    "(?:\\s+(limit)\\s+((?:.(?!output|insert|delete|update\\s+or\\s+insert\\s+into|update))*))?" +
+                    ")?" +
+                    "(?:\\s+(output)\\s+((?:.(?!insert|delete|update\\s+or\\s+insert\\s+into|update))*))?" +
+                    "(?:\\s+((?:insert|delete|update\\s+or\\s+insert\\s+into|update))\\s+((?:.(?!;))*.?))?$",
                 handler: "$query"
             },
 
@@ -1028,8 +1028,8 @@ define(["ace/ace", "jquery", "./constants", "./utils", "ace/snippets", "ace/rang
                         completions = completions.concat(
                             ["select"]
                                 .map(function (completion) {
-                                return {value: completion + " "};
-                            })
+                                    return {value: completion + " "};
+                                })
                         );
                     }
                     addCompletions(completions);
@@ -1056,8 +1056,8 @@ define(["ace/ace", "jquery", "./constants", "./utils", "ace/snippets", "ace/rang
                         });
                     }));
                     if (new RegExp(regex.aggregation.input.sourceRegex +
-                            "(?:" + regex.aggregation.input.sourceHandlersRegex + ")*" +
-                            regex.hash + "[^\\(\\.:]*$", "i").test(aggregationInput)) {
+                        "(?:" + regex.aggregation.input.sourceHandlersRegex + ")*" +
+                        regex.hash + "[^\\(\\.:]*$", "i").test(aggregationInput)) {
                         // Add window keyword suggestion
                         // Only one window can be applied for a stream
                         addCompletions({caption: "window", value: "window.", priority: 2});
@@ -1223,7 +1223,7 @@ define(["ace/ace", "jquery", "./constants", "./utils", "ace/snippets", "ace/rang
                             return Object.assign({}, type, {
                                 value: type.value + " ", priority: 2
                             })
-                    }));
+                        }));
                 }
             }
 
@@ -1467,7 +1467,7 @@ define(["ace/ace", "jquery", "./constants", "./utils", "ace/snippets", "ace/rang
                     }));
                     addCompletions(["select", "output", "insert", "delete", "update", "update or insert into"].map
                     (function (completion)
-                     {
+                    {
                         return {value: completion + " ", priority: 2};
                     }));
                 } else if (everyKeywordSuggestionsRegex.test(queryInput)) {
@@ -1511,8 +1511,8 @@ define(["ace/ace", "jquery", "./constants", "./utils", "ace/snippets", "ace/rang
                         });
                     }));
                     if (new RegExp(regex.query.input.sourceRegex +
-                            "(?:" + regex.query.input.sourceHandlersRegex + ")*" +
-                            regex.hash + "[^\\(\\.:]*$", "i").test(queryInput)) {
+                        "(?:" + regex.query.input.sourceHandlersRegex + ")*" +
+                        regex.hash + "[^\\(\\.:]*$", "i").test(queryInput)) {
                         // Add window keyword suggestion
                         // Only one window can be applied for a stream
                         addCompletions({caption: "window", value: "window.", priority: 2});
@@ -1651,9 +1651,9 @@ define(["ace/ace", "jquery", "./constants", "./utils", "ace/snippets", "ace/rang
                     addCompletions(["order by", "limit", "output", "insert", "delete", "update",
                         "update or insert into"]
                         .map(function (completion) {
-                            return {value: completion + " ", priority: 2};
-                        }
-                    ));
+                                return {value: completion + " ", priority: 2};
+                            }
+                        ));
                 }
                 addAttributesOfSourcesAsCompletionsFromQueryIn(
                     regexResults, fullEditorText, 3, 2,
@@ -1952,7 +1952,7 @@ define(["ace/ace", "jquery", "./constants", "./utils", "ace/snippets", "ace/rang
                     // Add the events keyword suggestion after the event type
                     addCompletions({value: "events "});
                 } else if (afterOnKeywordSuggestionsRegex.test(tableOutputClause)
-                            || afterSetKeywordSuggestionsRegex.test(tableOutputClause)) {
+                    || afterSetKeywordSuggestionsRegex.test(tableOutputClause)) {
                     // Add suggestions after the on keyword for specifying the rows to update in tables
                     var sourceReferenceSearchRegex = new RegExp("^" + regex.identifier, "ig");
                     var referenceToSourceMap = [];
@@ -1961,7 +1961,7 @@ define(["ace/ace", "jquery", "./constants", "./utils", "ace/snippets", "ace/rang
                     // Getting the reference to source map
                     while (sourceReferenceMatch = sourceReferenceSearchRegex.exec(tableOutputClause)) {
                         if (getSource(regexResults, fullEditorText, sourceReferenceMatch[0],
-                                [constants.EVENT_TABLES])) {
+                            [constants.EVENT_TABLES])) {
                             referenceToSourceMap[sourceReferenceMatch[0]] = sourceReferenceMatch[0];
                         }
                     }
@@ -2183,9 +2183,9 @@ define(["ace/ace", "jquery", "./constants", "./utils", "ace/snippets", "ace/rang
              * @param {int} streamPriority priority to be set as stream priority
              */
             function addAttributesOfStreamReferencesAsCompletionsFromAggregationDefinition(regexResults,
-                                                                                             fullEditorText,
-                                                                                             attributePriority,
-                                                                                             streamPriority) {
+                                                                                           fullEditorText,
+                                                                                           attributePriority,
+                                                                                           streamPriority) {
                 var aggregationInput = regexResults[4];
                 var sourceReferenceSearchRegex = new RegExp(regex.aggregation.input.streamReference, "ig");
                 var referenceToSourceMap = [];
@@ -2194,7 +2194,7 @@ define(["ace/ace", "jquery", "./constants", "./utils", "ace/snippets", "ace/rang
                 // Getting the reference to source map
                 while (sourceReferenceMatch = sourceReferenceSearchRegex.exec(aggregationInput)) {
                     if (getSource(regexResults, fullEditorText, sourceReferenceMatch[1],
-                            [constants.STREAMS])) {
+                        [constants.STREAMS])) {
                         referenceToSourceMap[sourceReferenceMatch[2]] = sourceReferenceMatch[1];
                     }
                 }
@@ -2257,7 +2257,7 @@ define(["ace/ace", "jquery", "./constants", "./utils", "ace/snippets", "ace/rang
                 // Getting the reference to source map
                 while (sourceReferenceMatch = sourceReferenceSearchRegex.exec(queryInput)) {
                     if (getSource(regexResults, fullEditorText, sourceReferenceMatch[1],
-                            [constants.STREAMS, constants.EVENT_TABLES, constants.AGGREGATIONS])) {
+                        [constants.STREAMS, constants.EVENT_TABLES, constants.AGGREGATIONS])) {
                         referenceToSourceMap[sourceReferenceMatch[2]] = sourceReferenceMatch[1];
                     }
                 }
@@ -2791,12 +2791,12 @@ define(["ace/ace", "jquery", "./constants", "./utils", "ace/snippets", "ace/rang
              * Can be object or array of objects with the object format as shown below
              *
              * {
-         *      caption:        "caption to be shown in the tooltip"        // optional | default: value
-         *      value:          "value to append after the cursor"          // required
-         *      priority:       2                                           // optional | default: 1
-         *      description:    "description about the completion"          // optional | default: no description
-         *      type:           "type of completion"                        // optional | default: no type
-         * }
+             *      caption:        "caption to be shown in the tooltip"        // optional | default: value
+             *      value:          "value to append after the cursor"          // required
+             *      priority:       2                                           // optional | default: 1
+             *      description:    "description about the completion"          // optional | default: no description
+             *      type:           "type of completion"                        // optional | default: no type
+             * }
              *
              * @private
              * @param {Object[]|Object} suggestions list of  suggestions
@@ -2978,7 +2978,7 @@ define(["ace/ace", "jquery", "./constants", "./utils", "ace/snippets", "ace/rang
                             CompletionEngine.rawExtensions.sink = response.extensions["sink"]["sinks"];
                             CompletionEngine.rawExtensions.source = response.extensions["source"]["sources"];
                             CompletionEngine.rawExtensions.sourceMaps = response
-                            .extensions["sourceMapper"]["sourceMaps"];
+                                .extensions["sourceMapper"]["sourceMaps"];
                             CompletionEngine.rawExtensions.sinkMaps = response.extensions["sinkMapper"]["sinkMaps"];
                             for (var namespace in response.extensions) {
                                 if (response.extensions.hasOwnProperty(namespace)) {

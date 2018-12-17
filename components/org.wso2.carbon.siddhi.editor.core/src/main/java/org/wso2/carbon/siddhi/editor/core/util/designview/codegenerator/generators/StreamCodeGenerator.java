@@ -24,30 +24,36 @@ import org.wso2.carbon.siddhi.editor.core.util.designview.exceptions.CodeGenerat
 import org.wso2.carbon.siddhi.editor.core.util.designview.utilities.CodeGeneratorUtils;
 
 /**
- * Generate's the code for a Siddhi stream element
+ * Generates the code for a Siddhi stream element
  */
 public class StreamCodeGenerator {
 
     /**
-     * Generate's the Siddhi code representation of a StreamConfig object
+     * Generates the Siddhi code representation of a StreamConfig object
      *
      * @param stream The StreamConfig object
+     * @param isGeneratingToolTip If it is generating a tooltip or not
      * @return The Siddhi code representation of the given StreamConfig object
      * @throws CodeGenerationException Error when generating the code
      */
-    public String generateStream(StreamConfig stream) throws CodeGenerationException {
+    public String generateStream(StreamConfig stream, boolean isGeneratingToolTip) throws CodeGenerationException {
         CodeGeneratorUtils.NullValidator.validateConfigObject(stream);
+        StringBuilder streamStringBuilder = new StringBuilder();
+        if (!isGeneratingToolTip) {
+            streamStringBuilder.append(SubElementCodeGenerator.generateComment(stream.getPreviousCommentSegment()));
+        }
 
-        return SubElementCodeGenerator.generateComment(stream.getPreviousCommentSegment()) +
-                SubElementCodeGenerator.generateAnnotations(stream.getAnnotationList()) +
-                SiddhiCodeBuilderConstants.DEFINE_STREAM +
-                SiddhiCodeBuilderConstants.SPACE +
-                stream.getName() +
-                SiddhiCodeBuilderConstants.SPACE +
-                SiddhiCodeBuilderConstants.OPEN_BRACKET +
-                SubElementCodeGenerator.generateAttributes(stream.getAttributeList()) +
-                SiddhiCodeBuilderConstants.CLOSE_BRACKET +
-                SiddhiCodeBuilderConstants.SEMI_COLON;
+        streamStringBuilder.append(SubElementCodeGenerator.generateAnnotations(stream.getAnnotationList()))
+                .append(SiddhiCodeBuilderConstants.DEFINE_STREAM)
+                .append(SiddhiCodeBuilderConstants.SPACE )
+                .append(stream.getName())
+                .append(SiddhiCodeBuilderConstants.SPACE)
+                .append(SiddhiCodeBuilderConstants.OPEN_BRACKET)
+                .append(SubElementCodeGenerator.generateAttributes(stream.getAttributeList()))
+                .append(SiddhiCodeBuilderConstants.CLOSE_BRACKET)
+                .append(SiddhiCodeBuilderConstants.SEMI_COLON);
+
+        return streamStringBuilder.toString();
     }
 
 }

@@ -100,16 +100,16 @@ define(['log', 'jquery', 'lodash', './tab-list', './service-tab',  'workspace','
                     var remove = function() {
                         TabList.prototype.removeTab.call(self, tab);
                         if(tab instanceof ServiceTab) {
-                          _.remove(self._workingFileSet, function(fileID){
-                              return _.isEqual(fileID, tab.getFile().id);
-                          });
-                          tab.trigger('tab-removed');
-                          self.getBrowserStorage().destroy(tab.getFile());
-                          self.getBrowserStorage().put('workingFileSet', self._workingFileSet);
-                          // open welcome page upon last tab close
-                          if(_.isEmpty(self.getTabList())){
-                              self.commandManager.dispatch("go-to-welcome-page");
-                          }
+                            _.remove(self._workingFileSet, function(fileID){
+                                return _.isEqual(fileID, tab.getFile().id);
+                            });
+                            tab.trigger('tab-removed');
+                            self.getBrowserStorage().destroy(tab.getFile());
+                            self.getBrowserStorage().put('workingFileSet', self._workingFileSet);
+                            // open welcome page upon last tab close
+                            if(_.isEmpty(self.getTabList())){
+                                self.commandManager.dispatch("go-to-welcome-page");
+                            }
                         }
 
                     };

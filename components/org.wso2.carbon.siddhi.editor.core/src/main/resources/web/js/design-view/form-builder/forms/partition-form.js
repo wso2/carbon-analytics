@@ -16,8 +16,8 @@
  * under the License.
  */
 
-define(['require', 'log', 'jquery', 'lodash', 'partitionWith', 'designViewUtils', 'jsonValidator'],
-    function (require, log, $, _, PartitionWith, DesignViewUtils, JSONValidator) {
+define(['require', 'log', 'jquery', 'lodash', 'partitionWith', 'designViewUtils', 'jsonValidator', 'constants'],
+    function (require, log, $, _, PartitionWith, DesignViewUtils, JSONValidator, Constants) {
 
         /**
          * @class PartitionForm Creates a forms to collect data from a partition
@@ -192,7 +192,6 @@ define(['require', 'log', 'jquery', 'lodash', 'partitionWith', 'designViewUtils'
                     });
 
                     $('#' + id).removeClass('incomplete-element');
-                    $('#' + id).prop('title', '');
 
                     // perform JSON validation
                     JSONValidator.prototype.validatePartition(partitionElement, self.jsPlumbInstance, true);
@@ -200,6 +199,10 @@ define(['require', 'log', 'jquery', 'lodash', 'partitionWith', 'designViewUtils'
                     // design view container and toggle view button are enabled
                     self.designViewContainer.removeClass('disableContainer');
                     self.toggleViewButton.removeClass('disableContainer');
+
+                    //Send partition element to the backend and generate tooltip
+                    var partitionToolTip = self.formUtils.getTooltip(partitionElement, Constants.PARTITION);
+                    $('#' + id).prop('title', partitionToolTip);
 
                     // close the form window
                     self.consoleListManager.removeFormConsole(formConsole);

@@ -17,12 +17,12 @@
  */
 
 define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert', 'queryOutputDelete',
-    'queryOutputUpdate', 'queryOutputUpdateOrInsertInto', 'queryOrderByValue',
-    'patternOrSequenceQueryCondition', 'streamHandler', 'queryWindowOrFunction', 'designViewUtils',
-    'jsonValidator'],
+        'queryOutputUpdate', 'queryOutputUpdateOrInsertInto', 'queryOrderByValue',
+        'patternOrSequenceQueryCondition', 'streamHandler', 'queryWindowOrFunction', 'designViewUtils',
+        'jsonValidator', 'constants'],
     function (require, log, $, _, QuerySelect, QueryOutputInsert, QueryOutputDelete, QueryOutputUpdate,
-        QueryOutputUpdateOrInsertInto, QueryOrderByValue, PatternOrSequenceQueryCondition, StreamHandler,
-        QueryWindowOrFunction, DesignViewUtils, JSONValidator) {
+              QueryOutputUpdateOrInsertInto, QueryOrderByValue, PatternOrSequenceQueryCondition, StreamHandler,
+              QueryWindowOrFunction, DesignViewUtils, JSONValidator, Constants) {
 
         /**
          * @class SequenceQueryForm Creates a forms to collect data from a sequence query
@@ -1139,13 +1139,16 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
                     }
 
                     $('#' + id).removeClass('incomplete-element');
-                    $('#' + id).prop('title', '');
 
                     // perform JSON validation
                     JSONValidator.prototype.validatePatternOrSequenceQuery(clickedElement, 'Sequence Query');
 
                     self.designViewContainer.removeClass('disableContainer');
                     self.toggleViewButton.removeClass('disableContainer');
+
+                    //Send sequence-query element to the backend and generate tooltip
+                    var queryToolTip = self.formUtils.getTooltip(clickedElement, Constants.SEQUENCE_QUERY);
+                    $('#' + id).prop('title', queryToolTip);
 
                     // close the form window
                     self.consoleListManager.removeFormConsole(formConsole);

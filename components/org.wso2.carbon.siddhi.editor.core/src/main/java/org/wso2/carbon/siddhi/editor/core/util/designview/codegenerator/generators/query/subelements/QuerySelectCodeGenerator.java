@@ -27,12 +27,12 @@ import org.wso2.carbon.siddhi.editor.core.util.designview.exceptions.CodeGenerat
 import org.wso2.carbon.siddhi.editor.core.util.designview.utilities.CodeGeneratorUtils;
 
 /**
- * Generate's the code for a select element of a Siddhi query
+ * Generates the code for a select element of a Siddhi query
  */
 public class QuerySelectCodeGenerator {
 
     /**
-     * Generate's the Siddhi code representation of a AttributesSelectionConfig object
+     * Generates the Siddhi code representation of a AttributesSelectionConfig object
      *
      * @param attributesSelection The AttributesSelectionConfig object
      * @return The Siddhi code representation of the given AttributesSelectionConfig object
@@ -43,7 +43,8 @@ public class QuerySelectCodeGenerator {
         CodeGeneratorUtils.NullValidator.validateConfigObject(attributesSelection);
 
         StringBuilder attributesSelectionStringBuilder = new StringBuilder();
-        attributesSelectionStringBuilder.append(SiddhiCodeBuilderConstants.SELECT)
+        attributesSelectionStringBuilder.append(SiddhiCodeBuilderConstants.NEW_LINE)
+                .append(SiddhiCodeBuilderConstants.SELECT)
                 .append(SiddhiCodeBuilderConstants.SPACE);
         switch (attributesSelection.getType().toUpperCase()) {
             case AttributeSelection.TYPE_USER_DEFINED:
@@ -62,7 +63,7 @@ public class QuerySelectCodeGenerator {
     }
 
     /**
-     * Generate's the Siddhi code representation of a UserDefinedSelectionConfig object
+     * Generates the Siddhi code representation of a UserDefinedSelectionConfig object
      *
      * @param userDefinedSelection The UserDefinedSelectionConfig object
      * @return The Siddhi code representation of the given UserDefinedSelectionConfig object

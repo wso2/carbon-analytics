@@ -130,7 +130,7 @@
 
 .debuggerToolbar a:hover,
 .debuggerToolbar a:focus {
-  color: #065ea5;
+    color: #065ea5;
 }
 
 .debuggerToolbar span.appName {
@@ -186,12 +186,12 @@ a.clear-console-btn:hover {
 }
 
 .debuggerContent {
-  height: 100%;
+    height: 100%;
 }
 
 .query-state,
 .event-state {
-  height: 100%;
+    height: 100%;
 }
 
 .output-console-activate-btn.close {
