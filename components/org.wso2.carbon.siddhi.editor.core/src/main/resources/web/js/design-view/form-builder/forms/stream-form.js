@@ -410,7 +410,8 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'designViewUtils', 'j
             self.toggleViewButton.addClass('disableContainer');
 
             var annotations = [];
-            var predefinedAnnotationList = self.configurationData.application.config.stream_predefined_annotations;
+            var predefinedAnnotationList = JSON.parse(JSON.stringify(self.configurationData.application.config.
+                stream_predefined_annotations));
             var checkedAnnotations = [];
 
             //To add attribute
@@ -505,7 +506,7 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'designViewUtils', 'j
                                         if (!predefinedAnnotationElement.isMandatory) {
                                             checkedAnnotations.push(savedAnnotationElement.key);
                                         }
-                                        predefinedAnnotationElement.value = savedAnnotationElement.value;
+                                        predefinedAnnotationElement.defaultValue = savedAnnotationElement.value;
                                     }
                                 })
                             })

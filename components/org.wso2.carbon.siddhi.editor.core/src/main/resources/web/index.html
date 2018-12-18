@@ -1071,7 +1071,7 @@
                 <li data-jstree = '{"icon":"/editor/commons/images/properties.png"}' class="{{class}}"> {{key}}
                     <ul>
                         <li data-jstree = '{"icon":"/editor/commons/images/value.png"}'
-                            class = "annotation-value"> {{value}} </li>
+                            class = "annotation-value"> {{defaultValue}} </li>
                     </ul>
                 </li>
                 {{/each}}
@@ -1785,19 +1785,19 @@
                 elements: [
                     {
                         key: 'buffer.size',
-                        value: '256',
+                        defaultValue: '256',
                         class: 'mandatory-key',
                         isMandatory: true
                     },
                     {
                         key: 'workers',
-                        value: '2',
+                        defaultValue: '2',
                         class: 'mandatory-key',
                         isMandatory: true
                     },
                     {
                         key: 'batch.size.max',
-                        value: '5',
+                        defaultValue: '5',
                         class: 'mandatory-key',
                         isMandatory: true
                     },
