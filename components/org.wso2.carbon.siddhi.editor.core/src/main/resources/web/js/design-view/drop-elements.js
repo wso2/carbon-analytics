@@ -217,7 +217,7 @@ define(['require', 'log', 'lodash', 'jquery', 'partition', 'stream', 'query', 'f
          * @param streamName name of the stream
          */
         DropElements.prototype.dropStream = function (newAgent, i, top, left, isCodeToDesignMode,
-            isGenerateStreamFromQueryOutput, streamName) {
+                                                      isGenerateStreamFromQueryOutput, streamName) {
             /*
              The node hosts a text node where the Stream's name input by the user will be held.
              Rather than simply having a `newAgent.text(streamName)` statement, as the text function tends to
@@ -310,7 +310,7 @@ define(['require', 'log', 'lodash', 'jquery', 'partition', 'stream', 'query', 'f
          * @param streamAttributes  projections list for output stream
          */
         DropElements.prototype.dropStreamFromQuery = function (queryModel, position, queryId, outStream,
-            streamAttributes) {
+                                                               streamAttributes) {
             var self = this;
             var isStreamNameUsed = false;
             var elementID;
@@ -628,7 +628,7 @@ define(['require', 'log', 'lodash', 'jquery', 'partition', 'stream', 'query', 'f
          * @param aggregationName name of the aggregation
          */
         DropElements.prototype.dropAggregation = function (newAgent, i, top, left, isCodeToDesignMode,
-            aggregationName) {
+                                                           aggregationName) {
             /*
              The node hosts a text node where the Aggregation's name input by the user will be held.
              Rather than simply having a `newAgent.text(aggregationName)` statement, as the text function tends to
@@ -791,7 +791,7 @@ define(['require', 'log', 'lodash', 'jquery', 'partition', 'stream', 'query', 'f
          * @param isCodeToDesignMode whether code to design mode is enable or not
          */
         DropElements.prototype.dropWindowFilterProjectionQuery = function (newAgent, i, dropType, top, left, text,
-            isCodeToDesignMode) {
+                                                                           isCodeToDesignMode) {
             /*
              A text node division will be appended to the newAgent element so that the element name can be changed in
              the text node and doesn't need to be appended to the newAgent Element every time the user changes it
@@ -869,7 +869,7 @@ define(['require', 'log', 'lodash', 'jquery', 'partition', 'stream', 'query', 'f
          * @param patternQueryName name of the patternQuery
          */
         DropElements.prototype.dropPatternQuery = function (newAgent, i, top, left, isCodeToDesignMode,
-            patternQueryName) {
+                                                            patternQueryName) {
 
             /*
              A text node division will be appended to the newAgent element so that the element name can be changed in
@@ -956,7 +956,7 @@ define(['require', 'log', 'lodash', 'jquery', 'partition', 'stream', 'query', 'f
          * @param sequenceQueryName name of the sequenceQuery
          */
         DropElements.prototype.dropSequenceQuery = function (newAgent, i, top, left, isCodeToDesignMode,
-            sequenceQueryName) {
+                                                             sequenceQueryName) {
 
             /*
              A text node division will be appended to the newAgent element so that the element name can be changed in

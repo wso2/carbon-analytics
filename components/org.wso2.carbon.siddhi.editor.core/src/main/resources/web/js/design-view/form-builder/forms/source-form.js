@@ -99,7 +99,7 @@ define(['log', 'jquery', 'lodash', 'sourceOrSinkAnnotation', 'mapAnnotation', 'p
          * @param {Object} predefinedOptions Predefined options of a particular source/map annotation type
          * @param {Object} savedOptions Saved options
          * @return {Object} options
-        */
+         */
         var mapUserOptionValues = function (predefinedOptions, savedOptions) {
             var options = [];
             _.forEach(predefinedOptions, function (predefinedOption) {
@@ -128,9 +128,9 @@ define(['log', 'jquery', 'lodash', 'sourceOrSinkAnnotation', 'mapAnnotation', 'p
             return options;
         };
 
-	    /**
-	    * Function to render the html to display the select options for attribute mapping
-	    */
+        /**
+         * Function to render the html to display the select options for attribute mapping
+         */
         var renderAttributeMapping = function () {
             if (!$.trim($('#define-attribute').html()).length) {
                 var attributeDiv = $('<div class="clearfix"> <label id="attribute-map-label">' +
@@ -314,12 +314,12 @@ define(['log', 'jquery', 'lodash', 'sourceOrSinkAnnotation', 'mapAnnotation', 'p
             return option;
         };
 
-	    /**
-		* Function to validate the data type of the options
-		* @param {String} dataType data-type of the option
-		* @param {String} optionValue value of the option
-		* @return {boolean} invalidDataType
-	    */
+        /**
+         * Function to validate the data type of the options
+         * @param {String} dataType data-type of the option
+         * @param {String} optionValue value of the option
+         * @return {boolean} invalidDataType
+         */
         var validateDataType = function (dataType, optionValue) {
             var invalidDataType = false;
             intLongRegexMatch = /^[-+]?\d+$/;
@@ -779,7 +779,9 @@ define(['log', 'jquery', 'lodash', 'sourceOrSinkAnnotation', 'mapAnnotation', 'p
                         clickedElement.setMap(mapperObject);
 
                         $('#' + id).removeClass('incomplete-element');
-                        $('#' + id).prop('title', '');
+                        //Send source element to the backend and generate tooltip
+                        var sourceToolTip = self.formUtils.getTooltip(clickedElement, Constants.SOURCE);
+                        $('#' + id).prop('title', sourceToolTip);
 
                         // set the isDesignViewContentChanged to true
                         self.configurationData.setIsDesignViewContentChanged(true);

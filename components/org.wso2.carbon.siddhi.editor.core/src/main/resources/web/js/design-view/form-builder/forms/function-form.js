@@ -189,7 +189,9 @@ define(['require', 'log', 'jquery', 'lodash', 'designViewUtils', 'constants'],
                     clickedElement.setBody(scriptBody);
 
                     $('#' + id).removeClass('incomplete-element');
-                    $('#' + id).prop('title', '');
+                    //Send function element to the backend and generate tooltip
+                    var functionToolTip = self.formUtils.getTooltip(clickedElement, Constants.FUNCTION);
+                    $('#' + id).prop('title', functionToolTip);
                     self.designViewContainer.removeClass('disableContainer');
                     self.toggleViewButton.removeClass('disableContainer');
 
@@ -209,8 +211,8 @@ define(['require', 'log', 'jquery', 'lodash', 'designViewUtils', 'constants'],
                 // close the form window
                 self.consoleListManager.removeFormConsole(formConsole);
             });
-
         };
 
         return FunctionForm;
     });
+

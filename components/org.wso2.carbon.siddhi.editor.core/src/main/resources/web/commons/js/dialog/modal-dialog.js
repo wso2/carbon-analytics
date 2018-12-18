@@ -72,13 +72,13 @@ define(['require', 'jquery', 'event_channel', 'bootstrap'], function (require, $
     };
 
     ModalDialog.prototype.showError = function (error) {
-       this.getErrorContainer().text(error);
-       this.getErrorContainer().show();
+        this.getErrorContainer().text(error);
+        this.getErrorContainer().show();
     };
 
     ModalDialog.prototype.clearError = function () {
-       this.getErrorContainer().text("");
-       this.getErrorContainer().hide();
+        this.getErrorContainer().text("");
+        this.getErrorContainer().hide();
     };
 
     ModalDialog.prototype.hide = function () {

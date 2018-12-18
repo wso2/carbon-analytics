@@ -24,35 +24,44 @@ import org.wso2.carbon.siddhi.editor.core.util.designview.exceptions.CodeGenerat
 import org.wso2.carbon.siddhi.editor.core.util.designview.utilities.CodeGeneratorUtils;
 
 /**
- * Generate's the code for a Siddhi trigger element
+ * Generates the code for a Siddhi trigger element
  */
 public class TriggerCodeGenerator {
 
     /**
-     * Generate's the Siddhi code representation of a TriggerConfig object
+     * Generates the Siddhi code representation of a TriggerConfig object
      *
      * @param trigger The TriggerConfig object
+     * @param isGeneratingToolTip If it is generating a tooltip or not
      * @return The Siddhi code representation of the given TriggerConfig object
      * @throws CodeGenerationException Error when generating the code
      */
-    public String generateTrigger(TriggerConfig trigger) throws CodeGenerationException {
+    public String generateTrigger(TriggerConfig trigger, boolean isGeneratingToolTip) throws CodeGenerationException {
         CodeGeneratorUtils.NullValidator.validateConfigObject(trigger);
+        StringBuilder triggerStringBuilder = new StringBuilder();
+
         //to append quotes to start and cronExpression
         if (trigger.getAtOrAtEvery().equalsIgnoreCase(SiddhiCodeBuilderConstants.AT )) {
             String triggerAt = trigger.getAt();
             triggerAt = SiddhiCodeBuilderConstants.SINGLE_QUOTE  + triggerAt + SiddhiCodeBuilderConstants.SINGLE_QUOTE;
             trigger.setAt(triggerAt);
         }
-        return SubElementCodeGenerator.generateComment(trigger.getPreviousCommentSegment()) +
-                SubElementCodeGenerator.generateAnnotations(trigger.getAnnotationList()) +
-                SiddhiCodeBuilderConstants.DEFINE_TRIGGER +
-                SiddhiCodeBuilderConstants.SPACE +
-                trigger.getName() +
-                SiddhiCodeBuilderConstants.SPACE +
-                SiddhiCodeBuilderConstants.AT +
-                SiddhiCodeBuilderConstants.SPACE +
-                trigger.getAt() +
-                SiddhiCodeBuilderConstants.SEMI_COLON;
+        if (!isGeneratingToolTip) {
+            triggerStringBuilder.append(SubElementCodeGenerator.generateComment(trigger.getPreviousCommentSegment()));
+        }
+
+        triggerStringBuilder.append(SubElementCodeGenerator.generateAnnotations(trigger.getAnnotationList()))
+                .append(SiddhiCodeBuilderConstants.NEW_LINE)
+                .append(SiddhiCodeBuilderConstants.DEFINE_TRIGGER)
+                .append(SiddhiCodeBuilderConstants.SPACE)
+                .append(trigger.getName())
+                .append(SiddhiCodeBuilderConstants.SPACE)
+                .append(SiddhiCodeBuilderConstants.AT)
+                .append(SiddhiCodeBuilderConstants.SPACE)
+                .append(trigger.getAt())
+                .append(SiddhiCodeBuilderConstants.SEMI_COLON);
+
+        return  triggerStringBuilder.toString();
     }
 
 }

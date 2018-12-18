@@ -296,7 +296,9 @@ define(['require', 'log', 'jquery', 'lodash', 'trigger', 'designViewUtils', 'con
                     self.designViewContainer.removeClass('disableContainer');
                     self.toggleViewButton.removeClass('disableContainer');
                     $('#' + id).removeClass('incomplete-element');
-                    $('#' + id).prop('title', '');
+                    //Send trigger element to the backend and generate tooltip
+                    var triggerToolTip = self.formUtils.getTooltip(clickedElement, Constants.TRIGGER);
+                    $('#' + id).prop('title', triggerToolTip);
 
                     // set the isDesignViewContentChanged to true
                     self.configurationData.setIsDesignViewContentChanged(true);

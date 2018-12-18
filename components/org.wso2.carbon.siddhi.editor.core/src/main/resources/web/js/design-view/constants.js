@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2017, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+ * Copyright (c) 2018, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
  *
  * WSO2 Inc. licenses this file to you under the Apache License,
  * Version 2.0 (the "License"); you may not use this file except
@@ -42,13 +42,19 @@ define(function () {
         MAP: "map",
         LIST: "list",
         MAPPER: "mapper",
+        AGGREGATION: "aggregation",
+        FUNCTION: "function",
         SINK: "sink",
         SOURCE: "source",
         TABLE: "table",
         STREAM: "stream",
         WINDOW: "window",
         TRIGGER: "trigger",
-        PARTITION: "partition"
+        PARTITION: "partition",
+        JOIN_QUERY: "join-query",
+        PATTERN_QUERY: "pattern-query",
+        SEQUENCE_QUERY: "sequence-query",
+        WINDOW_FILTER_PROJECTION_QUERY: "window-filter-projection-query"
     };
 
     return constants;

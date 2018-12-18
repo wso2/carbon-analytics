@@ -29,23 +29,26 @@ import org.wso2.carbon.siddhi.editor.core.util.designview.exceptions.CodeGenerat
 import org.wso2.carbon.siddhi.editor.core.util.designview.utilities.CodeGeneratorUtils;
 
 /**
- * Generate's the code for a Siddhi query element
+ * Generates the code for a Siddhi query element
  */
 public class QueryCodeGenerator {
 
     /**
-     * Generate's the Siddhi code representation of a QueryConfig object
+     * Generates the Siddhi code representation of a QueryConfig object
      *
-     * @param query The QueryConfig objecy
+     * @param query The QueryConfig object
+     * @param isGeneratingToolTip If it is generating a tooltip or not
      * @return The Siddhi code representation of the given QueryConfig object
      * @throws CodeGenerationException Error when generating the code
      */
-    public String generateQuery(QueryConfig query) throws CodeGenerationException {
+    public String generateQuery(QueryConfig query, boolean isGeneratingToolTip) throws CodeGenerationException {
         CodeGeneratorUtils.NullValidator.validateConfigObject(query);
 
         StringBuilder queryStringBuilder = new StringBuilder();
-        queryStringBuilder.append(SubElementCodeGenerator.generateComment(query.getPreviousCommentSegment()))
-                .append(SubElementCodeGenerator.generateAnnotations(query.getAnnotationList()))
+        if (!isGeneratingToolTip) {
+            queryStringBuilder.append(SubElementCodeGenerator.generateComment(query.getPreviousCommentSegment()));
+        }
+        queryStringBuilder.append(SubElementCodeGenerator.generateAnnotations(query.getAnnotationList()))
                 .append(SubElementCodeGenerator.generateQueryName(query.getQueryName()))
                 .append(QueryInputCodeGenerator.generateQueryInput(query.getQueryInput()))
                 .append(SiddhiCodeBuilderConstants.SPACE)
@@ -77,5 +80,4 @@ public class QueryCodeGenerator {
 
         return queryStringBuilder.toString();
     }
-
 }

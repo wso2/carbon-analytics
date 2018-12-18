@@ -849,7 +849,10 @@ define(['log', 'jquery', 'lodash', 'sourceOrSinkAnnotation', 'mapAnnotation', 'p
                         textNode.html(selectedSinkType);
 
                         $('#' + id).removeClass('incomplete-element');
-                        $('#' + id).prop('title', '');
+
+                        //Send sink element to the backend and generate tooltip
+                        var sinkToolTip = self.formUtils.getTooltip(clickedElement, Constants.SINK);
+                        $('#' + id).prop('title', sinkToolTip);
 
                         // set the isDesignViewContentChanged to true
                         self.configurationData.setIsDesignViewContentChanged(true);
@@ -874,4 +877,5 @@ define(['log', 'jquery', 'lodash', 'sourceOrSinkAnnotation', 'mapAnnotation', 'p
         };
         return SinkForm;
     });
+
 

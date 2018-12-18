@@ -34,9 +34,9 @@ define(['jquery', './modal-dialog'], function ($, ModalDialog) {
 
         var saveBtn = $("<button type='button' class='btn btn-primary'>Save</button>");
         var dontSaveBtn = $("<button type='button' class='btn btn-default" +
-                            " close-file-confirm-dialog-btn'>Close without Saving</button>");
+            " close-file-confirm-dialog-btn'>Close without Saving</button>");
         var cancelBtn = $("<button type='button' class='btn btn-default'" +
-                          " data-dismiss='modal'>Cancel</button>");
+            " data-dismiss='modal'>Cancel</button>");
         this._saveBtn = saveBtn;
         this._dontSaveBtn = dontSaveBtn;
 

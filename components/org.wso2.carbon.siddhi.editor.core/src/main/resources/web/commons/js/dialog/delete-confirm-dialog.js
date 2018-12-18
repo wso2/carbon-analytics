@@ -171,7 +171,7 @@ define(['require', 'lodash', 'jquery', 'log', 'backbone', 'file_browser',
                                                                     "There are running simulations.");
                                                                 deleteWizardError.show();
                                                                 simulationsExists = true;
-                                                            } 
+                                                            }
                                                         },
                                                         function (data) {
                                                             var message = {
@@ -185,7 +185,7 @@ define(['require', 'lodash', 'jquery', 'log', 'backbone', 'file_browser',
                                                     );
                                                 }
                                             }
-                                        }   
+                                        }
                                         if (!simulationsExists) {
                                             deleteSiddhiAppAndCloseSingleSimulations(callback, this.application);
                                         }

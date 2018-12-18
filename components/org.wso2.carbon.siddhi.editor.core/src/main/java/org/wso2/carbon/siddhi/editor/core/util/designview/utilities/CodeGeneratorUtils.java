@@ -108,7 +108,7 @@ public class CodeGeneratorUtils {
      * @return The list of names of the input streams of the given QueryConfig object
      * @throws CodeGenerationException Error while trying to identify the input streams
      */
-    private static List<String> getInputStreams(QueryConfig query)
+    public static List<String> getInputStreams(QueryConfig query)
             throws CodeGenerationException {
         NullValidator.validateConfigObject(query);
         NullValidator.validateConfigObject(query.getQueryInput());

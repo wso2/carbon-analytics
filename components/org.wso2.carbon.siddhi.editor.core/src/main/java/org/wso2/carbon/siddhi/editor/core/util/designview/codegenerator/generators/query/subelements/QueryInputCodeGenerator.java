@@ -34,12 +34,12 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
- * Generate's the code for a input element of a Siddhi query
+ * Generates code for an input element of a Siddhi query
  */
 public class QueryInputCodeGenerator {
 
     /**
-     * Generate's the Siddhi code representation of a QueryInputConfig object
+     * Generates the Siddhi code representation of a QueryInputConfig object
      *
      * @param queryInput The QueryInputConfig object
      * @return The Siddhi code representation of the given QueryInputConfig object
@@ -74,7 +74,7 @@ public class QueryInputCodeGenerator {
     }
 
     /**
-     * Generate's the Siddhi code representation of a WindowFilterProjectionConfig object
+     * Generates the Siddhi code representation of a WindowFilterProjectionConfig object
      *
      * @param windowFilterProjection The WindowFilterProjectionConfig object
      * @return The Siddhi code representation of the given WindowFilterProjectionConfig object
@@ -84,14 +84,15 @@ public class QueryInputCodeGenerator {
             throws CodeGenerationException {
         CodeGeneratorUtils.NullValidator.validateConfigObject(windowFilterProjection);
 
-        return SiddhiCodeBuilderConstants.FROM +
+        return SiddhiCodeBuilderConstants.NEW_LINE +
+                SiddhiCodeBuilderConstants.FROM +
                 SiddhiCodeBuilderConstants.SPACE +
                 windowFilterProjection.getFrom() +
                 SubElementCodeGenerator.generateStreamHandlerList(windowFilterProjection.getStreamHandlerList());
     }
 
     /**
-     * Generate's the Siddhi code representation of a JoinConfig object
+     * Generates the Siddhi code representation of a JoinConfig object
      *
      * @param join The JoinConfig object
      * @return The Siddhi code representation of the given JoinConfig object
@@ -101,7 +102,8 @@ public class QueryInputCodeGenerator {
         CodeGeneratorUtils.NullValidator.validateConfigObject(join);
 
         StringBuilder joinStringBuilder = new StringBuilder();
-        joinStringBuilder.append(SiddhiCodeBuilderConstants.FROM)
+        joinStringBuilder.append(SiddhiCodeBuilderConstants.NEW_LINE)
+                .append(SiddhiCodeBuilderConstants.FROM)
                 .append(SiddhiCodeBuilderConstants.SPACE)
                 .append(generateJoinElement(join.getLeft()))
                 .append(SiddhiCodeBuilderConstants.SPACE)
@@ -125,11 +127,11 @@ public class QueryInputCodeGenerator {
                         "aggregation query is empty");
             }
 
-            joinStringBuilder.append(SiddhiCodeBuilderConstants.SPACE)
+            joinStringBuilder.append(SiddhiCodeBuilderConstants.NEW_LINE)
                     .append(SiddhiCodeBuilderConstants.WITHIN)
                     .append(SiddhiCodeBuilderConstants.SPACE)
                     .append(join.getWithin())
-                    .append(SiddhiCodeBuilderConstants.SPACE)
+                    .append(SiddhiCodeBuilderConstants.NEW_LINE)
                     .append(SiddhiCodeBuilderConstants.PER)
                     .append(SiddhiCodeBuilderConstants.SPACE)
                     .append(join.getPer());
@@ -139,7 +141,7 @@ public class QueryInputCodeGenerator {
     }
 
     /**
-     * Generate's the Siddhi code representation of a JoinElementConfig object
+     * Generates the Siddhi code representation of a JoinElementConfig object
      *
      * @param joinElement The JoinElementConfig object
      * @return The Siddhi code representation of the given JoinElementConfig object
@@ -169,7 +171,7 @@ public class QueryInputCodeGenerator {
     }
 
     /**
-     * Generate's the Siddhi code representation of a join type
+     * Generates the Siddhi code representation of a join type
      *
      * @param joinType The join type
      * @return The Siddhi code representation of the given join type
@@ -182,20 +184,20 @@ public class QueryInputCodeGenerator {
 
         switch (joinType.toUpperCase()) {
             case CodeGeneratorConstants.JOIN:
-                return SiddhiCodeBuilderConstants.JOIN;
+                return SiddhiCodeBuilderConstants.NEW_LINE + SiddhiCodeBuilderConstants.JOIN;
             case CodeGeneratorConstants.LEFT_OUTER:
-                return SiddhiCodeBuilderConstants.LEFT_OUTER_JOIN;
+                return SiddhiCodeBuilderConstants.NEW_LINE + SiddhiCodeBuilderConstants.LEFT_OUTER_JOIN;
             case CodeGeneratorConstants.RIGHT_OUTER:
-                return SiddhiCodeBuilderConstants.RIGHT_OUTER_JOIN;
+                return SiddhiCodeBuilderConstants.NEW_LINE + SiddhiCodeBuilderConstants.RIGHT_OUTER_JOIN;
             case CodeGeneratorConstants.FULL_OUTER:
-                return SiddhiCodeBuilderConstants.FULL_OUTER_JOIN;
+                return SiddhiCodeBuilderConstants.NEW_LINE + SiddhiCodeBuilderConstants.FULL_OUTER_JOIN;
             default:
                 throw new CodeGenerationException("Invalid Join Type: " + joinType);
         }
     }
 
     /**
-     * Generate's the Siddhi code representation of a PatternSequenceConfig object
+     * Generates the Siddhi code representation of a PatternSequenceConfig object
      *
      * @param patternSequence The PatternSequenceConfig object
      * @return The Siddhi code representation of the given PatternSequenceConfig object
@@ -206,7 +208,8 @@ public class QueryInputCodeGenerator {
         CodeGeneratorUtils.NullValidator.validateConfigObject(patternSequence);
 
         StringBuilder patternSequenceInputStringBuilder = new StringBuilder();
-        patternSequenceInputStringBuilder.append(SiddhiCodeBuilderConstants.FROM)
+        patternSequenceInputStringBuilder.append(SiddhiCodeBuilderConstants.NEW_LINE)
+                .append(SiddhiCodeBuilderConstants.FROM)
                 .append(SiddhiCodeBuilderConstants.SPACE);
 
         String logic = patternSequence.getLogic();
@@ -229,7 +232,7 @@ public class QueryInputCodeGenerator {
     }
 
     /**
-     * Generate's the Siddhi code representation of a PatternSequenceConditionConfig object
+     * Generates the Siddhi code representation of a PatternSequenceConditionConfig object
      *
      * @param condition The PatternSequenceConditionConfig objecy
      * @param hasNot    Flag to show whether the given PatternSequenceConditionConfig has a 'not' keyword

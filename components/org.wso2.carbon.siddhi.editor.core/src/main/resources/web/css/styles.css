@@ -479,7 +479,7 @@ a.ui-button:active, .ui-button:active,
 }
 
 .app-list {
-margin-bottom: 5px;
+  margin-bottom: 5px;
 }
 
 .loader {
@@ -558,17 +558,17 @@ body.sticky-footer {
 }
 
 .selected-element {
-	z-index:500 !important;
+  z-index:500 !important;
 }
 
 .overlayed-container {
-	display: none;
-	position: fixed;
-	top: 0px;
-	bottom: 0px;
-	left: 0px;
-	right: 0px;
-	z-index: 90;
+  display: none;
+  position: fixed;
+  top: 0px;
+  bottom: 0px;
+  left: 0px;
+  right: 0px;
+  z-index: 90;
   background: rgba(90, 90, 90, 0.5);
 }
 
@@ -634,5 +634,5 @@ h3.popover-title {
 }
 
 .selected-element .element-close-icon {
-    display: inline !important;
+  display: inline !important;
 }

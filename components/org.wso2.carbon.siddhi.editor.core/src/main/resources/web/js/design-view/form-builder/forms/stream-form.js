@@ -675,7 +675,9 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'designViewUtils', 'j
                     });
 
                     $('#' + id).removeClass('incomplete-element');
-                    $('#' + id).prop('title', '');
+                    //Send stream element to the backend and generate tooltip
+                    var streamToolTip = self.formUtils.getTooltip(clickedElement, Constants.STREAM);
+                    $('#' + id).prop('title', streamToolTip);
                     // set the isDesignViewContentChanged to true
                     self.configurationData.setIsDesignViewContentChanged(true);
 

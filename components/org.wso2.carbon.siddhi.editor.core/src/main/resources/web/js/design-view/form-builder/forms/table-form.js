@@ -86,7 +86,7 @@ define(['log', 'jquery', 'lodash', 'attribute', 'storeAnnotation', 'designViewUt
          * @param {Object} predefinedOptions set of predefined option
          * @return {boolean} isError
          */
-        var validateOptions = function (predefinedOptions) {
+        var validateOptions = function (optionsMap, predefinedOptions) {
             var isError = false;
             $('#define-store-options #store-options .option').each(function () {
                 var option = $(this).find('.option-name');
@@ -1199,7 +1199,9 @@ define(['log', 'jquery', 'lodash', 'attribute', 'storeAnnotation', 'designViewUt
                     self.configurationData.setIsDesignViewContentChanged(true);
 
                     $('#' + id).removeClass('incomplete-element');
-                    $('#' + id).prop('title', '');
+                    //Send table element to the backend and generate tooltip
+                    var tableToolTip = self.formUtils.getTooltip(clickedElement, Constants.TABLE);
+                    $('#' + id).prop('title', tableToolTip);
                     // close the form window
                     self.consoleListManager.removeFormConsole(formConsole);
 

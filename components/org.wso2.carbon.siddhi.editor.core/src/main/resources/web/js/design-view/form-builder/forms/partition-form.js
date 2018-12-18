@@ -17,9 +17,9 @@
  */
 
 define(['require', 'log', 'jquery', 'lodash', 'partitionWith', 'designViewUtils', 'jsonValidator', 'handlebar',
-    'annotationObject', 'annotationElement'],
+    'annotationObject', 'annotationElement', 'constants'],
     function (require, log, $, _, PartitionWith, DesignViewUtils, JSONValidator, Handlebars, AnnotationObject,
-        AnnotationElement) {
+        AnnotationElement, Constants) {
 
         /**
          * @class PartitionForm Creates a forms to collect data from a partition
@@ -366,7 +366,10 @@ define(['require', 'log', 'jquery', 'lodash', 'partitionWith', 'designViewUtils'
                             // set the isDesignViewContentChanged to true
                             self.configurationData.setIsDesignViewContentChanged(true);
                             $('#' + id).removeClass('incomplete-element');
-                            $('#' + id).prop('title', '');
+
+                            //Send partition element to the backend and generate tooltip
+                            var partitionToolTip = self.formUtils.getTooltip(partitionElement, Constants.PARTITION);
+                            $('#' + id).prop('title', partitionToolTip);
 
                             // design view container and toggle view button are enabled
                             self.designViewContainer.removeClass('disableContainer');
@@ -391,3 +394,4 @@ define(['require', 'log', 'jquery', 'lodash', 'partitionWith', 'designViewUtils'
 
         return PartitionForm;
     });
+

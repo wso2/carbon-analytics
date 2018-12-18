@@ -1026,7 +1026,9 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'designViewUtils', 'h
                     });
 
                     $('#' + id).removeClass('incomplete-element');
-                    $('#' + id).prop('title', '');
+                    //Send window element to the backend and generate tooltip
+                    var windowToolTip = self.formUtils.getTooltip(clickedElement, Constants.WINDOW);
+                    $('#' + id).prop('title', windowToolTip);
                     self.designViewContainer.removeClass('disableContainer');
                     self.toggleViewButton.removeClass('disableContainer');
 

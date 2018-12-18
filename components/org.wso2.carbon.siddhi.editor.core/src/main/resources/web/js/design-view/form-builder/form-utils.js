@@ -16,8 +16,9 @@
  * under the License.
  */
 
-define(['require', 'lodash', 'handlebar'],
-    function (require, _, Handlebars) {
+define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar'],
+    function (require, _, AppData, log, Constants, Handlebars) {
+
 
         /**
          * @class FormUtils Contains utility methods for forms
@@ -212,6 +213,97 @@ define(['require', 'lodash', 'handlebar'],
             });
         };
 
+        /**
+        * Generate tooltip for siddhi app elements
+        *
+        * @param element JSON object of the element
+        * @param type type of the element
+        * @returns {string} tooltip
+        */
+        FormUtils.prototype.getTooltip = function (element, type) {
+            var appData = new AppData();
+
+            switch (type) {
+                case Constants.AGGREGATION:
+                    appData.addAggregation(element);
+                    break;
+
+                case Constants.FUNCTION:
+                    appData.addFunction(element);
+                    break;
+
+                case Constants.JOIN_QUERY:
+                    appData.addJoinQuery(element);
+                    break;
+
+                case Constants.PARTITION:
+                    appData.addPartition(element);
+                    break;
+
+                case Constants.PATTERN_QUERY:
+                    appData.addPatternQuery(element);
+                    break;
+
+                case Constants.SEQUENCE_QUERY:
+                    appData.addSequenceQuery(element);
+                    break;
+
+                case Constants.SINK:
+                    appData.addSink(element);
+                    break;
+
+                case Constants.SOURCE:
+                    appData.addSource(element);
+                    break;
+
+                case Constants.STREAM:
+                    appData.addStream(element);
+                    break;
+
+                case Constants.TABLE:
+                    appData.addTable(element);
+                    break;
+
+                case Constants.TRIGGER:
+                    appData.addTrigger(element);
+                    break;
+
+                case Constants.WINDOW:
+                    appData.addWindow(element);
+                    break;
+
+                case Constants.WINDOW_FILTER_PROJECTION_QUERY:
+                    appData.addWindowFilterProjectionQuery(element);
+                    break;
+            }
+
+            var self = this;
+            var result = '';
+            self.tooltipsURL = window.location.protocol + "//" + window.location.host + "/editor/tooltips";
+            $.ajax({
+                type: "POST",
+                url: self.tooltipsURL,
+                data: window.btoa(JSON.stringify(appData)),
+                async: false,
+                success: function (response) {
+                    var toolTipObject = _.find(response, function (toolTip) {
+                        return toolTip.id === element.getId();
+                    });
+                    if (toolTipObject !== undefined) {
+                        result = toolTipObject.text;
+                    }
+                },
+                error: function (error) {
+                    if (error.responseText) {
+                        log.error(error.responseText);
+                    } else {
+                        log.error("Error occured while processing the request");
+                    }
+                }
+            });
+            return result;
+        };
+
         /** Register classes for Handlebars */
 
         /** Generates the current index of the option being rendered */
@@ -257,3 +349,4 @@ define(['require', 'lodash', 'handlebar'],
 
         return FormUtils;
     });
+

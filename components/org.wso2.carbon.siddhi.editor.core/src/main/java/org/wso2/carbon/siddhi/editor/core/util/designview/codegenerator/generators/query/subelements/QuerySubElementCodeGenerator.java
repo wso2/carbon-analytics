@@ -27,12 +27,12 @@ import org.wso2.carbon.siddhi.editor.core.util.designview.utilities.CodeGenerato
 import java.util.List;
 
 /**
- * Generate's the code for sub-elements of a Siddhi query
+ * Generates the code for sub-elements of a Siddhi query
  */
 public class QuerySubElementCodeGenerator {
 
     /**
-     * Generate's the Siddhi code representation of a query's group by list
+     * Generates the Siddhi code representation of a query's group by list
      *
      * @param groupByList The group by list given
      * @return The Siddhi code representation of the given query's group by list
@@ -42,7 +42,8 @@ public class QuerySubElementCodeGenerator {
             return SiddhiCodeBuilderConstants.EMPTY_STRING;
         }
 
-        return SiddhiCodeBuilderConstants.GROUP +
+        return SiddhiCodeBuilderConstants.NEW_LINE +
+                SiddhiCodeBuilderConstants.GROUP +
                 SiddhiCodeBuilderConstants.SPACE +
                 SiddhiCodeBuilderConstants.BY +
                 SiddhiCodeBuilderConstants.SPACE +
@@ -50,7 +51,7 @@ public class QuerySubElementCodeGenerator {
     }
 
     /**
-     * Generate's the Siddhi code representation of a query's order by list
+     * Generates the Siddhi code representation of a query's order by list
      *
      * @param orderByList The order by list given
      * @return The Siddhi code representation of the given query's order by list
@@ -62,7 +63,8 @@ public class QuerySubElementCodeGenerator {
         }
 
         StringBuilder orderByListStringBuilder = new StringBuilder();
-        orderByListStringBuilder.append(SiddhiCodeBuilderConstants.ORDER)
+        orderByListStringBuilder.append(SiddhiCodeBuilderConstants.NEW_LINE)
+                .append(SiddhiCodeBuilderConstants.ORDER)
                 .append(SiddhiCodeBuilderConstants.SPACE)
                 .append(SiddhiCodeBuilderConstants.BY)
                 .append(SiddhiCodeBuilderConstants.SPACE);
@@ -87,14 +89,15 @@ public class QuerySubElementCodeGenerator {
     }
 
     /**
-     * Generate's the Siddhi code representation of a query's limit
+     * Generates the Siddhi code representation of a query's limit
      *
      * @param limit The limit value given
      * @return The Siddhi code representation of the given query's limit value
      */
     public static String generateQueryLimit(long limit) {
         if (limit != 0) {
-            return SiddhiCodeBuilderConstants.LIMIT +
+            return SiddhiCodeBuilderConstants.NEW_LINE +
+                    SiddhiCodeBuilderConstants.LIMIT +
                     SiddhiCodeBuilderConstants.SPACE +
                     limit;
         }
@@ -102,7 +105,7 @@ public class QuerySubElementCodeGenerator {
     }
 
     /**
-     * Generate's the Siddhi code representation of a query's having
+     * Generates the Siddhi code representation of a query's having
      *
      * @param having The having value given
      * @return The Siddhi code representation of the given query's having value
@@ -112,13 +115,14 @@ public class QuerySubElementCodeGenerator {
             return SiddhiCodeBuilderConstants.EMPTY_STRING;
         }
 
-        return SiddhiCodeBuilderConstants.HAVING +
+        return SiddhiCodeBuilderConstants.NEW_LINE +
+                SiddhiCodeBuilderConstants.HAVING +
                 SiddhiCodeBuilderConstants.SPACE +
                 having;
     }
 
     /**
-     * Generate's the Siddhi code representation of a query's output rate limit
+     * Generates the Siddhi code representation of a query's output rate limit
      *
      * @param outputRateLimit The output rate limit value given
      * @return The Siddhi code representation of the given query's output rate limit
@@ -128,7 +132,8 @@ public class QuerySubElementCodeGenerator {
             return SiddhiCodeBuilderConstants.EMPTY_STRING;
         }
 
-        return SiddhiCodeBuilderConstants.OUTPUT +
+        return SiddhiCodeBuilderConstants.NEW_LINE +
+                SiddhiCodeBuilderConstants.OUTPUT +
                 SiddhiCodeBuilderConstants.SPACE +
                 outputRateLimit;
     }

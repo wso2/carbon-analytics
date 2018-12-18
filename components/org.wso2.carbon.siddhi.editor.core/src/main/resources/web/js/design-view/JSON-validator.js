@@ -461,7 +461,7 @@ define(['require', 'log', 'jquery', 'lodash', 'designViewUtils'],
          * @returns {boolean} validity of the json
          */
         JSONValidator.prototype.validateQuerySelectSection = function (select, type, elementId,
-            doNotShowErrorMessages) {
+                                                                       doNotShowErrorMessages) {
             var isValid = true;
             var errorMessage;
             if (!select) {
@@ -498,7 +498,7 @@ define(['require', 'log', 'jquery', 'lodash', 'designViewUtils'],
          * @returns {boolean} validity of the json
          */
         JSONValidator.prototype.validateQueryOutputSection = function (query, type, elementId,
-            doNotShowErrorMessages) {
+                                                                       doNotShowErrorMessages) {
             var isValid = true;
             var errorMessage;
             if ((!query.queryOutput) || (query.queryOutput && !query.queryOutput.target)) {

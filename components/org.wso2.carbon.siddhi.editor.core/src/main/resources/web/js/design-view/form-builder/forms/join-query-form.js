@@ -17,11 +17,11 @@
  */
 
 define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert', 'queryOutputDelete',
-    'queryOutputUpdate', 'queryOutputUpdateOrInsertInto', 'queryWindowOrFunction', 'queryOrderByValue',
-    'joinQuerySource', 'streamHandler', 'designViewUtils', 'jsonValidator'],
+        'queryOutputUpdate', 'queryOutputUpdateOrInsertInto', 'queryWindowOrFunction', 'queryOrderByValue',
+        'joinQuerySource', 'streamHandler', 'designViewUtils', 'jsonValidator', 'constants'],
     function (require, log, $, _, QuerySelect, QueryOutputInsert, QueryOutputDelete, QueryOutputUpdate,
-        QueryOutputUpdateOrInsertInto, QueryWindowOrFunction, QueryOrderByValue, joinQuerySource, StreamHandler,
-        DesignViewUtils, JSONValidator) {
+              QueryOutputUpdateOrInsertInto, QueryWindowOrFunction, QueryOrderByValue, joinQuerySource, StreamHandler,
+              DesignViewUtils, JSONValidator, Constants) {
 
         var constants = {
             LEFT_SOURCE: 'Left Source',
@@ -1404,13 +1404,16 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
                     }
 
                     $('#' + id).removeClass('incomplete-element');
-                    $('#' + id).prop('title', '');
 
                     // perform JSON validation
                     JSONValidator.prototype.validateJoinQuery(clickedElement);
 
                     self.designViewContainer.removeClass('disableContainer');
                     self.toggleViewButton.removeClass('disableContainer');
+
+                    //Send join-query element to the backend and generate tooltip
+                    var queryToolTip = self.formUtils.getTooltip(clickedElement, Constants.JOIN_QUERY);
+                    $('#' + id).prop('title', queryToolTip);
 
                     // close the form window
                     self.consoleListManager.removeFormConsole(formConsole);
@@ -1438,7 +1441,7 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
          * @returns fullJoinSchema join source schema
          */
         JoinQueryForm.prototype.getJoinSourceSchema = function (sourceType, sourceName, secondarySourceName, sourceSide,
-            savedJoinSourceData) {
+                                                                savedJoinSourceData) {
             var self = this;
             // starting values for the join source
             var fillSourceWith = {};
@@ -1490,7 +1493,7 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
                     var connectedStreamOrTriggerName = (inputElement.element).getFrom();
                     inputElement
                         = self.configurationData.getSiddhiAppConfig()
-                            .getDefinitionElementByName(connectedStreamOrTriggerName, self.partitionId);
+                        .getDefinitionElementByName(connectedStreamOrTriggerName, self.partitionId);
                     if (inputElement.type === 'STREAM') {
                         inputElementAttributeList = (inputElement.element).getAttributeList();
                         _.forEach(inputElementAttributeList, function (attribute) {
