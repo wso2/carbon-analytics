@@ -217,8 +217,7 @@ define(['require', 'log', 'jquery', 'lodash', 'designViewUtils'],
          * returned
          * @returns {boolean} validity of the json
          */
-        JSONValidator.prototype.validateForElementName = function (element, type,
-            doNotShowErrorMessages) {
+        JSONValidator.prototype.validateForElementName = function (element, type, doNotShowErrorMessages) {
             var errorMessage;
             if (!element.name) {
                 errorMessage = type + ' form is incomplete'
@@ -460,8 +459,7 @@ define(['require', 'log', 'jquery', 'lodash', 'designViewUtils'],
          * returned
          * @returns {boolean} validity of the json
          */
-        JSONValidator.prototype.validateQuerySelectSection = function (select, type, elementId,
-                                                                       doNotShowErrorMessages) {
+        JSONValidator.prototype.validateQuerySelectSection = function (select, type, elementId, doNotShowErrorMessages){
             var isValid = true;
             var errorMessage;
             if (!select) {
@@ -497,8 +495,7 @@ define(['require', 'log', 'jquery', 'lodash', 'designViewUtils'],
          * returned
          * @returns {boolean} validity of the json
          */
-        JSONValidator.prototype.validateQueryOutputSection = function (query, type, elementId,
-                                                                       doNotShowErrorMessages) {
+        JSONValidator.prototype.validateQueryOutputSection = function (query, type, elementId, doNotShowErrorMessages) {
             var isValid = true;
             var errorMessage;
             if ((!query.queryOutput) || (query.queryOutput && !query.queryOutput.target)) {

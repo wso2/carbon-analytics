@@ -33,8 +33,9 @@ import java.util.List;
 public class TableConfigGenerator extends CodeSegmentsPreserver {
     /**
      * Generates TableConfig object from the given Siddhi TableDefinition
-     * @param tableDefinition       Siddhi TableDefinition
-     * @return                      TableConfig object
+     *
+     * @param tableDefinition Siddhi TableDefinition
+     * @return TableConfig object
      */
     public TableConfig generateTableConfig(TableDefinition tableDefinition) throws DesignGenerationException {
         // 'store' and annotations
@@ -52,13 +53,9 @@ public class TableConfigGenerator extends CodeSegmentsPreserver {
             }
         }
         AttributeConfigListGenerator attributeConfigListGenerator = new AttributeConfigListGenerator();
-        TableConfig tableConfig = new TableConfig(
-                tableDefinition.getId(),
-                tableDefinition.getId(),
+        TableConfig tableConfig = new TableConfig(tableDefinition.getId(), tableDefinition.getId(),
                 attributeConfigListGenerator.generateAttributeConfigList(tableDefinition.getAttributeList()),
-                storeConfig,
-                annotationList,
-                annotationListObjects);
+                storeConfig, annotationList, annotationListObjects);
         preserveCodeSegmentsOf(storeConfigGenerator, annotationConfigGenerator, attributeConfigListGenerator);
         preserveAndBindCodeSegment(tableDefinition, tableConfig);
 
