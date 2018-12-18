@@ -32,8 +32,9 @@ import java.util.List;
 public class StreamDefinitionConfigGenerator extends CodeSegmentsPreserver {
     /**
      * Generates StreamConfig object, with given Siddhi StreamDefinition
-     * @param streamDefinition  Siddhi StreamDefinition object
-     * @return                  StreamConfig object
+     *
+     * @param streamDefinition Siddhi StreamDefinition object
+     * @return StreamConfig object
      */
     public StreamConfig generateStreamConfig(StreamDefinition streamDefinition) {
         List<String> annotationConfigs = new ArrayList<>();
@@ -48,10 +49,9 @@ public class StreamDefinitionConfigGenerator extends CodeSegmentsPreserver {
             }
         }
         AttributeConfigListGenerator attributeConfigListGenerator = new AttributeConfigListGenerator();
-        StreamConfig streamConfig = new StreamConfig(streamDefinition.getId(),
-                streamDefinition.getId(),
+        StreamConfig streamConfig = new StreamConfig(streamDefinition.getId(), streamDefinition.getId(),
                 attributeConfigListGenerator.generateAttributeConfigList(streamDefinition.getAttributeList()),
-                annotationConfigs,annotationListObjects);
+                annotationConfigs, annotationListObjects);
         preserveCodeSegmentsOf(annotationConfigGenerator, attributeConfigListGenerator);
         preserveAndBindCodeSegment(streamDefinition, streamConfig);
 

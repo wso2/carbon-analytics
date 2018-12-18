@@ -17,9 +17,9 @@
  */
 
 define(['require', 'log', 'lodash', 'jquery', 'partition', 'stream', 'query', 'formBuilder', 'aggregation',
-        'jsonValidator', 'sourceOrSinkAnnotation', 'stream', 'table',],
+    'jsonValidator', 'sourceOrSinkAnnotation', 'stream', 'table', 'window', 'trigger', 'functionDefinition'],
     function (require, log, _, $, Partition, Stream, Query, FormBuilder, Aggregation, JSONValidator,
-              SourceOrSinkAnnotation, Stream, Table) {
+        SourceOrSinkAnnotation, Stream, Table, Window, Trigger, FunctionDefinition) {
 
         /**
          * @class DesignView
@@ -70,7 +70,6 @@ define(['require', 'log', 'lodash', 'jquery', 'partition', 'stream', 'query', 'f
             if (isCodeToDesignMode) {
                 name = sourceName;
             } else {
-                name = i;
                 var sourceOptions = {};
                 _.set(sourceOptions, 'id', i);
                 _.set(sourceOptions, 'annotationType', 'SOURCE');
@@ -147,7 +146,6 @@ define(['require', 'log', 'lodash', 'jquery', 'partition', 'stream', 'query', 'f
             if (isCodeToDesignMode) {
                 name = sinkName;
             } else {
-                name = i;
                 var sinkOptions = {};
                 _.set(sinkOptions, 'id', i);
                 _.set(sinkOptions, 'annotationType', 'SINK');
@@ -219,7 +217,7 @@ define(['require', 'log', 'lodash', 'jquery', 'partition', 'stream', 'query', 'f
          * @param streamName name of the stream
          */
         DropElements.prototype.dropStream = function (newAgent, i, top, left, isCodeToDesignMode,
-                                                      isGenerateStreamFromQueryOutput, streamName) {
+            isGenerateStreamFromQueryOutput, streamName) {
             /*
              The node hosts a text node where the Stream's name input by the user will be held.
              Rather than simply having a `newAgent.text(streamName)` statement, as the text function tends to
@@ -234,14 +232,13 @@ define(['require', 'log', 'lodash', 'jquery', 'partition', 'stream', 'query', 'f
                 if (isGenerateStreamFromQueryOutput) {
                     name = streamName;
                 } else {
-                    name = i;
                     var streamOptions = {};
                     _.set(streamOptions, 'id', i);
                     _.set(streamOptions, 'name', undefined);
                     var stream = new Stream(streamOptions);
                     self.configurationData.getSiddhiAppConfig().addStream(stream);
 
-                    JSONValidator.prototype.validateStreamOrTable(stream, "Stream", true)
+                    JSONValidator.prototype.validateForElementName(stream, "Stream", true)
                 }
             }
             var node = $('<div>' + name + '</div>');
@@ -313,7 +310,7 @@ define(['require', 'log', 'lodash', 'jquery', 'partition', 'stream', 'query', 'f
          * @param streamAttributes  projections list for output stream
          */
         DropElements.prototype.dropStreamFromQuery = function (queryModel, position, queryId, outStream,
-                                                               streamAttributes) {
+            streamAttributes) {
             var self = this;
             var isStreamNameUsed = false;
             var elementID;
@@ -381,14 +378,13 @@ define(['require', 'log', 'lodash', 'jquery', 'partition', 'stream', 'query', 'f
             if (isCodeToDesignMode) {
                 name = tableName;
             } else {
-                name = i;
                 var tableOptions = {};
                 _.set(tableOptions, 'id', i);
                 _.set(tableOptions, 'name', undefined);
                 var table = new Table(tableOptions);
                 self.configurationData.getSiddhiAppConfig().addTable(table);
 
-                JSONValidator.prototype.validateStreamOrTable(table, "Table", true)
+                JSONValidator.prototype.validateForElementName(table, "Table", true)
             }
             var node = $('<div>' + name + '</div>');
             newAgent.append(node);
@@ -469,7 +465,13 @@ define(['require', 'log', 'lodash', 'jquery', 'partition', 'stream', 'query', 'f
             if (isCodeToDesignMode) {
                 name = windowName;
             } else {
-                name = self.formBuilder.DefineWindow(i);
+                var windowOptions = {};
+                _.set(windowOptions, 'id', i);
+                _.set(windowOptions, 'name', undefined);
+                var window = new Window(windowOptions);
+                self.configurationData.getSiddhiAppConfig().addWindow(window);
+
+                JSONValidator.prototype.validateForElementName(window, "Window", true)
             }
             var node = $('<div>' + name + '</div>');
             newAgent.append(node);
@@ -550,7 +552,13 @@ define(['require', 'log', 'lodash', 'jquery', 'partition', 'stream', 'query', 'f
             if (isCodeToDesignMode) {
                 name = triggerName;
             } else {
-                name = self.formBuilder.DefineTrigger(i);
+                var triggerOptions = {};
+                _.set(triggerOptions, 'id', i);
+                _.set(triggerOptions, 'name', undefined);
+                var trigger = new Trigger(triggerOptions);
+                self.configurationData.getSiddhiAppConfig().addTrigger(trigger);
+
+                JSONValidator.prototype.validateForElementName(trigger, "Trigger", true)
             }
             var node = $('<div>' + name + '</div>');
             newAgent.append(node);
@@ -620,7 +628,7 @@ define(['require', 'log', 'lodash', 'jquery', 'partition', 'stream', 'query', 'f
          * @param aggregationName name of the aggregation
          */
         DropElements.prototype.dropAggregation = function (newAgent, i, top, left, isCodeToDesignMode,
-                                                           aggregationName) {
+            aggregationName) {
             /*
              The node hosts a text node where the Aggregation's name input by the user will be held.
              Rather than simply having a `newAgent.text(aggregationName)` statement, as the text function tends to
@@ -632,7 +640,6 @@ define(['require', 'log', 'lodash', 'jquery', 'partition', 'stream', 'query', 'f
             if (isCodeToDesignMode) {
                 name = aggregationName;
             } else {
-                name = i;
                 //add the new aggregation element to aggregation list
                 var aggregationOptions = {};
                 _.set(aggregationOptions, 'id', i);
@@ -724,7 +731,16 @@ define(['require', 'log', 'lodash', 'jquery', 'partition', 'stream', 'query', 'f
             if (isCodeToDesignMode) {
                 name = functionName;
             } else {
-                name = self.formBuilder.DefineFunction(i);
+                //add the new function element to function list
+                var functionOptions = {};
+                _.set(functionOptions, 'id', i);
+                _.set(functionOptions, 'name', undefined);
+                var functionObject = new FunctionDefinition(functionOptions);
+                self.configurationData.getSiddhiAppConfig().addFunction(functionObject);
+
+                //perform json validation
+                JSONValidator.prototype.validateForElementName(functionObject, "Function", true)
+
             }
             var node = $('<div>' + name + '</div>');
             newAgent.append(node);
@@ -775,7 +791,7 @@ define(['require', 'log', 'lodash', 'jquery', 'partition', 'stream', 'query', 'f
          * @param isCodeToDesignMode whether code to design mode is enable or not
          */
         DropElements.prototype.dropWindowFilterProjectionQuery = function (newAgent, i, dropType, top, left, text,
-                                                                           isCodeToDesignMode) {
+            isCodeToDesignMode) {
             /*
              A text node division will be appended to the newAgent element so that the element name can be changed in
              the text node and doesn't need to be appended to the newAgent Element every time the user changes it
@@ -853,7 +869,7 @@ define(['require', 'log', 'lodash', 'jquery', 'partition', 'stream', 'query', 'f
          * @param patternQueryName name of the patternQuery
          */
         DropElements.prototype.dropPatternQuery = function (newAgent, i, top, left, isCodeToDesignMode,
-                                                            patternQueryName) {
+            patternQueryName) {
 
             /*
              A text node division will be appended to the newAgent element so that the element name can be changed in
@@ -940,7 +956,7 @@ define(['require', 'log', 'lodash', 'jquery', 'partition', 'stream', 'query', 'f
          * @param sequenceQueryName name of the sequenceQuery
          */
         DropElements.prototype.dropSequenceQuery = function (newAgent, i, top, left, isCodeToDesignMode,
-                                                             sequenceQueryName) {
+            sequenceQueryName) {
 
             /*
              A text node division will be appended to the newAgent element so that the element name can be changed in

@@ -33,29 +33,29 @@ import java.util.List;
 public class TableConfigGenerator extends CodeSegmentsPreserver {
     /**
      * Generates TableConfig object from the given Siddhi TableDefinition
-     * @param tableDefinition       Siddhi TableDefinition
-     * @return                      TableConfig object
+     *
+     * @param tableDefinition Siddhi TableDefinition
+     * @return TableConfig object
      */
     public TableConfig generateTableConfig(TableDefinition tableDefinition) throws DesignGenerationException {
         // 'store' and annotations
         StoreConfigGenerator storeConfigGenerator = new StoreConfigGenerator();
         AnnotationConfigGenerator annotationConfigGenerator = new AnnotationConfigGenerator();
         StoreConfig storeConfig = null;
+        List<Annotation> annotationListObjects = new ArrayList<>();
         List<String> annotationList = new ArrayList<>();
         for (Annotation annotation : tableDefinition.getAnnotations()) {
             if (annotation.getName().equalsIgnoreCase("STORE")) {
                 storeConfig = storeConfigGenerator.generateStoreConfig(annotation);
             } else {
                 annotationList.add(annotationConfigGenerator.generateAnnotationConfig(annotation));
+                annotationListObjects.add(annotation);
             }
         }
         AttributeConfigListGenerator attributeConfigListGenerator = new AttributeConfigListGenerator();
-        TableConfig tableConfig = new TableConfig(
-                tableDefinition.getId(),
-                tableDefinition.getId(),
+        TableConfig tableConfig = new TableConfig(tableDefinition.getId(), tableDefinition.getId(),
                 attributeConfigListGenerator.generateAttributeConfigList(tableDefinition.getAttributeList()),
-                storeConfig,
-                annotationList);
+                storeConfig, annotationList, annotationListObjects);
         preserveCodeSegmentsOf(storeConfigGenerator, annotationConfigGenerator, attributeConfigListGenerator);
         preserveAndBindCodeSegment(tableDefinition, tableConfig);
 

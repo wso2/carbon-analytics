@@ -19,49 +19,6 @@
 define(['require', 'log', 'jquery', 'lodash', 'trigger', 'designViewUtils', 'constants'],
     function (require, log, $, _, Trigger, DesignViewUtils, Constants) {
 
-        var triggerSchema = {
-            type: "object",
-            title: "Trigger",
-            properties: {
-                annotations: {
-                    propertyOrder: 1,
-                    type: "array",
-                    format: "table",
-                    title: "Annotations",
-                    uniqueItems: true,
-                    minItems: 1,
-                    items: {
-                        type: "object",
-                        title: "Annotation",
-                        options: {
-                            disable_properties: true
-                        },
-                        properties: {
-                            annotation: {
-                                title: "Annotation",
-                                type: "string",
-                                minLength: 1
-                            }
-                        }
-                    }
-                },
-                name: {
-                    type: "string",
-                    title: "Name",
-                    minLength: 1,
-                    required: true,
-                    propertyOrder: 2
-                },
-                at: {
-                    type: "string",
-                    title: "At",
-                    minLength: 1,
-                    required: true,
-                    propertyOrder: 3
-                }
-            }
-        };
-
         /**
          * @class TriggerForm Creates a forms to collect data from a trigger
          * @constructor
@@ -79,80 +36,91 @@ define(['require', 'log', 'jquery', 'lodash', 'trigger', 'designViewUtils', 'con
             }
         };
 
+
         /**
-         * @function generate form when defining a form
-         * @param i id for the element
-         * @param formConsole Console which holds the form
-         * @param formContainer Container which holds the form
+         * Function to render the drop down for trigger-criteria
+         * @param {Object} triggerObject array of trigger criteria
          */
-        TriggerForm.prototype.generateDefineForm = function (i, formConsole, formContainer) {
-            var self = this;
-            var propertyDiv = $('<div id="property-header"><h3>Trigger Configuration</h3></div>' +
-                '<div id="define-trigger" class="define-trigger"></div>');
-            formContainer.append(propertyDiv);
-            $(".overlayed-container").fadeTo(200, 1);
-            $('#' + i).addClass('selected-element');
-            $('#' + i).addClass('incomplete-element');
-            $('#' + i).prop('title', 'Form is incomplete');
-
-            // generate the form to define a trigger
-            var editor = new JSONEditor($(formContainer).find('#define-trigger')[0], {
-                schema: triggerSchema,
-                show_errors: "always",
-                disable_properties: false,
-                disable_array_delete_all_rows: true,
-                disable_array_delete_last_row: true,
-                display_required_only: true,
-                no_additional_properties: true
+        var renderTriggerCriteria = function (triggerObject) {
+            var triggerCriteriaDiv = '<h4> Trigger Criteria </h4> <select id = "trigger-criteria-type">';
+            _.forEach(triggerObject, function (triggerCriteria) {
+                triggerCriteriaDiv += '<option value = "' + triggerCriteria.name + '">' + triggerCriteria.name + '</option>';
             });
+            triggerCriteriaDiv += '</select> <i class = "fw fw-info"> ' +
+                '<span style = "display:none" class = "criteria-description"> </span> </i>';
+            $('#define-trigger-criteria').html(triggerCriteriaDiv);
+        };
 
-            formContainer.append('<div id="submit"><button type="button" class="btn btn-default">Submit</button></div>');
+        /**
+         * Function to render a textbox according to the selected criteria-type
+         * @param {String} selectedCriteriaType selected criteria type from the select-box
+         */
+        var renderTriggerCriteriaContent = function (selectedCriteriaType) {
+            if (selectedCriteriaType === Constants.START) {
+                //show no text-box
+                $('#trigger-criteria-content').html('');
+            } else {
+                //render a text-box to put the atEvery or cron-expression value
+                $('#trigger-criteria-content').html('<input type="text" class="clearfix"> ' +
+                    '<label class="error-message" > </label>');
+            }
+        };
 
-            // 'Submit' button action
-            var submitButtonElement = $(formContainer).find('#submit')[0];
-            submitButtonElement.addEventListener('click', function () {
-
-                var errors = editor.validate();
-                if (errors.length) {
-                    return;
-                }
-                var isTriggerNameUsed = self.formUtils.isDefinitionElementNameUsed(editor.getValue().name);
-                if (isTriggerNameUsed) {
-                    DesignViewUtils.prototype
-                        .errorAlert("Trigger name \"" + editor.getValue().name + "\" is already used.");
-                    return;
-                }
-
-                // set the isDesignViewContentChanged to true
-                self.configurationData.setIsDesignViewContentChanged(true);
-
-                // add the new out trigger to the trigger array
-                var triggerOptions = {};
-                _.set(triggerOptions, 'id', i);
-                _.set(triggerOptions, 'name', editor.getValue().name);
-                _.set(triggerOptions, 'at', editor.getValue().at);
-                var trigger = new Trigger(triggerOptions);
-                _.forEach(editor.getValue().annotations, function (annotation) {
-                    trigger.addAnnotation(annotation.annotation);
+        /**
+         * Function to obtain a particular trigger object from the predefined triggers
+         * @param {Object} triggerObject predefined trigger object
+         * @param {String} selectedCriteria selected trigger criteria
+         * @return {Object} triggerCriteriaObject
+         */
+        var getTriggerCriteria = function (triggerObject, selectedCriteria) {
+            var triggerCriteriaObject =
+                _.find(triggerObject, function (criteria) {
+                    return criteria.name == selectedCriteria
                 });
-                self.configurationData.getSiddhiAppConfig().addTrigger(trigger);
+            return triggerCriteriaObject;
+        };
 
-                var textNode = $('#' + i).find('.triggerNameNode');
-                textNode.html(editor.getValue().name);
+        /**
+         * Function to determine the trigger-criteria-type
+         * @param {String} triggerCriteria criteria value
+         * @param {String} triggerCriteriaType at or every
+         * @return {String} criteriaType
+         */
+        var determineCriteriaType = function (triggerCriteria, triggerCriteriaType) {
+            if (triggerCriteriaType === Constants.AT) {
+                if (triggerCriteria.toLowerCase() === Constants.START) {
+                    //criteria-type is start
+                    renderTriggerCriteriaContent(Constants.START);
+                    return Constants.START;
+                } else {
+                    //cron expression
+                    renderTriggerCriteriaContent(Constants.CRON_EXPRESSION);
+                    return Constants.CRON_EXPRESSION;
+                }
+            } else {
+                //atEvery
+                renderTriggerCriteriaContent(Constants.EVERY);
+                return Constants.EVERY;
+            }
+        };
 
-                $('#' + i).removeClass('incomplete-element');
+        /**
+         * Function to add the error class
+         * @param {Object} id object where the errors needs to be displayed
+         */
+        var addErrorClass = function (id) {
+            $(id)[0].scrollIntoView();
+            $(id).addClass('required-input-field')
+        };
 
-                //Send trigger element to the backend and generate tooltip
-                var triggerToolTip = self.formUtils.getTooltip(trigger, Constants.TRIGGER);
-                $('#' + i).prop('title', triggerToolTip);
-
-                // close the form window
-                self.consoleListManager.removeFormConsole(formConsole);
-
-                self.designViewContainer.removeClass('disableContainer');
-                self.toggleViewButton.removeClass('disableContainer');
-            });
-            return editor.getValue().name;
+        /**
+        * Function to show the trigger criteria description
+        * @param {Object} triggerCriteria predefined trigger object
+        * @param {String} selected trigger criteria
+        */
+        var showTriggerCriteriaDescription = function (triggerObject, selectedCriteria) {
+            var triggerCriteriaObject = getTriggerCriteria(triggerObject, selectedCriteria);
+            $('#define-trigger-criteria .criteria-description').text(triggerCriteriaObject.description);
         };
 
         /**
@@ -164,7 +132,12 @@ define(['require', 'log', 'jquery', 'lodash', 'trigger', 'designViewUtils', 'con
         TriggerForm.prototype.generatePropertiesForm = function (element, formConsole, formContainer) {
             var self = this;
             var propertyDiv = $('<div id="property-header"><h3>Trigger Configuration</h3></div>' +
-                '<div id="define-trigger" class="define-trigger"></div>');
+                '<div class ="trigger-form-container"> <div id="define-trigger-name"> <h4>Name: </h4>' +
+                '<input type="text" id="triggerName" class="clearfix"> <label class="error-message" > </label> </div>' +
+                '<button id="btn-submit" type="button" class="btn toggle-view-button"> Submit </button> ' +
+                '<button id="btn-cancel" type="button" class="btn btn-default"> Cancel </button> </div>' +
+                '<div class = "trigger-form-container"> <div id= "define-trigger-criteria"> </div>' +
+                '<div id = "trigger-criteria-content" ></div> </div>');
             formContainer.append(propertyDiv);
             self.designViewContainer.addClass('disableContainer');
             self.toggleViewButton.addClass('disableContainer');
@@ -172,85 +145,162 @@ define(['require', 'log', 'jquery', 'lodash', 'trigger', 'designViewUtils', 'con
             var id = $(element).parent().attr('id');
             $('#' + id).addClass('selected-element');
             $(".overlayed-container").fadeTo(200, 1);
+
             // retrieve the trigger information from the collection
             var clickedElement = self.configurationData.getSiddhiAppConfig().getTrigger(id);
-            if (!clickedElement) {
-                var errorMessage = 'unable to find clicked element';
-                log.error(errorMessage);
-                throw errorMessage;
-            }
             var name = clickedElement.getName();
-            var at = clickedElement.getAt();
-            var savedAnnotations = clickedElement.getAnnotationList();
-            var annotations = [];
-            _.forEach(savedAnnotations, function (savedAnnotation) {
-                annotations.push({ annotation: savedAnnotation });
+            var triggerObject = self.configurationData.application.config.trigger;
+            renderTriggerCriteria(triggerObject);
+
+            //Event listener to show the criteria description
+            $('#define-trigger-criteria').on('mouseover', '.fw-info', function () {
+                $(this).find('.criteria-description').show();
             });
-            var fillWith = {
-                annotations: annotations,
-                name: name,
-                at: at
-            };
-            fillWith = self.formUtils.cleanJSONObject(fillWith);
-            var editor = new JSONEditor($(formContainer).find('#define-trigger')[0], {
-                schema: triggerSchema,
-                show_errors: "always",
-                disable_properties: false,
-                disable_array_delete_all_rows: true,
-                disable_array_delete_last_row: true,
-                display_required_only: true,
-                no_additional_properties: true,
-                startval: fillWith
+
+            //Event listener to hide the criteria description
+            $('#define-trigger-criteria').on('mouseout', '.fw-info', function () {
+                $(this).find('.criteria-description').hide();
             });
-            formContainer.append(self.formUtils.buildFormButtons(true));
+
+            if (name) {
+                //if the trigger object is already edited
+                $('#triggerName').val(name.trim());
+                var triggerCriteriaType = clickedElement.getCriteriaType().trim();
+                var triggerCriteria = clickedElement.getCriteria().trim();
+                if (triggerCriteriaType === Constants.AT) {
+                    if (triggerCriteria.indexOf("'") >= 0 || triggerCriteria.indexOf('"') >= 0) {
+                        //to remove the string quote from the start and cron expression
+                        triggerCriteria = triggerCriteria.slice(1, triggerCriteria.length - 1);
+                    }
+                } else {
+                    //remove every from atEvery's value
+                    var replaceEvery = triggerCriteria;
+                    triggerCriteria = replaceEvery.replace(Constants.EVERY, '');
+                }
+                triggerCriteria = triggerCriteria.trim();
+                var selectedCriteria = determineCriteriaType(triggerCriteria, triggerCriteriaType);
+                $('#define-trigger-criteria').find('#trigger-criteria-type option').filter(function () {
+                    return ($(this).val().toLowerCase() == (selectedCriteria.toLowerCase()));
+                }).prop('selected', true);
+
+                $('#trigger-criteria-content input[type="text"]').val(triggerCriteria);
+                showTriggerCriteriaDescription(triggerObject, selectedCriteria)
+            }
+
+            //onchange of the triggerCriteria-type selection
+            $('#trigger-criteria-type').change(function () {
+                renderTriggerCriteriaContent(this.value);
+                showTriggerCriteriaDescription(triggerObject, this.value)
+                if (triggerCriteria && this.value === selectedCriteria) {
+                    if (this.value !== Constants.START) {
+                        $('#trigger-criteria-content input[type="text"]').val(at);
+                    }
+                } else {
+                    if (this.value !== Constants.START) {
+                        var triggerCriteriaObject = getTriggerCriteria(triggerObject, this.value);
+                        $('#trigger-criteria-content input[type="text"]').val(triggerCriteriaObject.defaultValue);
+                    }
+                }
+            });
 
             // 'Submit' button action
             var submitButtonElement = $(formContainer).find('#btn-submit')[0];
             submitButtonElement.addEventListener('click', function () {
 
-                var errors = editor.validate();
-                if (errors.length) {
+                //clear the error classes
+                $('.error-message').text("");
+                $('.required-input-field').removeClass('required-input-field');
+                var isErrorOccurred = false;
+
+                var triggerName = $('#triggerName').val().trim();
+                var triggerNameErrorMessage = $('#define-trigger-name').find('.error-message');
+                // to check if trigger name is empty
+                if (triggerName == "") {
+                    addErrorClass('#triggerName');
+                    triggerNameErrorMessage.text("Trigger name is required.");
+                    isErrorOccurred = true;
                     return;
                 }
-                var isTriggerNameUsed = self.formUtils.isDefinitionElementNameUsed(editor.getValue().name,
-                    clickedElement.getId());
-                if (isTriggerNameUsed) {
-                    DesignViewUtils.prototype
-                        .errorAlert("Trigger name \"" + editor.getValue().name + "\" is already used.");
-                    return;
-                }
-                self.designViewContainer.removeClass('disableContainer');
-                self.toggleViewButton.removeClass('disableContainer');
-
-                // set the isDesignViewContentChanged to true
-                self.configurationData.setIsDesignViewContentChanged(true);
-
-                var config = editor.getValue();
-
                 var previouslySavedName = clickedElement.getName();
+                if (!previouslySavedName) {
+                    previouslySavedName = "";
+                }
                 // update connection related to the element if the name is changed
-                if (previouslySavedName !== config.name) {
-                    // update selected trigger model
-                    clickedElement.setName(config.name);
-                    self.formUtils.updateConnectionsAfterDefinitionElementNameChange(id);
+                if (previouslySavedName !== triggerName) {
+
+                    //check if name is already used
+                    var isTriggerNameUsed = self.formUtils.isDefinitionElementNameUsed(triggerName,
+                        clickedElement.getId());
+                    if (isTriggerNameUsed) {
+                        addErrorClass('#triggerName');
+                        triggerNameErrorMessage.text("Trigger name is already used.");
+                        isErrorOccurred = true;
+                        return;
+                    }
+                    //to check if trigger name contains white spaces
+                    if (triggerName.indexOf(' ') >= 0) {
+                        addErrorClass('#triggerName');
+                        triggerNameErrorMessage.text("Trigger name cannot have white space.");
+                        isErrorOccurred = true;
+                        return;
+                    }
+                    //to check if trigger name starts with an alphabetic character
+                    if (!(Constants.ALPHABETIC_VALIDATOR_REGEX).test(triggerName.charAt(0))) {
+                        addErrorClass('#triggerName');
+                        triggerNameErrorMessage.text("Trigger name must start with an alphabetic character.");
+                        isErrorOccurred = true;
+                        return;
+                    }
                 }
 
-                clickedElement.setAt(config.at);
+                var selectedCriteriaType = $('#trigger-criteria-type').val();
+                var triggerCriteria;
+                if (selectedCriteriaType !== Constants.START) {
+                    triggerCriteria = $('#trigger-criteria-content input[type="text"]').val().trim();
+                    if (triggerCriteria === "") {
+                        addErrorClass($('#trigger-criteria-content input[type="text"]'));
+                        $('#trigger-criteria-content').find('.error-message').text("Value is required");
+                        isErrorOccurred = true;
+                        return;
+                    }
+                }
 
-                clickedElement.clearAnnotationList();
-                _.forEach(config.annotations, function (annotation) {
-                    clickedElement.addAnnotation(annotation.annotation);
-                });
+                if (!isErrorOccurred) {
+                    if (previouslySavedName !== triggerName) {
+                        // update selected trigger model
+                        clickedElement.setName(triggerName);
+                        self.formUtils.updateConnectionsAfterDefinitionElementNameChange(id);
 
-                var textNode = $(element).parent().find('.triggerNameNode');
-                textNode.html(config.name);
+                        var textNode = $(element).parent().find('.triggerNameNode');
+                        textNode.html(triggerName);
+                    }
+                    var triggerCriteriaType;
+                    if (selectedCriteriaType === Constants.START) {
+                        triggerCriteria = Constants.START
+                        triggerCriteriaType = Constants.AT
+                    } else if (selectedCriteriaType === Constants.CRON_EXPRESSION) {
+                        triggerCriteria = triggerCriteria;
+                        triggerCriteriaType = Constants.AT;
+                    } else {
+                        triggerCriteria = Constants.EVERY + " " + triggerCriteria;
+                        triggerCriteriaType = Constants.EVERY;
+                    }
+                    clickedElement.setCriteria(triggerCriteria);
+                    clickedElement.setCriteriaType(triggerCriteriaType);
 
-                //Send trigger element to the backend and generate tooltip
-                var triggerToolTip = self.formUtils.getTooltip(clickedElement, Constants.TRIGGER);
-                $('#' + id).prop('title', triggerToolTip);
+                    self.designViewContainer.removeClass('disableContainer');
+                    self.toggleViewButton.removeClass('disableContainer');
+                    $('#' + id).removeClass('incomplete-element');
+                    //Send trigger element to the backend and generate tooltip
+                    var triggerToolTip = self.formUtils.getTooltip(clickedElement, Constants.TRIGGER);
+                    $('#' + id).prop('title', triggerToolTip);
 
-                // close the form window
-                self.consoleListManager.removeFormConsole(formConsole);
+                    // set the isDesignViewContentChanged to true
+                    self.configurationData.setIsDesignViewContentChanged(true);
+
+                    // close the form window
+                    self.consoleListManager.removeFormConsole(formConsole);
+                }
             });
 
             // 'Cancel' button action
@@ -258,7 +308,6 @@ define(['require', 'log', 'jquery', 'lodash', 'trigger', 'designViewUtils', 'con
             cancelButtonElement.addEventListener('click', function () {
                 self.designViewContainer.removeClass('disableContainer');
                 self.toggleViewButton.removeClass('disableContainer');
-
                 // close the form window
                 self.consoleListManager.removeFormConsole(formConsole);
             });
@@ -266,3 +315,4 @@ define(['require', 'log', 'jquery', 'lodash', 'trigger', 'designViewUtils', 'con
 
         return TriggerForm;
     });
+

@@ -22,6 +22,7 @@ import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhiel
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.StreamConfig;
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.query.QueryConfig;
 import org.wso2.carbon.siddhi.editor.core.util.designview.constants.query.QueryListType;
+import org.wso2.siddhi.query.api.annotation.Annotation;
 
 import java.util.HashMap;
 import java.util.List;
@@ -35,6 +36,7 @@ public class PartitionConfig extends SiddhiElementConfig {
     private List<StreamConfig> streamList;
     private List<PartitionWithElement> partitionWith;
     private List<String> annotationList;
+    private List<Annotation> annotationListObjects;
     private Map<String, String> connectorsAndStreams = new HashMap<>();
 
     public Map<QueryListType, List<QueryConfig>> getQueryLists() {
@@ -51,6 +53,10 @@ public class PartitionConfig extends SiddhiElementConfig {
 
     public List<String> getAnnotationList() {
         return annotationList;
+    }
+
+    public List<Annotation> getAnnotationListObjects() {
+        return annotationListObjects;
     }
 
     public Map<String, String> getConnectorsAndStreams() {
@@ -76,4 +82,9 @@ public class PartitionConfig extends SiddhiElementConfig {
     public void setConnectorsAndStreams(Map<String, String> connectorsAndStreams) {
         this.connectorsAndStreams = connectorsAndStreams;
     }
+
+    public void setAnnotationListObjects(List<Annotation> annotationListObjects) {
+        this.annotationListObjects = annotationListObjects;
+    }
+
 }

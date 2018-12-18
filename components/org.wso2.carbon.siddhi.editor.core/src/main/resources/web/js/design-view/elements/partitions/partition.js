@@ -45,6 +45,7 @@ define(['require', 'elementUtils', 'lodash'],
                     ...
                 ],
                 annotationList: {Annotation JSON Array}
+                annotationListObjects: {Annotation Json Array of objects}
             */
             if (options !== undefined) {
                 this.id = options.id;
@@ -59,11 +60,16 @@ define(['require', 'elementUtils', 'lodash'],
             };
             this.partitionWith = [];
             this.annotationList = [];
+            this.annotationListObjects = [];
         };
 
         Partition.prototype.addAnnotation = function (annotation) {
             this.annotationList.push(annotation);
         };
+
+        Partition.prototype.addAnnotationObject = function (annotation) {
+            this.annotationListObjects.push(annotation)
+        }
 
         Partition.prototype.addStream = function (stream) {
             this.streamList.push(stream);
@@ -92,6 +98,11 @@ define(['require', 'elementUtils', 'lodash'],
         Partition.prototype.clearAnnotationList = function () {
             ElementUtils.prototype.removeAllElements(this.annotationList);
         };
+
+        Partition.prototype.clearAnnotationListObjects = function () {
+            ElementUtils.prototype.removeAllElements(this.annotationListObjects);
+        };
+
 
         Partition.prototype.clearPartitionWith = function () {
             ElementUtils.prototype.removeAllElements(this.partitionWith);
@@ -195,6 +206,10 @@ define(['require', 'elementUtils', 'lodash'],
             return this.annotationList;
         };
 
+        Partition.prototype.getAnnotationListObjects = function () {
+			return this.annotationListObjects;
+		};
+
         Partition.prototype.setId = function (id) {
             this.id = id;
         };
@@ -206,6 +221,11 @@ define(['require', 'elementUtils', 'lodash'],
         Partition.prototype.setAnnotationList = function (annotationList) {
             this.annotationList = annotationList;
         };
+
+        Partition.prototype.setAnnotationListObjects = function (annotationListObjects) {
+                    this.annotationListObjects = annotationListObjects;
+                };
+
 
         Partition.prototype.checkOuterStreamIsAlreadyConnected = function (streamName) {
             var self = this;

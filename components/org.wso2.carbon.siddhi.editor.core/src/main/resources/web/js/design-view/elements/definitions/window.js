@@ -46,11 +46,12 @@ define(['require', 'elementUtils'],
                 this.id = options.id;
                 this.previousCommentSegment = options.previousCommentSegment;
                 this.name = options.name;
-                this.function = options.function;
+                this.type = options.type;
                 this.parameters = options.parameters;
                 this.outputEventType
                     = (options.outputEventType !== undefined) ? (options.outputEventType).toUpperCase() : undefined;
             }
+            this.annotationListObjects = [];
             this.attributeList = [];
             this.annotationList = [];
         };
@@ -59,12 +60,20 @@ define(['require', 'elementUtils'],
             this.attributeList.push(attribute);
         };
 
+        Window.prototype.addAnnotationObject = function (annotation) {
+            this.annotationListObjects.push(annotation)
+        };
+
         Window.prototype.addAnnotation = function (annotation) {
             this.annotationList.push(annotation);
         };
 
         Window.prototype.clearAnnotationList = function () {
             ElementUtils.prototype.removeAllElements(this.annotationList);
+        };
+
+        Window.prototype.clearAnnotationListObjects = function () {
+            ElementUtils.prototype.removeAllElements(this.annotationListObjects);
         };
 
         Window.prototype.clearAttributeList = function () {
@@ -83,8 +92,8 @@ define(['require', 'elementUtils'],
             return this.attributeList;
         };
 
-        Window.prototype.getFunction = function () {
-            return this.function;
+        Window.prototype.getType = function () {
+            return this.type;
         };
 
         Window.prototype.getParameters = function () {
@@ -99,6 +108,10 @@ define(['require', 'elementUtils'],
             return this.annotationList;
         };
 
+        Window.prototype.getAnnotationListObjects = function () {
+            return this.annotationListObjects;
+        };
+
         Window.prototype.setId = function (id) {
             this.id = id;
         };
@@ -111,8 +124,8 @@ define(['require', 'elementUtils'],
             this.attributeList = attributeList;
         };
 
-        Window.prototype.setFunction = function (functionName) {
-            this.function = functionName;
+        Window.prototype.setType = function (type) {
+            this.type = type;
         };
 
         Window.prototype.setParameters = function (parameters) {
