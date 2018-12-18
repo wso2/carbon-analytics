@@ -16,7 +16,7 @@
  * under the License.
  */
 
-.source-view-enabled {
+ .source-view-enabled {
     height: 100%;
 }
 
@@ -474,7 +474,7 @@ h3,
     font-size: 14px;
 }
 .design-view-form-content h4 {
-    font-size: 12px;
+	font-size: 12px;
 }
 
 .design-view-form-content .form-control {
@@ -601,18 +601,18 @@ a.list-group-item, button.list-group-item {
 }
 
 .incomplete-element {
-    border: 1px solid yellow;
-    box-shadow: 0 0 1px 2px yellow;
+	border: 1px solid yellow;
+	box-shadow: 0 0 1px 2px yellow;
 }
 
 .error-element {
-    border: 1px solid #FF0000;
-    box-shadow: 0 0 1px 2px #FF0000;
+	border: 1px solid #FF0000;
+	box-shadow: 0 0 1px 2px #FF0000;
 }
 
 .js-tree-error-node {
-    border: 1px solid red;
-    background: red;
+	border: 1px solid red;
+	background: red;
 }
 
 .design-view-form-content input[type="text"].required-input-field {
@@ -667,9 +667,9 @@ a.list-group-item, button.list-group-item {
 }
 
 .table-form-container input[type="text"].annotation-value {
-    margin-bottom: 2px;
-    margin-left: 20px;
-}
+ 	margin-bottom: 2px;
+	margin-left: 20px;
+ }
 
 .design-view-form-content .attr-nav {
 	margin-left: 10px;
@@ -685,28 +685,17 @@ a.list-group-item, button.list-group-item {
 	background: #424242;
 	color: #ccc;
 	border: 1px solid #716e6e;
-.stream-form-container .attribute .attr-nav  a,
-.table-form-container .attribute .attr-nav  a {
-    float: left;
-    display: inline-block;
-    height: 22px;
-    padding: 0 5px;
-    margin-left: 3px;
-    margin-top: 2px;
-    background: #424242;
-    color: #ccc;
-    border: 1px solid #716e6e;
 }
 
 .design-view-form-content .btn-del-option,
 .window-form-container .btn-del-parameter,
 .table-form-container .btn-del-annot-value {
-    display: inline-block;
-    height: 21px;
-    padding: 0 8px;
-    background: #424242;
-    margin-left: 3px;
-    border: 1px solid #716e6e;
+	display: inline-block;
+	height: 21px;
+	padding: 0 8px;
+	background: #424242;
+	margin-left: 3px;
+	border: 1px solid #716e6e;
 }
 
 .source-sink-form-container input[type="text"].readonly-attr,
@@ -731,9 +720,9 @@ a.list-group-item, button.list-group-item {
 }
 
 .clearfix {
-    display: block;
-    content: "";
-    clear: both;
+	display: block;
+	content: "";
+	clear: both;
 }
 
 .design-view-form-content .fw-delete {
@@ -857,20 +846,20 @@ a.list-group-item, button.list-group-item {
 
 .design-view-form-content .source-div,
 .design-view-form-content .sink-div {
-    width: 45%;
+	width: 45%;
 }
 
 .design-view-form-content .table-div {
-    width: 25%;
+	width: 25%;
 }
 
 .design-view-form-content .mapper-div {
-    width: 25% ;
+	width: 25% ;
 }
 
 .design-view-form-content .store-div {
-    width: 40%;
-    margin-top: 20px;
+	width: 40%;
+	margin-top: 20px;
 }
 
 .design-view-form-content .define-table-annotation {
@@ -880,7 +869,7 @@ a.list-group-item, button.list-group-item {
 }
 
 .table-form-container #table-annotations .table-annotation {
-    margin-bottom: 10px;
+	margin-bottom: 10px;
 }
 
 .design-view-form-content .attribute-map-div {
@@ -891,13 +880,13 @@ a.list-group-item, button.list-group-item {
 .table-form-container #store-options,
 .source-sink-form-container #source-options,
 .source-sink-form-container #sink-options {
-    display: flex;
+	display: flex;
 }
 
 .table-form-container .sub-store-options-div,
 .source-sink-form-container .sub-source-options-div,
 .source-sink-form-container .sub-sink-options-div {
-    width: 50%;
+	width: 50%;
 }
 
 .design-view-form-content #btn-submit,
@@ -980,20 +969,20 @@ a.list-group-item, button.list-group-item {
 .source-sink-form-container #attribute-map-label:hover,
 .table-form-container .rdbms-type,
 .table-form-container #table-annotations .annotation-name {
-    cursor: pointer;
+	cursor: pointer;
 }
 
 .source-sink-form-container .attribute-labels {
-    margin-top: 10px;
+	margin-top: 10px;
 }
 
 .design-view-form-content label {
-    word-break: break-all;
+   word-break: break-all;
 }
 
 .table-form-container .rdbms-type {
-    margin-right: 10px;
-    margin-top: 10px;
+	margin-right: 10px;
+	margin-top: 10px;
 }
 
 .selector {
