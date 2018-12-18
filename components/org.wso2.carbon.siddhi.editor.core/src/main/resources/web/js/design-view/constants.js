@@ -42,6 +42,7 @@ define(function () {
         MAP: "map",
         LIST: "list",
         MAPPER: "mapper",
+        STORE: "store",
         AGGREGATION: "aggregation",
         FUNCTION: "function",
         SINK: "sink",

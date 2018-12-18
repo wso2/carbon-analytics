@@ -86,7 +86,7 @@ define(['log', 'jquery', 'lodash', 'attribute', 'storeAnnotation', 'designViewUt
          * @param {Object} predefinedOptions set of predefined option
          * @return {boolean} isError
          */
-        var validateOptions = function (optionsMap, predefinedOptions) {
+        var validateOptions = function (predefinedOptions) {
             var isError = false;
             $('#define-store-options #store-options .option').each(function () {
                 var option = $(this).find('.option-name');
@@ -999,12 +999,12 @@ define(['log', 'jquery', 'lodash', 'attribute', 'storeAnnotation', 'designViewUt
 
             //render the template to  generate the store types
             var storeFormTemplate = Handlebars.compile($('#type-selection-form-template').html());
-            var wrappedHtml = storeFormTemplate({ id: "store", types: predefinedStores });
+            var wrappedHtml = storeFormTemplate({ id: Constants.STORE, types: predefinedStores });
             $('#define-store').html(wrappedHtml);
 
             $('#define-rdbms-type').on('change', '[name=radioOpt]', function () {
                 var dataStoreOptions = getRdbmsOptions(storeOptionsWithValues);
-                renderOptions(dataStoreOptions, customizedStoreOptions, "store")
+                renderOptions(dataStoreOptions, customizedStoreOptions, Constants.STORE)
             });
 
 
@@ -1030,9 +1030,9 @@ define(['log', 'jquery', 'lodash', 'attribute', 'storeAnnotation', 'designViewUt
                     renderRdbmsTypes();
                     checkRdbmsType(storeOptionsWithValues);
                     var dataStoreOptions = getRdbmsOptions(storeOptionsWithValues);
-                    renderOptions(dataStoreOptions, customizedStoreOptions, "store");
+                    renderOptions(dataStoreOptions, customizedStoreOptions, Constants.STORE);
                 } else {
-                    renderOptions(storeOptionsWithValues, customizedStoreOptions, "store");
+                    renderOptions(storeOptionsWithValues, customizedStoreOptions, Constants.STORE);
                 }
             } else {
                 //if table form is freshly opened [ new table object]
@@ -1050,13 +1050,12 @@ define(['log', 'jquery', 'lodash', 'attribute', 'storeAnnotation', 'designViewUt
                     storeOptionsWithValues = mapUserOptionValues(storeOptions, savedStoreOptions);
                     if (this.value == Constants.RDBMS_STORE_TYPE) {
                         $('#define-rdbms-type').show();
-                        renderRdbmsTypes();
                         var dataStoreOptions = getRdbmsOptions(storeOptionsWithValues);
-                        checkRdbmsType(dataStoreOptions);
-                        renderOptions(dataStoreOptions, customizedStoreOptions, "store");
+                        renderOptions(dataStoreOptions, customizedStoreOptions, Constants.STORE);
+                        checkRdbmsType(storeOptionsWithValues);
                     } else {
                         $('#define-rdbms-type').hide();
-                        renderOptions(storeOptionsWithValues, customizedStoreOptions, "store");
+                        renderOptions(storeOptionsWithValues, customizedStoreOptions, Constants.STORE);
                     }
                 } else {
                     storeOptions = getSelectedTypeOptions(this.value, predefinedStores);
@@ -1067,11 +1066,11 @@ define(['log', 'jquery', 'lodash', 'attribute', 'storeAnnotation', 'designViewUt
                         //as default select the data-store type
                         $("#define-rdbms-type input[name=radioOpt][value='inline-config']").prop("checked", true);
                         var dataStoreOptions = getRdbmsOptions(storeOptionsWithValues);
-                        renderOptions(dataStoreOptions, customizedStoreOptions, "store")
+                        renderOptions(dataStoreOptions, customizedStoreOptions, Constants.STORE)
                         $('#define-rdbms-type').show();
                     } else {
                         $('#define-rdbms-type').hide();
-                        renderOptions(storeOptionsWithValues, customizedStoreOptions, "store");
+                        renderOptions(storeOptionsWithValues, customizedStoreOptions, Constants.STORE);
                     }
                 }
             });
