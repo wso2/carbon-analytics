@@ -38,73 +38,69 @@ define(['require', 'log', 'jquery', 'lodash', 'trigger', 'designViewUtils', 'con
 
 
         /**
-         * Function to render the drop down for trigger-at
-         * @param {Object} triggerCriteria array of trigger criteria [at]
+         * Function to render the drop down for trigger-criteria
+         * @param {Object} triggerObject array of trigger criteria
          */
-        var renderAt = function (triggerCriteria) {
-            var atPropertyDiv = '<h4> Trigger Criteria </h4> <select id = "at-type">';
-            _.forEach(triggerCriteria, function (triggerAt) {
-                atPropertyDiv += '<option value = "' + triggerAt.name + '">' + triggerAt.name + '</option>';
+        var renderTriggerCriteria = function (triggerObject) {
+            var triggerCriteriaDiv = '<h4> Trigger Criteria </h4> <select id = "trigger-criteria-type">';
+            _.forEach(triggerObject, function (triggerCriteria) {
+                triggerCriteriaDiv += '<option value = "' + triggerCriteria.name + '">' + triggerCriteria.name + '</option>';
             });
-            atPropertyDiv += '</select> <i class = "fw fw-info"> ' +
-                '<span style = "display:none" class = "at-description"> {{description}} </span> </i>';
-            $('#define-trigger-at').html(atPropertyDiv);
+            triggerCriteriaDiv += '</select> <i class = "fw fw-info"> ' +
+                '<span style = "display:none" class = "criteria-description"> </span> </i>';
+            $('#define-trigger-criteria').html(triggerCriteriaDiv);
         };
 
         /**
-         * Function to render a textbox according to the selected at-type
-         * @param {String} selectedAtType selected at type from the select-box
+         * Function to render a textbox according to the selected criteria-type
+         * @param {String} selectedCriteriaType selected criteria type from the select-box
          */
-        var renderAtContent = function (selectedAtType) {
-            if (selectedAtType === Constants.START) {
+        var renderTriggerCriteriaContent = function (selectedCriteriaType) {
+            if (selectedCriteriaType === Constants.START) {
                 //show no text-box
-                $('#trigger-at-content').html('');
+                $('#trigger-criteria-content').html('');
             } else {
                 //render a text-box to put the atEvery or cron-expression value
-                $('#trigger-at-content').html('<input type="text" class="clearfix"> ' +
+                $('#trigger-criteria-content').html('<input type="text" class="clearfix"> ' +
                     '<label class="error-message" > </label>');
             }
         };
 
         /**
          * Function to obtain a particular trigger object from the predefined triggers
-         * @param {Object} triggerCriteria predefined trigger criteria
+         * @param {Object} triggerObject predefined trigger object
          * @param {String} selectedCriteria selected trigger criteria
          * @return {Object} triggerCriteriaObject
          */
-        var getTriggerCriteria = function (triggerCriteria, selectedCriteria) {
+        var getTriggerCriteria = function (triggerObject, selectedCriteria) {
             var triggerCriteriaObject =
-                _.find(triggerCriteria, function (criteria) {
+                _.find(triggerObject, function (criteria) {
                     return criteria.name == selectedCriteria
                 });
             return triggerCriteriaObject;
         };
 
         /**
-         * Function to determine the at-type
-         * @param {String} at at value
-         * @param {String} atOrAtEvery at or atEvery
-         * @return {String} selectedAtType
+         * Function to determine the trigger-criteria-type
+         * @param {String} triggerCriteria criteria value
+         * @param {String} triggerCriteriaType at or every
+         * @return {String} criteriaType
          */
-        var determineAt = function (at, atOrAtEvery) {
-            var selectedAtType;
-            if (atOrAtEvery === Constants.AT) {
-                //check if at-type is start
-                if (at.toLowerCase() === Constants.START) {
-                    selectedAtType = Constants.START;
-                    renderAtContent(selectedAtType);
-                    return selectedAtType;
+        var determineCriteriaType = function (triggerCriteria, triggerCriteriaType) {
+            if (triggerCriteriaType === Constants.AT) {
+                if (triggerCriteria.toLowerCase() === Constants.START) {
+                    //criteria-type is start
+                    renderTriggerCriteriaContent(Constants.START);
+                    return Constants.START;
                 } else {
                     //cron expression
-                    selectedAtType = Constants.CRON_EXPRESSION;
-                    renderAtContent(selectedAtType);
-                    return selectedAtType;
+                    renderTriggerCriteriaContent(Constants.CRON_EXPRESSION);
+                    return Constants.CRON_EXPRESSION;
                 }
             } else {
                 //atEvery
-                selectedAtType = Constants.EVERY;
-                renderAtContent(selectedAtType);
-                return selectedAtType;
+                renderTriggerCriteriaContent(Constants.EVERY);
+                return Constants.EVERY;
             }
         };
 
@@ -119,12 +115,12 @@ define(['require', 'log', 'jquery', 'lodash', 'trigger', 'designViewUtils', 'con
 
         /**
         * Function to show the trigger criteria description
-        * @param {Object} triggerCriteria predefined trigger criteria
+        * @param {Object} triggerCriteria predefined trigger object
         * @param {String} selected trigger criteria
         */
-        var showTriggerCriteriaDescription = function (triggerCriteria, selectedCriteria) {
-            var triggerCriteriaObject = getTriggerCriteria(triggerCriteria, selectedCriteria);
-            $('#define-trigger-at .at-description').text(triggerCriteriaObject.description);
+        var showTriggerCriteriaDescription = function (triggerObject, selectedCriteria) {
+            var triggerCriteriaObject = getTriggerCriteria(triggerObject, selectedCriteria);
+            $('#define-trigger-criteria .criteria-description').text(triggerCriteriaObject.description);
         };
 
         /**
@@ -140,8 +136,8 @@ define(['require', 'log', 'jquery', 'lodash', 'trigger', 'designViewUtils', 'con
                 '<input type="text" id="triggerName" class="clearfix"> <label class="error-message" > </label> </div>' +
                 '<button id="btn-submit" type="button" class="btn toggle-view-button"> Submit </button> ' +
                 '<button id="btn-cancel" type="button" class="btn btn-default"> Cancel </button> </div>' +
-                '<div class = "trigger-form-container"> <div id= "define-trigger-at"> </div>' +
-                '<div id = "trigger-at-content" ></div> </div>');
+                '<div class = "trigger-form-container"> <div id= "define-trigger-criteria"> </div>' +
+                '<div id = "trigger-criteria-content" ></div> </div>');
             formContainer.append(propertyDiv);
             self.designViewContainer.addClass('disableContainer');
             self.toggleViewButton.addClass('disableContainer');
@@ -153,57 +149,56 @@ define(['require', 'log', 'jquery', 'lodash', 'trigger', 'designViewUtils', 'con
             // retrieve the trigger information from the collection
             var clickedElement = self.configurationData.getSiddhiAppConfig().getTrigger(id);
             var name = clickedElement.getName();
-            var triggerCriteria = self.configurationData.application.config.trigger;
-            renderAt(triggerCriteria);
+            var triggerObject = self.configurationData.application.config.trigger;
+            renderTriggerCriteria(triggerObject);
 
-            //Event listener to show the at description
-            $('#define-trigger-at').on('mouseover', '.fw-info', function () {
-                $(this).find('.at-description').show();
+            //Event listener to show the criteria description
+            $('#define-trigger-criteria').on('mouseover', '.fw-info', function () {
+                $(this).find('.criteria-description').show();
             });
 
-            //Event listener to hide the at description
-            $('#define-trigger-at').on('mouseout', '.fw-info', function () {
-                $(this).find('.at-description').hide();
+            //Event listener to hide the criteria description
+            $('#define-trigger-criteria').on('mouseout', '.fw-info', function () {
+                $(this).find('.criteria-description').hide();
             });
-
 
             if (name) {
                 //if the trigger object is already edited
                 $('#triggerName').val(name.trim());
-                var atOrAtEvery = clickedElement.getAtOrAtEvery().trim();
-                var at = clickedElement.getAt().trim();
-                if (atOrAtEvery === Constants.AT) {
-                    if (at.indexOf("'") >= 0 || at.indexOf('"') >= 0) {
+                var triggerCriteriaType = clickedElement.getCriteriaType().trim();
+                var triggerCriteria = clickedElement.getCriteria().trim();
+                if (triggerCriteriaType === Constants.AT) {
+                    if (triggerCriteria.indexOf("'") >= 0 || triggerCriteria.indexOf('"') >= 0) {
                         //to remove the string quote from the start and cron expression
-                        at = at.slice(1, at.length - 1);
+                        triggerCriteria = triggerCriteria.slice(1, triggerCriteria.length - 1);
                     }
                 } else {
                     //remove every from atEvery's value
-                    var replaceEvery = at;
-                    at = replaceEvery.replace(Constants.EVERY, '');
+                    var replaceEvery = triggerCriteria;
+                    triggerCriteria = replaceEvery.replace(Constants.EVERY, '');
                 }
-                at = at.trim();
-                var selectedAtType = determineAt(at, atOrAtEvery);
-                $('#define-trigger-at').find('#at-type option').filter(function () {
-                    return ($(this).val().toLowerCase() == (selectedAtType.toLowerCase()));
+                triggerCriteria = triggerCriteria.trim();
+                var selectedCriteria = determineCriteriaType(triggerCriteria, triggerCriteriaType);
+                $('#define-trigger-criteria').find('#trigger-criteria-type option').filter(function () {
+                    return ($(this).val().toLowerCase() == (selectedCriteria.toLowerCase()));
                 }).prop('selected', true);
 
-                $('#trigger-at-content input[type="text"]').val(at);
-                showTriggerCriteriaDescription(triggerCriteria, selectedAtType)
+                $('#trigger-criteria-content input[type="text"]').val(triggerCriteria);
+                showTriggerCriteriaDescription(triggerObject, selectedCriteria)
             }
 
-            //onchange of the at-type selection
-            $('#at-type').change(function () {
-                renderAtContent(this.value);
-                showTriggerCriteriaDescription(triggerCriteria, this.value)
-                if (at && this.value === selectedAtType) {
+            //onchange of the triggerCriteria-type selection
+            $('#trigger-criteria-type').change(function () {
+                renderTriggerCriteriaContent(this.value);
+                showTriggerCriteriaDescription(triggerObject, this.value)
+                if (triggerCriteria && this.value === selectedCriteria) {
                     if (this.value !== Constants.START) {
-                        $('#trigger-at-content input[type="text"]').val(at);
+                        $('#trigger-criteria-content input[type="text"]').val(at);
                     }
                 } else {
                     if (this.value !== Constants.START) {
-                        var triggerCriteriaObject = getTriggerCriteria(triggerCriteria, this.value);
-                        $('#trigger-at-content input[type="text"]').val(triggerCriteriaObject.defaultValue);
+                        var triggerCriteriaObject = getTriggerCriteria(triggerObject, this.value);
+                        $('#trigger-criteria-content input[type="text"]').val(triggerCriteriaObject.defaultValue);
                     }
                 }
             });
@@ -258,13 +253,13 @@ define(['require', 'log', 'jquery', 'lodash', 'trigger', 'designViewUtils', 'con
                     }
                 }
 
-                var selectedAtType = $('#at-type').val();
-                var at;
-                if (selectedAtType !== Constants.START) {
-                    at = $('#trigger-at-content input[type="text"]').val().trim();
-                    if (at === "") {
-                        addErrorClass($('#trigger-at-content input[type="text"]'));
-                        $('#trigger-at-content').find('.error-message').text("Value is required");
+                var selectedCriteriaType = $('#trigger-criteria-type').val();
+                var triggerCriteria;
+                if (selectedCriteriaType !== Constants.START) {
+                    triggerCriteria = $('#trigger-criteria-content input[type="text"]').val().trim();
+                    if (triggerCriteria === "") {
+                        addErrorClass($('#trigger-criteria-content input[type="text"]'));
+                        $('#trigger-criteria-content').find('.error-message').text("Value is required");
                         isErrorOccurred = true;
                         return;
                     }
@@ -279,19 +274,19 @@ define(['require', 'log', 'jquery', 'lodash', 'trigger', 'designViewUtils', 'con
                         var textNode = $(element).parent().find('.triggerNameNode');
                         textNode.html(triggerName);
                     }
-                    var atOrAtEvery;
-                    if (selectedAtType === Constants.START) {
-                        at = Constants.START
-                        atOrAtEvery = Constants.AT
-                    } else if (selectedAtType === Constants.CRON_EXPRESSION) {
-                        at = at;
-                        atOrAtEvery = Constants.AT;
+                    var triggerCriteriaType;
+                    if (selectedCriteriaType === Constants.START) {
+                        triggerCriteria = Constants.START
+                        triggerCriteriaType = Constants.AT
+                    } else if (selectedCriteriaType === Constants.CRON_EXPRESSION) {
+                        triggerCriteria = triggerCriteria;
+                        triggerCriteriaType = Constants.AT;
                     } else {
-                        at = Constants.EVERY + " " + at;
-                        atOrAtEvery = Constants.EVERY;
+                        triggerCriteria = Constants.EVERY + " " + triggerCriteria;
+                        triggerCriteriaType = Constants.EVERY;
                     }
-                    clickedElement.setAt(at);
-                    clickedElement.setAtOrAtEvery(atOrAtEvery);
+                    clickedElement.setCriteria(triggerCriteria);
+                    clickedElement.setCriteriaType(triggerCriteriaType);
 
                     self.designViewContainer.removeClass('disableContainer');
                     self.toggleViewButton.removeClass('disableContainer');

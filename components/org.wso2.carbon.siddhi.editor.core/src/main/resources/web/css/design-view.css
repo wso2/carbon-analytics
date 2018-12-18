@@ -660,7 +660,7 @@ a.list-group-item, button.list-group-item {
 	margin-left: 20px;
 }
 
-.trigger-form-container #trigger-at-content .description {
+.trigger-form-container #trigger-criteria-content .description {
 	font-size: 12px;
 	margin-left: 5px;
 	color: #ccc;
@@ -833,7 +833,7 @@ a.list-group-item, button.list-group-item {
 	width: 25%;
 }
 
-.trigger-form-container #define-trigger-at {
+.trigger-form-container #define-trigger-criteria {
 	margin-top: -3px;
 	margin-bottom: 10px;
 }
@@ -926,7 +926,7 @@ a.list-group-item, button.list-group-item {
 
 .design-view-form-content .option .option-desc-content,
 .design-view-form-content .parameter .parameter-desc-content,
-.trigger-form-container #define-trigger-at .at-description {
+.trigger-form-container #define-trigger-criteria .criteria-description {
 	 font-family: Arial;
 	 background: #252525;
 	 width: 250px;
