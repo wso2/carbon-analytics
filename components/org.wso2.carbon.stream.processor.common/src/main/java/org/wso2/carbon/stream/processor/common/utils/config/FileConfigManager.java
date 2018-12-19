@@ -96,8 +96,19 @@ public class FileConfigManager implements ConfigManager {
 
     @Override
     public String extractProperty(String name) {
+        String property = null;
         if (configProvider != null) {
-            if ("shardId".equalsIgnoreCase(name)) {
+            try {
+                RootConfiguration rootConfiguration =
+                        configProvider.getConfigurationObject(RootConfiguration.class);
+                if (null != rootConfiguration && null != rootConfiguration.getProperties()) {
+                    property =  rootConfiguration.getProperties().get(name);
+                }
+            } catch (ConfigurationException e) {
+                LOGGER.error("Could not initiate the siddhi configuration object, " + e.getMessage(), e);
+            }
+
+            if (property == null && "shardId".equalsIgnoreCase(name)) {
                 try {
                     ClusterConfig clusterConfig =
                             configProvider.getConfigurationObject(ClusterConfig.class);
@@ -119,21 +130,11 @@ public class FileConfigManager implements ConfigManager {
                 } catch (ConfigurationException e) {
                     LOGGER.error("Could not initiate the wso2.carbon configuration object, " + e.getMessage(), e);
                 }
-            } else {
-                try {
-                    RootConfiguration rootConfiguration =
-                            configProvider.getConfigurationObject(RootConfiguration.class);
-                    if (null != rootConfiguration && null != rootConfiguration.getProperties()) {
-                        return rootConfiguration.getProperties().get(name);
-                    }
-                } catch (ConfigurationException e) {
-                    LOGGER.error("Could not initiate the siddhi configuration object, " + e.getMessage(), e);
-                }
             }
         }
         if (LOGGER.isDebugEnabled()) {
             LOGGER.debug("Could not find a matching configuration for property name: " + name + "");
         }
-        return null;
+        return property;
     }
 }
