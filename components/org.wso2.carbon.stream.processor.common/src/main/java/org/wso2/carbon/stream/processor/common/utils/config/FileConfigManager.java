@@ -21,10 +21,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.wso2.carbon.config.ConfigurationException;
 import org.wso2.carbon.config.provider.ConfigProvider;
+import org.wso2.carbon.kernel.config.model.CarbonConfiguration;
 import org.wso2.siddhi.core.util.SiddhiConstants;
 import org.wso2.siddhi.core.util.config.ConfigManager;
 import org.wso2.siddhi.core.util.config.ConfigReader;
-import org.wso2.carbon.kernel.config.model.CarbonConfiguration;
+
 import java.util.HashMap;
 import java.util.Map;
 
@@ -89,36 +90,50 @@ public class FileConfigManager implements ConfigManager {
             } catch (ConfigurationException e) {
                 LOGGER.error("Could not initiate the siddhi configuration object, " + e.getMessage(), e);
             }
+        }
+        return new HashMap<>();
+    }
 
-            if (name.equalsIgnoreCase("shardId")) {
-                Map<String, String> configs = new HashMap<>();
+    @Override
+    public String extractProperty(String name) {
+        if (configProvider != null) {
+            if ("shardId".equalsIgnoreCase(name)) {
                 try {
                     ClusterConfig clusterConfig =
                             configProvider.getConfigurationObject(ClusterConfig.class);
                     if (clusterConfig != null) {
                         if (clusterConfig.getGroupId() != null && clusterConfig.isEnabled()) {
-                            configs.put("shardId", clusterConfig.getGroupId());
-                            return configs;
+                            return clusterConfig.getGroupId();
                         }
                     }
                 } catch (ConfigurationException e) {
                     LOGGER.error("Could not initiate the cluster.config configuration object, " + e.getMessage(), e);
                 }
+
                 try {
                     CarbonConfiguration carbonConfiguration =
                             configProvider.getConfigurationObject(CarbonConfiguration.class);
                     if (carbonConfiguration != null && carbonConfiguration.getId() != null) {
-                        configs.put("shardId", carbonConfiguration.getId());
-                        return configs;
+                        return carbonConfiguration.getId();
                     }
                 } catch (ConfigurationException e) {
                     LOGGER.error("Could not initiate the wso2.carbon configuration object, " + e.getMessage(), e);
                 }
+            } else {
+                try {
+                    RootConfiguration rootConfiguration =
+                            configProvider.getConfigurationObject(RootConfiguration.class);
+                    if (null != rootConfiguration && null != rootConfiguration.getProperties()) {
+                        return rootConfiguration.getProperties().get(name);
+                    }
+                } catch (ConfigurationException e) {
+                    LOGGER.error("Could not initiate the siddhi configuration object, " + e.getMessage(), e);
+                }
             }
         }
         if (LOGGER.isDebugEnabled()) {
-            LOGGER.debug("Could not find a matching configuration for ref, name: " + name + "!");
+            LOGGER.debug("Could not find a matching configuration for property name: " + name + "");
         }
-        return new HashMap<>();
+        return null;
     }
 }
