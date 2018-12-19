@@ -529,7 +529,6 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'designViewUtils', 'j
             loadAnnotation();
             checkPredefinedAnnotations(checkedAnnotations);
 
-
             //submit button action
             var submitButtonElement = $(formContainer).find('#btn-submit')[0];
             submitButtonElement.addEventListener('click', function () {
