@@ -288,6 +288,17 @@ define(['require', 'jquery', 'backbone', 'lodash', 'log', 'design_view', "./sour
                             }
                         }
                     });
+                    toggleViewButton.keydown(function (key) {
+                        if (key.keyCode == 13) {
+                            toggleViewButton.click();
+                        }
+                    });
+                    toggleViewButton.focus(function () {
+                        toggleViewButton.addClass("selected-button");
+                    });
+                    toggleViewButton.focusout(function () {
+                        toggleViewButton.removeClass("selected-button");
+                    });
                 },
 
                 getContent: function () {

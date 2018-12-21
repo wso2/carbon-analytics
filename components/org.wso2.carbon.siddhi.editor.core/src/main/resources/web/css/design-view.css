@@ -47,6 +47,7 @@
 .toggle-button-text {
     padding-left: 5px;
 }
+
 .grid-container {
     /* Temp */
     width: calc(100% - 67px);
@@ -234,7 +235,7 @@
     margin-right: 5px;
 }
 
-input{
+input {
 . form-control input-md;
     font-family: inherit;
     font-size: inherit;
@@ -346,7 +347,7 @@ td {
     margin-right: 0;
 }
 
-.partition{
+.partition {
     margin-right: 6px;
 }
 
@@ -462,7 +463,7 @@ h3,
     font-size: 16px;
 }
 
-#siddhi-app-desc-node{
+#siddhi-app-desc-node {
     position: fixed;
     right: 60px;
     top: 97px;
@@ -473,6 +474,7 @@ h3,
 .design-view-form-content h3 {
     font-size: 14px;
 }
+
 .design-view-form-content h4 {
     font-size: 12px;
 }
@@ -527,8 +529,7 @@ a.list-group-item, button.list-group-item {
 .define-window [data-schemapath="root.parameters"] table,
 .define-trigger [data-schemapath="root.annotations"] table,
 .define-partition [data-schemapath="root.annotations"] table,
-.define-partition [data-schemapath="root.partitionKeys"] table
-{
+.define-partition [data-schemapath="root.partitionKeys"] table {
     width: 650px;
 }
 
@@ -543,8 +544,7 @@ a.list-group-item, button.list-group-item {
 .define-window [data-schemapath="root.annotations"] table tr td:first-child,
 .define-window [data-schemapath="root.parameters"] table tr td:first-child,
 .define-trigger [data-schemapath="root.annotations"] table tr td:first-child,
-.define-partition [data-schemapath="root.annotations"] table tr td:first-child
-{
+.define-partition [data-schemapath="root.annotations"] table tr td:first-child {
     width: 508px;
 }
 
@@ -558,23 +558,20 @@ a.list-group-item, button.list-group-item {
 .define-trigger [data-schemapath="root.annotations"] table tr td:nth-child(1),
 .define-trigger [data-schemapath="root.annotations"] table tr td:nth-child(2),
 .define-partition [data-schemapath="root.partitionKeys"] table tr td:nth-child(1),
-.define-partition [data-schemapath="root.partitionKeys"] table tr td:nth-child(2)
-{
+.define-partition [data-schemapath="root.partitionKeys"] table tr td:nth-child(2) {
     width: 254px;
 }
 
 /* 2 column with type field */
 .define-stream [data-schemapath="root.attributes"] table tr td:nth-child(1),
 .define-table [data-schemapath="root.attributes"] table tr td:nth-child(1),
-.define-window [data-schemapath="root.attributes"] table tr td:nth-child(1)
-{
+.define-window [data-schemapath="root.attributes"] table tr td:nth-child(1) {
     width: 428px;
 }
 
 .define-stream [data-schemapath="root.attributes"] table tr td:nth-child(2),
 .define-table [data-schemapath="root.attributes"] table tr td:nth-child(2),
-.define-window [data-schemapath="root.attributes"] table tr td:nth-child(2)
-{
+.define-window [data-schemapath="root.attributes"] table tr td:nth-child(2) {
     width: 80px;
 }
 
@@ -595,8 +592,7 @@ a.list-group-item, button.list-group-item {
 .define-aggregation [data-schemapath="root.annotations"] table thead,
 .define-aggregation [data-schemapath="root.aggregateByTimePeriod"] table thead,
 .define-pattern-query [data-schemapath="root.annotations"] table thead,
-.define-sequence-query [data-schemapath="root.annotations"] table thead
-{
+.define-sequence-query [data-schemapath="root.annotations"] table thead {
     display: none;
 }
 
@@ -622,7 +618,7 @@ a.list-group-item, button.list-group-item {
 }
 
 #stream-form {
-    position:absolute;
+    position: absolute;
 }
 
 .stream-form-container .error-message,
@@ -668,8 +664,8 @@ a.list-group-item, button.list-group-item {
     margin-left: 10px;
 }
 
-.stream-form-container .attribute .attr-nav  a,
-.table-form-container .attribute .attr-nav  a {
+.stream-form-container .attribute .attr-nav a,
+.table-form-container .attribute .attr-nav a {
     float: left;
     display: inline-block;
     height: 22px;
@@ -730,43 +726,43 @@ a.list-group-item, button.list-group-item {
 }
 
 .stream-form-container .attr-nav, .stream-form-container .attr-content,
-.table-form-container .attr-nav, .table-form-container .attr-content{
-    display:inline-block;
-    float:left;
+.table-form-container .attr-nav, .table-form-container .attr-content {
+    display: inline-block;
+    float: left;
 }
 
 .stream-form-container .attribute,
 .source-sink-form-container .attribute,
-.table-form-container .attribute{
+.table-form-container .attribute {
     margin-bottom: 5px;
 }
 
 .stream-form-container .annotation > a > i.jstree-checkbox,
 .stream-form-container .annotation > .jstree-clicked > i.jstree-checkbox,
-.stream-form-container .annotation > i.jstree-checkbox   {
-    display:none;
+.stream-form-container .annotation > i.jstree-checkbox {
+    display: none;
 }
 
 .stream-form-container .annotation-key > a > i.jstree-checkbox,
 .stream-form-container .annotation-key > .jstree-clicked > i.jstree-checkbox,
-.stream-form-container .annotation-key > i.jstree-checkbox   {
-    display:none;
+.stream-form-container .annotation-key > i.jstree-checkbox {
+    display: none;
 }
 
 .stream-form-container .annotation-value > a > i.jstree-checkbox,
 .stream-form-container .annotation-value > .jstree-clicked > i.jstree-checkbox,
-.stream-form-container .annotation-value > i.jstree-checkbox   {
-    display:none;
+.stream-form-container .annotation-value > i.jstree-checkbox {
+    display: none;
 }
 
 .stream-form-container .mandatory-key > a > i.jstree-checkbox,
-.stream-form-container .mandatory-key > .jstree-clicked > i.jstree-checkbox  {
-    display:none;
+.stream-form-container .mandatory-key > .jstree-clicked > i.jstree-checkbox {
+    display: none;
 }
 
 .stream-form-container .mandatory-annotation > a > i.jstree-checkbox,
-.stream-form-container .mandatory-annotation > .jstree-clicked > i.jstree-checkbox  {
-    display:none;
+.stream-form-container .mandatory-annotation > .jstree-clicked > i.jstree-checkbox {
+    display: none;
 }
 
 .stream-form-container .mandatory-annotation > a.jstree-hovered,
@@ -779,16 +775,16 @@ a.list-group-item, button.list-group-item {
 }
 
 .stream-form-container .optional-annotation > a.jstree-hovered,
-.stream-form-container .mandatory-key > a.jstree-hovered{
+.stream-form-container .mandatory-key > a.jstree-hovered {
     cursor: default;
     color: #ccc;
     background: transparent;
     border-radius: 0px;
 }
 
-.stream-form-container  .jstree-clicked {
+.stream-form-container .jstree-clicked {
     background: #5F5B5A;
-    color:black;
+    color: black;
     border-radius: 2px;
     box-shadow: inset 0 0 1px #999999;
 }
@@ -807,24 +803,25 @@ a.list-group-item, button.list-group-item {
 
 .source-sink-form-container .cust-option-key,
 .table-form-container .cust-option-key {
-    margin-left:20px;
+    margin-left: 20px;
 }
+
 .source-sink-form-container .cust-option-value,
 .table-form-container .cust-option-value {
     margin-left: 10px;
 }
 
 .stream-form-container {
-    float:left;
-    display:inline-block;
-    width:50%;
+    float: left;
+    display: inline-block;
+    width: 50%;
     padding: 5px;
 }
 
 .source-sink-form-container,
 .table-form-container {
-    float:left;
-    display:inline-block;
+    float: left;
+    display: inline-block;
     padding: 5px;
 }
 
@@ -838,7 +835,7 @@ a.list-group-item, button.list-group-item {
 }
 
 .design-view-form-content .mapper-div {
-    width: 25% ;
+    width: 25%;
 }
 
 .design-view-form-content .store-div {
@@ -881,7 +878,7 @@ a.list-group-item, button.list-group-item {
 
 .source-sink-form-container input[type="checkbox"],
 .table-form-container input[type="checkbox"],
-.table-form-container input[type="radio"]{
+.table-form-container input[type="radio"] {
     margin: 0px 5px 0px 0;
     vertical-align: middle;
 }
@@ -932,7 +929,7 @@ a.list-group-item, button.list-group-item {
 }
 
 .source-sink-form-container .mandatory-option-symbol,
-.table-form-container .mandatory-option-symbol{
+.table-form-container .mandatory-option-symbol {
     margin-right: 12px;
 }
 
@@ -967,8 +964,8 @@ a.list-group-item, button.list-group-item {
     margin-top: 10px;
 }
 
-.selector{
-    position: fixed;
+.selector {
+    position: absolute;
     background: rgba(0, 0, 255, 0.1) none repeat scroll 0% 0%;
     border: 1px solid rgba(0, 0, 255, 0.45);
     display: none;
@@ -981,4 +978,27 @@ textarea {
     width: 95%;
     background: #424242;
     min-height: 65px;
+}
+
+.focused-container {
+    border-color: #4af;
+    box-shadow: 0 0 1px 2px #4af !important;
+}
+
+.selected-container {
+    border-color: #4af;
+    box-shadow: 0 0 1px 1px #4af;
+}
+
+input:focus {
+    background: rgba(53, 53, 48, 0.56);
+}
+
+i:focus {
+    background: rgba(53, 53, 48, 0.56);
+}
+
+.selected-button{
+    color: #ffffff !important;
+    transition: 0.15s !important;
 }

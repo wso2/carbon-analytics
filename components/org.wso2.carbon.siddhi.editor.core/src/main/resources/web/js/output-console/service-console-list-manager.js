@@ -62,15 +62,15 @@ define(['log', 'jquery', 'lodash', 'output_console_list', 'workspace', 'service_
                     var activeTab = this.application.tabController.getActiveTab();
                     var file = undefined;
                     var console = this.getGlobalConsole();
-                    var serviceWrapper =  $('#service-tabs-wrapper');
+                    var serviceWrapper = $('#service-tabs-wrapper');
                     if (console !== undefined) {
                         if (this.isActive()) {
                             this._activateBtn.parent('li').removeClass('active');
                             this.hideAllConsoles();
-                            if (serviceWrapper.is('.ui-resizable')){
-                                serviceWrapper.resizable( "destroy" );
+                            if (serviceWrapper.is('.ui-resizable')) {
+                                serviceWrapper.resizable("destroy");
                             }
-                            if(activeTab._title != "welcome-page"){
+                            if (activeTab._title != "welcome-page") {
                                 if (activeTab.getSiddhiFileEditor().isInSourceView()) {
                                     activeTab.getSiddhiFileEditor().getSourceView().editorResize();
                                 }
@@ -97,15 +97,18 @@ define(['log', 'jquery', 'lodash', 'output_console_list', 'workspace', 'service_
                     ConsoleList.prototype.addConsole.call(this, console);
                 },
                 removeConsole: function (console) {
-                    var commandManager = _.get(this, 'options.application.commandManager');
-                    var self = this;
-                    var remove = function () {
-                        ConsoleList.prototype.removeConsole.call(self, console);
-                        if (console instanceof ServiceConsole) {
+                    if (self.activeConsole.options._type === "FORM") {
+                        $(self.activeConsole).trigger('close-button-in-form-clicked');
+                    } else {
+                        var commandManager = _.get(this, 'options.application.commandManager');
+                        var self = this;
+                        var remove = function () {
+                            ConsoleList.prototype.removeConsole.call(self, console);
+                            if (console instanceof ServiceConsole) {
 //                          _.remove(self._workingFileSet, function(fileID){
 //                              return _.isEqual(fileID, tab.getFile().id);
 //                          });
-                            console.trigger('console-removed');
+                                console.trigger('console-removed');
 //                          self.getBrowserStorage().destroy(tab.getFile());
 //                          self.getBrowserStorage().put('workingFileSet', self._workingFileSet);
 //                          // open welcome page upon last tab close
@@ -113,10 +116,11 @@ define(['log', 'jquery', 'lodash', 'output_console_list', 'workspace', 'service_
 //                              var commandManager = _.get(self, 'options.application.commandManager');
 //                              commandManager.dispatch("go-to-welcome-page");
 //                          }
-                        }
-                    };
+                            }
+                        };
 
-                    remove();
+                        remove();
+                    }
                 },
                 newConsole: function (opts) {
                     var options = opts || {};
@@ -134,7 +138,7 @@ define(['log', 'jquery', 'lodash', 'output_console_list', 'workspace', 'service_
                             if (console._uniqueId === uniqueId) {
                                 return console;
                             }
-                        }else if (type === "FORM") {
+                        } else if (type === "FORM") {
                             if (console._uniqueId === uniqueId) {
                                 return console;
                             }
@@ -147,19 +151,23 @@ define(['log', 'jquery', 'lodash', 'output_console_list', 'workspace', 'service_
                     });
                 },
                 hideAllConsoles: function () {
-                    ConsoleList.prototype.hideConsoleComponents.call(this);
-                    this._activateBtn.parent('li').removeClass('active');
+                    if (this.activeConsole != undefined && this.activeConsole.options._type === "FORM") {
+                        $(this.activeConsole).trigger('close-button-in-form-clicked');
+                    } else {
+                        ConsoleList.prototype.hideConsoleComponents.call(this);
+                        this._activateBtn.parent('li').removeClass('active');
+                    }
                 },
                 showAllConsoles: function () {
                     ConsoleList.prototype.showConsoleComponents.call(this);
                 },
-                showConsoleByTitle: function (title,type) {
-                    ConsoleList.prototype.enableConsoleByTitle.call(this, title,type);
+                showConsoleByTitle: function (title, type) {
+                    ConsoleList.prototype.enableConsoleByTitle.call(this, title, type);
                 },
                 getConsoleActivateBtn: function () {
                     return this._activateBtn;
                 },
-                clearConsole: function(){
+                clearConsole: function () {
                     var console = this._options.application.outputController.getGlobalConsole();
                     console.clear();
                 },
@@ -167,9 +175,9 @@ define(['log', 'jquery', 'lodash', 'output_console_list', 'workspace', 'service_
                     var url = "ws://" + opts.application.config.baseUrlHost + "/console";
                     var ws = new WebSocket(url);
                     var lineNumber;
-                    ws.onmessage = function(msg) {
+                    ws.onmessage = function (msg) {
                         var console = opts.application.outputController.getGlobalConsole();
-                        if(console == undefined){
+                        if (console == undefined) {
                             var consoleOptions = {};
                             var options = {};
                             _.set(options, '_type', "CONSOLE");
@@ -184,29 +192,29 @@ define(['log', 'jquery', 'lodash', 'output_console_list', 'workspace', 'service_
                         var loggerObj = JSON.parse(msg.data);
                         var type = "";
                         var colorDIffType = "";
-                        if(loggerObj.level == "INFO" || loggerObj.level == "WARN"){
+                        if (loggerObj.level == "INFO" || loggerObj.level == "WARN") {
                             type = "INFO";
                             colorDIffType = "INFO-LOGGER";
-                        } else if(loggerObj.level == "ERROR"){
+                        } else if (loggerObj.level == "ERROR") {
                             type = "ERROR";
                             colorDIffType = "ERROR";
                         }
                         var stacktrace = "";
-                        if(loggerObj.stacktrace != null){
+                        if (loggerObj.stacktrace != null) {
                             stacktrace = "<pre>" + loggerObj.stacktrace + "</pre>";
                         }
                         var logMessage = "[" + loggerObj.timeStamp + "] " + type + " " + "{" + loggerObj.fqcn + "} - " +
-                            loggerObj.message + " " + stacktrace ;
+                            loggerObj.message + " " + stacktrace;
                         var message = {
-                            "type" : colorDIffType,
+                            "type": colorDIffType,
                             "message": logMessage
                         };
                         console.println(message);
                     };
-                    ws.onerror = function(error) {
+                    ws.onerror = function (error) {
                         console.log(error);
                     };
-                    ws.onclose = function() {
+                    ws.onclose = function () {
 
                     };
                 }
