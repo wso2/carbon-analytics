@@ -235,7 +235,8 @@ define(['require', 'log', 'jquery', 'lodash', 'constants'],
                     triggerCriteria = $('#trigger-criteria-content input[type="text"]').val().trim();
                     if (triggerCriteria === "") {
                         self.formUtils.addErrorClass($('#trigger-criteria-content input[type="text"]'));
-                        $('#trigger-criteria-content').find('.error-message').text("Criteria value is required");
+                        $('#trigger-criteria-content').find('.error-message').text("Trigger criteria value is " +
+                            "required");
                         isErrorOccurred = true;
                         return;
                     }
