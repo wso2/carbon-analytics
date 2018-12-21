@@ -403,9 +403,21 @@ public class TemplateManagerService implements BusinessRulesService {
             }
             return TemplateManagerConstants.SIDDHI_APP_NOT_DEPLOYED;
         } catch (SiddhiAppsApiHelperException e) {
-            if (businessRuleStatus == TemplateManagerConstants.PARTIALLY_DEPLOYED) {
-                return TemplateManagerConstants.SIDDHI_APP_NOT_DEPLOYED;
+           if (businessRuleStatus == TemplateManagerConstants.PARTIALLY_DEPLOYED && e.getStatus() == 404) {
+               return TemplateManagerConstants.SIDDHI_APP_DEPLOYED;
+           } else  if (businessRuleStatus == TemplateManagerConstants.PARTIALLY_DEPLOYED) {
+               return TemplateManagerConstants.SIDDHI_APP_UNREACHABLE;
+           }
+           if (businessRuleStatus == TemplateManagerConstants.PARTIALLY_UNDEPLOYED && e.getStatus() == 404) {
+               return TemplateManagerConstants.SIDDHI_APP_NOT_DEPLOYED;
+            } else if (businessRuleStatus == TemplateManagerConstants.PARTIALLY_UNDEPLOYED ) {
+               return TemplateManagerConstants.SIDDHI_APP_UNREACHABLE;
             }
+           if (businessRuleStatus == TemplateManagerConstants.DEPLOYED && e.getStatus() == 404) {
+               return TemplateManagerConstants.SIDDHI_APP_NOT_DEPLOYED;
+            } else if (businessRuleStatus == TemplateManagerConstants.DEPLOYED) {
+               return TemplateManagerConstants.SIDDHI_APP_UNREACHABLE;
+           }
             return TemplateManagerConstants.SIDDHI_APP_UNREACHABLE;
         }
     }
@@ -939,20 +951,20 @@ public class TemplateManagerService implements BusinessRulesService {
         if (nodeList == null) {
             return TemplateManagerConstants.ERROR;
         }
-        outerloop:
+
         for (String nodeURL : nodeList) {
             if (businessRule instanceof BusinessRuleFromScratch) {
                 Integer queriedState = getSiddhiAppDeploymentState(businessRule.getUuid(), nodeURL,
                         businessRule.getUuid());
                 if (queriedState != null) {
-                    break outerloop;
+                    return queriedState;
                 }
             } else {
                 for (int i = 0; i < artifactCount; i++) {
                     String siddhiAppName = businessRule.getUuid() + "_" + i;
                     Integer queriedState = getSiddhiAppDeploymentState(businessRule.getUuid(), nodeURL, siddhiAppName);
                     if (queriedState != null) {
-                        break outerloop;
+                        return queriedState;
                     }
                 }
             }
@@ -992,6 +1004,12 @@ public class TemplateManagerService implements BusinessRulesService {
             if (queriedState == TemplateManagerConstants.PARTIALLY_DEPLOYED ||
                     queriedState == TemplateManagerConstants.PARTIALLY_UNDEPLOYED) {
                 return queriedState;
+            }
+            if (queriedState == TemplateManagerConstants.DEPLOYED) {
+                return TemplateManagerConstants.PARTIALLY_DEPLOYED;
+            }
+            if (queriedState == TemplateManagerConstants.SAVED) {
+                return TemplateManagerConstants.PARTIALLY_UNDEPLOYED;
             }
             return TemplateManagerConstants.SAVED;
         }
