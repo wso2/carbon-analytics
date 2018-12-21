@@ -615,7 +615,8 @@ a.list-group-item, button.list-group-item {
 	background: red;
 }
 
-.design-view-form-content input[type="text"].required-input-field {
+.design-view-form-content input[type="text"].required-input-field,
+.design-view-form-content textarea.required-input-field {
 	border: 1px solid #FF0000;
 }
 
@@ -810,9 +811,12 @@ a.list-group-item, button.list-group-item {
 	margin-left: 10px;
 }
 
-.stream-form-container,
-.partition-form-container {
+.stream-form-container {
 	width:50%;
+}
+
+.partition-form-container {
+	width: 40%;
 }
 
 .stream-form-container,

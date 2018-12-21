@@ -1277,12 +1277,12 @@
     <h3> Parameters </h3>
     <div id = "{{id}}-parameters">
     {{#each parameters}}
-        <div class = "parameter" id="{{name}}-parameter">
+        <div class = "parameter" id="{{key}}-parameter">
         {{#if optional}}
             {{#if value}}
                 <div class = "clearfix">
                     <label class = "parameter-name optional-parameter">
-                        <input type = "checkbox" class = "parameter-checkbox" checked> {{name}}
+                        <input type = "checkbox" class = "parameter-checkbox" checked> {{key}}
                     </label>
                     <i class = "fw fw-info parameter-desc">
                         <span style = "display:none" class = "parameter-desc-content"> {{description}} </span>
@@ -1294,7 +1294,7 @@
             {{else}}
                 <div class="clearfix">
                     <label class = "parameter-name optional-parameter">
-                        <input type = "checkbox" class = "parameter-checkbox"> {{name}}
+                        <input type = "checkbox" class = "parameter-checkbox"> {{key}}
                     </label>
                     <i class = "fw fw-info parameter-desc">
                         <span style = "display:none" class="parameter-desc-content"> {{description}} </span>
@@ -1309,7 +1309,7 @@
             <div class="clearfix">
                 <label class = "mandatory-parameter-symbol"> * </label>
                 <label class = "parameter-name mandatory-parameter">
-                    {{name}}
+                    {{key}}
                 </label>
                 <i class="fw fw-info parameter-desc">
                     <span style="display:none" class="parameter-desc-content"> {{description}} </span>

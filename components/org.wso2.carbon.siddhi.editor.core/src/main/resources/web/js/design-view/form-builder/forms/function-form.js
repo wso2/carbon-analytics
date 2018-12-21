@@ -16,8 +16,8 @@
  * under the License.
  */
 
-define(['require', 'log', 'jquery', 'lodash', 'designViewUtils', 'constants'],
-    function (require, log, $, _, DesignViewUtils, Constants) {
+define(['require', 'log', 'jquery', 'lodash', 'constants'],
+    function (require, log, $, _, Constants) {
 
         /**
          * @class FunctionForm Creates a forms to collect data from a function
@@ -36,7 +36,9 @@ define(['require', 'log', 'jquery', 'lodash', 'designViewUtils', 'constants'],
             }
         };
 
-        /** Function to render the script types */
+        /**
+         * @function renders the script types
+         */
         var renderScriptType = function () {
             var scriptDiv = '<h4> Script Type: </h4> <select id = "script-type">' +
                 '<option value = "Javascript"> Javascript </option>' +
@@ -47,15 +49,8 @@ define(['require', 'log', 'jquery', 'lodash', 'designViewUtils', 'constants'],
         };
 
         /**
-         * Function to add the error class
-         * @param {Object} id object where the errors needs to be displayed
+         * @function renders the return type of the script
          */
-        var addErrorClass = function (id) {
-            $(id)[0].scrollIntoView();
-            $(id).addClass('required-input-field')
-        };
-
-        /** Function to render the return type of the script */
         var renderReturnType = function () {
             var returnDiv = '<h4> Return Type: </h4> <select id = "return-type">' +
                 '<option value = "int"> int </option>' +
@@ -67,7 +62,7 @@ define(['require', 'log', 'jquery', 'lodash', 'designViewUtils', 'constants'],
                 '<option value = "object"> object </option>' +
                 '</select>';
             $('#function-return-type').html(returnDiv);
-        }
+        };
 
         /**
          * @function generate properties form for a function
@@ -77,25 +72,22 @@ define(['require', 'log', 'jquery', 'lodash', 'designViewUtils', 'constants'],
          */
         FunctionForm.prototype.generatePropertiesForm = function (element, formConsole, formContainer) {
             var self = this;
+            var id = $(element).parent().attr('id');
+            var clickedElement = self.configurationData.getSiddhiAppConfig().getFunction(id);
             var propertyDiv = $('<div id="property-header"><h3>Function Configuration</h3></div>' +
                 '<div class = "function-form-container"> <div id = "define-function-name"> <h4> Name </h4> ' +
-                '<input type="text" id="functionName" class="clearfix"><label class = "error-message"> </label></div>' +
+                '<input type="text" id="functionName" class="clearfix"><label class = "error-message" ' +
+                'id = "functionNameErrorMessage"> </label></div>' +
                 '<div id = "function-script-type"> </div> <div id= "function-return-type"> </div>' +
-                '<button id="btn-submit" type="button" class="btn toggle-view-button"> Submit </button>' +
-                '<button id="btn-cancel" type="button" class="btn btn-default"> Cancel </button> </div>' +
+                self.formUtils.buildFormButtons() + '</div>' +
                 '<div class = "function-form-container"> <div id="define-script-body"> <h4> Script Body: </h4> ' +
                 '<textarea id= "script-body-content" rows="5" cols="50"> </textarea> <label class = "error-message">' +
                 '</label> </div> </div>');
-            formContainer.append(propertyDiv);
 
-            var id = $(element).parent().attr('id');
+            formContainer.append(propertyDiv);
+            self.formUtils.popUpSelectedElement(id);
             self.designViewContainer.addClass('disableContainer');
             self.toggleViewButton.addClass('disableContainer');
-            $('#' + id).addClass('selected-element');
-            $(".overlayed-container").fadeTo(200, 1);
-
-            // retrieve the function information from the collection
-            var clickedElement = self.configurationData.getSiddhiAppConfig().getFunction(id);
 
             var name = clickedElement.getName();
             renderScriptType();
@@ -128,47 +120,33 @@ define(['require', 'log', 'jquery', 'lodash', 'designViewUtils', 'constants'],
                 var isErrorOccurred = false;
 
                 var functionName = $('#functionName').val().trim();
-                var functionNameErrorMessage = $('#define-function-name').find('.error-message');
                 var previouslySavedName = clickedElement.getName();
-
                 if (functionName === "") {
-                    addErrorClass($('#functionName'));
-                    functionNameErrorMessage.text("Function name is required.");
+                    self.formUtils.addErrorClass($('#functionName'));
+                    $('#functionNameErrorMessage').text("Function name is required.");
                     isErrorOccurred = true;
                     return;
                 }
-
                 if (!previouslySavedName) {
                     previouslySavedName = "";
                 }
-
                 if (previouslySavedName !== functionName) {
                     var isFunctionNameUsed = self.formUtils.isFunctionDefinitionElementNameUsed(functionName, id);
                     if (isFunctionNameUsed) {
-                        addErrorClass($('#functionName'));
-                        functionNameErrorMessage.text("Function name is already used.");
+                        self.formUtils.addErrorClass('#functionName');
+                        $('#functionNameErrorMessage').text("Function name is already used.");
                         isErrorOccurred = true;
                         return;
                     }
-
-                    //to check if function name contains white spaces
-                    if (functionName.indexOf(' ') >= 0) {
-                        addErrorClass($('#functionName'))
-                        functionNameErrorMessage.text("Function name cannot have white space.");
-                        isErrorOccurred = true;
-                        return;
-                    }
-                    //to check if function name starts with an alphabetic character
-                    if (!(Constants.ALPHABETIC_VALIDATOR_REGEX).test(functionName.charAt(0))) {
-                        addErrorClass($('#functionName'))
-                        functionNameErrorMessage.text("Function name must start with an alphabetic character.");
+                    if (self.formUtils.validateAttributeOrElementName("#functionName", Constants.FUNCTION, functionName)) {
                         isErrorOccurred = true;
                         return;
                     }
                 }
+
                 var scriptBody = $('#script-body-content').val().trim();
                 if (scriptBody === "") {
-                    addErrorClass($('#script-body-content'));
+                    self.formUtils.addErrorClass('#script-body-content');
                     $('#define-script-body').find('.error-message').text("Script body is required.");
                     isErrorOccurred = true;
                     return;
@@ -192,15 +170,14 @@ define(['require', 'log', 'jquery', 'lodash', 'designViewUtils', 'constants'],
                     //Send function element to the backend and generate tooltip
                     var functionToolTip = self.formUtils.getTooltip(clickedElement, Constants.FUNCTION);
                     $('#' + id).prop('title', functionToolTip);
+
                     self.designViewContainer.removeClass('disableContainer');
                     self.toggleViewButton.removeClass('disableContainer');
-
                     // set the isDesignViewContentChanged to true
                     self.configurationData.setIsDesignViewContentChanged(true);
                     // close the form window
                     self.consoleListManager.removeFormConsole(formConsole);
                 }
-
             });
 
             // 'Cancel' button action
@@ -215,4 +192,5 @@ define(['require', 'log', 'jquery', 'lodash', 'designViewUtils', 'constants'],
 
         return FunctionForm;
     });
+
 
