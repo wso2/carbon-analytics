@@ -322,11 +322,11 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
         };
 
         /**
-		 * Function to get the parameters of a selected type
-		 * @param {String} selectedType
-		 * @param {object} predefinedTypes Predefined types
-		 * @return {object} parameters
-		 */
+         * @function to get the parameters of a selected type
+         * @param {String} selectedType
+         * @param {object} predefinedTypes Predefined types
+         * @return {object} parameters
+         */
         FormUtils.prototype.getSelectedTypeParameters = function (selectedType, predefinedTypes) {
             var parameters = [];
             for (type of predefinedTypes) {
@@ -509,7 +509,7 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
         };
 
         /**
-         * Function to check if a particular value is valid
+         * @function to check if a particular value is valid
          * @param {String} optionValue value which needs to be validated
          * @param {Object} predefinedOptionObject predefined object of the option
          * @param {Object} parent div of the particular option
@@ -532,12 +532,12 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
         };
 
         /**
-		 * @function validates the names
-		 * @param {Object} id to find the error-message label
-		 * @param {String} type Attribue or any element
-		 * @param {String} name the name to be validated
-		 * @return {boolean}
-		 */
+         * @function validates the names
+         * @param {Object} id to find the error-message label
+         * @param {String} type Attribue or any element
+         * @param {String} name the name to be validated
+         * @return {boolean}
+         */
         FormUtils.prototype.validateAttributeOrElementName = function (id, type, name) {
             var self = this;
             var errorMessageLabel;
