@@ -21,7 +21,9 @@ import org.wso2.carbon.config.annotation.Configuration;
 import org.wso2.carbon.config.annotation.Element;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * {@code RootConfiguration} is a bean class for root level configuration.
@@ -35,9 +37,13 @@ public class RootConfiguration {
     @Element(description = "References list", required = false)
     private List<Reference> refs;
 
+    @Element(description = "Properties list", required = false)
+    private Map<String, String> properties;
+
     public RootConfiguration() {
         extensions = new ArrayList<>();
         refs = new ArrayList<>();
+        properties = new HashMap<>();
     }
 
     public List<Extension> getExtensions() {
@@ -46,5 +52,9 @@ public class RootConfiguration {
 
     public List<Reference> getRefs() {
         return refs;
+    }
+
+    public Map<String, String> getProperties() {
+        return properties;
     }
 }

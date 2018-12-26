@@ -21,6 +21,7 @@ package org.wso2.carbon.siddhi.editor.core.util.designview.designgenerator.gener
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.WindowConfig;
 import org.wso2.carbon.siddhi.editor.core.util.designview.exceptions.DesignGenerationException;
 import org.wso2.carbon.siddhi.editor.core.util.designview.utilities.ConfigBuildingUtilities;
+import org.wso2.siddhi.query.api.annotation.Annotation;
 import org.wso2.siddhi.query.api.definition.WindowDefinition;
 import org.wso2.siddhi.query.api.expression.Expression;
 
@@ -48,8 +49,14 @@ public class WindowConfigGenerator extends CodeSegmentsPreserver {
         for (Expression expression : windowDefinition.getWindow().getParameters()) {
             parameters.add(ConfigBuildingUtilities.getDefinition(expression, siddhiAppString));
         }
+        List<String> annotationConfigs = new ArrayList<>();
+        List<Annotation> annotationListObjects = new ArrayList<>();
         AnnotationConfigGenerator annotationConfigGenerator = new AnnotationConfigGenerator();
         AttributeConfigListGenerator attributeConfigListGenerator = new AttributeConfigListGenerator();
+        for (Annotation annotation : windowDefinition.getAnnotations()) {
+            annotationListObjects.add(annotation);
+            annotationConfigs.add(annotationConfigGenerator.generateAnnotationConfig(annotation));
+        }
         WindowConfig windowConfig =
                 new WindowConfig(
                         windowDefinition.getId(),
@@ -58,7 +65,8 @@ public class WindowConfigGenerator extends CodeSegmentsPreserver {
                         windowDefinition.getWindow().getName(),
                         parameters,
                         windowDefinition.getOutputEventType().name(),
-                        annotationConfigGenerator.generateAnnotationConfigList(windowDefinition.getAnnotations()));
+                        annotationConfigs,
+                        annotationListObjects);
         preserveCodeSegmentsOf(annotationConfigGenerator, attributeConfigListGenerator);
         preserveAndBindCodeSegment(windowDefinition, windowConfig);
 

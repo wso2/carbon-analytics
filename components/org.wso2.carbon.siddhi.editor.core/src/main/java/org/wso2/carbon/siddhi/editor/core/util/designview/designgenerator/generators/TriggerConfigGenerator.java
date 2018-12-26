@@ -23,6 +23,7 @@ import org.wso2.carbon.siddhi.editor.core.util.designview.exceptions.DesignGener
 import org.wso2.carbon.siddhi.editor.core.util.designview.utilities.ConfigBuildingUtilities;
 import org.wso2.siddhi.query.api.definition.StreamDefinition;
 import org.wso2.siddhi.query.api.definition.TriggerDefinition;
+import org.wso2.carbon.siddhi.editor.core.util.designview.constants.SiddhiCodeBuilderConstants;
 
 import java.util.Map;
 
@@ -47,12 +48,15 @@ public class TriggerConfigGenerator extends CodeSegmentsPreserver {
      * @throws DesignGenerationException        Error while getting the definition of the trigger definition
      */
     public TriggerConfig generateTriggerConfig(TriggerDefinition triggerDefinition) throws DesignGenerationException {
-        String at = "";
+        String criteria = "";
+        String criteriaType = "";
         if (triggerDefinition.getAtEvery() != null) {
-            at = "every " + ConfigBuildingUtilities.getDefinition(triggerDefinition, siddhiAppString)
+            criteria = "every " + ConfigBuildingUtilities.getDefinition(triggerDefinition, siddhiAppString)
                     .split(EVERY_SPLIT_KEYWORD)[1];
+            criteriaType = SiddhiCodeBuilderConstants.EVERY;
         } else if (triggerDefinition.getAt() != null) {
-            at = triggerDefinition.getAt();
+            criteria = triggerDefinition.getAt();
+            criteriaType = SiddhiCodeBuilderConstants.AT;
         }
         AnnotationConfigGenerator annotationConfigGenerator = new AnnotationConfigGenerator();
 
@@ -60,7 +64,8 @@ public class TriggerConfigGenerator extends CodeSegmentsPreserver {
                 new TriggerConfig(
                         triggerDefinition.getId(),
                         triggerDefinition.getId(),
-                        at,
+                        criteria,
+                        criteriaType,
                         annotationConfigGenerator
                                 .generateAnnotationConfigList(
                                         getTriggerStream(triggerDefinition.getId()).getAnnotations()));

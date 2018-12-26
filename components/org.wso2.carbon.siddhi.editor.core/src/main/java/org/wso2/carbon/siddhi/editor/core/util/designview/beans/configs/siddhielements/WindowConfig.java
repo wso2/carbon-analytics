@@ -18,6 +18,7 @@
 
 package org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements;
 
+import org.wso2.siddhi.query.api.annotation.Annotation;
 import java.util.List;
 
 /**
@@ -26,25 +27,28 @@ import java.util.List;
 public class WindowConfig extends SiddhiElementConfig {
     private String name;
     private List<AttributeConfig> attributeList;
-    private String function;
+    private String type;
     private List<String> parameters;
     private String outputEventType;
     private List<String> annotationList;
+    private List<Annotation> annotationListObjects;
 
     public WindowConfig(String id,
                         String name,
                         List<AttributeConfig> attributeList,
-                        String function,
+                        String type,
                         List<String> parameters,
                         String outputEventType,
-                        List<String> annotationList) {
+                        List<String> annotationList,
+                        List<Annotation> annotationListObjects) {
         super(id);
         this.name = name;
         this.attributeList = attributeList;
-        this.function = function;
+        this.type = type;
         this.parameters = parameters;
         this.outputEventType = outputEventType;
         this.annotationList = annotationList;
+        this.annotationListObjects = annotationListObjects;
     }
 
     public String getName() {
@@ -55,8 +59,8 @@ public class WindowConfig extends SiddhiElementConfig {
         return attributeList;
     }
 
-    public String getFunction() {
-        return function;
+    public String getType() {
+        return type;
     }
 
     public List<String> getParameters() {
@@ -69,5 +73,9 @@ public class WindowConfig extends SiddhiElementConfig {
 
     public List<String> getAnnotationList() {
         return annotationList;
+    }
+
+    public List<Annotation> getAnnotationListObjects() {
+        return  annotationListObjects;
     }
 }

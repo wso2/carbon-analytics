@@ -202,6 +202,7 @@ define(['require', 'log', 'lodash', 'jquery', 'configurationData', 'appData', 'p
                 }
                 addAnnotationsForElement(table, tableObject);
                 addAttributesForElement(table, tableObject);
+                addAnnotationObjectForElement(table, tableObject)
                 tableObject.setId(newIdBeginningPhrase + tableObject.getId());
                 mainObject.addTable(tableObject);
             });
@@ -211,6 +212,7 @@ define(['require', 'log', 'lodash', 'jquery', 'configurationData', 'appData', 'p
             _.forEach(windowList, function (window) {
                 var windowObject = new Window(window);
                 addAnnotationsForElement(window, windowObject);
+                addAnnotationObjectForElement(window, windowObject);
                 addAttributesForElement(window, windowObject);
                 windowObject.setId(newIdBeginningPhrase + windowObject.getId());
                 mainObject.addWindow(windowObject);

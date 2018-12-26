@@ -78,6 +78,7 @@ public class PartitionConfigGenerator extends CodeSegmentsPreserver {
                         partitionedInnerStreamDefinitions.get(partitionId).values()));
         partitionConfig.setPartitionWith(generatePartitionWith(partition.getPartitionTypeMap()));
         partitionConfig.setAnnotationList(generateAnnotations(partition.getAnnotations()));
+        partitionConfig.setAnnotationListObjects(partition.getAnnotations());
         partitionConfig.setConnectorsAndStreams(connectorsAndStreams);
         preserveAndBindCodeSegment(partition, partitionConfig);
         return partitionConfig;

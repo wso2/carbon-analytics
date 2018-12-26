@@ -39,6 +39,13 @@ public class TriggerCodeGenerator {
     public String generateTrigger(TriggerConfig trigger, boolean isGeneratingToolTip) throws CodeGenerationException {
         CodeGeneratorUtils.NullValidator.validateConfigObject(trigger);
         StringBuilder triggerStringBuilder = new StringBuilder();
+
+        //to append quotes to start and cronExpression
+        if (trigger.getCriteriaType().equalsIgnoreCase(SiddhiCodeBuilderConstants.AT )) {
+            String triggerCriteria = trigger.getCriteria();
+            triggerCriteria = SiddhiCodeBuilderConstants.SINGLE_QUOTE  + triggerCriteria + SiddhiCodeBuilderConstants.SINGLE_QUOTE;
+            trigger.setTriggerCriteria(triggerCriteria);
+        }
         if (!isGeneratingToolTip) {
             triggerStringBuilder.append(SubElementCodeGenerator.generateComment(trigger.getPreviousCommentSegment()));
         }
@@ -51,7 +58,7 @@ public class TriggerCodeGenerator {
                 .append(SiddhiCodeBuilderConstants.SPACE)
                 .append(SiddhiCodeBuilderConstants.AT)
                 .append(SiddhiCodeBuilderConstants.SPACE)
-                .append(trigger.getAt())
+                .append(trigger.getCriteria())
                 .append(SiddhiCodeBuilderConstants.SEMI_COLON);
 
         return  triggerStringBuilder.toString();

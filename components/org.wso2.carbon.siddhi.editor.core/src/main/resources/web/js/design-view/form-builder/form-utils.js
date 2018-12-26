@@ -16,8 +16,8 @@
  * under the License.
  */
 
-define(['require', 'lodash', 'appData', 'log', 'constants'],
-    function (require, _, AppData, log, Constants) {
+define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar'],
+    function (require, _, AppData, log, Constants, Handlebars) {
 
 
         /**
@@ -94,7 +94,7 @@ define(['require', 'lodash', 'appData', 'log', 'constants'],
          * @return {boolean}
          */
         FormUtils.prototype.isStreamDefinitionNameUsedInPartition = function (partitionId, elementName,
-                                                                              skipElementID) {
+            skipElementID) {
             var self = this;
             var isNameUsed = false;
             var partition = self.configurationData.getSiddhiAppConfig().getPartition(partitionId);
@@ -188,8 +188,8 @@ define(['require', 'lodash', 'appData', 'log', 'constants'],
         FormUtils.prototype.updateConnectionsAfterDefinitionElementNameChange = function (elementId) {
             var self = this;
 
-            var outConnections = self.jsPlumbInstance.getConnections({source: elementId + '-out'});
-            var inConnections = self.jsPlumbInstance.getConnections({target: elementId + '-in'});
+            var outConnections = self.jsPlumbInstance.getConnections({ source: elementId + '-out' });
+            var inConnections = self.jsPlumbInstance.getConnections({ target: elementId + '-in' });
 
             _.forEach(outConnections, function (connection) {
                 self.jsPlumbInstance.deleteConnection(connection);
@@ -214,65 +214,65 @@ define(['require', 'lodash', 'appData', 'log', 'constants'],
         };
 
         /**
-         * Generate tooltip for siddhi app elements
-         *
-         * @param element JSON object of the element
-         * @param type type of the element
-         * @returns {string} tooltip
-         */
+        * Generate tooltip for siddhi app elements
+        *
+        * @param element JSON object of the element
+        * @param type type of the element
+        * @returns {string} tooltip
+        */
         FormUtils.prototype.getTooltip = function (element, type) {
             var appData = new AppData();
 
             switch (type) {
-                case Constants.AGGREGATION :
+                case Constants.AGGREGATION:
                     appData.addAggregation(element);
                     break;
 
-                case Constants.FUNCTION :
+                case Constants.FUNCTION:
                     appData.addFunction(element);
                     break;
 
-                case Constants.JOIN_QUERY :
+                case Constants.JOIN_QUERY:
                     appData.addJoinQuery(element);
                     break;
 
-                case Constants.PARTITION :
+                case Constants.PARTITION:
                     appData.addPartition(element);
                     break;
 
-                case Constants.PATTERN_QUERY :
+                case Constants.PATTERN_QUERY:
                     appData.addPatternQuery(element);
                     break;
 
-                case Constants.SEQUENCE_QUERY :
+                case Constants.SEQUENCE_QUERY:
                     appData.addSequenceQuery(element);
                     break;
 
-                case Constants.SINK :
+                case Constants.SINK:
                     appData.addSink(element);
                     break;
 
-                case Constants.SOURCE :
+                case Constants.SOURCE:
                     appData.addSource(element);
                     break;
 
-                case Constants.STREAM :
+                case Constants.STREAM:
                     appData.addStream(element);
                     break;
 
-                case Constants.TABLE :
+                case Constants.TABLE:
                     appData.addTable(element);
                     break;
 
-                case Constants.TRIGGER :
+                case Constants.TRIGGER:
                     appData.addTrigger(element);
                     break;
 
-                case Constants.WINDOW :
+                case Constants.WINDOW:
                     appData.addWindow(element);
                     break;
 
-                case Constants.WINDOW_FILTER_PROJECTION_QUERY :
+                case Constants.WINDOW_FILTER_PROJECTION_QUERY:
                     appData.addWindowFilterProjectionQuery(element);
                     break;
             }
@@ -304,5 +304,49 @@ define(['require', 'lodash', 'appData', 'log', 'constants'],
             return result;
         };
 
+        /** Register classes for Handlebars */
+
+        /** Generates the current index of the option being rendered */
+        Handlebars.registerHelper('sum', function () {
+            return Array.prototype.slice.call(arguments, 0, -1).reduce((acc, num) => acc += num);
+        });
+
+        /** Handlebar helper to check if the index is equivalent to half the length of the option's array */
+        Handlebars.registerHelper('isDivisor', function (index, options) {
+            var divLength = Math.ceil(options.length / 2);
+            return index === divLength;
+        });
+
+        /** Handlebar helper to render heading for the form */
+        Handlebars.registerHelper('addTitle', function (id) {
+            return id.charAt(0).toUpperCase() + id.slice(1);
+        });
+
+        /** Handlebar helper to compare if the id is "source" or "sink" */
+        Handlebars.registerHelper('ifSourceOrSink', function (id, div) {
+            if (id === "source" || id === "sink") {
+                return div.fn(this);
+            }
+            return div.inverse(this);
+        });
+
+        /** Handlebar helper to compare if the id is "source" or "sink" or "store" */
+        Handlebars.registerHelper('ifSourceOrSinkOrStore', function (id, div) {
+            if (id === "source" || id === "sink" || id === "store") {
+                return div.fn(this);
+            }
+            return div.inverse(this);
+        });
+
+        /** Handlebar helper to check id is equivalent to a given string */
+        Handlebars.registerHelper('ifId', function (id, name, div) {
+            if (id === name) {
+                return div.fn(this);
+            }
+            return div.inverse(this);
+        });
+        /** End of register classes */
+
         return FormUtils;
     });
+

@@ -17,9 +17,9 @@
  */
 
 define(['log', 'jquery', 'lodash', 'sourceOrSinkAnnotation', 'mapAnnotation', 'payloadOrAttribute',
-        'jsonValidator', 'handlebar', 'designViewUtils', 'constants'],
+    'jsonValidator', 'handlebar', 'designViewUtils', 'constants'],
     function (log, $, _, SourceOrSinkAnnotation, MapAnnotation, PayloadOrAttribute, JSONValidator, Handlebars,
-              DesignViewUtils, Constants) {
+        DesignViewUtils, Constants) {
 
         /**
          * @class SourceForm Creates a forms to collect data from a source
@@ -38,49 +38,6 @@ define(['log', 'jquery', 'lodash', 'sourceOrSinkAnnotation', 'mapAnnotation', 'p
             }
         };
 
-        const constMap = "map";
-        const constList = "list";
-
-        /** Generates the current index of the option being rendered */
-        Handlebars.registerHelper('sum', function () {
-            return Array.prototype.slice.call(arguments, 0, -1).reduce((acc, num) => acc += num);
-        });
-
-        /** Handlebar helper to check if the index is equivalent to half the length of the option's array */
-        Handlebars.registerHelper('isDivisor', function (index, options) {
-            var divLength = Math.ceil(options.length / 2);
-            return index === divLength;
-        });
-
-        /** Handlebar helper to render heading for the form */
-        Handlebars.registerHelper('addTitle', function (id) {
-            return id.charAt(0).toUpperCase() + id.slice(1);
-        });
-
-        /** Handlebar helper to compare if the id is "source" or "sink" */
-        Handlebars.registerHelper('ifSourceOrSink', function (id, div) {
-            if (id === "source" || id === "sink") {
-                return div.fn(this);
-            }
-            return div.inverse(this);
-        });
-
-        /** Handlebar helper to compare if the id is "source" or "sink" or "store" */
-        Handlebars.registerHelper('ifSourceOrSinkOrStore', function (id, div) {
-            if (id === "source" || id === "sink" || id === "store") {
-                return div.fn(this);
-            }
-            return div.inverse(this);
-        });
-
-        /** Handlebar helper to check id is equivalent to a given string */
-        Handlebars.registerHelper('ifId', function (id, name, div) {
-            if (id === name) {
-                return div.fn(this);
-            }
-            return div.inverse(this);
-        });
-
         /**
          * Function to get the options of the selected source/map type
          * @param {String} selectedType Selected source/map type
@@ -91,8 +48,11 @@ define(['log', 'jquery', 'lodash', 'sourceOrSinkAnnotation', 'mapAnnotation', 'p
             var options = [];
             for (type of types) {
                 if (type.name.toLowerCase() == selectedType.toLowerCase()) {
-                    options = type.parameters;
+                    if (type.parameters) {
+                        options = type.parameters;
+                    }
                     break;
+
                 }
             }
             return options;
@@ -126,11 +86,11 @@ define(['log', 'jquery', 'lodash', 'sourceOrSinkAnnotation', 'mapAnnotation', 'p
          */
         var renderMap = function (predefinedSourceMaps) {
             if (!$.trim($('#define-map').html()).length) {
-                var mapFormTemplate = Handlebars.compile($('#source-sink-map-store-form-template').html());
+                var mapFormTemplate = Handlebars.compile($('#type-selection-form-template').html());
                 var wrappedHtml = mapFormTemplate({ id: "map", types: predefinedSourceMaps });
                 $('#define-map').html(wrappedHtml);
                 $('#define-map #map-type').val('passThrough');
-                $('#define-map #map-type option:contains("passThrough")').text('passThrough (default)');
+                $('#define-map #map-type option:contains("' + Constants.DEFAULT_MAPPER_TYPE + '")').text('passThrough (default)');
             }
         };
 
@@ -190,10 +150,10 @@ define(['log', 'jquery', 'lodash', 'sourceOrSinkAnnotation', 'mapAnnotation', 'p
             var customizedOptions = [];
             _.forEach(savedOptions, function (savedOption) {
                 var foundSavedOption = false;
+                var optionKey = savedOption.split('=')[0];
+                var optionValue = savedOption.split('=')[1].trim();
+                optionValue = optionValue.substring(1, optionValue.length - 1);
                 for (var predefinedOption of predefinedOptions) {
-                    var optionKey = savedOption.split('=')[0];
-                    var optionValue = savedOption.split('=')[1].trim();
-                    optionValue = optionValue.substring(1, optionValue.length - 1);
                     if (predefinedOption.name.toLowerCase() == optionKey.toLowerCase().trim()) {
                         foundSavedOption = true;
                         break;
@@ -237,7 +197,7 @@ define(['log', 'jquery', 'lodash', 'sourceOrSinkAnnotation', 'mapAnnotation', 'p
                 attributeType = savedMapperAttributes.getType().toLowerCase();
                 var attributeValues = savedMapperAttributes.getValue();
             }
-            if (attributeType === constList) {
+            if (attributeType === Constants.LIST) {
                 for (streamAttribute of streamAttributes) {
                     attributes.push({ key: streamAttribute.key, value: "" });
                 }
@@ -248,7 +208,7 @@ define(['log', 'jquery', 'lodash', 'sourceOrSinkAnnotation', 'mapAnnotation', 'p
                         i++;
                     }
                 }
-            } else if (attributeType === constMap) {
+            } else if (attributeType === Constants.MAP) {
                 for (streamAttribute of streamAttributes) {
                     attributes.push({ key: streamAttribute.key, value: "" });
                 }
@@ -269,12 +229,21 @@ define(['log', 'jquery', 'lodash', 'sourceOrSinkAnnotation', 'mapAnnotation', 'p
         };
 
         /**
+         * Function to add the error class
+         * @param {Object} id object where the errors needs to be displayed
+         */
+        var addErrorClass = function (id) {
+            $(id)[0].scrollIntoView();
+            $(id).addClass('required-input-field')
+        };
+
+        /**
          * Function to render the attribute-map div using handlebars
          * @param {Object} attributes which needs to be mapped on to the template
          */
         var renderAttributeMappingContent = function (attributes) {
             var attributeMapFormTemplate = Handlebars.compile($('#source-sink-map-attribute-template').html());
-            var wrappedHtml = attributeMapFormTemplate(attributes);
+            var wrappedHtml = attributeMapFormTemplate({ id: Constants.SOURCE, attributes: attributes });
             $('#attribute-map-content').html(wrappedHtml);
         };
 
@@ -304,9 +273,8 @@ define(['log', 'jquery', 'lodash', 'sourceOrSinkAnnotation', 'mapAnnotation', 'p
          * @param {String} id to identify the div in the html to traverse
          * @return {boolean} isError
          */
-        var validateCustomizedOptions = function (selectedOptions, id) {
+        var validateCustomizedOptions = function (id) {
             var isError = false;
-            var option = "";
             if ($('#customized-' + id + ' ul').has('li').length != 0) {
                 $('#customized-' + id + ' .option').each(function () {
                     var custOptName = $(this).find('.cust-option-key').val().trim();
@@ -314,19 +282,14 @@ define(['log', 'jquery', 'lodash', 'sourceOrSinkAnnotation', 'mapAnnotation', 'p
                     if ((custOptName != "") || (custOptValue != "")) {
                         if (custOptName == "") {
                             $(this).find('.error-message').text('Option key is required.');
-                            $(this)[0].scrollIntoView();
-                            $(this).find('.cust-option-key').addClass('required-input-field');
+                            addErrorClass($(this).find('.cust-option-key'))
                             isError = true;
                             return false;
                         } else if (custOptValue == "") {
                             $(this).find('.error-message').text('Option value is required.');
-                            $(this)[0].scrollIntoView();
-                            $(this).find('.cust-option-value').addClass('required-input-field');
+                            addErrorClass($(this).find('.cust-option-value'));
                             isError = true;
                             return false;
-                        } else {
-                            option = custOptName + " = \"" + custOptValue + "\"";
-                            selectedOptions.push(option);
                         }
                     }
                 });
@@ -382,7 +345,7 @@ define(['log', 'jquery', 'lodash', 'sourceOrSinkAnnotation', 'mapAnnotation', 'p
         /** Function to change the heading and the button text of the customized options div */
         var changeCustOptDiv = function () {
             var sourceCustOptionList = $('.source-sink-map-options #customized-source-options').
-            find('.cust-options li');
+                find('.cust-options li');
             var sourceDivParent = $('.source-sink-map-options #customized-source-options');
             if (sourceCustOptionList.length > 0) {
                 sourceDivParent.find('h3').show();
@@ -392,7 +355,7 @@ define(['log', 'jquery', 'lodash', 'sourceOrSinkAnnotation', 'mapAnnotation', 'p
                 sourceDivParent.find('.btn-add-options').html('Add customized option');
             }
             var mapperCustOptionList = $('.source-sink-map-options #customized-mapper-options').
-            find('.cust-options li');
+                find('.cust-options li');
             var mapperDivParent = $('.source-sink-map-options #customized-mapper-options');
             if (mapperCustOptionList.length > 0) {
                 mapperDivParent.find('h3').show();
@@ -405,61 +368,96 @@ define(['log', 'jquery', 'lodash', 'sourceOrSinkAnnotation', 'mapAnnotation', 'p
 
         /**
          * Function to validate the predefined options
-         * @param {Object} selectedOptions array to add the options which needs to be saved
          * @param {Object} predefinedOptions
          * @param {String} id to identify the div in the html to traverse
          * @return {boolean} isError
          */
-        var validateOptions = function (selectedOptions, predefinedOptions, id) {
+        var validateOptions = function (predefinedOptions, id) {
             var isError = false;
-            var option = "";
             $('.source-sink-map-options #' + id + ' .option').each(function () {
                 var optionName = $(this).find('.option-name').text().trim();
                 var optionValue = $(this).find('.option-value').val().trim();
                 var predefinedOptionObject = getOption(optionName, predefinedOptions);
                 if (!predefinedOptionObject.optional) {
-                    if (optionValue == "") {
-                        $(this).find('.error-message').text('Option value is required.');
-                        $(this)[0].scrollIntoView();
-                        $(this).find('.option-value').addClass('required-input-field');
+                    if (!checkOptionValue(optionValue, predefinedOptionObject, this)) {
                         isError = true;
                         return false;
-                    } else {
-                        var dataType = predefinedOptionObject.type[0];
-                        if (validateDataType(dataType, optionValue)) {
-                            $(this).find('.error-message').text('Invalid data-type. ' + dataType + ' required.');
-                            $(this)[0].scrollIntoView();
-                            $(this).find('.option-value').addClass('required-input-field');
+                    }
+                } else {
+                    if ($(this).find('.option-checkbox').is(":checked")) {
+                        if (!checkOptionValue(optionValue, predefinedOptionObject, this)) {
                             isError = true;
                             return false;
                         }
                     }
+                }
+            });
+            return isError;
+        };
+
+        /**
+         * Function to check if a particular option value is valid
+         * @param {String} optionValue value which needs to be validated
+         * @param {Object} predefinedOptionObject predefined object of the option
+         * @param {Object} parent div of the particular option
+         */
+        var checkOptionValue = function (optionValue, predefinedOptionObject, parent) {
+            if (optionValue == "") {
+                $(parent).find('.error-message').text('Option value is required.');
+                addErrorClass($(parent).find('.option-value'));
+                return false;
+            } else {
+                var dataType = predefinedOptionObject.type[0];
+                if (validateDataType(dataType, optionValue)) {
+                    $(parent).find('.error-message').text('Invalid data-type. ' + dataType + ' required.');
+                    addErrorClass($(parent).find('.option-value'));
+                    return false;
+                }
+            }
+            return true;
+        };
+
+        /**
+         * Function to build the options
+         * @param {Object} predefinedOptions predefined options
+         * @param {Object} selectedOptions array to add the built option
+         * @param {String} id div of the options which needs to be built [mapper or source]
+         */
+        var buildOptions = function (predefinedOptions, selectedOptions, id) {
+            var option;
+            $('.source-sink-map-options #' + id + ' .option').each(function () {
+                var optionName = $(this).find('.option-name').text().trim();
+                var optionValue = $(this).find('.option-value').val().trim();
+                var predefinedOptionObject = getOption(optionName, predefinedOptions);
+                if (!predefinedOptionObject.optional) {
                     option = optionName + " = \"" + optionValue + "\"";
                     selectedOptions.push(option);
                 } else {
                     if ($(this).find('.option-checkbox').is(":checked")) {
-                        if (optionValue == "") {
-                            $(this).find('.error-message').text('Option value is required.');
-                            $(this)[0].scrollIntoView();
-                            $(this).find('.option-value').addClass('required-input-field');
-                            isError = true;
-                            return false;
-                        } else {
-                            var dataType = predefinedOptionObject.type[0];
-                            if (validateDataType(dataType, optionValue)) {
-                                $(this).find('.error-message').text('Invalid data-type. ' + dataType + ' required.');
-                                $(this)[0].scrollIntoView();
-                                $(this).find('.option-value').addClass('required-input-field');
-                                isError = true;
-                                return false;
-                            }
-                        }
                         option = optionName + " = \"" + optionValue + "\"";
                         selectedOptions.push(option);
                     }
                 }
             });
-            return isError;
+        };
+
+        /**
+         * Function to build the customized options
+         * @param {Object} selectedOptions array to add the built option
+         * @param {String} id div of the options which needs to be built [mapper or source]
+         */
+        var buildCustomizedOption = function (selectedOptions, id) {
+            var option = "";
+            if ($('#customized-' + id + ' ul').has('li').length != 0) {
+                $('#customized-' + id + ' .option').each(function () {
+                    var custOptName = $(this).find('.cust-option-key').val().trim();
+                    var custOptValue = $(this).find('.cust-option-value').val().trim();
+                    if ((custOptName != "") && (custOptValue != "")) {
+                        option = custOptName + " = \"" + custOptValue + "\"";
+                        selectedOptions.push(option);
+                    }
+                });
+            }
         };
 
         /**
@@ -477,8 +475,8 @@ define(['log', 'jquery', 'lodash', 'sourceOrSinkAnnotation', 'mapAnnotation', 'p
             if ($('#' + id).hasClass('error-element')) {
                 isSourceConnected = false;
                 DesignViewUtils.prototype.errorAlert("Please connect to a stream");
-            } else if (!JSONValidator.prototype.validateSourceOrSinkAnnotation(clickedElement, 'Source', true)) {
-                // perform JSON validation to check if sink contains a connectedElement.
+            } else if (!JSONValidator.prototype.validateSourceOrSinkAnnotation(clickedElement, Constants.SOURCE, true)) {
+                // perform JSON validation to check if source contains a connectedElement.
                 isSourceConnected = false;
             }
             if (!isSourceConnected) {
@@ -497,7 +495,8 @@ define(['log', 'jquery', 'lodash', 'sourceOrSinkAnnotation', 'mapAnnotation', 'p
 
                 var propertyDiv = $('<div class="source-sink-form-container source-div"><div id="define-source"></div>' +
                     '<div class = "source-sink-map-options" id="source-options-div"></div>' +
-                    '<button type="submit" id ="btn-submit" class="btn toggle-view-button"> Submit </button> </div>' +
+                    '<button type="submit" id ="btn-submit" class="btn toggle-view-button"> Submit </button>' +
+                    '<button id="btn-cancel" type="button" class="btn btn-default"> Cancel </button> </div>' +
                     '<div class="source-sink-form-container mapper-div"> <div id="define-map"> </div> ' +
                     '<div class="source-sink-map-options" id="mapper-options-div">' +
                     '</div> </div> <div class= "source-sink-form-container attribute-map-div">' +
@@ -578,8 +577,8 @@ define(['log', 'jquery', 'lodash', 'sourceOrSinkAnnotation', 'mapAnnotation', 'p
                 var map = clickedElement.getMap();
 
                 //render the template to select the source type
-                var sourceFormTemplate = Handlebars.compile($('#source-sink-map-store-form-template').html());
-                var wrappedHtml = sourceFormTemplate({ id: "source", types: predefinedSources });
+                var sourceFormTemplate = Handlebars.compile($('#type-selection-form-template').html());
+                var wrappedHtml = sourceFormTemplate({ id: Constants.SOURCE, types: predefinedSources });
                 $('#define-source').html(wrappedHtml);
 
                 //onchange of the source-type selection
@@ -593,19 +592,19 @@ define(['log', 'jquery', 'lodash', 'sourceOrSinkAnnotation', 'mapAnnotation', 'p
                         sourceOptionsWithValues = createOptionObjectWithValues(sourceOptions);
                         customizedSourceOptions = [];
                     }
-                    renderOptions(sourceOptionsWithValues, customizedSourceOptions, "source");
+                    renderOptions(sourceOptionsWithValues, customizedSourceOptions, Constants.SOURCE);
                     if (!map) {
                         renderMap(predefinedSourceMaps);
                         customizedMapperOptions = [];
-                        mapperOptions = getSelectedTypeOptions("passThrough", predefinedSourceMaps);
+                        mapperOptions = getSelectedTypeOptions(Constants.DEFAULT_MAPPER_TYPE, predefinedSourceMaps);
                         mapperOptionsWithValues = createOptionObjectWithValues(mapperOptions);
-                        renderOptions(mapperOptionsWithValues, customizedMapperOptions, "mapper")
+                        renderOptions(mapperOptionsWithValues, customizedMapperOptions, Constants.MAPPER)
                         renderAttributeMapping();
                     }
                 });
 
-                // if source type is defined
                 if (type) {
+                    //if source object is already edited
                     $('#define-source').find('#source-type option').filter(function () {
                         return ($(this).val().toLowerCase() == (type.toLowerCase()));
                     }).prop('selected', true);
@@ -619,13 +618,13 @@ define(['log', 'jquery', 'lodash', 'sourceOrSinkAnnotation', 'mapAnnotation', 'p
                         sourceOptionsWithValues = createOptionObjectWithValues(sourceOptions);
                         customizedSourceOptions = [];
                     }
-                    renderOptions(sourceOptionsWithValues, customizedSourceOptions, "source");
+                    renderOptions(sourceOptionsWithValues, customizedSourceOptions, Constants.SOURCE);
                     if (!map) {
                         renderMap(predefinedSourceMaps);
                         customizedMapperOptions = [];
-                        mapperOptions = getSelectedTypeOptions("passThrough", predefinedSourceMaps);
+                        mapperOptions = getSelectedTypeOptions(Constants.DEFAULT_MAPPER_TYPE, predefinedSourceMaps);
                         mapperOptionsWithValues = createOptionObjectWithValues(mapperOptions);
-                        renderOptions(mapperOptionsWithValues, customizedMapperOptions, "mapper")
+                        renderOptions(mapperOptionsWithValues, customizedMapperOptions, Constants.MAPPER)
                         renderAttributeMapping();
                     }
                 }
@@ -652,7 +651,7 @@ define(['log', 'jquery', 'lodash', 'sourceOrSinkAnnotation', 'mapAnnotation', 'p
                             mapperOptionsWithValues = createOptionObjectWithValues(mapperOptions);
                             customizedMapperOptions = [];
                         }
-                        renderOptions(mapperOptionsWithValues, customizedMapperOptions, "mapper");
+                        renderOptions(mapperOptionsWithValues, customizedMapperOptions, Constants.MAPPER);
                     }
                     if (savedMapperAttributes) {
                         $('#define-attribute #attributeMap-checkBox').prop('checked', true);
@@ -674,7 +673,7 @@ define(['log', 'jquery', 'lodash', 'sourceOrSinkAnnotation', 'mapAnnotation', 'p
                         mapperOptionsWithValues = createOptionObjectWithValues(mapperOptions);
                         customizedMapperOptions = [];
                     }
-                    renderOptions(mapperOptionsWithValues, customizedMapperOptions, "mapper")
+                    renderOptions(mapperOptionsWithValues, customizedMapperOptions, Constants.MAPPER)
                     if (!map || (map && !savedMapperAttributes)) {
                         //if saved mapper attributes are undefined
                         renderAttributeMapping();
@@ -694,36 +693,71 @@ define(['log', 'jquery', 'lodash', 'sourceOrSinkAnnotation', 'mapAnnotation', 'p
                     //clear the errors
                     $('.error-message').text("")
                     $('.required-input-field').removeClass('required-input-field');
+                    var isErrorOccurred = false;
 
                     var selectedSourceType = $('#define-source #source-type').val();
                     if (selectedSourceType === null) {
-                        DesignViewUtils.prototype.errorAlert("Select a source type to submit");
+                        DesignViewUtils.prototype.errorAlert("Select a source type to submit.");
+                        isErrorOccurred = true;
                         return;
                     } else {
-                        var annotationOptions = [];
+                        if (validateOptions(sourceOptions, "source-options")) {
+                            isErrorOccurred = true;
+                            return;
+                        }
+                        if (validateCustomizedOptions("source-options")) {
+                            isErrorOccurred = true;
+                            return;
+                        }
+                        var selectedMapType = $('#define-map #map-type').val();
+                        var mapperAnnotationOptions = [];
+                        if (validateOptions(mapperOptions, "mapper-options")) {
+                            isErrorOccurred = true;
+                            return;
+                        }
+                        if (validateCustomizedOptions("mapper-options")) {
+                            isErrorOccurred = true;
+                            return;
+                        }
+
+                        if ($('#define-attribute #attributeMap-checkBox').is(":checked")) {
+                            //if attribute section is checked
+                            var mapperAttributeValuesArray = {};
+                            $('#mapper-attributes .attribute').each(function () {
+                                //validate mapper  attributes if value is not filled
+                                var key = $(this).find('.attr-key').val().trim();
+                                var value = $(this).find('.attr-value').val().trim();
+                                if (value == "") {
+                                    $(this).find('.error-message').text('Attribute Value is required.');
+                                    addErrorClass($(this).find('.attr-value'));
+                                    isErrorOccurred = true;
+                                    return false;
+                                } else {
+                                    mapperAttributeValuesArray[key] = value;
+                                }
+                            });
+                        }
+                    }
+
+                    if (!isErrorOccurred) {
                         clickedElement.setType(selectedSourceType);
-                        if (validateOptions(annotationOptions, sourceOptions, "source-options")) {
-                            return;
-                        }
-                        if (validateCustomizedOptions(annotationOptions, "source-options")) {
-                            return;
-                        }
+                        var textNode = $('#' + id).find('.sourceNameNode');
+                        textNode.html(selectedSourceType);
+
+                        var annotationOptions = [];
+                        buildOptions(sourceOptions, annotationOptions, "source-options");
+                        buildCustomizedOption(annotationOptions, "source-options");
                         if (annotationOptions.length == 0) {
                             clickedElement.setOptions(undefined);
                         } else {
                             clickedElement.setOptions(annotationOptions);
                         }
 
-                        var selectedMapType = $('#define-map #map-type').val();
-                        var mapperAnnotationOptions = [];
                         var mapper = {};
+                        var mapperAnnotationOptions = [];
+                        buildOptions(mapperOptions, mapperAnnotationOptions, "mapper-options");
+                        buildCustomizedOption(mapperAnnotationOptions, "mapper-options");
                         _.set(mapper, 'type', selectedMapType);
-                        if (validateOptions(mapperAnnotationOptions, mapperOptions, "mapper-options")) {
-                            return;
-                        }
-                        if (validateCustomizedOptions(mapperAnnotationOptions, "mapper-options")) {
-                            return;
-                        }
                         if (mapperAnnotationOptions.length == 0) {
                             _.set(mapper, 'options', undefined);
                         } else {
@@ -731,55 +765,40 @@ define(['log', 'jquery', 'lodash', 'sourceOrSinkAnnotation', 'mapAnnotation', 'p
                         }
 
                         if ($('#define-attribute #attributeMap-checkBox').is(":checked")) {
-                            //if attribute section is checked
-                            var mapperAttributeValuesArray = {};
-                            var isError = false;
-                            $('#mapper-attributes .attribute').each(function () {
-                                //validate mapper  attributes if value is not filled
-                                var key = $(this).find('.attr-key').val().trim();
-                                var value = $(this).find('.attr-value').val().trim();
-                                if (value == "") {
-                                    $(this).find('.error-message').text('Attribute Value is required.');
-                                    $(this)[0].scrollIntoView();
-                                    $(this).find('.attr-value').addClass('required-input-field');
-                                    isError = true;
-                                    return false;
-                                } else {
-                                    mapperAttributeValuesArray[key] = value;
-                                }
-                            });
-                            if (isError) {
-                                return;
-                            } else {
-                                payloadOrAttributeOptions = {};
-                                _.set(payloadOrAttributeOptions, 'annotationType', 'ATTRIBUTES');
-                                _.set(payloadOrAttributeOptions, 'type', "MAP");
-                                _.set(payloadOrAttributeOptions, 'value', mapperAttributeValuesArray);
-                                var payloadOrAttributeObject = new PayloadOrAttribute(payloadOrAttributeOptions);
-                                _.set(mapper, 'payloadOrAttribute', payloadOrAttributeObject);
-                            }
+                            payloadOrAttributeOptions = {};
+                            _.set(payloadOrAttributeOptions, 'annotationType', 'ATTRIBUTES');
+                            _.set(payloadOrAttributeOptions, 'type', Constants.MAP);
+                            _.set(payloadOrAttributeOptions, 'value', mapperAttributeValuesArray);
+                            var payloadOrAttributeObject = new PayloadOrAttribute(payloadOrAttributeOptions);
+                            _.set(mapper, 'payloadOrAttribute', payloadOrAttributeObject);
                         } else {
                             _.set(mapper, 'payloadOrAttribute', undefined);
                         }
+
                         var mapperObject = new MapAnnotation(mapper);
                         clickedElement.setMap(mapperObject);
+
+                        $('#' + id).removeClass('incomplete-element');
+                        //Send source element to the backend and generate tooltip
+                        var sourceToolTip = self.formUtils.getTooltip(clickedElement, Constants.SOURCE);
+                        $('#' + id).prop('title', sourceToolTip);
+
+                        // set the isDesignViewContentChanged to true
+                        self.configurationData.setIsDesignViewContentChanged(true);
+
+                        self.designViewContainer.removeClass('disableContainer');
+                        self.toggleViewButton.removeClass('disableContainer');
+
+                        // close the form window
+                        self.consoleListManager.removeFormConsole(formConsole);
                     }
+                });
 
-                    var textNode = $('#' + id).find('.sourceNameNode');
-                    textNode.html(selectedSourceType);
-
-                    $('#' + id).removeClass('incomplete-element');
-
-                    // set the isDesignViewContentChanged to true
-                    self.configurationData.setIsDesignViewContentChanged(true);
-
+                // 'Cancel' button action
+                var cancelButtonElement = $(formContainer).find('#btn-cancel')[0];
+                cancelButtonElement.addEventListener('click', function () {
                     self.designViewContainer.removeClass('disableContainer');
                     self.toggleViewButton.removeClass('disableContainer');
-
-                    //Send source element to the backend and generate tooltip
-                    var sourceToolTip = self.formUtils.getTooltip(clickedElement, Constants.SOURCE);
-                    $('#' + id).prop('title', sourceToolTip);
-
                     // close the form window
                     self.consoleListManager.removeFormConsole(formConsole);
                 });

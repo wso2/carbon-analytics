@@ -15,27 +15,47 @@
  * specific language governing permissions and limitations
  * under the License.
  */
+
+/**
+ * Constants to be used by the siddhi editor  design view
+ */
 define(function () {
 
-    "use strict"; // JS strict mode
+    "use strict";   // JS strict mode
 
     /**
      * Constants used by the siddhi editor design-view
      */
     var constants = {
-        AGGREGATION : "aggregation",
-        FUNCTION : "function",
-        JOIN_QUERY : "join-query",
-        PARTITION : "partition",
-        PATTERN_QUERY : "pattern-query",
-        SEQUENCE_QUERY : "sequence-query",
-        SINK : "sink",
-        SOURCE : "sink",
-        STREAM : "stream",
-        TABLE : "table",
-        TRIGGER : "trigger",
-        WINDOW : "window",
-        WINDOW_FILTER_PROJECTION_QUERY : "window-filter-projection-query"
+        ALPHABETIC_VALIDATOR_REGEX: /^([a-zA-Z])$/,
+        START: "start",
+        CRON_EXPRESSION: "cron-expression",
+        EVERY: "every",
+        AT: "at",
+        SORT: "sort",
+        FREQUENT: "frequent",
+        LOSSY_FREQUENT: "lossyfrequent",
+        DEFAULT_STORE_TYPE: "in-memory",
+        RDBMS_STORE_TYPE: "rdbms",
+        DEFAULT_MAPPER_TYPE: "passThrough",
+        ATTRIBUTE: "attribute",
+        MAP: "map",
+        LIST: "list",
+        MAPPER: "mapper",
+        STORE: "store",
+        AGGREGATION: "aggregation",
+        FUNCTION: "function",
+        SINK: "sink",
+        SOURCE: "source",
+        TABLE: "table",
+        STREAM: "stream",
+        WINDOW: "window",
+        TRIGGER: "trigger",
+        PARTITION: "partition",
+        JOIN_QUERY: "join-query",
+        PATTERN_QUERY: "pattern-query",
+        SEQUENCE_QUERY: "sequence-query",
+        WINDOW_FILTER_PROJECTION_QUERY: "window-filter-projection-query"
     };
 
     return constants;

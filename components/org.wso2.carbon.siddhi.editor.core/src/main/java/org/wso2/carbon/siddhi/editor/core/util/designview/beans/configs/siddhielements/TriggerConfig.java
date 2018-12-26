@@ -25,13 +25,16 @@ import java.util.List;
  */
 public class TriggerConfig extends SiddhiElementConfig {
     private String name;
-    private String at;
+    private String criteria;
+    private String criteriaType;
     private List<String> annotationList;
 
-    public TriggerConfig(String id, String name, String at, List<String> annotationList) {
+    public TriggerConfig(String id, String name, String criteria, String criteriaType,
+                         List<String> annotationList) {
         super(id);
         this.name = name;
-        this.at = at;
+        this.criteria = criteria;
+        this.criteriaType = criteriaType;
         this.annotationList = annotationList;
     }
 
@@ -39,11 +42,19 @@ public class TriggerConfig extends SiddhiElementConfig {
         return name;
     }
 
-    public String getAt() {
-        return at;
+    public String getCriteria() {
+        return criteria;
     }
 
     public List<String> getAnnotationList() {
         return annotationList;
+    }
+
+    public String getCriteriaType() {
+        return criteriaType;
+    }
+
+    public void setTriggerCriteria (String criteria) {
+        this.criteria = criteria;
     }
 }
