@@ -29,7 +29,6 @@ import org.testng.annotations.Test;
 import org.wso2.carbon.analytics.test.osgi.util.TestUtil;
 import org.wso2.carbon.analytics.test.osgi.util.HTTPResponseMessage;
 import org.wso2.carbon.container.CarbonContainerFactory;
-import org.wso2.carbon.container.options.CarbonDistributionOption;
 import org.wso2.carbon.kernel.CarbonServerInfo;
 import org.wso2.carbon.stream.processor.common.EventStreamService;
 import org.wso2.carbon.stream.processor.common.SiddhiAppRuntimeService;
@@ -75,8 +74,8 @@ public class SiddhiAsAPITestcase {
                 copySiddhiFileOption(),
                 carbonDistribution(
                         Paths.get("target", "wso2das-" + System.getProperty("carbon.analytic.version")),
-                        "worker"),
-                CarbonDistributionOption.debug(5005)
+                        "worker")
+                //CarbonDistributionOption.debug(5005)
         };
     }
 
