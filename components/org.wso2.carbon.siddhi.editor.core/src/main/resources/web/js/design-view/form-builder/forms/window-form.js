@@ -402,7 +402,7 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'handlebar', 'constan
             var clickedElement = self.configurationData.getSiddhiAppConfig().getWindow(id);
 
             var propertyDiv = $('<div class = "window-form-container"><div id="property-header"><h3>Window' +
-                ' Configuration</h3></div> <h4>Name: </h4> <input type="text" id="windowName" class="clearfix">' +
+                ' Configuration</h3></div> <h4>Name: </h4> <input type="text" id="windowName" class="clearfix name">' +
                 '<label class="error-message" id="windowNameErrorMessage"></label> <div id="define-attribute"></div>' +
                 self.formUtils.buildFormButtons() + '</div> <div class= "window-form-container"> ' +
                 '<div id = "defineFunctionName"> </div> <div id="defineFunctionParameters"> </div>' +

@@ -126,7 +126,7 @@ define(['require', 'log', 'jquery', 'lodash', 'constants'],
 
             var propertyDiv = $('<div id="property-header"><h3>Trigger Configuration</h3></div>' +
                 '<div class ="trigger-form-container"> <div id="define-trigger-name"> <h4>Name: </h4>' +
-                '<input type="text" id="triggerName" class="clearfix"> <label class="error-message" ' +
+                '<input type="text" id="triggerName" class="clearfix name"> <label class="error-message" ' +
                 'id = "triggerNameErrorMessage"> </label> </div>' + self.formUtils.buildFormButtons() + '</div>' +
                 '<div class = "trigger-form-container"> <div id= "define-trigger-criteria"> </div>' +
                 '<div id = "trigger-criteria-content" ></div> </div>');

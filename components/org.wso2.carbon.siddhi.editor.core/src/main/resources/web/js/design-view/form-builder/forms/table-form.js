@@ -365,8 +365,9 @@ define(['log', 'jquery', 'lodash', 'attribute', 'storeAnnotation', 'handlebar', 
             var clickedElement = self.configurationData.getSiddhiAppConfig().getTable(id);
 
             var propertyDiv = $('<div class = "table-form-container table-div"> <div id="property-header"> <h3> Table' +
-                ' Configuration </h3> </div> <h4> Name: </h4> <input type="text" id="tableName" class = "clearfix">' +
-                '<label class="error-message" id="tableNameErrorMessage"> </label> <div id = "define-attribute"> </div>' +
+                ' Configuration </h3> </div> <h4> Name: </h4> <input type="text" id="tableName" ' +
+                'class = "clearfix name"> <label class="error-message" id="tableNameErrorMessage"> </label>' +
+                '<div id = "define-attribute"> </div>' +
                 self.formUtils.buildFormButtons() + '</div> ' +
                 '<div class = "table-form-container store-div"> <div id = "define-store"> </div>  ' +
                 '<div id="define-rdbms-type"> </div> <div id="store-options-div"> </div> </div> ' +
