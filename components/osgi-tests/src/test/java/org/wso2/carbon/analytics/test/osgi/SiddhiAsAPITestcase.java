@@ -738,27 +738,6 @@ public class SiddhiAsAPITestcase {
 
     /**
      *
-     * Persistence clearing of all Siddhi Applications
-     */
-    @Test (dependsOnMethods = {"testValidSiddhiAPPDeployment"})
-    public void testAllSiddhiAppsPersistenceStoreClear() throws Exception {
-
-        URI baseURI = URI.create(String.format("http://%s:%d", "localhost", 9090));
-        String path = "/siddhi-apps/revisions";
-        String contentType = "text/plain";
-        String method = "DELETE";
-
-        logger.info("Deleting the persistence store through REST API");
-        HTTPResponseMessage httpResponseMessage = sendHRequest("", baseURI, path, contentType, method,
-                true, DEFAULT_USER_NAME, DEFAULT_PASSWORD);
-        Assert.assertEquals(httpResponseMessage.getResponseCode(), 200);
-        Assert.assertEquals(httpResponseMessage.getContentType(), "application/json");
-        Thread.sleep(2000);
-
-    }
-
-    /**
-     *
      * Persistence clearing of non-existing Siddhi App
      */
     @Test (dependsOnMethods = {"testValidSiddhiAPPDeployment"})

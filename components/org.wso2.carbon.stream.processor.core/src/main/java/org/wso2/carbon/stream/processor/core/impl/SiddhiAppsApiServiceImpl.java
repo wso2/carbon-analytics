@@ -385,9 +385,8 @@ public class SiddhiAppsApiServiceImpl extends SiddhiAppsApiService {
             }
             //deploy all the siddhi apps
             if (enabledRedeployment == null || "true".equals(enabledRedeployment)) {
-                //deploy persistence store
                 for (Map.Entry<String, SiddhiAppData> entry : storedSiddhiApps.entrySet()) {
-                    if (entry.getValue() != null) {
+                    if (entry.getValue() != null && entry.getValue().getSiddhiAppRuntime() != null) {
                         StreamProcessorDataHolder.getStreamProcessorService().deploySiddhiApp(entry.getValue().getSiddhiApp(), entry.getKey());
 
                     }
