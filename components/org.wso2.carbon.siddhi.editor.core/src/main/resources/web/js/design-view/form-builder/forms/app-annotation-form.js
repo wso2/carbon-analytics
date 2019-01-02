@@ -16,8 +16,8 @@
  * under the License.
  */
 
-define(['require', 'log', 'jquery', 'lodash'],
-    function (require, log, $, _) {
+define(['require', 'log', 'jquery', 'lodash', 'handlebar', 'annotationObject', 'annotationElement'],
+    function (require, log, $, _, Handlebars, AnnotationObject, AnnotationElement) {
 
         /**
          * @class AppAnnotationForm Creates a forms to collect app level annotations and siddhi app name
@@ -44,122 +44,85 @@ define(['require', 'log', 'jquery', 'lodash'],
          */
         AppAnnotationForm.prototype.generatePropertiesForm = function (element, formConsole, formContainer) {
             var self = this;
-            var div = $('<div />').attr({ id: 'define-appconfig', class: 'define-appconfig' });
-            formContainer.append(div);
+            var propertyDiv = $('<div class= "siddhi-app-form-container">  <div id="property-header"> <h3>' +
+                'Siddhi App Configuration</h3></div> <div id = "define-app-name"> <h4> Name </h4> ' +
+                '<input type="text" id="app-name" class="clearfix name"><label class = "error-message"> </label></div>' +
+                '<div id = "define-app-description"> <h4> Description </h4> <textarea id="app-description" ' +
+                'class="clearfix"> </textarea> <label class = "error-message"> </label> </div>' +
+                self.formUtils.buildFormButtons() + '</div>' +
+                '<div class = "siddhi-app-form-container"> <div id = "define-annotation" </div> </div>');
+
+            formContainer.append(propertyDiv);
+            $(".overlayed-container").fadeTo(200, 1);
             // design view container and toggle view button are enabled
             self.designViewContainer.addClass('disableContainer');
             self.toggleViewButton.addClass('disableContainer');
-            $(".overlayed-container").fadeTo(200, 1);
 
             var siddhiAppConfig = self.configurationData.getSiddhiAppConfig();
             var siddhiAppName = siddhiAppConfig.getSiddhiAppName();
             var siddhiAppDescription = siddhiAppConfig.getSiddhiAppDescription();
-            var savedAppAnnotations = siddhiAppConfig.getAppAnnotationList();
-            var annotations = [];
-            _.forEach(savedAppAnnotations, function (savedAnnotation) {
-                annotations.push({ annotation: savedAnnotation });
-            });
+            var savedAppAnnotationObjects = siddhiAppConfig.getAppAnnotationListObjects();
 
-            var fillWith = {
-                siddhiApp: {
-                    name: siddhiAppName,
-                    description: siddhiAppDescription
-                },
-                annotations: annotations
-            };
-            fillWith = self.formUtils.cleanJSONObject(fillWith);
-            var editor = new JSONEditor(div[0], {
-                schema: {
-                    type: "object",
-                    title: "Siddhi App Configurations",
-                    options: {
-                        disable_properties: false
-                    },
-                    properties: {
-                        siddhiApp: {
-                            propertyOrder: 1,
-                            type: "object",
-                            title: "Siddhi App",
-                            required: true,
-                            properties: {
-                                name: {
-                                    required: true,
-                                    title: "Name",
-                                    type: "string",
-                                    minLength: 1
-                                },
-                                description: {
-                                    required: true,
-                                    title: "Description",
-                                    type: "string",
-                                    minLength: 1
-
-                                }
-                            }
-                        },
-                        annotations: {
-                            propertyOrder: 2,
-                            type: "array",
-                            format: "table",
-                            title: "App Annotations",
-                            uniqueItems: true,
-                            minItems: 1,
-                            items: {
-                                type: "object",
-                                title: "App Annotation",
-                                properties: {
-                                    annotation: {
-                                        title: "App Annotation",
-                                        type: "string",
-                                        minLength: 1
-                                    }
-                                }
-                            }
-                        }
-                    }
-                },
-                startval: fillWith,
-                show_errors: "always",
-                disable_properties: true,
-                display_required_only: true,
-                no_additional_properties: true,
-                disable_array_delete_all_rows: true,
-                disable_array_delete_last_row: true,
-                disable_array_reorder: true
-            });
-
-            formContainer.append(self.formUtils.buildFormButtons(true));
+            $('#app-name').val(siddhiAppName);
+            $('#app-description').val(siddhiAppDescription);
+            self.formUtils.renderAnnotationTemplate("define-annotation", savedAppAnnotationObjects);
 
             // 'Submit' button action
             var submitButtonElement = $(formContainer).find('#btn-submit')[0];
             submitButtonElement.addEventListener('click', function () {
 
-                // set the isDesignViewContentChanged to true
-                self.configurationData.setIsDesignViewContentChanged(true);
+                var appName = $('#app-name').val().trim();
+                var appDescription = $('#app-description').val().trim();
+                var isErrorOccurred = false;
 
-                var config = editor.getValue();
+                if (appName === "") {
+                    self.formUtils.addErrorClass($('#define-app-name #app-name'));
+                    $('#define-app-name').find('.error-message').text("Siddhi App name is required");
+                    isErrorOccurred = true;
+                    return;
+                }
+                if (appDescription === "") {
+                    self.formUtils.addErrorClass($('#define-app-description #app-description'));
+                    $('#define-app-description').find('.error-message').text("Siddhi App description is required");
+                    isErrorOccurred = true;
+                    return;
+                }
 
-                siddhiAppConfig.setSiddhiAppName(config.siddhiApp.name);
-                siddhiAppConfig.setSiddhiAppDescription(config.siddhiApp.description);
-                siddhiAppConfig.clearAppAnnotationList();
-                _.forEach(config.annotations, function (annotation) {
-                    siddhiAppConfig.addAppAnnotation(annotation.annotation);
-                });
+                if (!isErrorOccurred) {
+                    siddhiAppConfig.setSiddhiAppName(appName);
+                    siddhiAppConfig.setSiddhiAppDescription(appDescription);
+                    siddhiAppConfig.clearAppAnnotationList();
+                    siddhiAppConfig.clearAppAnnotationListObjects()
 
-                // update the siddhi app name displayed on the canvas
-                var siddhiAppNameNode = $('#' + self.currentTabId + '-siddhiAppNameId');
-                siddhiAppNameNode.html(config.siddhiApp.name);
+                    var annotationStringList = [];
+                    var annotationObjectList = [];
+                    var annotationNodes = $('#annotation-div').jstree(true)._model.data['#'].children;
+                    self.formUtils.buildAnnotation(annotationNodes, annotationStringList, annotationObjectList);
+                    _.forEach(annotationStringList, function (annotation) {
+                        //remove the @ and add @App: from the annotation
+                        var appAnnotation = "@App:" + annotation.slice(1);
+                        siddhiAppConfig.addAppAnnotation(appAnnotation);
+                    });
+                    _.forEach(annotationObjectList, function (annotation) {
+                        siddhiAppConfig.addAppAnnotationObject(annotation);
+                    });
 
-                //update the siddhi app desc displayed on the canvas
-                var siddhiAppDescriptionNode = $('#siddhi-app-desc-node');
-                siddhiAppDescriptionNode.html(config.siddhiApp.description);
+                    // update the siddhi app name displayed on the canvas
+                    var siddhiAppNameNode = $('#' + self.currentTabId + '-siddhiAppNameId');
+                    siddhiAppNameNode.html(appName);
+                    //update the siddhi app desc displayed on the canvas
+                    var siddhiAppDescriptionNode = $('#siddhi-app-desc-node');
+                    siddhiAppDescriptionNode.html(appDescription);
 
-                // design view container and toggle view button are enabled
-                self.designViewContainer.removeClass('disableContainer');
-                self.toggleViewButton.removeClass('disableContainer');
+                    // set the isDesignViewContentChanged to true
+                    self.configurationData.setIsDesignViewContentChanged(true);
+                    // design view container and toggle view button are enabled
+                    self.designViewContainer.removeClass('disableContainer');
+                    self.toggleViewButton.removeClass('disableContainer');
+                    // close the form window
+                    self.consoleListManager.removeFormConsole(formConsole);
+                }
 
-                // close the form window
-                self.consoleListManager.removeFormConsole(formConsole);
             });
             // 'Cancel' button action
             var cancelButtonElement = $(formContainer).find('#btn-cancel')[0];

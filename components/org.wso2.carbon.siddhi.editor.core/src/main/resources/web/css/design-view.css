@@ -798,8 +798,9 @@ a.list-group-item, button.list-group-item {
 	background: transparent;
 }
 
-.design-view-form-content  .stream-form-container #define-annotation {
-	margin-top:10px;
+.design-view-form-content .stream-form-container #define-annotation,
+.design-view-form-content .siddhi-app-form-container #define-annotation {
+	margin-top:20px;
 	color: #ccc;
 }
 
@@ -811,11 +812,10 @@ a.list-group-item, button.list-group-item {
 	margin-left: 10px;
 }
 
-.stream-form-container {
-	width:50%;
-}
 
-.partition-form-container {
+.stream-form-container,
+.partition-form-container,
+.siddhi-app-form-container {
 	width: 40%;
 }
 
@@ -825,7 +825,8 @@ a.list-group-item, button.list-group-item {
 .window-form-container,
 .trigger-form-container,
 .function-form-container,
-.partition-form-container {
+.partition-form-container,
+.siddhi-app-form-container {
 	float:left;
 	display:inline-block;
 	padding: 5px;
