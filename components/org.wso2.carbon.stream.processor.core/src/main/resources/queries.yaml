@@ -10,6 +10,7 @@ queries:
       DELETE_ROW_FROM_TABLE:
       DELETE_OLD_REVISIONS:
       COUNT_NUMBER_REVISIONS:
+      DELETE_ALL_REVISIONS:
 
    type: default
    version: default
@@ -25,6 +26,7 @@ queries:
       DELETE_ROW_FROM_TABLE: DELETE FROM {{TABLE_NAME}} WHERE id IN (SELECT id FROM {{TABLE_NAME}} WHERE siddhiAppName = ? ORDER BY id ASC LIMIT ?)
       DELETE_OLD_REVISIONS: DELETE FROM {{TABLE_NAME}} WHERE revision IN (?) AND siddhiAppName = ?
       COUNT_NUMBER_REVISIONS: SELECT COUNT(*) FROM {{TABLE_NAME}} WHERE siddhiAppName = ?
+      DELETE_ALL_REVISIONS: DELETE FROM {{TABLE_NAME}} WHERE siddhiAppName = ?
 
    type: h2
    version: default
@@ -40,6 +42,7 @@ queries:
       DELETE_ROW_FROM_TABLE: DELETE FROM {{TABLE_NAME}} WHERE siddhiAppName = ? IS NOT NULL ORDER BY id ASC LIMIT ?
       DELETE_OLD_REVISIONS: DELETE FROM {{TABLE_NAME}} WHERE revision IN (?) AND siddhiAppName = ?
       COUNT_NUMBER_REVISIONS: SELECT COUNT(*) FROM {{TABLE_NAME}} WHERE siddhiAppName = ?
+      DELETE_ALL_REVISIONS: DELETE FROM {{TABLE_NAME}} WHERE siddhiAppName = ?
 
    type: mysql
    version: default
@@ -55,6 +58,7 @@ queries:
       DELETE_ROW_FROM_TABLE: DELETE FROM {{TABLE_NAME}} WHERE id IN (SELECT id FROM {{TABLE_NAME}} WHERE siddhiAppName = ? ORDER BY id ASC LIMIT ?)
       DELETE_OLD_REVISIONS: DELETE FROM {{TABLE_NAME}} WHERE revision IN (?) AND siddhiAppName = ?
       COUNT_NUMBER_REVISIONS: SELECT COUNT(*) FROM {{TABLE_NAME}} WHERE siddhiAppName = ?
+      DELETE_ALL_REVISIONS: DELETE FROM {{TABLE_NAME}} WHERE siddhiAppName = ?
 
    type: postgresql
    version: default
@@ -70,6 +74,7 @@ queries:
       DELETE_ROW_FROM_TABLE: DELETE FROM {{TABLE_NAME}} WHERE id IN (SELECT TOP (?) id FROM {{TABLE_NAME}} WHERE siddhiAppName = ? ORDER BY id ASC)
       DELETE_OLD_REVISIONS: DELETE FROM {{TABLE_NAME}} WHERE revision IN (?) AND siddhiAppName = ?
       COUNT_NUMBER_REVISIONS: SELECT COUNT(*) FROM {{TABLE_NAME}} WHERE siddhiAppName = ?
+      DELETE_ALL_REVISIONS: DELETE FROM {{TABLE_NAME}} WHERE siddhiAppName = ?
 
    type: microsoft sql server
    version: default
@@ -85,6 +90,7 @@ queries:
       DELETE_ROW_FROM_TABLE: DELETE {{TABLE_NAME}} WHERE revision in (SELECT revision FROM (SELECT * FROM {{TABLE_NAME}} WHERE siddhiAppName = ? ORDER BY revision ASC) WHERE rownum<=?)
       DELETE_OLD_REVISIONS: DELETE FROM {{TABLE_NAME}} WHERE revision in (?) AND siddhiAppName = ?
       COUNT_NUMBER_REVISIONS: SELECT COUNT(*) FROM {{TABLE_NAME}} WHERE siddhiAppName = ?
+      DELETE_ALL_REVISIONS: DELETE FROM {{TABLE_NAME}} WHERE siddhiAppName = ?
 
    type: oracle
    version: default

@@ -29,7 +29,7 @@ import org.wso2.carbon.stream.processor.core.persistence.query.QueryManager;
 import java.io.IOException;
 
 /**
- * Class used to get Database queries according to RDBMS type used
+ * Class used to get Database queries according to RDBMS type used.
  */
 public class RDBMSConfiguration {
 
@@ -68,6 +68,9 @@ public class RDBMSConfiguration {
             databaseQueryEntries.setDeleteOldRevisionsQuery(queryManager.getQuery(PersistenceConstants.DELETE_OLD_REVISIONS).
                     replace(PersistenceConstants.PLACEHOLDER_TABLE_NAME, tableName));
             databaseQueryEntries.setCountQuery(queryManager.getQuery(PersistenceConstants.COUNT_NUMBER_REVISIONS).
+                    replace(PersistenceConstants.PLACEHOLDER_TABLE_NAME, tableName));
+            databaseQueryEntries.setDeleteAllRevisionsQuery(queryManager.
+                    getQuery(PersistenceConstants.DELETE_ALL_REVISIONS).
                     replace(PersistenceConstants.PLACEHOLDER_TABLE_NAME, tableName));
 
         } catch (QueryMappingNotAvailableException | ConfigurationException | IOException e) {

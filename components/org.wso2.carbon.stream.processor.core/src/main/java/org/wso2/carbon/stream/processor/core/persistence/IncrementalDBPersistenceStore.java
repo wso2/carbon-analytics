@@ -261,6 +261,38 @@ public class IncrementalDBPersistenceStore implements IncrementalPersistenceStor
         return null;
     }
 
+    @Override
+    public void clearAllRevisions(String siddhiAppName) {
+        PreparedStatement stmt = null;
+        Connection con;
+        try {
+            con = datasource.getConnection();
+            con.setAutoCommit(false);
+        } catch (SQLException e) {
+            log.error("Cannot establish connection to data source " + datasourceName +
+                    " to clean all revisions", e);
+            return;
+        }
+        try {
+            stmt = con.prepareStatement(executionInfo.getPreparedDeleteAllRevisionsStatement());
+            stmt.setString(1, siddhiAppName);
+            stmt.executeUpdate();
+            con.commit();
+        } catch (SQLException e) {
+            log.error("Error in deleting all revisions of siddhiApp: " +
+                    siddhiAppName + "from the database with datasource " + datasourceName, e);
+        } finally {
+            if (stmt != null) {
+                try {
+                    stmt.close();
+                } catch (SQLException e) {
+                    log.error("Unable to close statement." + e.getMessage(), e);
+                }
+            }
+            DBPersistenceStoreUtils.cleanupConnections(stmt, con);
+        }
+    }
+
     private List<String> getListOfRevisionsFromDB(String siddhiAppName) {
         List<String> revisions = new ArrayList<>();
         PreparedStatement stmt = null;
@@ -310,6 +342,7 @@ public class IncrementalDBPersistenceStore implements IncrementalPersistenceStor
         executionInfo.setPreparedDeleteStatement(databaseQueryEntries.getDeleteQuery());
         executionInfo.setPreparedDeleteOldRevisionsStatement(databaseQueryEntries.getDeleteOldRevisionsQuery());
         executionInfo.setPreparedCountStatement(databaseQueryEntries.getCountQuery());
+        executionInfo.setPreparedDeleteAllRevisionsStatement(databaseQueryEntries.getDeleteAllRevisionsQuery());
     }
 
     private void cleanOldRevisions(IncrementalSnapshotInfo incrementalSnapshotInfo) {

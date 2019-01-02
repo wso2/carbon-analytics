@@ -29,6 +29,7 @@ import org.testng.annotations.Test;
 import org.wso2.carbon.analytics.test.osgi.util.TestUtil;
 import org.wso2.carbon.analytics.test.osgi.util.HTTPResponseMessage;
 import org.wso2.carbon.container.CarbonContainerFactory;
+import org.wso2.carbon.container.options.CarbonDistributionOption;
 import org.wso2.carbon.kernel.CarbonServerInfo;
 import org.wso2.carbon.stream.processor.common.EventStreamService;
 import org.wso2.carbon.stream.processor.common.SiddhiAppRuntimeService;
@@ -74,8 +75,8 @@ public class SiddhiAsAPITestcase {
                 copySiddhiFileOption(),
                 carbonDistribution(
                         Paths.get("target", "wso2das-" + System.getProperty("carbon.analytic.version")),
-                        "worker")
-                //CarbonDistributionOption.debug(5005)
+                        "worker"),
+                CarbonDistributionOption.debug(5005)
         };
     }
 
@@ -714,6 +715,68 @@ public class SiddhiAsAPITestcase {
         HTTPResponseMessage httpResponseMessage = sendHRequest(null, baseURI, path, contentType, method,
                 true, DEFAULT_USER_NAME, "admin2");
         Assert.assertEquals(httpResponseMessage.getResponseCode(), 401);
+    }
+
+    /**
+     * Persistence clearing of existing Siddhi App
+     */
+    @Test (dependsOnMethods = {"testValidSiddhiAPPDeployment"})
+    public void testSiddhiAppPersistenceStoreClear() throws Exception {
+
+        URI baseURI = URI.create(String.format("http://%s:%d", "localhost", 9090));
+        String path = "/siddhi-apps/SiddhiApp1/revisions";
+        String contentType = "text/plain";
+        String method = "DELETE";
+
+        logger.info("Deleting the persistence store through REST API");
+        HTTPResponseMessage httpResponseMessage = sendHRequest("", baseURI, path, contentType, method,
+                true, DEFAULT_USER_NAME, DEFAULT_PASSWORD);
+        Assert.assertEquals(httpResponseMessage.getResponseCode(), 200);
+        Assert.assertEquals(httpResponseMessage.getContentType(), "application/json");
+        Thread.sleep(2000);
+
+    }
+
+    /**
+     *
+     * Persistence clearing of all Siddhi Applications
+     */
+    @Test (dependsOnMethods = {"testValidSiddhiAPPDeployment"})
+    public void testAllSiddhiAppsPersistenceStoreClear() throws Exception {
+
+        URI baseURI = URI.create(String.format("http://%s:%d", "localhost", 9090));
+        String path = "/siddhi-apps/revisions";
+        String contentType = "text/plain";
+        String method = "DELETE";
+
+        logger.info("Deleting the persistence store through REST API");
+        HTTPResponseMessage httpResponseMessage = sendHRequest("", baseURI, path, contentType, method,
+                true, DEFAULT_USER_NAME, DEFAULT_PASSWORD);
+        Assert.assertEquals(httpResponseMessage.getResponseCode(), 200);
+        Assert.assertEquals(httpResponseMessage.getContentType(), "application/json");
+        Thread.sleep(2000);
+
+    }
+
+    /**
+     *
+     * Persistence clearing of non-existing Siddhi App
+     */
+    @Test (dependsOnMethods = {"testValidSiddhiAPPDeployment"})
+    public void testInvalidSiddhiAppPersistenceStoreClear() throws Exception {
+
+        URI baseURI = URI.create(String.format("http://%s:%d", "localhost", 9090));
+        String path = "/siddhi-apps/SiddhiAppInvalid/revisions";
+        String contentType = "text/plain";
+        String method = "DELETE";
+
+        logger.info("Deleting the persistence store through REST API");
+        HTTPResponseMessage httpResponseMessage = sendHRequest("", baseURI, path, contentType, method,
+                true, DEFAULT_USER_NAME, DEFAULT_PASSWORD);
+        Assert.assertEquals(httpResponseMessage.getResponseCode(), 404);
+        Assert.assertEquals(httpResponseMessage.getContentType(), "application/json");
+        Thread.sleep(2000);
+
     }
 
     private HTTPResponseMessage sendHRequest(String body, URI baseURI, String path, String contentType,

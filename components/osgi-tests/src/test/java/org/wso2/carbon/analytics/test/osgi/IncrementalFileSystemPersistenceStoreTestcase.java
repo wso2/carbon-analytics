@@ -138,4 +138,20 @@ public class IncrementalFileSystemPersistenceStoreTestcase {
         Assert.assertEquals(SiddhiAppUtil.outputElementsArray, Arrays.asList("500", "500", "500", "500", "500",
                 "300", "300", "280", "280", "280"));
     }
+
+    @Test(dependsOnMethods = {"testRestoreFromFileSystem"})
+    public void testFileSystemClearPeriodicPersistence() {
+        File file = new File(PERSISTENCE_FOLDER + File.separator + SIDDHIAPP_NAME);
+
+        SiddhiManager siddhiManager = StreamProcessorDataHolder.getSiddhiManager();
+        SiddhiAppRuntime siddhiAppRuntime = siddhiManager.getSiddhiAppRuntime(SIDDHIAPP_NAME);
+
+        if (file.list().length == 0) {
+            Assert.fail("File revisions are already deleted");
+        }
+
+        log.info("Deleting all the revisions of the persistence store of Siddhi App : " + SIDDHIAPP_NAME );
+        siddhiAppRuntime.clearAllRevisionsOfSiddhiAppInPersistenceStore();
+        Assert.assertEquals(file.list().length, 0, "All the revisions should be cleared");
+    }
 }

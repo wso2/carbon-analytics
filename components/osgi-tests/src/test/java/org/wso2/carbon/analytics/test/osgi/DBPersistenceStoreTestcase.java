@@ -276,4 +276,55 @@ public class DBPersistenceStoreTestcase {
             }
         }
     }
+
+    @Test(dependsOnMethods = {"testPeriodicDBSystemPersistence"})
+    public void testPeriodicDBSystemPersistenceClear() {
+
+        Connection con = null;
+        PreparedStatement stmt = null;
+        try {
+            DataSource dataSource = (HikariDataSource) dataSourceService.getDataSource("WSO2_ANALYTICS_DB");
+            con = dataSource.getConnection();
+            int count = 0;
+
+            SiddhiManager siddhiManager = StreamProcessorDataHolder.getSiddhiManager();
+            SiddhiAppRuntime siddhiAppRuntime = siddhiManager.getSiddhiAppRuntime(SIDDHIAPP_NAME);
+
+            stmt = con.prepareStatement(selectLastQuery);
+            stmt.setString(1, siddhiManager.getSiddhiAppRuntime(SIDDHIAPP_NAME).getName());
+            ResultSet resultSet = stmt.executeQuery();
+            while (resultSet.next()) {
+                count++;
+            }
+            //check whether the data exists in the table
+            if (count == 0) {
+                Assert.fail("Already data does not exists in the database table");
+            }
+
+            siddhiAppRuntime.clearAllRevisionsOfSiddhiAppInPersistenceStore();
+
+            resultSet = stmt.executeQuery();
+            count = 0;
+            while (resultSet.next()) {
+                count++;
+            }
+            Assert.assertEquals(count, 0);
+
+        } catch (SQLException e) {
+            log.error("Error in processing query ", e);
+        } catch (DataSourceException e) {
+            log.error("Cannot establish connection to the data source ", e);
+        } finally {
+            try {
+                if (con != null) {
+                    con.close();
+                }
+                if (stmt != null) {
+                    stmt.close();
+                }
+            } catch (SQLException e) {
+                log.error("Error in closing connection to test datasource ", e);
+            }
+        }
+    }
 }

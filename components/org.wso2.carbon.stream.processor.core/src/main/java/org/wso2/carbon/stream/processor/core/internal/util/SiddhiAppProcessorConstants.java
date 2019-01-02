@@ -49,6 +49,9 @@ public class SiddhiAppProcessorConstants {
     public static final String IS_SIDDHI_APP_PREFIX = "IS_";
     public static final String EI_SIDDHI_APP_PREFIX = "EI_";
 
+    public static final String PERSISTENCE_STORE_CLEAR_ENABLED = "persistenceStoreClearEnabled";
+    public static final String SIDDHI_APP = "siddhiApp";
+
     /**
      * Runtime modes of Stream Processor engine
      */
