@@ -639,8 +639,8 @@ a.list-group-item, button.list-group-item {
 }
 
 .source-sink-form-container .source-sink-map-options .error-message,
-.table-form-container #store-options .error-message,
-.table-form-container #define-predefined-annotations .error-message,
+.design-view-form-content #store-options .error-message,
+.design-view-form-content #primary-index-annotations .error-message,
 .window-form-container #defineFunctionParameters .error-message {
 	margin-left: 20px;
 }
@@ -652,6 +652,10 @@ a.list-group-item, button.list-group-item {
 	padding: 0 5px;
 	color: #ccc;
 	background: #424242;
+}
+
+.design-view-form-content textarea {
+	min-height: 65px;
 }
 
 .design-view-form-content input[type="text"].name,
@@ -672,7 +676,7 @@ a.list-group-item, button.list-group-item {
 	color: #ccc;
 }
 
-.table-form-container input[type="text"].annotation-value {
+.design-view-form-content #primary-index-annotations input[type="text"].annotation-value {
  	margin-bottom: 2px;
 	margin-left: 20px;
  }
@@ -695,7 +699,7 @@ a.list-group-item, button.list-group-item {
 
 .design-view-form-content .btn-del-option,
 .window-form-container .btn-del-parameter,
-.table-form-container .btn-del-annot-value {
+.design-view-form-content #primary-index-annotations .btn-del-annot-value {
 	display: inline-block;
 	height: 21px;
 	padding: 0 8px;
@@ -706,7 +710,7 @@ a.list-group-item, button.list-group-item {
 
 .source-sink-form-container input[type="text"].readonly-attr,
 .source-sink-form-container #attributeMap-type:disabled,
-.table-form-container #store-type:disabled,
+.design-view-form-content #store-type:disabled,
 .partition-form-container #define-partition-keys .partition-by-stream-name {
 	cursor: not-allowed;
 	background: #1d1d1d;
@@ -878,7 +882,7 @@ a.list-group-item, button.list-group-item {
 	margin-left: 20px;
 }
 
-.table-form-container #table-annotations .table-annotation {
+.design-view-form-content #primary-index-annotations .annotation {
 	margin-bottom: 10px;
 }
 
@@ -887,13 +891,13 @@ a.list-group-item, button.list-group-item {
 	margin-top: 48px;
 }
 
-.table-form-container #store-options,
+.design-view-form-content #store-options,
 .source-sink-form-container #source-options,
 .source-sink-form-container #sink-options {
 	display: flex;
 }
 
-.table-form-container .sub-store-options-div,
+.design-view-form-content .sub-store-options-div,
 .source-sink-form-container .sub-source-options-div,
 .source-sink-form-container .sub-sink-options-div {
 	width: 50%;
@@ -902,7 +906,9 @@ a.list-group-item, button.list-group-item {
 .design-view-form-content #btn-submit,
 .design-view-form-content #btn-cancel {
 	margin-top: 15px;
-	margin-right: 10px;
+	margin-right: -6px;
+	margin-left: 20px;
+	margin-bottom: 10px;
 }
 
 .design-view-form-content input[type="checkbox"],
@@ -977,8 +983,8 @@ a.list-group-item, button.list-group-item {
 .design-view-form-content .optional-option:hover,
 .design-view-form-content .optional-parameter:hover,
 .source-sink-form-container #attribute-map-label:hover,
-.table-form-container .rdbms-type,
-.table-form-container #table-annotations .annotation-name {
+.design-view-form-content .rdbms-type,
+.design-view-form-content #primary-index-annotations .annotation-name {
 	cursor: pointer;
 }
 
@@ -990,7 +996,7 @@ a.list-group-item, button.list-group-item {
    word-break: break-all;
 }
 
-.table-form-container .rdbms-type {
+.design-view-form-content .rdbms-type {
 	margin-right: 10px;
 	margin-top: 10px;
 }
@@ -1005,8 +1011,10 @@ a.list-group-item, button.list-group-item {
     top: 0px;
 }
 
-textarea {
-    width: 95%;
-    background: #424242;
-    min-height: 65px;
+.design-view-form-content .query-form-actions {
+	position: fixed;
+	bottom: 22px;
+	background: #0e0e0e;
+	width: 100%;
+	margin-left: -20;
 }
