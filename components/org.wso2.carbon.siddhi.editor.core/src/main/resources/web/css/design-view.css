@@ -809,7 +809,6 @@ a.list-group-item, button.list-group-item {
 
 .design-view-form-content .stream-form-container #define-annotation,
 .design-view-form-content .siddhi-app-form-container #define-annotation {
-	margin-top:20px;
 	color: #ccc;
 }
 
@@ -820,7 +819,6 @@ a.list-group-item, button.list-group-item {
 .design-view-form-content .cust-option-value {
 	margin-left: 10px;
 }
-
 
 .stream-form-container,
 .partition-form-container,
@@ -852,12 +850,6 @@ a.list-group-item, button.list-group-item {
 	margin-bottom: 10px;
 }
 
-.window-form-container #defineFunctionName,
-.window-form-container #defineOutputEvents,
-.window-form-container #define-annotation {
-	margin-top:18px;
-}
-
 .design-view-form-content .source-div,
 .design-view-form-content .sink-div {
 	width: 45%;
@@ -873,12 +865,10 @@ a.list-group-item, button.list-group-item {
 
 .design-view-form-content .store-div {
 	width: 40%;
-	margin-top: 20px;
 }
 
 .design-view-form-content .define-table-annotation {
 	width: 30%;
-	margin-top: 10px;
 	margin-left: 20px;
 }
 
@@ -888,7 +878,6 @@ a.list-group-item, button.list-group-item {
 
 .design-view-form-content .attribute-map-div {
 	width: 30%;
-	margin-top: 48px;
 }
 
 .design-view-form-content #store-options,

@@ -137,7 +137,8 @@ define(['log', 'jquery', 'lodash', 'sourceOrSinkAnnotation', 'mapAnnotation', 'p
                 var predefinedSourceMaps = _.orderBy(this.configurationData.rawExtensions["sourceMaps"], ['name'], ['asc']);
                 var streamAttributes = self.formUtils.getConnectedStreamAttributes(streamList, connectedElement);
 
-                var propertyDiv = $('<div class="source-sink-form-container source-div"><div id="define-source"></div>' +
+                var propertyDiv = $('<div id="property-header"> <h3> Sink Configuration </h3> </div> ' +
+                    '<div class="source-sink-form-container source-div"><div id="define-source"></div>' +
                     '<div class = "source-sink-map-options" id="source-options-div"></div>' +
                     self.formUtils.buildFormButtons() + '</div>' +
                     '<div class="source-sink-form-container mapper-div"> <div id="define-map"> </div> ' +

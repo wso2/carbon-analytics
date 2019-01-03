@@ -1099,16 +1099,12 @@
 
 <script id="type-selection-form-template" type="text/template">
     {{#ifSourceOrSink id}}
-        <h3>{{addTitle id}} Configuration</h3>
         <label class="clearfix"> * Type </label>
         <select id="{{id}}-type">
             <option style = "display:none" disabled selected value > -- select a type -- </option>
     {{else}}
-             {{#ifId id "map"}}
-                <h3> Mapping </h3>
-             {{/ifId}}
-              <label class="clearfix"> {{addTitle id}} Type </label>
-              <select id="{{id}}-type">
+          <label class="clearfix"> {{addTitle id}} Type </label>
+          <select id="{{id}}-type">
     {{/ifSourceOrSink}}
 
             {{#each types}}
