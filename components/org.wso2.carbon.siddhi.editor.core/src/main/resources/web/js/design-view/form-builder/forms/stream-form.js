@@ -63,8 +63,6 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'jsonValidator', 'con
                 stream_predefined_annotations));
             var checkedAnnotations = [];
 
-            self.formUtils.addEventListenersForAttributeDiv();
-
             var name = clickedElement.getName();
             if (!name) {
                 //if stream form is freshly opened [new object]

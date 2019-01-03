@@ -251,6 +251,7 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
             var wrappedHtml = attributeFormTemplate(attributes);
             $('#define-attribute').html(wrappedHtml);
             self.changeAttributeNavigation();
+            self.addEventListenersForAttributeDiv();
         };
 
         /**

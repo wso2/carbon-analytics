@@ -448,8 +448,6 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'handlebar', 'constan
                 }
             });
 
-            self.formUtils.addEventListenersForAttributeDiv();
-
             var windowFunctionNameTemplate = Handlebars.compile($('#type-selection-form-template').html());
             var wrappedHtml = windowFunctionNameTemplate({ id: Constants.WINDOW, types: predefinedWindowFunctionNames });
             $('#defineFunctionName').html(wrappedHtml);
