@@ -231,6 +231,41 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
         };
 
         /**
+		 * @function to add a default store type to the predefined stores
+		 * @param {Object} predefinedStores predefined store types
+		 */
+        FormUtils.prototype.addDefaultStoreType = function (predefinedStores) {
+            //first check if in-memory is already present in the predefined stores array
+            var found = false;
+            for (var store of predefinedStores) {
+                if (store.name === Constants.DEFAULT_STORE_TYPE) {
+                    found = true;
+                    break;
+                }
+            }
+            if (!found) {
+                var inMemoryType = {
+                    name: Constants.DEFAULT_STORE_TYPE,
+                    parameters: []
+                };
+                predefinedStores.push(inMemoryType);
+            }
+        };
+
+        /**
+        * @function to render the html to display the radio options for selecting the rdbms type
+        */
+        FormUtils.prototype.renderRdbmsTypes = function () {
+            var rdbmsTypeDiv = '<div class="clearfix"> <label class = "rdbms-type">' +
+                '<input type= "radio" name ="radioOpt" value="inline-config"> Inline-config' +
+                '</label> <label class = "rdbms-type">  ' +
+                '<input type = "radio" name = "radioOpt" value = "datasource"> Datasource </label>' +
+                '<label class = "rdbms-type"> <input type = "radio" name = "radioOpt" value="jndi"> Jndi-resource ' +
+                '</label></div> ';
+            $('#define-rdbms-type').html(rdbmsTypeDiv);
+        };
+
+        /**
          * @function render the select box template
          * @param {String} id div id to embed the select box
          * @param {Object} predefinedTypes
@@ -460,6 +495,69 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
                 }
             }
             return streamAttributes;
+        };
+
+        /**
+		 * @function to select the options according to the selected rdbms type
+		 * @param {Object} predefined_options all the options of rdbms with the user given values
+		 * @return {Object} rdbms_options
+		 */
+        FormUtils.prototype.getRdbmsOptions = function (predefined_options) {
+            var rdbms_options = [];
+            var selectedRdbmsType = $('input[name=radioOpt]:checked', '#define-rdbms-type').val();
+            if (selectedRdbmsType == "datasource") {
+                _.forEach(predefined_options, function (predefinedOption) {
+                    if (predefinedOption.key.toLowerCase() === "datasource") {
+                        rdbms_options.push({
+                            key: predefinedOption.key, value: predefinedOption.value, description: predefinedOption
+                                .description, optional: false, defaultValue: predefinedOption.defaultValue
+                        })
+                    } else if (predefinedOption.key.toLowerCase() === "pool.properties" ||
+                        predefinedOption.key.toLowerCase() === "table.name" ||
+                        predefinedOption.key.toLowerCase() === "field.length") {
+                        rdbms_options.push({
+                            key: predefinedOption.key, value: predefinedOption.value, description: predefinedOption
+                                .description, optional: predefinedOption.optional, defaultValue: predefinedOption
+                                    .defaultValue
+                        })
+                    }
+                });
+            } else if (selectedRdbmsType == "inline-config") {
+                _.forEach(predefined_options, function (predefinedOption) {
+                    if (predefinedOption.key.toLowerCase() === "username" ||
+                        predefinedOption.key.toLowerCase() === "password" ||
+                        predefinedOption.key.toLowerCase() === "jdbc.url" ||
+                        predefinedOption.key.toLowerCase() === "jdbc.driver.name" ||
+                        predefinedOption.key.toLowerCase() === "pool.properties" ||
+                        predefinedOption.key.toLowerCase() === "table.name" ||
+                        predefinedOption.key.toLowerCase() === "field.length") {
+                        rdbms_options.push({
+                            key: predefinedOption.key, value: predefinedOption.value, description: predefinedOption
+                                .description, optional: predefinedOption.optional, defaultValue: predefinedOption
+                                    .defaultValue
+                        })
+                    }
+                });
+            } else {
+                _.forEach(predefined_options, function (predefinedOption) {
+                    if (predefinedOption.key.toLowerCase() === "jndi.resource") {
+                        rdbms_options.push({
+                            key: predefinedOption.key, value: predefinedOption.value, description: predefinedOption
+                                .description, optional: false, defaultValue: predefinedOption.defaultValue
+                        })
+                    } else if (predefinedOption.key.toLowerCase() === "table.name" ||
+                        predefinedOption.key.toLowerCase() === "field.length") {
+                        rdbms_options.push({
+                            key: predefinedOption.key, value: predefinedOption.value, description: predefinedOption
+                                .description, optional: predefinedOption.optional, defaultValue: predefinedOption
+                                    .defaultValue
+                        })
+                    }
+
+                });
+
+            }
+            return rdbms_options;
         };
 
         /**
@@ -1012,6 +1110,48 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
         };
 
         /**
+         * @function to check the radio button of the selected rdbms type
+         * @param {Object} rdbmsOptions all the options of rdbms with the user given values
+         */
+        FormUtils.prototype.checkRdbmsType = function (rdbmsOptions) {
+            var isFound = false;
+            for (var option of rdbmsOptions) {
+                if (option.key.toLowerCase() == "datasource" && option.value != "") {
+                    $("#define-rdbms-type input[name=radioOpt][value='datasource']").prop("checked", true);
+                    isFound = true;
+                    break;
+                } else if (option.key.toLowerCase() == "jndi.resource" && option.value != "") {
+                    $("#define-rdbms-type input[name=radioOpt][value='jndi']").prop("checked", true);
+                    isFound = true;
+                    break;
+                }
+            }
+            if (!isFound) {
+                $("#define-rdbms-type input[name=radioOpt][value='inline-config']").prop("checked", true);
+            }
+        };
+
+        /**
+         * @function to check if the selected store type is rdbms
+         * @param {String} selectedRdbmsType
+         * @param {Object} storeOptions
+         * @param {Object} customizedStoreOptions
+         */
+        FormUtils.prototype.checkForRdbmsStoreType = function (selectedRdbmsType, storeOptions, customizedStoreOptions) {
+            var self = this;
+            self.renderRdbmsTypes();
+            if (selectedRdbmsType == Constants.RDBMS_STORE_TYPE) {
+                $('#define-rdbms-type').show();
+                self.checkRdbmsType(storeOptions);
+                var dataStoreOptions = self.getRdbmsOptions(storeOptions);
+                self.renderOptions(dataStoreOptions, customizedStoreOptions, Constants.STORE);
+            } else {
+                $('#define-rdbms-type').hide();
+                self.renderOptions(storeOptions, customizedStoreOptions, Constants.STORE);
+            }
+        };
+
+        /**
          * @function to build the annotations
          * @param {Object} annotationNodes array of nodes which needs to be constructed
          * @param {Object} annotationStringList array to add the built annotation strings
@@ -1542,4 +1682,3 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
 
         return FormUtils;
     });
-
