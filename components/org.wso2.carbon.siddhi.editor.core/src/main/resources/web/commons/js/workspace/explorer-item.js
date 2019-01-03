@@ -55,7 +55,7 @@ define(['lodash', 'log', 'file_browser', 'event_channel', 'context_menu', 'boots
         header.append(folderName);
         item.append(header);
         item.append(body);
-        this.container.find('.mCSB_container').append(item); //add to mscroller container 
+        this.container.append(item);
         this._itemElement = item;
 
         header.attr('title', this.path);
