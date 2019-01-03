@@ -284,7 +284,7 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
         };
 
         /**
-         * @functionrender the options for the selected type
+         * @function to render the options for the selected type
          * @param {Object} optionsArray Saved options
          * @param {Object} customizedMapperOptions Options typed by the user which aren't one of the predefined option
          * @param {String} id div to embed the options
@@ -304,6 +304,18 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
             });
             $('#' + id + '-options-div').html(wrappedHtml);
             self.changeCustomizedOptDiv(id);;
+        };
+
+        /**
+         * @function to render the template of primary and index annotations
+         */
+        FormUtils.prototype.renderPrimaryIndexAnnotations = function (primaryIndexAnnotations, id) {
+            var self = this;
+            var annotationFormTemplate = Handlebars.compile($('#primary-index-annotation-template').html());
+            var wrappedHtml = annotationFormTemplate(primaryIndexAnnotations);
+            $('#' + id).html(wrappedHtml);
+            self.removeDeleteButtonOfFirstValue();
+            self.addEventListenerForPrimaryIndexAnnotationDiv();
         };
 
         /**
@@ -381,6 +393,52 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
                 }
             });
             return customizedOptions;
+        };
+
+        /**
+		 * @function to obtain the customized option entered by the user in the source view
+		 * @param {Object} predefinedOptions Predefined options of a particular store annotation type
+		 * @param {Object} savedOptions saved store options
+		 * @return {Object} customizedOptions
+		 */
+        FormUtils.prototype.getCustomizedStoreOptions = function (predefinedOptions, savedOptions) {
+            var customizedOptions = [];
+            _.forEach(savedOptions, function (savedOption) {
+                var foundSavedOption = false;
+                for (var predefinedOption of predefinedOptions) {
+                    if (predefinedOption.name.toLowerCase() == savedOption.key.toLowerCase().trim()) {
+                        foundSavedOption = true;
+                        break;
+                    }
+                }
+                if (!foundSavedOption) {
+                    customizedOptions.push({ key: savedOption.key, value: savedOption.value });
+                }
+            });
+            return customizedOptions;
+        };
+
+		/**
+		 * @function to obtain the user defined annotations from the saved annotations
+		 * @param {Object} savedAnnotationObjects saved annotation objects
+		 * @param {Object} primaryIndexAnnotations predefined primary index annotations
+		 * @return {Object} userAnnotations
+		 */
+        FormUtils.prototype.getUserAnnotations = function (savedAnnotationObjects, primaryIndexAnnotations) {
+            var userAnnotations = [];
+            _.forEach(savedAnnotationObjects, function (savedAnnotation) {
+                var isPredefined = false;
+                _.forEach(primaryIndexAnnotations, function (annotation) {
+                    if (savedAnnotation.name.toLowerCase() === annotation.name.toLowerCase()) {
+                        isPredefined = true;
+                        return false;
+                    }
+                });
+                if (!isPredefined) {
+                    userAnnotations.push(savedAnnotation);
+                }
+            });
+            return userAnnotations;
         };
 
         /**
@@ -607,6 +665,43 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
         };
 
         /**
+		 * @function to build the store options
+		 * @param {Object} selectedOptions array to add the built option
+		 */
+        FormUtils.prototype.buildStoreOptions = function (selectedOptions) {
+            var option;
+            $('#store-options .option').each(function () {
+                var option = $(this).find('.option-name');
+                var optionName = option.text().trim();
+                var optionValue = $(this).find('.option-value').val().trim();
+                if (option.hasClass('mandatory-option')) {
+                    selectedOptions[optionName] = optionValue;
+                } else {
+                    if ($(this).find('.option-checkbox').is(":checked")) {
+                        selectedOptions[optionName] = optionValue;
+                    }
+                }
+            });
+        };
+
+		/**
+		 * Function to build the customized store options
+		 * @param {Object} selectedOptions array to add the built option
+		 */
+        FormUtils.prototype.buildCustomizedStoreOption = function (selectedOptions) {
+            var option = "";
+            if ($('#customized-store-options ul').has('li').length != 0) {
+                $('#customized-store-options .option').each(function () {
+                    var custOptName = $(this).find('.cust-option-key').val().trim();
+                    var custOptValue = $(this).find('.cust-option-value').val().trim();
+                    if ((custOptName != "") && (custOptValue != "")) {
+                        selectedOptions[custOptName] = custOptValue;
+                    }
+                });
+            }
+        };
+
+        /**
          * @function to build the customized options
          * @param {Object} selectedOptions array to add the built option
          * @param {String} id to identify the div in the html to traverse
@@ -623,6 +718,35 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
                     }
                 });
             }
+        };
+
+        /**
+         * @function to build the primary index
+         * @param {Object} annotationList array to add the built string annotations
+         * @param {Object} annotationObjectList array to add the annotation objects
+         */
+        FormUtils.prototype.buildPrimaryIndexAnnotations = function (annotationList, annotationObjectList) {
+            $('#primary-index-annotations .annotation').each(function () {
+                var annotationObject = new AnnotationObject();
+                if ($(this).find('.annotation-checkbox').is(':checked')) {
+                    var annotName = $(this).find('.annotation-name').text().trim();
+                    annotationObject.setName(annotName.substring(1))
+                    var annotation = annotName + "(";
+                    $(this).find('.annotation-value').each(function () {
+                        var annotValue = $(this).val().trim();
+                        if (annotValue != "") {
+                            var element = new AnnotationElement();
+                            element.setValue(annotValue)
+                            annotationObject.addElement(element);
+                            annotation += "'" + annotValue + "' ,";
+                        }
+                    });
+                    annotation = annotation.substring(0, annotation.length - 1);
+                    annotation += ")";
+                    annotationObjectList.push(annotationObject);
+                    annotationList.push(annotation);
+                }
+            });
         };
 
         /**
@@ -653,6 +777,59 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
             });
             return objects;
         };
+
+        /**
+		 * @function to map the values of saved annotation to predefined annotation object
+		 * @param {Object} predefined_annotations
+		 * @param {Object} savedAnnotations
+		 */
+        FormUtils.prototype.mapPrimaryIndexAnnotationValues = function (predefined_annotations,
+            predefinedSavedAnnotations) {
+            for (var savedAnnotation of predefinedSavedAnnotations) {
+                for (var predefined_annotation of predefined_annotations) {
+                    if (savedAnnotation.name.toLowerCase() === predefined_annotation.name.toLowerCase()) {
+                        predefined_annotation.isChecked = true;
+                        predefined_annotation.values = [];
+                        for (element of savedAnnotation.elements) {
+                            predefined_annotation.values.push({ value: element.value });
+                        }
+                        break;
+                    }
+                }
+            }
+        };
+
+		/**
+		 * @function to map the saved store option values to the option object
+		 * @param {Object} predefinedOptions Predefined options of a particular source/map annotation type
+		 * @param {Object} savedOptions Saved options
+		 * @return {Object} options
+		 */
+        FormUtils.prototype.mapUserStoreOptionValues = function (predefinedOptions, savedOptions) {
+            var options = [];
+            _.forEach(predefinedOptions, function (predefinedOption) {
+                var foundPredefinedOption = false;
+                for (var savedOption of savedOptions) {
+                    if (savedOption.key.trim().toLowerCase() == predefinedOption.name.toLowerCase()) {
+                        foundPredefinedOption = true;
+                        options.push({
+                            key: predefinedOption.name, value: savedOption.value, description: predefinedOption
+                                .description, optional: predefinedOption.optional,
+                            defaultValue: predefinedOption.defaultValue
+                        });
+                        break;
+                    }
+                }
+                if (!foundPredefinedOption) {
+                    options.push({
+                        key: predefinedOption.name, value: "", description: predefinedOption
+                            .description, optional: predefinedOption.optional, defaultValue: predefinedOption.defaultValue
+                    });
+                }
+            });
+            return options;
+        };
+
 
         /**
          * @function to map the saved option values to the option object
@@ -732,6 +909,31 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
                     annotationNodes.push(jsTreeAnnotation)
                 }
             }
+            return isErrorOccurred;
+        };
+
+        /**
+		 * @Function to validate the primary and index annotations
+		 * @return {boolean} isErrorOccurred
+		 */
+        FormUtils.prototype.validatePrimaryIndexAnnotations = function () {
+            var isErrorOccurred = false;
+            $('#primary-index-annotations .annotation').each(function () {
+                var annotationValues = [];
+                if ($(this).find('.annotation-checkbox').is(':checked')) {
+                    $(this).find('.annotation-value').each(function () {
+                        if ($(this).val().trim() != "") {
+                            annotationValues.push($(this).val());
+                        }
+                    });
+                    if (annotationValues.length == 0) {
+                        $(this).find('.annotation-value:eq(0)').addClass('required-input-field');
+                        $(this).find('.error-message:eq(0)').text("Minimum one value is required");
+                        isErrorOccurred = true;
+                        return false;
+                    }
+                }
+            });
             return isErrorOccurred;
         };
 
@@ -1076,6 +1278,38 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
                 }
             });
 
+            /**
+             * @function to add event listeners for the primary index annotation div
+             */
+            FormUtils.prototype.addEventListenerForPrimaryIndexAnnotationDiv = function () {
+
+                //To add annotation value
+                $('#primary-index-annotations').on('click', '.btn-add-annot-value', function () {
+                    $(this).parents(".annotation").find("ul").append
+                        ('<li class = "clearfix primary-index-annotation-value"> <div class="clearfix"> ' +
+                            '<input type = "text" value = "" class = "annotation-value"/> ' +
+                            '<a class = "btn-del-annot-value"> <i class = "fw fw-delete"> </i> </a> </div> ' +
+                            '<label class="error-message"></label> </li>');
+                });
+
+                //To delete annotation value
+                $('#primary-index-annotations').on('click', '.btn-del-annot-value', function () {
+                    $(this).closest('li').remove();
+                });
+
+                // To show the values of the primaryKey and index annotations on change of the checkbox
+                $('#primary-index-annotations').on('change', '.annotation-checkbox', function () {
+                    var parent = $(this).parents(".annotation");
+                    if ($(this).is(':checked')) {
+                        parent.find('.annotation-content').show();
+                    } else {
+                        parent.find('.annotation-content').hide();
+                        parent.find('.error-message').text("");
+                        parent.find('.annotation-value').removeClass('required-input-field')
+                    }
+                });
+            };
+
             //To add customized option
             $('#' + id + '-options-div').on('click', '#btn-add-' + id + '-options', function () {
                 var custOptDiv = '<li class="option">' +
@@ -1138,6 +1372,15 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
                 $('.attribute:eq(' + lastIndex + ')').find('.attr-nav a:eq(1)').remove();
             }
         };
+
+        /**
+         * @function to remove the first delete button of primary/index annot value
+         */
+        FormUtils.prototype.removeDeleteButtonOfFirstValue = function () {
+            $('#primary-index-annotations .annotation').each(function () {
+                $(this).find('.btn-del-annot-value:eq(0)').remove();
+            });
+        }
 
         /**
          * @function to pop up the element which is being currently edited
@@ -1298,5 +1541,4 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
 
         return FormUtils;
     });
-
 

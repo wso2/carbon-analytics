@@ -955,7 +955,7 @@ a.list-group-item, button.list-group-item {
 	margin-top: 15px;
 }
 
-.table-form-container #table-annotations .btn-add-annot-value {
+.design-view-form-content #primary-index-annotations .btn-add-annot-value {
 	margin-top: 0px;
 	margin-bottom: 10px;
 	margin-left: 160px;

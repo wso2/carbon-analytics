@@ -1235,11 +1235,11 @@
     </div>
 </script>
 
-<script id = "table-store-annotation-template" type = "text/template">
+<script id = "primary-index-annotation-template" type = "text/template">
     <h4> Annotations </h4>
-    <div id = "table-annotations">
+    <div id = "primary-index-annotations">
             {{#each this}}
-                <div class = "clearfix table-annotation">
+                <div class = "clearfix annotation">
                     <div class="clearfix">
                         <label class = "annotation-name">
                             {{#if isChecked}}
@@ -1256,7 +1256,7 @@
                     {{/if}}
                         <ul>
                         {{#each values}}
-                            <li class = "clearfix table-annotation-value">
+                            <li class = "clearfix primary-index-annotation-value">
                                 <div class="clearfix">
                                     <input type = "text" value = "{{value}}" class = "annotation-value"/>
                                     <a class = "btn-del-annot-value"> <i class = "fw fw-delete"> </i></a>
@@ -1343,6 +1343,7 @@
         </div>
         {{/each}}
     </div>
+</script>
 
 
 </script>
@@ -1804,7 +1805,7 @@
                 ]
             }
             ],
-            table_predefined_annotations: [
+            primary_index_annotations: [
             {
                 name: "primaryKey",
                 values: [{
