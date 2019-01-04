@@ -49,7 +49,7 @@ define(['log', 'jquery', 'lodash', 'attribute', 'storeAnnotation', 'handlebar', 
             var clickedElement = self.configurationData.getSiddhiAppConfig().getTable(id);
 
             var propertyDiv = $('<div id="property-header"> <h3> Table Configuration </h3> </div> ' +
-            	'<div class = "table-form-container table-div"> <h4> Name: </h4> <input type="text" id="tableName" ' +
+                '<div class = "table-form-container table-div"> <h4> Name: </h4> <input type="text" id="tableName" ' +
                 'class = "clearfix name"> <label class="error-message" id="tableNameErrorMessage"> </label>' +
                 '<div id = "define-attribute"> </div>' + self.formUtils.buildFormButtons() + '</div> ' +
                 '<div class = "table-form-container store-div"> <div id = "define-store"> </div>  ' +
@@ -108,11 +108,11 @@ define(['log', 'jquery', 'lodash', 'attribute', 'storeAnnotation', 'handlebar', 
             //onchange of the store type select box
             $('#define-store').on('change', '#store-type', function () {
                 if (this.value === Constants.DEFAULT_STORE_TYPE) {
-                	$('#define-predefined-annotations').hide();
+                    $('#define-predefined-annotations').hide();
                     $('#store-options-div').empty();
                     $('#define-rdbms-type').hide();
                 } else {
-                	$('#define-predefined-annotations').show();
+                    $('#define-predefined-annotations').show();
                     storeOptions = self.formUtils.getSelectedTypeParameters(this.value, predefinedStores);
                     if (clickedElement.getStore() && savedStoreType === this.value) {
                         customizedStoreOptions = self.formUtils.getCustomizedStoreOptions(storeOptions, savedStoreOptions);
@@ -198,6 +198,10 @@ define(['log', 'jquery', 'lodash', 'attribute', 'storeAnnotation', 'handlebar', 
                         isErrorOccurred = true;
                         return;
                     }
+                    if (self.formUtils.validatePrimaryIndexAnnotations()) {
+                        isErrorOccurred = true;
+                        return;
+                    }
                 }
 
                 var attributeNameList = [];
@@ -212,12 +216,13 @@ define(['log', 'jquery', 'lodash', 'attribute', 'storeAnnotation', 'handlebar', 
                     return;
                 }
 
-                if (self.formUtils.validatePrimaryIndexAnnotations()) {
-                    isErrorOccurred = true;
-                    return;
-                }
-
                 if (!isErrorOccurred) {
+                    var annotationList = [];
+                    var annotationObjectList = [];
+                    //clear the annotation list
+                    clickedElement.clearAnnotationList();
+                    clickedElement.clearAnnotationListObjects();
+
                     if (previouslySavedName !== tableName) {
                         // update selected table model
                         clickedElement.setName(tableName);
@@ -237,9 +242,21 @@ define(['log', 'jquery', 'lodash', 'attribute', 'storeAnnotation', 'handlebar', 
                         _.set(storeAnnotationOptions, 'options', optionsMap);
                         var storeAnnotation = new StoreAnnotation(storeAnnotationOptions);
                         clickedElement.setStore(storeAnnotation);
+
+                        self.formUtils.buildPrimaryIndexAnnotations(annotationList, annotationObjectList);
                     } else {
                         clickedElement.setStore(undefined);
                     }
+
+                    var annotationNodes = $('#annotation-div').jstree(true)._model.data['#'].children;
+                    self.formUtils.buildAnnotation(annotationNodes, annotationList, annotationObjectList)
+                    //add the annotations to the clicked element
+                    _.forEach(annotationList, function (annotation) {
+                        clickedElement.addAnnotation(annotation);
+                    });
+                    _.forEach(annotationObjectList, function (annotation) {
+                        clickedElement.addAnnotationObject(annotation);
+                    });
 
                     //clear the saved attributes
                     clickedElement.clearAttributeList()
@@ -251,22 +268,6 @@ define(['log', 'jquery', 'lodash', 'attribute', 'storeAnnotation', 'handlebar', 
                             var attributeObject = new Attribute({ name: nameValue, type: typeValue });
                             clickedElement.addAttribute(attributeObject);
                         }
-                    });
-
-                    var annotationList = [];
-                    var annotationObjectList = [];
-                    //clear the annotationlist
-                    clickedElement.clearAnnotationList();
-                    clickedElement.clearAnnotationListObjects();
-                    self.formUtils.buildPrimaryIndexAnnotations(annotationList, annotationObjectList);
-                    var annotationNodes = $('#annotation-div').jstree(true)._model.data['#'].children;
-                    self.formUtils.buildAnnotation(annotationNodes, annotationList, annotationObjectList)
-                    //add the annotations to the clicked element
-                    _.forEach(annotationList, function (annotation) {
-                        clickedElement.addAnnotation(annotation);
-                    });
-                    _.forEach(annotationObjectList, function (annotation) {
-                        clickedElement.addAnnotationObject(annotation);
                     });
 
                     $('#' + id).removeClass('incomplete-element');
