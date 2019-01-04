@@ -108,9 +108,11 @@ define(['log', 'jquery', 'lodash', 'attribute', 'storeAnnotation', 'handlebar', 
             //onchange of the store type select box
             $('#define-store').on('change', '#store-type', function () {
                 if (this.value === Constants.DEFAULT_STORE_TYPE) {
+                	$('#define-predefined-annotations').hide();
                     $('#store-options-div').empty();
                     $('#define-rdbms-type').hide();
                 } else {
+                	$('#define-predefined-annotations').show();
                     storeOptions = self.formUtils.getSelectedTypeParameters(this.value, predefinedStores);
                     if (clickedElement.getStore() && savedStoreType === this.value) {
                         customizedStoreOptions = self.formUtils.getCustomizedStoreOptions(storeOptions, savedStoreOptions);
@@ -146,6 +148,7 @@ define(['log', 'jquery', 'lodash', 'attribute', 'storeAnnotation', 'handlebar', 
             } else {
                 //if table form is freshly opened [ new table object]
                 $('#define-store #store-type').val(Constants.DEFAULT_STORE_TYPE);
+                $('#define-predefined-annotations').hide();
             }
 
             // 'Submit' button action
