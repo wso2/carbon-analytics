@@ -1419,38 +1419,6 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
                 }
             });
 
-            /**
-             * @function to add event listeners for the primary index annotation div
-             */
-            FormUtils.prototype.addEventListenerForPrimaryIndexAnnotationDiv = function () {
-
-                //To add annotation value
-                $('#primary-index-annotations').on('click', '.btn-add-annot-value', function () {
-                    $(this).parents(".annotation").find("ul").append
-                        ('<li class = "clearfix primary-index-annotation-value"> <div class="clearfix"> ' +
-                            '<input type = "text" value = "" class = "annotation-value"/> ' +
-                            '<a class = "btn-del-annot-value"> <i class = "fw fw-delete"> </i> </a> </div> ' +
-                            '<label class="error-message"></label> </li>');
-                });
-
-                //To delete annotation value
-                $('#primary-index-annotations').on('click', '.btn-del-annot-value', function () {
-                    $(this).closest('li').remove();
-                });
-
-                // To show the values of the primaryKey and index annotations on change of the checkbox
-                $('#primary-index-annotations').on('change', '.annotation-checkbox', function () {
-                    var parent = $(this).parents(".annotation");
-                    if ($(this).is(':checked')) {
-                        parent.find('.annotation-content').show();
-                    } else {
-                        parent.find('.annotation-content').hide();
-                        parent.find('.error-message').text("");
-                        parent.find('.annotation-value').removeClass('required-input-field')
-                    }
-                });
-            };
-
             //To add customized option
             $('#' + id + '-options-div').on('click', '#btn-add-' + id + '-options', function () {
                 var custOptDiv = '<li class="option">' +
@@ -1467,6 +1435,38 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
             $('#' + id + '-options-div').on('click', '.btn-del-option', function () {
                 $(this).closest('li').remove();
                 self.changeCustomizedOptDiv(id);
+            });
+        };
+
+        /**
+         * @function to add event listeners for the primary index annotation div
+         */
+        FormUtils.prototype.addEventListenerForPrimaryIndexAnnotationDiv = function () {
+
+            //To add annotation value
+            $('#primary-index-annotations').on('click', '.btn-add-annot-value', function () {
+                $(this).parents(".annotation").find("ul").append
+                    ('<li class = "clearfix primary-index-annotation-value"> <div class="clearfix"> ' +
+                        '<input type = "text" value = "" class = "annotation-value"/> ' +
+                        '<a class = "btn-del-annot-value"> <i class = "fw fw-delete"> </i> </a> </div> ' +
+                        '<label class="error-message"></label> </li>');
+            });
+
+            //To delete annotation value
+            $('#primary-index-annotations').on('click', '.btn-del-annot-value', function () {
+                $(this).closest('li').remove();
+            });
+
+            // To show the values of the primaryKey and index annotations on change of the checkbox
+            $('#primary-index-annotations').on('change', '.annotation-checkbox', function () {
+                var parent = $(this).parents(".annotation");
+                if ($(this).is(':checked')) {
+                    parent.find('.annotation-content').show();
+                } else {
+                    parent.find('.annotation-content').hide();
+                    parent.find('.error-message').text("");
+                    parent.find('.annotation-value').removeClass('required-input-field')
+                }
             });
         };
 
