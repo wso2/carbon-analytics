@@ -1006,4 +1006,9 @@ a.list-group-item, button.list-group-item {
 	background: #0e0e0e;
 	width: 100%;
 	margin-left: -20;
+	height: 53px;
+}
+
+.output-console-content-wrapper {
+	padding-bottom: 75px;
 }
