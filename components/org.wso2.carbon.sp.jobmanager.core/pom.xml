@@ -303,6 +303,53 @@
             <scope>test</scope>
         </dependency>
     </dependencies>
+    <profiles>
+        <profile>
+            <id>local</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-surefire-plugin</artifactId>
+                        <configuration combine.self="override">
+                            <useSystemClassLoader>false</useSystemClassLoader>
+                            <suiteXmlFiles>
+                                <suiteXmlFile>src/test/resources/testng-nats.xml</suiteXmlFile>
+                            </suiteXmlFiles>
+                        </configuration>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.jacoco</groupId>
+                        <artifactId>jacoco-maven-plugin</artifactId>
+                        <version>${org.jacoco.version}</version>
+                        <executions>
+                            <execution>
+                                <id>jacoco-initialize</id>
+                                <goals>
+                                    <goal>prepare-agent</goal>
+                                </goals>
+                                <configuration>
+                                    <destFile>${basedir}/target/coverage-reports/jacoco.exec</destFile>
+                                    <propertyName>surefireArgLine</propertyName>
+                                </configuration>
+                            </execution>
+                            <execution>
+                                <id>jacoco-site</id>
+                                <phase>post-integration-test</phase>
+                                <goals>
+                                    <goal>report</goal>
+                                </goals>
+                                <configuration>
+                                    <dataFile>${basedir}/target/coverage-reports/jacoco.exec</dataFile>
+                                    <outputDirectory>${basedir}/target/coverage-reports/</outputDirectory>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
     <build>
         <plugins>
             <!--plugin>
