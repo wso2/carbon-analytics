@@ -36,6 +36,8 @@ public class ResourceManagerConstants {
 
     public static final String STATE_EXISTS = "EXISTS";
 
+    public static final String QUEUE_GROUP_NAME = "queueGroupName";
+
     //App creator constants
     public static final String APP_NAME = "appName";
     public static final String TOPIC_LIST = "topicList";
@@ -76,6 +78,11 @@ public class ResourceManagerConstants {
 
     public static final String DESTINATION_TOPIC = "@destination(destination = '${"
             + PARTITION_TOPIC + "}')";
+    public static final String CLIENT_ID = "clientid";
+
+    public static final String CLUSTER_ID = "clusterid";
+
+    public static final String NATS_SERVER_URL = "natsserverurl";
 
     public static final String DEFAULT_MB_TOPIC_SOURCE_TEMPLATE = "@source(type='jms',"
             + "factory.initial='${" + FACTORY_INITIAL + "}',"
@@ -108,6 +115,28 @@ public class ResourceManagerConstants {
             + "${" + DESTINATIONS + "}),connection.factory.type='topic',"
             + "connection.factory.jndi.name='TopicConnectionFactory',"
             + "@map(type='" + MAPPING + "'))";
+
+    public static final String PARTITIONED_NATS_SINK_TEMPLATE = "@sink(type='nats',"
+            + "cluster.id='${" + CLUSTER_ID + "}',"
+            + "@distribution(strategy='partitioned', partitionKey='${" + PARTITION_KEY + "}',"
+            + "${" + DESTINATIONS + "}), bootstrap.servers="
+            + "'${" + NATS_SERVER_URL + "}',@map(type='" + MAPPING + "'))";
+
+    public static final String DEFAULT_NATS_SINK_TEMPLATE = "@sink(type='nats',"
+            + "cluster.id='${" + CLUSTER_ID + "}',"
+            + "destination = '${" + TOPIC_LIST +  "}', bootstrap.servers="
+            + "'${" + NATS_SERVER_URL + "}',@map(type='" + MAPPING + "'))";
+
+    public static final String DEFAULT_NATS_SOURCE_TEMPLATE = "@source(type='nats',"
+            + "cluster.id='${" + CLUSTER_ID + "}',"
+            + "destination = '${" + TOPIC_LIST +  "}', bootstrap.servers="
+            + "'${" + NATS_SERVER_URL + "}',@map(type='" + MAPPING + "'))";
+
+    public static final String RR_NATS_SOURCE_TEMPLATE = "@source(type='nats',"
+            + "cluster.id='${" + CLUSTER_ID + "}',"
+            + "queue.group.name='${"  + QUEUE_GROUP_NAME + "}',"
+            + "destination = '${" + TOPIC_LIST +  "}', bootstrap.servers="
+            + "'${" + NATS_SERVER_URL + "}',@map(type='" + MAPPING + "'))";
 
     public static final String DESTINATION = "@destination(partition.no = '${" + PARTITION_NO
             + "}')";
