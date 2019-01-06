@@ -1793,7 +1793,7 @@
         <org.fusesource.hawtbuf.version>1.11</org.fusesource.hawtbuf.version>
         <!-- nats test dependencies -->
         <io.nats.version>2.1.2</io.nats.version>
-        <siddhi.io.nats.version>1.0.0-SNAPSHOT</siddhi.io.nats.version>
+        <siddhi.io.nats.version>1.0.2</siddhi.io.nats.version>
         <org.testcontainers.version>1.8.0</org.testcontainers.version>
     </properties>
 </project>
