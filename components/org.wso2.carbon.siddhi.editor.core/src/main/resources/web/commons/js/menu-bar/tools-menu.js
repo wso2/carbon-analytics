@@ -76,24 +76,6 @@ define(([],function (){
                 disabled: false
             },
             {
-                id: "toggleFileExplorer",
-                label: "File Explorer",
-                command: {
-                    id: "toggle-file-explorer",
-                    shortcuts: {
-                        mac: {
-                            key: "command+shift+e",
-                            label: "\u2318\u21E7E"
-                        },
-                        other: {
-                            key: "ctrl+shift+e",
-                            label: "Ctrl+Shift+E"
-                        }
-                    }
-                },
-                disabled: false
-            },
-            {
                 id: "sampleEvent",
                 label: "Sample Event Generator",
                 command: {
