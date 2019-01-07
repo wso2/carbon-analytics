@@ -22,6 +22,7 @@ import com.google.common.io.Files;
 import org.apache.log4j.Logger;
 import org.wso2.carbon.stream.processor.core.ha.util.CompressionUtil;
 import org.wso2.carbon.stream.processor.core.persistence.util.PersistenceConstants;
+import org.wso2.siddhi.core.exception.CannotClearSiddhiAppStateException;
 import org.wso2.siddhi.core.util.persistence.IncrementalPersistenceStore;
 import org.wso2.siddhi.core.util.persistence.util.IncrementalSnapshotInfo;
 import org.wso2.siddhi.core.util.persistence.util.PersistenceHelper;
@@ -187,18 +188,15 @@ public class IncrementalFileSystemPersistenceStore implements IncrementalPersist
             log.info("No revisions were found with the Siddhi App " + siddhiAppName);
             return;
         }
-        try {
-            for (File file : files) {
-                if (file.exists()) {
-                    if (!file.delete()) {
-                        log.error("file is not deleted successfully!");
-                    }
+        for (File file : files) {
+            if (file.exists()) {
+                if (!file.delete()) {
+                    log.error("file is not deleted successfully!");
+                    throw new CannotClearSiddhiAppStateException("Persistence state " +
+                            "file is not deleted : " + file.getPath());
                 }
-
             }
-        } catch (Exception e) {
-            log.error("Error deleting all the revisions of the persistence store of Siddhi App " + siddhiAppName +
-                    " from file system.", e);
+
         }
     }
 

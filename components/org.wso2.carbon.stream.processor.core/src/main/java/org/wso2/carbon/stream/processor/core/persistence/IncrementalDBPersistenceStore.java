@@ -30,6 +30,7 @@ import org.wso2.carbon.stream.processor.core.persistence.util.DBPersistenceStore
 import org.wso2.carbon.stream.processor.core.persistence.util.ExecutionInfo;
 import org.wso2.carbon.stream.processor.core.persistence.util.PersistenceConstants;
 import org.wso2.carbon.stream.processor.core.persistence.util.RDBMSConfiguration;
+import org.wso2.siddhi.core.exception.CannotClearSiddhiAppStateException;
 import org.wso2.siddhi.core.util.persistence.IncrementalPersistenceStore;
 import org.wso2.siddhi.core.util.persistence.util.IncrementalSnapshotInfo;
 import org.wso2.siddhi.core.util.persistence.util.PersistenceHelper;
@@ -271,7 +272,9 @@ public class IncrementalDBPersistenceStore implements IncrementalPersistenceStor
         } catch (SQLException e) {
             log.error("Cannot establish connection to data source " + datasourceName +
                     " to clean all revisions", e);
-            return;
+            throw new CannotClearSiddhiAppStateException("Cannot establish connection" +
+                    " to data source " + datasourceName + " when deleting the revisions " +
+                    "of the persistence store of SiddhiApp: " + siddhiAppName, e);
         }
         try {
             stmt = con.prepareStatement(executionInfo.getPreparedDeleteAllRevisionsStatement());
@@ -281,6 +284,8 @@ public class IncrementalDBPersistenceStore implements IncrementalPersistenceStor
         } catch (SQLException e) {
             log.error("Error in deleting all revisions of siddhiApp: " +
                     siddhiAppName + "from the database with datasource " + datasourceName, e);
+            throw new CannotClearSiddhiAppStateException("Error in deleting all the revisions of the persistence " +
+                    "store of SiddhiApp: " + siddhiAppName + " from the database with datasource " + datasourceName, e);
         } finally {
             if (stmt != null) {
                 try {
