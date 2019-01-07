@@ -65,6 +65,8 @@ define(['require', 'lodash', 'log', 'jquery', 'backbone', 'command', 'sample_pre
                 var openButton = $('<button></button>');
 
                 var contentPane = $('<div></div>');
+                var scrollInner = $('<div class="nano-content"></div>');
+                var scrollWrapper = $('<div class="nano"></div>');
                 var recentFilesPane = $('<div></div>');
                 var samplesPane = $('<div></div>');
                 var quickLinksPane = $('<div></div>');
@@ -131,8 +133,10 @@ define(['require', 'lodash', 'log', 'jquery', 'backbone', 'command', 'sample_pre
                     'target="_blank"><i class="fw fw-ringing"></i>Support</a></li></ul>');
 
                 quickLinksPane.append(bodyUlQuickLinkContent);
-                contentPane.append(samplesPane);
-                contentPane.append(quickLinksPane);
+                scrollInner.append(samplesPane);
+                scrollInner.append(quickLinksPane);
+                scrollWrapper.append(scrollInner);
+                contentPane.append(scrollWrapper);
 
                 mainWelcomeDiv.append(contentPane);
                 backgroundDiv.append(mainWelcomeDiv);
