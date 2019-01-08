@@ -1015,11 +1015,11 @@ textarea {
 }
 
 input:focus {
-    background: rgba(53, 53, 48, 0.56);
+    background: rgba(53, 53, 48, 0.56) !important;
 }
 
 i:focus {
-    background: rgba(53, 53, 48, 0.56);
+    background: rgba(53, 53, 48, 0.56) !important;
 }
 
 .selected-button{
