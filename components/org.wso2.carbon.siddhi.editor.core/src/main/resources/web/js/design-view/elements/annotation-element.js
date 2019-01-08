@@ -26,17 +26,17 @@ define(
          * @param {value} to store the property's value of the annotation element
          */
 
-        var AnnotationElement = function (key, value) {
-            this.key = key;
+        var AnnotationElement = function (name, value) {
+            this.name = name;
             this.value = value;
         };
 
-        AnnotationElement.prototype.getKey = function () {
+        AnnotationElement.prototype.getName = function () {
             return this.key;
         };
 
-        AnnotationElement.prototype.setKey = function (key) {
-            this.key = key;
+        AnnotationElement.prototype.setName= function (name) {
+            this.name = name;
         };
 
         AnnotationElement.prototype.getValue = function () {

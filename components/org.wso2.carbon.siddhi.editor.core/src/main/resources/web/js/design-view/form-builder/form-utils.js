@@ -415,17 +415,17 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
             var customizedOptions = [];
             _.forEach(savedOptions, function (savedOption) {
                 var foundSavedOption = false;
-                var optionKey = savedOption.split('=')[0];
+                var optionName = savedOption.split('=')[0];
                 var optionValue = savedOption.split('=')[1].trim();
                 optionValue = optionValue.substring(1, optionValue.length - 1);
                 for (var predefinedOption of predefinedOptions) {
-                    if (predefinedOption.name.toLowerCase() == optionKey.toLowerCase().trim()) {
+                    if (predefinedOption.name.toLowerCase() == optionName.toLowerCase().trim()) {
                         foundSavedOption = true;
                         break;
                     }
                 }
                 if (!foundSavedOption) {
-                    customizedOptions.push({ key: optionKey, value: optionValue });
+                    customizedOptions.push({ name: optionName, value: optionValue });
                 }
             });
             return customizedOptions;
@@ -448,7 +448,7 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
                     }
                 }
                 if (!foundSavedOption) {
-                    customizedOptions.push({ key: savedOption.key, value: savedOption.value });
+                    customizedOptions.push({ name: savedOption.name, value: savedOption.value });
                 }
             });
             return customizedOptions;
@@ -507,16 +507,16 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
             var selectedRdbmsType = $('input[name=radioOpt]:checked', '#define-rdbms-type').val();
             if (selectedRdbmsType == "datasource") {
                 _.forEach(predefined_options, function (predefinedOption) {
-                    if (predefinedOption.key.toLowerCase() === "datasource") {
+                    if (predefinedOption.name.toLowerCase() === "datasource") {
                         rdbms_options.push({
-                            key: predefinedOption.key, value: predefinedOption.value, description: predefinedOption
+                            name: predefinedOption.name, value: predefinedOption.value, description: predefinedOption
                                 .description, optional: false, defaultValue: predefinedOption.defaultValue
                         })
-                    } else if (predefinedOption.key.toLowerCase() === "pool.properties" ||
-                        predefinedOption.key.toLowerCase() === "table.name" ||
-                        predefinedOption.key.toLowerCase() === "field.length") {
+                    } else if (predefinedOption.name.toLowerCase() === "pool.properties" ||
+                        predefinedOption.name.toLowerCase() === "table.name" ||
+                        predefinedOption.name.toLowerCase() === "field.length") {
                         rdbms_options.push({
-                            key: predefinedOption.key, value: predefinedOption.value, description: predefinedOption
+                            name: predefinedOption.name, value: predefinedOption.value, description: predefinedOption
                                 .description, optional: predefinedOption.optional, defaultValue: predefinedOption
                                     .defaultValue
                         })
@@ -524,15 +524,15 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
                 });
             } else if (selectedRdbmsType == "inline-config") {
                 _.forEach(predefined_options, function (predefinedOption) {
-                    if (predefinedOption.key.toLowerCase() === "username" ||
-                        predefinedOption.key.toLowerCase() === "password" ||
-                        predefinedOption.key.toLowerCase() === "jdbc.url" ||
-                        predefinedOption.key.toLowerCase() === "jdbc.driver.name" ||
-                        predefinedOption.key.toLowerCase() === "pool.properties" ||
-                        predefinedOption.key.toLowerCase() === "table.name" ||
-                        predefinedOption.key.toLowerCase() === "field.length") {
+                    if (predefinedOption.name.toLowerCase() === "username" ||
+                        predefinedOption.name.toLowerCase() === "password" ||
+                        predefinedOption.name.toLowerCase() === "jdbc.url" ||
+                        predefinedOption.name.toLowerCase() === "jdbc.driver.name" ||
+                        predefinedOption.name.toLowerCase() === "pool.properties" ||
+                        predefinedOption.name.toLowerCase() === "table.name" ||
+                        predefinedOption.name.toLowerCase() === "field.length") {
                         rdbms_options.push({
-                            key: predefinedOption.key, value: predefinedOption.value, description: predefinedOption
+                            name: predefinedOption.name, value: predefinedOption.value, description: predefinedOption
                                 .description, optional: predefinedOption.optional, defaultValue: predefinedOption
                                     .defaultValue
                         })
@@ -540,15 +540,15 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
                 });
             } else {
                 _.forEach(predefined_options, function (predefinedOption) {
-                    if (predefinedOption.key.toLowerCase() === "jndi.resource") {
+                    if (predefinedOption.name.toLowerCase() === "jndi.resource") {
                         rdbms_options.push({
-                            key: predefinedOption.key, value: predefinedOption.value, description: predefinedOption
+                            name: predefinedOption.name, value: predefinedOption.value, description: predefinedOption
                                 .description, optional: false, defaultValue: predefinedOption.defaultValue
                         })
-                    } else if (predefinedOption.key.toLowerCase() === "table.name" ||
-                        predefinedOption.key.toLowerCase() === "field.length") {
+                    } else if (predefinedOption.name.toLowerCase() === "table.name" ||
+                        predefinedOption.name.toLowerCase() === "field.length") {
                         rdbms_options.push({
-                            key: predefinedOption.key, value: predefinedOption.value, description: predefinedOption
+                            name: predefinedOption.name, value: predefinedOption.value, description: predefinedOption
                                 .description, optional: predefinedOption.optional, defaultValue: predefinedOption
                                     .defaultValue
                         })
@@ -870,7 +870,7 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
             var objects = [];
             _.forEach(objectArray, function (object) {
                 objects.push({
-                    key: object.name, value: "", description: object.description, optional: object.optional,
+                    name: object.name, value: "", description: object.description, optional: object.optional,
                     defaultValue: object.defaultValue
                 });
             });
@@ -912,7 +912,7 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
                     if (savedOption.key.trim().toLowerCase() == predefinedOption.name.toLowerCase()) {
                         foundPredefinedOption = true;
                         options.push({
-                            key: predefinedOption.name, value: savedOption.value, description: predefinedOption
+                            name: predefinedOption.name, value: savedOption.value, description: predefinedOption
                                 .description, optional: predefinedOption.optional,
                             defaultValue: predefinedOption.defaultValue
                         });
@@ -921,7 +921,7 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
                 }
                 if (!foundPredefinedOption) {
                     options.push({
-                        key: predefinedOption.name, value: "", description: predefinedOption
+                        name: predefinedOption.name, value: "", description: predefinedOption
                             .description, optional: predefinedOption.optional, defaultValue: predefinedOption.defaultValue
                     });
                 }
@@ -941,13 +941,13 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
             _.forEach(predefinedOptions, function (predefinedOption) {
                 var foundPredefinedOption = false;
                 for (var savedOption of savedOptions) {
-                    var optionKey = savedOption.split('=')[0].trim();
+                    var optionName = savedOption.split('=')[0].trim();
                     var optionValue = savedOption.split('=')[1].trim();
                     optionValue = optionValue.substring(1, optionValue.length - 1);
-                    if (optionKey.toLowerCase() == predefinedOption.name.toLowerCase()) {
+                    if (optionName.toLowerCase() == predefinedOption.name.toLowerCase()) {
                         foundPredefinedOption = true;
                         options.push({
-                            key: predefinedOption.name, value: optionValue, description: predefinedOption
+                            name: predefinedOption.name, value: optionValue, description: predefinedOption
                                 .description, optional: predefinedOption.optional,
                             defaultValue: predefinedOption.defaultValue
                         });
@@ -956,7 +956,7 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
                 }
                 if (!foundPredefinedOption) {
                     options.push({
-                        key: predefinedOption.name, value: "", description: predefinedOption
+                        name: predefinedOption.name, value: "", description: predefinedOption
                             .description, optional: predefinedOption.optional, defaultValue: predefinedOption.defaultValue
                     });
                 }
@@ -1078,12 +1078,12 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
             predefinedAnnotationObject) {
             var isErrorOccurred = false;
             for (var predefinedObjectElement of predefinedAnnotationObject.elements) {
-                if (annotationKey.text.trim().toLowerCase() == predefinedObjectElement.key
+                if (annotationKey.text.trim().toLowerCase() == predefinedObjectElement.name
                     .toLowerCase()) {
                     if (predefinedObjectElement.isMandatory) {
                         if (annotationValue.text.trim() == "") {
                             DesignViewUtils.prototype.errorAlert("Property '" + predefinedObjectElement
-                                .key + "' is mandatory");
+                                .name + "' is mandatory");
                             isErrorOccurred = true;
                             break;
                         }

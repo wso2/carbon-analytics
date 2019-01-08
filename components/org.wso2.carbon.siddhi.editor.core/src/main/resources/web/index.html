@@ -1068,7 +1068,7 @@
         <li data-jstree = '{"icon":"/editor/commons/images/annotation.png"}' class = "{{class}}"> {{name}}
             <ul>
                 {{#each elements}}
-                <li data-jstree = '{"icon":"/editor/commons/images/properties.png"}' class="{{class}}"> {{key}}
+                <li data-jstree = '{"icon":"/editor/commons/images/properties.png"}' class="{{class}}"> {{name}}
                     <ul>
                         <li data-jstree = '{"icon":"/editor/commons/images/value.png"}'
                             class = "annotation-value"> {{defaultValue}} </li>
@@ -1079,7 +1079,7 @@
         <li data-jstree = '{"icon":"/editor/commons/images/annotation.png"}' class = "annotation"> {{name}}
             <ul>
                 {{#each elements}}
-                <li data-jstree = '{"icon":"/editor/commons/images/properties.png"}' class = "annotation-key"> {{key}}
+                <li data-jstree = '{"icon":"/editor/commons/images/properties.png"}' class = "annotation-key"> {{name}}
                     <ul>
                         <li data-jstree = '{"icon":"/editor/commons/images/value.png"}'
                             class = "annotation-value"> {{value}} </li>
@@ -1126,7 +1126,7 @@
                     {{#if value}}
                         <div class = "clearfix">
                             <label class = "option-name optional-option">
-                                <input type = "checkbox" class = "option-checkbox" checked> {{key}}
+                                <input type = "checkbox" class = "option-checkbox" checked> {{name}}
                             </label>
                             <i class = "fw fw-info option-desc">
                                 <span style = "display:none" class = "option-desc-content"> {{description}} </span>
@@ -1138,7 +1138,7 @@
                     {{else}}
                         <div class="clearfix">
                             <label class = "option-name optional-option">
-                                <input type = "checkbox" class = "option-checkbox"> {{key}}
+                                <input type = "checkbox" class = "option-checkbox"> {{name}}
                             </label>
                             <i class = "fw fw-info option-desc">
                                 <span style = "display:none" class="option-desc-content"> {{description}} </span>
@@ -1153,7 +1153,7 @@
                     <div class="clearfix">
                         <label class = "mandatory-option-symbol"> * </label>
                         <label class = "option-name mandatory-option">
-                            {{key}}
+                            {{name}}
                         </label>
                         <i class="fw fw-info option-desc">
                             <span style="display:none" class="option-desc-content"> {{description}} </span>
@@ -1184,7 +1184,7 @@
                 <li class="option">
                     <div class = "clearfix">
                         <label> option.key </label>
-                        <input type="text" class="cust-option-key" value="{{key}}">
+                        <input type="text" class="cust-option-key" value="{{name}}">
                     </div>
                     <div class = "clearfix">
                         <label> option.value </label>
@@ -1781,19 +1781,19 @@
                 isMandatory: false,
                 elements: [
                     {
-                        key: 'buffer.size',
+                        name: 'buffer.size',
                         defaultValue: '256',
                         class: 'mandatory-key',
                         isMandatory: true
                     },
                     {
-                        key: 'workers',
+                        name: 'workers',
                         defaultValue: '2',
                         class: 'mandatory-key',
                         isMandatory: true
                     },
                     {
-                        key: 'batch.size.max',
+                        name: 'batch.size.max',
                         defaultValue: '5',
                         class: 'mandatory-key',
                         isMandatory: true
