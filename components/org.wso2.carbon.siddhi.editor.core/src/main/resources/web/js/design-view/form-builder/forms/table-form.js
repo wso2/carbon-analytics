@@ -16,10 +16,9 @@
  * under the License.
  */
 
-define(['log', 'jquery', 'lodash', 'attribute', 'storeAnnotation', 'designViewUtils', 'handlebar',
-    'js_tree', 'annotationObject', 'annotationElement', 'constants'],
-    function (log, $, _, Attribute, StoreAnnotation, DesignViewUtils, Handlebars, jstree,
-        AnnotationObject, AnnotationElement, Constants) {
+define(['log', 'jquery', 'lodash', 'attribute', 'storeAnnotation', 'handlebar', 'annotationObject', 'annotationElement',
+    'constants'],
+    function (log, $, _, Attribute, StoreAnnotation, Handlebars, AnnotationObject, AnnotationElement, Constants) {
 
         /**
          * @class TableForm Creates a forms to collect data from a table
@@ -38,113 +37,13 @@ define(['log', 'jquery', 'lodash', 'attribute', 'storeAnnotation', 'designViewUt
             }
         };
 
-        /** Function to manage the attribute navigations */
-        var changeAttributeNavigation = function () {
-            $('.attr-nav').empty();
-            var attrLength = $('#attribute-div li').length;
-            if (attrLength == 1) {
-                $('.attribute:eq(0)').find('.attr-nav').empty();
-            }
-            if (attrLength == 2) {
-                $('.attribute:eq(0)').find('.attr-nav').append('<a class = "reorder-down"><i class="fw fw-sort-down">' +
-                    '</i></a><a class = "btn-del-attr"><i class="fw fw-delete"></i></a>');
-                $('.attribute:eq(1)').find('.attr-nav').append('<a class="reorder-up"> <i class="fw fw-sort-up "></i>' +
-                    '</a><a class = "btn-del-attr"><i class="fw fw-delete"></i></a>');
-            }
-            if (attrLength > 2) {
-                var lastIndex = attrLength - 1;
-                for (var i = 0; i < attrLength; i++) {
-                    $('.attribute:eq(' + i + ')').find('.attr-nav').append('<a class="reorder-up"> ' +
-                        '<i class="fw fw-sort-up"></i></a>' +
-                        '<a class = "reorder-down"><i class="fw fw-sort-down"> </i></a>' +
-                        '<a class = "btn-del-attr"><i class="fw fw-delete"></i></a>');
-                }
-                $('.attribute:eq(0)').find('.attr-nav a:eq(0)').remove();
-                $('.attribute:eq(' + lastIndex + ')').find('.attr-nav a:eq(1)').remove();
-            }
-        };
-
         /**
-         * Function to obtain a particular option from predefined option
-         * @param {String} optionName option which needs to be found
-         * @param {Object} predefinedOptions set of predefined option
-         * @return {Object} option
+         * @function to build the options
+         * @param {Object} selectedOptions array to add the built option
          */
-        var getOption = function (optionName, predefinedOptions) {
-            var option = null;
-            for (var predefinedOption of predefinedOptions) {
-                if (predefinedOption.name.toLowerCase() == optionName.toLowerCase()) {
-                    option = predefinedOption;
-                    break;
-                }
-            }
-            return option;
-        };
-
-        /**
-         * Function to validate the predefined options
-         * @param {Object} predefinedOptions set of predefined option
-         * @return {boolean} isError
-         */
-        var validateOptions = function (predefinedOptions) {
-            var isError = false;
-            $('#define-store-options #store-options .option').each(function () {
-                var option = $(this).find('.option-name');
-                var optionName = option.text().trim();
-                var optionValue = $(this).find('.option-value').val().trim();
-                var predefinedOptionObject = getOption(optionName, predefinedOptions)
-                if ($(this).find('.option-name').hasClass('mandatory-option')) {
-                    if (!checkOptionValue(optionValue, predefinedOptionObject, this)) {
-                        isError = true;
-                        return false;
-                    }
-                } else {
-                    if ($(this).find('.option-checkbox').is(":checked")) {
-                        if (!checkOptionValue(optionValue, predefinedOptionObject, this)) {
-                            isError = true;
-                            return false;
-                        }
-                    }
-                }
-            });
-            return isError;
-        };
-
-        /**
-        * Function to validate the customized options
-        * @return {boolean} isError
-        */
-        var validateCustomizedOptions = function () {
-            var isError = false;
-            if ($('#customized-store-options ul').has('li').length != 0) {
-                $('#customized-store-options .option').each(function () {
-                    var custOptName = $(this).find('.cust-option-key').val().trim();
-                    var custOptValue = $(this).find('.cust-option-value').val().trim();
-                    if ((custOptName != "") || (custOptValue != "")) {
-                        if (custOptName == "") {
-                            addErrorClass($(this).find('.cust-option-key'))
-                            $(this).find('.error-message').text('Option key is required.');
-                            isError = true;
-                            return false;
-                        } else if (custOptValue == "") {
-                            $(this).find('.error-message').text('Option value is required.');
-                            addErrorClass($(this).find('.cust-option-value'));
-                            isError = true;
-                            return false;
-                        }
-                    }
-                });
-            }
-            return isError;
-        };
-
-        /**
-        * Function to build the options
-        * @param {Object} selectedOptions array to add the built option
-        */
         var buildOptions = function (selectedOptions) {
             var option;
-            $('#define-store-options #store-options .option').each(function () {
+            $('#store-options .option').each(function () {
                 var option = $(this).find('.option-name');
                 var optionName = option.text().trim();
                 var optionValue = $(this).find('.option-value').val().trim();
@@ -176,76 +75,11 @@ define(['log', 'jquery', 'lodash', 'attribute', 'storeAnnotation', 'designViewUt
         };
 
         /**
-         * Function to check if a particular option value is valid
-         * @param {String} optionValue value which needs to be validated
-         * @param {Object} predefinedOptionObject predefined object of the option
-         * @param {Object} parent div of the particular option
-         */
-        var checkOptionValue = function (optionValue, predefinedOptionObject, parent) {
-            if (optionValue == "") {
-                $(parent).find('.error-message').text('Option value is required.');
-                addErrorClass($(parent).find('.option-value'));
-                return false;
-            } else {
-                var dataType = predefinedOptionObject.type[0];
-                if (validateDataType(dataType, optionValue)) {
-                    $(parent).find('.error-message').text('Invalid data-type. ' + dataType + ' required.');
-                    addErrorClass($(parent).find('.option-value'));
-                    return false;
-                }
-            }
-            return true;
-        };
-
-        /**
-        * Function to validate the data type of the options
-        * @param {String} dataType data-type of the option
-        * @param {String} optionValue value of the option
-        * @return {boolean} invalidDataType
-        */
-        var validateDataType = function (dataType, optionValue) {
-            var invalidDataType = false;
-            intLongRegexMatch = /^[-+]?\d+$/;
-            doubleFloatRegexMatch = /^[+-]?([0-9]*[.])?[0-9]+$/;
-
-            if (dataType === "INT" || dataType === "LONG") {
-                if (!optionValue.match(intLongRegexMatch)) {
-                    invalidDataType = true;
-                }
-            } else if (dataType === "DOUBLE" || dataType === "FLOAT") {
-                if (!optionValue.match(doubleFloatRegexMatch)) {
-                    invalidDataType = true;
-                }
-            } else if (dataType === "BOOL") {
-                if (!(optionValue.toLowerCase() === "false" || optionValue.toLowerCase() === "true")) {
-                    invalidDataType = true;
-                }
-            }
-            return invalidDataType;
-        };
-
-        /**
-         * Function to create option object with an additional empty value attribute
-         * @param {Object} optionArray Predefined options without the attribute 'value'
-         * @return {Object} options
-         */
-        var createOptionObjectWithValues = function (optionArray) {
-            var options = [];
-            _.forEach(optionArray, function (option) {
-                options.push({
-                    key: option.name, value: "", description: option.description, optional: option.optional,
-                    defaultValue: option.defaultValue
-                });
-            });
-            return options;
-        };
-
-        /**
-         * Function to map the saved option values to the option object
+         * @function to map the saved option values to the option object
          * @param {Object} predefinedOptions Predefined options of a particular source/map annotation type
          * @param {Object} savedOptions Saved options
          * @return {Object} options
-        */
+         */
         var mapUserOptionValues = function (predefinedOptions, savedOptions) {
             var options = [];
             _.forEach(predefinedOptions, function (predefinedOption) {
@@ -272,11 +106,11 @@ define(['log', 'jquery', 'lodash', 'attribute', 'storeAnnotation', 'designViewUt
         };
 
         /**
-         * Function to obtain the customized option entered by the user in the source view
+         * @function to obtain the customized option entered by the user in the source view
          * @param {Object} predefinedOptions Predefined options of a particular store annotation type
          * @param {Object} savedOptions saved store options
          * @return {Object} customizedOptions
-	    */
+         */
         var getCustomizedOptions = function (predefinedOptions, savedOptions) {
             var customizedOptions = [];
             _.forEach(savedOptions, function (savedOption) {
@@ -295,61 +129,7 @@ define(['log', 'jquery', 'lodash', 'attribute', 'storeAnnotation', 'designViewUt
         };
 
         /**
-         * Function to render the options for the selected store type using handlebars
-         * @param {Object} optionsArray Saved options
-         * @param {Object} customizedMapperOptions Options typed by the user which aren't one of the predefined option
-         * @param {String} id Id for the div to embed the options
-         */
-        var renderOptions = function (optionsArray, customizedOptions, id) {
-            optionsArray.sort(function (val1, val2) {
-                if (val1.optional && !val2.optional) return 1;
-                else if (!val1.optional && val2.optional) return -1;
-                else return 0;
-            });
-            var storeOptionsTemplate = Handlebars.compile($('#source-sink-store-options-template').html());
-            var wrappedHtml = storeOptionsTemplate({
-                id: id,
-                options: optionsArray,
-                customizedOptions: customizedOptions
-            });
-            $('#define-store-options').html(wrappedHtml);
-            changeCustOptDiv();
-        };
-
-        /**
-         * Function to get the options of the selected store type
-         * @param {String} selectedType Selected store type
-         * @param {object} types Predefined store types
-         * @return {object} options
-         */
-        var getSelectedTypeOptions = function (selectedType, types) {
-            var options = [];
-            for (type of types) {
-                if (type.name.toLowerCase() == selectedType.toLowerCase()) {
-                    options = type.parameters;
-                    break;
-                }
-            }
-            return options;
-        };
-
-        /** Function to change the heading and the button text of the customized options div */
-        var changeCustOptDiv = function () {
-            var storeCustOptionList = $('.table-form-container #customized-store-options').
-                find('.cust-options li');
-            var storeDivParent = $('.table-form-container #customized-store-options');
-            if (storeCustOptionList.length > 0) {
-                storeDivParent.find('h3').show();
-                storeDivParent.find('.btn-add-options').html('Add more');
-            } else {
-                storeDivParent.find('h3').hide();
-                storeDivParent.find('.btn-add-options').
-                    html('Add customized option');
-            }
-        };
-
-        /**
-         * Function to add a default store type to the predefined stores
+         * @function to add a default store type to the predefined stores
          * @param {Object} predefinedStores predefined store types
          */
         var addDefaultStoreType = function (predefinedStores) {
@@ -371,64 +151,7 @@ define(['log', 'jquery', 'lodash', 'attribute', 'storeAnnotation', 'designViewUt
         };
 
         /**
-         * Function to validate the attribute names
-         * @param {Object} attributeNameList to add the valid attribute names
-         * @return {boolean} isErrorOccurred
-         */
-        var validateAttributeNames = function (attributeNameList) {
-            var isErrorOccurred = false;
-            $('.attr-name').each(function () {
-                var attributeName = $(this).val().trim();
-                if (attributeName != "") {
-                    var isError = validateName(this, Constants.ATTRIBUTE, attributeName);
-                    if (!isError) {
-                        attributeNameList.push(attributeName)
-                    } else {
-                        isErrorOccurred = true;
-                    }
-                }
-            });
-            return isErrorOccurred;
-        };
-
-        /**
-         * Common method to validate the names [attribute name or table name]
-         * @param {Object} id object which needs to be validated
-         * @param {String} type Table or Attribute
-         * @param {String} name the name to be validated
-         * @return {boolean}
-         */
-        var validateName = function (id, type, name) {
-            var errorMessageParent;
-            if (type === Constants.ATTRIBUTE) {
-                errorMessageParent = $(id).parents(".attribute").find(".error-message");
-            } else {
-                errorMessageParent = $('#tableNameErrorMessage');
-            }
-            if (name.indexOf(' ') >= 0) {
-                errorMessageParent.text(type + " name can not have white space.")
-                addErrorClass(id);
-                return true;
-            }
-            if (!Constants.ALPHABETIC_VALIDATOR_REGEX.test(name.charAt(0))) {
-                errorMessageParent.text(type + " name must start with an alphabetical character.");
-                addErrorClass(id);
-                return true;
-            }
-            return false;
-        };
-
-        /**
-         * Function to add the error class
-         * @param {Object} id object where the errors needs to be displayed
-         */
-        var addErrorClass = function (id) {
-            $(id)[0].scrollIntoView();
-            $(id).addClass('required-input-field')
-        };
-
-        /**
-         * Function to map the values of saved annotation to predefined annotation object
+         * @function to map the values of saved annotation to predefined annotation object
          * @param {Object} predefined_annotations
          * @param {Object} savedAnnotations
          */
@@ -447,7 +170,9 @@ define(['log', 'jquery', 'lodash', 'attribute', 'storeAnnotation', 'designViewUt
             }
         };
 
-        /** Function to remove the delete button of the first attribute-value */
+        /**
+         * @function to remove the delete button of the first attribute-value
+         */
         var changeAnnotValueDelButtons = function () {
             $('#define-predefined-annotations .table-annotation').each(function () {
                 $(this).find('.btn-del-annot-value:eq(0)').remove();
@@ -455,10 +180,10 @@ define(['log', 'jquery', 'lodash', 'attribute', 'storeAnnotation', 'designViewUt
         };
 
         /**
-         * Function to validate the table-annotations
+         * @Function to validate the table-annotations
          * @return {boolean} isErrorOccurred
          */
-        var validateAnnotations = function () {
+        var validatePredefinedAnnotations = function () {
             var isErrorOccurred = false;
             $('#define-predefined-annotations .table-annotation').each(function () {
                 var annotationValues = [];
@@ -480,10 +205,10 @@ define(['log', 'jquery', 'lodash', 'attribute', 'storeAnnotation', 'designViewUt
         };
 
         /**
-         * Function to build the table annotation as a string
+         * @function to build the table annotation as a string
          * @param {Object} annotationList array to add the built string annotations
          */
-        var buildAnnotations = function (annotationList, annotationObjectList) {
+        var buildPredefinedAnnotations = function (annotationList, annotationObjectList) {
             $('#define-predefined-annotations .table-annotation').each(function () {
                 var annotationObject = new AnnotationObject();
                 if ($(this).find('.annotation-checkbox').is(':checked')) {
@@ -508,7 +233,7 @@ define(['log', 'jquery', 'lodash', 'attribute', 'storeAnnotation', 'designViewUt
         };
 
         /**
-         * Function to render the html to display the radio options for selecting the rdbms type
+         * @function to render the html to display the radio options for selecting the rdbms type
          */
         var renderRdbmsTypes = function () {
             var rdbmsTypeDiv = '<div class="clearfix"> <label class = "rdbms-type">' +
@@ -521,7 +246,7 @@ define(['log', 'jquery', 'lodash', 'attribute', 'storeAnnotation', 'designViewUt
         };
 
         /**
-         * Function to select the options according to the selected rdbms type
+         * @function to select the options according to the selected rdbms type
          * @param {Object} predefined_options all the options of rdbms with the user given values
          * @return {Object} rdbms_options
          */
@@ -584,7 +309,7 @@ define(['log', 'jquery', 'lodash', 'attribute', 'storeAnnotation', 'designViewUt
         };
 
         /**
-         * Function to check the radio button of the selected rdbms type
+         * @function to check the radio button of the selected rdbms type
          * @param {Object} rdbmsOptions all the options of rdbms with the user given values
          */
         var checkRdbmsType = function (rdbmsOptions) {
@@ -606,11 +331,11 @@ define(['log', 'jquery', 'lodash', 'attribute', 'storeAnnotation', 'designViewUt
         };
 
         /**
-        * Function to obtain the user defined annotations from the saved annotations
-        * @param {Object} savedAnnotationObjects saved annotation objects
-        * @param {Object} tableAnnotations predefined table annotations
-        * @return {Object} userAnnotations
-        */
+         * @function to obtain the user defined annotations from the saved annotations
+         * @param {Object} savedAnnotationObjects saved annotation objects
+         * @param {Object} tableAnnotations predefined table annotations
+         * @return {Object} userAnnotations
+         */
         var getUserAnnotations = function (savedAnnotationObjects, tableAnnotations) {
             var userAnnotations = [];
             _.forEach(savedAnnotationObjects, function (savedAnnotation) {
@@ -629,180 +354,6 @@ define(['log', 'jquery', 'lodash', 'attribute', 'storeAnnotation', 'designViewUt
         };
 
         /**
-         * Function to initialize the jstree
-         * Function to add the event listeners for the jstree -div
-         */
-        var loadAnnotation = function () {
-            //initialise jstree
-            $("#annotation-div").jstree({
-                "core": {
-                    "check_callback": true
-                },
-                "themes": {
-                    "theme": "default",
-                    "url": "editor/commons/lib/js-tree-v3.3.2/themes/default/style.css"
-                },
-                "checkbox": {
-                    "three_state": false,
-                    "whole_node": false,
-                    "tie_selection": false
-                },
-                "plugins": ["themes", "checkbox"]
-            });
-
-            var tree = $('#annotation-div').jstree(true);
-
-            //to add key-value for annotation node
-            $("#btn-add-key-val").on("click", function () {
-                var selectedNode = $("#annotation-div").jstree("get_selected");
-                tree.create_node(selectedNode,
-                    {
-                        text: "property", class: "annotation-key", state: { "opened": true },
-                        "a_attr": { "class": "annotation-key" }, icon: "/editor/commons/images/properties.png",
-                        children: [{
-                            text: "value", class: "annotation-value", "a_attr": { "class": "annotation-value" },
-                            icon: "/editor/commons/images/value.png"
-                        }]
-                    }
-                );
-                tree.open_node(selectedNode);
-                tree.deselect_all();
-            });
-
-            //to add annotation node
-            $("#btn-add-annotation").on("click", function () {
-                var selectedNode = $("#annotation-div").jstree("get_selected");
-                if (selectedNode == "") {
-                    selectedNode = "#"
-                }
-                tree.create_node(selectedNode, {
-                    text: "Annotation", class: "annotation", state: { "opened": true },
-                    "a_attr": { "class": "annotation" }, icon: "/editor/commons/images/annotation.png",
-                    children: [{
-                        text: "property", class: "annotation-key", icon: "/editor/commons/images/properties.png",
-                        "a_attr": { "class": "annotation-key" },
-                        children: [{
-                            text: "value", class: "annotation-value", "a_attr": { "class": "annotation-value" },
-                            icon: "/editor/commons/images/value.png"
-                        }]
-                    }]
-
-                });
-                tree.open_node(selectedNode);
-                tree.deselect_all();
-            });
-
-            //to delete an annotation or a key-value node
-            $("#btn-del-annotation").on("click", function () {
-                var selectedNode = $("#annotation-div").jstree("get_selected");
-                tree.delete_node([selectedNode]);
-                tree.deselect_all();
-            })
-
-            //to edit the selected node
-            //to hide/show the buttons corresponding to the node selected
-            $('#annotation-div').on("select_node.jstree", function (e, data) {
-                var node_info = $('#annotation-div').jstree("get_node", data.node)
-                if ((node_info.original != undefined && (node_info.original.class == "annotation")) ||
-                    (node_info.li_attr != undefined && (node_info.li_attr.class == "annotation"))) {
-                    tree.edit(data.node)
-                    $("#btn-del-annotation").show();
-                    $("#btn-add-annotation").show();
-                    $("#btn-add-key-val").show();
-
-                } else if ((node_info.original != undefined && (node_info.original.class == "annotation-key")) ||
-                    (node_info.li_attr != undefined && (node_info.li_attr.class == "annotation-key"))) {
-                    tree.edit(data.node);
-                    $("#btn-del-annotation").show();
-                    $("#btn-add-annotation").hide();
-                    $("#btn-add-key-val").hide();
-
-                } else if ((node_info.original != undefined && (node_info.original.class == "annotation-value")) ||
-                    (node_info.li_attr != undefined && (node_info.li_attr.class == "annotation-value"))) {
-                    $("#btn-del-annotation").hide();
-                    $("#btn-add-annotation").hide();
-                    $("#btn-add-key-val").hide();
-                    tree.edit(data.node);
-                }
-            });
-
-            //to unselect the nodes when user clicks other than the nodes in jstree
-            $(document).on('click', function (e) {
-                if ($(e.target).closest('.jstree').length) {
-                    $("#btn-del-annotation").hide();
-                    $("#btn-add-annotation").show();
-                    $("#btn-add-key-val").hide();
-                    tree.deselect_all();
-                }
-            });
-        };
-
-        /**
-         * Function to build the annotations as a string
-         * Function to create the annotation objects
-         * @param {Object} annotationStringList array to add the built annotation strings
-         * @param {Object} annotationObjectList array to add the created annotation objects
-         */
-        var annotation = "";
-        var buildUserAnnotations = function (annotationStringList, annotationObjectList) {
-            var jsTreeNodes = $('#annotation-div').jstree(true)._model.data['#'].children;
-            _.forEach(jsTreeNodes, function (node) {
-                var node_info = $('#annotation-div').jstree("get_node", node);
-                var childArray = node_info.children
-                if (childArray.length != 0) {
-                    annotation += "@" + node_info.text.trim() + "( "
-                    //create annotation object
-                    var annotationObject = new AnnotationObject();
-                    annotationObject.setName(node_info.text.trim())
-                    traverseChildAnnotations(childArray, annotationObject)
-                    annotation = annotation.substring(0, annotation.length - 1);
-                    annotation += ")"
-                    annotationObjectList.push(annotationObject)
-                    annotationStringList.push(annotation);
-                    annotation = "";
-                }
-            });
-        };
-
-        /**
-         * Function to traverse the children of the parent annotaions
-         * @param {Object} children the children of a parent annotation node
-         * @param {Object} annotationObject the parent's annotation object
-         */
-        var traverseChildAnnotations = function (children, annotationObject) {
-            children.forEach(function (node) {
-                node_info = $('#annotation-div').jstree("get_node", node);
-                //if the child is a sub annotation
-                if ((node_info.original != undefined && node_info.original.class == "annotation") ||
-                    (node_info.li_attr != undefined && (node_info.li_attr.class == "annotation" ||
-                        node_info.li_attr.class == "optional-annotation" || node_info.li_attr.class ==
-                        "mandatory-annotation"))) {
-                    if (node_info.children.length != 0) {
-                        annotation += "@" + node_info.text.trim() + "( "
-                        var childAnnotation = new AnnotationObject();
-                        childAnnotation.setName(node_info.text.trim())
-                        traverseChildAnnotations(node_info.children, childAnnotation)
-                        annotationObject.addAnnotation(childAnnotation)
-                        annotation = annotation.substring(0, annotation.length - 1);
-                        annotation += "),"
-                    }
-                } else {
-                    //if the child is a property
-                    if (node_info.li_attr.class != undefined && (node_info.li_attr.class == "optional-key")
-                        && node_info.state.checked == false) {
-                        //not to add the child property if it hasn't been checked(predefined optional-key only)
-                    } else {
-                        annotation += node_info.text.trim() + "="
-                        var node_value = $('#annotation-div').jstree("get_node", node_info.children[0]).text.trim();
-                        annotation += "'" + node_value + "' ,";
-                        var element = new AnnotationElement(node_info.text.trim(), node_value)
-                        annotationObject.addElement(element);
-                    }
-                }
-            });
-        };
-
-        /**
          * @function generate properties form for a table
          * @param element selected element(table)
          * @param formConsole Console which holds the form
@@ -812,18 +363,18 @@ define(['log', 'jquery', 'lodash', 'attribute', 'storeAnnotation', 'designViewUt
             var self = this;
             var id = $(element).parent().attr('id');
             var clickedElement = self.configurationData.getSiddhiAppConfig().getTable(id);
-            $('#' + id).addClass('selected-element');
-            $(".overlayed-container").fadeTo(200, 1);
+
             var propertyDiv = $('<div class = "table-form-container table-div"> <div id="property-header"> <h3> Table' +
                 ' Configuration </h3> </div> <h4> Name: </h4> <input type="text" id="tableName" class = "clearfix">' +
                 '<label class="error-message" id="tableNameErrorMessage"> </label> <div id = "define-attribute"> </div>' +
-                '<button id = "btn-submit" type = "button" class = "btn toggle-view-button"> Submit </button>' +
-                '<button id="btn-cancel" type="button" class="btn btn-default"> Cancel </button> </div> ' +
+                self.formUtils.buildFormButtons() + '</div> ' +
                 '<div class = "table-form-container store-div"> <div id = "define-store"> </div>  ' +
-                '<div id="define-rdbms-type"> </div> <div id="define-store-options"> </div> </div> ' +
+                '<div id="define-rdbms-type"> </div> <div id="store-options-div"> </div> </div> ' +
                 '<div class = "table-form-container define-table-annotation">' +
                 '<div id = "define-predefined-annotations"> </div> <div id = "define-user-annotations"> </div> </div>');
+
             formContainer.append(propertyDiv);
+            self.formUtils.popUpSelectedElement(id);
             self.designViewContainer.addClass('disableContainer');
             self.toggleViewButton.addClass('disableContainer');
 
@@ -834,93 +385,8 @@ define(['log', 'jquery', 'lodash', 'attribute', 'storeAnnotation', 'designViewUt
             var storeOptions = [];
             var storeOptionsWithValues = [];
 
-            /** Event listeners */
-
-            //To add attribute
-            $("#define-attribute").on('click', '#btn-add-attribute', function () {
-                $("#attribute-div").append('<li class="attribute clearfix"><div class="clearfix"> ' +
-                    '<div class="attr-content">' +
-                    '<input type="text" value="" class="attr-name"/> ' +
-                    '<select class="attr-type">' +
-                    '<option value="string">string</option>' +
-                    '<option value="int">int</option>' +
-                    '<option value="long">long</option>' +
-                    '<option value="float">float</option>' +
-                    '<option value="double">double</option>' +
-                    '<option value="bool">bool</option>' +
-                    '<option value="object">object</option>' +
-                    '</select>' +
-                    '</div> <div class="attr-nav"> </div></div>' +
-                    '<label class="error-message"></label></li>');
-                changeAttributeNavigation();
-            });
-
-            //To delete attribute
-            $("#define-attribute").on('click', '#attribute-div .btn-del-attr', function () {
-                $(this).closest('li').remove();
-                changeAttributeNavigation();
-            });
-
-            //To reorder up the attribute
-            $("#define-attribute").on('click', ' #attribute-div .reorder-up', function () {
-                var $current = $(this).closest('li');
-                var $previous = $current.prev('li');
-                if ($previous.length !== 0) {
-                    $current.insertBefore($previous);
-                }
-                changeAttributeNavigation();
-            });
-
-            //To reorder down the attribute
-            $("#define-attribute").on('click', ' #attribute-div .reorder-down', function () {
-                var $current = $(this).closest('li');
-                var $next = $current.next('li');
-                if ($next.length !== 0) {
-                    $current.insertAfter($next);
-                }
-                changeAttributeNavigation();
-            });
-
-            //To show option description
-            $('#define-store-options').on('mouseover', '.option-desc', function () {
-                $(this).find('.option-desc-content').show();
-            });
-
-            //To hide option description
-            $('#define-store-options').on('mouseout', '.option-desc', function () {
-                $(this).find('.option-desc-content').hide();
-            });
-
-            //To hide and show the option content of the optional options
-            $('#define-store-options').on('change', '.option-checkbox', function () {
-                if ($(this).is(':checked')) {
-                    $(this).parents(".option").find(".option-value").show();
-                } else {
-                    $(this).parents(".option").find(".option-value").hide();
-                    if ($(this).parents(".option").find(".option-value").hasClass("required-input-field")) {
-                        $(this).parents(".option").find(".option-value").removeClass("required-input-field");
-                    }
-                    $(this).parents(".option").find(".error-message").text("");
-                }
-            });
-
-            //To add customized option
-            $('#define-store-options').on('click', '#btn-add-store-options', function () {
-                var custOptDiv = '<li class="option">' +
-                    '<div class = "clearfix"> <label>option.key</label> <input type="text" class="cust-option-key"' +
-                    'value=""> </div> <div class="clearfix"> <label>option.value</label> ' +
-                    '<input type="text" class="cust-option-value" value="">' +
-                    '<a class = "btn-del btn-del-option"><i class="fw fw-delete"></i></a></div>' +
-                    '<label class = "error-message"></label></li>';
-                $('#customized-store-options .cust-options').append(custOptDiv);
-                changeCustOptDiv();
-            });
-
-            //To delete customized option
-            $('#define-store-options').on('click', '.btn-del-option', function () {
-                $(this).closest('li').remove();
-                changeCustOptDiv();
-            });
+            self.formUtils.addEventListenersForAttributeDiv();
+            self.formUtils.addEventListenersForOptionsDiv(Constants.STORE);
 
             //To add annotation value
             $('#define-predefined-annotations').on('click', '.btn-add-annot-value', function () {
@@ -938,41 +404,29 @@ define(['log', 'jquery', 'lodash', 'attribute', 'storeAnnotation', 'designViewUt
 
             // To show the values of the primaryKey and index annotations on change of the checkbox
             $('#define-predefined-annotations').on('change', '.annotation-checkbox', function () {
+                var parent = $(this).parents(".table-annotation");
                 if ($(this).is(':checked')) {
-                    $(this).parents(".table-annotation").find('.annotation-content').show();
+                    parent.find('.annotation-content').show();
                 } else {
-                    $(this).parents(".table-annotation").find('.annotation-content').hide();
-                    $(this).parents(".table-annotation").find('.error-message').text("");
-                    if ($(this).parents(".table-annotation").find('.annotation-value').hasClass('required-input-field')) {
-                        $(this).parents(".table-annotation").find('.annotation-value').removeClass('required-input-field')
+                    parent.find('.annotation-content').hide();
+                    parent.find('.error-message').text("");
+                    if (parent.find('.annotation-value').hasClass('required-input-field')) {
+                        parent.find('.annotation-value').removeClass('required-input-field')
                     }
                 }
             });
 
             var name = clickedElement.getName();
             if (!name) {
-                var attributeFormTemplate = Handlebars.compile($('#attribute-form-template').html());
-                var wrappedHtml = attributeFormTemplate([{ name: "", type: "string" }]);
-                $('#define-attribute').html(wrappedHtml);
+                var attributes = [{ name: "" }];
+                self.formUtils.renderAttributeTemplate(attributes)
+
             } else {
                 $('#tableName').val(name);
                 var savedAttributes = clickedElement.getAttributeList();
-
-                //render the attribute form template
-                var attributeFormTemplate = Handlebars.compile($('#attribute-form-template').html());
-                var wrappedHtml = attributeFormTemplate(savedAttributes);
-                $('#define-attribute').html(wrappedHtml);
-                changeAttributeNavigation();
-                //to select the attribute-type of the saved attributes
-                var i = 0;
-                $('.attribute .attr-content').each(function () {
-                    $(this).find('.attr-type option').filter(function () {
-                        return ($(this).val() == (savedAttributes[i].getType()).toLowerCase());
-                    }).prop('selected', true);
-                    i++;
-                });
+                self.formUtils.renderAttributeTemplate(savedAttributes)
+                self.formUtils.selectTypesOfSavedAttributes(savedAttributes);
             }
-
             var savedAnnotations = clickedElement.getAnnotationList();
             var savedAnnotationObjects = clickedElement.getAnnotationListObjects();
             var userAnnotations = [];
@@ -988,31 +442,58 @@ define(['log', 'jquery', 'lodash', 'attribute', 'storeAnnotation', 'designViewUt
             $('#define-predefined-annotations').html(wrappedHtml);
             changeAnnotValueDelButtons();
 
-            //render the user defined annotations form template
-            var raw_partial = document.getElementById('recursiveAnnotationPartial').innerHTML;
-            Handlebars.registerPartial('recursiveAnnotation', raw_partial);
-            var annotationFormTemplate = Handlebars.compile($('#annotation-form-template').html());
-            var wrappedHtml = annotationFormTemplate(userAnnotations);
-            $('#define-user-annotations').html(wrappedHtml);
-            loadAnnotation();
+            self.formUtils.renderAnnotationTemplate("define-user-annotations", userAnnotations);
             $('#define-user-annotations').find('h4').html('Customized Annotations');
 
             //render the template to  generate the store types
-            var storeFormTemplate = Handlebars.compile($('#type-selection-form-template').html());
-            var wrappedHtml = storeFormTemplate({ id: Constants.STORE, types: predefinedStores });
-            $('#define-store').html(wrappedHtml);
+            self.formUtils.renderTypeSelectionTemplate(Constants.STORE, predefinedStores)
 
             $('#define-rdbms-type').on('change', '[name=radioOpt]', function () {
                 var dataStoreOptions = getRdbmsOptions(storeOptionsWithValues);
-                renderOptions(dataStoreOptions, customizedStoreOptions, Constants.STORE)
+                self.formUtils.renderOptions(dataStoreOptions, customizedStoreOptions, Constants.STORE)
             });
 
+            //onchange of the store type select box
+            $('#define-store').on('change', '#store-type', function () {
+                if (this.value === Constants.DEFAULT_STORE_TYPE) {
+                    $('#store-options-div').empty();
+                    $('#define-rdbms-type').hide();
+                } else if (clickedElement.getStore() && savedStoreType === this.value) {
+                    storeOptions = self.formUtils.getSelectedTypeParameters(this.value, predefinedStores);
+                    customizedStoreOptions = getCustomizedOptions(storeOptions, savedStoreOptions);
+                    storeOptionsWithValues = mapUserOptionValues(storeOptions, savedStoreOptions);
+                    if (this.value == Constants.RDBMS_STORE_TYPE) {
+                        $('#define-rdbms-type').show();
+                        var dataStoreOptions = getRdbmsOptions(storeOptionsWithValues);
+                        self.formUtils.renderOptions(dataStoreOptions, customizedStoreOptions, Constants.STORE);
+                        checkRdbmsType(storeOptionsWithValues);
+                    } else {
+                        $('#define-rdbms-type').hide();
+                        self.formUtils.renderOptions(storeOptionsWithValues, customizedStoreOptions, Constants.STORE);
+                    }
+                } else {
+                    storeOptions = self.formUtils.getSelectedTypeParameters(this.value, predefinedStores);
+                    storeOptionsWithValues = self.formUtils.createObjectWithValues(storeOptions);
+                    customizedStoreOptions = [];
+                    if (this.value == Constants.RDBMS_STORE_TYPE) {
+                        renderRdbmsTypes();
+                        //as default select the data-store type
+                        $("#define-rdbms-type input[name=radioOpt][value='inline-config']").prop("checked", true);
+                        var dataStoreOptions = getRdbmsOptions(storeOptionsWithValues);
+                        self.formUtils.renderOptions(dataStoreOptions, customizedStoreOptions, Constants.STORE)
+                        $('#define-rdbms-type').show();
+                    } else {
+                        $('#define-rdbms-type').hide();
+                        self.formUtils.renderOptions(storeOptionsWithValues, customizedStoreOptions, Constants.STORE);
+                    }
+                }
+            });
 
             if (clickedElement.getStore()) {
                 //if table object is already edited
                 var savedStoreAnnotation = clickedElement.getStore();
                 var savedStoreType = savedStoreAnnotation.getType().toLowerCase();
-                storeOptions = getSelectedTypeOptions(savedStoreType, predefinedStores);
+                storeOptions = self.formUtils.getSelectedTypeParameters(savedStoreType, predefinedStores);
                 var savedStoreAnnotationOptions = savedStoreAnnotation.getOptions();
                 var savedStoreOptions = [];
                 for (var key in savedStoreAnnotationOptions) {
@@ -1030,50 +511,14 @@ define(['log', 'jquery', 'lodash', 'attribute', 'storeAnnotation', 'designViewUt
                     renderRdbmsTypes();
                     checkRdbmsType(storeOptionsWithValues);
                     var dataStoreOptions = getRdbmsOptions(storeOptionsWithValues);
-                    renderOptions(dataStoreOptions, customizedStoreOptions, Constants.STORE);
+                    self.formUtils.renderOptions(dataStoreOptions, customizedStoreOptions, Constants.STORE);
                 } else {
-                    renderOptions(storeOptionsWithValues, customizedStoreOptions, Constants.STORE);
+                    self.formUtils.renderOptions(storeOptionsWithValues, customizedStoreOptions, Constants.STORE);
                 }
             } else {
                 //if table form is freshly opened [ new table object]
                 $('#define-store #store-type').val(Constants.DEFAULT_STORE_TYPE);
             }
-
-            //onchange of the store type select box
-            $('#define-store').on('change', '#store-type', function () {
-                if (this.value === Constants.DEFAULT_STORE_TYPE) {
-                    $('#define-store-options').empty();
-                    $('#define-rdbms-type').hide();
-                } else if (clickedElement.getStore() && savedStoreType === this.value) {
-                    storeOptions = getSelectedTypeOptions(this.value, predefinedStores);
-                    customizedStoreOptions = getCustomizedOptions(storeOptions, savedStoreOptions);
-                    storeOptionsWithValues = mapUserOptionValues(storeOptions, savedStoreOptions);
-                    if (this.value == Constants.RDBMS_STORE_TYPE) {
-                        $('#define-rdbms-type').show();
-                        var dataStoreOptions = getRdbmsOptions(storeOptionsWithValues);
-                        renderOptions(dataStoreOptions, customizedStoreOptions, Constants.STORE);
-                        checkRdbmsType(storeOptionsWithValues);
-                    } else {
-                        $('#define-rdbms-type').hide();
-                        renderOptions(storeOptionsWithValues, customizedStoreOptions, Constants.STORE);
-                    }
-                } else {
-                    storeOptions = getSelectedTypeOptions(this.value, predefinedStores);
-                    storeOptionsWithValues = createOptionObjectWithValues(storeOptions);
-                    customizedStoreOptions = [];
-                    if (this.value == Constants.RDBMS_STORE_TYPE) {
-                        renderRdbmsTypes();
-                        //as default select the data-store type
-                        $("#define-rdbms-type input[name=radioOpt][value='inline-config']").prop("checked", true);
-                        var dataStoreOptions = getRdbmsOptions(storeOptionsWithValues);
-                        renderOptions(dataStoreOptions, customizedStoreOptions, Constants.STORE)
-                        $('#define-rdbms-type').show();
-                    } else {
-                        $('#define-rdbms-type').hide();
-                        renderOptions(storeOptionsWithValues, customizedStoreOptions, Constants.STORE);
-                    }
-                }
-            });
 
             // 'Submit' button action
             var submitButtonElement = $(formContainer).find('#btn-submit')[0];
@@ -1086,10 +531,9 @@ define(['log', 'jquery', 'lodash', 'attribute', 'storeAnnotation', 'designViewUt
                 var isErrorOccurred = false;
 
                 var tableName = $('#tableName').val().trim();
-
                 // to check if table name is empty
                 if (tableName == "") {
-                    addErrorClass("#tableName");
+                    self.formUtils.addErrorClass("#tableName");
                     $('#tableNameErrorMessage').text("Table name is required.");
                     isErrorOccurred = true;
                     return;
@@ -1098,16 +542,15 @@ define(['log', 'jquery', 'lodash', 'attribute', 'storeAnnotation', 'designViewUt
                 if (!previouslySavedName) {
                     previouslySavedName = "";
                 }
-
                 if (previouslySavedName !== tableName) {
                     var isTableNameUsed = self.formUtils.isDefinitionElementNameUsed(tableName);
                     if (isTableNameUsed) {
-                        addErrorClass("#tableName");
+                        self.formUtils.addErrorClass("#tableName");
                         $('#tableNameErrorMessage').text("Table name is already used.");
                         isErrorOccurred = true;
                         return;
                     }
-                    if (validateName("#tableName", Constants.TABLE, tableName)) {
+                    if (self.formUtils.validateAttributeOrElementName("#tableName", Constants.TABLE, tableName)) {
                         isErrorOccurred = true;
                         return;
                     }
@@ -1116,30 +559,29 @@ define(['log', 'jquery', 'lodash', 'attribute', 'storeAnnotation', 'designViewUt
                 //store annotation
                 var selectedStoreType = $('#define-store #store-type').val();
                 if (selectedStoreType !== Constants.DEFAULT_STORE_TYPE) {
-                    if (validateOptions(storeOptions)) {
+                    if (self.formUtils.validateOptions(storeOptions, Constants.STORE)) {
                         isErrorOccurred = true;
                         return;
                     }
-                    if (validateCustomizedOptions()) {
+                    if (self.formUtils.validateCustomizedOptions(Constants.STORE)) {
                         isErrorOccurred = true;
                         return;
                     }
                 }
 
                 var attributeNameList = [];
-                if (validateAttributeNames(attributeNameList)) {
+                if (self.formUtils.validateAttributes(attributeNameList)) {
                     isErrorOccurred = true;
                     return;
                 }
-
                 if (attributeNameList.length == 0) {
-                    addErrorClass($('.attribute:eq(0)').find('.attr-name'));
+                    self.formUtils.addErrorClass($('.attribute:eq(0)').find('.attr-name'));
                     $('.attribute:eq(0)').find('.error-message').text("Minimum one attribute is required.");
                     isErrorOccurred = true;
                     return;
                 }
 
-                if (validateAnnotations()) {
+                if (validatePredefinedAnnotations()) {
                     isErrorOccurred = true;
                     return;
                 }
@@ -1154,6 +596,7 @@ define(['log', 'jquery', 'lodash', 'attribute', 'storeAnnotation', 'designViewUt
                         var textNode = $('#' + id).find('.tableNameNode');
                         textNode.html(tableName);
                     }
+
                     if (selectedStoreType !== Constants.DEFAULT_STORE_TYPE) {
                         var optionsMap = {};
                         buildOptions(optionsMap);
@@ -1184,8 +627,9 @@ define(['log', 'jquery', 'lodash', 'attribute', 'storeAnnotation', 'designViewUt
                     //clear the annotationlist
                     clickedElement.clearAnnotationList();
                     clickedElement.clearAnnotationListObjects();
-                    buildAnnotations(annotationList, annotationObjectList);
-                    buildUserAnnotations(annotationList, annotationObjectList)
+                    buildPredefinedAnnotations(annotationList, annotationObjectList);
+                    var annotationNodes = $('#annotation-div').jstree(true)._model.data['#'].children;
+                    self.formUtils.buildAnnotation(annotationNodes, annotationList, annotationObjectList)
                     //add the annotations to the clicked element
                     _.forEach(annotationList, function (annotation) {
                         clickedElement.addAnnotation(annotation);
@@ -1194,16 +638,15 @@ define(['log', 'jquery', 'lodash', 'attribute', 'storeAnnotation', 'designViewUt
                         clickedElement.addAnnotationObject(annotation);
                     });
 
-                    // set the isDesignViewContentChanged to true
-                    self.configurationData.setIsDesignViewContentChanged(true);
-
                     $('#' + id).removeClass('incomplete-element');
                     //Send table element to the backend and generate tooltip
                     var tableToolTip = self.formUtils.getTooltip(clickedElement, Constants.TABLE);
                     $('#' + id).prop('title', tableToolTip);
+
+                    // set the isDesignViewContentChanged to true
+                    self.configurationData.setIsDesignViewContentChanged(true);
                     // close the form window
                     self.consoleListManager.removeFormConsole(formConsole);
-
                     self.designViewContainer.removeClass('disableContainer');
                     self.toggleViewButton.removeClass('disableContainer');
                 }
@@ -1221,3 +664,4 @@ define(['log', 'jquery', 'lodash', 'attribute', 'storeAnnotation', 'designViewUt
 
         return TableForm;
     });
+

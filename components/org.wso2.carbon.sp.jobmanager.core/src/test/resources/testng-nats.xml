@@ -27,6 +27,7 @@
             <class name="org.wso2.carbon.sp.jobmanager.core.BeanTestCase"/>
             <class name="org.wso2.carbon.sp.jobmanager.core.DistributedAggregationTestCase"/>
             <class name="org.wso2.carbon.sp.jobmanager.core.JmsTransportTestCase"/>
+            <class name="org.wso2.carbon.sp.jobmanager.core.NatsAppCreatorTestCase"/>
         </classes>
     </test>
 </suite>

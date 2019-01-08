@@ -1277,12 +1277,12 @@
     <h3> Parameters </h3>
     <div id = "{{id}}-parameters">
     {{#each parameters}}
-        <div class = "parameter" id="{{name}}-parameter">
+        <div class = "parameter" id="{{key}}-parameter">
         {{#if optional}}
             {{#if value}}
                 <div class = "clearfix">
                     <label class = "parameter-name optional-parameter">
-                        <input type = "checkbox" class = "parameter-checkbox" checked> {{name}}
+                        <input type = "checkbox" class = "parameter-checkbox" checked> {{key}}
                     </label>
                     <i class = "fw fw-info parameter-desc">
                         <span style = "display:none" class = "parameter-desc-content"> {{description}} </span>
@@ -1294,7 +1294,7 @@
             {{else}}
                 <div class="clearfix">
                     <label class = "parameter-name optional-parameter">
-                        <input type = "checkbox" class = "parameter-checkbox"> {{name}}
+                        <input type = "checkbox" class = "parameter-checkbox"> {{key}}
                     </label>
                     <i class = "fw fw-info parameter-desc">
                         <span style = "display:none" class="parameter-desc-content"> {{description}} </span>
@@ -1309,7 +1309,7 @@
             <div class="clearfix">
                 <label class = "mandatory-parameter-symbol"> * </label>
                 <label class = "parameter-name mandatory-parameter">
-                    {{name}}
+                    {{key}}
                 </label>
                 <i class="fw fw-info parameter-desc">
                     <span style="display:none" class="parameter-desc-content"> {{description}} </span>
@@ -1595,7 +1595,6 @@
             backbone: "commons/lib/backbone_v1.3.3/backbone",
             file_saver: "commons/lib/file_saver/FileSaver",
             mousetrap: "commons/lib/mousetrap_v1.6.0/mousetrap.min",
-            mcustom_scroller: "commons/lib/mCustomScrollbar_v3.1.5/js/jquery.mCustomScrollbar",
             jquery_mousewheel: "commons/lib/jquery-mousewheel_v3.1.13/jquery.mousewheel",
             jquery_context_menu: "commons/lib/context-menu_v2.4.2/jquery.contextMenu.min",
             js_tree: "commons/lib/js-tree-v3.3.2/jstree",

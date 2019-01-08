@@ -603,8 +603,8 @@ a.list-group-item, button.list-group-item {
 }
 
 .incomplete-element {
-    border: 1px solid yellow;
-    box-shadow: 0 0 1px 2px yellow;
+	border: 1px solid yellow;
+	box-shadow: 0 0 1px 2px yellow;
 }
 
 .error-element {
@@ -617,13 +617,14 @@ a.list-group-item, button.list-group-item {
 	background: red;
 }
 
-.design-view-form-content input[type="text"].required-input-field {
+.design-view-form-content input[type="text"].required-input-field,
+.design-view-form-content textarea.required-input-field {
 	border: 1px solid #FF0000;
 }
 
 .design-view-form-content .error-message {
-    color: red;
-    padding-top: 3px;
+	color: red;
+	padding-top: 3px;
 }
 
 .design-view-form-content .customized-options .error-message,
@@ -678,15 +679,15 @@ a.list-group-item, button.list-group-item {
 }
 
 .design-view-form-content .attribute .attr-nav  a {
-    float: left;
-    display: inline-block;
-    height: 22px;
-    padding: 0 5px;
-    margin-left: 3px;
-    margin-top: 2px;
-    background: #424242;
-    color: #ccc;
-    border: 1px solid #716e6e;
+	float: left;
+	display: inline-block;
+	height: 22px;
+	padding: 0 5px;
+	margin-left: 3px;
+	margin-top: 2px;
+	background: #424242;
+	color: #ccc;
+	border: 1px solid #716e6e;
 }
 
 .design-view-form-content .btn-del-option,
@@ -789,10 +790,10 @@ a.list-group-item, button.list-group-item {
 }
 
 .design-view-form-content  .jstree-clicked {
-    background: #5F5B5A;
-    color:black;
-    border-radius: 2px;
-    box-shadow: inset 0 0 1px #999999;
+	background: #5F5B5A;
+	color:black;
+	border-radius: 2px;
+	box-shadow: inset 0 0 1px #999999;
 }
 
 .design-view-form-content .jstree-hovered {
@@ -812,10 +813,12 @@ a.list-group-item, button.list-group-item {
     margin-left: 10px;
 }
 
-.stream-form-container ,
-    .partition-form-container {
-    width:50%;
+.stream-form-container {
+	width:50%;
+}
 
+.partition-form-container {
+	width: 40%;
 }
 
 .stream-form-container,
