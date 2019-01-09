@@ -85,10 +85,8 @@ public class ServiceComponent {
                 AbstractSiddhiAppCreator siddhiAppCreator = (AbstractSiddhiAppCreator)
                         Class.forName(siddhiAppCreatorClassName).newInstance();
                 distributionServiceRegistration = bundleContext.registerService(
-                        DistributionService.class.getName(),
-                        new DistributionManagerServiceImpl(siddhiAppCreator,
-                                ServiceDataHolder.getDeploymentManager()),
-                        null);
+                        DistributionService.class.getName(), new DistributionManagerServiceImpl(siddhiAppCreator,
+                                ServiceDataHolder.getDeploymentManager()), null);
                 if (log.isDebugEnabled()) {
                     log.debug(siddhiAppCreatorClassName + " chosen as Siddhi Distributed App Creator");
                 }
