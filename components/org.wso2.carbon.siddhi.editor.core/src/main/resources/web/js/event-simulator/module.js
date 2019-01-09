@@ -156,10 +156,6 @@ function ($, Backbone, _, log, Dialogs, singleEventSimulator, feedSimulator, Sim
             singleEventSimulator.init(this._options);
             feedSimulator.init(this._options);
             this._eventSimulatorContainer = eventSimulatorContainer;
-            eventSimulatorContainer.mCustomScrollbar({
-                theme: "minimal",
-                scrollInertia: 0
-            });
         },
 
         addSingleEventConfigForm: function () {
