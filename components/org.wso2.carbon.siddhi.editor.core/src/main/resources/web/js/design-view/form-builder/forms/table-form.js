@@ -235,7 +235,7 @@ define(['log', 'jquery', 'lodash', 'attribute', 'storeAnnotation', 'handlebar', 
 
                     if (selectedStoreType !== Constants.DEFAULT_STORE_TYPE) {
                         var optionsMap = {};
-                        self.formUtils.buildStoreOptions(optionsMap);
+                        self.formUtils.buildStoreAndAnnotationOptions(optionsMap, Constants.STORE);
                         self.formUtils.buildCustomizedStoreOption(optionsMap);
                         var storeAnnotationOptions = {};
                         _.set(storeAnnotationOptions, 'type', selectedStoreType);
