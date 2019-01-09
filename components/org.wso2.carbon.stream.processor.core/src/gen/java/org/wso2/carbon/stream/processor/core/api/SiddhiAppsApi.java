@@ -213,6 +213,45 @@ public class SiddhiAppsApi implements Microservice {
         return delegate.siddhiAppsAppNameRestorePost(appName, revision, request);
     }
 
+    @DELETE
+    @Path("/{appName}/revisions")
+    @Produces({"application/json"})
+    @io.swagger.annotations.ApiOperation(value = "Deletes all revisions of the periodic state of a Siddhi Application.",
+            notes = "Deletes all revisions of the periodic state of the specified Siddhi Application.", response = InlineResponse400.class, tags = {"State",})
+    @io.swagger.annotations.ApiResponses(value = {
+            @io.swagger.annotations.ApiResponse(code = 200, message = "All revisions of the periodic state of the siddhi application" +
+                    " are deleted succussfully.", response = InlineResponse400.class),
+            @io.swagger.annotations.ApiResponse(code = 404, message = "The Siddhi Application is not found.",
+                    response = InlineResponse400.class),
+            @io.swagger.annotations.ApiResponse(code = 500, message = "An unexpected error occured.",
+                    response = InlineResponse400.class)})
+    public Response siddhiAppsAppNameRevisionsDelete(
+            @Context Request request,
+            @ApiParam(value = "The name of the Siddhi Application.", required = true)
+            @PathParam("appName") String appName,
+            @ApiParam(value = "Whether the redeployment enable or not", required = false)
+            @QueryParam("enabledRedeployment") String enabledRedeployment) throws NotFoundException {
+        return delegate.siddhiAppsAppNameRevisionsDelete(appName, enabledRedeployment, request);
+    }
+
+    @DELETE
+    @Path("/revisions")
+    @Produces({"application/json"})
+    @io.swagger.annotations.ApiOperation(value = "Deletes all revisions of the periodic state of all Siddhi Applications.",
+            notes = "Deletes all revisions of the periodic state of all Siddhi Applications. ", response = InlineResponse400.class, tags={ "State",})
+    @io.swagger.annotations.ApiResponses(value = {
+            @io.swagger.annotations.ApiResponse(code = 200, message = "All revisions of the periodic state of all the siddhi applicationa " +
+                    "are deleted succussfully.", response = InlineResponse400.class),
+            @io.swagger.annotations.ApiResponse(code = 500, message = "An unexpected error occured.",
+                    response = InlineResponse400.class) })
+    public Response siddhiAppsRevisionsDelete(
+            @Context Request request,
+            @ApiParam(value = "Whether the redeployment enable or not", required = false)
+            @QueryParam("enabledRedeployment") String enabledRedeployment)
+            throws NotFoundException {
+        return delegate.siddhiAppsRevisionsDelete(enabledRedeployment, request);
+    }
+
     @GET
     @Path("/{appName}/elements")
     @Produces({"application/json"})

@@ -152,4 +152,20 @@ public class FileSystemPersistenceStoreTestcase {
         Assert.assertEquals(file.list().length, 2, "There should be two revisions persisted");
     }
 
+    @Test(dependsOnMethods = {"testFileSystemPeriodicPersistence"})
+    public void testFileSystemClearPeriodicPersistence() {
+        File file = new File(PERSISTENCE_FOLDER + File.separator + SIDDHIAPP_NAME);
+
+        SiddhiManager siddhiManager = StreamProcessorDataHolder.getSiddhiManager();
+        SiddhiAppRuntime siddhiAppRuntime = siddhiManager.getSiddhiAppRuntime(SIDDHIAPP_NAME);
+
+        if (file.list().length == 0) {
+            Assert.fail("File revisions are already deleted");
+        }
+
+        log.info("Deleting all the revisions of the persistence store of Siddhi App : " + SIDDHIAPP_NAME );
+        siddhiAppRuntime.clearAllRevisions();
+        Assert.assertEquals(file.list().length, 0, "All the revisions should be deleted");
+    }
+
 }

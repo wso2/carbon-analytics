@@ -32,6 +32,7 @@ public class RDBMSQueryConfigurationEntry {
     private String deleteQuery;
     private String deleteOldRevisionsQuery;
     private String countQuery;
+    private String deleteAllRevisionsQuery;
 
     public String getDatabaseName() {
         return databaseName;
@@ -111,6 +112,14 @@ public class RDBMSQueryConfigurationEntry {
 
     public void setCountQuery(String countQuery) {
         this.countQuery = countQuery;
+    }
+
+    public String getDeleteAllRevisionsQuery() {
+        return deleteAllRevisionsQuery;
+    }
+
+    public void setDeleteAllRevisionsQuery(String deleteAllRevisionsQuery) {
+        this.deleteAllRevisionsQuery = deleteAllRevisionsQuery;
     }
 
 }

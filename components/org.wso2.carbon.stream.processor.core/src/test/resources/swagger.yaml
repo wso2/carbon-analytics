@@ -218,6 +218,71 @@ paths:
           description: An unexpected error occured.
           schema:
             $ref: '#/definitions/ApiResponseMessageWithCode'
+  '/siddhi-apps/{appName}/revisions':
+    delete:
+      x-wso2-curl: 'curl -k -X DELETE http://localhost:9090/siddhi-apps/TestSiddhiApp1/revisions'
+      x-wso2-request: 'DELETE http://localhost:9090/siddhi-apps/TestSiddhiApp1/revisions'
+      x-wso2-response: >-
+        HTTP/1.1 200 OK Content-Type: application/json
+        {"type":"success","message":"All revisions of periodic state deleted for Siddhi
+        App :TestSiddhiApp1"}
+      tags:
+      - State
+      summary: Deletes all revisions of the periodic state of a Siddhi Application.
+      description: |
+        Deletes all revisions of the periodic state of the specified Siddhi Application.
+      produces:
+      - application/json
+      parameters:
+      - name: appName
+        in: path
+        description: The name of the Siddhi Application.
+        required: true
+        type: string
+      - name: enabledRedeployment
+        in: query
+        description: Whether the redeployment enable or not
+        required: false
+        type: string
+      responses:
+        '200':
+          description: All revisions of the periodic state of the siddhi application are deleted succussfully.
+        '404':
+          description: The Siddhi Application is not found.
+          schema:
+            $ref: '#/definitions/ApiResponseMessageWithCode'
+        '500':
+          description: An unexpected error occured.
+          schema:
+            $ref: '#/definitions/ApiResponseMessageWithCode'
+  '/siddhi-apps/revisions':
+    delete:
+      x-wso2-curl: 'curl -k -X DELETE http://localhost:9090/siddhi-apps/revisions'
+      x-wso2-request: 'DELETE http://localhost:9090/siddhi-apps/revisions'
+      x-wso2-response: >-
+        HTTP/1.1 200 OK Content-Type: application/json
+        {"type":"success","message":"All revisions of periodic state deleted for all Siddhi
+        Apps"}
+      tags:
+      - State
+      summary: Deletes all revisions of the periodic state of all Siddhi Applications.
+      description: |
+        Deletes all revisions of the periodic state of all Siddhi Applications.
+      produces:
+      - application/json
+      parameters:
+      - name: enabledRedeployment
+        in: query
+        description: Whether the redeployment enable or not
+        required: false
+        type: string
+      responses:
+        '200':
+          description: All revisions of the periodic state of all the siddhi applicationa are deleted succussfully.
+        '500':
+          description: An unexpected error occured.
+          schema:
+            $ref: '#/definitions/ApiResponseMessageWithCode'
 definitions:
   SiddhiAppContent:
     type: object
