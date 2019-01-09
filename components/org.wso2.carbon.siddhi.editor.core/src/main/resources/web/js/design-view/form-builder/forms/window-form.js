@@ -73,13 +73,13 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'handlebar', 'constan
                         parameterValue = parameterValue.slice(1, parameterValue.length - 1)
                     }
                     parameters.push({
-                        key: predefinedParameters[i].name, value: parameterValue, description:
+                        name: predefinedParameters[i].name, value: parameterValue, description:
                             predefinedParameters[i].description, optional: predefinedParameters[i].optional,
                         defaultValue: predefinedParameters[i].defaultValue, timeStamp: timeStamp
                     });
                 } else {
                     parameters.push({
-                        key: predefinedParameters[i].name, value: "", description: predefinedParameters[i]
+                        name: predefinedParameters[i].name, value: "", description: predefinedParameters[i]
                             .description, optional: predefinedParameters[i].optional,
                         defaultValue: predefinedParameters[i].defaultValue, timeStamp: timeStamp
                     });
@@ -279,7 +279,7 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'handlebar', 'constan
             //add the two mandatory params of the saved values to the predefined param objects
             for (var i = 0; i <= 1; i++) {
                 parameters.push({
-                    key: predefinedParameters[i].name, value: savedParameterValues[i], description:
+                    name: predefinedParameters[i].name, value: savedParameterValues[i], description:
                         predefinedParameters[i].description, optional: predefinedParameters[i].optional,
                     defaultValue: predefinedParameters[i].defaultValue
                 });
@@ -292,7 +292,7 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'handlebar', 'constan
             attributes = attributes.substring(0, attributes.length - 2);
             //add the attributes to the third obj of the predefined parameter
             parameters.push({
-                key: predefinedParameters[2].name, value: attributes, description:
+                name: predefinedParameters[2].name, value: attributes, description:
                     predefinedParameters[2].description, optional: predefinedParameters[2].optional,
                 defaultValue: predefinedParameters[2].defaultValue
             });
@@ -310,7 +310,7 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'handlebar', 'constan
             var attributes = "";
             //add the first saved param to predefined param's first index (event.count)
             parameters.push({
-                key: predefinedParameters[0].name, value: savedParameterValues[0], description:
+                name: predefinedParameters[0].name, value: savedParameterValues[0], description:
                     predefinedParameters[0].description, optional: predefinedParameters[0].optional,
                 defaultValue: predefinedParameters[0].defaultValue
             });
@@ -322,7 +322,7 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'handlebar', 'constan
             attributes = attributes.substring(0, attributes.length - 2);
             //add the attributes to second obj of the predefined parameter
             parameters.push({
-                key: predefinedParameters[1].name, value: attributes, description:
+                name: predefinedParameters[1].name, value: attributes, description:
                     predefinedParameters[1].description, optional: predefinedParameters[1].optional,
                 defaultValue: predefinedParameters[1].defaultValue
             });
@@ -345,7 +345,7 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'handlebar', 'constan
             }
             //add the first saved param to predefined param's first index (window.length)
             parameters.push({
-                key: predefinedParameters[0].name, value: length, description:
+                name: predefinedParameters[0].name, value: length, description:
                     predefinedParameters[0].description, optional: predefinedParameters[0].optional,
                 defaultValue: predefinedParameters[0].defaultValue
             });
@@ -366,13 +366,13 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'handlebar', 'constan
             }
             //add the attributes to second obj of the predefined parameter
             parameters.push({
-                key: predefinedParameters[1].name, value: attributes, description:
+                name: predefinedParameters[1].name, value: attributes, description:
                     predefinedParameters[1].description, optional: predefinedParameters[1].optional,
                 defaultValue: predefinedParameters[1].defaultValue
             });
             //add the order to the third obj of the predefined parameter
             parameters.push({
-                key: predefinedParameters[2].name, value: order, description:
+                name: predefinedParameters[2].name, value: order, description:
                     predefinedParameters[2].description, optional: predefinedParameters[2].optional,
                 defaultValue: predefinedParameters[2].defaultValue
             });
