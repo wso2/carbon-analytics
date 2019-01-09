@@ -49,11 +49,11 @@ public class DeploymentConfig implements Serializable {
      * @deprecated zooKeeperURLs is moved to {@link ZooKeeperConfig} bean
      */
     @Deprecated
-    @Element(description = "ZooKeeper urls of Kafka cluster", required = true)
+    @Element(description = "ZooKeeper urls of Kafka cluster")
     private String zooKeeperURLs;
-    @Element(description = "ZooKeeper configurations", required = true)
+    @Element(description = "ZooKeeper configurations")
     private ZooKeeperConfig zooKeeperConfig;
-    @Element(description = "JMS Factory initial configuration", required = true)
+    @Element(description = "JMS Factory initial configuration")
     private String factoryInitial;
     @Element(description = "provider url configuration for siddhi-jms-io")
     private String providerUrl;
@@ -63,6 +63,8 @@ public class DeploymentConfig implements Serializable {
     private String natsServerUrl;
     @Element(description = "Id of the created nats cluster")
     private String clusterId;
+    @Element(description = "Siddhi App Creator based on the distribute implementation")
+    private String appCreatorClass = "org.wso2.carbon.sp.jobmanager.core.appcreator.KafkaSiddhiAppCreator";
 
     public String getNatsServerUrl() {
         return natsServerUrl;
@@ -185,4 +187,11 @@ public class DeploymentConfig implements Serializable {
         this.queries = queries;
     }
 
+    public String getAppCreatorClass() {
+        return appCreatorClass;
+    }
+
+    public void setAppCreatorClass(String appCreatorClass) {
+        this.appCreatorClass = appCreatorClass;
+    }
 }
