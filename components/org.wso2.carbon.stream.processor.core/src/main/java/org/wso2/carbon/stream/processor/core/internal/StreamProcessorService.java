@@ -68,7 +68,6 @@ public class StreamProcessorService {
     private Map<String, SiddhiAppData> siddhiAppMap = new ConcurrentHashMap<>();
     private BackoffRetryCounter backoffRetryCounter = new BackoffRetryCounter();
     private DistributionService distributionService = StreamProcessorDataHolder.getDistributionService();
-    private boolean isSingleAppPersistenceClear = false;
 
     public void deploySiddhiApp(String siddhiAppContent, String siddhiAppName) throws SiddhiAppConfigurationException,
             SiddhiAppAlreadyExistException, ConnectionUnavailableException {
@@ -118,17 +117,16 @@ public class StreamProcessorService {
                     if (StreamProcessorDataHolder.isPersistenceEnabled()) {
 
                         if (persistenceStoreClearEnabled) {
-
-                            if (siddhiApp != null && siddhiApp.equals(siddhiAppName)) {
-                                siddhiAppRuntime.clearAllRevisionsOfSiddhiAppInPersistenceStore();
-                                isSingleAppPersistenceClear = true;
+                            if (siddhiApp != null) {
+                                if (siddhiApp.equals(siddhiAppName)) {
+                                    siddhiAppRuntime.clearAllRevisions();
+                                    log.info("Deleting all the revisions of the Periodic Persistence of " +
+                                            "Active Node for " + siddhiAppName);
+                                }
+                            } else {
                                 log.info("Deleting all the revisions of the Periodic Persistence of " +
                                         "Active Node for " + siddhiAppName);
-                            } else if (!isSingleAppPersistenceClear) {
-                                log.info("Deleting all the revisions of the Periodic Persistence of " +
-                                        "Active Node for " + siddhiAppName);
-
-                                siddhiAppRuntime.clearAllRevisionsOfSiddhiAppInPersistenceStore();
+                                siddhiAppRuntime.clearAllRevisions();
                             }
                         } else {
                             log.info(
@@ -230,17 +228,16 @@ public class StreamProcessorService {
                     String revision = null;
 
                     if (persistenceStoreClearEnabled) {
-
-                        if (siddhiApp != null && siddhiApp.equals(siddhiAppName)) {
-                            siddhiAppRuntime.clearAllRevisionsOfSiddhiAppInPersistenceStore();
-                            isSingleAppPersistenceClear = true;
+                        if (siddhiApp != null) {
+                            if (siddhiApp.equals(siddhiAppName)) {
+                                siddhiAppRuntime.clearAllRevisions();
+                                log.info("Deleting all the revisions of the Periodic Persistence of " +
+                                        "Active Node for " + siddhiAppName);
+                            }
+                        } else {
                             log.info("Deleting all the revisions of the Periodic Persistence of " +
                                     "Active Node for " + siddhiAppName);
-                        } else if (!isSingleAppPersistenceClear) {
-                            log.info("Deleting all the revisions of the Periodic Persistence of " +
-                                    "Active Node for " + siddhiAppName);
-
-                            siddhiAppRuntime.clearAllRevisionsOfSiddhiAppInPersistenceStore();
+                            siddhiAppRuntime.clearAllRevisions();
                         }
 
                     } else {

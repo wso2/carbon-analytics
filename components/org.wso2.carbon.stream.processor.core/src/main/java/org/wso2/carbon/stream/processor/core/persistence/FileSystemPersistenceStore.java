@@ -141,16 +141,16 @@ public class FileSystemPersistenceStore implements PersistenceStore {
         File[] files = targetDirectory.listFiles();
 
         if (files == null || files.length == 0) {
-            log.info("No revisions were found with the Siddhi App " + siddhiAppName);
+            log.info("No revisions were found to delete for the Siddhi App " + siddhiAppName);
             return;
         }
 
         for (File file : files) {
             if (file.exists()) {
                 if (!file.delete()) {
-                    log.error("file is not deleted successfully!");
+                    log.error("file is not deleted successfully : " + file.getName());
                     throw new CannotClearSiddhiAppStateException("Persistence state " +
-                            "file is not deleted : " + file.getPath());
+                            "file is not deleted : " + file.getPath() + file.getName());
                 }
             }
 

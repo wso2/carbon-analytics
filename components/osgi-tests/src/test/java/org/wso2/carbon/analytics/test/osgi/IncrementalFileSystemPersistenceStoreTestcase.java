@@ -151,7 +151,7 @@ public class IncrementalFileSystemPersistenceStoreTestcase {
         }
 
         log.info("Deleting all the revisions of the persistence store of Siddhi App : " + SIDDHIAPP_NAME );
-        siddhiAppRuntime.clearAllRevisionsOfSiddhiAppInPersistenceStore();
+        siddhiAppRuntime.clearAllRevisions();
         Assert.assertEquals(file.list().length, 0, "All the revisions should be cleared");
     }
 }

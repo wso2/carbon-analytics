@@ -250,7 +250,7 @@ public class IncrementalDBPersistenceStoreTestcase {
                 Assert.fail("Already data does not exists in the database table");
             }
 
-            siddhiAppRuntime.clearAllRevisionsOfSiddhiAppInPersistenceStore();
+            siddhiAppRuntime.clearAllRevisions();
 
             resultSet = stmt.executeQuery();
             count = 0;

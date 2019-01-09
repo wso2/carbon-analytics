@@ -325,7 +325,7 @@ public class SiddhiAppsApiServiceImpl extends SiddhiAppsApiService {
                             getStreamProcessorService().undeploySiddhiApp(appName);
                 }
                 //clear the persistence store
-                siddhiAppRuntime.clearAllRevisionsOfSiddhiAppInPersistenceStore();
+                siddhiAppRuntime.clearAllRevisions();
 
                 if (enabledRedeployment == null || "true".equals(enabledRedeployment)) {
                     StreamProcessorDataHolder.
@@ -379,7 +379,7 @@ public class SiddhiAppsApiServiceImpl extends SiddhiAppsApiService {
             //clear persistence store
             for (Map.Entry<String, SiddhiAppData> entry : storedSiddhiApps.entrySet()) {
                 if (entry.getValue() != null && entry.getValue().getSiddhiAppRuntime() != null) {
-                    entry.getValue().getSiddhiAppRuntime().clearAllRevisionsOfSiddhiAppInPersistenceStore();
+                    entry.getValue().getSiddhiAppRuntime().clearAllRevisions();
                 }
             }
             //deploy all the siddhi apps
@@ -397,9 +397,7 @@ public class SiddhiAppsApiServiceImpl extends SiddhiAppsApiService {
                         "All revisions of the state persistence is deleted for Siddhi Apps"));
             }
 
-        } catch (RuntimeException e) {
-            throw e;
-        } catch (Exception e) {
+        } catch (Throwable e) {
             log.error("Exception occurred when deleting the persistance store :", e);
             jsonString = new Gson().
                     toJson(new ApiResponseMessageWithCode(ApiResponseMessageWithCode.FILE_PROCESSING_ERROR,
