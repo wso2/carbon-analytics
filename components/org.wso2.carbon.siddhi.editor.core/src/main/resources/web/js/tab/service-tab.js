@@ -15,8 +15,8 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-define(['require', 'log', 'jquery', 'lodash', './tab','workspace','toolEditor','workspace/file'],
-    function (require, log, jquery, _, Tab, Workspace,ToolEditor,File) {
+define(['require', 'log', 'jquery', 'lodash', './tab','workspace','toolEditor','workspace/file', 'operator_finder'],
+    function (require, log, jquery, _, Tab, Workspace, ToolEditor, File, OperatorFinder) {
         var  ServiceTab;
 
         ServiceTab = Tab.extend({
@@ -76,8 +76,9 @@ define(['require', 'log', 'jquery', 'lodash', './tab','workspace','toolEditor','
                     this.app.commandManager.dispatch(id);
                 }, this);
 
-                toolEditor.on("view-switch", function () {
+                toolEditor.on("view-switch", function (e) {
                     this.app.workspaceManager.updateMenuItems();
+                    OperatorFinder.Utils.toggleAddToSource(e.view === 'design');
                 }, this);
 
                 this._file.on("dirty-state-change", function () {
