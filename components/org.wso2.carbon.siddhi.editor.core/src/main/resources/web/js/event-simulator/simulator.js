@@ -768,8 +768,36 @@ define(['jquery', 'log', './simulator-rest-client', 'lodash', './open-siddhi-app
         $attributes.each(
             function () {
                 self.addRuleForAttribute(this);
+                var dataType = $(this).attr("data-type");
+                $(this).keypress(function(e) {
+                    var userInput = e.key;
+                    if (e.key != "Delete" && e.key != "Backspace" &&
+                        e.key != "ArrowLeft" && e.key != "ArrowRight") {
+                        var valid = self.realTimeValidate(dataType, userInput);
+                        if (!valid) {
+                            e.preventDefault();
+                        }
+                    }
+                });
             }
         );
+    };
+
+//add real time validation for an attribute based on the attribute type
+    self.realTimeValidate = function(dataType, userInput) {
+        var validDataType = false;
+        var intLongRegexMatch = /^-?[\d]*$/;
+        var doubleFloatRegexMatch = /^-?\d*[.]?\d*$/;
+        if (dataType === "INT" || dataType === "LONG") {
+            if (userInput.match(intLongRegexMatch)) {
+                validDataType = true;
+            }
+        } else if (dataType === "DOUBLE" || dataType === "FLOAT") {
+            if (userInput.match(doubleFloatRegexMatch)) {
+                validDataType = true;
+            }
+        }
+        return validDataType;
     };
 
 // add a validation rule for an attribute based on the attribute type
@@ -790,8 +818,7 @@ define(['jquery', 'log', './simulator-rest-client', 'lodash', './open-siddhi-app
                     required: true,
                     validateIntOrLong: true,
                     messages: {
-                        required: "Please specify an attribute value.",
-                        validateIntOrLong: "Please specify a valid " + type.toLowerCase() + " value."
+                        required: "Please specify an attribute value."
                     }
                 });
                 break;
@@ -801,8 +828,7 @@ define(['jquery', 'log', './simulator-rest-client', 'lodash', './open-siddhi-app
                     required: true,
                     validateFloatOrDouble: true,
                     messages: {
-                        required: "Please specify an attribute value.",
-                        validateFloatOrDouble: "Please specify a valid " + type.toLowerCase() + " value."
+                        required: "Please specify an attribute value."
                     }
                 });
                 break;
