@@ -771,8 +771,8 @@ define(['jquery', 'log', './simulator-rest-client', 'lodash', './open-siddhi-app
                 var dataType = $(this).attr("data-type");
                 $(this).keypress(function(e) {
                     var userInput = e.key;
-                    if (e.key != "Delete" && e.key != "Backspace" &&
-                        e.key != "ArrowLeft" && e.key != "ArrowRight") {
+                    if (userInput != "Delete" && userInput != "Backspace" &&
+                        userInput != "ArrowLeft" && userInput != "ArrowRight") {
                         var valid = self.realTimeValidate(dataType, userInput);
                         if (!valid) {
                             e.preventDefault();
