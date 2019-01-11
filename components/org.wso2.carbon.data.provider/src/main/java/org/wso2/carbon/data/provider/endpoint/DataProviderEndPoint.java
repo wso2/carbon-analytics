@@ -17,7 +17,6 @@
  */
 package org.wso2.carbon.data.provider.endpoint;
 
-
 import com.google.gson.Gson;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
@@ -112,6 +111,13 @@ public class DataProviderEndPoint implements WebSocketEndpoint {
                         dataProviderConfigRoot.getDataProviderConfiguration()).start();
                 getDataProviderHelper().addDataProviderToSessionMap(session.getId(), dataProviderConfigRoot.getTopic(),
                         dataProvider);
+                if (dataProvider instanceof SiddhiProvider) {
+                    SiddhiProvider siddhiProvider = (SiddhiProvider)dataProvider;
+                    if(siddhiProvider.getSiddhiDataProviderConfig().isPaginationEnable()){
+                        siddhiProvider.publishWithPagination(dataProviderConfigRoot.getDataProviderConfiguration(),
+                                dataProviderConfigRoot.getTopic(), session.getId());
+                    }
+                }
             } else if (dataProviderConfigRoot.getAction().equalsIgnoreCase(DataProviderConfigRoot.Types.UNSUBSCRIBE
                     .toString())) {
                 getDataProviderHelper().removeTopicIfExist(session.getId(), dataProviderConfigRoot.getTopic());
