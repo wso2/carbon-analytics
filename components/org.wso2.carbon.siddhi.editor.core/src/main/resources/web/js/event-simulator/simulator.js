@@ -768,11 +768,10 @@ define(['jquery', 'log', './constants', './simulator-rest-client', 'lodash', './
         $attributes.each(
             function () {
                 self.addRuleForAttribute(this);
-                const allowedKeys = constants.ALLOWED_KEYS;
                 var dataType = $(this).attr("data-type");
                 $(this).keypress(function(e) {
                     var userInput = e.key;
-                    if (!allowedKeys.includes(userInput)) {
+                    if (!constants.ALLOWED_KEYS.includes(userInput)) {
                         var valid = self.onKeyPressValidate(dataType, userInput);
                         if (!valid) {
                             e.preventDefault();
