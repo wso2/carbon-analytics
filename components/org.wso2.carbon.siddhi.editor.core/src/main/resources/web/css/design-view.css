@@ -631,11 +631,11 @@ a.list-group-item, button.list-group-item {
 }
 
 .design-view-form-content .partition-form-container #partition-by-stream-name-label {
-	margin-left: 120px;
+	margin-left: 150px;
 }
 
-.design-view-form-content .partition-form-container .partition-by-expression {
-	margin-right: 10px;
+.design-view-form-content .partition-form-container input[type="text"].partition-by-stream-name {
+	margin-left: 38px;
 }
 
 .source-sink-form-container .source-sink-map-options .error-message,
@@ -747,7 +747,7 @@ a.list-group-item, button.list-group-item {
 	float:left;
 }
 
-.design-view-form-content .attribute {
+.design-view-form-content #attribute-div .attribute {
 	margin-bottom: 5px;
 }
 
@@ -956,8 +956,7 @@ a.list-group-item, button.list-group-item {
 	margin-left: 160px;
 }
 
-.design-view-form-content .mandatory-option-symbol,
-.design-view-form-content .mandatory-parameter-symbol {
+.design-view-form-content .mandatory-symbol {
 	margin-right: 12px;
 }
 
