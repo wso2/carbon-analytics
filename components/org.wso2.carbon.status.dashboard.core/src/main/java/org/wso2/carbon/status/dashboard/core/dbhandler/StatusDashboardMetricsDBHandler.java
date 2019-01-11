@@ -426,7 +426,8 @@ public class StatusDashboardMetricsDBHandler {
                     return 0;
                 }
             }
-            case "tables": {
+            case "tables":
+            case "aggregations": {
                 List<List<Object>> metricsLatency = selectAppComponentsHistory
                         (carbonId, appName, timeInterval, System.currentTimeMillis(), METRICS_TYPE_LATENCY,
                                 componentType, componentId, true);
