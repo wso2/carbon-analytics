@@ -16,9 +16,9 @@
  * under the License.
  */
 
-define(['jquery', 'log', './simulator-rest-client', 'lodash', './open-siddhi-apps', 
+define(['jquery', 'log', './constants', './simulator-rest-client', 'lodash', './open-siddhi-apps',
     /* void libs */'bootstrap', 'theme_wso2', 'jquery_ui', 'jquery_validate', 'jquery_timepicker', './templates'], 
-    function ($, log, Simulator, _, OpenSiddhiApps) {
+    function ($, log, constants,Simulator, _, OpenSiddhiApps) {
 
     "use strict";   // JS strict mode
 
@@ -768,12 +768,12 @@ define(['jquery', 'log', './simulator-rest-client', 'lodash', './open-siddhi-app
         $attributes.each(
             function () {
                 self.addRuleForAttribute(this);
+                const allowedKeys = constants.ALLOWED_KEYS;
                 var dataType = $(this).attr("data-type");
                 $(this).keypress(function(e) {
                     var userInput = e.key;
-                    if (userInput != "Delete" && userInput != "Backspace" &&
-                        userInput != "ArrowLeft" && userInput != "ArrowRight") {
-                        var valid = self.realTimeValidate(dataType, userInput);
+                    if (!allowedKeys.includes(userInput)) {
+                        var valid = self.onKeyPressValidate(dataType, userInput);
                         if (!valid) {
                             e.preventDefault();
                         }
@@ -783,18 +783,17 @@ define(['jquery', 'log', './simulator-rest-client', 'lodash', './open-siddhi-app
         );
     };
 
-//add real time validation for an attribute based on the attribute type
-    self.realTimeValidate = function(dataType, userInput) {
-        var validDataType = false;
-        var intLongRegexMatch = /^-?[\d]*$/;
-        var doubleFloatRegexMatch = /^-?\d*[.]?\d*$/;
-        if (dataType === "INT" || dataType === "LONG") {
-            if (userInput.match(intLongRegexMatch)) {
-                validDataType = true;
+
+//add onKeyPressValidate for an attribute based on the attribute type
+    self.onKeyPressValidate = function(dataType, userInput) {
+        var validDataType = true;
+        if (constants.INTLONG.includes(dataType)) {
+            if (!userInput.match(constants.INTLONGREGEXMATCH)) {
+                validDataType = false;
             }
-        } else if (dataType === "DOUBLE" || dataType === "FLOAT") {
-            if (userInput.match(doubleFloatRegexMatch)) {
-                validDataType = true;
+        } else if (constants.DOUBLEFLOAT.includes(dataType)) {
+            if (!userInput.match(constants.DOUBLEFLOATREGEXMATCH)) {
+                validDataType = false;
             }
         }
         return validDataType;
