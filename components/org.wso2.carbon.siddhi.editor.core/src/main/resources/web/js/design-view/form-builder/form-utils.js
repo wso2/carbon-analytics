@@ -478,23 +478,17 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
         };
 
         /**
-         * @function to obtain the connected stream's attributes
-         * @param {Object} streamList List of all stream objects
-         * @param {String} connectedElement connected element's name
-         * @return {Object} streamAttributes
+         * @function to create stream attribute object with empty values
+         * @param {Object} streamAttributes
+         * @return {Object} streamAttributesObject
          */
-        FormUtils.prototype.getConnectedStreamAttributes = function (streamList, connectedElement) {
-            var streamAttributes = [];
-            for (var stream of streamList) {
-                if (stream.name == connectedElement) {
-                    var attributeList = stream.getAttributeList();
-                    _.forEach(attributeList, function (attribute) {
-                        streamAttributes.push({ key: attribute.getName(), value: "" });
-                    })
-                    break;
-                }
-            }
-            return streamAttributes;
+        FormUtils.prototype.createStreamAttributesObject = function (streamAttributes) {
+            var streamAttributesObject = [];
+
+            _.forEach(streamAttributes, function (attribute) {
+                streamAttributesObject.push({ key: attribute.getName(), value: "" });
+            })
+            return streamAttributesObject;
         };
 
         /**

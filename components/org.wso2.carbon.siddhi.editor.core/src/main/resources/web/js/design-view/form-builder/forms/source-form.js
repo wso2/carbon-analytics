@@ -131,11 +131,13 @@ define(['log', 'jquery', 'lodash', 'sourceOrSinkAnnotation', 'mapAnnotation', 'p
                 self.designViewContainer.removeClass('disableContainer');
                 self.toggleViewButton.removeClass('disableContainer');
             } else {
-                var streamList = self.configurationData.getSiddhiAppConfig().getStreamList();
                 var connectedElement = clickedElement.connectedElementName;
                 var predefinedSources = _.orderBy(this.configurationData.rawExtensions["source"], ['name'], ['asc']);
                 var predefinedSourceMaps = _.orderBy(this.configurationData.rawExtensions["sourceMaps"], ['name'], ['asc']);
-                var streamAttributes = self.formUtils.getConnectedStreamAttributes(streamList, connectedElement);
+                var connectedStream = self.configurationData.getSiddhiAppConfig().getDefinitionElementByName
+                    (connectedElement);
+                var streamAttributes = self.formUtils.createStreamAttributesObject
+                    (connectedStream.element.getAttributeList());
 
                 var propertyDiv = $('<div id="property-header"> <h3> Source Configuration </h3> </div> ' +
                     '<div class="source-sink-form-container source-div"><div id="define-source"></div>' +
@@ -383,4 +385,3 @@ define(['log', 'jquery', 'lodash', 'sourceOrSinkAnnotation', 'mapAnnotation', 'p
         };
         return SourceForm;
     });
-

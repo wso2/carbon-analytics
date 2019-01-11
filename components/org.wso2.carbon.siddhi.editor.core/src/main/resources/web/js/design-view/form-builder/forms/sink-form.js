@@ -141,7 +141,11 @@ define(['log', 'jquery', 'lodash', 'mapAnnotation', 'payloadOrAttribute', 'jsonV
                 var connectedElement = clickedElement.connectedElementName;
                 var predefinedSinks = _.orderBy(this.configurationData.rawExtensions["sink"], ['name'], ['asc']);
                 var predefinedSinkMaps = _.orderBy(this.configurationData.rawExtensions["sinkMaps"], ['name'], ['asc']);
-                var streamAttributes = self.formUtils.getConnectedStreamAttributes(streamList, connectedElement);
+                var connectedStream = self.configurationData.getSiddhiAppConfig().getDefinitionElementByName
+                    (connectedElement);
+                var streamAttributes = self.formUtils.createStreamAttributesObject
+                    (connectedStream.element.getAttributeList());
+
                 var propertyDiv = $('<div id="property-header"> <h3> Sink Configuration </h3> </div> ' +
                     '<div class="source-sink-form-container sink-div"><div id="define-sink"></div>' +
                     '<div class = "source-sink-map-options" id="sink-options-div"></div>' +
