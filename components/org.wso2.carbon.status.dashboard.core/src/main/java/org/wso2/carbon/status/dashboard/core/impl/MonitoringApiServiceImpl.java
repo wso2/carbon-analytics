@@ -1273,7 +1273,7 @@ public class MonitoringApiServiceImpl extends MonitoringApiService {
                         break;
                     }
                     case "tables":
-                    case "aggregations" :{
+                    case "aggregations" : {
                         componentHistory.put(METRICS_TYPE_LATENCY, metricStore.selectAppComponentsHistory(carbonId,
                                 appName, timeInterval, System.currentTimeMillis(), METRICS_TYPE_LATENCY, componentType,
                                 componentId, false));
