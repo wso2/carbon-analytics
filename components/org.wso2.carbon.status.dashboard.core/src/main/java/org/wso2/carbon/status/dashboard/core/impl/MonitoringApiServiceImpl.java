@@ -1272,7 +1272,8 @@ public class MonitoringApiServiceImpl extends MonitoringApiService {
                                 componentId, false));
                         break;
                     }
-                    case "tables": {
+                    case "tables":
+                    case "aggregations" :{
                         componentHistory.put(METRICS_TYPE_LATENCY, metricStore.selectAppComponentsHistory(carbonId,
                                 appName, timeInterval, System.currentTimeMillis(), METRICS_TYPE_LATENCY, componentType,
                                 componentId, false));
@@ -1344,7 +1345,8 @@ public class MonitoringApiServiceImpl extends MonitoringApiService {
                                 componentId, false));
                         break;
                     }
-                    case "tables": {
+                    case "tables":
+                    case "aggregations": {
                         componentHistory.put(METRICS_TYPE_LATENCY, metricStore.selectAppComponentsAggHistory(carbonId,
                                 appName, timeInterval, System.currentTimeMillis(), METRICS_TYPE_LATENCY, componentType,
                                 componentId, false));
