@@ -89,4 +89,9 @@ public class RDBMSDataProviderConf implements ProviderConfig {
     public boolean isPurgingEnable() {
         return isPurgingEnable;
     }
+
+    @Override
+    public boolean isPaginationEnable() {
+        return false;
+    }
 }

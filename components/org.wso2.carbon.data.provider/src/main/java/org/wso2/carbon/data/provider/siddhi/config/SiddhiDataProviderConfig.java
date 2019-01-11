@@ -18,13 +18,9 @@
 
 package org.wso2.carbon.data.provider.siddhi.config;
 
-import com.google.gson.Gson;
 import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import org.wso2.carbon.data.provider.ProviderConfig;
-
-import java.util.List;
 
 public class SiddhiDataProviderConfig implements ProviderConfig {
 
@@ -32,6 +28,9 @@ public class SiddhiDataProviderConfig implements ProviderConfig {
     private JsonElement queryData;
     private int publishingInterval;
     private String timeColumns;
+    private int currentPage;
+    private int pageSize;
+    private boolean paginationEnable;
 
 
     public SiddhiDataProviderConfig() {
@@ -41,6 +40,29 @@ public class SiddhiDataProviderConfig implements ProviderConfig {
                 "define table TRANSACTIONS_TABLE (CREDITCARDNO string, COUNTRY string, TRANSACTION string, AMOUNT int);";
         this.publishingInterval = 5;
         this.timeColumns = "";
+        this.currentPage = 0;
+        this.pageSize = 0;
+        this.paginationEnable = false;
+    }
+
+    public int getCurrentPage() {
+        return currentPage;
+    }
+
+    public void setCurrentPage(int currentPage) {
+        this.currentPage = currentPage;
+    }
+
+    public int getPageSize() {
+        return pageSize;
+    }
+
+    public void setPageSize(int pageSize) {
+        this.pageSize = pageSize;
+    }
+
+    public void setPaginationEnable(boolean paginationEnable) {
+        this.paginationEnable = paginationEnable;
     }
 
     public JsonElement getQueryData() {
@@ -72,6 +94,11 @@ public class SiddhiDataProviderConfig implements ProviderConfig {
     @Override
     public boolean isPurgingEnable() {
         return false;
+    }
+
+    @Override
+    public boolean isPaginationEnable() {
+        return paginationEnable;
     }
 
     public String getTimeColumns() {

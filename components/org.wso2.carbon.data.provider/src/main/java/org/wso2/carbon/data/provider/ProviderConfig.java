@@ -42,4 +42,11 @@ public interface ProviderConfig {
      * @return enable or disable state as boolean value.
      */
     boolean isPurgingEnable();
+
+    /**
+     * Get pagination enable or disable state.
+     *
+     * @return enable or disable state as boolean value.
+     */
+    boolean isPaginationEnable();
 }
