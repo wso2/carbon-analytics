@@ -410,7 +410,7 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
          * @param {Object} predefinedOptions Predefined options of a particular annotation type
          * @param {Object} savedOptions saved options
          * @return {Object} customizedOptions
-	     */
+         */
         FormUtils.prototype.getCustomizedOptions = function (predefinedOptions, savedOptions) {
             var customizedOptions = [];
             _.forEach(savedOptions, function (savedOption) {
@@ -432,11 +432,11 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
         };
 
         /**
-		 * @function to obtain the customized option entered by the user in the source view
-		 * @param {Object} predefinedOptions Predefined options of a particular store annotation type
-		 * @param {Object} savedOptions saved store options
-		 * @return {Object} customizedOptions
-		 */
+         * @function to obtain the customized option entered by the user in the source view
+         * @param {Object} predefinedOptions Predefined options of a particular store annotation type
+         * @param {Object} savedOptions saved store options
+         * @return {Object} customizedOptions
+         */
         FormUtils.prototype.getCustomizedStoreOptions = function (predefinedOptions, savedOptions) {
             var customizedOptions = [];
             _.forEach(savedOptions, function (savedOption) {
@@ -454,17 +454,17 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
             return customizedOptions;
         };
 
-		/**
-		 * @function to obtain the user defined annotations from the saved annotations
-		 * @param {Object} savedAnnotationObjects saved annotation objects
-		 * @param {Object} primaryIndexAnnotations predefined primary index annotations
-		 * @return {Object} userAnnotations
-		 */
-        FormUtils.prototype.getUserAnnotations = function (savedAnnotationObjects, primaryIndexAnnotations) {
+        /**
+         * @function to obtain the user defined annotations from the saved annotations
+         * @param {Object} savedAnnotationObjects saved annotation objects
+         * @param {Object} predefinedAnnotations predefined annotations
+         * @return {Object} userAnnotations
+         */
+        FormUtils.prototype.getUserAnnotations = function (savedAnnotationObjects, predefinedAnnotations) {
             var userAnnotations = [];
             _.forEach(savedAnnotationObjects, function (savedAnnotation) {
                 var isPredefined = false;
-                _.forEach(primaryIndexAnnotations, function (annotation) {
+                _.forEach(predefinedAnnotations, function (annotation) {
                     if (savedAnnotation.name.toLowerCase() === annotation.name.toLowerCase()) {
                         isPredefined = true;
                         return false;
@@ -498,10 +498,10 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
         };
 
         /**
-		 * @function to select the options according to the selected rdbms type
-		 * @param {Object} predefined_options all the options of rdbms with the user given values
-		 * @return {Object} rdbms_options
-		 */
+         * @function to select the options according to the selected rdbms type
+         * @param {Object} predefined_options all the options of rdbms with the user given values
+         * @return {Object} rdbms_options
+         */
         FormUtils.prototype.getRdbmsOptions = function (predefined_options) {
             var rdbms_options = [];
             var selectedRdbmsType = $('input[name=radioOpt]:checked', '#define-rdbms-type').val();

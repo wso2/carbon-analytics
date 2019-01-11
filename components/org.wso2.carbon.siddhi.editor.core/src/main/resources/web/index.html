@@ -1099,7 +1099,7 @@
 
 <script id="type-selection-form-template" type="text/template">
     {{#ifSourceOrSink id}}
-        <label class="clearfix"> * Type </label>
+        <label class="clearfix"> <label class="mandatory-symbol"> * </label> Type </label>
         <select id="{{id}}-type">
             <option style = "display:none" disabled selected value > -- select a type -- </option>
     {{else}}
@@ -1151,7 +1151,7 @@
                         <label class = "error-message"></label>
                 {{else}}
                     <div class="clearfix">
-                        <label class = "mandatory-option-symbol"> * </label>
+                        <label class = "mandatory-symbol"> * </label>
                         <label class = "option-name mandatory-option">
                             {{name}}
                         </label>
@@ -1303,7 +1303,7 @@
                 <label class = "error-message"></label>
         {{else}}
             <div class="clearfix">
-                <label class = "mandatory-parameter-symbol"> * </label>
+                <label class = "mandatory-symbol"> * </label>
                 <label class = "parameter-name mandatory-parameter">
                     {{key}}
                 </label>
