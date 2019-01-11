@@ -24,11 +24,10 @@ define(function() {
      */
     var constants = {
         ALLOWED_KEYS: ["Delete", "ArrowRight", "ArrowLeft", "Backspace"],
-        INTLONGREGEXMATCH: /^-?[\d]*$/,
-        DOUBLEFLOATREGEXMATCH: /^-?\d*[.]?\d*$/,
-        INTLONG:["INT","LONG"],
-        DOUBLEFLOAT:["DOUBLE","FLOAT"]
-
+        INT_LONG_REGEX_MATCH: /^-?[\d]*$/,
+        DOUBLE_FLOAT_REGEX_MATCH: /^-?\d*[.]?\d*$/,
+        INT_LONG:["INT","LONG"],
+        DOUBLE_FLOAT:["DOUBLE","FLOAT"]
     };
 
     return constants;

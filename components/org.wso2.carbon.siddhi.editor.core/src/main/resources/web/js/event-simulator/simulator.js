@@ -786,12 +786,12 @@ define(['jquery', 'log', './constants', './simulator-rest-client', 'lodash', './
 //add onKeyPressValidate for an attribute based on the attribute type
     self.onKeyPressValidate = function(dataType, userInput) {
         var validDataType = true;
-        if (constants.INTLONG.includes(dataType)) {
-            if (!userInput.match(constants.INTLONGREGEXMATCH)) {
+        if (constants.INT_LONG.includes(dataType)) {
+            if (!userInput.match(constants.INT_LONG_REGEX_MATCH)) {
                 validDataType = false;
             }
-        } else if (constants.DOUBLEFLOAT.includes(dataType)) {
-            if (!userInput.match(constants.DOUBLEFLOATREGEXMATCH)) {
+        } else if (constants.DOUBLE_FLOAT.includes(dataType)) {
+            if (!userInput.match(constants.DOUBLE_FLOAT_REGEX_MATCH)) {
                 validDataType = false;
             }
         }
