@@ -115,7 +115,7 @@ public class DataProviderEndPoint implements WebSocketEndpoint {
                         dataProvider);
                 if (dataProvider instanceof SiddhiProvider) {
                     SiddhiProvider siddhiProvider = (SiddhiProvider)dataProvider;
-                    if(siddhiProvider.getSiddhiDataProviderConfig().isPaginationEnable()){
+                    if(siddhiProvider.getSiddhiDataProviderConfig().isPaginationEnabled()){
                         siddhiProvider.publishWithPagination(dataProviderConfigRoot.getDataProviderConfiguration(),
                                 dataProviderConfigRoot.getTopic(), session.getId());
                     }
@@ -127,25 +127,22 @@ public class DataProviderEndPoint implements WebSocketEndpoint {
                     .toString())){
                 Map<String, DataProvider> topicDataProviderMap =  getDataProviderHelper().
                         getTopicDataProviderMap(session.getId());
-                if(topicDataProviderMap != null){
+                if (topicDataProviderMap != null) {
                     DataProvider dataProvider = topicDataProviderMap.get(dataProviderConfigRoot.getTopic());
-                    if (dataProvider != null) {
-                        AbstractDataProvider abstractDataProvider = (AbstractDataProvider) dataProvider;
-                        if (abstractDataProvider instanceof SiddhiProvider) {
-                            SiddhiProvider siddhiProvider = (SiddhiProvider)abstractDataProvider;
-                            if(siddhiProvider.getSiddhiDataProviderConfig().isPaginationEnable()){
-                                siddhiProvider.publishWithPagination(dataProviderConfigRoot
-                                                .getDataProviderConfiguration(), dataProviderConfigRoot.getTopic(),
-                                                    session.getId());
-                            } else {
-                                siddhiProvider.publish(dataProviderConfigRoot.getTopic(), session.getId());
-                            }
-                        } else {
-                            abstractDataProvider.publish(dataProviderConfigRoot.getTopic(), session.getId());
-                        }
-                    } else {
+                    if (dataProvider == null) {
                         throw new Exception("Error while performing action: " + dataProviderConfigRoot.getAction() +
                                 ", data provider for session id: " + session.getId() + " not found.");
+                    } else if (dataProvider instanceof SiddhiProvider) {
+                        SiddhiProvider siddhiProvider = (SiddhiProvider)dataProvider;
+                        if (siddhiProvider.getSiddhiDataProviderConfig().isPaginationEnabled()) {
+                            siddhiProvider.publishWithPagination(dataProviderConfigRoot.getDataProviderConfiguration(),
+                                    dataProviderConfigRoot.getTopic(), session.getId());
+                        } else {
+                            siddhiProvider.publish(dataProviderConfigRoot.getTopic(), session.getId());
+                        }
+                    } else {
+                        AbstractDataProvider abstractDataProvider = (AbstractDataProvider) dataProvider;
+                        abstractDataProvider.publish(dataProviderConfigRoot.getTopic(), session.getId());
                     }
                 } else {
                     throw new Exception("Error while performing action: " + dataProviderConfigRoot.getAction() +

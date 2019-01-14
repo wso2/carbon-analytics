@@ -91,7 +91,7 @@ public class RDBMSDataProviderConf implements ProviderConfig {
     }
 
     @Override
-    public boolean isPaginationEnable() {
+    public boolean isPaginationEnabled() {
         return false;
     }
 }

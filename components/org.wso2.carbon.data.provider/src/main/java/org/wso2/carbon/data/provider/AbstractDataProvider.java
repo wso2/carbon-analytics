@@ -44,7 +44,7 @@ public abstract class AbstractDataProvider implements DataProvider {
     private long publishingInterval;
     private long purgingInterval;
     private boolean isPurgingEnable;
-    private boolean isPaginationEnable;
+    private boolean isPaginationEnabled;
 
     public DataProvider init(String topic, String sessionId, ProviderConfig providerConfig)
             throws DataProviderException {
@@ -54,7 +54,7 @@ public abstract class AbstractDataProvider implements DataProvider {
             this.publishingInterval = providerConfig.getPublishingInterval();
             this.purgingInterval = providerConfig.getPurgingInterval();
             this.isPurgingEnable = providerConfig.isPurgingEnable();
-            this.isPaginationEnable = providerConfig.isPaginationEnable();
+            this.isPaginationEnabled = providerConfig.isPaginationEnabled();
             this.setProviderConfig(providerConfig);
             return this;
         } else {
@@ -71,7 +71,7 @@ public abstract class AbstractDataProvider implements DataProvider {
 
     @Override
     public void start() {
-        if (!this.isPaginationEnable) {
+        if (!this.isPaginationEnabled) {
             this.dataPublishingExecutorService.scheduleAtFixedRate(() -> {
                 this.publish(this.topic, this.sessionId);
             }, 0L, this.publishingInterval, TimeUnit.SECONDS);

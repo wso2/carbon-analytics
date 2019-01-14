@@ -48,5 +48,5 @@ public interface ProviderConfig {
      *
      * @return enable or disable state as boolean value.
      */
-    boolean isPaginationEnable();
+    boolean isPaginationEnabled();
 }

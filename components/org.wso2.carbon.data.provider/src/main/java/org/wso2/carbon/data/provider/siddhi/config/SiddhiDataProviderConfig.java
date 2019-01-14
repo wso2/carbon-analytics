@@ -30,7 +30,7 @@ public class SiddhiDataProviderConfig implements ProviderConfig {
     private String timeColumns;
     private int currentPage;
     private int pageSize;
-    private boolean paginationEnable;
+    private boolean isPaginationEnabled;
 
 
     public SiddhiDataProviderConfig() {
@@ -42,7 +42,7 @@ public class SiddhiDataProviderConfig implements ProviderConfig {
         this.timeColumns = "";
         this.currentPage = 0;
         this.pageSize = 0;
-        this.paginationEnable = false;
+        this.isPaginationEnabled = false;
     }
 
     public int getCurrentPage() {
@@ -61,8 +61,8 @@ public class SiddhiDataProviderConfig implements ProviderConfig {
         this.pageSize = pageSize;
     }
 
-    public void setPaginationEnable(boolean paginationEnable) {
-        this.paginationEnable = paginationEnable;
+    public void setPaginationEnabled(boolean isPaginationEnabled) {
+        this.isPaginationEnabled = isPaginationEnabled;
     }
 
     public JsonElement getQueryData() {
@@ -97,8 +97,8 @@ public class SiddhiDataProviderConfig implements ProviderConfig {
     }
 
     @Override
-    public boolean isPaginationEnable() {
-        return paginationEnable;
+    public boolean isPaginationEnabled() {
+        return isPaginationEnabled;
     }
 
     public String getTimeColumns() {
