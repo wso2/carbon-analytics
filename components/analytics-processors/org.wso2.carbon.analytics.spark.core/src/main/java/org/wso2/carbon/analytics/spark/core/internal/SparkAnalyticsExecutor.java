@@ -28,6 +28,24 @@ import org.apache.spark.api.java.JavaSparkContext;
 import org.apache.spark.deploy.master.LeaderElectable;
 import org.apache.spark.deploy.master.Master;
 import org.apache.spark.deploy.worker.Worker;
+import org.apache.spark.scheduler.SparkListener;
+import org.apache.spark.scheduler.SparkListenerApplicationEnd;
+import org.apache.spark.scheduler.SparkListenerApplicationStart;
+import org.apache.spark.scheduler.SparkListenerBlockManagerAdded;
+import org.apache.spark.scheduler.SparkListenerBlockManagerRemoved;
+import org.apache.spark.scheduler.SparkListenerBlockUpdated;
+import org.apache.spark.scheduler.SparkListenerEnvironmentUpdate;
+import org.apache.spark.scheduler.SparkListenerExecutorAdded;
+import org.apache.spark.scheduler.SparkListenerExecutorMetricsUpdate;
+import org.apache.spark.scheduler.SparkListenerExecutorRemoved;
+import org.apache.spark.scheduler.SparkListenerJobEnd;
+import org.apache.spark.scheduler.SparkListenerJobStart;
+import org.apache.spark.scheduler.SparkListenerStageCompleted;
+import org.apache.spark.scheduler.SparkListenerStageSubmitted;
+import org.apache.spark.scheduler.SparkListenerTaskEnd;
+import org.apache.spark.scheduler.SparkListenerTaskGettingResult;
+import org.apache.spark.scheduler.SparkListenerTaskStart;
+import org.apache.spark.scheduler.SparkListenerUnpersistRDD;
 import org.apache.spark.serializer.KryoSerializer;
 import org.apache.spark.sql.DataFrame;
 import org.apache.spark.sql.Row;
@@ -71,6 +89,8 @@ import org.wso2.carbon.ndatasource.core.DataSourceManager;
 import org.wso2.carbon.ndatasource.core.DataSourceMetaInfo;
 import org.wso2.carbon.utils.CarbonUtils;
 import org.wso2.carbon.utils.multitenancy.MultitenantConstants;
+import scala.Option;
+import scala.Tuple2;
 
 import java.io.File;
 import java.io.IOException;
@@ -92,6 +112,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import javax.crypto.Cipher;
@@ -100,9 +121,6 @@ import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
-
-import scala.Option;
-import scala.Tuple2;
 
 import static org.wso2.carbon.analytics.datasource.core.AnalyticsDataSourceConstants.SYS_PROPERTY_BASE;
 import static org.wso2.carbon.analytics.datasource.core.AnalyticsDataSourceConstants.SYS_PROPERTY_IV;
@@ -168,6 +186,8 @@ public class SparkAnalyticsExecutor implements GroupEventListener {
     private String initVector;
 
     private ClusterMode clusterMode;
+    private AtomicBoolean restarting = new AtomicBoolean(false);
+
 
     public SparkAnalyticsExecutor(String myHost, int portOffset) throws AnalyticsException {
         this.myHost = myHost;
@@ -200,7 +220,6 @@ public class SparkAnalyticsExecutor implements GroupEventListener {
      */
     public void initializeSparkServer() throws AnalyticsException {
         this.sparkConf.setMaster(this.sparkMaster);
-
         switch (clusterMode) {
             case local:
             case standaloneSpark:
@@ -360,6 +379,99 @@ public class SparkAnalyticsExecutor implements GroupEventListener {
         this.sqlCtx = new SQLContext(jsc);
         registerUDFs(this.sqlCtx);
         registerUDAFs(this.sqlCtx);
+        this.sqlCtx.sparkContext().addSparkListener(new SparkListener() {
+            @Override
+            public void onStageCompleted(SparkListenerStageCompleted sparkListenerStageCompleted) {
+                logDebug("Spark scheduler marked '" + sparkListenerStageCompleted.stageInfo().name() + "' as "
+                        + sparkListenerStageCompleted.stageInfo().getStatusString());
+            }
+
+            @Override
+            public void onStageSubmitted(SparkListenerStageSubmitted sparkListenerStageSubmitted) {
+                logDebug("Spark scheduler submitted the missing tasks of a stage '"
+                        + sparkListenerStageSubmitted.stageInfo().name() + "'.");
+            }
+
+            @Override
+            public void onTaskStart(SparkListenerTaskStart sparkListenerTaskStart) {
+                logDebug("Task '" + sparkListenerTaskStart.taskInfo().id() + "' started.");
+            }
+
+            @Override
+            public void onTaskGettingResult(SparkListenerTaskGettingResult sparkListenerTaskGettingResult) {
+            }
+
+            @Override
+            public void onTaskEnd(SparkListenerTaskEnd sparkListenerTaskEnd) {
+                logDebug("Task '" + sparkListenerTaskEnd.taskInfo().id() + "' completed.");
+            }
+
+            @Override
+            public void onJobStart(SparkListenerJobStart sparkListenerJobStart) {
+                logDebug("Job '" + sparkListenerJobStart.jobId() + "' submitted to Spark scheduler.");
+            }
+
+            @Override
+            public void onJobEnd(SparkListenerJobEnd sparkListenerJobEnd) {
+                logDebug("Job '" + sparkListenerJobEnd.jobId() + "' marked as finished.");
+            }
+
+            @Override
+            public void onEnvironmentUpdate(SparkListenerEnvironmentUpdate sparkListenerEnvironmentUpdate) {
+                logDebug("Environment updated.");
+            }
+
+            @Override
+            public void onBlockManagerAdded(SparkListenerBlockManagerAdded sparkListenerBlockManagerAdded) {
+                logDebug("BlockManagerMasterEndpoint has registered a BlockManager '"
+                        + sparkListenerBlockManagerAdded.blockManagerId() + "'.");
+            }
+
+            @Override
+            public void onBlockManagerRemoved(SparkListenerBlockManagerRemoved sparkListenerBlockManagerRemoved) {
+                log.error("BlockManagerMasterEndpoint has removed a BlockManager '"
+                        + sparkListenerBlockManagerRemoved.blockManagerId() + "'.");
+                ServiceHolder.setSparkContextRestartRequired(true);
+            }
+
+            @Override
+            public void onUnpersistRDD(SparkListenerUnpersistRDD sparkListenerUnpersistRDD) {
+            }
+
+            @Override
+            public void onApplicationStart(SparkListenerApplicationStart sparkListenerApplicationStart) {
+                //Will not be called since listener is added after Spark application initialization.
+            }
+
+            @Override
+            public void onApplicationEnd(SparkListenerApplicationEnd sparkListenerApplicationEnd) {
+                //Handled through Spark Extra Listener, JavaSparkApplicationListener
+            }
+
+            @Override
+            public void onExecutorMetricsUpdate(SparkListenerExecutorMetricsUpdate sparkListenerExecutorMetricsUpdate) {
+            }
+
+            @Override
+            public void onExecutorAdded(SparkListenerExecutorAdded sparkListenerExecutorAdded) {
+                log.info("Executor '" + sparkListenerExecutorAdded.executorId()
+                        + "' " + "added to spark cluster with '"
+                        + sparkListenerExecutorAdded.executorInfo().totalCores() + "' cores.");
+            }
+
+            @Override
+            public void onExecutorRemoved(SparkListenerExecutorRemoved sparkListenerExecutorRemoved) {
+                log.error("Spark executor '" + sparkListenerExecutorRemoved.executorId()
+                        + "' removed due to " + sparkListenerExecutorRemoved.reason());
+            }
+
+            @Override
+            public void onBlockUpdated(SparkListenerBlockUpdated sparkListenerBlockUpdated) {
+                logDebug("BlockManager '" + sparkListenerBlockUpdated.blockUpdatedInfo().blockManagerId()
+                        + "' " + "reported a block " + sparkListenerBlockUpdated.blockUpdatedInfo().blockId().name()
+                        + "status update to driver.");
+            }
+        });
     }
 
     public void registerUDFFromOSGIComponent(CarbonUDF carbonUDF) throws AnalyticsUDFException {
@@ -572,6 +684,8 @@ public class SparkAnalyticsExecutor implements GroupEventListener {
         logDebug("Loading Spark defaults from " + propsFile);
         scala.collection.Map<String, String> properties = Utils.getPropertiesFromFile(propsFile);
         conf.setAll(properties);
+        conf.set(AnalyticsConstants.SPARK_EXTRA_LISTENERS,
+                "org.wso2.carbon.analytics.spark.core.internal.JavaSparkApplicationListener");
         if (!conf.contains("carbon.ds.legacy.export.mode")) {
             this.exportDataSourcesAsProperties();
         }
@@ -871,7 +985,6 @@ public class SparkAnalyticsExecutor implements GroupEventListener {
 
     private AnalyticsQueryResult executeQueryLocal(int tenantId, String query)
             throws AnalyticsExecutionException {
-
         if (AnalyticsDataServiceUtils.isCarbonServer()) {
             PrivilegedCarbonContext.startTenantFlow();
             // Mandating initialisation of tenant domain for CarbonJDBC multi-tenant scenarios
@@ -902,6 +1015,16 @@ public class SparkAnalyticsExecutor implements GroupEventListener {
                     throw new AnalyticsExecutionException("Spark SQL Context is not available. " +
                             "Check if the cluster has instantiated properly.");
                 }
+                if (this.sqlCtx.sparkContext().stopped().get()) {
+                    log.error("Spark context has stopped.");
+                    restartSparkContext();
+                } else if (ServiceHolder.isSparkContextRestartRequired()) {
+                    log.info("Spark Context re-start required flag is set to true.");
+                    restartSparkContext();
+                } else if (currentActiveExecutors() == 0) {
+                    log.error("Spark executor count is '0'.");
+                    restartSparkContext();
+                }
                 this.sqlCtx.sparkContext().setLocalProperty(AnalyticsConstants.SPARK_SCHEDULER_POOL,
                         this.sparkConf.get(AnalyticsConstants.SPARK_SCHEDULER_POOL));
                 DataFrame result = this.sqlCtx.sql(query);
@@ -924,6 +1047,33 @@ public class SparkAnalyticsExecutor implements GroupEventListener {
                 PrivilegedCarbonContext.endTenantFlow();
             }
         }
+    }
+
+    private void restartSparkContext() {
+        log.info("Restarting Spark Context.");
+        if (restarting.get()) {
+            log.info("Restarting spark context is in progress from a different thread, hence not restarting");
+        } else {
+            restarting.set(true);
+            try {
+                this.stop();
+                initializeSqlContext(this.initializeSparkContext(this.sparkConf));
+            } catch (AnalyticsException e) {
+                log.error("Error while restarting Spark Context.", e);
+            }
+            restarting.set(false);
+        }
+    }
+
+    private int currentActiveExecutors() {
+        try {
+            scala.collection.Map<String, Tuple2<Object, Object>> executors = this.sqlCtx
+                    .sparkContext().getExecutorMemoryStatus();
+            return executors.size();
+        } catch (Throwable e) {
+            log.error("Error occurred while checking current Spark active executors.", e);
+        }
+        return 0;
     }
 
     private AnalyticsQueryResult processIncQuery(int tenantId, String query) throws AnalyticsExecutionException {

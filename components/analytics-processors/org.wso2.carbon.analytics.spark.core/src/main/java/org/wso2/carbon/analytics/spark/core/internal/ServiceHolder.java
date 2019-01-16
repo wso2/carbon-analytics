@@ -81,6 +81,8 @@ public class ServiceHolder {
 
     private static JavaSparkContext javaSparkContext;
 
+    private static boolean sparkContextRestartRequired = false;
+
     public static void setTaskService(TaskService taskService) {
         ServiceHolder.taskService = taskService;
     }
@@ -226,4 +228,11 @@ public class ServiceHolder {
         ServiceHolder.javaSparkContext = javaSparkContext;
     }
 
+    public static boolean isSparkContextRestartRequired() {
+        return sparkContextRestartRequired;
+    }
+
+    public static void setSparkContextRestartRequired(boolean sparkContextRestartRequired) {
+        ServiceHolder.sparkContextRestartRequired = sparkContextRestartRequired;
+    }
 }
