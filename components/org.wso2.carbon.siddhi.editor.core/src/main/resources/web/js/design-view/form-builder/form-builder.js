@@ -60,6 +60,7 @@ define(['require', 'log', 'jquery', 'lodash', 'formUtils', 'streamForm', 'tableF
             this.application = options.application;
             this.consoleListManager = options.application.outputController;
             this.jsPlumbInstance = options.jsPlumbInstance;
+            this.dropElementInstance = options.dropElementInstance;
             this.formUtils = new FormUtils(this.configurationData, this.jsPlumbInstance);
             var currentTabId = this.application.tabController.activeTab.cid;
             this.designViewContainer = $('#design-container-' + currentTabId);
@@ -180,6 +181,8 @@ define(['require', 'log', 'jquery', 'lodash', 'formUtils', 'streamForm', 'tableF
             _.set(formOptions, 'configurationData', self.configurationData);
             _.set(formOptions, 'application', self.application);
             _.set(formOptions, 'formUtils', self.formUtils);
+            _.set(formOptions, 'dropElementInstance', self.dropElementInstance);
+            _.set(formOptions, 'jsPlumbInstance', self.jsPlumbInstance);
             var sourceForm = new SourceForm(formOptions);
             sourceForm.generatePropertiesForm(element, formConsole, formContainer);
         };
@@ -197,6 +200,8 @@ define(['require', 'log', 'jquery', 'lodash', 'formUtils', 'streamForm', 'tableF
             _.set(formOptions, 'configurationData', self.configurationData);
             _.set(formOptions, 'application', self.application);
             _.set(formOptions, 'formUtils', self.formUtils);
+            _.set(formOptions, 'dropElementInstance', self.dropElementInstance);
+            _.set(formOptions, 'jsPlumbInstance', self.jsPlumbInstance);
             var sinkForm = new SinkForm(formOptions);
             sinkForm.generatePropertiesForm(element, formConsole, formContainer);
         };

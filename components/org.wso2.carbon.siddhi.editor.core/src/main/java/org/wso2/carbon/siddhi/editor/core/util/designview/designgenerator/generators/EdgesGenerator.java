@@ -114,6 +114,12 @@ public class EdgesGenerator {
     private Set<Edge> generateSinkEdges(List<SourceSinkConfig> sinkList) throws DesignGenerationException {
         Set<Edge> edges = new HashSet<>();
         for (SourceSinkConfig sink : sinkList) {
+            if (sink.isCorrelateIdExist()) {
+                SiddhiElementConfig sourceElement = getElementWithSinkCorrelateId(sink.getCorrelateId());
+                if (sourceElement != null) {
+                    edges.add(generateEdge(sink,sourceElement));
+                }
+            }
             edges.add(generateEdge(getElementWithStreamName(sink.getConnectedElementName(), null), sink));
         }
         return edges;
@@ -532,5 +538,16 @@ public class EdgesGenerator {
      */
     private static String generateEdgeId(String parentID, String childID) {
         return String.format("%s_%s", parentID, childID);
+    }
+
+    private SiddhiElementConfig getElementWithSinkCorrelateId(String correlateId) {
+        for (SourceSinkConfig sourceConfig : siddhiAppConfig.getSourceList()) {
+            if (sourceConfig.getCorrelateId() != null) {
+                if (sourceConfig.getCorrelateId().equals(correlateId)) {
+                    return sourceConfig;
+                }
+            }
+        }
+        return null;
     }
 }

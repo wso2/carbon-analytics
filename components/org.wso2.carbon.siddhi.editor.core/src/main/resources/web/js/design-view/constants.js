@@ -55,7 +55,9 @@ define(function () {
         JOIN_QUERY: "join-query",
         PATTERN_QUERY: "pattern-query",
         SEQUENCE_QUERY: "sequence-query",
-        WINDOW_FILTER_PROJECTION_QUERY: "window-filter-projection-query"
+        WINDOW_FILTER_PROJECTION_QUERY: "window-filter-projection-query",
+        TYPE_HTTP_REQUEST: "http-request",
+        TYPE_HTTP_RESPONSE: "http-response",
     };
 
     return constants;

@@ -117,13 +117,6 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
             self.jsPlumbInstance.ready(function () {
 
                 self.jsPlumbInstance.importDefaults({
-                    PaintStyle: {
-                        strokeWidth: 2,
-                        stroke: '#424242',
-                        outlineStroke: "transparent",
-                        outlineWidth: "3"
-                        // lineWidth: 2
-                    },
                     HoverPaintStyle: {
                         strokeStyle: '#424242',
                         strokeWidth: 2
@@ -450,6 +443,19 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
                         } else {
                             return connectionValidity = true;
                         }
+                    } //we allowing all sinks to be connected to source here if connections points are available to connect.
+                      //This need to be changed if there are use cases to allow specifics to connect
+                    else if (targetElement.hasClass(constants.SOURCE)) {
+                        if (!sourceElement.hasClass(constants.SINK)) {
+                            DesignViewUtils.prototype
+                                .errorAlert("Invalid Connection: http-request sink input source should be a " +
+                                    "http-response source or http-response sink input source should be a " +
+                                    "http-request source");
+                            return connectionValidity;
+                        } else {
+                            return connectionValidity = true;
+                        }
+
                     }
 
                     // When connecting streams to a query inside the partition if it is connected to the partition
@@ -708,6 +714,12 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
                             .getName();
                         self.configurationData.getSiddhiAppConfig().getSink(targetId)
                             .setConnectedElementName(connectedElementName);
+
+                    } else if (sourceElement.hasClass(constants.SINK) && targetElement.hasClass(constants.SOURCE)) {
+                        connectedElementName = self.configurationData.getSiddhiAppConfig().getSource(targetId)
+                            .getType();
+                        self.configurationData.getSiddhiAppConfig().getSink(sourceId)
+                            .setConnectedRightElementName(connectedElementName);
 
                     } else if (targetElement.hasClass(constants.AGGREGATION)
                         && (sourceElement.hasClass(constants.STREAM) || sourceElement.hasClass(constants.TRIGGER))) {
@@ -1818,6 +1830,12 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
             _.forEach(self.configurationData.edgeList, function (edge) {
                 var targetId;
                 var sourceId;
+                var paintStyle = {
+                    strokeWidth: 2,
+                    stroke: '#424242',
+                    outlineStroke: "transparent",
+                    outlineWidth: "3"
+                };
 
                 if (edge.getChildType() === 'PARTITION') {
                     targetId = edge.getChildId();
@@ -1825,6 +1843,11 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
                 } else if (edge.getParentType() === 'PARTITION') {
                     targetId = edge.getChildId() + '-in';
                     sourceId = edge.getParentId();
+                } else if (edge.getParentType() === 'SINK' && edge.getChildType() === 'SOURCE') {
+                    targetId = edge.getChildId() + '-in';
+                    sourceId = edge.getParentId() + '-out';
+                    paintStyle = { strokeWidth: 2, stroke: "#424242", dashstyle: "2 3", outlineStroke: "transparent",
+                        outlineWidth: "3" }
                 } else {
                     targetId = edge.getChildId() + '-in';
                     sourceId = edge.getParentId() + '-out';
@@ -1832,7 +1855,8 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
 
                 self.jsPlumbInstance.connect({
                     source: sourceId,
-                    target: targetId
+                    target: targetId,
+                    paintStyle: paintStyle
                 });
             });
 

@@ -32,6 +32,8 @@ define(['log', 'jquery', 'lodash', 'mapAnnotation', 'payloadOrAttribute', 'jsonV
                 this.application = options.application;
                 this.formUtils = options.formUtils;
                 this.consoleListManager = options.application.outputController;
+                this.dropElementInstance = options.dropElementInstance;
+                this.jsPlumbInstance = options.jsPlumbInstance;
                 var currentTabId = this.application.tabController.activeTab.cid;
                 this.designViewContainer = $('#design-container-' + currentTabId);
                 this.toggleViewButton = $('#toggle-view-button-' + currentTabId);
@@ -431,6 +433,9 @@ define(['log', 'jquery', 'lodash', 'mapAnnotation', 'payloadOrAttribute', 'jsonV
                         //Send sink element to the backend and generate tooltip
                         var sinkToolTip = self.formUtils.getTooltip(clickedElement, Constants.SINK);
                         $('#' + id).prop('title', sinkToolTip);
+
+                        self.dropElementInstance.generateSpecificSinkConnectionElements(selectedSinkType,
+                            self.jsPlumbInstance, id, $('#' + id));
 
                         // set the isDesignViewContentChanged to true
                         self.configurationData.setIsDesignViewContentChanged(true);
