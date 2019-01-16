@@ -17,7 +17,6 @@
  */
 package org.wso2.carbon.data.provider.endpoint;
 
-
 import com.google.gson.Gson;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
@@ -26,8 +25,10 @@ import org.osgi.service.component.annotations.ReferencePolicy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.wso2.carbon.config.provider.ConfigProvider;
+import org.wso2.carbon.data.provider.AbstractDataProvider;
 import org.wso2.carbon.data.provider.DataProvider;
 import org.wso2.carbon.data.provider.bean.DataProviderConfigRoot;
+import org.wso2.carbon.data.provider.siddhi.SiddhiProvider;
 import org.wso2.carbon.datasource.core.api.DataSourceService;
 import org.wso2.msf4j.websocket.WebSocketEndpoint;
 
@@ -112,16 +113,48 @@ public class DataProviderEndPoint implements WebSocketEndpoint {
                         dataProviderConfigRoot.getDataProviderConfiguration()).start();
                 getDataProviderHelper().addDataProviderToSessionMap(session.getId(), dataProviderConfigRoot.getTopic(),
                         dataProvider);
+                if (dataProvider instanceof SiddhiProvider) {
+                    SiddhiProvider siddhiProvider = (SiddhiProvider)dataProvider;
+                    if(siddhiProvider.getSiddhiDataProviderConfig().isPaginationEnabled()){
+                        siddhiProvider.publishWithPagination(dataProviderConfigRoot.getDataProviderConfiguration(),
+                                dataProviderConfigRoot.getTopic(), session.getId());
+                    }
+                }
             } else if (dataProviderConfigRoot.getAction().equalsIgnoreCase(DataProviderConfigRoot.Types.UNSUBSCRIBE
                     .toString())) {
                 getDataProviderHelper().removeTopicIfExist(session.getId(), dataProviderConfigRoot.getTopic());
+            } else if (dataProviderConfigRoot.getAction().equalsIgnoreCase(DataProviderConfigRoot.Types.POLLING
+                    .toString())){
+                Map<String, DataProvider> topicDataProviderMap =  getDataProviderHelper().
+                        getTopicDataProviderMap(session.getId());
+                if (topicDataProviderMap != null) {
+                    DataProvider dataProvider = topicDataProviderMap.get(dataProviderConfigRoot.getTopic());
+                    if (dataProvider == null) {
+                        throw new Exception("Error while performing action: " + dataProviderConfigRoot.getAction() +
+                                ", data provider for session id: " + session.getId() + " not found.");
+                    } else if (dataProvider instanceof SiddhiProvider) {
+                        SiddhiProvider siddhiProvider = (SiddhiProvider)dataProvider;
+                        if (siddhiProvider.getSiddhiDataProviderConfig().isPaginationEnabled()) {
+                            siddhiProvider.publishWithPagination(dataProviderConfigRoot.getDataProviderConfiguration(),
+                                    dataProviderConfigRoot.getTopic(), session.getId());
+                        } else {
+                            siddhiProvider.publish(dataProviderConfigRoot.getTopic(), session.getId());
+                        }
+                    } else {
+                        AbstractDataProvider abstractDataProvider = (AbstractDataProvider) dataProvider;
+                        abstractDataProvider.publish(dataProviderConfigRoot.getTopic(), session.getId());
+                    }
+                } else {
+                    throw new Exception("Error while performing action: " + dataProviderConfigRoot.getAction() +
+                            ", data provider map for session id: " + session.getId() + " not initialized.");
+                }
             } else {
                 throw new Exception("Invalid action " + dataProviderConfigRoot.getAction() + " given in the message." +
                         "Valid actions are : " + Arrays.toString(DataProviderConfigRoot.Types.values()));
             }
         } catch (Exception e) {
             try {
-                sendText(session.getId(), "Error initializing the data provider endpoint.");
+                sendText(session.getId(), e.getMessage());
             } catch (IOException e1) {
                 //ignore
             }
