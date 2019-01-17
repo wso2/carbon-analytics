@@ -411,12 +411,11 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
                         }
 
                     } else if (sourceElement.hasClass(constants.PARTITION)) {
-                        if ($(self.jsPlumbInstance.getGroupFor(targetId)).attr('id') !== sourceId) {
-                            DesignViewUtils.prototype.errorAlert("Invalid Connection: Connect to a partition query");
-                            return connectionValidity;
-                        } else {
+                        if ($(self.jsPlumbInstance.getGroupFor(targetId)).attr('id') == sourceId) {
                             return connectionValidity = true;
                         }
+                        DesignViewUtils.prototype.errorAlert("Invalid Connection: Connect to a partition query");
+                        return connectionValidity;
 
                     } else if (sourceElement.hasClass(constants.SOURCE)) {
                         if (!targetElement.hasClass(constants.STREAM)) {
@@ -427,13 +426,12 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
                         }
 
                     } else if (targetElement.hasClass(constants.SINK)) {
-                        if (!sourceElement.hasClass(constants.STREAM)) {
-                            DesignViewUtils.prototype
-                                .errorAlert("Invalid Connection: Sink input source should be a stream");
-                            return connectionValidity;
-                        } else {
+                        if (sourceElement.hasClass(constants.STREAM)) {
                             return connectionValidity = true;
                         }
+                        DesignViewUtils.prototype
+                            .errorAlert("Invalid Connection: Sink input source should be a stream");
+                        return connectionValidity;
 
                     } else if (targetElement.hasClass(constants.AGGREGATION)) {
                         if (!(sourceElement.hasClass(constants.STREAM) || sourceElement.hasClass(constants.TRIGGER))) {
@@ -446,16 +444,14 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
                     } //we allowing all sinks to be connected to source here if connections points are available to
                       // connect. This need to be changed if there are use cases to allow specifics to connect
                     else if (targetElement.hasClass(constants.SOURCE)) {
-                        if (!sourceElement.hasClass(constants.SINK)) {
-                            DesignViewUtils.prototype
-                                .errorAlert("Invalid Connection: http-request sink input source should be a " +
-                                    "http-response source or http-response sink input source should be a " +
-                                    "http-request source");
-                            return connectionValidity;
-                        } else {
+                        if (sourceElement.hasClass(constants.SINK)) {
                             return connectionValidity = true;
                         }
-
+                        DesignViewUtils.prototype
+                            .errorAlert("Invalid Connection: http-request sink input source should be a " +
+                                "http-response source or http-response sink input source should be a " +
+                                "http-request source");
+                        return connectionValidity;
                     }
 
                     // When connecting streams to a query inside the partition if it is connected to the partition
