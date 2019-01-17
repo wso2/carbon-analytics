@@ -443,8 +443,8 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
                         } else {
                             return connectionValidity = true;
                         }
-                    } //we allowing all sinks to be connected to source here if connections points are available to connect.
-                      //This need to be changed if there are use cases to allow specifics to connect
+                    } //we allowing all sinks to be connected to source here if connections points are available to
+                      // connect. This need to be changed if there are use cases to allow specifics to connect
                     else if (targetElement.hasClass(constants.SOURCE)) {
                         if (!sourceElement.hasClass(constants.SINK)) {
                             DesignViewUtils.prototype
