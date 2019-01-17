@@ -17,9 +17,10 @@
  */
 
 define(['require', 'log', 'lodash', 'jquery', 'partition', 'stream', 'query', 'formBuilder', 'aggregation',
-    'jsonValidator', 'sourceOrSinkAnnotation', 'stream', 'table', 'window', 'trigger', 'functionDefinition'],
+    'jsonValidator', 'sourceOrSinkAnnotation', 'stream', 'table', 'window', 'trigger', 'functionDefinition',
+        'constants'],
     function (require, log, _, $, Partition, Stream, Query, FormBuilder, Aggregation, JSONValidator,
-        SourceOrSinkAnnotation, Stream, Table, Window, Trigger, FunctionDefinition) {
+        SourceOrSinkAnnotation, Stream, Table, Window, Trigger, FunctionDefinition,Constants) {
 
         /**
          * @class DesignView
@@ -51,6 +52,7 @@ define(['require', 'log', 'lodash', 'jquery', 'partition', 'stream', 'query', 'f
             _.set(formBuilderOptions, 'application', this.application);
             _.set(formBuilderOptions, 'configurationData', this.configurationData);
             _.set(formBuilderOptions, 'jsPlumbInstance', this.jsPlumbInstance);
+            _.set(formBuilderOptions, 'dropElementInstance', this);
             this.formBuilder = new FormBuilder(formBuilderOptions);
         };
 
@@ -66,7 +68,6 @@ define(['require', 'log', 'lodash', 'jquery', 'partition', 'stream', 'query', 'f
         DropElements.prototype.dropSource = function (newAgent, i, top, left, isCodeToDesignMode, sourceName) {
 
             var self = this;
-            var name;
             if (isCodeToDesignMode) {
                 name = sourceName;
             } else {
@@ -104,6 +105,7 @@ define(['require', 'log', 'lodash', 'jquery', 'partition', 'stream', 'query', 'f
             /*
              connection --> The connection anchor point is appended to the element
              */
+            self.generateSpecificSourceConnectionElements(name,self.jsPlumbInstance, i, finalElement);
             var connection = $('<div class="connectorOutSource">').attr('id', i + "-out").addClass('connection');
 
             finalElement.append(connection);
@@ -180,6 +182,7 @@ define(['require', 'log', 'lodash', 'jquery', 'partition', 'stream', 'query', 'f
             /*
              connection --> The connection anchor point is appended to the element
              */
+            self.generateSpecificSinkConnectionElements(name,self.jsPlumbInstance, i, finalElement);
             var connection = $('<div class="connectorInSink">').attr('id', i + "-in").addClass('connection');
 
             finalElement.append(connection);
@@ -1190,6 +1193,41 @@ define(['require', 'log', 'lodash', 'jquery', 'partition', 'stream', 'query', 'f
                 dropOverride: false,
                 draggable: false
             });
+        };
+
+        DropElements.prototype.generateSpecificSourceConnectionElements = function (type, jsPlumbInstance, i, element) {
+            if (type == Constants.TYPE_HTTP_RESPONSE || type == Constants.TYPE_HTTP_REQUEST) {
+                var connectionIn = $('<div class="connectorInSource">').attr('id', i + "-in").addClass('connection');
+                element.append(connectionIn);
+                jsPlumbInstance.makeTarget(connectionIn, {
+                    deleteEndpointsOnDetach: true,
+                    anchor: 'Left',
+                    maxConnections: 1
+                });
+            } else {
+                if ($( "#" + i + "-in" ).length) {
+                    $( "#" + i + "-in" ).remove();
+                }
+            }
+
+        };
+
+        DropElements.prototype.generateSpecificSinkConnectionElements = function (type, jsPlumbInstance, i, element) {
+            if (type == Constants.TYPE_HTTP_REQUEST || type == Constants.TYPE_HTTP_RESPONSE) {
+                var connectionOut = $('<div class="connectorOutSink">').attr('id', i + "-out").addClass('connection');
+                element.append(connectionOut);
+                jsPlumbInstance.makeSource(connectionOut, {
+                    deleteEndpointsOnDetach: true,
+                    anchor: 'Right',
+                    connectorStyle: { strokeWidth: 2, stroke: "#424242", dashstyle: "2 3", outlineStroke: "transparent",
+                        outlineWidth: "3" }
+                });
+            } else {
+                if ($( "#" + i + "-out" ).length) {
+                    $( "#" + i + "-out" ).remove();
+                }
+            }
+
         };
 
         /**
