@@ -186,8 +186,7 @@ define(['jquery', 'log', './constants', './simulator-rest-client', 'lodash', './
             } else {
                 $inputField
                     .prop('disabled', false);
-                $('input[name="check-box"]')
-                    .prop("checked", false);
+                $('.parent-checkbox').prop("checked", false);
                 self.addRuleForAttribute($inputField);
             }
 
@@ -677,7 +676,7 @@ define(['jquery', 'log', './constants', './simulator-rest-client', 'lodash', './
             '           </label>' +
             '       </th>' +
             '       <th width="10%">' +
-            '           <input type="checkbox" name="check-box" style="margin-bottom:7px" >' +
+            '           <input type="checkbox" class="parent-checkbox" style="margin-bottom:7px" >' +
             '       </th>' +
             '    </tr>' +
             '   </thead>' +
@@ -721,20 +720,15 @@ define(['jquery', 'log', './constants', './simulator-rest-client', 'lodash', './
 
 //add an eventlistener to parent checkbox for disabling all the attributes
     var parentCheckboxEventListener = function() {
-        $('div[data-name="attributes"]').on('click', 'input[name="check-box"]', function () {
-            if ($(this).is(':checked')) {
-                $('div[data-name="attributes"]')
-                    .find('input[data-input="null"]' && 'input[data-element-type="attribute"]')
-                    .each(function () {
-                        $('input[data-input="null"]').prop("checked", true);
-                        $('input[data-element-type="attribute"]').val("").prop("disabled", true);
-                    });
-            } else {
-                $('input[data-element-type="attribute"]').val("").prop("disabled", false);
-                $('input[data-input="null"]').prop("checked", false);
-            }
-        });
-    }
+        $(".form-group").on("click", ".parent-checkbox", function() {
+            var checkStatus = $(this).is(":checked");
+            var parent = $(this).parents(".form-group");
+                parent.find(".attribtes-checkbox" && ".form-control").each(function() {
+                    parent.find(".attributes-checkbox").prop("checked", checkStatus);
+                    parent.find(".form-control").val("").prop("disabled", checkStatus);
+                });
+         });
+    };
 
 // create input fields for attributes
     self.generateAttributes = function (attributes, $form) {
@@ -751,7 +745,7 @@ define(['jquery', 'log', './constants', './simulator-rest-client', 'lodash', './
             '           </select>' +
             '   </td>' +
             '   <td width="15%" class="align-middle">' +
-            '       <input type="checkbox" name="{{attributeName}}-null" data-attribute-name="{{attributeName}}-attr"' +
+            '       <input type="checkbox" class="attributes-checkbox"  name="{{attributeName}}-null" data-attribute-name="{{attributeName}}-attr"' +
             '       data-input="null">' +
             '   </td>' +
             '</tr>';
@@ -766,7 +760,7 @@ define(['jquery', 'log', './constants', './simulator-rest-client', 'lodash', './
             '           name="{{attributeName}}-attr" data-type ="{{attributeType}}">' +
             '   </td>' +
             '   <td width="15%" class="align-middle">' +
-            '       <input align="center" type="checkbox" name="{{attributeName}}-null"' +
+            '       <input align="center" type="checkbox" class="attributes-checkbox" name="{{attributeName}}-null"' +
             '       data-attribute-name="{{attributeName}}-attr" data-input="null">' +
             '   </td>' +
             '</tr>';
