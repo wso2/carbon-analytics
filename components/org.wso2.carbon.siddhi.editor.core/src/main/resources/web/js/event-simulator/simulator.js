@@ -186,6 +186,7 @@ define(['jquery', 'log', './constants', './simulator-rest-client', 'lodash', './
             } else {
                 $inputField
                     .prop('disabled', false);
+                $('.parent-checkbox').prop("checked", false);
                 self.addRuleForAttribute($inputField);
             }
 
@@ -664,7 +665,7 @@ define(['jquery', 'log', './constants', './simulator-rest-client', 'lodash', './
             '<table class="table table-responsive"> ' +
             '   <thead>' +
             '    <tr>' +
-            '       <th width="90%">' +
+            '       <th width="80%">' +
             '           <label>' +
             '               Attributes<span class="requiredAstrix"> *</span>' +
             '           </label> ' +
@@ -673,6 +674,9 @@ define(['jquery', 'log', './constants', './simulator-rest-client', 'lodash', './
             '           <label>' +
             '            Is Null' +
             '           </label>' +
+            '       </th>' +
+            '       <th width="10%">' +
+            '           <input type="checkbox" class="parent-checkbox" style="margin-bottom:7px" >' +
             '       </th>' +
             '    </tr>' +
             '   </thead>' +
@@ -711,6 +715,19 @@ define(['jquery', 'log', './constants', './simulator-rest-client', 'lodash', './
             $(this)
                 .prop('selectedIndex', -1);
         });
+        parentCheckboxEventListener();
+    };
+
+//add an eventlistener to parent checkbox for disabling all the attributes
+    var parentCheckboxEventListener = function() {
+        $(".form-group").on("click", ".parent-checkbox", function() {
+            var checkStatus = $(this).is(":checked");
+            var parent = $(this).parents(".form-group");
+                parent.find(".attribtes-checkbox" && ".form-control").each(function() {
+                    parent.find(".attributes-checkbox").prop("checked", checkStatus);
+                    parent.find(".form-control").val("").prop("disabled", checkStatus);
+                });
+         });
     };
 
 // create input fields for attributes
@@ -728,7 +745,7 @@ define(['jquery', 'log', './constants', './simulator-rest-client', 'lodash', './
             '           </select>' +
             '   </td>' +
             '   <td width="15%" class="align-middle">' +
-            '       <input type="checkbox" name="{{attributeName}}-null" data-attribute-name="{{attributeName}}-attr"' +
+            '       <input type="checkbox" class="attributes-checkbox"  name="{{attributeName}}-null" data-attribute-name="{{attributeName}}-attr"' +
             '       data-input="null">' +
             '   </td>' +
             '</tr>';
@@ -743,7 +760,7 @@ define(['jquery', 'log', './constants', './simulator-rest-client', 'lodash', './
             '           name="{{attributeName}}-attr" data-type ="{{attributeType}}">' +
             '   </td>' +
             '   <td width="15%" class="align-middle">' +
-            '       <input align="center" type="checkbox" name="{{attributeName}}-null"' +
+            '       <input align="center" type="checkbox" class="attributes-checkbox" name="{{attributeName}}-null"' +
             '       data-attribute-name="{{attributeName}}-attr" data-input="null">' +
             '   </td>' +
             '</tr>';
