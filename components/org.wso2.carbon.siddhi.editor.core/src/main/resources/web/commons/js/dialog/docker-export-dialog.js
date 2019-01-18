@@ -51,6 +51,9 @@ define(['require', 'jquery', 'log', 'backbone', 'file_browser'],
 
                     var fileBrowser = new FileBrowser({container: treeContainer, application: self.app, fetchFiles: true,
                         showWorkspace: true, multiSelect: true});
+                    $(treeContainer).on('ready.jstree', function () {
+                        $(treeContainer).jstree("open_all");
+                    });
                     fileBrowser.render();
                     this.fileBrowser = fileBrowser;
 
