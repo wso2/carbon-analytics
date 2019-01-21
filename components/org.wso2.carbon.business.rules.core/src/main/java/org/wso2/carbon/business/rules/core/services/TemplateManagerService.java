@@ -403,14 +403,8 @@ public class TemplateManagerService implements BusinessRulesService {
             }
             return TemplateManagerConstants.SIDDHI_APP_NOT_DEPLOYED;
         } catch (SiddhiAppsApiHelperException e) {
-           if (businessRuleStatus == TemplateManagerConstants.PARTIALLY_DEPLOYED && e.getStatus() == 404) {
-               return TemplateManagerConstants.SIDDHI_APP_DEPLOYED;
-           }
-           if (businessRuleStatus == TemplateManagerConstants.PARTIALLY_UNDEPLOYED && e.getStatus() == 404) {
-               return TemplateManagerConstants.SIDDHI_APP_NOT_DEPLOYED;
-            }
-           if (businessRuleStatus == TemplateManagerConstants.DEPLOYED && e.getStatus() == 404) {
-               return TemplateManagerConstants.SIDDHI_APP_NOT_DEPLOYED;
+           if ( e.getStatus() == 404) {
+             return TemplateManagerConstants.SIDDHI_APP_NOT_DEPLOYED;
             }
             return TemplateManagerConstants.SIDDHI_APP_UNREACHABLE;
         }
