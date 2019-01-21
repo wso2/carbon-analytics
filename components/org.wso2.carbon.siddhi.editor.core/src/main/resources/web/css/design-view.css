@@ -664,7 +664,8 @@ a.list-group-item, button.list-group-item {
 }
 
 .design-view-form-content input[type="text"].option-value,
-.window-form-container input[type="text"].parameter-value{
+.window-form-container input[type="text"].parameter-value,
+.design-view-form-content input[type="text"].expression-value {
 	width: calc(90% - 30px);
 	margin-bottom: 2px;
 	margin-left: 20px;
@@ -711,7 +712,8 @@ a.list-group-item, button.list-group-item {
 .source-sink-form-container input[type="text"].readonly-attr,
 .source-sink-form-container #attributeMap-type:disabled,
 .design-view-form-content #store-type:disabled,
-.partition-form-container #define-partition-keys .partition-by-stream-name {
+.partition-form-container #define-partition-keys .partition-by-stream-name,
+.aggregation-form-container #aggregation-from {
 	cursor: not-allowed;
 	background: #1d1d1d;
 	border: 1px solid #545353;
@@ -749,6 +751,30 @@ a.list-group-item, button.list-group-item {
 
 .design-view-form-content #attribute-div .attribute {
 	margin-bottom: 5px;
+}
+
+.design-view-form-content .group-by-selection .attribute,
+.design-view-form-content .aggregation-form-container .group-by-attribute {
+	margin-top: 10px;
+	margin-bottom: 10px;
+}
+
+.design-view-form-content .group-by-selection .expression-content {
+	margin-left: 20px;
+}
+
+.design-view-form-content .group-by-selection .error-message {
+	margin-left: 35px;
+}
+
+.aggregation-form-container .aggregate-by-time-period-selection,
+.aggregation-form-container .aggregate-by-attribute-content {
+	margin-left: 20px;
+}
+
+.aggregation-form-container .aggregate-by-time-period-content {
+	padding: 10px;
+	margin-left: 85px;
 }
 
 .design-view-form-content .annotation > a > i.jstree-checkbox,
@@ -833,7 +859,8 @@ a.list-group-item, button.list-group-item {
 .trigger-form-container,
 .function-form-container,
 .partition-form-container,
-.siddhi-app-form-container {
+.siddhi-app-form-container,
+.aggregation-form-container {
 	float:left;
 	display:inline-block;
 	padding: 5px;
@@ -844,6 +871,20 @@ a.list-group-item, button.list-group-item {
 .function-form-container {
 	width: 25%;
 }
+
+.aggregation-form-container {
+	width: 30%;
+}
+
+.aggregation-form-container #primary-index-annotations {
+	margin-top: 2px;
+}
+
+.aggregation-form-container .define-predefined-annotations {
+	margin-top: -10px;
+}
+
+
 
 .trigger-form-container #define-trigger-criteria {
 	margin-top: -3px;
@@ -931,6 +972,7 @@ a.list-group-item, button.list-group-item {
 
 .design-view-form-content .option .option-desc-content,
 .design-view-form-content .parameter .parameter-desc-content,
+.aggregation-form-container .attribute-by-desc-content,
 .trigger-form-container #define-trigger-criteria .criteria-description {
 	 font-family: Arial;
 	 background: #252525;
@@ -1010,4 +1052,96 @@ a.list-group-item, button.list-group-item {
 
 .output-console-content-wrapper {
 	padding-bottom: 75px;
+}
+
+.define-predefined-annotations .sub-annotation  {
+	margin-left: 20px;
+}
+
+.define-predefined-annotations .sub-annotation > .sub-annotation {
+	margin-left:20px;
+}
+
+.design-view-form-content  #primary-index-annotations .annotation-content {
+	padding: 5px;
+	padding-left: 4px;
+}
+
+.design-view-form-content .define-predefined-annotations .annotation-options,
+.design-view-form-content .aggregation-form-container .store-content,
+.design-view-form-content .aggregation-form-container #store-options-div {
+	margin-left: 65px;
+}
+
+.design-view-form-content .aggregation-form-container .define-predefined-annotations,
+.design-view-form-content .define-predefined-annotations .annotation-options,
+.design-view-form-content .aggregation-form-container #store-options-div {
+	margin-top: -10px;
+}
+
+.design-view-form-content .aggregation-form-container #primary-index-annotations {
+	margin-top: 4px;
+}
+
+.design-view-form-content #define-aggregate-annotations .error-message {
+	margin-left: 20px;
+}
+
+.design-view-form-content .attribute-selection #user-defined-attributes {
+	margin-top: 15px;
+}
+
+.design-view-form-content .attribute-selection .attribute {
+	padding-top: 10px;
+	padding-bottom: 5px;
+}
+
+.design-view-form-content .attribute-selection input[type="text"].expression-as-value {
+	margin-left: 20px;
+}
+
+.design-view-form-content .attribute-selection .aggregate-function-selection {
+	margin-left: 80px;
+	margin-top: -24px;
+}
+
+.design-view-form-content .attribute-selection .expression-as {
+	margin-top: -32px;
+	margin-left: 200px;
+}
+
+.design-view-form-content .aggregate-by-time-period-content .interval-option {
+	padding: 5px;
+}
+
+.design-view-form-content .attribute-selection .expression-as-content {
+	margin-left: 70px;
+	margin-top: -6px;
+}
+
+.design-view-form-content .attribute-selection .select-label {
+	padding-top:10px;
+}
+
+.design-view-form-content .attribute-selection .attribute-label {
+	margin-left: 5px;
+}
+
+.design-view-form-content .attribute-selection .function-label {
+	margin-left: 102px;
+}
+
+.design-view-form-content .attribute-selection .expression-value-label {
+	margin-left: 105px;
+}
+
+.design-view-form-content hr {
+	margin-top: 15px;
+	margin-right: 24px;
+}
+
+.design-view-form-content .define-predefined-annotations .annotation-options h3,
+.aggregation-form-container #store-options-div h3 {
+	font-size: 12px;
+	margin-left: -25px;
 }

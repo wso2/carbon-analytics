@@ -1097,6 +1097,45 @@
         </li>
 </script>
 
+<script id="predefined-annotation-form-template" type="text/template">
+    <div class = "define-predefined-annotations">
+        {{#if this}}
+        <div>
+            {{#each this}}
+            <div class="main-annotation predefined-annotation">
+                {{> recursive-predefined-annotation this}}
+            </div>
+            {{/each}}
+        </div>
+        {{/if}}
+    </div>
+</script>
+
+<script id="recursive-predefined-annotation-partial" type="text/template">
+    <div id="{{name}}-annotation">
+        {{#if optional}}
+            <label class = "annotation-name optional-annotation">
+                <input type = "checkbox" class = "annotation-checkbox"> @{{name}}
+            </label>
+        {{else}}
+            <label class = "mandatory-annotation-symbol"> * </label>
+            <label class = "annotation-name mandatory-annotation">
+                @{{name}}
+            </label>
+        {{/if}}
+        <div class="annotation-content">
+            <div id = "{{name}}-options-div" class="annotation-options"> </div>
+            {{#if annotations}}
+                {{#each annotations}}
+                    <div class="sub-annotation predefined-annotation">
+                        {{> recursive-predefined-annotation this}}
+                    </div>
+                {{/each}}
+            {{/if}}
+        </div>
+    </div>
+</script>
+
 <script id="type-selection-form-template" type="text/template">
     {{#ifSourceOrSink id}}
         <label class="clearfix"> <label class="mandatory-symbol"> * </label> Type </label>
@@ -1342,7 +1381,162 @@
 </script>
 
 
+<script id="select-user-defined-attribute-template" type = "text/template">
+    {{#each this}}
+        <li class="attribute">
+            <div class="clearfix">
+                <div>
+                    {{> renderDropDown connectedElementAttributes}}
+                </div>
+                <div class="expression-as-content">
+                    <div>
+                        {{> renderDropDown aggregateFunctionNames}}
+                    </div>
+                    <div class="expression-as">
+                        <label> As </label> <input type="text" class="expression-as-value" value="{{as}}">
+                        <a class = "btn-del-option"> <i class = "fw fw-delete"> </i></a>
+                    </div>
+                </div>
+            </div>
+            <label class="error-message attribute-error-message"> </label>
+        </li>
+    {{/each}}
 </script>
+
+<script id = "aggregate-drop-down" type="text/template">
+    {{#ifId id "group-by"}}
+        <li>
+    {{/ifId}}
+            <div class="clearfix">
+                <select class="{{id}}-selection">
+                    {{#ifId id "group-by"}}
+                        <option style = "display:none" disabled selected value> -- select a value --</option>
+                    {{/ifId}}
+                    {{#each options}}
+                        <option value="{{this}}"> {{this}} </option>
+                    {{/each}}
+                </select>
+                {{#ifId id "group-by"}}
+                    <a class = "btn-del-option"> <i class = "fw fw-delete"> </i></a>
+                {{/ifId}}
+            </div>
+            <label class="error-message"> </label>
+    {{#ifId id "group-by"}}
+        </li>
+    {{/ifId}}
+</script>
+
+<script id="aggregation-group-by-template" type = "text/template">
+    <h3> Group By </h3>
+    <label> <input type = "checkbox" id="group-by-checkbox"> Group By Attributes </label>
+    <div class="group-by-content">
+        <label> Attribute Name </label>
+        <ul class="group-by-attributes">
+            {{#each groupBy}}
+                {{> renderDropDown ../possibleGroupByAttributes}}
+            {{/each}}
+        </ul>
+        <button class="btn btn-default btn-add-group-by-attribute"> + Attribute </button>
+    </div>
+</script>
+
+<script id="aggregation-by-interval-template" type = "text/template">
+    <div class="interval-content">
+        <div class="clearfix">
+        {{#each this}}
+            <label class="interval-option">
+                <input type="checkbox" class="{{this}}-checkbox interval-checkbox"> {{this}}
+            </label>
+            {{#if (isDivisor (sum @index 1) ../this)}}
+                </div>
+                <div class = "interval-content">
+            {{/if}}
+        {{/each}}
+        </div>
+        <label class="error-message"> </label>
+    </div>
+</script>
+
+<script id="aggregation-form-template" type = "text/template">
+    <div class = "aggregation-form-container">
+        <div id="aggregation-name-div">
+            <h4> Name: </h4>
+            <input type="text" id="aggregationName" class="clearfix name" value="{{name}}">
+            <label class="error-message" id="aggregationNameErrorMessage"> </label>
+        </div>
+        <div id="aggregation-from-div">
+            <h4> From: </h4>
+            <input type="text" id="aggregation-from" class="clearfix name" value="{{from}}" readonly>
+        </div>
+        <hr>
+        <div id = "define-aggregate-by">
+            <h3> Aggregation Criteria </h3>
+            <div id ="aggregate-by-time-period" class="aggregate-by-content">
+                <h4> <label class="mandatory-symbol"> * </label> By Time Period </h4>
+                <select class="aggregate-by-time-period-selection">
+                    <option value="interval"> Interval </option>
+                    <option value="range"> Range </option>
+                </select>
+            </div>
+            <div class="aggregate-by-time-period-content"> </div>
+            <div id="aggregate-by-attribute" class="aggregate-by-content">
+                <h4>
+                    <div class="clearfix">
+                   <label>
+                       <input type = "checkbox" id="aggregate-by-attribute-checkbox"> By Attribute
+                   </label>
+                    <i class = "fw fw-info attribute-by-desc">
+                        <span style = "display:none" class="attribute-by-desc-content">
+                            Attribute of timestamp is required
+                        </span>
+                    </i>
+                    </div>
+                </h4>
+                <div class="aggregate-by-attribute-content clearfix">
+                    <label> Attribute Name </label>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class = "aggregation-form-container">
+        <div id = "define-aggregate-select" class = "attribute-selection">
+            <h3> Projection </h3>
+            <label class="clearfix"> <label class="mandatory-symbol"> * </label> Select </label>
+            <select id="attribute-selection-type" class="clearfix">
+                <option value="all"> All Attributes </option>
+                <option value="user_defined"> User Defined Attributes </option>
+            </select>
+            <div class="define-user-defined-attributes">
+                <label class="clearfix">
+                    <label class="attribute-label select-label"> Attribute </label>
+                    <label class="function-label select-label"> Function </label>
+                    <label class="expression-value-label select-label"> Expression Value </label>
+                </label>
+                <ul class="user-defined-attributes"> </ul>
+                <button class="btn btn-default" id = "btn-add-user-defined-attribute"> + Attribute </button>
+            </div>
+        </div>
+        <hr>
+        <div id="define-aggregate-group-by"> </div>
+    </div>
+    <div class = "aggregation-form-container">
+        <div id="define-aggregate-annotations">
+            <h3> Annotations </h3>
+            <div id="define-store-annotation">
+                <label><input type = "checkbox" class="store-annotation-checkbox"> @store </label>
+                <div class = "store-content">
+                    <div id="define-store"> </div>
+                    <div id = "define-rdbms-type"> </div>
+                    <div id ="store-options-div"> </div>
+                </div>
+            </div>
+            <div id="define-index-annotation"> </div>
+            <div id="define-predefined-aggregation-annotation"> </div>
+            <div id="define-user-defined-annotation"> </div>
+        </div>
+    </div>
+</script>
+
 <!--Start: Settings Modal-->
 <div class="modal fade modalSettings" id="modalSettings" tabindex="-1" role="dialog">
     <div class="modal-dialog" role="document">
@@ -1816,6 +2010,122 @@
                 }],
                 isChecked: false
             }
+            ],
+            aggregation_predefined_annotations: [
+                {
+                    name: "purge",
+                    class: "main-annotation",
+                    optional: true,
+                    parameters: [
+                        {
+                            name: "enable",
+                            value: "",
+                            defaultValue: "true",
+                            optional: true,
+                            type: ["BOOL"]
+                        },
+                        {
+                            name: "interval",
+                            value: "",
+                            defaultValue: "10 sec",
+                            optional: true,
+                            type: ["INT", "LONG", "TIME"]
+                        }
+                    ],
+                    annotations: [{
+                        name: "retentionPeriod",
+                        class: "sub-Annotation",
+                        optional: true,
+                        parameters: [
+                            {
+                                name: "sec",
+                                possibleNames: ["sec","second","seconds"],
+                                value: "",
+                                defaultValue: "120 sec",
+                                optional: true,
+                                type: ["INT", "LONG", "TIME"]
+                            },
+                            {
+                                name: "min",
+                                possibleNames: ["min","minute","minutes"],
+                                value: "",
+                                defaultValue: "24 hours",
+                                optional: true,
+                                type: ["INT", "LONG", "TIME"]
+                            },
+                            {
+                                name: "hours",
+                                possibleNames: ["hour","hours"],
+                                value: "",
+                                defaultValue: "30 days",
+                                optional: true,
+                                type: ["INT", "LONG", "TIME"]
+                            },
+                            {
+                                name: "days",
+                                possibleNames: ["day","days"],
+                                value: "",
+                                defaultValue: "1 year",
+                                optional: true,
+                                type: ["INT", "LONG", "TIME"]
+                            },
+                            {
+                                name: "months",
+                                possibleNames: ["month","months"],
+                                value: "",
+                                defaultValue: "all",
+                                optional: true,
+                                type: ["INT", "LONG", "TIME"]
+                            },
+                            {
+                                name: "years",
+                                possibleNames: ["year","years"],
+                                value: "",
+                                defaultValue: "all",
+                                optional: true,
+                                type: ["INT", "LONG", "TIME"]
+                            }
+                        ]
+                    }
+                    ]
+                },
+                {
+                    name: "partitionById",
+                    class: "main-annotation",
+                    optional: true,
+                    parameters: [
+                        {
+                            name: "enable",
+                            value: "",
+                            defaultValue: "true",
+                            optional: true,
+                            type: ["BOOL"]
+                        }
+                    ]
+                }
+            ],
+            incremental_aggregator: [
+               {
+                    name: "none"
+               },
+               {
+                    name: "sum"
+               },
+               {
+                    name: "min"
+               },
+               {
+                    name: "max"
+               },
+               {
+                    name: "avg"
+               },
+               {
+                    name: "count"
+               },
+               {
+                    name: "distinctCount"
+               }
             ],
             trigger: [
             {

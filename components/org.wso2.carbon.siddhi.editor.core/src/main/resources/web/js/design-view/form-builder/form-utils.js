@@ -253,6 +253,74 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
         };
 
         /**
+         * @function to get the attribute expression of user-defined attributes
+         * @param {Object} aggregateFunctions predefined aggregate functions
+         * @param {Object} selectValues user selected select values
+         * @param {Object} connectedElementAttributes
+         */
+        FormUtils.prototype.getAttributeExpression = function (aggregateFunctions, selectValue, connectedElementAttributes) {
+            var self = this;
+            var attributes = self.createAggregateExpressionObject(aggregateFunctions, selectValue, connectedElementAttributes);
+            _.forEach(attributes, function (attribute) {
+                _.forEach(connectedElementAttributes, function (connectedElementAttribute) {
+                    if (attribute.expression.includes(connectedElementAttribute)) {
+                        if (attribute.expression == attribute.as) {
+                            attribute.as = "";
+                        } else {
+                            self.determineFunctionAndAttributeName(attribute);
+                        }
+                        return false;
+                    }
+                });
+            });
+            self.renderUserDefinedAttributeSelection(attributes)
+        };
+
+        /**
+         * @function to determine the function and attribute name from the given expression
+         * @param {Object} attribute the aggregate attribute object
+         */
+        FormUtils.prototype.determineFunctionAndAttributeName = function (attribute) {
+            var expressionContent = attribute.expression.trim().split('(');
+            if (expressionContent.length == 2) {
+                attribute.aggregateFunction = expressionContent[0].trim().toLowerCase();
+                attribute.attributeName = expressionContent[1].substring(0, expressionContent[1].length - 1);
+            }
+        };
+
+        /**
+         * @function to create the aggregate expression object
+         * @param {Object} aggregateFunctions predefined aggregate functions
+         * @param {Object} selectValue user defined select values
+         * @param {Object} connectedElementAttributes
+         */
+        FormUtils.prototype.createAggregateExpressionObject = function (aggregateFunctions, selectValue,
+            connectedElementAttributes) {
+            var self = this;
+            var attributes = [];
+            _.forEach(selectValue, function (value) {
+                var aggregateFunction = {
+                    id: "aggregate-function",
+                    options: self.getAggregationFunctionName(aggregateFunctions)
+                }
+                var possibleAttributes = {
+                    id: "stream-attribute",
+                    options: connectedElementAttributes
+                }
+                var expressionAs = {
+                    connectedElementAttributes: possibleAttributes,
+                    aggregateFunctionNames: aggregateFunction,
+                    expression: value.expression,
+                    as: value.as,
+                    aggregateFunction: "none",
+                    attributeName: ""
+                }
+                attributes.push(expressionAs);
+            });
+            return attributes;
+        };
+
+        /**
         * @function to render the html to display the radio options for selecting the rdbms type
         */
         FormUtils.prototype.renderRdbmsTypes = function () {
@@ -287,6 +355,23 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
             $('#define-attribute').html(wrappedHtml);
             self.changeAttributeNavigation();
             self.addEventListenersForAttributeDiv();
+        };
+
+        /**
+         * @function render the user defined select atributes
+         * @param {Object} attributes
+         */
+        FormUtils.prototype.renderUserDefinedAttributeSelection = function (attributes) {
+            var self = this;
+            var raw_partial = document.getElementById('aggregate-drop-down').innerHTML;
+            Handlebars.registerPartial('renderDropDown', raw_partial);
+            var userDefinedAttributeTemplate = Handlebars.compile($('#select-user-defined-attribute-template').html());
+            var wrappedHtml = userDefinedAttributeTemplate(attributes);
+            $('.attribute-selection .user-defined-attributes').append(wrappedHtml);
+            self.removeDeleteButtonOfFirstValue();
+            if ($('.user-defined-attributes li').length == attributes.length) {
+                self.mapAggregateExpression(attributes)
+            }
         };
 
         /**
@@ -343,6 +428,23 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
         };
 
         /**
+         * @function to render options for predefined annotations
+         */
+        FormUtils.prototype.renderOptionsForPredefinedAnnotations = function (predefinedAnnotations) {
+            var self = this;
+            _.forEach(predefinedAnnotations, function (annotation) {
+                if (annotation.parameters) {
+                    self.renderOptions(annotation.parameters, [], annotation.name)
+                }
+                if (annotation.annotations) {
+                    self.renderOptionsForPredefinedAnnotations(annotation.annotations);
+                }
+                self.addEventListenersForOptionsDiv(annotation.name);
+            });
+            self.hideCustomizedOptionsDiv();
+        };
+
+        /**
          * @function to render the template of primary and index annotations
          */
         FormUtils.prototype.renderPrimaryIndexAnnotations = function (primaryIndexAnnotations, id) {
@@ -352,6 +454,18 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
             $('#' + id).html(wrappedHtml);
             self.removeDeleteButtonOfFirstValue();
             self.addEventListenerForPrimaryIndexAnnotationDiv();
+        };
+
+        /**
+         * @function to render the template for predefined annotations
+         */
+        FormUtils.prototype.renderPredefinedAnnotations = function (predefinedAnnotations, id) {
+            var self = this;
+            var raw_partial = document.getElementById('recursive-predefined-annotation-partial').innerHTML;
+            Handlebars.registerPartial('recursive-predefined-annotation', raw_partial);
+            var annotationFormTemplate = Handlebars.compile($('#predefined-annotation-form-template').html());
+            var wrappedHtml = annotationFormTemplate(predefinedAnnotations);
+            $('#' + id).html(wrappedHtml);
         };
 
         /**
@@ -367,6 +481,33 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
                 }).prop('selected', true);
                 i++;
             });
+        };
+
+        /**
+         * @function to select the attribute selection[all or user-defined]
+         */
+        FormUtils.prototype.selectAttributeSelection = function (aggregateFunctions, select, connectedElementAttributes) {
+            var self = this;
+            $('.attribute-selection').find('#attribute-selection-type option').filter(function () {
+                return ($(this).val() === select.getType().toLowerCase());
+            }).prop('selected', true);
+            if (select.getType().toLowerCase() === Constants.TYPE_ALL) {
+                $('.define-user-defined-attributes').hide();
+            } else {
+                self.getAttributeExpression(aggregateFunctions, select.getValue(), connectedElementAttributes);
+                $('.define-user-defined-attributes').show();
+            }
+        };
+
+        /**
+         * @function to get the aggregate function names from it's object
+         */
+        FormUtils.prototype.getAggregationFunctionName = function (aggregateFunctions) {
+            var names = [];
+            _.forEach(aggregateFunctions, function (aggregateFunction) {
+                names.push(aggregateFunction.name);
+            });
+            return names;
         };
 
         /**
@@ -555,6 +696,31 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
         };
 
         /**
+         * @function to validate the user defined attribute selection section
+         */
+        FormUtils.prototype.validateUserDefinedAttributeSelection = function () {
+            var self = this;
+            var isErrorOccurred = false;
+            $('.user-defined-attributes .attribute').each(function () {
+                var expressionValue = $(this).find('.expression-as-value');
+                var functionName = $(this).find('.aggregate-function-selection').val();
+                var errorLabel = $(this).find('.attribute-error-message');
+                if (functionName != Constants.NONE && expressionValue.val().trim() == "") {
+                    self.addErrorClass(expressionValue);
+                    errorLabel.text('Expression value is required.');
+                    isErrorOccurred = true;
+                    return false;
+                } else if (expressionValue.val().trim().indexOf(' ') >= 0) {
+                    self.addErrorClass(expressionValue);
+                    errorLabel.text('Expression value can not have white space.');
+                    isErrorOccurred = true;
+                    return false;
+                }
+            });
+            return isErrorOccurred;
+        };
+
+        /**
          * @function to validate the predefined options
          * @param {Object} predefinedOptions
          * @param {String} id to identify the div in the html to traverse
@@ -585,6 +751,38 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
         };
 
         /**
+         * @function to validate the predefined annotations
+         */
+        FormUtils.prototype.validatePredefinedAnnotations = function (predefinedAnnotations) {
+            var self = this;
+            var isErrorOccurred = false;
+            var isCheckOptions = false;
+            _.forEach(predefinedAnnotations, function (annotation) {
+                if (annotation.parameters) {
+                    if (annotation.optional) {
+                        annotationCheckbox = $('#' + annotation.name + '-annotation').find('.annotation-checkbox').
+                            first();
+                        if (annotationCheckbox.is(':checked') && !annotationCheckbox.is(':disabled')) {
+                            isCheckOptions = true;
+                        }
+                    } else {
+                        isCheckOptions = true;
+                    }
+                    if (isCheckOptions) {
+                        if (self.validateOptions(annotation.parameters, annotation.name)) {
+                            isErrorOccurred = true;
+                            return false;
+                        }
+                    }
+                }
+                if (annotation.annotations) {
+                    self.validatePredefinedAnnotations(annotation.annotations)
+                }
+            });
+            return isErrorOccurred;
+        };
+
+        /**
          * @function to validate the data type of a given value
          * @param {Objects} dataType possible data-types
          * @param {String} optionValue value which needs to be checked for
@@ -592,33 +790,31 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
          */
         FormUtils.prototype.validateDataType = function (dataTypes, value) {
             var invalidDataType = false;
-            var intLongRegexMatch = /^[-+]?\d+$/;
-            var doubleFloatRegexMatch = /^[+-]?([0-9]*[.])?[0-9]+$/;
-            var timeRegexMatch = /^[_A-z0-9]*((-|\s)*[_A-z0-9])*$/g;
             for (var dataType of dataTypes) {
-                if (dataType === "INT" || dataType === "LONG") {
-                    if (!value.match(intLongRegexMatch)) {
+                dataType = dataType.toLowerCase();
+                if (dataType === Constants.INT || dataType === Constants.LONG) {
+                    if (!value.match(Constants.INT_LONG_VALIDATOR_REGEX)) {
                         invalidDataType = true;
                     } else {
                         invalidDataType = false;
                         break;
                     }
-                } else if (dataType === "DOUBLE" || dataType === "FLOAT") {
-                    if (!value.match(doubleFloatRegexMatch)) {
+                } else if (dataType === Constants.DOUBLE || dataType === Constants.FLOAT) {
+                    if (!value.match(Constants.DOUBLE_FLOAT_VALIDATOR_REGEX)) {
                         invalidDataType = true;
                     } else {
                         invalidDataType = false;
                         break;
                     }
-                } else if (dataType === "BOOL") {
+                } else if (dataType === Constants.BOOL) {
                     if (!(value.toLowerCase() === "false" || value.toLowerCase() === "true")) {
                         invalidDataType = true;
                     } else {
                         invalidDataType = false;
                         break;
                     }
-                } else if (dataType === "TIME") {
-                    if (!value.match(timeRegexMatch)) {
+                } else if (dataType === Constants.TIME) {
+                    if (!value.match(Constants.TIME_VALIDATOR_REGEX)) {
                         invalidDataType = true;
                     } else {
                         invalidDataType = false;
@@ -713,10 +909,10 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
         };
 
         /**
-		 * @function validate the attributes
-		 * @param {Object} attributeNameList to add the valid attributes
-		 * @return {boolean} isErrorOccurred
-		 */
+         * @function validate the attributes
+         * @param {Object} attributeNameList to add the valid attributes
+         * @return {boolean} isErrorOccurred
+         */
         FormUtils.prototype.validateAttributes = function (attributeNameList) {
             var self = this;
             var isErrorOccurred = false;
@@ -732,6 +928,44 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
                 }
             });
             return isErrorOccurred;
+        };
+
+        /**
+         * @function to build the select object
+         */
+        FormUtils.prototype.buildAttributeSelection = function (selectAttributeOptions) {
+            var self = this;
+            var selectionType = $('#attribute-selection-type').val();
+            if (selectionType == Constants.TYPE_ALL) {
+                _.set(selectAttributeOptions, 'type', Constants.TYPE_ALL.toUpperCase());
+                _.set(selectAttributeOptions, 'value', Constants.VALUE_ALL);
+            } else {
+                _.set(selectAttributeOptions, 'type', Constants.TYPE_USER_DEFINED.toUpperCase());
+                _.set(selectAttributeOptions, 'value', self.buildAttributeExpressions());
+            }
+        };
+
+        /**
+         * @function to build the attribute expression
+         */
+        FormUtils.prototype.buildAttributeExpressions = function () {
+            var attributeValues = [];
+            $('.attribute-selection .attribute').each(function () {
+                var functionName = $(this).find('.aggregate-function-selection').val();
+                var attributeName = $(this).find('.stream-attribute-selection').val();
+                var expression;
+                if (functionName != Constants.NONE) {
+                    expression = functionName + "(" + attributeName + ")";
+                } else {
+                    expression = attributeName;
+                }
+                var expressionAs = {
+                    expression: expression,
+                    as: $(this).find('.expression-as-value').val().trim()
+                }
+                attributeValues.push(expressionAs);
+            });
+            return attributeValues;
         };
 
         /**
@@ -758,12 +992,12 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
         };
 
         /**
-		 * @function to build the store options
-		 * @param {Object} selectedOptions array to add the built option
-		 */
-        FormUtils.prototype.buildStoreOptions = function (selectedOptions) {
+         * @function to build the store options
+         * @param {Object} selectedOptions array to add the built option
+         */
+        FormUtils.prototype.buildStoreAndAnnotationOptions = function (selectedOptions, id) {
             var option;
-            $('#store-options .option').each(function () {
+            $('#' + id + '-options .option').each(function () {
                 var option = $(this).find('.option-name');
                 var optionName = option.text().trim();
                 var optionValue = $(this).find('.option-value').val().trim();
@@ -777,10 +1011,10 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
             });
         };
 
-		/**
-		 * Function to build the customized store options
-		 * @param {Object} selectedOptions array to add the built option
-		 */
+        /**
+         * Function to build the customized store options
+         * @param {Object} selectedOptions array to add the built option
+         */
         FormUtils.prototype.buildCustomizedStoreOption = function (selectedOptions) {
             var option = "";
             if ($('#customized-store-options ul').has('li').length != 0) {
@@ -843,6 +1077,88 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
         };
 
         /**
+         * @function to determine if the annotation is to be built
+         */
+        FormUtils.prototype.isBuildAnnotation = function (annotation) {
+            var isBuildAnnotation = false;
+            if (annotation.optional) {
+                annotationCheckbox = $('#' + annotation.name + '-annotation').find('.annotation-checkbox').
+                    first();
+                if (annotationCheckbox.is(':checked') && !annotationCheckbox.is(':disabled')) {
+                    isBuildAnnotation = true;
+                }
+            } else {
+                isBuildAnnotation = true;
+            }
+            return isBuildAnnotation;
+        };
+
+        /**
+         * @function to traverse through all parent predefined annotation
+         */
+        var predefinedAnnotationString = "";
+        FormUtils.prototype.buildPredefinedAnnotations = function (predefinedAnnotations, annotationStringList,
+            annotationObjectList) {
+            var self = this;
+            _.forEach(predefinedAnnotations, function (annotation) {
+                if (self.isBuildAnnotation(annotation)) {
+                    var annotationObject = new AnnotationObject();
+                    annotationObject.setName(annotation.name);
+                    predefinedAnnotationString += "@" + annotation.name + "(";
+                    self.buildPredefinedAnnotation(annotation, annotationObject);
+
+                    predefinedAnnotationString += ")"
+                    annotationObjectList.push(annotationObject)
+                    annotationStringList.push(predefinedAnnotationString);
+                    predefinedAnnotationString = "";
+                }
+            });
+        };
+
+        /**
+         * @function to traverse through the sub annotations
+         */
+        FormUtils.prototype.buildPredefinedAnnotation = function (annotation, annotationObject) {
+            var self = this;
+            if (self.isBuildAnnotation(annotation)) {
+                if (annotation.annotations) {
+                    _.forEach(annotation.annotations, function (subAnnotation) {
+                        if (self.isBuildAnnotation(subAnnotation)) {
+                            predefinedAnnotationString += "@" + subAnnotation.name + "( "
+                            var childAnnotation = new AnnotationObject();
+                            childAnnotation.setName(subAnnotation.name)
+                            self.buildPredefinedAnnotation(subAnnotation, childAnnotation)
+                            annotationObject.addAnnotation(childAnnotation)
+                            predefinedAnnotationString = predefinedAnnotationString.substring(0,
+                                predefinedAnnotationString.length - 1);
+                            predefinedAnnotationString += "),"
+                        }
+                    });
+                }
+                if (annotation.parameters) {
+                    self.buildPredefinedAnnotationElements(annotation, annotationObject);
+                    predefinedAnnotationString = predefinedAnnotationString.substring(0,
+                        predefinedAnnotationString.length - 1);
+                }
+            }
+        };
+
+        /**
+         * @function to build the options of an annotation
+         */
+        FormUtils.prototype.buildPredefinedAnnotationElements = function (annotation, annotationObject) {
+            var self = this;
+            var annotationOptions = {};
+            self.buildStoreAndAnnotationOptions(annotationOptions, annotation.name);
+            for (key in annotationOptions) {
+                predefinedAnnotationString += key + "="
+                predefinedAnnotationString += "'" + annotationOptions[key] + "' ,";
+                var element = new AnnotationElement(key, annotationOptions[key])
+                annotationObject.addElement(element);
+            }
+        };
+
+        /**
          * @function to create the map section of the source/sink annotation
          * @param {Object} predefinedMaps predefined mappers
          */
@@ -872,10 +1188,27 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
         };
 
         /**
-		 * @function to map the values of saved annotation to predefined annotation object
-		 * @param {Object} predefined_annotations
-		 * @param {Object} savedAnnotations
-		 */
+         * @function to map the user given aggregate expression to the form
+         */
+        FormUtils.prototype.mapAggregateExpression = function (attributes) {
+            var i = 0;
+            $('.attribute').each(function () {
+                $(this).find('.stream-attribute-selection option').filter(function () {
+                    return ($(this).val() == (attributes[i].attributeName));
+                }).prop('selected', true);
+                $(this).find('.aggregate-function-selection option').filter(function () {
+                    return ($(this).val().toLowerCase() == (attributes[i].aggregateFunction));
+                }).prop('selected', true);
+
+                i++;
+            });
+        };
+
+        /**
+         * @function to map the values of saved annotation to predefined annotation object
+         * @param {Object} predefined_annotations
+         * @param {Object} savedAnnotations
+         */
         FormUtils.prototype.mapPrimaryIndexAnnotationValues = function (predefined_annotations,
             predefinedSavedAnnotations) {
             for (var savedAnnotation of predefinedSavedAnnotations) {
@@ -892,12 +1225,12 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
             }
         };
 
-		/**
-		 * @function to map the saved store option values to the option object
-		 * @param {Object} predefinedOptions Predefined options of a particular source/map annotation type
-		 * @param {Object} savedOptions Saved options
-		 * @return {Object} options
-		 */
+        /**
+         * @function to map the saved store option values to the option object
+         * @param {Object} predefinedOptions Predefined options of a particular source/map annotation type
+         * @param {Object} savedOptions Saved options
+         * @return {Object} options
+         */
         FormUtils.prototype.mapUserStoreOptionValues = function (predefinedOptions, savedOptions) {
             var options = [];
             _.forEach(predefinedOptions, function (predefinedOption) {
@@ -959,6 +1292,61 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
         };
 
         /**
+         * @function to map the values of the predefined annotations
+         */
+        FormUtils.prototype.mapPredefinedAnnotations = function (savedAnnotations, predefinedAnnotations) {
+            var self = this;
+            _.forEach(savedAnnotations, function (savedAnnotation) {
+                _.forEach(predefinedAnnotations, function (predefinedAnnotation) {
+                    if (savedAnnotation.name.toLowerCase() === predefinedAnnotation.name.toLowerCase()) {
+                        if (savedAnnotation.elements) {
+                            self.mapPredefinedAnnotationElements(savedAnnotation, predefinedAnnotation);
+                        }
+                        if (savedAnnotation.annotations) {
+                            self.mapPredefinedAnnotations(savedAnnotation.annotations, predefinedAnnotation.annotations);
+                        }
+                        return false;
+                    }
+                })
+            });
+        };
+
+        /**
+         * @function to map the user given values for the predefined options
+         */
+        FormUtils.prototype.mapPredefinedAnnotationElements = function (savedAnnotation, predefinedAnnotation) {
+            var self = this;
+            if (predefinedAnnotation.parameters) {
+                if (predefinedAnnotation.name.toLowerCase() === Constants.RETENTION_PERIOD) {
+                    self.mapTimeBasedAnnotationElements(savedAnnotation, predefinedAnnotation);
+                } else {
+                    _.forEach(savedAnnotation.elements, function (savedElement) {
+                        _.forEach(predefinedAnnotation.parameters, function (predefinedElement) {
+                            if (savedElement.key.toLowerCase() === predefinedElement.name.toLowerCase()) {
+                                predefinedElement.value = savedElement.value;
+                            }
+                        });
+                    });
+                }
+            }
+        };
+
+        /**
+         * @function to map time based annotation elements. A seperate method is used as an array
+         * is required to determine the option name as there are more than one option name referring
+         * to the same option. ex: sec,second,seconds
+         */
+        FormUtils.prototype.mapTimeBasedAnnotationElements = function (savedAnnotation, predefinedAnnotation) {
+            _.forEach(savedAnnotation.elements, function (savedElement) {
+                _.forEach(predefinedAnnotation.parameters, function (predefinedElement) {
+                    if (predefinedElement.possibleNames.includes(savedElement.key.toLowerCase())) {
+                        predefinedElement.value = savedElement.value;
+                    }
+                });
+            });
+        };
+
+        /**
          * @function checks if an annotation is predefined using the annotation name
          * @param {Object} predefinedAnnotationList list of predefined annotations
          * @param {String} annotationName the name which needs to be checked
@@ -975,7 +1363,7 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
             return predefinedObject;
         };
 
-		/**
+        /**
          * @function validate the annotations
          * @param {Object} predefinedAnnotationList List of predefined annotations
          * @param {Object} annotationNodes array to add the nodes which needs to be built
@@ -1006,9 +1394,9 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
         };
 
         /**
-		 * @Function to validate the primary and index annotations
-		 * @return {boolean} isErrorOccurred
-		 */
+         * @function to validate the primary and index annotations
+         * @return {boolean} isErrorOccurred
+         */
         FormUtils.prototype.validatePrimaryIndexAnnotations = function () {
             var isErrorOccurred = false;
             $('#primary-index-annotations .annotation').each(function () {
@@ -1110,11 +1498,11 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
         FormUtils.prototype.checkRdbmsType = function (rdbmsOptions) {
             var isFound = false;
             for (var option of rdbmsOptions) {
-                if (option.key.toLowerCase() == "datasource" && option.value != "") {
+                if (option.name.toLowerCase() == "datasource" && option.value != "") {
                     $("#define-rdbms-type input[name=radioOpt][value='datasource']").prop("checked", true);
                     isFound = true;
                     break;
-                } else if (option.key.toLowerCase() == "jndi.resource" && option.value != "") {
+                } else if (option.name.toLowerCase() == "jndi.resource" && option.value != "") {
                     $("#define-rdbms-type input[name=radioOpt][value='jndi']").prop("checked", true);
                     isFound = true;
                     break;
@@ -1465,6 +1853,73 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
         };
 
         /**
+         * @function to add event listener for the attribute selection division
+         */
+        FormUtils.prototype.addEventListenersForAttributeSelectionDiv = function (aggregateFunctions,
+            connectedElementAttributes) {
+            var self = this;
+            var selectValue = [{ expression: "", as: "" }];
+
+            $('.attribute-selection').on('change', '#attribute-selection-type', function () {
+                if (this.value === Constants.TYPE_ALL) {
+                    $('.define-user-defined-attributes').hide();
+                } else {
+                    $('.define-user-defined-attributes').show();
+                    if ($('.user-defined-attributes li').length == 0) {
+                        self.getAttributeExpression(aggregateFunctions, selectValue, connectedElementAttributes);
+                    }
+
+                }
+            });
+
+            $('.attribute-selection').on('click', '#btn-add-user-defined-attribute', function () {
+                self.getAttributeExpression(aggregateFunctions, selectValue, connectedElementAttributes);
+            });
+        };
+
+        /**
+         * @function to add event listeners for the predefined annotations
+         */
+        FormUtils.prototype.addEventListenersForPredefinedAnnotations = function () {
+            $('.define-predefined-annotations').on('change', '.annotation-checkbox', function () {
+                var parent = $(this).closest(".predefined-annotation");
+                if ($(this).is(':checked')) {
+                    parent.find('.annotation-content').first().show();
+                } else {
+                    parent.find('.annotation-content').first().hide();
+                    parent.find('.error-message').text("");
+                    parent.find('.option-value').removeClass('required-input-field')
+                }
+            });
+        };
+
+        /**
+         * @function to add a check for the user selected predefined annotations
+         */
+        FormUtils.prototype.addCheckedForUserSelectedPredefinedAnnotation = function (savedAnnotations,
+            predefinedAnnotations) {
+            var self = this;
+            _.forEach(predefinedAnnotations, function (predefinedAnnotation) {
+                var found = false;
+                _.forEach(savedAnnotations, function (savedAnnotation) {
+                    if (savedAnnotation.name.toLowerCase() === predefinedAnnotation.name.toLowerCase()) {
+                        found = true;
+                        $('.define-predefined-annotations #' + predefinedAnnotation.name + '-annotation').
+                            find('.annotation-checkbox').first().prop('checked', true);
+                        if (predefinedAnnotation.annotations && predefinedAnnotation.annotations.length != 0) {
+                            self.addCheckedForUserSelectedPredefinedAnnotation(savedAnnotation.annotations,
+                                predefinedAnnotation.annotations);
+                        }
+                    }
+                });
+                if (!found) {
+                    $('.define-predefined-annotations #' + predefinedAnnotation.name + '-annotation').find
+                        ('.annotation-content').hide();
+                }
+            });
+        };
+
+        /**
          * @function to change the heading and the button text of the customized options div
          */
         FormUtils.prototype.changeCustomizedOptDiv = function (id) {
@@ -1508,6 +1963,11 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
             }
         };
 
+        //to hide the customized option section
+        FormUtils.prototype.hideCustomizedOptionsDiv = function () {
+            $('.customized-options').remove();
+        };
+
         /**
          * @function to remove the first delete button of primary/index annot value
          */
@@ -1515,7 +1975,10 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
             $('#primary-index-annotations .annotation').each(function () {
                 $(this).find('.btn-del-annot-value:eq(0)').remove();
             });
-        }
+
+            $('#define-aggregate-group-by').find('.group-by-attributes li:eq(0) .btn-del-option').remove();
+            $('.attribute-selection').find('.user-defined-attributes li:eq(0) .btn-del-option').remove();
+        };
 
         /**
          * @function to pop up the element which is being currently edited
@@ -1526,9 +1989,9 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
         };
 
         /**
-		 * @function to add the error class
-		 * @param {Object} id object where the error needs to be added
-		 */
+         * @function to add the error class
+         * @param {Object} id object where the error needs to be added
+         */
         FormUtils.prototype.addErrorClass = function (id) {
             $(id)[0].scrollIntoView();
             $(id).addClass('required-input-field')
@@ -1651,7 +2114,7 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
 
         /** Handlebar helper to compare if the id is "source" or "sink" */
         Handlebars.registerHelper('ifSourceOrSink', function (id, div) {
-            if (id === "source" || id === "sink") {
+            if (id === Constants.SOURCE || id === Constants.SINK) {
                 return div.fn(this);
             }
             return div.inverse(this);
@@ -1659,7 +2122,7 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
 
         /** Handlebar helper to compare if the id is "source" or "sink" or "store" */
         Handlebars.registerHelper('ifSourceOrSinkOrStore', function (id, div) {
-            if (id === "source" || id === "sink" || id === "store") {
+            if (id === Constants.SOURCE || id === Constants.SINK || id === Constants.STORE) {
                 return div.fn(this);
             }
             return div.inverse(this);

@@ -239,6 +239,7 @@ define(['require', 'log', 'lodash', 'jquery', 'configurationData', 'appData', 'p
                     var storeAnnotation = new StoreAnnotation(aggregation.store);
                     aggregationObject.setStore(storeAnnotation);
                 }
+                addAnnotationObjectForElement(aggregation, aggregationObject);
                 addAnnotationsForElement(aggregation, aggregationObject);
                 // select section in the aggregation definition is compulsory. If that is not found there is a error in
                 // backend.

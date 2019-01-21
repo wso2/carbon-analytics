@@ -28,6 +28,9 @@ define(function () {
      */
     var constants = {
         ALPHABETIC_VALIDATOR_REGEX: /^([a-zA-Z])$/,
+        INT_LONG_VALIDATOR_REGEX: /^[-+]?\d+$/,
+        DOUBLE_FLOAT_VALIDATOR_REGEX: /^[+-]?([0-9]*[.])?[0-9]+$/,
+        TIME_VALIDATOR_REGEX: /^[_A-z0-9]*((-|\s)*[_A-z0-9])*$/g,
         START: "start",
         CRON_EXPRESSION: "cron-expression",
         EVERY: "every",
@@ -43,6 +46,8 @@ define(function () {
         LIST: "list",
         MAPPER: "mapper",
         STORE: "store",
+        PRIMARY_KEY: "primarykey",
+        INDEX: "index",
         AGGREGATION: "aggregation",
         FUNCTION: "function",
         SINK: "sink",
@@ -55,7 +60,24 @@ define(function () {
         JOIN_QUERY: "join-query",
         PATTERN_QUERY: "pattern-query",
         SEQUENCE_QUERY: "sequence-query",
-        WINDOW_FILTER_PROJECTION_QUERY: "window-filter-projection-query"
+        WINDOW_FILTER_PROJECTION_QUERY: "window-filter-projection-query",
+        TYPE_USER_DEFINED: "user_defined",
+        TYPE_ALL: "all",
+        VALUE_ALL: "*",
+        INT: "int",
+        LONG: "long",
+        DOUBLE: "double",
+        FLOAT: "float",
+        TIME: "time",
+        BOOL: "bool",
+        TRIGGERED_TIME: "triggered_time",
+        INTERVAL: "interval",
+        RANGE: "range",
+        GROUP_BY: "group-by",
+        SIDDHI_TIME: ["seconds", "minutes", "hours","days","months","years"],
+        MINUTES: "minutes",
+        NONE: "none",
+        RETENTION_PERIOD: "retentionperiod"
     };
 
     return constants;

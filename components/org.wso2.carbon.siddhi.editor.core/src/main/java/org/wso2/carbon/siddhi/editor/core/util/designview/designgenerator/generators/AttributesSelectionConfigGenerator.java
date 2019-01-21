@@ -47,17 +47,22 @@ public class AttributesSelectionConfigGenerator extends CodeSegmentsPreserver {
      */
     public AttributesSelectionConfig generateAttributesSelectionConfig(Selector selector) {
         List<SelectedAttribute> selectedAttributes = new ArrayList<>();
-        for (OutputAttribute outputAttribute : selector.getSelectionList()) {
-            try {
-                selectedAttributes.add(generateSelectedAttribute(outputAttribute));
-            } catch (DesignGenerationException e) {
-                // Selector object has been successfully compiled by the Siddhi Compiler, but no query indexes
-                // The OutputAttribute object was a result of 'select *'
-                AllSelectionConfig allSelectionConfig = new AllSelectionConfig();
-                preserveAndBindCodeSegment(selector, allSelectionConfig);
-                return new AllSelectionConfig();
+        List<OutputAttribute> selectionList = selector.getSelectionList();
+
+        if(selectionList.isEmpty()) {
+            AllSelectionConfig allSelectionConfig = new AllSelectionConfig();
+            preserveAndBindCodeSegment(selector, allSelectionConfig);
+            return new AllSelectionConfig();
+        } else {
+            for (OutputAttribute outputAttribute : selector.getSelectionList()) {
+                try {
+                    selectedAttributes.add(generateSelectedAttribute(outputAttribute));
+                } catch (DesignGenerationException e) {
+                    //is never caught
+                }
             }
         }
+
         UserDefinedSelectionConfig userDefinedSelectionConfig = new UserDefinedSelectionConfig(selectedAttributes);
         preserveAndBindCodeSegment(selector, userDefinedSelectionConfig);
         return new UserDefinedSelectionConfig(selectedAttributes);

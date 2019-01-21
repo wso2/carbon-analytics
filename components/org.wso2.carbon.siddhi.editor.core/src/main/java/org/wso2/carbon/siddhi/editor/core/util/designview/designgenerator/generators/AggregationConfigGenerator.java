@@ -82,15 +82,18 @@ public class AggregationConfigGenerator extends CodeSegmentsPreserver {
         AnnotationConfigGenerator annotationConfigGenerator = new AnnotationConfigGenerator();
         StoreConfig storeConfig = null;
         List<String> annotationList = new ArrayList<>();
+        List<Annotation> annotationListObjects = new ArrayList<>();
         for (Annotation annotation : aggregationDefinition.getAnnotations()) {
             if (annotation.getName().equalsIgnoreCase("STORE")) {
                 storeConfig = storeConfigGenerator.generateStoreConfig(annotation);
             } else {
+                annotationListObjects.add(annotation);
                 annotationList.add(annotationConfigGenerator.generateAnnotationConfig(annotation));
             }
         }
         aggregationConfig.setStore(storeConfig);
         aggregationConfig.setAnnotationList(annotationList);
+        aggregationConfig.setAnnotationListObjects(annotationListObjects);
 
         preserveCodeSegmentsOf(annotationConfigGenerator, storeConfigGenerator, attributesSelectionConfigGenerator);
         preserveAndBindCodeSegment(aggregationDefinition, aggregationConfig);
