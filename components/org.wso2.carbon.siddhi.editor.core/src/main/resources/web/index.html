@@ -1403,7 +1403,7 @@
     {{/each}}
 </script>
 
-<script id = "aggregate-drop-down" type="text/template">
+<script id = "drop-down-template" type="text/template">
     {{#ifId id "group-by"}}
         <li>
     {{/ifId}}
@@ -1426,17 +1426,19 @@
     {{/ifId}}
 </script>
 
-<script id="aggregation-group-by-template" type = "text/template">
-    <h3> Group By </h3>
-    <label> <input type = "checkbox" id="group-by-checkbox"> Group By Attributes </label>
-    <div class="group-by-content">
-        <label> Attribute Name </label>
-        <ul class="group-by-attributes">
-            {{#each groupBy}}
-                {{> renderDropDown ../possibleGroupByAttributes}}
-            {{/each}}
-        </ul>
-        <button class="btn btn-default btn-add-group-by-attribute"> + Attribute </button>
+<script id="group-by-template" type = "text/template">
+    <div class = "define-group-by-attributes">
+        <h3> Group By </h3>
+        <label> <input type = "checkbox" id="group-by-checkbox"> Group By Attributes </label>
+        <div class="group-by-content">
+            <label> Attribute Name </label>
+            <ul class="group-by-attributes">
+                {{#each groupBy}}
+                    {{> renderDropDown ../possibleGroupByAttributes}}
+                {{/each}}
+            </ul>
+            <button class="btn btn-default btn-add-group-by-attribute"> + Attribute </button>
+        </div>
     </div>
 </script>
 

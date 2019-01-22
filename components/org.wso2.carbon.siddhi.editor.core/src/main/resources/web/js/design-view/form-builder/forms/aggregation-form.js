@@ -83,27 +83,6 @@ define(['require', 'log', 'jquery', 'lodash', 'aggregateByTimePeriod', 'querySel
             $('.store-annotation-checkbox').prop('checked', true);
         };
 
-        /**
-         * @function to render the group-by template
-         * @param {Object} possibleGroupByAttributes attributes to be shown in the drop down
-         * @param {Object} groupBy user defined group by
-         */
-        var renderGroupBy = function (possibleGroupByAttributes, groupBy) {
-            var possibleGroupByAttributes = {
-                options: possibleGroupByAttributes,
-                id: Constants.GROUP_BY
-            }
-            var groupByAttributes = {
-                groupBy: groupBy,
-                possibleGroupByAttributes: possibleGroupByAttributes
-            }
-            var raw_partial = document.getElementById('aggregate-drop-down').innerHTML;
-            Handlebars.registerPartial('renderDropDown', raw_partial);
-            var groupByTemplate = Handlebars.compile($('#aggregation-group-by-template').html());
-            var wrappedHtml = groupByTemplate(groupByAttributes);
-            $('#define-aggregate-group-by').html(wrappedHtml);
-        };
-
         //maps the user given values for group-by
         var mapUserGroupBy = function (attributes) {
             var i = 0;
@@ -113,44 +92,6 @@ define(['require', 'log', 'jquery', 'lodash', 'aggregateByTimePeriod', 'querySel
                 }).prop('selected', true);
                 i++;
             });
-        };
-
-        //to prevent multiselection of dropdowns
-        var preventMultipleSelection = function (className) {
-            var dropDown = $('.' + className + '-selection');
-            dropDown.children().prop('disabled', false);
-            dropDown.each(function () {
-                var val = this.value;
-                dropDown.not(this).children('[value="' + val + '"]').prop('disabled', true);
-            });
-        };
-
-        //to render the drop down template
-        var renderDropDown = function (className, possibleOptions, id) {
-            var possibleValues = {
-                options: possibleOptions,
-                id: id
-            }
-            var dropDownTemplate = Handlebars.compile($('#aggregate-drop-down').html());
-            var wrappedHtml = dropDownTemplate(possibleValues);
-            $(className).append(wrappedHtml);
-        };
-
-        //to validate the group-by section
-        var validateGroupBy = function () {
-            var selectedAttributes = [];
-            var isErrorOccurred = false;
-            $('.group-by-attributes li').each(function () {
-                var selectedValue = $(this).find('select').val();
-                if (selectedValue != null && selectedValue != "") {
-                    selectedAttributes.push(selectedValue);
-                }
-            });
-            if (selectedAttributes.length == 0) {
-                $('.group-by-attributes').find('.error-message:eq(0)').text('Minimum one attribute is required');
-                isErrorOccurred = true;
-            }
-            return isErrorOccurred;
         };
 
         //to validate the aggregate[interval section]
@@ -183,18 +124,6 @@ define(['require', 'log', 'jquery', 'lodash', 'aggregateByTimePeriod', 'querySel
             return isErrorOccurred;
         };
 
-        //to build the group-by attributes
-        var buildGroupBy = function () {
-            var attributes = [];
-            $('.group-by-attributes li').each(function () {
-                var selectedValue = $(this).find('select').val();
-                if (selectedValue != null && selectedValue != "") {
-                    attributes.push(selectedValue);
-                }
-            });
-            return attributes;
-        };
-
         //to build aggregate[interval] section
         var buildAggregateInterval = function () {
             var intervals = [];
@@ -207,7 +136,7 @@ define(['require', 'log', 'jquery', 'lodash', 'aggregateByTimePeriod', 'querySel
         };
 
         //to render interval or range based on user selection
-        var renderIntervalOrRange = function (selectedValue, aggregateByTimePeriod) {
+        var renderIntervalOrRange = function (self, selectedValue, aggregateByTimePeriod) {
             if (selectedValue == Constants.INTERVAL) {
                 var interval = [];
                 if (aggregateByTimePeriod) {
@@ -218,8 +147,8 @@ define(['require', 'log', 'jquery', 'lodash', 'aggregateByTimePeriod', 'querySel
                 renderInterval(Constants.SIDDHI_TIME);
             } else {
                 renderRange();
-                renderDropDown('.min-content', Constants.SIDDHI_TIME, Constants.RANGE); //min
-                renderDropDown('.max-content', Constants.SIDDHI_TIME, Constants.RANGE); //max
+                self.formUtils.renderDropDown('.min-content', Constants.SIDDHI_TIME, Constants.RANGE); //min
+                self.formUtils.renderDropDown('.max-content', Constants.SIDDHI_TIME, Constants.RANGE); //max
                 //select max to have unique time for max and min as for min sec will be selected as default
                 $('.max-content').find('.range-selection option').filter(function () {
                     return ($(this).val() == Constants.MINUTES);
@@ -272,18 +201,6 @@ define(['require', 'log', 'jquery', 'lodash', 'aggregateByTimePeriod', 'querySel
             _.forEach(intervalValues, function (interval) {
                 $('.interval-content .' + interval.toLowerCase() + '-checkbox').prop('checked', true)
             });
-        };
-
-        /**
-         * @function to show the + attribute button based on the max group-by attribute a user can select
-         * @param {Int} maxLength
-         */
-        var checkForAttributeLength = function (maxLength) {
-            if ($('.group-by-attributes li').length >= maxLength) {
-                $('.btn-add-group-by-attribute').hide();
-            } else {
-                $('.btn-add-group-by-attribute').show();
-            }
         };
 
         /**
@@ -396,32 +313,14 @@ define(['require', 'log', 'jquery', 'lodash', 'aggregateByTimePeriod', 'querySel
                     }
                 });
 
-                $('#define-aggregate-group-by').on('change', '.group-by-selection', function () {
-                    preventMultipleSelection(Constants.GROUP_BY);
-                });
-
                 $('#define-aggregate-by').on('change', '.range-selection', function () {
-                    preventMultipleSelection(Constants.RANGE);
-                });
-
-                $('#define-aggregate-group-by').on('change', '#group-by-checkbox', function () {
-                    if ($(this).is(':checked')) {
-                        $('.group-by-content').show();
-                    } else {
-                        $('.group-by-content').hide();
-                    }
+                    self.formUtils.preventMultipleSelection(Constants.RANGE);
                 });
 
                 $('.aggregation-form-container').on('click', '.btn-del-option', function () {
                     $(this).closest('li').remove();
-                    preventMultipleSelection(Constants.GROUP_BY);
-                    checkForAttributeLength(possibleAttributes.length);
-                });
-
-                $('#define-aggregate-group-by').on('click', '.btn-add-group-by-attribute', function () {
-                    renderDropDown('.group-by-attributes', possibleAttributes, Constants.GROUP_BY);
-                    preventMultipleSelection(Constants.GROUP_BY);
-                    checkForAttributeLength(possibleAttributes.length);
+                    self.formUtils.preventMultipleSelection(Constants.GROUP_BY);
+                    self.formUtils.checkForAttributeLength(possibleAttributes.length);
                 });
 
                 $('#aggregate-by-attribute').on('change', '#aggregate-by-attribute-checkbox', function () {
@@ -441,9 +340,9 @@ define(['require', 'log', 'jquery', 'lodash', 'aggregateByTimePeriod', 'querySel
                 });
 
                 $('#define-aggregate-by').on('change', '.aggregate-by-time-period-selection', function () {
-                    renderIntervalOrRange(this.value, aggregateByTimePeriod);
+                    renderIntervalOrRange(self, this.value, aggregateByTimePeriod);
                     self.formUtils.removeDeleteButtonOfFirstValue();
-                    preventMultipleSelection(Constants.RANGE);
+                    self.formUtils.preventMultipleSelection(Constants.RANGE);
                 });
 
                 if (store) {
@@ -498,19 +397,20 @@ define(['require', 'log', 'jquery', 'lodash', 'aggregateByTimePeriod', 'querySel
                 } else {
                     groupByAttributes = groupBy.slice();
                 }
-                renderGroupBy(possibleAttributes, groupByAttributes);
+                self.formUtils.renderGroupBy(possibleAttributes, groupByAttributes, 'define-aggregate-group-by');
+                self.formUtils.addEventListenersForGroupByDiv(possibleAttributes);
                 self.formUtils.removeDeleteButtonOfFirstValue();
-                checkForAttributeLength(possibleAttributes.length);
+                self.formUtils.checkForAttributeLength(possibleAttributes.length);
 
                 if (groupBy && groupBy.length != 0) {
                     mapUserGroupBy(groupByAttributes);
-                    preventMultipleSelection(Constants.GROUP_BY);
+                    self.formUtils.preventMultipleSelection(Constants.GROUP_BY);
                     $("#group-by-checkbox").prop("checked", true);
                 } else {
                     $('.group-by-content').hide();
                 }
 
-                renderDropDown('.aggregate-by-attribute-content', possibleAttributes,
+                self.formUtils.renderDropDown('.aggregate-by-attribute-content', possibleAttributes,
                     Constants.ATTRIBUTE);
 
                 if (!aggregateByAttribute || aggregateByAttribute == "") {
@@ -532,9 +432,9 @@ define(['require', 'log', 'jquery', 'lodash', 'aggregateByTimePeriod', 'querySel
                     }).prop('selected', true);
                 }
 
-                renderIntervalOrRange(aggregateByTimePeriodType, aggregateByTimePeriod);
+                renderIntervalOrRange(self, aggregateByTimePeriodType, aggregateByTimePeriod);
                 self.formUtils.removeDeleteButtonOfFirstValue();
-                preventMultipleSelection(Constants.RANGE);
+                self.formUtils.preventMultipleSelection(Constants.RANGE);
 
                 $(formContainer).on('click', '#btn-submit', function () {
 
@@ -596,7 +496,7 @@ define(['require', 'log', 'jquery', 'lodash', 'aggregateByTimePeriod', 'querySel
                     }
 
                     if ($('#group-by-checkbox').is(':checked')) {
-                        if (validateGroupBy()) {
+                        if (self.formUtils.validateGroupBy()) {
                             isErrorOccurred = true;
                             return;
                         }
@@ -667,7 +567,7 @@ define(['require', 'log', 'jquery', 'lodash', 'aggregateByTimePeriod', 'querySel
                         clickedElement.setSelect(selectObject);
 
                         if ($('#group-by-checkbox').is(':checked')) {
-                            var groupByAttributes = buildGroupBy();
+                            var groupByAttributes = self.formUtils.buildGroupBy();
                             clickedElement.setGroupBy(groupByAttributes);
                         } else {
                             clickedElement.setGroupBy(undefined);

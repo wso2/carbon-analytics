@@ -363,7 +363,7 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
          */
         FormUtils.prototype.renderUserDefinedAttributeSelection = function (attributes) {
             var self = this;
-            var raw_partial = document.getElementById('aggregate-drop-down').innerHTML;
+            var raw_partial = document.getElementById('drop-down-template').innerHTML;
             Handlebars.registerPartial('renderDropDown', raw_partial);
             var userDefinedAttributeTemplate = Handlebars.compile($('#select-user-defined-attribute-template').html());
             var wrappedHtml = userDefinedAttributeTemplate(attributes);
@@ -425,6 +425,19 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
             });
             $('#' + id + '-options-div').html(wrappedHtml);
             self.changeCustomizedOptDiv(id);;
+        };
+
+        /**
+         * @function to render the drop-down template
+         */
+        FormUtils.prototype.renderDropDown = function (className, possibleOptions, id) {
+            var possibleValues = {
+                options: possibleOptions,
+                id: id
+            }
+            var dropDownTemplate = Handlebars.compile($('#drop-down-template').html());
+            var wrappedHtml = dropDownTemplate(possibleValues);
+            $(className).append(wrappedHtml);
         };
 
         /**
@@ -748,6 +761,25 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
                 }
             });
             return isError;
+        };
+
+        /**
+         * @function to validate the group-by attributes
+         */
+        FormUtils.prototype.validateGroupBy = function () {
+            var selectedAttributes = [];
+            var isErrorOccurred = false;
+            $('.group-by-attributes li').each(function () {
+                var selectedValue = $(this).find('select').val();
+                if (selectedValue != null && selectedValue != "") {
+                    selectedAttributes.push(selectedValue);
+                }
+            });
+            if (selectedAttributes.length == 0) {
+                $('.group-by-attributes').find('.error-message:eq(0)').text('Minimum one attribute is required');
+                isErrorOccurred = true;
+            }
+            return isErrorOccurred;
         };
 
         /**
@@ -1534,6 +1566,29 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
         };
 
         /**
+		 * @function to render the group-by template
+		 * @param {Object} possibleGroupByAttributes attributes to be shown in the drop down
+		 * @param {Object} groupBy user defined group by
+		 * @param {String} id of the division
+		 */
+        FormUtils.prototype.renderGroupBy = function (possibleGroupByAttributes, groupBy, id) {
+            var possibleGroupByAttributes = {
+                options: possibleGroupByAttributes,
+                id: Constants.GROUP_BY
+            }
+            var groupByAttributes = {
+                groupBy: groupBy,
+                possibleGroupByAttributes: possibleGroupByAttributes
+            }
+            var raw_partial = document.getElementById('drop-down-template').innerHTML;
+            Handlebars.registerPartial('renderDropDown', raw_partial);
+            var groupByTemplate = Handlebars.compile($('#group-by-template').html());
+            var wrappedHtml = groupByTemplate(groupByAttributes);
+            $('#' + id).html(wrappedHtml);
+        };
+
+
+        /**
          * @function to build the annotations
          * @param {Object} annotationNodes array of nodes which needs to be constructed
          * @param {Object} annotationStringList array to add the built annotation strings
@@ -1618,6 +1673,20 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
             } else {
                 return false;
             }
+        };
+
+        /**
+         * @function to build the group-by attributes
+         */
+        FormUtils.prototype.buildGroupBy = function () {
+            var attributes = [];
+            $('.group-by-attributes li').each(function () {
+                var selectedValue = $(this).find('select').val();
+                if (selectedValue != null && selectedValue != "") {
+                    attributes.push(selectedValue);
+                }
+            });
+            return attributes;
         };
 
         /**
@@ -1732,6 +1801,30 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
                     $("#btn-add-key-val").hide();
                     tree.deselect_all();
                 }
+            });
+        };
+
+        /**
+         * @function to add event listeners for the group by div
+         */
+        FormUtils.prototype.addEventListenersForGroupByDiv = function (possibleAttributes) {
+            var self = this;
+            $('.define-group-by-attributes').on('change', '#group-by-checkbox', function () {
+                if ($(this).is(':checked')) {
+                    $('.group-by-content').show();
+                } else {
+                    $('.group-by-content').hide();
+                }
+            });
+
+            $('.define-group-by-attributes').on('click', '.btn-add-group-by-attribute', function () {
+                self.renderDropDown('.group-by-attributes', possibleAttributes, Constants.GROUP_BY);
+                self.preventMultipleSelection(Constants.GROUP_BY);
+                self.checkForAttributeLength(possibleAttributes.length);
+            });
+
+            $('.define-group-by-attributes').on('change', '.group-by-selection', function () {
+                self.preventMultipleSelection(Constants.GROUP_BY);
             });
         };
 
@@ -1966,6 +2059,28 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
         //to hide the customized option section
         FormUtils.prototype.hideCustomizedOptionsDiv = function () {
             $('.customized-options').remove();
+        };
+
+        //to prevent multi-selection of dropdown
+        FormUtils.prototype.preventMultipleSelection = function (className) {
+            var dropDown = $('.' + className + '-selection');
+            dropDown.children().prop('disabled', false);
+            dropDown.each(function () {
+                var val = this.value;
+                dropDown.not(this).children('[value="' + val + '"]').prop('disabled', true);
+            });
+        };
+
+		/**
+		 * @function to show the + attribute button based on the max group-by attribute a user can select
+		 * @param {Int} maxLength
+		 */
+        FormUtils.prototype.checkForAttributeLength = function (maxLength) {
+            if ($('.group-by-attributes li').length >= maxLength) {
+                $('.btn-add-group-by-attribute').hide();
+            } else {
+                $('.btn-add-group-by-attribute').show();
+            }
         };
 
         /**
