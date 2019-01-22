@@ -92,7 +92,7 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'jsonValidator', 'con
                             foundPredefined = true;
                             _.forEach(predefinedAnnotation.elements, function (predefinedAnnotationElement) {
                                 _.forEach(savedAnnotation.elements, function (savedAnnotationElement) {
-                                    if (predefinedAnnotationElement.name.toLowerCase() == savedAnnotationElement.name
+                                    if (predefinedAnnotationElement.name.toLowerCase() == savedAnnotationElement.key
                                         .toLowerCase()) {
                                         //if an optional property is found push it to the checkedAnnotations[]
                                         if (!predefinedAnnotationElement.isMandatory) {
