@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2017, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+ * Copyright (c) 2019, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
  *
  * WSO2 Inc. licenses this file to you under the Apache License,
  * Version 2.0 (the "License"); you may not use this file except
@@ -48,14 +48,16 @@ define(['require', 'lodash', 'jquery', 'log', 'backbone', 'file_browser', 'works
                     "</div>");
             } else {
                 serverListHtml.push("<div class='select-boxes' id='select-boxes'>" +
-                    "<input type='checkbox' id='select-all-servers' name='select-all-servers' onclick='selectAllServers(this)'>" +
+                    "<input type='checkbox' id='select-all-servers' name='select-all-servers' " +
+                    "onclick='selectAllServers(this)'>" +
                     "<div class='divider'/>Select All" +
                     "</div>");
             }
 
             for (var i = 0; i < inMemoryList.length; i++) {
                 serverListHtml.push('<div class="server-block" id="server-block">' +
-                    '<input type="checkbox" name="server-credentials" id="check' + i + '" class="server-credentials" onclick="clickedState(this)">' +
+                    '<input type="checkbox" name="server-credentials" id="check' + i + '" class="server-credentials" ' +
+                    'onclick="clickedState(this)">' +
                     '<div class="toggle-divider"/>' +
                     '<div class="host">' + inMemoryList[i].host + ':' + inMemoryList[i].port +
                     '</div>' +
@@ -66,7 +68,8 @@ define(['require', 'lodash', 'jquery', 'log', 'backbone', 'file_browser', 'works
                     '<div class="credentials-password">' + inMemoryList[i].password +
                     '</div>' +
                     '<div class="toggle-divider"/>' +
-                    '<button id="' + i + '" type="button" class="delete-button" onclick="deleteServer(\'' + i + '\')">' +
+                    '<button id="' + i + '" type="button" class="delete-button" ' +
+                    'onclick="deleteServer(\'' + i + '\')">' +
                     '</button>' +
                     '</div>' +
                     '<div class="row-divider">' +
@@ -116,19 +119,22 @@ define(['require', 'lodash', 'jquery', 'log', 'backbone', 'file_browser', 'works
             var serverList = '<div>' +
                 '</div>';
             if (inMemoryList.length == 0) {
-                serverList = serverList + "<div id='add-server-alert' class='add-server-alert'>Add one or more servers" +
+                serverList = serverList + "<div id='add-server-alert' " +
+                    "class='add-server-alert'>Add one or more servers" +
                     "</div>";
             } else {
                 serverList = serverList +
                     "<div class='select-boxes' id='select-boxes'>" +
-                    "<input type='checkbox' id='select-all-servers' name='select-all-servers' onclick='selectAllServers(this)'>" +
+                    "<input type='checkbox' id='select-all-servers' name='select-all-servers' " +
+                    "onclick='selectAllServers(this)'>" +
                     "<div class='divider'/>Select All" +
                     "</div>";
             }
 
             for (var i = 0; i < inMemoryList.length; i++) {
                 serverList = serverList + '<div class="server-block" id="server-block">' +
-                    '<input type="checkbox"git  name="server-credentials" id="check' + i + '" class="server-credentials" onclick="clickedState(this)">' +
+                    '<input type="checkbox"git  name="server-credentials" id="check' + i + '" ' +
+                    'class="server-credentials" onclick="clickedState(this)">' +
                     '<div class="toggle-divider"/>' +
                     '<div class="host">' + inMemoryList[i].host + ' : ' + inMemoryList[i].port +
                     '</div>' +
@@ -139,7 +145,8 @@ define(['require', 'lodash', 'jquery', 'log', 'backbone', 'file_browser', 'works
                     '<div class="credentials-password">' + inMemoryList[i].password +
                     '</div>' +
                     '<div class="toggle-divider"/>' +
-                    '<button id="' + i + '" type="button" class="delete-button" onclick="deleteServer(\'' + i + '\')">' +
+                    '<button id="' + i + '" type="button" class="delete-button" ' +
+                    'onclick="deleteServer(\'' + i + '\')">' +
                     '</button>' +
                     '</div>' +
                     '<div class="row-divider">' +
@@ -234,7 +241,8 @@ define(['require', 'lodash', 'jquery', 'log', 'backbone', 'file_browser', 'works
                         "<div class='file-dialog-form-new-sever-container-toggle-divider'/>" +
                         "<input class='add-new-server-input' id='new_user_name' placeholder='User Name'>" +
                         "<div class='file-dialog-form-new-sever-container-toggle-divider'/>" +
-                        "<input class='file-dialog-form-toggle-password' id='new_password' placeholder='Password' type='password'>" +
+                        "<input class='file-dialog-form-toggle-password' id='new_password' placeholder='Password' " +
+                        "type='password'>" +
                         "<div class='file-dialog-form-new-sever-container-toggle-divider'/>" +
                         "<button id='addNew' type='button' class='add-new-button'>Add" +
                         "</button>" +
@@ -257,7 +265,8 @@ define(['require', 'lodash', 'jquery', 'log', 'backbone', 'file_browser', 'works
                         "</div>" +
                         "<div class='loader-deployment' id='loader-deployment' style='display: none'>" +
                         "</div>" +
-                        "<div class='deployment-status-title-container' id='deployment-status-title-container' style='display: none'>" +
+                        "<div class='deployment-status-title-container' id='deployment-status-title-container' " +
+                        "style='display: none'>" +
                         "<div class='deployment-status-title'>Deployment Status" +
                         "</div>" +
                         "<div class='vertical-divider'>" +
@@ -356,18 +365,21 @@ define(['require', 'lodash', 'jquery', 'log', 'backbone', 'file_browser', 'works
                         var serverListHtml = [];
 
                         if (inMemoryList.length == 0) {
-                            serverListHtml.push("<div id='add-server-alert' class='add-server-alert'>Add one or more servers" +
+                            serverListHtml.push("<div id='add-server-alert' " +
+                                "class='add-server-alert'>Add one or more servers" +
                                 "</div>");
                         } else {
                             serverListHtml.push("<div class='select-boxes' id='select-boxes'>" +
-                                "<input type='checkbox' id='select-all-servers' name='select-all-servers' onclick='selectAllServers(this)'>" +
+                                "<input type='checkbox' id='select-all-servers' name='select-all-servers' " +
+                                "onclick='selectAllServers(this)'>" +
                                 "<div class='divider'/>Select All" +
                                 "</div>");
                         }
 
                         for (var i = 0; i < inMemoryList.length; i++) {
                             serverListHtml.push('<div class="server-block" id="server-block">' +
-                                '<input type="checkbox"git  name="server-credentials" id="check' + i + '" class="server-credentials" onclick="clickedState(this)">' +
+                                '<input type="checkbox"git  name="server-credentials" id="check' + i + '" ' +
+                                'class="server-credentials" onclick="clickedState(this)">' +
                                 '<div class="toggle-divider"/>' +
                                 '<div class="host">' + inMemoryList[i].host + ' : ' + inMemoryList[i].port +
                                 '</div>' +
@@ -378,7 +390,8 @@ define(['require', 'lodash', 'jquery', 'log', 'backbone', 'file_browser', 'works
                                 '<div class="credentials-password">' + inMemoryList[i].password +
                                 '</div>' +
                                 '<div class="toggle-divider"/>' +
-                                '<button id="' + i + '" type="button" class="delete-button" onclick="deleteServer(\'' + i + '\')">' +
+                                '<button id="' + i + '" type="button" class="delete-button" ' +
+                                'onclick="deleteServer(\'' + i + '\')">' +
                                 '</button>' +
                                 '</div>' +
                                 '<div class="row-divider">' +

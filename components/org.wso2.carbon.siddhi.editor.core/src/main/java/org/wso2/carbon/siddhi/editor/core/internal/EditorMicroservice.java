@@ -21,10 +21,10 @@ package org.wso2.carbon.siddhi.editor.core.internal;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
-import com.google.gson.JsonArray;
 import com.google.gson.JsonPrimitive;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
@@ -366,7 +366,7 @@ public class EditorMicroservice implements Microservice {
         JsonArray failure = new JsonArray();
         JsonObject deploymentStatus = new JsonObject();
 
-        Integer siddhiFilesCount = element.getAsJsonObject().getAsJsonArray("siddhiFileList").size();
+        Integer siddhiFilesCount = element.getAsJsonObject().getAsJsonArray(Constants.SIDDHI_FILE_LIST).size();
         Integer serverListCount = element.getAsJsonObject().getAsJsonArray("serverList").size();
         String location = (Paths.get(Constants.RUNTIME_PATH,
                 Constants.DIRECTORY_DEPLOYMENT, Constants.DIRECTORY_WORKSPACE)).toString();
@@ -374,32 +374,39 @@ public class EditorMicroservice implements Microservice {
         SiddhiAppApiHelper siddhiAppApiHelper = new SiddhiAppApiHelper();
 
         for (int i = 0; i < siddhiFilesCount; i++) {
-            String fileName = element.getAsJsonObject().getAsJsonArray("siddhiFileList").get(i).getAsJsonObject().get("fileName").toString().replaceAll("\"", "");
-            String sidhiFile = new String((Files.readAllBytes(Paths.get(location + "/" + fileName))), "UTF-8");
+            String fileName = element.getAsJsonObject().getAsJsonArray(Constants.SIDDHI_FILE_LIST).get(i).
+                    getAsJsonObject().get(Constants.SIDDHI_APP_NAME).toString().replaceAll("\"", "");
+            String sidhiFile = new String((Files.readAllBytes(Paths.
+                    get(location + "/" + fileName))), "UTF-8");
             for (int x = 0; x < serverListCount; x++) {
-                String host = element.getAsJsonObject().getAsJsonArray("serverList").get(x).getAsJsonObject().get("host").toString().replaceAll("\"", "");
-                String port = element.getAsJsonObject().getAsJsonArray("serverList").get(x).getAsJsonObject().get("port").toString().replaceAll("\"", "");
+                String host = element.getAsJsonObject().getAsJsonArray(Constants.SERVER_LIST).get(x).
+                        getAsJsonObject().get(Constants.DEPLOYMENT_HOST).toString().replaceAll("\"",
+                        "");
+                String port = element.getAsJsonObject().getAsJsonArray(Constants.SERVER_LIST).get(x).
+                        getAsJsonObject().get(Constants.DEPLOYMENT_PORT).toString().replaceAll("\"",
+                        "");
                 String hostAndPort = host + ":" + port;
-                String username = element.getAsJsonObject().getAsJsonArray("serverList").get(x).getAsJsonObject().get("username").toString().replaceAll("\"", "");
-                String password = element.getAsJsonObject().getAsJsonArray("serverList").get(x).getAsJsonObject().get("password").toString().replaceAll("\"", "");
+                String username = element.getAsJsonObject().getAsJsonArray(Constants.SERVER_LIST).get(x).
+                        getAsJsonObject().get(Constants.DEPLOYMENT_USERNAME).toString().replaceAll("\"",
+                        "");
+                String password = element.getAsJsonObject().getAsJsonArray(Constants.SERVER_LIST).get(x).
+                        getAsJsonObject().get(Constants.DEPLOYMENT_PASSWORD).toString().replaceAll("\"", "");
                 try {
-                    boolean response = siddhiAppApiHelper.deploySiddhiApp(hostAndPort, username, password, sidhiFile, fileName);
+                    boolean response = siddhiAppApiHelper.
+                            deploySiddhiApp(hostAndPort, username, password, sidhiFile, fileName);
                     if (response == true) {
-                        String state = fileName + " was successfully deployed to " + hostAndPort;
-                        System.out.println(state);
-                        JsonPrimitive status = new JsonPrimitive(fileName + " was successfully deployed to " + hostAndPort);
+                        JsonPrimitive status = new JsonPrimitive(fileName + " was successfully deployed to " +
+                                hostAndPort);
                         success.add(status);
                     }
                 } catch (SiddhiAppsApiHelperException e) {
-                    System.out.println(e);
-                    JsonPrimitive status = new JsonPrimitive(String.valueOf(e));
+                    JsonPrimitive status = new JsonPrimitive(String.valueOf(e.getMessage()));
                     failure.add(status);
                 }
             }
         }
         deploymentStatus.add("success", success);
         deploymentStatus.add("failure", failure);
-        System.out.println("sssssssssssss" + deploymentStatus);
         return deploymentStatus;
     }
 

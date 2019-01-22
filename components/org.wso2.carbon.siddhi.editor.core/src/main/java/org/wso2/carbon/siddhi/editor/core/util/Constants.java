@@ -44,6 +44,13 @@ public class Constants {
     public static final String DIRECTORY_SAMPLE = "samples";
     public static final String DIRECTORY_ARTIFACTS = "artifacts";
     public static final String SIDDHI_APP_FILE_EXTENSION = ".siddhi";
+    public static final String SIDDHI_APP_NAME = "fileName";
+    public static final String DEPLOYMENT_HOST = "host";
+    public static final String DEPLOYMENT_PORT = "port";
+    public static final String DEPLOYMENT_USERNAME = "username";
+    public static final String DEPLOYMENT_PASSWORD = "password";
+    public static final String SIDDHI_FILE_LIST = "siddhiFileList";
+    public static final String SERVER_LIST = "serverList";
     static final String FUNCTION_EXECUTOR = "FunctionExecutor";
     static final String ATTRIBUTE_AGGREGATOR = "AttributeAggregator";
     static final String WINDOW_PROCESSOR = "WindowProcessor";
