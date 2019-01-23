@@ -5,7 +5,7 @@ var timeToObj;
 
 function getArbitraryFields(rowData) {
     var $img =
-            $('<img src="/carbon/dataexplorer/themes/metro/list_metro.png" title="Show Arbitrary Fields / Extended Fields"/>');
+            $('<img src="themes/metro/list_metro.png" title="Show Arbitrary Fields / Extended Fields"/>');
     $img.click(function () {
         $('#AnalyticsTableContainer').jtable('openChildTable', $img.closest('tr'), //Parent row
                 {
@@ -63,7 +63,7 @@ function escapeHtml (string) {
 function arbitraryFieldListActionMethod(postData, jtParams) {
     return $.Deferred(function ($dfd) {
         $.ajax({
-                    url: '/carbon/dataexplorer/dataexplorer_ajaxprocessor.jsp?type=' + typeListArbitraryRecord,
+                    url: 'dataexplorer_ajaxprocessor.jsp?type=' + typeListArbitraryRecord,
                     type: 'POST',
                     dataType: 'json',
                     data: postData,
@@ -130,7 +130,7 @@ function listActionMethod(jtParams) {
 
     return $.Deferred(function ($dfd) {
         $.ajax({
-                    url: '/carbon/dataexplorer/dataexplorer_ajaxprocessor.jsp?type=' + typeListRecord,
+                    url: 'dataexplorer_ajaxprocessor.jsp?type=' + typeListRecord,
                     type: 'POST',
                     dataType: 'json',
                     data: postData,
@@ -192,7 +192,7 @@ function scheduleDataPurge() {
             return false;
         }
     }
-    $.post('/carbon/dataexplorer/dataexplorer_ajaxprocessor.jsp?type=' + typeSavePurgingTask,
+    $.post('dataexplorer_ajaxprocessor.jsp?type=' + typeSavePurgingTask,
             {
                 tableName: $("#tableSelect").val(),
                 cron: $('#dataPurgingScheudleTime').val(),
@@ -242,7 +242,7 @@ function loadFacetNames() {
     $('#facetSearchTable tr').remove();
     $('#facetListSelect').find('option:gt(0)').remove();
     document.getElementById('radioQuery').style.display = '';
-    $.get('/carbon/dataexplorer/dataexplorer_ajaxprocessor.jsp?type=' + typeGetFacetNameList + '&tableName=' + $("#tableSelect").val(),
+    $.get('dataexplorer_ajaxprocessor.jsp?type=' + typeGetFacetNameList + '&tableName=' + $("#tableSelect").val(),
           function (result) {
               var resultObj = jQuery.parseJSON(result);
               var facetNames = "";
@@ -259,7 +259,7 @@ function checkTotalCountSupport() {
     $('#facetSearchTable tr').remove();
     $('#facetListSelect').find('option:gt(0)').remove();
     document.getElementById('radioQuery').style.display = '';
-    $.get('/carbon/dataexplorer/dataexplorer_ajaxprocessor.jsp?type=' + typeCheckTotalCount + '&tableName=' + $("#tableSelect").val(),
+    $.get('dataexplorer_ajaxprocessor.jsp?type=' + typeCheckTotalCount + '&tableName=' + $("#tableSelect").val(),
           function (result) {
               if (result.trim() != 'true') {
                   document.getElementById('resultCount').style.display = '';
@@ -271,7 +271,7 @@ function checkTotalCountSupport() {
 
 function loadPrimaryKeys() {
     $('#primaryKeyTable tr').remove();
-    $.get('/carbon/dataexplorer/dataexplorer_ajaxprocessor.jsp?type=' + typeGetPrymaryKeyList + '&tableName=' + $("#tableSelect").val(),
+    $.get('dataexplorer_ajaxprocessor.jsp?type=' + typeGetPrymaryKeyList + '&tableName=' + $("#tableSelect").val(),
           function (result) {
               var resultObj = jQuery.parseJSON(result);
               $(resultObj).each(function (key, columnName) {
