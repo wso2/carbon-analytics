@@ -19,6 +19,8 @@ define(['log', 'jquery', 'lodash', 'output_console_list', 'workspace', 'service_
 
     function (log, $, _, ConsoleList, Workspace, ServiceConsole) {
 
+        const CONSOLE_TYPE_FORM = "FORM";
+        const CONSOLE_TYPE_DEBUG = "DEBUG";
         var OutputConsoleList = ConsoleList.extend(
             /** @lends ConsoleList.prototype */
             {
@@ -45,15 +47,20 @@ define(['log', 'jquery', 'lodash', 'output_console_list', 'workspace', 'service_
                         self.application.commandManager.dispatch(_.get(self._options, 'commandClearConsole.id'));
                     });
                     if (this.application.isRunningOnMacOS()) {
-                        this._activateBtn.attr("title", "Output Console (" + _.get(self._options, 'command.shortcuts.mac.label') + ") ").tooltip();
+                        this._activateBtn.attr("title", "Output Console (" + _.get(self._options,
+                            'command.shortcuts.mac.label') + ") ").tooltip();
                     } else {
-                        this._activateBtn.attr("title", "Output Console  (" + _.get(self._options, 'command.shortcuts.other.label') + ") ").tooltip();
+                        this._activateBtn.attr("title", "Output Console  (" + _.get(self._options,
+                            'command.shortcuts.other.label') + ") ").tooltip();
                     }
                     // register command
-                    this.application.commandManager.registerCommand(options.command.id, {shortcuts: options.command.shortcuts});
+                    this.application.commandManager.registerCommand(options.command.id,
+                        {shortcuts: options.command.shortcuts});
                     this.application.commandManager.registerHandler(options.command.id, this.toggleOutputConsole, this);
-                    this.application.commandManager.registerCommand(options.commandClearConsole.id, {shortcuts: options.commandClearConsole.shortcuts});
-                    this.application.commandManager.registerHandler(options.commandClearConsole.id, this.clearConsole, this);
+                    this.application.commandManager.registerCommand(options.commandClearConsole.id,
+                        {shortcuts: options.commandClearConsole.shortcuts});
+                    this.application.commandManager.registerHandler(options.commandClearConsole.id,
+                        this.clearConsole, this);
                 },
                 isActive: function () {
                     return this._activateBtn.parent('li').hasClass('active');
@@ -97,7 +104,7 @@ define(['log', 'jquery', 'lodash', 'output_console_list', 'workspace', 'service_
                     ConsoleList.prototype.addConsole.call(this, console);
                 },
                 removeConsole: function (console) {
-                    if (self.activeConsole.options._type === "FORM") {
+                    if (self.activeConsole.options._type === CONSOLE_TYPE_FORM) {
                         $(self.activeConsole).trigger('close-button-in-form-clicked');
                     } else {
                         var commandManager = _.get(this, 'options.application.commandManager');
@@ -105,17 +112,7 @@ define(['log', 'jquery', 'lodash', 'output_console_list', 'workspace', 'service_
                         var remove = function () {
                             ConsoleList.prototype.removeConsole.call(self, console);
                             if (console instanceof ServiceConsole) {
-//                          _.remove(self._workingFileSet, function(fileID){
-//                              return _.isEqual(fileID, tab.getFile().id);
-//                          });
                                 console.trigger('console-removed');
-//                          self.getBrowserStorage().destroy(tab.getFile());
-//                          self.getBrowserStorage().put('workingFileSet', self._workingFileSet);
-//                          // open welcome page upon last tab close
-//                          if(_.isEmpty(self.getTabList())){
-//                              var commandManager = _.get(self, 'options.application.commandManager');
-//                              commandManager.dispatch("go-to-welcome-page");
-//                          }
                             }
                         };
 
@@ -127,18 +124,17 @@ define(['log', 'jquery', 'lodash', 'output_console_list', 'workspace', 'service_
                     return ConsoleList.prototype.newConsole.call(this, options);
                 },
                 getBrowserStorage: function () {
-                    //return _.get(this, 'options.application.browserStorage');
                 },
                 hasFilesInWorkingSet: function () {
                     return !_.isEmpty(this._workingFileSet);
                 },
                 getConsoleForType: function (type, uniqueId) {
                     return _.find(this._consoles, function (console) {
-                        if (type === "DEBUG") {
+                        if (type === CONSOLE_TYPE_DEBUG) {
                             if (console._uniqueId === uniqueId) {
                                 return console;
                             }
-                        } else if (type === "FORM") {
+                        } else if (type === CONSOLE_TYPE_FORM) {
                             if (console._uniqueId === uniqueId) {
                                 return console;
                             }
@@ -151,12 +147,8 @@ define(['log', 'jquery', 'lodash', 'output_console_list', 'workspace', 'service_
                     });
                 },
                 hideAllConsoles: function () {
-                    if (this.activeConsole != undefined && this.activeConsole.options._type === "FORM") {
-                        $(this.activeConsole).trigger('close-button-in-form-clicked');
-                    } else {
-                        ConsoleList.prototype.hideConsoleComponents.call(this);
-                        this._activateBtn.parent('li').removeClass('active');
-                    }
+                    ConsoleList.prototype.hideConsoleComponents.call(this);
+                    this._activateBtn.parent('li').removeClass('active');
                 },
                 showAllConsoles: function () {
                     ConsoleList.prototype.showConsoleComponents.call(this);

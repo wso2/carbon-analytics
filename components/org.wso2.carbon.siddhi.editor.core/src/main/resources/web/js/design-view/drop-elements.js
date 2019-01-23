@@ -27,6 +27,9 @@ define(['require', 'log', 'lodash', 'jquery', 'partition', 'stream', 'query', 'f
          * @class DesignView  Wraps the Ace editor for design view
          * @param {Object} options Rendering options for the view
          */
+
+        const ENTER_KEY = 13;
+
         var DropElements = function (options) {
             var errorMessage = 'unable to find design view container';
             if (!_.has(options, 'container')) {
@@ -84,13 +87,13 @@ define(['require', 'log', 'lodash', 'jquery', 'partition', 'stream', 'query', 'f
             node.attr('id', i + "-nodeInitial");
             node.attr('class', "sourceNameNode");
 
-            var nodeId = $("#" + i)[0];
-            nodeId.addEventListener("dblclick", function () {
+            var nodeId = $('#' + i)[0];
+            nodeId.addEventListener('dblclick', function () {
                 self.formBuilder.GeneratePropertiesFormForSources(this.children)
             });
 
-            $("#" + i).on('keydown', function (key) {
-                if (key.keyCode == 13) {
+            $('#' + i).on('keydown', function (key) {
+                if (key.keyCode == ENTER_KEY) {
                     self.formBuilder.GeneratePropertiesFormForSources(this.children)
                 }
             });
@@ -170,13 +173,13 @@ define(['require', 'log', 'lodash', 'jquery', 'partition', 'stream', 'query', 'f
             node.attr('id', i + "-nodeInitial");
             node.attr('class', "sinkNameNode");
 
-            var nodeId = $("#" + i + "")[0];
-            nodeId.addEventListener("dblclick", function () {
+            var nodeId = $('#' + i)[0];
+            nodeId.addEventListener('dblclick', function () {
                 self.formBuilder.GeneratePropertiesFormForSinks(this.children)
             });
 
-            $("#" + i).on('keydown', function (key) {
-                if (key.keyCode == 13) {
+            $('#' + i).on('keydown', function (key) {
+                if (key.keyCode == ENTER_KEY) {
                     self.formBuilder.GeneratePropertiesFormForSinks(this.children)
                 }
             });
@@ -266,13 +269,13 @@ define(['require', 'log', 'lodash', 'jquery', 'partition', 'stream', 'query', 'f
             node.attr('id', i + "-nodeInitial");
             node.attr('class', "streamNameNode");
 
-            var nodeId = $("#" + i + "")[0];
-            nodeId.addEventListener("dblclick", function () {
+            var nodeId = $('#' + i)[0];
+            nodeId.addEventListener('dblclick', function () {
                 self.formBuilder.GeneratePropertiesFormForStreams(this.children)
             });
 
-            $("#" + i).on('keydown', function (key) {
-                if (key.keyCode == 13) {
+            $('#' + i).on('keydown', function (key) {
+                if (key.keyCode == ENTER_KEY) {
                     self.formBuilder.GeneratePropertiesFormForStreams(this.children)
                 }
             });
@@ -353,7 +356,7 @@ define(['require', 'log', 'lodash', 'jquery', 'partition', 'stream', 'query', 'f
             });
             if (!isStreamNameUsed) {
                 elementID = self.designGrid.getNewAgentId();
-                var newAgent = $('<div>').attr('id', elementID).addClass('streamDrop').addAttribute();
+                var newAgent = $('<div>').attr('id', elementID).addClass('streamDrop');
                 $(self.container).append(newAgent);
 
                 // drop the stream
@@ -422,13 +425,13 @@ define(['require', 'log', 'lodash', 'jquery', 'partition', 'stream', 'query', 'f
             node.attr('id', i + "-nodeInitial");
             node.attr('class', "tableNameNode");
 
-            var nodeId = $("#" + i + "")[0];
-            nodeId.addEventListener("dblclick", function () {
+            var nodeId = $('#' + i)[0];
+            nodeId.addEventListener('dblclick', function () {
                 self.formBuilder.GeneratePropertiesFormForTables(this.children)
             });
 
-            $("#" + i).on('keydown', function (key) {
-                if (key.keyCode == 13) {
+            $('#' + i).on('keydown', function (key) {
+                if (key.keyCode == ENTER_KEY) {
                     self.formBuilder.GeneratePropertiesFormForTables(this.children)
                 }
             });
@@ -519,13 +522,13 @@ define(['require', 'log', 'lodash', 'jquery', 'partition', 'stream', 'query', 'f
             node.attr('id', i + "-nodeInitial");
             node.attr('class', "windowNameNode");
 
-            var nodeId = $("#" + i + "")[0];
-            nodeId.addEventListener("dblclick", function () {
+            var nodeId = $('#' + i)[0];
+            nodeId.addEventListener('dblclick', function () {
                 self.formBuilder.GeneratePropertiesFormForWindows(this.children)
             });
 
-            $("#" + i).on('keydown', function (key) {
-                if (key.keyCode == 13) {
+            $('#' + i).on('keydown', function (key) {
+                if (key.keyCode == ENTER_KEY) {
                     self.formBuilder.GeneratePropertiesFormForWindows(this.children)
                 }
             });
@@ -616,13 +619,13 @@ define(['require', 'log', 'lodash', 'jquery', 'partition', 'stream', 'query', 'f
             node.attr('id', i + "-nodeInitial");
             node.attr('class', "triggerNameNode");
 
-            var nodeId = $("#" + i + "")[0];
-            nodeId.addEventListener("dblclick", function () {
+            var nodeId = $('#' + i)[0];
+            nodeId.addEventListener('dblclick', function () {
                 self.formBuilder.GeneratePropertiesFormForTriggers(this.children)
             });
 
-            $("#" + i).on('keydown', function (key) {
-                if (key.keyCode == 13) {
+            $('#' + i).on('keydown', function (key) {
+                if (key.keyCode == ENTER_KEY) {
                     self.formBuilder.GeneratePropertiesFormForTriggers(this.children)
                 }
             });
@@ -717,13 +720,13 @@ define(['require', 'log', 'lodash', 'jquery', 'partition', 'stream', 'query', 'f
             node.attr('id', i + "-nodeInitial");
             node.attr('class', "aggregationNameNode");
 
-            var nodeId = $("#" + i + "")[0];
-            nodeId.addEventListener("dblclick", function () {
+            var nodeId = $('#' + i)[0];
+            nodeId.addEventListener('dblclick', function () {
                 self.formBuilder.GeneratePropertiesFormForAggregations(this.children)
             });
 
-            $("#" + i).on('keydown', function (key) {
-                if (key.keyCode == 13) {
+            $('#' + i).on('keydown', function (key) {
+                if (key.keyCode == ENTER_KEY) {
                     self.formBuilder.GeneratePropertiesFormForAggregations(this.children)
                 }
             });
@@ -818,13 +821,13 @@ define(['require', 'log', 'lodash', 'jquery', 'partition', 'stream', 'query', 'f
             node.attr('id', i + "-nodeInitial");
             node.attr('class', "functionNameNode");
 
-            var nodeId = $("#" + i + "")[0];
-            nodeId.addEventListener("dblclick", function () {
+            var nodeId = $('#' + i)[0];
+            nodeId.addEventListener('dblclick', function () {
                 self.formBuilder.GeneratePropertiesFormForFunctions(this.children)
             });
 
-            $("#" + i).on('keydown', function (key) {
-                if (key.keyCode == 13) {
+            $('#' + i).on('keydown', function (key) {
+                if (key.keyCode == ENTER_KEY) {
                     self.formBuilder.GeneratePropertiesFormForFunctions(this.children)
                 }
             });
@@ -883,12 +886,12 @@ define(['require', 'log', 'lodash', 'jquery', 'partition', 'stream', 'query', 'f
             node.attr('id', i + "-nodeInitial");
             node.attr('class', "queryNameNode");
 
-            var nodeId = $("#" + i + "")[0];
-            nodeId.addEventListener("dblclick", function () {
+            var nodeId = $('#' + i)[0];
+            nodeId.addEventListener('dblclick', function () {
                 self.formBuilder.GeneratePropertiesFormForWindowFilterProjectionQueries(this.children)
             });
-            $("#" + i).on('keydown', function (key) {
-                if (key.keyCode == 13) {
+            $('#' + i).on('keydown', function (key) {
+                if (key.keyCode == ENTER_KEY) {
                     self.formBuilder.GeneratePropertiesFormForWindowFilterProjectionQueries(this.children)
                 }
             });
@@ -972,13 +975,13 @@ define(['require', 'log', 'lodash', 'jquery', 'partition', 'stream', 'query', 'f
             node.attr('id', i + "-nodeInitial");
             node.attr('class', "patternQueryNameNode");
 
-            var nodeId = $("#" + i + "")[0];
-            nodeId.addEventListener("dblclick", function () {
+            var nodeId = $('#' + i)[0];
+            nodeId.addEventListener('dblclick', function () {
                 self.formBuilder.GeneratePropertiesFormForPatternQueries(this.children)
             });
 
-            $("#" + i).on('keydown', function (key) {
-                if (key.keyCode == 13) {
+            $('#' + i).on('keydown', function (key) {
+                if (key.keyCode == ENTER_KEY) {
                     self.formBuilder.GeneratePropertiesFormForPatternQueries(this.children)
                 }
             });
@@ -1070,13 +1073,13 @@ define(['require', 'log', 'lodash', 'jquery', 'partition', 'stream', 'query', 'f
             node.attr('id', i + "-nodeInitial");
             node.attr('class', "sequenceQueryNameNode");
 
-            var nodeId = $("#" + i + "")[0];
-            nodeId.addEventListener("dblclick", function () {
+            var nodeId = $('#' + i)[0];
+            nodeId.addEventListener('dblclick', function () {
                 self.formBuilder.GeneratePropertiesFormForSequenceQueries(this.children)
             });
 
-            $("#" + i).on('keydown', function (key) {
-                if (key.keyCode == 13) {
+            $('#' + i).on('keydown', function (key) {
+                if (key.keyCode == ENTER_KEY) {
                     self.formBuilder.GeneratePropertiesFormForSequenceQueries(this.children)
                 }
             });
@@ -1169,13 +1172,13 @@ define(['require', 'log', 'lodash', 'jquery', 'partition', 'stream', 'query', 'f
             node.attr('id', i + "-nodeInitial");
             node.attr('class', "joinQueryNameNode");
 
-            var nodeId = $("#" + i + "")[0];
-            nodeId.addEventListener("dblclick", function () {
+            var nodeId = $('#' + i)[0];
+            nodeId.addEventListener('dblclick', function () {
                 self.formBuilder.GeneratePropertiesFormForJoinQuery(this.children)
             });
 
-            $("#" + i).on('keydown', function (key) {
-                if (key.keyCode == 13) {
+            $('#' + i).on('keydown', function (key) {
+                if (key.keyCode == ENTER_KEY) {
                     self.formBuilder.GeneratePropertiesFormForJoinQuery(this.children)
                 }
             });
@@ -1252,13 +1255,13 @@ define(['require', 'log', 'lodash', 'jquery', 'partition', 'stream', 'query', 'f
             var node = $('<div></div>');
             node.attr('class', "partitionNameNode");
 
-            var nodeId = $("#" + i + "")[0];
-            nodeId.addEventListener("dblclick", function () {
+            var nodeId = $('#' + i)[0];
+            nodeId.addEventListener('dblclick', function () {
                 self.formBuilder.GeneratePartitionKeyForm(this.children)
             });
 
-            $("#" + i).on('keydown', function (key) {
-                if (key.keyCode == 13) {
+            $('#' + i).on('keydown', function (key) {
+                if (key.keyCode == ENTER_KEY) {
                     self.formBuilder.GeneratePartitionKeyForm(this.children)
                 }
             });
@@ -1367,14 +1370,14 @@ define(['require', 'log', 'lodash', 'jquery', 'partition', 'stream', 'query', 'f
                 });
                 $(dataObj).popover("show");
                 $(".overlayed-container ").fadeTo(200, 1);
-                $(element).on("click", ".popover-footer .btn.no", function () {
+                element.on("click", ".popover-footer .btn.no", function () {
                     $(".overlayed-container ").fadeOut(200);
                     $(this).parents(".popover").popover('hide');
                     $('#' + newElement[0].id).removeClass("selected-element");
                 });
 
-                $(element).off('click', '.popover-footer .btn.yes');
-                $(element).on("click", ".popover-footer .btn.yes", function () {
+                element.off('click', '.popover-footer .btn.yes');
+                element.on("click", ".popover-footer .btn.yes", function () {
                     if ('partition' === $(dataObj).data('type')) {
                         deletePartition();
                     } else {
@@ -1406,7 +1409,7 @@ define(['require', 'log', 'lodash', 'jquery', 'partition', 'stream', 'query', 'f
 
             newElement.on('focus', function () {
                 var element = $(this);
-                $(element).addClass("focused-container");
+                element.addClass("focused-container");
                 element.find('.element-prop-icon').show();
                 element.find('.element-close-icon').show();
                 element.find('.partition-element-prop-icon').show();
@@ -1414,7 +1417,7 @@ define(['require', 'log', 'lodash', 'jquery', 'partition', 'stream', 'query', 'f
 
             newElement.on('focusout', function () {
                 var element = $(this);
-                $(element).removeClass("focused-container");
+                element.removeClass("focused-container");
                 $('.element-prop-icon').hide();
                 $('.partition-element-prop-icon').hide();
                 $('.element-close-icon').hide();
@@ -1422,9 +1425,8 @@ define(['require', 'log', 'lodash', 'jquery', 'partition', 'stream', 'query', 'f
             });
 
             newElement.on('keydown', function (key) {
-                console.log("keyCode " + key.keyCode);
                 if ((key.keyCode = 91 && key.keyCode == 8) || key.keyCode == 46) {
-                    $('#' + newElement[0].id).addClass("selected-element");
+                    $('#' + newElement[0].id).addClass('selected-element');
                     showPopOver(this.children.item(1), newElement);
                 }
             });
@@ -1433,8 +1435,7 @@ define(['require', 'log', 'lodash', 'jquery', 'partition', 'stream', 'query', 'f
                 if (!window.selectedElements.includes(newElement[0], 0)) {
                     self.jsPlumbInstance.clearDragSelection();
                     for (var i = 0; i < window.selectedElements.length; i++) {
-                        $("#" + window.selectedElements[i].id).removeClass("selected-container");
-                        $("#" + window.selectedElements[i].id).removeClass("focused-container");
+                        $('#' + window.selectedElements[i].id).removeClass('selected-container focused-container');
                     }
                     window.selectedElements = [];
                 }

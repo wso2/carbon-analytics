@@ -2582,8 +2582,7 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
                             self.selectedObjects.splice(i, 1);
                         }
                     }
-                    $(element).removeClass("selected-container");
-                    $(element).removeClass("focused-container");
+                    $(element).removeClass('selected-container focused-container');
                     self.selectedObjects = [];
                 }
             });

@@ -1017,14 +1017,6 @@ textarea {
     box-shadow: 0 0 1px 1px #4af;
 }
 
-input:focus {
-    background: rgba(53, 53, 48, 0.56) !important;
-}
-
-i:focus {
-    background: rgba(53, 53, 48, 0.56) !important;
-}
-
 .selected-button{
     color: #ffffff !important;
     transition: 0.15s !important;
