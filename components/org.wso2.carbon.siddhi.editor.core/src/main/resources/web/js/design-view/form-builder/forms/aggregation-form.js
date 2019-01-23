@@ -83,17 +83,6 @@ define(['require', 'log', 'jquery', 'lodash', 'aggregateByTimePeriod', 'querySel
             $('.store-annotation-checkbox').prop('checked', true);
         };
 
-        //maps the user given values for group-by
-        var mapUserGroupBy = function (attributes) {
-            var i = 0;
-            $('.group-by-attributes li').each(function () {
-                $(this).find('.group-by-selection option').filter(function () {
-                    return ($(this).val() == (attributes[i]));
-                }).prop('selected', true);
-                i++;
-            });
-        };
-
         //to validate the aggregate[interval section]
         var validateAggregateInterval = function () {
             var selectedIntervals = [];
@@ -317,12 +306,6 @@ define(['require', 'log', 'jquery', 'lodash', 'aggregateByTimePeriod', 'querySel
                     self.formUtils.preventMultipleSelection(Constants.RANGE);
                 });
 
-                $('.aggregation-form-container').on('click', '.btn-del-option', function () {
-                    $(this).closest('li').remove();
-                    self.formUtils.preventMultipleSelection(Constants.GROUP_BY);
-                    self.formUtils.checkForAttributeLength(possibleAttributes.length);
-                });
-
                 $('#aggregate-by-attribute').on('change', '#aggregate-by-attribute-checkbox', function () {
                     if ($(this).is(':checked')) {
                         $('.aggregate-by-attribute-content').show();
@@ -403,7 +386,7 @@ define(['require', 'log', 'jquery', 'lodash', 'aggregateByTimePeriod', 'querySel
                 self.formUtils.checkForAttributeLength(possibleAttributes.length);
 
                 if (groupBy && groupBy.length != 0) {
-                    mapUserGroupBy(groupByAttributes);
+                    self.formUtils.mapUserGroupBy(groupByAttributes);
                     self.formUtils.preventMultipleSelection(Constants.GROUP_BY);
                     $("#group-by-checkbox").prop("checked", true);
                 } else {

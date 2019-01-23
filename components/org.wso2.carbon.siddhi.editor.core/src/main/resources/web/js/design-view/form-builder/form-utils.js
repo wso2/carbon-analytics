@@ -501,7 +501,7 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
          */
         FormUtils.prototype.selectAttributeSelection = function (aggregateFunctions, select, connectedElementAttributes) {
             var self = this;
-            $('.attribute-selection').find('#attribute-selection-type option').filter(function () {
+            $('.attribute-selection').find('.attribute-selection-type option').filter(function () {
                 return ($(this).val() === select.getType().toLowerCase());
             }).prop('selected', true);
             if (select.getType().toLowerCase() === Constants.TYPE_ALL) {
@@ -967,7 +967,7 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
          */
         FormUtils.prototype.buildAttributeSelection = function (selectAttributeOptions) {
             var self = this;
-            var selectionType = $('#attribute-selection-type').val();
+            var selectionType = $('.attribute-selection-type').val();
             if (selectionType == Constants.TYPE_ALL) {
                 _.set(selectAttributeOptions, 'type', Constants.TYPE_ALL.toUpperCase());
                 _.set(selectAttributeOptions, 'value', Constants.VALUE_ALL);
@@ -1288,6 +1288,19 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
             return options;
         };
 
+        /**
+         * @function to map the user given values for group-by
+         * @param {Object} attributes user saved group-by-attributes
+         */
+        FormUtils.prototype.mapUserGroupBy = function (attributes) {
+            var i = 0;
+            $('.group-by-attributes li').each(function () {
+                $(this).find('.group-by-selection option').filter(function () {
+                    return ($(this).val() == (attributes[i]));
+                }).prop('selected', true);
+                i++;
+            });
+        };
 
         /**
          * @function to map the saved option values to the option object
@@ -1571,7 +1584,7 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
 		 * @param {Object} groupBy user defined group by
 		 * @param {String} id of the division
 		 */
-        FormUtils.prototype.renderGroupBy = function (possibleGroupByAttributes, groupBy, id) {
+        FormUtils.prototype.renderGroupBy = function (possibleGroupByAttributes, groupBy, className) {
             var possibleGroupByAttributes = {
                 options: possibleGroupByAttributes,
                 id: Constants.GROUP_BY
@@ -1584,7 +1597,7 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
             Handlebars.registerPartial('renderDropDown', raw_partial);
             var groupByTemplate = Handlebars.compile($('#group-by-template').html());
             var wrappedHtml = groupByTemplate(groupByAttributes);
-            $('#' + id).html(wrappedHtml);
+            $('.' + className).html(wrappedHtml);
         };
 
 
@@ -1826,6 +1839,13 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
             $('.define-group-by-attributes').on('change', '.group-by-selection', function () {
                 self.preventMultipleSelection(Constants.GROUP_BY);
             });
+
+            $('.define-group-by-attributes').on('click', '.btn-del-option', function () {
+                $(this).closest('li').remove();
+                self.preventMultipleSelection(Constants.GROUP_BY);
+                self.checkForAttributeLength(possibleAttributes.length);
+            });
+
         };
 
         /**
@@ -1953,7 +1973,7 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
             var self = this;
             var selectValue = [{ expression: "", as: "" }];
 
-            $('.attribute-selection').on('change', '#attribute-selection-type', function () {
+            $('.attribute-selection').on('change', '.attribute-selection-type', function () {
                 if (this.value === Constants.TYPE_ALL) {
                     $('.define-user-defined-attributes').hide();
                 } else {
@@ -2091,7 +2111,7 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
                 $(this).find('.btn-del-annot-value:eq(0)').remove();
             });
 
-            $('#define-aggregate-group-by').find('.group-by-attributes li:eq(0) .btn-del-option').remove();
+            $('.define-group-by-attributes').find('.group-by-attributes li:eq(0) .btn-del-option').remove();
             $('.attribute-selection').find('.user-defined-attributes li:eq(0) .btn-del-option').remove();
         };
 
