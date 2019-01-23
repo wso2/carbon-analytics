@@ -67,7 +67,7 @@
         function loadTableSelect() {
             $('#tableSelect').find('option:gt(0)').remove();
             <c:if test="${permissions != null && permissions.isListTable()}">
-            $.get('/carbon/dataexplorer/dataexplorer_ajaxprocessor.jsp?type=' + typeListTable,
+            $.get('dataexplorer_ajaxprocessor.jsp?type=' + typeListTable,
                   function (result) {
                       var resultObj = jQuery.parseJSON(result);
                       var tableNames = "";
@@ -109,7 +109,7 @@
             $("#purgeRecordButton").on("click", function () {
                 var label = document.getElementById('dataPurgingMsgLabel');
                 label.style.display = 'none';
-                $.post('/carbon/dataexplorer/dataexplorer_ajaxprocessor.jsp?type=' + typeGetPurgingTask,
+                $.post('dataexplorer_ajaxprocessor.jsp?type=' + typeGetPurgingTask,
                         {tableName: $("#tableSelect").val()},
                        function (result) {
                            var resultObj = jQuery.parseJSON(result);
@@ -152,7 +152,7 @@
                                                           var $container =
                                                                   $('<select class="facetSelect1"></select>');
                                                           $container.append($('<option>').val('-1').text('Select a category'));
-                                                          $.post('/carbon/dataexplorer/dataexplorer_ajaxprocessor.jsp?type=' + typeGetFacetCategories,
+                                                          $.post('dataexplorer_ajaxprocessor.jsp?type=' + typeGetFacetCategories,
                                                                   {
                                                                       tableName: $("#tableSelect").val(),
                                                                       categoryPath: "",
@@ -191,7 +191,7 @@
                     $(this).closest("tr").find('td:last').before($('<td>').append(function () {
                         var $container = $('<select class="facetSelect1"></select>');
                         $container.append($('<option>').val('-1').text('Select a category'));
-                        $.post('/carbon/dataexplorer/dataexplorer_ajaxprocessor.jsp?type=' + typeGetFacetCategories,
+                        $.post('dataexplorer_ajaxprocessor.jsp?type=' + typeGetFacetCategories,
                                 {
                                     tableName: $("#tableSelect").val(),
                                     categoryPath: JSON.stringify(path),
@@ -241,7 +241,7 @@
             var workAreaWidth = $(".styledLeft").width();
             $("#AnalyticsTableContainer").width(workAreaWidth - 20);
             if (table != '-1') {
-                $.getJSON("/carbon/dataexplorer/dataexplorer_ajaxprocessor.jsp?type=" + typeTableInfo + "&tableName=" + table,
+                $.getJSON("dataexplorer_ajaxprocessor.jsp?type=" + typeTableInfo + "&tableName=" + table,
                           function (data, status) {
                               var fields = {
                                   ArbitraryFields: {
