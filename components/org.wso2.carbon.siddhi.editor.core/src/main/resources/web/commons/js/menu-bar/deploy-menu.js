@@ -39,10 +39,7 @@ define(([], function () {
                 },
                 disabled: false
             }
-
         ]
-
     };
-
     return DeployMenu;
 }));

@@ -34,9 +34,11 @@ public class SiddhiAppApiHelper implements SiddhiAppApiHelperService {
                                    String fileName) throws SiddhiAppsApiHelperException {
         Response response = null;
         try {
-            response = HTTPSClientUtil.doPostRequest(hostAndPort, username, password, siddhiApp);
+            response = HTTPSClientUtil.doPutRequest(hostAndPort, username, password, siddhiApp);
             int status = response.status();
             switch (status) {
+                case 200:
+                    return true;
                 case 201:
                     return true;
                 case 400:
@@ -44,10 +46,6 @@ public class SiddhiAppApiHelper implements SiddhiAppApiHelperService {
                             "saving the siddhi app '" + fileName + "' on the node '" + hostAndPort + "'", status);
                 case 401:
                     throw new SiddhiAppsApiHelperException("Invalid user name or password on the node '" +
-                            hostAndPort + "'", status);
-                case 409:
-                    throw new SiddhiAppsApiHelperException("A Siddhi Application with " +
-                            "the given name: '" + fileName + "' already exists in the node '" +
                             hostAndPort + "'", status);
                 case 500:
                     throw new SiddhiAppsApiHelperException("Unexpected error occurred during " +
@@ -74,5 +72,4 @@ public class SiddhiAppApiHelper implements SiddhiAppApiHelperService {
             response.close();
         }
     }
-
 }

@@ -44,7 +44,7 @@ public class HTTPSClientUtil {
     }
 
     /**
-     * Produces a Response after doing a POST request
+     * Produces a Response after doing a PUT request
      *
      * @param hostAndPort Host and Port of the Worker node in {Host}:{Port} format
      * @param username    Username
@@ -53,9 +53,9 @@ public class HTTPSClientUtil {
      * @return Feign Response object
      * @throws SiddhiAppDeployerServiceStubException Error occurred within SiddhiAppDeployerServiceStub
      */
-    public static Response doPostRequest(String hostAndPort, String username, String password, String payload)
+    public static Response doPutRequest(String hostAndPort, String username, String password, String payload)
             throws SiddhiAppDeployerServiceStubException {
         return SiddhiAppDeployerFactory.getSiddhiAppDeployerHttpsClient(generateURL(hostAndPort), username, password)
-                .doPostRequest(payload);
+                .doPutRequest(payload);
     }
 }

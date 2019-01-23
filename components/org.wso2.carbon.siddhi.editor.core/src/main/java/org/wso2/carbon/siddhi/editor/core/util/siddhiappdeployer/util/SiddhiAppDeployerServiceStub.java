@@ -27,7 +27,7 @@ import org.wso2.carbon.siddhi.editor.core.exception.SiddhiAppDeployerServiceStub
  * Feign client for sending requests
  */
 public interface SiddhiAppDeployerServiceStub {
-    @RequestLine("POST /siddhi-apps")
+    @RequestLine("PUT /siddhi-apps")
     @Headers("Content-Type: text/plain; charset=utf-8")
-    Response doPostRequest(String payload) throws SiddhiAppDeployerServiceStubException;
+    Response doPutRequest(String payload) throws SiddhiAppDeployerServiceStubException;
 }
