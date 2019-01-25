@@ -30,6 +30,7 @@ import org.wso2.siddhi.core.event.Event;
 import org.wso2.siddhi.core.exception.ConnectionUnavailableException;
 import org.wso2.siddhi.core.stream.input.InputHandler;
 import org.wso2.siddhi.core.stream.input.source.SourceHandler;
+import org.wso2.siddhi.core.stream.input.source.SourceSyncCallback;
 import org.wso2.siddhi.query.api.definition.StreamDefinition;
 
 import java.io.IOException;
@@ -50,6 +51,7 @@ public class HACoordinationSourceHandler extends SourceHandler {
     private GenericKeyedObjectPool eventSyncConnectionPoolFactory;
     private AtomicLong sequenceIDGenerator;
     private volatile boolean passiveNodeAdded;
+    private SourceSyncCallback sourceSyncCallback;
 
     private static final Logger log = Logger.getLogger(HACoordinationSourceHandler.class);
 
@@ -58,23 +60,28 @@ public class HACoordinationSourceHandler extends SourceHandler {
     }
 
     @Override
-    public void init(String siddhiAppName, String sourceElementId, StreamDefinition streamDefinition) {
+    public void init(String siddhiAppName, SourceSyncCallback sourceSyncCallback, String sourceElementId,
+                     StreamDefinition streamDefinition) {
         this.sourceHandlerElementId = sourceElementId;
         this.siddhiAppName = siddhiAppName;
+        this.sourceSyncCallback = sourceSyncCallback;
+
     }
 
     /**
      * Method that would process events if this is the Active Node.
      *
      * @param event        the event being sent to processing.
+     * @param transportSyncProperties transport sync properties which used to sync passive source state
      * @param inputHandler callback that would send events for processing.
      */
     @Override
-    public void sendEvent(Event event, InputHandler inputHandler) throws InterruptedException {
+    public void sendEvent(Event event, String[] transportSyncProperties, InputHandler inputHandler)
+            throws InterruptedException {
         if (isActiveNode) {
             lastProcessedEventTimestamp = event.getTimestamp();
             if (passiveNodeAdded) {
-                sendEventsToPassiveNode(event);
+                sendEventsToPassiveNode(event,transportSyncProperties);
             }
             inputHandler.send(event);
         }
@@ -85,14 +92,16 @@ public class HACoordinationSourceHandler extends SourceHandler {
      * If Passive Node, events will be buffered during the state syncing state.
      *
      * @param events       the event array being sent to processing.
+     * @param transportSyncProperties transport sync properties which used to sync passive source state
      * @param inputHandler callback that would send events for processing.
      */
     @Override
-    public void sendEvent(Event[] events, InputHandler inputHandler) throws InterruptedException {
+    public void sendEvent(Event[] events, String[] transportSyncProperties, InputHandler inputHandler)
+            throws InterruptedException {
         if (isActiveNode) {
             lastProcessedEventTimestamp = events[events.length - 1].getTimestamp();
             if (passiveNodeAdded) {
-                sendEventsToPassiveNode(events);
+                sendEventsToPassiveNode(events, transportSyncProperties);
             }
             inputHandler.send(events);
         }
@@ -137,12 +146,12 @@ public class HACoordinationSourceHandler extends SourceHandler {
         return sourceHandlerElementId;
     }
 
-    private void sendEventsToPassiveNode(Event event) {
+    private void sendEventsToPassiveNode(Event event, String[] transportSyncProperties) {
         EventSyncConnection eventSyncConnection = getTCPNettyClient();
         ByteBuffer messageBuffer = null;
         if (eventSyncConnection != null) {
             QueuedEvent queuedEvent = new QueuedEvent(siddhiAppName, sourceHandlerElementId, sequenceIDGenerator
-                    .incrementAndGet(), event);
+                    .incrementAndGet(), event, transportSyncProperties);
             try {
                 messageBuffer = BinaryEventConverter.convertToBinaryMessage(new QueuedEvent[]{queuedEvent});
             } catch (IOException e) {
@@ -164,7 +173,7 @@ public class HACoordinationSourceHandler extends SourceHandler {
         }
     }
 
-    private void sendEventsToPassiveNode(Event[] events) {
+    private void sendEventsToPassiveNode(Event[] events, String[] transportSyncProperties) {
         EventSyncConnection eventSyncConnection = getTCPNettyClient();
         ByteBuffer messageBuffer = null;
         if (eventSyncConnection != null) {
@@ -172,7 +181,8 @@ public class HACoordinationSourceHandler extends SourceHandler {
             int i = 0;
             for (Event event : events) {
                 QueuedEvent queuedEvent = new QueuedEvent(siddhiAppName, sourceHandlerElementId, sequenceIDGenerator
-                        .incrementAndGet(), event);
+                        .incrementAndGet(), event,
+                        transportSyncProperties != null ? new String[]{transportSyncProperties[i]} : null);
                 queuedEvents[i] = queuedEvent;
                 i++;
             }
@@ -207,4 +217,11 @@ public class HACoordinationSourceHandler extends SourceHandler {
         }
         return eventSyncConnection;
     }
+
+    public void updateTransportSyncProperties(String[] transportSyncProperties) {
+        if (null != transportSyncProperties && transportSyncProperties.length != 0) {
+            sourceSyncCallback.update(transportSyncProperties);
+        }
+    }
+
 }

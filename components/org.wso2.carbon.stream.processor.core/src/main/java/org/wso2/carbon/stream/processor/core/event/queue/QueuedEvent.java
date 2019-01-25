@@ -20,18 +20,25 @@ package org.wso2.carbon.stream.processor.core.event.queue;
 
 import org.wso2.siddhi.core.event.Event;
 
+import java.util.Arrays;
+
 public class QueuedEvent {
     private String sourceHandlerElementId;
     private long sequenceID;
     private Event event;
     private long timestamp;
     private String siddhiAppName;
+    private String[] transportSyncProperties;
 
-    public QueuedEvent(String siddhiAppName, String sourceHandlerElementId, long sequenceID, Event event) {
+    public QueuedEvent(String siddhiAppName, String sourceHandlerElementId, long sequenceID, Event event,
+                       String[] transportSyncProperties) {
         this.sourceHandlerElementId = sourceHandlerElementId;
         this.siddhiAppName = siddhiAppName;
         this.sequenceID = sequenceID;
         this.event = event;
+        this.transportSyncProperties = transportSyncProperties != null ?
+                Arrays.copyOf(transportSyncProperties,transportSyncProperties.length) : null;
+
     }
 
     public long getSequenceID() {
@@ -63,17 +70,19 @@ public class QueuedEvent {
     }
 
     public void setTimestamp(long timestamp) {
-
         this.timestamp = timestamp;
     }
 
     public String getSiddhiAppName() {
-
         return siddhiAppName;
     }
 
     public void setSiddhiAppName(String siddhiAppName) {
-
         this.siddhiAppName = siddhiAppName;
+    }
+
+    public String[] getTransportSyncProperties() {
+        return this.transportSyncProperties != null ?
+                Arrays.copyOf(this.transportSyncProperties, this.transportSyncProperties.length) : null;
     }
 }
