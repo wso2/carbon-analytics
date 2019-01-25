@@ -81,7 +81,7 @@ public class HACoordinationSourceHandler extends SourceHandler {
         if (isActiveNode) {
             lastProcessedEventTimestamp = event.getTimestamp();
             if (passiveNodeAdded) {
-                sendEventsToPassiveNode(event,transportSyncProperties);
+                sendEventsToPassiveNode(event, transportSyncProperties);
             }
             inputHandler.send(event);
         }
