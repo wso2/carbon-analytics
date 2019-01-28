@@ -126,7 +126,6 @@ public class HACoordinationSourceHandler extends SourceHandler {
 
     @Override
     public Map<String, Object> currentState() {
-        log.info("TESTTTTTTTTTTTTTTTTTTTTTTT");
         Map<String, Object> currentState = new HashMap<>();
         currentState.put(CoordinationConstants.ACTIVE_PROCESSED_LAST_TIMESTAMP, lastProcessedEventTimestamp);
         if (log.isDebugEnabled()) {
