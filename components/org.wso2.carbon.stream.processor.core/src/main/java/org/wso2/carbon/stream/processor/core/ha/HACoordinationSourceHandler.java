@@ -77,13 +77,11 @@ public class HACoordinationSourceHandler extends SourceHandler {
     @Override
     public void sendEvent(Event event, String[] transportSyncProperties, InputHandler inputHandler)
             throws InterruptedException {
-        log.info("SENDING EVENT");
         if (isActiveNode) {
             lastProcessedEventTimestamp = event.getTimestamp();
             if (passiveNodeAdded) {
                 sendEventsToPassiveNode(event, transportSyncProperties);
             }
-            log.info("SENT EVENT");
             inputHandler.send(event);
         }
     }
