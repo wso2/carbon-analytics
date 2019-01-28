@@ -19,8 +19,7 @@
 package org.wso2.carbon.stream.processor.core.event.queue;
 
 import org.wso2.siddhi.core.event.Event;
-
-import java.util.Arrays;
+import edu.umd.cs.findbugs.annotations.SuppressWarnings;
 
 public class QueuedEvent {
     private String sourceHandlerElementId;
@@ -30,15 +29,14 @@ public class QueuedEvent {
     private String siddhiAppName;
     private String[] transportSyncProperties;
 
+    @SuppressWarnings("EI_EXPOSE_REP2")
     public QueuedEvent(String siddhiAppName, String sourceHandlerElementId, long sequenceID, Event event,
                        String[] transportSyncProperties) {
         this.sourceHandlerElementId = sourceHandlerElementId;
         this.siddhiAppName = siddhiAppName;
         this.sequenceID = sequenceID;
         this.event = event;
-        this.transportSyncProperties = transportSyncProperties != null ?
-                Arrays.copyOf(transportSyncProperties,transportSyncProperties.length) : null;
-
+        this.transportSyncProperties = transportSyncProperties;
     }
 
     public long getSequenceID() {
@@ -81,8 +79,8 @@ public class QueuedEvent {
         this.siddhiAppName = siddhiAppName;
     }
 
+    @SuppressWarnings("EI_EXPOSE_REP")
     public String[] getTransportSyncProperties() {
-        return this.transportSyncProperties != null ?
-                Arrays.copyOf(this.transportSyncProperties, this.transportSyncProperties.length) : null;
+        return transportSyncProperties;
     }
 }

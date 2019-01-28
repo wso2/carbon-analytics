@@ -65,7 +65,6 @@ public class HACoordinationSourceHandler extends SourceHandler {
         this.sourceHandlerElementId = sourceElementId;
         this.siddhiAppName = siddhiAppName;
         this.sourceSyncCallback = sourceSyncCallback;
-
     }
 
     /**
@@ -78,11 +77,13 @@ public class HACoordinationSourceHandler extends SourceHandler {
     @Override
     public void sendEvent(Event event, String[] transportSyncProperties, InputHandler inputHandler)
             throws InterruptedException {
+        log.info("SENDING EVENT");
         if (isActiveNode) {
             lastProcessedEventTimestamp = event.getTimestamp();
             if (passiveNodeAdded) {
                 sendEventsToPassiveNode(event, transportSyncProperties);
             }
+            log.info("SENT EVENT");
             inputHandler.send(event);
         }
     }
@@ -127,6 +128,7 @@ public class HACoordinationSourceHandler extends SourceHandler {
 
     @Override
     public Map<String, Object> currentState() {
+        log.info("TESTTTTTTTTTTTTTTTTTTTTTTT");
         Map<String, Object> currentState = new HashMap<>();
         currentState.put(CoordinationConstants.ACTIVE_PROCESSED_LAST_TIMESTAMP, lastProcessedEventTimestamp);
         if (log.isDebugEnabled()) {
@@ -180,9 +182,14 @@ public class HACoordinationSourceHandler extends SourceHandler {
             QueuedEvent[] queuedEvents = new QueuedEvent[events.length];
             int i = 0;
             for (Event event : events) {
-                QueuedEvent queuedEvent = new QueuedEvent(siddhiAppName, sourceHandlerElementId, sequenceIDGenerator
-                        .incrementAndGet(), event,
-                        transportSyncProperties != null ? new String[]{transportSyncProperties[i]} : null);
+                QueuedEvent queuedEvent;
+                if (i == 0) {
+                    queuedEvent = new QueuedEvent(siddhiAppName, sourceHandlerElementId, sequenceIDGenerator
+                            .incrementAndGet(), event, transportSyncProperties);
+                } else {
+                    queuedEvent = new QueuedEvent(siddhiAppName, sourceHandlerElementId, sequenceIDGenerator
+                            .incrementAndGet(), event, null);
+                }
                 queuedEvents[i] = queuedEvent;
                 i++;
             }
@@ -219,7 +226,7 @@ public class HACoordinationSourceHandler extends SourceHandler {
     }
 
     public void updateTransportSyncProperties(String[] transportSyncProperties) {
-        if (null != transportSyncProperties && transportSyncProperties.length != 0) {
+        if (null != sourceSyncCallback) {
             sourceSyncCallback.update(transportSyncProperties);
         }
     }

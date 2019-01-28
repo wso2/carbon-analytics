@@ -95,8 +95,8 @@ public class EventListMapManager {
                 int transportSyncPropertiesBytes = eventContent.getInt();
                 if (transportSyncPropertiesBytes != 0) {
                     int transportSyncPropertiesSize = eventContent.getInt();
-                    transportSyncProperties = new String[transportSyncPropertiesSize];
                     if (transportSyncPropertiesSize != 0) {
+                        transportSyncProperties = new String[transportSyncPropertiesSize];
                         int byteReadLength = 0;
                         int propertiesLength = 0;
                         while (transportSyncPropertiesBytes != byteReadLength) {
@@ -172,9 +172,14 @@ public class EventListMapManager {
                         if(queuedEvent.getSourceHandlerElementId().equals(source.getMapper().
                                 getHandler().getElementId())){
                             source.getMapper().getHandler().sendEvent(queuedEvent.getEvent(),
-                                    null);
-                            ((HACoordinationSourceHandler)source.getMapper().getHandler()).
-                                    updateTransportSyncProperties(queuedEvent.getTransportSyncProperties());
+                                    queuedEvent.getTransportSyncProperties());
+                            if (null != queuedEvent.getTransportSyncProperties() &&
+                                    queuedEvent.getTransportSyncProperties().length != 0) {
+                                if (source.getMapper().getHandler() instanceof HACoordinationSourceHandler) {
+                                    ((HACoordinationSourceHandler)source.getMapper().getHandler()).
+                                            updateTransportSyncProperties(queuedEvent.getTransportSyncProperties());
+                                }
+                            }
                             eventListMap.remove(key);
                             isFound = true;
                             break;
