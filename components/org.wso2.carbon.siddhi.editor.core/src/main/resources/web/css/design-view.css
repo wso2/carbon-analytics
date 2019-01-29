@@ -1106,7 +1106,7 @@ a.list-group-item, button.list-group-item {
 }
 
 .design-view-form-content .attribute-selection .expression-as {
-	margin-top: -32px;
+	margin-top: -24px;
 	margin-left: 200px;
 }
 
@@ -1116,7 +1116,7 @@ a.list-group-item, button.list-group-item {
 
 .design-view-form-content .attribute-selection .expression-as-content {
 	margin-left: 70px;
-	margin-top: -6px;
+	margin-top: 2px;
 }
 
 .design-view-form-content .attribute-selection .select-label {

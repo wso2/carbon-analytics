@@ -1404,26 +1404,14 @@
 </script>
 
 <script id = "drop-down-template" type="text/template">
-    {{#ifId id "group-by"}}
-        <li>
-    {{/ifId}}
-            <div class="clearfix">
-                <select class="{{id}}-selection">
-                    {{#ifId id "group-by"}}
-                        <option style = "display:none" disabled selected value> -- select a value --</option>
-                    {{/ifId}}
-                    {{#each options}}
-                        <option value="{{this}}"> {{this}} </option>
-                    {{/each}}
-                </select>
-                {{#ifId id "group-by"}}
-                    <a class = "btn-del-option"> <i class = "fw fw-delete"> </i></a>
-                {{/ifId}}
-            </div>
-            <label class="error-message"> </label>
-    {{#ifId id "group-by"}}
-        </li>
-    {{/ifId}}
+    <select class="{{id}}-selection">
+        {{#ifId id "group-by"}}
+            <option style = "display:none" disabled selected value> -- select a value --</option>
+        {{/ifId}}
+        {{#each options}}
+            <option value="{{this}}"> {{this}} </option>
+        {{/each}}
+    </select>
 </script>
 
 <script id="group-by-template" type = "text/template">
@@ -1434,7 +1422,13 @@
             <label> Attribute Name </label>
             <ul class="group-by-attributes">
                 {{#each groupBy}}
-                    {{> renderDropDown ../possibleGroupByAttributes}}
+                <li>
+                    <div class="clearfix">
+                        {{> renderDropDown ../possibleGroupByAttributes}}
+                        <a class = "btn-del-option"> <i class = "fw fw-delete"> </i></a>
+                    </div>
+                    <label class="error-message"> </label>
+                </li>
                 {{/each}}
             </ul>
             <button class="btn btn-default btn-add-group-by-attribute"> + Attribute </button>
