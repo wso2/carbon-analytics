@@ -1985,6 +1985,10 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
                 }
             });
 
+            $('.attribute-selection').on('click', '.btn-del-option', function () {
+            	$(this).closest('li').remove();
+            });
+
             $('.attribute-selection').on('click', '#btn-add-user-defined-attribute', function () {
                 self.getAttributeExpression(aggregateFunctions, selectValue, connectedElementAttributes);
             });
