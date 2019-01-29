@@ -388,7 +388,7 @@ define(['require', 'log', 'jquery', 'lodash', 'aggregateByTimePeriod', 'querySel
                 if (groupBy && groupBy.length != 0) {
                     self.formUtils.mapUserGroupBy(groupByAttributes);
                     self.formUtils.preventMultipleSelection(Constants.GROUP_BY);
-                    $("#group-by-checkbox").prop("checked", true);
+                    $(".group-by-checkbox").prop("checked", true);
                 } else {
                     $('.group-by-content').hide();
                 }
@@ -478,7 +478,7 @@ define(['require', 'log', 'jquery', 'lodash', 'aggregateByTimePeriod', 'querySel
                         return;
                     }
 
-                    if ($('#group-by-checkbox').is(':checked')) {
+                    if ($('.group-by-checkbox').is(':checked')) {
                         if (self.formUtils.validateGroupBy()) {
                             isErrorOccurred = true;
                             return;
@@ -549,7 +549,7 @@ define(['require', 'log', 'jquery', 'lodash', 'aggregateByTimePeriod', 'querySel
                         var selectObject = new QuerySelect(selectAttributeOptions);
                         clickedElement.setSelect(selectObject);
 
-                        if ($('#group-by-checkbox').is(':checked')) {
+                        if ($('.group-by-checkbox').is(':checked')) {
                             var groupByAttributes = self.formUtils.buildGroupBy();
                             clickedElement.setGroupBy(groupByAttributes);
                         } else {
