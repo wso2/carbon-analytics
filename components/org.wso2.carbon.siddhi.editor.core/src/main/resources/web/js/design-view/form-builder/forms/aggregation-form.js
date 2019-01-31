@@ -255,9 +255,9 @@ define(['require', 'log', 'jquery', 'lodash', 'aggregateByTimePeriod', 'querySel
 
 
                 self.formUtils.renderAnnotationTemplate("define-user-defined-annotation", userDefinedAnnotations);
-                $('#define-user-defined-annotation').find('h4').html('Customized Annotations');
+                $('.define-user-defined-annotation').find('h4').html('Customized Annotations');
                 self.formUtils.renderPrimaryIndexAnnotations(indexAnnotation, 'define-index-annotation');
-                $('#define-index-annotation').find('h4').hide();
+                $('.define-index-annotation').find('h4').hide();
                 self.formUtils.renderPredefinedAnnotations(predefinedAggregationAnnotations,
                     'define-predefined-aggregation-annotation');
                 self.formUtils.renderOptionsForPredefinedAnnotations(predefinedAggregationAnnotations);
@@ -275,7 +275,7 @@ define(['require', 'log', 'jquery', 'lodash', 'aggregateByTimePeriod', 'querySel
                     self.formUtils.renderOptions(dataStoreOptions, customizedStoreOptions, Constants.STORE)
                 });
 
-                $('#define-store-annotation').on('change', '.store-annotation-checkbox', function () {
+                $('.define-store-annotation').on('change', '.store-annotation-checkbox', function () {
                     if ($(this).is(':checked')) {
                         enableIndexAndPartitionById();
                     } else {
@@ -479,7 +479,7 @@ define(['require', 'log', 'jquery', 'lodash', 'aggregateByTimePeriod', 'querySel
                     }
 
                     if ($('.group-by-checkbox').is(':checked')) {
-                        if (self.formUtils.validateGroupBy()) {
+                        if (self.formUtils.validateGroupOrderBy(Constants.GROUP_BY)) {
                             isErrorOccurred = true;
                             return;
                         }

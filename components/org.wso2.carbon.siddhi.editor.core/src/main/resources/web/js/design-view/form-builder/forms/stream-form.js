@@ -52,7 +52,7 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'jsonValidator', 'con
 				'<input type="text" id="streamName" class="clearfix name">' +
                 '<label class="error-message" id="streamNameErrorMessage"> </label>' +
                 '<div id="define-attribute"></div>' + self.formUtils.buildFormButtons() +
-                '</div> <div class= "stream-form-container"> <div id="define-annotation"> </div> </div>');
+                '</div> <div class= "stream-form-container"> <div class ="define-annotation"> </div> </div>');
 
             formContainer.append(propertyDiv);
             self.formUtils.popUpSelectedElement(id);

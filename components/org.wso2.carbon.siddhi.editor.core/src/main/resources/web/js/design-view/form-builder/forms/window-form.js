@@ -112,19 +112,6 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'handlebar', 'constan
         };
 
         /**
-         * @function to render the output event types
-         */
-        var renderOutputEventTypes = function () {
-            var outputEventDiv = '<div class = "clearfix"> <label>Event Type </label></div>' +
-                '<div class = "clearfix" ><select id="event-type">' +
-                '<option value = "current_events"> current events </option>' +
-                '<option value = "all_events"> all events </option>' +
-                '<option value = "expired_events"> expired events </option>' +
-                '</select> </div>'
-            $('#defineOutputEvents').html(outputEventDiv);
-        };
-
-        /**
          * @function to build the parameter values
          * @param {Object} parameterValues array to add the parameters
          * @param {Object} predefinedParameters predefined parameters
@@ -406,8 +393,8 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'handlebar', 'constan
                 '<label class="error-message" id="windowNameErrorMessage"></label> <div id="define-attribute"></div>' +
                 self.formUtils.buildFormButtons() + '</div> <div class= "window-form-container"> ' +
                 '<div id = "defineFunctionName"> </div> <div id="defineFunctionParameters"> </div>' +
-                '</div> <div class = "window-form-container"> <div id="defineOutputEvents"> </div> </div>' +
-                '<div class = "window-form-container"> <div id="define-annotation"> </div> </div>');
+                '</div> <div class = "window-form-container"> <div class="define-output-events"> </div> </div>' +
+                '<div class = "window-form-container"> <div class="define-annotation"> </div> </div>');
 
             formContainer.append(propertyDiv);
             self.formUtils.popUpSelectedElement(id);
@@ -453,7 +440,7 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'handlebar', 'constan
             $('#defineFunctionName').html(wrappedHtml);
 
             var name = clickedElement.getName();
-            renderOutputEventTypes();
+            self.formUtils.renderOutputEventTypes();
             if (!name) {
                 //if window form is freshly opened[unedited window object]
                 var attributes = [{ name: "" }];
@@ -483,7 +470,7 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'handlebar', 'constan
                 self.formUtils.selectTypesOfSavedAttributes(savedAttributes);
 
                 var savedOutputEventType = clickedElement.getOutputEventType().toLowerCase();
-                $('#defineOutputEvents').find('#event-type option').filter(function () {
+                $('#define-output-events').find('#event-type option').filter(function () {
                     return ($(this).val().toLowerCase() == (savedOutputEventType));
                 }).prop('selected', true);
 
@@ -593,7 +580,7 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'handlebar', 'constan
                         }
                     });
 
-                    var outputEventType = $('#defineOutputEvents #event-type').val().toUpperCase();
+                    var outputEventType = $('#define-output-events #event-type').val().toUpperCase();
                     clickedElement.setOutputEventType(outputEventType);
 
                     clickedElement.clearAnnotationList();

@@ -50,7 +50,7 @@ define(['require', 'log', 'jquery', 'lodash', 'handlebar', 'annotationObject', '
                 '<div id = "define-app-description"> <h4> Description </h4> <textarea id="app-description" ' +
                 'class="clearfix"> </textarea> <label class = "error-message"> </label> </div>' +
                 self.formUtils.buildFormButtons() + '</div>' +
-                '<div class = "siddhi-app-form-container"> <div id = "define-annotation" </div> </div>');
+                '<div class = "siddhi-app-form-container"> <div class = "define-annotation" </div> </div>');
 
             formContainer.append(propertyDiv);
             $(".overlayed-container").fadeTo(200, 1);

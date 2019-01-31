@@ -55,7 +55,7 @@ define(['log', 'jquery', 'lodash', 'attribute', 'storeAnnotation', 'handlebar', 
                 '<div class = "table-form-container store-div"> <div id = "define-store"> </div>  ' +
                 '<div id="define-rdbms-type"> </div> <div id="store-options-div"> </div> </div> ' +
                 '<div class = "table-form-container define-table-annotation">' +
-                '<div id = "define-predefined-annotations"> </div> <div id = "define-user-annotations"> </div> </div>');
+                '<div id = "define-predefined-annotations"> </div> <div class="define-user-annotations"> </div> </div>');
 
             formContainer.append(propertyDiv);
             self.formUtils.popUpSelectedElement(id);
