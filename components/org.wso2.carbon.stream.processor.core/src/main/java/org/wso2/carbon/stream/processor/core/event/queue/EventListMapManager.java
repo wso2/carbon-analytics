@@ -19,6 +19,7 @@
 package org.wso2.carbon.stream.processor.core.event.queue;
 
 import org.apache.log4j.Logger;
+import org.wso2.carbon.stream.processor.core.ha.HACoordinationSourceHandler;
 import org.wso2.carbon.stream.processor.core.ha.exception.InvalidByteMessageException;
 import org.wso2.carbon.stream.processor.core.ha.tcp.SiddhiEventConverter;
 import org.wso2.carbon.stream.processor.core.ha.util.HAConstants;
@@ -76,6 +77,7 @@ public class EventListMapManager {
             for (int i = 0; i < noOfEvents; i++) {
                 String sourceHandlerElementId;
                 String siddhiAppName;
+                String[] transportSyncProperties = null;
                 long sequenceID = eventContent.getLong();
                 int sourceHandlerLength = eventContent.getInt();
                 if (sourceHandlerLength == 0) {
@@ -89,6 +91,22 @@ public class EventListMapManager {
                     throw new InvalidByteMessageException("Invalid appNameLength size = 0");
                 } else {
                     siddhiAppName = BinaryMessageConverterUtil.getString(eventContent, appNameLength);
+                }
+                int transportSyncPropertiesBytes = eventContent.getInt();
+                if (transportSyncPropertiesBytes != 0) {
+                    int transportSyncPropertiesSize = eventContent.getInt();
+                    if (transportSyncPropertiesSize != 0) {
+                        transportSyncProperties = new String[transportSyncPropertiesSize];
+                        int byteReadLength = 0;
+                        int propertiesLength = 0;
+                        while (transportSyncPropertiesBytes != byteReadLength) {
+                            int readLength = eventContent.getInt();
+                            byteReadLength += readLength;
+                            transportSyncProperties[propertiesLength] = BinaryMessageConverterUtil.
+                                    getString(eventContent, readLength);
+                            propertiesLength ++;
+                        }
+                    }
                 }
                 long lastSequenceIdForApp = -1;
 
@@ -110,7 +128,8 @@ public class EventListMapManager {
                         }
                         String[] attributeTypes = attributes.substring(1, attributes.length() - 1).split(", ");
                         events[i] = SiddhiEventConverter.getEvent(eventContent, attributeTypes);
-                        queuedEvent = new QueuedEvent(siddhiAppName, sourceHandlerElementId, sequenceID, events[i]);
+                        queuedEvent = new QueuedEvent(siddhiAppName, sourceHandlerElementId, sequenceID, events[i],
+                                transportSyncProperties);
                         this.addToEventListMap(sequenceID, queuedEvent);
                     }
 
@@ -152,7 +171,15 @@ public class EventListMapManager {
                     for (Source source : sources) {
                         if(queuedEvent.getSourceHandlerElementId().equals(source.getMapper().
                                 getHandler().getElementId())){
-                            source.getMapper().getHandler().sendEvent(queuedEvent.getEvent());
+                            source.getMapper().getHandler().sendEvent(queuedEvent.getEvent(),
+                                    queuedEvent.getTransportSyncProperties());
+                            if (null != queuedEvent.getTransportSyncProperties() &&
+                                    queuedEvent.getTransportSyncProperties().length != 0) {
+                                if (source.getMapper().getHandler() instanceof HACoordinationSourceHandler) {
+                                    ((HACoordinationSourceHandler)source.getMapper().getHandler()).
+                                            updateTransportSyncProperties(queuedEvent.getTransportSyncProperties());
+                                }
+                            }
                             eventListMap.remove(key);
                             isFound = true;
                             break;
