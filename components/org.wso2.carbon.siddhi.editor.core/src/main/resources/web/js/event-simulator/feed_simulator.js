@@ -928,7 +928,7 @@ define(['jquery', 'log', './simulator-rest-client', 'lodash', './open-siddhi-app
             var dynamicId = $sourceConfigForm.attr('data-uuid');
             var attributeType = $(this).attr('data-type');
             var id = this.id;
-            $sourceConfigForm.find("."+id + "_config")
+            $sourceConfigForm.find('.' + id + '_config')
                 .html(self.generateRandomAttributeConfiguration(randomType, attributeType, dynamicId, id));
             // set the selected option of property based attribute configuration type (if any) to -1
             $sourceConfigForm.find('[class^="feed-attribute-random-' + dynamicId + '-property"]').each(function () {
@@ -1891,7 +1891,7 @@ define(['jquery', 'log', './simulator-rest-client', 'lodash', './open-siddhi-app
 
     };
 
-    self.generateAttributesListForSource = function (dataType, attributes,uuid) {
+    self.generateAttributesListForSource = function (dataType, attributes, uuid) {
         var csvAttribute =
             '<div class="form-group">' +
             '   <label for ="attributes_{{attributeName}}_{{id}}">' +
