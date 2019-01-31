@@ -1915,7 +1915,7 @@ define(['jquery', 'log', './simulator-rest-client', 'lodash', './open-siddhi-app
             '</div>';
         var randomAttribute =
             '<div class="form-group">' +
-            '   <label for ="attributes_{{attributeName}}__{{id}}">' +
+            '   <label for ="attributes_{{attributeName}}_{{id}}">' +
             '       {{attributeName}}({{attributeType}})' +
             '   </label>' +
             '           <select id="attributes_{{attributeName}}_{{id}}"' +
