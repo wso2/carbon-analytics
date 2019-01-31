@@ -16,9 +16,9 @@
  * under the License.
  */
 
-define(['jquery', 'log', './simulator-rest-client', 'lodash', './open-siddhi-apps', 
+define(['jquery', 'log', './constants', './simulator-rest-client', 'lodash', './open-siddhi-apps',
     /* void libs */'bootstrap', 'theme_wso2', 'jquery_ui', 'jquery_validate', 'jquery_timepicker', './templates'], 
-    function ($, log, Simulator, _, OpenSiddhiApps) {
+    function ($, log, constants,Simulator, _, OpenSiddhiApps) {
 
     "use strict";   // JS strict mode
 
@@ -186,6 +186,7 @@ define(['jquery', 'log', './simulator-rest-client', 'lodash', './open-siddhi-app
             } else {
                 $inputField
                     .prop('disabled', false);
+                $('.parent-checkbox').prop("checked", false);
                 self.addRuleForAttribute($inputField);
             }
 
@@ -664,7 +665,7 @@ define(['jquery', 'log', './simulator-rest-client', 'lodash', './open-siddhi-app
             '<table class="table table-responsive"> ' +
             '   <thead>' +
             '    <tr>' +
-            '       <th width="90%">' +
+            '       <th width="80%">' +
             '           <label>' +
             '               Attributes<span class="requiredAstrix"> *</span>' +
             '           </label> ' +
@@ -673,6 +674,9 @@ define(['jquery', 'log', './simulator-rest-client', 'lodash', './open-siddhi-app
             '           <label>' +
             '            Is Null' +
             '           </label>' +
+            '       </th>' +
+            '       <th width="10%">' +
+            '           <input type="checkbox" class="parent-checkbox" style="margin-bottom:7px" >' +
             '       </th>' +
             '    </tr>' +
             '   </thead>' +
@@ -711,6 +715,19 @@ define(['jquery', 'log', './simulator-rest-client', 'lodash', './open-siddhi-app
             $(this)
                 .prop('selectedIndex', -1);
         });
+        parentCheckboxEventListener();
+    };
+
+//add an eventlistener to parent checkbox for disabling all the attributes
+    var parentCheckboxEventListener = function() {
+        $(".form-group").on("click", ".parent-checkbox", function() {
+            var checkStatus = $(this).is(":checked");
+            var parent = $(this).parents(".form-group");
+                parent.find(".attribtes-checkbox" && ".form-control").each(function() {
+                    parent.find(".attributes-checkbox").prop("checked", checkStatus);
+                    parent.find(".form-control").val("").prop("disabled", checkStatus);
+                });
+         });
     };
 
 // create input fields for attributes
@@ -728,7 +745,7 @@ define(['jquery', 'log', './simulator-rest-client', 'lodash', './open-siddhi-app
             '           </select>' +
             '   </td>' +
             '   <td width="15%" class="align-middle">' +
-            '       <input type="checkbox" name="{{attributeName}}-null" data-attribute-name="{{attributeName}}-attr"' +
+            '       <input type="checkbox" class="attributes-checkbox"  name="{{attributeName}}-null" data-attribute-name="{{attributeName}}-attr"' +
             '       data-input="null">' +
             '   </td>' +
             '</tr>';
@@ -743,7 +760,7 @@ define(['jquery', 'log', './simulator-rest-client', 'lodash', './open-siddhi-app
             '           name="{{attributeName}}-attr" data-type ="{{attributeType}}">' +
             '   </td>' +
             '   <td width="15%" class="align-middle">' +
-            '       <input align="center" type="checkbox" name="{{attributeName}}-null"' +
+            '       <input align="center" type="checkbox" class="attributes-checkbox" name="{{attributeName}}-null"' +
             '       data-attribute-name="{{attributeName}}-attr" data-input="null">' +
             '   </td>' +
             '</tr>';
@@ -768,8 +785,34 @@ define(['jquery', 'log', './simulator-rest-client', 'lodash', './open-siddhi-app
         $attributes.each(
             function () {
                 self.addRuleForAttribute(this);
+                var dataType = $(this).attr("data-type");
+                $(this).keypress(function(e) {
+                    var userInput = e.key;
+                    if (!constants.ALLOWED_KEYS.includes(userInput)) {
+                        var valid = self.onKeyPressValidate(dataType, userInput);
+                        if (!valid) {
+                            e.preventDefault();
+                        }
+                    }
+                });
             }
         );
+    };
+
+
+//add onKeyPressValidate for an attribute based on the attribute type
+    self.onKeyPressValidate = function(dataType, userInput) {
+        var validDataType = true;
+        if (constants.INT_LONG.includes(dataType)) {
+            if (!userInput.match(constants.INT_LONG_REGEX_MATCH)) {
+                validDataType = false;
+            }
+        } else if (constants.DOUBLE_FLOAT.includes(dataType)) {
+            if (!userInput.match(constants.DOUBLE_FLOAT_REGEX_MATCH)) {
+                validDataType = false;
+            }
+        }
+        return validDataType;
     };
 
 // add a validation rule for an attribute based on the attribute type
@@ -790,8 +833,7 @@ define(['jquery', 'log', './simulator-rest-client', 'lodash', './open-siddhi-app
                     required: true,
                     validateIntOrLong: true,
                     messages: {
-                        required: "Please specify an attribute value.",
-                        validateIntOrLong: "Please specify a valid " + type.toLowerCase() + " value."
+                        required: "Please specify an attribute value."
                     }
                 });
                 break;
@@ -801,8 +843,7 @@ define(['jquery', 'log', './simulator-rest-client', 'lodash', './open-siddhi-app
                     required: true,
                     validateFloatOrDouble: true,
                     messages: {
-                        required: "Please specify an attribute value.",
-                        validateFloatOrDouble: "Please specify a valid " + type.toLowerCase() + " value."
+                        required: "Please specify an attribute value."
                     }
                 });
                 break;

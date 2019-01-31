@@ -16,7 +16,6 @@
 package org.wso2.carbon.data.provider.rdbms.config;
 
 import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import org.wso2.carbon.data.provider.ProviderConfig;
 
@@ -89,5 +88,10 @@ public class RDBMSDataProviderConf implements ProviderConfig {
     @Override
     public boolean isPurgingEnable() {
         return isPurgingEnable;
+    }
+
+    @Override
+    public boolean isPaginationEnabled() {
+        return false;
     }
 }

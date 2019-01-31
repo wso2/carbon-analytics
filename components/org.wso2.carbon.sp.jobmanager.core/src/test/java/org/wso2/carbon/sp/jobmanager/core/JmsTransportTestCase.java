@@ -306,7 +306,7 @@ public class JmsTransportTestCase {
             tempStreamHandler.send(new Object[]{2, 140, 100});
             tempStreamHandler.send(new Object[]{2, 140, 30});
 
-            SiddhiTestHelper.waitForEvents(2500, 2, count, 3000);
+            SiddhiTestHelper.waitForEvents(2500, 8, count, 5000);
             Assert.assertEquals(count.intValue(), 2);
             Assert.assertEquals(errorAssertionCount.intValue(), 0,
                     "No assertion errors should occur inside callbacks");

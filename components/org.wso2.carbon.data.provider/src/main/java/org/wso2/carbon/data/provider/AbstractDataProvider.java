@@ -44,16 +44,18 @@ public abstract class AbstractDataProvider implements DataProvider {
     private long publishingInterval;
     private long purgingInterval;
     private boolean isPurgingEnable;
+    private boolean isPaginationEnabled;
 
     public DataProvider init(String topic, String sessionId, ProviderConfig providerConfig)
             throws DataProviderException {
-        if (configValidator(providerConfig)) {
+        if (this.configValidator(providerConfig)) {
             this.topic = topic;
             this.sessionId = sessionId;
             this.publishingInterval = providerConfig.getPublishingInterval();
             this.purgingInterval = providerConfig.getPurgingInterval();
             this.isPurgingEnable = providerConfig.isPurgingEnable();
-            setProviderConfig(providerConfig);
+            this.isPaginationEnabled = providerConfig.isPaginationEnabled();
+            this.setProviderConfig(providerConfig);
             return this;
         } else {
             throw new DataProviderException("Invalid configuration provided. Unable to complete initialization " +
@@ -69,10 +71,11 @@ public abstract class AbstractDataProvider implements DataProvider {
 
     @Override
     public void start() {
-        dataPublishingExecutorService.scheduleAtFixedRate(() -> {
-
-            publish(this.topic, this.sessionId);
-        }, 0, publishingInterval, TimeUnit.SECONDS);
+        if (!this.isPaginationEnabled) {
+            this.dataPublishingExecutorService.scheduleAtFixedRate(() -> {
+                this.publish(this.topic, this.sessionId);
+            }, 0L, this.publishingInterval, TimeUnit.SECONDS);
+        }
         if (isPurgingEnable) {
             dataPublishingExecutorService.scheduleAtFixedRate(() -> {
                 purging();

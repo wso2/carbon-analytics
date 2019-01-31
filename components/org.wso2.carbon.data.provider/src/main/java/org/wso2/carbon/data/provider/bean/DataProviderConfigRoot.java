@@ -30,10 +30,10 @@ public class DataProviderConfigRoot {
     private JsonElement dataProviderConfiguration;
 
     /**
-     * enum for define the supportive data column types.
+     * Enum for define the supportive data provider action types.
      */
     public enum Types {
-        SUBSCRIBE, UNSUBSCRIBE
+        SUBSCRIBE, UNSUBSCRIBE, POLLING
     }
 
     public DataProviderConfigRoot() {
