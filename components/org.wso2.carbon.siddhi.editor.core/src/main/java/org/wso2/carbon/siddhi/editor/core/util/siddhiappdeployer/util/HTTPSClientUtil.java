@@ -25,7 +25,7 @@ import org.wso2.carbon.siddhi.editor.core.exception.SiddhiAppDeployerServiceStub
  * Contains HTTPS client related methods
  */
 public class HTTPSClientUtil {
-    private static final String PROTOCOL = "https://";
+    private static final String PROTOCOL = "https";
 
     /**
      * Avoids Instantiation
@@ -40,7 +40,7 @@ public class HTTPSClientUtil {
      * @return HTTPS URL
      */
     private static String generateURL(String hostAndPort) {
-        return PROTOCOL + hostAndPort;
+        return PROTOCOL + "://" + hostAndPort;
     }
 
     /**

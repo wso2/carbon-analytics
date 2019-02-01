@@ -21,17 +21,16 @@ package org.wso2.carbon.siddhi.editor.core.util.siddhiappdeployer;
 import feign.Response;
 import feign.RetryableException;
 import org.wso2.carbon.siddhi.editor.core.exception.SiddhiAppDeployerServiceStubException;
-import org.wso2.carbon.siddhi.editor.core.exception.SiddhiAppsApiHelperException;
 import org.wso2.carbon.siddhi.editor.core.util.siddhiappdeployer.api.SiddhiAppApiHelperService;
 import org.wso2.carbon.siddhi.editor.core.util.siddhiappdeployer.util.HTTPSClientUtil;
 
 /**
  * Consists of a method for the deployment feature for the exposed Siddhi App Api
  */
-public class SiddhiAppApiHelper implements SiddhiAppApiHelperService {
+public class SiddhiAppDeployerApiHelper implements SiddhiAppApiHelperService {
     @Override
     public boolean deploySiddhiApp(String hostAndPort, String username, String password, String siddhiApp,
-                                   String fileName) throws SiddhiAppsApiHelperException {
+                                   String fileName) throws SiddhiAppDeployerServiceStubException {
         Response response = null;
         try {
             response = HTTPSClientUtil.doPutRequest(hostAndPort, username, password, siddhiApp);
@@ -42,26 +41,25 @@ public class SiddhiAppApiHelper implements SiddhiAppApiHelperService {
                 case 201:
                     return true;
                 case 400:
-                    throw new SiddhiAppsApiHelperException("A validation error occurred during " +
-                            "saving the siddhi app '" + fileName + "' on the node '" + hostAndPort + "'", status);
+                    throw new SiddhiAppDeployerServiceStubException("Status code " + status +
+                            " received. A validation error occurred during " +
+                            "saving the siddhi app '" + fileName + "' on the node '" + hostAndPort + "'");
                 case 401:
-                    throw new SiddhiAppsApiHelperException("Invalid user name or password on the node '" +
-                            hostAndPort + "' for the user " + username, status);
+                    throw new SiddhiAppDeployerServiceStubException("Status code " + status +
+                            " received. Invalid user name or password on the node '" +
+                            hostAndPort + "' for the user " + username);
                 case 500:
-                    throw new SiddhiAppsApiHelperException("Unexpected error occurred during " +
-                            "saving the siddhi app '" + fileName + "' on the node '" +
-                            hostAndPort + "'", status);
+                    throw new SiddhiAppDeployerServiceStubException("Status code " + status +
+                            " received. Unexpected error occurred during " +
+                            "saving the siddhi app '" + fileName + "' on the node '" + hostAndPort + "'");
                 default:
-                    throw new SiddhiAppsApiHelperException("Unexpected status code '" + status + "' received when " +
-                            "trying to deploy the siddhi app '" + fileName + "' on node '" +
-                            hostAndPort + "'", status);
+                    throw new SiddhiAppDeployerServiceStubException("Unexpected status code '" + status +
+                            "' received when trying to deploy the siddhi app '" + fileName + "' on node '" +
+                            hostAndPort + "'");
             }
-        } catch (SiddhiAppDeployerServiceStubException e) {
-            throw new SiddhiAppsApiHelperException("Failed to deploy siddhi app '" + fileName + "' on the node '" +
-                    hostAndPort + "'. ", e);
         } catch (RetryableException e) {
-            throw new SiddhiAppsApiHelperException("Cannot connect to the worker node (" + hostAndPort + ") for " +
-                    "retrieving status of the siddhi app " + fileName + ".", e);
+            throw new SiddhiAppDeployerServiceStubException("Cannot connect to the worker node (" + hostAndPort + ") " +
+                    "for retrieving status of the siddhi app " + fileName + ".", e);
         } finally {
             closeResponse(response);
         }

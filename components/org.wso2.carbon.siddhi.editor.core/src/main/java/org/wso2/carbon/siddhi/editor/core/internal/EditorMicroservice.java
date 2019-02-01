@@ -53,7 +53,7 @@ import org.wso2.carbon.siddhi.editor.core.commons.response.MetaDataResponse;
 import org.wso2.carbon.siddhi.editor.core.commons.response.Status;
 import org.wso2.carbon.siddhi.editor.core.commons.response.ValidationSuccessResponse;
 import org.wso2.carbon.siddhi.editor.core.exception.DockerGenerationException;
-import org.wso2.carbon.siddhi.editor.core.exception.SiddhiAppsApiHelperException;
+import org.wso2.carbon.siddhi.editor.core.exception.SiddhiAppDeployerServiceStubException;
 import org.wso2.carbon.siddhi.editor.core.exception.SiddhiStoreQueryHelperException;
 import org.wso2.carbon.siddhi.editor.core.internal.local.LocalFSWorkspace;
 import org.wso2.carbon.siddhi.editor.core.util.Constants;
@@ -73,7 +73,7 @@ import org.wso2.carbon.siddhi.editor.core.util.designview.deserializers.Deserial
 import org.wso2.carbon.siddhi.editor.core.util.designview.designgenerator.DesignGenerator;
 import org.wso2.carbon.siddhi.editor.core.util.designview.exceptions.CodeGenerationException;
 import org.wso2.carbon.siddhi.editor.core.util.designview.exceptions.DesignGenerationException;
-import org.wso2.carbon.siddhi.editor.core.util.siddhiappdeployer.SiddhiAppApiHelper;
+import org.wso2.carbon.siddhi.editor.core.util.siddhiappdeployer.SiddhiAppDeployerApiHelper;
 import org.wso2.carbon.stream.processor.common.EventStreamService;
 import org.wso2.carbon.stream.processor.common.SiddhiAppRuntimeService;
 import org.wso2.carbon.stream.processor.common.utils.config.FileConfigManager;
@@ -371,7 +371,7 @@ public class EditorMicroservice implements Microservice {
         Integer serverListCount = element.getAsJsonObject().getAsJsonArray("serverList").size();
         String location = (Paths.get(Constants.RUNTIME_PATH,
                 Constants.DIRECTORY_DEPLOYMENT, Constants.DIRECTORY_WORKSPACE)).toString();
-        SiddhiAppApiHelper siddhiAppApiHelper = new SiddhiAppApiHelper();
+        SiddhiAppDeployerApiHelper siddhiAppDeployerApiHelper = new SiddhiAppDeployerApiHelper();
         for (int i = 0; i < siddhiFilesCount; i++) {
             fileName = element.getAsJsonObject().getAsJsonArray(Constants.SIDDHI_FILE_LIST).get(i).
                     getAsJsonObject().get(Constants.SIDDHI_APP_NAME).toString().replaceAll("\"", "");
@@ -397,14 +397,14 @@ public class EditorMicroservice implements Microservice {
                         getAsJsonObject().get(Constants.DEPLOYMENT_PASSWORD).toString().replaceAll("\"",
                         "");
                 try {
-                    boolean response = siddhiAppApiHelper.
+                    boolean response = siddhiAppDeployerApiHelper.
                             deploySiddhiApp(hostAndPort, username, password, sidhiFile, fileName);
                     if (response == true) {
                         JsonPrimitive status = new JsonPrimitive(fileName + " was successfully deployed to " +
                                 hostAndPort);
                         success.add(status);
                     }
-                } catch (SiddhiAppsApiHelperException e) {
+                } catch (SiddhiAppDeployerServiceStubException e) {
                     JsonPrimitive status = new JsonPrimitive(String.valueOf(e.getMessage()));
                     failure.add(status);
                 }
