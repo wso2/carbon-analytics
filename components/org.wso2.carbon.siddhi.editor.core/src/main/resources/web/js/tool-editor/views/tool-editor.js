@@ -22,6 +22,8 @@ define(['require', 'jquery', 'backbone', 'lodash', 'log', 'design_view', "./sour
     function (require, $, Backbone, _, log, DesignView, SourceView, constants, UndoManager, Launcher,
               DebugManager, DesignViewUtils) {
 
+        const ENTER_KEY = 13;
+
         var ServicePreview = Backbone.View.extend(
             /** @lends ServicePreview.prototype */
             {
@@ -289,7 +291,7 @@ define(['require', 'jquery', 'backbone', 'lodash', 'log', 'design_view', "./sour
                         }
                     });
                     toggleViewButton.keydown(function (key) {
-                        if (key.keyCode == 13) {
+                        if (key.keyCode == ENTER_KEY) {
                             toggleViewButton.click();
                         }
                     });

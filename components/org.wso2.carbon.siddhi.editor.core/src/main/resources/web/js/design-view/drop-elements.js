@@ -29,6 +29,9 @@ define(['require', 'log', 'lodash', 'jquery', 'partition', 'stream', 'query', 'f
          */
 
         const ENTER_KEY = 13;
+        const DELETE_KEY = 46;
+        const MAC_COMMAND_KEY = 91;
+        const MAC_DELETE_KEY = 8;
 
         var DropElements = function (options) {
             var errorMessage = 'unable to find design view container';
@@ -1425,12 +1428,14 @@ define(['require', 'log', 'lodash', 'jquery', 'partition', 'stream', 'query', 'f
             });
 
             newElement.on('keydown', function (key) {
-                if ((key.keyCode = 91 && key.keyCode == 8) || key.keyCode == 46) {
+                if ((key.keyCode = MAC_COMMAND_KEY && key.keyCode == MAC_DELETE_KEY) || key.keyCode == DELETE_KEY) {
                     $('#' + newElement[0].id).addClass('selected-element');
                     showPopOver(this.children.item(1), newElement);
                 }
             });
 
+            // Check whether clicked element is there in the selected element list and if not clear the selected
+            // element list and cleanDragSelection object
             newElement.on('mousedown', function () {
                 if (!window.selectedElements.includes(newElement[0], 0)) {
                     self.jsPlumbInstance.clearDragSelection();
