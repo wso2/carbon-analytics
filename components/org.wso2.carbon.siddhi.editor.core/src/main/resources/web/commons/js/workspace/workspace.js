@@ -514,6 +514,14 @@ define(['ace/ace', 'jquery', 'lodash', 'log','dialogs','./service-client','welco
 
             };
 
+            this.handleDeploy = function handleDeploy() {
+                if (_.isNil(this._handleDeploy)) {
+                    this._handleDeploy = new Dialogs.deploy_file_dialog(app);
+                }
+                this._handleDeploy.render();
+                this._handleDeploy.show();
+            };
+
             this.openDeleteFileConfirmDialog = function openDeleteFileConfirmDialog(options) {
                 if(_.isNil(this._deleteFileDialog)){
                     this._deleteFileDialog = new Dialogs.DeleteConfirmDialog(app);
@@ -744,6 +752,6 @@ define(['ace/ace', 'jquery', 'lodash', 'log','dialogs','./service-client','welco
             // Open Sample file open dialog
             app.commandManager.registerHandler('open-sample-file-open-dialog', this.openSampleFileOpenDialog, this);
             app.commandManager.registerHandler('query-store', this.openQueryStore, this);
+            app.commandManager.registerHandler('deploy-to-server', this.handleDeploy, this);
         }
     });
-

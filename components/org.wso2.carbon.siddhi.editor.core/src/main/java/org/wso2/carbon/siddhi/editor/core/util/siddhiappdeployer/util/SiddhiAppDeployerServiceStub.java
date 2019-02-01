@@ -1,5 +1,5 @@
-/**
- * Copyright (c) 2017, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+/*
+ * Copyright (c) 2019, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
  *
  * WSO2 Inc. licenses this file to you under the Apache License,
  * Version 2.0 (the "License"); you may not use this file except
@@ -16,12 +16,18 @@
  * under the License.
  */
 
-define(['file_menu', 'edit_menu', 'run_menu', 'tools_menu', 'deploy_menu'], function (FileMenu, EditMenu, RunMenu, ToolsMenu, DeployMenu) {
-    var menuBar = {};
-    menuBar[FileMenu.id] = FileMenu;
-    menuBar[EditMenu.id] = EditMenu;
-    menuBar[RunMenu.id] = RunMenu;
-    menuBar[ToolsMenu.id] = ToolsMenu;
-    menuBar[DeployMenu.id] = DeployMenu;
-    return menuBar;
-});
+package org.wso2.carbon.siddhi.editor.core.util.siddhiappdeployer.util;
+
+import feign.Headers;
+import feign.RequestLine;
+import feign.Response;
+import org.wso2.carbon.siddhi.editor.core.exception.SiddhiAppDeployerServiceStubException;
+
+/**
+ * Feign client for sending requests
+ */
+public interface SiddhiAppDeployerServiceStub {
+    @RequestLine("PUT /siddhi-apps")
+    @Headers("Content-Type: text/plain; charset=utf-8")
+    Response doPutRequest(String payload) throws SiddhiAppDeployerServiceStubException;
+}
