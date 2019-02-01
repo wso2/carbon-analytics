@@ -37,6 +37,6 @@ define(['./save-to-file-dialog','./replace-confirm-dialog','./open-file-dialog',
             docker_export_dialog: DockerExportDialog,
             sample_event_dialog: SampleEventDialog,
             query_store_api: QueryStoreDialog,
-            deploy_file_dialog: DeployFileDialog,
+            deploy_file_dialog: DeployFileDialog
         };
     });

@@ -46,7 +46,7 @@ public class SiddhiAppApiHelper implements SiddhiAppApiHelperService {
                             "saving the siddhi app '" + fileName + "' on the node '" + hostAndPort + "'", status);
                 case 401:
                     throw new SiddhiAppsApiHelperException("Invalid user name or password on the node '" +
-                            hostAndPort + "'", status);
+                            hostAndPort + "' for the user " + username, status);
                 case 500:
                     throw new SiddhiAppsApiHelperException("Unexpected error occurred during " +
                             "saving the siddhi app '" + fileName + "' on the node '" +

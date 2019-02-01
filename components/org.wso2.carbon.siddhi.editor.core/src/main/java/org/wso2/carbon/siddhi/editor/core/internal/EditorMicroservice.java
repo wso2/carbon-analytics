@@ -361,23 +361,27 @@ public class EditorMicroservice implements Microservice {
     @Path("/workspace/deploy")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public JsonObject deploy(JsonElement element) throws IOException, SiddhiAppsApiHelperException {
+    public JsonObject deploy(JsonElement element) {
         JsonArray success = new JsonArray();
         JsonArray failure = new JsonArray();
         JsonObject deploymentStatus = new JsonObject();
-
+        String fileName;
+        String sidhiFile = null;
         Integer siddhiFilesCount = element.getAsJsonObject().getAsJsonArray(Constants.SIDDHI_FILE_LIST).size();
         Integer serverListCount = element.getAsJsonObject().getAsJsonArray("serverList").size();
         String location = (Paths.get(Constants.RUNTIME_PATH,
                 Constants.DIRECTORY_DEPLOYMENT, Constants.DIRECTORY_WORKSPACE)).toString();
-
         SiddhiAppApiHelper siddhiAppApiHelper = new SiddhiAppApiHelper();
-
         for (int i = 0; i < siddhiFilesCount; i++) {
-            String fileName = element.getAsJsonObject().getAsJsonArray(Constants.SIDDHI_FILE_LIST).get(i).
+            fileName = element.getAsJsonObject().getAsJsonArray(Constants.SIDDHI_FILE_LIST).get(i).
                     getAsJsonObject().get(Constants.SIDDHI_APP_NAME).toString().replaceAll("\"", "");
-            String sidhiFile = new String((Files.readAllBytes(Paths.
-                    get(location + "/" + fileName))), "UTF-8");
+            try {
+                sidhiFile = new String((Files.readAllBytes(Paths.
+                        get(location + "/" + fileName))), "UTF-8");
+            } catch (IOException e) {
+                JsonPrimitive status = new JsonPrimitive(String.valueOf(e));
+                failure.add(status);
+            }
             for (int x = 0; x < serverListCount; x++) {
                 String host = element.getAsJsonObject().getAsJsonArray(Constants.SERVER_LIST).get(x).
                         getAsJsonObject().get(Constants.DEPLOYMENT_HOST).toString().replaceAll("\"",
@@ -390,7 +394,8 @@ public class EditorMicroservice implements Microservice {
                         getAsJsonObject().get(Constants.DEPLOYMENT_USERNAME).toString().replaceAll("\"",
                         "");
                 String password = element.getAsJsonObject().getAsJsonArray(Constants.SERVER_LIST).get(x).
-                        getAsJsonObject().get(Constants.DEPLOYMENT_PASSWORD).toString().replaceAll("\"", "");
+                        getAsJsonObject().get(Constants.DEPLOYMENT_PASSWORD).toString().replaceAll("\"",
+                        "");
                 try {
                     boolean response = siddhiAppApiHelper.
                             deploySiddhiApp(hostAndPort, username, password, sidhiFile, fileName);
