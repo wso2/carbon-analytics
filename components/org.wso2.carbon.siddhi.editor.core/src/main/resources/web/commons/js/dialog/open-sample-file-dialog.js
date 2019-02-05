@@ -59,7 +59,7 @@ define(['require', 'lodash','jquery', 'log', 'backbone', 'file_browser', 'worksp
                     var sampleFileOpen = $(
                         "<div class='modal fade' id='openSampleConfigModal' tabindex='-1' role='dialog' " +
                         "aria-tydden='true'>" + "<div class='modal-dialog file-dialog' role='document'>" +
-                        "<div class='modal-content'>" +
+                        "<div class='modal-content' id='sampleDialog'>" +
                         "<div class='modal-header'>" +
                         "<button type='button' class='close' data-dismiss='modal' aria-label='Close'>" +
                         "<span aria-hidden='true'>&times;</span>" +

@@ -755,3 +755,4 @@ define(['ace/ace', 'jquery', 'lodash', 'log','dialogs','./service-client','welco
             app.commandManager.registerHandler('deploy-to-server', this.handleDeploy, this);
         }
     });
+

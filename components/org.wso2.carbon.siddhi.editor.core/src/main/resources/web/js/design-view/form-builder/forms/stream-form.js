@@ -118,8 +118,8 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'jsonValidator', 'con
             self.formUtils.checkPredefinedAnnotations(checkedAnnotations);
 
             //submit button action
-            var submitButtonElement = $(formContainer).find('#btn-submit')[0];
-            submitButtonElement.addEventListener('click', function () {
+            $(formContainer).on('click', '#btn-submit', function () {
+                //.submitButtonElement.addEventListener('click', function () {
                 $('.error-message').text("")
                 $('.required-input-field').removeClass('required-input-field');
                 $('#streamNameErrorMessage').text("")
@@ -269,6 +269,7 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'jsonValidator', 'con
                     // close the form window
                     self.consoleListManager.removeFormConsole(formConsole);
                 }
+                return ;
             });
 
             // 'Cancel' button action
