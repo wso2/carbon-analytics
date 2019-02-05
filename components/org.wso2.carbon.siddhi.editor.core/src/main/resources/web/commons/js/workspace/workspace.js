@@ -744,6 +744,9 @@ define(['ace/ace', 'jquery', 'lodash', 'log','dialogs','./service-client','welco
             // Open Sample file open dialog
             app.commandManager.registerHandler('open-sample-file-open-dialog', this.openSampleFileOpenDialog, this);
             app.commandManager.registerHandler('query-store', this.openQueryStore, this);
+
+            // //Run hint tour
+            app.commandManager.registerHandler('hint-tour', app.runGuide , app);
         }
     });
 

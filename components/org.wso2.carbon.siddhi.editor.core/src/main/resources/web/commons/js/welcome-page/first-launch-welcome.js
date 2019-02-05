@@ -15,8 +15,8 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-define(['require', 'lodash', 'log', 'jquery', 'backbone', 'command', 'sample_preview', 'workspace/file'],
-    function (require, _, log, $, Backbone, CommandManager, SamplePreviewView, File) {
+define(['require', 'lodash', 'log', 'jquery', 'backbone', 'command', 'sample_preview', 'workspace/file', 'enjoyhint', 'guide'],
+    function (require, _, log, $, Backbone, CommandManager, SamplePreviewView, File, EnjoyHint, Guide) {
 
         var FirstLaunchWelcomePage = Backbone.View.extend({
             initialize: function (options) {
@@ -61,7 +61,7 @@ define(['require', 'lodash', 'log', 'jquery', 'backbone', 'command', 'sample_pre
                 var leftPane = $('<div></div>');
                 var buttonWrap = $('<div></div>');
                 var productNameWrap = $('<div></div>');
-                var newButton = $('<button></button>');
+                var newButton = $('<button id="newButton"></button>');
                 var openButton = $('<button></button>');
 
                 var contentPane = $('<div></div>');

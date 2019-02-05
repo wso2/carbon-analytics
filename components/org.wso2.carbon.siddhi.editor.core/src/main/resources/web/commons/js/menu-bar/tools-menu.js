@@ -110,6 +110,24 @@ define(([],function (){
                     }
                 },
                 disabled: false
+            },
+            {
+                id: "hintTour",
+                label: "Tour guide",
+                command: {
+                    id: "hint-tour",
+                    labels:{
+                        mac: {
+                            key: "command+shift+t",
+                            label: "\u2318\u21E7Q"
+                        },
+                        other: {
+                            key: "ctrl+shift+t",
+                            label: "Ctrl+Shift+T"
+                        }
+                    }
+                },
+                disabled: false
             }
         ]
 

@@ -31,6 +31,10 @@ define(['lodash', 'event_channel'],
         var parent = _.get(this, 'options.parent');
 
         var item = $('<li></li>');
+
+        //adding an id attr to the dropdown menu items
+        item.attr('id', _.get(this, 'definition.id'));
+
         var title = $('<span class="pull-left"></span>');
         var link = $('<a></a>');
         parent.append(item);

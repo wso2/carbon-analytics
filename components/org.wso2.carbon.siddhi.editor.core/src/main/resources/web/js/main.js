@@ -18,10 +18,10 @@
 
 define(['require', 'log', 'jquery', 'lodash', 'backbone', 'menu_bar', 'tool_bar', 'command', 'workspace',
         'app/tab/service-tab-list', 'event_simulator', 'app/output-console/service-console-list-manager',
-        'nano_scroller'],
+        'nano_scroller','guide'],
 
     function (require, log, $, _, Backbone, MenuBar, ToolBar, CommandManager, Workspace, TabController,
-              EventSimulator, OutputController) {
+              EventSimulator, OutputController,NanoScroller, Guide) {
 
         var Application = Backbone.View.extend(
             /** @lends Application.prototype */
@@ -87,6 +87,9 @@ define(['require', 'log', 'jquery', 'lodash', 'backbone', 'menu_bar', 'tool_bar'
                     _.set(eventSimulatorOpts, 'application', this);
                     this.eventSimulator = new EventSimulator(eventSimulatorOpts);
                     this.eventSimulator.stopRunningSimulations();
+
+                    //init Hint Guide
+                    this.guide = new Guide(this);
                 },
 
                 render: function () {
@@ -109,6 +112,7 @@ define(['require', 'log', 'jquery', 'lodash', 'backbone', 'menu_bar', 'tool_bar'
                     log.debug("start: rendering event simulator control");
                     this.eventSimulator.render();
                     log.debug("end: rendering event simulator control");
+
                 },
 
                 getOperatingSystem: function(){
@@ -130,6 +134,12 @@ define(['require', 'log', 'jquery', 'lodash', 'backbone', 'menu_bar', 'tool_bar'
 
                 displayInitialView: function () {
                     this.workspaceManager.displayInitialTab();
+                },
+
+                runGuide: function (){
+                    log.debug("start: rendering hint guide");
+                    this.guide.render();
+                    log.debug("end: rendering hint guide");
                 },
 
                 isRunningOnMacOS: function(){

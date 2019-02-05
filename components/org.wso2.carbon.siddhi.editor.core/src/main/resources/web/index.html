@@ -15,6 +15,8 @@
     <link href="/editor/commons/lib/data-table/dataTables.bootstrap.min.css" rel="stylesheet" type="text/css"/>
     <link href="/editor/commons/lib/theme-wso2-2.0.0/extensions/datatables/css/dataTables.wso2.css" rel="stylesheet"
           type="text/css"/>
+    <link href="/editor/commons/lib/theme-wso2-2.0.0/css/theme-wso2.css" rel="stylesheet" type="text/css"/>
+
     <link href="/editor/commons/css/layout.css" rel="stylesheet" type="text/css"/>
     <link href="/editor/commons/css/styles.css" rel="stylesheet" type="text/css"/>
     <link href="/editor/commons/css/welcome-screen.css" rel="stylesheet" type="text/css"/>
@@ -26,6 +28,11 @@
     <link href="/editor/commons/css/jquery-ui-timepicker-addon.css" rel="stylesheet" type="text/css"/>
     <link href="/editor/commons/css/simulator.css" rel="stylesheet" type="text/css"/>
     <link rel="stylesheet" type="text/css" href="/editor/commons/css/notification.css"/>
+
+    <!--Enjoy Hint CSS-->
+
+    <link href="/editor/commons/lib/enjoyhint/enjoyhint.css" rel="stylesheet" type="text/css"/>
+    <link href="/editor/commons/lib/enjoyhint/customEnjoyhint.css" rel="stylesheet" type="text/css"/>
 
     <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
     <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
@@ -273,7 +280,7 @@
         <div class="toggle-controls-container">
             <div class="btn toggle-view-button">
                 <i class="fw fw-design-view fw-rotate-90"></i>
-                <span class="toggle-button-text">Design View</span>
+                <span class="toggle-button-text" id="design_view_btn">Design View</span>
             </div>
         </div>
         <!-- End: Toggle Controls Container  -->
@@ -531,14 +538,14 @@
                 <label>
                     Siddhi App Name
                 </label>
-                <select name="single-event-siddhi-app-name" class="form-control">
+                <select name="single-event-siddhi-app-name" class="form-control" id="siddhi-app-name">
                 </select>
             </div>
             <div class="form-group">
                 <label>
                     Stream Name
                 </label>
-                <select name="stream-name" class="form-control">
+                <select name="stream-name" class="form-control" id="stream-name">
                 </select>
             </div>
             <div class="form-group">
@@ -546,7 +553,7 @@
                     Timestamp(ms)<span class="optional"> - optional</span></label>
                 <input type="text" class="form-control" name="sim-timestamp" placeholder="Current System Time">
             </div>
-            <div class="form-group" data-name="attributes">
+            <div class="form-group" data-name="attributes" id="attribute-table">
             </div>
             <div class="alert alert-warning hidden" role="alert">
                 <div data-name="siddhi-app-name-mode">
@@ -555,7 +562,7 @@
                 </div>
             </div>
             <div class="form-group">
-                <button type="submit" class="btn btn-primary" name="send">
+                <button type="submit" class="btn btn-primary" name="send" id="start-and-send">
                     Send
                 </button>
             </div>
@@ -1606,6 +1613,8 @@
             datatables: "commons/lib/data-table/jquery.dataTables.min",
             datatables_bootstrap: "commons/lib/data-table/dataTables.bootstrap.min",
             datatables_wso2: "commons/lib/theme-wso2-2.0.0/extensions/datatables/js/dataTables.wso2",
+            enjoyhint: "commons/lib/enjoyhint/enjoyhint",
+            guide: "js/guide/guide",
             //beautify: "commons/lib/beautify",
             ///////////////////////
             // custom modules ////
@@ -2173,6 +2182,7 @@
         app = new Application(config);
         app.render();
         app.displayInitialView();
+        app.runGuide();
     });
 
 
