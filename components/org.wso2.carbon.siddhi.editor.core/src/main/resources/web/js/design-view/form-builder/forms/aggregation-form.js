@@ -253,7 +253,6 @@ define(['require', 'log', 'jquery', 'lodash', 'aggregateByTimePeriod', 'querySel
                 var userDefinedAnnotations = self.formUtils.getUserAnnotations(annotationsWithoutPrimaryIndex,
                     predefinedAggregationAnnotations);
 
-
                 self.formUtils.renderAnnotationTemplate("define-user-defined-annotation", userDefinedAnnotations);
                 $('.define-user-defined-annotation').find('h4').html('Customized Annotations');
                 self.formUtils.renderPrimaryIndexAnnotations(indexAnnotation, 'define-index-annotation');
@@ -366,13 +365,12 @@ define(['require', 'log', 'jquery', 'lodash', 'aggregateByTimePeriod', 'querySel
                     possibleAttributes.push(Constants.TRIGGERED_TIME);
                 }
 
-                var aggregateFunctions = self.configurationData.application.config.incremental_aggregator;
                 if (select) {
-                    self.formUtils.selectAttributeSelection(aggregateFunctions, select, possibleAttributes);
+                    self.formUtils.selectAttributeSelection(select);
                 } else {
                     $('.define-user-defined-attributes').hide();
                 }
-                self.formUtils.addEventListenersForAttributeSelectionDiv(aggregateFunctions, possibleAttributes);
+                self.formUtils.addEventListenersForSelectionDiv();
 
                 var groupByAttributes = [];
                 if (!groupBy || (groupBy && groupBy.length == 0)) {
@@ -473,7 +471,7 @@ define(['require', 'log', 'jquery', 'lodash', 'aggregateByTimePeriod', 'querySel
                         return;
                     }
 
-                    if (self.formUtils.validateUserDefinedAttributeSelection()) {
+                    if (self.formUtils.validateUserDefinedAttributeSelection(possibleAttributes)) {
                         isErrorOccurred = true;
                         return;
                     }
@@ -544,9 +542,7 @@ define(['require', 'log', 'jquery', 'lodash', 'aggregateByTimePeriod', 'querySel
                             clickedElement.addAnnotationObject(annotation);
                         });
 
-                        var selectAttributeOptions = {};
-                        self.formUtils.buildAttributeSelection(selectAttributeOptions);
-                        var selectObject = new QuerySelect(selectAttributeOptions);
+                        var selectObject = new QuerySelect(self.formUtils.buildAttributeSelection());
                         clickedElement.setSelect(selectObject);
 
                         if ($('.group-by-checkbox').is(':checked')) {

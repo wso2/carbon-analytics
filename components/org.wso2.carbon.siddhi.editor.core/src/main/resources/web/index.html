@@ -1382,25 +1382,28 @@
 
 
 <script id="select-user-defined-attribute-template" type = "text/template">
-    {{#each this}}
-        <li class="attribute">
-            <div class="clearfix">
-                <div>
-                    {{> renderDropDown connectedElementAttributes}}
-                </div>
-                <div class="expression-as-content">
-                    <div>
-                        {{> renderDropDown aggregateFunctionNames}}
+    <h3> Projection </h3>
+    <label class="clearfix"> <label class="mandatory-symbol"> * </label> Select </label>
+    <select class="attribute-selection-type" class="clearfix">
+        <option value="all"> All Attributes </option>
+        <option value="user_defined"> User Defined Attributes </option>
+    </select>
+    <div class="define-user-defined-attributes">
+        <ul class="user-defined-attributes">
+            {{#each this}}
+                <li class="attribute">
+                    <div class="clearfix">
+                        <div class="clearfix">
+                            <input type="text" class = "attribute-expression-as name" value="{{this}}">
+                            <a class = "btn-del-option"> <i class = "fw fw-delete"> </i></a>
+                        </div>
+                        <label class = "error-message"></label>
                     </div>
-                    <div class="expression-as">
-                        <label> As </label> <input type="text" class="expression-as-value" value="{{as}}">
-                        <a class = "btn-del-option"> <i class = "fw fw-delete"> </i></a>
-                    </div>
-                </div>
-            </div>
-            <label class="error-message attribute-error-message"> </label>
-        </li>
-    {{/each}}
+                </li>
+            {{/each}}
+        </ul>
+        <button class="btn btn-default btn-add-user-defined-attribute"> + Attribute </button>
+    </div>
 </script>
 
 <script id = "drop-down-template" type="text/template">
