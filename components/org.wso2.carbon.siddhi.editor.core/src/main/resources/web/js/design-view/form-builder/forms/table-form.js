@@ -62,8 +62,9 @@ define(['log', 'jquery', 'lodash', 'attribute', 'storeAnnotation', 'handlebar', 
             self.designViewContainer.addClass('disableContainer');
             self.toggleViewButton.addClass('disableContainer');
 
-            var predefinedStores = _.orderBy(this.configurationData.rawExtensions["store"], ['name'], ['asc']);
-            self.formUtils.addDefaultStoreType(predefinedStores);
+            var predefinedStores =  _.orderBy(JSON.parse(JSON.stringify(this.configurationData.rawExtensions["store"]),
+            ['name'], ['asc']));
+            self.formUtils.addCustomizedType(predefinedStores, Constants.DEFAULT_STORE_TYPE);
             var predefinedTableAnnotations = self.configurationData.application.config.primary_index_annotations;
             var customizedStoreOptions = [];
             var storeOptions = [];
