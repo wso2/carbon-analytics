@@ -16,8 +16,8 @@
  * under the License.
  */
 
-define(['require', 'log', 'jquery', 'lodash', 'attribute', 'handlebar', 'constants'],
-    function (require, log, $, _, Attribute, Handlebars, Constants) {
+define(['require', 'log', 'jquery', 'lodash', 'attribute', 'constants'],
+    function (require, log, $, _, Attribute, Constants) {
 
         /**
          * @class WindowForm Creates a forms to collect data from a window
@@ -37,347 +37,6 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'handlebar', 'constan
         };
 
         /**
-         * @function to render the parameter for the selected window function using handlebars
-         * @param {Object} parameterArray Saved parameters
-         * @param {Object} windowType selected window processor type
-         * @param {String} id Id for the div to embed the parameters
-         */
-        var renderParameters = function (parameterArray, windowType, id) {
-            parameterArray.sort(function (val1, val2) {
-                if (val1.optional && !val2.optional) return 1;
-                else if (!val1.optional && val2.optional) return -1;
-                else return 0;
-            });
-            var parameterTemplate = Handlebars.compile($('#window-function-parameters-template').html());
-            var wrappedHtml = parameterTemplate({
-                id: id,
-                windowFunctionName: windowType,
-                parameters: parameterArray
-            });
-            $('#defineFunctionParameters').html(wrappedHtml);
-        };
-
-        /**
-         * @function to map the saved parameter values to the parameter object
-         * @param {Object} predefinedParameters Predefined parameters of a particular window type
-         * @param {Object} savedParameterValues Saved parameter values
-         * @return {Object} parameters
-         */
-        var mapUserParameterValues = function (predefinedParameters, savedParameterValues) {
-            var parameters = [];
-            for (var i = 0; i < predefinedParameters.length; i++) {
-                var timeStamp = "";
-                if (i < savedParameterValues.length) {
-                    var parameterValue = savedParameterValues[i];
-                    if (predefinedParameters[i].type.includes("STRING")) {
-                        parameterValue = parameterValue.slice(1, parameterValue.length - 1)
-                    }
-                    parameters.push({
-                        name: predefinedParameters[i].name, value: parameterValue, description:
-                            predefinedParameters[i].description, optional: predefinedParameters[i].optional,
-                        defaultValue: predefinedParameters[i].defaultValue, timeStamp: timeStamp
-                    });
-                } else {
-                    parameters.push({
-                        name: predefinedParameters[i].name, value: "", description: predefinedParameters[i]
-                            .description, optional: predefinedParameters[i].optional,
-                        defaultValue: predefinedParameters[i].defaultValue, timeStamp: timeStamp
-                    });
-                }
-            }
-            return parameters;
-        };
-
-        /**
-         * Function to select the parameter mapping method
-         * @param {String} selectedType selected window type
-         * @param {Object} functionParameters parameters of the selected window type
-         * @param {Object} savedParameterValues saved parameter values
-         * @param {Object} functionParametersWithValues array to hold the parameter of the mapped value
-         */
-        var callToMapParameters = function (selectedType, functionParameters, savedParameterValues,
-            functionParametersWithValues) {
-            if (selectedType === Constants.SORT) {
-                functionParametersWithValues = mapParameterValuesSort(functionParameters, savedParameterValues);
-            } else if (selectedType === Constants.FREQUENT) {
-                functionParametersWithValues = mapParameterValuesFrequent(functionParameters,
-                    savedParameterValues);
-            } else if (selectedType === Constants.LOSSY_FREQUENT) {
-                functionParametersWithValues = mapParameterValuesLossyFrequent(functionParameters,
-                    savedParameterValues);
-            } else {
-                functionParametersWithValues = mapUserParameterValues(functionParameters, savedParameterValues);
-            }
-            renderParameters(functionParametersWithValues, selectedType, Constants.WINDOW);
-        };
-
-        /**
-         * @function to build the parameter values
-         * @param {Object} parameterValues array to add the parameters
-         * @param {Object} predefinedParameters predefined parameters
-         * @return {boolean} isError
-         */
-        var buildParameterValues = function (self, parameterValues, predefinedParameters) {
-            $('.parameter').each(function () {
-                if ($(this).find('.parameter-name').hasClass('mandatory-parameter') || ($(this).find('.parameter-name')
-                    .hasClass('optional-parameter') && $(this).find('.parameter-checkbox').is(":checked"))) {
-                    var parameterValue = $(this).find('.parameter-value').val().trim();
-                    var parameterName = $(this).find('.parameter-name').text().trim();;
-                    var predefinedParameter = self.formUtils.getObject(parameterName, predefinedParameters);
-                    if (predefinedParameter.type.includes("STRING")) {
-                        parameterValue = "'" + parameterValue + "'";
-                    }
-                    parameterValues.push(parameterValue)
-                }
-            });
-        };
-
-        /**
-         * @function to construct parameter 'attributes'
-         * @param {String} parameterValue the attribute value
-         * @param {Object} parameterValues array to add the parameters
-         */
-        var buildAttributes = function (parameterValue, parameterValues) {
-            var attributeArray = parameterValue.split(',');
-            _.forEach(attributeArray, function (attribute) {
-                attribute = attribute.trim();
-                if (attribute !== "") {
-                    parameterValues.push(attribute);
-                }
-            });
-        };
-
-        /**
-         * @function to build parameters for frequent and lossyFrequent type
-         * @param {Object} parameterValues array to add the parameters
-         * @param {Object} predefinedParameters predefined parameters
-         */
-        var buildParameterValuesFrequentOrLossyFrequent = function (self, parameterValues, predefinedParameters) {
-            $('.parameter').each(function () {
-                if ($(this).find('.parameter-name').hasClass('mandatory-parameter') || ($(this).find('.parameter-name')
-                    .hasClass('optional-parameter') && $(this).find('.parameter-checkbox').is(":checked"))) {
-                    var parameterValue = $(this).find('.parameter-value').val().trim();
-                    var parameterName = $(this).find('.parameter-name').text().trim();
-                    var predefinedParameter = self.formUtils.getObject(parameterName, predefinedParameters);
-                    if (parameterName === "attribute") {
-                        buildAttributes(parameterValue, parameterValues);
-                    } else {
-                        if (predefinedParameter.type.includes("STRING")) {
-                            parameterValue = "'" + parameterValue + "'";
-                        }
-                        parameterValues.push(parameterValue)
-                    }
-                }
-            });
-        };
-
-        /**
-         * @function to build parameters for sort type
-         * @param {Object} parameterValues array to add the parameters
-         * @param {Object} predefinedParameters predefined parameters
-         */
-        var buildParameterValuesSort = function (self, parameterValues, predefinedParameters) {
-            $('.parameter').each(function () {
-                var parameterValue = $(this).find('.parameter-value').val().trim();
-                var parameterName = $(this).find('.parameter-name').text().trim();;
-                var predefinedParameter = self.formUtils.getObject(parameterName, predefinedParameters);
-                if (parameterName === "window.length") {
-                    parameterValues.push(parameterValue)
-                } else if (parameterName === "attribute") {
-                    if ($('#attribute-parameter').find('.parameter-checkbox').is(":checked")) {
-                        buildAttributes(parameterValue, parameterValues);
-                    }
-                } else {
-                    if (($('#attribute-parameter').find('.parameter-checkbox').is(":checked")) && ($
-                        ('#order-parameter').find('.parameter-checkbox').is(":checked"))) {
-                        parameterValue = "'" + parameterValue + "'";
-                        parameterValues.push(parameterValue)
-                    }
-                }
-            });
-        };
-
-        /**
-         * @function for generic validation of parameter values
-         * @param {Object} predefinedParameters predefined parameters of the selected window type
-         * @return {boolean} isError
-         */
-        var validateParameters = function (self, predefinedParameters) {
-            var isError = false;
-            $('.parameter').each(function () {
-                var parameterValue = $(this).find('.parameter-value').val().trim();
-                var parameterName = $(this).find('.parameter-name').text().trim();;
-                var predefinedParameter = self.formUtils.getObject(parameterName, predefinedParameters);
-                if (!predefinedParameter.optional) {
-                    if (!checkParameterValue(self, parameterValue, predefinedParameter, this)) {
-                        isError = true;
-                        return false;
-                    }
-                } else {
-                    if ($(this).find('.parameter-checkbox').is(":checked")) {
-                        if (!checkParameterValue(self, parameterValue, predefinedParameter, this)) {
-                            isError = true;
-                            return false;
-                        }
-                    }
-                }
-            });
-            return isError;
-        };
-
-        /**
-         * @function to check the given parameter value
-         * @param {String} parameterValue value which needs to be validated
-         * @param {Object} predefinedParameter predefined parameter object
-         * @param {Object} parent div of the html to locate the parameter
-         * @return {boolean}
-         */
-        var checkParameterValue = function (self, parameterValue, predefinedParameter, parent) {
-            if (parameterValue === "") {
-                $(parent).find('.error-message').text('Parameter Value is required.');
-                self.formUtils.addErrorClass($(parent).find('.parameter-value'));
-                return false;
-            } else {
-                var dataType = predefinedParameter.type;
-                if (self.formUtils.validateDataType(dataType, parameterValue)) {
-                    var errorMessage = "Invalid data-type. ";
-                    _.forEach(dataType, function (type) {
-                        errorMessage += type + " or ";
-                    });
-                    errorMessage = errorMessage.substring(0, errorMessage.length - 4);
-                    errorMessage += " is required";
-                    $(parent).find('.error-message').text(errorMessage);
-                    self.formUtils.addErrorClass($(parent).find('.parameter-value'));
-                    return false;
-                }
-            }
-            return true;
-        };
-
-        /**
-         * @function to map the user saved parameters of lossyFrequent
-         * @param {Object} predefinedParameters predefined parameters
-         * @param {Object} savedParameterValues user saved parameters
-         * @return {Object} parameters
-         */
-        var mapParameterValuesLossyFrequent = function (predefinedParameters, savedParameterValues) {
-            var parameters = [];
-            var attributes = "";
-            //add the two mandatory params of the saved values to the predefined param objects
-            for (var i = 0; i <= 1; i++) {
-                parameters.push({
-                    name: predefinedParameters[i].name, value: savedParameterValues[i], description:
-                        predefinedParameters[i].description, optional: predefinedParameters[i].optional,
-                    defaultValue: predefinedParameters[i].defaultValue
-                });
-            }
-            // add the attributes
-            for (var i = 2; i < savedParameterValues.length; i++) {
-                attributes += savedParameterValues[i] + ", "
-            }
-            //cutting off the last white space and the comma
-            attributes = attributes.substring(0, attributes.length - 2);
-            //add the attributes to the third obj of the predefined parameter
-            parameters.push({
-                name: predefinedParameters[2].name, value: attributes, description:
-                    predefinedParameters[2].description, optional: predefinedParameters[2].optional,
-                defaultValue: predefinedParameters[2].defaultValue
-            });
-            return parameters;
-        };
-
-        /**
-         * @function to map the user saved parameters of frequent
-         * @param {Object} predefinedParameters predefined parameters
-         * @param {Object} savedParameterValues user saved parameters
-         * @return {Object} parameters
-         */
-        var mapParameterValuesFrequent = function (predefinedParameters, savedParameterValues) {
-            var parameters = [];
-            var attributes = "";
-            //add the first saved param to predefined param's first index (event.count)
-            parameters.push({
-                name: predefinedParameters[0].name, value: savedParameterValues[0], description:
-                    predefinedParameters[0].description, optional: predefinedParameters[0].optional,
-                defaultValue: predefinedParameters[0].defaultValue
-            });
-            // add the attributes
-            for (var i = 1; i < savedParameterValues.length; i++) {
-                attributes += savedParameterValues[i] + ", "
-            }
-            //cutting off the last white space and the comma
-            attributes = attributes.substring(0, attributes.length - 2);
-            //add the attributes to second obj of the predefined parameter
-            parameters.push({
-                name: predefinedParameters[1].name, value: attributes, description:
-                    predefinedParameters[1].description, optional: predefinedParameters[1].optional,
-                defaultValue: predefinedParameters[1].defaultValue
-            });
-            return parameters;
-        };
-
-        /**
-         * @function to map the user saved parameters of sort
-         * @param {Object} predefinedParameters predefined parameters
-         * @param {Object} savedParameterValues user saved parameters
-         * @return {Object} parameters
-         */
-        var mapParameterValuesSort = function (predefinedParameters, savedParameterValues) {
-            var parameters = [];
-            var attributes = "";
-            var order = "";
-            var length = "";
-            if (savedParameterValues.length != 0) {
-                length = savedParameterValues[0];
-            }
-            //add the first saved param to predefined param's first index (window.length)
-            parameters.push({
-                name: predefinedParameters[0].name, value: length, description:
-                    predefinedParameters[0].description, optional: predefinedParameters[0].optional,
-                defaultValue: predefinedParameters[0].defaultValue
-            });
-            // to determine the attributes and order
-            if (savedParameterValues.length > 1) {
-                for (var i = 1; i < savedParameterValues.length; i++) {
-                    if (savedParameterValues[i].indexOf("'") >= 0 || savedParameterValues[i].indexOf('"') >= 0) {
-                        order = savedParameterValues[i];
-                        order = order.slice(1, order.length - 1)
-                    } else {
-                        //attributes
-                        attributes += savedParameterValues[i] + ", ";
-
-                    }
-                }
-                //cutting off the last white space and the comma
-                attributes = attributes.substring(0, attributes.length - 2);
-            }
-            //add the attributes to second obj of the predefined parameter
-            parameters.push({
-                name: predefinedParameters[1].name, value: attributes, description:
-                    predefinedParameters[1].description, optional: predefinedParameters[1].optional,
-                defaultValue: predefinedParameters[1].defaultValue
-            });
-            //add the order to the third obj of the predefined parameter
-            parameters.push({
-                name: predefinedParameters[2].name, value: order, description:
-                    predefinedParameters[2].description, optional: predefinedParameters[2].optional,
-                defaultValue: predefinedParameters[2].defaultValue
-            });
-            return parameters;
-        };
-
-        /**
-         * @function to show and hide the order parameter of sort type
-         */
-        var showHideOrderForSort = function () {
-            if ($('#window-parameters #attribute-parameter').find('.parameter-checkbox').is(":checked")) {
-                $('#window-parameters #order-parameter').show();
-            } else {
-                $('#window-parameters #order-parameter').hide();
-            }
-        };
-
-        /**
          * @function generate properties form for a window
          * @param element selected element(window)
          * @param formConsole Console which holds the form
@@ -388,11 +47,11 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'handlebar', 'constan
             var id = $(element).parent().attr('id');
             var clickedElement = self.configurationData.getSiddhiAppConfig().getWindow(id);
 
-            var propertyDiv = $('<div id="property-header"><h3>Window Configuration</h3></div> <div class = '+
-            	'"window-form-container"> <h4>Name: </h4> <input type="text" id="windowName" class="clearfix name">' +
+            var propertyDiv = $('<div id="property-header"><h3>Window Configuration</h3></div> <div class = ' +
+                '"window-form-container"> <h4>Name: </h4> <input type="text" id="windowName" class="clearfix name">' +
                 '<label class="error-message" id="windowNameErrorMessage"></label> <div id="define-attribute"></div>' +
                 self.formUtils.buildFormButtons() + '</div> <div class= "window-form-container"> ' +
-                '<div id = "defineFunctionName"> </div> <div id="defineFunctionParameters"> </div>' +
+                '<div class = "defineFunctionName"> </div> <div class ="defineFunctionParameters"> </div>' +
                 '</div> <div class = "window-form-container"> <div class="define-output-events"> </div> </div>' +
                 '<div class = "window-form-container"> <div class="define-annotation"> </div> </div>');
 
@@ -409,47 +68,18 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'handlebar', 'constan
             var selectedWindowType;
             var annotations = [];
 
-            //event listener to show parameter description
-            $('#defineFunctionParameters').on('mouseover', '.parameter-desc', function () {
-                $(this).find('.parameter-desc-content').show();
-            });
-
-            //event listener to hide parameter description
-            $('#defineFunctionParameters').on('mouseout', '.parameter-desc', function () {
-                $(this).find('.parameter-desc-content').hide();
-            });
-
-            //event listener when the parameter checkbox is changed
-            $('#defineFunctionParameters').on('change', '.parameter-checkbox', function () {
-                var parameterParent = $(this).parents(".parameter");
-                if ($(this).is(':checked')) {
-                    parameterParent.find(".optional-param-content").show();
-                } else {
-                    parameterParent.find(".optional-param-content").hide();
-                    parameterParent.find(".parameter-value").removeClass("required-input-field");
-                    parameterParent.find(".error-message").text("");
-                }
-                //check for sort type's parameter (order & attribute params)
-                if (selectedType === Constants.SORT) {
-                    showHideOrderForSort();
-                }
-            });
-
-            var windowFunctionNameTemplate = Handlebars.compile($('#type-selection-form-template').html());
-            var wrappedHtml = windowFunctionNameTemplate({ id: Constants.WINDOW, types: predefinedWindowFunctionNames });
-            $('#defineFunctionName').html(wrappedHtml);
-
+			self.formUtils.renderFunctions(predefinedWindowFunctionNames, '.window-form-container', Constants.WINDOW);
             var name = clickedElement.getName();
             self.formUtils.renderOutputEventTypes();
             if (!name) {
                 //if window form is freshly opened[unedited window object]
                 var attributes = [{ name: "" }];
                 self.formUtils.renderAttributeTemplate(attributes)
-                selectedWindowType = $('#defineFunctionName #window-type').val();
+                selectedWindowType = $('.defineFunctionName #window-type').val();
                 functionParameters = self.formUtils.getSelectedTypeParameters(selectedWindowType,
                     predefinedWindowFunctionNames);
                 functionParametersWithValues = self.formUtils.createObjectWithValues(functionParameters);
-                renderParameters(functionParametersWithValues, selectedWindowType, Constants.WINDOW)
+                self.formUtils.renderParameters(functionParametersWithValues, selectedWindowType, Constants.WINDOW)
             } else {
                 //if window object is already edited
                 var windowType = clickedElement.getType().toLowerCase();
@@ -457,20 +87,21 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'handlebar', 'constan
 
                 $('#windowName').val(name.trim());
                 selectedType = windowType;
-                $('#defineFunctionName').find('#window-type option').filter(function () {
+                $('.defineFunctionName').find('#window-type option').filter(function () {
                     return ($(this).val().toLowerCase() == (windowType));
                 }).prop('selected', true);
                 functionParameters = self.formUtils.getSelectedTypeParameters(windowType, predefinedWindowFunctionNames);
-                callToMapParameters(selectedType, functionParameters, savedParameterValues, functionParametersWithValues)
+                self.formUtils.callToMapParameters(selectedType, functionParameters, savedParameterValues,
+                    '.window-form-container')
                 if (selectedType === Constants.SORT) {
-                    showHideOrderForSort();
+                    self.formUtils.showHideOrderForSort();
                 }
                 var savedAttributes = clickedElement.getAttributeList();
                 self.formUtils.renderAttributeTemplate(savedAttributes)
                 self.formUtils.selectTypesOfSavedAttributes(savedAttributes);
 
                 var savedOutputEventType = clickedElement.getOutputEventType().toLowerCase();
-                $('#define-output-events').find('#event-type option').filter(function () {
+                $('.define-output-events').find('#event-type option').filter(function () {
                     return ($(this).val().toLowerCase() == (savedOutputEventType));
                 }).prop('selected', true);
 
@@ -478,19 +109,24 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'handlebar', 'constan
                 annotations = savedAnnotationObjects;
             }
             self.formUtils.renderAnnotationTemplate("define-annotation", annotations);
+            self.formUtils.addEventListenersForParameterDiv();
+            self.formUtils.addEventListenerForSortWindow(selectedType)
 
             $('#window-type').change(function () {
                 functionParameters = self.formUtils.getSelectedTypeParameters(this.value, predefinedWindowFunctionNames);
                 selectedType = this.value.toLowerCase();
                 if (savedParameterValues && selectedType == windowType.toLowerCase()) {
-                    callToMapParameters(selectedType, functionParameters, savedParameterValues, functionParametersWithValues)
+                    self.formUtils.callToMapParameters(selectedType, functionParameters, savedParameterValues,
+                        '.window-form-container')
                 } else {
                     functionParametersWithValues = self.formUtils.createObjectWithValues(functionParameters);
-                    renderParameters(functionParametersWithValues, selectedType, Constants.WINDOW);
+                    self.formUtils.renderParameters(functionParametersWithValues, Constants.WINDOW,
+                    '.window-form-container');
                 }
                 if (selectedType === Constants.SORT) {
-                    showHideOrderForSort();
-                }
+					self.formUtils.showHideOrderForSort();
+					self.formUtils.addEventListenerForSortWindow(selectedType)
+				}
             });
 
             // 'Submit' button action
@@ -540,9 +176,8 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'handlebar', 'constan
                     return;
                 }
 
-                var windowType = $('#defineFunctionName #window-type').val();
-                var parameters = [];
-                if (validateParameters(self, functionParameters)) {
+                var windowType = $('.defineFunctionName #window-type').val();
+                if (self.formUtils.validateParameters('.window-form-container', functionParameters)) {
                     isErrorOccurred = true;
                     return;
                 }
@@ -557,14 +192,8 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'handlebar', 'constan
                         textNode.html(windowName);
                     }
 
-                    if (windowType.toLowerCase() === Constants.SORT) {
-                        buildParameterValuesSort(self, parameters, functionParameters)
-                    } else if (windowType.toLowerCase() === Constants.FREQUENT ||
-                        windowType.toLowerCase() === Constants.LOSSY_FREQUENT) {
-                        buildParameterValuesFrequentOrLossyFrequent(self, parameters, functionParameters);
-                    } else {
-                        buildParameterValues(self, parameters, functionParameters)
-                    }
+					var parameters = self. formUtils.buildWindowParameters('.window-form-container', windowType,
+					predefinedWindowFunctionNames)
                     clickedElement.setType(windowType);
                     clickedElement.setParameters(parameters);
 
@@ -580,7 +209,7 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'handlebar', 'constan
                         }
                     });
 
-                    var outputEventType = $('#define-output-events #event-type').val().toUpperCase();
+                    var outputEventType = $('.define-output-events #event-type').val().toUpperCase();
                     clickedElement.setOutputEventType(outputEventType);
 
                     clickedElement.clearAnnotationList();
@@ -622,5 +251,3 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'handlebar', 'constan
 
         return WindowForm;
     });
-
-
