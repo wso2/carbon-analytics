@@ -118,12 +118,30 @@ define(([],function (){
                     id: "hint-tour",
                     labels:{
                         mac: {
-                            key: "command+shift+t",
-                            label: "\u2318\u21E7Q"
+                            key: "",
+                            label: ""
                         },
                         other: {
-                            key: "ctrl+shift+t",
-                            label: "Ctrl+Shift+T"
+                            key: "",
+                            label: ""
+                        }
+                    }
+                },
+                disabled: false
+            },
+            {
+                id: "simulateGuide",
+                label: "Simulate Guide",
+                command: {
+                    id: "simulate-guide",
+                    labels:{
+                        mac: {
+                            key: "",
+                            label: ""
+                        },
+                        other: {
+                            key: "",
+                            label: ""
                         }
                     }
                 },

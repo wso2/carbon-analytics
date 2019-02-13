@@ -136,9 +136,15 @@ define(['require', 'log', 'jquery', 'lodash', 'backbone', 'menu_bar', 'tool_bar'
                     this.workspaceManager.displayInitialTab();
                 },
 
-                runGuide: function (){
+                runFullGuide: function (){
                     log.debug("start: rendering hint guide");
-                    this.guide.render();
+                    this.guide.renderFull();
+                    log.debug("end: rendering hint guide");
+                },
+
+                runSimulateGuide: function (){
+                    log.debug("start: rendering hint guide");
+                    this.guide.renderSimulate();
                     log.debug("end: rendering hint guide");
                 },
 

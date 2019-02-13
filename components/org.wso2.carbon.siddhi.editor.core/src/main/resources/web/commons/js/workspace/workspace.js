@@ -746,7 +746,8 @@ define(['ace/ace', 'jquery', 'lodash', 'log','dialogs','./service-client','welco
             app.commandManager.registerHandler('query-store', this.openQueryStore, this);
 
             // //Run hint tour
-            app.commandManager.registerHandler('hint-tour', app.runGuide , app);
+            app.commandManager.registerHandler('hint-tour', app.runFullGuide , app);
+            app.commandManager.registerHandler('simulate-guide', app.runSimulateGuide , app);
         }
     });
 

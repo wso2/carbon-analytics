@@ -33,6 +33,7 @@ define(['lodash', 'event_channel', 'menu_item'],
         var menuItemOpts = _.cloneDeep(_.get(this, 'options.menu_item'));
 
         var toolBarDiv = $('<div></div>');
+        toolBarDiv.attr('id', _.get(this, 'definition.label'));
         toolBarDiv.addClass(_.get(this, 'options.cssClass.group'));
         parent.append(toolBarDiv);
 
