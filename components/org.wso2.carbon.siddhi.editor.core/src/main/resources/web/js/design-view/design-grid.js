@@ -45,8 +45,6 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
             MULTI_SELECTOR: 'multi-selector'
         };
 
-        window.selectedElements = [];
-
         /**
          * @class DesignGrid
          * @constructor
@@ -74,7 +72,37 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
             this.designViewContainer = $('#design-container-' + this.currentTabId);
             this.toggleViewButton = $('#toggle-view-button-' + this.currentTabId);
             this.designGridContainer = $('#design-grid-container-' + this.currentTabId);
+            this.selectedElements = [];
             this.selectedObjects = [];
+        };
+
+
+        DesignGrid.prototype.addSelectedElements = function(element){
+            this.selectedElements.push(element);
+        };
+
+        DesignGrid.prototype.isSelectedElements = function(element){
+            if (this.selectedElements.includes(element)){
+                return true;
+            } else{
+                return false;
+            }
+        };
+
+        DesignGrid.prototype.getSelectedElement = function(){
+            return this.selectedElements;
+        };
+
+        DesignGrid.prototype.resetSelectedElement = function(){
+           this.selectedElements = [];
+        };
+
+        DesignGrid.prototype.removeFromSelectedElements = function(element){
+            for (var i = 0; i < this.selectedElements.length; i++) {
+                if (this.selectedElements[i] == element) {
+                    this.selectedElements.splice(i, 1);
+                }
+            }
         };
 
         DesignGrid.prototype.render = function () {
@@ -2564,7 +2592,7 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
                 onElementSelect: function (element) {
                     if (!self.selectedObjects.includes(element, 0)) {
                         self.jsPlumbInstance.addToDragSelection(element);
-                        selectedElements.push(element);
+                        self.addSelectedElements(element);
                         $(element).focus();
                         $(element).addClass('selected-container');
                         self.selectedObjects.push(element);
@@ -2572,11 +2600,7 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
                 },
                 onElementUnselect: function (element) {
                     self.jsPlumbInstance.removeFromDragSelection(element);
-                    for (var i = 0; i < selectedElements.length; i++) {
-                        if (selectedElements[i] == element) {
-                            selectedElements.splice(i, 1);
-                        }
-                    }
+                    self.removeFromSelectedElements(element);
                     for (var i = 0; i < self.selectedObjects.length; i++) {
                         if (self.selectedObjects[i] == element) {
                             self.selectedObjects.splice(i, 1);

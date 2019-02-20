@@ -1437,12 +1437,14 @@ define(['require', 'log', 'lodash', 'jquery', 'partition', 'stream', 'query', 'f
             // Check whether clicked element is there in the selected element list and if not clear the selected
             // element list and cleanDragSelection object
             newElement.on('mousedown', function () {
-                if (!window.selectedElements.includes(newElement[0], 0)) {
+                if (!self.designGrid.isSelectedElements(newElement[0])){
+                // if (!window.selectedElements.includes(newElement[0], 0)) {
                     self.jsPlumbInstance.clearDragSelection();
-                    for (var i = 0; i < window.selectedElements.length; i++) {
-                        $('#' + window.selectedElements[i].id).removeClass('selected-container focused-container');
+                    var selectedElements = self.designGrid.getSelectedElement();
+                    for (var i = 0; i < selectedElements.length; i++) {
+                        $('#' + selectedElements[i].id).removeClass('selected-container focused-container');
                     }
-                    window.selectedElements = [];
+                    self.designGrid.resetSelectedElement();
                 }
             });
 
