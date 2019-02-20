@@ -2177,7 +2177,6 @@
             aggregation_predefined_annotations: [
                 {
                     name: "purge",
-                    class: "main-annotation",
                     optional: true,
                     parameters: [
                         {
@@ -2197,7 +2196,6 @@
                     ],
                     annotations: [{
                         name: "retentionPeriod",
-                        class: "sub-Annotation",
                         optional: true,
                         parameters: [
                             {
@@ -2266,29 +2264,35 @@
                     ]
                 }
             ],
-            incremental_aggregator: [
-               {
-                    name: "none"
-               },
-               {
-                    name: "sum"
-               },
-               {
-                    name: "min"
-               },
-               {
-                    name: "max"
-               },
-               {
-                    name: "avg"
-               },
-               {
-                    name: "count"
-               },
-               {
-                    name: "distinctCount"
-               }
+            query_predefined_annotations: [
+                {
+                    name: "dist",
+                    optional: true,
+                    parameters: [
+                        {
+                            name: "execGroup",
+                            value: "",
+                            defaultValue: "group-1",
+                            optional: true,
+                            type: ["STRING"]
+                        },
+                        {
+                            name: "parallel",
+                            value: "",
+                            defaultValue: "1",
+                            optional: true,
+                            type: ["INT"]
+
+                        }
+                    ]
+
+                }
             ],
+            query_condition_syntax: ["==", ">=", ">", "<=", "<", "&&", "||", "AND", "OR"],
+            other_query_syntax: ["snapshot", "every"],
+            incremental_aggregator: ["sum", "min", "max", "avg", "count", "distinctCount"],
+            join_types: ["join", "left_outer_join", "right_outer_join", "full_outer_join"],
+            stream_handler_types: ["filter", "function","window"],
             trigger: [
             {
                 name: "start",
