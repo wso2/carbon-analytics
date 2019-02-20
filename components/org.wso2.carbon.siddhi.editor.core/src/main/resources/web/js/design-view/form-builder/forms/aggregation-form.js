@@ -585,7 +585,6 @@ define(['require', 'log', 'jquery', 'lodash', 'aggregateByTimePeriod', 'querySel
                         var aggregateByTimePeriod = new AggregateByTimePeriod(aggregateByTimePeriodOptions);
                         clickedElement.setAggregateByTimePeriod(aggregateByTimePeriod);
 
-                        console.log(clickedElement)
                         $('#' + id).removeClass('incomplete-element');
                         $('#' + id).removeClass('error-element');
                         //Send aggregation element to the backend and generate tooltip
