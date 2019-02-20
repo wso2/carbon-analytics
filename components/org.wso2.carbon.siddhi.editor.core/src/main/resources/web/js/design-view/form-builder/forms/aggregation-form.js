@@ -50,7 +50,6 @@ define(['require', 'log', 'jquery', 'lodash', 'aggregateByTimePeriod', 'querySel
             return indexAnnotation;
         };
 
-
         //to disable selection of index and partitionId annotation
         var disableIndexAndPartitionById = function () {
             var indexParent = $('#primary-index-annotations')
@@ -84,7 +83,7 @@ define(['require', 'log', 'jquery', 'lodash', 'aggregateByTimePeriod', 'querySel
         };
 
         //to validate the aggregate[interval section]
-        var validateAggregateInterval = function () {
+        var validateAggregateInterval = function (self) {
             var selectedIntervals = [];
             var isErrorOccurred = false;
             $('.interval-option').each(function () {
@@ -95,6 +94,7 @@ define(['require', 'log', 'jquery', 'lodash', 'aggregateByTimePeriod', 'querySel
 
             if (selectedIntervals.length == 0) {
                 $('.interval-content').find('.error-message').text("Minimum one granularity is required.");
+                self.formUtils.addErrorClass('.interval-content')
                 isErrorOccurred = true;
             }
             return isErrorOccurred;
@@ -204,7 +204,8 @@ define(['require', 'log', 'jquery', 'lodash', 'aggregateByTimePeriod', 'querySel
             var clickedElement = self.configurationData.getSiddhiAppConfig().getAggregation(id);
 
             if (!clickedElement.getFrom()) {
-                DesignViewUtils.prototype.warnAlert('Connect an input stream element');
+                $('#' + id).addClass('incomplete-element');
+                DesignViewUtils.prototype.warnAlert('Connect an input stream element nrfjrnj');
                 self.designViewContainer.removeClass('disableContainer');
                 self.toggleViewButton.removeClass('disableContainer');
 
@@ -231,6 +232,8 @@ define(['require', 'log', 'jquery', 'lodash', 'aggregateByTimePeriod', 'querySel
                 var groupBy = clickedElement.getGroupBy();
                 var aggregateByAttribute = clickedElement.getAggregateByAttribute();
                 var aggregateByTimePeriod = clickedElement.getAggregateByTimePeriod();
+
+                var incrementalAggregator = self.configurationData.application.config.incremental_aggregator;
 
                 var predefinedStores = _.orderBy(this.configurationData.rawExtensions["store"], ['name'], ['asc']);
                 var predefinedPrimaryIndexAnnotations = JSON.parse(JSON.stringify(self.configurationData.application.config.
@@ -365,11 +368,7 @@ define(['require', 'log', 'jquery', 'lodash', 'aggregateByTimePeriod', 'querySel
                     possibleAttributes.push(Constants.TRIGGERED_TIME);
                 }
 
-                if (select) {
-                    self.formUtils.selectAttributeSelection(select);
-                } else {
-                    $('.define-user-defined-attributes').hide();
-                }
+                self.formUtils.selectAttributeSelection(select)
                 self.formUtils.addEventListenersForSelectionDiv();
 
                 var groupByAttributes = [];
@@ -381,7 +380,7 @@ define(['require', 'log', 'jquery', 'lodash', 'aggregateByTimePeriod', 'querySel
                 self.formUtils.renderGroupBy(possibleAttributes, groupByAttributes, 'define-aggregate-group-by');
                 self.formUtils.addEventListenersForGroupByDiv(possibleAttributes);
                 self.formUtils.removeDeleteButtonOfFirstValue();
-                self.formUtils.checkForAttributeLength(possibleAttributes.length);
+                self.formUtils.checkForAttributeLength(possibleAttributes.length, Constants.GROUP_BY);
 
                 if (groupBy && groupBy.length != 0) {
                     self.formUtils.mapUserGroupBy(groupByAttributes);
@@ -416,6 +415,16 @@ define(['require', 'log', 'jquery', 'lodash', 'aggregateByTimePeriod', 'querySel
                 renderIntervalOrRange(self, aggregateByTimePeriodType, aggregateByTimePeriod);
                 self.formUtils.removeDeleteButtonOfFirstValue();
                 self.formUtils.preventMultipleSelection(Constants.RANGE);
+
+                //create autocompletion
+                var selectExpressionMatches = JSON.parse(JSON.stringify(possibleAttributes));
+                selectExpressionMatches = selectExpressionMatches.concat(incrementalAggregator);
+                selectExpressionMatches.push(Constants.AS);
+                self.formUtils.createAutocomplete($('.attribute-expression-as'), selectExpressionMatches);
+                $('.define-select').on('click', '.btn-add-user-defined-attribute', function () {
+                    self.formUtils.appendUserSelectAttribute();
+                    self.formUtils.createAutocomplete($('.attribute-expression-as:last'), selectExpressionMatches);
+                });
 
                 $(formContainer).on('click', '#btn-submit', function () {
 
@@ -484,7 +493,7 @@ define(['require', 'log', 'jquery', 'lodash', 'aggregateByTimePeriod', 'querySel
                     }
 
                     if ($('.aggregate-by-time-period-selection').val() === Constants.INTERVAL) {
-                        if (validateAggregateInterval()) {
+                        if (validateAggregateInterval(self)) {
                             isErrorOccurred = true;
                             return;
                         }
@@ -578,6 +587,7 @@ define(['require', 'log', 'jquery', 'lodash', 'aggregateByTimePeriod', 'querySel
 
                         console.log(clickedElement)
                         $('#' + id).removeClass('incomplete-element');
+                        $('#' + id).removeClass('error-element');
                         //Send aggregation element to the backend and generate tooltip
                         var aggregationToolTip = self.formUtils.getTooltip(clickedElement, Constants.AGGREGATION);
                         $('#' + id).prop('title', aggregationToolTip);
