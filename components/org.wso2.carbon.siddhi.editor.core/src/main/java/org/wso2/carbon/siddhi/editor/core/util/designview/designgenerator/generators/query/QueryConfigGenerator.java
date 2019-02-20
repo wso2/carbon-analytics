@@ -82,6 +82,7 @@ public class QueryConfigGenerator extends CodeSegmentsPreserver {
 
         queryConfig.setQueryOutput(generateOutput(query.getOutputStream()));
         queryConfig.setOutputRateLimit(generateOutputRateLimit(query.getOutputRate()));
+        queryConfig.setAnnotationListObjects(removeInfoAnnotation(query.getAnnotations()));
         queryConfig.setAnnotationList(generateAnnotationList(query.getAnnotations()));
         queryConfig.setQueryName(generateQueryName(query.getAnnotations()));
         preserveAndBindCodeSegment(query, queryConfig);
@@ -142,8 +143,10 @@ public class QueryConfigGenerator extends CodeSegmentsPreserver {
     private List<QueryOrderByConfig> generateOrderBy(List<OrderByAttribute> orderByAttributeList) {
         List<QueryOrderByConfig> orderBy = new ArrayList<>();
         for (OrderByAttribute orderByAttribute : orderByAttributeList) {
+            String value = orderByAttribute.getVariable().getStreamId() + "." + orderByAttribute.getVariable()
+                    .getAttributeName();
             orderBy.add(new QueryOrderByConfig(
-                    orderByAttribute.getVariable().getAttributeName(),
+                    value,
                     orderByAttribute.getOrder().name()));
         }
         return orderBy;
@@ -204,6 +207,21 @@ public class QueryConfigGenerator extends CodeSegmentsPreserver {
             }
         }
         preserveCodeSegmentsOf(annotationConfigGenerator);
+        return annotationList;
+    }
+
+    /**
+     * Removes the @info from the query annotations
+     * @param queryAnnotations List of Siddhi Annotations of query
+     * @return annotationList  List of Siddhi Annotation of query without @info
+     */
+    private List<Annotation> removeInfoAnnotation(List<Annotation> queryAnnotations) {
+        List<Annotation> annotationList = new ArrayList<>();
+        for (Annotation queryAnnotation : queryAnnotations) {
+            if (!queryAnnotation.getName().equalsIgnoreCase("info")) {
+                annotationList.add(queryAnnotation);
+            }
+        }
         return annotationList;
     }
 

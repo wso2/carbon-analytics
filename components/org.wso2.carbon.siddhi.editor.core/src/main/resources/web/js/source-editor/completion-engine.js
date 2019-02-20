@@ -2914,7 +2914,8 @@ define(["ace/ace", "jquery", "./constants", "./utils", "ace/snippets", "ace/rang
             source: {},
             sourceMaps: {},
             sinkMaps: {},
-            windowFunctionNames: {}
+            windowFunctionNames: {},
+            streamFunctions: {}
         };
 
         CompletionEngine.isDynamicExtensionsLoaded = false;
@@ -2982,6 +2983,10 @@ define(["ace/ace", "jquery", "./constants", "./utils", "ace/snippets", "ace/rang
                                 .extensions["sourceMapper"]["sourceMaps"];
                             CompletionEngine.rawExtensions.sinkMaps = response.extensions["sinkMapper"]["sinkMaps"];
                             CompletionEngine.rawExtensions.windowFunctionNames = response.inBuilt["windowProcessors"];
+                            var streamFunctions = [];
+                            obtainStreamFunctionsFromResponse(response.extensions, streamFunctions);
+                            obtainStreamFunctionsFromResponse(response.inBuilt, streamFunctions);
+							CompletionEngine.rawExtensions.streamFunctions = streamFunctions;
                             for (var namespace in response.extensions) {
                                 if (response.extensions.hasOwnProperty(namespace)) {
                                     var processors = {};
@@ -3070,6 +3075,26 @@ define(["ace/ace", "jquery", "./constants", "./utils", "ace/snippets", "ace/rang
             }
             return snippet;
         }
+		
+		/**
+		 * @function to obtain the stream function from the given extensions
+		 * @param {Object} extensions extensions
+		 * @param {Object} streamFunctions array to hold the stream functions
+		 */
+        function obtainStreamFunctionsFromResponse(extensions, streamFunctions) {
+         	_.forEach(extensions, function(extension) {
+         		_.forEach(extension.streamProcessors, function(streamFunction){
+         			var streamProcessorFunction = {
+						description: streamFunction.description,
+						examples: streamFunction.examples,
+						name: streamFunction.namespace + ':' + streamFunction.name,
+						parameters: streamFunction.parameters,
+						returnAttributes: streamFunction.returnAttributes
+         			}
+         			streamFunctions.push(streamProcessorFunction);
+         		});
+         	});
+         }
 
         return CompletionEngine;
     });

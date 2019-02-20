@@ -358,6 +358,7 @@ define(['require', 'log', 'lodash', 'jquery', 'configurationData', 'appData', 'p
             _.forEach(joinQueryList, function (joinQuery) {
                 var queryObject = new Query(joinQuery);
                 addAnnotationsForElement(joinQuery, queryObject);
+                addAnnotationObjectForElement(joinQuery, queryObject);
 
                 var errMsg;
                 // queryInput section in the query is compulsory. If that is not found there is a error in backend.

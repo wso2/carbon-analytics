@@ -17,9 +17,9 @@
  */
 
 define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annotationObject', 'annotationElement',
-    'designViewUtils'],
-    function (require, _, AppData, log, Constants, Handlebars, AnnotationObject, AnnotationElement, DesignViewUtils) {
-
+    'designViewUtils', 'queryWindowOrFunction'],
+    function (require, _, AppData, log, Constants, Handlebars, AnnotationObject, AnnotationElement, DesignViewUtils,
+        QueryWindowOrFunction) {
 
         /**
          * @class FormUtils Contains utility methods for forms
@@ -198,7 +198,6 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
 
         /**
          * @function Builds HTML for form buttons.
-         * @param includeCancel boolean Show cancel button
          * @returns {string} HTML string
          */
         FormUtils.prototype.buildFormButtons = function () {
@@ -231,98 +230,62 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
         };
 
         /**
-		 * @function to add a default store type to the predefined stores
-		 * @param {Object} predefinedStores predefined store types
+		 * @function to add a default type to the predefined array
 		 */
-        FormUtils.prototype.addDefaultStoreType = function (predefinedStores) {
-            //first check if in-memory is already present in the predefined stores array
-            var found = false;
-            for (var store of predefinedStores) {
-                if (store.name === Constants.DEFAULT_STORE_TYPE) {
-                    found = true;
-                    break;
-                }
-            }
-            if (!found) {
-                var inMemoryType = {
-                    name: Constants.DEFAULT_STORE_TYPE,
-                    parameters: []
-                };
-                predefinedStores.push(inMemoryType);
-            }
+        FormUtils.prototype.addCustomizedType = function (predefinedFunctions, typeToBeAdded) {
+            var customizedType = {
+                name: typeToBeAdded,
+                parameters: []
+            };
+            predefinedFunctions.push(customizedType);
         };
 
         /**
-         * @function to get the attribute expression of user-defined attributes
-         * @param {Object} aggregateFunctions predefined aggregate functions
-         * @param {Object} selectValues user selected select values
-         * @param {Object} connectedElementAttributes
+         * @function to append an attribute for the order-by section
+         * @param {Object} possibleAttributes to be rendered down in the dropdown
          */
-        FormUtils.prototype.getAttributeExpression = function (aggregateFunctions, selectValue, connectedElementAttributes) {
+        FormUtils.prototype.appendOrderBy = function (possibleAttributes) {
             var self = this;
-            var attributes = self.createAggregateExpressionObject(aggregateFunctions, selectValue, connectedElementAttributes);
-            _.forEach(attributes, function (attribute) {
-                _.forEach(connectedElementAttributes, function (connectedElementAttribute) {
-                    if (attribute.expression.includes(connectedElementAttribute)) {
-                        if (attribute.expression == attribute.as) {
-                            attribute.as = "";
-                        } else {
-                            self.determineFunctionAndAttributeName(attribute);
-                        }
-                        return false;
-                    }
-                });
-            });
-            self.renderUserDefinedAttributeSelection(attributes)
+            var orderByDiv = '<li> <div class = "clearfix order-by-attribute-content">' +
+                '<div class="define-attribute-drop-down"> </div> <div class = "define-order-del">' +
+                '<select class="order-selection">' +
+                '<option value="asc"> asc </option> <option value="desc"> desc </option>' +
+                '</select> <a class = "btn-del-option"> <i class = "fw fw-delete"> </i></a> </div>' +
+                '</div> <label class="error-message"> </label> </li>';
+            $('.order-by-attributes').append(orderByDiv)
+            self.renderDropDown('.order-by-content .define-attribute-drop-down:last', possibleAttributes, Constants
+                .ORDER_BY);
         };
 
         /**
-         * @function to determine the function and attribute name from the given expression
-         * @param {Object} attribute the aggregate attribute object
+         * @function to append an attribute to the group-by section
+         * @param {Object} possibleAttributes to be rendered down in the dropdown
          */
-        FormUtils.prototype.determineFunctionAndAttributeName = function (attribute) {
-            var expressionContent = attribute.expression.trim().split('(');
-            if (expressionContent.length == 2) {
-                attribute.aggregateFunction = expressionContent[0].trim().toLowerCase();
-                attribute.attributeName = expressionContent[1].substring(0, expressionContent[1].length - 1);
-            }
-        };
-
-        /**
-         * @function to create the aggregate expression object
-         * @param {Object} aggregateFunctions predefined aggregate functions
-         * @param {Object} selectValue user defined select values
-         * @param {Object} connectedElementAttributes
-         */
-        FormUtils.prototype.createAggregateExpressionObject = function (aggregateFunctions, selectValue,
-            connectedElementAttributes) {
+        FormUtils.prototype.appendGroupBy = function (possibleAttributes) {
             var self = this;
-            var attributes = [];
-            _.forEach(selectValue, function (value) {
-                var aggregateFunction = {
-                    id: "aggregate-function",
-                    options: self.getAggregationFunctionName(aggregateFunctions)
-                }
-                var possibleAttributes = {
-                    id: "stream-attribute",
-                    options: connectedElementAttributes
-                }
-                var expressionAs = {
-                    connectedElementAttributes: possibleAttributes,
-                    aggregateFunctionNames: aggregateFunction,
-                    expression: value.expression,
-                    as: value.as,
-                    aggregateFunction: "none",
-                    attributeName: ""
-                }
-                attributes.push(expressionAs);
-            });
-            return attributes;
+            var groupByDiv = '<li>  <div class="clearfix"> <div class="group-by-attribute-content"> ' +
+                '<div class="define-attribute-drop-down"> </div> ' +
+                '<a class = "btn-del-option"> <i class = "fw fw-delete"> </i> </a> </div> </div> ' +
+                '<label class="error-message"> </label> </li>';
+            $('.group-by-attributes').append(groupByDiv)
+            self.renderDropDown('.group-by-content .define-attribute-drop-down:last', possibleAttributes, Constants
+                .GROUP_BY);
         };
 
         /**
-        * @function to render the html to display the radio options for selecting the rdbms type
-        */
+         * @function to append an attribute for the projection section
+         */
+        FormUtils.prototype.appendUserSelectAttribute = function () {
+            var userSelectDiv = '<li class="attribute"> <div class="clearfix"> <div class="clearfix"> ' +
+                '<input type="text" class = "attribute-expression-as name" value=""><a class = "btn-del-option"> ' +
+                '<i class = "fw fw-delete"> </i></a> </div> <label class = "error-message"></label> ' +
+                '</div> </li>';
+            $('.user-defined-attributes').append(userSelectDiv);
+        };
+
+        /**
+         * @function to render the html to display the radio options for selecting the rdbms type
+         */
         FormUtils.prototype.renderRdbmsTypes = function () {
             var rdbmsTypeDiv = '<div class="clearfix"> <label class = "rdbms-type">' +
                 '<input type= "radio" name ="radioOpt" value="inline-config"> Inline-config' +
@@ -346,14 +309,14 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
 
         /**
          * @function render the attribute form template
-         * @param {Object} attributes
+         * @param {Object} attributes the saved attributes
          */
         FormUtils.prototype.renderAttributeTemplate = function (attributes) {
             var self = this;
             var attributeFormTemplate = Handlebars.compile($('#attribute-form-template').html());
             var wrappedHtml = attributeFormTemplate(attributes);
             $('#define-attribute').html(wrappedHtml);
-            self.changeAttributeNavigation();
+            self.changeAttributeNavigation('#attribute-div');
             self.addEventListenersForAttributeDiv();
         };
 
@@ -363,29 +326,31 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
          */
         FormUtils.prototype.renderUserDefinedAttributeSelection = function (attributes) {
             var self = this;
+            var userAttributeSelectionTemplate = Handlebars.compile($('#select-user-defined-attribute-template').html());
+            var wrappedHtml = userAttributeSelectionTemplate(attributes);
+            $('.define-select').html(wrappedHtml);
+        };
+
+        /**
+         * @function to register the drop-down partial(handlebars)
+         */
+        FormUtils.prototype.registerDropDownPartial = function () {
             var raw_partial = document.getElementById('drop-down-template').innerHTML;
             Handlebars.registerPartial('renderDropDown', raw_partial);
-            var userDefinedAttributeTemplate = Handlebars.compile($('#select-user-defined-attribute-template').html());
-            var wrappedHtml = userDefinedAttributeTemplate(attributes);
-            $('.attribute-selection .user-defined-attributes').append(wrappedHtml);
-            self.removeDeleteButtonOfFirstValue();
-            if ($('.user-defined-attributes li').length == attributes.length) {
-                self.mapAggregateExpression(attributes)
-            }
         };
 
         /**
          * @function renders the annotation form template
-         * @param {String} id div to embed the template
-         * @param {Object} annotations
+         * @param {String} className div to embed the template
+         * @param {Object} annotations saved annotations
          */
-        FormUtils.prototype.renderAnnotationTemplate = function (id, annotations) {
+        FormUtils.prototype.renderAnnotationTemplate = function (className, annotations) {
             var self = this;
             var raw_partial = document.getElementById('recursiveAnnotationPartial').innerHTML;
             Handlebars.registerPartial('recursiveAnnotation', raw_partial);
             var annotationFormTemplate = Handlebars.compile($('#annotation-form-template').html());
             var wrappedHtml = annotationFormTemplate(annotations);
-            $('#' + id).html(wrappedHtml);
+            $('.' + className).html(wrappedHtml);
             self.loadAnnotation();
         };
 
@@ -407,8 +372,8 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
         /**
          * @function to render the options for the selected type
          * @param {Object} optionsArray Saved options
-         * @param {Object} customizedMapperOptions Options typed by the user which aren't one of the predefined option
-         * @param {String} id div to embed the options
+         * @param {Object} customizedOptions Options typed by the user which aren't one of the predefined option
+         * @param {String} id identify the div to embed the options
          */
         FormUtils.prototype.renderOptions = function (optionsArray, customizedOptions, id) {
             var self = this;
@@ -425,6 +390,48 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
             });
             $('#' + id + '-options-div').html(wrappedHtml);
             self.changeCustomizedOptDiv(id);;
+        };
+
+        /**
+         * @function to render the function of window/stream-function types
+         * @param {Object} predefinedFunction possible options of a particular type
+         * @param {String} className div to embed the template
+         * @param {String} id window or stream-function
+         */
+        FormUtils.prototype.renderFunctions = function (predefinedFunctions, className, id) {
+            var windowFunctionNameTemplate = Handlebars.compile($('#type-selection-form-template').html());
+            var wrappedHtml = windowFunctionNameTemplate({ id: id, types: predefinedFunctions });
+            $(className).find('.defineFunctionName').html(wrappedHtml);
+        };
+
+        /**
+         * @function to render the parameter for the selected function using handlebars
+         * @param {Object} parameterArray Saved parameters
+         * @param {String} id window or stream-function
+         * @param {String} parameterDiv div to embed the parameters
+         */
+        FormUtils.prototype.renderParameters = function (parameterArray, id, parameterDiv) {
+            parameterArray.sort(function (val1, val2) {
+                if (val1.optional && !val2.optional) return 1;
+                else if (!val1.optional && val2.optional) return -1;
+                else return 0;
+            });
+            var parameterTemplate = Handlebars.compile($('#window-function-parameters-template').html());
+            var wrappedHtml = parameterTemplate({
+                id: id,
+                parameters: parameterArray
+            });
+            $(parameterDiv).find('.defineFunctionParameters').html(wrappedHtml);
+        };
+
+        /**
+         * @function to render the left and right source for join-query
+         * @param {String} type left or right
+         */
+        FormUtils.prototype.renderLeftRightSource = function (type) {
+            var sourceTemplate = Handlebars.compile($('#query-source-form-template').html());
+            var wrappedHtml = sourceTemplate({ type: type });
+            $('.define-' + type + '-source').html(wrappedHtml);
         };
 
         /**
@@ -458,13 +465,55 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
         };
 
         /**
+         * @function to render the stream handler template
+         */
+        FormUtils.prototype.renderStreamHandler = function (className, savedData) {
+            var self = this;
+            var streamHandlerTypes = self.configurationData.application.config.stream_handler_types;
+            //todo: remove the window option from streamHandlerType for other queries
+            var streamHandlerList = []
+            var types = {
+                id: Constants.STREAM_HANDLER,
+                options: streamHandlerTypes
+            }
+            if (savedData && savedData.getStreamHandlerList() != 0) {
+                streamHandlerList = savedData.getStreamHandlerList();
+            }
+            var streamHandlers = {
+                streamHandlerList: streamHandlerList,
+                types: types
+            }
+            self.registerDropDownPartial();
+            var streamHandlerTemplate = Handlebars.compile($('#stream-handler-form-template').html());
+            var wrappedHtml = streamHandlerTemplate(streamHandlers);
+            $('.define-' + className + '-source .define-stream-handler-section').html(wrappedHtml);
+        };
+
+        /**
+         * @function to map the stream-handler content depending on the type
+         */
+        FormUtils.prototype.renderStreamHandlerContentDiv = function (type, div) {
+            if (type === Constants.FILTER) {
+                var contentDiv = '<input type="text" class = "filter-condition-content symbol-syntax-required-value ' +
+                    'name clearfix"> <label class = "error-message"> </label>';
+            } else if (type === Constants.WINDOW) {
+                var contentDiv = '<div class= "defineFunctionName"> </div> <div class = "defineFunctionParameters"> ' +
+                    '</div>';
+            } else if (type === Constants.FUNCTION) {
+                var contentDiv = '<div class= "defineFunctionName"> </div> <div class = "defineFunctionParameters"> ' +
+                    '</div>'
+            }
+            div.html(contentDiv)
+        };
+
+        /**
          * @function to render the template of primary and index annotations
          */
         FormUtils.prototype.renderPrimaryIndexAnnotations = function (primaryIndexAnnotations, id) {
             var self = this;
             var annotationFormTemplate = Handlebars.compile($('#primary-index-annotation-template').html());
             var wrappedHtml = annotationFormTemplate(primaryIndexAnnotations);
-            $('#' + id).html(wrappedHtml);
+            $('.' + id).html(wrappedHtml);
             self.removeDeleteButtonOfFirstValue();
             self.addEventListenerForPrimaryIndexAnnotationDiv();
         };
@@ -472,13 +521,71 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
         /**
          * @function to render the template for predefined annotations
          */
-        FormUtils.prototype.renderPredefinedAnnotations = function (predefinedAnnotations, id) {
-            var self = this;
+        FormUtils.prototype.renderPredefinedAnnotations = function (predefinedAnnotations, className) {
             var raw_partial = document.getElementById('recursive-predefined-annotation-partial').innerHTML;
             Handlebars.registerPartial('recursive-predefined-annotation', raw_partial);
             var annotationFormTemplate = Handlebars.compile($('#predefined-annotation-form-template').html());
             var wrappedHtml = annotationFormTemplate(predefinedAnnotations);
-            $('#' + id).html(wrappedHtml);
+            $('.' + className).html(wrappedHtml);
+        };
+
+        /**
+         * @function to render the group-by template
+         * @param {Object} possibleGroupByAttributes attributes to be shown in the drop down
+         * @param {Object} groupBy user defined group by
+         * @param {String} className of the division
+         */
+        FormUtils.prototype.renderGroupBy = function (possibleGroupByAttributes, groupBy, className) {
+            var self = this;
+            var possibleGroupByAttributes = {
+                options: possibleGroupByAttributes,
+                id: Constants.GROUP_BY
+            }
+            var groupByAttributes = {
+                groupBy: groupBy,
+                possibleGroupByAttributes: possibleGroupByAttributes
+            }
+            self.registerDropDownPartial();
+            var groupByTemplate = Handlebars.compile($('#group-by-template').html());
+            var wrappedHtml = groupByTemplate(groupByAttributes);
+            $('.' + className).html(wrappedHtml);
+            self.checkForAttributeLength(possibleGroupByAttributes.length, Constants.GROUP_BY);
+        };
+
+        /**
+         * @function to render the order-by template
+         * @param {Object} possibleOrderByAttributes attributes to be shown in the drop down
+         * @param {Object} orderBy user defined order by
+         * @param {String} className of the division
+         */
+        FormUtils.prototype.renderOrderBy = function (possibleOrderByAttributes, orderBy, className) {
+            var self = this;
+            var possibleOrderByAttributes = {
+                options: possibleOrderByAttributes,
+                id: Constants.ORDER_BY
+            }
+            var orderByAttributes = {
+                orderBy: orderBy,
+                possibleOrderByAttributes: possibleOrderByAttributes
+            }
+            self.registerDropDownPartial();
+            var orderByTemplate = Handlebars.compile($('#order-by-template').html());
+            var wrappedHtml = orderByTemplate(orderByAttributes);
+            $('.' + className).html(wrappedHtml);
+            self.checkForAttributeLength(possibleOrderByAttributes.length, Constants.ORDER_BY);
+        };
+
+        /**
+         * @function to render output event types
+         */
+        FormUtils.prototype.renderOutputEventTypes = function () {
+            var outputEventDiv = '<div class = "clearfix"> <label> Event Type </label> </div>' +
+                '<div class = "clearfix"> <select id="event-type">' +
+                '<option value = "current_events"> current events </option>' +
+                '<option value = "all_events"> all events </option>' +
+                '<option value = "expired_events"> expired events </option>' +
+                '</select> </div>'
+            $('.define-output-events').html(outputEventDiv);
         };
 
         /**
@@ -499,28 +606,43 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
         /**
          * @function to select the attribute selection[all or user-defined]
          */
-        FormUtils.prototype.selectAttributeSelection = function (aggregateFunctions, select, connectedElementAttributes) {
+        FormUtils.prototype.selectAttributeSelection = function (select) {
             var self = this;
-            $('.attribute-selection').find('.attribute-selection-type option').filter(function () {
-                return ($(this).val() === select.getType().toLowerCase());
+            var attributes;
+            var selectedType = Constants.TYPE_ALL;
+            if (select) {
+                selectedType = select.getType().toLowerCase();
+            }
+            if (selectedType === Constants.TYPE_ALL) {
+                attributes = [""]
+            } else {
+                attributes = self.getAttributeExpressions(select.getValue())
+            }
+            self.renderUserDefinedAttributeSelection(attributes);
+            self.removeDeleteButtonOfFirstValue();
+            $('.define-select').find('.attribute-selection-type option').filter(function () {
+                return ($(this).val() === selectedType);
             }).prop('selected', true);
-            if (select.getType().toLowerCase() === Constants.TYPE_ALL) {
+            if (selectedType === Constants.TYPE_ALL) {
                 $('.define-user-defined-attributes').hide();
             } else {
-                self.getAttributeExpression(aggregateFunctions, select.getValue(), connectedElementAttributes);
                 $('.define-user-defined-attributes').show();
             }
         };
 
         /**
-         * @function to get the aggregate function names from it's object
+         * @function to merge the attribute expression and as value
          */
-        FormUtils.prototype.getAggregationFunctionName = function (aggregateFunctions) {
-            var names = [];
-            _.forEach(aggregateFunctions, function (aggregateFunction) {
-                names.push(aggregateFunction.name);
+        FormUtils.prototype.getAttributeExpressions = function (selectValue) {
+            var attributes = [];
+            _.forEach(selectValue, function (select) {
+                var attribute = select.expression;
+                if (select.as != "" && select.as != select.expression) {
+                    attribute += " " + Constants.AS + " " + select.as
+                }
+                attributes.push(attribute);
             });
-            return names;
+            return attributes;
         };
 
         /**
@@ -709,31 +831,6 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
         };
 
         /**
-         * @function to validate the user defined attribute selection section
-         */
-        FormUtils.prototype.validateUserDefinedAttributeSelection = function () {
-            var self = this;
-            var isErrorOccurred = false;
-            $('.user-defined-attributes .attribute').each(function () {
-                var expressionValue = $(this).find('.expression-as-value');
-                var functionName = $(this).find('.aggregate-function-selection').val();
-                var errorLabel = $(this).find('.attribute-error-message');
-                if (functionName != Constants.NONE && expressionValue.val().trim() == "") {
-                    self.addErrorClass(expressionValue);
-                    errorLabel.text('Expression value is required.');
-                    isErrorOccurred = true;
-                    return false;
-                } else if (expressionValue.val().trim().indexOf(' ') >= 0) {
-                    self.addErrorClass(expressionValue);
-                    errorLabel.text('Expression value can not have white space.');
-                    isErrorOccurred = true;
-                    return false;
-                }
-            });
-            return isErrorOccurred;
-        };
-
-        /**
          * @function to validate the predefined options
          * @param {Object} predefinedOptions
          * @param {String} id to identify the div in the html to traverse
@@ -761,22 +858,277 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
                 }
             });
             return isError;
+        }
+
+        /**
+         * @function to validate stream handlers
+         * @param {String} to identify the div of stream-handler
+         */
+        FormUtils.prototype.validateStreamHandlers = function (div) {
+            var self = this;
+            var isErrorOccurred = false;
+            var sourceDiv = $('.define-' + div + '-source');
+            if (sourceDiv.find('.stream-handler-checkbox').is(':checked')) {
+                sourceDiv.find('.stream-handler-list li').each(function () {
+                    var streamHandlerContent = $(this).find('.define-stream-handler-type-content');
+                    if (streamHandlerContent.hasClass('define-filter-stream-handler')) {
+                        var filterCondition = streamHandlerContent.find('.filter-condition-content')
+                        if (filterCondition.val().trim() == "") {
+                            streamHandlerContent.find('.error-message').text('Filter value is required')
+                            self.addErrorClass(filterCondition);
+                            isErrorOccurred = true;
+                            return isErrorOccurred;
+                        }
+                    } else if (streamHandlerContent.hasClass('define-window-stream-handler') ||
+                        streamHandlerContent.hasClass('define-function-stream-handler')) {
+                        var predefinedParameters;
+                        if (streamHandlerContent.hasClass('define-window-stream-handler')) {
+                            predefinedParameters = self.getPredefinedParameters(streamHandlerContent,
+                                self.configurationData.rawExtensions["windowFunctionNames"])
+                        } else {
+                            predefinedParameters = self.getPredefinedParameters(streamHandlerContent,
+                                self.configurationData.rawExtensions["streamFunctions"])
+                        }
+                        if (self.validateParameters(streamHandlerContent, predefinedParameters)) {
+                            isErrorOccurred = true;
+                            return isErrorOccurred
+                        }
+                    }
+                });
+            }
+            return isErrorOccurred
+        };
+
+        /**
+         * @function to obtain the predefined parametes of particular window or stream-function type
+         */
+        FormUtils.prototype.getPredefinedParameters = function (div, predefinedFunctions) {
+            var predefinedParameters = [];
+            var functionName = $(div).find('.defineFunctionName select').val().toLowerCase()
+            _.forEach(predefinedFunctions, function (predefinedFunction) {
+                if (functionName == predefinedFunction.name.toLowerCase()) {
+                    predefinedParameters = predefinedFunction.parameters;
+                    return false;
+                }
+            });
+            return predefinedParameters;
+        };
+
+        /**
+         * @function for generic validation of parameter values
+         * @param {Object} predefinedParameters predefined parameters of the selected window type
+         * @return {boolean} isError
+         */
+        FormUtils.prototype.validateParameters = function (parameterDiv, predefinedParameters) {
+            var self = this;
+            var isError = false;
+            $(parameterDiv).find('.parameter').each(function () {
+                var parameterValue = $(this).find('.parameter-value').val().trim();
+                var parameterName = $(this).find('.parameter-name').text().trim();;
+                var predefinedParameter = self.getObject(parameterName, predefinedParameters);
+                if (!predefinedParameter.optional) {
+                    if (!self.checkParameterValue(parameterValue, predefinedParameter, this)) {
+                        isError = true;
+                        return false;
+                    }
+                } else {
+                    if ($(this).find('.parameter-checkbox').is(":checked")) {
+                        if (!self.checkParameterValue(parameterValue, predefinedParameter, this)) {
+                            isError = true;
+                            return false;
+                        }
+                    }
+                }
+            });
+            return isError;
+        };
+
+        /**
+         * @function to show autocomplete drop down
+         */
+        FormUtils.prototype.showDropDown = function () {
+
+            $.widget("custom.combobox", {
+                _create: function () {
+                    this.wrapper = $("<span>")
+                        .addClass("custom-combobox")
+                        .insertAfter(this.element);
+
+                    this.element.hide();
+                    this._createAutocomplete();
+                    this._createShowAllButton();
+                },
+
+                _createAutocomplete: function () {
+                    var selected = this.element.children(":selected"),
+                        value = selected.val() ? selected.text() : "";
+
+                    this.input = $("<input>")
+                        .appendTo(this.wrapper)
+                        .val(value)
+                        .attr("title", "")
+                        .addClass("custom-combobox-input ui-widget ui-widget-content ui-state-default ui-corner-left")
+                        .autocomplete({
+                            delay: 0,
+                            minLength: 0,
+                            source: $.proxy(this, "_source")
+                        })
+                        .tooltip({
+                            classes: {
+                                "ui-tooltip": "ui-state-highlight"
+                            }
+                        });
+
+                    this._on(this.input, {
+                        autocompleteselect: function (event, ui) {
+                            ui.item.option.selected = true;
+                            this._trigger("select", event, {
+                                item: ui.item.option
+                            });
+                        },
+
+                        autocompletechange: "_removeIfInvalid"
+                    });
+                },
+
+                _createShowAllButton: function () {
+                    var input = this.input,
+                        wasOpen = false;
+
+                    $("<a>")
+                        .attr("tabIndex", -1)
+                        .attr("title", "Show All Items")
+                        .tooltip()
+                        .appendTo(this.wrapper)
+                        .button({
+                            icons: {
+                                primary: "ui-icon-triangle-1-s"
+                            },
+                            text: false
+                        })
+                        .removeClass("ui-corner-all")
+                        .addClass("custom-combobox-toggle ui-corner-right")
+                        .on("mousedown", function () {
+                            wasOpen = input.autocomplete("widget").is(":visible");
+                        })
+                        .on("click", function () {
+                            input.trigger("focus");
+
+                            // Close if already visible
+                            if (wasOpen) {
+                                return;
+                            }
+
+                            // Pass empty string as value to search for, displaying all results
+                            input.autocomplete("search", "");
+                        });
+                },
+
+                _source: function (request, response) {
+                    var matcher = new RegExp($.ui.autocomplete.escapeRegex(request.term), "i");
+                    response(this.element.children("option").map(function () {
+                        var text = $(this).text();
+                        if (this.value && (!request.term || matcher.test(text)))
+                            return {
+                                label: text,
+                                value: text,
+                                option: this
+                            };
+                    }));
+                },
+
+                _removeIfInvalid: function (event, ui) {
+
+                    // Selected an item, nothing to do
+                    if (ui.item) {
+                        return;
+                    }
+
+                    // Search for a match (case-insensitive)
+                    var value = this.input.val(),
+                        valueLowerCase = value.toLowerCase(),
+                        valid = false;
+                    this.element.children("option").each(function () {
+                        if ($(this).text().toLowerCase() === valueLowerCase) {
+                            this.selected = valid = true;
+                            return false;
+                        }
+                    });
+
+                    // Found a match, nothing to do
+                    if (valid) {
+                        return;
+                    }
+
+                    // Remove invalid value
+                    this.input
+                        .val("")
+                        .attr("title", value + " didn't match any item")
+                        .tooltip("open");
+                    this.element.val("");
+                    this._delay(function () {
+                        this.input.tooltip("close").attr("title", "");
+                    }, 2500);
+                    this.input.autocomplete("instance").term = "";
+                },
+
+                _destroy: function () {
+                    this.wrapper.remove();
+                    this.element.show();
+                }
+            });
+
+            $("#stream-function-type").combobox();
+            $("#toggle").on("click", function () {
+                $("#combobox").toggle();
+            });
+        };
+
+        /**
+         * @function to check the given parameter value
+         * @param {String} parameterValue value which needs to be validated
+         * @param {Object} predefinedParameter predefined parameter object
+         * @param {Object} parent div of the html to locate the parameter
+         * @return {boolean}
+         */
+        FormUtils.prototype.checkParameterValue = function (parameterValue, predefinedParameter, parent) {
+            var self = this;
+            if (parameterValue === "") {
+                $(parent).find('.error-message').text('Parameter Value is required.');
+                self.addErrorClass($(parent).find('.parameter-value'));
+                return false;
+            } else {
+                var dataType = predefinedParameter.type;
+                if (self.validateDataType(dataType, parameterValue)) {
+                    var errorMessage = "Invalid data-type. ";
+                    _.forEach(dataType, function (type) {
+                        errorMessage += type + " or ";
+                    });
+                    errorMessage = errorMessage.substring(0, errorMessage.length - 4);
+                    errorMessage += " is required";
+                    $(parent).find('.error-message').text(errorMessage);
+                    self.addErrorClass($(parent).find('.parameter-value'));
+                    return false;
+                }
+            }
+            return true;
         };
 
         /**
          * @function to validate the group-by attributes
          */
-        FormUtils.prototype.validateGroupBy = function () {
+        FormUtils.prototype.validateGroupOrderBy = function (className) {
             var selectedAttributes = [];
             var isErrorOccurred = false;
-            $('.group-by-attributes li').each(function () {
-                var selectedValue = $(this).find('select').val();
-                if (selectedValue != null && selectedValue != "") {
+            $('.' + className + '-attributes li').each(function () {
+                var selectedValue = $(this).find('.' + className + '-selection').val();
+                if (selectedValue) {
                     selectedAttributes.push(selectedValue);
                 }
             });
             if (selectedAttributes.length == 0) {
-                $('.group-by-attributes').find('.error-message:eq(0)').text('Minimum one attribute is required');
+                $('.' + className + '-attributes').find('.error-message:eq(0)').text('Minimum one attribute is ' +
+                    'required');
                 isErrorOccurred = true;
             }
             return isErrorOccurred;
@@ -911,6 +1263,49 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
         };
 
         /**
+         * @function to validate the user defined attribute selection (projection)
+         */
+        FormUtils.prototype.validateUserDefinedAttributeSelection = function (possibleAttributes) {
+            var self = this;
+            var isErrorOccurred = false;
+            var errorMessage = ""
+            var attributes = 0;
+            if ($('.define-select .attribute-selection-type').val() == Constants.TYPE_USER_DEFINED) {
+                $('.define-select .user-defined-attributes li').each(function () {
+                    var expressionAs = $(this).find('.attribute-expression-as');
+                    var expressionAsValue = expressionAs.val().trim();
+                    var separateExpression = expressionAsValue.split(/as/i);
+                    if (expressionAsValue != "") {
+                        attributes++;
+                        if (separateExpression.length == 1 && !possibleAttributes.includes(expressionAsValue)) {
+                            isErrorOccurred = true;
+                            errorMessage = "As value is required."
+                        } else if (separateExpression.length == 2 && separateExpression[1].trim() == "") {
+                            isErrorOccurred = true;
+                            errorMessage = "As value is required."
+                        } else if (separateExpression.length > 2) {
+                            isErrorOccurred = true;
+                            errorMessage = "Only one as value is required."
+                        }
+                        if (isErrorOccurred) {
+                            $(this).find('.error-message').text(errorMessage);
+                            self.addErrorClass(expressionAs);
+                            return false;
+                        }
+                    }
+                });
+
+                if (attributes == 0) {
+                    isErrorOccurred = true;
+                    var firstAttributeList = '.user-defined-attributes li:first';
+                    $(firstAttributeList).find('.error-message').text("Minimum one attribute is required.")
+                    self.addErrorClass($(firstAttributeList).find('.attribute-expression-as'));
+                }
+            }
+            return isErrorOccurred;
+        };
+
+        /**
          * @function validates the names
          * @param {Object} id to find the error-message label
          * @param {String} type Attribue or any element
@@ -965,8 +1360,9 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
         /**
          * @function to build the select object
          */
-        FormUtils.prototype.buildAttributeSelection = function (selectAttributeOptions) {
+        FormUtils.prototype.buildAttributeSelection = function () {
             var self = this;
+            var selectAttributeOptions = {}
             var selectionType = $('.attribute-selection-type').val();
             if (selectionType == Constants.TYPE_ALL) {
                 _.set(selectAttributeOptions, 'type', Constants.TYPE_ALL.toUpperCase());
@@ -975,34 +1371,42 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
                 _.set(selectAttributeOptions, 'type', Constants.TYPE_USER_DEFINED.toUpperCase());
                 _.set(selectAttributeOptions, 'value', self.buildAttributeExpressions());
             }
+            return selectAttributeOptions;
         };
 
         /**
          * @function to build the attribute expression
          */
         FormUtils.prototype.buildAttributeExpressions = function () {
-            var attributeValues = [];
-            $('.attribute-selection .attribute').each(function () {
-                var functionName = $(this).find('.aggregate-function-selection').val();
-                var attributeName = $(this).find('.stream-attribute-selection').val();
-                var expression;
-                if (functionName != Constants.NONE) {
-                    expression = functionName + "(" + attributeName + ")";
-                } else {
-                    expression = attributeName;
+            var self = this;
+            var attributes = [];
+            $('.define-select .user-defined-attributes li').each(function () {
+                var expressionAsValue = $(this).find('.attribute-expression-as').val().trim();
+                if (expressionAsValue != "") {
+                    var separateExpression = expressionAsValue.split(/as/i);
+                    if (separateExpression.length == 1) {
+                        var expressionAs = {
+                            expression: separateExpression[0].trim(),
+                            as: ""
+                        }
+                    } else if (separateExpression.length = 2) {
+                        var asValue = "";
+                        if (separateExpression[0].trim() != separateExpression[1].trim()) {
+                            asValue = separateExpression[1].trim();
+                        }
+                        var expressionAs = {
+                            expression: separateExpression[0].trim(),
+                            as: asValue
+                        }
+                    }
+                    attributes.push(expressionAs)
                 }
-                var expressionAs = {
-                    expression: expression,
-                    as: $(this).find('.expression-as-value').val().trim()
-                }
-                attributeValues.push(expressionAs);
             });
-            return attributeValues;
+            return attributes;
         };
 
         /**
          * @function to build the options
-         * @param {Object} predefinedOptions predefined options
          * @param {Object} selectedOptions array to add the built options
          * @param {String} id to identify the div in the html to traverse
          */
@@ -1019,6 +1423,164 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
                         option = optionName + " = \"" + optionValue + "\"";
                         selectedOptions.push(option);
                     }
+                }
+            });
+        };
+
+        /**
+         * @function to build the stream-handlers
+         * @param {Object} div where the stream handler is embedded
+         */
+        FormUtils.prototype.buildStreamHandlers = function (sourceDiv) {
+            var self = this;
+            var streamHandlers = [];
+            if (sourceDiv.find('.stream-handler-checkbox').is(':checked')) {
+                sourceDiv.find('.stream-handler-list li').each(function () {
+                    var streamHandlerOptions = {};
+                    var streamHandlerContent = $(this).find('.define-stream-handler-type-content');
+                    if (streamHandlerContent.hasClass('define-filter-stream-handler')) {
+                        var filterCondition = streamHandlerContent.find('.filter-condition-content').val().trim()
+                        _.set(streamHandlerOptions, 'type', Constants.FILTER.toUpperCase());
+                        _.set(streamHandlerOptions, 'value', filterCondition);
+                    } else if (streamHandlerContent.hasClass('define-window-stream-handler') ||
+                        streamHandlerContent.hasClass('define-function-stream-handler')) {
+                        var functionName = streamHandlerContent.find('.defineFunctionName select').val();
+                        var parameters;
+                        var predefinedFunctions;
+                        var handlerType;
+                        if (streamHandlerContent.hasClass('define-window-stream-handler')) {
+                            predefinedFunctions = self.configurationData.rawExtensions["windowFunctionNames"]
+                            parameters = self.buildWindowParameters(streamHandlerContent, functionName, predefinedFunctions)
+                            handlerType = Constants.WINDOW.toUpperCase()
+                        } else {
+                            predefinedFunctions = self.configurationData.rawExtensions["streamFunctions"]
+                            predefinedParameters = self.getPredefinedParameters(streamHandlerContent, predefinedFunctions);
+                            parameters = self.buildParameterValues(streamHandlerContent, predefinedParameters)
+                            handlerType = Constants.FUNCTION.toUpperCase()
+                        }
+                        var windowFunctionOptions = {};
+                        _.set(windowFunctionOptions, 'function', functionName);
+                        _.set(windowFunctionOptions, 'parameters', parameters);
+                        var queryWindowFunction = new QueryWindowOrFunction(windowFunctionOptions);
+                        _.set(streamHandlerOptions, 'type', handlerType);
+                        _.set(streamHandlerOptions, 'value', queryWindowFunction);
+                    }
+                    streamHandlers.push(streamHandlerOptions);
+                });
+            }
+            return streamHandlers;
+        };
+
+        /**
+         * @function to build the parameters of window
+         */
+        FormUtils.prototype.buildWindowParameters = function (div, selectedType, predefinedFunctions) {
+            var self = this;
+            var parameters = [];
+            var predefinedParameters = self.getPredefinedParameters(div, predefinedFunctions)
+            if (selectedType.toLowerCase() === Constants.SORT) {
+                parameters = self.buildParameterValuesSort(div)
+            } else if (selectedType.toLowerCase() === Constants.FREQUENT ||
+                selectedType.toLowerCase() === Constants.LOSSY_FREQUENT) {
+                parameters = self.buildParameterValuesFrequentOrLossyFrequent(div,
+                    predefinedParameters)
+            } else {
+                parameters = self.buildParameterValues(div, predefinedParameters)
+            }
+            return parameters;
+        };
+
+        /**
+         * @function to build the parameter values
+         * @param {Object} div division where the parameters are in html
+         * @param {Object} predefinedParameters predefined parameters
+         * @return {boolean} isError
+         */
+        FormUtils.prototype.buildParameterValues = function (div, predefinedParameters) {
+            var self = this;
+            var parameterValues = [];
+            $(div).find('.parameter').each(function () {
+                if ($(this).find('.parameter-name').hasClass('mandatory-parameter') || ($(this).find('.parameter-name')
+                    .hasClass('optional-parameter') && $(this).find('.parameter-checkbox').is(":checked"))) {
+                    var parameterValue = $(this).find('.parameter-value').val().trim();
+                    var parameterName = $(this).find('.parameter-name').text().trim();;
+                    var predefinedParameter = self.getObject(parameterName, predefinedParameters);
+                    if (predefinedParameter.type.includes("STRING")) {
+                        parameterValue = "'" + parameterValue + "'";
+                    }
+                    parameterValues.push(parameterValue)
+                }
+            });
+            return parameterValues;
+        };
+
+        /**
+         * @function to build parameters for sort type
+         * @param {Object} div where the parameters are in html
+         * @returns {Object} parameterValues
+         */
+        FormUtils.prototype.buildParameterValuesSort = function (div) {
+            var self = this;
+            var parameterValues = [];
+            $(div).find('.parameter').each(function () {
+                var parameterValue = $(this).find('.parameter-value').val().trim();
+                var parameterName = $(this).find('.parameter-name').text().trim();;
+                if (parameterName === "window.length") {
+                    parameterValues.push(parameterValue)
+                } else if (parameterName === "attribute") {
+                    if ($('#attribute-parameter').find('.parameter-checkbox').is(":checked")) {
+                        self.buildAttributes(parameterValue, parameterValues);
+                    }
+                } else {
+                    if (($('#attribute-parameter').find('.parameter-checkbox').is(":checked")) && ($
+                        ('#order-parameter').find('.parameter-checkbox').is(":checked"))) {
+                        parameterValue = "'" + parameterValue + "'";
+                        parameterValues.push(parameterValue)
+                    }
+                }
+            });
+            return parameterValues;
+        };
+
+        /**
+         * @function to build parameters for frequent and lossyFrequent type
+         * @param {Object} div where the parameters are in html
+         * @param {Object} predefinedParameters predefined parameters
+         * @returns {Object} parameterValues
+         */
+        FormUtils.prototype.buildParameterValuesFrequentOrLossyFrequent = function (div, predefinedParameters) {
+            var self = this;
+            var parameterValues = [];
+            $(div).find('.parameter').each(function () {
+                if ($(this).find('.parameter-name').hasClass('mandatory-parameter') || ($(this).find('.parameter-name')
+                    .hasClass('optional-parameter') && $(this).find('.parameter-checkbox').is(":checked"))) {
+                    var parameterValue = $(this).find('.parameter-value').val().trim();
+                    var parameterName = $(this).find('.parameter-name').text().trim();
+                    var predefinedParameter = self.getObject(parameterName, predefinedParameters);
+                    if (parameterName === "attribute") {
+                        self.buildAttributes(parameterValue, parameterValues);
+                    } else {
+                        if (predefinedParameter.type.includes("STRING")) {
+                            parameterValue = "'" + parameterValue + "'";
+                        }
+                        parameterValues.push(parameterValue)
+                    }
+                }
+            });
+            return parameterValues;
+        };
+
+        /**
+         * @function to construct parameter 'attributes'
+         * @param {String} parameterValue the attribute value
+         * @param {Object} parameterValues array to add the parameters
+         */
+        FormUtils.prototype.buildAttributes = function (parameterValue, parameterValues) {
+            var attributeArray = parameterValue.split(',');
+            _.forEach(attributeArray, function (attribute) {
+                attribute = attribute.trim();
+                if (attribute !== "") {
+                    parameterValues.push(attribute);
                 }
             });
         };
@@ -1169,8 +1731,6 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
                 }
                 if (annotation.parameters) {
                     self.buildPredefinedAnnotationElements(annotation, annotationObject);
-                    predefinedAnnotationString = predefinedAnnotationString.substring(0,
-                        predefinedAnnotationString.length - 1);
                 }
             }
         };
@@ -1187,6 +1747,9 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
                 predefinedAnnotationString += "'" + annotationOptions[key] + "' ,";
                 var element = new AnnotationElement(key, annotationOptions[key])
                 annotationObject.addElement(element);
+            }
+            if (Object.keys(annotationOptions).length != 0) {
+                predefinedAnnotationString = predefinedAnnotationString.substring(0, predefinedAnnotationString.length - 1);
             }
         };
 
@@ -1220,20 +1783,89 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
         };
 
         /**
-         * @function to map the user given aggregate expression to the form
+         * @function to map the stream-handlers
+         * @param {Object} savedData the saved object which holds the streamhandler list
+         * @param {String} type the identification of the div where the stream-handlers are embedded
          */
-        FormUtils.prototype.mapAggregateExpression = function (attributes) {
-            var i = 0;
-            $('.attribute').each(function () {
-                $(this).find('.stream-attribute-selection option').filter(function () {
-                    return ($(this).val() == (attributes[i].attributeName));
-                }).prop('selected', true);
-                $(this).find('.aggregate-function-selection option').filter(function () {
-                    return ($(this).val().toLowerCase() == (attributes[i].aggregateFunction));
-                }).prop('selected', true);
+        FormUtils.prototype.mapStreamHandler = function (savedData, type) {
+            var self = this;
+            sourceDiv = '.define-' + type + '-source .define-stream-handler';
+            if (savedData && savedData.getStreamHandlerList() && savedData.getStreamHandlerList().length != 0) {
+                $(sourceDiv).find('.stream-handler-checkbox').prop('checked', true);
+                var streamHandlerList = savedData.getStreamHandlerList();
+                var i = 0;
+                $(sourceDiv).find('.define-stream-handler-content').each(function () {
+                    var streamHandlerType = streamHandlerList[i].getType().toLowerCase();
+                    var streamHandlerContent = $(this).find('.define-stream-handler-type-content');
+                    streamHandlerContent.addClass('define-' + streamHandlerType + '-stream-handler')
+                    self.renderStreamHandlerContentDiv(streamHandlerType, streamHandlerContent);
+                    self.mapStreamHandlerContent(streamHandlerContent, streamHandlerList[i])
+                    self.selectHandlerSelection($(this).find('.stream-handler-selection'), streamHandlerType)
+                    i++;
+                });
+            } else {
+                $(sourceDiv).find('.define-stream-handler-section').hide();
+                $(sourceDiv).find('.define-stream-handler-buttons').hide();
+            }
+            self.changeAttributeNavigation(sourceDiv + ' .stream-handler-list');
+            self.removeNavigationForWindow(sourceDiv)
+            self.showHideStreamHandlerWindowButton(sourceDiv)
+            self.preventMultipleSelectionOfWindowStreamHandler(sourceDiv)
+            self.addEventListenersForParameterDiv();
+        };
 
-                i++;
-            });
+        /**
+         * @function to map the stream handler content depending on the type
+         */
+        FormUtils.prototype.mapStreamHandlerContent = function (div, streamHandler) {
+            var self = this;
+            var type = streamHandler.type.toLowerCase();
+            if (type === Constants.FILTER) {
+                $(div).find('.filter-condition-content').val(streamHandler.value)
+            } else if (type === Constants.WINDOW) {
+                var predefinedWindowFunctions = _.orderBy(JSON.parse(JSON.stringify
+                    (self.configurationData.rawExtensions["windowFunctionNames"]), ['name'], ['asc']));
+                self.renderFunctions(predefinedWindowFunctions, div, Constants.WINDOW);
+                self.mapStreamHandlerWindow(div, predefinedWindowFunctions, streamHandler);
+            } else if (type === Constants.FUNCTION) {
+                var predefinedStreamFunctions = _.orderBy(JSON.parse(JSON.stringify
+                    (self.configurationData.rawExtensions["streamFunctions"]), ['name'], ['asc']));
+                self.renderFunctions(predefinedStreamFunctions, div, Constants.STREAM_FUNCTION);
+                self.mapStreamHandlerStreamFunction(div, predefinedStreamFunctions, streamHandler)
+            }
+        };
+
+        /**
+         * @function to map the window stream handler
+         */
+        FormUtils.prototype.mapStreamHandlerWindow = function (div, predefinedFunctions, streamHandler) {
+            var self = this;
+            var windowType = streamHandler.value.function.toLowerCase();
+            $(div).find('#window-type option').filter(function () {
+                return ($(this).val().toLowerCase() == (windowType));
+            }).prop('selected', true);
+            var savedParameterValues = streamHandler.value.parameters;
+            var functionParameters = self.getSelectedTypeParameters(windowType, predefinedFunctions);
+            self.callToMapParameters(windowType, functionParameters, savedParameterValues, div)
+            if (windowType === Constants.SORT) {
+                self.showHideOrderForSort();
+                self.addEventListenerForSortWindow(selectedType)
+            }
+        };
+
+        /**
+         * @function to map the stream function stream handler
+         */
+        FormUtils.prototype.mapStreamHandlerStreamFunction = function (div, predefinedFunctions, streamHandler) {
+            var self = this;
+            var functionType = streamHandler.value.function.toLowerCase();
+            $(div).find('#stream-function-type option').filter(function () {
+                return ($(this).val().toLowerCase() == (functionType));
+            }).prop('selected', true);
+            var savedParameterValues = streamHandler.value.parameters;
+            var functionParameters = self.getSelectedTypeParameters(functionType, predefinedFunctions);
+            var functionParametersWithValues = self.mapUserParameterValues(functionParameters, savedParameterValues);
+            self.renderParameters(functionParametersWithValues, Constants.STREAM_FUNCTION, div);
         };
 
         /**
@@ -1289,6 +1921,174 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
         };
 
         /**
+        * @function to map the saved parameter values to the parameter object
+        * @param {Object} predefinedParameters Predefined parameters of a particular window type
+        * @param {Object} savedParameterValues Saved parameter values
+        * @return {Object} parameters
+        */
+        FormUtils.prototype.mapUserParameterValues = function (predefinedParameters, savedParameterValues) {
+            var parameters = [];
+            for (var i = 0; i < predefinedParameters.length; i++) {
+                var timeStamp = "";
+                if (i < savedParameterValues.length) {
+                    var parameterValue = savedParameterValues[i];
+                    if (predefinedParameters[i].type.includes("STRING")) {
+                        parameterValue = parameterValue.slice(1, parameterValue.length - 1)
+                    }
+                    parameters.push({
+                        name: predefinedParameters[i].name, value: parameterValue, description:
+                            predefinedParameters[i].description, optional: predefinedParameters[i].optional,
+                        defaultValue: predefinedParameters[i].defaultValue, timeStamp: timeStamp
+                    });
+                } else {
+                    parameters.push({
+                        name: predefinedParameters[i].name, value: "", description: predefinedParameters[i]
+                            .description, optional: predefinedParameters[i].optional,
+                        defaultValue: predefinedParameters[i].defaultValue, timeStamp: timeStamp
+                    });
+                }
+            }
+            return parameters;
+        };
+
+        /**
+         * @function to map the user saved parameters of lossyFrequent
+         * @param {Object} predefinedParameters predefined parameters
+         * @param {Object} savedParameterValues user saved parameters
+         * @return {Object} parameters
+         *
+         */
+        FormUtils.prototype.mapParameterValuesLossyFrequent = function (predefinedParameters, savedParameterValues) {
+            var parameters = [];
+            var attributes = "";
+            //add the two mandatory params of the saved values to the predefined param objects
+            for (var i = 0; i <= 1; i++) {
+                parameters.push({
+                    name: predefinedParameters[i].name, value: savedParameterValues[i], description:
+                        predefinedParameters[i].description, optional: predefinedParameters[i].optional,
+                    defaultValue: predefinedParameters[i].defaultValue
+                });
+            }
+            // add the attributes
+            for (var i = 2; i < savedParameterValues.length; i++) {
+                attributes += savedParameterValues[i] + ", "
+            }
+            //cutting off the last white space and the comma
+            attributes = attributes.substring(0, attributes.length - 2);
+            //add the attributes to the third obj of the predefined parameter
+            parameters.push({
+                name: predefinedParameters[2].name, value: attributes, description:
+                    predefinedParameters[2].description, optional: predefinedParameters[2].optional,
+                defaultValue: predefinedParameters[2].defaultValue
+            });
+            return parameters;
+        };
+
+        /**
+         * @function to map the user saved parameters of frequent
+         * @param {Object} predefinedParameters predefined parameters
+         * @param {Object} savedParameterValues user saved parameters
+         * @return {Object} parameters
+         */
+        FormUtils.prototype.mapParameterValuesFrequent = function (predefinedParameters, savedParameterValues) {
+            var parameters = [];
+            var attributes = "";
+            //add the first saved param to predefined param's first index (event.count)
+            parameters.push({
+                name: predefinedParameters[0].name, value: savedParameterValues[0], description:
+                    predefinedParameters[0].description, optional: predefinedParameters[0].optional,
+                defaultValue: predefinedParameters[0].defaultValue
+            });
+            // add the attributes
+            for (var i = 1; i < savedParameterValues.length; i++) {
+                attributes += savedParameterValues[i] + ", "
+            }
+            //cutting off the last white space and the comma
+            attributes = attributes.substring(0, attributes.length - 2);
+            //add the attributes to second obj of the predefined parameter
+            parameters.push({
+                name: predefinedParameters[1].name, value: attributes, description:
+                    predefinedParameters[1].description, optional: predefinedParameters[1].optional,
+                defaultValue: predefinedParameters[1].defaultValue
+            });
+            return parameters;
+        };
+
+        /**
+         * @function to map the user saved parameters of sort
+         * @param {Object} predefinedParameters predefined parameters
+         * @param {Object} savedParameterValues user saved parameters
+         * @return {Object} parameters
+         */
+        FormUtils.prototype.mapParameterValuesSort = function (predefinedParameters, savedParameterValues) {
+            var parameters = [];
+            var attributes = "";
+            var order = "";
+            var length = "";
+            if (savedParameterValues.length != 0) {
+                length = savedParameterValues[0];
+            }
+            //add the first saved param to predefined param's first index (window.length)
+            parameters.push({
+                name: predefinedParameters[0].name, value: length, description:
+                    predefinedParameters[0].description, optional: predefinedParameters[0].optional,
+                defaultValue: predefinedParameters[0].defaultValue
+            });
+            // to determine the attributes and order
+            if (savedParameterValues.length > 1) {
+                for (var i = 1; i < savedParameterValues.length; i++) {
+                    if (savedParameterValues[i].indexOf("'") >= 0 || savedParameterValues[i].indexOf('"') >= 0) {
+                        order = savedParameterValues[i];
+                        order = order.slice(1, order.length - 1)
+                    } else {
+                        //attributes
+                        attributes += savedParameterValues[i] + ", ";
+
+                    }
+                }
+                //cutting off the last white space and the comma
+                attributes = attributes.substring(0, attributes.length - 2);
+            }
+            //add the attributes to second obj of the predefined parameter
+            parameters.push({
+                name: predefinedParameters[1].name, value: attributes, description:
+                    predefinedParameters[1].description, optional: predefinedParameters[1].optional,
+                defaultValue: predefinedParameters[1].defaultValue
+            });
+            //add the order to the third obj of the predefined parameter
+            parameters.push({
+                name: predefinedParameters[2].name, value: order, description:
+                    predefinedParameters[2].description, optional: predefinedParameters[2].optional,
+                defaultValue: predefinedParameters[2].defaultValue
+            });
+            return parameters;
+        };
+
+        /**
+         * Function to select the parameter mapping method
+         * @param {String} selectedType selected window type
+         * @param {Object} functionParameters parameters of the selected window type
+         * @param {Object} savedParameterValues saved parameter values
+         * @param {Object} functionParametersWithValues array to hold the parameter of the mapped value
+         */
+        FormUtils.prototype.callToMapParameters = function (selectedType, functionParameters, savedParameterValues,
+            parameterDiv) {
+            var self = this;
+            if (selectedType === Constants.SORT) {
+                functionParametersWithValues = self.mapParameterValuesSort(functionParameters, savedParameterValues);
+            } else if (selectedType === Constants.FREQUENT) {
+                functionParametersWithValues = self.mapParameterValuesFrequent(functionParameters,
+                    savedParameterValues);
+            } else if (selectedType === Constants.LOSSY_FREQUENT) {
+                functionParametersWithValues = self.mapParameterValuesLossyFrequent(functionParameters,
+                    savedParameterValues);
+            } else {
+                functionParametersWithValues = self.mapUserParameterValues(functionParameters, savedParameterValues);
+            }
+            self.renderParameters(functionParametersWithValues, Constants.WINDOW, parameterDiv);
+        };
+
+        /**
          * @function to map the user given values for group-by
          * @param {Object} attributes user saved group-by-attributes
          */
@@ -1297,6 +2097,26 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
             $('.group-by-attributes li').each(function () {
                 $(this).find('.group-by-selection option').filter(function () {
                     return ($(this).val() == (attributes[i]));
+                }).prop('selected', true);
+                i++;
+            });
+        };
+
+        /**
+         * @function to map the user saved values of order-by attributes
+         * @param {String} replacedAttributes attribute names which were replaced (only for join-query as because
+         *  there are two source the attribute names were changed to <sourceName>.<attributeName>).
+         *  It would be the same for the other forms
+         * @param {orderByAttributes} orderByAttributes saved order by attributes
+         */
+        FormUtils.prototype.mapUserOrderBy = function (replacedAttributes, orderByAttributes) {
+            var i = 0;
+            $('.order-by-attributes li').each(function () {
+                $(this).find('.order-by-selection option').filter(function () {
+                    return ($(this).val() == (replacedAttributes[i]));
+                }).prop('selected', true);
+                $(this).find('.order-selection option').filter(function () {
+                    return ($(this).val() == (orderByAttributes[i].getOrder().toLowerCase()));
                 }).prop('selected', true);
                 i++;
             });
@@ -1579,29 +2399,6 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
         };
 
         /**
-		 * @function to render the group-by template
-		 * @param {Object} possibleGroupByAttributes attributes to be shown in the drop down
-		 * @param {Object} groupBy user defined group by
-		 * @param {String} id of the division
-		 */
-        FormUtils.prototype.renderGroupBy = function (possibleGroupByAttributes, groupBy, className) {
-            var possibleGroupByAttributes = {
-                options: possibleGroupByAttributes,
-                id: Constants.GROUP_BY
-            }
-            var groupByAttributes = {
-                groupBy: groupBy,
-                possibleGroupByAttributes: possibleGroupByAttributes
-            }
-            var raw_partial = document.getElementById('drop-down-template').innerHTML;
-            Handlebars.registerPartial('renderDropDown', raw_partial);
-            var groupByTemplate = Handlebars.compile($('#group-by-template').html());
-            var wrappedHtml = groupByTemplate(groupByAttributes);
-            $('.' + className).html(wrappedHtml);
-        };
-
-
-        /**
          * @function to build the annotations
          * @param {Object} annotationNodes array of nodes which needs to be constructed
          * @param {Object} annotationStringList array to add the built annotation strings
@@ -1695,11 +2492,73 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
             var attributes = [];
             $('.group-by-attributes li').each(function () {
                 var selectedValue = $(this).find('select').val();
-                if (selectedValue != null && selectedValue != "") {
+                if (selectedValue != "") {
                     attributes.push(selectedValue);
                 }
             });
             return attributes;
+        };
+
+        /**
+         * @function to build the join-query order by section
+         */
+        FormUtils.prototype.buildQueryOrderBy = function () {
+            var self = this;
+            var orderByAttributes = [];
+            var leftSourceName = $('.define-left-source .source-selection').val();
+            var leftSourceAs = self.getSourceAs(Constants.LEFT);
+            var rightSourceAs = self.getSourceAs(Constants.RIGHT);
+            $('.order-by-attributes li').each(function () {
+                var orderValue = $(this).find('.order-by-selection').val();
+                if (orderValue) {
+                    var splitAttribute = orderValue.split('.');
+                    if (splitAttribute[0].trim() === leftSourceName) {
+                        orderValue = leftSourceAs + '.' + splitAttribute[1];
+                    } else {
+                        orderValue = rightSourceAs + '.' + splitAttribute[1];
+                    }
+                    var orderByValueObjectOptions = {};
+                    _.set(orderByValueObjectOptions, 'value', orderValue);
+                    _.set(orderByValueObjectOptions, 'order', $(this).find('.order-selection').val());
+                    orderByAttributes.push(orderByValueObjectOptions);
+                }
+            });
+            return orderByAttributes;
+        };
+
+        /**
+         * @function to build the join query group by section
+         */
+        FormUtils.prototype.buildQueryGroupBy = function () {
+            var self = this;
+            var attributes = [];
+            var leftSourceName = $('.define-left-source .source-selection').val();
+            var leftSourceAs = self.getSourceAs(Constants.LEFT);
+            var rightSourceAs = self.getSourceAs(Constants.RIGHT);
+            $('.group-by-attributes li').each(function () {
+                var selectedValue = $(this).find('select').val();
+                if (selectedValue) {
+                    var splitAttribute = selectedValue.split('.');
+                    if (splitAttribute[0].trim() === leftSourceName) {
+                        attributes.push(leftSourceAs + '.' + splitAttribute[1])
+                    } else {
+                        attributes.push(rightSourceAs + '.' + splitAttribute[1])
+                    }
+                }
+            });
+            return attributes;
+        };
+
+        /**
+         * @function to get the defined source-as in a join query
+         * @param {String} type left or right source
+         */
+        FormUtils.prototype.getSourceAs = function (type) {
+            if ($('.define-' + type + '-source').find('.source-as-checkbox').is(':checked')) {
+                return $('.define-' + type + '-source').find('.as-content-value').val().trim();
+            } else {
+                return $('.define-' + type + '-source').find('.source-selection').val().trim();
+            }
         };
 
         /**
@@ -1822,7 +2681,7 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
          */
         FormUtils.prototype.addEventListenersForGroupByDiv = function (possibleAttributes) {
             var self = this;
-            $('.define-group-by-attributes').on('change', '#group-by-checkbox', function () {
+            $('.define-group-by-attributes').on('change', '.group-by-checkbox', function () {
                 if ($(this).is(':checked')) {
                     $('.group-by-content').show();
                 } else {
@@ -1831,9 +2690,9 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
             });
 
             $('.define-group-by-attributes').on('click', '.btn-add-group-by-attribute', function () {
-                self.renderDropDown('.group-by-attributes', possibleAttributes, Constants.GROUP_BY);
+                self.appendGroupBy(possibleAttributes);
                 self.preventMultipleSelection(Constants.GROUP_BY);
-                self.checkForAttributeLength(possibleAttributes.length);
+                self.checkForAttributeLength(possibleAttributes.length, Constants.GROUP_BY);
             });
 
             $('.define-group-by-attributes').on('change', '.group-by-selection', function () {
@@ -1843,9 +2702,428 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
             $('.define-group-by-attributes').on('click', '.btn-del-option', function () {
                 $(this).closest('li').remove();
                 self.preventMultipleSelection(Constants.GROUP_BY);
-                self.checkForAttributeLength(possibleAttributes.length);
+                self.checkForAttributeLength(possibleAttributes.length, Constants.GROUP_BY);
+            });
+        };
+
+        /**
+         * @function to add event listeners for parameter division
+         */
+        FormUtils.prototype.addEventListenersForParameterDiv = function () {
+            var self = this;
+            //event listener to show parameter description
+            $('.defineFunctionParameters').on('mouseover', '.parameter-desc', function () {
+                $(this).find('.parameter-desc-content').show();
             });
 
+            //event listener to hide parameter description
+            $('.defineFunctionParameters').on('mouseout', '.parameter-desc', function () {
+                $(this).find('.parameter-desc-content').hide();
+            });
+
+            //event listener when the parameter checkbox is changed
+            $('.defineFunctionParameters').on('change', '.parameter-checkbox', function () {
+                var parameterParent = $(this).parents(".parameter");
+                if ($(this).is(':checked')) {
+                    parameterParent.find(".optional-param-content").show();
+                } else {
+                    parameterParent.find(".optional-param-content").hide();
+                    parameterParent.find(".parameter-value").removeClass("required-input-field");
+                    parameterParent.find(".error-message").text("");
+                }
+            });
+        };
+
+        /**
+         * @function to add event listeners for sort window type parameters
+         */
+        FormUtils.prototype.addEventListenerForSortWindow = function (selectedType) {
+            var self = this;
+            $('.defineFunctionParameters').on('change', '.parameter-checkbox', function () {
+                //check for sort type's parameter (order & attribute params)
+                if (selectedType === Constants.SORT) {
+                    self.showHideOrderForSort();
+                }
+            });
+        };
+
+        /**
+         * @function to add event listeners for the attribute selection(projection) division
+         */
+        FormUtils.prototype.addEventListenersForSelectionDiv = function () {
+            var self = this;
+            $('.define-select').on('change', '.attribute-selection-type', function () {
+                if ($(this).val() === Constants.TYPE_ALL) {
+                    $('.define-user-defined-attributes').hide();
+                } else {
+                    $('.define-user-defined-attributes').show();
+                }
+            });
+
+            $('.define-select').on('click', '.btn-del-option', function () {
+                $(this).closest('li').remove();
+            });
+        };
+
+        /**
+         * @function to add event listeners for order by division
+         * @param {Object} possibleAttributes possible order by attributes
+         */
+        FormUtils.prototype.addEventListenersForOrderByDiv = function (possibleAttributes) {
+            var self = this;
+            $('.define-order-by-attributes').on('change', '.order-by-checkbox', function () {
+                if ($(this).is(':checked')) {
+                    $('.order-by-content').show();
+                } else {
+                    $('.order-by-content').hide();
+                }
+            });
+
+            $('.define-order-by-attributes').on('change', '.order-by-selection', function () {
+                self.preventMultipleSelection(Constants.ORDER_BY);
+            });
+
+            $('.define-order-by-attributes').on('click', '.btn-del-option', function () {
+                $(this).closest('li').remove();
+                self.preventMultipleSelection(Constants.ORDER_BY);
+                self.checkForAttributeLength(possibleAttributes.length, Constants.ORDER_BY);
+            });
+
+            $('.define-order-by-attributes').on('click', '.btn-add-order-by-attribute', function () {
+                self.appendOrderBy(possibleAttributes);
+                self.preventMultipleSelection(Constants.ORDER_BY);
+                self.checkForAttributeLength(possibleAttributes.length, Constants.ORDER_BY);
+            });
+        };
+
+        /**
+         * @function to add event listeners for stream handler section
+         * @param {Object} streamHandlerList list of stream handlers
+         * @param {Object} elementType type of the element
+         */
+        FormUtils.prototype.addEventListenersForStreamHandlersDiv = function (streamHandlerList, elementType) {
+            var self = this;
+
+            //on change of stream handler checkbox
+            $('.define-stream-handler').on('change', '.stream-handler-checkbox', function () {
+                var sourceDiv = '.define-' + self.getSourceDiv(elementType, $(this)) + '-source';
+                if ($(this).is(':checked')) {
+                    $(sourceDiv).find('.define-stream-handler-section').show();
+                    $(sourceDiv).find('.define-stream-handler-buttons').show();
+                } else {
+                    $(sourceDiv).find('.define-stream-handler-section').hide();
+                    $(sourceDiv).find('.define-stream-handler-buttons').hide();
+                }
+            });
+
+            //on change of window type
+            var predefinedWindowFunctions = _.orderBy(JSON.parse(JSON.stringify
+                (self.configurationData.rawExtensions["windowFunctionNames"]), ['name'], ['asc']));
+            $('.define-stream-handler').on('change', '#window-type', function () {
+                var source = self.getSourceDiv(elementType, $(this))
+                var windowType;
+                var savedParameterValues;
+                var streamHandlerWindow = self.getStreamHandlerWindow(streamHandlerList, source);
+                if (streamHandlerWindow) {
+                    windowType = streamHandlerWindow.value.function.toLowerCase();
+                    savedParameterValues = streamHandlerWindow.value.parameters;
+                }
+                var selectedType = this.value.toLowerCase();
+                var functionParameters = self.getSelectedTypeParameters(selectedType, predefinedWindowFunctions);
+                var parameterDiv = $(this).closest('.defineFunctionName').parents('.define-stream-handler-type-content');
+                if (savedParameterValues && selectedType == windowType) {
+                    self.callToMapParameters(selectedType, functionParameters, savedParameterValues, parameterDiv)
+                } else {
+                    functionParametersWithValues = self.createObjectWithValues(functionParameters);
+                    self.renderParameters(functionParametersWithValues, Constants.WINDOW, parameterDiv);
+                }
+                if (selectedType === Constants.SORT) {
+                    self.showHideOrderForSort();
+                    self.addEventListenerForSortWindow(selectedType)
+                }
+            });
+
+            //on change of stream-function type
+            var predefinedStreamFunctions = _.orderBy(JSON.parse(JSON.stringify
+                (self.configurationData.rawExtensions["streamFunctions"]), ['name'], ['asc']));
+            $(".define-stream-handler").on("autocompleteselect", '.custom-combobox-input', function (event, ui) {
+                var selectedType = ui.item.value.toLowerCase();
+                var source = self.getSourceDiv(elementType, $(this))
+                var functionType;
+                var savedParameterValues;
+                var streamHandlerFunction = self.getStreamHandler(streamHandlerList, Constants.FUNCTION, selectedType);
+                if (streamHandlerFunction) {
+                    functionType = streamHandlerFunction.value.function.toLowerCase();
+                    savedParameterValues = streamHandlerFunction.value.parameters;
+                }
+                var functionParameters = self.getSelectedTypeParameters(selectedType, predefinedStreamFunctions);
+                var parameterDiv = $(this).closest('.defineFunctionName').parents('.define-stream-handler-type-content');
+                if (savedParameterValues && selectedType == functionType) {
+                    self.callToMapParameters(selectedType, functionParameters, savedParameterValues, parameterDiv)
+                } else {
+                    functionParametersWithValues = self.createObjectWithValues(functionParameters);
+                }
+                self.renderParameters(functionParametersWithValues, Constants.STREAM_FUNCTION, parameterDiv);
+            });
+
+            //to add window
+            $('.define-stream-handler').on('click', ".btn-add-window", function () {
+                var sourceDiv = '.define-' + self.getSourceDiv(elementType, $(this)) + '-source';
+                self.addNewStreamHandler(sourceDiv, Constants.WINDOW);
+            });
+
+            //to add stream-function
+            $('.define-stream-handler').on('click', ".btn-add-function", function () {
+                var sourceDiv = '.define-' + self.getSourceDiv(elementType, $(this)) + '-source';
+                self.addNewStreamHandler(sourceDiv, Constants.FUNCTION);
+            });
+
+            //on change of stream-handler type
+            var previousValue;
+            var previousContent;
+            $('.define-stream-handler').on('focus', '.stream-handler-selection', function () {
+                previousValue = this.value;
+                previousContent = $(this).closest('.define-stream-handler-type').next().
+                    find('.define-stream-handler-type-content').contents();
+
+            }).on('change', '.stream-handler-selection', function () {
+                var currentValue = this.value; // New Value
+                var currentContentDiv = $(this).closest('.define-stream-handler-type').next().
+                    find('.define-stream-handler-type-content');
+                if (currentValue == previousValue) {
+                    currentContentDiv.html(previousContent)
+                } else {
+                    var sourceDiv = '.define-' + self.getSourceDiv(elementType, $(this)) + '-source';
+                    var streamHandlerContent = $(this).closest('.define-stream-handler-type').next().
+                        find('.define-stream-handler-type-content');
+                    self.renderStreamHandlerContentDiv(currentValue, streamHandlerContent)
+                    self.mapStreamHandlerContent(streamHandlerContent, self.createEmptyStreamHandler(currentValue));
+                }
+                self.preventMultipleSelectionOfWindowStreamHandler(sourceDiv);
+            });
+
+            //To delete stream-handler
+            $(".define-stream-handler").on('click', '.btn-del-attr', function () {
+                var sourceDiv = '.define-' + self.getSourceDiv(elementType, $(this)) + '-source';
+                $(this).closest('li').remove();
+                self.preventMultipleSelectionOfWindowStreamHandler(sourceDiv);
+                self.changeAttributeNavigation(sourceDiv + ' .stream-handler-list');
+                self.removeNavigationForWindow(sourceDiv)
+                self.showHideStreamHandlerWindowButton(sourceDiv)
+            });
+
+            //To reorder up the stream-handler
+            $(".define-stream-handler").on('click', '.reorder-up', function () {
+                var sourceDiv = '.define-' + self.getSourceDiv(elementType, $(this)) + '-source';
+                var $current = $(this).closest('li');
+                var $previous = $current.prev('li');
+                if ($previous.length !== 0) {
+                    $current.insertBefore($previous);
+                }
+                self.changeAttributeNavigation(sourceDiv + ' .stream-handler-list');
+                self.removeNavigationForWindow(sourceDiv)
+            });
+
+            //To reorder down the stream-handler
+            $(".define-stream-handler").on('click', '.reorder-down', function () {
+                var sourceDiv = '.define-' + self.getSourceDiv(elementType, $(this)) + '-source';
+                var $current = $(this).closest('li');
+                var $next = $current.next('li');
+                if ($next.length !== 0) {
+                    $current.insertAfter($next);
+                }
+                self.changeAttributeNavigation(sourceDiv + ' .stream-handler-list');
+                self.removeNavigationForWindow(sourceDiv)
+            });
+        };
+
+        /**
+         * @function to return the div of where the streamhandler is embedded
+         * This method was required as there are two stream handler section for left and right source
+         * of join query form.
+         */
+        FormUtils.prototype.getSourceDiv = function (elementType, clickedSection) {
+            if (elementType === Constants.JOIN_QUERY) {
+                if (clickedSection.closest('.define-source').hasClass('define-' + Constants.LEFT + '-source')) {
+                    return Constants.LEFT
+                } else {
+                    return Constants.RIGHT
+                }
+            } else {
+                return elementType
+            }
+        };
+
+        /**
+         * @function to add a new stream handler
+         * @param {String} div where the stream handler section is present
+         * @param {String} type type of the stream handler
+         */
+        FormUtils.prototype.addNewStreamHandler = function (sourceDiv, type) {
+            var self = this;
+            var streamHandlerTypes = self.configurationData.application.config.stream_handler_types;
+            var handlerList = '<li class="define-stream-handler-content"> <div> ' +
+                '<label class="clearfix"> <label class="mandatory-symbol"> * </label> Type </label>' +
+                '<div class = "define-stream-handler-type"> </div>' +
+                '<div class="clearfix"> <div class = "define-stream-handler-type-content"> </div> ' +
+                '<div class = "attr-nav"> </div> </div> <label class = "error-message"> </label> </div> </li>';
+            var streamHandlerList = sourceDiv + ' .stream-handler-list';
+            var streamHandlerListLength = $(streamHandlerList).find('li').length
+            var appendedIndex;
+            if (type === Constants.WINDOW || streamHandlerListLength == 0) {
+                $(streamHandlerList).append(handlerList);
+                appendedIndex = streamHandlerListLength;
+            } else {
+                var lastIndex = streamHandlerListLength - 1;
+                $(streamHandlerList + ' li:eq(' + lastIndex + ')').before(handlerList)
+                appendedIndex = lastIndex;
+            }
+            var streamHandlerType = $(sourceDiv).find('.define-stream-handler-type:eq(' + appendedIndex + ')');
+            var streamHandlerContent = $(sourceDiv).find('.define-stream-handler-type-content:eq(' + appendedIndex + ')');
+            streamHandlerContent.addClass('define-' + type + '-stream-handler')
+            self.renderDropDown(streamHandlerType, streamHandlerTypes, Constants.STREAM_HANDLER);
+            self.renderStreamHandlerContentDiv(type, streamHandlerContent)
+            self.selectHandlerSelection($(sourceDiv).find('.stream-handler-selection:eq(' + appendedIndex + ')'), type)
+            self.changeAttributeNavigation(sourceDiv + ' .stream-handler-list');
+            self.mapStreamHandlerContent(streamHandlerContent, self.createEmptyStreamHandler(type))
+            self.preventMultipleSelectionOfWindowStreamHandler(sourceDiv);
+            self.mapStreamHandlerContent(streamHandlerContent, self.createEmptyStreamHandler(type))
+            self.removeNavigationForWindow(sourceDiv)
+            self.showHideStreamHandlerWindowButton(sourceDiv)
+            streamHandlerType[0].scrollIntoView();
+        };
+
+        /**
+         * @function to remove the up and down navigation for swindow stream handler
+         */
+        FormUtils.prototype.removeNavigationForWindow = function (sourceDiv) {
+            var streamHandlerListLength = $(sourceDiv).find('.stream-handler-list li').length
+            var lastIndex = streamHandlerListLength - 1;
+            var lastList = $(sourceDiv + ' .stream-handler-list li:eq(' + lastIndex + ')');
+            if (lastList.find('.define-stream-handler-type-content').hasClass('define-window-stream-handler')) {
+                lastList.find('.attr-nav a:eq(0)').remove();
+                if (streamHandlerListLength == 2) {
+                    lastList.prev('li').find('.attr-nav a:eq(0)').remove();
+                } else {
+                    lastList.prev('li').find('.attr-nav a:eq(1)').remove();
+                }
+            }
+        };
+
+        /**
+         * @function to get the saved window stream handler so that the saved parameters
+         * can be pre-populated if the user changes to a different window type and changes it back to
+         * the saved window type
+         */
+        FormUtils.prototype.getStreamHandlerWindow = function (streamHandlerList, source) {
+            var windowObject;
+            if (streamHandlerList && streamHandlerList.length != 0) {
+                _.forEach(streamHandlerList, function (streamHandler) {
+                    if (streamHandler.type.toLowerCase() === Constants.WINDOW && streamHandler.sourceType === source) {
+                        windowObject = streamHandler;
+                        return false;
+                    }
+                });
+            }
+            return windowObject;
+        };
+
+        /**
+         * @function to get the saved function stream handler so that the saved parameters
+         * can be pre-populated if the user changes to a different function type and changes it back to
+         * the saved function type - assuming that the user has saved different function types in each case
+         */
+        FormUtils.prototype.getStreamHandler = function (streamHandlerList, streamHandlerType, selectedType) {
+            var streamHandler;
+            if (streamHandlerList && streamHandlerList.length != 0) {
+                _.forEach(streamHandlerList, function (handler) {
+                    if (handler.type.toLowerCase() === streamHandlerType && handler.value.function === selectedType) {
+                        streamHandler = handler;
+                        return false;
+                    }
+                });
+            }
+            return streamHandler;
+        };
+
+        /**
+         * @function to select the stream handler type
+         */
+        FormUtils.prototype.selectHandlerSelection = function (classDiv, streamHandlerType) {
+            classDiv.find('option').filter(function () {
+                return ($(this).val() == streamHandlerType);
+            }).prop('selected', true);
+        };
+
+        /**
+         * @function to create an empty stream handler object
+         */
+        FormUtils.prototype.createEmptyStreamHandler = function (type) {
+            var streamHandlerObject;
+            if (type == Constants.FILTER) {
+                streamHandlerObject = {
+                    type: Constants.FILTER,
+                    value: ""
+                }
+            } else if (type == Constants.WINDOW) {
+                streamHandlerObject = {
+                    type: Constants.WINDOW,
+                    value: {
+                        function: "delay", //as default
+                        parameters: []
+                    }
+                }
+            } else if (type == Constants.FUNCTION) {
+                streamHandlerObject = {
+                    type: Constants.FUNCTION,
+                    value: {
+                        function: "approximate:count", //as default
+                        parameters: []
+                    }
+                }
+            }
+            return streamHandlerObject;
+        };
+
+        /**
+         * @function to replace the saved attribute names (join-query-form)
+         */
+        FormUtils.prototype.replaceAttributeNames = function (attributes, queryInput, attributeName) {
+            var self = this;
+            var replacedAttributes = [];
+            var replacedAttribute;
+            if (attributeName === Constants.GROUP_BY) {
+                _.forEach(attributes, function (attribute) {
+                    replacedAttribute = self.replaceNameWithSourceFrom(attribute, queryInput);
+                    replacedAttributes.push(replacedAttribute)
+                });
+            } else if (attributeName === Constants.ORDER_BY) {
+                _.forEach(attributes, function (attribute) {
+                    replacedAttribute = self.replaceNameWithSourceFrom(attribute.getValue(), queryInput)
+                    replacedAttributes.push(replacedAttribute)
+                });
+            }
+            return replacedAttributes;
+        };
+
+        /**
+         * @function to replace the saved attribute name from
+         * <source-as>.attributeName to <source-name>.attributeName
+         */
+        FormUtils.prototype.replaceNameWithSourceFrom = function (attribute, queryInput) {
+            var replacedAttribute;
+            var splitAttribute = attribute.split('.');
+            var sourceAs = splitAttribute[0].trim();
+            var attributeSourceAs;
+            if (sourceAs == queryInput.getLeft().getAs()) {
+                attributeSourceAs = queryInput.getLeft().getFrom();
+            } else if (sourceAs == queryInput.getRight().getAs()) {
+                attributeSourceAs = queryInput.getRight().getFrom();
+            } else {
+                attributeSourceAs = sourceAs;
+            }
+            replacedAttribute = attributeSourceAs + "." + splitAttribute[1].trim();
+            return replacedAttribute;
         };
 
         /**
@@ -1856,13 +3134,13 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
             //To add attribute
             $("#define-attribute").on('click', '#btn-add-attribute', function () {
                 $("#attribute-div").append(self.addAttribute());
-                self.changeAttributeNavigation();
+                self.changeAttributeNavigation('#attribute-div');
             });
 
             //To delete attribute
             $("#define-attribute").on('click', '#attribute-div .btn-del-attr', function () {
                 $(this).closest('li').remove();
-                self.changeAttributeNavigation();
+                self.changeAttributeNavigation('#attribute-div');
             });
 
             //To reorder up the attribute
@@ -1872,7 +3150,7 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
                 if ($previous.length !== 0) {
                     $current.insertBefore($previous);
                 }
-                self.changeAttributeNavigation();
+                self.changeAttributeNavigation('#attribute-div');
 
             });
 
@@ -1883,7 +3161,7 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
                 if ($next.length !== 0) {
                     $current.insertAfter($next);
                 }
-                self.changeAttributeNavigation();
+                self.changeAttributeNavigation('#attribute-div');
             });
         };
 
@@ -1966,35 +3244,6 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
         };
 
         /**
-         * @function to add event listener for the attribute selection division
-         */
-        FormUtils.prototype.addEventListenersForAttributeSelectionDiv = function (aggregateFunctions,
-            connectedElementAttributes) {
-            var self = this;
-            var selectValue = [{ expression: "", as: "" }];
-
-            $('.attribute-selection').on('change', '.attribute-selection-type', function () {
-                if (this.value === Constants.TYPE_ALL) {
-                    $('.define-user-defined-attributes').hide();
-                } else {
-                    $('.define-user-defined-attributes').show();
-                    if ($('.user-defined-attributes li').length == 0) {
-                        self.getAttributeExpression(aggregateFunctions, selectValue, connectedElementAttributes);
-                    }
-
-                }
-            });
-
-            $('.attribute-selection').on('click', '.btn-del-option', function () {
-            	$(this).closest('li').remove();
-            });
-
-            $('.attribute-selection').on('click', '#btn-add-user-defined-attribute', function () {
-                self.getAttributeExpression(aggregateFunctions, selectValue, connectedElementAttributes);
-            });
-        };
-
-        /**
          * @function to add event listeners for the predefined annotations
          */
         FormUtils.prototype.addEventListenersForPredefinedAnnotations = function () {
@@ -2055,28 +3304,30 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
         /**
          * @function manages the attribute navigations
          */
-        FormUtils.prototype.changeAttributeNavigation = function () {
-            $('.attr-nav').empty();
-            var attrLength = $('#attribute-div li').length;
+        FormUtils.prototype.changeAttributeNavigation = function (ulDiv) {
+            $(ulDiv).find('.attr-nav').empty();
+            var listClass = ulDiv + ' li'
+            var attrLength = $(listClass).length;
+
             if (attrLength == 1) {
-                $('.attribute:eq(0)').find('.attr-nav').empty();
+                $(listClass + ':eq(0)').find('.attr-nav').empty();
             }
             if (attrLength == 2) {
-                $('.attribute:eq(0)').find('.attr-nav').append('<a class = "reorder-down"><i class="fw fw-sort-down">' +
-                    '</i></a><a class = "btn-del-attr"><i class="fw fw-delete"></i></a>');
-                $('.attribute:eq(1)').find('.attr-nav').append('<a class="reorder-up"> <i class="fw fw-sort-up "></i>' +
-                    '</a><a class = "btn-del-attr"><i class="fw fw-delete"></i></a>');
+                $(listClass + ':eq(0)').find('.attr-nav').append('<a class = "reorder-down"><i class="fw fw-sort-down">'
+                    + '</i></a><a class = "btn-del-attr"><i class="fw fw-delete"></i></a>');
+                $(listClass + ':eq(1)').find('.attr-nav').append('<a class="reorder-up"> <i class="fw fw-sort-up">' +
+                    '</i> </a><a class = "btn-del-attr"><i class="fw fw-delete"></i></a>');
             }
             if (attrLength > 2) {
                 var lastIndex = attrLength - 1;
                 for (var i = 0; i < attrLength; i++) {
-                    $('.attribute:eq(' + i + ')').find('.attr-nav').append('<a class="reorder-up"> ' +
+                    $(listClass + ':eq(' + i + ')').find('.attr-nav').append('<a class="reorder-up"> ' +
                         '<i class="fw fw-sort-up"></i></a>' +
                         '<a class = "reorder-down"><i class="fw fw-sort-down"> </i></a>' +
                         '<a class = "btn-del-attr"><i class="fw fw-delete"></i></a>');
                 }
-                $('.attribute:eq(0)').find('.attr-nav a:eq(0)').remove();
-                $('.attribute:eq(' + lastIndex + ')').find('.attr-nav a:eq(1)').remove();
+                $(listClass + ':eq(0)').find('.attr-nav a:eq(0)').remove();
+                $(listClass + ':eq(' + lastIndex + ')').find('.attr-nav a:eq(1)').remove();
             }
         };
 
@@ -2095,15 +3346,56 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
             });
         };
 
-		/**
-		 * @function to show the + attribute button based on the max group-by attribute a user can select
-		 * @param {Int} maxLength
-		 */
-        FormUtils.prototype.checkForAttributeLength = function (maxLength) {
-            if ($('.group-by-attributes li').length >= maxLength) {
-                $('.btn-add-group-by-attribute').hide();
+        /**
+         * @function to prevent multiple selection. Prevents from selecting window multiple times
+         */
+        FormUtils.prototype.preventMultipleSelectionOfWindowStreamHandler = function (className) {
+            var dropDown = $(className + ' .' + Constants.STREAM_HANDLER + '-selection')
+            dropDown.children().prop('disabled', false);
+            dropDown.each(function () {
+                var val = this.value;
+                if (val === Constants.WINDOW)
+                    dropDown.not(this).children('[value="' + Constants.WINDOW + '"]').prop('disabled', true);
+            });
+        };
+
+        /**
+         * @function to show and hide the order parameter of sort type
+         */
+        FormUtils.prototype.showHideOrderForSort = function () {
+            if ($('#window-parameters #attribute-parameter').find('.parameter-checkbox').is(":checked")) {
+                $('#window-parameters #order-parameter').show();
             } else {
-                $('.btn-add-group-by-attribute').show();
+                $('#window-parameters #order-parameter').hide();
+            }
+        };
+
+        /**
+         * @function to show and hide the window button for stream handlers
+         */
+        FormUtils.prototype.showHideStreamHandlerWindowButton = function (sourceDiv) {
+            var found = false;
+            $(sourceDiv).find('.define-stream-handler-type-content').each(function () {
+                if ($(this).hasClass('define-window-stream-handler')) {
+                    found = true;
+                }
+            });
+            if (found) {
+                $(sourceDiv).find('.btn-add-window').hide()
+            } else {
+                $(sourceDiv).find('.btn-add-window').show()
+            }
+        };
+
+        /**
+         * @function to show the + attribute button based on the max group-by attribute a user can select
+         * @param {Int} maxLength
+         */
+        FormUtils.prototype.checkForAttributeLength = function (maxLength, className) {
+            if ($('.' + className + '-attributes li').length >= maxLength) {
+                $('.btn-add-' + className + '-attribute').hide();
+            } else {
+                $('.btn-add-' + className + '-attribute').show();
             }
         };
 
@@ -2116,7 +3408,8 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
             });
 
             $('.define-group-by-attributes').find('.group-by-attributes li:eq(0) .btn-del-option').remove();
-            $('.attribute-selection').find('.user-defined-attributes li:eq(0) .btn-del-option').remove();
+            $('.define-order-by-attributes').find('.order-by-attributes li:eq(0) .btn-del-option').remove();
+            $('.define-select').find('.user-defined-attributes li:eq(0) .btn-del-option').remove();
         };
 
         /**
@@ -2141,6 +3434,79 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
          */
         FormUtils.prototype.capitalizeFirstLetter = function (text) {
             return text[0].toUpperCase() + text.slice(1);
+        };
+
+        /**
+         * @function to find matches and drops down as user types in
+         */
+        FormUtils.prototype.substringMatcher = function (text) {
+            return function findMatches(q, cb) {
+                var matches, substringRegex;
+
+                // an array that will be populated with substring matches
+                matches = [];
+
+                // regex used to determine if a string contains the substring `q`
+                substringRegex = new RegExp(q, 'i');
+
+                // iterate through the pool of strings and for any string that
+                // contains the substring `q`, add it to the `matches` array
+                $.each(text, function (i, str) {
+                    if (substringRegex.test(str)) {
+                        matches.push(str);
+                    }
+                });
+
+                cb(matches);
+            };
+        };
+
+        //split the given val for space
+        FormUtils.prototype.splitForAutocomplete = function (val) {
+            return val.split(/\s/g);
+        };
+
+        //obtain the last entered letter
+        FormUtils.prototype.extractLast = function (term) {
+            var self = this;
+            return self.splitForAutocomplete(term).pop();
+        };
+
+        //create autocomplete for forms
+        FormUtils.prototype.createAutocomplete = function (element, possibleOptions) {
+            var self = this;
+            $(element)
+                // don't navigate away from the field on tab when selecting an item
+                .on("keydown", function (event) {
+                    if (event.keyCode === $.ui.keyCode.TAB &&
+                        $(this).autocomplete("instance").menu.active) {
+                        event.preventDefault();
+                    }
+                })
+                .autocomplete({
+                    minLength: 0,
+                    source: function (request, response) {
+                        // delegate back to autocomplete, but extract the last term
+                        response($.ui.autocomplete.filter(
+                            possibleOptions, self.extractLast(request.term)));
+                    },
+                    focus: function () {
+                        // prevent value inserted on focus
+                        return false;
+                    },
+                    select: function (event, ui) {
+                        var terms = self.splitForAutocomplete(this.value);
+                        // remove the current input
+                        terms.pop();
+                        // add the selected item
+                        terms.push(ui.item.value);
+                        // add placeholder to get the comma-and-space at the end
+                        terms.push("");
+                        this.value = terms.join(" ");
+                        return false;
+                    }
+
+                });
         };
 
         /**
@@ -2254,6 +3620,14 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
         /** Handlebar helper to compare if the id is "source" or "sink" */
         Handlebars.registerHelper('ifSourceOrSink', function (id, div) {
             if (id === Constants.SOURCE || id === Constants.SINK) {
+                return div.fn(this);
+            }
+            return div.inverse(this);
+        });
+
+        /** Handlebar helper to compare if the id is "group-by" or "order-by" */
+        Handlebars.registerHelper('ifGroupOrOrderBy', function (id, div) {
+            if (id === Constants.GROUP_BY || id === Constants.ORDER_BY) {
                 return div.fn(this);
             }
             return div.inverse(this);

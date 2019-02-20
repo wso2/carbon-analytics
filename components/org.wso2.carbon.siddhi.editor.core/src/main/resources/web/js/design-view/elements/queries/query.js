@@ -61,6 +61,7 @@ define(['require', 'elementUtils'],
             }
             this.orderBy = [];
             this.annotationList = [];
+            this.annotationListObjects = [];
         };
 
         Query.prototype.addQueryName = function (queryName) {
@@ -75,6 +76,10 @@ define(['require', 'elementUtils'],
             this.annotationList.push(annotation);
         };
 
+        Query.prototype.addAnnotationObject = function (annotationObject) {
+			this.annotationListObjects.push(annotationObject);
+		};
+
         Query.prototype.addOrderByValue = function (orderByValue) {
             this.orderBy.push(orderByValue);
         };
@@ -82,6 +87,10 @@ define(['require', 'elementUtils'],
         Query.prototype.clearAnnotationList = function () {
             ElementUtils.prototype.removeAllElements(this.annotationList);
         };
+
+        Query.prototype.clearAnnotationListObjects = function () {
+			ElementUtils.prototype.removeAllElements(this.annotationListObjects);
+		};
 
         Query.prototype.clearOrderByValueList = function () {
             ElementUtils.prototype.removeAllElements(this.orderBy);
@@ -126,6 +135,10 @@ define(['require', 'elementUtils'],
         Query.prototype.getAnnotationList = function () {
             return this.annotationList;
         };
+
+        Query.prototype.getAnnotationListObjects = function () {
+			return this.annotationListObjects;
+		};
 
         Query.prototype.setId = function (id) {
             this.id = id;
