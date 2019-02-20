@@ -28,6 +28,12 @@ define(['require', 'log', 'lodash', 'jquery', 'partition', 'stream', 'query', 'f
          * @class DesignView  Wraps the Ace editor for design view
          * @param {Object} options Rendering options for the view
          */
+
+        const ENTER_KEY = 13;
+        const DELETE_KEY = 46;
+        const MAC_COMMAND_KEY = 91;
+        const MAC_DELETE_KEY = 8;
+
         var DropElements = function (options) {
             var errorMessage = 'unable to find design view container';
             if (!_.has(options, 'container')) {
@@ -85,6 +91,16 @@ define(['require', 'log', 'lodash', 'jquery', 'partition', 'stream', 'query', 'f
             node.attr('id', i + "-nodeInitial");
             node.attr('class', "sourceNameNode");
 
+            var nodeId = $('#' + i)[0];
+            nodeId.addEventListener('dblclick', function () {
+                self.formBuilder.GeneratePropertiesFormForSources(this.children)
+            });
+
+            $('#' + i).on('keydown', function (key) {
+                if (key.keyCode == ENTER_KEY) {
+                    self.formBuilder.GeneratePropertiesFormForSources(this.children)
+                }
+            });
             /*
              prop --> When clicked on this icon, a definition and related information of the Source Element will
              be displayed in a form
@@ -162,6 +178,16 @@ define(['require', 'log', 'lodash', 'jquery', 'partition', 'stream', 'query', 'f
             node.attr('id', i + "-nodeInitial");
             node.attr('class', "sinkNameNode");
 
+            var nodeId = $('#' + i)[0];
+            nodeId.addEventListener('dblclick', function () {
+                self.formBuilder.GeneratePropertiesFormForSinks(this.children)
+            });
+
+            $('#' + i).on('keydown', function (key) {
+                if (key.keyCode == ENTER_KEY) {
+                    self.formBuilder.GeneratePropertiesFormForSinks(this.children)
+                }
+            });
             /*
              prop --> When clicked on this icon, a definition and related information of the Sink Element will
              be displayed in a form
@@ -248,6 +274,17 @@ define(['require', 'log', 'lodash', 'jquery', 'partition', 'stream', 'query', 'f
             newAgent.append(node);
             node.attr('id', i + "-nodeInitial");
             node.attr('class', "streamNameNode");
+
+            var nodeId = $('#' + i)[0];
+            nodeId.addEventListener('dblclick', function () {
+                self.formBuilder.GeneratePropertiesFormForStreams(this.children)
+            });
+
+            $('#' + i).on('keydown', function (key) {
+                if (key.keyCode == ENTER_KEY) {
+                    self.formBuilder.GeneratePropertiesFormForStreams(this.children)
+                }
+            });
 
             /*
              prop --> When clicked on this icon, a definition and related information of the Stream Element will
@@ -394,6 +431,16 @@ define(['require', 'log', 'lodash', 'jquery', 'partition', 'stream', 'query', 'f
             node.attr('id', i + "-nodeInitial");
             node.attr('class', "tableNameNode");
 
+            var nodeId = $('#' + i)[0];
+            nodeId.addEventListener('dblclick', function () {
+                self.formBuilder.GeneratePropertiesFormForTables(this.children)
+            });
+
+            $('#' + i).on('keydown', function (key) {
+                if (key.keyCode == ENTER_KEY) {
+                    self.formBuilder.GeneratePropertiesFormForTables(this.children)
+                }
+            });
             /*
              prop --> When clicked on this icon, a definition and related information of the Table Element will
              be displayed in a form
@@ -481,6 +528,16 @@ define(['require', 'log', 'lodash', 'jquery', 'partition', 'stream', 'query', 'f
             node.attr('id', i + "-nodeInitial");
             node.attr('class', "windowNameNode");
 
+            var nodeId = $('#' + i)[0];
+            nodeId.addEventListener('dblclick', function () {
+                self.formBuilder.GeneratePropertiesFormForWindows(this.children)
+            });
+
+            $('#' + i).on('keydown', function (key) {
+                if (key.keyCode == ENTER_KEY) {
+                    self.formBuilder.GeneratePropertiesFormForWindows(this.children)
+                }
+            });
             /*
              prop --> When clicked on this icon, a definition and related information of the Window Element will
              be displayed as an DesignViewUtils.prototype.warnAlert message
@@ -568,6 +625,16 @@ define(['require', 'log', 'lodash', 'jquery', 'partition', 'stream', 'query', 'f
             node.attr('id', i + "-nodeInitial");
             node.attr('class', "triggerNameNode");
 
+            var nodeId = $('#' + i)[0];
+            nodeId.addEventListener('dblclick', function () {
+                self.formBuilder.GeneratePropertiesFormForTriggers(this.children)
+            });
+
+            $('#' + i).on('keydown', function (key) {
+                if (key.keyCode == ENTER_KEY) {
+                    self.formBuilder.GeneratePropertiesFormForTriggers(this.children)
+                }
+            });
             /*
              prop --> When clicked on this icon, a definition and related information of the Trigger Element will
              be displayed as an DesignViewUtils.prototype.warnAlert message
@@ -659,6 +726,16 @@ define(['require', 'log', 'lodash', 'jquery', 'partition', 'stream', 'query', 'f
             node.attr('id', i + "-nodeInitial");
             node.attr('class', "aggregationNameNode");
 
+            var nodeId = $('#' + i)[0];
+            nodeId.addEventListener('dblclick', function () {
+                self.formBuilder.GeneratePropertiesFormForAggregations(this.children)
+            });
+
+            $('#' + i).on('keydown', function (key) {
+                if (key.keyCode == ENTER_KEY) {
+                    self.formBuilder.GeneratePropertiesFormForAggregations(this.children)
+                }
+            });
             /*
              prop --> When clicked on this icon, a definition and related information of the Aggregation Element will
              be displayed as an DesignViewUtils.prototype.warnAlert message
@@ -750,6 +827,16 @@ define(['require', 'log', 'lodash', 'jquery', 'partition', 'stream', 'query', 'f
             node.attr('id', i + "-nodeInitial");
             node.attr('class', "functionNameNode");
 
+            var nodeId = $('#' + i)[0];
+            nodeId.addEventListener('dblclick', function () {
+                self.formBuilder.GeneratePropertiesFormForFunctions(this.children)
+            });
+
+            $('#' + i).on('keydown', function (key) {
+                if (key.keyCode == ENTER_KEY) {
+                    self.formBuilder.GeneratePropertiesFormForFunctions(this.children)
+                }
+            });
             /*
              prop --> When clicked on this icon, a definition and related information of the Function Element will
              be displayed as an DesignViewUtils.prototype.warnAlert message
@@ -804,6 +891,16 @@ define(['require', 'log', 'lodash', 'jquery', 'partition', 'stream', 'query', 'f
             newAgent.append(node);
             node.attr('id', i + "-nodeInitial");
             node.attr('class', "queryNameNode");
+
+            var nodeId = $('#' + i)[0];
+            nodeId.addEventListener('dblclick', function () {
+                self.formBuilder.GeneratePropertiesFormForWindowFilterProjectionQueries(this.children)
+            });
+            $('#' + i).on('keydown', function (key) {
+                if (key.keyCode == ENTER_KEY) {
+                    self.formBuilder.GeneratePropertiesFormForWindowFilterProjectionQueries(this.children)
+                }
+            });
             if (!isCodeToDesignMode) {
                 //add the new join query to the join query array
                 var queryOptions = {};
@@ -883,6 +980,17 @@ define(['require', 'log', 'lodash', 'jquery', 'partition', 'stream', 'query', 'f
             newAgent.append(node);
             node.attr('id', i + "-nodeInitial");
             node.attr('class', "patternQueryNameNode");
+
+            var nodeId = $('#' + i)[0];
+            nodeId.addEventListener('dblclick', function () {
+                self.formBuilder.GeneratePropertiesFormForPatternQueries(this.children)
+            });
+
+            $('#' + i).on('keydown', function (key) {
+                if (key.keyCode == ENTER_KEY) {
+                    self.formBuilder.GeneratePropertiesFormForPatternQueries(this.children)
+                }
+            });
 
             if (!isCodeToDesignMode) {
                 //add the new join query to the join query array
@@ -971,6 +1079,17 @@ define(['require', 'log', 'lodash', 'jquery', 'partition', 'stream', 'query', 'f
             node.attr('id', i + "-nodeInitial");
             node.attr('class', "sequenceQueryNameNode");
 
+            var nodeId = $('#' + i)[0];
+            nodeId.addEventListener('dblclick', function () {
+                self.formBuilder.GeneratePropertiesFormForSequenceQueries(this.children)
+            });
+
+            $('#' + i).on('keydown', function (key) {
+                if (key.keyCode == ENTER_KEY) {
+                    self.formBuilder.GeneratePropertiesFormForSequenceQueries(this.children)
+                }
+            });
+
             if (!isCodeToDesignMode) {
                 //add the new join query to the join query array
                 var sequenceQueryOptions = {};
@@ -1058,6 +1177,18 @@ define(['require', 'log', 'lodash', 'jquery', 'partition', 'stream', 'query', 'f
             newAgent.append(node);
             node.attr('id', i + "-nodeInitial");
             node.attr('class', "joinQueryNameNode");
+
+            var nodeId = $('#' + i)[0];
+            nodeId.addEventListener('dblclick', function () {
+                self.formBuilder.GeneratePropertiesFormForJoinQuery(this.children)
+            });
+
+            $('#' + i).on('keydown', function (key) {
+                if (key.keyCode == ENTER_KEY) {
+                    self.formBuilder.GeneratePropertiesFormForJoinQuery(this.children)
+                }
+            });
+
             if (!isCodeToDesignMode) {
                 //add the new join query to the join query array
                 var queryOptions = {};
@@ -1129,6 +1260,18 @@ define(['require', 'log', 'lodash', 'jquery', 'partition', 'stream', 'query', 'f
 
             var node = $('<div></div>');
             node.attr('class', "partitionNameNode");
+
+            var nodeId = $('#' + i)[0];
+            nodeId.addEventListener('dblclick', function () {
+                self.formBuilder.GeneratePartitionKeyForm(this.children)
+            });
+
+            $('#' + i).on('keydown', function (key) {
+                if (key.keyCode == ENTER_KEY) {
+                    self.formBuilder.GeneratePartitionKeyForm(this.children)
+                }
+            });
+
             newAgent.append(node);
             var settingsIconId = "" + i + "-dropPartitionSettingsId";
             var propertiesIcon = $('<i id="' + settingsIconId + '" ' +
@@ -1238,6 +1381,9 @@ define(['require', 'log', 'lodash', 'jquery', 'partition', 'stream', 'query', 'f
             var self = this;
             //register event listener to show configuration icons when mouse is over the element
             newElement.on("mouseenter", function () {
+                $('.element-prop-icon').hide();
+                $('.partition-element-prop-icon').hide();
+                $('.element-close-icon').hide();
                 var element = $(this);
                 element.find('.element-prop-icon').show();
                 element.find('.element-close-icon').show();
@@ -1256,7 +1402,7 @@ define(['require', 'log', 'lodash', 'jquery', 'partition', 'stream', 'query', 'f
             function showPopOver(dataObj, element) {
                 $(dataObj).popover({
                     trigger: 'focus',
-                    placement:'auto',
+                    placement: 'auto',
                     title: 'Are you sure you want to delete?',
                     html: true,
                     content: function () {
@@ -1265,14 +1411,14 @@ define(['require', 'log', 'lodash', 'jquery', 'partition', 'stream', 'query', 'f
                 });
                 $(dataObj).popover("show");
                 $(".overlayed-container ").fadeTo(200, 1);
-                $(element).on("click", ".popover-footer .btn.no", function () {
+                element.on("click", ".popover-footer .btn.no", function () {
                     $(".overlayed-container ").fadeOut(200);
                     $(this).parents(".popover").popover('hide');
                     $('#' + newElement[0].id).removeClass("selected-element");
                 });
 
-                $(element).off('click', '.popover-footer .btn.yes');
-                $(element).on("click", ".popover-footer .btn.yes", function () {
+                element.off('click', '.popover-footer .btn.yes');
+                element.on("click", ".popover-footer .btn.yes", function () {
                     if ('partition' === $(dataObj).data('type')) {
                         deletePartition();
                     } else {
@@ -1302,6 +1448,44 @@ define(['require', 'log', 'lodash', 'jquery', 'partition', 'stream', 'query', 'f
                 showPopOver(this, newElement);
             });
 
+            newElement.on('focus', function () {
+                var element = $(this);
+                element.addClass("focused-container");
+                element.find('.element-prop-icon').show();
+                element.find('.element-close-icon').show();
+                element.find('.partition-element-prop-icon').show();
+            });
+
+            newElement.on('focusout', function () {
+                var element = $(this);
+                element.removeClass("focused-container");
+                $('.element-prop-icon').hide();
+                $('.partition-element-prop-icon').hide();
+                $('.element-close-icon').hide();
+
+            });
+
+            newElement.on('keydown', function (key) {
+                if ((key.keyCode = MAC_COMMAND_KEY && key.keyCode == MAC_DELETE_KEY) || key.keyCode == DELETE_KEY) {
+                    $('#' + newElement[0].id).addClass('selected-element');
+                    showPopOver(this.children.item(1), newElement);
+                }
+            });
+
+            // Check whether clicked element is there in the selected element list and if not clear the selected
+            // element list and cleanDragSelection object
+            newElement.on('mousedown', function () {
+                if (!self.designGrid.isSelectedElements(newElement[0])){
+                // if (!window.selectedElements.includes(newElement[0], 0)) {
+                    self.jsPlumbInstance.clearDragSelection();
+                    var selectedElements = self.designGrid.getSelectedElement();
+                    for (var i = 0; i < selectedElements.length; i++) {
+                        $('#' + selectedElements[i].id).removeClass('selected-container focused-container');
+                    }
+                    self.designGrid.resetSelectedElement();
+                }
+            });
+
             // Deleting an element
             function deleteElement() {
                 // set the isDesignViewContentChanged to true
@@ -1314,8 +1498,8 @@ define(['require', 'log', 'lodash', 'jquery', 'partition', 'stream', 'query', 'f
                 * query, from clause in the query will be updated as undefined.
                 * */
                 setTimeout(function () {
-                    var outConnections = self.jsPlumbInstance.getConnections({ source: elementId + '-out' });
-                    var inConnections = self.jsPlumbInstance.getConnections({ target: elementId + '-in' });
+                    var outConnections = self.jsPlumbInstance.getConnections({source: elementId + '-out'});
+                    var inConnections = self.jsPlumbInstance.getConnections({target: elementId + '-in'});
 
                     _.forEach(outConnections, function (connection) {
                         self.jsPlumbInstance.deleteConnection(connection);
@@ -1377,8 +1561,8 @@ define(['require', 'log', 'lodash', 'jquery', 'partition', 'stream', 'query', 'f
                 var partitionConnectionPoints = newElement.find('.partition-connector-in-part');
 
                 _.forEach(partitionConnectionPoints, function (partitionConnectionPoint) {
-                    var outConnections = self.jsPlumbInstance.getConnections({ source: partitionConnectionPoint });
-                    var inConnections = self.jsPlumbInstance.getConnections({ target: partitionConnectionPoint });
+                    var outConnections = self.jsPlumbInstance.getConnections({source: partitionConnectionPoint});
+                    var inConnections = self.jsPlumbInstance.getConnections({target: partitionConnectionPoint});
 
                     _.forEach(outConnections, function (connection) {
                         self.jsPlumbInstance.deleteConnection(connection);
