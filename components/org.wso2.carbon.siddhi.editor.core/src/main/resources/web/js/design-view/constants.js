@@ -61,6 +61,7 @@ define(function () {
         PATTERN_QUERY: "pattern-query",
         SEQUENCE_QUERY: "sequence-query",
         WINDOW_FILTER_PROJECTION_QUERY: "window-filter-projection-query",
+        FILTER: "filter",
         TYPE_USER_DEFINED: "user_defined",
         TYPE_ALL: "all",
         VALUE_ALL: "*",
@@ -74,10 +75,19 @@ define(function () {
         INTERVAL: "interval",
         RANGE: "range",
         GROUP_BY: "group-by",
-        SIDDHI_TIME: ["seconds", "minutes", "hours","days","months","years"],
+        ORDER_BY: "order-by",
+        SIDDHI_TIME: ["seconds", "minutes", "hours", "days", "months", "years"],
         MINUTES: "minutes",
-        NONE: "none",
-        RETENTION_PERIOD: "retentionperiod"
+        AS: "as",
+        RETENTION_PERIOD: "retentionperiod",
+        JOIN: "join",
+        LEFT: "left",
+        RIGHT: "right",
+        OPERATION: "operation",
+        INSERT: "insert",
+        CUSTOM: "custom",
+        STREAM_HANDLER: "stream-handler",
+        STREAM_FUNCTION: "stream-function"
     };
 
     return constants;
