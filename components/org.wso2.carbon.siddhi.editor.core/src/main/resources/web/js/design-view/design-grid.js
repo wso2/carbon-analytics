@@ -23,6 +23,7 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
               WindowFilterProjectionQueryInput, JoinQueryInput, PatternOrSequenceQueryInput, QueryOutput,
               PartitionWith, JSONValidator) {
 
+        const TAB_INDEX = 10;
         var constants = {
             SOURCE: 'sourceDrop',
             SINK: 'sinkDrop',
@@ -2149,7 +2150,7 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
             }
             var newAgent = $('<div>').attr({
                 'id': elementId,
-                'tabindex': 10
+                'tabindex': TAB_INDEX
             }).addClass(constants.SOURCE);
             if (isCodeToDesignMode) {
                 newAgent.attr('title', sourceToolTip);
@@ -2181,7 +2182,7 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
             }
             var newAgent = $('<div>').attr({
                 'id': elementId,
-                'tabindex': 10
+                'tabindex': TAB_INDEX
             }).addClass(constants.SINK);
             if (isCodeToDesignMode) {
                 newAgent.attr('title', sinkToolTip);
@@ -2213,7 +2214,7 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
             }
             var newAgent = $('<div>').attr({
                 'id': elementId,
-                'tabindex': 10
+                'tabindex': TAB_INDEX
             }).addClass(constants.STREAM);
             if (isCodeToDesignMode) {
                 newAgent.attr('title', streamToolTip);
@@ -2246,7 +2247,7 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
             }
             var newAgent = $('<div>').attr({
                 'id': elementId,
-                'tabindex': 10
+                'tabindex': TAB_INDEX
             }).addClass(constants.TABLE);
             if (isCodeToDesignMode) {
                 newAgent.attr('title', tableToolTip);
@@ -2278,7 +2279,7 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
             }
             var newAgent = $('<div>').attr({
                 'id': elementId,
-                'tabindex': 10
+                'tabindex': TAB_INDEX
             }).addClass(constants.WINDOW);
             if (isCodeToDesignMode) {
                 newAgent.attr('title', windowToolTip);
@@ -2310,7 +2311,7 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
             }
             var newAgent = $('<div>').attr({
                 'id': elementId,
-                'tabindex': 10
+                'tabindex': TAB_INDEX
             }).addClass(constants.TRIGGER);
             if (isCodeToDesignMode) {
                 newAgent.attr('title', triggerToolTip);
@@ -2342,7 +2343,7 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
             }
             var newAgent = $('<div>').attr({
                 'id': elementId,
-                'tabindex': 10
+                'tabindex': TAB_INDEX
             }).addClass(constants.AGGREGATION);
             if (isCodeToDesignMode) {
                 newAgent.attr('title', aggregationToolTip);
@@ -2375,7 +2376,7 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
             }
             var newAgent = $('<div>').attr({
                 'id': elementId,
-                'tabindex': 10
+                'tabindex': TAB_INDEX
             }).addClass(constants.FUNCTION);
             if (isCodeToDesignMode) {
                 newAgent.attr('title', functionToolTip);
@@ -2409,7 +2410,7 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
             }
             var newAgent = $('<div>').attr({
                 'id': elementId,
-                'tabindex': 10
+                'tabindex': TAB_INDEX
             }).addClass(type);
             if (isCodeToDesignMode) {
                 newAgent.attr('title', queryToolTip);
@@ -2442,7 +2443,7 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
             }
             var newAgent = $('<div>').attr({
                 'id': elementId,
-                'tabindex': 10
+                'tabindex': TAB_INDEX
             }).addClass(constants.JOIN);
             if (isCodeToDesignMode) {
                 newAgent.attr('title', joinQueryToolTip);
@@ -2475,7 +2476,7 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
             }
             var newAgent = $('<div>').attr({
                 'id': elementId,
-                'tabindex': 10
+                'tabindex': TAB_INDEX
             }).addClass(constants.PATTERN);
             if (isCodeToDesignMode) {
                 newAgent.attr('title', patternQueryToolTip);
@@ -2508,7 +2509,7 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
             }
             var newAgent = $('<div>').attr({
                 'id': elementId,
-                'tabindex': 10
+                'tabindex': TAB_INDEX
             }).addClass(constants.SEQUENCE);
             if (isCodeToDesignMode) {
                 newAgent.attr('title', sequenceQueryToolTip);
@@ -2541,7 +2542,7 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
             }
             var newAgent = $('<div>').attr({
                 'id': elementId,
-                'tabindex': 10
+                'tabindex': TAB_INDEX
             }).addClass(constants.PARTITION);
             if (isCodeToDesignMode) {
                 newAgent.attr('title', partitionToolTip);
