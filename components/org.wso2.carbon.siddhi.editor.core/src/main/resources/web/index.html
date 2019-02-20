@@ -1311,6 +1311,7 @@
     {{#if parameters}}
     <h3> Parameters </h3>
     <div id = "{{id}}-parameters">
+        <div class = "sub-{{id}}-parameter-div">
     {{#each parameters}}
         <div class = "parameter" id="{{name}}-parameter">
         {{#if optional}}
@@ -1356,7 +1357,12 @@
             <label class = "error-message"></label>
         {{/if}}
         </div>
+        {{#if (isDivisor (sum @index 1) ../parameters)}}
+            </div>
+            <div class = "sub-{{../id}}-parameter-div">
+        {{/if}}
     {{/each}}
+        </div>
     </div>
     {{/if}}
 </script>
@@ -1408,9 +1414,9 @@
 
 <script id = "drop-down-template" type="text/template">
     <select class="{{id}}-selection">
-        {{#ifId id "group-by"}}
+        {{#ifGroupOrOrderBy id}}
             <option style = "display:none" disabled selected value> -- select a value --</option>
-        {{/ifId}}
+        {{/ifGroupOrOrderBy}}
         {{#each options}}
             <option value="{{this}}"> {{this}} </option>
         {{/each}}
@@ -1421,14 +1427,18 @@
     <div class = "define-group-by-attributes">
         <h3> Group By </h3>
         <label> <input type = "checkbox" class="group-by-checkbox"> Group By Attributes </label>
-        <div class="group-by-content">
+        <div class="group-by-content order-group-by-content">
             <label> Attribute Name </label>
             <ul class="group-by-attributes">
                 {{#each groupBy}}
                 <li>
                     <div class="clearfix">
-                        {{> renderDropDown ../possibleGroupByAttributes}}
-                        <a class = "btn-del-option"> <i class = "fw fw-delete"> </i></a>
+                        <div class="group-by-attribute-content">
+                            <div class="define-attribute-drop-down">
+                                {{> renderDropDown ../possibleGroupByAttributes}}
+                            </div>
+                            <a class = "btn-del-option"> <i class = "fw fw-delete"> </i></a>
+                        </div>
                     </div>
                     <label class="error-message"> </label>
                 </li>
@@ -1436,6 +1446,35 @@
             </ul>
             <button class="btn btn-default btn-add-group-by-attribute"> + Attribute </button>
         </div>
+    </div>
+</script>
+
+<script id="order-by-template" type="text/template">
+    <h3> Order By </h3>
+    <label> <input type = "checkbox" class="order-by-checkbox"> Order By Attributes </label>
+    <div class="order-by-content order-group-by-content">
+        <ul class="order-by-attributes">
+            {{#each orderBy}}
+                <li>
+                    <div class="clearfix">
+                        <div class="order-by-attribute-content">
+                            <div class="define-attribute-drop-down">
+                                {{> renderDropDown ../possibleOrderByAttributes}}
+                            </div>
+                            <div class="define-order-del">
+                                <select class="order-selection">
+                                    <option value="asc"> asc </option>
+                                    <option value="desc"> desc </option>
+                                </select>
+                                <a class = "btn-del-option"> <i class = "fw fw-delete"> </i></a>
+                            </div>
+                        </div>
+                    </div>
+                    <label class="error-message"> </label>
+                </li>
+            {{/each}}
+        </ul>
+        <button class="btn btn-default btn-add-order-by-attribute"> + Attribute </button>
     </div>
 </script>
 
@@ -1498,30 +1537,14 @@
         </div>
     </div>
     <div class = "aggregation-form-container">
-        <div id = "define-aggregate-select" class = "attribute-selection">
-            <h3> Projection </h3>
-            <label class="clearfix"> <label class="mandatory-symbol"> * </label> Select </label>
-            <select class="attribute-selection-type" class="clearfix">
-                <option value="all"> All Attributes </option>
-                <option value="user_defined"> User Defined Attributes </option>
-            </select>
-            <div class="define-user-defined-attributes">
-                <label class="clearfix">
-                    <label class="attribute-label select-label"> Attribute </label>
-                    <label class="function-label select-label"> Function </label>
-                    <label class="expression-value-label select-label"> Expression Value </label>
-                </label>
-                <ul class="user-defined-attributes"> </ul>
-                <button class="btn btn-default" id = "btn-add-user-defined-attribute"> + Attribute </button>
-            </div>
-        </div>
+        <div class = "define-select"> </div>
         <hr>
         <div class="define-aggregate-group-by"> </div>
     </div>
     <div class = "aggregation-form-container">
         <div id="define-aggregate-annotations">
             <h3> Annotations </h3>
-            <div id="define-store-annotation">
+            <div class="define-store-annotation">
                 <label><input type = "checkbox" class="store-annotation-checkbox"> @store </label>
                 <div class = "store-content">
                     <div id="define-store"> </div>
@@ -1529,11 +1552,152 @@
                     <div id ="store-options-div"> </div>
                 </div>
             </div>
-            <div id="define-index-annotation"> </div>
-            <div id="define-predefined-aggregation-annotation"> </div>
-            <div id="define-user-defined-annotation"> </div>
+            <div class="define-index-annotation"> </div>
+            <div class ="define-predefined-aggregation-annotation"> </div>
+            <div class="define-user-defined-annotation"> </div>
         </div>
     </div>
+</script>
+
+<script id="join-query-form-template" type = "text/template">
+    <div class = "join-query-form-container">
+        <div class="query-name-div">
+            <h4> Name: </h4>
+            <input type="text"  class="clearfix query-name name" value="{{name}}">
+            <label class="error-message"> </label>
+        </div>
+        <div class ="define-annotations">
+            <h4> Annotations </h4>
+            <div class ="define-predefined-annotations"> </div>
+            <div class="define-user-defined-annotations"></div>
+        </div>
+    </div>
+    <div class = "join-query-form-container">
+        <h3> Input </h3>
+        <div class="define-left-source define-source"></div>
+        <hr>
+        <div class="define-join-type">
+            <h3> Join </h3>
+            <label class="clearfix"> <label class="mandatory-symbol"> * </label> Type </label>
+            <div class="define-join-type-selection"> </div>
+        </div>
+        <hr>
+        <div class="define-right-source define-source"></div>
+        <hr>
+        <div class="define-on-condition define-content">
+            <label>
+                <input type="checkbox" class="on-condition-checkbox query-checkbox"> On condition
+            </label>
+            <div class="on-condition-content query-content">
+                <input type="text"  class="clearfix on-condition-value query-content-value symbol-syntax-required-value">
+                <label class="error-message"> </label>
+            </div>
+        </div>
+        <div class="define-aggregate-per-within-condition"> </div>
+    </div>
+    <div class = "join-query-form-container">
+        <div class = "define-select"> </div>
+        <hr>
+        <div class="define-query-group-by"> </div>
+        <hr>
+        <div class="define-post-filter-condition define-content">
+            <label>
+                <input type="checkbox" class="post-filter-checkbox query-checkbox"> Post filter condition
+            </label>
+            <div class="post-filter-condition-content query-content">
+                <input type="text" class="clearfix post-condition-value query-content-value symbol-syntax-required-value">
+                <label class="error-message"> </label>
+            </div>
+        </div>
+    </div>
+    <div class="join-query-form-container">
+        <h3> Output </h3>
+        <div class = "define-limit define-content">
+            <label>
+                <input type="checkbox" class="limit-checkbox query-checkbox"> limit
+            </label>
+            <div class="limit-content query-content">
+                <input type="text"  class="clearfix limit-value query-content-value">
+                <label class="error-message"> </label>
+            </div>
+        </div>
+        <div class = "define-rate-limiting define-content">
+            <label>
+                <input type="checkbox" class="rate-limiting-checkbox query-checkbox"> Rate limiting
+            </label>
+            <div class="rate-limiting-content query-content">
+                <input type="text"  class="clearfix rate-limiting-value query-content-value">
+                <label class="error-message"> </label>
+            </div>
+        </div>
+        <div class="define-order-by-attributes"> </div>
+        <hr>
+        <div class="define-output-action">
+            <h3> Action </h3>
+            <div>
+                <h4> Operation: </h4>
+                <input type="text" class="clearfix name query-into" value="{{into}}" readonly>
+            </div>
+            <div class="define-query-into">
+                <h4> Into: </h4>
+                <input type="text" class="clearfix name query-operation" value="insert" readonly>
+            </div>
+            <div class="define-output-events"> </div>
+        </div>
+    </div>
+</script>
+
+<script id="query-source-form-template" type = "text/template">
+    <h4> {{addTitle type}} </h4>
+    <div class = "{{type}}-source-content">
+        <div class="input-from">
+            <label class="clearfix"> <label class="mandatory-symbol"> * </label> Input From </label>
+            <div class="input-from-drop-down"> </div>
+        </div>
+        <div class="define-as define-content">
+            <label>
+                <input type="checkbox" class="source-as-checkbox query-checkbox"> As
+            </label>
+            <div class="source-as-content query-content">
+                <input type="text"  class="clearfix as-content-value query-content-value">
+                <label class="error-message"> </label>
+            </div>
+        </div>
+        <div class="define-unidirectional">
+            <label class = "clearfix">
+                <input type="checkbox" class="is-unidirectional-checkbox"> Is Unidirectional
+            </label>
+            <label class="error-message"></label>
+        </div>
+        <div class="define-stream-handler">
+            <label> <input type="checkbox" class="stream-handler-checkbox"> Stream Handler </label>
+            <div class="define-stream-handler-section"> </div>
+            <div class = "define-stream-handler-buttons">
+                <button class="btn btn-default btn-add-filter"> + Filter </button>
+                <button class="btn btn-default btn-add-function"> + Function </button>
+                <button class="btn btn-default btn-add-window"> + Window </button>
+            </div>
+        </div>
+    </div>
+</script>
+
+<script id ="stream-handler-form-template" type = "text/template">
+    <ul class = "stream-handler-list">
+        {{#each streamHandlerList}}
+        <li class="define-stream-handler-content">
+            <div>
+                <label class="clearfix"> <label class="mandatory-symbol"> * </label> Type </label>
+                <div class = "define-stream-handler-type"> {{> renderDropDown ../types}} </div>
+                <div class="clearfix">
+                    <div class = "define-stream-handler-type-content"> </div>
+                    <div class = "attr-nav"> </div>
+                </div>
+                <label class = "error-message"> </label>
+            </div>
+        </li>
+        {{/each}}
+    </ul>
+
 </script>
 
 <!--Start: Settings Modal-->
@@ -2090,7 +2254,6 @@
                 },
                 {
                     name: "partitionById",
-                    class: "main-annotation",
                     optional: true,
                     parameters: [
                         {
