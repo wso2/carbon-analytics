@@ -339,8 +339,9 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
 
                 //render the join-query form template
                 var joinFormTemplate = Handlebars.compile($('#join-query-form-template').html());
-                var wrappedHtml = joinFormTemplate({ name: queryName, into: outputElementName });
+                var wrappedHtml = joinFormTemplate({ name: queryName });
                 $('#define-join-query').html(wrappedHtml);
+                self.formUtils.renderQueryOutput(outputElementName);
                 self.formUtils.renderOutputEventTypes();
 
                 //annotations

@@ -297,6 +297,15 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
         };
 
         /**
+         * @function to render the html for query output
+         */
+        FormUtils.prototype.renderQueryOutput = function (outputElementName) {
+            var queryOutputTemplate = Handlebars.compile($('#query-output-template').html());
+            var wrappedHtml = queryOutputTemplate({ into: outputElementName, operation: Constants.INSERT });
+            $('.define-query-output').html(wrappedHtml);
+        };
+
+        /**
          * @function render the select box template
          * @param {String} id div id to embed the select box
          * @param {Object} predefinedTypes

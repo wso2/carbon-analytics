@@ -1611,39 +1611,43 @@
         </div>
     </div>
     <div class="join-query-form-container">
-        <h3> Output </h3>
-        <div class = "define-limit define-content">
-            <label>
-                <input type="checkbox" class="limit-checkbox query-checkbox"> limit
-            </label>
-            <div class="limit-content query-content">
-                <input type="text"  class="clearfix limit-value query-content-value">
-                <label class="error-message"> </label>
-            </div>
+        <div class="define-query-output"> </div>
+    </div>
+</script>
+
+<script id="query-output-template" type = "text/template">
+    <h3> Output </h3>
+    <div class = "define-limit define-content">
+        <label>
+            <input type="checkbox" class="limit-checkbox query-checkbox"> limit
+        </label>
+        <div class="limit-content query-content">
+            <input type="text"  class="clearfix limit-value query-content-value">
+            <label class="error-message"> </label>
         </div>
-        <div class = "define-rate-limiting define-content">
-            <label>
-                <input type="checkbox" class="rate-limiting-checkbox query-checkbox"> Rate limiting
-            </label>
-            <div class="rate-limiting-content query-content">
-                <input type="text"  class="clearfix rate-limiting-value query-content-value">
-                <label class="error-message"> </label>
-            </div>
+    </div>
+    <div class = "define-rate-limiting define-content">
+        <label>
+            <input type="checkbox" class="rate-limiting-checkbox query-checkbox"> Rate limiting
+        </label>
+        <div class="rate-limiting-content query-content">
+            <input type="text"  class="clearfix rate-limiting-value query-content-value">
+            <label class="error-message"> </label>
         </div>
-        <div class="define-order-by-attributes"> </div>
-        <hr>
-        <div class="define-output-action">
-            <h3> Action </h3>
-            <div>
-                <h4> Operation: </h4>
-                <input type="text" class="clearfix name query-into" value="{{into}}" readonly>
-            </div>
-            <div class="define-query-into">
-                <h4> Into: </h4>
-                <input type="text" class="clearfix name query-operation" value="insert" readonly>
-            </div>
-            <div class="define-output-events"> </div>
+    </div>
+    <div class="define-order-by-attributes"> </div>
+    <hr>
+    <div class="define-output-action">
+        <h3> Action </h3>
+        <div>
+            <h4> Operation: </h4>
+            <input type="text" class="clearfix name query-into" value="{{operation}}" readonly>
         </div>
+        <div class="define-query-into">
+            <h4> Into: </h4>
+            <input type="text" class="clearfix name query-operation" value="{{into}}" readonly>
+        </div>
+        <div class="define-output-events"> </div>
     </div>
 </script>
 
@@ -1697,7 +1701,6 @@
         </li>
         {{/each}}
     </ul>
-
 </script>
 
 <!--Start: Settings Modal-->
