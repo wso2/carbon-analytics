@@ -1161,11 +1161,13 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
                                 var secondConnectedElement = queryInput.getSecondConnectedElement();
                                 if (!firstConnectedElement && !secondConnectedElement) {
                                     console.log("firstConnectedElement and secondConnectedElement are undefined!");
-                                } else if (firstConnectedElement !== undefined
-                                    && firstConnectedElement.name === disconnectedElementSourceName) {
+                                } else if (firstConnectedElement &&
+                                    (firstConnectedElement.name === disconnectedElementSourceName ||
+                                    !firstConnectedElement.name)) {
                                     queryInput.setFirstConnectedElement(undefined);
-                                } else if (secondConnectedElement !== undefined
-                                    && secondConnectedElement.name === disconnectedElementSourceName) {
+                                } else if (secondConnectedElement
+                                    && (secondConnectedElement.name === disconnectedElementSourceName ||
+                                    !secondConnectedElement.name)) {
                                     queryInput.setSecondConnectedElement(undefined);
                                 } else {
                                     console.log("Error: Disconnected source name not found in join query!");
