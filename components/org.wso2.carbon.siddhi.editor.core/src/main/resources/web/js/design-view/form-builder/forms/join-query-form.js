@@ -752,8 +752,6 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
                         var outputTarget = $('.query-into').val().trim()
                         var outputConfig = {};
                         _.set(outputConfig, 'eventType', $('#event-type').val());
-                        _.set(outputConfig, 'insert', Constants.INSERT);
-                        _.set(outputConfig, 'insertTarget', outputTarget)
                         var outputObject = new QueryOutputInsert(outputConfig);
                         queryOutput.setOutput(outputObject);
                         queryOutput.setTarget(outputTarget);
