@@ -143,7 +143,7 @@ export default class BusinessRule extends Component {
             case 2:
                 return this.displayDescribedDeployButton('Retry Deploy');
             case 3:
-                 return this.displayDescribedRetryUnDeployButton('Retry undeploy');
+                 return this.displayDescribedRetryUnDeployButton('Retry Undeploy');
             case 4:
                 return this.displayDescribedDeployButton('Retry Deploy');    
             case 8:

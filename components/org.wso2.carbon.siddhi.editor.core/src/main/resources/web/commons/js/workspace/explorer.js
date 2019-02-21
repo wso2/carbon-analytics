@@ -16,9 +16,9 @@
  * under the License.
  */
 
-define(['log', 'jquery', 'backbone', 'lodash', './explorer-item', './service-client', 'context_menu', 'mcustom_scroller'],
+define(['log', 'jquery', 'backbone', 'lodash', './explorer-item', './service-client', 'context_menu'],
 
-    function (log, $, Backbone, _, ExplorerItem, ServiceClient, ContextMenu, mcustomScroller) {
+    function (log, $, Backbone, _, ExplorerItem, ServiceClient, ContextMenu) {
 
     var WorkspaceExplorer = Backbone.View.extend({
 
@@ -219,11 +219,6 @@ define(['log', 'jquery', 'backbone', 'lodash', './explorer-item', './service-cli
                         }
                     }
                 }
-            });
-            explorerContainer.mCustomScrollbar({
-                theme: "minimal",
-                scrollInertia: 0,
-                axis: "xy"
             });
             if(!_.isEmpty(this._openedFolders)){
                 this._openedFolders.forEach(function(folder){

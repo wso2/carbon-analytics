@@ -22,6 +22,7 @@ import com.google.common.io.Files;
 import org.apache.log4j.Logger;
 import org.wso2.carbon.stream.processor.core.ha.util.CompressionUtil;
 import org.wso2.carbon.stream.processor.core.persistence.util.PersistenceConstants;
+import org.wso2.siddhi.core.exception.CannotClearSiddhiAppStateException;
 import org.wso2.siddhi.core.util.persistence.IncrementalPersistenceStore;
 import org.wso2.siddhi.core.util.persistence.util.IncrementalSnapshotInfo;
 import org.wso2.siddhi.core.util.persistence.util.PersistenceHelper;
@@ -177,6 +178,26 @@ public class IncrementalFileSystemPersistenceStore implements IncrementalPersist
             return restoreTime + PersistenceConstants.REVISION_SEPARATOR + siddhiAppName;
         }
         return null;
+    }
+
+    @Override
+    public void clearAllRevisions(String siddhiAppName) {
+        File dir = new File(folder + File.separator + siddhiAppName);
+        File[] files = dir.listFiles();
+        if (files == null || files.length == 0) {
+            log.info("No revisions were found to delete for the Siddhi App " + siddhiAppName);
+            return;
+        }
+        for (File file : files) {
+            if (file.exists()) {
+                if (!file.delete()) {
+                    log.error("file is not deleted successfully : " + file.getName());
+                    throw new CannotClearSiddhiAppStateException("Persistence state " +
+                            "file is not deleted : " + file.getName());
+                }
+            }
+
+        }
     }
 
     private void cleanOldRevisions(IncrementalSnapshotInfo incrementalSnapshotInfo) {

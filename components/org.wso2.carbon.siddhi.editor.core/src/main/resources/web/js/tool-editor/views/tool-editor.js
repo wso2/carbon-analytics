@@ -22,6 +22,8 @@ define(['require', 'jquery', 'backbone', 'lodash', 'log', 'design_view', "./sour
     function (require, $, Backbone, _, log, DesignView, SourceView, constants, UndoManager, Launcher,
               DebugManager, DesignViewUtils) {
 
+        const ENTER_KEY = 13;
+
         var ServicePreview = Backbone.View.extend(
             /** @lends ServicePreview.prototype */
             {
@@ -287,6 +289,17 @@ define(['require', 'jquery', 'backbone', 'lodash', 'log', 'design_view', "./sour
                                 DesignViewUtils.prototype.errorAlert(response.errorMessage);
                             }
                         }
+                    });
+                    toggleViewButton.keydown(function (key) {
+                        if (key.keyCode == ENTER_KEY) {
+                            toggleViewButton.click();
+                        }
+                    });
+                    toggleViewButton.focus(function () {
+                        toggleViewButton.addClass("selected-button");
+                    });
+                    toggleViewButton.focusout(function () {
+                        toggleViewButton.removeClass("selected-button");
                     });
                 },
 

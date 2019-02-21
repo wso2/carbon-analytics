@@ -23,13 +23,14 @@ import org.apache.log4j.Logger;
 import org.wso2.carbon.datasource.core.exception.DataSourceException;
 import org.wso2.carbon.stream.processor.core.ha.util.CompressionUtil;
 import org.wso2.carbon.stream.processor.core.internal.StreamProcessorDataHolder;
+import org.wso2.carbon.stream.processor.core.persistence.dto.RDBMSQueryConfigurationEntry;
 import org.wso2.carbon.stream.processor.core.persistence.exception.DatabaseUnsupportedException;
 import org.wso2.carbon.stream.processor.core.persistence.exception.DatasourceConfigurationException;
 import org.wso2.carbon.stream.processor.core.persistence.util.DBPersistenceStoreUtils;
 import org.wso2.carbon.stream.processor.core.persistence.util.ExecutionInfo;
 import org.wso2.carbon.stream.processor.core.persistence.util.PersistenceConstants;
 import org.wso2.carbon.stream.processor.core.persistence.util.RDBMSConfiguration;
-import org.wso2.carbon.stream.processor.core.persistence.dto.RDBMSQueryConfigurationEntry;
+import org.wso2.siddhi.core.exception.CannotClearSiddhiAppStateException;
 import org.wso2.siddhi.core.util.persistence.PersistenceStore;
 
 import java.io.IOException;
@@ -267,6 +268,7 @@ public class DBPersistenceStore implements PersistenceStore {
         executionInfo.setPreparedDeleteStatement(databaseQueryEntries.getDeleteQuery());
         executionInfo.setPreparedDeleteOldRevisionsStatement(databaseQueryEntries.getDeleteOldRevisionsQuery());
         executionInfo.setPreparedCountStatement(databaseQueryEntries.getCountQuery());
+        executionInfo.setPreparedDeleteAllRevisionsStatement(databaseQueryEntries.getDeleteAllRevisionsQuery());
 
     }
 
@@ -366,6 +368,46 @@ public class DBPersistenceStore implements PersistenceStore {
         }
     }
 
+    /**
+     * Method to clear all the revisions related to a Siddhi App
+     * @param siddhiAppName is the name of the Siddhi Application whose all revisions to remove
+     */
+    @Override
+    public void clearAllRevisions(String siddhiAppName) {
+        PreparedStatement stmt = null;
+        Connection con;
+        try {
+            con = datasource.getConnection();
+            con.setAutoCommit(false);
+        } catch (SQLException e) {
+            log.error("Cannot establish connection to data source " + datasourceName +
+                    " to delete the persistence store", e);
+            throw new CannotClearSiddhiAppStateException("Cannot establish connection" +
+                    " to data source " + datasourceName + " when deleting the revisions " +
+                    "of the persistence store of SiddhiApp: " + siddhiAppName, e);
+        }
+        try {
+            stmt = con.prepareStatement(executionInfo.getPreparedDeleteAllRevisionsStatement());
+            stmt.setString(1, siddhiAppName);
+            stmt.executeUpdate();
+            con.commit();
+        } catch (SQLException e) {
+            log.error("Error in deleting all the revisions of the persistence store of siddhiApp: " +
+                    siddhiAppName + " from the database with datasource " + datasourceName, e);
+
+            throw new CannotClearSiddhiAppStateException("Error in deleting all the revisions of the persistence " +
+                    "store of SiddhiApp: " + siddhiAppName + " from the database with datasource " + datasourceName, e);
+        } finally {
+            if (stmt != null) {
+                try {
+                    stmt.close();
+                } catch (SQLException e) {
+                    log.error("Unable to close statement. " + e.getMessage(), e);
+                }
+            }
+            cleanupConnections(stmt, con);
+        }
+    }
 
     private void cleanupConnections(Statement stmt, Connection connection) {
         if (stmt != null) {

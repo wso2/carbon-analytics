@@ -46,6 +46,7 @@ const ComponentType = {
     SINKS: 'Sinks',
     SINK_MAPPERS: 'SinkMappers',
     SOURCE_MAPPERS: 'SourceMappers',
+    AGGREGATIONS: 'Aggregations',
 };
 
 export {HttpStatus, MediaType, ComponentType};

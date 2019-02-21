@@ -87,7 +87,9 @@ define(function () {
         INSERT: "insert",
         CUSTOM: "custom",
         STREAM_HANDLER: "stream-handler",
-        STREAM_FUNCTION: "stream-function"
+        STREAM_FUNCTION: "stream-function",
+        TYPE_HTTP_REQUEST: "http-request",
+        TYPE_HTTP_RESPONSE: "http-response",
     };
 
     return constants;

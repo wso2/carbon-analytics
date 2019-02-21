@@ -61,6 +61,7 @@ import java.io.File;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -299,6 +300,105 @@ public class SiddhiAppsApiServiceImpl extends SiddhiAppsApiService {
             }
         } catch (Exception e) {
             log.error("Exception occurred when restoring the state for Siddhi App : " + appName, e);
+            jsonString = new Gson().
+                    toJson(new ApiResponseMessageWithCode(ApiResponseMessageWithCode.FILE_PROCESSING_ERROR,
+                            e.getMessage()));
+            status = Response.Status.INTERNAL_SERVER_ERROR;
+        }
+
+        return Response.status(status).entity(jsonString).build();
+    }
+
+    public Response siddhiAppsAppNamePersistenceDelete(String appName, String enabledRedeployment) throws NotFoundException {
+        String jsonString;
+        Response.Status status = Response.Status.OK;
+
+        try {
+            SiddhiAppRuntime siddhiAppRuntime = StreamProcessorDataHolder.getSiddhiManager().getSiddhiAppRuntime(appName);
+
+            if (siddhiAppRuntime != null) {
+                Map<String, SiddhiAppData> siddhiAppMap = StreamProcessorDataHolder.getStreamProcessorService().getSiddhiAppMap();
+                SiddhiAppData siddhiAppContent = siddhiAppMap.get(appName);
+
+                if (enabledRedeployment == null || "true".equals(enabledRedeployment)) {
+                    StreamProcessorDataHolder.
+                            getStreamProcessorService().undeploySiddhiApp(appName);
+                }
+                //clear the persistence store
+                siddhiAppRuntime.clearAllRevisions();
+
+                if (enabledRedeployment == null || "true".equals(enabledRedeployment)) {
+                    StreamProcessorDataHolder.
+                            getStreamProcessorService().deploySiddhiApp(siddhiAppContent.getSiddhiApp(), appName);
+                    jsonString = new Gson().toJson(new ApiResponseMessage(ApiResponseMessage.SUCCESS,
+                            "All revisions of the state persistence are deleted for Siddhi App :" +
+                                    appName));
+                } else {
+                    jsonString = new Gson().toJson(new ApiResponseMessage(ApiResponseMessage.SUCCESS,
+                            "All revisions of the state persistence are deleted for Siddhi App :" +
+                                    appName + " with redeployment."));
+                }
+
+            } else {
+                jsonString = new Gson().toJson(new ApiResponseMessage(ApiResponseMessage.NOT_FOUND,
+                        "There is no Siddhi App exist " +
+                                "with provided name : " + appName));
+                status = Response.Status.NOT_FOUND;
+            }
+
+        } catch (Exception e) {
+            log.error("Exception occurred when deleting the persistance store : " + appName, e);
+            jsonString = new Gson().
+                    toJson(new ApiResponseMessageWithCode(ApiResponseMessageWithCode.FILE_PROCESSING_ERROR,
+                            e.getMessage()));
+            status = Response.Status.INTERNAL_SERVER_ERROR;
+        }
+
+        return Response.status(status).entity(jsonString).build();
+    }
+
+    public Response siddhiAppsRevisionsDelete(String enabledRedeployment) throws NotFoundException {
+        String jsonString;
+        Response.Status status = Response.Status.OK;
+
+        try {
+            Map<String, SiddhiAppData> siddhiApps = StreamProcessorDataHolder.
+                    getStreamProcessorService().getSiddhiAppMap();
+
+            Map<String, SiddhiAppData> storedSiddhiApps = new HashMap<>(siddhiApps);
+
+            if (enabledRedeployment == null || "true".equals(enabledRedeployment)) {
+                //undeploy all the siddhi apps
+                for (Map.Entry<String, SiddhiAppData> entry : siddhiApps.entrySet()) {
+                    if (entry.getValue() != null) {
+                        StreamProcessorDataHolder.getStreamProcessorService().undeploySiddhiApp(entry.getKey());
+
+                    }
+                }
+            }
+            //clear persistence store
+            for (Map.Entry<String, SiddhiAppData> entry : storedSiddhiApps.entrySet()) {
+                if (entry.getValue() != null && entry.getValue().getSiddhiAppRuntime() != null) {
+                    entry.getValue().getSiddhiAppRuntime().clearAllRevisions();
+                }
+            }
+            //deploy all the siddhi apps
+            if (enabledRedeployment == null || "true".equals(enabledRedeployment)) {
+                for (Map.Entry<String, SiddhiAppData> entry : storedSiddhiApps.entrySet()) {
+                    if (entry.getValue() != null && entry.getValue().getSiddhiAppRuntime() != null) {
+                        StreamProcessorDataHolder.getStreamProcessorService().deploySiddhiApp(entry.getValue().getSiddhiApp(), entry.getKey());
+
+                    }
+                }
+                jsonString = new Gson().toJson(new ApiResponseMessage(ApiResponseMessage.SUCCESS,
+                        "All revisions of the state persistence is deleted for Siddhi Apps with redeployment"));
+            } else {
+                jsonString = new Gson().toJson(new ApiResponseMessage(ApiResponseMessage.SUCCESS,
+                        "All revisions of the state persistence is deleted for Siddhi Apps"));
+            }
+
+        } catch (Throwable e) {
+            log.error("Exception occurred when deleting the persistance store :", e);
             jsonString = new Gson().
                     toJson(new ApiResponseMessageWithCode(ApiResponseMessageWithCode.FILE_PROCESSING_ERROR,
                             e.getMessage()));
@@ -838,6 +938,29 @@ public class SiddhiAppsApiServiceImpl extends SiddhiAppsApiService {
                     "Siddhi App" + appName).build();
         }
         return siddhiAppsAppNameRestorePost(appName, revision);
+    }
+
+    @Override
+    public Response siddhiAppsAppNameRevisionsDelete(String appName, String enabledRedeployment, Request request)
+            throws NotFoundException {
+
+        if (getUserName(request) != null && !getPermissionProvider().hasPermission(getUserName(request), new
+                Permission(PERMISSION_APP_NAME, MANAGE_SIDDHI_APP_PERMISSION_STRING))) {
+            return Response.status(Response.Status.UNAUTHORIZED).entity("Insufficient permissions to delete the " +
+                    "persistence store of Siddhi App " + appName).build();
+        }
+        return siddhiAppsAppNamePersistenceDelete(appName, enabledRedeployment);
+    }
+
+    @Override
+    public Response siddhiAppsRevisionsDelete(String enabledRedeployment, Request request) throws NotFoundException {
+        if (getUserName(request) != null && !getPermissionProvider().hasPermission(getUserName(request), new
+                Permission(PERMISSION_APP_NAME, MANAGE_SIDDHI_APP_PERMISSION_STRING))) {
+            return Response.status(Response.Status.UNAUTHORIZED).entity("Insufficient permissions to delete the " +
+                    "persistence store of all Siddhi Apps").build();
+        }
+        return siddhiAppsRevisionsDelete(enabledRedeployment);
+
     }
 
     @Override

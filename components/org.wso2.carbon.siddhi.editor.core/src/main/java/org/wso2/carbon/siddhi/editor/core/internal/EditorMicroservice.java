@@ -21,9 +21,11 @@ package org.wso2.carbon.siddhi.editor.core.internal;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+import com.google.gson.JsonPrimitive;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
@@ -51,6 +53,7 @@ import org.wso2.carbon.siddhi.editor.core.commons.response.MetaDataResponse;
 import org.wso2.carbon.siddhi.editor.core.commons.response.Status;
 import org.wso2.carbon.siddhi.editor.core.commons.response.ValidationSuccessResponse;
 import org.wso2.carbon.siddhi.editor.core.exception.DockerGenerationException;
+import org.wso2.carbon.siddhi.editor.core.exception.SiddhiAppDeployerServiceStubException;
 import org.wso2.carbon.siddhi.editor.core.exception.SiddhiStoreQueryHelperException;
 import org.wso2.carbon.siddhi.editor.core.internal.local.LocalFSWorkspace;
 import org.wso2.carbon.siddhi.editor.core.util.Constants;
@@ -70,6 +73,7 @@ import org.wso2.carbon.siddhi.editor.core.util.designview.deserializers.Deserial
 import org.wso2.carbon.siddhi.editor.core.util.designview.designgenerator.DesignGenerator;
 import org.wso2.carbon.siddhi.editor.core.util.designview.exceptions.CodeGenerationException;
 import org.wso2.carbon.siddhi.editor.core.util.designview.exceptions.DesignGenerationException;
+import org.wso2.carbon.siddhi.editor.core.util.siddhiappdeployer.SiddhiAppDeployerApiHelper;
 import org.wso2.carbon.stream.processor.common.EventStreamService;
 import org.wso2.carbon.stream.processor.common.SiddhiAppRuntimeService;
 import org.wso2.carbon.stream.processor.common.utils.config.FileConfigManager;
@@ -351,6 +355,64 @@ public class EditorMicroservice implements Microservice {
             return Response.serverError().entity("failed")
                     .build();
         }
+    }
+
+    @POST
+    @Path("/workspace/deploy")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    public JsonObject deploy(JsonElement element) {
+        JsonArray success = new JsonArray();
+        JsonArray failure = new JsonArray();
+        JsonObject deploymentStatus = new JsonObject();
+        String fileName;
+        String sidhiFile = null;
+        Integer siddhiFilesCount = element.getAsJsonObject().getAsJsonArray(Constants.SIDDHI_FILE_LIST).size();
+        Integer serverListCount = element.getAsJsonObject().getAsJsonArray("serverList").size();
+        String location = (Paths.get(Constants.RUNTIME_PATH,
+                Constants.DIRECTORY_DEPLOYMENT, Constants.DIRECTORY_WORKSPACE)).toString();
+        SiddhiAppDeployerApiHelper siddhiAppDeployerApiHelper = new SiddhiAppDeployerApiHelper();
+        for (int i = 0; i < siddhiFilesCount; i++) {
+            fileName = element.getAsJsonObject().getAsJsonArray(Constants.SIDDHI_FILE_LIST).get(i).
+                    getAsJsonObject().get(Constants.SIDDHI_APP_NAME).toString().replaceAll("\"", "");
+            try {
+                sidhiFile = new String((Files.readAllBytes(Paths.
+                        get(location + "/" + fileName))), "UTF-8");
+            } catch (IOException e) {
+                JsonPrimitive status = new JsonPrimitive(String.valueOf(e));
+                failure.add(status);
+            }
+            for (int x = 0; x < serverListCount; x++) {
+                String host = element.getAsJsonObject().getAsJsonArray(Constants.SERVER_LIST).get(x).
+                        getAsJsonObject().get(Constants.DEPLOYMENT_HOST).toString().replaceAll("\"",
+                        "");
+                String port = element.getAsJsonObject().getAsJsonArray(Constants.SERVER_LIST).get(x).
+                        getAsJsonObject().get(Constants.DEPLOYMENT_PORT).toString().replaceAll("\"",
+                        "");
+                String hostAndPort = host + ":" + port;
+                String username = element.getAsJsonObject().getAsJsonArray(Constants.SERVER_LIST).get(x).
+                        getAsJsonObject().get(Constants.DEPLOYMENT_USERNAME).toString().replaceAll("\"",
+                        "");
+                String password = element.getAsJsonObject().getAsJsonArray(Constants.SERVER_LIST).get(x).
+                        getAsJsonObject().get(Constants.DEPLOYMENT_PASSWORD).toString().replaceAll("\"",
+                        "");
+                try {
+                    boolean response = siddhiAppDeployerApiHelper.
+                            deploySiddhiApp(hostAndPort, username, password, sidhiFile, fileName);
+                    if (response == true) {
+                        JsonPrimitive status = new JsonPrimitive(fileName + " was successfully deployed to " +
+                                hostAndPort);
+                        success.add(status);
+                    }
+                } catch (SiddhiAppDeployerServiceStubException e) {
+                    JsonPrimitive status = new JsonPrimitive(String.valueOf(e.getMessage()));
+                    failure.add(status);
+                }
+            }
+        }
+        deploymentStatus.add("success", success);
+        deploymentStatus.add("failure", failure);
+        return deploymentStatus;
     }
 
     @GET
@@ -972,9 +1034,9 @@ public class EditorMicroservice implements Microservice {
     /**
      * Get sample event for a particular event stream.
      *
-     * @param appName Siddhi app name.
+     * @param appName    Siddhi app name.
      * @param streamName Stream name.
-     * @param eventType The event type os the requested event (json, xml, text).
+     * @param eventType  The event type os the requested event (json, xml, text).
      * @return Sample event
      */
     @GET

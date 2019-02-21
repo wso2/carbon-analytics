@@ -16,9 +16,9 @@
  * under the License.
  */
 
-define(['log', 'jquery', 'backbone', 'lodash', 'context_menu', 'mcustom_scroller', 'launch_manager', 'alerts'],
+define(['log', 'jquery', 'backbone', 'lodash', 'context_menu', 'launch_manager', 'alerts'],
 
-    function (log, $, Backbone, _, ContextMenu, mcustomScroller, LaunchManager, alerts) {
+    function (log, $, Backbone, _, ContextMenu, LaunchManager, alerts) {
 
         var Launcher = Backbone.View.extend({
 
@@ -159,11 +159,6 @@ define(['log', 'jquery', 'backbone', 'lodash', 'context_menu', 'mcustom_scroller
                 });
                 this._launcherContainer = launcherContainer;
 
-                launcherContainer.mCustomScrollbar({
-                    theme: "minimal",
-                    scrollInertia: 0,
-                    axis: "xy"
-                });
                 if(!_.isEmpty(this._openedFolders)){
                     this._openedFolders.forEach(function(folder){
                         self.createExplorerItem(folder);

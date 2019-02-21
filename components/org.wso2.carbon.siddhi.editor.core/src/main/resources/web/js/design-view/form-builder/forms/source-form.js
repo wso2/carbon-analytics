@@ -31,6 +31,8 @@ define(['log', 'jquery', 'lodash', 'sourceOrSinkAnnotation', 'mapAnnotation', 'p
                 this.configurationData = options.configurationData;
                 this.application = options.application;
                 this.formUtils = options.formUtils;
+                this.dropElementInstance = options.dropElementInstance;
+                this.jsPlumbInstance = options.jsPlumbInstance;
                 this.consoleListManager = options.application.outputController;
                 var currentTabId = this.application.tabController.activeTab.cid;
                 this.designViewContainer = $('#design-container-' + currentTabId);
@@ -363,6 +365,9 @@ define(['log', 'jquery', 'lodash', 'sourceOrSinkAnnotation', 'mapAnnotation', 'p
                         //Send source element to the backend and generate tooltip
                         var sourceToolTip = self.formUtils.getTooltip(clickedElement, Constants.SOURCE);
                         $('#' + id).prop('title', sourceToolTip);
+
+                        self.dropElementInstance.generateSpecificSourceConnectionElements(selectedSourceType,
+                            self.jsPlumbInstance, id, $('#' + id));
 
                         // set the isDesignViewContentChanged to true
                         self.configurationData.setIsDesignViewContentChanged(true);

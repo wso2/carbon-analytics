@@ -43,6 +43,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 @Component(
         service = DataProvider.class,
@@ -56,6 +58,8 @@ public class SiddhiProvider extends AbstractDataProvider {
     private static final String PULISHING_INTERVAL = "publishingInterval";
     private static final String TIME_COLUMNS = "timeColumns";
     private static final String QUERY = "query";
+    private static final Pattern LIMIT_FILTER_REGEX = Pattern.compile("(?<=limit )([0-9]*)");
+    private static final Pattern OFFSET_AND_VALUE_REGEX = Pattern.compile("(offset )(?<=offset )([0-9]*)");
     private SiddhiDataProviderConfig siddhiDataProviderConfig;
     private DataSetMetadata metadata;
     private static SiddhiManager siddhiManager = null;
@@ -135,6 +139,61 @@ public class SiddhiProvider extends AbstractDataProvider {
         publishToEndPoint(data, sessionId, topic);
     }
 
+    public void publishWithPagination(JsonElement jsonElement, String topic, String sessionId) {
+        this.siddhiDataProviderConfig = new Gson().fromJson(jsonElement, SiddhiDataProviderConfig.class);
+        int currentPage = this.siddhiDataProviderConfig.getCurrentPage();
+        int pageSize = this.siddhiDataProviderConfig.getPageSize();
+        this.siddhiDataProviderConfig = (new Gson()).fromJson(jsonElement, SiddhiDataProviderConfig.class);
+        String query = siddhiDataProviderConfig.getQueryData().getAsJsonObject().get(QUERY).getAsString();
+        Matcher limitMatcher = LIMIT_FILTER_REGEX.matcher(query);
+        Matcher offsetAndValueMatcher = OFFSET_AND_VALUE_REGEX.matcher(query);
+        boolean limitMatcherFound = false;
+        boolean offsetAndValueMatcherFound = false;
+        int limit = 0;
+        int offset = 0;
+        if (limitMatcher.find()) {
+            limitMatcherFound = true;
+            limit = limitMatcher.group().isEmpty() ? 0 : Integer.parseInt(limitMatcher.group());
+        }
+        if (offsetAndValueMatcher.find()) {
+            offsetAndValueMatcherFound = true;
+            offset = offsetAndValueMatcher.group(2).isEmpty() ? 0 : Integer.parseInt(offsetAndValueMatcher.group(2));
+        }
+        int newOffset = offset + currentPage * pageSize;
+        int newLimit = limitMatcherFound && limit < pageSize? limit : pageSize;
+        if ((limitMatcherFound) && (newLimit + newOffset > limit + offset)) {
+            int limitDiff = (limit + offset) - newOffset;
+            if (limitDiff <= 0) {
+                newLimit = 0;
+            } else {
+                newLimit = limitDiff;
+            }
+        }
+        ArrayList<Object[]> data = new ArrayList<>();
+        if (newLimit == 0) {
+            publishToEndPoint(data, sessionId, topic);
+        } else {
+            if (!limitMatcherFound && offsetAndValueMatcherFound) {
+                query = offsetAndValueMatcher.replaceFirst("limit " + newLimit + " offset " + newOffset);
+            } else if (limitMatcherFound && offsetAndValueMatcherFound) {
+                query = limitMatcher.replaceFirst(String.valueOf(newLimit));
+                offsetAndValueMatcher = OFFSET_AND_VALUE_REGEX.matcher(query);
+                query = offsetAndValueMatcher.replaceFirst("offset " + newOffset);
+            } else if (limitMatcherFound) {
+                query = limitMatcher.replaceFirst(newLimit + " offset " + newOffset);
+            } else {
+                query = query + " limit " + newLimit + " offset " + newOffset;
+            }
+            Event[] events = siddhiAppRuntime.query(query);
+            if (events != null) {
+                for (Event event : events) {
+                    data.add(event.getData());
+                }
+            }
+            publishToEndPoint(data, sessionId, topic);
+        }
+    }
+
     @Override
     public void purging() {
         //In siddhi-store provider, we do not have a requirement to purge the data.
@@ -193,5 +252,9 @@ public class SiddhiProvider extends AbstractDataProvider {
         } else {
             return DataSetMetadata.Types.OBJECT;
         }
+    }
+
+    public SiddhiDataProviderConfig getSiddhiDataProviderConfig() {
+        return siddhiDataProviderConfig;
     }
 }

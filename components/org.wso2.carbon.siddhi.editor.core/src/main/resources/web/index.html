@@ -271,7 +271,7 @@
         <!-- End: design view container -->
         <!-- Start: Toggle Controls Container -->
         <div class="toggle-controls-container">
-            <div class="btn toggle-view-button">
+            <div class="btn toggle-view-button" tabindex="10">
                 <i class="fw fw-design-view fw-rotate-90"></i>
                 <span class="toggle-button-text">Design View</span>
             </div>
@@ -1848,12 +1848,11 @@
             <div class="modal-header">
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                     <i class="fw fw-cancel about-dialog-close"></i></button>
-                <h3 class="modal-title" id="aboutDockerExportLabel">Export as Docker</h3>
+                <h4 class="modal-title file-dialog-title" id="aboutDockerExportLabel">Export as Docker</h4>
+                <hr class="style1">
             </div>
             <div class="modal-body add-margin-top-2x add-margin-bottom-2x">
                 <form>
-                    <h4>Export as Docker</h4>
-                    <hr/>
                     <div class="form-group">
                         <label for="dockerProfile">Profile:</label>
                         <select class="form-control" id="dockerProfile">
@@ -1952,7 +1951,6 @@
             backbone: "commons/lib/backbone_v1.3.3/backbone",
             file_saver: "commons/lib/file_saver/FileSaver",
             mousetrap: "commons/lib/mousetrap_v1.6.0/mousetrap.min",
-            mcustom_scroller: "commons/lib/mCustomScrollbar_v3.1.5/js/jquery.mCustomScrollbar",
             jquery_mousewheel: "commons/lib/jquery-mousewheel_v3.1.13/jquery.mousewheel",
             jquery_context_menu: "commons/lib/context-menu_v2.4.2/jquery.contextMenu.min",
             js_tree: "commons/lib/js-tree-v3.3.2/jstree",
@@ -1985,6 +1983,7 @@
             edit_menu: "commons/js/menu-bar/edit-menu",
             run_menu: "commons/js/menu-bar/run-menu",
             tools_menu: "commons/js/menu-bar/tools-menu",
+            deploy_menu: "commons/js/menu-bar/deploy-menu",
             menu_item: "commons/js/menu-bar/menu-item",
             file_browser: "commons/js/file-browser/file-browser",
             undo_manager: "commons/js/undo-manager/undo-manager",
@@ -2050,7 +2049,7 @@
             queryOutputUpdateOrInsertInto: "js/design-view/elements/queries/query-sub-elements/query-output/query-output-types/query-output-update-or-insert-into",
             // queries
             joinQuerySource: "js/design-view/elements/queries/query-sub-elements/query-input/join-query-input/sub-elements/join-query-source",
-            joinQueryInput : "js/design-view/elements/queries/query-sub-elements/query-input/join-query-input/join-query-input",
+            joinQueryInput: "js/design-view/elements/queries/query-sub-elements/query-input/join-query-input/join-query-input",
             partition: "js/design-view/elements/partitions/partition",
             partitionWith: "js/design-view/elements/partitions/partition-sub-elements/partition-with",
             patternOrSequenceQueryInput: "js/design-view/elements/queries/query-sub-elements/query-input/pattern-or-sequence-query-input/pattern-or-sequence-query-input",
@@ -2108,9 +2107,9 @@
             baseUrl: window.location.protocol + "//" + window.location.host + '/editor',
             baseUrlHost: window.location.host,
             container: "#page-content",
-            welcome:{
-                container:"#welcome-container",
-                cssClass :{
+            welcome: {
+                container: "#welcome-container",
+                cssClass: {
                     parent: "initial-background-container",
                     outer: "initial-welcome-container",
                     leftPane: "left-pane",

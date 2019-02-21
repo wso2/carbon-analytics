@@ -23,6 +23,7 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
               WindowFilterProjectionQueryInput, JoinQueryInput, PatternOrSequenceQueryInput, QueryOutput,
               PartitionWith, JSONValidator) {
 
+        const TAB_INDEX = 10;
         var constants = {
             SOURCE: 'sourceDrop',
             SINK: 'sinkDrop',
@@ -42,7 +43,7 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
             PARTITION: 'partitionDrop',
             PARTITION_CONNECTION_POINT: 'partition-connector-in-part',
             SELECTOR: 'selector',
-            MULTI_SELECTOR:'multi-selector'
+            MULTI_SELECTOR: 'multi-selector'
         };
 
         /**
@@ -72,7 +73,37 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
             this.designViewContainer = $('#design-container-' + this.currentTabId);
             this.toggleViewButton = $('#toggle-view-button-' + this.currentTabId);
             this.designGridContainer = $('#design-grid-container-' + this.currentTabId);
+            this.selectedElements = [];
             this.selectedObjects = [];
+        };
+
+
+        DesignGrid.prototype.addSelectedElements = function(element){
+            this.selectedElements.push(element);
+        };
+
+        DesignGrid.prototype.isSelectedElements = function(element){
+            if (this.selectedElements.includes(element)){
+                return true;
+            } else{
+                return false;
+            }
+        };
+
+        DesignGrid.prototype.getSelectedElement = function(){
+            return this.selectedElements;
+        };
+
+        DesignGrid.prototype.resetSelectedElement = function(){
+           this.selectedElements = [];
+        };
+
+        DesignGrid.prototype.removeFromSelectedElements = function(element){
+            for (var i = 0; i < this.selectedElements.length; i++) {
+                if (this.selectedElements[i] == element) {
+                    this.selectedElements.splice(i, 1);
+                }
+            }
         };
 
         DesignGrid.prototype.render = function () {
@@ -108,8 +139,8 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
             var siddhiAppNameNode = $("<div id='" + siddhiAppNameNodeId + "' " +
                 "class='siddhi-app-name-node'>" + siddhiAppName + "</div>");
             var siddhiAppDescription = self.configurationData.getSiddhiAppConfig().getSiddhiAppDescription();
-            var siddhiAppDescriptionNode = $("<div id='siddhi-app-desc-node'>"+siddhiAppDescription +"</div>");
-            self.canvas.append(siddhiAppNameNode,siddhiAppDescriptionNode);
+            var siddhiAppDescriptionNode = $("<div id='siddhi-app-desc-node'>" + siddhiAppDescription + "</div>");
+            self.canvas.append(siddhiAppNameNode, siddhiAppDescriptionNode);
 
             /**
              * @description jsPlumb function opened
@@ -117,13 +148,6 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
             self.jsPlumbInstance.ready(function () {
 
                 self.jsPlumbInstance.importDefaults({
-                    PaintStyle: {
-                        strokeWidth: 2,
-                        stroke: '#424242',
-                        outlineStroke: "transparent",
-                        outlineWidth: "3"
-                        // lineWidth: 2
-                    },
                     HoverPaintStyle: {
                         strokeStyle: '#424242',
                         strokeWidth: 2
@@ -144,9 +168,9 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
                 self.canvas.droppable
                 ({
                     accept: '.stream-drag, .table-drag, .window-drag, .trigger-drag, .aggregation-drag,' +
-                        '.projection-query-drag, .filter-query-drag, .join-query-drag, .window-query-drag,' +
-                        '.pattern-query-drag, .sequence-query-drag, .partition-drag, .source-drag, .sink-drag, ' +
-                        '.function-drag, .function-query-drag',
+                    '.projection-query-drag, .filter-query-drag, .join-query-drag, .window-query-drag,' +
+                    '.pattern-query-drag, .sequence-query-drag, .partition-drag, .source-drag, .sink-drag, ' +
+                    '.function-drag, .function-query-drag',
                     containment: 'grid-container',
 
                     /**
@@ -418,12 +442,11 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
                         }
 
                     } else if (sourceElement.hasClass(constants.PARTITION)) {
-                        if ($(self.jsPlumbInstance.getGroupFor(targetId)).attr('id') !== sourceId) {
-                            DesignViewUtils.prototype.errorAlert("Invalid Connection: Connect to a partition query");
-                            return connectionValidity;
-                        } else {
+                        if ($(self.jsPlumbInstance.getGroupFor(targetId)).attr('id') == sourceId) {
                             return connectionValidity = true;
                         }
+                        DesignViewUtils.prototype.errorAlert("Invalid Connection: Connect to a partition query");
+                        return connectionValidity;
 
                     } else if (sourceElement.hasClass(constants.SOURCE)) {
                         if (!targetElement.hasClass(constants.STREAM)) {
@@ -434,13 +457,12 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
                         }
 
                     } else if (targetElement.hasClass(constants.SINK)) {
-                        if (!sourceElement.hasClass(constants.STREAM)) {
-                            DesignViewUtils.prototype
-                                .errorAlert("Invalid Connection: Sink input source should be a stream");
-                            return connectionValidity;
-                        } else {
+                        if (sourceElement.hasClass(constants.STREAM)) {
                             return connectionValidity = true;
                         }
+                        DesignViewUtils.prototype
+                            .errorAlert("Invalid Connection: Sink input source should be a stream");
+                        return connectionValidity;
 
                     } else if (targetElement.hasClass(constants.AGGREGATION)) {
                         if (!(sourceElement.hasClass(constants.STREAM) || sourceElement.hasClass(constants.TRIGGER))) {
@@ -450,6 +472,17 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
                         } else {
                             return connectionValidity = true;
                         }
+                    } //we allowing all sinks to be connected to source here if connections points are available to
+                      // connect. This need to be changed if there are use cases to allow specifics to connect
+                    else if (targetElement.hasClass(constants.SOURCE)) {
+                        if (sourceElement.hasClass(constants.SINK)) {
+                            return connectionValidity = true;
+                        }
+                        DesignViewUtils.prototype
+                            .errorAlert("Invalid Connection: http-request sink input source should be a " +
+                                "http-response source or http-response sink input source should be a " +
+                                "http-request source");
+                        return connectionValidity;
                     }
 
                     // When connecting streams to a query inside the partition if it is connected to the partition
@@ -709,6 +742,12 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
                         self.configurationData.getSiddhiAppConfig().getSink(targetId)
                             .setConnectedElementName(connectedElementName);
 
+                    } else if (sourceElement.hasClass(constants.SINK) && targetElement.hasClass(constants.SOURCE)) {
+                        connectedElementName = self.configurationData.getSiddhiAppConfig().getSource(targetId)
+                            .getType();
+                        self.configurationData.getSiddhiAppConfig().getSink(sourceId)
+                            .setConnectedRightElementName(connectedElementName);
+
                     } else if (targetElement.hasClass(constants.AGGREGATION)
                         && (sourceElement.hasClass(constants.STREAM) || sourceElement.hasClass(constants.TRIGGER))) {
                         if (sourceElement.hasClass(constants.STREAM)) {
@@ -943,6 +982,7 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
                             html: true,
                             content: function () {
                                 return $('.pop-over').html();
+
                             }
                         });
                         $('#' + connectionObject.id).popover("show");
@@ -1437,7 +1477,7 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
             //Send SiddhiApp Config to the backend and get tooltips
             var sendingString = JSON.stringify(self.configurationData.siddhiAppConfig);
             var response = this.getTooltips(sendingString);
-            var tooltipList=[];
+            var tooltipList = [];
             if (response.status === "success") {
                 tooltipList = response.tooltipList;
             } else {
@@ -1490,8 +1530,8 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
                 var mouseLeft = lastArrayEntry * 200 - self.canvas.offset().left + self.canvas.scrollLeft() - 60;
                 var streamToolTip = '';
                 var toolTipObject = _.find(tooltipList, function (toolTip) {
-                        return toolTip.id === streamId;
-                    });
+                    return toolTip.id === streamId;
+                });
                 if (toolTipObject !== undefined) {
                     streamToolTip = toolTipObject.text;
                 }
@@ -1820,6 +1860,12 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
             _.forEach(self.configurationData.edgeList, function (edge) {
                 var targetId;
                 var sourceId;
+                var paintStyle = {
+                    strokeWidth: 2,
+                    stroke: '#424242',
+                    outlineStroke: "transparent",
+                    outlineWidth: "3"
+                };
 
                 if (edge.getChildType() === 'PARTITION') {
                     targetId = edge.getChildId();
@@ -1827,6 +1873,11 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
                 } else if (edge.getParentType() === 'PARTITION') {
                     targetId = edge.getChildId() + '-in';
                     sourceId = edge.getParentId();
+                } else if (edge.getParentType() === 'SINK' && edge.getChildType() === 'SOURCE') {
+                    targetId = edge.getChildId() + '-in';
+                    sourceId = edge.getParentId() + '-out';
+                    paintStyle = { strokeWidth: 2, stroke: "#424242", dashstyle: "2 3", outlineStroke: "transparent",
+                        outlineWidth: "3" }
                 } else {
                     targetId = edge.getChildId() + '-in';
                     sourceId = edge.getParentId() + '-out';
@@ -1834,7 +1885,8 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
 
                 self.jsPlumbInstance.connect({
                     source: sourceId,
-                    target: targetId
+                    target: targetId,
+                    paintStyle: paintStyle
                 });
             });
 
@@ -2118,7 +2170,10 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
             } else {
                 console.log("isCodeToDesignMode parameter is undefined");
             }
-            var newAgent = $('<div>').attr('id', elementId).addClass(constants.SOURCE);
+            var newAgent = $('<div>').attr({
+                'id': elementId,
+                'tabindex': TAB_INDEX
+            }).addClass(constants.SOURCE);
             if (isCodeToDesignMode) {
                 newAgent.attr('title', sourceToolTip);
             }
@@ -2147,7 +2202,10 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
             } else {
                 console.log("isCodeToDesignMode parameter is undefined");
             }
-            var newAgent = $('<div>').attr('id', elementId).addClass(constants.SINK);
+            var newAgent = $('<div>').attr({
+                'id': elementId,
+                'tabindex': TAB_INDEX
+            }).addClass(constants.SINK);
             if (isCodeToDesignMode) {
                 newAgent.attr('title', sinkToolTip);
             }
@@ -2176,7 +2234,10 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
             } else {
                 console.log("isCodeToDesignMode parameter is undefined");
             }
-            var newAgent = $('<div>').attr('id', elementId).addClass(constants.STREAM);
+            var newAgent = $('<div>').attr({
+                'id': elementId,
+                'tabindex': TAB_INDEX
+            }).addClass(constants.STREAM);
             if (isCodeToDesignMode) {
                 newAgent.attr('title', streamToolTip);
             }
@@ -2206,7 +2267,10 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
             } else {
                 console.log("isCodeToDesignMode parameter is undefined");
             }
-            var newAgent = $('<div>').attr('id', elementId).addClass(constants.TABLE);
+            var newAgent = $('<div>').attr({
+                'id': elementId,
+                'tabindex': TAB_INDEX
+            }).addClass(constants.TABLE);
             if (isCodeToDesignMode) {
                 newAgent.attr('title', tableToolTip);
             }
@@ -2235,7 +2299,10 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
             } else {
                 console.log("isCodeToDesignMode parameter is undefined");
             }
-            var newAgent = $('<div>').attr('id', elementId).addClass(constants.WINDOW);
+            var newAgent = $('<div>').attr({
+                'id': elementId,
+                'tabindex': TAB_INDEX
+            }).addClass(constants.WINDOW);
             if (isCodeToDesignMode) {
                 newAgent.attr('title', windowToolTip);
             }
@@ -2264,7 +2331,10 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
             } else {
                 console.log("isCodeToDesignMode parameter is undefined");
             }
-            var newAgent = $('<div>').attr('id', elementId).addClass(constants.TRIGGER);
+            var newAgent = $('<div>').attr({
+                'id': elementId,
+                'tabindex': TAB_INDEX
+            }).addClass(constants.TRIGGER);
             if (isCodeToDesignMode) {
                 newAgent.attr('title', triggerToolTip);
             }
@@ -2293,7 +2363,10 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
             } else {
                 console.log("isCodeToDesignMode parameter is undefined");
             }
-            var newAgent = $('<div>').attr('id', elementId).addClass(constants.AGGREGATION);
+            var newAgent = $('<div>').attr({
+                'id': elementId,
+                'tabindex': TAB_INDEX
+            }).addClass(constants.AGGREGATION);
             if (isCodeToDesignMode) {
                 newAgent.attr('title', aggregationToolTip);
             }
@@ -2323,7 +2396,10 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
             } else {
                 console.log("isCodeToDesignMode parameter is undefined");
             }
-            var newAgent = $('<div>').attr('id', elementId).addClass(constants.FUNCTION);
+            var newAgent = $('<div>').attr({
+                'id': elementId,
+                'tabindex': TAB_INDEX
+            }).addClass(constants.FUNCTION);
             if (isCodeToDesignMode) {
                 newAgent.attr('title', functionToolTip);
             }
@@ -2354,7 +2430,10 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
             } else {
                 console.log("isCodeToDesignMode parameter is undefined");
             }
-            var newAgent = $('<div>').attr('id', elementId).addClass(type);
+            var newAgent = $('<div>').attr({
+                'id': elementId,
+                'tabindex': TAB_INDEX
+            }).addClass(type);
             if (isCodeToDesignMode) {
                 newAgent.attr('title', queryToolTip);
             }
@@ -2384,11 +2463,13 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
             } else {
                 console.log("isCodeToDesignMode parameter is undefined");
             }
-            var newAgent = $('<div>').attr('id', elementId).addClass(constants.JOIN);
+            var newAgent = $('<div>').attr({
+                'id': elementId,
+                'tabindex': TAB_INDEX
+            }).addClass(constants.JOIN);
             if (isCodeToDesignMode) {
                 newAgent.attr('title', joinQueryToolTip);
             }
-
             self.canvas.append(newAgent);
             // Drop the element instantly since its projections will be set only when the user requires it
             self.dropElements.dropJoinQuery(newAgent, elementId, mouseTop, mouseLeft, joinQueryName,
@@ -2415,7 +2496,10 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
             } else {
                 console.log("isCodeToDesignMode parameter is undefined");
             }
-            var newAgent = $('<div>').attr('id', elementId).addClass(constants.PATTERN);
+            var newAgent = $('<div>').attr({
+                'id': elementId,
+                'tabindex': TAB_INDEX
+            }).addClass(constants.PATTERN);
             if (isCodeToDesignMode) {
                 newAgent.attr('title', patternQueryToolTip);
             }
@@ -2445,7 +2529,10 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
             } else {
                 console.log("isCodeToDesignMode parameter is undefined");
             }
-            var newAgent = $('<div>').attr('id', elementId).addClass(constants.SEQUENCE);
+            var newAgent = $('<div>').attr({
+                'id': elementId,
+                'tabindex': TAB_INDEX
+            }).addClass(constants.SEQUENCE);
             if (isCodeToDesignMode) {
                 newAgent.attr('title', sequenceQueryToolTip);
             }
@@ -2475,7 +2562,10 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
             } else {
                 console.log("isCodeToDesignMode parameter is undefined");
             }
-            var newAgent = $('<div>').attr('id', elementId).addClass(constants.PARTITION);
+            var newAgent = $('<div>').attr({
+                'id': elementId,
+                'tabindex': TAB_INDEX
+            }).addClass(constants.PARTITION);
             if (isCodeToDesignMode) {
                 newAgent.attr('title', partitionToolTip);
             }
@@ -2515,28 +2605,31 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
 
         DesignGrid.prototype.enableMultipleSelection = function () {
             var self = this;
-            var selector = $('<div>').attr('id',constants.MULTI_SELECTOR).addClass(constants.SELECTOR);
+            var selector = $('<div>').attr('id', constants.MULTI_SELECTOR).addClass(constants.SELECTOR);
             self.canvas.append(selector);
-
             new DragSelect({
                 selectables: document.querySelectorAll('.jtk-draggable'),
                 selector: document.getElementById(constants.MULTI_SELECTOR),
                 area: document.getElementById('design-grid-container-' + self.currentTabId),
                 multiSelectKeys: ['ctrlKey', 'shiftKey'],
                 onElementSelect: function (element) {
-                    if (!self.selectedObjects.includes(element)) {
+                    if (!self.selectedObjects.includes(element, 0)) {
                         self.jsPlumbInstance.addToDragSelection(element);
-                        $(element).css('border-color', '#4af');
-                        $(element).css('box-shadow', '0 0 1px 2px #4af');
+                        self.addSelectedElements(element);
+                        $(element).focus();
+                        $(element).addClass('selected-container');
                         self.selectedObjects.push(element);
                     }
                 },
                 onElementUnselect: function (element) {
-                    self.jsPlumbInstance.clearDragSelection();
-                    self.selectedObjects.forEach(function (object) {
-                        $(object).css('border-color', '#ccc');
-                        $(object).css('box-shadow', 'none');
-                    });
+                    self.jsPlumbInstance.removeFromDragSelection(element);
+                    self.removeFromSelectedElements(element);
+                    for (var i = 0; i < self.selectedObjects.length; i++) {
+                        if (self.selectedObjects[i] == element) {
+                            self.selectedObjects.splice(i, 1);
+                        }
+                    }
+                    $(element).removeClass('selected-container focused-container');
                     self.selectedObjects = [];
                 }
             });

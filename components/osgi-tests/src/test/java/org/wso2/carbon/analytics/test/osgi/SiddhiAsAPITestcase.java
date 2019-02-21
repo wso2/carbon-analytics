@@ -716,6 +716,47 @@ public class SiddhiAsAPITestcase {
         Assert.assertEquals(httpResponseMessage.getResponseCode(), 401);
     }
 
+    /**
+     * Persistence clearing of existing Siddhi App
+     */
+    @Test (dependsOnMethods = {"testValidSiddhiAPPDeployment"})
+    public void testSiddhiAppPersistenceStoreClear() throws Exception {
+
+        URI baseURI = URI.create(String.format("http://%s:%d", "localhost", 9090));
+        String path = "/siddhi-apps/SiddhiApp1/revisions";
+        String contentType = "text/plain";
+        String method = "DELETE";
+
+        logger.info("Deleting the persistence store through REST API");
+        HTTPResponseMessage httpResponseMessage = sendHRequest("", baseURI, path, contentType, method,
+                true, DEFAULT_USER_NAME, DEFAULT_PASSWORD);
+        Assert.assertEquals(httpResponseMessage.getResponseCode(), 200);
+        Assert.assertEquals(httpResponseMessage.getContentType(), "application/json");
+        Thread.sleep(2000);
+
+    }
+
+    /**
+     *
+     * Persistence clearing of non-existing Siddhi App
+     */
+    @Test (dependsOnMethods = {"testValidSiddhiAPPDeployment"})
+    public void testInvalidSiddhiAppPersistenceStoreClear() throws Exception {
+
+        URI baseURI = URI.create(String.format("http://%s:%d", "localhost", 9090));
+        String path = "/siddhi-apps/SiddhiAppInvalid/revisions";
+        String contentType = "text/plain";
+        String method = "DELETE";
+
+        logger.info("Deleting the persistence store through REST API");
+        HTTPResponseMessage httpResponseMessage = sendHRequest("", baseURI, path, contentType, method,
+                true, DEFAULT_USER_NAME, DEFAULT_PASSWORD);
+        Assert.assertEquals(httpResponseMessage.getResponseCode(), 404);
+        Assert.assertEquals(httpResponseMessage.getContentType(), "application/json");
+        Thread.sleep(2000);
+
+    }
+
     private HTTPResponseMessage sendHRequest(String body, URI baseURI, String path, String contentType,
                                              String methodType, Boolean auth, String userName, String password) {
         TestUtil testUtil = new TestUtil(baseURI, path, auth, false, methodType,

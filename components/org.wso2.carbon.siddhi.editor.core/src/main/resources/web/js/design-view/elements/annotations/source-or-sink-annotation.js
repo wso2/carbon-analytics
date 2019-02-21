@@ -54,6 +54,7 @@ define(
                 this.id = options.id;
                 this.previousCommentSegment = options.previousCommentSegment;
                 this.connectedElementName = options.connectedElementName;
+                this.connectedRightElementName = options.connectedRightElementName;
                 this.annotationType
                     = (options.annotationType !== undefined) ? (options.annotationType).toUpperCase() : undefined;
                 this.type = options.type;
@@ -68,6 +69,10 @@ define(
 
         SourceOrSinkAnnotation.prototype.getConnectedElementName = function () {
             return this.connectedElementName;
+        };
+
+        SourceOrSinkAnnotation.prototype.getConnectedRightElementName = function () {
+            return this.connectedRightElementName;
         };
 
         SourceOrSinkAnnotation.prototype.getAnnotationType = function () {
@@ -92,6 +97,10 @@ define(
 
         SourceOrSinkAnnotation.prototype.setConnectedElementName = function (connectedElementName) {
             this.connectedElementName = connectedElementName;
+        };
+
+        SourceOrSinkAnnotation.prototype.setConnectedRightElementName = function (connectedRightElementName) {
+            this.connectedRightElementName = connectedRightElementName;
         };
 
         SourceOrSinkAnnotation.prototype.setAnnotationType = function (annotationType) {

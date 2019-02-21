@@ -40,6 +40,10 @@ public abstract class SiddhiAppsApiService {
 
     public abstract Response siddhiAppsAppNameBackupPost(String appName, Request request) throws NotFoundException;
 
+    public abstract Response siddhiAppsAppNameRevisionsDelete(String appName, String enabledRedeployment, Request request) throws NotFoundException;
+
+    public abstract Response siddhiAppsRevisionsDelete(String enabledRedeployment, Request request) throws NotFoundException;
+
     public abstract Response siddhiAppsGet(String isActive, Request request) throws NotFoundException;
 
     public abstract Response siddhiAppsPost(String body, Request request) throws NotFoundException;

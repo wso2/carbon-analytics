@@ -39,5 +39,6 @@ public class PersistenceConstants {
     public static final String DELETE_ROW_FROM_TABLE = "DELETE_ROW_FROM_TABLE";
     public static final String DELETE_OLD_REVISIONS = "DELETE_OLD_REVISIONS";
     public static final String COUNT_NUMBER_REVISIONS = "COUNT_NUMBER_REVISIONS";
+    public static final String DELETE_ALL_REVISIONS = "DELETE_ALL_REVISIONS";
 
 }

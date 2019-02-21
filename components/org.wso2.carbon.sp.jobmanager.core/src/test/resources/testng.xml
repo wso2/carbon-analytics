@@ -20,11 +20,13 @@
 <!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd" >
 
 <suite name="wso2sp-test-suite">
-    <test name="siddhi-distributed-unit-tests" preserve-order="true">
+    <test name="siddhi-distributed-unit-tests" parallel="false">
         <classes>
             <class name="org.wso2.carbon.sp.jobmanager.core.SiddhiTopologyCreatorTestCase"/>
             <class name="org.wso2.carbon.sp.jobmanager.core.TopologyCreatorExceptionHandlerTestCase"/>
             <class name="org.wso2.carbon.sp.jobmanager.core.BeanTestCase"/>
+            <class name="org.wso2.carbon.sp.jobmanager.core.DistributedAggregationTestCase"/>
+            <class name="org.wso2.carbon.sp.jobmanager.core.JmsTransportTestCase"/>
         </classes>
     </test>
 </suite>

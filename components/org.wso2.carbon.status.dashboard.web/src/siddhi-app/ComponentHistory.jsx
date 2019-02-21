@@ -229,7 +229,14 @@ export default class ComponentHistory extends React.Component {
                         latency: response.data.latency,
                         isApiWaiting: false
                     });
-                }
+                } else if (that.props.match.params.componentType === ComponentType.AGGREGATIONS) {
+                    that.setState({
+                        latency: response.data.latency,
+                        memory: response.data.memory,
+                        throughput: response.data.throughput,
+                        isApiWaiting: false
+                    });
+                } 
             }).catch((error) => {
             let message;
             if (error.response != null) {
@@ -288,7 +295,8 @@ export default class ComponentHistory extends React.Component {
         }
         else if ((this.state.componentType === ComponentType.QUERIES || this.state.componentType
                 === ComponentType.STORE_QUERIES ||
-                this.state.componentType === ComponentType.TABLES || this.state.componentType
+                this.state.componentType === ComponentType.TABLES ||
+                this.state.componentType === ComponentType.AGGREGATIONS || this.state.componentType
                 === ComponentType.SINK_MAPPERS ||
                 this.state.componentType === ComponentType.SOURCE_MAPPERS) && this.state.latency.length === 0) {
             return (
@@ -317,7 +325,8 @@ export default class ComponentHistory extends React.Component {
             return <div/>;
         }
         else if ((this.state.componentType === ComponentType.QUERIES || this.state.componentType
-                === ComponentType.TABLES) && this.state.memory.length === 0) {
+                === ComponentType.TABLES || this.state.componentType
+                === ComponentType.AGGREGATIONS) && this.state.memory.length === 0) {
             return (
                 <Card><CardHeader title={<FormattedMessage id='componentHistory.memoryInBytes' defaultMessage='Memory(bytes)' />} /><Divider />
                     <CardMedia>
@@ -345,7 +354,8 @@ export default class ComponentHistory extends React.Component {
                 this.state.componentType === ComponentType.TRIGGER
                 || this.state.componentType === ComponentType.TABLES ||
                 this.state.componentType === ComponentType.SOURCES
-                || this.state.componentType === ComponentType.SINKS) && this.state.throughput.length === 0) {
+                || this.state.componentType === ComponentType.SINKS ||
+                this.state.componentType === ComponentType.AGGREGATIONS) && this.state.throughput.length === 0) {
             return (
                 <Card><CardHeader title={<FormattedMessage id='componentHistory.throughputTitle' defaultMessage='Throughput(events/second)' />} /><Divider />
                     <CardMedia>

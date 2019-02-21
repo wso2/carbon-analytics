@@ -574,9 +574,11 @@ body.sticky-footer {
 
 .docker-export-file-tree {
   border: 1px solid #444;
-  height: 200px;
   padding: 5px;
   background-color: #2C2C2C;
+  overflow: auto;
+  min-height: 200px;
+  max-height: 550px;
 }
 
 /*Popover element changes*/

@@ -19,6 +19,8 @@ define(['log', 'jquery', 'lodash', 'output_console_list', 'workspace', 'service_
 
     function (log, $, _, ConsoleList, Workspace, ServiceConsole) {
 
+        const CONSOLE_TYPE_FORM = "FORM";
+        const CONSOLE_TYPE_DEBUG = "DEBUG";
         var OutputConsoleList = ConsoleList.extend(
             /** @lends ConsoleList.prototype */
             {
@@ -45,15 +47,20 @@ define(['log', 'jquery', 'lodash', 'output_console_list', 'workspace', 'service_
                         self.application.commandManager.dispatch(_.get(self._options, 'commandClearConsole.id'));
                     });
                     if (this.application.isRunningOnMacOS()) {
-                        this._activateBtn.attr("title", "Output Console (" + _.get(self._options, 'command.shortcuts.mac.label') + ") ").tooltip();
+                        this._activateBtn.attr("title", "Output Console (" + _.get(self._options,
+                            'command.shortcuts.mac.label') + ") ").tooltip();
                     } else {
-                        this._activateBtn.attr("title", "Output Console  (" + _.get(self._options, 'command.shortcuts.other.label') + ") ").tooltip();
+                        this._activateBtn.attr("title", "Output Console  (" + _.get(self._options,
+                            'command.shortcuts.other.label') + ") ").tooltip();
                     }
                     // register command
-                    this.application.commandManager.registerCommand(options.command.id, {shortcuts: options.command.shortcuts});
+                    this.application.commandManager.registerCommand(options.command.id,
+                        {shortcuts: options.command.shortcuts});
                     this.application.commandManager.registerHandler(options.command.id, this.toggleOutputConsole, this);
-                    this.application.commandManager.registerCommand(options.commandClearConsole.id, {shortcuts: options.commandClearConsole.shortcuts});
-                    this.application.commandManager.registerHandler(options.commandClearConsole.id, this.clearConsole, this);
+                    this.application.commandManager.registerCommand(options.commandClearConsole.id,
+                        {shortcuts: options.commandClearConsole.shortcuts});
+                    this.application.commandManager.registerHandler(options.commandClearConsole.id,
+                        this.clearConsole, this);
                 },
                 isActive: function () {
                     return this._activateBtn.parent('li').hasClass('active');
@@ -62,15 +69,15 @@ define(['log', 'jquery', 'lodash', 'output_console_list', 'workspace', 'service_
                     var activeTab = this.application.tabController.getActiveTab();
                     var file = undefined;
                     var console = this.getGlobalConsole();
-                    var serviceWrapper =  $('#service-tabs-wrapper');
+                    var serviceWrapper = $('#service-tabs-wrapper');
                     if (console !== undefined) {
                         if (this.isActive()) {
                             this._activateBtn.parent('li').removeClass('active');
                             this.hideAllConsoles();
-                            if (serviceWrapper.is('.ui-resizable')){
-                                serviceWrapper.resizable( "destroy" );
+                            if (serviceWrapper.is('.ui-resizable')) {
+                                serviceWrapper.resizable("destroy");
                             }
-                            if(activeTab._title != "welcome-page"){
+                            if (activeTab._title != "welcome-page") {
                                 if (activeTab.getSiddhiFileEditor().isInSourceView()) {
                                     activeTab.getSiddhiFileEditor().getSourceView().editorResize();
                                 }
@@ -97,44 +104,37 @@ define(['log', 'jquery', 'lodash', 'output_console_list', 'workspace', 'service_
                     ConsoleList.prototype.addConsole.call(this, console);
                 },
                 removeConsole: function (console) {
-                    var commandManager = _.get(this, 'options.application.commandManager');
-                    var self = this;
-                    var remove = function () {
-                        ConsoleList.prototype.removeConsole.call(self, console);
-                        if (console instanceof ServiceConsole) {
-//                          _.remove(self._workingFileSet, function(fileID){
-//                              return _.isEqual(fileID, tab.getFile().id);
-//                          });
-                            console.trigger('console-removed');
-//                          self.getBrowserStorage().destroy(tab.getFile());
-//                          self.getBrowserStorage().put('workingFileSet', self._workingFileSet);
-//                          // open welcome page upon last tab close
-//                          if(_.isEmpty(self.getTabList())){
-//                              var commandManager = _.get(self, 'options.application.commandManager');
-//                              commandManager.dispatch("go-to-welcome-page");
-//                          }
-                        }
-                    };
+                    if (self.activeConsole.options._type === CONSOLE_TYPE_FORM) {
+                        $(self.activeConsole).trigger('close-button-in-form-clicked');
+                    } else {
+                        var commandManager = _.get(this, 'options.application.commandManager');
+                        var self = this;
+                        var remove = function () {
+                            ConsoleList.prototype.removeConsole.call(self, console);
+                            if (console instanceof ServiceConsole) {
+                                console.trigger('console-removed');
+                            }
+                        };
 
-                    remove();
+                        remove();
+                    }
                 },
                 newConsole: function (opts) {
                     var options = opts || {};
                     return ConsoleList.prototype.newConsole.call(this, options);
                 },
                 getBrowserStorage: function () {
-                    //return _.get(this, 'options.application.browserStorage');
                 },
                 hasFilesInWorkingSet: function () {
                     return !_.isEmpty(this._workingFileSet);
                 },
                 getConsoleForType: function (type, uniqueId) {
                     return _.find(this._consoles, function (console) {
-                        if (type === "DEBUG") {
+                        if (type === CONSOLE_TYPE_DEBUG) {
                             if (console._uniqueId === uniqueId) {
                                 return console;
                             }
-                        }else if (type === "FORM") {
+                        } else if (type === CONSOLE_TYPE_FORM) {
                             if (console._uniqueId === uniqueId) {
                                 return console;
                             }
@@ -153,13 +153,13 @@ define(['log', 'jquery', 'lodash', 'output_console_list', 'workspace', 'service_
                 showAllConsoles: function () {
                     ConsoleList.prototype.showConsoleComponents.call(this);
                 },
-                showConsoleByTitle: function (title,type) {
-                    ConsoleList.prototype.enableConsoleByTitle.call(this, title,type);
+                showConsoleByTitle: function (title, type) {
+                    ConsoleList.prototype.enableConsoleByTitle.call(this, title, type);
                 },
                 getConsoleActivateBtn: function () {
                     return this._activateBtn;
                 },
-                clearConsole: function(){
+                clearConsole: function () {
                     var console = this._options.application.outputController.getGlobalConsole();
                     console.clear();
                 },
@@ -167,9 +167,9 @@ define(['log', 'jquery', 'lodash', 'output_console_list', 'workspace', 'service_
                     var url = "ws://" + opts.application.config.baseUrlHost + "/console";
                     var ws = new WebSocket(url);
                     var lineNumber;
-                    ws.onmessage = function(msg) {
+                    ws.onmessage = function (msg) {
                         var console = opts.application.outputController.getGlobalConsole();
-                        if(console == undefined){
+                        if (console == undefined) {
                             var consoleOptions = {};
                             var options = {};
                             _.set(options, '_type', "CONSOLE");
@@ -184,29 +184,29 @@ define(['log', 'jquery', 'lodash', 'output_console_list', 'workspace', 'service_
                         var loggerObj = JSON.parse(msg.data);
                         var type = "";
                         var colorDIffType = "";
-                        if(loggerObj.level == "INFO" || loggerObj.level == "WARN"){
+                        if (loggerObj.level == "INFO" || loggerObj.level == "WARN") {
                             type = "INFO";
                             colorDIffType = "INFO-LOGGER";
-                        } else if(loggerObj.level == "ERROR"){
+                        } else if (loggerObj.level == "ERROR") {
                             type = "ERROR";
                             colorDIffType = "ERROR";
                         }
                         var stacktrace = "";
-                        if(loggerObj.stacktrace != null){
+                        if (loggerObj.stacktrace != null) {
                             stacktrace = "<pre>" + loggerObj.stacktrace + "</pre>";
                         }
                         var logMessage = "[" + loggerObj.timeStamp + "] " + type + " " + "{" + loggerObj.fqcn + "} - " +
-                            loggerObj.message + " " + stacktrace ;
+                            loggerObj.message + " " + stacktrace;
                         var message = {
-                            "type" : colorDIffType,
+                            "type": colorDIffType,
                             "message": logMessage
                         };
                         console.println(message);
                     };
-                    ws.onerror = function(error) {
+                    ws.onerror = function (error) {
                         console.log(error);
                     };
-                    ws.onclose = function() {
+                    ws.onclose = function () {
 
                     };
                 }
