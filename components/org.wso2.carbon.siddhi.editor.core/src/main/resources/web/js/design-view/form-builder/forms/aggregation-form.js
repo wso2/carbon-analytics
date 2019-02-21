@@ -205,7 +205,7 @@ define(['require', 'log', 'jquery', 'lodash', 'aggregateByTimePeriod', 'querySel
 
             if (!clickedElement.getFrom()) {
                 $('#' + id).addClass('incomplete-element');
-                DesignViewUtils.prototype.warnAlert('Connect an input stream element nrfjrnj');
+                DesignViewUtils.prototype.warnAlert('Connect an input stream element');
                 self.designViewContainer.removeClass('disableContainer');
                 self.toggleViewButton.removeClass('disableContainer');
 
