@@ -256,8 +256,11 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
             selectExpressionMatches = selectExpressionMatches.concat(incrementalAggregator);
             var onFilterHavingConditionMatches = JSON.parse(JSON.stringify(possibleAttributesWithSourceAs));
             onFilterHavingConditionMatches = onFilterHavingConditionMatches.concat(QUERY_CONDITION_SYNTAX);
+            var perWithinMatches = JSON.parse(JSON.stringify(possibleAttributesWithSourceAs));
+            perWithinMatches = perWithinMatches.concat(Constants.SIDDHI_TIME);
             self.formUtils.createAutocomplete($('.attribute-expression'), selectExpressionMatches);
             self.formUtils.createAutocomplete($('.symbol-syntax-required-value'), onFilterHavingConditionMatches);
+            self.formUtils.createAutocomplete($('.per-within'), perWithinMatches);
         };
 
         /**
@@ -536,7 +539,6 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
 
                 var rateLimitingMatches = RATE_LIMITING_SYNTAX.concat(Constants.SIDDHI_TIME);
                 self.formUtils.createAutocomplete($('.rate-limiting-value'), rateLimitingMatches);
-                self.formUtils.createAutocomplete($('.per-within'), Constants.SIDDHI_TIME)
 
                 $(formContainer).on('click', '#btn-submit', function () {
                     $('.error-message').text("")
