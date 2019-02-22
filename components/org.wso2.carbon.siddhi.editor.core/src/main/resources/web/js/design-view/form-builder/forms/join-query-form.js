@@ -347,6 +347,7 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
                 $('.define-user-defined-annotations').find('h4').html('Customized Annotations');
                 self.formUtils.renderPredefinedAnnotations(predefinedAnnotations,
                     'define-predefined-annotations');
+                self.formUtils.mapPredefinedAnnotations(savedAnnotations, predefinedAnnotations);
                 self.formUtils.renderOptionsForPredefinedAnnotations(predefinedAnnotations);
                 self.formUtils.addCheckedForUserSelectedPredefinedAnnotation(savedAnnotations, predefinedAnnotations);
                 self.formUtils.addEventListenersForPredefinedAnnotations();
