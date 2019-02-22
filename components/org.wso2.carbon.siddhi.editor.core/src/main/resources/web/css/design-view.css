@@ -667,6 +667,11 @@ a.list-group-item, button.list-group-item {
 	width: 350px
 }
 
+.design-view-form-content .define-select input[type="text"].attribute-expression {
+	width: 235px;
+	margin-right: 5px;
+}
+
 .design-view-form-content input[type="text"].option-value,
 .window-form-container input[type="text"].parameter-value,
 .design-view-form-content input[type="text"].expression-value {
@@ -1178,6 +1183,10 @@ a.list-group-item, button.list-group-item {
 	margin-left: 46px;
 	margin-top: 10px;
 	margin-bottom: 10px;
+}
+
+.design-view-form-content .query-select .projection-as-label {
+	margin-left: 185px;
 }
 
 .focused-container {

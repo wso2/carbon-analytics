@@ -368,7 +368,7 @@ define(['require', 'log', 'jquery', 'lodash', 'aggregateByTimePeriod', 'querySel
                     possibleAttributes.push(Constants.TRIGGERED_TIME);
                 }
 
-                self.formUtils.selectAttributeSelection(select)
+                self.formUtils.selectAggregateProjection(select)
                 self.formUtils.addEventListenersForSelectionDiv();
 
                 var groupByAttributes = [];
@@ -480,7 +480,7 @@ define(['require', 'log', 'jquery', 'lodash', 'aggregateByTimePeriod', 'querySel
                         return;
                     }
 
-                    if (self.formUtils.validateUserDefinedAttributeSelection(possibleAttributes)) {
+                    if (self.formUtils.validateAggregateProjection(possibleAttributes)) {
                         isErrorOccurred = true;
                         return;
                     }
@@ -551,7 +551,7 @@ define(['require', 'log', 'jquery', 'lodash', 'aggregateByTimePeriod', 'querySel
                             clickedElement.addAnnotationObject(annotation);
                         });
 
-                        var selectObject = new QuerySelect(self.formUtils.buildAttributeSelection());
+                        var selectObject = new QuerySelect(self.formUtils.buildAttributeSelection(Constants.AGGREGATION));
                         clickedElement.setSelect(selectObject);
 
                         if ($('.group-by-checkbox').is(':checked')) {

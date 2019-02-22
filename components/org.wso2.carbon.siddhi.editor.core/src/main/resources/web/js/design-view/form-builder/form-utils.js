@@ -331,11 +331,12 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
 
         /**
          * @function render the user defined select atributes
-         * @param {Object} attributes
+         * @param {Object} attributes user saved attribute expression to be rendered
+         * @param {templateId} the id of the template div to render
          */
-        FormUtils.prototype.renderUserDefinedAttributeSelection = function (attributes) {
+        FormUtils.prototype.renderUserDefinedAttributeSelection = function (attributes, templateId) {
             var self = this;
-            var userAttributeSelectionTemplate = Handlebars.compile($('#select-user-defined-attribute-template').html());
+            var userAttributeSelectionTemplate = Handlebars.compile($('#' + templateId + '-template').html());
             var wrappedHtml = userAttributeSelectionTemplate(attributes);
             $('.define-select').html(wrappedHtml);
         };
@@ -613,9 +614,9 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
         };
 
         /**
-         * @function to select the attribute selection[all or user-defined]
+         * @function to select the projection for aggregation
          */
-        FormUtils.prototype.selectAttributeSelection = function (select) {
+        FormUtils.prototype.selectAggregateProjection = function (select) {
             var self = this;
             var attributes;
             var selectedType = Constants.TYPE_ALL;
@@ -627,8 +628,15 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
             } else {
                 attributes = self.getAttributeExpressions(select.getValue())
             }
-            self.renderUserDefinedAttributeSelection(attributes);
+            self.renderUserDefinedAttributeSelection(attributes, "aggregate-projection");
             self.removeDeleteButtonOfFirstValue();
+            self.selectAttributeSelection(selectedType);
+        };
+
+        /**
+         * @function to select the attribute selection [all or user-defined]
+         */
+        FormUtils.prototype.selectAttributeSelection = function (selectedType) {
             $('.define-select').find('.attribute-selection-type option').filter(function () {
                 return ($(this).val() === selectedType);
             }).prop('selected', true);
@@ -637,6 +645,43 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
             } else {
                 $('.define-user-defined-attributes').show();
             }
+        };
+
+        /**
+         * @function to select the projection for queries
+         */
+        FormUtils.prototype.selectQueryProjection = function (select, outputElementName) {
+            var self = this;
+            var attributes;
+            var selectedType = Constants.TYPE_ALL;
+            if (select) {
+                selectedType = select.getType().toLowerCase();
+            }
+            if (selectedType === Constants.TYPE_ALL) {
+                attributes = self.createEmptyAttributeSelection(outputElementName);
+            } else {
+                attributes = select.getValue();
+            }
+            self.renderUserDefinedAttributeSelection(attributes, "query-projection");
+            self.selectAttributeSelection(selectedType);
+        };
+
+        /**
+         * @function to create empty attribute expression for projection depending on
+         * the attributes defined in the connected output element
+         */
+        FormUtils.prototype.createEmptyAttributeSelection = function (outputElementName) {
+            var self = this;
+            var attributes = [];
+            var connectedElement = self.configurationData.getSiddhiAppConfig().
+                getDefinitionElementByName(outputElementName);
+            _.forEach(connectedElement.element.getAttributeList(), function () {
+                attributes.push({
+                    expression: "",
+                    as: ""
+                });
+            });
+            return attributes;
         };
 
         /**
@@ -1274,7 +1319,7 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
         /**
          * @function to validate the user defined attribute selection (projection)
          */
-        FormUtils.prototype.validateUserDefinedAttributeSelection = function (possibleAttributes) {
+        FormUtils.prototype.validateAggregateProjection = function (possibleAttributes) {
             var self = this;
             var isErrorOccurred = false;
             var errorMessage = ""
@@ -1310,6 +1355,26 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
                     $(firstAttributeList).find('.error-message').text("Minimum one attribute is required.")
                     self.addErrorClass($(firstAttributeList).find('.attribute-expression-as'));
                 }
+            }
+            return isErrorOccurred;
+        };
+
+        /**
+         * @function to validate the user defined attribute selection (queries)
+         */
+        FormUtils.prototype.validateQueryProjection = function () {
+            var self = this;
+            var isErrorOccurred = false;
+            if ($('.define-select .attribute-selection-type').val() == Constants.TYPE_USER_DEFINED) {
+                $('.define-select .user-defined-attributes li').each(function () {
+                    var expression = $(this).find('.attribute-expression').val().trim();
+                    if (expression == "") {
+                        isErrorOccurred = true;
+                        $(this).find('.error-message').text("Expression Value is required");
+                        self.addErrorClass($(this).find('.attribute-expression'));
+                        return false;
+                    }
+                });
             }
             return isErrorOccurred;
         };
@@ -1369,7 +1434,7 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
         /**
          * @function to build the select object
          */
-        FormUtils.prototype.buildAttributeSelection = function () {
+        FormUtils.prototype.buildAttributeSelection = function (elementType) {
             var self = this;
             var selectAttributeOptions = {}
             var selectionType = $('.attribute-selection-type').val();
@@ -1378,15 +1443,37 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
                 _.set(selectAttributeOptions, 'value', Constants.VALUE_ALL);
             } else {
                 _.set(selectAttributeOptions, 'type', Constants.TYPE_USER_DEFINED.toUpperCase());
-                _.set(selectAttributeOptions, 'value', self.buildAttributeExpressions());
+                if (elementType == Constants.AGGREGATION) {
+                    var attributeExpressions = self.buildAggregateExpressions();
+                } else {
+                    var attributeExpressions = self.buildQueryExpressions();
+                }
+                _.set(selectAttributeOptions, 'value', attributeExpressions);
             }
             return selectAttributeOptions;
         };
 
         /**
-         * @function to build the attribute expression
+         * @function to build the user defined attributes for queries
          */
-        FormUtils.prototype.buildAttributeExpressions = function () {
+        FormUtils.prototype.buildQueryExpressions = function () {
+            var attributes = [];
+            $('.define-select .user-defined-attributes li').each(function () {
+                var expressionValue = $(this).find('.attribute-expression').val().trim();
+                var asValue = $(this).find('.attribute-as').val().trim();
+                var expressionObject = {
+                    expression: expressionValue,
+                    as: asValue
+                }
+                attributes.push(expressionObject);
+            });
+            return attributes;
+        };
+
+        /**
+         * @function to build the user defined attributes for aggregation
+         */
+        FormUtils.prototype.buildAggregateExpressions = function () {
             var self = this;
             var attributes = [];
             $('.define-select .user-defined-attributes li').each(function () {

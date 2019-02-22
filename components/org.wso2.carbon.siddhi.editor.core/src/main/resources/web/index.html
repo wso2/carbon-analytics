@@ -1387,7 +1387,7 @@
 </script>
 
 
-<script id="select-user-defined-attribute-template" type = "text/template">
+<script id="aggregate-projection-template" type = "text/template">
     <h3> Projection </h3>
     <label class="clearfix"> <label class="mandatory-symbol"> * </label> Select </label>
     <select class="attribute-selection-type" class="clearfix">
@@ -1409,6 +1409,34 @@
             {{/each}}
         </ul>
         <button class="btn btn-default btn-add-user-defined-attribute"> + Attribute </button>
+    </div>
+</script>
+
+<script id="query-projection-template" type = "text/template">
+    <h3> Projection </h3>
+    <label class="clearfix"> <label class="mandatory-symbol"> * </label> Select </label>
+    <select class="attribute-selection-type" class="clearfix">
+        <option value="all"> All Attributes </option>
+        <option value="user_defined"> User Defined Attributes </option>
+    </select>
+    <div class="define-user-defined-attributes">
+        <label class="clearfix">
+            <label class="projection-expression-label"> Expression </label>
+            <label class="projection-as-label"> As </label>
+        </label>
+        <ul class="user-defined-attributes">
+            {{#each this}}
+            <li class="attribute">
+                <div class="clearfix">
+                    <div class="clearfix">
+                        <input type="text" class = "attribute-expression" value="{{expression}}">
+                        <input type="text" class = "attribute-as" value="{{as}}" readonly>
+                    </div>
+                    <label class = "error-message"></label>
+                </div>
+            </li>
+            {{/each}}
+        </ul>
     </div>
 </script>
 

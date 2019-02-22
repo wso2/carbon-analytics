@@ -203,11 +203,11 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
         var renderPerAndWithin = function () {
             var perDiv = '<div class="define-per-condition">' +
                 '<label> Per Condition </label> <div class="per-condition-content">' +
-                '<input type="text"  class="clearfix per-condition-value symbol-syntax-required-value name">' +
+                '<input type="text"  class="clearfix per-condition-value per-within name">' +
                 '<label class="error-message"> </label> </div> </div>';
             var withinDiv = '<div class="define-within-condition">' +
                 '<label> Within Condition </label> <div class="within-condition-content">' +
-                '<input type="text"  class="clearfix within-condition-value symbol-syntax-required-value name">' +
+                '<input type="text"  class="clearfix within-condition-value per-within name">' +
                 '<label class="error-message"> </label> </div> </div>';
             $('.define-aggregate-per-within-condition').append(perDiv);
             $('.define-aggregate-per-within-condition').append(withinDiv);
@@ -250,17 +250,14 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
         /**
          * @function to add autocompletion
          */
-        var addAutoCompletion = function (self, QUERY_CONDITION_SYNTAX, incrementalAggregator,
-            possibleAttributesWithSourceAs,
-            selectExpressionMatches, onPerWithinHavingConditionMatches) {
-            possibleAttributesWithSourceAs = getPossibleAttributesWithSourceAs(self);
-            selectExpressionMatches = JSON.parse(JSON.stringify(possibleAttributesWithSourceAs));
+        var addAutoCompletion = function (self, QUERY_CONDITION_SYNTAX, incrementalAggregator) {
+            var possibleAttributesWithSourceAs = getPossibleAttributesWithSourceAs(self);
+            var selectExpressionMatches = JSON.parse(JSON.stringify(possibleAttributesWithSourceAs));
             selectExpressionMatches = selectExpressionMatches.concat(incrementalAggregator);
-            selectExpressionMatches.push(Constants.AS)
-            onPerWithinHavingConditionMatches = JSON.parse(JSON.stringify(possibleAttributesWithSourceAs));
-            onPerWithinHavingConditionMatches = onPerWithinHavingConditionMatches.concat(QUERY_CONDITION_SYNTAX);
-            self.formUtils.createAutocomplete($('.attribute-expression-as'), selectExpressionMatches);
-            self.formUtils.createAutocomplete($('.symbol-syntax-required-value'), onPerWithinHavingConditionMatches);
+            var onFilterHavingConditionMatches = JSON.parse(JSON.stringify(possibleAttributesWithSourceAs));
+            onFilterHavingConditionMatches = onFilterHavingConditionMatches.concat(QUERY_CONDITION_SYNTAX);
+            self.formUtils.createAutocomplete($('.attribute-expression'), selectExpressionMatches);
+            self.formUtils.createAutocomplete($('.symbol-syntax-required-value'), onFilterHavingConditionMatches);
         };
 
         /**
@@ -332,10 +329,6 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
                 var predefinedAnnotations = JSON.parse(JSON.stringify(self.configurationData.application.config.
                     query_predefined_annotations));
                 var incrementalAggregator = self.configurationData.application.config.incremental_aggregator;
-
-                var possibleAttributesWithSourceAs = [];
-                var selectExpressionMatches = [];
-                var onPerWithinHavingConditionMatches = [];
 
                 //render the join-query form template
                 var joinFormTemplate = Handlebars.compile($('#join-query-form-template').html());
@@ -461,7 +454,7 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
                 self.formUtils.removeDeleteButtonOfFirstValue();
 
                 //projection
-                self.formUtils.selectAttributeSelection(select)
+                self.formUtils.selectQueryProjection(select, outputElementName);
                 self.formUtils.addEventListenersForSelectionDiv();
 
                 if (leftSourceSavedData && rightSourceSavedData) {
@@ -500,7 +493,6 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
                     $('.group-by-content').hide();
                     $('.order-by-content').hide();
                     $('.on-condition-content').hide();
-                    select = undefined
                 }
 
                 if (limit) {
@@ -529,31 +521,22 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
                     }
                 }
                 //autocompletion
-                addAutoCompletion(self, QUERY_CONDITION_SYNTAX, incrementalAggregator, possibleAttributesWithSourceAs,
-                    selectExpressionMatches,
-                    onPerWithinHavingConditionMatches);
+                addAutoCompletion(self, QUERY_CONDITION_SYNTAX, incrementalAggregator);
 
                 $('.join-query-form-container').on('blur', '.as-content-value', function () {
-                    addAutoCompletion(self, QUERY_CONDITION_SYNTAX, incrementalAggregator,
-                        possibleAttributesWithSourceAs, selectExpressionMatches,
-                        onPerWithinHavingConditionMatches);
-                });
-
-                $('.define-select').on('click', '.btn-add-user-defined-attribute', function () {
-                    self.formUtils.appendUserSelectAttribute();
-                    self.formUtils.createAutocomplete($('.attribute-expression-as:last'), selectExpressionMatches);
+                    addAutoCompletion(self, QUERY_CONDITION_SYNTAX, incrementalAggregator);
                 });
 
                 //to add filter
                 $('.define-stream-handler').on('click', '.btn-add-filter', function () {
                     var sourceDiv = '.define-' + self.formUtils.getSourceDiv(Constants.JOIN_QUERY, $(this)) + '-source';
                     self.formUtils.addNewStreamHandler(sourceDiv, Constants.FILTER);
-                    self.formUtils.createAutocomplete($(sourceDiv).find('.symbol-syntax-required-value:last'),
-                        onPerWithinHavingConditionMatches);
+                    addAutoCompletion(self, QUERY_CONDITION_SYNTAX, incrementalAggregator);
                 });
 
                 var rateLimitingMatches = RATE_LIMITING_SYNTAX.concat(Constants.SIDDHI_TIME);
                 self.formUtils.createAutocomplete($('.rate-limiting-value'), rateLimitingMatches);
+                self.formUtils.createAutocomplete($('.per-within'), Constants.SIDDHI_TIME)
 
                 $(formContainer).on('click', '#btn-submit', function () {
                     $('.error-message').text("")
@@ -628,7 +611,7 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
                         }
                     }
 
-                    if (self.formUtils.validateUserDefinedAttributeSelection(possibleAttributesWithSourceAs)) {
+                    if (self.formUtils.validateQueryProjection()) {
                         isErrorOccurred = true;
                         return;
                     }
@@ -706,7 +689,7 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
                             queryInput.setWithin($('.within-condition-value').val().trim())
                         }
 
-                        var selectObject = new QuerySelect(self.formUtils.buildAttributeSelection());
+                        var selectObject = new QuerySelect(self.formUtils.buildAttributeSelection(Constants.JOIN_QUERY));
                         clickedElement.setSelect(selectObject);
 
                         var annotationObjectList = [];
