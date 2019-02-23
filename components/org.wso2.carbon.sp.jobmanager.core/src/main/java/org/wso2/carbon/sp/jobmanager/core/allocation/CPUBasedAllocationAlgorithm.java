@@ -18,6 +18,7 @@
 package org.wso2.carbon.sp.jobmanager.core.allocation;
 
 import org.apache.log4j.Logger;
+import org.wso2.carbon.sp.jobmanager.core.appcreator.SiddhiQuery;
 import org.wso2.carbon.sp.jobmanager.core.bean.DeploymentConfig;
 import org.wso2.carbon.sp.jobmanager.core.exception.ResourceManagerException;
 import org.wso2.carbon.sp.jobmanager.core.internal.ServiceDataHolder;
@@ -39,7 +40,8 @@ public class CPUBasedAllocationAlgorithm implements ResourceAllocationAlgorithm 
     private DeploymentConfig deploymentConfig = ServiceDataHolder.getDeploymentConfig();
 
     @Override
-    public ResourceNode getNextResourceNode(Map<String, ResourceNode> resourceNodeMap, int minResourceCount) {
+    public ResourceNode getNextResourceNode(Map<String, ResourceNode> resourceNodeMap, int minResourceCount
+    , SiddhiQuery siddhiQuery) {
         long initialTimestamp = System.currentTimeMillis();
         if (deploymentConfig != null && !resourceNodeMap.isEmpty()) {
             if (resourceNodeMap.size() >= minResourceCount) {

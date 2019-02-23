@@ -18,9 +18,14 @@
 
 package org.wso2.carbon.sp.jobmanager.core.deployment;
 
+import com.zaxxer.hikari.HikariDataSource;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.log4j.Logger;
+import org.wso2.carbon.datasource.core.api.DataSourceService;
+import org.wso2.carbon.datasource.core.exception.DataSourceException;
 import org.wso2.carbon.sp.jobmanager.core.DeploymentManager;
+import org.wso2.carbon.sp.jobmanager.core.allocation.Knapsack;
+import org.wso2.carbon.sp.jobmanager.core.allocation.MetricsBasedAllocationAlgorithm;
 import org.wso2.carbon.sp.jobmanager.core.allocation.ResourceAllocationAlgorithm;
 import org.wso2.carbon.sp.jobmanager.core.ResourcePoolChangeListener;
 import org.wso2.carbon.sp.jobmanager.core.SiddhiAppDeployer;
@@ -33,33 +38,36 @@ import org.wso2.carbon.sp.jobmanager.core.model.ResourcePool;
 import org.wso2.carbon.sp.jobmanager.core.model.SiddhiAppHolder;
 import org.wso2.carbon.stream.processor.core.distribution.DeploymentStatus;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import javax.sql.DataSource;
+import java.sql.Connection;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.util.*;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
 /**
  * Implementation regarding deploying siddhi applications in the resource cluster
  */
-public class DeploymentManagerImpl implements DeploymentManager, ResourcePoolChangeListener {
+public class DeploymentManagerImpl extends  Thread implements DeploymentManager, ResourcePoolChangeListener  {
     private static final Logger log = Logger.getLogger(DeploymentManagerImpl.class);
     private final Lock lock = new ReentrantLock();
+    private MetricsBasedAllocationAlgorithm metricsBasedAllocationAlgorithm = new MetricsBasedAllocationAlgorithm();
     private ResourceAllocationAlgorithm resourceAllocationAlgorithm = ServiceDataHolder.getAllocationAlgorithm();
     private ResourceAllocationAlgorithm receiverAllocationAlgorithm = new RoundRobinAllocationAlgorithm();
+    public static Long  starttime = 0L;
+    boolean metricScheduling = false;
+    Connection conn = null;
+    Statement statement;
 
     @Override
-    public DeploymentStatus deploy(DistributedSiddhiQuery distributedSiddhiQuery) {
+    public DeploymentStatus deploy(DistributedSiddhiQuery distributedSiddhiQuery , boolean metricScheduling) {
         Map<String, List<SiddhiAppHolder>> deployedSiddhiAppHoldersMap = ServiceDataHolder
                 .getResourcePool().getSiddhiAppHoldersMap();
         List<SiddhiAppHolder> appsToDeploy = getSiddhiAppHolders(distributedSiddhiQuery);
         List<SiddhiAppHolder> deployedApps = new ArrayList<>();
         boolean shouldDeploy = true;
-
+        starttime = System.currentTimeMillis();
         lock.lock();
         try {
             if (deployedSiddhiAppHoldersMap.containsKey(distributedSiddhiQuery.getAppName())) {
@@ -91,10 +99,17 @@ public class DeploymentManagerImpl implements DeploymentManager, ResourcePoolCha
             }
             boolean isDeployed = true;
             if (shouldDeploy) {
+
+                if (metricScheduling) {
+                    processAlgorithm(distributedSiddhiQuery);
+                    log.info("metricsAllocationAlgorithm formulated");
+
+                }
                 for (SiddhiAppHolder appHolder : appsToDeploy) {
+                    log.info(appHolder.getAppName() + " is starting to deploy");
                     ResourceNode deployedNode;
                     deployedNode = deploy(new SiddhiQuery(appHolder.getAppName(), appHolder.getSiddhiApp(),
-                            appHolder.isReceiverQueryGroup()), 0, appHolder.getParallelism());
+                            appHolder.isReceiverQueryGroup()), 0, appHolder.getParallelism() , metricScheduling);
                     if (deployedNode != null) {
                         appHolder.setDeployedNode(deployedNode);
                         deployedApps.add(appHolder);
@@ -110,6 +125,27 @@ public class DeploymentManagerImpl implements DeploymentManager, ResourcePoolCha
                 if (isDeployed) {
                     deployedSiddhiAppHoldersMap.put(distributedSiddhiQuery.getAppName(), deployedApps);
                     log.info("Siddhi app " + distributedSiddhiQuery.getAppName() + " successfully deployed.");
+                    boolean isMetricScheduling = ServiceDataHolder.getDeploymentConfig().getMetricScheduling();
+                    log.info("metricschduling  "+ isMetricScheduling);
+                    int waitingTime = ServiceDataHolder.getDeploymentConfig().getWaitingTime();
+                    log.info("waitingtime " + waitingTime);
+                    log.info("isMetricscheduling " + isMetricScheduling);
+                    if (isMetricScheduling){
+                        while (true) {
+                            if ((DeploymentManagerImpl.starttime + (waitingTime *60*1000) < System.currentTimeMillis())) {
+                                metricScheduling = true;
+                                rollback(deployedApps);
+                                deployedApps = Collections.emptyList();
+                                deployedSiddhiAppHoldersMap.remove(distributedSiddhiQuery.getAppName());
+                                ServiceDataHolder.getResourcePool().getAppsWaitingForDeploy()
+                                        .put(distributedSiddhiQuery.getAppName(), appsToDeploy);
+                                log.info("Starting MetricBasedResourceAllocation...");
+                                deploy(distributedSiddhiQuery , metricScheduling);
+                                break;
+                            }
+                        }
+                    }
+
                 } else {
                     rollback(deployedApps);
                     deployedApps = Collections.emptyList();
@@ -127,6 +163,22 @@ public class DeploymentManagerImpl implements DeploymentManager, ResourcePoolCha
         }
         // Returning true as the deployment state, since we might put some apps on wait.
         return getDeploymentStatus(true, deployedApps);
+    }
+
+    public Statement dbConnector(){
+        try {
+            String datasourceName = ServiceDataHolder.getDeploymentConfig().getDatasource();
+            DataSourceService dataSourceService = ServiceDataHolder.getDataSourceService();
+            DataSource datasource = (HikariDataSource) dataSourceService.getDataSource(datasourceName);conn = datasource.getConnection();
+            conn = datasource.getConnection();
+
+            Statement st = conn.createStatement();
+            return st;
+        } catch (SQLException e) {
+           log.error("SQL error" + e.getMessage());
+        } catch (DataSourceException e) {
+            log.error("Datasource error" + e.getMessage()); }
+        return null;
     }
 
     private DeploymentStatus getDeploymentStatus(boolean isDeployed, List<SiddhiAppHolder> siddhiAppHolders) {
@@ -218,7 +270,7 @@ public class DeploymentManagerImpl implements DeploymentManager, ResourcePoolCha
                 for (SiddhiAppHolder partialAppHolder : partialAppHoldersOfSiddhiApp) {
                     ResourceNode deployedNode = deploy(new SiddhiQuery(partialAppHolder.getAppName(),
                                     partialAppHolder.getSiddhiApp(), partialAppHolder.isReceiverQueryGroup()), 0,
-                            partialAppHolder.getParallelism());
+                            partialAppHolder.getParallelism() , metricScheduling);
 
                     if (deployedNode != null) {
                         partialAppHolder.setDeployedNode(deployedNode);
@@ -264,7 +316,7 @@ public class DeploymentManagerImpl implements DeploymentManager, ResourcePoolCha
                 affectedPartialApps.forEach(affectedPartialApp -> {
                     ResourceNode deployedNode = deploy(new SiddhiQuery(affectedPartialApp.getAppName(),
                                     affectedPartialApp.getSiddhiApp(), affectedPartialApp.isReceiverQueryGroup()), 0,
-                            affectedPartialApp.getParallelism());
+                            affectedPartialApp.getParallelism() , metricScheduling);
                     if (deployedNode != null) {
                         affectedPartialApp.setDeployedNode(deployedNode);
                         log.info(String.format("Siddhi app %s of %s successfully deployed in %s.",
@@ -327,27 +379,68 @@ public class DeploymentManagerImpl implements DeploymentManager, ResourcePoolCha
         }
     }
 
-    private ResourceNode deploy(SiddhiQuery siddhiQuery, int retry, int parallelism) {
+    public void processAlgorithm(DistributedSiddhiQuery distributedSiddhiQuery){
+         metricsBasedAllocationAlgorithm.executeKnapsack(ServiceDataHolder.getResourcePool().getResourceNodeMap(),
+                ServiceDataHolder.getDeploymentConfig().getMinResourceCount() , distributedSiddhiQuery);
+    }
+
+    private ResourceNode deploy(SiddhiQuery siddhiQuery, int retry, int parallelism , boolean metricScheduling) {
         ResourcePool resourcePool = ServiceDataHolder.getResourcePool();
         Map<String, ResourceNode> nodeMap;
         ResourceNode resourceNode;
 
         if (siddhiQuery.isReceiverQuery()) {
             nodeMap = resourcePool.getReceiverNodeMap();
-            resourceNode = receiverAllocationAlgorithm.getNextResourceNode(nodeMap, parallelism);
+            resourceNode = receiverAllocationAlgorithm.getNextResourceNode(nodeMap, parallelism , siddhiQuery);
         } else {
             nodeMap = resourcePool.getResourceNodeMap();
-            resourceNode = resourceAllocationAlgorithm.getNextResourceNode(nodeMap,
-                    ServiceDataHolder.getDeploymentConfig().getMinResourceCount());
+            statement = dbConnector();
+            if (metricScheduling) {
+                log.info("Executing MetricBasedAllocationAlgorithm");
+                resourceNode = metricsBasedAllocationAlgorithm.getNextResourceNode(nodeMap,
+                        ServiceDataHolder.getDeploymentConfig().getMinResourceCount() , siddhiQuery);
+
+                try {
+                    String query = "INSERT into schedulingdetails (timestamp,partialSiddhiApp," +
+                            "deployedNode,algorithm)  values (" +
+                            System.currentTimeMillis() + "," +
+                            "\'"+ siddhiQuery.getAppName() + "\'" +  "," +
+                            "\'" + resourceNode.getId() + "\'" + "," +
+                            "\'" + "MetricsBasedAllocationAlgorithm" + "\'" + ")";
+                    statement.executeUpdate(query);
+                    log.info("data pushed to table");
+
+                } catch(SQLException e) {
+                    log.error("Error in inserting query . " + e.getMessage());
+                }
+            } else {
+                log.info("Executing Standard ResourceAllocationAlgorithm");
+                resourceNode = resourceAllocationAlgorithm.getNextResourceNode(nodeMap,
+                        ServiceDataHolder.getDeploymentConfig().getMinResourceCount() , siddhiQuery);
+                try {
+                    String query = "INSERT into schedulingdetails (timestamp,partialSiddhiApp," +
+                            "deployedNode,algorithm)  values (" +
+                            System.currentTimeMillis() + "," +
+                            "\'"+ siddhiQuery.getAppName() + "\'" +  "," +
+                            "\'" + resourceNode.getId() + "\'" + "," +
+                            "\'" + "RoundRobinAlgorithm" + "\'" + ")";
+                    statement.executeUpdate(query);
+                    log.info("data pushed to table");
+
+                } catch(SQLException e) {
+                    log.error("Error in inserting query. " + e.getMessage());
+                }
+            }
         }
         ResourceNode deployedNode = null;
+
         if (resourceNode != null) {
             String appName = SiddhiAppDeployer.deploy(resourceNode, siddhiQuery);
             if (appName == null || appName.isEmpty()) {
                 log.warn(String.format("Couldn't deploy partial Siddhi app %s in %s", siddhiQuery.getAppName(),
                         resourceNode));
                 if (retry < nodeMap.size()) {
-                    deployedNode = deploy(siddhiQuery, retry + 1, parallelism);
+                    deployedNode = deploy(siddhiQuery, retry + 1, parallelism , metricScheduling);
                 } else {
                     if (log.isDebugEnabled()) {
                         log.warn(String.format("Couldn't deploy partial Siddhi app %s even after %s attempts.",

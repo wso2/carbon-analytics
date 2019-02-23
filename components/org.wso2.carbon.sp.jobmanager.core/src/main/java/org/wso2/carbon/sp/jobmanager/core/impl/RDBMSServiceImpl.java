@@ -71,22 +71,30 @@ public class RDBMSServiceImpl {
         createResourcePoolTable();
     }
 
+
     /**
      * Create resource pool persistence table.
      */
     private void createResourcePoolTable() {
         Connection connection = null;
         PreparedStatement preparedStatement = null;
+        PreparedStatement preparedStatement2 = null;
+        PreparedStatement preparedStatement3 = null;
+
         try {
             connection = getConnection();
             preparedStatement = connection.prepareStatement(ResourceManagerConstants.CREATE_RESOURCE_MAPPING_TABLE);
             preparedStatement.execute();
+            preparedStatement2 = connection.prepareStatement(ResourceManagerConstants.CREATE_RESOURCE_METRICS_TABLE);
+            preparedStatement2.execute();
+            preparedStatement3 = connection.prepareStatement(ResourceManagerConstants.CREATE_RESOURCE_SCHEDULING_TABLE);
+            preparedStatement3.execute();
             connection.commit();
             if (log.isDebugEnabled()) {
-                log.debug("Resource Mapping Table Created Successfully");
+                log.debug("Tables Created Successfully");
             }
         } catch (SQLException e) {
-            throw new ResourceManagerException("Error in executing create resource mapping table query.", e);
+            throw new ResourceManagerException("Error in executing create table queries.", e);
         } finally {
             close(preparedStatement, "Execute query");
             close(connection, "Execute query");
@@ -168,7 +176,7 @@ public class RDBMSServiceImpl {
     /**
      * Get the connection to the database.
      */
-    private Connection getConnection() throws SQLException {
+    public Connection getConnection() throws SQLException {
         Connection connection = datasource.getConnection();
         connection.setAutoCommit(false);
         return connection;

@@ -20,6 +20,7 @@ package org.wso2.carbon.sp.jobmanager.core.model;
 
 import org.apache.log4j.Logger;
 import org.wso2.carbon.sp.jobmanager.core.ResourcePoolChangeListener;
+import org.wso2.carbon.sp.jobmanager.core.appcreator.DistributedSiddhiQuery;
 import org.wso2.carbon.sp.jobmanager.core.bean.DeploymentConfig;
 import org.wso2.carbon.sp.jobmanager.core.exception.ResourceManagerException;
 import org.wso2.carbon.sp.jobmanager.core.internal.ResourceNodeMonitor;

@@ -96,4 +96,17 @@ public class ResourceManagerConstants {
     public static final String PS_SELECT_RESOURCE_MAPPING_ROW =
             "SELECT GROUP_ID, RESOURCE_MAPPING FROM RESOURCE_POOL_TABLE WHERE GROUP_ID =?";
 
+    //public static final String CREATE_RESOURCE_METRICS_TABLE = "CREATE TABLE IF NOT EXISTS metricstable(iijtimestamp bigint(20),exec int(8),paralllel varchar(20),m1 int(10),m2 int(10),m3 double(20,10),m4 double(20,4),m5 int(20),m6 bigint(20),m7 bigint(20),m8 bigint(20),m9 bigint(20),m10 bigint(20),m11 bigint(20),m12 bigint(20),m13 bigint(20),m14 bigint(20),m15 bigint(20),m16 double(10,4));";
+
+    public static final String CREATE_RESOURCE_METRICS_TABLE = "CREATE TABLE IF NOT EXISTS metricstable" +
+            "(iijtimestamp long,exec int, " +
+            "parallel varchar(20),m1 int,m2 double,m3 double,m4 double,m5 int,m6 bigint," +
+            "m7 bigint, m8 bigint, m9 bigint, m10 bigint, m11 bigint,m12 bigint," +
+            " m13 bigint, m14 bigint, " +
+            "m15 bigint , m16 double);" ;
+
+    public static final String CREATE_RESOURCE_SCHEDULING_TABLE = "CREATE TABLE IF NOT EXISTS schedulingdetails" +
+            " (timestamp long ,partialSiddhiApp VARCHAR(700)," +
+            " deployedNode VARCHAR(700),algorithm VARCHAR(700)) ";
+
 }

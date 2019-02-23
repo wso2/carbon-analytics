@@ -42,6 +42,12 @@ public class DeploymentConfig implements Serializable {
     private String datasource;
     @Element(description = "bootstrap urls for Kafka", required = true)
     private String bootstrapURLs;
+    private String dbUsername;
+    private String dbPassword;
+    @Element(description = "Enable Metricscheduling or not", required = true)
+    private boolean isMetricScheduling = true;
+    private int waitingTime = 15;
+
     /**
      * @deprecated zooKeeperURLs is moved to {@link ZooKeeperConfig} bean
      */
@@ -78,6 +84,12 @@ public class DeploymentConfig implements Serializable {
     public int getHeartbeatMaxRetry() {
         return heartbeatMaxRetry;
     }
+
+    public  boolean getMetricScheduling() {
+        return isMetricScheduling;
+    }
+
+    public void setMetricScheduling(boolean isMetricScheduling){ this.isMetricScheduling = isMetricScheduling;}
 
     public void setHeartbeatMaxRetry(int heartbeatMaxRetry) {
         this.heartbeatMaxRetry = heartbeatMaxRetry;
@@ -126,6 +138,16 @@ public class DeploymentConfig implements Serializable {
     public String getAllocationAlgorithm() {
         return allocationAlgorithm;
     }
+
+    public  String getDbUsername() {
+        return  dbUsername;
+    }
+
+    public  String getDbPassword() {
+        return  dbPassword;
+    }
+
+    public int getWaitingTime(){ return  waitingTime;}
 
     public void setAllocationAlgorithm(String allocationAlgorithm) {
         this.allocationAlgorithm = allocationAlgorithm;

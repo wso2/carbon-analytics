@@ -17,6 +17,7 @@
  */
 package org.wso2.carbon.sp.jobmanager.core.allocation;
 
+import org.wso2.carbon.sp.jobmanager.core.appcreator.SiddhiQuery;
 import org.wso2.carbon.sp.jobmanager.core.model.ResourceNode;
 
 import java.util.Map;
@@ -32,5 +33,6 @@ public interface ResourceAllocationAlgorithm {
      * @param minResourceCount Minimum resource requirement for SiddhiQuery
      * @return Elected resource node for next deployment
      */
-    ResourceNode getNextResourceNode(Map<String, ResourceNode> resourceNodeMap, int minResourceCount);
+    ResourceNode getNextResourceNode(Map<String, ResourceNode> resourceNodeMap, int minResourceCount,
+                                     SiddhiQuery siddhiQuery);
 }

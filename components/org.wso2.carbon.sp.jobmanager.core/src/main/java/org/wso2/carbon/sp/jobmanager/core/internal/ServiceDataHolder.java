@@ -55,6 +55,7 @@ public class ServiceDataHolder {
     private static Map<String, String> userDefinedSiddhiApp;
     private static ResourceAllocationAlgorithm allocationAlgorithm;
     private static AnalyticsHttpClientBuilderService clientBuilderService;
+    private static boolean isMetricScheduling;
 
     public static ScheduledExecutorService getExecutorService() {
         return EXECUTOR_SERVICE;

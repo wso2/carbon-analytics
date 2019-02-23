@@ -18,11 +18,13 @@
 
 package org.wso2.carbon.sp.jobmanager.core.impl;
 
+import org.apache.log4j.Logger;
 import org.wso2.carbon.sp.jobmanager.core.DeploymentManager;
 import org.wso2.carbon.sp.jobmanager.core.SiddhiAppCreator;
 import org.wso2.carbon.sp.jobmanager.core.SiddhiTopologyCreator;
 import org.wso2.carbon.sp.jobmanager.core.appcreator.DeployableSiddhiQueryGroup;
 import org.wso2.carbon.sp.jobmanager.core.appcreator.DistributedSiddhiQuery;
+import org.wso2.carbon.sp.jobmanager.core.deployment.DeploymentManagerImpl;
 import org.wso2.carbon.sp.jobmanager.core.internal.ServiceDataHolder;
 import org.wso2.carbon.sp.jobmanager.core.topology.SiddhiTopology;
 import org.wso2.carbon.sp.jobmanager.core.topology.SiddhiTopologyCreatorImpl;
@@ -45,6 +47,8 @@ public class DistributionManagerServiceImpl implements DistributionService {
     private DeploymentManager deploymentManager;
     private SiddhiTopologyCreator siddhiTopologyCreator;
     private Map<String, String> serviceHolder = new HashMap<>();
+    public boolean metricscheduling = false;
+    private static final Logger log = Logger.getLogger(DistributionManagerServiceImpl.class);
 
     private DistributionManagerServiceImpl() {
         //Do nothing
@@ -62,7 +66,30 @@ public class DistributionManagerServiceImpl implements DistributionService {
         List<DeployableSiddhiQueryGroup> deployableQueryGroupList = appCreator.createApps(topology);
         serviceHolder.put(topology.getName(), userDefinedSiddhiApp);
         ServiceDataHolder.setUserDefinedSiddhiApp(serviceHolder);
-        return deploymentManager.deploy(new DistributedSiddhiQuery(topology.getName(), deployableQueryGroupList));
+        DistributedSiddhiQuery distributedSiddhiQuery = new DistributedSiddhiQuery(topology.getName(),
+                deployableQueryGroupList);
+        String parentSiddhiappname = distributedSiddhiQuery.getAppName();
+        log.info("parent siddhi app name is " + parentSiddhiappname);
+
+        while(true) {
+            if (DeploymentManagerImpl.starttime == 0) {
+                log.info("executinf deployment manager");
+                return deploymentManager.deploy(new DistributedSiddhiQuery(topology.getName(),
+                        deployableQueryGroupList), metricscheduling);
+
+            } else {
+                    if ((DeploymentManagerImpl.starttime + 10000 < System.currentTimeMillis())) {
+                        metricscheduling = true;
+//                        undeploy(parentSiddhiappname);
+//                        log.info(parentSiddhiappname + "undeployed");
+                        return deploymentManager.deploy(new DistributedSiddhiQuery(topology.getName(),
+                                deployableQueryGroupList), metricscheduling);
+                    }
+            }
+
+        }
+
+
     }
 
     @Override

@@ -32,7 +32,7 @@ public interface DeploymentManager {
      * @param distributedSiddhiQuery distributed Siddhi app
      * @return the deployment status of the Siddhi app
      */
-    DeploymentStatus deploy(DistributedSiddhiQuery distributedSiddhiQuery);
+    DeploymentStatus deploy(DistributedSiddhiQuery distributedSiddhiQuery , boolean metricscheduling);
 
     /**
      * Un-deploy a distributed Siddhi app.

@@ -157,6 +157,7 @@ public class ServiceComponent {
                         try {
                             resourceAllocationAlgorithm = (ResourceAllocationAlgorithm)
                                     Class.forName(allocationAlgoClassName).newInstance();
+                            log.info("Set " + resourceAllocationAlgorithm);
                             if (log.isDebugEnabled()) {
                                 log.debug(allocationAlgoClassName + " chosen as Allocation Algorithm");
                             }
