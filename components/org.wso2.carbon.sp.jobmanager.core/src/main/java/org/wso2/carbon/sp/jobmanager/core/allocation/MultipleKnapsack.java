@@ -122,7 +122,7 @@ public class MultipleKnapsack {
         }
     }
 
-    /**
+    /**  
      * Method that solves the Multiple Knapsack Problem by a greedy approach.
      * @param partialSiddhiApps
      */
@@ -133,7 +133,7 @@ public class MultipleKnapsack {
             public int compare(PartialSiddhiApp i1, PartialSiddhiApp i2) {
                 if(i1.getlatencyBycpuUsage() > i2.getlatencyBycpuUsage()) {
                     return -1;
-                } else if (i2.getlatencyBycpuUsage() > i2.getlatencyBycpuUsage()) {
+                } else if (i2.getlatencyBycpuUsage() > i1.getlatencyBycpuUsage()) {
                     return 1;
                 } else {
                     return 0;
