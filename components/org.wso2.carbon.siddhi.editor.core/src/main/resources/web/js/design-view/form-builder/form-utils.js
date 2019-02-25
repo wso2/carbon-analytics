@@ -3182,47 +3182,6 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
         };
 
         /**
-         * @function to replace the saved attribute names (join-query-form)
-         */
-        FormUtils.prototype.replaceAttributeNames = function (attributes, queryInput, attributeName) {
-            var self = this;
-            var replacedAttributes = [];
-            var replacedAttribute;
-            if (attributeName === Constants.GROUP_BY) {
-                _.forEach(attributes, function (attribute) {
-                    replacedAttribute = self.replaceNameWithSourceFrom(attribute, queryInput);
-                    replacedAttributes.push(replacedAttribute)
-                });
-            } else if (attributeName === Constants.ORDER_BY) {
-                _.forEach(attributes, function (attribute) {
-                    replacedAttribute = self.replaceNameWithSourceFrom(attribute.getValue(), queryInput)
-                    replacedAttributes.push(replacedAttribute)
-                });
-            }
-            return replacedAttributes;
-        };
-
-        /**
-         * @function to replace the saved attribute name from
-         * <source-as>.attributeName to <source-name>.attributeName
-         */
-        FormUtils.prototype.replaceNameWithSourceFrom = function (attribute, queryInput) {
-            var replacedAttribute;
-            var splitAttribute = attribute.split('.');
-            var sourceAs = splitAttribute[0].trim();
-            var attributeSourceAs;
-            if (sourceAs == queryInput.getLeft().getAs()) {
-                attributeSourceAs = queryInput.getLeft().getFrom();
-            } else if (sourceAs == queryInput.getRight().getAs()) {
-                attributeSourceAs = queryInput.getRight().getFrom();
-            } else {
-                attributeSourceAs = sourceAs;
-            }
-            replacedAttribute = attributeSourceAs + "." + splitAttribute[1].trim();
-            return replacedAttribute;
-        };
-
-        /**
          * @function to add event listeners for attribute section
          */
         FormUtils.prototype.addEventListenersForAttributeDiv = function () {

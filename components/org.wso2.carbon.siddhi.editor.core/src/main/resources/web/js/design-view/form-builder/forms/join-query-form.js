@@ -248,6 +248,46 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
         };
 
         /**
+		 * @function to replace the saved attribute names (join-query-form)
+		 */
+        var replaceAttributeNames = function (attributes, queryInput, attributeName) {
+            var replacedAttributes = [];
+            var replacedAttribute;
+            if (attributeName === Constants.GROUP_BY) {
+                _.forEach(attributes, function (attribute) {
+                    replacedAttribute = replaceNameWithSourceFrom(attribute, queryInput);
+                    replacedAttributes.push(replacedAttribute)
+                });
+            } else if (attributeName === Constants.ORDER_BY) {
+                _.forEach(attributes, function (attribute) {
+                    replacedAttribute = replaceNameWithSourceFrom(attribute.getValue(), queryInput)
+                    replacedAttributes.push(replacedAttribute)
+                });
+            }
+            return replacedAttributes;
+        };
+
+		/**
+		 * @function to replace the saved attribute name from
+		 * <source-as>.attributeName to <source-name>.attributeName
+		 */
+        var replaceNameWithSourceFrom = function (attribute, queryInput) {
+            var replacedAttribute;
+            var splitAttribute = attribute.split('.');
+            var sourceAs = splitAttribute[0].trim();
+            var attributeSourceAs;
+            if (sourceAs == queryInput.getLeft().getAs()) {
+                attributeSourceAs = queryInput.getLeft().getFrom();
+            } else if (sourceAs == queryInput.getRight().getAs()) {
+                attributeSourceAs = queryInput.getRight().getFrom();
+            } else {
+                attributeSourceAs = sourceAs;
+            }
+            replacedAttribute = attributeSourceAs + "." + splitAttribute[1].trim();
+            return replacedAttribute;
+        };
+
+        /**
          * @function to add autocompletion
          */
         var addAutoCompletion = function (self, QUERY_CONDITION_SYNTAX, incrementalAggregator) {
@@ -475,7 +515,7 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
                         $('.on-condition-content').hide();
                     }
                     if (groupBy && groupBy.length != 0) {
-                        var replacedGroupByAttributes = self.formUtils.replaceAttributeNames(groupByAttributes.slice(),
+                        var replacedGroupByAttributes = replaceAttributeNames(groupByAttributes.slice(),
                             queryInput, Constants.GROUP_BY)
                         self.formUtils.mapUserGroupBy(replacedGroupByAttributes);
                         self.formUtils.preventMultipleSelection(Constants.GROUP_BY);
@@ -484,7 +524,7 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
                         $('.group-by-content').hide();
                     }
                     if (orderBy && orderBy.length != 0) {
-                        var replacedOrderByAttributes = self.formUtils.replaceAttributeNames(orderByAttributes.slice(),
+                        var replacedOrderByAttributes = replaceAttributeNames(orderByAttributes.slice(),
                             queryInput, Constants.ORDER_BY)
                         self.formUtils.mapUserOrderBy(replacedOrderByAttributes, orderByAttributes);
                         self.formUtils.preventMultipleSelection(Constants.ORDER_BY);
