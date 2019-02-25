@@ -583,12 +583,33 @@ body.sticky-footer {
 
 /*Popover element changes*/
 .popOver {
-  width: 235px;
-  max-width: 235px;
+  width: 400px;
+  max-width: 450px;
   top: -54.5px;
   left: 53px;
   display: block;
   z-index: 300;
+  padding: 1px 1px;
+  border:2px red solid;
+  border-radius: 7px;
+}
+.popover-footer {
+  margin: 3px -9px 1px 0px;
+  padding: 2px 12px 32px;;
+}
+
+.popover-body-message {
+  text-align: justify;
+  margin: -46px 0px 0px 55px;
+  padding: 5px 1px 0px 1px;
+}
+
+.popover-alert-icon {
+  text-align: left;
+  margin: -7px 327px 1px 1px;
+  padding: 1px 0px 1px 3px;
+  font-size: 44px;
+  color: red;
 }
 
 h3.popover-title {
@@ -596,23 +617,32 @@ h3.popover-title {
   font-weight: 400;
 }
 
-.btn.no {
+.btn.no,.btn.yes {
   background-color: #f57e30;
   color: black;
+  border: 1px solid;
+  border-color: #f57e30;
 
 }
 
 .btn.no:hover {
+  background-color: #ff8d00;
   color: white;
 }
 
-.btn.yes {
-  background-color: white;
-  color: #000000;
+.btn.no:focus {
+  background-color: #ff8d00;
+  color: white;
+  border: 1px solid;
 }
 
 .btn.yes:hover {
-  background-color: #f57e30;
+  background-color: #ff8d00;
+  color: white;
+}
+
+.btn.yes:focus {
+  background-color: #ff8d00;
   color: white;
 }
 
@@ -620,6 +650,7 @@ h3.popover-title {
   padding: 1px 25px 1px 25px;
   float: right;
   margin: 5px;
+  border-radius: 5px;
 }
 
 .jtk-overlay {

@@ -978,14 +978,16 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
                     function popOverForConnector() {
                         $('#' + connectionObject.id).popover({
                             trigger: 'focus',
-                            title: 'Are you sure you want to delete?',
+                            title: 'Confirmation',
                             html: true,
                             content: function () {
                                 return $('.pop-over').html();
 
                             }
                         });
+                        $('#' + connectionObject.id).off();
                         $('#' + connectionObject.id).popover("show");
+                        $('.no').focus();
                         $(".overlayed-container ").fadeTo(200, 1);
                         // Custom jQuery to hide popover on click of the close button
                         $("#" + connectionObject.id).siblings(".popover").on("click", ".popover-footer .btn.yes",
@@ -1013,6 +1015,41 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
                                     close_icon_overlay.setVisible(false);
                                 }
                             });
+                        });
+                        $(".no").on("keyup", function (e) {
+                            if (e.which === 27 && $("#" + connectionObject.id).popover()) {
+                                $("#" + connectionObject.id).popover('hide');
+                                $(".overlayed-container ").fadeOut(200);
+                                close_icon_overlay.setVisible(false);
+                            }
+                        });
+                        //Navigation using arrow keys
+                        $(".no").on('keydown', function (e) {
+                            if (e.keyCode == 39) {
+                                $('.yes').focus();
+                            }
+                        });
+                        $(".yes").on('keydown', function (e) {
+                            if (e.keyCode == 37) {
+                                $('.no').focus();
+                            }
+                        });
+                        $(".no").on('keydown', function (e) {
+                            if (e.keyCode == 9) {
+                                e.preventDefault();
+                            }
+                            if (e.keyCode == 13) {
+                                e.stopPropagation();
+                            }
+                        });
+                        //Stop tab propagation and enter propagation when popover showed
+                        $(".yes").on('keydown', function (e) {
+                            if (e.keyCode == 9) {
+                                e.preventDefault();
+                            }
+                            if (e.keyCode == 13) {
+                                e.stopPropagation();
+                            }
                         });
                     }
 

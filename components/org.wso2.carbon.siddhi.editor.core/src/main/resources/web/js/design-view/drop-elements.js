@@ -1403,13 +1403,14 @@ define(['require', 'log', 'lodash', 'jquery', 'partition', 'stream', 'query', 'f
                 $(dataObj).popover({
                     trigger: 'focus',
                     placement: 'auto',
-                    title: 'Are you sure you want to delete?',
+                    title: 'Confirmation',
                     html: true,
                     content: function () {
                         return $('.pop-over').html();
                     }
                 });
                 $(dataObj).popover("show");
+                $('.no').focus();
                 $(".overlayed-container ").fadeTo(200, 1);
                 element.on("click", ".popover-footer .btn.no", function () {
                     $(".overlayed-container ").fadeOut(200);
@@ -1428,7 +1429,6 @@ define(['require', 'log', 'lodash', 'jquery', 'partition', 'stream', 'query', 'f
                     $(".overlayed-container ").fadeOut(200);
                 });
                 // Dismiss the pop-over by clicking outside
-                $('.overlayed-container ').off('click');
                 $('.overlayed-container ').on('click', function (e) {
                     $('[data-toggle="popover"]').each(function () {
                         if (!$(this).is(e.target) && $(this).has(e.target).length === 0 && $('.popover').has(
@@ -1440,6 +1440,43 @@ define(['require', 'log', 'lodash', 'jquery', 'partition', 'stream', 'query', 'f
                         }
                     });
                 });
+                    //Dismiss the pop-over on Esc button
+                    $(".no").keyup(function (e) {
+                        if (e.which === 27) {
+                            $(dataObj).popover('hide');
+                            $(".overlayed-container ").fadeOut(200);
+                            $('#' + newElement[0].id).removeClass("selected-element");
+                            $('#' + newElement[0].id).children().removeClass("selected-element");
+                        }
+                    });
+                    //Popver navigation using arrow keys
+                    $(".no").on('keydown', function (e) {
+                        if (e.keyCode == 39) {
+                            $('.yes').focus();
+                        }
+                    });
+                    $(".yes").on('keydown', function (e) {
+                        if (e.keyCode == 37) {
+                            $('.no').focus();
+                        }
+                    });
+                    $(".no").on('keydown', function (e) {
+                        if (e.keyCode == 9) {
+                            e.preventDefault();
+                        }
+                        if (e.keyCode == 13) {
+                            e.stopPropagation();
+                        }
+                    });
+                    //Stop tab propagation and enter propagation when popover showed
+                    $(".yes").on('keydown', function (e) {
+                        if (e.keyCode == 9) {
+                            e.preventDefault();
+                        }
+                        if (e.keyCode == 13) {
+                            e.stopPropagation();
+                        }
+                    });
             }
 
             //register event listener to remove the element when the close icon is clicked
@@ -1466,6 +1503,10 @@ define(['require', 'log', 'lodash', 'jquery', 'partition', 'stream', 'query', 'f
             });
 
             newElement.on('keydown', function (key) {
+                if ( key.keyCode == 46 || key.keyCode == 8 ) {
+                    $('#' + newElement[0].id).addClass("selected-element");
+                    showPopOver(this.children.item(1), newElement);
+                }
                 if ((key.keyCode = MAC_COMMAND_KEY && key.keyCode == MAC_DELETE_KEY) || key.keyCode == DELETE_KEY) {
                     $('#' + newElement[0].id).addClass('selected-element');
                     showPopOver(this.children.item(1), newElement);
