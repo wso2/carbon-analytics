@@ -590,8 +590,6 @@ body.sticky-footer {
   display: block;
   z-index: 300;
   padding: 1px 1px;
-  border:2px red solid;
-  border-radius: 7px;
 }
 .popover-footer {
   margin: 3px -9px 1px 0px;
@@ -617,40 +615,43 @@ h3.popover-title {
   font-weight: 400;
 }
 
-.btn.no,.btn.yes {
+.btn.no {
   background-color: #f57e30;
-  color: black;
+  color: #000000;
   border: 1px solid;
   border-color: #f57e30;
 
 }
+.btn.yes {
+  background-color: #b3b2b2;
+  color: #000000;
+  border: 1px solid #b3b2b2;
+  border-color: #b3b2b2;
 
-.btn.no:hover {
-  background-color: #ff8d00;
-  color: white;
 }
 
-.btn.no:focus {
-  background-color: #ff8d00;
-  color: white;
-  border: 1px solid;
+.btn.no:hover {
+  background-color: #e7620b;
+  color: #000000;
 }
 
 .btn.yes:hover {
-  background-color: #ff8d00;
-  color: white;
+  background-color: #a4a0a0;
+  color: #000000;
+}
+
+.btn.no:focus {
+  border: 2px solid #ff9f60;
 }
 
 .btn.yes:focus {
-  background-color: #ff8d00;
-  color: white;
+  border: 2px solid #9e9a9a;
 }
 
 .btn-xs {
   padding: 1px 25px 1px 25px;
   float: right;
   margin: 5px;
-  border-radius: 5px;
 }
 
 .jtk-overlay {

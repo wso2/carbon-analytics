@@ -33,6 +33,10 @@ define(['require', 'log', 'lodash', 'jquery', 'partition', 'stream', 'query', 'f
         const DELETE_KEY = 46;
         const MAC_COMMAND_KEY = 91;
         const MAC_DELETE_KEY = 8;
+        const LEFT_ARROW_KEY = 37;
+        const RIGHT_ARROW_KEY = 39;
+        const ESCAPE_KEY = 27;
+        const TAB_KEY = 9;
 
         var DropElements = function (options) {
             var errorMessage = 'unable to find design view container';
@@ -1442,7 +1446,7 @@ define(['require', 'log', 'lodash', 'jquery', 'partition', 'stream', 'query', 'f
                 });
                     //Dismiss the pop-over on Esc button
                     $(".no").keyup(function (e) {
-                        if (e.which === 27) {
+                        if (e.which === ESCAPE_KEY) {
                             $(dataObj).popover('hide');
                             $(".overlayed-container ").fadeOut(200);
                             $('#' + newElement[0].id).removeClass("selected-element");
@@ -1451,29 +1455,29 @@ define(['require', 'log', 'lodash', 'jquery', 'partition', 'stream', 'query', 'f
                     });
                     //Popver navigation using arrow keys
                     $(".no").on('keydown', function (e) {
-                        if (e.keyCode == 39) {
+                        if (e.keyCode == RIGHT_ARROW_KEY) {
                             $('.yes').focus();
                         }
                     });
                     $(".yes").on('keydown', function (e) {
-                        if (e.keyCode == 37) {
+                        if (e.keyCode == LEFT_ARROW_KEY) {
                             $('.no').focus();
                         }
                     });
                     $(".no").on('keydown', function (e) {
-                        if (e.keyCode == 9) {
+                        if (e.keyCode == TAB_KEY) {
                             e.preventDefault();
                         }
-                        if (e.keyCode == 13) {
+                        if (e.keyCode == ENTER_KEY) {
                             e.stopPropagation();
                         }
                     });
                     //Stop tab propagation and enter propagation when popover showed
                     $(".yes").on('keydown', function (e) {
-                        if (e.keyCode == 9) {
+                        if (e.keyCode == TAB_KEY) {
                             e.preventDefault();
                         }
-                        if (e.keyCode == 13) {
+                        if (e.keyCode == ENTER_KEY) {
                             e.stopPropagation();
                         }
                     });
@@ -1503,11 +1507,7 @@ define(['require', 'log', 'lodash', 'jquery', 'partition', 'stream', 'query', 'f
             });
 
             newElement.on('keydown', function (key) {
-                if ( key.keyCode == 46 || key.keyCode == 8 ) {
-                    $('#' + newElement[0].id).addClass("selected-element");
-                    showPopOver(this.children.item(1), newElement);
-                }
-                if ((key.keyCode = MAC_COMMAND_KEY && key.keyCode == MAC_DELETE_KEY) || key.keyCode == DELETE_KEY) {
+                if ((key.keyCode == DELETE_KEY) || (key.keyCode = MAC_COMMAND_KEY && key.keyCode == MAC_DELETE_KEY)) {
                     $('#' + newElement[0].id).addClass('selected-element');
                     showPopOver(this.children.item(1), newElement);
                 }
