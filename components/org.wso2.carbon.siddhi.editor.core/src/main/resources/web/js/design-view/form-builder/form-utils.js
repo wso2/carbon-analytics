@@ -1432,6 +1432,51 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
         };
 
         /**
+         * @function to generate the group-by div
+         */
+        FormUtils.prototype.generateGroupByDiv = function (savedGroupBy, possibleAttributes) {
+            var self = this;
+            var groupByAttributes = [""];
+            if ((savedGroupBy && savedGroupBy.length != 0)) {
+                groupByAttributes = savedGroupBy.slice();
+            }
+            self.renderGroupBy(possibleAttributes, groupByAttributes);
+            self.addEventListenersForGroupByDiv(possibleAttributes);
+            self.removeDeleteButtonOfFirstValue();
+            self.checkForAttributeLength(possibleAttributes.length, Constants.GROUP_BY);
+
+            if (savedGroupBy && savedGroupBy.length != 0) {
+                self.mapUserGroupBy(savedGroupBy);
+                self.preventMultipleSelection(Constants.GROUP_BY);
+                $(".group-by-checkbox").prop("checked", true);
+            } else {
+                $('.group-by-content').hide();
+            }
+        };
+
+        /**
+         * @function to generate the order-by div
+         */
+        FormUtils.prototype.generateOrderByDiv = function (savedOrderBy, possibleAttributes) {
+            var self = this;
+            var orderByAttributes = [""];
+            if ((savedOrderBy && savedOrderBy.length != 0)) {
+                orderByAttributes = savedOrderBy.slice();
+            }
+            self.renderOrderBy(possibleAttributes, orderByAttributes);
+            self.addEventListenersForOrderByDiv(possibleAttributes);
+            self.removeDeleteButtonOfFirstValue();
+
+            if (savedOrderBy && savedOrderBy.length != 0) {
+                self.mapUserOrderBy(orderByAttributes);
+                self.preventMultipleSelection(Constants.ORDER_BY);
+                $(".order-by-checkbox").prop("checked", true);
+            } else {
+                $('.order-by-content').hide();
+            }
+        };
+
+        /**
          * @function to build the select object
          */
         FormUtils.prototype.buildAttributeSelection = function (elementType) {

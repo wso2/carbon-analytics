@@ -136,20 +136,6 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
         };
 
         /**
-         * @function to validate the condition input fields
-         */
-        var validateContent = function (className, self) {
-            var isErrorOccurred = false;
-            var conditionValue = $(className).find('input[type="text"]');
-            if (conditionValue.val() == "") {
-                self.formUtils.addErrorClass(conditionValue);
-                $(className).find('.error-message').text('Value is required');
-                isErrorOccurred = true;
-            }
-            return isErrorOccurred;
-        };
-
-        /**
          * @function to validate the left and right source
          */
         var validateSource = function (type, self) {
@@ -157,14 +143,26 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
             var sourceDiv = $('.define-' + type + '-source');
             var asContent = sourceDiv.find('.source-as-content');
             if (sourceDiv.find('.source-as-checkbox').is(':checked')) {
-                if (validateContent(asContent, self)) {
+                if (self.formUtils.validateContent(asContent)) {
                     isErrorOccurred = true;
                 }
             }
-            if (self.formUtils.validateStreamHandlers(type)) {
+            if (self.formUtils.validateStreamHandlers(sourceDiv)) {
                 isErrorOccurred = true;
             }
             return isErrorOccurred
+        };
+
+		/**
+		 * @function to get the defined source-as in a join query
+		 * @param {String} type left or right source
+		 */
+        var getSourceAs = function (type) {
+            if ($('.define-' + type + '-source').find('.source-as-checkbox').is(':checked')) {
+                return $('.define-' + type + '-source').find('.as-content-value').val().trim();
+            } else {
+                return $('.define-' + type + '-source').find('.source-selection').val().trim();
+            }
         };
 
         /**
@@ -189,9 +187,8 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
                 _.set(sourceOptions, 'isUnidirectional', false);
             }
             var joinSource = new joinQuerySource(sourceOptions);
-            var streamHandlers = self.formUtils.buildStreamHandlers(sourceDiv);
+            var streamHandlers = self.formUtils.buildStreamHandlers(sourceDiv.find('.define-stream-handler'));
             _.forEach(streamHandlers, function (streamHandlerOption) {
-                var streamHandlerObject = new StreamHandler(streamHandlerOption);
                 joinSource.addStreamHandler(streamHandlerObject);
             });
             return joinSource;
@@ -241,57 +238,17 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
             var secondElementAttributes = getPossibleAttributes(self,
                 $('.define-right-source').find('.source-selection').val());
             constructPossibleAttributes(firstElementAttributes,
-                self.formUtils.getSourceAs(Constants.LEFT), possibleAttributesWithSourceAs)
+                getSourceAs(Constants.LEFT), possibleAttributesWithSourceAs)
             constructPossibleAttributes(secondElementAttributes,
-                self.formUtils.getSourceAs(Constants.RIGHT), possibleAttributesWithSourceAs)
+                getSourceAs(Constants.RIGHT), possibleAttributesWithSourceAs)
             return possibleAttributesWithSourceAs;
-        };
-
-        /**
-		 * @function to replace the saved attribute names (join-query-form)
-		 */
-        var replaceAttributeNames = function (attributes, queryInput, attributeName) {
-            var replacedAttributes = [];
-            var replacedAttribute;
-            if (attributeName === Constants.GROUP_BY) {
-                _.forEach(attributes, function (attribute) {
-                    replacedAttribute = replaceNameWithSourceFrom(attribute, queryInput);
-                    replacedAttributes.push(replacedAttribute)
-                });
-            } else if (attributeName === Constants.ORDER_BY) {
-                _.forEach(attributes, function (attribute) {
-                    replacedAttribute = replaceNameWithSourceFrom(attribute.getValue(), queryInput)
-                    replacedAttributes.push(replacedAttribute)
-                });
-            }
-            return replacedAttributes;
-        };
-
-		/**
-		 * @function to replace the saved attribute name from
-		 * <source-as>.attributeName to <source-name>.attributeName
-		 */
-        var replaceNameWithSourceFrom = function (attribute, queryInput) {
-            var replacedAttribute;
-            var splitAttribute = attribute.split('.');
-            var sourceAs = splitAttribute[0].trim();
-            var attributeSourceAs;
-            if (sourceAs == queryInput.getLeft().getAs()) {
-                attributeSourceAs = queryInput.getLeft().getFrom();
-            } else if (sourceAs == queryInput.getRight().getAs()) {
-                attributeSourceAs = queryInput.getRight().getFrom();
-            } else {
-                attributeSourceAs = sourceAs;
-            }
-            replacedAttribute = attributeSourceAs + "." + splitAttribute[1].trim();
-            return replacedAttribute;
         };
 
         /**
          * @function to add autocompletion
          */
-        var addAutoCompletion = function (self, QUERY_CONDITION_SYNTAX, incrementalAggregator) {
-            var possibleAttributesWithSourceAs = getPossibleAttributesWithSourceAs(self);
+        var addAutoCompletion = function (self, QUERY_CONDITION_SYNTAX, incrementalAggregator,
+            possibleAttributesWithSourceAs) {
             var selectExpressionMatches = JSON.parse(JSON.stringify(possibleAttributesWithSourceAs));
             selectExpressionMatches = selectExpressionMatches.concat(incrementalAggregator);
             var onFilterHavingConditionMatches = JSON.parse(JSON.stringify(possibleAttributesWithSourceAs));
@@ -372,6 +329,7 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
                 var predefinedAnnotations = JSON.parse(JSON.stringify(self.configurationData.application.config.
                     query_predefined_annotations));
                 var incrementalAggregator = self.configurationData.application.config.incremental_aggregator;
+                var streamHandlerTypes = self.configurationData.application.config.join_query_stream_handler_types;
 
                 //render the join-query form template
                 var joinFormTemplate = Handlebars.compile($('#join-query-form-template').html());
@@ -436,8 +394,8 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
                 possibleSources.push(secondConnectedElement.name);
                 self.formUtils.renderLeftRightSource(Constants.LEFT);
                 self.formUtils.renderLeftRightSource(Constants.RIGHT);
-                self.formUtils.renderStreamHandler(Constants.LEFT, leftSourceSavedData);
-                self.formUtils.renderStreamHandler(Constants.RIGHT, rightSourceSavedData);
+                self.formUtils.renderStreamHandler(Constants.LEFT, leftSourceSavedData, streamHandlerTypes);
+                self.formUtils.renderStreamHandler(Constants.RIGHT, rightSourceSavedData, streamHandlerTypes);
                 self.formUtils.renderDropDown('.input-from-drop-down', possibleSources, Constants.SOURCE);
 
                 if (leftSourceSavedData && !rightSourceSavedData) {
@@ -466,7 +424,6 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
 
                 self.formUtils.mapStreamHandler(leftSourceSavedData, Constants.LEFT)
                 self.formUtils.mapStreamHandler(rightSourceSavedData, Constants.RIGHT)
-                self.formUtils.showDropDown();
 
                 //is unidirectional
                 mapUnidirectionalCheckbox(leftSourceSavedData, Constants.LEFT);
@@ -477,25 +434,6 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
                 var secondElementAttributes = getPossibleAttributes(self, secondConnectedElement.name);
                 constructPossibleAttributes(firstElementAttributes, firstConnectedElement.name, possibleAttributes)
                 constructPossibleAttributes(secondElementAttributes, secondConnectedElement.name, possibleAttributes)
-
-                //group-by
-                var groupByAttributes = [""];
-                if ((groupBy && groupBy.length != 0) && leftSourceSavedData && rightSourceSavedData) {
-                    groupByAttributes = groupBy.slice();
-                }
-                self.formUtils.renderGroupBy(possibleAttributes, groupByAttributes, 'define-query-group-by');
-                self.formUtils.addEventListenersForGroupByDiv(possibleAttributes);
-                self.formUtils.removeDeleteButtonOfFirstValue();
-                self.formUtils.checkForAttributeLength(possibleAttributes.length);
-
-                //order-by
-                var orderByAttributes = [""];
-                if ((orderBy && orderBy.length != 0) && leftSourceSavedData && rightSourceSavedData) {
-                    orderByAttributes = orderBy.slice();
-                }
-                self.formUtils.renderOrderBy(possibleAttributes, orderByAttributes, 'define-order-by-attributes');
-                self.formUtils.addEventListenersForOrderByDiv(possibleAttributes);
-                self.formUtils.removeDeleteButtonOfFirstValue();
 
                 //projection
                 self.formUtils.selectQueryProjection(select, outputElementName);
@@ -514,30 +452,16 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
                     } else {
                         $('.on-condition-content').hide();
                     }
-                    if (groupBy && groupBy.length != 0) {
-                        var replacedGroupByAttributes = replaceAttributeNames(groupByAttributes.slice(),
-                            queryInput, Constants.GROUP_BY)
-                        self.formUtils.mapUserGroupBy(replacedGroupByAttributes);
-                        self.formUtils.preventMultipleSelection(Constants.GROUP_BY);
-                        $(".group-by-checkbox").prop("checked", true);
-                    } else {
-                        $('.group-by-content').hide();
-                    }
-                    if (orderBy && orderBy.length != 0) {
-                        var replacedOrderByAttributes = replaceAttributeNames(orderByAttributes.slice(),
-                            queryInput, Constants.ORDER_BY)
-                        self.formUtils.mapUserOrderBy(replacedOrderByAttributes, orderByAttributes);
-                        self.formUtils.preventMultipleSelection(Constants.ORDER_BY);
-                        $(".order-by-checkbox").prop("checked", true);
-                    } else {
-                        $('.order-by-content').hide();
-                    }
                 } else {
                     $('.post-filter-condition-content').hide();
-                    $('.group-by-content').hide();
-                    $('.order-by-content').hide();
+                    groupBy = [];
+                    orderBy = [];
                     $('.on-condition-content').hide();
                 }
+
+                var possibleAttributesWithSourceAs = getPossibleAttributesWithSourceAs(self);
+                self.formUtils.generateGroupByDiv(groupBy, possibleAttributesWithSourceAs);
+                self.formUtils.generateOrderByDiv(orderBy, possibleAttributesWithSourceAs);
 
                 if (limit) {
                     $('.limit-value').val(limit);
@@ -565,15 +489,18 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
                     }
                 }
                 //autocompletion
-                addAutoCompletion(self, QUERY_CONDITION_SYNTAX, incrementalAggregator);
+                addAutoCompletion(self, QUERY_CONDITION_SYNTAX, incrementalAggregator, possibleAttributesWithSourceAs);
 
                 $('.join-query-form-container').on('blur', '.as-content-value', function () {
-                    addAutoCompletion(self, QUERY_CONDITION_SYNTAX, incrementalAggregator);
+                    var possibleAttributesWithSourceAs = getPossibleAttributesWithSourceAs(self);
+                    addAutoCompletion(self, QUERY_CONDITION_SYNTAX, incrementalAggregator, possibleAttributesWithSourceAs);
+                    self.formUtils.generateGroupByDiv(groupBy, possibleAttributesWithSourceAs);
+                    self.formUtils.generateOrderByDiv(orderBy, possibleAttributesWithSourceAs);
                 });
 
                 //to add filter
                 $('.define-stream-handler').on('click', '.btn-add-filter', function () {
-                    var sourceDiv = '.define-' + self.formUtils.getSourceDiv(Constants.JOIN_QUERY, $(this)) + '-source';
+                    var sourceDiv = self.formUtils.getSourceDiv($(this));
                     self.formUtils.addNewStreamHandler(sourceDiv, Constants.FILTER);
                     addAutoCompletion(self, QUERY_CONDITION_SYNTAX, incrementalAggregator);
                 });
@@ -610,28 +537,28 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
                     }
 
                     if ($('.on-condition-checkbox').is(':checked')) {
-                        if (validateContent('.on-condition-content', self)) {
+                        if (self.formUtils.validateContent('.on-condition-content')) {
                             isErrorOccurred = true;
                             return;
                         }
                     }
 
                     if ($('.post-filter-checkbox').is(':checked')) {
-                        if (validateContent('.post-filter-condition-content', self)) {
+                        if (self.formUtils.validateContent('.post-filter-condition-content')) {
                             isErrorOccurred = true;
                             return;
                         }
                     }
 
                     if ($('.limit-checkbox').is(':checked')) {
-                        if (validateContent('.limit-content', self)) {
+                        if (self.formUtils.validateContent('.limit-content')) {
                             isErrorOccurred = true;
                             return;
                         }
                     }
 
                     if ($('.rate-limiting-checkbox').is(':checked')) {
-                        if (validateContent('.rate-limiting-content', self)) {
+                        if (self.formUtils.validateContent('.rate-limiting-content')) {
                             isErrorOccurred = true;
                             return;
                         }
@@ -644,11 +571,11 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
 
                     if (firstConnectedElement.type.toLowerCase() === Constants.AGGREGATION ||
                         secondConnectedElement.type.toLowerCase() === Constants.AGGREGATION) {
-                        if (validateContent('.per-condition-content', self)) {
+                        if (self.formUtils.validateContent('.per-condition-content')) {
                             isErrorOccurred = true;
                             return;
                         }
-                        if (validateContent('.within-condition-content', self)) {
+                        if (self.formUtils.validateContent('.within-condition-content')) {
                             isErrorOccurred = true;
                             return;
                         }
@@ -687,7 +614,7 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
                         clickedElement.addQueryName(queryName);
 
                         if ($('.group-by-checkbox').is(':checked')) {
-                            var groupByAttributes = self.formUtils.buildQueryGroupBy();
+                            var groupByAttributes = self.formUtils.buildGroupBy();
                             clickedElement.setGroupBy(groupByAttributes);
                         } else {
                             clickedElement.setGroupBy(undefined);
@@ -695,7 +622,7 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
 
                         clickedElement.clearOrderByValueList()
                         if ($('.order-by-checkbox').is(':checked')) {
-                            var orderByAttributes = self.formUtils.buildQueryOrderBy();
+                            var orderByAttributes = self.formUtils.buildOrderBy();
                             _.forEach(orderByAttributes, function (attribute) {
                                 var orderByValueObject = new QueryOrderByValue(attribute);
                                 clickedElement.addOrderByValue(orderByValueObject);

@@ -371,24 +371,7 @@ define(['require', 'log', 'jquery', 'lodash', 'aggregateByTimePeriod', 'querySel
                 self.formUtils.selectAggregateProjection(select)
                 self.formUtils.addEventListenersForSelectionDiv();
 
-                var groupByAttributes = [];
-                if (!groupBy || (groupBy && groupBy.length == 0)) {
-                    groupByAttributes.push("");
-                } else {
-                    groupByAttributes = groupBy.slice();
-                }
-                self.formUtils.renderGroupBy(possibleAttributes, groupByAttributes, 'define-aggregate-group-by');
-                self.formUtils.addEventListenersForGroupByDiv(possibleAttributes);
-                self.formUtils.removeDeleteButtonOfFirstValue();
-                self.formUtils.checkForAttributeLength(possibleAttributes.length, Constants.GROUP_BY);
-
-                if (groupBy && groupBy.length != 0) {
-                    self.formUtils.mapUserGroupBy(groupByAttributes);
-                    self.formUtils.preventMultipleSelection(Constants.GROUP_BY);
-                    $(".group-by-checkbox").prop("checked", true);
-                } else {
-                    $('.group-by-content').hide();
-                }
+				self.formUtils.generateGroupByDiv(groupBy, possibleAttributes);
 
                 self.formUtils.renderDropDown('.aggregate-by-attribute-content', possibleAttributes,
                     Constants.ATTRIBUTE);
