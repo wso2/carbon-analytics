@@ -16,7 +16,7 @@
  * under the License.
  */
 
- .source-view-enabled {
+.source-view-enabled {
     height: 100%;
 }
 
@@ -47,6 +47,7 @@
 .toggle-button-text {
     padding-left: 5px;
 }
+
 .grid-container {
     /* Temp */
     width: calc(100% - 67px);
@@ -234,7 +235,7 @@
     margin-right: 5px;
 }
 
-input{
+input {
 . form-control input-md;
     font-family: inherit;
     font-size: inherit;
@@ -348,7 +349,7 @@ td {
     margin-right: 0;
 }
 
-.partition{
+.partition {
     margin-right: 6px;
 }
 
@@ -464,7 +465,7 @@ h3,
     font-size: 16px;
 }
 
-#siddhi-app-desc-node{
+#siddhi-app-desc-node {
     position: fixed;
     right: 60px;
     top: 97px;
@@ -475,8 +476,9 @@ h3,
 .design-view-form-content h3 {
     font-size: 14px;
 }
+
 .design-view-form-content h4 {
-	font-size: 12px;
+    font-size: 12px;
 }
 
 .design-view-form-content .form-control {
@@ -736,8 +738,8 @@ a.list-group-item, button.list-group-item {
 
 .design-view-form-content .attr-nav,
 .design-view-form-content .attr-content {
-	display:inline-block;
-	float:left;
+	display: inline-block;
+	float: left;
 }
 
 .design-view-form-content .attribute {
@@ -746,30 +748,30 @@ a.list-group-item, button.list-group-item {
 
 .design-view-form-content .annotation > a > i.jstree-checkbox,
 .design-view-form-content .annotation > .jstree-clicked > i.jstree-checkbox,
-.design-view-form-content .annotation > i.jstree-checkbox   {
-	display:none;
+.design-view-form-content .annotation > i.jstree-checkbox {
+	display: none;
 }
 
 .design-view-form-content .annotation-key > a > i.jstree-checkbox,
 .design-view-form-content .annotation-key > .jstree-clicked > i.jstree-checkbox,
-.design-view-form-content .annotation-key > i.jstree-checkbox   {
-	display:none;
+.design-view-form-content .annotation-key > i.jstree-checkbox {
+	display: none;
 }
 
 .design-view-form-content .annotation-value > a > i.jstree-checkbox,
 .design-view-form-content .annotation-value > .jstree-clicked > i.jstree-checkbox,
-.design-view-form-content .annotation-value > i.jstree-checkbox   {
-	display:none;
+.design-view-form-content .annotation-value > i.jstree-checkbox {
+	display: none;
 }
 
 .design-view-form-content .mandatory-key > a > i.jstree-checkbox,
-.design-view-form-content .mandatory-key > .jstree-clicked > i.jstree-checkbox  {
-	display:none;
+.design-view-form-content .mandatory-key > .jstree-clicked > i.jstree-checkbox {
+	display: none;
 }
 
 .design-view-form-content .mandatory-annotation > a > i.jstree-checkbox,
-.design-view-form-content .mandatory-annotation > .jstree-clicked > i.jstree-checkbox  {
-	display:none;
+.design-view-form-content .mandatory-annotation > .jstree-clicked > i.jstree-checkbox {
+	display: none;
 }
 
 .design-view-form-content .mandatory-annotation > a.jstree-hovered,
@@ -782,7 +784,7 @@ a.list-group-item, button.list-group-item {
 }
 
 .design-view-form-content .optional-annotation > a.jstree-hovered,
-.design-view-form-content .mandatory-key > a.jstree-hovered{
+.design-view-form-content .mandatory-key > a.jstree-hovered {
 	cursor: default;
 	color: #ccc;
 	background: transparent;
@@ -806,11 +808,11 @@ a.list-group-item, button.list-group-item {
 }
 
 .design-view-form-content .cust-option-key {
-	margin-left:20px;
+	margin-left: 20px;
 }
 
 .design-view-form-content .cust-option-value {
-	margin-left: 10px;
+    margin-left: 10px;
 }
 
 .stream-form-container {
@@ -828,8 +830,8 @@ a.list-group-item, button.list-group-item {
 .trigger-form-container,
 .function-form-container,
 .partition-form-container {
-	float:left;
-	display:inline-block;
+	float: left;
+	display: inline-block;
 	padding: 5px;
 }
 
@@ -860,7 +862,7 @@ a.list-group-item, button.list-group-item {
 }
 
 .design-view-form-content .mapper-div {
-	width: 25% ;
+	width: 25%;
 }
 
 .design-view-form-content .store-div {
@@ -902,7 +904,7 @@ a.list-group-item, button.list-group-item {
 }
 
 .design-view-form-content input[type="checkbox"],
-.design-view-form-content input[type="radio"]{
+.design-view-form-content input[type="radio"] {
 	margin: 0px 5px 0px 0;
 	vertical-align: middle;
 }
@@ -992,7 +994,7 @@ a.list-group-item, button.list-group-item {
 }
 
 .selector {
-    position: fixed;
+    position: absolute;
     background: rgba(0, 0, 255, 0.1) none repeat scroll 0% 0%;
     border: 1px solid rgba(0, 0, 255, 0.45);
     display: none;
@@ -1005,4 +1007,19 @@ textarea {
     width: 95%;
     background: #424242;
     min-height: 65px;
+}
+
+.focused-container {
+    border-color: #4af;
+    box-shadow: 0 0 1px 2px #4af !important;
+}
+
+.selected-container {
+    border-color: #4af;
+    box-shadow: 0 0 1px 1px #4af;
+}
+
+.selected-button{
+    color: #ffffff !important;
+    transition: 0.15s !important;
 }
