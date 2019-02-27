@@ -18,10 +18,10 @@
 
 define(['require', 'log', 'jquery', 'lodash', 'backbone', 'menu_bar', 'tool_bar', 'command', 'workspace',
         'app/tab/service-tab-list', 'event_simulator', 'app/output-console/service-console-list-manager',
-        'nano_scroller','guide', 'operator_finder'],
+        'nano_scroller','guide','workspace/file', 'operator_finder'],
 
     function (require, log, $, _, Backbone, MenuBar, ToolBar, CommandManager, Workspace, TabController,
-              EventSimulator, OutputController,NanoScroller, Guide, OperatorFinder) {
+              EventSimulator, OutputController,NanoScroller, Guide, File, OperatorFinder) {
 
         var Application = Backbone.View.extend(
             /** @lends Application.prototype */
@@ -142,6 +142,14 @@ define(['require', 'log', 'jquery', 'lodash', 'backbone', 'menu_bar', 'tool_bar'
 
                 displayInitialView: function () {
                     this.workspaceManager.displayInitialTab();
+                },
+
+                runInitialGuide: function (){
+                    var isFreshUser = window.localStorage.getItem('guideFileNameIncr');
+                    if(isFreshUser == null) {
+                        this.workspaceManager.runGuide();
+                        window.localStorage.setItem('guideFileNameIncr', "0");
+                    }
                 },
 
                 isRunningOnMacOS: function(){
