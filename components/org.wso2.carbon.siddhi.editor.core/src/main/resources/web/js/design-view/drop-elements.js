@@ -1507,7 +1507,7 @@ define(['require', 'log', 'lodash', 'jquery', 'partition', 'stream', 'query', 'f
             });
 
             newElement.on('keydown', function (key) {
-                if ((key.keyCode == DELETE_KEY) || (key.keyCode = MAC_COMMAND_KEY && key.keyCode == MAC_DELETE_KEY)) {
+                if ((key.keyCode == DELETE_KEY) || (key.keyCode == MAC_COMMAND_KEY && key.keyCode == MAC_DELETE_KEY)) {
                     $('#' + newElement[0].id).addClass('selected-element');
                     showPopOver(this.children.item(1), newElement);
                 }
