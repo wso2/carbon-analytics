@@ -189,7 +189,7 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
             var joinSource = new joinQuerySource(sourceOptions);
             var streamHandlers = self.formUtils.buildStreamHandlers(sourceDiv.find('.define-stream-handler'));
             _.forEach(streamHandlers, function (streamHandlerOption) {
-                joinSource.addStreamHandler(streamHandlerObject);
+                joinSource.addStreamHandler(streamHandlerOption);
             });
             return joinSource;
         };
@@ -513,7 +513,7 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
                     $('.required-input-field').removeClass('required-input-field');
                     var isErrorOccurred = false;
 
-                    var queryName = $('.query-name').val()
+                    var queryName = $('.query-name').val().trim();
                     var isQueryNameUsed
                         = self.formUtils.isQueryDefinitionNameUsed(queryName, id);
                     if (isQueryNameUsed) {
@@ -725,7 +725,7 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
                         var queryToolTip = self.formUtils.getTooltip(clickedElement, Constants.JOIN_QUERY);
                         $('#' + id).prop('title', queryToolTip);
                         var textNode = $('#' + clickedElement.getId()).find('.joinQueryNameNode');
-                        textNode.html("Join-Query");
+                        textNode.html(queryName);
 
                         // close the form window
                         self.consoleListManager.removeFormConsole(formConsole);
