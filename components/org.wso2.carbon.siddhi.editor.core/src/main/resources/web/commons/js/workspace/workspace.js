@@ -682,6 +682,11 @@ define(['ace/ace', 'jquery', 'lodash', 'log','dialogs','./service-client','welco
                 return string.endsWith(".siddhi");
             }
 
+            this.runGuide = function runGuide(){
+                log.debug("start: rendering hint guide");
+                app.guide.start();
+                log.debug("end: rendering hint guide");
+            };
 
             app.commandManager.registerHandler('create-new-tab', this.createNewTab);
 
@@ -746,8 +751,8 @@ define(['ace/ace', 'jquery', 'lodash', 'log','dialogs','./service-client','welco
             app.commandManager.registerHandler('query-store', this.openQueryStore, this);
 
             // //Run hint tour
-            app.commandManager.registerHandler('hint-tour', app.runFullGuide , app);
-            app.commandManager.registerHandler('simulate-guide', app.runSimulateGuide , app);
+            app.commandManager.registerHandler('hint-tour', this.runGuide , this);
+
         }
     });
 

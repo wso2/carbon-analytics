@@ -128,24 +128,6 @@ define(([],function (){
                     }
                 },
                 disabled: false
-            },
-            {
-                id: "simulateGuide",
-                label: "Simulate Guide",
-                command: {
-                    id: "simulate-guide",
-                    labels:{
-                        mac: {
-                            key: "",
-                            label: ""
-                        },
-                        other: {
-                            key: "",
-                            label: ""
-                        }
-                    }
-                },
-                disabled: false
             }
         ]
 

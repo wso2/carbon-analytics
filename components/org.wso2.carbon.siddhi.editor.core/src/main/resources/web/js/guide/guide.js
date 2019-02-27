@@ -16,32 +16,29 @@
  * under the License.
  */
 
-//Todo
-//session check workspace
-/*
-check the flag for the first user
-Make a new option as help
-css button change
-highlighted area concern
-three options from the popup
-script changes
-don't delete the file
- */
 define(['ace/ace', 'jquery', 'lodash', 'log', 'enjoyhint', 'designViewUtils'],
     function (ace, $, _, log, EnjoyHintLib, DesignViewUtils) {
 
         /**
          * Arg: application instance
          */
+
+        var instanceVal = null;
+        var fileNameIncr = 0;
+
         var Guide = function (application) {
 
-            var app = application;
-            this.tabList = app.tabController.getTabList();
-            this.instanceVal;
-            this.tabLength;
             var self = this;
-            var workspaceServiceURL = app.config.services.workspace.endpoint;
-            var saveServiceURL = workspaceServiceURL + "/write";
+            var app = application;
+            self.tabList = app.tabController.getTabList();
+            var tempFileName = 'SweetFactory';
+
+            //URLs for AJAX requests
+            self.workspaceServiceURL = app.config.services.workspace.endpoint;
+            var checkFileURL = self.workspaceServiceURL + "/exists/workspace";
+            var saveServiceURL = self.workspaceServiceURL + "/write";
+
+            //String for the "write" API call from the simulation tour
             var content = '@App:name(\'SweetFactory\')\n' +
                 '@App:description(\'Description of the plan\')\n' +
                 '\n' +
@@ -57,19 +54,45 @@ define(['ace/ace', 'jquery', 'lodash', 'log', 'enjoyhint', 'designViewUtils'],
                 'select count() as TotalProduction \n' +
                 'insert into TotalProductionStream;\n';
 
-            var payload = "configName=" + btoa('SweetFactory.siddhi') + "&config=" + (btoa(content));
+            //Dialog box to choose tour options
+            var GuideDialog = $(
+                "<div class='modal fade' id='guideDialog' tabindex='-1' role='dialog' aria-tydden='true'>" +
+                "<div class='modal-dialog file-dialog' role='document'>" +
+                "<div class='modal-content' style='padding-bottom: 18px'>" +
+                "<div class='modal-header'>" +
+                "<button type='button' class='close' data-dismiss='modal' aria-label='Close'>" +
+                "<span aria-hidden='true'>&times;</span>" +
+                "</button>" +
+                "<h4 class='modal-title file-dialog-title' id='whereToStart'>Welcome to the Stream processor tour guide</h4>" +
+                "<hr class='style1'>"+
+                "<div class='divider'/>" +
+                "</div>" +
+                "<div class='modal-body'>"+
+                "<div><p>Click Complete tour to start the tour from the beginning to the test simulation. Click Simulation tour" +
+                " to jump to the test simulation. Click Samples to view how to use samples.</p><br></div>" +
+                "<div class='row'>" +
+                "<div class='col-sm-4'>" +
+                "<button class='btn btn-block btn-lg btn-primary tour-guide-button' id='fullGuide'>Complete tour</button></div>" +
+                "<div class='col-sm-4'>" +
+                "<button class='btn btn-block btn-lg btn-primary tour-guide-button' id='simulationGuide'>Simulation tour</button></div>" +
+                "<div class='col-sm-4'>" +
+                "<button class='btn btn-block btn-lg btn-primary tour-guide-button' id='sampleGuide'>Samples</button></div>" +
+                "</div>"+
+                "</div>" +
+                "</div>" +
+                "</div>"
+            );
+
+            self.guideDialog = GuideDialog;
 
             //Script array for the complete guide
-            this.createNewProject = [
+            self.createNewProject = [
                 {
                     'click #newButton': '<b>Welcome to WSO2 SP!</b> Click <b class="lime-text">New</b> to get started.',
-                    'showSkip': true,
-                    onBeforeStart: function () {
-                        $('#hintTour').removeClass('menu-item-enabled').addClass('menu-item-disabled').css('pointer-events', 'none');
-                    }
+                    'showSkip': true
                 },
                 {
-                    'next .ace_line_group': 'First, We have defined an input stream for you!. <b class="lime-text">' +
+                    'next .ace_line': 'First, We have defined an input stream for you!. <b class="lime-text">' +
                         'A stream</b> is a logical series of events ordered in time with a<br> uniquely identifiable ' +
                         'name, and set of defined attributes with specific data types defining its schema. ' +
                         '<br>Click <b class="lime-text">Next</b> to continue.',
@@ -80,6 +103,7 @@ define(['ace/ace', 'jquery', 'lodash', 'log', 'enjoyhint', 'designViewUtils'],
                         var editor = activeTab.getSiddhiFileEditor().getSourceView().getEditor();
                         var aceEditor = app.tabController.getActiveTab().getSiddhiFileEditor().getSourceView().getEditor();
                         editor.session.insert(aceEditor.getCursorPosition(), 'define stream SweetProductionStream (name string, amount long);');
+
                     }
                 },
                 {
@@ -104,14 +128,34 @@ define(['ace/ace', 'jquery', 'lodash', 'log', 'enjoyhint', 'designViewUtils'],
                     'keyCode': 9,
                     selector: '#saveName',
                     event: 'key',
-                    description: 'Your file name is <b class="lime-text">SweetFactory.</b> Press <b class="lime-text"> ' +
-                        'Tab </b>key to continue.',
+                    description: 'Your file name is this. Press <b class="lime-text">Tab </b>key to continue.',
                     'showNext': false,
                     'showSkip': false,
                     'timeout': 200,
                     onBeforeStart: function () {
+                        fileNameIncr = parseInt(window.localStorage.getItem('guideFileNameIncr'));
+                        tempFileName = "SweetFactory"+fileNameIncr;
+                        var fileToBeChecked = "configName="+btoa("SweetFactory"+fileNameIncr+'.siddhi');
+
+                        $.ajax({
+                            url: checkFileURL,
+                            type: "POST",
+                            contentType: "text/plain; charset=utf-8",
+                            data: fileToBeChecked,
+                            async: false,
+                            success: function (data, textStatus, xhr) {
+                                if(data.exists === true){
+                                    if(tempFileName.length > 12){
+                                        tempFileName = tempFileName.slice(0, 12);
+                                    }
+                                    fileNameIncr++;
+                                    tempFileName = tempFileName + fileNameIncr;
+                                }
+                            }
+                        });
+
                         setTimeout(function () {
-                            $('#saveConfigModal').find('#configName').val('SweetFactory');
+                            $('#saveConfigModal').find('#configName').val(tempFileName);
                             $('input[name=siddhiAppName]').focus();
                         }, 800);
                     }
@@ -125,7 +169,12 @@ define(['ace/ace', 'jquery', 'lodash', 'log', 'enjoyhint', 'designViewUtils'],
                         '<b class="lime-text">Design View.<br></b>Click <b class="lime-text">Design View</b> ' +
                         'to open the Design View.',
                     'showSkip': false,
-                    'showNext': false
+                    'showNext': false,
+                    onBeforeStart: function () {
+                        tempFileName = "SweetFactory"+fileNameIncr;
+                        fileNameIncr++;
+                        window.localStorage.setItem("guideFileNameIncr", fileNameIncr.toString());
+                    }
                 },
                 {
                     'next #stream': 'This is a <b class="lime-text">Stream </b>component. you need to use this to ' +
@@ -158,7 +207,7 @@ define(['ace/ace', 'jquery', 'lodash', 'log', 'enjoyhint', 'designViewUtils'],
                                 var newElement = app.tabController.getActiveTab().getSiddhiFileEditor().getDesignView()
                                     .getConfigurationData().getSiddhiAppConfig();
                                 if (newElement.streamList.length === 2) {
-                                    self.instanceVal.trigger('next');
+                                    instanceVal.trigger('next');
                                     clearInterval(Interval);
                                 } else if (flag) {
                                     flag = false;
@@ -264,7 +313,7 @@ define(['ace/ace', 'jquery', 'lodash', 'log', 'enjoyhint', 'designViewUtils'],
                                 var newElement = app.tabController.getActiveTab().getSiddhiFileEditor().getDesignView()
                                     .getConfigurationData().getSiddhiAppConfig();
                                 if (newElement.queryLists.WINDOW_FILTER_PROJECTION.length === 1) {
-                                    self.instanceVal.trigger('next');
+                                    instanceVal.trigger('next');
                                     clearInterval(Interval);
                                 } else if (flag) {
                                     flag = false;
@@ -294,7 +343,7 @@ define(['ace/ace', 'jquery', 'lodash', 'log', 'enjoyhint', 'designViewUtils'],
                             Interval = window.setInterval(function () {
                                 if ($('.projectionQueryDrop')[0].title === "Output section of Query form is not filled") {
                                     clearInterval(Interval);
-                                    self.instanceVal.trigger('next');
+                                    instanceVal.trigger('next');
                                 } else if (flag) {
                                     flag = false;
                                     DesignViewUtils.prototype.warnAlert("Please connect the elements to continue");
@@ -331,14 +380,14 @@ define(['ace/ace', 'jquery', 'lodash', 'log', 'enjoyhint', 'designViewUtils'],
                             var Interval = null;
                             Interval = window.setInterval(function () {
                                 if ($('#form-query-name').find('.form-control').val() == 'SweetTotalQuery') {
-                                    self.instanceVal.trigger('next');
+                                    instanceVal.trigger('next');
                                     clearInterval(Interval);
                                 } else if (flag) {
                                     flag = false;
                                     DesignViewUtils.prototype.warnAlert("Please insert the valid query name");
                                 }
                             }, 1000);
-                        }, 3000)
+                        }, 4000)
                     }
                 },
                 {
@@ -354,7 +403,7 @@ define(['ace/ace', 'jquery', 'lodash', 'log', 'enjoyhint', 'designViewUtils'],
                             var Interval = null;
                             Interval = window.setInterval(function () {
                                 if ($('.has-error').find('.form-control').val() == 'count()') {
-                                    self.instanceVal.trigger('next');
+                                    instanceVal.trigger('next');
                                     clearInterval(Interval);
                                 } else if (flag) {
                                     flag = false;
@@ -405,7 +454,7 @@ define(['ace/ace', 'jquery', 'lodash', 'log', 'enjoyhint', 'designViewUtils'],
                                 var newElement = app.tabController.getActiveTab().getSiddhiFileEditor().getDesignView()
                                     .getConfigurationData().getSiddhiAppConfig();
                                 if (newElement.sinkList.length === 1) {
-                                    self.instanceVal.trigger('next');
+                                    instanceVal.trigger('next');
                                     clearInterval(Interval);
                                 } else if (flag) {
                                     flag = false;
@@ -428,7 +477,7 @@ define(['ace/ace', 'jquery', 'lodash', 'log', 'enjoyhint', 'designViewUtils'],
                             Interval = window.setInterval(function () {
                                 if ($('.sinkDrop')[0].title === "Sink annotation form is incomplete") {
                                     clearInterval(Interval);
-                                    self.instanceVal.trigger('next');
+                                    instanceVal.trigger('next');
                                 } else if (flag) {
                                     flag = false;
                                     DesignViewUtils.prototype.warnAlert("Please connect the elements to continue");
@@ -457,7 +506,7 @@ define(['ace/ace', 'jquery', 'lodash', 'log', 'enjoyhint', 'designViewUtils'],
                         var Interval = null;
                         Interval = window.setInterval(function () {
                             if ($('#sink-type').val() === "log") {
-                                self.instanceVal.trigger('next');
+                                instanceVal.trigger('next');
                                 clearInterval(Interval);
                             }
                         }, 1000)
@@ -510,9 +559,10 @@ define(['ace/ace', 'jquery', 'lodash', 'log', 'enjoyhint', 'designViewUtils'],
                     'showNext': false,
                     onBeforeStart: function () {
                         var Interval = null;
+                        //var tourGuide = JSON.parse(window.localStorage.getItem('tourGuide'));
                         Interval = window.setInterval(function () {
-                            if ($('#siddhi-app-name').val() === "SweetFactory") {
-                                self.instanceVal.trigger('next');
+                            if ($('#siddhi-app-name').val() === tempFileName) {
+                                instanceVal.trigger('next');
                                 clearInterval(Interval);
                             }
                         }, 1000)
@@ -526,7 +576,7 @@ define(['ace/ace', 'jquery', 'lodash', 'log', 'enjoyhint', 'designViewUtils'],
                         var Interval = null;
                         Interval = window.setInterval(function () {
                             if ($('#stream-name').val() === "SweetProductionStream") {
-                                self.instanceVal.trigger('next');
+                                instanceVal.trigger('next');
                                 clearInterval(Interval);
                             }
                         }, 1000)
@@ -571,59 +621,14 @@ define(['ace/ace', 'jquery', 'lodash', 'log', 'enjoyhint', 'designViewUtils'],
                     'top': 100
                 },
                 {
+                    'click #welcome-page': "Let's try out some examples for our welcome page. Click here",
+                    'showNext' : false,
+                    'showSkip' : false
+                },
+                {
                     'click #sampleContent': 'Here are some samples for you to try out!',
                     'showSkip': false,
-                    'showNext': true,
-                    onBeforeStart: function () {
-                        var $singleEventConfigList = $("#single-event-configs")
-                            .find("div[id^='event-content-parent-']");
-                        var $singleEventConfigTabs = $("#single-event-config-tab");
-                        var activetingUuid = -1;
-                        $singleEventConfigList.each(function () {
-                            var $singleEventConfig = $(this);
-                            var siddhiAppName =
-                                $singleEventConfig.find("select[name='single-event-siddhi-app-name']").val();
-                            var simulationConfigId = $singleEventConfig.attr("id").replace("event-content-parent-", "");
-                            var eventConfigTab = $singleEventConfigTabs
-                                .find("li[data-uuid=\"" + simulationConfigId + "\"]");
-                            if ('SweetFactory' == siddhiAppName) {
-                                eventConfigTab.remove();
-                                $(this).remove();
-                            } else {
-                                if (!eventConfigTab.hasClass("active")) {
-                                    activetingUuid = eventConfigTab.attr("data-uuid");
-                                }
-                            }
-                        });
-                        if (activetingUuid != -1) {
-                            var eventConfigTab = $singleEventConfigTabs.find("li[data-uuid=\"" + activetingUuid + "\"]");
-                            eventConfigTab.addClass("active");
-                            var $singleEventConfig = $("#single-event-config-tab-content")
-                                .find("div[id='event-content-parent-" + activetingUuid + "']");
-                            $singleEventConfig.addClass("active");
-                        }
-
-                        var $singleEventConfigListTemp = $("#single-event-configs")
-                            .find("div[id^='event-content-parent-']");
-                        if ($singleEventConfigListTemp.size() == 0) {
-                            app.commandManager.dispatch("add-single-simulator");
-                        }
-                        var workspaceServiceURL = app.config.services.workspace.endpoint;
-                        var activeTab = app.tabController.activeTab;
-                        $.ajax({
-                            url: workspaceServiceURL + "/delete?siddhiAppName=SweetFactory.siddhi",
-                            type: "DELETE",
-                            contentType: "text/plain; charset=utf-8",
-                            async: false,
-                            success: function (data, textStatus, xhr) {
-                                app.tabController.removeTab(activeTab, undefined, true);
-                                log.debug('file deleted successfully');
-                                app.commandManager.dispatch("open-folder", data.path);
-                                app.eventSimulator.getFeedSimulator().updateFeedCreationButtonAndNotification();
-                                app.commandManager.dispatch("remove-siddhi-apps-on-delete", 'SweetFactory');
-                            }
-                        });
-                    }
+                    'showNext': true
                 },
                 {
                     'click .more-samples': 'Click here to view the full sample list',
@@ -642,13 +647,36 @@ define(['ace/ace', 'jquery', 'lodash', 'log', 'enjoyhint', 'designViewUtils'],
             ];
 
             //Script array for the simulation guide
-            this.simulateProject = [
+            self.simulateProject = [
                 {
                     'click .event-simulator-activate-btn': 'Now let us run our app using <b class="lime-text">Even Simulator.</b>' +
                         ' To open the Event Simulator, click this icon.',
                     'showNext': false,
                     'showSkip': false,
                     onBeforeStart: function () {
+
+                        fileNameIncr = parseInt(window.localStorage.getItem('guideFileNameIncr'));
+                        var payload = "configName=" + btoa("SweetFactory"+ fileNameIncr + '.siddhi') + "&config=" + (btoa(content));
+                        tempFileName = "SweetFactory"+fileNameIncr;
+                        var fileToBeChecked = "configName="+btoa("SweetFactory"+fileNameIncr+'.siddhi');
+
+                        $.ajax({
+                            url: checkFileURL,
+                            type: "POST",
+                            contentType: "text/plain; charset=utf-8",
+                            data: fileToBeChecked,
+                            async: false,
+                            success: function (data, textStatus, xhr) {
+                                if(data.exists === true){
+                                    if(tempFileName.length > 12){
+                                        tempFileName = tempFileName.slice(0, 12);
+                                    }
+                                    fileNameIncr++;
+                                    tempFileName = tempFileName + fileNameIncr;
+                                }
+                            }
+                        });
+
                         $.ajax({
                             url: saveServiceURL,
                             type: "POST",
@@ -660,27 +688,28 @@ define(['ace/ace', 'jquery', 'lodash', 'log', 'enjoyhint', 'designViewUtils'],
                                     if (!app.workspaceExplorer.isActive()) {
                                         app.commandManager.dispatch("toggle-file-explorer");
                                         app.commandManager.dispatch('remove-unwanted-streams-single-simulation',
-                                            'SweetFactory');
+                                            tempFileName);
                                     }
                                     app.workspaceManager.updateMenuItems();
                                     log.debug('Simulation file saved successfully');
-
                             },
                             error: function () {
                                 alert('Error saving the file');
                             }
                         });
+                        fileNameIncr++;
+                        window.localStorage.setItem("guideFileNameIncr", fileNameIncr.toString());
                     }
                 },
                 {
-                    'custom #siddhi-app-name': 'Select the <b class="lime-text">Sweet Factory</b> Siddhi application',
+                    'custom #siddhi-app-name': 'Select the <b class="lime-text">'+tempFileName+'</b> Siddhi application',
                     'showSkip': false,
                     'showNext': false,
                     onBeforeStart: function () {
                         var Interval = null;
                         Interval = window.setInterval(function () {
-                            if ($('#siddhi-app-name').val() === "SweetFactory") {
-                                self.instanceVal.trigger('next');
+                            if ($('#siddhi-app-name').val() === tempFileName) {
+                                instanceVal.trigger('next');
                                 clearInterval(Interval);
                             }
                         }, 1000)
@@ -691,11 +720,10 @@ define(['ace/ace', 'jquery', 'lodash', 'log', 'enjoyhint', 'designViewUtils'],
                     'showSkip': false,
                     'showNext': false,
                     onBeforeStart: function () {
-                        //scriptStep =  self.instanceVal.getCurrentStep();
                         var Interval = null;
                         Interval = window.setInterval(function () {
                             if ($('#stream-name').val() === "SweetProductionStream") {
-                                self.instanceVal.trigger('next');
+                                instanceVal.trigger('next');
                                 clearInterval(Interval);
                             }
                         }, 1000)
@@ -705,47 +733,32 @@ define(['ace/ace', 'jquery', 'lodash', 'log', 'enjoyhint', 'designViewUtils'],
                     'next #attribute-table': 'Enter attribute values as follows.<br>Name :  <b style="color:lime;">Cake</b><br>' +
                         'Amount : <b style="color:lime;">120</b><br>Then click <b class="lime-text">Next.</b>',
                     'showSkip': false,
-                    'showNext': true,
-                    onBeforeStart: function () {
-                        //scriptStep =  self.instanceVal.getCurrentStep();
-                    }
+                    'showNext': true
                 },
                 {
                     'click #start-and-send': 'To start the Siddhi application and send the test event,' +
                         'click <b class="lime-text">Start and Send</b>',
                     'showSkip': false,
-                    'showNext': false,
-                    onBeforeStart: function () {
-                        //scriptStep =  self.instanceVal.getCurrentStep();
-                    }
+                    'showNext': false
                 },
                 {
                     'next #console-container': 'You can see the results logged in this console',
                     'showSkip': false,
                     'showNext': true,
                     'shape': 'rect',
-                    'top': 100,
-                    onBeforeStart: function () {
-                        //scriptStep =  self.instanceVal.getCurrentStep();
-                    }
+                    'top': 100
                 },
                 {
                     'next #attribute-table': 'Simulate another event by entering attribute values as follows' +
                         '<br>Name :  <b class="lime-text">Toffee</b><br>' +
                         'Amount : <b class="lime-text">350</b><br>Then click <b class="lime-text">Next</b>.',
                     'showSkip': false,
-                    'showNext': true,
-                    onBeforeStart: function () {
-                        // scriptStep =  self.instanceVal.getCurrentStep();
-                    }
+                    'showNext': true
                 },
                 {
                     'click #start-and-send': 'Click <b class="lime-text">Send</b> to send this event',
                     'showSkip': false,
-                    'showNext': false,
-                    onBeforeStart: function () {
-                        //scriptStep =  self.instanceVal.getCurrentStep();
-                    }
+                    'showNext': false
                 },
                 {
                     'next #console-container': 'Now the second event is also logged in this console',
@@ -759,57 +772,30 @@ define(['ace/ace', 'jquery', 'lodash', 'log', 'enjoyhint', 'designViewUtils'],
                     'showSkip': false,
                     'showNext': false,
                     'shape': 'rect',
-                    'top': 10,
-                    onBeforeStart: function () {
-                        var $singleEventConfigList = $("#single-event-configs")
-                            .find("div[id^='event-content-parent-']");
-                        var $singleEventConfigTabs = $("#single-event-config-tab");
-                        var activetingUuid = -1;
-                        $singleEventConfigList.each(function () {
-                            var $singleEventConfig = $(this);
-                            var siddhiAppName =
-                                $singleEventConfig.find("select[name='single-event-siddhi-app-name']").val();
-                            var simulationConfigId = $singleEventConfig.attr("id").replace("event-content-parent-", "");
-                            var eventConfigTab = $singleEventConfigTabs
-                                .find("li[data-uuid=\"" + simulationConfigId + "\"]");
-                            if ('SweetFactory' == siddhiAppName) {
-                                eventConfigTab.remove();
-                                $(this).remove();
-                            } else {
-                                if (!eventConfigTab.hasClass("active")) {
-                                    activetingUuid = eventConfigTab.attr("data-uuid");
-                                }
-                            }
-                        });
-                        if (activetingUuid != -1) {
-                            var eventConfigTab = $singleEventConfigTabs.find("li[data-uuid=\"" + activetingUuid + "\"]");
-                            eventConfigTab.addClass("active");
-                            var $singleEventConfig = $("#single-event-config-tab-content")
-                                .find("div[id='event-content-parent-" + activetingUuid + "']");
-                            $singleEventConfig.addClass("active");
-                        }
+                    'top': 10
+                }
+            ];
 
-                        var $singleEventConfigListTemp = $("#single-event-configs")
-                            .find("div[id^='event-content-parent-']");
-                        if ($singleEventConfigListTemp.size() == 0) {
-                            app.commandManager.dispatch("add-single-simulator");
-                        }
-                        var workspaceServiceURL = app.config.services.workspace.endpoint;
-                        var activeTab = app.tabController.activeTab;
-                        $.ajax({
-                            url: workspaceServiceURL + "/delete?siddhiAppName=SweetFactory.siddhi",
-                            type: "DELETE",
-                            contentType: "text/plain; charset=utf-8",
-                            async: false,
-                            success: function (data, textStatus, xhr) {
-                                    app.tabController.removeTab(activeTab, undefined, true);
-                                    log.debug('file deleted successfully');
-                                    app.commandManager.dispatch("open-folder", data.path);
-                                    app.eventSimulator.getFeedSimulator().updateFeedCreationButtonAndNotification();
-                                    app.commandManager.dispatch("remove-siddhi-apps-on-delete", 'SweetFactory');
-                            }
-                        });
-                    }
+            //Script array for the sample guide
+            self.sampleGuide = [
+                {
+                    'click #sampleContent': 'Here are some samples for you to try out!',
+                    'showSkip': false,
+                    'showNext': true
+                },
+                {
+                    'click .more-samples': 'Click here to view the full sample list',
+                    'showSkip': false,
+                    'showFalse': false,
+                    'shape': 'rect',
+                    'right': 500
+                },
+                {
+                    'next #sampleDialog' : 'You can try out more samples from here',
+                    'showSkip' : false,
+                    'nextButton' : {className: "myNext", text: "Finish"},
+                    scrollAnimationSpeed : 900,
+                    'bottom' : 150
                 }
             ];
         };
@@ -817,42 +803,75 @@ define(['ace/ace', 'jquery', 'lodash', 'log', 'enjoyhint', 'designViewUtils'],
         //Constructor for the guide
         Guide.prototype.constructor = Guide;
 
-        //render function for the complete guide
-        Guide.prototype.renderFull = function () {
+        //function to view the dialog box to choose the guide option
+        Guide.prototype.showModel =  function(){
+            this.guideDialog.modal('show').on('shown.bs.modal', function(){
+                $('#guideDialog').trigger('loaded');
+            });
+            this.guideDialog.on('hidden.bs.modal', function(){
+                $('#guideDialog').trigger('unloaded');
+            })
+        };
 
-            var _tabList = this.tabList;
-            var _createNewProjectScript = this.createNewProject;
+        //start function for the complete guide
+        Guide.prototype.start = function () {
+
+            var self = this;
+            var guideModal = self.guideDialog.filter("#guideDialog");
             var _hintInstance = new EnjoyHint({});
-            _hintInstance.setScript(_createNewProjectScript);
+            var callback = function() { guideModal.modal('hide') };
 
-            _.each(_tabList, function (tab) {
-                if (_tabList.length === 1 && tab._title === "welcome-page") {
-                    _hintInstance.runScript();
+            //check whether there are multiple tabs and if the current tab is "welcome-page"
+            _.each(self.tabList, function (tab) {
+                if (self.tabList.length === 1 && tab._title === "welcome-page") {
+                    self.showModel();
                 } else {
-                    DesignViewUtils.prototype.errorAlert("Please close all tabs except welcome-page to start the guide");
+                    DesignViewUtils.prototype.errorAlert("Please close all tabs except welcome-page to start the guide." +
+                        "Your changes will be lost if you close all without saving.");
                 }
             });
 
-            this.instanceVal = _hintInstance;
-            this.tabLength = _tabList.length;
+            //function for the complete tour
+            guideModal.find("button").filter("#fullGuide").click(function() {
 
-            return _hintInstance;
-        };
+                $('#fullGuide').off('click');
+                $('#simulationGuide').off('click');
+                $('#sampleGuide').off('click');
 
-        //render function for the simulate guide
-        Guide.prototype.renderSimulate = function () {
+                _hintInstance.setScript(self.createNewProject);
+                _hintInstance.runScript();
 
-            var _tabList = this.tabList;
-            var _simulateProject = this.simulateProject;
+                instanceVal = _hintInstance;
+                callback();
+            });
 
-            var _hintInstance = new EnjoyHint({});
-            _hintInstance.setScript(_simulateProject);
-            _hintInstance.runScript();
+            //function for the simulation tour
+            guideModal.find("button").filter("#simulationGuide").click(function() {
 
-            this.instanceVal = _hintInstance;
-            this.tabLength = _tabList.length;
+                $('#fullGuide').off('click');
+                $('#simulationGuide').off('click');
+                $('#sampleGuide').off('click');
 
-            return _hintInstance;
+                _hintInstance.setScript(self.simulateProject);
+                _hintInstance.runScript();
+
+                instanceVal = _hintInstance;
+                callback();
+            });
+
+            //function for the sample tour
+            guideModal.find("button").filter("#sampleGuide").click(function() {
+
+                $('#fullGuide').off('click');
+                $('#simulationGuide').off('click');
+                $('#sampleGuide').off('click');
+
+                _hintInstance.setScript(self.sampleGuide);
+                _hintInstance.runScript();
+
+                instanceVal = _hintInstance;
+                callback();
+            });
         };
 
         return Guide;

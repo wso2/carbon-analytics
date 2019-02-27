@@ -18,10 +18,10 @@
 
 define(['require', 'log', 'jquery', 'lodash', 'backbone', 'menu_bar', 'tool_bar', 'command', 'workspace',
         'app/tab/service-tab-list', 'event_simulator', 'app/output-console/service-console-list-manager',
-        'nano_scroller','guide'],
+        'nano_scroller','guide','workspace/file'],
 
     function (require, log, $, _, Backbone, MenuBar, ToolBar, CommandManager, Workspace, TabController,
-              EventSimulator, OutputController,NanoScroller, Guide) {
+              EventSimulator, OutputController,NanoScroller, Guide, File) {
 
         var Application = Backbone.View.extend(
             /** @lends Application.prototype */
@@ -136,16 +136,12 @@ define(['require', 'log', 'jquery', 'lodash', 'backbone', 'menu_bar', 'tool_bar'
                     this.workspaceManager.displayInitialTab();
                 },
 
-                runFullGuide: function (){
-                    log.debug("start: rendering hint guide");
-                    this.guide.renderFull();
-                    log.debug("end: rendering hint guide");
-                },
-
-                runSimulateGuide: function (){
-                    log.debug("start: rendering hint guide");
-                    this.guide.renderSimulate();
-                    log.debug("end: rendering hint guide");
+                runInitialGuide: function (){
+                    var isFreshUser = window.localStorage.getItem('guideFileNameIncr');
+                    if(isFreshUser == null) {
+                        this.workspaceManager.runGuide();
+                        window.localStorage.setItem('guideFileNameIncr', "0");
+                    }
                 },
 
                 isRunningOnMacOS: function(){
