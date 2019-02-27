@@ -17,9 +17,9 @@
  */
 
 define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annotationObject', 'annotationElement',
-    'designViewUtils', 'queryWindowOrFunction'],
+    'designViewUtils', 'queryWindowOrFunction', 'streamHandler', 'patternOrSequenceQueryCondition'],
     function (require, _, AppData, log, Constants, Handlebars, AnnotationObject, AnnotationElement, DesignViewUtils,
-        QueryWindowOrFunction) {
+        QueryWindowOrFunction, StreamHandler, PatternOrSequenceQueryCondition) {
 
         /**
          * @class FormUtils Contains utility methods for forms
@@ -246,12 +246,12 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
          */
         FormUtils.prototype.appendOrderBy = function (possibleAttributes) {
             var self = this;
-            var orderByDiv = '<li> <div class = "clearfix order-by-attribute-content">' +
-                '<div class="define-attribute-drop-down"> </div> <div class = "define-order-del">' +
-                '<select class="order-selection">' +
+            var orderByDiv = '<li> <div class="clearfix"> ' +
+                '<div class="order-by-attribute-content"> <div class="define-attribute-drop-down">' +
+                '</div> <div class="define-order-del"> <select class="order-selection">' +
                 '<option value="asc"> asc </option> <option value="desc"> desc </option>' +
-                '</select> <a class = "btn-del-option"> <i class = "fw fw-delete"> </i></a> </div>' +
-                '</div> <label class="error-message"> </label> </li>';
+                '</select> <a class = "btn-del-option"> <i class = "fw fw-delete"> </i></a>' +
+                '</div> </div> </div> <label class="error-message"> </label> </li>';
             $('.order-by-attributes').append(orderByDiv)
             self.renderDropDown('.order-by-content .define-attribute-drop-down:last', possibleAttributes, Constants
                 .ORDER_BY);
@@ -403,6 +403,43 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
         };
 
         /**
+         * @function to render the conditions of pattern or sequence query
+         * @param {Object} conditionList List of conditions
+         * @param {Object} inputStreamNames streams connected to the query
+         */
+        FormUtils.prototype.renderConditions = function (conditionList, inputStreamNames) {
+            var self = this;
+            var conditions;
+            if (!conditionList || (conditionList && conditionList.length == 0)) {
+                conditions = [{ conditionId: "e1", streamHandlerList: [], streamName: "" }]
+            } else {
+                conditions = conditionList;
+            }
+            var streamNames = {
+                id: "condition-stream-name",
+                options: inputStreamNames
+            }
+            self.registerDropDownPartial();
+            var conditionNavTemplate = Handlebars.compile($('#pattern-sequence-condition-navigation-form-template')
+                .html());
+            var conditionContentTemplate = Handlebars.compile($('#pattern-sequence-condition-content-form-template')
+                .html());
+            _.forEach(conditions, function (condition) {
+                var wrappedHtml = conditionNavTemplate(condition);
+                $('.define-conditions .nav-tabs').append(wrappedHtml);
+            });
+
+            _.forEach(conditions, function (condition) {
+                var wrappedHtml = conditionContentTemplate({
+                    condition: condition,
+                    inputStreamNames: streamNames
+                });
+                $('.define-conditions .tab-content').append(wrappedHtml);
+            });
+            self.removeDeleteButtonOfFirstValue();
+        };
+
+        /**
          * @function to render the function of window/stream-function types
          * @param {Object} predefinedFunction possible options of a particular type
          * @param {String} className div to embed the template
@@ -477,10 +514,8 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
         /**
          * @function to render the stream handler template
          */
-        FormUtils.prototype.renderStreamHandler = function (className, savedData) {
+        FormUtils.prototype.renderStreamHandler = function (className, savedData, streamHandlerTypes) {
             var self = this;
-            var streamHandlerTypes = self.configurationData.application.config.stream_handler_types;
-            //todo: remove the window option from streamHandlerType for other queries
             var streamHandlerList = []
             var types = {
                 id: Constants.STREAM_HANDLER,
@@ -543,9 +578,8 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
          * @function to render the group-by template
          * @param {Object} possibleGroupByAttributes attributes to be shown in the drop down
          * @param {Object} groupBy user defined group by
-         * @param {String} className of the division
          */
-        FormUtils.prototype.renderGroupBy = function (possibleGroupByAttributes, groupBy, className) {
+        FormUtils.prototype.renderGroupBy = function (possibleGroupByAttributes, groupBy) {
             var self = this;
             var possibleGroupByAttributes = {
                 options: possibleGroupByAttributes,
@@ -558,7 +592,7 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
             self.registerDropDownPartial();
             var groupByTemplate = Handlebars.compile($('#group-by-template').html());
             var wrappedHtml = groupByTemplate(groupByAttributes);
-            $('.' + className).html(wrappedHtml);
+            $('.define-group-by-attributes').html(wrappedHtml);
             self.checkForAttributeLength(possibleGroupByAttributes.length, Constants.GROUP_BY);
         };
 
@@ -581,7 +615,7 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
             self.registerDropDownPartial();
             var orderByTemplate = Handlebars.compile($('#order-by-template').html());
             var wrappedHtml = orderByTemplate(orderByAttributes);
-            $('.' + className).html(wrappedHtml);
+            $('.define-order-by-attributes').html(wrappedHtml);
             self.checkForAttributeLength(possibleOrderByAttributes.length, Constants.ORDER_BY);
         };
 
@@ -912,18 +946,63 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
                 }
             });
             return isError;
-        }
+        };
+
+        /**
+         * @function to validate conditions of pattern and sequence query
+         */
+        FormUtils.prototype.validateConditions = function () {
+            var self = this;
+            var isErrorOccurred = false;
+            $('.define-conditions .condition-content').each(function () {
+                var conditionId = $(this).find('.condition-id');
+                if (conditionId.val().trim() == "") {
+                    $(conditionId).next('.error-message').text('Condition ID is required');
+                    self.addErrorClass(conditionId);
+                    isErrorOccurred = true;
+                }
+                if (!isErrorOccurred) {
+                    var isValidStreamHandler = self.validateStreamHandlers($(this));
+                    if (isValidStreamHandler) {
+                        isErrorOccurred = true;
+                    }
+                }
+                if (isErrorOccurred) {
+                    $(this).addClass('active');
+                    var conditionIndex = $(this).index();
+                    $('.define-conditions .nav-tabs .active').removeClass('active');
+                    $('.define-conditions .condition-navigation:eq(' + conditionIndex + ')').addClass('active');
+                    return false;
+                }
+            });
+            return isErrorOccurred;
+        };
+
+        /**
+		 * @function to validate the condition input fields
+		 */
+        FormUtils.prototype.validateContent = function (className) {
+            var self = this;
+            var isErrorOccurred = false;
+            var conditionValue = $(className).find('input[type="text"]');
+            if (conditionValue.val() == "") {
+                self.addErrorClass(conditionValue);
+                $(className).find('.error-message').text('Value is required');
+                isErrorOccurred = true;
+            }
+            return isErrorOccurred;
+        };
 
         /**
          * @function to validate stream handlers
-         * @param {String} to identify the div of stream-handler
+         * @param {String} div identify the div of stream-handler
          */
         FormUtils.prototype.validateStreamHandlers = function (div) {
             var self = this;
             var isErrorOccurred = false;
-            var sourceDiv = $('.define-' + div + '-source');
-            if (sourceDiv.find('.stream-handler-checkbox').is(':checked')) {
-                sourceDiv.find('.stream-handler-list li').each(function () {
+            var streamHandlerDiv = $(div).find('.define-stream-handler');
+            if ($(streamHandlerDiv).find('.stream-handler-checkbox').is(':checked')) {
+                $(streamHandlerDiv).find('.stream-handler-list li').each(function () {
                     var streamHandlerContent = $(this).find('.define-stream-handler-type-content');
                     if (streamHandlerContent.hasClass('define-filter-stream-handler')) {
                         var filterCondition = streamHandlerContent.find('.filter-condition-content')
@@ -1172,6 +1251,7 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
          * @function to validate the group-by attributes
          */
         FormUtils.prototype.validateGroupOrderBy = function (className) {
+            var self = this;
             var selectedAttributes = [];
             var isErrorOccurred = false;
             $('.' + className + '-attributes li').each(function () {
@@ -1181,8 +1261,9 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
                 }
             });
             if (selectedAttributes.length == 0) {
-                $('.' + className + '-attributes').find('.error-message:eq(0)').text('Minimum one attribute is ' +
-                    'required');
+                var errorDiv = $('.' + className + '-attributes').find('.error-message:eq(0)');
+                errorDiv.text('Minimum one attribute is required');
+                self.addErrorClass(errorDiv)
                 isErrorOccurred = true;
             }
             return isErrorOccurred;
@@ -1569,8 +1650,27 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
         };
 
         /**
+         * @function to build pattern or sequence conditions
+         */
+        FormUtils.prototype.buildConditions = function () {
+            var self = this;
+            var conditions = [];
+            $('.define-conditions .condition-content').each(function () {
+                var conditionId = $(this).find('.condition-id').val().trim();
+                var streamName = $(this).find('.condition-stream-name-selection').val();
+                var conditionObjectOptions = {};
+                _.set(conditionObjectOptions, 'conditionId', conditionId);
+                _.set(conditionObjectOptions, 'streamName', streamName);
+                var conditionObject = new PatternOrSequenceQueryCondition(conditionObjectOptions);
+                conditionObject.setStreamHandlerList(self.buildStreamHandlers($(this).find('.define-stream-handler')));
+                conditions.push(conditionObject);
+            });
+            return conditions
+        };
+
+        /**
          * @function to build the stream-handlers
-         * @param {Object} div where the stream handler is embedded
+         * @param {Object} sourceDiv where the stream handler is embedded
          */
         FormUtils.prototype.buildStreamHandlers = function (sourceDiv) {
             var self = this;
@@ -1606,7 +1706,8 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
                         _.set(streamHandlerOptions, 'type', handlerType);
                         _.set(streamHandlerOptions, 'value', queryWindowFunction);
                     }
-                    streamHandlers.push(streamHandlerOptions);
+                    var streamHandlerObject = new StreamHandler(streamHandlerOptions);
+                    streamHandlers.push(streamHandlerObject);
                 });
             }
             return streamHandlers;
@@ -1924,13 +2025,34 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
         };
 
         /**
+         * @function to map the user saved conditions
+         */
+        FormUtils.prototype.mapConditions = function (conditionList) {
+            var self = this;
+            var streamHandlerTypes = self.configurationData.application.config.stream_handler_types;
+            if (conditionList && conditionList.length != 0) {
+                _.forEach(conditionList, function (condition) {
+                    //select the stream name
+                    $('.define-' + condition.conditionId + '-source').find('.define-stream select option').filter
+                    (function () {
+                        return ($(this).val() == condition.streamName);
+                    }).prop('selected', true);
+
+                    //render and map stream handler
+                    self.renderStreamHandler(condition.conditionId, condition, streamHandlerTypes)
+                    self.mapStreamHandler(condition, condition.conditionId)
+                });
+            }
+        };
+
+        /**
          * @function to map the stream-handlers
          * @param {Object} savedData the saved object which holds the streamhandler list
-         * @param {String} type the identification of the div where the stream-handlers are embedded
+         * @param {String} className the identification of the div where the stream-handlers are embedded
          */
-        FormUtils.prototype.mapStreamHandler = function (savedData, type) {
+        FormUtils.prototype.mapStreamHandler = function (savedData, className) {
             var self = this;
-            sourceDiv = '.define-' + type + '-source .define-stream-handler';
+            sourceDiv = '.define-' + className + '-source .define-stream-handler';
             if (savedData && savedData.getStreamHandlerList() && savedData.getStreamHandlerList().length != 0) {
                 $(sourceDiv).find('.stream-handler-checkbox').prop('checked', true);
                 var streamHandlerList = savedData.getStreamHandlerList();
@@ -1948,11 +2070,12 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
                 $(sourceDiv).find('.define-stream-handler-section').hide();
                 $(sourceDiv).find('.define-stream-handler-buttons').hide();
             }
-            self.changeAttributeNavigation(sourceDiv + ' .stream-handler-list');
+            self.changeAttributeNavigation($(sourceDiv).find('.stream-handler-list'));
             self.removeNavigationForWindow(sourceDiv)
             self.showHideStreamHandlerWindowButton(sourceDiv)
             self.preventMultipleSelectionOfWindowStreamHandler(sourceDiv)
             self.addEventListenersForParameterDiv();
+            self.showDropDown();
         };
 
         /**
@@ -2250,11 +2373,11 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
          *  It would be the same for the other forms
          * @param {orderByAttributes} orderByAttributes saved order by attributes
          */
-        FormUtils.prototype.mapUserOrderBy = function (replacedAttributes, orderByAttributes) {
+        FormUtils.prototype.mapUserOrderBy = function (orderByAttributes) {
             var i = 0;
             $('.order-by-attributes li').each(function () {
                 $(this).find('.order-by-selection option').filter(function () {
-                    return ($(this).val() == (replacedAttributes[i]));
+                    return ($(this).val() == (orderByAttributes[i].getValue()));
                 }).prop('selected', true);
                 $(this).find('.order-selection option').filter(function () {
                     return ($(this).val() == (orderByAttributes[i].getOrder().toLowerCase()));
@@ -2633,7 +2756,7 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
             var attributes = [];
             $('.group-by-attributes li').each(function () {
                 var selectedValue = $(this).find('select').val();
-                if (selectedValue != "") {
+                if (selectedValue) {
                     attributes.push(selectedValue);
                 }
             });
@@ -2641,23 +2764,13 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
         };
 
         /**
-         * @function to build the join-query order by section
-         */
-        FormUtils.prototype.buildQueryOrderBy = function () {
-            var self = this;
+		 * @function to build the join-query order by section
+		 */
+        FormUtils.prototype.buildOrderBy = function () {
             var orderByAttributes = [];
-            var leftSourceName = $('.define-left-source .source-selection').val();
-            var leftSourceAs = self.getSourceAs(Constants.LEFT);
-            var rightSourceAs = self.getSourceAs(Constants.RIGHT);
             $('.order-by-attributes li').each(function () {
                 var orderValue = $(this).find('.order-by-selection').val();
                 if (orderValue) {
-                    var splitAttribute = orderValue.split('.');
-                    if (splitAttribute[0].trim() === leftSourceName) {
-                        orderValue = leftSourceAs + '.' + splitAttribute[1];
-                    } else {
-                        orderValue = rightSourceAs + '.' + splitAttribute[1];
-                    }
                     var orderByValueObjectOptions = {};
                     _.set(orderByValueObjectOptions, 'value', orderValue);
                     _.set(orderByValueObjectOptions, 'order', $(this).find('.order-selection').val());
@@ -2665,41 +2778,6 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
                 }
             });
             return orderByAttributes;
-        };
-
-        /**
-         * @function to build the join query group by section
-         */
-        FormUtils.prototype.buildQueryGroupBy = function () {
-            var self = this;
-            var attributes = [];
-            var leftSourceName = $('.define-left-source .source-selection').val();
-            var leftSourceAs = self.getSourceAs(Constants.LEFT);
-            var rightSourceAs = self.getSourceAs(Constants.RIGHT);
-            $('.group-by-attributes li').each(function () {
-                var selectedValue = $(this).find('select').val();
-                if (selectedValue) {
-                    var splitAttribute = selectedValue.split('.');
-                    if (splitAttribute[0].trim() === leftSourceName) {
-                        attributes.push(leftSourceAs + '.' + splitAttribute[1])
-                    } else {
-                        attributes.push(rightSourceAs + '.' + splitAttribute[1])
-                    }
-                }
-            });
-            return attributes;
-        };
-
-        /**
-         * @function to get the defined source-as in a join query
-         * @param {String} type left or right source
-         */
-        FormUtils.prototype.getSourceAs = function (type) {
-            if ($('.define-' + type + '-source').find('.source-as-checkbox').is(':checked')) {
-                return $('.define-' + type + '-source').find('.as-content-value').val().trim();
-            } else {
-                return $('.define-' + type + '-source').find('.source-selection').val().trim();
-            }
         };
 
         /**
@@ -2940,14 +3018,13 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
         /**
          * @function to add event listeners for stream handler section
          * @param {Object} streamHandlerList list of stream handlers
-         * @param {Object} elementType type of the element
          */
-        FormUtils.prototype.addEventListenersForStreamHandlersDiv = function (streamHandlerList, elementType) {
+        FormUtils.prototype.addEventListenersForStreamHandlersDiv = function (streamHandlerList) {
             var self = this;
 
             //on change of stream handler checkbox
             $('.define-stream-handler').on('change', '.stream-handler-checkbox', function () {
-                var sourceDiv = '.define-' + self.getSourceDiv(elementType, $(this)) + '-source';
+                var sourceDiv = self.getSourceDiv($(this));
                 if ($(this).is(':checked')) {
                     $(sourceDiv).find('.define-stream-handler-section').show();
                     $(sourceDiv).find('.define-stream-handler-buttons').show();
@@ -2961,7 +3038,12 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
             var predefinedWindowFunctions = _.orderBy(JSON.parse(JSON.stringify
                 (self.configurationData.rawExtensions["windowFunctionNames"]), ['name'], ['asc']));
             $('.define-stream-handler').on('change', '#window-type', function () {
-                var source = self.getSourceDiv(elementType, $(this))
+                var sourceDiv = self.getSourceDiv($(this))
+                if ($(sourceDiv).hasClass('define-left-source')) {
+                    var source = Constants.LEFT
+                } else {
+                    var source = Constants.RIGHT
+                }
                 var windowType;
                 var savedParameterValues;
                 var streamHandlerWindow = self.getStreamHandlerWindow(streamHandlerList, source);
@@ -2989,7 +3071,6 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
                 (self.configurationData.rawExtensions["streamFunctions"]), ['name'], ['asc']));
             $(".define-stream-handler").on("autocompleteselect", '.custom-combobox-input', function (event, ui) {
                 var selectedType = ui.item.value.toLowerCase();
-                var source = self.getSourceDiv(elementType, $(this))
                 var functionType;
                 var savedParameterValues;
                 var streamHandlerFunction = self.getStreamHandler(streamHandlerList, Constants.FUNCTION, selectedType);
@@ -3009,14 +3090,15 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
 
             //to add window
             $('.define-stream-handler').on('click', ".btn-add-window", function () {
-                var sourceDiv = '.define-' + self.getSourceDiv(elementType, $(this)) + '-source';
+                var sourceDiv = self.getSourceDiv($(this));
                 self.addNewStreamHandler(sourceDiv, Constants.WINDOW);
             });
 
             //to add stream-function
             $('.define-stream-handler').on('click', ".btn-add-function", function () {
-                var sourceDiv = '.define-' + self.getSourceDiv(elementType, $(this)) + '-source';
+                var sourceDiv = self.getSourceDiv($(this));
                 self.addNewStreamHandler(sourceDiv, Constants.FUNCTION);
+                self.showDropDown();
             });
 
             //on change of stream-handler type
@@ -3034,7 +3116,7 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
                 if (currentValue == previousValue) {
                     currentContentDiv.html(previousContent)
                 } else {
-                    var sourceDiv = '.define-' + self.getSourceDiv(elementType, $(this)) + '-source';
+                    var sourceDiv = self.getSourceDiv($(this));
                     var streamHandlerContent = $(this).closest('.define-stream-handler-type').next().
                         find('.define-stream-handler-type-content');
                     self.renderStreamHandlerContentDiv(currentValue, streamHandlerContent)
@@ -3045,54 +3127,46 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
 
             //To delete stream-handler
             $(".define-stream-handler").on('click', '.btn-del-attr', function () {
-                var sourceDiv = '.define-' + self.getSourceDiv(elementType, $(this)) + '-source';
+                var sourceDiv = self.getSourceDiv($(this));
                 $(this).closest('li').remove();
                 self.preventMultipleSelectionOfWindowStreamHandler(sourceDiv);
-                self.changeAttributeNavigation(sourceDiv + ' .stream-handler-list');
+                self.changeAttributeNavigation($(sourceDiv).find('.stream-handler-list'));
                 self.removeNavigationForWindow(sourceDiv)
                 self.showHideStreamHandlerWindowButton(sourceDiv)
             });
 
             //To reorder up the stream-handler
             $(".define-stream-handler").on('click', '.reorder-up', function () {
-                var sourceDiv = '.define-' + self.getSourceDiv(elementType, $(this)) + '-source';
+                var sourceDiv = self.getSourceDiv($(this));
                 var $current = $(this).closest('li');
                 var $previous = $current.prev('li');
                 if ($previous.length !== 0) {
                     $current.insertBefore($previous);
                 }
-                self.changeAttributeNavigation(sourceDiv + ' .stream-handler-list');
+                self.changeAttributeNavigation($(sourceDiv).find('.stream-handler-list'));
                 self.removeNavigationForWindow(sourceDiv)
             });
 
             //To reorder down the stream-handler
             $(".define-stream-handler").on('click', '.reorder-down', function () {
-                var sourceDiv = '.define-' + self.getSourceDiv(elementType, $(this)) + '-source';
+                var sourceDiv = self.getSourceDiv($(this));
                 var $current = $(this).closest('li');
                 var $next = $current.next('li');
                 if ($next.length !== 0) {
                     $current.insertAfter($next);
                 }
-                self.changeAttributeNavigation(sourceDiv + ' .stream-handler-list');
+                self.changeAttributeNavigation($(sourceDiv).find('.stream-handler-list'));
                 self.removeNavigationForWindow(sourceDiv)
             });
         };
 
         /**
-         * @function to return the div of where the streamhandler is embedded
-         * This method was required as there are two stream handler section for left and right source
+         * @function to return the div of where the stream handler is embedded
          * of join query form.
          */
-        FormUtils.prototype.getSourceDiv = function (elementType, clickedSection) {
-            if (elementType === Constants.JOIN_QUERY) {
-                if (clickedSection.closest('.define-source').hasClass('define-' + Constants.LEFT + '-source')) {
-                    return Constants.LEFT
-                } else {
-                    return Constants.RIGHT
-                }
-            } else {
-                return elementType
-            }
+        FormUtils.prototype.getSourceDiv = function (clickedSection) {
+            var sourceDiv = clickedSection.closest('.define-source');
+            return sourceDiv;
         };
 
         /**
@@ -3108,15 +3182,16 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
                 '<div class = "define-stream-handler-type"> </div>' +
                 '<div class="clearfix"> <div class = "define-stream-handler-type-content"> </div> ' +
                 '<div class = "attr-nav"> </div> </div> <label class = "error-message"> </label> </div> </li>';
-            var streamHandlerList = sourceDiv + ' .stream-handler-list';
+            var streamHandlerList = $(sourceDiv).find('.stream-handler-list');
             var streamHandlerListLength = $(streamHandlerList).find('li').length
             var appendedIndex;
-            if (type === Constants.WINDOW || streamHandlerListLength == 0) {
+            if (type === Constants.WINDOW || streamHandlerListLength == 0 ||
+                $(sourceDiv).find('.define-window-stream-handler').length == 0) {
                 $(streamHandlerList).append(handlerList);
                 appendedIndex = streamHandlerListLength;
             } else {
                 var lastIndex = streamHandlerListLength - 1;
-                $(streamHandlerList + ' li:eq(' + lastIndex + ')').before(handlerList)
+                $(streamHandlerList).find('li:eq(' + lastIndex + ')').before(handlerList);
                 appendedIndex = lastIndex;
             }
             var streamHandlerType = $(sourceDiv).find('.define-stream-handler-type:eq(' + appendedIndex + ')');
@@ -3125,7 +3200,7 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
             self.renderDropDown(streamHandlerType, streamHandlerTypes, Constants.STREAM_HANDLER);
             self.renderStreamHandlerContentDiv(type, streamHandlerContent)
             self.selectHandlerSelection($(sourceDiv).find('.stream-handler-selection:eq(' + appendedIndex + ')'), type)
-            self.changeAttributeNavigation(sourceDiv + ' .stream-handler-list');
+            self.changeAttributeNavigation($(sourceDiv).find('.stream-handler-list'));
             self.mapStreamHandlerContent(streamHandlerContent, self.createEmptyStreamHandler(type))
             self.preventMultipleSelectionOfWindowStreamHandler(sourceDiv);
             self.mapStreamHandlerContent(streamHandlerContent, self.createEmptyStreamHandler(type))
@@ -3135,12 +3210,36 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
         };
 
         /**
+         * @function to add event listeners for condition div
+         */
+        FormUtils.prototype.addEventListenersForConditionDiv = function (inputStreamNames) {
+            var self = this;
+            $('.define-conditions').on('click', '.btn-del-condition', function () {
+                var conditionIndex = $(this).closest('li').index();
+                $('.define-conditions .tab-pane:eq(' + conditionIndex + ')').remove();
+                $(this).closest('li').remove();
+            });
+
+            $('.define-conditions').on('click', '.btn-add-condition', function () {
+                var conditionLength = $('.condition-navigation').length + 1;
+                var conditionName = 'condition' + conditionLength;
+                var conditionList = [{ conditionId: conditionName, streamHandlerList: [], streamName: "" }]
+                self.renderConditions(conditionList, inputStreamNames)
+            });
+
+            $('.define-conditions').on('input', '.condition-id', function () {
+                var conditionIndex = $(this).closest('.condition-content').index();
+                $('.define-conditions .condition-navigation:eq(' + conditionIndex + ') a:eq(0)').html($(this).val());
+            });
+        };
+
+        /**
          * @function to remove the up and down navigation for swindow stream handler
          */
         FormUtils.prototype.removeNavigationForWindow = function (sourceDiv) {
             var streamHandlerListLength = $(sourceDiv).find('.stream-handler-list li').length
             var lastIndex = streamHandlerListLength - 1;
-            var lastList = $(sourceDiv + ' .stream-handler-list li:eq(' + lastIndex + ')');
+            var lastList = $(sourceDiv).find(' .stream-handler-list li:eq(' + lastIndex + ')');
             if (lastList.find('.define-stream-handler-type-content').hasClass('define-window-stream-handler')) {
                 lastList.find('.attr-nav a:eq(0)').remove();
                 if (streamHandlerListLength == 2) {
@@ -3403,31 +3502,31 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
 
         /**
          * @function manages the attribute navigations
+         * @param {Object} ulDiv div where the navigations needs to be altered
          */
         FormUtils.prototype.changeAttributeNavigation = function (ulDiv) {
             $(ulDiv).find('.attr-nav').empty();
-            var listClass = ulDiv + ' li'
-            var attrLength = $(listClass).length;
+            var attrLength = $(ulDiv).find('li').length;
 
             if (attrLength == 1) {
-                $(listClass + ':eq(0)').find('.attr-nav').empty();
+                $(ulDiv).find('li:eq(0)').find('.attr-nav').empty();
             }
             if (attrLength == 2) {
-                $(listClass + ':eq(0)').find('.attr-nav').append('<a class = "reorder-down"><i class="fw fw-sort-down">'
-                    + '</i></a><a class = "btn-del-attr"><i class="fw fw-delete"></i></a>');
-                $(listClass + ':eq(1)').find('.attr-nav').append('<a class="reorder-up"> <i class="fw fw-sort-up">' +
+                $(ulDiv).find('li:eq(0)').find('.attr-nav').append('<a class = "reorder-down"><i class="fw ' +
+                    'fw-sort-down"> </i></a><a class = "btn-del-attr"><i class="fw fw-delete"></i></a>');
+                $(ulDiv).find('li:eq(1)').find('.attr-nav').append('<a class="reorder-up"> <i class="fw fw-sort-up">' +
                     '</i> </a><a class = "btn-del-attr"><i class="fw fw-delete"></i></a>');
             }
             if (attrLength > 2) {
                 var lastIndex = attrLength - 1;
                 for (var i = 0; i < attrLength; i++) {
-                    $(listClass + ':eq(' + i + ')').find('.attr-nav').append('<a class="reorder-up"> ' +
+                    $(ulDiv).find('li:eq(' + i + ')').find('.attr-nav').append('<a class="reorder-up"> ' +
                         '<i class="fw fw-sort-up"></i></a>' +
                         '<a class = "reorder-down"><i class="fw fw-sort-down"> </i></a>' +
                         '<a class = "btn-del-attr"><i class="fw fw-delete"></i></a>');
                 }
-                $(listClass + ':eq(0)').find('.attr-nav a:eq(0)').remove();
-                $(listClass + ':eq(' + lastIndex + ')').find('.attr-nav a:eq(1)').remove();
+                $(ulDiv).find('li:eq(0)').find('.attr-nav a:eq(0)').remove();
+                $(ulDiv).find('li:eq(' + lastIndex + ')').find('.attr-nav a:eq(1)').remove();
             }
         };
 
@@ -3450,7 +3549,7 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
          * @function to prevent multiple selection. Prevents from selecting window multiple times
          */
         FormUtils.prototype.preventMultipleSelectionOfWindowStreamHandler = function (className) {
-            var dropDown = $(className + ' .' + Constants.STREAM_HANDLER + '-selection')
+            var dropDown = $(className).find(' .' + Constants.STREAM_HANDLER + '-selection')
             dropDown.children().prop('disabled', false);
             dropDown.each(function () {
                 var val = this.value;
@@ -3510,6 +3609,7 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
             $('.define-group-by-attributes').find('.group-by-attributes li:eq(0) .btn-del-option').remove();
             $('.define-order-by-attributes').find('.order-by-attributes li:eq(0) .btn-del-option').remove();
             $('.define-select').find('.user-defined-attributes li:eq(0) .btn-del-option').remove();
+            $('.define-conditions').find('.nav-tabs li:eq(0) .btn-del-condition').remove();
         };
 
         /**

@@ -1452,28 +1452,26 @@
 </script>
 
 <script id="group-by-template" type = "text/template">
-    <div class = "define-group-by-attributes">
-        <h3> Group By </h3>
-        <label> <input type = "checkbox" class="group-by-checkbox"> Group By Attributes </label>
-        <div class="group-by-content order-group-by-content">
-            <label> Attribute Name </label>
-            <ul class="group-by-attributes">
-                {{#each groupBy}}
-                <li>
-                    <div class="clearfix">
-                        <div class="group-by-attribute-content">
-                            <div class="define-attribute-drop-down">
-                                {{> renderDropDown ../possibleGroupByAttributes}}
-                            </div>
-                            <a class = "btn-del-option"> <i class = "fw fw-delete"> </i></a>
+    <h3> Group By </h3>
+    <label> <input type = "checkbox" class="group-by-checkbox"> Group By Attributes </label>
+    <div class="group-by-content order-group-by-content">
+        <label> Attribute Name </label>
+        <ul class="group-by-attributes">
+            {{#each groupBy}}
+            <li>
+                <div class="clearfix">
+                    <div class="group-by-attribute-content">
+                        <div class="define-attribute-drop-down">
+                            {{> renderDropDown ../possibleGroupByAttributes}}
                         </div>
+                        <a class = "btn-del-option"> <i class = "fw fw-delete"> </i></a>
                     </div>
-                    <label class="error-message"> </label>
-                </li>
-                {{/each}}
-            </ul>
-            <button class="btn btn-default btn-add-group-by-attribute"> + Attribute </button>
-        </div>
+                </div>
+                <label class="error-message"> </label>
+            </li>
+            {{/each}}
+        </ul>
+        <button class="btn btn-default btn-add-group-by-attribute"> + Attribute </button>
     </div>
 </script>
 
@@ -1567,7 +1565,7 @@
     <div class = "aggregation-form-container">
         <div class = "define-select"> </div>
         <hr>
-        <div class="define-aggregate-group-by"> </div>
+        <div class="define-group-by-attributes"> </div>
     </div>
     <div class = "aggregation-form-container">
         <div id="define-aggregate-annotations">
@@ -1626,14 +1624,15 @@
     <div class = "join-query-form-container">
         <div class = "define-select"> </div>
         <hr>
-        <div class="define-query-group-by"> </div>
+        <div class="define-group-by-attributes"> </div>
         <hr>
         <div class="define-post-filter-condition define-content">
             <label>
                 <input type="checkbox" class="post-filter-checkbox query-checkbox"> Post filter condition
             </label>
             <div class="post-filter-condition-content query-content">
-                <input type="text" class="clearfix post-condition-value query-content-value symbol-syntax-required-value">
+                <input type="text"
+                       class="clearfix post-condition-value query-content-value name symbol-syntax-required-value">
                 <label class="error-message"> </label>
             </div>
         </div>
@@ -1713,6 +1712,54 @@
     </div>
 </script>
 
+<script id="pattern-query-form-template" type = "text/template">
+    <div class="pattern-query-form-container">
+        <div class="query-name-div">
+            <h4> Name: </h4>
+            <input type="text"  class="clearfix query-name name" value="{{name}}">
+            <label class="error-message"> </label>
+        </div>
+        <div class ="define-annotations">
+            <h4> Annotations </h4>
+            <div class ="define-predefined-annotations"> </div>
+            <div class="define-user-defined-annotations"></div>
+        </div>
+    </div>
+    <div class="pattern-query-form-container">
+        <h4> Input </h4>
+        <div class="define-conditions">
+            <h4> Conditions </h4>
+            <ul class="nav nav-tabs"> </ul>
+            <div class="tab-content"> </div>
+            <button class="btn btn-default btn-add-condition"> + Condition </button>
+        </div>
+        <div class="define-logic-statement">
+            <h4> Logic Statement </h4>
+            <input type="text"  class="clearfix logic-statement name">
+            <label class="error-message"> </label>
+        </div>
+    </div>
+    <div class = "pattern-query-form-container">
+        <div class = "define-select"> </div>
+        <hr>
+        <div class="define-group-by-attributes"> </div>
+        <hr>
+        <div class="define-post-filter-condition define-content">
+            <label>
+                <input type="checkbox" class="post-filter-checkbox query-checkbox"> Post filter condition
+            </label>
+            <div class="post-filter-condition-content query-content">
+                <input type="text"
+                       class="clearfix post-condition-value query-content-value name symbol-syntax-required-value">
+                <label class="error-message"> </label>
+            </div>
+        </div>
+    </div>
+    <div class="pattern-query-form-container">
+        <div class="define-query-output"> </div>
+    </div>
+</script>
+
 <script id ="stream-handler-form-template" type = "text/template">
     <ul class = "stream-handler-list">
         {{#each streamHandlerList}}
@@ -1729,6 +1776,32 @@
         </li>
         {{/each}}
     </ul>
+</script>
+
+<script id="pattern-sequence-condition-navigation-form-template" type = "text/template">
+    <li class="condition-navigation">
+        <a href=".define-{{conditionId}}-source" data-toggle="tab"> {{conditionId}} </a>
+        <a class = "btn-del-condition"> <i class = "fw fw-delete"> </i></a>
+    </li>
+</script>
+
+<script id="pattern-sequence-condition-content-form-template" type = "text/template">
+    <div class="tab-pane condition-content define-source define-{{condition.conditionId}}-source">
+        <div class="define-source">
+            <label class="clearfix"> Condition ID </label>
+            <input type="text" class="condition-id clearfix" value="{{condition.conditionId}}" min="1">
+            <label class="error-message"></label>
+            <div class="define-stream"> {{> renderDropDown inputStreamNames}}  </div>
+            <div class="define-stream-handler">
+                <label> <input type="checkbox" class="stream-handler-checkbox"> Stream Handler </label>
+                <div class="define-stream-handler-section"> </div>
+                <div class = "define-stream-handler-buttons">
+                    <button class="btn btn-default btn-add-filter"> + Filter </button>
+                    <button class="btn btn-default btn-add-function"> + Function </button>
+                </div>
+            </div>
+        </div>
+    </div>
 </script>
 
 <!--Start: Settings Modal-->
@@ -2322,19 +2395,18 @@
             other_query_syntax: ["snapshot", "every"],
             incremental_aggregator: ["sum", "min", "max", "avg", "count", "distinctCount"],
             join_types: ["join", "left_outer_join", "right_outer_join", "full_outer_join"],
-            stream_handler_types: ["filter", "function","window"],
+            join_query_stream_handler_types: ["filter", "function","window"],
+            stream_handler_types: ["filter","function"],
             trigger: [
             {
                 name: "start",
                 description: "An event is triggered when Siddhi is started.",
                 defaultValue: ""
-
             },
             {
                 name: "cron-expression",
                 description: "An event is triggered periodically based on the given cron expression",
                 defaultValue: "0 15 10 ? * MON-FRI"
-
             },
             {
                 name: "every",

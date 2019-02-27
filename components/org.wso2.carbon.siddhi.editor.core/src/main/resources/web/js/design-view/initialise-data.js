@@ -302,6 +302,7 @@ define(['require', 'log', 'lodash', 'jquery', 'configurationData', 'appData', 'p
             _.forEach(patternQueryList, function (patternQuery) {
                 var patternQueryObject = new Query(patternQuery);
                 addAnnotationsForElement(patternQuery, patternQueryObject);
+                addAnnotationObjectForElement(patternQuery, patternQueryObject);
 
                 // queryInput section in the query is compulsory. If that is not found there is a error in backend.
                 if (!patternQuery.queryInput) {

@@ -877,7 +877,8 @@ a.list-group-item, button.list-group-item {
 .partition-form-container,
 .siddhi-app-form-container,
 .aggregation-form-container,
-.join-query-form-container {
+.join-query-form-container,
+.pattern-query-form-container {
 	float: left;
 	display: inline-block;
 	padding: 5px;
@@ -886,7 +887,8 @@ a.list-group-item, button.list-group-item {
 .window-form-container,
 .trigger-form-container,
 .function-form-container,
-.join-query-form-container {
+.join-query-form-container,
+.pattern-query-form-container {
 	width: 25%;
 }
 
@@ -1167,7 +1169,7 @@ a.list-group-item, button.list-group-item {
 	margin-top: 10px;
 }
 
-.join-query-form-container .define-output-events,
+.design-view-form-content .define-output-events,
 .design-view-form-content .query-selected-attributes li {
 	margin-top: 10px;
 }
@@ -1185,7 +1187,7 @@ a.list-group-item, button.list-group-item {
 	margin-bottom: 10px;
 }
 
-.design-view-form-content .query-select .projection-as-label {
+.design-view-form-content .define-select .projection-as-label {
 	margin-left: 185px;
 }
 
