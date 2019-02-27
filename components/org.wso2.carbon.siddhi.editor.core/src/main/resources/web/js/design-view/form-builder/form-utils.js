@@ -3214,18 +3214,6 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
          */
         FormUtils.prototype.addEventListenersForConditionDiv = function (inputStreamNames) {
             var self = this;
-            $('.define-conditions').on('click', '.btn-del-condition', function () {
-                var conditionIndex = $(this).closest('li').index();
-                $('.define-conditions .tab-pane:eq(' + conditionIndex + ')').remove();
-                $(this).closest('li').remove();
-            });
-
-            $('.define-conditions').on('click', '.btn-add-condition', function () {
-                var conditionLength = $('.condition-navigation').length + 1;
-                var conditionName = 'condition' + conditionLength;
-                var conditionList = [{ conditionId: conditionName, streamHandlerList: [], streamName: "" }]
-                self.renderConditions(conditionList, inputStreamNames)
-            });
 
             $('.define-conditions').on('input', '.condition-id', function () {
                 var conditionIndex = $(this).closest('.condition-content').index();
