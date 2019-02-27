@@ -277,19 +277,6 @@ public class PatternSequenceConfigGenerator {
     }
 
     /**
-     * Returns the 'within' expression when the given parameter is not null.
-     * Otherwise, returns an empty string
-     * @param nullableWithin        Value contained in 'within', which might be null
-     * @return                      Within expression
-     */
-    private static String buildWithin(String nullableWithin) {
-        if (nullableWithin == null) {
-            return "";
-        }
-        return WHITE_SPACE + WITHIN + WHITE_SPACE + nullableWithin;
-    }
-
-    /**
      * Generates ElementComponent object for the given CountStateElementConfig object
      * @param element                           CountStateElement object
      * @return                                  ElementComponent object
@@ -303,8 +290,7 @@ public class PatternSequenceConfigGenerator {
         conditions.add(conditionConfig);
         String logicComponent =
                 conditionConfig.getConditionId() +
-                buildMinMax(element.getMin(), element.getMax(), mode) +
-                buildWithin(element.getWithin());
+                buildMinMax(element.getMin(), element.getMax(), mode);
         return new ElementComponent(conditions, new ArrayList<>(Arrays.asList(logicComponent)));
     }
 
@@ -322,8 +308,7 @@ public class PatternSequenceConfigGenerator {
         String logicComponent =
                 EVERY +
                 WHITE_SPACE +
-                containedElement.getLogicComponentsString(mode) +
-                buildWithin(element.getWithin());
+                containedElement.getLogicComponentsString(mode);
         return new ElementComponent(conditions, new ArrayList<>(Arrays.asList(logicComponent)));
     }
 
@@ -360,8 +345,7 @@ public class PatternSequenceConfigGenerator {
                 WHITE_SPACE +
                 element.getType().toLowerCase() +
                 WHITE_SPACE +
-                condition2Component.getLogicComponentsString(mode) +
-                buildWithin(element.getWithin());
+                condition2Component.getLogicComponentsString(mode);
         // Add conditions
         List<PatternSequenceConditionConfig> conditions = new ArrayList<>();
         conditions.addAll(condition1Component.conditions);
@@ -391,7 +375,6 @@ public class PatternSequenceConfigGenerator {
             logicComponent.append(WHITE_SPACE);
             logicComponent.append(((AbsentStreamStateElementConfig) element).getWaitingTime());
         }
-        logicComponent.append(buildWithin(element.getWithin()));
         // Add condition
         List<PatternSequenceConditionConfig> conditions = new ArrayList<>();
         conditions.add(conditionConfig);
