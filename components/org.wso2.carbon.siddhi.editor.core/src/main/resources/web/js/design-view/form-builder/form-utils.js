@@ -2029,7 +2029,7 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
          */
         FormUtils.prototype.mapConditions = function (conditionList) {
             var self = this;
-            var streamHandlerTypes = self.configurationData.application.config.stream_handler_types;
+            var streamHandlerTypes = self.configurationData.application.config.stream_handler_types_without_window;
             if (conditionList && conditionList.length != 0) {
                 _.forEach(conditionList, function (condition) {
                     //select the stream name

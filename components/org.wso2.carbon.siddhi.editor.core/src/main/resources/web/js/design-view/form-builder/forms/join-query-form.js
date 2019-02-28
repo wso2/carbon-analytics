@@ -323,7 +323,7 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
                 var predefinedAnnotations = JSON.parse(JSON.stringify(self.configurationData.application.config.
                     query_predefined_annotations));
                 var incrementalAggregator = self.configurationData.application.config.incremental_aggregator;
-                var streamHandlerTypes = self.configurationData.application.config.join_query_stream_handler_types;
+                var streamHandlerTypes = self.configurationData.application.config.stream_handler_types;
 
                 //render the join-query form template
                 var joinFormTemplate = Handlebars.compile($('#join-query-form-template').html());
