@@ -22,7 +22,6 @@ public class LogicalStateElementConfig implements StateElementConfig {
     private StreamStateElementConfig streamStateElement1;
     private String type;
     private StreamStateElementConfig streamStateElement2;
-    private String within;
 
     public StreamStateElementConfig getStreamStateElement1() {
         return streamStateElement1;
@@ -46,13 +45,5 @@ public class LogicalStateElementConfig implements StateElementConfig {
 
     public void setStreamStateElement2(StreamStateElementConfig streamStateElement2) {
         this.streamStateElement2 = streamStateElement2;
-    }
-
-    public String getWithin() {
-        return within;
-    }
-
-    public void setWithin(String within) {
-        this.within = within;
     }
 }

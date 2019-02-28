@@ -1553,8 +1553,8 @@
 
     <properties>
         <carbon.analytics.version>2.0.488-SNAPSHOT</carbon.analytics.version>
-        <siddhi.version>4.4.0</siddhi.version>
-        <siddhi.bundle.version>4.4.0</siddhi.bundle.version>
+        <siddhi.version>4.4.8</siddhi.version>
+        <siddhi.bundle.version>4.4.8</siddhi.bundle.version>
         <siddhi.version.range>[4.0.0, 5.0.0)</siddhi.version.range>
         <carbon.analytics-common.version>6.0.73</carbon.analytics-common.version>
         <carbon.analytics-common.version.range>[6.0.66, 6.1.0)</carbon.analytics-common.version.range>
@@ -1609,7 +1609,7 @@
         <mavan.findbugsplugin.exclude.file>findbugs-exclude.xml</mavan.findbugsplugin.exclude.file>
 
         <!--Dashboard-->
-        <carbon.uiserver.version>0.19.5</carbon.uiserver.version>
+        <carbon.uiserver.version>0.19.6</carbon.uiserver.version>
         <carbon.uiserver.version.range>[0.19.3, 1.0.0]</carbon.uiserver.version.range>
 
         <!-- Maven plugins -->
@@ -1758,17 +1758,17 @@
 
         <!--Siddhi Extension Versions-->
 
-        <siddhi.io.tcp.version>2.0.20</siddhi.io.tcp.version>
-        <siddhi.io.email.version>1.0.22</siddhi.io.email.version>
-        <siddhi.io.kafka.version>4.1.17</siddhi.io.kafka.version>
-        <siddhi.io.http.version>1.0.37</siddhi.io.http.version>
+        <siddhi.io.tcp.version>2.1.0</siddhi.io.tcp.version>
+        <siddhi.io.email.version>1.1.0</siddhi.io.email.version>
+        <siddhi.io.kafka.version>4.2.0</siddhi.io.kafka.version>
+        <siddhi.io.http.version>1.1.0</siddhi.io.http.version>
 
-        <siddhi.map.json.version>4.0.31</siddhi.map.json.version>
-        <siddhi.map.binary.version>1.0.15</siddhi.map.binary.version>
-        <siddhi.map.xml.version>4.0.19</siddhi.map.xml.version>
+        <siddhi.map.json.version>4.1.0</siddhi.map.json.version>
+        <siddhi.map.binary.version>1.1.0</siddhi.map.binary.version>
+        <siddhi.map.xml.version>4.1.0</siddhi.map.xml.version>
 
-        <siddhi.store.rdbms.version>4.0.33</siddhi.store.rdbms.version>
-        <siddhi.store.solr.version>1.0.21</siddhi.store.solr.version>
+        <siddhi.store.rdbms.version>5.1.0</siddhi.store.rdbms.version>
+        <siddhi.store.solr.version>1.1.0</siddhi.store.solr.version>
 
         <zkclient.version>0.10</zkclient.version>
 
@@ -1786,14 +1786,14 @@
         <open.tracing.version>0.31.0</open.tracing.version>
 
         <!-- jms test dependencies version-->
-        <siddhi.io.jms.version>1.0.31</siddhi.io.jms.version>
+        <siddhi.io.jms.version>1.1.0</siddhi.io.jms.version>
         <andes.client.version>4.0.0</andes.client.version>
         <commons.lang.version>2.6</commons.lang.version>
         <org.apache.geronimo.specs.version>1.1.1</org.apache.geronimo.specs.version>
         <org.fusesource.hawtbuf.version>1.11</org.fusesource.hawtbuf.version>
         <!-- nats test dependencies -->
         <io.nats.version>2.1.2</io.nats.version>
-        <siddhi.io.nats.version>1.0.2</siddhi.io.nats.version>
+        <siddhi.io.nats.version>1.0.3</siddhi.io.nats.version>
         <org.testcontainers.version>1.8.0</org.testcontainers.version>
     </properties>
 </project>
