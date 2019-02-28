@@ -211,18 +211,12 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
         };
 
         /**
-         * @function to get the stream handler objects plus adding an additional attribute to
-         * determine if the stream handler object is left or right
+         * @function to get the stream handler objects
          */
-        var getStreamHandlers = function (savedData, streamHandlerList, leftOrRight) {
+        var getStreamHandlers = function (savedData, streamHandlerList) {
             if (savedData && savedData.getStreamHandlerList() && savedData.getStreamHandlerList().length != 0) {
                 _.forEach(savedData.getStreamHandlerList(), function (streamHandler) {
-                    var streamHandlerObject = {
-                        sourceType: leftOrRight,
-                        type: streamHandler.type,
-                        value: streamHandler.value
-                    }
-                    streamHandlerList.push(streamHandlerObject);
+                    streamHandlerList.push(streamHandler);
                 });
             }
         };

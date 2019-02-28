@@ -3046,12 +3046,12 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
                 }
                 var windowType;
                 var savedParameterValues;
-                var streamHandlerWindow = self.getStreamHandlerWindow(streamHandlerList, source);
+                var selectedType = this.value.toLowerCase();
+                var streamHandlerWindow = self.getStreamHandler(streamHandlerList, Constants.WINDOW, selectedType);
                 if (streamHandlerWindow) {
                     windowType = streamHandlerWindow.value.function.toLowerCase();
                     savedParameterValues = streamHandlerWindow.value.parameters;
                 }
-                var selectedType = this.value.toLowerCase();
                 var functionParameters = self.getSelectedTypeParameters(selectedType, predefinedWindowFunctions);
                 var parameterDiv = $(this).closest('.defineFunctionName').parents('.define-stream-handler-type-content');
                 if (savedParameterValues && selectedType == windowType) {
@@ -3239,25 +3239,7 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
         };
 
         /**
-         * @function to get the saved window stream handler so that the saved parameters
-         * can be pre-populated if the user changes to a different window type and changes it back to
-         * the saved window type
-         */
-        FormUtils.prototype.getStreamHandlerWindow = function (streamHandlerList, source) {
-            var windowObject;
-            if (streamHandlerList && streamHandlerList.length != 0) {
-                _.forEach(streamHandlerList, function (streamHandler) {
-                    if (streamHandler.type.toLowerCase() === Constants.WINDOW && streamHandler.sourceType === source) {
-                        windowObject = streamHandler;
-                        return false;
-                    }
-                });
-            }
-            return windowObject;
-        };
-
-        /**
-         * @function to get the saved function stream handler so that the saved parameters
+         * @function to get the saved stream handler[window/stream function] so that the saved parameters
          * can be pre-populated if the user changes to a different function type and changes it back to
          * the saved function type - assuming that the user has saved different function types in each case
          */
@@ -3265,7 +3247,8 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
             var streamHandler;
             if (streamHandlerList && streamHandlerList.length != 0) {
                 _.forEach(streamHandlerList, function (handler) {
-                    if (handler.type.toLowerCase() === streamHandlerType && handler.value.function === selectedType) {
+                    if (handler.type.toLowerCase() === streamHandlerType &&
+                    		handler.value.function.toLowerCase() === selectedType) {
                         streamHandler = handler;
                         return false;
                     }
