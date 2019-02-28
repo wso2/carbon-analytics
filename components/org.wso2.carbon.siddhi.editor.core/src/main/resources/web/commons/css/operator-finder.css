@@ -138,3 +138,10 @@
     color: #06c706;
     padding-right: 10px;
 }
+
+.info-text {
+    color: #009DA7;
+    font-weight: bold;
+    padding: 5px 0;
+    margin-bottom: 15px;
+}

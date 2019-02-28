@@ -16,44 +16,27 @@
  * under the License.
  */
 
-define(['jquery', 'lodash', 'log', 'handlebar', 'designViewUtils'],
-    function ($, _, log, Handlebars, DesignViewUtils) {
-
+define(['jquery', 'lodash', 'log', 'handlebar', 'designViewUtils', 'app/source-editor/completion-engine'],
+    function ($, _, log, Handlebars, DesignViewUtils, CompletionEngine) {
         /**
-         * Loads operators from the endpoint.
+         * Load operators from the Completion engine.
          *
-         * @param onSuccess Callback for success handler
-         * @param onError Callback for error handler
+         * @param callback Callback function
          */
-        var loadOperators = function (onSuccess, onError) {
-            var operators = [];
-            var namespaces = [];
-            $.ajax({
-                type: 'GET',
-                url: window.location.protocol + '//' + window.location.host + '/editor/metadata',
-                async: false,
-                success: function (data, status, xhr) {
-                    if (xhr.status === 200) {
-                        // Flatten operator metadata into an array.
-                        operators = flattenOperators(data);
-                        // Get all extension namespaces.
-                        for (var extension in data.extensions) {
-                            if (data.extensions.hasOwnProperty(extension)) {
-                                namespaces.push(extension);
-                            }
-                        }
-                        namespaces.sort();
-                        onSuccess(namespaces, operators);
-                    } else {
-                        onError('Failed retrieving operators.');
-                    }
-                },
-                error: function () {
-                    onError('Failed retrieving operators.');
+        var loadOperators = function(callback) {
+            var data = CompletionEngine.getRawMetadata();
+            // Flatten operator metadata into an array.
+            var operators = flattenOperators(data);
+            // Get all extension namespaces.
+                var namespaces = [];
+            for (var extension in data.extensions) {
+                if (data.extensions.hasOwnProperty(extension)) {
+                    namespaces.push(extension);
                 }
-            });
+            }
+            namespaces.sort();
+            callback(namespaces, operators);
         };
-
         /**
          * Builds operator syntax
          *
@@ -327,23 +310,21 @@ define(['jquery', 'lodash', 'log', 'handlebar', 'designViewUtils'],
             var detailsModal = $('#modalOperatorDetails').clone();
             var modalContent = detailsModal.find('.modal-content');
 
-            // Load operator metadata from the REST API.
-            loadOperators(
-                function (namespaces, operators) {
-                    self._namespaces = namespaces;
-                    self._operators = operators;
-                    self.renderSearchResults();
-                },
-                function (msg) {
-                    DesignViewUtils.prototype.errorAlert(msg);
-                });
-
             // Event handler for the sidebar (activate) button.
             this._activateBtn.on('click', function (e) {
                 e.preventDefault();
                 e.stopPropagation();
                 if (!$(this).hasClass('disabled')) {
                     self._application.commandManager.dispatch(self._options.command.id);
+                }
+
+                // If the operators are not available, get them from the completion engine.
+                if (!self._operators) {
+                    loadOperators(function(namespaces, operator) {
+                        self._namespaces = namespaces;
+                        self._operators = operator;
+                        self.renderSearchResults();
+                    });
                 }
             });
 
@@ -382,12 +363,18 @@ define(['jquery', 'lodash', 'log', 'handlebar', 'designViewUtils'],
                 e.preventDefault();
                 var index = $(this).closest('.result').data('index');
                 var data = _.clone(self._operators[index]);
-                data.parameters.forEach(function (p) {
-                    p.dataTypes = p.type.join('<br />');
-                });
-                data.returnAttributes.forEach(function (r) {
-                    r.dataTypes = r.type.join('<br />');
-                });
+                if (data.parameters) {
+                    data.parameters.forEach(function (p) {
+                        p.dataTypes = p.type.join('<br />');
+                    });
+                }
+                if (data.returnAttributes) {
+                    data.returnAttributes.forEach(function (r) {
+                        r.dataTypes = r.type.join('<br />');
+                    });
+                }
+                data.hasParameters = (data.parameters || []).length > 0;
+                data.hasReturnAttributes = (data.returnAttributes || []).length > 0;
                 data.index = index;
                 data.enableAddToSource = !self.isWelcomePageSelected() && isSourceView();
                 modalContent.html(self._templates.moreDetails(data));
