@@ -3080,11 +3080,11 @@ define(["ace/ace", "jquery", "./constants", "./utils", "ace/snippets", "ace/rang
             return snippet;
         }
 
-		/**
-		 * @function to obtain the stream function from the given extensions
-		 * @param {Object} extensions extensions
-		 * @param {Object} streamFunctions array to hold the stream functions
-		 */
+        /**
+         * @function to obtain the stream function from the given extensions
+         * @param {Object} extensions extensions
+         * @param {Object} streamFunctions array to hold the stream functions
+         */
         function obtainStreamFunctionsFromResponse(extensions, streamFunctions) {
             _.forEach(extensions, function (extension) {
                 _.forEach(extension.streamProcessors, function (streamFunction) {
