@@ -414,7 +414,7 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
                 var streamHandlerList = [];
                 getStreamHandlers(leftSourceSavedData, streamHandlerList, Constants.LEFT);
                 getStreamHandlers(rightSourceSavedData, streamHandlerList, Constants.RIGHT);
-                self.formUtils.addEventListenersForStreamHandlersDiv(streamHandlerList, Constants.JOIN_QUERY);
+                self.formUtils.addEventListenersForStreamHandlersDiv(streamHandlerList);
 
                 self.formUtils.mapStreamHandler(leftSourceSavedData, Constants.LEFT)
                 self.formUtils.mapStreamHandler(rightSourceSavedData, Constants.RIGHT)
@@ -511,6 +511,7 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
                     var isQueryNameUsed
                         = self.formUtils.isQueryDefinitionNameUsed(queryName, id);
                     if (isQueryNameUsed) {
+                    	self.formUtils.addErrorClass($('.query-name'));
                         $('.query-name-div').find('.error-message').text('Query name is already used.');
                         isErrorOccurred = true;
                         return;
