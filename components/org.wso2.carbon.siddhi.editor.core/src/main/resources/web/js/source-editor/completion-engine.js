@@ -2960,6 +2960,7 @@ define(["ace/ace", "jquery", "./constants", "./utils", "ace/snippets", "ace/rang
                 url: constants.SERVER_URL + "metadata",
                 success: function (response, textStatus, jqXHR) {
                     if (response.status == "SUCCESS") {
+                        CompletionEngine.rawMetadata = response;
                         (function () {
                             var snippets = {};
                             for (var processorType in response.inBuilt) {
@@ -3025,6 +3026,10 @@ define(["ace/ace", "jquery", "./constants", "./utils", "ace/snippets", "ace/rang
                     }
                 }
             });
+        };
+
+        CompletionEngine.getRawMetadata = function () {
+            return CompletionEngine.rawMetadata;
         };
 
         /**

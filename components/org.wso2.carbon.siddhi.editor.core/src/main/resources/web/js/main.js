@@ -17,11 +17,11 @@
  */
 
 define(['require', 'log', 'jquery', 'lodash', 'backbone', 'menu_bar', 'tool_bar', 'command', 'workspace',
-        'app/tab/service-tab-list', 'event_simulator', 'app/output-console/service-console-list-manager',
+        'app/tab/service-tab-list', 'event_simulator', 'operator_finder', 'app/output-console/service-console-list-manager',
         'nano_scroller'],
 
     function (require, log, $, _, Backbone, MenuBar, ToolBar, CommandManager, Workspace, TabController,
-              EventSimulator, OutputController) {
+              EventSimulator, OperatorFinder, OutputController) {
 
         var Application = Backbone.View.extend(
             /** @lends Application.prototype */
@@ -87,6 +87,11 @@ define(['require', 'log', 'jquery', 'lodash', 'backbone', 'menu_bar', 'tool_bar'
                     _.set(eventSimulatorOpts, 'application', this);
                     this.eventSimulator = new EventSimulator(eventSimulatorOpts);
                     this.eventSimulator.stopRunningSimulations();
+
+                    // Initialize operator finder.
+                    var operatorFinderOpts = _.get(this.config, 'operator_finder');
+                    _.set(operatorFinderOpts, 'application', this);
+                    this.operatorFinder = new OperatorFinder.OperatorFinder(operatorFinderOpts);
                 },
 
                 render: function () {
@@ -109,6 +114,10 @@ define(['require', 'log', 'jquery', 'lodash', 'backbone', 'menu_bar', 'tool_bar'
                     log.debug("start: rendering event simulator control");
                     this.eventSimulator.render();
                     log.debug("end: rendering event simulator control");
+
+                    log.debug("start: rendering operator finder");
+                    this.operatorFinder.render();
+                    log.debug("end: rendering operator finder");
                 },
 
                 getOperatingSystem: function(){

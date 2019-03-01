@@ -26,7 +26,6 @@ public class StreamStateElementConfig implements StateElementConfig {
     private String streamReference;
     private String streamName;
     private List<StreamHandlerConfig> streamHandlerList;
-    private String within;
 
     public String getStreamReference() {
         return streamReference;
@@ -50,13 +49,5 @@ public class StreamStateElementConfig implements StateElementConfig {
 
     public void setStreamHandlerList(List<StreamHandlerConfig> streamHandlerList) {
         this.streamHandlerList = streamHandlerList;
-    }
-
-    public String getWithin() {
-        return within;
-    }
-
-    public void setWithin(String within) {
-        this.within = within;
     }
 }

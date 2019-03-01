@@ -20,7 +20,6 @@ package org.wso2.carbon.siddhi.editor.core.util.designview.designgenerator.gener
 
 public class CountStateElementConfig implements StateElementConfig {
     private StreamStateElementConfig streamStateElement;
-    private String within;
     private int min;
     private int max;
 
@@ -30,14 +29,6 @@ public class CountStateElementConfig implements StateElementConfig {
 
     public void setStreamStateElement(StreamStateElementConfig streamStateElement) {
         this.streamStateElement = streamStateElement;
-    }
-
-    public String getWithin() {
-        return within;
-    }
-
-    public void setWithin(String within) {
-        this.within = within;
     }
 
     public int getMin() {
