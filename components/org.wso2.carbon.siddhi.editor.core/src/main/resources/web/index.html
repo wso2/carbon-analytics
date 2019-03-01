@@ -1804,6 +1804,55 @@
     </div>
 </script>
 
+<script id = "window-filter-projection-query-form-template" type="text/template">
+    <div class="query-form-container">
+        <div class="query-name-div">
+            <h4> Name: </h4>
+            <input type="text"  class="clearfix query-name name" value="{{name}}">
+            <label class="error-message"> </label>
+        </div>
+        <div class="query-from-div">
+            <h4> From: </h4>
+            <input type="text" class="clearfix name query-from" value="{{from}}" readonly>
+        </div>
+        <div class="define-query-source define-source">
+            <div class="define-stream-handler">
+                <label> <input type="checkbox" class="stream-handler-checkbox"> Stream Handler </label>
+                <div class="define-stream-handler-section"> </div>
+                <div class = "define-stream-handler-buttons">
+                    <button class="btn btn-default btn-add-filter"> + Filter </button>
+                    <button class="btn btn-default btn-add-function"> + Function </button>
+                    <button class="btn btn-default btn-add-window"> + Window </button>
+                </div>
+            </div>
+        </div>
+        <div class ="define-annotations">
+            <h4> Annotations </h4>
+            <div class ="define-predefined-annotations"> </div>
+            <div class="define-user-defined-annotations"></div>
+        </div>
+    </div>
+    <div class="query-form-container">
+        <div class = "define-select"> </div>
+        <hr>
+        <div class="define-group-by-attributes"> </div>
+        <hr>
+        <div class="define-post-filter-condition define-content">
+            <label>
+                <input type="checkbox" class="post-filter-checkbox query-checkbox"> Post filter condition
+            </label>
+            <div class="post-filter-condition-content query-content">
+                <input type="text"
+                       class="clearfix post-condition-value query-content-value name symbol-syntax-required-value">
+                <label class="error-message"> </label>
+            </div>
+        </div>
+    </div>
+    <div class="query-form-container">
+        <div class="define-query-output"> </div>
+    </div>
+</script>
+
 <!--Start: Settings Modal-->
 <div class="modal fade modalSettings" id="modalSettings" tabindex="-1" role="dialog">
     <div class="modal-dialog" role="document">

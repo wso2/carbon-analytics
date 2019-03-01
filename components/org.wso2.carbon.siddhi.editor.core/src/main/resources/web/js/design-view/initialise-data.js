@@ -273,6 +273,7 @@ define(['require', 'log', 'lodash', 'jquery', 'configurationData', 'appData', 'p
         function addWindowFilterProjectionQueries(mainObject, windowFilterProjectionQueryList, newIdBeginningPhrase) {
             _.forEach(windowFilterProjectionQueryList, function (windowFilterProjectionQuery) {
                 var queryObject = new Query(windowFilterProjectionQuery);
+                addAnnotationObjectForElement(windowFilterProjectionQuery, queryObject);
                 addAnnotationsForElement(windowFilterProjectionQuery, queryObject);
                 queryObject.addQueryName(windowFilterProjectionQuery.queryName);
 
