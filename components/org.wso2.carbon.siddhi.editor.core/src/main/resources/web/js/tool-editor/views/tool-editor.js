@@ -192,7 +192,7 @@ define(['require', 'jquery', 'backbone', 'lodash', 'log', 'design_view', "./sour
                                         loadingScreen.hide();
                                     }
                                     // NOTE - This trigger should be always handled at the end of setTimeout()
-                                    self.trigger("view-switch");
+                                    self.trigger("view-switch", { view: 'design' });
                                 }, 100);
                                 toggleViewButton.html("<i class=\"fw fw-code\"></i>" +
                                     "<span class=\"toggle-button-text\">Source View</span>");
@@ -250,7 +250,7 @@ define(['require', 'jquery', 'backbone', 'lodash', 'log', 'design_view', "./sour
                             if (!isDesignViewContentChanged) {
                                 designContainer.hide();
                                 sourceContainer.show();
-                                self.trigger("view-switch");
+                                self.trigger("view-switch", { view: 'source' });
                                 toggleViewButton.html("<i class=\"fw fw-design-view fw-rotate-90\"></i>" +
                                     "<span class=\"toggle-button-text\">Design View</span>");
                                 return;
@@ -281,7 +281,7 @@ define(['require', 'jquery', 'backbone', 'lodash', 'log', 'design_view', "./sour
                                     self._sourceView.format();
                                     loadingScreen.hide();
                                     // NOTE - This trigger should be always handled at the end of setTimeout()
-                                    self.trigger("view-switch");
+                                    self.trigger("view-switch", { view: 'source' });
                                 }, 100);
                                 toggleViewButton.html("<i class=\"fw fw-design-view fw-rotate-90\"></i>" +
                                     "<span class=\"toggle-button-text\">Design View</span>");
