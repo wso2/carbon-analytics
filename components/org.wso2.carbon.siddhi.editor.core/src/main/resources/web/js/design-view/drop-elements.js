@@ -74,6 +74,7 @@ define(['require', 'log', 'lodash', 'jquery', 'partition', 'stream', 'query', 'f
         DropElements.prototype.dropSource = function (newAgent, i, top, left, isCodeToDesignMode, sourceName) {
 
             var self = this;
+            var name;
             if (isCodeToDesignMode) {
                 name = sourceName;
             } else {
