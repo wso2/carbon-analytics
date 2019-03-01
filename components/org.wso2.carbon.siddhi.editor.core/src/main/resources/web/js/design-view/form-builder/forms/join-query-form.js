@@ -241,10 +241,11 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
         /**
          * @function to add autocompletion
          */
-        var addAutoCompletion = function (self, QUERY_CONDITION_SYNTAX, incrementalAggregator,
-            possibleAttributesWithSourceAs) {
+        var addAutoCompletion = function (self, QUERY_CONDITION_SYNTAX, incrementalAggregator, streamFunctions) {
+            var possibleAttributesWithSourceAs = getPossibleAttributesWithSourceAs(self);
             var selectExpressionMatches = JSON.parse(JSON.stringify(possibleAttributesWithSourceAs));
             selectExpressionMatches = selectExpressionMatches.concat(incrementalAggregator);
+            selectExpressionMatches = selectExpressionMatches.concat(streamFunctions);
             var onFilterHavingConditionMatches = JSON.parse(JSON.stringify(possibleAttributesWithSourceAs));
             onFilterHavingConditionMatches = onFilterHavingConditionMatches.concat(QUERY_CONDITION_SYNTAX);
             var perWithinMatches = JSON.parse(JSON.stringify(possibleAttributesWithSourceAs));
@@ -300,7 +301,7 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
 
                 const QUERY_CONDITION_SYNTAX = self.configurationData.application.config.query_condition_syntax;
                 const RATE_LIMITING_SYNTAX = self.configurationData.application.config.other_query_syntax;
-                var possibleJoinTypes = self.configurationData.application.config.join_types;
+
                 var firstConnectedElement = clickedElement.getQueryInput().getFirstConnectedElement();
                 var secondConnectedElement = clickedElement.getQueryInput().getSecondConnectedElement();
                 var leftSourceSavedData = clickedElement.getQueryInput().getLeft();
@@ -320,6 +321,8 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
                 var queryOutput = clickedElement.getQueryOutput();
                 var select = clickedElement.getSelect();
                 var savedAnnotations = clickedElement.getAnnotationListObjects();
+
+                var possibleJoinTypes = self.configurationData.application.config.join_types;
                 var predefinedAnnotations = JSON.parse(JSON.stringify(self.configurationData.application.config.
                     query_predefined_annotations));
                 var incrementalAggregator = self.configurationData.application.config.incremental_aggregator;
@@ -483,11 +486,10 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
                     }
                 }
                 //autocompletion
-                addAutoCompletion(self, QUERY_CONDITION_SYNTAX, incrementalAggregator, possibleAttributesWithSourceAs);
+                addAutoCompletion(self, QUERY_CONDITION_SYNTAX, incrementalAggregator, streamFunctions);
 
                 $('.join-query-form-container').on('blur', '.as-content-value', function () {
-                    var possibleAttributesWithSourceAs = getPossibleAttributesWithSourceAs(self);
-                    addAutoCompletion(self, QUERY_CONDITION_SYNTAX, incrementalAggregator, possibleAttributesWithSourceAs);
+                    addAutoCompletion(self, QUERY_CONDITION_SYNTAX, incrementalAggregator, streamFunctions);
                     self.formUtils.generateGroupByDiv(groupBy, possibleAttributesWithSourceAs);
                     self.formUtils.generateOrderByDiv(orderBy, possibleAttributesWithSourceAs);
                 });
@@ -496,7 +498,7 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
                 $('.define-stream-handler').on('click', '.btn-add-filter', function () {
                     var sourceDiv = self.formUtils.getSourceDiv($(this));
                     self.formUtils.addNewStreamHandler(sourceDiv, Constants.FILTER);
-                    addAutoCompletion(self, QUERY_CONDITION_SYNTAX, incrementalAggregator);
+                    addAutoCompletion(self, QUERY_CONDITION_SYNTAX, incrementalAggregator, streamFunctions);
                 });
 
                 var rateLimitingMatches = RATE_LIMITING_SYNTAX.concat(Constants.SIDDHI_TIME);
@@ -511,7 +513,7 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
                     var isQueryNameUsed
                         = self.formUtils.isQueryDefinitionNameUsed(queryName, id);
                     if (isQueryNameUsed) {
-                    	self.formUtils.addErrorClass($('.query-name'));
+                        self.formUtils.addErrorClass($('.query-name'));
                         $('.query-name-div').find('.error-message').text('Query name is already used.');
                         isErrorOccurred = true;
                         return;
@@ -605,8 +607,11 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
                     }
 
                     if (!isErrorOccurred) {
-
-                        clickedElement.addQueryName(queryName);
+                        if (queryName != "") {
+                            clickedElement.addQueryName(queryName);
+                        } else {
+                            clickedElement.addQueryName('query');
+                        }
 
                         if ($('.group-by-checkbox').is(':checked')) {
                             var groupByAttributes = self.formUtils.buildGroupBy();

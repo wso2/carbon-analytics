@@ -67,6 +67,9 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
                 self.toggleViewButton.addClass('disableContainer');
                 self.formUtils.popUpSelectedElement(id);
 
+                const QUERY_CONDITION_SYNTAX = self.configurationData.application.config.query_condition_syntax;
+                const RATE_LIMITING_SYNTAX = self.configurationData.application.config.other_query_syntax;
+
                 var queryName = clickedElement.getQueryName();
                 var queryInput = clickedElement.getQueryInput();
                 var inputElementName = queryInput.getFrom();
@@ -79,14 +82,12 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
                 var queryOutput = clickedElement.getQueryOutput();
                 var outputElementName = queryOutput.getTarget();
                 var savedStreamHandlerList = queryInput.getStreamHandlerList();
+                var savedAnnotations = clickedElement.getAnnotationListObjects();
+
                 var predefinedAnnotations = JSON.parse(JSON.stringify(self.configurationData.application.config.
                     query_predefined_annotations));
-                var savedAnnotations = clickedElement.getAnnotationListObjects();
                 var streamHandlerTypes = self.configurationData.application.config.stream_handler_types;
-
-				if(!queryName) {
-					queryName = 'query';
-				}
+                var incrementalAggregator = self.configurationData.application.config.incremental_aggregator;
 
                 //render the query form template
                 var queryFormTemplate = Handlebars.compile($('#window-filter-projection-query-form-template').html());
@@ -205,7 +206,7 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
                     var isQueryNameUsed
                         = self.formUtils.isQueryDefinitionNameUsed(queryName, id);
                     if (isQueryNameUsed) {
-                    	self.formUtils.addErrorClass($('.query-name'));
+                        self.formUtils.addErrorClass($('.query-name'));
                         $('.query-name-div').find('.error-message').text('Query name is already used.');
                         isErrorOccurred = true;
                         return;
@@ -261,7 +262,11 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
                     }
 
                     if (!isErrorOccurred) {
-                        clickedElement.addQueryName(queryName);
+                        if (queryName != "") {
+                            clickedElement.addQueryName(queryName);
+                        } else {
+                            clickedElement.addQueryName('query');
+                        }
 
                         if ($('.group-by-checkbox').is(':checked')) {
                             var groupByAttributes = self.formUtils.buildGroupBy();

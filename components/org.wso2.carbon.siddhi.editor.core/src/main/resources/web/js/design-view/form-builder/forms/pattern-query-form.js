@@ -80,16 +80,18 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
          * @function to add autocompletion for input fields
          */
         var addAutoCompletion = function (self, partitionId, QUERY_CONDITION_SYNTAX, QUERY_SYNTAX,
-            incrementalAggregator) {
+            incrementalAggregator, streamFunctions) {
             possibleAttributes = getPossibleAttributes(self, partitionId);
             var selectExpressionMatches = JSON.parse(JSON.stringify(possibleAttributes));
             selectExpressionMatches = selectExpressionMatches.concat(incrementalAggregator);
+            selectExpressionMatches = selectExpressionMatches.concat(streamFunctions);
             var filterMatches = JSON.parse(JSON.stringify(possibleAttributes));
             filterMatches = filterMatches.concat(QUERY_CONDITION_SYNTAX);
             var logicMatches = filterMatches.concat(QUERY_SYNTAX);
             logicMatches = logicMatches.concat(Constants.SIDDHI_TIME);
             self.formUtils.createAutocomplete($('.attribute-expression'), selectExpressionMatches);
             self.formUtils.createAutocomplete($('.logic-statement'), logicMatches);
+            self.formUtils.createAutocomplete($('.symbol-syntax-required-value'), filterMatches);
         };
 
         /**
@@ -116,19 +118,9 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
             if (!clickedElement.getQueryInput()
                 || clickedElement.getQueryInput().getConnectedElementNameList().length === 0) {
                 DesignViewUtils.prototype.warnAlert('Connect input streams');
-                // design view container and toggle view button are enabled
-                self.designViewContainer.removeClass('disableContainer');
-                self.toggleViewButton.removeClass('disableContainer');
-
-                // close the form window
-                self.consoleListManager.removeFormConsole(formConsole);
+               	self.consoleListManager.removeFormConsole(formConsole);
             } else if (!clickedElement.getQueryOutput() || !clickedElement.getQueryOutput().getTarget()) {
                 DesignViewUtils.prototype.warnAlert('Connect an output element');
-                // design view container and toggle view button are enabled
-                self.designViewContainer.removeClass('disableContainer');
-                self.toggleViewButton.removeClass('disableContainer');
-
-                // close the form window
                 self.consoleListManager.removeFormConsole(formConsole);
             } else {
                 var propertyDiv = $('<div id="property-header"><h3>Pattern Query Configuration</h3></div>' +
@@ -141,6 +133,7 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
 
                 const QUERY_CONDITION_SYNTAX = self.configurationData.application.config.query_condition_syntax;
                 const QUERY_SYNTAX = self.configurationData.application.config.other_query_syntax;
+
                 var incrementalAggregator = self.configurationData.application.config.incremental_aggregator;
                 var queryName = clickedElement.getQueryName();
                 var inputStreamNames = clickedElement.getQueryInput().getConnectedElementNameList();
@@ -153,13 +146,13 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
                 var outputRateLimit = clickedElement.getOutputRateLimit();
                 var outputElementName = clickedElement.getQueryOutput().getTarget();
                 var select = clickedElement.getSelect();
-                var predefinedAnnotations = JSON.parse(JSON.stringify(self.configurationData.application.config.
-                    query_predefined_annotations));
                 var savedAnnotations = clickedElement.getAnnotationListObjects();
                 var queryInput = clickedElement.getQueryInput();
                 var queryOutput = clickedElement.getQueryOutput();
 
-                var possibleAttributes = [];
+                var predefinedAnnotations = JSON.parse(JSON.stringify(self.configurationData.application.config.
+                    query_predefined_annotations));
+                var streamFunctions = self.formUtils.getStreamFunctionNames();
 
                 //render the pattern-query form template
                 var patternFormTemplate = Handlebars.compile($('#pattern-query-form-template').html());
@@ -289,7 +282,7 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
                     var isQueryNameUsed
                         = self.formUtils.isQueryDefinitionNameUsed(queryName, id);
                     if (isQueryNameUsed) {
-                    	self.formUtils.addErrorClass($('.query-name'));
+                        self.formUtils.addErrorClass($('.query-name'));
                         $('.query-name-div').find('.error-message').text('Query name is already used.');
                         isErrorOccurred = true;
                         return;
@@ -351,7 +344,11 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
                     }
 
                     if (!isErrorOccurred) {
-                        clickedElement.addQueryName(queryName);
+                        if (queryName != "") {
+                            clickedElement.addQueryName(queryName);
+                        } else {
+                            clickedElement.addQueryName('query');
+                        }
 
                         if ($('.group-by-checkbox').is(':checked')) {
                             var groupByAttributes = self.formUtils.buildGroupBy();

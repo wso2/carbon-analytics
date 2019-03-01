@@ -206,10 +206,6 @@ define(['require', 'log', 'jquery', 'lodash', 'aggregateByTimePeriod', 'querySel
             if (!clickedElement.getFrom()) {
                 $('#' + id).addClass('incomplete-element');
                 DesignViewUtils.prototype.warnAlert('Connect an input stream element');
-                self.designViewContainer.removeClass('disableContainer');
-                self.toggleViewButton.removeClass('disableContainer');
-
-                // close the form window
                 self.consoleListManager.removeFormConsole(formConsole);
             } else {
                 var propertyDiv = $('<div id="property-header"> <h3> Aggregation Configuration </h3> </div> ' +
@@ -232,8 +228,6 @@ define(['require', 'log', 'jquery', 'lodash', 'aggregateByTimePeriod', 'querySel
                 var groupBy = clickedElement.getGroupBy();
                 var aggregateByAttribute = clickedElement.getAggregateByAttribute();
                 var aggregateByTimePeriod = clickedElement.getAggregateByTimePeriod();
-
-                var incrementalAggregator = self.configurationData.application.config.incremental_aggregator;
 
                 var predefinedStores = _.orderBy(this.configurationData.rawExtensions["store"], ['name'], ['asc']);
                 var predefinedPrimaryIndexAnnotations = JSON.parse(JSON.stringify(self.configurationData.application.config.
@@ -371,7 +365,7 @@ define(['require', 'log', 'jquery', 'lodash', 'aggregateByTimePeriod', 'querySel
                 self.formUtils.selectAggregateProjection(select)
                 self.formUtils.addEventListenersForSelectionDiv();
 
-				self.formUtils.generateGroupByDiv(groupBy, possibleAttributes);
+                self.formUtils.generateGroupByDiv(groupBy, possibleAttributes);
 
                 self.formUtils.renderDropDown('.aggregate-by-attribute-content', possibleAttributes,
                     Constants.ATTRIBUTE);
