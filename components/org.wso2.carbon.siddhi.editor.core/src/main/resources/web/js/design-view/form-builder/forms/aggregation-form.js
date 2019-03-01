@@ -235,6 +235,8 @@ define(['require', 'log', 'jquery', 'lodash', 'aggregateByTimePeriod', 'querySel
                 var predefinedAggregationAnnotations = JSON.parse(JSON.stringify(self.configurationData.application.config.
                     aggregation_predefined_annotations));
                 var savedSource = self.configurationData.getSiddhiAppConfig().getDefinitionElementByName(from);
+                var incrementalAggregator = self.configurationData.application.config.incremental_aggregator;
+                var streamFunctions = self.formUtils.getStreamFunctionNames();
 
                 //render the aggregation form template
                 var aggregationFormTemplate = Handlebars.compile($('#aggregation-form-template').html());
@@ -396,6 +398,7 @@ define(['require', 'log', 'jquery', 'lodash', 'aggregateByTimePeriod', 'querySel
                 //create autocompletion
                 var selectExpressionMatches = JSON.parse(JSON.stringify(possibleAttributes));
                 selectExpressionMatches = selectExpressionMatches.concat(incrementalAggregator);
+                selectExpressionMatches = selectExpressionMatches.concat(streamFunctions)
                 selectExpressionMatches.push(Constants.AS);
                 self.formUtils.createAutocomplete($('.attribute-expression-as'), selectExpressionMatches);
                 $('.define-select').on('click', '.btn-add-user-defined-attribute', function () {

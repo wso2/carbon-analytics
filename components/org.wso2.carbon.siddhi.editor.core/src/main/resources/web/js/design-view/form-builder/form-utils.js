@@ -770,6 +770,19 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
         };
 
         /**
+         * @function to obtain only the stream function names
+         */
+        FormUtils.prototype.getStreamFunctionNames = function () {
+            var self = this;
+            var streamFunctions = self.configurationData.rawExtensions["streamFunctions"];
+            var streamFunctionNames = [];
+            _.forEach(streamFunctions, function (streamFunction) {
+                streamFunctionNames.push(streamFunction.name);
+            });
+            return streamFunctionNames;
+        };
+
+        /**
          * @function to obtain customized options from the saved options
          * @param {Object} predefinedOptions Predefined options of a particular annotation type
          * @param {Object} savedOptions saved options
@@ -2034,9 +2047,9 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
                 _.forEach(conditionList, function (condition) {
                     //select the stream name
                     $('.define-' + condition.conditionId + '-source').find('.define-stream select option').filter
-                    (function () {
-                        return ($(this).val() == condition.streamName);
-                    }).prop('selected', true);
+                        (function () {
+                            return ($(this).val() == condition.streamName);
+                        }).prop('selected', true);
 
                     //render and map stream handler
                     self.renderStreamHandler(condition.conditionId, condition, streamHandlerTypes)
@@ -3248,7 +3261,7 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
             if (streamHandlerList && streamHandlerList.length != 0) {
                 _.forEach(streamHandlerList, function (handler) {
                     if (handler.type.toLowerCase() === streamHandlerType &&
-                    		handler.value.function.toLowerCase() === selectedType) {
+                        handler.value.function.toLowerCase() === selectedType) {
                         streamHandler = handler;
                         return false;
                     }

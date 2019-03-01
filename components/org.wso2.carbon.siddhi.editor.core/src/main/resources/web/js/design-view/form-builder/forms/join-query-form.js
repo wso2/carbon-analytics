@@ -285,10 +285,6 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
                 inValid = true;
             }
             if (inValid) {
-                self.designViewContainer.removeClass('disableContainer');
-                self.toggleViewButton.removeClass('disableContainer');
-
-                // close the form window
                 self.consoleListManager.removeFormConsole(formConsole);
             } else {
                 var propertyDiv = $('<div id="property-header"><h3>Join Query Configuration</h3></div>' +
@@ -327,6 +323,7 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
                     query_predefined_annotations));
                 var incrementalAggregator = self.configurationData.application.config.incremental_aggregator;
                 var streamHandlerTypes = self.configurationData.application.config.stream_handler_types;
+                var streamFunctions = self.formUtils.getStreamFunctionNames();
 
                 //render the join-query form template
                 var joinFormTemplate = Handlebars.compile($('#join-query-form-template').html());

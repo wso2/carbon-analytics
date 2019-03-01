@@ -235,12 +235,14 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
                     $('.logic-statement').val(logic)
                 }
 
-                addAutoCompletion(self, partitionId, QUERY_CONDITION_SYNTAX, QUERY_SYNTAX, incrementalAggregator);
+                addAutoCompletion(self, partitionId, QUERY_CONDITION_SYNTAX, QUERY_SYNTAX, incrementalAggregator,
+                    streamFunctions);
 
                 $('.define-stream-handler').on('click', '.btn-add-filter', function () {
                     var sourceDiv = self.formUtils.getSourceDiv($(this));
                     self.formUtils.addNewStreamHandler(sourceDiv, Constants.FILTER);
-                    addAutoCompletion(self, partitionId, QUERY_CONDITION_SYNTAX, QUERY_SYNTAX, incrementalAggregator);
+                    addAutoCompletion(self, partitionId, QUERY_CONDITION_SYNTAX, QUERY_SYNTAX, incrementalAggregator,
+                        streamFunctions);
                 });
 
                 $('.define-conditions').on('click', '.btn-del-condition', function () {
@@ -248,7 +250,8 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
                     $('.define-conditions .tab-pane:eq(' + conditionIndex + ')').remove();
                     $(this).closest('li').remove();
                     generateDivRequiringPossibleAttributes(self, partitionId, groupBy, orderBy);
-                    addAutoCompletion(self, partitionId, QUERY_CONDITION_SYNTAX, QUERY_SYNTAX, incrementalAggregator);
+                    addAutoCompletion(self, partitionId, QUERY_CONDITION_SYNTAX, QUERY_SYNTAX, incrementalAggregator,
+                        streamFunctions);
                 });
 
                 $('.define-conditions').on('click', '.btn-add-condition', function () {
@@ -257,17 +260,20 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
                     var conditionList = [{ conditionId: conditionName, streamHandlerList: [], streamName: "" }]
                     self.formUtils.renderConditions(conditionList, inputStreamNames)
                     generateDivRequiringPossibleAttributes(self, partitionId, groupBy, orderBy);
-                    addAutoCompletion(self, partitionId, QUERY_CONDITION_SYNTAX, QUERY_SYNTAX, incrementalAggregator);
+                    addAutoCompletion(self, partitionId, QUERY_CONDITION_SYNTAX, QUERY_SYNTAX, incrementalAggregator,
+                        streamFunctions);
                 });
 
                 $('.define-conditions').on('blur', '.condition-id', function () {
                     generateDivRequiringPossibleAttributes(self, partitionId, groupBy, orderBy);
-                    addAutoCompletion(self, partitionId, QUERY_CONDITION_SYNTAX, QUERY_SYNTAX, incrementalAggregator);
+                    addAutoCompletion(self, partitionId, QUERY_CONDITION_SYNTAX, QUERY_SYNTAX, incrementalAggregator,
+                        streamFunctions);
                 });
 
                 $('.define-conditions').on('change', '.condition-stream-name-selection', function () {
                     generateDivRequiringPossibleAttributes(self, partitionId, groupBy, orderBy);
-                    addAutoCompletion(self, partitionId, QUERY_CONDITION_SYNTAX, QUERY_SYNTAX, incrementalAggregator);
+                    addAutoCompletion(self, partitionId, QUERY_CONDITION_SYNTAX, QUERY_SYNTAX, incrementalAggregator,
+                        streamFunctions);
                 });
 
                 var rateLimitingMatches = QUERY_SYNTAX.concat(Constants.SIDDHI_TIME);

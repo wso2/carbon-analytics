@@ -40,6 +40,15 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
             }
         };
 
+		/**
+		 * @function to add autocompletion for filter value
+		 */
+        var addAutoCompletionForFilter = function (self, QUERY_CONDITION_SYNTAX, possibleAttributes) {
+            var filterMatches = JSON.parse(JSON.stringify(possibleAttributes));
+            filterMatches = filterMatches.concat(QUERY_CONDITION_SYNTAX);
+            self.formUtils.createAutocomplete($('.symbol-syntax-required-value'), filterMatches);
+        };
+
         /**
          * @function generate the form for the simple queries (projection, filter and window)
          * @param element selected element(query)
@@ -196,6 +205,25 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
                 self.formUtils.renderStreamHandler("query", queryInput, streamHandlerTypes);
                 self.formUtils.mapStreamHandler(queryInput, "query");
                 self.formUtils.addEventListenersForStreamHandlersDiv(savedStreamHandlerList);
+
+                //autocompletion
+                var streamFunctions = self.formUtils.getStreamFunctionNames();
+                var selectExpressionMatches = JSON.parse(JSON.stringify(possibleAttributes));
+                selectExpressionMatches = selectExpressionMatches.concat(incrementalAggregator);
+                selectExpressionMatches = selectExpressionMatches.concat(streamFunctions);
+                self.formUtils.createAutocomplete($('.attribute-expression'), selectExpressionMatches);
+
+                addAutoCompletionForFilter(self, QUERY_CONDITION_SYNTAX, possibleAttributes);
+
+                //to add filter
+                $('.define-stream-handler').on('click', '.btn-add-filter', function () {
+                    var sourceDiv = self.formUtils.getSourceDiv($(this));
+                    self.formUtils.addNewStreamHandler(sourceDiv, Constants.FILTER);
+                    addAutoCompletionForFilter(self, QUERY_CONDITION_SYNTAX, possibleAttributes);
+                });
+
+                var rateLimitingMatches = RATE_LIMITING_SYNTAX.concat(Constants.SIDDHI_TIME);
+                self.formUtils.createAutocomplete($('.rate-limiting-value'), rateLimitingMatches);
 
                 $(formContainer).on('click', '#btn-submit', function () {
                     $('.error-message').text("");
