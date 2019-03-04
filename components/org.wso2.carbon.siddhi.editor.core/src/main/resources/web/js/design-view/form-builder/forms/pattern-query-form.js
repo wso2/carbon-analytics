@@ -16,13 +16,10 @@
  * under the License.
  */
 
-define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert', 'queryOutputDelete',
-    'queryOutputUpdate', 'queryOutputUpdateOrInsertInto', 'queryOrderByValue',
-    'patternOrSequenceQueryCondition', 'streamHandler', 'queryWindowOrFunction', 'designViewUtils',
+define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert', 'queryOrderByValue', 'designViewUtils',
     'jsonValidator', 'constants', 'handlebar'],
-    function (require, log, $, _, QuerySelect, QueryOutputInsert, QueryOutputDelete, QueryOutputUpdate,
-        QueryOutputUpdateOrInsertInto, QueryOrderByValue, PatternOrSequenceQueryCondition, StreamHandler,
-        QueryWindowOrFunction, DesignViewUtils, JSONValidator, Constants, Handlebars) {
+    function (require, log, $, _, QuerySelect, QueryOutputInsert, QueryOrderByValue, DesignViewUtils,
+        JSONValidator, Constants, Handlebars) {
 
         /**
          * @class PatternQueryForm Creates a forms to collect data from a pattern query
@@ -155,13 +152,13 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
                 var streamFunctions = self.formUtils.getStreamFunctionNames();
 
                 //render the pattern-query form template
-                var patternFormTemplate = Handlebars.compile($('#pattern-query-form-template').html());
+                var patternFormTemplate = Handlebars.compile($('#pattern-sequence-query-form-template').html());
                 var wrappedHtml = patternFormTemplate({ name: queryName });
                 $('#define-pattern-query').html(wrappedHtml);
                 self.formUtils.renderQueryOutput(outputElementName);
                 self.formUtils.renderOutputEventTypes();
 
-                $('.pattern-query-form-container').on('change', '.query-checkbox', function () {
+                $('.pattern-sequence-query-form-container').on('change', '.query-checkbox', function () {
                     var parent = $(this).parents(".define-content")
                     if ($(this).is(':checked')) {
                         parent.find('.query-content').show();
@@ -353,6 +350,7 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
                         if (queryName != "") {
                             clickedElement.addQueryName(queryName);
                         } else {
+                            queryName = "Pattern Query";
                             clickedElement.addQueryName('query');
                         }
 
@@ -440,7 +438,7 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
                         //Send pattern-query element to the backend and generate tooltip
                         var queryToolTip = self.formUtils.getTooltip(clickedElement, Constants.PATTERN_QUERY);
                         $('#' + id).prop('title', queryToolTip);
-                        var textNode = $('#' + clickedElement.getId()).find('.patternQueryNameNode');
+                        var textNode = $('#' + id).find('.patternQueryNameNode');
                         textNode.html(queryName);
 
                         // close the form window
