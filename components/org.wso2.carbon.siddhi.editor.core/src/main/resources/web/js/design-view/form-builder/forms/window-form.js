@@ -77,11 +77,11 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'constants'],
                 //if window form is freshly opened[unedited window object]
                 var attributes = [{ name: "" }];
                 self.formUtils.renderAttributeTemplate(attributes)
-                selectedWindowType = $('.defineFunctionName #window-type').val();
-                functionParameters = self.formUtils.getSelectedTypeParameters(selectedWindowType,
+                selectedType = $('.defineFunctionName #window-type').val();
+                functionParameters = self.formUtils.getSelectedTypeParameters(selectedType,
                     predefinedWindowFunctionNames);
                 functionParametersWithValues = self.formUtils.createObjectWithValues(functionParameters);
-                self.formUtils.renderParameters(functionParametersWithValues, selectedWindowType, Constants.WINDOW)
+                self.formUtils.renderParameters(functionParametersWithValues, selectedType, Constants.WINDOW)
             } else {
                 //if window object is already edited
                 var windowType = clickedElement.getType().toLowerCase();
