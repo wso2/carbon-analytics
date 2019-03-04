@@ -770,6 +770,20 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
         };
 
         /**
+         * @function to identify if atleast one connected input stream has been filled
+         */
+        FormUtils.prototype.isOneElementFilled = function (inputStreamNames) {
+            var isComplete = false;
+            _.forEach(inputStreamNames, function (streamName) {
+                if (streamName) {
+                    isComplete = true;
+                    return false;
+                }
+            });
+            return isComplete;
+        };
+
+        /**
          * @function to obtain only the stream function names
          */
         FormUtils.prototype.getStreamFunctionNames = function () {

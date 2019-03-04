@@ -115,7 +115,10 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
             if (!clickedElement.getQueryInput()
                 || clickedElement.getQueryInput().getConnectedElementNameList().length === 0) {
                 DesignViewUtils.prototype.warnAlert('Connect input streams');
-               	self.consoleListManager.removeFormConsole(formConsole);
+                self.consoleListManager.removeFormConsole(formConsole);
+            } else if (!self.formUtils.isOneElementFilled(clickedElement.getQueryInput().getConnectedElementNameList())) {
+                DesignViewUtils.prototype.warnAlert('Fill the incomplete input stream');
+                self.consoleListManager.removeFormConsole(formConsole);
             } else if (!clickedElement.getQueryOutput() || !clickedElement.getQueryOutput().getTarget()) {
                 DesignViewUtils.prototype.warnAlert('Connect an output element');
                 self.consoleListManager.removeFormConsole(formConsole);
@@ -133,7 +136,6 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
 
                 var incrementalAggregator = self.configurationData.application.config.incremental_aggregator;
                 var queryName = clickedElement.getQueryName();
-                var inputStreamNames = clickedElement.getQueryInput().getConnectedElementNameList();
                 var conditionList = clickedElement.getQueryInput().getConditionList();
                 var logic = clickedElement.getQueryInput().getLogic();
                 var groupBy = clickedElement.getGroupBy();
@@ -186,6 +188,14 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
                 self.formUtils.renderOptionsForPredefinedAnnotations(predefinedAnnotations);
                 self.formUtils.addCheckedForUserSelectedPredefinedAnnotation(savedAnnotations, predefinedAnnotations);
                 self.formUtils.addEventListenersForPredefinedAnnotations();
+
+                var connectedStreams = clickedElement.getQueryInput().getConnectedElementNameList();
+                var inputStreamNames = [];
+                _.forEach(connectedStreams, function (streamName) {
+                    if (streamName) {
+                        inputStreamNames.push(streamName)
+                    }
+                });
 
                 //conditions
                 self.formUtils.renderConditions(conditionList, inputStreamNames);
