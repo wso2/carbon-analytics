@@ -1288,9 +1288,8 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
                 }
             });
             if (selectedAttributes.length == 0) {
-                var errorDiv = $('.' + className + '-attributes').find('.error-message:eq(0)');
-                errorDiv.text('Minimum one attribute is required');
-                self.addErrorClass(errorDiv)
+                $('.' + className + '-attributes').find('.error-message:eq(0)').text('Minimum one attribute is required');
+                self.addErrorClass($('.' + className + '-attributes').find('.define-attribute-drop-down:eq(0)'))
                 isErrorOccurred = true;
             }
             return isErrorOccurred;
@@ -2935,7 +2934,7 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
                 }
             });
 
-            $('.define-group-by-attributes').on('click', '.btn-add-group-by-attribute', function () {
+            $('.btn-add-group-by-attribute').on('click', function () {
                 self.appendGroupBy(possibleAttributes);
                 self.preventMultipleSelection(Constants.GROUP_BY);
                 self.checkForAttributeLength(possibleAttributes.length, Constants.GROUP_BY);
@@ -2943,6 +2942,7 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
 
             $('.define-group-by-attributes').on('change', '.group-by-selection', function () {
                 self.preventMultipleSelection(Constants.GROUP_BY);
+                self.removeErrorClass();
             });
 
             $('.define-group-by-attributes').on('click', '.btn-del-option', function () {
@@ -3043,6 +3043,7 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
 
             $('.define-order-by-attributes').on('change', '.order-by-selection', function () {
                 self.preventMultipleSelection(Constants.ORDER_BY);
+                self.removeErrorClass();
             });
 
             $('.define-order-by-attributes').on('click', '.btn-del-option', function () {
@@ -3051,7 +3052,7 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
                 self.checkForAttributeLength(possibleAttributes.length, Constants.ORDER_BY);
             });
 
-            $('.define-order-by-attributes').on('click', '.btn-add-order-by-attribute', function () {
+            $('.btn-add-order-by-attribute').on('click', function () {
                 self.appendOrderBy(possibleAttributes);
                 self.preventMultipleSelection(Constants.ORDER_BY);
                 self.checkForAttributeLength(possibleAttributes.length, Constants.ORDER_BY);
@@ -3651,7 +3652,7 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
         FormUtils.prototype.removeErrorClass = function () {
             $('.required-input-field').removeClass('required-input-field');
             $('.error-input-field').removeClass('error-input-field');
-            $('.error-message').text("");
+            $('.error-message').hide();
         };
 
         /**

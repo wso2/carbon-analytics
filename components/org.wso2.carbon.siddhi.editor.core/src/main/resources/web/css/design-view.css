@@ -625,6 +625,7 @@ a.list-group-item, button.list-group-item {
 }
 
 .design-view-form-content .error-message {
+	display: none;
 	color: red;
 	padding-top: 3px;
 }
@@ -1207,3 +1208,11 @@ a.list-group-item, button.list-group-item {
     color: #ffffff !important;
     transition: 0.15s !important;
 }
+
+.design-view-form-content .define-user-defined-attributes .attribute,
+.design-view-form-content #mapper-attributes .attribute,
+.design-view-form-content #partition-by-content .partition-key,
+.design-view-form-content .order-group-by-content ul li {
+	margin: 6px;
+}
+
