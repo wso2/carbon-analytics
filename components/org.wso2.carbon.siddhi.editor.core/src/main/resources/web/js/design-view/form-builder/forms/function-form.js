@@ -89,6 +89,8 @@ define(['require', 'log', 'jquery', 'lodash', 'constants'],
             self.designViewContainer.addClass('disableContainer');
             self.toggleViewButton.addClass('disableContainer');
 
+            self.formUtils.addEventListenerToRemoveRequiredClass();
+
             var name = clickedElement.getName();
             renderScriptType();
             renderReturnType();
@@ -114,9 +116,7 @@ define(['require', 'log', 'jquery', 'lodash', 'constants'],
             var submitButtonElement = $(formContainer).find('#btn-submit')[0];
             submitButtonElement.addEventListener('click', function () {
 
-                //clear the error classes
-                $('.error-message').text("");
-                $('.required-input-field').removeClass('required-input-field');
+                self.formUtils.removeErrorClass();
                 var isErrorOccurred = false;
 
                 var functionName = $('#functionName').val().trim();

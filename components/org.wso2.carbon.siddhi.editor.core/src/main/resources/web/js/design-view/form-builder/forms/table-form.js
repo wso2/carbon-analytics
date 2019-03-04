@@ -62,6 +62,8 @@ define(['log', 'jquery', 'lodash', 'attribute', 'storeAnnotation', 'handlebar', 
             self.designViewContainer.addClass('disableContainer');
             self.toggleViewButton.addClass('disableContainer');
 
+            self.formUtils.addEventListenerToRemoveRequiredClass();
+
             var predefinedStores =  _.orderBy(JSON.parse(JSON.stringify(this.configurationData.rawExtensions["store"]),
             ['name'], ['asc']));
             self.formUtils.addCustomizedType(predefinedStores, Constants.DEFAULT_STORE_TYPE);
@@ -156,10 +158,7 @@ define(['log', 'jquery', 'lodash', 'attribute', 'storeAnnotation', 'handlebar', 
             var submitButtonElement = $(formContainer).find('#btn-submit')[0];
             submitButtonElement.addEventListener('click', function () {
 
-                //clear the error classes
-                $('.error-message').text("");
-                $('#tableNameErrorMessage').text("");
-                $('.required-input-field').removeClass('required-input-field');
+                self.formUtils.removeErrorClass();
                 var isErrorOccurred = false;
 
                 var tableName = $('#tableName').val().trim();

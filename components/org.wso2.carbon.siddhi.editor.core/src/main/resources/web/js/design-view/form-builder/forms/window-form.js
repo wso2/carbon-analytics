@@ -60,6 +60,8 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'constants'],
             self.designViewContainer.addClass('disableContainer');
             self.toggleViewButton.addClass('disableContainer');
 
+            self.formUtils.addEventListenerToRemoveRequiredClass();
+
             //declaration and initialization of variables
             var predefinedWindowFunctionNames = _.orderBy(this.configurationData.rawExtensions["windowFunctionNames"],
                 ['name'], ['asc']);
@@ -133,9 +135,7 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'constants'],
             var submitButtonElement = $(formContainer).find('#btn-submit')[0];
             submitButtonElement.addEventListener('click', function () {
 
-                //clear the error messages
-                $('.error-message').text("")
-                $('.required-input-field').removeClass('required-input-field');
+                self.formUtils.removeErrorClass();
                 var isErrorOccurred = false;
 
                 var windowName = $('#windowName').val().trim();

@@ -160,6 +160,8 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
                 self.formUtils.renderQueryOutput(outputElementName);
                 self.formUtils.renderOutputEventTypes();
 
+                self.formUtils.addEventListenerToRemoveRequiredClass();
+
                 $('.pattern-sequence-query-form-container').on('change', '.query-checkbox', function () {
                     var parent = $(this).parents(".define-content")
                     if ($(this).is(':checked')) {
@@ -287,8 +289,8 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
                 self.formUtils.createAutocomplete($('.rate-limiting-value'), rateLimitingMatches);
 
                 $(formContainer).on('click', '#btn-submit', function () {
-                    $('.error-message').text("")
-                    $('.required-input-field').removeClass('required-input-field');
+
+                    self.formUtils.removeErrorClass();
                     var isErrorOccurred = false;
 
                     var queryName = $('.query-name').val().trim();

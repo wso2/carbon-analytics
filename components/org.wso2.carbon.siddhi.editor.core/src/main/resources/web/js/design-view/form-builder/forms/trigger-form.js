@@ -140,6 +140,8 @@ define(['require', 'log', 'jquery', 'lodash', 'constants'],
             var triggerObject = self.configurationData.application.config.trigger;
             renderTriggerCriteria(triggerObject);
 
+            self.formUtils.addEventListenerToRemoveRequiredClass();
+
             //Event listener to show the criteria description
             $('#define-trigger-criteria').on('mouseover', '.fw-info', function () {
                 $(this).find('.criteria-description').show();
@@ -195,9 +197,7 @@ define(['require', 'log', 'jquery', 'lodash', 'constants'],
             var submitButtonElement = $(formContainer).find('#btn-submit')[0];
             submitButtonElement.addEventListener('click', function () {
 
-                //clear the error classes
-                $('.error-message').text("");
-                $('.required-input-field').removeClass('required-input-field');
+                self.formUtils.removeErrorClass();
                 var isErrorOccurred = false;
 
                 var triggerName = $('#triggerName').val().trim();

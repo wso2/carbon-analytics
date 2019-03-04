@@ -67,9 +67,13 @@ define(['require', 'log', 'jquery', 'lodash', 'handlebar', 'annotationObject', '
             $('#app-description').val(siddhiAppDescription);
             self.formUtils.renderAnnotationTemplate("define-annotation", savedAppAnnotationObjects);
 
+            self.formUtils.addEventListenerToRemoveRequiredClass();
+
             // 'Submit' button action
             var submitButtonElement = $(formContainer).find('#btn-submit')[0];
             submitButtonElement.addEventListener('click', function () {
+
+				self.formUtils.removeErrorClass();
 
                 var appName = $('#app-name').val().trim();
                 var appDescription = $('#app-description').val().trim();

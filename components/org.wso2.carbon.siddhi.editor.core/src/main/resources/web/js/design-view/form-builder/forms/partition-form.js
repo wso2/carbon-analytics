@@ -114,13 +114,13 @@ define(['require', 'log', 'jquery', 'lodash', 'partitionWith', 'jsonValidator', 
                     var wrappedHtml = partitionFormTemplate(partitionKeys);
                     $('#define-partition-keys').html(wrappedHtml);
 
+                    self.formUtils.addEventListenerToRemoveRequiredClass();
+
                     // 'Submit' button action
                     var submitButtonElement = $(formContainer).find('#btn-submit')[0];
                     submitButtonElement.addEventListener('click', function () {
 
-                        //clear the error classes
-                        $('.error-message').text("")
-                        $('.required-input-field').removeClass('required-input-field');
+                        self.formUtils.removeErrorClass();
                         var isErrorOccurred = false;
 
                         var partitionKeys = [];

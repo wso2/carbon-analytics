@@ -155,6 +155,8 @@ define(['log', 'jquery', 'lodash', 'sourceOrSinkAnnotation', 'mapAnnotation', 'p
                 self.designViewContainer.addClass('disableContainer');
                 self.toggleViewButton.addClass('disableContainer');
 
+                self.formUtils.addEventListenerToRemoveRequiredClass();
+
                 //declaration of variables
                 var sourceOptions = [];
                 var sourceOptionsWithValues = [];
@@ -274,9 +276,7 @@ define(['log', 'jquery', 'lodash', 'sourceOrSinkAnnotation', 'mapAnnotation', 'p
                 var submitButtonElement = $(formContainer).find('#btn-submit')[0];
                 submitButtonElement.addEventListener('click', function () {
 
-                    //clear the errors
-                    $('.error-message').text("")
-                    $('.required-input-field').removeClass('required-input-field');
+                    self.formUtils.removeErrorClass();
                     var isErrorOccurred = false;
 
                     var selectedSourceType = $('#define-source #source-type').val();

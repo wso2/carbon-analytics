@@ -243,6 +243,8 @@ define(['require', 'log', 'jquery', 'lodash', 'aggregateByTimePeriod', 'querySel
                 var wrappedHtml = aggregationFormTemplate({ name: name, from: from });
                 $('#define-aggregation').html(wrappedHtml);
 
+				self.formUtils.addEventListenerToRemoveRequiredClass();
+
                 //separate the annotation
                 var indexAnnotation = getIndexAnnotation(predefinedPrimaryIndexAnnotations);
                 self.formUtils.mapPrimaryIndexAnnotationValues(indexAnnotation, savedAnnotations);
@@ -408,8 +410,7 @@ define(['require', 'log', 'jquery', 'lodash', 'aggregateByTimePeriod', 'querySel
 
                 $(formContainer).on('click', '#btn-submit', function () {
 
-                    $('.error-message').text("")
-                    $('.required-input-field').removeClass('required-input-field');
+                    self.formUtils.removeErrorClass();
                     var isErrorOccurred = false;
 
                     var aggregationName = $('#aggregationName').val().trim();

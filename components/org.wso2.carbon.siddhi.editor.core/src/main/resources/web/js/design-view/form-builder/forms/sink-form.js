@@ -162,6 +162,8 @@ define(['log', 'jquery', 'lodash', 'mapAnnotation', 'payloadOrAttribute', 'jsonV
                 self.designViewContainer.addClass('disableContainer');
                 self.toggleViewButton.addClass('disableContainer');
 
+				self.formUtils.addEventListenerToRemoveRequiredClass();
+
                 //declaration of variables
                 var sinkOptions = [];
                 var sinkOptionsWithValues = [];
@@ -316,9 +318,8 @@ define(['log', 'jquery', 'lodash', 'mapAnnotation', 'payloadOrAttribute', 'jsonV
                 //onclick of submit
                 var submitButtonElement = $(formContainer).find('#btn-submit')[0];
                 submitButtonElement.addEventListener('click', function () {
-                    //clear the error classes
-                    $('.error-message').text("")
-                    $('.required-input-field').removeClass('required-input-field');
+
+                    self.formUtils.removeErrorClass();
                     var isErrorOccurred = false;
 
                     var selectedSinkType = $('#define-sink #sink-type').val();

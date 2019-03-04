@@ -2994,6 +2994,22 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
         };
 
         /**
+         * @function to remove the error class once the user fills in the required input
+         */
+        FormUtils.prototype.addEventListenerToRemoveRequiredClass = function () {
+            $('.design-view-form-content').on('input', '.error-input-field', function () {
+                var input = $(this).val().trim();
+                if (input != "") {
+                    $(this).removeClass('required-input-field');
+                    $(this).closest('.clearfix').next('label.error-message').hide();
+                } else {
+                    $(this).addClass('required-input-field');
+                    $(this).closest('.clearfix').next('label.error-message').show();
+                }
+            });
+        };
+
+        /**
          * @function to add event listeners for the attribute selection(projection) division
          */
         FormUtils.prototype.addEventListenersForSelectionDiv = function () {
@@ -3624,7 +3640,18 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
          */
         FormUtils.prototype.addErrorClass = function (id) {
             $(id)[0].scrollIntoView();
-            $(id).addClass('required-input-field')
+            $(id).addClass('required-input-field');
+            $(id).addClass('error-input-field');
+            $(id).closest('.clearfix').next('label.error-message').show();
+        };
+
+        /**
+         * @function to remove the error class
+         */
+        FormUtils.prototype.removeErrorClass = function () {
+            $('.required-input-field').removeClass('required-input-field');
+            $('.error-input-field').removeClass('error-input-field');
+            $('.error-message').text("");
         };
 
         /**

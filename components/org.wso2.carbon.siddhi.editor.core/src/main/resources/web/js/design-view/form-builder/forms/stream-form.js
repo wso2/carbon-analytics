@@ -59,6 +59,8 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'jsonValidator', 'con
             self.designViewContainer.addClass('disableContainer');
             self.toggleViewButton.addClass('disableContainer');
 
+            self.formUtils.addEventListenerToRemoveRequiredClass();
+
             var annotations = [];
             var predefinedAnnotationList = JSON.parse(JSON.stringify(self.configurationData.application.config.
                 stream_predefined_annotations));
@@ -119,9 +121,8 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'jsonValidator', 'con
             //submit button action
             var submitButtonElement = $(formContainer).find('#btn-submit')[0];
             submitButtonElement.addEventListener('click', function () {
-                $('.error-message').text("")
-                $('.required-input-field').removeClass('required-input-field');
-                $('#streamNameErrorMessage').text("")
+
+                self.formUtils.removeErrorClass();
 
                 var configName = $('#streamName').val().trim();
                 var streamName;

@@ -332,6 +332,8 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
                 self.formUtils.renderQueryOutput(outputElementName);
                 self.formUtils.renderOutputEventTypes();
 
+                self.formUtils.addEventListenerToRemoveRequiredClass();
+
                 //annotations
                 var userDefinedAnnotations = self.formUtils.getUserAnnotations(savedAnnotations,
                     predefinedAnnotations);
@@ -502,8 +504,8 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
                 self.formUtils.createAutocomplete($('.rate-limiting-value'), rateLimitingMatches);
 
                 $(formContainer).on('click', '#btn-submit', function () {
-                    $('.error-message').text("")
-                    $('.required-input-field').removeClass('required-input-field');
+
+                    self.formUtils.removeErrorClass();
                     var isErrorOccurred = false;
 
                     var queryName = $('.query-name').val().trim();
@@ -605,10 +607,11 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
 
                     if (!isErrorOccurred) {
                         if (queryName != "") {
-                            clickedElement.addQueryName(queryName);
-                        } else {
-                            clickedElement.addQueryName('query');
-                        }
+							clickedElement.addQueryName(queryName);
+						} else {
+							queryName = "Join Query";
+							clickedElement.addQueryName('query');
+						}
 
                         if ($('.group-by-checkbox').is(':checked')) {
                             var groupByAttributes = self.formUtils.buildGroupBy();
