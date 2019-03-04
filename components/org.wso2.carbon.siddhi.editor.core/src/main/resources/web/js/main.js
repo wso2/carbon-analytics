@@ -88,7 +88,7 @@ define(['require', 'log', 'jquery', 'lodash', 'backbone', 'menu_bar', 'tool_bar'
                     this.eventSimulator = new EventSimulator(eventSimulatorOpts);
                     this.eventSimulator.stopRunningSimulations();
 
-                    //init Hint Guide
+                    //init tour guide
                     this.guide = new Guide(this);
                 },
 
@@ -137,10 +137,11 @@ define(['require', 'log', 'jquery', 'lodash', 'backbone', 'menu_bar', 'tool_bar'
                 },
 
                 runInitialGuide: function (){
-                    var isFreshUser = window.localStorage.getItem('guideFileNameIncr');
+                    var isFreshUser = this.browserStorage.get('guideFileNameIncrement');
+
                     if(isFreshUser == null) {
                         this.workspaceManager.runGuide();
-                        window.localStorage.setItem('guideFileNameIncr', "0");
+                        this.browserStorage.put("guideFileNameIncrement", 1);
                     }
                 },
 
