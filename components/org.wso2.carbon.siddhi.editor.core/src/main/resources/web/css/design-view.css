@@ -878,7 +878,7 @@ a.list-group-item, button.list-group-item {
 .siddhi-app-form-container,
 .aggregation-form-container,
 .join-query-form-container,
-.pattern-query-form-container,
+.pattern-sequence-query-form-container,
 .query-form-container {
 	float: left;
 	display: inline-block;
@@ -889,7 +889,7 @@ a.list-group-item, button.list-group-item {
 .trigger-form-container,
 .function-form-container,
 .join-query-form-container,
-.pattern-query-form-container {
+.pattern-sequence-query-form-container {
 	width: 25%;
 }
 
