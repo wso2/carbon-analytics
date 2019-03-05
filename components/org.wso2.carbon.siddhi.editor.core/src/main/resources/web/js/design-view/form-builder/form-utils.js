@@ -1380,17 +1380,17 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
             var isError = false;
             if ($('#customized-' + id + '-options ul').has('li').length != 0) {
                 $('#customized-' + id + '-options .option').each(function () {
-                    var custOptName = $(this).find('.cust-option-key').val().trim();
-                    var custOptValue = $(this).find('.cust-option-value').val().trim();
-                    if ((custOptName != "") || (custOptValue != "")) {
-                        if (custOptName == "") {
-                            self.addErrorClass($(this).find('.cust-option-key'))
-                            $(this).find('.error-message').text('Option key is required.');
+                    var custOptName = $(this).find('.cust-option-key');
+                    var custOptValue = $(this).find('.cust-option-value');
+                    if ((custOptName.val().trim() != "") || (custOptValue.val().trim() != "")) {
+                        if (custOptName.val().trim() == "") {
+                            self.addErrorClass(custOptName);
+                            custOptName.parent().next('.error-message').text('Option key is required.');
                             isError = true;
                             return false;
-                        } else if (custOptValue == "") {
-                            $(this).find('.error-message').text('Option value is required.');
-                            self.addErrorClass($(this).find('.cust-option-value'));
+                        } else if (custOptValue.val().trim() == "") {
+                            custOptValue.parent().next('.error-message').text('Option value is required.');
+                            self.addErrorClass(custOptValue);
                             isError = true;
                             return false;
                         }
@@ -3410,7 +3410,8 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
             $('#' + id + '-options-div').on('click', '#btn-add-' + id + '-options', function () {
                 var custOptDiv = '<li class="option">' +
                     '<div class = "clearfix"> <label>option.key</label> <input type="text" class="cust-option-key"' +
-                    'value=""> </div> <div class="clearfix"> <label>option.value</label> ' +
+                    'value=""> </div> <label class = "error-message"></label> ' +
+                    '<div class="clearfix"> <label>option.value</label> ' +
                     '<input type="text" class="cust-option-value" value="">' +
                     '<a class = "btn-del btn-del-option"><i class="fw fw-delete"></i></a></div>' +
                     '<label class = "error-message"></label></li>';
