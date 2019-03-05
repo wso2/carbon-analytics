@@ -16,80 +16,36 @@
  * under the License.
  */
 
-define(['ace/ace', 'jquery', 'lodash', 'log', 'enjoyhint', 'designViewUtils'],
-    function (ace, $, _, log, EnjoyHintLib, DesignViewUtils) {
+define(['jquery', 'lodash', 'log', 'enjoyhint', 'designViewUtils', 'workspace', 'guideConstants'],
+    function ($, _, log, EnjoyHintLib, DesignViewUtils, Workspace, Constants) {
+
+        //enjoyhint instance to be used in the methods of this class
+        var instance = null;
 
         /**
          * Arg: application instance
          */
 
-        var instanceVal = null;
-        var fileNameIncr = 0;
-
         var Guide = function (application) {
 
             var self = this;
-            var app = application;
-            self.tabList = app.tabController.getTabList();
-            var tempFileName = 'SweetFactory';
+            this.app = application;
+            this.tabList = this.app.tabController.getTabList();
+            var browserStorage = this.app.browserStorage;
 
             //URLs for AJAX requests
-            self.workspaceServiceURL = app.config.services.workspace.endpoint;
+            self.workspaceServiceURL = this.app.config.services.workspace.endpoint;
             var checkFileURL = self.workspaceServiceURL + "/exists/workspace";
             var saveServiceURL = self.workspaceServiceURL + "/write";
 
-            //String for the "write" API call from the simulation tour
-            var content = '@App:name(\'SweetFactory\')\n' +
-                '@App:description(\'Description of the plan\')\n' +
-                '\n' +
-                '-- Please refer to https://docs.wso2.com/display/SP400/Quick+Start+Guide on getting started with SP editor. \n' +
-                '\n' +
-                'define stream SweetProductionStream (name string, amount long);\n' +
-                '@sink(type = \'log\', \n' +
-                '\t@map(type = \'passThrough\'))\n' +
-                'define stream TotalProductionStream (TotalProduction long);\n' +
-                '\n' +
-                '@info(name = \'SweetTotalQuery\')\n' +
-                'from SweetProductionStream \n' +
-                'select count() as TotalProduction \n' +
-                'insert into TotalProductionStream;\n';
-
             //Dialog box to choose tour options
-            var GuideDialog = $(
-                "<div class='modal fade' id='guideDialog' tabindex='-1' role='dialog' aria-tydden='true'>" +
-                "<div class='modal-dialog file-dialog' role='document'>" +
-                "<div class='modal-content' style='padding-bottom: 18px'>" +
-                "<div class='modal-header'>" +
-                "<button type='button' class='close' data-dismiss='modal' aria-label='Close'>" +
-                "<span aria-hidden='true'>&times;</span>" +
-                "</button>" +
-                "<h4 class='modal-title file-dialog-title' id='whereToStart'>Welcome to the Stream processor tour guide</h4>" +
-                "<hr class='style1'>"+
-                "<div class='divider'/>" +
-                "</div>" +
-                "<div class='modal-body'>"+
-                "<div><p>Click Complete tour to start the tour from the beginning to the test simulation. Click Simulation tour" +
-                " to jump to the test simulation. Click Samples to view how to use samples.</p><br></div>" +
-                "<div class='row'>" +
-                "<div class='col-sm-4'>" +
-                "<button class='btn btn-block btn-lg btn-primary tour-guide-button' id='fullGuide'>Complete tour</button></div>" +
-                "<div class='col-sm-4'>" +
-                "<button class='btn btn-block btn-lg btn-primary tour-guide-button' id='simulationGuide'>Simulation tour</button></div>" +
-                "<div class='col-sm-4'>" +
-                "<button class='btn btn-block btn-lg btn-primary tour-guide-button' id='sampleGuide'>Samples</button></div>" +
-                "</div>"+
-                "</div>" +
-                "</div>" +
-                "</div>"
-            );
-
-            self.guideDialog = GuideDialog;
+            self.guideDialog = $('#guideDialog');
 
             //Script array for the complete guide
-            self.createNewProject = [
+            this.completeGuide = [
                 {
-                    'click #newButton': '<b>Welcome to WSO2 SP!</b> Click <b class="lime-text">New</b> to get started.',
-                    'showSkip': true
+                    'click #newButton': '<b>Welcome to WSO2 Stream Processor Studio!</b> Click <b class="lime-text">New</b> to get started.',
+                    'showNext' : false
                 },
                 {
                     'next .ace_line': 'First, We have defined an input stream for you!. <b class="lime-text">' +
@@ -99,11 +55,11 @@ define(['ace/ace', 'jquery', 'lodash', 'log', 'enjoyhint', 'designViewUtils'],
                     'margin': 200,
                     'showSkip': false,
                     onBeforeStart: function () {
-                        var activeTab = app.tabController.getActiveTab();
+                        var activeTab = self.app.tabController.getActiveTab();
                         var editor = activeTab.getSiddhiFileEditor().getSourceView().getEditor();
-                        var aceEditor = app.tabController.getActiveTab().getSiddhiFileEditor().getSourceView().getEditor();
-                        editor.session.insert(aceEditor.getCursorPosition(), 'define stream SweetProductionStream (name string, amount long);');
-
+                        var aceEditor = self.app.tabController.getActiveTab().getSiddhiFileEditor().getSourceView().getEditor();
+                        editor.session.insert(aceEditor.getCursorPosition(), Constants.INSERT_STRING);
+                        Constants.CURRENT_STEP = null;
                     }
                 },
                 {
@@ -125,17 +81,17 @@ define(['ace/ace', 'jquery', 'lodash', 'log', 'enjoyhint', 'designViewUtils'],
                     'top': 7
                 },
                 {
-                    'keyCode': 9,
-                    selector: '#saveName',
-                    event: 'key',
-                    description: 'Your file name is this. Press <b class="lime-text">Tab </b>key to continue.',
+                    'keyCode': Constants.TAB_KEYCODE,
+                    'selector': '#saveName',
+                    'event': 'key',
+                    'description': 'Your file name is this. Press <b class="lime-text">Tab </b>key to continue.',
                     'showNext': false,
                     'showSkip': false,
                     'timeout': 200,
                     onBeforeStart: function () {
-                        fileNameIncr = parseInt(window.localStorage.getItem('guideFileNameIncr'));
-                        tempFileName = "SweetFactory"+fileNameIncr;
-                        var fileToBeChecked = "configName="+btoa("SweetFactory"+fileNameIncr+'.siddhi');
+                        Constants.FILE_INCREMENT = browserStorage.get('guideFileNameIncrement');
+                        Constants.TEMP_FILE = "SweetFactory__" + Constants.FILE_INCREMENT;
+                        var fileToBeChecked = "configName=" + btoa(Constants.TEMP_FILE + '.siddhi');
 
                         $.ajax({
                             url: checkFileURL,
@@ -143,20 +99,20 @@ define(['ace/ace', 'jquery', 'lodash', 'log', 'enjoyhint', 'designViewUtils'],
                             contentType: "text/plain; charset=utf-8",
                             data: fileToBeChecked,
                             async: false,
-                            success: function (data, textStatus, xhr) {
-                                if(data.exists === true){
-                                    if(tempFileName.length > 12){
-                                        tempFileName = tempFileName.slice(0, 12);
-                                    }
-                                    fileNameIncr++;
-                                    tempFileName = tempFileName + fileNameIncr;
+                            success: function (response) {
+                                if(response.exists === true){
+                                    Constants.TEMP_FILE = Constants.TEMP_FILE.slice(0, 14);
+                                    Constants.FILE_INCREMENT++;
+                                    Constants.TEMP_FILE = Constants.TEMP_FILE + Constants.FILE_INCREMENT;
                                 }
+                            },
+                            error: function () {
+                                DesignViewUtils.prototype.warnAlert("Server error has occurred");
                             }
                         });
 
                         setTimeout(function () {
-                            $('#saveConfigModal').find('#configName').val(tempFileName);
-                            $('input[name=siddhiAppName]').focus();
+                            $('#saveConfigModal').find('#configName').val(Constants.TEMP_FILE).focus();
                         }, 800);
                     }
                 },
@@ -171,9 +127,9 @@ define(['ace/ace', 'jquery', 'lodash', 'log', 'enjoyhint', 'designViewUtils'],
                     'showSkip': false,
                     'showNext': false,
                     onBeforeStart: function () {
-                        tempFileName = "SweetFactory"+fileNameIncr;
-                        fileNameIncr++;
-                        window.localStorage.setItem("guideFileNameIncr", fileNameIncr.toString());
+                        Constants.TEMP_FILE = "SweetFactory__" + Constants.FILE_INCREMENT;
+                        Constants.FILE_INCREMENT++;
+                        browserStorage.put("guideFileNameIncrement", Constants.FILE_INCREMENT);
                     }
                 },
                 {
@@ -183,6 +139,8 @@ define(['ace/ace', 'jquery', 'lodash', 'log', 'enjoyhint', 'designViewUtils'],
                     'showNext': true,
                     onBeforeStart: function () {
                         $('#stream').removeClass('stream-drag');
+                        Constants.CURRENT_STEP = instance.getCurrentStep();
+
                     }
                 },
                 {
@@ -193,7 +151,6 @@ define(['ace/ace', 'jquery', 'lodash', 'log', 'enjoyhint', 'designViewUtils'],
                     'shape': 'rect',
                     'bottom': 300,
                     onBeforeStart: function () {
-                        var flag = true;
                         $('#tool-group-Collections').find('.tool-group-body').css('display', 'none');
                         $('#tool-group-Queries').find('.tool-group-body').css('display', 'none');
                         $('#tool-group-Functions').find('.tool-group-body').css('display', 'none');
@@ -201,19 +158,18 @@ define(['ace/ace', 'jquery', 'lodash', 'log', 'enjoyhint', 'designViewUtils'],
                         $('#trigger').removeClass('trigger-drag');
                         $('#partition').removeClass('partition-drag');
                         $('#stream').addClass('stream-drag');
+                        Constants.CURRENT_STEP = instance.getCurrentStep();
+
                         setTimeout(function () {
                             var Interval = null;
                             Interval = window.setInterval(function () {
-                                var newElement = app.tabController.getActiveTab().getSiddhiFileEditor().getDesignView()
+                                var newElement = self.app.tabController.getActiveTab().getSiddhiFileEditor().getDesignView()
                                     .getConfigurationData().getSiddhiAppConfig();
                                 if (newElement.streamList.length === 2) {
-                                    instanceVal.trigger('next');
+                                    instance.trigger('next');
                                     clearInterval(Interval);
-                                } else if (flag) {
-                                    flag = false;
-                                    DesignViewUtils.prototype.warnAlert("Please drag and drop a Stream Component");
                                 }
-                            }, 1000);
+                            }, 3000);
                         }, 3000)
                     }
                 },
@@ -235,10 +191,10 @@ define(['ace/ace', 'jquery', 'lodash', 'log', 'enjoyhint', 'designViewUtils'],
                     }
                 },
                 {
-                    'keyCode': 9,
-                    selector: '#streamName',
-                    event: 'key',
-                    description: 'We have set the stream name as <b class="lime-text"> TotalProductionStream.</b> ' +
+                    'keyCode': Constants.TAB_KEYCODE,
+                    'selector': '#streamName',
+                    'event': 'key',
+                    'description': 'We have set the stream name as <b class="lime-text"> TotalProductionStream.</b> ' +
                         'Press<b class="lime-text"> Tab</b> to continue.',
                     'showNext': false,
                     'showSkip': false,
@@ -270,7 +226,7 @@ define(['ace/ace', 'jquery', 'lodash', 'log', 'enjoyhint', 'designViewUtils'],
                     'click #btn-submit': 'Click <b class="lime-text">Submit</b> to submit the stream configuration.',
                     'showSkip': false,
                     'showNext': false,
-                    scrollAnimationSpeed: 500,
+                    'scrollAnimationSpeed': 500,
                     onBeforeStart: function () {
                         setTimeout(function () {
                             $('#btn-submit').focus();
@@ -285,6 +241,7 @@ define(['ace/ace', 'jquery', 'lodash', 'log', 'enjoyhint', 'designViewUtils'],
                     'showNext': true,
                     onBeforeStart: function () {
                         $('#projection-query').removeClass('projection-query-drag');
+                        Constants.CURRENT_STEP = instance.getCurrentStep();
                     }
                 },
                 {
@@ -295,7 +252,6 @@ define(['ace/ace', 'jquery', 'lodash', 'log', 'enjoyhint', 'designViewUtils'],
                     'shape': 'rect',
                     'bottom': 300,
                     onBeforeStart: function () {
-                        var flag = true;
                         $('#tool-group-Collections').find('.tool-group-body').css('display', 'none');
                         $("div[id='tool-group-Flow Constructs']").find('.tool-group-body').css('display', 'none');
                         $('#tool-group-Functions').find('.tool-group-body').css('display', 'none');
@@ -307,17 +263,16 @@ define(['ace/ace', 'jquery', 'lodash', 'log', 'enjoyhint', 'designViewUtils'],
                         $('#sequence-query').removeClass('sequence-query-drag');
                         $('#join-query').removeClass('join-query-drag');
                         $('#function-query').removeClass('function-query-drag');
+                        Constants.CURRENT_STEP = instance.getCurrentStep();
+
                         setTimeout(function () {
                             var Interval = null;
                             Interval = window.setInterval(function () {
-                                var newElement = app.tabController.getActiveTab().getSiddhiFileEditor().getDesignView()
+                                var newElement = self.app.tabController.getActiveTab().getSiddhiFileEditor().getDesignView()
                                     .getConfigurationData().getSiddhiAppConfig();
                                 if (newElement.queryLists.WINDOW_FILTER_PROJECTION.length === 1) {
-                                    instanceVal.trigger('next');
+                                    instance.trigger('next');
                                     clearInterval(Interval);
-                                } else if (flag) {
-                                    flag = false;
-                                    DesignViewUtils.prototype.warnAlert("Please drag and drop a Projection Component");
                                 }
                             }, 1000);
                         }, 3000)
@@ -332,22 +287,24 @@ define(['ace/ace', 'jquery', 'lodash', 'log', 'enjoyhint', 'designViewUtils'],
                     'shape': 'rect',
                     'bottom': 300,
                     onBeforeStart: function () {
-                        var flag = true;
                         $('#filter-query').addClass('filter-query-drag');
                         $('#window-query').addClass('window-query-drag');
                         $('#pattern-query').addClass('pattern-query-drag');
                         $('#sequence-query').addClass('sequence-query-drag');
                         $("#tool-group-Queries").find('.tool-group-body').css('display', 'none');
+
                         setTimeout(function () {
                             var Interval = null;
+                            var newElement = self.app.tabController.getActiveTab().getSiddhiFileEditor().getDesignView()
+                                .getConfigurationData().getSiddhiAppConfig().queryLists.WINDOW_FILTER_PROJECTION[0];
+
                             Interval = window.setInterval(function () {
-                                if ($('.projectionQueryDrop')[0].title === "Output section of Query form is not filled") {
-                                    clearInterval(Interval);
-                                    instanceVal.trigger('next');
-                                } else if (flag) {
-                                    flag = false;
-                                    DesignViewUtils.prototype.warnAlert("Please connect the elements to continue");
-                                }
+                                    if(newElement.queryInput && newElement.queryOutput && newElement.queryInput.from === "SweetProductionStream" &&
+                                        newElement.queryOutput.target === "TotalProductionStream") {
+                                        clearInterval(Interval);
+                                        instance.trigger('next');
+                                    }
+
                             }, 1000);
                         }, 3000);
                     }
@@ -369,22 +326,18 @@ define(['ace/ace', 'jquery', 'lodash', 'log', 'enjoyhint', 'designViewUtils'],
                     }
                 },
                 {
-                    selector: '#form-query-name',
-                    event: 'custom',
-                    description: 'Change the query name to <b class="lime-text">SweetTotalQuery</b>',
+                    'selector': '#form-query-name',
+                    'event': 'custom',
+                    'description': 'Change the query name to <b class="lime-text">SweetTotalQuery</b>',
                     'showNext': false,
                     'showSkip': false,
                     onBeforeStart: function () {
-                        var flag = true;
                         setTimeout(function () {
                             var Interval = null;
                             Interval = window.setInterval(function () {
-                                if ($('#form-query-name').find('.form-control').val() == 'SweetTotalQuery') {
-                                    instanceVal.trigger('next');
+                                if ($('#form-query-name').find('.form-control').val() === 'SweetTotalQuery') {
+                                    instance.trigger('next');
                                     clearInterval(Interval);
-                                } else if (flag) {
-                                    flag = false;
-                                    DesignViewUtils.prototype.warnAlert("Please insert the valid query name");
                                 }
                             }, 1000);
                         }, 4000)
@@ -394,20 +347,15 @@ define(['ace/ace', 'jquery', 'lodash', 'log', 'enjoyhint', 'designViewUtils'],
                     'custom .has-error': 'Enter <b class="lime-text">count()</b> as the expression',
                     'showSkip': false,
                     'showNext': false,
-                    'keyCode': 13,
                     'shape': 'rect',
                     'bottom': 20,
                     onBeforeStart: function () {
-                        var flag = true;
                         setTimeout(function () {
                             var Interval = null;
                             Interval = window.setInterval(function () {
-                                if ($('.has-error').find('.form-control').val() == 'count()') {
-                                    instanceVal.trigger('next');
+                                if ($('.has-error').find('.form-control').val() === 'count()') {
+                                    instance.trigger('next');
                                     clearInterval(Interval);
-                                } else if (flag) {
-                                    flag = false;
-                                    DesignViewUtils.prototype.warnAlert("Please insert the valid expression");
                                 }
                             }, 1000);
                         }, 3000)
@@ -417,7 +365,7 @@ define(['ace/ace', 'jquery', 'lodash', 'log', 'enjoyhint', 'designViewUtils'],
                     'click #btn-submit': 'Click <b class="lime-text">Submit</b> to submit the query configuration',
                     'showSkip': false,
                     'showNext': false,
-                    scrollAnimationSpeed: 500,
+                    'scrollAnimationSpeed': 500,
                     onBeforeStart: function () {
                         setTimeout(function () {
                             $('#btn-submit').focus();
@@ -431,6 +379,7 @@ define(['ace/ace', 'jquery', 'lodash', 'log', 'enjoyhint', 'designViewUtils'],
                     'showSkip': false,
                     onBeforeStart: function () {
                         $('#sink').removeClass('sink-drag');
+                        Constants.CURRENT_STEP = instance.getCurrentStep();
                     }
                 },
                 {
@@ -446,19 +395,17 @@ define(['ace/ace', 'jquery', 'lodash', 'log', 'enjoyhint', 'designViewUtils'],
                         $('#tool-group-Functions').find('.tool-group-body').css('display', 'none');
                         $("#tool-group-Queries").find('.tool-group-body').css('display', 'none');
                         $('#source').removeClass('source-drag ');
-                        var flag = true;
                         $('#sink').addClass('sink-drag');
+                        Constants.CURRENT_STEP = instance.getCurrentStep();
+
                         setTimeout(function () {
                             var Interval = null;
                             Interval = window.setInterval(function () {
-                                var newElement = app.tabController.getActiveTab().getSiddhiFileEditor().getDesignView()
+                                var newElement = self.app.tabController.getActiveTab().getSiddhiFileEditor().getDesignView()
                                     .getConfigurationData().getSiddhiAppConfig();
                                 if (newElement.sinkList.length === 1) {
-                                    instanceVal.trigger('next');
+                                    instance.trigger('next');
                                     clearInterval(Interval);
-                                } else if (flag) {
-                                    flag = false;
-                                    DesignViewUtils.prototype.warnAlert("Please drag and drop a Sink Component");
                                 }
                             }, 1000);
                         }, 3000)
@@ -471,16 +418,14 @@ define(['ace/ace', 'jquery', 'lodash', 'log', 'enjoyhint', 'designViewUtils'],
                     'shape': 'rect',
                     'bottom': 300,
                     onBeforeStart: function () {
-                        var flag = true;
                         setTimeout(function () {
                             var Interval = null;
+                            var newElement = self.app.tabController.getActiveTab().getSiddhiFileEditor().getDesignView()
+                                .getConfigurationData().getSiddhiAppConfig().sinkList[0];
                             Interval = window.setInterval(function () {
-                                if ($('.sinkDrop')[0].title === "Sink annotation form is incomplete") {
+                                if (newElement.connectedElementName === "TotalProductionStream") {
                                     clearInterval(Interval);
-                                    instanceVal.trigger('next');
-                                } else if (flag) {
-                                    flag = false;
-                                    DesignViewUtils.prototype.warnAlert("Please connect the elements to continue");
+                                    instance.trigger('next');
                                 }
                             }, 1000);
                         }, 3000);
@@ -506,7 +451,7 @@ define(['ace/ace', 'jquery', 'lodash', 'log', 'enjoyhint', 'designViewUtils'],
                         var Interval = null;
                         Interval = window.setInterval(function () {
                             if ($('#sink-type').val() === "log") {
-                                instanceVal.trigger('next');
+                                instance.trigger('next');
                                 clearInterval(Interval);
                             }
                         }, 1000)
@@ -516,7 +461,7 @@ define(['ace/ace', 'jquery', 'lodash', 'log', 'enjoyhint', 'designViewUtils'],
                     'click #btn-submit': 'Click <b class="lime-text">Submit</b> to submit the Sink configuration form',
                     'showSkip': false,
                     'showNext': false,
-                    scrollAnimationSpeed: 500,
+                    'scrollAnimationSpeed': 500,
                     onBeforeStart: function () {
                         setTimeout(function () {
                             $('#btn-submit').focus();
@@ -554,15 +499,14 @@ define(['ace/ace', 'jquery', 'lodash', 'log', 'enjoyhint', 'designViewUtils'],
                     'showSkip': false
                 },
                 {
-                    'custom #siddhi-app-name': 'Select the <b class="lime-text">Sweet Factory</b> Siddhi application',
+                    'custom #siddhi-app-name': 'Select the <b class="lime-text">latest' + Constants.TEMP_FILE + '</b> Siddhi application',
                     'showSkip': false,
                     'showNext': false,
                     onBeforeStart: function () {
                         var Interval = null;
-                        //var tourGuide = JSON.parse(window.localStorage.getItem('tourGuide'));
                         Interval = window.setInterval(function () {
-                            if ($('#siddhi-app-name').val() === tempFileName) {
-                                instanceVal.trigger('next');
+                            if ($('#siddhi-app-name').val() === Constants.TEMP_FILE) {
+                                instance.trigger('next');
                                 clearInterval(Interval);
                             }
                         }, 1000)
@@ -576,7 +520,7 @@ define(['ace/ace', 'jquery', 'lodash', 'log', 'enjoyhint', 'designViewUtils'],
                         var Interval = null;
                         Interval = window.setInterval(function () {
                             if ($('#stream-name').val() === "SweetProductionStream") {
-                                instanceVal.trigger('next');
+                                instance.trigger('next');
                                 clearInterval(Interval);
                             }
                         }, 1000)
@@ -598,8 +542,7 @@ define(['ace/ace', 'jquery', 'lodash', 'log', 'enjoyhint', 'designViewUtils'],
                     'next #console-container': 'You can see the results logged in this console',
                     'showSkip': false,
                     'showNext': true,
-                    'shape': 'rect',
-                    'top': 100
+                    'shape': 'rect'
                 },
                 {
                     'next #attribute-table': 'Simulate another event by entering attribute values as follows' +
@@ -617,11 +560,10 @@ define(['ace/ace', 'jquery', 'lodash', 'log', 'enjoyhint', 'designViewUtils'],
                     'next #console-container': 'Now the second event is also logged in this console',
                     'showSkip': false,
                     'showNext': true,
-                    'shape': 'rect',
-                    'top': 100
+                    'shape': 'rect'
                 },
                 {
-                    'click #welcome-page': "Let's try out some examples for our welcome page. Click here",
+                    'click #welcome-page': 'Click here to visit welcome page to view examples',
                     'showNext' : false,
                     'showSkip' : false
                 },
@@ -638,16 +580,24 @@ define(['ace/ace', 'jquery', 'lodash', 'log', 'enjoyhint', 'designViewUtils'],
                     'right': 500
                 },
                 {
-                    'next #sampleDialog' : 'You can try out more samples from here',
+                    'next #sampleDialog': 'You can try out more samples from here. click <b class="lime-text">Next</b>',
+                    'showSkip': false,
+                    'scrollAnimationSpeed': 900,
+                    'bottom': 150
+                },
+                {
+                    'click #DataPreprocessing' : '<b class="lime-text">Click</b> here to try a sample which ' +
+                        '<b class="lime-text">collect data via TCP transport and preprocess.</b>',
+                    'showNext' : false,
                     'showSkip' : false,
-                    'nextButton' : {className: "myNext", text: "Finish"},
-                    scrollAnimationSpeed : 900,
-                    'bottom' : 150
+                    onBeforeStart: function () {
+                        $('#DataPreprocessing').focus();
+                    }
                 }
             ];
 
             //Script array for the simulation guide
-            self.simulateProject = [
+            this.simulateGuide = [
                 {
                     'click .event-simulator-activate-btn': 'Now let us run our app using <b class="lime-text">Even Simulator.</b>' +
                         ' To open the Event Simulator, click this icon.',
@@ -655,10 +605,10 @@ define(['ace/ace', 'jquery', 'lodash', 'log', 'enjoyhint', 'designViewUtils'],
                     'showSkip': false,
                     onBeforeStart: function () {
 
-                        fileNameIncr = parseInt(window.localStorage.getItem('guideFileNameIncr'));
-                        var payload = "configName=" + btoa("SweetFactory"+ fileNameIncr + '.siddhi') + "&config=" + (btoa(content));
-                        tempFileName = "SweetFactory"+fileNameIncr;
-                        var fileToBeChecked = "configName="+btoa("SweetFactory"+fileNameIncr+'.siddhi');
+                        Constants.FILE_INCREMENT = browserStorage.get('guideFileNameIncrement');
+                        Constants.TEMP_FILE = "SweetFactory__" + Constants.FILE_INCREMENT;
+                        var payload = "configName=" + btoa(Constants.TEMP_FILE + '.siddhi') + "&config=" + (btoa(Constants.CONTENT));
+                        var fileToBeChecked = "configName="+btoa(Constants.TEMP_FILE + '.siddhi');
 
                         $.ajax({
                             url: checkFileURL,
@@ -666,13 +616,12 @@ define(['ace/ace', 'jquery', 'lodash', 'log', 'enjoyhint', 'designViewUtils'],
                             contentType: "text/plain; charset=utf-8",
                             data: fileToBeChecked,
                             async: false,
-                            success: function (data, textStatus, xhr) {
-                                if(data.exists === true){
-                                    if(tempFileName.length > 12){
-                                        tempFileName = tempFileName.slice(0, 12);
-                                    }
-                                    fileNameIncr++;
-                                    tempFileName = tempFileName + fileNameIncr;
+                            success: function (response) {
+                                if(response.exists === true){
+                                    Constants.TEMP_FILE = Constants.TEMP_FILE.slice(0, 14);
+                                    Constants.FILE_INCREMENT++;
+                                    Constants.TEMP_FILE = Constants.TEMP_FILE + Constants.FILE_INCREMENT;
+                                    payload = "configName=" + btoa(Constants.TEMP_FILE + '.siddhi') + "&config=" + (btoa(content));
                                 }
                             }
                         });
@@ -683,33 +632,30 @@ define(['ace/ace', 'jquery', 'lodash', 'log', 'enjoyhint', 'designViewUtils'],
                             data: payload,
                             contentType: "text/plain; charset=utf-8",
                             async: false,
-                            success: function (data, textStatus, xhr) {
-                                    app.commandManager.dispatch("open-folder", data.path);
-                                    if (!app.workspaceExplorer.isActive()) {
-                                        app.commandManager.dispatch("toggle-file-explorer");
-                                        app.commandManager.dispatch('remove-unwanted-streams-single-simulation',
-                                            tempFileName);
-                                    }
-                                    app.workspaceManager.updateMenuItems();
-                                    log.debug('Simulation file saved successfully');
+                            success: function (data) {
+                                self.app.commandManager.dispatch("open-folder", data.path);
+                                self.app.workspaceManager.updateMenuItems();
+                                self.app.commandManager.dispatch('remove-unwanted-streams-single-simulation', Constants.TEMP_FILE);
+                                log.debug('Simulation file saved successfully');
                             },
                             error: function () {
-                                alert('Error saving the file');
+                                DesignViewUtils.prototype.warnAlert("Server error has occurred");
                             }
                         });
-                        fileNameIncr++;
-                        window.localStorage.setItem("guideFileNameIncr", fileNameIncr.toString());
+                        Constants.FILE_INCREMENT++;
+                        browserStorage.put('guideFileNameIncrement', Constants.FILE_INCREMENT)
                     }
                 },
                 {
-                    'custom #siddhi-app-name': 'Select the <b class="lime-text">'+tempFileName+'</b> Siddhi application',
+                    'custom #siddhi-app-name': 'We have created a simulation siddhi application for you.' +
+                        ' Select the <b class="lime-text">latest ' + Constants.TEMP_FILE + '</b> siddhi application',
                     'showSkip': false,
                     'showNext': false,
                     onBeforeStart: function () {
                         var Interval = null;
                         Interval = window.setInterval(function () {
-                            if ($('#siddhi-app-name').val() === tempFileName) {
-                                instanceVal.trigger('next');
+                            if ($('#siddhi-app-name').val() === Constants.TEMP_FILE) {
+                                instance.trigger('next');
                                 clearInterval(Interval);
                             }
                         }, 1000)
@@ -723,7 +669,7 @@ define(['ace/ace', 'jquery', 'lodash', 'log', 'enjoyhint', 'designViewUtils'],
                         var Interval = null;
                         Interval = window.setInterval(function () {
                             if ($('#stream-name').val() === "SweetProductionStream") {
-                                instanceVal.trigger('next');
+                                instance.trigger('next');
                                 clearInterval(Interval);
                             }
                         }, 1000)
@@ -745,8 +691,7 @@ define(['ace/ace', 'jquery', 'lodash', 'log', 'enjoyhint', 'designViewUtils'],
                     'next #console-container': 'You can see the results logged in this console',
                     'showSkip': false,
                     'showNext': true,
-                    'shape': 'rect',
-                    'top': 100
+                    'shape': 'rect'
                 },
                 {
                     'next #attribute-table': 'Simulate another event by entering attribute values as follows' +
@@ -764,20 +709,15 @@ define(['ace/ace', 'jquery', 'lodash', 'log', 'enjoyhint', 'designViewUtils'],
                     'next #console-container': 'Now the second event is also logged in this console',
                     'showSkip': false,
                     'showNext': true,
-                    'shape': 'rect',
-                    'top': 100
+                    'shape': 'rect'
                 },
                 {
-                    'next #sampleContent': 'Here are some samples for you to try out!',
+                    'click #welcome-page': 'Click here to visit welcome page to view examples',
                     'showSkip': false,
                     'showNext': false,
                     'shape': 'rect',
                     'top': 10
-                }
-            ];
-
-            //Script array for the sample guide
-            self.sampleGuide = [
+                },
                 {
                     'click #sampleContent': 'Here are some samples for you to try out!',
                     'showSkip': false,
@@ -791,11 +731,50 @@ define(['ace/ace', 'jquery', 'lodash', 'log', 'enjoyhint', 'designViewUtils'],
                     'right': 500
                 },
                 {
-                    'next #sampleDialog' : 'You can try out more samples from here',
+                    'next #sampleDialog' : 'You can try out more samples from here. click <b class="lime-text">Next</b>',
                     'showSkip' : false,
-                    'nextButton' : {className: "myNext", text: "Finish"},
-                    scrollAnimationSpeed : 900,
+                    'scrollAnimationSpeed' : 900,
                     'bottom' : 150
+                },
+                {
+                    'click #DataPreprocessing' : '<b class="lime-text">Click</b> here to try a sample which ' +
+                        '<b class="lime-text">collect data via TCP transport and preprocess.</b>',
+                    'showNext' : false,
+                    'showSkip' : false,
+                    onBeforeStart: function () {
+                        $('#DataPreprocessing').focus();
+                    }
+                }
+            ];
+
+            //Script array for the sample guide
+            this.sampleGuide = [
+                {
+                    'click #sampleContent': 'Here are some samples for you to try out!',
+                    'showSkip': false,
+                    'showNext': true
+                },
+                {
+                    'click .more-samples': 'Click here to view the full sample list',
+                    'showSkip': false,
+                    'showFalse': false,
+                    'shape': 'rect',
+                    'right': 500
+                },
+                {
+                    'next #sampleDialog' : 'You can try out more samples from here. click <b class="lime-text">Next</b>',
+                    'showSkip' : false,
+                    'scrollAnimationSpeed' : 900,
+                    'bottom' : 150
+                },
+                {
+                    'click #DataPreprocessing' : '<b class="lime-text">Click</b> here to try a sample which ' +
+                        '<b class="lime-text">collect data via TCP transport and preprocess.</b>',
+                    'showNext' : false,
+                    'showSkip' : false,
+                    onBeforeStart: function () {
+                        $('#DataPreprocessing').focus();
+                    }
                 }
             ];
         };
@@ -818,7 +797,7 @@ define(['ace/ace', 'jquery', 'lodash', 'log', 'enjoyhint', 'designViewUtils'],
 
             var self = this;
             var guideModal = self.guideDialog.filter("#guideDialog");
-            var _hintInstance = new EnjoyHint({});
+            var hintInstance = new EnjoyHint({});
             var callback = function() { guideModal.modal('hide') };
 
             //check whether there are multiple tabs and if the current tab is "welcome-page"
@@ -826,52 +805,76 @@ define(['ace/ace', 'jquery', 'lodash', 'log', 'enjoyhint', 'designViewUtils'],
                 if (self.tabList.length === 1 && tab._title === "welcome-page") {
                     self.showModel();
                 } else {
-                    DesignViewUtils.prototype.errorAlert("Please close all tabs except welcome-page to start the guide." +
-                        "Your changes will be lost if you close all without saving.");
+                    DesignViewUtils.prototype.errorAlert(Constants.ERROR_TEXT);
                 }
             });
 
             //function for the complete tour
             guideModal.find("button").filter("#fullGuide").click(function() {
 
+                //unbinding the click events from the previous click
                 $('#fullGuide').off('click');
                 $('#simulationGuide').off('click');
                 $('#sampleGuide').off('click');
 
-                _hintInstance.setScript(self.createNewProject);
-                _hintInstance.runScript();
+                hintInstance.setScript(self.completeGuide);
+                hintInstance.runScript();
 
-                instanceVal = _hintInstance;
+                instance = hintInstance;
                 callback();
             });
 
             //function for the simulation tour
             guideModal.find("button").filter("#simulationGuide").click(function() {
 
+                //unbinding the click events from the previous click
                 $('#fullGuide').off('click');
                 $('#simulationGuide').off('click');
                 $('#sampleGuide').off('click');
 
-                _hintInstance.setScript(self.simulateProject);
-                _hintInstance.runScript();
+                hintInstance.setScript(self.simulateGuide);
+                hintInstance.runScript();
 
-                instanceVal = _hintInstance;
+                instance = hintInstance;
                 callback();
             });
 
             //function for the sample tour
             guideModal.find("button").filter("#sampleGuide").click(function() {
 
+                //unbinding the click events from the previous click
                 $('#fullGuide').off('click');
                 $('#simulationGuide').off('click');
                 $('#sampleGuide').off('click');
 
-                _hintInstance.setScript(self.sampleGuide);
-                _hintInstance.runScript();
+                hintInstance.setScript(self.sampleGuide);
+                hintInstance.runScript();
 
-                instanceVal = _hintInstance;
+                instance = hintInstance;
                 callback();
             });
+
+            $('.enjoyhint_close_btn').click(function () {
+                switch (Constants.CURRENT_STEP) {
+                    case 7  :   $('#stream').addClass('stream-drag');
+                                break;
+                    case 8  :   $('#trigger').addClass('trigger-drag');
+                                $('#partition').addClass('partition-drag');
+                                break;
+                    case 14 :   $('#projection-query').addClass('projection-query-drag');
+                                break;
+                    case 15 :   $('#filter-query').addClass('filter-query-drag');
+                                $('#window-query').addClass('window-query-drag');
+                                $('#pattern-query').addClass('pattern-query-drag');
+                                $('#sequence-query').addClass('sequence-query-drag');
+                                break;
+                    case 21 :   $('#sink').addClass('sink-drag');
+                                break;
+                    case 22 :   $('#source').addClass('source-drag ');
+                                break;
+
+                }
+            })
         };
 
         return Guide;
