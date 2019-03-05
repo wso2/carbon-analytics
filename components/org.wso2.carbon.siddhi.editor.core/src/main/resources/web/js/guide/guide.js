@@ -60,7 +60,6 @@ define(['jquery', 'lodash', 'log', 'enjoyhint', 'designViewUtils', 'workspace', 
                         var aceEditor = self.app.tabController.getActiveTab().getSiddhiFileEditor().getSourceView().getEditor();
                         editor.session.insert(aceEditor.getCursorPosition(), Constants.INSERT_STRING);
                         Constants.CURRENT_STEP = null;
-                        console.log(Constants.CURRENT_STEP)
                     }
                 },
                 {
@@ -82,17 +81,17 @@ define(['jquery', 'lodash', 'log', 'enjoyhint', 'designViewUtils', 'workspace', 
                     'top': 7
                 },
                 {
-                    'keyCode': Constants.TAB_KEYCODE, //move to const
-                    selector: '#saveName', //''
-                    event: 'key',
-                    description: 'Your file name is this. Press <b class="lime-text">Tab </b>key to continue.',
+                    'keyCode': Constants.TAB_KEYCODE,
+                    'selector': '#saveName',
+                    'event': 'key',
+                    'description': 'Your file name is this. Press <b class="lime-text">Tab </b>key to continue.',
                     'showNext': false,
                     'showSkip': false,
                     'timeout': 200,
                     onBeforeStart: function () {
                         Constants.FILE_INCREMENT = browserStorage.get('guideFileNameIncrement');
                         Constants.TEMP_FILE = "SweetFactory__" + Constants.FILE_INCREMENT;
-                        var fileToBeChecked = "configName="+btoa(Constants.TEMP_FILE + '.siddhi');
+                        var fileToBeChecked = "configName=" + btoa(Constants.TEMP_FILE + '.siddhi');
 
                         $.ajax({
                             url: checkFileURL,
@@ -130,7 +129,7 @@ define(['jquery', 'lodash', 'log', 'enjoyhint', 'designViewUtils', 'workspace', 
                     onBeforeStart: function () {
                         Constants.TEMP_FILE = "SweetFactory__" + Constants.FILE_INCREMENT;
                         Constants.FILE_INCREMENT++;
-                        browserStorage.put("guideFileNameIncrement", Constants.FILE_INCREMENT)
+                        browserStorage.put("guideFileNameIncrement", Constants.FILE_INCREMENT);
                     }
                 },
                 {
@@ -141,7 +140,6 @@ define(['jquery', 'lodash', 'log', 'enjoyhint', 'designViewUtils', 'workspace', 
                     onBeforeStart: function () {
                         $('#stream').removeClass('stream-drag');
                         Constants.CURRENT_STEP = instance.getCurrentStep();
-                        console.log(Constants.CURRENT_STEP)
 
                     }
                 },
@@ -153,7 +151,6 @@ define(['jquery', 'lodash', 'log', 'enjoyhint', 'designViewUtils', 'workspace', 
                     'shape': 'rect',
                     'bottom': 300,
                     onBeforeStart: function () {
-                        var flag = true;
                         $('#tool-group-Collections').find('.tool-group-body').css('display', 'none');
                         $('#tool-group-Queries').find('.tool-group-body').css('display', 'none');
                         $('#tool-group-Functions').find('.tool-group-body').css('display', 'none');
@@ -162,7 +159,6 @@ define(['jquery', 'lodash', 'log', 'enjoyhint', 'designViewUtils', 'workspace', 
                         $('#partition').removeClass('partition-drag');
                         $('#stream').addClass('stream-drag');
                         Constants.CURRENT_STEP = instance.getCurrentStep();
-                        console.log(Constants.CURRENT_STEP)
 
                         setTimeout(function () {
                             var Interval = null;
@@ -196,9 +192,9 @@ define(['jquery', 'lodash', 'log', 'enjoyhint', 'designViewUtils', 'workspace', 
                 },
                 {
                     'keyCode': Constants.TAB_KEYCODE,
-                    selector: '#streamName',
-                    event: 'key',
-                    description: 'We have set the stream name as <b class="lime-text"> TotalProductionStream.</b> ' +
+                    'selector': '#streamName',
+                    'event': 'key',
+                    'description': 'We have set the stream name as <b class="lime-text"> TotalProductionStream.</b> ' +
                         'Press<b class="lime-text"> Tab</b> to continue.',
                     'showNext': false,
                     'showSkip': false,
@@ -230,7 +226,7 @@ define(['jquery', 'lodash', 'log', 'enjoyhint', 'designViewUtils', 'workspace', 
                     'click #btn-submit': 'Click <b class="lime-text">Submit</b> to submit the stream configuration.',
                     'showSkip': false,
                     'showNext': false,
-                    scrollAnimationSpeed: 500,
+                    'scrollAnimationSpeed': 500,
                     onBeforeStart: function () {
                         setTimeout(function () {
                             $('#btn-submit').focus();
@@ -246,8 +242,6 @@ define(['jquery', 'lodash', 'log', 'enjoyhint', 'designViewUtils', 'workspace', 
                     onBeforeStart: function () {
                         $('#projection-query').removeClass('projection-query-drag');
                         Constants.CURRENT_STEP = instance.getCurrentStep();
-                        console.log(Constants.CURRENT_STEP)
-
                     }
                 },
                 {
@@ -270,7 +264,6 @@ define(['jquery', 'lodash', 'log', 'enjoyhint', 'designViewUtils', 'workspace', 
                         $('#join-query').removeClass('join-query-drag');
                         $('#function-query').removeClass('function-query-drag');
                         Constants.CURRENT_STEP = instance.getCurrentStep();
-                        console.log(Constants.CURRENT_STEP)
 
                         setTimeout(function () {
                             var Interval = null;
@@ -294,22 +287,24 @@ define(['jquery', 'lodash', 'log', 'enjoyhint', 'designViewUtils', 'workspace', 
                     'shape': 'rect',
                     'bottom': 300,
                     onBeforeStart: function () {
-                        var flag = true;
                         $('#filter-query').addClass('filter-query-drag');
                         $('#window-query').addClass('window-query-drag');
                         $('#pattern-query').addClass('pattern-query-drag');
                         $('#sequence-query').addClass('sequence-query-drag');
                         $("#tool-group-Queries").find('.tool-group-body').css('display', 'none');
+
                         setTimeout(function () {
                             var Interval = null;
                             var newElement = self.app.tabController.getActiveTab().getSiddhiFileEditor().getDesignView()
                                 .getConfigurationData().getSiddhiAppConfig().queryLists.WINDOW_FILTER_PROJECTION[0];
+
                             Interval = window.setInterval(function () {
-                                if (newElement.queryInput.from === "SweetProductionStream" &&
-                                    newElement.queryOutput.target === "TotalProductionStream") {
-                                    clearInterval(Interval);
-                                    instance.trigger('next');
-                                }
+                                    if(newElement.queryInput && newElement.queryOutput && newElement.queryInput.from === "SweetProductionStream" &&
+                                        newElement.queryOutput.target === "TotalProductionStream") {
+                                        clearInterval(Interval);
+                                        instance.trigger('next');
+                                    }
+
                             }, 1000);
                         }, 3000);
                     }
@@ -331,9 +326,9 @@ define(['jquery', 'lodash', 'log', 'enjoyhint', 'designViewUtils', 'workspace', 
                     }
                 },
                 {
-                    selector: '#form-query-name',
-                    event: 'custom',
-                    description: 'Change the query name to <b class="lime-text">SweetTotalQuery</b>',
+                    'selector': '#form-query-name',
+                    'event': 'custom',
+                    'description': 'Change the query name to <b class="lime-text">SweetTotalQuery</b>',
                     'showNext': false,
                     'showSkip': false,
                     onBeforeStart: function () {
@@ -370,7 +365,7 @@ define(['jquery', 'lodash', 'log', 'enjoyhint', 'designViewUtils', 'workspace', 
                     'click #btn-submit': 'Click <b class="lime-text">Submit</b> to submit the query configuration',
                     'showSkip': false,
                     'showNext': false,
-                    scrollAnimationSpeed: 500,
+                    'scrollAnimationSpeed': 500,
                     onBeforeStart: function () {
                         setTimeout(function () {
                             $('#btn-submit').focus();
@@ -385,8 +380,6 @@ define(['jquery', 'lodash', 'log', 'enjoyhint', 'designViewUtils', 'workspace', 
                     onBeforeStart: function () {
                         $('#sink').removeClass('sink-drag');
                         Constants.CURRENT_STEP = instance.getCurrentStep();
-                        console.log(Constants.CURRENT_STEP)
-
                     }
                 },
                 {
@@ -404,7 +397,6 @@ define(['jquery', 'lodash', 'log', 'enjoyhint', 'designViewUtils', 'workspace', 
                         $('#source').removeClass('source-drag ');
                         $('#sink').addClass('sink-drag');
                         Constants.CURRENT_STEP = instance.getCurrentStep();
-                        console.log(Constants.CURRENT_STEP)
 
                         setTimeout(function () {
                             var Interval = null;
@@ -469,7 +461,7 @@ define(['jquery', 'lodash', 'log', 'enjoyhint', 'designViewUtils', 'workspace', 
                     'click #btn-submit': 'Click <b class="lime-text">Submit</b> to submit the Sink configuration form',
                     'showSkip': false,
                     'showNext': false,
-                    scrollAnimationSpeed: 500,
+                    'scrollAnimationSpeed': 500,
                     onBeforeStart: function () {
                         setTimeout(function () {
                             $('#btn-submit').focus();
@@ -588,10 +580,10 @@ define(['jquery', 'lodash', 'log', 'enjoyhint', 'designViewUtils', 'workspace', 
                     'right': 500
                 },
                 {
-                    'next #sampleDialog' : 'You can try out more samples from here. click <b class="lime-text">Next</b>',
-                    'showSkip' : false,
-                    scrollAnimationSpeed : 900,
-                    'bottom' : 150
+                    'next #sampleDialog': 'You can try out more samples from here. click <b class="lime-text">Next</b>',
+                    'showSkip': false,
+                    'scrollAnimationSpeed': 900,
+                    'bottom': 150
                 },
                 {
                     'click #DataPreprocessing' : '<b class="lime-text">Click</b> here to try a sample which ' +
@@ -640,7 +632,7 @@ define(['jquery', 'lodash', 'log', 'enjoyhint', 'designViewUtils', 'workspace', 
                             data: payload,
                             contentType: "text/plain; charset=utf-8",
                             async: false,
-                            success: function (data, textStatus, xhr) {
+                            success: function (data) {
                                 self.app.commandManager.dispatch("open-folder", data.path);
                                 self.app.workspaceManager.updateMenuItems();
                                 self.app.commandManager.dispatch('remove-unwanted-streams-single-simulation', Constants.TEMP_FILE);
@@ -741,7 +733,7 @@ define(['jquery', 'lodash', 'log', 'enjoyhint', 'designViewUtils', 'workspace', 
                 {
                     'next #sampleDialog' : 'You can try out more samples from here. click <b class="lime-text">Next</b>',
                     'showSkip' : false,
-                    scrollAnimationSpeed : 900,
+                    'scrollAnimationSpeed' : 900,
                     'bottom' : 150
                 },
                 {
@@ -772,7 +764,7 @@ define(['jquery', 'lodash', 'log', 'enjoyhint', 'designViewUtils', 'workspace', 
                 {
                     'next #sampleDialog' : 'You can try out more samples from here. click <b class="lime-text">Next</b>',
                     'showSkip' : false,
-                    scrollAnimationSpeed : 900,
+                    'scrollAnimationSpeed' : 900,
                     'bottom' : 150
                 },
                 {
