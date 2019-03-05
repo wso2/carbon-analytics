@@ -18,6 +18,7 @@
 package org.wso2.carbon.analytics.auth.rest.api.internal;
 
 import org.wso2.carbon.analytics.idp.client.core.api.IdPClient;
+import org.wso2.carbon.config.provider.ConfigProvider;
 
 /**
  * Data holder to hold reference to IdPClient OSGi service.
@@ -25,6 +26,8 @@ import org.wso2.carbon.analytics.idp.client.core.api.IdPClient;
 public class DataHolder {
     private static DataHolder instance = new DataHolder();
     private IdPClient idPClient;
+    private ConfigProvider configProvider;
+
 
     private DataHolder() {
     }
@@ -44,5 +47,13 @@ public class DataHolder {
 
     public void setIdPClient(IdPClient idPClient) {
         this.idPClient = idPClient;
+    }
+
+    public ConfigProvider getConfigProvider() {
+        return configProvider;
+    }
+
+    public void setConfigProvider(ConfigProvider configProvider) {
+        this.configProvider = configProvider;
     }
 }
