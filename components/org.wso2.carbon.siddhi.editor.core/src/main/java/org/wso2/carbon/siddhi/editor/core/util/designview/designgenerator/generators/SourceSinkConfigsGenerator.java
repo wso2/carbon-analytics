@@ -40,6 +40,8 @@ import java.util.Map;
  */
 public class SourceSinkConfigsGenerator extends CodeSegmentsPreserver {
     private static final String TYPE = "TYPE";
+    private static final String SINK_ID = "SINK.ID";
+    private static final String SOURCE_ID = "SOURCE.ID";
     private static final String MAP = "MAP";
 
     /**
@@ -96,12 +98,16 @@ public class SourceSinkConfigsGenerator extends CodeSegmentsPreserver {
         String connectedElementName = sourceOrSinkAndConnectedElement.getValue();
         // Options of the Source/Sink
         String type = null;
+        String correlationId = null;
         List<String> options = new ArrayList<>();
         for (Element element : sourceOrSinkAndConnectedElement.getKey().getElements()) {
             if (element.getKey().equalsIgnoreCase(TYPE)) {
                 type = element.getValue();
             } else {
                 options.add(element.toString());
+            }
+            if (element.getKey().equalsIgnoreCase(SINK_ID) || element.getKey().equalsIgnoreCase(SOURCE_ID)) {
+                correlationId = element.getValue();
             }
         }
         if (type == null) {
@@ -118,8 +124,10 @@ public class SourceSinkConfigsGenerator extends CodeSegmentsPreserver {
                 options.add(annotationConfigGenerator.generateAnnotationConfig(sourceOrSinkAnnotation));
             }
         }
+        boolean isCorrelationIdExist = correlationId != null ? true : false;
         SourceSinkConfig sourceSinkConfig =
-                new SourceSinkConfig(annotationType.toString(), connectedElementName, type, options, map);
+                new SourceSinkConfig(annotationType.toString(), connectedElementName, type, options, map,
+                        isCorrelationIdExist, correlationId);
         preserveCodeSegmentsOf(annotationConfigGenerator);
         preserveAndBindCodeSegment(sourceOrSinkAndConnectedElement.getKey(), sourceSinkConfig);
         return sourceSinkConfig;

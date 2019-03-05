@@ -25,11 +25,9 @@ import org.wso2.siddhi.core.event.Event;
 import org.wso2.siddhi.query.api.definition.Attribute;
 
 import java.io.IOException;
-import java.lang.reflect.Array;
 import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
 import java.util.Arrays;
-
 
 /**
  * This is a Util class help to convert from Siddhi event to Binary message.
@@ -41,13 +39,26 @@ public class BinaryEventConverter {
         ByteBuffer messageBuffer = null;
         for (QueuedEvent queuedEvent : queuedEvents) {
             Event event = queuedEvent.getEvent();
+            int allTrpSyncPropertiesByteLength = 0;
             int messageSize = 4 + BinaryMessageConverterUtil.getSize(queuedEvent.getSourceHandlerElementId());
             EventMetaInfo eventMetaInfo = getEventMetaInfo(event);
             String attributes = Arrays.toString(eventMetaInfo.getAttributeTypeOrder());
+
             messageSize += BinaryMessageConverterUtil.getSize(attributes) + BinaryMessageConverterUtil.getSize
                     (queuedEvent.getSequenceID()) + BinaryMessageConverterUtil.getSize(queuedEvent.getSiddhiAppName())
-                    + BinaryMessageConverterUtil.getSize(queuedEvent.getEvent().getTimestamp()) + getEventSize(event);
+                    + BinaryMessageConverterUtil.getSize(queuedEvent.getEvent().getTimestamp()) + getEventSize(event) +
+                    4;
 
+            String[] trpSyncProperties = queuedEvent.getTransportSyncProperties();
+            if (trpSyncProperties != null) {
+                for(String property : trpSyncProperties){
+                    allTrpSyncPropertiesByteLength += property.length();
+                    messageSize += 4;
+                }
+                if (trpSyncProperties.length != 0) {
+                    messageSize += 4 + allTrpSyncPropertiesByteLength;
+                }
+            }
             messageBuffer = ByteBuffer.wrap(new byte[messageSize]);
             messageBuffer.putInt(queuedEvents.length);
             messageBuffer.putLong(queuedEvent.getSequenceID());
@@ -55,10 +66,21 @@ public class BinaryEventConverter {
             messageBuffer.put(((queuedEvent.getSourceHandlerElementId()).getBytes(Charset.defaultCharset())));
             messageBuffer.putInt((queuedEvent.getSiddhiAppName()).length());
             messageBuffer.put(((queuedEvent.getSiddhiAppName()).getBytes(Charset.defaultCharset())));
+            messageBuffer.putInt(allTrpSyncPropertiesByteLength);
 
+            if (trpSyncProperties != null) {
+                messageBuffer.putInt(trpSyncProperties.length);
+                if (trpSyncProperties.length != 0) {
+                    for(String property : trpSyncProperties){
+                        messageBuffer.putInt(property.length());
+                        messageBuffer.put((property.getBytes(Charset.defaultCharset())));
+                    }
+                }
+            }
             messageBuffer.putInt(attributes.length());
             messageBuffer.put(((attributes).getBytes(Charset.defaultCharset())));
             messageBuffer.putLong(event.getTimestamp());
+
             if (event.getData() != null && event.getData().length != 0) {
                 Object[] data = event.getData();
                 for (int i = 0; i < data.length; i++) {

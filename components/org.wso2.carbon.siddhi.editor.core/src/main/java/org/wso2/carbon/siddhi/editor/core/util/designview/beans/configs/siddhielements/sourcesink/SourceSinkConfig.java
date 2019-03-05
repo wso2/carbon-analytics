@@ -32,17 +32,18 @@ public class SourceSinkConfig extends SiddhiElementConfig {
     private String type;
     private List<String> options;
     private MapperConfig map;
+    private boolean isCorrelationIdExist;
+    private String correlationId;
 
-    public SourceSinkConfig(String annotationType,
-                            String connectedElementName,
-                            String type,
-                            List<String> options,
-                            MapperConfig map) {
+    public SourceSinkConfig(String annotationType, String connectedElementName, String type,
+                            List<String> options, MapperConfig map, boolean isCorrelationIdExist, String correlationId) {
         this.annotationType = annotationType;
         this.connectedElementName = connectedElementName;
         this.type = type;
         this.options = options;
         this.map = map;
+        this.isCorrelationIdExist = isCorrelationIdExist;
+        this.correlationId = correlationId;
     }
 
     public String getAnnotationType() {
@@ -63,5 +64,13 @@ public class SourceSinkConfig extends SiddhiElementConfig {
 
     public MapperConfig getMap() {
         return map;
+    }
+
+    public boolean isCorrelationIdExist() {
+        return isCorrelationIdExist;
+    }
+
+    public String getCorrelationId() {
+        return correlationId;
     }
 }

@@ -927,9 +927,8 @@ define(['jquery', 'log', './simulator-rest-client', 'lodash', './open-siddhi-app
             var $sourceConfigForm = $(this).closest('.sourceConfigForm');
             var dynamicId = $sourceConfigForm.attr('data-uuid');
             var attributeType = $(this).attr('data-type');
-            var attributeName = $(this).attr('name').replaceAll('attributes_', '');
             var id = this.id;
-            $sourceConfigForm.find('.attributes_' + attributeName + '_config')
+            $sourceConfigForm.find('.' + id + '_config')
                 .html(self.generateRandomAttributeConfiguration(randomType, attributeType, dynamicId, id));
             // set the selected option of property based attribute configuration type (if any) to -1
             $sourceConfigForm.find('[class^="feed-attribute-random-' + dynamicId + '-property"]').each(function () {
@@ -1299,6 +1298,261 @@ define(['jquery', 'log', './simulator-rest-client', 'lodash', './open-siddhi-app
                                     source.streamName,
                                     function (data) {
                                         self.refreshAttributesList(elementId, data);
+                                        var $sourceConfigForm = $('div.sourceConfigForm[data-uuid="' + elementId + '"]');
+                                        if ("CSV_SIMULATION" == source.simulationType) {
+                                            if(source.indices !== undefined){
+                                                var indices = source.indices.split(",");
+                                                var i = 0;
+                                                var $attributes = $sourceConfigForm.find('input[id^="attributes"]');
+                                                $attributes.each(function () {
+                                                    $(this).val(indices[i]);
+                                                    i++;
+                                                    $(this).on("change", function () {
+                                                        self.addRulesForAttributes($sourceConfigForm);
+                                                    });
+                                                });
+                                            }
+                                            self.loadCSVFileNamesAndSelectOption(self.totalSourceNum, source.fileName);
+                                            var $timestampIndex = $sourceConfigForm.find('input[value="attribute"]');
+                                            var $timestampInteval = $sourceConfigForm.find('input[value="interval"]');
+                                            var $ordered = $sourceConfigForm.find('input[value="ordered"]');
+                                            var $notordered = $sourceConfigForm.find('input[value="not-ordered"]');
+                                            var $timestampAttribute = $sourceConfigForm
+                                                .find('input[name="timestamp-attribute"]');
+                                            var $timeInterval = $sourceConfigForm
+                                                .find('input[name="timestamp-interval"]');
+                                            if (source.timestampInterval && 0 != source.timestampInterval.length) {
+                                                $timeInterval.prop('disabled', false);
+                                                $timeInterval.val(source.timestampInterval);
+                                                $timestampAttribute.prop('disabled', true).val('');
+                                                $ordered.prop('disabled', true);
+                                                $notordered.prop('disabled', true);
+                                                $timestampIndex.prop("checked", false);
+                                                $timestampInteval.prop("checked", true);
+                                            } else {
+                                                $timestampAttribute.prop('disabled', false)
+                                                    .val(source.timestampAttribute);
+                                                $timeInterval.prop('disabled', true).val('');
+                                                $ordered.prop('disabled', false);
+                                                $notordered.prop('disabled', false);
+                                                $timestampIndex.prop("checked", true);
+                                                $timestampInteval.prop("checked", false);
+                                                if (source.isOrdered) {
+                                                    $ordered.prop("checked", true);
+                                                } else {
+                                                    $timestampAttribute.prop('disabled', false)
+                                                        .val(source.timestampAttribute);
+                                                    $timeInterval.prop('disabled', true).val('');
+                                                    $ordered.prop('disabled', false);
+                                                    $notordered.prop('disabled', false);
+                                                    $timestampIndex.prop("checked", true);
+                                                    $timestampInteval.prop("checked", false);
+                                                    if (source.isOrdered) {
+                                                        $ordered.prop("checked", true);
+                                                    } else {
+                                                        $notordered.prop("checked", true);
+                                                    }
+                                                }
+                                            }
+                                            $sourceConfigForm.find('input[name="delimiter"]').val(source.delimiter);
+                                            self.addSourceConfigValidation(source.simulationType,
+                                                self.currentTotalSourceNum);
+                                        } else if ("DATABASE_SIMULATION" == source.simulationType) {
+                                            $sourceConfigForm.find('input[name="data-source-location"]')
+                                                .val(source.dataSourceLocation);
+                                            $sourceConfigForm.find('input[name="driver-class"]').val(source.driver);
+                                            $sourceConfigForm.find('input[name="username"]').val(source.username);
+                                            $sourceConfigForm.find('input[name="password"]').val(source.password);
+                                            var $timestampIndex = $sourceConfigForm.find('input[value="attribute"]');
+                                            var $timestampInterval = $sourceConfigForm.find('input[value="interval"]');
+                                            var $timestampAttribute = $sourceConfigForm
+                                                .find('input[name="timestamp-attribute"]');
+                                            var $timeInterval = $sourceConfigForm
+                                                .find('input[name="timestamp-interval"]')
+                                            var connectionDetails = self
+                                                .validateAndGetDbConfiguration($sourceConfigForm);
+                                            var connectionStatus = "success";
+                                            if (null != connectionDetails) {
+                                                var $tableNames = $sourceConfigForm.find('select[name="table-name"]');
+                                                $(this).prop('disabled', true);
+                                                Simulator.testDatabaseConnectivity(
+                                                    JSON.stringify(connectionDetails),
+                                                    function (data) {
+                                                        // self.refreshTableNamesFromDataSource(connectionDetails, $tableNames);
+                                                        Simulator.retrieveTableNames(
+                                                            JSON.stringify(connectionDetails),
+                                                            function (data) {
+                                                                $tableNames.html(self.generateOptions(data));
+                                                                $tableNames.prop("selectedIndex", -1);
+                                                                $tableNames.find('option').eq($tableNames
+                                                                    .find('option[value="' + source.tableName + '"]').index())
+                                                                    .prop('selected', true);
+                                                                $tableNames.val(source.tableName).change();
+                                                            },
+                                                            function (msg) {
+                                                                log.error(msg['responseText']);
+                                                            }
+                                                        );
+                                                        $sourceConfigForm.find('.connectionSuccessMsg')
+                                                            .html(self.generateConnectionMessage('success'));
+                                                        Simulator.retrieveColumnNames(
+                                                            JSON.stringify(connectionDetails),
+                                                            source.tableName,
+                                                            function (data) {
+                                                                self.loadColumnNamesListAndSelect( data, $sourceConfigForm,
+                                                                    source.columnNamesList.split(","));
+                                                                var $timestampIndex = $sourceConfigForm.find('input[value="attribute"]');
+                                                                var $timestampInteval = $sourceConfigForm.find('input[value="interval"]');
+                                                                var $timestampAttribute = $sourceConfigForm.find('input[name="timestamp-attribute"]');
+                                                                var $timeInterval = $sourceConfigForm.find('input[name="timestamp-interval"]');
+                                                                if (source.timestampInterval && 0 != source.timestampInterval.length) {
+                                                                    $timeInterval.prop('disabled', false);
+                                                                    $timeInterval.val(source.timestampInterval);
+                                                                    $timestampAttribute.prop('disabled', true).val('');
+                                                                    $timestampIndex.prop("checked", false);
+                                                                    $timestampInteval.prop("checked", true);
+                                                                } else {
+                                                                    var $timestampAtt = $sourceConfigForm
+                                                                        .find('select[name="timestamp-attribute"]');
+                                                                    $timestampAtt.find('option').eq($timestampAtt
+                                                                        .find('option[value="'
+                                                                            + source.timestampAttribute + '"]').index())
+                                                                        .prop('selected', true);
+                                                                    $timestampAttribute.prop('disabled', false);
+                                                                    $timeInterval.prop('disabled', true).val('');
+                                                                    $timestampIndex.prop("checked", true);
+                                                                    $timestampInteval.prop("checked", false);
+                                                                }
+                                                            },
+                                                            function (msg) {
+                                                                log.error(msg['responseText']);
+                                                            }
+                                                        );
+                                                    },
+                                                    function (msg) {
+                                                        log.error(msg);
+                                                        connectionStatus = "error";
+                                                        $sourceConfigForm.find('.connectionSuccessMsg')
+                                                            .html(self.generateConnectionMessage('editFailure'));
+                                                        var tableOption =
+                                                            '<option value = "' + source.tableName + '">'
+                                                            + source.tableName + '</option>';
+                                                        $tableNames.html(tableOption);
+                                                        $tableNames.attr('disabled',true);
+                                                        var i=0;
+                                                        var selectedValueList = source.columnNamesList.split(",");
+                                                        $sourceConfigForm.find('.feed-attribute-db').each(function () {
+                                                            var columnOption =
+                                                                '<option value = "' + selectedValueList[i] + '">'
+                                                                + selectedValueList[i] + '</option>';
+                                                            $(this).html(columnOption);
+                                                            $(this).attr('disabled',true);
+                                                            i++;
+                                                        });
+                                                        if (source.timeInterval && 0 != source.timeInterval.length) {
+                                                            $timeInterval.attr('disabled',true);
+                                                            $timeInterval.val(source.timeInterval);
+                                                            $timestampAttribute.prop('disabled', true).val('');
+                                                            $timestampIndex.prop("checked", false);
+                                                            $timestampInterval.prop("checked", true);
+                                                        } else {
+                                                            var $timestampAtt = $sourceConfigForm
+                                                                .find('select[name="timestamp-attribute"]');
+                                                            if (connectionStatus == "success") {
+                                                                $timestampAtt.find('option')
+                                                                    .eq($timestampAtt.find('option[value="'
+                                                                        + source.timestampAttribute + '"]').index())
+                                                                    .prop('selected', true);
+                                                            } else {
+                                                                var attributeOption =
+                                                                    '<option value = "'
+                                                                    + source.timestampAttribute + '">'
+                                                                    + source.timestampAttribute + '</option>';
+                                                                $timestampAtt.html(attributeOption);
+                                                            }
+                                                            $timestampAttribute.attr('disabled',true);
+                                                            $timeInterval.prop('disabled', true).val('');
+                                                            $timestampIndex.prop("checked", true);
+                                                            $timestampInterval.prop("checked", false);
+                                                        }
+                                                        $timestampIndex.attr('disabled',true);
+                                                        $timestampInterval.attr('disabled',true);
+                                                    }
+                                                );
+                                            }
+
+                                        } else if ("RANDOM_DATA_SIMULATION" == source.simulationType) {
+                                            var attributeConfiguration = source.attributeConfiguration;
+                                            var $attributesDivs = $sourceConfigForm
+                                                .find('div.attributes-section label[for^="attributes_"]')
+                                                .closest('div');
+                                            var i=0;
+                                            $attributesDivs.each(function () {
+                                                var attributeConfig = attributeConfiguration[i];
+                                                var $attributesDiv = $(this);
+                                                var $attributeSelect = $attributesDiv
+                                                    .find('select[name^="attributes"]');
+                                                var attributeType = $attributeSelect.attr('data-type');
+                                                var attributeName = $attributeSelect.attr('name')
+                                                    .replaceAll('attributes_', '');
+                                                var id = this.id;
+                                                var $selectType = $attributesDiv.find('select[id^="attributes_"]');
+                                                if ("CUSTOM_DATA_BASED" == attributeConfig.type) {
+                                                    $selectType.find('option').eq($selectType
+                                                        .find('option[value="custom"]').index()).prop('selected', true);
+                                                    $sourceConfigForm
+                                                        .find('.attributes_' + attributeName + '_config')
+                                                        .html(self.generateRandomAttributeConfiguration(
+                                                            "custom", attributeType, elementId, id));
+                                                    $attributesDiv.find('input[data-type="custom"]')
+                                                        .val(attributeConfig.list);
+                                                } else if ("PRIMITIVE_BASED" == attributeConfig.type) {
+                                                    $selectType.find('option').eq($selectType
+                                                        .find('option[value="primitive"]').index())
+                                                        .prop('selected', true);
+                                                    var attDataType = attributeConfig.primitiveType;
+                                                    $sourceConfigForm.find('.attributes_' + attributeName + '_config')
+                                                        .html(self.generateRandomAttributeConfiguration("primitive",
+                                                            attributeType, elementId, id));
+                                                    if ("BOOL" == attDataType) {
+
+                                                    } else if ("STRING" == attDataType) {
+                                                        $attributesDiv.find('input[name$="_primitive_length"]')
+                                                            .val(attributeConfig.length);
+                                                    } else if ("INT" == attDataType || "LONG" == attDataType) {
+                                                        $attributesDiv.find('input[name$="_primitive_min"]')
+                                                            .val(attributeConfig.min);
+                                                        $attributesDiv.find('input[name$="_primitive_max"]')
+                                                            .val(attributeConfig.max);
+                                                    } else if ("FLOAT" == attDataType || "DOUBLE" == attDataType) {
+                                                        $attributesDiv.find('input[name$="_primitive_min"]')
+                                                            .val(attributeConfig.min);
+                                                        $attributesDiv.find('input[name$="_primitive_max"]')
+                                                            .val(attributeConfig.max);
+                                                        $attributesDiv.find('input[name$="_primitive_precision"]')
+                                                            .val(attributeConfig.precision);
+                                                    }
+                                                } else if ("PROPERTY_BASED" == attributeConfig.type) {
+                                                    $selectType.find('option')
+                                                        .eq($selectType.find('option[value="property"]').index())
+                                                        .prop('selected', true);
+                                                    $sourceConfigForm.find('.attributes_' + attributeName + '_config')
+                                                        .html(self.generateRandomAttributeConfiguration("property",
+                                                            attributeType, elementId, id));
+                                                    $attributesDiv.find('select[name$="_property"]')
+                                                        .val(attributeConfig.property);
+                                                } else if ("REGEX_BASED" == attributeConfig.type) {
+                                                    $selectType.find('option').eq($selectType
+                                                        .find('option[value="regex"]').index()).prop('selected', true);
+                                                    $sourceConfigForm.find('.attributes_' + attributeName + '_config')
+                                                        .html(self.generateRandomAttributeConfiguration("regex",
+                                                            attributeType, elementId, id));
+                                                    $attributesDiv.find('input[name$="_regex"]')
+                                                        .val(attributeConfig.pattern);
+                                                }
+                                                i++;
+                                            });
+                                        }
                                     },
                                     function (data) {
                                         log.info(data);
@@ -1309,270 +1563,16 @@ define(['jquery', 'log', './simulator-rest-client', 'lodash', './open-siddhi-app
                             });
                     }
                 }
-                var $sourceConfigForm = $('div.sourceConfigForm[data-uuid="' + elementId + '"]');
-                if ("CSV_SIMULATION" == source.simulationType) {
-                    if(source.indices !== undefined){
-                        var indices = source.indices.split(",");
-                        var i = 0;
-                        var $attributes = $sourceConfigForm.find('input[id^="attributes"]');
-                        $attributes.each(function () {
-                            $(this).val(indices[i]);
-                            i++;
-                            $(this).on("change", function () {
-                                self.addRulesForAttributes($sourceConfigForm);
-                            });
-                        });
-                    }
-                    self.loadCSVFileNamesAndSelectOption(self.totalSourceNum, source.fileName);
-                    var $timestampIndex = $sourceConfigForm.find('input[value="attribute"]');
-                    var $timestampInteval = $sourceConfigForm.find('input[value="interval"]');
-                    var $ordered = $sourceConfigForm.find('input[value="ordered"]');
-                    var $notordered = $sourceConfigForm.find('input[value="not-ordered"]');
-                    var $timestampAttribute = $sourceConfigForm
-                        .find('input[name="timestamp-attribute"]');
-                    var $timeInterval = $sourceConfigForm
-                        .find('input[name="timestamp-interval"]');
-                    if (source.timestampInterval && 0 != source.timestampInterval.length) {
-                        $timeInterval.prop('disabled', false);
-                        $timeInterval.val(source.timestampInterval);
-                        $timestampAttribute.prop('disabled', true).val('');
-                        $ordered.prop('disabled', true);
-                        $notordered.prop('disabled', true);
-                        $timestampIndex.prop("checked", false);
-                        $timestampInteval.prop("checked", true);
-                    } else {
-                        $timestampAttribute.prop('disabled', false)
-                            .val(source.timestampAttribute);
-                        $timeInterval.prop('disabled', true).val('');
-                        $ordered.prop('disabled', false);
-                        $notordered.prop('disabled', false);
-                        $timestampIndex.prop("checked", true);
-                        $timestampInteval.prop("checked", false);
-                        if (source.isOrdered) {
-                            $ordered.prop("checked", true);
-                        } else {
-                            $timestampAttribute.prop('disabled', false)
-                                .val(source.timestampAttribute);
-                            $timeInterval.prop('disabled', true).val('');
-                            $ordered.prop('disabled', false);
-                            $notordered.prop('disabled', false);
-                            $timestampIndex.prop("checked", true);
-                            $timestampInteval.prop("checked", false);
-                            if (source.isOrdered) {
-                                $ordered.prop("checked", true);
-                            } else {
-                                $notordered.prop("checked", true);
-                            }
-                        }
-                    }
-                    $sourceConfigForm.find('input[name="delimiter"]').val(source.delimiter);
-                    self.addSourceConfigValidation(source.simulationType,
-                        self.currentTotalSourceNum);
-                } else if ("DATABASE_SIMULATION" == source.simulationType) {
-                    $sourceConfigForm.find('input[name="data-source-location"]')
-                        .val(source.dataSourceLocation);
-                    $sourceConfigForm.find('input[name="driver-class"]').val(source.driver);
-                    $sourceConfigForm.find('input[name="username"]').val(source.username);
-                    $sourceConfigForm.find('input[name="password"]').val(source.password);
-                    var $timestampIndex = $sourceConfigForm.find('input[value="attribute"]');
-                    var $timestampInterval = $sourceConfigForm.find('input[value="interval"]');
-                    var $timestampAttribute = $sourceConfigForm
-                        .find('input[name="timestamp-attribute"]');
-                    var $timeInterval = $sourceConfigForm
-                        .find('input[name="timestamp-interval"]')
-                    var connectionDetails = self
-                        .validateAndGetDbConfiguration($sourceConfigForm);
-                    var connectionStatus = "success";
-                    if (null != connectionDetails) {
-                        var $tableNames = $sourceConfigForm.find('select[name="table-name"]');
-                        $(this).prop('disabled', true);
-                        Simulator.testDatabaseConnectivity(
-                            JSON.stringify(connectionDetails),
-                            function (data) {
-                                // self.refreshTableNamesFromDataSource(connectionDetails, $tableNames);
-                                Simulator.retrieveTableNames(
-                                    JSON.stringify(connectionDetails),
-                                    function (data) {
-                                        $tableNames.html(self.generateOptions(data));
-                                        $tableNames.prop("selectedIndex", -1);
-                                        $tableNames.find('option').eq($tableNames
-                                            .find('option[value="' + source.tableName + '"]').index())
-                                            .prop('selected', true);
-                                        $tableNames.val(source.tableName).change();
-                                    },
-                                    function (msg) {
-                                        log.error(msg['responseText']);
-                                    }
-                                );
-                                $sourceConfigForm.find('.connectionSuccessMsg')
-                                    .html(self.generateConnectionMessage('success'));
-                                Simulator.retrieveColumnNames(
-                                    JSON.stringify(connectionDetails),
-                                    source.tableName,
-                                    function (data) {
-                                        self.loadColumnNamesListAndSelect( data, $sourceConfigForm,
-                                            source.columnNamesList.split(","));
-                                        var $timestampIndex = $sourceConfigForm.find('input[value="attribute"]');
-                                        var $timestampInteval = $sourceConfigForm.find('input[value="interval"]');
-                                        var $timestampAttribute = $sourceConfigForm.find('input[name="timestamp-attribute"]');
-                                        var $timeInterval = $sourceConfigForm.find('input[name="timestamp-interval"]');
-                                        if (source.timestampInterval && 0 != source.timestampInterval.length) {
-                                            $timeInterval.prop('disabled', false);
-                                            $timeInterval.val(source.timestampInterval);
-                                            $timestampAttribute.prop('disabled', true).val('');
-                                            $timestampIndex.prop("checked", false);
-                                            $timestampInteval.prop("checked", true);
-                                        } else {
-                                            var $timestampAtt = $sourceConfigForm
-                                                .find('select[name="timestamp-attribute"]');
-                                            $timestampAtt.find('option').eq($timestampAtt
-                                                .find('option[value="'
-                                                    + source.timestampAttribute + '"]').index())
-                                                .prop('selected', true);
-                                            $timestampAttribute.prop('disabled', false);
-                                            $timeInterval.prop('disabled', true).val('');
-                                            $timestampIndex.prop("checked", true);
-                                            $timestampInteval.prop("checked", false);
-                                        }
-                                    },
-                                    function (msg) {
-                                        log.error(msg['responseText']);
-                                    }
-                                );
-                            },
-                            function (msg) {
-                                log.error(msg);
-                                connectionStatus = "error";
-                                $sourceConfigForm.find('.connectionSuccessMsg')
-                                    .html(self.generateConnectionMessage('editFailure'));
-                                var tableOption =
-                                    '<option value = "' + source.tableName + '">'
-                                    + source.tableName + '</option>';
-                                $tableNames.html(tableOption);
-                                $tableNames.attr('disabled',true);
-                                var i=0;
-                                var selectedValueList = source.columnNamesList.split(",");
-                                $sourceConfigForm.find('.feed-attribute-db').each(function () {
-                                    var columnOption =
-                                        '<option value = "' + selectedValueList[i] + '">'
-                                        + selectedValueList[i] + '</option>';
-                                    $(this).html(columnOption);
-                                    $(this).attr('disabled',true);
-                                    i++;
-                                });
-                                if (source.timeInterval && 0 != source.timeInterval.length) {
-                                    $timeInterval.attr('disabled',true);
-                                    $timeInterval.val(source.timeInterval);
-                                    $timestampAttribute.prop('disabled', true).val('');
-                                    $timestampIndex.prop("checked", false);
-                                    $timestampInterval.prop("checked", true);
-                                } else {
-                                    var $timestampAtt = $sourceConfigForm
-                                        .find('select[name="timestamp-attribute"]');
-                                    if (connectionStatus == "success") {
-                                        $timestampAtt.find('option')
-                                            .eq($timestampAtt.find('option[value="'
-                                                + source.timestampAttribute + '"]').index())
-                                            .prop('selected', true);
-                                    } else {
-                                        var attributeOption =
-                                            '<option value = "'
-                                            + source.timestampAttribute + '">'
-                                            + source.timestampAttribute + '</option>';
-                                        $timestampAtt.html(attributeOption);
-                                    }
-                                    $timestampAttribute.attr('disabled',true);
-                                    $timeInterval.prop('disabled', true).val('');
-                                    $timestampIndex.prop("checked", true);
-                                    $timestampInterval.prop("checked", false);
-                                }
-                                $timestampIndex.attr('disabled',true);
-                                $timestampInterval.attr('disabled',true);
-                            }
-                        );
-                    }
 
-                } else if ("RANDOM_DATA_SIMULATION" == source.simulationType) {
-                    var attributeConfiguration = source.attributeConfiguration;
-                    var $attributesDivs = $sourceConfigForm
-                        .find('div.attributes-section label[for^="attributes_"]')
-                        .closest('div');
-                    var i=0;
-                    $attributesDivs.each(function () {
-                        var attributeConfig = attributeConfiguration[i];
-                        var $attributesDiv = $(this);
-                        var $attributeSelect = $attributesDiv
-                            .find('select[name^="attributes"]');
-                        var attributeType = $attributeSelect.attr('data-type');
-                        var attributeName = $attributeSelect.attr('name')
-                            .replaceAll('attributes_', '');
-                        var id = this.id;
-                        var $selectType = $attributesDiv.find('select[id^="attributes_"]');
-                        if ("CUSTOM_DATA_BASED" == attributeConfig.type) {
-                            $selectType.find('option').eq($selectType
-                                .find('option[value="custom"]').index()).prop('selected', true);
-                            $sourceConfigForm
-                                .find('.attributes_' + attributeName + '_config')
-                                .html(self.generateRandomAttributeConfiguration(
-                                    "custom", attributeType, elementId, id));
-                            $attributesDiv.find('input[data-type="custom"]')
-                                .val(attributeConfig.list);
-                        } else if ("PRIMITIVE_BASED" == attributeConfig.type) {
-                            $selectType.find('option').eq($selectType
-                                .find('option[value="primitive"]').index())
-                                .prop('selected', true);
-                            var attDataType = attributeConfig.primitiveType;
-                            $sourceConfigForm.find('.attributes_' + attributeName + '_config')
-                                .html(self.generateRandomAttributeConfiguration("primitive",
-                                    attributeType, elementId, id));
-                            if ("BOOL" == attDataType) {
-
-                            } else if ("STRING" == attDataType) {
-                                $attributesDiv.find('input[name$="_primitive_length"]')
-                                    .val(attributeConfig.length);
-                            } else if ("INT" == attDataType || "LONG" == attDataType) {
-                                $attributesDiv.find('input[name$="_primitive_min"]')
-                                    .val(attributeConfig.min);
-                                $attributesDiv.find('input[name$="_primitive_max"]')
-                                    .val(attributeConfig.max);
-                            } else if ("FLOAT" == attDataType || "DOUBLE" == attDataType) {
-                                $attributesDiv.find('input[name$="_primitive_min"]')
-                                    .val(attributeConfig.min);
-                                $attributesDiv.find('input[name$="_primitive_max"]')
-                                    .val(attributeConfig.max);
-                                $attributesDiv.find('input[name$="_primitive_precision"]')
-                                    .val(attributeConfig.precision);
-                            }
-                        } else if ("PROPERTY_BASED" == attributeConfig.type) {
-                            $selectType.find('option')
-                                .eq($selectType.find('option[value="property"]').index())
-                                .prop('selected', true);
-                            $sourceConfigForm.find('.attributes_' + attributeName + '_config')
-                                .html(self.generateRandomAttributeConfiguration("property",
-                                    attributeType, elementId, id));
-                            $attributesDiv.find('select[name$="_property"]')
-                                .val(attributeConfig.property);
-                        } else if ("REGEX_BASED" == attributeConfig.type) {
-                            $selectType.find('option').eq($selectType
-                                .find('option[value="regex"]').index()).prop('selected', true);
-                            $sourceConfigForm.find('.attributes_' + attributeName + '_config')
-                                .html(self.generateRandomAttributeConfiguration("regex",
-                                    attributeType, elementId, id));
-                            $attributesDiv.find('input[name$="_regex"]')
-                                .val(attributeConfig.pattern);
-                        }
-                        i++;
-                    });
-                }
-                self.currentTotalSourceNum++;
-                self.dataCollapseNum++;
-                self.totalSourceNum++;
-                self.addAllSourceValuesValidation();
             },
             function (data) {
                 log.info(data);
             }
         );
+        self.currentTotalSourceNum++;
+        self.dataCollapseNum++;
+        self.totalSourceNum++;
+        self.addAllSourceValuesValidation();
     };
 
     self.loadCSVFileNames = function (dynamicId,initialLoading) {
@@ -1787,7 +1787,7 @@ define(['jquery', 'log', './simulator-rest-client', 'lodash', './open-siddhi-app
         var $attributesDiv = $('div.sourceConfigForm[data-uuid="' + uuid + '"] div.attributes-section');
         var dataType = $('div.sourceConfigForm[data-uuid=' + uuid + ']').attr('data-type');
         $attributesDiv.html(self.generateAttributesDivForSource(dataType));
-        var attributes = self.generateAttributesListForSource(dataType, streamAttributes);
+        var attributes = self.generateAttributesListForSource(dataType, streamAttributes,uuid);
         $attributesDiv.html(attributes);
         var $sourceConfig = $('div.sourceConfigForm[data-uuid="' + uuid + '"]');
         //this will trigger default primitive selection
@@ -1891,35 +1891,35 @@ define(['jquery', 'log', './simulator-rest-client', 'lodash', './open-siddhi-app
 
     };
 
-    self.generateAttributesListForSource = function (dataType, attributes) {
+    self.generateAttributesListForSource = function (dataType, attributes, uuid) {
         var csvAttribute =
             '<div class="form-group">' +
-            '   <label for ="attributes_{{attributeName}}">' +
+            '   <label for ="attributes_{{attributeName}}_{{id}}">' +
             '        {{attributeName}}({{attributeType}})' +
             '   </label>' +
             '       <input type="text" class="feed-attribute-csv form-control"' +
-            '       name="attributes_{{attributeName}}" value="{{defaultVal}}" ' +
-            '       id="attributes_{{attributeName}}"' +
+            '       name="attributes_{{attributeName}}_{{id}}" value="{{defaultVal}}" ' +
+            '       id="attributes_{{attributeName}}_{{id}}"' +
             '       data-type ="{{attributeType}}">' +
             '</div>';
         var dbAttribute =
             '<div class="form-group">' +
-            '   <label for ="attributes_{{attributeName}}">' +
+            '   <label for ="attributes_{{attributeName}}_{{id}}">' +
             '       {{attributeName}}({{attributeType}})' +
             '   </label>' +
-            '       <select id="attributes_{{attributeName}}"' +
-            '       name="attributes_{{attributeName}}" ' +
+            '       <select id="attributes_{{attributeName}}_{{id}}"' +
+            '       name="attributes_{{attributeName}}_{{id}}" ' +
             '       class="feed-attribute-db form-control" ' +
             '       data-type="{{attributeType}}"> ' +
             '       </select>' +
             '</div>';
         var randomAttribute =
             '<div class="form-group">' +
-            '   <label for ="attributes_{{attributeName}}">' +
+            '   <label for ="attributes_{{attributeName}}_{{id}}">' +
             '       {{attributeName}}({{attributeType}})' +
             '   </label>' +
-            '           <select id="attributes_{{attributeName}}"' +
-            '           name="attributes_{{attributeName}}" ' +
+            '           <select id="attributes_{{attributeName}}_{{id}}"' +
+            '           name="attributes_{{attributeName}}_{{id}}" ' +
             '           class="feed-attribute-random form-control"' +
             '           data-type ="{{attributeType}}"> ' +
             '              <option disabled selected value> -- select an configuration type -- </option>' +
@@ -1928,7 +1928,7 @@ define(['jquery', 'log', './simulator-rest-client', 'lodash', './open-siddhi-app
             '              <option value="property">Property based </option>' +
             '              <option value="regex">Regex based</option>' +
             '           </select>' +
-            '   <div class ="attributes_{{attributeName}}_config">' +
+            '   <div class ="attributes_{{attributeName}}_{{id}}_config">' +
             '   </div> ' +
             '</div>';
 
@@ -1955,6 +1955,7 @@ define(['jquery', 'log', './simulator-rest-client', 'lodash', './open-siddhi-app
                     break;
             }
         }
+        result = result.replaceAll("{{id}}", uuid);
         return result;
     };
 

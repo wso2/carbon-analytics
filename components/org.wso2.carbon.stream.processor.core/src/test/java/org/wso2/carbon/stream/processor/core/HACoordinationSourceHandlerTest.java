@@ -51,14 +51,15 @@ public class HACoordinationSourceHandlerTest extends PowerMockTestCase {
     public void testActiveNodeProcessing() throws InterruptedException {
 
         HACoordinationSourceHandler haCoordinationSourceHandler = spy(new HACoordinationSourceHandler());
-        doNothing().when(haCoordinationSourceHandler).sendEvent(Mockito.any(Event.class));
+        doNothing().when(haCoordinationSourceHandler).sendEvent(Mockito.any(Event.class), Mockito.any());
 
         InputHandler inputHandler = mock(InputHandler.class);
         doNothing().when(inputHandler).send(any(Event.class));
         haCoordinationSourceHandler.setInputHandler(inputHandler);
         haCoordinationSourceHandler.setAsActive();
+        haCoordinationSourceHandler.setPassiveNodeAdded(false);
 
-        haCoordinationSourceHandler.init("A", SOURCE_1, new StreamDefinition());
+        haCoordinationSourceHandler.init("A", null, SOURCE_1, new StreamDefinition());
 
         Event event = new Event();
         Event eventTwo = new Event();
@@ -69,16 +70,14 @@ public class HACoordinationSourceHandlerTest extends PowerMockTestCase {
         eventThree.setTimestamp(3L);
         eventFour.setTimestamp(4L);
 
-        //Active Should Send Events for Processing and Update the Last Published Events TS
-        haCoordinationSourceHandler.sendEvent(event, inputHandler);
-        haCoordinationSourceHandler.sendEvent(eventTwo, inputHandler);
-
+        haCoordinationSourceHandler.sendEvent(event, null, inputHandler);
+        haCoordinationSourceHandler.sendEvent(eventTwo, null, inputHandler);
 
         Map<String, Object> stateObject = haCoordinationSourceHandler.currentState();
         Assert.assertEquals((long) stateObject.get(CoordinationConstants.ACTIVE_PROCESSED_LAST_TIMESTAMP), 2L);
 
-        haCoordinationSourceHandler.sendEvent(eventThree, inputHandler);
-        haCoordinationSourceHandler.sendEvent(eventFour, inputHandler);
+        haCoordinationSourceHandler.sendEvent(eventThree, null, inputHandler);
+        haCoordinationSourceHandler.sendEvent(eventFour, null, inputHandler);
 
         stateObject = haCoordinationSourceHandler.currentState();
         Assert.assertEquals((long) stateObject.get(CoordinationConstants.ACTIVE_PROCESSED_LAST_TIMESTAMP), 4L);
@@ -89,14 +88,15 @@ public class HACoordinationSourceHandlerTest extends PowerMockTestCase {
     public void testActiveNodeArrayOfEventsProcessing() throws InterruptedException {
 
         HACoordinationSourceHandler haCoordinationSourceHandler = spy(new HACoordinationSourceHandler());
-        doNothing().when(haCoordinationSourceHandler).sendEvent(Mockito.any(Event.class));
+        doNothing().when(haCoordinationSourceHandler).sendEvent(Mockito.any(Event.class), Mockito.any());
 
         InputHandler inputHandler = mock(InputHandler.class);
         doNothing().when(inputHandler).send(any(Event.class));
         haCoordinationSourceHandler.setInputHandler(inputHandler);
         haCoordinationSourceHandler.setAsActive();
+        haCoordinationSourceHandler.setPassiveNodeAdded(false);
 
-        haCoordinationSourceHandler.init("A", SOURCE_1, new StreamDefinition());
+        haCoordinationSourceHandler.init("A", null, SOURCE_1, new StreamDefinition());
 
         Event event = new Event();
         Event eventTwo = new Event();
@@ -108,7 +108,7 @@ public class HACoordinationSourceHandlerTest extends PowerMockTestCase {
         eventFour.setTimestamp(4L);
         Event[] events = {event, eventTwo, eventThree, eventFour};
 
-        haCoordinationSourceHandler.sendEvent(events, inputHandler);
+        haCoordinationSourceHandler.sendEvent(events, null, inputHandler);
 
         Map<String, Object> stateObject = haCoordinationSourceHandler.currentState();
         Assert.assertEquals((long) stateObject.get(CoordinationConstants.ACTIVE_PROCESSED_LAST_TIMESTAMP), 4L);
