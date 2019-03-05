@@ -120,8 +120,7 @@ public class PatternSequenceConfigTreeInfoGenerator {
         streamStateElementConfig
                 .setStreamHandlerList(
                         new StreamHandlerConfigGenerator(siddhiAppString)
-                                .generateStreamHandlerConfigList(basicSingleInputStream.getStreamHandlers()));
-        streamStateElementConfig.setWithin(generateNullableElementDefinition(streamStateElement.getWithin()));
+                                .generateStreamHandlerConfigList(basicSingleInputStream.getStreamHandlers()));;
 
         addToAvailableStreamReferences(streamStateElement.getBasicSingleInputStream().getStreamReferenceId());
 
@@ -139,7 +138,6 @@ public class PatternSequenceConfigTreeInfoGenerator {
         CountStateElementConfig countStateElementConfig = new CountStateElementConfig();
         countStateElementConfig
                 .setStreamStateElement(generateStreamStateElementConfig(countStateElement.getStreamStateElement()));
-        countStateElementConfig.setWithin(generateNullableElementDefinition(countStateElement.getWithin()));
         countStateElementConfig.setMin(countStateElement.getMinCount());
         countStateElementConfig.setMax(countStateElement.getMaxCount());
 
@@ -160,7 +158,6 @@ public class PatternSequenceConfigTreeInfoGenerator {
         logicalStateElementConfig.setType(logicalStateElement.getType().toString().toLowerCase());
         logicalStateElementConfig
                 .setStreamStateElement2(generateStreamStateElementConfig(logicalStateElement.getStreamStateElement2()));
-        logicalStateElementConfig.setWithin(generateNullableElementDefinition(logicalStateElement.getWithin()));
 
         return logicalStateElementConfig;
     }
@@ -175,7 +172,6 @@ public class PatternSequenceConfigTreeInfoGenerator {
             throws DesignGenerationException {
         EveryStateElementConfig everyStateElementConfig = new EveryStateElementConfig();
         everyStateElementConfig.setStateElement(generateStateElementConfigTree(everyStateElement.getStateElement()));
-        everyStateElementConfig.setWithin(generateNullableElementDefinition(everyStateElement.getWithin()));
 
         return everyStateElementConfig;
     }
@@ -191,7 +187,6 @@ public class PatternSequenceConfigTreeInfoGenerator {
         NextStateElementConfig nextStateElementConfig = new NextStateElementConfig();
         nextStateElementConfig.setStateElement(generateStateElementConfigTree(nextStateElement.getStateElement()));
         nextStateElementConfig.setNextStateElement(generateStateElementConfigTree(nextStateElement.getNextStateElement()));
-        nextStateElementConfig.setWithin(generateNullableElementDefinition(nextStateElement.getWithin()));
 
         return nextStateElementConfig;
     }
@@ -213,8 +208,6 @@ public class PatternSequenceConfigTreeInfoGenerator {
                 .setStreamHandlerList(
                         new StreamHandlerConfigGenerator(siddhiAppString)
                                 .generateStreamHandlerConfigList(basicSingleInputStream.getStreamHandlers()));
-        absentStreamStateElementConfig.setWithin(
-                generateNullableElementDefinition(absentStreamStateElement.getWithin()));
         absentStreamStateElementConfig
                 .setWaitingTime(generateNullableElementDefinition(absentStreamStateElement.getWaitingTime()));
 
