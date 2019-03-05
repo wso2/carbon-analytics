@@ -615,14 +615,14 @@ h3.popover-title {
   font-weight: 400;
 }
 
-.btn.no {
+.btn.btn_no {
   background-color: #f57e30;
   color: #000000;
   border: 1px solid;
   border-color: #f57e30;
 
 }
-.btn.yes {
+.btn.btn_yes {
   background-color: #b3b2b2;
   color: #000000;
   border: 1px solid #b3b2b2;
@@ -630,21 +630,21 @@ h3.popover-title {
 
 }
 
-.btn.no:hover {
+.btn.btn_no:hover {
   background-color: #e7620b;
   color: #000000;
 }
 
-.btn.yes:hover {
+.btn.btn_yes:hover {
   background-color: #a4a0a0;
   color: #000000;
 }
 
-.btn.no:focus {
+.btn.btn_no:focus {
   border: 2px solid #ff9f60;
 }
 
-.btn.yes:focus {
+.btn.btn_yes:focus {
   border: 2px solid #9e9a9a;
 }
 

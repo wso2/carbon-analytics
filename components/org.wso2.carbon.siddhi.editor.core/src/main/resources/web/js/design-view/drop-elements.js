@@ -1414,16 +1414,16 @@ define(['require', 'log', 'lodash', 'jquery', 'partition', 'stream', 'query', 'f
                     }
                 });
                 $(dataObj).popover("show");
-                $('.no').focus();
+                $('.btn_no').focus();
                 $(".overlayed-container ").fadeTo(200, 1);
-                element.on("click", ".popover-footer .btn.no", function () {
+                element.on("click", ".popover-footer .btn_no", function () {
                     $(".overlayed-container ").fadeOut(200);
                     $(this).parents(".popover").popover('hide');
                     $('#' + newElement[0].id).removeClass("selected-element");
                 });
 
-                element.off('click', '.popover-footer .btn.yes');
-                element.on("click", ".popover-footer .btn.yes", function () {
+                element.off('click', '.popover-footer .btn_yes');
+                element.on("click", ".popover-footer .btn_yes", function () {
                     if ('partition' === $(dataObj).data('type')) {
                         deletePartition();
                     } else {
@@ -1445,7 +1445,7 @@ define(['require', 'log', 'lodash', 'jquery', 'partition', 'stream', 'query', 'f
                     });
                 });
                     //Dismiss the pop-over on Esc button
-                    $(".no").keyup(function (e) {
+                    $(".btn_no").keyup(function (e) {
                         if (e.which === ESCAPE_KEY) {
                             $(dataObj).popover('hide');
                             $(".overlayed-container ").fadeOut(200);
@@ -1454,17 +1454,17 @@ define(['require', 'log', 'lodash', 'jquery', 'partition', 'stream', 'query', 'f
                         }
                     });
                     //Popver navigation using arrow keys
-                    $(".no").on('keydown', function (e) {
+                    $(".btn_no").on('keydown', function (e) {
                         if (e.keyCode == RIGHT_ARROW_KEY) {
-                            $('.yes').focus();
+                            $('.btn_yes').focus();
                         }
                     });
-                    $(".yes").on('keydown', function (e) {
+                    $(".btn_yes").on('keydown', function (e) {
                         if (e.keyCode == LEFT_ARROW_KEY) {
-                            $('.no').focus();
+                            $('.btn_no').focus();
                         }
                     });
-                    $(".no").on('keydown', function (e) {
+                    $(".btn_no").on('keydown', function (e) {
                         if (e.keyCode == TAB_KEY) {
                             e.preventDefault();
                         }
@@ -1473,7 +1473,7 @@ define(['require', 'log', 'lodash', 'jquery', 'partition', 'stream', 'query', 'f
                         }
                     });
                     //Stop tab propagation and enter propagation when popover showed
-                    $(".yes").on('keydown', function (e) {
+                    $(".btn_yes").on('keydown', function (e) {
                         if (e.keyCode == TAB_KEY) {
                             e.preventDefault();
                         }

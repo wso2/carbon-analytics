@@ -992,10 +992,10 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
                         });
                         $('#' + connectionObject.id).off();
                         $('#' + connectionObject.id).popover("show");
-                        $('.no').focus();
+                        $('.btn_no').focus();
                         $(".overlayed-container ").fadeTo(200, 1);
                         // Custom jQuery to hide popover on click of the close button
-                        $("#" + connectionObject.id).siblings(".popover").on("click", ".popover-footer .btn.yes",
+                        $("#" + connectionObject.id).siblings(".popover").on("click", ".popover-footer .btn_yes",
                             function () {
                                 if (connectionObject.connector !== null) {
                                     self.jsPlumbInstance.deleteConnection(connectionObject);
@@ -1003,7 +1003,7 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
                                 $(".overlayed-container ").fadeOut(200);
                                 $(this).parents(".popover").popover('hide');
                             });
-                        $("#" + connectionObject.id).siblings(".popover").on("click", ".popover-footer .btn.no",
+                        $("#" + connectionObject.id).siblings(".popover").on("click", ".popover-footer .btn_no",
                             function () {
                                 $(".overlayed-container ").fadeOut(200);
                                 $(this).parents(".popover").popover('hide');
@@ -1021,7 +1021,7 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
                                 }
                             });
                         });
-                        $(".no").on("keyup", function (e) {
+                        $(".btn_no").on("keyup", function (e) {
                             if (e.which === ESCAPE_KEY && $("#" + connectionObject.id).popover()) {
                                 $("#" + connectionObject.id).popover('hide');
                                 $(".overlayed-container ").fadeOut(200);
@@ -1029,17 +1029,17 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
                             }
                         });
                         //Navigation using arrow keys
-                        $(".no").on('keydown', function (e) {
+                        $(".btn_no").on('keydown', function (e) {
                             if (e.keyCode == RIGHT_ARROW_KEY) {
-                                $('.yes').focus();
+                                $('.btn_yes').focus();
                             }
                         });
-                        $(".yes").on('keydown', function (e) {
+                        $(".btn_yes").on('keydown', function (e) {
                             if (e.keyCode == LEFT_ARROW_KEY) {
-                                $('.no').focus();
+                                $('.btn_no').focus();
                             }
                         });
-                        $(".no").on('keydown', function (e) {
+                        $(".btn_no").on('keydown', function (e) {
                             if (e.keyCode == TAB_KEY) {
                                 e.preventDefault();
                             }
@@ -1048,7 +1048,7 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
                             }
                         });
                         //Stop tab propagation and enter propagation when popover showed
-                        $(".yes").on('keydown', function (e) {
+                        $(".btn_yes").on('keydown', function (e) {
                             if (e.keyCode == TAB_KEY) {
                                 e.preventDefault();
                             }
