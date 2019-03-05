@@ -24,6 +24,11 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
               PartitionWith, JSONValidator) {
 
         const TAB_INDEX = 10;
+        const ENTER_KEY = 13;
+        const LEFT_ARROW_KEY = 37;
+        const RIGHT_ARROW_KEY = 39;
+        const ESCAPE_KEY = 27;
+        const TAB_KEY = 9;
         var constants = {
             SOURCE: 'sourceDrop',
             SINK: 'sinkDrop',
@@ -1017,7 +1022,7 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
                             });
                         });
                         $(".no").on("keyup", function (e) {
-                            if (e.which === 27 && $("#" + connectionObject.id).popover()) {
+                            if (e.which === ESCAPE_KEY && $("#" + connectionObject.id).popover()) {
                                 $("#" + connectionObject.id).popover('hide');
                                 $(".overlayed-container ").fadeOut(200);
                                 close_icon_overlay.setVisible(false);
@@ -1025,29 +1030,29 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
                         });
                         //Navigation using arrow keys
                         $(".no").on('keydown', function (e) {
-                            if (e.keyCode == 39) {
+                            if (e.keyCode == RIGHT_ARROW_KEY) {
                                 $('.yes').focus();
                             }
                         });
                         $(".yes").on('keydown', function (e) {
-                            if (e.keyCode == 37) {
+                            if (e.keyCode == LEFT_ARROW_KEY) {
                                 $('.no').focus();
                             }
                         });
                         $(".no").on('keydown', function (e) {
-                            if (e.keyCode == 9) {
+                            if (e.keyCode == TAB_KEY) {
                                 e.preventDefault();
                             }
-                            if (e.keyCode == 13) {
+                            if (e.keyCode == ENTER_KEY) {
                                 e.stopPropagation();
                             }
                         });
                         //Stop tab propagation and enter propagation when popover showed
                         $(".yes").on('keydown', function (e) {
-                            if (e.keyCode == 9) {
+                            if (e.keyCode == TAB_KEY) {
                                 e.preventDefault();
                             }
-                            if (e.keyCode == 13) {
+                            if (e.keyCode == ENTER_KEY) {
                                 e.stopPropagation();
                             }
                         });
