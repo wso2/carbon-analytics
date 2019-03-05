@@ -1,0 +1,1025 @@
+/*
+ * Copyright (c) 2018, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+ *
+ * WSO2 Inc. licenses this file to you under the Apache License,
+ * Version 2.0 (the "License"); you may not use this file except
+ * in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied. See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+ */
+
+.source-view-enabled {
+    height: 100%;
+}
+
+.design-view-container {
+    height: 100%;
+    display: flex;
+}
+
+.toggle-controls-container {
+    position: absolute;
+    bottom: 2%;
+    right: 2%;
+    z-index: 23;
+}
+
+.toggle-view-button {
+    transition: 0.15s;
+    font-weight: bold;
+    color: #333;
+    background-color: #f57e30;
+}
+
+.toggle-view-button:hover {
+    color: #fff;
+    transition: 0.15s;
+}
+
+.toggle-button-text {
+    padding-left: 5px;
+}
+
+.grid-container {
+    /* Temp */
+    width: calc(100% - 67px);
+    position: relative;
+    overflow: auto;
+    background: linear-gradient(-90deg, rgba(0, 0, 0, .001) 1px, transparent 1px),
+    linear-gradient(rgba(0, 0, 0, .03) 1px, transparent 1px),
+    linear-gradient(-90deg, rgba(0, 0, 0, .001) 1px, transparent 1px),
+    linear-gradient(rgba(0, 0, 0, .001) 1px, transparent 1px),
+    linear-gradient(transparent 3px, transparent 3px, transparent 78px, transparent 78px),
+    linear-gradient(-90deg, transparent 1px, transparent 1px),
+    linear-gradient(-90deg, transparent 3px, transparent 3px, transparent 78px, transparent 78px),
+    linear-gradient(transparent 1px, transparent 1px), transparent;
+    background-size: 10px 10px,
+    10px 10px,
+    10px 10px,
+    10px 10px,
+    10px 10px,
+    10px 10px,
+    10px 10px,
+    10px 10px;
+    background-color: #e7eaeb;
+}
+
+.sourceDrop {
+    background-image: url("../images/source.svg");
+}
+
+.sinkDrop {
+    background-image: url("../images/sink.svg");
+}
+
+.streamDrop {
+    background-image: url("../images/streams.svg");
+}
+
+.tableDrop {
+    background-image: url("../images/table.svg");
+}
+
+.windowDrop {
+    background-image: url("../images/window.svg");
+}
+
+.triggerDrop {
+    background-image: url("../images/trigger.svg");
+}
+
+.aggregationDrop {
+    background-image: url("../images/aggregate.svg");
+}
+
+.functionDrop {
+    background-image: url("../images/function.svg");
+}
+
+.projectionQueryDrop {
+    background-image: url("../images/query.svg");
+}
+
+.filterQueryDrop {
+    background-image: url("../images/filter-query.svg");
+}
+
+.windowQueryDrop {
+    background-image: url("../images/window-query.svg");
+}
+
+.functionQueryDrop {
+    background-image: url("../images/function-query.svg");
+}
+
+.joinQueryDrop {
+    background-image: url("../images/join-query.svg");
+}
+
+.patternQueryDrop {
+    background-image: url("../images/pattern-query.svg");
+}
+
+.sequenceQueryDrop {
+    background-image: url("../images/sequence-query.svg");
+}
+
+/*
+    Dropped Elements corresponding to their toolbox elements
+*/
+
+.streamDrop, .tableDrop, .windowDrop, .triggerDrop, .aggregationDrop, .projectionQueryDrop, .filterQueryDrop,
+.windowQueryDrop, .functionQueryDrop, .joinQueryDrop, .patternQueryDrop, .sequenceQueryDrop, .sourceDrop, .sinkDrop,
+.functionDrop {
+    opacity: 1;
+    width: 60px;
+    height: 60px;
+    cursor: pointer;
+    text-align: center;
+    z-index: 20;
+    position: absolute;
+    background-color: #fff;
+    background-size: 40px 40px;
+    background-repeat: no-repeat;
+    background-position: 10px 10px;
+    color: black;
+    font-family: helvetica, sans-serif;
+    font-size: 0.9em;
+    -webkit-transition: -webkit-box-shadow 0.15s ease-in;
+    -moz-transition: -moz-box-shadow 0.15s ease-in;
+    -o-transition: -o-box-shadow 0.15s ease-in;
+    transition: box-shadow 0.15s ease-in;
+    border: 1px solid #ccc;
+}
+
+.partitionDrop {
+    border: 1px solid #346789;
+    width: 250px;
+    height: 250px;
+    border-radius: 0.5em;
+    opacity: 1;
+    cursor: move;
+    text-align: center;
+    z-index: 1;
+    position: absolute;
+    background-color: transparent;
+    color: black;
+    font-family: helvetica, sans-serif;
+    font-size: 0.9em;
+    -webkit-transition: -webkit-box-shadow 0.15s ease-in;
+    -moz-transition: -moz-box-shadow 0.15s ease-in;
+    -o-transition: -o-box-shadow 0.15s ease-in;
+    transition: box-shadow 0.15s ease-in;
+    box-sizing: border-box;
+}
+
+/*
+    Element Divisions added as classes when the element is appended
+*/
+.title {
+    padding: 10px;
+    cursor: move;
+}
+
+.connection {
+    -moz-border-radius: 5px;
+    -webkit-border-radius: 5px;
+    border-radius: 5px;
+    font-size: 10px;
+    text-align: center;
+    cursor: pointer;
+    width: 10px;
+    height: 10px;
+    margin-left: -10px;
+    border: 1px solid #000;
+    background-color: #424242;
+}
+
+.property {
+    float: left;
+    margin-top: 10px;
+    background: #f4f4f4;
+    border: 1px solid #aaaaaa;
+    height: 800px;
+    overflow-y: scroll;
+    overflow-x: scroll;
+}
+
+/*
+*Styles for the configuration icons
+*/
+.element-prop-icon, .element-close-icon {
+    float: right;
+    width: 26px;
+    height: 26px;
+    margin-top: -95px;
+    cursor: pointer;
+    color: #616161;
+    border-radius: 40px;
+    font-size: 14px;
+}
+
+.element-prop-icon {
+    margin-right: 25px;
+}
+
+.element-close-icon {
+    margin-right: 5px;
+}
+
+input {
+. form-control input-md;
+    font-family: inherit;
+    font-size: inherit;
+    color: inherit;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+}
+
+.disableContainer {
+    pointer-events: none;
+}
+
+table {
+    border: 2px solid transparent;
+}
+
+td {
+    padding: 5px;
+    border: 1px solid transparent;
+}
+
+.queryDiv {
+    margin: 20px 0 20px 0;
+    width: 600px;
+    box-shadow: 3px 4px 5px 6px #707070;
+}
+
+.simpleQueryLabel, .windowStreamLabel {
+    background-color: #565656;
+    text-align: center;
+    margin: 20px 0 20px 0;
+    color: transparent;
+    text-shadow: 0 2px 3px rgba(255, 255, 255, 0.3);
+    -webkit-background-clip: text;
+}
+
+.connectorInStream, .connectorInTable, .connectorInWindow, .connectorInTrigger, .connectorInAggregation,
+.connectorInQuery, .connectorInPatternQuery, .connectorInSequenceQuery, .connectorInJoinQuery, .connectorInSink,
+.connectorInSource {
+    float: left;
+    margin-top: -53px;
+    margin-left: -5px;
+}
+
+.connectorOutStream, .connectorOutTable, .connectorOutWindow, .connectorOutTrigger, .connectorOutAggregation,
+.connectorOutQuery, .connectorOutPatternQuery, .connectorOutSequenceQuery, .connectorOutJoinQuery, .connectorOutSource,
+.connectorOutSink {
+    float: right;
+    margin-top: -53px;
+    margin-right: -5px;
+}
+
+.connectorIn {
+    float: left;
+    margin-top: -47%;
+    margin-left: -13px;
+}
+
+.connectorOut {
+    float: right;
+    margin-top: -47%;
+    margin-right: -13px;
+}
+
+.partition-connector-in-part {
+    margin-left: -5px;
+    margin-top: 20px;
+    width: 15px;
+    height: 15px;
+    border: 1px solid #424242;
+    background-color: #424242;
+}
+
+.connectorStream {
+    float: right;
+    margin-top: 25%;
+    margin-right: -10%;
+}
+
+.aggregationNameNode, .triggerNameNode, .windowNameNode, .tableNameNode, .streamNameNode, .queryNameNode,
+.patternQueryNameNode, .joinQueryNameNode, .sequenceQueryNameNode, .sourceNameNode, .sinkNameNode, .functionNameNode {
+    font-weight: 600;
+    width: 120px;
+    margin-left: -30px;
+    margin-top: 60px;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    overflow: hidden;
+}
+
+.streamDrop:hover .streamNameNode, .windowDrop:hover .windowNameNode, .sequenceQueryDrop:hover .sequenceQueryNameNode,
+.triggerDrop:hover .triggerNameNode, .aggregationDrop:hover .aggregationNameNode, .functionDrop:hover .functionNameNode,
+.projectionQueryDrop:hover .queryNameNode, .filterQueryDrop:hover .queryNameNode, .windowQueryDrop:hover .queryNameNode,
+.joinQueryDrop:hover .joinQueryNameNode, .patternQueryDrop:hover .patternQueryNameNode, .tableDrop:hover .tableNameNode,
+.sourceDrop:hover .sourceNameNode, .sinkDrop:hover .sinkNameNode, .functionQueryDrop:hover .queryNameNode {
+    overflow: initial;
+}
+
+.partition-element-prop-icon, .partition {
+    float: right;
+    width: 20px;
+    height: 20px;
+    margin-top: 10px;
+    cursor: pointer;
+    color: #616161;
+    font-size: 14px;
+}
+
+.partition-element-prop-icon {
+    margin-right: 0;
+}
+
+.partition {
+    margin-right: 6px;
+}
+
+/* Window Stream */
+
+.checkboxStyleWindow {
+    float: right;
+    width: 20px;
+    height: 20px;
+    background-color: transparent;
+    border: 1px solid transparent;
+    margin-top: -82px;
+    margin-right: 0;
+    cursor: pointer;
+    color: red;
+    border-radius: 40px;
+    padding-left: 10px;
+    padding-top: 4px;
+}
+
+.design-view-form-content .well {
+    background: transparent;
+    padding: 0;
+}
+
+.design-view-form-content {
+    padding: 10px;
+}
+
+select.form-control,
+.btn-group > div {
+    background: #2f2f2f !important;
+}
+
+.design-view-form-content th {
+    color: #BDBDBD;
+}
+
+.grid-container > div {
+    opacity: 1;
+}
+
+.design-view-form-content button i {
+    font-size: 1.1rem;
+}
+
+.section-seperator {
+    border-bottom: 1px solid #424242;
+}
+
+.query-form-actions {
+    margin-top: 10px;
+}
+
+.design-view-form-content .table-bordered > tbody > tr > td,
+.design-view-form-content .table-bordered,
+.design-view-form-content .table-bordered > thead > tr > th {
+    border: 0;
+}
+
+.design-view-form-content,
+h3,
+.control-label {
+    color: #BDBDBD;
+}
+
+.frm-qry {
+    margin-bottom: 20px;
+}
+
+.frm-agr thead tr th:nth-of-type(2) {
+    width: 30%;
+}
+
+.frm-agr table {
+    width: 100% !important;
+}
+
+.form-control[disabled] {
+    opacity: 0.3;
+}
+
+.loading-screen {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    z-index: 22;
+    background-color: #282828;
+    color: #fff;
+    font-size: 40px;
+    text-align: center;
+    padding: 20% 0;
+}
+
+.app-annotations-button {
+    position: fixed;
+    top: 79px;
+    right: 15px;
+    font-size: 20px;
+    color: #757575;
+    transition: 0.15s;
+}
+
+.app-annotations-button:hover {
+    color: black;
+}
+
+.siddhi-app-name-node {
+    position: fixed;
+    right: 60px;
+    top: 77px;
+    opacity: 1 !important;
+    font-size: 16px;
+}
+
+#siddhi-app-desc-node {
+    position: fixed;
+    right: 60px;
+    top: 97px;
+    opacity: 1 !important;
+    font-size: 14px;
+}
+
+.design-view-form-content h3 {
+    font-size: 14px;
+}
+
+.design-view-form-content h4 {
+    font-size: 12px;
+}
+
+.design-view-form-content .form-control {
+    max-width: 500px;
+}
+
+.list-group-item {
+    background: #37474F;
+    color: #E0E0E0;
+    border: 0;
+    margin-bottom: 0;
+}
+
+.list-group-item.active, .list-group-item.active:hover, .list-group-item.active:focus {
+    background: #9E9E9E;
+    border: 0;
+    color: #212121;
+    font-weight: 500;;
+}
+
+a.list-group-item, button.list-group-item {
+    color: #E0E0E0;
+}
+
+.design-view-form-content .btn {
+    font-size: 12px;
+}
+
+.design-view-form-content select,
+.design-view-form-content p {
+    font-size: 12px;
+}
+
+/* JSONEditor overrides */
+/* Set widths */
+.define-appconfig [data-schemapath="root.annotations"] table,
+.define-source [data-schemapath="root.annotationOptions"] table,
+.define-source [data-schemapath="root.map.annotationOptions"] table,
+.define-source [data-schemapath="root.map.attributeValues"] table,
+.define-sink [data-schemapath="root.annotationOptions"] table,
+.define-sink [data-schemapath="root.map.annotationOptions"] table,
+.define-source [data-schemapath="root.map.attributeValues"] table,
+.define-stream [data-schemapath="root.annotations"] table,
+.define-stream [data-schemapath="root.attributes"] table,
+.define-table [data-schemapath="root.annotations"] table,
+.define-table [data-schemapath="root.storeAnnotation.storeOptions"] table,
+.define-table [data-schemapath="root.attributes"] table,
+.define-window [data-schemapath="root.annotations"] table,
+.define-window [data-schemapath="root.attributes"] table,
+.define-window [data-schemapath="root.parameters"] table,
+.define-trigger [data-schemapath="root.annotations"] table,
+.define-partition [data-schemapath="root.annotations"] table,
+.define-partition [data-schemapath="root.partitionKeys"] table
+{
+    width: 650px;
+}
+
+/* 1 column */
+.define-appconfig [data-schemapath="root.annotations"] table tr td:first-child,
+.define-source [data-schemapath="root.annotationOptions"] table tr td:first-child,
+.define-source [data-schemapath="root.map.annotationOptions"] table tr td:first-child,
+.define-sink [data-schemapath="root.annotationOptions"] table tr td:first-child,
+.define-sink [data-schemapath="root.map.annotationOptions"] table tr td:first-child,
+.define-stream [data-schemapath="root.annotations"] table tr td:first-child,
+.define-table [data-schemapath="root.annotations"] table tr td:first-child,
+.define-window [data-schemapath="root.annotations"] table tr td:first-child,
+.define-window [data-schemapath="root.parameters"] table tr td:first-child,
+.define-trigger [data-schemapath="root.annotations"] table tr td:first-child,
+.define-partition [data-schemapath="root.annotations"] table tr td:first-child
+{
+    width: 508px;
+}
+
+/* 2 column */
+.define-source [data-schemapath="root.map.attributeValues"] table tr td:nth-child(1),
+.define-source [data-schemapath="root.map.attributeValues"] table tr td:nth-child(2),
+.define-sink [data-schemapath="root.map.attributeOrPayloadValues"] table tr td:nth-child(1),
+.define-sink [data-schemapath="root.map.attributeOrPayloadValues"] table tr td:nth-child(2),
+.define-table [data-schemapath="root.storeAnnotation.storeOptions"] table tr td:nth-child(1),
+.define-table [data-schemapath="root.storeAnnotation.storeOptions"] table tr td:nth-child(2),
+.define-trigger [data-schemapath="root.annotations"] table tr td:nth-child(1),
+.define-trigger [data-schemapath="root.annotations"] table tr td:nth-child(2),
+.define-partition [data-schemapath="root.partitionKeys"] table tr td:nth-child(1),
+.define-partition [data-schemapath="root.partitionKeys"] table tr td:nth-child(2)
+{
+    width: 254px;
+}
+
+/* 2 column with type field */
+.define-stream [data-schemapath="root.attributes"] table tr td:nth-child(1),
+.define-table [data-schemapath="root.attributes"] table tr td:nth-child(1),
+.define-window [data-schemapath="root.attributes"] table tr td:nth-child(1)
+{
+    width: 428px;
+}
+
+.define-stream [data-schemapath="root.attributes"] table tr td:nth-child(2),
+.define-table [data-schemapath="root.attributes"] table tr td:nth-child(2),
+.define-window [data-schemapath="root.attributes"] table tr td:nth-child(2)
+{
+    width: 80px;
+}
+
+/* Hide duplicate labels */
+.define-appconfig [data-schemapath="root.annotations"] table thead,
+.define-source [data-schemapath="root.annotationOptions"] table thead,
+.define-source [data-schemapath="root.map.annotationOptions"] table thead,
+.define-sink [data-schemapath="root.annotationOptions"] table thead,
+.define-sink [data-schemapath="root.map.annotationOptions"] table thead,
+.define-stream [data-schemapath="root.annotations"] table thead,
+.define-table [data-schemapath="root.annotations"] table thead,
+.define-window [data-schemapath="root.annotations"] table thead,
+.define-window [data-schemapath="root.parameters"] table thead,
+.define-trigger [data-schemapath="root.annotations"] table thead,
+.define-partition [data-schemapath="root.annotations"] table thead,
+.define-windowFilterProjection-query [data-schemapath="root.annotations"] table thead,
+.define-windowFilterProjection-query [data-schemapath="root.streamHandlerList.0.streamHandler.parameters"] table thead,
+.define-aggregation [data-schemapath="root.annotations"] table thead,
+.define-aggregation [data-schemapath="root.aggregateByTimePeriod"] table thead,
+.define-pattern-query [data-schemapath="root.annotations"] table thead,
+.define-sequence-query [data-schemapath="root.annotations"] table thead
+{
+    display: none;
+}
+
+.incomplete-element {
+	border: 1px solid yellow;
+	box-shadow: 0 0 1px 2px yellow;
+}
+
+.error-element {
+	border: 1px solid #FF0000;
+	box-shadow: 0 0 1px 2px #FF0000;
+}
+
+.js-tree-error-node {
+	border: 1px solid red;
+	background: red;
+}
+
+.design-view-form-content input[type="text"].required-input-field,
+.design-view-form-content textarea.required-input-field {
+	border: 1px solid #FF0000;
+}
+
+.design-view-form-content .error-message {
+	color: red;
+	padding-top: 3px;
+}
+
+.design-view-form-content .customized-options .error-message,
+.design-view-form-content .source-sink-map-options .customized-options .error-message {
+	margin-left: 75px;
+}
+
+.design-view-form-content .partition-form-container #partition-by-stream-name-label {
+	margin-left: 120px;
+}
+
+.design-view-form-content .partition-form-container .partition-by-expression {
+	margin-right: 10px;
+}
+
+.source-sink-form-container .source-sink-map-options .error-message,
+.table-form-container #store-options .error-message,
+.table-form-container #define-predefined-annotations .error-message,
+.window-form-container #defineFunctionParameters .error-message {
+	margin-left: 20px;
+}
+
+.design-view-form-content input[type="text"],
+.design-view-form-content textarea {
+	border: 1px solid #716e6e;
+	line-height: 20px;
+	padding: 0 5px;
+	color: #ccc;
+	background: #424242;
+}
+
+.design-view-form-content input[type="text"].option-value,
+.window-form-container input[type="text"].parameter-value{
+	width: calc(90% - 30px);
+	margin-bottom: 2px;
+	margin-left: 20px;
+}
+
+.trigger-form-container #trigger-criteria-content .description {
+	font-size: 12px;
+	margin-left: 5px;
+	color: #ccc;
+}
+
+.table-form-container input[type="text"].annotation-value {
+ 	margin-bottom: 2px;
+	margin-left: 20px;
+ }
+
+.design-view-form-content .attr-nav {
+	margin-left: 10px;
+}
+
+.design-view-form-content .attribute .attr-nav  a {
+	float: left;
+	display: inline-block;
+	height: 22px;
+	padding: 0 5px;
+	margin-left: 3px;
+	margin-top: 2px;
+	background: #424242;
+	color: #ccc;
+	border: 1px solid #716e6e;
+}
+
+.design-view-form-content .btn-del-option,
+.window-form-container .btn-del-parameter,
+.table-form-container .btn-del-annot-value {
+	display: inline-block;
+	height: 21px;
+	padding: 0 8px;
+	background: #424242;
+	margin-left: 3px;
+	border: 1px solid #716e6e;
+}
+
+.source-sink-form-container input[type="text"].readonly-attr,
+.source-sink-form-container #attributeMap-type:disabled,
+.table-form-container #store-type:disabled,
+.partition-form-container #define-partition-keys .partition-by-stream-name {
+	cursor: not-allowed;
+	background: #1d1d1d;
+	border: 1px solid #545353;
+}
+
+.design-view-form-content .attribute .attr-nav a .fw-sort-down {
+	font-size: 16px;
+	margin-top: -3px;
+	color: #ccc;
+}
+
+.design-view-form-content .attribute .attr-nav a .fw-sort-up {
+	font-size: 16px;
+	margin-top: 6px;
+	color: #ccc;
+}
+
+.clearfix {
+	display: block;
+	content: "";
+	clear: both;
+}
+
+.design-view-form-content .fw-delete {
+	font-size: 12px;
+	margin-top: 3px;
+	color: #ccc;
+}
+
+.design-view-form-content .attr-nav,
+.design-view-form-content .attr-content {
+	display: inline-block;
+	float: left;
+}
+
+.design-view-form-content .attribute {
+	margin-bottom: 5px;
+}
+
+.design-view-form-content .annotation > a > i.jstree-checkbox,
+.design-view-form-content .annotation > .jstree-clicked > i.jstree-checkbox,
+.design-view-form-content .annotation > i.jstree-checkbox {
+	display: none;
+}
+
+.design-view-form-content .annotation-key > a > i.jstree-checkbox,
+.design-view-form-content .annotation-key > .jstree-clicked > i.jstree-checkbox,
+.design-view-form-content .annotation-key > i.jstree-checkbox {
+	display: none;
+}
+
+.design-view-form-content .annotation-value > a > i.jstree-checkbox,
+.design-view-form-content .annotation-value > .jstree-clicked > i.jstree-checkbox,
+.design-view-form-content .annotation-value > i.jstree-checkbox {
+	display: none;
+}
+
+.design-view-form-content .mandatory-key > a > i.jstree-checkbox,
+.design-view-form-content .mandatory-key > .jstree-clicked > i.jstree-checkbox {
+	display: none;
+}
+
+.design-view-form-content .mandatory-annotation > a > i.jstree-checkbox,
+.design-view-form-content .mandatory-annotation > .jstree-clicked > i.jstree-checkbox {
+	display: none;
+}
+
+.design-view-form-content .mandatory-annotation > a.jstree-hovered,
+.design-view-form-content .optional-key > a.jstree-hovered,
+.design-view-form-content .annotation-value > a.jstree-hovered {
+	cursor: context;
+	color: #ccc;
+	background: transparent;
+	border-radius: 0px;
+}
+
+.design-view-form-content .optional-annotation > a.jstree-hovered,
+.design-view-form-content .mandatory-key > a.jstree-hovered {
+	cursor: default;
+	color: #ccc;
+	background: transparent;
+	border-radius: 0px;
+}
+
+.design-view-form-content  .jstree-clicked {
+	background: #5F5B5A;
+	color:black;
+	border-radius: 2px;
+	box-shadow: inset 0 0 1px #999999;
+}
+
+.design-view-form-content .jstree-hovered {
+	background: transparent;
+}
+
+.design-view-form-content  .stream-form-container #define-annotation {
+	margin-top:10px;
+	color: #ccc;
+}
+
+.design-view-form-content .cust-option-key {
+	margin-left: 20px;
+}
+
+.design-view-form-content .cust-option-value {
+    margin-left: 10px;
+}
+
+.stream-form-container {
+	width:50%;
+}
+
+.partition-form-container {
+	width: 40%;
+}
+
+.stream-form-container,
+.source-sink-form-container,
+.table-form-container,
+.window-form-container,
+.trigger-form-container,
+.function-form-container,
+.partition-form-container {
+	float: left;
+	display: inline-block;
+	padding: 5px;
+}
+
+.window-form-container,
+.trigger-form-container,
+.function-form-container {
+	width: 25%;
+}
+
+.trigger-form-container #define-trigger-criteria {
+	margin-top: -3px;
+	margin-bottom: 10px;
+}
+
+.window-form-container #defineFunctionName,
+.window-form-container #defineOutputEvents,
+.window-form-container #define-annotation {
+	margin-top:18px;
+}
+
+.design-view-form-content .source-div,
+.design-view-form-content .sink-div {
+	width: 45%;
+}
+
+.design-view-form-content .table-div {
+	width: 25%;
+}
+
+.design-view-form-content .mapper-div {
+	width: 25%;
+}
+
+.design-view-form-content .store-div {
+	width: 40%;
+	margin-top: 20px;
+}
+
+.design-view-form-content .define-table-annotation {
+	width: 30%;
+	margin-top: 10px;
+	margin-left: 20px;
+}
+
+.table-form-container #table-annotations .table-annotation {
+	margin-bottom: 10px;
+}
+
+.design-view-form-content .attribute-map-div {
+	width: 30%;
+	margin-top: 48px;
+}
+
+.table-form-container #store-options,
+.source-sink-form-container #source-options,
+.source-sink-form-container #sink-options {
+	display: flex;
+}
+
+.table-form-container .sub-store-options-div,
+.source-sink-form-container .sub-source-options-div,
+.source-sink-form-container .sub-sink-options-div {
+	width: 50%;
+}
+
+.design-view-form-content #btn-submit,
+.design-view-form-content #btn-cancel {
+	margin-top: 15px;
+	margin-right: 10px;
+}
+
+.design-view-form-content input[type="checkbox"],
+.design-view-form-content input[type="radio"] {
+	margin: 0px 5px 0px 0;
+	vertical-align: middle;
+}
+
+.design-view-form-content #attribute-key-label {
+	margin-left: 75px;
+	margin-right: 100px;
+}
+
+.design-view-form-content .fw-info {
+	font-size: 10px;
+	margin-left: 3px;
+	color: #b7f1eb;
+}
+
+.design-view-form-content .trigger-form-container .fw-info {
+	font-size: 12px;
+}
+
+.design-view-form-content .cust-options .option {
+	margin-bottom: 2px;
+}
+
+.design-view-form-content .source-sink-form-container #stream-attributes {
+	margin-top: 10px;
+}
+
+.design-view-form-content .option .option-desc-content,
+.design-view-form-content .parameter .parameter-desc-content,
+.trigger-form-container #define-trigger-criteria .criteria-description {
+	 font-family: Arial;
+	 background: #252525;
+	 width: 250px;
+	 color: #eee;
+	 text-align: left;
+	 border-radius: 6px;
+	 padding: 5 5px;
+	 /* Position the tooltip */
+	 position: absolute;
+	 z-index: 1;
+}
+
+.design-view-form-content .btn-default {
+	color: #ccc;
+	background: #2c2c2c;
+	margin-top: 15px;
+}
+
+.table-form-container #table-annotations .btn-add-annot-value {
+	margin-top: 0px;
+	margin-bottom: 10px;
+	margin-left: 160px;
+}
+
+.design-view-form-content .mandatory-option-symbol,
+.design-view-form-content .mandatory-parameter-symbol {
+	margin-right: 12px;
+}
+
+.design-view-form-content select {
+	color: #ccc;
+	background: #424242;
+	border: 1px solid #716e6e;
+	height: 22px;
+	margin-top: 2px;
+}
+
+.design-view-form-content .optional-option:hover,
+.design-view-form-content .optional-parameter:hover,
+.source-sink-form-container #attribute-map-label:hover,
+.table-form-container .rdbms-type,
+.table-form-container #table-annotations .annotation-name {
+	cursor: pointer;
+}
+
+.source-sink-form-container .attribute-labels {
+	margin-top: 10px;
+}
+
+.design-view-form-content label {
+   word-break: break-all;
+}
+
+.table-form-container .rdbms-type {
+	margin-right: 10px;
+	margin-top: 10px;
+}
+
+.selector {
+    position: absolute;
+    background: rgba(0, 0, 255, 0.1) none repeat scroll 0% 0%;
+    border: 1px solid rgba(0, 0, 255, 0.45);
+    display: none;
+    pointer-events: none;
+    left: 0px;
+    top: 0px;
+}
+
+textarea {
+    width: 95%;
+    background: #424242;
+    min-height: 65px;
+}
+
+.focused-container {
+    border-color: #4af;
+    box-shadow: 0 0 1px 2px #4af !important;
+}
+
+.selected-container {
+    border-color: #4af;
+    box-shadow: 0 0 1px 1px #4af;
+}
+
+.selected-button{
+    color: #ffffff !important;
+    transition: 0.15s !important;
+}
