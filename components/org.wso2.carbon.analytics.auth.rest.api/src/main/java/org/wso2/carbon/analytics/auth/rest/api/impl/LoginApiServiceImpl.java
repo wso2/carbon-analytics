@@ -18,7 +18,11 @@
 package org.wso2.carbon.analytics.auth.rest.api.impl;
 
 import org.osgi.framework.BundleContext;
-import org.osgi.service.component.annotations.*;
+import org.osgi.service.component.annotations.Activate;
+import org.osgi.service.component.annotations.Deactivate;
+import org.osgi.service.component.annotations.Reference;
+import org.osgi.service.component.annotations.ReferenceCardinality;
+import org.osgi.service.component.annotations.ReferencePolicy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.wso2.carbon.analytics.auth.rest.api.LoginApiService;
@@ -26,6 +30,7 @@ import org.wso2.carbon.analytics.auth.rest.api.NotFoundException;
 import org.wso2.carbon.analytics.auth.rest.api.dto.ErrorDTO;
 import org.wso2.carbon.analytics.auth.rest.api.dto.RedirectionDTO;
 import org.wso2.carbon.analytics.auth.rest.api.dto.UserDTO;
+import org.wso2.carbon.analytics.auth.rest.api.internal.AuthConfigurations;
 import org.wso2.carbon.analytics.auth.rest.api.internal.DataHolder;
 import org.wso2.carbon.analytics.auth.rest.api.internal.ServiceComponent;
 import org.wso2.carbon.analytics.auth.rest.api.util.AuthRESTAPIConstants;
@@ -35,6 +40,7 @@ import org.wso2.carbon.analytics.idp.client.core.exception.IdPClientException;
 import org.wso2.carbon.analytics.idp.client.core.utils.IdPClientConstants;
 import org.wso2.carbon.analytics.idp.client.external.ExternalIdPClient;
 import org.wso2.carbon.analytics.idp.client.external.ExternalIdPClientConstants;
+import org.wso2.carbon.config.ConfigurationException;
 import org.wso2.carbon.stream.processor.common.utils.SPConstants;
 import org.wso2.msf4j.Request;
 
@@ -79,13 +85,8 @@ public class LoginApiServiceImpl extends LoginApiService {
     }
 
     @Override
-    public Response loginAppNamePost(String appName
-            , String username
-            , String password
-            , String grantType
-            , Boolean rememberMe
-            , String appId
-            , Request request) throws NotFoundException {
+    public Response loginAppNamePost(String appName, String username, String password, String grantType,
+                                     Boolean rememberMe, String appId, Request request) throws NotFoundException {
         try {
             if (rememberMe == null) {
                 rememberMe = false;
@@ -124,6 +125,8 @@ public class LoginApiServiceImpl extends LoginApiService {
                 idPClientProperties.put(IdPClientConstants.APP_ID, appId);
                 idPClientProperties.put(IdPClientConstants.USERNAME, username);
                 idPClientProperties.put(IdPClientConstants.PASSWORD, password);
+            } else if (IdPClientConstants.AUTHORIZATION_CODE_GRANT_TYPE.equalsIgnoreCase(grantType)) {
+                idPClientProperties.put(IdPClientConstants.GRANT_TYPE, IdPClientConstants.AUTHORIZATION_CODE_GRANT_TYPE);
             } else {
                 if (LOG.isDebugEnabled()) {
                     LOG.debug("Grant type '{}' is not supported.", removeCRLFCharacters(grantType));
@@ -231,7 +234,8 @@ public class LoginApiServiceImpl extends LoginApiService {
     }
 
     @Override
-    public Response loginCallbackAppNameGet(String appName, Request request) throws NotFoundException {
+    public Response loginCallbackAppNameGet(String appName, String authentication, Request request) throws
+            NotFoundException {
         IdPClient idPClient = DataHolder.getInstance().getIdPClient();
         if (idPClient instanceof ExternalIdPClient) {
             String trimmedAppName = appName.split("/\\|?")[0];
@@ -348,6 +352,22 @@ public class LoginApiServiceImpl extends LoginApiService {
             return Response.status(Response.Status.BAD_REQUEST).entity(errorDTO).build();
         }
     }
+
+    @Override
+    public Response isSSOEnabled() {
+        try {
+            DataHolder.getInstance().getConfigProvider().getConfigurationObject(AuthConfigurations.class);
+            return Response.status(Response.Status.OK).entity(null).build();
+        } catch (ConfigurationException errorMsg) {
+            String error = "Error occurred while reading configs from deployment.yaml. " + errorMsg.getMessage();
+            ErrorDTO errorDTO = new ErrorDTO();
+            errorDTO.setError(IdPClientConstants.Error.INTERNAL_SERVER_ERROR);
+            errorDTO.setDescription(error);
+            return Response.status(Response.Status.BAD_REQUEST).entity(errorDTO).build();
+        }
+
+    }
+
 
     private static String removeCRLFCharacters(String str) {
         if (str != null) {
