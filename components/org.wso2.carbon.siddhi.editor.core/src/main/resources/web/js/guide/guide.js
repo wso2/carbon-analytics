@@ -299,7 +299,8 @@ define(['jquery', 'lodash', 'log', 'enjoyhint', 'designViewUtils', 'workspace', 
                                 .getConfigurationData().getSiddhiAppConfig().queryLists.WINDOW_FILTER_PROJECTION[0];
 
                             Interval = window.setInterval(function () {
-                                if(newElement.queryInput && newElement.queryOutput && newElement.queryInput.from === "SweetProductionStream" &&
+                                if(newElement.queryInput && newElement.queryOutput &&
+                                    newElement.queryInput.from === "SweetProductionStream" &&
                                     newElement.queryOutput.target === "TotalProductionStream") {
                                     clearInterval(Interval);
                                     instance.trigger('next');
@@ -607,7 +608,8 @@ define(['jquery', 'lodash', 'log', 'enjoyhint', 'designViewUtils', 'workspace', 
 
                         Constants.FILE_INCREMENT = browserStorage.get('guideFileNameIncrement');
                         Constants.TEMP_FILE = "SweetFactory__" + Constants.FILE_INCREMENT;
-                        var payload = "configName=" + btoa(Constants.TEMP_FILE + '.siddhi') + "&config=" + (btoa(Constants.CONTENT));
+                        var payload = "configName=" + btoa(Constants.TEMP_FILE + '.siddhi') + "&config="
+                            + (btoa(Constants.CONTENT));
                         var fileToBeChecked = "configName="+btoa(Constants.TEMP_FILE + '.siddhi');
 
                         $.ajax({
@@ -621,7 +623,8 @@ define(['jquery', 'lodash', 'log', 'enjoyhint', 'designViewUtils', 'workspace', 
                                     Constants.TEMP_FILE = Constants.TEMP_FILE.slice(0, 14);
                                     Constants.FILE_INCREMENT++;
                                     Constants.TEMP_FILE = Constants.TEMP_FILE + Constants.FILE_INCREMENT;
-                                    payload = "configName=" + btoa(Constants.TEMP_FILE + '.siddhi') + "&config=" + (btoa(content));
+                                    payload = "configName=" + btoa(Constants.TEMP_FILE + '.siddhi')
+                                        + "&config=" + (btoa(content));
                                 }
                             }
                         });
