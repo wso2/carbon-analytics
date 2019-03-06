@@ -38,16 +38,15 @@ define(['require', 'log', 'jquery', 'lodash', 'aggregateByTimePeriod', 'querySel
             }
         };
 
-        //to get the index annotation
-        var getIndexAnnotation = function (primaryIndexAnnotations) {
-            var indexAnnotation = [];
-            _.forEach(primaryIndexAnnotations, function (annotation) {
-                if (annotation.name.toLowerCase() === Constants.INDEX) {
-                    indexAnnotation.push(annotation);
-                    return false;
+        //to remove the primaryKey annotation
+        var removePrimaryAnnotation = function (savedAnnotations) {
+            var annotationsWithoutPrimary = [];
+            _.forEach(savedAnnotations, function (annotation) {
+                if (annotation.name.toLowerCase() != Constants.PRIMARY_KEY) {
+                    annotationsWithoutPrimary.push(annotation);
                 }
             });
-            return indexAnnotation;
+            return annotationsWithoutPrimary;
         };
 
         //to disable selection of index and partitionId annotation
@@ -125,14 +124,8 @@ define(['require', 'log', 'jquery', 'lodash', 'aggregateByTimePeriod', 'querySel
         };
 
         //to render interval or range based on user selection
-        var renderIntervalOrRange = function (self, selectedValue, aggregateByTimePeriod) {
+        var renderAggregateByTimePeriod = function (self, selectedValue, aggregateByTimePeriod) {
             if (selectedValue == Constants.INTERVAL) {
-                var interval = [];
-                if (aggregateByTimePeriod) {
-                    interval = aggregateByTimePeriod.getValue();
-                } else {
-                    interval.push("");
-                }
                 renderInterval(Constants.SIDDHI_TIME);
             } else {
                 renderRange();
@@ -144,7 +137,7 @@ define(['require', 'log', 'jquery', 'lodash', 'aggregateByTimePeriod', 'querySel
                 }).prop('selected', true);
             }
             if (aggregateByTimePeriod) {
-                mapUserValuesForIntervalOrRange(aggregateByTimePeriod);
+                mapAggregateByTimePeriod(aggregateByTimePeriod);
             }
         };
 
@@ -164,7 +157,7 @@ define(['require', 'log', 'jquery', 'lodash', 'aggregateByTimePeriod', 'querySel
         };
 
         //depending on the user selected aggregate map the values for interval or range
-        var mapUserValuesForIntervalOrRange = function (aggregateByTimePeriod) {
+        var mapAggregateByTimePeriod = function (aggregateByTimePeriod) {
             if (aggregateByTimePeriod.getType().toLowerCase() === Constants.INTERVAL) {
                 mapIntervalValues(aggregateByTimePeriod.getValue());
             } else {
@@ -201,9 +194,9 @@ define(['require', 'log', 'jquery', 'lodash', 'aggregateByTimePeriod', 'querySel
         AggregationForm.prototype.generatePropertiesForm = function (element, formConsole, formContainer) {
             var self = this;
             var id = $(element).parent().attr('id');
-            var clickedElement = self.configurationData.getSiddhiAppConfig().getAggregation(id);
+            var aggregationObject = self.configurationData.getSiddhiAppConfig().getAggregation(id);
 
-            if (!clickedElement.getFrom()) {
+            if (!aggregationObject.getConnectedSource()) {
                 $('#' + id).addClass('incomplete-element');
                 DesignViewUtils.prototype.warnAlert('Connect an input stream element');
                 self.consoleListManager.removeFormConsole(formConsole);
@@ -217,57 +210,55 @@ define(['require', 'log', 'jquery', 'lodash', 'aggregateByTimePeriod', 'querySel
                 self.formUtils.popUpSelectedElement(id);
 
                 var customizedStoreOptions = [];
-                var storeOptions = [];
+                var currentStoreOptions = [];
                 var storeOptionsWithValues = [];
+                var annotationsWithoutKeys = [];
+                var annotationsWithKeys = [];
 
-                var name = clickedElement.getName();
-                var from = clickedElement.getFrom();
-                var savedAnnotations = clickedElement.getAnnotationListObjects();
-                var store = clickedElement.getStore();
-                var select = clickedElement.getSelect();
-                var groupBy = clickedElement.getGroupBy();
-                var aggregateByAttribute = clickedElement.getAggregateByAttribute();
-                var aggregateByTimePeriod = clickedElement.getAggregateByTimePeriod();
+                var name = aggregationObject.getName();
+                var connectedSource = aggregationObject.getConnectedSource();
+                var annotationListObjects = removePrimaryAnnotation(aggregationObject.getAnnotationListObjects());
+                var store = aggregationObject.getStore();
+                var select = aggregationObject.getSelect();
+                var groupBy = aggregationObject.getGroupBy();
+                var aggregateByAttribute = aggregationObject.getAggregateByAttribute();
+                var aggregateByTimePeriod = aggregationObject.getAggregateByTimePeriod();
 
                 var predefinedStores = _.orderBy(this.configurationData.rawExtensions["store"], ['name'], ['asc']);
-                var predefinedPrimaryIndexAnnotations = JSON.parse(JSON.stringify(self.configurationData.application.config.
-                    primary_index_annotations));
                 var predefinedAggregationAnnotations = JSON.parse(JSON.stringify(self.configurationData.application.config.
-                    aggregation_predefined_annotations));
-                var savedSource = self.configurationData.getSiddhiAppConfig().getDefinitionElementByName(from);
+                    type_aggregation_predefined_annotations));
+                var connectedElement = self.configurationData.getSiddhiAppConfig().getDefinitionElementByName(connectedSource);
                 var incrementalAggregator = self.configurationData.application.config.incremental_aggregator;
                 var streamFunctions = self.formUtils.getStreamFunctionNames();
 
                 //render the aggregation form template
                 var aggregationFormTemplate = Handlebars.compile($('#aggregation-form-template').html());
-                var wrappedHtml = aggregationFormTemplate({ name: name, from: from });
+                var wrappedHtml = aggregationFormTemplate({ name: name, from: connectedSource });
                 $('#define-aggregation').html(wrappedHtml);
 
-				self.formUtils.addEventListenerToRemoveRequiredClass();
+                self.formUtils.addEventListenerToRemoveRequiredClass();
+
+                //createAnnotationObjects
+                annotationsWithKeys = self.formUtils.createObjectsForAnnotationsWithKeys(predefinedAggregationAnnotations);
+                annotationsWithoutKeys = self.formUtils.createObjectsForAnnotationsWithoutKeys(predefinedAggregationAnnotations);
 
                 //separate the annotation
-                var indexAnnotation = getIndexAnnotation(predefinedPrimaryIndexAnnotations);
-                self.formUtils.mapPrimaryIndexAnnotationValues(indexAnnotation, savedAnnotations);
-                var annotationsWithoutPrimaryIndex = self.formUtils.getUserAnnotations(savedAnnotations,
-                    predefinedPrimaryIndexAnnotations);
-                self.formUtils.mapPredefinedAnnotations(annotationsWithoutPrimaryIndex, predefinedAggregationAnnotations);
-                var userDefinedAnnotations = self.formUtils.getUserAnnotations(annotationsWithoutPrimaryIndex,
+                self.formUtils.mapPrimaryIndexAnnotationValues(annotationsWithoutKeys, annotationListObjects);
+                self.formUtils.mapPredefinedAnnotations(annotationListObjects, annotationsWithKeys);
+                var userDefinedAnnotations = self.formUtils.getUserAnnotations(annotationListObjects,
                     predefinedAggregationAnnotations);
 
                 self.formUtils.renderAnnotationTemplate("define-user-defined-annotation", userDefinedAnnotations);
                 $('.define-user-defined-annotation').find('h4').html('Customized Annotations');
-                self.formUtils.renderPrimaryIndexAnnotations(indexAnnotation, 'define-index-annotation');
+                self.formUtils.renderPrimaryIndexAnnotations(annotationsWithoutKeys, 'define-index-annotation');
                 $('.define-index-annotation').find('h4').hide();
-                self.formUtils.renderPredefinedAnnotations(predefinedAggregationAnnotations,
+                self.formUtils.renderPredefinedAnnotations(annotationsWithKeys,
                     'define-predefined-aggregation-annotation');
-                self.formUtils.renderOptionsForPredefinedAnnotations(predefinedAggregationAnnotations);
+                self.formUtils.renderOptionsForPredefinedAnnotations(annotationsWithKeys);
                 //render the template to  generate the store types
-                self.formUtils.renderTypeSelectionTemplate(Constants.STORE, predefinedStores)
+                self.formUtils.renderSourceSinkStoreTypeDropDown(Constants.STORE, predefinedStores);
 
-                self.formUtils.addCheckedForUserSelectedPredefinedAnnotation(savedAnnotations,
-                    predefinedAggregationAnnotations);
-
-                self.formUtils.addEventListenersForOptionsDiv(Constants.STORE);
+                self.formUtils.addEventListenersForGenericOptionsDiv(Constants.STORE);
                 self.formUtils.addEventListenersForPredefinedAnnotations();
 
                 $('#define-rdbms-type').on('change', '[name=radioOpt]', function () {
@@ -286,18 +277,18 @@ define(['require', 'log', 'jquery', 'lodash', 'aggregateByTimePeriod', 'querySel
                 //onchange of the store type select box
                 $('#define-store').on('change', '#store-type', function () {
                     $('#define-predefined-annotations').show();
-                    storeOptions = self.formUtils.getSelectedTypeParameters(this.value, predefinedStores);
-                    if (savedStoreType && savedStoreType === this.value) {
-                        customizedStoreOptions = self.formUtils.getCustomizedStoreOptions(storeOptions,
-                            savedStoreOptions);
-                        storeOptionsWithValues = self.formUtils.mapUserStoreOptionValues(storeOptions,
-                            savedStoreOptions);
-                        self.formUtils.checkForRdbmsStoreType(this.value, storeOptionsWithValues,
+                    currentStoreOptions = self.formUtils.getSelectedTypeParameters(this.value, predefinedStores);
+                    if (storeType && storeType === this.value) {
+                        customizedStoreOptions = self.formUtils.getCustomizedStoreOptions(currentStoreOptions,
+                            storeOptions);
+                        storeOptionsWithValues = self.formUtils.mapUserStoreOptionValues(currentStoreOptions,
+                            storeOptions);
+                        self.formUtils.populateStoreOptions(this.value, storeOptionsWithValues,
                             customizedStoreOptions);
                     } else {
-                        storeOptionsWithValues = self.formUtils.createObjectWithValues(storeOptions);
+                        storeOptionsWithValues = self.formUtils.createObjectWithValues(currentStoreOptions);
                         customizedStoreOptions = [];
-                        self.formUtils.checkForRdbmsStoreType(this.value, storeOptionsWithValues,
+                        self.formUtils.populateStoreOptions(this.value, storeOptionsWithValues,
                             customizedStoreOptions);
                     }
                 });
@@ -323,46 +314,46 @@ define(['require', 'log', 'jquery', 'lodash', 'aggregateByTimePeriod', 'querySel
                 });
 
                 $('#define-aggregate-by').on('change', '.aggregate-by-time-period-selection', function () {
-                    renderIntervalOrRange(self, this.value, aggregateByTimePeriod);
-                    self.formUtils.removeDeleteButtonOfFirstValue();
+                    renderAggregateByTimePeriod(self, this.value, aggregateByTimePeriod);
                     self.formUtils.preventMultipleSelection(Constants.RANGE);
                 });
 
                 if (store) {
-                    var savedStoreAnnotation = clickedElement.getStore();
-                    var savedStoreType = savedStoreAnnotation.getType().toLowerCase();
-                    storeOptions = self.formUtils.getSelectedTypeParameters(savedStoreType, predefinedStores);
-                    var savedStoreAnnotationOptions = savedStoreAnnotation.getOptions();
-                    var savedStoreOptions = [];
-                    for (var key in savedStoreAnnotationOptions) {
-                        if (savedStoreAnnotationOptions.hasOwnProperty(key)) {
-                            savedStoreOptions.push({
+                    var storeAnnotation = store;
+                    var storeType = storeAnnotation.getType().toLowerCase();
+                    currentStoreOptions = self.formUtils.getSelectedTypeParameters(storeType, predefinedStores);
+                    var storeAnnotationOptions = storeAnnotation.getOptions();
+                    var storeOptions = [];
+                    //todo fix the store option structure - backend
+                    for (var key in storeAnnotationOptions) {
+                        if (storeAnnotationOptions.hasOwnProperty(key)) {
+                            storeOptions.push({
                                 key: key,
-                                value: savedStoreAnnotationOptions[key]
+                                value: storeAnnotationOptions[key]
                             });
                         }
                     }
-                    $('#define-store #store-type').val(savedStoreType);
-                    customizedStoreOptions = self.formUtils.getCustomizedStoreOptions(storeOptions, savedStoreOptions);
-                    storeOptionsWithValues = self.formUtils.mapUserStoreOptionValues(storeOptions, savedStoreOptions);
-                    self.formUtils.checkForRdbmsStoreType(savedStoreType, storeOptionsWithValues, customizedStoreOptions);
+                    $('#define-store #store-type').val(storeType);
+                    customizedStoreOptions = self.formUtils.getCustomizedStoreOptions(currentStoreOptions, storeOptions);
+                    storeOptionsWithValues = self.formUtils.mapUserStoreOptionValues(currentStoreOptions, storeOptions);
+                    self.formUtils.populateStoreOptions(storeType, storeOptionsWithValues, customizedStoreOptions);
                     enableIndexAndPartitionById();
                 } else {
-                    storeOptions = self.formUtils.getSelectedTypeParameters($('#define-store #store-type').val(),
+                    currentStoreOptions = self.formUtils.getSelectedTypeParameters($('#define-store #store-type').val(),
                         predefinedStores);
-                    storeOptionsWithValues = self.formUtils.createObjectWithValues(storeOptions);
+                    storeOptionsWithValues = self.formUtils.createObjectWithValues(currentStoreOptions);
                     customizedStoreOptions = [];
                     self.formUtils.renderOptions(storeOptionsWithValues, customizedStoreOptions, Constants.STORE);
                     disableIndexAndPartitionById();
                 }
 
                 var possibleAttributes = [];
-                if (savedSource.type.toLowerCase() === Constants.STREAM) {
-                    var streamAttributes = savedSource.element.getAttributeList();
+                if (connectedElement.type.toLowerCase() === Constants.STREAM) {
+                    var streamAttributes = connectedElement.element.getAttributeList();
                     _.forEach(streamAttributes, function (attribute) {
                         possibleAttributes.push(attribute.getName());
                     });
-                } else if (savedSource.type.toLowerCase() === Constants.TRIGGER) {
+                } else if (connectedElement.type.toLowerCase() === Constants.TRIGGER) {
                     possibleAttributes.push(Constants.TRIGGERED_TIME);
                 }
 
@@ -393,8 +384,7 @@ define(['require', 'log', 'jquery', 'lodash', 'aggregateByTimePeriod', 'querySel
                     }).prop('selected', true);
                 }
 
-                renderIntervalOrRange(self, aggregateByTimePeriodType, aggregateByTimePeriod);
-                self.formUtils.removeDeleteButtonOfFirstValue();
+                renderAggregateByTimePeriod(self, aggregateByTimePeriodType, aggregateByTimePeriod);
                 self.formUtils.preventMultipleSelection(Constants.RANGE);
 
                 //create autocompletion
@@ -421,7 +411,7 @@ define(['require', 'log', 'jquery', 'lodash', 'aggregateByTimePeriod', 'querySel
                         isErrorOccurred = true;
                         return;
                     }
-                    var previouslySavedName = clickedElement.getName();
+                    var previouslySavedName = aggregationObject.getName();
                     if (previouslySavedName === undefined) {
                         previouslySavedName = "";
                     }
@@ -442,7 +432,7 @@ define(['require', 'log', 'jquery', 'lodash', 'aggregateByTimePeriod', 'querySel
 
                     var isStoreChecked = $('.store-annotation-checkbox').is(':checked');
                     if (isStoreChecked) {
-                        if (self.formUtils.validateOptions(storeOptions, Constants.STORE)) {
+                        if (self.formUtils.validateOptions(currentStoreOptions, Constants.STORE)) {
                             isErrorOccurred = true;
                             return;
                         }
@@ -487,11 +477,11 @@ define(['require', 'log', 'jquery', 'lodash', 'aggregateByTimePeriod', 'querySel
 
                     if (!isErrorOccurred) {
 
-                        clickedElement.setFrom($('#aggregation-from').val().trim());
+                        aggregationObject.setConnectedSource($('#aggregation-from').val().trim());
 
                         if (previouslySavedName !== aggregationName) {
                             // update selected aggregation model
-                            clickedElement.setName(aggregationName);
+                            aggregationObject.setName(aggregationName);
                             // update connection related to the element if the name is changed
                             self.formUtils.updateConnectionsAfterDefinitionElementNameChange(id);
 
@@ -511,42 +501,42 @@ define(['require', 'log', 'jquery', 'lodash', 'aggregateByTimePeriod', 'querySel
                             _.set(storeAnnotationOptions, 'type', selectedStoreType);
                             _.set(storeAnnotationOptions, 'options', optionsMap);
                             var storeAnnotation = new StoreAnnotation(storeAnnotationOptions);
-                            clickedElement.setStore(storeAnnotation);
+                            aggregationObject.setStore(storeAnnotation);
 
                             //buildAnnotations
                             self.formUtils.buildPrimaryIndexAnnotations(annotationStringList, annotationObjectList);
                         } else {
-                            clickedElement.setStore(undefined);
+                            aggregationObject.setStore(undefined);
                         }
 
                         self.formUtils.buildPredefinedAnnotations(predefinedAggregationAnnotations, annotationStringList,
                             annotationObjectList);
                         var annotationNodes = $('#annotation-div').jstree(true)._model.data['#'].children;
                         self.formUtils.buildAnnotation(annotationNodes, annotationStringList, annotationObjectList)
-                        clickedElement.clearAnnotationList();
-                        clickedElement.clearAnnotationListObjects();
+                        aggregationObject.clearAnnotationList();
+                        aggregationObject.clearAnnotationListObjects();
                         _.forEach(annotationStringList, function (annotation) {
-                            clickedElement.addAnnotation(annotation);
+                            aggregationObject.addAnnotation(annotation);
                         });
                         _.forEach(annotationObjectList, function (annotation) {
-                            clickedElement.addAnnotationObject(annotation);
+                            aggregationObject.addAnnotationObject(annotation);
                         });
 
                         var selectObject = new QuerySelect(self.formUtils.buildAttributeSelection(Constants.AGGREGATION));
-                        clickedElement.setSelect(selectObject);
+                        aggregationObject.setSelect(selectObject);
 
                         if ($('.group-by-checkbox').is(':checked')) {
                             var groupByAttributes = self.formUtils.buildGroupBy();
-                            clickedElement.setGroupBy(groupByAttributes);
+                            aggregationObject.setGroupBy(groupByAttributes);
                         } else {
-                            clickedElement.setGroupBy(undefined);
+                            aggregationObject.setGroupBy(undefined);
                         }
 
                         if ($('#aggregate-by-attribute-checkbox').is(':checked')) {
-                            clickedElement.setAggregateByAttribute(
+                            aggregationObject.setAggregateByAttribute(
                                 $('#aggregate-by-attribute .attribute-selection').val())
                         } else {
-                            clickedElement.setAggregateByAttribute(undefined)
+                            aggregationObject.setAggregateByAttribute(undefined)
                         }
 
                         var aggregateByTimePeriodOptions = {};
@@ -564,12 +554,12 @@ define(['require', 'log', 'jquery', 'lodash', 'aggregateByTimePeriod', 'querySel
                         _.set(aggregateByTimePeriodOptions, 'type', aggregateByTimePeriodType);
                         _.set(aggregateByTimePeriodOptions, 'value', value);
                         var aggregateByTimePeriod = new AggregateByTimePeriod(aggregateByTimePeriodOptions);
-                        clickedElement.setAggregateByTimePeriod(aggregateByTimePeriod);
+                        aggregationObject.setAggregateByTimePeriod(aggregateByTimePeriod);
 
                         $('#' + id).removeClass('incomplete-element');
                         $('#' + id).removeClass('error-element');
                         //Send aggregation element to the backend and generate tooltip
-                        var aggregationToolTip = self.formUtils.getTooltip(clickedElement, Constants.AGGREGATION);
+                        var aggregationToolTip = self.formUtils.getTooltip(aggregationObject, Constants.AGGREGATION);
                         $('#' + id).prop('title', aggregationToolTip);
 
                         self.configurationData.setIsDesignViewContentChanged(true);

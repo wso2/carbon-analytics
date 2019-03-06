@@ -46,7 +46,7 @@ define(['log', 'jquery', 'lodash', 'attribute', 'storeAnnotation', 'handlebar', 
         TableForm.prototype.generatePropertiesForm = function (element, formConsole, formContainer) {
             var self = this;
             var id = $(element).parent().attr('id');
-            var clickedElement = self.configurationData.getSiddhiAppConfig().getTable(id);
+            var tableObject = self.configurationData.getSiddhiAppConfig().getTable(id);
 
             var propertyDiv = $('<div id="property-header"> <h3> Table Configuration </h3> </div> ' +
                 '<div class = "table-form-container table-div"> <h4> Name: </h4> <input type="text" id="tableName" ' +
@@ -64,34 +64,35 @@ define(['log', 'jquery', 'lodash', 'attribute', 'storeAnnotation', 'handlebar', 
 
             self.formUtils.addEventListenerToRemoveRequiredClass();
 
-            var predefinedStores =  _.orderBy(JSON.parse(JSON.stringify(this.configurationData.rawExtensions["store"]),
-            ['name'], ['asc']));
+            var predefinedStores = _.orderBy(JSON.parse(JSON.stringify(this.configurationData.rawExtensions["store"]),
+                ['name'], ['asc']));
             self.formUtils.addCustomizedType(predefinedStores, Constants.DEFAULT_STORE_TYPE);
-            var predefinedTableAnnotations = self.configurationData.application.config.primary_index_annotations;
+            var predefinedTableAnnotations = JSON.parse(JSON.stringify(self.configurationData.application.config.
+                type_table_predefined_annotations));
             var customizedStoreOptions = [];
-            var storeOptions = [];
+            var currentStoreOptions = [];
             var storeOptionsWithValues = [];
 
-            self.formUtils.addEventListenersForOptionsDiv(Constants.STORE);
+            self.formUtils.addEventListenersForGenericOptionsDiv(Constants.STORE);
 
-            var name = clickedElement.getName();
+            var name = tableObject.getName();
             if (!name) {
                 var attributes = [{ name: "" }];
                 self.formUtils.renderAttributeTemplate(attributes)
 
             } else {
                 $('#tableName').val(name);
-                var savedAttributes = clickedElement.getAttributeList();
-                self.formUtils.renderAttributeTemplate(savedAttributes)
-                self.formUtils.selectTypesOfSavedAttributes(savedAttributes);
+                var attributeList = tableObject.getAttributeList();
+                self.formUtils.renderAttributeTemplate(attributeList)
+                self.formUtils.selectTypesOfSavedAttributes(attributeList);
             }
-            var savedAnnotations = clickedElement.getAnnotationList();
-            var savedAnnotationObjects = clickedElement.getAnnotationListObjects();
+
+            var annotationListObjects = tableObject.getAnnotationListObjects();
             var userAnnotations = [];
-            var tableAnnotations = JSON.parse(JSON.stringify(predefinedTableAnnotations));
-            if (savedAnnotations && savedAnnotations.length != 0) {
-                userAnnotations = self.formUtils.getUserAnnotations(savedAnnotationObjects, tableAnnotations);
-                self.formUtils.mapPrimaryIndexAnnotationValues(tableAnnotations, savedAnnotationObjects)
+            var tableAnnotations = self.formUtils.createObjectsForAnnotationsWithoutKeys(predefinedTableAnnotations);
+            if (annotationListObjects && annotationListObjects.length != 0) {
+                userAnnotations = self.formUtils.getUserAnnotations(annotationListObjects, tableAnnotations);
+                self.formUtils.mapPrimaryIndexAnnotationValues(tableAnnotations, annotationListObjects)
             }
 
             //render the predefined table annotation form template
@@ -101,7 +102,7 @@ define(['log', 'jquery', 'lodash', 'attribute', 'storeAnnotation', 'handlebar', 
             $('#define-user-annotations').find('h4').html('Customized Annotations');
 
             //render the template to  generate the store types
-            self.formUtils.renderTypeSelectionTemplate(Constants.STORE, predefinedStores)
+            self.formUtils.renderSourceSinkStoreTypeDropDown(Constants.STORE, predefinedStores)
 
             $('#define-rdbms-type').on('change', '[name=radioOpt]', function () {
                 var dataStoreOptions = self.formUtils.getRdbmsOptions(storeOptionsWithValues);
@@ -116,38 +117,38 @@ define(['log', 'jquery', 'lodash', 'attribute', 'storeAnnotation', 'handlebar', 
                     $('#define-rdbms-type').hide();
                 } else {
                     $('#define-predefined-annotations').show();
-                    storeOptions = self.formUtils.getSelectedTypeParameters(this.value, predefinedStores);
-                    if (clickedElement.getStore() && savedStoreType === this.value) {
-                        customizedStoreOptions = self.formUtils.getCustomizedStoreOptions(storeOptions, savedStoreOptions);
-                        storeOptionsWithValues = self.formUtils.mapUserStoreOptionValues(storeOptions, savedStoreOptions);
-                        self.formUtils.checkForRdbmsStoreType(this.value, storeOptionsWithValues, customizedStoreOptions);
+                    currentStoreOptions = self.formUtils.getSelectedTypeParameters(this.value, predefinedStores);
+                    if (tableObject.getStore() && storeType === this.value) {
+                        customizedStoreOptions = self.formUtils.getCustomizedStoreOptions(currentStoreOptions, storeOptions);
+                        storeOptionsWithValues = self.formUtils.mapUserStoreOptionValues(currentStoreOptions, storeOptions);
+                        self.formUtils.populateStoreOptions(this.value, storeOptionsWithValues, customizedStoreOptions);
                     } else {
-                        storeOptionsWithValues = self.formUtils.createObjectWithValues(storeOptions);
+                        storeOptionsWithValues = self.formUtils.createObjectWithValues(currentStoreOptions);
                         customizedStoreOptions = [];
-                        self.formUtils.checkForRdbmsStoreType(this.value, storeOptionsWithValues, customizedStoreOptions);
+                        self.formUtils.populateStoreOptions(this.value, storeOptionsWithValues, customizedStoreOptions);
                     }
                 }
             });
 
-            if (clickedElement.getStore()) {
+            if (tableObject.getStore()) {
                 //if table object is already edited
-                var savedStoreAnnotation = clickedElement.getStore();
-                var savedStoreType = savedStoreAnnotation.getType().toLowerCase();
-                storeOptions = self.formUtils.getSelectedTypeParameters(savedStoreType, predefinedStores);
-                var savedStoreAnnotationOptions = savedStoreAnnotation.getOptions();
-                var savedStoreOptions = [];
-                for (var key in savedStoreAnnotationOptions) {
-                    if (savedStoreAnnotationOptions.hasOwnProperty(key)) {
-                        savedStoreOptions.push({
+                var storeAnnotation = tableObject.getStore();
+                var storeType = storeAnnotation.getType().toLowerCase();
+                currentStoreOptions = self.formUtils.getSelectedTypeParameters(storeType, predefinedStores);
+                var storeAnnotationOptions = storeAnnotation.getOptions();
+                var storeOptions = [];
+                for (var key in storeAnnotationOptions) {
+                    if (storeAnnotationOptions.hasOwnProperty(key)) {
+                        storeOptions.push({
                             key: key,
-                            value: savedStoreAnnotationOptions[key]
+                            value: storeAnnotationOptions[key]
                         });
                     }
                 }
-                $('#define-store #store-type').val(savedStoreType);
-                customizedStoreOptions = self.formUtils.getCustomizedStoreOptions(storeOptions, savedStoreOptions);
-                storeOptionsWithValues = self.formUtils.mapUserStoreOptionValues(storeOptions, savedStoreOptions);
-                self.formUtils.checkForRdbmsStoreType(savedStoreType, storeOptionsWithValues, customizedStoreOptions);
+                $('#define-store #store-type').val(storeType);
+                customizedStoreOptions = self.formUtils.getCustomizedStoreOptions(currentStoreOptions, storeOptions);
+                storeOptionsWithValues = self.formUtils.mapUserStoreOptionValues(currentStoreOptions, storeOptions);
+                self.formUtils.populateStoreOptions(storeType, storeOptionsWithValues, customizedStoreOptions);
             } else {
                 //if table form is freshly opened [ new table object]
                 $('#define-store #store-type').val(Constants.DEFAULT_STORE_TYPE);
@@ -169,7 +170,7 @@ define(['log', 'jquery', 'lodash', 'attribute', 'storeAnnotation', 'handlebar', 
                     isErrorOccurred = true;
                     return;
                 }
-                var previouslySavedName = clickedElement.getName();
+                var previouslySavedName = tableObject.getName();
                 if (!previouslySavedName) {
                     previouslySavedName = "";
                 }
@@ -190,7 +191,7 @@ define(['log', 'jquery', 'lodash', 'attribute', 'storeAnnotation', 'handlebar', 
                 //store annotation
                 var selectedStoreType = $('#define-store #store-type').val();
                 if (selectedStoreType !== Constants.DEFAULT_STORE_TYPE) {
-                    if (self.formUtils.validateOptions(storeOptions, Constants.STORE)) {
+                    if (self.formUtils.validateOptions(currentStoreOptions, Constants.STORE)) {
                         isErrorOccurred = true;
                         return;
                     }
@@ -220,12 +221,12 @@ define(['log', 'jquery', 'lodash', 'attribute', 'storeAnnotation', 'handlebar', 
                     var annotationList = [];
                     var annotationObjectList = [];
                     //clear the annotation list
-                    clickedElement.clearAnnotationList();
-                    clickedElement.clearAnnotationListObjects();
+                    tableObject.clearAnnotationList();
+                    tableObject.clearAnnotationListObjects();
 
                     if (previouslySavedName !== tableName) {
                         // update selected table model
-                        clickedElement.setName(tableName);
+                        tableObject.setName(tableName);
                         // update connection related to the element if the name is changed
                         self.formUtils.updateConnectionsAfterDefinitionElementNameChange(id);
 
@@ -241,38 +242,38 @@ define(['log', 'jquery', 'lodash', 'attribute', 'storeAnnotation', 'handlebar', 
                         _.set(storeAnnotationOptions, 'type', selectedStoreType);
                         _.set(storeAnnotationOptions, 'options', optionsMap);
                         var storeAnnotation = new StoreAnnotation(storeAnnotationOptions);
-                        clickedElement.setStore(storeAnnotation);
+                        tableObject.setStore(storeAnnotation);
 
                         self.formUtils.buildPrimaryIndexAnnotations(annotationList, annotationObjectList);
                     } else {
-                        clickedElement.setStore(undefined);
+                        tableObject.setStore(undefined);
                     }
 
                     var annotationNodes = $('#annotation-div').jstree(true)._model.data['#'].children;
                     self.formUtils.buildAnnotation(annotationNodes, annotationList, annotationObjectList)
                     //add the annotations to the clicked element
                     _.forEach(annotationList, function (annotation) {
-                        clickedElement.addAnnotation(annotation);
+                        tableObject.addAnnotation(annotation);
                     });
                     _.forEach(annotationObjectList, function (annotation) {
-                        clickedElement.addAnnotationObject(annotation);
+                        tableObject.addAnnotationObject(annotation);
                     });
 
                     //clear the saved attributes
-                    clickedElement.clearAttributeList()
+                    tableObject.clearAttributeList()
                     //add the attributes
                     $('.attribute .attr-content').each(function () {
                         var nameValue = $(this).find('.attr-name').val().trim();
                         var typeValue = $(this).find('.attr-type').val();
                         if (nameValue != "") {
                             var attributeObject = new Attribute({ name: nameValue, type: typeValue });
-                            clickedElement.addAttribute(attributeObject);
+                            tableObject.addAttribute(attributeObject);
                         }
                     });
 
                     $('#' + id).removeClass('incomplete-element');
                     //Send table element to the backend and generate tooltip
-                    var tableToolTip = self.formUtils.getTooltip(clickedElement, Constants.TABLE);
+                    var tableToolTip = self.formUtils.getTooltip(tableObject, Constants.TABLE);
                     $('#' + id).prop('title', tableToolTip);
 
                     // set the isDesignViewContentChanged to true

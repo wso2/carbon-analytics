@@ -101,7 +101,7 @@ define(['require', 'elementUtils'],
             return this.name;
         };
 
-        Aggregation.prototype.getFrom = function () {
+        Aggregation.prototype.getConnectedSource = function () {
             return this.from;
         };
 
@@ -141,7 +141,7 @@ define(['require', 'elementUtils'],
             this.name = name;
         };
 
-        Aggregation.prototype.setFrom = function (from) {
+        Aggregation.prototype.setConnectedSource = function (from) {
             this.from = from;
         };
 

@@ -65,7 +65,7 @@ define(['require', 'elementUtils'],
             return this.type;
         };
 
-        WindowFilterProjectionQueryInput.prototype.getFrom = function () {
+        WindowFilterProjectionQueryInput.prototype.getConnectedSource = function () {
             return this.from;
         };
 

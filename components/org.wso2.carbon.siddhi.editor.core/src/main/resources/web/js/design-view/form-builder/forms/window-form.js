@@ -45,7 +45,7 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'constants'],
         WindowForm.prototype.generatePropertiesForm = function (element, formConsole, formContainer) {
             var self = this;
             var id = $(element).parent().attr('id');
-            var clickedElement = self.configurationData.getSiddhiAppConfig().getWindow(id);
+            var windowObject = self.configurationData.getSiddhiAppConfig().getWindow(id);
 
             var propertyDiv = $('<div id="property-header"><h3>Window Configuration</h3></div> <div class = ' +
                 '"window-form-container"> <h4>Name: </h4> <input type="text" id="windowName" class="clearfix name">' +
@@ -67,11 +67,11 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'constants'],
                 ['name'], ['asc']);
             var functionParameters = [];
             var functionParametersWithValues = [];
-            var selectedWindowType;
+            var selectedType;
             var annotations = [];
 
-			self.formUtils.renderFunctions(predefinedWindowFunctionNames, '.window-form-container', Constants.WINDOW);
-            var name = clickedElement.getName();
+            self.formUtils.renderFunctions(predefinedWindowFunctionNames, '.window-form-container', Constants.WINDOW);
+            var name = windowObject.getName();
             self.formUtils.renderOutputEventTypes();
             if (!name) {
                 //if window form is freshly opened[unedited window object]
@@ -84,8 +84,8 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'constants'],
                 self.formUtils.renderParameters(functionParametersWithValues, selectedType, Constants.WINDOW)
             } else {
                 //if window object is already edited
-                var windowType = clickedElement.getType().toLowerCase();
-                var savedParameterValues = clickedElement.getParameters();
+                var windowType = windowObject.getType().toLowerCase();
+                var parameterValues = windowObject.getParameters();
 
                 $('#windowName').val(name.trim());
                 selectedType = windowType;
@@ -93,22 +93,22 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'constants'],
                     return ($(this).val().toLowerCase() == (windowType));
                 }).prop('selected', true);
                 functionParameters = self.formUtils.getSelectedTypeParameters(windowType, predefinedWindowFunctionNames);
-                self.formUtils.callToMapParameters(selectedType, functionParameters, savedParameterValues,
+                self.formUtils.callToMapParameters(selectedType, functionParameters, parameterValues,
                     '.window-form-container')
                 if (selectedType === Constants.SORT) {
                     self.formUtils.showHideOrderForSort();
                 }
-                var savedAttributes = clickedElement.getAttributeList();
-                self.formUtils.renderAttributeTemplate(savedAttributes)
-                self.formUtils.selectTypesOfSavedAttributes(savedAttributes);
+                var attributeList = windowObject.getAttributeList();
+                self.formUtils.renderAttributeTemplate(attributeList)
+                self.formUtils.selectTypesOfSavedAttributes(attributeList);
 
-                var savedOutputEventType = clickedElement.getOutputEventType().toLowerCase();
+                var outputEventType = windowObject.getOutputEventType().toLowerCase();
                 $('.define-output-events').find('#event-type option').filter(function () {
-                    return ($(this).val().toLowerCase() == (savedOutputEventType));
+                    return ($(this).val().toLowerCase() == (outputEventType));
                 }).prop('selected', true);
 
-                var savedAnnotationObjects = clickedElement.getAnnotationListObjects();
-                annotations = savedAnnotationObjects;
+                var annotationListObjects = windowObject.getAnnotationListObjects();
+                annotations = annotationListObjects;
             }
             self.formUtils.renderAnnotationTemplate("define-annotation", annotations);
             self.formUtils.addEventListenersForParameterDiv();
@@ -117,18 +117,18 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'constants'],
             $('#window-type').change(function () {
                 functionParameters = self.formUtils.getSelectedTypeParameters(this.value, predefinedWindowFunctionNames);
                 selectedType = this.value.toLowerCase();
-                if (savedParameterValues && selectedType == windowType.toLowerCase()) {
-                    self.formUtils.callToMapParameters(selectedType, functionParameters, savedParameterValues,
+                if (parameterValues && selectedType == windowType.toLowerCase()) {
+                    self.formUtils.callToMapParameters(selectedType, functionParameters, parameterValues,
                         '.window-form-container')
                 } else {
                     functionParametersWithValues = self.formUtils.createObjectWithValues(functionParameters);
                     self.formUtils.renderParameters(functionParametersWithValues, Constants.WINDOW,
-                    '.window-form-container');
+                        '.window-form-container');
                 }
                 if (selectedType === Constants.SORT) {
-					self.formUtils.showHideOrderForSort();
-					self.formUtils.addEventListenerForSortWindow(selectedType)
-				}
+                    self.formUtils.showHideOrderForSort();
+                    self.formUtils.addEventListenerForSortWindow(selectedType)
+                }
             });
 
             // 'Submit' button action
@@ -146,7 +146,7 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'constants'],
                     isErrorOccurred = true;
                     return;
                 }
-                var previouslySavedName = clickedElement.getName();
+                var previouslySavedName = windowObject.getName();
                 if (previouslySavedName === undefined) {
                     previouslySavedName = "";
                 }
@@ -185,49 +185,49 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'constants'],
                 if (!isErrorOccurred) {
                     if (previouslySavedName !== windowName) {
                         // update connection related to the element if the name is changed
-                        clickedElement.setName(windowName);
+                        windowObject.setName(windowName);
                         self.formUtils.updateConnectionsAfterDefinitionElementNameChange(id);
 
                         var textNode = $(element).parent().find('.windowNameNode');
                         textNode.html(windowName);
                     }
 
-					var parameters = self. formUtils.buildWindowParameters('.window-form-container', windowType,
-					predefinedWindowFunctionNames)
-                    clickedElement.setType(windowType);
-                    clickedElement.setParameters(parameters);
+                    var parameters = self.formUtils.buildWindowParameters('.window-form-container', windowType,
+                        predefinedWindowFunctionNames)
+                    windowObject.setType(windowType);
+                    windowObject.setParameters(parameters);
 
                     //clear the previously saved attribute list
-                    clickedElement.clearAttributeList();
+                    windowObject.clearAttributeList();
                     //add the attributes to the attribute list
                     $('.attribute .attr-content').each(function () {
                         var nameValue = $(this).find('.attr-name').val().trim();
                         var typeValue = $(this).find('.attr-type').val();
                         if (nameValue != "") {
                             var attributeObject = new Attribute({ name: nameValue, type: typeValue });
-                            clickedElement.addAttribute(attributeObject)
+                            windowObject.addAttribute(attributeObject)
                         }
                     });
 
                     var outputEventType = $('.define-output-events #event-type').val().toUpperCase();
-                    clickedElement.setOutputEventType(outputEventType);
+                    windowObject.setOutputEventType(outputEventType);
 
-                    clickedElement.clearAnnotationList();
-                    clickedElement.clearAnnotationListObjects();
+                    windowObject.clearAnnotationList();
+                    windowObject.clearAnnotationListObjects();
                     var annotationStringList = [];
                     var annotationObjectList = [];
                     var annotationNodes = $('#annotation-div').jstree(true)._model.data['#'].children;
                     self.formUtils.buildAnnotation(annotationNodes, annotationStringList, annotationObjectList);
                     _.forEach(annotationStringList, function (annotation) {
-                        clickedElement.addAnnotation(annotation);
+                        windowObject.addAnnotation(annotation);
                     });
                     _.forEach(annotationObjectList, function (annotation) {
-                        clickedElement.addAnnotationObject(annotation);
+                        windowObject.addAnnotationObject(annotation);
                     });
 
                     $('#' + id).removeClass('incomplete-element');
                     //Send window element to the backend and generate tooltip
-                    var windowToolTip = self.formUtils.getTooltip(clickedElement, Constants.WINDOW);
+                    var windowToolTip = self.formUtils.getTooltip(windowObject, Constants.WINDOW);
                     $('#' + id).prop('title', windowToolTip);
 
                     self.designViewContainer.removeClass('disableContainer');

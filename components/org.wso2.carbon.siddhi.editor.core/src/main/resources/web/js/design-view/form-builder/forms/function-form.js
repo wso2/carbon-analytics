@@ -73,7 +73,7 @@ define(['require', 'log', 'jquery', 'lodash', 'constants'],
         FunctionForm.prototype.generatePropertiesForm = function (element, formConsole, formContainer) {
             var self = this;
             var id = $(element).parent().attr('id');
-            var clickedElement = self.configurationData.getSiddhiAppConfig().getFunction(id);
+            var functionObject = self.configurationData.getSiddhiAppConfig().getFunction(id);
             var propertyDiv = $('<div id="property-header"><h3>Function Configuration</h3></div>' +
                 '<div class = "function-form-container"> <div id = "define-function-name"> <h4> Name </h4> ' +
                 '<input type="text" id="functionName" class="clearfix name"><label class = "error-message" ' +
@@ -81,8 +81,8 @@ define(['require', 'log', 'jquery', 'lodash', 'constants'],
                 '<div id = "function-script-type"> </div> <div id= "function-return-type"> </div>' +
                 self.formUtils.buildFormButtons() + '</div>' +
                 '<div class = "function-form-container"> <div id="define-script-body"> <h4> Script Body: </h4> ' +
-                '<textarea id= "script-body-content" rows="5" cols="50"> </textarea> <label class = "error-message">' +
-                '</label> </div> </div>');
+                '<textarea id= "script-body-content" class="clearfix" rows="5" cols="50"> </textarea> ' +
+                '<label class = "error-message"></label> </div> </div>');
 
             formContainer.append(propertyDiv);
             self.formUtils.popUpSelectedElement(id);
@@ -91,14 +91,14 @@ define(['require', 'log', 'jquery', 'lodash', 'constants'],
 
             self.formUtils.addEventListenerToRemoveRequiredClass();
 
-            var name = clickedElement.getName();
+            var name = functionObject.getName();
             renderScriptType();
             renderReturnType();
             if (name) {
                 //if the function object is already edited
-                var scriptType = (clickedElement.getScriptType()).toLowerCase();
-                var returnType = (clickedElement.getReturnType()).toLowerCase();
-                var body = clickedElement.getBody().trim();
+                var scriptType = (functionObject.getScriptType()).toLowerCase();
+                var returnType = (functionObject.getReturnType()).toLowerCase();
+                var body = functionObject.getBody().trim();
 
                 //populate the saved values
                 $('#functionName').val(name.trim());
@@ -120,7 +120,7 @@ define(['require', 'log', 'jquery', 'lodash', 'constants'],
                 var isErrorOccurred = false;
 
                 var functionName = $('#functionName').val().trim();
-                var previouslySavedName = clickedElement.getName();
+                var previouslySavedName = functionObject.getName();
                 if (functionName === "") {
                     self.formUtils.addErrorClass($('#functionName'));
                     $('#functionNameErrorMessage').text("Function name is required.");
@@ -155,20 +155,20 @@ define(['require', 'log', 'jquery', 'lodash', 'constants'],
                 if (!isErrorOccurred) {
                     if (previouslySavedName !== functionName) {
                         // update selected trigger model
-                        clickedElement.setName(functionName);
+                        functionObject.setName(functionName);
                         self.formUtils.updateConnectionsAfterDefinitionElementNameChange(id);
                         var textNode = $(element).parent().find('.functionNameNode');
                         textNode.html(functionName);
                     }
                     var scriptType = $('#script-type').val();
                     var returnType = $('#return-type').val();
-                    clickedElement.setScriptType(scriptType.toUpperCase());
-                    clickedElement.setReturnType(returnType.toUpperCase());
-                    clickedElement.setBody(scriptBody);
+                    functionObject.setScriptType(scriptType.toUpperCase());
+                    functionObject.setReturnType(returnType.toUpperCase());
+                    functionObject.setBody(scriptBody);
 
                     $('#' + id).removeClass('incomplete-element');
                     //Send function element to the backend and generate tooltip
-                    var functionToolTip = self.formUtils.getTooltip(clickedElement, Constants.FUNCTION);
+                    var functionToolTip = self.formUtils.getTooltip(functionObject, Constants.FUNCTION);
                     $('#' + id).prop('title', functionToolTip);
 
                     self.designViewContainer.removeClass('disableContainer');

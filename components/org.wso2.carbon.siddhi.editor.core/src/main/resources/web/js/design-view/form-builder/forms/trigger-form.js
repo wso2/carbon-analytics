@@ -122,7 +122,7 @@ define(['require', 'log', 'jquery', 'lodash', 'constants'],
         TriggerForm.prototype.generatePropertiesForm = function (element, formConsole, formContainer) {
             var self = this;
             var id = $(element).parent().attr('id');
-            var clickedElement = self.configurationData.getSiddhiAppConfig().getTrigger(id);
+            var triggerObject = self.configurationData.getSiddhiAppConfig().getTrigger(id);
 
             var propertyDiv = $('<div id="property-header"><h3>Trigger Configuration</h3></div>' +
                 '<div class ="trigger-form-container"> <div id="define-trigger-name"> <h4>Name: </h4>' +
@@ -136,9 +136,9 @@ define(['require', 'log', 'jquery', 'lodash', 'constants'],
             self.designViewContainer.addClass('disableContainer');
             self.toggleViewButton.addClass('disableContainer');
 
-            var name = clickedElement.getName();
-            var triggerObject = self.configurationData.application.config.trigger;
-            renderTriggerCriteria(triggerObject);
+            var name = triggerObject.getName();
+            var triggerCriteriaObject = self.configurationData.application.config.trigger;
+            renderTriggerCriteria(triggerCriteriaObject);
 
             self.formUtils.addEventListenerToRemoveRequiredClass();
 
@@ -155,8 +155,8 @@ define(['require', 'log', 'jquery', 'lodash', 'constants'],
             if (name) {
                 //if the trigger object is already edited
                 $('#triggerName').val(name.trim());
-                var triggerCriteriaType = clickedElement.getCriteriaType().trim();
-                var triggerCriteria = clickedElement.getCriteria().trim();
+                var triggerCriteriaType = triggerObject.getCriteriaType().trim();
+                var triggerCriteria = triggerObject.getCriteria().trim();
                 if (triggerCriteriaType === Constants.AT) {
                     if (triggerCriteria.indexOf("'") >= 0 || triggerCriteria.indexOf('"') >= 0) {
                         //to remove the string quote from the start and cron expression
@@ -174,20 +174,20 @@ define(['require', 'log', 'jquery', 'lodash', 'constants'],
                 }).prop('selected', true);
 
                 $('#trigger-criteria-content input[type="text"]').val(triggerCriteria);
-                showTriggerCriteriaDescription(triggerObject, selectedCriteria)
+                showTriggerCriteriaDescription(triggerCriteriaObject, selectedCriteria)
             }
 
             //onchange of the triggerCriteria-type selection
             $('#trigger-criteria-type').change(function () {
                 renderTriggerCriteriaContent(this.value);
-                showTriggerCriteriaDescription(triggerObject, this.value)
+                showTriggerCriteriaDescription(triggerCriteriaObject, this.value)
                 if (triggerCriteria && this.value === selectedCriteria) {
                     if (this.value !== Constants.START) {
                         $('#trigger-criteria-content input[type="text"]').val(triggerCriteria);
                     }
                 } else {
                     if (this.value !== Constants.START) {
-                        var triggerCriteriaObject = getTriggerCriteria(triggerObject, this.value);
+                        var triggerCriteriaObject = getTriggerCriteria(triggerCriteriaObject, this.value);
                         $('#trigger-criteria-content input[type="text"]').val(triggerCriteriaObject.defaultValue);
                     }
                 }
@@ -208,7 +208,7 @@ define(['require', 'log', 'jquery', 'lodash', 'constants'],
                     isErrorOccurred = true;
                     return;
                 }
-                var previouslySavedName = clickedElement.getName();
+                var previouslySavedName = triggerObject.getName();
                 if (!previouslySavedName) {
                     previouslySavedName = "";
                 }
@@ -216,7 +216,7 @@ define(['require', 'log', 'jquery', 'lodash', 'constants'],
                 if (previouslySavedName !== triggerName) {
                     //check if name is already used
                     var isTriggerNameUsed = self.formUtils.isDefinitionElementNameUsed(triggerName,
-                        clickedElement.getId());
+                        triggerObject.getId());
                     if (isTriggerNameUsed) {
                         self.formUtils.addErrorClass('#triggerName');
                         $('#triggerNameErrorMessage').text("Trigger name is already used.");
@@ -245,7 +245,7 @@ define(['require', 'log', 'jquery', 'lodash', 'constants'],
                 if (!isErrorOccurred) {
                     if (previouslySavedName !== triggerName) {
                         // update selected trigger model
-                        clickedElement.setName(triggerName);
+                        triggerObject.setName(triggerName);
                         self.formUtils.updateConnectionsAfterDefinitionElementNameChange(id);
 
                         var textNode = $(element).parent().find('.triggerNameNode');
@@ -263,12 +263,12 @@ define(['require', 'log', 'jquery', 'lodash', 'constants'],
                         triggerCriteria = Constants.EVERY + " " + triggerCriteria;
                         triggerCriteriaType = Constants.EVERY;
                     }
-                    clickedElement.setCriteria(triggerCriteria);
-                    clickedElement.setCriteriaType(triggerCriteriaType);
+                    triggerObject.setCriteria(triggerCriteria);
+                    triggerObject.setCriteriaType(triggerCriteriaType);
 
                     $('#' + id).removeClass('incomplete-element');
                     //Send trigger element to the backend and generate tooltip
-                    var triggerToolTip = self.formUtils.getTooltip(clickedElement, Constants.TRIGGER);
+                    var triggerToolTip = self.formUtils.getTooltip(triggerObject, Constants.TRIGGER);
                     $('#' + id).prop('title', triggerToolTip);
 
                     // set the isDesignViewContentChanged to true

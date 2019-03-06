@@ -76,7 +76,7 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
             var selectType = aggregationElement.getSelect().getType().toLowerCase();
             if (selectType === Constants.TYPE_ALL) {
                 var elementConnectedToAggregation = self.configurationData.getSiddhiAppConfig().
-                    getDefinitionElementByName(aggregationElement.getFrom());
+                    getDefinitionElementByName(aggregationElement.getConnectedSource());
                 attributes = elementConnectedToAggregation.element.getAttributeList();
             } else {
                 _.forEach(aggregationElement.getSelect().getValue(), function (selectAttribute) {
@@ -264,23 +264,23 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
         JoinQueryForm.prototype.generatePropertiesForm = function (element, formConsole, formContainer) {
             var self = this;
             var id = $(element).parent().attr('id');
-            var clickedElement = self.configurationData.getSiddhiAppConfig().getJoinQuery(id);
+            var joinQueryObject = self.configurationData.getSiddhiAppConfig().getJoinQuery(id);
 
             var inValid = false;
-            if (!clickedElement.getQueryInput()
-                || !clickedElement.getQueryInput().getFirstConnectedElement()
-                || !clickedElement.getQueryInput().getSecondConnectedElement()) {
+            if (!joinQueryObject.getQueryInput()
+                || !joinQueryObject.getQueryInput().getFirstConnectedElement()
+                || !joinQueryObject.getQueryInput().getSecondConnectedElement()) {
                 DesignViewUtils.prototype.warnAlert('Connect two input elements to join query');
                 inValid = true;
 
-            } else if ((clickedElement.getQueryInput().getFirstConnectedElement() && !clickedElement.getQueryInput()
+            } else if ((joinQueryObject.getQueryInput().getFirstConnectedElement() && !joinQueryObject.getQueryInput()
                 .getFirstConnectedElement().name)
-                || (clickedElement.getQueryInput().getSecondConnectedElement() && !clickedElement.getQueryInput()
+                || (joinQueryObject.getQueryInput().getSecondConnectedElement() && !joinQueryObject.getQueryInput()
                     .getSecondConnectedElement().name)) {
                 DesignViewUtils.prototype.warnAlert('Fill the connected element to join query');
                 inValid = true;
 
-            } else if (!clickedElement.getQueryOutput() || !clickedElement.getQueryOutput().getTarget()) {
+            } else if (!joinQueryObject.getQueryOutput() || !joinQueryObject.getQueryOutput().getTarget()) {
                 DesignViewUtils.prototype.warnAlert('Connect an output element');
                 inValid = true;
             }
@@ -295,32 +295,32 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
                 self.toggleViewButton.addClass('disableContainer');
                 self.formUtils.popUpSelectedElement(id);
 
-                const QUERY_CONDITION_SYNTAX = self.configurationData.application.config.query_condition_syntax;
-                const RATE_LIMITING_SYNTAX = self.configurationData.application.config.other_query_syntax;
+                var QUERY_CONDITION_SYNTAX = self.configurationData.application.config.query_condition_syntax;
+                var RATE_LIMITING_SYNTAX = self.configurationData.application.config.other_query_syntax;
 
-                var firstConnectedElement = clickedElement.getQueryInput().getFirstConnectedElement();
-                var secondConnectedElement = clickedElement.getQueryInput().getSecondConnectedElement();
-                var leftSourceSavedData = clickedElement.getQueryInput().getLeft();
-                var rightSourceSavedData = clickedElement.getQueryInput().getRight();
-                var joinType = clickedElement.getQueryInput().getJoinType();
-                var queryName = clickedElement.getQueryName();
-                var on = clickedElement.getQueryInput().getOn();
-                var within = clickedElement.getQueryInput().getWithin();
-                var per = clickedElement.getQueryInput().getPer();
-                var groupBy = clickedElement.getGroupBy();
-                var having = clickedElement.getHaving();
-                var orderBy = clickedElement.getOrderBy();
-                var limit = clickedElement.getLimit();
-                var outputRateLimit = clickedElement.getOutputRateLimit();
-                var outputElementName = clickedElement.getQueryOutput().getTarget();
-                var queryInput = clickedElement.getQueryInput();
-                var queryOutput = clickedElement.getQueryOutput();
-                var select = clickedElement.getSelect();
-                var savedAnnotations = clickedElement.getAnnotationListObjects();
+                var firstConnectedElement = joinQueryObject.getQueryInput().getFirstConnectedElement();
+                var secondConnectedElement = joinQueryObject.getQueryInput().getSecondConnectedElement();
+                var leftSourceData = joinQueryObject.getQueryInput().getLeft();
+                var rightSourceData = joinQueryObject.getQueryInput().getRight();
+                var joinType = joinQueryObject.getQueryInput().getJoinType();
+                var queryName = joinQueryObject.getQueryName();
+                var on = joinQueryObject.getQueryInput().getOn();
+                var within = joinQueryObject.getQueryInput().getWithin();
+                var per = joinQueryObject.getQueryInput().getPer();
+                var groupBy = joinQueryObject.getGroupBy();
+                var having = joinQueryObject.getHaving();
+                var orderBy = joinQueryObject.getOrderBy();
+                var limit = joinQueryObject.getLimit();
+                var outputRateLimit = joinQueryObject.getOutputRateLimit();
+                var outputElementName = joinQueryObject.getQueryOutput().getTarget();
+                var queryInput = joinQueryObject.getQueryInput();
+                var queryOutput = joinQueryObject.getQueryOutput();
+                var select = joinQueryObject.getSelect();
+                var annotationListObjects = joinQueryObject.getAnnotationListObjects();
 
                 var possibleJoinTypes = self.configurationData.application.config.join_types;
                 var predefinedAnnotations = JSON.parse(JSON.stringify(self.configurationData.application.config.
-                    query_predefined_annotations));
+                    type_query_predefined_annotations));
                 var incrementalAggregator = self.configurationData.application.config.incremental_aggregator;
                 var streamHandlerTypes = self.configurationData.application.config.stream_handler_types;
                 var streamFunctions = self.formUtils.getStreamFunctionNames();
@@ -335,15 +335,15 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
                 self.formUtils.addEventListenerToRemoveRequiredClass();
 
                 //annotations
-                var userDefinedAnnotations = self.formUtils.getUserAnnotations(savedAnnotations,
+                predefinedAnnotations = self.formUtils.createObjectsForAnnotationsWithKeys(predefinedAnnotations);
+                var userDefinedAnnotations = self.formUtils.getUserAnnotations(annotationListObjects,
                     predefinedAnnotations);
                 self.formUtils.renderAnnotationTemplate("define-user-defined-annotations", userDefinedAnnotations);
                 $('.define-user-defined-annotations').find('h4').html('Customized Annotations');
+                self.formUtils.mapPredefinedAnnotations(annotationListObjects, predefinedAnnotations);
                 self.formUtils.renderPredefinedAnnotations(predefinedAnnotations,
                     'define-predefined-annotations');
-                self.formUtils.mapPredefinedAnnotations(savedAnnotations, predefinedAnnotations);
                 self.formUtils.renderOptionsForPredefinedAnnotations(predefinedAnnotations);
-                self.formUtils.addCheckedForUserSelectedPredefinedAnnotation(savedAnnotations, predefinedAnnotations);
                 self.formUtils.addEventListenersForPredefinedAnnotations();
 
                 //event listeners
@@ -390,40 +390,40 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
                 possibleSources.push(secondConnectedElement.name);
                 self.formUtils.renderLeftRightSource(Constants.LEFT);
                 self.formUtils.renderLeftRightSource(Constants.RIGHT);
-                self.formUtils.renderStreamHandler(Constants.LEFT, leftSourceSavedData, streamHandlerTypes);
-                self.formUtils.renderStreamHandler(Constants.RIGHT, rightSourceSavedData, streamHandlerTypes);
+                self.formUtils.renderStreamHandler(Constants.LEFT, leftSourceData, streamHandlerTypes);
+                self.formUtils.renderStreamHandler(Constants.RIGHT, rightSourceData, streamHandlerTypes);
                 self.formUtils.renderDropDown('.input-from-drop-down', possibleSources, Constants.SOURCE);
 
-                if (leftSourceSavedData && !rightSourceSavedData) {
-                    mapSourceType(Constants.LEFT, leftSourceSavedData.getFrom(), true);
-                    mapSourceType(Constants.RIGHT, leftSourceSavedData.getFrom(), false);
-                } else if (!leftSourceSavedData && rightSourceSavedData) {
-                    mapSourceType(Constants.RIGHT, rightSourceSavedData.getFrom(), true);
-                    mapSourceType(Constants.LEFT, rightSourceSavedData.getFrom(), false);
-                } else if (leftSourceSavedData && rightSourceSavedData) {
-                    mapSourceType(Constants.LEFT, leftSourceSavedData.getFrom(), true);
-                    mapSourceType(Constants.RIGHT, rightSourceSavedData.getFrom(), true);
-                } else if (!leftSourceSavedData && !rightSourceSavedData) {
+                if (leftSourceData && !rightSourceData) {
+                    mapSourceType(Constants.LEFT, leftSourceData.getConnectedSource(), true);
+                    mapSourceType(Constants.RIGHT, leftSourceData.getConnectedSource(), false);
+                } else if (!leftSourceData && rightSourceData) {
+                    mapSourceType(Constants.RIGHT, rightSourceData.getConnectedSource(), true);
+                    mapSourceType(Constants.LEFT, rightSourceData.getConnectedSource(), false);
+                } else if (leftSourceData && rightSourceData) {
+                    mapSourceType(Constants.LEFT, leftSourceData.getConnectedSource(), true);
+                    mapSourceType(Constants.RIGHT, rightSourceData.getConnectedSource(), true);
+                } else if (!leftSourceData && !rightSourceData) {
                     mapSourceType(Constants.LEFT, firstConnectedElement.name, true);
                     mapSourceType(Constants.RIGHT, secondConnectedElement.name, true);
                 }
 
                 //source-as
-                mapSourceAs(leftSourceSavedData, Constants.LEFT);
-                mapSourceAs(rightSourceSavedData, Constants.RIGHT);
+                mapSourceAs(leftSourceData, Constants.LEFT);
+                mapSourceAs(rightSourceData, Constants.RIGHT);
 
                 //map-streamHandler
                 var streamHandlerList = [];
-                getStreamHandlers(leftSourceSavedData, streamHandlerList, Constants.LEFT);
-                getStreamHandlers(rightSourceSavedData, streamHandlerList, Constants.RIGHT);
+                getStreamHandlers(leftSourceData, streamHandlerList, Constants.LEFT);
+                getStreamHandlers(rightSourceData, streamHandlerList, Constants.RIGHT);
                 self.formUtils.addEventListenersForStreamHandlersDiv(streamHandlerList);
 
-                self.formUtils.mapStreamHandler(leftSourceSavedData, Constants.LEFT)
-                self.formUtils.mapStreamHandler(rightSourceSavedData, Constants.RIGHT)
+                self.formUtils.mapStreamHandler(leftSourceData, Constants.LEFT)
+                self.formUtils.mapStreamHandler(rightSourceData, Constants.RIGHT)
 
                 //is unidirectional
-                mapUnidirectionalCheckbox(leftSourceSavedData, Constants.LEFT);
-                mapUnidirectionalCheckbox(rightSourceSavedData, Constants.RIGHT);
+                mapUnidirectionalCheckbox(leftSourceData, Constants.LEFT);
+                mapUnidirectionalCheckbox(rightSourceData, Constants.RIGHT);
 
                 var possibleAttributes = [];
                 var firstElementAttributes = getPossibleAttributes(self, firstConnectedElement.name);
@@ -435,7 +435,7 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
                 self.formUtils.selectQueryProjection(select, outputElementName);
                 self.formUtils.addEventListenersForSelectionDiv();
 
-                if (leftSourceSavedData && rightSourceSavedData) {
+                if (leftSourceData && rightSourceData) {
                     if (having) {
                         $('.post-condition-value').val(having);
                         $(".post-filter-checkbox").prop("checked", true);
@@ -607,25 +607,25 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
 
                     if (!isErrorOccurred) {
                         if (queryName != "") {
-							clickedElement.addQueryName(queryName);
-						} else {
-							queryName = "Join Query";
-							clickedElement.addQueryName('query');
-						}
+                            joinQueryObject.addQueryName(queryName);
+                        } else {
+                            queryName = "Join Query";
+                            joinQueryObject.addQueryName('query');
+                        }
 
                         if ($('.group-by-checkbox').is(':checked')) {
                             var groupByAttributes = self.formUtils.buildGroupBy();
-                            clickedElement.setGroupBy(groupByAttributes);
+                            joinQueryObject.setGroupBy(groupByAttributes);
                         } else {
-                            clickedElement.setGroupBy(undefined);
+                            joinQueryObject.setGroupBy(undefined);
                         }
 
-                        clickedElement.clearOrderByValueList()
+                        joinQueryObject.clearOrderByValueList()
                         if ($('.order-by-checkbox').is(':checked')) {
                             var orderByAttributes = self.formUtils.buildOrderBy();
                             _.forEach(orderByAttributes, function (attribute) {
                                 var orderByValueObject = new QueryOrderByValue(attribute);
-                                clickedElement.addOrderByValue(orderByValueObject);
+                                joinQueryObject.addOrderByValue(orderByValueObject);
                             });
                         }
 
@@ -636,21 +636,21 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
                         }
 
                         if ($('.post-filter-checkbox').is(':checked')) {
-                            clickedElement.setHaving($('.post-condition-value').val().trim());
+                            joinQueryObject.setHaving($('.post-condition-value').val().trim());
                         } else {
-                            clickedElement.setHaving(undefined)
+                            joinQueryObject.setHaving(undefined)
                         }
 
                         if ($('.limit-checkbox').is(':checked')) {
-                            clickedElement.setLimit($('.limit-value').val().trim())
+                            joinQueryObject.setLimit($('.limit-value').val().trim())
                         } else {
-                            clickedElement.setLimit(undefined)
+                            joinQueryObject.setLimit(undefined)
                         }
 
                         if ($('.rate-limiting-checkbox').is(':checked')) {
-                            clickedElement.setOutputRateLimit($('.rate-limiting-value').val().trim())
+                            joinQueryObject.setOutputRateLimit($('.rate-limiting-value').val().trim())
                         } else {
-                            clickedElement.setOutputRateLimit(undefined)
+                            joinQueryObject.setOutputRateLimit(undefined)
                         }
 
                         if (firstConnectedElement.type.toLowerCase() === Constants.AGGREGATION ||
@@ -660,7 +660,7 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
                         }
 
                         var selectObject = new QuerySelect(self.formUtils.buildAttributeSelection(Constants.JOIN_QUERY));
-                        clickedElement.setSelect(selectObject);
+                        joinQueryObject.setSelect(selectObject);
 
                         var annotationObjectList = [];
                         var annotationStringList = [];
@@ -668,14 +668,14 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
                         self.formUtils.buildAnnotation(annotationNodes, annotationStringList, annotationObjectList);
                         self.formUtils.buildPredefinedAnnotations(predefinedAnnotations, annotationStringList,
                             annotationObjectList);
-                        clickedElement.clearAnnotationList();
-                        clickedElement.clearAnnotationListObjects();
+                        joinQueryObject.clearAnnotationList();
+                        joinQueryObject.clearAnnotationListObjects();
                         //add the annotations to the clicked element
                         _.forEach(annotationStringList, function (annotation) {
-                            clickedElement.addAnnotation(annotation);
+                            joinQueryObject.addAnnotation(annotation);
                         });
                         _.forEach(annotationObjectList, function (annotation) {
-                            clickedElement.addAnnotationObject(annotation);
+                            joinQueryObject.addAnnotationObject(annotation);
                         });
 
                         queryInput.setLeft(buildSource(Constants.LEFT, self));
@@ -710,7 +710,7 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
                         queryOutput.setTarget(outputTarget);
                         queryOutput.setType(Constants.INSERT);
 
-                        var isValid = JSONValidator.prototype.validateJoinQuery(clickedElement, false);
+                        var isValid = JSONValidator.prototype.validateJoinQuery(joinQueryObject, false);
                         if (!isValid) {
                             isErrorOccurred = true;
                             return;
@@ -722,9 +722,9 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
                         self.toggleViewButton.removeClass('disableContainer');
 
                         //Send join-query element to the backend and generate tooltip
-                        var queryToolTip = self.formUtils.getTooltip(clickedElement, Constants.JOIN_QUERY);
+                        var queryToolTip = self.formUtils.getTooltip(joinQueryObject, Constants.JOIN_QUERY);
                         $('#' + id).prop('title', queryToolTip);
-                        var textNode = $('#' + clickedElement.getId()).find('.joinQueryNameNode');
+                        var textNode = $('#' + joinQueryObject.getId()).find('.joinQueryNameNode');
                         textNode.html(queryName);
 
                         // close the form window

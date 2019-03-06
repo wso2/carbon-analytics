@@ -1121,16 +1121,26 @@
 <script id="recursive-predefined-annotation-partial" type="text/template">
     <div id="{{name}}-annotation">
         {{#if optional}}
-            <label class = "annotation-name optional-annotation">
-                <input type = "checkbox" class = "annotation-checkbox"> @{{name}}
-            </label>
+            {{#if isChecked}}
+                <label class = "annotation-name optional-annotation">
+                    <input type = "checkbox" class = "annotation-checkbox" checked> @{{name}}
+                </label>
+            {{else}}
+                <label class = "annotation-name optional-annotation">
+                    <input type = "checkbox" class = "annotation-checkbox"> @{{name}}
+                </label>
+            {{/if}}
         {{else}}
             <label class = "mandatory-annotation-symbol"> * </label>
             <label class = "annotation-name mandatory-annotation">
                 @{{name}}
             </label>
         {{/if}}
-        <div class="annotation-content">
+        {{#if isChecked}}
+            <div class="annotation-content">
+        {{else}}
+            <div class="annotation-content" style="display: none">
+        {{/if}}
             <div id = "{{name}}-options-div" class="annotation-options"> </div>
             {{#if annotations}}
                 {{#each annotations}}
@@ -2470,37 +2480,30 @@
                 ]
             }
             ],
-            primary_index_annotations: [
+            //todo: add desc for options
+            type_table_predefined_annotations: [
             {
                 name: "primaryKey",
-                values: [{
-                    value: ""
-                }],
-                isChecked: false
+                optional: true
             },
             {
                 name: "index",
-                values: [{
-                    value: ""
-                }],
-                isChecked: false
+                optional: true
             }
             ],
-            aggregation_predefined_annotations: [
+            type_aggregation_predefined_annotations: [
                 {
                     name: "purge",
                     optional: true,
                     parameters: [
                         {
                             name: "enable",
-                            value: "",
                             defaultValue: "true",
                             optional: true,
                             type: ["BOOL"]
                         },
                         {
                             name: "interval",
-                            value: "",
                             defaultValue: "10 sec",
                             optional: true,
                             type: ["INT", "LONG", "TIME"]
@@ -2512,48 +2515,36 @@
                         parameters: [
                             {
                                 name: "sec",
-                                possibleNames: ["sec","second","seconds"],
-                                value: "",
                                 defaultValue: "120 sec",
                                 optional: true,
                                 type: ["INT", "LONG", "TIME"]
                             },
                             {
                                 name: "min",
-                                possibleNames: ["min","minute","minutes"],
-                                value: "",
                                 defaultValue: "24 hours",
                                 optional: true,
                                 type: ["INT", "LONG", "TIME"]
                             },
                             {
                                 name: "hours",
-                                possibleNames: ["hour","hours"],
-                                value: "",
                                 defaultValue: "30 days",
                                 optional: true,
                                 type: ["INT", "LONG", "TIME"]
                             },
                             {
                                 name: "days",
-                                possibleNames: ["day","days"],
-                                value: "",
                                 defaultValue: "1 year",
                                 optional: true,
                                 type: ["INT", "LONG", "TIME"]
                             },
                             {
                                 name: "months",
-                                possibleNames: ["month","months"],
-                                value: "",
                                 defaultValue: "all",
                                 optional: true,
                                 type: ["INT", "LONG", "TIME"]
                             },
                             {
                                 name: "years",
-                                possibleNames: ["year","years"],
-                                value: "",
                                 defaultValue: "all",
                                 optional: true,
                                 type: ["INT", "LONG", "TIME"]
@@ -2568,29 +2559,30 @@
                     parameters: [
                         {
                             name: "enable",
-                            value: "",
                             defaultValue: "true",
                             optional: true,
                             type: ["BOOL"]
                         }
                     ]
+                },
+                {
+                    name: "index",
+                    optional: true
                 }
             ],
-            query_predefined_annotations: [
+            type_query_predefined_annotations: [
                 {
                     name: "dist",
                     optional: true,
                     parameters: [
                         {
                             name: "execGroup",
-                            value: "",
                             defaultValue: "group-1",
                             optional: true,
                             type: ["STRING"]
                         },
                         {
                             name: "parallel",
-                            value: "",
                             defaultValue: "1",
                             optional: true,
                             type: ["INT"]

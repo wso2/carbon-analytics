@@ -110,16 +110,16 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
         SequenceQueryForm.prototype.generatePropertiesForm = function (element, formConsole, formContainer) {
             var self = this;
             var id = $(element).parent().attr('id');
-            var clickedElement = self.configurationData.getSiddhiAppConfig().getSequenceQuery(id);
+            var sequenceQueryObject = self.configurationData.getSiddhiAppConfig().getSequenceQuery(id);
 
-            if (!clickedElement.getQueryInput()
-                || clickedElement.getQueryInput().getConnectedElementNameList().length === 0) {
+            if (!sequenceQueryObject.getQueryInput()
+                || sequenceQueryObject.getQueryInput().getConnectedElementNameList().length === 0) {
                 DesignViewUtils.prototype.warnAlert('Connect input streams');
                 self.consoleListManager.removeFormConsole(formConsole);
-            } else if (!self.formUtils.isOneElementFilled(clickedElement.getQueryInput().getConnectedElementNameList())) {
+            } else if (!self.formUtils.isOneElementFilled(sequenceQueryObject.getQueryInput().getConnectedElementNameList())) {
                 DesignViewUtils.prototype.warnAlert('Fill the incomplete input stream');
                 self.consoleListManager.removeFormConsole(formConsole);
-            } else if (!clickedElement.getQueryOutput() || !clickedElement.getQueryOutput().getTarget()) {
+            } else if (!sequenceQueryObject.getQueryOutput() || !sequenceQueryObject.getQueryOutput().getTarget()) {
                 DesignViewUtils.prototype.warnAlert('Connect an output element');
                 self.consoleListManager.removeFormConsole(formConsole);
             } else {
@@ -131,26 +131,26 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
                 self.toggleViewButton.addClass('disableContainer');
                 self.formUtils.popUpSelectedElement(id);
 
-                const QUERY_CONDITION_SYNTAX = self.configurationData.application.config.query_condition_syntax;
-                const QUERY_SYNTAX = self.configurationData.application.config.other_query_syntax;
+                var QUERY_CONDITION_SYNTAX = self.configurationData.application.config.query_condition_syntax;
+                var QUERY_SYNTAX = self.configurationData.application.config.other_query_syntax;
 
                 var incrementalAggregator = self.configurationData.application.config.incremental_aggregator;
-                var queryName = clickedElement.getQueryName();
-                var conditionList = clickedElement.getQueryInput().getConditionList();
-                var logic = clickedElement.getQueryInput().getLogic();
-                var groupBy = clickedElement.getGroupBy();
-                var having = clickedElement.getHaving();
-                var orderBy = clickedElement.getOrderBy();
-                var limit = clickedElement.getLimit();
-                var outputRateLimit = clickedElement.getOutputRateLimit();
-                var outputElementName = clickedElement.getQueryOutput().getTarget();
-                var select = clickedElement.getSelect();
-                var savedAnnotations = clickedElement.getAnnotationListObjects();
-                var queryInput = clickedElement.getQueryInput();
-                var queryOutput = clickedElement.getQueryOutput();
+                var queryName = sequenceQueryObject.getQueryName();
+                var conditionList = sequenceQueryObject.getQueryInput().getConditionList();
+                var logic = sequenceQueryObject.getQueryInput().getLogic();
+                var groupBy = sequenceQueryObject.getGroupBy();
+                var having = sequenceQueryObject.getHaving();
+                var orderBy = sequenceQueryObject.getOrderBy();
+                var limit = sequenceQueryObject.getLimit();
+                var outputRateLimit = sequenceQueryObject.getOutputRateLimit();
+                var outputElementName = sequenceQueryObject.getQueryOutput().getTarget();
+                var select = sequenceQueryObject.getSelect();
+                var annotationListObjects = sequenceQueryObject.getAnnotationListObjects();
+                var queryInput = sequenceQueryObject.getQueryInput();
+                var queryOutput = sequenceQueryObject.getQueryOutput();
 
                 var predefinedAnnotations = JSON.parse(JSON.stringify(self.configurationData.application.config.
-                    query_predefined_annotations));
+                    type_query_predefined_annotations));
                 var streamFunctions = self.formUtils.getStreamFunctionNames();
 
                 //render the sequence-query form template
@@ -180,18 +180,18 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
                 }
 
                 //annotations
-                var userDefinedAnnotations = self.formUtils.getUserAnnotations(savedAnnotations,
+                predefinedAnnotations = self.formUtils.createObjectsForAnnotationsWithKeys(predefinedAnnotations);
+                var userDefinedAnnotations = self.formUtils.getUserAnnotations(annotationListObjects,
                     predefinedAnnotations);
                 self.formUtils.renderAnnotationTemplate("define-user-defined-annotations", userDefinedAnnotations);
                 $('.define-user-defined-annotations').find('h4').html('Customized Annotations');
+                self.formUtils.mapPredefinedAnnotations(annotationListObjects, predefinedAnnotations);
                 self.formUtils.renderPredefinedAnnotations(predefinedAnnotations,
                     'define-predefined-annotations');
-                self.formUtils.mapPredefinedAnnotations(savedAnnotations, predefinedAnnotations);
                 self.formUtils.renderOptionsForPredefinedAnnotations(predefinedAnnotations);
-                self.formUtils.addCheckedForUserSelectedPredefinedAnnotation(savedAnnotations, predefinedAnnotations);
                 self.formUtils.addEventListenersForPredefinedAnnotations();
 
-                var connectedStreams = clickedElement.getQueryInput().getConnectedElementNameList();
+                var connectedStreams = sequenceQueryObject.getQueryInput().getConnectedElementNameList();
                 var inputStreamNames = [];
                 _.forEach(connectedStreams, function (streamName) {
                     if (streamName) {
@@ -360,51 +360,51 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
 
                     if (!isErrorOccurred) {
                         if (queryName != "") {
-                            clickedElement.addQueryName(queryName);
+                            sequenceQueryObject.addQueryName(queryName);
                         } else {
                             queryName = "Sequence Query";
-                            clickedElement.addQueryName('query');
+                            sequenceQueryObject.addQueryName('query');
                         }
 
                         if ($('.group-by-checkbox').is(':checked')) {
                             var groupByAttributes = self.formUtils.buildGroupBy();
-                            clickedElement.setGroupBy(groupByAttributes);
+                            sequenceQueryObject.setGroupBy(groupByAttributes);
                         } else {
-                            clickedElement.setGroupBy(undefined);
+                            sequenceQueryObject.setGroupBy(undefined);
                         }
 
-                        clickedElement.clearOrderByValueList()
+                        sequenceQueryObject.clearOrderByValueList()
                         if ($('.order-by-checkbox').is(':checked')) {
                             var orderByAttributes = self.formUtils.buildOrderBy();
                             _.forEach(orderByAttributes, function (attribute) {
                                 var orderByValueObject = new QueryOrderByValue(attribute);
-                                clickedElement.addOrderByValue(orderByValueObject);
+                                sequenceQueryObject.addOrderByValue(orderByValueObject);
                             });
                         }
 
                         if ($('.post-filter-checkbox').is(':checked')) {
-                            clickedElement.setHaving($('.post-condition-value').val().trim());
+                            sequenceQueryObject.setHaving($('.post-condition-value').val().trim());
                         } else {
-                            clickedElement.setHaving(undefined)
+                            sequenceQueryObject.setHaving(undefined)
                         }
 
                         if ($('.limit-checkbox').is(':checked')) {
-                            clickedElement.setLimit($('.limit-value').val().trim())
+                            sequenceQueryObject.setLimit($('.limit-value').val().trim())
                         } else {
-                            clickedElement.setLimit(undefined)
+                            sequenceQueryObject.setLimit(undefined)
                         }
 
                         if ($('.rate-limiting-checkbox').is(':checked')) {
-                            clickedElement.setOutputRateLimit($('.rate-limiting-value').val().trim())
+                            sequenceQueryObject.setOutputRateLimit($('.rate-limiting-value').val().trim())
                         } else {
-                            clickedElement.setOutputRateLimit(undefined)
+                            sequenceQueryObject.setOutputRateLimit(undefined)
                         }
 
                         queryInput.setLogic($('.logic-statement').val().trim());
 
                         var selectObject = new QuerySelect(self.formUtils.buildAttributeSelection(Constants
                             .SEQUENCE_QUERY));
-                        clickedElement.setSelect(selectObject);
+                        sequenceQueryObject.setSelect(selectObject);
 
                         queryInput.clearConditionList();
                         var conditions = self.formUtils.buildConditions();
@@ -418,14 +418,14 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
                         self.formUtils.buildAnnotation(annotationNodes, annotationStringList, annotationObjectList);
                         self.formUtils.buildPredefinedAnnotations(predefinedAnnotations, annotationStringList,
                             annotationObjectList);
-                        clickedElement.clearAnnotationList();
-                        clickedElement.clearAnnotationListObjects();
+                        sequenceQueryObject.clearAnnotationList();
+                        sequenceQueryObject.clearAnnotationListObjects();
                         //add the annotations to the clicked element
                         _.forEach(annotationStringList, function (annotation) {
-                            clickedElement.addAnnotation(annotation);
+                            sequenceQueryObject.addAnnotation(annotation);
                         });
                         _.forEach(annotationObjectList, function (annotation) {
-                            clickedElement.addAnnotationObject(annotation);
+                            sequenceQueryObject.addAnnotationObject(annotation);
                         });
 
                         var outputTarget = $('.query-into').val().trim()
@@ -436,7 +436,7 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
                         queryOutput.setTarget(outputTarget);
                         queryOutput.setType(Constants.INSERT);
 
-                        var isValid = JSONValidator.prototype.validatePatternOrSequenceQuery(clickedElement,
+                        var isValid = JSONValidator.prototype.validatePatternOrSequenceQuery(sequenceQueryObject,
                             Constants.SEQUENCE_QUERY, false);
                         if (!isValid) {
                             isErrorOccurred = true;
@@ -449,7 +449,7 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
                         self.toggleViewButton.removeClass('disableContainer');
 
                         //Send sequence-query element to the backend and generate tooltip
-                        var queryToolTip = self.formUtils.getTooltip(clickedElement, Constants.SEQUENCE_QUERY);
+                        var queryToolTip = self.formUtils.getTooltip(sequenceQueryObject, Constants.SEQUENCE_QUERY);
                         $('#' + id).prop('title', queryToolTip);
                         var textNode = $('#' + id).find('.sequenceQueryNameNode');
                         textNode.html(queryName);

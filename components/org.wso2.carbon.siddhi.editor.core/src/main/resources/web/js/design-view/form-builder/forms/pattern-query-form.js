@@ -96,7 +96,7 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
          * condition's connected stream is changed
          */
         var generateDivRequiringPossibleAttributes = function (self, partitionId, groupBy, orderBy) {
-            possibleAttributes = getPossibleAttributes(self, partitionId);
+            var possibleAttributes = getPossibleAttributes(self, partitionId);
             self.formUtils.generateGroupByDiv(groupBy, possibleAttributes);
             self.formUtils.generateOrderByDiv(orderBy, possibleAttributes);
         };
@@ -110,16 +110,16 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
         PatternQueryForm.prototype.generatePropertiesForm = function (element, formConsole, formContainer) {
             var self = this;
             var id = $(element).parent().attr('id');
-            var clickedElement = self.configurationData.getSiddhiAppConfig().getPatternQuery(id);
+            var patternQueryObject = self.configurationData.getSiddhiAppConfig().getPatternQuery(id);
 
-            if (!clickedElement.getQueryInput()
-                || clickedElement.getQueryInput().getConnectedElementNameList().length === 0) {
+            if (!patternQueryObject.getQueryInput()
+                || patternQueryObject.getQueryInput().getConnectedElementNameList().length === 0) {
                 DesignViewUtils.prototype.warnAlert('Connect input streams');
                 self.consoleListManager.removeFormConsole(formConsole);
-            } else if (!self.formUtils.isOneElementFilled(clickedElement.getQueryInput().getConnectedElementNameList())) {
+            } else if (!self.formUtils.isOneElementFilled(patternQueryObject.getQueryInput().getConnectedElementNameList())) {
                 DesignViewUtils.prototype.warnAlert('Fill the incomplete input stream');
                 self.consoleListManager.removeFormConsole(formConsole);
-            } else if (!clickedElement.getQueryOutput() || !clickedElement.getQueryOutput().getTarget()) {
+            } else if (!patternQueryObject.getQueryOutput() || !patternQueryObject.getQueryOutput().getTarget()) {
                 DesignViewUtils.prototype.warnAlert('Connect an output element');
                 self.consoleListManager.removeFormConsole(formConsole);
             } else {
@@ -131,26 +131,26 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
                 self.toggleViewButton.addClass('disableContainer');
                 self.formUtils.popUpSelectedElement(id);
 
-                const QUERY_CONDITION_SYNTAX = self.configurationData.application.config.query_condition_syntax;
-                const QUERY_SYNTAX = self.configurationData.application.config.other_query_syntax;
+                var QUERY_CONDITION_SYNTAX = self.configurationData.application.config.query_condition_syntax;
+                var QUERY_SYNTAX = self.configurationData.application.config.other_query_syntax;
 
                 var incrementalAggregator = self.configurationData.application.config.incremental_aggregator;
-                var queryName = clickedElement.getQueryName();
-                var conditionList = clickedElement.getQueryInput().getConditionList();
-                var logic = clickedElement.getQueryInput().getLogic();
-                var groupBy = clickedElement.getGroupBy();
-                var having = clickedElement.getHaving();
-                var orderBy = clickedElement.getOrderBy();
-                var limit = clickedElement.getLimit();
-                var outputRateLimit = clickedElement.getOutputRateLimit();
-                var outputElementName = clickedElement.getQueryOutput().getTarget();
-                var select = clickedElement.getSelect();
-                var savedAnnotations = clickedElement.getAnnotationListObjects();
-                var queryInput = clickedElement.getQueryInput();
-                var queryOutput = clickedElement.getQueryOutput();
+                var queryName = patternQueryObject.getQueryName();
+                var conditionList = patternQueryObject.getQueryInput().getConditionList();
+                var logic = patternQueryObject.getQueryInput().getLogic();
+                var groupBy = patternQueryObject.getGroupBy();
+                var having = patternQueryObject.getHaving();
+                var orderBy = patternQueryObject.getOrderBy();
+                var limit = patternQueryObject.getLimit();
+                var outputRateLimit = patternQueryObject.getOutputRateLimit();
+                var outputElementName = patternQueryObject.getQueryOutput().getTarget();
+                var select = patternQueryObject.getSelect();
+                var annotationListObjects = patternQueryObject.getAnnotationListObjects();
+                var queryInput = patternQueryObject.getQueryInput();
+                var queryOutput = patternQueryObject.getQueryOutput();
 
                 var predefinedAnnotations = JSON.parse(JSON.stringify(self.configurationData.application.config.
-                    query_predefined_annotations));
+                    type_query_predefined_annotations));
                 var streamFunctions = self.formUtils.getStreamFunctionNames();
 
                 //render the pattern-query form template
@@ -180,18 +180,18 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
                 }
 
                 //annotations
-                var userDefinedAnnotations = self.formUtils.getUserAnnotations(savedAnnotations,
+                predefinedAnnotations = self.formUtils.createObjectsForAnnotationsWithKeys(predefinedAnnotations);
+                var userDefinedAnnotations = self.formUtils.getUserAnnotations(annotationListObjects,
                     predefinedAnnotations);
                 self.formUtils.renderAnnotationTemplate("define-user-defined-annotations", userDefinedAnnotations);
                 $('.define-user-defined-annotations').find('h4').html('Customized Annotations');
+                self.formUtils.mapPredefinedAnnotations(annotationListObjects, predefinedAnnotations);
                 self.formUtils.renderPredefinedAnnotations(predefinedAnnotations,
                     'define-predefined-annotations');
-                self.formUtils.mapPredefinedAnnotations(savedAnnotations, predefinedAnnotations);
                 self.formUtils.renderOptionsForPredefinedAnnotations(predefinedAnnotations);
-                self.formUtils.addCheckedForUserSelectedPredefinedAnnotation(savedAnnotations, predefinedAnnotations);
                 self.formUtils.addEventListenersForPredefinedAnnotations();
 
-                var connectedStreams = clickedElement.getQueryInput().getConnectedElementNameList();
+                var connectedStreams = patternQueryObject.getQueryInput().getConnectedElementNameList();
                 var inputStreamNames = [];
                 _.forEach(connectedStreams, function (streamName) {
                     if (streamName) {
@@ -360,50 +360,50 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
 
                     if (!isErrorOccurred) {
                         if (queryName != "") {
-                            clickedElement.addQueryName(queryName);
+                            patternQueryObject.addQueryName(queryName);
                         } else {
                             queryName = "Pattern Query";
-                            clickedElement.addQueryName('query');
+                            patternQueryObject.addQueryName('query');
                         }
 
                         if ($('.group-by-checkbox').is(':checked')) {
                             var groupByAttributes = self.formUtils.buildGroupBy();
-                            clickedElement.setGroupBy(groupByAttributes);
+                            patternQueryObject.setGroupBy(groupByAttributes);
                         } else {
-                            clickedElement.setGroupBy(undefined);
+                            patternQueryObject.setGroupBy(undefined);
                         }
 
-                        clickedElement.clearOrderByValueList()
+                        patternQueryObject.clearOrderByValueList()
                         if ($('.order-by-checkbox').is(':checked')) {
                             var orderByAttributes = self.formUtils.buildOrderBy();
                             _.forEach(orderByAttributes, function (attribute) {
                                 var orderByValueObject = new QueryOrderByValue(attribute);
-                                clickedElement.addOrderByValue(orderByValueObject);
+                                patternQueryObject.addOrderByValue(orderByValueObject);
                             });
                         }
 
                         if ($('.post-filter-checkbox').is(':checked')) {
-                            clickedElement.setHaving($('.post-condition-value').val().trim());
+                            patternQueryObject.setHaving($('.post-condition-value').val().trim());
                         } else {
-                            clickedElement.setHaving(undefined)
+                            patternQueryObject.setHaving(undefined)
                         }
 
                         if ($('.limit-checkbox').is(':checked')) {
-                            clickedElement.setLimit($('.limit-value').val().trim())
+                            patternQueryObject.setLimit($('.limit-value').val().trim())
                         } else {
-                            clickedElement.setLimit(undefined)
+                            patternQueryObject.setLimit(undefined)
                         }
 
                         if ($('.rate-limiting-checkbox').is(':checked')) {
-                            clickedElement.setOutputRateLimit($('.rate-limiting-value').val().trim())
+                            patternQueryObject.setOutputRateLimit($('.rate-limiting-value').val().trim())
                         } else {
-                            clickedElement.setOutputRateLimit(undefined)
+                            patternQueryObject.setOutputRateLimit(undefined)
                         }
 
                         queryInput.setLogic($('.logic-statement').val().trim());
 
                         var selectObject = new QuerySelect(self.formUtils.buildAttributeSelection(Constants.PATTERN_QUERY));
-                        clickedElement.setSelect(selectObject);
+                        patternQueryObject.setSelect(selectObject);
 
                         queryInput.clearConditionList();
                         var conditions = self.formUtils.buildConditions();
@@ -417,14 +417,14 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
                         self.formUtils.buildAnnotation(annotationNodes, annotationStringList, annotationObjectList);
                         self.formUtils.buildPredefinedAnnotations(predefinedAnnotations, annotationStringList,
                             annotationObjectList);
-                        clickedElement.clearAnnotationList();
-                        clickedElement.clearAnnotationListObjects();
+                        patternQueryObject.clearAnnotationList();
+                        patternQueryObject.clearAnnotationListObjects();
                         //add the annotations to the clicked element
                         _.forEach(annotationStringList, function (annotation) {
-                            clickedElement.addAnnotation(annotation);
+                            patternQueryObject.addAnnotation(annotation);
                         });
                         _.forEach(annotationObjectList, function (annotation) {
-                            clickedElement.addAnnotationObject(annotation);
+                            patternQueryObject.addAnnotationObject(annotation);
                         });
 
                         var outputTarget = $('.query-into').val().trim()
@@ -435,7 +435,7 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
                         queryOutput.setTarget(outputTarget);
                         queryOutput.setType(Constants.INSERT);
 
-                        var isValid = JSONValidator.prototype.validatePatternOrSequenceQuery(clickedElement,
+                        var isValid = JSONValidator.prototype.validatePatternOrSequenceQuery(patternQueryObject,
                             Constants.PATTERN_QUERY, false);
                         if (!isValid) {
                             isErrorOccurred = true;
@@ -448,7 +448,7 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
                         self.toggleViewButton.removeClass('disableContainer');
 
                         //Send pattern-query element to the backend and generate tooltip
-                        var queryToolTip = self.formUtils.getTooltip(clickedElement, Constants.PATTERN_QUERY);
+                        var queryToolTip = self.formUtils.getTooltip(patternQueryObject, Constants.PATTERN_QUERY);
                         $('#' + id).prop('title', queryToolTip);
                         var textNode = $('#' + id).find('.patternQueryNameNode');
                         textNode.html(queryName);

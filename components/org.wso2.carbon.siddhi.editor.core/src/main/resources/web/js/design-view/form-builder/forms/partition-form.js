@@ -44,12 +44,12 @@ define(['require', 'log', 'jquery', 'lodash', 'partitionWith', 'jsonValidator', 
          */
         var ifStreamsAreFilled = function (partitionWithList) {
             var isFilled = false;
-            for (var partitionKey of partitionWithList) {
+            _.forEach(partitionWithList, function (partitionKey) {
                 if (partitionKey.getStreamName()) {
                     isFilled = true;
-                    break;
+                    return false;
                 }
-            }
+            });
             return isFilled;
         };
 
@@ -62,8 +62,8 @@ define(['require', 'log', 'jquery', 'lodash', 'partitionWith', 'jsonValidator', 
         PartitionForm.prototype.generatePropertiesForm = function (element, formConsole, formContainer) {
             var self = this;
             var id = $(element).parent().attr('id');
-            var clickedElement = self.configurationData.getSiddhiAppConfig().getPartition(id);
-            var partitionWithList = clickedElement.getPartitionWith();
+            var partitionObject = self.configurationData.getSiddhiAppConfig().getPartition(id);
+            var partitionWithList = partitionObject.getPartitionWith();
 
             if (!partitionWithList || partitionWithList.length === 0) {
                 $("#" + id).addClass('incomplete-element');
@@ -88,7 +88,7 @@ define(['require', 'log', 'jquery', 'lodash', 'partitionWith', 'jsonValidator', 
                     var propertyDiv = $('<div id="property-header"><h3>Partition Configuration</h3></div>' +
                         '<div class = "partition-form-container"> <div id = "define-partition-keys"> </div> ' +
                         self.formUtils.buildFormButtons() + '</div>' +
-                        '<div class = "partition-form-container"> <div id = "define-annotation"> </div> </div>');
+                        '<div class = "partition-form-container"> <div class = "define-annotation"> </div> </div>');
 
                     formContainer.append(propertyDiv);
                     self.formUtils.popUpSelectedElement(id);
@@ -96,9 +96,8 @@ define(['require', 'log', 'jquery', 'lodash', 'partitionWith', 'jsonValidator', 
                     self.designViewContainer.addClass('disableContainer');
                     self.toggleViewButton.addClass('disableContainer');
 
-                    var savedAnnotations = [];
-                    savedAnnotations = clickedElement.getAnnotationListObjects();
-                    self.formUtils.renderAnnotationTemplate("define-annotation", savedAnnotations);
+                    var annotationListObjects = partitionObject.getAnnotationListObjects();
+                    self.formUtils.renderAnnotationTemplate("define-annotation", annotationListObjects);
 
                     var partitionKeys = [];
                     for (var i = 0; i < partitionWithList.length; i++) {
@@ -142,35 +141,35 @@ define(['require', 'log', 'jquery', 'lodash', 'partitionWith', 'jsonValidator', 
                         });
 
                         if (!isErrorOccurred) {
-                            clickedElement.clearPartitionWith();
+                            partitionObject.clearPartitionWith();
                             _.forEach(partitionKeys, function (partitionKey) {
                                 var partitionWithObject = new PartitionWith(partitionKey);
-                                clickedElement.addPartitionWith(partitionWithObject);
+                                partitionObject.addPartitionWith(partitionWithObject);
                             });
 
-                            var isValid = JSONValidator.prototype.validatePartition(clickedElement, self.jsPlumbInstance,
+                            var isValid = JSONValidator.prototype.validatePartition(partitionObject, self.jsPlumbInstance,
                                 false);
                             if (!isValid) {
                                 return;
                             }
 
-                            clickedElement.clearAnnotationList();
-                            clickedElement.clearAnnotationListObjects();
+                            partitionObject.clearAnnotationList();
+                            partitionObject.clearAnnotationListObjects();
                             var annotationStringList = [];
                             var annotationObjectList = [];
                             var annotationNodes = $('#annotation-div').jstree(true)._model.data['#'].children;
                             self.formUtils.buildAnnotation(annotationNodes, annotationStringList, annotationObjectList);
                             _.forEach(annotationStringList, function (annotation) {
-                                clickedElement.addAnnotation(annotation);
+                                partitionObject.addAnnotation(annotation);
                             });
                             _.forEach(annotationObjectList, function (annotation) {
-                                clickedElement.addAnnotationObject(annotation);
+                                partitionObject.addAnnotationObject(annotation);
                             });
 
 
                             $('#' + id).removeClass('incomplete-element');
                             //Send partition element to the backend and generate tooltip
-                            var partitionToolTip = self.formUtils.getTooltip(clickedElement, Constants.PARTITION);
+                            var partitionToolTip = self.formUtils.getTooltip(partitionObject, Constants.PARTITION);
                             $('#' + id).prop('title', partitionToolTip);
 
                             // set the isDesignViewContentChanged to true

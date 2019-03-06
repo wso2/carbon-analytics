@@ -70,7 +70,7 @@ define(['require', 'elementUtils'],
             return this.type;
         };
 
-        JoinSource.prototype.getFrom = function () {
+        JoinSource.prototype.getConnectedSource = function () {
             return this.from;
         };
 
@@ -90,7 +90,7 @@ define(['require', 'elementUtils'],
             this.type = type.toUpperCase();
         };
 
-        JoinSource.prototype.setFrom = function (from) {
+        JoinSource.prototype.setConnectedSource = function (from) {
             this.from = from;
         };
 

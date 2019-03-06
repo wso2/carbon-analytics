@@ -16,8 +16,8 @@
  * under the License.
  */
 
-define(['require', 'log', 'jquery', 'lodash', 'handlebar', 'annotationObject', 'annotationElement'],
-    function (require, log, $, _, Handlebars, AnnotationObject, AnnotationElement) {
+define(['require', 'log', 'jquery', 'lodash'],
+    function (require, log, $, _) {
 
         /**
          * @class AppAnnotationForm Creates a forms to collect app level annotations and siddhi app name
@@ -45,7 +45,7 @@ define(['require', 'log', 'jquery', 'lodash', 'handlebar', 'annotationObject', '
         AppAnnotationForm.prototype.generatePropertiesForm = function (element, formConsole, formContainer) {
             var self = this;
             var propertyDiv = $('<div id="property-header"> <h3> Siddhi App Configuration </h3> </div> ' +
-            	'<div class= "siddhi-app-form-container"> <div id = "define-app-name"> <h4> Name </h4> ' +
+                '<div class= "siddhi-app-form-container"> <div id = "define-app-name"> <h4> Name </h4> ' +
                 '<input type="text" id="app-name" class="clearfix name"><label class = "error-message"> </label></div>' +
                 '<div id = "define-app-description"> <h4> Description </h4> <textarea id="app-description" ' +
                 'class="clearfix"> </textarea> <label class = "error-message"> </label> </div>' +
@@ -61,11 +61,11 @@ define(['require', 'log', 'jquery', 'lodash', 'handlebar', 'annotationObject', '
             var siddhiAppConfig = self.configurationData.getSiddhiAppConfig();
             var siddhiAppName = siddhiAppConfig.getSiddhiAppName();
             var siddhiAppDescription = siddhiAppConfig.getSiddhiAppDescription();
-            var savedAppAnnotationObjects = siddhiAppConfig.getAppAnnotationListObjects();
+            var appAnnotationObjects = siddhiAppConfig.getAppAnnotationListObjects();
 
             $('#app-name').val(siddhiAppName);
             $('#app-description').val(siddhiAppDescription);
-            self.formUtils.renderAnnotationTemplate("define-annotation", savedAppAnnotationObjects);
+            self.formUtils.renderAnnotationTemplate("define-annotation", appAnnotationObjects);
 
             self.formUtils.addEventListenerToRemoveRequiredClass();
 
@@ -73,7 +73,7 @@ define(['require', 'log', 'jquery', 'lodash', 'handlebar', 'annotationObject', '
             var submitButtonElement = $(formContainer).find('#btn-submit')[0];
             submitButtonElement.addEventListener('click', function () {
 
-				self.formUtils.removeErrorClass();
+                self.formUtils.removeErrorClass();
 
                 var appName = $('#app-name').val().trim();
                 var appDescription = $('#app-description').val().trim();

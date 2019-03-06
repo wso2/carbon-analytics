@@ -59,12 +59,12 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
             formContainer) {
             var self = this;
             var id = $(element).parent().attr('id');
-            var clickedElement = self.configurationData.getSiddhiAppConfig().getWindowFilterProjectionQuery(id);
+            var queryObject = self.configurationData.getSiddhiAppConfig().getWindowFilterProjectionQuery(id);
 
-            if (!clickedElement.getQueryInput() || !clickedElement.getQueryInput().getFrom()) {
+            if (!queryObject.getQueryInput() || !queryObject.getQueryInput().getConnectedSource()) {
                 DesignViewUtils.prototype.warnAlert('Connect an input element');
                 self.consoleListManager.removeFormConsole(formConsole);
-            } else if (!clickedElement.getQueryOutput() || !clickedElement.getQueryOutput().getTarget()) {
+            } else if (!queryObject.getQueryOutput() || !queryObject.getQueryOutput().getTarget()) {
                 DesignViewUtils.prototype.warnAlert('Connect an output stream');
                 self.consoleListManager.removeFormConsole(formConsole);
             } else {
@@ -76,25 +76,25 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
                 self.toggleViewButton.addClass('disableContainer');
                 self.formUtils.popUpSelectedElement(id);
 
-                const QUERY_CONDITION_SYNTAX = self.configurationData.application.config.query_condition_syntax;
-                const RATE_LIMITING_SYNTAX = self.configurationData.application.config.other_query_syntax;
+                var QUERY_CONDITION_SYNTAX = self.configurationData.application.config.query_condition_syntax;
+                var RATE_LIMITING_SYNTAX = self.configurationData.application.config.other_query_syntax;
 
-                var queryName = clickedElement.getQueryName();
-                var queryInput = clickedElement.getQueryInput();
-                var inputElementName = queryInput.getFrom();
-                var groupBy = clickedElement.getGroupBy();
-                var having = clickedElement.getHaving();
-                var orderBy = clickedElement.getOrderBy();
-                var limit = clickedElement.getLimit();
-                var select = clickedElement.getSelect();
-                var outputRateLimit = clickedElement.getOutputRateLimit();
-                var queryOutput = clickedElement.getQueryOutput();
+                var queryName = queryObject.getQueryName();
+                var queryInput = queryObject.getQueryInput();
+                var inputElementName = queryInput.getConnectedSource();
+                var groupBy = queryObject.getGroupBy();
+                var having = queryObject.getHaving();
+                var orderBy = queryObject.getOrderBy();
+                var limit = queryObject.getLimit();
+                var select = queryObject.getSelect();
+                var outputRateLimit = queryObject.getOutputRateLimit();
+                var queryOutput = queryObject.getQueryOutput();
                 var outputElementName = queryOutput.getTarget();
-                var savedStreamHandlerList = queryInput.getStreamHandlerList();
-                var savedAnnotations = clickedElement.getAnnotationListObjects();
+                var streamHandlerList = queryInput.getStreamHandlerList();
+                var annotationListObjects = queryObject.getAnnotationListObjects();
 
                 var predefinedAnnotations = JSON.parse(JSON.stringify(self.configurationData.application.config.
-                    query_predefined_annotations));
+                    type_query_predefined_annotations));
                 var streamHandlerTypes = self.configurationData.application.config.stream_handler_types;
                 var incrementalAggregator = self.configurationData.application.config.incremental_aggregator;
 
@@ -125,15 +125,15 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
                 }
 
                 //annotations
-                var userDefinedAnnotations = self.formUtils.getUserAnnotations(savedAnnotations,
+                predefinedAnnotations = self.formUtils.createObjectsForAnnotationsWithKeys(predefinedAnnotations);
+                var userDefinedAnnotations = self.formUtils.getUserAnnotations(annotationListObjects,
                     predefinedAnnotations);
                 self.formUtils.renderAnnotationTemplate("define-user-defined-annotations", userDefinedAnnotations);
                 $('.define-user-defined-annotations').find('h4').html('Customized Annotations');
+                self.formUtils.mapPredefinedAnnotations(annotationListObjects, predefinedAnnotations);
                 self.formUtils.renderPredefinedAnnotations(predefinedAnnotations,
                     'define-predefined-annotations');
-                self.formUtils.mapPredefinedAnnotations(savedAnnotations, predefinedAnnotations);
                 self.formUtils.renderOptionsForPredefinedAnnotations(predefinedAnnotations);
-                self.formUtils.addCheckedForUserSelectedPredefinedAnnotation(savedAnnotations, predefinedAnnotations);
                 self.formUtils.addEventListenersForPredefinedAnnotations();
 
                 var partitionId;
@@ -187,7 +187,7 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
                  * if stream-handlers are empty, add a stream handler according to the selected query
                  * [window/filter/projection] else use the saved stream handler
                  */
-                if (savedStreamHandlerList && savedStreamHandlerList.length == 0) {
+                if (streamHandlerList && streamHandlerList.length == 0) {
                     var streamHandler;
                     var parent = $(element).parent();
                     if (parent.hasClass(Constants.FUNCTION_QUERY_DROP)) {
@@ -206,7 +206,7 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
                 }
                 self.formUtils.renderStreamHandler("query", queryInput, streamHandlerTypes);
                 self.formUtils.mapStreamHandler(queryInput, "query");
-                self.formUtils.addEventListenersForStreamHandlersDiv(savedStreamHandlerList);
+                self.formUtils.addEventListenersForStreamHandlersDiv(streamHandlerList);
 
                 //autocompletion
                 var streamFunctions = self.formUtils.getStreamFunctionNames();
@@ -293,48 +293,48 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
 
                     if (!isErrorOccurred) {
                         if (queryName != "") {
-							clickedElement.addQueryName(queryName);
-						} else {
-							queryName = "Query";
-							clickedElement.addQueryName('query');
-						}
+                            queryObject.addQueryName(queryName);
+                        } else {
+                            queryName = "Query";
+                            queryObject.addQueryName('query');
+                        }
 
                         if ($('.group-by-checkbox').is(':checked')) {
                             var groupByAttributes = self.formUtils.buildGroupBy();
-                            clickedElement.setGroupBy(groupByAttributes);
+                            queryObject.setGroupBy(groupByAttributes);
                         } else {
-                            clickedElement.setGroupBy(undefined);
+                            queryObject.setGroupBy(undefined);
                         }
 
-                        clickedElement.clearOrderByValueList()
+                        queryObject.clearOrderByValueList()
                         if ($('.order-by-checkbox').is(':checked')) {
                             var orderByAttributes = self.formUtils.buildOrderBy();
                             _.forEach(orderByAttributes, function (attribute) {
                                 var orderByValueObject = new QueryOrderByValue(attribute);
-                                clickedElement.addOrderByValue(orderByValueObject);
+                                queryObject.addOrderByValue(orderByValueObject);
                             });
                         }
 
                         if ($('.post-filter-checkbox').is(':checked')) {
-                            clickedElement.setHaving($('.post-condition-value').val().trim());
+                            queryObject.setHaving($('.post-condition-value').val().trim());
                         } else {
-                            clickedElement.setHaving(undefined)
+                            queryObject.setHaving(undefined)
                         }
 
                         if ($('.limit-checkbox').is(':checked')) {
-                            clickedElement.setLimit($('.limit-value').val().trim())
+                            queryObject.setLimit($('.limit-value').val().trim())
                         } else {
-                            clickedElement.setLimit(undefined)
+                            queryObject.setLimit(undefined)
                         }
 
                         if ($('.rate-limiting-checkbox').is(':checked')) {
-                            clickedElement.setOutputRateLimit($('.rate-limiting-value').val().trim())
+                            queryObject.setOutputRateLimit($('.rate-limiting-value').val().trim())
                         } else {
-                            clickedElement.setOutputRateLimit(undefined)
+                            queryObject.setOutputRateLimit(undefined)
                         }
 
                         var selectObject = new QuerySelect(self.formUtils.buildAttributeSelection(Constants.JOIN_QUERY));
-                        clickedElement.setSelect(selectObject);
+                        queryObject.setSelect(selectObject);
 
                         var annotationObjectList = [];
                         var annotationStringList = [];
@@ -342,17 +342,17 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
                         self.formUtils.buildAnnotation(annotationNodes, annotationStringList, annotationObjectList);
                         self.formUtils.buildPredefinedAnnotations(predefinedAnnotations, annotationStringList,
                             annotationObjectList);
-                        clickedElement.clearAnnotationList();
-                        clickedElement.clearAnnotationListObjects();
+                        queryObject.clearAnnotationList();
+                        queryObject.clearAnnotationListObjects();
                         //add the annotations to the clicked element
                         _.forEach(annotationStringList, function (annotation) {
-                            clickedElement.addAnnotation(annotation);
+                            queryObject.addAnnotation(annotation);
                         });
                         _.forEach(annotationObjectList, function (annotation) {
-                            clickedElement.addAnnotationObject(annotation);
+                            queryObject.addAnnotationObject(annotation);
                         });
 
-                        clickedElement.getQueryInput().clearStreamHandlerList();
+                        queryObject.getQueryInput().clearStreamHandlerList();
                         var streamHandlers = self.formUtils.buildStreamHandlers($('.define-stream-handler'));
                         _.forEach(streamHandlers, function (streamHandlerOption) {
                             queryInput.addStreamHandler(streamHandlerOption);
@@ -366,7 +366,7 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
                         queryOutput.setTarget(outputTarget);
                         queryOutput.setType(Constants.INSERT);
 
-                        var isValid = JSONValidator.prototype.validateWindowFilterProjectionQuery(clickedElement, false);
+                        var isValid = JSONValidator.prototype.validateWindowFilterProjectionQuery(queryObject, false);
                         if (!isValid) {
                             isErrorOccurred = true;
                             return;
@@ -378,7 +378,7 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
                         var noOfSavedFilters = 0;
                         var noOfSavedWindows = 0;
                         var noOfSavedFunctions = 0;
-                        var newStreamHandlers = clickedElement.getQueryInput().getStreamHandlerList();
+                        var newStreamHandlers = queryObject.getQueryInput().getStreamHandlerList();
                         _.forEach(newStreamHandlers, function (streamHandler) {
                             if (streamHandler.getType().toLowerCase() == Constants.FILTER) {
                                 noOfSavedFilters++;
@@ -415,10 +415,10 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
                         self.toggleViewButton.removeClass('disableContainer');
 
                         //Send query element to the backend and generate tooltip
-                        var queryToolTip = self.formUtils.getTooltip(clickedElement,
+                        var queryToolTip = self.formUtils.getTooltip(queryObject,
                             Constants.WINDOW_FILTER_PROJECTION_QUERY);
                         $('#' + id).prop('title', queryToolTip);
-                        var textNode = $('#' + clickedElement.getId()).find('.queryNameNode');
+                        var textNode = $('#' + queryObject.getId()).find('.queryNameNode');
                         textNode.html(queryName);
 
                         // close the form window

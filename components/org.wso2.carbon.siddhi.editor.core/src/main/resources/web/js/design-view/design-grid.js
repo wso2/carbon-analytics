@@ -352,8 +352,8 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
                                 var isStreamDirectlyConnectedToAQuery = false;
                                 _.forEach(partition.getWindowFilterProjectionQueryList(), function (query) {
                                     if (query.getQueryInput() !== undefined
-                                        && query.getQueryInput().getFrom() !== undefined
-                                        && query.getQueryInput().getFrom() === connectedStreamName) {
+                                        && query.getQueryInput().getConnectedSource() !== undefined
+                                        && query.getQueryInput().getConnectedSource() === connectedStreamName) {
                                         isStreamDirectlyConnectedToAQuery = true;
                                     }
                                 });
@@ -758,7 +758,7 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
                                 .getName();
                         }
                         self.configurationData.getSiddhiAppConfig().getAggregation(targetId)
-                            .setFrom(connectedElementName);
+                            .setConnectedSource(connectedElementName);
 
                     } else if (sourceElement.hasClass(constants.STREAM) || sourceElement.hasClass(constants.TABLE)
                         || sourceElement.hasClass(constants.AGGREGATION) || sourceElement.hasClass(constants.WINDOW)
@@ -827,7 +827,7 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
                                 var queryInputObject = new WindowFilterProjectionQueryInput(queryInputOptions);
                                 model.setQueryInput(queryInputObject);
                             } else {
-                                model.getQueryInput().setFrom(connectedElementName);
+                                model.getQueryInput().setConnectedSource(connectedElementName);
                             }
                         } else if (targetElement.hasClass(constants.JOIN)) {
                             model = self.configurationData.getSiddhiAppConfig().getJoinQuery(targetId);
@@ -1159,7 +1159,7 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
 
                     } else if (targetElement.hasClass(constants.AGGREGATION)
                         && (sourceElement.hasClass(constants.STREAM) || sourceElement.hasClass(constants.TRIGGER))) {
-                        self.configurationData.getSiddhiAppConfig().getAggregation(targetId).setFrom(undefined);
+                        self.configurationData.getSiddhiAppConfig().getAggregation(targetId).setConnectedSource(undefined);
 
                     } else if (sourceElement.hasClass(constants.STREAM) || sourceElement.hasClass(constants.TABLE)
                         || sourceElement.hasClass(constants.AGGREGATION) || sourceElement.hasClass(constants.WINDOW)
@@ -1184,7 +1184,7 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
                                 || targetElement.hasClass(constants.FUNCTION_QUERY))) {
                             model = self.configurationData.getSiddhiAppConfig()
                                 .getWindowFilterProjectionQuery(targetId);
-                            model.getQueryInput().setFrom(undefined);
+                            model.getQueryInput().setConnectedSource(undefined);
 
                         } else if (targetElement.hasClass(constants.JOIN)) {
                             model = self.configurationData.getSiddhiAppConfig().getJoinQuery(targetId);
@@ -1216,10 +1216,10 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
 
                                 // if left or sources are created then remove data from those sources
                                 if (queryInput.getLeft() !== undefined
-                                    && queryInput.getLeft().getFrom() === disconnectedElementSourceName) {
+                                    && queryInput.getLeft().getConnectedSource() === disconnectedElementSourceName) {
                                     queryInput.setLeft(undefined);
                                 } else if (queryInput.getRight() !== undefined
-                                    && queryInput.getRight().getFrom() === disconnectedElementSourceName) {
+                                    && queryInput.getRight().getConnectedSource() === disconnectedElementSourceName) {
                                     queryInput.setRight(undefined);
                                 }
                             }
