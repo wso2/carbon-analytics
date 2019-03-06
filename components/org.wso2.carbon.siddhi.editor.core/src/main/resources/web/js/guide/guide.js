@@ -875,8 +875,11 @@ define(['jquery', 'lodash', 'log', 'enjoyhint', 'designViewUtils', 'workspace', 
                                 break;
                     case 22 :   $('#source').addClass('source-drag ');
                                 break;
-
+                    default :   break;
                 }
+
+                instance = null;
+
             })
         };
 
