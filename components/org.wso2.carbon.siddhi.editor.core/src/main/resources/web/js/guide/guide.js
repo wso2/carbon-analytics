@@ -91,7 +91,6 @@ define(['jquery', 'lodash', 'log', 'enjoyhint', 'designViewUtils', 'workspace', 
                         fileIncrement = browserStorage.get('guideFileNameIncrement');
                         tempFile = "SweetFactory__" + fileIncrement;
                         var fileToBeChecked = "configName=" + btoa(tempFile + '.siddhi');
-
                         $.ajax({
                             url: checkFileURL,
                             type: "POST",
@@ -99,7 +98,7 @@ define(['jquery', 'lodash', 'log', 'enjoyhint', 'designViewUtils', 'workspace', 
                             data: fileToBeChecked,
                             async: false,
                             success: function (response) {
-                                if(response.exists === true){
+                                if(response.exists){
                                     tempFile = tempFile.slice(0, 14);
                                     fileIncrement++;
                                     tempFile = tempFile + fileIncrement;
@@ -109,7 +108,6 @@ define(['jquery', 'lodash', 'log', 'enjoyhint', 'designViewUtils', 'workspace', 
                                 DesignViewUtils.prototype.warnAlert("Server error has occurred");
                             }
                         });
-
                         setTimeout(function () {
                             $('#saveConfigModal').find('#configName').val(tempFile).focus();
                         }, 800);
@@ -158,7 +156,6 @@ define(['jquery', 'lodash', 'log', 'enjoyhint', 'designViewUtils', 'workspace', 
                         $('#partition').removeClass('partition-drag');
                         $('#stream').addClass('stream-drag');
                         currentStep = instance.getCurrentStep();
-
                         setTimeout(function () {
                             var interval = null;
                             interval = window.setInterval(function () {
@@ -613,7 +610,7 @@ define(['jquery', 'lodash', 'log', 'enjoyhint', 'designViewUtils', 'workspace', 
                             data: fileToBeChecked,
                             async: false,
                             success: function (response) {
-                                if(response.exists === true){
+                                if(response.exists){
                                     tempFile = tempFile.slice(0, 14);
                                     fileIncrement++;
                                     tempFile = tempFile + fileIncrement;
