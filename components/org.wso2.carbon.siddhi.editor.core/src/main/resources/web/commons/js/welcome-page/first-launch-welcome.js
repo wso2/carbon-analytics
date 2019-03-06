@@ -130,7 +130,7 @@ define(['require', 'lodash', 'log', 'jquery', 'backbone', 'command', 'sample_pre
                     '<li class="col-md-4"><a href="https://docs.wso2.com/display/SP430/Stream+Processor+Documentation"' +
                     'target="_blank"><i class="fw fw-google-docs"></i>Documentation</a></li>' +
                     '<li class="col-md-4"><a href="http://wso2.com/support/"' +
-                    'target="_blank"><i class="fw fw-ringing"></i>Support</a></li>');
+                    'target="_blank"><i class="fw fw-ringing"></i>Support</a></li></ul>');
 
                 quickLinksPane.append(bodyUlQuickLinkContent);
                 scrollInner.append(samplesPane);
