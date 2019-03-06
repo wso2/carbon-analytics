@@ -299,11 +299,11 @@ define(['jquery', 'lodash', 'log', 'enjoyhint', 'designViewUtils', 'workspace', 
                                 .getConfigurationData().getSiddhiAppConfig().queryLists.WINDOW_FILTER_PROJECTION[0];
 
                             Interval = window.setInterval(function () {
-                                    if(newElement.queryInput && newElement.queryOutput && newElement.queryInput.from === "SweetProductionStream" &&
-                                        newElement.queryOutput.target === "TotalProductionStream") {
-                                        clearInterval(Interval);
-                                        instance.trigger('next');
-                                    }
+                                if(newElement.queryInput && newElement.queryOutput && newElement.queryInput.from === "SweetProductionStream" &&
+                                    newElement.queryOutput.target === "TotalProductionStream") {
+                                    clearInterval(Interval);
+                                    instance.trigger('next');
+                                }
 
                             }, 1000);
                         }, 3000);

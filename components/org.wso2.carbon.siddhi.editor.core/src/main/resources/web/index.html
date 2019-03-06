@@ -32,8 +32,8 @@
 
     <!--Enjoy Hint CSS-->
 
-    <link href="/editor/commons/lib/enjoyhint/enjoyhint.css" rel="stylesheet" type="text/css"/>
-    <link href="/editor/commons/lib/enjoyhint/customEnjoyhint.css" rel="stylesheet" type="text/css"/>
+    <link href="/editor/commons/css/enjoyhint.css" rel="stylesheet" type="text/css"/>
+    <link href="/editor/commons/css/customEnjoyhint.css" rel="stylesheet" type="text/css"/>
 
     <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
     <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
@@ -1532,6 +1532,34 @@
 
 <iframe id="frm-download" style="display: none;"></iframe>
 
+<div class='modal fade' id='guideDialog' tabindex='-1' role='dialog' aria-tydden='true'>
+    <div class='modal-dialog file-dialog' role='document'>
+        <div class='modal-content' style='padding-bottom: 18px;padding-right: 10px;'>
+            <div class='modal-header'>
+                <button type='button' class='close' data-dismiss='modal' aria-label='Close'>
+                    <span aria-hidden='true'>&times;</span>
+                </button>
+                <h4 class='modal-title file-dialog-title text-center' id='whereToStart'>Welcome to the Stream Processor Studio tour guide</h4>
+                <hr class='style1'>
+                <div class='divider'></div>
+            </div>
+            <div class='modal-body'>
+                <div class='text-center'><p>For the complete tour from application design to test simulation, click <b>Complete Tour.</b>
+                    <br>To skip the application creation tour and move on to the test simulation tour, click <b>Simulation Tour.</b>
+                    <br>To use samples, click <b>Samples.</b> You can always try the guide using <b>Tools menu.</b></p><br></div>
+                <div class='row'>
+                    <div class='col-sm-4'>
+                        <button class='btn btn-block btn-lg btn-primary tour-guide-button' id='fullGuide'>Complete tour</button></div>
+                    <div class='col-sm-4'>
+                        <button class='btn btn-block btn-lg btn-primary tour-guide-button' id='simulationGuide'>Simulation tour</button></div>
+                    <div class='col-sm-4'>
+                        <button class='btn btn-block btn-lg btn-primary tour-guide-button' id='sampleGuide'>Samples</button></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
 <div class="modal fade modalSampleEvent" id="modalSampleEvent" tabindex="-1" role="dialog">
     <div class="modal-dialog" role="document">
         <div class="modal-content clearfix">
@@ -1869,7 +1897,8 @@
             attribute: "js/design-view/elements/attribute",
             // element data holding objects ends here
             //constants
-            constants: "js/design-view/constants"
+            constants: "js/design-view/constants",
+            guideConstants: "js/guide/guide-constants"
         },
         map: {
             "*": {
