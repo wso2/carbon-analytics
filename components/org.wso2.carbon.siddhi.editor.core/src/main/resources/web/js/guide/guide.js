@@ -376,7 +376,8 @@ define(['jquery', 'lodash', 'log', 'enjoyhint', 'designViewUtils', 'workspace', 
                 {
                     'next #sink': 'This is a <b class="lime-text">Sink component</b>.<br>Sink is a contract that takes ' +
                         'events arriving at a stream, maps them to a predefined data format,<br> and publishes them' +
-                        ' to external endpoints. You are using this to <b class="lime-text">display the output result.</b>',
+                        ' to external endpoints. You are using this to <b class="lime-text">display the output result.</b>' +
+                        ' Click <b class="lime-text">Next</b>',
                     'showSkip': false,
                     onBeforeStart: function () {
                         $('#sink').removeClass('sink-drag');
@@ -500,7 +501,7 @@ define(['jquery', 'lodash', 'log', 'enjoyhint', 'designViewUtils', 'workspace', 
                     'showSkip': false
                 },
                 {
-                    'custom #siddhi-app-name': 'Select the <b class="lime-text">latest' + Constants.TEMP_FILE + '</b> Siddhi application',
+                    'custom #siddhi-app-name': 'Select the latest <b class="lime-text">' + Constants.TEMP_FILE + '</b> Siddhi application',
                     'showSkip': false,
                     'showNext': false,
                     onBeforeStart: function () {
@@ -651,7 +652,7 @@ define(['jquery', 'lodash', 'log', 'enjoyhint', 'designViewUtils', 'workspace', 
                 },
                 {
                     'custom #siddhi-app-name': 'We have created a simulation siddhi application for you.' +
-                        ' Select the <b class="lime-text">latest ' + Constants.TEMP_FILE + '</b> siddhi application',
+                        ' Select the latest<b class="lime-text"> ' + Constants.TEMP_FILE + '</b> siddhi application',
                     'showSkip': false,
                     'showNext': false,
                     onBeforeStart: function () {
