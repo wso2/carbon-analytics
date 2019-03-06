@@ -27,8 +27,6 @@ define(function () {
      * Constants used by the siddhi editor tour guide
      */
     var constants = {
-        TEMP_FILE: 'SweetFactory__',
-        FILE_INCREMENT: 0,
         CONTENT: '@App:name(\'SweetFactory\')\n' +
             '@App:description(\'Description of the plan\')\n' +
             '\n' +

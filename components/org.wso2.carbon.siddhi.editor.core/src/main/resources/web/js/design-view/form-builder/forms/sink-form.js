@@ -311,8 +311,6 @@ define(['log', 'jquery', 'lodash', 'mapAnnotation', 'payloadOrAttribute', 'jsonV
                 //onclick of submit
                 var submitButtonElement = $(formContainer).find('#btn-submit')[0];
                 $(formContainer).on('click', '#btn-submit', function () {
-                // submitButtonElement.addEventListener('click', function () {
-                    //clear the error classes
                     $('.error-message').text("")
                     $('.required-input-field').removeClass('required-input-field');
                     var isErrorOccurred = false;

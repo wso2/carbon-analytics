@@ -119,7 +119,6 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'jsonValidator', 'con
 
             //submit button action
             $(formContainer).on('click', '#btn-submit', function () {
-                //.submitButtonElement.addEventListener('click', function () {
                 $('.error-message').text("")
                 $('.required-input-field').removeClass('required-input-field');
                 $('#streamNameErrorMessage').text("")
@@ -269,7 +268,6 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'jsonValidator', 'con
                     // close the form window
                     self.consoleListManager.removeFormConsole(formConsole);
                 }
-                return ;
             });
 
             // 'Cancel' button action

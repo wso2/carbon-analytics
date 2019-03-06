@@ -112,18 +112,18 @@ define(([],function (){
                 disabled: false
             },
             {
-                id: "hintTour",
-                label: "Tour guide",
+                id: 'hintTour',
+                label: 'Tour guide',
                 command: {
-                    id: "hint-tour",
+                    id: 'hint-tour',
                     labels:{
                         mac: {
-                            key: "",
-                            label: ""
+                            key: '',
+                            label: ''
                         },
                         other: {
-                            key: "",
-                            label: ""
+                            key: '',
+                            label: ''
                         }
                     }
                 },

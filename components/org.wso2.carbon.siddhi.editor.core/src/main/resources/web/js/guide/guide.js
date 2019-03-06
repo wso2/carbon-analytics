@@ -18,20 +18,19 @@
 
 define(['jquery', 'lodash', 'log', 'enjoyhint', 'designViewUtils', 'workspace', 'guideConstants'],
     function ($, _, log, EnjoyHintLib, DesignViewUtils, Workspace, Constants) {
-
-        //enjoyhint instance to be used in the methods of this class
+        //Enjoy Hint instance to be used in the methods of this class
         var instance = null;
-
+        var currentStep = null;
         /**
          * Arg: application instance
          */
-
         var Guide = function (application) {
-
             var self = this;
             this.app = application;
             this.tabList = this.app.tabController.getTabList();
             var browserStorage = this.app.browserStorage;
+            var tempFile = 'SweetFactory__';
+            var fileIncrement = 1;
 
             //URLs for AJAX requests
             self.workspaceServiceURL = this.app.config.services.workspace.endpoint;
@@ -59,7 +58,7 @@ define(['jquery', 'lodash', 'log', 'enjoyhint', 'designViewUtils', 'workspace', 
                         var editor = activeTab.getSiddhiFileEditor().getSourceView().getEditor();
                         var aceEditor = self.app.tabController.getActiveTab().getSiddhiFileEditor().getSourceView().getEditor();
                         editor.session.insert(aceEditor.getCursorPosition(), Constants.INSERT_STRING);
-                        Constants.CURRENT_STEP = null;
+                        currentStep = null;
                     }
                 },
                 {
@@ -89,9 +88,9 @@ define(['jquery', 'lodash', 'log', 'enjoyhint', 'designViewUtils', 'workspace', 
                     'showSkip': false,
                     'timeout': 200,
                     onBeforeStart: function () {
-                        Constants.FILE_INCREMENT = browserStorage.get('guideFileNameIncrement');
-                        Constants.TEMP_FILE = "SweetFactory__" + Constants.FILE_INCREMENT;
-                        var fileToBeChecked = "configName=" + btoa(Constants.TEMP_FILE + '.siddhi');
+                        fileIncrement = browserStorage.get('guideFileNameIncrement');
+                        tempFile = "SweetFactory__" + fileIncrement;
+                        var fileToBeChecked = "configName=" + btoa(tempFile + '.siddhi');
 
                         $.ajax({
                             url: checkFileURL,
@@ -101,9 +100,9 @@ define(['jquery', 'lodash', 'log', 'enjoyhint', 'designViewUtils', 'workspace', 
                             async: false,
                             success: function (response) {
                                 if(response.exists === true){
-                                    Constants.TEMP_FILE = Constants.TEMP_FILE.slice(0, 14);
-                                    Constants.FILE_INCREMENT++;
-                                    Constants.TEMP_FILE = Constants.TEMP_FILE + Constants.FILE_INCREMENT;
+                                    tempFile = tempFile.slice(0, 14);
+                                    fileIncrement++;
+                                    tempFile = tempFile + fileIncrement;
                                 }
                             },
                             error: function () {
@@ -112,7 +111,7 @@ define(['jquery', 'lodash', 'log', 'enjoyhint', 'designViewUtils', 'workspace', 
                         });
 
                         setTimeout(function () {
-                            $('#saveConfigModal').find('#configName').val(Constants.TEMP_FILE).focus();
+                            $('#saveConfigModal').find('#configName').val(tempFile).focus();
                         }, 800);
                     }
                 },
@@ -127,9 +126,9 @@ define(['jquery', 'lodash', 'log', 'enjoyhint', 'designViewUtils', 'workspace', 
                     'showSkip': false,
                     'showNext': false,
                     onBeforeStart: function () {
-                        Constants.TEMP_FILE = "SweetFactory__" + Constants.FILE_INCREMENT;
-                        Constants.FILE_INCREMENT++;
-                        browserStorage.put("guideFileNameIncrement", Constants.FILE_INCREMENT);
+                        tempFile = "SweetFactory__" + fileIncrement;
+                        fileIncrement++;
+                        browserStorage.put("guideFileNameIncrement", fileIncrement);
                     }
                 },
                 {
@@ -139,7 +138,7 @@ define(['jquery', 'lodash', 'log', 'enjoyhint', 'designViewUtils', 'workspace', 
                     'showNext': true,
                     onBeforeStart: function () {
                         $('#stream').removeClass('stream-drag');
-                        Constants.CURRENT_STEP = instance.getCurrentStep();
+                        currentStep = instance.getCurrentStep();
 
                     }
                 },
@@ -158,16 +157,16 @@ define(['jquery', 'lodash', 'log', 'enjoyhint', 'designViewUtils', 'workspace', 
                         $('#trigger').removeClass('trigger-drag');
                         $('#partition').removeClass('partition-drag');
                         $('#stream').addClass('stream-drag');
-                        Constants.CURRENT_STEP = instance.getCurrentStep();
+                        currentStep = instance.getCurrentStep();
 
                         setTimeout(function () {
-                            var Interval = null;
-                            Interval = window.setInterval(function () {
+                            var interval = null;
+                            interval = window.setInterval(function () {
                                 var newElement = self.app.tabController.getActiveTab().getSiddhiFileEditor().getDesignView()
                                     .getConfigurationData().getSiddhiAppConfig();
                                 if (newElement.streamList.length === 2) {
                                     instance.trigger('next');
-                                    clearInterval(Interval);
+                                    clearInterval(interval);
                                 }
                             }, 3000);
                         }, 3000)
@@ -241,7 +240,7 @@ define(['jquery', 'lodash', 'log', 'enjoyhint', 'designViewUtils', 'workspace', 
                     'showNext': true,
                     onBeforeStart: function () {
                         $('#projection-query').removeClass('projection-query-drag');
-                        Constants.CURRENT_STEP = instance.getCurrentStep();
+                        currentStep = instance.getCurrentStep();
                     }
                 },
                 {
@@ -263,16 +262,15 @@ define(['jquery', 'lodash', 'log', 'enjoyhint', 'designViewUtils', 'workspace', 
                         $('#sequence-query').removeClass('sequence-query-drag');
                         $('#join-query').removeClass('join-query-drag');
                         $('#function-query').removeClass('function-query-drag');
-                        Constants.CURRENT_STEP = instance.getCurrentStep();
-
+                        currentStep = instance.getCurrentStep();
                         setTimeout(function () {
-                            var Interval = null;
-                            Interval = window.setInterval(function () {
+                            var interval = null;
+                            interval = window.setInterval(function () {
                                 var newElement = self.app.tabController.getActiveTab().getSiddhiFileEditor().getDesignView()
                                     .getConfigurationData().getSiddhiAppConfig();
                                 if (newElement.queryLists.WINDOW_FILTER_PROJECTION.length === 1) {
                                     instance.trigger('next');
-                                    clearInterval(Interval);
+                                    clearInterval(interval);
                                 }
                             }, 1000);
                         }, 3000)
@@ -292,17 +290,15 @@ define(['jquery', 'lodash', 'log', 'enjoyhint', 'designViewUtils', 'workspace', 
                         $('#pattern-query').addClass('pattern-query-drag');
                         $('#sequence-query').addClass('sequence-query-drag');
                         $("#tool-group-Queries").find('.tool-group-body').css('display', 'none');
-
                         setTimeout(function () {
-                            var Interval = null;
+                            var interval = null;
                             var newElement = self.app.tabController.getActiveTab().getSiddhiFileEditor().getDesignView()
                                 .getConfigurationData().getSiddhiAppConfig().queryLists.WINDOW_FILTER_PROJECTION[0];
-
-                            Interval = window.setInterval(function () {
+                            interval = window.setInterval(function () {
                                 if(newElement.queryInput && newElement.queryOutput &&
                                     newElement.queryInput.from === "SweetProductionStream" &&
                                     newElement.queryOutput.target === "TotalProductionStream") {
-                                    clearInterval(Interval);
+                                    clearInterval(interval);
                                     instance.trigger('next');
                                 }
 
@@ -334,11 +330,11 @@ define(['jquery', 'lodash', 'log', 'enjoyhint', 'designViewUtils', 'workspace', 
                     'showSkip': false,
                     onBeforeStart: function () {
                         setTimeout(function () {
-                            var Interval = null;
-                            Interval = window.setInterval(function () {
+                            var interval = null;
+                            interval = window.setInterval(function () {
                                 if ($('#form-query-name').find('.form-control').val() === 'SweetTotalQuery') {
                                     instance.trigger('next');
-                                    clearInterval(Interval);
+                                    clearInterval(interval);
                                 }
                             }, 1000);
                         }, 4000)
@@ -352,11 +348,11 @@ define(['jquery', 'lodash', 'log', 'enjoyhint', 'designViewUtils', 'workspace', 
                     'bottom': 20,
                     onBeforeStart: function () {
                         setTimeout(function () {
-                            var Interval = null;
-                            Interval = window.setInterval(function () {
+                            var interval = null;
+                            interval = window.setInterval(function () {
                                 if ($('.has-error').find('.form-control').val() === 'count()') {
                                     instance.trigger('next');
-                                    clearInterval(Interval);
+                                    clearInterval(interval);
                                 }
                             }, 1000);
                         }, 3000)
@@ -381,7 +377,7 @@ define(['jquery', 'lodash', 'log', 'enjoyhint', 'designViewUtils', 'workspace', 
                     'showSkip': false,
                     onBeforeStart: function () {
                         $('#sink').removeClass('sink-drag');
-                        Constants.CURRENT_STEP = instance.getCurrentStep();
+                        currentStep = instance.getCurrentStep();
                     }
                 },
                 {
@@ -398,16 +394,15 @@ define(['jquery', 'lodash', 'log', 'enjoyhint', 'designViewUtils', 'workspace', 
                         $("#tool-group-Queries").find('.tool-group-body').css('display', 'none');
                         $('#source').removeClass('source-drag ');
                         $('#sink').addClass('sink-drag');
-                        Constants.CURRENT_STEP = instance.getCurrentStep();
-
+                        currentStep = instance.getCurrentStep();
                         setTimeout(function () {
-                            var Interval = null;
-                            Interval = window.setInterval(function () {
+                            var interval = null;
+                            interval = window.setInterval(function () {
                                 var newElement = self.app.tabController.getActiveTab().getSiddhiFileEditor().getDesignView()
                                     .getConfigurationData().getSiddhiAppConfig();
                                 if (newElement.sinkList.length === 1) {
                                     instance.trigger('next');
-                                    clearInterval(Interval);
+                                    clearInterval(interval);
                                 }
                             }, 1000);
                         }, 3000)
@@ -421,12 +416,12 @@ define(['jquery', 'lodash', 'log', 'enjoyhint', 'designViewUtils', 'workspace', 
                     'bottom': 300,
                     onBeforeStart: function () {
                         setTimeout(function () {
-                            var Interval = null;
+                            var interval = null;
                             var newElement = self.app.tabController.getActiveTab().getSiddhiFileEditor().getDesignView()
                                 .getConfigurationData().getSiddhiAppConfig().sinkList[0];
-                            Interval = window.setInterval(function () {
+                            interval = window.setInterval(function () {
                                 if (newElement.connectedElementName === "TotalProductionStream") {
-                                    clearInterval(Interval);
+                                    clearInterval(interval);
                                     instance.trigger('next');
                                 }
                             }, 1000);
@@ -450,11 +445,11 @@ define(['jquery', 'lodash', 'log', 'enjoyhint', 'designViewUtils', 'workspace', 
                     'showSkip': false,
                     'showNext': false,
                     onBeforeStart: function () {
-                        var Interval = null;
-                        Interval = window.setInterval(function () {
+                        var interval = null;
+                        interval = window.setInterval(function () {
                             if ($('#sink-type').val() === "log") {
                                 instance.trigger('next');
-                                clearInterval(Interval);
+                                clearInterval(interval);
                             }
                         }, 1000)
                     }
@@ -501,15 +496,15 @@ define(['jquery', 'lodash', 'log', 'enjoyhint', 'designViewUtils', 'workspace', 
                     'showSkip': false
                 },
                 {
-                    'custom #siddhi-app-name': 'Select the latest <b class="lime-text">' + Constants.TEMP_FILE + '</b> Siddhi application',
+                    'custom #siddhi-app-name': 'Select the latest <b class="lime-text">' + tempFile + '</b> Siddhi application',
                     'showSkip': false,
                     'showNext': false,
                     onBeforeStart: function () {
-                        var Interval = null;
-                        Interval = window.setInterval(function () {
-                            if ($('#siddhi-app-name').val() === Constants.TEMP_FILE) {
+                        var interval = null;
+                        interval = window.setInterval(function () {
+                            if ($('#siddhi-app-name').val() === tempFile) {
                                 instance.trigger('next');
-                                clearInterval(Interval);
+                                clearInterval(interval);
                             }
                         }, 1000)
                     }
@@ -519,11 +514,11 @@ define(['jquery', 'lodash', 'log', 'enjoyhint', 'designViewUtils', 'workspace', 
                     'showSkip': false,
                     'showNext': false,
                     onBeforeStart: function () {
-                        var Interval = null;
-                        Interval = window.setInterval(function () {
+                        var interval = null;
+                        interval = window.setInterval(function () {
                             if ($('#stream-name').val() === "SweetProductionStream") {
                                 instance.trigger('next');
-                                clearInterval(Interval);
+                                clearInterval(interval);
                             }
                         }, 1000)
                     }
@@ -606,13 +601,11 @@ define(['jquery', 'lodash', 'log', 'enjoyhint', 'designViewUtils', 'workspace', 
                     'showNext': false,
                     'showSkip': false,
                     onBeforeStart: function () {
-
-                        Constants.FILE_INCREMENT = browserStorage.get('guideFileNameIncrement');
-                        Constants.TEMP_FILE = "SweetFactory__" + Constants.FILE_INCREMENT;
-                        var payload = "configName=" + btoa(Constants.TEMP_FILE + '.siddhi') + "&config="
+                        fileIncrement = browserStorage.get('guideFileNameIncrement');
+                        tempFile = "SweetFactory__" + fileIncrement;
+                        var payload = "configName=" + btoa(tempFile + '.siddhi') + "&config="
                             + (btoa(Constants.CONTENT));
-                        var fileToBeChecked = "configName="+btoa(Constants.TEMP_FILE + '.siddhi');
-
+                        var fileToBeChecked = "configName="+btoa(tempFile + '.siddhi');
                         $.ajax({
                             url: checkFileURL,
                             type: "POST",
@@ -621,15 +614,14 @@ define(['jquery', 'lodash', 'log', 'enjoyhint', 'designViewUtils', 'workspace', 
                             async: false,
                             success: function (response) {
                                 if(response.exists === true){
-                                    Constants.TEMP_FILE = Constants.TEMP_FILE.slice(0, 14);
-                                    Constants.FILE_INCREMENT++;
-                                    Constants.TEMP_FILE = Constants.TEMP_FILE + Constants.FILE_INCREMENT;
-                                    payload = "configName=" + btoa(Constants.TEMP_FILE + '.siddhi')
+                                    tempFile = tempFile.slice(0, 14);
+                                    fileIncrement++;
+                                    tempFile = tempFile + fileIncrement;
+                                    payload = "configName=" + btoa(tempFile + '.siddhi')
                                         + "&config=" + (btoa(content));
                                 }
                             }
                         });
-
                         $.ajax({
                             url: saveServiceURL,
                             type: "POST",
@@ -639,28 +631,28 @@ define(['jquery', 'lodash', 'log', 'enjoyhint', 'designViewUtils', 'workspace', 
                             success: function (data) {
                                 self.app.commandManager.dispatch("open-folder", data.path);
                                 self.app.workspaceManager.updateMenuItems();
-                                self.app.commandManager.dispatch('remove-unwanted-streams-single-simulation', Constants.TEMP_FILE);
+                                self.app.commandManager.dispatch('remove-unwanted-streams-single-simulation', tempFile);
                                 log.debug('Simulation file saved successfully');
                             },
                             error: function () {
                                 DesignViewUtils.prototype.warnAlert("Server error has occurred");
                             }
                         });
-                        Constants.FILE_INCREMENT++;
-                        browserStorage.put('guideFileNameIncrement', Constants.FILE_INCREMENT)
+                        fileIncrement++;
+                        browserStorage.put('guideFileNameIncrement', fileIncrement)
                     }
                 },
                 {
                     'custom #siddhi-app-name': 'We have created a simulation siddhi application for you.' +
-                        ' Select the latest<b class="lime-text"> ' + Constants.TEMP_FILE + '</b> siddhi application',
+                        ' Select the latest<b class="lime-text"> ' + tempFile + '</b> siddhi application',
                     'showSkip': false,
                     'showNext': false,
                     onBeforeStart: function () {
-                        var Interval = null;
-                        Interval = window.setInterval(function () {
-                            if ($('#siddhi-app-name').val() === Constants.TEMP_FILE) {
+                        var interval = null;
+                        interval = window.setInterval(function () {
+                            if ($('#siddhi-app-name').val() === tempFile) {
                                 instance.trigger('next');
-                                clearInterval(Interval);
+                                clearInterval(interval);
                             }
                         }, 1000)
                     }
@@ -670,11 +662,11 @@ define(['jquery', 'lodash', 'log', 'enjoyhint', 'designViewUtils', 'workspace', 
                     'showSkip': false,
                     'showNext': false,
                     onBeforeStart: function () {
-                        var Interval = null;
-                        Interval = window.setInterval(function () {
+                        var interval = null;
+                        interval = window.setInterval(function () {
                             if ($('#stream-name').val() === "SweetProductionStream") {
                                 instance.trigger('next');
-                                clearInterval(Interval);
+                                clearInterval(interval);
                             }
                         }, 1000)
                     }
@@ -798,12 +790,10 @@ define(['jquery', 'lodash', 'log', 'enjoyhint', 'designViewUtils', 'workspace', 
 
         //start function for the complete guide
         Guide.prototype.start = function () {
-
             var self = this;
             var guideModal = self.guideDialog.filter("#guideDialog");
-            var hintInstance = new EnjoyHint({});
+            instance = new EnjoyHint({});
             var callback = function() { guideModal.modal('hide') };
-
             //check whether there are multiple tabs and if the current tab is "welcome-page"
             _.each(self.tabList, function (tab) {
                 if (self.tabList.length === 1 && tab._title === "welcome-page") {
@@ -812,7 +802,6 @@ define(['jquery', 'lodash', 'log', 'enjoyhint', 'designViewUtils', 'workspace', 
                     DesignViewUtils.prototype.errorAlert(Constants.ERROR_TEXT);
                 }
             });
-
             //function for the complete tour
             guideModal.find("button").filter("#fullGuide").click(function() {
 
@@ -820,63 +809,56 @@ define(['jquery', 'lodash', 'log', 'enjoyhint', 'designViewUtils', 'workspace', 
                 $('#fullGuide').off('click');
                 $('#simulationGuide').off('click');
                 $('#sampleGuide').off('click');
-
-                hintInstance.setScript(self.completeGuide);
-                hintInstance.runScript();
-
-                instance = hintInstance;
+                instance.setScript(self.completeGuide);
+                instance.runScript();
                 callback();
             });
-
             //function for the simulation tour
             guideModal.find("button").filter("#simulationGuide").click(function() {
-
                 //unbinding the click events from the previous click
                 $('#fullGuide').off('click');
                 $('#simulationGuide').off('click');
                 $('#sampleGuide').off('click');
-
-                hintInstance.setScript(self.simulateGuide);
-                hintInstance.runScript();
-
-                instance = hintInstance;
+                instance.setScript(self.simulateGuide);
+                instance.runScript();
                 callback();
             });
-
             //function for the sample tour
             guideModal.find("button").filter("#sampleGuide").click(function() {
-
                 //unbinding the click events from the previous click
                 $('#fullGuide').off('click');
                 $('#simulationGuide').off('click');
                 $('#sampleGuide').off('click');
-
-                hintInstance.setScript(self.sampleGuide);
-                hintInstance.runScript();
-
-                instance = hintInstance;
+                instance.setScript(self.sampleGuide);
+                instance.runScript();
                 callback();
             });
-
             $('.enjoyhint_close_btn').click(function () {
-                switch (Constants.CURRENT_STEP) {
-                    case 7  :   $('#stream').addClass('stream-drag');
-                                break;
-                    case 8  :   $('#trigger').addClass('trigger-drag');
-                                $('#partition').addClass('partition-drag');
-                                break;
-                    case 14 :   $('#projection-query').addClass('projection-query-drag');
-                                break;
-                    case 15 :   $('#filter-query').addClass('filter-query-drag');
-                                $('#window-query').addClass('window-query-drag');
-                                $('#pattern-query').addClass('pattern-query-drag');
-                                $('#sequence-query').addClass('sequence-query-drag');
-                                break;
-                    case 21 :   $('#sink').addClass('sink-drag');
-                                break;
-                    case 22 :   $('#source').addClass('source-drag ');
-                                break;
-                    default :   break;
+                switch (currentStep) {
+                    case 7  :
+                        $('#stream').addClass('stream-drag');
+                        break;
+                    case 8  :
+                        $('#trigger').addClass('trigger-drag');
+                        $('#partition').addClass('partition-drag');
+                        break;
+                    case 14 :
+                        $('#projection-query').addClass('projection-query-drag');
+                        break;
+                    case 15 :
+                        $('#filter-query').addClass('filter-query-drag');
+                        $('#window-query').addClass('window-query-drag');
+                        $('#pattern-query').addClass('pattern-query-drag');
+                        $('#sequence-query').addClass('sequence-query-drag');
+                        break;
+                    case 21 :
+                        $('#sink').addClass('sink-drag');
+                        break;
+                    case 22 :
+                        $('#source').addClass('source-drag ');
+                        break;
+                    default :
+                        break;
                 }
 
                 instance = null;
