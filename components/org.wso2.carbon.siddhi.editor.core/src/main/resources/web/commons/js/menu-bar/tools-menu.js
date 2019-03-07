@@ -112,18 +112,18 @@ define(([],function (){
                 disabled: false
             },
             {
-                id: 'hintTour',
+                id: 'tour-guide',
                 label: 'Tour guide',
                 command: {
-                    id: 'hint-tour',
-                    labels:{
+                    id: 'tour-guide',
+                    shortcuts: {
                         mac: {
-                            key: '',
-                            label: ''
+                            key: "command+shift+h",
+                            label: "\u2318\u21E7H"
                         },
                         other: {
-                            key: '',
-                            label: ''
+                            key: "ctrl+shift+h",
+                            label: "Ctrl+Shift+H"
                         }
                     }
                 },

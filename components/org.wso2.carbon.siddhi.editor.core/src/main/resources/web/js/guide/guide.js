@@ -576,7 +576,7 @@ define(['jquery', 'lodash', 'log', 'enjoyhint', 'designViewUtils', 'workspace', 
                 {
                     'next #sampleDialog': 'You can try out more samples from here. click <b class="lime-text">Next</b>',
                     'showSkip': false,
-                    'scrollAnimationSpeed': 900,
+                    'scrollAnimationSpeed': 500,
                     'bottom': 150
                 },
                 {
@@ -726,7 +726,7 @@ define(['jquery', 'lodash', 'log', 'enjoyhint', 'designViewUtils', 'workspace', 
                 {
                     'next #sampleDialog' : 'You can try out more samples from here. click <b class="lime-text">Next</b>',
                     'showSkip' : false,
-                    'scrollAnimationSpeed' : 900,
+                    'scrollAnimationSpeed' : 500,
                     'bottom' : 150
                 },
                 {
@@ -757,7 +757,7 @@ define(['jquery', 'lodash', 'log', 'enjoyhint', 'designViewUtils', 'workspace', 
                 {
                     'next #sampleDialog' : 'You can try out more samples from here. click <b class="lime-text">Next</b>',
                     'showSkip' : false,
-                    'scrollAnimationSpeed' : 900,
+                    'scrollAnimationSpeed' : 500,
                     'bottom' : 150
                 },
                 {

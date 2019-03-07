@@ -759,7 +759,7 @@ define(['ace/ace', 'jquery', 'lodash', 'log','dialogs','./service-client','welco
             app.commandManager.registerHandler('query-store', this.openQueryStore, this);
 
             //Run hint tour
-            app.commandManager.registerHandler('hint-tour', this.runGuide , this);
+            app.commandManager.registerHandler('tour-guide', this.runGuide, this);
 
             app.commandManager.registerHandler('deploy-to-server', this.handleDeploy, this);
         }
