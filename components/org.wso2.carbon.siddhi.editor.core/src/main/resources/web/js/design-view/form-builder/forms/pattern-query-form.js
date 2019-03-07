@@ -264,7 +264,7 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
                 });
 
                 $('.define-conditions').on('click', '.btn-add-condition', function () {
-                    var conditionLength = $('.condition-navigation').length + 1;
+                    var conditionLength = $('.condition-navigation').length;
                     var conditionName = 'condition' + conditionLength;
                     var conditionList = [{ conditionId: conditionName, streamHandlerList: [], streamName: "" }]
                     self.formUtils.renderConditions(conditionList, inputStreamNames)

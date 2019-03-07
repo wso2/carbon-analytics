@@ -424,9 +424,10 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
                 .html());
             var conditionContentTemplate = Handlebars.compile($('#pattern-sequence-condition-content-form-template')
                 .html());
+            self.addDeleteButtonForConditionNav();
             _.forEach(conditions, function (condition) {
                 var wrappedHtml = conditionNavTemplate(condition);
-                $('.define-conditions .nav-tabs').append(wrappedHtml);
+                $('.define-conditions .nav-tabs li:last-child').before(wrappedHtml);
             });
 
             _.forEach(conditions, function (condition) {
@@ -438,6 +439,16 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
             });
             //removes the first delete button
             $('.define-conditions').find('.nav-tabs li:eq(0) .btn-del-condition').remove();
+        };
+
+        /**
+         * @function to add the button to add the condition in the nav bar of the condition-ul
+         */
+        FormUtils.prototype.addDeleteButtonForConditionNav = function () {
+            var buttonHTML = '<li> <button class="btn btn-default btn-add-condition"> +</button> </li> ';
+            if ($(".define-conditions").find(".btn-add-condition").length == 0){
+                $('.define-conditions .nav-tabs').append(buttonHTML);
+            }
         };
 
         /**
