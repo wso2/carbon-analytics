@@ -789,7 +789,6 @@ define(['jquery', 'lodash', 'log', 'enjoyhint', 'designViewUtils', 'workspace', 
         Guide.prototype.start = function () {
             var self = this;
             var guideModal = self.guideDialog.filter("#guideDialog");
-            instance = new EnjoyHint({});
             var callback = function() { guideModal.modal('hide') };
             //check whether there are multiple tabs and if the current tab is "welcome-page"
             _.each(self.tabList, function (tab) {
@@ -801,7 +800,7 @@ define(['jquery', 'lodash', 'log', 'enjoyhint', 'designViewUtils', 'workspace', 
             });
             //function for the complete tour
             guideModal.find("button").filter("#fullGuide").click(function() {
-
+                instance = new EnjoyHint({});
                 //unbinding the click events from the previous click
                 $('#fullGuide').off('click');
                 $('#simulationGuide').off('click');
@@ -812,6 +811,7 @@ define(['jquery', 'lodash', 'log', 'enjoyhint', 'designViewUtils', 'workspace', 
             });
             //function for the simulation tour
             guideModal.find("button").filter("#simulationGuide").click(function() {
+                instance = new EnjoyHint({});
                 //unbinding the click events from the previous click
                 $('#fullGuide').off('click');
                 $('#simulationGuide').off('click');
@@ -822,6 +822,7 @@ define(['jquery', 'lodash', 'log', 'enjoyhint', 'designViewUtils', 'workspace', 
             });
             //function for the sample tour
             guideModal.find("button").filter("#sampleGuide").click(function() {
+                instance = new EnjoyHint({});
                 //unbinding the click events from the previous click
                 $('#fullGuide').off('click');
                 $('#simulationGuide').off('click');
@@ -857,10 +858,8 @@ define(['jquery', 'lodash', 'log', 'enjoyhint', 'designViewUtils', 'workspace', 
                     default :
                         break;
                 }
-
                 instance = null;
-
-            })
+            });
         };
 
         return Guide;
