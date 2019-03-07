@@ -30,7 +30,6 @@ import org.wso2.carbon.siddhi.editor.core.util.designview.exceptions.CodeGenerat
 import org.wso2.carbon.siddhi.editor.core.util.designview.utilities.CodeGeneratorUtils;
 
 import java.util.List;
-import java.util.Map;
 
 /**
  * Generates the code for a sub-element of a Siddhi element
@@ -139,23 +138,9 @@ public class SubElementCodeGenerator {
         storeStringBuilder.append(SiddhiCodeBuilderConstants.STORE_ANNOTATION)
                 .append(store.getType())
                 .append(SiddhiCodeBuilderConstants.SINGLE_QUOTE);
-        Map<String, String> options = store.getOptions();
-
-        if (options != null && options.size() !=0) {
-            storeStringBuilder.append(SiddhiCodeBuilderConstants.COMMA);
-            int optionsLeft = options.size();
-            for (Map.Entry<String, String> entry : options.entrySet()) {
-                storeStringBuilder.append(entry.getKey())
-                        .append(SiddhiCodeBuilderConstants.EQUAL)
-                        .append(SiddhiCodeBuilderConstants.SINGLE_QUOTE)
-                        .append(entry.getValue())
-                        .append(SiddhiCodeBuilderConstants.SINGLE_QUOTE);
-                if (optionsLeft != 1) {
-                    storeStringBuilder.append(SiddhiCodeBuilderConstants.COMMA);
-                }
-                optionsLeft--;
-            }
-        }
+        List<String> options = store.getOptions();
+        storeStringBuilder.append(SiddhiCodeBuilderConstants.COMMA);
+        storeStringBuilder.append(generateParameterList(options));
         storeStringBuilder.append(SiddhiCodeBuilderConstants.CLOSE_BRACKET);
 
         return storeStringBuilder.toString();

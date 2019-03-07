@@ -279,9 +279,9 @@ define(['require', 'log', 'jquery', 'lodash', 'aggregateByTimePeriod', 'querySel
                     $('#define-predefined-annotations').show();
                     currentStoreOptions = self.formUtils.getSelectedTypeParameters(this.value, predefinedStores);
                     if (storeType && storeType === this.value) {
-                        customizedStoreOptions = self.formUtils.getCustomizedStoreOptions(currentStoreOptions,
+                        customizedStoreOptions = self.formUtils.getCustomizedOptions(currentStoreOptions,
                             storeOptions);
-                        storeOptionsWithValues = self.formUtils.mapUserStoreOptionValues(currentStoreOptions,
+                        storeOptionsWithValues = self.formUtils.mapUserOptionValues(currentStoreOptions,
                             storeOptions);
                         self.formUtils.populateStoreOptions(this.value, storeOptionsWithValues,
                             customizedStoreOptions);
@@ -322,20 +322,10 @@ define(['require', 'log', 'jquery', 'lodash', 'aggregateByTimePeriod', 'querySel
                     var storeAnnotation = store;
                     var storeType = storeAnnotation.getType().toLowerCase();
                     currentStoreOptions = self.formUtils.getSelectedTypeParameters(storeType, predefinedStores);
-                    var storeAnnotationOptions = storeAnnotation.getOptions();
-                    var storeOptions = [];
-                    //todo fix the store option structure - backend
-                    for (var key in storeAnnotationOptions) {
-                        if (storeAnnotationOptions.hasOwnProperty(key)) {
-                            storeOptions.push({
-                                key: key,
-                                value: storeAnnotationOptions[key]
-                            });
-                        }
-                    }
+                    var storeOptions = storeAnnotation.getOptions();
                     $('#define-store #store-type').val(storeType);
-                    customizedStoreOptions = self.formUtils.getCustomizedStoreOptions(currentStoreOptions, storeOptions);
-                    storeOptionsWithValues = self.formUtils.mapUserStoreOptionValues(currentStoreOptions, storeOptions);
+                    customizedStoreOptions = self.formUtils.getCustomizedOptions(currentStoreOptions, storeOptions);
+                    storeOptionsWithValues = self.formUtils.mapUserOptionValues(currentStoreOptions, storeOptions);
                     self.formUtils.populateStoreOptions(storeType, storeOptionsWithValues, customizedStoreOptions);
                     enableIndexAndPartitionById();
                 } else {
@@ -494,12 +484,12 @@ define(['require', 'log', 'jquery', 'lodash', 'aggregateByTimePeriod', 'querySel
                         if (isStoreChecked) {
                             //add store
                             var selectedStoreType = $('#define-store #store-type').val();
-                            var optionsMap = {};
-                            self.formUtils.buildStoreAndAnnotationOptions(optionsMap, Constants.STORE);
-                            self.formUtils.buildCustomizedStoreOption(optionsMap);
+                            var storeOptions = [];
+                            self.formUtils.buildOptions(storeOptions, Constants.STORE);
+                            self.formUtils.buildCustomizedOption(storeOptions, Constants.SOURCE);
                             var storeAnnotationOptions = {};
                             _.set(storeAnnotationOptions, 'type', selectedStoreType);
-                            _.set(storeAnnotationOptions, 'options', optionsMap);
+                            _.set(storeAnnotationOptions, 'options', storeOptions);
                             var storeAnnotation = new StoreAnnotation(storeAnnotationOptions);
                             aggregationObject.setStore(storeAnnotation);
 

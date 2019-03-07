@@ -854,29 +854,6 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
         };
 
         /**
-         * @function to obtain the customized option entered by the user in the source view
-         * @param {Object} predefinedOptions Predefined options of a particular store annotation type
-         * @param {Object} savedOptions saved store options
-         * @return {Object} customizedOptions
-         */
-        FormUtils.prototype.getCustomizedStoreOptions = function (predefinedOptions, savedOptions) {
-            var customizedOptions = [];
-            _.forEach(savedOptions, function (savedOption) {
-                var foundSavedOption = false;
-                _.forEach(predefinedOptions, function (predefinedOption) {
-                    if (predefinedOption.name.toLowerCase() == savedOption.key.toLowerCase().trim()) {
-                        foundSavedOption = true;
-                        return false;
-                    }
-                });
-                if (!foundSavedOption) {
-                    customizedOptions.push({ name: savedOption.name, value: savedOption.value });
-                }
-            });
-            return customizedOptions;
-        };
-
-        /**
          * @function to obtain the user defined annotations from the saved annotations
          * @param {Object} savedAnnotationObjects saved annotation objects
          * @param {Object} predefinedAnnotations predefined annotations
@@ -1886,40 +1863,24 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
         };
 
         /**
-         * @function to build the store options
-         * @param {Object} selectedOptions array to add the built option
+         * @function to build the elements of predefined annotations
+         * @param {String} id to refer to the html where the elements are embedded of a particular annotation
          */
-        FormUtils.prototype.buildStoreAndAnnotationOptions = function (selectedOptions, id) {
-            var option;
+        FormUtils.prototype.buildAnnotationElements = function (id) {
+            var elements = []
             $('#' + id + '-options .option').each(function () {
                 var option = $(this).find('.option-name');
                 var optionName = option.text().trim();
                 var optionValue = $(this).find('.option-value').val().trim();
                 if (option.hasClass('mandatory-option')) {
-                    selectedOptions[optionName] = optionValue;
+                    elements.push({key: optionName, value: optionValue});
                 } else {
                     if ($(this).find('.option-checkbox').is(":checked")) {
-                        selectedOptions[optionName] = optionValue;
+                        elements.push({key: optionName, value: optionValue});
                     }
                 }
             });
-        };
-
-        /**
-         * Function to build the customized store options
-         * @param {Object} selectedOptions array to add the built option
-         */
-        FormUtils.prototype.buildCustomizedStoreOption = function (selectedOptions) {
-            var option = "";
-            if ($('#customized-store-options ul').has('li').length != 0) {
-                $('#customized-store-options .option').each(function () {
-                    var custOptName = $(this).find('.cust-option-key').val().trim();
-                    var custOptValue = $(this).find('.cust-option-value').val().trim();
-                    if ((custOptName != "") && (custOptValue != "")) {
-                        selectedOptions[custOptName] = custOptValue;
-                    }
-                });
-            }
+            return elements;
         };
 
         /**
@@ -2040,15 +2001,15 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
          */
         FormUtils.prototype.buildPredefinedAnnotationElements = function (annotation, annotationObject) {
             var self = this;
-            var annotationOptions = {};
-            self.buildStoreAndAnnotationOptions(annotationOptions, annotation.name);
-            for (key in annotationOptions) {
-                predefinedAnnotationString += key + "="
-                predefinedAnnotationString += "'" + annotationOptions[key] + "' ,";
-                var element = new AnnotationElement(key, annotationOptions[key])
-                annotationObject.addElement(element);
-            }
-            if (Object.keys(annotationOptions).length != 0) {
+            var elements = self.buildAnnotationElements(annotation.name);
+            _.forEach(elements, function (element) {
+                predefinedAnnotationString += element.key + "="
+                predefinedAnnotationString += "'" + element.value + "' ,";
+                var newElement = new AnnotationElement(element.key, element.value);
+                annotationObject.addElement(newElement);
+            })
+
+            if (elements.length != 0) {
                 predefinedAnnotationString = predefinedAnnotationString.substring(0, predefinedAnnotationString.length - 1);
             }
         };
@@ -2208,37 +2169,6 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
                     }
                 })
             });
-        };
-
-        /**
-         * @function to map the saved store option values to the option object
-         * @param {Object} predefinedOptions Predefined options of a particular source/map annotation type
-         * @param {Object} savedOptions Saved options
-         * @return {Object} options
-         */
-        FormUtils.prototype.mapUserStoreOptionValues = function (predefinedOptions, savedOptions) {
-            var options = [];
-            _.forEach(predefinedOptions, function (predefinedOption) {
-                var foundPredefinedOption = false;
-                _.forEach(savedOptions, function (savedOption) {
-                    if (savedOption.key.trim().toLowerCase() == predefinedOption.name.toLowerCase()) {
-                        foundPredefinedOption = true;
-                        options.push({
-                            name: predefinedOption.name, value: savedOption.value, description: predefinedOption
-                                .description, optional: predefinedOption.optional,
-                            defaultValue: predefinedOption.defaultValue
-                        });
-                        return false;
-                    }
-                });
-                if (!foundPredefinedOption) {
-                    options.push({
-                        name: predefinedOption.name, value: "", description: predefinedOption
-                            .description, optional: predefinedOption.optional, defaultValue: predefinedOption.defaultValue
-                    });
-                }
-            });
-            return options;
         };
 
         /**
@@ -2571,7 +2501,6 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
                     }
                     if (predefinedAnnotation.name.toLowerCase() === Constants.RETENTION_PERIOD) {
                         parameters = self.createParametersWithPossibleNames(predefinedAnnotation.parameters);
-                        console.log(parameters)
                     } else {
                         parameters = self.createObjectWithValues(predefinedAnnotation.parameters);
                     }

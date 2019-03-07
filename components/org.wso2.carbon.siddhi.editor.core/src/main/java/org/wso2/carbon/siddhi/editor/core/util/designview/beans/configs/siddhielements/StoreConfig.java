@@ -18,16 +18,16 @@
 
 package org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements;
 
-import java.util.Map;
+import java.util.List;
 
 /**
  * Represents configuration of 'Store' annotation in a Siddhi Table
  */
 public class StoreConfig extends SiddhiElementConfig {
     private String type;
-    private Map<String, String> options;
+    private List<String> options;
 
-    public StoreConfig(String type, Map<String, String> options) {
+    public StoreConfig(String type, List<String> options) {
         super();
         this.type = type;
         this.options = options;
@@ -37,7 +37,7 @@ public class StoreConfig extends SiddhiElementConfig {
         return type;
     }
 
-    public Map<String, String> getOptions() {
+    public List<String> getOptions() {
         return options;
     }
 }

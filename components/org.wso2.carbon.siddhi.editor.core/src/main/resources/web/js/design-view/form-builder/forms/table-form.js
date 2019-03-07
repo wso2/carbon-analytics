@@ -119,8 +119,8 @@ define(['log', 'jquery', 'lodash', 'attribute', 'storeAnnotation', 'handlebar', 
                     $('#define-predefined-annotations').show();
                     currentStoreOptions = self.formUtils.getSelectedTypeParameters(this.value, predefinedStores);
                     if (tableObject.getStore() && storeType === this.value) {
-                        customizedStoreOptions = self.formUtils.getCustomizedStoreOptions(currentStoreOptions, storeOptions);
-                        storeOptionsWithValues = self.formUtils.mapUserStoreOptionValues(currentStoreOptions, storeOptions);
+                        customizedStoreOptions = self.formUtils.getCustomizedOptions(currentStoreOptions, storeOptions);
+                        storeOptionsWithValues = self.formUtils.mapUserOptionValues(currentStoreOptions, storeOptions);
                         self.formUtils.populateStoreOptions(this.value, storeOptionsWithValues, customizedStoreOptions);
                     } else {
                         storeOptionsWithValues = self.formUtils.createObjectWithValues(currentStoreOptions);
@@ -135,19 +135,10 @@ define(['log', 'jquery', 'lodash', 'attribute', 'storeAnnotation', 'handlebar', 
                 var storeAnnotation = tableObject.getStore();
                 var storeType = storeAnnotation.getType().toLowerCase();
                 currentStoreOptions = self.formUtils.getSelectedTypeParameters(storeType, predefinedStores);
-                var storeAnnotationOptions = storeAnnotation.getOptions();
-                var storeOptions = [];
-                for (var key in storeAnnotationOptions) {
-                    if (storeAnnotationOptions.hasOwnProperty(key)) {
-                        storeOptions.push({
-                            key: key,
-                            value: storeAnnotationOptions[key]
-                        });
-                    }
-                }
+                var storeOptions = storeAnnotation.getOptions();
                 $('#define-store #store-type').val(storeType);
-                customizedStoreOptions = self.formUtils.getCustomizedStoreOptions(currentStoreOptions, storeOptions);
-                storeOptionsWithValues = self.formUtils.mapUserStoreOptionValues(currentStoreOptions, storeOptions);
+                customizedStoreOptions = self.formUtils.getCustomizedOptions(currentStoreOptions, storeOptions);
+                storeOptionsWithValues = self.formUtils.mapUserOptionValues(currentStoreOptions, storeOptions);
                 self.formUtils.populateStoreOptions(storeType, storeOptionsWithValues, customizedStoreOptions);
             } else {
                 //if table form is freshly opened [ new table object]
@@ -235,12 +226,12 @@ define(['log', 'jquery', 'lodash', 'attribute', 'storeAnnotation', 'handlebar', 
                     }
 
                     if (selectedStoreType !== Constants.DEFAULT_STORE_TYPE) {
-                        var optionsMap = {};
-                        self.formUtils.buildStoreAndAnnotationOptions(optionsMap, Constants.STORE);
-                        self.formUtils.buildCustomizedStoreOption(optionsMap);
+                        var storeOptions = [];
+                        self.formUtils.buildOptions(storeOptions, Constants.STORE);
+                        self.formUtils.buildCustomizedOption(storeOptions, Constants.STORE);
                         var storeAnnotationOptions = {};
                         _.set(storeAnnotationOptions, 'type', selectedStoreType);
-                        _.set(storeAnnotationOptions, 'options', optionsMap);
+                        _.set(storeAnnotationOptions, 'options', storeOptions);
                         var storeAnnotation = new StoreAnnotation(storeAnnotationOptions);
                         tableObject.setStore(storeAnnotation);
 
