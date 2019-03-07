@@ -2479,7 +2479,6 @@
                 ]
             }
             ],
-            //todo: add desc for options
             type_table_predefined_annotations: [
             {
                 name: "primaryKey",
@@ -2498,12 +2497,14 @@
                         {
                             name: "enable",
                             defaultValue: "true",
+                            description: "Data purging can be enabled or disabled using this option.",
                             optional: true,
                             type: ["BOOL"]
                         },
                         {
                             name: "interval",
                             defaultValue: "10 sec",
+                            description: "The interval to purge data can be mentioned using this option.",
                             optional: true,
                             type: ["INT", "LONG", "TIME"]
                         }
@@ -2515,36 +2516,42 @@
                             {
                                 name: "sec",
                                 defaultValue: "120 sec",
+                                description: "The amount of data to be kept in the database in seconds.",
                                 optional: true,
                                 type: ["INT", "LONG", "TIME"]
                             },
                             {
                                 name: "min",
                                 defaultValue: "24 hours",
+                                description: "The amount of data to be kept in the database in minutes.",
                                 optional: true,
                                 type: ["INT", "LONG", "TIME"]
                             },
                             {
                                 name: "hours",
                                 defaultValue: "30 days",
+                                description: "The amount of data to be kept in the database in hours.",
                                 optional: true,
                                 type: ["INT", "LONG", "TIME"]
                             },
                             {
                                 name: "days",
                                 defaultValue: "1 year",
+                                description: "The amount of data to be kept in the database in days.",
                                 optional: true,
                                 type: ["INT", "LONG", "TIME"]
                             },
                             {
                                 name: "months",
                                 defaultValue: "all",
+                                description: "The amount of data to be kept in the database in months.",
                                 optional: true,
                                 type: ["INT", "LONG", "TIME"]
                             },
                             {
                                 name: "years",
                                 defaultValue: "all",
+                                description: "The amount of data to be kept in the database in years.",
                                 optional: true,
                                 type: ["INT", "LONG", "TIME"]
                             }
@@ -2559,6 +2566,7 @@
                         {
                             name: "enable",
                             defaultValue: "true",
+                            description: "The distributed aggregation can be enabled or disabled using this option.",
                             optional: true,
                             type: ["BOOL"]
                         }
@@ -2577,12 +2585,17 @@
                         {
                             name: "execGroup",
                             defaultValue: "group-1",
+                            description: "The name of the execution group. Elements with the same execution group are " +
+                                "executed in the same siddhi application. Elements with different execution group are executed " +
+                                "in separate siddhi Application per execution group",
                             optional: true,
                             type: ["STRING"]
                         },
                         {
                             name: "parallel",
                             defaultValue: "1",
+                            description: "The number of instances in which the execution element must be executed in parallel." +
+                                "If there is a mismatch in the parallel instances specified for an execution group, an exception occurs.",
                             optional: true,
                             type: ["INT"]
 
