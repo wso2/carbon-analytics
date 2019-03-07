@@ -66,7 +66,7 @@ public class SourceSinkCodeGenerator {
 
         if (sourceSink.getOptions() != null && !sourceSink.getOptions().isEmpty()) {
             sourceSinkStringBuilder.append(SiddhiCodeBuilderConstants.COMMA)
-                    .append(SubElementCodeGenerator.generateElementList(sourceSink.getOptions()));
+                    .append(SubElementCodeGenerator.generateParameterList(sourceSink.getOptions()));
         }
 
         if (sourceSink.getMap() != null) {
@@ -97,7 +97,7 @@ public class SourceSinkCodeGenerator {
 
         if (mapper.getOptions() != null && !mapper.getOptions().isEmpty()) {
             mapperStringBuilder.append(SiddhiCodeBuilderConstants.COMMA)
-                    .append(SubElementCodeGenerator.generateElementList(mapper.getOptions()));
+                    .append(SubElementCodeGenerator.generateParameterList(mapper.getOptions()));
         }
 
         if (mapper.getPayloadOrAttribute() != null) {

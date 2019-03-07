@@ -294,7 +294,6 @@ define(['log', 'jquery', 'lodash', 'sourceOrSinkAnnotation', 'mapAnnotation', 'p
                             return;
                         }
                         var selectedMapType = $('#define-map #map-type').val();
-                        var mapperAnnotationOptions = [];
                         if (self.formUtils.validateOptions(currentMapperOptions, Constants.MAPPER)) {
                             isErrorOccurred = true;
                             return;

@@ -171,30 +171,6 @@ public class SubElementCodeGenerator {
     }
 
     /**
-     * Generates the Siddhi code representation of a element list
-     *
-     * @param elements The elements list
-     * @return The Siddhi code representation of the given elements list
-     */
-    public static String generateElementList(List<String> elements) {
-        if (elements == null || elements.isEmpty()) {
-            return SiddhiCodeBuilderConstants.EMPTY_STRING;
-        }
-
-        StringBuilder parametersStringBuilder = new StringBuilder();
-        int parametersLeft = elements.size();
-        for (String parameter : elements) {
-            parametersStringBuilder.append(toStringWithEscapeChars(parameter));
-            if (parametersLeft != 1) {
-                parametersStringBuilder.append(SiddhiCodeBuilderConstants.COMMA);
-            }
-            parametersLeft--;
-        }
-
-        return parametersStringBuilder.toString();
-    }
-
-    /**
      * Generates the Siddhi code representation of a StreamHandlerConfig list
      *
      * @param streamHandlerList The StreamHandlerConfig list
