@@ -583,12 +583,31 @@ body.sticky-footer {
 
 /*Popover element changes*/
 .popOver {
-  width: 235px;
-  max-width: 235px;
+  width: 400px;
+  max-width: 450px;
   top: -54.5px;
   left: 53px;
   display: block;
   z-index: 300;
+  padding: 1px 1px;
+}
+.popover-footer {
+  margin: 3px -9px 1px 0px;
+  padding: 2px 12px 32px;;
+}
+
+.popover-body-message {
+  text-align: justify;
+  margin: -46px 0px 0px 55px;
+  padding: 5px 1px 0px 1px;
+}
+
+.popover-alert-icon {
+  text-align: left;
+  margin: -7px 327px 1px 1px;
+  padding: 1px 0px 1px 3px;
+  font-size: 44px;
+  color: red;
 }
 
 h3.popover-title {
@@ -596,24 +615,37 @@ h3.popover-title {
   font-weight: 400;
 }
 
-.btn.no {
+.btn.btn_no {
   background-color: #f57e30;
-  color: black;
+  color: #000000;
+  border: 1px solid;
+  border-color: #f57e30;
+
+}
+.btn.btn_yes {
+  background-color: #b3b2b2;
+  color: #000000;
+  border: 1px solid #b3b2b2;
+  border-color: #b3b2b2;
 
 }
 
-.btn.no:hover {
-  color: white;
-}
-
-.btn.yes {
-  background-color: white;
+.btn.btn_no:hover {
+  background-color: #e7620b;
   color: #000000;
 }
 
-.btn.yes:hover {
-  background-color: #f57e30;
-  color: white;
+.btn.btn_yes:hover {
+  background-color: #a4a0a0;
+  color: #000000;
+}
+
+.btn.btn_no:focus {
+  border: 2px solid #ff9f60;
+}
+
+.btn.btn_yes:focus {
+  border: 2px solid #9e9a9a;
 }
 
 .btn-xs {

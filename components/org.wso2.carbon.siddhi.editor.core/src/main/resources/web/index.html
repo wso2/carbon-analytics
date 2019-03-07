@@ -266,9 +266,15 @@
             <div id="grid-container" class="grid-container"></div>
             <!-- Start: pop-over-design-view -->
             <div class="hide pop-over">
+                <div class="popover-body">
+                    <div class="popover-alert-icon"><i class="fw fw-alert"></i></div>
+                    <div class="popover-body-message"><span>Are you sure you want to delete this element?<br>This
+                        cannot be undone.</span>
+                    </div>
+                </div>
                 <div class="popover-footer">
-                    <button class="btn btn-primary btn-xs yes">Yes</button>
-                    <button class="btn btn-primary btn-xs no">No</button>
+                    <button type="button" class="btn btn-secondary btn-xs btn_yes" tabindex="-1">Yes</button>
+                    <button type="button"class="btn btn-default btn-xs btn_no" tabindex="-1">No</button>
                 </div>
             </div>
             <!-- End: pop-over-design-view -->
@@ -278,7 +284,7 @@
         <!-- End: design view container -->
         <!-- Start: Toggle Controls Container -->
         <div class="toggle-controls-container">
-            <div class="btn toggle-view-button" tabindex="10">
+            <div class="btn toggle-view-button">
                 <i class="fw fw-design-view fw-rotate-90"></i>
                 <span class="toggle-button-text">Design View</span>
             </div>
