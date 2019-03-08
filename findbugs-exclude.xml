@@ -17,7 +17,7 @@
 
 <FindBugsFilter>
     <Match>
-        <Class name="org.wso2.carbon.siddhi.editor.core.internal.EditorMicroservice"/>
+        <Class name="io.siddhi.distribution.editor.core.internal.EditorMicroservice"/>
         <Bug pattern="OBL_UNSATISFIED_OBLIGATION"/>
     </Match>
 </FindBugsFilter>
