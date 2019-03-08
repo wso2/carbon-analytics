@@ -97,9 +97,9 @@ define(['log', 'jquery', 'lodash', 'mapAnnotation', 'payloadOrAttribute', 'jsonV
          * @param {Object} streamAttributes to display the stream attributes
          */
         var renderAttributeMappingContent = function (attributes, streamAttributes) {
-            var attributeMapFormTemplate = Handlebars.compile($('#source-sink-map-attribute-template').html());
-            var wrappedHtml = attributeMapFormTemplate({ id: Constants.SINK, attributes: attributes });
-            $('#attribute-map-content').html(wrappedHtml);
+            var attributeMapFormTemplate = Handlebars.compile($('#source-sink-map-attribute-template').html())
+                ({ id: Constants.SINK, attributes: attributes });
+            $('#attribute-map-content').html(attributeMapFormTemplate);
 
             var streamAttributeMessage = "Stream Attributes are: ";
             _.forEach(streamAttributes, function (attribute) {

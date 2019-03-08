@@ -64,11 +64,11 @@ define(['log', 'jquery', 'lodash', 'attribute', 'storeAnnotation', 'handlebar', 
 
             self.formUtils.addEventListenerToRemoveRequiredClass();
 
-            var predefinedStores = _.orderBy(JSON.parse(JSON.stringify(this.configurationData.rawExtensions["store"]),
-                ['name'], ['asc']));
+            var predefinedStores = _.orderBy(_.cloneDeep(this.configurationData.rawExtensions["store"]),
+                ['name'], ['asc']);
             self.formUtils.addCustomizedType(predefinedStores, Constants.DEFAULT_STORE_TYPE);
-            var predefinedTableAnnotations = JSON.parse(JSON.stringify(self.configurationData.application.config.
-                type_table_predefined_annotations));
+            var predefinedTableAnnotations = _.cloneDeep(self.configurationData.application.config.
+                type_table_predefined_annotations);
             var customizedStoreOptions = [];
             var currentStoreOptions = [];
             var storeOptionsWithValues = [];

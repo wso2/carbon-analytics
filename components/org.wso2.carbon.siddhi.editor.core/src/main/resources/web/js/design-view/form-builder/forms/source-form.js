@@ -57,9 +57,9 @@ define(['log', 'jquery', 'lodash', 'sourceOrSinkAnnotation', 'mapAnnotation', 'p
 		 * @param {Object} attributes which needs to be mapped on to the template
 		 */
         var renderAttributeMappingContent = function (id, attributes) {
-            var attributeMapFormTemplate = Handlebars.compile($('#source-sink-map-attribute-template').html());
-            var wrappedHtml = attributeMapFormTemplate({ id: id, attributes: attributes });
-            $('#attribute-map-content').html(wrappedHtml);
+            var attributeMapFormTemplate = Handlebars.compile($('#source-sink-map-attribute-template').html())
+                ({ id: id, attributes: attributes });
+            $('#attribute-map-content').html(attributeMapFormTemplate);
         };
 
         /**

@@ -62,8 +62,8 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'jsonValidator', 'con
             self.formUtils.addEventListenerToRemoveRequiredClass();
 
             var annotations = [];
-            var predefinedAnnotationList = JSON.parse(JSON.stringify(self.configurationData.application.config.
-                stream_predefined_annotations));
+            var predefinedAnnotationList = _.cloneDeep(self.configurationData.application.config.
+                stream_predefined_annotations);
             var checkedAnnotations = [];
 
             var name = streamObject.getName();

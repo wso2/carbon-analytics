@@ -141,12 +141,6 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
         var validateSource = function (type, self) {
             var isErrorOccurred = false;
             var sourceDiv = $('.define-' + type + '-source');
-            var asContent = sourceDiv.find('.source-as-content');
-            if (sourceDiv.find('.source-as-checkbox').is(':checked')) {
-                if (self.formUtils.validateContent(asContent)) {
-                    isErrorOccurred = true;
-                }
-            }
             if (self.formUtils.validateStreamHandlers(sourceDiv)) {
                 isErrorOccurred = true;
             }
@@ -198,11 +192,11 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
          * @function to render per and within input fields if the connected element is aggregation
          */
         var renderPerAndWithin = function () {
-            var perDiv = '<div class="define-per-condition">' +
+            var perDiv = '<div class="define-per-condition define-content">' +
                 '<label> Per Condition </label> <div class="per-condition-content">' +
                 '<input type="text"  class="clearfix per-condition-value per-within name">' +
                 '<label class="error-message"> </label> </div> </div>';
-            var withinDiv = '<div class="define-within-condition">' +
+            var withinDiv = '<div class="define-within-condition define-content">' +
                 '<label> Within Condition </label> <div class="within-condition-content">' +
                 '<input type="text"  class="clearfix within-condition-value per-within name">' +
                 '<label class="error-message"> </label> </div> </div>';
@@ -319,16 +313,15 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
                 var annotationListObjects = joinQueryObject.getAnnotationListObjects();
 
                 var possibleJoinTypes = self.configurationData.application.config.join_types;
-                var predefinedAnnotations = JSON.parse(JSON.stringify(self.configurationData.application.config.
-                    type_query_predefined_annotations));
+                var predefinedAnnotations = _.cloneDeep(self.configurationData.application.config.
+                    type_query_predefined_annotations);
                 var incrementalAggregator = self.configurationData.application.config.incremental_aggregator;
                 var streamHandlerTypes = self.configurationData.application.config.stream_handler_types;
                 var streamFunctions = self.formUtils.getStreamFunctionNames();
 
                 //render the join-query form template
-                var joinFormTemplate = Handlebars.compile($('#join-query-form-template').html());
-                var wrappedHtml = joinFormTemplate({ name: queryName });
-                $('#define-join-query').html(wrappedHtml);
+                var joinFormTemplate = Handlebars.compile($('#join-query-form-template').html())({ name: queryName });
+                $('#define-join-query').html(joinFormTemplate);
                 self.formUtils.renderQueryOutput(outputElementName);
                 self.formUtils.renderOutputEventTypes();
 
@@ -532,32 +525,9 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
                         }
                     }
 
-                    if ($('.on-condition-checkbox').is(':checked')) {
-                        if (self.formUtils.validateContent('.on-condition-content')) {
-                            isErrorOccurred = true;
-                            return;
-                        }
-                    }
-
-                    if ($('.post-filter-checkbox').is(':checked')) {
-                        if (self.formUtils.validateContent('.post-filter-condition-content')) {
-                            isErrorOccurred = true;
-                            return;
-                        }
-                    }
-
-                    if ($('.limit-checkbox').is(':checked')) {
-                        if (self.formUtils.validateContent('.limit-content')) {
-                            isErrorOccurred = true;
-                            return;
-                        }
-                    }
-
-                    if ($('.rate-limiting-checkbox').is(':checked')) {
-                        if (self.formUtils.validateContent('.rate-limiting-content')) {
-                            isErrorOccurred = true;
-                            return;
-                        }
+                    if (self.formUtils.validateRequiredFields('.define-content')) {
+                        isErrorOccurred = true;
+                        return;
                     }
 
                     if (self.formUtils.validatePredefinedAnnotations(predefinedAnnotations)) {
@@ -565,17 +535,6 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
                         return;
                     }
 
-                    if (firstConnectedElement.type.toLowerCase() === Constants.AGGREGATION ||
-                        secondConnectedElement.type.toLowerCase() === Constants.AGGREGATION) {
-                        if (self.formUtils.validateContent('.per-condition-content')) {
-                            isErrorOccurred = true;
-                            return;
-                        }
-                        if (self.formUtils.validateContent('.within-condition-content')) {
-                            isErrorOccurred = true;
-                            return;
-                        }
-                    }
 
                     if (self.formUtils.validateQueryProjection()) {
                         isErrorOccurred = true;
@@ -712,7 +671,6 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
 
                         var isValid = JSONValidator.prototype.validateJoinQuery(joinQueryObject, false);
                         if (!isValid) {
-                            isErrorOccurred = true;
                             return;
                         }
 

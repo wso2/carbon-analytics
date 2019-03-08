@@ -78,7 +78,7 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
          */
         var addAutoCompletion = function (self, partitionId, QUERY_CONDITION_SYNTAX, QUERY_SYNTAX,
             incrementalAggregator, streamFunctions) {
-            possibleAttributes = getPossibleAttributes(self, partitionId);
+            var possibleAttributes = getPossibleAttributes(self, partitionId);
             var selectExpressionMatches = JSON.parse(JSON.stringify(possibleAttributes));
             selectExpressionMatches = selectExpressionMatches.concat(incrementalAggregator);
             selectExpressionMatches = selectExpressionMatches.concat(streamFunctions);
@@ -149,14 +149,14 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
                 var queryInput = patternQueryObject.getQueryInput();
                 var queryOutput = patternQueryObject.getQueryOutput();
 
-                var predefinedAnnotations = JSON.parse(JSON.stringify(self.configurationData.application.config.
-                    type_query_predefined_annotations));
+                var predefinedAnnotations = _.cloneDeep(self.configurationData.application.config.
+                    type_query_predefined_annotations);
                 var streamFunctions = self.formUtils.getStreamFunctionNames();
 
                 //render the pattern-query form template
-                var patternFormTemplate = Handlebars.compile($('#pattern-sequence-query-form-template').html());
-                var wrappedHtml = patternFormTemplate({ name: queryName });
-                $('#define-pattern-query').html(wrappedHtml);
+                var patternFormTemplate = Handlebars.compile($('#pattern-sequence-query-form-template').html())
+                    ({ name: queryName });
+                $('#define-pattern-query').html(patternFormTemplate);
                 self.formUtils.renderQueryOutput(outputElementName);
                 self.formUtils.renderOutputEventTypes();
 
@@ -317,28 +317,7 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
                         }
                     }
 
-                    if ($('.post-filter-checkbox').is(':checked')) {
-                        if (self.formUtils.validateContent('.post-filter-condition-content')) {
-                            isErrorOccurred = true;
-                            return;
-                        }
-                    }
-
-                    if ($('.limit-checkbox').is(':checked')) {
-                        if (self.formUtils.validateContent('.limit-content')) {
-                            isErrorOccurred = true;
-                            return;
-                        }
-                    }
-
-                    if ($('.rate-limiting-checkbox').is(':checked')) {
-                        if (self.formUtils.validateContent('.rate-limiting-content')) {
-                            isErrorOccurred = true;
-                            return;
-                        }
-                    }
-
-                    if (self.formUtils.validateContent('.define-logic-statement')) {
+                    if (self.formUtils.validateRequiredFields('.define-content')) {
                         isErrorOccurred = true;
                         return;
                     }

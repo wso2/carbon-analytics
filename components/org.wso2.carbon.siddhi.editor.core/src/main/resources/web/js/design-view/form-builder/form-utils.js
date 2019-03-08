@@ -300,9 +300,9 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
          * @function to render the html for query output
          */
         FormUtils.prototype.renderQueryOutput = function (outputElementName) {
-            var queryOutputTemplate = Handlebars.compile($('#query-output-template').html());
-            var wrappedHtml = queryOutputTemplate({ into: outputElementName, operation: Constants.INSERT });
-            $('.define-query-output').html(wrappedHtml);
+            var queryOutputTemplate = Handlebars.compile($('#query-output-template').html())
+                ({ into: outputElementName, operation: Constants.INSERT });
+            $('.define-query-output').html(queryOutputTemplate);
         };
 
         /**
@@ -311,9 +311,9 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
          * @param {Object} predefinedTypes
          */
         FormUtils.prototype.renderSourceSinkStoreTypeDropDown = function (id, predefinedTypes) {
-            var selectionFormTemplate = Handlebars.compile($('#type-selection-form-template').html());
-            var wrappedHtml = selectionFormTemplate({ id: id, types: predefinedTypes });
-            $('#define-' + id).html(wrappedHtml);
+            var selectionFormTemplate = Handlebars.compile($('#type-selection-form-template').html())
+                ({ id: id, types: predefinedTypes });
+            $('#define-' + id).html(selectionFormTemplate);
         };
 
         /**
@@ -322,9 +322,8 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
          */
         FormUtils.prototype.renderAttributeTemplate = function (attributes) {
             var self = this;
-            var attributeFormTemplate = Handlebars.compile($('#attribute-form-template').html());
-            var wrappedHtml = attributeFormTemplate(attributes);
-            $('#define-attribute').html(wrappedHtml);
+            var attributeFormTemplate = Handlebars.compile($('#attribute-form-template').html())(attributes);
+            $('#define-attribute').html(attributeFormTemplate);
             self.changeAttributeNavigation('#attribute-div');
             self.addEventListenersForAttributeDiv();
         };
@@ -335,10 +334,8 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
          * @param {templateId} the id of the template div to render
          */
         FormUtils.prototype.renderUserDefinedAttributeSelection = function (attributes, templateId) {
-            var self = this;
-            var userAttributeSelectionTemplate = Handlebars.compile($('#' + templateId + '-template').html());
-            var wrappedHtml = userAttributeSelectionTemplate(attributes);
-            $('.define-select').html(wrappedHtml);
+            var userAttributeSelectionTemplate = Handlebars.compile($('#' + templateId + '-template').html())(attributes);
+            $('.define-select').html(userAttributeSelectionTemplate);
         };
 
         /**
@@ -358,9 +355,8 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
             var self = this;
             var raw_partial = document.getElementById('recursiveAnnotationPartial').innerHTML;
             Handlebars.registerPartial('recursiveAnnotation', raw_partial);
-            var annotationFormTemplate = Handlebars.compile($('#annotation-form-template').html());
-            var wrappedHtml = annotationFormTemplate(annotations);
-            $('.' + className).html(wrappedHtml);
+            var annotationFormTemplate = Handlebars.compile($('#annotation-form-template').html())(annotations);
+            $('.' + className).html(annotationFormTemplate);
             self.loadAnnotation();
         };
 
@@ -370,9 +366,9 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
          */
         FormUtils.prototype.renderMap = function (predefinedMaps) {
             if (!$.trim($('#define-map').html()).length) {
-                var mapFormTemplate = Handlebars.compile($('#type-selection-form-template').html());
-                var wrappedHtml = mapFormTemplate({ id: "map", types: predefinedMaps });
-                $('#define-map').html(wrappedHtml);
+                var mapFormTemplate = Handlebars.compile($('#type-selection-form-template').html())
+                    ({ id: "map", types: predefinedMaps });
+                $('#define-map').html(mapFormTemplate);
                 $('#define-map #map-type').val('passThrough');
                 $('#define-map #map-type option:contains("' + Constants.DEFAULT_MAPPER_TYPE + '")').
                     text('passThrough (default)');
@@ -392,13 +388,12 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
                 else if (!val1.optional && val2.optional) return -1;
                 else return 0;
             });
-            var optionsTemplate = Handlebars.compile($('#source-sink-store-options-template').html());
-            var wrappedHtml = optionsTemplate({
+            var optionsTemplate = Handlebars.compile($('#source-sink-store-options-template').html())({
                 id: id,
                 options: optionsArray,
                 customizedOptions: customizedOptions
             });
-            $('#' + id + '-options-div').html(wrappedHtml);
+            $('#' + id + '-options-div').html(optionsTemplate);
             self.changeCustomizedOptDiv(id);;
         };
 
@@ -446,7 +441,7 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
          */
         FormUtils.prototype.addDeleteButtonForConditionNav = function () {
             var buttonHTML = '<li> <button class="btn btn-default btn-add-condition"> +</button> </li> ';
-            if ($(".define-conditions").find(".btn-add-condition").length == 0){
+            if ($(".define-conditions").find(".btn-add-condition").length == 0) {
                 $('.define-conditions .nav-tabs').append(buttonHTML);
             }
         };
@@ -458,9 +453,9 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
          * @param {String} id window or stream-function
          */
         FormUtils.prototype.renderFunctions = function (predefinedFunctions, className, id) {
-            var windowFunctionNameTemplate = Handlebars.compile($('#type-selection-form-template').html());
-            var wrappedHtml = windowFunctionNameTemplate({ id: id, types: predefinedFunctions });
-            $(className).find('.defineFunctionName').html(wrappedHtml);
+            var windowFunctionNameTemplate = Handlebars.compile($('#type-selection-form-template').html())
+                ({ id: id, types: predefinedFunctions });
+            $(className).find('.defineFunctionName').html(windowFunctionNameTemplate);
         };
 
         /**
@@ -475,12 +470,11 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
                 else if (!val1.optional && val2.optional) return -1;
                 else return 0;
             });
-            var parameterTemplate = Handlebars.compile($('#window-function-parameters-template').html());
-            var wrappedHtml = parameterTemplate({
+            var parameterTemplate = Handlebars.compile($('#window-function-parameters-template').html())({
                 id: id,
                 parameters: parameterArray
             });
-            $(parameterDiv).find('.defineFunctionParameters').html(wrappedHtml);
+            $(parameterDiv).find('.defineFunctionParameters').html(parameterTemplate);
         };
 
         /**
@@ -488,9 +482,8 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
          * @param {String} type left or right
          */
         FormUtils.prototype.renderLeftRightSource = function (type) {
-            var sourceTemplate = Handlebars.compile($('#query-source-form-template').html());
-            var wrappedHtml = sourceTemplate({ type: type });
-            $('.define-' + type + '-source').html(wrappedHtml);
+            var sourceTemplate = Handlebars.compile($('#query-source-form-template').html())({ type: type });
+            $('.define-' + type + '-source').html(sourceTemplate);
         };
 
         /**
@@ -501,9 +494,8 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
                 options: possibleOptions,
                 id: id
             }
-            var dropDownTemplate = Handlebars.compile($('#drop-down-template').html());
-            var wrappedHtml = dropDownTemplate(possibleValues);
-            $(className).append(wrappedHtml);
+            var dropDownTemplate = Handlebars.compile($('#drop-down-template').html())(possibleValues);
+            $(className).append(dropDownTemplate);
         };
 
         /**
@@ -541,9 +533,8 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
                 types: types
             }
             self.registerDropDownPartial();
-            var streamHandlerTemplate = Handlebars.compile($('#stream-handler-form-template').html());
-            var wrappedHtml = streamHandlerTemplate(streamHandlers);
-            $('.define-' + className + '-source .define-stream-handler-section').html(wrappedHtml);
+            var streamHandlerTemplate = Handlebars.compile($('#stream-handler-form-template').html())(streamHandlers);
+            $('.define-' + className + '-source .define-stream-handler-section').html(streamHandlerTemplate);
         };
 
         /**
@@ -568,9 +559,9 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
          */
         FormUtils.prototype.renderPrimaryIndexAnnotations = function (primaryIndexAnnotations, id) {
             var self = this;
-            var annotationFormTemplate = Handlebars.compile($('#primary-index-annotation-template').html());
-            var wrappedHtml = annotationFormTemplate(primaryIndexAnnotations);
-            $('.' + id).html(wrappedHtml);
+            var annotationFormTemplate = Handlebars.compile($('#primary-index-annotation-template').html())
+                (primaryIndexAnnotations);
+            $('.' + id).html(annotationFormTemplate);
             self.removeDeleteButtonOfPrimaryIndexAnnotationValue();
             self.addEventListenerForPrimaryIndexAnnotationDiv();
         };
@@ -581,9 +572,9 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
         FormUtils.prototype.renderPredefinedAnnotations = function (predefinedAnnotations, className) {
             var raw_partial = document.getElementById('recursive-predefined-annotation-partial').innerHTML;
             Handlebars.registerPartial('recursive-predefined-annotation', raw_partial);
-            var annotationFormTemplate = Handlebars.compile($('#predefined-annotation-form-template').html());
-            var wrappedHtml = annotationFormTemplate(predefinedAnnotations);
-            $('.' + className).html(wrappedHtml);
+            var annotationFormTemplate = Handlebars.compile($('#predefined-annotation-form-template').html())
+                (predefinedAnnotations);
+            $('.' + className).html(annotationFormTemplate);
         };
 
         /**
@@ -602,9 +593,8 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
                 possibleGroupByAttributes: possibleGroupByAttributes
             }
             self.registerDropDownPartial();
-            var groupByTemplate = Handlebars.compile($('#group-by-template').html());
-            var wrappedHtml = groupByTemplate(groupByAttributes);
-            $('.define-group-by-attributes').html(wrappedHtml);
+            var groupByTemplate = Handlebars.compile($('#group-by-template').html())(groupByAttributes);
+            $('.define-group-by-attributes').html(groupByTemplate);
             self.checkForAttributeLength(possibleGroupByAttributes.length, Constants.GROUP_BY);
         };
 
@@ -625,9 +615,8 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
                 possibleOrderByAttributes: possibleOrderByAttributes
             }
             self.registerDropDownPartial();
-            var orderByTemplate = Handlebars.compile($('#order-by-template').html());
-            var wrappedHtml = orderByTemplate(orderByAttributes);
-            $('.define-order-by-attributes').html(wrappedHtml);
+            var orderByTemplate = Handlebars.compile($('#order-by-template').html())(orderByAttributes);
+            $('.define-order-by-attributes').html(orderByTemplate);
             self.checkForAttributeLength(possibleOrderByAttributes.length, Constants.ORDER_BY);
         };
 
@@ -665,10 +654,7 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
         FormUtils.prototype.selectAggregateProjection = function (select) {
             var self = this;
             var attributes;
-            var selectedType = Constants.TYPE_ALL;
-            if (select) {
-                selectedType = select.getType().toLowerCase();
-            }
+            var selectedType = (select) ? (select.getType().toLowerCase()) : Constants.TYPE_ALL;
             if (selectedType === Constants.TYPE_ALL) {
                 attributes = [""]
             } else {
@@ -700,10 +686,7 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
         FormUtils.prototype.selectQueryProjection = function (select, outputElementName) {
             var self = this;
             var attributes;
-            var selectedType = Constants.TYPE_ALL;
-            if (select) {
-                selectedType = select.getType().toLowerCase();
-            }
+            var selectedType = (select) ? (select.getType().toLowerCase()) : Constants.TYPE_ALL;
             if (selectedType === Constants.TYPE_ALL) {
                 attributes = self.createEmptyAttributesForQueryProjection(outputElementName);
             } else {
@@ -1014,17 +997,24 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
         };
 
         /**
-		 * @function to validate the condition input fields
-		 */
-        FormUtils.prototype.validateContent = function (className) {
+         *
+         * @param className the divisions which needs to be validated
+         * @returns {boolean}
+         */
+        FormUtils.prototype.validateRequiredFields = function (className) {
             var self = this;
             var isErrorOccurred = false;
-            var conditionValue = $(className).find('input[type="text"]');
-            if (conditionValue.val() == "") {
-                self.addErrorClass(conditionValue);
-                $(className).find('.error-message').text('Value is required');
-                isErrorOccurred = true;
-            }
+            $(className).each(function () {
+                var checkBox = $(this).find('input:checkbox');
+                if (checkBox.length == 0 || (checkBox.length > 0 && checkBox.is(":checked"))) {
+                    var inputValue = $(this).find('input:text');
+                    if (inputValue.val().trim() == "") {
+                        self.addErrorClass(inputValue);
+                        $(className).find('.error-message').text('Value is required');
+                        isErrorOccurred = true;
+                    }
+                }
+            });
             return isErrorOccurred;
         };
 
@@ -1873,10 +1863,10 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
                 var optionName = option.text().trim();
                 var optionValue = $(this).find('.option-value').val().trim();
                 if (option.hasClass('mandatory-option')) {
-                    elements.push({key: optionName, value: optionValue});
+                    elements.push({ key: optionName, value: optionValue });
                 } else {
                     if ($(this).find('.option-checkbox').is(":checked")) {
-                        elements.push({key: optionName, value: optionValue});
+                        elements.push({ key: optionName, value: optionValue });
                     }
                 }
             });

@@ -109,9 +109,8 @@ define(['require', 'log', 'jquery', 'lodash', 'partitionWith', 'jsonValidator', 
                             partitionKeys.push(partitionKey);
                         }
                     }
-                    var partitionFormTemplate = Handlebars.compile($('#partition-by-template').html());
-                    var wrappedHtml = partitionFormTemplate(partitionKeys);
-                    $('#define-partition-keys').html(wrappedHtml);
+                    var partitionFormTemplate = Handlebars.compile($('#partition-by-template').html())(partitionKeys);
+                    $('#define-partition-keys').html(partitionFormTemplate);
 
                     self.formUtils.addEventListenerToRemoveRequiredClass();
 

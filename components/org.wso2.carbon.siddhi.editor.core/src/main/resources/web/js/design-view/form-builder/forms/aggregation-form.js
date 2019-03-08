@@ -92,8 +92,10 @@ define(['require', 'log', 'jquery', 'lodash', 'aggregateByTimePeriod', 'querySel
             });
 
             if (selectedIntervals.length == 0) {
-                $('.interval-content').find('.error-message').text("Minimum one granularity is required.");
-                self.formUtils.addErrorClass('.interval-content')
+                var errorLabel = $('.interval-content').find('.error-message');
+                errorLabel.text("Minimum one granularity is required.");
+                errorLabel.show();
+                self.formUtils.addErrorClass('.interval-content');
                 isErrorOccurred = true;
             }
             return isErrorOccurred;
@@ -225,16 +227,16 @@ define(['require', 'log', 'jquery', 'lodash', 'aggregateByTimePeriod', 'querySel
                 var aggregateByTimePeriod = aggregationObject.getAggregateByTimePeriod();
 
                 var predefinedStores = _.orderBy(this.configurationData.rawExtensions["store"], ['name'], ['asc']);
-                var predefinedAggregationAnnotations = JSON.parse(JSON.stringify(self.configurationData.application.config.
-                    type_aggregation_predefined_annotations));
+                var predefinedAggregationAnnotations = _.cloneDeep(self.configurationData.application.config.
+                    type_aggregation_predefined_annotations);
                 var connectedElement = self.configurationData.getSiddhiAppConfig().getDefinitionElementByName(connectedSource);
                 var incrementalAggregator = self.configurationData.application.config.incremental_aggregator;
                 var streamFunctions = self.formUtils.getStreamFunctionNames();
 
                 //render the aggregation form template
-                var aggregationFormTemplate = Handlebars.compile($('#aggregation-form-template').html());
-                var wrappedHtml = aggregationFormTemplate({ name: name, from: connectedSource });
-                $('#define-aggregation').html(wrappedHtml);
+                var aggregationFormTemplate = Handlebars.compile($('#aggregation-form-template').html())
+                    ({ name: name, from: connectedSource });
+                $('#define-aggregation').html(aggregationFormTemplate);
 
                 self.formUtils.addEventListenerToRemoveRequiredClass();
 

@@ -93,15 +93,15 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
                 var streamHandlerList = queryInput.getStreamHandlerList();
                 var annotationListObjects = queryObject.getAnnotationListObjects();
 
-                var predefinedAnnotations = JSON.parse(JSON.stringify(self.configurationData.application.config.
-                    type_query_predefined_annotations));
+                var predefinedAnnotations = _.cloneDeep(self.configurationData.application.config.
+                    type_query_predefined_annotations);
                 var streamHandlerTypes = self.configurationData.application.config.stream_handler_types;
                 var incrementalAggregator = self.configurationData.application.config.incremental_aggregator;
 
                 //render the query form template
-                var queryFormTemplate = Handlebars.compile($('#window-filter-projection-query-form-template').html());
-                var wrappedHtml = queryFormTemplate({ name: queryName, from: inputElementName });
-                $('#define-windowFilterProjection-query').html(wrappedHtml);
+                var queryFormTemplate = Handlebars.compile($('#window-filter-projection-query-form-template').html())
+                    ({ name: queryName, from: inputElementName });
+                $('#define-windowFilterProjection-query').html(queryFormTemplate);
                 self.formUtils.renderQueryOutput(outputElementName);
                 self.formUtils.renderOutputEventTypes();
 
@@ -256,25 +256,9 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
                         }
                     }
 
-                    if ($('.post-filter-checkbox').is(':checked')) {
-                        if (self.formUtils.validateContent('.post-filter-condition-content')) {
-                            isErrorOccurred = true;
-                            return;
-                        }
-                    }
-
-                    if ($('.limit-checkbox').is(':checked')) {
-                        if (self.formUtils.validateContent('.limit-content')) {
-                            isErrorOccurred = true;
-                            return;
-                        }
-                    }
-
-                    if ($('.rate-limiting-checkbox').is(':checked')) {
-                        if (self.formUtils.validateContent('.rate-limiting-content')) {
-                            isErrorOccurred = true;
-                            return;
-                        }
+                    if (self.formUtils.validateRequiredFields('.define-content')) {
+                        isErrorOccurred = true;
+                        return;
                     }
 
                     if (self.formUtils.validatePredefinedAnnotations(predefinedAnnotations)) {
