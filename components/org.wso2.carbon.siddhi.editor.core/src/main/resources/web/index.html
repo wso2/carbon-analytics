@@ -1691,11 +1691,11 @@
     <div class="define-output-action">
         <h3> Action </h3>
         <div>
-            <h4> Operation: </h4>
+            <label> Operation: </label>
             <input type="text" class="clearfix name query-operation" value="{{operation}}" readonly>
         </div>
-        <div class="define-query-into">
-            <h4> Into: </h4>
+        <div class="define-query-into margin-top-5">
+            <label> Into: </label>
             <input type="text" class="clearfix name query-into" value="{{into}}" readonly>
         </div>
         <div class="define-output-events"> </div>
@@ -1750,7 +1750,7 @@
         </div>
     </div>
     <div class="pattern-sequence-query-form-container">
-        <h4> Input </h4>
+        <h3> Input </h3>
         <div class="define-conditions">
             <h4> Conditions </h4>
             <ul class="nav nav-tabs"> </ul>
@@ -1814,7 +1814,10 @@
             <label class="clearfix"> Condition ID </label>
             <input type="text" class="condition-id clearfix" value="{{condition.conditionId}}" min="1">
             <label class="error-message"></label>
-            <div class="define-stream"> {{> renderDropDown inputStreamNames}}  </div>
+            <div class="define-stream">
+                <label class="clearfix"> Stream </label>
+                <div>{{> renderDropDown inputStreamNames}}</div>
+            </div>
             <div class="define-stream-handler">
                 <label> <input type="checkbox" class="stream-handler-checkbox"> Stream Handler </label>
                 <div class="define-stream-handler-section"> </div>
@@ -1830,7 +1833,7 @@
 <script id = "window-filter-projection-query-form-template" type="text/template">
     <div class="query-form-container">
         <div class="query-name-div">
-            <h4> Name: </h4>
+            <label> Name: </label>
             <input type="text"  class="clearfix query-name name" value="{{name}}">
             <label class="error-message"> </label>
         </div>
