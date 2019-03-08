@@ -148,7 +148,7 @@ define(['require', 'log', 'jquery', 'lodash', 'backbone', 'menu_bar', 'tool_bar'
 
                     var isFreshUser = (this.browserStorage.get('guideFileNameIncrement') === null);
                     if(isFreshUser) {
-                        this.workspaceManager.runGuide();
+                        this.guide.startGuide();
                         this.browserStorage.put("guideFileNameIncrement", 1);
                     }
                 },

@@ -786,10 +786,12 @@ define(['jquery', 'lodash', 'log', 'enjoyhint', 'designViewUtils', 'workspace', 
         };
 
         //start function for the complete guide
-        Guide.prototype.start = function () {
+        Guide.prototype.startGuide = function () {
+            alert("start");
             var self = this;
             var guideModal = self.guideDialog.filter("#guideDialog");
-            var callback = function() { guideModal.modal('hide') };
+            var callBack = function() { guideModal.modal('hide') };
+            //instance = new EnjoyHint({});
             //check whether there are multiple tabs and if the current tab is "welcome-page"
             _.each(self.tabList, function (tab) {
                 if (self.tabList.length === 1 && tab._title === "welcome-page") {
@@ -799,67 +801,74 @@ define(['jquery', 'lodash', 'log', 'enjoyhint', 'designViewUtils', 'workspace', 
                 }
             });
             //function for the complete tour
-            guideModal.find("button").filter("#fullGuide").click(function() {
-                instance = new EnjoyHint({});
+            guideModal.find("button").filter("#fullGuide").unbind().click(function() {
                 //unbinding the click events from the previous click
+                instance = new EnjoyHint({});
                 $('#fullGuide').off('click');
                 $('#simulationGuide').off('click');
                 $('#sampleGuide').off('click');
                 instance.setScript(self.completeGuide);
                 instance.runScript();
-                callback();
+                callBack();
+                test();
             });
             //function for the simulation tour
-            guideModal.find("button").filter("#simulationGuide").click(function() {
-                instance = new EnjoyHint({});
+            guideModal.find("button").filter("#simulationGuide").unbind().click(function() {
                 //unbinding the click events from the previous click
+                instance = new EnjoyHint({});
                 $('#fullGuide').off('click');
                 $('#simulationGuide').off('click');
                 $('#sampleGuide').off('click');
                 instance.setScript(self.simulateGuide);
                 instance.runScript();
-                callback();
+                callBack();
+                test();
             });
             //function for the sample tour
-            guideModal.find("button").filter("#sampleGuide").click(function() {
-                instance = new EnjoyHint({});
+            guideModal.find("button").filter("#sampleGuide").unbind().click(function() {
                 //unbinding the click events from the previous click
+                instance = new EnjoyHint({});
                 $('#fullGuide').off('click');
                 $('#simulationGuide').off('click');
                 $('#sampleGuide').off('click');
                 instance.setScript(self.sampleGuide);
                 instance.runScript();
-                callback();
+                callBack();
+                test();
             });
-            $('.enjoyhint_close_btn').click(function () {
-                switch (currentStep) {
-                    case 7  :
-                        $('#stream').addClass('stream-drag');
-                        break;
-                    case 8  :
-                        $('#trigger').addClass('trigger-drag');
-                        $('#partition').addClass('partition-drag');
-                        break;
-                    case 14 :
-                        $('#projection-query').addClass('projection-query-drag');
-                        break;
-                    case 15 :
-                        $('#filter-query').addClass('filter-query-drag');
-                        $('#window-query').addClass('window-query-drag');
-                        $('#pattern-query').addClass('pattern-query-drag');
-                        $('#sequence-query').addClass('sequence-query-drag');
-                        break;
-                    case 21 :
-                        $('#sink').addClass('sink-drag');
-                        break;
-                    case 22 :
-                        $('#source').addClass('source-drag ');
-                        break;
-                    default :
-                        break;
-                }
-                instance = null;
-            });
+
+            var test = function () {
+                $('.enjoyhint_close_btn').click(function () {
+                    switch (currentStep) {
+                        case 7  :
+                            $('#stream').addClass('stream-drag');
+                            break;
+                        case 8  :
+                            $('#trigger').addClass('trigger-drag');
+                            $('#partition').addClass('partition-drag');
+                            break;
+                        case 14 :
+                            $('#projection-query').addClass('projection-query-drag');
+                            break;
+                        case 15 :
+                            $('#filter-query').addClass('filter-query-drag');
+                            $('#window-query').addClass('window-query-drag');
+                            $('#pattern-query').addClass('pattern-query-drag');
+                            $('#sequence-query').addClass('sequence-query-drag');
+                            break;
+                        case 21 :
+                            $('#sink').addClass('sink-drag');
+                            break;
+                        case 22 :
+                            $('#source').addClass('source-drag ');
+                            break;
+                        default :
+                            break;
+                    }
+
+                    instance = null;
+                });
+            }
         };
 
         return Guide;

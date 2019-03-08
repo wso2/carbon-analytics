@@ -692,7 +692,7 @@ define(['ace/ace', 'jquery', 'lodash', 'log','dialogs','./service-client','welco
 
             this.runGuide = function runGuide(){
                 log.debug("start: rendering hint guide");
-                app.guide.start();
+                app.guide.startGuide();
                 log.debug("end: rendering hint guide");
             };
 

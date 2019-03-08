@@ -1125,7 +1125,6 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
                 // 'Submit' button action
                 var submitButtonElement = $(formContainer).find('#btn-submit')[0];
                 $(formContainer).on('click', '#btn-submit', function () {
-                // submitButtonElement.addEventListener('click', function () {
 
                     var annotationErrors = editorAnnotation.validate();
                     var inputErrors = editorInput.validate();
