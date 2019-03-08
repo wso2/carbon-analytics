@@ -231,7 +231,7 @@
                     <suiteXmlFiles>
                         <suiteXmlFile>src/test/resources/testng.xml</suiteXmlFile>
                     </suiteXmlFiles>
-                    <argLine>${surefireArgLine} -ea -Xmx512m</argLine>
+                    <argLine>${surefireArgLine} -ea -Xmx750m</argLine>
                 </configuration>
             </plugin>
             <plugin>
