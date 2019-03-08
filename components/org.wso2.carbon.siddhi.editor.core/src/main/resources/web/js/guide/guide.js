@@ -787,11 +787,9 @@ define(['jquery', 'lodash', 'log', 'enjoyhint', 'designViewUtils', 'workspace', 
 
         //start function for the complete guide
         Guide.prototype.startGuide = function () {
-            alert("start");
             var self = this;
             var guideModal = self.guideDialog.filter("#guideDialog");
             var callBack = function() { guideModal.modal('hide') };
-            //instance = new EnjoyHint({});
             //check whether there are multiple tabs and if the current tab is "welcome-page"
             _.each(self.tabList, function (tab) {
                 if (self.tabList.length === 1 && tab._title === "welcome-page") {
