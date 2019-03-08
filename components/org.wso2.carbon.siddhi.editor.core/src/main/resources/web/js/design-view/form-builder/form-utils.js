@@ -445,7 +445,7 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
          * @function to add the button to add the condition in the nav bar of the condition-ul
          */
         FormUtils.prototype.addDeleteButtonForConditionNav = function () {
-            var buttonHTML = '<li> <button class="btn btn-default btn-add-condition"> +</button> </li> ';
+            var buttonHTML = '<li> <a class="btn-add-condition">+</a> </li> ';
             if ($(".define-conditions").find(".btn-add-condition").length == 0){
                 $('.define-conditions .nav-tabs').append(buttonHTML);
             }
