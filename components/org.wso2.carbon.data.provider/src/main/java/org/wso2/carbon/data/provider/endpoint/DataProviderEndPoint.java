@@ -31,6 +31,7 @@ import org.wso2.carbon.data.provider.bean.DataProviderConfigRoot;
 import org.wso2.carbon.data.provider.siddhi.SiddhiProvider;
 import org.wso2.carbon.datasource.core.api.DataSourceService;
 import org.wso2.msf4j.websocket.WebSocketEndpoint;
+import org.wso2.transport.http.netty.contract.websocket.WebSocketConnection;
 
 import java.io.IOException;
 import java.util.Arrays;
@@ -40,7 +41,6 @@ import javax.websocket.OnClose;
 import javax.websocket.OnError;
 import javax.websocket.OnMessage;
 import javax.websocket.OnOpen;
-import javax.websocket.Session;
 import javax.websocket.server.ServerEndpoint;
 
 import static org.wso2.carbon.data.provider.utils.DataProviderValueHolder.getDataProviderHelper;
@@ -55,7 +55,7 @@ import static org.wso2.carbon.data.provider.utils.DataProviderValueHolder.getDat
 @ServerEndpoint(value = "/data-provider")
 public class DataProviderEndPoint implements WebSocketEndpoint {
     private static final Logger LOGGER = LoggerFactory.getLogger(DataProviderEndPoint.class);
-    private static final Map<String, Session> sessionMap = new ConcurrentHashMap<>();
+    private static final Map<String, WebSocketConnection> sessionMap = new ConcurrentHashMap<>();
 
     @Reference(
             name = "org.wso2.carbon.datasource.DataSourceService",
@@ -87,66 +87,73 @@ public class DataProviderEndPoint implements WebSocketEndpoint {
     /**
      * Handle initiation of the connection map the session object in the session map.
      *
-     * @param session Session object associated with the connection
+     * @param webSocketConnection webSocketConnection object associated with the connection
      */
     @OnOpen
-    public static void onOpen(Session session) {
-        sessionMap.put(session.getId(), session);
+    public static void onOpen(WebSocketConnection webSocketConnection) {
+        sessionMap.put(webSocketConnection.getChannelId(), webSocketConnection);
     }
 
     /**
      * Create DataProvider instance, start it and store it in the providerMap.
      *
      * @param message String message received from the web client
-     * @param session Session object associated with the connection
+     * @param webSocketConnection webSocketConnection object associated with the connection
      */
     @OnMessage
-    public void onMessage(String message, Session session) {
+    public void onMessage(String message, WebSocketConnection webSocketConnection) {
         DataProviderConfigRoot dataProviderConfigRoot = new Gson().fromJson(message, DataProviderConfigRoot.class);
         try {
             if (dataProviderConfigRoot.getAction().equalsIgnoreCase(DataProviderConfigRoot.Types.SUBSCRIBE.toString()
             )) {
-                getDataProviderHelper().removeTopicIfExist(session.getId(), dataProviderConfigRoot.getTopic());
+                getDataProviderHelper().removeTopicIfExist(webSocketConnection.getChannelId(),
+                        dataProviderConfigRoot.getTopic());
                 DataProvider dataProvider = getDataProviderHelper().getDataProvider(dataProviderConfigRoot
                         .getProviderName());
-                dataProvider.init(dataProviderConfigRoot.getTopic(), session.getId(),
+                dataProvider.init(dataProviderConfigRoot.getTopic(), webSocketConnection.getChannelId(),
                         dataProviderConfigRoot.getDataProviderConfiguration()).start();
-                getDataProviderHelper().addDataProviderToSessionMap(session.getId(), dataProviderConfigRoot.getTopic(),
+                getDataProviderHelper().addDataProviderToSessionMap(webSocketConnection.getChannelId(),
+                        dataProviderConfigRoot.getTopic(),
                         dataProvider);
                 if (dataProvider instanceof SiddhiProvider) {
                     SiddhiProvider siddhiProvider = (SiddhiProvider)dataProvider;
                     if(siddhiProvider.getSiddhiDataProviderConfig().isPaginationEnabled()){
                         siddhiProvider.publishWithPagination(dataProviderConfigRoot.getDataProviderConfiguration(),
-                                dataProviderConfigRoot.getTopic(), session.getId());
+                                dataProviderConfigRoot.getTopic(), webSocketConnection.getChannelId());
                     }
                 }
             } else if (dataProviderConfigRoot.getAction().equalsIgnoreCase(DataProviderConfigRoot.Types.UNSUBSCRIBE
                     .toString())) {
-                getDataProviderHelper().removeTopicIfExist(session.getId(), dataProviderConfigRoot.getTopic());
+                getDataProviderHelper().removeTopicIfExist(webSocketConnection.getChannelId(),
+                        dataProviderConfigRoot.getTopic());
             } else if (dataProviderConfigRoot.getAction().equalsIgnoreCase(DataProviderConfigRoot.Types.POLLING
                     .toString())){
                 Map<String, DataProvider> topicDataProviderMap =  getDataProviderHelper().
-                        getTopicDataProviderMap(session.getId());
+                        getTopicDataProviderMap(webSocketConnection.getChannelId());
                 if (topicDataProviderMap != null) {
                     DataProvider dataProvider = topicDataProviderMap.get(dataProviderConfigRoot.getTopic());
                     if (dataProvider == null) {
                         throw new Exception("Error while performing action: " + dataProviderConfigRoot.getAction() +
-                                ", data provider for session id: " + session.getId() + " not found.");
+                                ", data provider for session id: " + webSocketConnection.getChannelId() +
+                                " not found.");
                     } else if (dataProvider instanceof SiddhiProvider) {
                         SiddhiProvider siddhiProvider = (SiddhiProvider)dataProvider;
                         if (siddhiProvider.getSiddhiDataProviderConfig().isPaginationEnabled()) {
                             siddhiProvider.publishWithPagination(dataProviderConfigRoot.getDataProviderConfiguration(),
-                                    dataProviderConfigRoot.getTopic(), session.getId());
+                                    dataProviderConfigRoot.getTopic(), webSocketConnection.getChannelId());
                         } else {
-                            siddhiProvider.publish(dataProviderConfigRoot.getTopic(), session.getId());
+                            siddhiProvider.publish(dataProviderConfigRoot.getTopic(),
+                                    webSocketConnection.getChannelId());
                         }
                     } else {
                         AbstractDataProvider abstractDataProvider = (AbstractDataProvider) dataProvider;
-                        abstractDataProvider.publish(dataProviderConfigRoot.getTopic(), session.getId());
+                        abstractDataProvider.publish(dataProviderConfigRoot.getTopic(),
+                                webSocketConnection.getChannelId());
                     }
                 } else {
                     throw new Exception("Error while performing action: " + dataProviderConfigRoot.getAction() +
-                            ", data provider map for session id: " + session.getId() + " not initialized.");
+                            ", data provider map for session id: " + webSocketConnection.getChannelId() +
+                            " not initialized.");
                 }
             } else {
                 throw new Exception("Invalid action " + dataProviderConfigRoot.getAction() + " given in the message." +
@@ -154,7 +161,7 @@ public class DataProviderEndPoint implements WebSocketEndpoint {
             }
         } catch (Exception e) {
             try {
-                sendText(session.getId(), e.getMessage());
+                sendText(webSocketConnection.getChannelId(), e.getMessage());
             } catch (IOException e1) {
                 //ignore
             }
@@ -167,15 +174,16 @@ public class DataProviderEndPoint implements WebSocketEndpoint {
     /**
      * handle disconnection with the client.
      *
-     * @param session Session object associated with the connection
+     * @param webSocketConnection webSocketConnection object associated with the connection
      */
     @OnClose
-    public void onClose(Session session) {
-        Map<String, DataProvider> dataProviderMap = getDataProviderHelper().getTopicDataProviderMap(session.getId());
+    public void onClose(WebSocketConnection webSocketConnection) {
+        Map<String, DataProvider> dataProviderMap = getDataProviderHelper().getTopicDataProviderMap(
+                webSocketConnection.getChannelId());
         for (String topic : dataProviderMap.keySet()) {
-            getDataProviderHelper().removeTopicIfExist(session.getId(), topic);
+            getDataProviderHelper().removeTopicIfExist(webSocketConnection.getChannelId(), topic);
         }
-        getDataProviderHelper().removeSessionData(session.getId());
+        getDataProviderHelper().removeSessionData(webSocketConnection.getChannelId());
     }
 
     /**
@@ -196,12 +204,8 @@ public class DataProviderEndPoint implements WebSocketEndpoint {
     public static void sendText(String sessionId, String text) throws IOException {
         if (sessionMap.containsKey(sessionId)) {
             if (sessionMap.get(sessionId) != null) {
-                sessionMap.get(sessionId).getBasicRemote().sendText(text);
+                sessionMap.get(sessionId).pushText(text);
             }
         }
-    }
-
-    public static Map<String, Session> getSessionMap() {
-        return sessionMap;
     }
 }
