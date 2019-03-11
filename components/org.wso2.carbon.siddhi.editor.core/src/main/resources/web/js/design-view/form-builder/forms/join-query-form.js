@@ -431,10 +431,10 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
 
                 if (leftSourceData && rightSourceData) {
                     if (having) {
-                        $('.post-condition-value').val(having);
-                        $(".post-filter-checkbox").prop("checked", true);
+                        $('.having-value').val(having);
+                        $(".having-checkbox").prop("checked", true);
                     } else {
-                        $('.post-filter-condition-content').hide();
+                        $('.having-condition-content').hide();
                     }
                     if (on) {
                         $('.on-condition-value').val(on);
@@ -443,7 +443,7 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
                         $('.on-condition-content').hide();
                     }
                 } else {
-                    $('.post-filter-condition-content').hide();
+                    $('.having-condition-content').hide();
                     groupBy = [];
                     orderBy = [];
                     $('.on-condition-content').hide();
@@ -602,8 +602,8 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
                             queryInput.setOn(undefined)
                         }
 
-                        if ($('.post-filter-checkbox').is(':checked')) {
-                            joinQueryObject.setHaving($('.post-condition-value').val().trim());
+                        if ($('.having-checkbox').is(':checked')) {
+                            joinQueryObject.setHaving($('.having-value').val().trim());
                         } else {
                             joinQueryObject.setHaving(undefined)
                         }

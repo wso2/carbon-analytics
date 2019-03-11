@@ -1437,7 +1437,6 @@
 </script>
 
 <script id="query-projection-template" type = "text/template">
-    <h3> Projection </h3>
     <label class="clearfix"> <label class="mandatory-symbol"> * </label> Select </label>
     <select class="attribute-selection-type" class="clearfix">
         <option value="all"> All Attributes </option>
@@ -1476,10 +1475,8 @@
 </script>
 
 <script id="group-by-template" type = "text/template">
-    <h3> Group By </h3>
     <label> <input type = "checkbox" class="group-by-checkbox"> Group By Attributes </label>
     <div class="group-by-content order-group-by-content">
-        <label> Attribute Name </label>
         <ul class="group-by-attributes">
             {{#each groupBy}}
             <li>
@@ -1500,7 +1497,6 @@
 </script>
 
 <script id="order-by-template" type="text/template">
-    <h3> Order By </h3>
     <label> <input type = "checkbox" class="order-by-checkbox"> Order By Attributes </label>
     <div class="order-by-content order-group-by-content">
         <ul class="order-by-attributes">
@@ -1548,12 +1544,12 @@
 <script id="aggregation-form-template" type = "text/template">
     <div class = "aggregation-form-container">
         <div id="aggregation-name-div">
-            <h4> Name: </h4>
+            <h4> Name </h4>
             <input type="text" id="aggregationName" class="clearfix name" value="{{name}}">
             <label class="error-message" id="aggregationNameErrorMessage"> </label>
         </div>
         <div id="aggregation-from-div">
-            <h4> From: </h4>
+            <h4> From </h4>
             <input type="text" id="aggregation-from" class="clearfix name" value="{{from}}" readonly>
         </div>
         <hr>
@@ -1612,7 +1608,7 @@
 <script id="join-query-form-template" type = "text/template">
     <div class = "join-query-form-container">
         <div class="query-name-div">
-            <h4> Name: </h4>
+            <h4> Name </h4>
             <input type="text"  class="clearfix query-name name" value="{{name}}">
             <label class="error-message"> </label>
         </div>
@@ -1650,11 +1646,11 @@
         <hr>
         <div class="define-group-by-attributes"> </div>
         <hr>
-        <div class="define-post-filter-condition define-content">
+        <div class="define-having-condition define-content">
             <label>
-                <input type="checkbox" class="post-filter-checkbox query-checkbox"> Post filter condition
+                <input type="checkbox" class="having-checkbox query-checkbox"> Having condition
             </label>
-            <div class="post-filter-condition-content query-content">
+            <div class="having-condition-content query-content">
                 <input type="text"
                        class="clearfix post-condition-value query-content-value name symbol-syntax-required-value">
                 <label class="error-message"> </label>
@@ -1668,34 +1664,41 @@
 
 <script id="query-output-template" type = "text/template">
     <h3> Output </h3>
-    <div class = "define-limit define-content">
-        <label>
-            <input type="checkbox" class="limit-checkbox query-checkbox"> limit
-        </label>
-        <div class="limit-content query-content">
-            <input type="text"  class="clearfix limit-value query-content-value">
-            <label class="error-message"> </label>
+    <div class="query-output-container">
+        <div class="define-order-by-attributes"> </div>
+        <div class = "define-limit define-content">
+            <label>
+                <input type="checkbox" class="limit-checkbox query-checkbox"> Limit
+            </label>
+            <div class="limit-content query-content">
+                <input type="text"  class="clearfix limit-value query-content-value">
+                <label class="error-message"> </label>
+            </div>
         </div>
-    </div>
-    <div class = "define-rate-limiting define-content">
-        <label>
-            <input type="checkbox" class="rate-limiting-checkbox query-checkbox"> Rate limiting
-        </label>
-        <div class="rate-limiting-content query-content">
-            <input type="text"  class="clearfix rate-limiting-value query-content-value">
-            <label class="error-message"> </label>
+        <div class = "define-offset define-content">
+            <label>
+                <input type="checkbox" class="offset-checkbox query-checkbox"> Offset
+            </label>
+            <div class="offset-content query-content">
+                <input type="text"  class="clearfix offset-value query-content-value">
+                <label class="error-message"> </label>
+            </div>
         </div>
-    </div>
-    <div class="define-order-by-attributes"> </div>
-    <hr>
-    <div class="define-output-action">
-        <h3> Action </h3>
-        <div>
-            <label> Operation: </label>
+        <div class = "define-rate-limiting define-content">
+            <label>
+                <input type="checkbox" class="rate-limiting-checkbox query-checkbox"> Rate limiting
+            </label>
+            <div class="rate-limiting-content query-content">
+                <input type="text"  class="clearfix rate-limiting-value query-content-value">
+                <label class="error-message"> </label>
+            </div>
+        </div>
+        <div class="margin-top-5">
+            <label> Operation </label>
             <input type="text" class="clearfix name query-operation" value="{{operation}}" readonly>
         </div>
         <div class="define-query-into margin-top-5">
-            <label> Into: </label>
+            <label> Into </label>
             <input type="text" class="clearfix name query-into" value="{{into}}" readonly>
         </div>
         <div class="define-output-events"> </div>
@@ -1739,7 +1742,7 @@
 <script id="pattern-sequence-query-form-template" type = "text/template">
     <div class="pattern-sequence-query-form-container">
         <div class="query-name-div">
-            <h4> Name: </h4>
+            <h4> Name </h4>
             <input type="text"  class="clearfix query-name name" value="{{name}}">
             <label class="error-message"> </label>
         </div>
@@ -1767,13 +1770,13 @@
         <hr>
         <div class="define-group-by-attributes"> </div>
         <hr>
-        <div class="define-post-filter-condition define-content">
+        <div class="define-having-condition define-content">
             <label>
-                <input type="checkbox" class="post-filter-checkbox query-checkbox"> Post filter condition
+                <input type="checkbox" class="having-checkbox query-checkbox"> Having condition
             </label>
-            <div class="post-filter-condition-content query-content">
+            <div class="having-condition-content query-content">
                 <input type="text"
-                       class="clearfix post-condition-value query-content-value name symbol-syntax-required-value">
+                       class="clearfix having-value query-content-value name symbol-syntax-required-value">
                 <label class="error-message"> </label>
             </div>
         </div>
@@ -1833,12 +1836,12 @@
 <script id = "window-filter-projection-query-form-template" type="text/template">
     <div class="query-form-container">
         <div class="query-name-div">
-            <label> Name: </label>
+            <h4> Name </h4>
             <input type="text"  class="clearfix query-name name" value="{{name}}">
             <label class="error-message"> </label>
         </div>
         <div class="query-from-div">
-            <h4> From: </h4>
+            <h4> From </h4>
             <input type="text" class="clearfix name query-from" value="{{from}}" readonly>
         </div>
         <div class="define-query-source define-source">
@@ -1859,18 +1862,19 @@
         </div>
     </div>
     <div class="query-form-container">
-        <div class = "define-select"> </div>
-        <hr>
-        <div class="define-group-by-attributes"> </div>
-        <hr>
-        <div class="define-post-filter-condition define-content">
-            <label>
-                <input type="checkbox" class="post-filter-checkbox query-checkbox"> Post filter condition
-            </label>
-            <div class="post-filter-condition-content query-content">
-                <input type="text"
-                       class="clearfix post-condition-value query-content-value name symbol-syntax-required-value">
-                <label class="error-message"> </label>
+        <h3> Projection </h3>
+        <div class="projection-container">
+            <div class = "define-select"> </div>
+            <div class="define-group-by-attributes"> </div>
+            <div class="define-having-condition define-content">
+                <label>
+                    <input type="checkbox" class="having-checkbox query-checkbox"> Having condition
+                </label>
+                <div class="having-condition-content query-content">
+                    <input type="text"
+                           class="clearfix having-condition-value query-content-value name symbol-syntax-required-value">
+                    <label class="error-message"> </label>
+                </div>
             </div>
         </div>
     </div>

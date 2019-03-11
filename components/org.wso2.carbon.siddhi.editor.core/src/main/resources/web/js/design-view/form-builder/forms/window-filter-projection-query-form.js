@@ -164,10 +164,10 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
                 self.formUtils.addEventListenersForSelectionDiv();
 
                 if (having) {
-                    $('.post-condition-value').val(having);
-                    $(".post-filter-checkbox").prop("checked", true);
+                    $('.having-condition-value').val(having);
+                    $(".having-checkbox").prop("checked", true);
                 } else {
-                    $('.post-filter-condition-content').hide();
+                    $('.having-condition-content').hide();
                 }
 
                 if (limit) {
@@ -308,8 +308,8 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
                             });
                         }
 
-                        if ($('.post-filter-checkbox').is(':checked')) {
-                            queryObject.setHaving($('.post-condition-value').val().trim());
+                        if ($('.having-filter-checkbox').is(':checked')) {
+                            queryObject.setHaving($('.having-condition-value').val().trim());
                         } else {
                             queryObject.setHaving(undefined)
                         }

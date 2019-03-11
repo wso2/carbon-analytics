@@ -95,6 +95,20 @@ define(function () {
         STREAM_FUNCTION: "stream-function",
         TYPE_HTTP_REQUEST: "http-request",
         TYPE_HTTP_RESPONSE: "http-response",
+        JOIN_QUERY_TITLE: "Join Query Configuration",
+        AGGREGATION_TITLE: "Aggregation Configuration",
+        APP_ANNOTATION_TITLE: "Siddhi App Configuration",
+        FUNCTION_TITLE: "Function Configuration",
+        PARTITION_TITLE: "Partition Configuration",
+        PATTERN_QUERY_TITLE: "Pattern Query Configuration",
+        SEQUENCE_QUERY_TITLE: "Sequence Query Configuration",
+        SINK_TITLE: "Sink Configuration",
+        SOURCE_TITLE: "Source Configuration",
+        STREAM_TITLE: "Stream Configuration",
+        TABLE_TITLE: "Table Configuration",
+        TRIGGER_TITLE: "Trigger Configuration",
+        QUERY_TITLE: "Query Configuration",
+        WINDOW_TITLE: "Window Configuration"
     };
 
     return constants;
