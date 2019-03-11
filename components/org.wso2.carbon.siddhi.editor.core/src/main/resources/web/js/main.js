@@ -17,11 +17,11 @@
  */
 
 define(['require', 'log', 'jquery', 'lodash', 'backbone', 'menu_bar', 'tool_bar', 'command', 'workspace',
-        'app/tab/service-tab-list', 'event_simulator', 'operator_finder', 'app/output-console/service-console-list-manager',
-        'nano_scroller'],
+        'app/tab/service-tab-list', 'event_simulator', 'app/output-console/service-console-list-manager',
+        'nano_scroller','guide','workspace/file', 'operator_finder'],
 
     function (require, log, $, _, Backbone, MenuBar, ToolBar, CommandManager, Workspace, TabController,
-              EventSimulator, OperatorFinder, OutputController) {
+              EventSimulator, OutputController,NanoScroller, Guide, File, OperatorFinder) {
 
         var Application = Backbone.View.extend(
             /** @lends Application.prototype */
@@ -88,6 +88,9 @@ define(['require', 'log', 'jquery', 'lodash', 'backbone', 'menu_bar', 'tool_bar'
                     this.eventSimulator = new EventSimulator(eventSimulatorOpts);
                     this.eventSimulator.stopRunningSimulations();
 
+                    //init Hint Guide
+                    this.guide = new Guide(this);
+
                     // Initialize operator finder.
                     var operatorFinderOpts = _.get(this.config, 'operator_finder');
                     _.set(operatorFinderOpts, 'application', this);
@@ -139,6 +142,14 @@ define(['require', 'log', 'jquery', 'lodash', 'backbone', 'menu_bar', 'tool_bar'
 
                 displayInitialView: function () {
                     this.workspaceManager.displayInitialTab();
+                },
+
+                runInitialGuide: function (){
+                    var isFreshUser = (this.browserStorage.get('guideFileNameIncrement') === null);
+                    if(isFreshUser) {
+                        this.guide.startGuide();
+                        this.browserStorage.put("guideFileNameIncrement", 1);
+                    }
                 },
 
                 isRunningOnMacOS: function(){

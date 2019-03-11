@@ -95,8 +95,8 @@ define(['require', 'lodash', 'jquery', 'log', 'backbone', 'file_browser', 'boots
                         "<form class='form-horizontal' onsubmit='return false'>" +
                         "<div class='form-group'>" +
                         "<label for='configName' class='col-sm-2 file-dialog-label'>File Name :</label>" +
-                        "<div class='col-sm-9'>" +
-                        "<input class='file-dialog-form-control' id='configName' placeholder='"+ providedFileName +"'>" +
+                        "<div class='col-sm-9' id='saveName'>" +
+                        "<input class='file-dialog-form-control' id='configName' name='siddhiAppName' placeholder='"+ providedFileName +"'>" +
                         "</div>" +
                         "</div>" +
                         "<div class='form-group'>" +
