@@ -86,6 +86,7 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
                 var having = queryObject.getHaving();
                 var orderBy = queryObject.getOrderBy();
                 var limit = queryObject.getLimit();
+                var offset = queryObject.getOffset();
                 var select = queryObject.getSelect();
                 var outputRateLimit = queryObject.getOutputRateLimit();
                 var queryOutput = queryObject.getQueryOutput();
@@ -182,6 +183,14 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
                 } else {
                     $('.rate-limiting-content').hide();
                 }
+
+                if (offset) {
+                    $('.offset-value').val(offset);
+                    $(".offset-checkbox").prop("checked", true);
+                } else {
+                    $('.offset-content').hide();
+                }
+
 
                 /**
                  * if stream-handlers are empty, add a stream handler according to the selected query
@@ -309,6 +318,12 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
                             queryObject.setLimit($('.limit-value').val().trim())
                         } else {
                             queryObject.setLimit(undefined)
+                        }
+
+                        if ($('.offset-checkbox').is(':checked')) {
+                            queryObject.setOffset($('.offset-value').val().trim())
+                        } else {
+                            queryObject.setOffset(undefined)
                         }
 
                         if ($('.rate-limiting-checkbox').is(':checked')) {

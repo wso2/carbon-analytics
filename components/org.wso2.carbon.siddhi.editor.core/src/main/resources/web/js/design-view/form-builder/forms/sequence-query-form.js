@@ -142,6 +142,7 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
                 var having = sequenceQueryObject.getHaving();
                 var orderBy = sequenceQueryObject.getOrderBy();
                 var limit = sequenceQueryObject.getLimit();
+                var offset = sequenceQueryObject.getOffset();
                 var outputRateLimit = sequenceQueryObject.getOutputRateLimit();
                 var outputElementName = sequenceQueryObject.getQueryOutput().getTarget();
                 var select = sequenceQueryObject.getSelect();
@@ -231,6 +232,13 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
                     $(".limit-checkbox").prop("checked", true);
                 } else {
                     $('.limit-content').hide();
+                }
+
+                if (offset) {
+                    $('.offset-value').val(offset);
+                    $(".offset-checkbox").prop("checked", true);
+                } else {
+                    $('.offset-content').hide();
                 }
 
                 if (outputRateLimit) {
@@ -371,6 +379,12 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
                             sequenceQueryObject.setLimit($('.limit-value').val().trim())
                         } else {
                             sequenceQueryObject.setLimit(undefined)
+                        }
+
+                        if ($('.offset-checkbox').is(':checked')) {
+                            sequenceQueryObject.setOffset($('.offset-value').val().trim())
+                        } else {
+                            sequenceQueryObject.setOffset(undefined)
                         }
 
                         if ($('.rate-limiting-checkbox').is(':checked')) {

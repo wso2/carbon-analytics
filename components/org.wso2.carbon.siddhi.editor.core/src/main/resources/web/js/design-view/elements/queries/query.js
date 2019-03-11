@@ -55,6 +55,7 @@ define(['require', 'elementUtils'],
                 this.select = options.select;
                 this.groupBy = options.groupBy;
                 this.limit = options.limit;
+                this.offset = options.offset;
                 this.having = options.having;
                 this.outputRateLimit = options.outputRateLimit;
                 this.queryOutput = options.queryOutput;
@@ -120,6 +121,10 @@ define(['require', 'elementUtils'],
             return this.limit;
         };
 
+        Query.prototype.getOffset = function () {
+          return this.offset;
+        };
+
         Query.prototype.getHaving = function () {
             return this.having;
         };
@@ -166,6 +171,10 @@ define(['require', 'elementUtils'],
 
         Query.prototype.setHaving = function (having) {
             this.having = having;
+        };
+
+        Query.prototype.setOffset = function (offset) {
+            this.offset = offset;
         };
 
         Query.prototype.setOutputRateLimit = function (outputRateLimit) {

@@ -79,6 +79,7 @@ public class QueryConfigGenerator extends CodeSegmentsPreserver {
         queryConfig.setOrderBy(generateOrderBy(selector.getOrderByList()));
         queryConfig.setHaving(generateHaving(selector.getHavingExpression()));
         queryConfig.setLimit(generateLimit(selector.getLimit()));
+        queryConfig.setOffset(generateOffset(selector.getOffset()));
 
         queryConfig.setQueryOutput(generateOutput(query.getOutputStream()));
         queryConfig.setOutputRateLimit(generateOutputRateLimit(query.getOutputRate()));
@@ -191,6 +192,20 @@ public class QueryConfigGenerator extends CodeSegmentsPreserver {
         }
         return 0;
     }
+
+    /**
+     * Generates the long value for the given 'offset' Siddhi Constant
+     * @param offset                             Siddhi Constant
+     * @return                                  Long value
+     * @throws DesignGenerationException        Error while generating value of 'limit'
+     */
+    private long generateOffset(Constant offset) throws DesignGenerationException {
+        if (offset != null) {
+            return Long.parseLong(ConfigBuildingUtilities.getDefinition(offset, siddhiAppString));
+        }
+        return 0;
+    }
+
 
     /**
      * Generates a string list of Siddhi Annotations, from the given list of Siddhi Annotations.

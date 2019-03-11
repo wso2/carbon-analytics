@@ -305,6 +305,7 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
                 var having = joinQueryObject.getHaving();
                 var orderBy = joinQueryObject.getOrderBy();
                 var limit = joinQueryObject.getLimit();
+                var offset = joinQueryObject.getOffset();
                 var outputRateLimit = joinQueryObject.getOutputRateLimit();
                 var outputElementName = joinQueryObject.getQueryOutput().getTarget();
                 var queryInput = joinQueryObject.getQueryInput();
@@ -459,6 +460,13 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
                     $('.limit-content').hide();
                 }
 
+                if (offset) {
+                    $('.offset-value').val(offset);
+                    $(".offset-checkbox").prop("checked", true);
+                } else {
+                    $('.offset-content').hide();
+                }
+
                 if (outputRateLimit) {
                     $('.rate-limiting-value').val(outputRateLimit);
                     $(".rate-limiting-checkbox").prop("checked", true);
@@ -604,6 +612,12 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
                             joinQueryObject.setLimit($('.limit-value').val().trim())
                         } else {
                             joinQueryObject.setLimit(undefined)
+                        }
+
+                        if ($('.offset-checkbox').is(':checked')) {
+                            joinQueryObject.setOffset($('.offset-value').val().trim())
+                        } else {
+                            joinQueryObject.setOffset(undefined)
                         }
 
                         if ($('.rate-limiting-checkbox').is(':checked')) {

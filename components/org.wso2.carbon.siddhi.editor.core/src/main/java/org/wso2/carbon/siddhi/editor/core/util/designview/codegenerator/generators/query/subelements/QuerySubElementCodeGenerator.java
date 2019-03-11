@@ -105,6 +105,23 @@ public class QuerySubElementCodeGenerator {
     }
 
     /**
+     * Generates the Siddhi code representation of a query's offset
+     *
+     * @param offset The offset value given
+     * @return The Siddhi code representation of the given query's offset value
+     */
+    public static String generateQueryOffset(long offset) {
+        if (offset != 0) {
+            return SiddhiCodeBuilderConstants.NEW_LINE +
+                    SiddhiCodeBuilderConstants.OFFSET +
+                    SiddhiCodeBuilderConstants.SPACE +
+                    offset;
+        }
+        return SiddhiCodeBuilderConstants.EMPTY_STRING;
+    }
+
+
+    /**
      * Generates the Siddhi code representation of a query's having
      *
      * @param having The having value given

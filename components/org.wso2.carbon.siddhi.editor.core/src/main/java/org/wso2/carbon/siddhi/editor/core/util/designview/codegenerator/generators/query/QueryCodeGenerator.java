@@ -70,6 +70,10 @@ public class QueryCodeGenerator {
             queryStringBuilder.append(SiddhiCodeBuilderConstants.SPACE)
                     .append(QuerySubElementCodeGenerator.generateQueryLimit(query.getLimit()));
         }
+        if (query.getOffset() != 0) {
+            queryStringBuilder.append(SiddhiCodeBuilderConstants.SPACE)
+                    .append(QuerySubElementCodeGenerator.generateQueryOffset(query.getOffset()));
+        }
         if (query.getOutputRateLimit() != null && !query.getOutputRateLimit().isEmpty()) {
             queryStringBuilder.append(SiddhiCodeBuilderConstants.SPACE)
                     .append(QuerySubElementCodeGenerator.generateQueryOutputRateLimit(query.getOutputRateLimit()));

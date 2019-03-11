@@ -37,6 +37,7 @@ public class QueryConfig extends SiddhiElementConfig {
     private List<String> groupBy;
     private List<QueryOrderByConfig> orderBy;
     private long limit;
+    private long offset;
     private String having;
     private String outputRateLimit;
     private QueryOutputConfig queryOutput;
@@ -79,6 +80,14 @@ public class QueryConfig extends SiddhiElementConfig {
 
     public void setOrderBy(List<QueryOrderByConfig> orderBy) {
         this.orderBy = orderBy;
+    }
+
+    public long getOffset() {
+        return offset;
+    }
+
+    public void setOffset(long offset) {
+        this.offset = offset;
     }
 
     public long getLimit() {
