@@ -85,8 +85,7 @@ define(['require', 'log', 'jquery', 'lodash', 'partitionWith', 'jsonValidator', 
                     // close the form window
                     self.consoleListManager.removeFormConsole(formConsole);
                 } else {
-                    var propertyDiv = $('<div id="property-header"><h3>Partition Configuration</h3></div>' +
-                        '<div class = "partition-form-container"> <div id = "define-partition-keys"> </div> ' +
+                    var propertyDiv = $('<div class = "partition-form-container"> <div id = "define-partition-keys"> </div> ' +
                         self.formUtils.buildFormButtons() + '</div>' +
                         '<div class = "partition-form-container"> <div class = "define-annotation"> </div> </div>');
 

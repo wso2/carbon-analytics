@@ -664,12 +664,20 @@ a.list-group-item, button.list-group-item {
 
 .design-view-form-content input[type="text"].name,
 .design-view-form-content textarea {
-	width: 100%
+	width: 85%
 }
 
 .design-view-form-content .define-select input[type="text"].attribute-expression {
-	width: 235px;
+	width: 60%;
 	margin-right: 5px;
+}
+
+.design-view-form-content .define-select input[type="text"].attribute-as {
+    width: 35%;
+}
+
+.design-view-form-content .define-select .projection-expression-label {
+    margin-left: 7px;
 }
 
 .design-view-form-content input[type="text"].option-value,
@@ -883,14 +891,18 @@ a.list-group-item, button.list-group-item {
 	float: left;
 	display: inline-block;
 	padding: 5px;
+    margin-right: 10px;
 }
 
 .window-form-container,
 .trigger-form-container,
-.function-form-container,
-.join-query-form-container,
-.pattern-sequence-query-form-container {
+.function-form-container {
 	width: 25%;
+}
+
+.pattern-sequence-query-form-container,
+.join-query-form-container {
+    width: 23%;
 }
 
 .aggregation-form-container,
@@ -1074,7 +1086,7 @@ a.list-group-item, button.list-group-item {
 	bottom: 22px;
 	background: #0e0e0e;
 	width: 100%;
-	margin-left: -20;
+	margin-left: -20px;
 	height: 53px;
 }
 
@@ -1098,7 +1110,7 @@ a.list-group-item, button.list-group-item {
 .design-view-form-content .define-predefined-annotations .annotation-options,
 .design-view-form-content .aggregation-form-container .store-content,
 .design-view-form-content .aggregation-form-container #store-options-div {
-	margin-left: 65px;
+	margin-left: 40px;
 }
 
 .design-view-form-content .aggregation-form-container .define-predefined-annotations,
@@ -1106,6 +1118,12 @@ a.list-group-item, button.list-group-item {
 .design-view-form-content .aggregation-form-container #store-options-div {
 	margin-top: -10px;
 }
+
+.design-view-form-content .option,
+.design-view-form-content .parameter {
+    margin-bottom: 5px;
+}
+
 
 .design-view-form-content .aggregation-form-container #primary-index-annotations {
 	margin-top: 4px;
@@ -1127,7 +1145,6 @@ a.list-group-item, button.list-group-item {
 .design-view-form-content .define-predefined-annotations .annotation-options h3,
 .aggregation-form-container #store-options-div h3 {
 	font-size: 12px;
-	margin-left: -25px;
 }
 
 .join-query-form-container .post-filter-condition-content,
@@ -1186,8 +1203,30 @@ a.list-group-item, button.list-group-item {
 	margin-bottom: 10px;
 }
 
-.design-view-form-content .define-select .projection-as-label {
-	margin-left: 185px;
+.design-view-form-content .query-form-container .define-select .projection-as-label {
+	margin-left: 234px;
+}
+
+.design-view-form-content .pattern-sequence-query-form-container .define-select .projection-as-label,
+.design-view-form-content .join-query-form-container .define-select .projection-as-label{
+    margin-left: 160px;
+}
+
+.design-view-form-content .projection-container,
+.design-view-form-content .condition-container,
+.design-view-form-content .query-input-container,
+.design-view-form-content .query-output-container,
+.design-view-form-content .query-content,
+.design-view-form-content .define-user-defined-attributes,
+.design-view-form-content .order-group-by-content {
+    margin-left: 20px;
+}
+
+.design-view-form-content .define-group-by-attributes,
+.design-view-form-content .define-order-by-attributes,
+.design-view-form-content .define-content,
+.design-view-form-content .define-stream-handler {
+    margin-top: 10px;
 }
 
 .focused-container {
@@ -1212,35 +1251,36 @@ a.list-group-item, button.list-group-item {
 	margin: 6px;
 }
 
-.define-conditions .nav-tabs > li.active > a {
+.design-view-form-content .define-conditions .nav-tabs > li.active > a {
     font-weight: 500;
 }
 
-.define-conditions .nav-tabs > li.active {
+.design-view-form-content .define-conditions .nav-tabs > li.active {
     background: #1f1e1e;
 }
 
-.define-conditions .nav-tabs > li {
+.design-view-form-content .define-conditions .nav-tabs > li {
     width: auto;
     border-right: 1px solid #4c4c4c;
 }
 
-.define-conditions .nav-tabs > li:last-child {
+.design-view-form-content .define-conditions .nav-tabs > li:last-child {
     border: 0;
 }
 
-.define-conditions .nav-tabs > li > a {
-    padding: 2px 15px;
+.design-view-form-content .define-conditions .nav-tabs > li > a {
+    padding: 2px 10px;
+    float: left;
 }
 
-.define-conditions .nav-tabs > li.active > a,
-.define-conditions .nav-tabs > li.active > a:hover,
-.define-conditions .nav-tabs > li.active > a:focus {
+.design-view-form-content .define-conditions .nav-tabs > li.active > a,
+.design-view-form-content .define-conditions .nav-tabs > li.active > a:hover,
+.design-view-form-content .define-conditions .nav-tabs > li.active > a:focus {
     background-color: transparent;
     border-color: transparent;
 }
 
-.define-conditions button.close {
+.design-view-form-content .define-conditions button.close {
     padding-left: 10px;
     display: none;
     font-size: 0.7em;
@@ -1249,25 +1289,32 @@ a.list-group-item, button.list-group-item {
     color: #fff;
 }
 
-.define-conditions button.close:hover,
-.define-conditions button.close:focus {
+.design-view-form-content .define-conditions button.close:hover,
+.design-view-form-content .define-conditions button.close:focus {
     opacity: 0.6;
 }
 
-.define-conditions li.active button.close {
+.design-view-form-content .define-conditions li.active button.close {
     display: block;
 }
 
-.define-conditions .close i {
+.design-view-form-content .define-conditions .close i {
     padding-right: 0;
 }
 
-.define-source {
+.design-view-form-content .define-stream-handler-section,
+.design-view-form-content .define-stream-handler-buttons {
+    background: #1f1e1e;
+    padding: 5px;
+    margin-left: 20px;
+}
+
+.design-view-form-content .define-conditions .tab-content {
     background: #1f1e1e;
     padding: 5px;
 }
 
-.define-stream {
+.design-view-form-content .define-stream {
     padding: 5px 0;
 }
 
@@ -1277,4 +1324,9 @@ a.list-group-item, button.list-group-item {
 
 .margin-top-5 {
     margin-top: 5px;
+}
+
+.aggregation-form-container .min-range,
+.aggregation-form-container .max-range {
+    margin-bottom: 10px;
 }

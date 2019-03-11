@@ -68,8 +68,8 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
                 DesignViewUtils.prototype.warnAlert('Connect an output stream');
                 self.consoleListManager.removeFormConsole(formConsole);
             } else {
-                var propertyDiv = $('<div id="property-header"><h3> Query Configuration </h3></div>' +
-                    '<div id="define-windowFilterProjection-query"></div>' + self.formUtils.buildFormButtons());
+                var propertyDiv = $('<div id="define-windowFilterProjection-query"></div>' +
+                    self.formUtils.buildFormButtons());
                 formContainer.append(propertyDiv);
 
                 self.designViewContainer.addClass('disableContainer');

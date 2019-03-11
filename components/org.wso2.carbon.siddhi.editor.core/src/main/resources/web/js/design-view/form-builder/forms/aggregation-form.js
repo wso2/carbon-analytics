@@ -203,8 +203,7 @@ define(['require', 'log', 'jquery', 'lodash', 'aggregateByTimePeriod', 'querySel
                 DesignViewUtils.prototype.warnAlert('Connect an input stream element');
                 self.consoleListManager.removeFormConsole(formConsole);
             } else {
-                var propertyDiv = $('<div id="property-header"> <h3> Aggregation Configuration </h3> </div> ' +
-                    '<div id = "define-aggregation"> </div>' + self.formUtils.buildFormButtons());
+                var propertyDiv = $('<div id = "define-aggregation"> </div>' + self.formUtils.buildFormButtons());
 
                 formContainer.append(propertyDiv);
                 self.designViewContainer.addClass('disableContainer');

@@ -74,8 +74,7 @@ define(['require', 'log', 'jquery', 'lodash', 'constants'],
             var self = this;
             var id = $(element).parent().attr('id');
             var functionObject = self.configurationData.getSiddhiAppConfig().getFunction(id);
-            var propertyDiv = $('<div id="property-header"><h3>Function Configuration</h3></div>' +
-                '<div class = "function-form-container"> <div id = "define-function-name"> <h4> Name </h4> ' +
+            var propertyDiv = $('<div class = "function-form-container"> <div id = "define-function-name"> <h4> Name </h4> ' +
                 '<input type="text" id="functionName" class="clearfix name"><label class = "error-message" ' +
                 'id = "functionNameErrorMessage"> </label></div>' +
                 '<div id = "function-script-type"> </div> <div id= "function-return-type"> </div>' +

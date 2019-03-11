@@ -18,10 +18,10 @@
 
 define(['require', 'log', 'jquery', 'lodash', 'formUtils', 'streamForm', 'tableForm', 'windowForm', 'aggregationForm',
         'triggerForm', 'windowFilterProjectionQueryForm', 'patternQueryForm', 'joinQueryForm', 'partitionForm',
-        'sequenceQueryForm', 'sourceForm', 'sinkForm', 'functionForm', 'appAnnotationForm'],
+        'sequenceQueryForm', 'sourceForm', 'sinkForm', 'functionForm', 'appAnnotationForm', 'constants'],
     function (require, log, $, _, FormUtils, StreamForm, TableForm, WindowForm, AggregationForm, TriggerForm,
               WindowFilterProjectionQueryForm, PatternQueryForm, JoinQueryForm, PartitionForm, SequenceQueryForm,
-              SourceForm, SinkForm, FunctionForm, AppAnnotationForm) {
+              SourceForm, SinkForm, FunctionForm, AppAnnotationForm, Constants) {
 
         // common properties for the JSON editor
         JSONEditor.defaults.options.theme = 'bootstrap3';
@@ -73,7 +73,7 @@ define(['require', 'log', 'jquery', 'lodash', 'formUtils', 'streamForm', 'tableF
          * @param elementType type of the element
          * @returns newly created formConsole
          */
-        FormBuilder.prototype.createTabForForm = function (elementId, elementType) {
+        FormBuilder.prototype.createTabForForm = function (formType) {
             var self = this;
             var activeTab = this.application.tabController.getActiveTab();
             var siddhiAppName = "";
@@ -85,12 +85,13 @@ define(['require', 'log', 'jquery', 'lodash', 'formUtils', 'streamForm', 'tableF
             }
 
             var uniqueTabId = 'form-' + activeTab.cid;
+            var formTitle = siddhiAppName + ' - ' + formType;
             var consoleOptions = {};
             var options = {};
             _.set(options, '_type', "FORM");
             _.set(options, 'title', "Form");
             _.set(options, 'uniqueTabId', uniqueTabId);
-            _.set(options, 'appName', siddhiAppName);
+            _.set(options, 'appName', formTitle);
 
             var console = this.consoleListManager.getGlobalConsole();
             if (!console) {
@@ -109,39 +110,6 @@ define(['require', 'log', 'jquery', 'lodash', 'formUtils', 'streamForm', 'tableF
             _.set(consoleOptions, 'consoleOptions', options);
             var formConsole = this.consoleListManager.newFormConsole(consoleOptions);
             $(formConsole).on("close-button-in-form-clicked", function () {
-                if (elementType === constants.SOURCE) {
-                    if (!self.configurationData.getSiddhiAppConfig().getSource(elementId)) {
-                        $("#" + elementId).remove();
-                    }
-                } else if (elementType === constants.SINK) {
-                    if (!self.configurationData.getSiddhiAppConfig().getSink(elementId)) {
-                        $("#" + elementId).remove();
-                    }
-                } else if (elementType === constants.STREAM) {
-                    if (!self.configurationData.getSiddhiAppConfig().getStream(elementId)) {
-                        $("#" + elementId).remove();
-                    }
-                } else if (elementType === constants.TABLE) {
-                    if (!self.configurationData.getSiddhiAppConfig().getTable(elementId)) {
-                        $("#" + elementId).remove();
-                    }
-                } else if (elementType === constants.WINDOW) {
-                    if (!self.configurationData.getSiddhiAppConfig().getWindow(elementId)) {
-                        $("#" + elementId).remove();
-                    }
-                } else if (elementType === constants.TRIGGER) {
-                    if (!self.configurationData.getSiddhiAppConfig().getTrigger(elementId)) {
-                        $("#" + elementId).remove();
-                    }
-                } else if (elementType === constants.AGGREGATION) {
-                    if (!self.configurationData.getSiddhiAppConfig().getAggregation(elementId)) {
-                        $("#" + elementId).remove();
-                    }
-                } else if (elementType === constants.FUNCTION) {
-                    if (!self.configurationData.getSiddhiAppConfig().getFunction(elementId)) {
-                        $("#" + elementId).remove();
-                    }
-                }
                 // close the form window
                 self.consoleListManager.removeFormConsole(formConsole);
                 // design view container and toggle view button are enabled
@@ -157,7 +125,7 @@ define(['require', 'log', 'jquery', 'lodash', 'formUtils', 'streamForm', 'tableF
          */
         FormBuilder.prototype.DefineFormForAppAnnotations = function (element) {
             var self = this;
-            var formConsole = this.createTabForForm();
+            var formConsole = this.createTabForForm(Constants.APP_ANNOTATION_TITLE);
             var formContainer = formConsole.getContentContainer();
 
             var formOptions = {};
@@ -174,7 +142,7 @@ define(['require', 'log', 'jquery', 'lodash', 'formUtils', 'streamForm', 'tableF
          */
         FormBuilder.prototype.GeneratePropertiesFormForSources = function (element) {
             var self = this;
-            var formConsole = this.createTabForForm();
+            var formConsole = this.createTabForForm(Constants.SOURCE_TITLE);
             var formContainer = formConsole.getContentContainer();
 
             var formOptions = {};
@@ -193,7 +161,7 @@ define(['require', 'log', 'jquery', 'lodash', 'formUtils', 'streamForm', 'tableF
          */
         FormBuilder.prototype.GeneratePropertiesFormForSinks = function (element) {
             var self = this;
-            var formConsole = this.createTabForForm();
+            var formConsole = this.createTabForForm(Constants.SINK_TITLE);
             var formContainer = formConsole.getContentContainer();
 
             var formOptions = {};
@@ -212,7 +180,7 @@ define(['require', 'log', 'jquery', 'lodash', 'formUtils', 'streamForm', 'tableF
          */
         FormBuilder.prototype.GeneratePropertiesFormForStreams = function (element) {
             var self = this;
-            var formConsole = this.createTabForForm();
+            var formConsole = this.createTabForForm(Constants.STREAM_TITLE);
             var formContainer = formConsole.getContentContainer();
 
             var formOptions = {};
@@ -230,7 +198,7 @@ define(['require', 'log', 'jquery', 'lodash', 'formUtils', 'streamForm', 'tableF
          */
         FormBuilder.prototype.GeneratePropertiesFormForTables = function (element) {
             var self = this;
-            var formConsole = this.createTabForForm();
+            var formConsole = this.createTabForForm(Constants.TABLE_TITLE);
             var formContainer = formConsole.getContentContainer();
 
             var formOptions = {};
@@ -247,7 +215,7 @@ define(['require', 'log', 'jquery', 'lodash', 'formUtils', 'streamForm', 'tableF
          */
         FormBuilder.prototype.GeneratePropertiesFormForWindows = function (element) {
             var self = this;
-            var formConsole = this.createTabForForm();
+            var formConsole = this.createTabForForm(Constants.WINDOW_TITLE);
             var formContainer = formConsole.getContentContainer();
 
             var formOptions = {};
@@ -264,7 +232,7 @@ define(['require', 'log', 'jquery', 'lodash', 'formUtils', 'streamForm', 'tableF
          */
         FormBuilder.prototype.GeneratePropertiesFormForTriggers = function (element) {
             var self = this;
-            var formConsole = this.createTabForForm();
+            var formConsole = this.createTabForForm(Constants.TRIGGER_TITLE);
             var formContainer = formConsole.getContentContainer();
 
             var formOptions = {};
@@ -281,7 +249,7 @@ define(['require', 'log', 'jquery', 'lodash', 'formUtils', 'streamForm', 'tableF
          */
         FormBuilder.prototype.GeneratePropertiesFormForAggregations = function (element) {
             var self = this;
-            var formConsole = this.createTabForForm();
+            var formConsole = this.createTabForForm(Constants.AGGREGATION_TITLE);
             var formContainer = formConsole.getContentContainer();
 
             var formOptions = {};
@@ -298,7 +266,7 @@ define(['require', 'log', 'jquery', 'lodash', 'formUtils', 'streamForm', 'tableF
          */
         FormBuilder.prototype.GeneratePropertiesFormForFunctions = function (element) {
             var self = this;
-            var formConsole = this.createTabForForm();
+            var formConsole = this.createTabForForm(Constants.FUNCTION_TITLE);
             var formContainer = formConsole.getContentContainer();
 
             var formOptions = {};
@@ -315,7 +283,7 @@ define(['require', 'log', 'jquery', 'lodash', 'formUtils', 'streamForm', 'tableF
          */
         FormBuilder.prototype.GeneratePropertiesFormForWindowFilterProjectionQueries = function (element) {
             var self = this;
-            var formConsole = this.createTabForForm();
+            var formConsole = this.createTabForForm(Constants.QUERY_TITLE);
             var formContainer = formConsole.getContentContainer();
 
             var formOptions = {};
@@ -332,7 +300,7 @@ define(['require', 'log', 'jquery', 'lodash', 'formUtils', 'streamForm', 'tableF
          */
         FormBuilder.prototype.GeneratePropertiesFormForPatternQueries = function (element) {
             var self = this;
-            var formConsole = this.createTabForForm();
+            var formConsole = this.createTabForForm(Constants.PATTERN_QUERY_TITLE);
             var formContainer = formConsole.getContentContainer();
 
             var formOptions = {};
@@ -349,7 +317,7 @@ define(['require', 'log', 'jquery', 'lodash', 'formUtils', 'streamForm', 'tableF
          */
         FormBuilder.prototype.GeneratePropertiesFormForSequenceQueries = function (element) {
             var self = this;
-            var formConsole = this.createTabForForm();
+            var formConsole = this.createTabForForm(Constants.SEQUENCE_QUERY_TITLE);
             var formContainer = formConsole.getContentContainer();
 
             var formOptions = {};
@@ -366,7 +334,7 @@ define(['require', 'log', 'jquery', 'lodash', 'formUtils', 'streamForm', 'tableF
          */
         FormBuilder.prototype.GeneratePropertiesFormForJoinQuery = function (element) {
             var self = this;
-            var formConsole = this.createTabForForm();
+            var formConsole = this.createTabForForm(Constants.JOIN_QUERY_TITLE);
             var formContainer = formConsole.getContentContainer();
 
             var formOptions = {};
@@ -383,7 +351,7 @@ define(['require', 'log', 'jquery', 'lodash', 'formUtils', 'streamForm', 'tableF
          */
         FormBuilder.prototype.GeneratePartitionKeyForm = function (element) {
             var self = this;
-            var formConsole = this.createTabForForm();
+            var formConsole = this.createTabForForm(Constants.PARTITION_TITLE);
             var formContainer = formConsole.getContentContainer();
 
             var formOptions = {};

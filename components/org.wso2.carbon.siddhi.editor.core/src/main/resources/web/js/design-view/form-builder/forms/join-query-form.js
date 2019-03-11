@@ -281,8 +281,7 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
             if (inValid) {
                 self.consoleListManager.removeFormConsole(formConsole);
             } else {
-                var propertyDiv = $('<div id="property-header"><h3>Join Query Configuration</h3></div>' +
-                    '<div id="define-join-query"></div>' + self.formUtils.buildFormButtons());
+                var propertyDiv = $('<div id="define-join-query"></div>' + self.formUtils.buildFormButtons());
                 formContainer.append(propertyDiv);
 
                 self.designViewContainer.addClass('disableContainer');
