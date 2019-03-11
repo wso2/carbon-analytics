@@ -808,7 +808,7 @@ define(['jquery', 'lodash', 'log', 'enjoyhint', 'designViewUtils', 'workspace', 
                 instance.setScript(self.completeGuide);
                 instance.runScript();
                 callBack();
-                test();
+                guideCloseCallback();
             });
             //function for the simulation tour
             guideModal.find("button").filter("#simulationGuide").unbind().click(function() {
@@ -820,7 +820,7 @@ define(['jquery', 'lodash', 'log', 'enjoyhint', 'designViewUtils', 'workspace', 
                 instance.setScript(self.simulateGuide);
                 instance.runScript();
                 callBack();
-                test();
+                guideCloseCallback();
             });
             //function for the sample tour
             guideModal.find("button").filter("#sampleGuide").unbind().click(function() {
@@ -832,10 +832,10 @@ define(['jquery', 'lodash', 'log', 'enjoyhint', 'designViewUtils', 'workspace', 
                 instance.setScript(self.sampleGuide);
                 instance.runScript();
                 callBack();
-                test();
+                guideCloseCallback();
             });
 
-            var test = function () {
+            var guideCloseCallback = function () {
                 $('.enjoyhint_close_btn').click(function () {
                     switch (currentStep) {
                         case 7  :
@@ -863,7 +863,6 @@ define(['jquery', 'lodash', 'log', 'enjoyhint', 'designViewUtils', 'workspace', 
                         default :
                             break;
                     }
-
                     instance = null;
                 });
             }
