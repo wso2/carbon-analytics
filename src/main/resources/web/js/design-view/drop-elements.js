@@ -17,10 +17,10 @@
  */
 
 define(['require', 'log', 'lodash', 'jquery', 'partition', 'stream', 'query', 'formBuilder', 'aggregation',
-    'jsonValidator', 'sourceOrSinkAnnotation', 'stream', 'table', 'window', 'trigger', 'functionDefinition',
+        'jsonValidator', 'sourceOrSinkAnnotation', 'stream', 'table', 'window', 'trigger', 'functionDefinition',
         'constants'],
     function (require, log, _, $, Partition, Stream, Query, FormBuilder, Aggregation, JSONValidator,
-        SourceOrSinkAnnotation, Stream, Table, Window, Trigger, FunctionDefinition,Constants) {
+              SourceOrSinkAnnotation, Stream, Table, Window, Trigger, FunctionDefinition, Constants) {
 
         /**
          * @class DesignView
@@ -104,7 +104,7 @@ define(['require', 'log', 'lodash', 'jquery', 'partition', 'stream', 'query', 'f
             /*
              prop --> When clicked on this icon, a definition and related information of the Source Element will
              be displayed in a form
-            */
+             */
             var settingsIconId = "" + i + "-dropSourceSettingsId";
             var prop = $('<i id="' + settingsIconId + '" ' +
                 'class="fw fw-settings element-prop-icon collapse"></i>');
@@ -121,7 +121,7 @@ define(['require', 'log', 'lodash', 'jquery', 'partition', 'stream', 'query', 'f
             /*
              connection --> The connection anchor point is appended to the element
              */
-            self.generateSpecificSourceConnectionElements(name,self.jsPlumbInstance, i, finalElement);
+            self.generateSpecificSourceConnectionElements(name, self.jsPlumbInstance, i, finalElement);
             var connection = $('<div class="connectorOutSource">').attr('id', i + "-out").addClass('connection');
 
             finalElement.append(connection);
@@ -191,7 +191,7 @@ define(['require', 'log', 'lodash', 'jquery', 'partition', 'stream', 'query', 'f
             /*
              prop --> When clicked on this icon, a definition and related information of the Sink Element will
              be displayed in a form
-            */
+             */
             var settingsIconId = "" + i + "-dropSinkSettingsId";
             var prop = $('<i id="' + settingsIconId + '" ' +
                 'class="fw fw-settings element-prop-icon collapse"></i>');
@@ -208,7 +208,7 @@ define(['require', 'log', 'lodash', 'jquery', 'partition', 'stream', 'query', 'f
             /*
              connection --> The connection anchor point is appended to the element
              */
-            self.generateSpecificSinkConnectionElements(name,self.jsPlumbInstance, i, finalElement);
+            self.generateSpecificSinkConnectionElements(name, self.jsPlumbInstance, i, finalElement);
             var connection = $('<div class="connectorInSink">').attr('id', i + "-in").addClass('connection');
 
             finalElement.append(connection);
@@ -246,12 +246,12 @@ define(['require', 'log', 'lodash', 'jquery', 'partition', 'stream', 'query', 'f
          * @param streamName name of the stream
          */
         DropElements.prototype.dropStream = function (newAgent, i, top, left, isCodeToDesignMode,
-            isGenerateStreamFromQueryOutput, streamName) {
+                                                      isGenerateStreamFromQueryOutput, streamName) {
             /*
              The node hosts a text node where the Stream's name input by the user will be held.
              Rather than simply having a `newAgent.text(streamName)` statement, as the text function tends to
              reposition the other appended elements with the length of the Stream name input by the user.
-            */
+             */
 
             var self = this;
             var name;
@@ -291,7 +291,7 @@ define(['require', 'log', 'lodash', 'jquery', 'partition', 'stream', 'query', 'f
              be displayed in a form
              showIcon --> An icon that elucidates whether the dropped stream element is an Import/Export/Defined
              stream (In this case: an Import arrow icon)
-            */
+             */
             var settingsIconId = "" + i + "-dropStreamSettingsId";
             var prop = $('<i id="' + settingsIconId + '" ' +
                 'class="fw fw-settings element-prop-icon collapse"></i>');
@@ -350,7 +350,7 @@ define(['require', 'log', 'lodash', 'jquery', 'partition', 'stream', 'query', 'f
          * @param streamAttributes  projections list for output stream
          */
         DropElements.prototype.dropStreamFromQuery = function (queryModel, position, queryId, outStream,
-            streamAttributes) {
+                                                               streamAttributes) {
             var self = this;
             var isStreamNameUsed = false;
             var elementID;
@@ -411,7 +411,7 @@ define(['require', 'log', 'lodash', 'jquery', 'partition', 'stream', 'query', 'f
              The node hosts a text node where the Table's name input by the user will be held.
              Rather than simply having a `newAgent.text(tableName)` statement, as the text function tends to
              reposition the other appended elements with the length of the Table name input by the user.
-            */
+             */
 
             var self = this;
             var name;
@@ -444,7 +444,7 @@ define(['require', 'log', 'lodash', 'jquery', 'partition', 'stream', 'query', 'f
             /*
              prop --> When clicked on this icon, a definition and related information of the Table Element will
              be displayed in a form
-            */
+             */
             var settingsIconId = "" + i + "-dropTableSettingsId";
             var prop = $('<i id="' + settingsIconId + '" ' +
                 'class="fw fw-settings element-prop-icon collapse"></i>');
@@ -508,7 +508,7 @@ define(['require', 'log', 'lodash', 'jquery', 'partition', 'stream', 'query', 'f
              The node hosts a text node where the Window's name input by the user will be held.
              Rather than simply having a `newAgent.text(windowName)` statement, as the text function tends to
              reposition the other appended elements with the length of the Window name input by the user.
-            */
+             */
 
             var self = this;
             var name;
@@ -541,7 +541,7 @@ define(['require', 'log', 'lodash', 'jquery', 'partition', 'stream', 'query', 'f
             /*
              prop --> When clicked on this icon, a definition and related information of the Window Element will
              be displayed as an DesignViewUtils.prototype.warnAlert message
-            */
+             */
             var settingsIconId = "" + i + "-dropWindowSettingsId";
             var prop = $('<i id="' + settingsIconId + '" ' +
                 'class="fw fw-settings element-prop-icon collapse"></i>');
@@ -605,7 +605,7 @@ define(['require', 'log', 'lodash', 'jquery', 'partition', 'stream', 'query', 'f
              The node hosts a text node where the Trigger's name input by the user will be held.
              Rather than simply having a `newAgent.text(triggerName)` statement, as the text function tends to
              reposition the other appended elements with the length of the Trigger name input by the user.
-            */
+             */
 
             var self = this;
             var name;
@@ -638,7 +638,7 @@ define(['require', 'log', 'lodash', 'jquery', 'partition', 'stream', 'query', 'f
             /*
              prop --> When clicked on this icon, a definition and related information of the Trigger Element will
              be displayed as an DesignViewUtils.prototype.warnAlert message
-            */
+             */
             var settingsIconId = "" + i + "-dropTriggerSettingsId";
             var prop = $('<i id="' + settingsIconId + '" ' +
                 'class="fw fw-settings element-prop-icon collapse"></i>');
@@ -698,12 +698,12 @@ define(['require', 'log', 'lodash', 'jquery', 'partition', 'stream', 'query', 'f
          * @param aggregationName name of the aggregation
          */
         DropElements.prototype.dropAggregation = function (newAgent, i, top, left, isCodeToDesignMode,
-            aggregationName) {
+                                                           aggregationName) {
             /*
              The node hosts a text node where the Aggregation's name input by the user will be held.
              Rather than simply having a `newAgent.text(aggregationName)` statement, as the text function tends to
              reposition the other appended elements with the length of the Aggregation name input by the user.
-            */
+             */
 
             var self = this;
             var name;
@@ -739,7 +739,7 @@ define(['require', 'log', 'lodash', 'jquery', 'partition', 'stream', 'query', 'f
             /*
              prop --> When clicked on this icon, a definition and related information of the Aggregation Element will
              be displayed as an DesignViewUtils.prototype.warnAlert message
-            */
+             */
             var settingsIconId = "" + i + "-dropAggregationSettingsId";
             var prop = $('<i id="' + settingsIconId + '" ' +
                 'class="fw fw-settings element-prop-icon collapse"></i>');
@@ -804,7 +804,7 @@ define(['require', 'log', 'lodash', 'jquery', 'partition', 'stream', 'query', 'f
              The node hosts a text node where the Function's name input by the user will be held.
              Rather than simply having a `newAgent.text(functionName)` statement, as the text function tends to
              reposition the other appended elements with the length of the Function name input by the user.
-            */
+             */
 
             var self = this;
             var name;
@@ -840,7 +840,7 @@ define(['require', 'log', 'lodash', 'jquery', 'partition', 'stream', 'query', 'f
             /*
              prop --> When clicked on this icon, a definition and related information of the Function Element will
              be displayed as an DesignViewUtils.prototype.warnAlert message
-            */
+             */
             var settingsIconId = "" + i + "-dropFunctionSettingsId";
             var prop = $('<i id="' + settingsIconId + '" ' +
                 'class="fw fw-settings element-prop-icon collapse"></i>');
@@ -881,11 +881,11 @@ define(['require', 'log', 'lodash', 'jquery', 'partition', 'stream', 'query', 'f
          * @param isCodeToDesignMode whether code to design mode is enable or not
          */
         DropElements.prototype.dropWindowFilterProjectionQuery = function (newAgent, i, dropType, top, left, text,
-            isCodeToDesignMode) {
+                                                                           isCodeToDesignMode) {
             /*
              A text node division will be appended to the newAgent element so that the element name can be changed in
              the text node and doesn't need to be appended to the newAgent Element every time the user changes it
-            */
+             */
             var self = this;
             var node = $('<div>' + text + '</div>');
             newAgent.append(node);
@@ -969,12 +969,12 @@ define(['require', 'log', 'lodash', 'jquery', 'partition', 'stream', 'query', 'f
          * @param patternQueryName name of the patternQuery
          */
         DropElements.prototype.dropPatternQuery = function (newAgent, i, top, left, isCodeToDesignMode,
-            patternQueryName) {
+                                                            patternQueryName) {
 
             /*
              A text node division will be appended to the newAgent element so that the element name can be changed in
              the text node and doesn't need to be appended to the newAgent Element every time the user changes it
-            */
+             */
             var self = this;
             var node = $('<div>' + patternQueryName + '</div>');
             newAgent.append(node);
@@ -1006,7 +1006,7 @@ define(['require', 'log', 'lodash', 'jquery', 'partition', 'stream', 'query', 'f
             /*
              prop --> When clicked on this icon, a definition and related information of the PatternQuery Element will
              be displayed as an DesignViewUtils.prototype.warnAlert message
-            */
+             */
             var settingsIconId = "" + i + "-dropPatternQuerySettingsId";
             var prop = $('<i id="' + settingsIconId + '" ' +
                 'class="fw fw-settings element-prop-icon collapse"></i>');
@@ -1067,12 +1067,12 @@ define(['require', 'log', 'lodash', 'jquery', 'partition', 'stream', 'query', 'f
          * @param sequenceQueryName name of the sequenceQuery
          */
         DropElements.prototype.dropSequenceQuery = function (newAgent, i, top, left, isCodeToDesignMode,
-            sequenceQueryName) {
+                                                             sequenceQueryName) {
 
             /*
              A text node division will be appended to the newAgent element so that the element name can be changed in
              the text node and doesn't need to be appended to the newAgent Element every time the user changes it
-            */
+             */
             var self = this;
             var node = $('<div>' + sequenceQueryName + '</div>');
             newAgent.append(node);
@@ -1105,7 +1105,7 @@ define(['require', 'log', 'lodash', 'jquery', 'partition', 'stream', 'query', 'f
             /*
              prop --> When clicked on this icon, a definition and related information of the SequenceQuery Element will
              be displayed in a form
-            */
+             */
             var settingsIconId = "" + i + "-dropSequenceQuerySettingsId";
             var prop = $('<i id="' + settingsIconId + '" ' +
                 'class="fw fw-settings element-prop-icon collapse"></i>');
@@ -1171,7 +1171,7 @@ define(['require', 'log', 'lodash', 'jquery', 'partition', 'stream', 'query', 'f
             /*
              A text node division will be appended to the newAgent element so that the element name can be changed in
              the text node and doesn't need to be appended to the newAgent Element every time the user changes it
-            */
+             */
             var self = this;
             var node = $('<div>' + text + '</div>');
             newAgent.append(node);
@@ -1348,8 +1348,8 @@ define(['require', 'log', 'lodash', 'jquery', 'partition', 'stream', 'query', 'f
                     maxConnections: 1
                 });
             } else {
-                if ($( "#" + i + "-in" ).length) {
-                    $( "#" + i + "-in" ).remove();
+                if ($("#" + i + "-in").length) {
+                    $("#" + i + "-in").remove();
                 }
             }
 
@@ -1362,12 +1362,14 @@ define(['require', 'log', 'lodash', 'jquery', 'partition', 'stream', 'query', 'f
                 jsPlumbInstance.makeSource(connectionOut, {
                     deleteEndpointsOnDetach: true,
                     anchor: 'Right',
-                    connectorStyle: { strokeWidth: 2, stroke: "#424242", dashstyle: "2 3", outlineStroke: "transparent",
-                        outlineWidth: "3" }
+                    connectorStyle: {
+                        strokeWidth: 2, stroke: "#424242", dashstyle: "2 3", outlineStroke: "transparent",
+                        outlineWidth: "3"
+                    }
                 });
             } else {
-                if ($( "#" + i + "-out" ).length) {
-                    $( "#" + i + "-out" ).remove();
+                if ($("#" + i + "-out").length) {
+                    $("#" + i + "-out").remove();
                 }
             }
 
@@ -1432,7 +1434,7 @@ define(['require', 'log', 'lodash', 'jquery', 'partition', 'stream', 'query', 'f
                 $('.overlayed-container ').on('click', function (e) {
                     $('[data-toggle="popover"]').each(function () {
                         if (!$(this).is(e.target) && $(this).has(e.target).length === 0 && $('.popover').has(
-                            e.target).length === 0) {
+                                e.target).length === 0) {
                             $(this).popover('hide');
                             $(".overlayed-container ").fadeOut(200);
                             $('#' + newElement[0].id).removeClass("selected-element");
@@ -1475,8 +1477,8 @@ define(['require', 'log', 'lodash', 'jquery', 'partition', 'stream', 'query', 'f
             // Check whether clicked element is there in the selected element list and if not clear the selected
             // element list and cleanDragSelection object
             newElement.on('mousedown', function () {
-                if (!self.designGrid.isSelectedElements(newElement[0])){
-                // if (!window.selectedElements.includes(newElement[0], 0)) {
+                if (!self.designGrid.isSelectedElements(newElement[0])) {
+                    // if (!window.selectedElements.includes(newElement[0], 0)) {
                     self.jsPlumbInstance.clearDragSelection();
                     var selectedElements = self.designGrid.getSelectedElement();
                     for (var i = 0; i < selectedElements.length; i++) {
@@ -1492,11 +1494,11 @@ define(['require', 'log', 'lodash', 'jquery', 'partition', 'stream', 'query', 'f
                 self.configurationData.setIsDesignViewContentChanged(true);
                 var elementId = newElement[0].id;
                 /*
-                * before deleting the element data from the data store structure, it is mandatory to delete the element
-                * from jsPlumb because it will fire the 'beforeDetach' and 'connectionDetached' events and it will
-                * update the other elements data connected to current element. ex: when a stream is deleted from a
-                * query, from clause in the query will be updated as undefined.
-                * */
+                 * before deleting the element data from the data store structure, it is mandatory to delete the element
+                 * from jsPlumb because it will fire the 'beforeDetach' and 'connectionDetached' events and it will
+                 * update the other elements data connected to current element. ex: when a stream is deleted from a
+                 * query, from clause in the query will be updated as undefined.
+                 * */
                 setTimeout(function () {
                     var outConnections = self.jsPlumbInstance.getConnections({source: elementId + '-out'});
                     var inConnections = self.jsPlumbInstance.getConnections({target: elementId + '-in'});
@@ -1572,9 +1574,9 @@ define(['require', 'log', 'lodash', 'jquery', 'partition', 'stream', 'query', 'f
                     });
                 });
                 /*
-                * before deleting the element data from the data store structure, it is mandatory to delete the element
-                * from jsPlumb.
-                * */
+                 * before deleting the element data from the data store structure, it is mandatory to delete the element
+                 * from jsPlumb.
+                 * */
                 self.jsPlumbInstance.remove(newElement);
                 if (self.jsPlumbInstance.getGroupFor(newElement)) {
                     self.jsPlumbInstance.removeFromGroup(newElement);

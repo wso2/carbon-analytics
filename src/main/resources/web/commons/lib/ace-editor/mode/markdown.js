@@ -28,50 +28,50 @@
  *
  * ***** END LICENSE BLOCK ***** */
 
-define(function(require, exports, module) {
-"use strict";
+define(function (require, exports, module) {
+    "use strict";
 
-var oop = require("../lib/oop");
-var TextMode = require("./text").Mode;
-var JavaScriptMode = require("./javascript").Mode;
-var XmlMode = require("./xml").Mode;
-var HtmlMode = require("./html").Mode;
-var MarkdownHighlightRules = require("./markdown_highlight_rules").MarkdownHighlightRules;
-var MarkdownFoldMode = require("./folding/markdown").FoldMode;
+    var oop = require("../lib/oop");
+    var TextMode = require("./text").Mode;
+    var JavaScriptMode = require("./javascript").Mode;
+    var XmlMode = require("./xml").Mode;
+    var HtmlMode = require("./html").Mode;
+    var MarkdownHighlightRules = require("./markdown_highlight_rules").MarkdownHighlightRules;
+    var MarkdownFoldMode = require("./folding/markdown").FoldMode;
 
-var Mode = function() {
-    this.HighlightRules = MarkdownHighlightRules;
+    var Mode = function () {
+        this.HighlightRules = MarkdownHighlightRules;
 
-    this.createModeDelegates({
-        "js-": JavaScriptMode,
-        "xml-": XmlMode,
-        "html-": HtmlMode
-    });
+        this.createModeDelegates({
+            "js-": JavaScriptMode,
+            "xml-": XmlMode,
+            "html-": HtmlMode
+        });
 
-    this.foldingRules = new MarkdownFoldMode();
-    this.$behaviour = this.$defaultBehaviour;
-};
-oop.inherits(Mode, TextMode);
-
-(function() {
-    this.type = "text";
-    this.blockComment = {start: "<!--", end: "-->"};
-
-    this.getNextLineIndent = function(state, line, tab) {
-        if (state == "listblock") {
-            var match = /^(\s*)(?:([-+*])|(\d+)\.)(\s+)/.exec(line);
-            if (!match)
-                return "";
-            var marker = match[2];
-            if (!marker)
-                marker = parseInt(match[3], 10) + 1 + ".";
-            return match[1] + marker + match[4];
-        } else {
-            return this.$getIndent(line);
-        }
+        this.foldingRules = new MarkdownFoldMode();
+        this.$behaviour = this.$defaultBehaviour;
     };
-    this.$id = "ace/mode/markdown";
-}).call(Mode.prototype);
+    oop.inherits(Mode, TextMode);
 
-exports.Mode = Mode;
+    (function () {
+        this.type = "text";
+        this.blockComment = {start: "<!--", end: "-->"};
+
+        this.getNextLineIndent = function (state, line, tab) {
+            if (state == "listblock") {
+                var match = /^(\s*)(?:([-+*])|(\d+)\.)(\s+)/.exec(line);
+                if (!match)
+                    return "";
+                var marker = match[2];
+                if (!marker)
+                    marker = parseInt(match[3], 10) + 1 + ".";
+                return match[1] + marker + match[4];
+            } else {
+                return this.$getIndent(line);
+            }
+        };
+        this.$id = "ace/mode/markdown";
+    }).call(Mode.prototype);
+
+    exports.Mode = Mode;
 });

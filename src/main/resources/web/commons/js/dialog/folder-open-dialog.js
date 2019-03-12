@@ -29,7 +29,7 @@ define(['require', 'jquery', 'log', 'backbone', 'file_browser', 'bootstrap'], fu
             initialize: function (options) {
                 this._options = options;
                 this.application = _.get(options, "application");
-                this._dialogContainer =  $(_.get(options, "application.config.dialog.container"));
+                this._dialogContainer = $(_.get(options, "application.config.dialog.container"));
             },
 
             show: function () {
@@ -46,7 +46,7 @@ define(['require', 'jquery', 'log', 'backbone', 'file_browser', 'bootstrap'], fu
                     app = this.application,
                     options = this._options;
 
-                if(!_.isNil(this._modalContainer)){
+                if (!_.isNil(this._modalContainer)) {
                     this._modalContainer.remove();
                 }
 

@@ -59,8 +59,7 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'jsonValidator', 'con
             self.toggleViewButton.addClass('disableContainer');
 
             var annotations = [];
-            var predefinedAnnotationList = JSON.parse(JSON.stringify(self.configurationData.application.config.
-                stream_predefined_annotations));
+            var predefinedAnnotationList = JSON.parse(JSON.stringify(self.configurationData.application.config.stream_predefined_annotations));
             var checkedAnnotations = [];
 
             self.formUtils.addEventListenersForAttributeDiv();
@@ -69,7 +68,7 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'jsonValidator', 'con
             if (!name) {
                 //if stream form is freshly opened [new object]
                 annotations = predefinedAnnotationList;
-                var attributes = [{ name: "" }];
+                var attributes = [{name: ""}];
                 self.formUtils.renderAttributeTemplate(attributes)
             } else {
                 //if the stream object is already edited
@@ -94,7 +93,7 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'jsonValidator', 'con
                             _.forEach(predefinedAnnotation.elements, function (predefinedAnnotationElement) {
                                 _.forEach(savedAnnotation.elements, function (savedAnnotationElement) {
                                     if (predefinedAnnotationElement.key.toLowerCase() == savedAnnotationElement.key
-                                        .toLowerCase()) {
+                                            .toLowerCase()) {
                                         //if an optional property is found push it to the checkedAnnotations[]
                                         if (!predefinedAnnotationElement.isMandatory) {
                                             checkedAnnotations.push(savedAnnotationElement.key);
@@ -130,9 +129,9 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'jsonValidator', 'con
                 var isStreamNameUsed;
                 var isErrorOccurred = false;
                 /*
-                * check whether the stream is inside a partition and if yes check whether it begins with '#'.
-                *  If not add '#' to the beginning of the stream name.
-                * */
+                 * check whether the stream is inside a partition and if yes check whether it begins with '#'.
+                 *  If not add '#' to the beginning of the stream name.
+                 * */
                 var isStreamSavedInsideAPartition
                     = self.configurationData.getSiddhiAppConfig().getStreamSavedInsideAPartition(id);
                 if (!isStreamSavedInsideAPartition) {
@@ -239,7 +238,7 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'jsonValidator', 'con
                         var nameValue = $(this).find('.attr-name').val().trim();
                         var typeValue = $(this).find('.attr-type').val();
                         if (nameValue != "") {
-                            var attributeObject = new Attribute({ name: nameValue, type: typeValue });
+                            var attributeObject = new Attribute({name: nameValue, type: typeValue});
                             clickedElement.addAttribute(attributeObject)
                         }
                     });

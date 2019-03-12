@@ -30,90 +30,90 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  *
  */
-define(function(require, exports, module) {
-"use strict";
+define(function (require, exports, module) {
+    "use strict";
 
-var oop = require("../lib/oop");
-var lang = require("../lib/lang");
-var TextHighlightRules = require("./text_highlight_rules").TextHighlightRules;
-var LaTeXHighlightRules = require("./latex_highlight_rules");
+    var oop = require("../lib/oop");
+    var lang = require("../lib/lang");
+    var TextHighlightRules = require("./text_highlight_rules").TextHighlightRules;
+    var LaTeXHighlightRules = require("./latex_highlight_rules");
 
-var RDocHighlightRules = function() {
+    var RDocHighlightRules = function () {
 
-    // regexp must not have capturing parentheses. Use (?:) instead.
-    // regexps are ordered -> the first match is used
+        // regexp must not have capturing parentheses. Use (?:) instead.
+        // regexps are ordered -> the first match is used
 
-    this.$rules = {
-        "start" : [
-            {
-                token : "comment",
-                regex : "%.*$"
-            }, {
-                token : "text", // non-command
-                regex : "\\\\[$&%#\\{\\}]"
-            }, {
-                token : "keyword", // command
-                regex : "\\\\(?:name|alias|method|S3method|S4method|item|code|preformatted|kbd|pkg|var|env|option|command|author|email|url|source|cite|acronym|href|code|preformatted|link|eqn|deqn|keyword|usage|examples|dontrun|dontshow|figure|if|ifelse|Sexpr|RdOpts|inputencoding|usepackage)\\b",
-               next : "nospell"
-            }, {
-                token : "keyword", // command
-                regex : "\\\\(?:[a-zA-Z0-9]+|[^a-zA-Z0-9])"
-            }, {
-               // Obviously these are neither keywords nor operators, but
-               // labelling them as such was the easiest way to get them
-               // to be colored distinctly from regular text
-               token : "paren.keyword.operator",
-                regex : "[[({]"
-            }, {
-               // Obviously these are neither keywords nor operators, but
-               // labelling them as such was the easiest way to get them
-               // to be colored distinctly from regular text
-               token : "paren.keyword.operator",
-                regex : "[\\])}]"
-            }, {
-                token : "text",
-                regex : "\\s+"
-            }
-        ],
-        // This mode is necessary to prevent spell checking, but to keep the
-        // same syntax highlighting behavior. 
-        "nospell" : [
-           {
-               token : "comment",
-               regex : "%.*$",
-               next : "start"
-           }, {
-               token : "nospell.text", // non-command
-               regex : "\\\\[$&%#\\{\\}]"
-           }, {
-               token : "keyword", // command
-               regex : "\\\\(?:name|alias|method|S3method|S4method|item|code|preformatted|kbd|pkg|var|env|option|command|author|email|url|source|cite|acronym|href|code|preformatted|link|eqn|deqn|keyword|usage|examples|dontrun|dontshow|figure|if|ifelse|Sexpr|RdOpts|inputencoding|usepackage)\\b"
-           }, {
-               token : "keyword", // command
-               regex : "\\\\(?:[a-zA-Z0-9]+|[^a-zA-Z0-9])",
-               next : "start"
-           }, {
-               token : "paren.keyword.operator",
-               regex : "[[({]"
-           }, {
-               token : "paren.keyword.operator",
-               regex : "[\\])]"
-           }, {
-               token : "paren.keyword.operator",
-               regex : "}",
-               next : "start"
-           }, {
-               token : "nospell.text",
-               regex : "\\s+"
-           }, {
-               token : "nospell.text",
-               regex : "\\w+"
-           }
-        ]
+        this.$rules = {
+            "start": [
+                {
+                    token: "comment",
+                    regex: "%.*$"
+                }, {
+                    token: "text", // non-command
+                    regex: "\\\\[$&%#\\{\\}]"
+                }, {
+                    token: "keyword", // command
+                    regex: "\\\\(?:name|alias|method|S3method|S4method|item|code|preformatted|kbd|pkg|var|env|option|command|author|email|url|source|cite|acronym|href|code|preformatted|link|eqn|deqn|keyword|usage|examples|dontrun|dontshow|figure|if|ifelse|Sexpr|RdOpts|inputencoding|usepackage)\\b",
+                    next: "nospell"
+                }, {
+                    token: "keyword", // command
+                    regex: "\\\\(?:[a-zA-Z0-9]+|[^a-zA-Z0-9])"
+                }, {
+                    // Obviously these are neither keywords nor operators, but
+                    // labelling them as such was the easiest way to get them
+                    // to be colored distinctly from regular text
+                    token: "paren.keyword.operator",
+                    regex: "[[({]"
+                }, {
+                    // Obviously these are neither keywords nor operators, but
+                    // labelling them as such was the easiest way to get them
+                    // to be colored distinctly from regular text
+                    token: "paren.keyword.operator",
+                    regex: "[\\])}]"
+                }, {
+                    token: "text",
+                    regex: "\\s+"
+                }
+            ],
+            // This mode is necessary to prevent spell checking, but to keep the
+            // same syntax highlighting behavior. 
+            "nospell": [
+                {
+                    token: "comment",
+                    regex: "%.*$",
+                    next: "start"
+                }, {
+                    token: "nospell.text", // non-command
+                    regex: "\\\\[$&%#\\{\\}]"
+                }, {
+                    token: "keyword", // command
+                    regex: "\\\\(?:name|alias|method|S3method|S4method|item|code|preformatted|kbd|pkg|var|env|option|command|author|email|url|source|cite|acronym|href|code|preformatted|link|eqn|deqn|keyword|usage|examples|dontrun|dontshow|figure|if|ifelse|Sexpr|RdOpts|inputencoding|usepackage)\\b"
+                }, {
+                    token: "keyword", // command
+                    regex: "\\\\(?:[a-zA-Z0-9]+|[^a-zA-Z0-9])",
+                    next: "start"
+                }, {
+                    token: "paren.keyword.operator",
+                    regex: "[[({]"
+                }, {
+                    token: "paren.keyword.operator",
+                    regex: "[\\])]"
+                }, {
+                    token: "paren.keyword.operator",
+                    regex: "}",
+                    next: "start"
+                }, {
+                    token: "nospell.text",
+                    regex: "\\s+"
+                }, {
+                    token: "nospell.text",
+                    regex: "\\w+"
+                }
+            ]
+        };
     };
-};
 
-oop.inherits(RDocHighlightRules, TextHighlightRules);
+    oop.inherits(RDocHighlightRules, TextHighlightRules);
 
-exports.RDocHighlightRules = RDocHighlightRules;
+    exports.RDocHighlightRules = RDocHighlightRules;
 });

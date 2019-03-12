@@ -1,26 +1,25 @@
-
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
-  <title>Ace Unit Tests</title>
-  <style type="text/css" media="screen">
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <title>Ace Unit Tests</title>
+    <style type="text/css" media="screen">
 
-    #log .passed {
-        color: green;
-    }
-    
-    #log .failed {
-        color: red;
-    }
-    
-    #log pre.error {
-        color: black;
-    }
-  </style>
+        #log .passed {
+            color: green;
+        }
+
+        #log .failed {
+            color: red;
+        }
+
+        #log pre.error {
+            color: black;
+        }
+    </style>
 </head>
 <body>
-    
+
 <div id="log"></div>
 
 <script type="text/javascript">
@@ -28,7 +27,7 @@
         paths: {
             ace: "../"
         },
-        packages : [{
+        packages: [{
             name: "asyncjs",
             location: "./asyncjs",
             main: "index"
@@ -39,7 +38,8 @@
         }]
     };
 </script>
-<script src="../../../demo/kitchen-sink/require.js" data-main="all_browser" type="text/javascript" charset="utf-8"></script>
+<script src="../../../demo/kitchen-sink/require.js" data-main="all_browser" type="text/javascript"
+        charset="utf-8"></script>
 
 
 </body>

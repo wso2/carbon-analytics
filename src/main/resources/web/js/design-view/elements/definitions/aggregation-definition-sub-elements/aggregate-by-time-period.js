@@ -28,15 +28,15 @@ define(
         var AggregateByTimePeriod = function (options) {
             /*
              Data storing structure as follows
-                type*: 'RANGE',
-                value*: {
-                    min*: '',
-                    max*: ''
-                }
-                << or >>
-                type*: 'INTERVAL',
-                value*: ['seconds', 'minutes', ...] // At least one value must be available
-            */
+             type*: 'RANGE',
+             value*: {
+             min*: '',
+             max*: ''
+             }
+             << or >>
+             type*: 'INTERVAL',
+             value*: ['seconds', 'minutes', ...] // At least one value must be available
+             */
             if (options !== undefined) {
                 this.type = (options.type !== undefined) ? (options.type).toUpperCase() : undefined;
                 this.value = options.value;

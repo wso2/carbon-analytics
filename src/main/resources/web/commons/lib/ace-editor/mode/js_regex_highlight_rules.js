@@ -1,17 +1,17 @@
-define(function(require, exports, module) {
-"use strict";
+define(function (require, exports, module) {
+    "use strict";
 
-var oop = require("../lib/oop");
-var TextHighlightRules = require("./text_highlight_rules").TextHighlightRules;
+    var oop = require("../lib/oop");
+    var TextHighlightRules = require("./text_highlight_rules").TextHighlightRules;
 
-var escape = "\\\\(?:u[\\da-fA-F]{4}|x[\\da-fA-F]{2}|.)";
-var quantifier = "({\\d+\\b,?\\d*}|[+*?])(\\??)";
+    var escape = "\\\\(?:u[\\da-fA-F]{4}|x[\\da-fA-F]{2}|.)";
+    var quantifier = "({\\d+\\b,?\\d*}|[+*?])(\\??)";
 
-var JsRegexHighlightRules = function() {
-    this.$rules = {
-        "start": [{
+    var JsRegexHighlightRules = function () {
+        this.$rules = {
+            "start": [{
                 // operators
-                token : "keyword",
+                token: "keyword",
                 regex: "\\\\[bB]",
                 next: "no_quantifier"
             }, {
@@ -22,22 +22,22 @@ var JsRegexHighlightRules = function() {
                 token: "string.regexp",
                 regex: "/\\w*",
                 next: "start"
-            }, {               
-                token : ["string", "string.regex"],
+            }, {
+                token: ["string", "string.regex"],
                 regex: quantifier,
                 next: "no_quantifier"
             }, {
                 // operators
-                token : "keyword",
+                token: "keyword",
                 regex: "[$^]|\\\\[bB]",
                 next: "no_quantifier"
             }, {
                 // operators
-                token : "constant.language.escape",
+                token: "constant.language.escape",
                 regex: /\(\?[:=!]|\)|[()$^+*?]/,
                 next: "no_quantifier"
             }, {
-                token : "constant.language.delimiter",
+                token: "constant.language.delimiter",
                 regex: /\|/,
                 next: "no_quantifier"
             }, {
@@ -49,12 +49,12 @@ var JsRegexHighlightRules = function() {
                 regex: "$",
                 next: "start"
             }
-        ],
-        
+            ],
 
-        "character_class": [{
+
+            "character_class": [{
                 regex: /\\[dDwWsS]/
-            },{
+            }, {
                 token: "markup.list",
                 regex: "(?:" + escape + "|.)-(?:[^\\]\\\\]|" + escape + ")"
             }, {
@@ -74,8 +74,8 @@ var JsRegexHighlightRules = function() {
             }, {
                 defaultToken: "string.regexp.charachterclass"
             }
-        ],
-        "no_quantifier":[{
+            ],
+            "no_quantifier": [{
                 token: "invalid",
                 regex: quantifier
             }, {
@@ -83,12 +83,12 @@ var JsRegexHighlightRules = function() {
                 regex: "",
                 next: "start"
             }
-        ]
-        
+            ]
+
+        };
     };
-};
 
-oop.inherits(JsRegexHighlightRules, TextHighlightRules);
+    oop.inherits(JsRegexHighlightRules, TextHighlightRules);
 
-exports.JsRegexHighlightRules = JsRegexHighlightRules;
+    exports.JsRegexHighlightRules = JsRegexHighlightRules;
 });

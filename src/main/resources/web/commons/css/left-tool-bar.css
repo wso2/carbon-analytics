@@ -1,17 +1,17 @@
-.left-tool-bar .nav-tabs a{
+.left-tool-bar .nav-tabs a {
     padding: 0;
 }
 
-.left-tool-bar .nav-tabs > li{
+.left-tool-bar .nav-tabs > li {
     float: none;
     width: 42px;
 }
-.left-tool-bar .nav-tabs li.active a{
+
+.left-tool-bar .nav-tabs li.active a {
     border: none;
 }
 
-
-.left-tool-bar .nav-tabs{
+.left-tool-bar .nav-tabs {
     border: none;
 }
 
@@ -20,8 +20,7 @@
     background-color: inherit;
 }
 
-
-.left-tool-bar .nav-tabs li a{
+.left-tool-bar .nav-tabs li a {
     padding-top: 11px;
     border: none;
     width: 40px;
@@ -37,7 +36,7 @@
     opacity: 0.4;
 }
 
-.left-tool-bar .nav-tabs > li:hover i{
+.left-tool-bar .nav-tabs > li:hover i {
     opacity: 1;
     cursor: pointer;
 }
@@ -62,7 +61,7 @@
 }
 
 .left-tool-bar .nav-tabs li.disabled a.output-console-activate-btn i,
-.left-tool-bar .nav-tabs li.disabled a.output-console-activate-btn:hover i{
+.left-tool-bar .nav-tabs li.disabled a.output-console-activate-btn:hover i {
     color: #333333;
 }
 

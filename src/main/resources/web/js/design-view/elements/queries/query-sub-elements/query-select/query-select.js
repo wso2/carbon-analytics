@@ -28,18 +28,18 @@ define(
         var QuerySelect = function (options) {
             /*
              Data storing structure as follows
-                type*: 'USER_DEFINED',
-                value*: [
-                    {
-                        expression*: '',
-                        as: ''
-                    },
-                    ...
-                ]
-                << or >>
-                type*: 'ALL',
-                value*: '*'
-            */
+             type*: 'USER_DEFINED',
+             value*: [
+             {
+             expression*: '',
+             as: ''
+             },
+             ...
+             ]
+             << or >>
+             type*: 'ALL',
+             value*: '*'
+             */
             if (options !== undefined) {
                 this.type = (options.type !== undefined) ? (options.type).toUpperCase() : undefined;
                 this.value = options.value;

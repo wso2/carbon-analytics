@@ -21,7 +21,7 @@ define(['lodash', 'backbone', 'log', 'mousetrap'], function (_, Backbone, log, M
     /**
      * Arg: application instance
      */
-    return function(app) {
+    return function (app) {
 
         // not reinventing the wheel - reusing event-bus impl provided in backbone models
         var CommandBus = Backbone.Model.extend({}),
@@ -35,19 +35,19 @@ define(['lodash', 'backbone', 'log', 'mousetrap'], function (_, Backbone, log, M
          * @param options key-bindings etc.
          */
         this.registerCommand = function (cmd, options) {
-            if (_.isEqual(_.findIndex(commands,  ['id', cmd.id]), -1)) {
+            if (_.isEqual(_.findIndex(commands, ['id', cmd.id]), -1)) {
                 var command = {id: cmd};
-                if(_.has(options, 'shortcuts')){
+                if (_.has(options, 'shortcuts')) {
                     _.set(command, 'shortcuts', _.get(options, 'shortcuts'))
                 }
                 commands.push(command);
                 log.debug("Command: " + cmd +
                     " is registered.");
                 // do shortcut key bindings
-                if(_.has(options, 'shortcuts')){
+                if (_.has(options, 'shortcuts')) {
                     var shortcuts = _.get(options, 'shortcuts'),
                         key = app.isRunningOnMacOS() ? shortcuts.mac.key : shortcuts.other.key;
-                    Mousetrap.bind(key, function(e) {
+                    Mousetrap.bind(key, function (e) {
                         commandBus.trigger(cmd);
                         e.preventDefault();
                         e.stopPropagation();
@@ -66,7 +66,7 @@ define(['lodash', 'backbone', 'log', 'mousetrap'], function (_, Backbone, log, M
          *
          */
         this.unRegisterCommand = function (cmd) {
-            if (!_.isEqual(_.findIndex(commands,  ['id', cmd.id]), -1)) {
+            if (!_.isEqual(_.findIndex(commands, ['id', cmd.id]), -1)) {
                 _.remove(commands, ['id', cmd.id]);
                 //remove all handlers for the command
                 commandBus.off(cmd, null, app);
@@ -86,7 +86,7 @@ define(['lodash', 'backbone', 'log', 'mousetrap'], function (_, Backbone, log, M
          * @param context this context for the handler, default is app instance
          */
         this.registerHandler = function (cmd, handler, context) {
-            if(_.isEqual(_.findIndex(commands,  ['id', cmd]), -1)){
+            if (_.isEqual(_.findIndex(commands, ['id', cmd]), -1)) {
                 var message = "No such registered command found. Command: " + cmd;
                 log.debug(message);
             }
@@ -123,7 +123,7 @@ define(['lodash', 'backbone', 'log', 'mousetrap'], function (_, Backbone, log, M
             }
         };
 
-        this.getCommands = function(){
+        this.getCommands = function () {
             return commands;
         };
     }

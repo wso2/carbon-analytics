@@ -29,13 +29,13 @@ define(['log', 'backbone'], function (log, Backbone) {
                 var errMsg, template;
                 _.set(this, 'id', this.cid);
                 _.set(this, '_title', _.get(options, 'title'));
-                if (!_.has(options, 'template')){
+                if (!_.has(options, 'template')) {
                     errMsg = 'unable to find config template ' + _.toString(options);
                     log.error(errMsg);
                     throw errMsg;
                 }
                 template = $(_.get(options, 'template'));
-                if(!template.length > 0){
+                if (!template.length > 0) {
                     errMsg = 'unable to find template with id ' + _.get(options, 'template');
                     log.error(errMsg);
                     throw errMsg;
@@ -45,7 +45,7 @@ define(['log', 'backbone'], function (log, Backbone) {
                 this._isActive = false;
                 this._lastActiveConsole = undefined;
 
-                if (_.has(options, 'parent')){
+                if (_.has(options, 'parent')) {
                     this.setParent(_.get(options, 'parent'));
                 }
 
@@ -57,48 +57,48 @@ define(['log', 'backbone'], function (log, Backbone) {
                 tab.attr('id', this.cid);
                 this.$el = tab;
             },
-            setActive: function(isActive){
-                if(_.isBoolean(isActive)){
+            setActive: function (isActive) {
+                if (_.isBoolean(isActive)) {
                     this._isActive = isActive;
-                    if (isActive){
+                    if (isActive) {
                         this.$el.addClass(_.get(this.options, 'cssClass.tab_active'));
                     } else {
                         this.$el.removeClass(_.get(this.options, 'cssClass.tab_active'));
                     }
                 }
             },
-            isActive: function(){
+            isActive: function () {
                 return this._isActive;
             },
-            setHeader: function(header){
+            setHeader: function (header) {
                 this._tabHeader = header;
             },
-            getHeader: function(){
+            getHeader: function () {
                 return this._tabHeader;
             },
-            getContentContainer: function(){
+            getContentContainer: function () {
                 return this.$el.get(0);
             },
-            getParent: function(){
+            getParent: function () {
                 return this._parentTabList;
             },
-            setParent: function(parentTabList){
+            setParent: function (parentTabList) {
                 this._parentTabList = parentTabList;
             },
-            getTitle: function(){
+            getTitle: function () {
                 return _.isNil(this._title) ? "untitled" : this._title;
             },
-            setTitle: function(title){
+            setTitle: function (title) {
                 this._title = title;
                 this.trigger('title-changed', title);
             },
-            setRunMode: function(){
+            setRunMode: function () {
                 this._tabHeader.addClass(_.get(this.options, 'cssClass.run_state'));
             },
-            setDebugMode: function(){
+            setDebugMode: function () {
                 this._tabHeader.addClass(_.get(this.options, 'cssClass.debug_state'));
             },
-            setNonRunningMode: function(){
+            setNonRunningMode: function () {
                 var debugClass = _.get(this.options, 'cssClass.debug_state');
                 if (this._tabHeader.hasClass(debugClass)) {
                     this._tabHeader.removeClass(debugClass);

@@ -31,6 +31,9 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.LinkedBlockingQueue;
 
+/**
+ * Class for debugger runtime implementation.
+ */
 public class DebugRuntime {
     private String siddhiAppName;
     private Mode mode = Mode.STOP;
@@ -173,6 +176,11 @@ public class DebugRuntime {
         return siddhiAppRuntime;
     }
 
-    public enum Mode {RUN, DEBUG, STOP, FAULTY}
+    /**
+     * Enum whichholds debugger modes.
+     */
+    public enum Mode {
+        RUN, DEBUG, STOP, FAULTY
+    }
 
 }

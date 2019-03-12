@@ -96,7 +96,7 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
                 var savedAnnotations = clickedElement.getAnnotationList();
                 var annotations = [];
                 _.forEach(savedAnnotations, function (savedAnnotation) {
-                    annotations.push({ annotation: savedAnnotation });
+                    annotations.push({annotation: savedAnnotation});
                 });
 
                 var leftSourceSavedData = clickedElement.getQueryInput().getLeft();
@@ -207,7 +207,7 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
                 if (outputElement !== undefined) {
                     if (outputElement.type !== undefined
                         && (outputElement.type === 'STREAM' || outputElement.type === 'TABLE'
-                            || outputElement.type === 'WINDOW')) {
+                        || outputElement.type === 'WINDOW')) {
                         outputElementType = outputElement.type;
                         if (outputElement.element !== undefined) {
                             outputElementAttributesList = outputElement.element.getAttributeList();
@@ -642,9 +642,9 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
                 });
 
                 /*
-                * This function adds watch fields for the input section. Each time a new editorInput is created,
-                * this function needs to be called.
-                * */
+                 * This function adds watch fields for the input section. Each time a new editorInput is created,
+                 * this function needs to be called.
+                 * */
                 function addWatchFieldsForInput() {
                     editorInput.watch('root.left.input', function () {
                         var leftFromNode = editorInput.getEditor('root.left.input.from');
@@ -679,11 +679,11 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
                 }
 
                 /*
-                * This function will swap the left and right sources data in the form.
-                * Right source values will be saved in the left source and vice versa.
-                * Since the input schema is changed, we have to reset the watch functions
-                * for the each left and right source changes.
-                * */
+                 * This function will swap the left and right sources data in the form.
+                 * Right source values will be saved in the left source and vice versa.
+                 * Since the input schema is changed, we have to reset the watch functions
+                 * for the each left and right source changes.
+                 * */
                 function interChangeSourceDataAndSchema(oldFromSourceValue, newFromSourceValue) {
                     if (oldFromSourceValue !== newFromSourceValue) {
                         var newLeftSchema =

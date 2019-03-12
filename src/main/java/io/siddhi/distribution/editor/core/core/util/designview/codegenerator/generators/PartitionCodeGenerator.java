@@ -37,8 +37,8 @@ public class PartitionCodeGenerator {
     /**
      * Generates the Siddhi code representation of a PartitionConfig object
      *
-     * @param partition       The PartitionConfig object
-     * @param definitionNames The names of all the Siddhi definition objects (including inner streams)
+     * @param partition           The PartitionConfig object
+     * @param definitionNames     The names of all the Siddhi definition objects (including inner streams)
      * @param isGeneratingToolTip If it is generating a tooltip or not
      * @return The Siddhi code representation of the given PartitionConfig object
      * @throws CodeGenerationException Error when generating the code

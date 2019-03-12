@@ -68,7 +68,7 @@ define(['require', 'elementUtils'],
             this.siddhiAppConfig = siddhiAppConfig;
         };
 
-        ConfigurationData.prototype.setIsStillDrawingGraph= function (isStillDrawingGraph) {
+        ConfigurationData.prototype.setIsStillDrawingGraph = function (isStillDrawingGraph) {
             this.isStillDrawingGraph = isStillDrawingGraph;
         };
 
@@ -79,8 +79,8 @@ define(['require', 'elementUtils'],
             var file = activeTab.getFile();
             // If the graph is not drawing from the JSON sent from the backend when switching from code to design, then
             // if a change is done in the design then app is stop if it is still running or debugging.
-            if(!self.isStillDrawingGraph && isDesignViewContentChanged
-                && (file.getRunStatus() || file.getDebugStatus())){
+            if (!self.isStillDrawingGraph && isDesignViewContentChanged
+                && (file.getRunStatus() || file.getDebugStatus())) {
                 var launcher = activeTab.getSiddhiFileEditor().getLauncher();
                 launcher.stopApplication(self.application.workspaceManager, false);
             }

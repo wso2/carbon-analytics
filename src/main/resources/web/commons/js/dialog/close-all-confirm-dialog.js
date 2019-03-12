@@ -28,7 +28,7 @@ define(['jquery', './modal-dialog'], function ($, ModalDialog) {
     CloseAllConfirmDialog.prototype.constructor = CloseAllConfirmDialog;
 
     CloseAllConfirmDialog.prototype.init = function () {
-        if(this._initialized) {
+        if (this._initialized) {
             return;
         }
 
@@ -58,11 +58,11 @@ define(['jquery', './modal-dialog'], function ($, ModalDialog) {
 
         this._close.unbind('click');
 
-        this._close.click(function(e){
-            if(_.has(options, 'tabList')){
+        this._close.click(function (e) {
+            if (_.has(options, 'tabList')) {
                 self.hide();
                 _.each(options.tabList, function (tab) {
-                    options.tabController.removeTab(tab,true);
+                    options.tabController.removeTab(tab, true);
                 });
             }
         });

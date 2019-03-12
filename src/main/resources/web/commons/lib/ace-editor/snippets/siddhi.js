@@ -1,4 +1,3 @@
-
 /*
  * Copyright (c) 2014, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
  *
@@ -15,10 +14,10 @@
  * limitations under the License.
  */
 
-define("ace/snippets/siddhi",["require","exports","module"], function(require, exports, module) {
-	"use strict";
+define("ace/snippets/siddhi", ["require", "exports", "module"], function (require, exports, module) {
+    "use strict";
 
-exports.snippetText = undefined;	// Snippets are defined in the completion engine
-exports.scope = "siddhi";
+    exports.snippetText = undefined;	// Snippets are defined in the completion engine
+    exports.scope = "siddhi";
 
 });

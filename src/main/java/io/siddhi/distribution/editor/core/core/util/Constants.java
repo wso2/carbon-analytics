@@ -51,19 +51,6 @@ public class Constants {
     public static final String DEPLOYMENT_PASSWORD = "password";
     public static final String SIDDHI_FILE_LIST = "siddhiFileList";
     public static final String SERVER_LIST = "serverList";
-    static final String FUNCTION_EXECUTOR = "FunctionExecutor";
-    static final String ATTRIBUTE_AGGREGATOR = "AttributeAggregator";
-    static final String WINDOW_PROCESSOR = "WindowProcessor";
-    static final String STREAM_FUNCTION_PROCESSOR = "StreamFunctionProcessor";
-    static final String STREAM_PROCESSOR = "StreamProcessor";
-    static final String SOURCE = "Source";
-    static final String SINK = "Sink";
-    static final String SOURCEMAP = "SourceMap";
-    static final String SINKMAP = "SinkMap";
-    static final String STORE = "Store";
-    static final Map<String, Class<?>> SUPER_CLASS_MAP;
-    static final Map<String, String> PACKAGE_NAME_MAP;
-
     public static final String XML_EVENT = "xml";
     public static final String JSON_EVENT = "json";
     public static final String TEXT_EVENT = "text";
@@ -76,6 +63,18 @@ public class Constants {
     public static final String ATTR_TYPE_STRING = "string";
     public static final String ATTR_TYPE_BOOL = "bool";
     public static final String EVENT_ATTRIBUTE_VALUE_SEPARATOR = ":";
+    static final String FUNCTION_EXECUTOR = "FunctionExecutor";
+    static final String ATTRIBUTE_AGGREGATOR = "AttributeAggregator";
+    static final String WINDOW_PROCESSOR = "WindowProcessor";
+    static final String STREAM_FUNCTION_PROCESSOR = "StreamFunctionProcessor";
+    static final String STREAM_PROCESSOR = "StreamProcessor";
+    static final String SOURCE = "Source";
+    static final String SINK = "Sink";
+    static final String SOURCEMAP = "SourceMap";
+    static final String SINKMAP = "SinkMap";
+    static final String STORE = "Store";
+    static final Map<String, Class<?>> SUPER_CLASS_MAP;
+    static final Map<String, String> PACKAGE_NAME_MAP;
 
     static {
         // Populating the processor super class map

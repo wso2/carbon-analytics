@@ -33,10 +33,11 @@ public class ConfigBuildingUtilities {
 
     /**
      * Gets the piece of the code for the given SiddhiElement, from the siddhiAppString
-     * @param siddhiElement                     SiddhiElement object, whose code definition is to be extracted
-     * @param siddhiAppString                   Complete Siddhi app string
-     * @return                                  Code definition of the given SiddhiElement object
-     * @throws DesignGenerationException        Error on getting query start/end index of the element
+     *
+     * @param siddhiElement   SiddhiElement object, whose code definition is to be extracted
+     * @param siddhiAppString Complete Siddhi app string
+     * @return Code definition of the given SiddhiElement object
+     * @throws DesignGenerationException Error on getting query start/end index of the element
      */
     public static String getDefinition(SiddhiElement siddhiElement, String siddhiAppString)
             throws DesignGenerationException {
@@ -49,11 +50,12 @@ public class ConfigBuildingUtilities {
     /**
      * Gets the code segment starting from the given startIndex and ending at the given endIndex,
      * from the given Siddhi app string
-     * @param startIndex                        Query context start index
-     * @param endIndex                          Query context end index
-     * @param siddhiAppString                   Complete Siddhi app string
-     * @return                                  Extracted code segment
-     * @throws DesignGenerationException        At least one of given startIndex and endIndex is null
+     *
+     * @param startIndex      Query context start index
+     * @param endIndex        Query context end index
+     * @param siddhiAppString Complete Siddhi app string
+     * @return Extracted code segment
+     * @throws DesignGenerationException At least one of given startIndex and endIndex is null
      */
     public static String getStringWithQueryContextIndexes(int[] startIndex, int[] endIndex, String siddhiAppString)
             throws DesignGenerationException {
@@ -71,9 +73,9 @@ public class ConfigBuildingUtilities {
     /**
      * Gets the relative position in the siddhiAppString of the start of the given line number.
      *
-     * @param lineNumber        The line number in which the relative start position should be obtained
-     * @param siddhiAppString   Complete Siddhi app string
-     * @return                  The relative position of where the given line starts in the siddhiAppString
+     * @param lineNumber      The line number in which the relative start position should be obtained
+     * @param siddhiAppString Complete Siddhi app string
+     * @return The relative position of where the given line starts in the siddhiAppString
      */
     private static int ordinalIndexOf(int lineNumber, String siddhiAppString) {
         int position = 0;

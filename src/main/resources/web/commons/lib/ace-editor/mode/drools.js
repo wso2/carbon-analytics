@@ -28,28 +28,28 @@
  *
  * ***** END LICENSE BLOCK ***** */
 
-define(function(require, exports, module) {
-"use strict";
+define(function (require, exports, module) {
+    "use strict";
 
-var oop = require("../lib/oop");
-var TextMode = require("./text").Mode;
-var DroolsHighlightRules = require("./drools_highlight_rules").DroolsHighlightRules;
-var DroolsFoldMode = require("./folding/drools").FoldMode;
+    var oop = require("../lib/oop");
+    var TextMode = require("./text").Mode;
+    var DroolsHighlightRules = require("./drools_highlight_rules").DroolsHighlightRules;
+    var DroolsFoldMode = require("./folding/drools").FoldMode;
 
-var Mode = function() {
-    this.HighlightRules = DroolsHighlightRules;
-    this.foldingRules = new DroolsFoldMode();
-    this.$behaviour = this.$defaultBehaviour;
+    var Mode = function () {
+        this.HighlightRules = DroolsHighlightRules;
+        this.foldingRules = new DroolsFoldMode();
+        this.$behaviour = this.$defaultBehaviour;
 
-};
-oop.inherits(Mode, TextMode);
+    };
+    oop.inherits(Mode, TextMode);
 
-(function() {
-    this.lineCommentStart = "//";
-    this.$id = "ace/mode/drools";
-}).call(Mode.prototype);
+    (function () {
+        this.lineCommentStart = "//";
+        this.$id = "ace/mode/drools";
+    }).call(Mode.prototype);
 
-exports.Mode = Mode;
+    exports.Mode = Mode;
 
 });
 

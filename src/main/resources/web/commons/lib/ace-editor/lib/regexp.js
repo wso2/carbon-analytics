@@ -8,9 +8,9 @@
  * Provides an augmented, extensible, cross-browser implementation of regular expressions,
  * including support for additional syntax, flags, and methods
  */
- 
-define(function(require, exports, module) {
-"use strict";
+
+define(function (require, exports, module) {
+    "use strict";
 
     //---------------------------------
     //  Private variables
@@ -45,7 +45,7 @@ define(function(require, exports, module) {
     RegExp.prototype.exec = function (str) {
         var match = real.exec.apply(this, arguments),
             name, r2;
-        if ( typeof(str) == 'string' && match) {
+        if (typeof(str) == 'string' && match) {
             // Fix browsers whose `exec` methods don't consistently return `undefined` for
             // nonparticipating capturing groups
             if (!compliantExecNpcg && match.length > 1 && indexOf(match, "") > -1) {
@@ -64,7 +64,7 @@ define(function(require, exports, module) {
                 for (var i = 1; i < match.length; i++) {
                     name = this._xregexp.captureNames[i - 1];
                     if (name)
-                       match[name] = match[i];
+                        match[name] = match[i];
                 }
             }
             // Fix browsers that increment `lastIndex` after zero-length matches
@@ -92,15 +92,15 @@ define(function(require, exports, module) {
     //  Private helper functions
     //---------------------------------
 
-    function getNativeFlags (regex) {
-        return (regex.global     ? "g" : "") +
-               (regex.ignoreCase ? "i" : "") +
-               (regex.multiline  ? "m" : "") +
-               (regex.extended   ? "x" : "") + // Proposed for ES4; included in AS3
-               (regex.sticky     ? "y" : "");
+    function getNativeFlags(regex) {
+        return (regex.global ? "g" : "") +
+            (regex.ignoreCase ? "i" : "") +
+            (regex.multiline ? "m" : "") +
+            (regex.extended ? "x" : "") + // Proposed for ES4; included in AS3
+            (regex.sticky ? "y" : "");
     }
 
-    function indexOf (array, item, from) {
+    function indexOf(array, item, from) {
         if (Array.prototype.indexOf) // Use the native array method if available
             return array.indexOf(item, from);
         for (var i = from || 0; i < array.length; i++) {

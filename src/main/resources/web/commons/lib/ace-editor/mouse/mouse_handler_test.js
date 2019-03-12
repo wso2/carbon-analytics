@@ -33,42 +33,42 @@ if (typeof process !== "undefined") {
     require("../test/mockdom");
 }
 
-define(function(require, exports, module) {
-"use strict";
+define(function (require, exports, module) {
+    "use strict";
 
-var Editor = require("../editor").Editor;
-var MockRenderer = require("../test/mockrenderer").MockRenderer;
-var assert = require("../test/assertions");
-var MouseEvent = function(type, opts){
-    var e = document.createEvent("MouseEvents");
-    e.initMouseEvent("mouse" + type,
-        true, true, window,
-        opts.detail,
-        opts.x, opts.y, opts.x, opts.y,
-        opts.ctrl, opts.alt, opts.shift, opts.meta,
-        opts.button || 0, opts.relatedTarget);
-    return e;
-};
+    var Editor = require("../editor").Editor;
+    var MockRenderer = require("../test/mockrenderer").MockRenderer;
+    var assert = require("../test/assertions");
+    var MouseEvent = function (type, opts) {
+        var e = document.createEvent("MouseEvents");
+        e.initMouseEvent("mouse" + type,
+            true, true, window,
+            opts.detail,
+            opts.x, opts.y, opts.x, opts.y,
+            opts.ctrl, opts.alt, opts.shift, opts.meta,
+            opts.button || 0, opts.relatedTarget);
+        return e;
+    };
 
-module.exports = {
+    module.exports = {
 
-    setUp : function(next) {
-        this.editor = new Editor(new MockRenderer());
-        this.editor.setValue("Juhu kinners!")
-        next();
-    },
+        setUp: function (next) {
+            this.editor = new Editor(new MockRenderer());
+            this.editor.setValue("Juhu kinners!")
+            next();
+        },
 
-    "test: double tap. issue #956" : function() {
-        // mouse up fired immediately after mouse down
-        var target = this.editor.renderer.getMouseEventTarget();
-        target.dispatchEvent(MouseEvent("down", {x: 1, y: 1}));
-        target.dispatchEvent(MouseEvent("up", {x: 1, y: 1}));
-        target.dispatchEvent(MouseEvent("down", {x: 1, y: 1, detail: 2}));
-        target.dispatchEvent(MouseEvent("up", {x: 1, y: 1, detail: 2}));
-        
-        assert.equal(this.editor.getSelectedText(), "Juhu");
-    }
-};
+        "test: double tap. issue #956": function () {
+            // mouse up fired immediately after mouse down
+            var target = this.editor.renderer.getMouseEventTarget();
+            target.dispatchEvent(MouseEvent("down", {x: 1, y: 1}));
+            target.dispatchEvent(MouseEvent("up", {x: 1, y: 1}));
+            target.dispatchEvent(MouseEvent("down", {x: 1, y: 1, detail: 2}));
+            target.dispatchEvent(MouseEvent("up", {x: 1, y: 1, detail: 2}));
+
+            assert.equal(this.editor.getSelectedText(), "Juhu");
+        }
+    };
 
 });
 

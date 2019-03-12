@@ -28,18 +28,18 @@ define(
         var Annotation = function (options) {
             /*
              Data storing structure as follows
-                {
-                    name: ‘’,
-                    type: ‘VALUE’,
-                    value: [‘value1’,’value2’]
-                },
-                and|or
-                {
-                    name: ‘’
-                    type: ‘KEY_VALUE’,
-                    value: {‘option’:’value’}
-                }
-            */
+             {
+             name: ‘’,
+             type: ‘VALUE’,
+             value: [‘value1’,’value2’]
+             },
+             and|or
+             {
+             name: ‘’
+             type: ‘KEY_VALUE’,
+             value: {‘option’:’value’}
+             }
+             */
             if (options !== undefined) {
                 this.name = options.name;
                 this.type = options.type;

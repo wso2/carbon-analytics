@@ -12,7 +12,7 @@
  ~   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  ~   See the License for the specific language governing permissions and
  ~   limitations under the License.
-*/
+ */
 
 /*
  ~   DataTables WSO2 Integration
@@ -22,31 +22,31 @@
  ~   DataTables 1.10 or newer.
  */
 
-(function(window, document, undefined){
+(function (window, document, undefined) {
 
-    var factory = function($, DataTable) {
+    var factory = function ($, DataTable) {
         "use strict";
-        
+
         /* Set the defaults for DataTables initialisation */
         $.extend(true, DataTable.defaults, {
             bSortCellsTop: true,
             responsive: false,
             autoWidth: false,
             dom: '<"dataTablesTop"' +
-                'f' +
-                '<"dataTables_toolbar">' +
-                '>' +
-                'rt' +
-                '<"dataTablesBottom"' +
-                'lip' +
-                '>',
+            'f' +
+            '<"dataTables_toolbar">' +
+            '>' +
+            'rt' +
+            '<"dataTablesBottom"' +
+            'lip' +
+            '>',
             language: {
                 searchPlaceholder: 'Filter by ...',
                 search: ''
             }
         });
-        
-        var wso2Extend = function(settings, opts) {
+
+        var wso2Extend = function (settings, opts) {
 
             // Sanity check that we are using DataTables 1.10 or newer
             if (!DataTable.versionCheck || !DataTable.versionCheck('1.10.12')) {
@@ -65,25 +65,25 @@
 
             // details is an object, but for simplicity the user can give it as a string
             if (opts && typeof opts.details === 'string') {
-                opts.details = { type: opts.details };
+                opts.details = {type: opts.details};
             }
-            
-            this.c = $.extend( true, {}, wso2Extend.defaults, DataTable.defaults.wso2, opts );
+
+            this.c = $.extend(true, {}, wso2Extend.defaults, DataTable.defaults.wso2, opts);
             settings.wso2 = this;
             this._constructor();
 
         };
-        
+
         wso2Extend.prototype = {
-            
-            _constructor: function(){
-                
-		        var dt = this.s.dt;
+
+            _constructor: function () {
+
+                var dt = this.s.dt;
                 var elem = $('table', dt.table().container());
 
                 var ROW_SELECTED_CLASS = 'DTTT_selected';
 
-                dt.table().columns().every(function() {
+                dt.table().columns().every(function () {
 
                     var column = this;
                     var filterColumn = $('.filter-row th', elem);
@@ -187,12 +187,12 @@
                         thisTable = $(this).closest('.dataTables_wrapper').find('.dataTable').dataTable();
                     if ($(button).html() == 'Select') {
                         thisTable.api().rows().every(function () {
-                            $(this.node()).attr('data-type','selectable');
+                            $(this.node()).attr('data-type', 'selectable');
                         });
                         thisTable.addClass("table-selectable");
                         $(button).addClass("active").html('Cancel');
                         $(button).closest('li').siblings('.select-all-btn').show();
-                    } else if ($(button).html() == 'Cancel'){
+                    } else if ($(button).html() == 'Cancel') {
                         thisTable.api().rows().every(function () {
                             $(this.node()).removeAttr('data-type');
                             $(this.node()).removeClass(ROW_SELECTED_CLASS);
@@ -223,7 +223,7 @@
 
 
                 //Event for row select/deselect
-                $('body').on('click', '[data-type=selectable]', function() {
+                $('body').on('click', '[data-type=selectable]', function () {
                     $(this).toggleClass(ROW_SELECTED_CLASS);
                     var button = this,
                         thisTable = $(this).closest('.dataTables_wrapper').find('.dataTable').dataTable();
@@ -257,25 +257,25 @@
 
             }
         }
-        
+
         wso2Extend.defaults = {
             bSortCellsTop: true,
             responsive: false,
             autoWidth: false,
             dom: '<"dataTablesTop"' +
-                'f' +
-                '<"dataTables_toolbar">' +
-                '>' +
-                'rt' +
-                '<"dataTablesBottom"' +
-                'lip' +
-                '>',
+            'f' +
+            '<"dataTables_toolbar">' +
+            '>' +
+            'rt' +
+            '<"dataTablesBottom"' +
+            'lip' +
+            '>',
             language: {
                 searchPlaceholder: 'Filter by ...',
                 search: ''
             }
         }
-        
+
         /**
          * Version information
          *
@@ -289,7 +289,7 @@
 
         // Attach a listener to the document which listens for DataTables initialisation
         // events so we can automatically initialise
-        $(document).on('preInit.dt.dte', function(e, settings, json) {            
+        $(document).on('preInit.dt.dte', function (e, settings, json) {
             if (e.namespace !== 'dt') {
                 return;
             }
@@ -299,23 +299,23 @@
 //                 settings.oInit.wso2 ||
 //                 DataTable.defaults.wso2 ||
 //            ) {
-                var init = settings.oInit.wso2;
+            var init = settings.oInit.wso2;
 
-                if (init !== false) {
-                    new wso2Extend (settings, $.isPlainObject(init) ? init : {});
-                }
+            if (init !== false) {
+                new wso2Extend(settings, $.isPlainObject(init) ? init : {});
+            }
             //}
         });
-        
+
         return wso2Extend;
 
     };
 
     // Define as an AMD module if possible
-    if (typeof define === 'function' && define.amd){
+    if (typeof define === 'function' && define.amd) {
         define(['jquery', 'datatables'], factory);
     }
-    else if (typeof exports === 'object'){
+    else if (typeof exports === 'object') {
         // Node/CommonJS
         factory(require('jquery'), require('datatables'));
     }

@@ -1,7 +1,7 @@
-define(function(require, exports, module) {
-"use strict";
+define(function (require, exports, module) {
+    "use strict";
 
-exports.snippetText = require("../requirejs/text!./typescript.snippets");
-exports.scope = "typescript";
+    exports.snippetText = require("../requirejs/text!./typescript.snippets");
+    exports.scope = "typescript";
 
 });

@@ -38,7 +38,7 @@ public class SourceSinkCodeGenerator {
     /**
      * Generates the Siddhi code representation of a SourceSinkConfig object
      *
-     * @param sourceSink The SourceSinkConfig object
+     * @param sourceSink          The SourceSinkConfig object
      * @param isGeneratingToolTip If it is generating a tooltip or not
      * @return The Siddhi code representation of the given SourceSinkConfig object
      * @throws CodeGenerationException Error when generating the code

@@ -314,8 +314,8 @@ define(function (require) {
             }
             // checking the end of an annotation
             if (commonAnnotationLevel > 0 && (token.type === 'keyword.other.annotation.mid.end'
-                    || token.type === 'keyword.other.annotation.full.end'
-                    || token.type === 'keyword.other.rparen')) {
+                || token.type === 'keyword.other.annotation.full.end'
+                || token.type === 'keyword.other.rparen')) {
                 var tokenValue = token.value;
                 var regex = new RegExp("\\)", "gi");
                 commonAnnotationLevel -= tokenValue.match(regex).length;

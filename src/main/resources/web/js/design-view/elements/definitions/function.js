@@ -28,13 +28,13 @@ define(
         var Function = function (options) {
             /*
              Data storing structure as follows
-                id*: '',
-                previousCommentSegment:'',
-                name*: '',
-                scriptType*: 'JAVASCRIPT | R | SCALA',
-                returnType*: 'INT | LONG | DOUBLE | FLOAT | STRING | BOOL | OBJECT',
-                body*: ''
-            */
+             id*: '',
+             previousCommentSegment:'',
+             name*: '',
+             scriptType*: 'JAVASCRIPT | R | SCALA',
+             returnType*: 'INT | LONG | DOUBLE | FLOAT | STRING | BOOL | OBJECT',
+             body*: ''
+             */
             if (options !== undefined) {
                 this.id = options.id;
                 this.previousCommentSegment = options.previousCommentSegment;

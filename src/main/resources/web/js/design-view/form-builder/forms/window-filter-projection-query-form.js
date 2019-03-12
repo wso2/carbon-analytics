@@ -132,7 +132,7 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
                 var savedAnnotations = clickedElement.getAnnotationList();
                 var annotations = [];
                 _.forEach(savedAnnotations, function (savedAnnotation) {
-                    annotations.push({ annotation: savedAnnotation });
+                    annotations.push({annotation: savedAnnotation});
                 });
 
                 var queryName = clickedElement.getQueryName();
@@ -197,7 +197,7 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
                 if (outputElement !== undefined) {
                     if (outputElement.type !== undefined
                         && (outputElement.type === 'STREAM' || outputElement.type === 'TABLE'
-                            || outputElement.type === 'WINDOW')) {
+                        || outputElement.type === 'WINDOW')) {
                         outputElementType = outputElement.type;
                         if (outputElement.element !== undefined) {
                             outputElementAttributesList = outputElement.element.getAttributeList();
@@ -298,13 +298,13 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
 
 
                 /*
-                * Test whether filter, function and window queries has their unique elements. For an example if a filter
-                * is added the filter field should be activated. If a window is added window fields should be
-                * activated. If a function query is added function related fields should be activated.
-                * NOTE: this check is only essential when a form is opened for a query for the first time. After that
-                * query type is changed according to the user input. So the required fields are already activated and
-                * filled.
-                * */
+                 * Test whether filter, function and window queries has their unique elements. For an example if a filter
+                 * is added the filter field should be activated. If a window is added window fields should be
+                 * activated. If a function query is added function related fields should be activated.
+                 * NOTE: this check is only essential when a form is opened for a query for the first time. After that
+                 * query type is changed according to the user input. So the required fields are already activated and
+                 * filled.
+                 * */
                 if ($(element).parent().hasClass(constants.FILTER) && noOfSavedFilters === 0) {
                     var streamHandlerFilterObject = {
                         streamHandler: {
@@ -317,7 +317,7 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
                     var streamHandlerWindowObject = {
                         streamHandler: {
                             windowName: ' ',
-                            parameters: [{ parameter: ' ' }]
+                            parameters: [{parameter: ' '}]
                         }
                     };
                     streamHandlerList.push(streamHandlerWindowObject);
@@ -325,7 +325,7 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
                     var streamHandlerFunctionObject = {
                         streamHandler: {
                             functionName: ' ',
-                            parameters: [{ parameter: ' ' }]
+                            parameters: [{parameter: ' '}]
                         }
                     };
                     streamHandlerList.push(streamHandlerFunctionObject);

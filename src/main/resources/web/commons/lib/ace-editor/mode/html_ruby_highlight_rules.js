@@ -28,14 +28,14 @@
  *
  * ***** END LICENSE BLOCK ***** */
 
-define(function(require, exports, module) {
+define(function (require, exports, module) {
     "use strict";
 
     var oop = require("../lib/oop");
     var HtmlHighlightRules = require("./html_highlight_rules").HtmlHighlightRules;
     var RubyHighlightRules = require("./ruby_highlight_rules").RubyHighlightRules;
 
-    var HtmlRubyHighlightRules = function() {
+    var HtmlRubyHighlightRules = function () {
         HtmlHighlightRules.call(this);
 
         var startRules = [
@@ -43,26 +43,26 @@ define(function(require, exports, module) {
                 regex: "<%%|%%>",
                 token: "constant.language.escape"
             }, {
-                token : "comment.start.erb",
-                regex : "<%#",
-                push  : [{
-                    token : "comment.end.erb",
+                token: "comment.start.erb",
+                regex: "<%#",
+                push: [{
+                    token: "comment.end.erb",
                     regex: "%>",
                     next: "pop",
-                    defaultToken:"comment"
+                    defaultToken: "comment"
                 }]
             }, {
-                token : "support.ruby_tag",
-                regex : "<%+(?!>)[-=]?",
-                push  : "ruby-start"
+                token: "support.ruby_tag",
+                regex: "<%+(?!>)[-=]?",
+                push: "ruby-start"
             }
         ];
 
         var endRules = [
             {
-                token : "support.ruby_tag",
-                regex : "%>",
-                next  : "pop"
+                token: "support.ruby_tag",
+                regex: "%>",
+                next: "pop"
             }, {
                 token: "comment",
                 regex: "#(?:[^%]|%[^>])*"

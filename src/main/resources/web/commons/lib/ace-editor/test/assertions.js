@@ -28,29 +28,29 @@
  *
  * ***** END LICENSE BLOCK ***** */
 
-define(function(require, exports, module) {
-"use strict";
+define(function (require, exports, module) {
+    "use strict";
 
-var assert = require("assert");
-    
-assert.position = function(cursor, row, column) {
-    assert.equal(cursor.row, row);
-    assert.equal(cursor.column, column);
-};
+    var assert = require("assert");
 
-assert.range = function(range, startRow, startColumn, endRow, endColumn) {
-    assert.position(range.start, startRow, startColumn);
-    assert.position(range.end, endRow, endColumn);
-};
+    assert.position = function (cursor, row, column) {
+        assert.equal(cursor.row, row);
+        assert.equal(cursor.column, column);
+    };
 
-assert.notOk = function(value) {
-    assert.equal(value, false);   
-};
+    assert.range = function (range, startRow, startColumn, endRow, endColumn) {
+        assert.position(range.start, startRow, startColumn);
+        assert.position(range.end, endRow, endColumn);
+    };
 
-exports.jsonEquals = function(foundJson, expectedJson) {
-    assert.equal(JSON.stringify(foundJson), JSON.stringify(expectedJson));
-};
+    assert.notOk = function (value) {
+        assert.equal(value, false);
+    };
 
-module.exports = assert;
+    exports.jsonEquals = function (foundJson, expectedJson) {
+        assert.equal(JSON.stringify(foundJson), JSON.stringify(expectedJson));
+    };
+
+    module.exports = assert;
 
 });

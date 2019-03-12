@@ -1,4 +1,4 @@
-module.exports = function(grunt) {
+module.exports = function (grunt) {
 
     // Project configuration.
     grunt.initConfig({
@@ -25,7 +25,7 @@ module.exports = function(grunt) {
                 options: {
                     hostname: '*',
                     keepalive: true,
-                    middleware: function(connect, options) {
+                    middleware: function (connect, options) {
                         return [
                             connect.static(options.base),
                             connect.directory(options.base)

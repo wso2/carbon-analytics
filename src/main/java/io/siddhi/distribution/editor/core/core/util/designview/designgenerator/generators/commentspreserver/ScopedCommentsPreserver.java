@@ -45,26 +45,29 @@ public abstract class ScopedCommentsPreserver {
 
     /**
      * Generates a list of CommentCodeSegments
-     * @return                                  List of CommentCodeSegments
-     * @throws DesignGenerationException        Error while getting code segments between two ElementCodeSegments
+     *
+     * @return List of CommentCodeSegments
+     * @throws DesignGenerationException Error while getting code segments between two ElementCodeSegments
      */
     public abstract List<CommentCodeSegment> generateCommentCodeSegments() throws DesignGenerationException;
 
     /**
      * Binds CommentCodeSegments from the given list,
      * to their relevant Siddhi Element Config objects from the given SiddhiAppConfig reference object
-     * @param commentCodeSegments               List of CommentCodeSegments of a Siddhi app
-     * @param siddhiAppConfigReference          SiddhiAppConfig object reference
-     * @return                                  SiddhiAppConfig object with bound CommentCodeSegments
+     *
+     * @param commentCodeSegments      List of CommentCodeSegments of a Siddhi app
+     * @param siddhiAppConfigReference SiddhiAppConfig object reference
+     * @return SiddhiAppConfig object with bound CommentCodeSegments
      */
     public abstract SiddhiAppConfig bindCommentsToElements(Collection<CommentCodeSegment> commentCodeSegments,
                                                            SiddhiAppConfig siddhiAppConfigReference);
 
     /**
      * Returns detected Comment segments in between the given list of ElementCodeSegment objects
-     * @param elementCodeSegments               List of ElementCodeSegment objects, each representing a Code segment
-     * @return                                  List of detected CommentCodeSegment objects
-     * @throws DesignGenerationException        Error while getting a code segment in between
+     *
+     * @param elementCodeSegments List of ElementCodeSegment objects, each representing a Code segment
+     * @return List of detected CommentCodeSegment objects
+     * @throws DesignGenerationException Error while getting a code segment in between
      */
     protected List<CommentCodeSegment> detectCommentCodeSegments(List<ElementCodeSegment> elementCodeSegments)
             throws DesignGenerationException {
@@ -83,11 +86,12 @@ public abstract class ScopedCommentsPreserver {
 
     /**
      * Assigns the previous CommentCodeSegment from the given list, to the SiddhiElementConfig object
-     * @param siddhiElementConfigReference          SiddhiElementConfig object
-     * @param commentCodeSegments                   List of CommentCodeSegment objects
+     *
+     * @param siddhiElementConfigReference SiddhiElementConfig object
+     * @param commentCodeSegments          List of CommentCodeSegment objects
      */
     protected void assignPreviousCommentSegment(SiddhiElementConfig siddhiElementConfigReference,
-                                              Collection<CommentCodeSegment> commentCodeSegments) {
+                                                Collection<CommentCodeSegment> commentCodeSegments) {
         siddhiElementConfigReference.setPreviousCommentSegment(
                 findPreviousCommentCodeSegment(siddhiElementConfigReference, commentCodeSegments));
     }
@@ -96,12 +100,13 @@ public abstract class ScopedCommentsPreserver {
      * Finds and returns the previous CommentCodeSegment object for the given SiddhiElementConfig object,
      * from the given list of CommentCodeSegments when exists,
      * otherwise returns null
-     * @param siddhiElementConfig           SiddhiElementConfig object
-     * @param commentCodeSegments           List of CommentCodeSegment objects
-     * @return                              CommentCodeSegment object
+     *
+     * @param siddhiElementConfig SiddhiElementConfig object
+     * @param commentCodeSegments List of CommentCodeSegment objects
+     * @return CommentCodeSegment object
      */
     protected CommentCodeSegment findPreviousCommentCodeSegment(SiddhiElementConfig siddhiElementConfig,
-                                                              Collection<CommentCodeSegment> commentCodeSegments) {
+                                                                Collection<CommentCodeSegment> commentCodeSegments) {
         int[] previousCommentCodeSegmentEndIndex =
                 getPreviousCommentCodeSegmentEndIndexes(siddhiElementConfig.getQueryContextStartIndex());
         if (previousCommentCodeSegmentEndIndex == null) {
@@ -117,9 +122,10 @@ public abstract class ScopedCommentsPreserver {
 
     /**
      * Returns whether the given ElementCodeSegments have a Code segment in between
-     * @param previousSegment       First ElementCodeSegment
-     * @param currentSegment        Second ElementCodeSegment
-     * @return                      Whether previousSegment and currentSegment objects have a code segment in between
+     *
+     * @param previousSegment First ElementCodeSegment
+     * @param currentSegment  Second ElementCodeSegment
+     * @return Whether previousSegment and currentSegment objects have a code segment in between
      */
     protected boolean hasCodeSegmentInBetween(ElementCodeSegment previousSegment, ElementCodeSegment currentSegment) {
         return (getCharCountFromLineAndColumn(
@@ -133,8 +139,9 @@ public abstract class ScopedCommentsPreserver {
 
     /**
      * Returns whether the given CommentCodeSegment is valid as a Siddhi comment or not
-     * @param commentCodeSegment        CommentCodeSegment object
-     * @return                          Whether the CommentCodeSegment is valid or not
+     *
+     * @param commentCodeSegment CommentCodeSegment object
+     * @return Whether the CommentCodeSegment is valid or not
      */
     protected boolean isCommentValid(CommentCodeSegment commentCodeSegment) {
         if (commentCodeSegment == null) {
@@ -151,10 +158,11 @@ public abstract class ScopedCommentsPreserver {
 
     /**
      * Gets the comment segment in between the given ElementCodeSegment objects
-     * @param previous                          First ElementCodeSegment object
-     * @param current                           Second ElementCodeSegment object
-     * @return                                  CommentCodeSegment object
-     * @throws DesignGenerationException        Error while getting the comment segment
+     *
+     * @param previous First ElementCodeSegment object
+     * @param current  Second ElementCodeSegment object
+     * @return CommentCodeSegment object
+     * @throws DesignGenerationException Error while getting the comment segment
      */
     protected CommentCodeSegment getCodeSegmentInBetween(ElementCodeSegment previous, ElementCodeSegment current)
             throws DesignGenerationException {
@@ -179,8 +187,9 @@ public abstract class ScopedCommentsPreserver {
 
     /**
      * Returns filtered code segments, that is only the major elements of the Siddhi app
-     * @param elementCodeSegments       Unfiltered list of ElementCodeSegments
-     * @return                          Filtered list of ElementCodeSegments
+     *
+     * @param elementCodeSegments Unfiltered list of ElementCodeSegments
+     * @return Filtered list of ElementCodeSegments
      */
     protected List<ElementCodeSegment> filterMajorElementCodeSegments(List<ElementCodeSegment> elementCodeSegments) {
         // Eliminates elements that are inside any other element in the elementCodeSegments list
@@ -195,10 +204,11 @@ public abstract class ScopedCommentsPreserver {
 
     /**
      * Returns whether the given ElementCodeSegment is contained within any other ElementCodeSegment in the given list
-     * @param elementCodeSegment        ElementCodeSegment object to perform the check
-     * @param elementCodeSegments       List of ElementCodeSegments, that might contain the elementCodeSegment
-     * @return                          Whether the given ElementCodeSegment is contained
-     *                                  within any other ElementCodeSegment in the given list, or not
+     *
+     * @param elementCodeSegment  ElementCodeSegment object to perform the check
+     * @param elementCodeSegments List of ElementCodeSegments, that might contain the elementCodeSegment
+     * @return Whether the given ElementCodeSegment is contained
+     * within any other ElementCodeSegment in the given list, or not
      */
     private boolean isContainedInAnySegment(ElementCodeSegment elementCodeSegment,
                                             List<ElementCodeSegment> elementCodeSegments) {
@@ -215,8 +225,9 @@ public abstract class ScopedCommentsPreserver {
 
     /**
      * Returns the comment segment, which exists before the first even element's code
-     * @return                                  CommentCodeSegment object, representing the first comment segment
-     * @throws DesignGenerationException        Error while getting the first comment segment
+     *
+     * @return CommentCodeSegment object, representing the first comment segment
+     * @throws DesignGenerationException Error while getting the first comment segment
      */
     public CommentCodeSegment getCommentSegmentBeforeContent() throws DesignGenerationException {
         return getCommentSegmentBeforeContent(elementCodeSegments.get(0));
@@ -224,9 +235,10 @@ public abstract class ScopedCommentsPreserver {
 
     /**
      * Returns the comment segment before the given code segment
-     * @param firstElementCodeSegment           Code segment of the first ever element from the Siddhi app
-     * @return                                  CommentCodeSegment object
-     * @throws DesignGenerationException        Error while getting the comment segment
+     *
+     * @param firstElementCodeSegment Code segment of the first ever element from the Siddhi app
+     * @return CommentCodeSegment object
+     * @throws DesignGenerationException Error while getting the comment segment
      */
     private CommentCodeSegment getCommentSegmentBeforeContent(ElementCodeSegment firstElementCodeSegment)
             throws DesignGenerationException {
@@ -249,9 +261,10 @@ public abstract class ScopedCommentsPreserver {
 
     /**
      * Returns whether the given container ElementCodeSegment contains the contained ElementCodeSegment or not
-     * @param containedElement          ElementCodeSegment object that can be contained
-     * @param containerElement          ElementCodeSegment object that can contain
-     * @return                          Whether the containerElement contains the containedElement or not
+     *
+     * @param containedElement ElementCodeSegment object that can be contained
+     * @param containerElement ElementCodeSegment object that can contain
+     * @return Whether the containerElement contains the containedElement or not
      */
     protected boolean isSegmentContainedIn(ElementCodeSegment containedElement, ElementCodeSegment containerElement) {
         int containedStart =
@@ -275,9 +288,10 @@ public abstract class ScopedCommentsPreserver {
 
     /**
      * Gets query indexes, in between the given query indexes
-     * @param prevIndex     Query indexes of the first element
-     * @param current       Query indexes of the second element
-     * @return              Query indexes in between the given first and the second elements
+     *
+     * @param prevIndex Query indexes of the first element
+     * @param current   Query indexes of the second element
+     * @return Query indexes in between the given first and the second elements
      */
     protected int[][] getIndexesInBetween(int[] prevIndex, int[] current) {
         return new int[][]{
@@ -287,9 +301,10 @@ public abstract class ScopedCommentsPreserver {
 
     /**
      * Gets the previous query indexes for the given query indexes, in the given Siddhi app string
-     * @param queryIndexes                  Query indexes depicting the current line and column
-     * @param siddhiAppString               Complete Siddhi app string
-     * @return                              Previous query indexes
+     *
+     * @param queryIndexes    Query indexes depicting the current line and column
+     * @param siddhiAppString Complete Siddhi app string
+     * @return Previous query indexes
      */
     protected int[] getPreviousQueryIndexes(int[] queryIndexes, String siddhiAppString) {
         if (queryIndexes[1] == 0) {
@@ -307,9 +322,10 @@ public abstract class ScopedCommentsPreserver {
 
     /**
      * Gets the next query indexes for the given query indexes, in the given Siddhi app string
-     * @param queryIndexes                  Query indexes depicting the current line and column
-     * @param siddhiAppString               Complete Siddhi app string
-     * @return                              Next query indexes
+     *
+     * @param queryIndexes    Query indexes depicting the current line and column
+     * @param siddhiAppString Complete Siddhi app string
+     * @return Next query indexes
      */
     protected int[] getNextQueryIndexes(int[] queryIndexes, String siddhiAppString) {
         String lineContent = getLineContent(queryIndexes[0], siddhiAppString);
@@ -327,9 +343,10 @@ public abstract class ScopedCommentsPreserver {
 
     /**
      * Gets content of the line that has the given number, in the given Siddhi app string
-     * @param lineNo                Line number
-     * @param siddhiAppString       Complete Siddhi app string
-     * @return                      Content of the line
+     *
+     * @param lineNo          Line number
+     * @param siddhiAppString Complete Siddhi app string
+     * @return Content of the line
      */
     protected String getLineContent(int lineNo, String siddhiAppString) {
         int lineCounter = 1;
@@ -350,8 +367,9 @@ public abstract class ScopedCommentsPreserver {
 
     /**
      * Gets the indexes of the previous CommentCodeSegment, from the given start indexes
-     * @param currentStartIndexes           Starting indexes after a CommentCodeSegment
-     * @return                              Ending indexes of the CommentCodeSegment
+     *
+     * @param currentStartIndexes Starting indexes after a CommentCodeSegment
+     * @return Ending indexes of the CommentCodeSegment
      */
     protected int[] getPreviousCommentCodeSegmentEndIndexes(int[] currentStartIndexes) {
         if (!(currentStartIndexes[0] == 0 && currentStartIndexes[1] == 0)) {
@@ -363,9 +381,10 @@ public abstract class ScopedCommentsPreserver {
     /**
      * Returns the CommentCodeSegment which is ending with the given indexes,
      * from the given list of CommentCodeSegments
-     * @param endIndexes                    Ending query indexes of the CommentCodeSegment
-     * @param commentCodeSegments           List of CommentCodeSegments
-     * @return                              CommentCodeSegment which is ending with the given indexes
+     *
+     * @param endIndexes          Ending query indexes of the CommentCodeSegment
+     * @param commentCodeSegments List of CommentCodeSegments
+     * @return CommentCodeSegment which is ending with the given indexes
      */
     protected CommentCodeSegment findCommentCodeSegmentEndingWith(int[] endIndexes,
                                                                   Collection<CommentCodeSegment> commentCodeSegments) {
@@ -383,10 +402,11 @@ public abstract class ScopedCommentsPreserver {
 
     /**
      * Gets the character count until the given line and column, in the given Siddhi app string
-     * @param line                  Line number
-     * @param column                Column number
-     * @param siddhiAppString       Complete Siddhi app string
-     * @return                      Character count
+     *
+     * @param line            Line number
+     * @param column          Column number
+     * @param siddhiAppString Complete Siddhi app string
+     * @return Character count
      */
     protected int getCharCountFromLineAndColumn(int line, int column, String siddhiAppString) {
         int characterCounter = 0;

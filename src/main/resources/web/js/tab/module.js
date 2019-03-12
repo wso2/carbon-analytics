@@ -17,7 +17,7 @@
  */
 define(['./tab', './tab-list', './service-tab', './service-tab-list'],
     function (Tab, TabList, ServiceTab, ServiceTabList) {
-        return  {
+        return {
             Tab: Tab,
             TabList: TabList,
             ServiceTab: ServiceTab,

@@ -28,66 +28,66 @@
  *
  * ***** END LICENSE BLOCK ***** */
 
-define(function(require, exports, module) {
-"use strict";
+define(function (require, exports, module) {
+    "use strict";
 
-var oop = require("../lib/oop");
-var TextMode = require("./text").Mode;
-var HighlightRules = require("./json_highlight_rules").JsonHighlightRules;
-var MatchingBraceOutdent = require("./matching_brace_outdent").MatchingBraceOutdent;
-var CstyleBehaviour = require("./behaviour/cstyle").CstyleBehaviour;
-var CStyleFoldMode = require("./folding/cstyle").FoldMode;
-var WorkerClient = require("../worker/worker_client").WorkerClient;
+    var oop = require("../lib/oop");
+    var TextMode = require("./text").Mode;
+    var HighlightRules = require("./json_highlight_rules").JsonHighlightRules;
+    var MatchingBraceOutdent = require("./matching_brace_outdent").MatchingBraceOutdent;
+    var CstyleBehaviour = require("./behaviour/cstyle").CstyleBehaviour;
+    var CStyleFoldMode = require("./folding/cstyle").FoldMode;
+    var WorkerClient = require("../worker/worker_client").WorkerClient;
 
-var Mode = function() {
-    this.HighlightRules = HighlightRules;
-    this.$outdent = new MatchingBraceOutdent();
-    this.$behaviour = new CstyleBehaviour();
-    this.foldingRules = new CStyleFoldMode();
-};
-oop.inherits(Mode, TextMode);
+    var Mode = function () {
+        this.HighlightRules = HighlightRules;
+        this.$outdent = new MatchingBraceOutdent();
+        this.$behaviour = new CstyleBehaviour();
+        this.foldingRules = new CStyleFoldMode();
+    };
+    oop.inherits(Mode, TextMode);
 
-(function() {
+    (function () {
 
-    this.getNextLineIndent = function(state, line, tab) {
-        var indent = this.$getIndent(line);
+        this.getNextLineIndent = function (state, line, tab) {
+            var indent = this.$getIndent(line);
 
-        if (state == "start") {
-            var match = line.match(/^.*[\{\(\[]\s*$/);
-            if (match) {
-                indent += tab;
+            if (state == "start") {
+                var match = line.match(/^.*[\{\(\[]\s*$/);
+                if (match) {
+                    indent += tab;
+                }
             }
-        }
 
-        return indent;
-    };
+            return indent;
+        };
 
-    this.checkOutdent = function(state, line, input) {
-        return this.$outdent.checkOutdent(line, input);
-    };
+        this.checkOutdent = function (state, line, input) {
+            return this.$outdent.checkOutdent(line, input);
+        };
 
-    this.autoOutdent = function(state, doc, row) {
-        this.$outdent.autoOutdent(doc, row);
-    };
+        this.autoOutdent = function (state, doc, row) {
+            this.$outdent.autoOutdent(doc, row);
+        };
 
-    this.createWorker = function(session) {
-        var worker = new WorkerClient(["ace"], "ace/mode/json_worker", "JsonWorker");
-        worker.attachToDocument(session.getDocument());
+        this.createWorker = function (session) {
+            var worker = new WorkerClient(["ace"], "ace/mode/json_worker", "JsonWorker");
+            worker.attachToDocument(session.getDocument());
 
-        worker.on("annotate", function(e) {
-            session.setAnnotations(e.data);
-        });
+            worker.on("annotate", function (e) {
+                session.setAnnotations(e.data);
+            });
 
-        worker.on("terminate", function() {
-            session.clearAnnotations();
-        });
+            worker.on("terminate", function () {
+                session.clearAnnotations();
+            });
 
-        return worker;
-    };
+            return worker;
+        };
 
 
-    this.$id = "ace/mode/json";
-}).call(Mode.prototype);
+        this.$id = "ace/mode/json";
+    }).call(Mode.prototype);
 
-exports.Mode = Mode;
+    exports.Mode = Mode;
 });

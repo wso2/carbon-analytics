@@ -1,4 +1,3 @@
-
 /* ***** BEGIN LICENSE BLOCK *****
  * Distributed under the BSD license:
  *
@@ -29,12 +28,12 @@
  *
  * ***** END LICENSE BLOCK ***** */
 
-define(function(require, exports, module) {
+define(function (require, exports, module) {
 
-exports.isDark = false;
-exports.cssClass = "ace-iplastic";
-exports.cssText = require("../requirejs/text!./iplastic.css");
+    exports.isDark = false;
+    exports.cssClass = "ace-iplastic";
+    exports.cssText = require("../requirejs/text!./iplastic.css");
 
-var dom = require("../lib/dom");
-dom.importCssString(exports.cssText, exports.cssClass);
+    var dom = require("../lib/dom");
+    dom.importCssString(exports.cssText, exports.cssClass);
 });

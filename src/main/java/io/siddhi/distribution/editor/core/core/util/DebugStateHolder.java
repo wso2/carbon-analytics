@@ -30,6 +30,7 @@ public class DebugStateHolder {
 
     private DebugStateHolder() {
     }
+
     public DebugStateHolder(DebugCallbackEvent eventState, Map<String, Map<String, Object>> queryState) {
         this.eventState = eventState;
         this.queryState = queryState;

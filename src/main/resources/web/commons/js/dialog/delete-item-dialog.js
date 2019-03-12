@@ -35,7 +35,7 @@ define(['require', 'jquery', 'lodash', './modal-dialog', 'log'], function (requi
         } else {
             this.hide();
             var successCallBack = _.get(data, 'onSuccess');
-            if(_.isFunction(successCallBack)){
+            if (_.isFunction(successCallBack)) {
                 successCallBack.call();
             }
             log.debug(data.path + " deleted successfully");
@@ -43,7 +43,7 @@ define(['require', 'jquery', 'lodash', './modal-dialog', 'log'], function (requi
     };
 
     DeleteItemDialog.prototype.displayWizard = function (data) {
-        this.setTitle("delete "+ data.type);
+        this.setTitle("delete " + data.type);
         this.setSubmitBtnText("delete");
         var body = this.getBody();
         body.empty();
@@ -56,14 +56,14 @@ define(['require', 'jquery', 'lodash', './modal-dialog', 'log'], function (requi
                 "</div>" +
                 "<div class='text'>" +
                 "<h3> Are you sure you want to delete the selected item?</h3>" +
-                "<p>You are deleting:</br>" +  data.path + "</p>" +
+                "<p>You are deleting:</br>" + data.path + "</p>" +
                 "</div>" +
                 "</div>");
         body.append(modalBody);
 
         this.show();
         var self = this;
-        this.getSubmitBtn().click(function(e){
+        this.getSubmitBtn().click(function (e) {
             self.onSubmit(data);
         });
     };

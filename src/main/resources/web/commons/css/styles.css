@@ -1537,7 +1537,7 @@ span.fw-stack.fw-lg {
 
 .panel-state-body {
     background-color: #252525;
-    border: 3px solid rgba(0,0,0,0.15);
+    border: 3px solid rgba(0, 0, 0, 0.15);
     height: calc(100% - 40px);
 }
 
@@ -1546,7 +1546,7 @@ span.fw-stack.fw-lg {
     border-radius: 0;
     margin: 0;
     padding: 5px;
-    border: 3px solid rgba(0,0,0,0.15);
+    border: 3px solid rgba(0, 0, 0, 0.15);
 }
 
 .panel-state-heading {
@@ -1591,7 +1591,7 @@ textarea.form-control.curl-editor {
 }
 
 .table-bordered > tbody > tr > td,
-.table-bordered > thead > tr > th{
+.table-bordered > thead > tr > th {
     border-right: 1px solid #424242;
 }
 
@@ -1651,7 +1651,9 @@ table.dataTable thead .sorting::after {
     padding: 2px 8px;
 }
 
-.dataTablesBottom {color:#b7b7b7 }
+.dataTablesBottom {
+    color: #b7b7b7
+}
 
 div.dataTables_wrapper div.dataTables_info {
     padding-top: 4px;

@@ -65,50 +65,50 @@ define(['log', 'jquery', 'lodash', 'workspace', 'backbone'],
                     ConsoleList.prototype.render.call(this);
                     this.initiateLogReader(this._options);
                 },
-                runApp: function(){
+                runApp: function () {
                     var launcher = this.application.tabController.getActiveTab().getSiddhiFileEditor().getLauncher();
                     launcher.runApplication(this.application.workspaceManager, false);
                 },
-                debugApp: function(){
+                debugApp: function () {
                     var launcher = this.application.tabController.getActiveTab().getSiddhiFileEditor().getLauncher();
                     launcher.debugApplication(this.application.workspaceManager, false);
                 },
-                stopApp: function(){
+                stopApp: function () {
                     var launcher = this.application.tabController.getActiveTab().getSiddhiFileEditor().getLauncher();
                     launcher.stopApplication(this.application.workspaceManager, false);
                 },
-                revertAppContent: function(){
+                revertAppContent: function () {
                     this.application.workspaceManager.revertAppContent();
                 },
-                disableRunButton: function(){
+                disableRunButton: function () {
                     this._runButn.addClass("disabled");
                     this._runButn.removeClass("active");
                 },
-                disableDebugButton: function(){
+                disableDebugButton: function () {
                     this._debugBtn.addClass("disabled");
                     this._debugBtn.removeClass("active");
                 },
-                disableStopButton: function(){
+                disableStopButton: function () {
                     this._stopBtn.addClass("disabled");
                     this._stopBtn.removeClass("active");
                 },
-                disableRevertButton: function(){
+                disableRevertButton: function () {
                     this._revertBtn.addClass("disabled");
                     this._revertBtn.removeClass("active");
                 },
-                enableRunButton: function(){
+                enableRunButton: function () {
                     this._runButn.removeClass("disabled");
                     this._runButn.addClass("active");
                 },
-                enableDebugButton: function(){
+                enableDebugButton: function () {
                     this._debugBtn.removeClass("disabled");
                     this._debugBtn.addClass("active");
                 },
-                enableStopButton: function(){
+                enableStopButton: function () {
                     this._stopBtn.removeClass("disabled");
                     this._stopBtn.addClass("active");
                 },
-                enableRevertButton: function(){
+                enableRevertButton: function () {
                     this._revertBtn.removeClass("disabled");
                     this._revertBtn.addClass("active");
                 }

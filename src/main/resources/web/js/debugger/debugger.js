@@ -49,15 +49,15 @@ define(['jquery', 'backbone', 'log', 'lodash', 'ace/range', 'render_json'], func
                             JSON.stringify(self._validBreakpoints[row]));
                     }
                 } else if (breakpoints[row] === "ace_breakpoint") {
-                        if (self._debugStarted) {
-                            self._debugger.release(row, function (d) {
-                                self._breakpoints[row] = undefined;
-                                e.editor.session.clearBreakpoint(row);
-                            });
-                        } else {
+                    if (self._debugStarted) {
+                        self._debugger.release(row, function (d) {
                             self._breakpoints[row] = undefined;
                             e.editor.session.clearBreakpoint(row);
-                        }
+                        });
+                    } else {
+                        self._breakpoints[row] = undefined;
+                        e.editor.session.clearBreakpoint(row);
+                    }
                 } else {
                     var warningMessage = "Break points can only be applied for <i><b>from</b></i> or " +
                         "<i><b>query output(insert, delete, update, update or insert into)</b></i>" + " statements";
@@ -181,7 +181,7 @@ define(['jquery', 'backbone', 'log', 'lodash', 'ace/range', 'render_json'], func
 
         },
 
-        getWarningNotification: function(warningMessage) {
+        getWarningNotification: function (warningMessage) {
             return $(
                 "<div style='z-index: 9999;' style='line-height: 20%;' class='alert alert-warning' id='error-alert'>" +
                 "<span class='notification'>" +
@@ -262,7 +262,7 @@ define(['jquery', 'backbone', 'log', 'lodash', 'ace/range', 'render_json'], func
             var debuggerModalName = debuggerModel.find(".appName");
             self._debugStarted = true;
 
-            debuggerModel.find(".fw-resume").click(function(e) {
+            debuggerModel.find(".fw-resume").click(function (e) {
                 e.preventDefault();
                 self._debugger.play();
             });
@@ -295,9 +295,9 @@ define(['jquery', 'backbone', 'log', 'lodash', 'ace/range', 'render_json'], func
             var activeTab = this.application.tabController.getActiveTab();
             var workspace = this.application.workspaceManager;
             var siddhiAppName = "";
-            if(activeTab.getTitle().lastIndexOf(".siddhi") != -1){
+            if (activeTab.getTitle().lastIndexOf(".siddhi") != -1) {
                 siddhiAppName = activeTab.getTitle().substring(0, activeTab.getTitle().lastIndexOf(".siddhi"));
-            } else{
+            } else {
                 siddhiAppName = activeTab.getTitle();
             }
             this.unHighlightDebugLine();

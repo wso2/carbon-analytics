@@ -28,18 +28,18 @@
  *
  * ***** END LICENSE BLOCK ***** */
 
-define(function(require, exports, module) {
-"use strict";
+define(function (require, exports, module) {
+    "use strict";
 
-var oop = require("../lib/oop");
-var TextHighlightRules = require("./text_highlight_rules").TextHighlightRules;
+    var oop = require("../lib/oop");
+    var TextHighlightRules = require("./text_highlight_rules").TextHighlightRules;
 
-var DiffHighlightRules = function() {
-    // regexp must not have capturing parentheses. Use (?:) instead.
-    // regexps are ordered -> the first match is used
+    var DiffHighlightRules = function () {
+        // regexp must not have capturing parentheses. Use (?:) instead.
+        // regexps are ordered -> the first match is used
 
-    this.$rules = {
-        "start" : [{
+        this.$rules = {
+            "start": [{
                 regex: "^(?:\\*{15}|={67}|-{3}|\\+{3})$",
                 token: "punctuation.definition.separator.diff",
                 "name": "keyword"
@@ -98,11 +98,11 @@ var DiffHighlightRules = function() {
                 defaultToken: "invisible",
                 caseInsensitive: true
             }
-        ]
+            ]
+        };
     };
-};
 
-oop.inherits(DiffHighlightRules, TextHighlightRules);
+    oop.inherits(DiffHighlightRules, TextHighlightRules);
 
-exports.DiffHighlightRules = DiffHighlightRules;
+    exports.DiffHighlightRules = DiffHighlightRules;
 });

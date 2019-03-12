@@ -28,14 +28,14 @@
  *
  * ***** END LICENSE BLOCK ***** */
 
-define(function(require, exports, module) {
+define(function (require, exports, module) {
     "use strict";
 
     var oop = require("../lib/oop");
     var HtmlHighlightRules = require("./html_highlight_rules").HtmlHighlightRules;
     var ElixirHighlightRules = require("./elixir_highlight_rules").ElixirHighlightRules;
 
-    var HtmlElixirHighlightRules = function() {
+    var HtmlElixirHighlightRules = function () {
         HtmlHighlightRules.call(this);
 
         var startRules = [
@@ -43,26 +43,26 @@ define(function(require, exports, module) {
                 regex: "<%%|%%>",
                 token: "constant.language.escape"
             }, {
-                token : "comment.start.eex",
-                regex : "<%#",
-                push  : [{
-                    token : "comment.end.eex",
+                token: "comment.start.eex",
+                regex: "<%#",
+                push: [{
+                    token: "comment.end.eex",
                     regex: "%>",
                     next: "pop",
-                    defaultToken:"comment"
+                    defaultToken: "comment"
                 }]
             }, {
-                token : "support.elixir_tag",
-                regex : "<%+(?!>)[-=]?",
-                push  : "elixir-start"
+                token: "support.elixir_tag",
+                regex: "<%+(?!>)[-=]?",
+                push: "elixir-start"
             }
         ];
 
         var endRules = [
             {
-                token : "support.elixir_tag",
-                regex : "%>",
-                next  : "pop"
+                token: "support.elixir_tag",
+                regex: "%>",
+                next: "pop"
             }, {
                 token: "comment",
                 regex: "#(?:[^%]|%[^>])*"

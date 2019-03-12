@@ -31,7 +31,7 @@ public class TriggerCodeGenerator {
     /**
      * Generates the Siddhi code representation of a TriggerConfig object
      *
-     * @param trigger The TriggerConfig object
+     * @param trigger             The TriggerConfig object
      * @param isGeneratingToolTip If it is generating a tooltip or not
      * @return The Siddhi code representation of the given TriggerConfig object
      * @throws CodeGenerationException Error when generating the code
@@ -41,9 +41,10 @@ public class TriggerCodeGenerator {
         StringBuilder triggerStringBuilder = new StringBuilder();
 
         //to append quotes to start and cronExpression
-        if (trigger.getCriteriaType().equalsIgnoreCase(SiddhiCodeBuilderConstants.AT )) {
+        if (trigger.getCriteriaType().equalsIgnoreCase(SiddhiCodeBuilderConstants.AT)) {
             String triggerCriteria = trigger.getCriteria();
-            triggerCriteria = SiddhiCodeBuilderConstants.SINGLE_QUOTE  + triggerCriteria + SiddhiCodeBuilderConstants.SINGLE_QUOTE;
+            triggerCriteria = SiddhiCodeBuilderConstants.SINGLE_QUOTE + triggerCriteria +
+                    SiddhiCodeBuilderConstants.SINGLE_QUOTE;
             trigger.setTriggerCriteria(triggerCriteria);
         }
         if (!isGeneratingToolTip) {
@@ -61,7 +62,7 @@ public class TriggerCodeGenerator {
                 .append(trigger.getCriteria())
                 .append(SiddhiCodeBuilderConstants.SEMI_COLON);
 
-        return  triggerStringBuilder.toString();
+        return triggerStringBuilder.toString();
     }
 
 }

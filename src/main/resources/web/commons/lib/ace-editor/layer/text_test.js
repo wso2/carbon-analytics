@@ -33,91 +33,98 @@ if (typeof process !== "undefined") {
     require("../test/mockdom");
 }
 
-define(function(require, exports, module) {
-"use strict";
+define(function (require, exports, module) {
+    "use strict";
 
-var assert = require("../test/assertions");
-var EditSession = require("../edit_session").EditSession;
-var TextLayer = require("./text").Text;
-var JavaScriptMode = require("../mode/javascript").Mode;
+    var assert = require("../test/assertions");
+    var EditSession = require("../edit_session").EditSession;
+    var TextLayer = require("./text").Text;
+    var JavaScriptMode = require("../mode/javascript").Mode;
 
-module.exports = {
+    module.exports = {
 
-    setUp: function(next) {
-        this.session = new EditSession("");
-        this.session.setMode(new JavaScriptMode());
-        this.textLayer = new TextLayer(document.createElement("div"));
-        this.textLayer.setSession(this.session);
-        this.textLayer.config = {
-            characterWidth: 10,
-            lineHeight: 20
-        };
-        next()
-    },
+        setUp: function (next) {
+            this.session = new EditSession("");
+            this.session.setMode(new JavaScriptMode());
+            this.textLayer = new TextLayer(document.createElement("div"));
+            this.textLayer.setSession(this.session);
+            this.textLayer.config = {
+                characterWidth: 10,
+                lineHeight: 20
+            };
+            next()
+        },
 
-    "test: render line with hard tabs should render the same as lines with soft tabs" : function() {
-        this.session.setValue("a\ta\ta\t\na   a   a   \n");
-        this.textLayer.$computeTabString();
-        
-        // row with hard tabs
-        var stringBuilder = [];
-        this.textLayer.$renderLine(stringBuilder, 0);
-        
-        // row with soft tabs
-        var stringBuilder2 = [];
-        this.textLayer.$renderLine(stringBuilder2, 1);
-        assert.equal(stringBuilder.join(""), stringBuilder2.join(""));
-    },
-    
-    "test rendering width of ideographic space (U+3000)" : function() {
-        this.session.setValue("\u3000");
-        
-        var stringBuilder = [];
-        this.textLayer.$renderLine(stringBuilder, 0, true);
-        assert.equal(stringBuilder.join(""), "<span class='ace_cjk' style='width:20px'></span>");
+        "test: render line with hard tabs should render the same as lines with soft tabs": function () {
+            this.session.setValue("a\ta\ta\t\na   a   a   \n");
+            this.textLayer.$computeTabString();
 
-        this.textLayer.setShowInvisibles(true);
-        var stringBuilder = [];
-        this.textLayer.$renderLine(stringBuilder, 0, true);
-        assert.equal(
-            stringBuilder.join(""),
-            "<span class='ace_cjk ace_invisible ace_invisible_space' style='width:20px'>" + this.textLayer.SPACE_CHAR + "</span>"
-            + "<span class='ace_invisible ace_invisible_eol'>\xB6</span>"
-        );
-    },
+            // row with hard tabs
+            var stringBuilder = [];
+            this.textLayer.$renderLine(stringBuilder, 0);
 
-    "test rendering of indent guides" : function() {
-        var textLayer = this.textLayer
-        var EOL = "<span class='ace_invisible ace_invisible_eol'>" + textLayer.EOL_CHAR + "</span>";
-        var SPACE = function(i) {return Array(i+1).join(" ")}
-        var DOT = function(i) {return Array(i+1).join(textLayer.SPACE_CHAR)}
-        var TAB = function(i) {return Array(i+1).join(textLayer.TAB_CHAR)}
-        function testRender(results) {
-            for (var i = results.length; i--; ) {
-                var stringBuilder = [];
-                textLayer.$renderLine(stringBuilder, i, true);
-                assert.equal(stringBuilder.join(""), results[i]);
+            // row with soft tabs
+            var stringBuilder2 = [];
+            this.textLayer.$renderLine(stringBuilder2, 1);
+            assert.equal(stringBuilder.join(""), stringBuilder2.join(""));
+        },
+
+        "test rendering width of ideographic space (U+3000)": function () {
+            this.session.setValue("\u3000");
+
+            var stringBuilder = [];
+            this.textLayer.$renderLine(stringBuilder, 0, true);
+            assert.equal(stringBuilder.join(""), "<span class='ace_cjk' style='width:20px'></span>");
+
+            this.textLayer.setShowInvisibles(true);
+            var stringBuilder = [];
+            this.textLayer.$renderLine(stringBuilder, 0, true);
+            assert.equal(
+                stringBuilder.join(""),
+                "<span class='ace_cjk ace_invisible ace_invisible_space' style='width:20px'>" + this.textLayer.SPACE_CHAR + "</span>"
+                + "<span class='ace_invisible ace_invisible_eol'>\xB6</span>"
+            );
+        },
+
+        "test rendering of indent guides": function () {
+            var textLayer = this.textLayer
+            var EOL = "<span class='ace_invisible ace_invisible_eol'>" + textLayer.EOL_CHAR + "</span>";
+            var SPACE = function (i) {
+                return Array(i + 1).join(" ")
             }
+            var DOT = function (i) {
+                return Array(i + 1).join(textLayer.SPACE_CHAR)
+            }
+            var TAB = function (i) {
+                return Array(i + 1).join(textLayer.TAB_CHAR)
+            }
+
+            function testRender(results) {
+                for (var i = results.length; i--;) {
+                    var stringBuilder = [];
+                    textLayer.$renderLine(stringBuilder, i, true);
+                    assert.equal(stringBuilder.join(""), results[i]);
+                }
+            }
+
+            this.session.setValue("      \n\t\tf\n   ");
+            testRender([
+                "<span class='ace_indent-guide'>" + SPACE(4) + "</span>" + SPACE(2),
+                "<span class='ace_indent-guide'>" + SPACE(4) + "</span>" + SPACE(4) + "<span class='ace_identifier'>f</span>",
+                SPACE(3)
+            ]);
+            this.textLayer.setShowInvisibles(true);
+            testRender([
+                "<span class='ace_indent-guide ace_invisible ace_invisible_space'>" + DOT(4) + "</span><span class='ace_invisible ace_invisible_space'>" + DOT(2) + "</span>" + EOL,
+                "<span class='ace_indent-guide ace_invisible ace_invisible_tab'>" + TAB(4) + "</span><span class='ace_invisible ace_invisible_tab'>" + TAB(4) + "</span><span class='ace_identifier'>f</span>" + EOL
+            ]);
+            this.textLayer.setDisplayIndentGuides(false);
+            testRender([
+                "<span class='ace_invisible ace_invisible_space'>" + DOT(6) + "</span>" + EOL,
+                "<span class='ace_invisible ace_invisible_tab'>" + TAB(4) + "</span><span class='ace_invisible ace_invisible_tab'>" + TAB(4) + "</span><span class='ace_identifier'>f</span>" + EOL
+            ]);
         }
-        
-        this.session.setValue("      \n\t\tf\n   ");
-        testRender([
-            "<span class='ace_indent-guide'>" + SPACE(4) + "</span>" + SPACE(2),
-            "<span class='ace_indent-guide'>" + SPACE(4) + "</span>" + SPACE(4) + "<span class='ace_identifier'>f</span>",
-            SPACE(3)
-        ]);
-        this.textLayer.setShowInvisibles(true);
-        testRender([
-            "<span class='ace_indent-guide ace_invisible ace_invisible_space'>" + DOT(4) + "</span><span class='ace_invisible ace_invisible_space'>" + DOT(2) + "</span>" + EOL,
-            "<span class='ace_indent-guide ace_invisible ace_invisible_tab'>" + TAB(4) + "</span><span class='ace_invisible ace_invisible_tab'>" + TAB(4) + "</span><span class='ace_identifier'>f</span>" + EOL
-        ]);
-        this.textLayer.setDisplayIndentGuides(false);
-        testRender([
-            "<span class='ace_invisible ace_invisible_space'>" + DOT(6) + "</span>" + EOL,
-            "<span class='ace_invisible ace_invisible_tab'>" + TAB(4) + "</span><span class='ace_invisible ace_invisible_tab'>" + TAB(4) + "</span><span class='ace_identifier'>f</span>" + EOL
-        ]);
-    }
-};
+    };
 
 });
 

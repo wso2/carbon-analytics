@@ -32,33 +32,33 @@ if (typeof process !== "undefined") {
     require("amd-loader");
 }
 
-define(function(require, exports, module) {
-"use strict";
+define(function (require, exports, module) {
+    "use strict";
 
-var EditSession = require("../edit_session").EditSession;
-var Range = require("../range").Range;
-var HtmlMode = require("./html").Mode;
-var assert = require("../test/assertions");
+    var EditSession = require("../edit_session").EditSession;
+    var Range = require("../range").Range;
+    var HtmlMode = require("./html").Mode;
+    var assert = require("../test/assertions");
 
-module.exports = {
-    setUp : function() {    
-        this.mode = new HtmlMode();
-    },
+    module.exports = {
+        setUp: function () {
+            this.mode = new HtmlMode();
+        },
 
-    "test: toggle comment lines" : function() {
-        var session = new EditSession(["  abc", "", "fg"]);
+        "test: toggle comment lines": function () {
+            var session = new EditSession(["  abc", "", "fg"]);
 
-        var range = new Range(0, 3, 1, 1);
-        var comment = this.mode.toggleCommentLines("start", session, 0, 1);
-        assert.equal(["  <!--abc-->", "", "fg"].join("\n"), session.toString());
-    },
+            var range = new Range(0, 3, 1, 1);
+            var comment = this.mode.toggleCommentLines("start", session, 0, 1);
+            assert.equal(["  <!--abc-->", "", "fg"].join("\n"), session.toString());
+        },
 
-    "test: next line indent should be the same as the current line indent" : function() {
-        assert.equal("     ", this.mode.getNextLineIndent("start", "     abc"));
-        assert.equal("", this.mode.getNextLineIndent("start", "abc"));
-        assert.equal("\t", this.mode.getNextLineIndent("start", "\tabc"));
-    }
-};
+        "test: next line indent should be the same as the current line indent": function () {
+            assert.equal("     ", this.mode.getNextLineIndent("start", "     abc"));
+            assert.equal("", this.mode.getNextLineIndent("start", "abc"));
+            assert.equal("\t", this.mode.getNextLineIndent("start", "\tabc"));
+        }
+    };
 
 });
 

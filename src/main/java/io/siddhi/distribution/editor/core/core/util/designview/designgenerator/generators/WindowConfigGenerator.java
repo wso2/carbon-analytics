@@ -40,9 +40,10 @@ public class WindowConfigGenerator extends CodeSegmentsPreserver {
 
     /**
      * Generates WindowConfig from the given Siddhi WindowDefinition
-     * @param windowDefinition                  Siddhi WindowDefinition
-     * @return                                  WindowConfig object
-     * @throws DesignGenerationException        Error while generating WindowConfig
+     *
+     * @param windowDefinition Siddhi WindowDefinition
+     * @return WindowConfig object
+     * @throws DesignGenerationException Error while generating WindowConfig
      */
     public WindowConfig generateWindowConfig(WindowDefinition windowDefinition) throws DesignGenerationException {
         List<String> parameters = new ArrayList<>();

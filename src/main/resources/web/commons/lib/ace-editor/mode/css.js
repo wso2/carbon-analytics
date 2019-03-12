@@ -28,79 +28,79 @@
  *
  * ***** END LICENSE BLOCK ***** */
 
-define(function(require, exports, module) {
-"use strict";
+define(function (require, exports, module) {
+    "use strict";
 
-var oop = require("../lib/oop");
-var TextMode = require("./text").Mode;
-var CssHighlightRules = require("./css_highlight_rules").CssHighlightRules;
-var MatchingBraceOutdent = require("./matching_brace_outdent").MatchingBraceOutdent;
-var WorkerClient = require("../worker/worker_client").WorkerClient;
-var CssCompletions = require("./css_completions").CssCompletions;
-var CssBehaviour = require("./behaviour/css").CssBehaviour;
-var CStyleFoldMode = require("./folding/cstyle").FoldMode;
+    var oop = require("../lib/oop");
+    var TextMode = require("./text").Mode;
+    var CssHighlightRules = require("./css_highlight_rules").CssHighlightRules;
+    var MatchingBraceOutdent = require("./matching_brace_outdent").MatchingBraceOutdent;
+    var WorkerClient = require("../worker/worker_client").WorkerClient;
+    var CssCompletions = require("./css_completions").CssCompletions;
+    var CssBehaviour = require("./behaviour/css").CssBehaviour;
+    var CStyleFoldMode = require("./folding/cstyle").FoldMode;
 
-var Mode = function() {
-    this.HighlightRules = CssHighlightRules;
-    this.$outdent = new MatchingBraceOutdent();
-    this.$behaviour = new CssBehaviour();
-    this.$completer = new CssCompletions();
-    this.foldingRules = new CStyleFoldMode();
-};
-oop.inherits(Mode, TextMode);
+    var Mode = function () {
+        this.HighlightRules = CssHighlightRules;
+        this.$outdent = new MatchingBraceOutdent();
+        this.$behaviour = new CssBehaviour();
+        this.$completer = new CssCompletions();
+        this.foldingRules = new CStyleFoldMode();
+    };
+    oop.inherits(Mode, TextMode);
 
-(function() {
+    (function () {
 
-    this.foldingRules = "cStyle";
-    this.blockComment = {start: "/*", end: "*/"};
+        this.foldingRules = "cStyle";
+        this.blockComment = {start: "/*", end: "*/"};
 
-    this.getNextLineIndent = function(state, line, tab) {
-        var indent = this.$getIndent(line);
+        this.getNextLineIndent = function (state, line, tab) {
+            var indent = this.$getIndent(line);
 
-        // ignore braces in comments
-        var tokens = this.getTokenizer().getLineTokens(line, state).tokens;
-        if (tokens.length && tokens[tokens.length-1].type == "comment") {
+            // ignore braces in comments
+            var tokens = this.getTokenizer().getLineTokens(line, state).tokens;
+            if (tokens.length && tokens[tokens.length - 1].type == "comment") {
+                return indent;
+            }
+
+            var match = line.match(/^.*\{\s*$/);
+            if (match) {
+                indent += tab;
+            }
+
             return indent;
-        }
+        };
 
-        var match = line.match(/^.*\{\s*$/);
-        if (match) {
-            indent += tab;
-        }
+        this.checkOutdent = function (state, line, input) {
+            return this.$outdent.checkOutdent(line, input);
+        };
 
-        return indent;
-    };
+        this.autoOutdent = function (state, doc, row) {
+            this.$outdent.autoOutdent(doc, row);
+        };
 
-    this.checkOutdent = function(state, line, input) {
-        return this.$outdent.checkOutdent(line, input);
-    };
+        this.getCompletions = function (state, session, pos, prefix) {
+            return this.$completer.getCompletions(state, session, pos, prefix);
+        };
 
-    this.autoOutdent = function(state, doc, row) {
-        this.$outdent.autoOutdent(doc, row);
-    };
+        this.createWorker = function (session) {
+            var worker = new WorkerClient(["ace"], "ace/mode/css_worker", "Worker");
+            worker.attachToDocument(session.getDocument());
 
-    this.getCompletions = function(state, session, pos, prefix) {
-        return this.$completer.getCompletions(state, session, pos, prefix);
-    };
+            worker.on("annotate", function (e) {
+                session.setAnnotations(e.data);
+            });
 
-    this.createWorker = function(session) {
-        var worker = new WorkerClient(["ace"], "ace/mode/css_worker", "Worker");
-        worker.attachToDocument(session.getDocument());
+            worker.on("terminate", function () {
+                session.clearAnnotations();
+            });
 
-        worker.on("annotate", function(e) {
-            session.setAnnotations(e.data);
-        });
+            return worker;
+        };
 
-        worker.on("terminate", function() {
-            session.clearAnnotations();
-        });
+        this.$id = "ace/mode/css";
+    }).call(Mode.prototype);
 
-        return worker;
-    };
-
-    this.$id = "ace/mode/css";
-}).call(Mode.prototype);
-
-exports.Mode = Mode;
+    exports.Mode = Mode;
 
 });

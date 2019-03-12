@@ -27,26 +27,26 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
  * ***** END LICENSE BLOCK ***** */
-define(function(require, exports, module) {
-"use strict";
+define(function (require, exports, module) {
+    "use strict";
 
-var oop = require("../lib/oop");
-var TextMode = require("./text").Mode;
-var VHDLHighlightRules = require("./vhdl_highlight_rules").VHDLHighlightRules;
+    var oop = require("../lib/oop");
+    var TextMode = require("./text").Mode;
+    var VHDLHighlightRules = require("./vhdl_highlight_rules").VHDLHighlightRules;
 
-var Mode = function() {
-    this.HighlightRules = VHDLHighlightRules;
-    this.$behaviour = this.$defaultBehaviour;
-};
-oop.inherits(Mode, TextMode);
+    var Mode = function () {
+        this.HighlightRules = VHDLHighlightRules;
+        this.$behaviour = this.$defaultBehaviour;
+    };
+    oop.inherits(Mode, TextMode);
 
-(function() {
+    (function () {
 
-    this.lineCommentStart = "--";
+        this.lineCommentStart = "--";
 
-    this.$id = "ace/mode/vhdl";
-}).call(Mode.prototype);
+        this.$id = "ace/mode/vhdl";
+    }).call(Mode.prototype);
 
-exports.Mode = Mode;
+    exports.Mode = Mode;
 
 });

@@ -32,43 +32,43 @@ if (typeof process !== "undefined") {
     require("amd-loader");
 }
 
-define(function(require, exports, module) {
-"use strict";
+define(function (require, exports, module) {
+    "use strict";
 
-var assert = require("../test/assertions");
+    var assert = require("../test/assertions");
 
-module.exports = {
-    "test: getTokenizer() (smoke test)" : function() {
-        var exec = RegExp.prototype.exec
-        var brokenExec = function(str) {
-            var result = exec.call(this, str);
-            if (result) {
-                for (var i = result.length; i--;)
-                    if (!result[i])
-                        result[i] = "";
+    module.exports = {
+        "test: getTokenizer() (smoke test)": function () {
+            var exec = RegExp.prototype.exec
+            var brokenExec = function (str) {
+                var result = exec.call(this, str);
+                if (result) {
+                    for (var i = result.length; i--;)
+                        if (!result[i])
+                            result[i] = "";
+                }
+                return result;
             }
-            return result;
+
+            try {
+                // break this to emulate old ie
+                RegExp.prototype.exec = brokenExec;
+                require("./old_ie");
+                var Tokenizer = require("../tokenizer").Tokenizer;
+                var JavaScriptHighlightRules = require("../mode/javascript_highlight_rules").JavaScriptHighlightRules;
+                var tokenizer = new Tokenizer((new JavaScriptHighlightRules).getRules());
+
+                var tokens = tokenizer.getLineTokens("'juhu'", "start").tokens;
+                assert.equal("string", tokens[0].type);
+            } finally {
+                // restore modified functions
+                RegExp.prototype.exec = exec;
+                var module = require("../tokenizer");
+                module.Tokenizer = module.Tokenizer_orig;
+                module.Tokenizer.prototype.getLineTokens = module.Tokenizer.prototype.getLineTokens_orig;
+            }
         }
-        
-        try {
-            // break this to emulate old ie
-            RegExp.prototype.exec = brokenExec;
-            require("./old_ie");
-            var Tokenizer = require("../tokenizer").Tokenizer;
-            var JavaScriptHighlightRules = require("../mode/javascript_highlight_rules").JavaScriptHighlightRules;
-            var tokenizer = new Tokenizer((new JavaScriptHighlightRules).getRules());
-            
-            var tokens = tokenizer.getLineTokens("'juhu'", "start").tokens;
-            assert.equal("string", tokens[0].type);
-        } finally {
-            // restore modified functions
-            RegExp.prototype.exec = exec;
-            var module = require("../tokenizer");
-            module.Tokenizer = module.Tokenizer_orig;
-            module.Tokenizer.prototype.getLineTokens = module.Tokenizer.prototype.getLineTokens_orig;
-        }
-    }
-};
+    };
 
 });
 

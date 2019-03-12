@@ -30,7 +30,7 @@
 var LL1Analyzer = require('./../LL1Analyzer').LL1Analyzer;
 var IntervalSet = require('./../IntervalSet').IntervalSet;
 
-function ATN(grammarType , maxTokenType) {
+function ATN(grammarType, maxTokenType) {
 
     // Used for runtime deserialization of ATNs from strings///
     // The type of the ATN.
@@ -60,12 +60,12 @@ function ATN(grammarType , maxTokenType) {
 
     return this;
 }
-	
+
 // Compute the set of valid tokens that can occur starting in state {@code s}.
 //  If {@code ctx} is null, the set of tokens will not include what can follow
 //  the rule surrounding {@code s}. In other words, the set will be
 //  restricted to tokens reachable staying within {@code s}'s rule.
-ATN.prototype.nextTokensInContext = function(s, ctx) {
+ATN.prototype.nextTokensInContext = function (s, ctx) {
     var anal = new LL1Analyzer(this);
     return anal.LOOK(s, null, ctx);
 };
@@ -73,8 +73,8 @@ ATN.prototype.nextTokensInContext = function(s, ctx) {
 // Compute the set of valid tokens that can occur starting in {@code s} and
 // staying in same rule. {@link Token//EPSILON} is in set if we reach end of
 // rule.
-ATN.prototype.nextTokensNoContext = function(s) {
-    if (s.nextTokenWithinRule !== null ) {
+ATN.prototype.nextTokensNoContext = function (s) {
+    if (s.nextTokenWithinRule !== null) {
         return s.nextTokenWithinRule;
     }
     s.nextTokenWithinRule = this.nextTokensInContext(s, null);
@@ -82,34 +82,34 @@ ATN.prototype.nextTokensNoContext = function(s) {
     return s.nextTokenWithinRule;
 };
 
-ATN.prototype.nextTokens = function(s, ctx) {
-    if ( ctx===undefined ) {
+ATN.prototype.nextTokens = function (s, ctx) {
+    if (ctx === undefined) {
         return this.nextTokensNoContext(s);
     } else {
         return this.nextTokensInContext(s, ctx);
     }
 };
 
-ATN.prototype.addState = function( state) {
-    if ( state !== null ) {
+ATN.prototype.addState = function (state) {
+    if (state !== null) {
         state.atn = this;
         state.stateNumber = this.states.length;
     }
     this.states.push(state);
 };
 
-ATN.prototype.removeState = function( state) {
+ATN.prototype.removeState = function (state) {
     this.states[state.stateNumber] = null; // just free mem, don't shift states in list
 };
 
-ATN.prototype.defineDecisionState = function( s) {
+ATN.prototype.defineDecisionState = function (s) {
     this.decisionToState.push(s);
-    s.decision = this.decisionToState.length-1;
+    s.decision = this.decisionToState.length - 1;
     return s.decision;
 };
 
-ATN.prototype.getDecisionState = function( decision) {
-    if (this.decisionToState.length===0) {
+ATN.prototype.getDecisionState = function (decision) {
+    if (this.decisionToState.length === 0) {
         return null;
     } else {
         return this.decisionToState[decision];
@@ -135,8 +135,8 @@ ATN.prototype.getDecisionState = function( decision) {
 // number {@code stateNumber}
 var Token = require('./../Token').Token;
 
-ATN.prototype.getExpectedTokens = function( stateNumber, ctx ) {
-    if ( stateNumber < 0 || stateNumber >= this.states.length ) {
+ATN.prototype.getExpectedTokens = function (stateNumber, ctx) {
+    if (stateNumber < 0 || stateNumber >= this.states.length) {
         throw("Invalid state number.");
     }
     var s = this.states[stateNumber];

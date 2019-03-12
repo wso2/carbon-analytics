@@ -30,8 +30,9 @@ import java.util.List;
 public class AttributeConfigListGenerator extends CodeSegmentsPreserver {
     /**
      * Generates list of AttributeConfigs, with given List of Siddhi Attributes
-     * @param attributes    List of Siddhi Attribute objects
-     * @return              List of AttributeConfig objects
+     *
+     * @param attributes List of Siddhi Attribute objects
+     * @return List of AttributeConfig objects
      */
     public List<AttributeConfig> generateAttributeConfigList(List<Attribute> attributes) {
         List<AttributeConfig> attributeConfigs = new ArrayList<>();

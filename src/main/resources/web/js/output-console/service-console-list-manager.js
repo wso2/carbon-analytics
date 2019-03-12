@@ -48,10 +48,10 @@ define(['log', 'jquery', 'lodash', 'output_console_list', 'workspace', 'service_
                     });
                     if (this.application.isRunningOnMacOS()) {
                         this._activateBtn.attr("title", "Output Console (" + _.get(self._options,
-                            'command.shortcuts.mac.label') + ") ").tooltip();
+                                'command.shortcuts.mac.label') + ") ").tooltip();
                     } else {
                         this._activateBtn.attr("title", "Output Console  (" + _.get(self._options,
-                            'command.shortcuts.other.label') + ") ").tooltip();
+                                'command.shortcuts.other.label') + ") ").tooltip();
                     }
                     // register command
                     this.application.commandManager.registerCommand(options.command.id,

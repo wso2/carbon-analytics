@@ -28,12 +28,12 @@ define(
         var PayloadOrAttribute = function (options) {
             /*
              Data storing structure as follows
-                annotationType: 'PAYLOAD' | 'ATTRIBUTES',
-                type*: ‘MAP' | 'LIST’,
-                value*: {Key-Value Pair JSON} | ['value1',...]
+             annotationType: 'PAYLOAD' | 'ATTRIBUTES',
+             type*: ‘MAP' | 'LIST’,
+             value*: {Key-Value Pair JSON} | ['value1',...]
 
-                NOTE: LIST will contain only one value in sink mapper payload.
-            */
+             NOTE: LIST will contain only one value in sink mapper payload.
+             */
             if (options !== undefined) {
                 this.annotationType
                     = (options.annotationType !== undefined) ? (options.annotationType).toUpperCase() : undefined;

@@ -31,7 +31,7 @@ public class FunctionCodeGenerator {
     /**
      * Generates the Siddhi code representation of a FunctionConfig object
      *
-     * @param function The FunctionConfig object
+     * @param function            The FunctionConfig object
      * @param isGeneratingToolTip If it is generating a tooltip or not
      * @return The Siddhi code representation of the given FunctionConfig object
      * @throws CodeGenerationException Error when generating the code
@@ -48,10 +48,10 @@ public class FunctionCodeGenerator {
                 .append(function.getName())
                 .append(SiddhiCodeBuilderConstants.OPEN_SQUARE_BRACKET)
                 .append(function.getScriptType())
-                .append(SiddhiCodeBuilderConstants.CLOSE_SQUARE_BRACKET )
+                .append(SiddhiCodeBuilderConstants.CLOSE_SQUARE_BRACKET)
                 .append(SiddhiCodeBuilderConstants.SPACE)
                 .append(SiddhiCodeBuilderConstants.RETURN)
-                .append(SiddhiCodeBuilderConstants.SPACE )
+                .append(SiddhiCodeBuilderConstants.SPACE)
                 .append(function.getReturnType().toLowerCase())
                 .append(SiddhiCodeBuilderConstants.SPACE)
                 .append(SiddhiCodeBuilderConstants.OPEN_CURLY_BRACKET)

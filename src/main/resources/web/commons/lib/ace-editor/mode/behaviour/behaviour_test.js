@@ -33,152 +33,154 @@ if (typeof process !== "undefined") {
     require("../../test/mockdom");
 }
 
-define(function(require, exports, module) {
-"use strict";
+define(function (require, exports, module) {
+    "use strict";
 
-require("../../multi_select");
-var assert = require("../../test/assertions");
-var Range = require("../../range").Range;
-var Editor = require("../../editor").Editor;
-var EditSession = require("../../edit_session").EditSession;
-var MockRenderer = require("../../test/mockrenderer").MockRenderer;
-var JavaScriptMode = require("../javascript").Mode;
-var XMLMode = require("../xml").Mode;
-var editor;
-var exec = function(name, times, args) {
-    do {
-        editor.commands.exec(name, editor, args);
-    } while(times --> 1);
-};
-var testRanges = function(str) {
-    assert.equal(editor.selection.getAllRanges() + "", str + "");
-};
+    require("../../multi_select");
+    var assert = require("../../test/assertions");
+    var Range = require("../../range").Range;
+    var Editor = require("../../editor").Editor;
+    var EditSession = require("../../edit_session").EditSession;
+    var MockRenderer = require("../../test/mockrenderer").MockRenderer;
+    var JavaScriptMode = require("../javascript").Mode;
+    var XMLMode = require("../xml").Mode;
+    var editor;
+    var exec = function (name, times, args) {
+        do {
+            editor.commands.exec(name, editor, args);
+        } while (times-- > 1);
+    };
+    var testRanges = function (str) {
+        assert.equal(editor.selection.getAllRanges() + "", str + "");
+    };
 
-module.exports = {
-    "test: cstyle": function() {
-        function testValue(line) {
-            assert.equal(editor.getValue(), Array(4).join(line + "\n"));
+    module.exports = {
+        "test: cstyle": function () {
+            function testValue(line) {
+                assert.equal(editor.getValue(), Array(4).join(line + "\n"));
+            }
+
+            function testSelection(line, col, inc) {
+                editor.selection.rangeList.ranges.forEach(function (r) {
+                    assert.range(r, line, col, line, col);
+                    line += (inc || 1);
+                });
+            }
+
+            var doc = new EditSession([
+                "",
+                "",
+                "",
+                ""
+            ], new JavaScriptMode());
+            editor = new Editor(new MockRenderer(), doc);
+            editor.setOption("behavioursEnabled", true);
+
+            editor.navigateFileStart();
+            exec("addCursorBelow", 2);
+
+            exec("insertstring", 1, "if ");
+
+            // pairing ( 
+            exec("insertstring", 1, "(");
+            testValue("if ()");
+            testSelection(0, 4);
+            exec("insertstring", 1, ")");
+            testValue("if ()");
+            testSelection(0, 5);
+
+            // pairing [ 
+            exec("gotoleft", 1);
+            exec("insertstring", 1, "[");
+            testValue("if ([])");
+            testSelection(0, 5);
+
+            exec("insertstring", 1, "]");
+            testValue("if ([])");
+            testSelection(0, 6);
+
+            // test deletion
+            exec("gotoleft", 1);
+            exec("backspace", 1);
+            testValue("if ()");
+            testSelection(0, 4);
+
+            exec("gotolineend", 1);
+            exec("insertstring", 1, "{");
+            testValue("if (){}");
+            testSelection(0, 6);
+
+            exec("insertstring", 1, "}");
+            testValue("if (){}");
+            testSelection(0, 7);
+
+            exec("gotolinestart", 1);
+            exec("insertstring", 1, "(");
+            testValue("(if (){}");
+            exec("backspace", 1);
+
+            editor.setValue("");
+            exec("insertstring", 1, "{");
+            assert.equal(editor.getValue(), "{");
+            exec("insertstring", 1, "\n");
+            assert.equal(editor.getValue(), "{\n    \n}");
+
+            editor.setValue("");
+            exec("insertstring", 1, "(");
+            exec("insertstring", 1, '"');
+            exec("insertstring", 1, '"');
+            assert.equal(editor.getValue(), '("")');
+            exec("backspace", 1);
+            exec("insertstring", 1, '"');
+            assert.equal(editor.getValue(), '("")');
+
+            editor.setValue("('foo')", 1);
+            exec("gotoleft", 1);
+            exec("selectleft", 1);
+            exec("selectMoreBefore", 1);
+            exec("insertstring", 1, "'");
+            assert.equal(editor.getValue(), "('foo')");
+            exec("selectleft", 1);
+            exec("insertstring", 1, '"');
+            assert.equal(editor.getValue(), '("foo")');
+            exec("selectleft", 1);
+            exec("insertstring", 1, '"');
+            assert.equal(editor.getValue(), '("foo")');
+
+            editor.setValue("", 1);
+            exec("selectleft", 1);
+            exec("insertstring", 1, '"');
+            assert.equal(editor.getValue(), '""');
+            exec("insertstring", 1, '\\');
+            exec("insertstring", 1, 'n');
+            exec("insertstring", 1, '"');
+            assert.equal(editor.getValue(), '"\\n"');
+
+        },
+        "test: xml": function () {
+            editor = new Editor(new MockRenderer());
+            editor.setValue(["<OuterTag>",
+                "    <SelfClosingTag />"
+            ].join("\n"));
+            editor.session.setMode(new XMLMode);
+            exec("golinedown", 1);
+            exec("gotolineend", 1);
+            exec("insertstring", 1, '\n');
+            assert.equal(editor.session.getLine(2), "    ");
+            exec("gotolineup", 1);
+            exec("gotolineend", 1);
+            exec("insertstring", 1, '\n');
+            assert.equal(editor.session.getLine(2), "    ");
+            editor.session.setValue(["<OuterTag",
+                "    <xyzrt"
+            ].join("\n"));
+            exec("golinedown", 1);
+            exec("gotolineend", 1);
+            exec("selectleft", 3);
+            exec("insertstring", 1, '>');
+            assert.equal(editor.session.getLine(1), "    <xy></xy>");
         }
-        function testSelection(line, col, inc) {
-            editor.selection.rangeList.ranges.forEach(function(r) {
-                assert.range(r, line, col, line, col);
-                line += (inc || 1);
-            });
-        }
-        var doc = new EditSession([
-            "",
-            "",
-            "",
-            ""
-        ], new JavaScriptMode());
-        editor = new Editor(new MockRenderer(), doc);
-        editor.setOption("behavioursEnabled", true);
-
-        editor.navigateFileStart();
-        exec("addCursorBelow", 2);
-
-        exec("insertstring", 1, "if ");
-        
-        // pairing ( 
-        exec("insertstring", 1, "(");
-        testValue("if ()");
-        testSelection(0, 4);
-        exec("insertstring", 1, ")");
-        testValue("if ()");
-        testSelection(0, 5);
-        
-        // pairing [ 
-        exec("gotoleft", 1);
-        exec("insertstring", 1, "[");
-        testValue("if ([])");
-        testSelection(0, 5);
-        
-        exec("insertstring", 1, "]");
-        testValue("if ([])");
-        testSelection(0, 6);
-        
-        // test deletion
-        exec("gotoleft", 1);
-        exec("backspace", 1);
-        testValue("if ()");
-        testSelection(0, 4);
-
-        exec("gotolineend", 1);
-        exec("insertstring", 1, "{");
-        testValue("if (){}");
-        testSelection(0, 6);
-        
-        exec("insertstring", 1, "}");
-        testValue("if (){}");
-        testSelection(0, 7);
-        
-        exec("gotolinestart", 1);
-        exec("insertstring", 1, "(");
-        testValue("(if (){}");
-        exec("backspace", 1);
-        
-        editor.setValue("");
-        exec("insertstring", 1, "{");
-        assert.equal(editor.getValue(), "{");
-        exec("insertstring", 1, "\n");
-        assert.equal(editor.getValue(), "{\n    \n}");
-        
-        editor.setValue("");
-        exec("insertstring", 1, "(");
-        exec("insertstring", 1, '"');
-        exec("insertstring", 1, '"');
-        assert.equal(editor.getValue(), '("")');
-        exec("backspace", 1);
-        exec("insertstring", 1, '"');
-        assert.equal(editor.getValue(), '("")');
-        
-        editor.setValue("('foo')", 1);
-        exec("gotoleft", 1);
-        exec("selectleft", 1);
-        exec("selectMoreBefore", 1);
-        exec("insertstring", 1, "'");
-        assert.equal(editor.getValue(), "('foo')");
-        exec("selectleft", 1);
-        exec("insertstring", 1, '"');
-        assert.equal(editor.getValue(), '("foo")');
-        exec("selectleft", 1);
-        exec("insertstring", 1, '"');
-        assert.equal(editor.getValue(), '("foo")');
-        
-        editor.setValue("", 1);
-        exec("selectleft", 1);
-        exec("insertstring", 1, '"');
-        assert.equal(editor.getValue(), '""');
-        exec("insertstring", 1, '\\');
-        exec("insertstring", 1, 'n');
-        exec("insertstring", 1, '"');
-        assert.equal(editor.getValue(), '"\\n"');
-        
-    },
-    "test: xml": function() {
-        editor = new Editor(new MockRenderer());
-        editor.setValue(["<OuterTag>",
-            "    <SelfClosingTag />"
-        ].join("\n"));
-        editor.session.setMode(new XMLMode);
-        exec("golinedown", 1);
-        exec("gotolineend", 1);
-        exec("insertstring", 1, '\n');
-        assert.equal(editor.session.getLine(2), "    ");
-        exec("gotolineup", 1);
-        exec("gotolineend", 1);
-        exec("insertstring", 1, '\n');
-        assert.equal(editor.session.getLine(2), "    ");
-        editor.session.setValue(["<OuterTag",
-            "    <xyzrt"
-        ].join("\n"));        
-        exec("golinedown", 1);
-        exec("gotolineend", 1);
-        exec("selectleft", 3);
-        exec("insertstring", 1, '>');
-        assert.equal(editor.session.getLine(1), "    <xy></xy>");
-    }
-};
+    };
 
 });
 

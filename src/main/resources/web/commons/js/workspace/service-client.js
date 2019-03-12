@@ -16,7 +16,7 @@
  * under the License.
  */
 define(['log', 'lodash', 'jquery', 'event_channel', './file'],
-    function(log, _, $, EventChannel, File) {
+    function (log, _, $, EventChannel, File) {
 
         /**
          * @class ServiceClient
@@ -30,7 +30,7 @@ define(['log', 'lodash', 'jquery', 'event_channel', './file'],
         ServiceClient.prototype = Object.create(EventChannel.prototype);
         ServiceClient.prototype.constructor = EventChannel;
 
-        ServiceClient.prototype.getErrorFromResponse = function(xhr, textStatus, errorThrown) {
+        ServiceClient.prototype.getErrorFromResponse = function (xhr, textStatus, errorThrown) {
             var msg = _.isString(errorThrown) ? errorThrown : xhr.statusText,
                 responseObj;
             try {
@@ -38,8 +38,8 @@ define(['log', 'lodash', 'jquery', 'event_channel', './file'],
             } catch (e) {
                 // ignore
             }
-            if(!_.isNil(responseObj)){
-                if(_.has(responseObj, 'Error')){
+            if (!_.isNil(responseObj)) {
+                if (_.has(responseObj, 'Error')) {
                     msg = _.get(responseObj, 'Error');
                 }
             }
@@ -51,7 +51,7 @@ define(['log', 'lodash', 'jquery', 'event_channel', './file'],
          * @param ServiceClient
          */
         ServiceClient.prototype.parse = function (source) {
-            var content = { "content": source };
+            var content = {"content": source};
             var data = {};
             $.ajax({
                 type: "POST",
@@ -64,7 +64,7 @@ define(['log', 'lodash', 'jquery', 'event_channel', './file'],
                 success: function (response) {
                     data = response;
                 },
-                error: function(xhr, textStatus, errorThrown){
+                error: function (xhr, textStatus, errorThrown) {
                     data = getErrorFromResponse(xhr, textStatus, errorThrown);
                     log.error(data.message);
                 }
@@ -77,7 +77,7 @@ define(['log', 'lodash', 'jquery', 'event_channel', './file'],
          * @param String source
          */
         ServiceClient.prototype.validate = function (source) {
-            var content = { "content": source };
+            var content = {"content": source};
             var data = {};
             $.ajax({
                 type: "POST",
@@ -90,7 +90,7 @@ define(['log', 'lodash', 'jquery', 'event_channel', './file'],
                 success: function (response) {
                     data = response;
                 },
-                error: function(xhr, textStatus, errorThrown){
+                error: function (xhr, textStatus, errorThrown) {
                     data = getErrorFromResponse(xhr, textStatus, errorThrown);
                     log.error(data.message);
                 }
@@ -114,7 +114,7 @@ define(['log', 'lodash', 'jquery', 'event_channel', './file'],
                 success: function (response) {
                     data = response;
                 },
-                error: function(xhr, textStatus, errorThrown){
+                error: function (xhr, textStatus, errorThrown) {
                     data = getErrorFromResponse(xhr, textStatus, errorThrown);
                     log.error(data.message);
                 }
@@ -123,10 +123,10 @@ define(['log', 'lodash', 'jquery', 'event_channel', './file'],
         };
 
         ServiceClient.prototype.readFile = function (filePath) {
-           var fileData = this.readFileContent(filePath),
-               pathArray = _.split(filePath, this.application.getPathSeperator()),
-               fileName = _.last(pathArray),
-               folderPath = _.join(_.take(pathArray, pathArray.length -1), this.application.getPathSeperator());
+            var fileData = this.readFileContent(filePath),
+                pathArray = _.split(filePath, this.application.getPathSeperator()),
+                fileName = _.last(pathArray),
+                folderPath = _.join(_.take(pathArray, pathArray.length - 1), this.application.getPathSeperator());
 
             return new File({
                 name: fileName,
@@ -148,7 +148,7 @@ define(['log', 'lodash', 'jquery', 'event_channel', './file'],
                 success: function (response) {
                     data = response;
                 },
-                error: function(xhr, textStatus, errorThrown){
+                error: function (xhr, textStatus, errorThrown) {
                     data = getErrorFromResponse(xhr, textStatus, errorThrown);
                     log.error(data.message);
                 }
@@ -162,12 +162,12 @@ define(['log', 'lodash', 'jquery', 'event_channel', './file'],
                 type: "GET",
                 context: this,
                 url: _.get(this.application, 'config.services.workspace.endpoint') + "/config",
-                datatype : "application/json",
+                datatype: "application/json",
                 async: false,
                 success: function (response) {
                     data = response;
                 },
-                error: function(xhr, textStatus, errorThrown){
+                error: function (xhr, textStatus, errorThrown) {
                     data = getErrorFromResponse(xhr, textStatus, errorThrown);
                     log.error(data.message);
                 }
@@ -181,13 +181,13 @@ define(['log', 'lodash', 'jquery', 'event_channel', './file'],
                 type: "GET",
                 context: this,
                 url: _.get(this.application, 'config.services.workspace.endpoint') + "/create?" + "path=" + btoa(path)
-                    + "&type=" + btoa(type),
+                + "&type=" + btoa(type),
                 contentType: "text/plain; charset=utf-8",
                 async: false,
                 success: function (response) {
                     data = response;
                 },
-                error: function(xhr, textStatus, errorThrown){
+                error: function (xhr, textStatus, errorThrown) {
                     data = getErrorFromResponse(xhr, textStatus, errorThrown);
                     log.error(data.message);
                 }
@@ -201,13 +201,13 @@ define(['log', 'lodash', 'jquery', 'event_channel', './file'],
                 type: "GET",
                 context: this,
                 url: _.get(this.application, 'config.services.workspace.endpoint') + "/delete?" + "path=" + btoa(path)
-                    + "&type=" + btoa(type),
+                + "&type=" + btoa(type),
                 contentType: "text/plain; charset=utf-8",
                 async: false,
                 success: function (response) {
                     data = response;
                 },
-                error: function(xhr, textStatus, errorThrown){
+                error: function (xhr, textStatus, errorThrown) {
                     data = getErrorFromResponse(xhr, textStatus, errorThrown);
                     log.error(data.message);
                 }
@@ -215,7 +215,7 @@ define(['log', 'lodash', 'jquery', 'event_channel', './file'],
             return data;
         };
 
-        ServiceClient.prototype.writeFile = function (file,content) {
+        ServiceClient.prototype.writeFile = function (file, content) {
             var self = this;
             var data = {};
             $.ajax({
@@ -223,7 +223,7 @@ define(['log', 'lodash', 'jquery', 'event_channel', './file'],
                 context: this,
                 url: _.get(this.application, 'config.services.workspace.endpoint') + "/write",
                 data: "location=" + btoa(file.getPath()) + "&configName=" +
-                    btoa(file.getName()) + "&config=" + (btoa(content)),
+                btoa(file.getName()) + "&config=" + (btoa(content)),
                 contentType: "text/plain; charset=utf-8",
                 async: false,
                 success: function (response) {
@@ -231,9 +231,9 @@ define(['log', 'lodash', 'jquery', 'event_channel', './file'],
                     file.setDirty(false)
                         .setLastPersisted(_.now())
                         .save(true);
-                    log.debug("File " + file.getName() + ' saved successfully at '+ file.getPath());
+                    log.debug("File " + file.getName() + ' saved successfully at ' + file.getPath());
                 },
-                error: function(xhr, textStatus, errorThrown){
+                error: function (xhr, textStatus, errorThrown) {
                     data = getErrorFromResponse(xhr, textStatus, errorThrown);
                     log.error(data.message);
                 }

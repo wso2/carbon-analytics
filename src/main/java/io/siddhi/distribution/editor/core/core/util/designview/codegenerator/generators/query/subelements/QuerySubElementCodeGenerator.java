@@ -31,6 +31,9 @@ import java.util.List;
  */
 public class QuerySubElementCodeGenerator {
 
+    private QuerySubElementCodeGenerator() {
+    }
+
     /**
      * Generates the Siddhi code representation of a query's group by list
      *
@@ -136,9 +139,6 @@ public class QuerySubElementCodeGenerator {
                 SiddhiCodeBuilderConstants.OUTPUT +
                 SiddhiCodeBuilderConstants.SPACE +
                 outputRateLimit;
-    }
-
-    private QuerySubElementCodeGenerator() {
     }
 
 }

@@ -4,8 +4,8 @@
     z-index: 4444;
 }
 
-.output-console-content{
-    height: calc(100% - 5px );
+.output-console-content {
+    height: calc(100% - 5px);
     padding: 10px;
     font-family: "Lucida Console", Monaco, monospace;
 }
@@ -15,11 +15,19 @@
     height: calc(100% - 26px);
 }
 
-.output-console-content .INFO { color: #03a9f4; }
-.output-console-content .INFO-LOGGER { color: #e7dfe0; }
-.output-console-content .ERROR { color: #f44336; }
+.output-console-content .INFO {
+    color: #03a9f4;
+}
 
-.output-headers-bar{
+.output-console-content .INFO-LOGGER {
+    color: #e7dfe0;
+}
+
+.output-console-content .ERROR {
+    color: #f44336;
+}
+
+.output-headers-bar {
     background: #232323;
     padding: 0;
     height: 20px;
@@ -52,9 +60,9 @@
     font-size: 20px;
     color: #AAA;
     font-size: 20px;
-    margin-top:0;
-    margin-left:10px;
-    top:0;
+    margin-top: 0;
+    margin-left: 10px;
+    top: 0;
     right: 5px;
 }
 
@@ -117,7 +125,7 @@
     display: inline-block;
     font-size: 16px;
     font-weight: 500;
-    vertical-align:middle;
+    vertical-align: middle;
     padding-left: 6px;
 }
 

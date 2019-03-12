@@ -36,7 +36,7 @@ public class QueryCodeGenerator {
     /**
      * Generates the Siddhi code representation of a QueryConfig object
      *
-     * @param query The QueryConfig object
+     * @param query               The QueryConfig object
      * @param isGeneratingToolTip If it is generating a tooltip or not
      * @return The Siddhi code representation of the given QueryConfig object
      * @throws CodeGenerationException Error when generating the code

@@ -29,24 +29,24 @@ define(['require', 'elementUtils'],
             /*
              Data storing structure as follows.
 
-                id*: '',
-                previousCommentSegment:'',
-                queryInput*: {Query Input JSON},
-                select*: {Query Select JSON},
-                groupBy: ['value1',...],
-                orderBy: [
-                    {
-                        value*: '',
-                        order: 'ASC|DESC'
-                    },
-                    ...
-                ],
-                limit: <long>,
-                having: '',
-                outputRateLimit: ''
-                queryOutput*: {Query Output JSON},
-                annotationList: [annotation1, annotation2, ...]
-            */
+             id*: '',
+             previousCommentSegment:'',
+             queryInput*: {Query Input JSON},
+             select*: {Query Select JSON},
+             groupBy: ['value1',...],
+             orderBy: [
+             {
+             value*: '',
+             order: 'ASC|DESC'
+             },
+             ...
+             ],
+             limit: <long>,
+             having: '',
+             outputRateLimit: ''
+             queryOutput*: {Query Output JSON},
+             annotationList: [annotation1, annotation2, ...]
+             */
             if (options !== undefined) {
                 this.queryName = options.queryName;
                 this.id = options.id;
@@ -64,7 +64,7 @@ define(['require', 'elementUtils'],
         };
 
         Query.prototype.addQueryName = function (queryName) {
-            this.queryName =  queryName ;
+            this.queryName = queryName;
         };
 
         Query.prototype.getQueryName = function () {

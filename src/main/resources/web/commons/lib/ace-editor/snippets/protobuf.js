@@ -1,7 +1,7 @@
-define(function(require, exports, module) {
-"use strict";
+define(function (require, exports, module) {
+    "use strict";
 
-exports.snippetText = "";
-exports.scope = "protobuf";
+    exports.snippetText = "";
+    exports.scope = "protobuf";
 
 });

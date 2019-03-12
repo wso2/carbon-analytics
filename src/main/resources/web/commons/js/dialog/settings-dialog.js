@@ -29,7 +29,7 @@ define(['require', 'jquery', 'log', 'backbone'], function (require, $, log, Back
             initialize: function (options) {
                 this._options = options;
                 this.application = _.get(options, "application");
-                this._dialogContainer =  $(_.get(options, "application.config.dialog.container"));
+                this._dialogContainer = $(_.get(options, "application.config.dialog.container"));
             },
 
             show: function () {
@@ -44,17 +44,17 @@ define(['require', 'jquery', 'log', 'backbone'], function (require, $, log, Back
                 var app = this.application,
                     options = this._options;
 
-                if(!_.isNil(this._modalContainer)){
+                if (!_.isNil(this._modalContainer)) {
                     this._modalContainer.remove();
                 }
 
                 var settingsModal = $(_.get(options, 'selector')).clone();
 
-                settingsModal.find("select").filter("#sourceViewFontSize").change(function(){
+                settingsModal.find("select").filter("#sourceViewFontSize").change(function () {
                     var fontSize = $(this).val();
                     var tabList = app.tabController.getTabList();
                     _.each(tabList, function (tab) {
-                        if(tab._title != "welcome-page"){
+                        if (tab._title != "welcome-page") {
                             tab.getSiddhiFileEditor().getSourceView().setFontSize(fontSize);
                         }
                     });
@@ -63,11 +63,11 @@ define(['require', 'jquery', 'log', 'backbone'], function (require, $, log, Back
                     app.browserStorage.get("pref:sourceViewFontSize")
                 );
 
-                settingsModal.find("select").filter("#sourceViewTheme").change(function(){
+                settingsModal.find("select").filter("#sourceViewTheme").change(function () {
                     var selectedTheme = $(this).val();
                     var tabList = app.tabController.getTabList();
                     _.each(tabList, function (tab) {
-                        if(tab._title != "welcome-page"){
+                        if (tab._title != "welcome-page") {
                             tab.getSiddhiFileEditor().getSourceView().setTheme(selectedTheme);
                         }
                     });
@@ -79,11 +79,11 @@ define(['require', 'jquery', 'log', 'backbone'], function (require, $, log, Back
                 this._dialogContainer.append(settingsModal);
                 this._modalContainer = settingsModal;
 
-                if(app.browserStorage.get("pref:sourceViewTheme") == null){
+                if (app.browserStorage.get("pref:sourceViewTheme") == null) {
                     settingsModal.find("select").filter("#sourceViewTheme").val("ace/theme/twilight");
                 }
 
-                if(app.browserStorage.get("pref:sourceViewFontSize") == null){
+                if (app.browserStorage.get("pref:sourceViewFontSize") == null) {
                     settingsModal.find("select").filter("#sourceViewFontSize").val("12px");
                 }
             }

@@ -28,20 +28,20 @@ define(['require', 'elementUtils'],
         var Window = function (options) {
             /*
              Data storing structure as follows
-                id: '',
-                previousCommentSegment:'',
-                name: '',
-                attributeList: [
-                    {
-                        name: ‘’,
-                        type: ‘’
-                    }
-                ],
-                function*: ‘time|length|timeBatch|lengthBatch...’,
-                parameters*: ['value1',...],
-                outputEventType: ‘CURRENT_EVENTS|EXPIRED_EVENTS|ALL_EVENTS’,
-                annotationList: [annotation1, annotation2, ...]
-            */
+             id: '',
+             previousCommentSegment:'',
+             name: '',
+             attributeList: [
+             {
+             name: ‘’,
+             type: ‘’
+             }
+             ],
+             function*: ‘time|length|timeBatch|lengthBatch...’,
+             parameters*: ['value1',...],
+             outputEventType: ‘CURRENT_EVENTS|EXPIRED_EVENTS|ALL_EVENTS’,
+             annotationList: [annotation1, annotation2, ...]
+             */
             if (options !== undefined) {
                 this.id = options.id;
                 this.previousCommentSegment = options.previousCommentSegment;

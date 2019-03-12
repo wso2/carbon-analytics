@@ -82,7 +82,7 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
                 var savedAnnotations = clickedElement.getAnnotationList();
                 var annotations = [];
                 _.forEach(savedAnnotations, function (savedAnnotation) {
-                    annotations.push({ annotation: savedAnnotation });
+                    annotations.push({annotation: savedAnnotation});
                 });
 
                 var queryName = clickedElement.getQueryName();
@@ -200,7 +200,7 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
                 if (outputElement !== undefined) {
                     if (outputElement.type !== undefined
                         && (outputElement.type === 'STREAM' || outputElement.type === 'TABLE'
-                            || outputElement.type === 'WINDOW')) {
+                        || outputElement.type === 'WINDOW')) {
                         outputElementType = outputElement.type;
                         if (outputElement.element !== undefined) {
                             outputElementAttributesList = outputElement.element.getAttributeList();
@@ -583,10 +583,10 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
                 });
 
                 /*
-                * set the description for query input manually. Even though we have set that in the 'editorInput' schema
-                * we re do it here because in the json editor generated description field cannot identify the page break
-                * tags.
-                * */
+                 * set the description for query input manually. Even though we have set that in the 'editorInput' schema
+                 * we re do it here because in the json editor generated description field cannot identify the page break
+                 * tags.
+                 * */
                 $('#' + self.currentTabId + '[data-schemapath="root"] >  p:eq(0)').html(descriptionForInputElements);
 
                 var selectScheme = {

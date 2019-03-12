@@ -18,6 +18,9 @@
 
 package io.siddhi.distribution.editor.core.core.util.designview.designgenerator.generators.query.input.types.patternsequencesupporters;
 
+/**
+ * Configuration class for logical statement element.
+ */
 public class LogicalStateElementConfig implements StateElementConfig {
     private StreamStateElementConfig streamStateElement1;
     private String type;

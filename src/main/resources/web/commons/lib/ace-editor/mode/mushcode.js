@@ -28,88 +28,88 @@
  *
  * ***** END LICENSE BLOCK ***** */
 
-define(function(require, exports, module) {
-"use strict";
+define(function (require, exports, module) {
+    "use strict";
 
-var oop = require("../lib/oop");
-var TextMode = require("./text").Mode;
-var MushCodeRules = require("./mushcode_highlight_rules").MushCodeRules;
-var PythonFoldMode = require("./folding/pythonic").FoldMode;
-var Range = require("../range").Range;
+    var oop = require("../lib/oop");
+    var TextMode = require("./text").Mode;
+    var MushCodeRules = require("./mushcode_highlight_rules").MushCodeRules;
+    var PythonFoldMode = require("./folding/pythonic").FoldMode;
+    var Range = require("../range").Range;
 
-var Mode = function() {
-    this.HighlightRules = MushCodeRules;
-    this.foldingRules = new PythonFoldMode("\\:");
-    this.$behaviour = this.$defaultBehaviour;
-};
-oop.inherits(Mode, TextMode);
+    var Mode = function () {
+        this.HighlightRules = MushCodeRules;
+        this.foldingRules = new PythonFoldMode("\\:");
+        this.$behaviour = this.$defaultBehaviour;
+    };
+    oop.inherits(Mode, TextMode);
 
-(function() {
+    (function () {
 
 
-    this.getNextLineIndent = function(state, line, tab) {
-        var indent = this.$getIndent(line);
+        this.getNextLineIndent = function (state, line, tab) {
+            var indent = this.$getIndent(line);
 
-        var tokenizedLine = this.getTokenizer().getLineTokens(line, state);
-        var tokens = tokenizedLine.tokens;
+            var tokenizedLine = this.getTokenizer().getLineTokens(line, state);
+            var tokens = tokenizedLine.tokens;
 
-        if (tokens.length && tokens[tokens.length-1].type == "comment") {
-            return indent;
-        }
-
-        if (state == "start") {
-            var match = line.match(/^.*[\{\(\[:]\s*$/);
-            if (match) {
-                indent += tab;
+            if (tokens.length && tokens[tokens.length - 1].type == "comment") {
+                return indent;
             }
-        }
 
-        return indent;
-    };
+            if (state == "start") {
+                var match = line.match(/^.*[\{\(\[:]\s*$/);
+                if (match) {
+                    indent += tab;
+                }
+            }
 
-   var outdents = {
-        "pass": 1,
-        "return": 1,
-        "raise": 1,
-        "break": 1,
-        "continue": 1
-    };
+            return indent;
+        };
 
-    this.checkOutdent = function(state, line, input) {
-        if (input !== "\r\n" && input !== "\r" && input !== "\n")
-            return false;
+        var outdents = {
+            "pass": 1,
+            "return": 1,
+            "raise": 1,
+            "break": 1,
+            "continue": 1
+        };
 
-        var tokens = this.getTokenizer().getLineTokens(line.trim(), state).tokens;
+        this.checkOutdent = function (state, line, input) {
+            if (input !== "\r\n" && input !== "\r" && input !== "\n")
+                return false;
 
-        if (!tokens)
-            return false;
+            var tokens = this.getTokenizer().getLineTokens(line.trim(), state).tokens;
 
-        // ignore trailing comments
-        do {
-            var last = tokens.pop();
-        } while (last && (last.type == "comment" || (last.type == "text" && last.value.match(/^\s+$/))));
+            if (!tokens)
+                return false;
 
-        if (!last)
-            return false;
+            // ignore trailing comments
+            do {
+                var last = tokens.pop();
+            } while (last && (last.type == "comment" || (last.type == "text" && last.value.match(/^\s+$/))));
 
-        return (last.type == "keyword" && outdents[last.value]);
-    };
+            if (!last)
+                return false;
 
-    this.autoOutdent = function(state, doc, row) {
-        // outdenting in python is slightly different because it always applies
-        // to the next line and only of a new line is inserted
+            return (last.type == "keyword" && outdents[last.value]);
+        };
 
-        row += 1;
-        var indent = this.$getIndent(doc.getLine(row));
-        var tab = doc.getTabString();
-        if (indent.slice(-tab.length) == tab)
-            doc.remove(new Range(row, indent.length-tab.length, row, indent.length));
-    };
+        this.autoOutdent = function (state, doc, row) {
+            // outdenting in python is slightly different because it always applies
+            // to the next line and only of a new line is inserted
 
-    this.$id = "ace/mode/mushcode";
-}).call(Mode.prototype);
+            row += 1;
+            var indent = this.$getIndent(doc.getLine(row));
+            var tab = doc.getTabString();
+            if (indent.slice(-tab.length) == tab)
+                doc.remove(new Range(row, indent.length - tab.length, row, indent.length));
+        };
 
-exports.Mode = Mode;
+        this.$id = "ace/mode/mushcode";
+    }).call(Mode.prototype);
+
+    exports.Mode = Mode;
 });
 
 

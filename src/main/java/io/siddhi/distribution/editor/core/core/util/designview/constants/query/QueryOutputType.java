@@ -22,8 +22,8 @@ package io.siddhi.distribution.editor.core.core.util.designview.constants.query;
  * Type of a Query's Output
  */
 public enum QueryOutputType {
-        INSERT,
-        DELETE,
-        UPDATE,
-        UPDATE_OR_INSERT_INTO
+    INSERT,
+    DELETE,
+    UPDATE,
+    UPDATE_OR_INSERT_INTO
 }

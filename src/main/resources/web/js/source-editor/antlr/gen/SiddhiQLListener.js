@@ -1307,5 +1307,4 @@ SiddhiQLListener.prototype.exitString_value = function (ctx) {
 };
 
 
-
 exports.SiddhiQLListener = SiddhiQLListener;

@@ -1,4 +1,4 @@
-.workspace-explorer-container{
+.workspace-explorer-container {
     width: 100%;
     color: #dedede;
     position: relative;
@@ -7,13 +7,13 @@
     height: 100%;
 }
 
-.tree-highlight{
+.tree-highlight {
     background-color: #373737;
     position: absolute;
     width: 100%;
 }
 
-.open-folder-button{
+.open-folder-button {
     max-height: 35px;
     padding-top: 3px;
     position: relative;
@@ -28,22 +28,22 @@
     padding: 8px 15px 8px 15px;
 }
 
-.folder-tree-header > span{
+.folder-tree-header > span {
     padding-left: 5px;
-    vertical-align:middle;
+    vertical-align: middle;
 }
 
-.folder-tree-header > i.expand-icon{
+.folder-tree-header > i.expand-icon {
     margin-right: 8px;
     font-size: 8px;
-    vertical-align:middle;
+    vertical-align: middle;
 }
 
-.folder-tree-header > i.item-icon{
-    vertical-align:middle;
+.folder-tree-header > i.item-icon {
+    vertical-align: middle;
 }
 
-.folder-tree-header:hover{
+.folder-tree-header:hover {
     color: white;
     cursor: pointer;
     background-color: #232323;
@@ -52,24 +52,24 @@
 .workspace-explorer-container .jstree-default-small .jstree-anchor {
     height: 28px;
     padding-top: 5px;
-    display:inline-block;
-    width:calc(100% - 30px);
+    display: inline-block;
+    width: calc(100% - 30px);
     white-space: nowrap;
-    overflow:hidden;
+    overflow: hidden;
     text-overflow: ellipsis;
 }
 
 .workspace-explorer-container .jstree-default-small .jstree-anchor.jstree-hovered {
     background-color: #232323;
     color: white;
-    box-shadow:none;
+    box-shadow: none;
     padding-top: 5px;
 }
 
 .workspace-explorer-container .jstree-default-small .jstree-anchor.jstree-clicked {
     background-color: #232323;
     color: white;
-    box-shadow:none;
+    box-shadow: none;
     padding-top: 5px;
 }
 
@@ -77,21 +77,20 @@
     margin-top: 5px;
 }
 
-
-.workspace-explorer-container .jstree-default-small .jstree-wholerow{
+.workspace-explorer-container .jstree-default-small .jstree-wholerow {
     height: 28px;
 }
 
-.workspace-explorer-container .jstree-default .jstree-wholerow-clicked{
+.workspace-explorer-container .jstree-default .jstree-wholerow-clicked {
     background-color: #232323;
     background: linear-gradient(to bottom, #232323 0%, #232323 100%);
 }
 
-.workspace-explorer-container .jstree-default .jstree-wholerow-hovered{
+.workspace-explorer-container .jstree-default .jstree-wholerow-hovered {
     background-color: #232323;
 }
 
-.workspace-explorer-container .jstree-default-small > .jstree-container-ul > .jstree-node{
+.workspace-explorer-container .jstree-default-small > .jstree-container-ul > .jstree-node {
     margin-left: 25px;
 }
 
@@ -121,7 +120,7 @@
     box-shadow: none;
 }
 
-.vakata-context li > a .vakata-contextmenu-sep{
+.vakata-context li > a .vakata-contextmenu-sep {
     display: none;
 }
 

@@ -46,12 +46,12 @@ public class UpdateInsertIntoOutputConfig extends OutputConfig {
         return set;
     }
 
-    public String getOn() {
-        return on;
-    }
-
     public void setSet(List<SetAttributeConfig> set) {
         this.set = set;
+    }
+
+    public String getOn() {
+        return on;
     }
 
     public void setOn(String on) {

@@ -38,16 +38,16 @@ define(['require', 'log', 'jquery', 'lodash', 'backbone', 'menu_bar', 'tool_bar'
                     var pathSeparator;
                     this.initComponents();
                     $(".nano").nanoScroller();
-                    $( "#service-tabs-wrapper" ).on( "resize", function( event, ui ) {
-                        if(self.tabController.activeTab._title != "welcome-page"){
+                    $("#service-tabs-wrapper").on("resize", function (event, ui) {
+                        if (self.tabController.activeTab._title != "welcome-page") {
                             if (self.tabController.activeTab.getSiddhiFileEditor().isInSourceView()) {
                                 self.tabController.activeTab.getSiddhiFileEditor().getSourceView().editorResize();
                             }
                         }
-                    } );
+                    });
                 },
 
-                initComponents: function(){
+                initComponents: function () {
 
                     // init command manager
                     this.commandManager = new CommandManager(this);
@@ -111,7 +111,7 @@ define(['require', 'log', 'jquery', 'lodash', 'backbone', 'menu_bar', 'tool_bar'
                     log.debug("end: rendering event simulator control");
                 },
 
-                getOperatingSystem: function(){
+                getOperatingSystem: function () {
                     var operatingSystem = "Unknown OS";
                     if (navigator.appVersion.indexOf("Win") != -1) {
                         operatingSystem = "Windows";
@@ -132,12 +132,12 @@ define(['require', 'log', 'jquery', 'lodash', 'backbone', 'menu_bar', 'tool_bar'
                     this.workspaceManager.displayInitialTab();
                 },
 
-                isRunningOnMacOS: function(){
+                isRunningOnMacOS: function () {
                     return _.isEqual(this.getOperatingSystem(), 'MacOS');
                 },
 
-                getPathSeperator: function(){
-                    if(this.pathSeparator != undefined) {
+                getPathSeperator: function () {
+                    if (this.pathSeparator != undefined) {
                         return this.pathSeparator;
                     } else {
                         this.pathSeparator = this.workspaceExplorer._serviceClient.readPathSeparator();
@@ -145,11 +145,11 @@ define(['require', 'log', 'jquery', 'lodash', 'backbone', 'menu_bar', 'tool_bar'
                     }
                 },
 
-                applicationConstants: function() {
+                applicationConstants: function () {
                     var constants = {
                         messageLinkType: {
-                            OutOnly : 1,
-                            InOut : 2
+                            OutOnly: 1,
+                            InOut: 2
                         }
                     };
 

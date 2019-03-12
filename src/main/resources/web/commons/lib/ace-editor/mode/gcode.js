@@ -28,7 +28,7 @@
  *
  * ***** END LICENSE BLOCK ***** */
 
-define(function(require, exports, module) {
+define(function (require, exports, module) {
     "use strict";
 
     var oop = require("../lib/oop");
@@ -36,13 +36,13 @@ define(function(require, exports, module) {
     var GcodeHighlightRules = require("./gcode_highlight_rules").GcodeHighlightRules;
     var Range = require("../range").Range;
 
-    var Mode = function() {
+    var Mode = function () {
         this.HighlightRules = GcodeHighlightRules;
         this.$behaviour = this.$defaultBehaviour;
     };
     oop.inherits(Mode, TextMode);
 
-    (function() {
+    (function () {
         this.$id = "ace/mode/gcode";
     }).call(Mode.prototype);
 

@@ -54,52 +54,52 @@ public class JoinConfig extends QueryInputConfig {
         return joinWith;
     }
 
-    public JoinElementConfig getLeft() {
-        return left;
-    }
-
-    public String getJoinType() {
-        return joinType;
-    }
-
-    public JoinElementConfig getRight() {
-        return right;
-    }
-
-    public String getOn() {
-        return on;
-    }
-
-    public String getWithin() {
-        return within;
-    }
-
-    public String getPer() {
-        return per;
-    }
-
     public void setJoinWith(String joinWith) {
         this.joinWith = joinWith;
+    }
+
+    public JoinElementConfig getLeft() {
+        return left;
     }
 
     public void setLeft(JoinElementConfig left) {
         this.left = left;
     }
 
+    public String getJoinType() {
+        return joinType;
+    }
+
     public void setJoinType(String joinType) {
         this.joinType = joinType;
+    }
+
+    public JoinElementConfig getRight() {
+        return right;
     }
 
     public void setRight(JoinElementConfig right) {
         this.right = right;
     }
 
+    public String getOn() {
+        return on;
+    }
+
     public void setOn(String on) {
         this.on = on;
     }
 
+    public String getWithin() {
+        return within;
+    }
+
     public void setWithin(String within) {
         this.within = within;
+    }
+
+    public String getPer() {
+        return per;
     }
 
     public void setPer(String per) {

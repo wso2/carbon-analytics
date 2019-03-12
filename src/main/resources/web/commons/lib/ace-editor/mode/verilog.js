@@ -28,28 +28,28 @@
  *
  * ***** END LICENSE BLOCK ***** */
 
-define(function(require, exports, module) {
-"use strict";
+define(function (require, exports, module) {
+    "use strict";
 
-var oop = require("../lib/oop");
-var TextMode = require("./text").Mode;
-var VerilogHighlightRules = require("./verilog_highlight_rules").VerilogHighlightRules;
-var Range = require("../range").Range;
+    var oop = require("../lib/oop");
+    var TextMode = require("./text").Mode;
+    var VerilogHighlightRules = require("./verilog_highlight_rules").VerilogHighlightRules;
+    var Range = require("../range").Range;
 
-var Mode = function() {
-    this.HighlightRules = VerilogHighlightRules;
-    this.$behaviour = this.$defaultBehaviour;
-};
-oop.inherits(Mode, TextMode);
+    var Mode = function () {
+        this.HighlightRules = VerilogHighlightRules;
+        this.$behaviour = this.$defaultBehaviour;
+    };
+    oop.inherits(Mode, TextMode);
 
-(function() {
+    (function () {
 
-    this.lineCommentStart = "//";
-    this.blockComment = {start: "/*", end: "*/"};
+        this.lineCommentStart = "//";
+        this.blockComment = {start: "/*", end: "*/"};
 
-    this.$id = "ace/mode/verilog";
-}).call(Mode.prototype);
+        this.$id = "ace/mode/verilog";
+    }).call(Mode.prototype);
 
-exports.Mode = Mode;
+    exports.Mode = Mode;
 
 });

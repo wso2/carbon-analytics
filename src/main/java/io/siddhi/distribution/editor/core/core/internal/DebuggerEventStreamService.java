@@ -47,7 +47,8 @@ public class DebuggerEventStreamService implements EventStreamService {
     }
 
     @Override
-    public List<Attribute> getStreamAttributes(String siddhiAppName, String streamName) throws ResourceNotFoundException {
+    public List<Attribute> getStreamAttributes(String siddhiAppName, String streamName)
+            throws ResourceNotFoundException {
         DebugRuntime runtimeHolder = EditorDataHolder.getSiddhiAppMap().get(siddhiAppName);
         if (runtimeHolder != null) {
             try {

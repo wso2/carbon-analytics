@@ -46,9 +46,10 @@ public class StreamHandlerConfigGenerator {
 
     /**
      * Generates a list of StreamHandlerConfigs, from the given list of Siddhi StreamHandlers
-     * @param streamHandlers                    List of Siddhi StreamHandler objects
-     * @return                                  List of StreamHandlerConfig objects
-     * @throws DesignGenerationException        Error while generating a StreamHandlerConfig
+     *
+     * @param streamHandlers List of Siddhi StreamHandler objects
+     * @return List of StreamHandlerConfig objects
+     * @throws DesignGenerationException Error while generating a StreamHandlerConfig
      */
     public List<StreamHandlerConfig> generateStreamHandlerConfigList(List<StreamHandler> streamHandlers)
             throws DesignGenerationException {
@@ -61,9 +62,10 @@ public class StreamHandlerConfigGenerator {
 
     /**
      * Generates StreamHandlerConfig from the given Siddhi StreamHandler
-     * @param streamHandler                     Siddhi StreamHandler object
-     * @return                                  StreamHandlerConfig object
-     * @throws DesignGenerationException        Error while generating config
+     *
+     * @param streamHandler Siddhi StreamHandler object
+     * @return StreamHandlerConfig object
+     * @throws DesignGenerationException Error while generating config
      */
     private StreamHandlerConfig generateStreamHandlerConfig(StreamHandler streamHandler)
             throws DesignGenerationException {
@@ -79,9 +81,10 @@ public class StreamHandlerConfigGenerator {
 
     /**
      * Generates FilterConfig from the given Siddhi Filter
-     * @param filter                            Siddhi Filter object
-     * @return                                  FilterConfig object
-     * @throws DesignGenerationException        Error while generating filter
+     *
+     * @param filter Siddhi Filter object
+     * @return FilterConfig object
+     * @throws DesignGenerationException Error while generating filter
      */
     private FilterConfig generateFilterConfig(Filter filter) throws DesignGenerationException {
         String filterDefinition = ConfigBuildingUtilities.getDefinition(filter, siddhiAppString);
@@ -90,9 +93,10 @@ public class StreamHandlerConfigGenerator {
 
     /**
      * Generates Function config from the given Siddhi StreamFunction
-     * @param streamFunction                    Siddhi StreamFunction object
-     * @return                                  FunctionWindowConfig object
-     * @throws DesignGenerationException        Error while generating function
+     *
+     * @param streamFunction Siddhi StreamFunction object
+     * @return FunctionWindowConfig object
+     * @throws DesignGenerationException Error while generating function
      */
     private FunctionWindowConfig generateFunction(StreamFunction streamFunction) throws DesignGenerationException {
         StringBuilder function = new StringBuilder();
@@ -111,9 +115,10 @@ public class StreamHandlerConfigGenerator {
 
     /**
      * Generates Window config from the given Siddhi Window
-     * @param window                            Siddhi Window object
-     * @return                                  FunctionWindowConfig object
-     * @throws DesignGenerationException        Error while generating window
+     *
+     * @param window Siddhi Window object
+     * @return FunctionWindowConfig object
+     * @throws DesignGenerationException Error while generating window
      */
     private FunctionWindowConfig generateWindow(Window window) throws DesignGenerationException {
         StringBuilder function = new StringBuilder();
@@ -132,9 +137,10 @@ public class StreamHandlerConfigGenerator {
 
     /**
      * Generates a string list of parameters, from the given list of Siddhi Expressions
-     * @param parameters                        Siddhi Expressions
-     * @return                                  String list of parameters
-     * @throws DesignGenerationException        Error while generating parameters
+     *
+     * @param parameters Siddhi Expressions
+     * @return String list of parameters
+     * @throws DesignGenerationException Error while generating parameters
      */
     private List<String> generateParameters(Expression[] parameters) throws DesignGenerationException {
         List<String> parameterStrings = new ArrayList<>();

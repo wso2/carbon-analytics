@@ -28,24 +28,24 @@ define(['require', 'elementUtils'],
         var WindowFilterProjectionQueryInput = function (options) {
             /*
              Data storing structure as follows.
-                type*: 'FUNCTION|WINDOW|FILTER|PROJECTION',
-                from*: '',
-                streamHandlerList: [
-                    {
-                        type*: 'FILTER',
-                        value*: ''
-                    },
-                    << and|or >>
-                    {
-                        type*: 'FUNCTION|WINDOW',
-                        value*: {
-                            function*: '',
-                            parameters*: ['value1',...],
-                        }
-                    },
-                    ...
-                ]
-            */
+             type*: 'FUNCTION|WINDOW|FILTER|PROJECTION',
+             from*: '',
+             streamHandlerList: [
+             {
+             type*: 'FILTER',
+             value*: ''
+             },
+             << and|or >>
+             {
+             type*: 'FUNCTION|WINDOW',
+             value*: {
+             function*: '',
+             parameters*: ['value1',...],
+             }
+             },
+             ...
+             ]
+             */
             if (options !== undefined) {
                 this.type = (options.type !== undefined) ? (options.type).toUpperCase() : undefined;
                 this.from = options.from;

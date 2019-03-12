@@ -28,73 +28,73 @@
  *
  * ***** END LICENSE BLOCK ***** */
 
-define(function(require, exports, module) {
-"use strict";
+define(function (require, exports, module) {
+    "use strict";
 
-var oop = require("../lib/oop");
-var TextMode = require("./text").Mode;
-var RubyHighlightRules = require("./ruby_highlight_rules").RubyHighlightRules;
-var MatchingBraceOutdent = require("./matching_brace_outdent").MatchingBraceOutdent;
-var Range = require("../range").Range;
-var CstyleBehaviour = require("./behaviour/cstyle").CstyleBehaviour;
-var FoldMode = require("./folding/coffee").FoldMode;
+    var oop = require("../lib/oop");
+    var TextMode = require("./text").Mode;
+    var RubyHighlightRules = require("./ruby_highlight_rules").RubyHighlightRules;
+    var MatchingBraceOutdent = require("./matching_brace_outdent").MatchingBraceOutdent;
+    var Range = require("../range").Range;
+    var CstyleBehaviour = require("./behaviour/cstyle").CstyleBehaviour;
+    var FoldMode = require("./folding/coffee").FoldMode;
 
-var Mode = function() {
-    this.HighlightRules = RubyHighlightRules;
-    this.$outdent = new MatchingBraceOutdent();
-    this.$behaviour = new CstyleBehaviour();
-    this.foldingRules = new FoldMode();
-};
-oop.inherits(Mode, TextMode);
+    var Mode = function () {
+        this.HighlightRules = RubyHighlightRules;
+        this.$outdent = new MatchingBraceOutdent();
+        this.$behaviour = new CstyleBehaviour();
+        this.foldingRules = new FoldMode();
+    };
+    oop.inherits(Mode, TextMode);
 
-(function() {
+    (function () {
 
 
-    this.lineCommentStart = "#";
+        this.lineCommentStart = "#";
 
-    this.getNextLineIndent = function(state, line, tab) {
-        var indent = this.$getIndent(line);
+        this.getNextLineIndent = function (state, line, tab) {
+            var indent = this.$getIndent(line);
 
-        var tokenizedLine = this.getTokenizer().getLineTokens(line, state);
-        var tokens = tokenizedLine.tokens;
+            var tokenizedLine = this.getTokenizer().getLineTokens(line, state);
+            var tokens = tokenizedLine.tokens;
 
-        if (tokens.length && tokens[tokens.length-1].type == "comment") {
-            return indent;
-        }
-
-        if (state == "start") {
-            var match = line.match(/^.*[\{\(\[]\s*$/);
-            var startingClassOrMethod = line.match(/^\s*(class|def|module)\s.*$/);
-            var startingDoBlock = line.match(/.*do(\s*|\s+\|.*\|\s*)$/);
-            var startingConditional = line.match(/^\s*(if|else|when)\s*/)
-            if (match || startingClassOrMethod || startingDoBlock || startingConditional) {
-                indent += tab;
+            if (tokens.length && tokens[tokens.length - 1].type == "comment") {
+                return indent;
             }
-        }
 
-        return indent;
-    };
+            if (state == "start") {
+                var match = line.match(/^.*[\{\(\[]\s*$/);
+                var startingClassOrMethod = line.match(/^\s*(class|def|module)\s.*$/);
+                var startingDoBlock = line.match(/.*do(\s*|\s+\|.*\|\s*)$/);
+                var startingConditional = line.match(/^\s*(if|else|when)\s*/)
+                if (match || startingClassOrMethod || startingDoBlock || startingConditional) {
+                    indent += tab;
+                }
+            }
 
-    this.checkOutdent = function(state, line, input) {
-        return /^\s+(end|else)$/.test(line + input) || this.$outdent.checkOutdent(line, input);
-    };
+            return indent;
+        };
 
-    this.autoOutdent = function(state, session, row) {
-        var line = session.getLine(row);
-        if (/}/.test(line))
-            return this.$outdent.autoOutdent(session, row);
-        var indent = this.$getIndent(line);
-        var prevLine = session.getLine(row - 1);
-        var prevIndent = this.$getIndent(prevLine);
-        var tab = session.getTabString();
-        if (prevIndent.length <= indent.length) {
-            if (indent.slice(-tab.length) == tab)
-                session.remove(new Range(row, indent.length-tab.length, row, indent.length));
-        }
-    };
+        this.checkOutdent = function (state, line, input) {
+            return /^\s+(end|else)$/.test(line + input) || this.$outdent.checkOutdent(line, input);
+        };
 
-    this.$id = "ace/mode/ruby";
-}).call(Mode.prototype);
+        this.autoOutdent = function (state, session, row) {
+            var line = session.getLine(row);
+            if (/}/.test(line))
+                return this.$outdent.autoOutdent(session, row);
+            var indent = this.$getIndent(line);
+            var prevLine = session.getLine(row - 1);
+            var prevIndent = this.$getIndent(prevLine);
+            var tab = session.getTabString();
+            if (prevIndent.length <= indent.length) {
+                if (indent.slice(-tab.length) == tab)
+                    session.remove(new Range(row, indent.length - tab.length, row, indent.length));
+            }
+        };
 
-exports.Mode = Mode;
+        this.$id = "ace/mode/ruby";
+    }).call(Mode.prototype);
+
+    exports.Mode = Mode;
 });

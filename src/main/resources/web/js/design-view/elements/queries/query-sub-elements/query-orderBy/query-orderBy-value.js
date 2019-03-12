@@ -28,9 +28,9 @@ define(
         var QueryOrderBy = function (options) {
             /*
              Data storing structure as follows
-                value*: '',
-                order: 'ASC|DESC'
-            */
+             value*: '',
+             order: 'ASC|DESC'
+             */
             if (options !== undefined) {
                 this.value = options.value;
                 this.order = (options.order !== undefined) ? (options.order).toUpperCase() : undefined;

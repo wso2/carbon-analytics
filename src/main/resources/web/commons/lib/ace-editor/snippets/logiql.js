@@ -1,7 +1,7 @@
-define(function(require, exports, module) {
-"use strict";
+define(function (require, exports, module) {
+    "use strict";
 
-exports.snippetText = require("../requirejs/text!./logiql.snippets");
-exports.scope = "logiql";
+    exports.snippetText = require("../requirejs/text!./logiql.snippets");
+    exports.scope = "logiql";
 
 });

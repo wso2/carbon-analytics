@@ -32,7 +32,7 @@ public class WindowCodeGenerator {
     /**
      * Generates the Siddhi code representation of a WindowConfig object
      *
-     * @param window The WindowConfig object
+     * @param window              The WindowConfig object
      * @param isGeneratingToolTip If it is generating a tooltip or not
      * @return The Siddhi code representation of the given WindowConfig object
      * @throws CodeGenerationException Error when generating the code

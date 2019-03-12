@@ -28,18 +28,18 @@ define(['require', 'elementUtils'],
         var PatternOrSequenceQueryInput = function (options) {
             /*
              Data storing structure as follows.
-                type*: 'PATTERN|SEQUENCE',
-                connectedElementList: [],
-                conditionList*: [
-                    {
-                        conditionId*: '',
-                        streamName*: '',
-                        filter: ''
-                    },
-                    ...
-                ],
-                logic*: ''
-            */
+             type*: 'PATTERN|SEQUENCE',
+             connectedElementList: [],
+             conditionList*: [
+             {
+             conditionId*: '',
+             streamName*: '',
+             filter: ''
+             },
+             ...
+             ],
+             logic*: ''
+             */
             if (options !== undefined) {
                 this.type = (options.type !== undefined) ? (options.type).toUpperCase() : undefined;
                 this.logic = options.logic;

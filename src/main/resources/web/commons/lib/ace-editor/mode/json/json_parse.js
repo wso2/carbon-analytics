@@ -1,57 +1,57 @@
 /*
-    http://www.JSON.org/json_parse.js
-    2008-09-18
+ http://www.JSON.org/json_parse.js
+ 2008-09-18
 
-    Public Domain.
+ Public Domain.
 
-    NO WARRANTY EXPRESSED OR IMPLIED. USE AT YOUR OWN RISK.
+ NO WARRANTY EXPRESSED OR IMPLIED. USE AT YOUR OWN RISK.
 
-    This file creates a json_parse function.
+ This file creates a json_parse function.
 
-        json_parse(text, reviver)
-            This method parses a JSON text to produce an object or array.
-            It can throw a SyntaxError exception.
+ json_parse(text, reviver)
+ This method parses a JSON text to produce an object or array.
+ It can throw a SyntaxError exception.
 
-            The optional reviver parameter is a function that can filter and
-            transform the results. It receives each of the keys and values,
-            and its return value is used instead of the original value.
-            If it returns what it received, then the structure is not modified.
-            If it returns undefined then the member is deleted.
+ The optional reviver parameter is a function that can filter and
+ transform the results. It receives each of the keys and values,
+ and its return value is used instead of the original value.
+ If it returns what it received, then the structure is not modified.
+ If it returns undefined then the member is deleted.
 
-            Example:
+ Example:
 
-            // Parse the text. Values that look like ISO date strings will
-            // be converted to Date objects.
+ // Parse the text. Values that look like ISO date strings will
+ // be converted to Date objects.
 
-            myData = json_parse(text, function (key, value) {
-                var a;
-                if (typeof value === 'string') {
-                    a =
-/^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2}):(\d{2}(?:\.\d*)?)Z$/.exec(value);
-                    if (a) {
-                        return new Date(Date.UTC(+a[1], +a[2] - 1, +a[3], +a[4],
-                            +a[5], +a[6]));
-                    }
-                }
-                return value;
-            });
+ myData = json_parse(text, function (key, value) {
+ var a;
+ if (typeof value === 'string') {
+ a =
+ /^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2}):(\d{2}(?:\.\d*)?)Z$/.exec(value);
+ if (a) {
+ return new Date(Date.UTC(+a[1], +a[2] - 1, +a[3], +a[4],
+ +a[5], +a[6]));
+ }
+ }
+ return value;
+ });
 
-    This is a reference implementation. You are free to copy, modify, or
-    redistribute.
+ This is a reference implementation. You are free to copy, modify, or
+ redistribute.
 
-    This code should be minified before deployment.
-    See http://javascript.crockford.com/jsmin.html
+ This code should be minified before deployment.
+ See http://javascript.crockford.com/jsmin.html
 
-    USE YOUR OWN COPY. IT IS EXTREMELY UNWISE TO LOAD CODE FROM SERVERS YOU DO
-    NOT CONTROL.
-*/
+ USE YOUR OWN COPY. IT IS EXTREMELY UNWISE TO LOAD CODE FROM SERVERS YOU DO
+ NOT CONTROL.
+ */
 
 /*members "", "\"", "\/", "\\", at, b, call, charAt, f, fromCharCode,
-    hasOwnProperty, message, n, name, push, r, t, text
-*/
+ hasOwnProperty, message, n, name, push, r, t, text
+ */
 
-define(function(require, exports, module) {
-"use strict";
+define(function (require, exports, module) {
+    "use strict";
 
 // This is a function that can parse a JSON text, producing a JavaScript
 // data structure. It is a simple, recursive descent parser. It does not use
@@ -64,14 +64,14 @@ define(function(require, exports, module) {
     var at,     // The index of the current character
         ch,     // The current character
         escapee = {
-            '"':  '"',
+            '"': '"',
             '\\': '\\',
-            '/':  '/',
-            b:    '\b',
-            f:    '\f',
-            n:    '\n',
-            r:    '\r',
-            t:    '\t'
+            '/': '/',
+            b: '\b',
+            f: '\f',
+            n: '\n',
+            r: '\r',
+            t: '\t'
         },
         text,
 
@@ -80,10 +80,10 @@ define(function(require, exports, module) {
 // Call error when something is wrong.
 
             throw {
-                name:    'SyntaxError',
+                name: 'SyntaxError',
                 message: m,
-                at:      at,
-                text:    text
+                at: at,
+                text: text
             };
         },
 
@@ -199,25 +199,25 @@ define(function(require, exports, module) {
 // true, false, or null.
 
             switch (ch) {
-            case 't':
-                next('t');
-                next('r');
-                next('u');
-                next('e');
-                return true;
-            case 'f':
-                next('f');
-                next('a');
-                next('l');
-                next('s');
-                next('e');
-                return false;
-            case 'n':
-                next('n');
-                next('u');
-                next('l');
-                next('l');
-                return null;
+                case 't':
+                    next('t');
+                    next('r');
+                    next('u');
+                    next('e');
+                    return true;
+                case 'f':
+                    next('f');
+                    next('a');
+                    next('l');
+                    next('s');
+                    next('e');
+                    return false;
+                case 'n':
+                    next('n');
+                    next('u');
+                    next('l');
+                    next('l');
+                    return null;
             }
             error("Unexpected '" + ch + "'");
         },
@@ -292,16 +292,16 @@ define(function(require, exports, module) {
 
         white();
         switch (ch) {
-        case '{':
-            return object();
-        case '[':
-            return array();
-        case '"':
-            return string();
-        case '-':
-            return number();
-        default:
-            return ch >= '0' && ch <= '9' ? number() : word();
+            case '{':
+                return object();
+            case '[':
+                return array();
+            case '"':
+                return string();
+            case '-':
+                return number();
+            default:
+                return ch >= '0' && ch <= '9' ? number() : word();
         }
     };
 

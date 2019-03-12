@@ -88,7 +88,7 @@ define(['log', 'jquery', 'lodash', 'backbone', './tab', 'bootstrap'],
                     this.el = tabList.get();
                     var closeAllButton = $("a.close-all")
 
-                    closeAllButton.on('click',self._closeAllFile,function(e){
+                    closeAllButton.on('click', self._closeAllFile, function (e) {
                         self.options.application.commandManager.dispatch("close-all");
                     });
 
@@ -111,7 +111,7 @@ define(['log', 'jquery', 'lodash', 'backbone', './tab', 'bootstrap'],
                     //_.get(this.options, 'toolPalette').showToolPalette();
                 },
 
-                createHeaderForTab: function(tab){
+                createHeaderForTab: function (tab) {
                     var tabHeader = $('<li></li>');
                     this._$tabList.append(tabHeader);
 
@@ -124,16 +124,16 @@ define(['log', 'jquery', 'lodash', 'backbone', './tab', 'bootstrap'],
                     tabHeaderLink.attr('href', '#' + tab.cid);
                     tabHeaderLink.text(tab.getTitle());
 
-                    tabHeader.setText = function(text){
-                        if(text.lastIndexOf(".siddhi") != -1){
+                    tabHeader.setText = function (text) {
+                        if (text.lastIndexOf(".siddhi") != -1) {
                             tabHeaderLink.text(text.substring(0, text.lastIndexOf(".siddhi")));
-                        } else{
+                        } else {
                             tabHeaderLink.text(text);
                         }
                     };
 
                     var self = this;
-                    tabHeaderLink.click(function(e){
+                    tabHeaderLink.click(function (e) {
                         //tabHeaderLink.tab('show');
                         self.setActiveTab(tab);
                         e.preventDefault();
@@ -142,21 +142,21 @@ define(['log', 'jquery', 'lodash', 'backbone', './tab', 'bootstrap'],
 
                     var tabCloseBtn = $('<button type="button" >×</button>');
                     tabHeader.append(tabCloseBtn);
-                    tabCloseBtn.addClass( _.get(this.options, 'tabs.tab.cssClass.tab_close_btn'));
-                    tabCloseBtn.click(function(e){
+                    tabCloseBtn.addClass(_.get(this.options, 'tabs.tab.cssClass.tab_close_btn'));
+                    tabCloseBtn.click(function (e) {
                         self.removeTab(tab);
                         e.preventDefault();
                         e.stopPropagation();
                     });
 
-                    tab.on('title-changed', function(title){
+                    tab.on('title-changed', function (title) {
                         tabHeaderLink.text(title);
                     });
 
                     tab.setHeader(tabHeader);
                 },
 
-                getTabContainer: function(){
+                getTabContainer: function () {
                     return this._$tab_container;
                 },
                 /**
@@ -209,10 +209,10 @@ define(['log', 'jquery', 'lodash', 'backbone', './tab', 'bootstrap'],
 
                     //switch to tab at last or next index
                     //make sure there are remaining tabs
-                    if(this._tabs.length > 0 && !_.isEqual(tabIndex, -1)){
+                    if (this._tabs.length > 0 && !_.isEqual(tabIndex, -1)) {
                         // if removing tab is 0th tab, next tab is also the 0th
                         var nextTabIndex = 0;
-                        if(!_.isEqual(tabIndex, 0)){
+                        if (!_.isEqual(tabIndex, 0)) {
                             nextTabIndex = tabIndex - 1;
                         }
                         var nextTab = this._tabs[nextTabIndex];
@@ -226,7 +226,7 @@ define(['log', 'jquery', 'lodash', 'backbone', './tab', 'bootstrap'],
                  */
                 setActiveTab: function (tab) {
                     if (!_.isEqual(this.activeTab, tab)) {
-                        if(!_.includes(this._tabs, tab)) {
+                        if (!_.includes(this._tabs, tab)) {
                             var errMsg = 'tab : ' + tab.cid + 'is not part of this tab list.';
                             log.error(errMsg);
                             throw errMsg;
@@ -235,7 +235,7 @@ define(['log', 'jquery', 'lodash', 'backbone', './tab', 'bootstrap'],
                         this.activeTab = tab;
                         var activeTabHeaderClass = _.get(this.options, 'headers.cssClass.active');
 
-                        if(!_.isUndefined(lastActiveTab)){
+                        if (!_.isUndefined(lastActiveTab)) {
                             lastActiveTab.getHeader().removeClass(activeTabHeaderClass);
                             lastActiveTab.setActive(false);
                         }
@@ -261,7 +261,7 @@ define(['log', 'jquery', 'lodash', 'backbone', './tab', 'bootstrap'],
                 getActiveTab: function () {
                     return this.activeTab;
                 },
-                getTabList: function() {
+                getTabList: function () {
                     return this._tabs;
                 },
                 /**
@@ -278,7 +278,7 @@ define(['log', 'jquery', 'lodash', 'backbone', './tab', 'bootstrap'],
                     _.set(tabOptions, 'application', this.options.application);
                     // merge view options from app config
                     _.assign(tabOptions, _.get(this.options, 'tabs.tab'));
-                    _.set(tabOptions, 'tabs_container',_.get(this.options, 'tabs.container'));
+                    _.set(tabOptions, 'tabs_container', _.get(this.options, 'tabs.container'));
                     _.set(tabOptions, 'parent', this);
                     var newTab;
                     // user provided a custom tab type
@@ -288,9 +288,9 @@ define(['log', 'jquery', 'lodash', 'backbone', './tab', 'bootstrap'],
                         newTab = new TabModel(tabOptions);
                     } else {
                         newTab = new this.TabModel(tabOptions);
-                        if(newTab.getTitle() !== undefined){
+                        if (newTab.getTitle() !== undefined) {
                             _.set(newTab, '_title', newTab.getTitle());
-                        }else {
+                        } else {
                             _.set(newTab, '_title', _.get(tabOptions, 'title'))
                         }
                     }
@@ -308,7 +308,7 @@ define(['log', 'jquery', 'lodash', 'backbone', './tab', 'bootstrap'],
                     return newTab;
                 },
 
-                forEach: function(callback){
+                forEach: function (callback) {
                     this._tabs.forEach(callback);
                 }
             });

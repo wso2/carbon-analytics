@@ -1,26 +1,26 @@
-define(function(require, exports, module) {
-"use strict";
+define(function (require, exports, module) {
+    "use strict";
 
-var oop = require("../lib/oop");
-var TextMode = require("./text").Mode;
-var LatexHighlightRules = require("./latex_highlight_rules").LatexHighlightRules;
-var LatexFoldMode = require("./folding/latex").FoldMode;
+    var oop = require("../lib/oop");
+    var TextMode = require("./text").Mode;
+    var LatexHighlightRules = require("./latex_highlight_rules").LatexHighlightRules;
+    var LatexFoldMode = require("./folding/latex").FoldMode;
 
-var Mode = function() {
-    this.HighlightRules = LatexHighlightRules;
-    this.foldingRules = new LatexFoldMode();
-    this.$behaviour = this.$defaultBehaviour;
-};
-oop.inherits(Mode, TextMode);
+    var Mode = function () {
+        this.HighlightRules = LatexHighlightRules;
+        this.foldingRules = new LatexFoldMode();
+        this.$behaviour = this.$defaultBehaviour;
+    };
+    oop.inherits(Mode, TextMode);
 
-(function() {
-    this.type = "text";
-    
-    this.lineCommentStart = "%";
+    (function () {
+        this.type = "text";
 
-    this.$id = "ace/mode/latex";
-}).call(Mode.prototype);
+        this.lineCommentStart = "%";
 
-exports.Mode = Mode;
+        this.$id = "ace/mode/latex";
+    }).call(Mode.prototype);
+
+    exports.Mode = Mode;
 
 });

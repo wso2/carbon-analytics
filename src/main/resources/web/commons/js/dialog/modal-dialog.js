@@ -66,7 +66,7 @@ define(['require', 'jquery', 'event_channel', 'bootstrap'], function (require, $
 
     ModalDialog.prototype.show = function () {
         var self = this;
-        this._$modalContainer.modal('show').on('shown.bs.modal', function(){
+        this._$modalContainer.modal('show').on('shown.bs.modal', function () {
             self.trigger('loaded');
         });
     };
@@ -83,14 +83,14 @@ define(['require', 'jquery', 'event_channel', 'bootstrap'], function (require, $
 
     ModalDialog.prototype.hide = function () {
         var self = this;
-        this._$modalContainer.modal('hide').on('hidden.bs.modal', function(){
+        this._$modalContainer.modal('hide').on('hidden.bs.modal', function () {
             self.trigger('unloaded');
         });
     };
 
 
     ModalDialog.prototype.render = function () {
-        if(!_.isNil(this._$modalContainer)){
+        if (!_.isNil(this._$modalContainer)) {
             this._$modalContainer.remove();
         }
         var modalContainer = $("<div class='modal fade " + _.get(this._options, 'class') +
@@ -130,10 +130,10 @@ define(['require', 'jquery', 'event_channel', 'bootstrap'], function (require, $
         modalFooter.append(modalCloseBtnBottom);
         this._$container.append(modalContainer);
 
-        if(_.has(this._options, 'title')){
+        if (_.has(this._options, 'title')) {
             modalTitle.text(_.get(this._options, 'title'));
         }
-        if(_.has(this._options, 'submitBtnText')){
+        if (_.has(this._options, 'submitBtnText')) {
             modalSubmitBtn.text(_.get(this._options, 'submitBtnText'));
         }
         return modalContainer;

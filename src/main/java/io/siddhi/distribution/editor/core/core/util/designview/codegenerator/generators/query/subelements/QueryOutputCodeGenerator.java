@@ -34,6 +34,9 @@ import io.siddhi.distribution.editor.core.core.util.designview.utilities.CodeGen
  */
 public class QueryOutputCodeGenerator {
 
+    private QueryOutputCodeGenerator() {
+    }
+
     /**
      * Generates the Siddhi code representation of a QueryOutputConfig object
      *
@@ -208,9 +211,6 @@ public class QueryOutputCodeGenerator {
                 SiddhiCodeBuilderConstants.EQUAL +
                 SiddhiCodeBuilderConstants.SPACE +
                 setAttribute.getValue();
-    }
-
-    private QueryOutputCodeGenerator() {
     }
 
 }

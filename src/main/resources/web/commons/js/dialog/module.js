@@ -16,12 +16,12 @@
  * under the License.
  */
 
-define(['./save-to-file-dialog','./replace-confirm-dialog','./open-file-dialog','./close-confirm-dialog',
-        './import-file-dialog', './export-file-dialog','./settings-dialog','./close-all-confirm-dialog',
-        './delete-confirm-dialog','./open-sample-file-dialog', './docker-export-dialog', './sample-event-dialog',
+define(['./save-to-file-dialog', './replace-confirm-dialog', './open-file-dialog', './close-confirm-dialog',
+        './import-file-dialog', './export-file-dialog', './settings-dialog', './close-all-confirm-dialog',
+        './delete-confirm-dialog', './open-sample-file-dialog', './docker-export-dialog', './sample-event-dialog',
         './query-store-dialog', './deploy-file-dialog'],
-    function (SaveToFileDialog,ReplaceConfirmDialog,OpenFileDialog,CloseConfirmDialog,ImportFileDialog,
-              ExportFileDialog,SettingsDialog,CloseAllConfirmDialog,DeleteConfirmDialog,OpenSampleFileDialog,
+    function (SaveToFileDialog, ReplaceConfirmDialog, OpenFileDialog, CloseConfirmDialog, ImportFileDialog,
+              ExportFileDialog, SettingsDialog, CloseAllConfirmDialog, DeleteConfirmDialog, OpenSampleFileDialog,
               DockerExportDialog, SampleEventDialog, QueryStoreDialog, DeployFileDialog) {
         return {
             save_to_file_dialog: SaveToFileDialog,

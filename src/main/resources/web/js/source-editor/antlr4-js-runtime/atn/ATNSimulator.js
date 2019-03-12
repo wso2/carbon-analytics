@@ -34,7 +34,7 @@ var ATNConfigSet = require('./ATNConfigSet').ATNConfigSet;
 var getCachedPredictionContext = require('./../PredictionContext').getCachedPredictionContext;
 
 function ATNSimulator(atn, sharedContextCache) {
-	
+
     // The context cache maps all PredictionContext objects that are ==
     //  to a single cached copy. This cache is shared across all contexts
     //  in all ATNConfigs in all DFA states.  We rebuild each ATNConfigSet
@@ -64,8 +64,8 @@ function ATNSimulator(atn, sharedContextCache) {
 ATNSimulator.ERROR = new DFAState(0x7FFFFFFF, new ATNConfigSet());
 
 
-ATNSimulator.prototype.getCachedContext = function(context) {
-    if (this.sharedContextCache ===null) {
+ATNSimulator.prototype.getCachedContext = function (context) {
+    if (this.sharedContextCache === null) {
         return context;
     }
     var visited = {};

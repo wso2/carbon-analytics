@@ -27,26 +27,26 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
  * ***** END LICENSE BLOCK ***** */
- 
-define(function(require, exports, module) {
-"use strict";
 
-var oop = require("../lib/oop");
-var TextMode = require("./text").Mode;
-var CirruHighlightRules = require("./cirru_highlight_rules").CirruHighlightRules;
-var CoffeeFoldMode = require("./folding/coffee").FoldMode;
+define(function (require, exports, module) {
+    "use strict";
 
-var Mode = function() {
-    this.HighlightRules = CirruHighlightRules;
-    this.foldingRules = new CoffeeFoldMode();
-    this.$behaviour = this.$defaultBehaviour;
-};
-oop.inherits(Mode, TextMode);
+    var oop = require("../lib/oop");
+    var TextMode = require("./text").Mode;
+    var CirruHighlightRules = require("./cirru_highlight_rules").CirruHighlightRules;
+    var CoffeeFoldMode = require("./folding/coffee").FoldMode;
 
-(function() {
-    this.lineCommentStart = "--";
-    this.$id = "ace/mode/cirru";
-}).call(Mode.prototype);
+    var Mode = function () {
+        this.HighlightRules = CirruHighlightRules;
+        this.foldingRules = new CoffeeFoldMode();
+        this.$behaviour = this.$defaultBehaviour;
+    };
+    oop.inherits(Mode, TextMode);
 
-exports.Mode = Mode;
+    (function () {
+        this.lineCommentStart = "--";
+        this.$id = "ace/mode/cirru";
+    }).call(Mode.prototype);
+
+    exports.Mode = Mode;
 });

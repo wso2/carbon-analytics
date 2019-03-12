@@ -35,119 +35,118 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  *
  */
-define(function(require, exports, module) {
-   "use strict";
+define(function (require, exports, module) {
+    "use strict";
 
-   var Range = require("../range").Range;
-   var oop = require("../lib/oop");
-   var TextMode = require("./text").Mode;
-   var TextHighlightRules = require("./text_highlight_rules").TextHighlightRules;
-   var RHighlightRules = require("./r_highlight_rules").RHighlightRules;
-   var MatchingBraceOutdent = require("./matching_brace_outdent").MatchingBraceOutdent;
+    var Range = require("../range").Range;
+    var oop = require("../lib/oop");
+    var TextMode = require("./text").Mode;
+    var TextHighlightRules = require("./text_highlight_rules").TextHighlightRules;
+    var RHighlightRules = require("./r_highlight_rules").RHighlightRules;
+    var MatchingBraceOutdent = require("./matching_brace_outdent").MatchingBraceOutdent;
 
-   var Mode = function(){
-      this.HighlightRules = RHighlightRules;
-      this.$outdent = new MatchingBraceOutdent();
-      this.$behaviour = this.$defaultBehaviour;
-   };
-   oop.inherits(Mode, TextMode);
+    var Mode = function () {
+        this.HighlightRules = RHighlightRules;
+        this.$outdent = new MatchingBraceOutdent();
+        this.$behaviour = this.$defaultBehaviour;
+    };
+    oop.inherits(Mode, TextMode);
 
-   (function()
-   {
-      this.lineCommentStart = "#";
-      // todo import codeModel from RStudio
-      /*this.tokenRe = new RegExp("^["
-          + unicode.packages.L
-          + unicode.packages.Mn + unicode.packages.Mc
-          + unicode.packages.Nd
-          + unicode.packages.Pc + "._]+", "g"
-      );
+    (function () {
+        this.lineCommentStart = "#";
+        // todo import codeModel from RStudio
+        /*this.tokenRe = new RegExp("^["
+         + unicode.packages.L
+         + unicode.packages.Mn + unicode.packages.Mc
+         + unicode.packages.Nd
+         + unicode.packages.Pc + "._]+", "g"
+         );
 
-      this.nonTokenRe = new RegExp("^(?:[^"
-          + unicode.packages.L
-          + unicode.packages.Mn + unicode.packages.Mc
-          + unicode.packages.Nd
-          + unicode.packages.Pc + "._]|\s])+", "g"
-      );
+         this.nonTokenRe = new RegExp("^(?:[^"
+         + unicode.packages.L
+         + unicode.packages.Mn + unicode.packages.Mc
+         + unicode.packages.Nd
+         + unicode.packages.Pc + "._]|\s])+", "g"
+         );
 
-      this.$complements = {
-               "(": ")",
-               "[": "]",
-               '"': '"',
-               "'": "'",
-               "{": "}"
-            };
-      this.$reOpen = /^[(["'{]$/;
-      this.$reClose = /^[)\]"'}]$/;
+         this.$complements = {
+         "(": ")",
+         "[": "]",
+         '"': '"',
+         "'": "'",
+         "{": "}"
+         };
+         this.$reOpen = /^[(["'{]$/;
+         this.$reClose = /^[)\]"'}]$/;
 
-      this.getNextLineIndent = function(state, line, tab, tabSize, row)
-      {
+         this.getNextLineIndent = function(state, line, tab, tabSize, row)
+         {
          return this.codeModel.getNextLineIndent(row, line, state, tab, tabSize);
-      };
+         };
 
-      this.allowAutoInsert = this.smartAllowAutoInsert;
+         this.allowAutoInsert = this.smartAllowAutoInsert;
 
-      this.checkOutdent = function(state, line, input) {
+         this.checkOutdent = function(state, line, input) {
          if (! /^\s+$/.test(line))
-            return false;
+         return false;
 
          return /^\s*[\{\}\)]/.test(input);
-      };
+         };
 
-      this.getIndentForOpenBrace = function(openBracePos)
-      {
+         this.getIndentForOpenBrace = function(openBracePos)
+         {
          return this.codeModel.getIndentForOpenBrace(openBracePos);
-      };
+         };
 
-      this.autoOutdent = function(state, doc, row) {
+         this.autoOutdent = function(state, doc, row) {
          if (row == 0)
-            return 0;
+         return 0;
 
          var line = doc.getLine(row);
 
          var match = line.match(/^(\s*[\}\)])/);
          if (match)
          {
-            var column = match[1].length;
-            var openBracePos = doc.findMatchingBracket({row: row, column: column});
+         var column = match[1].length;
+         var openBracePos = doc.findMatchingBracket({row: row, column: column});
 
-            if (!openBracePos || openBracePos.row == row) return 0;
+         if (!openBracePos || openBracePos.row == row) return 0;
 
-            var indent = this.codeModel.getIndentForOpenBrace(openBracePos);
-            doc.replace(new Range(row, 0, row, column-1), indent);
+         var indent = this.codeModel.getIndentForOpenBrace(openBracePos);
+         doc.replace(new Range(row, 0, row, column-1), indent);
          }
 
          match = line.match(/^(\s*\{)/);
          if (match)
          {
-            var column = match[1].length;
-            var indent = this.codeModel.getBraceIndent(row-1);
-            doc.replace(new Range(row, 0, row, column-1), indent);
+         var column = match[1].length;
+         var indent = this.codeModel.getBraceIndent(row-1);
+         doc.replace(new Range(row, 0, row, column-1), indent);
          }
-      };
+         };
 
-      this.$getIndent = function(line) {
+         this.$getIndent = function(line) {
          var match = line.match(/^(\s+)/);
          if (match) {
-            return match[1];
+         return match[1];
          }
 
          return "";
-      };
+         };
 
-      this.transformAction = function(state, action, editor, session, text) {
+         this.transformAction = function(state, action, editor, session, text) {
          if (action === 'insertion' && text === "\n") {
 
-            // If newline in a doxygen comment, continue the comment
-            var pos = editor.getSelectionRange().start;
-            var match = /^((\s*#+')\s*)/.exec(session.doc.getLine(pos.row));
-            if (match && editor.getSelectionRange().start.column >= match[2].length) {
-               return {text: "\n" + match[1]};
-            }
+         // If newline in a doxygen comment, continue the comment
+         var pos = editor.getSelectionRange().start;
+         var match = /^((\s*#+')\s*)/.exec(session.doc.getLine(pos.row));
+         if (match && editor.getSelectionRange().start.column >= match[2].length) {
+         return {text: "\n" + match[1]};
+         }
          }
          return false;
-      };*/
-       this.$id = "ace/mode/r";
-   }).call(Mode.prototype);
-   exports.Mode = Mode;
+         };*/
+        this.$id = "ace/mode/r";
+    }).call(Mode.prototype);
+    exports.Mode = Mode;
 });

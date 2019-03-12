@@ -28,8 +28,8 @@ define(
         var QueryOutputInsert = function (options) {
             /*
              Data storing structure as follows
-                eventType: 'CURRENT_EVENTS|EXPIRED_EVENTS|ALL_EVENTS'
-            */
+             eventType: 'CURRENT_EVENTS|EXPIRED_EVENTS|ALL_EVENTS'
+             */
             if (options !== undefined) {
                 this.eventType = (options.eventType !== undefined) ? (options.eventType).toUpperCase() : undefined;
             }

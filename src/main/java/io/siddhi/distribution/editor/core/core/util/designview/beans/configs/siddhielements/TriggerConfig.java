@@ -54,7 +54,7 @@ public class TriggerConfig extends SiddhiElementConfig {
         return criteriaType;
     }
 
-    public void setTriggerCriteria (String criteria) {
+    public void setTriggerCriteria(String criteria) {
         this.criteria = criteria;
     }
 }

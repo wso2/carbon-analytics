@@ -17,23 +17,23 @@
 define("ace/mode/siddhi", ["require", "exports", "module", "ace/lib/oop", "ace/mode/text", "ace/mode/siddhi_highlight_rules", "ace/range", "ace/mode/folding/siddhi"],
     function (require, exports, module) {
 
-    "use strict";   // JS strict mode
+        "use strict";   // JS strict mode
 
-    var oop = require("../lib/oop");
-    var TextMode = require("./text").Mode;
-    var SiddhiHighlightRules = require("./siddhi_highlight_rules").SiddhiHighlightRules;
-    var SiddhiFoldMode = require("./folding/siddhi").SiddhiFoldMode;
+        var oop = require("../lib/oop");
+        var TextMode = require("./text").Mode;
+        var SiddhiHighlightRules = require("./siddhi_highlight_rules").SiddhiHighlightRules;
+        var SiddhiFoldMode = require("./folding/siddhi").SiddhiFoldMode;
 
-    var Mode = function () {
-        this.HighlightRules = SiddhiHighlightRules;
-        this.foldingRules = new SiddhiFoldMode();
-    };
-    oop.inherits(Mode, TextMode);
+        var Mode = function () {
+            this.HighlightRules = SiddhiHighlightRules;
+            this.foldingRules = new SiddhiFoldMode();
+        };
+        oop.inherits(Mode, TextMode);
 
-    (function () {
-        this.lineCommentStart = "--";
-        this.$id = "ace/mode/siddhi";
-    }).call(Mode.prototype);
+        (function () {
+            this.lineCommentStart = "--";
+            this.$id = "ace/mode/siddhi";
+        }).call(Mode.prototype);
 
-    exports.Mode = Mode;
-});
+        exports.Mode = Mode;
+    });

@@ -42,8 +42,9 @@ public class AttributesSelectionConfigGenerator extends CodeSegmentsPreserver {
 
     /**
      * Generates an AttributesSelectionConfig from the given Siddhi Selector
-     * @param selector      Siddhi Selector object
-     * @return              AttributesSelectionConfig object
+     *
+     * @param selector Siddhi Selector object
+     * @return AttributesSelectionConfig object
      */
     public AttributesSelectionConfig generateAttributesSelectionConfig(Selector selector) {
         List<SelectedAttribute> selectedAttributes = new ArrayList<>();
@@ -65,9 +66,10 @@ public class AttributesSelectionConfigGenerator extends CodeSegmentsPreserver {
 
     /**
      * Generates a SelectedAttribute object from the given Siddhi OutputAttribute
-     * @param outputAttribute                   Siddhi OutputAttribute object
-     * @return                                  SelectedAttribute object
-     * @throws DesignGenerationException        Error while getting the definition of the OutputAttribute
+     *
+     * @param outputAttribute Siddhi OutputAttribute object
+     * @return SelectedAttribute object
+     * @throws DesignGenerationException Error while getting the definition of the OutputAttribute
      */
     private SelectedAttribute generateSelectedAttribute(OutputAttribute outputAttribute)
             throws DesignGenerationException {

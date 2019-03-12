@@ -365,6 +365,7 @@ define(["ace/ace", "jquery", "./constants", "./utils", "./completion-engine", ".
                     }
                     return streams;
                 }
+
                 /**
                  * Get the attribute list from the attribute definitions list returned from the server
                  * This is used for transforming server's aggregation definitions to completion engine's aggregation
@@ -443,7 +444,6 @@ define(["ace/ace", "jquery", "./constants", "./utils", "./completion-engine", ".
 
             return self;
         }
-
 
 
         /**

@@ -28,7 +28,8 @@ public class DebugRuntimeResponse extends GeneralResponse {
     private List<String> streams;
     private List<String> queries;
 
-    public DebugRuntimeResponse(Status status, String msg, String runtimeId, List<String> streams, List<String> queries) {
+    public DebugRuntimeResponse(Status status, String msg, String runtimeId, List<String> streams,
+                                List<String> queries) {
         super(status, msg);
         this.runtimeId = runtimeId;
         this.streams = streams;

@@ -41,11 +41,11 @@ define(['require', 'jquery', 'lodash', './modal-dialog', 'log'], function (requi
             } else {
                 this.hide();
                 var successCallBack = _.get(data, 'onSuccess');
-                if(_.isFunction(successCallBack)){
+                if (_.isFunction(successCallBack)) {
                     successCallBack.call();
                 }
                 log.debug('file' + path + " created successfully");
-                if(!_.isEqual('folder', data.type)){
+                if (!_.isEqual('folder', data.type)) {
                     var file = this._serviceClient.readFile(path);
                     app.commandManager.dispatch("create-new-tab", {tabOptions: {file: file}});
                 }
@@ -54,13 +54,13 @@ define(['require', 'jquery', 'lodash', './modal-dialog', 'log'], function (requi
     };
 
     NewItemDialog.prototype.displayWizard = function (data) {
-        this.setTitle("new "+ data.type);
+        this.setTitle("new " + data.type);
         this.setSubmitBtnText("create");
         var body = this.getBody();
         body.empty();
         this.getSubmitBtn().unbind('click');
         this.clearError();
-        var modalBody = $("<hr class='file-dialog-hr'>"+
+        var modalBody = $("<hr class='file-dialog-hr'>" +
             "<div class='container-fluid'>" +
             "<form class='form-horizontal' onsubmit='return false'>" +
             "<div class='form-group'>" +
@@ -68,30 +68,29 @@ define(['require', 'jquery', 'lodash', './modal-dialog', 'log'], function (requi
             "<div class='file-dialog-input-field'>" +
             "<input type='text' id='item-name' class='file-dialog-form-control item-name' placeholder='name'>" +
             "</div>" +
-            "</div>"+
-            "</form>"+
-            "</div>" );
+            "</div>" +
+            "</form>" +
+            "</div>");
         body.append(modalBody);
         this.show();
         var self = this,
             input = modalBody.find('input');
 
-        this.on('loaded', function(){
+        this.on('loaded', function () {
             input.focus();
         });
 
-        this.getSubmitBtn().click(function(e){
+        this.getSubmitBtn().click(function (e) {
             self.onSubmit(data, input.val());
         });
-        input.keyup(function(e){
-            if(e.keyCode == 13) {
+        input.keyup(function (e) {
+            if (e.keyCode == 13) {
                 self.onSubmit(data, input.val());
             } else {
                 self.clearError();
             }
         });
     };
-
 
 
     return NewItemDialog;

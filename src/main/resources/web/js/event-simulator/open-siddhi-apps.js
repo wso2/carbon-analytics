@@ -16,7 +16,7 @@
  * under the License.
  */
 
-define(['require', 'lodash','jquery', 'log', 'backbone', 'file_browser', 'workspace/file'],
+define(['require', 'lodash', 'jquery', 'log', 'backbone', 'file_browser', 'workspace/file'],
     function (require, _, $, log, Backbone, FileBrowser, File) {
 
         var self = {};
@@ -53,7 +53,7 @@ define(['require', 'lodash','jquery', 'log', 'backbone', 'file_browser', 'worksp
                     if (xhr.status == 200) {
                         var pathArray = _.split(path, self.app.getPathSeperator()),
                             fileName = _.last(pathArray),
-                            folderPath = _.join(_.take(pathArray, pathArray.length -1), self.app.getPathSeperator());
+                            folderPath = _.join(_.take(pathArray, pathArray.length - 1), self.app.getPathSeperator());
 
                         var file = new File({
                             name: fileName,

@@ -1,20 +1,20 @@
-define(function(require, exports, module) {
-'use strict';
+define(function (require, exports, module) {
+    'use strict';
 
-var oop = require("../lib/oop");
-var TextMode = require("./text").Mode;
-var LuceneHighlightRules = require("./lucene_highlight_rules").LuceneHighlightRules;
+    var oop = require("../lib/oop");
+    var TextMode = require("./text").Mode;
+    var LuceneHighlightRules = require("./lucene_highlight_rules").LuceneHighlightRules;
 
-var Mode = function() {
-    this.HighlightRules = LuceneHighlightRules;
-    this.$behaviour = this.$defaultBehaviour;
-};
+    var Mode = function () {
+        this.HighlightRules = LuceneHighlightRules;
+        this.$behaviour = this.$defaultBehaviour;
+    };
 
-oop.inherits(Mode, TextMode);
+    oop.inherits(Mode, TextMode);
 
-(function() {
-    this.$id = "ace/mode/lucene";
-}).call(Mode.prototype);
+    (function () {
+        this.$id = "ace/mode/lucene";
+    }).call(Mode.prototype);
 
-exports.Mode = Mode;
+    exports.Mode = Mode;
 });

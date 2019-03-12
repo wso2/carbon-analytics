@@ -41,40 +41,40 @@ var DecisionState = require('./ATNState').DecisionState;
 var SemanticContext = require('./SemanticContext').SemanticContext;
 
 function checkParams(params, isCfg) {
-	if(params===null) {
-		var result = { state:null, alt:null, context:null, semanticContext:null };
-		if(isCfg) {
-			result.reachesIntoOuterContext = 0;
-		}
-		return result;
-	} else {
-		var props = {};
-		props.state = params.state || null;
-		props.alt = params.alt || null;
-		props.context = params.context || null;
-		props.semanticContext = params.semanticContext || null;
-		if(isCfg) {
-			props.reachesIntoOuterContext = params.reachesIntoOuterContext || 0;
-			props.precedenceFilterSuppressed = params.precedenceFilterSuppressed || false;
-		}
-		return props;
-	}
+    if (params === null) {
+        var result = {state: null, alt: null, context: null, semanticContext: null};
+        if (isCfg) {
+            result.reachesIntoOuterContext = 0;
+        }
+        return result;
+    } else {
+        var props = {};
+        props.state = params.state || null;
+        props.alt = params.alt || null;
+        props.context = params.context || null;
+        props.semanticContext = params.semanticContext || null;
+        if (isCfg) {
+            props.reachesIntoOuterContext = params.reachesIntoOuterContext || 0;
+            props.precedenceFilterSuppressed = params.precedenceFilterSuppressed || false;
+        }
+        return props;
+    }
 }
 
 function ATNConfig(params, config) {
-	this.checkContext(params, config);
-	params = checkParams(params);
-	config = checkParams(config, true);
+    this.checkContext(params, config);
+    params = checkParams(params);
+    config = checkParams(config, true);
     // The ATN state associated with this configuration///
-    this.state = params.state!==null ? params.state : config.state;
+    this.state = params.state !== null ? params.state : config.state;
     // What alt (or lexer rule) is predicted by this configuration///
-    this.alt = params.alt!==null ? params.alt : config.alt;
+    this.alt = params.alt !== null ? params.alt : config.alt;
     // The stack of invoking states leading to the rule/states associated
     //  with this config.  We track only those contexts pushed during
     //  execution of the ATN simulator.
-    this.context = params.context!==null ? params.context : config.context;
-    this.semanticContext = params.semanticContext!==null ? params.semanticContext :
-        (config.semanticContext!==null ? config.semanticContext : SemanticContext.NONE);
+    this.context = params.context !== null ? params.context : config.context;
+    this.semanticContext = params.semanticContext !== null ? params.semanticContext :
+        (config.semanticContext !== null ? config.semanticContext : SemanticContext.NONE);
     // We cannot execute predicates dependent upon local context unless
     // we know for sure we are in the correct context. Because there is
     // no way to do this efficiently, we simply cannot evaluate
@@ -89,73 +89,73 @@ function ATNConfig(params, config) {
     return this;
 }
 
-ATNConfig.prototype.checkContext = function(params, config) {
-	if((params.context===null || params.context===undefined) &&
-			(config===null || config.context===null || config.context===undefined)) {
-		this.context = null;
-	}
+ATNConfig.prototype.checkContext = function (params, config) {
+    if ((params.context === null || params.context === undefined) &&
+        (config === null || config.context === null || config.context === undefined)) {
+        this.context = null;
+    }
 };
 
 // An ATN configuration is equal to another if both have
 //  the same state, they predict the same alternative, and
 //  syntactic/semantic contexts are the same.
 ///
-ATNConfig.prototype.equals = function(other) {
+ATNConfig.prototype.equals = function (other) {
     if (this === other) {
         return true;
-    } else if (! (other instanceof ATNConfig)) {
+    } else if (!(other instanceof ATNConfig)) {
         return false;
     } else {
-        return this.state.stateNumber===other.state.stateNumber &&
-            this.alt===other.alt &&
-            (this.context===null ? other.context===null : this.context.equals(other.context)) &&
+        return this.state.stateNumber === other.state.stateNumber &&
+            this.alt === other.alt &&
+            (this.context === null ? other.context === null : this.context.equals(other.context)) &&
             this.semanticContext.equals(other.semanticContext) &&
-            this.precedenceFilterSuppressed===other.precedenceFilterSuppressed;
+            this.precedenceFilterSuppressed === other.precedenceFilterSuppressed;
     }
 };
 
-ATNConfig.prototype.shortHashString = function() {
+ATNConfig.prototype.shortHashString = function () {
     return "" + this.state.stateNumber + "/" + this.alt + "/" + this.semanticContext;
 };
 
-ATNConfig.prototype.hashString = function() {
+ATNConfig.prototype.hashString = function () {
     return "" + this.state.stateNumber + "/" + this.alt + "/" +
-             (this.context===null ? "" : this.context.hashString()) +
-             "/" + this.semanticContext.hashString();
+        (this.context === null ? "" : this.context.hashString()) +
+        "/" + this.semanticContext.hashString();
 };
 
-ATNConfig.prototype.toString = function() {
+ATNConfig.prototype.toString = function () {
     return "(" + this.state + "," + this.alt +
-        (this.context!==null ? ",[" + this.context.toString() + "]" : "") +
+        (this.context !== null ? ",[" + this.context.toString() + "]" : "") +
         (this.semanticContext !== SemanticContext.NONE ?
-                ("," + this.semanticContext.toString())
-                : "") +
-        (this.reachesIntoOuterContext>0 ?
-                (",up=" + this.reachesIntoOuterContext)
-                : "") + ")";
+            ("," + this.semanticContext.toString())
+            : "") +
+        (this.reachesIntoOuterContext > 0 ?
+            (",up=" + this.reachesIntoOuterContext)
+            : "") + ")";
 };
 
 
 function LexerATNConfig(params, config) {
-	ATNConfig.call(this, params, config);
-    
+    ATNConfig.call(this, params, config);
+
     // This is the backing field for {@link //getLexerActionExecutor}.
-	var lexerActionExecutor = params.lexerActionExecutor || null;
-    this.lexerActionExecutor = lexerActionExecutor || (config!==null ? config.lexerActionExecutor : null);
-    this.passedThroughNonGreedyDecision = config!==null ? this.checkNonGreedyDecision(config, this.state) : false;
+    var lexerActionExecutor = params.lexerActionExecutor || null;
+    this.lexerActionExecutor = lexerActionExecutor || (config !== null ? config.lexerActionExecutor : null);
+    this.passedThroughNonGreedyDecision = config !== null ? this.checkNonGreedyDecision(config, this.state) : false;
     return this;
 }
 
 LexerATNConfig.prototype = Object.create(ATNConfig.prototype);
 LexerATNConfig.prototype.constructor = LexerATNConfig;
 
-LexerATNConfig.prototype.hashString = function() {
+LexerATNConfig.prototype.hashString = function () {
     return "" + this.state.stateNumber + this.alt + this.context +
-            this.semanticContext + (this.passedThroughNonGreedyDecision ? 1 : 0) +
-            this.lexerActionExecutor;
+        this.semanticContext + (this.passedThroughNonGreedyDecision ? 1 : 0) +
+        this.lexerActionExecutor;
 };
 
-LexerATNConfig.prototype.equals = function(other) {
+LexerATNConfig.prototype.equals = function (other) {
     if (this === other) {
         return true;
     } else if (!(other instanceof LexerATNConfig)) {
@@ -171,7 +171,7 @@ LexerATNConfig.prototype.equals = function(other) {
     }
 };
 
-LexerATNConfig.prototype.checkNonGreedyDecision = function(source, target) {
+LexerATNConfig.prototype.checkNonGreedyDecision = function (source, target) {
     return source.passedThroughNonGreedyDecision ||
         (target instanceof DecisionState) && target.nonGreedy;
 };

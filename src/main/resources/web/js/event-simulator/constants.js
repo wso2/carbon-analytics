@@ -16,7 +16,7 @@
  * under the License.
  */
 
-define(function() {
+define(function () {
     "use strict"; // JS strict mode
 
     /**
@@ -26,8 +26,8 @@ define(function() {
         ALLOWED_KEYS: ["Delete", "ArrowRight", "ArrowLeft", "Backspace"],
         INT_LONG_REGEX_MATCH: /^-?[\d]*$/,
         DOUBLE_FLOAT_REGEX_MATCH: /^-?\d*[.]?\d*$/,
-        INT_LONG:["INT","LONG"],
-        DOUBLE_FLOAT:["DOUBLE","FLOAT"]
+        INT_LONG: ["INT", "LONG"],
+        DOUBLE_FLOAT: ["DOUBLE", "FLOAT"]
     };
 
     return constants;

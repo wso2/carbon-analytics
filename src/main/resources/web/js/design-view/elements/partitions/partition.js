@@ -28,25 +28,25 @@ define(['require', 'elementUtils', 'lodash'],
         var Partition = function (options) {
             /*
              Data storing structure as follows.
-                id*: ‘’,
-                previousCommentSegment:'',
-                streamList = [];
-                queryLists: [
-                    {
-                        '<queryType>': [{Query JSON},...]
-                    },
-                    ...
-                ],
-                partitionWith*: [
-                    {
-                        streamName*: '',
-                        expression*: ''
-                    },
-                    ...
-                ],
-                annotationList: {Annotation JSON Array}
-                annotationListObjects: {Annotation Json Array of objects}
-            */
+             id*: ‘’,
+             previousCommentSegment:'',
+             streamList = [];
+             queryLists: [
+             {
+             '<queryType>': [{Query JSON},...]
+             },
+             ...
+             ],
+             partitionWith*: [
+             {
+             streamName*: '',
+             expression*: ''
+             },
+             ...
+             ],
+             annotationList: {Annotation JSON Array}
+             annotationListObjects: {Annotation Json Array of objects}
+             */
             if (options !== undefined) {
                 this.id = options.id;
                 this.previousCommentSegment = options.previousCommentSegment;
@@ -207,8 +207,8 @@ define(['require', 'elementUtils', 'lodash'],
         };
 
         Partition.prototype.getAnnotationListObjects = function () {
-			return this.annotationListObjects;
-		};
+            return this.annotationListObjects;
+        };
 
         Partition.prototype.setId = function (id) {
             this.id = id;
@@ -223,8 +223,8 @@ define(['require', 'elementUtils', 'lodash'],
         };
 
         Partition.prototype.setAnnotationListObjects = function (annotationListObjects) {
-                    this.annotationListObjects = annotationListObjects;
-                };
+            this.annotationListObjects = annotationListObjects;
+        };
 
 
         Partition.prototype.checkOuterStreamIsAlreadyConnected = function (streamName) {

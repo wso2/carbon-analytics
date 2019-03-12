@@ -16,7 +16,7 @@
  * under the License.
  */
 
-define(([],function (){
+define(([], function () {
     var FileMenu = {
         id: "file",
         label: "File",
@@ -228,7 +228,7 @@ define(([],function (){
                 disabled: false
             }
 
-            ]
+        ]
 
     };
 

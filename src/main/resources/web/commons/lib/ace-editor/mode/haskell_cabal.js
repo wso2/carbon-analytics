@@ -33,29 +33,29 @@
  *
  * ***** END LICENSE BLOCK ***** */
 /**
-* Haskell Cabal files mode (https://www.haskell.org/cabal/users-guide/developing-packages.html)
-**/
+ * Haskell Cabal files mode (https://www.haskell.org/cabal/users-guide/developing-packages.html)
+ **/
 
-define(function(require, exports, module) {
-"use strict";
+define(function (require, exports, module) {
+    "use strict";
 
-var oop = require("../lib/oop");
-var TextMode = require("./text").Mode;
-var CabalHighlightRules = require("./haskell_cabal_highlight_rules").CabalHighlightRules;
-var FoldMode = require("./folding/haskell_cabal").FoldMode;
+    var oop = require("../lib/oop");
+    var TextMode = require("./text").Mode;
+    var CabalHighlightRules = require("./haskell_cabal_highlight_rules").CabalHighlightRules;
+    var FoldMode = require("./folding/haskell_cabal").FoldMode;
 
-var Mode = function() {
-    this.HighlightRules = CabalHighlightRules;
-    this.foldingRules = new FoldMode();
-    this.$behaviour = this.$defaultBehaviour;
-};
-oop.inherits(Mode, TextMode);
+    var Mode = function () {
+        this.HighlightRules = CabalHighlightRules;
+        this.foldingRules = new FoldMode();
+        this.$behaviour = this.$defaultBehaviour;
+    };
+    oop.inherits(Mode, TextMode);
 
-(function() {
-    this.lineCommentStart = "--";
-    this.blockComment = null;
-    this.$id = "ace/mode/haskell_cabal";
-}).call(Mode.prototype);
+    (function () {
+        this.lineCommentStart = "--";
+        this.blockComment = null;
+        this.$id = "ace/mode/haskell_cabal";
+    }).call(Mode.prototype);
 
-exports.Mode = Mode;
+    exports.Mode = Mode;
 });

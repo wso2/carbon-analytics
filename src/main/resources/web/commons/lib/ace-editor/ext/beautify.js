@@ -30,28 +30,28 @@
 
 // [WIP]
 
-define(function(require, exports, module) {
-"use strict";
-var TokenIterator = require("ace/token_iterator").TokenIterator;
+define(function (require, exports, module) {
+    "use strict";
+    var TokenIterator = require("ace/token_iterator").TokenIterator;
 
-var phpTransform = require("./beautify/php_rules").transform;
+    var phpTransform = require("./beautify/php_rules").transform;
 
-exports.beautify = function(session) {
-    var iterator = new TokenIterator(session, 0, 0);
-    var token = iterator.getCurrentToken();
+    exports.beautify = function (session) {
+        var iterator = new TokenIterator(session, 0, 0);
+        var token = iterator.getCurrentToken();
 
-    var context = session.$modeId.split("/").pop();
+        var context = session.$modeId.split("/").pop();
 
-    var code = phpTransform(iterator, context);
-    session.doc.setValue(code);
-};
+        var code = phpTransform(iterator, context);
+        session.doc.setValue(code);
+    };
 
-exports.commands = [{
-    name: "beautify",
-    exec: function(editor) {
-        exports.beautify(editor.session);
-    },
-    bindKey: "Ctrl-Shift-B"
-}]
+    exports.commands = [{
+        name: "beautify",
+        exec: function (editor) {
+            exports.beautify(editor.session);
+        },
+        bindKey: "Ctrl-Shift-B"
+    }]
 
 });

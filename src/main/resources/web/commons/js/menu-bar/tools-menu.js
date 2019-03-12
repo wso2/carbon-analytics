@@ -16,7 +16,7 @@
  * under the License.
  */
 
-define(([],function (){
+define(([], function () {
     var ToolsMenu = {
         id: "tools",
         label: "Tools",
@@ -98,7 +98,7 @@ define(([],function (){
                 label: "Siddhi Store Query",
                 command: {
                     id: "query-store",
-                    labels:{
+                    labels: {
                         mac: {
                             key: "command+shift+q",
                             label: "\u2318\u21E7Q"

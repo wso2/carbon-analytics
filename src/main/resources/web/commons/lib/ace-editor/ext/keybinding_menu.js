@@ -42,9 +42,10 @@
  *  ☭ Hial Atropa!! ☭
  */
 
-define(function(require, exports, module) {
+define(function (require, exports, module) {
     "use strict";
     var Editor = require("ace/editor").Editor;
+
     /**
      * Generates a menu which displays the keyboard shortcuts.
      * @author <a href="mailto:matthewkastor@gmail.com">
@@ -52,15 +53,15 @@ define(function(require, exports, module) {
      *  ☭ Hial Atropa!! ☭
      * @param {ace.Editor} editor An instance of the ace editor.
      */
-    function showKeyboardShortcuts (editor) {
+    function showKeyboardShortcuts(editor) {
         // make sure the menu isn't open already.
-        if(!document.getElementById('kbshortcutmenu')) {
+        if (!document.getElementById('kbshortcutmenu')) {
             var overlayPage = require('./menu_tools/overlay_page').overlayPage;
             var getEditorKeybordShortcuts = require('./menu_tools/get_editor_keyboard_shortcuts').getEditorKeybordShortcuts;
             var kb = getEditorKeybordShortcuts(editor);
             var el = document.createElement('div');
-            var commands = kb.reduce(function(previous, current) {
-                return previous + '<div class="ace_optionsMenuEntry"><span class="ace_optionsMenuCommand">' 
+            var commands = kb.reduce(function (previous, current) {
+                return previous + '<div class="ace_optionsMenuEntry"><span class="ace_optionsMenuCommand">'
                     + current.command + '</span> : '
                     + '<span class="ace_optionsMenuKey">' + current.key + '</span></div>';
             }, '');
@@ -70,14 +71,15 @@ define(function(require, exports, module) {
             overlayPage(editor, el, '0', '0', '0', null);
         }
     }
-    module.exports.init = function(editor) {
-        Editor.prototype.showKeyboardShortcuts = function() {
+
+    module.exports.init = function (editor) {
+        Editor.prototype.showKeyboardShortcuts = function () {
             showKeyboardShortcuts(this);
         };
         editor.commands.addCommands([{
             name: "showKeyboardShortcuts",
             bindKey: {win: "Ctrl-Alt-h", mac: "Command-Alt-h"},
-            exec: function(editor, line) {
+            exec: function (editor, line) {
                 editor.showKeyboardShortcuts();
             }
         }]);

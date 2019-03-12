@@ -28,9 +28,9 @@ define(
         var PartitionWith = function (options) {
             /*
              Data storing structure as follows
-                streamName*: '',
-                expression*: ''
-            */
+             streamName*: '',
+             expression*: ''
+             */
             if (options !== undefined) {
                 this.streamName = options.streamName;
                 this.expression = options.expression;

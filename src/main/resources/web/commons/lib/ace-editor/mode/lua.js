@@ -28,142 +28,142 @@
  *
  * ***** END LICENSE BLOCK ***** */
 
-define(function(require, exports, module) {
-"use strict";
+define(function (require, exports, module) {
+    "use strict";
 
-var oop = require("../lib/oop");
-var TextMode = require("./text").Mode;
-var LuaHighlightRules = require("./lua_highlight_rules").LuaHighlightRules;
-var LuaFoldMode = require("./folding/lua").FoldMode;
-var Range = require("../range").Range;
-var WorkerClient = require("../worker/worker_client").WorkerClient;
+    var oop = require("../lib/oop");
+    var TextMode = require("./text").Mode;
+    var LuaHighlightRules = require("./lua_highlight_rules").LuaHighlightRules;
+    var LuaFoldMode = require("./folding/lua").FoldMode;
+    var Range = require("../range").Range;
+    var WorkerClient = require("../worker/worker_client").WorkerClient;
 
-var Mode = function() {
-    this.HighlightRules = LuaHighlightRules;
-    
-    this.foldingRules = new LuaFoldMode();
-    this.$behaviour = this.$defaultBehaviour;
-};
-oop.inherits(Mode, TextMode);
+    var Mode = function () {
+        this.HighlightRules = LuaHighlightRules;
 
-(function() {
-   
-    this.lineCommentStart = "--";
-    this.blockComment = {start: "--[", end: "]--"};
-    
-    var indentKeywords = {
-        "function": 1,
-        "then": 1,
-        "do": 1,
-        "else": 1,
-        "elseif": 1,
-        "repeat": 1,
-        "end": -1,
-        "until": -1
+        this.foldingRules = new LuaFoldMode();
+        this.$behaviour = this.$defaultBehaviour;
     };
-    var outdentKeywords = [
-        "else",
-        "elseif",
-        "end",
-        "until"
-    ];
+    oop.inherits(Mode, TextMode);
 
-    function getNetIndentLevel(tokens) {
-        var level = 0;
-        // Support single-line blocks by decrementing the indent level if
-        // an ending token is found
-        for (var i = 0; i < tokens.length; i++) {
-            var token = tokens[i];
-            if (token.type == "keyword") {
-                if (token.value in indentKeywords) {
-                    level += indentKeywords[token.value];
+    (function () {
+
+        this.lineCommentStart = "--";
+        this.blockComment = {start: "--[", end: "]--"};
+
+        var indentKeywords = {
+            "function": 1,
+            "then": 1,
+            "do": 1,
+            "else": 1,
+            "elseif": 1,
+            "repeat": 1,
+            "end": -1,
+            "until": -1
+        };
+        var outdentKeywords = [
+            "else",
+            "elseif",
+            "end",
+            "until"
+        ];
+
+        function getNetIndentLevel(tokens) {
+            var level = 0;
+            // Support single-line blocks by decrementing the indent level if
+            // an ending token is found
+            for (var i = 0; i < tokens.length; i++) {
+                var token = tokens[i];
+                if (token.type == "keyword") {
+                    if (token.value in indentKeywords) {
+                        level += indentKeywords[token.value];
+                    }
+                } else if (token.type == "paren.lparen") {
+                    level += token.value.length;
+                } else if (token.type == "paren.rparen") {
+                    level -= token.value.length;
                 }
-            } else if (token.type == "paren.lparen") {
-                level += token.value.length;
-            } else if (token.type == "paren.rparen") {
-                level -= token.value.length;
+            }
+            // Limit the level to +/- 1 since usually users only indent one level
+            // at a time regardless of the logical nesting level
+            if (level < 0) {
+                return -1;
+            } else if (level > 0) {
+                return 1;
+            } else {
+                return 0;
             }
         }
-        // Limit the level to +/- 1 since usually users only indent one level
-        // at a time regardless of the logical nesting level
-        if (level < 0) {
-            return -1;
-        } else if (level > 0) {
-            return 1;
-        } else {
-            return 0;
-        }
-    }
 
-    this.getNextLineIndent = function(state, line, tab) {
-        var indent = this.$getIndent(line);
-        var level = 0;
+        this.getNextLineIndent = function (state, line, tab) {
+            var indent = this.$getIndent(line);
+            var level = 0;
 
-        var tokenizedLine = this.getTokenizer().getLineTokens(line, state);
-        var tokens = tokenizedLine.tokens;
+            var tokenizedLine = this.getTokenizer().getLineTokens(line, state);
+            var tokens = tokenizedLine.tokens;
 
-        if (state == "start") {
-            level = getNetIndentLevel(tokens);
-        }
-        if (level > 0) {
-            return indent + tab;
-        } else if (level < 0 && indent.substr(indent.length - tab.length) == tab) {
-            // Don't do a next-line outdent if we're going to do a real outdent of this line
-            if (!this.checkOutdent(state, line, "\n")) {
-                return indent.substr(0, indent.length - tab.length);
+            if (state == "start") {
+                level = getNetIndentLevel(tokens);
             }
-        }
-        return indent;
-    };
+            if (level > 0) {
+                return indent + tab;
+            } else if (level < 0 && indent.substr(indent.length - tab.length) == tab) {
+                // Don't do a next-line outdent if we're going to do a real outdent of this line
+                if (!this.checkOutdent(state, line, "\n")) {
+                    return indent.substr(0, indent.length - tab.length);
+                }
+            }
+            return indent;
+        };
 
-    this.checkOutdent = function(state, line, input) {
-        if (input != "\n" && input != "\r" && input != "\r\n")
-            return false;
+        this.checkOutdent = function (state, line, input) {
+            if (input != "\n" && input != "\r" && input != "\r\n")
+                return false;
 
-        if (line.match(/^\s*[\)\}\]]$/))
-            return true;
+            if (line.match(/^\s*[\)\}\]]$/))
+                return true;
 
-        var tokens = this.getTokenizer().getLineTokens(line.trim(), state).tokens;
+            var tokens = this.getTokenizer().getLineTokens(line.trim(), state).tokens;
 
-        if (!tokens || !tokens.length)
-            return false;
+            if (!tokens || !tokens.length)
+                return false;
 
-        return (tokens[0].type == "keyword" && outdentKeywords.indexOf(tokens[0].value) != -1);
-    };
+            return (tokens[0].type == "keyword" && outdentKeywords.indexOf(tokens[0].value) != -1);
+        };
 
-    this.autoOutdent = function(state, session, row) {
-        var prevLine = session.getLine(row - 1);
-        var prevIndent = this.$getIndent(prevLine).length;
-        var prevTokens = this.getTokenizer().getLineTokens(prevLine, "start").tokens;
-        var tabLength = session.getTabString().length;
-        var expectedIndent = prevIndent + tabLength * getNetIndentLevel(prevTokens);
-        var curIndent = this.$getIndent(session.getLine(row)).length;
-        if (curIndent < expectedIndent) {
-            // User already outdented //
-            return;
-        }
-        session.outdentRows(new Range(row, 0, row + 2, 0));
-    };
+        this.autoOutdent = function (state, session, row) {
+            var prevLine = session.getLine(row - 1);
+            var prevIndent = this.$getIndent(prevLine).length;
+            var prevTokens = this.getTokenizer().getLineTokens(prevLine, "start").tokens;
+            var tabLength = session.getTabString().length;
+            var expectedIndent = prevIndent + tabLength * getNetIndentLevel(prevTokens);
+            var curIndent = this.$getIndent(session.getLine(row)).length;
+            if (curIndent < expectedIndent) {
+                // User already outdented //
+                return;
+            }
+            session.outdentRows(new Range(row, 0, row + 2, 0));
+        };
 
-    this.createWorker = function(session) {
-        var worker = new WorkerClient(["ace"], "ace/mode/lua_worker", "Worker");
-        worker.attachToDocument(session.getDocument());
-        
-        worker.on("annotate", function(e) {
-            session.setAnnotations(e.data);
-        });
-        
-        worker.on("terminate", function() {
-            session.clearAnnotations();
-        });
-        
-        return worker;
-    };
+        this.createWorker = function (session) {
+            var worker = new WorkerClient(["ace"], "ace/mode/lua_worker", "Worker");
+            worker.attachToDocument(session.getDocument());
 
-    this.$id = "ace/mode/lua";
-}).call(Mode.prototype);
+            worker.on("annotate", function (e) {
+                session.setAnnotations(e.data);
+            });
 
-exports.Mode = Mode;
+            worker.on("terminate", function () {
+                session.clearAnnotations();
+            });
+
+            return worker;
+        };
+
+        this.$id = "ace/mode/lua";
+    }).call(Mode.prototype);
+
+    exports.Mode = Mode;
 });
 
 

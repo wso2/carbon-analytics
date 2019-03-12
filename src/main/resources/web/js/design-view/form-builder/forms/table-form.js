@@ -17,7 +17,7 @@
  */
 
 define(['log', 'jquery', 'lodash', 'attribute', 'storeAnnotation', 'handlebar', 'annotationObject', 'annotationElement',
-    'constants'],
+        'constants'],
     function (log, $, _, Attribute, StoreAnnotation, Handlebars, AnnotationObject, AnnotationElement, Constants) {
 
         /**
@@ -97,8 +97,12 @@ define(['log', 'jquery', 'lodash', 'attribute', 'storeAnnotation', 'handlebar', 
                 }
                 if (!foundPredefinedOption) {
                     options.push({
-                        key: predefinedOption.name, value: "", description: predefinedOption
-                            .description, optional: predefinedOption.optional, defaultValue: predefinedOption.defaultValue
+                        key: predefinedOption.name,
+                        value: "",
+                        description: predefinedOption
+                            .description,
+                        optional: predefinedOption.optional,
+                        defaultValue: predefinedOption.defaultValue
                     });
                 }
             });
@@ -122,7 +126,7 @@ define(['log', 'jquery', 'lodash', 'attribute', 'storeAnnotation', 'handlebar', 
                     }
                 }
                 if (!foundSavedOption) {
-                    customizedOptions.push({ key: savedOption.key, value: savedOption.value });
+                    customizedOptions.push({key: savedOption.key, value: savedOption.value});
                 }
             });
             return customizedOptions;
@@ -162,7 +166,7 @@ define(['log', 'jquery', 'lodash', 'attribute', 'storeAnnotation', 'handlebar', 
                         predefined_annotation.isChecked = true;
                         predefined_annotation.values = [];
                         for (element of savedAnnotation.elements) {
-                            predefined_annotation.values.push({ value: element.value });
+                            predefined_annotation.values.push({value: element.value});
                         }
                         break;
                     }
@@ -266,7 +270,7 @@ define(['log', 'jquery', 'lodash', 'attribute', 'storeAnnotation', 'handlebar', 
                         rdbms_options.push({
                             key: predefinedOption.key, value: predefinedOption.value, description: predefinedOption
                                 .description, optional: predefinedOption.optional, defaultValue: predefinedOption
-                                    .defaultValue
+                                .defaultValue
                         })
                     }
                 });
@@ -282,7 +286,7 @@ define(['log', 'jquery', 'lodash', 'attribute', 'storeAnnotation', 'handlebar', 
                         rdbms_options.push({
                             key: predefinedOption.key, value: predefinedOption.value, description: predefinedOption
                                 .description, optional: predefinedOption.optional, defaultValue: predefinedOption
-                                    .defaultValue
+                                .defaultValue
                         })
                     }
                 });
@@ -298,7 +302,7 @@ define(['log', 'jquery', 'lodash', 'attribute', 'storeAnnotation', 'handlebar', 
                         rdbms_options.push({
                             key: predefinedOption.key, value: predefinedOption.value, description: predefinedOption
                                 .description, optional: predefinedOption.optional, defaultValue: predefinedOption
-                                    .defaultValue
+                                .defaultValue
                         })
                     }
 
@@ -391,10 +395,10 @@ define(['log', 'jquery', 'lodash', 'attribute', 'storeAnnotation', 'handlebar', 
             //To add annotation value
             $('#define-predefined-annotations').on('click', '.btn-add-annot-value', function () {
                 $(this).parents(".table-annotation").find("ul").append
-                    ('<li class = "clearfix table-annotation-value"> <div class="clearfix"> ' +
-                        '<input type = "text" value = "" class = "annotation-value"/> ' +
-                        '<a class = "btn-del-annot-value"> <i class = "fw fw-delete"> </i> </a> </div> ' +
-                        '<label class="error-message"></label> </li>');
+                ('<li class = "clearfix table-annotation-value"> <div class="clearfix"> ' +
+                    '<input type = "text" value = "" class = "annotation-value"/> ' +
+                    '<a class = "btn-del-annot-value"> <i class = "fw fw-delete"> </i> </a> </div> ' +
+                    '<label class="error-message"></label> </li>');
             });
 
             //To delete annotation value
@@ -418,7 +422,7 @@ define(['log', 'jquery', 'lodash', 'attribute', 'storeAnnotation', 'handlebar', 
 
             var name = clickedElement.getName();
             if (!name) {
-                var attributes = [{ name: "" }];
+                var attributes = [{name: ""}];
                 self.formUtils.renderAttributeTemplate(attributes)
 
             } else {
@@ -617,7 +621,7 @@ define(['log', 'jquery', 'lodash', 'attribute', 'storeAnnotation', 'handlebar', 
                         var nameValue = $(this).find('.attr-name').val().trim();
                         var typeValue = $(this).find('.attr-type').val();
                         if (nameValue != "") {
-                            var attributeObject = new Attribute({ name: nameValue, type: typeValue });
+                            var attributeObject = new Attribute({name: nameValue, type: typeValue});
                             clickedElement.addAttribute(attributeObject);
                         }
                     });

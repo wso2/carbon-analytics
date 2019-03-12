@@ -59,10 +59,10 @@ var ErrorNodeImpl = Tree.ErrorNodeImpl;
 var Interval = require("./IntervalSet").Interval;
 
 function ParserRuleContext(parent, invokingStateNumber) {
-	parent = parent || null;
-	invokingStateNumber = invokingStateNumber || null;
-	RuleContext.call(this, parent, invokingStateNumber);
-	this.ruleIndex = -1;
+    parent = parent || null;
+    invokingStateNumber = invokingStateNumber || null;
+    RuleContext.call(this, parent, invokingStateNumber);
+    this.ruleIndex = -1;
     // * If we are debugging or building a parse tree for a visitor,
     // we need to track all of the tokens and rule invocations associated
     // with this rule's context. This is empty for parsing w/o tree constr.
@@ -81,7 +81,7 @@ ParserRuleContext.prototype = Object.create(RuleContext.prototype);
 ParserRuleContext.prototype.constructor = ParserRuleContext;
 
 // * COPY a ctx (I'm deliberately not using copy constructor)///
-ParserRuleContext.prototype.copyFrom = function(ctx) {
+ParserRuleContext.prototype.copyFrom = function (ctx) {
     // from RuleContext
     this.parentCtx = ctx.parentCtx;
     this.invokingState = ctx.invokingState;
@@ -91,14 +91,14 @@ ParserRuleContext.prototype.copyFrom = function(ctx) {
 };
 
 // Double dispatch methods for listeners
-ParserRuleContext.prototype.enterRule = function(listener) {
+ParserRuleContext.prototype.enterRule = function (listener) {
 };
 
-ParserRuleContext.prototype.exitRule = function(listener) {
+ParserRuleContext.prototype.exitRule = function (listener) {
 };
 
 // * Does not set parent link; other add methods do that///
-ParserRuleContext.prototype.addChild = function(child) {
+ParserRuleContext.prototype.addChild = function (child) {
     if (this.children === null) {
         this.children = [];
     }
@@ -110,108 +110,108 @@ ParserRuleContext.prototype.addChild = function(child) {
 // we entered a rule. If we have // label, we will need to remove
 // generic ruleContext object.
 // /
-ParserRuleContext.prototype.removeLastChild = function() {
+ParserRuleContext.prototype.removeLastChild = function () {
     if (this.children !== null) {
         this.children.pop();
     }
 };
 
-ParserRuleContext.prototype.addTokenNode = function(token) {
+ParserRuleContext.prototype.addTokenNode = function (token) {
     var node = new TerminalNodeImpl(token);
     this.addChild(node);
     node.parentCtx = this;
     return node;
 };
 
-ParserRuleContext.prototype.addErrorNode = function(badToken) {
+ParserRuleContext.prototype.addErrorNode = function (badToken) {
     var node = new ErrorNodeImpl(badToken);
     this.addChild(node);
     node.parentCtx = this;
     return node;
 };
 
-ParserRuleContext.prototype.getChild = function(i, type) {
-	type = type || null;
-	if (type === null) {
-		return this.children.length>=i ? this.children[i] : null;
-	} else {
-		for(var j=0; j<this.children.length; j++) {
-			var child = this.children[j];
-			if(child instanceof type) {
-				if(i===0) {
-					return child;
-				} else {
-					i -= 1;
-				}
-			}
-		}
-		return null;
+ParserRuleContext.prototype.getChild = function (i, type) {
+    type = type || null;
+    if (type === null) {
+        return this.children.length >= i ? this.children[i] : null;
+    } else {
+        for (var j = 0; j < this.children.length; j++) {
+            var child = this.children[j];
+            if (child instanceof type) {
+                if (i === 0) {
+                    return child;
+                } else {
+                    i -= 1;
+                }
+            }
+        }
+        return null;
     }
 };
 
 
-ParserRuleContext.prototype.getToken = function(ttype, i) {
-	for(var j=0; j<this.children.length; j++) {
-		var child = this.children[j];
-		if (child instanceof TerminalNode) {
-			if (child.symbol.type === ttype) {
-				if(i===0) {
-					return child;
-				} else {
-					i -= 1;
-				}
-			}
+ParserRuleContext.prototype.getToken = function (ttype, i) {
+    for (var j = 0; j < this.children.length; j++) {
+        var child = this.children[j];
+        if (child instanceof TerminalNode) {
+            if (child.symbol.type === ttype) {
+                if (i === 0) {
+                    return child;
+                } else {
+                    i -= 1;
+                }
+            }
         }
-	}
+    }
     return null;
 };
 
-ParserRuleContext.prototype.getTokens = function(ttype ) {
-    if (this.children=== null) {
+ParserRuleContext.prototype.getTokens = function (ttype) {
+    if (this.children === null) {
         return [];
     } else {
-		var tokens = [];
-		for(var j=0; j<this.children.length; j++) {
-			var child = this.children[j];
-			if (child instanceof TerminalNode) {
-				if (child.symbol.type === ttype) {
-					tokens.push(child);
-				}
-			}
-		}
-		return tokens;
+        var tokens = [];
+        for (var j = 0; j < this.children.length; j++) {
+            var child = this.children[j];
+            if (child instanceof TerminalNode) {
+                if (child.symbol.type === ttype) {
+                    tokens.push(child);
+                }
+            }
+        }
+        return tokens;
     }
 };
 
-ParserRuleContext.prototype.getTypedRuleContext = function(ctxType, i) {
+ParserRuleContext.prototype.getTypedRuleContext = function (ctxType, i) {
     return this.getChild(i, ctxType);
 };
 
-ParserRuleContext.prototype.getTypedRuleContexts = function(ctxType) {
-    if (this.children=== null) {
+ParserRuleContext.prototype.getTypedRuleContexts = function (ctxType) {
+    if (this.children === null) {
         return [];
     } else {
-		var contexts = [];
-		for(var j=0; j<this.children.length; j++) {
-			var child = this.children[j];
-			if (child instanceof ctxType) {
-				contexts.push(child);
-			}
-		}
-		return contexts;
-	}
+        var contexts = [];
+        for (var j = 0; j < this.children.length; j++) {
+            var child = this.children[j];
+            if (child instanceof ctxType) {
+                contexts.push(child);
+            }
+        }
+        return contexts;
+    }
 };
 
-ParserRuleContext.prototype.getChildCount = function() {
-	if (this.children=== null) {
-		return 0;
-	} else {
-		return this.children.length;
-	}
+ParserRuleContext.prototype.getChildCount = function () {
+    if (this.children === null) {
+        return 0;
+    } else {
+        return this.children.length;
+    }
 };
 
-ParserRuleContext.prototype.getSourceInterval = function() {
-    if( this.start === null || this.stop === null) {
+ParserRuleContext.prototype.getSourceInterval = function () {
+    if (this.start === null || this.stop === null) {
         return INVALID_INTERVAL;
     } else {
         return new Interval(this.start.tokenIndex, this.stop.tokenIndex);
@@ -221,7 +221,7 @@ ParserRuleContext.prototype.getSourceInterval = function() {
 RuleContext.EMPTY = new ParserRuleContext();
 
 function InterpreterRuleContext(parent, invokingStateNumber, ruleIndex) {
-	ParserRuleContext.call(parent, invokingStateNumber);
+    ParserRuleContext.call(parent, invokingStateNumber);
     this.ruleIndex = ruleIndex;
     return this;
 }

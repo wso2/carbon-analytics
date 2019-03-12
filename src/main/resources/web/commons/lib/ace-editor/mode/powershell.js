@@ -1,61 +1,61 @@
-define(function(require, exports, module) {
-"use strict";
+define(function (require, exports, module) {
+    "use strict";
 
-var oop = require("../lib/oop");
-var TextMode = require("./text").Mode;
-var PowershellHighlightRules = require("./powershell_highlight_rules").PowershellHighlightRules;
-var MatchingBraceOutdent = require("./matching_brace_outdent").MatchingBraceOutdent;
-var CstyleBehaviour = require("./behaviour/cstyle").CstyleBehaviour;
-var CStyleFoldMode = require("./folding/cstyle").FoldMode;
+    var oop = require("../lib/oop");
+    var TextMode = require("./text").Mode;
+    var PowershellHighlightRules = require("./powershell_highlight_rules").PowershellHighlightRules;
+    var MatchingBraceOutdent = require("./matching_brace_outdent").MatchingBraceOutdent;
+    var CstyleBehaviour = require("./behaviour/cstyle").CstyleBehaviour;
+    var CStyleFoldMode = require("./folding/cstyle").FoldMode;
 
-var Mode = function() {
-    this.HighlightRules = PowershellHighlightRules;
-    this.$outdent = new MatchingBraceOutdent();
-    this.$behaviour = new CstyleBehaviour();
-    this.foldingRules = new CStyleFoldMode({start: "^\\s*(<#)", end: "^[#\\s]>\\s*$"});
-};
-oop.inherits(Mode, TextMode);
+    var Mode = function () {
+        this.HighlightRules = PowershellHighlightRules;
+        this.$outdent = new MatchingBraceOutdent();
+        this.$behaviour = new CstyleBehaviour();
+        this.foldingRules = new CStyleFoldMode({start: "^\\s*(<#)", end: "^[#\\s]>\\s*$"});
+    };
+    oop.inherits(Mode, TextMode);
 
-(function() {
+    (function () {
 
-    this.lineCommentStart = "#";
-    this.blockComment = {start: "<#", end: "#>"};
-    
-    this.getNextLineIndent = function(state, line, tab) {
-        var indent = this.$getIndent(line);
+        this.lineCommentStart = "#";
+        this.blockComment = {start: "<#", end: "#>"};
 
-        var tokenizedLine = this.getTokenizer().getLineTokens(line, state);
-        var tokens = tokenizedLine.tokens;
+        this.getNextLineIndent = function (state, line, tab) {
+            var indent = this.$getIndent(line);
 
-        if (tokens.length && tokens[tokens.length-1].type == "comment") {
-            return indent;
-        }
-      
-        if (state == "start") {
-            var match = line.match(/^.*[\{\(\[]\s*$/);
-            if (match) {
-                indent += tab;
+            var tokenizedLine = this.getTokenizer().getLineTokens(line, state);
+            var tokens = tokenizedLine.tokens;
+
+            if (tokens.length && tokens[tokens.length - 1].type == "comment") {
+                return indent;
             }
-        }
 
-        return indent;
-    };
+            if (state == "start") {
+                var match = line.match(/^.*[\{\(\[]\s*$/);
+                if (match) {
+                    indent += tab;
+                }
+            }
 
-    this.checkOutdent = function(state, line, input) {
-        return this.$outdent.checkOutdent(line, input);
-    };
+            return indent;
+        };
 
-    this.autoOutdent = function(state, doc, row) {
-        this.$outdent.autoOutdent(doc, row);
-    };
+        this.checkOutdent = function (state, line, input) {
+            return this.$outdent.checkOutdent(line, input);
+        };
+
+        this.autoOutdent = function (state, doc, row) {
+            this.$outdent.autoOutdent(doc, row);
+        };
 
 
-    this.createWorker = function(session) {
-        return null;
-    };
+        this.createWorker = function (session) {
+            return null;
+        };
 
-    this.$id = "ace/mode/powershell";
-}).call(Mode.prototype);
+        this.$id = "ace/mode/powershell";
+    }).call(Mode.prototype);
 
-exports.Mode = Mode;
+    exports.Mode = Mode;
 });

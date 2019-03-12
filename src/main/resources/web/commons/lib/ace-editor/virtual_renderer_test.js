@@ -33,78 +33,79 @@ if (typeof process !== "undefined") {
     require("./test/mockdom");
 }
 
-define(function(require, exports, module) {
-"use strict";
+define(function (require, exports, module) {
+    "use strict";
 
-var Editor = require("./edit_session").Editor;
-var EditSession = require("./edit_session").EditSession;
-var VirtualRenderer = require("./virtual_renderer").VirtualRenderer;
-var assert = require("./test/assertions");
+    var Editor = require("./edit_session").Editor;
+    var EditSession = require("./edit_session").EditSession;
+    var VirtualRenderer = require("./virtual_renderer").VirtualRenderer;
+    var assert = require("./test/assertions");
 
-var editor = null;
-module.exports = {
-    setUp: function() {
-        if (editor)
-            editor.destroy()
-        var el = document.createElement("div");
+    var editor = null;
+    module.exports = {
+        setUp: function () {
+            if (editor)
+                editor.destroy()
+            var el = document.createElement("div");
 
-        el.style.left = "20px";
-        el.style.top = "30px";
-        el.style.width = "300px";
-        el.style.height = "100px";
-        document.body.appendChild(el);
-        var renderer = new VirtualRenderer(el);
-        var editor = new Editor(renderer);
-        editor.on("destroy", function() {
-            document.body.removeChild(el);
-        });
-    },
-    tearDown: function() {
-        editor && editor.destroy();
-        editor = null;
-    },
-    "test: screen2text the column should be rounded to the next character edge" : function(done) {
-        if (!editor) return done();
-        var renderer = editor.renderer;
+            el.style.left = "20px";
+            el.style.top = "30px";
+            el.style.width = "300px";
+            el.style.height = "100px";
+            document.body.appendChild(el);
+            var renderer = new VirtualRenderer(el);
+            var editor = new Editor(renderer);
+            editor.on("destroy", function () {
+                document.body.removeChild(el);
+            });
+        },
+        tearDown: function () {
+            editor && editor.destroy();
+            editor = null;
+        },
+        "test: screen2text the column should be rounded to the next character edge": function (done) {
+            if (!editor) return done();
+            var renderer = editor.renderer;
 
-        renderer.setPadding(0);
-        renderer.setSession(new EditSession("1234"));
+            renderer.setPadding(0);
+            renderer.setSession(new EditSession("1234"));
 
-        var r = renderer.scroller.getBoundingClientRect();
-        function testPixelToText(x, y, row, column) {
-            assert.position(renderer.screenToTextCoordinates(x+r.left, y+r.top), row, column);
+            var r = renderer.scroller.getBoundingClientRect();
+
+            function testPixelToText(x, y, row, column) {
+                assert.position(renderer.screenToTextCoordinates(x + r.left, y + r.top), row, column);
+            }
+
+            renderer.characterWidth = 10;
+            renderer.lineHeight = 15;
+
+            testPixelToText(4, 0, 0, 0);
+            testPixelToText(5, 0, 0, 1);
+            testPixelToText(9, 0, 0, 1);
+            testPixelToText(10, 0, 0, 1);
+            testPixelToText(14, 0, 0, 1);
+            testPixelToText(15, 0, 0, 2);
+            done();
+        },
+
+        "test scrollmargin + autosize": function (done) {
+            if (!editor) return done();
+            editor.setOptions({
+                maxLines: 100,
+                useWrapMode: true
+            });
+            editor.renderer.setScrollMargin(10, 10);
+            editor.setValue("\n\n");
+            editor.setValue("\n\n\n\n");
+            editor.renderer.once("afterRender", function () {
+                setTimeout(function () {
+                    done();
+                }, 0);
+            });
         }
 
-        renderer.characterWidth = 10;
-        renderer.lineHeight = 15;
-
-        testPixelToText(4, 0, 0, 0);
-        testPixelToText(5, 0, 0, 1);
-        testPixelToText(9, 0, 0, 1);
-        testPixelToText(10, 0, 0, 1);
-        testPixelToText(14, 0, 0, 1);
-        testPixelToText(15, 0, 0, 2);
-        done();
-    },
-    
-    "test scrollmargin + autosize": function(done) {
-        if (!editor) return done();
-        editor.setOptions({
-            maxLines: 100,
-            useWrapMode: true
-        });        
-        editor.renderer.setScrollMargin(10, 10);
-        editor.setValue("\n\n");
-        editor.setValue("\n\n\n\n");
-        editor.renderer.once("afterRender", function() {
-            setTimeout(function() {
-                done();
-            }, 0);
-        });
-    }
-
-    // change tab size after setDocument (for text layer)
-};
+        // change tab size after setDocument (for text layer)
+    };
 
 });
 

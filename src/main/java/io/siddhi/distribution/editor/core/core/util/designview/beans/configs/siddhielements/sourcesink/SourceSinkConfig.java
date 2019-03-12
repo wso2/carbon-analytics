@@ -36,7 +36,8 @@ public class SourceSinkConfig extends SiddhiElementConfig {
     private String correlationId;
 
     public SourceSinkConfig(String annotationType, String connectedElementName, String type,
-                            List<String> options, MapperConfig map, boolean isCorrelationIdExist, String correlationId) {
+                            List<String> options, MapperConfig map, boolean isCorrelationIdExist,
+                            String correlationId) {
         this.annotationType = annotationType;
         this.connectedElementName = connectedElementName;
         this.type = type;

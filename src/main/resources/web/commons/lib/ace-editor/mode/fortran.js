@@ -29,85 +29,85 @@
  * ***** END LICENSE BLOCK ***** */
 
 /* Derived from Python rules */
-define(function(require, exports, module) {
-"use strict";
+define(function (require, exports, module) {
+    "use strict";
 
-var oop = require("../lib/oop");
-var TextMode = require("./text").Mode;
-var FortranHighlightRules = require("./fortran_highlight_rules").FortranHighlightRules;
-var CStyleFoldMode = require("./folding/cstyle").FoldMode;
-var Range = require("../range").Range;
+    var oop = require("../lib/oop");
+    var TextMode = require("./text").Mode;
+    var FortranHighlightRules = require("./fortran_highlight_rules").FortranHighlightRules;
+    var CStyleFoldMode = require("./folding/cstyle").FoldMode;
+    var Range = require("../range").Range;
 
-var Mode = function() {
-    this.HighlightRules = FortranHighlightRules;
-    this.foldingRules = new CStyleFoldMode();
-    this.$behaviour = this.$defaultBehaviour;
-};
-oop.inherits(Mode, TextMode);
+    var Mode = function () {
+        this.HighlightRules = FortranHighlightRules;
+        this.foldingRules = new CStyleFoldMode();
+        this.$behaviour = this.$defaultBehaviour;
+    };
+    oop.inherits(Mode, TextMode);
 
-(function() {
+    (function () {
 
-    this.lineCommentStart = "!";
+        this.lineCommentStart = "!";
 
-    this.getNextLineIndent = function(state, line, tab) {
-        var indent = this.$getIndent(line);
+        this.getNextLineIndent = function (state, line, tab) {
+            var indent = this.$getIndent(line);
 
-        var tokenizedLine = this.getTokenizer().getLineTokens(line, state);
-        var tokens = tokenizedLine.tokens;
+            var tokenizedLine = this.getTokenizer().getLineTokens(line, state);
+            var tokens = tokenizedLine.tokens;
 
-        if (tokens.length && tokens[tokens.length-1].type == "comment") {
-            return indent;
-        }
-
-        if (state == "start") {
-            var match = line.match(/^.*[\{\(\[:]\s*$/);
-            if (match) {
-                indent += tab;
+            if (tokens.length && tokens[tokens.length - 1].type == "comment") {
+                return indent;
             }
-        }
 
-        return indent;
-    };
+            if (state == "start") {
+                var match = line.match(/^.*[\{\(\[:]\s*$/);
+                if (match) {
+                    indent += tab;
+                }
+            }
 
-    var outdents = {
-        "return": 1,
-        "break": 1,
-        "continue": 1,
-        "RETURN": 1,
-        "BREAK": 1,
-        "CONTINUE": 1
-    };
+            return indent;
+        };
 
-    this.checkOutdent = function(state, line, input) {
-        if (input !== "\r\n" && input !== "\r" && input !== "\n")
-            return false;
+        var outdents = {
+            "return": 1,
+            "break": 1,
+            "continue": 1,
+            "RETURN": 1,
+            "BREAK": 1,
+            "CONTINUE": 1
+        };
 
-        var tokens = this.getTokenizer().getLineTokens(line.trim(), state).tokens;
+        this.checkOutdent = function (state, line, input) {
+            if (input !== "\r\n" && input !== "\r" && input !== "\n")
+                return false;
 
-        if (!tokens)
-            return false;
-        do {
-            var last = tokens.pop();
-        } while (last && (last.type == "comment" || (last.type == "text" && last.value.match(/^\s+$/))));
+            var tokens = this.getTokenizer().getLineTokens(line.trim(), state).tokens;
 
-        if (!last)
-            return false;
+            if (!tokens)
+                return false;
+            do {
+                var last = tokens.pop();
+            } while (last && (last.type == "comment" || (last.type == "text" && last.value.match(/^\s+$/))));
 
-        return (last.type == "keyword" && outdents[last.value]);
-    };
+            if (!last)
+                return false;
 
-    this.autoOutdent = function(state, doc, row) {
+            return (last.type == "keyword" && outdents[last.value]);
+        };
 
-        row += 1;
-        var indent = this.$getIndent(doc.getLine(row));
-        var tab = doc.getTabString();
-        if (indent.slice(-tab.length) == tab)
-            doc.remove(new Range(row, indent.length-tab.length, row, indent.length));
-    };
+        this.autoOutdent = function (state, doc, row) {
 
-    this.$id = "ace/mode/fortran";
-}).call(Mode.prototype);
+            row += 1;
+            var indent = this.$getIndent(doc.getLine(row));
+            var tab = doc.getTabString();
+            if (indent.slice(-tab.length) == tab)
+                doc.remove(new Range(row, indent.length - tab.length, row, indent.length));
+        };
 
-exports.Mode = Mode;
+        this.$id = "ace/mode/fortran";
+    }).call(Mode.prototype);
+
+    exports.Mode = Mode;
 });
 

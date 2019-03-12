@@ -28,135 +28,136 @@
  *
  * ***** END LICENSE BLOCK ***** */
 
-define(function(require, exports, module) {
-"use strict";
+define(function (require, exports, module) {
+    "use strict";
 
-var oop = require("../../lib/oop");
-var BaseFoldMode = require("./fold_mode").FoldMode;
-var Range = require("../../range").Range;
-var TokenIterator = require("../../token_iterator").TokenIterator;
+    var oop = require("../../lib/oop");
+    var BaseFoldMode = require("./fold_mode").FoldMode;
+    var Range = require("../../range").Range;
+    var TokenIterator = require("../../token_iterator").TokenIterator;
 
-var FoldMode = exports.FoldMode = function() {};
-
-oop.inherits(FoldMode, BaseFoldMode);
-
-(function() {
-
-    this.foldingStartMarker = /^\s*\\(begin)|(section|subsection|paragraph)\b|{\s*$/;
-    this.foldingStopMarker = /^\s*\\(end)\b|^\s*}/;
-
-    this.getFoldWidgetRange = function(session, foldStyle, row) {
-        var line = session.doc.getLine(row);
-        var match = this.foldingStartMarker.exec(line);
-        if (match) {
-            if (match[1])
-                return this.latexBlock(session, row, match[0].length - 1);
-            if (match[2])
-                return this.latexSection(session, row, match[0].length - 1);
-
-            return this.openingBracketBlock(session, "{", row, match.index);
-        }
-
-        var match = this.foldingStopMarker.exec(line);
-        if (match) {
-            if (match[1])
-                return this.latexBlock(session, row, match[0].length - 1);
-
-            return this.closingBracketBlock(session, "}", row, match.index + match[0].length);
-        }
+    var FoldMode = exports.FoldMode = function () {
     };
 
-    this.latexBlock = function(session, row, column) {
-        var keywords = {
-            "\\begin": 1,
-            "\\end": -1
-        };
+    oop.inherits(FoldMode, BaseFoldMode);
 
-        var stream = new TokenIterator(session, row, column);
-        var token = stream.getCurrentToken();
-        if (!token || !(token.type == "storage.type" || token.type == "constant.character.escape"))
-            return;
+    (function () {
 
-        var val = token.value;
-        var dir = keywords[val];
+        this.foldingStartMarker = /^\s*\\(begin)|(section|subsection|paragraph)\b|{\s*$/;
+        this.foldingStopMarker = /^\s*\\(end)\b|^\s*}/;
 
-        var getType = function() {
-            var token = stream.stepForward();
-            var type = token.type == "lparen" ?stream.stepForward().value : "";
-            if (dir === -1) {
-                stream.stepBackward();
-                if (type)
-                    stream.stepBackward();
+        this.getFoldWidgetRange = function (session, foldStyle, row) {
+            var line = session.doc.getLine(row);
+            var match = this.foldingStartMarker.exec(line);
+            if (match) {
+                if (match[1])
+                    return this.latexBlock(session, row, match[0].length - 1);
+                if (match[2])
+                    return this.latexSection(session, row, match[0].length - 1);
+
+                return this.openingBracketBlock(session, "{", row, match.index);
             }
-            return type;
+
+            var match = this.foldingStopMarker.exec(line);
+            if (match) {
+                if (match[1])
+                    return this.latexBlock(session, row, match[0].length - 1);
+
+                return this.closingBracketBlock(session, "}", row, match.index + match[0].length);
+            }
         };
-        var stack = [getType()];
-        var startColumn = dir === -1 ? stream.getCurrentTokenColumn() : session.getLine(row).length;
-        var startRow = row;
 
-        stream.step = dir === -1 ? stream.stepBackward : stream.stepForward;
-        while(token = stream.step()) {
+        this.latexBlock = function (session, row, column) {
+            var keywords = {
+                "\\begin": 1,
+                "\\end": -1
+            };
+
+            var stream = new TokenIterator(session, row, column);
+            var token = stream.getCurrentToken();
             if (!token || !(token.type == "storage.type" || token.type == "constant.character.escape"))
-                continue;
-            var level = keywords[token.value];
-            if (!level)
-                continue;
-            var type = getType();
-            if (level === dir)
-                stack.unshift(type);
-            else if (stack.shift() !== type || !stack.length)
-                break;
-        }
+                return;
 
-        if (stack.length)
-            return;
+            var val = token.value;
+            var dir = keywords[val];
 
-        var row = stream.getCurrentTokenRow();
-        if (dir === -1)
-            return new Range(row, session.getLine(row).length, startRow, startColumn);
-        stream.stepBackward();
-        return new Range(startRow, startColumn, row, stream.getCurrentTokenColumn());
-    };
+            var getType = function () {
+                var token = stream.stepForward();
+                var type = token.type == "lparen" ? stream.stepForward().value : "";
+                if (dir === -1) {
+                    stream.stepBackward();
+                    if (type)
+                        stream.stepBackward();
+                }
+                return type;
+            };
+            var stack = [getType()];
+            var startColumn = dir === -1 ? stream.getCurrentTokenColumn() : session.getLine(row).length;
+            var startRow = row;
 
-    this.latexSection = function(session, row, column) {
-        var keywords = ["\\subsection", "\\section", "\\begin", "\\end", "\\paragraph"];
+            stream.step = dir === -1 ? stream.stepBackward : stream.stepForward;
+            while (token = stream.step()) {
+                if (!token || !(token.type == "storage.type" || token.type == "constant.character.escape"))
+                    continue;
+                var level = keywords[token.value];
+                if (!level)
+                    continue;
+                var type = getType();
+                if (level === dir)
+                    stack.unshift(type);
+                else if (stack.shift() !== type || !stack.length)
+                    break;
+            }
 
-        var stream = new TokenIterator(session, row, column);
-        var token = stream.getCurrentToken();
-        if (!token || token.type != "storage.type")
-            return;
+            if (stack.length)
+                return;
 
-        var startLevel = keywords.indexOf(token.value);
-        var stackDepth = 0
-        var endRow = row;
+            var row = stream.getCurrentTokenRow();
+            if (dir === -1)
+                return new Range(row, session.getLine(row).length, startRow, startColumn);
+            stream.stepBackward();
+            return new Range(startRow, startColumn, row, stream.getCurrentTokenColumn());
+        };
 
-        while(token = stream.stepForward()) {
-            if (token.type !== "storage.type")
-                continue;
-            var level = keywords.indexOf(token.value);
+        this.latexSection = function (session, row, column) {
+            var keywords = ["\\subsection", "\\section", "\\begin", "\\end", "\\paragraph"];
 
-            if (level >= 2) {
-                if (!stackDepth)
-                    endRow = stream.getCurrentTokenRow() - 1;
-                stackDepth += level == 2 ? 1 : - 1;
-                if (stackDepth < 0)
-                    break
-            } else if (level >= startLevel)
-                break;
-        }
+            var stream = new TokenIterator(session, row, column);
+            var token = stream.getCurrentToken();
+            if (!token || token.type != "storage.type")
+                return;
 
-        if (!stackDepth)
-            endRow = stream.getCurrentTokenRow() - 1;
+            var startLevel = keywords.indexOf(token.value);
+            var stackDepth = 0
+            var endRow = row;
 
-        while (endRow > row && !/\S/.test(session.getLine(endRow)))
-            endRow--;
+            while (token = stream.stepForward()) {
+                if (token.type !== "storage.type")
+                    continue;
+                var level = keywords.indexOf(token.value);
 
-        return new Range(
-            row, session.getLine(row).length,
-            endRow, session.getLine(endRow).length
-        );
-    };
+                if (level >= 2) {
+                    if (!stackDepth)
+                        endRow = stream.getCurrentTokenRow() - 1;
+                    stackDepth += level == 2 ? 1 : -1;
+                    if (stackDepth < 0)
+                        break
+                } else if (level >= startLevel)
+                    break;
+            }
 
-}).call(FoldMode.prototype);
+            if (!stackDepth)
+                endRow = stream.getCurrentTokenRow() - 1;
+
+            while (endRow > row && !/\S/.test(session.getLine(endRow)))
+                endRow--;
+
+            return new Range(
+                row, session.getLine(row).length,
+                endRow, session.getLine(endRow).length
+            );
+        };
+
+    }).call(FoldMode.prototype);
 
 });

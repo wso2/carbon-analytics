@@ -1,33 +1,33 @@
 //
- //[The "BSD license"]
- // Copyright (c) 2013 Terence Parr
- // Copyright (c) 2013 Sam Harwell
- // Copyright (c) 2014 Eric Vergnaud
- // All rights reserved.
- //
- // Redistribution and use in source and binary forms, with or without
- // modification, are permitted provided that the following conditions
- // are met:
- //
- // 1. Redistributions of source code must retain the above copyright
- //    notice, this list of conditions and the following disclaimer.
- // 2. Redistributions in binary form must reproduce the above copyright
- //    notice, this list of conditions and the following disclaimer in the
- //    documentation and/or other materials provided with the distribution.
- // 3. The name of the author may not be used to endorse or promote products
- //    derived from this software without specific prior written permission.
- //
- // THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR
- // IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
- // OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
- // IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT,
- // INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
- // NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
- // DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
- // THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
- // (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
- // THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- //
+//[The "BSD license"]
+// Copyright (c) 2013 Terence Parr
+// Copyright (c) 2013 Sam Harwell
+// Copyright (c) 2014 Eric Vergnaud
+// All rights reserved.
+//
+// Redistribution and use in source and binary forms, with or without
+// modification, are permitted provided that the following conditions
+// are met:
+//
+// 1. Redistributions of source code must retain the above copyright
+//    notice, this list of conditions and the following disclaimer.
+// 2. Redistributions in binary form must reproduce the above copyright
+//    notice, this list of conditions and the following disclaimer in the
+//    documentation and/or other materials provided with the distribution.
+// 3. The name of the author may not be used to endorse or promote products
+//    derived from this software without specific prior written permission.
+//
+// THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR
+// IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
+// OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
+// IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT,
+// INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
+// NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+// DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+// THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+// (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
+// THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+//
 
 function LexerActionType() {
 }
@@ -47,14 +47,13 @@ function LexerAction(action) {
     return this;
 }
 
-LexerAction.prototype.hashString = function() {
+LexerAction.prototype.hashString = function () {
     return "" + this.actionType;
 };
 
-LexerAction.prototype.equals = function(other) {
+LexerAction.prototype.equals = function (other) {
     return this === other;
 };
-
 
 
 //
@@ -63,8 +62,8 @@ LexerAction.prototype.equals = function(other) {
 // <p>The {@code skip} command does not have any parameters, so this action is
 // implemented as a singleton instance exposed by {@link //INSTANCE}.</p>
 function LexerSkipAction() {
-	LexerAction.call(this, LexerActionType.SKIP);
-	return this;
+    LexerAction.call(this, LexerActionType.SKIP);
+    return this;
 }
 
 LexerSkipAction.prototype = Object.create(LexerAction.prototype);
@@ -73,52 +72,52 @@ LexerSkipAction.prototype.constructor = LexerSkipAction;
 // Provides a singleton instance of this parameterless lexer action.
 LexerSkipAction.INSTANCE = new LexerSkipAction();
 
-LexerSkipAction.prototype.execute = function(lexer) {
+LexerSkipAction.prototype.execute = function (lexer) {
     lexer.skip();
 };
 
-LexerSkipAction.prototype.toString = function() {
-	return "skip";
+LexerSkipAction.prototype.toString = function () {
+    return "skip";
 };
 
 //  Implements the {@code type} lexer action by calling {@link Lexer//setType}
 // with the assigned type.
 function LexerTypeAction(type) {
-	LexerAction.call(this, LexerActionType.TYPE);
-	this.type = type;
-	return this;
+    LexerAction.call(this, LexerActionType.TYPE);
+    this.type = type;
+    return this;
 }
 
 LexerTypeAction.prototype = Object.create(LexerAction.prototype);
 LexerTypeAction.prototype.constructor = LexerTypeAction;
 
-LexerTypeAction.prototype.execute = function(lexer) {
+LexerTypeAction.prototype.execute = function (lexer) {
     lexer.type = this.type;
 };
 
-LexerTypeAction.prototype.hashString = function() {
-	return "" + this.actionType + this.type;
+LexerTypeAction.prototype.hashString = function () {
+    return "" + this.actionType + this.type;
 };
 
 
-LexerTypeAction.prototype.equals = function(other) {
-    if(this === other) {
+LexerTypeAction.prototype.equals = function (other) {
+    if (this === other) {
         return true;
-    } else if (! (other instanceof LexerTypeAction)) {
+    } else if (!(other instanceof LexerTypeAction)) {
         return false;
     } else {
         return this.type === other.type;
     }
 };
 
-LexerTypeAction.prototype.toString = function() {
+LexerTypeAction.prototype.toString = function () {
     return "type(" + this.type + ")";
 };
 
 // Implements the {@code pushMode} lexer action by calling
 // {@link Lexer//pushMode} with the assigned mode.
 function LexerPushModeAction(mode) {
-	LexerAction.call(this, LexerActionType.PUSH_MODE);
+    LexerAction.call(this, LexerActionType.PUSH_MODE);
     this.mode = mode;
     return this;
 }
@@ -128,26 +127,26 @@ LexerPushModeAction.prototype.constructor = LexerPushModeAction;
 
 // <p>This action is implemented by calling {@link Lexer//pushMode} with the
 // value provided by {@link //getMode}.</p>
-LexerPushModeAction.prototype.execute = function(lexer) {
+LexerPushModeAction.prototype.execute = function (lexer) {
     lexer.pushMode(this.mode);
 };
 
-LexerPushModeAction.prototype.hashString = function() {
+LexerPushModeAction.prototype.hashString = function () {
     return "" + this.actionType + this.mode;
 };
 
-LexerPushModeAction.prototype.equals = function(other) {
+LexerPushModeAction.prototype.equals = function (other) {
     if (this === other) {
         return true;
-    } else if (! (other instanceof LexerPushModeAction)) {
+    } else if (!(other instanceof LexerPushModeAction)) {
         return false;
     } else {
         return this.mode === other.mode;
     }
 };
 
-LexerPushModeAction.prototype.toString = function() {
-	return "pushMode(" + this.mode + ")";
+LexerPushModeAction.prototype.toString = function () {
+    return "pushMode(" + this.mode + ")";
 };
 
 
@@ -156,8 +155,8 @@ LexerPushModeAction.prototype.toString = function() {
 // <p>The {@code popMode} command does not have any parameters, so this action is
 // implemented as a singleton instance exposed by {@link //INSTANCE}.</p>
 function LexerPopModeAction() {
-	LexerAction.call(this,LexerActionType.POP_MODE);
-	return this;
+    LexerAction.call(this, LexerActionType.POP_MODE);
+    return this;
 }
 
 LexerPopModeAction.prototype = Object.create(LexerAction.prototype);
@@ -166,12 +165,12 @@ LexerPopModeAction.prototype.constructor = LexerPopModeAction;
 LexerPopModeAction.INSTANCE = new LexerPopModeAction();
 
 // <p>This action is implemented by calling {@link Lexer//popMode}.</p>
-LexerPopModeAction.prototype.execute = function(lexer) {
+LexerPopModeAction.prototype.execute = function (lexer) {
     lexer.popMode();
 };
 
-LexerPopModeAction.prototype.toString = function() {
-	return "popMode";
+LexerPopModeAction.prototype.toString = function () {
+    return "popMode";
 };
 
 // Implements the {@code more} lexer action by calling {@link Lexer//more}.
@@ -179,8 +178,8 @@ LexerPopModeAction.prototype.toString = function() {
 // <p>The {@code more} command does not have any parameters, so this action is
 // implemented as a singleton instance exposed by {@link //INSTANCE}.</p>
 function LexerMoreAction() {
-	LexerAction.call(this, LexerActionType.MORE);
-	return this;
+    LexerAction.call(this, LexerActionType.MORE);
+    return this;
 }
 
 LexerMoreAction.prototype = Object.create(LexerAction.prototype);
@@ -189,11 +188,11 @@ LexerMoreAction.prototype.constructor = LexerMoreAction;
 LexerMoreAction.INSTANCE = new LexerMoreAction();
 
 // <p>This action is implemented by calling {@link Lexer//popMode}.</p>
-LexerMoreAction.prototype.execute = function(lexer) {
+LexerMoreAction.prototype.execute = function (lexer) {
     lexer.more();
 };
 
-LexerMoreAction.prototype.toString = function() {
+LexerMoreAction.prototype.toString = function () {
     return "more";
 };
 
@@ -201,7 +200,7 @@ LexerMoreAction.prototype.toString = function() {
 // Implements the {@code mode} lexer action by calling {@link Lexer//mode} with
 // the assigned mode.
 function LexerModeAction(mode) {
-	LexerAction.call(this, LexerActionType.MODE);
+    LexerAction.call(this, LexerActionType.MODE);
     this.mode = mode;
     return this;
 }
@@ -211,25 +210,25 @@ LexerModeAction.prototype.constructor = LexerModeAction;
 
 // <p>This action is implemented by calling {@link Lexer//mode} with the
 // value provided by {@link //getMode}.</p>
-LexerModeAction.prototype.execute = function(lexer) {
+LexerModeAction.prototype.execute = function (lexer) {
     lexer.mode(this.mode);
 };
 
-LexerModeAction.prototype.hashString = function() {
-	return "" + this.actionType + this.mode;
+LexerModeAction.prototype.hashString = function () {
+    return "" + this.actionType + this.mode;
 };
 
-LexerModeAction.prototype.equals = function(other) {
+LexerModeAction.prototype.equals = function (other) {
     if (this === other) {
         return true;
-    } else if (! (other instanceof LexerModeAction)) {
+    } else if (!(other instanceof LexerModeAction)) {
         return false;
     } else {
         return this.mode === other.mode;
     }
 };
 
-LexerModeAction.prototype.toString = function() {
+LexerModeAction.prototype.toString = function () {
     return "mode(" + this.mode + ")";
 };
 
@@ -243,16 +242,16 @@ LexerModeAction.prototype.toString = function() {
 // command argument could not be evaluated when the grammar was compiled.</p>
 
 
-    // Constructs a custom lexer action with the specified rule and action
-    // indexes.
-    //
-    // @param ruleIndex The rule index to use for calls to
-    // {@link Recognizer//action}.
-    // @param actionIndex The action index to use for calls to
-    // {@link Recognizer//action}.
+// Constructs a custom lexer action with the specified rule and action
+// indexes.
+//
+// @param ruleIndex The rule index to use for calls to
+// {@link Recognizer//action}.
+// @param actionIndex The action index to use for calls to
+// {@link Recognizer//action}.
 
 function LexerCustomAction(ruleIndex, actionIndex) {
-	LexerAction.call(this, LexerActionType.CUSTOM);
+    LexerAction.call(this, LexerActionType.CUSTOM);
     this.ruleIndex = ruleIndex;
     this.actionIndex = actionIndex;
     this.isPositionDependent = true;
@@ -264,18 +263,18 @@ LexerCustomAction.prototype.constructor = LexerCustomAction;
 
 // <p>Custom actions are implemented by calling {@link Lexer//action} with the
 // appropriate rule and action indexes.</p>
-LexerCustomAction.prototype.execute = function(lexer) {
+LexerCustomAction.prototype.execute = function (lexer) {
     lexer.action(null, this.ruleIndex, this.actionIndex);
 };
 
-LexerCustomAction.prototype.hashString = function() {
+LexerCustomAction.prototype.hashString = function () {
     return "" + this.actionType + this.ruleIndex + this.actionIndex;
 };
 
-LexerCustomAction.prototype.equals = function(other) {
+LexerCustomAction.prototype.equals = function (other) {
     if (this === other) {
         return true;
-    } else if (! (other instanceof LexerCustomAction)) {
+    } else if (!(other instanceof LexerCustomAction)) {
         return false;
     } else {
         return this.ruleIndex === other.ruleIndex && this.actionIndex === other.actionIndex;
@@ -287,7 +286,7 @@ LexerCustomAction.prototype.equals = function(other) {
 // Constructs a new {@code channel} action with the specified channel value.
 // @param channel The channel value to pass to {@link Lexer//setChannel}.
 function LexerChannelAction(channel) {
-	LexerAction.call(this, LexerActionType.CHANNEL);
+    LexerAction.call(this, LexerActionType.CHANNEL);
     this.channel = channel;
     return this;
 }
@@ -297,25 +296,25 @@ LexerChannelAction.prototype.constructor = LexerChannelAction;
 
 // <p>This action is implemented by calling {@link Lexer//setChannel} with the
 // value provided by {@link //getChannel}.</p>
-LexerChannelAction.prototype.execute = function(lexer) {
+LexerChannelAction.prototype.execute = function (lexer) {
     lexer._channel = this.channel;
 };
 
-LexerChannelAction.prototype.hashString = function() {
+LexerChannelAction.prototype.hashString = function () {
     return "" + this.actionType + this.channel;
 };
 
-LexerChannelAction.prototype.equals = function(other) {
+LexerChannelAction.prototype.equals = function (other) {
     if (this === other) {
         return true;
-    } else if (! (other instanceof LexerChannelAction)) {
+    } else if (!(other instanceof LexerChannelAction)) {
         return false;
     } else {
         return this.channel === other.channel;
     }
 };
 
-LexerChannelAction.prototype.toString = function() {
+LexerChannelAction.prototype.toString = function () {
     return "channel(" + this.channel + ")";
 };
 
@@ -340,7 +339,7 @@ LexerChannelAction.prototype.toString = function() {
 // @param action The lexer action to execute at a particular offset in the
 // input {@link CharStream}.
 function LexerIndexedCustomAction(offset, action) {
-	LexerAction.call(this, action.actionType);
+    LexerAction.call(this, action.actionType);
     this.offset = offset;
     this.action = action;
     this.isPositionDependent = true;
@@ -352,19 +351,19 @@ LexerIndexedCustomAction.prototype.constructor = LexerIndexedCustomAction;
 
 // <p>This method calls {@link //execute} on the result of {@link //getAction}
 // using the provided {@code lexer}.</p>
-LexerIndexedCustomAction.prototype.execute = function(lexer) {
+LexerIndexedCustomAction.prototype.execute = function (lexer) {
     // assume the input stream position was properly set by the calling code
     this.action.execute(lexer);
 };
 
-LexerIndexedCustomAction.prototype.hashString = function() {
+LexerIndexedCustomAction.prototype.hashString = function () {
     return "" + this.actionType + this.offset + this.action;
 };
 
-LexerIndexedCustomAction.prototype.equals = function(other) {
+LexerIndexedCustomAction.prototype.equals = function (other) {
     if (this === other) {
         return true;
-    } else if (! (other instanceof LexerIndexedCustomAction)) {
+    } else if (!(other instanceof LexerIndexedCustomAction)) {
         return false;
     } else {
         return this.offset === other.offset && this.action === other.action;
