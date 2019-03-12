@@ -668,6 +668,11 @@ a.list-group-item, button.list-group-item {
 	width: 100%
 }
 
+.design-view-form-content .pattern-query-form-container input.name,
+.design-view-form-content .pattern-query-form-container textarea {
+    width: 100%;
+}
+
 .design-view-form-content .define-select input[type="text"].attribute-expression {
 	width: 235px;
 	margin-right: 5px;
@@ -841,9 +846,13 @@ a.list-group-item, button.list-group-item {
 
 .design-view-form-content  .jstree-clicked {
 	background: #5F5B5A;
-	color:black;
+	color:#ccc;
 	border-radius: 2px;
 	box-shadow: inset 0 0 1px #999999;
+}
+
+.design-view-form-content .jstree-rename-input {
+    background: #5F5B5A;
 }
 
 .design-view-form-content .jstree-hovered {
@@ -1099,7 +1108,7 @@ a.list-group-item, button.list-group-item {
 .design-view-form-content .define-predefined-annotations .annotation-options,
 .design-view-form-content .aggregation-form-container .store-content,
 .design-view-form-content .aggregation-form-container #store-options-div {
-	margin-left: 65px;
+	margin-left: 30px;
 }
 
 .design-view-form-content .aggregation-form-container .define-predefined-annotations,
@@ -1121,14 +1130,15 @@ a.list-group-item, button.list-group-item {
 }
 
 .design-view-form-content hr {
-	margin-top: 15px;
-	margin-right: 24px;
+	margin-top: 10px;
+	margin-bottom: 3px;
 }
 
 .design-view-form-content .define-predefined-annotations .annotation-options h3,
 .aggregation-form-container #store-options-div h3 {
 	font-size: 12px;
-	margin-left: -25px;
+    margin-bottom: 3px;
+    margin-top: 10px;
 }
 
 .join-query-form-container .post-filter-condition-content,
@@ -1204,6 +1214,14 @@ a.list-group-item, button.list-group-item {
 .selected-button{
     color: #ffffff !important;
     transition: 0.15s !important;
+}
+
+label.option-name {
+    margin-bottom: 2px;
+}
+
+.define-user-defined-annotations a.jstree-anchor {
+    cursor: text;
 }
 
 .design-view-form-content .define-user-defined-attributes .attribute,

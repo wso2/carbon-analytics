@@ -1797,8 +1797,11 @@
 
 <script id="pattern-sequence-condition-navigation-form-template" type = "text/template">
     <li class="condition-navigation">
-        <a href=".define-{{conditionId}}-source" data-toggle="tab"> {{conditionId}} </a>
-        <a class = "btn-del-condition"> <i class = "fw fw-delete"> </i></a>
+        <a href=".define-{{conditionId}}-source" data-toggle="tab"> {{conditionId}}
+            <button type="button" class="close btn-del-condition" name="delete" data-form-type="single" aria-label="Close">
+                <i class="fw fw-cancel"></i>
+            </button>
+        </a>
     </li>
 </script>
 
