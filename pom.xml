@@ -1724,7 +1724,7 @@
 
         <!--MSF4J related-->
         <msf4j.version>2.7.0</msf4j.version>
-        <msf4j.import.version.range>[2.6.2, 3.0.0)</msf4j.import.version.range>
+        <msf4j.import.version.range>[2.7.0, 3.0.0)</msf4j.import.version.range>
         <com.fasterxml.jackson.core.version>2.9.6</com.fasterxml.jackson.core.version>
         <com.fasterxml.jackson.core.version.range>[2.9.0, 2.10.0)</com.fasterxml.jackson.core.version.range>
         <io.swagger.version>1.5.16</io.swagger.version>
