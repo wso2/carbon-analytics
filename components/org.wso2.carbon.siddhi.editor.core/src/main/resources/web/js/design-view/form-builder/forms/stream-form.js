@@ -47,7 +47,7 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'jsonValidator', 'con
             var self = this;
             var id = $(element).parent().attr('id');
             var streamObject = self.configurationData.getSiddhiAppConfig().getStream(id);
-            var propertyDiv = $('<div class = "stream-form-container"> <h4>Name </h4>' +
+            var propertyDiv = $('<div class = "stream-form-container"> <label>Name </label>' +
                 '<input type="text" id="streamName" class="clearfix name">' +
                 '<label class="error-message" id="streamNameErrorMessage"> </label>' +
                 '<div id="define-attribute"></div>' + self.formUtils.buildFormButtons() +

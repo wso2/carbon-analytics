@@ -1218,7 +1218,8 @@ a.list-group-item, button.list-group-item {
 .design-view-form-content .query-output-container,
 .design-view-form-content .query-content,
 .design-view-form-content .define-user-defined-attributes,
-.design-view-form-content .order-group-by-content {
+.design-view-form-content .order-group-by-content,
+.design-view-form-content .join-source-content {
     margin-left: 20px;
 }
 
@@ -1327,6 +1328,9 @@ a.list-group-item, button.list-group-item {
 }
 
 .aggregation-form-container .min-range,
-.aggregation-form-container .max-range {
+.aggregation-form-container .max-range,
+.design-view-form-content .define-join-type,
+.design-view-form-content .aggregation-info,
+.join-query-form-container .define-source {
     margin-bottom: 10px;
 }

@@ -124,7 +124,7 @@ define(['require', 'log', 'jquery', 'lodash', 'constants'],
             var id = $(element).parent().attr('id');
             var triggerObject = self.configurationData.getSiddhiAppConfig().getTrigger(id);
 
-            var propertyDiv = $('<div class ="trigger-form-container"> <div id="define-trigger-name"> <h4>Name </h4>' +
+            var propertyDiv = $('<div class ="trigger-form-container"> <div id="define-trigger-name"> <label>Name </label>' +
                 '<input type="text" id="triggerName" class="clearfix name"> <label class="error-message" ' +
                 'id = "triggerNameErrorMessage"> </label> </div>' + self.formUtils.buildFormButtons() + '</div>' +
                 '<div class = "trigger-form-container"> <div id= "define-trigger-criteria"> </div>' +

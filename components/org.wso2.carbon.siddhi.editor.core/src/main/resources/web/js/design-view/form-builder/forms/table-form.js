@@ -48,7 +48,7 @@ define(['log', 'jquery', 'lodash', 'attribute', 'storeAnnotation', 'handlebar', 
             var id = $(element).parent().attr('id');
             var tableObject = self.configurationData.getSiddhiAppConfig().getTable(id);
 
-            var propertyDiv = $('<div class = "table-form-container table-div"> <h4> Name </h4> <input type="text" id="tableName" ' +
+            var propertyDiv = $('<div class = "table-form-container table-div"> <label> Name </label> <input type="text" id="tableName" ' +
                 'class = "clearfix name"> <label class="error-message" id="tableNameErrorMessage"> </label>' +
                 '<div id = "define-attribute"> </div>' + self.formUtils.buildFormButtons() + '</div> ' +
                 '<div class = "table-form-container store-div"> <div id = "define-store"> </div>  ' +

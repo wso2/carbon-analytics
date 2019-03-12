@@ -193,11 +193,13 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
          */
         var renderPerAndWithin = function () {
             var perDiv = '<div class="define-per-condition define-content">' +
-                '<label> Per Condition </label> <div class="per-condition-content">' +
+                '<label> <label class="mandatory-symbol"> * </label> Per Condition </label> ' +
+                '<div class="per-condition-content query-content">' +
                 '<input type="text"  class="clearfix per-condition-value per-within name">' +
                 '<label class="error-message"> </label> </div> </div>';
             var withinDiv = '<div class="define-within-condition define-content">' +
-                '<label> Within Condition </label> <div class="within-condition-content">' +
+                '<label> <label class="mandatory-symbol"> * </label> Within Condition </label> ' +
+                '<div class="within-condition-content query-content">' +
                 '<input type="text"  class="clearfix within-condition-value per-within name">' +
                 '<label class="error-message"> </label> </div> </div>';
             $('.define-aggregate-per-within-condition').append(perDiv);
