@@ -28,10 +28,10 @@ define(
         var QueryOutput = function (options) {
             /*
              Data storing structure as follows
-                type*: 'INSERT|DELETE|UPDATE|UPDATE_OR_INSERT_INTO',
-                output*: {INSERT JSON|DELETE JSON|UPDATE JSON|UPDATE-OR-INSERT JSON},
-                target*: ''
-            */
+             type*: 'INSERT|DELETE|UPDATE|UPDATE_OR_INSERT_INTO',
+             output*: {INSERT JSON|DELETE JSON|UPDATE JSON|UPDATE-OR-INSERT JSON},
+             target*: ''
+             */
             if (options !== undefined) {
                 this.type = (options.type !== undefined) ? (options.type).toUpperCase() : undefined;
                 this.output = options.output;

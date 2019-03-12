@@ -17,9 +17,9 @@
  */
 
 define(['log', 'jquery', 'lodash', 'sourceOrSinkAnnotation', 'mapAnnotation', 'payloadOrAttribute',
-    'jsonValidator', 'handlebar', 'designViewUtils', 'constants'],
+        'jsonValidator', 'handlebar', 'designViewUtils', 'constants'],
     function (log, $, _, SourceOrSinkAnnotation, MapAnnotation, PayloadOrAttribute, JSONValidator, Handlebars,
-        DesignViewUtils, Constants) {
+              DesignViewUtils, Constants) {
 
         /**
          * @class SourceForm Creates a forms to collect data from a source
@@ -53,12 +53,12 @@ define(['log', 'jquery', 'lodash', 'sourceOrSinkAnnotation', 'mapAnnotation', 'p
         };
 
         /**
-		 * @function to render the attribute-map div using handlebars
-		 * @param {Object} attributes which needs to be mapped on to the template
-		 */
+         * @function to render the attribute-map div using handlebars
+         * @param {Object} attributes which needs to be mapped on to the template
+         */
         var renderAttributeMappingContent = function (id, attributes) {
             var attributeMapFormTemplate = Handlebars.compile($('#source-sink-map-attribute-template').html());
-            var wrappedHtml = attributeMapFormTemplate({ id: id, attributes: attributes });
+            var wrappedHtml = attributeMapFormTemplate({id: id, attributes: attributes});
             $('#attribute-map-content').html(wrappedHtml);
         };
 
@@ -79,7 +79,7 @@ define(['log', 'jquery', 'lodash', 'sourceOrSinkAnnotation', 'mapAnnotation', 'p
             }
             if (attributeType === Constants.LIST) {
                 for (streamAttribute of streamAttributes) {
-                    attributes.push({ key: streamAttribute.key, value: "" });
+                    attributes.push({key: streamAttribute.key, value: ""});
                 }
                 var i = 0;
                 for (var attribute in attributeValues) {
@@ -90,7 +90,7 @@ define(['log', 'jquery', 'lodash', 'sourceOrSinkAnnotation', 'mapAnnotation', 'p
                 }
             } else if (attributeType === Constants.MAP) {
                 for (streamAttribute of streamAttributes) {
-                    attributes.push({ key: streamAttribute.key, value: "" });
+                    attributes.push({key: streamAttribute.key, value: ""});
                 }
                 for (var mappedAttribute of attributes) {
                     for (var attribute in attributeValues) {
@@ -102,7 +102,7 @@ define(['log', 'jquery', 'lodash', 'sourceOrSinkAnnotation', 'mapAnnotation', 'p
                 }
             } else {
                 for (var streamAttribute of streamAttributes) {
-                    attributes.push({ key: streamAttribute.key, value: "" });
+                    attributes.push({key: streamAttribute.key, value: ""});
                 }
             }
             return attributes;
@@ -204,7 +204,7 @@ define(['log', 'jquery', 'lodash', 'sourceOrSinkAnnotation', 'mapAnnotation', 'p
                 $('#define-map').on('change', '#map-type', function () {
                     mapperOptions = self.formUtils.getSelectedTypeParameters(this.value, predefinedSourceMaps);
                     if ((map) && (mapperType) && (mapperType.toLowerCase() == this
-                        .value.toLowerCase()) && savedMapperOptions) {
+                            .value.toLowerCase()) && savedMapperOptions) {
                         //if the selected type is same as the saved map type
                         mapperOptionsWithValues = self.formUtils.mapUserOptionValues(mapperOptions, savedMapperOptions);
                         customizedMapperOptions = self.formUtils.getCustomizedOptions(mapperOptions, savedMapperOptions);

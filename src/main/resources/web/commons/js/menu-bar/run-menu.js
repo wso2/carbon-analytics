@@ -16,7 +16,7 @@
  * under the License.
  */
 
-define(([],function (){
+define(([], function () {
     var RunMenu = {
         id: "run",
         label: "Run",
@@ -39,42 +39,42 @@ define(([],function (){
                 },
                 disabled: true
             },
-             {
-                 id: "debug",
-                 label: "Debug",
-                 command: {
-                     id: "debug",
-                     shortcuts: {
-                         mac: {
-                             key: "command+shift+d",
-                             label: "\u2318\u21E7D"
-                         },
-                         other: {
-                             key: "ctrl+shift+d",
-                             label: "Ctrl+Shift+D"
-                         }
-                     }
-                 },
-                 disabled: true
-             },
             {
-               id: "stop",
-               label: "Stop",
-               command: {
-                   id: "stop",
-                   shortcuts: {
-                       mac: {
-                           key: "command+p",
-                           label: "\u2318P"
-                       },
-                       other: {
-                           key: "ctrl+p",
-                           label: "Ctrl+P"
-                       }
-                   }
-               },
-               disabled: true
-           }
+                id: "debug",
+                label: "Debug",
+                command: {
+                    id: "debug",
+                    shortcuts: {
+                        mac: {
+                            key: "command+shift+d",
+                            label: "\u2318\u21E7D"
+                        },
+                        other: {
+                            key: "ctrl+shift+d",
+                            label: "Ctrl+Shift+D"
+                        }
+                    }
+                },
+                disabled: true
+            },
+            {
+                id: "stop",
+                label: "Stop",
+                command: {
+                    id: "stop",
+                    shortcuts: {
+                        mac: {
+                            key: "command+p",
+                            label: "\u2318P"
+                        },
+                        other: {
+                            key: "ctrl+p",
+                            label: "Ctrl+P"
+                        }
+                    }
+                },
+                disabled: true
+            }
 
         ]
 

@@ -14,89 +14,94 @@
  * limitations under the License.
  */
 
-var log4javascript_stub = (function() {
-	var log4javascript;
+var log4javascript_stub = (function () {
+    var log4javascript;
 
-	function ff() {
-		return function() {};
-	}
-	function copy(obj, props) {
-		for (var i in props) {
-			obj[i] = props[i];
-		}
-	}
-	var f = ff();
+    function ff() {
+        return function () {
+        };
+    }
 
-	// Loggers
-	var Logger = ff();
-	copy(Logger.prototype, {
-		setLevel: f,
-		getLevel: f,
-		trace: f,
-		debug: f,
-		info: f,
-		warn: f,
-		error: f,
-		fatal: f,
-		isEnabledFor: f,
-		isTraceEnabled: f,
-		isDebugEnabled: f,
-		isInfoEnabled: f,
-		isWarnEnabled: f,
-		isErrorEnabled: f,
-		isFatalEnabled: f
-	});
+    function copy(obj, props) {
+        for (var i in props) {
+            obj[i] = props[i];
+        }
+    }
 
-	var getLogger = function() {
-		return new Logger();
-	};
+    var f = ff();
 
-	function Log4JavaScript() {}
-	log4javascript = new Log4JavaScript();
+    // Loggers
+    var Logger = ff();
+    copy(Logger.prototype, {
+        setLevel: f,
+        getLevel: f,
+        trace: f,
+        debug: f,
+        info: f,
+        warn: f,
+        error: f,
+        fatal: f,
+        isEnabledFor: f,
+        isTraceEnabled: f,
+        isDebugEnabled: f,
+        isInfoEnabled: f,
+        isWarnEnabled: f,
+        isErrorEnabled: f,
+        isFatalEnabled: f
+    });
 
-	log4javascript = {
-		isStub: true,
-		version: "1.4.13",
-		edition: "log4javascript_lite",
-		setEnabled: f,
-		isEnabled: f,
-		setShowStackTraces: f,
-		getDefaultLogger: getLogger,
-		getLogger: getLogger,
-		getNullLogger: getLogger,
-		Level: ff(),
-		LoggingEvent: ff(),
-		Appender: ff()
-	};
+    var getLogger = function () {
+        return new Logger();
+    };
 
-	// LoggingEvents
-	log4javascript.LoggingEvent.prototype = {
-		getThrowableStrRep: f,
-		getCombinedMessages: f
-	};
+    function Log4JavaScript() {
+    }
 
-	// Levels
-	log4javascript.Level.prototype = {
-		toString: f,
-		equals: f,
-		isGreaterOrEqual: f
-	};
-	var level = new log4javascript.Level();
-	copy(log4javascript.Level, {
-		ALL: level,
-		TRACE: level,
-		DEBUG: level,
-		INFO: level,
-		WARN: level,
-		ERROR: level,
-		FATAL: level,
-		OFF: level
-	});
+    log4javascript = new Log4JavaScript();
 
-	log4javascript.Appender.prototype.append = f;
+    log4javascript = {
+        isStub: true,
+        version: "1.4.13",
+        edition: "log4javascript_lite",
+        setEnabled: f,
+        isEnabled: f,
+        setShowStackTraces: f,
+        getDefaultLogger: getLogger,
+        getLogger: getLogger,
+        getNullLogger: getLogger,
+        Level: ff(),
+        LoggingEvent: ff(),
+        Appender: ff()
+    };
 
-	return log4javascript;
+    // LoggingEvents
+    log4javascript.LoggingEvent.prototype = {
+        getThrowableStrRep: f,
+        getCombinedMessages: f
+    };
+
+    // Levels
+    log4javascript.Level.prototype = {
+        toString: f,
+        equals: f,
+        isGreaterOrEqual: f
+    };
+    var level = new log4javascript.Level();
+    copy(log4javascript.Level, {
+        ALL: level,
+        TRACE: level,
+        DEBUG: level,
+        INFO: level,
+        WARN: level,
+        ERROR: level,
+        FATAL: level,
+        OFF: level
+    });
+
+    log4javascript.Appender.prototype.append = f;
+
+    return log4javascript;
 })();
 if (typeof window.log4javascript == "undefined") {
-	var log4javascript = log4javascript_stub;
+    var log4javascript = log4javascript_stub;
 }

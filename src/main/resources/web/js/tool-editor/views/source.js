@@ -29,7 +29,7 @@ define(['require', 'log', 'lodash', 'jquery', 'event_channel', 'app/source-edito
          */
         var SourceView = function (args) {
             this._options = args;
-            if(!_.has(args, 'sourceContainer')){
+            if (!_.has(args, 'sourceContainer')) {
                 log.error('container is not specified for rendering source view.')
             }
             this._container = _.get(args, 'sourceContainer');
@@ -51,15 +51,15 @@ define(['require', 'log', 'lodash', 'jquery', 'event_channel', 'app/source-edito
             var self = this;
             $(this._container).show();
             var editorFontSize = (this._storage.get("pref:sourceViewFontSize") != null) ?
-                this._storage.get("pref:sourceViewFontSize"): _.get(this._options, 'font_size');
+                this._storage.get("pref:sourceViewFontSize") : _.get(this._options, 'font_size');
             var editorTheme = (this._storage.get("pref:sourceViewTheme") != null) ? this._storage.get
-            ("pref:sourceViewTheme"): _.get(this._options, 'theme');
+            ("pref:sourceViewTheme") : _.get(this._options, 'theme');
 
             self._editor.setFontSize(editorFontSize);
             self._editor.setTheme(editorTheme);
 
-            this._editor.on("change", function(event) {
-                if(!self._inSilentMode){
+            this._editor.on("change", function (event) {
+                if (!self._inSilentMode) {
                     var changeEvent = {
                         type: "source-modified",
                         title: "Modify source",
@@ -95,26 +95,26 @@ define(['require', 'log', 'lodash', 'jquery', 'event_channel', 'app/source-edito
          * @param {String} content - content for the editor.
          *
          */
-        SourceView.prototype.setContent = function(content){
+        SourceView.prototype.setContent = function (content) {
             this._inSilentMode = true;
             this._editor.session.setValue(content);
             this._inSilentMode = false;
             this.markClean();
         };
 
-        SourceView.prototype.getContent = function(){
+        SourceView.prototype.getContent = function () {
             return this._editor.session.getValue();
         };
 
-        SourceView.prototype.getEditor = function(){
+        SourceView.prototype.getEditor = function () {
             return this._editor;
         };
 
-        SourceView.prototype.getDebugger = function(){
+        SourceView.prototype.getDebugger = function () {
             return this._mainEditor.getDebugger();
         };
 
-        SourceView.prototype.getRawExtensions = function (){
+        SourceView.prototype.getRawExtensions = function () {
             return this._mainEditor.getRawExtensions();
         };
 
@@ -130,59 +130,59 @@ define(['require', 'log', 'lodash', 'jquery', 'event_channel', 'app/source-edito
          * @param command.shortcuts.other {Object}
          * @param command.shortcuts.other.key {String} key combination for other platforms eg. 'Ctrl+N'
          */
-        SourceView.prototype.bindCommand = function(command){
+        SourceView.prototype.bindCommand = function (command) {
             var id = command.id,
                 hasShortcut = _.has(command, 'shortcuts'),
                 self = this;
-            if(hasShortcut){
+            if (hasShortcut) {
                 var macShortcut = _.replace(command.shortcuts.mac.key, '+', "-"),
                     winShortcut = _.replace(command.shortcuts.other.key, '+', "-");
                 this.getEditor().commands.addCommand({
                     name: id,
                     bindKey: {win: winShortcut, mac: macShortcut},
-                    exec: function(editor) {
+                    exec: function (editor) {
                         self.trigger('dispatch-command', id);
                     }
                 });
             }
         };
 
-        SourceView.prototype.show = function(){
+        SourceView.prototype.show = function () {
             $(this._container).show();
         };
 
-        SourceView.prototype.hide = function(){
+        SourceView.prototype.hide = function () {
             $(this._container).hide();
         };
 
-        SourceView.prototype.isVisible = function(){
-            return  $("#" + this._container).is(':visible');
+        SourceView.prototype.isVisible = function () {
+            return $("#" + this._container).is(':visible');
         };
 
         SourceView.prototype.format = function (doSilently) {
-            if(doSilently){
+            if (doSilently) {
                 this._inSilentMode = true;
             }
             beautify.beautify(this._editor.session);
-            if(doSilently){
+            if (doSilently) {
                 this._inSilentMode = false;
                 this.markClean();
             }
         };
 
-        SourceView.prototype.isClean = function(){
+        SourceView.prototype.isClean = function () {
             return this._editor.getSession().getUndoManager().isClean();
         };
 
-        SourceView.prototype.undo = function(){
+        SourceView.prototype.undo = function () {
             return this._editor.getSession().getUndoManager().undo();
         };
 
-        SourceView.prototype.redo = function(){
+        SourceView.prototype.redo = function () {
             return this._editor.getSession().getUndoManager().redo();
         };
 
-        SourceView.prototype.markClean = function(){
+        SourceView.prototype.markClean = function () {
             this._editor.getSession().getUndoManager().markClean();
         };
 

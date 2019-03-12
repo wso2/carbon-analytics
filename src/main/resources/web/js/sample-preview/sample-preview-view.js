@@ -16,9 +16,9 @@
  * under the License.
  */
 
-define(['require', 'jquery', 'lodash','log'], function (require, $,  _,log) {
+define(['require', 'jquery', 'lodash', 'log'], function (require, $, _, log) {
 
-    var ServicePreviewView = function(config){
+    var ServicePreviewView = function (config) {
         this._config = config;
     };
 
@@ -38,7 +38,7 @@ define(['require', 'jquery', 'lodash','log'], function (require, $,  _,log) {
         this._sampleName = config.sampleName;
         this._content = config.content;
         var regexToExtractAppDescription = new RegExp("@[Aa][Pp][Pp]:[Dd][Ee][Ss][Cc][Rr][Ii][Pp][Tt][Ii][Oo]" +
-            "[Nn]\\(['|\"](.*?)['|\"]\\)","ig");
+            "[Nn]\\(['|\"](.*?)['|\"]\\)", "ig");
 
         //create the parent for drawn svg
         var previewLi = $("<li class='col-md-6 col-lg-4'></li>");

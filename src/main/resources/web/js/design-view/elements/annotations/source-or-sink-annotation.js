@@ -28,28 +28,28 @@ define(
         var SourceOrSinkAnnotation = function (options) {
             /*
              Data storing structure as follows
-                id*: ‘’,
-                previousCommentSegment:'',
-                connectedElementName*: '',
-                annotationType*: 'SOURCE | SINK',
-                type*: ‘’,
-                options: ['option1', 'option2=value2',...],
-                map: {
-                    type*: ‘’,
-                    options: {Key-Value Pair JSON},
-                    payloadOrAttribute: {
-                        annotationType: 'PAYLOAD | ATTRIBUTES',
-                        type*: ‘MAP’,
-                        value*: {Key-Value Pair JSON}
-                    }
-                    << or >>
-                    payloadOrAttribute: {
-                        annotationType: 'PAYLOAD | ATTRIBUTES',
-                        type*: ‘LIST’,
-                        value*: ['value1',...]
-                    }
-                }
-            */
+             id*: ‘’,
+             previousCommentSegment:'',
+             connectedElementName*: '',
+             annotationType*: 'SOURCE | SINK',
+             type*: ‘’,
+             options: ['option1', 'option2=value2',...],
+             map: {
+             type*: ‘’,
+             options: {Key-Value Pair JSON},
+             payloadOrAttribute: {
+             annotationType: 'PAYLOAD | ATTRIBUTES',
+             type*: ‘MAP’,
+             value*: {Key-Value Pair JSON}
+             }
+             << or >>
+             payloadOrAttribute: {
+             annotationType: 'PAYLOAD | ATTRIBUTES',
+             type*: ‘LIST’,
+             value*: ['value1',...]
+             }
+             }
+             */
             if (options !== undefined) {
                 this.id = options.id;
                 this.previousCommentSegment = options.previousCommentSegment;

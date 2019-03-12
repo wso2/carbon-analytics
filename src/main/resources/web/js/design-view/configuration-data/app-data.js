@@ -200,9 +200,9 @@ define(['require', 'elementUtils', 'lodash'],
             return this.siddhiAppName;
         };
 
-         AppData.prototype.getSiddhiAppDescription = function () {
-                    return this.siddhiAppDescription;
-         };
+        AppData.prototype.getSiddhiAppDescription = function () {
+            return this.siddhiAppDescription;
+        };
 
         AppData.prototype.getStream = function (streamId) {
             var returnedElement = ElementUtils.prototype.getElement(this.streamList, streamId);
@@ -343,8 +343,8 @@ define(['require', 'elementUtils', 'lodash'],
         };
 
         AppData.prototype.setSiddhiAppDescription = function (siddhiAppDescription) {
-                    this.siddhiAppDescription = siddhiAppDescription;
-         };
+            this.siddhiAppDescription = siddhiAppDescription;
+        };
 
         AppData.prototype.setAppAnnotationList = function (appAnnotationList) {
             this.appAnnotationList = appAnnotationList;

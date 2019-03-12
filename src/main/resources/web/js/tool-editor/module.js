@@ -16,8 +16,8 @@
  * under the License.
  */
 define(['require', 'app/tool-editor/views/module'],
-    function (require,views) {
-        return  {
+    function (require, views) {
+        return {
             Views: views
         }
     });

@@ -82,7 +82,7 @@ public class LocalFSWorkspace implements Workspace {
         String location = "";
         if (path.equals("")) {
             location = (Paths.get(Constants.RUNTIME_PATH,
-                                  Constants.DIRECTORY_DEPLOYMENT)).toString();
+                    Constants.DIRECTORY_DEPLOYMENT)).toString();
         }
         return listWorkspaceDirectoryInPath(location);
     }
@@ -151,9 +151,9 @@ public class LocalFSWorkspace implements Workspace {
 
     @Override
     public void log(String loggerID, String timestamp, String level,
-                    String URL, String message, String layout) throws IOException {
+                    String url, String message, String layout) throws IOException {
         Logger frontEndLog = LoggerFactory.getLogger(loggerID);
-        String logMessage = "client-timestamp: " + timestamp + ", page: " + URL + ", message: " + message;
+        String logMessage = "client-timestamp: " + timestamp + ", page: " + url + ", message: " + message;
         switch (level) {
             case "TRACE":
                 frontEndLog.trace(logMessage);
@@ -183,7 +183,7 @@ public class LocalFSWorkspace implements Workspace {
         JsonObject rootObj = new JsonObject();
         Path path = root.getFileName();
         rootObj.addProperty("text", path != null ?
-                                    path.toString() : root.toString());
+                path.toString() : root.toString());
         rootObj.addProperty("id", Paths.get(Constants.CARBON_HOME).relativize(root).toString());
         if (Files.isDirectory(root) && checkChildren) {
             rootObj.addProperty("type", "folder");

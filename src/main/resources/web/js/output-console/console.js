@@ -15,7 +15,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-define(['log', 'backbone','lodash', 'jquery'], function (log, Backbone, _, $) {
+define(['log', 'backbone', 'lodash', 'jquery'], function (log, Backbone, _, $) {
 
     var Console = Backbone.View.extend(
         /** @lends Console.prototype */
@@ -29,13 +29,13 @@ define(['log', 'backbone','lodash', 'jquery'], function (log, Backbone, _, $) {
 
                 _.set(this, 'id', this.cid);
                 _.set(this, '_title', _.get(options, 'title'));
-                if (!_.has(options, 'template')){
+                if (!_.has(options, 'template')) {
                     errMsg = 'unable to find config template ' + _.toString(options);
                     log.error(errMsg);
                     throw errMsg;
                 }
                 template = $(_.get(options, 'template'));
-                if(!template.length > 0){
+                if (!template.length > 0) {
                     errMsg = 'unable to find template with id ' + _.get(options, 'template');
                     log.error(errMsg);
                     throw errMsg;
@@ -49,7 +49,7 @@ define(['log', 'backbone','lodash', 'jquery'], function (log, Backbone, _, $) {
                 this.app = _.get(options, 'application');
                 this._appName = _.get(options, 'appName') + ".siddhi";
 
-                if (_.has(options, 'parent')){
+                if (_.has(options, 'parent')) {
                     this.setParent(_.get(options, 'parent'));
                 }
 
@@ -58,14 +58,14 @@ define(['log', 'backbone','lodash', 'jquery'], function (log, Backbone, _, $) {
                 _.set(options, 'parent-container', this.getParent().getConsoleContainer());
                 _.set(options, 'cid', this.cid);
 
-                if(this._type === "CONSOLE"){
+                if (this._type === "CONSOLE") {
                     console = this._template.children('div').clone();
-                }else if(this._type === "DEBUG"){
+                } else if (this._type === "DEBUG") {
                     var debugManager = this.app.tabController.activeTab.getSiddhiFileEditor().getDebuggerWrapper();
                     debugManager.initContainerOpts(options);
                     debugManager.render();
                     console = debugManager.getConsole();
-                } else if(this._type === "FORM"){
+                } else if (this._type === "FORM") {
                     var formTemplate = $("#form-template");
                     console = formTemplate.children('div').clone();
                 }
@@ -77,71 +77,71 @@ define(['log', 'backbone','lodash', 'jquery'], function (log, Backbone, _, $) {
                 this.$el = console;
                 this._contentContainer = console;
             },
-            setActive: function(isActive){
-                if(_.isBoolean(isActive)){
+            setActive: function (isActive) {
+                if (_.isBoolean(isActive)) {
                     this._isActive = isActive;
-                    if (isActive){
+                    if (isActive) {
                         this.$el.addClass(_.get(this.options, 'cssClass.console_active'));
                     } else {
                         this.$el.removeClass(_.get(this.options, 'cssClass.console_active'));
                     }
                 }
             },
-            isActive: function(){
+            isActive: function () {
                 return this._isActive;
             },
-            setHeader: function(header){
+            setHeader: function (header) {
                 this._consoleHeader = header;
             },
-            getHeader: function(){
+            getHeader: function () {
                 return this._consoleHeader;
             },
-            getContentContainer: function(){
+            getContentContainer: function () {
                 return this.$el.get(0);
             },
-            getParent: function(){
+            getParent: function () {
                 return this._parentConsoleList;
             },
-            setParent: function(parentConsoleList){
+            setParent: function (parentConsoleList) {
                 this._parentConsoleList = parentConsoleList;
             },
-            getTitle: function(){
+            getTitle: function () {
                 return _.isNil(this._title) ? "untitled" : this._title;
             },
-            setTitle: function(title){
+            setTitle: function (title) {
                 this._title = title;
                 this.trigger('title-changed', title);
             },
-            getType: function(){
+            getType: function () {
                 return _.isNil(this._type) ? "untitled" : this._type;
             },
-            setType: function(type){
+            setType: function (type) {
                 this._type = type;
             },
-            addRunningPlanToList: function(executionPlan){
+            addRunningPlanToList: function (executionPlan) {
                 this._startedExecutionPlans.push(executionPlan);
             },
-            hide: function(){
-                if(this._consoleHeader.hasClass('active')){
+            hide: function () {
+                if (this._consoleHeader.hasClass('active')) {
                     this._consoleHeader.removeClass('active');
                 }
 
                 this.$el.removeClass('active');
-                this._consoleHeader.css('display','none');
+                this._consoleHeader.css('display', 'none');
             },
-            show: function(makeActive){
+            show: function (makeActive) {
 
-                if(makeActive){
+                if (makeActive) {
                     this._consoleHeader.addClass('active');
                     this.$el.addClass('active');
-                }else {
-                    if(this._consoleHeader.hasClass('active')){
+                } else {
+                    if (this._consoleHeader.hasClass('active')) {
                         this._consoleHeader.removeClass('active');
                         this.$el.removeClass('active');
                     }
                 }
 
-                this._consoleHeader.css('display','block');
+                this._consoleHeader.css('display', 'block');
             }
         });
 

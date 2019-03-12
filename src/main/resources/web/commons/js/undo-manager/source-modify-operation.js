@@ -25,7 +25,7 @@ define(['lodash', 'undoable_operation'],
          * @param args
          * @constructor
          */
-        var SourceModifyOperation = function(args){
+        var SourceModifyOperation = function (args) {
             UndoableOperation.call(this, args);
         };
 
@@ -33,23 +33,23 @@ define(['lodash', 'undoable_operation'],
         SourceModifyOperation.prototype.constructor = SourceModifyOperation;
 
 
-        SourceModifyOperation.prototype.undo = function(){
-            if(this.canUndo()){
+        SourceModifyOperation.prototype.undo = function () {
+            if (this.canUndo()) {
                 this.getEditor().getSourceView().undo();
             }
         };
 
-        SourceModifyOperation.prototype.redo = function(){
-            if(this.canRedo()){
+        SourceModifyOperation.prototype.redo = function () {
+            if (this.canRedo()) {
                 this.getEditor().getSourceView().redo();
             }
         };
 
-        SourceModifyOperation.prototype.canUndo = function(){
-            return  this.getEditor().isInSourceView();
+        SourceModifyOperation.prototype.canUndo = function () {
+            return this.getEditor().isInSourceView();
         };
 
-        SourceModifyOperation.prototype.canUndo = function(){
+        SourceModifyOperation.prototype.canUndo = function () {
             return this.getEditor().isInSourceView();
         };
 

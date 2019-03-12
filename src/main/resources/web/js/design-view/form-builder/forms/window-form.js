@@ -73,9 +73,12 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'handlebar', 'constan
                         parameterValue = parameterValue.slice(1, parameterValue.length - 1)
                     }
                     parameters.push({
-                        key: predefinedParameters[i].name, value: parameterValue, description:
-                            predefinedParameters[i].description, optional: predefinedParameters[i].optional,
-                        defaultValue: predefinedParameters[i].defaultValue, timeStamp: timeStamp
+                        key: predefinedParameters[i].name,
+                        value: parameterValue,
+                        description: predefinedParameters[i].description,
+                        optional: predefinedParameters[i].optional,
+                        defaultValue: predefinedParameters[i].defaultValue,
+                        timeStamp: timeStamp
                     });
                 } else {
                     parameters.push({
@@ -96,7 +99,7 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'handlebar', 'constan
          * @param {Object} functionParametersWithValues array to hold the parameter of the mapped value
          */
         var callToMapParameters = function (selectedType, functionParameters, savedParameterValues,
-            functionParametersWithValues) {
+                                            functionParametersWithValues) {
             if (selectedType === Constants.SORT) {
                 functionParametersWithValues = mapParameterValuesSort(functionParameters, savedParameterValues);
             } else if (selectedType === Constants.FREQUENT) {
@@ -133,9 +136,10 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'handlebar', 'constan
         var buildParameterValues = function (self, parameterValues, predefinedParameters) {
             $('.parameter').each(function () {
                 if ($(this).find('.parameter-name').hasClass('mandatory-parameter') || ($(this).find('.parameter-name')
-                    .hasClass('optional-parameter') && $(this).find('.parameter-checkbox').is(":checked"))) {
+                        .hasClass('optional-parameter') && $(this).find('.parameter-checkbox').is(":checked"))) {
                     var parameterValue = $(this).find('.parameter-value').val().trim();
-                    var parameterName = $(this).find('.parameter-name').text().trim();;
+                    var parameterName = $(this).find('.parameter-name').text().trim();
+                    ;
                     var predefinedParameter = self.formUtils.getObject(parameterName, predefinedParameters);
                     if (predefinedParameter.type.includes("STRING")) {
                         parameterValue = "'" + parameterValue + "'";
@@ -168,7 +172,7 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'handlebar', 'constan
         var buildParameterValuesFrequentOrLossyFrequent = function (self, parameterValues, predefinedParameters) {
             $('.parameter').each(function () {
                 if ($(this).find('.parameter-name').hasClass('mandatory-parameter') || ($(this).find('.parameter-name')
-                    .hasClass('optional-parameter') && $(this).find('.parameter-checkbox').is(":checked"))) {
+                        .hasClass('optional-parameter') && $(this).find('.parameter-checkbox').is(":checked"))) {
                     var parameterValue = $(this).find('.parameter-value').val().trim();
                     var parameterName = $(this).find('.parameter-name').text().trim();
                     var predefinedParameter = self.formUtils.getObject(parameterName, predefinedParameters);
@@ -192,7 +196,8 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'handlebar', 'constan
         var buildParameterValuesSort = function (self, parameterValues, predefinedParameters) {
             $('.parameter').each(function () {
                 var parameterValue = $(this).find('.parameter-value').val().trim();
-                var parameterName = $(this).find('.parameter-name').text().trim();;
+                var parameterName = $(this).find('.parameter-name').text().trim();
+                ;
                 var predefinedParameter = self.formUtils.getObject(parameterName, predefinedParameters);
                 if (parameterName === "window.length") {
                     parameterValues.push(parameterValue)
@@ -219,7 +224,8 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'handlebar', 'constan
             var isError = false;
             $('.parameter').each(function () {
                 var parameterValue = $(this).find('.parameter-value').val().trim();
-                var parameterName = $(this).find('.parameter-name').text().trim();;
+                var parameterName = $(this).find('.parameter-name').text().trim();
+                ;
                 var predefinedParameter = self.formUtils.getObject(parameterName, predefinedParameters);
                 if (!predefinedParameter.optional) {
                     if (!checkParameterValue(self, parameterValue, predefinedParameter, this)) {
@@ -279,8 +285,10 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'handlebar', 'constan
             //add the two mandatory params of the saved values to the predefined param objects
             for (var i = 0; i <= 1; i++) {
                 parameters.push({
-                    key: predefinedParameters[i].name, value: savedParameterValues[i], description:
-                        predefinedParameters[i].description, optional: predefinedParameters[i].optional,
+                    key: predefinedParameters[i].name,
+                    value: savedParameterValues[i],
+                    description: predefinedParameters[i].description,
+                    optional: predefinedParameters[i].optional,
                     defaultValue: predefinedParameters[i].defaultValue
                 });
             }
@@ -292,8 +300,10 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'handlebar', 'constan
             attributes = attributes.substring(0, attributes.length - 2);
             //add the attributes to the third obj of the predefined parameter
             parameters.push({
-                key: predefinedParameters[2].name, value: attributes, description:
-                    predefinedParameters[2].description, optional: predefinedParameters[2].optional,
+                key: predefinedParameters[2].name,
+                value: attributes,
+                description: predefinedParameters[2].description,
+                optional: predefinedParameters[2].optional,
                 defaultValue: predefinedParameters[2].defaultValue
             });
             return parameters;
@@ -310,8 +320,10 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'handlebar', 'constan
             var attributes = "";
             //add the first saved param to predefined param's first index (event.count)
             parameters.push({
-                key: predefinedParameters[0].name, value: savedParameterValues[0], description:
-                    predefinedParameters[0].description, optional: predefinedParameters[0].optional,
+                key: predefinedParameters[0].name,
+                value: savedParameterValues[0],
+                description: predefinedParameters[0].description,
+                optional: predefinedParameters[0].optional,
                 defaultValue: predefinedParameters[0].defaultValue
             });
             // add the attributes
@@ -322,8 +334,10 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'handlebar', 'constan
             attributes = attributes.substring(0, attributes.length - 2);
             //add the attributes to second obj of the predefined parameter
             parameters.push({
-                key: predefinedParameters[1].name, value: attributes, description:
-                    predefinedParameters[1].description, optional: predefinedParameters[1].optional,
+                key: predefinedParameters[1].name,
+                value: attributes,
+                description: predefinedParameters[1].description,
+                optional: predefinedParameters[1].optional,
                 defaultValue: predefinedParameters[1].defaultValue
             });
             return parameters;
@@ -345,8 +359,10 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'handlebar', 'constan
             }
             //add the first saved param to predefined param's first index (window.length)
             parameters.push({
-                key: predefinedParameters[0].name, value: length, description:
-                    predefinedParameters[0].description, optional: predefinedParameters[0].optional,
+                key: predefinedParameters[0].name,
+                value: length,
+                description: predefinedParameters[0].description,
+                optional: predefinedParameters[0].optional,
                 defaultValue: predefinedParameters[0].defaultValue
             });
             // to determine the attributes and order
@@ -366,14 +382,18 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'handlebar', 'constan
             }
             //add the attributes to second obj of the predefined parameter
             parameters.push({
-                key: predefinedParameters[1].name, value: attributes, description:
-                    predefinedParameters[1].description, optional: predefinedParameters[1].optional,
+                key: predefinedParameters[1].name,
+                value: attributes,
+                description: predefinedParameters[1].description,
+                optional: predefinedParameters[1].optional,
                 defaultValue: predefinedParameters[1].defaultValue
             });
             //add the order to the third obj of the predefined parameter
             parameters.push({
-                key: predefinedParameters[2].name, value: order, description:
-                    predefinedParameters[2].description, optional: predefinedParameters[2].optional,
+                key: predefinedParameters[2].name,
+                value: order,
+                description: predefinedParameters[2].description,
+                optional: predefinedParameters[2].optional,
                 defaultValue: predefinedParameters[2].defaultValue
             });
             return parameters;
@@ -451,14 +471,14 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'handlebar', 'constan
             self.formUtils.addEventListenersForAttributeDiv();
 
             var windowFunctionNameTemplate = Handlebars.compile($('#type-selection-form-template').html());
-            var wrappedHtml = windowFunctionNameTemplate({ id: Constants.WINDOW, types: predefinedWindowFunctionNames });
+            var wrappedHtml = windowFunctionNameTemplate({id: Constants.WINDOW, types: predefinedWindowFunctionNames});
             $('#defineFunctionName').html(wrappedHtml);
 
             var name = clickedElement.getName();
             renderOutputEventTypes();
             if (!name) {
                 //if window form is freshly opened[unedited window object]
-                var attributes = [{ name: "" }];
+                var attributes = [{name: ""}];
                 self.formUtils.renderAttributeTemplate(attributes)
                 selectedWindowType = $('#defineFunctionName #window-type').val();
                 functionParameters = self.formUtils.getSelectedTypeParameters(selectedWindowType,
@@ -590,7 +610,7 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'handlebar', 'constan
                         var nameValue = $(this).find('.attr-name').val().trim();
                         var typeValue = $(this).find('.attr-type').val();
                         if (nameValue != "") {
-                            var attributeObject = new Attribute({ name: nameValue, type: typeValue });
+                            var attributeObject = new Attribute({name: nameValue, type: typeValue});
                             clickedElement.addAttribute(attributeObject)
                         }
                     });

@@ -78,27 +78,27 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
         };
 
 
-        DesignGrid.prototype.addSelectedElements = function(element){
+        DesignGrid.prototype.addSelectedElements = function (element) {
             this.selectedElements.push(element);
         };
 
-        DesignGrid.prototype.isSelectedElements = function(element){
-            if (this.selectedElements.includes(element)){
+        DesignGrid.prototype.isSelectedElements = function (element) {
+            if (this.selectedElements.includes(element)) {
                 return true;
-            } else{
+            } else {
                 return false;
             }
         };
 
-        DesignGrid.prototype.getSelectedElement = function(){
+        DesignGrid.prototype.getSelectedElement = function () {
             return this.selectedElements;
         };
 
-        DesignGrid.prototype.resetSelectedElement = function(){
-           this.selectedElements = [];
+        DesignGrid.prototype.resetSelectedElement = function () {
+            this.selectedElements = [];
         };
 
-        DesignGrid.prototype.removeFromSelectedElements = function(element){
+        DesignGrid.prototype.removeFromSelectedElements = function (element) {
             for (var i = 0; i < this.selectedElements.length; i++) {
                 if (this.selectedElements[i] == element) {
                     this.selectedElements.splice(i, 1);
@@ -291,10 +291,10 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
                     var target = connection.targetId;
                     var targetId = target.substr(0, target.indexOf('-'));
                     /*
-                    * There is no 'in' or 'out' clause(for other connection they will have like 'view74_element_6-out')
-                    * section in partition connection point. So once we substr with '-' we don't get any value. So we
-                    * explicitly set the targetId.
-                    * */
+                     * There is no 'in' or 'out' clause(for other connection they will have like 'view74_element_6-out')
+                     * section in partition connection point. So once we substr with '-' we don't get any value. So we
+                     * explicitly set the targetId.
+                     * */
                     if (targetId === '') {
                         targetId = target;
                     }
@@ -303,10 +303,10 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
                     var source = connection.sourceId;
                     var sourceId = source.substr(0, source.indexOf('-'));
                     /*
-                    * There is no 'in' or 'out' clause(for other connection they will have like 'view74_element_6-out')
-                    * section in partition connection point. So once we substr with '-' we don't get any value. So we
-                    * explicitly set the sourceId.
-                    * */
+                     * There is no 'in' or 'out' clause(for other connection they will have like 'view74_element_6-out')
+                     * section in partition connection point. So once we substr with '-' we don't get any value. So we
+                     * explicitly set the sourceId.
+                     * */
                     if (sourceId === '') {
                         sourceId = source;
                     }
@@ -622,11 +622,11 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
                     var targetId = target.substr(0, target.indexOf('-'));
                     var targetType;
                     /*
-                    * There is no 'in' or 'out' clause(for other connection they will have like 'view74_element_6-out')
-                    * section in partition connection point. So once we substr with '-' we don't get any value. So we
-                    * explicitly set the targetId.  Simply if targetId is '' that means this connection is related to a
-                    * partition.
-                    * */
+                     * There is no 'in' or 'out' clause(for other connection they will have like 'view74_element_6-out')
+                     * section in partition connection point. So once we substr with '-' we don't get any value. So we
+                     * explicitly set the targetId.  Simply if targetId is '' that means this connection is related to a
+                     * partition.
+                     * */
                     if (targetId === '') {
                         targetId = target;
                         targetType = 'PARTITION';
@@ -646,11 +646,11 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
                     var sourceId = source.substr(0, source.indexOf('-'));
                     var sourceType;
                     /*
-                    * There is no 'in' or 'out' clause(for other connection they will have like 'view74_element_6-out')
-                    * section in partition connection point. So once we substr with '-' we don't get any value. So we
-                    * explicitly set the sourceId.  Simply if sourceId is '' that means this connection is related to a
-                    * partition.
-                    * */
+                     * There is no 'in' or 'out' clause(for other connection they will have like 'view74_element_6-out')
+                     * section in partition connection point. So once we substr with '-' we don't get any value. So we
+                     * explicitly set the sourceId.  Simply if sourceId is '' that means this connection is related to a
+                     * partition.
+                     * */
                     if (sourceId === '') {
                         sourceId = source;
                         sourceType = 'PARTITION';
@@ -697,12 +697,12 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
                             = self.configurationData.getSiddhiAppConfig().getStream(sourceId).getName();
 
                         /*
-                        * check whether the stream is already connected to partition. This validation is done in the
-                        * checkConnectionValidityBeforeElementDrop() function. But that beforedrop event is triggered
-                        * only when user adds connection. It doesn't fire when we programmatically create connections
-                        * (in this case rendering the design view from code). So we need to do the validation here
-                        * again.
-                        * */
+                         * check whether the stream is already connected to partition. This validation is done in the
+                         * checkConnectionValidityBeforeElementDrop() function. But that beforedrop event is triggered
+                         * only when user adds connection. It doesn't fire when we programmatically create connections
+                         * (in this case rendering the design view from code). So we need to do the validation here
+                         * again.
+                         * */
                         var isStreamConnected = partition.checkOuterStreamIsAlreadyConnected(connectedElementName);
                         if (!isStreamConnected) {
                             var partitionWithOptions = {};
@@ -766,10 +766,10 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
                         || sourceElement.hasClass(constants.PARTITION_CONNECTION_POINT)) {
 
                         /*
-                        * Partition connection point represents a stream connection point. so it holds a reference for
-                        * the stream.So that in here we replaces the source element with the actual stream element if a
-                        * connection partition connection pint is found.
-                        * */
+                         * Partition connection point represents a stream connection point. so it holds a reference for
+                         * the stream.So that in here we replaces the source element with the actual stream element if a
+                         * connection partition connection pint is found.
+                         * */
                         if (sourceElement.hasClass(constants.PARTITION_CONNECTION_POINT)) {
                             var sourceConnection = self.jsPlumbInstance.getConnections({target: sourceId});
                             var sourceConnectionId = sourceConnection[0].sourceId;
@@ -803,8 +803,8 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
                         if ((sourceElement.hasClass(constants.STREAM) || sourceElement.hasClass(constants.WINDOW)
                             || sourceElement.hasClass(constants.TRIGGER))
                             && (targetElement.hasClass(constants.PROJECTION) || targetElement.hasClass(constants.FILTER)
-                                || targetElement.hasClass(constants.WINDOW_QUERY)
-                                || targetElement.hasClass(constants.FUNCTION_QUERY))) {
+                            || targetElement.hasClass(constants.WINDOW_QUERY)
+                            || targetElement.hasClass(constants.FUNCTION_QUERY))) {
                             model = self.configurationData.getSiddhiAppConfig()
                                 .getWindowFilterProjectionQuery(targetId);
                             var type;
@@ -1007,7 +1007,7 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
                         $('.overlayed-container ').on('click', function (e) {
                             $('[data-toggle="popover"]').each(function () {
                                 if (!$(this).is(e.target) && $(this).has(e.target).length === 0 && $('.popover').has(
-                                    e.target).length === 0) {
+                                        e.target).length === 0) {
                                     $(this).popover('hide');
                                     $(".overlayed-container ").fadeOut(200);
                                     close_icon_overlay.setVisible(false);
@@ -1050,15 +1050,15 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
                     var target = connection.targetId;
                     var targetId = target.substr(0, target.indexOf('-'));
                     /*
-                    * There is no 'in' or 'out' clause(for other connection they will have like 'view74_element_6-out')
-                    * section in partition connection point. So once we substr with '-' we don't get any value. So we
-                    * explicitly set the targetId.  Simply if targetId is '' that means this connection is related to a
-                    * partition.
-                    * */
+                     * There is no 'in' or 'out' clause(for other connection they will have like 'view74_element_6-out')
+                     * section in partition connection point. So once we substr with '-' we don't get any value. So we
+                     * explicitly set the targetId.  Simply if targetId is '' that means this connection is related to a
+                     * partition.
+                     * */
                     if (targetId === '') {
                         targetId = target;
                     } else if (!self.configurationData.getSiddhiAppConfig()
-                        .getDefinitionElementById(targetId, true, true)) {
+                            .getDefinitionElementById(targetId, true, true)) {
                         console.log("Target element not found!");
                     }
                     var targetElement = $('#' + targetId);
@@ -1066,15 +1066,15 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
                     var source = connection.sourceId;
                     var sourceId = source.substr(0, source.indexOf('-'));
                     /*
-                    * There is no 'in' or 'out' clause(for other connection they will have like 'view74_element_6-out')
-                    * section in partition connection point. So once we substr with '-' we don't get any value. So we
-                    * explicitly set the sourceId.  Simply if sourceId is '' that means this connection is related to a
-                    * partition.
-                    * */
+                     * There is no 'in' or 'out' clause(for other connection they will have like 'view74_element_6-out')
+                     * section in partition connection point. So once we substr with '-' we don't get any value. So we
+                     * explicitly set the sourceId.  Simply if sourceId is '' that means this connection is related to a
+                     * partition.
+                     * */
                     if (sourceId === '') {
                         sourceId = source;
                     } else if (!self.configurationData.getSiddhiAppConfig()
-                        .getDefinitionElementById(sourceId, true, true)) {
+                            .getDefinitionElementById(sourceId, true, true)) {
                         console.log("Source element not found!");
                     }
                     var sourceElement = $('#' + sourceId);
@@ -1114,15 +1114,15 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
                     var target = connection.targetId;
                     var targetId = target.substr(0, target.indexOf('-'));
                     /*
-                    * There is no 'in' or 'out' clause(for other connection they will have like 'view74_element_6-out')
-                    * section in partition connection point. So once we substr with '-' we don't get any value. So we
-                    * explicitly set the targetId.  Simply if targetId is '' that means this connection is related to a
-                    * partition.
-                    * */
+                     * There is no 'in' or 'out' clause(for other connection they will have like 'view74_element_6-out')
+                     * section in partition connection point. So once we substr with '-' we don't get any value. So we
+                     * explicitly set the targetId.  Simply if targetId is '' that means this connection is related to a
+                     * partition.
+                     * */
                     if (targetId === '') {
                         targetId = target;
                     } else if (!self.configurationData.getSiddhiAppConfig()
-                        .getDefinitionElementById(targetId, true, true)) {
+                            .getDefinitionElementById(targetId, true, true)) {
                         console.log("Target element not found!");
                     }
                     var targetElement = $('#' + targetId);
@@ -1130,15 +1130,15 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
                     var source = connection.sourceId;
                     var sourceId = source.substr(0, source.indexOf('-'));
                     /*
-                    * There is no 'in' or 'out' clause(for other connection they will have like 'view74_element_6-out')
-                    * section in partition connection point. So once we substr with '-' we don't get any value. So we
-                    * explicitly set the sourceId.  Simply if sourceId is '' that means this connection is related to a
-                    * partition.
-                    * */
+                     * There is no 'in' or 'out' clause(for other connection they will have like 'view74_element_6-out')
+                     * section in partition connection point. So once we substr with '-' we don't get any value. So we
+                     * explicitly set the sourceId.  Simply if sourceId is '' that means this connection is related to a
+                     * partition.
+                     * */
                     if (sourceId === '') {
                         sourceId = source;
                     } else if (!self.configurationData.getSiddhiAppConfig()
-                        .getDefinitionElementById(sourceId, true, true)) {
+                            .getDefinitionElementById(sourceId, true, true)) {
                         console.log("Source element not found!");
                     }
                     var sourceElement = $('#' + sourceId);
@@ -1180,8 +1180,8 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
                         if ((sourceElement.hasClass(constants.STREAM) || sourceElement.hasClass(constants.WINDOW)
                             || sourceElement.hasClass(constants.TRIGGER))
                             && (targetElement.hasClass(constants.PROJECTION) || targetElement.hasClass(constants.FILTER)
-                                || targetElement.hasClass(constants.WINDOW_QUERY)
-                                || targetElement.hasClass(constants.FUNCTION_QUERY))) {
+                            || targetElement.hasClass(constants.WINDOW_QUERY)
+                            || targetElement.hasClass(constants.FUNCTION_QUERY))) {
                             model = self.configurationData.getSiddhiAppConfig()
                                 .getWindowFilterProjectionQuery(targetId);
                             model.getQueryInput().setFrom(undefined);
@@ -1874,8 +1874,10 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
                 } else if (edge.getParentType() === 'SINK' && edge.getChildType() === 'SOURCE') {
                     targetId = edge.getChildId() + '-in';
                     sourceId = edge.getParentId() + '-out';
-                    paintStyle = { strokeWidth: 2, stroke: "#424242", dashstyle: "2 3", outlineStroke: "transparent",
-                        outlineWidth: "3" }
+                    paintStyle = {
+                        strokeWidth: 2, stroke: "#424242", dashstyle: "2 3", outlineStroke: "transparent",
+                        outlineWidth: "3"
+                    }
                 } else {
                     targetId = edge.getChildId() + '-in';
                     sourceId = edge.getParentId() + '-out';
@@ -1892,10 +1894,10 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
             self.autoAlignElements();
 
             /*
-            * In here we set a timeout because when drawing the graph jsplumb triggers a 'addMember' event (when adding
-            * an element to the partition) an it takes some time to execute. So that we add a timeout and set the
-            * isDesignViewContentChange to false.
-            * */
+             * In here we set a timeout because when drawing the graph jsplumb triggers a 'addMember' event (when adding
+             * an element to the partition) an it takes some time to execute. So that we add a timeout and set the
+             * isDesignViewContentChange to false.
+             * */
             setTimeout(function () {
                 // set the isDesignViewContentChanged to false
                 self.configurationData.setIsDesignViewContentChanged(false);

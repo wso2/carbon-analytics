@@ -16,7 +16,7 @@
  * under the License.
  */
 
-define(['require', 'lodash','jquery', 'log', 'backbone', 'file_browser', 'workspace/file'],
+define(['require', 'lodash', 'jquery', 'log', 'backbone', 'file_browser', 'workspace/file'],
     function (require, _, $, log, Backbone, FileBrowser, File) {
         var OpenFileDialog = Backbone.View.extend(
             /** @lends SaveToFileDialog.prototype */
@@ -37,11 +37,11 @@ define(['require', 'lodash','jquery', 'log', 'backbone', 'file_browser', 'worksp
                         'source_view.container');
                 },
 
-                show: function(){
+                show: function () {
                     this._fileOpenModal.modal('show');
                 },
 
-                select: function(path){
+                select: function (path) {
                     this._fileBrowser.select('path');
                 },
 
@@ -52,7 +52,7 @@ define(['require', 'lodash','jquery', 'log', 'backbone', 'file_browser', 'worksp
                     var app = this.app;
                     var notification_container = this.notification_container;
 
-                    if(!_.isNil(this._fileOpenModal)){
+                    if (!_.isNil(this._fileOpenModal)) {
                         this._fileOpenModal.remove();
                     }
 
@@ -65,7 +65,7 @@ define(['require', 'lodash','jquery', 'log', 'backbone', 'file_browser', 'worksp
                         "<span aria-hidden='true'>&times;</span>" +
                         "</button>" +
                         "<h4 class='modal-title file-dialog-title'>Open File</h4>" +
-                        "<hr class='style1'>"+
+                        "<hr class='style1'>" +
                         "</div>" +
                         "<div class='modal-body'>" +
                         "<div class='container-fluid'>" +
@@ -113,7 +113,7 @@ define(['require', 'lodash','jquery', 'log', 'backbone', 'file_browser', 'worksp
 
                     function getErrorNotification(detailedErrorMsg) {
                         var errorMsg = "Error while opening configuration";
-                        if (!_.isEmpty(detailedErrorMsg)){
+                        if (!_.isEmpty(detailedErrorMsg)) {
                             errorMsg += (" : " + detailedErrorMsg);
                         }
                         return $(
@@ -129,9 +129,11 @@ define(['require', 'lodash','jquery', 'log', 'backbone', 'file_browser', 'worksp
                     var openFileWizardError = fileOpen.find("#openFileWizardError");
                     var location = fileOpen.find("input").filter("#location");
 
-                    var treeContainer  = fileOpen.find("div").filter("#fileTree")
-                    fileBrowser = new FileBrowser({container: treeContainer, application:app, fetchFiles:true,
-                        showWorkspace:true});
+                    var treeContainer = fileOpen.find("div").filter("#fileTree")
+                    fileBrowser = new FileBrowser({
+                        container: treeContainer, application: app, fetchFiles: true,
+                        showWorkspace: true
+                    });
 
                     fileBrowser.render();
                     this._fileBrowser = fileBrowser;
@@ -141,7 +143,7 @@ define(['require', 'lodash','jquery', 'log', 'backbone', 'file_browser', 'worksp
                         var pathAttributes = selectedLocation.split(self.pathSeparator);
                         var fileName = _.last(pathAttributes);
 
-                        if(selectedLocation && fileName.lastIndexOf(".siddhi") != -1){
+                        if (selectedLocation && fileName.lastIndexOf(".siddhi") != -1) {
                             location.val(fileName);
                         }
                     });
@@ -163,14 +165,14 @@ define(['require', 'lodash','jquery', 'log', 'backbone', 'file_browser', 'worksp
                         var fileAlreadyOpened = false;
                         var openedTab;
 
-                        _.each(tabList, function(tab) {
-                            if(tab.getTitle() == fileName){
+                        _.each(tabList, function (tab) {
+                            if (tab.getTitle() == fileName) {
                                 fileAlreadyOpened = true;
                                 openedTab = tab;
                             }
                         })
 
-                        if(fileAlreadyOpened){
+                        if (fileAlreadyOpened) {
                             self.app.tabController.setActiveTab(openedTab);
                             openConfigModal.modal('hide');
                         } else {
@@ -228,7 +230,7 @@ define(['require', 'lodash','jquery', 'log', 'backbone', 'file_browser', 'worksp
                                 if (xhr.status == 200) {
                                     var pathArray = _.split(path, self.app.getPathSeperator()),
                                         fileName = _.last(pathArray),
-                                        folderPath = _.join(_.take(pathArray, pathArray.length -1), self.app
+                                        folderPath = _.join(_.take(pathArray, pathArray.length - 1), self.app
                                             .getPathSeperator());
 
                                     var file = new File({
@@ -247,9 +249,9 @@ define(['require', 'lodash','jquery', 'log', 'backbone', 'file_browser', 'worksp
                             },
                             error: function (res, errorCode, error) {
                                 var msg = _.isString(error) ? error : res.statusText;
-                                if(isJsonString(res.responseText)){
+                                if (isJsonString(res.responseText)) {
                                     var resObj = JSON.parse(res.responseText);
-                                    if(_.has(resObj, 'Error')){
+                                    if (_.has(resObj, 'Error')) {
                                         msg = _.get(resObj, 'Error');
                                     }
                                 }

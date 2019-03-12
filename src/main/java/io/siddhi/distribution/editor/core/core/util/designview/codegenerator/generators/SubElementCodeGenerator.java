@@ -37,6 +37,9 @@ import java.util.Map;
  */
 public class SubElementCodeGenerator {
 
+    private SubElementCodeGenerator() {
+    }
+
     /**
      * Generates the Siddhi code representation of a CommentCodeSegment object
      *
@@ -66,8 +69,7 @@ public class SubElementCodeGenerator {
                     .append(queryName)
                     .append(SiddhiCodeBuilderConstants.SINGLE_QUOTE)
                     .append(SiddhiCodeBuilderConstants.CLOSE_BRACKET);
-        }
-        else {
+        } else {
             queryNameStringBuilder.append(SiddhiCodeBuilderConstants.DEFAULT_QUERY_NAME_ANNOTATION);
         }
 
@@ -141,7 +143,7 @@ public class SubElementCodeGenerator {
                 .append(SiddhiCodeBuilderConstants.SINGLE_QUOTE);
         Map<String, String> options = store.getOptions();
 
-        if (options != null && options.size() !=0) {
+        if (options != null && options.size() != 0) {
             storeStringBuilder.append(SiddhiCodeBuilderConstants.COMMA);
             int optionsLeft = options.size();
             for (Map.Entry<String, String> entry : options.entrySet()) {
@@ -308,12 +310,10 @@ public class SubElementCodeGenerator {
         return forEventTypeStringBuilder.toString();
     }
 
-    private SubElementCodeGenerator() {
-    }
-
     /**
-     *Converts an org.wso2.siddhi.query.api.annotation.Element in string format to another string with escape characters
-     * which is the siddhi app code representation of the Element.
+     * Converts an org.wso2.siddhi.query.api.annotation.Element in string format to another string with escape
+     * characters which is the siddhi app code representation of the Element.
+     *
      * @param elementStr The Element in String format. E.g. title = "The wonder of "foo""
      * @return The code representation of the Element. E.g. title = """The wonder of "foo""""
      */

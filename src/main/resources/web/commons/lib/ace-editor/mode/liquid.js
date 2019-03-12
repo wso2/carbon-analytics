@@ -28,55 +28,55 @@
  *
  * ***** END LICENSE BLOCK ***** */
 
-define(function(require, exports, module) {
+define(function (require, exports, module) {
 
-var oop = require("../lib/oop");
-var TextMode = require("./text").Mode;
-var LiquidHighlightRules = require("./liquid_highlight_rules").LiquidHighlightRules;
-var MatchingBraceOutdent = require("./matching_brace_outdent").MatchingBraceOutdent;
+    var oop = require("../lib/oop");
+    var TextMode = require("./text").Mode;
+    var LiquidHighlightRules = require("./liquid_highlight_rules").LiquidHighlightRules;
+    var MatchingBraceOutdent = require("./matching_brace_outdent").MatchingBraceOutdent;
 
-var Mode = function() {
-    this.HighlightRules = LiquidHighlightRules;
-    this.$outdent = new MatchingBraceOutdent();
-    this.$behaviour = this.$defaultBehaviour;
-};
-oop.inherits(Mode, TextMode);
+    var Mode = function () {
+        this.HighlightRules = LiquidHighlightRules;
+        this.$outdent = new MatchingBraceOutdent();
+        this.$behaviour = this.$defaultBehaviour;
+    };
+    oop.inherits(Mode, TextMode);
 
-(function() {
+    (function () {
 
-    this.blockComment = {start: "<!--", end: "-->"};
+        this.blockComment = {start: "<!--", end: "-->"};
 
-    this.getNextLineIndent = function(state, line, tab) {
-        var indent = this.$getIndent(line);
+        this.getNextLineIndent = function (state, line, tab) {
+            var indent = this.$getIndent(line);
 
-        var tokenizedLine = this.getTokenizer().getLineTokens(line, state);
-        var tokens = tokenizedLine.tokens;
-        var endState = tokenizedLine.state;
+            var tokenizedLine = this.getTokenizer().getLineTokens(line, state);
+            var tokens = tokenizedLine.tokens;
+            var endState = tokenizedLine.state;
 
-        if (tokens.length && tokens[tokens.length-1].type == "comment") {
-            return indent;
-        }
-
-        if (state == "start") {
-            var match = line.match(/^.*[\{\(\[]\s*$/);
-            if (match) {
-                indent += tab;
+            if (tokens.length && tokens[tokens.length - 1].type == "comment") {
+                return indent;
             }
-        }
 
-        return indent;
-    };
+            if (state == "start") {
+                var match = line.match(/^.*[\{\(\[]\s*$/);
+                if (match) {
+                    indent += tab;
+                }
+            }
 
-    this.checkOutdent = function(state, line, input) {
-        return this.$outdent.checkOutdent(line, input);
-    };
+            return indent;
+        };
 
-    this.autoOutdent = function(state, doc, row) {
-        this.$outdent.autoOutdent(doc, row);
-    };
+        this.checkOutdent = function (state, line, input) {
+            return this.$outdent.checkOutdent(line, input);
+        };
 
-    this.$id = "ace/mode/liquid";
-}).call(Mode.prototype);
+        this.autoOutdent = function (state, doc, row) {
+            this.$outdent.autoOutdent(doc, row);
+        };
 
-exports.Mode = Mode;
+        this.$id = "ace/mode/liquid";
+    }).call(Mode.prototype);
+
+    exports.Mode = Mode;
 });

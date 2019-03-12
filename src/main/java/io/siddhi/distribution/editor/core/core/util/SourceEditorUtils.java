@@ -81,7 +81,7 @@ public class SourceEditorUtils {
      * Get the definition of the inner streams in the partitions
      * Inner streams will be separated based on the partition
      *
-     * @param siddhiAppRuntime              Siddhi app runtime created after validating
+     * @param siddhiAppRuntime                  Siddhi app runtime created after validating
      * @param partitionsWithMissingInnerStreams Required inner stream names separated based on partition it belongs to
      * @return The inner stream definitions separated base on the partition it belongs to
      */
@@ -143,7 +143,7 @@ public class SourceEditorUtils {
      * used for fetching the definitions of streams that queries output into without defining them first
      *
      * @param siddhiAppRuntime Siddhi app runtime created after validating
-     * @param missingStreams       Required stream names
+     * @param missingStreams   Required stream names
      * @return The stream definitions
      */
     public static List<AbstractDefinition> getStreamDefinitions(SiddhiAppRuntime siddhiAppRuntime,
@@ -163,12 +163,12 @@ public class SourceEditorUtils {
      * Get the definitions of the aggregations that are requested
      * used for fetching the definitions of aggregations
      *
-     * @param siddhiAppRuntime Siddhi app runtime created after validating
-     * @param missingAggregationDefinitions       Required stream names
+     * @param siddhiAppRuntime              Siddhi app runtime created after validating
+     * @param missingAggregationDefinitions Required stream names
      * @return The stream definitions
      */
     public static List<AbstractDefinition> getAggregationDefinitions(SiddhiAppRuntime siddhiAppRuntime,
-                                                                List<String> missingAggregationDefinitions) {
+                                                                     List<String> missingAggregationDefinitions) {
         List<AbstractDefinition> aggregationDefinitions = new ArrayList<>();
         Map<String, AggregationDefinition> aggregationDefinitionMap = siddhiAppRuntime.getAggregationDefinitionMap();
         for (String aggregation : missingAggregationDefinitions) {
@@ -354,19 +354,19 @@ public class SourceEditorUtils {
                     .isAssignableFrom(extensionClass)) {
                 processorType = Constants.WINDOW_PROCESSOR;
                 processorMetaDataList = metaData.getWindowProcessors();
-            } else if (Constants.SUPER_CLASS_MAP.get(Constants.SOURCE).isAssignableFrom(extensionClass)){
+            } else if (Constants.SUPER_CLASS_MAP.get(Constants.SOURCE).isAssignableFrom(extensionClass)) {
                 processorType = Constants.SOURCE;
                 processorMetaDataList = metaData.getSources();
-            } else if (Constants.SUPER_CLASS_MAP.get(Constants.SINK).isAssignableFrom(extensionClass)){
+            } else if (Constants.SUPER_CLASS_MAP.get(Constants.SINK).isAssignableFrom(extensionClass)) {
                 processorType = Constants.SINK;
                 processorMetaDataList = metaData.getSinks();
-            } else if (Constants.SUPER_CLASS_MAP.get(Constants.SOURCEMAP).isAssignableFrom(extensionClass)){
+            } else if (Constants.SUPER_CLASS_MAP.get(Constants.SOURCEMAP).isAssignableFrom(extensionClass)) {
                 processorType = Constants.SOURCEMAP;
                 processorMetaDataList = metaData.getSourceMaps();
-            } else if (Constants.SUPER_CLASS_MAP.get(Constants.SINKMAP).isAssignableFrom(extensionClass)){
+            } else if (Constants.SUPER_CLASS_MAP.get(Constants.SINKMAP).isAssignableFrom(extensionClass)) {
                 processorType = Constants.SINKMAP;
                 processorMetaDataList = metaData.getSinkMaps();
-            } else if (Constants.SUPER_CLASS_MAP.get(Constants.STORE).isAssignableFrom(extensionClass)){
+            } else if (Constants.SUPER_CLASS_MAP.get(Constants.STORE).isAssignableFrom(extensionClass)) {
                 processorType = Constants.STORE;
                 processorMetaDataList = metaData.getStores();
             }

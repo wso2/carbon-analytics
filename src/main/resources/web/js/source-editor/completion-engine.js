@@ -14,8 +14,8 @@
  * limitations under the License.
  */
 
-define(["ace/ace", "jquery", "./constants", "./utils", "ace/snippets", "ace/range", "ace/lib/lang",'lodash'],
-    function (ace, $, constants, utils, aceSnippetManager, aceRange, aceLang,_) {
+define(["ace/ace", "jquery", "./constants", "./utils", "ace/snippets", "ace/range", "ace/lib/lang", 'lodash'],
+    function (ace, $, constants, utils, aceSnippetManager, aceRange, aceLang, _) {
 
         "use strict";   // JS strict mode
 
@@ -69,7 +69,7 @@ define(["ace/ace", "jquery", "./constants", "./utils", "ace/snippets", "ace/rang
         regex.namespace = "(" + regex.identifier + ")\\s*:\\s*";
         regex.hash = "#\\s*";
         regex.comma = ",\\s*";
-        regex.tripleDot="\\.\\.\\.";
+        regex.tripleDot = "\\.\\.\\.";
         regex.functionOperation = regex.identifier + "\\s*\\((?:(?:.(?!\\)))*.)?\\)";
         regex.dataTypes = suggestions.dataTypes.map(function (dataType) {
             return dataType.value;
@@ -150,11 +150,11 @@ define(["ace/ace", "jquery", "./constants", "./utils", "ace/snippets", "ace/rang
             "\tdefine trigger ${1:trigger_name} at ${2:time};\n" +
             "snippet define-Aggregation\n" +
             "\tdefine aggregation ${1:aggregator_name}\n" +
-            "\tfrom ${2:input_stream}\n"+
+            "\tfrom ${2:input_stream}\n" +
             "\tselect ${3:attribute1}, ${4:aggregate_function}(${5:attribute2}) as ${6:attribute3}," +
-            "${7:aggregate_function}(${8:attribute4}) as ${9:attribute5}\n"+
-            "\t\tgroup by ${10:attribute6}\n"+
-            "\t\taggregate by ${11:timestamp_attribute} every ${12:time_periods};\n"+
+            "${7:aggregate_function}(${8:attribute4}) as ${9:attribute5}\n" +
+            "\t\tgroup by ${10:attribute6}\n" +
+            "\t\taggregate by ${11:timestamp_attribute} every ${12:time_periods};\n" +
             "snippet define-Function\n" +
             "\tdefine function ${1:function_name}[${2:lang_name}] return ${3:return_type} { \n" +
             "\t\t${4:function_body} \n" +
@@ -286,9 +286,9 @@ define(["ace/ace", "jquery", "./constants", "./utils", "ace/snippets", "ace/rang
             },
             {
                 regex: "define\\s+(stream|table|window)\\s+" + regex.identifier + "\\s*\\((\\s*" +
-                    regex.identifier + "\\s+(" + regex.dataTypes + ")\\s*,)*\\s*" +
-                    regex.identifier + "\\s+[^\\s" +
-                    "\\),]*$",
+                regex.identifier + "\\s+(" + regex.dataTypes + ")\\s*,)*\\s*" +
+                regex.identifier + "\\s+[^\\s" +
+                "\\),]*$",
                 handler: suggestions.dataTypes
             },
             {
@@ -313,31 +313,31 @@ define(["ace/ace", "jquery", "./constants", "./utils", "ace/snippets", "ace/rang
             },
             {
                 regex: "define\\s+window\\s+" + regex.identifier + "\\s*\\((\\s*" +
-                    regex.identifier + "\\s+(" + regex.dataTypes + ")\\s*,)*\\s*" +
-                    regex.identifier + "\\s+(" + regex.dataTypes + ")\\s*" +
-                    "\\)\\s+[a-zA-Z_0-9]*$",
+                regex.identifier + "\\s+(" + regex.dataTypes + ")\\s*,)*\\s*" +
+                regex.identifier + "\\s+(" + regex.dataTypes + ")\\s*" +
+                "\\)\\s+[a-zA-Z_0-9]*$",
                 handler: "$defineWindowStatementWindowType"
             },
             {
                 regex: "define\\s+window\\s+(" + regex.identifier + ")\\s*\\((\\s*" +
-                    regex.identifier + "\\s+(" + regex.dataTypes + ")\\s*,)*\\s*" +
-                    regex.identifier + "\\s+(" + regex.dataTypes + ")\\s*" +
-                    "\\)\\s+(" + regex.identifier + ":)?" + regex.identifier + "\\s*" +
-                    "\\((\\s*" + regex.identifier + "\\s*,)*\\s*[^\\s\\)]*$",
+                regex.identifier + "\\s+(" + regex.dataTypes + ")\\s*,)*\\s*" +
+                regex.identifier + "\\s+(" + regex.dataTypes + ")\\s*" +
+                "\\)\\s+(" + regex.identifier + ":)?" + regex.identifier + "\\s*" +
+                "\\((\\s*" + regex.identifier + "\\s*,)*\\s*[^\\s\\)]*$",
                 handler: "$defineWindowStatementWindowParameters"
             },
             {
                 regex: "define\\s+window\\s+" + regex.identifier + "\\s*\\((\\s*" +
-                    regex.identifier + "\\s+(" + regex.dataTypes + ")\\s*,)*\\s*" +
-                    regex.identifier + "\\s+(" + regex.dataTypes + ")\\s*" +
-                    "\\)\\s+(" + regex.identifier + ":)?" + regex.identifier + "\\s*\\(.*\\)\\s+[^\\s]*$",
+                regex.identifier + "\\s+(" + regex.dataTypes + ")\\s*,)*\\s*" +
+                regex.identifier + "\\s+(" + regex.dataTypes + ")\\s*" +
+                "\\)\\s+(" + regex.identifier + ":)?" + regex.identifier + "\\s*\\(.*\\)\\s+[^\\s]*$",
                 handler: ["output"]
             },
             {
                 regex: "define\\s+window\\s+" + regex.identifier + "\\s*\\((\\s*" +
-                    regex.identifier + "\\s+(" + regex.dataTypes + ")\\s*,)*\\s*" +
-                    regex.identifier + "\\s+(" + regex.dataTypes + ")\\s*" +
-                    "\\)\\s+(" + regex.identifier + ":)?" + regex.identifier + "\\s*\\(.*\\)\\s+output\\s+[^\\s]*$",
+                regex.identifier + "\\s+(" + regex.dataTypes + ")\\s*,)*\\s*" +
+                regex.identifier + "\\s+(" + regex.dataTypes + ")\\s*" +
+                "\\)\\s+(" + regex.identifier + ":)?" + regex.identifier + "\\s*\\(.*\\)\\s+output\\s+[^\\s]*$",
                 handler: suggestions.outputEventTypes.map(function (completion) {
                     return Object.assign({}, completion, {
                         value: completion.value + " events;"
@@ -346,39 +346,39 @@ define(["ace/ace", "jquery", "./constants", "./utils", "ace/snippets", "ace/rang
             },
             {
                 regex: "(define\\s+aggregation)\\s+([a-zA-Z_][a-zA-Z_0-9]*)\\s+$",
-                handler:["from"]
+                handler: ["from"]
             },
             {
-                regex:"(define\\s+aggregation)\\s+([a-zA-Z_][a-zA-Z_0-9]*)" +
-                    "(?:\\s+(from)\\s+((?:.(?!select|group\\s+by|aggregate\\s+by|aggregate|every))*))" +
-                    "(?:\\s+(select)\\s+((?:.(?!group\\s+by|aggregate\\s+by|aggregate|every))*))" +
-                    "(?:\\s+(group\\s+by)\\s+((?:.(?!aggregate\\s+by|aggregate|every))*))?" +
-                    "(?:\\s+(aggregate)\\s+)$",
-                handler:["by","every"]
+                regex: "(define\\s+aggregation)\\s+([a-zA-Z_][a-zA-Z_0-9]*)" +
+                "(?:\\s+(from)\\s+((?:.(?!select|group\\s+by|aggregate\\s+by|aggregate|every))*))" +
+                "(?:\\s+(select)\\s+((?:.(?!group\\s+by|aggregate\\s+by|aggregate|every))*))" +
+                "(?:\\s+(group\\s+by)\\s+((?:.(?!aggregate\\s+by|aggregate|every))*))?" +
+                "(?:\\s+(aggregate)\\s+)$",
+                handler: ["by", "every"]
             },
             {
-                regex:"(define\\s+aggregation)\\s+([a-zA-Z_][a-zA-Z_0-9]*)" +
-                    "(?:\\s+(from)\\s+((?:.(?!select|group\\s+by|aggregate\\s+by|aggregate|every))*))" +
-                    "(?:\\s+(select)\\s+((?:.(?!group\\s+by|aggregate\\s+by|aggregate|every))*))" +
-                    "(?:\\s+(group\\s+by)\\s+((?:.(?!aggregate\\s+by|aggregate|every))*))?" +
-                    "(?:\\s+(aggregate)\\s+)" +
-                    "(?:(by)((?:.(?!every))*)\\s+)?" +
-                    "(?:(every)\\s+)$",
-                handler:suggestions.aggregationTimeValueTypes.map(function (type) {
+                regex: "(define\\s+aggregation)\\s+([a-zA-Z_][a-zA-Z_0-9]*)" +
+                "(?:\\s+(from)\\s+((?:.(?!select|group\\s+by|aggregate\\s+by|aggregate|every))*))" +
+                "(?:\\s+(select)\\s+((?:.(?!group\\s+by|aggregate\\s+by|aggregate|every))*))" +
+                "(?:\\s+(group\\s+by)\\s+((?:.(?!aggregate\\s+by|aggregate|every))*))?" +
+                "(?:\\s+(aggregate)\\s+)" +
+                "(?:(by)((?:.(?!every))*)\\s+)?" +
+                "(?:(every)\\s+)$",
+                handler: suggestions.aggregationTimeValueTypes.map(function (type) {
                     return Object.assign({}, type, {
                         value: type.value + " "
                     });
                 })
             },
             {
-                regex:"(define\\s+aggregation)\\s+([a-zA-Z_][a-zA-Z_0-9]*)" +
-                    "(?:\\s+(from)\\s+((?:.(?!select|group\\s+by|aggregate\\s+by|aggregate|every))*))?" +
-                    "(?:\\s+(select)\\s+((?:.(?!group\\s+by|aggregate\\s+by|aggregate|every))*))?" +
-                    "(?:\\s+(group\\s+by)\\s+((?:.(?!aggregate\\s+by|aggregate|every))*))?" +
-                    "(?:\\s+(aggregate)\\s+)?" +
-                    "(?:(by)((?:.(?!every))*)\\s+)?" +
-                    "(?:(every)\\s+((?:.(?!;))*.?))?$",
-                handler:"$aggregationDefinition"
+                regex: "(define\\s+aggregation)\\s+([a-zA-Z_][a-zA-Z_0-9]*)" +
+                "(?:\\s+(from)\\s+((?:.(?!select|group\\s+by|aggregate\\s+by|aggregate|every))*))?" +
+                "(?:\\s+(select)\\s+((?:.(?!group\\s+by|aggregate\\s+by|aggregate|every))*))?" +
+                "(?:\\s+(group\\s+by)\\s+((?:.(?!aggregate\\s+by|aggregate|every))*))?" +
+                "(?:\\s+(aggregate)\\s+)?" +
+                "(?:(by)((?:.(?!every))*)\\s+)?" +
+                "(?:(every)\\s+((?:.(?!;))*.?))?$",
+                handler: "$aggregationDefinition"
             },
             /*
              * Define statement rules ends here
@@ -387,17 +387,17 @@ define(["ace/ace", "jquery", "./constants", "./utils", "ace/snippets", "ace/rang
             // Query rule
             {
                 regex: "(@\\s*[a-zA-Z]*\\s*\\(([^)]+)\\)\\s*)*?" +
-                    "(from)\\s+" +
-                    "(" +
-                    "(?:.(?!select|group\\s+by|having|output|insert|delete|update or insert into|update))*)" +
-                    "(?:\\s+(select)\\s+((?:.(?!group\\s+by|having|order\\s+by|limit|output|insert|delete|update\\s+or\\s+insert\\s+into|update))*)" +
-                    "(?:\\s+(group\\s+by)\\s+((?:.(?!having|order\\s+by|limit|output|insert|delete|update\\s+or\\s+insert\\s+into|update))*))?" +
-                    "(?:\\s+(having)\\s+((?:.(?!order\\s+by|limit|output|insert|delete|update\\s+or\\s+insert\\s+into|update))*))?" +
-                    "(?:\\s+(order\\s+by)\\s+((?:.(?!limit|output|insert|delete|update\\s+or\\s+insert\\s+into|update))*))?" +
-                    "(?:\\s+(limit)\\s+((?:.(?!output|insert|delete|update\\s+or\\s+insert\\s+into|update))*))?" +
-                    ")?" +
-                    "(?:\\s+(output)\\s+((?:.(?!insert|delete|update\\s+or\\s+insert\\s+into|update))*))?" +
-                    "(?:\\s+((?:insert|delete|update\\s+or\\s+insert\\s+into|update))\\s+((?:.(?!;))*.?))?$",
+                "(from)\\s+" +
+                "(" +
+                "(?:.(?!select|group\\s+by|having|output|insert|delete|update or insert into|update))*)" +
+                "(?:\\s+(select)\\s+((?:.(?!group\\s+by|having|order\\s+by|limit|output|insert|delete|update\\s+or\\s+insert\\s+into|update))*)" +
+                "(?:\\s+(group\\s+by)\\s+((?:.(?!having|order\\s+by|limit|output|insert|delete|update\\s+or\\s+insert\\s+into|update))*))?" +
+                "(?:\\s+(having)\\s+((?:.(?!order\\s+by|limit|output|insert|delete|update\\s+or\\s+insert\\s+into|update))*))?" +
+                "(?:\\s+(order\\s+by)\\s+((?:.(?!limit|output|insert|delete|update\\s+or\\s+insert\\s+into|update))*))?" +
+                "(?:\\s+(limit)\\s+((?:.(?!output|insert|delete|update\\s+or\\s+insert\\s+into|update))*))?" +
+                ")?" +
+                "(?:\\s+(output)\\s+((?:.(?!insert|delete|update\\s+or\\s+insert\\s+into|update))*))?" +
+                "(?:\\s+((?:insert|delete|update\\s+or\\s+insert\\s+into|update))\\s+((?:.(?!;))*.?))?$",
                 handler: "$query"
             },
 
@@ -798,7 +798,7 @@ define(["ace/ace", "jquery", "./constants", "./utils", "ace/snippets", "ace/rang
                     // the position is inside the partition by using that last rule in mainRuleBase. If more rules are
                     // added after partition rules the (mainRuleBase.length -1) should be replaced with the correct
                     // partition rule number
-                    var partitionRuleRegex = new RegExp(mainRuleBase[mainRuleBase.length -1].regex, "i");
+                    var partitionRuleRegex = new RegExp(mainRuleBase[mainRuleBase.length - 1].regex, "i");
                     if (!(partitionRuleRegex.test(editorText))) {
                         self.$startOfStatement();
                         aceModules.snippetManager.register(
@@ -821,8 +821,8 @@ define(["ace/ace", "jquery", "./constants", "./utils", "ace/snippets", "ace/rang
                     );
                 }
 
-                var dynamicCompletionTypes = ["store","source","sink"];
-                generateDynamicCompletionsForExtensionTypes(dynamicCompletionTypes,mainRuleBase);
+                var dynamicCompletionTypes = ["store", "source", "sink"];
+                generateDynamicCompletionsForExtensionTypes(dynamicCompletionTypes, mainRuleBase);
 
                 // Finding the relevant rule from the main rule base
                 for (i = 0; i < mainRuleBase.length; i++) {
@@ -872,17 +872,17 @@ define(["ace/ace", "jquery", "./constants", "./utils", "ace/snippets", "ace/rang
             };
 
             /*
-            * Load completions for stream definition
-            */
+             * Load completions for stream definition
+             */
             self.$defineStream = function () {
                 addCompletions(Object.keys(self.streamsList).map(function (stream) {
                     var attributesDefinition = "";
-                    for ( var attribute in self.streamsList[stream].attributes) {
+                    for (var attribute in self.streamsList[stream].attributes) {
                         attributesDefinition += attribute + " ";
                         attributesDefinition += self.streamsList[stream].attributes[attribute].toLowerCase() + ", ";
                     }
 
-                    attributesDefinition = "(" + attributesDefinition.slice(0,attributesDefinition.length - 2) + ");";
+                    attributesDefinition = "(" + attributesDefinition.slice(0, attributesDefinition.length - 2) + ");";
                     return {
                         value: stream + attributesDefinition,
                         type: constants.typeToDisplayNameMap[constants.STREAMS],
@@ -1041,13 +1041,13 @@ define(["ace/ace", "jquery", "./constants", "./utils", "ace/snippets", "ace/rang
                         });
                     }));
                     /*
-                    addSnippets(getExtensionNamesSpaces([constants.STREAM_PROCESSORS]).map(function (suggestion) {
-                        return Object.assign({}, suggestion, {
-                            value: suggestion.value + ":",
-                            priority: 3
-                        });
-                    }));
-                    */
+                     addSnippets(getExtensionNamesSpaces([constants.STREAM_PROCESSORS]).map(function (suggestion) {
+                     return Object.assign({}, suggestion, {
+                     value: suggestion.value + ":",
+                     priority: 3
+                     });
+                     }));
+                     */
                     addCompletions(getExtensionNamesSpaces([constants.STREAM_PROCESSORS]).map(function (completion) {
                         return Object.assign({}, completion, {
                             caption: completion,
@@ -1056,8 +1056,8 @@ define(["ace/ace", "jquery", "./constants", "./utils", "ace/snippets", "ace/rang
                         });
                     }));
                     if (new RegExp(regex.aggregation.input.sourceRegex +
-                        "(?:" + regex.aggregation.input.sourceHandlersRegex + ")*" +
-                        regex.hash + "[^\\(\\.:]*$", "i").test(aggregationInput)) {
+                            "(?:" + regex.aggregation.input.sourceHandlersRegex + ")*" +
+                            regex.hash + "[^\\(\\.:]*$", "i").test(aggregationInput)) {
                         // Add window keyword suggestion
                         // Only one window can be applied for a stream
                         addCompletions({caption: "window", value: "window.", priority: 2});
@@ -1118,13 +1118,13 @@ define(["ace/ace", "jquery", "./constants", "./utils", "ace/snippets", "ace/rang
                         });
                     }));
                     /*
-                    addSnippets(getExtensionNamesSpaces([constants.FUNCTIONS]).map(function (suggestion) {
-                        return Object.assign({}, suggestion, {
-                            value: suggestion.value + ":",
-                            priority: 2
-                        });
-                    }));
-                    */
+                     addSnippets(getExtensionNamesSpaces([constants.FUNCTIONS]).map(function (suggestion) {
+                     return Object.assign({}, suggestion, {
+                     value: suggestion.value + ":",
+                     priority: 2
+                     });
+                     }));
+                     */
                     addCompletions(getExtensionNamesSpaces([constants.FUNCTIONS]).map(function (functionName) {
                         return {
                             value: functionName,
@@ -1270,7 +1270,7 @@ define(["ace/ace", "jquery", "./constants", "./utils", "ace/snippets", "ace/rang
                     case "update or insert into":
                     case "delete":
                     case "update":
-                        handleQueryUpdateOrInsertIntoDeleteUpdateSuggestions(regexResults,fullEditorText);
+                        handleQueryUpdateOrInsertIntoDeleteUpdateSuggestions(regexResults, fullEditorText);
                         break;
                     default:
                 }
@@ -1466,8 +1466,7 @@ define(["ace/ace", "jquery", "./constants", "./utils", "ace/snippets", "ace/rang
                         });
                     }));
                     addCompletions(["select", "output", "insert", "delete", "update", "update or insert into"].map
-                    (function (completion)
-                    {
+                    (function (completion) {
                         return {value: completion + " ", priority: 2};
                     }));
                 } else if (everyKeywordSuggestionsRegex.test(queryInput)) {
@@ -1496,13 +1495,13 @@ define(["ace/ace", "jquery", "./constants", "./utils", "ace/snippets", "ace/rang
                         });
                     }));
                     /*
-                    addSnippets(getExtensionNamesSpaces([constants.STREAM_PROCESSORS]).map(function (suggestion) {
-                        return Object.assign({}, suggestion, {
-                            value: suggestion.value + ":",
-                            priority: 3
-                        });
-                    }));
-                    */
+                     addSnippets(getExtensionNamesSpaces([constants.STREAM_PROCESSORS]).map(function (suggestion) {
+                     return Object.assign({}, suggestion, {
+                     value: suggestion.value + ":",
+                     priority: 3
+                     });
+                     }));
+                     */
                     addCompletions(getExtensionNamesSpaces([constants.STREAM_PROCESSORS]).map(function (completion) {
                         return Object.assign({}, completion, {
                             caption: completion,
@@ -1511,8 +1510,8 @@ define(["ace/ace", "jquery", "./constants", "./utils", "ace/snippets", "ace/rang
                         });
                     }));
                     if (new RegExp(regex.query.input.sourceRegex +
-                        "(?:" + regex.query.input.sourceHandlersRegex + ")*" +
-                        regex.hash + "[^\\(\\.:]*$", "i").test(queryInput)) {
+                            "(?:" + regex.query.input.sourceHandlersRegex + ")*" +
+                            regex.hash + "[^\\(\\.:]*$", "i").test(queryInput)) {
                         // Add window keyword suggestion
                         // Only one window can be applied for a stream
                         addCompletions({caption: "window", value: "window.", priority: 2});
@@ -1577,13 +1576,13 @@ define(["ace/ace", "jquery", "./constants", "./utils", "ace/snippets", "ace/rang
                         });
                     }));
                     /*
-                    addSnippets(getExtensionNamesSpaces([constants.FUNCTIONS]).map(function (suggestion) {
-                        return Object.assign({}, suggestion, {
-                            value: suggestion.value + ":",
-                            priority: 2
-                        });
-                    }));
-                    */
+                     addSnippets(getExtensionNamesSpaces([constants.FUNCTIONS]).map(function (suggestion) {
+                     return Object.assign({}, suggestion, {
+                     value: suggestion.value + ":",
+                     priority: 2
+                     });
+                     }));
+                     */
                     addCompletions(getExtensionNamesSpaces([constants.FUNCTIONS]).map(function (functionName) {
                         return {
                             value: functionName,
@@ -1961,7 +1960,7 @@ define(["ace/ace", "jquery", "./constants", "./utils", "ace/snippets", "ace/rang
                     // Getting the reference to source map
                     while (sourceReferenceMatch = sourceReferenceSearchRegex.exec(tableOutputClause)) {
                         if (getSource(regexResults, fullEditorText, sourceReferenceMatch[0],
-                            [constants.EVENT_TABLES])) {
+                                [constants.EVENT_TABLES])) {
                             referenceToSourceMap[sourceReferenceMatch[0]] = sourceReferenceMatch[0];
                         }
                     }
@@ -2194,7 +2193,7 @@ define(["ace/ace", "jquery", "./constants", "./utils", "ace/snippets", "ace/rang
                 // Getting the reference to source map
                 while (sourceReferenceMatch = sourceReferenceSearchRegex.exec(aggregationInput)) {
                     if (getSource(regexResults, fullEditorText, sourceReferenceMatch[1],
-                        [constants.STREAMS])) {
+                            [constants.STREAMS])) {
                         referenceToSourceMap[sourceReferenceMatch[2]] = sourceReferenceMatch[1];
                     }
                 }
@@ -2257,7 +2256,7 @@ define(["ace/ace", "jquery", "./constants", "./utils", "ace/snippets", "ace/rang
                 // Getting the reference to source map
                 while (sourceReferenceMatch = sourceReferenceSearchRegex.exec(queryInput)) {
                     if (getSource(regexResults, fullEditorText, sourceReferenceMatch[1],
-                        [constants.STREAMS, constants.EVENT_TABLES, constants.AGGREGATIONS])) {
+                            [constants.STREAMS, constants.EVENT_TABLES, constants.AGGREGATIONS])) {
                         referenceToSourceMap[sourceReferenceMatch[2]] = sourceReferenceMatch[1];
                     }
                 }
@@ -2544,15 +2543,15 @@ define(["ace/ace", "jquery", "./constants", "./utils", "ace/snippets", "ace/rang
                 }
             }
 
-            function generateDynamicCompletionsForExtensionTypes(typeArray,ruleBase){
-                if(!CompletionEngine.isDynamicExtensionsLoaded){
+            function generateDynamicCompletionsForExtensionTypes(typeArray, ruleBase) {
+                if (!CompletionEngine.isDynamicExtensionsLoaded) {
                     CompletionEngine.isDynamicExtensionsLoaded = true;
                     var completions = "";
-                    var rules = _.find(ruleBase, function(rule) {
+                    var rules = _.find(ruleBase, function (rule) {
                         return rule.regex == "@[^\\(]*$";
                     });
-                    _.each(typeArray, function(type){
-                        generateCompletionsForExtensions(CompletionEngine.rawExtensions[type],rules);
+                    _.each(typeArray, function (type) {
+                        generateCompletionsForExtensions(CompletionEngine.rawExtensions[type], rules);
                     });
                 }
             }
@@ -2581,13 +2580,13 @@ define(["ace/ace", "jquery", "./constants", "./utils", "ace/snippets", "ace/rang
             //     return dynamicStreams;
             // }
 
-            function generateCompletionsForExtensions(extensionArray,rules){
-                _.each(extensionArray, function(extension){
+            function generateCompletionsForExtensions(extensionArray, rules) {
+                _.each(extensionArray, function (extension) {
                     var completionString = extension.namespace + "(type=\'" + extension.name + "\' ";
                     var isMandatoryParametersExist = false;
-                    _.each(extension.parameters, function(parameter){
-                        if(!parameter.optional){
-                            if(!isMandatoryParametersExist){
+                    _.each(extension.parameters, function (parameter) {
+                        if (!parameter.optional) {
+                            if (!isMandatoryParametersExist) {
                                 completionString += ", ";
                                 isMandatoryParametersExist = true;
                             }

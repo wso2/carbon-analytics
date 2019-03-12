@@ -17,9 +17,9 @@
  */
 
 define(['log', 'jquery', 'lodash', 'mapAnnotation', 'payloadOrAttribute', 'jsonValidator',
-    'handlebar', 'designViewUtils', 'constants'],
+        'handlebar', 'designViewUtils', 'constants'],
     function (log, $, _, MapAnnotation, PayloadOrAttribute, JSONValidator, Handlebars, DesignViewUtils,
-        Constants) {
+              Constants) {
 
         /**
          * @class SinkForm Creates a forms to collect data from a sink
@@ -66,11 +66,11 @@ define(['log', 'jquery', 'lodash', 'mapAnnotation', 'payloadOrAttribute', 'jsonV
             var attributes = [];
             if (attributeType === Constants.LIST) {
                 $('#define-attribute #attributeMap-type').val('payloadList');
-                attributes.push({ value: attributeValues[0] });
+                attributes.push({value: attributeValues[0]});
             } else {
                 $('#define-attribute #attributeMap-type').val('payloadMap');
                 for (var attribute in attributeValues) {
-                    attributes.push({ key: attribute, value: attributeValues[attribute] });
+                    attributes.push({key: attribute, value: attributeValues[attribute]});
                 }
             }
             return attributes;
@@ -84,9 +84,9 @@ define(['log', 'jquery', 'lodash', 'mapAnnotation', 'payloadOrAttribute', 'jsonV
             var selectedAttributeType = $('#define-attribute #attributeMap-type').val();
             var attributes = [];
             if (selectedAttributeType === "payloadList") {
-                attributes.push({ value: "" });
+                attributes.push({value: ""});
             } else {
-                attributes.push({ key: " ", value: "" });
+                attributes.push({key: " ", value: ""});
             }
             return attributes;
         };
@@ -98,7 +98,7 @@ define(['log', 'jquery', 'lodash', 'mapAnnotation', 'payloadOrAttribute', 'jsonV
          */
         var renderAttributeMappingContent = function (attributes, streamAttributes) {
             var attributeMapFormTemplate = Handlebars.compile($('#source-sink-map-attribute-template').html());
-            var wrappedHtml = attributeMapFormTemplate({ id: Constants.SINK, attributes: attributes });
+            var wrappedHtml = attributeMapFormTemplate({id: Constants.SINK, attributes: attributes});
             $('#attribute-map-content').html(wrappedHtml);
 
             var streamAttributeMessage = "Stream Attributes are: ";

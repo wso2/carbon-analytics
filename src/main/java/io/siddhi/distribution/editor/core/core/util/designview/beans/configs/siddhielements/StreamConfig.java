@@ -50,12 +50,20 @@ public class StreamConfig extends SiddhiElementConfig {
         return name;
     }
 
+    public void setName(String name) {
+        this.name = name;
+    }
+
     public List<AttributeConfig> getAttributeList() {
         return attributeList;
     }
 
+    public void setAttributeList(List<AttributeConfig> attributeList) {
+        this.attributeList = attributeList;
+    }
+
     public List<Annotation> getAnnotationListObjects() {
-        return  annotationListObjects;
+        return annotationListObjects;
     }
 
     public void setAnnotationListObjects(List<Annotation> annotationListObjects) {
@@ -66,28 +74,20 @@ public class StreamConfig extends SiddhiElementConfig {
         return annotationList;
     }
 
-    public String getPartitionId() {
-        return partitionId;
-    }
-
-    public Map<String, String> getConnectorsAndStreams() {
-        return connectorsAndStreams;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public void setAttributeList(List<AttributeConfig> attributeList) {
-        this.attributeList = attributeList;
-    }
-
     public void setAnnotationList(List<String> annotationList) {
         this.annotationList = annotationList;
     }
 
+    public String getPartitionId() {
+        return partitionId;
+    }
+
     public void setPartitionId(String partitionId) {
         this.partitionId = partitionId;
+    }
+
+    public Map<String, String> getConnectorsAndStreams() {
+        return connectorsAndStreams;
     }
 
     public void setConnectorsAndStreams(Map<String, String> connectorsAndStreams) {

@@ -1,9 +1,9 @@
-define(function(require, exports, module) {
+define(function (require, exports, module) {
     var oop = require("../lib/oop");
     var DocCommentHighlightRules = require("./doc_comment_highlight_rules").DocCommentHighlightRules;
     var TextHighlightRules = require("./text_highlight_rules").TextHighlightRules;
 
-    var GolangHighlightRules = function() {
+    var GolangHighlightRules = function () {
         var keywords = (
             "else|break|case|return|goto|if|const|select|" +
             "continue|struct|default|switch|for|range|" +
@@ -25,41 +25,41 @@ define(function(require, exports, module) {
             "support.function": builtinFunctions,
             "support.type": builtinTypes
         }, "");
-        
+
         var stringEscapeRe = "\\\\(?:[0-7]{3}|x\\h{2}|u{4}|U\\h{6}|[abfnrtv'\"\\\\])".replace(/\\h/g, "[a-fA-F\\d]");
 
         this.$rules = {
-            "start" : [
+            "start": [
                 {
-                    token : "comment",
-                    regex : "\\/\\/.*$"
+                    token: "comment",
+                    regex: "\\/\\/.*$"
                 },
                 DocCommentHighlightRules.getStartRule("doc-start"),
                 {
-                    token : "comment.start", // multi line comment
-                    regex : "\\/\\*",
-                    next : "comment"
+                    token: "comment.start", // multi line comment
+                    regex: "\\/\\*",
+                    next: "comment"
                 }, {
-                    token : "string", // single line
-                    regex : /"(?:[^"\\]|\\.)*?"/
+                    token: "string", // single line
+                    regex: /"(?:[^"\\]|\\.)*?"/
                 }, {
-                    token : "string", // raw
-                    regex : '`',
-                    next : "bqstring"
+                    token: "string", // raw
+                    regex: '`',
+                    next: "bqstring"
                 }, {
-                    token : "constant.numeric", // rune
-                    regex : "'(?:[^\\'\uD800-\uDBFF]|[\uD800-\uDBFF][\uDC00-\uDFFF]|" + stringEscapeRe.replace('"', '')  + ")'"
+                    token: "constant.numeric", // rune
+                    regex: "'(?:[^\\'\uD800-\uDBFF]|[\uD800-\uDBFF][\uDC00-\uDFFF]|" + stringEscapeRe.replace('"', '') + ")'"
                 }, {
-                    token : "constant.numeric", // hex
-                    regex : "0[xX][0-9a-fA-F]+\\b" 
+                    token: "constant.numeric", // hex
+                    regex: "0[xX][0-9a-fA-F]+\\b"
                 }, {
-                    token : "constant.numeric", // float
-                    regex : "[+-]?\\d+(?:(?:\\.\\d*)?(?:[eE][+-]?\\d+)?)?\\b"
+                    token: "constant.numeric", // float
+                    regex: "[+-]?\\d+(?:(?:\\.\\d*)?(?:[eE][+-]?\\d+)?)?\\b"
                 }, {
-                    token : ["keyword", "text", "entity.name.function"],
-                    regex : "(func)(\\s+)([a-zA-Z_$][a-zA-Z0-9_$]*)\\b"
+                    token: ["keyword", "text", "entity.name.function"],
+                    regex: "(func)(\\s+)([a-zA-Z_$][a-zA-Z0-9_$]*)\\b"
                 }, {
-                    token : function(val) {
+                    token: function (val) {
                         if (val[val.length - 1] == "(") {
                             return [{
                                 type: keywordMapper(val.slice(0, -1)) || "support.function",
@@ -69,49 +69,49 @@ define(function(require, exports, module) {
                                 value: val.slice(-1)
                             }];
                         }
-                        
+
                         return keywordMapper(val) || "identifier";
                     },
-                    regex : "[a-zA-Z_$][a-zA-Z0-9_$]*\\b\\(?"
+                    regex: "[a-zA-Z_$][a-zA-Z0-9_$]*\\b\\(?"
                 }, {
-                    token : "keyword.operator",
-                    regex : "!|\\$|%|&|\\*|\\-\\-|\\-|\\+\\+|\\+|~|==|=|!=|<=|>=|<<=|>>=|>>>=|<>|<|>|!|&&|\\|\\||\\?\\:|\\*=|%=|\\+=|\\-=|&=|\\^="
+                    token: "keyword.operator",
+                    regex: "!|\\$|%|&|\\*|\\-\\-|\\-|\\+\\+|\\+|~|==|=|!=|<=|>=|<<=|>>=|>>>=|<>|<|>|!|&&|\\|\\||\\?\\:|\\*=|%=|\\+=|\\-=|&=|\\^="
                 }, {
-                    token : "punctuation.operator",
-                    regex : "\\?|\\:|\\,|\\;|\\."
+                    token: "punctuation.operator",
+                    regex: "\\?|\\:|\\,|\\;|\\."
                 }, {
-                    token : "paren.lparen",
-                    regex : "[[({]"
+                    token: "paren.lparen",
+                    regex: "[[({]"
                 }, {
-                    token : "paren.rparen",
-                    regex : "[\\])}]"
+                    token: "paren.rparen",
+                    regex: "[\\])}]"
                 }, {
-                    token : "text",
-                    regex : "\\s+"
+                    token: "text",
+                    regex: "\\s+"
                 }
             ],
-            "comment" : [
+            "comment": [
                 {
-                    token : "comment.end",
-                    regex : "\\*\\/",
-                    next : "start"
+                    token: "comment.end",
+                    regex: "\\*\\/",
+                    next: "start"
                 }, {
-                    defaultToken : "comment"
+                    defaultToken: "comment"
                 }
             ],
-            "bqstring" : [
+            "bqstring": [
                 {
-                    token : "string",
-                    regex : '`',
-                    next : "start"
+                    token: "string",
+                    regex: '`',
+                    next: "start"
                 }, {
-                    defaultToken : "string"
+                    defaultToken: "string"
                 }
             ]
         };
 
         this.embedRules(DocCommentHighlightRules, "doc-",
-            [ DocCommentHighlightRules.getEndRule("start") ]);
+            [DocCommentHighlightRules.getEndRule("start")]);
     };
     oop.inherits(GolangHighlightRules, TextHighlightRules);
 

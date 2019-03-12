@@ -29,9 +29,9 @@ define(
         var StreamHandler = function (options) {
             /*
              Data storing structure as follows.
-                type*: 'FILTER | FUNCTION | WINDOW',
-                value*: ''
-            */
+             type*: 'FILTER | FUNCTION | WINDOW',
+             value*: ''
+             */
             if (options !== undefined) {
                 this.type
                     = (options.type !== undefined) ? (options.type).toUpperCase() : undefined;

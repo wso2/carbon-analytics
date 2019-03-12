@@ -259,8 +259,8 @@ DataPopulationListener.prototype.exitExecution_element = function (ctx) {
  */
 function addStatement(walker, ctx, endOfStatementToken) {
     walker.statementsList.push({
-        statement: walker.utils.getTextFromANTLRCtx(ctx)  + (endOfStatementToken ? endOfStatementToken : ""),
-        line:ctx.start.line - 1
+        statement: walker.utils.getTextFromANTLRCtx(ctx) + (endOfStatementToken ? endOfStatementToken : ""),
+        line: ctx.start.line - 1
     });
 }
 

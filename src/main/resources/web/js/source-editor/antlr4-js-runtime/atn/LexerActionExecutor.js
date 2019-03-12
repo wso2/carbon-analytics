@@ -39,12 +39,12 @@
 var LexerIndexedCustomAction = require('./LexerAction').LexerIndexedCustomAction;
 
 function LexerActionExecutor(lexerActions) {
-	this.lexerActions = lexerActions === null ? [] : lexerActions;
-	// Caches the result of {@link //hashCode} since the hash code is an element
-	// of the performance-critical {@link LexerATNConfig//hashCode} operation.
-	this._hashString = lexerActions.toString(); // "".join([str(la) for la in
-	// lexerActions]))
-	return this;
+    this.lexerActions = lexerActions === null ? [] : lexerActions;
+    // Caches the result of {@link //hashCode} since the hash code is an element
+    // of the performance-critical {@link LexerATNConfig//hashCode} operation.
+    this._hashString = lexerActions.toString(); // "".join([str(la) for la in
+    // lexerActions]))
+    return this;
 }
 
 // Creates a {@link LexerActionExecutor} which executes the actions for
@@ -60,12 +60,12 @@ function LexerActionExecutor(lexerActions) {
 //
 // @return A {@link LexerActionExecutor} for executing the combine actions
 // of {@code lexerActionExecutor} and {@code lexerAction}.
-LexerActionExecutor.append = function(lexerActionExecutor, lexerAction) {
-	if (lexerActionExecutor === null) {
-		return new LexerActionExecutor([ lexerAction ]);
-	}
-	var lexerActions = lexerActionExecutor.lexerActions.concat([ lexerAction ]);
-	return new LexerActionExecutor(lexerActions);
+LexerActionExecutor.append = function (lexerActionExecutor, lexerAction) {
+    if (lexerActionExecutor === null) {
+        return new LexerActionExecutor([lexerAction]);
+    }
+    var lexerActions = lexerActionExecutor.lexerActions.concat([lexerAction]);
+    return new LexerActionExecutor(lexerActions);
 };
 
 // Creates a {@link LexerActionExecutor} which encodes the current offset
@@ -96,23 +96,23 @@ LexerActionExecutor.append = function(lexerActionExecutor, lexerAction) {
 // @return A {@link LexerActionExecutor} which stores input stream offsets
 // for all position-dependent lexer actions.
 // /
-LexerActionExecutor.prototype.fixOffsetBeforeMatch = function(offset) {
-	var updatedLexerActions = null;
-	for (var i = 0; i < this.lexerActions.length; i++) {
-		if (this.lexerActions[i].isPositionDependent &&
-				!(this.lexerActions[i] instanceof LexerIndexedCustomAction)) {
-			if (updatedLexerActions === null) {
-				updatedLexerActions = this.lexerActions.concat([]);
-			}
-			updatedLexerActions[i] = new LexerIndexedCustomAction(offset,
-					this.lexerActions[i]);
-		}
-	}
-	if (updatedLexerActions === null) {
-		return this;
-	} else {
-		return new LexerActionExecutor(updatedLexerActions);
-	}
+LexerActionExecutor.prototype.fixOffsetBeforeMatch = function (offset) {
+    var updatedLexerActions = null;
+    for (var i = 0; i < this.lexerActions.length; i++) {
+        if (this.lexerActions[i].isPositionDependent &&
+            !(this.lexerActions[i] instanceof LexerIndexedCustomAction)) {
+            if (updatedLexerActions === null) {
+                updatedLexerActions = this.lexerActions.concat([]);
+            }
+            updatedLexerActions[i] = new LexerIndexedCustomAction(offset,
+                this.lexerActions[i]);
+        }
+    }
+    if (updatedLexerActions === null) {
+        return this;
+    } else {
+        return new LexerActionExecutor(updatedLexerActions);
+    }
 };
 
 // Execute the actions encapsulated by this executor within the context of a
@@ -133,43 +133,43 @@ LexerActionExecutor.prototype.fixOffsetBeforeMatch = function(offset) {
 // {@link IntStream//seek} to set the {@code input} position to the beginning
 // of the token.
 // /
-LexerActionExecutor.prototype.execute = function(lexer, input, startIndex) {
-	var requiresSeek = false;
-	var stopIndex = input.index;
-	try {
-		for (var i = 0; i < this.lexerActions.length; i++) {
-			var lexerAction = this.lexerActions[i];
-			if (lexerAction instanceof LexerIndexedCustomAction) {
-				var offset = lexerAction.offset;
-				input.seek(startIndex + offset);
-				lexerAction = lexerAction.action;
-				requiresSeek = (startIndex + offset) !== stopIndex;
-			} else if (lexerAction.isPositionDependent) {
-				input.seek(stopIndex);
-				requiresSeek = false;
-			}
-			lexerAction.execute(lexer);
-		}
-	} finally {
-		if (requiresSeek) {
-			input.seek(stopIndex);
-		}
-	}
+LexerActionExecutor.prototype.execute = function (lexer, input, startIndex) {
+    var requiresSeek = false;
+    var stopIndex = input.index;
+    try {
+        for (var i = 0; i < this.lexerActions.length; i++) {
+            var lexerAction = this.lexerActions[i];
+            if (lexerAction instanceof LexerIndexedCustomAction) {
+                var offset = lexerAction.offset;
+                input.seek(startIndex + offset);
+                lexerAction = lexerAction.action;
+                requiresSeek = (startIndex + offset) !== stopIndex;
+            } else if (lexerAction.isPositionDependent) {
+                input.seek(stopIndex);
+                requiresSeek = false;
+            }
+            lexerAction.execute(lexer);
+        }
+    } finally {
+        if (requiresSeek) {
+            input.seek(stopIndex);
+        }
+    }
 };
 
-LexerActionExecutor.prototype.hashString = function() {
-	return this._hashString;
+LexerActionExecutor.prototype.hashString = function () {
+    return this._hashString;
 };
 
-LexerActionExecutor.prototype.equals = function(other) {
-	if (this === other) {
-		return true;
-	} else if (!(other instanceof LexerActionExecutor)) {
-		return false;
-	} else {
-		return this._hashString === other._hashString &&
-				this.lexerActions === other.lexerActions;
-	}
+LexerActionExecutor.prototype.equals = function (other) {
+    if (this === other) {
+        return true;
+    } else if (!(other instanceof LexerActionExecutor)) {
+        return false;
+    } else {
+        return this._hashString === other._hashString &&
+            this.lexerActions === other.lexerActions;
+    }
 };
 
 exports.LexerActionExecutor = LexerActionExecutor;

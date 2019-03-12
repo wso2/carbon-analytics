@@ -1,7 +1,7 @@
-define(function(require, exports, module) {
-"use strict";
+define(function (require, exports, module) {
+    "use strict";
 
-exports.snippetText = require("../requirejs/text!./python.snippets");
-exports.scope = "python";
+    exports.snippetText = require("../requirejs/text!./python.snippets");
+    exports.scope = "python";
 
 });

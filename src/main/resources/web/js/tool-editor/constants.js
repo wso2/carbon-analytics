@@ -16,7 +16,7 @@
  * under the License.
  */
 
-define(function() {
+define(function () {
 
     "use strict";   // JS strict mode
 
@@ -25,8 +25,8 @@ define(function() {
      */
     var constants = {
         INITIAL_SOURCE_INSTRUCTIONS: "@App:name(\"SiddhiApp\")\n@App:description(\"Description of the plan\")\n\n" +
-            "-- Please refer to https://docs.wso2.com/display/SP400/Quick+Start+Guide " +
-            "on getting started with SP editor. \n\n"
+        "-- Please refer to https://docs.wso2.com/display/SP400/Quick+Start+Guide " +
+        "on getting started with SP editor. \n\n"
     };
 
     return constants;

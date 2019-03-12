@@ -28,259 +28,260 @@
  *
  * ***** END LICENSE BLOCK ***** */
 
-define(function(require, exports, module) {
-"use strict";
+define(function (require, exports, module) {
+    "use strict";
 
-var XHTML_NS = "http://www.w3.org/1999/xhtml";
+    var XHTML_NS = "http://www.w3.org/1999/xhtml";
 
-exports.getDocumentHead = function(doc) {
-    if (!doc)
-        doc = document;
-    return doc.head || doc.getElementsByTagName("head")[0] || doc.documentElement;
-}
-
-exports.createElement = function(tag, ns) {
-    return document.createElementNS ?
-           document.createElementNS(ns || XHTML_NS, tag) :
-           document.createElement(tag);
-};
-
-exports.hasCssClass = function(el, name) {
-    var classes = (el.className + "").split(/\s+/g);
-    return classes.indexOf(name) !== -1;
-};
-
-/*
-* Add a CSS class to the list of classes on the given node
-*/
-exports.addCssClass = function(el, name) {
-    if (!exports.hasCssClass(el, name)) {
-        el.className += " " + name;
+    exports.getDocumentHead = function (doc) {
+        if (!doc)
+            doc = document;
+        return doc.head || doc.getElementsByTagName("head")[0] || doc.documentElement;
     }
-};
 
-/*
-* Remove a CSS class from the list of classes on the given node
-*/
-exports.removeCssClass = function(el, name) {
-    var classes = el.className.split(/\s+/g);
-    while (true) {
-        var index = classes.indexOf(name);
-        if (index == -1) {
-            break;
+    exports.createElement = function (tag, ns) {
+        return document.createElementNS ?
+            document.createElementNS(ns || XHTML_NS, tag) :
+            document.createElement(tag);
+    };
+
+    exports.hasCssClass = function (el, name) {
+        var classes = (el.className + "").split(/\s+/g);
+        return classes.indexOf(name) !== -1;
+    };
+
+    /*
+     * Add a CSS class to the list of classes on the given node
+     */
+    exports.addCssClass = function (el, name) {
+        if (!exports.hasCssClass(el, name)) {
+            el.className += " " + name;
         }
-        classes.splice(index, 1);
-    }
-    el.className = classes.join(" ");
-};
+    };
 
-exports.toggleCssClass = function(el, name) {
-    var classes = el.className.split(/\s+/g), add = true;
-    while (true) {
-        var index = classes.indexOf(name);
-        if (index == -1) {
-            break;
+    /*
+     * Remove a CSS class from the list of classes on the given node
+     */
+    exports.removeCssClass = function (el, name) {
+        var classes = el.className.split(/\s+/g);
+        while (true) {
+            var index = classes.indexOf(name);
+            if (index == -1) {
+                break;
+            }
+            classes.splice(index, 1);
         }
-        add = false;
-        classes.splice(index, 1);
-    }
-    if (add)
-        classes.push(name);
+        el.className = classes.join(" ");
+    };
 
-    el.className = classes.join(" ");
-    return add;
-};
+    exports.toggleCssClass = function (el, name) {
+        var classes = el.className.split(/\s+/g), add = true;
+        while (true) {
+            var index = classes.indexOf(name);
+            if (index == -1) {
+                break;
+            }
+            add = false;
+            classes.splice(index, 1);
+        }
+        if (add)
+            classes.push(name);
+
+        el.className = classes.join(" ");
+        return add;
+    };
 
 
-/*
- * Add or remove a CSS class from the list of classes on the given node
- * depending on the value of <tt>include</tt>
- */
-exports.setCssClass = function(node, className, include) {
-    if (include) {
-        exports.addCssClass(node, className);
-    } else {
-        exports.removeCssClass(node, className);
-    }
-};
+    /*
+     * Add or remove a CSS class from the list of classes on the given node
+     * depending on the value of <tt>include</tt>
+     */
+    exports.setCssClass = function (node, className, include) {
+        if (include) {
+            exports.addCssClass(node, className);
+        } else {
+            exports.removeCssClass(node, className);
+        }
+    };
 
-exports.hasCssString = function(id, doc) {
-    var index = 0, sheets;
-    doc = doc || document;
+    exports.hasCssString = function (id, doc) {
+        var index = 0, sheets;
+        doc = doc || document;
 
-    if (doc.createStyleSheet && (sheets = doc.styleSheets)) {
-        while (index < sheets.length)
-            if (sheets[index++].owningElement.id === id) return true;
-    } else if ((sheets = doc.getElementsByTagName("style"))) {
-        while (index < sheets.length)
-            if (sheets[index++].id === id) return true;
-    }
+        if (doc.createStyleSheet && (sheets = doc.styleSheets)) {
+            while (index < sheets.length)
+                if (sheets[index++].owningElement.id === id) return true;
+        } else if ((sheets = doc.getElementsByTagName("style"))) {
+            while (index < sheets.length)
+                if (sheets[index++].id === id) return true;
+        }
 
-    return false;
-};
+        return false;
+    };
 
-exports.importCssString = function importCssString(cssText, id, doc) {
-    doc = doc || document;
-    // If style is already imported return immediately.
-    if (id && exports.hasCssString(id, doc))
-        return null;
-    
-    var style;
-    
-    if (id)
-        cssText += "\n/*# sourceURL=ace/css/" + id + " */";
-    
-    if (doc.createStyleSheet) {
-        style = doc.createStyleSheet();
-        style.cssText = cssText;
+    exports.importCssString = function importCssString(cssText, id, doc) {
+        doc = doc || document;
+        // If style is already imported return immediately.
+        if (id && exports.hasCssString(id, doc))
+            return null;
+
+        var style;
+
         if (id)
-            style.owningElement.id = id;
-    } else {
-        style = exports.createElement("style");
-        style.appendChild(doc.createTextNode(cssText));
-        if (id)
-            style.id = id;
+            cssText += "\n/*# sourceURL=ace/css/" + id + " */";
 
-        exports.getDocumentHead(doc).appendChild(style);
+        if (doc.createStyleSheet) {
+            style = doc.createStyleSheet();
+            style.cssText = cssText;
+            if (id)
+                style.owningElement.id = id;
+        } else {
+            style = exports.createElement("style");
+            style.appendChild(doc.createTextNode(cssText));
+            if (id)
+                style.id = id;
+
+            exports.getDocumentHead(doc).appendChild(style);
+        }
+    };
+
+    exports.importCssStylsheet = function (uri, doc) {
+        if (doc.createStyleSheet) {
+            doc.createStyleSheet(uri);
+        } else {
+            var link = exports.createElement('link');
+            link.rel = 'stylesheet';
+            link.href = uri;
+
+            exports.getDocumentHead(doc).appendChild(link);
+        }
+    };
+
+    exports.getInnerWidth = function (element) {
+        return (
+            parseInt(exports.computedStyle(element, "paddingLeft"), 10) +
+            parseInt(exports.computedStyle(element, "paddingRight"), 10) +
+            element.clientWidth
+        );
+    };
+
+    exports.getInnerHeight = function (element) {
+        return (
+            parseInt(exports.computedStyle(element, "paddingTop"), 10) +
+            parseInt(exports.computedStyle(element, "paddingBottom"), 10) +
+            element.clientHeight
+        );
+    };
+
+    exports.scrollbarWidth = function (document) {
+        var inner = exports.createElement("ace_inner");
+        inner.style.width = "100%";
+        inner.style.minWidth = "0px";
+        inner.style.height = "200px";
+        inner.style.display = "block";
+
+        var outer = exports.createElement("ace_outer");
+        var style = outer.style;
+
+        style.position = "absolute";
+        style.left = "-10000px";
+        style.overflow = "hidden";
+        style.width = "200px";
+        style.minWidth = "0px";
+        style.height = "150px";
+        style.display = "block";
+
+        outer.appendChild(inner);
+
+        var body = document.documentElement;
+        body.appendChild(outer);
+
+        var noScrollbar = inner.offsetWidth;
+
+        style.overflow = "scroll";
+        var withScrollbar = inner.offsetWidth;
+
+        if (noScrollbar == withScrollbar) {
+            withScrollbar = outer.clientWidth;
+        }
+
+        body.removeChild(outer);
+
+        return noScrollbar - withScrollbar;
+    };
+
+    if (typeof document == "undefined") {
+        exports.importCssString = function () {
+        };
+        return;
     }
-};
 
-exports.importCssStylsheet = function(uri, doc) {
-    if (doc.createStyleSheet) {
-        doc.createStyleSheet(uri);
-    } else {
-        var link = exports.createElement('link');
-        link.rel = 'stylesheet';
-        link.href = uri;
+    if (window.pageYOffset !== undefined) {
+        exports.getPageScrollTop = function () {
+            return window.pageYOffset;
+        };
 
-        exports.getDocumentHead(doc).appendChild(link);
+        exports.getPageScrollLeft = function () {
+            return window.pageXOffset;
+        };
     }
-};
+    else {
+        exports.getPageScrollTop = function () {
+            return document.body.scrollTop;
+        };
 
-exports.getInnerWidth = function(element) {
-    return (
-        parseInt(exports.computedStyle(element, "paddingLeft"), 10) +
-        parseInt(exports.computedStyle(element, "paddingRight"), 10) + 
-        element.clientWidth
-    );
-};
-
-exports.getInnerHeight = function(element) {
-    return (
-        parseInt(exports.computedStyle(element, "paddingTop"), 10) +
-        parseInt(exports.computedStyle(element, "paddingBottom"), 10) +
-        element.clientHeight
-    );
-};
-
-exports.scrollbarWidth = function(document) {
-    var inner = exports.createElement("ace_inner");
-    inner.style.width = "100%";
-    inner.style.minWidth = "0px";
-    inner.style.height = "200px";
-    inner.style.display = "block";
-
-    var outer = exports.createElement("ace_outer");
-    var style = outer.style;
-
-    style.position = "absolute";
-    style.left = "-10000px";
-    style.overflow = "hidden";
-    style.width = "200px";
-    style.minWidth = "0px";
-    style.height = "150px";
-    style.display = "block";
-
-    outer.appendChild(inner);
-
-    var body = document.documentElement;
-    body.appendChild(outer);
-
-    var noScrollbar = inner.offsetWidth;
-
-    style.overflow = "scroll";
-    var withScrollbar = inner.offsetWidth;
-
-    if (noScrollbar == withScrollbar) {
-        withScrollbar = outer.clientWidth;
+        exports.getPageScrollLeft = function () {
+            return document.body.scrollLeft;
+        };
     }
 
-    body.removeChild(outer);
+    if (window.getComputedStyle)
+        exports.computedStyle = function (element, style) {
+            if (style)
+                return (window.getComputedStyle(element, "") || {})[style] || "";
+            return window.getComputedStyle(element, "") || {};
+        };
+    else
+        exports.computedStyle = function (element, style) {
+            if (style)
+                return element.currentStyle[style];
+            return element.currentStyle;
+        };
 
-    return noScrollbar-withScrollbar;
-};
-
-if (typeof document == "undefined") {
-    exports.importCssString = function() {};
-    return;
-}
-
-if (window.pageYOffset !== undefined) {
-    exports.getPageScrollTop = function() {
-        return window.pageYOffset;
+    /*
+     * Optimized set innerHTML. This is faster than plain innerHTML if the element
+     * already contains a lot of child elements.
+     *
+     * See http://blog.stevenlevithan.com/archives/faster-than-innerhtml for details
+     */
+    exports.setInnerHtml = function (el, innerHtml) {
+        var element = el.cloneNode(false);//document.createElement("div");
+        element.innerHTML = innerHtml;
+        el.parentNode.replaceChild(element, el);
+        return element;
     };
 
-    exports.getPageScrollLeft = function() {
-        return window.pageXOffset;
-    };
-}
-else {
-    exports.getPageScrollTop = function() {
-        return document.body.scrollTop;
-    };
+    if ("textContent" in document.documentElement) {
+        exports.setInnerText = function (el, innerText) {
+            el.textContent = innerText;
+        };
 
-    exports.getPageScrollLeft = function() {
-        return document.body.scrollLeft;
-    };
-}
+        exports.getInnerText = function (el) {
+            return el.textContent;
+        };
+    }
+    else {
+        exports.setInnerText = function (el, innerText) {
+            el.innerText = innerText;
+        };
 
-if (window.getComputedStyle)
-    exports.computedStyle = function(element, style) {
-        if (style)
-            return (window.getComputedStyle(element, "") || {})[style] || "";
-        return window.getComputedStyle(element, "") || {};
-    };
-else
-    exports.computedStyle = function(element, style) {
-        if (style)
-            return element.currentStyle[style];
-        return element.currentStyle;
-    };
+        exports.getInnerText = function (el) {
+            return el.innerText;
+        };
+    }
 
-/*
- * Optimized set innerHTML. This is faster than plain innerHTML if the element
- * already contains a lot of child elements.
- *
- * See http://blog.stevenlevithan.com/archives/faster-than-innerhtml for details
- */
-exports.setInnerHtml = function(el, innerHtml) {
-    var element = el.cloneNode(false);//document.createElement("div");
-    element.innerHTML = innerHtml;
-    el.parentNode.replaceChild(element, el);
-    return element;
-};
-
-if ("textContent" in document.documentElement) {
-    exports.setInnerText = function(el, innerText) {
-        el.textContent = innerText;
+    exports.getParentWindow = function (document) {
+        return document.defaultView || document.parentWindow;
     };
-
-    exports.getInnerText = function(el) {
-        return el.textContent;
-    };
-}
-else {
-    exports.setInnerText = function(el, innerText) {
-        el.innerText = innerText;
-    };
-
-    exports.getInnerText = function(el) {
-        return el.innerText;
-    };
-}
-
-exports.getParentWindow = function(document) {
-    return document.defaultView || document.parentWindow;
-};
 
 });

@@ -31,25 +31,25 @@
 
 
 function DFASerializer(dfa, literalNames, symbolicNames) {
-	this.dfa = dfa;
-	this.literalNames = literalNames || [];
-	this.symbolicNames = symbolicNames || [];
-	return this;
+    this.dfa = dfa;
+    this.literalNames = literalNames || [];
+    this.symbolicNames = symbolicNames || [];
+    return this;
 }
 
-DFASerializer.prototype.toString = function() {
-   if(this.dfa.s0 === null) {
-       return null;
-   }
-   var buf = "";
-   var states = this.dfa.sortedStates();
-   for(var i=0;i<states.length;i++) {
-       var s = states[i];
-       if(s.edges!==null) {
+DFASerializer.prototype.toString = function () {
+    if (this.dfa.s0 === null) {
+        return null;
+    }
+    var buf = "";
+    var states = this.dfa.sortedStates();
+    for (var i = 0; i < states.length; i++) {
+        var s = states[i];
+        if (s.edges !== null) {
             var n = s.edges.length;
-            for(var j=0;j<n;j++) {
+            for (var j = 0; j < n; j++) {
                 var t = s.edges[j] || null;
-                if(t!==null && t.stateNumber !== 0x7FFFFFFF) {
+                if (t !== null && t.stateNumber !== 0x7FFFFFFF) {
                     buf = buf.concat(this.getStateString(s));
                     buf = buf.concat("-");
                     buf = buf.concat(this.getEdgeLabel(j));
@@ -58,24 +58,24 @@ DFASerializer.prototype.toString = function() {
                     buf = buf.concat('\n');
                 }
             }
-       }
-   }
-   return buf.length===0 ? null : buf;
+        }
+    }
+    return buf.length === 0 ? null : buf;
 };
 
-DFASerializer.prototype.getEdgeLabel = function(i) {
-    if (i===0) {
+DFASerializer.prototype.getEdgeLabel = function (i) {
+    if (i === 0) {
         return "EOF";
-    } else if(this.literalNames !==null || this.symbolicNames!==null) {
-        return this.literalNames[i-1] || this.symbolicNames[i-1];
+    } else if (this.literalNames !== null || this.symbolicNames !== null) {
+        return this.literalNames[i - 1] || this.symbolicNames[i - 1];
     } else {
-        return String.fromCharCode(i-1);
+        return String.fromCharCode(i - 1);
     }
 };
 
-DFASerializer.prototype.getStateString = function(s) {
+DFASerializer.prototype.getStateString = function (s) {
     var baseStateStr = ( s.isAcceptState ? ":" : "") + "s" + s.stateNumber + ( s.requiresFullContext ? "^" : "");
-    if(s.isAcceptState) {
+    if (s.isAcceptState) {
         if (s.predicates !== null) {
             return baseStateStr + "=>" + s.predicates.toString();
         } else {
@@ -87,15 +87,15 @@ DFASerializer.prototype.getStateString = function(s) {
 };
 
 function LexerDFASerializer(dfa) {
-	DFASerializer.call(this, dfa, null);
-	return this;
+    DFASerializer.call(this, dfa, null);
+    return this;
 }
 
 LexerDFASerializer.prototype = Object.create(DFASerializer.prototype);
 LexerDFASerializer.prototype.constructor = LexerDFASerializer;
 
-LexerDFASerializer.prototype.getEdgeLabel = function(i) {
-	return "'" + String.fromCharCode(i) + "'";
+LexerDFASerializer.prototype.getEdgeLabel = function (i) {
+    return "'" + String.fromCharCode(i) + "'";
 };
 
 exports.DFASerializer = DFASerializer;

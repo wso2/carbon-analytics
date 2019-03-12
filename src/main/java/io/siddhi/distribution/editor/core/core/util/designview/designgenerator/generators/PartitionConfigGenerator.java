@@ -63,11 +63,12 @@ public class PartitionConfigGenerator extends CodeSegmentsPreserver {
 
     /**
      * Generates PartitionConfig object from the given Siddhi Partition
-     * @param partition                         Siddhi Partition
-     * @param partitionId                       Id of the Partition against which,
-     *                                          Inner Stream definitions are contained in the respective map
-     * @return                                  PartitionConfig object
-     * @throws DesignGenerationException        Error when generating PartitionConfig object
+     *
+     * @param partition   Siddhi Partition
+     * @param partitionId Id of the Partition against which,
+     *                    Inner Stream definitions are contained in the respective map
+     * @return PartitionConfig object
+     * @throws DesignGenerationException Error when generating PartitionConfig object
      */
     public PartitionConfig generatePartitionConfig(Partition partition, String partitionId)
             throws DesignGenerationException {
@@ -86,9 +87,10 @@ public class PartitionConfigGenerator extends CodeSegmentsPreserver {
 
     /**
      * Generates QueryList from the given list of Siddhi Queries
-     * @param queryList                         List of Siddhi Queries
-     * @return                                  QueryConfig lists
-     * @throws DesignGenerationException        Error when generating a QueryConfig
+     *
+     * @param queryList List of Siddhi Queries
+     * @return QueryConfig lists
+     * @throws DesignGenerationException Error when generating a QueryConfig
      */
     private Map<QueryListType, List<QueryConfig>> generateQueryList(List<Query> queryList)
             throws DesignGenerationException {
@@ -105,7 +107,8 @@ public class PartitionConfigGenerator extends CodeSegmentsPreserver {
 
     /**
      * Populates an empty map of QueryConfig lists
-     * @return      Map of QueryConfig lists
+     *
+     * @return Map of QueryConfig lists
      */
     private Map<QueryListType, List<QueryConfig>> populateEmptyQueryLists() {
         Map<QueryListType, List<QueryConfig>> queryLists = new EnumMap<>(QueryListType.class);
@@ -118,8 +121,9 @@ public class PartitionConfigGenerator extends CodeSegmentsPreserver {
 
     /**
      * Generates a list of StreamConfigs from the given map of Inner Stream definition
-     * @param innerStreamDefinitions        Map of Inner Stream definitions
-     * @return                              List of StreamConfigs
+     *
+     * @param innerStreamDefinitions Map of Inner Stream definitions
+     * @return List of StreamConfigs
      */
     private List<StreamConfig> generateInnerStreams(Collection<AbstractDefinition> innerStreamDefinitions) {
         StreamDefinitionConfigGenerator streamDefinitionConfigGenerator = new StreamDefinitionConfigGenerator();
@@ -136,9 +140,10 @@ public class PartitionConfigGenerator extends CodeSegmentsPreserver {
 
     /**
      * Generates a list of PartitionWithElements, with the given map of Siddhi PartitionType
-     * @param partitionTypeMap                  Map of Siddhi PartitionType
-     * @return                                  List of PartitionWithElements
-     * @throws DesignGenerationException        Error when generating a PartitionWithElement
+     *
+     * @param partitionTypeMap Map of Siddhi PartitionType
+     * @return List of PartitionWithElements
+     * @throws DesignGenerationException Error when generating a PartitionWithElement
      */
     private List<PartitionWithElement> generatePartitionWith(Map<String, PartitionType> partitionTypeMap)
             throws DesignGenerationException {
@@ -156,9 +161,10 @@ public class PartitionConfigGenerator extends CodeSegmentsPreserver {
 
     /**
      * Generates PartitionWithElement, with the given map entry of PartitionType
-     * @param partitionWithEntry                PartitionType map entry
-     * @return                                  PartitionWithElement
-     * @throws DesignGenerationException        Error when generating PartitionElementExpression
+     *
+     * @param partitionWithEntry PartitionType map entry
+     * @return PartitionWithElement
+     * @throws DesignGenerationException Error when generating PartitionElementExpression
      */
     private PartitionWithElement generatePartitionWithElement(Map.Entry<String, PartitionType> partitionWithEntry)
             throws DesignGenerationException {
@@ -172,9 +178,10 @@ public class PartitionConfigGenerator extends CodeSegmentsPreserver {
 
     /**
      * Generates a string denoting PartitionElementExpression, with the given Siddhi PartitionType
-     * @param partitionType                     Siddhi PartitionType
-     * @return                                  String denoting PartitionElementExpression
-     * @throws DesignGenerationException        Error when generating PartitionExpression
+     *
+     * @param partitionType Siddhi PartitionType
+     * @return String denoting PartitionElementExpression
+     * @throws DesignGenerationException Error when generating PartitionExpression
      */
     private String generatePartitionElementExpression(PartitionType partitionType) throws DesignGenerationException {
         if (partitionType instanceof RangePartitionType) {
@@ -187,9 +194,10 @@ public class PartitionConfigGenerator extends CodeSegmentsPreserver {
 
     /**
      * Generates a string denoting RangePartitionExpression, with the given Siddhi RangePartitionProperty array
-     * @param rangePartitionProperties          Array of Siddhi RangePartitionProperty
-     * @return                                  String denoting RangePartitionExpression
-     * @throws DesignGenerationException        Error when generating RangePartitionExpression string
+     *
+     * @param rangePartitionProperties Array of Siddhi RangePartitionProperty
+     * @return String denoting RangePartitionExpression
+     * @throws DesignGenerationException Error when generating RangePartitionExpression string
      */
     private String generateRangePartitionExpression(
             RangePartitionType.RangePartitionProperty[] rangePartitionProperties) throws DesignGenerationException {
@@ -202,9 +210,10 @@ public class PartitionConfigGenerator extends CodeSegmentsPreserver {
 
     /**
      * Generates a string denoting ValuePartitionExpression, with the given Siddhi Expression
-     * @param valuePartitionExpression          Siddhi Expression
-     * @return                                  String denoting ValuePartitionExpression
-     * @throws DesignGenerationException        Error when generating ValuePartitionExpression string
+     *
+     * @param valuePartitionExpression Siddhi Expression
+     * @return String denoting ValuePartitionExpression
+     * @throws DesignGenerationException Error when generating ValuePartitionExpression string
      */
     private String generateValuePartitionExpression(Expression valuePartitionExpression)
             throws DesignGenerationException {
@@ -213,8 +222,9 @@ public class PartitionConfigGenerator extends CodeSegmentsPreserver {
 
     /**
      * Generates list of strings, denoting annotations
-     * @param annotations       List of Siddhi Annotations
-     * @return                  List of strings, denoting annotations
+     *
+     * @param annotations List of Siddhi Annotations
+     * @return List of strings, denoting annotations
      */
     private List<String> generateAnnotations(List<Annotation> annotations) {
         AnnotationConfigGenerator annotationConfigGenerator = new AnnotationConfigGenerator();

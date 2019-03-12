@@ -47,9 +47,10 @@ public class PatternSequenceConfigTreeInfoGenerator {
 
     /**
      * Generates PatternSequenceConfigTreeInfo object, with the given Siddhi StateElement
-     * @param stateElement                      Siddhi StateElement
-     * @return                                  PatternSequenceConfigTreeInfo object
-     * @throws DesignGenerationException        Error while generating StateElementConfig tree
+     *
+     * @param stateElement Siddhi StateElement
+     * @return PatternSequenceConfigTreeInfo object
+     * @throws DesignGenerationException Error while generating StateElementConfig tree
      */
     public PatternSequenceConfigTreeInfo generatePatternSequenceConfigTreeInfo(StateElement stateElement)
             throws DesignGenerationException {
@@ -59,7 +60,8 @@ public class PatternSequenceConfigTreeInfoGenerator {
 
     /**
      * Adds the given stream reference to the list of available stream references
-     * @param streamReference       Stream reference of a Siddhi InputStream when available, or null
+     *
+     * @param streamReference Stream reference of a Siddhi InputStream when available, or null
      */
     private void addToAvailableStreamReferences(String streamReference) {
         if (streamReference != null) {
@@ -69,9 +71,10 @@ public class PatternSequenceConfigTreeInfoGenerator {
 
     /**
      * Creates a StateElementConfig object from the given Siddhi StateElement object
-     * @param stateElement                      Siddhi StateElement object
-     * @return                                  StateElementConfig object
-     * @throws DesignGenerationException        Error while generating StateElementConfig object
+     *
+     * @param stateElement Siddhi StateElement object
+     * @return StateElementConfig object
+     * @throws DesignGenerationException Error while generating StateElementConfig object
      */
     private StateElementConfig generateStateElementConfigTree(StateElement stateElement)
             throws DesignGenerationException {
@@ -94,10 +97,11 @@ public class PatternSequenceConfigTreeInfoGenerator {
      * Generates the definition of the given SiddhiElement object, in Siddhi app String.
      * This method wraps the getDefinition method of the ConfigBuildingUtilities class,
      * as the returned value should be null - when null is given for the parameter SiddhiElement
-     * @param siddhiElement                     SiddhiElement object
-     * @return                                  Definition of the given SiddhiElement object when not null,
-     *                                          otherwise returns null
-     * @throws DesignGenerationException        Error while getting definition for the non-null SiddhiElement object
+     *
+     * @param siddhiElement SiddhiElement object
+     * @return Definition of the given SiddhiElement object when not null,
+     * otherwise returns null
+     * @throws DesignGenerationException Error while getting definition for the non-null SiddhiElement object
      */
     private String generateNullableElementDefinition(SiddhiElement siddhiElement) throws DesignGenerationException {
         if (siddhiElement == null) {
@@ -108,9 +112,10 @@ public class PatternSequenceConfigTreeInfoGenerator {
 
     /**
      * Generates config for the given Siddhi StreamStateElement object
-     * @param streamStateElement                Siddhi StreamStateElement object
-     * @return                                  StreamStateElement config
-     * @throws DesignGenerationException        Error while generating StreamStateElement config
+     *
+     * @param streamStateElement Siddhi StreamStateElement object
+     * @return StreamStateElement config
+     * @throws DesignGenerationException Error while generating StreamStateElement config
      */
     private StreamStateElementConfig generateStreamStateElementConfig(StreamStateElement streamStateElement)
             throws DesignGenerationException {
@@ -136,9 +141,10 @@ public class PatternSequenceConfigTreeInfoGenerator {
 
     /**
      * Generates config for the given Siddhi CountStateElement object
-     * @param countStateElement                 Siddhi CountStateElement object
-     * @return                                  CountStateElementConfig object
-     * @throws DesignGenerationException        Error while generating CountStateElementConfig object
+     *
+     * @param countStateElement Siddhi CountStateElement object
+     * @return CountStateElementConfig object
+     * @throws DesignGenerationException Error while generating CountStateElementConfig object
      */
     private CountStateElementConfig generateCountStateElementConfig(CountStateElement countStateElement)
             throws DesignGenerationException {
@@ -154,9 +160,10 @@ public class PatternSequenceConfigTreeInfoGenerator {
 
     /**
      * Generates config for the given Siddhi LogicalStateElement object
-     * @param logicalStateElement               Siddhi LogicalStateElement object
-     * @return                                  LogicalStateElementConfig object
-     * @throws DesignGenerationException        Error while generating LogicalStateElementConfig object
+     *
+     * @param logicalStateElement Siddhi LogicalStateElement object
+     * @return LogicalStateElementConfig object
+     * @throws DesignGenerationException Error while generating LogicalStateElementConfig object
      */
     private LogicalStateElementConfig generateLogicalStateElementConfig(LogicalStateElement logicalStateElement)
             throws DesignGenerationException {
@@ -173,9 +180,10 @@ public class PatternSequenceConfigTreeInfoGenerator {
 
     /**
      * Generates config for the given Siddhi EveryStateElement object
-     * @param everyStateElement                 Siddhi EveryStateElement object
-     * @return                                  EveryStateElementConfig object
-     * @throws DesignGenerationException        Error while generating EveryStateElementConfig object
+     *
+     * @param everyStateElement Siddhi EveryStateElement object
+     * @return EveryStateElementConfig object
+     * @throws DesignGenerationException Error while generating EveryStateElementConfig object
      */
     private EveryStateElementConfig generateEveryStateElementConfig(EveryStateElement everyStateElement)
             throws DesignGenerationException {
@@ -188,15 +196,17 @@ public class PatternSequenceConfigTreeInfoGenerator {
 
     /**
      * Generates config for the given Siddhi NextStateElement object
-     * @param nextStateElement                  Siddhi NextStateElement object
-     * @return                                  NextStateElementConfig object
-     * @throws DesignGenerationException        Error while generating NextStateElementConfig object
+     *
+     * @param nextStateElement Siddhi NextStateElement object
+     * @return NextStateElementConfig object
+     * @throws DesignGenerationException Error while generating NextStateElementConfig object
      */
     private NextStateElementConfig generateNextStateElementConfig(NextStateElement nextStateElement)
             throws DesignGenerationException {
         NextStateElementConfig nextStateElementConfig = new NextStateElementConfig();
         nextStateElementConfig.setStateElement(generateStateElementConfigTree(nextStateElement.getStateElement()));
-        nextStateElementConfig.setNextStateElement(generateStateElementConfigTree(nextStateElement.getNextStateElement()));
+        nextStateElementConfig.
+                setNextStateElement(generateStateElementConfigTree(nextStateElement.getNextStateElement()));
         nextStateElementConfig.setWithin(generateNullableElementDefinition(nextStateElement.getWithin()));
 
         return nextStateElementConfig;
@@ -204,9 +214,10 @@ public class PatternSequenceConfigTreeInfoGenerator {
 
     /**
      * Generates config for the given Siddhi AbsentStreamStateElement object
-     * @param absentStreamStateElement          Siddhi AbsentStreamStateElement object
-     * @return                                  AbsentStreamStateElementConfig object
-     * @throws DesignGenerationException        Error while generating AbsentStreamStateElementConfig object
+     *
+     * @param absentStreamStateElement Siddhi AbsentStreamStateElement object
+     * @return AbsentStreamStateElementConfig object
+     * @throws DesignGenerationException Error while generating AbsentStreamStateElementConfig object
      */
     private AbsentStreamStateElementConfig generateAbsentStreamStateElementConfig(
             AbsentStreamStateElement absentStreamStateElement) throws DesignGenerationException {

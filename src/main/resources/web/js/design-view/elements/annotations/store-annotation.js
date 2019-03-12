@@ -28,9 +28,9 @@ define(
         var StoreAnnotation = function (options) {
             /*
              Data storing structure as follows
-                type*: ‘’,
-                options*: {Key-Value Pair JSON}
-            */
+             type*: ‘’,
+             options*: {Key-Value Pair JSON}
+             */
             if (options !== undefined) {
                 this.type = options.type;
                 this.options = options.options;

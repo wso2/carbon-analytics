@@ -17,8 +17,6 @@
  */
 define([],
     function () {
-        return  {
-
-        }
+        return {}
     });
 

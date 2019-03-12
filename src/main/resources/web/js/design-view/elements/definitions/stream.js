@@ -28,17 +28,17 @@ define(['require', 'elementUtils'],
         var Stream = function (options) {
             /*
              Data storing structure as follows
-                id: '',
-                previousCommentSegment:'',
-                name: '',
-                attributeList: [
-                    {
-                        name: ‘’,
-                        type: ‘’
-                    }
-                ],
-                annotationList: [annotation1, annotation2, ...]
-            */
+             id: '',
+             previousCommentSegment:'',
+             name: '',
+             attributeList: [
+             {
+             name: ‘’,
+             type: ‘’
+             }
+             ],
+             annotationList: [annotation1, annotation2, ...]
+             */
             if (options !== undefined) {
                 this.id = options.id;
                 this.previousCommentSegment = options.previousCommentSegment;

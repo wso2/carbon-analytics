@@ -68,6 +68,9 @@ import java.util.Set;
  */
 public class CodeGeneratorUtils {
 
+    private CodeGeneratorUtils() {
+    }
+
     /**
      * Reorders a list of QueryConfig objects to the right order that it should be in displayed in
      * when converting to a Siddhi app partition
@@ -250,7 +253,8 @@ public class CodeGeneratorUtils {
      * @param queries    The list of queries in a Siddhi app
      * @param partitions The list of partitions in a Siddhi app
      * @return The list of ExecutionElementConfig objects of a Siddhi app
-     * @throws CodeGenerationException Error when trying to convert a query/partition to an ExecutionElementConfig object
+     * @throws CodeGenerationException Error when trying to convert a query/partition to an ExecutionElementConfig
+     * object
      */
     public static List<ExecutionElementConfig> convertToExecutionElements(List<QueryConfig> queries,
                                                                           List<PartitionConfig> partitions)
@@ -271,7 +275,8 @@ public class CodeGeneratorUtils {
      * be in displayed in when converting to a Siddhi app partition
      *
      * @param executionElements The ExecutionElements (queries and partitions) of a Siddhi app
-     * @param definitionNames   The names of all the definition elements in a Siddhi app (excluding inner streams and undefined streams)
+     * @param definitionNames   The names of all the definition elements in a Siddhi app (excluding inner streams
+     *                          and undefined streams)
      * @return The execution elements reordered to the way it should be represented in a Siddhi application
      * @throws CodeGenerationException Error when trying to reorder the ExecutionElementConfig list
      */
@@ -304,6 +309,9 @@ public class CodeGeneratorUtils {
      * Static inner class that is used to validate any incoming *Config objects for null pointers
      */
     public static class NullValidator {
+
+        private NullValidator() {
+        }
 
         public static void validateConfigObject(StreamConfig stream) throws CodeGenerationException {
             if (stream == null) {
@@ -339,11 +347,13 @@ public class CodeGeneratorUtils {
             }
         }
 
-        public static void validateConfigObject(PatternSequenceConditionConfig condition) throws CodeGenerationException {
+        public static void validateConfigObject(PatternSequenceConditionConfig condition)
+                throws CodeGenerationException {
             if (condition == null) {
                 throw new CodeGenerationException("A given pattern/sequence query condition is empty");
             } else if (condition.getStreamName() == null || condition.getStreamName().isEmpty()) {
-                throw new CodeGenerationException("The stream name of a given pattern/sequence query condition is empty");
+                throw new CodeGenerationException("The stream name of a given pattern/sequence query condition " +
+                        "is empty");
             }
         }
 
@@ -365,7 +375,8 @@ public class CodeGeneratorUtils {
             }
         }
 
-        public static void validateConfigObject(WindowFilterProjectionConfig windowFilterProjection) throws CodeGenerationException {
+        public static void validateConfigObject(WindowFilterProjectionConfig windowFilterProjection)
+                throws CodeGenerationException {
             if (windowFilterProjection == null) {
                 throw new CodeGenerationException("A given window/filter/project element is empty");
             } else if (windowFilterProjection.getFrom() == null || windowFilterProjection.getFrom().isEmpty()) {
@@ -390,7 +401,8 @@ public class CodeGeneratorUtils {
             }
         }
 
-        public static void validateConfigObject(UpdateInsertIntoOutputConfig updateInsertIntoOutput) throws CodeGenerationException {
+        public static void validateConfigObject(UpdateInsertIntoOutputConfig updateInsertIntoOutput)
+                throws CodeGenerationException {
             if (updateInsertIntoOutput == null) {
                 throw new CodeGenerationException("A given update/insert query output element is empty");
             } else if (updateInsertIntoOutput.getOn() == null || updateInsertIntoOutput.getOn().isEmpty()) {
@@ -426,7 +438,8 @@ public class CodeGeneratorUtils {
             }
         }
 
-        public static void validateConfigObject(AggregateByTimePeriod aggregateByTimePeriod) throws CodeGenerationException {
+        public static void validateConfigObject(AggregateByTimePeriod aggregateByTimePeriod)
+                throws CodeGenerationException {
             if (aggregateByTimePeriod == null) {
                 throw new CodeGenerationException("A given aggregateByTimePeriod element is empty");
             } else if (aggregateByTimePeriod.getType() == null || aggregateByTimePeriod.getType().isEmpty()) {
@@ -434,7 +447,8 @@ public class CodeGeneratorUtils {
             }
         }
 
-        public static void validateConfigObject(AggregateByTimeRange aggregateByTimeRange) throws CodeGenerationException {
+        public static void validateConfigObject(AggregateByTimeRange aggregateByTimeRange)
+                throws CodeGenerationException {
             if (aggregateByTimeRange.getValue() == null) {
                 throw new CodeGenerationException("The 'value' attribute of a given aggregateByTimeRange" +
                         " element is empty");
@@ -473,12 +487,16 @@ public class CodeGeneratorUtils {
             }
         }
 
-        public static void validateConfigObject(PartitionWithElement partitionWithElement) throws CodeGenerationException {
+        public static void validateConfigObject(PartitionWithElement partitionWithElement)
+                throws CodeGenerationException {
             if (partitionWithElement == null) {
                 throw new CodeGenerationException("A given 'partition with' element is empty");
-            } else if (partitionWithElement.getExpression() == null || partitionWithElement.getExpression().isEmpty()) {
-                throw new CodeGenerationException("The 'expression' value of a given 'partition with' element is empty");
-            } else if (partitionWithElement.getStreamName() == null || partitionWithElement.getStreamName().isEmpty()) {
+            } else if (partitionWithElement.getExpression() == null ||
+                    partitionWithElement.getExpression().isEmpty()) {
+                throw new CodeGenerationException("The 'expression' value of a given 'partition with' " +
+                        "element is empty");
+            } else if (partitionWithElement.getStreamName() == null ||
+                    partitionWithElement.getStreamName().isEmpty()) {
                 throw new CodeGenerationException("The stream name of a given 'partition with' element is empty");
             }
         }
@@ -541,7 +559,8 @@ public class CodeGeneratorUtils {
             }
         }
 
-        public static void validateConfigObject(AttributesSelectionConfig attributesSelection) throws CodeGenerationException {
+        public static void validateConfigObject(AttributesSelectionConfig attributesSelection)
+                throws CodeGenerationException {
             if (attributesSelection == null) {
                 throw new CodeGenerationException("A given attribute selection element is empty");
             } else if (attributesSelection.getType() == null || attributesSelection.getType().isEmpty()) {
@@ -570,14 +589,16 @@ public class CodeGeneratorUtils {
             }
         }
 
-        public static void validateConfigObject(AggregateByTimeInterval aggregateByTimeInterval) throws CodeGenerationException {
+        public static void validateConfigObject(AggregateByTimeInterval aggregateByTimeInterval)
+                throws CodeGenerationException {
             if (aggregateByTimeInterval.getValue() == null || aggregateByTimeInterval.getValue().isEmpty()) {
                 throw new CodeGenerationException("The 'value' attribute of a given" +
                         " attributeByTimeInterval element is empty");
             }
         }
 
-        public static void validateConfigObject(List<PartitionWithElement> partitionWith) throws CodeGenerationException {
+        public static void validateConfigObject(List<PartitionWithElement> partitionWith)
+                throws CodeGenerationException {
             if (partitionWith == null || partitionWith.isEmpty()) {
                 throw new CodeGenerationException("A given 'partitionWith' list is empty");
             }
@@ -589,20 +610,24 @@ public class CodeGeneratorUtils {
             }
         }
 
-        public static void validateConfigObject(MapperPayloadOrAttribute payloadOrAttribute) throws CodeGenerationException {
+        public static void validateConfigObject(MapperPayloadOrAttribute payloadOrAttribute)
+                throws CodeGenerationException {
             if (payloadOrAttribute.getType() == null || payloadOrAttribute.getType().isEmpty()) {
-                throw new CodeGenerationException("The 'type' value of a given source/sink map attribute element is empty");
+                throw new CodeGenerationException("The 'type' value of a given source/sink map attribute " +
+                        "element is empty");
             }
         }
 
-        public static void validateConfigObject(MapperListPayloadOrAttribute mapperListAttribute) throws CodeGenerationException {
+        public static void validateConfigObject(MapperListPayloadOrAttribute mapperListAttribute)
+                throws CodeGenerationException {
             if (mapperListAttribute.getValue() == null || mapperListAttribute.getValue().isEmpty()) {
                 throw new CodeGenerationException("The list values of a given sink/source" +
                         " map attribute element is empty");
             }
         }
 
-        public static void validateConfigObject(MapperMapPayloadOrAttribute mapperMapAttribute) throws CodeGenerationException {
+        public static void validateConfigObject(MapperMapPayloadOrAttribute mapperMapAttribute)
+                throws CodeGenerationException {
             if (mapperMapAttribute.getValue() == null || mapperMapAttribute.getValue().isEmpty()) {
                 throw new CodeGenerationException("The key-value pair values of" +
                         " a given source/sink map attribute element is empty");
@@ -619,12 +644,6 @@ public class CodeGeneratorUtils {
             }
         }
 
-        private NullValidator() {
-        }
-
-    }
-
-    private CodeGeneratorUtils() {
     }
 
 }

@@ -77,12 +77,12 @@ define(['require', 'jquery', 'backbone', 'lodash', 'log', 'design_view', "./sour
                     designContainer.attr('id', designViewDynamicId);
 
                     /*
-                    * Use the below line to assign dynamic id for design grid container and pass the id to initialize
-                    * jsPlumb.
-                    *
-                    * NOTE: jsPlumb is loaded via the index.html as a common script for the entire program. When a new
-                    * tab is created, that tab is initialised with a dedicated jsPlumb instance.
-                    * */
+                     * Use the below line to assign dynamic id for design grid container and pass the id to initialize
+                     * jsPlumb.
+                     *
+                     * NOTE: jsPlumb is loaded via the index.html as a common script for the entire program. When a new
+                     * tab is created, that tab is initialised with a dedicated jsPlumb instance.
+                     * */
                     var designGridDynamicId = "design-grid-container-" + this._$parent_el.attr('id');
                     var designViewGridContainer =
                         this._$parent_el.find(_.get(this.options, 'design_view.grid_container'));
@@ -127,7 +127,7 @@ define(['require', 'jquery', 'backbone', 'lodash', 'log', 'design_view', "./sour
                         if (self.getUndoManager().hasUndo()) {
                             // clear undo stack from design view
                             if (!self.getUndoManager().getOperationFactory()
-                                .isSourceModifiedOperation(self.getUndoManager().undoStackTop())) {
+                                    .isSourceModifiedOperation(self.getUndoManager().undoStackTop())) {
                                 self.getUndoManager().reset();
                             }
                         }
@@ -135,7 +135,7 @@ define(['require', 'jquery', 'backbone', 'lodash', 'log', 'design_view', "./sour
                         if (self.getUndoManager().hasRedo()) {
                             // clear redo stack from design view
                             if (!self.getUndoManager().getOperationFactory()
-                                .isSourceModifiedOperation(self.getUndoManager().redoStackTop())) {
+                                    .isSourceModifiedOperation(self.getUndoManager().redoStackTop())) {
                                 self.getUndoManager().reset();
                             }
                         }

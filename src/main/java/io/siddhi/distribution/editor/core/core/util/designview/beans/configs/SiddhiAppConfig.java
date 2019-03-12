@@ -208,24 +208,28 @@ public class SiddhiAppConfig {
         addElement(partitionList, partitionConfig);
     }
 
-    public void setAppAnnotationList(List<String> appAnnotationList) {
-        this.appAnnotationList = appAnnotationList;
+    public String getSiddhiAppDescription() {
+        return siddhiAppDescription;
     }
 
-    public void setSiddhiAppDescription(String siddhiAppDescription) { this.siddhiAppDescription = siddhiAppDescription; }
-
-    public String getSiddhiAppDescription() { return siddhiAppDescription; }
-
-    public void setSiddhiAppName(String siddhiAppName) {
-        this.siddhiAppName = siddhiAppName;
+    public void setSiddhiAppDescription(String siddhiAppDescription) {
+        this.siddhiAppDescription = siddhiAppDescription;
     }
 
     public String getSiddhiAppName() {
         return siddhiAppName;
     }
 
+    public void setSiddhiAppName(String siddhiAppName) {
+        this.siddhiAppName = siddhiAppName;
+    }
+
     public List<String> getAppAnnotationList() {
         return appAnnotationList;
+    }
+
+    public void setAppAnnotationList(List<String> appAnnotationList) {
+        this.appAnnotationList = appAnnotationList;
     }
 
     public List<SourceSinkConfig> getSourceList() {

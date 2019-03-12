@@ -48,9 +48,10 @@ public class QueryOutputConfigGenerator {
 
     /**
      * Generates Config for a Siddhi Query's output part
-     * @param queryOutputStream                 Siddhi QueryOutputStream
-     * @return                                  QueryOutputConfig
-     * @throws DesignGenerationException        Error while generating Query Output
+     *
+     * @param queryOutputStream Siddhi QueryOutputStream
+     * @return QueryOutputConfig
+     * @throws DesignGenerationException Error while generating Query Output
      */
     public QueryOutputConfig generateQueryOutputConfig(OutputStream queryOutputStream)
             throws DesignGenerationException {
@@ -68,8 +69,9 @@ public class QueryOutputConfigGenerator {
 
     /**
      * Generates a QueryOutputConfig of type 'insert into'
-     * @param insertIntoStream      Siddhi InsertIntoStream
-     * @return                      QueryOutputConfig
+     *
+     * @param insertIntoStream Siddhi InsertIntoStream
+     * @return QueryOutputConfig
      */
     private QueryOutputConfig generateInsertOutputConfig(InsertIntoStream insertIntoStream) {
         return new QueryOutputConfig(
@@ -80,9 +82,10 @@ public class QueryOutputConfigGenerator {
 
     /**
      * Generates a QueryOutputConfig of type 'delete'
-     * @param deleteStream                      Siddhi DeleteStream
-     * @return                                  QueryOutputConfig
-     * @throws DesignGenerationException        Error while generating QueryOutputConfig
+     *
+     * @param deleteStream Siddhi DeleteStream
+     * @return QueryOutputConfig
+     * @throws DesignGenerationException Error while generating QueryOutputConfig
      */
     private QueryOutputConfig generateDeleteOutputConfig(DeleteStream deleteStream) throws DesignGenerationException {
         return new QueryOutputConfig(
@@ -95,9 +98,10 @@ public class QueryOutputConfigGenerator {
 
     /**
      * Generates a QueryOutputConfig of type 'update'
-     * @param updateStream                      Siddhi UpdateStream
-     * @return                                  QueryOutputConfig
-     * @throws DesignGenerationException        Error while generating QueryOutputConfig
+     *
+     * @param updateStream Siddhi UpdateStream
+     * @return QueryOutputConfig
+     * @throws DesignGenerationException Error while generating QueryOutputConfig
      */
     private QueryOutputConfig generateUpdateOutputConfig(UpdateStream updateStream) throws DesignGenerationException {
         List<SetAttributeConfig> setAttributeConfigList = null;
@@ -115,9 +119,10 @@ public class QueryOutputConfigGenerator {
 
     /**
      * Generates a QueryOutputConfig of type 'update or insert into'
-     * @param updateOrInsertStream              Siddhi UpdateOrInsertStream
-     * @return                                  QueryOutputConfig
-     * @throws DesignGenerationException        Error while generating QueryOutputConfig
+     *
+     * @param updateOrInsertStream Siddhi UpdateOrInsertStream
+     * @return QueryOutputConfig
+     * @throws DesignGenerationException Error while generating QueryOutputConfig
      */
     private QueryOutputConfig generateUpdateOrInsertIntoOutputConfig(UpdateOrInsertStream updateOrInsertStream)
             throws DesignGenerationException {
@@ -138,9 +143,10 @@ public class QueryOutputConfigGenerator {
 
     /**
      * Generates config of attributes, set in 'update' or 'update or insert into' queries
-     * @param setAttributes                     List of Siddhi SetAttributes
-     * @return                                  List of SetAttributeConfigs
-     * @throws DesignGenerationException        Error while generating config
+     *
+     * @param setAttributes List of Siddhi SetAttributes
+     * @return List of SetAttributeConfigs
+     * @throws DesignGenerationException Error while generating config
      */
     private List<SetAttributeConfig> generateSetAttributeConfigsList(List<UpdateSet.SetAttribute> setAttributes)
             throws DesignGenerationException {

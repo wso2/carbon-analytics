@@ -1,6 +1,12 @@
-[[
-   "start",
-  ["comment","# comment"]
-],[
-   "start"
-]]
+[
+  [
+    "start",
+    [
+      "comment",
+      "# comment"
+    ]
+  ],
+  [
+    "start"
+  ]
+]

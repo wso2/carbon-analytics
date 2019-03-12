@@ -1,24 +1,24 @@
-define(function(require, exports, module) {
-"use strict";
+define(function (require, exports, module) {
+    "use strict";
 
-var oop = require("../lib/oop");
-var HtmlMode = require("./html").Mode;
-var LuaMode = require("./lua").Mode;
-var LuaPageHighlightRules = require("./luapage_highlight_rules").LuaPageHighlightRules;
+    var oop = require("../lib/oop");
+    var HtmlMode = require("./html").Mode;
+    var LuaMode = require("./lua").Mode;
+    var LuaPageHighlightRules = require("./luapage_highlight_rules").LuaPageHighlightRules;
 
-var Mode = function() {
-    HtmlMode.call(this);
-    
-    this.HighlightRules = LuaPageHighlightRules;
-    this.createModeDelegates({
-        "lua-": LuaMode
-    });
-};
-oop.inherits(Mode, HtmlMode);
+    var Mode = function () {
+        HtmlMode.call(this);
 
-(function() {
-    this.$id = "ace/mode/luapage";
-}).call(Mode.prototype);
+        this.HighlightRules = LuaPageHighlightRules;
+        this.createModeDelegates({
+            "lua-": LuaMode
+        });
+    };
+    oop.inherits(Mode, HtmlMode);
 
-exports.Mode = Mode;
+    (function () {
+        this.$id = "ace/mode/luapage";
+    }).call(Mode.prototype);
+
+    exports.Mode = Mode;
 });

@@ -28,35 +28,35 @@
  *
  * ***** END LICENSE BLOCK ***** */
 
-define(function(require, exports, module) {
-"use strict";
+define(function (require, exports, module) {
+    "use strict";
 
-var oop = require("ace/lib/oop");
-var EventEmitter = require("ace/lib/event_emitter").EventEmitter;
+    var oop = require("ace/lib/oop");
+    var EventEmitter = require("ace/lib/event_emitter").EventEmitter;
 
-var Editor = exports.Editor = function() {
-    this._buffers = [];
-    this._windows = [];
-};
-
-(function() {
-
-    oop.implement(this, EventEmitter);
-    
-    this.addBuffer = function(buffer) {
-        this._buffers.push(buffer);
-        return this._buffers.length-1;
+    var Editor = exports.Editor = function () {
+        this._buffers = [];
+        this._windows = [];
     };
-    
-    this.addWindow = function(win) {
-        this._windows.push(win);
-        return this._windows.length-1;
-    };
-    
-    this.openInWindow = function(bufferId, winId) {
-        this._windows[winId || 0].setBuffer(this._buffers[bufferId]);
-    };
-    
-}).call(Editor.prototype);
+
+    (function () {
+
+        oop.implement(this, EventEmitter);
+
+        this.addBuffer = function (buffer) {
+            this._buffers.push(buffer);
+            return this._buffers.length - 1;
+        };
+
+        this.addWindow = function (win) {
+            this._windows.push(win);
+            return this._windows.length - 1;
+        };
+
+        this.openInWindow = function (bufferId, winId) {
+            this._windows[winId || 0].setBuffer(this._buffers[bufferId]);
+        };
+
+    }).call(Editor.prototype);
 
 });

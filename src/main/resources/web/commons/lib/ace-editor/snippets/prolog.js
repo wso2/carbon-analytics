@@ -1,7 +1,7 @@
-define(function(require, exports, module) {
-"use strict";
+define(function (require, exports, module) {
+    "use strict";
 
-exports.snippetText = require("../requirejs/text!./prolog.snippets");
-exports.scope = "prolog";
+    exports.snippetText = require("../requirejs/text!./prolog.snippets");
+    exports.scope = "prolog";
 
 });

@@ -28,20 +28,20 @@ define(
         var Map = function (options) {
             /*
              Data storing structure as follows
-                type*: ‘’,
-                options: {Key-Value Pair JSON},
-                payloadOrAttribute: {
-                    annotationType: 'PAYLOAD | ATTRIBUTES',
-                    type*: ‘MAP’,
-                    value*: {Key-Value Pair JSON}
-                }
-                << or >>
-                payloadOrAttribute: {
-                    annotationType: 'PAYLOAD | ATTRIBUTES',
-                    type*: ‘LIST’,
-                    value*: ['value1',...]
-                } NOTE: LIST will contain only one value in sink mapper payload.
-            */
+             type*: ‘’,
+             options: {Key-Value Pair JSON},
+             payloadOrAttribute: {
+             annotationType: 'PAYLOAD | ATTRIBUTES',
+             type*: ‘MAP’,
+             value*: {Key-Value Pair JSON}
+             }
+             << or >>
+             payloadOrAttribute: {
+             annotationType: 'PAYLOAD | ATTRIBUTES',
+             type*: ‘LIST’,
+             value*: ['value1',...]
+             } NOTE: LIST will contain only one value in sink mapper payload.
+             */
             if (options !== undefined) {
                 this.type = options.type;
                 this.options = options.options;

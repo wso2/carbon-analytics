@@ -39,148 +39,150 @@ var Utils = require('../Utils.js');
 
 
 function Tree() {
-	return this;
+    return this;
 }
 
 function SyntaxTree() {
-	Tree.call(this);
-	return this;
+    Tree.call(this);
+    return this;
 }
 
 SyntaxTree.prototype = Object.create(Tree.prototype);
 SyntaxTree.prototype.constructor = SyntaxTree;
 
 function ParseTree() {
-	SyntaxTree.call(this);
-	return this;
+    SyntaxTree.call(this);
+    return this;
 }
 
 ParseTree.prototype = Object.create(SyntaxTree.prototype);
 ParseTree.prototype.constructor = ParseTree;
 
 function RuleNode() {
-	ParseTree.call(this);
-	return this;
+    ParseTree.call(this);
+    return this;
 }
 
 RuleNode.prototype = Object.create(ParseTree.prototype);
 RuleNode.prototype.constructor = RuleNode;
 
 function TerminalNode() {
-	ParseTree.call(this);
-	return this;
+    ParseTree.call(this);
+    return this;
 }
 
 TerminalNode.prototype = Object.create(ParseTree.prototype);
 TerminalNode.prototype.constructor = TerminalNode;
 
 function ErrorNode() {
-	TerminalNode.call(this);
-	return this;
+    TerminalNode.call(this);
+    return this;
 }
 
 ErrorNode.prototype = Object.create(TerminalNode.prototype);
 ErrorNode.prototype.constructor = ErrorNode;
 
 function ParseTreeVisitor() {
-	return this;
+    return this;
 }
 
-ParseTreeVisitor.prototype.visit = function(ctx) {
-	if (Utils.isArray(ctx)) {
-		var self = this;
-		return ctx.map(function(child) { return visitAtom(self, child)});
-	} else {
-		return visitAtom(this, ctx);
-	}
+ParseTreeVisitor.prototype.visit = function (ctx) {
+    if (Utils.isArray(ctx)) {
+        var self = this;
+        return ctx.map(function (child) {
+            return visitAtom(self, child)
+        });
+    } else {
+        return visitAtom(this, ctx);
+    }
 };
 
-ParseTreeVisitor.prototype.visitTerminal = function(node) {
+ParseTreeVisitor.prototype.visitTerminal = function (node) {
 };
 
-ParseTreeVisitor.prototype.visitErrorNode = function(node) {
+ParseTreeVisitor.prototype.visitErrorNode = function (node) {
 };
 
 
-var visitAtom = function(visitor, ctx) {
-	if (ctx.parser === undefined) { //is terminal
-		return;
-	}
+var visitAtom = function (visitor, ctx) {
+    if (ctx.parser === undefined) { //is terminal
+        return;
+    }
 
-	var name = ctx.parser.ruleNames[ctx.ruleIndex];
-	var funcName = "visit" + Utils.titleCase(name);
+    var name = ctx.parser.ruleNames[ctx.ruleIndex];
+    var funcName = "visit" + Utils.titleCase(name);
 
-	return visitor[funcName](ctx);
+    return visitor[funcName](ctx);
 };
 
 function ParseTreeListener() {
-	return this;
+    return this;
 }
 
-ParseTreeListener.prototype.visitTerminal = function(node) {
+ParseTreeListener.prototype.visitTerminal = function (node) {
 };
 
-ParseTreeListener.prototype.visitErrorNode = function(node) {
+ParseTreeListener.prototype.visitErrorNode = function (node) {
 };
 
-ParseTreeListener.prototype.enterEveryRule = function(node) {
+ParseTreeListener.prototype.enterEveryRule = function (node) {
 };
 
-ParseTreeListener.prototype.exitEveryRule = function(node) {
+ParseTreeListener.prototype.exitEveryRule = function (node) {
 };
 
 function TerminalNodeImpl(symbol) {
-	TerminalNode.call(this);
-	this.parentCtx = null;
-	this.symbol = symbol;
-	return this;
+    TerminalNode.call(this);
+    this.parentCtx = null;
+    this.symbol = symbol;
+    return this;
 }
 
 TerminalNodeImpl.prototype = Object.create(TerminalNode.prototype);
 TerminalNodeImpl.prototype.constructor = TerminalNodeImpl;
 
-TerminalNodeImpl.prototype.getChild = function(i) {
-	return null;
+TerminalNodeImpl.prototype.getChild = function (i) {
+    return null;
 };
 
-TerminalNodeImpl.prototype.getSymbol = function() {
-	return this.symbol;
+TerminalNodeImpl.prototype.getSymbol = function () {
+    return this.symbol;
 };
 
-TerminalNodeImpl.prototype.getParent = function() {
-	return this.parentCtx;
+TerminalNodeImpl.prototype.getParent = function () {
+    return this.parentCtx;
 };
 
-TerminalNodeImpl.prototype.getPayload = function() {
-	return this.symbol;
+TerminalNodeImpl.prototype.getPayload = function () {
+    return this.symbol;
 };
 
-TerminalNodeImpl.prototype.getSourceInterval = function() {
-	if (this.symbol === null) {
-		return INVALID_INTERVAL;
-	}
-	var tokenIndex = this.symbol.tokenIndex;
-	return new Interval(tokenIndex, tokenIndex);
+TerminalNodeImpl.prototype.getSourceInterval = function () {
+    if (this.symbol === null) {
+        return INVALID_INTERVAL;
+    }
+    var tokenIndex = this.symbol.tokenIndex;
+    return new Interval(tokenIndex, tokenIndex);
 };
 
-TerminalNodeImpl.prototype.getChildCount = function() {
-	return 0;
+TerminalNodeImpl.prototype.getChildCount = function () {
+    return 0;
 };
 
-TerminalNodeImpl.prototype.accept = function(visitor) {
-	return visitor.visitTerminal(this);
+TerminalNodeImpl.prototype.accept = function (visitor) {
+    return visitor.visitTerminal(this);
 };
 
-TerminalNodeImpl.prototype.getText = function() {
-	return this.symbol.text;
+TerminalNodeImpl.prototype.getText = function () {
+    return this.symbol.text;
 };
 
-TerminalNodeImpl.prototype.toString = function() {
-	if (this.symbol.type === Token.EOF) {
-		return "<EOF>";
-	} else {
-		return this.symbol.text;
-	}
+TerminalNodeImpl.prototype.toString = function () {
+    if (this.symbol.type === Token.EOF) {
+        return "<EOF>";
+    } else {
+        return this.symbol.text;
+    }
 };
 
 // Represents a token that was consumed during resynchronization
@@ -190,40 +192,40 @@ TerminalNodeImpl.prototype.toString = function() {
 // upon no viable alternative exceptions.
 
 function ErrorNodeImpl(token) {
-	TerminalNodeImpl.call(this, token);
-	return this;
+    TerminalNodeImpl.call(this, token);
+    return this;
 }
 
 ErrorNodeImpl.prototype = Object.create(TerminalNodeImpl.prototype);
 ErrorNodeImpl.prototype.constructor = ErrorNodeImpl;
 
-ErrorNodeImpl.prototype.isErrorNode = function() {
-	return true;
+ErrorNodeImpl.prototype.isErrorNode = function () {
+    return true;
 };
 
-ErrorNodeImpl.prototype.accept = function(visitor) {
-	return visitor.visitErrorNode(this);
+ErrorNodeImpl.prototype.accept = function (visitor) {
+    return visitor.visitErrorNode(this);
 };
 
 function ParseTreeWalker() {
-	return this;
+    return this;
 }
 
-ParseTreeWalker.prototype.walk = function(listener, t) {
-	var errorNode = t instanceof ErrorNode ||
-			(t.isErrorNode !== undefined && t.isErrorNode());
-	if (errorNode) {
-		listener.visitErrorNode(t);
-	} else if (t instanceof TerminalNode) {
-		listener.visitTerminal(t);
-	} else {
-		this.enterRule(listener, t);
-		for (var i = 0; i < t.getChildCount(); i++) {
-			var child = t.getChild(i);
-			this.walk(listener, child);
-		}
-		this.exitRule(listener, t);
-	}
+ParseTreeWalker.prototype.walk = function (listener, t) {
+    var errorNode = t instanceof ErrorNode ||
+        (t.isErrorNode !== undefined && t.isErrorNode());
+    if (errorNode) {
+        listener.visitErrorNode(t);
+    } else if (t instanceof TerminalNode) {
+        listener.visitTerminal(t);
+    } else {
+        this.enterRule(listener, t);
+        for (var i = 0; i < t.getChildCount(); i++) {
+            var child = t.getChild(i);
+            this.walk(listener, child);
+        }
+        this.exitRule(listener, t);
+    }
 };
 //
 // The discovery of a rule node, involves sending two events: the generic
@@ -231,16 +233,16 @@ ParseTreeWalker.prototype.walk = function(listener, t) {
 // {@link RuleContext}-specific event. First we trigger the generic and then
 // the rule specific. We to them in reverse order upon finishing the node.
 //
-ParseTreeWalker.prototype.enterRule = function(listener, r) {
-	var ctx = r.getRuleContext();
-	listener.enterEveryRule(ctx);
-	ctx.enterRule(listener);
+ParseTreeWalker.prototype.enterRule = function (listener, r) {
+    var ctx = r.getRuleContext();
+    listener.enterEveryRule(ctx);
+    ctx.enterRule(listener);
 };
 
-ParseTreeWalker.prototype.exitRule = function(listener, r) {
-	var ctx = r.getRuleContext();
-	ctx.exitRule(listener);
-	listener.exitEveryRule(ctx);
+ParseTreeWalker.prototype.exitRule = function (listener, r) {
+    var ctx = r.getRuleContext();
+    ctx.exitRule(listener);
+    listener.exitEveryRule(ctx);
 };
 
 ParseTreeWalker.DEFAULT = new ParseTreeWalker();

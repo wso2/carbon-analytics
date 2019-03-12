@@ -41,7 +41,7 @@ define(['require', 'jquery', 'log', 'backbone', 'file_browser'],
                     var self = this,
                         options = _.get(self.app, 'config.docker_export_dialog');
 
-                    if(!_.isNil(this.modalContainer)){
+                    if (!_.isNil(this.modalContainer)) {
                         this.modalContainer.remove();
                     }
 
@@ -49,8 +49,10 @@ define(['require', 'jquery', 'log', 'backbone', 'file_browser'],
                     var treeContainer = exportModal.find('#file-tree');
                     var exportButton = exportModal.find('#exportButton');
 
-                    var fileBrowser = new FileBrowser({container: treeContainer, application: self.app, fetchFiles: true,
-                        showWorkspace: true, multiSelect: true});
+                    var fileBrowser = new FileBrowser({
+                        container: treeContainer, application: self.app, fetchFiles: true,
+                        showWorkspace: true, multiSelect: true
+                    });
                     $(treeContainer).on('ready.jstree', function () {
                         $(this).jstree('open_all');
                     });
@@ -65,7 +67,7 @@ define(['require', 'jquery', 'log', 'backbone', 'file_browser'],
                         }
                     });
 
-                    exportButton.on('click', function() {
+                    exportButton.on('click', function () {
                         var payload = {
                             profile: exportModal.find('#dockerProfile').val(),
                             files: []

@@ -28,42 +28,43 @@
  *
  * ***** END LICENSE BLOCK ***** */
 
-define(function(require, exports, module) {
-"use strict";
+define(function (require, exports, module) {
+    "use strict";
 
-var Range = require("../range").Range;
+    var Range = require("../range").Range;
 
-var MatchingBraceOutdent = function() {};
-
-(function() {
-
-    this.checkOutdent = function(line, input) {
-        if (! /^\s+$/.test(line))
-            return false;
-
-        return /^\s*\}/.test(input);
+    var MatchingBraceOutdent = function () {
     };
 
-    this.autoOutdent = function(doc, row) {
-        var line = doc.getLine(row);
-        var match = line.match(/^(\s*\})/);
+    (function () {
 
-        if (!match) return 0;
+        this.checkOutdent = function (line, input) {
+            if (!/^\s+$/.test(line))
+                return false;
 
-        var column = match[1].length;
-        var openBracePos = doc.findMatchingBracket({row: row, column: column});
+            return /^\s*\}/.test(input);
+        };
 
-        if (!openBracePos || openBracePos.row == row) return 0;
+        this.autoOutdent = function (doc, row) {
+            var line = doc.getLine(row);
+            var match = line.match(/^(\s*\})/);
 
-        var indent = this.$getIndent(doc.getLine(openBracePos.row));
-        doc.replace(new Range(row, 0, row, column-1), indent);
-    };
+            if (!match) return 0;
 
-    this.$getIndent = function(line) {
-        return line.match(/^\s*/)[0];
-    };
+            var column = match[1].length;
+            var openBracePos = doc.findMatchingBracket({row: row, column: column});
 
-}).call(MatchingBraceOutdent.prototype);
+            if (!openBracePos || openBracePos.row == row) return 0;
 
-exports.MatchingBraceOutdent = MatchingBraceOutdent;
+            var indent = this.$getIndent(doc.getLine(openBracePos.row));
+            doc.replace(new Range(row, 0, row, column - 1), indent);
+        };
+
+        this.$getIndent = function (line) {
+            return line.match(/^\s*/)[0];
+        };
+
+    }).call(MatchingBraceOutdent.prototype);
+
+    exports.MatchingBraceOutdent = MatchingBraceOutdent;
 });

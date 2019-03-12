@@ -43,9 +43,13 @@ public class QueryConfig extends SiddhiElementConfig {
     private String partitionId;
     private Map<String, String> connectorsAndStreams;
 
-    public String getQueryName() { return queryName; }
+    public String getQueryName() {
+        return queryName;
+    }
 
-    public void setQueryName(String queryName) { this.queryName = queryName; }
+    public void setQueryName(String queryName) {
+        this.queryName = queryName;
+    }
 
     public QueryInputConfig getQueryInput() {
         return queryInput;

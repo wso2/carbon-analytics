@@ -39,9 +39,10 @@ public class DesignGenerator {
 
     /**
      * Gets EventFlow configuration for a given Siddhi app code string
-     * @param siddhiAppString                   Code representation of the Siddhi app
-     * @return                                  Event flow representation of the Siddhi app
-     * @throws DesignGenerationException        Error while generating config
+     *
+     * @param siddhiAppString Code representation of the Siddhi app
+     * @return Event flow representation of the Siddhi app
+     * @throws DesignGenerationException Error while generating config
      */
     public EventFlow getEventFlow(String siddhiAppString) throws DesignGenerationException {
         SiddhiApp siddhiApp;

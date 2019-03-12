@@ -80,19 +80,19 @@ define(['log', 'jquery', 'lodash', 'backbone', 'console'], function (log, $, _, 
             hideConsoleComponents: function () {
                 var self = this;
                 var consoleHeaderContainer = self._$parent_el;
-                var serviceWrapper =  $('#service-tabs-wrapper');
+                var serviceWrapper = $('#service-tabs-wrapper');
                 consoleHeaderContainer.addClass('hide');
                 serviceWrapper.css('height', '100%');
-                if (serviceWrapper.is('.ui-resizable')){
-                    serviceWrapper.resizable( "destroy" );
+                if (serviceWrapper.is('.ui-resizable')) {
+                    serviceWrapper.resizable("destroy");
                     /*
-                    * when resizable method in #service-tabs-wrapper's resizable method is destroyed
-                    * it affects to it's child elements as well. So partitions in the design view also gets affected by
-                    * this and partition's resize handles are also disappears. In order to add them back initialise them
-                    * again.
-                    * */
+                     * when resizable method in #service-tabs-wrapper's resizable method is destroyed
+                     * it affects to it's child elements as well. So partitions in the design view also gets affected by
+                     * this and partition's resize handles are also disappears. In order to add them back initialise them
+                     * again.
+                     * */
                     var partitions = $('.partitionDrop');
-                    partitions.resizable( "destroy" );
+                    partitions.resizable("destroy");
                     partitions.resizable();
                 }
                 var activeTab = self.options.application.tabController.activeTab;
@@ -106,21 +106,21 @@ define(['log', 'jquery', 'lodash', 'backbone', 'console'], function (log, $, _, 
             showConsoleComponents: function () {
                 var self = this;
                 var consoleHeaderContainer = self._$parent_el;
-                var serviceWrapper =  $('#service-tabs-wrapper');
+                var serviceWrapper = $('#service-tabs-wrapper');
                 serviceWrapper.css('height', '65%');
                 consoleHeaderContainer.removeClass('hide');
                 serviceWrapper.resizable({
                     handleSelector: ".splitter-horizontal",
                     handles: "s",
-                    resize: function( event, ui ) {
+                    resize: function (event, ui) {
                     }
                 });
                 /*
-                * when resizable method in #service-tabs-wrapper's resizable method is given a custom implementation
-                * it affects to it's child elements as well. So partitions in the design view also gets affected by
-                * this and partition's resize handles are also disappears. In order to add them back initialise them
-                * again.
-                * */
+                 * when resizable method in #service-tabs-wrapper's resizable method is given a custom implementation
+                 * it affects to it's child elements as well. So partitions in the design view also gets affected by
+                 * this and partition's resize handles are also disappears. In order to add them back initialise them
+                 * again.
+                 * */
                 $('.partitionDrop').resizable();
                 var activeTab = self.options.application.tabController.activeTab;
                 if (activeTab.getTitle() != "welcome-page") {
@@ -275,7 +275,7 @@ define(['log', 'jquery', 'lodash', 'backbone', 'console'], function (log, $, _, 
                 if (console._type === "CONSOLE") {
                     $(".consoleToolbar").removeClass("hidden");
                     this.options.application.tabController.getActiveTab()._lastActiveConsole = "CONSOLE";
-                } else if (console._type === "FORM"){
+                } else if (console._type === "FORM") {
                     $(".consoleToolbar").addClass("hidden");
                     this.options.application.tabController.getActiveTab()._lastActiveConsole = "FORM";
                 } else {
@@ -338,29 +338,31 @@ define(['log', 'jquery', 'lodash', 'backbone', 'console'], function (log, $, _, 
                     console.hide();
                 });
             },
-            enableConsoleByTitle: function (title,type) {
+            enableConsoleByTitle: function (title, type) {
                 var exist = false;
                 var self = this;
-                var globalConsole = this._consoles[_.findIndex(this._consoles, function(o) { return o._type ===
-                    'CONSOLE'; })];
+                var globalConsole = this._consoles[_.findIndex(this._consoles, function (o) {
+                    return o._type ===
+                        'CONSOLE';
+                })];
                 _.each(this._consoles, function (console) {
-                    if(console._type === type){
+                    if (console._type === type) {
                         if (console._appName === title) {
                             /*
-                            * If the user has closed the output console in a previous tab and switches back to the
-                            * design view of a tab(earlier a form was kept opened in the output console in this tab and
-                            * now it is hidden because user has closed the output console in the previous tab) now we
-                            * need to enable the output console.
-                            * */
+                             * If the user has closed the output console in a previous tab and switches back to the
+                             * design view of a tab(earlier a form was kept opened in the output console in this tab and
+                             * now it is hidden because user has closed the output console in the previous tab) now we
+                             * need to enable the output console.
+                             * */
                             if (type === 'FORM') {
                                 self.showConsoleComponents();
                             }
                             console.show(true);
                             self.setActiveConsole(console);
                             globalConsole._isActive = false;
-                        } else{
+                        } else {
                             console.hide();
-                            if(console._isActive){
+                            if (console._isActive) {
                                 self.setActiveConsole(globalConsole);
                             }
                         }
@@ -399,7 +401,7 @@ define(['log', 'jquery', 'lodash', 'backbone', 'console'], function (log, $, _, 
 
                         if (statusForCurrentFocusedFile == "SUCCESS") {
                             newConsole.showInitialStartingMessage(currentFocusedFile + ".siddhi " + message);
-                        } else if(statusForCurrentFocusedFile != "LOGGER"){
+                        } else if (statusForCurrentFocusedFile != "LOGGER") {
                             var message = {
                                 "type": "ERROR",
                                 "message": "" + currentFocusedFile + ".siddhi - " + message + ""

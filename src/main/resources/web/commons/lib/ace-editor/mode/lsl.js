@@ -28,65 +28,65 @@
  *
  * ***** END LICENSE BLOCK ***** */
 
-define(function(require, exports, module) {
-"use strict";
+define(function (require, exports, module) {
+    "use strict";
 
-var Rules = require("./lsl_highlight_rules").LSLHighlightRules;
-var Outdent = require("./matching_brace_outdent").MatchingBraceOutdent;
-var Range = require("../range").Range;
-var TextMode = require("./text").Mode;
-var CstyleBehaviour = require("./behaviour/cstyle").CstyleBehaviour;
-var CStyleFoldMode = require("./folding/cstyle").FoldMode;
-var oop = require("../lib/oop");
+    var Rules = require("./lsl_highlight_rules").LSLHighlightRules;
+    var Outdent = require("./matching_brace_outdent").MatchingBraceOutdent;
+    var Range = require("../range").Range;
+    var TextMode = require("./text").Mode;
+    var CstyleBehaviour = require("./behaviour/cstyle").CstyleBehaviour;
+    var CStyleFoldMode = require("./folding/cstyle").FoldMode;
+    var oop = require("../lib/oop");
 
-var Mode = function() {
-    this.HighlightRules = Rules;
-    this.$outdent = new Outdent();
-    this.$behaviour = new CstyleBehaviour();
-    this.foldingRules = new CStyleFoldMode();
-};
-oop.inherits(Mode, TextMode);
-
-(function() {
-
-    this.lineCommentStart = ["//"];
-
-    this.blockComment = {
-        start: "/*",
-        end: "*/"
+    var Mode = function () {
+        this.HighlightRules = Rules;
+        this.$outdent = new Outdent();
+        this.$behaviour = new CstyleBehaviour();
+        this.foldingRules = new CStyleFoldMode();
     };
+    oop.inherits(Mode, TextMode);
 
-    this.getNextLineIndent = function(state, line, tab) {
-        var indent = this.$getIndent(line);
+    (function () {
 
-        var tokenizedLine = this.getTokenizer().getLineTokens(line, state);
-        var tokens = tokenizedLine.tokens;
-        var endState = tokenizedLine.state;
+        this.lineCommentStart = ["//"];
 
-        if (tokens.length && tokens[tokens.length-1].type === "comment.block.lsl") {
-            return indent;
-        }
+        this.blockComment = {
+            start: "/*",
+            end: "*/"
+        };
 
-        if (state === "start") {
-            var match = line.match(/^.*[\{\(\[]\s*$/);
-            if (match) {
-                indent += tab;
+        this.getNextLineIndent = function (state, line, tab) {
+            var indent = this.$getIndent(line);
+
+            var tokenizedLine = this.getTokenizer().getLineTokens(line, state);
+            var tokens = tokenizedLine.tokens;
+            var endState = tokenizedLine.state;
+
+            if (tokens.length && tokens[tokens.length - 1].type === "comment.block.lsl") {
+                return indent;
             }
-        }
 
-        return indent;
-    };
+            if (state === "start") {
+                var match = line.match(/^.*[\{\(\[]\s*$/);
+                if (match) {
+                    indent += tab;
+                }
+            }
 
-    this.checkOutdent = function(state, line, input) {
-        return this.$outdent.checkOutdent(line, input);
-    };
+            return indent;
+        };
 
-    this.autoOutdent = function(state, doc, row) {
-        this.$outdent.autoOutdent(doc, row);
-    };
+        this.checkOutdent = function (state, line, input) {
+            return this.$outdent.checkOutdent(line, input);
+        };
 
-    this.$id = "ace/mode/lsl";
-}).call(Mode.prototype);
+        this.autoOutdent = function (state, doc, row) {
+            this.$outdent.autoOutdent(doc, row);
+        };
 
-exports.Mode = Mode;
+        this.$id = "ace/mode/lsl";
+    }).call(Mode.prototype);
+
+    exports.Mode = Mode;
 });

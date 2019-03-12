@@ -41,9 +41,10 @@ public class WindowFilterProjectionConfigGenerator {
 
     /**
      * Generates a WindowFilterProjectionConfig object, from the given Siddhi Query InputStream object
-     * @param queryInputStream                  Siddhi Query InputStream object
-     * @return                                  WindowFilterProjectionConfig object
-     * @throws DesignGenerationException        Error while generating config
+     *
+     * @param queryInputStream Siddhi Query InputStream object
+     * @return WindowFilterProjectionConfig object
+     * @throws DesignGenerationException Error while generating config
      */
     public WindowFilterProjectionConfig generateWindowFilterProjectionConfig(InputStream queryInputStream)
             throws DesignGenerationException {
@@ -56,8 +57,9 @@ public class WindowFilterProjectionConfigGenerator {
 
     /**
      * Returns the type of WindowFilterProjection Config to generate, from the given Siddhi Query object
-     * @param queryInputStream     Siddhi Query InputStream object
-     * @return                     Type of WindowFilterProjection Query to generate
+     *
+     * @param queryInputStream Siddhi Query InputStream object
+     * @return Type of WindowFilterProjection Query to generate
      */
     private WindowFilterProjectionQueryType getType(InputStream queryInputStream) {
         List<StreamHandler> streamHandlers = ((SingleInputStream) queryInputStream).getStreamHandlers();

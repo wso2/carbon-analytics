@@ -34,7 +34,7 @@ var ConsoleErrorListener = require('./error/ErrorListener').ConsoleErrorListener
 var ProxyErrorListener = require('./error/ErrorListener').ProxyErrorListener;
 
 function Recognizer() {
-    this._listeners = [ ConsoleErrorListener.INSTANCE ];
+    this._listeners = [ConsoleErrorListener.INSTANCE];
     this._interp = null;
     this._stateNumber = -1;
     return this;
@@ -44,29 +44,31 @@ Recognizer.tokenTypeMapCache = {};
 Recognizer.ruleIndexMapCache = {};
 
 
-Recognizer.prototype.checkVersion = function(toolVersion) {
+Recognizer.prototype.checkVersion = function (toolVersion) {
     var runtimeVersion = "4.5.2";
-    if (runtimeVersion!==toolVersion) {
-        console.log("ANTLR runtime and generated code versions disagree: "+runtimeVersion+"!="+toolVersion);
+    if (runtimeVersion !== toolVersion) {
+        console.log("ANTLR runtime and generated code versions disagree: " + runtimeVersion + "!=" + toolVersion);
     }
 };
 
-Recognizer.prototype.addErrorListener = function(listener) {
+Recognizer.prototype.addErrorListener = function (listener) {
     this._listeners.push(listener);
 };
 
-Recognizer.prototype.removeErrorListeners = function() {
+Recognizer.prototype.removeErrorListeners = function () {
     this._listeners = [];
 };
 
-Recognizer.prototype.getTokenTypeMap = function() {
+Recognizer.prototype.getTokenTypeMap = function () {
     var tokenNames = this.getTokenNames();
-    if (tokenNames===null) {
+    if (tokenNames === null) {
         throw("The current recognizer does not provide a list of token names.");
     }
     var result = this.tokenTypeMapCache[tokenNames];
-    if(result===undefined) {
-        result = tokenNames.reduce(function(o, k, i) { o[k] = i; });
+    if (result === undefined) {
+        result = tokenNames.reduce(function (o, k, i) {
+            o[k] = i;
+        });
         result.EOF = Token.EOF;
         this.tokenTypeMapCache[tokenNames] = result;
     }
@@ -77,22 +79,24 @@ Recognizer.prototype.getTokenTypeMap = function() {
 //
 // <p>Used for XPath and tree pattern compilation.</p>
 //
-Recognizer.prototype.getRuleIndexMap = function() {
+Recognizer.prototype.getRuleIndexMap = function () {
     var ruleNames = this.getRuleNames();
-    if (ruleNames===null) {
+    if (ruleNames === null) {
         throw("The current recognizer does not provide a list of rule names.");
     }
     var result = this.ruleIndexMapCache[ruleNames];
-    if(result===undefined) {
-        result = ruleNames.reduce(function(o, k, i) { o[k] = i; });
+    if (result === undefined) {
+        result = ruleNames.reduce(function (o, k, i) {
+            o[k] = i;
+        });
         this.ruleIndexMapCache[ruleNames] = result;
     }
     return result;
 };
 
-Recognizer.prototype.getTokenType = function(tokenName) {
+Recognizer.prototype.getTokenType = function (tokenName) {
     var ttype = this.getTokenTypeMap()[tokenName];
-    if (ttype !==undefined) {
+    if (ttype !== undefined) {
         return ttype;
     } else {
         return Token.INVALID_TYPE;
@@ -101,7 +105,7 @@ Recognizer.prototype.getTokenType = function(tokenName) {
 
 
 // What is the error header, normally line/character position information?//
-Recognizer.prototype.getErrorHeader = function(e) {
+Recognizer.prototype.getErrorHeader = function (e) {
     var line = e.getOffendingToken().line;
     var column = e.getOffendingToken().column;
     return "line " + line + ":" + column;
@@ -121,33 +125,33 @@ Recognizer.prototype.getErrorHeader = function(e) {
 // feature when necessary. For example, see
 // {@link DefaultErrorStrategy//getTokenErrorDisplay}.
 //
-Recognizer.prototype.getTokenErrorDisplay = function(t) {
-    if (t===null) {
+Recognizer.prototype.getTokenErrorDisplay = function (t) {
+    if (t === null) {
         return "<no token>";
     }
     var s = t.text;
-    if (s===null) {
-        if (t.type===Token.EOF) {
+    if (s === null) {
+        if (t.type === Token.EOF) {
             s = "<EOF>";
         } else {
             s = "<" + t.type + ">";
         }
     }
-    s = s.replace("\n","\\n").replace("\r","\\r").replace("\t","\\t");
+    s = s.replace("\n", "\\n").replace("\r", "\\r").replace("\t", "\\t");
     return "'" + s + "'";
 };
 
-Recognizer.prototype.getErrorListenerDispatch = function() {
+Recognizer.prototype.getErrorListenerDispatch = function () {
     return new ProxyErrorListener(this._listeners);
 };
 
 // subclass needs to override these if there are sempreds or actions
 // that the ATN interp needs to execute
-Recognizer.prototype.sempred = function(localctx, ruleIndex, actionIndex) {
+Recognizer.prototype.sempred = function (localctx, ruleIndex, actionIndex) {
     return true;
 };
 
-Recognizer.prototype.precpred = function(localctx , precedence) {
+Recognizer.prototype.precpred = function (localctx, precedence) {
     return true;
 };
 
@@ -159,12 +163,12 @@ Recognizer.prototype.precpred = function(localctx , precedence) {
 //configuration information.
 
 Object.defineProperty(Recognizer.prototype, "state", {
-	get : function() {
-		return this._stateNumber;
-	},
-	set : function(state) {
-		this._stateNumber = state;
-	}
+    get: function () {
+        return this._stateNumber;
+    },
+    set: function (state) {
+        this._stateNumber = state;
+    }
 });
 
 

@@ -28,24 +28,24 @@
  *
  * ***** END LICENSE BLOCK ***** */
 
-define(function(require, exports, module) {
-  "use strict";
+define(function (require, exports, module) {
+    "use strict";
 
-var oop = require("../lib/oop");
-var HtmlMode = require("./html").Mode;
-var SmartyHighlightRules = require("./smarty_highlight_rules").SmartyHighlightRules;
+    var oop = require("../lib/oop");
+    var HtmlMode = require("./html").Mode;
+    var SmartyHighlightRules = require("./smarty_highlight_rules").SmartyHighlightRules;
 
-var Mode = function() {
-    HtmlMode.call(this);
-    this.HighlightRules = SmartyHighlightRules;
-};
+    var Mode = function () {
+        HtmlMode.call(this);
+        this.HighlightRules = SmartyHighlightRules;
+    };
 
-oop.inherits(Mode, HtmlMode);
+    oop.inherits(Mode, HtmlMode);
 
-(function() {
-    
-    this.$id = "ace/mode/smarty";
-}).call(Mode.prototype);
+    (function () {
 
-exports.Mode = Mode;
+        this.$id = "ace/mode/smarty";
+    }).call(Mode.prototype);
+
+    exports.Mode = Mode;
 });

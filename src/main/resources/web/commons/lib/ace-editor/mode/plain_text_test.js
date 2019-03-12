@@ -32,22 +32,22 @@ if (typeof process !== "undefined") {
     require("amd-loader");
 }
 
-define(function(require, exports, module) {
-"use strict";
+define(function (require, exports, module) {
+    "use strict";
 
-var EditSession = require("../edit_session").EditSession;
-var PlainTextMode = require("./plain_text").Mode;
-var assert = require("../test/assertions");
+    var EditSession = require("../edit_session").EditSession;
+    var PlainTextMode = require("./plain_text").Mode;
+    var assert = require("../test/assertions");
 
-module.exports = {
-    setUp : function() {
-        this.mode = new PlainTextMode();
-    },
+    module.exports = {
+        setUp: function () {
+            this.mode = new PlainTextMode();
+        },
 
-    "test: lines should not be indented" : function() {
-        assert.equal("", this.mode.getNextLineIndent("start", "   abc", "  "));
-    }
-};
+        "test: lines should not be indented": function () {
+            assert.equal("", this.mode.getNextLineIndent("start", "   abc", "  "));
+        }
+    };
 
 });
 

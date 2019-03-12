@@ -77,6 +77,6 @@ public class WindowConfig extends SiddhiElementConfig {
     }
 
     public List<Annotation> getAnnotationListObjects() {
-        return  annotationListObjects;
+        return annotationListObjects;
     }
 }

@@ -16,114 +16,114 @@
  * under the License.
  */
 
-define(['require', 'lodash','jquery', 'log', 'backbone', '../../../js/event-simulator/simulator-rest-client',
+define(['require', 'lodash', 'jquery', 'log', 'backbone', '../../../js/event-simulator/simulator-rest-client',
         './query-store-rest-client', 'datatables', 'datatables_bootstrap', 'datatables_wso2'],
     function (require, _, $, log, Backbone, SimulatorRestClient, QueryStoreRestClient) {
-    var QueryStoreDialog = Backbone.View.extend(
-        /** @lends QueryStoreDialog.prototype */
-        {
-            /**
-             * @augments Backbone.View
-             * @constructs
-             * @class queryStore
-             * @param {Object} config configuration options for the QueryStoreDialog
-             */
-            initialize: function (options) {
-                this._options = options;
-                this.application = _.get(options, "application");
-                this._dialogContainer = $(_.get(options, "application.config.dialog.container"));
-            },
+        var QueryStoreDialog = Backbone.View.extend(
+            /** @lends QueryStoreDialog.prototype */
+            {
+                /**
+                 * @augments Backbone.View
+                 * @constructs
+                 * @class queryStore
+                 * @param {Object} config configuration options for the QueryStoreDialog
+                 */
+                initialize: function (options) {
+                    this._options = options;
+                    this.application = _.get(options, "application");
+                    this._dialogContainer = $(_.get(options, "application.config.dialog.container"));
+                },
 
-            show: function(){
-                this._storeQueryModal.modal('show');
-            },
+                show: function () {
+                    this._storeQueryModal.modal('show');
+                },
 
-            render: function () {
-                var app = this.application,
-                    options = this._options;
+                render: function () {
+                    var app = this.application,
+                        options = this._options;
 
-                if (!_.isNil(this._storeQueryModal)) {
-                    this._storeQueryModal.remove();
-                }
-
-                var storeQueryModal = $(options.selector).clone();
-                this._storeQueryModal = storeQueryModal;
-                var errorBox = storeQueryModal.find('#error-box');
-                var resultBox = storeQueryModal.find('#simulator_output');
-
-                var showError = function(message) {
-                    errorBox.text(message).show();
-                };
-
-                var clearError = function() {
-                    errorBox.hide();
-                };
-
-                SimulatorRestClient.retrieveSiddhiAppNames(
-                    function (data) {
-                        var template = '<option value="{{dataName}}">{{dataName}}</option>';
-                        var options =
-                            '<option selected="selected" value = "-1" disabled>-- Please Select a Siddhi App --</option>';
-                        if (data) {
-                            data.sort();
-                            for (var i = 0; i < data.length; i++) {
-                                options += template.replaceAll('{{dataName}}', data[i].siddhiAppName);
-                            }
-                        }
-                        storeQueryModal.find("select[name='siddhi-app-name']").html(options);
-                    },
-                    function (data) {
-                        showError("Error when retrieving siddhi apps. Reason: " + data);
+                    if (!_.isNil(this._storeQueryModal)) {
+                        this._storeQueryModal.remove();
                     }
-                );
 
-                storeQueryModal.submit(function (event) {
-                    QueryStoreRestClient.retrieveStoresQuery(
-                        storeQueryModal.find("select[name='siddhi-app-name']").val(),
-                        storeQueryModal.find("textarea[id='curlEditor']").val(),
+                    var storeQueryModal = $(options.selector).clone();
+                    this._storeQueryModal = storeQueryModal;
+                    var errorBox = storeQueryModal.find('#error-box');
+                    var resultBox = storeQueryModal.find('#simulator_output');
+
+                    var showError = function (message) {
+                        errorBox.text(message).show();
+                    };
+
+                    var clearError = function () {
+                        errorBox.hide();
+                    };
+
+                    SimulatorRestClient.retrieveSiddhiAppNames(
                         function (data) {
-                            // Add header row
-                            var headerColumns = [];
-                            data.details.forEach(function(header) {
-                                headerColumns.push('<th>' + header.name + '</th>');
-                            });
-                            var headerRow = '<tr>' + headerColumns + '</tr>';
-
-                            // Add data rows
-                            var rows = [];
-                            data.records.forEach(function(record){
-                                var columns = [];
-                                record.forEach(function(value) {
-                                    columns.push('<td>' + value + '</td>');
-                                });
-                                rows.push('<tr>' + columns + '</tr>');
-                            });
-
-                            var queryData = storeQueryModal.find("table[id='query_data']");
-                            if ($.fn.DataTable.isDataTable(queryData)) {
-                                queryData.DataTable().clear().destroy();
+                            var template = '<option value="{{dataName}}">{{dataName}}</option>';
+                            var options =
+                                '<option selected="selected" value = "-1" disabled>-- Please Select a Siddhi App --</option>';
+                            if (data) {
+                                data.sort();
+                                for (var i = 0; i < data.length; i++) {
+                                    options += template.replaceAll('{{dataName}}', data[i].siddhiAppName);
+                                }
                             }
-                            clearError();
-                            resultBox.find('thead').html(headerRow);
-                            resultBox.find('tbody').html(rows);
-                            queryData.DataTable();
-                            queryData.removeClass('hidden');
+                            storeQueryModal.find("select[name='siddhi-app-name']").html(options);
                         },
                         function (data) {
-                            var queryData = storeQueryModal.find("table[id='query_data']");
-                            if ($.fn.DataTable.isDataTable(queryData)) {
-                                queryData.DataTable().clear().destroy();
-                            }
-                            resultBox.find('thead').html('');
-                            resultBox.find('tbody').html('');
-                            queryData.addClass('hidden');
-
-                            showError("Error when executing query on Siddhi Store. Reason: " + data.responseText);
+                            showError("Error when retrieving siddhi apps. Reason: " + data);
                         }
                     );
-                    event.preventDefault();
-                });
-            }
-        });
-    return QueryStoreDialog;
-});
+
+                    storeQueryModal.submit(function (event) {
+                        QueryStoreRestClient.retrieveStoresQuery(
+                            storeQueryModal.find("select[name='siddhi-app-name']").val(),
+                            storeQueryModal.find("textarea[id='curlEditor']").val(),
+                            function (data) {
+                                // Add header row
+                                var headerColumns = [];
+                                data.details.forEach(function (header) {
+                                    headerColumns.push('<th>' + header.name + '</th>');
+                                });
+                                var headerRow = '<tr>' + headerColumns + '</tr>';
+
+                                // Add data rows
+                                var rows = [];
+                                data.records.forEach(function (record) {
+                                    var columns = [];
+                                    record.forEach(function (value) {
+                                        columns.push('<td>' + value + '</td>');
+                                    });
+                                    rows.push('<tr>' + columns + '</tr>');
+                                });
+
+                                var queryData = storeQueryModal.find("table[id='query_data']");
+                                if ($.fn.DataTable.isDataTable(queryData)) {
+                                    queryData.DataTable().clear().destroy();
+                                }
+                                clearError();
+                                resultBox.find('thead').html(headerRow);
+                                resultBox.find('tbody').html(rows);
+                                queryData.DataTable();
+                                queryData.removeClass('hidden');
+                            },
+                            function (data) {
+                                var queryData = storeQueryModal.find("table[id='query_data']");
+                                if ($.fn.DataTable.isDataTable(queryData)) {
+                                    queryData.DataTable().clear().destroy();
+                                }
+                                resultBox.find('thead').html('');
+                                resultBox.find('tbody').html('');
+                                queryData.addClass('hidden');
+
+                                showError("Error when executing query on Siddhi Store. Reason: " + data.responseText);
+                            }
+                        );
+                        event.preventDefault();
+                    });
+                }
+            });
+        return QueryStoreDialog;
+    });

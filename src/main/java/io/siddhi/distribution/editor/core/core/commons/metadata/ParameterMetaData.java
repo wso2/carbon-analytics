@@ -64,11 +64,11 @@ public class ParameterMetaData {
         this.description = description;
     }
 
-    public void setDefaultValue(String defaultValue) {
-        this.defaultValue = defaultValue;
+    public String getDefaultValue() {
+        return this.defaultValue;
     }
 
-    public  String getDefaultValue() {
-        return  this.defaultValue;
+    public void setDefaultValue(String defaultValue) {
+        this.defaultValue = defaultValue;
     }
 }

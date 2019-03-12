@@ -694,83 +694,85 @@ var serializedATN = ["\3\u0430\ud6d1\u8206\uad2d\u4417\uaef1\u8d80\uaadd",
 
 var atn = new antlr4.atn.ATNDeserializer().deserialize(serializedATN);
 
-var decisionsToDFA = atn.decisionToState.map( function(ds, index) { return new antlr4.dfa.DFA(ds, index); });
+var decisionsToDFA = atn.decisionToState.map(function (ds, index) {
+    return new antlr4.dfa.DFA(ds, index);
+});
 
 var sharedContextCache = new antlr4.PredictionContextCache();
 
-var literalNames = [ 'null', 'null', 'null', 'null', 'null', "':'", "';'", 
-                     "'.'", "'...'", "'('", "')'", "'['", "']'", "','", 
-                     "'='", "'*'", "'+'", "'?'", "'-'", "'/'", "'%'", "'<'", 
-                     "'<='", "'>'", "'>='", "'=='", "'!='", "'@'", "'->'", 
-                     "'#'" ];
+var literalNames = ['null', 'null', 'null', 'null', 'null', "':'", "';'",
+    "'.'", "'...'", "'('", "')'", "'['", "']'", "','",
+    "'='", "'*'", "'+'", "'?'", "'-'", "'/'", "'%'", "'<'",
+    "'<='", "'>'", "'>='", "'=='", "'!='", "'@'", "'->'",
+    "'#'"];
 
-var symbolicNames = [ 'null', "INT_LITERAL", "LONG_LITERAL", "FLOAT_LITERAL", 
-                      "DOUBLE_LITERAL", "COL", "SCOL", "DOT", "TRIPLE_DOT", 
-                      "OPEN_PAR", "CLOSE_PAR", "OPEN_SQUARE_BRACKETS", "CLOSE_SQUARE_BRACKETS", 
-                      "COMMA", "ASSIGN", "STAR", "PLUS", "QUESTION", "MINUS", 
-                      "DIV", "MOD", "LT", "LT_EQ", "GT", "GT_EQ", "EQ", 
-                      "NOT_EQ", "AT_SYMBOL", "FOLLOWED_BY", "HASH", "STREAM", 
-                      "DEFINE", "FUNCTION", "TRIGGER", "TABLE", "APP", "FROM", 
-                      "PARTITION", "WINDOW", "SELECT", "GROUP", "BY", "ORDER", 
-                      "LIMIT", "OFFSET", "ASC", "DESC", "HAVING", "INSERT", 
-                      "DELETE", "UPDATE", "SET", "RETURN", "EVENTS", "INTO", 
-                      "OUTPUT", "EXPIRED", "CURRENT", "SNAPSHOT", "FOR", 
-                      "RAW", "OF", "AS", "AT", "OR", "AND", "IN", "ON", 
-                      "IS", "NOT", "WITHIN", "WITH", "BEGIN", "END", "NULL", 
-                      "EVERY", "LAST", "ALL", "FIRST", "JOIN", "INNER", 
-                      "OUTER", "RIGHT", "LEFT", "FULL", "UNIDIRECTIONAL", 
-                      "YEARS", "MONTHS", "WEEKS", "DAYS", "HOURS", "MINUTES", 
-                      "SECONDS", "MILLISECONDS", "FALSE", "TRUE", "STRING", 
-                      "INT", "LONG", "FLOAT", "DOUBLE", "BOOL", "OBJECT", 
-                      "AGGREGATION", "AGGREGATE", "PER", "ID_QUOTES", "ID", 
-                      "STRING_LITERAL", "SINGLE_LINE_COMMENT", "MULTILINE_COMMENT", 
-                      "SPACES", "UNEXPECTED_CHAR", "SCRIPT" ];
+var symbolicNames = ['null', "INT_LITERAL", "LONG_LITERAL", "FLOAT_LITERAL",
+    "DOUBLE_LITERAL", "COL", "SCOL", "DOT", "TRIPLE_DOT",
+    "OPEN_PAR", "CLOSE_PAR", "OPEN_SQUARE_BRACKETS", "CLOSE_SQUARE_BRACKETS",
+    "COMMA", "ASSIGN", "STAR", "PLUS", "QUESTION", "MINUS",
+    "DIV", "MOD", "LT", "LT_EQ", "GT", "GT_EQ", "EQ",
+    "NOT_EQ", "AT_SYMBOL", "FOLLOWED_BY", "HASH", "STREAM",
+    "DEFINE", "FUNCTION", "TRIGGER", "TABLE", "APP", "FROM",
+    "PARTITION", "WINDOW", "SELECT", "GROUP", "BY", "ORDER",
+    "LIMIT", "OFFSET", "ASC", "DESC", "HAVING", "INSERT",
+    "DELETE", "UPDATE", "SET", "RETURN", "EVENTS", "INTO",
+    "OUTPUT", "EXPIRED", "CURRENT", "SNAPSHOT", "FOR",
+    "RAW", "OF", "AS", "AT", "OR", "AND", "IN", "ON",
+    "IS", "NOT", "WITHIN", "WITH", "BEGIN", "END", "NULL",
+    "EVERY", "LAST", "ALL", "FIRST", "JOIN", "INNER",
+    "OUTER", "RIGHT", "LEFT", "FULL", "UNIDIRECTIONAL",
+    "YEARS", "MONTHS", "WEEKS", "DAYS", "HOURS", "MINUTES",
+    "SECONDS", "MILLISECONDS", "FALSE", "TRUE", "STRING",
+    "INT", "LONG", "FLOAT", "DOUBLE", "BOOL", "OBJECT",
+    "AGGREGATION", "AGGREGATE", "PER", "ID_QUOTES", "ID",
+    "STRING_LITERAL", "SINGLE_LINE_COMMENT", "MULTILINE_COMMENT",
+    "SPACES", "UNEXPECTED_CHAR", "SCRIPT"];
 
-var ruleNames =  [ "parse", "error", "siddhi_app", "execution_element", 
-                   "definition_stream_final", "definition_stream", "definition_table_final", 
-                   "definition_table", "definition_window_final", "definition_window", 
-                   "store_query_final", "store_query", "store_input", "definition_function_final", 
-                   "definition_function", "function_name", "language_name", 
-                   "function_body", "definition_trigger_final", "definition_trigger", 
-                   "trigger_name", "definition_aggregation_final", "definition_aggregation", 
-                   "aggregation_name", "aggregation_time", "aggregation_time_duration", 
-                   "aggregation_time_range", "aggregation_time_interval", 
-                   "annotation", "app_annotation", "annotation_element", 
-                   "partition", "partition_final", "partition_with_stream", 
-                   "condition_ranges", "condition_range", "query_final", 
-                   "query", "query_input", "standard_stream", "join_stream", 
-                   "join_source", "pattern_stream", "every_pattern_source_chain", 
-                   "pattern_source_chain", "absent_pattern_source_chain", 
-                   "left_absent_pattern_source", "right_absent_pattern_source", 
-                   "pattern_source", "logical_stateful_source", "logical_absent_stateful_source", 
-                   "every_absent_pattern_source", "basic_absent_pattern_source", 
-                   "pattern_collection_stateful_source", "standard_stateful_source", 
-                   "basic_source", "basic_source_stream_handlers", "basic_source_stream_handler", 
-                   "sequence_stream", "every_sequence_source_chain", "every_absent_sequence_source_chain", 
-                   "absent_sequence_source_chain", "left_absent_sequence_source", 
-                   "right_absent_sequence_source", "sequence_source_chain", 
-                   "sequence_source", "sequence_collection_stateful_source", 
-                   "anonymous_stream", "filter", "stream_function", "window", 
-                   "group_by_query_selection", "query_section", "group_by", 
-                   "having", "order_by", "order_by_reference", "order", 
-                   "limit", "offset", "query_output", "store_query_output", 
-                   "set_clause", "set_assignment", "output_event_type", 
-                   "output_rate", "output_rate_type", "for_time", "within_time", 
-                   "within_time_range", "per", "output_attribute", "attribute", 
-                   "expression", "math_operation", "function_operation", 
-                   "attribute_list", "null_check", "stream_reference", "attribute_reference", 
-                   "attribute_index", "function_id", "function_namespace", 
-                   "stream_id", "source_id", "alias", "property_name", "attribute_name", 
-                   "type", "property_value", "property_separator", "source", 
-                   "target", "event", "name", "collect", "attribute_type", 
-                   "join", "constant_value", "id", "keyword", "time_value", 
-                   "year_value", "month_value", "week_value", "day_value", 
-                   "hour_value", "minute_value", "second_value", "millisecond_value", 
-                   "signed_double_value", "signed_long_value", "signed_float_value", 
-                   "signed_int_value", "bool_value", "string_value" ];
+var ruleNames = ["parse", "error", "siddhi_app", "execution_element",
+    "definition_stream_final", "definition_stream", "definition_table_final",
+    "definition_table", "definition_window_final", "definition_window",
+    "store_query_final", "store_query", "store_input", "definition_function_final",
+    "definition_function", "function_name", "language_name",
+    "function_body", "definition_trigger_final", "definition_trigger",
+    "trigger_name", "definition_aggregation_final", "definition_aggregation",
+    "aggregation_name", "aggregation_time", "aggregation_time_duration",
+    "aggregation_time_range", "aggregation_time_interval",
+    "annotation", "app_annotation", "annotation_element",
+    "partition", "partition_final", "partition_with_stream",
+    "condition_ranges", "condition_range", "query_final",
+    "query", "query_input", "standard_stream", "join_stream",
+    "join_source", "pattern_stream", "every_pattern_source_chain",
+    "pattern_source_chain", "absent_pattern_source_chain",
+    "left_absent_pattern_source", "right_absent_pattern_source",
+    "pattern_source", "logical_stateful_source", "logical_absent_stateful_source",
+    "every_absent_pattern_source", "basic_absent_pattern_source",
+    "pattern_collection_stateful_source", "standard_stateful_source",
+    "basic_source", "basic_source_stream_handlers", "basic_source_stream_handler",
+    "sequence_stream", "every_sequence_source_chain", "every_absent_sequence_source_chain",
+    "absent_sequence_source_chain", "left_absent_sequence_source",
+    "right_absent_sequence_source", "sequence_source_chain",
+    "sequence_source", "sequence_collection_stateful_source",
+    "anonymous_stream", "filter", "stream_function", "window",
+    "group_by_query_selection", "query_section", "group_by",
+    "having", "order_by", "order_by_reference", "order",
+    "limit", "offset", "query_output", "store_query_output",
+    "set_clause", "set_assignment", "output_event_type",
+    "output_rate", "output_rate_type", "for_time", "within_time",
+    "within_time_range", "per", "output_attribute", "attribute",
+    "expression", "math_operation", "function_operation",
+    "attribute_list", "null_check", "stream_reference", "attribute_reference",
+    "attribute_index", "function_id", "function_namespace",
+    "stream_id", "source_id", "alias", "property_name", "attribute_name",
+    "type", "property_value", "property_separator", "source",
+    "target", "event", "name", "collect", "attribute_type",
+    "join", "constant_value", "id", "keyword", "time_value",
+    "year_value", "month_value", "week_value", "day_value",
+    "hour_value", "minute_value", "second_value", "millisecond_value",
+    "signed_double_value", "signed_long_value", "signed_float_value",
+    "signed_int_value", "bool_value", "string_value"];
 
-function SiddhiQLParser (input) {
-	antlr4.Parser.call(this, input);
+function SiddhiQLParser(input) {
+    antlr4.Parser.call(this, input);
     this._interp = new antlr4.atn.ParserATNSimulator(this, atn, decisionsToDFA, sharedContextCache);
     this.ruleNames = ruleNames;
     this.literalNames = literalNames;
@@ -782,9 +784,9 @@ SiddhiQLParser.prototype = Object.create(antlr4.Parser.prototype);
 SiddhiQLParser.prototype.constructor = SiddhiQLParser;
 
 Object.defineProperty(SiddhiQLParser.prototype, "atn", {
-	get : function() {
-		return atn;
-	}
+    get: function () {
+        return atn;
+    }
 });
 
 SiddhiQLParser.EOF = antlr4.Token.EOF;
@@ -1040,13 +1042,13 @@ SiddhiQLParser.RULE_bool_value = 134;
 SiddhiQLParser.RULE_string_value = 135;
 
 function ParseContext(parser, parent, invokingState) {
-	if(parent===undefined) {
-	    parent = null;
-	}
-	if(invokingState===undefined || invokingState===null) {
-		invokingState = -1;
-	}
-	antlr4.ParserRuleContext.call(this, parent, invokingState);
+    if (parent === undefined) {
+        parent = null;
+    }
+    if (invokingState === undefined || invokingState === null) {
+        invokingState = -1;
+    }
+    antlr4.ParserRuleContext.call(this, parent, invokingState);
     this.parser = parser;
     this.ruleIndex = SiddhiQLParser.RULE_parse;
     return this;
@@ -1055,32 +1057,30 @@ function ParseContext(parser, parent, invokingState) {
 ParseContext.prototype = Object.create(antlr4.ParserRuleContext.prototype);
 ParseContext.prototype.constructor = ParseContext;
 
-ParseContext.prototype.siddhi_app = function() {
-    return this.getTypedRuleContext(Siddhi_appContext,0);
+ParseContext.prototype.siddhi_app = function () {
+    return this.getTypedRuleContext(Siddhi_appContext, 0);
 };
 
-ParseContext.prototype.EOF = function() {
+ParseContext.prototype.EOF = function () {
     return this.getToken(SiddhiQLParser.EOF, 0);
 };
 
-ParseContext.prototype.enterRule = function(listener) {
-    if(listener instanceof SiddhiQLListener ) {
+ParseContext.prototype.enterRule = function (listener) {
+    if (listener instanceof SiddhiQLListener) {
         listener.enterParse(this);
-	}
+    }
 };
 
-ParseContext.prototype.exitRule = function(listener) {
-    if(listener instanceof SiddhiQLListener ) {
+ParseContext.prototype.exitRule = function (listener) {
+    if (listener instanceof SiddhiQLListener) {
         listener.exitParse(this);
-	}
+    }
 };
-
-
 
 
 SiddhiQLParser.ParseContext = ParseContext;
 
-SiddhiQLParser.prototype.parse = function() {
+SiddhiQLParser.prototype.parse = function () {
 
     var localctx = new ParseContext(this, this._ctx, this.state);
     this.enterRule(localctx, 0, SiddhiQLParser.RULE_parse);
@@ -1091,13 +1091,13 @@ SiddhiQLParser.prototype.parse = function() {
         this.state = 273;
         this.match(SiddhiQLParser.EOF);
     } catch (re) {
-    	if(re instanceof antlr4.error.RecognitionException) {
-	        localctx.exception = re;
-	        this._errHandler.reportError(this, re);
-	        this._errHandler.recover(this, re);
-	    } else {
-	    	throw re;
-	    }
+        if (re instanceof antlr4.error.RecognitionException) {
+            localctx.exception = re;
+            this._errHandler.reportError(this, re);
+            this._errHandler.recover(this, re);
+        } else {
+            throw re;
+        }
     } finally {
         this.exitRule();
     }
@@ -1105,13 +1105,13 @@ SiddhiQLParser.prototype.parse = function() {
 };
 
 function ErrorContext(parser, parent, invokingState) {
-	if(parent===undefined) {
-	    parent = null;
-	}
-	if(invokingState===undefined || invokingState===null) {
-		invokingState = -1;
-	}
-	antlr4.ParserRuleContext.call(this, parent, invokingState);
+    if (parent === undefined) {
+        parent = null;
+    }
+    if (invokingState === undefined || invokingState === null) {
+        invokingState = -1;
+    }
+    antlr4.ParserRuleContext.call(this, parent, invokingState);
     this.parser = parser;
     this.ruleIndex = SiddhiQLParser.RULE_error;
     return this;
@@ -1120,28 +1120,26 @@ function ErrorContext(parser, parent, invokingState) {
 ErrorContext.prototype = Object.create(antlr4.ParserRuleContext.prototype);
 ErrorContext.prototype.constructor = ErrorContext;
 
-ErrorContext.prototype.UNEXPECTED_CHAR = function() {
+ErrorContext.prototype.UNEXPECTED_CHAR = function () {
     return this.getToken(SiddhiQLParser.UNEXPECTED_CHAR, 0);
 };
 
-ErrorContext.prototype.enterRule = function(listener) {
-    if(listener instanceof SiddhiQLListener ) {
+ErrorContext.prototype.enterRule = function (listener) {
+    if (listener instanceof SiddhiQLListener) {
         listener.enterError(this);
-	}
+    }
 };
 
-ErrorContext.prototype.exitRule = function(listener) {
-    if(listener instanceof SiddhiQLListener ) {
+ErrorContext.prototype.exitRule = function (listener) {
+    if (listener instanceof SiddhiQLListener) {
         listener.exitError(this);
-	}
+    }
 };
-
-
 
 
 SiddhiQLParser.ErrorContext = ErrorContext;
 
-SiddhiQLParser.prototype.error = function() {
+SiddhiQLParser.prototype.error = function () {
 
     var localctx = new ErrorContext(this, this._ctx, this.state);
     this.enterRule(localctx, 2, SiddhiQLParser.RULE_error);
@@ -1150,13 +1148,13 @@ SiddhiQLParser.prototype.error = function() {
         this.state = 275;
         this.match(SiddhiQLParser.UNEXPECTED_CHAR);
     } catch (re) {
-    	if(re instanceof antlr4.error.RecognitionException) {
-	        localctx.exception = re;
-	        this._errHandler.reportError(this, re);
-	        this._errHandler.recover(this, re);
-	    } else {
-	    	throw re;
-	    }
+        if (re instanceof antlr4.error.RecognitionException) {
+            localctx.exception = re;
+            this._errHandler.reportError(this, re);
+            this._errHandler.recover(this, re);
+        } else {
+            throw re;
+        }
     } finally {
         this.exitRule();
     }
@@ -1164,13 +1162,13 @@ SiddhiQLParser.prototype.error = function() {
 };
 
 function Siddhi_appContext(parser, parent, invokingState) {
-	if(parent===undefined) {
-	    parent = null;
-	}
-	if(invokingState===undefined || invokingState===null) {
-		invokingState = -1;
-	}
-	antlr4.ParserRuleContext.call(this, parent, invokingState);
+    if (parent === undefined) {
+        parent = null;
+    }
+    if (invokingState === undefined || invokingState === null) {
+        invokingState = -1;
+    }
+    antlr4.ParserRuleContext.call(this, parent, invokingState);
     this.parser = parser;
     this.ruleIndex = SiddhiQLParser.RULE_siddhi_app;
     return this;
@@ -1179,123 +1177,121 @@ function Siddhi_appContext(parser, parent, invokingState) {
 Siddhi_appContext.prototype = Object.create(antlr4.ParserRuleContext.prototype);
 Siddhi_appContext.prototype.constructor = Siddhi_appContext;
 
-Siddhi_appContext.prototype.definition_stream = function(i) {
-    if(i===undefined) {
+Siddhi_appContext.prototype.definition_stream = function (i) {
+    if (i === undefined) {
         i = null;
     }
-    if(i===null) {
+    if (i === null) {
         return this.getTypedRuleContexts(Definition_streamContext);
     } else {
-        return this.getTypedRuleContext(Definition_streamContext,i);
+        return this.getTypedRuleContext(Definition_streamContext, i);
     }
 };
 
-Siddhi_appContext.prototype.definition_table = function(i) {
-    if(i===undefined) {
+Siddhi_appContext.prototype.definition_table = function (i) {
+    if (i === undefined) {
         i = null;
     }
-    if(i===null) {
+    if (i === null) {
         return this.getTypedRuleContexts(Definition_tableContext);
     } else {
-        return this.getTypedRuleContext(Definition_tableContext,i);
+        return this.getTypedRuleContext(Definition_tableContext, i);
     }
 };
 
-Siddhi_appContext.prototype.definition_trigger = function(i) {
-    if(i===undefined) {
+Siddhi_appContext.prototype.definition_trigger = function (i) {
+    if (i === undefined) {
         i = null;
     }
-    if(i===null) {
+    if (i === null) {
         return this.getTypedRuleContexts(Definition_triggerContext);
     } else {
-        return this.getTypedRuleContext(Definition_triggerContext,i);
+        return this.getTypedRuleContext(Definition_triggerContext, i);
     }
 };
 
-Siddhi_appContext.prototype.definition_function = function(i) {
-    if(i===undefined) {
+Siddhi_appContext.prototype.definition_function = function (i) {
+    if (i === undefined) {
         i = null;
     }
-    if(i===null) {
+    if (i === null) {
         return this.getTypedRuleContexts(Definition_functionContext);
     } else {
-        return this.getTypedRuleContext(Definition_functionContext,i);
+        return this.getTypedRuleContext(Definition_functionContext, i);
     }
 };
 
-Siddhi_appContext.prototype.definition_window = function(i) {
-    if(i===undefined) {
+Siddhi_appContext.prototype.definition_window = function (i) {
+    if (i === undefined) {
         i = null;
     }
-    if(i===null) {
+    if (i === null) {
         return this.getTypedRuleContexts(Definition_windowContext);
     } else {
-        return this.getTypedRuleContext(Definition_windowContext,i);
+        return this.getTypedRuleContext(Definition_windowContext, i);
     }
 };
 
-Siddhi_appContext.prototype.definition_aggregation = function(i) {
-    if(i===undefined) {
+Siddhi_appContext.prototype.definition_aggregation = function (i) {
+    if (i === undefined) {
         i = null;
     }
-    if(i===null) {
+    if (i === null) {
         return this.getTypedRuleContexts(Definition_aggregationContext);
     } else {
-        return this.getTypedRuleContext(Definition_aggregationContext,i);
+        return this.getTypedRuleContext(Definition_aggregationContext, i);
     }
 };
 
-Siddhi_appContext.prototype.error = function(i) {
-    if(i===undefined) {
+Siddhi_appContext.prototype.error = function (i) {
+    if (i === undefined) {
         i = null;
     }
-    if(i===null) {
+    if (i === null) {
         return this.getTypedRuleContexts(ErrorContext);
     } else {
-        return this.getTypedRuleContext(ErrorContext,i);
+        return this.getTypedRuleContext(ErrorContext, i);
     }
 };
 
-Siddhi_appContext.prototype.app_annotation = function(i) {
-    if(i===undefined) {
+Siddhi_appContext.prototype.app_annotation = function (i) {
+    if (i === undefined) {
         i = null;
     }
-    if(i===null) {
+    if (i === null) {
         return this.getTypedRuleContexts(App_annotationContext);
     } else {
-        return this.getTypedRuleContext(App_annotationContext,i);
+        return this.getTypedRuleContext(App_annotationContext, i);
     }
 };
 
-Siddhi_appContext.prototype.execution_element = function(i) {
-    if(i===undefined) {
+Siddhi_appContext.prototype.execution_element = function (i) {
+    if (i === undefined) {
         i = null;
     }
-    if(i===null) {
+    if (i === null) {
         return this.getTypedRuleContexts(Execution_elementContext);
     } else {
-        return this.getTypedRuleContext(Execution_elementContext,i);
+        return this.getTypedRuleContext(Execution_elementContext, i);
     }
 };
 
-Siddhi_appContext.prototype.enterRule = function(listener) {
-    if(listener instanceof SiddhiQLListener ) {
+Siddhi_appContext.prototype.enterRule = function (listener) {
+    if (listener instanceof SiddhiQLListener) {
         listener.enterSiddhi_app(this);
-	}
+    }
 };
 
-Siddhi_appContext.prototype.exitRule = function(listener) {
-    if(listener instanceof SiddhiQLListener ) {
+Siddhi_appContext.prototype.exitRule = function (listener) {
+    if (listener instanceof SiddhiQLListener) {
         listener.exitSiddhi_app(this);
-	}
+    }
 };
-
-
 
 
 SiddhiQLParser.Siddhi_appContext = Siddhi_appContext;
 
-SiddhiQLParser.prototype.siddhi_app = function() {
+SiddhiQLParser.prototype.siddhi_app = function () {
 
     var localctx = new Siddhi_appContext(this, this._ctx, this.state);
     this.enterRule(localctx, 4, SiddhiQLParser.RULE_siddhi_app);
@@ -1304,162 +1300,162 @@ SiddhiQLParser.prototype.siddhi_app = function() {
         this.enterOuterAlt(localctx, 1);
         this.state = 281;
         this._errHandler.sync(this);
-        var _alt = this._interp.adaptivePredict(this._input,1,this._ctx)
-        while(_alt!=2 && _alt!=antlr4.atn.ATN.INVALID_ALT_NUMBER) {
-            if(_alt===1) {
+        var _alt = this._interp.adaptivePredict(this._input, 1, this._ctx)
+        while (_alt != 2 && _alt != antlr4.atn.ATN.INVALID_ALT_NUMBER) {
+            if (_alt === 1) {
                 this.state = 279;
-                switch(this._input.LA(1)) {
-                case SiddhiQLParser.AT_SYMBOL:
-                    this.state = 277;
-                    this.app_annotation();
-                    break;
-                case SiddhiQLParser.UNEXPECTED_CHAR:
-                    this.state = 278;
-                    this.error();
-                    break;
-                default:
-                    throw new antlr4.error.NoViableAltException(this);
-                } 
+                switch (this._input.LA(1)) {
+                    case SiddhiQLParser.AT_SYMBOL:
+                        this.state = 277;
+                        this.app_annotation();
+                        break;
+                    case SiddhiQLParser.UNEXPECTED_CHAR:
+                        this.state = 278;
+                        this.error();
+                        break;
+                    default:
+                        throw new antlr4.error.NoViableAltException(this);
+                }
             }
             this.state = 283;
             this._errHandler.sync(this);
-            _alt = this._interp.adaptivePredict(this._input,1,this._ctx);
+            _alt = this._interp.adaptivePredict(this._input, 1, this._ctx);
         }
 
         this.state = 291;
-        var la_ = this._interp.adaptivePredict(this._input,2,this._ctx);
-        switch(la_) {
-        case 1:
-            this.state = 284;
-            this.definition_stream();
-            break;
+        var la_ = this._interp.adaptivePredict(this._input, 2, this._ctx);
+        switch (la_) {
+            case 1:
+                this.state = 284;
+                this.definition_stream();
+                break;
 
-        case 2:
-            this.state = 285;
-            this.definition_table();
-            break;
+            case 2:
+                this.state = 285;
+                this.definition_table();
+                break;
 
-        case 3:
-            this.state = 286;
-            this.definition_trigger();
-            break;
+            case 3:
+                this.state = 286;
+                this.definition_trigger();
+                break;
 
-        case 4:
-            this.state = 287;
-            this.definition_function();
-            break;
+            case 4:
+                this.state = 287;
+                this.definition_function();
+                break;
 
-        case 5:
-            this.state = 288;
-            this.definition_window();
-            break;
+            case 5:
+                this.state = 288;
+                this.definition_window();
+                break;
 
-        case 6:
-            this.state = 289;
-            this.definition_aggregation();
-            break;
+            case 6:
+                this.state = 289;
+                this.definition_aggregation();
+                break;
 
-        case 7:
-            this.state = 290;
-            this.error();
-            break;
+            case 7:
+                this.state = 290;
+                this.error();
+                break;
 
         }
         this.state = 305;
         this._errHandler.sync(this);
-        var _alt = this._interp.adaptivePredict(this._input,4,this._ctx)
-        while(_alt!=2 && _alt!=antlr4.atn.ATN.INVALID_ALT_NUMBER) {
-            if(_alt===1) {
+        var _alt = this._interp.adaptivePredict(this._input, 4, this._ctx)
+        while (_alt != 2 && _alt != antlr4.atn.ATN.INVALID_ALT_NUMBER) {
+            if (_alt === 1) {
                 this.state = 293;
                 this.match(SiddhiQLParser.SCOL);
                 this.state = 301;
-                var la_ = this._interp.adaptivePredict(this._input,3,this._ctx);
-                switch(la_) {
-                case 1:
-                    this.state = 294;
-                    this.definition_stream();
-                    break;
+                var la_ = this._interp.adaptivePredict(this._input, 3, this._ctx);
+                switch (la_) {
+                    case 1:
+                        this.state = 294;
+                        this.definition_stream();
+                        break;
 
-                case 2:
-                    this.state = 295;
-                    this.definition_table();
-                    break;
+                    case 2:
+                        this.state = 295;
+                        this.definition_table();
+                        break;
 
-                case 3:
-                    this.state = 296;
-                    this.definition_trigger();
-                    break;
+                    case 3:
+                        this.state = 296;
+                        this.definition_trigger();
+                        break;
 
-                case 4:
-                    this.state = 297;
-                    this.definition_function();
-                    break;
+                    case 4:
+                        this.state = 297;
+                        this.definition_function();
+                        break;
 
-                case 5:
-                    this.state = 298;
-                    this.definition_window();
-                    break;
+                    case 5:
+                        this.state = 298;
+                        this.definition_window();
+                        break;
 
-                case 6:
-                    this.state = 299;
-                    this.definition_aggregation();
-                    break;
+                    case 6:
+                        this.state = 299;
+                        this.definition_aggregation();
+                        break;
 
-                case 7:
-                    this.state = 300;
-                    this.error();
-                    break;
+                    case 7:
+                        this.state = 300;
+                        this.error();
+                        break;
 
-                } 
+                }
             }
             this.state = 307;
             this._errHandler.sync(this);
-            _alt = this._interp.adaptivePredict(this._input,4,this._ctx);
+            _alt = this._interp.adaptivePredict(this._input, 4, this._ctx);
         }
 
         this.state = 315;
         this._errHandler.sync(this);
-        var _alt = this._interp.adaptivePredict(this._input,6,this._ctx)
-        while(_alt!=2 && _alt!=antlr4.atn.ATN.INVALID_ALT_NUMBER) {
-            if(_alt===1) {
+        var _alt = this._interp.adaptivePredict(this._input, 6, this._ctx)
+        while (_alt != 2 && _alt != antlr4.atn.ATN.INVALID_ALT_NUMBER) {
+            if (_alt === 1) {
                 this.state = 308;
                 this.match(SiddhiQLParser.SCOL);
                 this.state = 311;
-                switch(this._input.LA(1)) {
-                case SiddhiQLParser.AT_SYMBOL:
-                case SiddhiQLParser.FROM:
-                case SiddhiQLParser.PARTITION:
-                    this.state = 309;
-                    this.execution_element();
-                    break;
-                case SiddhiQLParser.UNEXPECTED_CHAR:
-                    this.state = 310;
-                    this.error();
-                    break;
-                default:
-                    throw new antlr4.error.NoViableAltException(this);
-                } 
+                switch (this._input.LA(1)) {
+                    case SiddhiQLParser.AT_SYMBOL:
+                    case SiddhiQLParser.FROM:
+                    case SiddhiQLParser.PARTITION:
+                        this.state = 309;
+                        this.execution_element();
+                        break;
+                    case SiddhiQLParser.UNEXPECTED_CHAR:
+                        this.state = 310;
+                        this.error();
+                        break;
+                    default:
+                        throw new antlr4.error.NoViableAltException(this);
+                }
             }
             this.state = 317;
             this._errHandler.sync(this);
-            _alt = this._interp.adaptivePredict(this._input,6,this._ctx);
+            _alt = this._interp.adaptivePredict(this._input, 6, this._ctx);
         }
 
         this.state = 319;
         _la = this._input.LA(1);
-        if(_la===SiddhiQLParser.SCOL) {
+        if (_la === SiddhiQLParser.SCOL) {
             this.state = 318;
             this.match(SiddhiQLParser.SCOL);
         }
 
     } catch (re) {
-    	if(re instanceof antlr4.error.RecognitionException) {
-	        localctx.exception = re;
-	        this._errHandler.reportError(this, re);
-	        this._errHandler.recover(this, re);
-	    } else {
-	    	throw re;
-	    }
+        if (re instanceof antlr4.error.RecognitionException) {
+            localctx.exception = re;
+            this._errHandler.reportError(this, re);
+            this._errHandler.recover(this, re);
+        } else {
+            throw re;
+        }
     } finally {
         this.exitRule();
     }
@@ -1467,13 +1463,13 @@ SiddhiQLParser.prototype.siddhi_app = function() {
 };
 
 function Execution_elementContext(parser, parent, invokingState) {
-	if(parent===undefined) {
-	    parent = null;
-	}
-	if(invokingState===undefined || invokingState===null) {
-		invokingState = -1;
-	}
-	antlr4.ParserRuleContext.call(this, parent, invokingState);
+    if (parent === undefined) {
+        parent = null;
+    }
+    if (invokingState === undefined || invokingState === null) {
+        invokingState = -1;
+    }
+    antlr4.ParserRuleContext.call(this, parent, invokingState);
     this.parser = parser;
     this.ruleIndex = SiddhiQLParser.RULE_execution_element;
     return this;
@@ -1482,60 +1478,58 @@ function Execution_elementContext(parser, parent, invokingState) {
 Execution_elementContext.prototype = Object.create(antlr4.ParserRuleContext.prototype);
 Execution_elementContext.prototype.constructor = Execution_elementContext;
 
-Execution_elementContext.prototype.query = function() {
-    return this.getTypedRuleContext(QueryContext,0);
+Execution_elementContext.prototype.query = function () {
+    return this.getTypedRuleContext(QueryContext, 0);
 };
 
-Execution_elementContext.prototype.partition = function() {
-    return this.getTypedRuleContext(PartitionContext,0);
+Execution_elementContext.prototype.partition = function () {
+    return this.getTypedRuleContext(PartitionContext, 0);
 };
 
-Execution_elementContext.prototype.enterRule = function(listener) {
-    if(listener instanceof SiddhiQLListener ) {
+Execution_elementContext.prototype.enterRule = function (listener) {
+    if (listener instanceof SiddhiQLListener) {
         listener.enterExecution_element(this);
-	}
+    }
 };
 
-Execution_elementContext.prototype.exitRule = function(listener) {
-    if(listener instanceof SiddhiQLListener ) {
+Execution_elementContext.prototype.exitRule = function (listener) {
+    if (listener instanceof SiddhiQLListener) {
         listener.exitExecution_element(this);
-	}
+    }
 };
-
-
 
 
 SiddhiQLParser.Execution_elementContext = Execution_elementContext;
 
-SiddhiQLParser.prototype.execution_element = function() {
+SiddhiQLParser.prototype.execution_element = function () {
 
     var localctx = new Execution_elementContext(this, this._ctx, this.state);
     this.enterRule(localctx, 6, SiddhiQLParser.RULE_execution_element);
     try {
         this.state = 323;
-        var la_ = this._interp.adaptivePredict(this._input,8,this._ctx);
-        switch(la_) {
-        case 1:
-            this.enterOuterAlt(localctx, 1);
-            this.state = 321;
-            this.query();
-            break;
+        var la_ = this._interp.adaptivePredict(this._input, 8, this._ctx);
+        switch (la_) {
+            case 1:
+                this.enterOuterAlt(localctx, 1);
+                this.state = 321;
+                this.query();
+                break;
 
-        case 2:
-            this.enterOuterAlt(localctx, 2);
-            this.state = 322;
-            this.partition();
-            break;
+            case 2:
+                this.enterOuterAlt(localctx, 2);
+                this.state = 322;
+                this.partition();
+                break;
 
         }
     } catch (re) {
-    	if(re instanceof antlr4.error.RecognitionException) {
-	        localctx.exception = re;
-	        this._errHandler.reportError(this, re);
-	        this._errHandler.recover(this, re);
-	    } else {
-	    	throw re;
-	    }
+        if (re instanceof antlr4.error.RecognitionException) {
+            localctx.exception = re;
+            this._errHandler.reportError(this, re);
+            this._errHandler.recover(this, re);
+        } else {
+            throw re;
+        }
     } finally {
         this.exitRule();
     }
@@ -1543,13 +1537,13 @@ SiddhiQLParser.prototype.execution_element = function() {
 };
 
 function Definition_stream_finalContext(parser, parent, invokingState) {
-	if(parent===undefined) {
-	    parent = null;
-	}
-	if(invokingState===undefined || invokingState===null) {
-		invokingState = -1;
-	}
-	antlr4.ParserRuleContext.call(this, parent, invokingState);
+    if (parent === undefined) {
+        parent = null;
+    }
+    if (invokingState === undefined || invokingState === null) {
+        invokingState = -1;
+    }
+    antlr4.ParserRuleContext.call(this, parent, invokingState);
     this.parser = parser;
     this.ruleIndex = SiddhiQLParser.RULE_definition_stream_final;
     return this;
@@ -1558,32 +1552,30 @@ function Definition_stream_finalContext(parser, parent, invokingState) {
 Definition_stream_finalContext.prototype = Object.create(antlr4.ParserRuleContext.prototype);
 Definition_stream_finalContext.prototype.constructor = Definition_stream_finalContext;
 
-Definition_stream_finalContext.prototype.definition_stream = function() {
-    return this.getTypedRuleContext(Definition_streamContext,0);
+Definition_stream_finalContext.prototype.definition_stream = function () {
+    return this.getTypedRuleContext(Definition_streamContext, 0);
 };
 
-Definition_stream_finalContext.prototype.EOF = function() {
+Definition_stream_finalContext.prototype.EOF = function () {
     return this.getToken(SiddhiQLParser.EOF, 0);
 };
 
-Definition_stream_finalContext.prototype.enterRule = function(listener) {
-    if(listener instanceof SiddhiQLListener ) {
+Definition_stream_finalContext.prototype.enterRule = function (listener) {
+    if (listener instanceof SiddhiQLListener) {
         listener.enterDefinition_stream_final(this);
-	}
+    }
 };
 
-Definition_stream_finalContext.prototype.exitRule = function(listener) {
-    if(listener instanceof SiddhiQLListener ) {
+Definition_stream_finalContext.prototype.exitRule = function (listener) {
+    if (listener instanceof SiddhiQLListener) {
         listener.exitDefinition_stream_final(this);
-	}
+    }
 };
-
-
 
 
 SiddhiQLParser.Definition_stream_finalContext = Definition_stream_finalContext;
 
-SiddhiQLParser.prototype.definition_stream_final = function() {
+SiddhiQLParser.prototype.definition_stream_final = function () {
 
     var localctx = new Definition_stream_finalContext(this, this._ctx, this.state);
     this.enterRule(localctx, 8, SiddhiQLParser.RULE_definition_stream_final);
@@ -1594,7 +1586,7 @@ SiddhiQLParser.prototype.definition_stream_final = function() {
         this.definition_stream();
         this.state = 327;
         _la = this._input.LA(1);
-        if(_la===SiddhiQLParser.SCOL) {
+        if (_la === SiddhiQLParser.SCOL) {
             this.state = 326;
             this.match(SiddhiQLParser.SCOL);
         }
@@ -1602,13 +1594,13 @@ SiddhiQLParser.prototype.definition_stream_final = function() {
         this.state = 329;
         this.match(SiddhiQLParser.EOF);
     } catch (re) {
-    	if(re instanceof antlr4.error.RecognitionException) {
-	        localctx.exception = re;
-	        this._errHandler.reportError(this, re);
-	        this._errHandler.recover(this, re);
-	    } else {
-	    	throw re;
-	    }
+        if (re instanceof antlr4.error.RecognitionException) {
+            localctx.exception = re;
+            this._errHandler.reportError(this, re);
+            this._errHandler.recover(this, re);
+        } else {
+            throw re;
+        }
     } finally {
         this.exitRule();
     }
@@ -1616,13 +1608,13 @@ SiddhiQLParser.prototype.definition_stream_final = function() {
 };
 
 function Definition_streamContext(parser, parent, invokingState) {
-	if(parent===undefined) {
-	    parent = null;
-	}
-	if(invokingState===undefined || invokingState===null) {
-		invokingState = -1;
-	}
-	antlr4.ParserRuleContext.call(this, parent, invokingState);
+    if (parent === undefined) {
+        parent = null;
+    }
+    if (invokingState === undefined || invokingState === null) {
+        invokingState = -1;
+    }
+    antlr4.ParserRuleContext.call(this, parent, invokingState);
     this.parser = parser;
     this.ruleIndex = SiddhiQLParser.RULE_definition_stream;
     return this;
@@ -1631,69 +1623,67 @@ function Definition_streamContext(parser, parent, invokingState) {
 Definition_streamContext.prototype = Object.create(antlr4.ParserRuleContext.prototype);
 Definition_streamContext.prototype.constructor = Definition_streamContext;
 
-Definition_streamContext.prototype.DEFINE = function() {
+Definition_streamContext.prototype.DEFINE = function () {
     return this.getToken(SiddhiQLParser.DEFINE, 0);
 };
 
-Definition_streamContext.prototype.STREAM = function() {
+Definition_streamContext.prototype.STREAM = function () {
     return this.getToken(SiddhiQLParser.STREAM, 0);
 };
 
-Definition_streamContext.prototype.source = function() {
-    return this.getTypedRuleContext(SourceContext,0);
+Definition_streamContext.prototype.source = function () {
+    return this.getTypedRuleContext(SourceContext, 0);
 };
 
-Definition_streamContext.prototype.attribute_name = function(i) {
-    if(i===undefined) {
+Definition_streamContext.prototype.attribute_name = function (i) {
+    if (i === undefined) {
         i = null;
     }
-    if(i===null) {
+    if (i === null) {
         return this.getTypedRuleContexts(Attribute_nameContext);
     } else {
-        return this.getTypedRuleContext(Attribute_nameContext,i);
+        return this.getTypedRuleContext(Attribute_nameContext, i);
     }
 };
 
-Definition_streamContext.prototype.attribute_type = function(i) {
-    if(i===undefined) {
+Definition_streamContext.prototype.attribute_type = function (i) {
+    if (i === undefined) {
         i = null;
     }
-    if(i===null) {
+    if (i === null) {
         return this.getTypedRuleContexts(Attribute_typeContext);
     } else {
-        return this.getTypedRuleContext(Attribute_typeContext,i);
+        return this.getTypedRuleContext(Attribute_typeContext, i);
     }
 };
 
-Definition_streamContext.prototype.annotation = function(i) {
-    if(i===undefined) {
+Definition_streamContext.prototype.annotation = function (i) {
+    if (i === undefined) {
         i = null;
     }
-    if(i===null) {
+    if (i === null) {
         return this.getTypedRuleContexts(AnnotationContext);
     } else {
-        return this.getTypedRuleContext(AnnotationContext,i);
+        return this.getTypedRuleContext(AnnotationContext, i);
     }
 };
 
-Definition_streamContext.prototype.enterRule = function(listener) {
-    if(listener instanceof SiddhiQLListener ) {
+Definition_streamContext.prototype.enterRule = function (listener) {
+    if (listener instanceof SiddhiQLListener) {
         listener.enterDefinition_stream(this);
-	}
+    }
 };
 
-Definition_streamContext.prototype.exitRule = function(listener) {
-    if(listener instanceof SiddhiQLListener ) {
+Definition_streamContext.prototype.exitRule = function (listener) {
+    if (listener instanceof SiddhiQLListener) {
         listener.exitDefinition_stream(this);
-	}
+    }
 };
-
-
 
 
 SiddhiQLParser.Definition_streamContext = Definition_streamContext;
 
-SiddhiQLParser.prototype.definition_stream = function() {
+SiddhiQLParser.prototype.definition_stream = function () {
 
     var localctx = new Definition_streamContext(this, this._ctx, this.state);
     this.enterRule(localctx, 10, SiddhiQLParser.RULE_definition_stream);
@@ -1703,7 +1693,7 @@ SiddhiQLParser.prototype.definition_stream = function() {
         this.state = 334;
         this._errHandler.sync(this);
         _la = this._input.LA(1);
-        while(_la===SiddhiQLParser.AT_SYMBOL) {
+        while (_la === SiddhiQLParser.AT_SYMBOL) {
             this.state = 331;
             this.annotation();
             this.state = 336;
@@ -1725,7 +1715,7 @@ SiddhiQLParser.prototype.definition_stream = function() {
         this.state = 349;
         this._errHandler.sync(this);
         _la = this._input.LA(1);
-        while(_la===SiddhiQLParser.COMMA) {
+        while (_la === SiddhiQLParser.COMMA) {
             this.state = 343;
             this.match(SiddhiQLParser.COMMA);
             this.state = 344;
@@ -1739,13 +1729,13 @@ SiddhiQLParser.prototype.definition_stream = function() {
         this.state = 352;
         this.match(SiddhiQLParser.CLOSE_PAR);
     } catch (re) {
-    	if(re instanceof antlr4.error.RecognitionException) {
-	        localctx.exception = re;
-	        this._errHandler.reportError(this, re);
-	        this._errHandler.recover(this, re);
-	    } else {
-	    	throw re;
-	    }
+        if (re instanceof antlr4.error.RecognitionException) {
+            localctx.exception = re;
+            this._errHandler.reportError(this, re);
+            this._errHandler.recover(this, re);
+        } else {
+            throw re;
+        }
     } finally {
         this.exitRule();
     }
@@ -1753,13 +1743,13 @@ SiddhiQLParser.prototype.definition_stream = function() {
 };
 
 function Definition_table_finalContext(parser, parent, invokingState) {
-	if(parent===undefined) {
-	    parent = null;
-	}
-	if(invokingState===undefined || invokingState===null) {
-		invokingState = -1;
-	}
-	antlr4.ParserRuleContext.call(this, parent, invokingState);
+    if (parent === undefined) {
+        parent = null;
+    }
+    if (invokingState === undefined || invokingState === null) {
+        invokingState = -1;
+    }
+    antlr4.ParserRuleContext.call(this, parent, invokingState);
     this.parser = parser;
     this.ruleIndex = SiddhiQLParser.RULE_definition_table_final;
     return this;
@@ -1768,32 +1758,30 @@ function Definition_table_finalContext(parser, parent, invokingState) {
 Definition_table_finalContext.prototype = Object.create(antlr4.ParserRuleContext.prototype);
 Definition_table_finalContext.prototype.constructor = Definition_table_finalContext;
 
-Definition_table_finalContext.prototype.definition_table = function() {
-    return this.getTypedRuleContext(Definition_tableContext,0);
+Definition_table_finalContext.prototype.definition_table = function () {
+    return this.getTypedRuleContext(Definition_tableContext, 0);
 };
 
-Definition_table_finalContext.prototype.EOF = function() {
+Definition_table_finalContext.prototype.EOF = function () {
     return this.getToken(SiddhiQLParser.EOF, 0);
 };
 
-Definition_table_finalContext.prototype.enterRule = function(listener) {
-    if(listener instanceof SiddhiQLListener ) {
+Definition_table_finalContext.prototype.enterRule = function (listener) {
+    if (listener instanceof SiddhiQLListener) {
         listener.enterDefinition_table_final(this);
-	}
+    }
 };
 
-Definition_table_finalContext.prototype.exitRule = function(listener) {
-    if(listener instanceof SiddhiQLListener ) {
+Definition_table_finalContext.prototype.exitRule = function (listener) {
+    if (listener instanceof SiddhiQLListener) {
         listener.exitDefinition_table_final(this);
-	}
+    }
 };
-
-
 
 
 SiddhiQLParser.Definition_table_finalContext = Definition_table_finalContext;
 
-SiddhiQLParser.prototype.definition_table_final = function() {
+SiddhiQLParser.prototype.definition_table_final = function () {
 
     var localctx = new Definition_table_finalContext(this, this._ctx, this.state);
     this.enterRule(localctx, 12, SiddhiQLParser.RULE_definition_table_final);
@@ -1804,7 +1792,7 @@ SiddhiQLParser.prototype.definition_table_final = function() {
         this.definition_table();
         this.state = 356;
         _la = this._input.LA(1);
-        if(_la===SiddhiQLParser.SCOL) {
+        if (_la === SiddhiQLParser.SCOL) {
             this.state = 355;
             this.match(SiddhiQLParser.SCOL);
         }
@@ -1812,13 +1800,13 @@ SiddhiQLParser.prototype.definition_table_final = function() {
         this.state = 358;
         this.match(SiddhiQLParser.EOF);
     } catch (re) {
-    	if(re instanceof antlr4.error.RecognitionException) {
-	        localctx.exception = re;
-	        this._errHandler.reportError(this, re);
-	        this._errHandler.recover(this, re);
-	    } else {
-	    	throw re;
-	    }
+        if (re instanceof antlr4.error.RecognitionException) {
+            localctx.exception = re;
+            this._errHandler.reportError(this, re);
+            this._errHandler.recover(this, re);
+        } else {
+            throw re;
+        }
     } finally {
         this.exitRule();
     }
@@ -1826,13 +1814,13 @@ SiddhiQLParser.prototype.definition_table_final = function() {
 };
 
 function Definition_tableContext(parser, parent, invokingState) {
-	if(parent===undefined) {
-	    parent = null;
-	}
-	if(invokingState===undefined || invokingState===null) {
-		invokingState = -1;
-	}
-	antlr4.ParserRuleContext.call(this, parent, invokingState);
+    if (parent === undefined) {
+        parent = null;
+    }
+    if (invokingState === undefined || invokingState === null) {
+        invokingState = -1;
+    }
+    antlr4.ParserRuleContext.call(this, parent, invokingState);
     this.parser = parser;
     this.ruleIndex = SiddhiQLParser.RULE_definition_table;
     return this;
@@ -1841,69 +1829,67 @@ function Definition_tableContext(parser, parent, invokingState) {
 Definition_tableContext.prototype = Object.create(antlr4.ParserRuleContext.prototype);
 Definition_tableContext.prototype.constructor = Definition_tableContext;
 
-Definition_tableContext.prototype.DEFINE = function() {
+Definition_tableContext.prototype.DEFINE = function () {
     return this.getToken(SiddhiQLParser.DEFINE, 0);
 };
 
-Definition_tableContext.prototype.TABLE = function() {
+Definition_tableContext.prototype.TABLE = function () {
     return this.getToken(SiddhiQLParser.TABLE, 0);
 };
 
-Definition_tableContext.prototype.source = function() {
-    return this.getTypedRuleContext(SourceContext,0);
+Definition_tableContext.prototype.source = function () {
+    return this.getTypedRuleContext(SourceContext, 0);
 };
 
-Definition_tableContext.prototype.attribute_name = function(i) {
-    if(i===undefined) {
+Definition_tableContext.prototype.attribute_name = function (i) {
+    if (i === undefined) {
         i = null;
     }
-    if(i===null) {
+    if (i === null) {
         return this.getTypedRuleContexts(Attribute_nameContext);
     } else {
-        return this.getTypedRuleContext(Attribute_nameContext,i);
+        return this.getTypedRuleContext(Attribute_nameContext, i);
     }
 };
 
-Definition_tableContext.prototype.attribute_type = function(i) {
-    if(i===undefined) {
+Definition_tableContext.prototype.attribute_type = function (i) {
+    if (i === undefined) {
         i = null;
     }
-    if(i===null) {
+    if (i === null) {
         return this.getTypedRuleContexts(Attribute_typeContext);
     } else {
-        return this.getTypedRuleContext(Attribute_typeContext,i);
+        return this.getTypedRuleContext(Attribute_typeContext, i);
     }
 };
 
-Definition_tableContext.prototype.annotation = function(i) {
-    if(i===undefined) {
+Definition_tableContext.prototype.annotation = function (i) {
+    if (i === undefined) {
         i = null;
     }
-    if(i===null) {
+    if (i === null) {
         return this.getTypedRuleContexts(AnnotationContext);
     } else {
-        return this.getTypedRuleContext(AnnotationContext,i);
+        return this.getTypedRuleContext(AnnotationContext, i);
     }
 };
 
-Definition_tableContext.prototype.enterRule = function(listener) {
-    if(listener instanceof SiddhiQLListener ) {
+Definition_tableContext.prototype.enterRule = function (listener) {
+    if (listener instanceof SiddhiQLListener) {
         listener.enterDefinition_table(this);
-	}
+    }
 };
 
-Definition_tableContext.prototype.exitRule = function(listener) {
-    if(listener instanceof SiddhiQLListener ) {
+Definition_tableContext.prototype.exitRule = function (listener) {
+    if (listener instanceof SiddhiQLListener) {
         listener.exitDefinition_table(this);
-	}
+    }
 };
-
-
 
 
 SiddhiQLParser.Definition_tableContext = Definition_tableContext;
 
-SiddhiQLParser.prototype.definition_table = function() {
+SiddhiQLParser.prototype.definition_table = function () {
 
     var localctx = new Definition_tableContext(this, this._ctx, this.state);
     this.enterRule(localctx, 14, SiddhiQLParser.RULE_definition_table);
@@ -1913,7 +1899,7 @@ SiddhiQLParser.prototype.definition_table = function() {
         this.state = 363;
         this._errHandler.sync(this);
         _la = this._input.LA(1);
-        while(_la===SiddhiQLParser.AT_SYMBOL) {
+        while (_la === SiddhiQLParser.AT_SYMBOL) {
             this.state = 360;
             this.annotation();
             this.state = 365;
@@ -1935,7 +1921,7 @@ SiddhiQLParser.prototype.definition_table = function() {
         this.state = 378;
         this._errHandler.sync(this);
         _la = this._input.LA(1);
-        while(_la===SiddhiQLParser.COMMA) {
+        while (_la === SiddhiQLParser.COMMA) {
             this.state = 372;
             this.match(SiddhiQLParser.COMMA);
             this.state = 373;
@@ -1949,13 +1935,13 @@ SiddhiQLParser.prototype.definition_table = function() {
         this.state = 381;
         this.match(SiddhiQLParser.CLOSE_PAR);
     } catch (re) {
-    	if(re instanceof antlr4.error.RecognitionException) {
-	        localctx.exception = re;
-	        this._errHandler.reportError(this, re);
-	        this._errHandler.recover(this, re);
-	    } else {
-	    	throw re;
-	    }
+        if (re instanceof antlr4.error.RecognitionException) {
+            localctx.exception = re;
+            this._errHandler.reportError(this, re);
+            this._errHandler.recover(this, re);
+        } else {
+            throw re;
+        }
     } finally {
         this.exitRule();
     }
@@ -1963,13 +1949,13 @@ SiddhiQLParser.prototype.definition_table = function() {
 };
 
 function Definition_window_finalContext(parser, parent, invokingState) {
-	if(parent===undefined) {
-	    parent = null;
-	}
-	if(invokingState===undefined || invokingState===null) {
-		invokingState = -1;
-	}
-	antlr4.ParserRuleContext.call(this, parent, invokingState);
+    if (parent === undefined) {
+        parent = null;
+    }
+    if (invokingState === undefined || invokingState === null) {
+        invokingState = -1;
+    }
+    antlr4.ParserRuleContext.call(this, parent, invokingState);
     this.parser = parser;
     this.ruleIndex = SiddhiQLParser.RULE_definition_window_final;
     return this;
@@ -1978,32 +1964,30 @@ function Definition_window_finalContext(parser, parent, invokingState) {
 Definition_window_finalContext.prototype = Object.create(antlr4.ParserRuleContext.prototype);
 Definition_window_finalContext.prototype.constructor = Definition_window_finalContext;
 
-Definition_window_finalContext.prototype.definition_window = function() {
-    return this.getTypedRuleContext(Definition_windowContext,0);
+Definition_window_finalContext.prototype.definition_window = function () {
+    return this.getTypedRuleContext(Definition_windowContext, 0);
 };
 
-Definition_window_finalContext.prototype.EOF = function() {
+Definition_window_finalContext.prototype.EOF = function () {
     return this.getToken(SiddhiQLParser.EOF, 0);
 };
 
-Definition_window_finalContext.prototype.enterRule = function(listener) {
-    if(listener instanceof SiddhiQLListener ) {
+Definition_window_finalContext.prototype.enterRule = function (listener) {
+    if (listener instanceof SiddhiQLListener) {
         listener.enterDefinition_window_final(this);
-	}
+    }
 };
 
-Definition_window_finalContext.prototype.exitRule = function(listener) {
-    if(listener instanceof SiddhiQLListener ) {
+Definition_window_finalContext.prototype.exitRule = function (listener) {
+    if (listener instanceof SiddhiQLListener) {
         listener.exitDefinition_window_final(this);
-	}
+    }
 };
-
-
 
 
 SiddhiQLParser.Definition_window_finalContext = Definition_window_finalContext;
 
-SiddhiQLParser.prototype.definition_window_final = function() {
+SiddhiQLParser.prototype.definition_window_final = function () {
 
     var localctx = new Definition_window_finalContext(this, this._ctx, this.state);
     this.enterRule(localctx, 16, SiddhiQLParser.RULE_definition_window_final);
@@ -2014,7 +1998,7 @@ SiddhiQLParser.prototype.definition_window_final = function() {
         this.definition_window();
         this.state = 385;
         _la = this._input.LA(1);
-        if(_la===SiddhiQLParser.SCOL) {
+        if (_la === SiddhiQLParser.SCOL) {
             this.state = 384;
             this.match(SiddhiQLParser.SCOL);
         }
@@ -2022,13 +2006,13 @@ SiddhiQLParser.prototype.definition_window_final = function() {
         this.state = 387;
         this.match(SiddhiQLParser.EOF);
     } catch (re) {
-    	if(re instanceof antlr4.error.RecognitionException) {
-	        localctx.exception = re;
-	        this._errHandler.reportError(this, re);
-	        this._errHandler.recover(this, re);
-	    } else {
-	    	throw re;
-	    }
+        if (re instanceof antlr4.error.RecognitionException) {
+            localctx.exception = re;
+            this._errHandler.reportError(this, re);
+            this._errHandler.recover(this, re);
+        } else {
+            throw re;
+        }
     } finally {
         this.exitRule();
     }
@@ -2036,13 +2020,13 @@ SiddhiQLParser.prototype.definition_window_final = function() {
 };
 
 function Definition_windowContext(parser, parent, invokingState) {
-	if(parent===undefined) {
-	    parent = null;
-	}
-	if(invokingState===undefined || invokingState===null) {
-		invokingState = -1;
-	}
-	antlr4.ParserRuleContext.call(this, parent, invokingState);
+    if (parent === undefined) {
+        parent = null;
+    }
+    if (invokingState === undefined || invokingState === null) {
+        invokingState = -1;
+    }
+    antlr4.ParserRuleContext.call(this, parent, invokingState);
     this.parser = parser;
     this.ruleIndex = SiddhiQLParser.RULE_definition_window;
     return this;
@@ -2051,81 +2035,79 @@ function Definition_windowContext(parser, parent, invokingState) {
 Definition_windowContext.prototype = Object.create(antlr4.ParserRuleContext.prototype);
 Definition_windowContext.prototype.constructor = Definition_windowContext;
 
-Definition_windowContext.prototype.DEFINE = function() {
+Definition_windowContext.prototype.DEFINE = function () {
     return this.getToken(SiddhiQLParser.DEFINE, 0);
 };
 
-Definition_windowContext.prototype.WINDOW = function() {
+Definition_windowContext.prototype.WINDOW = function () {
     return this.getToken(SiddhiQLParser.WINDOW, 0);
 };
 
-Definition_windowContext.prototype.source = function() {
-    return this.getTypedRuleContext(SourceContext,0);
+Definition_windowContext.prototype.source = function () {
+    return this.getTypedRuleContext(SourceContext, 0);
 };
 
-Definition_windowContext.prototype.attribute_name = function(i) {
-    if(i===undefined) {
+Definition_windowContext.prototype.attribute_name = function (i) {
+    if (i === undefined) {
         i = null;
     }
-    if(i===null) {
+    if (i === null) {
         return this.getTypedRuleContexts(Attribute_nameContext);
     } else {
-        return this.getTypedRuleContext(Attribute_nameContext,i);
+        return this.getTypedRuleContext(Attribute_nameContext, i);
     }
 };
 
-Definition_windowContext.prototype.attribute_type = function(i) {
-    if(i===undefined) {
+Definition_windowContext.prototype.attribute_type = function (i) {
+    if (i === undefined) {
         i = null;
     }
-    if(i===null) {
+    if (i === null) {
         return this.getTypedRuleContexts(Attribute_typeContext);
     } else {
-        return this.getTypedRuleContext(Attribute_typeContext,i);
+        return this.getTypedRuleContext(Attribute_typeContext, i);
     }
 };
 
-Definition_windowContext.prototype.function_operation = function() {
-    return this.getTypedRuleContext(Function_operationContext,0);
+Definition_windowContext.prototype.function_operation = function () {
+    return this.getTypedRuleContext(Function_operationContext, 0);
 };
 
-Definition_windowContext.prototype.annotation = function(i) {
-    if(i===undefined) {
+Definition_windowContext.prototype.annotation = function (i) {
+    if (i === undefined) {
         i = null;
     }
-    if(i===null) {
+    if (i === null) {
         return this.getTypedRuleContexts(AnnotationContext);
     } else {
-        return this.getTypedRuleContext(AnnotationContext,i);
+        return this.getTypedRuleContext(AnnotationContext, i);
     }
 };
 
-Definition_windowContext.prototype.OUTPUT = function() {
+Definition_windowContext.prototype.OUTPUT = function () {
     return this.getToken(SiddhiQLParser.OUTPUT, 0);
 };
 
-Definition_windowContext.prototype.output_event_type = function() {
-    return this.getTypedRuleContext(Output_event_typeContext,0);
+Definition_windowContext.prototype.output_event_type = function () {
+    return this.getTypedRuleContext(Output_event_typeContext, 0);
 };
 
-Definition_windowContext.prototype.enterRule = function(listener) {
-    if(listener instanceof SiddhiQLListener ) {
+Definition_windowContext.prototype.enterRule = function (listener) {
+    if (listener instanceof SiddhiQLListener) {
         listener.enterDefinition_window(this);
-	}
+    }
 };
 
-Definition_windowContext.prototype.exitRule = function(listener) {
-    if(listener instanceof SiddhiQLListener ) {
+Definition_windowContext.prototype.exitRule = function (listener) {
+    if (listener instanceof SiddhiQLListener) {
         listener.exitDefinition_window(this);
-	}
+    }
 };
-
-
 
 
 SiddhiQLParser.Definition_windowContext = Definition_windowContext;
 
-SiddhiQLParser.prototype.definition_window = function() {
+SiddhiQLParser.prototype.definition_window = function () {
 
     var localctx = new Definition_windowContext(this, this._ctx, this.state);
     this.enterRule(localctx, 18, SiddhiQLParser.RULE_definition_window);
@@ -2135,7 +2117,7 @@ SiddhiQLParser.prototype.definition_window = function() {
         this.state = 392;
         this._errHandler.sync(this);
         _la = this._input.LA(1);
-        while(_la===SiddhiQLParser.AT_SYMBOL) {
+        while (_la === SiddhiQLParser.AT_SYMBOL) {
             this.state = 389;
             this.annotation();
             this.state = 394;
@@ -2157,7 +2139,7 @@ SiddhiQLParser.prototype.definition_window = function() {
         this.state = 407;
         this._errHandler.sync(this);
         _la = this._input.LA(1);
-        while(_la===SiddhiQLParser.COMMA) {
+        while (_la === SiddhiQLParser.COMMA) {
             this.state = 401;
             this.match(SiddhiQLParser.COMMA);
             this.state = 402;
@@ -2174,7 +2156,7 @@ SiddhiQLParser.prototype.definition_window = function() {
         this.function_operation();
         this.state = 414;
         _la = this._input.LA(1);
-        if(_la===SiddhiQLParser.OUTPUT) {
+        if (_la === SiddhiQLParser.OUTPUT) {
             this.state = 412;
             this.match(SiddhiQLParser.OUTPUT);
             this.state = 413;
@@ -2182,13 +2164,13 @@ SiddhiQLParser.prototype.definition_window = function() {
         }
 
     } catch (re) {
-    	if(re instanceof antlr4.error.RecognitionException) {
-	        localctx.exception = re;
-	        this._errHandler.reportError(this, re);
-	        this._errHandler.recover(this, re);
-	    } else {
-	    	throw re;
-	    }
+        if (re instanceof antlr4.error.RecognitionException) {
+            localctx.exception = re;
+            this._errHandler.reportError(this, re);
+            this._errHandler.recover(this, re);
+        } else {
+            throw re;
+        }
     } finally {
         this.exitRule();
     }
@@ -2196,13 +2178,13 @@ SiddhiQLParser.prototype.definition_window = function() {
 };
 
 function Store_query_finalContext(parser, parent, invokingState) {
-	if(parent===undefined) {
-	    parent = null;
-	}
-	if(invokingState===undefined || invokingState===null) {
-		invokingState = -1;
-	}
-	antlr4.ParserRuleContext.call(this, parent, invokingState);
+    if (parent === undefined) {
+        parent = null;
+    }
+    if (invokingState === undefined || invokingState === null) {
+        invokingState = -1;
+    }
+    antlr4.ParserRuleContext.call(this, parent, invokingState);
     this.parser = parser;
     this.ruleIndex = SiddhiQLParser.RULE_store_query_final;
     return this;
@@ -2211,32 +2193,30 @@ function Store_query_finalContext(parser, parent, invokingState) {
 Store_query_finalContext.prototype = Object.create(antlr4.ParserRuleContext.prototype);
 Store_query_finalContext.prototype.constructor = Store_query_finalContext;
 
-Store_query_finalContext.prototype.store_query = function() {
-    return this.getTypedRuleContext(Store_queryContext,0);
+Store_query_finalContext.prototype.store_query = function () {
+    return this.getTypedRuleContext(Store_queryContext, 0);
 };
 
-Store_query_finalContext.prototype.EOF = function() {
+Store_query_finalContext.prototype.EOF = function () {
     return this.getToken(SiddhiQLParser.EOF, 0);
 };
 
-Store_query_finalContext.prototype.enterRule = function(listener) {
-    if(listener instanceof SiddhiQLListener ) {
+Store_query_finalContext.prototype.enterRule = function (listener) {
+    if (listener instanceof SiddhiQLListener) {
         listener.enterStore_query_final(this);
-	}
+    }
 };
 
-Store_query_finalContext.prototype.exitRule = function(listener) {
-    if(listener instanceof SiddhiQLListener ) {
+Store_query_finalContext.prototype.exitRule = function (listener) {
+    if (listener instanceof SiddhiQLListener) {
         listener.exitStore_query_final(this);
-	}
+    }
 };
-
-
 
 
 SiddhiQLParser.Store_query_finalContext = Store_query_finalContext;
 
-SiddhiQLParser.prototype.store_query_final = function() {
+SiddhiQLParser.prototype.store_query_final = function () {
 
     var localctx = new Store_query_finalContext(this, this._ctx, this.state);
     this.enterRule(localctx, 20, SiddhiQLParser.RULE_store_query_final);
@@ -2247,7 +2227,7 @@ SiddhiQLParser.prototype.store_query_final = function() {
         this.store_query();
         this.state = 418;
         _la = this._input.LA(1);
-        if(_la===SiddhiQLParser.SCOL) {
+        if (_la === SiddhiQLParser.SCOL) {
             this.state = 417;
             this.match(SiddhiQLParser.SCOL);
         }
@@ -2255,13 +2235,13 @@ SiddhiQLParser.prototype.store_query_final = function() {
         this.state = 420;
         this.match(SiddhiQLParser.EOF);
     } catch (re) {
-    	if(re instanceof antlr4.error.RecognitionException) {
-	        localctx.exception = re;
-	        this._errHandler.reportError(this, re);
-	        this._errHandler.recover(this, re);
-	    } else {
-	    	throw re;
-	    }
+        if (re instanceof antlr4.error.RecognitionException) {
+            localctx.exception = re;
+            this._errHandler.reportError(this, re);
+            this._errHandler.recover(this, re);
+        } else {
+            throw re;
+        }
     } finally {
         this.exitRule();
     }
@@ -2269,13 +2249,13 @@ SiddhiQLParser.prototype.store_query_final = function() {
 };
 
 function Store_queryContext(parser, parent, invokingState) {
-	if(parent===undefined) {
-	    parent = null;
-	}
-	if(invokingState===undefined || invokingState===null) {
-		invokingState = -1;
-	}
-	antlr4.ParserRuleContext.call(this, parent, invokingState);
+    if (parent === undefined) {
+        parent = null;
+    }
+    if (invokingState === undefined || invokingState === null) {
+        invokingState = -1;
+    }
+    antlr4.ParserRuleContext.call(this, parent, invokingState);
     this.parser = parser;
     this.ruleIndex = SiddhiQLParser.RULE_store_query;
     return this;
@@ -2284,156 +2264,154 @@ function Store_queryContext(parser, parent, invokingState) {
 Store_queryContext.prototype = Object.create(antlr4.ParserRuleContext.prototype);
 Store_queryContext.prototype.constructor = Store_queryContext;
 
-Store_queryContext.prototype.FROM = function() {
+Store_queryContext.prototype.FROM = function () {
     return this.getToken(SiddhiQLParser.FROM, 0);
 };
 
-Store_queryContext.prototype.store_input = function() {
-    return this.getTypedRuleContext(Store_inputContext,0);
+Store_queryContext.prototype.store_input = function () {
+    return this.getTypedRuleContext(Store_inputContext, 0);
 };
 
-Store_queryContext.prototype.query_section = function() {
-    return this.getTypedRuleContext(Query_sectionContext,0);
+Store_queryContext.prototype.query_section = function () {
+    return this.getTypedRuleContext(Query_sectionContext, 0);
 };
 
-Store_queryContext.prototype.INSERT = function() {
+Store_queryContext.prototype.INSERT = function () {
     return this.getToken(SiddhiQLParser.INSERT, 0);
 };
 
-Store_queryContext.prototype.INTO = function() {
+Store_queryContext.prototype.INTO = function () {
     return this.getToken(SiddhiQLParser.INTO, 0);
 };
 
-Store_queryContext.prototype.target = function() {
-    return this.getTypedRuleContext(TargetContext,0);
+Store_queryContext.prototype.target = function () {
+    return this.getTypedRuleContext(TargetContext, 0);
 };
 
-Store_queryContext.prototype.UPDATE = function() {
+Store_queryContext.prototype.UPDATE = function () {
     return this.getToken(SiddhiQLParser.UPDATE, 0);
 };
 
-Store_queryContext.prototype.OR = function() {
+Store_queryContext.prototype.OR = function () {
     return this.getToken(SiddhiQLParser.OR, 0);
 };
 
-Store_queryContext.prototype.ON = function() {
+Store_queryContext.prototype.ON = function () {
     return this.getToken(SiddhiQLParser.ON, 0);
 };
 
-Store_queryContext.prototype.expression = function() {
-    return this.getTypedRuleContext(ExpressionContext,0);
+Store_queryContext.prototype.expression = function () {
+    return this.getTypedRuleContext(ExpressionContext, 0);
 };
 
-Store_queryContext.prototype.set_clause = function() {
-    return this.getTypedRuleContext(Set_clauseContext,0);
+Store_queryContext.prototype.set_clause = function () {
+    return this.getTypedRuleContext(Set_clauseContext, 0);
 };
 
-Store_queryContext.prototype.store_query_output = function() {
-    return this.getTypedRuleContext(Store_query_outputContext,0);
+Store_queryContext.prototype.store_query_output = function () {
+    return this.getTypedRuleContext(Store_query_outputContext, 0);
 };
 
-Store_queryContext.prototype.enterRule = function(listener) {
-    if(listener instanceof SiddhiQLListener ) {
+Store_queryContext.prototype.enterRule = function (listener) {
+    if (listener instanceof SiddhiQLListener) {
         listener.enterStore_query(this);
-	}
+    }
 };
 
-Store_queryContext.prototype.exitRule = function(listener) {
-    if(listener instanceof SiddhiQLListener ) {
+Store_queryContext.prototype.exitRule = function (listener) {
+    if (listener instanceof SiddhiQLListener) {
         listener.exitStore_query(this);
-	}
+    }
 };
-
-
 
 
 SiddhiQLParser.Store_queryContext = Store_queryContext;
 
-SiddhiQLParser.prototype.store_query = function() {
+SiddhiQLParser.prototype.store_query = function () {
 
     var localctx = new Store_queryContext(this, this._ctx, this.state);
     this.enterRule(localctx, 22, SiddhiQLParser.RULE_store_query);
     var _la = 0; // Token type
     try {
         this.state = 448;
-        var la_ = this._interp.adaptivePredict(this._input,23,this._ctx);
-        switch(la_) {
-        case 1:
-            this.enterOuterAlt(localctx, 1);
-            this.state = 422;
-            this.match(SiddhiQLParser.FROM);
-            this.state = 423;
-            this.store_input();
-            this.state = 425;
-            _la = this._input.LA(1);
-            if(_la===SiddhiQLParser.SELECT) {
-                this.state = 424;
+        var la_ = this._interp.adaptivePredict(this._input, 23, this._ctx);
+        switch (la_) {
+            case 1:
+                this.enterOuterAlt(localctx, 1);
+                this.state = 422;
+                this.match(SiddhiQLParser.FROM);
+                this.state = 423;
+                this.store_input();
+                this.state = 425;
+                _la = this._input.LA(1);
+                if (_la === SiddhiQLParser.SELECT) {
+                    this.state = 424;
+                    this.query_section();
+                }
+
+                break;
+
+            case 2:
+                this.enterOuterAlt(localctx, 2);
+                this.state = 427;
                 this.query_section();
-            }
+                this.state = 428;
+                this.match(SiddhiQLParser.INSERT);
+                this.state = 429;
+                this.match(SiddhiQLParser.INTO);
+                this.state = 430;
+                this.target();
+                break;
 
-            break;
-
-        case 2:
-            this.enterOuterAlt(localctx, 2);
-            this.state = 427;
-            this.query_section();
-            this.state = 428;
-            this.match(SiddhiQLParser.INSERT);
-            this.state = 429;
-            this.match(SiddhiQLParser.INTO);
-            this.state = 430;
-            this.target();
-            break;
-
-        case 3:
-            this.enterOuterAlt(localctx, 3);
-            this.state = 432;
-            this.query_section();
-            this.state = 433;
-            this.match(SiddhiQLParser.UPDATE);
-            this.state = 434;
-            this.match(SiddhiQLParser.OR);
-            this.state = 435;
-            this.match(SiddhiQLParser.INSERT);
-            this.state = 436;
-            this.match(SiddhiQLParser.INTO);
-            this.state = 437;
-            this.target();
-            this.state = 439;
-            _la = this._input.LA(1);
-            if(_la===SiddhiQLParser.SET) {
-                this.state = 438;
-                this.set_clause();
-            }
-
-            this.state = 441;
-            this.match(SiddhiQLParser.ON);
-            this.state = 442;
-            this.expression();
-            break;
-
-        case 4:
-            this.enterOuterAlt(localctx, 4);
-            this.state = 445;
-            _la = this._input.LA(1);
-            if(_la===SiddhiQLParser.SELECT) {
-                this.state = 444;
+            case 3:
+                this.enterOuterAlt(localctx, 3);
+                this.state = 432;
                 this.query_section();
-            }
+                this.state = 433;
+                this.match(SiddhiQLParser.UPDATE);
+                this.state = 434;
+                this.match(SiddhiQLParser.OR);
+                this.state = 435;
+                this.match(SiddhiQLParser.INSERT);
+                this.state = 436;
+                this.match(SiddhiQLParser.INTO);
+                this.state = 437;
+                this.target();
+                this.state = 439;
+                _la = this._input.LA(1);
+                if (_la === SiddhiQLParser.SET) {
+                    this.state = 438;
+                    this.set_clause();
+                }
 
-            this.state = 447;
-            this.store_query_output();
-            break;
+                this.state = 441;
+                this.match(SiddhiQLParser.ON);
+                this.state = 442;
+                this.expression();
+                break;
+
+            case 4:
+                this.enterOuterAlt(localctx, 4);
+                this.state = 445;
+                _la = this._input.LA(1);
+                if (_la === SiddhiQLParser.SELECT) {
+                    this.state = 444;
+                    this.query_section();
+                }
+
+                this.state = 447;
+                this.store_query_output();
+                break;
 
         }
     } catch (re) {
-    	if(re instanceof antlr4.error.RecognitionException) {
-	        localctx.exception = re;
-	        this._errHandler.reportError(this, re);
-	        this._errHandler.recover(this, re);
-	    } else {
-	    	throw re;
-	    }
+        if (re instanceof antlr4.error.RecognitionException) {
+            localctx.exception = re;
+            this._errHandler.reportError(this, re);
+            this._errHandler.recover(this, re);
+        } else {
+            throw re;
+        }
     } finally {
         this.exitRule();
     }
@@ -2441,13 +2419,13 @@ SiddhiQLParser.prototype.store_query = function() {
 };
 
 function Store_inputContext(parser, parent, invokingState) {
-	if(parent===undefined) {
-	    parent = null;
-	}
-	if(invokingState===undefined || invokingState===null) {
-		invokingState = -1;
-	}
-	antlr4.ParserRuleContext.call(this, parent, invokingState);
+    if (parent === undefined) {
+        parent = null;
+    }
+    if (invokingState === undefined || invokingState === null) {
+        invokingState = -1;
+    }
+    antlr4.ParserRuleContext.call(this, parent, invokingState);
     this.parser = parser;
     this.ruleIndex = SiddhiQLParser.RULE_store_input;
     return this;
@@ -2456,52 +2434,50 @@ function Store_inputContext(parser, parent, invokingState) {
 Store_inputContext.prototype = Object.create(antlr4.ParserRuleContext.prototype);
 Store_inputContext.prototype.constructor = Store_inputContext;
 
-Store_inputContext.prototype.source_id = function() {
-    return this.getTypedRuleContext(Source_idContext,0);
+Store_inputContext.prototype.source_id = function () {
+    return this.getTypedRuleContext(Source_idContext, 0);
 };
 
-Store_inputContext.prototype.AS = function() {
+Store_inputContext.prototype.AS = function () {
     return this.getToken(SiddhiQLParser.AS, 0);
 };
 
-Store_inputContext.prototype.alias = function() {
-    return this.getTypedRuleContext(AliasContext,0);
+Store_inputContext.prototype.alias = function () {
+    return this.getTypedRuleContext(AliasContext, 0);
 };
 
-Store_inputContext.prototype.ON = function() {
+Store_inputContext.prototype.ON = function () {
     return this.getToken(SiddhiQLParser.ON, 0);
 };
 
-Store_inputContext.prototype.expression = function() {
-    return this.getTypedRuleContext(ExpressionContext,0);
+Store_inputContext.prototype.expression = function () {
+    return this.getTypedRuleContext(ExpressionContext, 0);
 };
 
-Store_inputContext.prototype.within_time_range = function() {
-    return this.getTypedRuleContext(Within_time_rangeContext,0);
+Store_inputContext.prototype.within_time_range = function () {
+    return this.getTypedRuleContext(Within_time_rangeContext, 0);
 };
 
-Store_inputContext.prototype.per = function() {
-    return this.getTypedRuleContext(PerContext,0);
+Store_inputContext.prototype.per = function () {
+    return this.getTypedRuleContext(PerContext, 0);
 };
 
-Store_inputContext.prototype.enterRule = function(listener) {
-    if(listener instanceof SiddhiQLListener ) {
+Store_inputContext.prototype.enterRule = function (listener) {
+    if (listener instanceof SiddhiQLListener) {
         listener.enterStore_input(this);
-	}
+    }
 };
 
-Store_inputContext.prototype.exitRule = function(listener) {
-    if(listener instanceof SiddhiQLListener ) {
+Store_inputContext.prototype.exitRule = function (listener) {
+    if (listener instanceof SiddhiQLListener) {
         listener.exitStore_input(this);
-	}
+    }
 };
-
-
 
 
 SiddhiQLParser.Store_inputContext = Store_inputContext;
 
-SiddhiQLParser.prototype.store_input = function() {
+SiddhiQLParser.prototype.store_input = function () {
 
     var localctx = new Store_inputContext(this, this._ctx, this.state);
     this.enterRule(localctx, 24, SiddhiQLParser.RULE_store_input);
@@ -2512,7 +2488,7 @@ SiddhiQLParser.prototype.store_input = function() {
         this.source_id();
         this.state = 453;
         _la = this._input.LA(1);
-        if(_la===SiddhiQLParser.AS) {
+        if (_la === SiddhiQLParser.AS) {
             this.state = 451;
             this.match(SiddhiQLParser.AS);
             this.state = 452;
@@ -2521,7 +2497,7 @@ SiddhiQLParser.prototype.store_input = function() {
 
         this.state = 457;
         _la = this._input.LA(1);
-        if(_la===SiddhiQLParser.ON) {
+        if (_la === SiddhiQLParser.ON) {
             this.state = 455;
             this.match(SiddhiQLParser.ON);
             this.state = 456;
@@ -2530,7 +2506,7 @@ SiddhiQLParser.prototype.store_input = function() {
 
         this.state = 462;
         _la = this._input.LA(1);
-        if(_la===SiddhiQLParser.WITHIN) {
+        if (_la === SiddhiQLParser.WITHIN) {
             this.state = 459;
             this.within_time_range();
             this.state = 460;
@@ -2538,13 +2514,13 @@ SiddhiQLParser.prototype.store_input = function() {
         }
 
     } catch (re) {
-    	if(re instanceof antlr4.error.RecognitionException) {
-	        localctx.exception = re;
-	        this._errHandler.reportError(this, re);
-	        this._errHandler.recover(this, re);
-	    } else {
-	    	throw re;
-	    }
+        if (re instanceof antlr4.error.RecognitionException) {
+            localctx.exception = re;
+            this._errHandler.reportError(this, re);
+            this._errHandler.recover(this, re);
+        } else {
+            throw re;
+        }
     } finally {
         this.exitRule();
     }
@@ -2552,13 +2528,13 @@ SiddhiQLParser.prototype.store_input = function() {
 };
 
 function Definition_function_finalContext(parser, parent, invokingState) {
-	if(parent===undefined) {
-	    parent = null;
-	}
-	if(invokingState===undefined || invokingState===null) {
-		invokingState = -1;
-	}
-	antlr4.ParserRuleContext.call(this, parent, invokingState);
+    if (parent === undefined) {
+        parent = null;
+    }
+    if (invokingState === undefined || invokingState === null) {
+        invokingState = -1;
+    }
+    antlr4.ParserRuleContext.call(this, parent, invokingState);
     this.parser = parser;
     this.ruleIndex = SiddhiQLParser.RULE_definition_function_final;
     return this;
@@ -2567,32 +2543,30 @@ function Definition_function_finalContext(parser, parent, invokingState) {
 Definition_function_finalContext.prototype = Object.create(antlr4.ParserRuleContext.prototype);
 Definition_function_finalContext.prototype.constructor = Definition_function_finalContext;
 
-Definition_function_finalContext.prototype.definition_function = function() {
-    return this.getTypedRuleContext(Definition_functionContext,0);
+Definition_function_finalContext.prototype.definition_function = function () {
+    return this.getTypedRuleContext(Definition_functionContext, 0);
 };
 
-Definition_function_finalContext.prototype.EOF = function() {
+Definition_function_finalContext.prototype.EOF = function () {
     return this.getToken(SiddhiQLParser.EOF, 0);
 };
 
-Definition_function_finalContext.prototype.enterRule = function(listener) {
-    if(listener instanceof SiddhiQLListener ) {
+Definition_function_finalContext.prototype.enterRule = function (listener) {
+    if (listener instanceof SiddhiQLListener) {
         listener.enterDefinition_function_final(this);
-	}
+    }
 };
 
-Definition_function_finalContext.prototype.exitRule = function(listener) {
-    if(listener instanceof SiddhiQLListener ) {
+Definition_function_finalContext.prototype.exitRule = function (listener) {
+    if (listener instanceof SiddhiQLListener) {
         listener.exitDefinition_function_final(this);
-	}
+    }
 };
-
-
 
 
 SiddhiQLParser.Definition_function_finalContext = Definition_function_finalContext;
 
-SiddhiQLParser.prototype.definition_function_final = function() {
+SiddhiQLParser.prototype.definition_function_final = function () {
 
     var localctx = new Definition_function_finalContext(this, this._ctx, this.state);
     this.enterRule(localctx, 26, SiddhiQLParser.RULE_definition_function_final);
@@ -2603,7 +2577,7 @@ SiddhiQLParser.prototype.definition_function_final = function() {
         this.definition_function();
         this.state = 466;
         _la = this._input.LA(1);
-        if(_la===SiddhiQLParser.SCOL) {
+        if (_la === SiddhiQLParser.SCOL) {
             this.state = 465;
             this.match(SiddhiQLParser.SCOL);
         }
@@ -2611,13 +2585,13 @@ SiddhiQLParser.prototype.definition_function_final = function() {
         this.state = 468;
         this.match(SiddhiQLParser.EOF);
     } catch (re) {
-    	if(re instanceof antlr4.error.RecognitionException) {
-	        localctx.exception = re;
-	        this._errHandler.reportError(this, re);
-	        this._errHandler.recover(this, re);
-	    } else {
-	    	throw re;
-	    }
+        if (re instanceof antlr4.error.RecognitionException) {
+            localctx.exception = re;
+            this._errHandler.reportError(this, re);
+            this._errHandler.recover(this, re);
+        } else {
+            throw re;
+        }
     } finally {
         this.exitRule();
     }
@@ -2625,13 +2599,13 @@ SiddhiQLParser.prototype.definition_function_final = function() {
 };
 
 function Definition_functionContext(parser, parent, invokingState) {
-	if(parent===undefined) {
-	    parent = null;
-	}
-	if(invokingState===undefined || invokingState===null) {
-		invokingState = -1;
-	}
-	antlr4.ParserRuleContext.call(this, parent, invokingState);
+    if (parent === undefined) {
+        parent = null;
+    }
+    if (invokingState === undefined || invokingState === null) {
+        invokingState = -1;
+    }
+    antlr4.ParserRuleContext.call(this, parent, invokingState);
     this.parser = parser;
     this.ruleIndex = SiddhiQLParser.RULE_definition_function;
     return this;
@@ -2640,52 +2614,50 @@ function Definition_functionContext(parser, parent, invokingState) {
 Definition_functionContext.prototype = Object.create(antlr4.ParserRuleContext.prototype);
 Definition_functionContext.prototype.constructor = Definition_functionContext;
 
-Definition_functionContext.prototype.DEFINE = function() {
+Definition_functionContext.prototype.DEFINE = function () {
     return this.getToken(SiddhiQLParser.DEFINE, 0);
 };
 
-Definition_functionContext.prototype.FUNCTION = function() {
+Definition_functionContext.prototype.FUNCTION = function () {
     return this.getToken(SiddhiQLParser.FUNCTION, 0);
 };
 
-Definition_functionContext.prototype.function_name = function() {
-    return this.getTypedRuleContext(Function_nameContext,0);
+Definition_functionContext.prototype.function_name = function () {
+    return this.getTypedRuleContext(Function_nameContext, 0);
 };
 
-Definition_functionContext.prototype.language_name = function() {
-    return this.getTypedRuleContext(Language_nameContext,0);
+Definition_functionContext.prototype.language_name = function () {
+    return this.getTypedRuleContext(Language_nameContext, 0);
 };
 
-Definition_functionContext.prototype.RETURN = function() {
+Definition_functionContext.prototype.RETURN = function () {
     return this.getToken(SiddhiQLParser.RETURN, 0);
 };
 
-Definition_functionContext.prototype.attribute_type = function() {
-    return this.getTypedRuleContext(Attribute_typeContext,0);
+Definition_functionContext.prototype.attribute_type = function () {
+    return this.getTypedRuleContext(Attribute_typeContext, 0);
 };
 
-Definition_functionContext.prototype.function_body = function() {
-    return this.getTypedRuleContext(Function_bodyContext,0);
+Definition_functionContext.prototype.function_body = function () {
+    return this.getTypedRuleContext(Function_bodyContext, 0);
 };
 
-Definition_functionContext.prototype.enterRule = function(listener) {
-    if(listener instanceof SiddhiQLListener ) {
+Definition_functionContext.prototype.enterRule = function (listener) {
+    if (listener instanceof SiddhiQLListener) {
         listener.enterDefinition_function(this);
-	}
+    }
 };
 
-Definition_functionContext.prototype.exitRule = function(listener) {
-    if(listener instanceof SiddhiQLListener ) {
+Definition_functionContext.prototype.exitRule = function (listener) {
+    if (listener instanceof SiddhiQLListener) {
         listener.exitDefinition_function(this);
-	}
+    }
 };
-
-
 
 
 SiddhiQLParser.Definition_functionContext = Definition_functionContext;
 
-SiddhiQLParser.prototype.definition_function = function() {
+SiddhiQLParser.prototype.definition_function = function () {
 
     var localctx = new Definition_functionContext(this, this._ctx, this.state);
     this.enterRule(localctx, 28, SiddhiQLParser.RULE_definition_function);
@@ -2710,13 +2682,13 @@ SiddhiQLParser.prototype.definition_function = function() {
         this.state = 478;
         this.function_body();
     } catch (re) {
-    	if(re instanceof antlr4.error.RecognitionException) {
-	        localctx.exception = re;
-	        this._errHandler.reportError(this, re);
-	        this._errHandler.recover(this, re);
-	    } else {
-	    	throw re;
-	    }
+        if (re instanceof antlr4.error.RecognitionException) {
+            localctx.exception = re;
+            this._errHandler.reportError(this, re);
+            this._errHandler.recover(this, re);
+        } else {
+            throw re;
+        }
     } finally {
         this.exitRule();
     }
@@ -2724,13 +2696,13 @@ SiddhiQLParser.prototype.definition_function = function() {
 };
 
 function Function_nameContext(parser, parent, invokingState) {
-	if(parent===undefined) {
-	    parent = null;
-	}
-	if(invokingState===undefined || invokingState===null) {
-		invokingState = -1;
-	}
-	antlr4.ParserRuleContext.call(this, parent, invokingState);
+    if (parent === undefined) {
+        parent = null;
+    }
+    if (invokingState === undefined || invokingState === null) {
+        invokingState = -1;
+    }
+    antlr4.ParserRuleContext.call(this, parent, invokingState);
     this.parser = parser;
     this.ruleIndex = SiddhiQLParser.RULE_function_name;
     return this;
@@ -2739,28 +2711,26 @@ function Function_nameContext(parser, parent, invokingState) {
 Function_nameContext.prototype = Object.create(antlr4.ParserRuleContext.prototype);
 Function_nameContext.prototype.constructor = Function_nameContext;
 
-Function_nameContext.prototype.id = function() {
-    return this.getTypedRuleContext(IdContext,0);
+Function_nameContext.prototype.id = function () {
+    return this.getTypedRuleContext(IdContext, 0);
 };
 
-Function_nameContext.prototype.enterRule = function(listener) {
-    if(listener instanceof SiddhiQLListener ) {
+Function_nameContext.prototype.enterRule = function (listener) {
+    if (listener instanceof SiddhiQLListener) {
         listener.enterFunction_name(this);
-	}
+    }
 };
 
-Function_nameContext.prototype.exitRule = function(listener) {
-    if(listener instanceof SiddhiQLListener ) {
+Function_nameContext.prototype.exitRule = function (listener) {
+    if (listener instanceof SiddhiQLListener) {
         listener.exitFunction_name(this);
-	}
+    }
 };
-
-
 
 
 SiddhiQLParser.Function_nameContext = Function_nameContext;
 
-SiddhiQLParser.prototype.function_name = function() {
+SiddhiQLParser.prototype.function_name = function () {
 
     var localctx = new Function_nameContext(this, this._ctx, this.state);
     this.enterRule(localctx, 30, SiddhiQLParser.RULE_function_name);
@@ -2769,13 +2739,13 @@ SiddhiQLParser.prototype.function_name = function() {
         this.state = 480;
         this.id();
     } catch (re) {
-    	if(re instanceof antlr4.error.RecognitionException) {
-	        localctx.exception = re;
-	        this._errHandler.reportError(this, re);
-	        this._errHandler.recover(this, re);
-	    } else {
-	    	throw re;
-	    }
+        if (re instanceof antlr4.error.RecognitionException) {
+            localctx.exception = re;
+            this._errHandler.reportError(this, re);
+            this._errHandler.recover(this, re);
+        } else {
+            throw re;
+        }
     } finally {
         this.exitRule();
     }
@@ -2783,13 +2753,13 @@ SiddhiQLParser.prototype.function_name = function() {
 };
 
 function Language_nameContext(parser, parent, invokingState) {
-	if(parent===undefined) {
-	    parent = null;
-	}
-	if(invokingState===undefined || invokingState===null) {
-		invokingState = -1;
-	}
-	antlr4.ParserRuleContext.call(this, parent, invokingState);
+    if (parent === undefined) {
+        parent = null;
+    }
+    if (invokingState === undefined || invokingState === null) {
+        invokingState = -1;
+    }
+    antlr4.ParserRuleContext.call(this, parent, invokingState);
     this.parser = parser;
     this.ruleIndex = SiddhiQLParser.RULE_language_name;
     return this;
@@ -2798,28 +2768,26 @@ function Language_nameContext(parser, parent, invokingState) {
 Language_nameContext.prototype = Object.create(antlr4.ParserRuleContext.prototype);
 Language_nameContext.prototype.constructor = Language_nameContext;
 
-Language_nameContext.prototype.id = function() {
-    return this.getTypedRuleContext(IdContext,0);
+Language_nameContext.prototype.id = function () {
+    return this.getTypedRuleContext(IdContext, 0);
 };
 
-Language_nameContext.prototype.enterRule = function(listener) {
-    if(listener instanceof SiddhiQLListener ) {
+Language_nameContext.prototype.enterRule = function (listener) {
+    if (listener instanceof SiddhiQLListener) {
         listener.enterLanguage_name(this);
-	}
+    }
 };
 
-Language_nameContext.prototype.exitRule = function(listener) {
-    if(listener instanceof SiddhiQLListener ) {
+Language_nameContext.prototype.exitRule = function (listener) {
+    if (listener instanceof SiddhiQLListener) {
         listener.exitLanguage_name(this);
-	}
+    }
 };
-
-
 
 
 SiddhiQLParser.Language_nameContext = Language_nameContext;
 
-SiddhiQLParser.prototype.language_name = function() {
+SiddhiQLParser.prototype.language_name = function () {
 
     var localctx = new Language_nameContext(this, this._ctx, this.state);
     this.enterRule(localctx, 32, SiddhiQLParser.RULE_language_name);
@@ -2828,13 +2796,13 @@ SiddhiQLParser.prototype.language_name = function() {
         this.state = 482;
         this.id();
     } catch (re) {
-    	if(re instanceof antlr4.error.RecognitionException) {
-	        localctx.exception = re;
-	        this._errHandler.reportError(this, re);
-	        this._errHandler.recover(this, re);
-	    } else {
-	    	throw re;
-	    }
+        if (re instanceof antlr4.error.RecognitionException) {
+            localctx.exception = re;
+            this._errHandler.reportError(this, re);
+            this._errHandler.recover(this, re);
+        } else {
+            throw re;
+        }
     } finally {
         this.exitRule();
     }
@@ -2842,13 +2810,13 @@ SiddhiQLParser.prototype.language_name = function() {
 };
 
 function Function_bodyContext(parser, parent, invokingState) {
-	if(parent===undefined) {
-	    parent = null;
-	}
-	if(invokingState===undefined || invokingState===null) {
-		invokingState = -1;
-	}
-	antlr4.ParserRuleContext.call(this, parent, invokingState);
+    if (parent === undefined) {
+        parent = null;
+    }
+    if (invokingState === undefined || invokingState === null) {
+        invokingState = -1;
+    }
+    antlr4.ParserRuleContext.call(this, parent, invokingState);
     this.parser = parser;
     this.ruleIndex = SiddhiQLParser.RULE_function_body;
     return this;
@@ -2857,28 +2825,26 @@ function Function_bodyContext(parser, parent, invokingState) {
 Function_bodyContext.prototype = Object.create(antlr4.ParserRuleContext.prototype);
 Function_bodyContext.prototype.constructor = Function_bodyContext;
 
-Function_bodyContext.prototype.SCRIPT = function() {
+Function_bodyContext.prototype.SCRIPT = function () {
     return this.getToken(SiddhiQLParser.SCRIPT, 0);
 };
 
-Function_bodyContext.prototype.enterRule = function(listener) {
-    if(listener instanceof SiddhiQLListener ) {
+Function_bodyContext.prototype.enterRule = function (listener) {
+    if (listener instanceof SiddhiQLListener) {
         listener.enterFunction_body(this);
-	}
+    }
 };
 
-Function_bodyContext.prototype.exitRule = function(listener) {
-    if(listener instanceof SiddhiQLListener ) {
+Function_bodyContext.prototype.exitRule = function (listener) {
+    if (listener instanceof SiddhiQLListener) {
         listener.exitFunction_body(this);
-	}
+    }
 };
-
-
 
 
 SiddhiQLParser.Function_bodyContext = Function_bodyContext;
 
-SiddhiQLParser.prototype.function_body = function() {
+SiddhiQLParser.prototype.function_body = function () {
 
     var localctx = new Function_bodyContext(this, this._ctx, this.state);
     this.enterRule(localctx, 34, SiddhiQLParser.RULE_function_body);
@@ -2887,13 +2853,13 @@ SiddhiQLParser.prototype.function_body = function() {
         this.state = 484;
         this.match(SiddhiQLParser.SCRIPT);
     } catch (re) {
-    	if(re instanceof antlr4.error.RecognitionException) {
-	        localctx.exception = re;
-	        this._errHandler.reportError(this, re);
-	        this._errHandler.recover(this, re);
-	    } else {
-	    	throw re;
-	    }
+        if (re instanceof antlr4.error.RecognitionException) {
+            localctx.exception = re;
+            this._errHandler.reportError(this, re);
+            this._errHandler.recover(this, re);
+        } else {
+            throw re;
+        }
     } finally {
         this.exitRule();
     }
@@ -2901,13 +2867,13 @@ SiddhiQLParser.prototype.function_body = function() {
 };
 
 function Definition_trigger_finalContext(parser, parent, invokingState) {
-	if(parent===undefined) {
-	    parent = null;
-	}
-	if(invokingState===undefined || invokingState===null) {
-		invokingState = -1;
-	}
-	antlr4.ParserRuleContext.call(this, parent, invokingState);
+    if (parent === undefined) {
+        parent = null;
+    }
+    if (invokingState === undefined || invokingState === null) {
+        invokingState = -1;
+    }
+    antlr4.ParserRuleContext.call(this, parent, invokingState);
     this.parser = parser;
     this.ruleIndex = SiddhiQLParser.RULE_definition_trigger_final;
     return this;
@@ -2916,32 +2882,30 @@ function Definition_trigger_finalContext(parser, parent, invokingState) {
 Definition_trigger_finalContext.prototype = Object.create(antlr4.ParserRuleContext.prototype);
 Definition_trigger_finalContext.prototype.constructor = Definition_trigger_finalContext;
 
-Definition_trigger_finalContext.prototype.definition_trigger = function() {
-    return this.getTypedRuleContext(Definition_triggerContext,0);
+Definition_trigger_finalContext.prototype.definition_trigger = function () {
+    return this.getTypedRuleContext(Definition_triggerContext, 0);
 };
 
-Definition_trigger_finalContext.prototype.EOF = function() {
+Definition_trigger_finalContext.prototype.EOF = function () {
     return this.getToken(SiddhiQLParser.EOF, 0);
 };
 
-Definition_trigger_finalContext.prototype.enterRule = function(listener) {
-    if(listener instanceof SiddhiQLListener ) {
+Definition_trigger_finalContext.prototype.enterRule = function (listener) {
+    if (listener instanceof SiddhiQLListener) {
         listener.enterDefinition_trigger_final(this);
-	}
+    }
 };
 
-Definition_trigger_finalContext.prototype.exitRule = function(listener) {
-    if(listener instanceof SiddhiQLListener ) {
+Definition_trigger_finalContext.prototype.exitRule = function (listener) {
+    if (listener instanceof SiddhiQLListener) {
         listener.exitDefinition_trigger_final(this);
-	}
+    }
 };
-
-
 
 
 SiddhiQLParser.Definition_trigger_finalContext = Definition_trigger_finalContext;
 
-SiddhiQLParser.prototype.definition_trigger_final = function() {
+SiddhiQLParser.prototype.definition_trigger_final = function () {
 
     var localctx = new Definition_trigger_finalContext(this, this._ctx, this.state);
     this.enterRule(localctx, 36, SiddhiQLParser.RULE_definition_trigger_final);
@@ -2952,7 +2916,7 @@ SiddhiQLParser.prototype.definition_trigger_final = function() {
         this.definition_trigger();
         this.state = 488;
         _la = this._input.LA(1);
-        if(_la===SiddhiQLParser.SCOL) {
+        if (_la === SiddhiQLParser.SCOL) {
             this.state = 487;
             this.match(SiddhiQLParser.SCOL);
         }
@@ -2960,13 +2924,13 @@ SiddhiQLParser.prototype.definition_trigger_final = function() {
         this.state = 490;
         this.match(SiddhiQLParser.EOF);
     } catch (re) {
-    	if(re instanceof antlr4.error.RecognitionException) {
-	        localctx.exception = re;
-	        this._errHandler.reportError(this, re);
-	        this._errHandler.recover(this, re);
-	    } else {
-	    	throw re;
-	    }
+        if (re instanceof antlr4.error.RecognitionException) {
+            localctx.exception = re;
+            this._errHandler.reportError(this, re);
+            this._errHandler.recover(this, re);
+        } else {
+            throw re;
+        }
     } finally {
         this.exitRule();
     }
@@ -2974,13 +2938,13 @@ SiddhiQLParser.prototype.definition_trigger_final = function() {
 };
 
 function Definition_triggerContext(parser, parent, invokingState) {
-	if(parent===undefined) {
-	    parent = null;
-	}
-	if(invokingState===undefined || invokingState===null) {
-		invokingState = -1;
-	}
-	antlr4.ParserRuleContext.call(this, parent, invokingState);
+    if (parent === undefined) {
+        parent = null;
+    }
+    if (invokingState === undefined || invokingState === null) {
+        invokingState = -1;
+    }
+    antlr4.ParserRuleContext.call(this, parent, invokingState);
     this.parser = parser;
     this.ruleIndex = SiddhiQLParser.RULE_definition_trigger;
     return this;
@@ -2989,52 +2953,50 @@ function Definition_triggerContext(parser, parent, invokingState) {
 Definition_triggerContext.prototype = Object.create(antlr4.ParserRuleContext.prototype);
 Definition_triggerContext.prototype.constructor = Definition_triggerContext;
 
-Definition_triggerContext.prototype.DEFINE = function() {
+Definition_triggerContext.prototype.DEFINE = function () {
     return this.getToken(SiddhiQLParser.DEFINE, 0);
 };
 
-Definition_triggerContext.prototype.TRIGGER = function() {
+Definition_triggerContext.prototype.TRIGGER = function () {
     return this.getToken(SiddhiQLParser.TRIGGER, 0);
 };
 
-Definition_triggerContext.prototype.trigger_name = function() {
-    return this.getTypedRuleContext(Trigger_nameContext,0);
+Definition_triggerContext.prototype.trigger_name = function () {
+    return this.getTypedRuleContext(Trigger_nameContext, 0);
 };
 
-Definition_triggerContext.prototype.AT = function() {
+Definition_triggerContext.prototype.AT = function () {
     return this.getToken(SiddhiQLParser.AT, 0);
 };
 
-Definition_triggerContext.prototype.EVERY = function() {
+Definition_triggerContext.prototype.EVERY = function () {
     return this.getToken(SiddhiQLParser.EVERY, 0);
 };
 
-Definition_triggerContext.prototype.time_value = function() {
-    return this.getTypedRuleContext(Time_valueContext,0);
+Definition_triggerContext.prototype.time_value = function () {
+    return this.getTypedRuleContext(Time_valueContext, 0);
 };
 
-Definition_triggerContext.prototype.string_value = function() {
-    return this.getTypedRuleContext(String_valueContext,0);
+Definition_triggerContext.prototype.string_value = function () {
+    return this.getTypedRuleContext(String_valueContext, 0);
 };
 
-Definition_triggerContext.prototype.enterRule = function(listener) {
-    if(listener instanceof SiddhiQLListener ) {
+Definition_triggerContext.prototype.enterRule = function (listener) {
+    if (listener instanceof SiddhiQLListener) {
         listener.enterDefinition_trigger(this);
-	}
+    }
 };
 
-Definition_triggerContext.prototype.exitRule = function(listener) {
-    if(listener instanceof SiddhiQLListener ) {
+Definition_triggerContext.prototype.exitRule = function (listener) {
+    if (listener instanceof SiddhiQLListener) {
         listener.exitDefinition_trigger(this);
-	}
+    }
 };
-
-
 
 
 SiddhiQLParser.Definition_triggerContext = Definition_triggerContext;
 
-SiddhiQLParser.prototype.definition_trigger = function() {
+SiddhiQLParser.prototype.definition_trigger = function () {
 
     var localctx = new Definition_triggerContext(this, this._ctx, this.state);
     this.enterRule(localctx, 38, SiddhiQLParser.RULE_definition_trigger);
@@ -3049,28 +3011,28 @@ SiddhiQLParser.prototype.definition_trigger = function() {
         this.state = 495;
         this.match(SiddhiQLParser.AT);
         this.state = 499;
-        switch(this._input.LA(1)) {
-        case SiddhiQLParser.EVERY:
-            this.state = 496;
-            this.match(SiddhiQLParser.EVERY);
-            this.state = 497;
-            this.time_value();
-            break;
-        case SiddhiQLParser.STRING_LITERAL:
-            this.state = 498;
-            this.string_value();
-            break;
-        default:
-            throw new antlr4.error.NoViableAltException(this);
+        switch (this._input.LA(1)) {
+            case SiddhiQLParser.EVERY:
+                this.state = 496;
+                this.match(SiddhiQLParser.EVERY);
+                this.state = 497;
+                this.time_value();
+                break;
+            case SiddhiQLParser.STRING_LITERAL:
+                this.state = 498;
+                this.string_value();
+                break;
+            default:
+                throw new antlr4.error.NoViableAltException(this);
         }
     } catch (re) {
-    	if(re instanceof antlr4.error.RecognitionException) {
-	        localctx.exception = re;
-	        this._errHandler.reportError(this, re);
-	        this._errHandler.recover(this, re);
-	    } else {
-	    	throw re;
-	    }
+        if (re instanceof antlr4.error.RecognitionException) {
+            localctx.exception = re;
+            this._errHandler.reportError(this, re);
+            this._errHandler.recover(this, re);
+        } else {
+            throw re;
+        }
     } finally {
         this.exitRule();
     }
@@ -3078,13 +3040,13 @@ SiddhiQLParser.prototype.definition_trigger = function() {
 };
 
 function Trigger_nameContext(parser, parent, invokingState) {
-	if(parent===undefined) {
-	    parent = null;
-	}
-	if(invokingState===undefined || invokingState===null) {
-		invokingState = -1;
-	}
-	antlr4.ParserRuleContext.call(this, parent, invokingState);
+    if (parent === undefined) {
+        parent = null;
+    }
+    if (invokingState === undefined || invokingState === null) {
+        invokingState = -1;
+    }
+    antlr4.ParserRuleContext.call(this, parent, invokingState);
     this.parser = parser;
     this.ruleIndex = SiddhiQLParser.RULE_trigger_name;
     return this;
@@ -3093,28 +3055,26 @@ function Trigger_nameContext(parser, parent, invokingState) {
 Trigger_nameContext.prototype = Object.create(antlr4.ParserRuleContext.prototype);
 Trigger_nameContext.prototype.constructor = Trigger_nameContext;
 
-Trigger_nameContext.prototype.id = function() {
-    return this.getTypedRuleContext(IdContext,0);
+Trigger_nameContext.prototype.id = function () {
+    return this.getTypedRuleContext(IdContext, 0);
 };
 
-Trigger_nameContext.prototype.enterRule = function(listener) {
-    if(listener instanceof SiddhiQLListener ) {
+Trigger_nameContext.prototype.enterRule = function (listener) {
+    if (listener instanceof SiddhiQLListener) {
         listener.enterTrigger_name(this);
-	}
+    }
 };
 
-Trigger_nameContext.prototype.exitRule = function(listener) {
-    if(listener instanceof SiddhiQLListener ) {
+Trigger_nameContext.prototype.exitRule = function (listener) {
+    if (listener instanceof SiddhiQLListener) {
         listener.exitTrigger_name(this);
-	}
+    }
 };
-
-
 
 
 SiddhiQLParser.Trigger_nameContext = Trigger_nameContext;
 
-SiddhiQLParser.prototype.trigger_name = function() {
+SiddhiQLParser.prototype.trigger_name = function () {
 
     var localctx = new Trigger_nameContext(this, this._ctx, this.state);
     this.enterRule(localctx, 40, SiddhiQLParser.RULE_trigger_name);
@@ -3123,13 +3083,13 @@ SiddhiQLParser.prototype.trigger_name = function() {
         this.state = 501;
         this.id();
     } catch (re) {
-    	if(re instanceof antlr4.error.RecognitionException) {
-	        localctx.exception = re;
-	        this._errHandler.reportError(this, re);
-	        this._errHandler.recover(this, re);
-	    } else {
-	    	throw re;
-	    }
+        if (re instanceof antlr4.error.RecognitionException) {
+            localctx.exception = re;
+            this._errHandler.reportError(this, re);
+            this._errHandler.recover(this, re);
+        } else {
+            throw re;
+        }
     } finally {
         this.exitRule();
     }
@@ -3137,13 +3097,13 @@ SiddhiQLParser.prototype.trigger_name = function() {
 };
 
 function Definition_aggregation_finalContext(parser, parent, invokingState) {
-	if(parent===undefined) {
-	    parent = null;
-	}
-	if(invokingState===undefined || invokingState===null) {
-		invokingState = -1;
-	}
-	antlr4.ParserRuleContext.call(this, parent, invokingState);
+    if (parent === undefined) {
+        parent = null;
+    }
+    if (invokingState === undefined || invokingState === null) {
+        invokingState = -1;
+    }
+    antlr4.ParserRuleContext.call(this, parent, invokingState);
     this.parser = parser;
     this.ruleIndex = SiddhiQLParser.RULE_definition_aggregation_final;
     return this;
@@ -3152,32 +3112,30 @@ function Definition_aggregation_finalContext(parser, parent, invokingState) {
 Definition_aggregation_finalContext.prototype = Object.create(antlr4.ParserRuleContext.prototype);
 Definition_aggregation_finalContext.prototype.constructor = Definition_aggregation_finalContext;
 
-Definition_aggregation_finalContext.prototype.definition_aggregation = function() {
-    return this.getTypedRuleContext(Definition_aggregationContext,0);
+Definition_aggregation_finalContext.prototype.definition_aggregation = function () {
+    return this.getTypedRuleContext(Definition_aggregationContext, 0);
 };
 
-Definition_aggregation_finalContext.prototype.EOF = function() {
+Definition_aggregation_finalContext.prototype.EOF = function () {
     return this.getToken(SiddhiQLParser.EOF, 0);
 };
 
-Definition_aggregation_finalContext.prototype.enterRule = function(listener) {
-    if(listener instanceof SiddhiQLListener ) {
+Definition_aggregation_finalContext.prototype.enterRule = function (listener) {
+    if (listener instanceof SiddhiQLListener) {
         listener.enterDefinition_aggregation_final(this);
-	}
+    }
 };
 
-Definition_aggregation_finalContext.prototype.exitRule = function(listener) {
-    if(listener instanceof SiddhiQLListener ) {
+Definition_aggregation_finalContext.prototype.exitRule = function (listener) {
+    if (listener instanceof SiddhiQLListener) {
         listener.exitDefinition_aggregation_final(this);
-	}
+    }
 };
-
-
 
 
 SiddhiQLParser.Definition_aggregation_finalContext = Definition_aggregation_finalContext;
 
-SiddhiQLParser.prototype.definition_aggregation_final = function() {
+SiddhiQLParser.prototype.definition_aggregation_final = function () {
 
     var localctx = new Definition_aggregation_finalContext(this, this._ctx, this.state);
     this.enterRule(localctx, 42, SiddhiQLParser.RULE_definition_aggregation_final);
@@ -3188,7 +3146,7 @@ SiddhiQLParser.prototype.definition_aggregation_final = function() {
         this.definition_aggregation();
         this.state = 505;
         _la = this._input.LA(1);
-        if(_la===SiddhiQLParser.SCOL) {
+        if (_la === SiddhiQLParser.SCOL) {
             this.state = 504;
             this.match(SiddhiQLParser.SCOL);
         }
@@ -3196,13 +3154,13 @@ SiddhiQLParser.prototype.definition_aggregation_final = function() {
         this.state = 507;
         this.match(SiddhiQLParser.EOF);
     } catch (re) {
-    	if(re instanceof antlr4.error.RecognitionException) {
-	        localctx.exception = re;
-	        this._errHandler.reportError(this, re);
-	        this._errHandler.recover(this, re);
-	    } else {
-	    	throw re;
-	    }
+        if (re instanceof antlr4.error.RecognitionException) {
+            localctx.exception = re;
+            this._errHandler.reportError(this, re);
+            this._errHandler.recover(this, re);
+        } else {
+            throw re;
+        }
     } finally {
         this.exitRule();
     }
@@ -3210,13 +3168,13 @@ SiddhiQLParser.prototype.definition_aggregation_final = function() {
 };
 
 function Definition_aggregationContext(parser, parent, invokingState) {
-	if(parent===undefined) {
-	    parent = null;
-	}
-	if(invokingState===undefined || invokingState===null) {
-		invokingState = -1;
-	}
-	antlr4.ParserRuleContext.call(this, parent, invokingState);
+    if (parent === undefined) {
+        parent = null;
+    }
+    if (invokingState === undefined || invokingState === null) {
+        invokingState = -1;
+    }
+    antlr4.ParserRuleContext.call(this, parent, invokingState);
     this.parser = parser;
     this.ruleIndex = SiddhiQLParser.RULE_definition_aggregation;
     return this;
@@ -3225,79 +3183,77 @@ function Definition_aggregationContext(parser, parent, invokingState) {
 Definition_aggregationContext.prototype = Object.create(antlr4.ParserRuleContext.prototype);
 Definition_aggregationContext.prototype.constructor = Definition_aggregationContext;
 
-Definition_aggregationContext.prototype.DEFINE = function() {
+Definition_aggregationContext.prototype.DEFINE = function () {
     return this.getToken(SiddhiQLParser.DEFINE, 0);
 };
 
-Definition_aggregationContext.prototype.AGGREGATION = function() {
+Definition_aggregationContext.prototype.AGGREGATION = function () {
     return this.getToken(SiddhiQLParser.AGGREGATION, 0);
 };
 
-Definition_aggregationContext.prototype.aggregation_name = function() {
-    return this.getTypedRuleContext(Aggregation_nameContext,0);
+Definition_aggregationContext.prototype.aggregation_name = function () {
+    return this.getTypedRuleContext(Aggregation_nameContext, 0);
 };
 
-Definition_aggregationContext.prototype.FROM = function() {
+Definition_aggregationContext.prototype.FROM = function () {
     return this.getToken(SiddhiQLParser.FROM, 0);
 };
 
-Definition_aggregationContext.prototype.standard_stream = function() {
-    return this.getTypedRuleContext(Standard_streamContext,0);
+Definition_aggregationContext.prototype.standard_stream = function () {
+    return this.getTypedRuleContext(Standard_streamContext, 0);
 };
 
-Definition_aggregationContext.prototype.group_by_query_selection = function() {
-    return this.getTypedRuleContext(Group_by_query_selectionContext,0);
+Definition_aggregationContext.prototype.group_by_query_selection = function () {
+    return this.getTypedRuleContext(Group_by_query_selectionContext, 0);
 };
 
-Definition_aggregationContext.prototype.AGGREGATE = function() {
+Definition_aggregationContext.prototype.AGGREGATE = function () {
     return this.getToken(SiddhiQLParser.AGGREGATE, 0);
 };
 
-Definition_aggregationContext.prototype.EVERY = function() {
+Definition_aggregationContext.prototype.EVERY = function () {
     return this.getToken(SiddhiQLParser.EVERY, 0);
 };
 
-Definition_aggregationContext.prototype.aggregation_time = function() {
-    return this.getTypedRuleContext(Aggregation_timeContext,0);
+Definition_aggregationContext.prototype.aggregation_time = function () {
+    return this.getTypedRuleContext(Aggregation_timeContext, 0);
 };
 
-Definition_aggregationContext.prototype.annotation = function(i) {
-    if(i===undefined) {
+Definition_aggregationContext.prototype.annotation = function (i) {
+    if (i === undefined) {
         i = null;
     }
-    if(i===null) {
+    if (i === null) {
         return this.getTypedRuleContexts(AnnotationContext);
     } else {
-        return this.getTypedRuleContext(AnnotationContext,i);
+        return this.getTypedRuleContext(AnnotationContext, i);
     }
 };
 
-Definition_aggregationContext.prototype.BY = function() {
+Definition_aggregationContext.prototype.BY = function () {
     return this.getToken(SiddhiQLParser.BY, 0);
 };
 
-Definition_aggregationContext.prototype.attribute_reference = function() {
-    return this.getTypedRuleContext(Attribute_referenceContext,0);
+Definition_aggregationContext.prototype.attribute_reference = function () {
+    return this.getTypedRuleContext(Attribute_referenceContext, 0);
 };
 
-Definition_aggregationContext.prototype.enterRule = function(listener) {
-    if(listener instanceof SiddhiQLListener ) {
+Definition_aggregationContext.prototype.enterRule = function (listener) {
+    if (listener instanceof SiddhiQLListener) {
         listener.enterDefinition_aggregation(this);
-	}
+    }
 };
 
-Definition_aggregationContext.prototype.exitRule = function(listener) {
-    if(listener instanceof SiddhiQLListener ) {
+Definition_aggregationContext.prototype.exitRule = function (listener) {
+    if (listener instanceof SiddhiQLListener) {
         listener.exitDefinition_aggregation(this);
-	}
+    }
 };
-
-
 
 
 SiddhiQLParser.Definition_aggregationContext = Definition_aggregationContext;
 
-SiddhiQLParser.prototype.definition_aggregation = function() {
+SiddhiQLParser.prototype.definition_aggregation = function () {
 
     var localctx = new Definition_aggregationContext(this, this._ctx, this.state);
     this.enterRule(localctx, 44, SiddhiQLParser.RULE_definition_aggregation);
@@ -3307,7 +3263,7 @@ SiddhiQLParser.prototype.definition_aggregation = function() {
         this.state = 512;
         this._errHandler.sync(this);
         _la = this._input.LA(1);
-        while(_la===SiddhiQLParser.AT_SYMBOL) {
+        while (_la === SiddhiQLParser.AT_SYMBOL) {
             this.state = 509;
             this.annotation();
             this.state = 514;
@@ -3330,7 +3286,7 @@ SiddhiQLParser.prototype.definition_aggregation = function() {
         this.match(SiddhiQLParser.AGGREGATE);
         this.state = 524;
         _la = this._input.LA(1);
-        if(_la===SiddhiQLParser.BY) {
+        if (_la === SiddhiQLParser.BY) {
             this.state = 522;
             this.match(SiddhiQLParser.BY);
             this.state = 523;
@@ -3342,13 +3298,13 @@ SiddhiQLParser.prototype.definition_aggregation = function() {
         this.state = 527;
         this.aggregation_time();
     } catch (re) {
-    	if(re instanceof antlr4.error.RecognitionException) {
-	        localctx.exception = re;
-	        this._errHandler.reportError(this, re);
-	        this._errHandler.recover(this, re);
-	    } else {
-	    	throw re;
-	    }
+        if (re instanceof antlr4.error.RecognitionException) {
+            localctx.exception = re;
+            this._errHandler.reportError(this, re);
+            this._errHandler.recover(this, re);
+        } else {
+            throw re;
+        }
     } finally {
         this.exitRule();
     }
@@ -3356,13 +3312,13 @@ SiddhiQLParser.prototype.definition_aggregation = function() {
 };
 
 function Aggregation_nameContext(parser, parent, invokingState) {
-	if(parent===undefined) {
-	    parent = null;
-	}
-	if(invokingState===undefined || invokingState===null) {
-		invokingState = -1;
-	}
-	antlr4.ParserRuleContext.call(this, parent, invokingState);
+    if (parent === undefined) {
+        parent = null;
+    }
+    if (invokingState === undefined || invokingState === null) {
+        invokingState = -1;
+    }
+    antlr4.ParserRuleContext.call(this, parent, invokingState);
     this.parser = parser;
     this.ruleIndex = SiddhiQLParser.RULE_aggregation_name;
     return this;
@@ -3371,28 +3327,26 @@ function Aggregation_nameContext(parser, parent, invokingState) {
 Aggregation_nameContext.prototype = Object.create(antlr4.ParserRuleContext.prototype);
 Aggregation_nameContext.prototype.constructor = Aggregation_nameContext;
 
-Aggregation_nameContext.prototype.id = function() {
-    return this.getTypedRuleContext(IdContext,0);
+Aggregation_nameContext.prototype.id = function () {
+    return this.getTypedRuleContext(IdContext, 0);
 };
 
-Aggregation_nameContext.prototype.enterRule = function(listener) {
-    if(listener instanceof SiddhiQLListener ) {
+Aggregation_nameContext.prototype.enterRule = function (listener) {
+    if (listener instanceof SiddhiQLListener) {
         listener.enterAggregation_name(this);
-	}
+    }
 };
 
-Aggregation_nameContext.prototype.exitRule = function(listener) {
-    if(listener instanceof SiddhiQLListener ) {
+Aggregation_nameContext.prototype.exitRule = function (listener) {
+    if (listener instanceof SiddhiQLListener) {
         listener.exitAggregation_name(this);
-	}
+    }
 };
-
-
 
 
 SiddhiQLParser.Aggregation_nameContext = Aggregation_nameContext;
 
-SiddhiQLParser.prototype.aggregation_name = function() {
+SiddhiQLParser.prototype.aggregation_name = function () {
 
     var localctx = new Aggregation_nameContext(this, this._ctx, this.state);
     this.enterRule(localctx, 46, SiddhiQLParser.RULE_aggregation_name);
@@ -3401,13 +3355,13 @@ SiddhiQLParser.prototype.aggregation_name = function() {
         this.state = 529;
         this.id();
     } catch (re) {
-    	if(re instanceof antlr4.error.RecognitionException) {
-	        localctx.exception = re;
-	        this._errHandler.reportError(this, re);
-	        this._errHandler.recover(this, re);
-	    } else {
-	    	throw re;
-	    }
+        if (re instanceof antlr4.error.RecognitionException) {
+            localctx.exception = re;
+            this._errHandler.reportError(this, re);
+            this._errHandler.recover(this, re);
+        } else {
+            throw re;
+        }
     } finally {
         this.exitRule();
     }
@@ -3415,13 +3369,13 @@ SiddhiQLParser.prototype.aggregation_name = function() {
 };
 
 function Aggregation_timeContext(parser, parent, invokingState) {
-	if(parent===undefined) {
-	    parent = null;
-	}
-	if(invokingState===undefined || invokingState===null) {
-		invokingState = -1;
-	}
-	antlr4.ParserRuleContext.call(this, parent, invokingState);
+    if (parent === undefined) {
+        parent = null;
+    }
+    if (invokingState === undefined || invokingState === null) {
+        invokingState = -1;
+    }
+    antlr4.ParserRuleContext.call(this, parent, invokingState);
     this.parser = parser;
     this.ruleIndex = SiddhiQLParser.RULE_aggregation_time;
     return this;
@@ -3430,60 +3384,58 @@ function Aggregation_timeContext(parser, parent, invokingState) {
 Aggregation_timeContext.prototype = Object.create(antlr4.ParserRuleContext.prototype);
 Aggregation_timeContext.prototype.constructor = Aggregation_timeContext;
 
-Aggregation_timeContext.prototype.aggregation_time_range = function() {
-    return this.getTypedRuleContext(Aggregation_time_rangeContext,0);
+Aggregation_timeContext.prototype.aggregation_time_range = function () {
+    return this.getTypedRuleContext(Aggregation_time_rangeContext, 0);
 };
 
-Aggregation_timeContext.prototype.aggregation_time_interval = function() {
-    return this.getTypedRuleContext(Aggregation_time_intervalContext,0);
+Aggregation_timeContext.prototype.aggregation_time_interval = function () {
+    return this.getTypedRuleContext(Aggregation_time_intervalContext, 0);
 };
 
-Aggregation_timeContext.prototype.enterRule = function(listener) {
-    if(listener instanceof SiddhiQLListener ) {
+Aggregation_timeContext.prototype.enterRule = function (listener) {
+    if (listener instanceof SiddhiQLListener) {
         listener.enterAggregation_time(this);
-	}
+    }
 };
 
-Aggregation_timeContext.prototype.exitRule = function(listener) {
-    if(listener instanceof SiddhiQLListener ) {
+Aggregation_timeContext.prototype.exitRule = function (listener) {
+    if (listener instanceof SiddhiQLListener) {
         listener.exitAggregation_time(this);
-	}
+    }
 };
-
-
 
 
 SiddhiQLParser.Aggregation_timeContext = Aggregation_timeContext;
 
-SiddhiQLParser.prototype.aggregation_time = function() {
+SiddhiQLParser.prototype.aggregation_time = function () {
 
     var localctx = new Aggregation_timeContext(this, this._ctx, this.state);
     this.enterRule(localctx, 48, SiddhiQLParser.RULE_aggregation_time);
     try {
         this.state = 533;
-        var la_ = this._interp.adaptivePredict(this._input,33,this._ctx);
-        switch(la_) {
-        case 1:
-            this.enterOuterAlt(localctx, 1);
-            this.state = 531;
-            this.aggregation_time_range();
-            break;
+        var la_ = this._interp.adaptivePredict(this._input, 33, this._ctx);
+        switch (la_) {
+            case 1:
+                this.enterOuterAlt(localctx, 1);
+                this.state = 531;
+                this.aggregation_time_range();
+                break;
 
-        case 2:
-            this.enterOuterAlt(localctx, 2);
-            this.state = 532;
-            this.aggregation_time_interval();
-            break;
+            case 2:
+                this.enterOuterAlt(localctx, 2);
+                this.state = 532;
+                this.aggregation_time_interval();
+                break;
 
         }
     } catch (re) {
-    	if(re instanceof antlr4.error.RecognitionException) {
-	        localctx.exception = re;
-	        this._errHandler.reportError(this, re);
-	        this._errHandler.recover(this, re);
-	    } else {
-	    	throw re;
-	    }
+        if (re instanceof antlr4.error.RecognitionException) {
+            localctx.exception = re;
+            this._errHandler.reportError(this, re);
+            this._errHandler.recover(this, re);
+        } else {
+            throw re;
+        }
     } finally {
         this.exitRule();
     }
@@ -3491,13 +3443,13 @@ SiddhiQLParser.prototype.aggregation_time = function() {
 };
 
 function Aggregation_time_durationContext(parser, parent, invokingState) {
-	if(parent===undefined) {
-	    parent = null;
-	}
-	if(invokingState===undefined || invokingState===null) {
-		invokingState = -1;
-	}
-	antlr4.ParserRuleContext.call(this, parent, invokingState);
+    if (parent === undefined) {
+        parent = null;
+    }
+    if (invokingState === undefined || invokingState === null) {
+        invokingState = -1;
+    }
+    antlr4.ParserRuleContext.call(this, parent, invokingState);
     this.parser = parser;
     this.ruleIndex = SiddhiQLParser.RULE_aggregation_time_duration;
     return this;
@@ -3506,52 +3458,50 @@ function Aggregation_time_durationContext(parser, parent, invokingState) {
 Aggregation_time_durationContext.prototype = Object.create(antlr4.ParserRuleContext.prototype);
 Aggregation_time_durationContext.prototype.constructor = Aggregation_time_durationContext;
 
-Aggregation_time_durationContext.prototype.SECONDS = function() {
+Aggregation_time_durationContext.prototype.SECONDS = function () {
     return this.getToken(SiddhiQLParser.SECONDS, 0);
 };
 
-Aggregation_time_durationContext.prototype.MINUTES = function() {
+Aggregation_time_durationContext.prototype.MINUTES = function () {
     return this.getToken(SiddhiQLParser.MINUTES, 0);
 };
 
-Aggregation_time_durationContext.prototype.HOURS = function() {
+Aggregation_time_durationContext.prototype.HOURS = function () {
     return this.getToken(SiddhiQLParser.HOURS, 0);
 };
 
-Aggregation_time_durationContext.prototype.DAYS = function() {
+Aggregation_time_durationContext.prototype.DAYS = function () {
     return this.getToken(SiddhiQLParser.DAYS, 0);
 };
 
-Aggregation_time_durationContext.prototype.WEEKS = function() {
+Aggregation_time_durationContext.prototype.WEEKS = function () {
     return this.getToken(SiddhiQLParser.WEEKS, 0);
 };
 
-Aggregation_time_durationContext.prototype.MONTHS = function() {
+Aggregation_time_durationContext.prototype.MONTHS = function () {
     return this.getToken(SiddhiQLParser.MONTHS, 0);
 };
 
-Aggregation_time_durationContext.prototype.YEARS = function() {
+Aggregation_time_durationContext.prototype.YEARS = function () {
     return this.getToken(SiddhiQLParser.YEARS, 0);
 };
 
-Aggregation_time_durationContext.prototype.enterRule = function(listener) {
-    if(listener instanceof SiddhiQLListener ) {
+Aggregation_time_durationContext.prototype.enterRule = function (listener) {
+    if (listener instanceof SiddhiQLListener) {
         listener.enterAggregation_time_duration(this);
-	}
+    }
 };
 
-Aggregation_time_durationContext.prototype.exitRule = function(listener) {
-    if(listener instanceof SiddhiQLListener ) {
+Aggregation_time_durationContext.prototype.exitRule = function (listener) {
+    if (listener instanceof SiddhiQLListener) {
         listener.exitAggregation_time_duration(this);
-	}
+    }
 };
-
-
 
 
 SiddhiQLParser.Aggregation_time_durationContext = Aggregation_time_durationContext;
 
-SiddhiQLParser.prototype.aggregation_time_duration = function() {
+SiddhiQLParser.prototype.aggregation_time_duration = function () {
 
     var localctx = new Aggregation_time_durationContext(this, this._ctx, this.state);
     this.enterRule(localctx, 50, SiddhiQLParser.RULE_aggregation_time_duration);
@@ -3560,20 +3510,20 @@ SiddhiQLParser.prototype.aggregation_time_duration = function() {
         this.enterOuterAlt(localctx, 1);
         this.state = 535;
         _la = this._input.LA(1);
-        if(!(((((_la - 86)) & ~0x1f) == 0 && ((1 << (_la - 86)) & ((1 << (SiddhiQLParser.YEARS - 86)) | (1 << (SiddhiQLParser.MONTHS - 86)) | (1 << (SiddhiQLParser.WEEKS - 86)) | (1 << (SiddhiQLParser.DAYS - 86)) | (1 << (SiddhiQLParser.HOURS - 86)) | (1 << (SiddhiQLParser.MINUTES - 86)) | (1 << (SiddhiQLParser.SECONDS - 86)))) !== 0))) {
-        this._errHandler.recoverInline(this);
+        if (!(((((_la - 86)) & ~0x1f) == 0 && ((1 << (_la - 86)) & ((1 << (SiddhiQLParser.YEARS - 86)) | (1 << (SiddhiQLParser.MONTHS - 86)) | (1 << (SiddhiQLParser.WEEKS - 86)) | (1 << (SiddhiQLParser.DAYS - 86)) | (1 << (SiddhiQLParser.HOURS - 86)) | (1 << (SiddhiQLParser.MINUTES - 86)) | (1 << (SiddhiQLParser.SECONDS - 86)))) !== 0))) {
+            this._errHandler.recoverInline(this);
         }
         else {
             this.consume();
         }
     } catch (re) {
-    	if(re instanceof antlr4.error.RecognitionException) {
-	        localctx.exception = re;
-	        this._errHandler.reportError(this, re);
-	        this._errHandler.recover(this, re);
-	    } else {
-	    	throw re;
-	    }
+        if (re instanceof antlr4.error.RecognitionException) {
+            localctx.exception = re;
+            this._errHandler.reportError(this, re);
+            this._errHandler.recover(this, re);
+        } else {
+            throw re;
+        }
     } finally {
         this.exitRule();
     }
@@ -3581,13 +3531,13 @@ SiddhiQLParser.prototype.aggregation_time_duration = function() {
 };
 
 function Aggregation_time_rangeContext(parser, parent, invokingState) {
-	if(parent===undefined) {
-	    parent = null;
-	}
-	if(invokingState===undefined || invokingState===null) {
-		invokingState = -1;
-	}
-	antlr4.ParserRuleContext.call(this, parent, invokingState);
+    if (parent === undefined) {
+        parent = null;
+    }
+    if (invokingState === undefined || invokingState === null) {
+        invokingState = -1;
+    }
+    antlr4.ParserRuleContext.call(this, parent, invokingState);
     this.parser = parser;
     this.ruleIndex = SiddhiQLParser.RULE_aggregation_time_range;
     return this;
@@ -3596,39 +3546,37 @@ function Aggregation_time_rangeContext(parser, parent, invokingState) {
 Aggregation_time_rangeContext.prototype = Object.create(antlr4.ParserRuleContext.prototype);
 Aggregation_time_rangeContext.prototype.constructor = Aggregation_time_rangeContext;
 
-Aggregation_time_rangeContext.prototype.aggregation_time_duration = function(i) {
-    if(i===undefined) {
+Aggregation_time_rangeContext.prototype.aggregation_time_duration = function (i) {
+    if (i === undefined) {
         i = null;
     }
-    if(i===null) {
+    if (i === null) {
         return this.getTypedRuleContexts(Aggregation_time_durationContext);
     } else {
-        return this.getTypedRuleContext(Aggregation_time_durationContext,i);
+        return this.getTypedRuleContext(Aggregation_time_durationContext, i);
     }
 };
 
-Aggregation_time_rangeContext.prototype.TRIPLE_DOT = function() {
+Aggregation_time_rangeContext.prototype.TRIPLE_DOT = function () {
     return this.getToken(SiddhiQLParser.TRIPLE_DOT, 0);
 };
 
-Aggregation_time_rangeContext.prototype.enterRule = function(listener) {
-    if(listener instanceof SiddhiQLListener ) {
+Aggregation_time_rangeContext.prototype.enterRule = function (listener) {
+    if (listener instanceof SiddhiQLListener) {
         listener.enterAggregation_time_range(this);
-	}
+    }
 };
 
-Aggregation_time_rangeContext.prototype.exitRule = function(listener) {
-    if(listener instanceof SiddhiQLListener ) {
+Aggregation_time_rangeContext.prototype.exitRule = function (listener) {
+    if (listener instanceof SiddhiQLListener) {
         listener.exitAggregation_time_range(this);
-	}
+    }
 };
-
-
 
 
 SiddhiQLParser.Aggregation_time_rangeContext = Aggregation_time_rangeContext;
 
-SiddhiQLParser.prototype.aggregation_time_range = function() {
+SiddhiQLParser.prototype.aggregation_time_range = function () {
 
     var localctx = new Aggregation_time_rangeContext(this, this._ctx, this.state);
     this.enterRule(localctx, 52, SiddhiQLParser.RULE_aggregation_time_range);
@@ -3641,13 +3589,13 @@ SiddhiQLParser.prototype.aggregation_time_range = function() {
         this.state = 539;
         this.aggregation_time_duration();
     } catch (re) {
-    	if(re instanceof antlr4.error.RecognitionException) {
-	        localctx.exception = re;
-	        this._errHandler.reportError(this, re);
-	        this._errHandler.recover(this, re);
-	    } else {
-	    	throw re;
-	    }
+        if (re instanceof antlr4.error.RecognitionException) {
+            localctx.exception = re;
+            this._errHandler.reportError(this, re);
+            this._errHandler.recover(this, re);
+        } else {
+            throw re;
+        }
     } finally {
         this.exitRule();
     }
@@ -3655,13 +3603,13 @@ SiddhiQLParser.prototype.aggregation_time_range = function() {
 };
 
 function Aggregation_time_intervalContext(parser, parent, invokingState) {
-	if(parent===undefined) {
-	    parent = null;
-	}
-	if(invokingState===undefined || invokingState===null) {
-		invokingState = -1;
-	}
-	antlr4.ParserRuleContext.call(this, parent, invokingState);
+    if (parent === undefined) {
+        parent = null;
+    }
+    if (invokingState === undefined || invokingState === null) {
+        invokingState = -1;
+    }
+    antlr4.ParserRuleContext.call(this, parent, invokingState);
     this.parser = parser;
     this.ruleIndex = SiddhiQLParser.RULE_aggregation_time_interval;
     return this;
@@ -3670,22 +3618,22 @@ function Aggregation_time_intervalContext(parser, parent, invokingState) {
 Aggregation_time_intervalContext.prototype = Object.create(antlr4.ParserRuleContext.prototype);
 Aggregation_time_intervalContext.prototype.constructor = Aggregation_time_intervalContext;
 
-Aggregation_time_intervalContext.prototype.aggregation_time_duration = function(i) {
-    if(i===undefined) {
+Aggregation_time_intervalContext.prototype.aggregation_time_duration = function (i) {
+    if (i === undefined) {
         i = null;
     }
-    if(i===null) {
+    if (i === null) {
         return this.getTypedRuleContexts(Aggregation_time_durationContext);
     } else {
-        return this.getTypedRuleContext(Aggregation_time_durationContext,i);
+        return this.getTypedRuleContext(Aggregation_time_durationContext, i);
     }
 };
 
-Aggregation_time_intervalContext.prototype.COMMA = function(i) {
-	if(i===undefined) {
-		i = null;
-	}
-    if(i===null) {
+Aggregation_time_intervalContext.prototype.COMMA = function (i) {
+    if (i === undefined) {
+        i = null;
+    }
+    if (i === null) {
         return this.getTokens(SiddhiQLParser.COMMA);
     } else {
         return this.getToken(SiddhiQLParser.COMMA, i);
@@ -3693,24 +3641,22 @@ Aggregation_time_intervalContext.prototype.COMMA = function(i) {
 };
 
 
-Aggregation_time_intervalContext.prototype.enterRule = function(listener) {
-    if(listener instanceof SiddhiQLListener ) {
+Aggregation_time_intervalContext.prototype.enterRule = function (listener) {
+    if (listener instanceof SiddhiQLListener) {
         listener.enterAggregation_time_interval(this);
-	}
+    }
 };
 
-Aggregation_time_intervalContext.prototype.exitRule = function(listener) {
-    if(listener instanceof SiddhiQLListener ) {
+Aggregation_time_intervalContext.prototype.exitRule = function (listener) {
+    if (listener instanceof SiddhiQLListener) {
         listener.exitAggregation_time_interval(this);
-	}
+    }
 };
-
-
 
 
 SiddhiQLParser.Aggregation_time_intervalContext = Aggregation_time_intervalContext;
 
-SiddhiQLParser.prototype.aggregation_time_interval = function() {
+SiddhiQLParser.prototype.aggregation_time_interval = function () {
 
     var localctx = new Aggregation_time_intervalContext(this, this._ctx, this.state);
     this.enterRule(localctx, 54, SiddhiQLParser.RULE_aggregation_time_interval);
@@ -3722,7 +3668,7 @@ SiddhiQLParser.prototype.aggregation_time_interval = function() {
         this.state = 546;
         this._errHandler.sync(this);
         _la = this._input.LA(1);
-        while(_la===SiddhiQLParser.COMMA) {
+        while (_la === SiddhiQLParser.COMMA) {
             this.state = 542;
             this.match(SiddhiQLParser.COMMA);
             this.state = 543;
@@ -3732,13 +3678,13 @@ SiddhiQLParser.prototype.aggregation_time_interval = function() {
             _la = this._input.LA(1);
         }
     } catch (re) {
-    	if(re instanceof antlr4.error.RecognitionException) {
-	        localctx.exception = re;
-	        this._errHandler.reportError(this, re);
-	        this._errHandler.recover(this, re);
-	    } else {
-	    	throw re;
-	    }
+        if (re instanceof antlr4.error.RecognitionException) {
+            localctx.exception = re;
+            this._errHandler.reportError(this, re);
+            this._errHandler.recover(this, re);
+        } else {
+            throw re;
+        }
     } finally {
         this.exitRule();
     }
@@ -3746,13 +3692,13 @@ SiddhiQLParser.prototype.aggregation_time_interval = function() {
 };
 
 function AnnotationContext(parser, parent, invokingState) {
-	if(parent===undefined) {
-	    parent = null;
-	}
-	if(invokingState===undefined || invokingState===null) {
-		invokingState = -1;
-	}
-	antlr4.ParserRuleContext.call(this, parent, invokingState);
+    if (parent === undefined) {
+        parent = null;
+    }
+    if (invokingState === undefined || invokingState === null) {
+        invokingState = -1;
+    }
+    antlr4.ParserRuleContext.call(this, parent, invokingState);
     this.parser = parser;
     this.ruleIndex = SiddhiQLParser.RULE_annotation;
     return this;
@@ -3761,50 +3707,48 @@ function AnnotationContext(parser, parent, invokingState) {
 AnnotationContext.prototype = Object.create(antlr4.ParserRuleContext.prototype);
 AnnotationContext.prototype.constructor = AnnotationContext;
 
-AnnotationContext.prototype.name = function() {
-    return this.getTypedRuleContext(NameContext,0);
+AnnotationContext.prototype.name = function () {
+    return this.getTypedRuleContext(NameContext, 0);
 };
 
-AnnotationContext.prototype.annotation_element = function(i) {
-    if(i===undefined) {
+AnnotationContext.prototype.annotation_element = function (i) {
+    if (i === undefined) {
         i = null;
     }
-    if(i===null) {
+    if (i === null) {
         return this.getTypedRuleContexts(Annotation_elementContext);
     } else {
-        return this.getTypedRuleContext(Annotation_elementContext,i);
+        return this.getTypedRuleContext(Annotation_elementContext, i);
     }
 };
 
-AnnotationContext.prototype.annotation = function(i) {
-    if(i===undefined) {
+AnnotationContext.prototype.annotation = function (i) {
+    if (i === undefined) {
         i = null;
     }
-    if(i===null) {
+    if (i === null) {
         return this.getTypedRuleContexts(AnnotationContext);
     } else {
-        return this.getTypedRuleContext(AnnotationContext,i);
+        return this.getTypedRuleContext(AnnotationContext, i);
     }
 };
 
-AnnotationContext.prototype.enterRule = function(listener) {
-    if(listener instanceof SiddhiQLListener ) {
+AnnotationContext.prototype.enterRule = function (listener) {
+    if (listener instanceof SiddhiQLListener) {
         listener.enterAnnotation(this);
-	}
+    }
 };
 
-AnnotationContext.prototype.exitRule = function(listener) {
-    if(listener instanceof SiddhiQLListener ) {
+AnnotationContext.prototype.exitRule = function (listener) {
+    if (listener instanceof SiddhiQLListener) {
         listener.exitAnnotation(this);
-	}
+    }
 };
-
-
 
 
 SiddhiQLParser.AnnotationContext = AnnotationContext;
 
-SiddhiQLParser.prototype.annotation = function() {
+SiddhiQLParser.prototype.annotation = function () {
 
     var localctx = new AnnotationContext(this, this._ctx, this.state);
     this.enterRule(localctx, 56, SiddhiQLParser.RULE_annotation);
@@ -3817,99 +3761,11 @@ SiddhiQLParser.prototype.annotation = function() {
         this.name();
         this.state = 568;
         _la = this._input.LA(1);
-        if(_la===SiddhiQLParser.OPEN_PAR) {
+        if (_la === SiddhiQLParser.OPEN_PAR) {
             this.state = 551;
             this.match(SiddhiQLParser.OPEN_PAR);
             this.state = 554;
-            switch(this._input.LA(1)) {
-            case SiddhiQLParser.STREAM:
-            case SiddhiQLParser.DEFINE:
-            case SiddhiQLParser.TABLE:
-            case SiddhiQLParser.APP:
-            case SiddhiQLParser.FROM:
-            case SiddhiQLParser.PARTITION:
-            case SiddhiQLParser.WINDOW:
-            case SiddhiQLParser.SELECT:
-            case SiddhiQLParser.GROUP:
-            case SiddhiQLParser.BY:
-            case SiddhiQLParser.ORDER:
-            case SiddhiQLParser.LIMIT:
-            case SiddhiQLParser.ASC:
-            case SiddhiQLParser.DESC:
-            case SiddhiQLParser.HAVING:
-            case SiddhiQLParser.INSERT:
-            case SiddhiQLParser.DELETE:
-            case SiddhiQLParser.UPDATE:
-            case SiddhiQLParser.RETURN:
-            case SiddhiQLParser.EVENTS:
-            case SiddhiQLParser.INTO:
-            case SiddhiQLParser.OUTPUT:
-            case SiddhiQLParser.EXPIRED:
-            case SiddhiQLParser.CURRENT:
-            case SiddhiQLParser.SNAPSHOT:
-            case SiddhiQLParser.FOR:
-            case SiddhiQLParser.RAW:
-            case SiddhiQLParser.OF:
-            case SiddhiQLParser.AS:
-            case SiddhiQLParser.OR:
-            case SiddhiQLParser.AND:
-            case SiddhiQLParser.ON:
-            case SiddhiQLParser.IS:
-            case SiddhiQLParser.NOT:
-            case SiddhiQLParser.WITHIN:
-            case SiddhiQLParser.WITH:
-            case SiddhiQLParser.BEGIN:
-            case SiddhiQLParser.END:
-            case SiddhiQLParser.NULL:
-            case SiddhiQLParser.EVERY:
-            case SiddhiQLParser.LAST:
-            case SiddhiQLParser.ALL:
-            case SiddhiQLParser.FIRST:
-            case SiddhiQLParser.JOIN:
-            case SiddhiQLParser.INNER:
-            case SiddhiQLParser.OUTER:
-            case SiddhiQLParser.RIGHT:
-            case SiddhiQLParser.LEFT:
-            case SiddhiQLParser.FULL:
-            case SiddhiQLParser.UNIDIRECTIONAL:
-            case SiddhiQLParser.YEARS:
-            case SiddhiQLParser.MONTHS:
-            case SiddhiQLParser.WEEKS:
-            case SiddhiQLParser.DAYS:
-            case SiddhiQLParser.HOURS:
-            case SiddhiQLParser.MINUTES:
-            case SiddhiQLParser.SECONDS:
-            case SiddhiQLParser.MILLISECONDS:
-            case SiddhiQLParser.FALSE:
-            case SiddhiQLParser.TRUE:
-            case SiddhiQLParser.STRING:
-            case SiddhiQLParser.INT:
-            case SiddhiQLParser.LONG:
-            case SiddhiQLParser.FLOAT:
-            case SiddhiQLParser.DOUBLE:
-            case SiddhiQLParser.BOOL:
-            case SiddhiQLParser.OBJECT:
-            case SiddhiQLParser.ID_QUOTES:
-            case SiddhiQLParser.ID:
-            case SiddhiQLParser.STRING_LITERAL:
-                this.state = 552;
-                this.annotation_element();
-                break;
-            case SiddhiQLParser.AT_SYMBOL:
-                this.state = 553;
-                this.annotation();
-                break;
-            default:
-                throw new antlr4.error.NoViableAltException(this);
-            }
-            this.state = 563;
-            this._errHandler.sync(this);
-            _la = this._input.LA(1);
-            while(_la===SiddhiQLParser.COMMA) {
-                this.state = 556;
-                this.match(SiddhiQLParser.COMMA);
-                this.state = 559;
-                switch(this._input.LA(1)) {
+            switch (this._input.LA(1)) {
                 case SiddhiQLParser.STREAM:
                 case SiddhiQLParser.DEFINE:
                 case SiddhiQLParser.TABLE:
@@ -3980,15 +3836,103 @@ SiddhiQLParser.prototype.annotation = function() {
                 case SiddhiQLParser.ID_QUOTES:
                 case SiddhiQLParser.ID:
                 case SiddhiQLParser.STRING_LITERAL:
-                    this.state = 557;
+                    this.state = 552;
                     this.annotation_element();
                     break;
                 case SiddhiQLParser.AT_SYMBOL:
-                    this.state = 558;
+                    this.state = 553;
                     this.annotation();
                     break;
                 default:
                     throw new antlr4.error.NoViableAltException(this);
+            }
+            this.state = 563;
+            this._errHandler.sync(this);
+            _la = this._input.LA(1);
+            while (_la === SiddhiQLParser.COMMA) {
+                this.state = 556;
+                this.match(SiddhiQLParser.COMMA);
+                this.state = 559;
+                switch (this._input.LA(1)) {
+                    case SiddhiQLParser.STREAM:
+                    case SiddhiQLParser.DEFINE:
+                    case SiddhiQLParser.TABLE:
+                    case SiddhiQLParser.APP:
+                    case SiddhiQLParser.FROM:
+                    case SiddhiQLParser.PARTITION:
+                    case SiddhiQLParser.WINDOW:
+                    case SiddhiQLParser.SELECT:
+                    case SiddhiQLParser.GROUP:
+                    case SiddhiQLParser.BY:
+                    case SiddhiQLParser.ORDER:
+                    case SiddhiQLParser.LIMIT:
+                    case SiddhiQLParser.ASC:
+                    case SiddhiQLParser.DESC:
+                    case SiddhiQLParser.HAVING:
+                    case SiddhiQLParser.INSERT:
+                    case SiddhiQLParser.DELETE:
+                    case SiddhiQLParser.UPDATE:
+                    case SiddhiQLParser.RETURN:
+                    case SiddhiQLParser.EVENTS:
+                    case SiddhiQLParser.INTO:
+                    case SiddhiQLParser.OUTPUT:
+                    case SiddhiQLParser.EXPIRED:
+                    case SiddhiQLParser.CURRENT:
+                    case SiddhiQLParser.SNAPSHOT:
+                    case SiddhiQLParser.FOR:
+                    case SiddhiQLParser.RAW:
+                    case SiddhiQLParser.OF:
+                    case SiddhiQLParser.AS:
+                    case SiddhiQLParser.OR:
+                    case SiddhiQLParser.AND:
+                    case SiddhiQLParser.ON:
+                    case SiddhiQLParser.IS:
+                    case SiddhiQLParser.NOT:
+                    case SiddhiQLParser.WITHIN:
+                    case SiddhiQLParser.WITH:
+                    case SiddhiQLParser.BEGIN:
+                    case SiddhiQLParser.END:
+                    case SiddhiQLParser.NULL:
+                    case SiddhiQLParser.EVERY:
+                    case SiddhiQLParser.LAST:
+                    case SiddhiQLParser.ALL:
+                    case SiddhiQLParser.FIRST:
+                    case SiddhiQLParser.JOIN:
+                    case SiddhiQLParser.INNER:
+                    case SiddhiQLParser.OUTER:
+                    case SiddhiQLParser.RIGHT:
+                    case SiddhiQLParser.LEFT:
+                    case SiddhiQLParser.FULL:
+                    case SiddhiQLParser.UNIDIRECTIONAL:
+                    case SiddhiQLParser.YEARS:
+                    case SiddhiQLParser.MONTHS:
+                    case SiddhiQLParser.WEEKS:
+                    case SiddhiQLParser.DAYS:
+                    case SiddhiQLParser.HOURS:
+                    case SiddhiQLParser.MINUTES:
+                    case SiddhiQLParser.SECONDS:
+                    case SiddhiQLParser.MILLISECONDS:
+                    case SiddhiQLParser.FALSE:
+                    case SiddhiQLParser.TRUE:
+                    case SiddhiQLParser.STRING:
+                    case SiddhiQLParser.INT:
+                    case SiddhiQLParser.LONG:
+                    case SiddhiQLParser.FLOAT:
+                    case SiddhiQLParser.DOUBLE:
+                    case SiddhiQLParser.BOOL:
+                    case SiddhiQLParser.OBJECT:
+                    case SiddhiQLParser.ID_QUOTES:
+                    case SiddhiQLParser.ID:
+                    case SiddhiQLParser.STRING_LITERAL:
+                        this.state = 557;
+                        this.annotation_element();
+                        break;
+                    case SiddhiQLParser.AT_SYMBOL:
+                        this.state = 558;
+                        this.annotation();
+                        break;
+                    default:
+                        throw new antlr4.error.NoViableAltException(this);
                 }
                 this.state = 565;
                 this._errHandler.sync(this);
@@ -3999,13 +3943,13 @@ SiddhiQLParser.prototype.annotation = function() {
         }
 
     } catch (re) {
-    	if(re instanceof antlr4.error.RecognitionException) {
-	        localctx.exception = re;
-	        this._errHandler.reportError(this, re);
-	        this._errHandler.recover(this, re);
-	    } else {
-	    	throw re;
-	    }
+        if (re instanceof antlr4.error.RecognitionException) {
+            localctx.exception = re;
+            this._errHandler.reportError(this, re);
+            this._errHandler.recover(this, re);
+        } else {
+            throw re;
+        }
     } finally {
         this.exitRule();
     }
@@ -4013,13 +3957,13 @@ SiddhiQLParser.prototype.annotation = function() {
 };
 
 function App_annotationContext(parser, parent, invokingState) {
-	if(parent===undefined) {
-	    parent = null;
-	}
-	if(invokingState===undefined || invokingState===null) {
-		invokingState = -1;
-	}
-	antlr4.ParserRuleContext.call(this, parent, invokingState);
+    if (parent === undefined) {
+        parent = null;
+    }
+    if (invokingState === undefined || invokingState === null) {
+        invokingState = -1;
+    }
+    antlr4.ParserRuleContext.call(this, parent, invokingState);
     this.parser = parser;
     this.ruleIndex = SiddhiQLParser.RULE_app_annotation;
     return this;
@@ -4028,43 +3972,41 @@ function App_annotationContext(parser, parent, invokingState) {
 App_annotationContext.prototype = Object.create(antlr4.ParserRuleContext.prototype);
 App_annotationContext.prototype.constructor = App_annotationContext;
 
-App_annotationContext.prototype.APP = function() {
+App_annotationContext.prototype.APP = function () {
     return this.getToken(SiddhiQLParser.APP, 0);
 };
 
-App_annotationContext.prototype.name = function() {
-    return this.getTypedRuleContext(NameContext,0);
+App_annotationContext.prototype.name = function () {
+    return this.getTypedRuleContext(NameContext, 0);
 };
 
-App_annotationContext.prototype.annotation_element = function(i) {
-    if(i===undefined) {
+App_annotationContext.prototype.annotation_element = function (i) {
+    if (i === undefined) {
         i = null;
     }
-    if(i===null) {
+    if (i === null) {
         return this.getTypedRuleContexts(Annotation_elementContext);
     } else {
-        return this.getTypedRuleContext(Annotation_elementContext,i);
+        return this.getTypedRuleContext(Annotation_elementContext, i);
     }
 };
 
-App_annotationContext.prototype.enterRule = function(listener) {
-    if(listener instanceof SiddhiQLListener ) {
+App_annotationContext.prototype.enterRule = function (listener) {
+    if (listener instanceof SiddhiQLListener) {
         listener.enterApp_annotation(this);
-	}
+    }
 };
 
-App_annotationContext.prototype.exitRule = function(listener) {
-    if(listener instanceof SiddhiQLListener ) {
+App_annotationContext.prototype.exitRule = function (listener) {
+    if (listener instanceof SiddhiQLListener) {
         listener.exitApp_annotation(this);
-	}
+    }
 };
-
-
 
 
 SiddhiQLParser.App_annotationContext = App_annotationContext;
 
-SiddhiQLParser.prototype.app_annotation = function() {
+SiddhiQLParser.prototype.app_annotation = function () {
 
     var localctx = new App_annotationContext(this, this._ctx, this.state);
     this.enterRule(localctx, 58, SiddhiQLParser.RULE_app_annotation);
@@ -4081,7 +4023,7 @@ SiddhiQLParser.prototype.app_annotation = function() {
         this.name();
         this.state = 585;
         _la = this._input.LA(1);
-        if(_la===SiddhiQLParser.OPEN_PAR) {
+        if (_la === SiddhiQLParser.OPEN_PAR) {
             this.state = 574;
             this.match(SiddhiQLParser.OPEN_PAR);
             this.state = 575;
@@ -4089,7 +4031,7 @@ SiddhiQLParser.prototype.app_annotation = function() {
             this.state = 580;
             this._errHandler.sync(this);
             _la = this._input.LA(1);
-            while(_la===SiddhiQLParser.COMMA) {
+            while (_la === SiddhiQLParser.COMMA) {
                 this.state = 576;
                 this.match(SiddhiQLParser.COMMA);
                 this.state = 577;
@@ -4103,13 +4045,13 @@ SiddhiQLParser.prototype.app_annotation = function() {
         }
 
     } catch (re) {
-    	if(re instanceof antlr4.error.RecognitionException) {
-	        localctx.exception = re;
-	        this._errHandler.reportError(this, re);
-	        this._errHandler.recover(this, re);
-	    } else {
-	    	throw re;
-	    }
+        if (re instanceof antlr4.error.RecognitionException) {
+            localctx.exception = re;
+            this._errHandler.reportError(this, re);
+            this._errHandler.recover(this, re);
+        } else {
+            throw re;
+        }
     } finally {
         this.exitRule();
     }
@@ -4117,13 +4059,13 @@ SiddhiQLParser.prototype.app_annotation = function() {
 };
 
 function Annotation_elementContext(parser, parent, invokingState) {
-	if(parent===undefined) {
-	    parent = null;
-	}
-	if(invokingState===undefined || invokingState===null) {
-		invokingState = -1;
-	}
-	antlr4.ParserRuleContext.call(this, parent, invokingState);
+    if (parent === undefined) {
+        parent = null;
+    }
+    if (invokingState === undefined || invokingState === null) {
+        invokingState = -1;
+    }
+    antlr4.ParserRuleContext.call(this, parent, invokingState);
     this.parser = parser;
     this.ruleIndex = SiddhiQLParser.RULE_annotation_element;
     return this;
@@ -4132,32 +4074,30 @@ function Annotation_elementContext(parser, parent, invokingState) {
 Annotation_elementContext.prototype = Object.create(antlr4.ParserRuleContext.prototype);
 Annotation_elementContext.prototype.constructor = Annotation_elementContext;
 
-Annotation_elementContext.prototype.property_value = function() {
-    return this.getTypedRuleContext(Property_valueContext,0);
+Annotation_elementContext.prototype.property_value = function () {
+    return this.getTypedRuleContext(Property_valueContext, 0);
 };
 
-Annotation_elementContext.prototype.property_name = function() {
-    return this.getTypedRuleContext(Property_nameContext,0);
+Annotation_elementContext.prototype.property_name = function () {
+    return this.getTypedRuleContext(Property_nameContext, 0);
 };
 
-Annotation_elementContext.prototype.enterRule = function(listener) {
-    if(listener instanceof SiddhiQLListener ) {
+Annotation_elementContext.prototype.enterRule = function (listener) {
+    if (listener instanceof SiddhiQLListener) {
         listener.enterAnnotation_element(this);
-	}
+    }
 };
 
-Annotation_elementContext.prototype.exitRule = function(listener) {
-    if(listener instanceof SiddhiQLListener ) {
+Annotation_elementContext.prototype.exitRule = function (listener) {
+    if (listener instanceof SiddhiQLListener) {
         listener.exitAnnotation_element(this);
-	}
+    }
 };
-
-
 
 
 SiddhiQLParser.Annotation_elementContext = Annotation_elementContext;
 
-SiddhiQLParser.prototype.annotation_element = function() {
+SiddhiQLParser.prototype.annotation_element = function () {
 
     var localctx = new Annotation_elementContext(this, this._ctx, this.state);
     this.enterRule(localctx, 60, SiddhiQLParser.RULE_annotation_element);
@@ -4166,7 +4106,7 @@ SiddhiQLParser.prototype.annotation_element = function() {
         this.enterOuterAlt(localctx, 1);
         this.state = 590;
         _la = this._input.LA(1);
-        if(((((_la - 30)) & ~0x1f) == 0 && ((1 << (_la - 30)) & ((1 << (SiddhiQLParser.STREAM - 30)) | (1 << (SiddhiQLParser.DEFINE - 30)) | (1 << (SiddhiQLParser.TABLE - 30)) | (1 << (SiddhiQLParser.APP - 30)) | (1 << (SiddhiQLParser.FROM - 30)) | (1 << (SiddhiQLParser.PARTITION - 30)) | (1 << (SiddhiQLParser.WINDOW - 30)) | (1 << (SiddhiQLParser.SELECT - 30)) | (1 << (SiddhiQLParser.GROUP - 30)) | (1 << (SiddhiQLParser.BY - 30)) | (1 << (SiddhiQLParser.ORDER - 30)) | (1 << (SiddhiQLParser.LIMIT - 30)) | (1 << (SiddhiQLParser.ASC - 30)) | (1 << (SiddhiQLParser.DESC - 30)) | (1 << (SiddhiQLParser.HAVING - 30)) | (1 << (SiddhiQLParser.INSERT - 30)) | (1 << (SiddhiQLParser.DELETE - 30)) | (1 << (SiddhiQLParser.UPDATE - 30)) | (1 << (SiddhiQLParser.RETURN - 30)) | (1 << (SiddhiQLParser.EVENTS - 30)) | (1 << (SiddhiQLParser.INTO - 30)) | (1 << (SiddhiQLParser.OUTPUT - 30)) | (1 << (SiddhiQLParser.EXPIRED - 30)) | (1 << (SiddhiQLParser.CURRENT - 30)) | (1 << (SiddhiQLParser.SNAPSHOT - 30)) | (1 << (SiddhiQLParser.FOR - 30)) | (1 << (SiddhiQLParser.RAW - 30)) | (1 << (SiddhiQLParser.OF - 30)))) !== 0) || ((((_la - 62)) & ~0x1f) == 0 && ((1 << (_la - 62)) & ((1 << (SiddhiQLParser.AS - 62)) | (1 << (SiddhiQLParser.OR - 62)) | (1 << (SiddhiQLParser.AND - 62)) | (1 << (SiddhiQLParser.ON - 62)) | (1 << (SiddhiQLParser.IS - 62)) | (1 << (SiddhiQLParser.NOT - 62)) | (1 << (SiddhiQLParser.WITHIN - 62)) | (1 << (SiddhiQLParser.WITH - 62)) | (1 << (SiddhiQLParser.BEGIN - 62)) | (1 << (SiddhiQLParser.END - 62)) | (1 << (SiddhiQLParser.NULL - 62)) | (1 << (SiddhiQLParser.EVERY - 62)) | (1 << (SiddhiQLParser.LAST - 62)) | (1 << (SiddhiQLParser.ALL - 62)) | (1 << (SiddhiQLParser.FIRST - 62)) | (1 << (SiddhiQLParser.JOIN - 62)) | (1 << (SiddhiQLParser.INNER - 62)) | (1 << (SiddhiQLParser.OUTER - 62)) | (1 << (SiddhiQLParser.RIGHT - 62)) | (1 << (SiddhiQLParser.LEFT - 62)) | (1 << (SiddhiQLParser.FULL - 62)) | (1 << (SiddhiQLParser.UNIDIRECTIONAL - 62)) | (1 << (SiddhiQLParser.YEARS - 62)) | (1 << (SiddhiQLParser.MONTHS - 62)) | (1 << (SiddhiQLParser.WEEKS - 62)) | (1 << (SiddhiQLParser.DAYS - 62)) | (1 << (SiddhiQLParser.HOURS - 62)) | (1 << (SiddhiQLParser.MINUTES - 62)) | (1 << (SiddhiQLParser.SECONDS - 62)) | (1 << (SiddhiQLParser.MILLISECONDS - 62)))) !== 0) || ((((_la - 94)) & ~0x1f) == 0 && ((1 << (_la - 94)) & ((1 << (SiddhiQLParser.FALSE - 94)) | (1 << (SiddhiQLParser.TRUE - 94)) | (1 << (SiddhiQLParser.STRING - 94)) | (1 << (SiddhiQLParser.INT - 94)) | (1 << (SiddhiQLParser.LONG - 94)) | (1 << (SiddhiQLParser.FLOAT - 94)) | (1 << (SiddhiQLParser.DOUBLE - 94)) | (1 << (SiddhiQLParser.BOOL - 94)) | (1 << (SiddhiQLParser.OBJECT - 94)) | (1 << (SiddhiQLParser.ID_QUOTES - 94)) | (1 << (SiddhiQLParser.ID - 94)))) !== 0)) {
+        if (((((_la - 30)) & ~0x1f) == 0 && ((1 << (_la - 30)) & ((1 << (SiddhiQLParser.STREAM - 30)) | (1 << (SiddhiQLParser.DEFINE - 30)) | (1 << (SiddhiQLParser.TABLE - 30)) | (1 << (SiddhiQLParser.APP - 30)) | (1 << (SiddhiQLParser.FROM - 30)) | (1 << (SiddhiQLParser.PARTITION - 30)) | (1 << (SiddhiQLParser.WINDOW - 30)) | (1 << (SiddhiQLParser.SELECT - 30)) | (1 << (SiddhiQLParser.GROUP - 30)) | (1 << (SiddhiQLParser.BY - 30)) | (1 << (SiddhiQLParser.ORDER - 30)) | (1 << (SiddhiQLParser.LIMIT - 30)) | (1 << (SiddhiQLParser.ASC - 30)) | (1 << (SiddhiQLParser.DESC - 30)) | (1 << (SiddhiQLParser.HAVING - 30)) | (1 << (SiddhiQLParser.INSERT - 30)) | (1 << (SiddhiQLParser.DELETE - 30)) | (1 << (SiddhiQLParser.UPDATE - 30)) | (1 << (SiddhiQLParser.RETURN - 30)) | (1 << (SiddhiQLParser.EVENTS - 30)) | (1 << (SiddhiQLParser.INTO - 30)) | (1 << (SiddhiQLParser.OUTPUT - 30)) | (1 << (SiddhiQLParser.EXPIRED - 30)) | (1 << (SiddhiQLParser.CURRENT - 30)) | (1 << (SiddhiQLParser.SNAPSHOT - 30)) | (1 << (SiddhiQLParser.FOR - 30)) | (1 << (SiddhiQLParser.RAW - 30)) | (1 << (SiddhiQLParser.OF - 30)))) !== 0) || ((((_la - 62)) & ~0x1f) == 0 && ((1 << (_la - 62)) & ((1 << (SiddhiQLParser.AS - 62)) | (1 << (SiddhiQLParser.OR - 62)) | (1 << (SiddhiQLParser.AND - 62)) | (1 << (SiddhiQLParser.ON - 62)) | (1 << (SiddhiQLParser.IS - 62)) | (1 << (SiddhiQLParser.NOT - 62)) | (1 << (SiddhiQLParser.WITHIN - 62)) | (1 << (SiddhiQLParser.WITH - 62)) | (1 << (SiddhiQLParser.BEGIN - 62)) | (1 << (SiddhiQLParser.END - 62)) | (1 << (SiddhiQLParser.NULL - 62)) | (1 << (SiddhiQLParser.EVERY - 62)) | (1 << (SiddhiQLParser.LAST - 62)) | (1 << (SiddhiQLParser.ALL - 62)) | (1 << (SiddhiQLParser.FIRST - 62)) | (1 << (SiddhiQLParser.JOIN - 62)) | (1 << (SiddhiQLParser.INNER - 62)) | (1 << (SiddhiQLParser.OUTER - 62)) | (1 << (SiddhiQLParser.RIGHT - 62)) | (1 << (SiddhiQLParser.LEFT - 62)) | (1 << (SiddhiQLParser.FULL - 62)) | (1 << (SiddhiQLParser.UNIDIRECTIONAL - 62)) | (1 << (SiddhiQLParser.YEARS - 62)) | (1 << (SiddhiQLParser.MONTHS - 62)) | (1 << (SiddhiQLParser.WEEKS - 62)) | (1 << (SiddhiQLParser.DAYS - 62)) | (1 << (SiddhiQLParser.HOURS - 62)) | (1 << (SiddhiQLParser.MINUTES - 62)) | (1 << (SiddhiQLParser.SECONDS - 62)) | (1 << (SiddhiQLParser.MILLISECONDS - 62)))) !== 0) || ((((_la - 94)) & ~0x1f) == 0 && ((1 << (_la - 94)) & ((1 << (SiddhiQLParser.FALSE - 94)) | (1 << (SiddhiQLParser.TRUE - 94)) | (1 << (SiddhiQLParser.STRING - 94)) | (1 << (SiddhiQLParser.INT - 94)) | (1 << (SiddhiQLParser.LONG - 94)) | (1 << (SiddhiQLParser.FLOAT - 94)) | (1 << (SiddhiQLParser.DOUBLE - 94)) | (1 << (SiddhiQLParser.BOOL - 94)) | (1 << (SiddhiQLParser.OBJECT - 94)) | (1 << (SiddhiQLParser.ID_QUOTES - 94)) | (1 << (SiddhiQLParser.ID - 94)))) !== 0)) {
             this.state = 587;
             this.property_name();
             this.state = 588;
@@ -4176,13 +4116,13 @@ SiddhiQLParser.prototype.annotation_element = function() {
         this.state = 592;
         this.property_value();
     } catch (re) {
-    	if(re instanceof antlr4.error.RecognitionException) {
-	        localctx.exception = re;
-	        this._errHandler.reportError(this, re);
-	        this._errHandler.recover(this, re);
-	    } else {
-	    	throw re;
-	    }
+        if (re instanceof antlr4.error.RecognitionException) {
+            localctx.exception = re;
+            this._errHandler.reportError(this, re);
+            this._errHandler.recover(this, re);
+        } else {
+            throw re;
+        }
     } finally {
         this.exitRule();
     }
@@ -4190,13 +4130,13 @@ SiddhiQLParser.prototype.annotation_element = function() {
 };
 
 function PartitionContext(parser, parent, invokingState) {
-	if(parent===undefined) {
-	    parent = null;
-	}
-	if(invokingState===undefined || invokingState===null) {
-		invokingState = -1;
-	}
-	antlr4.ParserRuleContext.call(this, parent, invokingState);
+    if (parent === undefined) {
+        parent = null;
+    }
+    if (invokingState === undefined || invokingState === null) {
+        invokingState = -1;
+    }
+    antlr4.ParserRuleContext.call(this, parent, invokingState);
     this.parser = parser;
     this.ruleIndex = SiddhiQLParser.RULE_partition;
     return this;
@@ -4205,84 +4145,82 @@ function PartitionContext(parser, parent, invokingState) {
 PartitionContext.prototype = Object.create(antlr4.ParserRuleContext.prototype);
 PartitionContext.prototype.constructor = PartitionContext;
 
-PartitionContext.prototype.PARTITION = function() {
+PartitionContext.prototype.PARTITION = function () {
     return this.getToken(SiddhiQLParser.PARTITION, 0);
 };
 
-PartitionContext.prototype.WITH = function() {
+PartitionContext.prototype.WITH = function () {
     return this.getToken(SiddhiQLParser.WITH, 0);
 };
 
-PartitionContext.prototype.partition_with_stream = function(i) {
-    if(i===undefined) {
+PartitionContext.prototype.partition_with_stream = function (i) {
+    if (i === undefined) {
         i = null;
     }
-    if(i===null) {
+    if (i === null) {
         return this.getTypedRuleContexts(Partition_with_streamContext);
     } else {
-        return this.getTypedRuleContext(Partition_with_streamContext,i);
+        return this.getTypedRuleContext(Partition_with_streamContext, i);
     }
 };
 
-PartitionContext.prototype.BEGIN = function() {
+PartitionContext.prototype.BEGIN = function () {
     return this.getToken(SiddhiQLParser.BEGIN, 0);
 };
 
-PartitionContext.prototype.END = function() {
+PartitionContext.prototype.END = function () {
     return this.getToken(SiddhiQLParser.END, 0);
 };
 
-PartitionContext.prototype.query = function(i) {
-    if(i===undefined) {
+PartitionContext.prototype.query = function (i) {
+    if (i === undefined) {
         i = null;
     }
-    if(i===null) {
+    if (i === null) {
         return this.getTypedRuleContexts(QueryContext);
     } else {
-        return this.getTypedRuleContext(QueryContext,i);
+        return this.getTypedRuleContext(QueryContext, i);
     }
 };
 
-PartitionContext.prototype.error = function(i) {
-    if(i===undefined) {
+PartitionContext.prototype.error = function (i) {
+    if (i === undefined) {
         i = null;
     }
-    if(i===null) {
+    if (i === null) {
         return this.getTypedRuleContexts(ErrorContext);
     } else {
-        return this.getTypedRuleContext(ErrorContext,i);
+        return this.getTypedRuleContext(ErrorContext, i);
     }
 };
 
-PartitionContext.prototype.annotation = function(i) {
-    if(i===undefined) {
+PartitionContext.prototype.annotation = function (i) {
+    if (i === undefined) {
         i = null;
     }
-    if(i===null) {
+    if (i === null) {
         return this.getTypedRuleContexts(AnnotationContext);
     } else {
-        return this.getTypedRuleContext(AnnotationContext,i);
+        return this.getTypedRuleContext(AnnotationContext, i);
     }
 };
 
-PartitionContext.prototype.enterRule = function(listener) {
-    if(listener instanceof SiddhiQLListener ) {
+PartitionContext.prototype.enterRule = function (listener) {
+    if (listener instanceof SiddhiQLListener) {
         listener.enterPartition(this);
-	}
+    }
 };
 
-PartitionContext.prototype.exitRule = function(listener) {
-    if(listener instanceof SiddhiQLListener ) {
+PartitionContext.prototype.exitRule = function (listener) {
+    if (listener instanceof SiddhiQLListener) {
         listener.exitPartition(this);
-	}
+    }
 };
-
-
 
 
 SiddhiQLParser.PartitionContext = PartitionContext;
 
-SiddhiQLParser.prototype.partition = function() {
+SiddhiQLParser.prototype.partition = function () {
 
     var localctx = new PartitionContext(this, this._ctx, this.state);
     this.enterRule(localctx, 62, SiddhiQLParser.RULE_partition);
@@ -4292,7 +4230,7 @@ SiddhiQLParser.prototype.partition = function() {
         this.state = 597;
         this._errHandler.sync(this);
         _la = this._input.LA(1);
-        while(_la===SiddhiQLParser.AT_SYMBOL) {
+        while (_la === SiddhiQLParser.AT_SYMBOL) {
             this.state = 594;
             this.annotation();
             this.state = 599;
@@ -4310,7 +4248,7 @@ SiddhiQLParser.prototype.partition = function() {
         this.state = 608;
         this._errHandler.sync(this);
         _la = this._input.LA(1);
-        while(_la===SiddhiQLParser.COMMA) {
+        while (_la === SiddhiQLParser.COMMA) {
             this.state = 604;
             this.match(SiddhiQLParser.COMMA);
             this.state = 605;
@@ -4324,49 +4262,49 @@ SiddhiQLParser.prototype.partition = function() {
         this.state = 612;
         this.match(SiddhiQLParser.BEGIN);
         this.state = 615;
-        switch(this._input.LA(1)) {
-        case SiddhiQLParser.AT_SYMBOL:
-        case SiddhiQLParser.FROM:
-            this.state = 613;
-            this.query();
-            break;
-        case SiddhiQLParser.UNEXPECTED_CHAR:
-            this.state = 614;
-            this.error();
-            break;
-        default:
-            throw new antlr4.error.NoViableAltException(this);
+        switch (this._input.LA(1)) {
+            case SiddhiQLParser.AT_SYMBOL:
+            case SiddhiQLParser.FROM:
+                this.state = 613;
+                this.query();
+                break;
+            case SiddhiQLParser.UNEXPECTED_CHAR:
+                this.state = 614;
+                this.error();
+                break;
+            default:
+                throw new antlr4.error.NoViableAltException(this);
         }
         this.state = 624;
         this._errHandler.sync(this);
-        var _alt = this._interp.adaptivePredict(this._input,46,this._ctx)
-        while(_alt!=2 && _alt!=antlr4.atn.ATN.INVALID_ALT_NUMBER) {
-            if(_alt===1) {
+        var _alt = this._interp.adaptivePredict(this._input, 46, this._ctx)
+        while (_alt != 2 && _alt != antlr4.atn.ATN.INVALID_ALT_NUMBER) {
+            if (_alt === 1) {
                 this.state = 617;
                 this.match(SiddhiQLParser.SCOL);
                 this.state = 620;
-                switch(this._input.LA(1)) {
-                case SiddhiQLParser.AT_SYMBOL:
-                case SiddhiQLParser.FROM:
-                    this.state = 618;
-                    this.query();
-                    break;
-                case SiddhiQLParser.UNEXPECTED_CHAR:
-                    this.state = 619;
-                    this.error();
-                    break;
-                default:
-                    throw new antlr4.error.NoViableAltException(this);
-                } 
+                switch (this._input.LA(1)) {
+                    case SiddhiQLParser.AT_SYMBOL:
+                    case SiddhiQLParser.FROM:
+                        this.state = 618;
+                        this.query();
+                        break;
+                    case SiddhiQLParser.UNEXPECTED_CHAR:
+                        this.state = 619;
+                        this.error();
+                        break;
+                    default:
+                        throw new antlr4.error.NoViableAltException(this);
+                }
             }
             this.state = 626;
             this._errHandler.sync(this);
-            _alt = this._interp.adaptivePredict(this._input,46,this._ctx);
+            _alt = this._interp.adaptivePredict(this._input, 46, this._ctx);
         }
 
         this.state = 628;
         _la = this._input.LA(1);
-        if(_la===SiddhiQLParser.SCOL) {
+        if (_la === SiddhiQLParser.SCOL) {
             this.state = 627;
             this.match(SiddhiQLParser.SCOL);
         }
@@ -4374,13 +4312,13 @@ SiddhiQLParser.prototype.partition = function() {
         this.state = 630;
         this.match(SiddhiQLParser.END);
     } catch (re) {
-    	if(re instanceof antlr4.error.RecognitionException) {
-	        localctx.exception = re;
-	        this._errHandler.reportError(this, re);
-	        this._errHandler.recover(this, re);
-	    } else {
-	    	throw re;
-	    }
+        if (re instanceof antlr4.error.RecognitionException) {
+            localctx.exception = re;
+            this._errHandler.reportError(this, re);
+            this._errHandler.recover(this, re);
+        } else {
+            throw re;
+        }
     } finally {
         this.exitRule();
     }
@@ -4388,13 +4326,13 @@ SiddhiQLParser.prototype.partition = function() {
 };
 
 function Partition_finalContext(parser, parent, invokingState) {
-	if(parent===undefined) {
-	    parent = null;
-	}
-	if(invokingState===undefined || invokingState===null) {
-		invokingState = -1;
-	}
-	antlr4.ParserRuleContext.call(this, parent, invokingState);
+    if (parent === undefined) {
+        parent = null;
+    }
+    if (invokingState === undefined || invokingState === null) {
+        invokingState = -1;
+    }
+    antlr4.ParserRuleContext.call(this, parent, invokingState);
     this.parser = parser;
     this.ruleIndex = SiddhiQLParser.RULE_partition_final;
     return this;
@@ -4403,32 +4341,30 @@ function Partition_finalContext(parser, parent, invokingState) {
 Partition_finalContext.prototype = Object.create(antlr4.ParserRuleContext.prototype);
 Partition_finalContext.prototype.constructor = Partition_finalContext;
 
-Partition_finalContext.prototype.partition = function() {
-    return this.getTypedRuleContext(PartitionContext,0);
+Partition_finalContext.prototype.partition = function () {
+    return this.getTypedRuleContext(PartitionContext, 0);
 };
 
-Partition_finalContext.prototype.EOF = function() {
+Partition_finalContext.prototype.EOF = function () {
     return this.getToken(SiddhiQLParser.EOF, 0);
 };
 
-Partition_finalContext.prototype.enterRule = function(listener) {
-    if(listener instanceof SiddhiQLListener ) {
+Partition_finalContext.prototype.enterRule = function (listener) {
+    if (listener instanceof SiddhiQLListener) {
         listener.enterPartition_final(this);
-	}
+    }
 };
 
-Partition_finalContext.prototype.exitRule = function(listener) {
-    if(listener instanceof SiddhiQLListener ) {
+Partition_finalContext.prototype.exitRule = function (listener) {
+    if (listener instanceof SiddhiQLListener) {
         listener.exitPartition_final(this);
-	}
+    }
 };
-
-
 
 
 SiddhiQLParser.Partition_finalContext = Partition_finalContext;
 
-SiddhiQLParser.prototype.partition_final = function() {
+SiddhiQLParser.prototype.partition_final = function () {
 
     var localctx = new Partition_finalContext(this, this._ctx, this.state);
     this.enterRule(localctx, 64, SiddhiQLParser.RULE_partition_final);
@@ -4439,7 +4375,7 @@ SiddhiQLParser.prototype.partition_final = function() {
         this.partition();
         this.state = 634;
         _la = this._input.LA(1);
-        if(_la===SiddhiQLParser.SCOL) {
+        if (_la === SiddhiQLParser.SCOL) {
             this.state = 633;
             this.match(SiddhiQLParser.SCOL);
         }
@@ -4447,13 +4383,13 @@ SiddhiQLParser.prototype.partition_final = function() {
         this.state = 636;
         this.match(SiddhiQLParser.EOF);
     } catch (re) {
-    	if(re instanceof antlr4.error.RecognitionException) {
-	        localctx.exception = re;
-	        this._errHandler.reportError(this, re);
-	        this._errHandler.recover(this, re);
-	    } else {
-	    	throw re;
-	    }
+        if (re instanceof antlr4.error.RecognitionException) {
+            localctx.exception = re;
+            this._errHandler.reportError(this, re);
+            this._errHandler.recover(this, re);
+        } else {
+            throw re;
+        }
     } finally {
         this.exitRule();
     }
@@ -4461,13 +4397,13 @@ SiddhiQLParser.prototype.partition_final = function() {
 };
 
 function Partition_with_streamContext(parser, parent, invokingState) {
-	if(parent===undefined) {
-	    parent = null;
-	}
-	if(invokingState===undefined || invokingState===null) {
-		invokingState = -1;
-	}
-	antlr4.ParserRuleContext.call(this, parent, invokingState);
+    if (parent === undefined) {
+        parent = null;
+    }
+    if (invokingState === undefined || invokingState === null) {
+        invokingState = -1;
+    }
+    antlr4.ParserRuleContext.call(this, parent, invokingState);
     this.parser = parser;
     this.ruleIndex = SiddhiQLParser.RULE_partition_with_stream;
     return this;
@@ -4476,76 +4412,74 @@ function Partition_with_streamContext(parser, parent, invokingState) {
 Partition_with_streamContext.prototype = Object.create(antlr4.ParserRuleContext.prototype);
 Partition_with_streamContext.prototype.constructor = Partition_with_streamContext;
 
-Partition_with_streamContext.prototype.attribute = function() {
-    return this.getTypedRuleContext(AttributeContext,0);
+Partition_with_streamContext.prototype.attribute = function () {
+    return this.getTypedRuleContext(AttributeContext, 0);
 };
 
-Partition_with_streamContext.prototype.OF = function() {
+Partition_with_streamContext.prototype.OF = function () {
     return this.getToken(SiddhiQLParser.OF, 0);
 };
 
-Partition_with_streamContext.prototype.stream_id = function() {
-    return this.getTypedRuleContext(Stream_idContext,0);
+Partition_with_streamContext.prototype.stream_id = function () {
+    return this.getTypedRuleContext(Stream_idContext, 0);
 };
 
-Partition_with_streamContext.prototype.condition_ranges = function() {
-    return this.getTypedRuleContext(Condition_rangesContext,0);
+Partition_with_streamContext.prototype.condition_ranges = function () {
+    return this.getTypedRuleContext(Condition_rangesContext, 0);
 };
 
-Partition_with_streamContext.prototype.enterRule = function(listener) {
-    if(listener instanceof SiddhiQLListener ) {
+Partition_with_streamContext.prototype.enterRule = function (listener) {
+    if (listener instanceof SiddhiQLListener) {
         listener.enterPartition_with_stream(this);
-	}
+    }
 };
 
-Partition_with_streamContext.prototype.exitRule = function(listener) {
-    if(listener instanceof SiddhiQLListener ) {
+Partition_with_streamContext.prototype.exitRule = function (listener) {
+    if (listener instanceof SiddhiQLListener) {
         listener.exitPartition_with_stream(this);
-	}
+    }
 };
-
-
 
 
 SiddhiQLParser.Partition_with_streamContext = Partition_with_streamContext;
 
-SiddhiQLParser.prototype.partition_with_stream = function() {
+SiddhiQLParser.prototype.partition_with_stream = function () {
 
     var localctx = new Partition_with_streamContext(this, this._ctx, this.state);
     this.enterRule(localctx, 66, SiddhiQLParser.RULE_partition_with_stream);
     try {
         this.state = 646;
-        var la_ = this._interp.adaptivePredict(this._input,49,this._ctx);
-        switch(la_) {
-        case 1:
-            this.enterOuterAlt(localctx, 1);
-            this.state = 638;
-            this.attribute();
-            this.state = 639;
-            this.match(SiddhiQLParser.OF);
-            this.state = 640;
-            this.stream_id();
-            break;
+        var la_ = this._interp.adaptivePredict(this._input, 49, this._ctx);
+        switch (la_) {
+            case 1:
+                this.enterOuterAlt(localctx, 1);
+                this.state = 638;
+                this.attribute();
+                this.state = 639;
+                this.match(SiddhiQLParser.OF);
+                this.state = 640;
+                this.stream_id();
+                break;
 
-        case 2:
-            this.enterOuterAlt(localctx, 2);
-            this.state = 642;
-            this.condition_ranges();
-            this.state = 643;
-            this.match(SiddhiQLParser.OF);
-            this.state = 644;
-            this.stream_id();
-            break;
+            case 2:
+                this.enterOuterAlt(localctx, 2);
+                this.state = 642;
+                this.condition_ranges();
+                this.state = 643;
+                this.match(SiddhiQLParser.OF);
+                this.state = 644;
+                this.stream_id();
+                break;
 
         }
     } catch (re) {
-    	if(re instanceof antlr4.error.RecognitionException) {
-	        localctx.exception = re;
-	        this._errHandler.reportError(this, re);
-	        this._errHandler.recover(this, re);
-	    } else {
-	    	throw re;
-	    }
+        if (re instanceof antlr4.error.RecognitionException) {
+            localctx.exception = re;
+            this._errHandler.reportError(this, re);
+            this._errHandler.recover(this, re);
+        } else {
+            throw re;
+        }
     } finally {
         this.exitRule();
     }
@@ -4553,13 +4487,13 @@ SiddhiQLParser.prototype.partition_with_stream = function() {
 };
 
 function Condition_rangesContext(parser, parent, invokingState) {
-	if(parent===undefined) {
-	    parent = null;
-	}
-	if(invokingState===undefined || invokingState===null) {
-		invokingState = -1;
-	}
-	antlr4.ParserRuleContext.call(this, parent, invokingState);
+    if (parent === undefined) {
+        parent = null;
+    }
+    if (invokingState === undefined || invokingState === null) {
+        invokingState = -1;
+    }
+    antlr4.ParserRuleContext.call(this, parent, invokingState);
     this.parser = parser;
     this.ruleIndex = SiddhiQLParser.RULE_condition_ranges;
     return this;
@@ -4568,22 +4502,22 @@ function Condition_rangesContext(parser, parent, invokingState) {
 Condition_rangesContext.prototype = Object.create(antlr4.ParserRuleContext.prototype);
 Condition_rangesContext.prototype.constructor = Condition_rangesContext;
 
-Condition_rangesContext.prototype.condition_range = function(i) {
-    if(i===undefined) {
+Condition_rangesContext.prototype.condition_range = function (i) {
+    if (i === undefined) {
         i = null;
     }
-    if(i===null) {
+    if (i === null) {
         return this.getTypedRuleContexts(Condition_rangeContext);
     } else {
-        return this.getTypedRuleContext(Condition_rangeContext,i);
+        return this.getTypedRuleContext(Condition_rangeContext, i);
     }
 };
 
-Condition_rangesContext.prototype.OR = function(i) {
-	if(i===undefined) {
-		i = null;
-	}
-    if(i===null) {
+Condition_rangesContext.prototype.OR = function (i) {
+    if (i === undefined) {
+        i = null;
+    }
+    if (i === null) {
         return this.getTokens(SiddhiQLParser.OR);
     } else {
         return this.getToken(SiddhiQLParser.OR, i);
@@ -4591,24 +4525,22 @@ Condition_rangesContext.prototype.OR = function(i) {
 };
 
 
-Condition_rangesContext.prototype.enterRule = function(listener) {
-    if(listener instanceof SiddhiQLListener ) {
+Condition_rangesContext.prototype.enterRule = function (listener) {
+    if (listener instanceof SiddhiQLListener) {
         listener.enterCondition_ranges(this);
-	}
+    }
 };
 
-Condition_rangesContext.prototype.exitRule = function(listener) {
-    if(listener instanceof SiddhiQLListener ) {
+Condition_rangesContext.prototype.exitRule = function (listener) {
+    if (listener instanceof SiddhiQLListener) {
         listener.exitCondition_ranges(this);
-	}
+    }
 };
-
-
 
 
 SiddhiQLParser.Condition_rangesContext = Condition_rangesContext;
 
-SiddhiQLParser.prototype.condition_ranges = function() {
+SiddhiQLParser.prototype.condition_ranges = function () {
 
     var localctx = new Condition_rangesContext(this, this._ctx, this.state);
     this.enterRule(localctx, 68, SiddhiQLParser.RULE_condition_ranges);
@@ -4620,7 +4552,7 @@ SiddhiQLParser.prototype.condition_ranges = function() {
         this.state = 653;
         this._errHandler.sync(this);
         _la = this._input.LA(1);
-        while(_la===SiddhiQLParser.OR) {
+        while (_la === SiddhiQLParser.OR) {
             this.state = 649;
             this.match(SiddhiQLParser.OR);
             this.state = 650;
@@ -4630,13 +4562,13 @@ SiddhiQLParser.prototype.condition_ranges = function() {
             _la = this._input.LA(1);
         }
     } catch (re) {
-    	if(re instanceof antlr4.error.RecognitionException) {
-	        localctx.exception = re;
-	        this._errHandler.reportError(this, re);
-	        this._errHandler.recover(this, re);
-	    } else {
-	    	throw re;
-	    }
+        if (re instanceof antlr4.error.RecognitionException) {
+            localctx.exception = re;
+            this._errHandler.reportError(this, re);
+            this._errHandler.recover(this, re);
+        } else {
+            throw re;
+        }
     } finally {
         this.exitRule();
     }
@@ -4644,13 +4576,13 @@ SiddhiQLParser.prototype.condition_ranges = function() {
 };
 
 function Condition_rangeContext(parser, parent, invokingState) {
-	if(parent===undefined) {
-	    parent = null;
-	}
-	if(invokingState===undefined || invokingState===null) {
-		invokingState = -1;
-	}
-	antlr4.ParserRuleContext.call(this, parent, invokingState);
+    if (parent === undefined) {
+        parent = null;
+    }
+    if (invokingState === undefined || invokingState === null) {
+        invokingState = -1;
+    }
+    antlr4.ParserRuleContext.call(this, parent, invokingState);
     this.parser = parser;
     this.ruleIndex = SiddhiQLParser.RULE_condition_range;
     return this;
@@ -4659,36 +4591,34 @@ function Condition_rangeContext(parser, parent, invokingState) {
 Condition_rangeContext.prototype = Object.create(antlr4.ParserRuleContext.prototype);
 Condition_rangeContext.prototype.constructor = Condition_rangeContext;
 
-Condition_rangeContext.prototype.expression = function() {
-    return this.getTypedRuleContext(ExpressionContext,0);
+Condition_rangeContext.prototype.expression = function () {
+    return this.getTypedRuleContext(ExpressionContext, 0);
 };
 
-Condition_rangeContext.prototype.AS = function() {
+Condition_rangeContext.prototype.AS = function () {
     return this.getToken(SiddhiQLParser.AS, 0);
 };
 
-Condition_rangeContext.prototype.string_value = function() {
-    return this.getTypedRuleContext(String_valueContext,0);
+Condition_rangeContext.prototype.string_value = function () {
+    return this.getTypedRuleContext(String_valueContext, 0);
 };
 
-Condition_rangeContext.prototype.enterRule = function(listener) {
-    if(listener instanceof SiddhiQLListener ) {
+Condition_rangeContext.prototype.enterRule = function (listener) {
+    if (listener instanceof SiddhiQLListener) {
         listener.enterCondition_range(this);
-	}
+    }
 };
 
-Condition_rangeContext.prototype.exitRule = function(listener) {
-    if(listener instanceof SiddhiQLListener ) {
+Condition_rangeContext.prototype.exitRule = function (listener) {
+    if (listener instanceof SiddhiQLListener) {
         listener.exitCondition_range(this);
-	}
+    }
 };
-
-
 
 
 SiddhiQLParser.Condition_rangeContext = Condition_rangeContext;
 
-SiddhiQLParser.prototype.condition_range = function() {
+SiddhiQLParser.prototype.condition_range = function () {
 
     var localctx = new Condition_rangeContext(this, this._ctx, this.state);
     this.enterRule(localctx, 70, SiddhiQLParser.RULE_condition_range);
@@ -4701,13 +4631,13 @@ SiddhiQLParser.prototype.condition_range = function() {
         this.state = 658;
         this.string_value();
     } catch (re) {
-    	if(re instanceof antlr4.error.RecognitionException) {
-	        localctx.exception = re;
-	        this._errHandler.reportError(this, re);
-	        this._errHandler.recover(this, re);
-	    } else {
-	    	throw re;
-	    }
+        if (re instanceof antlr4.error.RecognitionException) {
+            localctx.exception = re;
+            this._errHandler.reportError(this, re);
+            this._errHandler.recover(this, re);
+        } else {
+            throw re;
+        }
     } finally {
         this.exitRule();
     }
@@ -4715,13 +4645,13 @@ SiddhiQLParser.prototype.condition_range = function() {
 };
 
 function Query_finalContext(parser, parent, invokingState) {
-	if(parent===undefined) {
-	    parent = null;
-	}
-	if(invokingState===undefined || invokingState===null) {
-		invokingState = -1;
-	}
-	antlr4.ParserRuleContext.call(this, parent, invokingState);
+    if (parent === undefined) {
+        parent = null;
+    }
+    if (invokingState === undefined || invokingState === null) {
+        invokingState = -1;
+    }
+    antlr4.ParserRuleContext.call(this, parent, invokingState);
     this.parser = parser;
     this.ruleIndex = SiddhiQLParser.RULE_query_final;
     return this;
@@ -4730,32 +4660,30 @@ function Query_finalContext(parser, parent, invokingState) {
 Query_finalContext.prototype = Object.create(antlr4.ParserRuleContext.prototype);
 Query_finalContext.prototype.constructor = Query_finalContext;
 
-Query_finalContext.prototype.query = function() {
-    return this.getTypedRuleContext(QueryContext,0);
+Query_finalContext.prototype.query = function () {
+    return this.getTypedRuleContext(QueryContext, 0);
 };
 
-Query_finalContext.prototype.EOF = function() {
+Query_finalContext.prototype.EOF = function () {
     return this.getToken(SiddhiQLParser.EOF, 0);
 };
 
-Query_finalContext.prototype.enterRule = function(listener) {
-    if(listener instanceof SiddhiQLListener ) {
+Query_finalContext.prototype.enterRule = function (listener) {
+    if (listener instanceof SiddhiQLListener) {
         listener.enterQuery_final(this);
-	}
+    }
 };
 
-Query_finalContext.prototype.exitRule = function(listener) {
-    if(listener instanceof SiddhiQLListener ) {
+Query_finalContext.prototype.exitRule = function (listener) {
+    if (listener instanceof SiddhiQLListener) {
         listener.exitQuery_final(this);
-	}
+    }
 };
-
-
 
 
 SiddhiQLParser.Query_finalContext = Query_finalContext;
 
-SiddhiQLParser.prototype.query_final = function() {
+SiddhiQLParser.prototype.query_final = function () {
 
     var localctx = new Query_finalContext(this, this._ctx, this.state);
     this.enterRule(localctx, 72, SiddhiQLParser.RULE_query_final);
@@ -4766,7 +4694,7 @@ SiddhiQLParser.prototype.query_final = function() {
         this.query();
         this.state = 662;
         _la = this._input.LA(1);
-        if(_la===SiddhiQLParser.SCOL) {
+        if (_la === SiddhiQLParser.SCOL) {
             this.state = 661;
             this.match(SiddhiQLParser.SCOL);
         }
@@ -4774,13 +4702,13 @@ SiddhiQLParser.prototype.query_final = function() {
         this.state = 664;
         this.match(SiddhiQLParser.EOF);
     } catch (re) {
-    	if(re instanceof antlr4.error.RecognitionException) {
-	        localctx.exception = re;
-	        this._errHandler.reportError(this, re);
-	        this._errHandler.recover(this, re);
-	    } else {
-	    	throw re;
-	    }
+        if (re instanceof antlr4.error.RecognitionException) {
+            localctx.exception = re;
+            this._errHandler.reportError(this, re);
+            this._errHandler.recover(this, re);
+        } else {
+            throw re;
+        }
     } finally {
         this.exitRule();
     }
@@ -4788,13 +4716,13 @@ SiddhiQLParser.prototype.query_final = function() {
 };
 
 function QueryContext(parser, parent, invokingState) {
-	if(parent===undefined) {
-	    parent = null;
-	}
-	if(invokingState===undefined || invokingState===null) {
-		invokingState = -1;
-	}
-	antlr4.ParserRuleContext.call(this, parent, invokingState);
+    if (parent === undefined) {
+        parent = null;
+    }
+    if (invokingState === undefined || invokingState === null) {
+        invokingState = -1;
+    }
+    antlr4.ParserRuleContext.call(this, parent, invokingState);
     this.parser = parser;
     this.ruleIndex = SiddhiQLParser.RULE_query;
     return this;
@@ -4803,55 +4731,53 @@ function QueryContext(parser, parent, invokingState) {
 QueryContext.prototype = Object.create(antlr4.ParserRuleContext.prototype);
 QueryContext.prototype.constructor = QueryContext;
 
-QueryContext.prototype.FROM = function() {
+QueryContext.prototype.FROM = function () {
     return this.getToken(SiddhiQLParser.FROM, 0);
 };
 
-QueryContext.prototype.query_input = function() {
-    return this.getTypedRuleContext(Query_inputContext,0);
+QueryContext.prototype.query_input = function () {
+    return this.getTypedRuleContext(Query_inputContext, 0);
 };
 
-QueryContext.prototype.query_output = function() {
-    return this.getTypedRuleContext(Query_outputContext,0);
+QueryContext.prototype.query_output = function () {
+    return this.getTypedRuleContext(Query_outputContext, 0);
 };
 
-QueryContext.prototype.annotation = function(i) {
-    if(i===undefined) {
+QueryContext.prototype.annotation = function (i) {
+    if (i === undefined) {
         i = null;
     }
-    if(i===null) {
+    if (i === null) {
         return this.getTypedRuleContexts(AnnotationContext);
     } else {
-        return this.getTypedRuleContext(AnnotationContext,i);
+        return this.getTypedRuleContext(AnnotationContext, i);
     }
 };
 
-QueryContext.prototype.query_section = function() {
-    return this.getTypedRuleContext(Query_sectionContext,0);
+QueryContext.prototype.query_section = function () {
+    return this.getTypedRuleContext(Query_sectionContext, 0);
 };
 
-QueryContext.prototype.output_rate = function() {
-    return this.getTypedRuleContext(Output_rateContext,0);
+QueryContext.prototype.output_rate = function () {
+    return this.getTypedRuleContext(Output_rateContext, 0);
 };
 
-QueryContext.prototype.enterRule = function(listener) {
-    if(listener instanceof SiddhiQLListener ) {
+QueryContext.prototype.enterRule = function (listener) {
+    if (listener instanceof SiddhiQLListener) {
         listener.enterQuery(this);
-	}
+    }
 };
 
-QueryContext.prototype.exitRule = function(listener) {
-    if(listener instanceof SiddhiQLListener ) {
+QueryContext.prototype.exitRule = function (listener) {
+    if (listener instanceof SiddhiQLListener) {
         listener.exitQuery(this);
-	}
+    }
 };
-
-
 
 
 SiddhiQLParser.QueryContext = QueryContext;
 
-SiddhiQLParser.prototype.query = function() {
+SiddhiQLParser.prototype.query = function () {
 
     var localctx = new QueryContext(this, this._ctx, this.state);
     this.enterRule(localctx, 74, SiddhiQLParser.RULE_query);
@@ -4861,7 +4787,7 @@ SiddhiQLParser.prototype.query = function() {
         this.state = 669;
         this._errHandler.sync(this);
         _la = this._input.LA(1);
-        while(_la===SiddhiQLParser.AT_SYMBOL) {
+        while (_la === SiddhiQLParser.AT_SYMBOL) {
             this.state = 666;
             this.annotation();
             this.state = 671;
@@ -4874,14 +4800,14 @@ SiddhiQLParser.prototype.query = function() {
         this.query_input();
         this.state = 675;
         _la = this._input.LA(1);
-        if(_la===SiddhiQLParser.SELECT) {
+        if (_la === SiddhiQLParser.SELECT) {
             this.state = 674;
             this.query_section();
         }
 
         this.state = 678;
         _la = this._input.LA(1);
-        if(_la===SiddhiQLParser.OUTPUT) {
+        if (_la === SiddhiQLParser.OUTPUT) {
             this.state = 677;
             this.output_rate();
         }
@@ -4889,13 +4815,13 @@ SiddhiQLParser.prototype.query = function() {
         this.state = 680;
         this.query_output();
     } catch (re) {
-    	if(re instanceof antlr4.error.RecognitionException) {
-	        localctx.exception = re;
-	        this._errHandler.reportError(this, re);
-	        this._errHandler.recover(this, re);
-	    } else {
-	    	throw re;
-	    }
+        if (re instanceof antlr4.error.RecognitionException) {
+            localctx.exception = re;
+            this._errHandler.reportError(this, re);
+            this._errHandler.recover(this, re);
+        } else {
+            throw re;
+        }
     } finally {
         this.exitRule();
     }
@@ -4903,13 +4829,13 @@ SiddhiQLParser.prototype.query = function() {
 };
 
 function Query_inputContext(parser, parent, invokingState) {
-	if(parent===undefined) {
-	    parent = null;
-	}
-	if(invokingState===undefined || invokingState===null) {
-		invokingState = -1;
-	}
-	antlr4.ParserRuleContext.call(this, parent, invokingState);
+    if (parent === undefined) {
+        parent = null;
+    }
+    if (invokingState === undefined || invokingState === null) {
+        invokingState = -1;
+    }
+    antlr4.ParserRuleContext.call(this, parent, invokingState);
     this.parser = parser;
     this.ruleIndex = SiddhiQLParser.RULE_query_input;
     return this;
@@ -4918,86 +4844,84 @@ function Query_inputContext(parser, parent, invokingState) {
 Query_inputContext.prototype = Object.create(antlr4.ParserRuleContext.prototype);
 Query_inputContext.prototype.constructor = Query_inputContext;
 
-Query_inputContext.prototype.standard_stream = function() {
-    return this.getTypedRuleContext(Standard_streamContext,0);
+Query_inputContext.prototype.standard_stream = function () {
+    return this.getTypedRuleContext(Standard_streamContext, 0);
 };
 
-Query_inputContext.prototype.join_stream = function() {
-    return this.getTypedRuleContext(Join_streamContext,0);
+Query_inputContext.prototype.join_stream = function () {
+    return this.getTypedRuleContext(Join_streamContext, 0);
 };
 
-Query_inputContext.prototype.pattern_stream = function() {
-    return this.getTypedRuleContext(Pattern_streamContext,0);
+Query_inputContext.prototype.pattern_stream = function () {
+    return this.getTypedRuleContext(Pattern_streamContext, 0);
 };
 
-Query_inputContext.prototype.sequence_stream = function() {
-    return this.getTypedRuleContext(Sequence_streamContext,0);
+Query_inputContext.prototype.sequence_stream = function () {
+    return this.getTypedRuleContext(Sequence_streamContext, 0);
 };
 
-Query_inputContext.prototype.anonymous_stream = function() {
-    return this.getTypedRuleContext(Anonymous_streamContext,0);
+Query_inputContext.prototype.anonymous_stream = function () {
+    return this.getTypedRuleContext(Anonymous_streamContext, 0);
 };
 
-Query_inputContext.prototype.enterRule = function(listener) {
-    if(listener instanceof SiddhiQLListener ) {
+Query_inputContext.prototype.enterRule = function (listener) {
+    if (listener instanceof SiddhiQLListener) {
         listener.enterQuery_input(this);
-	}
+    }
 };
 
-Query_inputContext.prototype.exitRule = function(listener) {
-    if(listener instanceof SiddhiQLListener ) {
+Query_inputContext.prototype.exitRule = function (listener) {
+    if (listener instanceof SiddhiQLListener) {
         listener.exitQuery_input(this);
-	}
+    }
 };
-
-
 
 
 SiddhiQLParser.Query_inputContext = Query_inputContext;
 
-SiddhiQLParser.prototype.query_input = function() {
+SiddhiQLParser.prototype.query_input = function () {
 
     var localctx = new Query_inputContext(this, this._ctx, this.state);
     this.enterRule(localctx, 76, SiddhiQLParser.RULE_query_input);
     try {
         this.enterOuterAlt(localctx, 1);
         this.state = 687;
-        var la_ = this._interp.adaptivePredict(this._input,55,this._ctx);
-        switch(la_) {
-        case 1:
-            this.state = 682;
-            this.standard_stream();
-            break;
+        var la_ = this._interp.adaptivePredict(this._input, 55, this._ctx);
+        switch (la_) {
+            case 1:
+                this.state = 682;
+                this.standard_stream();
+                break;
 
-        case 2:
-            this.state = 683;
-            this.join_stream();
-            break;
+            case 2:
+                this.state = 683;
+                this.join_stream();
+                break;
 
-        case 3:
-            this.state = 684;
-            this.pattern_stream();
-            break;
+            case 3:
+                this.state = 684;
+                this.pattern_stream();
+                break;
 
-        case 4:
-            this.state = 685;
-            this.sequence_stream();
-            break;
+            case 4:
+                this.state = 685;
+                this.sequence_stream();
+                break;
 
-        case 5:
-            this.state = 686;
-            this.anonymous_stream();
-            break;
+            case 5:
+                this.state = 686;
+                this.anonymous_stream();
+                break;
 
         }
     } catch (re) {
-    	if(re instanceof antlr4.error.RecognitionException) {
-	        localctx.exception = re;
-	        this._errHandler.reportError(this, re);
-	        this._errHandler.recover(this, re);
-	    } else {
-	    	throw re;
-	    }
+        if (re instanceof antlr4.error.RecognitionException) {
+            localctx.exception = re;
+            this._errHandler.reportError(this, re);
+            this._errHandler.recover(this, re);
+        } else {
+            throw re;
+        }
     } finally {
         this.exitRule();
     }
@@ -5005,13 +4929,13 @@ SiddhiQLParser.prototype.query_input = function() {
 };
 
 function Standard_streamContext(parser, parent, invokingState) {
-	if(parent===undefined) {
-	    parent = null;
-	}
-	if(invokingState===undefined || invokingState===null) {
-		invokingState = -1;
-	}
-	antlr4.ParserRuleContext.call(this, parent, invokingState);
+    if (parent === undefined) {
+        parent = null;
+    }
+    if (invokingState === undefined || invokingState === null) {
+        invokingState = -1;
+    }
+    antlr4.ParserRuleContext.call(this, parent, invokingState);
     this.parser = parser;
     this.ruleIndex = SiddhiQLParser.RULE_standard_stream;
     this.pre_window_handlers = null; // Basic_source_stream_handlersContext
@@ -5022,43 +4946,41 @@ function Standard_streamContext(parser, parent, invokingState) {
 Standard_streamContext.prototype = Object.create(antlr4.ParserRuleContext.prototype);
 Standard_streamContext.prototype.constructor = Standard_streamContext;
 
-Standard_streamContext.prototype.source = function() {
-    return this.getTypedRuleContext(SourceContext,0);
+Standard_streamContext.prototype.source = function () {
+    return this.getTypedRuleContext(SourceContext, 0);
 };
 
-Standard_streamContext.prototype.window = function() {
-    return this.getTypedRuleContext(WindowContext,0);
+Standard_streamContext.prototype.window = function () {
+    return this.getTypedRuleContext(WindowContext, 0);
 };
 
-Standard_streamContext.prototype.basic_source_stream_handlers = function(i) {
-    if(i===undefined) {
+Standard_streamContext.prototype.basic_source_stream_handlers = function (i) {
+    if (i === undefined) {
         i = null;
     }
-    if(i===null) {
+    if (i === null) {
         return this.getTypedRuleContexts(Basic_source_stream_handlersContext);
     } else {
-        return this.getTypedRuleContext(Basic_source_stream_handlersContext,i);
+        return this.getTypedRuleContext(Basic_source_stream_handlersContext, i);
     }
 };
 
-Standard_streamContext.prototype.enterRule = function(listener) {
-    if(listener instanceof SiddhiQLListener ) {
+Standard_streamContext.prototype.enterRule = function (listener) {
+    if (listener instanceof SiddhiQLListener) {
         listener.enterStandard_stream(this);
-	}
+    }
 };
 
-Standard_streamContext.prototype.exitRule = function(listener) {
-    if(listener instanceof SiddhiQLListener ) {
+Standard_streamContext.prototype.exitRule = function (listener) {
+    if (listener instanceof SiddhiQLListener) {
         listener.exitStandard_stream(this);
-	}
+    }
 };
-
-
 
 
 SiddhiQLParser.Standard_streamContext = Standard_streamContext;
 
-SiddhiQLParser.prototype.standard_stream = function() {
+SiddhiQLParser.prototype.standard_stream = function () {
 
     var localctx = new Standard_streamContext(this, this._ctx, this.state);
     this.enterRule(localctx, 78, SiddhiQLParser.RULE_standard_stream);
@@ -5068,34 +4990,34 @@ SiddhiQLParser.prototype.standard_stream = function() {
         this.state = 689;
         this.source();
         this.state = 691;
-        var la_ = this._interp.adaptivePredict(this._input,56,this._ctx);
-        if(la_===1) {
+        var la_ = this._interp.adaptivePredict(this._input, 56, this._ctx);
+        if (la_ === 1) {
             this.state = 690;
             localctx.pre_window_handlers = this.basic_source_stream_handlers();
 
         }
         this.state = 694;
-        var la_ = this._interp.adaptivePredict(this._input,57,this._ctx);
-        if(la_===1) {
+        var la_ = this._interp.adaptivePredict(this._input, 57, this._ctx);
+        if (la_ === 1) {
             this.state = 693;
             this.window();
 
         }
         this.state = 697;
         _la = this._input.LA(1);
-        if(_la===SiddhiQLParser.OPEN_SQUARE_BRACKETS || _la===SiddhiQLParser.HASH) {
+        if (_la === SiddhiQLParser.OPEN_SQUARE_BRACKETS || _la === SiddhiQLParser.HASH) {
             this.state = 696;
             localctx.post_window_handlers = this.basic_source_stream_handlers();
         }
 
     } catch (re) {
-    	if(re instanceof antlr4.error.RecognitionException) {
-	        localctx.exception = re;
-	        this._errHandler.reportError(this, re);
-	        this._errHandler.recover(this, re);
-	    } else {
-	    	throw re;
-	    }
+        if (re instanceof antlr4.error.RecognitionException) {
+            localctx.exception = re;
+            this._errHandler.reportError(this, re);
+            this._errHandler.recover(this, re);
+        } else {
+            throw re;
+        }
     } finally {
         this.exitRule();
     }
@@ -5103,13 +5025,13 @@ SiddhiQLParser.prototype.standard_stream = function() {
 };
 
 function Join_streamContext(parser, parent, invokingState) {
-	if(parent===undefined) {
-	    parent = null;
-	}
-	if(invokingState===undefined || invokingState===null) {
-		invokingState = -1;
-	}
-	antlr4.ParserRuleContext.call(this, parent, invokingState);
+    if (parent === undefined) {
+        parent = null;
+    }
+    if (invokingState === undefined || invokingState === null) {
+        invokingState = -1;
+    }
+    antlr4.ParserRuleContext.call(this, parent, invokingState);
     this.parser = parser;
     this.ruleIndex = SiddhiQLParser.RULE_join_stream;
     this.left_source = null; // Join_sourceContext
@@ -5122,59 +5044,57 @@ function Join_streamContext(parser, parent, invokingState) {
 Join_streamContext.prototype = Object.create(antlr4.ParserRuleContext.prototype);
 Join_streamContext.prototype.constructor = Join_streamContext;
 
-Join_streamContext.prototype.join_source = function(i) {
-    if(i===undefined) {
+Join_streamContext.prototype.join_source = function (i) {
+    if (i === undefined) {
         i = null;
     }
-    if(i===null) {
+    if (i === null) {
         return this.getTypedRuleContexts(Join_sourceContext);
     } else {
-        return this.getTypedRuleContext(Join_sourceContext,i);
+        return this.getTypedRuleContext(Join_sourceContext, i);
     }
 };
 
-Join_streamContext.prototype.join = function() {
-    return this.getTypedRuleContext(JoinContext,0);
+Join_streamContext.prototype.join = function () {
+    return this.getTypedRuleContext(JoinContext, 0);
 };
 
-Join_streamContext.prototype.UNIDIRECTIONAL = function() {
+Join_streamContext.prototype.UNIDIRECTIONAL = function () {
     return this.getToken(SiddhiQLParser.UNIDIRECTIONAL, 0);
 };
 
-Join_streamContext.prototype.ON = function() {
+Join_streamContext.prototype.ON = function () {
     return this.getToken(SiddhiQLParser.ON, 0);
 };
 
-Join_streamContext.prototype.expression = function() {
-    return this.getTypedRuleContext(ExpressionContext,0);
+Join_streamContext.prototype.expression = function () {
+    return this.getTypedRuleContext(ExpressionContext, 0);
 };
 
-Join_streamContext.prototype.within_time_range = function() {
-    return this.getTypedRuleContext(Within_time_rangeContext,0);
+Join_streamContext.prototype.within_time_range = function () {
+    return this.getTypedRuleContext(Within_time_rangeContext, 0);
 };
 
-Join_streamContext.prototype.per = function() {
-    return this.getTypedRuleContext(PerContext,0);
+Join_streamContext.prototype.per = function () {
+    return this.getTypedRuleContext(PerContext, 0);
 };
 
-Join_streamContext.prototype.enterRule = function(listener) {
-    if(listener instanceof SiddhiQLListener ) {
+Join_streamContext.prototype.enterRule = function (listener) {
+    if (listener instanceof SiddhiQLListener) {
         listener.enterJoin_stream(this);
-	}
+    }
 };
 
-Join_streamContext.prototype.exitRule = function(listener) {
-    if(listener instanceof SiddhiQLListener ) {
+Join_streamContext.prototype.exitRule = function (listener) {
+    if (listener instanceof SiddhiQLListener) {
         listener.exitJoin_stream(this);
-	}
+    }
 };
-
-
 
 
 SiddhiQLParser.Join_streamContext = Join_streamContext;
 
-SiddhiQLParser.prototype.join_stream = function() {
+SiddhiQLParser.prototype.join_stream = function () {
 
     var localctx = new Join_streamContext(this, this._ctx, this.state);
     this.enterRule(localctx, 80, SiddhiQLParser.RULE_join_stream);
@@ -5184,39 +5104,39 @@ SiddhiQLParser.prototype.join_stream = function() {
         this.state = 699;
         localctx.left_source = this.join_source();
         this.state = 709;
-        switch(this._input.LA(1)) {
-        case SiddhiQLParser.JOIN:
-        case SiddhiQLParser.INNER:
-        case SiddhiQLParser.OUTER:
-        case SiddhiQLParser.RIGHT:
-        case SiddhiQLParser.LEFT:
-        case SiddhiQLParser.FULL:
-            this.state = 700;
-            this.join();
-            this.state = 701;
-            localctx.right_source = this.join_source();
-            this.state = 703;
-            _la = this._input.LA(1);
-            if(_la===SiddhiQLParser.UNIDIRECTIONAL) {
-                this.state = 702;
-                localctx.right_unidirectional = this.match(SiddhiQLParser.UNIDIRECTIONAL);
-            }
+        switch (this._input.LA(1)) {
+            case SiddhiQLParser.JOIN:
+            case SiddhiQLParser.INNER:
+            case SiddhiQLParser.OUTER:
+            case SiddhiQLParser.RIGHT:
+            case SiddhiQLParser.LEFT:
+            case SiddhiQLParser.FULL:
+                this.state = 700;
+                this.join();
+                this.state = 701;
+                localctx.right_source = this.join_source();
+                this.state = 703;
+                _la = this._input.LA(1);
+                if (_la === SiddhiQLParser.UNIDIRECTIONAL) {
+                    this.state = 702;
+                    localctx.right_unidirectional = this.match(SiddhiQLParser.UNIDIRECTIONAL);
+                }
 
-            break;
-        case SiddhiQLParser.UNIDIRECTIONAL:
-            this.state = 705;
-            localctx.left_unidirectional = this.match(SiddhiQLParser.UNIDIRECTIONAL);
-            this.state = 706;
-            this.join();
-            this.state = 707;
-            localctx.right_source = this.join_source();
-            break;
-        default:
-            throw new antlr4.error.NoViableAltException(this);
+                break;
+            case SiddhiQLParser.UNIDIRECTIONAL:
+                this.state = 705;
+                localctx.left_unidirectional = this.match(SiddhiQLParser.UNIDIRECTIONAL);
+                this.state = 706;
+                this.join();
+                this.state = 707;
+                localctx.right_source = this.join_source();
+                break;
+            default:
+                throw new antlr4.error.NoViableAltException(this);
         }
         this.state = 713;
         _la = this._input.LA(1);
-        if(_la===SiddhiQLParser.ON) {
+        if (_la === SiddhiQLParser.ON) {
             this.state = 711;
             this.match(SiddhiQLParser.ON);
             this.state = 712;
@@ -5225,7 +5145,7 @@ SiddhiQLParser.prototype.join_stream = function() {
 
         this.state = 718;
         _la = this._input.LA(1);
-        if(_la===SiddhiQLParser.WITHIN) {
+        if (_la === SiddhiQLParser.WITHIN) {
             this.state = 715;
             this.within_time_range();
             this.state = 716;
@@ -5233,13 +5153,13 @@ SiddhiQLParser.prototype.join_stream = function() {
         }
 
     } catch (re) {
-    	if(re instanceof antlr4.error.RecognitionException) {
-	        localctx.exception = re;
-	        this._errHandler.reportError(this, re);
-	        this._errHandler.recover(this, re);
-	    } else {
-	    	throw re;
-	    }
+        if (re instanceof antlr4.error.RecognitionException) {
+            localctx.exception = re;
+            this._errHandler.reportError(this, re);
+            this._errHandler.recover(this, re);
+        } else {
+            throw re;
+        }
     } finally {
         this.exitRule();
     }
@@ -5247,13 +5167,13 @@ SiddhiQLParser.prototype.join_stream = function() {
 };
 
 function Join_sourceContext(parser, parent, invokingState) {
-	if(parent===undefined) {
-	    parent = null;
-	}
-	if(invokingState===undefined || invokingState===null) {
-		invokingState = -1;
-	}
-	antlr4.ParserRuleContext.call(this, parent, invokingState);
+    if (parent === undefined) {
+        parent = null;
+    }
+    if (invokingState === undefined || invokingState === null) {
+        invokingState = -1;
+    }
+    antlr4.ParserRuleContext.call(this, parent, invokingState);
     this.parser = parser;
     this.ruleIndex = SiddhiQLParser.RULE_join_source;
     return this;
@@ -5262,44 +5182,42 @@ function Join_sourceContext(parser, parent, invokingState) {
 Join_sourceContext.prototype = Object.create(antlr4.ParserRuleContext.prototype);
 Join_sourceContext.prototype.constructor = Join_sourceContext;
 
-Join_sourceContext.prototype.source = function() {
-    return this.getTypedRuleContext(SourceContext,0);
+Join_sourceContext.prototype.source = function () {
+    return this.getTypedRuleContext(SourceContext, 0);
 };
 
-Join_sourceContext.prototype.basic_source_stream_handlers = function() {
-    return this.getTypedRuleContext(Basic_source_stream_handlersContext,0);
+Join_sourceContext.prototype.basic_source_stream_handlers = function () {
+    return this.getTypedRuleContext(Basic_source_stream_handlersContext, 0);
 };
 
-Join_sourceContext.prototype.window = function() {
-    return this.getTypedRuleContext(WindowContext,0);
+Join_sourceContext.prototype.window = function () {
+    return this.getTypedRuleContext(WindowContext, 0);
 };
 
-Join_sourceContext.prototype.AS = function() {
+Join_sourceContext.prototype.AS = function () {
     return this.getToken(SiddhiQLParser.AS, 0);
 };
 
-Join_sourceContext.prototype.alias = function() {
-    return this.getTypedRuleContext(AliasContext,0);
+Join_sourceContext.prototype.alias = function () {
+    return this.getTypedRuleContext(AliasContext, 0);
 };
 
-Join_sourceContext.prototype.enterRule = function(listener) {
-    if(listener instanceof SiddhiQLListener ) {
+Join_sourceContext.prototype.enterRule = function (listener) {
+    if (listener instanceof SiddhiQLListener) {
         listener.enterJoin_source(this);
-	}
+    }
 };
 
-Join_sourceContext.prototype.exitRule = function(listener) {
-    if(listener instanceof SiddhiQLListener ) {
+Join_sourceContext.prototype.exitRule = function (listener) {
+    if (listener instanceof SiddhiQLListener) {
         listener.exitJoin_source(this);
-	}
+    }
 };
-
-
 
 
 SiddhiQLParser.Join_sourceContext = Join_sourceContext;
 
-SiddhiQLParser.prototype.join_source = function() {
+SiddhiQLParser.prototype.join_source = function () {
 
     var localctx = new Join_sourceContext(this, this._ctx, this.state);
     this.enterRule(localctx, 82, SiddhiQLParser.RULE_join_source);
@@ -5309,22 +5227,22 @@ SiddhiQLParser.prototype.join_source = function() {
         this.state = 720;
         this.source();
         this.state = 722;
-        var la_ = this._interp.adaptivePredict(this._input,63,this._ctx);
-        if(la_===1) {
+        var la_ = this._interp.adaptivePredict(this._input, 63, this._ctx);
+        if (la_ === 1) {
             this.state = 721;
             this.basic_source_stream_handlers();
 
         }
         this.state = 725;
         _la = this._input.LA(1);
-        if(_la===SiddhiQLParser.HASH) {
+        if (_la === SiddhiQLParser.HASH) {
             this.state = 724;
             this.window();
         }
 
         this.state = 729;
         _la = this._input.LA(1);
-        if(_la===SiddhiQLParser.AS) {
+        if (_la === SiddhiQLParser.AS) {
             this.state = 727;
             this.match(SiddhiQLParser.AS);
             this.state = 728;
@@ -5332,13 +5250,13 @@ SiddhiQLParser.prototype.join_source = function() {
         }
 
     } catch (re) {
-    	if(re instanceof antlr4.error.RecognitionException) {
-	        localctx.exception = re;
-	        this._errHandler.reportError(this, re);
-	        this._errHandler.recover(this, re);
-	    } else {
-	    	throw re;
-	    }
+        if (re instanceof antlr4.error.RecognitionException) {
+            localctx.exception = re;
+            this._errHandler.reportError(this, re);
+            this._errHandler.recover(this, re);
+        } else {
+            throw re;
+        }
     } finally {
         this.exitRule();
     }
@@ -5346,13 +5264,13 @@ SiddhiQLParser.prototype.join_source = function() {
 };
 
 function Pattern_streamContext(parser, parent, invokingState) {
-	if(parent===undefined) {
-	    parent = null;
-	}
-	if(invokingState===undefined || invokingState===null) {
-		invokingState = -1;
-	}
-	antlr4.ParserRuleContext.call(this, parent, invokingState);
+    if (parent === undefined) {
+        parent = null;
+    }
+    if (invokingState === undefined || invokingState === null) {
+        invokingState = -1;
+    }
+    antlr4.ParserRuleContext.call(this, parent, invokingState);
     this.parser = parser;
     this.ruleIndex = SiddhiQLParser.RULE_pattern_stream;
     return this;
@@ -5361,60 +5279,58 @@ function Pattern_streamContext(parser, parent, invokingState) {
 Pattern_streamContext.prototype = Object.create(antlr4.ParserRuleContext.prototype);
 Pattern_streamContext.prototype.constructor = Pattern_streamContext;
 
-Pattern_streamContext.prototype.every_pattern_source_chain = function() {
-    return this.getTypedRuleContext(Every_pattern_source_chainContext,0);
+Pattern_streamContext.prototype.every_pattern_source_chain = function () {
+    return this.getTypedRuleContext(Every_pattern_source_chainContext, 0);
 };
 
-Pattern_streamContext.prototype.absent_pattern_source_chain = function() {
-    return this.getTypedRuleContext(Absent_pattern_source_chainContext,0);
+Pattern_streamContext.prototype.absent_pattern_source_chain = function () {
+    return this.getTypedRuleContext(Absent_pattern_source_chainContext, 0);
 };
 
-Pattern_streamContext.prototype.enterRule = function(listener) {
-    if(listener instanceof SiddhiQLListener ) {
+Pattern_streamContext.prototype.enterRule = function (listener) {
+    if (listener instanceof SiddhiQLListener) {
         listener.enterPattern_stream(this);
-	}
+    }
 };
 
-Pattern_streamContext.prototype.exitRule = function(listener) {
-    if(listener instanceof SiddhiQLListener ) {
+Pattern_streamContext.prototype.exitRule = function (listener) {
+    if (listener instanceof SiddhiQLListener) {
         listener.exitPattern_stream(this);
-	}
+    }
 };
-
-
 
 
 SiddhiQLParser.Pattern_streamContext = Pattern_streamContext;
 
-SiddhiQLParser.prototype.pattern_stream = function() {
+SiddhiQLParser.prototype.pattern_stream = function () {
 
     var localctx = new Pattern_streamContext(this, this._ctx, this.state);
     this.enterRule(localctx, 84, SiddhiQLParser.RULE_pattern_stream);
     try {
         this.state = 733;
-        var la_ = this._interp.adaptivePredict(this._input,66,this._ctx);
-        switch(la_) {
-        case 1:
-            this.enterOuterAlt(localctx, 1);
-            this.state = 731;
-            this.every_pattern_source_chain(0);
-            break;
+        var la_ = this._interp.adaptivePredict(this._input, 66, this._ctx);
+        switch (la_) {
+            case 1:
+                this.enterOuterAlt(localctx, 1);
+                this.state = 731;
+                this.every_pattern_source_chain(0);
+                break;
 
-        case 2:
-            this.enterOuterAlt(localctx, 2);
-            this.state = 732;
-            this.absent_pattern_source_chain();
-            break;
+            case 2:
+                this.enterOuterAlt(localctx, 2);
+                this.state = 732;
+                this.absent_pattern_source_chain();
+                break;
 
         }
     } catch (re) {
-    	if(re instanceof antlr4.error.RecognitionException) {
-	        localctx.exception = re;
-	        this._errHandler.reportError(this, re);
-	        this._errHandler.recover(this, re);
-	    } else {
-	    	throw re;
-	    }
+        if (re instanceof antlr4.error.RecognitionException) {
+            localctx.exception = re;
+            this._errHandler.reportError(this, re);
+            this._errHandler.recover(this, re);
+        } else {
+            throw re;
+        }
     } finally {
         this.exitRule();
     }
@@ -5422,13 +5338,13 @@ SiddhiQLParser.prototype.pattern_stream = function() {
 };
 
 function Every_pattern_source_chainContext(parser, parent, invokingState) {
-	if(parent===undefined) {
-	    parent = null;
-	}
-	if(invokingState===undefined || invokingState===null) {
-		invokingState = -1;
-	}
-	antlr4.ParserRuleContext.call(this, parent, invokingState);
+    if (parent === undefined) {
+        parent = null;
+    }
+    if (invokingState === undefined || invokingState === null) {
+        invokingState = -1;
+    }
+    antlr4.ParserRuleContext.call(this, parent, invokingState);
     this.parser = parser;
     this.ruleIndex = SiddhiQLParser.RULE_every_pattern_source_chain;
     return this;
@@ -5437,51 +5353,50 @@ function Every_pattern_source_chainContext(parser, parent, invokingState) {
 Every_pattern_source_chainContext.prototype = Object.create(antlr4.ParserRuleContext.prototype);
 Every_pattern_source_chainContext.prototype.constructor = Every_pattern_source_chainContext;
 
-Every_pattern_source_chainContext.prototype.every_pattern_source_chain = function(i) {
-    if(i===undefined) {
+Every_pattern_source_chainContext.prototype.every_pattern_source_chain = function (i) {
+    if (i === undefined) {
         i = null;
     }
-    if(i===null) {
+    if (i === null) {
         return this.getTypedRuleContexts(Every_pattern_source_chainContext);
     } else {
-        return this.getTypedRuleContext(Every_pattern_source_chainContext,i);
+        return this.getTypedRuleContext(Every_pattern_source_chainContext, i);
     }
 };
 
-Every_pattern_source_chainContext.prototype.within_time = function() {
-    return this.getTypedRuleContext(Within_timeContext,0);
+Every_pattern_source_chainContext.prototype.within_time = function () {
+    return this.getTypedRuleContext(Within_timeContext, 0);
 };
 
-Every_pattern_source_chainContext.prototype.EVERY = function() {
+Every_pattern_source_chainContext.prototype.EVERY = function () {
     return this.getToken(SiddhiQLParser.EVERY, 0);
 };
 
-Every_pattern_source_chainContext.prototype.pattern_source_chain = function() {
-    return this.getTypedRuleContext(Pattern_source_chainContext,0);
+Every_pattern_source_chainContext.prototype.pattern_source_chain = function () {
+    return this.getTypedRuleContext(Pattern_source_chainContext, 0);
 };
 
-Every_pattern_source_chainContext.prototype.pattern_source = function() {
-    return this.getTypedRuleContext(Pattern_sourceContext,0);
+Every_pattern_source_chainContext.prototype.pattern_source = function () {
+    return this.getTypedRuleContext(Pattern_sourceContext, 0);
 };
 
-Every_pattern_source_chainContext.prototype.enterRule = function(listener) {
-    if(listener instanceof SiddhiQLListener ) {
+Every_pattern_source_chainContext.prototype.enterRule = function (listener) {
+    if (listener instanceof SiddhiQLListener) {
         listener.enterEvery_pattern_source_chain(this);
-	}
+    }
 };
 
-Every_pattern_source_chainContext.prototype.exitRule = function(listener) {
-    if(listener instanceof SiddhiQLListener ) {
+Every_pattern_source_chainContext.prototype.exitRule = function (listener) {
+    if (listener instanceof SiddhiQLListener) {
         listener.exitEvery_pattern_source_chain(this);
-	}
+    }
 };
 
 
-
-SiddhiQLParser.prototype.every_pattern_source_chain = function(_p) {
-	if(_p===undefined) {
-	    _p = 0;
-	}
+SiddhiQLParser.prototype.every_pattern_source_chain = function (_p) {
+    if (_p === undefined) {
+        _p = 0;
+    }
     var _parentctx = this._ctx;
     var _parentState = this.state;
     var localctx = new Every_pattern_source_chainContext(this, this._ctx, _parentState);
@@ -5491,69 +5406,69 @@ SiddhiQLParser.prototype.every_pattern_source_chain = function(_p) {
     try {
         this.enterOuterAlt(localctx, 1);
         this.state = 755;
-        var la_ = this._interp.adaptivePredict(this._input,70,this._ctx);
-        switch(la_) {
-        case 1:
-            this.state = 736;
-            this.match(SiddhiQLParser.OPEN_PAR);
-            this.state = 737;
-            this.every_pattern_source_chain(0);
-            this.state = 738;
-            this.match(SiddhiQLParser.CLOSE_PAR);
-            this.state = 740;
-            var la_ = this._interp.adaptivePredict(this._input,67,this._ctx);
-            if(la_===1) {
-                this.state = 739;
-                this.within_time();
+        var la_ = this._interp.adaptivePredict(this._input, 70, this._ctx);
+        switch (la_) {
+            case 1:
+                this.state = 736;
+                this.match(SiddhiQLParser.OPEN_PAR);
+                this.state = 737;
+                this.every_pattern_source_chain(0);
+                this.state = 738;
+                this.match(SiddhiQLParser.CLOSE_PAR);
+                this.state = 740;
+                var la_ = this._interp.adaptivePredict(this._input, 67, this._ctx);
+                if (la_ === 1) {
+                    this.state = 739;
+                    this.within_time();
 
-            }
-            break;
+                }
+                break;
 
-        case 2:
-            this.state = 742;
-            this.match(SiddhiQLParser.EVERY);
-            this.state = 743;
-            this.match(SiddhiQLParser.OPEN_PAR);
-            this.state = 744;
-            this.pattern_source_chain(0);
-            this.state = 745;
-            this.match(SiddhiQLParser.CLOSE_PAR);
-            this.state = 747;
-            var la_ = this._interp.adaptivePredict(this._input,68,this._ctx);
-            if(la_===1) {
-                this.state = 746;
-                this.within_time();
+            case 2:
+                this.state = 742;
+                this.match(SiddhiQLParser.EVERY);
+                this.state = 743;
+                this.match(SiddhiQLParser.OPEN_PAR);
+                this.state = 744;
+                this.pattern_source_chain(0);
+                this.state = 745;
+                this.match(SiddhiQLParser.CLOSE_PAR);
+                this.state = 747;
+                var la_ = this._interp.adaptivePredict(this._input, 68, this._ctx);
+                if (la_ === 1) {
+                    this.state = 746;
+                    this.within_time();
 
-            }
-            break;
+                }
+                break;
 
-        case 3:
-            this.state = 749;
-            this.pattern_source_chain(0);
-            break;
+            case 3:
+                this.state = 749;
+                this.pattern_source_chain(0);
+                break;
 
-        case 4:
-            this.state = 750;
-            this.match(SiddhiQLParser.EVERY);
-            this.state = 751;
-            this.pattern_source();
-            this.state = 753;
-            var la_ = this._interp.adaptivePredict(this._input,69,this._ctx);
-            if(la_===1) {
-                this.state = 752;
-                this.within_time();
+            case 4:
+                this.state = 750;
+                this.match(SiddhiQLParser.EVERY);
+                this.state = 751;
+                this.pattern_source();
+                this.state = 753;
+                var la_ = this._interp.adaptivePredict(this._input, 69, this._ctx);
+                if (la_ === 1) {
+                    this.state = 752;
+                    this.within_time();
 
-            }
-            break;
+                }
+                break;
 
         }
         this._ctx.stop = this._input.LT(-1);
         this.state = 762;
         this._errHandler.sync(this);
-        var _alt = this._interp.adaptivePredict(this._input,71,this._ctx)
-        while(_alt!=2 && _alt!=antlr4.atn.ATN.INVALID_ALT_NUMBER) {
-            if(_alt===1) {
-                if(this._parseListeners!==null) {
+        var _alt = this._interp.adaptivePredict(this._input, 71, this._ctx)
+        while (_alt != 2 && _alt != antlr4.atn.ATN.INVALID_ALT_NUMBER) {
+            if (_alt === 1) {
+                if (this._parseListeners !== null) {
                     this.triggerExitRuleEvent();
                 }
                 _prevctx = localctx;
@@ -5566,21 +5481,21 @@ SiddhiQLParser.prototype.every_pattern_source_chain = function(_p) {
                 this.state = 758;
                 this.match(SiddhiQLParser.FOLLOWED_BY);
                 this.state = 759;
-                this.every_pattern_source_chain(4); 
+                this.every_pattern_source_chain(4);
             }
             this.state = 764;
             this._errHandler.sync(this);
-            _alt = this._interp.adaptivePredict(this._input,71,this._ctx);
+            _alt = this._interp.adaptivePredict(this._input, 71, this._ctx);
         }
 
-    } catch( error) {
-        if(error instanceof antlr4.error.RecognitionException) {
-	        localctx.exception = error;
-	        this._errHandler.reportError(this, error);
-	        this._errHandler.recover(this, error);
-	    } else {
-	    	throw error;
-	    }
+    } catch (error) {
+        if (error instanceof antlr4.error.RecognitionException) {
+            localctx.exception = error;
+            this._errHandler.reportError(this, error);
+            this._errHandler.recover(this, error);
+        } else {
+            throw error;
+        }
     } finally {
         this.unrollRecursionContexts(_parentctx)
     }
@@ -5588,13 +5503,13 @@ SiddhiQLParser.prototype.every_pattern_source_chain = function(_p) {
 };
 
 function Pattern_source_chainContext(parser, parent, invokingState) {
-	if(parent===undefined) {
-	    parent = null;
-	}
-	if(invokingState===undefined || invokingState===null) {
-		invokingState = -1;
-	}
-	antlr4.ParserRuleContext.call(this, parent, invokingState);
+    if (parent === undefined) {
+        parent = null;
+    }
+    if (invokingState === undefined || invokingState === null) {
+        invokingState = -1;
+    }
+    antlr4.ParserRuleContext.call(this, parent, invokingState);
     this.parser = parser;
     this.ruleIndex = SiddhiQLParser.RULE_pattern_source_chain;
     return this;
@@ -5603,43 +5518,42 @@ function Pattern_source_chainContext(parser, parent, invokingState) {
 Pattern_source_chainContext.prototype = Object.create(antlr4.ParserRuleContext.prototype);
 Pattern_source_chainContext.prototype.constructor = Pattern_source_chainContext;
 
-Pattern_source_chainContext.prototype.pattern_source_chain = function(i) {
-    if(i===undefined) {
+Pattern_source_chainContext.prototype.pattern_source_chain = function (i) {
+    if (i === undefined) {
         i = null;
     }
-    if(i===null) {
+    if (i === null) {
         return this.getTypedRuleContexts(Pattern_source_chainContext);
     } else {
-        return this.getTypedRuleContext(Pattern_source_chainContext,i);
+        return this.getTypedRuleContext(Pattern_source_chainContext, i);
     }
 };
 
-Pattern_source_chainContext.prototype.within_time = function() {
-    return this.getTypedRuleContext(Within_timeContext,0);
+Pattern_source_chainContext.prototype.within_time = function () {
+    return this.getTypedRuleContext(Within_timeContext, 0);
 };
 
-Pattern_source_chainContext.prototype.pattern_source = function() {
-    return this.getTypedRuleContext(Pattern_sourceContext,0);
+Pattern_source_chainContext.prototype.pattern_source = function () {
+    return this.getTypedRuleContext(Pattern_sourceContext, 0);
 };
 
-Pattern_source_chainContext.prototype.enterRule = function(listener) {
-    if(listener instanceof SiddhiQLListener ) {
+Pattern_source_chainContext.prototype.enterRule = function (listener) {
+    if (listener instanceof SiddhiQLListener) {
         listener.enterPattern_source_chain(this);
-	}
+    }
 };
 
-Pattern_source_chainContext.prototype.exitRule = function(listener) {
-    if(listener instanceof SiddhiQLListener ) {
+Pattern_source_chainContext.prototype.exitRule = function (listener) {
+    if (listener instanceof SiddhiQLListener) {
         listener.exitPattern_source_chain(this);
-	}
+    }
 };
 
 
-
-SiddhiQLParser.prototype.pattern_source_chain = function(_p) {
-	if(_p===undefined) {
-	    _p = 0;
-	}
+SiddhiQLParser.prototype.pattern_source_chain = function (_p) {
+    if (_p === undefined) {
+        _p = 0;
+    }
     var _parentctx = this._ctx;
     var _parentState = this.state;
     var localctx = new Pattern_source_chainContext(this, this._ctx, _parentState);
@@ -5649,44 +5563,44 @@ SiddhiQLParser.prototype.pattern_source_chain = function(_p) {
     try {
         this.enterOuterAlt(localctx, 1);
         this.state = 776;
-        var la_ = this._interp.adaptivePredict(this._input,74,this._ctx);
-        switch(la_) {
-        case 1:
-            this.state = 766;
-            this.match(SiddhiQLParser.OPEN_PAR);
-            this.state = 767;
-            this.pattern_source_chain(0);
-            this.state = 768;
-            this.match(SiddhiQLParser.CLOSE_PAR);
-            this.state = 770;
-            var la_ = this._interp.adaptivePredict(this._input,72,this._ctx);
-            if(la_===1) {
-                this.state = 769;
-                this.within_time();
+        var la_ = this._interp.adaptivePredict(this._input, 74, this._ctx);
+        switch (la_) {
+            case 1:
+                this.state = 766;
+                this.match(SiddhiQLParser.OPEN_PAR);
+                this.state = 767;
+                this.pattern_source_chain(0);
+                this.state = 768;
+                this.match(SiddhiQLParser.CLOSE_PAR);
+                this.state = 770;
+                var la_ = this._interp.adaptivePredict(this._input, 72, this._ctx);
+                if (la_ === 1) {
+                    this.state = 769;
+                    this.within_time();
 
-            }
-            break;
+                }
+                break;
 
-        case 2:
-            this.state = 772;
-            this.pattern_source();
-            this.state = 774;
-            var la_ = this._interp.adaptivePredict(this._input,73,this._ctx);
-            if(la_===1) {
-                this.state = 773;
-                this.within_time();
+            case 2:
+                this.state = 772;
+                this.pattern_source();
+                this.state = 774;
+                var la_ = this._interp.adaptivePredict(this._input, 73, this._ctx);
+                if (la_ === 1) {
+                    this.state = 773;
+                    this.within_time();
 
-            }
-            break;
+                }
+                break;
 
         }
         this._ctx.stop = this._input.LT(-1);
         this.state = 783;
         this._errHandler.sync(this);
-        var _alt = this._interp.adaptivePredict(this._input,75,this._ctx)
-        while(_alt!=2 && _alt!=antlr4.atn.ATN.INVALID_ALT_NUMBER) {
-            if(_alt===1) {
-                if(this._parseListeners!==null) {
+        var _alt = this._interp.adaptivePredict(this._input, 75, this._ctx)
+        while (_alt != 2 && _alt != antlr4.atn.ATN.INVALID_ALT_NUMBER) {
+            if (_alt === 1) {
+                if (this._parseListeners !== null) {
                     this.triggerExitRuleEvent();
                 }
                 _prevctx = localctx;
@@ -5699,21 +5613,21 @@ SiddhiQLParser.prototype.pattern_source_chain = function(_p) {
                 this.state = 779;
                 this.match(SiddhiQLParser.FOLLOWED_BY);
                 this.state = 780;
-                this.pattern_source_chain(3); 
+                this.pattern_source_chain(3);
             }
             this.state = 785;
             this._errHandler.sync(this);
-            _alt = this._interp.adaptivePredict(this._input,75,this._ctx);
+            _alt = this._interp.adaptivePredict(this._input, 75, this._ctx);
         }
 
-    } catch( error) {
-        if(error instanceof antlr4.error.RecognitionException) {
-	        localctx.exception = error;
-	        this._errHandler.reportError(this, error);
-	        this._errHandler.recover(this, error);
-	    } else {
-	    	throw error;
-	    }
+    } catch (error) {
+        if (error instanceof antlr4.error.RecognitionException) {
+            localctx.exception = error;
+            this._errHandler.reportError(this, error);
+            this._errHandler.recover(this, error);
+        } else {
+            throw error;
+        }
     } finally {
         this.unrollRecursionContexts(_parentctx)
     }
@@ -5721,13 +5635,13 @@ SiddhiQLParser.prototype.pattern_source_chain = function(_p) {
 };
 
 function Absent_pattern_source_chainContext(parser, parent, invokingState) {
-	if(parent===undefined) {
-	    parent = null;
-	}
-	if(invokingState===undefined || invokingState===null) {
-		invokingState = -1;
-	}
-	antlr4.ParserRuleContext.call(this, parent, invokingState);
+    if (parent === undefined) {
+        parent = null;
+    }
+    if (invokingState === undefined || invokingState === null) {
+        invokingState = -1;
+    }
+    antlr4.ParserRuleContext.call(this, parent, invokingState);
     this.parser = parser;
     this.ruleIndex = SiddhiQLParser.RULE_absent_pattern_source_chain;
     return this;
@@ -5736,107 +5650,105 @@ function Absent_pattern_source_chainContext(parser, parent, invokingState) {
 Absent_pattern_source_chainContext.prototype = Object.create(antlr4.ParserRuleContext.prototype);
 Absent_pattern_source_chainContext.prototype.constructor = Absent_pattern_source_chainContext;
 
-Absent_pattern_source_chainContext.prototype.absent_pattern_source_chain = function() {
-    return this.getTypedRuleContext(Absent_pattern_source_chainContext,0);
+Absent_pattern_source_chainContext.prototype.absent_pattern_source_chain = function () {
+    return this.getTypedRuleContext(Absent_pattern_source_chainContext, 0);
 };
 
-Absent_pattern_source_chainContext.prototype.EVERY = function() {
+Absent_pattern_source_chainContext.prototype.EVERY = function () {
     return this.getToken(SiddhiQLParser.EVERY, 0);
 };
 
-Absent_pattern_source_chainContext.prototype.within_time = function() {
-    return this.getTypedRuleContext(Within_timeContext,0);
+Absent_pattern_source_chainContext.prototype.within_time = function () {
+    return this.getTypedRuleContext(Within_timeContext, 0);
 };
 
-Absent_pattern_source_chainContext.prototype.every_absent_pattern_source = function() {
-    return this.getTypedRuleContext(Every_absent_pattern_sourceContext,0);
+Absent_pattern_source_chainContext.prototype.every_absent_pattern_source = function () {
+    return this.getTypedRuleContext(Every_absent_pattern_sourceContext, 0);
 };
 
-Absent_pattern_source_chainContext.prototype.left_absent_pattern_source = function() {
-    return this.getTypedRuleContext(Left_absent_pattern_sourceContext,0);
+Absent_pattern_source_chainContext.prototype.left_absent_pattern_source = function () {
+    return this.getTypedRuleContext(Left_absent_pattern_sourceContext, 0);
 };
 
-Absent_pattern_source_chainContext.prototype.right_absent_pattern_source = function() {
-    return this.getTypedRuleContext(Right_absent_pattern_sourceContext,0);
+Absent_pattern_source_chainContext.prototype.right_absent_pattern_source = function () {
+    return this.getTypedRuleContext(Right_absent_pattern_sourceContext, 0);
 };
 
-Absent_pattern_source_chainContext.prototype.enterRule = function(listener) {
-    if(listener instanceof SiddhiQLListener ) {
+Absent_pattern_source_chainContext.prototype.enterRule = function (listener) {
+    if (listener instanceof SiddhiQLListener) {
         listener.enterAbsent_pattern_source_chain(this);
-	}
+    }
 };
 
-Absent_pattern_source_chainContext.prototype.exitRule = function(listener) {
-    if(listener instanceof SiddhiQLListener ) {
+Absent_pattern_source_chainContext.prototype.exitRule = function (listener) {
+    if (listener instanceof SiddhiQLListener) {
         listener.exitAbsent_pattern_source_chain(this);
-	}
+    }
 };
-
-
 
 
 SiddhiQLParser.Absent_pattern_source_chainContext = Absent_pattern_source_chainContext;
 
-SiddhiQLParser.prototype.absent_pattern_source_chain = function() {
+SiddhiQLParser.prototype.absent_pattern_source_chain = function () {
 
     var localctx = new Absent_pattern_source_chainContext(this, this._ctx, this.state);
     this.enterRule(localctx, 90, SiddhiQLParser.RULE_absent_pattern_source_chain);
     var _la = 0; // Token type
     try {
         this.state = 798;
-        var la_ = this._interp.adaptivePredict(this._input,78,this._ctx);
-        switch(la_) {
-        case 1:
-            this.enterOuterAlt(localctx, 1);
-            this.state = 787;
-            _la = this._input.LA(1);
-            if(_la===SiddhiQLParser.EVERY) {
-                this.state = 786;
-                this.match(SiddhiQLParser.EVERY);
-            }
+        var la_ = this._interp.adaptivePredict(this._input, 78, this._ctx);
+        switch (la_) {
+            case 1:
+                this.enterOuterAlt(localctx, 1);
+                this.state = 787;
+                _la = this._input.LA(1);
+                if (_la === SiddhiQLParser.EVERY) {
+                    this.state = 786;
+                    this.match(SiddhiQLParser.EVERY);
+                }
 
-            this.state = 789;
-            this.match(SiddhiQLParser.OPEN_PAR);
-            this.state = 790;
-            this.absent_pattern_source_chain();
-            this.state = 791;
-            this.match(SiddhiQLParser.CLOSE_PAR);
-            this.state = 793;
-            _la = this._input.LA(1);
-            if(_la===SiddhiQLParser.WITHIN) {
-                this.state = 792;
-                this.within_time();
-            }
+                this.state = 789;
+                this.match(SiddhiQLParser.OPEN_PAR);
+                this.state = 790;
+                this.absent_pattern_source_chain();
+                this.state = 791;
+                this.match(SiddhiQLParser.CLOSE_PAR);
+                this.state = 793;
+                _la = this._input.LA(1);
+                if (_la === SiddhiQLParser.WITHIN) {
+                    this.state = 792;
+                    this.within_time();
+                }
 
-            break;
+                break;
 
-        case 2:
-            this.enterOuterAlt(localctx, 2);
-            this.state = 795;
-            this.every_absent_pattern_source();
-            break;
+            case 2:
+                this.enterOuterAlt(localctx, 2);
+                this.state = 795;
+                this.every_absent_pattern_source();
+                break;
 
-        case 3:
-            this.enterOuterAlt(localctx, 3);
-            this.state = 796;
-            this.left_absent_pattern_source(0);
-            break;
+            case 3:
+                this.enterOuterAlt(localctx, 3);
+                this.state = 796;
+                this.left_absent_pattern_source(0);
+                break;
 
-        case 4:
-            this.enterOuterAlt(localctx, 4);
-            this.state = 797;
-            this.right_absent_pattern_source(0);
-            break;
+            case 4:
+                this.enterOuterAlt(localctx, 4);
+                this.state = 797;
+                this.right_absent_pattern_source(0);
+                break;
 
         }
     } catch (re) {
-    	if(re instanceof antlr4.error.RecognitionException) {
-	        localctx.exception = re;
-	        this._errHandler.reportError(this, re);
-	        this._errHandler.recover(this, re);
-	    } else {
-	    	throw re;
-	    }
+        if (re instanceof antlr4.error.RecognitionException) {
+            localctx.exception = re;
+            this._errHandler.reportError(this, re);
+            this._errHandler.recover(this, re);
+        } else {
+            throw re;
+        }
     } finally {
         this.exitRule();
     }
@@ -5844,13 +5756,13 @@ SiddhiQLParser.prototype.absent_pattern_source_chain = function() {
 };
 
 function Left_absent_pattern_sourceContext(parser, parent, invokingState) {
-	if(parent===undefined) {
-	    parent = null;
-	}
-	if(invokingState===undefined || invokingState===null) {
-		invokingState = -1;
-	}
-	antlr4.ParserRuleContext.call(this, parent, invokingState);
+    if (parent === undefined) {
+        parent = null;
+    }
+    if (invokingState === undefined || invokingState === null) {
+        invokingState = -1;
+    }
+    antlr4.ParserRuleContext.call(this, parent, invokingState);
     this.parser = parser;
     this.ruleIndex = SiddhiQLParser.RULE_left_absent_pattern_source;
     return this;
@@ -5859,51 +5771,50 @@ function Left_absent_pattern_sourceContext(parser, parent, invokingState) {
 Left_absent_pattern_sourceContext.prototype = Object.create(antlr4.ParserRuleContext.prototype);
 Left_absent_pattern_sourceContext.prototype.constructor = Left_absent_pattern_sourceContext;
 
-Left_absent_pattern_sourceContext.prototype.every_pattern_source_chain = function() {
-    return this.getTypedRuleContext(Every_pattern_source_chainContext,0);
+Left_absent_pattern_sourceContext.prototype.every_pattern_source_chain = function () {
+    return this.getTypedRuleContext(Every_pattern_source_chainContext, 0);
 };
 
-Left_absent_pattern_sourceContext.prototype.left_absent_pattern_source = function(i) {
-    if(i===undefined) {
+Left_absent_pattern_sourceContext.prototype.left_absent_pattern_source = function (i) {
+    if (i === undefined) {
         i = null;
     }
-    if(i===null) {
+    if (i === null) {
         return this.getTypedRuleContexts(Left_absent_pattern_sourceContext);
     } else {
-        return this.getTypedRuleContext(Left_absent_pattern_sourceContext,i);
+        return this.getTypedRuleContext(Left_absent_pattern_sourceContext, i);
     }
 };
 
-Left_absent_pattern_sourceContext.prototype.EVERY = function() {
+Left_absent_pattern_sourceContext.prototype.EVERY = function () {
     return this.getToken(SiddhiQLParser.EVERY, 0);
 };
 
-Left_absent_pattern_sourceContext.prototype.within_time = function() {
-    return this.getTypedRuleContext(Within_timeContext,0);
+Left_absent_pattern_sourceContext.prototype.within_time = function () {
+    return this.getTypedRuleContext(Within_timeContext, 0);
 };
 
-Left_absent_pattern_sourceContext.prototype.every_absent_pattern_source = function() {
-    return this.getTypedRuleContext(Every_absent_pattern_sourceContext,0);
+Left_absent_pattern_sourceContext.prototype.every_absent_pattern_source = function () {
+    return this.getTypedRuleContext(Every_absent_pattern_sourceContext, 0);
 };
 
-Left_absent_pattern_sourceContext.prototype.enterRule = function(listener) {
-    if(listener instanceof SiddhiQLListener ) {
+Left_absent_pattern_sourceContext.prototype.enterRule = function (listener) {
+    if (listener instanceof SiddhiQLListener) {
         listener.enterLeft_absent_pattern_source(this);
-	}
+    }
 };
 
-Left_absent_pattern_sourceContext.prototype.exitRule = function(listener) {
-    if(listener instanceof SiddhiQLListener ) {
+Left_absent_pattern_sourceContext.prototype.exitRule = function (listener) {
+    if (listener instanceof SiddhiQLListener) {
         listener.exitLeft_absent_pattern_source(this);
-	}
+    }
 };
 
 
-
-SiddhiQLParser.prototype.left_absent_pattern_source = function(_p) {
-	if(_p===undefined) {
-	    _p = 0;
-	}
+SiddhiQLParser.prototype.left_absent_pattern_source = function (_p) {
+    if (_p === undefined) {
+        _p = 0;
+    }
     var _parentctx = this._ctx;
     var _parentState = this.state;
     var localctx = new Left_absent_pattern_sourceContext(this, this._ctx, _parentState);
@@ -5914,104 +5825,104 @@ SiddhiQLParser.prototype.left_absent_pattern_source = function(_p) {
     try {
         this.enterOuterAlt(localctx, 1);
         this.state = 818;
-        var la_ = this._interp.adaptivePredict(this._input,81,this._ctx);
-        switch(la_) {
-        case 1:
-            this.state = 801;
-            this.every_pattern_source_chain(0);
-            this.state = 802;
-            this.match(SiddhiQLParser.FOLLOWED_BY);
-            this.state = 803;
-            this.left_absent_pattern_source(1);
-            break;
+        var la_ = this._interp.adaptivePredict(this._input, 81, this._ctx);
+        switch (la_) {
+            case 1:
+                this.state = 801;
+                this.every_pattern_source_chain(0);
+                this.state = 802;
+                this.match(SiddhiQLParser.FOLLOWED_BY);
+                this.state = 803;
+                this.left_absent_pattern_source(1);
+                break;
 
-        case 2:
-            this.state = 806;
-            _la = this._input.LA(1);
-            if(_la===SiddhiQLParser.EVERY) {
-                this.state = 805;
-                this.match(SiddhiQLParser.EVERY);
-            }
+            case 2:
+                this.state = 806;
+                _la = this._input.LA(1);
+                if (_la === SiddhiQLParser.EVERY) {
+                    this.state = 805;
+                    this.match(SiddhiQLParser.EVERY);
+                }
 
-            this.state = 808;
-            this.match(SiddhiQLParser.OPEN_PAR);
-            this.state = 809;
-            this.left_absent_pattern_source(0);
-            this.state = 810;
-            this.match(SiddhiQLParser.CLOSE_PAR);
-            this.state = 812;
-            var la_ = this._interp.adaptivePredict(this._input,80,this._ctx);
-            if(la_===1) {
-                this.state = 811;
-                this.within_time();
+                this.state = 808;
+                this.match(SiddhiQLParser.OPEN_PAR);
+                this.state = 809;
+                this.left_absent_pattern_source(0);
+                this.state = 810;
+                this.match(SiddhiQLParser.CLOSE_PAR);
+                this.state = 812;
+                var la_ = this._interp.adaptivePredict(this._input, 80, this._ctx);
+                if (la_ === 1) {
+                    this.state = 811;
+                    this.within_time();
 
-            }
-            break;
+                }
+                break;
 
-        case 3:
-            this.state = 814;
-            this.every_absent_pattern_source();
-            this.state = 815;
-            this.match(SiddhiQLParser.FOLLOWED_BY);
-            this.state = 816;
-            this.every_pattern_source_chain(0);
-            break;
+            case 3:
+                this.state = 814;
+                this.every_absent_pattern_source();
+                this.state = 815;
+                this.match(SiddhiQLParser.FOLLOWED_BY);
+                this.state = 816;
+                this.every_pattern_source_chain(0);
+                break;
 
         }
         this._ctx.stop = this._input.LT(-1);
         this.state = 828;
         this._errHandler.sync(this);
-        var _alt = this._interp.adaptivePredict(this._input,83,this._ctx)
-        while(_alt!=2 && _alt!=antlr4.atn.ATN.INVALID_ALT_NUMBER) {
-            if(_alt===1) {
-                if(this._parseListeners!==null) {
+        var _alt = this._interp.adaptivePredict(this._input, 83, this._ctx)
+        while (_alt != 2 && _alt != antlr4.atn.ATN.INVALID_ALT_NUMBER) {
+            if (_alt === 1) {
+                if (this._parseListeners !== null) {
                     this.triggerExitRuleEvent();
                 }
                 _prevctx = localctx;
                 this.state = 826;
-                var la_ = this._interp.adaptivePredict(this._input,82,this._ctx);
-                switch(la_) {
-                case 1:
-                    localctx = new Left_absent_pattern_sourceContext(this, _parentctx, _parentState);
-                    this.pushNewRecursionContext(localctx, _startState, SiddhiQLParser.RULE_left_absent_pattern_source);
-                    this.state = 820;
-                    if (!( this.precpred(this._ctx, 3))) {
-                        throw new antlr4.error.FailedPredicateException(this, "this.precpred(this._ctx, 3)");
-                    }
-                    this.state = 821;
-                    this.match(SiddhiQLParser.FOLLOWED_BY);
-                    this.state = 822;
-                    this.left_absent_pattern_source(4);
-                    break;
+                var la_ = this._interp.adaptivePredict(this._input, 82, this._ctx);
+                switch (la_) {
+                    case 1:
+                        localctx = new Left_absent_pattern_sourceContext(this, _parentctx, _parentState);
+                        this.pushNewRecursionContext(localctx, _startState, SiddhiQLParser.RULE_left_absent_pattern_source);
+                        this.state = 820;
+                        if (!( this.precpred(this._ctx, 3))) {
+                            throw new antlr4.error.FailedPredicateException(this, "this.precpred(this._ctx, 3)");
+                        }
+                        this.state = 821;
+                        this.match(SiddhiQLParser.FOLLOWED_BY);
+                        this.state = 822;
+                        this.left_absent_pattern_source(4);
+                        break;
 
-                case 2:
-                    localctx = new Left_absent_pattern_sourceContext(this, _parentctx, _parentState);
-                    this.pushNewRecursionContext(localctx, _startState, SiddhiQLParser.RULE_left_absent_pattern_source);
-                    this.state = 823;
-                    if (!( this.precpred(this._ctx, 2))) {
-                        throw new antlr4.error.FailedPredicateException(this, "this.precpred(this._ctx, 2)");
-                    }
-                    this.state = 824;
-                    this.match(SiddhiQLParser.FOLLOWED_BY);
-                    this.state = 825;
-                    this.every_absent_pattern_source();
-                    break;
+                    case 2:
+                        localctx = new Left_absent_pattern_sourceContext(this, _parentctx, _parentState);
+                        this.pushNewRecursionContext(localctx, _startState, SiddhiQLParser.RULE_left_absent_pattern_source);
+                        this.state = 823;
+                        if (!( this.precpred(this._ctx, 2))) {
+                            throw new antlr4.error.FailedPredicateException(this, "this.precpred(this._ctx, 2)");
+                        }
+                        this.state = 824;
+                        this.match(SiddhiQLParser.FOLLOWED_BY);
+                        this.state = 825;
+                        this.every_absent_pattern_source();
+                        break;
 
-                } 
+                }
             }
             this.state = 830;
             this._errHandler.sync(this);
-            _alt = this._interp.adaptivePredict(this._input,83,this._ctx);
+            _alt = this._interp.adaptivePredict(this._input, 83, this._ctx);
         }
 
-    } catch( error) {
-        if(error instanceof antlr4.error.RecognitionException) {
-	        localctx.exception = error;
-	        this._errHandler.reportError(this, error);
-	        this._errHandler.recover(this, error);
-	    } else {
-	    	throw error;
-	    }
+    } catch (error) {
+        if (error instanceof antlr4.error.RecognitionException) {
+            localctx.exception = error;
+            this._errHandler.reportError(this, error);
+            this._errHandler.recover(this, error);
+        } else {
+            throw error;
+        }
     } finally {
         this.unrollRecursionContexts(_parentctx)
     }
@@ -6019,13 +5930,13 @@ SiddhiQLParser.prototype.left_absent_pattern_source = function(_p) {
 };
 
 function Right_absent_pattern_sourceContext(parser, parent, invokingState) {
-	if(parent===undefined) {
-	    parent = null;
-	}
-	if(invokingState===undefined || invokingState===null) {
-		invokingState = -1;
-	}
-	antlr4.ParserRuleContext.call(this, parent, invokingState);
+    if (parent === undefined) {
+        parent = null;
+    }
+    if (invokingState === undefined || invokingState === null) {
+        invokingState = -1;
+    }
+    antlr4.ParserRuleContext.call(this, parent, invokingState);
     this.parser = parser;
     this.ruleIndex = SiddhiQLParser.RULE_right_absent_pattern_source;
     return this;
@@ -6034,51 +5945,50 @@ function Right_absent_pattern_sourceContext(parser, parent, invokingState) {
 Right_absent_pattern_sourceContext.prototype = Object.create(antlr4.ParserRuleContext.prototype);
 Right_absent_pattern_sourceContext.prototype.constructor = Right_absent_pattern_sourceContext;
 
-Right_absent_pattern_sourceContext.prototype.every_absent_pattern_source = function() {
-    return this.getTypedRuleContext(Every_absent_pattern_sourceContext,0);
+Right_absent_pattern_sourceContext.prototype.every_absent_pattern_source = function () {
+    return this.getTypedRuleContext(Every_absent_pattern_sourceContext, 0);
 };
 
-Right_absent_pattern_sourceContext.prototype.right_absent_pattern_source = function(i) {
-    if(i===undefined) {
+Right_absent_pattern_sourceContext.prototype.right_absent_pattern_source = function (i) {
+    if (i === undefined) {
         i = null;
     }
-    if(i===null) {
+    if (i === null) {
         return this.getTypedRuleContexts(Right_absent_pattern_sourceContext);
     } else {
-        return this.getTypedRuleContext(Right_absent_pattern_sourceContext,i);
+        return this.getTypedRuleContext(Right_absent_pattern_sourceContext, i);
     }
 };
 
-Right_absent_pattern_sourceContext.prototype.EVERY = function() {
+Right_absent_pattern_sourceContext.prototype.EVERY = function () {
     return this.getToken(SiddhiQLParser.EVERY, 0);
 };
 
-Right_absent_pattern_sourceContext.prototype.within_time = function() {
-    return this.getTypedRuleContext(Within_timeContext,0);
+Right_absent_pattern_sourceContext.prototype.within_time = function () {
+    return this.getTypedRuleContext(Within_timeContext, 0);
 };
 
-Right_absent_pattern_sourceContext.prototype.every_pattern_source_chain = function() {
-    return this.getTypedRuleContext(Every_pattern_source_chainContext,0);
+Right_absent_pattern_sourceContext.prototype.every_pattern_source_chain = function () {
+    return this.getTypedRuleContext(Every_pattern_source_chainContext, 0);
 };
 
-Right_absent_pattern_sourceContext.prototype.enterRule = function(listener) {
-    if(listener instanceof SiddhiQLListener ) {
+Right_absent_pattern_sourceContext.prototype.enterRule = function (listener) {
+    if (listener instanceof SiddhiQLListener) {
         listener.enterRight_absent_pattern_source(this);
-	}
+    }
 };
 
-Right_absent_pattern_sourceContext.prototype.exitRule = function(listener) {
-    if(listener instanceof SiddhiQLListener ) {
+Right_absent_pattern_sourceContext.prototype.exitRule = function (listener) {
+    if (listener instanceof SiddhiQLListener) {
         listener.exitRight_absent_pattern_source(this);
-	}
+    }
 };
 
 
-
-SiddhiQLParser.prototype.right_absent_pattern_source = function(_p) {
-	if(_p===undefined) {
-	    _p = 0;
-	}
+SiddhiQLParser.prototype.right_absent_pattern_source = function (_p) {
+    if (_p === undefined) {
+        _p = 0;
+    }
     var _parentctx = this._ctx;
     var _parentState = this.state;
     var localctx = new Right_absent_pattern_sourceContext(this, this._ctx, _parentState);
@@ -6089,104 +5999,104 @@ SiddhiQLParser.prototype.right_absent_pattern_source = function(_p) {
     try {
         this.enterOuterAlt(localctx, 1);
         this.state = 849;
-        var la_ = this._interp.adaptivePredict(this._input,86,this._ctx);
-        switch(la_) {
-        case 1:
-            this.state = 832;
-            this.every_absent_pattern_source();
-            this.state = 833;
-            this.match(SiddhiQLParser.FOLLOWED_BY);
-            this.state = 834;
-            this.right_absent_pattern_source(2);
-            break;
+        var la_ = this._interp.adaptivePredict(this._input, 86, this._ctx);
+        switch (la_) {
+            case 1:
+                this.state = 832;
+                this.every_absent_pattern_source();
+                this.state = 833;
+                this.match(SiddhiQLParser.FOLLOWED_BY);
+                this.state = 834;
+                this.right_absent_pattern_source(2);
+                break;
 
-        case 2:
-            this.state = 837;
-            _la = this._input.LA(1);
-            if(_la===SiddhiQLParser.EVERY) {
-                this.state = 836;
-                this.match(SiddhiQLParser.EVERY);
-            }
+            case 2:
+                this.state = 837;
+                _la = this._input.LA(1);
+                if (_la === SiddhiQLParser.EVERY) {
+                    this.state = 836;
+                    this.match(SiddhiQLParser.EVERY);
+                }
 
-            this.state = 839;
-            this.match(SiddhiQLParser.OPEN_PAR);
-            this.state = 840;
-            this.right_absent_pattern_source(0);
-            this.state = 841;
-            this.match(SiddhiQLParser.CLOSE_PAR);
-            this.state = 843;
-            var la_ = this._interp.adaptivePredict(this._input,85,this._ctx);
-            if(la_===1) {
-                this.state = 842;
-                this.within_time();
+                this.state = 839;
+                this.match(SiddhiQLParser.OPEN_PAR);
+                this.state = 840;
+                this.right_absent_pattern_source(0);
+                this.state = 841;
+                this.match(SiddhiQLParser.CLOSE_PAR);
+                this.state = 843;
+                var la_ = this._interp.adaptivePredict(this._input, 85, this._ctx);
+                if (la_ === 1) {
+                    this.state = 842;
+                    this.within_time();
 
-            }
-            break;
+                }
+                break;
 
-        case 3:
-            this.state = 845;
-            this.every_pattern_source_chain(0);
-            this.state = 846;
-            this.match(SiddhiQLParser.FOLLOWED_BY);
-            this.state = 847;
-            this.every_absent_pattern_source();
-            break;
+            case 3:
+                this.state = 845;
+                this.every_pattern_source_chain(0);
+                this.state = 846;
+                this.match(SiddhiQLParser.FOLLOWED_BY);
+                this.state = 847;
+                this.every_absent_pattern_source();
+                break;
 
         }
         this._ctx.stop = this._input.LT(-1);
         this.state = 859;
         this._errHandler.sync(this);
-        var _alt = this._interp.adaptivePredict(this._input,88,this._ctx)
-        while(_alt!=2 && _alt!=antlr4.atn.ATN.INVALID_ALT_NUMBER) {
-            if(_alt===1) {
-                if(this._parseListeners!==null) {
+        var _alt = this._interp.adaptivePredict(this._input, 88, this._ctx)
+        while (_alt != 2 && _alt != antlr4.atn.ATN.INVALID_ALT_NUMBER) {
+            if (_alt === 1) {
+                if (this._parseListeners !== null) {
                     this.triggerExitRuleEvent();
                 }
                 _prevctx = localctx;
                 this.state = 857;
-                var la_ = this._interp.adaptivePredict(this._input,87,this._ctx);
-                switch(la_) {
-                case 1:
-                    localctx = new Right_absent_pattern_sourceContext(this, _parentctx, _parentState);
-                    this.pushNewRecursionContext(localctx, _startState, SiddhiQLParser.RULE_right_absent_pattern_source);
-                    this.state = 851;
-                    if (!( this.precpred(this._ctx, 3))) {
-                        throw new antlr4.error.FailedPredicateException(this, "this.precpred(this._ctx, 3)");
-                    }
-                    this.state = 852;
-                    this.match(SiddhiQLParser.FOLLOWED_BY);
-                    this.state = 853;
-                    this.right_absent_pattern_source(4);
-                    break;
+                var la_ = this._interp.adaptivePredict(this._input, 87, this._ctx);
+                switch (la_) {
+                    case 1:
+                        localctx = new Right_absent_pattern_sourceContext(this, _parentctx, _parentState);
+                        this.pushNewRecursionContext(localctx, _startState, SiddhiQLParser.RULE_right_absent_pattern_source);
+                        this.state = 851;
+                        if (!( this.precpred(this._ctx, 3))) {
+                            throw new antlr4.error.FailedPredicateException(this, "this.precpred(this._ctx, 3)");
+                        }
+                        this.state = 852;
+                        this.match(SiddhiQLParser.FOLLOWED_BY);
+                        this.state = 853;
+                        this.right_absent_pattern_source(4);
+                        break;
 
-                case 2:
-                    localctx = new Right_absent_pattern_sourceContext(this, _parentctx, _parentState);
-                    this.pushNewRecursionContext(localctx, _startState, SiddhiQLParser.RULE_right_absent_pattern_source);
-                    this.state = 854;
-                    if (!( this.precpred(this._ctx, 1))) {
-                        throw new antlr4.error.FailedPredicateException(this, "this.precpred(this._ctx, 1)");
-                    }
-                    this.state = 855;
-                    this.match(SiddhiQLParser.FOLLOWED_BY);
-                    this.state = 856;
-                    this.every_pattern_source_chain(0);
-                    break;
+                    case 2:
+                        localctx = new Right_absent_pattern_sourceContext(this, _parentctx, _parentState);
+                        this.pushNewRecursionContext(localctx, _startState, SiddhiQLParser.RULE_right_absent_pattern_source);
+                        this.state = 854;
+                        if (!( this.precpred(this._ctx, 1))) {
+                            throw new antlr4.error.FailedPredicateException(this, "this.precpred(this._ctx, 1)");
+                        }
+                        this.state = 855;
+                        this.match(SiddhiQLParser.FOLLOWED_BY);
+                        this.state = 856;
+                        this.every_pattern_source_chain(0);
+                        break;
 
-                } 
+                }
             }
             this.state = 861;
             this._errHandler.sync(this);
-            _alt = this._interp.adaptivePredict(this._input,88,this._ctx);
+            _alt = this._interp.adaptivePredict(this._input, 88, this._ctx);
         }
 
-    } catch( error) {
-        if(error instanceof antlr4.error.RecognitionException) {
-	        localctx.exception = error;
-	        this._errHandler.reportError(this, error);
-	        this._errHandler.recover(this, error);
-	    } else {
-	    	throw error;
-	    }
+    } catch (error) {
+        if (error instanceof antlr4.error.RecognitionException) {
+            localctx.exception = error;
+            this._errHandler.reportError(this, error);
+            this._errHandler.recover(this, error);
+        } else {
+            throw error;
+        }
     } finally {
         this.unrollRecursionContexts(_parentctx)
     }
@@ -6194,13 +6104,13 @@ SiddhiQLParser.prototype.right_absent_pattern_source = function(_p) {
 };
 
 function Pattern_sourceContext(parser, parent, invokingState) {
-	if(parent===undefined) {
-	    parent = null;
-	}
-	if(invokingState===undefined || invokingState===null) {
-		invokingState = -1;
-	}
-	antlr4.ParserRuleContext.call(this, parent, invokingState);
+    if (parent === undefined) {
+        parent = null;
+    }
+    if (invokingState === undefined || invokingState === null) {
+        invokingState = -1;
+    }
+    antlr4.ParserRuleContext.call(this, parent, invokingState);
     this.parser = parser;
     this.ruleIndex = SiddhiQLParser.RULE_pattern_source;
     return this;
@@ -6209,80 +6119,78 @@ function Pattern_sourceContext(parser, parent, invokingState) {
 Pattern_sourceContext.prototype = Object.create(antlr4.ParserRuleContext.prototype);
 Pattern_sourceContext.prototype.constructor = Pattern_sourceContext;
 
-Pattern_sourceContext.prototype.logical_stateful_source = function() {
-    return this.getTypedRuleContext(Logical_stateful_sourceContext,0);
+Pattern_sourceContext.prototype.logical_stateful_source = function () {
+    return this.getTypedRuleContext(Logical_stateful_sourceContext, 0);
 };
 
-Pattern_sourceContext.prototype.pattern_collection_stateful_source = function() {
-    return this.getTypedRuleContext(Pattern_collection_stateful_sourceContext,0);
+Pattern_sourceContext.prototype.pattern_collection_stateful_source = function () {
+    return this.getTypedRuleContext(Pattern_collection_stateful_sourceContext, 0);
 };
 
-Pattern_sourceContext.prototype.standard_stateful_source = function() {
-    return this.getTypedRuleContext(Standard_stateful_sourceContext,0);
+Pattern_sourceContext.prototype.standard_stateful_source = function () {
+    return this.getTypedRuleContext(Standard_stateful_sourceContext, 0);
 };
 
-Pattern_sourceContext.prototype.logical_absent_stateful_source = function() {
-    return this.getTypedRuleContext(Logical_absent_stateful_sourceContext,0);
+Pattern_sourceContext.prototype.logical_absent_stateful_source = function () {
+    return this.getTypedRuleContext(Logical_absent_stateful_sourceContext, 0);
 };
 
-Pattern_sourceContext.prototype.enterRule = function(listener) {
-    if(listener instanceof SiddhiQLListener ) {
+Pattern_sourceContext.prototype.enterRule = function (listener) {
+    if (listener instanceof SiddhiQLListener) {
         listener.enterPattern_source(this);
-	}
+    }
 };
 
-Pattern_sourceContext.prototype.exitRule = function(listener) {
-    if(listener instanceof SiddhiQLListener ) {
+Pattern_sourceContext.prototype.exitRule = function (listener) {
+    if (listener instanceof SiddhiQLListener) {
         listener.exitPattern_source(this);
-	}
+    }
 };
-
-
 
 
 SiddhiQLParser.Pattern_sourceContext = Pattern_sourceContext;
 
-SiddhiQLParser.prototype.pattern_source = function() {
+SiddhiQLParser.prototype.pattern_source = function () {
 
     var localctx = new Pattern_sourceContext(this, this._ctx, this.state);
     this.enterRule(localctx, 96, SiddhiQLParser.RULE_pattern_source);
     try {
         this.state = 866;
-        var la_ = this._interp.adaptivePredict(this._input,89,this._ctx);
-        switch(la_) {
-        case 1:
-            this.enterOuterAlt(localctx, 1);
-            this.state = 862;
-            this.logical_stateful_source();
-            break;
+        var la_ = this._interp.adaptivePredict(this._input, 89, this._ctx);
+        switch (la_) {
+            case 1:
+                this.enterOuterAlt(localctx, 1);
+                this.state = 862;
+                this.logical_stateful_source();
+                break;
 
-        case 2:
-            this.enterOuterAlt(localctx, 2);
-            this.state = 863;
-            this.pattern_collection_stateful_source();
-            break;
+            case 2:
+                this.enterOuterAlt(localctx, 2);
+                this.state = 863;
+                this.pattern_collection_stateful_source();
+                break;
 
-        case 3:
-            this.enterOuterAlt(localctx, 3);
-            this.state = 864;
-            this.standard_stateful_source();
-            break;
+            case 3:
+                this.enterOuterAlt(localctx, 3);
+                this.state = 864;
+                this.standard_stateful_source();
+                break;
 
-        case 4:
-            this.enterOuterAlt(localctx, 4);
-            this.state = 865;
-            this.logical_absent_stateful_source();
-            break;
+            case 4:
+                this.enterOuterAlt(localctx, 4);
+                this.state = 865;
+                this.logical_absent_stateful_source();
+                break;
 
         }
     } catch (re) {
-    	if(re instanceof antlr4.error.RecognitionException) {
-	        localctx.exception = re;
-	        this._errHandler.reportError(this, re);
-	        this._errHandler.recover(this, re);
-	    } else {
-	    	throw re;
-	    }
+        if (re instanceof antlr4.error.RecognitionException) {
+            localctx.exception = re;
+            this._errHandler.reportError(this, re);
+            this._errHandler.recover(this, re);
+        } else {
+            throw re;
+        }
     } finally {
         this.exitRule();
     }
@@ -6290,13 +6198,13 @@ SiddhiQLParser.prototype.pattern_source = function() {
 };
 
 function Logical_stateful_sourceContext(parser, parent, invokingState) {
-	if(parent===undefined) {
-	    parent = null;
-	}
-	if(invokingState===undefined || invokingState===null) {
-		invokingState = -1;
-	}
-	antlr4.ParserRuleContext.call(this, parent, invokingState);
+    if (parent === undefined) {
+        parent = null;
+    }
+    if (invokingState === undefined || invokingState === null) {
+        invokingState = -1;
+    }
+    antlr4.ParserRuleContext.call(this, parent, invokingState);
     this.parser = parser;
     this.ruleIndex = SiddhiQLParser.RULE_logical_stateful_source;
     return this;
@@ -6305,79 +6213,77 @@ function Logical_stateful_sourceContext(parser, parent, invokingState) {
 Logical_stateful_sourceContext.prototype = Object.create(antlr4.ParserRuleContext.prototype);
 Logical_stateful_sourceContext.prototype.constructor = Logical_stateful_sourceContext;
 
-Logical_stateful_sourceContext.prototype.standard_stateful_source = function(i) {
-    if(i===undefined) {
+Logical_stateful_sourceContext.prototype.standard_stateful_source = function (i) {
+    if (i === undefined) {
         i = null;
     }
-    if(i===null) {
+    if (i === null) {
         return this.getTypedRuleContexts(Standard_stateful_sourceContext);
     } else {
-        return this.getTypedRuleContext(Standard_stateful_sourceContext,i);
+        return this.getTypedRuleContext(Standard_stateful_sourceContext, i);
     }
 };
 
-Logical_stateful_sourceContext.prototype.AND = function() {
+Logical_stateful_sourceContext.prototype.AND = function () {
     return this.getToken(SiddhiQLParser.AND, 0);
 };
 
-Logical_stateful_sourceContext.prototype.OR = function() {
+Logical_stateful_sourceContext.prototype.OR = function () {
     return this.getToken(SiddhiQLParser.OR, 0);
 };
 
-Logical_stateful_sourceContext.prototype.enterRule = function(listener) {
-    if(listener instanceof SiddhiQLListener ) {
+Logical_stateful_sourceContext.prototype.enterRule = function (listener) {
+    if (listener instanceof SiddhiQLListener) {
         listener.enterLogical_stateful_source(this);
-	}
+    }
 };
 
-Logical_stateful_sourceContext.prototype.exitRule = function(listener) {
-    if(listener instanceof SiddhiQLListener ) {
+Logical_stateful_sourceContext.prototype.exitRule = function (listener) {
+    if (listener instanceof SiddhiQLListener) {
         listener.exitLogical_stateful_source(this);
-	}
+    }
 };
-
-
 
 
 SiddhiQLParser.Logical_stateful_sourceContext = Logical_stateful_sourceContext;
 
-SiddhiQLParser.prototype.logical_stateful_source = function() {
+SiddhiQLParser.prototype.logical_stateful_source = function () {
 
     var localctx = new Logical_stateful_sourceContext(this, this._ctx, this.state);
     this.enterRule(localctx, 98, SiddhiQLParser.RULE_logical_stateful_source);
     try {
         this.state = 876;
-        var la_ = this._interp.adaptivePredict(this._input,90,this._ctx);
-        switch(la_) {
-        case 1:
-            this.enterOuterAlt(localctx, 1);
-            this.state = 868;
-            this.standard_stateful_source();
-            this.state = 869;
-            this.match(SiddhiQLParser.AND);
-            this.state = 870;
-            this.standard_stateful_source();
-            break;
+        var la_ = this._interp.adaptivePredict(this._input, 90, this._ctx);
+        switch (la_) {
+            case 1:
+                this.enterOuterAlt(localctx, 1);
+                this.state = 868;
+                this.standard_stateful_source();
+                this.state = 869;
+                this.match(SiddhiQLParser.AND);
+                this.state = 870;
+                this.standard_stateful_source();
+                break;
 
-        case 2:
-            this.enterOuterAlt(localctx, 2);
-            this.state = 872;
-            this.standard_stateful_source();
-            this.state = 873;
-            this.match(SiddhiQLParser.OR);
-            this.state = 874;
-            this.standard_stateful_source();
-            break;
+            case 2:
+                this.enterOuterAlt(localctx, 2);
+                this.state = 872;
+                this.standard_stateful_source();
+                this.state = 873;
+                this.match(SiddhiQLParser.OR);
+                this.state = 874;
+                this.standard_stateful_source();
+                break;
 
         }
     } catch (re) {
-    	if(re instanceof antlr4.error.RecognitionException) {
-	        localctx.exception = re;
-	        this._errHandler.reportError(this, re);
-	        this._errHandler.recover(this, re);
-	    } else {
-	    	throw re;
-	    }
+        if (re instanceof antlr4.error.RecognitionException) {
+            localctx.exception = re;
+            this._errHandler.reportError(this, re);
+            this._errHandler.recover(this, re);
+        } else {
+            throw re;
+        }
     } finally {
         this.exitRule();
     }
@@ -6385,13 +6291,13 @@ SiddhiQLParser.prototype.logical_stateful_source = function() {
 };
 
 function Logical_absent_stateful_sourceContext(parser, parent, invokingState) {
-	if(parent===undefined) {
-	    parent = null;
-	}
-	if(invokingState===undefined || invokingState===null) {
-		invokingState = -1;
-	}
-	antlr4.ParserRuleContext.call(this, parent, invokingState);
+    if (parent === undefined) {
+        parent = null;
+    }
+    if (invokingState === undefined || invokingState === null) {
+        invokingState = -1;
+    }
+    antlr4.ParserRuleContext.call(this, parent, invokingState);
     this.parser = parser;
     this.ruleIndex = SiddhiQLParser.RULE_logical_absent_stateful_source;
     return this;
@@ -6400,169 +6306,167 @@ function Logical_absent_stateful_sourceContext(parser, parent, invokingState) {
 Logical_absent_stateful_sourceContext.prototype = Object.create(antlr4.ParserRuleContext.prototype);
 Logical_absent_stateful_sourceContext.prototype.constructor = Logical_absent_stateful_sourceContext;
 
-Logical_absent_stateful_sourceContext.prototype.logical_absent_stateful_source = function() {
-    return this.getTypedRuleContext(Logical_absent_stateful_sourceContext,0);
+Logical_absent_stateful_sourceContext.prototype.logical_absent_stateful_source = function () {
+    return this.getTypedRuleContext(Logical_absent_stateful_sourceContext, 0);
 };
 
-Logical_absent_stateful_sourceContext.prototype.standard_stateful_source = function() {
-    return this.getTypedRuleContext(Standard_stateful_sourceContext,0);
+Logical_absent_stateful_sourceContext.prototype.standard_stateful_source = function () {
+    return this.getTypedRuleContext(Standard_stateful_sourceContext, 0);
 };
 
-Logical_absent_stateful_sourceContext.prototype.AND = function() {
+Logical_absent_stateful_sourceContext.prototype.AND = function () {
     return this.getToken(SiddhiQLParser.AND, 0);
 };
 
-Logical_absent_stateful_sourceContext.prototype.NOT = function() {
+Logical_absent_stateful_sourceContext.prototype.NOT = function () {
     return this.getToken(SiddhiQLParser.NOT, 0);
 };
 
-Logical_absent_stateful_sourceContext.prototype.basic_source = function() {
-    return this.getTypedRuleContext(Basic_sourceContext,0);
+Logical_absent_stateful_sourceContext.prototype.basic_source = function () {
+    return this.getTypedRuleContext(Basic_sourceContext, 0);
 };
 
-Logical_absent_stateful_sourceContext.prototype.basic_absent_pattern_source = function(i) {
-    if(i===undefined) {
+Logical_absent_stateful_sourceContext.prototype.basic_absent_pattern_source = function (i) {
+    if (i === undefined) {
         i = null;
     }
-    if(i===null) {
+    if (i === null) {
         return this.getTypedRuleContexts(Basic_absent_pattern_sourceContext);
     } else {
-        return this.getTypedRuleContext(Basic_absent_pattern_sourceContext,i);
+        return this.getTypedRuleContext(Basic_absent_pattern_sourceContext, i);
     }
 };
 
-Logical_absent_stateful_sourceContext.prototype.OR = function() {
+Logical_absent_stateful_sourceContext.prototype.OR = function () {
     return this.getToken(SiddhiQLParser.OR, 0);
 };
 
-Logical_absent_stateful_sourceContext.prototype.enterRule = function(listener) {
-    if(listener instanceof SiddhiQLListener ) {
+Logical_absent_stateful_sourceContext.prototype.enterRule = function (listener) {
+    if (listener instanceof SiddhiQLListener) {
         listener.enterLogical_absent_stateful_source(this);
-	}
+    }
 };
 
-Logical_absent_stateful_sourceContext.prototype.exitRule = function(listener) {
-    if(listener instanceof SiddhiQLListener ) {
+Logical_absent_stateful_sourceContext.prototype.exitRule = function (listener) {
+    if (listener instanceof SiddhiQLListener) {
         listener.exitLogical_absent_stateful_source(this);
-	}
+    }
 };
-
-
 
 
 SiddhiQLParser.Logical_absent_stateful_sourceContext = Logical_absent_stateful_sourceContext;
 
-SiddhiQLParser.prototype.logical_absent_stateful_source = function() {
+SiddhiQLParser.prototype.logical_absent_stateful_source = function () {
 
     var localctx = new Logical_absent_stateful_sourceContext(this, this._ctx, this.state);
     this.enterRule(localctx, 100, SiddhiQLParser.RULE_logical_absent_stateful_source);
     try {
         this.state = 916;
-        var la_ = this._interp.adaptivePredict(this._input,91,this._ctx);
-        switch(la_) {
-        case 1:
-            this.enterOuterAlt(localctx, 1);
-            this.state = 878;
-            this.match(SiddhiQLParser.OPEN_PAR);
-            this.state = 879;
-            this.logical_absent_stateful_source();
-            this.state = 880;
-            this.match(SiddhiQLParser.CLOSE_PAR);
-            break;
+        var la_ = this._interp.adaptivePredict(this._input, 91, this._ctx);
+        switch (la_) {
+            case 1:
+                this.enterOuterAlt(localctx, 1);
+                this.state = 878;
+                this.match(SiddhiQLParser.OPEN_PAR);
+                this.state = 879;
+                this.logical_absent_stateful_source();
+                this.state = 880;
+                this.match(SiddhiQLParser.CLOSE_PAR);
+                break;
 
-        case 2:
-            this.enterOuterAlt(localctx, 2);
-            this.state = 882;
-            this.standard_stateful_source();
-            this.state = 883;
-            this.match(SiddhiQLParser.AND);
-            this.state = 884;
-            this.match(SiddhiQLParser.NOT);
-            this.state = 885;
-            this.basic_source();
-            break;
+            case 2:
+                this.enterOuterAlt(localctx, 2);
+                this.state = 882;
+                this.standard_stateful_source();
+                this.state = 883;
+                this.match(SiddhiQLParser.AND);
+                this.state = 884;
+                this.match(SiddhiQLParser.NOT);
+                this.state = 885;
+                this.basic_source();
+                break;
 
-        case 3:
-            this.enterOuterAlt(localctx, 3);
-            this.state = 887;
-            this.match(SiddhiQLParser.NOT);
-            this.state = 888;
-            this.basic_source();
-            this.state = 889;
-            this.match(SiddhiQLParser.AND);
-            this.state = 890;
-            this.standard_stateful_source();
-            break;
+            case 3:
+                this.enterOuterAlt(localctx, 3);
+                this.state = 887;
+                this.match(SiddhiQLParser.NOT);
+                this.state = 888;
+                this.basic_source();
+                this.state = 889;
+                this.match(SiddhiQLParser.AND);
+                this.state = 890;
+                this.standard_stateful_source();
+                break;
 
-        case 4:
-            this.enterOuterAlt(localctx, 4);
-            this.state = 892;
-            this.standard_stateful_source();
-            this.state = 893;
-            this.match(SiddhiQLParser.AND);
-            this.state = 894;
-            this.basic_absent_pattern_source();
-            break;
+            case 4:
+                this.enterOuterAlt(localctx, 4);
+                this.state = 892;
+                this.standard_stateful_source();
+                this.state = 893;
+                this.match(SiddhiQLParser.AND);
+                this.state = 894;
+                this.basic_absent_pattern_source();
+                break;
 
-        case 5:
-            this.enterOuterAlt(localctx, 5);
-            this.state = 896;
-            this.basic_absent_pattern_source();
-            this.state = 897;
-            this.match(SiddhiQLParser.AND);
-            this.state = 898;
-            this.standard_stateful_source();
-            break;
+            case 5:
+                this.enterOuterAlt(localctx, 5);
+                this.state = 896;
+                this.basic_absent_pattern_source();
+                this.state = 897;
+                this.match(SiddhiQLParser.AND);
+                this.state = 898;
+                this.standard_stateful_source();
+                break;
 
-        case 6:
-            this.enterOuterAlt(localctx, 6);
-            this.state = 900;
-            this.basic_absent_pattern_source();
-            this.state = 901;
-            this.match(SiddhiQLParser.AND);
-            this.state = 902;
-            this.basic_absent_pattern_source();
-            break;
+            case 6:
+                this.enterOuterAlt(localctx, 6);
+                this.state = 900;
+                this.basic_absent_pattern_source();
+                this.state = 901;
+                this.match(SiddhiQLParser.AND);
+                this.state = 902;
+                this.basic_absent_pattern_source();
+                break;
 
-        case 7:
-            this.enterOuterAlt(localctx, 7);
-            this.state = 904;
-            this.standard_stateful_source();
-            this.state = 905;
-            this.match(SiddhiQLParser.OR);
-            this.state = 906;
-            this.basic_absent_pattern_source();
-            break;
+            case 7:
+                this.enterOuterAlt(localctx, 7);
+                this.state = 904;
+                this.standard_stateful_source();
+                this.state = 905;
+                this.match(SiddhiQLParser.OR);
+                this.state = 906;
+                this.basic_absent_pattern_source();
+                break;
 
-        case 8:
-            this.enterOuterAlt(localctx, 8);
-            this.state = 908;
-            this.basic_absent_pattern_source();
-            this.state = 909;
-            this.match(SiddhiQLParser.OR);
-            this.state = 910;
-            this.standard_stateful_source();
-            break;
+            case 8:
+                this.enterOuterAlt(localctx, 8);
+                this.state = 908;
+                this.basic_absent_pattern_source();
+                this.state = 909;
+                this.match(SiddhiQLParser.OR);
+                this.state = 910;
+                this.standard_stateful_source();
+                break;
 
-        case 9:
-            this.enterOuterAlt(localctx, 9);
-            this.state = 912;
-            this.basic_absent_pattern_source();
-            this.state = 913;
-            this.match(SiddhiQLParser.OR);
-            this.state = 914;
-            this.basic_absent_pattern_source();
-            break;
+            case 9:
+                this.enterOuterAlt(localctx, 9);
+                this.state = 912;
+                this.basic_absent_pattern_source();
+                this.state = 913;
+                this.match(SiddhiQLParser.OR);
+                this.state = 914;
+                this.basic_absent_pattern_source();
+                break;
 
         }
     } catch (re) {
-    	if(re instanceof antlr4.error.RecognitionException) {
-	        localctx.exception = re;
-	        this._errHandler.reportError(this, re);
-	        this._errHandler.recover(this, re);
-	    } else {
-	    	throw re;
-	    }
+        if (re instanceof antlr4.error.RecognitionException) {
+            localctx.exception = re;
+            this._errHandler.reportError(this, re);
+            this._errHandler.recover(this, re);
+        } else {
+            throw re;
+        }
     } finally {
         this.exitRule();
     }
@@ -6570,13 +6474,13 @@ SiddhiQLParser.prototype.logical_absent_stateful_source = function() {
 };
 
 function Every_absent_pattern_sourceContext(parser, parent, invokingState) {
-	if(parent===undefined) {
-	    parent = null;
-	}
-	if(invokingState===undefined || invokingState===null) {
-		invokingState = -1;
-	}
-	antlr4.ParserRuleContext.call(this, parent, invokingState);
+    if (parent === undefined) {
+        parent = null;
+    }
+    if (invokingState === undefined || invokingState === null) {
+        invokingState = -1;
+    }
+    antlr4.ParserRuleContext.call(this, parent, invokingState);
     this.parser = parser;
     this.ruleIndex = SiddhiQLParser.RULE_every_absent_pattern_source;
     return this;
@@ -6585,32 +6489,30 @@ function Every_absent_pattern_sourceContext(parser, parent, invokingState) {
 Every_absent_pattern_sourceContext.prototype = Object.create(antlr4.ParserRuleContext.prototype);
 Every_absent_pattern_sourceContext.prototype.constructor = Every_absent_pattern_sourceContext;
 
-Every_absent_pattern_sourceContext.prototype.basic_absent_pattern_source = function() {
-    return this.getTypedRuleContext(Basic_absent_pattern_sourceContext,0);
+Every_absent_pattern_sourceContext.prototype.basic_absent_pattern_source = function () {
+    return this.getTypedRuleContext(Basic_absent_pattern_sourceContext, 0);
 };
 
-Every_absent_pattern_sourceContext.prototype.EVERY = function() {
+Every_absent_pattern_sourceContext.prototype.EVERY = function () {
     return this.getToken(SiddhiQLParser.EVERY, 0);
 };
 
-Every_absent_pattern_sourceContext.prototype.enterRule = function(listener) {
-    if(listener instanceof SiddhiQLListener ) {
+Every_absent_pattern_sourceContext.prototype.enterRule = function (listener) {
+    if (listener instanceof SiddhiQLListener) {
         listener.enterEvery_absent_pattern_source(this);
-	}
+    }
 };
 
-Every_absent_pattern_sourceContext.prototype.exitRule = function(listener) {
-    if(listener instanceof SiddhiQLListener ) {
+Every_absent_pattern_sourceContext.prototype.exitRule = function (listener) {
+    if (listener instanceof SiddhiQLListener) {
         listener.exitEvery_absent_pattern_source(this);
-	}
+    }
 };
-
-
 
 
 SiddhiQLParser.Every_absent_pattern_sourceContext = Every_absent_pattern_sourceContext;
 
-SiddhiQLParser.prototype.every_absent_pattern_source = function() {
+SiddhiQLParser.prototype.every_absent_pattern_source = function () {
 
     var localctx = new Every_absent_pattern_sourceContext(this, this._ctx, this.state);
     this.enterRule(localctx, 102, SiddhiQLParser.RULE_every_absent_pattern_source);
@@ -6619,7 +6521,7 @@ SiddhiQLParser.prototype.every_absent_pattern_source = function() {
         this.enterOuterAlt(localctx, 1);
         this.state = 919;
         _la = this._input.LA(1);
-        if(_la===SiddhiQLParser.EVERY) {
+        if (_la === SiddhiQLParser.EVERY) {
             this.state = 918;
             this.match(SiddhiQLParser.EVERY);
         }
@@ -6627,13 +6529,13 @@ SiddhiQLParser.prototype.every_absent_pattern_source = function() {
         this.state = 921;
         this.basic_absent_pattern_source();
     } catch (re) {
-    	if(re instanceof antlr4.error.RecognitionException) {
-	        localctx.exception = re;
-	        this._errHandler.reportError(this, re);
-	        this._errHandler.recover(this, re);
-	    } else {
-	    	throw re;
-	    }
+        if (re instanceof antlr4.error.RecognitionException) {
+            localctx.exception = re;
+            this._errHandler.reportError(this, re);
+            this._errHandler.recover(this, re);
+        } else {
+            throw re;
+        }
     } finally {
         this.exitRule();
     }
@@ -6641,13 +6543,13 @@ SiddhiQLParser.prototype.every_absent_pattern_source = function() {
 };
 
 function Basic_absent_pattern_sourceContext(parser, parent, invokingState) {
-	if(parent===undefined) {
-	    parent = null;
-	}
-	if(invokingState===undefined || invokingState===null) {
-		invokingState = -1;
-	}
-	antlr4.ParserRuleContext.call(this, parent, invokingState);
+    if (parent === undefined) {
+        parent = null;
+    }
+    if (invokingState === undefined || invokingState === null) {
+        invokingState = -1;
+    }
+    antlr4.ParserRuleContext.call(this, parent, invokingState);
     this.parser = parser;
     this.ruleIndex = SiddhiQLParser.RULE_basic_absent_pattern_source;
     return this;
@@ -6656,36 +6558,34 @@ function Basic_absent_pattern_sourceContext(parser, parent, invokingState) {
 Basic_absent_pattern_sourceContext.prototype = Object.create(antlr4.ParserRuleContext.prototype);
 Basic_absent_pattern_sourceContext.prototype.constructor = Basic_absent_pattern_sourceContext;
 
-Basic_absent_pattern_sourceContext.prototype.NOT = function() {
+Basic_absent_pattern_sourceContext.prototype.NOT = function () {
     return this.getToken(SiddhiQLParser.NOT, 0);
 };
 
-Basic_absent_pattern_sourceContext.prototype.basic_source = function() {
-    return this.getTypedRuleContext(Basic_sourceContext,0);
+Basic_absent_pattern_sourceContext.prototype.basic_source = function () {
+    return this.getTypedRuleContext(Basic_sourceContext, 0);
 };
 
-Basic_absent_pattern_sourceContext.prototype.for_time = function() {
-    return this.getTypedRuleContext(For_timeContext,0);
+Basic_absent_pattern_sourceContext.prototype.for_time = function () {
+    return this.getTypedRuleContext(For_timeContext, 0);
 };
 
-Basic_absent_pattern_sourceContext.prototype.enterRule = function(listener) {
-    if(listener instanceof SiddhiQLListener ) {
+Basic_absent_pattern_sourceContext.prototype.enterRule = function (listener) {
+    if (listener instanceof SiddhiQLListener) {
         listener.enterBasic_absent_pattern_source(this);
-	}
+    }
 };
 
-Basic_absent_pattern_sourceContext.prototype.exitRule = function(listener) {
-    if(listener instanceof SiddhiQLListener ) {
+Basic_absent_pattern_sourceContext.prototype.exitRule = function (listener) {
+    if (listener instanceof SiddhiQLListener) {
         listener.exitBasic_absent_pattern_source(this);
-	}
+    }
 };
-
-
 
 
 SiddhiQLParser.Basic_absent_pattern_sourceContext = Basic_absent_pattern_sourceContext;
 
-SiddhiQLParser.prototype.basic_absent_pattern_source = function() {
+SiddhiQLParser.prototype.basic_absent_pattern_source = function () {
 
     var localctx = new Basic_absent_pattern_sourceContext(this, this._ctx, this.state);
     this.enterRule(localctx, 104, SiddhiQLParser.RULE_basic_absent_pattern_source);
@@ -6698,13 +6598,13 @@ SiddhiQLParser.prototype.basic_absent_pattern_source = function() {
         this.state = 925;
         this.for_time();
     } catch (re) {
-    	if(re instanceof antlr4.error.RecognitionException) {
-	        localctx.exception = re;
-	        this._errHandler.reportError(this, re);
-	        this._errHandler.recover(this, re);
-	    } else {
-	    	throw re;
-	    }
+        if (re instanceof antlr4.error.RecognitionException) {
+            localctx.exception = re;
+            this._errHandler.reportError(this, re);
+            this._errHandler.recover(this, re);
+        } else {
+            throw re;
+        }
     } finally {
         this.exitRule();
     }
@@ -6712,13 +6612,13 @@ SiddhiQLParser.prototype.basic_absent_pattern_source = function() {
 };
 
 function Pattern_collection_stateful_sourceContext(parser, parent, invokingState) {
-	if(parent===undefined) {
-	    parent = null;
-	}
-	if(invokingState===undefined || invokingState===null) {
-		invokingState = -1;
-	}
-	antlr4.ParserRuleContext.call(this, parent, invokingState);
+    if (parent === undefined) {
+        parent = null;
+    }
+    if (invokingState === undefined || invokingState === null) {
+        invokingState = -1;
+    }
+    antlr4.ParserRuleContext.call(this, parent, invokingState);
     this.parser = parser;
     this.ruleIndex = SiddhiQLParser.RULE_pattern_collection_stateful_source;
     return this;
@@ -6727,32 +6627,30 @@ function Pattern_collection_stateful_sourceContext(parser, parent, invokingState
 Pattern_collection_stateful_sourceContext.prototype = Object.create(antlr4.ParserRuleContext.prototype);
 Pattern_collection_stateful_sourceContext.prototype.constructor = Pattern_collection_stateful_sourceContext;
 
-Pattern_collection_stateful_sourceContext.prototype.standard_stateful_source = function() {
-    return this.getTypedRuleContext(Standard_stateful_sourceContext,0);
+Pattern_collection_stateful_sourceContext.prototype.standard_stateful_source = function () {
+    return this.getTypedRuleContext(Standard_stateful_sourceContext, 0);
 };
 
-Pattern_collection_stateful_sourceContext.prototype.collect = function() {
-    return this.getTypedRuleContext(CollectContext,0);
+Pattern_collection_stateful_sourceContext.prototype.collect = function () {
+    return this.getTypedRuleContext(CollectContext, 0);
 };
 
-Pattern_collection_stateful_sourceContext.prototype.enterRule = function(listener) {
-    if(listener instanceof SiddhiQLListener ) {
+Pattern_collection_stateful_sourceContext.prototype.enterRule = function (listener) {
+    if (listener instanceof SiddhiQLListener) {
         listener.enterPattern_collection_stateful_source(this);
-	}
+    }
 };
 
-Pattern_collection_stateful_sourceContext.prototype.exitRule = function(listener) {
-    if(listener instanceof SiddhiQLListener ) {
+Pattern_collection_stateful_sourceContext.prototype.exitRule = function (listener) {
+    if (listener instanceof SiddhiQLListener) {
         listener.exitPattern_collection_stateful_source(this);
-	}
+    }
 };
-
-
 
 
 SiddhiQLParser.Pattern_collection_stateful_sourceContext = Pattern_collection_stateful_sourceContext;
 
-SiddhiQLParser.prototype.pattern_collection_stateful_source = function() {
+SiddhiQLParser.prototype.pattern_collection_stateful_source = function () {
 
     var localctx = new Pattern_collection_stateful_sourceContext(this, this._ctx, this.state);
     this.enterRule(localctx, 106, SiddhiQLParser.RULE_pattern_collection_stateful_source);
@@ -6767,13 +6665,13 @@ SiddhiQLParser.prototype.pattern_collection_stateful_source = function() {
         this.state = 930;
         this.match(SiddhiQLParser.GT);
     } catch (re) {
-    	if(re instanceof antlr4.error.RecognitionException) {
-	        localctx.exception = re;
-	        this._errHandler.reportError(this, re);
-	        this._errHandler.recover(this, re);
-	    } else {
-	    	throw re;
-	    }
+        if (re instanceof antlr4.error.RecognitionException) {
+            localctx.exception = re;
+            this._errHandler.reportError(this, re);
+            this._errHandler.recover(this, re);
+        } else {
+            throw re;
+        }
     } finally {
         this.exitRule();
     }
@@ -6781,13 +6679,13 @@ SiddhiQLParser.prototype.pattern_collection_stateful_source = function() {
 };
 
 function Standard_stateful_sourceContext(parser, parent, invokingState) {
-	if(parent===undefined) {
-	    parent = null;
-	}
-	if(invokingState===undefined || invokingState===null) {
-		invokingState = -1;
-	}
-	antlr4.ParserRuleContext.call(this, parent, invokingState);
+    if (parent === undefined) {
+        parent = null;
+    }
+    if (invokingState === undefined || invokingState === null) {
+        invokingState = -1;
+    }
+    antlr4.ParserRuleContext.call(this, parent, invokingState);
     this.parser = parser;
     this.ruleIndex = SiddhiQLParser.RULE_standard_stateful_source;
     return this;
@@ -6796,40 +6694,38 @@ function Standard_stateful_sourceContext(parser, parent, invokingState) {
 Standard_stateful_sourceContext.prototype = Object.create(antlr4.ParserRuleContext.prototype);
 Standard_stateful_sourceContext.prototype.constructor = Standard_stateful_sourceContext;
 
-Standard_stateful_sourceContext.prototype.basic_source = function() {
-    return this.getTypedRuleContext(Basic_sourceContext,0);
+Standard_stateful_sourceContext.prototype.basic_source = function () {
+    return this.getTypedRuleContext(Basic_sourceContext, 0);
 };
 
-Standard_stateful_sourceContext.prototype.event = function() {
-    return this.getTypedRuleContext(EventContext,0);
+Standard_stateful_sourceContext.prototype.event = function () {
+    return this.getTypedRuleContext(EventContext, 0);
 };
 
-Standard_stateful_sourceContext.prototype.enterRule = function(listener) {
-    if(listener instanceof SiddhiQLListener ) {
+Standard_stateful_sourceContext.prototype.enterRule = function (listener) {
+    if (listener instanceof SiddhiQLListener) {
         listener.enterStandard_stateful_source(this);
-	}
+    }
 };
 
-Standard_stateful_sourceContext.prototype.exitRule = function(listener) {
-    if(listener instanceof SiddhiQLListener ) {
+Standard_stateful_sourceContext.prototype.exitRule = function (listener) {
+    if (listener instanceof SiddhiQLListener) {
         listener.exitStandard_stateful_source(this);
-	}
+    }
 };
-
-
 
 
 SiddhiQLParser.Standard_stateful_sourceContext = Standard_stateful_sourceContext;
 
-SiddhiQLParser.prototype.standard_stateful_source = function() {
+SiddhiQLParser.prototype.standard_stateful_source = function () {
 
     var localctx = new Standard_stateful_sourceContext(this, this._ctx, this.state);
     this.enterRule(localctx, 108, SiddhiQLParser.RULE_standard_stateful_source);
     try {
         this.enterOuterAlt(localctx, 1);
         this.state = 935;
-        var la_ = this._interp.adaptivePredict(this._input,93,this._ctx);
-        if(la_===1) {
+        var la_ = this._interp.adaptivePredict(this._input, 93, this._ctx);
+        if (la_ === 1) {
             this.state = 932;
             this.event();
             this.state = 933;
@@ -6839,13 +6735,13 @@ SiddhiQLParser.prototype.standard_stateful_source = function() {
         this.state = 937;
         this.basic_source();
     } catch (re) {
-    	if(re instanceof antlr4.error.RecognitionException) {
-	        localctx.exception = re;
-	        this._errHandler.reportError(this, re);
-	        this._errHandler.recover(this, re);
-	    } else {
-	    	throw re;
-	    }
+        if (re instanceof antlr4.error.RecognitionException) {
+            localctx.exception = re;
+            this._errHandler.reportError(this, re);
+            this._errHandler.recover(this, re);
+        } else {
+            throw re;
+        }
     } finally {
         this.exitRule();
     }
@@ -6853,13 +6749,13 @@ SiddhiQLParser.prototype.standard_stateful_source = function() {
 };
 
 function Basic_sourceContext(parser, parent, invokingState) {
-	if(parent===undefined) {
-	    parent = null;
-	}
-	if(invokingState===undefined || invokingState===null) {
-		invokingState = -1;
-	}
-	antlr4.ParserRuleContext.call(this, parent, invokingState);
+    if (parent === undefined) {
+        parent = null;
+    }
+    if (invokingState === undefined || invokingState === null) {
+        invokingState = -1;
+    }
+    antlr4.ParserRuleContext.call(this, parent, invokingState);
     this.parser = parser;
     this.ruleIndex = SiddhiQLParser.RULE_basic_source;
     return this;
@@ -6868,32 +6764,30 @@ function Basic_sourceContext(parser, parent, invokingState) {
 Basic_sourceContext.prototype = Object.create(antlr4.ParserRuleContext.prototype);
 Basic_sourceContext.prototype.constructor = Basic_sourceContext;
 
-Basic_sourceContext.prototype.source = function() {
-    return this.getTypedRuleContext(SourceContext,0);
+Basic_sourceContext.prototype.source = function () {
+    return this.getTypedRuleContext(SourceContext, 0);
 };
 
-Basic_sourceContext.prototype.basic_source_stream_handlers = function() {
-    return this.getTypedRuleContext(Basic_source_stream_handlersContext,0);
+Basic_sourceContext.prototype.basic_source_stream_handlers = function () {
+    return this.getTypedRuleContext(Basic_source_stream_handlersContext, 0);
 };
 
-Basic_sourceContext.prototype.enterRule = function(listener) {
-    if(listener instanceof SiddhiQLListener ) {
+Basic_sourceContext.prototype.enterRule = function (listener) {
+    if (listener instanceof SiddhiQLListener) {
         listener.enterBasic_source(this);
-	}
+    }
 };
 
-Basic_sourceContext.prototype.exitRule = function(listener) {
-    if(listener instanceof SiddhiQLListener ) {
+Basic_sourceContext.prototype.exitRule = function (listener) {
+    if (listener instanceof SiddhiQLListener) {
         listener.exitBasic_source(this);
-	}
+    }
 };
-
-
 
 
 SiddhiQLParser.Basic_sourceContext = Basic_sourceContext;
 
-SiddhiQLParser.prototype.basic_source = function() {
+SiddhiQLParser.prototype.basic_source = function () {
 
     var localctx = new Basic_sourceContext(this, this._ctx, this.state);
     this.enterRule(localctx, 110, SiddhiQLParser.RULE_basic_source);
@@ -6902,20 +6796,20 @@ SiddhiQLParser.prototype.basic_source = function() {
         this.state = 939;
         this.source();
         this.state = 941;
-        var la_ = this._interp.adaptivePredict(this._input,94,this._ctx);
-        if(la_===1) {
+        var la_ = this._interp.adaptivePredict(this._input, 94, this._ctx);
+        if (la_ === 1) {
             this.state = 940;
             this.basic_source_stream_handlers();
 
         }
     } catch (re) {
-    	if(re instanceof antlr4.error.RecognitionException) {
-	        localctx.exception = re;
-	        this._errHandler.reportError(this, re);
-	        this._errHandler.recover(this, re);
-	    } else {
-	    	throw re;
-	    }
+        if (re instanceof antlr4.error.RecognitionException) {
+            localctx.exception = re;
+            this._errHandler.reportError(this, re);
+            this._errHandler.recover(this, re);
+        } else {
+            throw re;
+        }
     } finally {
         this.exitRule();
     }
@@ -6923,13 +6817,13 @@ SiddhiQLParser.prototype.basic_source = function() {
 };
 
 function Basic_source_stream_handlersContext(parser, parent, invokingState) {
-	if(parent===undefined) {
-	    parent = null;
-	}
-	if(invokingState===undefined || invokingState===null) {
-		invokingState = -1;
-	}
-	antlr4.ParserRuleContext.call(this, parent, invokingState);
+    if (parent === undefined) {
+        parent = null;
+    }
+    if (invokingState === undefined || invokingState === null) {
+        invokingState = -1;
+    }
+    antlr4.ParserRuleContext.call(this, parent, invokingState);
     this.parser = parser;
     this.ruleIndex = SiddhiQLParser.RULE_basic_source_stream_handlers;
     return this;
@@ -6938,64 +6832,62 @@ function Basic_source_stream_handlersContext(parser, parent, invokingState) {
 Basic_source_stream_handlersContext.prototype = Object.create(antlr4.ParserRuleContext.prototype);
 Basic_source_stream_handlersContext.prototype.constructor = Basic_source_stream_handlersContext;
 
-Basic_source_stream_handlersContext.prototype.basic_source_stream_handler = function(i) {
-    if(i===undefined) {
+Basic_source_stream_handlersContext.prototype.basic_source_stream_handler = function (i) {
+    if (i === undefined) {
         i = null;
     }
-    if(i===null) {
+    if (i === null) {
         return this.getTypedRuleContexts(Basic_source_stream_handlerContext);
     } else {
-        return this.getTypedRuleContext(Basic_source_stream_handlerContext,i);
+        return this.getTypedRuleContext(Basic_source_stream_handlerContext, i);
     }
 };
 
-Basic_source_stream_handlersContext.prototype.enterRule = function(listener) {
-    if(listener instanceof SiddhiQLListener ) {
+Basic_source_stream_handlersContext.prototype.enterRule = function (listener) {
+    if (listener instanceof SiddhiQLListener) {
         listener.enterBasic_source_stream_handlers(this);
-	}
+    }
 };
 
-Basic_source_stream_handlersContext.prototype.exitRule = function(listener) {
-    if(listener instanceof SiddhiQLListener ) {
+Basic_source_stream_handlersContext.prototype.exitRule = function (listener) {
+    if (listener instanceof SiddhiQLListener) {
         listener.exitBasic_source_stream_handlers(this);
-	}
+    }
 };
-
-
 
 
 SiddhiQLParser.Basic_source_stream_handlersContext = Basic_source_stream_handlersContext;
 
-SiddhiQLParser.prototype.basic_source_stream_handlers = function() {
+SiddhiQLParser.prototype.basic_source_stream_handlers = function () {
 
     var localctx = new Basic_source_stream_handlersContext(this, this._ctx, this.state);
     this.enterRule(localctx, 112, SiddhiQLParser.RULE_basic_source_stream_handlers);
     try {
         this.enterOuterAlt(localctx, 1);
-        this.state = 944; 
+        this.state = 944;
         this._errHandler.sync(this);
         var _alt = 1;
         do {
-        	switch (_alt) {
-        	case 1:
-        		this.state = 943;
-        		this.basic_source_stream_handler();
-        		break;
-        	default:
-        		throw new antlr4.error.NoViableAltException(this);
-        	}
-        	this.state = 946; 
-        	this._errHandler.sync(this);
-        	_alt = this._interp.adaptivePredict(this._input,95, this._ctx);
-        } while ( _alt!=2 && _alt!=antlr4.atn.ATN.INVALID_ALT_NUMBER );
+            switch (_alt) {
+                case 1:
+                    this.state = 943;
+                    this.basic_source_stream_handler();
+                    break;
+                default:
+                    throw new antlr4.error.NoViableAltException(this);
+            }
+            this.state = 946;
+            this._errHandler.sync(this);
+            _alt = this._interp.adaptivePredict(this._input, 95, this._ctx);
+        } while (_alt != 2 && _alt != antlr4.atn.ATN.INVALID_ALT_NUMBER);
     } catch (re) {
-    	if(re instanceof antlr4.error.RecognitionException) {
-	        localctx.exception = re;
-	        this._errHandler.reportError(this, re);
-	        this._errHandler.recover(this, re);
-	    } else {
-	    	throw re;
-	    }
+        if (re instanceof antlr4.error.RecognitionException) {
+            localctx.exception = re;
+            this._errHandler.reportError(this, re);
+            this._errHandler.recover(this, re);
+        } else {
+            throw re;
+        }
     } finally {
         this.exitRule();
     }
@@ -7003,13 +6895,13 @@ SiddhiQLParser.prototype.basic_source_stream_handlers = function() {
 };
 
 function Basic_source_stream_handlerContext(parser, parent, invokingState) {
-	if(parent===undefined) {
-	    parent = null;
-	}
-	if(invokingState===undefined || invokingState===null) {
-		invokingState = -1;
-	}
-	antlr4.ParserRuleContext.call(this, parent, invokingState);
+    if (parent === undefined) {
+        parent = null;
+    }
+    if (invokingState === undefined || invokingState === null) {
+        invokingState = -1;
+    }
+    antlr4.ParserRuleContext.call(this, parent, invokingState);
     this.parser = parser;
     this.ruleIndex = SiddhiQLParser.RULE_basic_source_stream_handler;
     return this;
@@ -7018,60 +6910,58 @@ function Basic_source_stream_handlerContext(parser, parent, invokingState) {
 Basic_source_stream_handlerContext.prototype = Object.create(antlr4.ParserRuleContext.prototype);
 Basic_source_stream_handlerContext.prototype.constructor = Basic_source_stream_handlerContext;
 
-Basic_source_stream_handlerContext.prototype.filter = function() {
-    return this.getTypedRuleContext(FilterContext,0);
+Basic_source_stream_handlerContext.prototype.filter = function () {
+    return this.getTypedRuleContext(FilterContext, 0);
 };
 
-Basic_source_stream_handlerContext.prototype.stream_function = function() {
-    return this.getTypedRuleContext(Stream_functionContext,0);
+Basic_source_stream_handlerContext.prototype.stream_function = function () {
+    return this.getTypedRuleContext(Stream_functionContext, 0);
 };
 
-Basic_source_stream_handlerContext.prototype.enterRule = function(listener) {
-    if(listener instanceof SiddhiQLListener ) {
+Basic_source_stream_handlerContext.prototype.enterRule = function (listener) {
+    if (listener instanceof SiddhiQLListener) {
         listener.enterBasic_source_stream_handler(this);
-	}
+    }
 };
 
-Basic_source_stream_handlerContext.prototype.exitRule = function(listener) {
-    if(listener instanceof SiddhiQLListener ) {
+Basic_source_stream_handlerContext.prototype.exitRule = function (listener) {
+    if (listener instanceof SiddhiQLListener) {
         listener.exitBasic_source_stream_handler(this);
-	}
+    }
 };
-
-
 
 
 SiddhiQLParser.Basic_source_stream_handlerContext = Basic_source_stream_handlerContext;
 
-SiddhiQLParser.prototype.basic_source_stream_handler = function() {
+SiddhiQLParser.prototype.basic_source_stream_handler = function () {
 
     var localctx = new Basic_source_stream_handlerContext(this, this._ctx, this.state);
     this.enterRule(localctx, 114, SiddhiQLParser.RULE_basic_source_stream_handler);
     try {
         this.state = 950;
-        var la_ = this._interp.adaptivePredict(this._input,96,this._ctx);
-        switch(la_) {
-        case 1:
-            this.enterOuterAlt(localctx, 1);
-            this.state = 948;
-            this.filter();
-            break;
+        var la_ = this._interp.adaptivePredict(this._input, 96, this._ctx);
+        switch (la_) {
+            case 1:
+                this.enterOuterAlt(localctx, 1);
+                this.state = 948;
+                this.filter();
+                break;
 
-        case 2:
-            this.enterOuterAlt(localctx, 2);
-            this.state = 949;
-            this.stream_function();
-            break;
+            case 2:
+                this.enterOuterAlt(localctx, 2);
+                this.state = 949;
+                this.stream_function();
+                break;
 
         }
     } catch (re) {
-    	if(re instanceof antlr4.error.RecognitionException) {
-	        localctx.exception = re;
-	        this._errHandler.reportError(this, re);
-	        this._errHandler.recover(this, re);
-	    } else {
-	    	throw re;
-	    }
+        if (re instanceof antlr4.error.RecognitionException) {
+            localctx.exception = re;
+            this._errHandler.reportError(this, re);
+            this._errHandler.recover(this, re);
+        } else {
+            throw re;
+        }
     } finally {
         this.exitRule();
     }
@@ -7079,13 +6969,13 @@ SiddhiQLParser.prototype.basic_source_stream_handler = function() {
 };
 
 function Sequence_streamContext(parser, parent, invokingState) {
-	if(parent===undefined) {
-	    parent = null;
-	}
-	if(invokingState===undefined || invokingState===null) {
-		invokingState = -1;
-	}
-	antlr4.ParserRuleContext.call(this, parent, invokingState);
+    if (parent === undefined) {
+        parent = null;
+    }
+    if (invokingState === undefined || invokingState === null) {
+        invokingState = -1;
+    }
+    antlr4.ParserRuleContext.call(this, parent, invokingState);
     this.parser = parser;
     this.ruleIndex = SiddhiQLParser.RULE_sequence_stream;
     return this;
@@ -7094,60 +6984,58 @@ function Sequence_streamContext(parser, parent, invokingState) {
 Sequence_streamContext.prototype = Object.create(antlr4.ParserRuleContext.prototype);
 Sequence_streamContext.prototype.constructor = Sequence_streamContext;
 
-Sequence_streamContext.prototype.every_sequence_source_chain = function() {
-    return this.getTypedRuleContext(Every_sequence_source_chainContext,0);
+Sequence_streamContext.prototype.every_sequence_source_chain = function () {
+    return this.getTypedRuleContext(Every_sequence_source_chainContext, 0);
 };
 
-Sequence_streamContext.prototype.every_absent_sequence_source_chain = function() {
-    return this.getTypedRuleContext(Every_absent_sequence_source_chainContext,0);
+Sequence_streamContext.prototype.every_absent_sequence_source_chain = function () {
+    return this.getTypedRuleContext(Every_absent_sequence_source_chainContext, 0);
 };
 
-Sequence_streamContext.prototype.enterRule = function(listener) {
-    if(listener instanceof SiddhiQLListener ) {
+Sequence_streamContext.prototype.enterRule = function (listener) {
+    if (listener instanceof SiddhiQLListener) {
         listener.enterSequence_stream(this);
-	}
+    }
 };
 
-Sequence_streamContext.prototype.exitRule = function(listener) {
-    if(listener instanceof SiddhiQLListener ) {
+Sequence_streamContext.prototype.exitRule = function (listener) {
+    if (listener instanceof SiddhiQLListener) {
         listener.exitSequence_stream(this);
-	}
+    }
 };
-
-
 
 
 SiddhiQLParser.Sequence_streamContext = Sequence_streamContext;
 
-SiddhiQLParser.prototype.sequence_stream = function() {
+SiddhiQLParser.prototype.sequence_stream = function () {
 
     var localctx = new Sequence_streamContext(this, this._ctx, this.state);
     this.enterRule(localctx, 116, SiddhiQLParser.RULE_sequence_stream);
     try {
         this.state = 954;
-        var la_ = this._interp.adaptivePredict(this._input,97,this._ctx);
-        switch(la_) {
-        case 1:
-            this.enterOuterAlt(localctx, 1);
-            this.state = 952;
-            this.every_sequence_source_chain();
-            break;
+        var la_ = this._interp.adaptivePredict(this._input, 97, this._ctx);
+        switch (la_) {
+            case 1:
+                this.enterOuterAlt(localctx, 1);
+                this.state = 952;
+                this.every_sequence_source_chain();
+                break;
 
-        case 2:
-            this.enterOuterAlt(localctx, 2);
-            this.state = 953;
-            this.every_absent_sequence_source_chain();
-            break;
+            case 2:
+                this.enterOuterAlt(localctx, 2);
+                this.state = 953;
+                this.every_absent_sequence_source_chain();
+                break;
 
         }
     } catch (re) {
-    	if(re instanceof antlr4.error.RecognitionException) {
-	        localctx.exception = re;
-	        this._errHandler.reportError(this, re);
-	        this._errHandler.recover(this, re);
-	    } else {
-	    	throw re;
-	    }
+        if (re instanceof antlr4.error.RecognitionException) {
+            localctx.exception = re;
+            this._errHandler.reportError(this, re);
+            this._errHandler.recover(this, re);
+        } else {
+            throw re;
+        }
     } finally {
         this.exitRule();
     }
@@ -7155,13 +7043,13 @@ SiddhiQLParser.prototype.sequence_stream = function() {
 };
 
 function Every_sequence_source_chainContext(parser, parent, invokingState) {
-	if(parent===undefined) {
-	    parent = null;
-	}
-	if(invokingState===undefined || invokingState===null) {
-		invokingState = -1;
-	}
-	antlr4.ParserRuleContext.call(this, parent, invokingState);
+    if (parent === undefined) {
+        parent = null;
+    }
+    if (invokingState === undefined || invokingState === null) {
+        invokingState = -1;
+    }
+    antlr4.ParserRuleContext.call(this, parent, invokingState);
     this.parser = parser;
     this.ruleIndex = SiddhiQLParser.RULE_every_sequence_source_chain;
     return this;
@@ -7170,40 +7058,38 @@ function Every_sequence_source_chainContext(parser, parent, invokingState) {
 Every_sequence_source_chainContext.prototype = Object.create(antlr4.ParserRuleContext.prototype);
 Every_sequence_source_chainContext.prototype.constructor = Every_sequence_source_chainContext;
 
-Every_sequence_source_chainContext.prototype.sequence_source = function() {
-    return this.getTypedRuleContext(Sequence_sourceContext,0);
+Every_sequence_source_chainContext.prototype.sequence_source = function () {
+    return this.getTypedRuleContext(Sequence_sourceContext, 0);
 };
 
-Every_sequence_source_chainContext.prototype.sequence_source_chain = function() {
-    return this.getTypedRuleContext(Sequence_source_chainContext,0);
+Every_sequence_source_chainContext.prototype.sequence_source_chain = function () {
+    return this.getTypedRuleContext(Sequence_source_chainContext, 0);
 };
 
-Every_sequence_source_chainContext.prototype.EVERY = function() {
+Every_sequence_source_chainContext.prototype.EVERY = function () {
     return this.getToken(SiddhiQLParser.EVERY, 0);
 };
 
-Every_sequence_source_chainContext.prototype.within_time = function() {
-    return this.getTypedRuleContext(Within_timeContext,0);
+Every_sequence_source_chainContext.prototype.within_time = function () {
+    return this.getTypedRuleContext(Within_timeContext, 0);
 };
 
-Every_sequence_source_chainContext.prototype.enterRule = function(listener) {
-    if(listener instanceof SiddhiQLListener ) {
+Every_sequence_source_chainContext.prototype.enterRule = function (listener) {
+    if (listener instanceof SiddhiQLListener) {
         listener.enterEvery_sequence_source_chain(this);
-	}
+    }
 };
 
-Every_sequence_source_chainContext.prototype.exitRule = function(listener) {
-    if(listener instanceof SiddhiQLListener ) {
+Every_sequence_source_chainContext.prototype.exitRule = function (listener) {
+    if (listener instanceof SiddhiQLListener) {
         listener.exitEvery_sequence_source_chain(this);
-	}
+    }
 };
-
-
 
 
 SiddhiQLParser.Every_sequence_source_chainContext = Every_sequence_source_chainContext;
 
-SiddhiQLParser.prototype.every_sequence_source_chain = function() {
+SiddhiQLParser.prototype.every_sequence_source_chain = function () {
 
     var localctx = new Every_sequence_source_chainContext(this, this._ctx, this.state);
     this.enterRule(localctx, 118, SiddhiQLParser.RULE_every_sequence_source_chain);
@@ -7211,8 +7097,8 @@ SiddhiQLParser.prototype.every_sequence_source_chain = function() {
     try {
         this.enterOuterAlt(localctx, 1);
         this.state = 957;
-        var la_ = this._interp.adaptivePredict(this._input,98,this._ctx);
-        if(la_===1) {
+        var la_ = this._interp.adaptivePredict(this._input, 98, this._ctx);
+        if (la_ === 1) {
             this.state = 956;
             this.match(SiddhiQLParser.EVERY);
 
@@ -7221,7 +7107,7 @@ SiddhiQLParser.prototype.every_sequence_source_chain = function() {
         this.sequence_source();
         this.state = 961;
         _la = this._input.LA(1);
-        if(_la===SiddhiQLParser.WITHIN) {
+        if (_la === SiddhiQLParser.WITHIN) {
             this.state = 960;
             this.within_time();
         }
@@ -7231,13 +7117,13 @@ SiddhiQLParser.prototype.every_sequence_source_chain = function() {
         this.state = 964;
         this.sequence_source_chain(0);
     } catch (re) {
-    	if(re instanceof antlr4.error.RecognitionException) {
-	        localctx.exception = re;
-	        this._errHandler.reportError(this, re);
-	        this._errHandler.recover(this, re);
-	    } else {
-	    	throw re;
-	    }
+        if (re instanceof antlr4.error.RecognitionException) {
+            localctx.exception = re;
+            this._errHandler.reportError(this, re);
+            this._errHandler.recover(this, re);
+        } else {
+            throw re;
+        }
     } finally {
         this.exitRule();
     }
@@ -7245,13 +7131,13 @@ SiddhiQLParser.prototype.every_sequence_source_chain = function() {
 };
 
 function Every_absent_sequence_source_chainContext(parser, parent, invokingState) {
-	if(parent===undefined) {
-	    parent = null;
-	}
-	if(invokingState===undefined || invokingState===null) {
-		invokingState = -1;
-	}
-	antlr4.ParserRuleContext.call(this, parent, invokingState);
+    if (parent === undefined) {
+        parent = null;
+    }
+    if (invokingState === undefined || invokingState === null) {
+        invokingState = -1;
+    }
+    antlr4.ParserRuleContext.call(this, parent, invokingState);
     this.parser = parser;
     this.ruleIndex = SiddhiQLParser.RULE_every_absent_sequence_source_chain;
     return this;
@@ -7260,109 +7146,107 @@ function Every_absent_sequence_source_chainContext(parser, parent, invokingState
 Every_absent_sequence_source_chainContext.prototype = Object.create(antlr4.ParserRuleContext.prototype);
 Every_absent_sequence_source_chainContext.prototype.constructor = Every_absent_sequence_source_chainContext;
 
-Every_absent_sequence_source_chainContext.prototype.absent_sequence_source_chain = function() {
-    return this.getTypedRuleContext(Absent_sequence_source_chainContext,0);
+Every_absent_sequence_source_chainContext.prototype.absent_sequence_source_chain = function () {
+    return this.getTypedRuleContext(Absent_sequence_source_chainContext, 0);
 };
 
-Every_absent_sequence_source_chainContext.prototype.sequence_source_chain = function() {
-    return this.getTypedRuleContext(Sequence_source_chainContext,0);
+Every_absent_sequence_source_chainContext.prototype.sequence_source_chain = function () {
+    return this.getTypedRuleContext(Sequence_source_chainContext, 0);
 };
 
-Every_absent_sequence_source_chainContext.prototype.EVERY = function() {
+Every_absent_sequence_source_chainContext.prototype.EVERY = function () {
     return this.getToken(SiddhiQLParser.EVERY, 0);
 };
 
-Every_absent_sequence_source_chainContext.prototype.within_time = function() {
-    return this.getTypedRuleContext(Within_timeContext,0);
+Every_absent_sequence_source_chainContext.prototype.within_time = function () {
+    return this.getTypedRuleContext(Within_timeContext, 0);
 };
 
-Every_absent_sequence_source_chainContext.prototype.sequence_source = function() {
-    return this.getTypedRuleContext(Sequence_sourceContext,0);
+Every_absent_sequence_source_chainContext.prototype.sequence_source = function () {
+    return this.getTypedRuleContext(Sequence_sourceContext, 0);
 };
 
-Every_absent_sequence_source_chainContext.prototype.enterRule = function(listener) {
-    if(listener instanceof SiddhiQLListener ) {
+Every_absent_sequence_source_chainContext.prototype.enterRule = function (listener) {
+    if (listener instanceof SiddhiQLListener) {
         listener.enterEvery_absent_sequence_source_chain(this);
-	}
+    }
 };
 
-Every_absent_sequence_source_chainContext.prototype.exitRule = function(listener) {
-    if(listener instanceof SiddhiQLListener ) {
+Every_absent_sequence_source_chainContext.prototype.exitRule = function (listener) {
+    if (listener instanceof SiddhiQLListener) {
         listener.exitEvery_absent_sequence_source_chain(this);
-	}
+    }
 };
-
-
 
 
 SiddhiQLParser.Every_absent_sequence_source_chainContext = Every_absent_sequence_source_chainContext;
 
-SiddhiQLParser.prototype.every_absent_sequence_source_chain = function() {
+SiddhiQLParser.prototype.every_absent_sequence_source_chain = function () {
 
     var localctx = new Every_absent_sequence_source_chainContext(this, this._ctx, this.state);
     this.enterRule(localctx, 120, SiddhiQLParser.RULE_every_absent_sequence_source_chain);
     var _la = 0; // Token type
     try {
         this.state = 986;
-        var la_ = this._interp.adaptivePredict(this._input,104,this._ctx);
-        switch(la_) {
-        case 1:
-            this.enterOuterAlt(localctx, 1);
-            this.state = 967;
-            var la_ = this._interp.adaptivePredict(this._input,100,this._ctx);
-            if(la_===1) {
-                this.state = 966;
-                this.match(SiddhiQLParser.EVERY);
+        var la_ = this._interp.adaptivePredict(this._input, 104, this._ctx);
+        switch (la_) {
+            case 1:
+                this.enterOuterAlt(localctx, 1);
+                this.state = 967;
+                var la_ = this._interp.adaptivePredict(this._input, 100, this._ctx);
+                if (la_ === 1) {
+                    this.state = 966;
+                    this.match(SiddhiQLParser.EVERY);
 
-            }
-            this.state = 969;
-            this.absent_sequence_source_chain();
-            this.state = 971;
-            _la = this._input.LA(1);
-            if(_la===SiddhiQLParser.WITHIN) {
-                this.state = 970;
-                this.within_time();
-            }
+                }
+                this.state = 969;
+                this.absent_sequence_source_chain();
+                this.state = 971;
+                _la = this._input.LA(1);
+                if (_la === SiddhiQLParser.WITHIN) {
+                    this.state = 970;
+                    this.within_time();
+                }
 
-            this.state = 973;
-            this.match(SiddhiQLParser.COMMA);
-            this.state = 974;
-            this.sequence_source_chain(0);
-            break;
+                this.state = 973;
+                this.match(SiddhiQLParser.COMMA);
+                this.state = 974;
+                this.sequence_source_chain(0);
+                break;
 
-        case 2:
-            this.enterOuterAlt(localctx, 2);
-            this.state = 977;
-            var la_ = this._interp.adaptivePredict(this._input,102,this._ctx);
-            if(la_===1) {
-                this.state = 976;
-                this.match(SiddhiQLParser.EVERY);
+            case 2:
+                this.enterOuterAlt(localctx, 2);
+                this.state = 977;
+                var la_ = this._interp.adaptivePredict(this._input, 102, this._ctx);
+                if (la_ === 1) {
+                    this.state = 976;
+                    this.match(SiddhiQLParser.EVERY);
 
-            }
-            this.state = 979;
-            this.sequence_source();
-            this.state = 981;
-            _la = this._input.LA(1);
-            if(_la===SiddhiQLParser.WITHIN) {
-                this.state = 980;
-                this.within_time();
-            }
+                }
+                this.state = 979;
+                this.sequence_source();
+                this.state = 981;
+                _la = this._input.LA(1);
+                if (_la === SiddhiQLParser.WITHIN) {
+                    this.state = 980;
+                    this.within_time();
+                }
 
-            this.state = 983;
-            this.match(SiddhiQLParser.COMMA);
-            this.state = 984;
-            this.absent_sequence_source_chain();
-            break;
+                this.state = 983;
+                this.match(SiddhiQLParser.COMMA);
+                this.state = 984;
+                this.absent_sequence_source_chain();
+                break;
 
         }
     } catch (re) {
-    	if(re instanceof antlr4.error.RecognitionException) {
-	        localctx.exception = re;
-	        this._errHandler.reportError(this, re);
-	        this._errHandler.recover(this, re);
-	    } else {
-	    	throw re;
-	    }
+        if (re instanceof antlr4.error.RecognitionException) {
+            localctx.exception = re;
+            this._errHandler.reportError(this, re);
+            this._errHandler.recover(this, re);
+        } else {
+            throw re;
+        }
     } finally {
         this.exitRule();
     }
@@ -7370,13 +7254,13 @@ SiddhiQLParser.prototype.every_absent_sequence_source_chain = function() {
 };
 
 function Absent_sequence_source_chainContext(parser, parent, invokingState) {
-	if(parent===undefined) {
-	    parent = null;
-	}
-	if(invokingState===undefined || invokingState===null) {
-		invokingState = -1;
-	}
-	antlr4.ParserRuleContext.call(this, parent, invokingState);
+    if (parent === undefined) {
+        parent = null;
+    }
+    if (invokingState === undefined || invokingState === null) {
+        invokingState = -1;
+    }
+    antlr4.ParserRuleContext.call(this, parent, invokingState);
     this.parser = parser;
     this.ruleIndex = SiddhiQLParser.RULE_absent_sequence_source_chain;
     return this;
@@ -7385,95 +7269,93 @@ function Absent_sequence_source_chainContext(parser, parent, invokingState) {
 Absent_sequence_source_chainContext.prototype = Object.create(antlr4.ParserRuleContext.prototype);
 Absent_sequence_source_chainContext.prototype.constructor = Absent_sequence_source_chainContext;
 
-Absent_sequence_source_chainContext.prototype.absent_sequence_source_chain = function() {
-    return this.getTypedRuleContext(Absent_sequence_source_chainContext,0);
+Absent_sequence_source_chainContext.prototype.absent_sequence_source_chain = function () {
+    return this.getTypedRuleContext(Absent_sequence_source_chainContext, 0);
 };
 
-Absent_sequence_source_chainContext.prototype.within_time = function() {
-    return this.getTypedRuleContext(Within_timeContext,0);
+Absent_sequence_source_chainContext.prototype.within_time = function () {
+    return this.getTypedRuleContext(Within_timeContext, 0);
 };
 
-Absent_sequence_source_chainContext.prototype.basic_absent_pattern_source = function() {
-    return this.getTypedRuleContext(Basic_absent_pattern_sourceContext,0);
+Absent_sequence_source_chainContext.prototype.basic_absent_pattern_source = function () {
+    return this.getTypedRuleContext(Basic_absent_pattern_sourceContext, 0);
 };
 
-Absent_sequence_source_chainContext.prototype.left_absent_sequence_source = function() {
-    return this.getTypedRuleContext(Left_absent_sequence_sourceContext,0);
+Absent_sequence_source_chainContext.prototype.left_absent_sequence_source = function () {
+    return this.getTypedRuleContext(Left_absent_sequence_sourceContext, 0);
 };
 
-Absent_sequence_source_chainContext.prototype.right_absent_sequence_source = function() {
-    return this.getTypedRuleContext(Right_absent_sequence_sourceContext,0);
+Absent_sequence_source_chainContext.prototype.right_absent_sequence_source = function () {
+    return this.getTypedRuleContext(Right_absent_sequence_sourceContext, 0);
 };
 
-Absent_sequence_source_chainContext.prototype.enterRule = function(listener) {
-    if(listener instanceof SiddhiQLListener ) {
+Absent_sequence_source_chainContext.prototype.enterRule = function (listener) {
+    if (listener instanceof SiddhiQLListener) {
         listener.enterAbsent_sequence_source_chain(this);
-	}
+    }
 };
 
-Absent_sequence_source_chainContext.prototype.exitRule = function(listener) {
-    if(listener instanceof SiddhiQLListener ) {
+Absent_sequence_source_chainContext.prototype.exitRule = function (listener) {
+    if (listener instanceof SiddhiQLListener) {
         listener.exitAbsent_sequence_source_chain(this);
-	}
+    }
 };
-
-
 
 
 SiddhiQLParser.Absent_sequence_source_chainContext = Absent_sequence_source_chainContext;
 
-SiddhiQLParser.prototype.absent_sequence_source_chain = function() {
+SiddhiQLParser.prototype.absent_sequence_source_chain = function () {
 
     var localctx = new Absent_sequence_source_chainContext(this, this._ctx, this.state);
     this.enterRule(localctx, 122, SiddhiQLParser.RULE_absent_sequence_source_chain);
     try {
         this.state = 997;
-        var la_ = this._interp.adaptivePredict(this._input,106,this._ctx);
-        switch(la_) {
-        case 1:
-            this.enterOuterAlt(localctx, 1);
-            this.state = 988;
-            this.match(SiddhiQLParser.OPEN_PAR);
-            this.state = 989;
-            this.absent_sequence_source_chain();
-            this.state = 990;
-            this.match(SiddhiQLParser.CLOSE_PAR);
-            this.state = 992;
-            var la_ = this._interp.adaptivePredict(this._input,105,this._ctx);
-            if(la_===1) {
-                this.state = 991;
-                this.within_time();
+        var la_ = this._interp.adaptivePredict(this._input, 106, this._ctx);
+        switch (la_) {
+            case 1:
+                this.enterOuterAlt(localctx, 1);
+                this.state = 988;
+                this.match(SiddhiQLParser.OPEN_PAR);
+                this.state = 989;
+                this.absent_sequence_source_chain();
+                this.state = 990;
+                this.match(SiddhiQLParser.CLOSE_PAR);
+                this.state = 992;
+                var la_ = this._interp.adaptivePredict(this._input, 105, this._ctx);
+                if (la_ === 1) {
+                    this.state = 991;
+                    this.within_time();
 
-            }
-            break;
+                }
+                break;
 
-        case 2:
-            this.enterOuterAlt(localctx, 2);
-            this.state = 994;
-            this.basic_absent_pattern_source();
-            break;
+            case 2:
+                this.enterOuterAlt(localctx, 2);
+                this.state = 994;
+                this.basic_absent_pattern_source();
+                break;
 
-        case 3:
-            this.enterOuterAlt(localctx, 3);
-            this.state = 995;
-            this.left_absent_sequence_source(0);
-            break;
+            case 3:
+                this.enterOuterAlt(localctx, 3);
+                this.state = 995;
+                this.left_absent_sequence_source(0);
+                break;
 
-        case 4:
-            this.enterOuterAlt(localctx, 4);
-            this.state = 996;
-            this.right_absent_sequence_source(0);
-            break;
+            case 4:
+                this.enterOuterAlt(localctx, 4);
+                this.state = 996;
+                this.right_absent_sequence_source(0);
+                break;
 
         }
     } catch (re) {
-    	if(re instanceof antlr4.error.RecognitionException) {
-	        localctx.exception = re;
-	        this._errHandler.reportError(this, re);
-	        this._errHandler.recover(this, re);
-	    } else {
-	    	throw re;
-	    }
+        if (re instanceof antlr4.error.RecognitionException) {
+            localctx.exception = re;
+            this._errHandler.reportError(this, re);
+            this._errHandler.recover(this, re);
+        } else {
+            throw re;
+        }
     } finally {
         this.exitRule();
     }
@@ -7481,13 +7363,13 @@ SiddhiQLParser.prototype.absent_sequence_source_chain = function() {
 };
 
 function Left_absent_sequence_sourceContext(parser, parent, invokingState) {
-	if(parent===undefined) {
-	    parent = null;
-	}
-	if(invokingState===undefined || invokingState===null) {
-		invokingState = -1;
-	}
-	antlr4.ParserRuleContext.call(this, parent, invokingState);
+    if (parent === undefined) {
+        parent = null;
+    }
+    if (invokingState === undefined || invokingState === null) {
+        invokingState = -1;
+    }
+    antlr4.ParserRuleContext.call(this, parent, invokingState);
     this.parser = parser;
     this.ruleIndex = SiddhiQLParser.RULE_left_absent_sequence_source;
     return this;
@@ -7496,47 +7378,46 @@ function Left_absent_sequence_sourceContext(parser, parent, invokingState) {
 Left_absent_sequence_sourceContext.prototype = Object.create(antlr4.ParserRuleContext.prototype);
 Left_absent_sequence_sourceContext.prototype.constructor = Left_absent_sequence_sourceContext;
 
-Left_absent_sequence_sourceContext.prototype.sequence_source_chain = function() {
-    return this.getTypedRuleContext(Sequence_source_chainContext,0);
+Left_absent_sequence_sourceContext.prototype.sequence_source_chain = function () {
+    return this.getTypedRuleContext(Sequence_source_chainContext, 0);
 };
 
-Left_absent_sequence_sourceContext.prototype.left_absent_sequence_source = function(i) {
-    if(i===undefined) {
+Left_absent_sequence_sourceContext.prototype.left_absent_sequence_source = function (i) {
+    if (i === undefined) {
         i = null;
     }
-    if(i===null) {
+    if (i === null) {
         return this.getTypedRuleContexts(Left_absent_sequence_sourceContext);
     } else {
-        return this.getTypedRuleContext(Left_absent_sequence_sourceContext,i);
+        return this.getTypedRuleContext(Left_absent_sequence_sourceContext, i);
     }
 };
 
-Left_absent_sequence_sourceContext.prototype.within_time = function() {
-    return this.getTypedRuleContext(Within_timeContext,0);
+Left_absent_sequence_sourceContext.prototype.within_time = function () {
+    return this.getTypedRuleContext(Within_timeContext, 0);
 };
 
-Left_absent_sequence_sourceContext.prototype.basic_absent_pattern_source = function() {
-    return this.getTypedRuleContext(Basic_absent_pattern_sourceContext,0);
+Left_absent_sequence_sourceContext.prototype.basic_absent_pattern_source = function () {
+    return this.getTypedRuleContext(Basic_absent_pattern_sourceContext, 0);
 };
 
-Left_absent_sequence_sourceContext.prototype.enterRule = function(listener) {
-    if(listener instanceof SiddhiQLListener ) {
+Left_absent_sequence_sourceContext.prototype.enterRule = function (listener) {
+    if (listener instanceof SiddhiQLListener) {
         listener.enterLeft_absent_sequence_source(this);
-	}
+    }
 };
 
-Left_absent_sequence_sourceContext.prototype.exitRule = function(listener) {
-    if(listener instanceof SiddhiQLListener ) {
+Left_absent_sequence_sourceContext.prototype.exitRule = function (listener) {
+    if (listener instanceof SiddhiQLListener) {
         listener.exitLeft_absent_sequence_source(this);
-	}
+    }
 };
 
 
-
-SiddhiQLParser.prototype.left_absent_sequence_source = function(_p) {
-	if(_p===undefined) {
-	    _p = 0;
-	}
+SiddhiQLParser.prototype.left_absent_sequence_source = function (_p) {
+    if (_p === undefined) {
+        _p = 0;
+    }
     var _parentctx = this._ctx;
     var _parentState = this.state;
     var localctx = new Left_absent_sequence_sourceContext(this, this._ctx, _parentState);
@@ -7546,97 +7427,97 @@ SiddhiQLParser.prototype.left_absent_sequence_source = function(_p) {
     try {
         this.enterOuterAlt(localctx, 1);
         this.state = 1014;
-        var la_ = this._interp.adaptivePredict(this._input,108,this._ctx);
-        switch(la_) {
-        case 1:
-            this.state = 1000;
-            this.sequence_source_chain(0);
-            this.state = 1001;
-            this.match(SiddhiQLParser.COMMA);
-            this.state = 1002;
-            this.left_absent_sequence_source(1);
-            break;
+        var la_ = this._interp.adaptivePredict(this._input, 108, this._ctx);
+        switch (la_) {
+            case 1:
+                this.state = 1000;
+                this.sequence_source_chain(0);
+                this.state = 1001;
+                this.match(SiddhiQLParser.COMMA);
+                this.state = 1002;
+                this.left_absent_sequence_source(1);
+                break;
 
-        case 2:
-            this.state = 1004;
-            this.match(SiddhiQLParser.OPEN_PAR);
-            this.state = 1005;
-            this.left_absent_sequence_source(0);
-            this.state = 1006;
-            this.match(SiddhiQLParser.CLOSE_PAR);
-            this.state = 1008;
-            var la_ = this._interp.adaptivePredict(this._input,107,this._ctx);
-            if(la_===1) {
-                this.state = 1007;
-                this.within_time();
+            case 2:
+                this.state = 1004;
+                this.match(SiddhiQLParser.OPEN_PAR);
+                this.state = 1005;
+                this.left_absent_sequence_source(0);
+                this.state = 1006;
+                this.match(SiddhiQLParser.CLOSE_PAR);
+                this.state = 1008;
+                var la_ = this._interp.adaptivePredict(this._input, 107, this._ctx);
+                if (la_ === 1) {
+                    this.state = 1007;
+                    this.within_time();
 
-            }
-            break;
+                }
+                break;
 
-        case 3:
-            this.state = 1010;
-            this.basic_absent_pattern_source();
-            this.state = 1011;
-            this.match(SiddhiQLParser.COMMA);
-            this.state = 1012;
-            this.sequence_source_chain(0);
-            break;
+            case 3:
+                this.state = 1010;
+                this.basic_absent_pattern_source();
+                this.state = 1011;
+                this.match(SiddhiQLParser.COMMA);
+                this.state = 1012;
+                this.sequence_source_chain(0);
+                break;
 
         }
         this._ctx.stop = this._input.LT(-1);
         this.state = 1024;
         this._errHandler.sync(this);
-        var _alt = this._interp.adaptivePredict(this._input,110,this._ctx)
-        while(_alt!=2 && _alt!=antlr4.atn.ATN.INVALID_ALT_NUMBER) {
-            if(_alt===1) {
-                if(this._parseListeners!==null) {
+        var _alt = this._interp.adaptivePredict(this._input, 110, this._ctx)
+        while (_alt != 2 && _alt != antlr4.atn.ATN.INVALID_ALT_NUMBER) {
+            if (_alt === 1) {
+                if (this._parseListeners !== null) {
                     this.triggerExitRuleEvent();
                 }
                 _prevctx = localctx;
                 this.state = 1022;
-                var la_ = this._interp.adaptivePredict(this._input,109,this._ctx);
-                switch(la_) {
-                case 1:
-                    localctx = new Left_absent_sequence_sourceContext(this, _parentctx, _parentState);
-                    this.pushNewRecursionContext(localctx, _startState, SiddhiQLParser.RULE_left_absent_sequence_source);
-                    this.state = 1016;
-                    if (!( this.precpred(this._ctx, 3))) {
-                        throw new antlr4.error.FailedPredicateException(this, "this.precpred(this._ctx, 3)");
-                    }
-                    this.state = 1017;
-                    this.match(SiddhiQLParser.COMMA);
-                    this.state = 1018;
-                    this.left_absent_sequence_source(4);
-                    break;
+                var la_ = this._interp.adaptivePredict(this._input, 109, this._ctx);
+                switch (la_) {
+                    case 1:
+                        localctx = new Left_absent_sequence_sourceContext(this, _parentctx, _parentState);
+                        this.pushNewRecursionContext(localctx, _startState, SiddhiQLParser.RULE_left_absent_sequence_source);
+                        this.state = 1016;
+                        if (!( this.precpred(this._ctx, 3))) {
+                            throw new antlr4.error.FailedPredicateException(this, "this.precpred(this._ctx, 3)");
+                        }
+                        this.state = 1017;
+                        this.match(SiddhiQLParser.COMMA);
+                        this.state = 1018;
+                        this.left_absent_sequence_source(4);
+                        break;
 
-                case 2:
-                    localctx = new Left_absent_sequence_sourceContext(this, _parentctx, _parentState);
-                    this.pushNewRecursionContext(localctx, _startState, SiddhiQLParser.RULE_left_absent_sequence_source);
-                    this.state = 1019;
-                    if (!( this.precpred(this._ctx, 2))) {
-                        throw new antlr4.error.FailedPredicateException(this, "this.precpred(this._ctx, 2)");
-                    }
-                    this.state = 1020;
-                    this.match(SiddhiQLParser.COMMA);
-                    this.state = 1021;
-                    this.basic_absent_pattern_source();
-                    break;
+                    case 2:
+                        localctx = new Left_absent_sequence_sourceContext(this, _parentctx, _parentState);
+                        this.pushNewRecursionContext(localctx, _startState, SiddhiQLParser.RULE_left_absent_sequence_source);
+                        this.state = 1019;
+                        if (!( this.precpred(this._ctx, 2))) {
+                            throw new antlr4.error.FailedPredicateException(this, "this.precpred(this._ctx, 2)");
+                        }
+                        this.state = 1020;
+                        this.match(SiddhiQLParser.COMMA);
+                        this.state = 1021;
+                        this.basic_absent_pattern_source();
+                        break;
 
-                } 
+                }
             }
             this.state = 1026;
             this._errHandler.sync(this);
-            _alt = this._interp.adaptivePredict(this._input,110,this._ctx);
+            _alt = this._interp.adaptivePredict(this._input, 110, this._ctx);
         }
 
-    } catch( error) {
-        if(error instanceof antlr4.error.RecognitionException) {
-	        localctx.exception = error;
-	        this._errHandler.reportError(this, error);
-	        this._errHandler.recover(this, error);
-	    } else {
-	    	throw error;
-	    }
+    } catch (error) {
+        if (error instanceof antlr4.error.RecognitionException) {
+            localctx.exception = error;
+            this._errHandler.reportError(this, error);
+            this._errHandler.recover(this, error);
+        } else {
+            throw error;
+        }
     } finally {
         this.unrollRecursionContexts(_parentctx)
     }
@@ -7644,13 +7525,13 @@ SiddhiQLParser.prototype.left_absent_sequence_source = function(_p) {
 };
 
 function Right_absent_sequence_sourceContext(parser, parent, invokingState) {
-	if(parent===undefined) {
-	    parent = null;
-	}
-	if(invokingState===undefined || invokingState===null) {
-		invokingState = -1;
-	}
-	antlr4.ParserRuleContext.call(this, parent, invokingState);
+    if (parent === undefined) {
+        parent = null;
+    }
+    if (invokingState === undefined || invokingState === null) {
+        invokingState = -1;
+    }
+    antlr4.ParserRuleContext.call(this, parent, invokingState);
     this.parser = parser;
     this.ruleIndex = SiddhiQLParser.RULE_right_absent_sequence_source;
     return this;
@@ -7659,47 +7540,46 @@ function Right_absent_sequence_sourceContext(parser, parent, invokingState) {
 Right_absent_sequence_sourceContext.prototype = Object.create(antlr4.ParserRuleContext.prototype);
 Right_absent_sequence_sourceContext.prototype.constructor = Right_absent_sequence_sourceContext;
 
-Right_absent_sequence_sourceContext.prototype.basic_absent_pattern_source = function() {
-    return this.getTypedRuleContext(Basic_absent_pattern_sourceContext,0);
+Right_absent_sequence_sourceContext.prototype.basic_absent_pattern_source = function () {
+    return this.getTypedRuleContext(Basic_absent_pattern_sourceContext, 0);
 };
 
-Right_absent_sequence_sourceContext.prototype.right_absent_sequence_source = function(i) {
-    if(i===undefined) {
+Right_absent_sequence_sourceContext.prototype.right_absent_sequence_source = function (i) {
+    if (i === undefined) {
         i = null;
     }
-    if(i===null) {
+    if (i === null) {
         return this.getTypedRuleContexts(Right_absent_sequence_sourceContext);
     } else {
-        return this.getTypedRuleContext(Right_absent_sequence_sourceContext,i);
+        return this.getTypedRuleContext(Right_absent_sequence_sourceContext, i);
     }
 };
 
-Right_absent_sequence_sourceContext.prototype.within_time = function() {
-    return this.getTypedRuleContext(Within_timeContext,0);
+Right_absent_sequence_sourceContext.prototype.within_time = function () {
+    return this.getTypedRuleContext(Within_timeContext, 0);
 };
 
-Right_absent_sequence_sourceContext.prototype.sequence_source_chain = function() {
-    return this.getTypedRuleContext(Sequence_source_chainContext,0);
+Right_absent_sequence_sourceContext.prototype.sequence_source_chain = function () {
+    return this.getTypedRuleContext(Sequence_source_chainContext, 0);
 };
 
-Right_absent_sequence_sourceContext.prototype.enterRule = function(listener) {
-    if(listener instanceof SiddhiQLListener ) {
+Right_absent_sequence_sourceContext.prototype.enterRule = function (listener) {
+    if (listener instanceof SiddhiQLListener) {
         listener.enterRight_absent_sequence_source(this);
-	}
+    }
 };
 
-Right_absent_sequence_sourceContext.prototype.exitRule = function(listener) {
-    if(listener instanceof SiddhiQLListener ) {
+Right_absent_sequence_sourceContext.prototype.exitRule = function (listener) {
+    if (listener instanceof SiddhiQLListener) {
         listener.exitRight_absent_sequence_source(this);
-	}
+    }
 };
 
 
-
-SiddhiQLParser.prototype.right_absent_sequence_source = function(_p) {
-	if(_p===undefined) {
-	    _p = 0;
-	}
+SiddhiQLParser.prototype.right_absent_sequence_source = function (_p) {
+    if (_p === undefined) {
+        _p = 0;
+    }
     var _parentctx = this._ctx;
     var _parentState = this.state;
     var localctx = new Right_absent_sequence_sourceContext(this, this._ctx, _parentState);
@@ -7709,97 +7589,97 @@ SiddhiQLParser.prototype.right_absent_sequence_source = function(_p) {
     try {
         this.enterOuterAlt(localctx, 1);
         this.state = 1042;
-        var la_ = this._interp.adaptivePredict(this._input,112,this._ctx);
-        switch(la_) {
-        case 1:
-            this.state = 1028;
-            this.basic_absent_pattern_source();
-            this.state = 1029;
-            this.match(SiddhiQLParser.COMMA);
-            this.state = 1030;
-            this.right_absent_sequence_source(2);
-            break;
+        var la_ = this._interp.adaptivePredict(this._input, 112, this._ctx);
+        switch (la_) {
+            case 1:
+                this.state = 1028;
+                this.basic_absent_pattern_source();
+                this.state = 1029;
+                this.match(SiddhiQLParser.COMMA);
+                this.state = 1030;
+                this.right_absent_sequence_source(2);
+                break;
 
-        case 2:
-            this.state = 1032;
-            this.match(SiddhiQLParser.OPEN_PAR);
-            this.state = 1033;
-            this.right_absent_sequence_source(0);
-            this.state = 1034;
-            this.match(SiddhiQLParser.CLOSE_PAR);
-            this.state = 1036;
-            var la_ = this._interp.adaptivePredict(this._input,111,this._ctx);
-            if(la_===1) {
-                this.state = 1035;
-                this.within_time();
+            case 2:
+                this.state = 1032;
+                this.match(SiddhiQLParser.OPEN_PAR);
+                this.state = 1033;
+                this.right_absent_sequence_source(0);
+                this.state = 1034;
+                this.match(SiddhiQLParser.CLOSE_PAR);
+                this.state = 1036;
+                var la_ = this._interp.adaptivePredict(this._input, 111, this._ctx);
+                if (la_ === 1) {
+                    this.state = 1035;
+                    this.within_time();
 
-            }
-            break;
+                }
+                break;
 
-        case 3:
-            this.state = 1038;
-            this.sequence_source_chain(0);
-            this.state = 1039;
-            this.match(SiddhiQLParser.COMMA);
-            this.state = 1040;
-            this.basic_absent_pattern_source();
-            break;
+            case 3:
+                this.state = 1038;
+                this.sequence_source_chain(0);
+                this.state = 1039;
+                this.match(SiddhiQLParser.COMMA);
+                this.state = 1040;
+                this.basic_absent_pattern_source();
+                break;
 
         }
         this._ctx.stop = this._input.LT(-1);
         this.state = 1052;
         this._errHandler.sync(this);
-        var _alt = this._interp.adaptivePredict(this._input,114,this._ctx)
-        while(_alt!=2 && _alt!=antlr4.atn.ATN.INVALID_ALT_NUMBER) {
-            if(_alt===1) {
-                if(this._parseListeners!==null) {
+        var _alt = this._interp.adaptivePredict(this._input, 114, this._ctx)
+        while (_alt != 2 && _alt != antlr4.atn.ATN.INVALID_ALT_NUMBER) {
+            if (_alt === 1) {
+                if (this._parseListeners !== null) {
                     this.triggerExitRuleEvent();
                 }
                 _prevctx = localctx;
                 this.state = 1050;
-                var la_ = this._interp.adaptivePredict(this._input,113,this._ctx);
-                switch(la_) {
-                case 1:
-                    localctx = new Right_absent_sequence_sourceContext(this, _parentctx, _parentState);
-                    this.pushNewRecursionContext(localctx, _startState, SiddhiQLParser.RULE_right_absent_sequence_source);
-                    this.state = 1044;
-                    if (!( this.precpred(this._ctx, 3))) {
-                        throw new antlr4.error.FailedPredicateException(this, "this.precpred(this._ctx, 3)");
-                    }
-                    this.state = 1045;
-                    this.match(SiddhiQLParser.COMMA);
-                    this.state = 1046;
-                    this.right_absent_sequence_source(4);
-                    break;
+                var la_ = this._interp.adaptivePredict(this._input, 113, this._ctx);
+                switch (la_) {
+                    case 1:
+                        localctx = new Right_absent_sequence_sourceContext(this, _parentctx, _parentState);
+                        this.pushNewRecursionContext(localctx, _startState, SiddhiQLParser.RULE_right_absent_sequence_source);
+                        this.state = 1044;
+                        if (!( this.precpred(this._ctx, 3))) {
+                            throw new antlr4.error.FailedPredicateException(this, "this.precpred(this._ctx, 3)");
+                        }
+                        this.state = 1045;
+                        this.match(SiddhiQLParser.COMMA);
+                        this.state = 1046;
+                        this.right_absent_sequence_source(4);
+                        break;
 
-                case 2:
-                    localctx = new Right_absent_sequence_sourceContext(this, _parentctx, _parentState);
-                    this.pushNewRecursionContext(localctx, _startState, SiddhiQLParser.RULE_right_absent_sequence_source);
-                    this.state = 1047;
-                    if (!( this.precpred(this._ctx, 1))) {
-                        throw new antlr4.error.FailedPredicateException(this, "this.precpred(this._ctx, 1)");
-                    }
-                    this.state = 1048;
-                    this.match(SiddhiQLParser.COMMA);
-                    this.state = 1049;
-                    this.sequence_source_chain(0);
-                    break;
+                    case 2:
+                        localctx = new Right_absent_sequence_sourceContext(this, _parentctx, _parentState);
+                        this.pushNewRecursionContext(localctx, _startState, SiddhiQLParser.RULE_right_absent_sequence_source);
+                        this.state = 1047;
+                        if (!( this.precpred(this._ctx, 1))) {
+                            throw new antlr4.error.FailedPredicateException(this, "this.precpred(this._ctx, 1)");
+                        }
+                        this.state = 1048;
+                        this.match(SiddhiQLParser.COMMA);
+                        this.state = 1049;
+                        this.sequence_source_chain(0);
+                        break;
 
-                } 
+                }
             }
             this.state = 1054;
             this._errHandler.sync(this);
-            _alt = this._interp.adaptivePredict(this._input,114,this._ctx);
+            _alt = this._interp.adaptivePredict(this._input, 114, this._ctx);
         }
 
-    } catch( error) {
-        if(error instanceof antlr4.error.RecognitionException) {
-	        localctx.exception = error;
-	        this._errHandler.reportError(this, error);
-	        this._errHandler.recover(this, error);
-	    } else {
-	    	throw error;
-	    }
+    } catch (error) {
+        if (error instanceof antlr4.error.RecognitionException) {
+            localctx.exception = error;
+            this._errHandler.reportError(this, error);
+            this._errHandler.recover(this, error);
+        } else {
+            throw error;
+        }
     } finally {
         this.unrollRecursionContexts(_parentctx)
     }
@@ -7807,13 +7687,13 @@ SiddhiQLParser.prototype.right_absent_sequence_source = function(_p) {
 };
 
 function Sequence_source_chainContext(parser, parent, invokingState) {
-	if(parent===undefined) {
-	    parent = null;
-	}
-	if(invokingState===undefined || invokingState===null) {
-		invokingState = -1;
-	}
-	antlr4.ParserRuleContext.call(this, parent, invokingState);
+    if (parent === undefined) {
+        parent = null;
+    }
+    if (invokingState === undefined || invokingState === null) {
+        invokingState = -1;
+    }
+    antlr4.ParserRuleContext.call(this, parent, invokingState);
     this.parser = parser;
     this.ruleIndex = SiddhiQLParser.RULE_sequence_source_chain;
     return this;
@@ -7822,43 +7702,42 @@ function Sequence_source_chainContext(parser, parent, invokingState) {
 Sequence_source_chainContext.prototype = Object.create(antlr4.ParserRuleContext.prototype);
 Sequence_source_chainContext.prototype.constructor = Sequence_source_chainContext;
 
-Sequence_source_chainContext.prototype.sequence_source_chain = function(i) {
-    if(i===undefined) {
+Sequence_source_chainContext.prototype.sequence_source_chain = function (i) {
+    if (i === undefined) {
         i = null;
     }
-    if(i===null) {
+    if (i === null) {
         return this.getTypedRuleContexts(Sequence_source_chainContext);
     } else {
-        return this.getTypedRuleContext(Sequence_source_chainContext,i);
+        return this.getTypedRuleContext(Sequence_source_chainContext, i);
     }
 };
 
-Sequence_source_chainContext.prototype.within_time = function() {
-    return this.getTypedRuleContext(Within_timeContext,0);
+Sequence_source_chainContext.prototype.within_time = function () {
+    return this.getTypedRuleContext(Within_timeContext, 0);
 };
 
-Sequence_source_chainContext.prototype.sequence_source = function() {
-    return this.getTypedRuleContext(Sequence_sourceContext,0);
+Sequence_source_chainContext.prototype.sequence_source = function () {
+    return this.getTypedRuleContext(Sequence_sourceContext, 0);
 };
 
-Sequence_source_chainContext.prototype.enterRule = function(listener) {
-    if(listener instanceof SiddhiQLListener ) {
+Sequence_source_chainContext.prototype.enterRule = function (listener) {
+    if (listener instanceof SiddhiQLListener) {
         listener.enterSequence_source_chain(this);
-	}
+    }
 };
 
-Sequence_source_chainContext.prototype.exitRule = function(listener) {
-    if(listener instanceof SiddhiQLListener ) {
+Sequence_source_chainContext.prototype.exitRule = function (listener) {
+    if (listener instanceof SiddhiQLListener) {
         listener.exitSequence_source_chain(this);
-	}
+    }
 };
 
 
-
-SiddhiQLParser.prototype.sequence_source_chain = function(_p) {
-	if(_p===undefined) {
-	    _p = 0;
-	}
+SiddhiQLParser.prototype.sequence_source_chain = function (_p) {
+    if (_p === undefined) {
+        _p = 0;
+    }
     var _parentctx = this._ctx;
     var _parentState = this.state;
     var localctx = new Sequence_source_chainContext(this, this._ctx, _parentState);
@@ -7868,44 +7747,44 @@ SiddhiQLParser.prototype.sequence_source_chain = function(_p) {
     try {
         this.enterOuterAlt(localctx, 1);
         this.state = 1066;
-        var la_ = this._interp.adaptivePredict(this._input,117,this._ctx);
-        switch(la_) {
-        case 1:
-            this.state = 1056;
-            this.match(SiddhiQLParser.OPEN_PAR);
-            this.state = 1057;
-            this.sequence_source_chain(0);
-            this.state = 1058;
-            this.match(SiddhiQLParser.CLOSE_PAR);
-            this.state = 1060;
-            var la_ = this._interp.adaptivePredict(this._input,115,this._ctx);
-            if(la_===1) {
-                this.state = 1059;
-                this.within_time();
+        var la_ = this._interp.adaptivePredict(this._input, 117, this._ctx);
+        switch (la_) {
+            case 1:
+                this.state = 1056;
+                this.match(SiddhiQLParser.OPEN_PAR);
+                this.state = 1057;
+                this.sequence_source_chain(0);
+                this.state = 1058;
+                this.match(SiddhiQLParser.CLOSE_PAR);
+                this.state = 1060;
+                var la_ = this._interp.adaptivePredict(this._input, 115, this._ctx);
+                if (la_ === 1) {
+                    this.state = 1059;
+                    this.within_time();
 
-            }
-            break;
+                }
+                break;
 
-        case 2:
-            this.state = 1062;
-            this.sequence_source();
-            this.state = 1064;
-            var la_ = this._interp.adaptivePredict(this._input,116,this._ctx);
-            if(la_===1) {
-                this.state = 1063;
-                this.within_time();
+            case 2:
+                this.state = 1062;
+                this.sequence_source();
+                this.state = 1064;
+                var la_ = this._interp.adaptivePredict(this._input, 116, this._ctx);
+                if (la_ === 1) {
+                    this.state = 1063;
+                    this.within_time();
 
-            }
-            break;
+                }
+                break;
 
         }
         this._ctx.stop = this._input.LT(-1);
         this.state = 1073;
         this._errHandler.sync(this);
-        var _alt = this._interp.adaptivePredict(this._input,118,this._ctx)
-        while(_alt!=2 && _alt!=antlr4.atn.ATN.INVALID_ALT_NUMBER) {
-            if(_alt===1) {
-                if(this._parseListeners!==null) {
+        var _alt = this._interp.adaptivePredict(this._input, 118, this._ctx)
+        while (_alt != 2 && _alt != antlr4.atn.ATN.INVALID_ALT_NUMBER) {
+            if (_alt === 1) {
+                if (this._parseListeners !== null) {
                     this.triggerExitRuleEvent();
                 }
                 _prevctx = localctx;
@@ -7918,21 +7797,21 @@ SiddhiQLParser.prototype.sequence_source_chain = function(_p) {
                 this.state = 1069;
                 this.match(SiddhiQLParser.COMMA);
                 this.state = 1070;
-                this.sequence_source_chain(3); 
+                this.sequence_source_chain(3);
             }
             this.state = 1075;
             this._errHandler.sync(this);
-            _alt = this._interp.adaptivePredict(this._input,118,this._ctx);
+            _alt = this._interp.adaptivePredict(this._input, 118, this._ctx);
         }
 
-    } catch( error) {
-        if(error instanceof antlr4.error.RecognitionException) {
-	        localctx.exception = error;
-	        this._errHandler.reportError(this, error);
-	        this._errHandler.recover(this, error);
-	    } else {
-	    	throw error;
-	    }
+    } catch (error) {
+        if (error instanceof antlr4.error.RecognitionException) {
+            localctx.exception = error;
+            this._errHandler.reportError(this, error);
+            this._errHandler.recover(this, error);
+        } else {
+            throw error;
+        }
     } finally {
         this.unrollRecursionContexts(_parentctx)
     }
@@ -7940,13 +7819,13 @@ SiddhiQLParser.prototype.sequence_source_chain = function(_p) {
 };
 
 function Sequence_sourceContext(parser, parent, invokingState) {
-	if(parent===undefined) {
-	    parent = null;
-	}
-	if(invokingState===undefined || invokingState===null) {
-		invokingState = -1;
-	}
-	antlr4.ParserRuleContext.call(this, parent, invokingState);
+    if (parent === undefined) {
+        parent = null;
+    }
+    if (invokingState === undefined || invokingState === null) {
+        invokingState = -1;
+    }
+    antlr4.ParserRuleContext.call(this, parent, invokingState);
     this.parser = parser;
     this.ruleIndex = SiddhiQLParser.RULE_sequence_source;
     return this;
@@ -7955,80 +7834,78 @@ function Sequence_sourceContext(parser, parent, invokingState) {
 Sequence_sourceContext.prototype = Object.create(antlr4.ParserRuleContext.prototype);
 Sequence_sourceContext.prototype.constructor = Sequence_sourceContext;
 
-Sequence_sourceContext.prototype.logical_stateful_source = function() {
-    return this.getTypedRuleContext(Logical_stateful_sourceContext,0);
+Sequence_sourceContext.prototype.logical_stateful_source = function () {
+    return this.getTypedRuleContext(Logical_stateful_sourceContext, 0);
 };
 
-Sequence_sourceContext.prototype.sequence_collection_stateful_source = function() {
-    return this.getTypedRuleContext(Sequence_collection_stateful_sourceContext,0);
+Sequence_sourceContext.prototype.sequence_collection_stateful_source = function () {
+    return this.getTypedRuleContext(Sequence_collection_stateful_sourceContext, 0);
 };
 
-Sequence_sourceContext.prototype.standard_stateful_source = function() {
-    return this.getTypedRuleContext(Standard_stateful_sourceContext,0);
+Sequence_sourceContext.prototype.standard_stateful_source = function () {
+    return this.getTypedRuleContext(Standard_stateful_sourceContext, 0);
 };
 
-Sequence_sourceContext.prototype.logical_absent_stateful_source = function() {
-    return this.getTypedRuleContext(Logical_absent_stateful_sourceContext,0);
+Sequence_sourceContext.prototype.logical_absent_stateful_source = function () {
+    return this.getTypedRuleContext(Logical_absent_stateful_sourceContext, 0);
 };
 
-Sequence_sourceContext.prototype.enterRule = function(listener) {
-    if(listener instanceof SiddhiQLListener ) {
+Sequence_sourceContext.prototype.enterRule = function (listener) {
+    if (listener instanceof SiddhiQLListener) {
         listener.enterSequence_source(this);
-	}
+    }
 };
 
-Sequence_sourceContext.prototype.exitRule = function(listener) {
-    if(listener instanceof SiddhiQLListener ) {
+Sequence_sourceContext.prototype.exitRule = function (listener) {
+    if (listener instanceof SiddhiQLListener) {
         listener.exitSequence_source(this);
-	}
+    }
 };
-
-
 
 
 SiddhiQLParser.Sequence_sourceContext = Sequence_sourceContext;
 
-SiddhiQLParser.prototype.sequence_source = function() {
+SiddhiQLParser.prototype.sequence_source = function () {
 
     var localctx = new Sequence_sourceContext(this, this._ctx, this.state);
     this.enterRule(localctx, 130, SiddhiQLParser.RULE_sequence_source);
     try {
         this.state = 1080;
-        var la_ = this._interp.adaptivePredict(this._input,119,this._ctx);
-        switch(la_) {
-        case 1:
-            this.enterOuterAlt(localctx, 1);
-            this.state = 1076;
-            this.logical_stateful_source();
-            break;
+        var la_ = this._interp.adaptivePredict(this._input, 119, this._ctx);
+        switch (la_) {
+            case 1:
+                this.enterOuterAlt(localctx, 1);
+                this.state = 1076;
+                this.logical_stateful_source();
+                break;
 
-        case 2:
-            this.enterOuterAlt(localctx, 2);
-            this.state = 1077;
-            this.sequence_collection_stateful_source();
-            break;
+            case 2:
+                this.enterOuterAlt(localctx, 2);
+                this.state = 1077;
+                this.sequence_collection_stateful_source();
+                break;
 
-        case 3:
-            this.enterOuterAlt(localctx, 3);
-            this.state = 1078;
-            this.standard_stateful_source();
-            break;
+            case 3:
+                this.enterOuterAlt(localctx, 3);
+                this.state = 1078;
+                this.standard_stateful_source();
+                break;
 
-        case 4:
-            this.enterOuterAlt(localctx, 4);
-            this.state = 1079;
-            this.logical_absent_stateful_source();
-            break;
+            case 4:
+                this.enterOuterAlt(localctx, 4);
+                this.state = 1079;
+                this.logical_absent_stateful_source();
+                break;
 
         }
     } catch (re) {
-    	if(re instanceof antlr4.error.RecognitionException) {
-	        localctx.exception = re;
-	        this._errHandler.reportError(this, re);
-	        this._errHandler.recover(this, re);
-	    } else {
-	    	throw re;
-	    }
+        if (re instanceof antlr4.error.RecognitionException) {
+            localctx.exception = re;
+            this._errHandler.reportError(this, re);
+            this._errHandler.recover(this, re);
+        } else {
+            throw re;
+        }
     } finally {
         this.exitRule();
     }
@@ -8036,13 +7913,13 @@ SiddhiQLParser.prototype.sequence_source = function() {
 };
 
 function Sequence_collection_stateful_sourceContext(parser, parent, invokingState) {
-	if(parent===undefined) {
-	    parent = null;
-	}
-	if(invokingState===undefined || invokingState===null) {
-		invokingState = -1;
-	}
-	antlr4.ParserRuleContext.call(this, parent, invokingState);
+    if (parent === undefined) {
+        parent = null;
+    }
+    if (invokingState === undefined || invokingState === null) {
+        invokingState = -1;
+    }
+    antlr4.ParserRuleContext.call(this, parent, invokingState);
     this.parser = parser;
     this.ruleIndex = SiddhiQLParser.RULE_sequence_collection_stateful_source;
     this.zero_or_more = null; // Token
@@ -8054,32 +7931,30 @@ function Sequence_collection_stateful_sourceContext(parser, parent, invokingStat
 Sequence_collection_stateful_sourceContext.prototype = Object.create(antlr4.ParserRuleContext.prototype);
 Sequence_collection_stateful_sourceContext.prototype.constructor = Sequence_collection_stateful_sourceContext;
 
-Sequence_collection_stateful_sourceContext.prototype.standard_stateful_source = function() {
-    return this.getTypedRuleContext(Standard_stateful_sourceContext,0);
+Sequence_collection_stateful_sourceContext.prototype.standard_stateful_source = function () {
+    return this.getTypedRuleContext(Standard_stateful_sourceContext, 0);
 };
 
-Sequence_collection_stateful_sourceContext.prototype.collect = function() {
-    return this.getTypedRuleContext(CollectContext,0);
+Sequence_collection_stateful_sourceContext.prototype.collect = function () {
+    return this.getTypedRuleContext(CollectContext, 0);
 };
 
-Sequence_collection_stateful_sourceContext.prototype.enterRule = function(listener) {
-    if(listener instanceof SiddhiQLListener ) {
+Sequence_collection_stateful_sourceContext.prototype.enterRule = function (listener) {
+    if (listener instanceof SiddhiQLListener) {
         listener.enterSequence_collection_stateful_source(this);
-	}
+    }
 };
 
-Sequence_collection_stateful_sourceContext.prototype.exitRule = function(listener) {
-    if(listener instanceof SiddhiQLListener ) {
+Sequence_collection_stateful_sourceContext.prototype.exitRule = function (listener) {
+    if (listener instanceof SiddhiQLListener) {
         listener.exitSequence_collection_stateful_source(this);
-	}
+    }
 };
-
-
 
 
 SiddhiQLParser.Sequence_collection_stateful_sourceContext = Sequence_collection_stateful_sourceContext;
 
-SiddhiQLParser.prototype.sequence_collection_stateful_source = function() {
+SiddhiQLParser.prototype.sequence_collection_stateful_source = function () {
 
     var localctx = new Sequence_collection_stateful_sourceContext(this, this._ctx, this.state);
     this.enterRule(localctx, 132, SiddhiQLParser.RULE_sequence_collection_stateful_source);
@@ -8088,38 +7963,38 @@ SiddhiQLParser.prototype.sequence_collection_stateful_source = function() {
         this.state = 1082;
         this.standard_stateful_source();
         this.state = 1090;
-        switch(this._input.LA(1)) {
-        case SiddhiQLParser.LT:
-            this.state = 1083;
-            this.match(SiddhiQLParser.LT);
-            this.state = 1084;
-            this.collect();
-            this.state = 1085;
-            this.match(SiddhiQLParser.GT);
-            break;
-        case SiddhiQLParser.STAR:
-            this.state = 1087;
-            localctx.zero_or_more = this.match(SiddhiQLParser.STAR);
-            break;
-        case SiddhiQLParser.QUESTION:
-            this.state = 1088;
-            localctx.zero_or_one = this.match(SiddhiQLParser.QUESTION);
-            break;
-        case SiddhiQLParser.PLUS:
-            this.state = 1089;
-            localctx.one_or_more = this.match(SiddhiQLParser.PLUS);
-            break;
-        default:
-            throw new antlr4.error.NoViableAltException(this);
+        switch (this._input.LA(1)) {
+            case SiddhiQLParser.LT:
+                this.state = 1083;
+                this.match(SiddhiQLParser.LT);
+                this.state = 1084;
+                this.collect();
+                this.state = 1085;
+                this.match(SiddhiQLParser.GT);
+                break;
+            case SiddhiQLParser.STAR:
+                this.state = 1087;
+                localctx.zero_or_more = this.match(SiddhiQLParser.STAR);
+                break;
+            case SiddhiQLParser.QUESTION:
+                this.state = 1088;
+                localctx.zero_or_one = this.match(SiddhiQLParser.QUESTION);
+                break;
+            case SiddhiQLParser.PLUS:
+                this.state = 1089;
+                localctx.one_or_more = this.match(SiddhiQLParser.PLUS);
+                break;
+            default:
+                throw new antlr4.error.NoViableAltException(this);
         }
     } catch (re) {
-    	if(re instanceof antlr4.error.RecognitionException) {
-	        localctx.exception = re;
-	        this._errHandler.reportError(this, re);
-	        this._errHandler.recover(this, re);
-	    } else {
-	    	throw re;
-	    }
+        if (re instanceof antlr4.error.RecognitionException) {
+            localctx.exception = re;
+            this._errHandler.reportError(this, re);
+            this._errHandler.recover(this, re);
+        } else {
+            throw re;
+        }
     } finally {
         this.exitRule();
     }
@@ -8127,13 +8002,13 @@ SiddhiQLParser.prototype.sequence_collection_stateful_source = function() {
 };
 
 function Anonymous_streamContext(parser, parent, invokingState) {
-	if(parent===undefined) {
-	    parent = null;
-	}
-	if(invokingState===undefined || invokingState===null) {
-		invokingState = -1;
-	}
-	antlr4.ParserRuleContext.call(this, parent, invokingState);
+    if (parent === undefined) {
+        parent = null;
+    }
+    if (invokingState === undefined || invokingState === null) {
+        invokingState = -1;
+    }
+    antlr4.ParserRuleContext.call(this, parent, invokingState);
     this.parser = parser;
     this.ruleIndex = SiddhiQLParser.RULE_anonymous_stream;
     return this;
@@ -8142,109 +8017,107 @@ function Anonymous_streamContext(parser, parent, invokingState) {
 Anonymous_streamContext.prototype = Object.create(antlr4.ParserRuleContext.prototype);
 Anonymous_streamContext.prototype.constructor = Anonymous_streamContext;
 
-Anonymous_streamContext.prototype.anonymous_stream = function() {
-    return this.getTypedRuleContext(Anonymous_streamContext,0);
+Anonymous_streamContext.prototype.anonymous_stream = function () {
+    return this.getTypedRuleContext(Anonymous_streamContext, 0);
 };
 
-Anonymous_streamContext.prototype.FROM = function() {
+Anonymous_streamContext.prototype.FROM = function () {
     return this.getToken(SiddhiQLParser.FROM, 0);
 };
 
-Anonymous_streamContext.prototype.query_input = function() {
-    return this.getTypedRuleContext(Query_inputContext,0);
+Anonymous_streamContext.prototype.query_input = function () {
+    return this.getTypedRuleContext(Query_inputContext, 0);
 };
 
-Anonymous_streamContext.prototype.RETURN = function() {
+Anonymous_streamContext.prototype.RETURN = function () {
     return this.getToken(SiddhiQLParser.RETURN, 0);
 };
 
-Anonymous_streamContext.prototype.query_section = function() {
-    return this.getTypedRuleContext(Query_sectionContext,0);
+Anonymous_streamContext.prototype.query_section = function () {
+    return this.getTypedRuleContext(Query_sectionContext, 0);
 };
 
-Anonymous_streamContext.prototype.output_rate = function() {
-    return this.getTypedRuleContext(Output_rateContext,0);
+Anonymous_streamContext.prototype.output_rate = function () {
+    return this.getTypedRuleContext(Output_rateContext, 0);
 };
 
-Anonymous_streamContext.prototype.output_event_type = function() {
-    return this.getTypedRuleContext(Output_event_typeContext,0);
+Anonymous_streamContext.prototype.output_event_type = function () {
+    return this.getTypedRuleContext(Output_event_typeContext, 0);
 };
 
-Anonymous_streamContext.prototype.enterRule = function(listener) {
-    if(listener instanceof SiddhiQLListener ) {
+Anonymous_streamContext.prototype.enterRule = function (listener) {
+    if (listener instanceof SiddhiQLListener) {
         listener.enterAnonymous_stream(this);
-	}
+    }
 };
 
-Anonymous_streamContext.prototype.exitRule = function(listener) {
-    if(listener instanceof SiddhiQLListener ) {
+Anonymous_streamContext.prototype.exitRule = function (listener) {
+    if (listener instanceof SiddhiQLListener) {
         listener.exitAnonymous_stream(this);
-	}
+    }
 };
-
-
 
 
 SiddhiQLParser.Anonymous_streamContext = Anonymous_streamContext;
 
-SiddhiQLParser.prototype.anonymous_stream = function() {
+SiddhiQLParser.prototype.anonymous_stream = function () {
 
     var localctx = new Anonymous_streamContext(this, this._ctx, this.state);
     this.enterRule(localctx, 134, SiddhiQLParser.RULE_anonymous_stream);
     var _la = 0; // Token type
     try {
         this.state = 1108;
-        switch(this._input.LA(1)) {
-        case SiddhiQLParser.OPEN_PAR:
-            this.enterOuterAlt(localctx, 1);
-            this.state = 1092;
-            this.match(SiddhiQLParser.OPEN_PAR);
-            this.state = 1093;
-            this.anonymous_stream();
-            this.state = 1094;
-            this.match(SiddhiQLParser.CLOSE_PAR);
-            break;
-        case SiddhiQLParser.FROM:
-            this.enterOuterAlt(localctx, 2);
-            this.state = 1096;
-            this.match(SiddhiQLParser.FROM);
-            this.state = 1097;
-            this.query_input();
-            this.state = 1099;
-            _la = this._input.LA(1);
-            if(_la===SiddhiQLParser.SELECT) {
-                this.state = 1098;
-                this.query_section();
-            }
+        switch (this._input.LA(1)) {
+            case SiddhiQLParser.OPEN_PAR:
+                this.enterOuterAlt(localctx, 1);
+                this.state = 1092;
+                this.match(SiddhiQLParser.OPEN_PAR);
+                this.state = 1093;
+                this.anonymous_stream();
+                this.state = 1094;
+                this.match(SiddhiQLParser.CLOSE_PAR);
+                break;
+            case SiddhiQLParser.FROM:
+                this.enterOuterAlt(localctx, 2);
+                this.state = 1096;
+                this.match(SiddhiQLParser.FROM);
+                this.state = 1097;
+                this.query_input();
+                this.state = 1099;
+                _la = this._input.LA(1);
+                if (_la === SiddhiQLParser.SELECT) {
+                    this.state = 1098;
+                    this.query_section();
+                }
 
-            this.state = 1102;
-            _la = this._input.LA(1);
-            if(_la===SiddhiQLParser.OUTPUT) {
-                this.state = 1101;
-                this.output_rate();
-            }
+                this.state = 1102;
+                _la = this._input.LA(1);
+                if (_la === SiddhiQLParser.OUTPUT) {
+                    this.state = 1101;
+                    this.output_rate();
+                }
 
-            this.state = 1104;
-            this.match(SiddhiQLParser.RETURN);
-            this.state = 1106;
-            _la = this._input.LA(1);
-            if(((((_la - 53)) & ~0x1f) == 0 && ((1 << (_la - 53)) & ((1 << (SiddhiQLParser.EVENTS - 53)) | (1 << (SiddhiQLParser.EXPIRED - 53)) | (1 << (SiddhiQLParser.CURRENT - 53)) | (1 << (SiddhiQLParser.ALL - 53)))) !== 0)) {
-                this.state = 1105;
-                this.output_event_type();
-            }
+                this.state = 1104;
+                this.match(SiddhiQLParser.RETURN);
+                this.state = 1106;
+                _la = this._input.LA(1);
+                if (((((_la - 53)) & ~0x1f) == 0 && ((1 << (_la - 53)) & ((1 << (SiddhiQLParser.EVENTS - 53)) | (1 << (SiddhiQLParser.EXPIRED - 53)) | (1 << (SiddhiQLParser.CURRENT - 53)) | (1 << (SiddhiQLParser.ALL - 53)))) !== 0)) {
+                    this.state = 1105;
+                    this.output_event_type();
+                }
 
-            break;
-        default:
-            throw new antlr4.error.NoViableAltException(this);
+                break;
+            default:
+                throw new antlr4.error.NoViableAltException(this);
         }
     } catch (re) {
-    	if(re instanceof antlr4.error.RecognitionException) {
-	        localctx.exception = re;
-	        this._errHandler.reportError(this, re);
-	        this._errHandler.recover(this, re);
-	    } else {
-	    	throw re;
-	    }
+        if (re instanceof antlr4.error.RecognitionException) {
+            localctx.exception = re;
+            this._errHandler.reportError(this, re);
+            this._errHandler.recover(this, re);
+        } else {
+            throw re;
+        }
     } finally {
         this.exitRule();
     }
@@ -8252,13 +8125,13 @@ SiddhiQLParser.prototype.anonymous_stream = function() {
 };
 
 function FilterContext(parser, parent, invokingState) {
-	if(parent===undefined) {
-	    parent = null;
-	}
-	if(invokingState===undefined || invokingState===null) {
-		invokingState = -1;
-	}
-	antlr4.ParserRuleContext.call(this, parent, invokingState);
+    if (parent === undefined) {
+        parent = null;
+    }
+    if (invokingState === undefined || invokingState === null) {
+        invokingState = -1;
+    }
+    antlr4.ParserRuleContext.call(this, parent, invokingState);
     this.parser = parser;
     this.ruleIndex = SiddhiQLParser.RULE_filter;
     return this;
@@ -8267,28 +8140,26 @@ function FilterContext(parser, parent, invokingState) {
 FilterContext.prototype = Object.create(antlr4.ParserRuleContext.prototype);
 FilterContext.prototype.constructor = FilterContext;
 
-FilterContext.prototype.expression = function() {
-    return this.getTypedRuleContext(ExpressionContext,0);
+FilterContext.prototype.expression = function () {
+    return this.getTypedRuleContext(ExpressionContext, 0);
 };
 
-FilterContext.prototype.enterRule = function(listener) {
-    if(listener instanceof SiddhiQLListener ) {
+FilterContext.prototype.enterRule = function (listener) {
+    if (listener instanceof SiddhiQLListener) {
         listener.enterFilter(this);
-	}
+    }
 };
 
-FilterContext.prototype.exitRule = function(listener) {
-    if(listener instanceof SiddhiQLListener ) {
+FilterContext.prototype.exitRule = function (listener) {
+    if (listener instanceof SiddhiQLListener) {
         listener.exitFilter(this);
-	}
+    }
 };
-
-
 
 
 SiddhiQLParser.FilterContext = FilterContext;
 
-SiddhiQLParser.prototype.filter = function() {
+SiddhiQLParser.prototype.filter = function () {
 
     var localctx = new FilterContext(this, this._ctx, this.state);
     this.enterRule(localctx, 136, SiddhiQLParser.RULE_filter);
@@ -8297,7 +8168,7 @@ SiddhiQLParser.prototype.filter = function() {
         this.enterOuterAlt(localctx, 1);
         this.state = 1111;
         _la = this._input.LA(1);
-        if(_la===SiddhiQLParser.HASH) {
+        if (_la === SiddhiQLParser.HASH) {
             this.state = 1110;
             this.match(SiddhiQLParser.HASH);
         }
@@ -8309,13 +8180,13 @@ SiddhiQLParser.prototype.filter = function() {
         this.state = 1115;
         this.match(SiddhiQLParser.CLOSE_SQUARE_BRACKETS);
     } catch (re) {
-    	if(re instanceof antlr4.error.RecognitionException) {
-	        localctx.exception = re;
-	        this._errHandler.reportError(this, re);
-	        this._errHandler.recover(this, re);
-	    } else {
-	    	throw re;
-	    }
+        if (re instanceof antlr4.error.RecognitionException) {
+            localctx.exception = re;
+            this._errHandler.reportError(this, re);
+            this._errHandler.recover(this, re);
+        } else {
+            throw re;
+        }
     } finally {
         this.exitRule();
     }
@@ -8323,13 +8194,13 @@ SiddhiQLParser.prototype.filter = function() {
 };
 
 function Stream_functionContext(parser, parent, invokingState) {
-	if(parent===undefined) {
-	    parent = null;
-	}
-	if(invokingState===undefined || invokingState===null) {
-		invokingState = -1;
-	}
-	antlr4.ParserRuleContext.call(this, parent, invokingState);
+    if (parent === undefined) {
+        parent = null;
+    }
+    if (invokingState === undefined || invokingState === null) {
+        invokingState = -1;
+    }
+    antlr4.ParserRuleContext.call(this, parent, invokingState);
     this.parser = parser;
     this.ruleIndex = SiddhiQLParser.RULE_stream_function;
     return this;
@@ -8338,28 +8209,26 @@ function Stream_functionContext(parser, parent, invokingState) {
 Stream_functionContext.prototype = Object.create(antlr4.ParserRuleContext.prototype);
 Stream_functionContext.prototype.constructor = Stream_functionContext;
 
-Stream_functionContext.prototype.function_operation = function() {
-    return this.getTypedRuleContext(Function_operationContext,0);
+Stream_functionContext.prototype.function_operation = function () {
+    return this.getTypedRuleContext(Function_operationContext, 0);
 };
 
-Stream_functionContext.prototype.enterRule = function(listener) {
-    if(listener instanceof SiddhiQLListener ) {
+Stream_functionContext.prototype.enterRule = function (listener) {
+    if (listener instanceof SiddhiQLListener) {
         listener.enterStream_function(this);
-	}
+    }
 };
 
-Stream_functionContext.prototype.exitRule = function(listener) {
-    if(listener instanceof SiddhiQLListener ) {
+Stream_functionContext.prototype.exitRule = function (listener) {
+    if (listener instanceof SiddhiQLListener) {
         listener.exitStream_function(this);
-	}
+    }
 };
-
-
 
 
 SiddhiQLParser.Stream_functionContext = Stream_functionContext;
 
-SiddhiQLParser.prototype.stream_function = function() {
+SiddhiQLParser.prototype.stream_function = function () {
 
     var localctx = new Stream_functionContext(this, this._ctx, this.state);
     this.enterRule(localctx, 138, SiddhiQLParser.RULE_stream_function);
@@ -8370,13 +8239,13 @@ SiddhiQLParser.prototype.stream_function = function() {
         this.state = 1118;
         this.function_operation();
     } catch (re) {
-    	if(re instanceof antlr4.error.RecognitionException) {
-	        localctx.exception = re;
-	        this._errHandler.reportError(this, re);
-	        this._errHandler.recover(this, re);
-	    } else {
-	    	throw re;
-	    }
+        if (re instanceof antlr4.error.RecognitionException) {
+            localctx.exception = re;
+            this._errHandler.reportError(this, re);
+            this._errHandler.recover(this, re);
+        } else {
+            throw re;
+        }
     } finally {
         this.exitRule();
     }
@@ -8384,13 +8253,13 @@ SiddhiQLParser.prototype.stream_function = function() {
 };
 
 function WindowContext(parser, parent, invokingState) {
-	if(parent===undefined) {
-	    parent = null;
-	}
-	if(invokingState===undefined || invokingState===null) {
-		invokingState = -1;
-	}
-	antlr4.ParserRuleContext.call(this, parent, invokingState);
+    if (parent === undefined) {
+        parent = null;
+    }
+    if (invokingState === undefined || invokingState === null) {
+        invokingState = -1;
+    }
+    antlr4.ParserRuleContext.call(this, parent, invokingState);
     this.parser = parser;
     this.ruleIndex = SiddhiQLParser.RULE_window;
     return this;
@@ -8399,32 +8268,30 @@ function WindowContext(parser, parent, invokingState) {
 WindowContext.prototype = Object.create(antlr4.ParserRuleContext.prototype);
 WindowContext.prototype.constructor = WindowContext;
 
-WindowContext.prototype.WINDOW = function() {
+WindowContext.prototype.WINDOW = function () {
     return this.getToken(SiddhiQLParser.WINDOW, 0);
 };
 
-WindowContext.prototype.function_operation = function() {
-    return this.getTypedRuleContext(Function_operationContext,0);
+WindowContext.prototype.function_operation = function () {
+    return this.getTypedRuleContext(Function_operationContext, 0);
 };
 
-WindowContext.prototype.enterRule = function(listener) {
-    if(listener instanceof SiddhiQLListener ) {
+WindowContext.prototype.enterRule = function (listener) {
+    if (listener instanceof SiddhiQLListener) {
         listener.enterWindow(this);
-	}
+    }
 };
 
-WindowContext.prototype.exitRule = function(listener) {
-    if(listener instanceof SiddhiQLListener ) {
+WindowContext.prototype.exitRule = function (listener) {
+    if (listener instanceof SiddhiQLListener) {
         listener.exitWindow(this);
-	}
+    }
 };
-
-
 
 
 SiddhiQLParser.WindowContext = WindowContext;
 
-SiddhiQLParser.prototype.window = function() {
+SiddhiQLParser.prototype.window = function () {
 
     var localctx = new WindowContext(this, this._ctx, this.state);
     this.enterRule(localctx, 140, SiddhiQLParser.RULE_window);
@@ -8439,13 +8306,13 @@ SiddhiQLParser.prototype.window = function() {
         this.state = 1123;
         this.function_operation();
     } catch (re) {
-    	if(re instanceof antlr4.error.RecognitionException) {
-	        localctx.exception = re;
-	        this._errHandler.reportError(this, re);
-	        this._errHandler.recover(this, re);
-	    } else {
-	    	throw re;
-	    }
+        if (re instanceof antlr4.error.RecognitionException) {
+            localctx.exception = re;
+            this._errHandler.reportError(this, re);
+            this._errHandler.recover(this, re);
+        } else {
+            throw re;
+        }
     } finally {
         this.exitRule();
     }
@@ -8453,13 +8320,13 @@ SiddhiQLParser.prototype.window = function() {
 };
 
 function Group_by_query_selectionContext(parser, parent, invokingState) {
-	if(parent===undefined) {
-	    parent = null;
-	}
-	if(invokingState===undefined || invokingState===null) {
-		invokingState = -1;
-	}
-	antlr4.ParserRuleContext.call(this, parent, invokingState);
+    if (parent === undefined) {
+        parent = null;
+    }
+    if (invokingState === undefined || invokingState === null) {
+        invokingState = -1;
+    }
+    antlr4.ParserRuleContext.call(this, parent, invokingState);
     this.parser = parser;
     this.ruleIndex = SiddhiQLParser.RULE_group_by_query_selection;
     return this;
@@ -8468,43 +8335,41 @@ function Group_by_query_selectionContext(parser, parent, invokingState) {
 Group_by_query_selectionContext.prototype = Object.create(antlr4.ParserRuleContext.prototype);
 Group_by_query_selectionContext.prototype.constructor = Group_by_query_selectionContext;
 
-Group_by_query_selectionContext.prototype.SELECT = function() {
+Group_by_query_selectionContext.prototype.SELECT = function () {
     return this.getToken(SiddhiQLParser.SELECT, 0);
 };
 
-Group_by_query_selectionContext.prototype.group_by = function() {
-    return this.getTypedRuleContext(Group_byContext,0);
+Group_by_query_selectionContext.prototype.group_by = function () {
+    return this.getTypedRuleContext(Group_byContext, 0);
 };
 
-Group_by_query_selectionContext.prototype.output_attribute = function(i) {
-    if(i===undefined) {
+Group_by_query_selectionContext.prototype.output_attribute = function (i) {
+    if (i === undefined) {
         i = null;
     }
-    if(i===null) {
+    if (i === null) {
         return this.getTypedRuleContexts(Output_attributeContext);
     } else {
-        return this.getTypedRuleContext(Output_attributeContext,i);
+        return this.getTypedRuleContext(Output_attributeContext, i);
     }
 };
 
-Group_by_query_selectionContext.prototype.enterRule = function(listener) {
-    if(listener instanceof SiddhiQLListener ) {
+Group_by_query_selectionContext.prototype.enterRule = function (listener) {
+    if (listener instanceof SiddhiQLListener) {
         listener.enterGroup_by_query_selection(this);
-	}
+    }
 };
 
-Group_by_query_selectionContext.prototype.exitRule = function(listener) {
-    if(listener instanceof SiddhiQLListener ) {
+Group_by_query_selectionContext.prototype.exitRule = function (listener) {
+    if (listener instanceof SiddhiQLListener) {
         listener.exitGroup_by_query_selection(this);
-	}
+    }
 };
-
-
 
 
 SiddhiQLParser.Group_by_query_selectionContext = Group_by_query_selectionContext;
 
-SiddhiQLParser.prototype.group_by_query_selection = function() {
+SiddhiQLParser.prototype.group_by_query_selection = function () {
 
     var localctx = new Group_by_query_selectionContext(this, this._ctx, this.state);
     this.enterRule(localctx, 142, SiddhiQLParser.RULE_group_by_query_selection);
@@ -8514,122 +8379,122 @@ SiddhiQLParser.prototype.group_by_query_selection = function() {
         this.state = 1125;
         this.match(SiddhiQLParser.SELECT);
         this.state = 1135;
-        switch(this._input.LA(1)) {
-        case SiddhiQLParser.STAR:
-            this.state = 1126;
-            this.match(SiddhiQLParser.STAR);
-            break;
-        case SiddhiQLParser.INT_LITERAL:
-        case SiddhiQLParser.LONG_LITERAL:
-        case SiddhiQLParser.FLOAT_LITERAL:
-        case SiddhiQLParser.DOUBLE_LITERAL:
-        case SiddhiQLParser.OPEN_PAR:
-        case SiddhiQLParser.PLUS:
-        case SiddhiQLParser.MINUS:
-        case SiddhiQLParser.HASH:
-        case SiddhiQLParser.STREAM:
-        case SiddhiQLParser.DEFINE:
-        case SiddhiQLParser.TABLE:
-        case SiddhiQLParser.APP:
-        case SiddhiQLParser.FROM:
-        case SiddhiQLParser.PARTITION:
-        case SiddhiQLParser.WINDOW:
-        case SiddhiQLParser.SELECT:
-        case SiddhiQLParser.GROUP:
-        case SiddhiQLParser.BY:
-        case SiddhiQLParser.ORDER:
-        case SiddhiQLParser.LIMIT:
-        case SiddhiQLParser.ASC:
-        case SiddhiQLParser.DESC:
-        case SiddhiQLParser.HAVING:
-        case SiddhiQLParser.INSERT:
-        case SiddhiQLParser.DELETE:
-        case SiddhiQLParser.UPDATE:
-        case SiddhiQLParser.RETURN:
-        case SiddhiQLParser.EVENTS:
-        case SiddhiQLParser.INTO:
-        case SiddhiQLParser.OUTPUT:
-        case SiddhiQLParser.EXPIRED:
-        case SiddhiQLParser.CURRENT:
-        case SiddhiQLParser.SNAPSHOT:
-        case SiddhiQLParser.FOR:
-        case SiddhiQLParser.RAW:
-        case SiddhiQLParser.OF:
-        case SiddhiQLParser.AS:
-        case SiddhiQLParser.OR:
-        case SiddhiQLParser.AND:
-        case SiddhiQLParser.ON:
-        case SiddhiQLParser.IS:
-        case SiddhiQLParser.NOT:
-        case SiddhiQLParser.WITHIN:
-        case SiddhiQLParser.WITH:
-        case SiddhiQLParser.BEGIN:
-        case SiddhiQLParser.END:
-        case SiddhiQLParser.NULL:
-        case SiddhiQLParser.EVERY:
-        case SiddhiQLParser.LAST:
-        case SiddhiQLParser.ALL:
-        case SiddhiQLParser.FIRST:
-        case SiddhiQLParser.JOIN:
-        case SiddhiQLParser.INNER:
-        case SiddhiQLParser.OUTER:
-        case SiddhiQLParser.RIGHT:
-        case SiddhiQLParser.LEFT:
-        case SiddhiQLParser.FULL:
-        case SiddhiQLParser.UNIDIRECTIONAL:
-        case SiddhiQLParser.YEARS:
-        case SiddhiQLParser.MONTHS:
-        case SiddhiQLParser.WEEKS:
-        case SiddhiQLParser.DAYS:
-        case SiddhiQLParser.HOURS:
-        case SiddhiQLParser.MINUTES:
-        case SiddhiQLParser.SECONDS:
-        case SiddhiQLParser.MILLISECONDS:
-        case SiddhiQLParser.FALSE:
-        case SiddhiQLParser.TRUE:
-        case SiddhiQLParser.STRING:
-        case SiddhiQLParser.INT:
-        case SiddhiQLParser.LONG:
-        case SiddhiQLParser.FLOAT:
-        case SiddhiQLParser.DOUBLE:
-        case SiddhiQLParser.BOOL:
-        case SiddhiQLParser.OBJECT:
-        case SiddhiQLParser.ID_QUOTES:
-        case SiddhiQLParser.ID:
-        case SiddhiQLParser.STRING_LITERAL:
-            this.state = 1127;
-            this.output_attribute();
-            this.state = 1132;
-            this._errHandler.sync(this);
-            _la = this._input.LA(1);
-            while(_la===SiddhiQLParser.COMMA) {
-                this.state = 1128;
-                this.match(SiddhiQLParser.COMMA);
-                this.state = 1129;
+        switch (this._input.LA(1)) {
+            case SiddhiQLParser.STAR:
+                this.state = 1126;
+                this.match(SiddhiQLParser.STAR);
+                break;
+            case SiddhiQLParser.INT_LITERAL:
+            case SiddhiQLParser.LONG_LITERAL:
+            case SiddhiQLParser.FLOAT_LITERAL:
+            case SiddhiQLParser.DOUBLE_LITERAL:
+            case SiddhiQLParser.OPEN_PAR:
+            case SiddhiQLParser.PLUS:
+            case SiddhiQLParser.MINUS:
+            case SiddhiQLParser.HASH:
+            case SiddhiQLParser.STREAM:
+            case SiddhiQLParser.DEFINE:
+            case SiddhiQLParser.TABLE:
+            case SiddhiQLParser.APP:
+            case SiddhiQLParser.FROM:
+            case SiddhiQLParser.PARTITION:
+            case SiddhiQLParser.WINDOW:
+            case SiddhiQLParser.SELECT:
+            case SiddhiQLParser.GROUP:
+            case SiddhiQLParser.BY:
+            case SiddhiQLParser.ORDER:
+            case SiddhiQLParser.LIMIT:
+            case SiddhiQLParser.ASC:
+            case SiddhiQLParser.DESC:
+            case SiddhiQLParser.HAVING:
+            case SiddhiQLParser.INSERT:
+            case SiddhiQLParser.DELETE:
+            case SiddhiQLParser.UPDATE:
+            case SiddhiQLParser.RETURN:
+            case SiddhiQLParser.EVENTS:
+            case SiddhiQLParser.INTO:
+            case SiddhiQLParser.OUTPUT:
+            case SiddhiQLParser.EXPIRED:
+            case SiddhiQLParser.CURRENT:
+            case SiddhiQLParser.SNAPSHOT:
+            case SiddhiQLParser.FOR:
+            case SiddhiQLParser.RAW:
+            case SiddhiQLParser.OF:
+            case SiddhiQLParser.AS:
+            case SiddhiQLParser.OR:
+            case SiddhiQLParser.AND:
+            case SiddhiQLParser.ON:
+            case SiddhiQLParser.IS:
+            case SiddhiQLParser.NOT:
+            case SiddhiQLParser.WITHIN:
+            case SiddhiQLParser.WITH:
+            case SiddhiQLParser.BEGIN:
+            case SiddhiQLParser.END:
+            case SiddhiQLParser.NULL:
+            case SiddhiQLParser.EVERY:
+            case SiddhiQLParser.LAST:
+            case SiddhiQLParser.ALL:
+            case SiddhiQLParser.FIRST:
+            case SiddhiQLParser.JOIN:
+            case SiddhiQLParser.INNER:
+            case SiddhiQLParser.OUTER:
+            case SiddhiQLParser.RIGHT:
+            case SiddhiQLParser.LEFT:
+            case SiddhiQLParser.FULL:
+            case SiddhiQLParser.UNIDIRECTIONAL:
+            case SiddhiQLParser.YEARS:
+            case SiddhiQLParser.MONTHS:
+            case SiddhiQLParser.WEEKS:
+            case SiddhiQLParser.DAYS:
+            case SiddhiQLParser.HOURS:
+            case SiddhiQLParser.MINUTES:
+            case SiddhiQLParser.SECONDS:
+            case SiddhiQLParser.MILLISECONDS:
+            case SiddhiQLParser.FALSE:
+            case SiddhiQLParser.TRUE:
+            case SiddhiQLParser.STRING:
+            case SiddhiQLParser.INT:
+            case SiddhiQLParser.LONG:
+            case SiddhiQLParser.FLOAT:
+            case SiddhiQLParser.DOUBLE:
+            case SiddhiQLParser.BOOL:
+            case SiddhiQLParser.OBJECT:
+            case SiddhiQLParser.ID_QUOTES:
+            case SiddhiQLParser.ID:
+            case SiddhiQLParser.STRING_LITERAL:
+                this.state = 1127;
                 this.output_attribute();
-                this.state = 1134;
+                this.state = 1132;
                 this._errHandler.sync(this);
                 _la = this._input.LA(1);
-            }
-            break;
-        default:
-            throw new antlr4.error.NoViableAltException(this);
+                while (_la === SiddhiQLParser.COMMA) {
+                    this.state = 1128;
+                    this.match(SiddhiQLParser.COMMA);
+                    this.state = 1129;
+                    this.output_attribute();
+                    this.state = 1134;
+                    this._errHandler.sync(this);
+                    _la = this._input.LA(1);
+                }
+                break;
+            default:
+                throw new antlr4.error.NoViableAltException(this);
         }
         this.state = 1138;
         _la = this._input.LA(1);
-        if(_la===SiddhiQLParser.GROUP) {
+        if (_la === SiddhiQLParser.GROUP) {
             this.state = 1137;
             this.group_by();
         }
 
     } catch (re) {
-    	if(re instanceof antlr4.error.RecognitionException) {
-	        localctx.exception = re;
-	        this._errHandler.reportError(this, re);
-	        this._errHandler.recover(this, re);
-	    } else {
-	    	throw re;
-	    }
+        if (re instanceof antlr4.error.RecognitionException) {
+            localctx.exception = re;
+            this._errHandler.reportError(this, re);
+            this._errHandler.recover(this, re);
+        } else {
+            throw re;
+        }
     } finally {
         this.exitRule();
     }
@@ -8637,13 +8502,13 @@ SiddhiQLParser.prototype.group_by_query_selection = function() {
 };
 
 function Query_sectionContext(parser, parent, invokingState) {
-	if(parent===undefined) {
-	    parent = null;
-	}
-	if(invokingState===undefined || invokingState===null) {
-		invokingState = -1;
-	}
-	antlr4.ParserRuleContext.call(this, parent, invokingState);
+    if (parent === undefined) {
+        parent = null;
+    }
+    if (invokingState === undefined || invokingState === null) {
+        invokingState = -1;
+    }
+    antlr4.ParserRuleContext.call(this, parent, invokingState);
     this.parser = parser;
     this.ruleIndex = SiddhiQLParser.RULE_query_section;
     return this;
@@ -8652,59 +8517,57 @@ function Query_sectionContext(parser, parent, invokingState) {
 Query_sectionContext.prototype = Object.create(antlr4.ParserRuleContext.prototype);
 Query_sectionContext.prototype.constructor = Query_sectionContext;
 
-Query_sectionContext.prototype.SELECT = function() {
+Query_sectionContext.prototype.SELECT = function () {
     return this.getToken(SiddhiQLParser.SELECT, 0);
 };
 
-Query_sectionContext.prototype.group_by = function() {
-    return this.getTypedRuleContext(Group_byContext,0);
+Query_sectionContext.prototype.group_by = function () {
+    return this.getTypedRuleContext(Group_byContext, 0);
 };
 
-Query_sectionContext.prototype.having = function() {
-    return this.getTypedRuleContext(HavingContext,0);
+Query_sectionContext.prototype.having = function () {
+    return this.getTypedRuleContext(HavingContext, 0);
 };
 
-Query_sectionContext.prototype.order_by = function() {
-    return this.getTypedRuleContext(Order_byContext,0);
+Query_sectionContext.prototype.order_by = function () {
+    return this.getTypedRuleContext(Order_byContext, 0);
 };
 
-Query_sectionContext.prototype.limit = function() {
-    return this.getTypedRuleContext(LimitContext,0);
+Query_sectionContext.prototype.limit = function () {
+    return this.getTypedRuleContext(LimitContext, 0);
 };
 
-Query_sectionContext.prototype.offset = function() {
-    return this.getTypedRuleContext(OffsetContext,0);
+Query_sectionContext.prototype.offset = function () {
+    return this.getTypedRuleContext(OffsetContext, 0);
 };
 
-Query_sectionContext.prototype.output_attribute = function(i) {
-    if(i===undefined) {
+Query_sectionContext.prototype.output_attribute = function (i) {
+    if (i === undefined) {
         i = null;
     }
-    if(i===null) {
+    if (i === null) {
         return this.getTypedRuleContexts(Output_attributeContext);
     } else {
-        return this.getTypedRuleContext(Output_attributeContext,i);
+        return this.getTypedRuleContext(Output_attributeContext, i);
     }
 };
 
-Query_sectionContext.prototype.enterRule = function(listener) {
-    if(listener instanceof SiddhiQLListener ) {
+Query_sectionContext.prototype.enterRule = function (listener) {
+    if (listener instanceof SiddhiQLListener) {
         listener.enterQuery_section(this);
-	}
+    }
 };
 
-Query_sectionContext.prototype.exitRule = function(listener) {
-    if(listener instanceof SiddhiQLListener ) {
+Query_sectionContext.prototype.exitRule = function (listener) {
+    if (listener instanceof SiddhiQLListener) {
         listener.exitQuery_section(this);
-	}
+    }
 };
-
-
 
 
 SiddhiQLParser.Query_sectionContext = Query_sectionContext;
 
-SiddhiQLParser.prototype.query_section = function() {
+SiddhiQLParser.prototype.query_section = function () {
 
     var localctx = new Query_sectionContext(this, this._ctx, this.state);
     this.enterRule(localctx, 144, SiddhiQLParser.RULE_query_section);
@@ -8714,150 +8577,150 @@ SiddhiQLParser.prototype.query_section = function() {
         this.state = 1140;
         this.match(SiddhiQLParser.SELECT);
         this.state = 1150;
-        switch(this._input.LA(1)) {
-        case SiddhiQLParser.STAR:
-            this.state = 1141;
-            this.match(SiddhiQLParser.STAR);
-            break;
-        case SiddhiQLParser.INT_LITERAL:
-        case SiddhiQLParser.LONG_LITERAL:
-        case SiddhiQLParser.FLOAT_LITERAL:
-        case SiddhiQLParser.DOUBLE_LITERAL:
-        case SiddhiQLParser.OPEN_PAR:
-        case SiddhiQLParser.PLUS:
-        case SiddhiQLParser.MINUS:
-        case SiddhiQLParser.HASH:
-        case SiddhiQLParser.STREAM:
-        case SiddhiQLParser.DEFINE:
-        case SiddhiQLParser.TABLE:
-        case SiddhiQLParser.APP:
-        case SiddhiQLParser.FROM:
-        case SiddhiQLParser.PARTITION:
-        case SiddhiQLParser.WINDOW:
-        case SiddhiQLParser.SELECT:
-        case SiddhiQLParser.GROUP:
-        case SiddhiQLParser.BY:
-        case SiddhiQLParser.ORDER:
-        case SiddhiQLParser.LIMIT:
-        case SiddhiQLParser.ASC:
-        case SiddhiQLParser.DESC:
-        case SiddhiQLParser.HAVING:
-        case SiddhiQLParser.INSERT:
-        case SiddhiQLParser.DELETE:
-        case SiddhiQLParser.UPDATE:
-        case SiddhiQLParser.RETURN:
-        case SiddhiQLParser.EVENTS:
-        case SiddhiQLParser.INTO:
-        case SiddhiQLParser.OUTPUT:
-        case SiddhiQLParser.EXPIRED:
-        case SiddhiQLParser.CURRENT:
-        case SiddhiQLParser.SNAPSHOT:
-        case SiddhiQLParser.FOR:
-        case SiddhiQLParser.RAW:
-        case SiddhiQLParser.OF:
-        case SiddhiQLParser.AS:
-        case SiddhiQLParser.OR:
-        case SiddhiQLParser.AND:
-        case SiddhiQLParser.ON:
-        case SiddhiQLParser.IS:
-        case SiddhiQLParser.NOT:
-        case SiddhiQLParser.WITHIN:
-        case SiddhiQLParser.WITH:
-        case SiddhiQLParser.BEGIN:
-        case SiddhiQLParser.END:
-        case SiddhiQLParser.NULL:
-        case SiddhiQLParser.EVERY:
-        case SiddhiQLParser.LAST:
-        case SiddhiQLParser.ALL:
-        case SiddhiQLParser.FIRST:
-        case SiddhiQLParser.JOIN:
-        case SiddhiQLParser.INNER:
-        case SiddhiQLParser.OUTER:
-        case SiddhiQLParser.RIGHT:
-        case SiddhiQLParser.LEFT:
-        case SiddhiQLParser.FULL:
-        case SiddhiQLParser.UNIDIRECTIONAL:
-        case SiddhiQLParser.YEARS:
-        case SiddhiQLParser.MONTHS:
-        case SiddhiQLParser.WEEKS:
-        case SiddhiQLParser.DAYS:
-        case SiddhiQLParser.HOURS:
-        case SiddhiQLParser.MINUTES:
-        case SiddhiQLParser.SECONDS:
-        case SiddhiQLParser.MILLISECONDS:
-        case SiddhiQLParser.FALSE:
-        case SiddhiQLParser.TRUE:
-        case SiddhiQLParser.STRING:
-        case SiddhiQLParser.INT:
-        case SiddhiQLParser.LONG:
-        case SiddhiQLParser.FLOAT:
-        case SiddhiQLParser.DOUBLE:
-        case SiddhiQLParser.BOOL:
-        case SiddhiQLParser.OBJECT:
-        case SiddhiQLParser.ID_QUOTES:
-        case SiddhiQLParser.ID:
-        case SiddhiQLParser.STRING_LITERAL:
-            this.state = 1142;
-            this.output_attribute();
-            this.state = 1147;
-            this._errHandler.sync(this);
-            _la = this._input.LA(1);
-            while(_la===SiddhiQLParser.COMMA) {
-                this.state = 1143;
-                this.match(SiddhiQLParser.COMMA);
-                this.state = 1144;
+        switch (this._input.LA(1)) {
+            case SiddhiQLParser.STAR:
+                this.state = 1141;
+                this.match(SiddhiQLParser.STAR);
+                break;
+            case SiddhiQLParser.INT_LITERAL:
+            case SiddhiQLParser.LONG_LITERAL:
+            case SiddhiQLParser.FLOAT_LITERAL:
+            case SiddhiQLParser.DOUBLE_LITERAL:
+            case SiddhiQLParser.OPEN_PAR:
+            case SiddhiQLParser.PLUS:
+            case SiddhiQLParser.MINUS:
+            case SiddhiQLParser.HASH:
+            case SiddhiQLParser.STREAM:
+            case SiddhiQLParser.DEFINE:
+            case SiddhiQLParser.TABLE:
+            case SiddhiQLParser.APP:
+            case SiddhiQLParser.FROM:
+            case SiddhiQLParser.PARTITION:
+            case SiddhiQLParser.WINDOW:
+            case SiddhiQLParser.SELECT:
+            case SiddhiQLParser.GROUP:
+            case SiddhiQLParser.BY:
+            case SiddhiQLParser.ORDER:
+            case SiddhiQLParser.LIMIT:
+            case SiddhiQLParser.ASC:
+            case SiddhiQLParser.DESC:
+            case SiddhiQLParser.HAVING:
+            case SiddhiQLParser.INSERT:
+            case SiddhiQLParser.DELETE:
+            case SiddhiQLParser.UPDATE:
+            case SiddhiQLParser.RETURN:
+            case SiddhiQLParser.EVENTS:
+            case SiddhiQLParser.INTO:
+            case SiddhiQLParser.OUTPUT:
+            case SiddhiQLParser.EXPIRED:
+            case SiddhiQLParser.CURRENT:
+            case SiddhiQLParser.SNAPSHOT:
+            case SiddhiQLParser.FOR:
+            case SiddhiQLParser.RAW:
+            case SiddhiQLParser.OF:
+            case SiddhiQLParser.AS:
+            case SiddhiQLParser.OR:
+            case SiddhiQLParser.AND:
+            case SiddhiQLParser.ON:
+            case SiddhiQLParser.IS:
+            case SiddhiQLParser.NOT:
+            case SiddhiQLParser.WITHIN:
+            case SiddhiQLParser.WITH:
+            case SiddhiQLParser.BEGIN:
+            case SiddhiQLParser.END:
+            case SiddhiQLParser.NULL:
+            case SiddhiQLParser.EVERY:
+            case SiddhiQLParser.LAST:
+            case SiddhiQLParser.ALL:
+            case SiddhiQLParser.FIRST:
+            case SiddhiQLParser.JOIN:
+            case SiddhiQLParser.INNER:
+            case SiddhiQLParser.OUTER:
+            case SiddhiQLParser.RIGHT:
+            case SiddhiQLParser.LEFT:
+            case SiddhiQLParser.FULL:
+            case SiddhiQLParser.UNIDIRECTIONAL:
+            case SiddhiQLParser.YEARS:
+            case SiddhiQLParser.MONTHS:
+            case SiddhiQLParser.WEEKS:
+            case SiddhiQLParser.DAYS:
+            case SiddhiQLParser.HOURS:
+            case SiddhiQLParser.MINUTES:
+            case SiddhiQLParser.SECONDS:
+            case SiddhiQLParser.MILLISECONDS:
+            case SiddhiQLParser.FALSE:
+            case SiddhiQLParser.TRUE:
+            case SiddhiQLParser.STRING:
+            case SiddhiQLParser.INT:
+            case SiddhiQLParser.LONG:
+            case SiddhiQLParser.FLOAT:
+            case SiddhiQLParser.DOUBLE:
+            case SiddhiQLParser.BOOL:
+            case SiddhiQLParser.OBJECT:
+            case SiddhiQLParser.ID_QUOTES:
+            case SiddhiQLParser.ID:
+            case SiddhiQLParser.STRING_LITERAL:
+                this.state = 1142;
                 this.output_attribute();
-                this.state = 1149;
+                this.state = 1147;
                 this._errHandler.sync(this);
                 _la = this._input.LA(1);
-            }
-            break;
-        default:
-            throw new antlr4.error.NoViableAltException(this);
+                while (_la === SiddhiQLParser.COMMA) {
+                    this.state = 1143;
+                    this.match(SiddhiQLParser.COMMA);
+                    this.state = 1144;
+                    this.output_attribute();
+                    this.state = 1149;
+                    this._errHandler.sync(this);
+                    _la = this._input.LA(1);
+                }
+                break;
+            default:
+                throw new antlr4.error.NoViableAltException(this);
         }
         this.state = 1153;
         _la = this._input.LA(1);
-        if(_la===SiddhiQLParser.GROUP) {
+        if (_la === SiddhiQLParser.GROUP) {
             this.state = 1152;
             this.group_by();
         }
 
         this.state = 1156;
         _la = this._input.LA(1);
-        if(_la===SiddhiQLParser.HAVING) {
+        if (_la === SiddhiQLParser.HAVING) {
             this.state = 1155;
             this.having();
         }
 
         this.state = 1159;
         _la = this._input.LA(1);
-        if(_la===SiddhiQLParser.ORDER) {
+        if (_la === SiddhiQLParser.ORDER) {
             this.state = 1158;
             this.order_by();
         }
 
         this.state = 1162;
         _la = this._input.LA(1);
-        if(_la===SiddhiQLParser.LIMIT) {
+        if (_la === SiddhiQLParser.LIMIT) {
             this.state = 1161;
             this.limit();
         }
 
         this.state = 1165;
         _la = this._input.LA(1);
-        if(_la===SiddhiQLParser.OFFSET) {
+        if (_la === SiddhiQLParser.OFFSET) {
             this.state = 1164;
             this.offset();
         }
 
     } catch (re) {
-    	if(re instanceof antlr4.error.RecognitionException) {
-	        localctx.exception = re;
-	        this._errHandler.reportError(this, re);
-	        this._errHandler.recover(this, re);
-	    } else {
-	    	throw re;
-	    }
+        if (re instanceof antlr4.error.RecognitionException) {
+            localctx.exception = re;
+            this._errHandler.reportError(this, re);
+            this._errHandler.recover(this, re);
+        } else {
+            throw re;
+        }
     } finally {
         this.exitRule();
     }
@@ -8865,13 +8728,13 @@ SiddhiQLParser.prototype.query_section = function() {
 };
 
 function Group_byContext(parser, parent, invokingState) {
-	if(parent===undefined) {
-	    parent = null;
-	}
-	if(invokingState===undefined || invokingState===null) {
-		invokingState = -1;
-	}
-	antlr4.ParserRuleContext.call(this, parent, invokingState);
+    if (parent === undefined) {
+        parent = null;
+    }
+    if (invokingState === undefined || invokingState === null) {
+        invokingState = -1;
+    }
+    antlr4.ParserRuleContext.call(this, parent, invokingState);
     this.parser = parser;
     this.ruleIndex = SiddhiQLParser.RULE_group_by;
     return this;
@@ -8880,43 +8743,41 @@ function Group_byContext(parser, parent, invokingState) {
 Group_byContext.prototype = Object.create(antlr4.ParserRuleContext.prototype);
 Group_byContext.prototype.constructor = Group_byContext;
 
-Group_byContext.prototype.GROUP = function() {
+Group_byContext.prototype.GROUP = function () {
     return this.getToken(SiddhiQLParser.GROUP, 0);
 };
 
-Group_byContext.prototype.BY = function() {
+Group_byContext.prototype.BY = function () {
     return this.getToken(SiddhiQLParser.BY, 0);
 };
 
-Group_byContext.prototype.attribute_reference = function(i) {
-    if(i===undefined) {
+Group_byContext.prototype.attribute_reference = function (i) {
+    if (i === undefined) {
         i = null;
     }
-    if(i===null) {
+    if (i === null) {
         return this.getTypedRuleContexts(Attribute_referenceContext);
     } else {
-        return this.getTypedRuleContext(Attribute_referenceContext,i);
+        return this.getTypedRuleContext(Attribute_referenceContext, i);
     }
 };
 
-Group_byContext.prototype.enterRule = function(listener) {
-    if(listener instanceof SiddhiQLListener ) {
+Group_byContext.prototype.enterRule = function (listener) {
+    if (listener instanceof SiddhiQLListener) {
         listener.enterGroup_by(this);
-	}
+    }
 };
 
-Group_byContext.prototype.exitRule = function(listener) {
-    if(listener instanceof SiddhiQLListener ) {
+Group_byContext.prototype.exitRule = function (listener) {
+    if (listener instanceof SiddhiQLListener) {
         listener.exitGroup_by(this);
-	}
+    }
 };
-
-
 
 
 SiddhiQLParser.Group_byContext = Group_byContext;
 
-SiddhiQLParser.prototype.group_by = function() {
+SiddhiQLParser.prototype.group_by = function () {
 
     var localctx = new Group_byContext(this, this._ctx, this.state);
     this.enterRule(localctx, 146, SiddhiQLParser.RULE_group_by);
@@ -8932,7 +8793,7 @@ SiddhiQLParser.prototype.group_by = function() {
         this.state = 1174;
         this._errHandler.sync(this);
         _la = this._input.LA(1);
-        while(_la===SiddhiQLParser.COMMA) {
+        while (_la === SiddhiQLParser.COMMA) {
             this.state = 1170;
             this.match(SiddhiQLParser.COMMA);
             this.state = 1171;
@@ -8942,13 +8803,13 @@ SiddhiQLParser.prototype.group_by = function() {
             _la = this._input.LA(1);
         }
     } catch (re) {
-    	if(re instanceof antlr4.error.RecognitionException) {
-	        localctx.exception = re;
-	        this._errHandler.reportError(this, re);
-	        this._errHandler.recover(this, re);
-	    } else {
-	    	throw re;
-	    }
+        if (re instanceof antlr4.error.RecognitionException) {
+            localctx.exception = re;
+            this._errHandler.reportError(this, re);
+            this._errHandler.recover(this, re);
+        } else {
+            throw re;
+        }
     } finally {
         this.exitRule();
     }
@@ -8956,13 +8817,13 @@ SiddhiQLParser.prototype.group_by = function() {
 };
 
 function HavingContext(parser, parent, invokingState) {
-	if(parent===undefined) {
-	    parent = null;
-	}
-	if(invokingState===undefined || invokingState===null) {
-		invokingState = -1;
-	}
-	antlr4.ParserRuleContext.call(this, parent, invokingState);
+    if (parent === undefined) {
+        parent = null;
+    }
+    if (invokingState === undefined || invokingState === null) {
+        invokingState = -1;
+    }
+    antlr4.ParserRuleContext.call(this, parent, invokingState);
     this.parser = parser;
     this.ruleIndex = SiddhiQLParser.RULE_having;
     return this;
@@ -8971,32 +8832,30 @@ function HavingContext(parser, parent, invokingState) {
 HavingContext.prototype = Object.create(antlr4.ParserRuleContext.prototype);
 HavingContext.prototype.constructor = HavingContext;
 
-HavingContext.prototype.HAVING = function() {
+HavingContext.prototype.HAVING = function () {
     return this.getToken(SiddhiQLParser.HAVING, 0);
 };
 
-HavingContext.prototype.expression = function() {
-    return this.getTypedRuleContext(ExpressionContext,0);
+HavingContext.prototype.expression = function () {
+    return this.getTypedRuleContext(ExpressionContext, 0);
 };
 
-HavingContext.prototype.enterRule = function(listener) {
-    if(listener instanceof SiddhiQLListener ) {
+HavingContext.prototype.enterRule = function (listener) {
+    if (listener instanceof SiddhiQLListener) {
         listener.enterHaving(this);
-	}
+    }
 };
 
-HavingContext.prototype.exitRule = function(listener) {
-    if(listener instanceof SiddhiQLListener ) {
+HavingContext.prototype.exitRule = function (listener) {
+    if (listener instanceof SiddhiQLListener) {
         listener.exitHaving(this);
-	}
+    }
 };
-
-
 
 
 SiddhiQLParser.HavingContext = HavingContext;
 
-SiddhiQLParser.prototype.having = function() {
+SiddhiQLParser.prototype.having = function () {
 
     var localctx = new HavingContext(this, this._ctx, this.state);
     this.enterRule(localctx, 148, SiddhiQLParser.RULE_having);
@@ -9007,13 +8866,13 @@ SiddhiQLParser.prototype.having = function() {
         this.state = 1178;
         this.expression();
     } catch (re) {
-    	if(re instanceof antlr4.error.RecognitionException) {
-	        localctx.exception = re;
-	        this._errHandler.reportError(this, re);
-	        this._errHandler.recover(this, re);
-	    } else {
-	    	throw re;
-	    }
+        if (re instanceof antlr4.error.RecognitionException) {
+            localctx.exception = re;
+            this._errHandler.reportError(this, re);
+            this._errHandler.recover(this, re);
+        } else {
+            throw re;
+        }
     } finally {
         this.exitRule();
     }
@@ -9021,13 +8880,13 @@ SiddhiQLParser.prototype.having = function() {
 };
 
 function Order_byContext(parser, parent, invokingState) {
-	if(parent===undefined) {
-	    parent = null;
-	}
-	if(invokingState===undefined || invokingState===null) {
-		invokingState = -1;
-	}
-	antlr4.ParserRuleContext.call(this, parent, invokingState);
+    if (parent === undefined) {
+        parent = null;
+    }
+    if (invokingState === undefined || invokingState === null) {
+        invokingState = -1;
+    }
+    antlr4.ParserRuleContext.call(this, parent, invokingState);
     this.parser = parser;
     this.ruleIndex = SiddhiQLParser.RULE_order_by;
     return this;
@@ -9036,43 +8895,41 @@ function Order_byContext(parser, parent, invokingState) {
 Order_byContext.prototype = Object.create(antlr4.ParserRuleContext.prototype);
 Order_byContext.prototype.constructor = Order_byContext;
 
-Order_byContext.prototype.ORDER = function() {
+Order_byContext.prototype.ORDER = function () {
     return this.getToken(SiddhiQLParser.ORDER, 0);
 };
 
-Order_byContext.prototype.BY = function() {
+Order_byContext.prototype.BY = function () {
     return this.getToken(SiddhiQLParser.BY, 0);
 };
 
-Order_byContext.prototype.order_by_reference = function(i) {
-    if(i===undefined) {
+Order_byContext.prototype.order_by_reference = function (i) {
+    if (i === undefined) {
         i = null;
     }
-    if(i===null) {
+    if (i === null) {
         return this.getTypedRuleContexts(Order_by_referenceContext);
     } else {
-        return this.getTypedRuleContext(Order_by_referenceContext,i);
+        return this.getTypedRuleContext(Order_by_referenceContext, i);
     }
 };
 
-Order_byContext.prototype.enterRule = function(listener) {
-    if(listener instanceof SiddhiQLListener ) {
+Order_byContext.prototype.enterRule = function (listener) {
+    if (listener instanceof SiddhiQLListener) {
         listener.enterOrder_by(this);
-	}
+    }
 };
 
-Order_byContext.prototype.exitRule = function(listener) {
-    if(listener instanceof SiddhiQLListener ) {
+Order_byContext.prototype.exitRule = function (listener) {
+    if (listener instanceof SiddhiQLListener) {
         listener.exitOrder_by(this);
-	}
+    }
 };
-
-
 
 
 SiddhiQLParser.Order_byContext = Order_byContext;
 
-SiddhiQLParser.prototype.order_by = function() {
+SiddhiQLParser.prototype.order_by = function () {
 
     var localctx = new Order_byContext(this, this._ctx, this.state);
     this.enterRule(localctx, 150, SiddhiQLParser.RULE_order_by);
@@ -9088,7 +8945,7 @@ SiddhiQLParser.prototype.order_by = function() {
         this.state = 1187;
         this._errHandler.sync(this);
         _la = this._input.LA(1);
-        while(_la===SiddhiQLParser.COMMA) {
+        while (_la === SiddhiQLParser.COMMA) {
             this.state = 1183;
             this.match(SiddhiQLParser.COMMA);
             this.state = 1184;
@@ -9098,13 +8955,13 @@ SiddhiQLParser.prototype.order_by = function() {
             _la = this._input.LA(1);
         }
     } catch (re) {
-    	if(re instanceof antlr4.error.RecognitionException) {
-	        localctx.exception = re;
-	        this._errHandler.reportError(this, re);
-	        this._errHandler.recover(this, re);
-	    } else {
-	    	throw re;
-	    }
+        if (re instanceof antlr4.error.RecognitionException) {
+            localctx.exception = re;
+            this._errHandler.reportError(this, re);
+            this._errHandler.recover(this, re);
+        } else {
+            throw re;
+        }
     } finally {
         this.exitRule();
     }
@@ -9112,13 +8969,13 @@ SiddhiQLParser.prototype.order_by = function() {
 };
 
 function Order_by_referenceContext(parser, parent, invokingState) {
-	if(parent===undefined) {
-	    parent = null;
-	}
-	if(invokingState===undefined || invokingState===null) {
-		invokingState = -1;
-	}
-	antlr4.ParserRuleContext.call(this, parent, invokingState);
+    if (parent === undefined) {
+        parent = null;
+    }
+    if (invokingState === undefined || invokingState === null) {
+        invokingState = -1;
+    }
+    antlr4.ParserRuleContext.call(this, parent, invokingState);
     this.parser = parser;
     this.ruleIndex = SiddhiQLParser.RULE_order_by_reference;
     return this;
@@ -9127,32 +8984,30 @@ function Order_by_referenceContext(parser, parent, invokingState) {
 Order_by_referenceContext.prototype = Object.create(antlr4.ParserRuleContext.prototype);
 Order_by_referenceContext.prototype.constructor = Order_by_referenceContext;
 
-Order_by_referenceContext.prototype.attribute_reference = function() {
-    return this.getTypedRuleContext(Attribute_referenceContext,0);
+Order_by_referenceContext.prototype.attribute_reference = function () {
+    return this.getTypedRuleContext(Attribute_referenceContext, 0);
 };
 
-Order_by_referenceContext.prototype.order = function() {
-    return this.getTypedRuleContext(OrderContext,0);
+Order_by_referenceContext.prototype.order = function () {
+    return this.getTypedRuleContext(OrderContext, 0);
 };
 
-Order_by_referenceContext.prototype.enterRule = function(listener) {
-    if(listener instanceof SiddhiQLListener ) {
+Order_by_referenceContext.prototype.enterRule = function (listener) {
+    if (listener instanceof SiddhiQLListener) {
         listener.enterOrder_by_reference(this);
-	}
+    }
 };
 
-Order_by_referenceContext.prototype.exitRule = function(listener) {
-    if(listener instanceof SiddhiQLListener ) {
+Order_by_referenceContext.prototype.exitRule = function (listener) {
+    if (listener instanceof SiddhiQLListener) {
         listener.exitOrder_by_reference(this);
-	}
+    }
 };
-
-
 
 
 SiddhiQLParser.Order_by_referenceContext = Order_by_referenceContext;
 
-SiddhiQLParser.prototype.order_by_reference = function() {
+SiddhiQLParser.prototype.order_by_reference = function () {
 
     var localctx = new Order_by_referenceContext(this, this._ctx, this.state);
     this.enterRule(localctx, 152, SiddhiQLParser.RULE_order_by_reference);
@@ -9163,19 +9018,19 @@ SiddhiQLParser.prototype.order_by_reference = function() {
         this.attribute_reference();
         this.state = 1192;
         _la = this._input.LA(1);
-        if(_la===SiddhiQLParser.ASC || _la===SiddhiQLParser.DESC) {
+        if (_la === SiddhiQLParser.ASC || _la === SiddhiQLParser.DESC) {
             this.state = 1191;
             this.order();
         }
 
     } catch (re) {
-    	if(re instanceof antlr4.error.RecognitionException) {
-	        localctx.exception = re;
-	        this._errHandler.reportError(this, re);
-	        this._errHandler.recover(this, re);
-	    } else {
-	    	throw re;
-	    }
+        if (re instanceof antlr4.error.RecognitionException) {
+            localctx.exception = re;
+            this._errHandler.reportError(this, re);
+            this._errHandler.recover(this, re);
+        } else {
+            throw re;
+        }
     } finally {
         this.exitRule();
     }
@@ -9183,13 +9038,13 @@ SiddhiQLParser.prototype.order_by_reference = function() {
 };
 
 function OrderContext(parser, parent, invokingState) {
-	if(parent===undefined) {
-	    parent = null;
-	}
-	if(invokingState===undefined || invokingState===null) {
-		invokingState = -1;
-	}
-	antlr4.ParserRuleContext.call(this, parent, invokingState);
+    if (parent === undefined) {
+        parent = null;
+    }
+    if (invokingState === undefined || invokingState === null) {
+        invokingState = -1;
+    }
+    antlr4.ParserRuleContext.call(this, parent, invokingState);
     this.parser = parser;
     this.ruleIndex = SiddhiQLParser.RULE_order;
     return this;
@@ -9198,32 +9053,30 @@ function OrderContext(parser, parent, invokingState) {
 OrderContext.prototype = Object.create(antlr4.ParserRuleContext.prototype);
 OrderContext.prototype.constructor = OrderContext;
 
-OrderContext.prototype.ASC = function() {
+OrderContext.prototype.ASC = function () {
     return this.getToken(SiddhiQLParser.ASC, 0);
 };
 
-OrderContext.prototype.DESC = function() {
+OrderContext.prototype.DESC = function () {
     return this.getToken(SiddhiQLParser.DESC, 0);
 };
 
-OrderContext.prototype.enterRule = function(listener) {
-    if(listener instanceof SiddhiQLListener ) {
+OrderContext.prototype.enterRule = function (listener) {
+    if (listener instanceof SiddhiQLListener) {
         listener.enterOrder(this);
-	}
+    }
 };
 
-OrderContext.prototype.exitRule = function(listener) {
-    if(listener instanceof SiddhiQLListener ) {
+OrderContext.prototype.exitRule = function (listener) {
+    if (listener instanceof SiddhiQLListener) {
         listener.exitOrder(this);
-	}
+    }
 };
-
-
 
 
 SiddhiQLParser.OrderContext = OrderContext;
 
-SiddhiQLParser.prototype.order = function() {
+SiddhiQLParser.prototype.order = function () {
 
     var localctx = new OrderContext(this, this._ctx, this.state);
     this.enterRule(localctx, 154, SiddhiQLParser.RULE_order);
@@ -9232,20 +9085,20 @@ SiddhiQLParser.prototype.order = function() {
         this.enterOuterAlt(localctx, 1);
         this.state = 1194;
         _la = this._input.LA(1);
-        if(!(_la===SiddhiQLParser.ASC || _la===SiddhiQLParser.DESC)) {
-        this._errHandler.recoverInline(this);
+        if (!(_la === SiddhiQLParser.ASC || _la === SiddhiQLParser.DESC)) {
+            this._errHandler.recoverInline(this);
         }
         else {
             this.consume();
         }
     } catch (re) {
-    	if(re instanceof antlr4.error.RecognitionException) {
-	        localctx.exception = re;
-	        this._errHandler.reportError(this, re);
-	        this._errHandler.recover(this, re);
-	    } else {
-	    	throw re;
-	    }
+        if (re instanceof antlr4.error.RecognitionException) {
+            localctx.exception = re;
+            this._errHandler.reportError(this, re);
+            this._errHandler.recover(this, re);
+        } else {
+            throw re;
+        }
     } finally {
         this.exitRule();
     }
@@ -9253,13 +9106,13 @@ SiddhiQLParser.prototype.order = function() {
 };
 
 function LimitContext(parser, parent, invokingState) {
-	if(parent===undefined) {
-	    parent = null;
-	}
-	if(invokingState===undefined || invokingState===null) {
-		invokingState = -1;
-	}
-	antlr4.ParserRuleContext.call(this, parent, invokingState);
+    if (parent === undefined) {
+        parent = null;
+    }
+    if (invokingState === undefined || invokingState === null) {
+        invokingState = -1;
+    }
+    antlr4.ParserRuleContext.call(this, parent, invokingState);
     this.parser = parser;
     this.ruleIndex = SiddhiQLParser.RULE_limit;
     return this;
@@ -9268,32 +9121,30 @@ function LimitContext(parser, parent, invokingState) {
 LimitContext.prototype = Object.create(antlr4.ParserRuleContext.prototype);
 LimitContext.prototype.constructor = LimitContext;
 
-LimitContext.prototype.LIMIT = function() {
+LimitContext.prototype.LIMIT = function () {
     return this.getToken(SiddhiQLParser.LIMIT, 0);
 };
 
-LimitContext.prototype.expression = function() {
-    return this.getTypedRuleContext(ExpressionContext,0);
+LimitContext.prototype.expression = function () {
+    return this.getTypedRuleContext(ExpressionContext, 0);
 };
 
-LimitContext.prototype.enterRule = function(listener) {
-    if(listener instanceof SiddhiQLListener ) {
+LimitContext.prototype.enterRule = function (listener) {
+    if (listener instanceof SiddhiQLListener) {
         listener.enterLimit(this);
-	}
+    }
 };
 
-LimitContext.prototype.exitRule = function(listener) {
-    if(listener instanceof SiddhiQLListener ) {
+LimitContext.prototype.exitRule = function (listener) {
+    if (listener instanceof SiddhiQLListener) {
         listener.exitLimit(this);
-	}
+    }
 };
-
-
 
 
 SiddhiQLParser.LimitContext = LimitContext;
 
-SiddhiQLParser.prototype.limit = function() {
+SiddhiQLParser.prototype.limit = function () {
 
     var localctx = new LimitContext(this, this._ctx, this.state);
     this.enterRule(localctx, 156, SiddhiQLParser.RULE_limit);
@@ -9304,13 +9155,13 @@ SiddhiQLParser.prototype.limit = function() {
         this.state = 1197;
         this.expression();
     } catch (re) {
-    	if(re instanceof antlr4.error.RecognitionException) {
-	        localctx.exception = re;
-	        this._errHandler.reportError(this, re);
-	        this._errHandler.recover(this, re);
-	    } else {
-	    	throw re;
-	    }
+        if (re instanceof antlr4.error.RecognitionException) {
+            localctx.exception = re;
+            this._errHandler.reportError(this, re);
+            this._errHandler.recover(this, re);
+        } else {
+            throw re;
+        }
     } finally {
         this.exitRule();
     }
@@ -9318,13 +9169,13 @@ SiddhiQLParser.prototype.limit = function() {
 };
 
 function OffsetContext(parser, parent, invokingState) {
-	if(parent===undefined) {
-	    parent = null;
-	}
-	if(invokingState===undefined || invokingState===null) {
-		invokingState = -1;
-	}
-	antlr4.ParserRuleContext.call(this, parent, invokingState);
+    if (parent === undefined) {
+        parent = null;
+    }
+    if (invokingState === undefined || invokingState === null) {
+        invokingState = -1;
+    }
+    antlr4.ParserRuleContext.call(this, parent, invokingState);
     this.parser = parser;
     this.ruleIndex = SiddhiQLParser.RULE_offset;
     return this;
@@ -9333,32 +9184,30 @@ function OffsetContext(parser, parent, invokingState) {
 OffsetContext.prototype = Object.create(antlr4.ParserRuleContext.prototype);
 OffsetContext.prototype.constructor = OffsetContext;
 
-OffsetContext.prototype.OFFSET = function() {
+OffsetContext.prototype.OFFSET = function () {
     return this.getToken(SiddhiQLParser.OFFSET, 0);
 };
 
-OffsetContext.prototype.expression = function() {
-    return this.getTypedRuleContext(ExpressionContext,0);
+OffsetContext.prototype.expression = function () {
+    return this.getTypedRuleContext(ExpressionContext, 0);
 };
 
-OffsetContext.prototype.enterRule = function(listener) {
-    if(listener instanceof SiddhiQLListener ) {
+OffsetContext.prototype.enterRule = function (listener) {
+    if (listener instanceof SiddhiQLListener) {
         listener.enterOffset(this);
-	}
+    }
 };
 
-OffsetContext.prototype.exitRule = function(listener) {
-    if(listener instanceof SiddhiQLListener ) {
+OffsetContext.prototype.exitRule = function (listener) {
+    if (listener instanceof SiddhiQLListener) {
         listener.exitOffset(this);
-	}
+    }
 };
-
-
 
 
 SiddhiQLParser.OffsetContext = OffsetContext;
 
-SiddhiQLParser.prototype.offset = function() {
+SiddhiQLParser.prototype.offset = function () {
 
     var localctx = new OffsetContext(this, this._ctx, this.state);
     this.enterRule(localctx, 158, SiddhiQLParser.RULE_offset);
@@ -9369,13 +9218,13 @@ SiddhiQLParser.prototype.offset = function() {
         this.state = 1200;
         this.expression();
     } catch (re) {
-    	if(re instanceof antlr4.error.RecognitionException) {
-	        localctx.exception = re;
-	        this._errHandler.reportError(this, re);
-	        this._errHandler.recover(this, re);
-	    } else {
-	    	throw re;
-	    }
+        if (re instanceof antlr4.error.RecognitionException) {
+            localctx.exception = re;
+            this._errHandler.reportError(this, re);
+            this._errHandler.recover(this, re);
+        } else {
+            throw re;
+        }
     } finally {
         this.exitRule();
     }
@@ -9383,13 +9232,13 @@ SiddhiQLParser.prototype.offset = function() {
 };
 
 function Query_outputContext(parser, parent, invokingState) {
-	if(parent===undefined) {
-	    parent = null;
-	}
-	if(invokingState===undefined || invokingState===null) {
-		invokingState = -1;
-	}
-	antlr4.ParserRuleContext.call(this, parent, invokingState);
+    if (parent === undefined) {
+        parent = null;
+    }
+    if (invokingState === undefined || invokingState === null) {
+        invokingState = -1;
+    }
+    antlr4.ParserRuleContext.call(this, parent, invokingState);
     this.parser = parser;
     this.ruleIndex = SiddhiQLParser.RULE_query_output;
     return this;
@@ -9398,202 +9247,200 @@ function Query_outputContext(parser, parent, invokingState) {
 Query_outputContext.prototype = Object.create(antlr4.ParserRuleContext.prototype);
 Query_outputContext.prototype.constructor = Query_outputContext;
 
-Query_outputContext.prototype.INSERT = function() {
+Query_outputContext.prototype.INSERT = function () {
     return this.getToken(SiddhiQLParser.INSERT, 0);
 };
 
-Query_outputContext.prototype.INTO = function() {
+Query_outputContext.prototype.INTO = function () {
     return this.getToken(SiddhiQLParser.INTO, 0);
 };
 
-Query_outputContext.prototype.target = function() {
-    return this.getTypedRuleContext(TargetContext,0);
+Query_outputContext.prototype.target = function () {
+    return this.getTypedRuleContext(TargetContext, 0);
 };
 
-Query_outputContext.prototype.output_event_type = function() {
-    return this.getTypedRuleContext(Output_event_typeContext,0);
+Query_outputContext.prototype.output_event_type = function () {
+    return this.getTypedRuleContext(Output_event_typeContext, 0);
 };
 
-Query_outputContext.prototype.DELETE = function() {
+Query_outputContext.prototype.DELETE = function () {
     return this.getToken(SiddhiQLParser.DELETE, 0);
 };
 
-Query_outputContext.prototype.ON = function() {
+Query_outputContext.prototype.ON = function () {
     return this.getToken(SiddhiQLParser.ON, 0);
 };
 
-Query_outputContext.prototype.expression = function() {
-    return this.getTypedRuleContext(ExpressionContext,0);
+Query_outputContext.prototype.expression = function () {
+    return this.getTypedRuleContext(ExpressionContext, 0);
 };
 
-Query_outputContext.prototype.FOR = function() {
+Query_outputContext.prototype.FOR = function () {
     return this.getToken(SiddhiQLParser.FOR, 0);
 };
 
-Query_outputContext.prototype.UPDATE = function() {
+Query_outputContext.prototype.UPDATE = function () {
     return this.getToken(SiddhiQLParser.UPDATE, 0);
 };
 
-Query_outputContext.prototype.OR = function() {
+Query_outputContext.prototype.OR = function () {
     return this.getToken(SiddhiQLParser.OR, 0);
 };
 
-Query_outputContext.prototype.set_clause = function() {
-    return this.getTypedRuleContext(Set_clauseContext,0);
+Query_outputContext.prototype.set_clause = function () {
+    return this.getTypedRuleContext(Set_clauseContext, 0);
 };
 
-Query_outputContext.prototype.RETURN = function() {
+Query_outputContext.prototype.RETURN = function () {
     return this.getToken(SiddhiQLParser.RETURN, 0);
 };
 
-Query_outputContext.prototype.enterRule = function(listener) {
-    if(listener instanceof SiddhiQLListener ) {
+Query_outputContext.prototype.enterRule = function (listener) {
+    if (listener instanceof SiddhiQLListener) {
         listener.enterQuery_output(this);
-	}
+    }
 };
 
-Query_outputContext.prototype.exitRule = function(listener) {
-    if(listener instanceof SiddhiQLListener ) {
+Query_outputContext.prototype.exitRule = function (listener) {
+    if (listener instanceof SiddhiQLListener) {
         listener.exitQuery_output(this);
-	}
+    }
 };
-
-
 
 
 SiddhiQLParser.Query_outputContext = Query_outputContext;
 
-SiddhiQLParser.prototype.query_output = function() {
+SiddhiQLParser.prototype.query_output = function () {
 
     var localctx = new Query_outputContext(this, this._ctx, this.state);
     this.enterRule(localctx, 160, SiddhiQLParser.RULE_query_output);
     var _la = 0; // Token type
     try {
         this.state = 1248;
-        var la_ = this._interp.adaptivePredict(this._input,146,this._ctx);
-        switch(la_) {
-        case 1:
-            this.enterOuterAlt(localctx, 1);
-            this.state = 1202;
-            this.match(SiddhiQLParser.INSERT);
-            this.state = 1204;
-            _la = this._input.LA(1);
-            if(((((_la - 53)) & ~0x1f) == 0 && ((1 << (_la - 53)) & ((1 << (SiddhiQLParser.EVENTS - 53)) | (1 << (SiddhiQLParser.EXPIRED - 53)) | (1 << (SiddhiQLParser.CURRENT - 53)) | (1 << (SiddhiQLParser.ALL - 53)))) !== 0)) {
-                this.state = 1203;
-                this.output_event_type();
-            }
+        var la_ = this._interp.adaptivePredict(this._input, 146, this._ctx);
+        switch (la_) {
+            case 1:
+                this.enterOuterAlt(localctx, 1);
+                this.state = 1202;
+                this.match(SiddhiQLParser.INSERT);
+                this.state = 1204;
+                _la = this._input.LA(1);
+                if (((((_la - 53)) & ~0x1f) == 0 && ((1 << (_la - 53)) & ((1 << (SiddhiQLParser.EVENTS - 53)) | (1 << (SiddhiQLParser.EXPIRED - 53)) | (1 << (SiddhiQLParser.CURRENT - 53)) | (1 << (SiddhiQLParser.ALL - 53)))) !== 0)) {
+                    this.state = 1203;
+                    this.output_event_type();
+                }
 
-            this.state = 1206;
-            this.match(SiddhiQLParser.INTO);
-            this.state = 1207;
-            this.target();
-            break;
+                this.state = 1206;
+                this.match(SiddhiQLParser.INTO);
+                this.state = 1207;
+                this.target();
+                break;
 
-        case 2:
-            this.enterOuterAlt(localctx, 2);
-            this.state = 1208;
-            this.match(SiddhiQLParser.DELETE);
-            this.state = 1209;
-            this.target();
-            this.state = 1212;
-            _la = this._input.LA(1);
-            if(_la===SiddhiQLParser.FOR) {
-                this.state = 1210;
-                this.match(SiddhiQLParser.FOR);
-                this.state = 1211;
-                this.output_event_type();
-            }
+            case 2:
+                this.enterOuterAlt(localctx, 2);
+                this.state = 1208;
+                this.match(SiddhiQLParser.DELETE);
+                this.state = 1209;
+                this.target();
+                this.state = 1212;
+                _la = this._input.LA(1);
+                if (_la === SiddhiQLParser.FOR) {
+                    this.state = 1210;
+                    this.match(SiddhiQLParser.FOR);
+                    this.state = 1211;
+                    this.output_event_type();
+                }
 
-            this.state = 1214;
-            this.match(SiddhiQLParser.ON);
-            this.state = 1215;
-            this.expression();
-            break;
+                this.state = 1214;
+                this.match(SiddhiQLParser.ON);
+                this.state = 1215;
+                this.expression();
+                break;
 
-        case 3:
-            this.enterOuterAlt(localctx, 3);
-            this.state = 1217;
-            this.match(SiddhiQLParser.UPDATE);
-            this.state = 1218;
-            this.match(SiddhiQLParser.OR);
-            this.state = 1219;
-            this.match(SiddhiQLParser.INSERT);
-            this.state = 1220;
-            this.match(SiddhiQLParser.INTO);
-            this.state = 1221;
-            this.target();
-            this.state = 1224;
-            _la = this._input.LA(1);
-            if(_la===SiddhiQLParser.FOR) {
-                this.state = 1222;
-                this.match(SiddhiQLParser.FOR);
-                this.state = 1223;
-                this.output_event_type();
-            }
+            case 3:
+                this.enterOuterAlt(localctx, 3);
+                this.state = 1217;
+                this.match(SiddhiQLParser.UPDATE);
+                this.state = 1218;
+                this.match(SiddhiQLParser.OR);
+                this.state = 1219;
+                this.match(SiddhiQLParser.INSERT);
+                this.state = 1220;
+                this.match(SiddhiQLParser.INTO);
+                this.state = 1221;
+                this.target();
+                this.state = 1224;
+                _la = this._input.LA(1);
+                if (_la === SiddhiQLParser.FOR) {
+                    this.state = 1222;
+                    this.match(SiddhiQLParser.FOR);
+                    this.state = 1223;
+                    this.output_event_type();
+                }
 
-            this.state = 1227;
-            _la = this._input.LA(1);
-            if(_la===SiddhiQLParser.SET) {
-                this.state = 1226;
-                this.set_clause();
-            }
+                this.state = 1227;
+                _la = this._input.LA(1);
+                if (_la === SiddhiQLParser.SET) {
+                    this.state = 1226;
+                    this.set_clause();
+                }
 
-            this.state = 1229;
-            this.match(SiddhiQLParser.ON);
-            this.state = 1230;
-            this.expression();
-            break;
+                this.state = 1229;
+                this.match(SiddhiQLParser.ON);
+                this.state = 1230;
+                this.expression();
+                break;
 
-        case 4:
-            this.enterOuterAlt(localctx, 4);
-            this.state = 1232;
-            this.match(SiddhiQLParser.UPDATE);
-            this.state = 1233;
-            this.target();
-            this.state = 1236;
-            _la = this._input.LA(1);
-            if(_la===SiddhiQLParser.FOR) {
-                this.state = 1234;
-                this.match(SiddhiQLParser.FOR);
-                this.state = 1235;
-                this.output_event_type();
-            }
+            case 4:
+                this.enterOuterAlt(localctx, 4);
+                this.state = 1232;
+                this.match(SiddhiQLParser.UPDATE);
+                this.state = 1233;
+                this.target();
+                this.state = 1236;
+                _la = this._input.LA(1);
+                if (_la === SiddhiQLParser.FOR) {
+                    this.state = 1234;
+                    this.match(SiddhiQLParser.FOR);
+                    this.state = 1235;
+                    this.output_event_type();
+                }
 
-            this.state = 1239;
-            _la = this._input.LA(1);
-            if(_la===SiddhiQLParser.SET) {
-                this.state = 1238;
-                this.set_clause();
-            }
+                this.state = 1239;
+                _la = this._input.LA(1);
+                if (_la === SiddhiQLParser.SET) {
+                    this.state = 1238;
+                    this.set_clause();
+                }
 
-            this.state = 1241;
-            this.match(SiddhiQLParser.ON);
-            this.state = 1242;
-            this.expression();
-            break;
+                this.state = 1241;
+                this.match(SiddhiQLParser.ON);
+                this.state = 1242;
+                this.expression();
+                break;
 
-        case 5:
-            this.enterOuterAlt(localctx, 5);
-            this.state = 1244;
-            this.match(SiddhiQLParser.RETURN);
-            this.state = 1246;
-            _la = this._input.LA(1);
-            if(((((_la - 53)) & ~0x1f) == 0 && ((1 << (_la - 53)) & ((1 << (SiddhiQLParser.EVENTS - 53)) | (1 << (SiddhiQLParser.EXPIRED - 53)) | (1 << (SiddhiQLParser.CURRENT - 53)) | (1 << (SiddhiQLParser.ALL - 53)))) !== 0)) {
-                this.state = 1245;
-                this.output_event_type();
-            }
+            case 5:
+                this.enterOuterAlt(localctx, 5);
+                this.state = 1244;
+                this.match(SiddhiQLParser.RETURN);
+                this.state = 1246;
+                _la = this._input.LA(1);
+                if (((((_la - 53)) & ~0x1f) == 0 && ((1 << (_la - 53)) & ((1 << (SiddhiQLParser.EVENTS - 53)) | (1 << (SiddhiQLParser.EXPIRED - 53)) | (1 << (SiddhiQLParser.CURRENT - 53)) | (1 << (SiddhiQLParser.ALL - 53)))) !== 0)) {
+                    this.state = 1245;
+                    this.output_event_type();
+                }
 
-            break;
+                break;
 
         }
     } catch (re) {
-    	if(re instanceof antlr4.error.RecognitionException) {
-	        localctx.exception = re;
-	        this._errHandler.reportError(this, re);
-	        this._errHandler.recover(this, re);
-	    } else {
-	    	throw re;
-	    }
+        if (re instanceof antlr4.error.RecognitionException) {
+            localctx.exception = re;
+            this._errHandler.reportError(this, re);
+            this._errHandler.recover(this, re);
+        } else {
+            throw re;
+        }
     } finally {
         this.exitRule();
     }
@@ -9601,13 +9448,13 @@ SiddhiQLParser.prototype.query_output = function() {
 };
 
 function Store_query_outputContext(parser, parent, invokingState) {
-	if(parent===undefined) {
-	    parent = null;
-	}
-	if(invokingState===undefined || invokingState===null) {
-		invokingState = -1;
-	}
-	antlr4.ParserRuleContext.call(this, parent, invokingState);
+    if (parent === undefined) {
+        parent = null;
+    }
+    if (invokingState === undefined || invokingState === null) {
+        invokingState = -1;
+    }
+    antlr4.ParserRuleContext.call(this, parent, invokingState);
     this.parser = parser;
     this.ruleIndex = SiddhiQLParser.RULE_store_query_output;
     return this;
@@ -9616,95 +9463,93 @@ function Store_query_outputContext(parser, parent, invokingState) {
 Store_query_outputContext.prototype = Object.create(antlr4.ParserRuleContext.prototype);
 Store_query_outputContext.prototype.constructor = Store_query_outputContext;
 
-Store_query_outputContext.prototype.DELETE = function() {
+Store_query_outputContext.prototype.DELETE = function () {
     return this.getToken(SiddhiQLParser.DELETE, 0);
 };
 
-Store_query_outputContext.prototype.target = function() {
-    return this.getTypedRuleContext(TargetContext,0);
+Store_query_outputContext.prototype.target = function () {
+    return this.getTypedRuleContext(TargetContext, 0);
 };
 
-Store_query_outputContext.prototype.ON = function() {
+Store_query_outputContext.prototype.ON = function () {
     return this.getToken(SiddhiQLParser.ON, 0);
 };
 
-Store_query_outputContext.prototype.expression = function() {
-    return this.getTypedRuleContext(ExpressionContext,0);
+Store_query_outputContext.prototype.expression = function () {
+    return this.getTypedRuleContext(ExpressionContext, 0);
 };
 
-Store_query_outputContext.prototype.UPDATE = function() {
+Store_query_outputContext.prototype.UPDATE = function () {
     return this.getToken(SiddhiQLParser.UPDATE, 0);
 };
 
-Store_query_outputContext.prototype.set_clause = function() {
-    return this.getTypedRuleContext(Set_clauseContext,0);
+Store_query_outputContext.prototype.set_clause = function () {
+    return this.getTypedRuleContext(Set_clauseContext, 0);
 };
 
-Store_query_outputContext.prototype.enterRule = function(listener) {
-    if(listener instanceof SiddhiQLListener ) {
+Store_query_outputContext.prototype.enterRule = function (listener) {
+    if (listener instanceof SiddhiQLListener) {
         listener.enterStore_query_output(this);
-	}
+    }
 };
 
-Store_query_outputContext.prototype.exitRule = function(listener) {
-    if(listener instanceof SiddhiQLListener ) {
+Store_query_outputContext.prototype.exitRule = function (listener) {
+    if (listener instanceof SiddhiQLListener) {
         listener.exitStore_query_output(this);
-	}
+    }
 };
-
-
 
 
 SiddhiQLParser.Store_query_outputContext = Store_query_outputContext;
 
-SiddhiQLParser.prototype.store_query_output = function() {
+SiddhiQLParser.prototype.store_query_output = function () {
 
     var localctx = new Store_query_outputContext(this, this._ctx, this.state);
     this.enterRule(localctx, 162, SiddhiQLParser.RULE_store_query_output);
     var _la = 0; // Token type
     try {
         this.state = 1263;
-        switch(this._input.LA(1)) {
-        case SiddhiQLParser.DELETE:
-            this.enterOuterAlt(localctx, 1);
-            this.state = 1250;
-            this.match(SiddhiQLParser.DELETE);
-            this.state = 1251;
-            this.target();
-            this.state = 1252;
-            this.match(SiddhiQLParser.ON);
-            this.state = 1253;
-            this.expression();
-            break;
-        case SiddhiQLParser.UPDATE:
-            this.enterOuterAlt(localctx, 2);
-            this.state = 1255;
-            this.match(SiddhiQLParser.UPDATE);
-            this.state = 1256;
-            this.target();
-            this.state = 1258;
-            _la = this._input.LA(1);
-            if(_la===SiddhiQLParser.SET) {
-                this.state = 1257;
-                this.set_clause();
-            }
+        switch (this._input.LA(1)) {
+            case SiddhiQLParser.DELETE:
+                this.enterOuterAlt(localctx, 1);
+                this.state = 1250;
+                this.match(SiddhiQLParser.DELETE);
+                this.state = 1251;
+                this.target();
+                this.state = 1252;
+                this.match(SiddhiQLParser.ON);
+                this.state = 1253;
+                this.expression();
+                break;
+            case SiddhiQLParser.UPDATE:
+                this.enterOuterAlt(localctx, 2);
+                this.state = 1255;
+                this.match(SiddhiQLParser.UPDATE);
+                this.state = 1256;
+                this.target();
+                this.state = 1258;
+                _la = this._input.LA(1);
+                if (_la === SiddhiQLParser.SET) {
+                    this.state = 1257;
+                    this.set_clause();
+                }
 
-            this.state = 1260;
-            this.match(SiddhiQLParser.ON);
-            this.state = 1261;
-            this.expression();
-            break;
-        default:
-            throw new antlr4.error.NoViableAltException(this);
+                this.state = 1260;
+                this.match(SiddhiQLParser.ON);
+                this.state = 1261;
+                this.expression();
+                break;
+            default:
+                throw new antlr4.error.NoViableAltException(this);
         }
     } catch (re) {
-    	if(re instanceof antlr4.error.RecognitionException) {
-	        localctx.exception = re;
-	        this._errHandler.reportError(this, re);
-	        this._errHandler.recover(this, re);
-	    } else {
-	    	throw re;
-	    }
+        if (re instanceof antlr4.error.RecognitionException) {
+            localctx.exception = re;
+            this._errHandler.reportError(this, re);
+            this._errHandler.recover(this, re);
+        } else {
+            throw re;
+        }
     } finally {
         this.exitRule();
     }
@@ -9712,13 +9557,13 @@ SiddhiQLParser.prototype.store_query_output = function() {
 };
 
 function Set_clauseContext(parser, parent, invokingState) {
-	if(parent===undefined) {
-	    parent = null;
-	}
-	if(invokingState===undefined || invokingState===null) {
-		invokingState = -1;
-	}
-	antlr4.ParserRuleContext.call(this, parent, invokingState);
+    if (parent === undefined) {
+        parent = null;
+    }
+    if (invokingState === undefined || invokingState === null) {
+        invokingState = -1;
+    }
+    antlr4.ParserRuleContext.call(this, parent, invokingState);
     this.parser = parser;
     this.ruleIndex = SiddhiQLParser.RULE_set_clause;
     return this;
@@ -9727,39 +9572,37 @@ function Set_clauseContext(parser, parent, invokingState) {
 Set_clauseContext.prototype = Object.create(antlr4.ParserRuleContext.prototype);
 Set_clauseContext.prototype.constructor = Set_clauseContext;
 
-Set_clauseContext.prototype.SET = function() {
+Set_clauseContext.prototype.SET = function () {
     return this.getToken(SiddhiQLParser.SET, 0);
 };
 
-Set_clauseContext.prototype.set_assignment = function(i) {
-    if(i===undefined) {
+Set_clauseContext.prototype.set_assignment = function (i) {
+    if (i === undefined) {
         i = null;
     }
-    if(i===null) {
+    if (i === null) {
         return this.getTypedRuleContexts(Set_assignmentContext);
     } else {
-        return this.getTypedRuleContext(Set_assignmentContext,i);
+        return this.getTypedRuleContext(Set_assignmentContext, i);
     }
 };
 
-Set_clauseContext.prototype.enterRule = function(listener) {
-    if(listener instanceof SiddhiQLListener ) {
+Set_clauseContext.prototype.enterRule = function (listener) {
+    if (listener instanceof SiddhiQLListener) {
         listener.enterSet_clause(this);
-	}
+    }
 };
 
-Set_clauseContext.prototype.exitRule = function(listener) {
-    if(listener instanceof SiddhiQLListener ) {
+Set_clauseContext.prototype.exitRule = function (listener) {
+    if (listener instanceof SiddhiQLListener) {
         listener.exitSet_clause(this);
-	}
+    }
 };
-
-
 
 
 SiddhiQLParser.Set_clauseContext = Set_clauseContext;
 
-SiddhiQLParser.prototype.set_clause = function() {
+SiddhiQLParser.prototype.set_clause = function () {
 
     var localctx = new Set_clauseContext(this, this._ctx, this.state);
     this.enterRule(localctx, 164, SiddhiQLParser.RULE_set_clause);
@@ -9773,7 +9616,7 @@ SiddhiQLParser.prototype.set_clause = function() {
         this.state = 1271;
         this._errHandler.sync(this);
         _la = this._input.LA(1);
-        while(_la===SiddhiQLParser.COMMA) {
+        while (_la === SiddhiQLParser.COMMA) {
             this.state = 1267;
             this.match(SiddhiQLParser.COMMA);
             this.state = 1268;
@@ -9783,13 +9626,13 @@ SiddhiQLParser.prototype.set_clause = function() {
             _la = this._input.LA(1);
         }
     } catch (re) {
-    	if(re instanceof antlr4.error.RecognitionException) {
-	        localctx.exception = re;
-	        this._errHandler.reportError(this, re);
-	        this._errHandler.recover(this, re);
-	    } else {
-	    	throw re;
-	    }
+        if (re instanceof antlr4.error.RecognitionException) {
+            localctx.exception = re;
+            this._errHandler.reportError(this, re);
+            this._errHandler.recover(this, re);
+        } else {
+            throw re;
+        }
     } finally {
         this.exitRule();
     }
@@ -9797,13 +9640,13 @@ SiddhiQLParser.prototype.set_clause = function() {
 };
 
 function Set_assignmentContext(parser, parent, invokingState) {
-	if(parent===undefined) {
-	    parent = null;
-	}
-	if(invokingState===undefined || invokingState===null) {
-		invokingState = -1;
-	}
-	antlr4.ParserRuleContext.call(this, parent, invokingState);
+    if (parent === undefined) {
+        parent = null;
+    }
+    if (invokingState === undefined || invokingState === null) {
+        invokingState = -1;
+    }
+    antlr4.ParserRuleContext.call(this, parent, invokingState);
     this.parser = parser;
     this.ruleIndex = SiddhiQLParser.RULE_set_assignment;
     return this;
@@ -9812,32 +9655,30 @@ function Set_assignmentContext(parser, parent, invokingState) {
 Set_assignmentContext.prototype = Object.create(antlr4.ParserRuleContext.prototype);
 Set_assignmentContext.prototype.constructor = Set_assignmentContext;
 
-Set_assignmentContext.prototype.attribute_reference = function() {
-    return this.getTypedRuleContext(Attribute_referenceContext,0);
+Set_assignmentContext.prototype.attribute_reference = function () {
+    return this.getTypedRuleContext(Attribute_referenceContext, 0);
 };
 
-Set_assignmentContext.prototype.expression = function() {
-    return this.getTypedRuleContext(ExpressionContext,0);
+Set_assignmentContext.prototype.expression = function () {
+    return this.getTypedRuleContext(ExpressionContext, 0);
 };
 
-Set_assignmentContext.prototype.enterRule = function(listener) {
-    if(listener instanceof SiddhiQLListener ) {
+Set_assignmentContext.prototype.enterRule = function (listener) {
+    if (listener instanceof SiddhiQLListener) {
         listener.enterSet_assignment(this);
-	}
+    }
 };
 
-Set_assignmentContext.prototype.exitRule = function(listener) {
-    if(listener instanceof SiddhiQLListener ) {
+Set_assignmentContext.prototype.exitRule = function (listener) {
+    if (listener instanceof SiddhiQLListener) {
         listener.exitSet_assignment(this);
-	}
+    }
 };
-
-
 
 
 SiddhiQLParser.Set_assignmentContext = Set_assignmentContext;
 
-SiddhiQLParser.prototype.set_assignment = function() {
+SiddhiQLParser.prototype.set_assignment = function () {
 
     var localctx = new Set_assignmentContext(this, this._ctx, this.state);
     this.enterRule(localctx, 166, SiddhiQLParser.RULE_set_assignment);
@@ -9850,13 +9691,13 @@ SiddhiQLParser.prototype.set_assignment = function() {
         this.state = 1276;
         this.expression();
     } catch (re) {
-    	if(re instanceof antlr4.error.RecognitionException) {
-	        localctx.exception = re;
-	        this._errHandler.reportError(this, re);
-	        this._errHandler.recover(this, re);
-	    } else {
-	    	throw re;
-	    }
+        if (re instanceof antlr4.error.RecognitionException) {
+            localctx.exception = re;
+            this._errHandler.reportError(this, re);
+            this._errHandler.recover(this, re);
+        } else {
+            throw re;
+        }
     } finally {
         this.exitRule();
     }
@@ -9864,13 +9705,13 @@ SiddhiQLParser.prototype.set_assignment = function() {
 };
 
 function Output_event_typeContext(parser, parent, invokingState) {
-	if(parent===undefined) {
-	    parent = null;
-	}
-	if(invokingState===undefined || invokingState===null) {
-		invokingState = -1;
-	}
-	antlr4.ParserRuleContext.call(this, parent, invokingState);
+    if (parent === undefined) {
+        parent = null;
+    }
+    if (invokingState === undefined || invokingState === null) {
+        invokingState = -1;
+    }
+    antlr4.ParserRuleContext.call(this, parent, invokingState);
     this.parser = parser;
     this.ruleIndex = SiddhiQLParser.RULE_output_event_type;
     return this;
@@ -9879,85 +9720,83 @@ function Output_event_typeContext(parser, parent, invokingState) {
 Output_event_typeContext.prototype = Object.create(antlr4.ParserRuleContext.prototype);
 Output_event_typeContext.prototype.constructor = Output_event_typeContext;
 
-Output_event_typeContext.prototype.ALL = function() {
+Output_event_typeContext.prototype.ALL = function () {
     return this.getToken(SiddhiQLParser.ALL, 0);
 };
 
-Output_event_typeContext.prototype.EVENTS = function() {
+Output_event_typeContext.prototype.EVENTS = function () {
     return this.getToken(SiddhiQLParser.EVENTS, 0);
 };
 
-Output_event_typeContext.prototype.EXPIRED = function() {
+Output_event_typeContext.prototype.EXPIRED = function () {
     return this.getToken(SiddhiQLParser.EXPIRED, 0);
 };
 
-Output_event_typeContext.prototype.CURRENT = function() {
+Output_event_typeContext.prototype.CURRENT = function () {
     return this.getToken(SiddhiQLParser.CURRENT, 0);
 };
 
-Output_event_typeContext.prototype.enterRule = function(listener) {
-    if(listener instanceof SiddhiQLListener ) {
+Output_event_typeContext.prototype.enterRule = function (listener) {
+    if (listener instanceof SiddhiQLListener) {
         listener.enterOutput_event_type(this);
-	}
+    }
 };
 
-Output_event_typeContext.prototype.exitRule = function(listener) {
-    if(listener instanceof SiddhiQLListener ) {
+Output_event_typeContext.prototype.exitRule = function (listener) {
+    if (listener instanceof SiddhiQLListener) {
         listener.exitOutput_event_type(this);
-	}
+    }
 };
-
-
 
 
 SiddhiQLParser.Output_event_typeContext = Output_event_typeContext;
 
-SiddhiQLParser.prototype.output_event_type = function() {
+SiddhiQLParser.prototype.output_event_type = function () {
 
     var localctx = new Output_event_typeContext(this, this._ctx, this.state);
     this.enterRule(localctx, 168, SiddhiQLParser.RULE_output_event_type);
     var _la = 0; // Token type
     try {
         this.state = 1286;
-        switch(this._input.LA(1)) {
-        case SiddhiQLParser.ALL:
-            this.enterOuterAlt(localctx, 1);
-            this.state = 1278;
-            this.match(SiddhiQLParser.ALL);
-            this.state = 1279;
-            this.match(SiddhiQLParser.EVENTS);
-            break;
-        case SiddhiQLParser.EXPIRED:
-            this.enterOuterAlt(localctx, 2);
-            this.state = 1280;
-            this.match(SiddhiQLParser.EXPIRED);
-            this.state = 1281;
-            this.match(SiddhiQLParser.EVENTS);
-            break;
-        case SiddhiQLParser.EVENTS:
-        case SiddhiQLParser.CURRENT:
-            this.enterOuterAlt(localctx, 3);
-            this.state = 1283;
-            _la = this._input.LA(1);
-            if(_la===SiddhiQLParser.CURRENT) {
-                this.state = 1282;
-                this.match(SiddhiQLParser.CURRENT);
-            }
+        switch (this._input.LA(1)) {
+            case SiddhiQLParser.ALL:
+                this.enterOuterAlt(localctx, 1);
+                this.state = 1278;
+                this.match(SiddhiQLParser.ALL);
+                this.state = 1279;
+                this.match(SiddhiQLParser.EVENTS);
+                break;
+            case SiddhiQLParser.EXPIRED:
+                this.enterOuterAlt(localctx, 2);
+                this.state = 1280;
+                this.match(SiddhiQLParser.EXPIRED);
+                this.state = 1281;
+                this.match(SiddhiQLParser.EVENTS);
+                break;
+            case SiddhiQLParser.EVENTS:
+            case SiddhiQLParser.CURRENT:
+                this.enterOuterAlt(localctx, 3);
+                this.state = 1283;
+                _la = this._input.LA(1);
+                if (_la === SiddhiQLParser.CURRENT) {
+                    this.state = 1282;
+                    this.match(SiddhiQLParser.CURRENT);
+                }
 
-            this.state = 1285;
-            this.match(SiddhiQLParser.EVENTS);
-            break;
-        default:
-            throw new antlr4.error.NoViableAltException(this);
+                this.state = 1285;
+                this.match(SiddhiQLParser.EVENTS);
+                break;
+            default:
+                throw new antlr4.error.NoViableAltException(this);
         }
     } catch (re) {
-    	if(re instanceof antlr4.error.RecognitionException) {
-	        localctx.exception = re;
-	        this._errHandler.reportError(this, re);
-	        this._errHandler.recover(this, re);
-	    } else {
-	    	throw re;
-	    }
+        if (re instanceof antlr4.error.RecognitionException) {
+            localctx.exception = re;
+            this._errHandler.reportError(this, re);
+            this._errHandler.recover(this, re);
+        } else {
+            throw re;
+        }
     } finally {
         this.exitRule();
     }
@@ -9965,13 +9804,13 @@ SiddhiQLParser.prototype.output_event_type = function() {
 };
 
 function Output_rateContext(parser, parent, invokingState) {
-	if(parent===undefined) {
-	    parent = null;
-	}
-	if(invokingState===undefined || invokingState===null) {
-		invokingState = -1;
-	}
-	antlr4.ParserRuleContext.call(this, parent, invokingState);
+    if (parent === undefined) {
+        parent = null;
+    }
+    if (invokingState === undefined || invokingState === null) {
+        invokingState = -1;
+    }
+    antlr4.ParserRuleContext.call(this, parent, invokingState);
     this.parser = parser;
     this.ruleIndex = SiddhiQLParser.RULE_output_rate;
     return this;
@@ -9980,112 +9819,110 @@ function Output_rateContext(parser, parent, invokingState) {
 Output_rateContext.prototype = Object.create(antlr4.ParserRuleContext.prototype);
 Output_rateContext.prototype.constructor = Output_rateContext;
 
-Output_rateContext.prototype.OUTPUT = function() {
+Output_rateContext.prototype.OUTPUT = function () {
     return this.getToken(SiddhiQLParser.OUTPUT, 0);
 };
 
-Output_rateContext.prototype.EVERY = function() {
+Output_rateContext.prototype.EVERY = function () {
     return this.getToken(SiddhiQLParser.EVERY, 0);
 };
 
-Output_rateContext.prototype.time_value = function() {
-    return this.getTypedRuleContext(Time_valueContext,0);
+Output_rateContext.prototype.time_value = function () {
+    return this.getTypedRuleContext(Time_valueContext, 0);
 };
 
-Output_rateContext.prototype.INT_LITERAL = function() {
+Output_rateContext.prototype.INT_LITERAL = function () {
     return this.getToken(SiddhiQLParser.INT_LITERAL, 0);
 };
 
-Output_rateContext.prototype.EVENTS = function() {
+Output_rateContext.prototype.EVENTS = function () {
     return this.getToken(SiddhiQLParser.EVENTS, 0);
 };
 
-Output_rateContext.prototype.output_rate_type = function() {
-    return this.getTypedRuleContext(Output_rate_typeContext,0);
+Output_rateContext.prototype.output_rate_type = function () {
+    return this.getTypedRuleContext(Output_rate_typeContext, 0);
 };
 
-Output_rateContext.prototype.SNAPSHOT = function() {
+Output_rateContext.prototype.SNAPSHOT = function () {
     return this.getToken(SiddhiQLParser.SNAPSHOT, 0);
 };
 
-Output_rateContext.prototype.enterRule = function(listener) {
-    if(listener instanceof SiddhiQLListener ) {
+Output_rateContext.prototype.enterRule = function (listener) {
+    if (listener instanceof SiddhiQLListener) {
         listener.enterOutput_rate(this);
-	}
+    }
 };
 
-Output_rateContext.prototype.exitRule = function(listener) {
-    if(listener instanceof SiddhiQLListener ) {
+Output_rateContext.prototype.exitRule = function (listener) {
+    if (listener instanceof SiddhiQLListener) {
         listener.exitOutput_rate(this);
-	}
+    }
 };
-
-
 
 
 SiddhiQLParser.Output_rateContext = Output_rateContext;
 
-SiddhiQLParser.prototype.output_rate = function() {
+SiddhiQLParser.prototype.output_rate = function () {
 
     var localctx = new Output_rateContext(this, this._ctx, this.state);
     this.enterRule(localctx, 170, SiddhiQLParser.RULE_output_rate);
     var _la = 0; // Token type
     try {
         this.state = 1302;
-        var la_ = this._interp.adaptivePredict(this._input,154,this._ctx);
-        switch(la_) {
-        case 1:
-            this.enterOuterAlt(localctx, 1);
-            this.state = 1288;
-            this.match(SiddhiQLParser.OUTPUT);
-            this.state = 1290;
-            _la = this._input.LA(1);
-            if(((((_la - 76)) & ~0x1f) == 0 && ((1 << (_la - 76)) & ((1 << (SiddhiQLParser.LAST - 76)) | (1 << (SiddhiQLParser.ALL - 76)) | (1 << (SiddhiQLParser.FIRST - 76)))) !== 0)) {
-                this.state = 1289;
-                this.output_rate_type();
-            }
-
-            this.state = 1292;
-            this.match(SiddhiQLParser.EVERY);
-            this.state = 1296;
-            var la_ = this._interp.adaptivePredict(this._input,153,this._ctx);
-            switch(la_) {
+        var la_ = this._interp.adaptivePredict(this._input, 154, this._ctx);
+        switch (la_) {
             case 1:
-                this.state = 1293;
-                this.time_value();
+                this.enterOuterAlt(localctx, 1);
+                this.state = 1288;
+                this.match(SiddhiQLParser.OUTPUT);
+                this.state = 1290;
+                _la = this._input.LA(1);
+                if (((((_la - 76)) & ~0x1f) == 0 && ((1 << (_la - 76)) & ((1 << (SiddhiQLParser.LAST - 76)) | (1 << (SiddhiQLParser.ALL - 76)) | (1 << (SiddhiQLParser.FIRST - 76)))) !== 0)) {
+                    this.state = 1289;
+                    this.output_rate_type();
+                }
+
+                this.state = 1292;
+                this.match(SiddhiQLParser.EVERY);
+                this.state = 1296;
+                var la_ = this._interp.adaptivePredict(this._input, 153, this._ctx);
+                switch (la_) {
+                    case 1:
+                        this.state = 1293;
+                        this.time_value();
+                        break;
+
+                    case 2:
+                        this.state = 1294;
+                        this.match(SiddhiQLParser.INT_LITERAL);
+                        this.state = 1295;
+                        this.match(SiddhiQLParser.EVENTS);
+                        break;
+
+                }
                 break;
 
             case 2:
-                this.state = 1294;
-                this.match(SiddhiQLParser.INT_LITERAL);
-                this.state = 1295;
-                this.match(SiddhiQLParser.EVENTS);
+                this.enterOuterAlt(localctx, 2);
+                this.state = 1298;
+                this.match(SiddhiQLParser.OUTPUT);
+                this.state = 1299;
+                this.match(SiddhiQLParser.SNAPSHOT);
+                this.state = 1300;
+                this.match(SiddhiQLParser.EVERY);
+                this.state = 1301;
+                this.time_value();
                 break;
-
-            }
-            break;
-
-        case 2:
-            this.enterOuterAlt(localctx, 2);
-            this.state = 1298;
-            this.match(SiddhiQLParser.OUTPUT);
-            this.state = 1299;
-            this.match(SiddhiQLParser.SNAPSHOT);
-            this.state = 1300;
-            this.match(SiddhiQLParser.EVERY);
-            this.state = 1301;
-            this.time_value();
-            break;
 
         }
     } catch (re) {
-    	if(re instanceof antlr4.error.RecognitionException) {
-	        localctx.exception = re;
-	        this._errHandler.reportError(this, re);
-	        this._errHandler.recover(this, re);
-	    } else {
-	    	throw re;
-	    }
+        if (re instanceof antlr4.error.RecognitionException) {
+            localctx.exception = re;
+            this._errHandler.reportError(this, re);
+            this._errHandler.recover(this, re);
+        } else {
+            throw re;
+        }
     } finally {
         this.exitRule();
     }
@@ -10093,13 +9930,13 @@ SiddhiQLParser.prototype.output_rate = function() {
 };
 
 function Output_rate_typeContext(parser, parent, invokingState) {
-	if(parent===undefined) {
-	    parent = null;
-	}
-	if(invokingState===undefined || invokingState===null) {
-		invokingState = -1;
-	}
-	antlr4.ParserRuleContext.call(this, parent, invokingState);
+    if (parent === undefined) {
+        parent = null;
+    }
+    if (invokingState === undefined || invokingState === null) {
+        invokingState = -1;
+    }
+    antlr4.ParserRuleContext.call(this, parent, invokingState);
     this.parser = parser;
     this.ruleIndex = SiddhiQLParser.RULE_output_rate_type;
     return this;
@@ -10108,36 +9945,34 @@ function Output_rate_typeContext(parser, parent, invokingState) {
 Output_rate_typeContext.prototype = Object.create(antlr4.ParserRuleContext.prototype);
 Output_rate_typeContext.prototype.constructor = Output_rate_typeContext;
 
-Output_rate_typeContext.prototype.ALL = function() {
+Output_rate_typeContext.prototype.ALL = function () {
     return this.getToken(SiddhiQLParser.ALL, 0);
 };
 
-Output_rate_typeContext.prototype.LAST = function() {
+Output_rate_typeContext.prototype.LAST = function () {
     return this.getToken(SiddhiQLParser.LAST, 0);
 };
 
-Output_rate_typeContext.prototype.FIRST = function() {
+Output_rate_typeContext.prototype.FIRST = function () {
     return this.getToken(SiddhiQLParser.FIRST, 0);
 };
 
-Output_rate_typeContext.prototype.enterRule = function(listener) {
-    if(listener instanceof SiddhiQLListener ) {
+Output_rate_typeContext.prototype.enterRule = function (listener) {
+    if (listener instanceof SiddhiQLListener) {
         listener.enterOutput_rate_type(this);
-	}
+    }
 };
 
-Output_rate_typeContext.prototype.exitRule = function(listener) {
-    if(listener instanceof SiddhiQLListener ) {
+Output_rate_typeContext.prototype.exitRule = function (listener) {
+    if (listener instanceof SiddhiQLListener) {
         listener.exitOutput_rate_type(this);
-	}
+    }
 };
-
-
 
 
 SiddhiQLParser.Output_rate_typeContext = Output_rate_typeContext;
 
-SiddhiQLParser.prototype.output_rate_type = function() {
+SiddhiQLParser.prototype.output_rate_type = function () {
 
     var localctx = new Output_rate_typeContext(this, this._ctx, this.state);
     this.enterRule(localctx, 172, SiddhiQLParser.RULE_output_rate_type);
@@ -10146,20 +9981,20 @@ SiddhiQLParser.prototype.output_rate_type = function() {
         this.enterOuterAlt(localctx, 1);
         this.state = 1304;
         _la = this._input.LA(1);
-        if(!(((((_la - 76)) & ~0x1f) == 0 && ((1 << (_la - 76)) & ((1 << (SiddhiQLParser.LAST - 76)) | (1 << (SiddhiQLParser.ALL - 76)) | (1 << (SiddhiQLParser.FIRST - 76)))) !== 0))) {
-        this._errHandler.recoverInline(this);
+        if (!(((((_la - 76)) & ~0x1f) == 0 && ((1 << (_la - 76)) & ((1 << (SiddhiQLParser.LAST - 76)) | (1 << (SiddhiQLParser.ALL - 76)) | (1 << (SiddhiQLParser.FIRST - 76)))) !== 0))) {
+            this._errHandler.recoverInline(this);
         }
         else {
             this.consume();
         }
     } catch (re) {
-    	if(re instanceof antlr4.error.RecognitionException) {
-	        localctx.exception = re;
-	        this._errHandler.reportError(this, re);
-	        this._errHandler.recover(this, re);
-	    } else {
-	    	throw re;
-	    }
+        if (re instanceof antlr4.error.RecognitionException) {
+            localctx.exception = re;
+            this._errHandler.reportError(this, re);
+            this._errHandler.recover(this, re);
+        } else {
+            throw re;
+        }
     } finally {
         this.exitRule();
     }
@@ -10167,13 +10002,13 @@ SiddhiQLParser.prototype.output_rate_type = function() {
 };
 
 function For_timeContext(parser, parent, invokingState) {
-	if(parent===undefined) {
-	    parent = null;
-	}
-	if(invokingState===undefined || invokingState===null) {
-		invokingState = -1;
-	}
-	antlr4.ParserRuleContext.call(this, parent, invokingState);
+    if (parent === undefined) {
+        parent = null;
+    }
+    if (invokingState === undefined || invokingState === null) {
+        invokingState = -1;
+    }
+    antlr4.ParserRuleContext.call(this, parent, invokingState);
     this.parser = parser;
     this.ruleIndex = SiddhiQLParser.RULE_for_time;
     return this;
@@ -10182,32 +10017,30 @@ function For_timeContext(parser, parent, invokingState) {
 For_timeContext.prototype = Object.create(antlr4.ParserRuleContext.prototype);
 For_timeContext.prototype.constructor = For_timeContext;
 
-For_timeContext.prototype.FOR = function() {
+For_timeContext.prototype.FOR = function () {
     return this.getToken(SiddhiQLParser.FOR, 0);
 };
 
-For_timeContext.prototype.time_value = function() {
-    return this.getTypedRuleContext(Time_valueContext,0);
+For_timeContext.prototype.time_value = function () {
+    return this.getTypedRuleContext(Time_valueContext, 0);
 };
 
-For_timeContext.prototype.enterRule = function(listener) {
-    if(listener instanceof SiddhiQLListener ) {
+For_timeContext.prototype.enterRule = function (listener) {
+    if (listener instanceof SiddhiQLListener) {
         listener.enterFor_time(this);
-	}
+    }
 };
 
-For_timeContext.prototype.exitRule = function(listener) {
-    if(listener instanceof SiddhiQLListener ) {
+For_timeContext.prototype.exitRule = function (listener) {
+    if (listener instanceof SiddhiQLListener) {
         listener.exitFor_time(this);
-	}
+    }
 };
-
-
 
 
 SiddhiQLParser.For_timeContext = For_timeContext;
 
-SiddhiQLParser.prototype.for_time = function() {
+SiddhiQLParser.prototype.for_time = function () {
 
     var localctx = new For_timeContext(this, this._ctx, this.state);
     this.enterRule(localctx, 174, SiddhiQLParser.RULE_for_time);
@@ -10218,13 +10051,13 @@ SiddhiQLParser.prototype.for_time = function() {
         this.state = 1307;
         this.time_value();
     } catch (re) {
-    	if(re instanceof antlr4.error.RecognitionException) {
-	        localctx.exception = re;
-	        this._errHandler.reportError(this, re);
-	        this._errHandler.recover(this, re);
-	    } else {
-	    	throw re;
-	    }
+        if (re instanceof antlr4.error.RecognitionException) {
+            localctx.exception = re;
+            this._errHandler.reportError(this, re);
+            this._errHandler.recover(this, re);
+        } else {
+            throw re;
+        }
     } finally {
         this.exitRule();
     }
@@ -10232,13 +10065,13 @@ SiddhiQLParser.prototype.for_time = function() {
 };
 
 function Within_timeContext(parser, parent, invokingState) {
-	if(parent===undefined) {
-	    parent = null;
-	}
-	if(invokingState===undefined || invokingState===null) {
-		invokingState = -1;
-	}
-	antlr4.ParserRuleContext.call(this, parent, invokingState);
+    if (parent === undefined) {
+        parent = null;
+    }
+    if (invokingState === undefined || invokingState === null) {
+        invokingState = -1;
+    }
+    antlr4.ParserRuleContext.call(this, parent, invokingState);
     this.parser = parser;
     this.ruleIndex = SiddhiQLParser.RULE_within_time;
     return this;
@@ -10247,32 +10080,30 @@ function Within_timeContext(parser, parent, invokingState) {
 Within_timeContext.prototype = Object.create(antlr4.ParserRuleContext.prototype);
 Within_timeContext.prototype.constructor = Within_timeContext;
 
-Within_timeContext.prototype.WITHIN = function() {
+Within_timeContext.prototype.WITHIN = function () {
     return this.getToken(SiddhiQLParser.WITHIN, 0);
 };
 
-Within_timeContext.prototype.time_value = function() {
-    return this.getTypedRuleContext(Time_valueContext,0);
+Within_timeContext.prototype.time_value = function () {
+    return this.getTypedRuleContext(Time_valueContext, 0);
 };
 
-Within_timeContext.prototype.enterRule = function(listener) {
-    if(listener instanceof SiddhiQLListener ) {
+Within_timeContext.prototype.enterRule = function (listener) {
+    if (listener instanceof SiddhiQLListener) {
         listener.enterWithin_time(this);
-	}
+    }
 };
 
-Within_timeContext.prototype.exitRule = function(listener) {
-    if(listener instanceof SiddhiQLListener ) {
+Within_timeContext.prototype.exitRule = function (listener) {
+    if (listener instanceof SiddhiQLListener) {
         listener.exitWithin_time(this);
-	}
+    }
 };
-
-
 
 
 SiddhiQLParser.Within_timeContext = Within_timeContext;
 
-SiddhiQLParser.prototype.within_time = function() {
+SiddhiQLParser.prototype.within_time = function () {
 
     var localctx = new Within_timeContext(this, this._ctx, this.state);
     this.enterRule(localctx, 176, SiddhiQLParser.RULE_within_time);
@@ -10283,13 +10114,13 @@ SiddhiQLParser.prototype.within_time = function() {
         this.state = 1310;
         this.time_value();
     } catch (re) {
-    	if(re instanceof antlr4.error.RecognitionException) {
-	        localctx.exception = re;
-	        this._errHandler.reportError(this, re);
-	        this._errHandler.recover(this, re);
-	    } else {
-	    	throw re;
-	    }
+        if (re instanceof antlr4.error.RecognitionException) {
+            localctx.exception = re;
+            this._errHandler.reportError(this, re);
+            this._errHandler.recover(this, re);
+        } else {
+            throw re;
+        }
     } finally {
         this.exitRule();
     }
@@ -10297,13 +10128,13 @@ SiddhiQLParser.prototype.within_time = function() {
 };
 
 function Within_time_rangeContext(parser, parent, invokingState) {
-	if(parent===undefined) {
-	    parent = null;
-	}
-	if(invokingState===undefined || invokingState===null) {
-		invokingState = -1;
-	}
-	antlr4.ParserRuleContext.call(this, parent, invokingState);
+    if (parent === undefined) {
+        parent = null;
+    }
+    if (invokingState === undefined || invokingState === null) {
+        invokingState = -1;
+    }
+    antlr4.ParserRuleContext.call(this, parent, invokingState);
     this.parser = parser;
     this.ruleIndex = SiddhiQLParser.RULE_within_time_range;
     this.start_pattern = null; // ExpressionContext
@@ -10314,39 +10145,37 @@ function Within_time_rangeContext(parser, parent, invokingState) {
 Within_time_rangeContext.prototype = Object.create(antlr4.ParserRuleContext.prototype);
 Within_time_rangeContext.prototype.constructor = Within_time_rangeContext;
 
-Within_time_rangeContext.prototype.WITHIN = function() {
+Within_time_rangeContext.prototype.WITHIN = function () {
     return this.getToken(SiddhiQLParser.WITHIN, 0);
 };
 
-Within_time_rangeContext.prototype.expression = function(i) {
-    if(i===undefined) {
+Within_time_rangeContext.prototype.expression = function (i) {
+    if (i === undefined) {
         i = null;
     }
-    if(i===null) {
+    if (i === null) {
         return this.getTypedRuleContexts(ExpressionContext);
     } else {
-        return this.getTypedRuleContext(ExpressionContext,i);
+        return this.getTypedRuleContext(ExpressionContext, i);
     }
 };
 
-Within_time_rangeContext.prototype.enterRule = function(listener) {
-    if(listener instanceof SiddhiQLListener ) {
+Within_time_rangeContext.prototype.enterRule = function (listener) {
+    if (listener instanceof SiddhiQLListener) {
         listener.enterWithin_time_range(this);
-	}
+    }
 };
 
-Within_time_rangeContext.prototype.exitRule = function(listener) {
-    if(listener instanceof SiddhiQLListener ) {
+Within_time_rangeContext.prototype.exitRule = function (listener) {
+    if (listener instanceof SiddhiQLListener) {
         listener.exitWithin_time_range(this);
-	}
+    }
 };
-
-
 
 
 SiddhiQLParser.Within_time_rangeContext = Within_time_rangeContext;
 
-SiddhiQLParser.prototype.within_time_range = function() {
+SiddhiQLParser.prototype.within_time_range = function () {
 
     var localctx = new Within_time_rangeContext(this, this._ctx, this.state);
     this.enterRule(localctx, 178, SiddhiQLParser.RULE_within_time_range);
@@ -10359,7 +10188,7 @@ SiddhiQLParser.prototype.within_time_range = function() {
         localctx.start_pattern = this.expression();
         this.state = 1316;
         _la = this._input.LA(1);
-        if(_la===SiddhiQLParser.COMMA) {
+        if (_la === SiddhiQLParser.COMMA) {
             this.state = 1314;
             this.match(SiddhiQLParser.COMMA);
             this.state = 1315;
@@ -10367,13 +10196,13 @@ SiddhiQLParser.prototype.within_time_range = function() {
         }
 
     } catch (re) {
-    	if(re instanceof antlr4.error.RecognitionException) {
-	        localctx.exception = re;
-	        this._errHandler.reportError(this, re);
-	        this._errHandler.recover(this, re);
-	    } else {
-	    	throw re;
-	    }
+        if (re instanceof antlr4.error.RecognitionException) {
+            localctx.exception = re;
+            this._errHandler.reportError(this, re);
+            this._errHandler.recover(this, re);
+        } else {
+            throw re;
+        }
     } finally {
         this.exitRule();
     }
@@ -10381,13 +10210,13 @@ SiddhiQLParser.prototype.within_time_range = function() {
 };
 
 function PerContext(parser, parent, invokingState) {
-	if(parent===undefined) {
-	    parent = null;
-	}
-	if(invokingState===undefined || invokingState===null) {
-		invokingState = -1;
-	}
-	antlr4.ParserRuleContext.call(this, parent, invokingState);
+    if (parent === undefined) {
+        parent = null;
+    }
+    if (invokingState === undefined || invokingState === null) {
+        invokingState = -1;
+    }
+    antlr4.ParserRuleContext.call(this, parent, invokingState);
     this.parser = parser;
     this.ruleIndex = SiddhiQLParser.RULE_per;
     return this;
@@ -10396,32 +10225,30 @@ function PerContext(parser, parent, invokingState) {
 PerContext.prototype = Object.create(antlr4.ParserRuleContext.prototype);
 PerContext.prototype.constructor = PerContext;
 
-PerContext.prototype.PER = function() {
+PerContext.prototype.PER = function () {
     return this.getToken(SiddhiQLParser.PER, 0);
 };
 
-PerContext.prototype.expression = function() {
-    return this.getTypedRuleContext(ExpressionContext,0);
+PerContext.prototype.expression = function () {
+    return this.getTypedRuleContext(ExpressionContext, 0);
 };
 
-PerContext.prototype.enterRule = function(listener) {
-    if(listener instanceof SiddhiQLListener ) {
+PerContext.prototype.enterRule = function (listener) {
+    if (listener instanceof SiddhiQLListener) {
         listener.enterPer(this);
-	}
+    }
 };
 
-PerContext.prototype.exitRule = function(listener) {
-    if(listener instanceof SiddhiQLListener ) {
+PerContext.prototype.exitRule = function (listener) {
+    if (listener instanceof SiddhiQLListener) {
         listener.exitPer(this);
-	}
+    }
 };
-
-
 
 
 SiddhiQLParser.PerContext = PerContext;
 
-SiddhiQLParser.prototype.per = function() {
+SiddhiQLParser.prototype.per = function () {
 
     var localctx = new PerContext(this, this._ctx, this.state);
     this.enterRule(localctx, 180, SiddhiQLParser.RULE_per);
@@ -10432,13 +10259,13 @@ SiddhiQLParser.prototype.per = function() {
         this.state = 1319;
         this.expression();
     } catch (re) {
-    	if(re instanceof antlr4.error.RecognitionException) {
-	        localctx.exception = re;
-	        this._errHandler.reportError(this, re);
-	        this._errHandler.recover(this, re);
-	    } else {
-	    	throw re;
-	    }
+        if (re instanceof antlr4.error.RecognitionException) {
+            localctx.exception = re;
+            this._errHandler.reportError(this, re);
+            this._errHandler.recover(this, re);
+        } else {
+            throw re;
+        }
     } finally {
         this.exitRule();
     }
@@ -10446,13 +10273,13 @@ SiddhiQLParser.prototype.per = function() {
 };
 
 function Output_attributeContext(parser, parent, invokingState) {
-	if(parent===undefined) {
-	    parent = null;
-	}
-	if(invokingState===undefined || invokingState===null) {
-		invokingState = -1;
-	}
-	antlr4.ParserRuleContext.call(this, parent, invokingState);
+    if (parent === undefined) {
+        parent = null;
+    }
+    if (invokingState === undefined || invokingState === null) {
+        invokingState = -1;
+    }
+    antlr4.ParserRuleContext.call(this, parent, invokingState);
     this.parser = parser;
     this.ruleIndex = SiddhiQLParser.RULE_output_attribute;
     return this;
@@ -10461,72 +10288,70 @@ function Output_attributeContext(parser, parent, invokingState) {
 Output_attributeContext.prototype = Object.create(antlr4.ParserRuleContext.prototype);
 Output_attributeContext.prototype.constructor = Output_attributeContext;
 
-Output_attributeContext.prototype.attribute = function() {
-    return this.getTypedRuleContext(AttributeContext,0);
+Output_attributeContext.prototype.attribute = function () {
+    return this.getTypedRuleContext(AttributeContext, 0);
 };
 
-Output_attributeContext.prototype.AS = function() {
+Output_attributeContext.prototype.AS = function () {
     return this.getToken(SiddhiQLParser.AS, 0);
 };
 
-Output_attributeContext.prototype.attribute_name = function() {
-    return this.getTypedRuleContext(Attribute_nameContext,0);
+Output_attributeContext.prototype.attribute_name = function () {
+    return this.getTypedRuleContext(Attribute_nameContext, 0);
 };
 
-Output_attributeContext.prototype.attribute_reference = function() {
-    return this.getTypedRuleContext(Attribute_referenceContext,0);
+Output_attributeContext.prototype.attribute_reference = function () {
+    return this.getTypedRuleContext(Attribute_referenceContext, 0);
 };
 
-Output_attributeContext.prototype.enterRule = function(listener) {
-    if(listener instanceof SiddhiQLListener ) {
+Output_attributeContext.prototype.enterRule = function (listener) {
+    if (listener instanceof SiddhiQLListener) {
         listener.enterOutput_attribute(this);
-	}
+    }
 };
 
-Output_attributeContext.prototype.exitRule = function(listener) {
-    if(listener instanceof SiddhiQLListener ) {
+Output_attributeContext.prototype.exitRule = function (listener) {
+    if (listener instanceof SiddhiQLListener) {
         listener.exitOutput_attribute(this);
-	}
+    }
 };
-
-
 
 
 SiddhiQLParser.Output_attributeContext = Output_attributeContext;
 
-SiddhiQLParser.prototype.output_attribute = function() {
+SiddhiQLParser.prototype.output_attribute = function () {
 
     var localctx = new Output_attributeContext(this, this._ctx, this.state);
     this.enterRule(localctx, 182, SiddhiQLParser.RULE_output_attribute);
     try {
         this.state = 1326;
-        var la_ = this._interp.adaptivePredict(this._input,156,this._ctx);
-        switch(la_) {
-        case 1:
-            this.enterOuterAlt(localctx, 1);
-            this.state = 1321;
-            this.attribute();
-            this.state = 1322;
-            this.match(SiddhiQLParser.AS);
-            this.state = 1323;
-            this.attribute_name();
-            break;
+        var la_ = this._interp.adaptivePredict(this._input, 156, this._ctx);
+        switch (la_) {
+            case 1:
+                this.enterOuterAlt(localctx, 1);
+                this.state = 1321;
+                this.attribute();
+                this.state = 1322;
+                this.match(SiddhiQLParser.AS);
+                this.state = 1323;
+                this.attribute_name();
+                break;
 
-        case 2:
-            this.enterOuterAlt(localctx, 2);
-            this.state = 1325;
-            this.attribute_reference();
-            break;
+            case 2:
+                this.enterOuterAlt(localctx, 2);
+                this.state = 1325;
+                this.attribute_reference();
+                break;
 
         }
     } catch (re) {
-    	if(re instanceof antlr4.error.RecognitionException) {
-	        localctx.exception = re;
-	        this._errHandler.reportError(this, re);
-	        this._errHandler.recover(this, re);
-	    } else {
-	    	throw re;
-	    }
+        if (re instanceof antlr4.error.RecognitionException) {
+            localctx.exception = re;
+            this._errHandler.reportError(this, re);
+            this._errHandler.recover(this, re);
+        } else {
+            throw re;
+        }
     } finally {
         this.exitRule();
     }
@@ -10534,13 +10359,13 @@ SiddhiQLParser.prototype.output_attribute = function() {
 };
 
 function AttributeContext(parser, parent, invokingState) {
-	if(parent===undefined) {
-	    parent = null;
-	}
-	if(invokingState===undefined || invokingState===null) {
-		invokingState = -1;
-	}
-	antlr4.ParserRuleContext.call(this, parent, invokingState);
+    if (parent === undefined) {
+        parent = null;
+    }
+    if (invokingState === undefined || invokingState === null) {
+        invokingState = -1;
+    }
+    antlr4.ParserRuleContext.call(this, parent, invokingState);
     this.parser = parser;
     this.ruleIndex = SiddhiQLParser.RULE_attribute;
     return this;
@@ -10549,28 +10374,26 @@ function AttributeContext(parser, parent, invokingState) {
 AttributeContext.prototype = Object.create(antlr4.ParserRuleContext.prototype);
 AttributeContext.prototype.constructor = AttributeContext;
 
-AttributeContext.prototype.math_operation = function() {
-    return this.getTypedRuleContext(Math_operationContext,0);
+AttributeContext.prototype.math_operation = function () {
+    return this.getTypedRuleContext(Math_operationContext, 0);
 };
 
-AttributeContext.prototype.enterRule = function(listener) {
-    if(listener instanceof SiddhiQLListener ) {
+AttributeContext.prototype.enterRule = function (listener) {
+    if (listener instanceof SiddhiQLListener) {
         listener.enterAttribute(this);
-	}
+    }
 };
 
-AttributeContext.prototype.exitRule = function(listener) {
-    if(listener instanceof SiddhiQLListener ) {
+AttributeContext.prototype.exitRule = function (listener) {
+    if (listener instanceof SiddhiQLListener) {
         listener.exitAttribute(this);
-	}
+    }
 };
-
-
 
 
 SiddhiQLParser.AttributeContext = AttributeContext;
 
-SiddhiQLParser.prototype.attribute = function() {
+SiddhiQLParser.prototype.attribute = function () {
 
     var localctx = new AttributeContext(this, this._ctx, this.state);
     this.enterRule(localctx, 184, SiddhiQLParser.RULE_attribute);
@@ -10579,13 +10402,13 @@ SiddhiQLParser.prototype.attribute = function() {
         this.state = 1328;
         this.math_operation(0);
     } catch (re) {
-    	if(re instanceof antlr4.error.RecognitionException) {
-	        localctx.exception = re;
-	        this._errHandler.reportError(this, re);
-	        this._errHandler.recover(this, re);
-	    } else {
-	    	throw re;
-	    }
+        if (re instanceof antlr4.error.RecognitionException) {
+            localctx.exception = re;
+            this._errHandler.reportError(this, re);
+            this._errHandler.recover(this, re);
+        } else {
+            throw re;
+        }
     } finally {
         this.exitRule();
     }
@@ -10593,13 +10416,13 @@ SiddhiQLParser.prototype.attribute = function() {
 };
 
 function ExpressionContext(parser, parent, invokingState) {
-	if(parent===undefined) {
-	    parent = null;
-	}
-	if(invokingState===undefined || invokingState===null) {
-		invokingState = -1;
-	}
-	antlr4.ParserRuleContext.call(this, parent, invokingState);
+    if (parent === undefined) {
+        parent = null;
+    }
+    if (invokingState === undefined || invokingState === null) {
+        invokingState = -1;
+    }
+    antlr4.ParserRuleContext.call(this, parent, invokingState);
     this.parser = parser;
     this.ruleIndex = SiddhiQLParser.RULE_expression;
     return this;
@@ -10608,28 +10431,26 @@ function ExpressionContext(parser, parent, invokingState) {
 ExpressionContext.prototype = Object.create(antlr4.ParserRuleContext.prototype);
 ExpressionContext.prototype.constructor = ExpressionContext;
 
-ExpressionContext.prototype.math_operation = function() {
-    return this.getTypedRuleContext(Math_operationContext,0);
+ExpressionContext.prototype.math_operation = function () {
+    return this.getTypedRuleContext(Math_operationContext, 0);
 };
 
-ExpressionContext.prototype.enterRule = function(listener) {
-    if(listener instanceof SiddhiQLListener ) {
+ExpressionContext.prototype.enterRule = function (listener) {
+    if (listener instanceof SiddhiQLListener) {
         listener.enterExpression(this);
-	}
+    }
 };
 
-ExpressionContext.prototype.exitRule = function(listener) {
-    if(listener instanceof SiddhiQLListener ) {
+ExpressionContext.prototype.exitRule = function (listener) {
+    if (listener instanceof SiddhiQLListener) {
         listener.exitExpression(this);
-	}
+    }
 };
-
-
 
 
 SiddhiQLParser.ExpressionContext = ExpressionContext;
 
-SiddhiQLParser.prototype.expression = function() {
+SiddhiQLParser.prototype.expression = function () {
 
     var localctx = new ExpressionContext(this, this._ctx, this.state);
     this.enterRule(localctx, 186, SiddhiQLParser.RULE_expression);
@@ -10638,13 +10459,13 @@ SiddhiQLParser.prototype.expression = function() {
         this.state = 1330;
         this.math_operation(0);
     } catch (re) {
-    	if(re instanceof antlr4.error.RecognitionException) {
-	        localctx.exception = re;
-	        this._errHandler.reportError(this, re);
-	        this._errHandler.recover(this, re);
-	    } else {
-	    	throw re;
-	    }
+        if (re instanceof antlr4.error.RecognitionException) {
+            localctx.exception = re;
+            this._errHandler.reportError(this, re);
+            this._errHandler.recover(this, re);
+        } else {
+            throw re;
+        }
     } finally {
         this.exitRule();
     }
@@ -10652,13 +10473,13 @@ SiddhiQLParser.prototype.expression = function() {
 };
 
 function Math_operationContext(parser, parent, invokingState) {
-	if(parent===undefined) {
-	    parent = null;
-	}
-	if(invokingState===undefined || invokingState===null) {
-		invokingState = -1;
-	}
-	antlr4.ParserRuleContext.call(this, parent, invokingState);
+    if (parent === undefined) {
+        parent = null;
+    }
+    if (invokingState === undefined || invokingState === null) {
+        invokingState = -1;
+    }
+    antlr4.ParserRuleContext.call(this, parent, invokingState);
     this.parser = parser;
     this.ruleIndex = SiddhiQLParser.RULE_math_operation;
     return this;
@@ -10668,13 +10489,12 @@ Math_operationContext.prototype = Object.create(antlr4.ParserRuleContext.prototy
 Math_operationContext.prototype.constructor = Math_operationContext;
 
 
- 
-Math_operationContext.prototype.copyFrom = function(ctx) {
+Math_operationContext.prototype.copyFrom = function (ctx) {
     antlr4.ParserRuleContext.prototype.copyFrom.call(this, ctx);
 };
 
 function Multiplication_math_operationContext(parser, ctx) {
-	Math_operationContext.call(this, parser);
+    Math_operationContext.call(this, parser);
     this.multiply = null; // Token;
     this.devide = null; // Token;
     this.mod = null; // Token;
@@ -10687,31 +10507,31 @@ Multiplication_math_operationContext.prototype.constructor = Multiplication_math
 
 SiddhiQLParser.Multiplication_math_operationContext = Multiplication_math_operationContext;
 
-Multiplication_math_operationContext.prototype.math_operation = function(i) {
-    if(i===undefined) {
+Multiplication_math_operationContext.prototype.math_operation = function (i) {
+    if (i === undefined) {
         i = null;
     }
-    if(i===null) {
+    if (i === null) {
         return this.getTypedRuleContexts(Math_operationContext);
     } else {
-        return this.getTypedRuleContext(Math_operationContext,i);
+        return this.getTypedRuleContext(Math_operationContext, i);
     }
 };
-Multiplication_math_operationContext.prototype.enterRule = function(listener) {
-    if(listener instanceof SiddhiQLListener ) {
+Multiplication_math_operationContext.prototype.enterRule = function (listener) {
+    if (listener instanceof SiddhiQLListener) {
         listener.enterMultiplication_math_operation(this);
-	}
+    }
 };
 
-Multiplication_math_operationContext.prototype.exitRule = function(listener) {
-    if(listener instanceof SiddhiQLListener ) {
+Multiplication_math_operationContext.prototype.exitRule = function (listener) {
+    if (listener instanceof SiddhiQLListener) {
         listener.exitMultiplication_math_operation(this);
-	}
+    }
 };
 
 
 function Greaterthan_lessthan_math_operationContext(parser, ctx) {
-	Math_operationContext.call(this, parser);
+    Math_operationContext.call(this, parser);
     this.gt_eq = null; // Token;
     this.lt_eq = null; // Token;
     this.gt = null; // Token;
@@ -10725,31 +10545,31 @@ Greaterthan_lessthan_math_operationContext.prototype.constructor = Greaterthan_l
 
 SiddhiQLParser.Greaterthan_lessthan_math_operationContext = Greaterthan_lessthan_math_operationContext;
 
-Greaterthan_lessthan_math_operationContext.prototype.math_operation = function(i) {
-    if(i===undefined) {
+Greaterthan_lessthan_math_operationContext.prototype.math_operation = function (i) {
+    if (i === undefined) {
         i = null;
     }
-    if(i===null) {
+    if (i === null) {
         return this.getTypedRuleContexts(Math_operationContext);
     } else {
-        return this.getTypedRuleContext(Math_operationContext,i);
+        return this.getTypedRuleContext(Math_operationContext, i);
     }
 };
-Greaterthan_lessthan_math_operationContext.prototype.enterRule = function(listener) {
-    if(listener instanceof SiddhiQLListener ) {
+Greaterthan_lessthan_math_operationContext.prototype.enterRule = function (listener) {
+    if (listener instanceof SiddhiQLListener) {
         listener.enterGreaterthan_lessthan_math_operation(this);
-	}
+    }
 };
 
-Greaterthan_lessthan_math_operationContext.prototype.exitRule = function(listener) {
-    if(listener instanceof SiddhiQLListener ) {
+Greaterthan_lessthan_math_operationContext.prototype.exitRule = function (listener) {
+    if (listener instanceof SiddhiQLListener) {
         listener.exitGreaterthan_lessthan_math_operation(this);
-	}
+    }
 };
 
 
 function Basic_math_operationContext(parser, ctx) {
-	Math_operationContext.call(this, parser);
+    Math_operationContext.call(this, parser);
     Math_operationContext.prototype.copyFrom.call(this, ctx);
     return this;
 }
@@ -10759,40 +10579,40 @@ Basic_math_operationContext.prototype.constructor = Basic_math_operationContext;
 
 SiddhiQLParser.Basic_math_operationContext = Basic_math_operationContext;
 
-Basic_math_operationContext.prototype.math_operation = function() {
-    return this.getTypedRuleContext(Math_operationContext,0);
+Basic_math_operationContext.prototype.math_operation = function () {
+    return this.getTypedRuleContext(Math_operationContext, 0);
 };
 
-Basic_math_operationContext.prototype.null_check = function() {
-    return this.getTypedRuleContext(Null_checkContext,0);
+Basic_math_operationContext.prototype.null_check = function () {
+    return this.getTypedRuleContext(Null_checkContext, 0);
 };
 
-Basic_math_operationContext.prototype.function_operation = function() {
-    return this.getTypedRuleContext(Function_operationContext,0);
+Basic_math_operationContext.prototype.function_operation = function () {
+    return this.getTypedRuleContext(Function_operationContext, 0);
 };
 
-Basic_math_operationContext.prototype.constant_value = function() {
-    return this.getTypedRuleContext(Constant_valueContext,0);
+Basic_math_operationContext.prototype.constant_value = function () {
+    return this.getTypedRuleContext(Constant_valueContext, 0);
 };
 
-Basic_math_operationContext.prototype.attribute_reference = function() {
-    return this.getTypedRuleContext(Attribute_referenceContext,0);
+Basic_math_operationContext.prototype.attribute_reference = function () {
+    return this.getTypedRuleContext(Attribute_referenceContext, 0);
 };
-Basic_math_operationContext.prototype.enterRule = function(listener) {
-    if(listener instanceof SiddhiQLListener ) {
+Basic_math_operationContext.prototype.enterRule = function (listener) {
+    if (listener instanceof SiddhiQLListener) {
         listener.enterBasic_math_operation(this);
-	}
+    }
 };
 
-Basic_math_operationContext.prototype.exitRule = function(listener) {
-    if(listener instanceof SiddhiQLListener ) {
+Basic_math_operationContext.prototype.exitRule = function (listener) {
+    if (listener instanceof SiddhiQLListener) {
         listener.exitBasic_math_operation(this);
-	}
+    }
 };
 
 
 function In_math_operationContext(parser, ctx) {
-	Math_operationContext.call(this, parser);
+    Math_operationContext.call(this, parser);
     Math_operationContext.prototype.copyFrom.call(this, ctx);
     return this;
 }
@@ -10802,32 +10622,32 @@ In_math_operationContext.prototype.constructor = In_math_operationContext;
 
 SiddhiQLParser.In_math_operationContext = In_math_operationContext;
 
-In_math_operationContext.prototype.math_operation = function() {
-    return this.getTypedRuleContext(Math_operationContext,0);
+In_math_operationContext.prototype.math_operation = function () {
+    return this.getTypedRuleContext(Math_operationContext, 0);
 };
 
-In_math_operationContext.prototype.IN = function() {
+In_math_operationContext.prototype.IN = function () {
     return this.getToken(SiddhiQLParser.IN, 0);
 };
 
-In_math_operationContext.prototype.name = function() {
-    return this.getTypedRuleContext(NameContext,0);
+In_math_operationContext.prototype.name = function () {
+    return this.getTypedRuleContext(NameContext, 0);
 };
-In_math_operationContext.prototype.enterRule = function(listener) {
-    if(listener instanceof SiddhiQLListener ) {
+In_math_operationContext.prototype.enterRule = function (listener) {
+    if (listener instanceof SiddhiQLListener) {
         listener.enterIn_math_operation(this);
-	}
+    }
 };
 
-In_math_operationContext.prototype.exitRule = function(listener) {
-    if(listener instanceof SiddhiQLListener ) {
+In_math_operationContext.prototype.exitRule = function (listener) {
+    if (listener instanceof SiddhiQLListener) {
         listener.exitIn_math_operation(this);
-	}
+    }
 };
 
 
 function Addition_math_operationContext(parser, ctx) {
-	Math_operationContext.call(this, parser);
+    Math_operationContext.call(this, parser);
     this.add = null; // Token;
     this.substract = null; // Token;
     Math_operationContext.prototype.copyFrom.call(this, ctx);
@@ -10839,31 +10659,31 @@ Addition_math_operationContext.prototype.constructor = Addition_math_operationCo
 
 SiddhiQLParser.Addition_math_operationContext = Addition_math_operationContext;
 
-Addition_math_operationContext.prototype.math_operation = function(i) {
-    if(i===undefined) {
+Addition_math_operationContext.prototype.math_operation = function (i) {
+    if (i === undefined) {
         i = null;
     }
-    if(i===null) {
+    if (i === null) {
         return this.getTypedRuleContexts(Math_operationContext);
     } else {
-        return this.getTypedRuleContext(Math_operationContext,i);
+        return this.getTypedRuleContext(Math_operationContext, i);
     }
 };
-Addition_math_operationContext.prototype.enterRule = function(listener) {
-    if(listener instanceof SiddhiQLListener ) {
+Addition_math_operationContext.prototype.enterRule = function (listener) {
+    if (listener instanceof SiddhiQLListener) {
         listener.enterAddition_math_operation(this);
-	}
+    }
 };
 
-Addition_math_operationContext.prototype.exitRule = function(listener) {
-    if(listener instanceof SiddhiQLListener ) {
+Addition_math_operationContext.prototype.exitRule = function (listener) {
+    if (listener instanceof SiddhiQLListener) {
         listener.exitAddition_math_operation(this);
-	}
+    }
 };
 
 
 function And_math_operationContext(parser, ctx) {
-	Math_operationContext.call(this, parser);
+    Math_operationContext.call(this, parser);
     Math_operationContext.prototype.copyFrom.call(this, ctx);
     return this;
 }
@@ -10873,35 +10693,35 @@ And_math_operationContext.prototype.constructor = And_math_operationContext;
 
 SiddhiQLParser.And_math_operationContext = And_math_operationContext;
 
-And_math_operationContext.prototype.math_operation = function(i) {
-    if(i===undefined) {
+And_math_operationContext.prototype.math_operation = function (i) {
+    if (i === undefined) {
         i = null;
     }
-    if(i===null) {
+    if (i === null) {
         return this.getTypedRuleContexts(Math_operationContext);
     } else {
-        return this.getTypedRuleContext(Math_operationContext,i);
+        return this.getTypedRuleContext(Math_operationContext, i);
     }
 };
 
-And_math_operationContext.prototype.AND = function() {
+And_math_operationContext.prototype.AND = function () {
     return this.getToken(SiddhiQLParser.AND, 0);
 };
-And_math_operationContext.prototype.enterRule = function(listener) {
-    if(listener instanceof SiddhiQLListener ) {
+And_math_operationContext.prototype.enterRule = function (listener) {
+    if (listener instanceof SiddhiQLListener) {
         listener.enterAnd_math_operation(this);
-	}
+    }
 };
 
-And_math_operationContext.prototype.exitRule = function(listener) {
-    if(listener instanceof SiddhiQLListener ) {
+And_math_operationContext.prototype.exitRule = function (listener) {
+    if (listener instanceof SiddhiQLListener) {
         listener.exitAnd_math_operation(this);
-	}
+    }
 };
 
 
 function Or_math_operationContext(parser, ctx) {
-	Math_operationContext.call(this, parser);
+    Math_operationContext.call(this, parser);
     Math_operationContext.prototype.copyFrom.call(this, ctx);
     return this;
 }
@@ -10911,35 +10731,35 @@ Or_math_operationContext.prototype.constructor = Or_math_operationContext;
 
 SiddhiQLParser.Or_math_operationContext = Or_math_operationContext;
 
-Or_math_operationContext.prototype.math_operation = function(i) {
-    if(i===undefined) {
+Or_math_operationContext.prototype.math_operation = function (i) {
+    if (i === undefined) {
         i = null;
     }
-    if(i===null) {
+    if (i === null) {
         return this.getTypedRuleContexts(Math_operationContext);
     } else {
-        return this.getTypedRuleContext(Math_operationContext,i);
+        return this.getTypedRuleContext(Math_operationContext, i);
     }
 };
 
-Or_math_operationContext.prototype.OR = function() {
+Or_math_operationContext.prototype.OR = function () {
     return this.getToken(SiddhiQLParser.OR, 0);
 };
-Or_math_operationContext.prototype.enterRule = function(listener) {
-    if(listener instanceof SiddhiQLListener ) {
+Or_math_operationContext.prototype.enterRule = function (listener) {
+    if (listener instanceof SiddhiQLListener) {
         listener.enterOr_math_operation(this);
-	}
+    }
 };
 
-Or_math_operationContext.prototype.exitRule = function(listener) {
-    if(listener instanceof SiddhiQLListener ) {
+Or_math_operationContext.prototype.exitRule = function (listener) {
+    if (listener instanceof SiddhiQLListener) {
         listener.exitOr_math_operation(this);
-	}
+    }
 };
 
 
 function Equality_math_operationContext(parser, ctx) {
-	Math_operationContext.call(this, parser);
+    Math_operationContext.call(this, parser);
     this.eq = null; // Token;
     this.not_eq = null; // Token;
     Math_operationContext.prototype.copyFrom.call(this, ctx);
@@ -10951,31 +10771,31 @@ Equality_math_operationContext.prototype.constructor = Equality_math_operationCo
 
 SiddhiQLParser.Equality_math_operationContext = Equality_math_operationContext;
 
-Equality_math_operationContext.prototype.math_operation = function(i) {
-    if(i===undefined) {
+Equality_math_operationContext.prototype.math_operation = function (i) {
+    if (i === undefined) {
         i = null;
     }
-    if(i===null) {
+    if (i === null) {
         return this.getTypedRuleContexts(Math_operationContext);
     } else {
-        return this.getTypedRuleContext(Math_operationContext,i);
+        return this.getTypedRuleContext(Math_operationContext, i);
     }
 };
-Equality_math_operationContext.prototype.enterRule = function(listener) {
-    if(listener instanceof SiddhiQLListener ) {
+Equality_math_operationContext.prototype.enterRule = function (listener) {
+    if (listener instanceof SiddhiQLListener) {
         listener.enterEquality_math_operation(this);
-	}
+    }
 };
 
-Equality_math_operationContext.prototype.exitRule = function(listener) {
-    if(listener instanceof SiddhiQLListener ) {
+Equality_math_operationContext.prototype.exitRule = function (listener) {
+    if (listener instanceof SiddhiQLListener) {
         listener.exitEquality_math_operation(this);
-	}
+    }
 };
 
 
 function Not_math_operationContext(parser, ctx) {
-	Math_operationContext.call(this, parser);
+    Math_operationContext.call(this, parser);
     Math_operationContext.prototype.copyFrom.call(this, ctx);
     return this;
 }
@@ -10985,31 +10805,30 @@ Not_math_operationContext.prototype.constructor = Not_math_operationContext;
 
 SiddhiQLParser.Not_math_operationContext = Not_math_operationContext;
 
-Not_math_operationContext.prototype.NOT = function() {
+Not_math_operationContext.prototype.NOT = function () {
     return this.getToken(SiddhiQLParser.NOT, 0);
 };
 
-Not_math_operationContext.prototype.math_operation = function() {
-    return this.getTypedRuleContext(Math_operationContext,0);
+Not_math_operationContext.prototype.math_operation = function () {
+    return this.getTypedRuleContext(Math_operationContext, 0);
 };
-Not_math_operationContext.prototype.enterRule = function(listener) {
-    if(listener instanceof SiddhiQLListener ) {
+Not_math_operationContext.prototype.enterRule = function (listener) {
+    if (listener instanceof SiddhiQLListener) {
         listener.enterNot_math_operation(this);
-	}
+    }
 };
 
-Not_math_operationContext.prototype.exitRule = function(listener) {
-    if(listener instanceof SiddhiQLListener ) {
+Not_math_operationContext.prototype.exitRule = function (listener) {
+    if (listener instanceof SiddhiQLListener) {
         listener.exitNot_math_operation(this);
-	}
+    }
 };
 
 
-
-SiddhiQLParser.prototype.math_operation = function(_p) {
-	if(_p===undefined) {
-	    _p = 0;
-	}
+SiddhiQLParser.prototype.math_operation = function (_p) {
+    if (_p === undefined) {
+        _p = 0;
+    }
     var _parentctx = this._ctx;
     var _parentState = this.state;
     var localctx = new Math_operationContext(this, this._ctx, _parentState);
@@ -11019,239 +10838,239 @@ SiddhiQLParser.prototype.math_operation = function(_p) {
     try {
         this.enterOuterAlt(localctx, 1);
         this.state = 1343;
-        var la_ = this._interp.adaptivePredict(this._input,157,this._ctx);
-        switch(la_) {
-        case 1:
-            localctx = new Not_math_operationContext(this, localctx);
-            this._ctx = localctx;
-            _prevctx = localctx;
+        var la_ = this._interp.adaptivePredict(this._input, 157, this._ctx);
+        switch (la_) {
+            case 1:
+                localctx = new Not_math_operationContext(this, localctx);
+                this._ctx = localctx;
+                _prevctx = localctx;
 
-            this.state = 1333;
-            this.match(SiddhiQLParser.NOT);
-            this.state = 1334;
-            this.math_operation(11);
-            break;
+                this.state = 1333;
+                this.match(SiddhiQLParser.NOT);
+                this.state = 1334;
+                this.math_operation(11);
+                break;
 
-        case 2:
-            localctx = new Basic_math_operationContext(this, localctx);
-            this._ctx = localctx;
-            _prevctx = localctx;
-            this.state = 1335;
-            this.match(SiddhiQLParser.OPEN_PAR);
-            this.state = 1336;
-            this.math_operation(0);
-            this.state = 1337;
-            this.match(SiddhiQLParser.CLOSE_PAR);
-            break;
+            case 2:
+                localctx = new Basic_math_operationContext(this, localctx);
+                this._ctx = localctx;
+                _prevctx = localctx;
+                this.state = 1335;
+                this.match(SiddhiQLParser.OPEN_PAR);
+                this.state = 1336;
+                this.math_operation(0);
+                this.state = 1337;
+                this.match(SiddhiQLParser.CLOSE_PAR);
+                break;
 
-        case 3:
-            localctx = new Basic_math_operationContext(this, localctx);
-            this._ctx = localctx;
-            _prevctx = localctx;
-            this.state = 1339;
-            this.null_check();
-            break;
+            case 3:
+                localctx = new Basic_math_operationContext(this, localctx);
+                this._ctx = localctx;
+                _prevctx = localctx;
+                this.state = 1339;
+                this.null_check();
+                break;
 
-        case 4:
-            localctx = new Basic_math_operationContext(this, localctx);
-            this._ctx = localctx;
-            _prevctx = localctx;
-            this.state = 1340;
-            this.function_operation();
-            break;
+            case 4:
+                localctx = new Basic_math_operationContext(this, localctx);
+                this._ctx = localctx;
+                _prevctx = localctx;
+                this.state = 1340;
+                this.function_operation();
+                break;
 
-        case 5:
-            localctx = new Basic_math_operationContext(this, localctx);
-            this._ctx = localctx;
-            _prevctx = localctx;
-            this.state = 1341;
-            this.constant_value();
-            break;
+            case 5:
+                localctx = new Basic_math_operationContext(this, localctx);
+                this._ctx = localctx;
+                _prevctx = localctx;
+                this.state = 1341;
+                this.constant_value();
+                break;
 
-        case 6:
-            localctx = new Basic_math_operationContext(this, localctx);
-            this._ctx = localctx;
-            _prevctx = localctx;
-            this.state = 1342;
-            this.attribute_reference();
-            break;
+            case 6:
+                localctx = new Basic_math_operationContext(this, localctx);
+                this._ctx = localctx;
+                _prevctx = localctx;
+                this.state = 1342;
+                this.attribute_reference();
+                break;
 
         }
         this._ctx.stop = this._input.LT(-1);
         this.state = 1383;
         this._errHandler.sync(this);
-        var _alt = this._interp.adaptivePredict(this._input,163,this._ctx)
-        while(_alt!=2 && _alt!=antlr4.atn.ATN.INVALID_ALT_NUMBER) {
-            if(_alt===1) {
-                if(this._parseListeners!==null) {
+        var _alt = this._interp.adaptivePredict(this._input, 163, this._ctx)
+        while (_alt != 2 && _alt != antlr4.atn.ATN.INVALID_ALT_NUMBER) {
+            if (_alt === 1) {
+                if (this._parseListeners !== null) {
                     this.triggerExitRuleEvent();
                 }
                 _prevctx = localctx;
                 this.state = 1381;
-                var la_ = this._interp.adaptivePredict(this._input,162,this._ctx);
-                switch(la_) {
-                case 1:
-                    localctx = new Multiplication_math_operationContext(this, new Math_operationContext(this, _parentctx, _parentState));
-                    this.pushNewRecursionContext(localctx, _startState, SiddhiQLParser.RULE_math_operation);
-                    this.state = 1345;
-                    if (!( this.precpred(this._ctx, 10))) {
-                        throw new antlr4.error.FailedPredicateException(this, "this.precpred(this._ctx, 10)");
-                    }
-                    this.state = 1349;
-                    switch(this._input.LA(1)) {
-                    case SiddhiQLParser.STAR:
-                        this.state = 1346;
-                        localctx.multiply = this.match(SiddhiQLParser.STAR);
+                var la_ = this._interp.adaptivePredict(this._input, 162, this._ctx);
+                switch (la_) {
+                    case 1:
+                        localctx = new Multiplication_math_operationContext(this, new Math_operationContext(this, _parentctx, _parentState));
+                        this.pushNewRecursionContext(localctx, _startState, SiddhiQLParser.RULE_math_operation);
+                        this.state = 1345;
+                        if (!( this.precpred(this._ctx, 10))) {
+                            throw new antlr4.error.FailedPredicateException(this, "this.precpred(this._ctx, 10)");
+                        }
+                        this.state = 1349;
+                        switch (this._input.LA(1)) {
+                            case SiddhiQLParser.STAR:
+                                this.state = 1346;
+                                localctx.multiply = this.match(SiddhiQLParser.STAR);
+                                break;
+                            case SiddhiQLParser.DIV:
+                                this.state = 1347;
+                                localctx.devide = this.match(SiddhiQLParser.DIV);
+                                break;
+                            case SiddhiQLParser.MOD:
+                                this.state = 1348;
+                                localctx.mod = this.match(SiddhiQLParser.MOD);
+                                break;
+                            default:
+                                throw new antlr4.error.NoViableAltException(this);
+                        }
+                        this.state = 1351;
+                        this.math_operation(11);
                         break;
-                    case SiddhiQLParser.DIV:
-                        this.state = 1347;
-                        localctx.devide = this.match(SiddhiQLParser.DIV);
-                        break;
-                    case SiddhiQLParser.MOD:
-                        this.state = 1348;
-                        localctx.mod = this.match(SiddhiQLParser.MOD);
-                        break;
-                    default:
-                        throw new antlr4.error.NoViableAltException(this);
-                    }
-                    this.state = 1351;
-                    this.math_operation(11);
-                    break;
 
-                case 2:
-                    localctx = new Addition_math_operationContext(this, new Math_operationContext(this, _parentctx, _parentState));
-                    this.pushNewRecursionContext(localctx, _startState, SiddhiQLParser.RULE_math_operation);
-                    this.state = 1352;
-                    if (!( this.precpred(this._ctx, 9))) {
-                        throw new antlr4.error.FailedPredicateException(this, "this.precpred(this._ctx, 9)");
-                    }
-                    this.state = 1355;
-                    switch(this._input.LA(1)) {
-                    case SiddhiQLParser.PLUS:
-                        this.state = 1353;
-                        localctx.add = this.match(SiddhiQLParser.PLUS);
+                    case 2:
+                        localctx = new Addition_math_operationContext(this, new Math_operationContext(this, _parentctx, _parentState));
+                        this.pushNewRecursionContext(localctx, _startState, SiddhiQLParser.RULE_math_operation);
+                        this.state = 1352;
+                        if (!( this.precpred(this._ctx, 9))) {
+                            throw new antlr4.error.FailedPredicateException(this, "this.precpred(this._ctx, 9)");
+                        }
+                        this.state = 1355;
+                        switch (this._input.LA(1)) {
+                            case SiddhiQLParser.PLUS:
+                                this.state = 1353;
+                                localctx.add = this.match(SiddhiQLParser.PLUS);
+                                break;
+                            case SiddhiQLParser.MINUS:
+                                this.state = 1354;
+                                localctx.substract = this.match(SiddhiQLParser.MINUS);
+                                break;
+                            default:
+                                throw new antlr4.error.NoViableAltException(this);
+                        }
+                        this.state = 1357;
+                        this.math_operation(10);
                         break;
-                    case SiddhiQLParser.MINUS:
-                        this.state = 1354;
-                        localctx.substract = this.match(SiddhiQLParser.MINUS);
-                        break;
-                    default:
-                        throw new antlr4.error.NoViableAltException(this);
-                    }
-                    this.state = 1357;
-                    this.math_operation(10);
-                    break;
 
-                case 3:
-                    localctx = new Greaterthan_lessthan_math_operationContext(this, new Math_operationContext(this, _parentctx, _parentState));
-                    this.pushNewRecursionContext(localctx, _startState, SiddhiQLParser.RULE_math_operation);
-                    this.state = 1358;
-                    if (!( this.precpred(this._ctx, 8))) {
-                        throw new antlr4.error.FailedPredicateException(this, "this.precpred(this._ctx, 8)");
-                    }
-                    this.state = 1363;
-                    switch(this._input.LA(1)) {
-                    case SiddhiQLParser.GT_EQ:
-                        this.state = 1359;
-                        localctx.gt_eq = this.match(SiddhiQLParser.GT_EQ);
+                    case 3:
+                        localctx = new Greaterthan_lessthan_math_operationContext(this, new Math_operationContext(this, _parentctx, _parentState));
+                        this.pushNewRecursionContext(localctx, _startState, SiddhiQLParser.RULE_math_operation);
+                        this.state = 1358;
+                        if (!( this.precpred(this._ctx, 8))) {
+                            throw new antlr4.error.FailedPredicateException(this, "this.precpred(this._ctx, 8)");
+                        }
+                        this.state = 1363;
+                        switch (this._input.LA(1)) {
+                            case SiddhiQLParser.GT_EQ:
+                                this.state = 1359;
+                                localctx.gt_eq = this.match(SiddhiQLParser.GT_EQ);
+                                break;
+                            case SiddhiQLParser.LT_EQ:
+                                this.state = 1360;
+                                localctx.lt_eq = this.match(SiddhiQLParser.LT_EQ);
+                                break;
+                            case SiddhiQLParser.GT:
+                                this.state = 1361;
+                                localctx.gt = this.match(SiddhiQLParser.GT);
+                                break;
+                            case SiddhiQLParser.LT:
+                                this.state = 1362;
+                                localctx.lt = this.match(SiddhiQLParser.LT);
+                                break;
+                            default:
+                                throw new antlr4.error.NoViableAltException(this);
+                        }
+                        this.state = 1365;
+                        this.math_operation(9);
                         break;
-                    case SiddhiQLParser.LT_EQ:
-                        this.state = 1360;
-                        localctx.lt_eq = this.match(SiddhiQLParser.LT_EQ);
-                        break;
-                    case SiddhiQLParser.GT:
-                        this.state = 1361;
-                        localctx.gt = this.match(SiddhiQLParser.GT);
-                        break;
-                    case SiddhiQLParser.LT:
-                        this.state = 1362;
-                        localctx.lt = this.match(SiddhiQLParser.LT);
-                        break;
-                    default:
-                        throw new antlr4.error.NoViableAltException(this);
-                    }
-                    this.state = 1365;
-                    this.math_operation(9);
-                    break;
 
-                case 4:
-                    localctx = new Equality_math_operationContext(this, new Math_operationContext(this, _parentctx, _parentState));
-                    this.pushNewRecursionContext(localctx, _startState, SiddhiQLParser.RULE_math_operation);
-                    this.state = 1366;
-                    if (!( this.precpred(this._ctx, 7))) {
-                        throw new antlr4.error.FailedPredicateException(this, "this.precpred(this._ctx, 7)");
-                    }
-                    this.state = 1369;
-                    switch(this._input.LA(1)) {
-                    case SiddhiQLParser.EQ:
-                        this.state = 1367;
-                        localctx.eq = this.match(SiddhiQLParser.EQ);
+                    case 4:
+                        localctx = new Equality_math_operationContext(this, new Math_operationContext(this, _parentctx, _parentState));
+                        this.pushNewRecursionContext(localctx, _startState, SiddhiQLParser.RULE_math_operation);
+                        this.state = 1366;
+                        if (!( this.precpred(this._ctx, 7))) {
+                            throw new antlr4.error.FailedPredicateException(this, "this.precpred(this._ctx, 7)");
+                        }
+                        this.state = 1369;
+                        switch (this._input.LA(1)) {
+                            case SiddhiQLParser.EQ:
+                                this.state = 1367;
+                                localctx.eq = this.match(SiddhiQLParser.EQ);
+                                break;
+                            case SiddhiQLParser.NOT_EQ:
+                                this.state = 1368;
+                                localctx.not_eq = this.match(SiddhiQLParser.NOT_EQ);
+                                break;
+                            default:
+                                throw new antlr4.error.NoViableAltException(this);
+                        }
+                        this.state = 1371;
+                        this.math_operation(8);
                         break;
-                    case SiddhiQLParser.NOT_EQ:
-                        this.state = 1368;
-                        localctx.not_eq = this.match(SiddhiQLParser.NOT_EQ);
+
+                    case 5:
+                        localctx = new And_math_operationContext(this, new Math_operationContext(this, _parentctx, _parentState));
+                        this.pushNewRecursionContext(localctx, _startState, SiddhiQLParser.RULE_math_operation);
+                        this.state = 1372;
+                        if (!( this.precpred(this._ctx, 5))) {
+                            throw new antlr4.error.FailedPredicateException(this, "this.precpred(this._ctx, 5)");
+                        }
+                        this.state = 1373;
+                        this.match(SiddhiQLParser.AND);
+                        this.state = 1374;
+                        this.math_operation(6);
                         break;
-                    default:
-                        throw new antlr4.error.NoViableAltException(this);
-                    }
-                    this.state = 1371;
-                    this.math_operation(8);
-                    break;
 
-                case 5:
-                    localctx = new And_math_operationContext(this, new Math_operationContext(this, _parentctx, _parentState));
-                    this.pushNewRecursionContext(localctx, _startState, SiddhiQLParser.RULE_math_operation);
-                    this.state = 1372;
-                    if (!( this.precpred(this._ctx, 5))) {
-                        throw new antlr4.error.FailedPredicateException(this, "this.precpred(this._ctx, 5)");
-                    }
-                    this.state = 1373;
-                    this.match(SiddhiQLParser.AND);
-                    this.state = 1374;
-                    this.math_operation(6);
-                    break;
+                    case 6:
+                        localctx = new Or_math_operationContext(this, new Math_operationContext(this, _parentctx, _parentState));
+                        this.pushNewRecursionContext(localctx, _startState, SiddhiQLParser.RULE_math_operation);
+                        this.state = 1375;
+                        if (!( this.precpred(this._ctx, 4))) {
+                            throw new antlr4.error.FailedPredicateException(this, "this.precpred(this._ctx, 4)");
+                        }
+                        this.state = 1376;
+                        this.match(SiddhiQLParser.OR);
+                        this.state = 1377;
+                        this.math_operation(5);
+                        break;
 
-                case 6:
-                    localctx = new Or_math_operationContext(this, new Math_operationContext(this, _parentctx, _parentState));
-                    this.pushNewRecursionContext(localctx, _startState, SiddhiQLParser.RULE_math_operation);
-                    this.state = 1375;
-                    if (!( this.precpred(this._ctx, 4))) {
-                        throw new antlr4.error.FailedPredicateException(this, "this.precpred(this._ctx, 4)");
-                    }
-                    this.state = 1376;
-                    this.match(SiddhiQLParser.OR);
-                    this.state = 1377;
-                    this.math_operation(5);
-                    break;
+                    case 7:
+                        localctx = new In_math_operationContext(this, new Math_operationContext(this, _parentctx, _parentState));
+                        this.pushNewRecursionContext(localctx, _startState, SiddhiQLParser.RULE_math_operation);
+                        this.state = 1378;
+                        if (!( this.precpred(this._ctx, 6))) {
+                            throw new antlr4.error.FailedPredicateException(this, "this.precpred(this._ctx, 6)");
+                        }
+                        this.state = 1379;
+                        this.match(SiddhiQLParser.IN);
+                        this.state = 1380;
+                        this.name();
+                        break;
 
-                case 7:
-                    localctx = new In_math_operationContext(this, new Math_operationContext(this, _parentctx, _parentState));
-                    this.pushNewRecursionContext(localctx, _startState, SiddhiQLParser.RULE_math_operation);
-                    this.state = 1378;
-                    if (!( this.precpred(this._ctx, 6))) {
-                        throw new antlr4.error.FailedPredicateException(this, "this.precpred(this._ctx, 6)");
-                    }
-                    this.state = 1379;
-                    this.match(SiddhiQLParser.IN);
-                    this.state = 1380;
-                    this.name();
-                    break;
-
-                } 
+                }
             }
             this.state = 1385;
             this._errHandler.sync(this);
-            _alt = this._interp.adaptivePredict(this._input,163,this._ctx);
+            _alt = this._interp.adaptivePredict(this._input, 163, this._ctx);
         }
 
-    } catch( error) {
-        if(error instanceof antlr4.error.RecognitionException) {
-	        localctx.exception = error;
-	        this._errHandler.reportError(this, error);
-	        this._errHandler.recover(this, error);
-	    } else {
-	    	throw error;
-	    }
+    } catch (error) {
+        if (error instanceof antlr4.error.RecognitionException) {
+            localctx.exception = error;
+            this._errHandler.reportError(this, error);
+            this._errHandler.recover(this, error);
+        } else {
+            throw error;
+        }
     } finally {
         this.unrollRecursionContexts(_parentctx)
     }
@@ -11259,13 +11078,13 @@ SiddhiQLParser.prototype.math_operation = function(_p) {
 };
 
 function Function_operationContext(parser, parent, invokingState) {
-	if(parent===undefined) {
-	    parent = null;
-	}
-	if(invokingState===undefined || invokingState===null) {
-		invokingState = -1;
-	}
-	antlr4.ParserRuleContext.call(this, parent, invokingState);
+    if (parent === undefined) {
+        parent = null;
+    }
+    if (invokingState === undefined || invokingState === null) {
+        invokingState = -1;
+    }
+    antlr4.ParserRuleContext.call(this, parent, invokingState);
     this.parser = parser;
     this.ruleIndex = SiddhiQLParser.RULE_function_operation;
     return this;
@@ -11274,36 +11093,34 @@ function Function_operationContext(parser, parent, invokingState) {
 Function_operationContext.prototype = Object.create(antlr4.ParserRuleContext.prototype);
 Function_operationContext.prototype.constructor = Function_operationContext;
 
-Function_operationContext.prototype.function_id = function() {
-    return this.getTypedRuleContext(Function_idContext,0);
+Function_operationContext.prototype.function_id = function () {
+    return this.getTypedRuleContext(Function_idContext, 0);
 };
 
-Function_operationContext.prototype.function_namespace = function() {
-    return this.getTypedRuleContext(Function_namespaceContext,0);
+Function_operationContext.prototype.function_namespace = function () {
+    return this.getTypedRuleContext(Function_namespaceContext, 0);
 };
 
-Function_operationContext.prototype.attribute_list = function() {
-    return this.getTypedRuleContext(Attribute_listContext,0);
+Function_operationContext.prototype.attribute_list = function () {
+    return this.getTypedRuleContext(Attribute_listContext, 0);
 };
 
-Function_operationContext.prototype.enterRule = function(listener) {
-    if(listener instanceof SiddhiQLListener ) {
+Function_operationContext.prototype.enterRule = function (listener) {
+    if (listener instanceof SiddhiQLListener) {
         listener.enterFunction_operation(this);
-	}
+    }
 };
 
-Function_operationContext.prototype.exitRule = function(listener) {
-    if(listener instanceof SiddhiQLListener ) {
+Function_operationContext.prototype.exitRule = function (listener) {
+    if (listener instanceof SiddhiQLListener) {
         listener.exitFunction_operation(this);
-	}
+    }
 };
-
-
 
 
 SiddhiQLParser.Function_operationContext = Function_operationContext;
 
-SiddhiQLParser.prototype.function_operation = function() {
+SiddhiQLParser.prototype.function_operation = function () {
 
     var localctx = new Function_operationContext(this, this._ctx, this.state);
     this.enterRule(localctx, 190, SiddhiQLParser.RULE_function_operation);
@@ -11311,8 +11128,8 @@ SiddhiQLParser.prototype.function_operation = function() {
     try {
         this.enterOuterAlt(localctx, 1);
         this.state = 1389;
-        var la_ = this._interp.adaptivePredict(this._input,164,this._ctx);
-        if(la_===1) {
+        var la_ = this._interp.adaptivePredict(this._input, 164, this._ctx);
+        if (la_ === 1) {
             this.state = 1386;
             this.function_namespace();
             this.state = 1387;
@@ -11325,7 +11142,7 @@ SiddhiQLParser.prototype.function_operation = function() {
         this.match(SiddhiQLParser.OPEN_PAR);
         this.state = 1394;
         _la = this._input.LA(1);
-        if((((_la) & ~0x1f) == 0 && ((1 << _la) & ((1 << SiddhiQLParser.INT_LITERAL) | (1 << SiddhiQLParser.LONG_LITERAL) | (1 << SiddhiQLParser.FLOAT_LITERAL) | (1 << SiddhiQLParser.DOUBLE_LITERAL) | (1 << SiddhiQLParser.OPEN_PAR) | (1 << SiddhiQLParser.STAR) | (1 << SiddhiQLParser.PLUS) | (1 << SiddhiQLParser.MINUS) | (1 << SiddhiQLParser.HASH) | (1 << SiddhiQLParser.STREAM) | (1 << SiddhiQLParser.DEFINE))) !== 0) || ((((_la - 34)) & ~0x1f) == 0 && ((1 << (_la - 34)) & ((1 << (SiddhiQLParser.TABLE - 34)) | (1 << (SiddhiQLParser.APP - 34)) | (1 << (SiddhiQLParser.FROM - 34)) | (1 << (SiddhiQLParser.PARTITION - 34)) | (1 << (SiddhiQLParser.WINDOW - 34)) | (1 << (SiddhiQLParser.SELECT - 34)) | (1 << (SiddhiQLParser.GROUP - 34)) | (1 << (SiddhiQLParser.BY - 34)) | (1 << (SiddhiQLParser.ORDER - 34)) | (1 << (SiddhiQLParser.LIMIT - 34)) | (1 << (SiddhiQLParser.ASC - 34)) | (1 << (SiddhiQLParser.DESC - 34)) | (1 << (SiddhiQLParser.HAVING - 34)) | (1 << (SiddhiQLParser.INSERT - 34)) | (1 << (SiddhiQLParser.DELETE - 34)) | (1 << (SiddhiQLParser.UPDATE - 34)) | (1 << (SiddhiQLParser.RETURN - 34)) | (1 << (SiddhiQLParser.EVENTS - 34)) | (1 << (SiddhiQLParser.INTO - 34)) | (1 << (SiddhiQLParser.OUTPUT - 34)) | (1 << (SiddhiQLParser.EXPIRED - 34)) | (1 << (SiddhiQLParser.CURRENT - 34)) | (1 << (SiddhiQLParser.SNAPSHOT - 34)) | (1 << (SiddhiQLParser.FOR - 34)) | (1 << (SiddhiQLParser.RAW - 34)) | (1 << (SiddhiQLParser.OF - 34)) | (1 << (SiddhiQLParser.AS - 34)) | (1 << (SiddhiQLParser.OR - 34)) | (1 << (SiddhiQLParser.AND - 34)))) !== 0) || ((((_la - 67)) & ~0x1f) == 0 && ((1 << (_la - 67)) & ((1 << (SiddhiQLParser.ON - 67)) | (1 << (SiddhiQLParser.IS - 67)) | (1 << (SiddhiQLParser.NOT - 67)) | (1 << (SiddhiQLParser.WITHIN - 67)) | (1 << (SiddhiQLParser.WITH - 67)) | (1 << (SiddhiQLParser.BEGIN - 67)) | (1 << (SiddhiQLParser.END - 67)) | (1 << (SiddhiQLParser.NULL - 67)) | (1 << (SiddhiQLParser.EVERY - 67)) | (1 << (SiddhiQLParser.LAST - 67)) | (1 << (SiddhiQLParser.ALL - 67)) | (1 << (SiddhiQLParser.FIRST - 67)) | (1 << (SiddhiQLParser.JOIN - 67)) | (1 << (SiddhiQLParser.INNER - 67)) | (1 << (SiddhiQLParser.OUTER - 67)) | (1 << (SiddhiQLParser.RIGHT - 67)) | (1 << (SiddhiQLParser.LEFT - 67)) | (1 << (SiddhiQLParser.FULL - 67)) | (1 << (SiddhiQLParser.UNIDIRECTIONAL - 67)) | (1 << (SiddhiQLParser.YEARS - 67)) | (1 << (SiddhiQLParser.MONTHS - 67)) | (1 << (SiddhiQLParser.WEEKS - 67)) | (1 << (SiddhiQLParser.DAYS - 67)) | (1 << (SiddhiQLParser.HOURS - 67)) | (1 << (SiddhiQLParser.MINUTES - 67)) | (1 << (SiddhiQLParser.SECONDS - 67)) | (1 << (SiddhiQLParser.MILLISECONDS - 67)) | (1 << (SiddhiQLParser.FALSE - 67)) | (1 << (SiddhiQLParser.TRUE - 67)) | (1 << (SiddhiQLParser.STRING - 67)) | (1 << (SiddhiQLParser.INT - 67)) | (1 << (SiddhiQLParser.LONG - 67)))) !== 0) || ((((_la - 99)) & ~0x1f) == 0 && ((1 << (_la - 99)) & ((1 << (SiddhiQLParser.FLOAT - 99)) | (1 << (SiddhiQLParser.DOUBLE - 99)) | (1 << (SiddhiQLParser.BOOL - 99)) | (1 << (SiddhiQLParser.OBJECT - 99)) | (1 << (SiddhiQLParser.ID_QUOTES - 99)) | (1 << (SiddhiQLParser.ID - 99)) | (1 << (SiddhiQLParser.STRING_LITERAL - 99)))) !== 0)) {
+        if ((((_la) & ~0x1f) == 0 && ((1 << _la) & ((1 << SiddhiQLParser.INT_LITERAL) | (1 << SiddhiQLParser.LONG_LITERAL) | (1 << SiddhiQLParser.FLOAT_LITERAL) | (1 << SiddhiQLParser.DOUBLE_LITERAL) | (1 << SiddhiQLParser.OPEN_PAR) | (1 << SiddhiQLParser.STAR) | (1 << SiddhiQLParser.PLUS) | (1 << SiddhiQLParser.MINUS) | (1 << SiddhiQLParser.HASH) | (1 << SiddhiQLParser.STREAM) | (1 << SiddhiQLParser.DEFINE))) !== 0) || ((((_la - 34)) & ~0x1f) == 0 && ((1 << (_la - 34)) & ((1 << (SiddhiQLParser.TABLE - 34)) | (1 << (SiddhiQLParser.APP - 34)) | (1 << (SiddhiQLParser.FROM - 34)) | (1 << (SiddhiQLParser.PARTITION - 34)) | (1 << (SiddhiQLParser.WINDOW - 34)) | (1 << (SiddhiQLParser.SELECT - 34)) | (1 << (SiddhiQLParser.GROUP - 34)) | (1 << (SiddhiQLParser.BY - 34)) | (1 << (SiddhiQLParser.ORDER - 34)) | (1 << (SiddhiQLParser.LIMIT - 34)) | (1 << (SiddhiQLParser.ASC - 34)) | (1 << (SiddhiQLParser.DESC - 34)) | (1 << (SiddhiQLParser.HAVING - 34)) | (1 << (SiddhiQLParser.INSERT - 34)) | (1 << (SiddhiQLParser.DELETE - 34)) | (1 << (SiddhiQLParser.UPDATE - 34)) | (1 << (SiddhiQLParser.RETURN - 34)) | (1 << (SiddhiQLParser.EVENTS - 34)) | (1 << (SiddhiQLParser.INTO - 34)) | (1 << (SiddhiQLParser.OUTPUT - 34)) | (1 << (SiddhiQLParser.EXPIRED - 34)) | (1 << (SiddhiQLParser.CURRENT - 34)) | (1 << (SiddhiQLParser.SNAPSHOT - 34)) | (1 << (SiddhiQLParser.FOR - 34)) | (1 << (SiddhiQLParser.RAW - 34)) | (1 << (SiddhiQLParser.OF - 34)) | (1 << (SiddhiQLParser.AS - 34)) | (1 << (SiddhiQLParser.OR - 34)) | (1 << (SiddhiQLParser.AND - 34)))) !== 0) || ((((_la - 67)) & ~0x1f) == 0 && ((1 << (_la - 67)) & ((1 << (SiddhiQLParser.ON - 67)) | (1 << (SiddhiQLParser.IS - 67)) | (1 << (SiddhiQLParser.NOT - 67)) | (1 << (SiddhiQLParser.WITHIN - 67)) | (1 << (SiddhiQLParser.WITH - 67)) | (1 << (SiddhiQLParser.BEGIN - 67)) | (1 << (SiddhiQLParser.END - 67)) | (1 << (SiddhiQLParser.NULL - 67)) | (1 << (SiddhiQLParser.EVERY - 67)) | (1 << (SiddhiQLParser.LAST - 67)) | (1 << (SiddhiQLParser.ALL - 67)) | (1 << (SiddhiQLParser.FIRST - 67)) | (1 << (SiddhiQLParser.JOIN - 67)) | (1 << (SiddhiQLParser.INNER - 67)) | (1 << (SiddhiQLParser.OUTER - 67)) | (1 << (SiddhiQLParser.RIGHT - 67)) | (1 << (SiddhiQLParser.LEFT - 67)) | (1 << (SiddhiQLParser.FULL - 67)) | (1 << (SiddhiQLParser.UNIDIRECTIONAL - 67)) | (1 << (SiddhiQLParser.YEARS - 67)) | (1 << (SiddhiQLParser.MONTHS - 67)) | (1 << (SiddhiQLParser.WEEKS - 67)) | (1 << (SiddhiQLParser.DAYS - 67)) | (1 << (SiddhiQLParser.HOURS - 67)) | (1 << (SiddhiQLParser.MINUTES - 67)) | (1 << (SiddhiQLParser.SECONDS - 67)) | (1 << (SiddhiQLParser.MILLISECONDS - 67)) | (1 << (SiddhiQLParser.FALSE - 67)) | (1 << (SiddhiQLParser.TRUE - 67)) | (1 << (SiddhiQLParser.STRING - 67)) | (1 << (SiddhiQLParser.INT - 67)) | (1 << (SiddhiQLParser.LONG - 67)))) !== 0) || ((((_la - 99)) & ~0x1f) == 0 && ((1 << (_la - 99)) & ((1 << (SiddhiQLParser.FLOAT - 99)) | (1 << (SiddhiQLParser.DOUBLE - 99)) | (1 << (SiddhiQLParser.BOOL - 99)) | (1 << (SiddhiQLParser.OBJECT - 99)) | (1 << (SiddhiQLParser.ID_QUOTES - 99)) | (1 << (SiddhiQLParser.ID - 99)) | (1 << (SiddhiQLParser.STRING_LITERAL - 99)))) !== 0)) {
             this.state = 1393;
             this.attribute_list();
         }
@@ -11333,13 +11150,13 @@ SiddhiQLParser.prototype.function_operation = function() {
         this.state = 1396;
         this.match(SiddhiQLParser.CLOSE_PAR);
     } catch (re) {
-    	if(re instanceof antlr4.error.RecognitionException) {
-	        localctx.exception = re;
-	        this._errHandler.reportError(this, re);
-	        this._errHandler.recover(this, re);
-	    } else {
-	    	throw re;
-	    }
+        if (re instanceof antlr4.error.RecognitionException) {
+            localctx.exception = re;
+            this._errHandler.reportError(this, re);
+            this._errHandler.recover(this, re);
+        } else {
+            throw re;
+        }
     } finally {
         this.exitRule();
     }
@@ -11347,13 +11164,13 @@ SiddhiQLParser.prototype.function_operation = function() {
 };
 
 function Attribute_listContext(parser, parent, invokingState) {
-	if(parent===undefined) {
-	    parent = null;
-	}
-	if(invokingState===undefined || invokingState===null) {
-		invokingState = -1;
-	}
-	antlr4.ParserRuleContext.call(this, parent, invokingState);
+    if (parent === undefined) {
+        parent = null;
+    }
+    if (invokingState === undefined || invokingState === null) {
+        invokingState = -1;
+    }
+    antlr4.ParserRuleContext.call(this, parent, invokingState);
     this.parser = parser;
     this.ruleIndex = SiddhiQLParser.RULE_attribute_list;
     return this;
@@ -11362,152 +11179,150 @@ function Attribute_listContext(parser, parent, invokingState) {
 Attribute_listContext.prototype = Object.create(antlr4.ParserRuleContext.prototype);
 Attribute_listContext.prototype.constructor = Attribute_listContext;
 
-Attribute_listContext.prototype.attribute = function(i) {
-    if(i===undefined) {
+Attribute_listContext.prototype.attribute = function (i) {
+    if (i === undefined) {
         i = null;
     }
-    if(i===null) {
+    if (i === null) {
         return this.getTypedRuleContexts(AttributeContext);
     } else {
-        return this.getTypedRuleContext(AttributeContext,i);
+        return this.getTypedRuleContext(AttributeContext, i);
     }
 };
 
-Attribute_listContext.prototype.enterRule = function(listener) {
-    if(listener instanceof SiddhiQLListener ) {
+Attribute_listContext.prototype.enterRule = function (listener) {
+    if (listener instanceof SiddhiQLListener) {
         listener.enterAttribute_list(this);
-	}
+    }
 };
 
-Attribute_listContext.prototype.exitRule = function(listener) {
-    if(listener instanceof SiddhiQLListener ) {
+Attribute_listContext.prototype.exitRule = function (listener) {
+    if (listener instanceof SiddhiQLListener) {
         listener.exitAttribute_list(this);
-	}
+    }
 };
-
-
 
 
 SiddhiQLParser.Attribute_listContext = Attribute_listContext;
 
-SiddhiQLParser.prototype.attribute_list = function() {
+SiddhiQLParser.prototype.attribute_list = function () {
 
     var localctx = new Attribute_listContext(this, this._ctx, this.state);
     this.enterRule(localctx, 192, SiddhiQLParser.RULE_attribute_list);
     var _la = 0; // Token type
     try {
         this.state = 1407;
-        switch(this._input.LA(1)) {
-        case SiddhiQLParser.INT_LITERAL:
-        case SiddhiQLParser.LONG_LITERAL:
-        case SiddhiQLParser.FLOAT_LITERAL:
-        case SiddhiQLParser.DOUBLE_LITERAL:
-        case SiddhiQLParser.OPEN_PAR:
-        case SiddhiQLParser.PLUS:
-        case SiddhiQLParser.MINUS:
-        case SiddhiQLParser.HASH:
-        case SiddhiQLParser.STREAM:
-        case SiddhiQLParser.DEFINE:
-        case SiddhiQLParser.TABLE:
-        case SiddhiQLParser.APP:
-        case SiddhiQLParser.FROM:
-        case SiddhiQLParser.PARTITION:
-        case SiddhiQLParser.WINDOW:
-        case SiddhiQLParser.SELECT:
-        case SiddhiQLParser.GROUP:
-        case SiddhiQLParser.BY:
-        case SiddhiQLParser.ORDER:
-        case SiddhiQLParser.LIMIT:
-        case SiddhiQLParser.ASC:
-        case SiddhiQLParser.DESC:
-        case SiddhiQLParser.HAVING:
-        case SiddhiQLParser.INSERT:
-        case SiddhiQLParser.DELETE:
-        case SiddhiQLParser.UPDATE:
-        case SiddhiQLParser.RETURN:
-        case SiddhiQLParser.EVENTS:
-        case SiddhiQLParser.INTO:
-        case SiddhiQLParser.OUTPUT:
-        case SiddhiQLParser.EXPIRED:
-        case SiddhiQLParser.CURRENT:
-        case SiddhiQLParser.SNAPSHOT:
-        case SiddhiQLParser.FOR:
-        case SiddhiQLParser.RAW:
-        case SiddhiQLParser.OF:
-        case SiddhiQLParser.AS:
-        case SiddhiQLParser.OR:
-        case SiddhiQLParser.AND:
-        case SiddhiQLParser.ON:
-        case SiddhiQLParser.IS:
-        case SiddhiQLParser.NOT:
-        case SiddhiQLParser.WITHIN:
-        case SiddhiQLParser.WITH:
-        case SiddhiQLParser.BEGIN:
-        case SiddhiQLParser.END:
-        case SiddhiQLParser.NULL:
-        case SiddhiQLParser.EVERY:
-        case SiddhiQLParser.LAST:
-        case SiddhiQLParser.ALL:
-        case SiddhiQLParser.FIRST:
-        case SiddhiQLParser.JOIN:
-        case SiddhiQLParser.INNER:
-        case SiddhiQLParser.OUTER:
-        case SiddhiQLParser.RIGHT:
-        case SiddhiQLParser.LEFT:
-        case SiddhiQLParser.FULL:
-        case SiddhiQLParser.UNIDIRECTIONAL:
-        case SiddhiQLParser.YEARS:
-        case SiddhiQLParser.MONTHS:
-        case SiddhiQLParser.WEEKS:
-        case SiddhiQLParser.DAYS:
-        case SiddhiQLParser.HOURS:
-        case SiddhiQLParser.MINUTES:
-        case SiddhiQLParser.SECONDS:
-        case SiddhiQLParser.MILLISECONDS:
-        case SiddhiQLParser.FALSE:
-        case SiddhiQLParser.TRUE:
-        case SiddhiQLParser.STRING:
-        case SiddhiQLParser.INT:
-        case SiddhiQLParser.LONG:
-        case SiddhiQLParser.FLOAT:
-        case SiddhiQLParser.DOUBLE:
-        case SiddhiQLParser.BOOL:
-        case SiddhiQLParser.OBJECT:
-        case SiddhiQLParser.ID_QUOTES:
-        case SiddhiQLParser.ID:
-        case SiddhiQLParser.STRING_LITERAL:
-            this.enterOuterAlt(localctx, 1);
-            this.state = 1398;
-            this.attribute();
-            this.state = 1403;
-            this._errHandler.sync(this);
-            _la = this._input.LA(1);
-            while(_la===SiddhiQLParser.COMMA) {
-                this.state = 1399;
-                this.match(SiddhiQLParser.COMMA);
-                this.state = 1400;
+        switch (this._input.LA(1)) {
+            case SiddhiQLParser.INT_LITERAL:
+            case SiddhiQLParser.LONG_LITERAL:
+            case SiddhiQLParser.FLOAT_LITERAL:
+            case SiddhiQLParser.DOUBLE_LITERAL:
+            case SiddhiQLParser.OPEN_PAR:
+            case SiddhiQLParser.PLUS:
+            case SiddhiQLParser.MINUS:
+            case SiddhiQLParser.HASH:
+            case SiddhiQLParser.STREAM:
+            case SiddhiQLParser.DEFINE:
+            case SiddhiQLParser.TABLE:
+            case SiddhiQLParser.APP:
+            case SiddhiQLParser.FROM:
+            case SiddhiQLParser.PARTITION:
+            case SiddhiQLParser.WINDOW:
+            case SiddhiQLParser.SELECT:
+            case SiddhiQLParser.GROUP:
+            case SiddhiQLParser.BY:
+            case SiddhiQLParser.ORDER:
+            case SiddhiQLParser.LIMIT:
+            case SiddhiQLParser.ASC:
+            case SiddhiQLParser.DESC:
+            case SiddhiQLParser.HAVING:
+            case SiddhiQLParser.INSERT:
+            case SiddhiQLParser.DELETE:
+            case SiddhiQLParser.UPDATE:
+            case SiddhiQLParser.RETURN:
+            case SiddhiQLParser.EVENTS:
+            case SiddhiQLParser.INTO:
+            case SiddhiQLParser.OUTPUT:
+            case SiddhiQLParser.EXPIRED:
+            case SiddhiQLParser.CURRENT:
+            case SiddhiQLParser.SNAPSHOT:
+            case SiddhiQLParser.FOR:
+            case SiddhiQLParser.RAW:
+            case SiddhiQLParser.OF:
+            case SiddhiQLParser.AS:
+            case SiddhiQLParser.OR:
+            case SiddhiQLParser.AND:
+            case SiddhiQLParser.ON:
+            case SiddhiQLParser.IS:
+            case SiddhiQLParser.NOT:
+            case SiddhiQLParser.WITHIN:
+            case SiddhiQLParser.WITH:
+            case SiddhiQLParser.BEGIN:
+            case SiddhiQLParser.END:
+            case SiddhiQLParser.NULL:
+            case SiddhiQLParser.EVERY:
+            case SiddhiQLParser.LAST:
+            case SiddhiQLParser.ALL:
+            case SiddhiQLParser.FIRST:
+            case SiddhiQLParser.JOIN:
+            case SiddhiQLParser.INNER:
+            case SiddhiQLParser.OUTER:
+            case SiddhiQLParser.RIGHT:
+            case SiddhiQLParser.LEFT:
+            case SiddhiQLParser.FULL:
+            case SiddhiQLParser.UNIDIRECTIONAL:
+            case SiddhiQLParser.YEARS:
+            case SiddhiQLParser.MONTHS:
+            case SiddhiQLParser.WEEKS:
+            case SiddhiQLParser.DAYS:
+            case SiddhiQLParser.HOURS:
+            case SiddhiQLParser.MINUTES:
+            case SiddhiQLParser.SECONDS:
+            case SiddhiQLParser.MILLISECONDS:
+            case SiddhiQLParser.FALSE:
+            case SiddhiQLParser.TRUE:
+            case SiddhiQLParser.STRING:
+            case SiddhiQLParser.INT:
+            case SiddhiQLParser.LONG:
+            case SiddhiQLParser.FLOAT:
+            case SiddhiQLParser.DOUBLE:
+            case SiddhiQLParser.BOOL:
+            case SiddhiQLParser.OBJECT:
+            case SiddhiQLParser.ID_QUOTES:
+            case SiddhiQLParser.ID:
+            case SiddhiQLParser.STRING_LITERAL:
+                this.enterOuterAlt(localctx, 1);
+                this.state = 1398;
                 this.attribute();
-                this.state = 1405;
+                this.state = 1403;
                 this._errHandler.sync(this);
                 _la = this._input.LA(1);
-            }
-            break;
-        case SiddhiQLParser.STAR:
-            this.enterOuterAlt(localctx, 2);
-            this.state = 1406;
-            this.match(SiddhiQLParser.STAR);
-            break;
-        default:
-            throw new antlr4.error.NoViableAltException(this);
+                while (_la === SiddhiQLParser.COMMA) {
+                    this.state = 1399;
+                    this.match(SiddhiQLParser.COMMA);
+                    this.state = 1400;
+                    this.attribute();
+                    this.state = 1405;
+                    this._errHandler.sync(this);
+                    _la = this._input.LA(1);
+                }
+                break;
+            case SiddhiQLParser.STAR:
+                this.enterOuterAlt(localctx, 2);
+                this.state = 1406;
+                this.match(SiddhiQLParser.STAR);
+                break;
+            default:
+                throw new antlr4.error.NoViableAltException(this);
         }
     } catch (re) {
-    	if(re instanceof antlr4.error.RecognitionException) {
-	        localctx.exception = re;
-	        this._errHandler.reportError(this, re);
-	        this._errHandler.recover(this, re);
-	    } else {
-	    	throw re;
-	    }
+        if (re instanceof antlr4.error.RecognitionException) {
+            localctx.exception = re;
+            this._errHandler.reportError(this, re);
+            this._errHandler.recover(this, re);
+        } else {
+            throw re;
+        }
     } finally {
         this.exitRule();
     }
@@ -11515,13 +11330,13 @@ SiddhiQLParser.prototype.attribute_list = function() {
 };
 
 function Null_checkContext(parser, parent, invokingState) {
-	if(parent===undefined) {
-	    parent = null;
-	}
-	if(invokingState===undefined || invokingState===null) {
-		invokingState = -1;
-	}
-	antlr4.ParserRuleContext.call(this, parent, invokingState);
+    if (parent === undefined) {
+        parent = null;
+    }
+    if (invokingState === undefined || invokingState === null) {
+        invokingState = -1;
+    }
+    antlr4.ParserRuleContext.call(this, parent, invokingState);
     this.parser = parser;
     this.ruleIndex = SiddhiQLParser.RULE_null_check;
     return this;
@@ -11530,66 +11345,64 @@ function Null_checkContext(parser, parent, invokingState) {
 Null_checkContext.prototype = Object.create(antlr4.ParserRuleContext.prototype);
 Null_checkContext.prototype.constructor = Null_checkContext;
 
-Null_checkContext.prototype.IS = function() {
+Null_checkContext.prototype.IS = function () {
     return this.getToken(SiddhiQLParser.IS, 0);
 };
 
-Null_checkContext.prototype.NULL = function() {
+Null_checkContext.prototype.NULL = function () {
     return this.getToken(SiddhiQLParser.NULL, 0);
 };
 
-Null_checkContext.prototype.stream_reference = function() {
-    return this.getTypedRuleContext(Stream_referenceContext,0);
+Null_checkContext.prototype.stream_reference = function () {
+    return this.getTypedRuleContext(Stream_referenceContext, 0);
 };
 
-Null_checkContext.prototype.attribute_reference = function() {
-    return this.getTypedRuleContext(Attribute_referenceContext,0);
+Null_checkContext.prototype.attribute_reference = function () {
+    return this.getTypedRuleContext(Attribute_referenceContext, 0);
 };
 
-Null_checkContext.prototype.function_operation = function() {
-    return this.getTypedRuleContext(Function_operationContext,0);
+Null_checkContext.prototype.function_operation = function () {
+    return this.getTypedRuleContext(Function_operationContext, 0);
 };
 
-Null_checkContext.prototype.enterRule = function(listener) {
-    if(listener instanceof SiddhiQLListener ) {
+Null_checkContext.prototype.enterRule = function (listener) {
+    if (listener instanceof SiddhiQLListener) {
         listener.enterNull_check(this);
-	}
+    }
 };
 
-Null_checkContext.prototype.exitRule = function(listener) {
-    if(listener instanceof SiddhiQLListener ) {
+Null_checkContext.prototype.exitRule = function (listener) {
+    if (listener instanceof SiddhiQLListener) {
         listener.exitNull_check(this);
-	}
+    }
 };
-
-
 
 
 SiddhiQLParser.Null_checkContext = Null_checkContext;
 
-SiddhiQLParser.prototype.null_check = function() {
+SiddhiQLParser.prototype.null_check = function () {
 
     var localctx = new Null_checkContext(this, this._ctx, this.state);
     this.enterRule(localctx, 194, SiddhiQLParser.RULE_null_check);
     try {
         this.enterOuterAlt(localctx, 1);
         this.state = 1412;
-        var la_ = this._interp.adaptivePredict(this._input,168,this._ctx);
-        switch(la_) {
-        case 1:
-            this.state = 1409;
-            this.stream_reference();
-            break;
+        var la_ = this._interp.adaptivePredict(this._input, 168, this._ctx);
+        switch (la_) {
+            case 1:
+                this.state = 1409;
+                this.stream_reference();
+                break;
 
-        case 2:
-            this.state = 1410;
-            this.attribute_reference();
-            break;
+            case 2:
+                this.state = 1410;
+                this.attribute_reference();
+                break;
 
-        case 3:
-            this.state = 1411;
-            this.function_operation();
-            break;
+            case 3:
+                this.state = 1411;
+                this.function_operation();
+                break;
 
         }
         this.state = 1414;
@@ -11597,13 +11410,13 @@ SiddhiQLParser.prototype.null_check = function() {
         this.state = 1415;
         this.match(SiddhiQLParser.NULL);
     } catch (re) {
-    	if(re instanceof antlr4.error.RecognitionException) {
-	        localctx.exception = re;
-	        this._errHandler.reportError(this, re);
-	        this._errHandler.recover(this, re);
-	    } else {
-	    	throw re;
-	    }
+        if (re instanceof antlr4.error.RecognitionException) {
+            localctx.exception = re;
+            this._errHandler.reportError(this, re);
+            this._errHandler.recover(this, re);
+        } else {
+            throw re;
+        }
     } finally {
         this.exitRule();
     }
@@ -11611,13 +11424,13 @@ SiddhiQLParser.prototype.null_check = function() {
 };
 
 function Stream_referenceContext(parser, parent, invokingState) {
-	if(parent===undefined) {
-	    parent = null;
-	}
-	if(invokingState===undefined || invokingState===null) {
-		invokingState = -1;
-	}
-	antlr4.ParserRuleContext.call(this, parent, invokingState);
+    if (parent === undefined) {
+        parent = null;
+    }
+    if (invokingState === undefined || invokingState === null) {
+        invokingState = -1;
+    }
+    antlr4.ParserRuleContext.call(this, parent, invokingState);
     this.parser = parser;
     this.ruleIndex = SiddhiQLParser.RULE_stream_reference;
     this.hash = null; // Token
@@ -11627,32 +11440,30 @@ function Stream_referenceContext(parser, parent, invokingState) {
 Stream_referenceContext.prototype = Object.create(antlr4.ParserRuleContext.prototype);
 Stream_referenceContext.prototype.constructor = Stream_referenceContext;
 
-Stream_referenceContext.prototype.name = function() {
-    return this.getTypedRuleContext(NameContext,0);
+Stream_referenceContext.prototype.name = function () {
+    return this.getTypedRuleContext(NameContext, 0);
 };
 
-Stream_referenceContext.prototype.attribute_index = function() {
-    return this.getTypedRuleContext(Attribute_indexContext,0);
+Stream_referenceContext.prototype.attribute_index = function () {
+    return this.getTypedRuleContext(Attribute_indexContext, 0);
 };
 
-Stream_referenceContext.prototype.enterRule = function(listener) {
-    if(listener instanceof SiddhiQLListener ) {
+Stream_referenceContext.prototype.enterRule = function (listener) {
+    if (listener instanceof SiddhiQLListener) {
         listener.enterStream_reference(this);
-	}
+    }
 };
 
-Stream_referenceContext.prototype.exitRule = function(listener) {
-    if(listener instanceof SiddhiQLListener ) {
+Stream_referenceContext.prototype.exitRule = function (listener) {
+    if (listener instanceof SiddhiQLListener) {
         listener.exitStream_reference(this);
-	}
+    }
 };
-
-
 
 
 SiddhiQLParser.Stream_referenceContext = Stream_referenceContext;
 
-SiddhiQLParser.prototype.stream_reference = function() {
+SiddhiQLParser.prototype.stream_reference = function () {
 
     var localctx = new Stream_referenceContext(this, this._ctx, this.state);
     this.enterRule(localctx, 196, SiddhiQLParser.RULE_stream_reference);
@@ -11661,7 +11472,7 @@ SiddhiQLParser.prototype.stream_reference = function() {
         this.enterOuterAlt(localctx, 1);
         this.state = 1418;
         _la = this._input.LA(1);
-        if(_la===SiddhiQLParser.HASH) {
+        if (_la === SiddhiQLParser.HASH) {
             this.state = 1417;
             localctx.hash = this.match(SiddhiQLParser.HASH);
         }
@@ -11670,7 +11481,7 @@ SiddhiQLParser.prototype.stream_reference = function() {
         this.name();
         this.state = 1425;
         _la = this._input.LA(1);
-        if(_la===SiddhiQLParser.OPEN_SQUARE_BRACKETS) {
+        if (_la === SiddhiQLParser.OPEN_SQUARE_BRACKETS) {
             this.state = 1421;
             this.match(SiddhiQLParser.OPEN_SQUARE_BRACKETS);
             this.state = 1422;
@@ -11680,13 +11491,13 @@ SiddhiQLParser.prototype.stream_reference = function() {
         }
 
     } catch (re) {
-    	if(re instanceof antlr4.error.RecognitionException) {
-	        localctx.exception = re;
-	        this._errHandler.reportError(this, re);
-	        this._errHandler.recover(this, re);
-	    } else {
-	    	throw re;
-	    }
+        if (re instanceof antlr4.error.RecognitionException) {
+            localctx.exception = re;
+            this._errHandler.reportError(this, re);
+            this._errHandler.recover(this, re);
+        } else {
+            throw re;
+        }
     } finally {
         this.exitRule();
     }
@@ -11694,13 +11505,13 @@ SiddhiQLParser.prototype.stream_reference = function() {
 };
 
 function Attribute_referenceContext(parser, parent, invokingState) {
-	if(parent===undefined) {
-	    parent = null;
-	}
-	if(invokingState===undefined || invokingState===null) {
-		invokingState = -1;
-	}
-	antlr4.ParserRuleContext.call(this, parent, invokingState);
+    if (parent === undefined) {
+        parent = null;
+    }
+    if (invokingState === undefined || invokingState === null) {
+        invokingState = -1;
+    }
+    antlr4.ParserRuleContext.call(this, parent, invokingState);
     this.parser = parser;
     this.ruleIndex = SiddhiQLParser.RULE_attribute_reference;
     this.hash1 = null; // Token
@@ -11715,121 +11526,119 @@ function Attribute_referenceContext(parser, parent, invokingState) {
 Attribute_referenceContext.prototype = Object.create(antlr4.ParserRuleContext.prototype);
 Attribute_referenceContext.prototype.constructor = Attribute_referenceContext;
 
-Attribute_referenceContext.prototype.attribute_name = function() {
-    return this.getTypedRuleContext(Attribute_nameContext,0);
+Attribute_referenceContext.prototype.attribute_name = function () {
+    return this.getTypedRuleContext(Attribute_nameContext, 0);
 };
 
-Attribute_referenceContext.prototype.name = function(i) {
-    if(i===undefined) {
+Attribute_referenceContext.prototype.name = function (i) {
+    if (i === undefined) {
         i = null;
     }
-    if(i===null) {
+    if (i === null) {
         return this.getTypedRuleContexts(NameContext);
     } else {
-        return this.getTypedRuleContext(NameContext,i);
+        return this.getTypedRuleContext(NameContext, i);
     }
 };
 
-Attribute_referenceContext.prototype.attribute_index = function(i) {
-    if(i===undefined) {
+Attribute_referenceContext.prototype.attribute_index = function (i) {
+    if (i === undefined) {
         i = null;
     }
-    if(i===null) {
+    if (i === null) {
         return this.getTypedRuleContexts(Attribute_indexContext);
     } else {
-        return this.getTypedRuleContext(Attribute_indexContext,i);
+        return this.getTypedRuleContext(Attribute_indexContext, i);
     }
 };
 
-Attribute_referenceContext.prototype.enterRule = function(listener) {
-    if(listener instanceof SiddhiQLListener ) {
+Attribute_referenceContext.prototype.enterRule = function (listener) {
+    if (listener instanceof SiddhiQLListener) {
         listener.enterAttribute_reference(this);
-	}
+    }
 };
 
-Attribute_referenceContext.prototype.exitRule = function(listener) {
-    if(listener instanceof SiddhiQLListener ) {
+Attribute_referenceContext.prototype.exitRule = function (listener) {
+    if (listener instanceof SiddhiQLListener) {
         listener.exitAttribute_reference(this);
-	}
+    }
 };
-
-
 
 
 SiddhiQLParser.Attribute_referenceContext = Attribute_referenceContext;
 
-SiddhiQLParser.prototype.attribute_reference = function() {
+SiddhiQLParser.prototype.attribute_reference = function () {
 
     var localctx = new Attribute_referenceContext(this, this._ctx, this.state);
     this.enterRule(localctx, 198, SiddhiQLParser.RULE_attribute_reference);
     var _la = 0; // Token type
     try {
         this.state = 1451;
-        var la_ = this._interp.adaptivePredict(this._input,175,this._ctx);
-        switch(la_) {
-        case 1:
-            this.enterOuterAlt(localctx, 1);
-            this.state = 1428;
-            _la = this._input.LA(1);
-            if(_la===SiddhiQLParser.HASH) {
-                this.state = 1427;
-                localctx.hash1 = this.match(SiddhiQLParser.HASH);
-            }
-
-            this.state = 1430;
-            localctx.name1 = this.name();
-            this.state = 1435;
-            _la = this._input.LA(1);
-            if(_la===SiddhiQLParser.OPEN_SQUARE_BRACKETS) {
-                this.state = 1431;
-                this.match(SiddhiQLParser.OPEN_SQUARE_BRACKETS);
-                this.state = 1432;
-                localctx.attribute_index1 = this.attribute_index();
-                this.state = 1433;
-                this.match(SiddhiQLParser.CLOSE_SQUARE_BRACKETS);
-            }
-
-            this.state = 1445;
-            _la = this._input.LA(1);
-            if(_la===SiddhiQLParser.HASH) {
-                this.state = 1437;
-                localctx.hash2 = this.match(SiddhiQLParser.HASH);
-                this.state = 1438;
-                localctx.name2 = this.name();
-                this.state = 1443;
+        var la_ = this._interp.adaptivePredict(this._input, 175, this._ctx);
+        switch (la_) {
+            case 1:
+                this.enterOuterAlt(localctx, 1);
+                this.state = 1428;
                 _la = this._input.LA(1);
-                if(_la===SiddhiQLParser.OPEN_SQUARE_BRACKETS) {
-                    this.state = 1439;
+                if (_la === SiddhiQLParser.HASH) {
+                    this.state = 1427;
+                    localctx.hash1 = this.match(SiddhiQLParser.HASH);
+                }
+
+                this.state = 1430;
+                localctx.name1 = this.name();
+                this.state = 1435;
+                _la = this._input.LA(1);
+                if (_la === SiddhiQLParser.OPEN_SQUARE_BRACKETS) {
+                    this.state = 1431;
                     this.match(SiddhiQLParser.OPEN_SQUARE_BRACKETS);
-                    this.state = 1440;
-                    localctx.attribute_index2 = this.attribute_index();
-                    this.state = 1441;
+                    this.state = 1432;
+                    localctx.attribute_index1 = this.attribute_index();
+                    this.state = 1433;
                     this.match(SiddhiQLParser.CLOSE_SQUARE_BRACKETS);
                 }
 
-            }
+                this.state = 1445;
+                _la = this._input.LA(1);
+                if (_la === SiddhiQLParser.HASH) {
+                    this.state = 1437;
+                    localctx.hash2 = this.match(SiddhiQLParser.HASH);
+                    this.state = 1438;
+                    localctx.name2 = this.name();
+                    this.state = 1443;
+                    _la = this._input.LA(1);
+                    if (_la === SiddhiQLParser.OPEN_SQUARE_BRACKETS) {
+                        this.state = 1439;
+                        this.match(SiddhiQLParser.OPEN_SQUARE_BRACKETS);
+                        this.state = 1440;
+                        localctx.attribute_index2 = this.attribute_index();
+                        this.state = 1441;
+                        this.match(SiddhiQLParser.CLOSE_SQUARE_BRACKETS);
+                    }
 
-            this.state = 1447;
-            this.match(SiddhiQLParser.DOT);
-            this.state = 1448;
-            this.attribute_name();
-            break;
+                }
 
-        case 2:
-            this.enterOuterAlt(localctx, 2);
-            this.state = 1450;
-            this.attribute_name();
-            break;
+                this.state = 1447;
+                this.match(SiddhiQLParser.DOT);
+                this.state = 1448;
+                this.attribute_name();
+                break;
+
+            case 2:
+                this.enterOuterAlt(localctx, 2);
+                this.state = 1450;
+                this.attribute_name();
+                break;
 
         }
     } catch (re) {
-    	if(re instanceof antlr4.error.RecognitionException) {
-	        localctx.exception = re;
-	        this._errHandler.reportError(this, re);
-	        this._errHandler.recover(this, re);
-	    } else {
-	    	throw re;
-	    }
+        if (re instanceof antlr4.error.RecognitionException) {
+            localctx.exception = re;
+            this._errHandler.reportError(this, re);
+            this._errHandler.recover(this, re);
+        } else {
+            throw re;
+        }
     } finally {
         this.exitRule();
     }
@@ -11837,13 +11646,13 @@ SiddhiQLParser.prototype.attribute_reference = function() {
 };
 
 function Attribute_indexContext(parser, parent, invokingState) {
-	if(parent===undefined) {
-	    parent = null;
-	}
-	if(invokingState===undefined || invokingState===null) {
-		invokingState = -1;
-	}
-	antlr4.ParserRuleContext.call(this, parent, invokingState);
+    if (parent === undefined) {
+        parent = null;
+    }
+    if (invokingState === undefined || invokingState === null) {
+        invokingState = -1;
+    }
+    antlr4.ParserRuleContext.call(this, parent, invokingState);
     this.parser = parser;
     this.ruleIndex = SiddhiQLParser.RULE_attribute_index;
     return this;
@@ -11852,69 +11661,67 @@ function Attribute_indexContext(parser, parent, invokingState) {
 Attribute_indexContext.prototype = Object.create(antlr4.ParserRuleContext.prototype);
 Attribute_indexContext.prototype.constructor = Attribute_indexContext;
 
-Attribute_indexContext.prototype.INT_LITERAL = function() {
+Attribute_indexContext.prototype.INT_LITERAL = function () {
     return this.getToken(SiddhiQLParser.INT_LITERAL, 0);
 };
 
-Attribute_indexContext.prototype.LAST = function() {
+Attribute_indexContext.prototype.LAST = function () {
     return this.getToken(SiddhiQLParser.LAST, 0);
 };
 
-Attribute_indexContext.prototype.enterRule = function(listener) {
-    if(listener instanceof SiddhiQLListener ) {
+Attribute_indexContext.prototype.enterRule = function (listener) {
+    if (listener instanceof SiddhiQLListener) {
         listener.enterAttribute_index(this);
-	}
+    }
 };
 
-Attribute_indexContext.prototype.exitRule = function(listener) {
-    if(listener instanceof SiddhiQLListener ) {
+Attribute_indexContext.prototype.exitRule = function (listener) {
+    if (listener instanceof SiddhiQLListener) {
         listener.exitAttribute_index(this);
-	}
+    }
 };
-
-
 
 
 SiddhiQLParser.Attribute_indexContext = Attribute_indexContext;
 
-SiddhiQLParser.prototype.attribute_index = function() {
+SiddhiQLParser.prototype.attribute_index = function () {
 
     var localctx = new Attribute_indexContext(this, this._ctx, this.state);
     this.enterRule(localctx, 200, SiddhiQLParser.RULE_attribute_index);
     var _la = 0; // Token type
     try {
         this.state = 1459;
-        switch(this._input.LA(1)) {
-        case SiddhiQLParser.INT_LITERAL:
-            this.enterOuterAlt(localctx, 1);
-            this.state = 1453;
-            this.match(SiddhiQLParser.INT_LITERAL);
-            break;
-        case SiddhiQLParser.LAST:
-            this.enterOuterAlt(localctx, 2);
-            this.state = 1454;
-            this.match(SiddhiQLParser.LAST);
-            this.state = 1457;
-            _la = this._input.LA(1);
-            if(_la===SiddhiQLParser.MINUS) {
-                this.state = 1455;
-                this.match(SiddhiQLParser.MINUS);
-                this.state = 1456;
+        switch (this._input.LA(1)) {
+            case SiddhiQLParser.INT_LITERAL:
+                this.enterOuterAlt(localctx, 1);
+                this.state = 1453;
                 this.match(SiddhiQLParser.INT_LITERAL);
-            }
+                break;
+            case SiddhiQLParser.LAST:
+                this.enterOuterAlt(localctx, 2);
+                this.state = 1454;
+                this.match(SiddhiQLParser.LAST);
+                this.state = 1457;
+                _la = this._input.LA(1);
+                if (_la === SiddhiQLParser.MINUS) {
+                    this.state = 1455;
+                    this.match(SiddhiQLParser.MINUS);
+                    this.state = 1456;
+                    this.match(SiddhiQLParser.INT_LITERAL);
+                }
 
-            break;
-        default:
-            throw new antlr4.error.NoViableAltException(this);
+                break;
+            default:
+                throw new antlr4.error.NoViableAltException(this);
         }
     } catch (re) {
-    	if(re instanceof antlr4.error.RecognitionException) {
-	        localctx.exception = re;
-	        this._errHandler.reportError(this, re);
-	        this._errHandler.recover(this, re);
-	    } else {
-	    	throw re;
-	    }
+        if (re instanceof antlr4.error.RecognitionException) {
+            localctx.exception = re;
+            this._errHandler.reportError(this, re);
+            this._errHandler.recover(this, re);
+        } else {
+            throw re;
+        }
     } finally {
         this.exitRule();
     }
@@ -11922,13 +11729,13 @@ SiddhiQLParser.prototype.attribute_index = function() {
 };
 
 function Function_idContext(parser, parent, invokingState) {
-	if(parent===undefined) {
-	    parent = null;
-	}
-	if(invokingState===undefined || invokingState===null) {
-		invokingState = -1;
-	}
-	antlr4.ParserRuleContext.call(this, parent, invokingState);
+    if (parent === undefined) {
+        parent = null;
+    }
+    if (invokingState === undefined || invokingState === null) {
+        invokingState = -1;
+    }
+    antlr4.ParserRuleContext.call(this, parent, invokingState);
     this.parser = parser;
     this.ruleIndex = SiddhiQLParser.RULE_function_id;
     return this;
@@ -11937,28 +11744,26 @@ function Function_idContext(parser, parent, invokingState) {
 Function_idContext.prototype = Object.create(antlr4.ParserRuleContext.prototype);
 Function_idContext.prototype.constructor = Function_idContext;
 
-Function_idContext.prototype.name = function() {
-    return this.getTypedRuleContext(NameContext,0);
+Function_idContext.prototype.name = function () {
+    return this.getTypedRuleContext(NameContext, 0);
 };
 
-Function_idContext.prototype.enterRule = function(listener) {
-    if(listener instanceof SiddhiQLListener ) {
+Function_idContext.prototype.enterRule = function (listener) {
+    if (listener instanceof SiddhiQLListener) {
         listener.enterFunction_id(this);
-	}
+    }
 };
 
-Function_idContext.prototype.exitRule = function(listener) {
-    if(listener instanceof SiddhiQLListener ) {
+Function_idContext.prototype.exitRule = function (listener) {
+    if (listener instanceof SiddhiQLListener) {
         listener.exitFunction_id(this);
-	}
+    }
 };
-
-
 
 
 SiddhiQLParser.Function_idContext = Function_idContext;
 
-SiddhiQLParser.prototype.function_id = function() {
+SiddhiQLParser.prototype.function_id = function () {
 
     var localctx = new Function_idContext(this, this._ctx, this.state);
     this.enterRule(localctx, 202, SiddhiQLParser.RULE_function_id);
@@ -11967,13 +11772,13 @@ SiddhiQLParser.prototype.function_id = function() {
         this.state = 1461;
         this.name();
     } catch (re) {
-    	if(re instanceof antlr4.error.RecognitionException) {
-	        localctx.exception = re;
-	        this._errHandler.reportError(this, re);
-	        this._errHandler.recover(this, re);
-	    } else {
-	    	throw re;
-	    }
+        if (re instanceof antlr4.error.RecognitionException) {
+            localctx.exception = re;
+            this._errHandler.reportError(this, re);
+            this._errHandler.recover(this, re);
+        } else {
+            throw re;
+        }
     } finally {
         this.exitRule();
     }
@@ -11981,13 +11786,13 @@ SiddhiQLParser.prototype.function_id = function() {
 };
 
 function Function_namespaceContext(parser, parent, invokingState) {
-	if(parent===undefined) {
-	    parent = null;
-	}
-	if(invokingState===undefined || invokingState===null) {
-		invokingState = -1;
-	}
-	antlr4.ParserRuleContext.call(this, parent, invokingState);
+    if (parent === undefined) {
+        parent = null;
+    }
+    if (invokingState === undefined || invokingState === null) {
+        invokingState = -1;
+    }
+    antlr4.ParserRuleContext.call(this, parent, invokingState);
     this.parser = parser;
     this.ruleIndex = SiddhiQLParser.RULE_function_namespace;
     return this;
@@ -11996,28 +11801,26 @@ function Function_namespaceContext(parser, parent, invokingState) {
 Function_namespaceContext.prototype = Object.create(antlr4.ParserRuleContext.prototype);
 Function_namespaceContext.prototype.constructor = Function_namespaceContext;
 
-Function_namespaceContext.prototype.name = function() {
-    return this.getTypedRuleContext(NameContext,0);
+Function_namespaceContext.prototype.name = function () {
+    return this.getTypedRuleContext(NameContext, 0);
 };
 
-Function_namespaceContext.prototype.enterRule = function(listener) {
-    if(listener instanceof SiddhiQLListener ) {
+Function_namespaceContext.prototype.enterRule = function (listener) {
+    if (listener instanceof SiddhiQLListener) {
         listener.enterFunction_namespace(this);
-	}
+    }
 };
 
-Function_namespaceContext.prototype.exitRule = function(listener) {
-    if(listener instanceof SiddhiQLListener ) {
+Function_namespaceContext.prototype.exitRule = function (listener) {
+    if (listener instanceof SiddhiQLListener) {
         listener.exitFunction_namespace(this);
-	}
+    }
 };
-
-
 
 
 SiddhiQLParser.Function_namespaceContext = Function_namespaceContext;
 
-SiddhiQLParser.prototype.function_namespace = function() {
+SiddhiQLParser.prototype.function_namespace = function () {
 
     var localctx = new Function_namespaceContext(this, this._ctx, this.state);
     this.enterRule(localctx, 204, SiddhiQLParser.RULE_function_namespace);
@@ -12026,13 +11829,13 @@ SiddhiQLParser.prototype.function_namespace = function() {
         this.state = 1463;
         this.name();
     } catch (re) {
-    	if(re instanceof antlr4.error.RecognitionException) {
-	        localctx.exception = re;
-	        this._errHandler.reportError(this, re);
-	        this._errHandler.recover(this, re);
-	    } else {
-	    	throw re;
-	    }
+        if (re instanceof antlr4.error.RecognitionException) {
+            localctx.exception = re;
+            this._errHandler.reportError(this, re);
+            this._errHandler.recover(this, re);
+        } else {
+            throw re;
+        }
     } finally {
         this.exitRule();
     }
@@ -12040,13 +11843,13 @@ SiddhiQLParser.prototype.function_namespace = function() {
 };
 
 function Stream_idContext(parser, parent, invokingState) {
-	if(parent===undefined) {
-	    parent = null;
-	}
-	if(invokingState===undefined || invokingState===null) {
-		invokingState = -1;
-	}
-	antlr4.ParserRuleContext.call(this, parent, invokingState);
+    if (parent === undefined) {
+        parent = null;
+    }
+    if (invokingState === undefined || invokingState === null) {
+        invokingState = -1;
+    }
+    antlr4.ParserRuleContext.call(this, parent, invokingState);
     this.parser = parser;
     this.ruleIndex = SiddhiQLParser.RULE_stream_id;
     return this;
@@ -12055,28 +11858,26 @@ function Stream_idContext(parser, parent, invokingState) {
 Stream_idContext.prototype = Object.create(antlr4.ParserRuleContext.prototype);
 Stream_idContext.prototype.constructor = Stream_idContext;
 
-Stream_idContext.prototype.name = function() {
-    return this.getTypedRuleContext(NameContext,0);
+Stream_idContext.prototype.name = function () {
+    return this.getTypedRuleContext(NameContext, 0);
 };
 
-Stream_idContext.prototype.enterRule = function(listener) {
-    if(listener instanceof SiddhiQLListener ) {
+Stream_idContext.prototype.enterRule = function (listener) {
+    if (listener instanceof SiddhiQLListener) {
         listener.enterStream_id(this);
-	}
+    }
 };
 
-Stream_idContext.prototype.exitRule = function(listener) {
-    if(listener instanceof SiddhiQLListener ) {
+Stream_idContext.prototype.exitRule = function (listener) {
+    if (listener instanceof SiddhiQLListener) {
         listener.exitStream_id(this);
-	}
+    }
 };
-
-
 
 
 SiddhiQLParser.Stream_idContext = Stream_idContext;
 
-SiddhiQLParser.prototype.stream_id = function() {
+SiddhiQLParser.prototype.stream_id = function () {
 
     var localctx = new Stream_idContext(this, this._ctx, this.state);
     this.enterRule(localctx, 206, SiddhiQLParser.RULE_stream_id);
@@ -12085,13 +11886,13 @@ SiddhiQLParser.prototype.stream_id = function() {
         this.state = 1465;
         this.name();
     } catch (re) {
-    	if(re instanceof antlr4.error.RecognitionException) {
-	        localctx.exception = re;
-	        this._errHandler.reportError(this, re);
-	        this._errHandler.recover(this, re);
-	    } else {
-	    	throw re;
-	    }
+        if (re instanceof antlr4.error.RecognitionException) {
+            localctx.exception = re;
+            this._errHandler.reportError(this, re);
+            this._errHandler.recover(this, re);
+        } else {
+            throw re;
+        }
     } finally {
         this.exitRule();
     }
@@ -12099,13 +11900,13 @@ SiddhiQLParser.prototype.stream_id = function() {
 };
 
 function Source_idContext(parser, parent, invokingState) {
-	if(parent===undefined) {
-	    parent = null;
-	}
-	if(invokingState===undefined || invokingState===null) {
-		invokingState = -1;
-	}
-	antlr4.ParserRuleContext.call(this, parent, invokingState);
+    if (parent === undefined) {
+        parent = null;
+    }
+    if (invokingState === undefined || invokingState === null) {
+        invokingState = -1;
+    }
+    antlr4.ParserRuleContext.call(this, parent, invokingState);
     this.parser = parser;
     this.ruleIndex = SiddhiQLParser.RULE_source_id;
     return this;
@@ -12114,28 +11915,26 @@ function Source_idContext(parser, parent, invokingState) {
 Source_idContext.prototype = Object.create(antlr4.ParserRuleContext.prototype);
 Source_idContext.prototype.constructor = Source_idContext;
 
-Source_idContext.prototype.name = function() {
-    return this.getTypedRuleContext(NameContext,0);
+Source_idContext.prototype.name = function () {
+    return this.getTypedRuleContext(NameContext, 0);
 };
 
-Source_idContext.prototype.enterRule = function(listener) {
-    if(listener instanceof SiddhiQLListener ) {
+Source_idContext.prototype.enterRule = function (listener) {
+    if (listener instanceof SiddhiQLListener) {
         listener.enterSource_id(this);
-	}
+    }
 };
 
-Source_idContext.prototype.exitRule = function(listener) {
-    if(listener instanceof SiddhiQLListener ) {
+Source_idContext.prototype.exitRule = function (listener) {
+    if (listener instanceof SiddhiQLListener) {
         listener.exitSource_id(this);
-	}
+    }
 };
-
-
 
 
 SiddhiQLParser.Source_idContext = Source_idContext;
 
-SiddhiQLParser.prototype.source_id = function() {
+SiddhiQLParser.prototype.source_id = function () {
 
     var localctx = new Source_idContext(this, this._ctx, this.state);
     this.enterRule(localctx, 208, SiddhiQLParser.RULE_source_id);
@@ -12144,13 +11943,13 @@ SiddhiQLParser.prototype.source_id = function() {
         this.state = 1467;
         this.name();
     } catch (re) {
-    	if(re instanceof antlr4.error.RecognitionException) {
-	        localctx.exception = re;
-	        this._errHandler.reportError(this, re);
-	        this._errHandler.recover(this, re);
-	    } else {
-	    	throw re;
-	    }
+        if (re instanceof antlr4.error.RecognitionException) {
+            localctx.exception = re;
+            this._errHandler.reportError(this, re);
+            this._errHandler.recover(this, re);
+        } else {
+            throw re;
+        }
     } finally {
         this.exitRule();
     }
@@ -12158,13 +11957,13 @@ SiddhiQLParser.prototype.source_id = function() {
 };
 
 function AliasContext(parser, parent, invokingState) {
-	if(parent===undefined) {
-	    parent = null;
-	}
-	if(invokingState===undefined || invokingState===null) {
-		invokingState = -1;
-	}
-	antlr4.ParserRuleContext.call(this, parent, invokingState);
+    if (parent === undefined) {
+        parent = null;
+    }
+    if (invokingState === undefined || invokingState === null) {
+        invokingState = -1;
+    }
+    antlr4.ParserRuleContext.call(this, parent, invokingState);
     this.parser = parser;
     this.ruleIndex = SiddhiQLParser.RULE_alias;
     return this;
@@ -12173,28 +11972,26 @@ function AliasContext(parser, parent, invokingState) {
 AliasContext.prototype = Object.create(antlr4.ParserRuleContext.prototype);
 AliasContext.prototype.constructor = AliasContext;
 
-AliasContext.prototype.name = function() {
-    return this.getTypedRuleContext(NameContext,0);
+AliasContext.prototype.name = function () {
+    return this.getTypedRuleContext(NameContext, 0);
 };
 
-AliasContext.prototype.enterRule = function(listener) {
-    if(listener instanceof SiddhiQLListener ) {
+AliasContext.prototype.enterRule = function (listener) {
+    if (listener instanceof SiddhiQLListener) {
         listener.enterAlias(this);
-	}
+    }
 };
 
-AliasContext.prototype.exitRule = function(listener) {
-    if(listener instanceof SiddhiQLListener ) {
+AliasContext.prototype.exitRule = function (listener) {
+    if (listener instanceof SiddhiQLListener) {
         listener.exitAlias(this);
-	}
+    }
 };
-
-
 
 
 SiddhiQLParser.AliasContext = AliasContext;
 
-SiddhiQLParser.prototype.alias = function() {
+SiddhiQLParser.prototype.alias = function () {
 
     var localctx = new AliasContext(this, this._ctx, this.state);
     this.enterRule(localctx, 210, SiddhiQLParser.RULE_alias);
@@ -12203,13 +12000,13 @@ SiddhiQLParser.prototype.alias = function() {
         this.state = 1469;
         this.name();
     } catch (re) {
-    	if(re instanceof antlr4.error.RecognitionException) {
-	        localctx.exception = re;
-	        this._errHandler.reportError(this, re);
-	        this._errHandler.recover(this, re);
-	    } else {
-	    	throw re;
-	    }
+        if (re instanceof antlr4.error.RecognitionException) {
+            localctx.exception = re;
+            this._errHandler.reportError(this, re);
+            this._errHandler.recover(this, re);
+        } else {
+            throw re;
+        }
     } finally {
         this.exitRule();
     }
@@ -12217,13 +12014,13 @@ SiddhiQLParser.prototype.alias = function() {
 };
 
 function Property_nameContext(parser, parent, invokingState) {
-	if(parent===undefined) {
-	    parent = null;
-	}
-	if(invokingState===undefined || invokingState===null) {
-		invokingState = -1;
-	}
-	antlr4.ParserRuleContext.call(this, parent, invokingState);
+    if (parent === undefined) {
+        parent = null;
+    }
+    if (invokingState === undefined || invokingState === null) {
+        invokingState = -1;
+    }
+    antlr4.ParserRuleContext.call(this, parent, invokingState);
     this.parser = parser;
     this.ruleIndex = SiddhiQLParser.RULE_property_name;
     return this;
@@ -12232,46 +12029,44 @@ function Property_nameContext(parser, parent, invokingState) {
 Property_nameContext.prototype = Object.create(antlr4.ParserRuleContext.prototype);
 Property_nameContext.prototype.constructor = Property_nameContext;
 
-Property_nameContext.prototype.name = function(i) {
-    if(i===undefined) {
+Property_nameContext.prototype.name = function (i) {
+    if (i === undefined) {
         i = null;
     }
-    if(i===null) {
+    if (i === null) {
         return this.getTypedRuleContexts(NameContext);
     } else {
-        return this.getTypedRuleContext(NameContext,i);
+        return this.getTypedRuleContext(NameContext, i);
     }
 };
 
-Property_nameContext.prototype.property_separator = function(i) {
-    if(i===undefined) {
+Property_nameContext.prototype.property_separator = function (i) {
+    if (i === undefined) {
         i = null;
     }
-    if(i===null) {
+    if (i === null) {
         return this.getTypedRuleContexts(Property_separatorContext);
     } else {
-        return this.getTypedRuleContext(Property_separatorContext,i);
+        return this.getTypedRuleContext(Property_separatorContext, i);
     }
 };
 
-Property_nameContext.prototype.enterRule = function(listener) {
-    if(listener instanceof SiddhiQLListener ) {
+Property_nameContext.prototype.enterRule = function (listener) {
+    if (listener instanceof SiddhiQLListener) {
         listener.enterProperty_name(this);
-	}
+    }
 };
 
-Property_nameContext.prototype.exitRule = function(listener) {
-    if(listener instanceof SiddhiQLListener ) {
+Property_nameContext.prototype.exitRule = function (listener) {
+    if (listener instanceof SiddhiQLListener) {
         listener.exitProperty_name(this);
-	}
+    }
 };
-
-
 
 
 SiddhiQLParser.Property_nameContext = Property_nameContext;
 
-SiddhiQLParser.prototype.property_name = function() {
+SiddhiQLParser.prototype.property_name = function () {
 
     var localctx = new Property_nameContext(this, this._ctx, this.state);
     this.enterRule(localctx, 212, SiddhiQLParser.RULE_property_name);
@@ -12283,7 +12078,7 @@ SiddhiQLParser.prototype.property_name = function() {
         this.state = 1477;
         this._errHandler.sync(this);
         _la = this._input.LA(1);
-        while((((_la) & ~0x1f) == 0 && ((1 << _la) & ((1 << SiddhiQLParser.COL) | (1 << SiddhiQLParser.DOT) | (1 << SiddhiQLParser.MINUS))) !== 0)) {
+        while ((((_la) & ~0x1f) == 0 && ((1 << _la) & ((1 << SiddhiQLParser.COL) | (1 << SiddhiQLParser.DOT) | (1 << SiddhiQLParser.MINUS))) !== 0)) {
             this.state = 1472;
             this.property_separator();
             this.state = 1473;
@@ -12293,13 +12088,13 @@ SiddhiQLParser.prototype.property_name = function() {
             _la = this._input.LA(1);
         }
     } catch (re) {
-    	if(re instanceof antlr4.error.RecognitionException) {
-	        localctx.exception = re;
-	        this._errHandler.reportError(this, re);
-	        this._errHandler.recover(this, re);
-	    } else {
-	    	throw re;
-	    }
+        if (re instanceof antlr4.error.RecognitionException) {
+            localctx.exception = re;
+            this._errHandler.reportError(this, re);
+            this._errHandler.recover(this, re);
+        } else {
+            throw re;
+        }
     } finally {
         this.exitRule();
     }
@@ -12307,13 +12102,13 @@ SiddhiQLParser.prototype.property_name = function() {
 };
 
 function Attribute_nameContext(parser, parent, invokingState) {
-	if(parent===undefined) {
-	    parent = null;
-	}
-	if(invokingState===undefined || invokingState===null) {
-		invokingState = -1;
-	}
-	antlr4.ParserRuleContext.call(this, parent, invokingState);
+    if (parent === undefined) {
+        parent = null;
+    }
+    if (invokingState === undefined || invokingState === null) {
+        invokingState = -1;
+    }
+    antlr4.ParserRuleContext.call(this, parent, invokingState);
     this.parser = parser;
     this.ruleIndex = SiddhiQLParser.RULE_attribute_name;
     return this;
@@ -12322,28 +12117,26 @@ function Attribute_nameContext(parser, parent, invokingState) {
 Attribute_nameContext.prototype = Object.create(antlr4.ParserRuleContext.prototype);
 Attribute_nameContext.prototype.constructor = Attribute_nameContext;
 
-Attribute_nameContext.prototype.name = function() {
-    return this.getTypedRuleContext(NameContext,0);
+Attribute_nameContext.prototype.name = function () {
+    return this.getTypedRuleContext(NameContext, 0);
 };
 
-Attribute_nameContext.prototype.enterRule = function(listener) {
-    if(listener instanceof SiddhiQLListener ) {
+Attribute_nameContext.prototype.enterRule = function (listener) {
+    if (listener instanceof SiddhiQLListener) {
         listener.enterAttribute_name(this);
-	}
+    }
 };
 
-Attribute_nameContext.prototype.exitRule = function(listener) {
-    if(listener instanceof SiddhiQLListener ) {
+Attribute_nameContext.prototype.exitRule = function (listener) {
+    if (listener instanceof SiddhiQLListener) {
         listener.exitAttribute_name(this);
-	}
+    }
 };
-
-
 
 
 SiddhiQLParser.Attribute_nameContext = Attribute_nameContext;
 
-SiddhiQLParser.prototype.attribute_name = function() {
+SiddhiQLParser.prototype.attribute_name = function () {
 
     var localctx = new Attribute_nameContext(this, this._ctx, this.state);
     this.enterRule(localctx, 214, SiddhiQLParser.RULE_attribute_name);
@@ -12352,13 +12145,13 @@ SiddhiQLParser.prototype.attribute_name = function() {
         this.state = 1480;
         this.name();
     } catch (re) {
-    	if(re instanceof antlr4.error.RecognitionException) {
-	        localctx.exception = re;
-	        this._errHandler.reportError(this, re);
-	        this._errHandler.recover(this, re);
-	    } else {
-	    	throw re;
-	    }
+        if (re instanceof antlr4.error.RecognitionException) {
+            localctx.exception = re;
+            this._errHandler.reportError(this, re);
+            this._errHandler.recover(this, re);
+        } else {
+            throw re;
+        }
     } finally {
         this.exitRule();
     }
@@ -12366,13 +12159,13 @@ SiddhiQLParser.prototype.attribute_name = function() {
 };
 
 function TypeContext(parser, parent, invokingState) {
-	if(parent===undefined) {
-	    parent = null;
-	}
-	if(invokingState===undefined || invokingState===null) {
-		invokingState = -1;
-	}
-	antlr4.ParserRuleContext.call(this, parent, invokingState);
+    if (parent === undefined) {
+        parent = null;
+    }
+    if (invokingState === undefined || invokingState === null) {
+        invokingState = -1;
+    }
+    antlr4.ParserRuleContext.call(this, parent, invokingState);
     this.parser = parser;
     this.ruleIndex = SiddhiQLParser.RULE_type;
     return this;
@@ -12381,28 +12174,26 @@ function TypeContext(parser, parent, invokingState) {
 TypeContext.prototype = Object.create(antlr4.ParserRuleContext.prototype);
 TypeContext.prototype.constructor = TypeContext;
 
-TypeContext.prototype.name = function() {
-    return this.getTypedRuleContext(NameContext,0);
+TypeContext.prototype.name = function () {
+    return this.getTypedRuleContext(NameContext, 0);
 };
 
-TypeContext.prototype.enterRule = function(listener) {
-    if(listener instanceof SiddhiQLListener ) {
+TypeContext.prototype.enterRule = function (listener) {
+    if (listener instanceof SiddhiQLListener) {
         listener.enterType(this);
-	}
+    }
 };
 
-TypeContext.prototype.exitRule = function(listener) {
-    if(listener instanceof SiddhiQLListener ) {
+TypeContext.prototype.exitRule = function (listener) {
+    if (listener instanceof SiddhiQLListener) {
         listener.exitType(this);
-	}
+    }
 };
-
-
 
 
 SiddhiQLParser.TypeContext = TypeContext;
 
-SiddhiQLParser.prototype.type = function() {
+SiddhiQLParser.prototype.type = function () {
 
     var localctx = new TypeContext(this, this._ctx, this.state);
     this.enterRule(localctx, 216, SiddhiQLParser.RULE_type);
@@ -12411,13 +12202,13 @@ SiddhiQLParser.prototype.type = function() {
         this.state = 1482;
         this.name();
     } catch (re) {
-    	if(re instanceof antlr4.error.RecognitionException) {
-	        localctx.exception = re;
-	        this._errHandler.reportError(this, re);
-	        this._errHandler.recover(this, re);
-	    } else {
-	    	throw re;
-	    }
+        if (re instanceof antlr4.error.RecognitionException) {
+            localctx.exception = re;
+            this._errHandler.reportError(this, re);
+            this._errHandler.recover(this, re);
+        } else {
+            throw re;
+        }
     } finally {
         this.exitRule();
     }
@@ -12425,13 +12216,13 @@ SiddhiQLParser.prototype.type = function() {
 };
 
 function Property_valueContext(parser, parent, invokingState) {
-	if(parent===undefined) {
-	    parent = null;
-	}
-	if(invokingState===undefined || invokingState===null) {
-		invokingState = -1;
-	}
-	antlr4.ParserRuleContext.call(this, parent, invokingState);
+    if (parent === undefined) {
+        parent = null;
+    }
+    if (invokingState === undefined || invokingState === null) {
+        invokingState = -1;
+    }
+    antlr4.ParserRuleContext.call(this, parent, invokingState);
     this.parser = parser;
     this.ruleIndex = SiddhiQLParser.RULE_property_value;
     return this;
@@ -12440,28 +12231,26 @@ function Property_valueContext(parser, parent, invokingState) {
 Property_valueContext.prototype = Object.create(antlr4.ParserRuleContext.prototype);
 Property_valueContext.prototype.constructor = Property_valueContext;
 
-Property_valueContext.prototype.string_value = function() {
-    return this.getTypedRuleContext(String_valueContext,0);
+Property_valueContext.prototype.string_value = function () {
+    return this.getTypedRuleContext(String_valueContext, 0);
 };
 
-Property_valueContext.prototype.enterRule = function(listener) {
-    if(listener instanceof SiddhiQLListener ) {
+Property_valueContext.prototype.enterRule = function (listener) {
+    if (listener instanceof SiddhiQLListener) {
         listener.enterProperty_value(this);
-	}
+    }
 };
 
-Property_valueContext.prototype.exitRule = function(listener) {
-    if(listener instanceof SiddhiQLListener ) {
+Property_valueContext.prototype.exitRule = function (listener) {
+    if (listener instanceof SiddhiQLListener) {
         listener.exitProperty_value(this);
-	}
+    }
 };
-
-
 
 
 SiddhiQLParser.Property_valueContext = Property_valueContext;
 
-SiddhiQLParser.prototype.property_value = function() {
+SiddhiQLParser.prototype.property_value = function () {
 
     var localctx = new Property_valueContext(this, this._ctx, this.state);
     this.enterRule(localctx, 218, SiddhiQLParser.RULE_property_value);
@@ -12470,13 +12259,13 @@ SiddhiQLParser.prototype.property_value = function() {
         this.state = 1484;
         this.string_value();
     } catch (re) {
-    	if(re instanceof antlr4.error.RecognitionException) {
-	        localctx.exception = re;
-	        this._errHandler.reportError(this, re);
-	        this._errHandler.recover(this, re);
-	    } else {
-	    	throw re;
-	    }
+        if (re instanceof antlr4.error.RecognitionException) {
+            localctx.exception = re;
+            this._errHandler.reportError(this, re);
+            this._errHandler.recover(this, re);
+        } else {
+            throw re;
+        }
     } finally {
         this.exitRule();
     }
@@ -12484,13 +12273,13 @@ SiddhiQLParser.prototype.property_value = function() {
 };
 
 function Property_separatorContext(parser, parent, invokingState) {
-	if(parent===undefined) {
-	    parent = null;
-	}
-	if(invokingState===undefined || invokingState===null) {
-		invokingState = -1;
-	}
-	antlr4.ParserRuleContext.call(this, parent, invokingState);
+    if (parent === undefined) {
+        parent = null;
+    }
+    if (invokingState === undefined || invokingState === null) {
+        invokingState = -1;
+    }
+    antlr4.ParserRuleContext.call(this, parent, invokingState);
     this.parser = parser;
     this.ruleIndex = SiddhiQLParser.RULE_property_separator;
     return this;
@@ -12499,36 +12288,34 @@ function Property_separatorContext(parser, parent, invokingState) {
 Property_separatorContext.prototype = Object.create(antlr4.ParserRuleContext.prototype);
 Property_separatorContext.prototype.constructor = Property_separatorContext;
 
-Property_separatorContext.prototype.DOT = function() {
+Property_separatorContext.prototype.DOT = function () {
     return this.getToken(SiddhiQLParser.DOT, 0);
 };
 
-Property_separatorContext.prototype.MINUS = function() {
+Property_separatorContext.prototype.MINUS = function () {
     return this.getToken(SiddhiQLParser.MINUS, 0);
 };
 
-Property_separatorContext.prototype.COL = function() {
+Property_separatorContext.prototype.COL = function () {
     return this.getToken(SiddhiQLParser.COL, 0);
 };
 
-Property_separatorContext.prototype.enterRule = function(listener) {
-    if(listener instanceof SiddhiQLListener ) {
+Property_separatorContext.prototype.enterRule = function (listener) {
+    if (listener instanceof SiddhiQLListener) {
         listener.enterProperty_separator(this);
-	}
+    }
 };
 
-Property_separatorContext.prototype.exitRule = function(listener) {
-    if(listener instanceof SiddhiQLListener ) {
+Property_separatorContext.prototype.exitRule = function (listener) {
+    if (listener instanceof SiddhiQLListener) {
         listener.exitProperty_separator(this);
-	}
+    }
 };
-
-
 
 
 SiddhiQLParser.Property_separatorContext = Property_separatorContext;
 
-SiddhiQLParser.prototype.property_separator = function() {
+SiddhiQLParser.prototype.property_separator = function () {
 
     var localctx = new Property_separatorContext(this, this._ctx, this.state);
     this.enterRule(localctx, 220, SiddhiQLParser.RULE_property_separator);
@@ -12537,20 +12324,20 @@ SiddhiQLParser.prototype.property_separator = function() {
         this.enterOuterAlt(localctx, 1);
         this.state = 1486;
         _la = this._input.LA(1);
-        if(!((((_la) & ~0x1f) == 0 && ((1 << _la) & ((1 << SiddhiQLParser.COL) | (1 << SiddhiQLParser.DOT) | (1 << SiddhiQLParser.MINUS))) !== 0))) {
-        this._errHandler.recoverInline(this);
+        if (!((((_la) & ~0x1f) == 0 && ((1 << _la) & ((1 << SiddhiQLParser.COL) | (1 << SiddhiQLParser.DOT) | (1 << SiddhiQLParser.MINUS))) !== 0))) {
+            this._errHandler.recoverInline(this);
         }
         else {
             this.consume();
         }
     } catch (re) {
-    	if(re instanceof antlr4.error.RecognitionException) {
-	        localctx.exception = re;
-	        this._errHandler.reportError(this, re);
-	        this._errHandler.recover(this, re);
-	    } else {
-	    	throw re;
-	    }
+        if (re instanceof antlr4.error.RecognitionException) {
+            localctx.exception = re;
+            this._errHandler.reportError(this, re);
+            this._errHandler.recover(this, re);
+        } else {
+            throw re;
+        }
     } finally {
         this.exitRule();
     }
@@ -12558,13 +12345,13 @@ SiddhiQLParser.prototype.property_separator = function() {
 };
 
 function SourceContext(parser, parent, invokingState) {
-	if(parent===undefined) {
-	    parent = null;
-	}
-	if(invokingState===undefined || invokingState===null) {
-		invokingState = -1;
-	}
-	antlr4.ParserRuleContext.call(this, parent, invokingState);
+    if (parent === undefined) {
+        parent = null;
+    }
+    if (invokingState === undefined || invokingState === null) {
+        invokingState = -1;
+    }
+    antlr4.ParserRuleContext.call(this, parent, invokingState);
     this.parser = parser;
     this.ruleIndex = SiddhiQLParser.RULE_source;
     this.inner = null; // Token
@@ -12574,28 +12361,26 @@ function SourceContext(parser, parent, invokingState) {
 SourceContext.prototype = Object.create(antlr4.ParserRuleContext.prototype);
 SourceContext.prototype.constructor = SourceContext;
 
-SourceContext.prototype.stream_id = function() {
-    return this.getTypedRuleContext(Stream_idContext,0);
+SourceContext.prototype.stream_id = function () {
+    return this.getTypedRuleContext(Stream_idContext, 0);
 };
 
-SourceContext.prototype.enterRule = function(listener) {
-    if(listener instanceof SiddhiQLListener ) {
+SourceContext.prototype.enterRule = function (listener) {
+    if (listener instanceof SiddhiQLListener) {
         listener.enterSource(this);
-	}
+    }
 };
 
-SourceContext.prototype.exitRule = function(listener) {
-    if(listener instanceof SiddhiQLListener ) {
+SourceContext.prototype.exitRule = function (listener) {
+    if (listener instanceof SiddhiQLListener) {
         listener.exitSource(this);
-	}
+    }
 };
-
-
 
 
 SiddhiQLParser.SourceContext = SourceContext;
 
-SiddhiQLParser.prototype.source = function() {
+SiddhiQLParser.prototype.source = function () {
 
     var localctx = new SourceContext(this, this._ctx, this.state);
     this.enterRule(localctx, 222, SiddhiQLParser.RULE_source);
@@ -12604,7 +12389,7 @@ SiddhiQLParser.prototype.source = function() {
         this.enterOuterAlt(localctx, 1);
         this.state = 1489;
         _la = this._input.LA(1);
-        if(_la===SiddhiQLParser.HASH) {
+        if (_la === SiddhiQLParser.HASH) {
             this.state = 1488;
             localctx.inner = this.match(SiddhiQLParser.HASH);
         }
@@ -12612,13 +12397,13 @@ SiddhiQLParser.prototype.source = function() {
         this.state = 1491;
         this.stream_id();
     } catch (re) {
-    	if(re instanceof antlr4.error.RecognitionException) {
-	        localctx.exception = re;
-	        this._errHandler.reportError(this, re);
-	        this._errHandler.recover(this, re);
-	    } else {
-	    	throw re;
-	    }
+        if (re instanceof antlr4.error.RecognitionException) {
+            localctx.exception = re;
+            this._errHandler.reportError(this, re);
+            this._errHandler.recover(this, re);
+        } else {
+            throw re;
+        }
     } finally {
         this.exitRule();
     }
@@ -12626,13 +12411,13 @@ SiddhiQLParser.prototype.source = function() {
 };
 
 function TargetContext(parser, parent, invokingState) {
-	if(parent===undefined) {
-	    parent = null;
-	}
-	if(invokingState===undefined || invokingState===null) {
-		invokingState = -1;
-	}
-	antlr4.ParserRuleContext.call(this, parent, invokingState);
+    if (parent === undefined) {
+        parent = null;
+    }
+    if (invokingState === undefined || invokingState === null) {
+        invokingState = -1;
+    }
+    antlr4.ParserRuleContext.call(this, parent, invokingState);
     this.parser = parser;
     this.ruleIndex = SiddhiQLParser.RULE_target;
     return this;
@@ -12641,28 +12426,26 @@ function TargetContext(parser, parent, invokingState) {
 TargetContext.prototype = Object.create(antlr4.ParserRuleContext.prototype);
 TargetContext.prototype.constructor = TargetContext;
 
-TargetContext.prototype.source = function() {
-    return this.getTypedRuleContext(SourceContext,0);
+TargetContext.prototype.source = function () {
+    return this.getTypedRuleContext(SourceContext, 0);
 };
 
-TargetContext.prototype.enterRule = function(listener) {
-    if(listener instanceof SiddhiQLListener ) {
+TargetContext.prototype.enterRule = function (listener) {
+    if (listener instanceof SiddhiQLListener) {
         listener.enterTarget(this);
-	}
+    }
 };
 
-TargetContext.prototype.exitRule = function(listener) {
-    if(listener instanceof SiddhiQLListener ) {
+TargetContext.prototype.exitRule = function (listener) {
+    if (listener instanceof SiddhiQLListener) {
         listener.exitTarget(this);
-	}
+    }
 };
-
-
 
 
 SiddhiQLParser.TargetContext = TargetContext;
 
-SiddhiQLParser.prototype.target = function() {
+SiddhiQLParser.prototype.target = function () {
 
     var localctx = new TargetContext(this, this._ctx, this.state);
     this.enterRule(localctx, 224, SiddhiQLParser.RULE_target);
@@ -12671,13 +12454,13 @@ SiddhiQLParser.prototype.target = function() {
         this.state = 1493;
         this.source();
     } catch (re) {
-    	if(re instanceof antlr4.error.RecognitionException) {
-	        localctx.exception = re;
-	        this._errHandler.reportError(this, re);
-	        this._errHandler.recover(this, re);
-	    } else {
-	    	throw re;
-	    }
+        if (re instanceof antlr4.error.RecognitionException) {
+            localctx.exception = re;
+            this._errHandler.reportError(this, re);
+            this._errHandler.recover(this, re);
+        } else {
+            throw re;
+        }
     } finally {
         this.exitRule();
     }
@@ -12685,13 +12468,13 @@ SiddhiQLParser.prototype.target = function() {
 };
 
 function EventContext(parser, parent, invokingState) {
-	if(parent===undefined) {
-	    parent = null;
-	}
-	if(invokingState===undefined || invokingState===null) {
-		invokingState = -1;
-	}
-	antlr4.ParserRuleContext.call(this, parent, invokingState);
+    if (parent === undefined) {
+        parent = null;
+    }
+    if (invokingState === undefined || invokingState === null) {
+        invokingState = -1;
+    }
+    antlr4.ParserRuleContext.call(this, parent, invokingState);
     this.parser = parser;
     this.ruleIndex = SiddhiQLParser.RULE_event;
     return this;
@@ -12700,28 +12483,26 @@ function EventContext(parser, parent, invokingState) {
 EventContext.prototype = Object.create(antlr4.ParserRuleContext.prototype);
 EventContext.prototype.constructor = EventContext;
 
-EventContext.prototype.name = function() {
-    return this.getTypedRuleContext(NameContext,0);
+EventContext.prototype.name = function () {
+    return this.getTypedRuleContext(NameContext, 0);
 };
 
-EventContext.prototype.enterRule = function(listener) {
-    if(listener instanceof SiddhiQLListener ) {
+EventContext.prototype.enterRule = function (listener) {
+    if (listener instanceof SiddhiQLListener) {
         listener.enterEvent(this);
-	}
+    }
 };
 
-EventContext.prototype.exitRule = function(listener) {
-    if(listener instanceof SiddhiQLListener ) {
+EventContext.prototype.exitRule = function (listener) {
+    if (listener instanceof SiddhiQLListener) {
         listener.exitEvent(this);
-	}
+    }
 };
-
-
 
 
 SiddhiQLParser.EventContext = EventContext;
 
-SiddhiQLParser.prototype.event = function() {
+SiddhiQLParser.prototype.event = function () {
 
     var localctx = new EventContext(this, this._ctx, this.state);
     this.enterRule(localctx, 226, SiddhiQLParser.RULE_event);
@@ -12730,13 +12511,13 @@ SiddhiQLParser.prototype.event = function() {
         this.state = 1495;
         this.name();
     } catch (re) {
-    	if(re instanceof antlr4.error.RecognitionException) {
-	        localctx.exception = re;
-	        this._errHandler.reportError(this, re);
-	        this._errHandler.recover(this, re);
-	    } else {
-	    	throw re;
-	    }
+        if (re instanceof antlr4.error.RecognitionException) {
+            localctx.exception = re;
+            this._errHandler.reportError(this, re);
+            this._errHandler.recover(this, re);
+        } else {
+            throw re;
+        }
     } finally {
         this.exitRule();
     }
@@ -12744,13 +12525,13 @@ SiddhiQLParser.prototype.event = function() {
 };
 
 function NameContext(parser, parent, invokingState) {
-	if(parent===undefined) {
-	    parent = null;
-	}
-	if(invokingState===undefined || invokingState===null) {
-		invokingState = -1;
-	}
-	antlr4.ParserRuleContext.call(this, parent, invokingState);
+    if (parent === undefined) {
+        parent = null;
+    }
+    if (invokingState === undefined || invokingState === null) {
+        invokingState = -1;
+    }
+    antlr4.ParserRuleContext.call(this, parent, invokingState);
     this.parser = parser;
     this.ruleIndex = SiddhiQLParser.RULE_name;
     return this;
@@ -12759,126 +12540,124 @@ function NameContext(parser, parent, invokingState) {
 NameContext.prototype = Object.create(antlr4.ParserRuleContext.prototype);
 NameContext.prototype.constructor = NameContext;
 
-NameContext.prototype.id = function() {
-    return this.getTypedRuleContext(IdContext,0);
+NameContext.prototype.id = function () {
+    return this.getTypedRuleContext(IdContext, 0);
 };
 
-NameContext.prototype.keyword = function() {
-    return this.getTypedRuleContext(KeywordContext,0);
+NameContext.prototype.keyword = function () {
+    return this.getTypedRuleContext(KeywordContext, 0);
 };
 
-NameContext.prototype.enterRule = function(listener) {
-    if(listener instanceof SiddhiQLListener ) {
+NameContext.prototype.enterRule = function (listener) {
+    if (listener instanceof SiddhiQLListener) {
         listener.enterName(this);
-	}
+    }
 };
 
-NameContext.prototype.exitRule = function(listener) {
-    if(listener instanceof SiddhiQLListener ) {
+NameContext.prototype.exitRule = function (listener) {
+    if (listener instanceof SiddhiQLListener) {
         listener.exitName(this);
-	}
+    }
 };
-
-
 
 
 SiddhiQLParser.NameContext = NameContext;
 
-SiddhiQLParser.prototype.name = function() {
+SiddhiQLParser.prototype.name = function () {
 
     var localctx = new NameContext(this, this._ctx, this.state);
     this.enterRule(localctx, 228, SiddhiQLParser.RULE_name);
     try {
         this.state = 1499;
-        switch(this._input.LA(1)) {
-        case SiddhiQLParser.ID_QUOTES:
-        case SiddhiQLParser.ID:
-            this.enterOuterAlt(localctx, 1);
-            this.state = 1497;
-            this.id();
-            break;
-        case SiddhiQLParser.STREAM:
-        case SiddhiQLParser.DEFINE:
-        case SiddhiQLParser.TABLE:
-        case SiddhiQLParser.APP:
-        case SiddhiQLParser.FROM:
-        case SiddhiQLParser.PARTITION:
-        case SiddhiQLParser.WINDOW:
-        case SiddhiQLParser.SELECT:
-        case SiddhiQLParser.GROUP:
-        case SiddhiQLParser.BY:
-        case SiddhiQLParser.ORDER:
-        case SiddhiQLParser.LIMIT:
-        case SiddhiQLParser.ASC:
-        case SiddhiQLParser.DESC:
-        case SiddhiQLParser.HAVING:
-        case SiddhiQLParser.INSERT:
-        case SiddhiQLParser.DELETE:
-        case SiddhiQLParser.UPDATE:
-        case SiddhiQLParser.RETURN:
-        case SiddhiQLParser.EVENTS:
-        case SiddhiQLParser.INTO:
-        case SiddhiQLParser.OUTPUT:
-        case SiddhiQLParser.EXPIRED:
-        case SiddhiQLParser.CURRENT:
-        case SiddhiQLParser.SNAPSHOT:
-        case SiddhiQLParser.FOR:
-        case SiddhiQLParser.RAW:
-        case SiddhiQLParser.OF:
-        case SiddhiQLParser.AS:
-        case SiddhiQLParser.OR:
-        case SiddhiQLParser.AND:
-        case SiddhiQLParser.ON:
-        case SiddhiQLParser.IS:
-        case SiddhiQLParser.NOT:
-        case SiddhiQLParser.WITHIN:
-        case SiddhiQLParser.WITH:
-        case SiddhiQLParser.BEGIN:
-        case SiddhiQLParser.END:
-        case SiddhiQLParser.NULL:
-        case SiddhiQLParser.EVERY:
-        case SiddhiQLParser.LAST:
-        case SiddhiQLParser.ALL:
-        case SiddhiQLParser.FIRST:
-        case SiddhiQLParser.JOIN:
-        case SiddhiQLParser.INNER:
-        case SiddhiQLParser.OUTER:
-        case SiddhiQLParser.RIGHT:
-        case SiddhiQLParser.LEFT:
-        case SiddhiQLParser.FULL:
-        case SiddhiQLParser.UNIDIRECTIONAL:
-        case SiddhiQLParser.YEARS:
-        case SiddhiQLParser.MONTHS:
-        case SiddhiQLParser.WEEKS:
-        case SiddhiQLParser.DAYS:
-        case SiddhiQLParser.HOURS:
-        case SiddhiQLParser.MINUTES:
-        case SiddhiQLParser.SECONDS:
-        case SiddhiQLParser.MILLISECONDS:
-        case SiddhiQLParser.FALSE:
-        case SiddhiQLParser.TRUE:
-        case SiddhiQLParser.STRING:
-        case SiddhiQLParser.INT:
-        case SiddhiQLParser.LONG:
-        case SiddhiQLParser.FLOAT:
-        case SiddhiQLParser.DOUBLE:
-        case SiddhiQLParser.BOOL:
-        case SiddhiQLParser.OBJECT:
-            this.enterOuterAlt(localctx, 2);
-            this.state = 1498;
-            this.keyword();
-            break;
-        default:
-            throw new antlr4.error.NoViableAltException(this);
+        switch (this._input.LA(1)) {
+            case SiddhiQLParser.ID_QUOTES:
+            case SiddhiQLParser.ID:
+                this.enterOuterAlt(localctx, 1);
+                this.state = 1497;
+                this.id();
+                break;
+            case SiddhiQLParser.STREAM:
+            case SiddhiQLParser.DEFINE:
+            case SiddhiQLParser.TABLE:
+            case SiddhiQLParser.APP:
+            case SiddhiQLParser.FROM:
+            case SiddhiQLParser.PARTITION:
+            case SiddhiQLParser.WINDOW:
+            case SiddhiQLParser.SELECT:
+            case SiddhiQLParser.GROUP:
+            case SiddhiQLParser.BY:
+            case SiddhiQLParser.ORDER:
+            case SiddhiQLParser.LIMIT:
+            case SiddhiQLParser.ASC:
+            case SiddhiQLParser.DESC:
+            case SiddhiQLParser.HAVING:
+            case SiddhiQLParser.INSERT:
+            case SiddhiQLParser.DELETE:
+            case SiddhiQLParser.UPDATE:
+            case SiddhiQLParser.RETURN:
+            case SiddhiQLParser.EVENTS:
+            case SiddhiQLParser.INTO:
+            case SiddhiQLParser.OUTPUT:
+            case SiddhiQLParser.EXPIRED:
+            case SiddhiQLParser.CURRENT:
+            case SiddhiQLParser.SNAPSHOT:
+            case SiddhiQLParser.FOR:
+            case SiddhiQLParser.RAW:
+            case SiddhiQLParser.OF:
+            case SiddhiQLParser.AS:
+            case SiddhiQLParser.OR:
+            case SiddhiQLParser.AND:
+            case SiddhiQLParser.ON:
+            case SiddhiQLParser.IS:
+            case SiddhiQLParser.NOT:
+            case SiddhiQLParser.WITHIN:
+            case SiddhiQLParser.WITH:
+            case SiddhiQLParser.BEGIN:
+            case SiddhiQLParser.END:
+            case SiddhiQLParser.NULL:
+            case SiddhiQLParser.EVERY:
+            case SiddhiQLParser.LAST:
+            case SiddhiQLParser.ALL:
+            case SiddhiQLParser.FIRST:
+            case SiddhiQLParser.JOIN:
+            case SiddhiQLParser.INNER:
+            case SiddhiQLParser.OUTER:
+            case SiddhiQLParser.RIGHT:
+            case SiddhiQLParser.LEFT:
+            case SiddhiQLParser.FULL:
+            case SiddhiQLParser.UNIDIRECTIONAL:
+            case SiddhiQLParser.YEARS:
+            case SiddhiQLParser.MONTHS:
+            case SiddhiQLParser.WEEKS:
+            case SiddhiQLParser.DAYS:
+            case SiddhiQLParser.HOURS:
+            case SiddhiQLParser.MINUTES:
+            case SiddhiQLParser.SECONDS:
+            case SiddhiQLParser.MILLISECONDS:
+            case SiddhiQLParser.FALSE:
+            case SiddhiQLParser.TRUE:
+            case SiddhiQLParser.STRING:
+            case SiddhiQLParser.INT:
+            case SiddhiQLParser.LONG:
+            case SiddhiQLParser.FLOAT:
+            case SiddhiQLParser.DOUBLE:
+            case SiddhiQLParser.BOOL:
+            case SiddhiQLParser.OBJECT:
+                this.enterOuterAlt(localctx, 2);
+                this.state = 1498;
+                this.keyword();
+                break;
+            default:
+                throw new antlr4.error.NoViableAltException(this);
         }
     } catch (re) {
-    	if(re instanceof antlr4.error.RecognitionException) {
-	        localctx.exception = re;
-	        this._errHandler.reportError(this, re);
-	        this._errHandler.recover(this, re);
-	    } else {
-	    	throw re;
-	    }
+        if (re instanceof antlr4.error.RecognitionException) {
+            localctx.exception = re;
+            this._errHandler.reportError(this, re);
+            this._errHandler.recover(this, re);
+        } else {
+            throw re;
+        }
     } finally {
         this.exitRule();
     }
@@ -12886,13 +12665,13 @@ SiddhiQLParser.prototype.name = function() {
 };
 
 function CollectContext(parser, parent, invokingState) {
-	if(parent===undefined) {
-	    parent = null;
-	}
-	if(invokingState===undefined || invokingState===null) {
-		invokingState = -1;
-	}
-	antlr4.ParserRuleContext.call(this, parent, invokingState);
+    if (parent === undefined) {
+        parent = null;
+    }
+    if (invokingState === undefined || invokingState === null) {
+        invokingState = -1;
+    }
+    antlr4.ParserRuleContext.call(this, parent, invokingState);
     this.parser = parser;
     this.ruleIndex = SiddhiQLParser.RULE_collect;
     this.start = null; // Token
@@ -12903,11 +12682,11 @@ function CollectContext(parser, parent, invokingState) {
 CollectContext.prototype = Object.create(antlr4.ParserRuleContext.prototype);
 CollectContext.prototype.constructor = CollectContext;
 
-CollectContext.prototype.INT_LITERAL = function(i) {
-	if(i===undefined) {
-		i = null;
-	}
-    if(i===null) {
+CollectContext.prototype.INT_LITERAL = function (i) {
+    if (i === undefined) {
+        i = null;
+    }
+    if (i === null) {
         return this.getTokens(SiddhiQLParser.INT_LITERAL);
     } else {
         return this.getToken(SiddhiQLParser.INT_LITERAL, i);
@@ -12915,72 +12694,70 @@ CollectContext.prototype.INT_LITERAL = function(i) {
 };
 
 
-CollectContext.prototype.enterRule = function(listener) {
-    if(listener instanceof SiddhiQLListener ) {
+CollectContext.prototype.enterRule = function (listener) {
+    if (listener instanceof SiddhiQLListener) {
         listener.enterCollect(this);
-	}
+    }
 };
 
-CollectContext.prototype.exitRule = function(listener) {
-    if(listener instanceof SiddhiQLListener ) {
+CollectContext.prototype.exitRule = function (listener) {
+    if (listener instanceof SiddhiQLListener) {
         listener.exitCollect(this);
-	}
+    }
 };
-
-
 
 
 SiddhiQLParser.CollectContext = CollectContext;
 
-SiddhiQLParser.prototype.collect = function() {
+SiddhiQLParser.prototype.collect = function () {
 
     var localctx = new CollectContext(this, this._ctx, this.state);
     this.enterRule(localctx, 230, SiddhiQLParser.RULE_collect);
     try {
         this.state = 1509;
-        var la_ = this._interp.adaptivePredict(this._input,181,this._ctx);
-        switch(la_) {
-        case 1:
-            this.enterOuterAlt(localctx, 1);
-            this.state = 1501;
-            localctx.start = this.match(SiddhiQLParser.INT_LITERAL);
-            this.state = 1502;
-            this.match(SiddhiQLParser.COL);
-            this.state = 1503;
-            localctx.end = this.match(SiddhiQLParser.INT_LITERAL);
-            break;
+        var la_ = this._interp.adaptivePredict(this._input, 181, this._ctx);
+        switch (la_) {
+            case 1:
+                this.enterOuterAlt(localctx, 1);
+                this.state = 1501;
+                localctx.start = this.match(SiddhiQLParser.INT_LITERAL);
+                this.state = 1502;
+                this.match(SiddhiQLParser.COL);
+                this.state = 1503;
+                localctx.end = this.match(SiddhiQLParser.INT_LITERAL);
+                break;
 
-        case 2:
-            this.enterOuterAlt(localctx, 2);
-            this.state = 1504;
-            localctx.start = this.match(SiddhiQLParser.INT_LITERAL);
-            this.state = 1505;
-            this.match(SiddhiQLParser.COL);
-            break;
+            case 2:
+                this.enterOuterAlt(localctx, 2);
+                this.state = 1504;
+                localctx.start = this.match(SiddhiQLParser.INT_LITERAL);
+                this.state = 1505;
+                this.match(SiddhiQLParser.COL);
+                break;
 
-        case 3:
-            this.enterOuterAlt(localctx, 3);
-            this.state = 1506;
-            this.match(SiddhiQLParser.COL);
-            this.state = 1507;
-            localctx.end = this.match(SiddhiQLParser.INT_LITERAL);
-            break;
+            case 3:
+                this.enterOuterAlt(localctx, 3);
+                this.state = 1506;
+                this.match(SiddhiQLParser.COL);
+                this.state = 1507;
+                localctx.end = this.match(SiddhiQLParser.INT_LITERAL);
+                break;
 
-        case 4:
-            this.enterOuterAlt(localctx, 4);
-            this.state = 1508;
-            this.match(SiddhiQLParser.INT_LITERAL);
-            break;
+            case 4:
+                this.enterOuterAlt(localctx, 4);
+                this.state = 1508;
+                this.match(SiddhiQLParser.INT_LITERAL);
+                break;
 
         }
     } catch (re) {
-    	if(re instanceof antlr4.error.RecognitionException) {
-	        localctx.exception = re;
-	        this._errHandler.reportError(this, re);
-	        this._errHandler.recover(this, re);
-	    } else {
-	    	throw re;
-	    }
+        if (re instanceof antlr4.error.RecognitionException) {
+            localctx.exception = re;
+            this._errHandler.reportError(this, re);
+            this._errHandler.recover(this, re);
+        } else {
+            throw re;
+        }
     } finally {
         this.exitRule();
     }
@@ -12988,13 +12765,13 @@ SiddhiQLParser.prototype.collect = function() {
 };
 
 function Attribute_typeContext(parser, parent, invokingState) {
-	if(parent===undefined) {
-	    parent = null;
-	}
-	if(invokingState===undefined || invokingState===null) {
-		invokingState = -1;
-	}
-	antlr4.ParserRuleContext.call(this, parent, invokingState);
+    if (parent === undefined) {
+        parent = null;
+    }
+    if (invokingState === undefined || invokingState === null) {
+        invokingState = -1;
+    }
+    antlr4.ParserRuleContext.call(this, parent, invokingState);
     this.parser = parser;
     this.ruleIndex = SiddhiQLParser.RULE_attribute_type;
     return this;
@@ -13003,52 +12780,50 @@ function Attribute_typeContext(parser, parent, invokingState) {
 Attribute_typeContext.prototype = Object.create(antlr4.ParserRuleContext.prototype);
 Attribute_typeContext.prototype.constructor = Attribute_typeContext;
 
-Attribute_typeContext.prototype.STRING = function() {
+Attribute_typeContext.prototype.STRING = function () {
     return this.getToken(SiddhiQLParser.STRING, 0);
 };
 
-Attribute_typeContext.prototype.INT = function() {
+Attribute_typeContext.prototype.INT = function () {
     return this.getToken(SiddhiQLParser.INT, 0);
 };
 
-Attribute_typeContext.prototype.LONG = function() {
+Attribute_typeContext.prototype.LONG = function () {
     return this.getToken(SiddhiQLParser.LONG, 0);
 };
 
-Attribute_typeContext.prototype.FLOAT = function() {
+Attribute_typeContext.prototype.FLOAT = function () {
     return this.getToken(SiddhiQLParser.FLOAT, 0);
 };
 
-Attribute_typeContext.prototype.DOUBLE = function() {
+Attribute_typeContext.prototype.DOUBLE = function () {
     return this.getToken(SiddhiQLParser.DOUBLE, 0);
 };
 
-Attribute_typeContext.prototype.BOOL = function() {
+Attribute_typeContext.prototype.BOOL = function () {
     return this.getToken(SiddhiQLParser.BOOL, 0);
 };
 
-Attribute_typeContext.prototype.OBJECT = function() {
+Attribute_typeContext.prototype.OBJECT = function () {
     return this.getToken(SiddhiQLParser.OBJECT, 0);
 };
 
-Attribute_typeContext.prototype.enterRule = function(listener) {
-    if(listener instanceof SiddhiQLListener ) {
+Attribute_typeContext.prototype.enterRule = function (listener) {
+    if (listener instanceof SiddhiQLListener) {
         listener.enterAttribute_type(this);
-	}
+    }
 };
 
-Attribute_typeContext.prototype.exitRule = function(listener) {
-    if(listener instanceof SiddhiQLListener ) {
+Attribute_typeContext.prototype.exitRule = function (listener) {
+    if (listener instanceof SiddhiQLListener) {
         listener.exitAttribute_type(this);
-	}
+    }
 };
-
-
 
 
 SiddhiQLParser.Attribute_typeContext = Attribute_typeContext;
 
-SiddhiQLParser.prototype.attribute_type = function() {
+SiddhiQLParser.prototype.attribute_type = function () {
 
     var localctx = new Attribute_typeContext(this, this._ctx, this.state);
     this.enterRule(localctx, 232, SiddhiQLParser.RULE_attribute_type);
@@ -13057,20 +12832,20 @@ SiddhiQLParser.prototype.attribute_type = function() {
         this.enterOuterAlt(localctx, 1);
         this.state = 1511;
         _la = this._input.LA(1);
-        if(!(((((_la - 96)) & ~0x1f) == 0 && ((1 << (_la - 96)) & ((1 << (SiddhiQLParser.STRING - 96)) | (1 << (SiddhiQLParser.INT - 96)) | (1 << (SiddhiQLParser.LONG - 96)) | (1 << (SiddhiQLParser.FLOAT - 96)) | (1 << (SiddhiQLParser.DOUBLE - 96)) | (1 << (SiddhiQLParser.BOOL - 96)) | (1 << (SiddhiQLParser.OBJECT - 96)))) !== 0))) {
-        this._errHandler.recoverInline(this);
+        if (!(((((_la - 96)) & ~0x1f) == 0 && ((1 << (_la - 96)) & ((1 << (SiddhiQLParser.STRING - 96)) | (1 << (SiddhiQLParser.INT - 96)) | (1 << (SiddhiQLParser.LONG - 96)) | (1 << (SiddhiQLParser.FLOAT - 96)) | (1 << (SiddhiQLParser.DOUBLE - 96)) | (1 << (SiddhiQLParser.BOOL - 96)) | (1 << (SiddhiQLParser.OBJECT - 96)))) !== 0))) {
+            this._errHandler.recoverInline(this);
         }
         else {
             this.consume();
         }
     } catch (re) {
-    	if(re instanceof antlr4.error.RecognitionException) {
-	        localctx.exception = re;
-	        this._errHandler.reportError(this, re);
-	        this._errHandler.recover(this, re);
-	    } else {
-	    	throw re;
-	    }
+        if (re instanceof antlr4.error.RecognitionException) {
+            localctx.exception = re;
+            this._errHandler.reportError(this, re);
+            this._errHandler.recover(this, re);
+        } else {
+            throw re;
+        }
     } finally {
         this.exitRule();
     }
@@ -13078,13 +12853,13 @@ SiddhiQLParser.prototype.attribute_type = function() {
 };
 
 function JoinContext(parser, parent, invokingState) {
-	if(parent===undefined) {
-	    parent = null;
-	}
-	if(invokingState===undefined || invokingState===null) {
-		invokingState = -1;
-	}
-	antlr4.ParserRuleContext.call(this, parent, invokingState);
+    if (parent === undefined) {
+        parent = null;
+    }
+    if (invokingState === undefined || invokingState === null) {
+        invokingState = -1;
+    }
+    antlr4.ParserRuleContext.call(this, parent, invokingState);
     this.parser = parser;
     this.ruleIndex = SiddhiQLParser.RULE_join;
     return this;
@@ -13093,113 +12868,111 @@ function JoinContext(parser, parent, invokingState) {
 JoinContext.prototype = Object.create(antlr4.ParserRuleContext.prototype);
 JoinContext.prototype.constructor = JoinContext;
 
-JoinContext.prototype.LEFT = function() {
+JoinContext.prototype.LEFT = function () {
     return this.getToken(SiddhiQLParser.LEFT, 0);
 };
 
-JoinContext.prototype.OUTER = function() {
+JoinContext.prototype.OUTER = function () {
     return this.getToken(SiddhiQLParser.OUTER, 0);
 };
 
-JoinContext.prototype.JOIN = function() {
+JoinContext.prototype.JOIN = function () {
     return this.getToken(SiddhiQLParser.JOIN, 0);
 };
 
-JoinContext.prototype.RIGHT = function() {
+JoinContext.prototype.RIGHT = function () {
     return this.getToken(SiddhiQLParser.RIGHT, 0);
 };
 
-JoinContext.prototype.FULL = function() {
+JoinContext.prototype.FULL = function () {
     return this.getToken(SiddhiQLParser.FULL, 0);
 };
 
-JoinContext.prototype.INNER = function() {
+JoinContext.prototype.INNER = function () {
     return this.getToken(SiddhiQLParser.INNER, 0);
 };
 
-JoinContext.prototype.enterRule = function(listener) {
-    if(listener instanceof SiddhiQLListener ) {
+JoinContext.prototype.enterRule = function (listener) {
+    if (listener instanceof SiddhiQLListener) {
         listener.enterJoin(this);
-	}
+    }
 };
 
-JoinContext.prototype.exitRule = function(listener) {
-    if(listener instanceof SiddhiQLListener ) {
+JoinContext.prototype.exitRule = function (listener) {
+    if (listener instanceof SiddhiQLListener) {
         listener.exitJoin(this);
-	}
+    }
 };
-
-
 
 
 SiddhiQLParser.JoinContext = JoinContext;
 
-SiddhiQLParser.prototype.join = function() {
+SiddhiQLParser.prototype.join = function () {
 
     var localctx = new JoinContext(this, this._ctx, this.state);
     this.enterRule(localctx, 234, SiddhiQLParser.RULE_join);
     var _la = 0; // Token type
     try {
         this.state = 1528;
-        switch(this._input.LA(1)) {
-        case SiddhiQLParser.LEFT:
-            this.enterOuterAlt(localctx, 1);
-            this.state = 1513;
-            this.match(SiddhiQLParser.LEFT);
-            this.state = 1514;
-            this.match(SiddhiQLParser.OUTER);
-            this.state = 1515;
-            this.match(SiddhiQLParser.JOIN);
-            break;
-        case SiddhiQLParser.RIGHT:
-            this.enterOuterAlt(localctx, 2);
-            this.state = 1516;
-            this.match(SiddhiQLParser.RIGHT);
-            this.state = 1517;
-            this.match(SiddhiQLParser.OUTER);
-            this.state = 1518;
-            this.match(SiddhiQLParser.JOIN);
-            break;
-        case SiddhiQLParser.FULL:
-            this.enterOuterAlt(localctx, 3);
-            this.state = 1519;
-            this.match(SiddhiQLParser.FULL);
-            this.state = 1520;
-            this.match(SiddhiQLParser.OUTER);
-            this.state = 1521;
-            this.match(SiddhiQLParser.JOIN);
-            break;
-        case SiddhiQLParser.OUTER:
-            this.enterOuterAlt(localctx, 4);
-            this.state = 1522;
-            this.match(SiddhiQLParser.OUTER);
-            this.state = 1523;
-            this.match(SiddhiQLParser.JOIN);
-            break;
-        case SiddhiQLParser.JOIN:
-        case SiddhiQLParser.INNER:
-            this.enterOuterAlt(localctx, 5);
-            this.state = 1525;
-            _la = this._input.LA(1);
-            if(_la===SiddhiQLParser.INNER) {
-                this.state = 1524;
-                this.match(SiddhiQLParser.INNER);
-            }
+        switch (this._input.LA(1)) {
+            case SiddhiQLParser.LEFT:
+                this.enterOuterAlt(localctx, 1);
+                this.state = 1513;
+                this.match(SiddhiQLParser.LEFT);
+                this.state = 1514;
+                this.match(SiddhiQLParser.OUTER);
+                this.state = 1515;
+                this.match(SiddhiQLParser.JOIN);
+                break;
+            case SiddhiQLParser.RIGHT:
+                this.enterOuterAlt(localctx, 2);
+                this.state = 1516;
+                this.match(SiddhiQLParser.RIGHT);
+                this.state = 1517;
+                this.match(SiddhiQLParser.OUTER);
+                this.state = 1518;
+                this.match(SiddhiQLParser.JOIN);
+                break;
+            case SiddhiQLParser.FULL:
+                this.enterOuterAlt(localctx, 3);
+                this.state = 1519;
+                this.match(SiddhiQLParser.FULL);
+                this.state = 1520;
+                this.match(SiddhiQLParser.OUTER);
+                this.state = 1521;
+                this.match(SiddhiQLParser.JOIN);
+                break;
+            case SiddhiQLParser.OUTER:
+                this.enterOuterAlt(localctx, 4);
+                this.state = 1522;
+                this.match(SiddhiQLParser.OUTER);
+                this.state = 1523;
+                this.match(SiddhiQLParser.JOIN);
+                break;
+            case SiddhiQLParser.JOIN:
+            case SiddhiQLParser.INNER:
+                this.enterOuterAlt(localctx, 5);
+                this.state = 1525;
+                _la = this._input.LA(1);
+                if (_la === SiddhiQLParser.INNER) {
+                    this.state = 1524;
+                    this.match(SiddhiQLParser.INNER);
+                }
 
-            this.state = 1527;
-            this.match(SiddhiQLParser.JOIN);
-            break;
-        default:
-            throw new antlr4.error.NoViableAltException(this);
+                this.state = 1527;
+                this.match(SiddhiQLParser.JOIN);
+                break;
+            default:
+                throw new antlr4.error.NoViableAltException(this);
         }
     } catch (re) {
-    	if(re instanceof antlr4.error.RecognitionException) {
-	        localctx.exception = re;
-	        this._errHandler.reportError(this, re);
-	        this._errHandler.recover(this, re);
-	    } else {
-	    	throw re;
-	    }
+        if (re instanceof antlr4.error.RecognitionException) {
+            localctx.exception = re;
+            this._errHandler.reportError(this, re);
+            this._errHandler.recover(this, re);
+        } else {
+            throw re;
+        }
     } finally {
         this.exitRule();
     }
@@ -13207,13 +12980,13 @@ SiddhiQLParser.prototype.join = function() {
 };
 
 function Constant_valueContext(parser, parent, invokingState) {
-	if(parent===undefined) {
-	    parent = null;
-	}
-	if(invokingState===undefined || invokingState===null) {
-		invokingState = -1;
-	}
-	antlr4.ParserRuleContext.call(this, parent, invokingState);
+    if (parent === undefined) {
+        parent = null;
+    }
+    if (invokingState === undefined || invokingState === null) {
+        invokingState = -1;
+    }
+    antlr4.ParserRuleContext.call(this, parent, invokingState);
     this.parser = parser;
     this.ruleIndex = SiddhiQLParser.RULE_constant_value;
     return this;
@@ -13222,110 +12995,108 @@ function Constant_valueContext(parser, parent, invokingState) {
 Constant_valueContext.prototype = Object.create(antlr4.ParserRuleContext.prototype);
 Constant_valueContext.prototype.constructor = Constant_valueContext;
 
-Constant_valueContext.prototype.bool_value = function() {
-    return this.getTypedRuleContext(Bool_valueContext,0);
+Constant_valueContext.prototype.bool_value = function () {
+    return this.getTypedRuleContext(Bool_valueContext, 0);
 };
 
-Constant_valueContext.prototype.signed_double_value = function() {
-    return this.getTypedRuleContext(Signed_double_valueContext,0);
+Constant_valueContext.prototype.signed_double_value = function () {
+    return this.getTypedRuleContext(Signed_double_valueContext, 0);
 };
 
-Constant_valueContext.prototype.signed_float_value = function() {
-    return this.getTypedRuleContext(Signed_float_valueContext,0);
+Constant_valueContext.prototype.signed_float_value = function () {
+    return this.getTypedRuleContext(Signed_float_valueContext, 0);
 };
 
-Constant_valueContext.prototype.signed_long_value = function() {
-    return this.getTypedRuleContext(Signed_long_valueContext,0);
+Constant_valueContext.prototype.signed_long_value = function () {
+    return this.getTypedRuleContext(Signed_long_valueContext, 0);
 };
 
-Constant_valueContext.prototype.signed_int_value = function() {
-    return this.getTypedRuleContext(Signed_int_valueContext,0);
+Constant_valueContext.prototype.signed_int_value = function () {
+    return this.getTypedRuleContext(Signed_int_valueContext, 0);
 };
 
-Constant_valueContext.prototype.time_value = function() {
-    return this.getTypedRuleContext(Time_valueContext,0);
+Constant_valueContext.prototype.time_value = function () {
+    return this.getTypedRuleContext(Time_valueContext, 0);
 };
 
-Constant_valueContext.prototype.string_value = function() {
-    return this.getTypedRuleContext(String_valueContext,0);
+Constant_valueContext.prototype.string_value = function () {
+    return this.getTypedRuleContext(String_valueContext, 0);
 };
 
-Constant_valueContext.prototype.enterRule = function(listener) {
-    if(listener instanceof SiddhiQLListener ) {
+Constant_valueContext.prototype.enterRule = function (listener) {
+    if (listener instanceof SiddhiQLListener) {
         listener.enterConstant_value(this);
-	}
+    }
 };
 
-Constant_valueContext.prototype.exitRule = function(listener) {
-    if(listener instanceof SiddhiQLListener ) {
+Constant_valueContext.prototype.exitRule = function (listener) {
+    if (listener instanceof SiddhiQLListener) {
         listener.exitConstant_value(this);
-	}
+    }
 };
-
-
 
 
 SiddhiQLParser.Constant_valueContext = Constant_valueContext;
 
-SiddhiQLParser.prototype.constant_value = function() {
+SiddhiQLParser.prototype.constant_value = function () {
 
     var localctx = new Constant_valueContext(this, this._ctx, this.state);
     this.enterRule(localctx, 236, SiddhiQLParser.RULE_constant_value);
     try {
         this.state = 1537;
-        var la_ = this._interp.adaptivePredict(this._input,184,this._ctx);
-        switch(la_) {
-        case 1:
-            this.enterOuterAlt(localctx, 1);
-            this.state = 1530;
-            this.bool_value();
-            break;
+        var la_ = this._interp.adaptivePredict(this._input, 184, this._ctx);
+        switch (la_) {
+            case 1:
+                this.enterOuterAlt(localctx, 1);
+                this.state = 1530;
+                this.bool_value();
+                break;
 
-        case 2:
-            this.enterOuterAlt(localctx, 2);
-            this.state = 1531;
-            this.signed_double_value();
-            break;
+            case 2:
+                this.enterOuterAlt(localctx, 2);
+                this.state = 1531;
+                this.signed_double_value();
+                break;
 
-        case 3:
-            this.enterOuterAlt(localctx, 3);
-            this.state = 1532;
-            this.signed_float_value();
-            break;
+            case 3:
+                this.enterOuterAlt(localctx, 3);
+                this.state = 1532;
+                this.signed_float_value();
+                break;
 
-        case 4:
-            this.enterOuterAlt(localctx, 4);
-            this.state = 1533;
-            this.signed_long_value();
-            break;
+            case 4:
+                this.enterOuterAlt(localctx, 4);
+                this.state = 1533;
+                this.signed_long_value();
+                break;
 
-        case 5:
-            this.enterOuterAlt(localctx, 5);
-            this.state = 1534;
-            this.signed_int_value();
-            break;
+            case 5:
+                this.enterOuterAlt(localctx, 5);
+                this.state = 1534;
+                this.signed_int_value();
+                break;
 
-        case 6:
-            this.enterOuterAlt(localctx, 6);
-            this.state = 1535;
-            this.time_value();
-            break;
+            case 6:
+                this.enterOuterAlt(localctx, 6);
+                this.state = 1535;
+                this.time_value();
+                break;
 
-        case 7:
-            this.enterOuterAlt(localctx, 7);
-            this.state = 1536;
-            this.string_value();
-            break;
+            case 7:
+                this.enterOuterAlt(localctx, 7);
+                this.state = 1536;
+                this.string_value();
+                break;
 
         }
     } catch (re) {
-    	if(re instanceof antlr4.error.RecognitionException) {
-	        localctx.exception = re;
-	        this._errHandler.reportError(this, re);
-	        this._errHandler.recover(this, re);
-	    } else {
-	    	throw re;
-	    }
+        if (re instanceof antlr4.error.RecognitionException) {
+            localctx.exception = re;
+            this._errHandler.reportError(this, re);
+            this._errHandler.recover(this, re);
+        } else {
+            throw re;
+        }
     } finally {
         this.exitRule();
     }
@@ -13333,13 +13104,13 @@ SiddhiQLParser.prototype.constant_value = function() {
 };
 
 function IdContext(parser, parent, invokingState) {
-	if(parent===undefined) {
-	    parent = null;
-	}
-	if(invokingState===undefined || invokingState===null) {
-		invokingState = -1;
-	}
-	antlr4.ParserRuleContext.call(this, parent, invokingState);
+    if (parent === undefined) {
+        parent = null;
+    }
+    if (invokingState === undefined || invokingState === null) {
+        invokingState = -1;
+    }
+    antlr4.ParserRuleContext.call(this, parent, invokingState);
     this.parser = parser;
     this.ruleIndex = SiddhiQLParser.RULE_id;
     return this;
@@ -13348,32 +13119,30 @@ function IdContext(parser, parent, invokingState) {
 IdContext.prototype = Object.create(antlr4.ParserRuleContext.prototype);
 IdContext.prototype.constructor = IdContext;
 
-IdContext.prototype.ID_QUOTES = function() {
+IdContext.prototype.ID_QUOTES = function () {
     return this.getToken(SiddhiQLParser.ID_QUOTES, 0);
 };
 
-IdContext.prototype.ID = function() {
+IdContext.prototype.ID = function () {
     return this.getToken(SiddhiQLParser.ID, 0);
 };
 
-IdContext.prototype.enterRule = function(listener) {
-    if(listener instanceof SiddhiQLListener ) {
+IdContext.prototype.enterRule = function (listener) {
+    if (listener instanceof SiddhiQLListener) {
         listener.enterId(this);
-	}
+    }
 };
 
-IdContext.prototype.exitRule = function(listener) {
-    if(listener instanceof SiddhiQLListener ) {
+IdContext.prototype.exitRule = function (listener) {
+    if (listener instanceof SiddhiQLListener) {
         listener.exitId(this);
-	}
+    }
 };
-
-
 
 
 SiddhiQLParser.IdContext = IdContext;
 
-SiddhiQLParser.prototype.id = function() {
+SiddhiQLParser.prototype.id = function () {
 
     var localctx = new IdContext(this, this._ctx, this.state);
     this.enterRule(localctx, 238, SiddhiQLParser.RULE_id);
@@ -13382,20 +13151,20 @@ SiddhiQLParser.prototype.id = function() {
         this.enterOuterAlt(localctx, 1);
         this.state = 1539;
         _la = this._input.LA(1);
-        if(!(_la===SiddhiQLParser.ID_QUOTES || _la===SiddhiQLParser.ID)) {
-        this._errHandler.recoverInline(this);
+        if (!(_la === SiddhiQLParser.ID_QUOTES || _la === SiddhiQLParser.ID)) {
+            this._errHandler.recoverInline(this);
         }
         else {
             this.consume();
         }
     } catch (re) {
-    	if(re instanceof antlr4.error.RecognitionException) {
-	        localctx.exception = re;
-	        this._errHandler.reportError(this, re);
-	        this._errHandler.recover(this, re);
-	    } else {
-	    	throw re;
-	    }
+        if (re instanceof antlr4.error.RecognitionException) {
+            localctx.exception = re;
+            this._errHandler.reportError(this, re);
+            this._errHandler.recover(this, re);
+        } else {
+            throw re;
+        }
     } finally {
         this.exitRule();
     }
@@ -13403,13 +13172,13 @@ SiddhiQLParser.prototype.id = function() {
 };
 
 function KeywordContext(parser, parent, invokingState) {
-	if(parent===undefined) {
-	    parent = null;
-	}
-	if(invokingState===undefined || invokingState===null) {
-		invokingState = -1;
-	}
-	antlr4.ParserRuleContext.call(this, parent, invokingState);
+    if (parent === undefined) {
+        parent = null;
+    }
+    if (invokingState === undefined || invokingState === null) {
+        invokingState = -1;
+    }
+    antlr4.ParserRuleContext.call(this, parent, invokingState);
     this.parser = parser;
     this.ruleIndex = SiddhiQLParser.RULE_keyword;
     return this;
@@ -13418,292 +13187,290 @@ function KeywordContext(parser, parent, invokingState) {
 KeywordContext.prototype = Object.create(antlr4.ParserRuleContext.prototype);
 KeywordContext.prototype.constructor = KeywordContext;
 
-KeywordContext.prototype.APP = function() {
+KeywordContext.prototype.APP = function () {
     return this.getToken(SiddhiQLParser.APP, 0);
 };
 
-KeywordContext.prototype.STREAM = function() {
+KeywordContext.prototype.STREAM = function () {
     return this.getToken(SiddhiQLParser.STREAM, 0);
 };
 
-KeywordContext.prototype.DEFINE = function() {
+KeywordContext.prototype.DEFINE = function () {
     return this.getToken(SiddhiQLParser.DEFINE, 0);
 };
 
-KeywordContext.prototype.TABLE = function() {
+KeywordContext.prototype.TABLE = function () {
     return this.getToken(SiddhiQLParser.TABLE, 0);
 };
 
-KeywordContext.prototype.FROM = function() {
+KeywordContext.prototype.FROM = function () {
     return this.getToken(SiddhiQLParser.FROM, 0);
 };
 
-KeywordContext.prototype.PARTITION = function() {
+KeywordContext.prototype.PARTITION = function () {
     return this.getToken(SiddhiQLParser.PARTITION, 0);
 };
 
-KeywordContext.prototype.WINDOW = function() {
+KeywordContext.prototype.WINDOW = function () {
     return this.getToken(SiddhiQLParser.WINDOW, 0);
 };
 
-KeywordContext.prototype.SELECT = function() {
+KeywordContext.prototype.SELECT = function () {
     return this.getToken(SiddhiQLParser.SELECT, 0);
 };
 
-KeywordContext.prototype.GROUP = function() {
+KeywordContext.prototype.GROUP = function () {
     return this.getToken(SiddhiQLParser.GROUP, 0);
 };
 
-KeywordContext.prototype.BY = function() {
+KeywordContext.prototype.BY = function () {
     return this.getToken(SiddhiQLParser.BY, 0);
 };
 
-KeywordContext.prototype.ORDER = function() {
+KeywordContext.prototype.ORDER = function () {
     return this.getToken(SiddhiQLParser.ORDER, 0);
 };
 
-KeywordContext.prototype.ASC = function() {
+KeywordContext.prototype.ASC = function () {
     return this.getToken(SiddhiQLParser.ASC, 0);
 };
 
-KeywordContext.prototype.DESC = function() {
+KeywordContext.prototype.DESC = function () {
     return this.getToken(SiddhiQLParser.DESC, 0);
 };
 
-KeywordContext.prototype.LIMIT = function() {
+KeywordContext.prototype.LIMIT = function () {
     return this.getToken(SiddhiQLParser.LIMIT, 0);
 };
 
-KeywordContext.prototype.HAVING = function() {
+KeywordContext.prototype.HAVING = function () {
     return this.getToken(SiddhiQLParser.HAVING, 0);
 };
 
-KeywordContext.prototype.INSERT = function() {
+KeywordContext.prototype.INSERT = function () {
     return this.getToken(SiddhiQLParser.INSERT, 0);
 };
 
-KeywordContext.prototype.DELETE = function() {
+KeywordContext.prototype.DELETE = function () {
     return this.getToken(SiddhiQLParser.DELETE, 0);
 };
 
-KeywordContext.prototype.UPDATE = function() {
+KeywordContext.prototype.UPDATE = function () {
     return this.getToken(SiddhiQLParser.UPDATE, 0);
 };
 
-KeywordContext.prototype.RETURN = function() {
+KeywordContext.prototype.RETURN = function () {
     return this.getToken(SiddhiQLParser.RETURN, 0);
 };
 
-KeywordContext.prototype.EVENTS = function() {
+KeywordContext.prototype.EVENTS = function () {
     return this.getToken(SiddhiQLParser.EVENTS, 0);
 };
 
-KeywordContext.prototype.INTO = function() {
+KeywordContext.prototype.INTO = function () {
     return this.getToken(SiddhiQLParser.INTO, 0);
 };
 
-KeywordContext.prototype.OUTPUT = function() {
+KeywordContext.prototype.OUTPUT = function () {
     return this.getToken(SiddhiQLParser.OUTPUT, 0);
 };
 
-KeywordContext.prototype.EXPIRED = function() {
+KeywordContext.prototype.EXPIRED = function () {
     return this.getToken(SiddhiQLParser.EXPIRED, 0);
 };
 
-KeywordContext.prototype.CURRENT = function() {
+KeywordContext.prototype.CURRENT = function () {
     return this.getToken(SiddhiQLParser.CURRENT, 0);
 };
 
-KeywordContext.prototype.SNAPSHOT = function() {
+KeywordContext.prototype.SNAPSHOT = function () {
     return this.getToken(SiddhiQLParser.SNAPSHOT, 0);
 };
 
-KeywordContext.prototype.FOR = function() {
+KeywordContext.prototype.FOR = function () {
     return this.getToken(SiddhiQLParser.FOR, 0);
 };
 
-KeywordContext.prototype.RAW = function() {
+KeywordContext.prototype.RAW = function () {
     return this.getToken(SiddhiQLParser.RAW, 0);
 };
 
-KeywordContext.prototype.OF = function() {
+KeywordContext.prototype.OF = function () {
     return this.getToken(SiddhiQLParser.OF, 0);
 };
 
-KeywordContext.prototype.AS = function() {
+KeywordContext.prototype.AS = function () {
     return this.getToken(SiddhiQLParser.AS, 0);
 };
 
-KeywordContext.prototype.OR = function() {
+KeywordContext.prototype.OR = function () {
     return this.getToken(SiddhiQLParser.OR, 0);
 };
 
-KeywordContext.prototype.AND = function() {
+KeywordContext.prototype.AND = function () {
     return this.getToken(SiddhiQLParser.AND, 0);
 };
 
-KeywordContext.prototype.ON = function() {
+KeywordContext.prototype.ON = function () {
     return this.getToken(SiddhiQLParser.ON, 0);
 };
 
-KeywordContext.prototype.IS = function() {
+KeywordContext.prototype.IS = function () {
     return this.getToken(SiddhiQLParser.IS, 0);
 };
 
-KeywordContext.prototype.NOT = function() {
+KeywordContext.prototype.NOT = function () {
     return this.getToken(SiddhiQLParser.NOT, 0);
 };
 
-KeywordContext.prototype.WITHIN = function() {
+KeywordContext.prototype.WITHIN = function () {
     return this.getToken(SiddhiQLParser.WITHIN, 0);
 };
 
-KeywordContext.prototype.WITH = function() {
+KeywordContext.prototype.WITH = function () {
     return this.getToken(SiddhiQLParser.WITH, 0);
 };
 
-KeywordContext.prototype.BEGIN = function() {
+KeywordContext.prototype.BEGIN = function () {
     return this.getToken(SiddhiQLParser.BEGIN, 0);
 };
 
-KeywordContext.prototype.END = function() {
+KeywordContext.prototype.END = function () {
     return this.getToken(SiddhiQLParser.END, 0);
 };
 
-KeywordContext.prototype.NULL = function() {
+KeywordContext.prototype.NULL = function () {
     return this.getToken(SiddhiQLParser.NULL, 0);
 };
 
-KeywordContext.prototype.EVERY = function() {
+KeywordContext.prototype.EVERY = function () {
     return this.getToken(SiddhiQLParser.EVERY, 0);
 };
 
-KeywordContext.prototype.LAST = function() {
+KeywordContext.prototype.LAST = function () {
     return this.getToken(SiddhiQLParser.LAST, 0);
 };
 
-KeywordContext.prototype.ALL = function() {
+KeywordContext.prototype.ALL = function () {
     return this.getToken(SiddhiQLParser.ALL, 0);
 };
 
-KeywordContext.prototype.FIRST = function() {
+KeywordContext.prototype.FIRST = function () {
     return this.getToken(SiddhiQLParser.FIRST, 0);
 };
 
-KeywordContext.prototype.JOIN = function() {
+KeywordContext.prototype.JOIN = function () {
     return this.getToken(SiddhiQLParser.JOIN, 0);
 };
 
-KeywordContext.prototype.INNER = function() {
+KeywordContext.prototype.INNER = function () {
     return this.getToken(SiddhiQLParser.INNER, 0);
 };
 
-KeywordContext.prototype.OUTER = function() {
+KeywordContext.prototype.OUTER = function () {
     return this.getToken(SiddhiQLParser.OUTER, 0);
 };
 
-KeywordContext.prototype.RIGHT = function() {
+KeywordContext.prototype.RIGHT = function () {
     return this.getToken(SiddhiQLParser.RIGHT, 0);
 };
 
-KeywordContext.prototype.LEFT = function() {
+KeywordContext.prototype.LEFT = function () {
     return this.getToken(SiddhiQLParser.LEFT, 0);
 };
 
-KeywordContext.prototype.FULL = function() {
+KeywordContext.prototype.FULL = function () {
     return this.getToken(SiddhiQLParser.FULL, 0);
 };
 
-KeywordContext.prototype.UNIDIRECTIONAL = function() {
+KeywordContext.prototype.UNIDIRECTIONAL = function () {
     return this.getToken(SiddhiQLParser.UNIDIRECTIONAL, 0);
 };
 
-KeywordContext.prototype.YEARS = function() {
+KeywordContext.prototype.YEARS = function () {
     return this.getToken(SiddhiQLParser.YEARS, 0);
 };
 
-KeywordContext.prototype.MONTHS = function() {
+KeywordContext.prototype.MONTHS = function () {
     return this.getToken(SiddhiQLParser.MONTHS, 0);
 };
 
-KeywordContext.prototype.WEEKS = function() {
+KeywordContext.prototype.WEEKS = function () {
     return this.getToken(SiddhiQLParser.WEEKS, 0);
 };
 
-KeywordContext.prototype.DAYS = function() {
+KeywordContext.prototype.DAYS = function () {
     return this.getToken(SiddhiQLParser.DAYS, 0);
 };
 
-KeywordContext.prototype.HOURS = function() {
+KeywordContext.prototype.HOURS = function () {
     return this.getToken(SiddhiQLParser.HOURS, 0);
 };
 
-KeywordContext.prototype.MINUTES = function() {
+KeywordContext.prototype.MINUTES = function () {
     return this.getToken(SiddhiQLParser.MINUTES, 0);
 };
 
-KeywordContext.prototype.SECONDS = function() {
+KeywordContext.prototype.SECONDS = function () {
     return this.getToken(SiddhiQLParser.SECONDS, 0);
 };
 
-KeywordContext.prototype.MILLISECONDS = function() {
+KeywordContext.prototype.MILLISECONDS = function () {
     return this.getToken(SiddhiQLParser.MILLISECONDS, 0);
 };
 
-KeywordContext.prototype.FALSE = function() {
+KeywordContext.prototype.FALSE = function () {
     return this.getToken(SiddhiQLParser.FALSE, 0);
 };
 
-KeywordContext.prototype.TRUE = function() {
+KeywordContext.prototype.TRUE = function () {
     return this.getToken(SiddhiQLParser.TRUE, 0);
 };
 
-KeywordContext.prototype.STRING = function() {
+KeywordContext.prototype.STRING = function () {
     return this.getToken(SiddhiQLParser.STRING, 0);
 };
 
-KeywordContext.prototype.INT = function() {
+KeywordContext.prototype.INT = function () {
     return this.getToken(SiddhiQLParser.INT, 0);
 };
 
-KeywordContext.prototype.LONG = function() {
+KeywordContext.prototype.LONG = function () {
     return this.getToken(SiddhiQLParser.LONG, 0);
 };
 
-KeywordContext.prototype.FLOAT = function() {
+KeywordContext.prototype.FLOAT = function () {
     return this.getToken(SiddhiQLParser.FLOAT, 0);
 };
 
-KeywordContext.prototype.DOUBLE = function() {
+KeywordContext.prototype.DOUBLE = function () {
     return this.getToken(SiddhiQLParser.DOUBLE, 0);
 };
 
-KeywordContext.prototype.BOOL = function() {
+KeywordContext.prototype.BOOL = function () {
     return this.getToken(SiddhiQLParser.BOOL, 0);
 };
 
-KeywordContext.prototype.OBJECT = function() {
+KeywordContext.prototype.OBJECT = function () {
     return this.getToken(SiddhiQLParser.OBJECT, 0);
 };
 
-KeywordContext.prototype.enterRule = function(listener) {
-    if(listener instanceof SiddhiQLListener ) {
+KeywordContext.prototype.enterRule = function (listener) {
+    if (listener instanceof SiddhiQLListener) {
         listener.enterKeyword(this);
-	}
+    }
 };
 
-KeywordContext.prototype.exitRule = function(listener) {
-    if(listener instanceof SiddhiQLListener ) {
+KeywordContext.prototype.exitRule = function (listener) {
+    if (listener instanceof SiddhiQLListener) {
         listener.exitKeyword(this);
-	}
+    }
 };
-
-
 
 
 SiddhiQLParser.KeywordContext = KeywordContext;
 
-SiddhiQLParser.prototype.keyword = function() {
+SiddhiQLParser.prototype.keyword = function () {
 
     var localctx = new KeywordContext(this, this._ctx, this.state);
     this.enterRule(localctx, 240, SiddhiQLParser.RULE_keyword);
@@ -13712,20 +13479,20 @@ SiddhiQLParser.prototype.keyword = function() {
         this.enterOuterAlt(localctx, 1);
         this.state = 1541;
         _la = this._input.LA(1);
-        if(!(((((_la - 30)) & ~0x1f) == 0 && ((1 << (_la - 30)) & ((1 << (SiddhiQLParser.STREAM - 30)) | (1 << (SiddhiQLParser.DEFINE - 30)) | (1 << (SiddhiQLParser.TABLE - 30)) | (1 << (SiddhiQLParser.APP - 30)) | (1 << (SiddhiQLParser.FROM - 30)) | (1 << (SiddhiQLParser.PARTITION - 30)) | (1 << (SiddhiQLParser.WINDOW - 30)) | (1 << (SiddhiQLParser.SELECT - 30)) | (1 << (SiddhiQLParser.GROUP - 30)) | (1 << (SiddhiQLParser.BY - 30)) | (1 << (SiddhiQLParser.ORDER - 30)) | (1 << (SiddhiQLParser.LIMIT - 30)) | (1 << (SiddhiQLParser.ASC - 30)) | (1 << (SiddhiQLParser.DESC - 30)) | (1 << (SiddhiQLParser.HAVING - 30)) | (1 << (SiddhiQLParser.INSERT - 30)) | (1 << (SiddhiQLParser.DELETE - 30)) | (1 << (SiddhiQLParser.UPDATE - 30)) | (1 << (SiddhiQLParser.RETURN - 30)) | (1 << (SiddhiQLParser.EVENTS - 30)) | (1 << (SiddhiQLParser.INTO - 30)) | (1 << (SiddhiQLParser.OUTPUT - 30)) | (1 << (SiddhiQLParser.EXPIRED - 30)) | (1 << (SiddhiQLParser.CURRENT - 30)) | (1 << (SiddhiQLParser.SNAPSHOT - 30)) | (1 << (SiddhiQLParser.FOR - 30)) | (1 << (SiddhiQLParser.RAW - 30)) | (1 << (SiddhiQLParser.OF - 30)))) !== 0) || ((((_la - 62)) & ~0x1f) == 0 && ((1 << (_la - 62)) & ((1 << (SiddhiQLParser.AS - 62)) | (1 << (SiddhiQLParser.OR - 62)) | (1 << (SiddhiQLParser.AND - 62)) | (1 << (SiddhiQLParser.ON - 62)) | (1 << (SiddhiQLParser.IS - 62)) | (1 << (SiddhiQLParser.NOT - 62)) | (1 << (SiddhiQLParser.WITHIN - 62)) | (1 << (SiddhiQLParser.WITH - 62)) | (1 << (SiddhiQLParser.BEGIN - 62)) | (1 << (SiddhiQLParser.END - 62)) | (1 << (SiddhiQLParser.NULL - 62)) | (1 << (SiddhiQLParser.EVERY - 62)) | (1 << (SiddhiQLParser.LAST - 62)) | (1 << (SiddhiQLParser.ALL - 62)) | (1 << (SiddhiQLParser.FIRST - 62)) | (1 << (SiddhiQLParser.JOIN - 62)) | (1 << (SiddhiQLParser.INNER - 62)) | (1 << (SiddhiQLParser.OUTER - 62)) | (1 << (SiddhiQLParser.RIGHT - 62)) | (1 << (SiddhiQLParser.LEFT - 62)) | (1 << (SiddhiQLParser.FULL - 62)) | (1 << (SiddhiQLParser.UNIDIRECTIONAL - 62)) | (1 << (SiddhiQLParser.YEARS - 62)) | (1 << (SiddhiQLParser.MONTHS - 62)) | (1 << (SiddhiQLParser.WEEKS - 62)) | (1 << (SiddhiQLParser.DAYS - 62)) | (1 << (SiddhiQLParser.HOURS - 62)) | (1 << (SiddhiQLParser.MINUTES - 62)) | (1 << (SiddhiQLParser.SECONDS - 62)) | (1 << (SiddhiQLParser.MILLISECONDS - 62)))) !== 0) || ((((_la - 94)) & ~0x1f) == 0 && ((1 << (_la - 94)) & ((1 << (SiddhiQLParser.FALSE - 94)) | (1 << (SiddhiQLParser.TRUE - 94)) | (1 << (SiddhiQLParser.STRING - 94)) | (1 << (SiddhiQLParser.INT - 94)) | (1 << (SiddhiQLParser.LONG - 94)) | (1 << (SiddhiQLParser.FLOAT - 94)) | (1 << (SiddhiQLParser.DOUBLE - 94)) | (1 << (SiddhiQLParser.BOOL - 94)) | (1 << (SiddhiQLParser.OBJECT - 94)))) !== 0))) {
-        this._errHandler.recoverInline(this);
+        if (!(((((_la - 30)) & ~0x1f) == 0 && ((1 << (_la - 30)) & ((1 << (SiddhiQLParser.STREAM - 30)) | (1 << (SiddhiQLParser.DEFINE - 30)) | (1 << (SiddhiQLParser.TABLE - 30)) | (1 << (SiddhiQLParser.APP - 30)) | (1 << (SiddhiQLParser.FROM - 30)) | (1 << (SiddhiQLParser.PARTITION - 30)) | (1 << (SiddhiQLParser.WINDOW - 30)) | (1 << (SiddhiQLParser.SELECT - 30)) | (1 << (SiddhiQLParser.GROUP - 30)) | (1 << (SiddhiQLParser.BY - 30)) | (1 << (SiddhiQLParser.ORDER - 30)) | (1 << (SiddhiQLParser.LIMIT - 30)) | (1 << (SiddhiQLParser.ASC - 30)) | (1 << (SiddhiQLParser.DESC - 30)) | (1 << (SiddhiQLParser.HAVING - 30)) | (1 << (SiddhiQLParser.INSERT - 30)) | (1 << (SiddhiQLParser.DELETE - 30)) | (1 << (SiddhiQLParser.UPDATE - 30)) | (1 << (SiddhiQLParser.RETURN - 30)) | (1 << (SiddhiQLParser.EVENTS - 30)) | (1 << (SiddhiQLParser.INTO - 30)) | (1 << (SiddhiQLParser.OUTPUT - 30)) | (1 << (SiddhiQLParser.EXPIRED - 30)) | (1 << (SiddhiQLParser.CURRENT - 30)) | (1 << (SiddhiQLParser.SNAPSHOT - 30)) | (1 << (SiddhiQLParser.FOR - 30)) | (1 << (SiddhiQLParser.RAW - 30)) | (1 << (SiddhiQLParser.OF - 30)))) !== 0) || ((((_la - 62)) & ~0x1f) == 0 && ((1 << (_la - 62)) & ((1 << (SiddhiQLParser.AS - 62)) | (1 << (SiddhiQLParser.OR - 62)) | (1 << (SiddhiQLParser.AND - 62)) | (1 << (SiddhiQLParser.ON - 62)) | (1 << (SiddhiQLParser.IS - 62)) | (1 << (SiddhiQLParser.NOT - 62)) | (1 << (SiddhiQLParser.WITHIN - 62)) | (1 << (SiddhiQLParser.WITH - 62)) | (1 << (SiddhiQLParser.BEGIN - 62)) | (1 << (SiddhiQLParser.END - 62)) | (1 << (SiddhiQLParser.NULL - 62)) | (1 << (SiddhiQLParser.EVERY - 62)) | (1 << (SiddhiQLParser.LAST - 62)) | (1 << (SiddhiQLParser.ALL - 62)) | (1 << (SiddhiQLParser.FIRST - 62)) | (1 << (SiddhiQLParser.JOIN - 62)) | (1 << (SiddhiQLParser.INNER - 62)) | (1 << (SiddhiQLParser.OUTER - 62)) | (1 << (SiddhiQLParser.RIGHT - 62)) | (1 << (SiddhiQLParser.LEFT - 62)) | (1 << (SiddhiQLParser.FULL - 62)) | (1 << (SiddhiQLParser.UNIDIRECTIONAL - 62)) | (1 << (SiddhiQLParser.YEARS - 62)) | (1 << (SiddhiQLParser.MONTHS - 62)) | (1 << (SiddhiQLParser.WEEKS - 62)) | (1 << (SiddhiQLParser.DAYS - 62)) | (1 << (SiddhiQLParser.HOURS - 62)) | (1 << (SiddhiQLParser.MINUTES - 62)) | (1 << (SiddhiQLParser.SECONDS - 62)) | (1 << (SiddhiQLParser.MILLISECONDS - 62)))) !== 0) || ((((_la - 94)) & ~0x1f) == 0 && ((1 << (_la - 94)) & ((1 << (SiddhiQLParser.FALSE - 94)) | (1 << (SiddhiQLParser.TRUE - 94)) | (1 << (SiddhiQLParser.STRING - 94)) | (1 << (SiddhiQLParser.INT - 94)) | (1 << (SiddhiQLParser.LONG - 94)) | (1 << (SiddhiQLParser.FLOAT - 94)) | (1 << (SiddhiQLParser.DOUBLE - 94)) | (1 << (SiddhiQLParser.BOOL - 94)) | (1 << (SiddhiQLParser.OBJECT - 94)))) !== 0))) {
+            this._errHandler.recoverInline(this);
         }
         else {
             this.consume();
         }
     } catch (re) {
-    	if(re instanceof antlr4.error.RecognitionException) {
-	        localctx.exception = re;
-	        this._errHandler.reportError(this, re);
-	        this._errHandler.recover(this, re);
-	    } else {
-	    	throw re;
-	    }
+        if (re instanceof antlr4.error.RecognitionException) {
+            localctx.exception = re;
+            this._errHandler.reportError(this, re);
+            this._errHandler.recover(this, re);
+        } else {
+            throw re;
+        }
     } finally {
         this.exitRule();
     }
@@ -13733,13 +13500,13 @@ SiddhiQLParser.prototype.keyword = function() {
 };
 
 function Time_valueContext(parser, parent, invokingState) {
-	if(parent===undefined) {
-	    parent = null;
-	}
-	if(invokingState===undefined || invokingState===null) {
-		invokingState = -1;
-	}
-	antlr4.ParserRuleContext.call(this, parent, invokingState);
+    if (parent === undefined) {
+        parent = null;
+    }
+    if (invokingState === undefined || invokingState === null) {
+        invokingState = -1;
+    }
+    antlr4.ParserRuleContext.call(this, parent, invokingState);
     this.parser = parser;
     this.ruleIndex = SiddhiQLParser.RULE_time_value;
     return this;
@@ -13748,316 +13515,314 @@ function Time_valueContext(parser, parent, invokingState) {
 Time_valueContext.prototype = Object.create(antlr4.ParserRuleContext.prototype);
 Time_valueContext.prototype.constructor = Time_valueContext;
 
-Time_valueContext.prototype.year_value = function() {
-    return this.getTypedRuleContext(Year_valueContext,0);
+Time_valueContext.prototype.year_value = function () {
+    return this.getTypedRuleContext(Year_valueContext, 0);
 };
 
-Time_valueContext.prototype.month_value = function() {
-    return this.getTypedRuleContext(Month_valueContext,0);
+Time_valueContext.prototype.month_value = function () {
+    return this.getTypedRuleContext(Month_valueContext, 0);
 };
 
-Time_valueContext.prototype.week_value = function() {
-    return this.getTypedRuleContext(Week_valueContext,0);
+Time_valueContext.prototype.week_value = function () {
+    return this.getTypedRuleContext(Week_valueContext, 0);
 };
 
-Time_valueContext.prototype.day_value = function() {
-    return this.getTypedRuleContext(Day_valueContext,0);
+Time_valueContext.prototype.day_value = function () {
+    return this.getTypedRuleContext(Day_valueContext, 0);
 };
 
-Time_valueContext.prototype.hour_value = function() {
-    return this.getTypedRuleContext(Hour_valueContext,0);
+Time_valueContext.prototype.hour_value = function () {
+    return this.getTypedRuleContext(Hour_valueContext, 0);
 };
 
-Time_valueContext.prototype.minute_value = function() {
-    return this.getTypedRuleContext(Minute_valueContext,0);
+Time_valueContext.prototype.minute_value = function () {
+    return this.getTypedRuleContext(Minute_valueContext, 0);
 };
 
-Time_valueContext.prototype.second_value = function() {
-    return this.getTypedRuleContext(Second_valueContext,0);
+Time_valueContext.prototype.second_value = function () {
+    return this.getTypedRuleContext(Second_valueContext, 0);
 };
 
-Time_valueContext.prototype.millisecond_value = function() {
-    return this.getTypedRuleContext(Millisecond_valueContext,0);
+Time_valueContext.prototype.millisecond_value = function () {
+    return this.getTypedRuleContext(Millisecond_valueContext, 0);
 };
 
-Time_valueContext.prototype.enterRule = function(listener) {
-    if(listener instanceof SiddhiQLListener ) {
+Time_valueContext.prototype.enterRule = function (listener) {
+    if (listener instanceof SiddhiQLListener) {
         listener.enterTime_value(this);
-	}
+    }
 };
 
-Time_valueContext.prototype.exitRule = function(listener) {
-    if(listener instanceof SiddhiQLListener ) {
+Time_valueContext.prototype.exitRule = function (listener) {
+    if (listener instanceof SiddhiQLListener) {
         listener.exitTime_value(this);
-	}
+    }
 };
-
-
 
 
 SiddhiQLParser.Time_valueContext = Time_valueContext;
 
-SiddhiQLParser.prototype.time_value = function() {
+SiddhiQLParser.prototype.time_value = function () {
 
     var localctx = new Time_valueContext(this, this._ctx, this.state);
     this.enterRule(localctx, 242, SiddhiQLParser.RULE_time_value);
     try {
         this.state = 1635;
-        var la_ = this._interp.adaptivePredict(this._input,213,this._ctx);
-        switch(la_) {
-        case 1:
-            this.enterOuterAlt(localctx, 1);
-            this.state = 1543;
-            this.year_value();
-            this.state = 1545;
-            var la_ = this._interp.adaptivePredict(this._input,185,this._ctx);
-            if(la_===1) {
-                this.state = 1544;
+        var la_ = this._interp.adaptivePredict(this._input, 213, this._ctx);
+        switch (la_) {
+            case 1:
+                this.enterOuterAlt(localctx, 1);
+                this.state = 1543;
+                this.year_value();
+                this.state = 1545;
+                var la_ = this._interp.adaptivePredict(this._input, 185, this._ctx);
+                if (la_ === 1) {
+                    this.state = 1544;
+                    this.month_value();
+
+                }
+                this.state = 1548;
+                var la_ = this._interp.adaptivePredict(this._input, 186, this._ctx);
+                if (la_ === 1) {
+                    this.state = 1547;
+                    this.week_value();
+
+                }
+                this.state = 1551;
+                var la_ = this._interp.adaptivePredict(this._input, 187, this._ctx);
+                if (la_ === 1) {
+                    this.state = 1550;
+                    this.day_value();
+
+                }
+                this.state = 1554;
+                var la_ = this._interp.adaptivePredict(this._input, 188, this._ctx);
+                if (la_ === 1) {
+                    this.state = 1553;
+                    this.hour_value();
+
+                }
+                this.state = 1557;
+                var la_ = this._interp.adaptivePredict(this._input, 189, this._ctx);
+                if (la_ === 1) {
+                    this.state = 1556;
+                    this.minute_value();
+
+                }
+                this.state = 1560;
+                var la_ = this._interp.adaptivePredict(this._input, 190, this._ctx);
+                if (la_ === 1) {
+                    this.state = 1559;
+                    this.second_value();
+
+                }
+                this.state = 1563;
+                var la_ = this._interp.adaptivePredict(this._input, 191, this._ctx);
+                if (la_ === 1) {
+                    this.state = 1562;
+                    this.millisecond_value();
+
+                }
+                break;
+
+            case 2:
+                this.enterOuterAlt(localctx, 2);
+                this.state = 1565;
                 this.month_value();
+                this.state = 1567;
+                var la_ = this._interp.adaptivePredict(this._input, 192, this._ctx);
+                if (la_ === 1) {
+                    this.state = 1566;
+                    this.week_value();
 
-            }
-            this.state = 1548;
-            var la_ = this._interp.adaptivePredict(this._input,186,this._ctx);
-            if(la_===1) {
-                this.state = 1547;
+                }
+                this.state = 1570;
+                var la_ = this._interp.adaptivePredict(this._input, 193, this._ctx);
+                if (la_ === 1) {
+                    this.state = 1569;
+                    this.day_value();
+
+                }
+                this.state = 1573;
+                var la_ = this._interp.adaptivePredict(this._input, 194, this._ctx);
+                if (la_ === 1) {
+                    this.state = 1572;
+                    this.hour_value();
+
+                }
+                this.state = 1576;
+                var la_ = this._interp.adaptivePredict(this._input, 195, this._ctx);
+                if (la_ === 1) {
+                    this.state = 1575;
+                    this.minute_value();
+
+                }
+                this.state = 1579;
+                var la_ = this._interp.adaptivePredict(this._input, 196, this._ctx);
+                if (la_ === 1) {
+                    this.state = 1578;
+                    this.second_value();
+
+                }
+                this.state = 1582;
+                var la_ = this._interp.adaptivePredict(this._input, 197, this._ctx);
+                if (la_ === 1) {
+                    this.state = 1581;
+                    this.millisecond_value();
+
+                }
+                break;
+
+            case 3:
+                this.enterOuterAlt(localctx, 3);
+                this.state = 1584;
                 this.week_value();
+                this.state = 1586;
+                var la_ = this._interp.adaptivePredict(this._input, 198, this._ctx);
+                if (la_ === 1) {
+                    this.state = 1585;
+                    this.day_value();
 
-            }
-            this.state = 1551;
-            var la_ = this._interp.adaptivePredict(this._input,187,this._ctx);
-            if(la_===1) {
-                this.state = 1550;
+                }
+                this.state = 1589;
+                var la_ = this._interp.adaptivePredict(this._input, 199, this._ctx);
+                if (la_ === 1) {
+                    this.state = 1588;
+                    this.hour_value();
+
+                }
+                this.state = 1592;
+                var la_ = this._interp.adaptivePredict(this._input, 200, this._ctx);
+                if (la_ === 1) {
+                    this.state = 1591;
+                    this.minute_value();
+
+                }
+                this.state = 1595;
+                var la_ = this._interp.adaptivePredict(this._input, 201, this._ctx);
+                if (la_ === 1) {
+                    this.state = 1594;
+                    this.second_value();
+
+                }
+                this.state = 1598;
+                var la_ = this._interp.adaptivePredict(this._input, 202, this._ctx);
+                if (la_ === 1) {
+                    this.state = 1597;
+                    this.millisecond_value();
+
+                }
+                break;
+
+            case 4:
+                this.enterOuterAlt(localctx, 4);
+                this.state = 1600;
                 this.day_value();
+                this.state = 1602;
+                var la_ = this._interp.adaptivePredict(this._input, 203, this._ctx);
+                if (la_ === 1) {
+                    this.state = 1601;
+                    this.hour_value();
 
-            }
-            this.state = 1554;
-            var la_ = this._interp.adaptivePredict(this._input,188,this._ctx);
-            if(la_===1) {
-                this.state = 1553;
+                }
+                this.state = 1605;
+                var la_ = this._interp.adaptivePredict(this._input, 204, this._ctx);
+                if (la_ === 1) {
+                    this.state = 1604;
+                    this.minute_value();
+
+                }
+                this.state = 1608;
+                var la_ = this._interp.adaptivePredict(this._input, 205, this._ctx);
+                if (la_ === 1) {
+                    this.state = 1607;
+                    this.second_value();
+
+                }
+                this.state = 1611;
+                var la_ = this._interp.adaptivePredict(this._input, 206, this._ctx);
+                if (la_ === 1) {
+                    this.state = 1610;
+                    this.millisecond_value();
+
+                }
+                break;
+
+            case 5:
+                this.enterOuterAlt(localctx, 5);
+                this.state = 1613;
                 this.hour_value();
+                this.state = 1615;
+                var la_ = this._interp.adaptivePredict(this._input, 207, this._ctx);
+                if (la_ === 1) {
+                    this.state = 1614;
+                    this.minute_value();
 
-            }
-            this.state = 1557;
-            var la_ = this._interp.adaptivePredict(this._input,189,this._ctx);
-            if(la_===1) {
-                this.state = 1556;
+                }
+                this.state = 1618;
+                var la_ = this._interp.adaptivePredict(this._input, 208, this._ctx);
+                if (la_ === 1) {
+                    this.state = 1617;
+                    this.second_value();
+
+                }
+                this.state = 1621;
+                var la_ = this._interp.adaptivePredict(this._input, 209, this._ctx);
+                if (la_ === 1) {
+                    this.state = 1620;
+                    this.millisecond_value();
+
+                }
+                break;
+
+            case 6:
+                this.enterOuterAlt(localctx, 6);
+                this.state = 1623;
                 this.minute_value();
+                this.state = 1625;
+                var la_ = this._interp.adaptivePredict(this._input, 210, this._ctx);
+                if (la_ === 1) {
+                    this.state = 1624;
+                    this.second_value();
 
-            }
-            this.state = 1560;
-            var la_ = this._interp.adaptivePredict(this._input,190,this._ctx);
-            if(la_===1) {
-                this.state = 1559;
+                }
+                this.state = 1628;
+                var la_ = this._interp.adaptivePredict(this._input, 211, this._ctx);
+                if (la_ === 1) {
+                    this.state = 1627;
+                    this.millisecond_value();
+
+                }
+                break;
+
+            case 7:
+                this.enterOuterAlt(localctx, 7);
+                this.state = 1630;
                 this.second_value();
+                this.state = 1632;
+                var la_ = this._interp.adaptivePredict(this._input, 212, this._ctx);
+                if (la_ === 1) {
+                    this.state = 1631;
+                    this.millisecond_value();
 
-            }
-            this.state = 1563;
-            var la_ = this._interp.adaptivePredict(this._input,191,this._ctx);
-            if(la_===1) {
-                this.state = 1562;
+                }
+                break;
+
+            case 8:
+                this.enterOuterAlt(localctx, 8);
+                this.state = 1634;
                 this.millisecond_value();
-
-            }
-            break;
-
-        case 2:
-            this.enterOuterAlt(localctx, 2);
-            this.state = 1565;
-            this.month_value();
-            this.state = 1567;
-            var la_ = this._interp.adaptivePredict(this._input,192,this._ctx);
-            if(la_===1) {
-                this.state = 1566;
-                this.week_value();
-
-            }
-            this.state = 1570;
-            var la_ = this._interp.adaptivePredict(this._input,193,this._ctx);
-            if(la_===1) {
-                this.state = 1569;
-                this.day_value();
-
-            }
-            this.state = 1573;
-            var la_ = this._interp.adaptivePredict(this._input,194,this._ctx);
-            if(la_===1) {
-                this.state = 1572;
-                this.hour_value();
-
-            }
-            this.state = 1576;
-            var la_ = this._interp.adaptivePredict(this._input,195,this._ctx);
-            if(la_===1) {
-                this.state = 1575;
-                this.minute_value();
-
-            }
-            this.state = 1579;
-            var la_ = this._interp.adaptivePredict(this._input,196,this._ctx);
-            if(la_===1) {
-                this.state = 1578;
-                this.second_value();
-
-            }
-            this.state = 1582;
-            var la_ = this._interp.adaptivePredict(this._input,197,this._ctx);
-            if(la_===1) {
-                this.state = 1581;
-                this.millisecond_value();
-
-            }
-            break;
-
-        case 3:
-            this.enterOuterAlt(localctx, 3);
-            this.state = 1584;
-            this.week_value();
-            this.state = 1586;
-            var la_ = this._interp.adaptivePredict(this._input,198,this._ctx);
-            if(la_===1) {
-                this.state = 1585;
-                this.day_value();
-
-            }
-            this.state = 1589;
-            var la_ = this._interp.adaptivePredict(this._input,199,this._ctx);
-            if(la_===1) {
-                this.state = 1588;
-                this.hour_value();
-
-            }
-            this.state = 1592;
-            var la_ = this._interp.adaptivePredict(this._input,200,this._ctx);
-            if(la_===1) {
-                this.state = 1591;
-                this.minute_value();
-
-            }
-            this.state = 1595;
-            var la_ = this._interp.adaptivePredict(this._input,201,this._ctx);
-            if(la_===1) {
-                this.state = 1594;
-                this.second_value();
-
-            }
-            this.state = 1598;
-            var la_ = this._interp.adaptivePredict(this._input,202,this._ctx);
-            if(la_===1) {
-                this.state = 1597;
-                this.millisecond_value();
-
-            }
-            break;
-
-        case 4:
-            this.enterOuterAlt(localctx, 4);
-            this.state = 1600;
-            this.day_value();
-            this.state = 1602;
-            var la_ = this._interp.adaptivePredict(this._input,203,this._ctx);
-            if(la_===1) {
-                this.state = 1601;
-                this.hour_value();
-
-            }
-            this.state = 1605;
-            var la_ = this._interp.adaptivePredict(this._input,204,this._ctx);
-            if(la_===1) {
-                this.state = 1604;
-                this.minute_value();
-
-            }
-            this.state = 1608;
-            var la_ = this._interp.adaptivePredict(this._input,205,this._ctx);
-            if(la_===1) {
-                this.state = 1607;
-                this.second_value();
-
-            }
-            this.state = 1611;
-            var la_ = this._interp.adaptivePredict(this._input,206,this._ctx);
-            if(la_===1) {
-                this.state = 1610;
-                this.millisecond_value();
-
-            }
-            break;
-
-        case 5:
-            this.enterOuterAlt(localctx, 5);
-            this.state = 1613;
-            this.hour_value();
-            this.state = 1615;
-            var la_ = this._interp.adaptivePredict(this._input,207,this._ctx);
-            if(la_===1) {
-                this.state = 1614;
-                this.minute_value();
-
-            }
-            this.state = 1618;
-            var la_ = this._interp.adaptivePredict(this._input,208,this._ctx);
-            if(la_===1) {
-                this.state = 1617;
-                this.second_value();
-
-            }
-            this.state = 1621;
-            var la_ = this._interp.adaptivePredict(this._input,209,this._ctx);
-            if(la_===1) {
-                this.state = 1620;
-                this.millisecond_value();
-
-            }
-            break;
-
-        case 6:
-            this.enterOuterAlt(localctx, 6);
-            this.state = 1623;
-            this.minute_value();
-            this.state = 1625;
-            var la_ = this._interp.adaptivePredict(this._input,210,this._ctx);
-            if(la_===1) {
-                this.state = 1624;
-                this.second_value();
-
-            }
-            this.state = 1628;
-            var la_ = this._interp.adaptivePredict(this._input,211,this._ctx);
-            if(la_===1) {
-                this.state = 1627;
-                this.millisecond_value();
-
-            }
-            break;
-
-        case 7:
-            this.enterOuterAlt(localctx, 7);
-            this.state = 1630;
-            this.second_value();
-            this.state = 1632;
-            var la_ = this._interp.adaptivePredict(this._input,212,this._ctx);
-            if(la_===1) {
-                this.state = 1631;
-                this.millisecond_value();
-
-            }
-            break;
-
-        case 8:
-            this.enterOuterAlt(localctx, 8);
-            this.state = 1634;
-            this.millisecond_value();
-            break;
+                break;
 
         }
     } catch (re) {
-    	if(re instanceof antlr4.error.RecognitionException) {
-	        localctx.exception = re;
-	        this._errHandler.reportError(this, re);
-	        this._errHandler.recover(this, re);
-	    } else {
-	    	throw re;
-	    }
+        if (re instanceof antlr4.error.RecognitionException) {
+            localctx.exception = re;
+            this._errHandler.reportError(this, re);
+            this._errHandler.recover(this, re);
+        } else {
+            throw re;
+        }
     } finally {
         this.exitRule();
     }
@@ -14065,13 +13830,13 @@ SiddhiQLParser.prototype.time_value = function() {
 };
 
 function Year_valueContext(parser, parent, invokingState) {
-	if(parent===undefined) {
-	    parent = null;
-	}
-	if(invokingState===undefined || invokingState===null) {
-		invokingState = -1;
-	}
-	antlr4.ParserRuleContext.call(this, parent, invokingState);
+    if (parent === undefined) {
+        parent = null;
+    }
+    if (invokingState === undefined || invokingState === null) {
+        invokingState = -1;
+    }
+    antlr4.ParserRuleContext.call(this, parent, invokingState);
     this.parser = parser;
     this.ruleIndex = SiddhiQLParser.RULE_year_value;
     return this;
@@ -14080,32 +13845,30 @@ function Year_valueContext(parser, parent, invokingState) {
 Year_valueContext.prototype = Object.create(antlr4.ParserRuleContext.prototype);
 Year_valueContext.prototype.constructor = Year_valueContext;
 
-Year_valueContext.prototype.INT_LITERAL = function() {
+Year_valueContext.prototype.INT_LITERAL = function () {
     return this.getToken(SiddhiQLParser.INT_LITERAL, 0);
 };
 
-Year_valueContext.prototype.YEARS = function() {
+Year_valueContext.prototype.YEARS = function () {
     return this.getToken(SiddhiQLParser.YEARS, 0);
 };
 
-Year_valueContext.prototype.enterRule = function(listener) {
-    if(listener instanceof SiddhiQLListener ) {
+Year_valueContext.prototype.enterRule = function (listener) {
+    if (listener instanceof SiddhiQLListener) {
         listener.enterYear_value(this);
-	}
+    }
 };
 
-Year_valueContext.prototype.exitRule = function(listener) {
-    if(listener instanceof SiddhiQLListener ) {
+Year_valueContext.prototype.exitRule = function (listener) {
+    if (listener instanceof SiddhiQLListener) {
         listener.exitYear_value(this);
-	}
+    }
 };
-
-
 
 
 SiddhiQLParser.Year_valueContext = Year_valueContext;
 
-SiddhiQLParser.prototype.year_value = function() {
+SiddhiQLParser.prototype.year_value = function () {
 
     var localctx = new Year_valueContext(this, this._ctx, this.state);
     this.enterRule(localctx, 244, SiddhiQLParser.RULE_year_value);
@@ -14116,13 +13879,13 @@ SiddhiQLParser.prototype.year_value = function() {
         this.state = 1638;
         this.match(SiddhiQLParser.YEARS);
     } catch (re) {
-    	if(re instanceof antlr4.error.RecognitionException) {
-	        localctx.exception = re;
-	        this._errHandler.reportError(this, re);
-	        this._errHandler.recover(this, re);
-	    } else {
-	    	throw re;
-	    }
+        if (re instanceof antlr4.error.RecognitionException) {
+            localctx.exception = re;
+            this._errHandler.reportError(this, re);
+            this._errHandler.recover(this, re);
+        } else {
+            throw re;
+        }
     } finally {
         this.exitRule();
     }
@@ -14130,13 +13893,13 @@ SiddhiQLParser.prototype.year_value = function() {
 };
 
 function Month_valueContext(parser, parent, invokingState) {
-	if(parent===undefined) {
-	    parent = null;
-	}
-	if(invokingState===undefined || invokingState===null) {
-		invokingState = -1;
-	}
-	antlr4.ParserRuleContext.call(this, parent, invokingState);
+    if (parent === undefined) {
+        parent = null;
+    }
+    if (invokingState === undefined || invokingState === null) {
+        invokingState = -1;
+    }
+    antlr4.ParserRuleContext.call(this, parent, invokingState);
     this.parser = parser;
     this.ruleIndex = SiddhiQLParser.RULE_month_value;
     return this;
@@ -14145,32 +13908,30 @@ function Month_valueContext(parser, parent, invokingState) {
 Month_valueContext.prototype = Object.create(antlr4.ParserRuleContext.prototype);
 Month_valueContext.prototype.constructor = Month_valueContext;
 
-Month_valueContext.prototype.INT_LITERAL = function() {
+Month_valueContext.prototype.INT_LITERAL = function () {
     return this.getToken(SiddhiQLParser.INT_LITERAL, 0);
 };
 
-Month_valueContext.prototype.MONTHS = function() {
+Month_valueContext.prototype.MONTHS = function () {
     return this.getToken(SiddhiQLParser.MONTHS, 0);
 };
 
-Month_valueContext.prototype.enterRule = function(listener) {
-    if(listener instanceof SiddhiQLListener ) {
+Month_valueContext.prototype.enterRule = function (listener) {
+    if (listener instanceof SiddhiQLListener) {
         listener.enterMonth_value(this);
-	}
+    }
 };
 
-Month_valueContext.prototype.exitRule = function(listener) {
-    if(listener instanceof SiddhiQLListener ) {
+Month_valueContext.prototype.exitRule = function (listener) {
+    if (listener instanceof SiddhiQLListener) {
         listener.exitMonth_value(this);
-	}
+    }
 };
-
-
 
 
 SiddhiQLParser.Month_valueContext = Month_valueContext;
 
-SiddhiQLParser.prototype.month_value = function() {
+SiddhiQLParser.prototype.month_value = function () {
 
     var localctx = new Month_valueContext(this, this._ctx, this.state);
     this.enterRule(localctx, 246, SiddhiQLParser.RULE_month_value);
@@ -14181,13 +13942,13 @@ SiddhiQLParser.prototype.month_value = function() {
         this.state = 1641;
         this.match(SiddhiQLParser.MONTHS);
     } catch (re) {
-    	if(re instanceof antlr4.error.RecognitionException) {
-	        localctx.exception = re;
-	        this._errHandler.reportError(this, re);
-	        this._errHandler.recover(this, re);
-	    } else {
-	    	throw re;
-	    }
+        if (re instanceof antlr4.error.RecognitionException) {
+            localctx.exception = re;
+            this._errHandler.reportError(this, re);
+            this._errHandler.recover(this, re);
+        } else {
+            throw re;
+        }
     } finally {
         this.exitRule();
     }
@@ -14195,13 +13956,13 @@ SiddhiQLParser.prototype.month_value = function() {
 };
 
 function Week_valueContext(parser, parent, invokingState) {
-	if(parent===undefined) {
-	    parent = null;
-	}
-	if(invokingState===undefined || invokingState===null) {
-		invokingState = -1;
-	}
-	antlr4.ParserRuleContext.call(this, parent, invokingState);
+    if (parent === undefined) {
+        parent = null;
+    }
+    if (invokingState === undefined || invokingState === null) {
+        invokingState = -1;
+    }
+    antlr4.ParserRuleContext.call(this, parent, invokingState);
     this.parser = parser;
     this.ruleIndex = SiddhiQLParser.RULE_week_value;
     return this;
@@ -14210,32 +13971,30 @@ function Week_valueContext(parser, parent, invokingState) {
 Week_valueContext.prototype = Object.create(antlr4.ParserRuleContext.prototype);
 Week_valueContext.prototype.constructor = Week_valueContext;
 
-Week_valueContext.prototype.INT_LITERAL = function() {
+Week_valueContext.prototype.INT_LITERAL = function () {
     return this.getToken(SiddhiQLParser.INT_LITERAL, 0);
 };
 
-Week_valueContext.prototype.WEEKS = function() {
+Week_valueContext.prototype.WEEKS = function () {
     return this.getToken(SiddhiQLParser.WEEKS, 0);
 };
 
-Week_valueContext.prototype.enterRule = function(listener) {
-    if(listener instanceof SiddhiQLListener ) {
+Week_valueContext.prototype.enterRule = function (listener) {
+    if (listener instanceof SiddhiQLListener) {
         listener.enterWeek_value(this);
-	}
+    }
 };
 
-Week_valueContext.prototype.exitRule = function(listener) {
-    if(listener instanceof SiddhiQLListener ) {
+Week_valueContext.prototype.exitRule = function (listener) {
+    if (listener instanceof SiddhiQLListener) {
         listener.exitWeek_value(this);
-	}
+    }
 };
-
-
 
 
 SiddhiQLParser.Week_valueContext = Week_valueContext;
 
-SiddhiQLParser.prototype.week_value = function() {
+SiddhiQLParser.prototype.week_value = function () {
 
     var localctx = new Week_valueContext(this, this._ctx, this.state);
     this.enterRule(localctx, 248, SiddhiQLParser.RULE_week_value);
@@ -14246,13 +14005,13 @@ SiddhiQLParser.prototype.week_value = function() {
         this.state = 1644;
         this.match(SiddhiQLParser.WEEKS);
     } catch (re) {
-    	if(re instanceof antlr4.error.RecognitionException) {
-	        localctx.exception = re;
-	        this._errHandler.reportError(this, re);
-	        this._errHandler.recover(this, re);
-	    } else {
-	    	throw re;
-	    }
+        if (re instanceof antlr4.error.RecognitionException) {
+            localctx.exception = re;
+            this._errHandler.reportError(this, re);
+            this._errHandler.recover(this, re);
+        } else {
+            throw re;
+        }
     } finally {
         this.exitRule();
     }
@@ -14260,13 +14019,13 @@ SiddhiQLParser.prototype.week_value = function() {
 };
 
 function Day_valueContext(parser, parent, invokingState) {
-	if(parent===undefined) {
-	    parent = null;
-	}
-	if(invokingState===undefined || invokingState===null) {
-		invokingState = -1;
-	}
-	antlr4.ParserRuleContext.call(this, parent, invokingState);
+    if (parent === undefined) {
+        parent = null;
+    }
+    if (invokingState === undefined || invokingState === null) {
+        invokingState = -1;
+    }
+    antlr4.ParserRuleContext.call(this, parent, invokingState);
     this.parser = parser;
     this.ruleIndex = SiddhiQLParser.RULE_day_value;
     return this;
@@ -14275,32 +14034,30 @@ function Day_valueContext(parser, parent, invokingState) {
 Day_valueContext.prototype = Object.create(antlr4.ParserRuleContext.prototype);
 Day_valueContext.prototype.constructor = Day_valueContext;
 
-Day_valueContext.prototype.INT_LITERAL = function() {
+Day_valueContext.prototype.INT_LITERAL = function () {
     return this.getToken(SiddhiQLParser.INT_LITERAL, 0);
 };
 
-Day_valueContext.prototype.DAYS = function() {
+Day_valueContext.prototype.DAYS = function () {
     return this.getToken(SiddhiQLParser.DAYS, 0);
 };
 
-Day_valueContext.prototype.enterRule = function(listener) {
-    if(listener instanceof SiddhiQLListener ) {
+Day_valueContext.prototype.enterRule = function (listener) {
+    if (listener instanceof SiddhiQLListener) {
         listener.enterDay_value(this);
-	}
+    }
 };
 
-Day_valueContext.prototype.exitRule = function(listener) {
-    if(listener instanceof SiddhiQLListener ) {
+Day_valueContext.prototype.exitRule = function (listener) {
+    if (listener instanceof SiddhiQLListener) {
         listener.exitDay_value(this);
-	}
+    }
 };
-
-
 
 
 SiddhiQLParser.Day_valueContext = Day_valueContext;
 
-SiddhiQLParser.prototype.day_value = function() {
+SiddhiQLParser.prototype.day_value = function () {
 
     var localctx = new Day_valueContext(this, this._ctx, this.state);
     this.enterRule(localctx, 250, SiddhiQLParser.RULE_day_value);
@@ -14311,13 +14068,13 @@ SiddhiQLParser.prototype.day_value = function() {
         this.state = 1647;
         this.match(SiddhiQLParser.DAYS);
     } catch (re) {
-    	if(re instanceof antlr4.error.RecognitionException) {
-	        localctx.exception = re;
-	        this._errHandler.reportError(this, re);
-	        this._errHandler.recover(this, re);
-	    } else {
-	    	throw re;
-	    }
+        if (re instanceof antlr4.error.RecognitionException) {
+            localctx.exception = re;
+            this._errHandler.reportError(this, re);
+            this._errHandler.recover(this, re);
+        } else {
+            throw re;
+        }
     } finally {
         this.exitRule();
     }
@@ -14325,13 +14082,13 @@ SiddhiQLParser.prototype.day_value = function() {
 };
 
 function Hour_valueContext(parser, parent, invokingState) {
-	if(parent===undefined) {
-	    parent = null;
-	}
-	if(invokingState===undefined || invokingState===null) {
-		invokingState = -1;
-	}
-	antlr4.ParserRuleContext.call(this, parent, invokingState);
+    if (parent === undefined) {
+        parent = null;
+    }
+    if (invokingState === undefined || invokingState === null) {
+        invokingState = -1;
+    }
+    antlr4.ParserRuleContext.call(this, parent, invokingState);
     this.parser = parser;
     this.ruleIndex = SiddhiQLParser.RULE_hour_value;
     return this;
@@ -14340,32 +14097,30 @@ function Hour_valueContext(parser, parent, invokingState) {
 Hour_valueContext.prototype = Object.create(antlr4.ParserRuleContext.prototype);
 Hour_valueContext.prototype.constructor = Hour_valueContext;
 
-Hour_valueContext.prototype.INT_LITERAL = function() {
+Hour_valueContext.prototype.INT_LITERAL = function () {
     return this.getToken(SiddhiQLParser.INT_LITERAL, 0);
 };
 
-Hour_valueContext.prototype.HOURS = function() {
+Hour_valueContext.prototype.HOURS = function () {
     return this.getToken(SiddhiQLParser.HOURS, 0);
 };
 
-Hour_valueContext.prototype.enterRule = function(listener) {
-    if(listener instanceof SiddhiQLListener ) {
+Hour_valueContext.prototype.enterRule = function (listener) {
+    if (listener instanceof SiddhiQLListener) {
         listener.enterHour_value(this);
-	}
+    }
 };
 
-Hour_valueContext.prototype.exitRule = function(listener) {
-    if(listener instanceof SiddhiQLListener ) {
+Hour_valueContext.prototype.exitRule = function (listener) {
+    if (listener instanceof SiddhiQLListener) {
         listener.exitHour_value(this);
-	}
+    }
 };
-
-
 
 
 SiddhiQLParser.Hour_valueContext = Hour_valueContext;
 
-SiddhiQLParser.prototype.hour_value = function() {
+SiddhiQLParser.prototype.hour_value = function () {
 
     var localctx = new Hour_valueContext(this, this._ctx, this.state);
     this.enterRule(localctx, 252, SiddhiQLParser.RULE_hour_value);
@@ -14376,13 +14131,13 @@ SiddhiQLParser.prototype.hour_value = function() {
         this.state = 1650;
         this.match(SiddhiQLParser.HOURS);
     } catch (re) {
-    	if(re instanceof antlr4.error.RecognitionException) {
-	        localctx.exception = re;
-	        this._errHandler.reportError(this, re);
-	        this._errHandler.recover(this, re);
-	    } else {
-	    	throw re;
-	    }
+        if (re instanceof antlr4.error.RecognitionException) {
+            localctx.exception = re;
+            this._errHandler.reportError(this, re);
+            this._errHandler.recover(this, re);
+        } else {
+            throw re;
+        }
     } finally {
         this.exitRule();
     }
@@ -14390,13 +14145,13 @@ SiddhiQLParser.prototype.hour_value = function() {
 };
 
 function Minute_valueContext(parser, parent, invokingState) {
-	if(parent===undefined) {
-	    parent = null;
-	}
-	if(invokingState===undefined || invokingState===null) {
-		invokingState = -1;
-	}
-	antlr4.ParserRuleContext.call(this, parent, invokingState);
+    if (parent === undefined) {
+        parent = null;
+    }
+    if (invokingState === undefined || invokingState === null) {
+        invokingState = -1;
+    }
+    antlr4.ParserRuleContext.call(this, parent, invokingState);
     this.parser = parser;
     this.ruleIndex = SiddhiQLParser.RULE_minute_value;
     return this;
@@ -14405,32 +14160,30 @@ function Minute_valueContext(parser, parent, invokingState) {
 Minute_valueContext.prototype = Object.create(antlr4.ParserRuleContext.prototype);
 Minute_valueContext.prototype.constructor = Minute_valueContext;
 
-Minute_valueContext.prototype.INT_LITERAL = function() {
+Minute_valueContext.prototype.INT_LITERAL = function () {
     return this.getToken(SiddhiQLParser.INT_LITERAL, 0);
 };
 
-Minute_valueContext.prototype.MINUTES = function() {
+Minute_valueContext.prototype.MINUTES = function () {
     return this.getToken(SiddhiQLParser.MINUTES, 0);
 };
 
-Minute_valueContext.prototype.enterRule = function(listener) {
-    if(listener instanceof SiddhiQLListener ) {
+Minute_valueContext.prototype.enterRule = function (listener) {
+    if (listener instanceof SiddhiQLListener) {
         listener.enterMinute_value(this);
-	}
+    }
 };
 
-Minute_valueContext.prototype.exitRule = function(listener) {
-    if(listener instanceof SiddhiQLListener ) {
+Minute_valueContext.prototype.exitRule = function (listener) {
+    if (listener instanceof SiddhiQLListener) {
         listener.exitMinute_value(this);
-	}
+    }
 };
-
-
 
 
 SiddhiQLParser.Minute_valueContext = Minute_valueContext;
 
-SiddhiQLParser.prototype.minute_value = function() {
+SiddhiQLParser.prototype.minute_value = function () {
 
     var localctx = new Minute_valueContext(this, this._ctx, this.state);
     this.enterRule(localctx, 254, SiddhiQLParser.RULE_minute_value);
@@ -14441,13 +14194,13 @@ SiddhiQLParser.prototype.minute_value = function() {
         this.state = 1653;
         this.match(SiddhiQLParser.MINUTES);
     } catch (re) {
-    	if(re instanceof antlr4.error.RecognitionException) {
-	        localctx.exception = re;
-	        this._errHandler.reportError(this, re);
-	        this._errHandler.recover(this, re);
-	    } else {
-	    	throw re;
-	    }
+        if (re instanceof antlr4.error.RecognitionException) {
+            localctx.exception = re;
+            this._errHandler.reportError(this, re);
+            this._errHandler.recover(this, re);
+        } else {
+            throw re;
+        }
     } finally {
         this.exitRule();
     }
@@ -14455,13 +14208,13 @@ SiddhiQLParser.prototype.minute_value = function() {
 };
 
 function Second_valueContext(parser, parent, invokingState) {
-	if(parent===undefined) {
-	    parent = null;
-	}
-	if(invokingState===undefined || invokingState===null) {
-		invokingState = -1;
-	}
-	antlr4.ParserRuleContext.call(this, parent, invokingState);
+    if (parent === undefined) {
+        parent = null;
+    }
+    if (invokingState === undefined || invokingState === null) {
+        invokingState = -1;
+    }
+    antlr4.ParserRuleContext.call(this, parent, invokingState);
     this.parser = parser;
     this.ruleIndex = SiddhiQLParser.RULE_second_value;
     return this;
@@ -14470,32 +14223,30 @@ function Second_valueContext(parser, parent, invokingState) {
 Second_valueContext.prototype = Object.create(antlr4.ParserRuleContext.prototype);
 Second_valueContext.prototype.constructor = Second_valueContext;
 
-Second_valueContext.prototype.INT_LITERAL = function() {
+Second_valueContext.prototype.INT_LITERAL = function () {
     return this.getToken(SiddhiQLParser.INT_LITERAL, 0);
 };
 
-Second_valueContext.prototype.SECONDS = function() {
+Second_valueContext.prototype.SECONDS = function () {
     return this.getToken(SiddhiQLParser.SECONDS, 0);
 };
 
-Second_valueContext.prototype.enterRule = function(listener) {
-    if(listener instanceof SiddhiQLListener ) {
+Second_valueContext.prototype.enterRule = function (listener) {
+    if (listener instanceof SiddhiQLListener) {
         listener.enterSecond_value(this);
-	}
+    }
 };
 
-Second_valueContext.prototype.exitRule = function(listener) {
-    if(listener instanceof SiddhiQLListener ) {
+Second_valueContext.prototype.exitRule = function (listener) {
+    if (listener instanceof SiddhiQLListener) {
         listener.exitSecond_value(this);
-	}
+    }
 };
-
-
 
 
 SiddhiQLParser.Second_valueContext = Second_valueContext;
 
-SiddhiQLParser.prototype.second_value = function() {
+SiddhiQLParser.prototype.second_value = function () {
 
     var localctx = new Second_valueContext(this, this._ctx, this.state);
     this.enterRule(localctx, 256, SiddhiQLParser.RULE_second_value);
@@ -14506,13 +14257,13 @@ SiddhiQLParser.prototype.second_value = function() {
         this.state = 1656;
         this.match(SiddhiQLParser.SECONDS);
     } catch (re) {
-    	if(re instanceof antlr4.error.RecognitionException) {
-	        localctx.exception = re;
-	        this._errHandler.reportError(this, re);
-	        this._errHandler.recover(this, re);
-	    } else {
-	    	throw re;
-	    }
+        if (re instanceof antlr4.error.RecognitionException) {
+            localctx.exception = re;
+            this._errHandler.reportError(this, re);
+            this._errHandler.recover(this, re);
+        } else {
+            throw re;
+        }
     } finally {
         this.exitRule();
     }
@@ -14520,13 +14271,13 @@ SiddhiQLParser.prototype.second_value = function() {
 };
 
 function Millisecond_valueContext(parser, parent, invokingState) {
-	if(parent===undefined) {
-	    parent = null;
-	}
-	if(invokingState===undefined || invokingState===null) {
-		invokingState = -1;
-	}
-	antlr4.ParserRuleContext.call(this, parent, invokingState);
+    if (parent === undefined) {
+        parent = null;
+    }
+    if (invokingState === undefined || invokingState === null) {
+        invokingState = -1;
+    }
+    antlr4.ParserRuleContext.call(this, parent, invokingState);
     this.parser = parser;
     this.ruleIndex = SiddhiQLParser.RULE_millisecond_value;
     return this;
@@ -14535,32 +14286,30 @@ function Millisecond_valueContext(parser, parent, invokingState) {
 Millisecond_valueContext.prototype = Object.create(antlr4.ParserRuleContext.prototype);
 Millisecond_valueContext.prototype.constructor = Millisecond_valueContext;
 
-Millisecond_valueContext.prototype.INT_LITERAL = function() {
+Millisecond_valueContext.prototype.INT_LITERAL = function () {
     return this.getToken(SiddhiQLParser.INT_LITERAL, 0);
 };
 
-Millisecond_valueContext.prototype.MILLISECONDS = function() {
+Millisecond_valueContext.prototype.MILLISECONDS = function () {
     return this.getToken(SiddhiQLParser.MILLISECONDS, 0);
 };
 
-Millisecond_valueContext.prototype.enterRule = function(listener) {
-    if(listener instanceof SiddhiQLListener ) {
+Millisecond_valueContext.prototype.enterRule = function (listener) {
+    if (listener instanceof SiddhiQLListener) {
         listener.enterMillisecond_value(this);
-	}
+    }
 };
 
-Millisecond_valueContext.prototype.exitRule = function(listener) {
-    if(listener instanceof SiddhiQLListener ) {
+Millisecond_valueContext.prototype.exitRule = function (listener) {
+    if (listener instanceof SiddhiQLListener) {
         listener.exitMillisecond_value(this);
-	}
+    }
 };
-
-
 
 
 SiddhiQLParser.Millisecond_valueContext = Millisecond_valueContext;
 
-SiddhiQLParser.prototype.millisecond_value = function() {
+SiddhiQLParser.prototype.millisecond_value = function () {
 
     var localctx = new Millisecond_valueContext(this, this._ctx, this.state);
     this.enterRule(localctx, 258, SiddhiQLParser.RULE_millisecond_value);
@@ -14571,13 +14320,13 @@ SiddhiQLParser.prototype.millisecond_value = function() {
         this.state = 1659;
         this.match(SiddhiQLParser.MILLISECONDS);
     } catch (re) {
-    	if(re instanceof antlr4.error.RecognitionException) {
-	        localctx.exception = re;
-	        this._errHandler.reportError(this, re);
-	        this._errHandler.recover(this, re);
-	    } else {
-	    	throw re;
-	    }
+        if (re instanceof antlr4.error.RecognitionException) {
+            localctx.exception = re;
+            this._errHandler.reportError(this, re);
+            this._errHandler.recover(this, re);
+        } else {
+            throw re;
+        }
     } finally {
         this.exitRule();
     }
@@ -14585,13 +14334,13 @@ SiddhiQLParser.prototype.millisecond_value = function() {
 };
 
 function Signed_double_valueContext(parser, parent, invokingState) {
-	if(parent===undefined) {
-	    parent = null;
-	}
-	if(invokingState===undefined || invokingState===null) {
-		invokingState = -1;
-	}
-	antlr4.ParserRuleContext.call(this, parent, invokingState);
+    if (parent === undefined) {
+        parent = null;
+    }
+    if (invokingState === undefined || invokingState === null) {
+        invokingState = -1;
+    }
+    antlr4.ParserRuleContext.call(this, parent, invokingState);
     this.parser = parser;
     this.ruleIndex = SiddhiQLParser.RULE_signed_double_value;
     return this;
@@ -14600,28 +14349,26 @@ function Signed_double_valueContext(parser, parent, invokingState) {
 Signed_double_valueContext.prototype = Object.create(antlr4.ParserRuleContext.prototype);
 Signed_double_valueContext.prototype.constructor = Signed_double_valueContext;
 
-Signed_double_valueContext.prototype.DOUBLE_LITERAL = function() {
+Signed_double_valueContext.prototype.DOUBLE_LITERAL = function () {
     return this.getToken(SiddhiQLParser.DOUBLE_LITERAL, 0);
 };
 
-Signed_double_valueContext.prototype.enterRule = function(listener) {
-    if(listener instanceof SiddhiQLListener ) {
+Signed_double_valueContext.prototype.enterRule = function (listener) {
+    if (listener instanceof SiddhiQLListener) {
         listener.enterSigned_double_value(this);
-	}
+    }
 };
 
-Signed_double_valueContext.prototype.exitRule = function(listener) {
-    if(listener instanceof SiddhiQLListener ) {
+Signed_double_valueContext.prototype.exitRule = function (listener) {
+    if (listener instanceof SiddhiQLListener) {
         listener.exitSigned_double_value(this);
-	}
+    }
 };
-
-
 
 
 SiddhiQLParser.Signed_double_valueContext = Signed_double_valueContext;
 
-SiddhiQLParser.prototype.signed_double_value = function() {
+SiddhiQLParser.prototype.signed_double_value = function () {
 
     var localctx = new Signed_double_valueContext(this, this._ctx, this.state);
     this.enterRule(localctx, 260, SiddhiQLParser.RULE_signed_double_value);
@@ -14630,11 +14377,11 @@ SiddhiQLParser.prototype.signed_double_value = function() {
         this.enterOuterAlt(localctx, 1);
         this.state = 1662;
         _la = this._input.LA(1);
-        if(_la===SiddhiQLParser.PLUS || _la===SiddhiQLParser.MINUS) {
+        if (_la === SiddhiQLParser.PLUS || _la === SiddhiQLParser.MINUS) {
             this.state = 1661;
             _la = this._input.LA(1);
-            if(!(_la===SiddhiQLParser.PLUS || _la===SiddhiQLParser.MINUS)) {
-            this._errHandler.recoverInline(this);
+            if (!(_la === SiddhiQLParser.PLUS || _la === SiddhiQLParser.MINUS)) {
+                this._errHandler.recoverInline(this);
             }
             else {
                 this.consume();
@@ -14644,13 +14391,13 @@ SiddhiQLParser.prototype.signed_double_value = function() {
         this.state = 1664;
         this.match(SiddhiQLParser.DOUBLE_LITERAL);
     } catch (re) {
-    	if(re instanceof antlr4.error.RecognitionException) {
-	        localctx.exception = re;
-	        this._errHandler.reportError(this, re);
-	        this._errHandler.recover(this, re);
-	    } else {
-	    	throw re;
-	    }
+        if (re instanceof antlr4.error.RecognitionException) {
+            localctx.exception = re;
+            this._errHandler.reportError(this, re);
+            this._errHandler.recover(this, re);
+        } else {
+            throw re;
+        }
     } finally {
         this.exitRule();
     }
@@ -14658,13 +14405,13 @@ SiddhiQLParser.prototype.signed_double_value = function() {
 };
 
 function Signed_long_valueContext(parser, parent, invokingState) {
-	if(parent===undefined) {
-	    parent = null;
-	}
-	if(invokingState===undefined || invokingState===null) {
-		invokingState = -1;
-	}
-	antlr4.ParserRuleContext.call(this, parent, invokingState);
+    if (parent === undefined) {
+        parent = null;
+    }
+    if (invokingState === undefined || invokingState === null) {
+        invokingState = -1;
+    }
+    antlr4.ParserRuleContext.call(this, parent, invokingState);
     this.parser = parser;
     this.ruleIndex = SiddhiQLParser.RULE_signed_long_value;
     return this;
@@ -14673,28 +14420,26 @@ function Signed_long_valueContext(parser, parent, invokingState) {
 Signed_long_valueContext.prototype = Object.create(antlr4.ParserRuleContext.prototype);
 Signed_long_valueContext.prototype.constructor = Signed_long_valueContext;
 
-Signed_long_valueContext.prototype.LONG_LITERAL = function() {
+Signed_long_valueContext.prototype.LONG_LITERAL = function () {
     return this.getToken(SiddhiQLParser.LONG_LITERAL, 0);
 };
 
-Signed_long_valueContext.prototype.enterRule = function(listener) {
-    if(listener instanceof SiddhiQLListener ) {
+Signed_long_valueContext.prototype.enterRule = function (listener) {
+    if (listener instanceof SiddhiQLListener) {
         listener.enterSigned_long_value(this);
-	}
+    }
 };
 
-Signed_long_valueContext.prototype.exitRule = function(listener) {
-    if(listener instanceof SiddhiQLListener ) {
+Signed_long_valueContext.prototype.exitRule = function (listener) {
+    if (listener instanceof SiddhiQLListener) {
         listener.exitSigned_long_value(this);
-	}
+    }
 };
-
-
 
 
 SiddhiQLParser.Signed_long_valueContext = Signed_long_valueContext;
 
-SiddhiQLParser.prototype.signed_long_value = function() {
+SiddhiQLParser.prototype.signed_long_value = function () {
 
     var localctx = new Signed_long_valueContext(this, this._ctx, this.state);
     this.enterRule(localctx, 262, SiddhiQLParser.RULE_signed_long_value);
@@ -14703,11 +14448,11 @@ SiddhiQLParser.prototype.signed_long_value = function() {
         this.enterOuterAlt(localctx, 1);
         this.state = 1667;
         _la = this._input.LA(1);
-        if(_la===SiddhiQLParser.PLUS || _la===SiddhiQLParser.MINUS) {
+        if (_la === SiddhiQLParser.PLUS || _la === SiddhiQLParser.MINUS) {
             this.state = 1666;
             _la = this._input.LA(1);
-            if(!(_la===SiddhiQLParser.PLUS || _la===SiddhiQLParser.MINUS)) {
-            this._errHandler.recoverInline(this);
+            if (!(_la === SiddhiQLParser.PLUS || _la === SiddhiQLParser.MINUS)) {
+                this._errHandler.recoverInline(this);
             }
             else {
                 this.consume();
@@ -14717,13 +14462,13 @@ SiddhiQLParser.prototype.signed_long_value = function() {
         this.state = 1669;
         this.match(SiddhiQLParser.LONG_LITERAL);
     } catch (re) {
-    	if(re instanceof antlr4.error.RecognitionException) {
-	        localctx.exception = re;
-	        this._errHandler.reportError(this, re);
-	        this._errHandler.recover(this, re);
-	    } else {
-	    	throw re;
-	    }
+        if (re instanceof antlr4.error.RecognitionException) {
+            localctx.exception = re;
+            this._errHandler.reportError(this, re);
+            this._errHandler.recover(this, re);
+        } else {
+            throw re;
+        }
     } finally {
         this.exitRule();
     }
@@ -14731,13 +14476,13 @@ SiddhiQLParser.prototype.signed_long_value = function() {
 };
 
 function Signed_float_valueContext(parser, parent, invokingState) {
-	if(parent===undefined) {
-	    parent = null;
-	}
-	if(invokingState===undefined || invokingState===null) {
-		invokingState = -1;
-	}
-	antlr4.ParserRuleContext.call(this, parent, invokingState);
+    if (parent === undefined) {
+        parent = null;
+    }
+    if (invokingState === undefined || invokingState === null) {
+        invokingState = -1;
+    }
+    antlr4.ParserRuleContext.call(this, parent, invokingState);
     this.parser = parser;
     this.ruleIndex = SiddhiQLParser.RULE_signed_float_value;
     return this;
@@ -14746,28 +14491,26 @@ function Signed_float_valueContext(parser, parent, invokingState) {
 Signed_float_valueContext.prototype = Object.create(antlr4.ParserRuleContext.prototype);
 Signed_float_valueContext.prototype.constructor = Signed_float_valueContext;
 
-Signed_float_valueContext.prototype.FLOAT_LITERAL = function() {
+Signed_float_valueContext.prototype.FLOAT_LITERAL = function () {
     return this.getToken(SiddhiQLParser.FLOAT_LITERAL, 0);
 };
 
-Signed_float_valueContext.prototype.enterRule = function(listener) {
-    if(listener instanceof SiddhiQLListener ) {
+Signed_float_valueContext.prototype.enterRule = function (listener) {
+    if (listener instanceof SiddhiQLListener) {
         listener.enterSigned_float_value(this);
-	}
+    }
 };
 
-Signed_float_valueContext.prototype.exitRule = function(listener) {
-    if(listener instanceof SiddhiQLListener ) {
+Signed_float_valueContext.prototype.exitRule = function (listener) {
+    if (listener instanceof SiddhiQLListener) {
         listener.exitSigned_float_value(this);
-	}
+    }
 };
-
-
 
 
 SiddhiQLParser.Signed_float_valueContext = Signed_float_valueContext;
 
-SiddhiQLParser.prototype.signed_float_value = function() {
+SiddhiQLParser.prototype.signed_float_value = function () {
 
     var localctx = new Signed_float_valueContext(this, this._ctx, this.state);
     this.enterRule(localctx, 264, SiddhiQLParser.RULE_signed_float_value);
@@ -14776,11 +14519,11 @@ SiddhiQLParser.prototype.signed_float_value = function() {
         this.enterOuterAlt(localctx, 1);
         this.state = 1672;
         _la = this._input.LA(1);
-        if(_la===SiddhiQLParser.PLUS || _la===SiddhiQLParser.MINUS) {
+        if (_la === SiddhiQLParser.PLUS || _la === SiddhiQLParser.MINUS) {
             this.state = 1671;
             _la = this._input.LA(1);
-            if(!(_la===SiddhiQLParser.PLUS || _la===SiddhiQLParser.MINUS)) {
-            this._errHandler.recoverInline(this);
+            if (!(_la === SiddhiQLParser.PLUS || _la === SiddhiQLParser.MINUS)) {
+                this._errHandler.recoverInline(this);
             }
             else {
                 this.consume();
@@ -14790,13 +14533,13 @@ SiddhiQLParser.prototype.signed_float_value = function() {
         this.state = 1674;
         this.match(SiddhiQLParser.FLOAT_LITERAL);
     } catch (re) {
-    	if(re instanceof antlr4.error.RecognitionException) {
-	        localctx.exception = re;
-	        this._errHandler.reportError(this, re);
-	        this._errHandler.recover(this, re);
-	    } else {
-	    	throw re;
-	    }
+        if (re instanceof antlr4.error.RecognitionException) {
+            localctx.exception = re;
+            this._errHandler.reportError(this, re);
+            this._errHandler.recover(this, re);
+        } else {
+            throw re;
+        }
     } finally {
         this.exitRule();
     }
@@ -14804,13 +14547,13 @@ SiddhiQLParser.prototype.signed_float_value = function() {
 };
 
 function Signed_int_valueContext(parser, parent, invokingState) {
-	if(parent===undefined) {
-	    parent = null;
-	}
-	if(invokingState===undefined || invokingState===null) {
-		invokingState = -1;
-	}
-	antlr4.ParserRuleContext.call(this, parent, invokingState);
+    if (parent === undefined) {
+        parent = null;
+    }
+    if (invokingState === undefined || invokingState === null) {
+        invokingState = -1;
+    }
+    antlr4.ParserRuleContext.call(this, parent, invokingState);
     this.parser = parser;
     this.ruleIndex = SiddhiQLParser.RULE_signed_int_value;
     return this;
@@ -14819,28 +14562,26 @@ function Signed_int_valueContext(parser, parent, invokingState) {
 Signed_int_valueContext.prototype = Object.create(antlr4.ParserRuleContext.prototype);
 Signed_int_valueContext.prototype.constructor = Signed_int_valueContext;
 
-Signed_int_valueContext.prototype.INT_LITERAL = function() {
+Signed_int_valueContext.prototype.INT_LITERAL = function () {
     return this.getToken(SiddhiQLParser.INT_LITERAL, 0);
 };
 
-Signed_int_valueContext.prototype.enterRule = function(listener) {
-    if(listener instanceof SiddhiQLListener ) {
+Signed_int_valueContext.prototype.enterRule = function (listener) {
+    if (listener instanceof SiddhiQLListener) {
         listener.enterSigned_int_value(this);
-	}
+    }
 };
 
-Signed_int_valueContext.prototype.exitRule = function(listener) {
-    if(listener instanceof SiddhiQLListener ) {
+Signed_int_valueContext.prototype.exitRule = function (listener) {
+    if (listener instanceof SiddhiQLListener) {
         listener.exitSigned_int_value(this);
-	}
+    }
 };
-
-
 
 
 SiddhiQLParser.Signed_int_valueContext = Signed_int_valueContext;
 
-SiddhiQLParser.prototype.signed_int_value = function() {
+SiddhiQLParser.prototype.signed_int_value = function () {
 
     var localctx = new Signed_int_valueContext(this, this._ctx, this.state);
     this.enterRule(localctx, 266, SiddhiQLParser.RULE_signed_int_value);
@@ -14849,11 +14590,11 @@ SiddhiQLParser.prototype.signed_int_value = function() {
         this.enterOuterAlt(localctx, 1);
         this.state = 1677;
         _la = this._input.LA(1);
-        if(_la===SiddhiQLParser.PLUS || _la===SiddhiQLParser.MINUS) {
+        if (_la === SiddhiQLParser.PLUS || _la === SiddhiQLParser.MINUS) {
             this.state = 1676;
             _la = this._input.LA(1);
-            if(!(_la===SiddhiQLParser.PLUS || _la===SiddhiQLParser.MINUS)) {
-            this._errHandler.recoverInline(this);
+            if (!(_la === SiddhiQLParser.PLUS || _la === SiddhiQLParser.MINUS)) {
+                this._errHandler.recoverInline(this);
             }
             else {
                 this.consume();
@@ -14863,13 +14604,13 @@ SiddhiQLParser.prototype.signed_int_value = function() {
         this.state = 1679;
         this.match(SiddhiQLParser.INT_LITERAL);
     } catch (re) {
-    	if(re instanceof antlr4.error.RecognitionException) {
-	        localctx.exception = re;
-	        this._errHandler.reportError(this, re);
-	        this._errHandler.recover(this, re);
-	    } else {
-	    	throw re;
-	    }
+        if (re instanceof antlr4.error.RecognitionException) {
+            localctx.exception = re;
+            this._errHandler.reportError(this, re);
+            this._errHandler.recover(this, re);
+        } else {
+            throw re;
+        }
     } finally {
         this.exitRule();
     }
@@ -14877,13 +14618,13 @@ SiddhiQLParser.prototype.signed_int_value = function() {
 };
 
 function Bool_valueContext(parser, parent, invokingState) {
-	if(parent===undefined) {
-	    parent = null;
-	}
-	if(invokingState===undefined || invokingState===null) {
-		invokingState = -1;
-	}
-	antlr4.ParserRuleContext.call(this, parent, invokingState);
+    if (parent === undefined) {
+        parent = null;
+    }
+    if (invokingState === undefined || invokingState === null) {
+        invokingState = -1;
+    }
+    antlr4.ParserRuleContext.call(this, parent, invokingState);
     this.parser = parser;
     this.ruleIndex = SiddhiQLParser.RULE_bool_value;
     return this;
@@ -14892,32 +14633,30 @@ function Bool_valueContext(parser, parent, invokingState) {
 Bool_valueContext.prototype = Object.create(antlr4.ParserRuleContext.prototype);
 Bool_valueContext.prototype.constructor = Bool_valueContext;
 
-Bool_valueContext.prototype.TRUE = function() {
+Bool_valueContext.prototype.TRUE = function () {
     return this.getToken(SiddhiQLParser.TRUE, 0);
 };
 
-Bool_valueContext.prototype.FALSE = function() {
+Bool_valueContext.prototype.FALSE = function () {
     return this.getToken(SiddhiQLParser.FALSE, 0);
 };
 
-Bool_valueContext.prototype.enterRule = function(listener) {
-    if(listener instanceof SiddhiQLListener ) {
+Bool_valueContext.prototype.enterRule = function (listener) {
+    if (listener instanceof SiddhiQLListener) {
         listener.enterBool_value(this);
-	}
+    }
 };
 
-Bool_valueContext.prototype.exitRule = function(listener) {
-    if(listener instanceof SiddhiQLListener ) {
+Bool_valueContext.prototype.exitRule = function (listener) {
+    if (listener instanceof SiddhiQLListener) {
         listener.exitBool_value(this);
-	}
+    }
 };
-
-
 
 
 SiddhiQLParser.Bool_valueContext = Bool_valueContext;
 
-SiddhiQLParser.prototype.bool_value = function() {
+SiddhiQLParser.prototype.bool_value = function () {
 
     var localctx = new Bool_valueContext(this, this._ctx, this.state);
     this.enterRule(localctx, 268, SiddhiQLParser.RULE_bool_value);
@@ -14926,20 +14665,20 @@ SiddhiQLParser.prototype.bool_value = function() {
         this.enterOuterAlt(localctx, 1);
         this.state = 1681;
         _la = this._input.LA(1);
-        if(!(_la===SiddhiQLParser.FALSE || _la===SiddhiQLParser.TRUE)) {
-        this._errHandler.recoverInline(this);
+        if (!(_la === SiddhiQLParser.FALSE || _la === SiddhiQLParser.TRUE)) {
+            this._errHandler.recoverInline(this);
         }
         else {
             this.consume();
         }
     } catch (re) {
-    	if(re instanceof antlr4.error.RecognitionException) {
-	        localctx.exception = re;
-	        this._errHandler.reportError(this, re);
-	        this._errHandler.recover(this, re);
-	    } else {
-	    	throw re;
-	    }
+        if (re instanceof antlr4.error.RecognitionException) {
+            localctx.exception = re;
+            this._errHandler.reportError(this, re);
+            this._errHandler.recover(this, re);
+        } else {
+            throw re;
+        }
     } finally {
         this.exitRule();
     }
@@ -14947,13 +14686,13 @@ SiddhiQLParser.prototype.bool_value = function() {
 };
 
 function String_valueContext(parser, parent, invokingState) {
-	if(parent===undefined) {
-	    parent = null;
-	}
-	if(invokingState===undefined || invokingState===null) {
-		invokingState = -1;
-	}
-	antlr4.ParserRuleContext.call(this, parent, invokingState);
+    if (parent === undefined) {
+        parent = null;
+    }
+    if (invokingState === undefined || invokingState === null) {
+        invokingState = -1;
+    }
+    antlr4.ParserRuleContext.call(this, parent, invokingState);
     this.parser = parser;
     this.ruleIndex = SiddhiQLParser.RULE_string_value;
     return this;
@@ -14962,28 +14701,26 @@ function String_valueContext(parser, parent, invokingState) {
 String_valueContext.prototype = Object.create(antlr4.ParserRuleContext.prototype);
 String_valueContext.prototype.constructor = String_valueContext;
 
-String_valueContext.prototype.STRING_LITERAL = function() {
+String_valueContext.prototype.STRING_LITERAL = function () {
     return this.getToken(SiddhiQLParser.STRING_LITERAL, 0);
 };
 
-String_valueContext.prototype.enterRule = function(listener) {
-    if(listener instanceof SiddhiQLListener ) {
+String_valueContext.prototype.enterRule = function (listener) {
+    if (listener instanceof SiddhiQLListener) {
         listener.enterString_value(this);
-	}
+    }
 };
 
-String_valueContext.prototype.exitRule = function(listener) {
-    if(listener instanceof SiddhiQLListener ) {
+String_valueContext.prototype.exitRule = function (listener) {
+    if (listener instanceof SiddhiQLListener) {
         listener.exitString_value(this);
-	}
+    }
 };
-
-
 
 
 SiddhiQLParser.String_valueContext = String_valueContext;
 
-SiddhiQLParser.prototype.string_value = function() {
+SiddhiQLParser.prototype.string_value = function () {
 
     var localctx = new String_valueContext(this, this._ctx, this.state);
     this.enterRule(localctx, 270, SiddhiQLParser.RULE_string_value);
@@ -14992,13 +14729,13 @@ SiddhiQLParser.prototype.string_value = function() {
         this.state = 1683;
         this.match(SiddhiQLParser.STRING_LITERAL);
     } catch (re) {
-    	if(re instanceof antlr4.error.RecognitionException) {
-	        localctx.exception = re;
-	        this._errHandler.reportError(this, re);
-	        this._errHandler.recover(this, re);
-	    } else {
-	    	throw re;
-	    }
+        if (re instanceof antlr4.error.RecognitionException) {
+            localctx.exception = re;
+            this._errHandler.reportError(this, re);
+            this._errHandler.recover(this, re);
+        } else {
+            throw re;
+        }
     } finally {
         this.exitRule();
     }
@@ -15006,119 +14743,119 @@ SiddhiQLParser.prototype.string_value = function() {
 };
 
 
-SiddhiQLParser.prototype.sempred = function(localctx, ruleIndex, predIndex) {
-	switch(ruleIndex) {
-	case 43:
-			return this.every_pattern_source_chain_sempred(localctx, predIndex);
-	case 44:
-			return this.pattern_source_chain_sempred(localctx, predIndex);
-	case 46:
-			return this.left_absent_pattern_source_sempred(localctx, predIndex);
-	case 47:
-			return this.right_absent_pattern_source_sempred(localctx, predIndex);
-	case 62:
-			return this.left_absent_sequence_source_sempred(localctx, predIndex);
-	case 63:
-			return this.right_absent_sequence_source_sempred(localctx, predIndex);
-	case 64:
-			return this.sequence_source_chain_sempred(localctx, predIndex);
-	case 94:
-			return this.math_operation_sempred(localctx, predIndex);
-    default:
-        throw "No predicate with index:" + ruleIndex;
-   }
+SiddhiQLParser.prototype.sempred = function (localctx, ruleIndex, predIndex) {
+    switch (ruleIndex) {
+        case 43:
+            return this.every_pattern_source_chain_sempred(localctx, predIndex);
+        case 44:
+            return this.pattern_source_chain_sempred(localctx, predIndex);
+        case 46:
+            return this.left_absent_pattern_source_sempred(localctx, predIndex);
+        case 47:
+            return this.right_absent_pattern_source_sempred(localctx, predIndex);
+        case 62:
+            return this.left_absent_sequence_source_sempred(localctx, predIndex);
+        case 63:
+            return this.right_absent_sequence_source_sempred(localctx, predIndex);
+        case 64:
+            return this.sequence_source_chain_sempred(localctx, predIndex);
+        case 94:
+            return this.math_operation_sempred(localctx, predIndex);
+        default:
+            throw "No predicate with index:" + ruleIndex;
+    }
 };
 
-SiddhiQLParser.prototype.every_pattern_source_chain_sempred = function(localctx, predIndex) {
-	switch(predIndex) {
-		case 0:
-			return this.precpred(this._ctx, 3);
-		default:
-			throw "No predicate with index:" + predIndex;
-	}
+SiddhiQLParser.prototype.every_pattern_source_chain_sempred = function (localctx, predIndex) {
+    switch (predIndex) {
+        case 0:
+            return this.precpred(this._ctx, 3);
+        default:
+            throw "No predicate with index:" + predIndex;
+    }
 };
 
-SiddhiQLParser.prototype.pattern_source_chain_sempred = function(localctx, predIndex) {
-	switch(predIndex) {
-		case 1:
-			return this.precpred(this._ctx, 2);
-		default:
-			throw "No predicate with index:" + predIndex;
-	}
+SiddhiQLParser.prototype.pattern_source_chain_sempred = function (localctx, predIndex) {
+    switch (predIndex) {
+        case 1:
+            return this.precpred(this._ctx, 2);
+        default:
+            throw "No predicate with index:" + predIndex;
+    }
 };
 
-SiddhiQLParser.prototype.left_absent_pattern_source_sempred = function(localctx, predIndex) {
-	switch(predIndex) {
-		case 2:
-			return this.precpred(this._ctx, 3);
-		case 3:
-			return this.precpred(this._ctx, 2);
-		default:
-			throw "No predicate with index:" + predIndex;
-	}
+SiddhiQLParser.prototype.left_absent_pattern_source_sempred = function (localctx, predIndex) {
+    switch (predIndex) {
+        case 2:
+            return this.precpred(this._ctx, 3);
+        case 3:
+            return this.precpred(this._ctx, 2);
+        default:
+            throw "No predicate with index:" + predIndex;
+    }
 };
 
-SiddhiQLParser.prototype.right_absent_pattern_source_sempred = function(localctx, predIndex) {
-	switch(predIndex) {
-		case 4:
-			return this.precpred(this._ctx, 3);
-		case 5:
-			return this.precpred(this._ctx, 1);
-		default:
-			throw "No predicate with index:" + predIndex;
-	}
+SiddhiQLParser.prototype.right_absent_pattern_source_sempred = function (localctx, predIndex) {
+    switch (predIndex) {
+        case 4:
+            return this.precpred(this._ctx, 3);
+        case 5:
+            return this.precpred(this._ctx, 1);
+        default:
+            throw "No predicate with index:" + predIndex;
+    }
 };
 
-SiddhiQLParser.prototype.left_absent_sequence_source_sempred = function(localctx, predIndex) {
-	switch(predIndex) {
-		case 6:
-			return this.precpred(this._ctx, 3);
-		case 7:
-			return this.precpred(this._ctx, 2);
-		default:
-			throw "No predicate with index:" + predIndex;
-	}
+SiddhiQLParser.prototype.left_absent_sequence_source_sempred = function (localctx, predIndex) {
+    switch (predIndex) {
+        case 6:
+            return this.precpred(this._ctx, 3);
+        case 7:
+            return this.precpred(this._ctx, 2);
+        default:
+            throw "No predicate with index:" + predIndex;
+    }
 };
 
-SiddhiQLParser.prototype.right_absent_sequence_source_sempred = function(localctx, predIndex) {
-	switch(predIndex) {
-		case 8:
-			return this.precpred(this._ctx, 3);
-		case 9:
-			return this.precpred(this._ctx, 1);
-		default:
-			throw "No predicate with index:" + predIndex;
-	}
+SiddhiQLParser.prototype.right_absent_sequence_source_sempred = function (localctx, predIndex) {
+    switch (predIndex) {
+        case 8:
+            return this.precpred(this._ctx, 3);
+        case 9:
+            return this.precpred(this._ctx, 1);
+        default:
+            throw "No predicate with index:" + predIndex;
+    }
 };
 
-SiddhiQLParser.prototype.sequence_source_chain_sempred = function(localctx, predIndex) {
-	switch(predIndex) {
-		case 10:
-			return this.precpred(this._ctx, 2);
-		default:
-			throw "No predicate with index:" + predIndex;
-	}
+SiddhiQLParser.prototype.sequence_source_chain_sempred = function (localctx, predIndex) {
+    switch (predIndex) {
+        case 10:
+            return this.precpred(this._ctx, 2);
+        default:
+            throw "No predicate with index:" + predIndex;
+    }
 };
 
-SiddhiQLParser.prototype.math_operation_sempred = function(localctx, predIndex) {
-	switch(predIndex) {
-		case 11:
-			return this.precpred(this._ctx, 10);
-		case 12:
-			return this.precpred(this._ctx, 9);
-		case 13:
-			return this.precpred(this._ctx, 8);
-		case 14:
-			return this.precpred(this._ctx, 7);
-		case 15:
-			return this.precpred(this._ctx, 5);
-		case 16:
-			return this.precpred(this._ctx, 4);
-		case 17:
-			return this.precpred(this._ctx, 6);
-		default:
-			throw "No predicate with index:" + predIndex;
-	}
+SiddhiQLParser.prototype.math_operation_sempred = function (localctx, predIndex) {
+    switch (predIndex) {
+        case 11:
+            return this.precpred(this._ctx, 10);
+        case 12:
+            return this.precpred(this._ctx, 9);
+        case 13:
+            return this.precpred(this._ctx, 8);
+        case 14:
+            return this.precpred(this._ctx, 7);
+        case 15:
+            return this.precpred(this._ctx, 5);
+        case 16:
+            return this.precpred(this._ctx, 4);
+        case 17:
+            return this.precpred(this._ctx, 6);
+        default:
+            throw "No predicate with index:" + predIndex;
+    }
 };
 
 

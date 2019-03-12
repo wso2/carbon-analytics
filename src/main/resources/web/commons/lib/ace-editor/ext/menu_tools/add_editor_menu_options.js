@@ -44,66 +44,66 @@
  *  ☭ Hial Atropa!! ☭
  */
 
-define(function(require, exports, module) {
-'use strict';
+define(function (require, exports, module) {
+    'use strict';
 
-/**
- * The menu options property needs to be added to the editor
- *  so that the settings menu can know about options for
- *  selection elements and track which option is selected.
- * @author <a href="mailto:matthewkastor@gmail.com">
- *  Matthew Christopher Kastor-Inare III </a><br />
- *  ☭ Hial Atropa!! ☭
- * @param {ace.Editor} editor An instance of the ace editor.
- */
-module.exports.addEditorMenuOptions = function addEditorMenuOptions (editor) {
-    var modelist = require('../modelist');
-    var themelist = require('../themelist');
-    editor.menuOptions = {
-        setNewLineMode: [{
-            textContent: "unix",
-            value: "unix"
-        }, {
-            textContent: "windows",
-            value: "windows"
-        }, {
-            textContent: "auto",
-            value: "auto"
-        }],
-        setTheme: [],
-        setMode: [],
-        setKeyboardHandler: [{
-            textContent: "ace",
-            value: ""
-        }, {
-            textContent: "vim",
-            value: "ace/keyboard/vim"
-        }, {
-            textContent: "emacs",
-            value: "ace/keyboard/emacs"
-        }, {
-            textContent: "textarea",
-            value: "ace/keyboard/textarea"
-        }, {
-            textContent: "sublime",
-            value: "ace/keyboard/sublime"
-        }]
+    /**
+     * The menu options property needs to be added to the editor
+     *  so that the settings menu can know about options for
+     *  selection elements and track which option is selected.
+     * @author <a href="mailto:matthewkastor@gmail.com">
+     *  Matthew Christopher Kastor-Inare III </a><br />
+     *  ☭ Hial Atropa!! ☭
+     * @param {ace.Editor} editor An instance of the ace editor.
+     */
+    module.exports.addEditorMenuOptions = function addEditorMenuOptions(editor) {
+        var modelist = require('../modelist');
+        var themelist = require('../themelist');
+        editor.menuOptions = {
+            setNewLineMode: [{
+                textContent: "unix",
+                value: "unix"
+            }, {
+                textContent: "windows",
+                value: "windows"
+            }, {
+                textContent: "auto",
+                value: "auto"
+            }],
+            setTheme: [],
+            setMode: [],
+            setKeyboardHandler: [{
+                textContent: "ace",
+                value: ""
+            }, {
+                textContent: "vim",
+                value: "ace/keyboard/vim"
+            }, {
+                textContent: "emacs",
+                value: "ace/keyboard/emacs"
+            }, {
+                textContent: "textarea",
+                value: "ace/keyboard/textarea"
+            }, {
+                textContent: "sublime",
+                value: "ace/keyboard/sublime"
+            }]
+        };
+
+        editor.menuOptions.setTheme = themelist.themes.map(function (theme) {
+            return {
+                textContent: theme.caption,
+                value: theme.theme
+            };
+        });
+
+        editor.menuOptions.setMode = modelist.modes.map(function (mode) {
+            return {
+                textContent: mode.name,
+                value: mode.mode
+            };
+        });
     };
-
-    editor.menuOptions.setTheme = themelist.themes.map(function(theme) {
-        return {
-            textContent: theme.caption,
-            value: theme.theme
-        };
-    });
-
-    editor.menuOptions.setMode = modelist.modes.map(function(mode) {
-        return {
-            textContent: mode.name,
-            value: mode.mode
-        };
-    });
-};
 
 
 });

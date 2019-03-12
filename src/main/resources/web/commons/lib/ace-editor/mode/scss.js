@@ -28,57 +28,57 @@
  *
  * ***** END LICENSE BLOCK ***** */
 
-define(function(require, exports, module) {
-"use strict";
+define(function (require, exports, module) {
+    "use strict";
 
-var oop = require("../lib/oop");
-var TextMode = require("./text").Mode;
-var ScssHighlightRules = require("./scss_highlight_rules").ScssHighlightRules;
-var MatchingBraceOutdent = require("./matching_brace_outdent").MatchingBraceOutdent;
-var CssBehaviour = require("./behaviour/css").CssBehaviour;
-var CStyleFoldMode = require("./folding/cstyle").FoldMode;
+    var oop = require("../lib/oop");
+    var TextMode = require("./text").Mode;
+    var ScssHighlightRules = require("./scss_highlight_rules").ScssHighlightRules;
+    var MatchingBraceOutdent = require("./matching_brace_outdent").MatchingBraceOutdent;
+    var CssBehaviour = require("./behaviour/css").CssBehaviour;
+    var CStyleFoldMode = require("./folding/cstyle").FoldMode;
 
-var Mode = function() {
-    this.HighlightRules = ScssHighlightRules;
-    this.$outdent = new MatchingBraceOutdent();
-    this.$behaviour = new CssBehaviour();
-    this.foldingRules = new CStyleFoldMode();
-};
-oop.inherits(Mode, TextMode);
+    var Mode = function () {
+        this.HighlightRules = ScssHighlightRules;
+        this.$outdent = new MatchingBraceOutdent();
+        this.$behaviour = new CssBehaviour();
+        this.foldingRules = new CStyleFoldMode();
+    };
+    oop.inherits(Mode, TextMode);
 
-(function() {
-   
-    this.lineCommentStart = "//";
-    this.blockComment = {start: "/*", end: "*/"};
+    (function () {
 
-    this.getNextLineIndent = function(state, line, tab) {
-        var indent = this.$getIndent(line);
+        this.lineCommentStart = "//";
+        this.blockComment = {start: "/*", end: "*/"};
 
-        // ignore braces in comments
-        var tokens = this.getTokenizer().getLineTokens(line, state).tokens;
-        if (tokens.length && tokens[tokens.length-1].type == "comment") {
+        this.getNextLineIndent = function (state, line, tab) {
+            var indent = this.$getIndent(line);
+
+            // ignore braces in comments
+            var tokens = this.getTokenizer().getLineTokens(line, state).tokens;
+            if (tokens.length && tokens[tokens.length - 1].type == "comment") {
+                return indent;
+            }
+
+            var match = line.match(/^.*\{\s*$/);
+            if (match) {
+                indent += tab;
+            }
+
             return indent;
-        }
+        };
 
-        var match = line.match(/^.*\{\s*$/);
-        if (match) {
-            indent += tab;
-        }
+        this.checkOutdent = function (state, line, input) {
+            return this.$outdent.checkOutdent(line, input);
+        };
 
-        return indent;
-    };
+        this.autoOutdent = function (state, doc, row) {
+            this.$outdent.autoOutdent(doc, row);
+        };
 
-    this.checkOutdent = function(state, line, input) {
-        return this.$outdent.checkOutdent(line, input);
-    };
+        this.$id = "ace/mode/scss";
+    }).call(Mode.prototype);
 
-    this.autoOutdent = function(state, doc, row) {
-        this.$outdent.autoOutdent(doc, row);
-    };
-
-    this.$id = "ace/mode/scss";
-}).call(Mode.prototype);
-
-exports.Mode = Mode;
+    exports.Mode = Mode;
 
 });

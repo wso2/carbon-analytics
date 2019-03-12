@@ -28,11 +28,11 @@ define(
         var Attribute = function (options) {
             /*
              Data storing structure as follows
-                {
-                    name: ‘’,
-                    type: ‘’
-                }
-            */
+             {
+             name: ‘’,
+             type: ‘’
+             }
+             */
             if (options !== undefined) {
                 this.name = options.name;
                 this.type = (options.type !== undefined) ? (options.type).toUpperCase() : undefined;

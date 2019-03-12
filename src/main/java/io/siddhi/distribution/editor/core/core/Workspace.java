@@ -31,6 +31,7 @@ public interface Workspace {
 
     /**
      * List the roots of the system.
+     *
      * @return array of directories
      * @throws IOException
      */
@@ -38,6 +39,7 @@ public interface Workspace {
 
     /**
      * List the files of a given directory path of the system.
+     *
      * @return array of files
      * @throws IOException
      */
@@ -45,6 +47,7 @@ public interface Workspace {
 
     /**
      * List of directories in the path.
+     *
      * @param path provided path
      * @return array of directories
      * @throws IOException
@@ -53,6 +56,7 @@ public interface Workspace {
 
     /**
      * List of files in the path.
+     *
      * @param path provided path
      * @return array of files
      * @throws IOException
@@ -61,6 +65,7 @@ public interface Workspace {
 
     /**
      * Whether file exist.
+     *
      * @param path provided path
      * @return json object
      * @throws IOException
@@ -69,6 +74,7 @@ public interface Workspace {
 
     /**
      * create file or directory.
+     *
      * @param path provided path
      * @param type type of artifact eg:folder
      * @throws IOException
@@ -77,6 +83,7 @@ public interface Workspace {
 
     /**
      * delete file or directory.
+     *
      * @param path provided path
      * @param type type of artifact eg:folder
      * @throws IOException
@@ -85,6 +92,7 @@ public interface Workspace {
 
     /**
      * Read content.
+     *
      * @param path provided path
      * @return content read
      * @throws IOException
@@ -92,20 +100,20 @@ public interface Workspace {
     JsonObject read(Path path) throws IOException;
 
     /**
-     *
      * @param logger
      * @param timestamp
      * @param level
-     * @param URL
+     * @param url
      * @param message
      * @param layout
      * @throws IOException
      */
-    void log(String logger, String timestamp, String level, String URL, String message, String layout)
+    void log(String logger, String timestamp, String level, String url, String message, String layout)
             throws IOException;
 
     /**
      * List the samples in the given path with descriptions
+     *
      * @param sampleMap provided sample map
      * @return samples with descriptions
      */

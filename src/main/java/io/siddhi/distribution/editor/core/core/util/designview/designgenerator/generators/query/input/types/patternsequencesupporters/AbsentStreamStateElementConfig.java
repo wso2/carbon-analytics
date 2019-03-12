@@ -18,6 +18,9 @@
 
 package io.siddhi.distribution.editor.core.core.util.designview.designgenerator.generators.query.input.types.patternsequencesupporters;
 
+/**
+ * Absent stream state element configuration class.
+ */
 public class AbsentStreamStateElementConfig extends StreamStateElementConfig {
     private String waitingTime;
 

@@ -28,13 +28,13 @@
  *
  * ***** END LICENSE BLOCK ***** */
 
-define(function(require, exports, module) {
+define(function (require, exports, module) {
     var Range = require("../range").Range;
-    
+
     var splitRegex = /[^a-zA-Z_0-9\$\-\u00C0-\u1FFF\u2C00-\uD7FF\w]+/;
 
     function getWordIndex(doc, pos) {
-        var textBefore = doc.getTextRange(Range.fromPoints({row: 0, column:0}, pos));
+        var textBefore = doc.getTextRange(Range.fromPoints({row: 0, column: 0}, pos));
         return textBefore.split(splitRegex).length - 1;
     }
 
@@ -46,10 +46,10 @@ define(function(require, exports, module) {
         var prefixPos = getWordIndex(doc, pos);
         var words = doc.getValue().split(splitRegex);
         var wordScores = Object.create(null);
-        
+
         var currentWord = words[prefixPos];
 
-        words.forEach(function(word, idx) {
+        words.forEach(function (word, idx) {
             if (!word || word === currentWord) return;
 
             var distance = Math.abs(prefixPos - idx);
@@ -63,10 +63,10 @@ define(function(require, exports, module) {
         return wordScores;
     }
 
-    exports.getCompletions = function(editor, session, pos, prefix, callback) {
+    exports.getCompletions = function (editor, session, pos, prefix, callback) {
         var wordScore = wordDistance(session, pos, prefix);
         var wordList = Object.keys(wordScore);
-        callback(null, wordList.map(function(word) {
+        callback(null, wordList.map(function (word) {
             return {
                 caption: word,
                 value: word,

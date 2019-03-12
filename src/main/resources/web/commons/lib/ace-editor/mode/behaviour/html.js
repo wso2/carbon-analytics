@@ -28,19 +28,19 @@
  *
  * ***** END LICENSE BLOCK ***** */
 
-define(function(require, exports, module) {
-"use strict";
+define(function (require, exports, module) {
+    "use strict";
 
-var oop = require("../../lib/oop");
-var XmlBehaviour = require("../behaviour/xml").XmlBehaviour;
+    var oop = require("../../lib/oop");
+    var XmlBehaviour = require("../behaviour/xml").XmlBehaviour;
 
-var HtmlBehaviour = function () {
+    var HtmlBehaviour = function () {
 
-    XmlBehaviour.call(this);
+        XmlBehaviour.call(this);
 
-};
+    };
 
-oop.inherits(HtmlBehaviour, XmlBehaviour);
+    oop.inherits(HtmlBehaviour, XmlBehaviour);
 
-exports.HtmlBehaviour = HtmlBehaviour;
+    exports.HtmlBehaviour = HtmlBehaviour;
 });

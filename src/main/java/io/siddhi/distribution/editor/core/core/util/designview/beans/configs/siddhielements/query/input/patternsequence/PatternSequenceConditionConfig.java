@@ -44,20 +44,20 @@ public class PatternSequenceConditionConfig {
         return conditionId;
     }
 
-    public String getStreamName() {
-        return streamName;
-    }
-
-    public List<StreamHandlerConfig> getStreamHandlerList() {
-        return streamHandlerList;
-    }
-
     public void setConditionId(String conditionId) {
         this.conditionId = conditionId;
     }
 
+    public String getStreamName() {
+        return streamName;
+    }
+
     public void setStreamName(String streamName) {
         this.streamName = streamName;
+    }
+
+    public List<StreamHandlerConfig> getStreamHandlerList() {
+        return streamHandlerList;
     }
 
     public void setStreamHandlerList(List<StreamHandlerConfig> streamHandlerList) {

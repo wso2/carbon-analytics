@@ -28,13 +28,13 @@
  *
  * ***** END LICENSE BLOCK ***** */
 
-define(function(require, exports, module) {
-"use strict";
+define(function (require, exports, module) {
+    "use strict";
 
-exports.isDark = false;
-exports.cssClass = "ace-tm";
-exports.cssText = require("../requirejs/text!./textmate.css");
+    exports.isDark = false;
+    exports.cssClass = "ace-tm";
+    exports.cssText = require("../requirejs/text!./textmate.css");
 
-var dom = require("../lib/dom");
-dom.importCssString(exports.cssText, exports.cssClass);
+    var dom = require("../lib/dom");
+    dom.importCssString(exports.cssText, exports.cssClass);
 });

@@ -21,7 +21,7 @@ define(['require', 'log', 'jquery', 'lodash', 'event_channel', 'menu_definitions
 
         var MenuBar = function (options) {
             var errMsg;
-            if(!_.has(options, 'container')){
+            if (!_.has(options, 'container')) {
                 errMsg = 'Unable to find configuration for container';
                 log.error(errMsg);
                 throw errMsg;

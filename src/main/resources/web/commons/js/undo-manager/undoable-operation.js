@@ -25,7 +25,7 @@ define(['lodash', 'event_channel'],
          * @param args
          * @constructor
          */
-        var UndoableOperation = function(args){
+        var UndoableOperation = function (args) {
             this.setTitle(_.get(args, 'title', undefined));
             this.setEditor(_.get(args, 'editor', undefined));
             this.setSkipInSourceView(_.get(args, 'skipInSourceView', false));
@@ -34,40 +34,42 @@ define(['lodash', 'event_channel'],
         UndoableOperation.prototype = Object.create(EventChannel.prototype);
         UndoableOperation.prototype.constructor = UndoableOperation;
 
-        UndoableOperation.prototype.canUndo = function(){
+        UndoableOperation.prototype.canUndo = function () {
             return !(this.getEditor().isInSourceView() && this.skipInSourceView());
         };
 
-        UndoableOperation.prototype.canRedo = function(){
+        UndoableOperation.prototype.canRedo = function () {
             return !(this.getEditor().isInSourceView() && this.skipInSourceView());
         };
 
-        UndoableOperation.prototype.getTitle = function(){
+        UndoableOperation.prototype.getTitle = function () {
             return this._title;
         };
 
-        UndoableOperation.prototype.setTitle = function(title){
+        UndoableOperation.prototype.setTitle = function (title) {
             this._title = title;
         };
 
-        UndoableOperation.prototype.getEditor = function(){
+        UndoableOperation.prototype.getEditor = function () {
             return this._editor;
         };
 
-        UndoableOperation.prototype.setEditor = function(editor){
+        UndoableOperation.prototype.setEditor = function (editor) {
             this._editor = editor;
         };
 
-        UndoableOperation.prototype.skipInSourceView = function(){
+        UndoableOperation.prototype.skipInSourceView = function () {
             return this._skipInSourceView;
         };
 
-        UndoableOperation.prototype.setSkipInSourceView = function(skipInSourceView){
+        UndoableOperation.prototype.setSkipInSourceView = function (skipInSourceView) {
             this._skipInSourceView = skipInSourceView;
         };
 
-        UndoableOperation.prototype.undo = function(){};
-        UndoableOperation.prototype.redo = function(){};
+        UndoableOperation.prototype.undo = function () {
+        };
+        UndoableOperation.prototype.redo = function () {
+        };
 
         return UndoableOperation;
     });

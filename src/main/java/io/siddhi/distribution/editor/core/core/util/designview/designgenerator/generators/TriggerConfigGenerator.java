@@ -43,9 +43,10 @@ public class TriggerConfigGenerator extends CodeSegmentsPreserver {
 
     /**
      * Generates TriggerConfig for the given Siddhi TriggerDefinition
-     * @param triggerDefinition                 Siddhi TriggerDefinition object
-     * @return                                  TriggerConfig object
-     * @throws DesignGenerationException        Error while getting the definition of the trigger definition
+     *
+     * @param triggerDefinition Siddhi TriggerDefinition object
+     * @return TriggerConfig object
+     * @throws DesignGenerationException Error while getting the definition of the trigger definition
      */
     public TriggerConfig generateTriggerConfig(TriggerDefinition triggerDefinition) throws DesignGenerationException {
         String criteria = "";
@@ -77,9 +78,10 @@ public class TriggerConfigGenerator extends CodeSegmentsPreserver {
 
     /**
      * Gets the stream, which is defined for the Trigger with the given name
-     * @param triggerName                       Name of the Trigger
-     * @return                                  Stream Definition object
-     * @throws DesignGenerationException        No stream is found with the Trigger's name
+     *
+     * @param triggerName Name of the Trigger
+     * @return Stream Definition object
+     * @throws DesignGenerationException No stream is found with the Trigger's name
      */
     private StreamDefinition getTriggerStream(String triggerName) throws DesignGenerationException {
         for (Map.Entry<String, StreamDefinition> streamDefinitionEntry : streamDefinitions.entrySet()) {

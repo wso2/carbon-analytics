@@ -28,12 +28,12 @@
  *
  * ***** END LICENSE BLOCK ***** */
 
-define(function(require, exports, module) {
+define(function (require, exports, module) {
 
-exports.isDark = true;
-exports.cssClass = "ace-tomorrow-night";
-exports.cssText = require("../requirejs/text!./tomorrow_night.css");
+    exports.isDark = true;
+    exports.cssClass = "ace-tomorrow-night";
+    exports.cssText = require("../requirejs/text!./tomorrow_night.css");
 
-var dom = require("../lib/dom");
-dom.importCssString(exports.cssText, exports.cssClass);
+    var dom = require("../lib/dom");
+    dom.importCssString(exports.cssText, exports.cssClass);
 });

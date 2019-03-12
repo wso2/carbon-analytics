@@ -22,7 +22,7 @@ define(['require', 'log4javascript'], function (require, log4javascript) {
     var consoleAppender = new log4javascript.BrowserConsoleAppender();
     logger.addAppender(consoleAppender);
 
-    logger.initAjaxAppender = function(workspaceServiceEP){
+    logger.initAjaxAppender = function (workspaceServiceEP) {
         var ajaxAppender = new log4javascript.AjaxAppender(workspaceServiceEP + "/log");
         logger.addAppender(ajaxAppender);
     };

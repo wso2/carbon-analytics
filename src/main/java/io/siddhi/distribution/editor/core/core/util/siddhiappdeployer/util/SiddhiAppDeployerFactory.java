@@ -19,6 +19,7 @@
 package io.siddhi.distribution.editor.core.core.util.siddhiappdeployer.util;
 
 import io.siddhi.distribution.editor.core.core.internal.EditorDataHolder;
+
 /**
  * Factory that is used to produce a HTTPS client for calling a Worker
  */

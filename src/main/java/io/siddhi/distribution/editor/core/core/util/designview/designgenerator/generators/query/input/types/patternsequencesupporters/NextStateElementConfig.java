@@ -18,6 +18,9 @@
 
 package io.siddhi.distribution.editor.core.core.util.designview.designgenerator.generators.query.input.types.patternsequencesupporters;
 
+/**
+ * Class for next state element configuration.
+ */
 public class NextStateElementConfig implements StateElementConfig {
     private StateElementConfig stateElement;
     private StateElementConfig nextStateElement;

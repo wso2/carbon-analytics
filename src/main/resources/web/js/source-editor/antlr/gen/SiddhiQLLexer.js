@@ -456,10 +456,12 @@ var serializedATN = ["\3\u0430\ud6d1\u8206\uad2d\u4417\uaef1\u8d80\uaadd",
 
 var atn = new antlr4.atn.ATNDeserializer().deserialize(serializedATN);
 
-var decisionsToDFA = atn.decisionToState.map( function(ds, index) { return new antlr4.dfa.DFA(ds, index); });
+var decisionsToDFA = atn.decisionToState.map(function (ds, index) {
+    return new antlr4.dfa.DFA(ds, index);
+});
 
 function SiddhiQLLexer(input) {
-	antlr4.Lexer.call(this, input);
+    antlr4.Lexer.call(this, input);
     this._interp = new antlr4.atn.LexerATNSimulator(this, atn, decisionsToDFA, new antlr4.PredictionContextCache());
     return this;
 }
@@ -583,83 +585,83 @@ SiddhiQLLexer.UNEXPECTED_CHAR = 112;
 SiddhiQLLexer.SCRIPT = 113;
 
 
-SiddhiQLLexer.modeNames = [ "DEFAULT_MODE" ];
+SiddhiQLLexer.modeNames = ["DEFAULT_MODE"];
 
-SiddhiQLLexer.literalNames = [ 'null', 'null', 'null', 'null', 'null', "':'", 
-                               "';'", "'.'", "'...'", "'('", "')'", "'['", 
-                               "']'", "','", "'='", "'*'", "'+'", "'?'", 
-                               "'-'", "'/'", "'%'", "'<'", "'<='", "'>'", 
-                               "'>='", "'=='", "'!='", "'@'", "'->'", "'#'" ];
+SiddhiQLLexer.literalNames = ['null', 'null', 'null', 'null', 'null', "':'",
+    "';'", "'.'", "'...'", "'('", "')'", "'['",
+    "']'", "','", "'='", "'*'", "'+'", "'?'",
+    "'-'", "'/'", "'%'", "'<'", "'<='", "'>'",
+    "'>='", "'=='", "'!='", "'@'", "'->'", "'#'"];
 
-SiddhiQLLexer.symbolicNames = [ 'null', "INT_LITERAL", "LONG_LITERAL", "FLOAT_LITERAL", 
-                                "DOUBLE_LITERAL", "COL", "SCOL", "DOT", 
-                                "TRIPLE_DOT", "OPEN_PAR", "CLOSE_PAR", "OPEN_SQUARE_BRACKETS", 
-                                "CLOSE_SQUARE_BRACKETS", "COMMA", "ASSIGN", 
-                                "STAR", "PLUS", "QUESTION", "MINUS", "DIV", 
-                                "MOD", "LT", "LT_EQ", "GT", "GT_EQ", "EQ", 
-                                "NOT_EQ", "AT_SYMBOL", "FOLLOWED_BY", "HASH", 
-                                "STREAM", "DEFINE", "FUNCTION", "TRIGGER", 
-                                "TABLE", "APP", "FROM", "PARTITION", "WINDOW", 
-                                "SELECT", "GROUP", "BY", "ORDER", "LIMIT", 
-                                "OFFSET", "ASC", "DESC", "HAVING", "INSERT", 
-                                "DELETE", "UPDATE", "SET", "RETURN", "EVENTS", 
-                                "INTO", "OUTPUT", "EXPIRED", "CURRENT", 
-                                "SNAPSHOT", "FOR", "RAW", "OF", "AS", "AT", 
-                                "OR", "AND", "IN", "ON", "IS", "NOT", "WITHIN", 
-                                "WITH", "BEGIN", "END", "NULL", "EVERY", 
-                                "LAST", "ALL", "FIRST", "JOIN", "INNER", 
-                                "OUTER", "RIGHT", "LEFT", "FULL", "UNIDIRECTIONAL", 
-                                "YEARS", "MONTHS", "WEEKS", "DAYS", "HOURS", 
-                                "MINUTES", "SECONDS", "MILLISECONDS", "FALSE", 
-                                "TRUE", "STRING", "INT", "LONG", "FLOAT", 
-                                "DOUBLE", "BOOL", "OBJECT", "AGGREGATION", 
-                                "AGGREGATE", "PER", "ID_QUOTES", "ID", "STRING_LITERAL", 
-                                "SINGLE_LINE_COMMENT", "MULTILINE_COMMENT", 
-                                "SPACES", "UNEXPECTED_CHAR", "SCRIPT" ];
+SiddhiQLLexer.symbolicNames = ['null', "INT_LITERAL", "LONG_LITERAL", "FLOAT_LITERAL",
+    "DOUBLE_LITERAL", "COL", "SCOL", "DOT",
+    "TRIPLE_DOT", "OPEN_PAR", "CLOSE_PAR", "OPEN_SQUARE_BRACKETS",
+    "CLOSE_SQUARE_BRACKETS", "COMMA", "ASSIGN",
+    "STAR", "PLUS", "QUESTION", "MINUS", "DIV",
+    "MOD", "LT", "LT_EQ", "GT", "GT_EQ", "EQ",
+    "NOT_EQ", "AT_SYMBOL", "FOLLOWED_BY", "HASH",
+    "STREAM", "DEFINE", "FUNCTION", "TRIGGER",
+    "TABLE", "APP", "FROM", "PARTITION", "WINDOW",
+    "SELECT", "GROUP", "BY", "ORDER", "LIMIT",
+    "OFFSET", "ASC", "DESC", "HAVING", "INSERT",
+    "DELETE", "UPDATE", "SET", "RETURN", "EVENTS",
+    "INTO", "OUTPUT", "EXPIRED", "CURRENT",
+    "SNAPSHOT", "FOR", "RAW", "OF", "AS", "AT",
+    "OR", "AND", "IN", "ON", "IS", "NOT", "WITHIN",
+    "WITH", "BEGIN", "END", "NULL", "EVERY",
+    "LAST", "ALL", "FIRST", "JOIN", "INNER",
+    "OUTER", "RIGHT", "LEFT", "FULL", "UNIDIRECTIONAL",
+    "YEARS", "MONTHS", "WEEKS", "DAYS", "HOURS",
+    "MINUTES", "SECONDS", "MILLISECONDS", "FALSE",
+    "TRUE", "STRING", "INT", "LONG", "FLOAT",
+    "DOUBLE", "BOOL", "OBJECT", "AGGREGATION",
+    "AGGREGATE", "PER", "ID_QUOTES", "ID", "STRING_LITERAL",
+    "SINGLE_LINE_COMMENT", "MULTILINE_COMMENT",
+    "SPACES", "UNEXPECTED_CHAR", "SCRIPT"];
 
-SiddhiQLLexer.ruleNames = [ "INT_LITERAL", "LONG_LITERAL", "FLOAT_LITERAL", 
-                            "DOUBLE_LITERAL", "COL", "SCOL", "DOT", "TRIPLE_DOT", 
-                            "OPEN_PAR", "CLOSE_PAR", "OPEN_SQUARE_BRACKETS", 
-                            "CLOSE_SQUARE_BRACKETS", "COMMA", "ASSIGN", 
-                            "STAR", "PLUS", "QUESTION", "MINUS", "DIV", 
-                            "MOD", "LT", "LT_EQ", "GT", "GT_EQ", "EQ", "NOT_EQ", 
-                            "AT_SYMBOL", "FOLLOWED_BY", "HASH", "STREAM", 
-                            "DEFINE", "FUNCTION", "TRIGGER", "TABLE", "APP", 
-                            "FROM", "PARTITION", "WINDOW", "SELECT", "GROUP", 
-                            "BY", "ORDER", "LIMIT", "OFFSET", "ASC", "DESC", 
-                            "HAVING", "INSERT", "DELETE", "UPDATE", "SET", 
-                            "RETURN", "EVENTS", "INTO", "OUTPUT", "EXPIRED", 
-                            "CURRENT", "SNAPSHOT", "FOR", "RAW", "OF", "AS", 
-                            "AT", "OR", "AND", "IN", "ON", "IS", "NOT", 
-                            "WITHIN", "WITH", "BEGIN", "END", "NULL", "EVERY", 
-                            "LAST", "ALL", "FIRST", "JOIN", "INNER", "OUTER", 
-                            "RIGHT", "LEFT", "FULL", "UNIDIRECTIONAL", "YEARS", 
-                            "MONTHS", "WEEKS", "DAYS", "HOURS", "MINUTES", 
-                            "SECONDS", "MILLISECONDS", "FALSE", "TRUE", 
-                            "STRING", "INT", "LONG", "FLOAT", "DOUBLE", 
-                            "BOOL", "OBJECT", "AGGREGATION", "AGGREGATE", 
-                            "PER", "ID_QUOTES", "ID", "STRING_LITERAL", 
-                            "SINGLE_LINE_COMMENT", "MULTILINE_COMMENT", 
-                            "SPACES", "UNEXPECTED_CHAR", "SCRIPT", "SCRIPT_ATOM", 
-                            "DIGIT", "A", "B", "C", "D", "E", "F", "G", 
-                            "H", "I", "J", "K", "L", "M", "N", "O", "P", 
-                            "Q", "R", "S", "T", "U", "V", "W", "X", "Y", 
-                            "Z" ];
+SiddhiQLLexer.ruleNames = ["INT_LITERAL", "LONG_LITERAL", "FLOAT_LITERAL",
+    "DOUBLE_LITERAL", "COL", "SCOL", "DOT", "TRIPLE_DOT",
+    "OPEN_PAR", "CLOSE_PAR", "OPEN_SQUARE_BRACKETS",
+    "CLOSE_SQUARE_BRACKETS", "COMMA", "ASSIGN",
+    "STAR", "PLUS", "QUESTION", "MINUS", "DIV",
+    "MOD", "LT", "LT_EQ", "GT", "GT_EQ", "EQ", "NOT_EQ",
+    "AT_SYMBOL", "FOLLOWED_BY", "HASH", "STREAM",
+    "DEFINE", "FUNCTION", "TRIGGER", "TABLE", "APP",
+    "FROM", "PARTITION", "WINDOW", "SELECT", "GROUP",
+    "BY", "ORDER", "LIMIT", "OFFSET", "ASC", "DESC",
+    "HAVING", "INSERT", "DELETE", "UPDATE", "SET",
+    "RETURN", "EVENTS", "INTO", "OUTPUT", "EXPIRED",
+    "CURRENT", "SNAPSHOT", "FOR", "RAW", "OF", "AS",
+    "AT", "OR", "AND", "IN", "ON", "IS", "NOT",
+    "WITHIN", "WITH", "BEGIN", "END", "NULL", "EVERY",
+    "LAST", "ALL", "FIRST", "JOIN", "INNER", "OUTER",
+    "RIGHT", "LEFT", "FULL", "UNIDIRECTIONAL", "YEARS",
+    "MONTHS", "WEEKS", "DAYS", "HOURS", "MINUTES",
+    "SECONDS", "MILLISECONDS", "FALSE", "TRUE",
+    "STRING", "INT", "LONG", "FLOAT", "DOUBLE",
+    "BOOL", "OBJECT", "AGGREGATION", "AGGREGATE",
+    "PER", "ID_QUOTES", "ID", "STRING_LITERAL",
+    "SINGLE_LINE_COMMENT", "MULTILINE_COMMENT",
+    "SPACES", "UNEXPECTED_CHAR", "SCRIPT", "SCRIPT_ATOM",
+    "DIGIT", "A", "B", "C", "D", "E", "F", "G",
+    "H", "I", "J", "K", "L", "M", "N", "O", "P",
+    "Q", "R", "S", "T", "U", "V", "W", "X", "Y",
+    "Z"];
 
 SiddhiQLLexer.grammarFileName = "SiddhiQL.g4";
 
 
-SiddhiQLLexer.prototype.action = function(localctx, ruleIndex, actionIndex) {
-	switch (ruleIndex) {
-	case 105:
-		this.ID_QUOTES_action(localctx, actionIndex);
-		break;
-	case 107:
-		this.STRING_LITERAL_action(localctx, actionIndex);
-		break;
-	default:
-		throw "No registered action for:" + ruleIndex;
-	}
+SiddhiQLLexer.prototype.action = function (localctx, ruleIndex, actionIndex) {
+    switch (ruleIndex) {
+        case 105:
+            this.ID_QUOTES_action(localctx, actionIndex);
+            break;
+        case 107:
+            this.STRING_LITERAL_action(localctx, actionIndex);
+            break;
+        default:
+            throw "No registered action for:" + ruleIndex;
+    }
 };
 
 SiddhiQLLexer.prototype.ID_QUOTES_action = function (localctx, actionIndex) {
@@ -673,17 +675,17 @@ SiddhiQLLexer.prototype.ID_QUOTES_action = function (localctx, actionIndex) {
     }
 };
 
-SiddhiQLLexer.prototype.STRING_LITERAL_action = function(localctx , actionIndex) {
-	switch (actionIndex) {
-	case 1:
-        this.text = this.text.substring(1, this.text.length - 1);
-		break;
-	case 2:
-        this.text = this.text.substring(3, this.text.length - 3);
-		break;
-	default:
-		throw "No registered action for:" + actionIndex;
-	}
+SiddhiQLLexer.prototype.STRING_LITERAL_action = function (localctx, actionIndex) {
+    switch (actionIndex) {
+        case 1:
+            this.text = this.text.substring(1, this.text.length - 1);
+            break;
+        case 2:
+            this.text = this.text.substring(3, this.text.length - 3);
+            break;
+        default:
+            throw "No registered action for:" + actionIndex;
+    }
 };
 
 exports.SiddhiQLLexer = SiddhiQLLexer;

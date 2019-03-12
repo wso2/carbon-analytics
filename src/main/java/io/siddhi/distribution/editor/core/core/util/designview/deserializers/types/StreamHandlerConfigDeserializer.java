@@ -35,6 +35,7 @@ import java.lang.reflect.Type;
  */
 public class StreamHandlerConfigDeserializer implements JsonDeserializer {
     private static final String TYPE = "type";
+
     @Override
     public Object deserialize(
             JsonElement jsonElement, Type type, JsonDeserializationContext jsonDeserializationContext) {

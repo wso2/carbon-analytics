@@ -15,37 +15,37 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-define(['require', 'log', 'jquery', 'lodash', 'console','workspace','toolEditor'],
-    function (require, log, jquery, _, Console, Workspace,ToolEditor) {
-        var  ServiceConsole;
+define(['require', 'log', 'jquery', 'lodash', 'console', 'workspace', 'toolEditor'],
+    function (require, log, jquery, _, Console, Workspace, ToolEditor) {
+        var ServiceConsole;
 
         ServiceConsole = Console.extend({
             initialize: function (options) {
                 Console.prototype.initialize.call(this, options);
                 this.app = options.application;
             },
-            getFile: function(){
+            getFile: function () {
                 return this._file;
             },
 
-            getTitle: function(){
+            getTitle: function () {
                 return this._title;
             },
 
-            getContentContainer: function(){
+            getContentContainer: function () {
                 return this.$el;
             },
 
-            updateHeader: function(){
+            updateHeader: function () {
             },
 
-            showInitialStartingMessage: function(message){
+            showInitialStartingMessage: function (message) {
                 this.$el.append('<span class="INFO">' + message + '<span>');
                 this.$el.append("<br />");
                 this.$el.scrollTop(100000);
             },
 
-            println: function(message){
+            println: function (message) {
                 this.$el.append('<span class="' + message.type + '">' + message.message + '<span>');
                 this.$el.append("<br />");
                 this.$el.scrollTop(100000);
@@ -54,16 +54,16 @@ define(['require', 'log', 'jquery', 'lodash', 'console','workspace','toolEditor'
                 parentDiv.scrollTop = parentDiv.scrollHeight;
                 var childLength = this.$el.children().size();
                 //console.log("Count="+);
-                if(childLength > 2500){
+                if (childLength > 2500) {
                     $(this.$el).children().first().remove();
                 }
             },
 
-            addRunningPlan: function(executionPlan){
+            addRunningPlan: function (executionPlan) {
                 this.addRunningPlanToList(executionPlan);
             },
 
-            clear: function(){
+            clear: function () {
                 this.$el.empty();
             }
 

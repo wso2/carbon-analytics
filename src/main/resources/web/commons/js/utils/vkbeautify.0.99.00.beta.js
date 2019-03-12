@@ -196,7 +196,7 @@
             }
         }
 
-        return  (str[0] == '\n') ? str.slice(1) : str;
+        return (str[0] == '\n') ? str.slice(1) : str;
     }
 
     vkbeautify.prototype.json = function (text, step) {
@@ -252,7 +252,7 @@
 //----------------------------------------------------------------------------
 
     function isSubquery(str, parenthesisLevel) {
-        return  parenthesisLevel - (str.replace(/\(/g, '').length - str.replace(/\)/g, '').length )
+        return parenthesisLevel - (str.replace(/\(/g, '').length - str.replace(/\)/g, '').length )
     }
 
     function split_sql(str, tab) {
@@ -376,8 +376,8 @@
 
         var str = preserveComments ? text
             : text.replace(/\<![ \r\n\t]*(--([^\-]|[\r\n]|-[^\-])*--[ \r\n\t]*)\>/g, "")
-            .replace(/[ \r\n\t]{1,}xmlns/g, ' xmlns');
-        return  str.replace(/>\s{0,}</g, "><");
+                .replace(/[ \r\n\t]{1,}xmlns/g, ' xmlns');
+        return str.replace(/>\s{0,}</g, "><");
     }
 
     vkbeautify.prototype.jsonmin = function (text) {

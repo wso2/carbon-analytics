@@ -41,8 +41,8 @@ define(['jquery', './modal-dialog'], function ($, ModalDialog) {
 
         this.getSubmitBtn().unbind('click');
 
-        this.getSubmitBtn().click(function(){
-            if(_.has(options, 'handleConfirm')){
+        this.getSubmitBtn().click(function () {
+            if (_.has(options, 'handleConfirm')) {
                 self.hide();
                 options.handleConfirm(true);
             }

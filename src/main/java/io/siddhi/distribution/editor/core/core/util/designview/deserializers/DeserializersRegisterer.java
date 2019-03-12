@@ -45,7 +45,8 @@ public class DeserializersRegisterer {
     /**
      * Returns a GsonBuilder with de-serializers registered as TypeAdapters,
      * for the classes whose concrete types are not directly found in the JSON
-     * @return          GsonBuilder object with registered TypeAdapters
+     *
+     * @return GsonBuilder object with registered TypeAdapters
      */
     public static GsonBuilder getGsonBuilder() {
         GsonBuilder gsonBuilder = new GsonBuilder();

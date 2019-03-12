@@ -38,6 +38,9 @@ import java.util.regex.Pattern;
  */
 public class QueryInputCodeGenerator {
 
+    private QueryInputCodeGenerator() {
+    }
+
     /**
      * Generates the Siddhi code representation of a QueryInputConfig object
      *
@@ -254,9 +257,6 @@ public class QueryInputCodeGenerator {
                 .append(SubElementCodeGenerator.generateStreamHandlerList(condition.getStreamHandlerList()));
 
         return patternSequenceConditionStringBuilder.toString();
-    }
-
-    private QueryInputCodeGenerator() {
     }
 
 }

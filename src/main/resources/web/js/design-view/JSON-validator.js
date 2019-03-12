@@ -163,7 +163,7 @@ define(['require', 'log', 'jquery', 'lodash', 'designViewUtils'],
             var errorMessage;
             removeTooltipErrorMessage(innerStream.id);
             // check whether it has a connection in because there cannot be a inner stream without a 'connection-in'
-            var inConnections = jsPlumbInstance.getConnections({ target: innerStream.id + '-in' });
+            var inConnections = jsPlumbInstance.getConnections({target: innerStream.id + '-in'});
             if (inConnections.length === 0) {
                 errorMessage = 'Inner stream does not contain a connection input from an inner query';
                 highlightErrorElement(innerStream.id, errorMessage);
@@ -209,7 +209,7 @@ define(['require', 'log', 'jquery', 'lodash', 'designViewUtils'],
             }
         };
 
-		/**
+        /**
          * @function Validates a given element
          * @param element element json
          * @param type stream or table or window or trigger or function
@@ -459,7 +459,7 @@ define(['require', 'log', 'jquery', 'lodash', 'designViewUtils'],
          * returned
          * @returns {boolean} validity of the json
          */
-        JSONValidator.prototype.validateQuerySelectSection = function (select, type, elementId, doNotShowErrorMessages){
+        JSONValidator.prototype.validateQuerySelectSection = function (select, type, elementId, doNotShowErrorMessages) {
             var isValid = true;
             var errorMessage;
             if (!select) {

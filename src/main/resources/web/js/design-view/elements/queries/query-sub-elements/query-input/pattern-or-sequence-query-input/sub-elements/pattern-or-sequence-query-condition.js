@@ -28,24 +28,24 @@ define(['require', 'elementUtils'],
         var PatternOrSequenceQueryCondition = function (options) {
             /*
              Data storing structure as follows.
-               conditionId*: '',
-               streamName*: '',
-               streamHandlerList: [
-                    {
-                        type*: 'FILTER',
-                        value*: ''
-                    },
-                    << and|or >>
-                    {
-                        type*: 'FUNCTION',
-                        value*: {
-                            function*: '',
-                            parameters*: ['value1',...],
-                        }
-                    },
-                    ...
-                ]
-            */
+             conditionId*: '',
+             streamName*: '',
+             streamHandlerList: [
+             {
+             type*: 'FILTER',
+             value*: ''
+             },
+             << and|or >>
+             {
+             type*: 'FUNCTION',
+             value*: {
+             function*: '',
+             parameters*: ['value1',...],
+             }
+             },
+             ...
+             ]
+             */
             if (options !== undefined) {
                 this.conditionId = options.conditionId;
                 this.streamName = options.streamName;

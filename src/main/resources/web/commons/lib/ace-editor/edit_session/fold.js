@@ -28,113 +28,116 @@
  *
  * ***** END LICENSE BLOCK ***** */
 
-define(function(require, exports, module) {
-"use strict";
+define(function (require, exports, module) {
+    "use strict";
 
-var Range = require("../range").Range;
-var RangeList = require("../range_list").RangeList;
-var oop = require("../lib/oop")
-/*
- * Simple fold-data struct.
- **/
-var Fold = exports.Fold = function(range, placeholder) {
-    this.foldLine = null;
-    this.placeholder = placeholder;
-    this.range = range;
-    this.start = range.start;
-    this.end = range.end;
+    var Range = require("../range").Range;
+    var RangeList = require("../range_list").RangeList;
+    var oop = require("../lib/oop")
+    /*
+     * Simple fold-data struct.
+     **/
+    var Fold = exports.Fold = function (range, placeholder) {
+        this.foldLine = null;
+        this.placeholder = placeholder;
+        this.range = range;
+        this.start = range.start;
+        this.end = range.end;
 
-    this.sameRow = range.start.row == range.end.row;
-    this.subFolds = this.ranges = [];
-};
-
-oop.inherits(Fold, RangeList);
-
-(function() {
-
-    this.toString = function() {
-        return '"' + this.placeholder + '" ' + this.range.toString();
+        this.sameRow = range.start.row == range.end.row;
+        this.subFolds = this.ranges = [];
     };
 
-    this.setFoldLine = function(foldLine) {
-        this.foldLine = foldLine;
-        this.subFolds.forEach(function(fold) {
-            fold.setFoldLine(foldLine);
-        });
-    };
+    oop.inherits(Fold, RangeList);
 
-    this.clone = function() {
-        var range = this.range.clone();
-        var fold = new Fold(range, this.placeholder);
-        this.subFolds.forEach(function(subFold) {
-            fold.subFolds.push(subFold.clone());
-        });
-        fold.collapseChildren = this.collapseChildren;
-        return fold;
-    };
+    (function () {
 
-    this.addSubFold = function(fold) {
-        if (this.range.isEqual(fold))
-            return;
+        this.toString = function () {
+            return '"' + this.placeholder + '" ' + this.range.toString();
+        };
 
-        if (!this.range.containsRange(fold))
-            throw new Error("A fold can't intersect already existing fold" + fold.range + this.range);
+        this.setFoldLine = function (foldLine) {
+            this.foldLine = foldLine;
+            this.subFolds.forEach(function (fold) {
+                fold.setFoldLine(foldLine);
+            });
+        };
 
-        // transform fold to local coordinates
-        consumeRange(fold, this.start);
+        this.clone = function () {
+            var range = this.range.clone();
+            var fold = new Fold(range, this.placeholder);
+            this.subFolds.forEach(function (subFold) {
+                fold.subFolds.push(subFold.clone());
+            });
+            fold.collapseChildren = this.collapseChildren;
+            return fold;
+        };
 
-        var row = fold.start.row, column = fold.start.column;
-        for (var i = 0, cmp = -1; i < this.subFolds.length; i++) {
-            cmp = this.subFolds[i].range.compare(row, column);
-            if (cmp != 1)
-                break;
-        }
-        var afterStart = this.subFolds[i];
+        this.addSubFold = function (fold) {
+            if (this.range.isEqual(fold))
+                return;
 
-        if (cmp == 0)
-            return afterStart.addSubFold(fold);
+            if (!this.range.containsRange(fold))
+                throw new Error("A fold can't intersect already existing fold" + fold.range + this.range);
 
-        // cmp == -1
-        var row = fold.range.end.row, column = fold.range.end.column;
-        for (var j = i, cmp = -1; j < this.subFolds.length; j++) {
-            cmp = this.subFolds[j].range.compare(row, column);
-            if (cmp != 1)
-                break;
-        }
-        var afterEnd = this.subFolds[j];
+            // transform fold to local coordinates
+            consumeRange(fold, this.start);
 
-        if (cmp == 0)
-            throw new Error("A fold can't intersect already existing fold" + fold.range + this.range);
+            var row = fold.start.row, column = fold.start.column;
+            for (var i = 0, cmp = -1; i < this.subFolds.length; i++) {
+                cmp = this.subFolds[i].range.compare(row, column);
+                if (cmp != 1)
+                    break;
+            }
+            var afterStart = this.subFolds[i];
 
-        var consumedFolds = this.subFolds.splice(i, j - i, fold);
-        fold.setFoldLine(this.foldLine);
+            if (cmp == 0)
+                return afterStart.addSubFold(fold);
 
-        return fold;
-    };
-    
-    this.restoreRange = function(range) {
-        return restoreRange(range, this.start);
-    };
+            // cmp == -1
+            var row = fold.range.end.row, column = fold.range.end.column;
+            for (var j = i, cmp = -1; j < this.subFolds.length; j++) {
+                cmp = this.subFolds[j].range.compare(row, column);
+                if (cmp != 1)
+                    break;
+            }
+            var afterEnd = this.subFolds[j];
 
-}).call(Fold.prototype);
+            if (cmp == 0)
+                throw new Error("A fold can't intersect already existing fold" + fold.range + this.range);
 
-function consumePoint(point, anchor) {
-    point.row -= anchor.row;
-    if (point.row == 0)
-        point.column -= anchor.column;
-}
-function consumeRange(range, anchor) {
-    consumePoint(range.start, anchor);
-    consumePoint(range.end, anchor);
-}
-function restorePoint(point, anchor) {
-    if (point.row == 0)
-        point.column += anchor.column;
-    point.row += anchor.row;
-}
-function restoreRange(range, anchor) {
-    restorePoint(range.start, anchor);
-    restorePoint(range.end, anchor);
-}
+            var consumedFolds = this.subFolds.splice(i, j - i, fold);
+            fold.setFoldLine(this.foldLine);
+
+            return fold;
+        };
+
+        this.restoreRange = function (range) {
+            return restoreRange(range, this.start);
+        };
+
+    }).call(Fold.prototype);
+
+    function consumePoint(point, anchor) {
+        point.row -= anchor.row;
+        if (point.row == 0)
+            point.column -= anchor.column;
+    }
+
+    function consumeRange(range, anchor) {
+        consumePoint(range.start, anchor);
+        consumePoint(range.end, anchor);
+    }
+
+    function restorePoint(point, anchor) {
+        if (point.row == 0)
+            point.column += anchor.column;
+        point.row += anchor.row;
+    }
+
+    function restoreRange(range, anchor) {
+        restorePoint(range.start, anchor);
+        restorePoint(range.end, anchor);
+    }
 
 });

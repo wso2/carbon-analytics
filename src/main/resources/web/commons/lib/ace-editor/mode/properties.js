@@ -28,22 +28,22 @@
  *
  * ***** END LICENSE BLOCK ***** */
 
-define(function(require, exports, module) {
-"use strict";
+define(function (require, exports, module) {
+    "use strict";
 
-var oop = require("../lib/oop");
-var TextMode = require("./text").Mode;
-var PropertiesHighlightRules = require("./properties_highlight_rules").PropertiesHighlightRules;
+    var oop = require("../lib/oop");
+    var TextMode = require("./text").Mode;
+    var PropertiesHighlightRules = require("./properties_highlight_rules").PropertiesHighlightRules;
 
-var Mode = function() {
-    this.HighlightRules = PropertiesHighlightRules;
-    this.$behaviour = this.$defaultBehaviour;
-};
-oop.inherits(Mode, TextMode);
+    var Mode = function () {
+        this.HighlightRules = PropertiesHighlightRules;
+        this.$behaviour = this.$defaultBehaviour;
+    };
+    oop.inherits(Mode, TextMode);
 
-(function() {
-    this.$id = "ace/mode/properties";
-}).call(Mode.prototype);
+    (function () {
+        this.$id = "ace/mode/properties";
+    }).call(Mode.prototype);
 
-exports.Mode = Mode;
+    exports.Mode = Mode;
 });

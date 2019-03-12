@@ -125,7 +125,8 @@ public class DockerUtils {
         // Add selected Siddhi files.
         for (String siddhiFile : siddhiFiles) {
             String key = Paths.get(SIDDHI_FILES_DIR, siddhiFile).toString();
-            Path path = Paths.get(Constants.RUNTIME_PATH, Constants.DIRECTORY_DEPLOYMENT, Constants.DIRECTORY_WORKSPACE, siddhiFile);
+            Path path = Paths.get(Constants.RUNTIME_PATH, Constants.DIRECTORY_DEPLOYMENT,
+                    Constants.DIRECTORY_WORKSPACE, siddhiFile);
             files.put(key, path);
         }
         return files;

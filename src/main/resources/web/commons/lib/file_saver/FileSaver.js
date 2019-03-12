@@ -26,7 +26,7 @@ var saveAs = saveAs
         }
         var
             doc = view.document
-        // only get URL when necessary in case Blob.js hasn't overridden it yet
+            // only get URL when necessary in case Blob.js hasn't overridden it yet
             , get_URL = function () {
                 return view.URL || view.webkitURL || view;
             }
@@ -49,8 +49,8 @@ var saveAs = saveAs
             }
             , force_saveable_type = "application/octet-stream"
             , fs_min_size = 0
-        // See https://code.google.com/p/chromium/issues/detail?id=375297#c7 for
-        // the reasoning behind the timeout and revocation flow
+            // See https://code.google.com/p/chromium/issues/detail?id=375297#c7 for
+            // the reasoning behind the timeout and revocation flow
             , arbitrary_revoke_timeout = 10
             , revoke = function (file) {
                 var revoker = function () {
@@ -91,7 +91,7 @@ var saveAs = saveAs
                     , dispatch_all = function () {
                         dispatch(filesaver, "writestart progress write writeend".split(" "));
                     }
-                // on any filesys errors revert to saving with object URLs
+                    // on any filesys errors revert to saving with object URLs
                     , fs_error = function () {
                         // don't create more object URLs than needed
                         if (blob_changed || !object_url) {
@@ -119,7 +119,7 @@ var saveAs = saveAs
                     }
                     , create_if_not_found = {create: true, exclusive: false}
                     , slice
-                    ;
+                ;
                 filesaver.readyState = filesaver.INIT;
                 if (!name) {
                     name = "download";
@@ -205,7 +205,7 @@ var saveAs = saveAs
             , saveAs = function (blob, name) {
                 return new FileSaver(blob, name);
             }
-            ;
+        ;
         FS_proto.abort = function () {
             var filesaver = this;
             filesaver.readyState = filesaver.DONE;

@@ -31,6 +31,9 @@ import io.siddhi.distribution.editor.core.core.util.designview.utilities.CodeGen
  */
 public class QuerySelectCodeGenerator {
 
+    private QuerySelectCodeGenerator() {
+    }
+
     /**
      * Generates the Siddhi code representation of a AttributesSelectionConfig object
      *
@@ -97,9 +100,6 @@ public class QuerySelectCodeGenerator {
         }
 
         return userDefinedSelectionStringBuilder.toString();
-    }
-
-    private QuerySelectCodeGenerator() {
     }
 
 }

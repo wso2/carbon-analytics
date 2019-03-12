@@ -28,27 +28,27 @@
  *
  * ***** END LICENSE BLOCK ***** */
 
-define(function(require, exports, module) {
-"use strict";
+define(function (require, exports, module) {
+    "use strict";
 
-var oop = require("../lib/oop");
-var TextMode = require("./text").Mode;
-var AdaHighlightRules = require("./ada_highlight_rules").AdaHighlightRules;
+    var oop = require("../lib/oop");
+    var TextMode = require("./text").Mode;
+    var AdaHighlightRules = require("./ada_highlight_rules").AdaHighlightRules;
 
-var Mode = function() {
-    this.HighlightRules = AdaHighlightRules;
-    this.$behaviour = this.$defaultBehaviour;
-};
-oop.inherits(Mode, TextMode);
+    var Mode = function () {
+        this.HighlightRules = AdaHighlightRules;
+        this.$behaviour = this.$defaultBehaviour;
+    };
+    oop.inherits(Mode, TextMode);
 
-(function() {
+    (function () {
 
-    this.lineCommentStart = "--";
+        this.lineCommentStart = "--";
 
-    this.$id = "ace/mode/ada";
-}).call(Mode.prototype);
+        this.$id = "ace/mode/ada";
+    }).call(Mode.prototype);
 
-exports.Mode = Mode;
+    exports.Mode = Mode;
 
 });
 

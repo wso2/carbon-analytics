@@ -37,18 +37,17 @@
  * " Last Change: 2012 Oct 23
  */
 
-define(function(require, exports, module) {
-"use strict";
+define(function (require, exports, module) {
+    "use strict";
 
-var oop = require("../lib/oop");
-var TextHighlightRules = require("./text_highlight_rules").TextHighlightRules;
+    var oop = require("../lib/oop");
+    var TextHighlightRules = require("./text_highlight_rules").TextHighlightRules;
 
-var AbapHighlightRules = function() {
+    var AbapHighlightRules = function () {
 
-    var keywordMapper = this.createKeywordMapper({
-        "variable.language": "this",
-        "keyword": 
-            "ADD ALIAS ALIASES ASCENDING ASSERT ASSIGN ASSIGNING AT BACK" +
+        var keywordMapper = this.createKeywordMapper({
+            "variable.language": "this",
+            "keyword": "ADD ALIAS ALIASES ASCENDING ASSERT ASSIGN ASSIGNING AT BACK" +
             " CALL CASE CATCH CHECK CLASS CLEAR CLOSE CNT COLLECT COMMIT COMMUNICATION COMPUTE CONCATENATE CONDENSE CONSTANTS CONTINUE CONTROLS CONVERT CREATE CURRENCY" +
             " DATA DEFINE DEFINITION DEFERRED DELETE DESCENDING DESCRIBE DETAIL DIVIDE DO" +
             " ELSE ELSEIF ENDAT ENDCASE ENDCLASS ENDDO ENDEXEC ENDFORM ENDFUNCTION ENDIF ENDIFEND ENDINTERFACE ENDLOOP ENDMETHOD ENDMODULE ENDON ENDPROVIDE ENDSELECT ENDTRY ENDWHILE EVENT EVENTS EXEC EXIT EXPORT EXPORTING EXTRACT" +
@@ -74,61 +73,58 @@ var AbapHighlightRules = function() {
             " APPENDING CORRESPONDING FIELDS OF TABLE" +
             " LEFT RIGHT OUTER INNER JOIN AS CLIENT SPECIFIED BYPASSING BUFFER UP TO ROWS CONNECTING" +
             " EQ NE LT LE GT GE NOT AND OR XOR IN LIKE BETWEEN",
-        "constant.language": 
-            "TRUE FALSE NULL SPACE",
-        "support.type": 
-            "c n i p f d t x string xstring decfloat16 decfloat34",
-        "keyword.operator":
-            "abs sign ceil floor trunc frac acos asin atan cos sin tan" +
+            "constant.language": "TRUE FALSE NULL SPACE",
+            "support.type": "c n i p f d t x string xstring decfloat16 decfloat34",
+            "keyword.operator": "abs sign ceil floor trunc frac acos asin atan cos sin tan" +
             " abapOperator cosh sinh tanh exp log log10 sqrt" +
-            " strlen xstrlen charlen numofchar dbmaxlen lines" 
-    }, "text", true, " ");
+            " strlen xstrlen charlen numofchar dbmaxlen lines"
+        }, "text", true, " ");
 
-    var compoundKeywords = "WITH\\W+(?:HEADER\\W+LINE|FRAME|KEY)|NO\\W+STANDARD\\W+PAGE\\W+HEADING|"+
-        "EXIT\\W+FROM\\W+STEP\\W+LOOP|BEGIN\\W+OF\\W+(?:BLOCK|LINE)|BEGIN\\W+OF|"+
-        "END\\W+OF\\W+(?:BLOCK|LINE)|END\\W+OF|NO\\W+INTERVALS|"+
-        "RESPECTING\\W+BLANKS|SEPARATED\\W+BY|USING\\W+(?:EDIT\\W+MASK)|"+
-        "WHERE\\W+(?:LINE)|RADIOBUTTON\\W+GROUP|REF\\W+TO|"+
-        "(?:PUBLIC|PRIVATE|PROTECTED)(?:\\W+SECTION)?|DELETING\\W+(?:TRAILING|LEADING)"+
-        "(?:ALL\\W+OCCURRENCES)|(?:FIRST|LAST)\\W+OCCURRENCE|INHERITING\\W+FROM|"+
-        "LINE-COUNT|ADD-CORRESPONDING|AUTHORITY-CHECK|BREAK-POINT|CLASS-DATA|CLASS-METHODS|"+
-        "CLASS-METHOD|DIVIDE-CORRESPONDING|EDITOR-CALL|END-OF-DEFINITION|END-OF-PAGE|END-OF-SELECTION|"+
-        "FIELD-GROUPS|FIELD-SYMBOLS|FUNCTION-POOL|MOVE-CORRESPONDING|MULTIPLY-CORRESPONDING|NEW-LINE|"+
-        "NEW-PAGE|NEW-SECTION|PRINT-CONTROL|RP-PROVIDE-FROM-LAST|SELECT-OPTIONS|SELECTION-SCREEN|"+
-        "START-OF-SELECTION|SUBTRACT-CORRESPONDING|SYNTAX-CHECK|SYNTAX-TRACE|TOP-OF-PAGE|TYPE-POOL|"+
-        "TYPE-POOLS|LINE-SIZE|LINE-COUNT|MESSAGE-ID|DISPLAY-MODE|READ(?:-ONLY)?|"+
-        "IS\\W+(?:NOT\\W+)?(?:ASSIGNED|BOUND|INITIAL|SUPPLIED)";
-     
-    this.$rules = {
-        "start" : [
-            {token : "string", regex : "`", next  : "string"},
-            {token : "string", regex : "'", next  : "qstring"},
-            {token : "doc.comment", regex : /^\*.+/},
-            {token : "comment",  regex : /".+$/},
-            {token : "invalid", regex: "\\.{2,}"},
-            {token : "keyword.operator", regex: /\W[\-+%=<>*]\W|\*\*|[~:,\.&$]|->*?|=>/},
-            {token : "paren.lparen", regex : "[\\[({]"},
-            {token : "paren.rparen", regex : "[\\])}]"},
-            {token : "constant.numeric", regex: "[+-]?\\d+\\b"},
-            {token : "variable.parameter", regex : /sy|pa?\d\d\d\d\|t\d\d\d\.|innnn/}, 
-            {token : "keyword", regex : compoundKeywords}, 
-            {token : "variable.parameter", regex : /\w+-\w+(?:-\w+)*/}, 
-            {token : keywordMapper, regex : "\\b\\w+\\b"},
-            {caseInsensitive: true}
-        ],
-        "qstring" : [
-            {token : "constant.language.escape",   regex : "''"},
-            {token : "string", regex : "'",     next  : "start"},
-            {defaultToken : "string"}
-        ],
-        "string" : [
-            {token : "constant.language.escape",   regex : "``"},
-            {token : "string", regex : "`",     next  : "start"},
-            {defaultToken : "string"}
-        ]
+        var compoundKeywords = "WITH\\W+(?:HEADER\\W+LINE|FRAME|KEY)|NO\\W+STANDARD\\W+PAGE\\W+HEADING|" +
+            "EXIT\\W+FROM\\W+STEP\\W+LOOP|BEGIN\\W+OF\\W+(?:BLOCK|LINE)|BEGIN\\W+OF|" +
+            "END\\W+OF\\W+(?:BLOCK|LINE)|END\\W+OF|NO\\W+INTERVALS|" +
+            "RESPECTING\\W+BLANKS|SEPARATED\\W+BY|USING\\W+(?:EDIT\\W+MASK)|" +
+            "WHERE\\W+(?:LINE)|RADIOBUTTON\\W+GROUP|REF\\W+TO|" +
+            "(?:PUBLIC|PRIVATE|PROTECTED)(?:\\W+SECTION)?|DELETING\\W+(?:TRAILING|LEADING)" +
+            "(?:ALL\\W+OCCURRENCES)|(?:FIRST|LAST)\\W+OCCURRENCE|INHERITING\\W+FROM|" +
+            "LINE-COUNT|ADD-CORRESPONDING|AUTHORITY-CHECK|BREAK-POINT|CLASS-DATA|CLASS-METHODS|" +
+            "CLASS-METHOD|DIVIDE-CORRESPONDING|EDITOR-CALL|END-OF-DEFINITION|END-OF-PAGE|END-OF-SELECTION|" +
+            "FIELD-GROUPS|FIELD-SYMBOLS|FUNCTION-POOL|MOVE-CORRESPONDING|MULTIPLY-CORRESPONDING|NEW-LINE|" +
+            "NEW-PAGE|NEW-SECTION|PRINT-CONTROL|RP-PROVIDE-FROM-LAST|SELECT-OPTIONS|SELECTION-SCREEN|" +
+            "START-OF-SELECTION|SUBTRACT-CORRESPONDING|SYNTAX-CHECK|SYNTAX-TRACE|TOP-OF-PAGE|TYPE-POOL|" +
+            "TYPE-POOLS|LINE-SIZE|LINE-COUNT|MESSAGE-ID|DISPLAY-MODE|READ(?:-ONLY)?|" +
+            "IS\\W+(?:NOT\\W+)?(?:ASSIGNED|BOUND|INITIAL|SUPPLIED)";
+
+        this.$rules = {
+            "start": [
+                {token: "string", regex: "`", next: "string"},
+                {token: "string", regex: "'", next: "qstring"},
+                {token: "doc.comment", regex: /^\*.+/},
+                {token: "comment", regex: /".+$/},
+                {token: "invalid", regex: "\\.{2,}"},
+                {token: "keyword.operator", regex: /\W[\-+%=<>*]\W|\*\*|[~:,\.&$]|->*?|=>/},
+                {token: "paren.lparen", regex: "[\\[({]"},
+                {token: "paren.rparen", regex: "[\\])}]"},
+                {token: "constant.numeric", regex: "[+-]?\\d+\\b"},
+                {token: "variable.parameter", regex: /sy|pa?\d\d\d\d\|t\d\d\d\.|innnn/},
+                {token: "keyword", regex: compoundKeywords},
+                {token: "variable.parameter", regex: /\w+-\w+(?:-\w+)*/},
+                {token: keywordMapper, regex: "\\b\\w+\\b"},
+                {caseInsensitive: true}
+            ],
+            "qstring": [
+                {token: "constant.language.escape", regex: "''"},
+                {token: "string", regex: "'", next: "start"},
+                {defaultToken: "string"}
+            ],
+            "string": [
+                {token: "constant.language.escape", regex: "``"},
+                {token: "string", regex: "`", next: "start"},
+                {defaultToken: "string"}
+            ]
+        };
     };
-};
-oop.inherits(AbapHighlightRules, TextHighlightRules);
+    oop.inherits(AbapHighlightRules, TextHighlightRules);
 
-exports.AbapHighlightRules = AbapHighlightRules;
+    exports.AbapHighlightRules = AbapHighlightRules;
 });

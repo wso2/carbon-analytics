@@ -28,7 +28,7 @@ define(["jquery"], function (jQuery) {
     self.HTTP_PUT = "PUT";
     self.HTTP_DELETE = "DELETE";
     self.simulatorUrl = window.location.protocol + "//" + window.location.host + "/simulation";
-    self.editorUrl =  window.location.protocol + "//" + window.location.host + '/editor';
+    self.editorUrl = window.location.protocol + "//" + window.location.host + '/editor';
 
 
     self.retrieveSiddhiAppNames = function (successCallback, errorCallback) {
@@ -238,7 +238,7 @@ define(["jquery"], function (jQuery) {
     self.updateSimulation = function (simulationName, simulationConfig, successCallback, errorCallback) {
         jQuery.ajax({
             async: true,
-            url: self.simulatorUrl + "/feed/"+simulationName+"",
+            url: self.simulatorUrl + "/feed/" + simulationName + "",
             type: self.HTTP_PUT,
             data: simulationConfig,
             dataType: "json",
@@ -257,7 +257,7 @@ define(["jquery"], function (jQuery) {
     self.deleteSimulation = function (simulationName, successCallback, errorCallback) {
         jQuery.ajax({
             async: true,
-            url: self.simulatorUrl + "/feed/"+simulationName+"",
+            url: self.simulatorUrl + "/feed/" + simulationName + "",
             type: self.HTTP_DELETE,
             dataType: "json",
             success: function (data) {

@@ -46,7 +46,7 @@ var predictionContextFromRuleContext = pc.predictionContextFromRuleContext;
 var PredictionContext = pc.PredictionContext;
 var SingletonPredictionContext = pc.SingletonPredictionContext;
 
-function LL1Analyzer (atn) {
+function LL1Analyzer(atn) {
     this.atn = atn;
 }
 
@@ -66,21 +66,21 @@ LL1Analyzer.HIT_PRED = Token.INVALID_TYPE;
 // @param s the ATN state
 // @return the expected symbols for each outgoing transition of {@code s}.
 ///
-LL1Analyzer.prototype.getDecisionLookahead = function(s) {
+LL1Analyzer.prototype.getDecisionLookahead = function (s) {
     if (s === null) {
         return null;
     }
     var count = s.transitions.length;
     var look = [];
-    for(var alt=0; alt< count; alt++) {
+    for (var alt = 0; alt < count; alt++) {
         look[alt] = new IntervalSet();
         var lookBusy = new Set();
         var seeThruPreds = false; // fail to get lookahead upon pred
         this._LOOK(s.transition(alt).target, null, PredictionContext.EMPTY,
-              look[alt], lookBusy, new BitSet(), seeThruPreds, false);
+            look[alt], lookBusy, new BitSet(), seeThruPreds, false);
         // Wipe out lookahead for this alternative if we found nothing
         // or we had a predicate when we !seeThruPreds
-        if (look[alt].length===0 || look[alt].contains(LL1Analyzer.HIT_PRED)) {
+        if (look[alt].length === 0 || look[alt].contains(LL1Analyzer.HIT_PRED)) {
             look[alt] = null;
         }
     }
@@ -105,15 +105,15 @@ LL1Analyzer.prototype.getDecisionLookahead = function(s) {
 // @return The set of tokens that can follow {@code s} in the ATN in the
 // specified {@code ctx}.
 ///
-LL1Analyzer.prototype.LOOK = function(s, stopState, ctx) {
+LL1Analyzer.prototype.LOOK = function (s, stopState, ctx) {
     var r = new IntervalSet();
     var seeThruPreds = true; // ignore preds; get all lookahead
-	ctx = ctx || null;
-    var lookContext = ctx!==null ? predictionContextFromRuleContext(s.atn, ctx) : null;
+    ctx = ctx || null;
+    var lookContext = ctx !== null ? predictionContextFromRuleContext(s.atn, ctx) : null;
     this._LOOK(s, stopState, lookContext, r, new Set(), new BitSet(), seeThruPreds, true);
     return r;
 };
-    
+
 //*
 // Compute set of tokens that can follow {@code s} in the ATN in the
 // specified {@code ctx}.
@@ -144,14 +144,14 @@ LL1Analyzer.prototype.LOOK = function(s, stopState, ctx) {
 // outermost context is reached. This parameter has no effect if {@code ctx}
 // is {@code null}.
 ///
-LL1Analyzer.prototype._LOOK = function(s, stopState , ctx, look, lookBusy, calledRuleStack, seeThruPreds, addEOF) {
-    var c = new ATNConfig({state:s, alt:0, context: ctx}, null);
+LL1Analyzer.prototype._LOOK = function (s, stopState, ctx, look, lookBusy, calledRuleStack, seeThruPreds, addEOF) {
+    var c = new ATNConfig({state: s, alt: 0, context: ctx}, null);
     if (lookBusy.contains(c)) {
         return;
     }
     lookBusy.add(c);
     if (s === stopState) {
-        if (ctx ===null) {
+        if (ctx === null) {
             look.addOne(Token.EPSILON);
             return;
         } else if (ctx.isEmpty() && addEOF) {
@@ -159,8 +159,8 @@ LL1Analyzer.prototype._LOOK = function(s, stopState , ctx, look, lookBusy, calle
             return;
         }
     }
-    if (s instanceof RuleStopState ) {
-        if (ctx ===null) {
+    if (s instanceof RuleStopState) {
+        if (ctx === null) {
             look.addOne(Token.EPSILON);
             return;
         } else if (ctx.isEmpty() && addEOF) {
@@ -169,7 +169,7 @@ LL1Analyzer.prototype._LOOK = function(s, stopState , ctx, look, lookBusy, calle
         }
         if (ctx !== PredictionContext.EMPTY) {
             // run thru all possible stack tops in ctx
-            for(var i=0; i<ctx.length; i++) {
+            for (var i = 0; i < ctx.length; i++) {
                 var returnState = this.atn.states[ctx.getReturnState(i)];
                 var removed = calledRuleStack.contains(returnState.ruleIndex);
                 try {
@@ -184,7 +184,7 @@ LL1Analyzer.prototype._LOOK = function(s, stopState , ctx, look, lookBusy, calle
             return;
         }
     }
-    for(var j=0; j<s.transitions.length; j++) {
+    for (var j = 0; j < s.transitions.length; j++) {
         var t = s.transitions[j];
         if (t.constructor === RuleTransition) {
             if (calledRuleStack.contains(t.target.ruleIndex)) {
@@ -197,16 +197,16 @@ LL1Analyzer.prototype._LOOK = function(s, stopState , ctx, look, lookBusy, calle
             } finally {
                 calledRuleStack.remove(t.target.ruleIndex);
             }
-        } else if (t instanceof AbstractPredicateTransition ) {
+        } else if (t instanceof AbstractPredicateTransition) {
             if (seeThruPreds) {
                 this._LOOK(t.target, stopState, ctx, look, lookBusy, calledRuleStack, seeThruPreds, addEOF);
             } else {
                 look.addOne(LL1Analyzer.HIT_PRED);
             }
-        } else if( t.isEpsilon) {
+        } else if (t.isEpsilon) {
             this._LOOK(t.target, stopState, ctx, look, lookBusy, calledRuleStack, seeThruPreds, addEOF);
         } else if (t.constructor === WildcardTransition) {
-            look.addRange( Token.MIN_USER_TOKEN_TYPE, this.atn.maxTokenType );
+            look.addRange(Token.MIN_USER_TOKEN_TYPE, this.atn.maxTokenType);
         } else {
             var set = t.label;
             if (set !== null) {

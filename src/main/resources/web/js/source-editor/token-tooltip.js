@@ -103,7 +103,7 @@ define(["ace/lib/dom", "ace/lib/oop", "ace/lib/event", "ace/range", "ace/tooltip
                         if (!this.isOpen) {
                             // Starting the timer to show tooltip if it not already open
                             var self = this;
-                            this.$showTooltipTimer = setTimeout(function() {
+                            this.$showTooltipTimer = setTimeout(function () {
                                 self.show(null, self.x, self.y);
                             }, constants.TOOLTIP_SHOW_DELAY - 100);
                         } else {

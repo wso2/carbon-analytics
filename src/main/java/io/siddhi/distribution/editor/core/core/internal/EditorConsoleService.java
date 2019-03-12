@@ -112,23 +112,6 @@ public class EditorConsoleService implements WebSocketEndpoint {
         }
     }
 
-    private final class LogPublisherTask implements Runnable {
-        public void run() {
-            try {
-                List<ConsoleLogEvent> logEvents = circularBuffer.get(circularBuffer.getAmount());
-                if (!logEvents.isEmpty()) {
-                    broadcastConsoleOutput(logEvents);
-                    circularBuffer.clear();
-                }
-            } catch (Exception e) {
-                // Preserve interrupt status
-                Thread.currentThread().interrupt();
-                LogLog.error("LogEventAppender cannot publish log events, " + e.getMessage(), e);
-            }
-        }
-
-    }
-
     private void broadcastConsoleOutput(List<ConsoleLogEvent> event) {
         for (ConsoleLogEvent logEvent : event) {
             if (session.isOpen()) {
@@ -145,6 +128,23 @@ public class EditorConsoleService implements WebSocketEndpoint {
     private String getJsonString(ConsoleLogEvent logEvent) throws JsonProcessingException {
         ObjectMapper mapper = new ObjectMapper();
         return mapper.writeValueAsString(logEvent);
+    }
+
+    private final class LogPublisherTask implements Runnable {
+        public void run() {
+            try {
+                List<ConsoleLogEvent> logEvents = circularBuffer.get(circularBuffer.getAmount());
+                if (!logEvents.isEmpty()) {
+                    broadcastConsoleOutput(logEvents);
+                    circularBuffer.clear();
+                }
+            } catch (Exception e) {
+                // Preserve interrupt status
+                Thread.currentThread().interrupt();
+                LogLog.error("LogEventAppender cannot publish log events, " + e.getMessage(), e);
+            }
+        }
+
     }
 }
 

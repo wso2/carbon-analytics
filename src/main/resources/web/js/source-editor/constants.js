@@ -21,7 +21,7 @@
  * This is not directly imported by the web worker since some of the constants are initiated using the window object
  * The SiddhiEditor.constants in passed into the web worker when the siddhi worker is initialized
  */
-define(function() {
+define(function () {
 
     "use strict";   // JS strict mode
 

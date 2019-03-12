@@ -18,6 +18,9 @@
 
 package io.siddhi.distribution.editor.core.core.util.designview.designgenerator.generators.query.input.types.patternsequencesupporters;
 
+/**
+ * Class for event state element configuration.
+ */
 public class EveryStateElementConfig implements StateElementConfig {
     private StateElementConfig stateElement;
     private String within;

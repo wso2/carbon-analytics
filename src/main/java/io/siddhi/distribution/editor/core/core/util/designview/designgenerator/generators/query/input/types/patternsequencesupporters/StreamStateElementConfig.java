@@ -22,6 +22,9 @@ import io.siddhi.distribution.editor.core.core.util.designview.beans.configs.sid
 
 import java.util.List;
 
+/**
+ * Stream state element configuration class.
+ */
 public class StreamStateElementConfig implements StateElementConfig {
     private String streamReference;
     private String streamName;

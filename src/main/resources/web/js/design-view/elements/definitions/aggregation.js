@@ -28,40 +28,40 @@ define(['require', 'elementUtils'],
         var Aggregation = function (options) {
             /*
              Data storing structure as follows
-                id: '',
-                previousCommentSegment:'',
-                name*: '',
-                from*: ‘’,
-                select*: [
-                    {
-                        type*: 'USER_DEFINED',
-                        value*: [
-                            {
-                                expression*: '',
-                                as: ''
-                            },
-                            ...
-                        ]
-                        << or >>
-                        type*: 'ALL',
-                        value*: '*'
-                    }
-                ],
-                groupBy: ['value1',...],
-                aggregateByAttribute*: ‘’,
-                aggregateByTimePeriod*: {
-                    type*: 'RANGE',
-                    value*: {
-                        min*: '',
-                        max*: ''
-                    }
-                    << or >>
-                    type*: 'INTERVAL',
-                    value*: ['seconds', 'minutes', ...] // At least one value must be available
-                },
-                store: {Store JSON},
-                annotationList: [annotation1, annotation2, ...]
-            */
+             id: '',
+             previousCommentSegment:'',
+             name*: '',
+             from*: ‘’,
+             select*: [
+             {
+             type*: 'USER_DEFINED',
+             value*: [
+             {
+             expression*: '',
+             as: ''
+             },
+             ...
+             ]
+             << or >>
+             type*: 'ALL',
+             value*: '*'
+             }
+             ],
+             groupBy: ['value1',...],
+             aggregateByAttribute*: ‘’,
+             aggregateByTimePeriod*: {
+             type*: 'RANGE',
+             value*: {
+             min*: '',
+             max*: ''
+             }
+             << or >>
+             type*: 'INTERVAL',
+             value*: ['seconds', 'minutes', ...] // At least one value must be available
+             },
+             store: {Store JSON},
+             annotationList: [annotation1, annotation2, ...]
+             */
             if (options !== undefined) {
                 this.id = options.id;
                 this.previousCommentSegment = options.previousCommentSegment;

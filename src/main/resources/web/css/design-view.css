@@ -531,8 +531,7 @@ a.list-group-item, button.list-group-item {
 .define-window [data-schemapath="root.parameters"] table,
 .define-trigger [data-schemapath="root.annotations"] table,
 .define-partition [data-schemapath="root.annotations"] table,
-.define-partition [data-schemapath="root.partitionKeys"] table
-{
+.define-partition [data-schemapath="root.partitionKeys"] table {
     width: 650px;
 }
 
@@ -547,8 +546,7 @@ a.list-group-item, button.list-group-item {
 .define-window [data-schemapath="root.annotations"] table tr td:first-child,
 .define-window [data-schemapath="root.parameters"] table tr td:first-child,
 .define-trigger [data-schemapath="root.annotations"] table tr td:first-child,
-.define-partition [data-schemapath="root.annotations"] table tr td:first-child
-{
+.define-partition [data-schemapath="root.annotations"] table tr td:first-child {
     width: 508px;
 }
 
@@ -562,23 +560,20 @@ a.list-group-item, button.list-group-item {
 .define-trigger [data-schemapath="root.annotations"] table tr td:nth-child(1),
 .define-trigger [data-schemapath="root.annotations"] table tr td:nth-child(2),
 .define-partition [data-schemapath="root.partitionKeys"] table tr td:nth-child(1),
-.define-partition [data-schemapath="root.partitionKeys"] table tr td:nth-child(2)
-{
+.define-partition [data-schemapath="root.partitionKeys"] table tr td:nth-child(2) {
     width: 254px;
 }
 
 /* 2 column with type field */
 .define-stream [data-schemapath="root.attributes"] table tr td:nth-child(1),
 .define-table [data-schemapath="root.attributes"] table tr td:nth-child(1),
-.define-window [data-schemapath="root.attributes"] table tr td:nth-child(1)
-{
+.define-window [data-schemapath="root.attributes"] table tr td:nth-child(1) {
     width: 428px;
 }
 
 .define-stream [data-schemapath="root.attributes"] table tr td:nth-child(2),
 .define-table [data-schemapath="root.attributes"] table tr td:nth-child(2),
-.define-window [data-schemapath="root.attributes"] table tr td:nth-child(2)
-{
+.define-window [data-schemapath="root.attributes"] table tr td:nth-child(2) {
     width: 80px;
 }
 
@@ -599,216 +594,215 @@ a.list-group-item, button.list-group-item {
 .define-aggregation [data-schemapath="root.annotations"] table thead,
 .define-aggregation [data-schemapath="root.aggregateByTimePeriod"] table thead,
 .define-pattern-query [data-schemapath="root.annotations"] table thead,
-.define-sequence-query [data-schemapath="root.annotations"] table thead
-{
+.define-sequence-query [data-schemapath="root.annotations"] table thead {
     display: none;
 }
 
 .incomplete-element {
-	border: 1px solid yellow;
-	box-shadow: 0 0 1px 2px yellow;
+    border: 1px solid yellow;
+    box-shadow: 0 0 1px 2px yellow;
 }
 
 .error-element {
-	border: 1px solid #FF0000;
-	box-shadow: 0 0 1px 2px #FF0000;
+    border: 1px solid #FF0000;
+    box-shadow: 0 0 1px 2px #FF0000;
 }
 
 .js-tree-error-node {
-	border: 1px solid red;
-	background: red;
+    border: 1px solid red;
+    background: red;
 }
 
 .design-view-form-content input[type="text"].required-input-field,
 .design-view-form-content textarea.required-input-field {
-	border: 1px solid #FF0000;
+    border: 1px solid #FF0000;
 }
 
 .design-view-form-content .error-message {
-	color: red;
-	padding-top: 3px;
+    color: red;
+    padding-top: 3px;
 }
 
 .design-view-form-content .customized-options .error-message,
 .design-view-form-content .source-sink-map-options .customized-options .error-message {
-	margin-left: 75px;
+    margin-left: 75px;
 }
 
 .design-view-form-content .partition-form-container #partition-by-stream-name-label {
-	margin-left: 120px;
+    margin-left: 120px;
 }
 
 .design-view-form-content .partition-form-container .partition-by-expression {
-	margin-right: 10px;
+    margin-right: 10px;
 }
 
 .source-sink-form-container .source-sink-map-options .error-message,
 .table-form-container #store-options .error-message,
 .table-form-container #define-predefined-annotations .error-message,
 .window-form-container #defineFunctionParameters .error-message {
-	margin-left: 20px;
+    margin-left: 20px;
 }
 
 .design-view-form-content input[type="text"],
 .design-view-form-content textarea {
-	border: 1px solid #716e6e;
-	line-height: 20px;
-	padding: 0 5px;
-	color: #ccc;
-	background: #424242;
+    border: 1px solid #716e6e;
+    line-height: 20px;
+    padding: 0 5px;
+    color: #ccc;
+    background: #424242;
 }
 
 .design-view-form-content input[type="text"].option-value,
-.window-form-container input[type="text"].parameter-value{
-	width: calc(90% - 30px);
-	margin-bottom: 2px;
-	margin-left: 20px;
+.window-form-container input[type="text"].parameter-value {
+    width: calc(90% - 30px);
+    margin-bottom: 2px;
+    margin-left: 20px;
 }
 
 .trigger-form-container #trigger-criteria-content .description {
-	font-size: 12px;
-	margin-left: 5px;
-	color: #ccc;
+    font-size: 12px;
+    margin-left: 5px;
+    color: #ccc;
 }
 
 .table-form-container input[type="text"].annotation-value {
- 	margin-bottom: 2px;
-	margin-left: 20px;
- }
-
-.design-view-form-content .attr-nav {
-	margin-left: 10px;
+    margin-bottom: 2px;
+    margin-left: 20px;
 }
 
-.design-view-form-content .attribute .attr-nav  a {
-	float: left;
-	display: inline-block;
-	height: 22px;
-	padding: 0 5px;
-	margin-left: 3px;
-	margin-top: 2px;
-	background: #424242;
-	color: #ccc;
-	border: 1px solid #716e6e;
+.design-view-form-content .attr-nav {
+    margin-left: 10px;
+}
+
+.design-view-form-content .attribute .attr-nav a {
+    float: left;
+    display: inline-block;
+    height: 22px;
+    padding: 0 5px;
+    margin-left: 3px;
+    margin-top: 2px;
+    background: #424242;
+    color: #ccc;
+    border: 1px solid #716e6e;
 }
 
 .design-view-form-content .btn-del-option,
 .window-form-container .btn-del-parameter,
 .table-form-container .btn-del-annot-value {
-	display: inline-block;
-	height: 21px;
-	padding: 0 8px;
-	background: #424242;
-	margin-left: 3px;
-	border: 1px solid #716e6e;
+    display: inline-block;
+    height: 21px;
+    padding: 0 8px;
+    background: #424242;
+    margin-left: 3px;
+    border: 1px solid #716e6e;
 }
 
 .source-sink-form-container input[type="text"].readonly-attr,
 .source-sink-form-container #attributeMap-type:disabled,
 .table-form-container #store-type:disabled,
 .partition-form-container #define-partition-keys .partition-by-stream-name {
-	cursor: not-allowed;
-	background: #1d1d1d;
-	border: 1px solid #545353;
+    cursor: not-allowed;
+    background: #1d1d1d;
+    border: 1px solid #545353;
 }
 
 .design-view-form-content .attribute .attr-nav a .fw-sort-down {
-	font-size: 16px;
-	margin-top: -3px;
-	color: #ccc;
+    font-size: 16px;
+    margin-top: -3px;
+    color: #ccc;
 }
 
 .design-view-form-content .attribute .attr-nav a .fw-sort-up {
-	font-size: 16px;
-	margin-top: 6px;
-	color: #ccc;
+    font-size: 16px;
+    margin-top: 6px;
+    color: #ccc;
 }
 
 .clearfix {
-	display: block;
-	content: "";
-	clear: both;
+    display: block;
+    content: "";
+    clear: both;
 }
 
 .design-view-form-content .fw-delete {
-	font-size: 12px;
-	margin-top: 3px;
-	color: #ccc;
+    font-size: 12px;
+    margin-top: 3px;
+    color: #ccc;
 }
 
 .design-view-form-content .attr-nav,
 .design-view-form-content .attr-content {
-	display: inline-block;
-	float: left;
+    display: inline-block;
+    float: left;
 }
 
 .design-view-form-content .attribute {
-	margin-bottom: 5px;
+    margin-bottom: 5px;
 }
 
 .design-view-form-content .annotation > a > i.jstree-checkbox,
 .design-view-form-content .annotation > .jstree-clicked > i.jstree-checkbox,
 .design-view-form-content .annotation > i.jstree-checkbox {
-	display: none;
+    display: none;
 }
 
 .design-view-form-content .annotation-key > a > i.jstree-checkbox,
 .design-view-form-content .annotation-key > .jstree-clicked > i.jstree-checkbox,
 .design-view-form-content .annotation-key > i.jstree-checkbox {
-	display: none;
+    display: none;
 }
 
 .design-view-form-content .annotation-value > a > i.jstree-checkbox,
 .design-view-form-content .annotation-value > .jstree-clicked > i.jstree-checkbox,
 .design-view-form-content .annotation-value > i.jstree-checkbox {
-	display: none;
+    display: none;
 }
 
 .design-view-form-content .mandatory-key > a > i.jstree-checkbox,
 .design-view-form-content .mandatory-key > .jstree-clicked > i.jstree-checkbox {
-	display: none;
+    display: none;
 }
 
 .design-view-form-content .mandatory-annotation > a > i.jstree-checkbox,
 .design-view-form-content .mandatory-annotation > .jstree-clicked > i.jstree-checkbox {
-	display: none;
+    display: none;
 }
 
 .design-view-form-content .mandatory-annotation > a.jstree-hovered,
 .design-view-form-content .optional-key > a.jstree-hovered,
 .design-view-form-content .annotation-value > a.jstree-hovered {
-	cursor: context;
-	color: #ccc;
-	background: transparent;
-	border-radius: 0px;
+    cursor: context;
+    color: #ccc;
+    background: transparent;
+    border-radius: 0px;
 }
 
 .design-view-form-content .optional-annotation > a.jstree-hovered,
 .design-view-form-content .mandatory-key > a.jstree-hovered {
-	cursor: default;
-	color: #ccc;
-	background: transparent;
-	border-radius: 0px;
+    cursor: default;
+    color: #ccc;
+    background: transparent;
+    border-radius: 0px;
 }
 
-.design-view-form-content  .jstree-clicked {
-	background: #5F5B5A;
-	color:black;
-	border-radius: 2px;
-	box-shadow: inset 0 0 1px #999999;
+.design-view-form-content .jstree-clicked {
+    background: #5F5B5A;
+    color: black;
+    border-radius: 2px;
+    box-shadow: inset 0 0 1px #999999;
 }
 
 .design-view-form-content .jstree-hovered {
-	background: transparent;
+    background: transparent;
 }
 
-.design-view-form-content  .stream-form-container #define-annotation {
-	margin-top:10px;
-	color: #ccc;
+.design-view-form-content .stream-form-container #define-annotation {
+    margin-top: 10px;
+    color: #ccc;
 }
 
 .design-view-form-content .cust-option-key {
-	margin-left: 20px;
+    margin-left: 20px;
 }
 
 .design-view-form-content .cust-option-value {
@@ -816,11 +810,11 @@ a.list-group-item, button.list-group-item {
 }
 
 .stream-form-container {
-	width:50%;
+    width: 50%;
 }
 
 .partition-form-container {
-	width: 40%;
+    width: 40%;
 }
 
 .stream-form-container,
@@ -830,146 +824,146 @@ a.list-group-item, button.list-group-item {
 .trigger-form-container,
 .function-form-container,
 .partition-form-container {
-	float: left;
-	display: inline-block;
-	padding: 5px;
+    float: left;
+    display: inline-block;
+    padding: 5px;
 }
 
 .window-form-container,
 .trigger-form-container,
 .function-form-container {
-	width: 25%;
+    width: 25%;
 }
 
 .trigger-form-container #define-trigger-criteria {
-	margin-top: -3px;
-	margin-bottom: 10px;
+    margin-top: -3px;
+    margin-bottom: 10px;
 }
 
 .window-form-container #defineFunctionName,
 .window-form-container #defineOutputEvents,
 .window-form-container #define-annotation {
-	margin-top:18px;
+    margin-top: 18px;
 }
 
 .design-view-form-content .source-div,
 .design-view-form-content .sink-div {
-	width: 45%;
+    width: 45%;
 }
 
 .design-view-form-content .table-div {
-	width: 25%;
+    width: 25%;
 }
 
 .design-view-form-content .mapper-div {
-	width: 25%;
+    width: 25%;
 }
 
 .design-view-form-content .store-div {
-	width: 40%;
-	margin-top: 20px;
+    width: 40%;
+    margin-top: 20px;
 }
 
 .design-view-form-content .define-table-annotation {
-	width: 30%;
-	margin-top: 10px;
-	margin-left: 20px;
+    width: 30%;
+    margin-top: 10px;
+    margin-left: 20px;
 }
 
 .table-form-container #table-annotations .table-annotation {
-	margin-bottom: 10px;
+    margin-bottom: 10px;
 }
 
 .design-view-form-content .attribute-map-div {
-	width: 30%;
-	margin-top: 48px;
+    width: 30%;
+    margin-top: 48px;
 }
 
 .table-form-container #store-options,
 .source-sink-form-container #source-options,
 .source-sink-form-container #sink-options {
-	display: flex;
+    display: flex;
 }
 
 .table-form-container .sub-store-options-div,
 .source-sink-form-container .sub-source-options-div,
 .source-sink-form-container .sub-sink-options-div {
-	width: 50%;
+    width: 50%;
 }
 
 .design-view-form-content #btn-submit,
 .design-view-form-content #btn-cancel {
-	margin-top: 15px;
-	margin-right: 10px;
+    margin-top: 15px;
+    margin-right: 10px;
 }
 
 .design-view-form-content input[type="checkbox"],
 .design-view-form-content input[type="radio"] {
-	margin: 0px 5px 0px 0;
-	vertical-align: middle;
+    margin: 0px 5px 0px 0;
+    vertical-align: middle;
 }
 
 .design-view-form-content #attribute-key-label {
-	margin-left: 75px;
-	margin-right: 100px;
+    margin-left: 75px;
+    margin-right: 100px;
 }
 
 .design-view-form-content .fw-info {
-	font-size: 10px;
-	margin-left: 3px;
-	color: #b7f1eb;
+    font-size: 10px;
+    margin-left: 3px;
+    color: #b7f1eb;
 }
 
 .design-view-form-content .trigger-form-container .fw-info {
-	font-size: 12px;
+    font-size: 12px;
 }
 
 .design-view-form-content .cust-options .option {
-	margin-bottom: 2px;
+    margin-bottom: 2px;
 }
 
 .design-view-form-content .source-sink-form-container #stream-attributes {
-	margin-top: 10px;
+    margin-top: 10px;
 }
 
 .design-view-form-content .option .option-desc-content,
 .design-view-form-content .parameter .parameter-desc-content,
 .trigger-form-container #define-trigger-criteria .criteria-description {
-	 font-family: Arial;
-	 background: #252525;
-	 width: 250px;
-	 color: #eee;
-	 text-align: left;
-	 border-radius: 6px;
-	 padding: 5 5px;
-	 /* Position the tooltip */
-	 position: absolute;
-	 z-index: 1;
+    font-family: Arial;
+    background: #252525;
+    width: 250px;
+    color: #eee;
+    text-align: left;
+    border-radius: 6px;
+    padding: 5 5px;
+    /* Position the tooltip */
+    position: absolute;
+    z-index: 1;
 }
 
 .design-view-form-content .btn-default {
-	color: #ccc;
-	background: #2c2c2c;
-	margin-top: 15px;
+    color: #ccc;
+    background: #2c2c2c;
+    margin-top: 15px;
 }
 
 .table-form-container #table-annotations .btn-add-annot-value {
-	margin-top: 0px;
-	margin-bottom: 10px;
-	margin-left: 160px;
+    margin-top: 0px;
+    margin-bottom: 10px;
+    margin-left: 160px;
 }
 
 .design-view-form-content .mandatory-option-symbol,
 .design-view-form-content .mandatory-parameter-symbol {
-	margin-right: 12px;
+    margin-right: 12px;
 }
 
 .design-view-form-content select {
-	color: #ccc;
-	background: #424242;
-	border: 1px solid #716e6e;
-	height: 22px;
-	margin-top: 2px;
+    color: #ccc;
+    background: #424242;
+    border: 1px solid #716e6e;
+    height: 22px;
+    margin-top: 2px;
 }
 
 .design-view-form-content .optional-option:hover,
@@ -977,20 +971,20 @@ a.list-group-item, button.list-group-item {
 .source-sink-form-container #attribute-map-label:hover,
 .table-form-container .rdbms-type,
 .table-form-container #table-annotations .annotation-name {
-	cursor: pointer;
+    cursor: pointer;
 }
 
 .source-sink-form-container .attribute-labels {
-	margin-top: 10px;
+    margin-top: 10px;
 }
 
 .design-view-form-content label {
-   word-break: break-all;
+    word-break: break-all;
 }
 
 .table-form-container .rdbms-type {
-	margin-right: 10px;
-	margin-top: 10px;
+    margin-right: 10px;
+    margin-top: 10px;
 }
 
 .selector {
@@ -1019,7 +1013,7 @@ textarea {
     box-shadow: 0 0 1px 1px #4af;
 }
 
-.selected-button{
+.selected-button {
     color: #ffffff !important;
     transition: 0.15s !important;
 }

@@ -133,10 +133,10 @@ define(['require', 'log', 'jquery', 'backbone', 'tool_palette/tool', 'tool_palet
                         toolGroupName: "Queries"
                     },
                     {
-                        id : "sequence-query",
-                        className : "sequence-query-drag",
-                        title : "Sequence",
-                        icon : "/editor/images/sequence-query.svg",
+                        id: "sequence-query",
+                        className: "sequence-query-drag",
+                        title: "Sequence",
+                        icon: "/editor/images/sequence-query.svg",
                         toolGroupName: "Queries"
                     },
                     {
@@ -158,8 +158,8 @@ define(['require', 'log', 'jquery', 'backbone', 'tool_palette/tool', 'tool_palet
                 this.toolGroups = {};
                 var self = this;
 
-                _.forEach(definitionTools, function(obj){
-                    if(!self.toolGroups[obj.toolGroupName]){
+                _.forEach(definitionTools, function (obj) {
+                    if (!self.toolGroups[obj.toolGroupName]) {
                         self.toolGroups[obj.toolGroupName] = [];
                     }
                     var tool = new Tool(obj);
@@ -173,24 +173,24 @@ define(['require', 'log', 'jquery', 'backbone', 'tool_palette/tool', 'tool_palet
 
                 var toolGroupElements = [];
 
-                Object.keys(self.toolGroups).forEach(function(key) {
-                    var groupDiv = $('<div id="tool-group-'+ key +'" class="tool-group"></div>');
+                Object.keys(self.toolGroups).forEach(function (key) {
+                    var groupDiv = $('<div id="tool-group-' + key + '" class="tool-group"></div>');
                     var groupDivBody = $('<div class="tool-group-body"></div>');
                     var groupDivHeader = $('<div class="tool-group-header">' +
-                        '<a class="tool-group-header-title">'+key+'</a>' +
+                        '<a class="tool-group-header-title">' + key + '</a>' +
                         '<span class="collapse-icon fw fw-up"></span>' +
                         '</div>');
 
-                    groupDivHeader.click(function(e) {
+                    groupDivHeader.click(function (e) {
                         var clickedEl = e.target;
 
-                        if(clickedEl.classList.contains('collapse-icon') ||
+                        if (clickedEl.classList.contains('collapse-icon') ||
                             clickedEl.classList.contains('tool-group-header-title')) {
                             clickedEl = e.target.parentElement;
                         }
 
-                        if(clickedEl.classList.contains('tool-group-header')) {
-                            $(clickedEl.parentElement.lastElementChild).slideToggle(500, function() {
+                        if (clickedEl.classList.contains('tool-group-header')) {
+                            $(clickedEl.parentElement.lastElementChild).slideToggle(500, function () {
                                 $(clickedEl.lastElementChild).toggleClass("fw-down fw-up");
                             });
                         }
@@ -198,7 +198,7 @@ define(['require', 'log', 'jquery', 'backbone', 'tool_palette/tool', 'tool_palet
 
                     groupDiv.append(groupDivHeader);
 
-                    _.forEach(self.toolGroups[key], function(tool) {
+                    _.forEach(self.toolGroups[key], function (tool) {
                         var toolView = new ToolView({model: tool, toolPalette: self.toolPalette});
                         toolView.render(groupDivBody);
                     });

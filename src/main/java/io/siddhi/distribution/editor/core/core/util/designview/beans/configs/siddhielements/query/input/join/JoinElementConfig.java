@@ -51,36 +51,36 @@ public class JoinElementConfig {
         return type;
     }
 
-    public String getFrom() {
-        return from;
-    }
-
-    public List<StreamHandlerConfig> getStreamHandlerList() {
-        return streamHandlerList;
-    }
-
-    public String getAs() {
-        return as;
-    }
-
-    public boolean isUnidirectional() {
-        return isUnidirectional;
-    }
-
     public void setType(String type) {
         this.type = type;
+    }
+
+    public String getFrom() {
+        return from;
     }
 
     public void setFrom(String from) {
         this.from = from;
     }
 
+    public List<StreamHandlerConfig> getStreamHandlerList() {
+        return streamHandlerList;
+    }
+
     public void setStreamHandlerList(List<StreamHandlerConfig> streamHandlerList) {
         this.streamHandlerList = streamHandlerList;
     }
 
+    public String getAs() {
+        return as;
+    }
+
     public void setAs(String as) {
         this.as = as;
+    }
+
+    public boolean isUnidirectional() {
+        return isUnidirectional;
     }
 
     public void setUnidirectional(boolean unidirectional) {

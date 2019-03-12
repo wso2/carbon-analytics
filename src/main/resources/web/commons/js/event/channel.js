@@ -15,7 +15,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-define(['lodash'], function(_){
+define(['lodash'], function (_) {
 
     // A module that can be mixed in to *any object* in order to provide it with
     // a custom event channel. You may bind a callback to an event with `on` or
@@ -25,7 +25,8 @@ define(['lodash'], function(_){
      * @class EventChannel
      * @constructor
      */
-    var EventChannel = function(){};
+    var EventChannel = function () {
+    };
 
     // Regular expression used to split event strings.
     var eventSplitter = /\s+/;
@@ -33,12 +34,12 @@ define(['lodash'], function(_){
     // Iterates over the standard `event, callback` (as well as the fancy multiple
     // space-separated events `"change blur", callback` and jQuery-style event
     // maps `{event: callback}`).
-    var eventsApi = function(iteratee, events, name, callback, opts) {
+    var eventsApi = function (iteratee, events, name, callback, opts) {
         var i = 0, names;
         if (name && typeof name === 'object') {
             // Handle event maps.
             if (callback !== void 0 && 'context' in opts && opts.context === void 0) opts.context = callback;
-            for (names = _.keys(name); i < names.length ; i++) {
+            for (names = _.keys(name); i < names.length; i++) {
                 events = eventsApi(iteratee, events, names[i], name[names[i]], opts);
             }
         } else if (name && eventSplitter.test(name)) {
@@ -55,12 +56,12 @@ define(['lodash'], function(_){
 
     // Bind an event to a `callback` function. Passing `"all"` will bind
     // the callback to all events fired.
-    EventChannel.prototype.on = function(name, callback, context) {
+    EventChannel.prototype.on = function (name, callback, context) {
         return internalOn(this, name, callback, context);
     };
 
     // Guard the `listening` argument from the public API.
-    var internalOn = function(obj, name, callback, context, listening) {
+    var internalOn = function (obj, name, callback, context, listening) {
         obj._events = eventsApi(onApi, obj._events || {}, name, callback, {
             context: context,
             ctx: obj,
@@ -78,7 +79,7 @@ define(['lodash'], function(_){
     // Inversion-of-control versions of `on`. Tell *this* object to listen to
     // an event in another object... keeping track of what it's listening to
     // for easier unbinding later.
-    EventChannel.prototype.listenTo = function(obj, name, callback) {
+    EventChannel.prototype.listenTo = function (obj, name, callback) {
         if (!obj) return this;
         var id = obj._listenId || (obj._listenId = _.uniqueId('l'));
         var listeningTo = this._listeningTo || (this._listeningTo = {});
@@ -97,7 +98,7 @@ define(['lodash'], function(_){
     };
 
     // The reducing API that adds a callback to the `events` object.
-    var onApi = function(events, name, callback, options) {
+    var onApi = function (events, name, callback, options) {
         if (callback) {
             var handlers = events[name] || (events[name] = []);
             var context = options.context, ctx = options.ctx, listening = options.listening;
@@ -112,7 +113,7 @@ define(['lodash'], function(_){
     // callbacks with that function. If `callback` is null, removes all
     // callbacks for the event. If `name` is null, removes all bound
     // callbacks for all events.
-    EventChannel.prototype.off = function(name, callback, context) {
+    EventChannel.prototype.off = function (name, callback, context) {
         if (!this._events) return this;
         this._events = eventsApi(offApi, this._events, name, callback, {
             context: context,
@@ -123,7 +124,7 @@ define(['lodash'], function(_){
 
     // Tell this object to stop listening to either specific events ... or
     // to every object it's currently listening to.
-    EventChannel.prototype.stopListening = function(obj, name, callback) {
+    EventChannel.prototype.stopListening = function (obj, name, callback) {
         var listeningTo = this._listeningTo;
         if (!listeningTo) return this;
 
@@ -143,7 +144,7 @@ define(['lodash'], function(_){
     };
 
     // The reducing API that removes a callback from the `events` object.
-    var offApi = function(events, name, callback, options) {
+    var offApi = function (events, name, callback, options) {
         if (!events) return;
 
         var i = 0, listening;
@@ -201,7 +202,7 @@ define(['lodash'], function(_){
     // the callback is invoked, its listener will be removed. If multiple events
     // are passed in using the space-separated syntax, the handler will fire
     // once for each event, not once for a combination of all events.
-    EventChannel.prototype.once = function(name, callback, context) {
+    EventChannel.prototype.once = function (name, callback, context) {
         // Map the event into a `{event: once}` object.
         var events = eventsApi(onceMap, {}, name, callback, _.bind(this.off, this));
         if (typeof name === 'string' && context == null) callback = void 0;
@@ -209,7 +210,7 @@ define(['lodash'], function(_){
     };
 
     // Inversion-of-control versions of `once`.
-    EventChannel.prototype.listenToOnce = function(obj, name, callback) {
+    EventChannel.prototype.listenToOnce = function (obj, name, callback) {
         // Map the event into a `{event: once}` object.
         var events = eventsApi(onceMap, {}, name, callback, _.bind(this.stopListening, this, obj));
         return this.listenTo(obj, events);
@@ -217,9 +218,9 @@ define(['lodash'], function(_){
 
     // Reduces the event callbacks into a map of `{event: onceWrapper}`.
     // `offer` unbinds the `onceWrapper` after it has been called.
-    var onceMap = function(map, name, callback, offer) {
+    var onceMap = function (map, name, callback, offer) {
         if (callback) {
-            var once = map[name] = _.once(function() {
+            var once = map[name] = _.once(function () {
                 offer(name, once);
                 callback.apply(this, arguments);
             });
@@ -232,7 +233,7 @@ define(['lodash'], function(_){
     // passed the same arguments as `trigger` is, apart from the event name
     // (unless you're listening on `"all"`, which will cause your callback to
     // receive the true name of the event as the first argument).
-    EventChannel.prototype.trigger = function(name) {
+    EventChannel.prototype.trigger = function (name) {
         if (!this._events) return this;
 
         var length = Math.max(0, arguments.length - 1);
@@ -244,7 +245,7 @@ define(['lodash'], function(_){
     };
 
     // Handles triggering the appropriate event callbacks.
-    var triggerApi = function(objEvents, name, callback, args) {
+    var triggerApi = function (objEvents, name, callback, args) {
         if (objEvents) {
             var events = objEvents[name];
             var allEvents = objEvents.all;
@@ -258,14 +259,24 @@ define(['lodash'], function(_){
     // A difficult-to-believe, but optimized internal dispatch function for
     // triggering events. Tries to keep the usual cases speedy (most internal
     // Backbone events have 3 arguments).
-    var triggerEvents = function(events, args) {
+    var triggerEvents = function (events, args) {
         var ev, i = -1, l = events.length, a1 = args[0], a2 = args[1], a3 = args[2];
         switch (args.length) {
-            case 0: while (++i < l) (ev = events[i]).callback.call(ev.ctx); return;
-            case 1: while (++i < l) (ev = events[i]).callback.call(ev.ctx, a1); return;
-            case 2: while (++i < l) (ev = events[i]).callback.call(ev.ctx, a1, a2); return;
-            case 3: while (++i < l) (ev = events[i]).callback.call(ev.ctx, a1, a2, a3); return;
-            default: while (++i < l) (ev = events[i]).callback.apply(ev.ctx, args); return;
+            case 0:
+                while (++i < l) (ev = events[i]).callback.call(ev.ctx);
+                return;
+            case 1:
+                while (++i < l) (ev = events[i]).callback.call(ev.ctx, a1);
+                return;
+            case 2:
+                while (++i < l) (ev = events[i]).callback.call(ev.ctx, a1, a2);
+                return;
+            case 3:
+                while (++i < l) (ev = events[i]).callback.call(ev.ctx, a1, a2, a3);
+                return;
+            default:
+                while (++i < l) (ev = events[i]).callback.apply(ev.ctx, args);
+                return;
         }
     };
 

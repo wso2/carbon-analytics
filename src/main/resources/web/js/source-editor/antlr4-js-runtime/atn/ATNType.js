@@ -31,7 +31,7 @@
 // Represents the type of recognizer an ATN applies to.
 
 function ATNType() {
-	
+
 }
 
 ATNType.LEXER = 0;

@@ -35,53 +35,52 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  */
 
-define(function(require, exports, module) {
-"use strict";
+define(function (require, exports, module) {
+    "use strict";
 
-var oop = require("../lib/oop");
-var HtmlMode = require("./html").Mode;
+    var oop = require("../lib/oop");
+    var HtmlMode = require("./html").Mode;
 
-var RHtmlHighlightRules = require("./rhtml_highlight_rules").RHtmlHighlightRules;
-/* Make life easier, don't do these right now 
-var SweaveBackgroundHighlighter = require("mode/sweave_background_highlighter").SweaveBackgroundHighlighter;
-var RCodeModel = require("mode/r_code_model").RCodeModel;
-*/
+    var RHtmlHighlightRules = require("./rhtml_highlight_rules").RHtmlHighlightRules;
+    /* Make life easier, don't do these right now
+     var SweaveBackgroundHighlighter = require("mode/sweave_background_highlighter").SweaveBackgroundHighlighter;
+     var RCodeModel = require("mode/r_code_model").RCodeModel;
+     */
 
-var Mode = function(doc, session) {
-   HtmlMode.call(this);
-   this.$session = session;
-   this.HighlightRules = RHtmlHighlightRules;
+    var Mode = function (doc, session) {
+        HtmlMode.call(this);
+        this.$session = session;
+        this.HighlightRules = RHtmlHighlightRules;
 
-   /* Or these.
-   this.codeModel = new RCodeModel(doc, this.$tokenizer, /^r-/,
-                                   /^<!--\s*begin.rcode\s*(.*)/);
-   this.foldingRules = this.codeModel;
-   this.$sweaveBackgroundHighlighter = new SweaveBackgroundHighlighter(
+        /* Or these.
+         this.codeModel = new RCodeModel(doc, this.$tokenizer, /^r-/,
+         /^<!--\s*begin.rcode\s*(.*)/);
+         this.foldingRules = this.codeModel;
+         this.$sweaveBackgroundHighlighter = new SweaveBackgroundHighlighter(
          session,
          /^<!--\s*begin.rcode\s*(?:.*)/,
          /^\s*end.rcode\s*-->/,
          true); */
-};
-oop.inherits(Mode, HtmlMode);
+    };
+    oop.inherits(Mode, HtmlMode);
 
-(function() {
-   this.insertChunkInfo = {
-      value: "<!--begin.rcode\n\nend.rcode-->\n",
-      position: {row: 0, column: 15}
-   };
-    
-   this.getLanguageMode = function(position)
-   {
-      return this.$session.getState(position.row).match(/^r-/) ? 'R' : 'HTML';
-   };
+    (function () {
+        this.insertChunkInfo = {
+            value: "<!--begin.rcode\n\nend.rcode-->\n",
+            position: {row: 0, column: 15}
+        };
 
-   /* this.getNextLineIndent = function(state, line, tab, tabSize, row)
-   {
-      return this.codeModel.getNextLineIndent(row, line, state, tab, tabSize);
-   }; */
+        this.getLanguageMode = function (position) {
+            return this.$session.getState(position.row).match(/^r-/) ? 'R' : 'HTML';
+        };
 
-    this.$id = "ace/mode/rhtml";
-}).call(Mode.prototype);
+        /* this.getNextLineIndent = function(state, line, tab, tabSize, row)
+         {
+         return this.codeModel.getNextLineIndent(row, line, state, tab, tabSize);
+         }; */
 
-exports.Mode = Mode;
+        this.$id = "ace/mode/rhtml";
+    }).call(Mode.prototype);
+
+    exports.Mode = Mode;
 });

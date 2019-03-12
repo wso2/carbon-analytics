@@ -28,7 +28,7 @@ define(['jquery', './modal-dialog'], function ($, ModalDialog) {
     CloseConfirmDialog.prototype.constructor = CloseConfirmDialog;
 
     CloseConfirmDialog.prototype.init = function () {
-        if(this._initialized) {
+        if (this._initialized) {
             return;
         }
 
@@ -63,15 +63,15 @@ define(['jquery', './modal-dialog'], function ($, ModalDialog) {
         this._saveBtn.unbind('click');
         this._dontSaveBtn.unbind('click');
 
-        this._saveBtn.click(function(e){
-            if(_.has(options, 'handleConfirm')){
+        this._saveBtn.click(function (e) {
+            if (_.has(options, 'handleConfirm')) {
                 self.hide();
                 options.handleConfirm(true);
             }
         });
 
-        this._dontSaveBtn.click(function(e){
-            if(_.has(options, 'handleConfirm')){
+        this._dontSaveBtn.click(function (e) {
+            if (_.has(options, 'handleConfirm')) {
                 self.hide();
                 options.handleConfirm(false);
             }

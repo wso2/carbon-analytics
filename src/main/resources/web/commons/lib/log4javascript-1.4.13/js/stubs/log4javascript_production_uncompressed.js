@@ -14,240 +14,246 @@
  * limitations under the License.
  */
 
-var log4javascript_stub = (function() {
-	var log4javascript;
+var log4javascript_stub = (function () {
+    var log4javascript;
 
-	function ff() {
-		return function() {};
-	}
-	function copy(obj, props) {
-		for (var i in props) {
-			obj[i] = props[i];
-		}
-	}
-	var f = ff();
+    function ff() {
+        return function () {
+        };
+    }
 
-	// Loggers
-	var Logger = ff();
-	copy(Logger.prototype, {
-		addChild: f,
-		getEffectiveAppenders: f,
-		invalidateAppenderCache: f,
-		getAdditivity: f,
-		setAdditivity: f,
-		addAppender: f,
-		removeAppender: f,
-		removeAllAppenders: f,
-		log: f,
-		setLevel: f,
-		getLevel: f,
-		getEffectiveLevel: f,
-		trace: f,
-		debug: f,
-		info: f,
-		warn: f,
-		error: f,
-		fatal: f,
-		isEnabledFor: f,
-		isTraceEnabled: f,
-		isDebugEnabled: f,
-		isInfoEnabled: f,
-		isWarnEnabled: f,
-		isErrorEnabled: f,
-		isFatalEnabled: f,
-		callAppenders: f,
-		group: f,
-		groupEnd: f,
-		time: f,
-		timeEnd: f,
-		assert: f,
-		parent: new Logger()
-	});
+    function copy(obj, props) {
+        for (var i in props) {
+            obj[i] = props[i];
+        }
+    }
 
-	var getLogger = function() {
-		return new Logger();
-	};
+    var f = ff();
 
-	function EventSupport() {}
+    // Loggers
+    var Logger = ff();
+    copy(Logger.prototype, {
+        addChild: f,
+        getEffectiveAppenders: f,
+        invalidateAppenderCache: f,
+        getAdditivity: f,
+        setAdditivity: f,
+        addAppender: f,
+        removeAppender: f,
+        removeAllAppenders: f,
+        log: f,
+        setLevel: f,
+        getLevel: f,
+        getEffectiveLevel: f,
+        trace: f,
+        debug: f,
+        info: f,
+        warn: f,
+        error: f,
+        fatal: f,
+        isEnabledFor: f,
+        isTraceEnabled: f,
+        isDebugEnabled: f,
+        isInfoEnabled: f,
+        isWarnEnabled: f,
+        isErrorEnabled: f,
+        isFatalEnabled: f,
+        callAppenders: f,
+        group: f,
+        groupEnd: f,
+        time: f,
+        timeEnd: f,
+        assert: f,
+        parent: new Logger()
+    });
 
-	copy(EventSupport.prototype, {
-		setEventTypes: f,
-		addEventListener: f,
-		removeEventListener: f,
-		dispatchEvent: f,
-		eventTypes: [],
-		eventListeners: {}
-	});
+    var getLogger = function () {
+        return new Logger();
+    };
 
-	function Log4JavaScript() {}
-	Log4JavaScript.prototype = new EventSupport();
-	log4javascript = new Log4JavaScript();
+    function EventSupport() {
+    }
 
-	log4javascript = {
-		isStub: true,
-		version: "1.4.13",
-		edition: "log4javascript_production",
-		setDocumentReady: f,
-		setEventTypes: f,
-		addEventListener: f,
-		removeEventListener: f,
-		dispatchEvent: f,
-		eventTypes: [],
-		eventListeners: {},
-		logLog: {
-			setQuietMode: f,
-			setAlertAllErrors: f,
-			debug: f,
-			displayDebug: f,
-			warn: f,
-			error: f
-		},
-		handleError: f,
-		setEnabled: f,
-		isEnabled: f,
-		setTimeStampsInMilliseconds: f,
-		isTimeStampsInMilliseconds: f,
-		evalInScope: f,
-		setShowStackTraces: f,
-		getLogger: getLogger,
-		getDefaultLogger: getLogger,
-		getNullLogger: getLogger,
-		getRootLogger: getLogger,
-		resetConfiguration: f,
-		Level: ff(),
-		LoggingEvent: ff(),
-		Layout: ff(),
-		Appender: ff()
-	};
+    copy(EventSupport.prototype, {
+        setEventTypes: f,
+        addEventListener: f,
+        removeEventListener: f,
+        dispatchEvent: f,
+        eventTypes: [],
+        eventListeners: {}
+    });
 
-	// LoggingEvents
-	log4javascript.LoggingEvent.prototype = {
-		getThrowableStrRep: f,
-		getCombinedMessages: f
-	};
+    function Log4JavaScript() {
+    }
 
-	// Levels
-	log4javascript.Level.prototype = {
-		toString: f,
-		equals: f,
-		isGreaterOrEqual: f
-	};
-	var level = new log4javascript.Level();
-	copy(log4javascript.Level, {
-		ALL: level,
-		TRACE: level,
-		DEBUG: level,
-		INFO: level,
-		WARN: level,
-		ERROR: level,
-		FATAL: level,
-		OFF: level
-	});
+    Log4JavaScript.prototype = new EventSupport();
+    log4javascript = new Log4JavaScript();
 
-	// Layouts
-	log4javascript.Layout.prototype = {
-		defaults: {},
-		format: f,
-		ignoresThrowable: f,
-		getContentType: f,
-		allowBatching: f,
-		getDataValues: f,
-		setKeys: f,
-		setCustomField: f,
-		hasCustomFields: f,
-		setTimeStampsInMilliseconds: f,
-		isTimeStampsInMilliseconds: f,
-		getTimeStampValue: f,
-		toString: f
-	};
+    log4javascript = {
+        isStub: true,
+        version: "1.4.13",
+        edition: "log4javascript_production",
+        setDocumentReady: f,
+        setEventTypes: f,
+        addEventListener: f,
+        removeEventListener: f,
+        dispatchEvent: f,
+        eventTypes: [],
+        eventListeners: {},
+        logLog: {
+            setQuietMode: f,
+            setAlertAllErrors: f,
+            debug: f,
+            displayDebug: f,
+            warn: f,
+            error: f
+        },
+        handleError: f,
+        setEnabled: f,
+        isEnabled: f,
+        setTimeStampsInMilliseconds: f,
+        isTimeStampsInMilliseconds: f,
+        evalInScope: f,
+        setShowStackTraces: f,
+        getLogger: getLogger,
+        getDefaultLogger: getLogger,
+        getNullLogger: getLogger,
+        getRootLogger: getLogger,
+        resetConfiguration: f,
+        Level: ff(),
+        LoggingEvent: ff(),
+        Layout: ff(),
+        Appender: ff()
+    };
 
-	// PatternLayout related
-	log4javascript.SimpleDateFormat = ff();
-	log4javascript.SimpleDateFormat.prototype = {
-		setMinimalDaysInFirstWeek: f,
-		getMinimalDaysInFirstWeek: f,
-		format: f
-	};
+    // LoggingEvents
+    log4javascript.LoggingEvent.prototype = {
+        getThrowableStrRep: f,
+        getCombinedMessages: f
+    };
 
-	// PatternLayout
-	log4javascript.PatternLayout = ff();
-	log4javascript.PatternLayout.prototype = new log4javascript.Layout();
+    // Levels
+    log4javascript.Level.prototype = {
+        toString: f,
+        equals: f,
+        isGreaterOrEqual: f
+    };
+    var level = new log4javascript.Level();
+    copy(log4javascript.Level, {
+        ALL: level,
+        TRACE: level,
+        DEBUG: level,
+        INFO: level,
+        WARN: level,
+        ERROR: level,
+        FATAL: level,
+        OFF: level
+    });
 
-	// Appenders
-	log4javascript.Appender = ff();
-	log4javascript.Appender.prototype = new EventSupport();
+    // Layouts
+    log4javascript.Layout.prototype = {
+        defaults: {},
+        format: f,
+        ignoresThrowable: f,
+        getContentType: f,
+        allowBatching: f,
+        getDataValues: f,
+        setKeys: f,
+        setCustomField: f,
+        hasCustomFields: f,
+        setTimeStampsInMilliseconds: f,
+        isTimeStampsInMilliseconds: f,
+        getTimeStampValue: f,
+        toString: f
+    };
 
-	copy(log4javascript.Appender.prototype, {
-		layout: new log4javascript.PatternLayout(),
-		threshold: log4javascript.Level.ALL,
-		loggers: [],
-		doAppend: f,
-		append: f,
-		setLayout: f,
-		getLayout: f,
-		setThreshold: f,
-		getThreshold: f,
-		setAddedToLogger: f,
-		setRemovedFromLogger: f,
-		group: f,
-		groupEnd: f,
-		toString: f
-	});
-	// SimpleLayout
-	log4javascript.SimpleLayout = ff();
-	log4javascript.SimpleLayout.prototype = new log4javascript.Layout();
-	// NullLayout
-	log4javascript.NullLayout = ff();
-	log4javascript.NullLayout.prototype = new log4javascript.Layout();
-	// ZmlLayout
-	log4javascript.XmlLayout = ff();
-	log4javascript.XmlLayout.prototype = new log4javascript.Layout();
-	copy(log4javascript.XmlLayout.prototype, {
-		escapeCdata: f,
-		isCombinedMessages: f
-	});
-	// JsonLayout
-	log4javascript.JsonLayout = ff();
-	log4javascript.JsonLayout.prototype = new log4javascript.Layout();
-	copy(log4javascript.JsonLayout.prototype, {
-		isReadable: f,
-		isCombinedMessages: f
-	});
-	// HttpPostDataLayout 
-	log4javascript.HttpPostDataLayout = ff();
-	log4javascript.HttpPostDataLayout.prototype = new log4javascript.Layout();
-	// PatternLayout
-	log4javascript.PatternLayout = ff();
-	log4javascript.PatternLayout.prototype = new log4javascript.Layout();
-	// AjaxAppender
-	log4javascript.AjaxAppender = ff();
-	log4javascript.AjaxAppender.prototype = new log4javascript.Appender();
-	copy(log4javascript.AjaxAppender.prototype, {
-		getSessionId: f,
-		setSessionId: f,
-		isTimed: f,
-		setTimed: f,
-		getTimerInterval: f,
-		setTimerInterval: f,
-		isWaitForResponse: f,
-		setWaitForResponse: f,
-		getBatchSize: f,
-		setBatchSize: f,
-		isSendAllOnUnload: f,
-		setSendAllOnUnload: f,
-		setRequestSuccessCallback: f,
-		setFailCallback: f,
-		getPostVarName: f,
-		setPostVarName: f,
-		sendAll: f,
-		sendAllRemaining: f,
-		defaults: {
-			requestSuccessCallback: null,
-			failCallback: null
-		}
-	});
-	return log4javascript;
+    // PatternLayout related
+    log4javascript.SimpleDateFormat = ff();
+    log4javascript.SimpleDateFormat.prototype = {
+        setMinimalDaysInFirstWeek: f,
+        getMinimalDaysInFirstWeek: f,
+        format: f
+    };
+
+    // PatternLayout
+    log4javascript.PatternLayout = ff();
+    log4javascript.PatternLayout.prototype = new log4javascript.Layout();
+
+    // Appenders
+    log4javascript.Appender = ff();
+    log4javascript.Appender.prototype = new EventSupport();
+
+    copy(log4javascript.Appender.prototype, {
+        layout: new log4javascript.PatternLayout(),
+        threshold: log4javascript.Level.ALL,
+        loggers: [],
+        doAppend: f,
+        append: f,
+        setLayout: f,
+        getLayout: f,
+        setThreshold: f,
+        getThreshold: f,
+        setAddedToLogger: f,
+        setRemovedFromLogger: f,
+        group: f,
+        groupEnd: f,
+        toString: f
+    });
+    // SimpleLayout
+    log4javascript.SimpleLayout = ff();
+    log4javascript.SimpleLayout.prototype = new log4javascript.Layout();
+    // NullLayout
+    log4javascript.NullLayout = ff();
+    log4javascript.NullLayout.prototype = new log4javascript.Layout();
+    // ZmlLayout
+    log4javascript.XmlLayout = ff();
+    log4javascript.XmlLayout.prototype = new log4javascript.Layout();
+    copy(log4javascript.XmlLayout.prototype, {
+        escapeCdata: f,
+        isCombinedMessages: f
+    });
+    // JsonLayout
+    log4javascript.JsonLayout = ff();
+    log4javascript.JsonLayout.prototype = new log4javascript.Layout();
+    copy(log4javascript.JsonLayout.prototype, {
+        isReadable: f,
+        isCombinedMessages: f
+    });
+    // HttpPostDataLayout
+    log4javascript.HttpPostDataLayout = ff();
+    log4javascript.HttpPostDataLayout.prototype = new log4javascript.Layout();
+    // PatternLayout
+    log4javascript.PatternLayout = ff();
+    log4javascript.PatternLayout.prototype = new log4javascript.Layout();
+    // AjaxAppender
+    log4javascript.AjaxAppender = ff();
+    log4javascript.AjaxAppender.prototype = new log4javascript.Appender();
+    copy(log4javascript.AjaxAppender.prototype, {
+        getSessionId: f,
+        setSessionId: f,
+        isTimed: f,
+        setTimed: f,
+        getTimerInterval: f,
+        setTimerInterval: f,
+        isWaitForResponse: f,
+        setWaitForResponse: f,
+        getBatchSize: f,
+        setBatchSize: f,
+        isSendAllOnUnload: f,
+        setSendAllOnUnload: f,
+        setRequestSuccessCallback: f,
+        setFailCallback: f,
+        getPostVarName: f,
+        setPostVarName: f,
+        sendAll: f,
+        sendAllRemaining: f,
+        defaults: {
+            requestSuccessCallback: null,
+            failCallback: null
+        }
+    });
+    return log4javascript;
 })();
 if (typeof window.log4javascript == "undefined") {
-	var log4javascript = log4javascript_stub;
+    var log4javascript = log4javascript_stub;
 }

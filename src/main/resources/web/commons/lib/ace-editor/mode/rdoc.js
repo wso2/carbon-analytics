@@ -35,27 +35,27 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  *
  */
-define(function(require, exports, module) {
-"use strict";
+define(function (require, exports, module) {
+    "use strict";
 
-var oop = require("../lib/oop");
-var TextMode = require("./text").Mode;
-var RDocHighlightRules = require("./rdoc_highlight_rules").RDocHighlightRules;
-var MatchingBraceOutdent = require("./matching_brace_outdent").MatchingBraceOutdent;
+    var oop = require("../lib/oop");
+    var TextMode = require("./text").Mode;
+    var RDocHighlightRules = require("./rdoc_highlight_rules").RDocHighlightRules;
+    var MatchingBraceOutdent = require("./matching_brace_outdent").MatchingBraceOutdent;
 
-var Mode = function(suppressHighlighting) {
-	this.HighlightRules = RDocHighlightRules;
-    this.$outdent = new MatchingBraceOutdent();
-    this.$behaviour = this.$defaultBehaviour;
-};
-oop.inherits(Mode, TextMode);
-
-(function() {
-    this.getNextLineIndent = function(state, line, tab) {
-        return this.$getIndent(line);
+    var Mode = function (suppressHighlighting) {
+        this.HighlightRules = RDocHighlightRules;
+        this.$outdent = new MatchingBraceOutdent();
+        this.$behaviour = this.$defaultBehaviour;
     };
-    this.$id = "ace/mode/rdoc";
-}).call(Mode.prototype);
+    oop.inherits(Mode, TextMode);
 
-exports.Mode = Mode;
+    (function () {
+        this.getNextLineIndent = function (state, line, tab) {
+            return this.$getIndent(line);
+        };
+        this.$id = "ace/mode/rdoc";
+    }).call(Mode.prototype);
+
+    exports.Mode = Mode;
 });

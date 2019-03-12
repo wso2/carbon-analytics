@@ -122,6 +122,9 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
+/**
+ * Editor micro service implementation class.
+ */
 @Component(
         service = Microservice.class,
         immediate = true
@@ -738,7 +741,8 @@ public class EditorMicroservice implements Microservice {
                     .releaseAllBreakPoints();
             return Response
                     .status(Response.Status.OK)
-                    .entity(new GeneralResponse(Status.SUCCESS, "All breakpoints released for siddhiAppName " + siddhiAppName))
+                    .entity(new GeneralResponse(Status.SUCCESS, "All breakpoints released for siddhiAppName " +
+                            siddhiAppName))
                     .build();
         } else {
             // release only specified break point
@@ -986,7 +990,7 @@ public class EditorMicroservice implements Microservice {
             Gson gson = DeserializersRegisterer.getGsonBuilder().disableHtmlEscaping().create();
             SiddhiAppConfig siddhiAppConfig = gson.fromJson(siddhiAppConfigJson, SiddhiAppConfig.class);
             CodeGenerator codeGenerator = new CodeGenerator();
-            List <ToolTip> toolTipList = codeGenerator.generateSiddhiAppToolTips(siddhiAppConfig);
+            List<ToolTip> toolTipList = codeGenerator.generateSiddhiAppToolTips(siddhiAppConfig);
 
             String jsonString = new Gson().toJson(toolTipList);
             return Response.status(Response.Status.OK)

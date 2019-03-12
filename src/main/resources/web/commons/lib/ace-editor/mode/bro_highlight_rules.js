@@ -34,171 +34,171 @@
  * fileTypes                                                                            *
  ****************************************************************************************/
 
-define(function(require, exports, module) {
-"use strict";
+define(function (require, exports, module) {
+    "use strict";
 
-var oop = require("../lib/oop");
-var TextHighlightRules = require("./text_highlight_rules").TextHighlightRules;
+    var oop = require("../lib/oop");
+    var TextHighlightRules = require("./text_highlight_rules").TextHighlightRules;
 
-var BroHighlightRules = function() {
-    // regexp must not have capturing parentheses. Use (?:) instead.
-    // regexps are ordered -> the first match is used
+    var BroHighlightRules = function () {
+        // regexp must not have capturing parentheses. Use (?:) instead.
+        // regexps are ordered -> the first match is used
 
-    this.$rules = {
-        start: [{
-            token: "punctuation.definition.comment.bro",
-            regex: /#/,
-            push: [{
-                token: "comment.line.number-sign.bro",
-                regex: /$/,
-                next: "pop"
+        this.$rules = {
+            start: [{
+                token: "punctuation.definition.comment.bro",
+                regex: /#/,
+                push: [{
+                    token: "comment.line.number-sign.bro",
+                    regex: /$/,
+                    next: "pop"
+                }, {
+                    defaultToken: "comment.line.number-sign.bro"
+                }]
             }, {
-                defaultToken: "comment.line.number-sign.bro"
-            }]
-        }, {
-            token: "keyword.control.bro",
-            regex: /\b(?:break|case|continue|else|for|if|return|switch|next|when|timeout|schedule)\b/
-        }, {
-            token: [
-                "meta.function.bro",
-                "meta.function.bro",
-                "storage.type.bro",
-                "meta.function.bro",
-                "entity.name.function.bro",
-                "meta.function.bro"
-            ],
-            regex: /^(\s*)(?:function|hook|event)(\s*)(.*)(\s*\()(.*)(\).*$)/
-        }, {
-            token: "storage.type.bro",
-            regex: /\b(?:bool|enum|double|int|count|port|addr|subnet|any|file|interval|time|string|table|vector|set|record|pattern|hook)\b/
-        }, {
-            token: "storage.modifier.bro",
-            regex: /\b(?:global|const|redef|local|&(?:optional|rotate_interval|rotate_size|add_func|del_func|expire_func|expire_create|expire_read|expire_write|persistent|synchronized|encrypt|mergeable|priority|group|type_column|log|error_handler))\b/
-        }, {
-            token: "keyword.operator.bro",
-            regex: /\s*(?:\||&&|(?:>|<|!)=?|==)\s*|\b!?in\b/
-        }, {
-            token: "constant.language.bro",
-            regex: /\b(?:T|F)\b/
-        }, {
-            token: "constant.numeric.bro",
-            regex: /\b(?:0(?:x|X)[0-9a-fA-F]*|(?:[0-9]+\.?[0-9]*|\.[0-9]+)(?:(?:e|E)(?:\+|-)?[0-9]+)?)(?:\/(?:tcp|udp|icmp)|\s*(?:u?sec|min|hr|day)s?)?\b/
-        }, {
-            token: "punctuation.definition.string.begin.bro",
-            regex: /"/,
-            push: [{
-                token: "punctuation.definition.string.end.bro",
+                token: "keyword.control.bro",
+                regex: /\b(?:break|case|continue|else|for|if|return|switch|next|when|timeout|schedule)\b/
+            }, {
+                token: [
+                    "meta.function.bro",
+                    "meta.function.bro",
+                    "storage.type.bro",
+                    "meta.function.bro",
+                    "entity.name.function.bro",
+                    "meta.function.bro"
+                ],
+                regex: /^(\s*)(?:function|hook|event)(\s*)(.*)(\s*\()(.*)(\).*$)/
+            }, {
+                token: "storage.type.bro",
+                regex: /\b(?:bool|enum|double|int|count|port|addr|subnet|any|file|interval|time|string|table|vector|set|record|pattern|hook)\b/
+            }, {
+                token: "storage.modifier.bro",
+                regex: /\b(?:global|const|redef|local|&(?:optional|rotate_interval|rotate_size|add_func|del_func|expire_func|expire_create|expire_read|expire_write|persistent|synchronized|encrypt|mergeable|priority|group|type_column|log|error_handler))\b/
+            }, {
+                token: "keyword.operator.bro",
+                regex: /\s*(?:\||&&|(?:>|<|!)=?|==)\s*|\b!?in\b/
+            }, {
+                token: "constant.language.bro",
+                regex: /\b(?:T|F)\b/
+            }, {
+                token: "constant.numeric.bro",
+                regex: /\b(?:0(?:x|X)[0-9a-fA-F]*|(?:[0-9]+\.?[0-9]*|\.[0-9]+)(?:(?:e|E)(?:\+|-)?[0-9]+)?)(?:\/(?:tcp|udp|icmp)|\s*(?:u?sec|min|hr|day)s?)?\b/
+            }, {
+                token: "punctuation.definition.string.begin.bro",
                 regex: /"/,
-                next: "pop"
+                push: [{
+                    token: "punctuation.definition.string.end.bro",
+                    regex: /"/,
+                    next: "pop"
+                }, {
+                    include: "#string_escaped_char"
+                }, {
+                    include: "#string_placeholder"
+                }, {
+                    defaultToken: "string.quoted.double.bro"
+                }]
             }, {
-                include: "#string_escaped_char"
-            }, {
-                include: "#string_placeholder"
-            }, {
-                defaultToken: "string.quoted.double.bro"
-            }]
-        }, {
-            token: "punctuation.definition.string.begin.bro",
-            regex: /\//,
-            push: [{
-                token: "punctuation.definition.string.end.bro",
+                token: "punctuation.definition.string.begin.bro",
                 regex: /\//,
-                next: "pop"
+                push: [{
+                    token: "punctuation.definition.string.end.bro",
+                    regex: /\//,
+                    next: "pop"
+                }, {
+                    include: "#string_escaped_char"
+                }, {
+                    include: "#string_placeholder"
+                }, {
+                    defaultToken: "string.quoted.regex.bro"
+                }]
             }, {
-                include: "#string_escaped_char"
+                token: [
+                    "meta.preprocessor.bro.load",
+                    "keyword.other.special-method.bro"
+                ],
+                regex: /^(\s*)(\@load(?:-sigs)?)\b/,
+                push: [{
+                    token: [],
+                    regex: /(?=\#)|$/,
+                    next: "pop"
+                }, {
+                    defaultToken: "meta.preprocessor.bro.load"
+                }]
             }, {
-                include: "#string_placeholder"
-            }, {
-                defaultToken: "string.quoted.regex.bro"
-            }]
-        }, {
-            token: [
-                "meta.preprocessor.bro.load",
-                "keyword.other.special-method.bro"
-            ],
-            regex: /^(\s*)(\@load(?:-sigs)?)\b/,
-            push: [{
-                token: [],
-                regex: /(?=\#)|$/,
-                next: "pop"
-            }, {
-                defaultToken: "meta.preprocessor.bro.load"
-            }]
-        }, {
-            token: [
-                "meta.preprocessor.bro.if",
-                "keyword.other.special-method.bro",
-                "meta.preprocessor.bro.if"
-            ],
-            regex: /^(\s*)(\@endif|\@if(?:n?def)?)(.*$)/,
-            push: [{
-                token: [],
-                regex: /$/,
-                next: "pop"
-            }, {
-                defaultToken: "meta.preprocessor.bro.if"
-            }]
-        }],
-        "#disabled": [{
-            token: "text",
-            regex: /^\s*\@if(?:n?def)?\b.*$/,
-            push: [{
-                token: "text",
-                regex: /^\s*\@endif\b.*$/,
-                next: "pop"
-            }, {
-                include: "#disabled"
-            }, {
-                include: "#pragma-mark"
+                token: [
+                    "meta.preprocessor.bro.if",
+                    "keyword.other.special-method.bro",
+                    "meta.preprocessor.bro.if"
+                ],
+                regex: /^(\s*)(\@endif|\@if(?:n?def)?)(.*$)/,
+                push: [{
+                    token: [],
+                    regex: /$/,
+                    next: "pop"
+                }, {
+                    defaultToken: "meta.preprocessor.bro.if"
+                }]
             }],
-            comment: "eat nested preprocessor ifdefs"
-        }],
-        "#preprocessor-rule-other": [{
-            token: [
-                "text",
-                "meta.preprocessor.bro",
-                "meta.preprocessor.bro",
-                "text"
-            ],
-            regex: /^(\s*)(@if)((?:n?def)?)\b(.*?)(?:(?=)|$)/,
-            push: [{
-                token: ["text", "meta.preprocessor.bro", "text"],
-                regex: /^(\s*)(@endif)\b(.*$)/,
-                next: "pop"
+            "#disabled": [{
+                token: "text",
+                regex: /^\s*\@if(?:n?def)?\b.*$/,
+                push: [{
+                    token: "text",
+                    regex: /^\s*\@endif\b.*$/,
+                    next: "pop"
+                }, {
+                    include: "#disabled"
+                }, {
+                    include: "#pragma-mark"
+                }],
+                comment: "eat nested preprocessor ifdefs"
+            }],
+            "#preprocessor-rule-other": [{
+                token: [
+                    "text",
+                    "meta.preprocessor.bro",
+                    "meta.preprocessor.bro",
+                    "text"
+                ],
+                regex: /^(\s*)(@if)((?:n?def)?)\b(.*?)(?:(?=)|$)/,
+                push: [{
+                    token: ["text", "meta.preprocessor.bro", "text"],
+                    regex: /^(\s*)(@endif)\b(.*$)/,
+                    next: "pop"
+                }, {
+                    include: "$base"
+                }]
+            }],
+            "#string_escaped_char": [{
+                token: "constant.character.escape.bro",
+                regex: /\\(?:\\|[abefnprtv'"?]|[0-3]\d{,2}|[4-7]\d?|x[a-fA-F0-9]{,2})/
             }, {
-                include: "$base"
+                token: "invalid.illegal.unknown-escape.bro",
+                regex: /\\./
+            }],
+            "#string_placeholder": [{
+                token: "constant.other.placeholder.bro",
+                regex: /%(?:\d+\$)?[#0\- +']*[,;:_]?(?:-?\d+|\*(?:-?\d+\$)?)?(?:\.(?:-?\d+|\*(?:-?\d+\$)?)?)?(?:hh|h|ll|l|j|t|z|q|L|vh|vl|v|hv|hl)?[diouxXDOUeEfFgGaACcSspn%]/
+            }, {
+                token: "invalid.illegal.placeholder.bro",
+                regex: /%/
             }]
-        }],
-        "#string_escaped_char": [{
-            token: "constant.character.escape.bro",
-            regex: /\\(?:\\|[abefnprtv'"?]|[0-3]\d{,2}|[4-7]\d?|x[a-fA-F0-9]{,2})/
-        }, {
-            token: "invalid.illegal.unknown-escape.bro",
-            regex: /\\./
-        }],
-        "#string_placeholder": [{
-            token: "constant.other.placeholder.bro",
-            regex: /%(?:\d+\$)?[#0\- +']*[,;:_]?(?:-?\d+|\*(?:-?\d+\$)?)?(?:\.(?:-?\d+|\*(?:-?\d+\$)?)?)?(?:hh|h|ll|l|j|t|z|q|L|vh|vl|v|hv|hl)?[diouxXDOUeEfFgGaACcSspn%]/
-        }, {
-            token: "invalid.illegal.placeholder.bro",
-            regex: /%/
-        }]
+        }
+
+        this.normalizeRules();
+    };
+
+    BroHighlightRules.metaData = {
+        fileTypes: ["bro"],
+        foldingStartMarker: "^(\\@if(n?def)?)",
+        foldingStopMarker: "^\\@endif",
+        keyEquivalent: "@B",
+        name: "Bro",
+        scopeName: "source.bro"
     }
-    
-    this.normalizeRules();
-};
-
-BroHighlightRules.metaData = {
-    fileTypes: ["bro"],
-    foldingStartMarker: "^(\\@if(n?def)?)",
-    foldingStopMarker: "^\\@endif",
-    keyEquivalent: "@B",
-    name: "Bro",
-    scopeName: "source.bro"
-}
 
 
-oop.inherits(BroHighlightRules, TextHighlightRules);
+    oop.inherits(BroHighlightRules, TextHighlightRules);
 
-exports.BroHighlightRules = BroHighlightRules;
+    exports.BroHighlightRules = BroHighlightRules;
 });

@@ -1,5 +1,5 @@
 
-.tool-palette-container{
+.tool-palette-container {
     border-right: 1px solid #c9c9c9;
     background-color: #fff;
     height: 100%;
@@ -8,7 +8,7 @@
     padding-bottom: 20px
 }
 
-.tool-group{
+.tool-group {
     width: 100%;
     border-bottom: 1px solid #e4e4e4;
     overflow: hidden;
@@ -28,26 +28,26 @@
 }
 
 .tool-image {
-    max-width:40px;
-    max-height:40px;
-    display : block;
-    margin : auto;
+    max-width: 40px;
+    max-height: 40px;
+    display: block;
+    margin: auto;
 }
 
 .tool-title {
     color: #131313;
     font-weight: 500;
-    margin : 0 0 0 -2px;
+    margin: 0 0 0 -2px;
     font-size: 9PX;
 }
 
-.tool-validator{
+.tool-validator {
     height: 40px;
     color: darkred;
-    display:none;
+    display: none;
 }
 
-.tool-container > .tool-image{
+.tool-container > .tool-image {
     max-width: 30px;
     max-height: 30px;
     display: block;
@@ -79,21 +79,21 @@
 }
 
 .tool-group-header-title {
-    padding:5px;
+    padding: 5px;
     width: 100%;
 }
 
-.tool-group-header-title:hover{
+.tool-group-header-title:hover {
     cursor: pointer;
     color: black;
 }
 
-.tool-group-body{
+.tool-group-body {
     overflow: hidden;
-    padding:2px;
+    padding: 2px;
 }
 
-.collapse-icon{
+.collapse-icon {
     float: right;
     padding-top: 3px;
     font-size: 10px;

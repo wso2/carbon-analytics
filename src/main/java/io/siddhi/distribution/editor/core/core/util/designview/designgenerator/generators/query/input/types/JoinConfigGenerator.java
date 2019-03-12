@@ -44,10 +44,11 @@ public class JoinConfigGenerator {
 
     /**
      * Gets a JoinQueryConfig object, from the given Siddhi Query InputStream object
-     * @param queryInputStream      Siddhi Query InputStream object, which contains data regarding Siddhi Query input
-     * @param siddhiApp             Compiled Siddhi app
-     * @param siddhiAppString       Complete Siddhi app string
-     * @return                      JoinQueryConfig object
+     *
+     * @param queryInputStream Siddhi Query InputStream object, which contains data regarding Siddhi Query input
+     * @param siddhiApp        Compiled Siddhi app
+     * @param siddhiAppString  Complete Siddhi app string
+     * @return JoinQueryConfig object
      */
     public JoinConfig getJoinQueryConfig(InputStream queryInputStream, SiddhiApp siddhiApp, String siddhiAppString)
             throws DesignGenerationException {
@@ -57,8 +58,9 @@ public class JoinConfigGenerator {
 
     /**
      * Gets the JoinWithType for the JoinQueryConfig
-     * @return                                  JoinWithType object
-     * @throws DesignGenerationException        Error while generating config
+     *
+     * @return JoinWithType object
+     * @throws DesignGenerationException Error while generating config
      */
     private JoinWithType getJoinWithType() throws DesignGenerationException {
         if (tableIDs.size() == 1) {
@@ -76,8 +78,9 @@ public class JoinConfigGenerator {
 
     /**
      * Gets the JoinElementType with the given streamId, which is an element of the join
-     * @param streamId      ID of the stream, defined for a window|table|aggregation|stream
-     * @return              JoinElementType
+     *
+     * @param streamId ID of the stream, defined for a window|table|aggregation|stream
+     * @return JoinElementType
      */
     private JoinElementType getJoinElementType(String streamId) {
         if (tableIDs.contains(streamId)) {
@@ -95,9 +98,10 @@ public class JoinConfigGenerator {
      * Distinguishes elements that are represented with each Stream ID in the given list of streamIds,
      * and adds the streamId to the relevant list,
      * since Streams are manually defined in the Siddhi run time for Tables, Aggregations and Windows
-     * @param streamIds     IDs of Streams, inclusive of the Streams defined for Tables, Aggregations and Windows,
-     *                      by the Siddhi run time
-     * @param siddhiApp     Compiled SiddhiApp
+     *
+     * @param streamIds IDs of Streams, inclusive of the Streams defined for Tables, Aggregations and Windows,
+     *                  by the Siddhi run time
+     * @param siddhiApp Compiled SiddhiApp
      */
     private void distinguishElements(List<String> streamIds, SiddhiApp siddhiApp) {
         for (String streamId : streamIds) {
@@ -118,9 +122,10 @@ public class JoinConfigGenerator {
 
     /**
      * Generates Config for a Join Element of a Join QueryInput, with the given Siddhi SingleInputStream
-     * @param singleInputStream     Siddhi SingleInputStream object
-     * @param siddhiAppString       Complete Siddhi app string
-     * @return                      JoinElementConfig object, representing a Left|Right element of a join
+     *
+     * @param singleInputStream Siddhi SingleInputStream object
+     * @param siddhiAppString   Complete Siddhi app string
+     * @return JoinElementConfig object, representing a Left|Right element of a join
      */
     private JoinElementConfig generateJoinElementConfig(SingleInputStream singleInputStream, String siddhiAppString)
             throws DesignGenerationException {
@@ -136,10 +141,11 @@ public class JoinConfigGenerator {
 
     /**
      * Generates a JoinConfig, which represents a Join Input of a Siddhi Query
-     * @param queryInputStream                  Siddhi Query InputStream object
-     * @param siddhiAppString                   Complete Siddhi app string
-     * @return                                  JoinConfig object
-     * @throws DesignGenerationException        Error while generating config
+     *
+     * @param queryInputStream Siddhi Query InputStream object
+     * @param siddhiAppString  Complete Siddhi app string
+     * @return JoinConfig object
+     * @throws DesignGenerationException Error while generating config
      */
     private JoinConfig generateJoinConfig(InputStream queryInputStream, String siddhiAppString)
             throws DesignGenerationException {

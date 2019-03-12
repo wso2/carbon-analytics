@@ -28,18 +28,18 @@ define(['require', 'elementUtils'],
         var Table = function (options) {
             /*
              Data storing structure as follows
-                id: '',
-                previousCommentSegment:'',
-                name: '',
-                attributeList: [
-                    {
-                        name: ‘’,
-                        type: ‘’
-                    }
-                ],
-                store: {},
-                annotationList: [annotation1, annotation2, ...]
-            */
+             id: '',
+             previousCommentSegment:'',
+             name: '',
+             attributeList: [
+             {
+             name: ‘’,
+             type: ‘’
+             }
+             ],
+             store: {},
+             annotationList: [annotation1, annotation2, ...]
+             */
             if (options !== undefined) {
                 this.id = options.id;
                 this.previousCommentSegment = options.previousCommentSegment;

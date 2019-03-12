@@ -18,6 +18,9 @@
 
 package io.siddhi.distribution.editor.core.core.util.designview.designgenerator.generators.query.input.types.patternsequencesupporters;
 
+/**
+ * Class for count state element configuration.
+ */
 public class CountStateElementConfig implements StateElementConfig {
     private StreamStateElementConfig streamStateElement;
     private String within;

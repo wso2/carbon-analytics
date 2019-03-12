@@ -39,12 +39,12 @@ public class PartitionWithElement extends SiddhiElementConfig {
         return expression;
     }
 
-    public String getStreamName() {
-        return streamName;
-    }
-
     public void setExpression(String expression) {
         this.expression = expression;
+    }
+
+    public String getStreamName() {
+        return streamName;
     }
 
     public void setStreamName(String streamName) {

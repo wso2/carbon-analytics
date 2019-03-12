@@ -42,20 +42,40 @@ public class AggregationConfig extends SiddhiElementConfig {
         return name;
     }
 
+    public void setName(String name) {
+        this.name = name;
+    }
+
     public String getFrom() {
         return from;
+    }
+
+    public void setFrom(String from) {
+        this.from = from;
     }
 
     public AttributesSelectionConfig getSelect() {
         return select;
     }
 
+    public void setSelect(AttributesSelectionConfig select) {
+        this.select = select;
+    }
+
     public List<String> getGroupBy() {
         return groupBy;
     }
 
+    public void setGroupBy(List<String> groupBy) {
+        this.groupBy = groupBy;
+    }
+
     public String getAggregateByAttribute() {
         return aggregateByAttribute;
+    }
+
+    public void setAggregateByAttribute(String aggregateByAttribute) {
+        this.aggregateByAttribute = aggregateByAttribute;
     }
 
     public AggregateByTimePeriod getAggregateByTimePeriod() {
@@ -66,39 +86,19 @@ public class AggregationConfig extends SiddhiElementConfig {
         return store;
     }
 
-    public List<String> getAnnotationList() {
-        return annotationList;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public void setFrom(String from) {
-        this.from = from;
-    }
-
-    public void setSelect(AttributesSelectionConfig select) {
-        this.select = select;
-    }
-
-    public void setGroupBy(List<String> groupBy) {
-        this.groupBy = groupBy;
-    }
-
-    public void setAggregateByAttribute(String aggregateByAttribute) {
-        this.aggregateByAttribute = aggregateByAttribute;
-    }
-
-    public void setAggregateByTime(AggregateByTimePeriod aggregateByTimePeriod) {
-        this.aggregateByTimePeriod = aggregateByTimePeriod;
-    }
-
     public void setStore(StoreConfig store) {
         this.store = store;
     }
 
+    public List<String> getAnnotationList() {
+        return annotationList;
+    }
+
     public void setAnnotationList(List<String> annotationList) {
         this.annotationList = annotationList;
+    }
+
+    public void setAggregateByTime(AggregateByTimePeriod aggregateByTimePeriod) {
+        this.aggregateByTimePeriod = aggregateByTimePeriod;
     }
 }

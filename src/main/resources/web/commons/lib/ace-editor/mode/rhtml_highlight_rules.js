@@ -35,32 +35,32 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  *
  */
-define(function(require, exports, module) {
-"use strict";
+define(function (require, exports, module) {
+    "use strict";
 
-var oop = require("../lib/oop");
-var RHighlightRules = require("./r_highlight_rules").RHighlightRules;
-var HtmlHighlightRules = require("./html_highlight_rules").HtmlHighlightRules;
-var TextHighlightRules = require("./text_highlight_rules").TextHighlightRules;
+    var oop = require("../lib/oop");
+    var RHighlightRules = require("./r_highlight_rules").RHighlightRules;
+    var HtmlHighlightRules = require("./html_highlight_rules").HtmlHighlightRules;
+    var TextHighlightRules = require("./text_highlight_rules").TextHighlightRules;
 
-var RHtmlHighlightRules = function() {
-    HtmlHighlightRules.call(this);
+    var RHtmlHighlightRules = function () {
+        HtmlHighlightRules.call(this);
 
-    this.$rules["start"].unshift({
-        token: "support.function.codebegin",
-        regex: "^<" + "!--\\s*begin.rcode\\s*(?:.*)",
-        next: "r-start"
-    });
+        this.$rules["start"].unshift({
+            token: "support.function.codebegin",
+            regex: "^<" + "!--\\s*begin.rcode\\s*(?:.*)",
+            next: "r-start"
+        });
 
-    this.embedRules(RHighlightRules, "r-", [{
-        token: "support.function.codeend",
-        regex: "^\\s*end.rcode\\s*-->",
-        next: "start"
-    }], ["start"]);
+        this.embedRules(RHighlightRules, "r-", [{
+            token: "support.function.codeend",
+            regex: "^\\s*end.rcode\\s*-->",
+            next: "start"
+        }], ["start"]);
 
-    this.normalizeRules();
-};
-oop.inherits(RHtmlHighlightRules, TextHighlightRules);
+        this.normalizeRules();
+    };
+    oop.inherits(RHtmlHighlightRules, TextHighlightRules);
 
-exports.RHtmlHighlightRules = RHtmlHighlightRules;
+    exports.RHtmlHighlightRules = RHtmlHighlightRules;
 });

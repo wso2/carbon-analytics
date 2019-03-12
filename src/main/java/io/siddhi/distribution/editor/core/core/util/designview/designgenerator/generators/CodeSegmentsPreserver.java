@@ -38,7 +38,8 @@ public abstract class CodeSegmentsPreserver {
 
     /**
      * Preserves code segment of the given SiddhiElement object
-     * @param siddhiElement     SiddhiElement object which represents a parsed Siddhi element
+     *
+     * @param siddhiElement SiddhiElement object which represents a parsed Siddhi element
      */
     public void preserveCodeSegment(SiddhiElement siddhiElement) {
         if (isCodeSegmentValid(siddhiElement)) {
@@ -51,9 +52,10 @@ public abstract class CodeSegmentsPreserver {
     /**
      * Preserves code segment of the given SiddhiElement,
      * and binds the query start and end indexes to the given SiddhiElementConfig
-     * @param bindFromElement           SiddhiElement object from which,
-     *                                  code segment indexes are acquired and preserved
-     * @param bindToElementConfig       SiddhiElementConfig object to which, the acquired indexes should be bound
+     *
+     * @param bindFromElement     SiddhiElement object from which,
+     *                            code segment indexes are acquired and preserved
+     * @param bindToElementConfig SiddhiElementConfig object to which, the acquired indexes should be bound
      */
     protected void preserveAndBindCodeSegment(SiddhiElement bindFromElement, SiddhiElementConfig bindToElementConfig) {
         preserveCodeSegment(bindFromElement);
@@ -63,8 +65,9 @@ public abstract class CodeSegmentsPreserver {
     /**
      * Binds query context start and end indexes of the given SiddhiElement object,
      * to the given SiddhiElementConfig object
-     * @param bindFromElement           SiddhiElement object from which, code segment indexes are acquired
-     * @param bindToElementConfig       SiddhiElementConfig object to which, the acquired code segment indexes are bound
+     *
+     * @param bindFromElement     SiddhiElement object from which, code segment indexes are acquired
+     * @param bindToElementConfig SiddhiElementConfig object to which, the acquired code segment indexes are bound
      */
     protected void bindCodeSegmentIndexes(SiddhiElement bindFromElement,
                                           SiddhiElementConfig bindToElementConfig) {
@@ -76,8 +79,9 @@ public abstract class CodeSegmentsPreserver {
 
     /**
      * Preserves the code segments that are preserved in each of the given CodeSegmentsPreservers
-     * @param codeSegmentsPreservers        One or more CodeSegmentsPreserver objects,
-     *                                      whose preserved code segments are accessed for preserving
+     *
+     * @param codeSegmentsPreservers One or more CodeSegmentsPreserver objects,
+     *                               whose preserved code segments are accessed for preserving
      */
     protected void preserveCodeSegmentsOf(CodeSegmentsPreserver... codeSegmentsPreservers) {
         for (CodeSegmentsPreserver codeSegmentsPreserver : codeSegmentsPreservers) {
@@ -87,8 +91,9 @@ public abstract class CodeSegmentsPreserver {
 
     /**
      * Returns whether the given SiddhiElement object's code segment is valid or not
-     * @param siddhiElement     SiddhiElement object
-     * @return                  true if the code segment is valid, otherwise false
+     *
+     * @param siddhiElement SiddhiElement object
+     * @return true if the code segment is valid, otherwise false
      */
     private boolean isCodeSegmentValid(SiddhiElement siddhiElement) {
         return siddhiElement != null &&

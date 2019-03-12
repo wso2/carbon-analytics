@@ -29,6 +29,9 @@ import java.util.List;
 import java.util.Random;
 import javax.xml.namespace.QName;
 
+/**
+ * Class for sample event generation.
+ */
 public class SampleEventGenerator {
 
     private static double[] doubleValues = {1.23434, 4.504343, 5.443435, 20.44345, 90.34344};
@@ -91,10 +94,12 @@ public class SampleEventGenerator {
                     sampleEvent.append(",\n");
                 }
                 if (Constants.ATTR_TYPE_STRING.equals(attributeList.get(i).getType().toString())) {
-                    sampleEvent.append(attributeList.get(i).getName()).append(Constants.EVENT_ATTRIBUTE_VALUE_SEPARATOR).
+                    sampleEvent.append(attributeList.get(i).getName()).
+                            append(Constants.EVENT_ATTRIBUTE_VALUE_SEPARATOR).
                             append("'").append(getSampleValue(attributeList.get(i).getType())).append("'");
                 } else {
-                    sampleEvent.append(attributeList.get(i).getName()).append(Constants.EVENT_ATTRIBUTE_VALUE_SEPARATOR).
+                    sampleEvent.append(attributeList.get(i).getName()).
+                            append(Constants.EVENT_ATTRIBUTE_VALUE_SEPARATOR).
                             append(getSampleValue(attributeList.get(i).getType()));
                 }
             }

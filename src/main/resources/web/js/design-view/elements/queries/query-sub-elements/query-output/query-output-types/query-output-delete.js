@@ -28,9 +28,9 @@ define(
         var QueryOutputDelete = function (options) {
             /*
              Data storing structure as follows
-                eventType: 'CURRENT_EVENTS|EXPIRED_EVENTS|ALL_EVENTS',
-                on*: ''
-            */
+             eventType: 'CURRENT_EVENTS|EXPIRED_EVENTS|ALL_EVENTS',
+             on*: ''
+             */
             if (options !== undefined) {
                 this.eventType = (options.eventType !== undefined) ? (options.eventType).toUpperCase() : undefined;
                 this.on = options.on;

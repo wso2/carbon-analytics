@@ -302,10 +302,10 @@ var SiddhiEditor = {};
                     query: ctx.start.getInputStream().getText(ctx.start.start, ctx.stop.stop)
                 };
 
-                if(ctx.query() != null){
+                if (ctx.query() != null) {
                     for (var i = 0; i < ctx.query().children.length; i++) {
                         var childCtx = ctx.query().getChild(i);
-                        switch(childCtx.constructor.name) {
+                        switch (childCtx.constructor.name) {
                             case 'Query_inputContext':
                                 queryInfo.in = childCtx.start.line;
                                 break;
@@ -316,7 +316,7 @@ var SiddhiEditor = {};
                                 break;
                         }
                     }
-                }else{
+                } else {
                     queryInfo.in = ctx.children[0].start.line;
                     queryInfo.out = ctx.children[0].stop.line;
                 }

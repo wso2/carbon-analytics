@@ -16,7 +16,7 @@
  * under the License.
  */
 
-define(['require', 'lodash', 'jquery', 'log', 'backbone', 'file_browser', 'bootstrap','ace/ace'], function
+define(['require', 'lodash', 'jquery', 'log', 'backbone', 'file_browser', 'bootstrap', 'ace/ace'], function
     (require, _, $, log, Backbone) {
     var ExportFileDialog = Backbone.View.extend(
         /** @lends ExportFileDialog.prototype */
@@ -35,7 +35,7 @@ define(['require', 'lodash', 'jquery', 'log', 'backbone', 'file_browser', 'boots
                 var app = this.app;
                 var title = app.tabController.getActiveTab().getTitle();
                 var activeTab = app.tabController.activeTab;
-                var siddhiFileEditor= activeTab.getSiddhiFileEditor();
+                var siddhiFileEditor = activeTab.getSiddhiFileEditor();
                 var config = siddhiFileEditor.getContent();
                 var payload = new Blob([config], {type: "text/plain; charset=utf-8"});
                 var downloadLink = document.createElement("a");

@@ -16,7 +16,7 @@
  * under the License.
  */
 
-define(([],function (){
+define(([], function () {
     var EditMenu = {
         id: "edit",
         label: "Edit",
@@ -80,7 +80,7 @@ define(([],function (){
                 label: "Find and Replace",
                 command: {
                     id: "findAndReplace",
-                    labels:{
+                    labels: {
                         mac: {
                             //key: "command+option+f",
                             label: "\u2318\u2325f"

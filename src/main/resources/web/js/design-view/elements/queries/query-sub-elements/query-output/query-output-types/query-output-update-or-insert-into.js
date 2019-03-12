@@ -28,16 +28,16 @@ define(
         var QueryOutputUpdateOrInsertInto = function (options) {
             /*
              Data storing structure as follows
-                eventType: 'CURRENT_EVENTS|EXPIRED_EVENTS|ALL_EVENTS',
-                set*: [
-                    {
-                        attribute*: '',
-                        value*: ''
-                    },
-                    ...
-                ],
-                on*: ''
-            */
+             eventType: 'CURRENT_EVENTS|EXPIRED_EVENTS|ALL_EVENTS',
+             set*: [
+             {
+             attribute*: '',
+             value*: ''
+             },
+             ...
+             ],
+             on*: ''
+             */
             if (options !== undefined) {
                 this.eventType = (options.eventType !== undefined) ? (options.eventType).toUpperCase() : undefined;
                 this.set = options.set;

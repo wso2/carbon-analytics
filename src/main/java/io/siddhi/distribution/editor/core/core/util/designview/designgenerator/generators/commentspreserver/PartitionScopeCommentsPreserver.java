@@ -67,8 +67,9 @@ public class PartitionScopeCommentsPreserver extends ScopedCommentsPreserver {
     /**
      * Returns the filtered list of Code segments that only belong to the current Partition,
      * from the given list of ElementCodeSegments
-     * @param elementCodeSegments       Unfiltered list of ElementCodeSegment objects
-     * @return                          Filtered list of ElementCodeSegment objects
+     *
+     * @param elementCodeSegments Unfiltered list of ElementCodeSegment objects
+     * @return Filtered list of ElementCodeSegment objects
      */
     private List<ElementCodeSegment> filterCurrentPartitionContainedCodeSegments(
             List<ElementCodeSegment> elementCodeSegments) {
@@ -87,8 +88,9 @@ public class PartitionScopeCommentsPreserver extends ScopedCommentsPreserver {
 
     /**
      * Returns only the Comment segments, existing after 'partition with' elements
-     * @param commentCodeSegments       List of CommentCodeSegment objects
-     * @return                          List of filtered CommentCodeSegment objects
+     *
+     * @param commentCodeSegments List of CommentCodeSegment objects
+     * @return List of filtered CommentCodeSegment objects
      */
     private List<CommentCodeSegment> filterCommentsAfterPartitionWithKeyword(
             List<CommentCodeSegment> commentCodeSegments) {
@@ -126,8 +128,9 @@ public class PartitionScopeCommentsPreserver extends ScopedCommentsPreserver {
 
     /**
      * Gets the ending index of the very last 'partition with' element
-     * @param partitionWithElements     List of 'partition with' elements
-     * @return                          Query context end index of the very last 'partition with' element
+     *
+     * @param partitionWithElements List of 'partition with' elements
+     * @return Query context end index of the very last 'partition with' element
      */
     private int[] getLastPartitionWithElementEndIndex(List<PartitionWithElement> partitionWithElements) {
         List<ElementCodeSegment> partitionWithCodeSegments = new ArrayList<>();
@@ -145,13 +148,14 @@ public class PartitionScopeCommentsPreserver extends ScopedCommentsPreserver {
      * Returns the first comment within the partition, after trimming the 'begin' keyword.
      * Since the 'begin' keyword is not parsed, it will be detected as a comment that is immediately after the
      * last ever 'partition with' element.
-     * @param firstCommentCodeSegment       First comment segment, that contains the 'begin' keyword
-     * @return                              Comment segment trimmed out of the 'begin' keyword
+     *
+     * @param firstCommentCodeSegment First comment segment, that contains the 'begin' keyword
+     * @return Comment segment trimmed out of the 'begin' keyword
      */
     private CommentCodeSegment getTrimmedFirstInnerPartitionCommentSegment(CommentCodeSegment firstCommentCodeSegment) {
-        final String BEGIN = "begin";
-        String[] splitArray = firstCommentCodeSegment.getContent().split(BEGIN);
-        String newContent = String.join(BEGIN, Arrays.copyOfRange(splitArray, 1, splitArray.length));
+        final String begin = "begin";
+        String[] splitArray = firstCommentCodeSegment.getContent().split(begin);
+        String newContent = String.join(begin, Arrays.copyOfRange(splitArray, 1, splitArray.length));
 
         int line = firstCommentCodeSegment.getStartLine();
         int column = firstCommentCodeSegment.getStartColumn();
@@ -163,7 +167,7 @@ public class PartitionScopeCommentsPreserver extends ScopedCommentsPreserver {
                 column++;
             }
         }
-        column += BEGIN.length();
+        column += begin.length();
 
         return new CommentCodeSegment(
                 new int[]{line, column}, firstCommentCodeSegment.getQueryContextEndIndex(), newContent);
@@ -173,8 +177,9 @@ public class PartitionScopeCommentsPreserver extends ScopedCommentsPreserver {
      * Finds and returns the reference of the PartitionConfig object,
      * for the Partition whose comments are about to be preserved with this Preserver,
      * from the given SiddhiAppConfig reference
-     * @param siddhiAppConfigReference          SiddhiAppConfig object reference
-     * @return                                  PartitionConfig object reference
+     *
+     * @param siddhiAppConfigReference SiddhiAppConfig object reference
+     * @return PartitionConfig object reference
      */
     private PartitionConfig getCurrentPartitionConfigReference(SiddhiAppConfig siddhiAppConfigReference) {
         for (PartitionConfig partitionConfigReference : siddhiAppConfigReference.getPartitionList()) {
@@ -191,8 +196,9 @@ public class PartitionScopeCommentsPreserver extends ScopedCommentsPreserver {
 
     /**
      * Returns whether the given code segment belongs to the current Partition or not
-     * @param elementCodeSegment        ElementCodeSegment object
-     * @return                          Whether the code segment belongs to the current Partition or not
+     *
+     * @param elementCodeSegment ElementCodeSegment object
+     * @return Whether the code segment belongs to the current Partition or not
      */
     private boolean doesSegmentBelongToCurrentPartition(ElementCodeSegment elementCodeSegment) {
         ElementCodeSegment partitionElementCodeSegment =

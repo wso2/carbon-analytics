@@ -31,7 +31,7 @@ public class StreamCodeGenerator {
     /**
      * Generates the Siddhi code representation of a StreamConfig object
      *
-     * @param stream The StreamConfig object
+     * @param stream              The StreamConfig object
      * @param isGeneratingToolTip If it is generating a tooltip or not
      * @return The Siddhi code representation of the given StreamConfig object
      * @throws CodeGenerationException Error when generating the code
@@ -45,7 +45,7 @@ public class StreamCodeGenerator {
 
         streamStringBuilder.append(SubElementCodeGenerator.generateAnnotations(stream.getAnnotationList()))
                 .append(SiddhiCodeBuilderConstants.DEFINE_STREAM)
-                .append(SiddhiCodeBuilderConstants.SPACE )
+                .append(SiddhiCodeBuilderConstants.SPACE)
                 .append(stream.getName())
                 .append(SiddhiCodeBuilderConstants.SPACE)
                 .append(SiddhiCodeBuilderConstants.OPEN_BRACKET)
