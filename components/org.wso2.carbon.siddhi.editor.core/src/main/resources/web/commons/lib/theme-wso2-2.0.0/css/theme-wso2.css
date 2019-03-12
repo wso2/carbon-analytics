@@ -2982,7 +2982,8 @@ footer {
     text-decoration: none; }
 
 body.sticky-footer {
-  padding-bottom: 40px; }
+  padding-bottom: 40px;
+  overflow: hidden !important;}
   body.sticky-footer footer {
     position: absolute;
     bottom: 0;

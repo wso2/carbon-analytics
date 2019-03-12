@@ -110,6 +110,24 @@ define(([],function (){
                     }
                 },
                 disabled: false
+            },
+            {
+                id: 'tour-guide',
+                label: 'Tour guide',
+                command: {
+                    id: 'tour-guide',
+                    shortcuts: {
+                        mac: {
+                            key: "command+shift+h",
+                            label: "\u2318\u21E7H"
+                        },
+                        other: {
+                            key: "ctrl+shift+h",
+                            label: "Ctrl+Shift+H"
+                        }
+                    }
+                },
+                disabled: false
             }
         ]
 

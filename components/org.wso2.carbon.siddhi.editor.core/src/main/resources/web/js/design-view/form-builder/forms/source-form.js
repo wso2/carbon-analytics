@@ -272,8 +272,7 @@ define(['log', 'jquery', 'lodash', 'sourceOrSinkAnnotation', 'mapAnnotation', 'p
                 }
 
                 //onclick of submit
-                var submitButtonElement = $(formContainer).find('#btn-submit')[0];
-                submitButtonElement.addEventListener('click', function () {
+                $(formContainer).on('click', '#btn-submit', function () {
 
                     self.formUtils.removeErrorClass();
                     var isErrorOccurred = false;

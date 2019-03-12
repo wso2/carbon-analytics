@@ -1226,6 +1226,8 @@ a.list-group-item, button.list-group-item {
 .design-view-form-content .define-group-by-attributes,
 .design-view-form-content .define-order-by-attributes,
 .design-view-form-content .define-content,
+.design-view-form-content .define-output-content,
+.query-output-container .define-output-events,
 .design-view-form-content .define-stream-handler {
     margin-top: 10px;
 }

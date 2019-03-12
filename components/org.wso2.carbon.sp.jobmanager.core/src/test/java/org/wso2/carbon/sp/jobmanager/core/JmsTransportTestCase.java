@@ -249,7 +249,8 @@ public class JmsTransportTestCase {
      * Sequence can can reside in an execGroup with parallel > 1 if the used stream is a
      * (Partitioned/Inner) Stream.
      */
-    @Test(dependsOnMethods = "testPartitionWithWindow")
+//    Disabling due to issue #1574
+//    @Test(dependsOnMethods = "testPartitionWithWindow")
     public void testPartitionWithSequence() {
         String siddhiApp = "@App:name('TestPlan4')\n"
                 + "@source(type = 'http', topic = 'device-power', @map(type = 'json'))\n"
@@ -321,7 +322,7 @@ public class JmsTransportTestCase {
      * If a siddhi app contains patterns while the corresponding execution group's
      * parallelism > 1 then SiddhiAppValidationException will be thrown.
      */
-    @Test(dependsOnMethods = "testPartitionWithSequence")
+    @Test(dependsOnMethods = "testPartitionWithWindow")
     public void testPartitionWithPattern() {
         String siddhiApp = "@App:name('TestPlan5')"
                 + "@source(type = 'http', topic = 'device-power', @map(type = 'json'))"

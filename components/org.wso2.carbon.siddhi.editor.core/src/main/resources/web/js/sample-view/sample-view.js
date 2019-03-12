@@ -33,11 +33,13 @@ define(['require', 'jquery', 'lodash', 'log'], function (require, $, _, log) {
         var parentContainer = _.get(config, 'parentContainer');
         this._sampleName = config.sampleName;
         this._content = config.sampleDes;
+        this._id = config.sampleName;
 
         //create the parent for drawn svg
         var sampleLi = $("<li class='col-md-6'></li>");
         var linkSample = $("<a href='#' style='height: 100px;display: block;'></a>");
         linkSample.text(this._sampleName);
+        linkSample.attr('id', this._sampleName);
         linkSample.bind('click', config.clickEventCallback);
 
         var description = "<span class='description'>" + this._content + "</span>";
