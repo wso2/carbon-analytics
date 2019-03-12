@@ -102,10 +102,11 @@ public class LoginApi implements Microservice {
                                             @PathParam("appName") String appName,
                                             @QueryParam("code") String authorizationCode, @Context Request request)
             throws NotFoundException {
-        return delegate.loginCallbackAppNameGet(appName, authorizationCode, request);
+        Response response = delegate.loginCallbackAppNameGet(appName, authorizationCode, request);
+        return response;
     }
 
-    @POST
+    @GET
     @Path("/auth-type")
     @io.swagger.annotations.ApiOperation(value = "", notes = "Login type check Request to Stream Processor.",
             response = UserDTO.class, tags = {})

@@ -100,7 +100,6 @@ public class LoginApiServiceImpl extends LoginApiService {
 
             String trimmedAppName = appName.split("/\\|?")[0];
             String appContext = "/" + trimmedAppName;
-
             idPClientProperties.put(IdPClientConstants.APP_NAME, trimmedAppName);
             idPClientProperties.put(IdPClientConstants.GRANT_TYPE, grantType);
             idPClientProperties.put(IdPClientConstants.REMEMBER_ME, rememberMe.toString());
@@ -127,6 +126,7 @@ public class LoginApiServiceImpl extends LoginApiService {
                 idPClientProperties.put(IdPClientConstants.PASSWORD, password);
             } else if (IdPClientConstants.AUTHORIZATION_CODE_GRANT_TYPE.equalsIgnoreCase(grantType)) {
                 idPClientProperties.put(IdPClientConstants.GRANT_TYPE, IdPClientConstants.AUTHORIZATION_CODE_GRANT_TYPE);
+                idPClientProperties.put(IdPClientConstants.CALLBACK_URL, appName);
             } else {
                 if (LOG.isDebugEnabled()) {
                     LOG.debug("Grant type '{}' is not supported.", removeCRLFCharacters(grantType));
@@ -213,7 +213,9 @@ public class LoginApiServiceImpl extends LoginApiService {
                     redirectionDTO.setClientId(loginResponse.get(ExternalIdPClientConstants.CLIENT_ID));
                     redirectionDTO.setCallbackUrl(loginResponse.get(ExternalIdPClientConstants.CALLBACK_URL_NAME));
                     redirectionDTO.setRedirectUrl(loginResponse.get(ExternalIdPClientConstants.REDIRECT_URL));
-                    return Response.status(Response.Status.FOUND).entity(redirectionDTO).build();
+                    return Response.status(Response.Status.FOUND)
+
+                            .entity(redirectionDTO).build();
                 default:
                     if (LOG.isDebugEnabled()) {
                         LOG.debug("Error in login to the uri '{}'.", removeCRLFCharacters(appName));
@@ -289,6 +291,11 @@ public class LoginApiServiceImpl extends LoginApiService {
                             .cookieBuilder(AuthRESTAPIConstants.WSO2_SP_TOKEN, accessTokenSecondHalf,
                                     AuthRESTAPIConstants.LOGOUT_CONTEXT + appContext, true, true, -1);
 
+                    NewCookie userAuthenticate = AuthUtil.cookieBuilder("DASHBOARD_USER", userDTO.toStringify(),
+                            appContext, true, true, -1);
+
+                    NewCookie refreshTokenCookie = AuthUtil.cookieBuilder("PRT", accessTokenSecondHalf, appContext,
+                            true, true, validityPeriod);
                     if (refreshToken != null) {
                         NewCookie loginContextRefreshTokenCookie;
                         String refTokenPart1 = refreshToken.substring(0, refreshToken.length() / 2);
@@ -302,13 +309,14 @@ public class LoginApiServiceImpl extends LoginApiService {
                                 .header(HttpHeaders.LOCATION, targetURIForRedirection)
                                 .entity(userDTO)
                                 .cookie(accessTokenhttpOnlyCookie, logoutContextAccessToken,
-                                        loginContextRefreshTokenCookie)
+                                        loginContextRefreshTokenCookie, userAuthenticate, refreshTokenCookie)
                                 .build();
                     }
                     return Response.status(Response.Status.FOUND)
                             .header(HttpHeaders.LOCATION, targetURIForRedirection)
                             .entity(userDTO)
-                            .cookie(accessTokenhttpOnlyCookie, logoutContextAccessToken)
+                            .cookie(accessTokenhttpOnlyCookie, logoutContextAccessToken, userAuthenticate,
+                                    refreshTokenCookie)
                             .build();
                 } else {
                     if (LOG.isDebugEnabled()) {
@@ -341,6 +349,13 @@ public class LoginApiServiceImpl extends LoginApiService {
                 errorDTO.setDescription("Error in accessing token from the code for uri '" + appName + "'. Error : '"
                         + e.getMessage() + "'");
                 return Response.serverError().entity(errorDTO).build();
+            } catch (Throwable t) {
+                LOG.error("Error occurred: " + t.getMessage(), t);
+                ErrorDTO errorDTO = new ErrorDTO();
+                errorDTO.setError(IdPClientConstants.Error.INTERNAL_SERVER_ERROR);
+                errorDTO.setDescription("Error occurred '" + appName + "'. Error : '"
+                        + t.getMessage() + "'");
+                return Response.serverError().entity(errorDTO).build();
             }
         } else {
             String errorMsg = "This API is only supported for External IS integration with OAuth2 support. " +
@@ -356,8 +371,9 @@ public class LoginApiServiceImpl extends LoginApiService {
     @Override
     public Response isSSOEnabled() {
         try {
-            DataHolder.getInstance().getConfigProvider().getConfigurationObject(AuthConfigurations.class);
-            return Response.status(Response.Status.OK).entity(null).build();
+            AuthConfigurations authConfigurations = DataHolder.getInstance().getConfigProvider().getConfigurationObject
+                    (AuthConfigurations.class);
+            return Response.status(Response.Status.OK).entity(authConfigurations.isSsoEnabled()).build();
         } catch (ConfigurationException errorMsg) {
             String error = "Error occurred while reading configs from deployment.yaml. " + errorMsg.getMessage();
             ErrorDTO errorDTO = new ErrorDTO();
