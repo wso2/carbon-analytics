@@ -1615,7 +1615,7 @@
         <mavan.findbugsplugin.exclude.file>findbugs-exclude.xml</mavan.findbugsplugin.exclude.file>
 
         <!--Dashboard-->
-        <carbon.uiserver.version>0.19.6</carbon.uiserver.version>
+        <carbon.uiserver.version>0.19.7</carbon.uiserver.version>
         <carbon.uiserver.version.range>[0.19.3, 1.0.0]</carbon.uiserver.version.range>
 
         <!-- Maven plugins -->
@@ -1768,7 +1768,7 @@
         <siddhi.io.tcp.version>2.1.0</siddhi.io.tcp.version>
         <siddhi.io.email.version>1.1.0</siddhi.io.email.version>
         <siddhi.io.kafka.version>4.2.0</siddhi.io.kafka.version>
-        <siddhi.io.http.version>1.1.1</siddhi.io.http.version>
+        <siddhi.io.http.version>1.1.1-SNAPSHOT</siddhi.io.http.version>
 
         <siddhi.map.json.version>4.1.0</siddhi.map.json.version>
         <siddhi.map.binary.version>1.1.0</siddhi.map.binary.version>
