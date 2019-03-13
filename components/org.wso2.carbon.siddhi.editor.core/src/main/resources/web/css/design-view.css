@@ -474,6 +474,7 @@ h3,
 
 .design-view-form-content h3 {
     font-size: 14px;
+    font-weight: 400;
 }
 
 .design-view-form-content h4 {
@@ -634,12 +635,26 @@ a.list-group-item, button.list-group-item {
 	margin-left: 75px;
 }
 
-.design-view-form-content .partition-form-container #partition-by-stream-name-label {
-	margin-left: 150px;
-}
 
 .design-view-form-content .partition-form-container input[type="text"].partition-by-stream-name {
 	margin-left: 38px;
+}
+
+.partition-form-container .partition-by-label {
+    width: 29%;
+    margin: 5px;
+    text-align: left;
+}
+
+.partition-form-container .partition-by-expression-selection {
+    width: 29%;
+}
+
+.partition-form-container .partition-stream-name {
+    min-height: 25px;
+    width: 50%;
+    margin-top: -22px;
+    margin-left: 175px;
 }
 
 .source-sink-form-container .source-sink-map-options .error-message,
@@ -682,7 +697,14 @@ a.list-group-item, button.list-group-item {
 }
 
 .design-view-form-content .define-select .projection-expression-label {
-    margin-left: 7px;
+    width: 60%;
+    margin: 5px;
+    text-align: left;
+}
+
+.design-view-form-content .projection-as-label {
+    width: 32%;
+    text-align: left;
 }
 
 .design-view-form-content input[type="text"].option-value,
@@ -715,8 +737,7 @@ a.list-group-item, button.list-group-item {
 	padding: 0 5px;
 	margin-left: 3px;
 	margin-top: 2px;
-	background: #424242;
-	color: #ccc;
+	background: #2c2c2c;
 	border: 1px solid #716e6e;
 }
 
@@ -726,9 +747,16 @@ a.list-group-item, button.list-group-item {
 	display: inline-block;
 	height: 21px;
 	padding: 0 8px;
-	background: #424242;
+	background: #2c2c2c;
 	margin-left: 3px;
 	border: 1px solid #716e6e;
+}
+
+.design-view-form-content .btn-del-option:hover,
+.window-form-container .btn-del-parameter:hover,
+.design-view-form-content #primary-index-annotations .btn-del-annot-value:hover,
+.design-view-form-content .attr-nav  a:hover {
+    background: #424242;
 }
 
 .design-view-form-content input[type="text"]:read-only,
@@ -741,13 +769,13 @@ a.list-group-item, button.list-group-item {
 .design-view-form-content .attr-nav a .fw-sort-down {
 	font-size: 16px;
 	margin-top: -3px;
-	color: #ccc;
+	color: #fff;
 }
 
 .design-view-form-content .attr-nav a .fw-sort-up {
 	font-size: 16px;
 	margin-top: 6px;
-	color: #ccc;
+	color: #fff;
 }
 
 .clearfix {
@@ -759,7 +787,7 @@ a.list-group-item, button.list-group-item {
 .design-view-form-content .fw-delete {
 	font-size: 12px;
 	margin-top: 3px;
-	color: #ccc;
+	color: #fff;
 }
 
 .design-view-form-content .attr-nav,
@@ -776,6 +804,10 @@ a.list-group-item, button.list-group-item {
 
 .design-view-form-content #attribute-div .attribute {
 	margin-bottom: 5px;
+}
+
+.design-view-form-content .attributes-container {
+    margin-top: 15px;
 }
 
 .design-view-form-content .group-by-selection .attribute,
@@ -803,7 +835,7 @@ a.list-group-item, button.list-group-item {
 
 .aggregation-form-container .aggregate-by-time-period-content {
 	padding: 10px;
-	margin-left: 85px;
+	margin-left: 35px;
 }
 
 .design-view-form-content .annotation > a > i.jstree-checkbox,
@@ -903,11 +935,12 @@ a.list-group-item, button.list-group-item {
     margin-right: 10px;
 }
 
-.window-form-container,
 .trigger-form-container,
 .function-form-container {
 	width: 25%;
 }
+
+.window-form-container { width: 24% }
 
 .pattern-sequence-query-form-container,
 .join-query-form-container {
@@ -936,12 +969,23 @@ a.list-group-item, button.list-group-item {
 
 .design-view-form-content .source-div,
 .design-view-form-content .sink-div {
-	width: 45%;
+	width: 40%;
 }
 
-.design-view-form-content .table-div,
-.design-view-form-content .mapper-div {
+.design-view-form-content .table-div{
 	width: 25%;
+}
+
+.design-view-form-content .mapper-div {
+    width: 22%;
+}
+
+.design-view-form-content .customized-options{
+    min-width: 330px;
+}
+
+.design-view-form-content .define-select {
+   min-width: 300px;
 }
 
 .design-view-form-content .store-div {
@@ -1005,7 +1049,7 @@ a.list-group-item, button.list-group-item {
 }
 
 .design-view-form-content .cust-options .option {
-	margin-bottom: 2px;
+	margin-bottom: 5px;
 }
 
 .design-view-form-content .source-sink-form-container #stream-attributes {
@@ -1029,19 +1073,22 @@ a.list-group-item, button.list-group-item {
 }
 
 .design-view-form-content .btn-default {
-	color: #ccc;
-	background: #2c2c2c;
-	margin-top: 15px;
+    margin-top: 15px;
 }
 
 .design-view-form-content #primary-index-annotations .btn-add-annot-value {
-	margin-top: 0px;
+	margin-top: 5px;
 	margin-bottom: 10px;
-	margin-left: 160px;
+	margin-left: 125px;
+}
+
+.design-view-form-content .option .mandatory-symbol,
+.design-view-form-content .parameter .mandatory-symbol{
+	margin-right: 12px;
 }
 
 .design-view-form-content .mandatory-symbol {
-	margin-right: 12px;
+    margin-right: 8px;
 }
 
 .design-view-form-content select,
@@ -1158,16 +1205,6 @@ a.list-group-item, button.list-group-item {
     margin-top: 10px;
 }
 
-.join-query-form-container .post-filter-condition-content,
-.join-query-form-container .on-condition-content {
-	padding-top: 10px;
-}
-
-.join-query-form-container input[type="text"].post-condition-value,
-.join-query-form-container input[type="text"].on-condition-value {
-	width: calc(90% - 30px);
-}
-
 .design-view-form-content .order-by-content .order-by-attribute-content,
 .design-view-form-content .group-by-content .group-by-attribute-content {
 	display: inline-flex;
@@ -1177,16 +1214,10 @@ a.list-group-item, button.list-group-item {
 	margin-top: 3px;
 }
 
-.design-view-form-content .group-by-content .btn-del-option {
-	margin-left: 10px;
-}
-
+.design-view-form-content .group-by-content .btn-del-option,
 .design-view-form-content .order-by-attributes .define-order-del {
 	margin-left: 10px;
-}
-
-.join-query-form-container .define-source .define-as {
-	margin-top: 10px;
+    margin-top: 2px;
 }
 
 .join-query-form-container .define-source input[type="text"].as-content-value {
@@ -1194,12 +1225,9 @@ a.list-group-item, button.list-group-item {
 }
 
 .join-query-form-container .define-unidirectional,
-.join-query-form-container .define-streamHandler {
-	margin-top: 10px;
-}
-
-.design-view-form-content .define-output-events,
-.design-view-form-content .query-selected-attributes li {
+.join-query-form-container .define-streamHandler,
+.design-view-form-content .query-selected-attributes li,
+.join-query-form-container .define-source .define-as {
 	margin-top: 10px;
 }
 
@@ -1212,26 +1240,6 @@ a.list-group-item, button.list-group-item {
 .design-view-form-content .define-stream-handler .define-stream-handler-type-content {
 	margin-top: 10px;
 	margin-bottom: 10px;
-}
-
-.design-view-form-content .query-form-container .define-select .projection-as-label {
-	margin-left: 234px;
-}
-
-.design-view-form-content .pattern-sequence-query-form-container .define-select .projection-as-label,
-.design-view-form-content .join-query-form-container .define-select .projection-as-label{
-    margin-left: 160px;
-}
-
-.design-view-form-content .projection-container,
-.design-view-form-content .condition-container,
-.design-view-form-content .query-input-container,
-.design-view-form-content .query-output-container,
-.design-view-form-content .query-content,
-.design-view-form-content .define-user-defined-attributes,
-.design-view-form-content .order-group-by-content,
-.design-view-form-content .join-source-content {
-    margin-left: 20px;
 }
 
 .design-view-form-content .define-group-by-attributes,
@@ -1350,8 +1358,71 @@ label.option-name {
 
 .aggregation-form-container .min-range,
 .aggregation-form-container .max-range,
-.design-view-form-content .define-join-type,
 .design-view-form-content .aggregation-info,
 .join-query-form-container .define-source {
     margin-bottom: 10px;
+}
+
+.design-view-form-content .define-join-type {
+    margin-bottom: 15px;
+}
+
+.aggregation-form-container #define-aggregate-annotations,
+.trigger-form-container #define-trigger-criteria{
+    margin-top: 20px;
+}
+
+.design-view-form-content .define-user-defined-annotations,
+.design-view-form-content .join-source-content {
+    margin-top: 10px;
+}
+
+#define-aggregate-annotations .define-store-annotation {
+    margin-top: -5px;
+}
+
+.cust-options .option div:first-child {
+    margin-bottom: 2px;
+}
+
+.output-console-content-wrapper {
+    min-width: 1300px;
+}
+
+.btn-default:active,
+.btn-default:focus {
+    background: #2c2c2c;
+    color: #fff;
+}
+
+.design-view-form-content .attribute-mapping-label {
+    width: 30%;
+    text-align: left;
+    margin: 6px;
+}
+
+.design-view-form-content .collapse-div[aria-expanded=false] a::after {
+    font-family: font-wso2;
+    content: "\e685";
+}
+
+.design-view-form-content .collapse-div[aria-expanded=true] a::after {
+    content: "\e684";
+}
+
+.design-view-form-content .collapse-div a {
+    padding: 0 5px;
+    font-family: font-wso2;
+    font-size: 10px;
+    float: right
+}
+
+.design-view-form-content .collapse-div {
+    min-height: 25px;
+    background-color: #282929;
+    padding: 3px 7px;
+}
+
+.design-view-form-content input[type=checkbox][disabled] {
+    background-color: #1d1d1d;
 }

@@ -17,11 +17,11 @@
  */
 
 define(['require', 'log', 'jquery', 'lodash', 'formUtils', 'streamForm', 'tableForm', 'windowForm', 'aggregationForm',
-        'triggerForm', 'windowFilterProjectionQueryForm', 'patternQueryForm', 'joinQueryForm', 'partitionForm',
-        'sequenceQueryForm', 'sourceForm', 'sinkForm', 'functionForm', 'appAnnotationForm', 'constants'],
+    'triggerForm', 'windowFilterProjectionQueryForm', 'patternQueryForm', 'joinQueryForm', 'partitionForm',
+    'sequenceQueryForm', 'sourceForm', 'sinkForm', 'functionForm', 'appAnnotationForm', 'constants'],
     function (require, log, $, _, FormUtils, StreamForm, TableForm, WindowForm, AggregationForm, TriggerForm,
-              WindowFilterProjectionQueryForm, PatternQueryForm, JoinQueryForm, PartitionForm, SequenceQueryForm,
-              SourceForm, SinkForm, FunctionForm, AppAnnotationForm, Constants) {
+        WindowFilterProjectionQueryForm, PatternQueryForm, JoinQueryForm, PartitionForm, SequenceQueryForm,
+        SourceForm, SinkForm, FunctionForm, AppAnnotationForm, Constants) {
 
         // common properties for the JSON editor
         JSONEditor.defaults.options.theme = 'bootstrap3';
@@ -85,7 +85,7 @@ define(['require', 'log', 'jquery', 'lodash', 'formUtils', 'streamForm', 'tableF
             }
 
             var uniqueTabId = 'form-' + activeTab.cid;
-            var formTitle = siddhiAppName + ' - ' + formType;
+            var formTitle = formType + ' - ' + siddhiAppName;
             var consoleOptions = {};
             var options = {};
             _.set(options, '_type', "FORM");

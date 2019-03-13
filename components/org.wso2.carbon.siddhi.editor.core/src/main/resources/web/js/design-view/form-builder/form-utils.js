@@ -404,12 +404,6 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
          */
         FormUtils.prototype.renderConditions = function (conditionList, inputStreamNames) {
             var self = this;
-            var conditions;
-            if (!conditionList || (conditionList && conditionList.length == 0)) {
-                conditions = [{ conditionId: "e1", streamHandlerList: [], streamName: "" }]
-            } else {
-                conditions = conditionList;
-            }
             var streamNames = {
                 id: "condition-stream-name",
                 options: inputStreamNames
@@ -420,12 +414,12 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
             var conditionContentTemplate = Handlebars.compile($('#pattern-sequence-condition-content-form-template')
                 .html());
             self.addDeleteButtonForConditionNav();
-            _.forEach(conditions, function (condition) {
+            _.forEach(conditionList, function (condition) {
                 var wrappedHtml = conditionNavTemplate(condition);
                 $('.define-conditions .nav-tabs li:last-child').before(wrappedHtml);
             });
 
-            _.forEach(conditions, function (condition) {
+            _.forEach(conditionList, function (condition) {
                 var wrappedHtml = conditionContentTemplate({
                     condition: condition,
                     inputStreamNames: streamNames
@@ -441,7 +435,7 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
          */
         FormUtils.prototype.addDeleteButtonForConditionNav = function () {
             var buttonHTML = '<li> <a class="btn-add-condition">+</a> </li> ';
-            if ($(".define-conditions").find(".btn-add-condition").length == 0){
+            if ($(".define-conditions").find(".btn-add-condition").length == 0) {
                 $('.define-conditions .nav-tabs').append(buttonHTML);
             }
         };
@@ -525,8 +519,8 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
                 id: Constants.STREAM_HANDLER,
                 options: streamHandlerTypes
             }
-            if (savedData && savedData.getStreamHandlerList() != 0) {
-                streamHandlerList = savedData.getStreamHandlerList();
+            if (savedData && savedData.streamHandlerList != 0) {
+                streamHandlerList = savedData.streamHandlerList;
             }
             var streamHandlers = {
                 streamHandlerList: streamHandlerList,
@@ -557,11 +551,11 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
         /**
          * @function to render the template of primary and index annotations
          */
-        FormUtils.prototype.renderPrimaryIndexAnnotations = function (primaryIndexAnnotations, id) {
+        FormUtils.prototype.renderPrimaryIndexAnnotations = function (primaryIndexAnnotations, className) {
             var self = this;
             var annotationFormTemplate = Handlebars.compile($('#primary-index-annotation-template').html())
                 (primaryIndexAnnotations);
-            $('.' + id).html(annotationFormTemplate);
+            $('.' + className).html(annotationFormTemplate);
             self.removeDeleteButtonOfPrimaryIndexAnnotationValue();
             self.addEventListenerForPrimaryIndexAnnotationDiv();
         };
@@ -2062,9 +2056,9 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
         FormUtils.prototype.mapStreamHandler = function (savedData, className) {
             var self = this;
             var sourceDiv = '.define-' + className + '-source .define-stream-handler';
-            if (savedData && savedData.getStreamHandlerList() && savedData.getStreamHandlerList().length != 0) {
+            if (savedData && savedData.streamHandlerList && savedData.streamHandlerList.length != 0) {
                 $(sourceDiv).find('.stream-handler-checkbox').prop('checked', true);
-                var streamHandlerList = savedData.getStreamHandlerList();
+                var streamHandlerList = savedData.streamHandlerList;
                 var i = 0;
                 $(sourceDiv).find('.define-stream-handler-content').each(function () {
                     var streamHandlerType = streamHandlerList[i].getType().toLowerCase();
@@ -2085,6 +2079,14 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
             self.preventMultipleSelectionOfWindowStreamHandler(sourceDiv)
             self.addEventListenersForParameterDiv();
             self.showDropDown();
+        };
+
+        /**
+         * @function to select the first condition as default
+         */
+        FormUtils.prototype.selectFirstConditionByDefault = function () {
+            $('.define-conditions .nav-tabs').find('li:first-child').addClass('active');
+            $('.define-conditions .tab-content').find('.tab-pane:first-child').addClass('active');
         };
 
         /**
@@ -3514,11 +3516,11 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
                 find('.cust-options li');
             var parent = $('#customized-' + id + '-options');
             if (customizedOptionList.length > 0) {
-                parent.find('h3').show();
-                parent.find('.btn-add-options').html('Add more');
+                parent.find('h4').show();
+                parent.find('.btn-add-options').html('+ More');
             } else {
-                parent.find('h3').hide();
-                parent.find('.btn-add-options').html('Add customized option');
+                parent.find('h4').hide();
+                parent.find('.btn-add-options').html('+ Customized Option');
             }
         };
 

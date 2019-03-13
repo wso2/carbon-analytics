@@ -41,7 +41,7 @@ define(['require', 'log', 'jquery', 'lodash', 'constants'],
          * @param {Object} triggerObject array of trigger criteria
          */
         var renderTriggerCriteria = function (triggerObject) {
-            var triggerCriteriaDiv = '<h4> Trigger Criteria </h4> <select id = "trigger-criteria-type">';
+            var triggerCriteriaDiv = '<label class="clearfix"> Trigger Criteria </label> <select id = "trigger-criteria-type">';
             _.forEach(triggerObject, function (triggerCriteria) {
                 triggerCriteriaDiv += '<option value = "' + triggerCriteria.name + '">' + triggerCriteria.name + '</option>';
             });
@@ -126,9 +126,9 @@ define(['require', 'log', 'jquery', 'lodash', 'constants'],
 
             var propertyDiv = $('<div class ="trigger-form-container"> <div id="define-trigger-name"> <label>Name </label>' +
                 '<input type="text" id="triggerName" class="clearfix name"> <label class="error-message" ' +
-                'id = "triggerNameErrorMessage"> </label> </div>' + self.formUtils.buildFormButtons() + '</div>' +
-                '<div class = "trigger-form-container"> <div id= "define-trigger-criteria"> </div>' +
-                '<div id = "trigger-criteria-content" ></div> </div>');
+                'id = "triggerNameErrorMessage"> </label> </div> <div id= "define-trigger-criteria"> </div>' +
+                '<div id = "trigger-criteria-content"></div> </div>' +
+                self.formUtils.buildFormButtons());
 
             formContainer.append(propertyDiv);
             self.formUtils.popUpSelectedElement(id);
@@ -186,8 +186,8 @@ define(['require', 'log', 'jquery', 'lodash', 'constants'],
                     }
                 } else {
                     if (this.value !== Constants.START) {
-                        var triggerCriteriaObject = getTriggerCriteria(triggerCriteriaObject, this.value);
-                        $('#trigger-criteria-content input[type="text"]').val(triggerCriteriaObject.defaultValue);
+                        var triggerCriteriaType = getTriggerCriteria(triggerCriteriaObject, this.value);
+                        $('#trigger-criteria-content input[type="text"]').val(triggerCriteriaType.defaultValue);
                     }
                 }
             });

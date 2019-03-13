@@ -184,7 +184,7 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
                 var userDefinedAnnotations = self.formUtils.getUserAnnotations(annotationListObjects,
                     predefinedAnnotations);
                 self.formUtils.renderAnnotationTemplate("define-user-defined-annotations", userDefinedAnnotations);
-                $('.define-user-defined-annotations').find('h4').html('Customized Annotations');
+                $('.define-user-defined-annotations').find('label:first-child').html('Customized Annotations');
                 self.formUtils.mapPredefinedAnnotations(annotationListObjects, predefinedAnnotations);
                 self.formUtils.renderPredefinedAnnotations(predefinedAnnotations,
                     'define-predefined-annotations');
@@ -200,8 +200,13 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
                 });
 
                 //conditions
+                if (!conditionList || (conditionList && conditionList.length == 0)) {
+                    conditionList = [{ conditionId: "e1", streamHandlerList: [], streamName: "" }];
+                    queryInput.setConditionList(conditionList);
+                }
                 self.formUtils.renderConditions(conditionList, inputStreamNames);
                 self.formUtils.mapConditions(conditionList);
+                self.formUtils.selectFirstConditionByDefault();
                 var streamHandlerList = getStreamHandlers(conditionList);
                 self.formUtils.addEventListenersForStreamHandlersDiv(streamHandlerList);
                 self.formUtils.addEventListenersForConditionDiv(inputStreamNames);
@@ -397,11 +402,8 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
                         var selectObject = new QuerySelect(self.formUtils.buildAttributeSelection(Constants.PATTERN_QUERY));
                         patternQueryObject.setSelect(selectObject);
 
-                        queryInput.clearConditionList();
                         var conditions = self.formUtils.buildConditions();
-                        _.forEach(conditions, function (condition) {
-                            queryInput.addCondition(condition);
-                        });
+                        queryInput.setConditionList(conditions);
 
                         var annotationObjectList = [];
                         var annotationStringList = [];

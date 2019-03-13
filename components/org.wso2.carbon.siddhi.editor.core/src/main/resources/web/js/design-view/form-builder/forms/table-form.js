@@ -54,7 +54,7 @@ define(['log', 'jquery', 'lodash', 'attribute', 'storeAnnotation', 'handlebar', 
                 '<div class = "table-form-container store-div"> <div id = "define-store"> </div>  ' +
                 '<div id="define-rdbms-type"> </div> <div id="store-options-div"> </div> </div> ' +
                 '<div class = "table-form-container define-table-annotation">' +
-                '<div id = "define-predefined-annotations"> </div> <div class="define-user-annotations"> </div> </div>');
+                '<div class = "define-predefined-annotations"> </div> <div class="define-user-defined-annotations"> </div> </div>');
 
             formContainer.append(propertyDiv);
             self.formUtils.popUpSelectedElement(id);
@@ -97,8 +97,8 @@ define(['log', 'jquery', 'lodash', 'attribute', 'storeAnnotation', 'handlebar', 
             //render the predefined table annotation form template
             self.formUtils.renderPrimaryIndexAnnotations(tableAnnotations, 'define-predefined-annotations');
 
-            self.formUtils.renderAnnotationTemplate("define-user-annotations", userAnnotations);
-            $('#define-user-annotations').find('h4').html('Customized Annotations');
+            self.formUtils.renderAnnotationTemplate("define-user-defined-annotations", userAnnotations);
+            $('.define-user-defined-annotations').find('label:first-child').html('Customized Annotations');
 
             //render the template to  generate the store types
             self.formUtils.renderSourceSinkStoreTypeDropDown(Constants.STORE, predefinedStores)
@@ -111,11 +111,11 @@ define(['log', 'jquery', 'lodash', 'attribute', 'storeAnnotation', 'handlebar', 
             //onchange of the store type select box
             $('#define-store').on('change', '#store-type', function () {
                 if (this.value === Constants.DEFAULT_STORE_TYPE) {
-                    $('#define-predefined-annotations').hide();
+                    $('.define-predefined-annotations').hide();
                     $('#store-options-div').empty();
                     $('#define-rdbms-type').hide();
                 } else {
-                    $('#define-predefined-annotations').show();
+                    $('.define-predefined-annotations').show();
                     currentStoreOptions = self.formUtils.getSelectedTypeParameters(this.value, predefinedStores);
                     if (tableObject.getStore() && storeType === this.value) {
                         customizedStoreOptions = self.formUtils.getCustomizedOptions(currentStoreOptions, storeOptions);
@@ -142,7 +142,7 @@ define(['log', 'jquery', 'lodash', 'attribute', 'storeAnnotation', 'handlebar', 
             } else {
                 //if table form is freshly opened [ new table object]
                 $('#define-store #store-type').val(Constants.DEFAULT_STORE_TYPE);
-                $('#define-predefined-annotations').hide();
+                $('.define-predefined-annotations').hide();
             }
 
             // 'Submit' button action

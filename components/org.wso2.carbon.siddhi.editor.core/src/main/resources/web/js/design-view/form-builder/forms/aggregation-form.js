@@ -249,8 +249,8 @@ define(['require', 'log', 'jquery', 'lodash', 'aggregateByTimePeriod', 'querySel
                 var userDefinedAnnotations = self.formUtils.getUserAnnotations(annotationListObjects,
                     predefinedAggregationAnnotations);
 
-                self.formUtils.renderAnnotationTemplate("define-user-defined-annotation", userDefinedAnnotations);
-                $('.define-user-defined-annotation').find('h4').html('Customized Annotations');
+                self.formUtils.renderAnnotationTemplate("define-user-defined-annotations", userDefinedAnnotations);
+                $('.define-user-defined-annotations').find('label:first-child').html('Customized Annotations');
                 self.formUtils.renderPrimaryIndexAnnotations(annotationsWithoutKeys, 'define-index-annotation');
                 $('.define-index-annotation').find('h4').hide();
                 self.formUtils.renderPredefinedAnnotations(annotationsWithKeys,
