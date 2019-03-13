@@ -54,6 +54,18 @@ define(['require', 'log', 'jquery', 'lodash', 'partitionWith', 'jsonValidator', 
         };
 
         /**
+         * @function to get the attribute names of the connected stream
+         */
+        var getAttributeNames = function (streamName, self) {
+            var connectedElement = self.configurationData.getSiddhiAppConfig().getDefinitionElementByName(streamName);
+            var attributes = [];
+            _.forEach(connectedElement.element.getAttributeList(), function (attribute) {
+                attributes.push(attribute.getName());
+            });
+            return attributes;
+        };
+
+        /**
          * @function generate form for Partition
          * @param element selected element(partition)
          * @param formConsole Console which holds the form
@@ -103,13 +115,27 @@ define(['require', 'log', 'jquery', 'lodash', 'partitionWith', 'jsonValidator', 
                         if (partitionWithList[i].getStreamName()) {
                             var partitionKey = {
                                 expression: partitionWithList[i].getExpression(),
-                                streamName: partitionWithList[i].getStreamName()
+                                streamName: partitionWithList[i].getStreamName(),
+                                streamAttributes: {
+                                    id: "partition-by-expression",
+                                    options: getAttributeNames(partitionWithList[i].getStreamName(), self)
+                                }
                             };
                             partitionKeys.push(partitionKey);
                         }
                     }
+                    self.formUtils.registerDropDownPartial();
                     var partitionFormTemplate = Handlebars.compile($('#partition-by-template').html())(partitionKeys);
                     $('#define-partition-keys').html(partitionFormTemplate);
+
+                    //to map partition expressions
+                    var i = 0;
+                    $('.partition-key').each(function () {
+                        $(this).find('.partition-by-expression-selection option').filter(function () {
+                            return ($(this).val() == (partitionKeys[i].expression));
+                        }).prop('selected', true);
+                        i++;
+                    });
 
                     self.formUtils.addEventListenerToRemoveRequiredClass();
 
@@ -121,20 +147,14 @@ define(['require', 'log', 'jquery', 'lodash', 'partitionWith', 'jsonValidator', 
 
                         var partitionKeys = [];
                         $('#partition-by-content .partition-key').each(function () {
-                            var expression = $(this).find('.partition-by-expression').val().trim();
-                            if (expression === "") {
-                                self.formUtils.addErrorClass($(this).find('.partition-by-expression'));
-                                $(this).find('.error-message').text("Expression value is required.")
-                                isErrorOccurred = true;
-                                return false;
-                            } else {
-                                var streamName = $(this).find('.partition-by-stream-name').val().trim();
-                                var partitionKey = {
-                                    expression: expression,
-                                    streamName: streamName
-                                };
-                                partitionKeys.push(partitionKey);
-                            }
+                            var expression = $(this).find('.partition-by-expression-selection').val();
+                            var streamName = $(this).find('.partition-by-stream-name').val().trim();
+                            var partitionKey = {
+                                expression: expression,
+                                streamName: streamName
+                            };
+                            partitionKeys.push(partitionKey);
+
                         });
 
                         if (!isErrorOccurred) {
