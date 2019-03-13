@@ -1373,7 +1373,8 @@ label.option-name {
 }
 
 .design-view-form-content .define-user-defined-annotations,
-.design-view-form-content .join-source-content {
+.design-view-form-content .join-source-content,
+.siddhi-app-form-container #define-app-description {
     margin-top: 10px;
 }
 
