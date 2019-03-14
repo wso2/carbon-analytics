@@ -1169,17 +1169,10 @@ a.list-group-item, button.list-group-item {
 	margin-left: 30px;
 }
 
-.design-view-form-content .aggregation-form-container .define-predefined-annotations,
-.design-view-form-content .define-predefined-annotations .annotation-options,
-.design-view-form-content .aggregation-form-container #store-options-div {
-	margin-top: -10px;
-}
-
 .design-view-form-content .option,
 .design-view-form-content .parameter {
     margin-bottom: 5px;
 }
-
 
 .design-view-form-content .aggregation-form-container #primary-index-annotations {
 	margin-top: 4px;
@@ -1402,20 +1395,20 @@ label.option-name {
     margin: 6px;
 }
 
-.design-view-form-content .collapse-div[aria-expanded=false] a::after {
-    font-family: font-wso2;
+.design-view-form-content .collapse-div[aria-expanded=false] .collapse-icon::after {
     content: "\e685";
 }
 
-.design-view-form-content .collapse-div[aria-expanded=true] a::after {
+.design-view-form-content .collapse-div[aria-expanded=true] .collapse-icon::after {
     content: "\e684";
 }
 
-.design-view-form-content .collapse-div a {
+.design-view-form-content .collapse-div .collapse-icon {
     padding: 0 5px;
     font-family: font-wso2;
     font-size: 10px;
-    float: right
+    float: right;
+    color: #f47a1e;
 }
 
 .design-view-form-content .collapse-div {

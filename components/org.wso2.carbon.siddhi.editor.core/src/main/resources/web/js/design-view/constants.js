@@ -108,7 +108,10 @@ define(function () {
         TABLE_TITLE: "Table Configuration",
         TRIGGER_TITLE: "Trigger Configuration",
         QUERY_TITLE: "Query Configuration",
-        WINDOW_TITLE: "Window Configuration"
+        WINDOW_TITLE: "Window Configuration",
+        DATASOURCE: "datasource",
+        INLINE_CONFIG: "inline-config",
+        JNDI_RESOURCE: "jndi-resource"
     };
 
     return constants;

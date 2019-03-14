@@ -2691,6 +2691,140 @@
                 defaultValue: "5 min"
             }
             ],
+            rdbms_types: [
+                {
+                    name: "inline-config",
+                    parameters: [
+                        {
+                            name: "jdbc.url",
+                            optional: false,
+                            description: "The JDBC URL via which the RDBMS data store is accessed.",
+                            defaultValue: ""
+                        },
+                        {
+                            name: "username",
+                            optional: false,
+                            description: "The username to be used to access the RDBMS data store.",
+                            defaultValue: ""
+                        },
+                        {
+                            name: "password",
+                            optional: false,
+                            description: "The password to be used to access the RDBMS data store.",
+                            defaultValue: ""
+                        },
+                        {
+                            name: "jdbc.driver.name",
+                            optional: false,
+                            description: "The driver class name for connecting the RDBMS data store.",
+                            defaultValue: ""
+                        },
+                        {
+                            name: "pool.properties",
+                            optional: true,
+                            description: "Any pool parameters for the database connection must be specified as " +
+                                "key-value pairs.",
+                            defaultValue: "null"
+                        },
+                        {
+                            name: "table.name",
+                            optional: true,
+                            description: "The name with which the event table should be persisted in the store." +
+                                " If no name is specified via this parameter, the event table is persisted with " +
+                                "the same name as the Siddhi table.",
+                            defaultValue: "The table name defined in the Siddhi App query."
+                        },
+                        {
+                            name: "field.length",
+                            optional: true,
+                            description: "The number of characters that the values for fields of the 'STRING' type in" +
+                                " the table definition must contain. Each required field must be provided as a " +
+                                "comma-separated list of key-value pairs in the [field.name:length] format." +
+                                "If this is not specified, the default number of characters specific to the database type is considered.",
+                            defaultValue: "The table name defined in the Siddhi App query."
+                        }
+
+                    ]
+
+                },
+                {
+                    name: "datasource",
+                    parameters: [
+                        {
+                            name: "datasource",
+                            optional: false,
+                            description: "The name of the Carbon datasource that should be used for creating the " +
+                                "connection with the database. If this is found, neither the pool properties nor the " +
+                                "JNDI resource name described above are taken into account and the connection is " +
+                                "attempted via Carbon datasources instead. ",
+                            defaultValue: ""
+                        },
+                        {
+                            name: "pool.properties",
+                            optional: true,
+                            description: "Any pool parameters for the database connection must be specified as " +
+                                "key-value pairs.",
+                            defaultValue: "null"
+                        },
+                        {
+                            name: "table.name",
+                            optional: true,
+                            description: "The name with which the event table should be persisted in the store." +
+                                " If no name is specified via this parameter, the event table is persisted with " +
+                                "the same name as the Siddhi table.",
+                            defaultValue: "The table name defined in the Siddhi App query."
+                        },
+                        {
+                            name: "field.length",
+                            optional: true,
+                            description: "The number of characters that the values for fields of the 'STRING' type in" +
+                                " the table definition must contain. Each required field must be provided as a " +
+                                "comma-separated list of key-value pairs in the [field.name:length] format." +
+                                "If this is not specified, the default number of characters specific to the database type is considered.",
+                            defaultValue: "The table name defined in the Siddhi App query."
+                        }
+                    ]
+                },
+                {
+                    name: "jndi-resource",
+                    parameters: [
+                        {
+                            name: "jndi.resource",
+                            optional: false,
+                            description: "The name of the JNDI resource through which the connection is attempted. " +
+                                "If this is found, the pool properties described above are not taken into account and " +
+                                "the connection is attempted via JNDI lookup instead.",
+                            defaultValue: ""
+                        },
+                        {
+                            name: "pool.properties",
+                            optional: true,
+                            description: "Any pool parameters for the database connection must be specified as " +
+                                "key-value pairs.",
+                            defaultValue: "null"
+                        },
+                        {
+                            name: "table.name",
+                            optional: true,
+                            description: "The name with which the event table should be persisted in the store." +
+                                " If no name is specified via this parameter, the event table is persisted with " +
+                                "the same name as the Siddhi table.",
+                            defaultValue: "The table name defined in the Siddhi App query."
+                        },
+                        {
+                            name: "field.length",
+                            optional: true,
+                            description: "The number of characters that the values for fields of the 'STRING' type in" +
+                                " the table definition must contain. Each required field must be provided as a " +
+                                "comma-separated list of key-value pairs in the [field.name:length] format." +
+                                "If this is not specified, the default number of characters specific to the database type is considered.",
+                            defaultValue: "The table name defined in the Siddhi App query."
+                        }
+
+                    ]
+
+                }
+            ],
             services:   {
                 workspace:  {
                    endpoint: window.location.protocol + "//" + window.location.host + '/editor/workspace'

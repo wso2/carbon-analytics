@@ -197,7 +197,7 @@ public class QueryConfigGenerator extends CodeSegmentsPreserver {
      * Generates the long value for the given 'offset' Siddhi Constant
      * @param offset                             Siddhi Constant
      * @return                                  Long value
-     * @throws DesignGenerationException        Error while generating value of 'limit'
+     * @throws DesignGenerationException        Error while generating value of 'offset'
      */
     private long generateOffset(Constant offset) throws DesignGenerationException {
         if (offset != null) {

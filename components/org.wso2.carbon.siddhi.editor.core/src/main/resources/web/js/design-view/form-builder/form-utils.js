@@ -869,65 +869,58 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
 
         /**
          * @function to select the options according to the selected rdbms type
-         * @param {Object} predefined_options all the options of rdbms with the user given values
-         * @return {Object} rdbms_options
+         * @param {Object} savedOptions all the options of rdbms with the user given values
+         * @return {Object} rdbmsOptions
          */
-        FormUtils.prototype.getRdbmsOptions = function (predefined_options) {
-            var rdbms_options = [];
+        FormUtils.prototype.getRdbmsOptions = function (savedOptions) {
+            var self = this;
+            var rdbmsOptions = [];
             var selectedRdbmsType = $('input[name=radioOpt]:checked', '#define-rdbms-type').val();
-            if (selectedRdbmsType == "datasource") {
-                _.forEach(predefined_options, function (predefinedOption) {
-                    if (predefinedOption.name.toLowerCase() === "datasource") {
-                        rdbms_options.push({
-                            name: predefinedOption.name, value: predefinedOption.value, description: predefinedOption
-                                .description, optional: false, defaultValue: predefinedOption.defaultValue
-                        })
-                    } else if (predefinedOption.name.toLowerCase() === "pool.properties" ||
-                        predefinedOption.name.toLowerCase() === "table.name" ||
-                        predefinedOption.name.toLowerCase() === "field.length") {
-                        rdbms_options.push({
-                            name: predefinedOption.name, value: predefinedOption.value, description: predefinedOption
-                                .description, optional: predefinedOption.optional, defaultValue: predefinedOption
-                                    .defaultValue
-                        })
-                    }
+            var predefinedRdbmsOptions = _.cloneDeep(self.configurationData.application.config.
+                rdbms_types);
+            if (selectedRdbmsType == Constants.DATASOURCE) {
+                var datasourceOptions = (_.filter(predefinedRdbmsOptions, function (rdbmsOption) {
+                    return rdbmsOption.name == Constants.DATASOURCE
+                }))[0].parameters;
+                _.forEach(datasourceOptions, function (datasourceOption) {
+                    var savedOption = (_.filter(savedOptions, function (rdbmsOption) {
+                        return rdbmsOption.name == datasourceOption.name
+                    }))[0];
+                    rdbmsOptions.push({
+                        name: datasourceOption.name, value: savedOption.value, description: datasourceOption
+                            .description, optional: datasourceOption.optional, defaultValue: datasourceOption.defaultValue
+                    });
                 });
-            } else if (selectedRdbmsType == "inline-config") {
-                _.forEach(predefined_options, function (predefinedOption) {
-                    if (predefinedOption.name.toLowerCase() === "username" ||
-                        predefinedOption.name.toLowerCase() === "password" ||
-                        predefinedOption.name.toLowerCase() === "jdbc.url" ||
-                        predefinedOption.name.toLowerCase() === "jdbc.driver.name" ||
-                        predefinedOption.name.toLowerCase() === "pool.properties" ||
-                        predefinedOption.name.toLowerCase() === "table.name" ||
-                        predefinedOption.name.toLowerCase() === "field.length") {
-                        rdbms_options.push({
-                            name: predefinedOption.name, value: predefinedOption.value, description: predefinedOption
-                                .description, optional: predefinedOption.optional, defaultValue: predefinedOption
-                                    .defaultValue
-                        })
-                    }
+            } else if (selectedRdbmsType == Constants.INLINE_CONFIG) {
+                var inlineConfigOptions = (_.filter(predefinedRdbmsOptions, function (rdbmsOption) {
+                    return rdbmsOption.name == Constants.INLINE_CONFIG
+                }))[0].parameters;
+                _.forEach(inlineConfigOptions, function (inlineConfigOption) {
+                    var savedOption = (_.filter(savedOptions, function (rdbmsOption) {
+                        return rdbmsOption.name == inlineConfigOption.name
+                    }))[0];
+                    rdbmsOptions.push({
+                        name: inlineConfigOption.name, value: savedOption.value, description: inlineConfigOption
+                            .description, optional: inlineConfigOption.optional, defaultValue: inlineConfigOption
+                                .defaultValue
+                    });
                 });
             } else {
-                _.forEach(predefined_options, function (predefinedOption) {
-                    if (predefinedOption.name.toLowerCase() === "jndi.resource") {
-                        rdbms_options.push({
-                            name: predefinedOption.name, value: predefinedOption.value, description: predefinedOption
-                                .description, optional: false, defaultValue: predefinedOption.defaultValue
-                        })
-                    } else if (predefinedOption.name.toLowerCase() === "table.name" ||
-                        predefinedOption.name.toLowerCase() === "field.length") {
-                        rdbms_options.push({
-                            name: predefinedOption.name, value: predefinedOption.value, description: predefinedOption
-                                .description, optional: predefinedOption.optional, defaultValue: predefinedOption
-                                    .defaultValue
-                        })
-                    }
-
+                var jndiResourceOptions = (_.filter(predefinedRdbmsOptions, function (rdbmsOption) {
+                    return rdbmsOption.name == Constants.JNDI_RESOURCE
+                }))[0].parameters;
+                _.forEach(jndiResourceOptions, function (jndiResourceOption) {
+                    var savedOption = (_.filter(savedOptions, function (rdbmsOption) {
+                        return rdbmsOption.name == jndiResourceOption.name
+                    }))[0];
+                    rdbmsOptions.push({
+                        name: jndiResourceOption.name, value: savedOption.value, description: jndiResourceOption
+                            .description, optional: jndiResourceOption.optional, defaultValue: jndiResourceOption.defaultValue
+                    });
                 });
 
             }
-            return rdbms_options;
+            return rdbmsOptions;
         };
 
         /**

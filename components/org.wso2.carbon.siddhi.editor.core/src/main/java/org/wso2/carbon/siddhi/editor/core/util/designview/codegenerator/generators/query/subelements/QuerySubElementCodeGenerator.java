@@ -42,11 +42,8 @@ public class QuerySubElementCodeGenerator {
             return SiddhiCodeBuilderConstants.EMPTY_STRING;
         }
 
-        return SiddhiCodeBuilderConstants.NEW_LINE +
-                SiddhiCodeBuilderConstants.GROUP +
-                SiddhiCodeBuilderConstants.SPACE +
-                SiddhiCodeBuilderConstants.BY +
-                SiddhiCodeBuilderConstants.SPACE +
+        return SiddhiCodeBuilderConstants.NEW_LINE + SiddhiCodeBuilderConstants.GROUP + SiddhiCodeBuilderConstants.SPACE +
+                SiddhiCodeBuilderConstants.BY + SiddhiCodeBuilderConstants.SPACE +
                 SubElementCodeGenerator.generateParameterList(groupByList);
     }
 
@@ -96,10 +93,8 @@ public class QuerySubElementCodeGenerator {
      */
     public static String generateQueryLimit(long limit) {
         if (limit != 0) {
-            return SiddhiCodeBuilderConstants.NEW_LINE +
-                    SiddhiCodeBuilderConstants.LIMIT +
-                    SiddhiCodeBuilderConstants.SPACE +
-                    limit;
+            return SiddhiCodeBuilderConstants.NEW_LINE + SiddhiCodeBuilderConstants.LIMIT +
+                    SiddhiCodeBuilderConstants.SPACE + limit;
         }
         return SiddhiCodeBuilderConstants.EMPTY_STRING;
     }
@@ -112,10 +107,8 @@ public class QuerySubElementCodeGenerator {
      */
     public static String generateQueryOffset(long offset) {
         if (offset != 0) {
-            return SiddhiCodeBuilderConstants.NEW_LINE +
-                    SiddhiCodeBuilderConstants.OFFSET +
-                    SiddhiCodeBuilderConstants.SPACE +
-                    offset;
+            return SiddhiCodeBuilderConstants.NEW_LINE + SiddhiCodeBuilderConstants.OFFSET +
+                    SiddhiCodeBuilderConstants.SPACE + offset;
         }
         return SiddhiCodeBuilderConstants.EMPTY_STRING;
     }
@@ -132,10 +125,8 @@ public class QuerySubElementCodeGenerator {
             return SiddhiCodeBuilderConstants.EMPTY_STRING;
         }
 
-        return SiddhiCodeBuilderConstants.NEW_LINE +
-                SiddhiCodeBuilderConstants.HAVING +
-                SiddhiCodeBuilderConstants.SPACE +
-                having;
+        return SiddhiCodeBuilderConstants.NEW_LINE + SiddhiCodeBuilderConstants.HAVING +
+                SiddhiCodeBuilderConstants.SPACE + having;
     }
 
     /**
@@ -149,10 +140,8 @@ public class QuerySubElementCodeGenerator {
             return SiddhiCodeBuilderConstants.EMPTY_STRING;
         }
 
-        return SiddhiCodeBuilderConstants.NEW_LINE +
-                SiddhiCodeBuilderConstants.OUTPUT +
-                SiddhiCodeBuilderConstants.SPACE +
-                outputRateLimit;
+        return SiddhiCodeBuilderConstants.NEW_LINE + SiddhiCodeBuilderConstants.OUTPUT +
+                SiddhiCodeBuilderConstants.SPACE + outputRateLimit;
     }
 
     private QuerySubElementCodeGenerator() {

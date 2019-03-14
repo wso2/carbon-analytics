@@ -18,6 +18,7 @@
 
 package org.wso2.carbon.siddhi.editor.core.util.designview.designgenerator.generators;
 
+import org.apache.log4j.Logger;
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.attributesselection.AllSelectionConfig;
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.attributesselection.AttributesSelectionConfig;
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.attributesselection.SelectedAttribute;
@@ -35,6 +36,7 @@ import java.util.List;
  */
 public class AttributesSelectionConfigGenerator extends CodeSegmentsPreserver {
     private String siddhiAppString;
+    private static final Logger log = Logger.getLogger(AttributesSelectionConfigGenerator.class);
 
     public AttributesSelectionConfigGenerator(String siddhiAppString) {
         this.siddhiAppString = siddhiAppString;
@@ -58,7 +60,7 @@ public class AttributesSelectionConfigGenerator extends CodeSegmentsPreserver {
                 try {
                     selectedAttributes.add(generateSelectedAttribute(outputAttribute));
                 } catch (DesignGenerationException e) {
-                    //is never caught
+                    log.error(e);
                 }
             }
         }
