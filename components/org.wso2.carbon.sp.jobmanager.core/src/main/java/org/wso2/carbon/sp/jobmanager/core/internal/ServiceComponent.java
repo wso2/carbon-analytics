@@ -36,7 +36,7 @@ import org.wso2.carbon.datasource.core.api.DataSourceService;
 import org.wso2.carbon.sp.jobmanager.core.CoordinatorChangeListener;
 import org.wso2.carbon.sp.jobmanager.core.allocation.ResourceAllocationAlgorithm;
 import org.wso2.carbon.sp.jobmanager.core.api.ResourceManagerApi;
-import org.wso2.carbon.sp.jobmanager.core.appcreator.KafkaSiddhiAppCreator;
+import org.wso2.carbon.sp.jobmanager.core.appcreator.AbstractSiddhiAppCreator;
 import org.wso2.carbon.stream.processor.common.utils.config.ClusterConfig;
 import org.wso2.carbon.sp.jobmanager.core.bean.DeploymentConfig;
 import org.wso2.carbon.sp.jobmanager.core.deployment.DeploymentManagerImpl;
@@ -80,11 +80,21 @@ public class ServiceComponent {
             ServiceDataHolder.setDeploymentManager(new DeploymentManagerImpl());
             resourceManagerAPIServiceRegistration = bundleContext.registerService(Microservice.class.getName(),
                     new ResourceManagerApi(), null);
-            distributionServiceRegistration = bundleContext.registerService(
-                    DistributionService.class.getName(),
-                    new DistributionManagerServiceImpl(new KafkaSiddhiAppCreator(),
-                            ServiceDataHolder.getDeploymentManager()),
-                    null);
+            String siddhiAppCreatorClassName = ServiceDataHolder.getDeploymentConfig().getAppCreatorClass();
+            try {
+                AbstractSiddhiAppCreator siddhiAppCreator = (AbstractSiddhiAppCreator)
+                        Class.forName(siddhiAppCreatorClassName).newInstance();
+                distributionServiceRegistration = bundleContext.registerService(
+                        DistributionService.class.getName(), new DistributionManagerServiceImpl(siddhiAppCreator,
+                                ServiceDataHolder.getDeploymentManager()), null);
+                if (log.isDebugEnabled()) {
+                    log.debug(siddhiAppCreatorClassName + " chosen as Siddhi Distributed App Creator");
+                }
+            } catch (ClassNotFoundException | IllegalAccessException | InstantiationException e) {
+                throw new ResourceManagerException("Error while initializing Manager node in distributed mode, " +
+                        " Siddhi Distributed App creator class '" + siddhiAppCreatorClassName + "' is " +
+                        "specified in deployment.yaml not found.", e);
+            }
         }
     }
 
