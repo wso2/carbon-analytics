@@ -1548,6 +1548,12 @@
                 <version>${org.testcontainers.version}</version>
                 <scope>test</scope>
             </dependency>
+            <dependency>
+                <groupId>io.netty</groupId>
+                <artifactId>netty-codec-http</artifactId>
+                <version>${netty.version}</version>
+                <scope>test</scope>
+            </dependency>
         </dependencies>
     </dependencyManagement>
 
@@ -1609,7 +1615,7 @@
         <mavan.findbugsplugin.exclude.file>findbugs-exclude.xml</mavan.findbugsplugin.exclude.file>
 
         <!--Dashboard-->
-        <carbon.uiserver.version>0.19.6</carbon.uiserver.version>
+        <carbon.uiserver.version>0.19.7</carbon.uiserver.version>
         <carbon.uiserver.version.range>[0.19.3, 1.0.0]</carbon.uiserver.version.range>
 
         <!-- Maven plugins -->
@@ -1645,7 +1651,8 @@
         <carbon.kernel.package.import.version.range>[5.2.6, 6.0.0)</carbon.kernel.package.import.version.range>
         <carbon.kernel.pax.version>5.2.8</carbon.kernel.pax.version>
 
-        <org.wso2.transport.http.netty.version>6.0.163</org.wso2.transport.http.netty.version>
+        <netty.version>4.1.19.Final</netty.version>
+        <org.wso2.transport.http.netty.version>6.0.272</org.wso2.transport.http.netty.version>
         <carbon.transport.package.import.version.range>[6.0.0, 7.0.0)</carbon.transport.package.import.version.range>
 
         <carbon.messaging.version>3.0.3</carbon.messaging.version>
@@ -1716,8 +1723,8 @@
         <common.collections4.version>4.1</common.collections4.version>
 
         <!--MSF4J related-->
-        <msf4j.version>2.6.4</msf4j.version>
-        <msf4j.import.version.range>[2.6.2, 3.0.0)</msf4j.import.version.range>
+        <msf4j.version>2.7.0</msf4j.version>
+        <msf4j.import.version.range>[2.7.0, 3.0.0)</msf4j.import.version.range>
         <com.fasterxml.jackson.core.version>2.9.6</com.fasterxml.jackson.core.version>
         <com.fasterxml.jackson.core.version.range>[2.9.0, 2.10.0)</com.fasterxml.jackson.core.version.range>
         <io.swagger.version>1.5.16</io.swagger.version>
@@ -1761,7 +1768,7 @@
         <siddhi.io.tcp.version>2.1.0</siddhi.io.tcp.version>
         <siddhi.io.email.version>1.1.0</siddhi.io.email.version>
         <siddhi.io.kafka.version>4.2.0</siddhi.io.kafka.version>
-        <siddhi.io.http.version>1.1.0</siddhi.io.http.version>
+        <siddhi.io.http.version>1.1.1</siddhi.io.http.version>
 
         <siddhi.map.json.version>4.1.0</siddhi.map.json.version>
         <siddhi.map.binary.version>1.1.0</siddhi.map.binary.version>

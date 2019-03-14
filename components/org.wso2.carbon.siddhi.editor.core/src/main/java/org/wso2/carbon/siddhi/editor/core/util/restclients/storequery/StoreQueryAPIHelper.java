@@ -22,8 +22,8 @@ import org.apache.log4j.Logger;
 import org.wso2.carbon.config.ConfigurationException;
 import org.wso2.carbon.config.provider.ConfigProvider;
 import org.wso2.carbon.siddhi.editor.core.exception.SiddhiStoreQueryHelperException;
-import org.wso2.transport.http.netty.config.ListenerConfiguration;
-import org.wso2.transport.http.netty.config.TransportsConfiguration;
+import org.wso2.transport.http.netty.contract.config.ListenerConfiguration;
+import org.wso2.transport.http.netty.contract.config.TransportsConfiguration;
 
 /**
  * Utility class to access the Siddhi Store API.

@@ -30,6 +30,7 @@ import org.w3c.dom.NodeList;
 import org.wso2.carbon.data.provider.endpoint.DataProviderEndPoint;
 import org.wso2.carbon.data.provider.websocket.bean.WebSocketChannel;
 import org.wso2.msf4j.websocket.WebSocketEndpoint;
+import org.wso2.transport.http.netty.contract.websocket.WebSocketConnection;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
@@ -37,7 +38,6 @@ import javax.websocket.OnClose;
 import javax.websocket.OnError;
 import javax.websocket.OnMessage;
 import javax.websocket.OnOpen;
-import javax.websocket.Session;
 import javax.websocket.server.PathParam;
 import javax.websocket.server.ServerEndpoint;
 import javax.xml.parsers.DocumentBuilder;
@@ -69,7 +69,7 @@ public class WebSocketProviderEndPoint implements WebSocketEndpoint {
     private static final String XML_PATTERN_PATH = "//events/event/*";
 
     @OnOpen
-    public static void onOpen(Session session, @PathParam("topic") String topic) {
+    public static void onOpen(WebSocketConnection webSocketConnection, @PathParam("topic") String topic) {
         // Not required.
     }
 
@@ -89,7 +89,7 @@ public class WebSocketProviderEndPoint implements WebSocketEndpoint {
     }
 
     @OnClose
-    public void onClose(Session session) {
+    public void onClose(WebSocketConnection webSocketConnection) {
         // Not applicable as disconnecting from the web-socket provider doesn't affect the subscribed clients of the
         // data provider
     }

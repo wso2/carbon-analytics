@@ -40,7 +40,7 @@ import javax.ws.rs.core.Response;
 
 import io.swagger.annotations.ApiParam;
 import org.wso2.msf4j.MicroservicesRunner;
-import org.wso2.transport.http.netty.config.TransportsConfiguration;
+import org.wso2.msf4j.config.TransportsFileConfiguration;
 
 @Component(
         name = "siddhi-store-query-service",
@@ -54,7 +54,7 @@ import org.wso2.transport.http.netty.config.TransportsConfiguration;
 public class StoresApi implements HAStateChangeListener {
     private Logger log = LoggerFactory.getLogger(StoresApi.class);
     private final StoresApiService delegate = StoresApiServiceFactory.getStoresApi();
-    private static TransportsConfiguration transportsConfiguration;
+    private static TransportsFileConfiguration transportsFileConfiguration;
     private static MicroservicesRunner microservicesRunner;
     private static volatile boolean microserviceActive;
     private static final String ROOT_CONFIG_ELEMENT = "siddhi.stores.query.api";
@@ -88,7 +88,7 @@ public class StoresApi implements HAStateChangeListener {
     @Activate
     protected void start(BundleContext bundleContext) throws Exception {
         log.debug("Siddhi Store REST API activated.");
-        microservicesRunner = new MicroservicesRunner(transportsConfiguration);
+        microservicesRunner = new MicroservicesRunner(transportsFileConfiguration);
         if (SiddhiStoreDataHolder.getInstance().getAuthenticationInterceptor() != null) {
             microservicesRunner.addGlobalRequestInterceptor(SiddhiStoreDataHolder.getInstance().
                     getAuthenticationInterceptor());
@@ -154,8 +154,8 @@ public class StoresApi implements HAStateChangeListener {
     protected void registerConfigProvider(ConfigProvider configProvider) {
         SiddhiStoreDataHolder.getInstance().setConfigProvider(configProvider);
         try {
-            transportsConfiguration = configProvider.getConfigurationObject(ROOT_CONFIG_ELEMENT,
-                    TransportsConfiguration.class);
+            transportsFileConfiguration = configProvider.getConfigurationObject(ROOT_CONFIG_ELEMENT,
+                    TransportsFileConfiguration.class);
         } catch (ConfigurationException e) {
             log.error("Error while loading TransportsConfiguration for " + ROOT_CONFIG_ELEMENT, e);
         }
