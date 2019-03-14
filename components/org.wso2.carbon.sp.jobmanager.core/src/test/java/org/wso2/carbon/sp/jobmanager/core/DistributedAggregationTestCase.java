@@ -867,7 +867,7 @@ public class DistributedAggregationTestCase {
             Thread.sleep(1000);
             stockStreamInputHandler.send(new Object[]{"IBM", 900f, 25f, 200L, 60, "2017-06-01 04:08:56"});
 
-            Thread.sleep(2000);
+            Thread.sleep(5000);
             testStreamInputHandler.send(new Object[]{"IBM", 1, "2017-06-01 09:35:51 +05:30",
                     "2017-06-01 09:35:52 +05:30", "seconds"});
             Thread.sleep(2000);
@@ -981,7 +981,7 @@ public class DistributedAggregationTestCase {
             Thread.sleep(1000);
             stockStreamInputHandler.send(new Object[]{"IBM", 900f, 25f, 200L, 60, "2017-06-01 04:08:56"});
 
-            Thread.sleep(100);
+            Thread.sleep(5000);
             testStreamInputHandler.send(new Object[]{"IBM", 1, "2017-06-01 09:35:51 +05:30",
                     "2017-06-01 09:35:52 +05:30", "seconds"});
             Thread.sleep(100);
@@ -1230,7 +1230,7 @@ public class DistributedAggregationTestCase {
 
         test1StreamInputHandler.send(new Object[]{"IBM", 100f, null, 200L, 26, 1496289954000L});
         test1StreamInputHandler.send(new Object[]{"IBM", 100f, null, 200L, 96, 1496289954000L});
-        Thread.sleep(100);
+        Thread.sleep(5000);
 
         ArrayList<Event> query1EventsList = new ArrayList<>();
         for (SiddhiAppRuntime runtime : siddhiAppRuntimeMap.get(queryGroupList.get(2).getGroupName())) {
@@ -1367,7 +1367,7 @@ public class DistributedAggregationTestCase {
 
         test1StreamInputHandler.send(new Object[]{"IBM", 100f, null, 200L, 26, 1496289954000L});
         test1StreamInputHandler.send(new Object[]{"IBM", 100f, null, 200L, 96, 1496289954000L});
-        Thread.sleep(100);
+        Thread.sleep(5000);
 
         ArrayList<Event> partition1EventsList = new ArrayList<>();
         for (SiddhiAppRuntime runtime : siddhiAppRuntimeMap.get(queryGroupList.get(2).getGroupName())) {
@@ -1526,7 +1526,7 @@ public class DistributedAggregationTestCase {
         test2StreamInputHandler.send(new Object[]{"IBM", 100f, 9, 1496289954000L});
         test2StreamInputHandler.send(new Object[]{"IBM", 100f, 6, 1496289954000L});
 
-        Thread.sleep(1000);
+        Thread.sleep(5000);
 
         ArrayList<Event> partitionQuery1EventsList = new ArrayList<>();
         for (SiddhiAppRuntime runtime : siddhiAppRuntimeMap.get(queryGroupList.get(2).getGroupName())) {
