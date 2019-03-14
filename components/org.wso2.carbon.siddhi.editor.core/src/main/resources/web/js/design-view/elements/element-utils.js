@@ -44,6 +44,16 @@ define(
             return foundElement;
         };
 
+        ElementUtils.prototype.getElements = function(array, elementId) {
+            var foundElements = [];
+            array.forEach(function(element) {
+                if (typeof element.getId === 'function' && element.getId() === elementId) {
+                    foundElements.push(element);
+                }
+            });
+            return foundElements;
+        };
+
         /**
          * Removes an element from the array.
          * @param array Array which the element is needed to be removed.

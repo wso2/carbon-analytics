@@ -22,6 +22,8 @@ import org.wso2.siddhi.query.api.annotation.Annotation;
 import java.util.List;
 import java.util.Map;
 
+import org.wso2.carbon.siddhi.editor.core.util.Constants;
+
 /**
  * Represents configuration of a Siddhi Stream
  */
@@ -71,6 +73,10 @@ public class StreamConfig extends SiddhiElementConfig {
 
     public Map<String, String> getConnectorsAndStreams() {
         return connectorsAndStreams;
+    }
+
+    public boolean isFaultStream() {
+        return name.startsWith(Constants.FAULT_STREAM_PREFIX);
     }
 
     public void setName(String name) {

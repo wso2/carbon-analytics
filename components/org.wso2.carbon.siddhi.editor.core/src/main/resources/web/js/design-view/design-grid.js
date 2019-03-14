@@ -656,10 +656,23 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
                     * explicitly set the sourceId.  Simply if sourceId is '' that means this connection is related to a
                     * partition.
                     * */
+                    var isFromFaultStream = connection.sourceId.substr(connection.sourceId.indexOf('-')) === '-err-out';
                     if (sourceId === '') {
                         sourceId = source;
                         sourceType = 'PARTITION';
                     } else {
+                        if (isFromFaultStream) {
+                            // Change the source id to the respective source id of the fault stream
+                            var streamMap = {};
+                            var eventStreamName = '';
+                            self.configurationData.getSiddhiAppConfig().getStreamList().forEach(function(s) {
+                                streamMap[s.getName()] = s;
+                                if (s.getId() === sourceId) {
+                                    eventStreamName = s.getName();
+                                }
+                            });
+                            sourceId = streamMap['!' + eventStreamName].getId();
+                        }
                         if (self.configurationData.getSiddhiAppConfig().getDefinitionElementById(sourceId, true, true)
                             !== undefined) {
                             sourceType
@@ -1577,7 +1590,7 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
                 if (toolTipObject !== undefined) {
                     streamToolTip = toolTipObject.text;
                 }
-                self.handleStream(mouseTop, mouseLeft, true, streamId, streamName, streamToolTip);
+                self.handleStream(mouseTop, mouseLeft, true, streamId, streamName, streamToolTip, stream);
             });
 
             _.forEach(self.configurationData.getSiddhiAppConfig().getTableList(), function (table) {
@@ -1790,7 +1803,7 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
                     if (toolTipObject !== undefined) {
                         streamToolTip = toolTipObject.text;
                     }
-                    self.handleStream(mouseTop, mouseLeft, true, streamId, streamName, streamToolTip);
+                    self.handleStream(mouseTop, mouseLeft, true, streamId, streamName, streamToolTip, stream);
 
                     var streamElement = $('#' + streamId)[0];
                     self.jsPlumbInstance.addToGroup(jsPlumbPartitionGroup, streamElement);
@@ -1918,11 +1931,23 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
                 } else if (edge.getParentType() === 'SINK' && edge.getChildType() === 'SOURCE') {
                     targetId = edge.getChildId() + '-in';
                     sourceId = edge.getParentId() + '-out';
-                    paintStyle = { strokeWidth: 2, stroke: "#424242", dashstyle: "2 3", outlineStroke: "transparent",
-                        outlineWidth: "3" }
+                    paintStyle = {
+                        strokeWidth: 2, stroke: "#424242", dashstyle: "2 3", outlineStroke: "transparent",
+                        outlineWidth: "3"
+                    }
                 } else {
+                    // check if the edge is originating from a fault stream. if so get the corresponding event stream
+                    // and draw the edge from the -err-out connector.
+                    if (edge.isFromFaultStream()) {
+                        sourceId = edge.getParentId() + '-err-out';
+                        paintStyle = {
+                            strokeWidth: 2, stroke: "#FF0000", dashstyle: "2 3", outlineStroke: "transparent",
+                            outlineWidth: "3"
+                        };
+                    } else {
+                        sourceId = edge.getParentId() + '-out';
+                    }
                     targetId = edge.getChildId() + '-in';
-                    sourceId = edge.getParentId() + '-out';
                 }
 
                 self.jsPlumbInstance.connect({
@@ -2261,7 +2286,7 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
         };
 
         DesignGrid.prototype.handleStream = function (mouseTop, mouseLeft, isCodeToDesignMode, streamId, streamName,
-                                                      streamToolTip) {
+                                                      streamToolTip, stream) {
             var self = this;
             var elementId;
             if (isCodeToDesignMode !== undefined && !isCodeToDesignMode) {
@@ -2276,17 +2301,24 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
             } else {
                 console.log("isCodeToDesignMode parameter is undefined");
             }
+
             var newAgent = $('<div>').attr({
                 'id': elementId,
                 'tabindex': TAB_INDEX
             }).addClass(constants.STREAM);
+
+            // If this is a fault stream, hide it
+            if (stream && stream.isFaultStream()) {
+                newAgent.hide();
+            }
+
             if (isCodeToDesignMode) {
                 newAgent.attr('title', streamToolTip);
             }
             self.canvas.append(newAgent);
             // Drop the stream element. Inside this a it generates the stream definition form.
             self.dropElements.dropStream(newAgent, elementId, mouseTop, mouseLeft, isCodeToDesignMode,
-                false, streamName);
+                false, streamName, stream && stream.hasFaultStream());
             self.configurationData.getSiddhiAppConfig()
                 .setFinalElementCount(self.configurationData.getSiddhiAppConfig().getFinalElementCount() + 1);
             self.dropElements.registerElementEventListeners(newAgent);

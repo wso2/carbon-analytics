@@ -251,13 +251,12 @@ define(['require', 'log', 'lodash', 'jquery', 'partition', 'stream', 'query', 'f
          * @param streamName name of the stream
          */
         DropElements.prototype.dropStream = function (newAgent, i, top, left, isCodeToDesignMode,
-            isGenerateStreamFromQueryOutput, streamName) {
+            isGenerateStreamFromQueryOutput, streamName, hasFaultStream) {
             /*
              The node hosts a text node where the Stream's name input by the user will be held.
              Rather than simply having a `newAgent.text(streamName)` statement, as the text function tends to
              reposition the other appended elements with the length of the Stream name input by the user.
             */
-
             var self = this;
             var name;
             if (isCodeToDesignMode) {
@@ -316,9 +315,14 @@ define(['require', 'log', 'lodash', 'jquery', 'partition', 'stream', 'query', 'f
             var connection1 = $('<div class="connectorInStream">').attr('id', i + "-in").addClass('connection');
             var connection2 = $('<div class="connectorOutStream">').attr('id', i + "-out").addClass('connection');
 
-
             finalElement.append(connection1);
             finalElement.append(connection2);
+
+            var connectionErrOut;
+            if (hasFaultStream) {
+                connectionErrOut = $('<div class="connection connectorErrOutStream">').attr('id', i + "-err-out");
+                finalElement.append(connectionErrOut);
+            }
 
             finalElement.css({
                 'top': top,
@@ -344,6 +348,15 @@ define(['require', 'log', 'lodash', 'jquery', 'partition', 'stream', 'query', 'f
                 deleteEndpointsOnDetach: true,
                 anchor: 'Right'
             });
+
+            if (hasFaultStream) {
+                self.jsPlumbInstance.makeSource(connectionErrOut, {
+                    deleteEndpointsOnDetach: true,
+                    anchor: 'Right',
+                    connectorStyle: { strokeWidth: 2, stroke: '#FF0000', dashstyle: '2 3', outlineStroke: 'transparent',
+                        outlineWidth: '3' }
+                });
+            }
         };
 
         /**
@@ -1376,6 +1389,27 @@ define(['require', 'log', 'lodash', 'jquery', 'partition', 'stream', 'query', 'f
                 }
             }
 
+        };
+
+        DropElements.prototype.toggleFaultStreamConnector = function(stream, jsPlumbInstance) {
+            if (stream.hasFaultStream()) {
+                var connectionErrOut = $('<div class="connection connectorErrOutStream">')
+                    .attr('id', stream.getId() + "-err-out");
+                $('#' + stream.getId()).append(connectionErrOut);
+                jsPlumbInstance.makeSource(connectionErrOut, {
+                    deleteEndpointsOnDetach: true,
+                    anchor: 'Right',
+                    connectorStyle: { strokeWidth: 2, stroke: '#FF0000', dashstyle: '2 3', outlineStroke: 'transparent',
+                        outlineWidth: '3' }
+                });
+                // Add the fault stream to the stream list
+                this.configurationData.getSiddhiAppConfig().addStream(new Stream({
+                    id: stream.getId(),
+                    name: '!' + stream.getName()
+                }));
+            } else {
+                $('#' + stream.getId() + '-err-out').remove();
+            }
         };
 
         /**

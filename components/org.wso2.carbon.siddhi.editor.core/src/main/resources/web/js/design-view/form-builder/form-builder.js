@@ -184,6 +184,7 @@ define(['require', 'log', 'jquery', 'lodash', 'formUtils', 'streamForm', 'tableF
             _.set(formOptions, 'configurationData', self.configurationData);
             _.set(formOptions, 'application', self.application);
             _.set(formOptions, 'formUtils', self.formUtils);
+            _.set(formOptions, 'dropElementInstance', self.dropElementInstance);
             _.set(formOptions, 'jsPlumbInstance', self.jsPlumbInstance);
             var streamForm = new StreamForm(formOptions);
             streamForm.generatePropertiesForm(element, formConsole, formContainer);

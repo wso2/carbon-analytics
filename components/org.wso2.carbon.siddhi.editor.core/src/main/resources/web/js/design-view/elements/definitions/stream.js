@@ -110,6 +110,25 @@ define(['require', 'elementUtils'],
             this.annotationList = annotationList;
         };
 
+        Stream.prototype.hasFaultStream = function() {
+            // Check if the OnError(action='STREAM') annotation is set. If so enable the fault connector.
+            var faultStream = false;
+            this.annotationListObjects.forEach(function(annotation) {
+                if (annotation.name === 'OnError') {
+                    annotation.elements.forEach(function(p) {
+                        if (p.key.toLowerCase() === 'action' && p.value.toLowerCase() === 'stream') {
+                            faultStream = true;
+                        }
+                    });
+                }
+            });
+            return faultStream;
+        };
+
+        Stream.prototype.isFaultStream = function() {
+            return this.name && this.name.startsWith('!');
+        };
+
         return Stream;
 
     });
