@@ -1092,7 +1092,6 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
          * @function to show autocomplete drop down
          */
         FormUtils.prototype.showDropDown = function () {
-
             $.widget("custom.combobox", {
                 _create: function () {
                     this.wrapper = $("<span>")
