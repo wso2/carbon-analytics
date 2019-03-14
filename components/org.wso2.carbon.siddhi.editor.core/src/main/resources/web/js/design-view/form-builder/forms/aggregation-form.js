@@ -554,10 +554,6 @@ define(['require', 'log', 'jquery', 'lodash', 'aggregateByTimePeriod', 'querySel
                         $('#' + id).prop('title', aggregationToolTip);
 
                         self.configurationData.setIsDesignViewContentChanged(true);
-                        // design view container and toggle view button are enabled
-                        self.designViewContainer.removeClass('disableContainer');
-                        self.toggleViewButton.removeClass('disableContainer');
-
                         // close the form aggregation
                         self.consoleListManager.removeFormConsole(formConsole);
                     }
@@ -566,10 +562,6 @@ define(['require', 'log', 'jquery', 'lodash', 'aggregateByTimePeriod', 'querySel
                 // 'Cancel' button action
                 var cancelButtonElement = $(formContainer).find('#btn-cancel')[0];
                 cancelButtonElement.addEventListener('click', function () {
-                    // design view container and toggle view button are enabled
-                    self.designViewContainer.removeClass('disableContainer');
-                    self.toggleViewButton.removeClass('disableContainer');
-
                     // close the form aggregation
                     self.consoleListManager.removeFormConsole(formConsole);
                 });

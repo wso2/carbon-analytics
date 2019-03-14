@@ -118,9 +118,6 @@ define(['require', 'log', 'jquery', 'lodash'],
 
                     // set the isDesignViewContentChanged to true
                     self.configurationData.setIsDesignViewContentChanged(true);
-                    // design view container and toggle view button are enabled
-                    self.designViewContainer.removeClass('disableContainer');
-                    self.toggleViewButton.removeClass('disableContainer');
                     // close the form window
                     self.consoleListManager.removeFormConsole(formConsole);
                 }
@@ -129,9 +126,6 @@ define(['require', 'log', 'jquery', 'lodash'],
             // 'Cancel' button action
             var cancelButtonElement = $(formContainer).find('#btn-cancel')[0];
             cancelButtonElement.addEventListener('click', function () {
-                self.designViewContainer.removeClass('disableContainer');
-                self.toggleViewButton.removeClass('disableContainer');
-
                 // close the form window
                 self.consoleListManager.removeFormConsole(formConsole);
             });

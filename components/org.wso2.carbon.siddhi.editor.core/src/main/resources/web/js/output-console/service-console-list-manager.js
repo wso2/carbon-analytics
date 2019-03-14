@@ -47,10 +47,10 @@ define(['log', 'jquery', 'lodash', 'output_console_list', 'workspace', 'service_
                         self.application.commandManager.dispatch(_.get(self._options, 'commandClearConsole.id'));
                     });
                     if (this.application.isRunningOnMacOS()) {
-                        this._activateBtn.attr("title", "Output Console (" + _.get(self._options,
+                        this._activateBtn.attr("title", "Close Console (" + _.get(self._options,
                             'command.shortcuts.mac.label') + ") ").tooltip();
                     } else {
-                        this._activateBtn.attr("title", "Output Console  (" + _.get(self._options,
+                        this._activateBtn.attr("title", "Close Console  (" + _.get(self._options,
                             'command.shortcuts.other.label') + ") ").tooltip();
                     }
                     // register command
@@ -80,6 +80,8 @@ define(['log', 'jquery', 'lodash', 'output_console_list', 'workspace', 'service_
                             if (activeTab._title != "welcome-page") {
                                 if (activeTab.getSiddhiFileEditor().isInSourceView()) {
                                     activeTab.getSiddhiFileEditor().getSourceView().editorResize();
+                                } else {
+                                    ConsoleList.prototype.removePoppedUpElement();
                                 }
                             }
                         } else {

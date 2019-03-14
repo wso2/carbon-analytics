@@ -81,9 +81,6 @@ define(['require', 'log', 'jquery', 'lodash', 'partitionWith', 'jsonValidator', 
                 $("#" + id).addClass('incomplete-element');
                 $('#' + id).prop('title', 'Connect a stream for partitioning');
 
-                // design view container and toggle view button are enabled
-                self.designViewContainer.removeClass('disableContainer');
-                self.toggleViewButton.removeClass('disableContainer');
                 // close the form window
                 self.consoleListManager.removeFormConsole(formConsole);
             } else {
@@ -91,9 +88,6 @@ define(['require', 'log', 'jquery', 'lodash', 'partitionWith', 'jsonValidator', 
                     $("#" + id).addClass('incomplete-element');
                     $('#' + id).prop('title', 'To edit partition configuration, fill the connected stream.');
 
-                    // design view container and toggle view button are enabled
-                    self.designViewContainer.removeClass('disableContainer');
-                    self.toggleViewButton.removeClass('disableContainer');
                     // close the form window
                     self.consoleListManager.removeFormConsole(formConsole);
                 } else {
@@ -191,9 +185,6 @@ define(['require', 'log', 'jquery', 'lodash', 'partitionWith', 'jsonValidator', 
 
                             // set the isDesignViewContentChanged to true
                             self.configurationData.setIsDesignViewContentChanged(true);
-                            // design view container and toggle view button are enabled
-                            self.designViewContainer.removeClass('disableContainer');
-                            self.toggleViewButton.removeClass('disableContainer');
                             // close the form window
                             self.consoleListManager.removeFormConsole(formConsole);
                         }
@@ -202,8 +193,6 @@ define(['require', 'log', 'jquery', 'lodash', 'partitionWith', 'jsonValidator', 
                     // 'Cancel' button action
                     var cancelButtonElement = $(formContainer).find('#btn-cancel')[0];
                     cancelButtonElement.addEventListener('click', function () {
-                        self.designViewContainer.removeClass('disableContainer');
-                        self.toggleViewButton.removeClass('disableContainer');
                         // close the form window
                         self.consoleListManager.removeFormConsole(formConsole);
                     });

@@ -439,8 +439,6 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
 
                         $('#' + id).removeClass('incomplete-element');
                         self.configurationData.setIsDesignViewContentChanged(true);
-                        self.designViewContainer.removeClass('disableContainer');
-                        self.toggleViewButton.removeClass('disableContainer');
 
                         //Send sequence-query element to the backend and generate tooltip
                         var queryToolTip = self.formUtils.getTooltip(sequenceQueryObject, Constants.SEQUENCE_QUERY);
@@ -456,8 +454,6 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
                 // 'Cancel' button action
                 var cancelButtonElement = $(formContainer).find('#btn-cancel')[0];
                 cancelButtonElement.addEventListener('click', function () {
-                    self.designViewContainer.removeClass('disableContainer');
-                    self.toggleViewButton.removeClass('disableContainer');
                     // close the form window
                     self.consoleListManager.removeFormConsole(formConsole);
                 });

@@ -262,8 +262,6 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'jsonValidator', 'con
 
                     // set the isDesignViewContentChanged to true
                     self.configurationData.setIsDesignViewContentChanged(true);
-                    self.designViewContainer.removeClass('disableContainer');
-                    self.toggleViewButton.removeClass('disableContainer');
                     // close the form window
                     self.consoleListManager.removeFormConsole(formConsole);
                 }
@@ -272,8 +270,6 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'jsonValidator', 'con
             // 'Cancel' button action
             var cancelButtonElement = $(formContainer).find('#btn-cancel')[0];
             cancelButtonElement.addEventListener('click', function () {
-                self.designViewContainer.removeClass('disableContainer');
-                self.toggleViewButton.removeClass('disableContainer');
                 // close the form window
                 self.consoleListManager.removeFormConsole(formConsole);
             });

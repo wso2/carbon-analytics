@@ -130,8 +130,6 @@ define(['log', 'jquery', 'lodash', 'sourceOrSinkAnnotation', 'mapAnnotation', 'p
             if (!isSourceConnected) {
                 // close the form window
                 self.consoleListManager.removeFormConsole(formConsole);
-                self.designViewContainer.removeClass('disableContainer');
-                self.toggleViewButton.removeClass('disableContainer');
             } else {
                 var connectedElement = sourceObject.connectedElementName;
                 var predefinedSources = _.orderBy(this.configurationData.rawExtensions["source"], ['name'], ['asc']);
@@ -368,8 +366,6 @@ define(['log', 'jquery', 'lodash', 'sourceOrSinkAnnotation', 'mapAnnotation', 'p
 
                         // set the isDesignViewContentChanged to true
                         self.configurationData.setIsDesignViewContentChanged(true);
-                        self.designViewContainer.removeClass('disableContainer');
-                        self.toggleViewButton.removeClass('disableContainer');
                         // close the form window
                         self.consoleListManager.removeFormConsole(formConsole);
                     }
@@ -378,8 +374,6 @@ define(['log', 'jquery', 'lodash', 'sourceOrSinkAnnotation', 'mapAnnotation', 'p
                 // 'Cancel' button action
                 var cancelButtonElement = $(formContainer).find('#btn-cancel')[0];
                 cancelButtonElement.addEventListener('click', function () {
-                    self.designViewContainer.removeClass('disableContainer');
-                    self.toggleViewButton.removeClass('disableContainer');
                     // close the form window
                     self.consoleListManager.removeFormConsole(formConsole);
                 });

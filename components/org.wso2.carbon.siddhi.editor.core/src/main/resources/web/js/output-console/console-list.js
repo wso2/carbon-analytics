@@ -255,14 +255,21 @@ define(['log', 'jquery', 'lodash', 'backbone', 'console'], function (log, $, _, 
                 _.remove(this._consoles, console);
                 console.getHeader().remove();
                 console.remove();
-                $('.selected-element').removeClass('selected-element');
-                $(".overlayed-container").fadeOut(200);
                 this.trigger("console-removed", console);
+                this.removePoppedUpElement();
 
                 // setting the global console as the next active console
                 var nextConsole = this.getGlobalConsole();
                 this.setActiveConsole(nextConsole);
                 this.hideAllConsoles();
+            },
+            /**
+             * removes the classes added to pop-up the element
+             */
+            removePoppedUpElement: function () {
+                $(".selected-element").removeClass("selected-element");
+                $(".overlayed-container").fadeOut(200);
+                $(".disableContainer").removeClass("disableContainer");
             },
             /**
              * set selected console

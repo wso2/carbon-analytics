@@ -169,8 +169,6 @@ define(['require', 'log', 'jquery', 'lodash', 'constants'],
                     var functionToolTip = self.formUtils.getTooltip(functionObject, Constants.FUNCTION);
                     $('#' + id).prop('title', functionToolTip);
 
-                    self.designViewContainer.removeClass('disableContainer');
-                    self.toggleViewButton.removeClass('disableContainer');
                     // set the isDesignViewContentChanged to true
                     self.configurationData.setIsDesignViewContentChanged(true);
                     // close the form window
@@ -181,8 +179,6 @@ define(['require', 'log', 'jquery', 'lodash', 'constants'],
             // 'Cancel' button action
             var cancelButtonElement = $(formContainer).find('#btn-cancel')[0];
             cancelButtonElement.addEventListener('click', function () {
-                self.designViewContainer.removeClass('disableContainer');
-                self.toggleViewButton.removeClass('disableContainer');
                 // close the form window
                 self.consoleListManager.removeFormConsole(formConsole);
             });

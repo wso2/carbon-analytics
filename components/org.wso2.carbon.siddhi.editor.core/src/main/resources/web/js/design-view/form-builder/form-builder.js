@@ -112,9 +112,6 @@ define(['require', 'log', 'jquery', 'lodash', 'formUtils', 'streamForm', 'tableF
             $(formConsole).on("close-button-in-form-clicked", function () {
                 // close the form window
                 self.consoleListManager.removeFormConsole(formConsole);
-                // design view container and toggle view button are enabled
-                self.designViewContainer.removeClass('disableContainer');
-                self.toggleViewButton.removeClass('disableContainer');
             });
             return formConsole;
         };

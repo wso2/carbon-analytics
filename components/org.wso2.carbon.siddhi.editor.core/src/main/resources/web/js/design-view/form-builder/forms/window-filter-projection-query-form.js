@@ -410,8 +410,6 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
 
                         $('#' + id).removeClass('incomplete-element');
                         self.configurationData.setIsDesignViewContentChanged(true);
-                        self.designViewContainer.removeClass('disableContainer');
-                        self.toggleViewButton.removeClass('disableContainer');
 
                         //Send query element to the backend and generate tooltip
                         var queryToolTip = self.formUtils.getTooltip(queryObject,
@@ -428,9 +426,6 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
                 // 'Cancel' button action
                 var cancelButtonElement = $(formContainer).find('#btn-cancel')[0];
                 cancelButtonElement.addEventListener('click', function () {
-                    // design view container and toggle view button are enabled
-                    self.designViewContainer.removeClass('disableContainer');
-                    self.toggleViewButton.removeClass('disableContainer');
 
                     // close the form
                     self.consoleListManager.removeFormConsole(formConsole);
