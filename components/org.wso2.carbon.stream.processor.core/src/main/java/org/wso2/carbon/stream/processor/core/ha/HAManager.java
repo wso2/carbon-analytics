@@ -19,6 +19,7 @@
 package org.wso2.carbon.stream.processor.core.ha;
 
 import org.apache.log4j.Logger;
+import org.wso2.carbon.cluster.coordinator.commons.node.NodeDetail;
 import org.wso2.carbon.cluster.coordinator.service.ClusterCoordinator;
 import org.wso2.carbon.databridge.commons.ServerEventListener;
 import org.wso2.carbon.stream.processor.core.DeploymentMode;
@@ -32,14 +33,22 @@ import org.wso2.carbon.stream.processor.core.internal.SiddhiAppData;
 import org.wso2.carbon.stream.processor.core.internal.StreamProcessorDataHolder;
 import org.wso2.carbon.stream.processor.core.internal.beans.DeploymentConfig;
 import org.wso2.carbon.stream.processor.core.internal.beans.EventSyncClientPoolConfig;
+import org.wso2.carbon.stream.processor.core.persistence.PersistenceManager;
 import org.wso2.siddhi.core.SiddhiAppRuntime;
 import org.wso2.siddhi.core.SiddhiManager;
 import org.wso2.siddhi.core.exception.CannotRestoreSiddhiAppStateException;
+import org.wso2.siddhi.core.stream.input.source.SourceHandler;
+import org.wso2.siddhi.core.stream.output.sink.SinkHandler;
+import org.wso2.siddhi.core.table.record.RecordTableHandler;
+import org.wso2.siddhi.core.util.transport.BackoffRetryCounter;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentMap;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Class that manages Active and Passive nodes in a 2 node minimum HA configuration
@@ -57,6 +66,7 @@ public class HAManager {
     private EventListMapManager eventListMapManager;
     private DeploymentConfig deploymentConfig;
     private EventSyncClientPoolConfig eventSyncClientPoolConfig;
+    private BackoffRetryCounter backoffRetryCounter = new BackoffRetryCounter();
     private boolean passiveNodeAdded;
     private String host;
     private int port;
@@ -102,13 +112,32 @@ public class HAManager {
         isActiveNode = clusterCoordinator.isLeaderNode();
 
         if (isActiveNode) {
-            isActiveNode = true;
             log.info("HA Deployment: Starting up as Active Node");
             //notify the HAStateChangeListener as becameActive
             List<HAStateChangeListener> haStateChangeListeners = StreamProcessorDataHolder.
                     getHaStateChangeListenerList();
             for (HAStateChangeListener listener : haStateChangeListeners) {
                 listener.becameActive();
+            }
+            //if active node restarted before the heart beat become old then node will be still active and then,
+            // we need to initialize connections to passive node because we are not getting a passive member added
+            // event. This will happen if and only if passive node already exist
+            Map passiveNodePropertyMap = null;
+            for (NodeDetail node : clusterCoordinator.getAllNodeDetails()) {
+                if (!node.getNodeId().equals(nodeId)) {
+                    passiveNodePropertyMap = node.getPropertiesMap();
+                }
+            }
+
+            if (null != passiveNodePropertyMap) {
+                setPassiveNodeAdded(true);
+                for (SourceHandler sourceHandler : sourceHandlerManager.getRegsiteredSourceHandlers().values()) {
+                    ((HACoordinationSourceHandler) sourceHandler).setPassiveNodeAdded(true);
+                }
+                setPassiveNodeHostPort(getHost(passiveNodePropertyMap),
+                        getPort(passiveNodePropertyMap));
+                initializeEventSyncConnectionPool();
+                new PersistenceManager().run();
             }
         } else {
             log.info("HA Deployment: Starting up as Passive Node");
@@ -148,6 +177,7 @@ public class HAManager {
      */
     void changeToActive() {
         if (!isActiveNode) {
+            log.info("HA Deployment: This Node is now becoming the Active Node");
             isActiveNode = true;
             changeSiddhiAppState(true);
             NodeInfo nodeInfo = StreamProcessorDataHolder.getNodeInfo();
@@ -156,13 +186,16 @@ public class HAManager {
             syncState();
 
             //Give time for byte buffer queue to be empty
-            while (tcpServerInstance.getEventSyncServer().getEventByteBufferQueue().peek() != null) {
-                try {
-                    Thread.sleep(100);
-                } catch (InterruptedException e) {
-                    log.warn("Error in checking byte buffer queue empty");
+            if (null != tcpServerInstance.getEventSyncServer().getEventByteBufferQueue()) {
+                while (tcpServerInstance.getEventSyncServer().getEventByteBufferQueue().peek() != null) {
+                    try {
+                        Thread.sleep(100);
+                    } catch (InterruptedException e) {
+                        log.warn("Error in checking byte buffer queue empty");
+                    }
                 }
             }
+
             tcpServerInstance.clearResources();
             //change the system clock to work with event time
             enableEventTimeClock(true);
@@ -175,6 +208,36 @@ public class HAManager {
 
             //change the system clock to work with current time
             enableEventTimeClock(false);
+
+            //here before starting the sources need to enable sinks and record table handlers
+            // so that new events will process accordingly
+            for (SinkHandler sinkHandler : sinkHandlerManager.getRegisteredSinkHandlers().values()) {
+                try {
+                    ((HACoordinationSinkHandler) sinkHandler).setAsActive();
+                } catch (Throwable t) {
+                    log.error("HA Deployment: Error when connecting to sink " + sinkHandler.getElementId() +
+                            " while changing from passive state to active, skipping the sink. ", t);
+                    continue;
+                }
+            }
+
+            for (RecordTableHandler recordTableHandler : recordTableHandlerManager.getRegisteredRecordTableHandlers().
+                    values()) {
+                try {
+                    ((HACoordinationRecordTableHandler) recordTableHandler).setAsActive();
+                } catch (Throwable e) {
+                    backoffRetryCounter.reset();
+                    log.error("HA Deployment: Error in connecting to table " + ((HACoordinationRecordTableHandler)
+                            recordTableHandler).getTableId() + " while changing from passive" +
+                            " state to active, will retry in " + backoffRetryCounter.getTimeInterval(), e);
+                    ScheduledExecutorService scheduledExecutorService = Executors.newSingleThreadScheduledExecutor();
+                    backoffRetryCounter.increment();
+                    scheduledExecutorService.schedule(new RetryRecordTableConnection(backoffRetryCounter,
+                                    recordTableHandler, scheduledExecutorService),
+                            backoffRetryCounter.getTimeIntervalMillis(), TimeUnit.MILLISECONDS);
+                }
+            }
+
             startSiddhiAppRuntimeSources();
 
             //start the databridge servers
@@ -198,21 +261,16 @@ public class HAManager {
      * Initialize eventEventListMap
      */
     void changeToPassive() {
-        isActiveNode = false;
-        changeSiddhiAppState(false);
-        passiveNodeDetailsPropertiesMap.put(HAConstants.HOST, deploymentConfig.eventSyncServerConfigs().getHost());
-        passiveNodeDetailsPropertiesMap.put(HAConstants.PORT, deploymentConfig.eventSyncServerConfigs().getPort());
-        passiveNodeDetailsPropertiesMap.put(HAConstants.ADVERTISED_HOST, deploymentConfig.eventSyncServerConfigs()
-                .getAdvertisedHost());
-        passiveNodeDetailsPropertiesMap.put(HAConstants.ADVERTISED_PORT, deploymentConfig.eventSyncServerConfigs()
-                .getAdvertisedPort());
-        clusterCoordinator.setPropertiesMap(passiveNodeDetailsPropertiesMap);
+        log.info("HA Deployment: This Node is now becoming the Passive Node");
         //stop the databridge servers
         List<ServerEventListener> listeners = StreamProcessorDataHolder.getServerListeners();
         for (ServerEventListener listener : listeners) {
             listener.stop();
         }
         stopSiddhiAppRuntimes();
+        isActiveNode = false;
+        changeSiddhiAppState(false);
+
         //initialize event list map
         EventListMapManager.initializeEventListMap();
 
@@ -315,6 +373,28 @@ public class HAManager {
         });
     }
 
+    private String getHost(Map nodePropertiesMap) {
+        Object host = nodePropertiesMap.get(HAConstants.ADVERTISED_HOST);
+        if (host == null) {
+            host = nodePropertiesMap.get(HAConstants.HOST);
+        }
+        return (String) host;
+    }
+
+    private int getPort(Map nodePropertiesMap) {
+        int port = 0;
+        try {
+            port = (int) nodePropertiesMap.get(HAConstants.ADVERTISED_PORT);
+        } catch (Exception e) {
+            log.warn("Error in getting the advertisedPort from deployment yaml. Hence using port as the " +
+                    "advertisedPort" + e.getMessage());
+        }
+        if (port == 0) {
+            port = (int) nodePropertiesMap.get(HAConstants.PORT);
+        }
+        return port;
+    }
+
     public void initializeEventSyncConnectionPool() {
         EventSyncConnectionPoolManager.initializeConnectionPool(host, port, deploymentConfig);
     }
@@ -334,5 +414,13 @@ public class HAManager {
 
     public void setPassiveNodeAdded(boolean passiveNodeAdded) {
         this.passiveNodeAdded = passiveNodeAdded;
+    }
+
+    public String getNodeId () {
+        return nodeId;
+    }
+
+    public DeploymentConfig getDeploymentConfig() {
+        return deploymentConfig;
     }
 }
