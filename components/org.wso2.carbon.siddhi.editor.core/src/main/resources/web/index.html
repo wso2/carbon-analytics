@@ -123,7 +123,7 @@
                             </a>
                         </li>
                         <li>
-                            <a href="#output-console" class="output-console-activate-btn">
+                            <a href="#output-console" class="output-console-activate-btn open-console-btn">
                                 <i class="fw fw-console fw-lg"></i>
                             </a>
                         </li>
@@ -162,7 +162,7 @@
                 <div class="splitter-horizontal"></div>
                 <div id="console-container" class="col-sm-12 hide console-container">
                     <div class="output-headers output-headers-bar">
-                        <button type="button" class="close pull-right output-console-activate-btn"><i
+                        <button type="button" class="close pull-right output-console-activate-btn close-console-btn"><i
                                 class="fw fw-cancel"></i></button>
                     </div>
                     <div class="nano console-wrap">
@@ -2855,6 +2855,8 @@
             output_controller: {
                 container: "#console-container",
                 activateBtn: '.output-console-activate-btn',
+                openConsoleBtn: '.open-console-btn',
+                closeConsoleBtn: '.close-console-btn',
                 cleanConsoleBtn: '.clear-console-btn',
                 headers: {
                     // relative selector within container for tab controller
