@@ -32,13 +32,9 @@ import org.wso2.siddhi.core.stream.output.sink.SinkHandler;
 import org.wso2.siddhi.core.stream.output.sink.SinkHandlerManager;
 import org.wso2.siddhi.core.table.record.RecordTableHandler;
 import org.wso2.siddhi.core.table.record.RecordTableHandlerManager;
-import org.wso2.siddhi.core.util.transport.BackoffRetryCounter;
 
+import java.util.HashMap;
 import java.util.Map;
-import java.util.Optional;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
 
 /**
  * Event listener implementation that listens for changes that happen within the cluster used for 2 node minimum HA
@@ -46,38 +42,100 @@ import java.util.concurrent.TimeUnit;
 public class HAEventListener extends MemberEventListener {
 
     private static final Logger log = LoggerFactory.getLogger(HAEventListener.class);
-    private BackoffRetryCounter backoffRetryCounter = new BackoffRetryCounter();
 
     @Override
     public void memberAdded(NodeDetail nodeDetail) {
         ClusterCoordinator clusterCoordinator = StreamProcessorDataHolder.getClusterCoordinator();
+        HAManager haManager = StreamProcessorDataHolder.getHAManager();
+
         if (clusterCoordinator.isLeaderNode()) {
-            SourceHandlerManager sourceHandlerManager = StreamProcessorDataHolder.getSourceHandlerManager();
-            Map<String, SourceHandler> registeredSourceHandlers = sourceHandlerManager.
-                    getRegsiteredSourceHandlers();
-            HAManager haManager = StreamProcessorDataHolder.getHAManager();
-            haManager.setPassiveNodeAdded(true);
-            for (SourceHandler sourceHandler : registeredSourceHandlers.values()) {
-                ((HACoordinationSourceHandler) sourceHandler).setPassiveNodeAdded(true);
+            //if this event has come for active node due to member addition of passive node
+            if (!haManager.getNodeId().equals(nodeDetail.getNodeId())) {
+                SourceHandlerManager sourceHandlerManager = StreamProcessorDataHolder.getSourceHandlerManager();
+                Map<String, SourceHandler> registeredSourceHandlers = sourceHandlerManager.
+                        getRegsiteredSourceHandlers();
+
+                Map propertiesMap = null;
+                long waitTimeout = haManager.getDeploymentConfig().getPassiveNodeDetailsWaitTimeOutMillis();
+                long initialWaitingStartedTimestamp = 0L;
+                boolean waitTimeOutExceeded = false;
+                do {
+                    for (NodeDetail node : clusterCoordinator.getAllNodeDetails()) {
+                        if (!node.getNodeId().equals(haManager.getNodeId())) {
+                            propertiesMap = node.getPropertiesMap();
+                            if (null == propertiesMap) {
+                                try {
+                                    if (initialWaitingStartedTimestamp == 0) {
+                                        initialWaitingStartedTimestamp = System.currentTimeMillis();
+                                    } else if (System.currentTimeMillis() - initialWaitingStartedTimestamp >
+                                            waitTimeout) {
+                                        log.error("Wait time out " + waitTimeout + " milliseconds exceeded. " +
+                                                "Active node could not retrieve passive node details from database");
+                                        waitTimeOutExceeded = true;
+                                    } else {
+                                        log.warn("Passive node properties Map is null. Waiting " +
+                                                haManager.getDeploymentConfig().
+                                                        getPassiveNodeDetailsRetrySleepTimeMillis()
+                                                + " milliseconds till it available");
+                                        Thread.sleep(haManager.getDeploymentConfig().
+                                                getPassiveNodeDetailsRetrySleepTimeMillis());
+                                    }
+                                } catch (InterruptedException e) {
+                                    log.error("Error occurred while waiting for passive node property map to " +
+                                            "available. " + e.getMessage(),e);
+                                }
+                            }
+                            break;
+                        }
+                    }
+                    if (waitTimeOutExceeded) {
+                        break;
+                    }
+                } while (propertiesMap == null);
+
+                if (null != propertiesMap) {
+                    haManager.setPassiveNodeAdded(true);
+                    for (SourceHandler sourceHandler : registeredSourceHandlers.values()) {
+                        ((HACoordinationSourceHandler) sourceHandler).setPassiveNodeAdded(true);
+                    }
+                    haManager.setPassiveNodeHostPort(getHost(propertiesMap),
+                            getPort(propertiesMap));
+                    haManager.initializeEventSyncConnectionPool();
+                    new PersistenceManager().run();
+                }
             }
-            if (!nodeDetail.getNodeId().equals(clusterCoordinator.getLeaderNode().getNodeId()) && nodeDetail
-                    .getPropertiesMap() != null) {
-                haManager.setPassiveNodeHostPort(getHost(nodeDetail.getPropertiesMap()
-                ), getPort(nodeDetail.getPropertiesMap()));
-                haManager.initializeEventSyncConnectionPool();
+        } else {
+            // if the event has come for passive node due to entering it self to cluster
+            if (haManager.getNodeId().equals(nodeDetail.getNodeId())) {
+                Map<String, Object> passiveNodeDetailsPropertiesMap = new HashMap<>();
+                passiveNodeDetailsPropertiesMap.put(HAConstants.HOST, haManager.getDeploymentConfig()
+                        .eventSyncServerConfigs().getHost());
+                passiveNodeDetailsPropertiesMap.put(HAConstants.PORT, haManager.getDeploymentConfig()
+                        .eventSyncServerConfigs().getPort());
+                passiveNodeDetailsPropertiesMap.put(HAConstants.ADVERTISED_HOST, haManager.getDeploymentConfig()
+                        .eventSyncServerConfigs()
+                        .getAdvertisedHost());
+                passiveNodeDetailsPropertiesMap.put(HAConstants.ADVERTISED_PORT, haManager.getDeploymentConfig()
+                        .eventSyncServerConfigs().getAdvertisedPort());
+                clusterCoordinator.setPropertiesMap(passiveNodeDetailsPropertiesMap);
             }
-            new PersistenceManager().run();
         }
     }
 
     @Override
     public void memberRemoved(NodeDetail nodeDetail) {
-        SourceHandlerManager sourceHandlerManager = StreamProcessorDataHolder.getSourceHandlerManager();
-        Map<String, SourceHandler> registeredSourceHandlers = sourceHandlerManager.
-                getRegsiteredSourceHandlers();
-        StreamProcessorDataHolder.getHAManager().setPassiveNodeAdded(false);
-        for (SourceHandler sourceHandler : registeredSourceHandlers.values()) {
-            ((HACoordinationSourceHandler) sourceHandler).setPassiveNodeAdded(false);
+        ClusterCoordinator clusterCoordinator = StreamProcessorDataHolder.getClusterCoordinator();
+        HAManager haManager = StreamProcessorDataHolder.getHAManager();
+        if (clusterCoordinator.isLeaderNode()) {
+            if (!haManager.getNodeId().equals(nodeDetail.getNodeId())) {
+                SourceHandlerManager sourceHandlerManager = StreamProcessorDataHolder.getSourceHandlerManager();
+                Map<String, SourceHandler> registeredSourceHandlers = sourceHandlerManager.
+                        getRegsiteredSourceHandlers();
+                StreamProcessorDataHolder.getHAManager().setPassiveNodeAdded(false);
+                for (SourceHandler sourceHandler : registeredSourceHandlers.values()) {
+                    ((HACoordinationSourceHandler) sourceHandler).setPassiveNodeAdded(false);
+                }
+            }
         }
     }
 
@@ -98,63 +156,68 @@ public class HAEventListener extends MemberEventListener {
             Map<String, RecordTableHandler> registeredRecordTableHandlers = recordTableHandlerManager.
                     getRegisteredRecordTableHandlers();
 
-            if (clusterCoordinator.isLeaderNode()) {
-                for (SourceHandler sourceHandler : registeredSourceHandlers.values()) {
-                    try {
-                        ((HACoordinationSourceHandler) sourceHandler).setAsActive();
-                    } catch (Throwable t) {
-                        log.error("HA Deployment: Error when connecting to source " + sourceHandler.getElementId() +
-                                " while changing from passive state to active, skipping the source. ", t);
-                        continue;
+            //synchronizing this inorder to prevent quick changes of active passive states in same node if occurred
+            synchronized (this) {
+                if (clusterCoordinator.isLeaderNode()) {
+                    for (SourceHandler sourceHandler : registeredSourceHandlers.values()) {
+                        try {
+                            ((HACoordinationSourceHandler) sourceHandler).setAsActive();
+                        } catch (Throwable t) {
+                            log.error("HA Deployment: Error when connecting to source " + sourceHandler.getElementId() +
+                                    " while changing from passive state to active, skipping the source. ", t);
+                            continue;
+                        }
                     }
-                }
-                StreamProcessorDataHolder.getHAManager().changeToActive();
-                if (clusterCoordinator.getAllNodeDetails().size() == 2) {
-                    NodeDetail passiveNode = getPassiveNode();
-                    StreamProcessorDataHolder.getHAManager().setPassiveNodeHostPort(getHost(passiveNode
-                            .getPropertiesMap()), getPort(passiveNode.getPropertiesMap()));
-                    StreamProcessorDataHolder.getHAManager().initializeEventSyncConnectionPool();
-                }
-                for (SinkHandler sinkHandler : registeredSinkHandlers.values()) {
-                    try {
-                        ((HACoordinationSinkHandler) sinkHandler).setAsActive();
-                    } catch (Throwable t) {
-                        log.error("HA Deployment: Error when connecting to sink " + sinkHandler.getElementId() +
-                                " while changing from passive state to active, skipping the sink. ", t);
-                        continue;
+                    StreamProcessorDataHolder.getHAManager().changeToActive();
+                } else {
+                    //Allow only to become passive if and only if node was active before - this could happen if both
+                    // nodes become unresponsive and already passive node could become passive again
+                    if (StreamProcessorDataHolder.getHAManager().isActiveNode()) {
+                        StreamProcessorDataHolder.getHAManager().changeToPassive();
+                        for (Map.Entry<String, SinkHandler> entry : registeredSinkHandlers.entrySet()) {
+                            HACoordinationSinkHandler handler = (HACoordinationSinkHandler) entry.getValue();
+                            handler.setAsPassive();
+                        }
+                        for (SourceHandler sourceHandler : registeredSourceHandlers.values()) {
+                            ((HACoordinationSourceHandler) sourceHandler).setAsPassive();
+                        }
+                        for (RecordTableHandler recordTableHandler : registeredRecordTableHandlers.values()) {
+                            ((HACoordinationRecordTableHandler) recordTableHandler).setAsPassive();
+                        }
                     }
-                }
-
-                for (RecordTableHandler recordTableHandler : registeredRecordTableHandlers.values()) {
-                    try {
-                        ((HACoordinationRecordTableHandler) recordTableHandler).setAsActive();
-                    } catch (Throwable e) {
-                        backoffRetryCounter.reset();
-                        log.error("HA Deployment: Error in connecting to table " + ((HACoordinationRecordTableHandler)
-                                recordTableHandler).getTableId() + " while changing from passive" +
-                                " state to active, will retry in " + backoffRetryCounter.getTimeInterval(), e);
-                        ScheduledExecutorService scheduledExecutorService = Executors.newSingleThreadScheduledExecutor();
-                        backoffRetryCounter.increment();
-                        scheduledExecutorService.schedule(new RetryRecordTableConnection(backoffRetryCounter,
-                                        recordTableHandler, scheduledExecutorService),
-                                backoffRetryCounter.getTimeIntervalMillis(), TimeUnit.MILLISECONDS);
-                    }
-                }
-            } else {
-                log.info("HA Deployment: This Node is now the Passive Node");
-                StreamProcessorDataHolder.getHAManager().changeToPassive();
-                for (Map.Entry<String, SinkHandler> entry : registeredSinkHandlers.entrySet()) {
-                    HACoordinationSinkHandler handler = (HACoordinationSinkHandler) entry.getValue();
-                    handler.setAsPassive();
-                }
-                for (SourceHandler sourceHandler : registeredSourceHandlers.values()) {
-                    ((HACoordinationSourceHandler) sourceHandler).setAsPassive();
-                }
-                for (RecordTableHandler recordTableHandler : registeredRecordTableHandlers.values()) {
-                    ((HACoordinationRecordTableHandler) recordTableHandler).setAsPassive();
                 }
             }
         }
+    }
+
+    @Override
+    public void becameUnresponsive(String nodeId) {
+        if (StreamProcessorDataHolder.getHAManager().isActiveNode()) {
+            SinkHandlerManager sinkHandlerManager = StreamProcessorDataHolder.getSinkHandlerManager();
+            Map<String, SinkHandler> registeredSinkHandlers = sinkHandlerManager.getRegisteredSinkHandlers();
+
+            SourceHandlerManager sourceHandlerManager = StreamProcessorDataHolder.getSourceHandlerManager();
+            Map<String, SourceHandler> registeredSourceHandlers = sourceHandlerManager.
+                    getRegsiteredSourceHandlers();
+
+            RecordTableHandlerManager recordTableHandlerManager = StreamProcessorDataHolder.
+                    getRecordTableHandlerManager();
+            Map<String, RecordTableHandler> registeredRecordTableHandlers = recordTableHandlerManager.
+                    getRegisteredRecordTableHandlers();
+
+            StreamProcessorDataHolder.getHAManager().changeToPassive();
+            for (Map.Entry<String, SinkHandler> entry : registeredSinkHandlers.entrySet()) {
+                HACoordinationSinkHandler handler = (HACoordinationSinkHandler) entry.getValue();
+                handler.setAsPassive();
+            }
+            for (SourceHandler sourceHandler : registeredSourceHandlers.values()) {
+                ((HACoordinationSourceHandler) sourceHandler).setAsPassive();
+            }
+            for (RecordTableHandler recordTableHandler : registeredRecordTableHandlers.values()) {
+                ((HACoordinationRecordTableHandler) recordTableHandler).setAsPassive();
+            }
+        }
+
     }
 
     private String getHost(Map nodePropertiesMap) {
@@ -177,14 +240,5 @@ public class HAEventListener extends MemberEventListener {
             port = (int) nodePropertiesMap.get(HAConstants.PORT);
         }
         return port;
-    }
-
-    private NodeDetail getPassiveNode() {
-        ClusterCoordinator clusterCoordinator = StreamProcessorDataHolder.getClusterCoordinator();
-        NodeDetail leaderNode = clusterCoordinator.getLeaderNode();
-        Optional<NodeDetail> passiveNode = StreamProcessorDataHolder.getClusterCoordinator().getAllNodeDetails()
-                .stream().filter(nodeDetail -> !nodeDetail.getNodeId().equals(leaderNode.getNodeId()))
-                .findFirst();
-        return passiveNode.get();
     }
 }

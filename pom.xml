@@ -1556,7 +1556,7 @@
         <siddhi.version>4.4.0</siddhi.version>
         <siddhi.bundle.version>4.4.0</siddhi.bundle.version>
         <siddhi.version.range>[4.0.0, 5.0.0)</siddhi.version.range>
-        <carbon.analytics-common.version>6.0.73</carbon.analytics-common.version>
+        <carbon.analytics-common.version>6.1.0</carbon.analytics-common.version>
         <carbon.analytics-common.version.range>[6.0.66, 6.1.0)</carbon.analytics-common.version.range>
         <carbon.analytics.version.range>[2.0.0, 3.0.0)</carbon.analytics.version.range>
 
@@ -1666,7 +1666,7 @@
         <carbon.securevault.version>5.0.11</carbon.securevault.version>
 
         <!-- Clustering Dependencies -->
-        <carbon.coordination.version>2.0.18</carbon.coordination.version>
+        <carbon.coordination.version>2.1.0</carbon.coordination.version>
 
         <slf4j.version>1.7.12</slf4j.version>
         <slf4j.logging.package.import.version.range>[1.7.1, 2.0.0)
