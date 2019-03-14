@@ -21,7 +21,7 @@ package io.siddhi.distribution.editor.core.util.designview.beans.configs.siddhie
 import java.util.List;
 
 /**
- * Represents a Siddhi Window, inside the 'input' part of a Siddhi Query
+ * Represents a Siddhi Window, inside the 'input' part of a Siddhi Query.
  */
 public class QueryWindowConfig {
     private String function;

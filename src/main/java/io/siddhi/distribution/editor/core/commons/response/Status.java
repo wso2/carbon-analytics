@@ -18,7 +18,7 @@
 package io.siddhi.distribution.editor.core.commons.response;
 
 /**
- * Constants used for returning responses for API requests
+ * Constants used for returning responses for API requests.
  */
 public enum Status {
     SUCCESS, ERROR

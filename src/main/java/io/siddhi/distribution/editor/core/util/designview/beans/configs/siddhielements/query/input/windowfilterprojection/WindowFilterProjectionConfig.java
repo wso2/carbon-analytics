@@ -24,7 +24,7 @@ import io.siddhi.distribution.editor.core.util.designview.beans.configs.siddhiel
 import java.util.List;
 
 /**
- * Represents a Window | Filter | Projection QueryInputConfig, for Siddhi Query
+ * Represents a Window | Filter | Projection QueryInputConfig, for Siddhi Query.
  */
 public class WindowFilterProjectionConfig extends QueryInputConfig {
     private String from;

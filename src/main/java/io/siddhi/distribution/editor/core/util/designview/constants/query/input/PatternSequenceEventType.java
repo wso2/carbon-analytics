@@ -19,7 +19,7 @@
 package io.siddhi.distribution.editor.core.util.designview.constants.query.input;
 
 /**
- * Type of Event, of a Pattern or Sequence Query
+ * Type of Event, of a Pattern or Sequence Query.
  */
 public enum PatternSequenceEventType {
     COUNTING,

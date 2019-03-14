@@ -36,7 +36,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Generator to create AggregationConfig
+ * Generator to create AggregationConfig.
  */
 public class AggregationConfigGenerator extends CodeSegmentsPreserver {
     private String siddhiAppString;

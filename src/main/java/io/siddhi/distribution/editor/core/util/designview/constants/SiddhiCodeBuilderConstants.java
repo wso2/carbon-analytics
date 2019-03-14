@@ -20,7 +20,7 @@ package io.siddhi.distribution.editor.core.util.designview.constants;
 
 /**
  * Contains all the generic String/char values that are needed by
- * the CodeGenerator class to build the entire Siddhi app string
+ * the CodeGenerator class to build the entire Siddhi app string.
  */
 public class SiddhiCodeBuilderConstants {
     // General chars

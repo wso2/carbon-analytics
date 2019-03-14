@@ -25,7 +25,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Generator to create AnnotationConfig
+ * Generator to create AnnotationConfig.
  */
 public class AnnotationConfigGenerator extends CodeSegmentsPreserver {
     /**

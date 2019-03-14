@@ -22,7 +22,7 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.ext.ExceptionMapper;
 
 /**
- * Exception mapper that maps customized DebuggerException to customized HTTP responses
+ * Exception mapper that maps customized DebuggerException to customized HTTP responses.
  */
 public class DebuggerExceptionMapper implements ExceptionMapper<DebuggerException> {
     @Override

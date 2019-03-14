@@ -23,7 +23,7 @@ import io.siddhi.distribution.editor.core.util.designview.beans.configs.siddhiel
 import java.util.List;
 
 /**
- * Represents a Condition element of Pattern | Sequence QueryInputConfig
+ * Represents a Condition element of Pattern | Sequence QueryInputConfig.
  */
 public class PatternSequenceConditionConfig {
     private String conditionId;

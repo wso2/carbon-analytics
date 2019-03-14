@@ -41,7 +41,7 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * Preserves Comments of major elements, that reside in the outer scope of Siddhi app
+ * Preserves Comments of major elements, that reside in the outer scope of Siddhi app.
  */
 public class OuterScopeCommentsPreserver extends ScopedCommentsPreserver {
 

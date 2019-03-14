@@ -19,7 +19,7 @@
 package io.siddhi.distribution.editor.core.util.designview.beans.configs;
 
 /**
- * Represents Code segment of a Comment in a Siddhi app
+ * Represents Code segment of a Comment in a Siddhi app.
  */
 public class CommentCodeSegment extends ElementCodeSegment {
     private String content;

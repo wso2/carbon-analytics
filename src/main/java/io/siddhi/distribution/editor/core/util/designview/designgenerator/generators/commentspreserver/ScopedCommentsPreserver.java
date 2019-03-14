@@ -31,7 +31,7 @@ import java.util.List;
 
 /**
  * Contains methods for preserving Comment segments from a Siddhi app, within preferred scopes.
- * Scopes are defined by classes that extend this abstract class
+ * Scopes are defined by classes that extend this abstract class.
  */
 public abstract class ScopedCommentsPreserver {
     protected String siddhiAppString;

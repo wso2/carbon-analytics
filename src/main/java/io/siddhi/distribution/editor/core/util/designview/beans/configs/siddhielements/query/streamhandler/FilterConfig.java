@@ -21,7 +21,7 @@ package io.siddhi.distribution.editor.core.util.designview.beans.configs.siddhie
 import io.siddhi.distribution.editor.core.util.designview.constants.query.StreamHandlerType;
 
 /**
- * Represents a Filter
+ * Represents a Filter.
  */
 public class FilterConfig extends StreamHandlerConfig {
     String value;

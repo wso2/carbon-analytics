@@ -61,7 +61,7 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * Builder to create EventFlow
+ * Builder to create EventFlow.
  */
 public class EventFlowBuilder {
     private String siddhiAppString;

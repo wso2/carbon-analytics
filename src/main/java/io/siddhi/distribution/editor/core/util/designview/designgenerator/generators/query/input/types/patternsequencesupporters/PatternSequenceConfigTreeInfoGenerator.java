@@ -35,7 +35,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Generates PatternSequenceConfig tree, along with event references that are already present
+ * Generates PatternSequenceConfig tree, along with event references that are already present.
  */
 public class PatternSequenceConfigTreeInfoGenerator {
     private String siddhiAppString;

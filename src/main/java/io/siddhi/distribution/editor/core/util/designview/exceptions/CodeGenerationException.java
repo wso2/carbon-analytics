@@ -20,7 +20,7 @@ package io.siddhi.distribution.editor.core.util.designview.exceptions;
 
 /**
  * Represents the exception which occurs during code generation from
- * the 'CodeGenerator' class
+ * the 'CodeGenerator' class.
  */
 public class CodeGenerationException extends Exception {
 

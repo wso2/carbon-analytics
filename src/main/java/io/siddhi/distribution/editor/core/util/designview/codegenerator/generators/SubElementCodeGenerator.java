@@ -33,7 +33,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Generates the code for a sub-element of a Siddhi element
+ * Generates the code for a sub-element of a Siddhi element.
  */
 public class SubElementCodeGenerator {
 

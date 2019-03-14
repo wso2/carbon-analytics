@@ -31,7 +31,7 @@ import io.siddhi.distribution.editor.core.util.designview.constants.AttributeSel
 import java.lang.reflect.Type;
 
 /**
- * De-serializer for AttributesSelectionConfig class
+ * De-serializer for AttributesSelectionConfig class.
  */
 public class AttributesSelectionConfigDeSerializer implements JsonDeserializer {
     private static final String TYPE = "type";

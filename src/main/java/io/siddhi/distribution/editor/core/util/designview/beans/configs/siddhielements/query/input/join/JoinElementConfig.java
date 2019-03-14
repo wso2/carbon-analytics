@@ -23,7 +23,7 @@ import io.siddhi.distribution.editor.core.util.designview.beans.configs.siddhiel
 import java.util.List;
 
 /**
- * Represents a Join element of Join QueryInputConfig
+ * Represents a Join element of Join QueryInputConfig.
  */
 public class JoinElementConfig {
     private String type;

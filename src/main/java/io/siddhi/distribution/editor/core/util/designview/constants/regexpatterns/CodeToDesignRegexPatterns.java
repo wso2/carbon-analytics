@@ -19,7 +19,7 @@
 package io.siddhi.distribution.editor.core.util.designview.constants.regexpatterns;
 
 /**
- * Has Regex pattern string constants, related to Code to Design
+ * Has Regex pattern string constants, related to Code to Design.
  */
 public class CodeToDesignRegexPatterns {
     public static final String SOURCE_ANNOTATION_CONTENT = "@source\\s*\\(\\s*(.+)\\s*\\)[^.]";

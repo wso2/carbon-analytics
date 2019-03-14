@@ -31,7 +31,7 @@ import io.siddhi.distribution.editor.core.util.designview.constants.AggregationB
 import java.lang.reflect.Type;
 
 /**
- * De-serializer for AggregateByTimePeriod class
+ * De-serializer for AggregateByTimePeriod class.
  */
 public class AggregateByTimePeriodDeSerializer implements JsonDeserializer {
     private static final String TYPE = "type";

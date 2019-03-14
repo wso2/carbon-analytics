@@ -19,7 +19,7 @@
 package io.siddhi.distribution.editor.core.util.designview.beans.configs.siddhielements.query.output.types.setattribute;
 
 /**
- * Represents Attribute to set in Siddhi Query Output
+ * Represents Attribute to set in Siddhi Query Output.
  */
 public class SetAttributeConfig {
     private String attribute;

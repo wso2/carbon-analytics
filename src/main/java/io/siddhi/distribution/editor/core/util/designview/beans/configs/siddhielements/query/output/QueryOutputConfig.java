@@ -21,7 +21,7 @@ package io.siddhi.distribution.editor.core.util.designview.beans.configs.siddhie
 import io.siddhi.distribution.editor.core.util.designview.beans.configs.siddhielements.query.output.types.OutputConfig;
 
 /**
- * Represents Output part of a Siddhi Query
+ * Represents Output part of a Siddhi Query.
  */
 public class QueryOutputConfig {
     private String type;

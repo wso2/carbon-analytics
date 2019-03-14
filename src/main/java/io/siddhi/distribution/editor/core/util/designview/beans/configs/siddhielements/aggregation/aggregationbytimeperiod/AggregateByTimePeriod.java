@@ -19,7 +19,7 @@
 package io.siddhi.distribution.editor.core.util.designview.beans.configs.siddhielements.aggregation.aggregationbytimeperiod;
 
 /**
- * Represents an 'aggregateByTimePeriod' abstract element inside Siddhi Aggregation
+ * Represents an 'aggregateByTimePeriod' abstract element inside Siddhi Aggregation.
  */
 public abstract class AggregateByTimePeriod {
     private String type;

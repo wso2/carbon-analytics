@@ -25,7 +25,7 @@ import io.siddhi.distribution.editor.core.util.designview.exceptions.CodeGenerat
 import io.siddhi.distribution.editor.core.util.designview.utilities.CodeGeneratorUtils;
 
 /**
- * Generates the code for a Siddhi window element
+ * Generates the code for a Siddhi window element.
  */
 public class WindowCodeGenerator {
 

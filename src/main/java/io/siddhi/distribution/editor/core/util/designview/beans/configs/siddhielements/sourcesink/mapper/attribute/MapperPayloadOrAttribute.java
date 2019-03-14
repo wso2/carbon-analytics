@@ -19,7 +19,7 @@
 package io.siddhi.distribution.editor.core.util.designview.beans.configs.siddhielements.sourcesink.mapper.attribute;
 
 /**
- * Represents @attribute or @payload of a Siddhi Source/Sink mapper
+ * Represents @attribute or @payload of a Siddhi Source/Sink mapper.
  */
 public abstract class MapperPayloadOrAttribute {
     private String annotationType;

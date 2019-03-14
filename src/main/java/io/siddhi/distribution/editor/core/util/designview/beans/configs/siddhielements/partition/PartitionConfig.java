@@ -29,7 +29,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Represents Siddhi Partition
+ * Represents Siddhi Partition.
  */
 public class PartitionConfig extends SiddhiElementConfig {
     private Map<QueryListType, List<QueryConfig>> queryLists;

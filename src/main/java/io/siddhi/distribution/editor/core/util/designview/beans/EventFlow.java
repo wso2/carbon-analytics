@@ -24,7 +24,7 @@ import io.siddhi.distribution.editor.core.util.designview.beans.configs.SiddhiAp
 import java.util.Set;
 
 /**
- * Represents the visual structure of a Siddhi app, for the design view
+ * Represents the visual structure of a Siddhi app, for the design view.
  */
 public class EventFlow {
     private SiddhiAppConfig siddhiAppConfig;

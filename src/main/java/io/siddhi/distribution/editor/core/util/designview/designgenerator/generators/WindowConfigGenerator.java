@@ -29,7 +29,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Generator to create WindowConfig
+ * Generator to create WindowConfig.
  */
 public class WindowConfigGenerator extends CodeSegmentsPreserver {
     private String siddhiAppString;

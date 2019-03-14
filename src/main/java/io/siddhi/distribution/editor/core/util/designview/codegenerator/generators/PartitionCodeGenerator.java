@@ -30,7 +30,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 /**
- * Generates the code for a Siddhi partition element
+ * Generates the code for a Siddhi partition element.
  */
 public class PartitionCodeGenerator {
 

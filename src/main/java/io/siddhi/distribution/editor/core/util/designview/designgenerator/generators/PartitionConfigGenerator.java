@@ -45,7 +45,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Generator to create PartitionConfig
+ * Generator to create PartitionConfig.
  */
 public class PartitionConfigGenerator extends CodeSegmentsPreserver {
     private String siddhiAppString;

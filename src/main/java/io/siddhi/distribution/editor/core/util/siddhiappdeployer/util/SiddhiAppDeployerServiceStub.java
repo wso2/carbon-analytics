@@ -24,7 +24,7 @@ import feign.Response;
 import io.siddhi.distribution.editor.core.exception.SiddhiAppDeployerServiceStubException;
 
 /**
- * Feign client for sending requests
+ * Feign client for sending requests.
  */
 public interface SiddhiAppDeployerServiceStub {
     @RequestLine("PUT /siddhi-apps")

@@ -28,7 +28,7 @@ import org.wso2.siddhi.query.api.definition.TriggerDefinition;
 import java.util.Map;
 
 /**
- * Generator to create config for a Siddhi Trigger
+ * Generator to create config for a Siddhi Trigger.
  */
 public class TriggerConfigGenerator extends CodeSegmentsPreserver {
     private static final String EVERY_SPLIT_KEYWORD = " every ";

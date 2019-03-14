@@ -19,7 +19,7 @@
 package io.siddhi.distribution.editor.core.util.designview.constants;
 
 /**
- * Type of an Annotation Config
+ * Type of an Annotation Config.
  */
 public enum AnnotationConfigType {
     LIST,

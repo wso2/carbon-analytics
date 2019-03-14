@@ -39,7 +39,7 @@ import java.util.Arrays;
 import java.util.List;
 
 /**
- * Generates Pattern/Sequence Query Input Config with given Siddhi elements
+ * Generates Pattern/Sequence Query Input Config with given Siddhi elements.
  */
 public class PatternSequenceConfigGenerator {
     private static final String PATTERN_DELIMITER = " -> ";

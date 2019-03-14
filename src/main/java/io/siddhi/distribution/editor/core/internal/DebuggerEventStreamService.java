@@ -30,7 +30,7 @@ import org.wso2.siddhi.query.api.definition.Attribute;
 import java.util.List;
 
 /**
- * Class which provides necessary apis for event stream related operations
+ * Class which provides necessary apis for event stream related operations.
  */
 public class DebuggerEventStreamService implements EventStreamService {
     private static Logger log = LoggerFactory.getLogger(DebuggerEventStreamService.class);

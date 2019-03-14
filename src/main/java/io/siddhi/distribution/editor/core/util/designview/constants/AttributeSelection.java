@@ -19,7 +19,7 @@
 package io.siddhi.distribution.editor.core.util.designview.constants;
 
 /**
- * Attribute Selection
+ * Attribute Selection.
  */
 public class AttributeSelection {
     public static final String TYPE_USER_DEFINED = "USER_DEFINED";

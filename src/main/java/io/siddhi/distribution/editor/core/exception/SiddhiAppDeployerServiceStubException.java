@@ -19,7 +19,7 @@
 package io.siddhi.distribution.editor.core.exception;
 
 /**
- * Exceptions related to SiddhiAppDeployerServiceStub
+ * Exceptions related to SiddhiAppDeployerServiceStub.
  */
 public class SiddhiAppDeployerServiceStubException extends Exception {
 

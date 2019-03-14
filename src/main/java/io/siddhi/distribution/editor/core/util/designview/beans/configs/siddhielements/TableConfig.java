@@ -23,7 +23,7 @@ import org.wso2.siddhi.query.api.annotation.Annotation;
 import java.util.List;
 
 /**
- * Represents configuration of a Siddhi Table
+ * Represents configuration of a Siddhi Table.
  */
 public class TableConfig extends SiddhiElementConfig {
     private String name;

@@ -19,7 +19,7 @@
 package io.siddhi.distribution.editor.core.util.designview.constants.query;
 
 /**
- * Type of a Query's Input
+ * Type of a Query's Input.
  */
 public enum QueryInputType {
     WINDOW_FILTER_PROJECTION,

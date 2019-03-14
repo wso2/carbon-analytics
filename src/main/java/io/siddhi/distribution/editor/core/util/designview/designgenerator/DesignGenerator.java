@@ -28,7 +28,7 @@ import org.wso2.siddhi.query.api.SiddhiApp;
 import org.wso2.siddhi.query.compiler.SiddhiCompiler;
 
 /**
- * Generator to create Config objects from Siddhi Code
+ * Generator to create Config objects from Siddhi Code.
  */
 public class DesignGenerator {
     private SiddhiManager siddhiManager;

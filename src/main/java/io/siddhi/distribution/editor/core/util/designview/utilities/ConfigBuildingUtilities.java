@@ -22,7 +22,7 @@ import io.siddhi.distribution.editor.core.util.designview.exceptions.DesignGener
 import org.wso2.siddhi.query.api.SiddhiElement;
 
 /**
- * Has methods involved in converting Siddhi elements to Design view Config objects
+ * Has methods involved in converting Siddhi elements to Design view Config objects.
  */
 public class ConfigBuildingUtilities {
     /**

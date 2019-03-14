@@ -35,7 +35,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Generator to create StreamHandlerConfig from Siddhi elements
+ * Generator to create StreamHandlerConfig from Siddhi elements.
  */
 public class StreamHandlerConfigGenerator {
     private String siddhiAppString;

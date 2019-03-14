@@ -64,7 +64,7 @@ import java.util.List;
 import java.util.Set;
 
 /**
- * Utility methods for the CodeGenerator class
+ * Utility methods for the CodeGenerator class.
  */
 public class CodeGeneratorUtils {
 

@@ -39,7 +39,7 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * Contains elements of a Siddhi app
+ * Contains elements of a Siddhi app,
  */
 public class SiddhiAppConfig {
     private int finalElementCount = 0;

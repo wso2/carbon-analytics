@@ -33,7 +33,7 @@ import io.siddhi.distribution.editor.core.util.designview.constants.query.QueryO
 import java.lang.reflect.Type;
 
 /**
- * De-serializer for QueryOutputConfig class
+ * De-serializer for QueryOutputConfig class.
  */
 public class QueryOutputConfigDeSerializer implements JsonDeserializer {
     private static final String TYPE = "type";

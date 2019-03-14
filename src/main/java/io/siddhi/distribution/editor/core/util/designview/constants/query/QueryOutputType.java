@@ -19,7 +19,7 @@
 package io.siddhi.distribution.editor.core.util.designview.constants.query;
 
 /**
- * Type of a Query's Output
+ * Type of a Query's Output.
  */
 public enum QueryOutputType {
     INSERT,

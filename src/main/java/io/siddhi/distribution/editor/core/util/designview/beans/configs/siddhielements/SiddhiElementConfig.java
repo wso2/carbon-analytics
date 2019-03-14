@@ -21,7 +21,7 @@ package io.siddhi.distribution.editor.core.util.designview.beans.configs.siddhie
 import io.siddhi.distribution.editor.core.util.designview.beans.configs.CommentCodeSegment;
 
 /**
- * Represents a Siddhi Element
+ * Represents a Siddhi Element.
  */
 public abstract class SiddhiElementConfig {
     private String id;

@@ -22,7 +22,7 @@ import io.siddhi.distribution.editor.core.util.designview.beans.configs.siddhiel
 import io.siddhi.distribution.editor.core.util.designview.constants.AggregationByTimeType;
 
 /**
- * Represents an 'aggregateByTimePeriod' element by time range
+ * Represents an 'aggregateByTimePeriod' element by time range.
  */
 public class AggregateByTimeRange extends AggregateByTimePeriod {
     private AggregationByTimeRangeValue value;

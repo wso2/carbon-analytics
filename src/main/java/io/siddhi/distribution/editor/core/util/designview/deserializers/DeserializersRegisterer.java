@@ -33,7 +33,7 @@ import io.siddhi.distribution.editor.core.util.designview.deserializers.types.Qu
 import io.siddhi.distribution.editor.core.util.designview.deserializers.types.StreamHandlerConfigDeserializer;
 
 /**
- * Handles De-serializer registrations with GsonBuilder, for required classes
+ * Handles De-serializer registrations with GsonBuilder, for required classes.
  */
 public class DeserializersRegisterer {
     /**

@@ -27,7 +27,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Generator to create Store config
+ * Generator to create Store config.
  */
 public class StoreConfigGenerator extends CodeSegmentsPreserver {
     public StoreConfig generateStoreConfig(Annotation storeAnnotation) throws DesignGenerationException {

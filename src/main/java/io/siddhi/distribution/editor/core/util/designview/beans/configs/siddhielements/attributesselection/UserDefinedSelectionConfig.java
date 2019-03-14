@@ -23,7 +23,7 @@ import io.siddhi.distribution.editor.core.util.designview.constants.AttributeSel
 import java.util.List;
 
 /**
- * Represents user defined selection of Siddhi Attributes
+ * Represents user defined selection of Siddhi Attributes.
  */
 public class UserDefinedSelectionConfig extends AttributesSelectionConfig {
     private List<SelectedAttribute> value;

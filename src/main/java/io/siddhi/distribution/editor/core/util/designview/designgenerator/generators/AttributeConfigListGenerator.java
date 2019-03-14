@@ -25,7 +25,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Generator to create a list of AttributeConfigs, for a list of Siddhi Attributes
+ * Generator to create a list of AttributeConfigs, for a list of Siddhi Attributes.
  */
 public class AttributeConfigListGenerator extends CodeSegmentsPreserver {
     /**

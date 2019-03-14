@@ -22,7 +22,7 @@ import java.util.List;
 
 /**
  * For storing meta data for a extension namespace or in-built processors
- * Used in JSON responses
+ * Used in JSON responses.
  */
 public class MetaData {
     private List<ProcessorMetaData> functions;

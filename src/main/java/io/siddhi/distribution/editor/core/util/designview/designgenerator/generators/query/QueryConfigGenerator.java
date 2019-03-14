@@ -50,7 +50,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Generator to create QueryConfig from Siddhi elements
+ * Generator to create QueryConfig from Siddhi elements.
  */
 public class QueryConfigGenerator extends CodeSegmentsPreserver {
     private static final String DEFAULT_QUERY_NAME = "query";

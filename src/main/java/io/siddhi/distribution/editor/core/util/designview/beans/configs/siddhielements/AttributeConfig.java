@@ -19,7 +19,7 @@
 package io.siddhi.distribution.editor.core.util.designview.beans.configs.siddhielements;
 
 /**
- * Represents a Siddhi Attribute
+ * Represents a Siddhi Attribute.
  */
 public class AttributeConfig extends SiddhiElementConfig {
     private String name;

@@ -19,7 +19,7 @@
 package io.siddhi.distribution.editor.core.util.designview.beans.configs.siddhielements.query.streamhandler;
 
 /**
- * Represents a Siddhi Stream Handler
+ * Represents a Siddhi Stream Handler.
  */
 public abstract class StreamHandlerConfig {
     private String type;

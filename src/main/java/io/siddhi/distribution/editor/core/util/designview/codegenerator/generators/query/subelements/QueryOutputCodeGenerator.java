@@ -30,7 +30,7 @@ import io.siddhi.distribution.editor.core.util.designview.exceptions.CodeGenerat
 import io.siddhi.distribution.editor.core.util.designview.utilities.CodeGeneratorUtils;
 
 /**
- * Generates the code for a output element of a Siddhi query
+ * Generates the code for a output element of a Siddhi query.
  */
 public class QueryOutputCodeGenerator {
 

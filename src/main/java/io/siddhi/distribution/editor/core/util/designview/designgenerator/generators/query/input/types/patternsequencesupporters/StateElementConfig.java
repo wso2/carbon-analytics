@@ -19,7 +19,7 @@
 package io.siddhi.distribution.editor.core.util.designview.designgenerator.generators.query.input.types.patternsequencesupporters;
 
 /**
- * Interface for state element configuration
+ * Interface for state element configuration.
  */
 public interface StateElementConfig {
 }

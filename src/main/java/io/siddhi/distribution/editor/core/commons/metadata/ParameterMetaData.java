@@ -23,7 +23,7 @@ import java.util.List;
 
 /**
  * For storing parameter meta data of a processor or expression executor
- * Used in JSON responses
+ * Used in JSON responses.
  */
 public class ParameterMetaData {
     private String name;

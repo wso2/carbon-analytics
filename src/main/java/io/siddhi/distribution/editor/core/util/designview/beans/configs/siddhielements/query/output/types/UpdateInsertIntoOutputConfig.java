@@ -23,7 +23,7 @@ import io.siddhi.distribution.editor.core.util.designview.beans.configs.siddhiel
 import java.util.List;
 
 /**
- * Represents Siddhi Update Or Insert Into Query's output
+ * Represents Siddhi Update Or Insert Into Query's output.
  */
 public class UpdateInsertIntoOutputConfig extends OutputConfig {
     private List<SetAttributeConfig> set;

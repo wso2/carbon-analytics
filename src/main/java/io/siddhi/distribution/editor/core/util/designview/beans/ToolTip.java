@@ -19,7 +19,7 @@
 package io.siddhi.distribution.editor.core.util.designview.beans;
 
 /**
- * Represents a structure for tooltips
+ * Represents a structure for tooltips.
  */
 public class ToolTip {
     private String id;

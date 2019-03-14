@@ -21,7 +21,7 @@ package io.siddhi.distribution.editor.core.util.designview.designgenerator.gener
 import java.util.List;
 
 /**
- * Holds information about the PatternSequenceConfig tree
+ * Holds information about the PatternSequenceConfig tree.
  */
 public class PatternSequenceConfigTreeInfo {
     StateElementConfig patternSequenceConfigTree;

@@ -19,7 +19,7 @@
 package io.siddhi.distribution.editor.core.util.designview.beans.configs.siddhielements.query.streamhandler;
 
 /**
- * Represents a Function|Window
+ * Represents a Function|Window.
  */
 public class FunctionWindowConfig extends StreamHandlerConfig {
     private FunctionWindowValue value;

@@ -24,7 +24,7 @@ import io.siddhi.distribution.editor.core.util.designview.exceptions.CodeGenerat
 import io.siddhi.distribution.editor.core.util.designview.utilities.CodeGeneratorUtils;
 
 /**
- * Generates the code for a Siddhi table element
+ * Generates the code for a Siddhi table element.
  */
 public class TableCodeGenerator {
 

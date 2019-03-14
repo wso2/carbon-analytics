@@ -19,7 +19,7 @@
 package io.siddhi.distribution.editor.core.util.designview.constants.query;
 
 /**
- * Type of Siddhi Query's Stream Handler
+ * Type of Siddhi Query's Stream Handler.
  */
 public enum StreamHandlerType {
     FILTER,

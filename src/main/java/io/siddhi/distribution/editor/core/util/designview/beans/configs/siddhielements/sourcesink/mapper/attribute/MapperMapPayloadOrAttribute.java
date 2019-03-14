@@ -23,7 +23,7 @@ import io.siddhi.distribution.editor.core.util.designview.constants.MapperPayloa
 import java.util.Map;
 
 /**
- * Represents a map of values in the Mapper
+ * Represents a map of values in the Mapper.
  */
 public class MapperMapPayloadOrAttribute extends MapperPayloadOrAttribute {
     private Map<String, String> value;

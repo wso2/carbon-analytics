@@ -19,7 +19,7 @@
 package io.siddhi.distribution.editor.core.util.designview.beans.configs.siddhielements.query.output.types;
 
 /**
- * Represents Siddhi Delete Query's output
+ * Represents Siddhi Delete Query's output.
  */
 public class DeleteOutputConfig extends OutputConfig {
     private String on;

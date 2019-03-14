@@ -31,7 +31,7 @@ import io.siddhi.distribution.editor.core.util.designview.utilities.CodeGenerato
 import java.util.Map;
 
 /**
- * Generates the code for a Siddhi source/sink element
+ * Generates the code for a Siddhi source/sink element.
  */
 public class SourceSinkCodeGenerator {
 

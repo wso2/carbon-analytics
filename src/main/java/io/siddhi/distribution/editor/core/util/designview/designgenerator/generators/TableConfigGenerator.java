@@ -28,7 +28,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Generator to create TableConfig
+ * Generator to create TableConfig.
  */
 public class TableConfigGenerator extends CodeSegmentsPreserver {
     /**

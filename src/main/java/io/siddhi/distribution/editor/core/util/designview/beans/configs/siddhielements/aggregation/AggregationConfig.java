@@ -26,7 +26,7 @@ import io.siddhi.distribution.editor.core.util.designview.beans.configs.siddhiel
 import java.util.List;
 
 /**
- * Represents a Siddhi Aggregation
+ * Represents a Siddhi Aggregation.
  */
 public class AggregationConfig extends SiddhiElementConfig {
     private String name;

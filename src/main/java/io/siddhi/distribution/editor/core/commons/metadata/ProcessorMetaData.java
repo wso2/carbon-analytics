@@ -22,7 +22,7 @@ import java.util.List;
 
 /**
  * For storing Processor and ExpressionExecutor related meta data
- * Used in JSON responses
+ * Used in JSON responses.
  */
 public class ProcessorMetaData {
     private String name;

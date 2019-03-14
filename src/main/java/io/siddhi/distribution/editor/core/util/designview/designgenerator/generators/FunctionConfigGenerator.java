@@ -22,7 +22,7 @@ import io.siddhi.distribution.editor.core.util.designview.beans.configs.siddhiel
 import org.wso2.siddhi.query.api.definition.FunctionDefinition;
 
 /**
- * Generator to create FunctionConfig
+ * Generator to create FunctionConfig.
  */
 public class FunctionConfigGenerator extends CodeSegmentsPreserver {
     /**

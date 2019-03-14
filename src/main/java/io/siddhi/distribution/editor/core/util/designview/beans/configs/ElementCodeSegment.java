@@ -21,7 +21,7 @@ package io.siddhi.distribution.editor.core.util.designview.beans.configs;
 import java.util.Arrays;
 
 /**
- * Represents Code segment of a Siddhi element in a Siddhi app, which is generated as a config
+ * Represents Code segment of a Siddhi element in a Siddhi app, which is generated as a config.
  */
 public class ElementCodeSegment implements Comparable<ElementCodeSegment> {
     private int[] queryContextStartIndex;

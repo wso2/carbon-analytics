@@ -27,7 +27,7 @@ import io.siddhi.distribution.editor.core.util.designview.utilities.CodeGenerato
 import java.util.List;
 
 /**
- * Generates the code for sub-elements of a Siddhi query
+ * Generates the code for sub-elements of a Siddhi query.
  */
 public class QuerySubElementCodeGenerator {
 

@@ -19,7 +19,7 @@
 package io.siddhi.distribution.editor.core.util.designview.beans.configs.siddhielements.query.output.types;
 
 /**
- * Represents Siddhi Query's output
+ * Represents Siddhi Query's output.
  */
 public abstract class OutputConfig {
     private String eventType;

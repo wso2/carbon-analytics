@@ -46,7 +46,7 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * Generator to create Edges, that connect Siddhi Elements - considered as Nodes
+ * Generator to create Edges, that connect Siddhi Elements - considered as Nodes.
  */
 public class EdgesGenerator {
     private SiddhiAppConfig siddhiAppConfig;

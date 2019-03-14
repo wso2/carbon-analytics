@@ -19,7 +19,7 @@
 package io.siddhi.distribution.editor.core.util.designview.beans.configs.siddhielements.aggregation.aggregationbytimeperiod.aggregationbytimerange;
 
 /**
- * Represents the value of an aggregation by time range
+ * Represents the value of an aggregation by time range.
  */
 public class AggregationByTimeRangeValue {
     private String min;

@@ -32,7 +32,7 @@ import io.siddhi.distribution.editor.core.util.designview.utilities.CodeGenerato
 import java.util.List;
 
 /**
- * Generates the code for a Siddhi aggregation element
+ * Generates the code for a Siddhi aggregation element.
  */
 public class AggregationCodeGenerator {
 

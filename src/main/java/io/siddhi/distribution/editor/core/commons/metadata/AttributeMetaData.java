@@ -23,7 +23,7 @@ import java.util.List;
 
 /**
  * For storing attribute meta data of the the additional attributes added in return events of a stream processor
- * Used in JSON responses
+ * Used in JSON responses.
  */
 public class AttributeMetaData {
     private String name;

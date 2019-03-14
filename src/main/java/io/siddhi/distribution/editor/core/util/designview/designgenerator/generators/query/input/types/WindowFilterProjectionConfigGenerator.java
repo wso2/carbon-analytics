@@ -30,7 +30,7 @@ import org.wso2.siddhi.query.api.execution.query.input.stream.SingleInputStream;
 import java.util.List;
 
 /**
- * Generates WindowFilterProjection Query Input Config with given Siddhi elements
+ * Generates WindowFilterProjection Query Input Config with given Siddhi elements.
  */
 public class WindowFilterProjectionConfigGenerator {
     private String siddhiAppString;

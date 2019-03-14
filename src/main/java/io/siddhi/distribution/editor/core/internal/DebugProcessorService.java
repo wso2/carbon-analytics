@@ -23,7 +23,7 @@ package io.siddhi.distribution.editor.core.internal;
 import io.siddhi.distribution.editor.core.exception.NoSuchSiddhiAppException;
 
 /**
- * Class which manage siddhi apps and their runtime
+ * Class which manage siddhi apps and their runtime.
  */
 public class DebugProcessorService {
 

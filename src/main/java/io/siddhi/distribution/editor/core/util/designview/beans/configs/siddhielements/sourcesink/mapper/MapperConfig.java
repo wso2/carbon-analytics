@@ -24,7 +24,7 @@ import io.siddhi.distribution.editor.core.util.designview.beans.configs.siddhiel
 import java.util.List;
 
 /**
- * Represents Siddhi Source/Sink Mapper
+ * Represents Siddhi Source/Sink Mapper.
  */
 public class MapperConfig extends SiddhiElementConfig {
     private String type;

@@ -23,7 +23,7 @@ import org.wso2.siddhi.query.api.annotation.Annotation;
 import java.util.List;
 
 /**
- * Represents configuration of a Siddhi Defined Window
+ * Represents configuration of a Siddhi Defined Window.
  */
 public class WindowConfig extends SiddhiElementConfig {
     private String name;

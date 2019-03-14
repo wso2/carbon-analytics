@@ -21,7 +21,7 @@ package io.siddhi.distribution.editor.core.util.designview.beans.configs.siddhie
 import java.util.List;
 
 /**
- * Represents configuration of a Siddhi Trigger
+ * Represents configuration of a Siddhi Trigger.
  */
 public class TriggerConfig extends SiddhiElementConfig {
     private String name;

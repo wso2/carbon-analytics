@@ -24,7 +24,7 @@ import io.siddhi.distribution.editor.core.util.designview.constants.AggregationB
 import java.util.List;
 
 /**
- * Represents an 'aggregateByTimePeriod' element by a list of time intervals
+ * Represents an 'aggregateByTimePeriod' element by a list of time intervals.
  */
 public class AggregateByTimeInterval extends AggregateByTimePeriod {
     private List<String> value;

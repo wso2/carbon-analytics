@@ -53,7 +53,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Generates the code for a Siddhi application
+ * Generates the code for a Siddhi application.
  */
 public class CodeGenerator {
 

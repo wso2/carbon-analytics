@@ -19,7 +19,7 @@
 package io.siddhi.distribution.editor.core.util.designview.beans.configs.siddhielements;
 
 /**
- * Represents a Siddhi Script Function
+ * Represents a Siddhi Script Function.
  */
 public class FunctionConfig extends SiddhiElementConfig {
     private String name;

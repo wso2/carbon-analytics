@@ -40,7 +40,7 @@ import javax.websocket.Session;
 import javax.websocket.server.ServerEndpoint;
 
 /**
- * EditorConsoleService Websocket - Client connect to this
+ * EditorConsoleService Websocket - Client connect to this.
  */
 @Component(
         name = "editor-console-service",

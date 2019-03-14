@@ -18,7 +18,7 @@
 package io.siddhi.distribution.editor.core.util.designview.exceptions;
 
 /**
- * Exceptions related to operations of generating Configs from code
+ * Exceptions related to operations of generating Configs from code.
  */
 public class DesignGenerationException extends Exception {
     public DesignGenerationException(String message) {

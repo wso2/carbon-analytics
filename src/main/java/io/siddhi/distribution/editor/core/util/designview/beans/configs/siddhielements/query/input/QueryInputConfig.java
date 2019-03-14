@@ -19,7 +19,7 @@
 package io.siddhi.distribution.editor.core.util.designview.beans.configs.siddhielements.query.input;
 
 /**
- * Represents the 'input' part of a Siddhi Query
+ * Represents the 'input' part of a Siddhi Query.
  */
 public abstract class QueryInputConfig {
     private String type;

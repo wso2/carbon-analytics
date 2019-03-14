@@ -19,7 +19,7 @@
 package io.siddhi.distribution.editor.core.util.designview.beans.configs.siddhielements.query.output.types;
 
 /**
- * Represents Siddhi Insert Query's output
+ * Represents Siddhi Insert Query's output.
  */
 public class InsertOutputConfig extends OutputConfig {
     public InsertOutputConfig() {

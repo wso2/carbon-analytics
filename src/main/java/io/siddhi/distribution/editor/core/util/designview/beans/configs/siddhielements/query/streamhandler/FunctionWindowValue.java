@@ -21,7 +21,7 @@ package io.siddhi.distribution.editor.core.util.designview.beans.configs.siddhie
 import java.util.List;
 
 /**
- * Represents value of a Function|Window
+ * Represents value of a Function|Window.
  */
 public class FunctionWindowValue {
     private String function;

@@ -21,7 +21,7 @@ package io.siddhi.distribution.editor.core.util.designview.beans.configs.siddhie
 import io.siddhi.distribution.editor.core.util.designview.beans.configs.siddhielements.SiddhiElementConfig;
 
 /**
- * Represents Siddhi Partition with element
+ * Represents Siddhi Partition with element.
  */
 public class PartitionWithElement extends SiddhiElementConfig {
     private String expression;

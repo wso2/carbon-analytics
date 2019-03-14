@@ -21,7 +21,7 @@ package io.siddhi.distribution.editor.core.commons.response;
 import java.util.List;
 
 /**
- * Response wrapper for Debug Runtime Meta Data
+ * Response wrapper for Debug Runtime Meta Data.
  */
 public class DebugRuntimeResponse extends GeneralResponse {
     private String runtimeId;

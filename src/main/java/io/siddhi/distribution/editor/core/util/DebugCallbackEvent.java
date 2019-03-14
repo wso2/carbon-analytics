@@ -22,7 +22,7 @@ import org.wso2.siddhi.core.debugger.SiddhiDebugger;
 import org.wso2.siddhi.core.event.ComplexEvent;
 
 /**
- * Event to be send in within the Debug callback
+ * Event to be send in within the Debug callback.
  */
 public class DebugCallbackEvent {
     private ComplexEvent event;

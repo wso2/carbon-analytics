@@ -37,7 +37,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Generator to create QueryOutputConfig from Siddhi elements
+ * Generator to create QueryOutputConfig from Siddhi elements.
  */
 public class QueryOutputConfigGenerator {
     private String siddhiAppString;

@@ -36,7 +36,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Generator to create Source or Sink config
+ * Generator to create Source or Sink config.
  */
 public class SourceSinkConfigsGenerator extends CodeSegmentsPreserver {
     private static final String TYPE = "TYPE";

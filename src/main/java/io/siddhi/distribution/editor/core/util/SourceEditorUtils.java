@@ -47,7 +47,7 @@ import java.util.jar.JarEntry;
 import java.util.jar.JarInputStream;
 
 /**
- * Utility class for getting the meta data for the in built and extension processors in siddhi
+ * Utility class for getting the meta data for the in built and extension processors in Siddhi.
  */
 public class SourceEditorUtils {
     static final Logger LOGGER = Logger.getLogger(SourceEditorUtils.class);

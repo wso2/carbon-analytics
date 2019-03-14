@@ -32,7 +32,7 @@ import io.siddhi.distribution.editor.core.util.designview.constants.query.QueryI
 import java.lang.reflect.Type;
 
 /**
- * De-serializer for QueryInputConfig class
+ * De-serializer for QueryInputConfig class.
  */
 public class QueryInputConfigDeSerializer implements JsonDeserializer {
     private static final String TYPE = "type";

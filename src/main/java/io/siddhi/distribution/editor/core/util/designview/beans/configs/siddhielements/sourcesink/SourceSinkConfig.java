@@ -24,7 +24,7 @@ import io.siddhi.distribution.editor.core.util.designview.beans.configs.siddhiel
 import java.util.List;
 
 /**
- * Represents Siddhi Source/Sink
+ * Represents Siddhi Source/Sink.
  */
 public class SourceSinkConfig extends SiddhiElementConfig {
     private String annotationType;

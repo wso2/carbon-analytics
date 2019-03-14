@@ -22,7 +22,7 @@ import io.siddhi.distribution.editor.core.util.designview.beans.configs.siddhiel
 import io.siddhi.distribution.editor.core.util.designview.constants.query.QueryInputType;
 
 /**
- * Represents a Join QueryInputConfig, for Siddhi Query
+ * Represents a Join QueryInputConfig, for Siddhi Query.
  */
 public class JoinConfig extends QueryInputConfig {
     private String joinWith;

@@ -18,8 +18,8 @@
 package io.siddhi.distribution.editor.core.commons.response;
 
 /**
- * Store the attributes of a general response
- * All other responses inherits from this apart from custom responses generated using ResponseFactory
+ * Store the attributes of a general response.
+ * All other responses inherits from this apart from custom responses generated using ResponseFactory.
  */
 public class GeneralResponse {
     private Status status;

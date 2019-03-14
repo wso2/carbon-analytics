@@ -19,7 +19,7 @@
 package io.siddhi.distribution.editor.core.util.designview.constants;
 
 /**
- * Partition With Types
+ * Partition With Types.
  */
 public enum PartitionWithTypes {
     VALUE,

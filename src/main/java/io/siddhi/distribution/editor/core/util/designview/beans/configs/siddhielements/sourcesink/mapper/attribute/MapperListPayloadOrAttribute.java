@@ -23,7 +23,7 @@ import io.siddhi.distribution.editor.core.util.designview.constants.MapperPayloa
 import java.util.List;
 
 /**
- * Represents a list of values in the Mapper
+ * Represents a list of values in the Mapper.
  */
 public class MapperListPayloadOrAttribute extends MapperPayloadOrAttribute {
     private List<String> value;

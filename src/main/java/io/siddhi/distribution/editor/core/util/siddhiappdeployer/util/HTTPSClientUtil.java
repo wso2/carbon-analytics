@@ -22,7 +22,7 @@ import feign.Response;
 import io.siddhi.distribution.editor.core.exception.SiddhiAppDeployerServiceStubException;
 
 /**
- * Contains HTTPS client related methods
+ * Contains HTTPS client related methods.
  */
 public class HTTPSClientUtil {
     private static final String PROTOCOL = "https";

@@ -34,7 +34,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
- * Generates code for an input element of a Siddhi query
+ * Generates code for an input element of a Siddhi query.
  */
 public class QueryInputCodeGenerator {
 

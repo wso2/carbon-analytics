@@ -23,7 +23,7 @@ import io.siddhi.distribution.editor.core.commons.metadata.MetaData;
 import java.util.Map;
 
 /**
- * Response wrapper for Meta Data
+ * Response wrapper for Meta Data.
  */
 public class MetaDataResponse extends GeneralResponse {
     private MetaData inBuilt;

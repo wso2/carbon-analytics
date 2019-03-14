@@ -31,7 +31,7 @@ import io.siddhi.distribution.editor.core.util.designview.constants.query.Stream
 import java.lang.reflect.Type;
 
 /**
- * De-serializer for StreamHandlerConfig class
+ * De-serializer for StreamHandlerConfig class.
  */
 public class StreamHandlerConfigDeserializer implements JsonDeserializer {
     private static final String TYPE = "type";

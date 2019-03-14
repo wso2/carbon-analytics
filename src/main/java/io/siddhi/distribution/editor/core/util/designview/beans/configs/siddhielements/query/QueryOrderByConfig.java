@@ -19,7 +19,7 @@
 package io.siddhi.distribution.editor.core.util.designview.beans.configs.siddhielements.query;
 
 /**
- * Represents the 'orderBy' clause of QueryConfig
+ * Represents the 'orderBy' clause of QueryConfig.
  */
 public class QueryOrderByConfig {
     private String value;

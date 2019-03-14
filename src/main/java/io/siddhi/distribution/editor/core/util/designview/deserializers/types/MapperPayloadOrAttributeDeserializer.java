@@ -31,7 +31,7 @@ import io.siddhi.distribution.editor.core.util.designview.constants.MapperPayloa
 import java.lang.reflect.Type;
 
 /**
- * De-serializer for MapperPayloadOrAttribute class
+ * De-serializer for MapperPayloadOrAttribute class.
  */
 public class MapperPayloadOrAttributeDeserializer implements JsonDeserializer {
     private static final String TYPE = "type";

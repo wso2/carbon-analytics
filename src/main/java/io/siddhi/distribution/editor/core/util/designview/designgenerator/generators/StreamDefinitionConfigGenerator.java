@@ -27,7 +27,7 @@ import java.util.Arrays;
 import java.util.List;
 
 /**
- * Generator to create Stream definition config
+ * Generator to create Stream definition config.
  */
 public class StreamDefinitionConfigGenerator extends CodeSegmentsPreserver {
     /**

@@ -25,7 +25,7 @@ import io.siddhi.distribution.editor.core.util.siddhiappdeployer.api.SiddhiAppAp
 import io.siddhi.distribution.editor.core.util.siddhiappdeployer.util.HTTPSClientUtil;
 
 /**
- * Consists of a method for the deployment feature for the exposed Siddhi App Api
+ * Consists of a method for the deployment feature for the exposed Siddhi App Api.
  */
 public class SiddhiAppDeployerApiHelper implements SiddhiAppApiHelperService {
     @Override

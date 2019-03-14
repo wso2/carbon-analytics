@@ -31,7 +31,7 @@ import org.wso2.siddhi.query.api.execution.query.input.stream.SingleInputStream;
 import org.wso2.siddhi.query.api.execution.query.input.stream.StateInputStream;
 
 /**
- * Generator to create QueryInputConfig from Siddhi elements
+ * Generator to create QueryInputConfig from Siddhi elements.
  */
 public class QueryInputConfigGenerator {
     private String siddhiAppString;

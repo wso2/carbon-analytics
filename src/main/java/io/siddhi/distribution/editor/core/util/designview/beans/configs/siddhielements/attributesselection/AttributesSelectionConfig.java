@@ -21,7 +21,7 @@ package io.siddhi.distribution.editor.core.util.designview.beans.configs.siddhie
 import io.siddhi.distribution.editor.core.util.designview.beans.configs.siddhielements.SiddhiElementConfig;
 
 /**
- * Represents selection of Siddhi attributes
+ * Represents selection of Siddhi attributes.
  */
 public abstract class AttributesSelectionConfig extends SiddhiElementConfig {
     private String type;

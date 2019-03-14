@@ -37,7 +37,7 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * Preserves Comments of major elements, that reside in a Partition scope
+ * Preserves Comments of major elements, that reside in a Partition scope.
  */
 public class PartitionScopeCommentsPreserver extends ScopedCommentsPreserver {
     private PartitionConfig partitionConfig;
