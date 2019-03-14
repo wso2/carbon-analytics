@@ -97,4 +97,14 @@ public class CoordinatorChangeListener extends MemberEventListener {
             log.info(ServiceDataHolder.getLeaderNode() + " became the leader of the resource pool.");
         }
     }
+
+    @Override
+    public void becameUnresponsive(String nodeId) {
+        if (ServiceDataHolder.isLeader() && nodeId.equals(ServiceDataHolder.getCurrentNode().getId())) {
+            ServiceDataHolder.setLeaderNode(null);
+            ServiceDataHolder.isLeader(false);
+            log.warn(String.format("ManagerNode { id: %s } removed from the manager cluster due to unresponsiveness",
+                    nodeId));
+        }
+    }
 }

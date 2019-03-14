@@ -26,6 +26,10 @@ import org.wso2.carbon.config.annotation.Element;
 public class DeploymentConfig {
 
     private String type;
+    @Element(description = "Wait time out for passive node details", required = false)
+    private long passiveNodeDetailsWaitTimeOutMillis = 300000;
+    @Element(description = "Sleep time before retrying for passive node details", required = false)
+    private long passiveNodeDetailsRetrySleepTimeMillis = 500;
     private EventSyncServerConfig eventSyncServer;
     @Element(description = "Byte buffer queue capacity", required = false)
     private int eventByteBufferQueueCapacity = 20000;
@@ -77,5 +81,25 @@ public class DeploymentConfig {
     public void setByteBufferExtractorThreadPoolSize(int byteBufferExtractorThreadPoolSize) {
 
         this.byteBufferExtractorThreadPoolSize = byteBufferExtractorThreadPoolSize;
+    }
+
+    public long getPassiveNodeDetailsWaitTimeOutMillis() {
+
+        return passiveNodeDetailsWaitTimeOutMillis;
+    }
+
+    public void setPassiveNodeDetailsWaitTimeOutMillis(long passiveNodeDetailsWaitTimeOutMillis) {
+
+        this.passiveNodeDetailsWaitTimeOutMillis = passiveNodeDetailsWaitTimeOutMillis;
+    }
+
+    public long getPassiveNodeDetailsRetrySleepTimeMillis() {
+
+        return passiveNodeDetailsRetrySleepTimeMillis;
+    }
+
+    public void setPassiveNodeDetailsRetrySleepTimeMillis(long passiveNodeDetailsRetrySleepTimeMillis) {
+
+        this.passiveNodeDetailsRetrySleepTimeMillis = passiveNodeDetailsRetrySleepTimeMillis;
     }
 }

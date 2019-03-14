@@ -60,11 +60,12 @@ public class EventSyncServer {
     private static final Logger log = Logger.getLogger(EventSyncServer.class);
     private EventListMapManager eventListMapManager = new EventListMapManager();
     private BlockingQueue<ByteBuffer> eventByteBufferQueue;
-    private ExecutorService eventBufferExtractorExecutorService = Executors.newFixedThreadPool(
-            HAConstants.EVENT_BUFFER_EXTRACTOR_THREAD_POOL_SIZE);
+    private ExecutorService eventBufferExtractorExecutorService;
     private EventBufferExtractor eventBufferExtractor = new EventBufferExtractor();
 
     public void start(DeploymentConfig deploymentConfig) {
+        eventBufferExtractorExecutorService = Executors.newFixedThreadPool(
+                HAConstants.EVENT_BUFFER_EXTRACTOR_THREAD_POOL_SIZE);
         this.eventByteBufferQueue = new LinkedBlockingQueue<>(deploymentConfig.
                 getEventByteBufferQueueCapacity());
         serverConfig = deploymentConfig.eventSyncServerConfigs();
