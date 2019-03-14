@@ -74,15 +74,24 @@ define(['require', 'elementUtils'],
                 this.store = options.store;
             }
             this.annotationList = [];
+            this.annotationListObjects = [];
         };
 
         Aggregation.prototype.addAnnotation = function (annotation) {
             this.annotationList.push(annotation);
         };
 
+        Aggregation.prototype.addAnnotationObject = function (annotation) {
+			this.annotationListObjects.push(annotation);
+		};
+
         Aggregation.prototype.clearAnnotationList = function () {
             ElementUtils.prototype.removeAllElements(this.annotationList);
         };
+
+        Aggregation.prototype.clearAnnotationListObjects = function () {
+			ElementUtils.prototype.removeAllElements(this.annotationListObjects);
+		};
 
         Aggregation.prototype.getId = function () {
             return this.id;
@@ -92,7 +101,7 @@ define(['require', 'elementUtils'],
             return this.name;
         };
 
-        Aggregation.prototype.getFrom = function () {
+        Aggregation.prototype.getConnectedSource = function () {
             return this.from;
         };
 
@@ -120,6 +129,10 @@ define(['require', 'elementUtils'],
             return this.annotationList;
         };
 
+        Aggregation.prototype.getAnnotationListObjects = function () {
+			return this.annotationListObjects;
+		};
+
         Aggregation.prototype.setId = function (id) {
             this.id = id;
         };
@@ -128,7 +141,7 @@ define(['require', 'elementUtils'],
             this.name = name;
         };
 
-        Aggregation.prototype.setFrom = function (from) {
+        Aggregation.prototype.setConnectedSource = function (from) {
             this.from = from;
         };
 
@@ -155,6 +168,10 @@ define(['require', 'elementUtils'],
         Aggregation.prototype.setAnnotationList = function (annotationList) {
             this.annotationList = annotationList;
         };
+
+        Aggregation.prototype.setAnnotationListObjects = function (annotationListObjects) {
+			this.annotationListObjects = annotationListObjects;
+		};
 
         return Aggregation;
 

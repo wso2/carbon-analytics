@@ -123,7 +123,7 @@
                             </a>
                         </li>
                         <li>
-                            <a href="#output-console" class="output-console-activate-btn">
+                            <a href="#output-console" class="output-console-activate-btn open-console-btn">
                                 <i class="fw fw-console fw-lg"></i>
                             </a>
                         </li>
@@ -162,7 +162,7 @@
                 <div class="splitter-horizontal"></div>
                 <div id="console-container" class="col-sm-12 hide console-container">
                     <div class="output-headers output-headers-bar">
-                        <button type="button" class="close pull-right output-console-activate-btn"><i
+                        <button type="button" class="close pull-right output-console-activate-btn close-console-btn"><i
                                 class="fw fw-cancel"></i></button>
                     </div>
                     <div class="nano console-wrap">
@@ -1037,36 +1037,38 @@
 </div>
 
 <script id = "attribute-form-template" type = "text/x-handlebars-template">
-    <h4>Attributes</h4>
-    <ul>
-        <div id = "attribute-div">
-            {{#each this}}
-            <li class = "attribute clearfix">
-                <div class = "clearfix">
-                    <div class = "attr-content">
-                        <input type = "text" value = "{{name}}" class = "attr-name"/>
-                        <select class = "attr-type">
-                            <option value = "string"> string </option>
-                            <option value = "int"> int </option>
-                            <option value = "long"> long </option>
-                            <option value = "float"> float </option>
-                            <option value = "double"> double </option>
-                            <option value = "bool"> bool </option>
-                            <option value = "object"> object </option>
-                        </select>
+    <div class="attributes-container">
+        <label>Attributes</label>
+        <ul>
+            <div id = "attribute-div">
+                {{#each this}}
+                <li class = "attribute clearfix">
+                    <div class = "clearfix">
+                        <div class = "attr-content">
+                            <input type = "text" value = "{{name}}" class = "attr-name"/>
+                            <select class = "attr-type">
+                                <option value = "string"> string </option>
+                                <option value = "int"> int </option>
+                                <option value = "long"> long </option>
+                                <option value = "float"> float </option>
+                                <option value = "double"> double </option>
+                                <option value = "bool"> bool </option>
+                                <option value = "object"> object </option>
+                            </select>
+                        </div>
+                        <div class = "attr-nav"></div>
                     </div>
-                    <div class = "attr-nav"></div>
-                </div>
-                <label class = "error-message"></label>
-            </li>
-            {{/each}}
-        </div>
-    </ul>
-    <button id="btn-add-attribute" class="btn btn-default"> + Attribute </button>
+                    <label class = "error-message"></label>
+                </li>
+                {{/each}}
+            </div>
+        </ul>
+        <button id="btn-add-attribute" class="btn btn-default"> + Attribute </button>
+    </div>
 </script>
 
 <script id = "annotation-form-template" type = "text/x-handlebars-template">
-    <h4>Annotations</h4>
+    <label>Annotations</label>
     <div id = "annotation-div">
         {{#if this}}
         <ul>
@@ -1076,7 +1078,6 @@
         </ul>
         {{/if}}
     </div>
-    <br>
     <button id = "btn-add-annotation" class = "btn btn-default"> + Annotation </button>
     <button id = "btn-add-key-val" class = "btn btn-default" style = "display: none"> + Property </button>
     <button id = "btn-del-annotation" class = "btn btn-default" style = "display: none"> Delete </button>
@@ -1087,7 +1088,7 @@
         <li data-jstree = '{"icon":"/editor/commons/images/annotation.png"}' class = "{{class}}"> {{name}}
             <ul>
                 {{#each elements}}
-                <li data-jstree = '{"icon":"/editor/commons/images/properties.png"}' class="{{class}}"> {{key}}
+                <li data-jstree = '{"icon":"/editor/commons/images/properties.png"}' class="{{class}}"> {{name}}
                     <ul>
                         <li data-jstree = '{"icon":"/editor/commons/images/value.png"}'
                             class = "annotation-value"> {{defaultValue}} </li>
@@ -1116,18 +1117,67 @@
         </li>
 </script>
 
+<script id="predefined-annotation-form-template" type="text/template">
+    <div class = "define-predefined-annotations">
+        {{#if this}}
+        <div>
+            {{#each this}}
+            <div class="main-annotation predefined-annotation">
+                {{> recursive-predefined-annotation this}}
+            </div>
+            {{/each}}
+        </div>
+        {{/if}}
+    </div>
+</script>
+
+<script id="recursive-predefined-annotation-partial" type="text/template">
+    <div id="{{name}}-annotation">
+        {{#if optional}}
+            {{#if isChecked}}
+                <label class = "annotation-name optional-annotation">
+                    <input type = "checkbox" class = "annotation-checkbox" checked> @{{name}}
+                </label>
+            {{else}}
+                <label class = "annotation-name optional-annotation">
+                    <input type = "checkbox" class = "annotation-checkbox"> @{{name}}
+                </label>
+            {{/if}}
+        {{else}}
+            <label class = "mandatory-annotation-symbol"> * </label>
+            <label class = "annotation-name mandatory-annotation">
+                @{{name}}
+            </label>
+        {{/if}}
+        {{#if isChecked}}
+            <div class="annotation-content">
+        {{else}}
+            <div class="annotation-content" style="display: none">
+        {{/if}}
+            <div id = "{{name}}-options-div" class="annotation-options"> </div>
+            {{#if annotations}}
+                {{#each annotations}}
+                    <div class="sub-annotation predefined-annotation">
+                        {{> recursive-predefined-annotation this}}
+                    </div>
+                {{/each}}
+            {{/if}}
+        </div>
+    </div>
+</script>
+
 <script id="type-selection-form-template" type="text/template">
+    {{#ifSourceOrSinkOrStore id}}
+        <label class="clearfix"> <span class="mandatory-symbol"> * </span> {{addTitle id}} Type </label>
+    {{else}}
+        <label class="clearfix"> {{addTitle id}} Type </label>
+    {{/ifSourceOrSinkOrStore}}
+
     {{#ifSourceOrSink id}}
-        <h3>{{addTitle id}} Configuration</h3>
-        <label class="clearfix"> * Type </label>
         <select id="{{id}}-type">
             <option style = "display:none" disabled selected value > -- select a type -- </option>
     {{else}}
-             {{#ifId id "map"}}
-                <h3> Mapping </h3>
-             {{/ifId}}
-              <label class="clearfix"> {{addTitle id}} Type </label>
-              <select id="{{id}}-type">
+          <select id="{{id}}-type">
     {{/ifSourceOrSink}}
 
             {{#each types}}
@@ -1138,7 +1188,7 @@
 
 <script id = "source-sink-store-options-template" type = "text/template">
     {{#if options}}
-        <h3> Options </h3>
+        <h4> Options </h4>
         <div id = "{{id}}-options">
             {{#ifSourceOrSinkOrStore id}}
                 <div class = "sub-{{id}}-options-div">
@@ -1149,7 +1199,7 @@
                     {{#if value}}
                         <div class = "clearfix">
                             <label class = "option-name optional-option">
-                                <input type = "checkbox" class = "option-checkbox" checked> {{key}}
+                                <input type = "checkbox" class = "option-checkbox" checked> {{name}}
                             </label>
                             <i class = "fw fw-info option-desc">
                                 <span style = "display:none" class = "option-desc-content"> {{description}} </span>
@@ -1161,7 +1211,7 @@
                     {{else}}
                         <div class="clearfix">
                             <label class = "option-name optional-option">
-                                <input type = "checkbox" class = "option-checkbox"> {{key}}
+                                <input type = "checkbox" class = "option-checkbox"> {{name}}
                             </label>
                             <i class = "fw fw-info option-desc">
                                 <span style = "display:none" class="option-desc-content"> {{description}} </span>
@@ -1174,9 +1224,9 @@
                         <label class = "error-message"></label>
                 {{else}}
                     <div class="clearfix">
-                        <label class = "mandatory-option-symbol"> * </label>
+                        <span class = "mandatory-symbol"> * </span>
                         <label class = "option-name mandatory-option">
-                            {{key}}
+                            {{name}}
                         </label>
                         <i class="fw fw-info option-desc">
                             <span style="display:none" class="option-desc-content"> {{description}} </span>
@@ -1201,14 +1251,15 @@
     {{/if}}
     </div>
     <div class = "customized-options" id = "customized-{{id}}-options">
-        <h3> <i> Customized Options </i> </h3>
+        <h4> Customized Options </h4>
         <ul class = "cust-options">
             {{#each customizedOptions}}
                 <li class="option">
                     <div class = "clearfix">
                         <label> option.key </label>
-                        <input type="text" class="cust-option-key" value="{{key}}">
+                        <input type="text" class="cust-option-key" value="{{name}}">
                     </div>
+                    <label class = "error-message"> </label>
                     <div class = "clearfix">
                         <label> option.value </label>
                         <input type = "text" class = "cust-option-value" value = "{{value}}">
@@ -1228,8 +1279,8 @@
             <div class="clearfix" id="stream-attributes"></div>
         {{/ifId}}
         <div class = "attribute-labels clearfix">
-                {{#if attributes.0.key }} <label id = "attribute-key-label"> Key </label> {{/if}}
-                <label id = "attribute-value-label"> Value </label>
+                {{#if attributes.0.key }} <label class = "attribute-mapping-label"> Key </label> {{/if}}
+                <label class = "attribute-mapping-label"> Value </label>
         </div>
         <div id="attributes">
         {{#each attributes}}
@@ -1254,11 +1305,11 @@
     </div>
 </script>
 
-<script id = "table-store-annotation-template" type = "text/template">
+<script id = "primary-index-annotation-template" type = "text/template">
     <h4> Annotations </h4>
-    <div id = "table-annotations">
+    <div id = "primary-index-annotations">
             {{#each this}}
-                <div class = "clearfix table-annotation">
+                <div class = "clearfix annotation">
                     <div class="clearfix">
                         <label class = "annotation-name">
                             {{#if isChecked}}
@@ -1275,7 +1326,7 @@
                     {{/if}}
                         <ul>
                         {{#each values}}
-                            <li class = "clearfix table-annotation-value">
+                            <li class = "clearfix primary-index-annotation-value">
                                 <div class="clearfix">
                                     <input type = "text" value = "{{value}}" class = "annotation-value"/>
                                     <a class = "btn-del-annot-value"> <i class = "fw fw-delete"> </i></a>
@@ -1293,15 +1344,16 @@
 
 <script id="window-function-parameters-template" type = "text/template">
     {{#if parameters}}
-    <h3> Parameters </h3>
+    <h4> Parameters </h4>
     <div id = "{{id}}-parameters">
+        <div class = "sub-{{id}}-parameter-div">
     {{#each parameters}}
-        <div class = "parameter" id="{{key}}-parameter">
+        <div class = "parameter" id="{{name}}-parameter">
         {{#if optional}}
             {{#if value}}
                 <div class = "clearfix">
                     <label class = "parameter-name optional-parameter">
-                        <input type = "checkbox" class = "parameter-checkbox" checked> {{key}}
+                        <input type = "checkbox" class = "parameter-checkbox" checked> {{name}}
                     </label>
                     <i class = "fw fw-info parameter-desc">
                         <span style = "display:none" class = "parameter-desc-content"> {{description}} </span>
@@ -1313,7 +1365,7 @@
             {{else}}
                 <div class="clearfix">
                     <label class = "parameter-name optional-parameter">
-                        <input type = "checkbox" class = "parameter-checkbox"> {{key}}
+                        <input type = "checkbox" class = "parameter-checkbox"> {{name}}
                     </label>
                     <i class = "fw fw-info parameter-desc">
                         <span style = "display:none" class="parameter-desc-content"> {{description}} </span>
@@ -1326,9 +1378,9 @@
                 <label class = "error-message"></label>
         {{else}}
             <div class="clearfix">
-                <label class = "mandatory-parameter-symbol"> * </label>
+                <span class = "mandatory-symbol"> * </span>
                 <label class = "parameter-name mandatory-parameter">
-                    {{key}}
+                    {{name}}
                 </label>
                 <i class="fw fw-info parameter-desc">
                     <span style="display:none" class="parameter-desc-content"> {{description}} </span>
@@ -1340,31 +1392,517 @@
             <label class = "error-message"></label>
         {{/if}}
         </div>
+        {{#if (isDivisor (sum @index 1) ../parameters)}}
+            </div>
+            <div class = "sub-{{../id}}-parameter-div">
+        {{/if}}
     {{/each}}
+        </div>
     </div>
     {{/if}}
 </script>
 
 <script id="partition-by-template" type = "text/template">
-    <h4> Partition By </h4>
+    <label> Partition By </label>
     <div class="clearfix">
-        <label id = "partition-by-expression-label"> Expression </label>
-        <label id = "partition-by-stream-name-label"> Stream Name </label>
+        <label class = "partition-by-label"> Expression </label>
+        <label class = "partition-by-label"> Stream Name </label>
     </div>
     <div id = "partition-by-content">
         {{#each this}}
         <div class="partition-key">
             <div class="clearfix">
-                <input type="text" class="partition-by-expression" value="{{this.expression}}">
-                <input type="text" class="partition-by-stream-name" value="{{this.streamName}}" readonly>
+                <div class="partition-expression"> {{> renderDropDown streamAttributes}} </div>
+                <div class="partition-stream-name"> <input type="text" class="partition-by-stream-name" value="{{streamName}}" readonly> <div>
             </div>
             <label class="error-message"></label>
         </div>
         {{/each}}
     </div>
-
-
 </script>
+
+
+<script id="aggregate-projection-template" type = "text/template">
+    <label class="clearfix"> <span class="mandatory-symbol"> * </span> Select </label>
+    <select class="attribute-selection-type" class="clearfix">
+        <option value="all"> All Attributes </option>
+        <option value="user_defined"> User Defined Attributes </option>
+    </select>
+    <div class="define-user-defined-attributes">
+        <ul class="user-defined-attributes">
+            {{#each this}}
+                <li class="attribute">
+                    <div class="clearfix">
+                        <div class="clearfix">
+                            <input type="text" class = "attribute-expression-as name" value="{{this}}">
+                            <a class = "btn-del-option"> <i class = "fw fw-delete"> </i></a>
+                        </div>
+                        <label class = "error-message"></label>
+                    </div>
+                </li>
+            {{/each}}
+        </ul>
+        <button class="btn btn-default btn-add-user-defined-attribute"> + Attribute </button>
+    </div>
+</script>
+
+<script id="query-projection-template" type = "text/template">
+    <label class="clearfix"> <span class="mandatory-symbol"> * </span> Select </label>
+    <select class="attribute-selection-type" class="clearfix">
+        <option value="all"> All Attributes </option>
+        <option value="user_defined"> User Defined Attributes </option>
+    </select>
+    <div class="define-user-defined-attributes">
+        <div class="clearfix">
+            <label class="projection-expression-label"> Expression </label>
+            <label class="projection-as-label"> As </label>
+        </div>
+        <ul class="user-defined-attributes">
+            {{#each this}}
+            <li class="attribute">
+                <div class="clearfix">
+                    <div class="clearfix">
+                        <input type="text" class = "attribute-expression" value="{{expression}}">
+                        <input type="text" class = "attribute-as" value="{{as}}" readonly>
+                    </div>
+                    <label class = "error-message"></label>
+                </div>
+            </li>
+            {{/each}}
+        </ul>
+    </div>
+</script>
+
+<script id = "drop-down-template" type="text/template">
+    <select class="{{id}}-selection">
+        {{#ifGroupOrOrderBy id}}
+            <option style = "display:none" disabled selected value> -- select a value --</option>
+        {{/ifGroupOrOrderBy}}
+        {{#each options}}
+            <option value="{{this}}"> {{this}} </option>
+        {{/each}}
+    </select>
+</script>
+
+<script id="group-by-template" type = "text/template">
+    <label> <input type = "checkbox" class="group-by-checkbox"> Group By Attributes </label>
+    <div class="group-by-content order-group-by-content">
+        <ul class="group-by-attributes">
+            {{#each groupBy}}
+            <li>
+                <div class="clearfix">
+                    <div class="group-by-attribute-content">
+                        <div class="define-attribute-drop-down">
+                            {{> renderDropDown ../possibleGroupByAttributes}}
+                        </div>
+                        <a class = "btn-del-option"> <i class = "fw fw-delete"> </i></a>
+                    </div>
+                </div>
+                <label class="error-message"> </label>
+            </li>
+            {{/each}}
+        </ul>
+        <button class="btn btn-default btn-add-group-by-attribute"> + Attribute </button>
+    </div>
+</script>
+
+<script id="order-by-template" type="text/template">
+    <label> <input type = "checkbox" class="order-by-checkbox"> Order By Attributes </label>
+    <div class="order-by-content order-group-by-content">
+        <ul class="order-by-attributes">
+            {{#each orderBy}}
+                <li>
+                    <div class="clearfix">
+                        <div class="order-by-attribute-content">
+                            <div class="define-attribute-drop-down">
+                                {{> renderDropDown ../possibleOrderByAttributes}}
+                            </div>
+                            <div class="define-order-del">
+                                <select class="order-selection">
+                                    <option value="asc"> asc </option>
+                                    <option value="desc"> desc </option>
+                                </select>
+                                <a class = "btn-del-option"> <i class = "fw fw-delete"> </i></a>
+                            </div>
+                        </div>
+                    </div>
+                    <label class="error-message"> </label>
+                </li>
+            {{/each}}
+        </ul>
+        <button class="btn btn-default btn-add-order-by-attribute"> + Attribute </button>
+    </div>
+</script>
+
+<script id="aggregation-by-interval-template" type = "text/template">
+    <div class="interval-content">
+        <div class="clearfix">
+        {{#each this}}
+            <label class="interval-option">
+                <input type="checkbox" class="{{this}}-checkbox interval-checkbox"> {{this}}
+            </label>
+            {{#if (isDivisor (sum @index 1) ../this)}}
+                </div>
+                <div class = "interval-content">
+            {{/if}}
+        {{/each}}
+        </div>
+        <label class="error-message"> </label>
+    </div>
+</script>
+
+<script id="aggregation-form-template" type = "text/template">
+    <div class = "aggregation-form-container">
+        <h3> Aggregation Meta Information </h3>
+            <div id="aggregation-name-div" class="aggregation-info">
+                <label> Name </label>
+                <input type="text" id="aggregationName" class="clearfix name" value="{{name}}">
+                <label class="error-message" id="aggregationNameErrorMessage"> </label>
+            </div>
+            <div id="aggregation-from-div" class="aggregation-info">
+                <label> From </label>
+                <input type="text" id="aggregation-from" class="clearfix name" value="{{from}}" readonly>
+            </div>
+            <div id="define-aggregate-annotations">
+                <h4> Annotations </h4>
+                <div class="define-store-annotation">
+                    <label><input type = "checkbox" class="store-annotation-checkbox"> @store </label>
+                    <div class = "store-content">
+                        <div id="define-store"> </div>
+                        <div id = "define-rdbms-type"> </div>
+                        <div id ="store-options-div"> </div>
+                    </div>
+                </div>
+                <div class="define-index-annotation"> </div>
+                <div class ="define-predefined-aggregation-annotation"> </div>
+                <div class="define-user-defined-annotations"> </div>
+            </div>
+    </div>
+    <div class = "aggregation-form-container">
+        <h3> Projection </h3>
+        <div class = "define-select"> </div>
+        <div class="define-group-by-attributes"> </div>
+    </div>
+    <div class = "aggregation-form-container">
+        <div id = "define-aggregate-by">
+            <h3> Aggregation Criteria </h3>
+            <div id ="aggregate-by-time-period" class="aggregate-by-content">
+                <h4> <span class="mandatory-symbol"> * </span> By Time Period </h4>
+                <select class="aggregate-by-time-period-selection">
+                    <option value="interval"> Interval </option>
+                    <option value="range"> Range </option>
+                </select>
+            </div>
+            <div class="aggregate-by-time-period-content"> </div>
+            <div id="aggregate-by-attribute" class="aggregate-by-content">
+                <h4>
+                    <div class="clearfix">
+                        <label>
+                            <input type = "checkbox" id="aggregate-by-attribute-checkbox"> By Attribute
+                        </label>
+                        <i class = "fw fw-info attribute-by-desc">
+                        <span style = "display:none" class="attribute-by-desc-content">
+                            Attribute of timestamp is required
+                        </span>
+                        </i>
+                    </div>
+                </h4>
+                <div class="aggregate-by-attribute-content clearfix">
+                    <label class="clearfix"> Attribute Name </label>
+                </div>
+            </div>
+        </div>
+    </div>
+</script>
+
+<script id="join-query-form-template" type = "text/template">
+    <div class = "join-query-form-container">
+        <h3> Query Meta Information </h3>
+        <div class="query-name-div">
+            <label> Name </label>
+            <input type="text"  class="clearfix query-name name" value="{{name}}">
+            <label class="error-message"> </label>
+        </div>
+        <div class ="define-annotations">
+            <h4> Annotations </h4>
+            <div class ="define-predefined-annotations"> </div>
+            <div class="define-user-defined-annotations"></div>
+        </div>
+    </div>
+    <div class = "join-query-form-container">
+        <h3> Input </h3>
+        <div class="query-input-container">
+            <div class="define-left-source define-source"></div>
+            <div class="define-join-type">
+                <div class="join-type-div">
+                    <label class="clearfix"> Join Type </label>
+                    <div class="define-join-type-selection"> </div>
+                </div>
+            </div>
+            <div class="define-right-source define-source"></div>
+            <div class="define-on-condition define-content">
+                <label>
+                    <input type="checkbox" class="on-condition-checkbox query-checkbox"> On Condition
+                </label>
+                <div class="on-condition-content query-content">
+                    <input type="text"  class="clearfix name on-condition-value query-content-value symbol-syntax-required-value">
+                    <label class="error-message"> </label>
+                </div>
+            </div>
+            <div class="define-aggregate-per-within-condition"> </div>
+        </div>
+    </div>
+    <div class = "join-query-form-container">
+        <h3> Projection </h3>
+        <div class = "define-select"> </div>
+        <div class="define-group-by-attributes"> </div>
+        <div class="define-having-condition define-content">
+            <label>
+                <input type="checkbox" class="having-checkbox query-checkbox"> Having condition
+            </label>
+            <div class="having-condition-content query-content">
+                <input type="text"
+                       class="clearfix having-value query-content-value name symbol-syntax-required-value">
+                <label class="error-message"> </label>
+            </div>
+        </div>
+    </div>
+    <div class="join-query-form-container">
+        <div class="define-query-output"> </div>
+    </div>
+</script>
+
+<script id="query-output-template" type = "text/template">
+    <h3> Output </h3>
+    <div class="define-order-by-attributes"> </div>
+    <div class = "define-limit define-content">
+        <label>
+            <input type="checkbox" class="limit-checkbox query-checkbox"> Limit
+        </label>
+        <div class="limit-content query-content">
+            <input type="text"  class="clearfix limit-value query-content-value">
+            <label class="error-message"> </label>
+        </div>
+    </div>
+    <div class = "define-offset define-content">
+        <label>
+            <input type="checkbox" class="offset-checkbox query-checkbox"> Offset
+        </label>
+        <div class="offset-content query-content">
+            <input type="text"  class="clearfix offset-value query-content-value">
+            <label class="error-message"> </label>
+        </div>
+    </div>
+    <div class = "define-rate-limiting define-content">
+        <label>
+            <input type="checkbox" class="rate-limiting-checkbox query-checkbox"> Rate limiting
+        </label>
+        <div class="rate-limiting-content query-content">
+            <input type="text"  class="clearfix rate-limiting-value query-content-value">
+            <label class="error-message"> </label>
+        </div>
+    </div>
+    <div class="define-output-content">
+        <label> Operation </label>
+        <input type="text" class="clearfix name query-operation" value="{{operation}}" readonly>
+    </div>
+    <div class="define-query-into define-output-content">
+        <label> Into </label>
+        <input type="text" class="clearfix name query-into" value="{{into}}" readonly>
+    </div>
+    <div class="define-output-events define-output-content"> </div>
+</script>
+
+<script id="query-source-form-template" type = "text/template">
+    <div class="clearfix collapse-div" data-toggle="collapse" href="#join-{{type}}-content"
+         aria-controls="join-{{type}}-content" aria-expanded="false">
+            <label> {{addTitle type}}</label>
+            <a class="collapse-icon"> </a>
+    </div>
+    <div class = "{{type}}-source-content collapse join-source-content" id ="join-{{type}}-content">
+        <div class="input-from">
+            <label class="clearfix"> <span class="mandatory-symbol"> * </span> Input From </label>
+            <div class="input-from-drop-down"> </div>
+        </div>
+        <div class="define-as define-content">
+            <label>
+                <input type="checkbox" class="source-as-checkbox query-checkbox"> As
+            </label>
+            <div class="source-as-content query-content">
+                <input type="text"  class="clearfix as-content-value query-content-value">
+                <label class="error-message"> </label>
+            </div>
+        </div>
+        <div class="define-unidirectional">
+            <label class = "clearfix">
+                <input type="checkbox" class="is-unidirectional-checkbox"> Is Unidirectional
+            </label>
+            <label class="error-message"></label>
+        </div>
+        <div class="define-stream-handler">
+            <label> <input type="checkbox" class="stream-handler-checkbox"> Stream Handler </label>
+            <div class="define-stream-handler-section"> </div>
+            <div class = "define-stream-handler-buttons">
+                <button class="btn btn-default btn-add-filter"> + Filter </button>
+                <button class="btn btn-default btn-add-function"> + Function </button>
+                <button class="btn btn-default btn-add-window"> + Window </button>
+            </div>
+        </div>
+    </div>
+</script>
+
+<script id="pattern-sequence-query-form-template" type = "text/template">
+    <div class="pattern-sequence-query-form-container">
+        <h3> Query Meta Information</h3>
+        <div class="query-name-div">
+            <label> Name </label>
+            <input type="text"  class="clearfix query-name name" value="{{name}}">
+            <label class="error-message"> </label>
+        </div>
+        <div class ="define-annotations">
+            <h4> Annotations </h4>
+            <div class ="define-predefined-annotations"> </div>
+            <div class="define-user-defined-annotations"></div>
+        </div>
+    </div>
+    <div class="pattern-sequence-query-form-container">
+        <h3> Input </h3>
+        <div class="input-container">
+            <div class="define-conditions">
+                <label class="clearfix"> <span class="mandatory-symbol"> * </span> Conditions </label>
+                <div class="condition-container">
+                    <ul class="nav nav-tabs"> </ul>
+                    <div class="tab-content"> </div>
+                </div>
+            </div>
+            <div class="define-logic-statement define-content">
+                <label class="clearfix"> <span class="mandatory-symbol"> * </span> Logic Statement </label>
+                <div class="query-content">
+                    <input type="text" class="clearfix logic-statement name">
+                    <label class="error-message"> </label>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class = "pattern-sequence-query-form-container">
+        <h3> Projection </h3>
+            <div class = "define-select"> </div>
+            <div class="define-group-by-attributes"> </div>
+            <div class="define-having-condition define-content">
+                <label>
+                    <input type="checkbox" class="having-checkbox query-checkbox"> Having condition
+                </label>
+                <div class="having-condition-content query-content">
+                    <input type="text"
+                           class="clearfix having-value query-content-value name symbol-syntax-required-value">
+                    <label class="error-message"> </label>
+                </div>
+            </div>
+    </div>
+    <div class="pattern-sequence-query-form-container">
+        <div class="define-query-output"> </div>
+    </div>
+</script>
+
+<script id ="stream-handler-form-template" type = "text/template">
+    <ul class = "stream-handler-list">
+        {{#each streamHandlerList}}
+        <li class="define-stream-handler-content">
+            <div>
+                <label class="clearfix"> <span class="mandatory-symbol"> * </span> Type </label>
+                <div class = "define-stream-handler-type"> {{> renderDropDown ../types}} </div>
+                <div class="clearfix">
+                    <div class = "define-stream-handler-type-content"> </div>
+                    <div class = "attr-nav"> </div>
+                </div>
+                <label class = "error-message"> </label>
+            </div>
+        </li>
+        {{/each}}
+    </ul>
+</script>
+
+<script id="pattern-sequence-condition-navigation-form-template" type = "text/template">
+    <li class="condition-navigation">
+        <a href=".define-{{conditionId}}-source" data-toggle="tab"> {{conditionId}}
+            <button type="button" class="close btn-del-condition" name="delete" data-form-type="single" aria-label="Close">
+                <i class="fw fw-cancel"></i>
+            </button>
+        </a>
+    </li>
+</script>
+
+<script id="pattern-sequence-condition-content-form-template" type = "text/template">
+    <div class="tab-pane condition-content define-source define-{{condition.conditionId}}-source">
+        <div class="define-source">
+            <label class="clearfix"> Condition ID </label>
+            <input type="text" class="condition-id clearfix" value="{{condition.conditionId}}" min="1">
+            <label class="error-message"></label>
+            <div class="define-stream">
+                <label class="clearfix"> Stream </label>
+                <div>{{> renderDropDown inputStreamNames}}</div>
+            </div>
+            <div class="define-stream-handler">
+                <label> <input type="checkbox" class="stream-handler-checkbox"> Stream Handler </label>
+                <div class="define-stream-handler-section"> </div>
+                <div class = "define-stream-handler-buttons">
+                    <button class="btn btn-default btn-add-filter"> + Filter </button>
+                    <button class="btn btn-default btn-add-function"> + Function </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</script>
+
+<script id = "window-filter-projection-query-form-template" type="text/template">
+    <div class="query-form-container">
+        <h3> Query Meta Information </h3>
+        <div class="query-name-div">
+            <label> Name </label>
+            <input type="text"  class="clearfix query-name name" value="{{name}}">
+            <label class="error-message"> </label>
+        </div>
+        <div class="query-from-div">
+            <label> From </label>
+            <input type="text" class="clearfix name query-from" value="{{from}}" readonly>
+        </div>
+        <div class="define-query-source define-source">
+            <div class="define-stream-handler">
+                <label> <input type="checkbox" class="stream-handler-checkbox"> Stream Handler </label>
+                <div class="define-stream-handler-section"> </div>
+                <div class = "define-stream-handler-buttons">
+                    <button class="btn btn-default btn-add-filter"> + Filter </button>
+                    <button class="btn btn-default btn-add-function"> + Function </button>
+                    <button class="btn btn-default btn-add-window"> + Window </button>
+                </div>
+            </div>
+        </div>
+        <div class ="define-annotations">
+            <h4> Annotations </h4>
+            <div class ="define-predefined-annotations"> </div>
+            <div class="define-user-defined-annotations"></div>
+        </div>
+    </div>
+    <div class="query-form-container">
+        <h3> Projection </h3>
+        <div class = "define-select"> </div>
+        <div class="define-group-by-attributes"> </div>
+        <div class="define-having-condition define-content">
+            <label>
+                <input type="checkbox" class="having-checkbox query-checkbox"> Having condition
+            </label>
+            <div class="having-condition-content query-content">
+                <input type="text"
+                       class="clearfix having-condition-value query-content-value name symbol-syntax-required-value">
+                <label class="error-message"> </label>
+            </div>
+        </div>
+    </div>
+    <div class="query-form-container">
+        <div class="define-query-output"> </div>
+    </div>
+</script>
+
 <!--Start: Settings Modal-->
 <div class="modal fade modalSettings" id="modalSettings" tabindex="-1" role="dialog">
     <div class="modal-dialog" role="document">
@@ -1985,19 +2523,19 @@
                 isMandatory: false,
                 elements: [
                     {
-                        key: 'buffer.size',
+                        name: 'buffer.size',
                         defaultValue: '256',
                         class: 'mandatory-key',
                         isMandatory: true
                     },
                     {
-                        key: 'workers',
+                        name: 'workers',
                         defaultValue: '2',
                         class: 'mandatory-key',
                         isMandatory: true
                     },
                     {
-                        key: 'batch.size.max',
+                        name: 'batch.size.max',
                         defaultValue: '5',
                         class: 'mandatory-key',
                         isMandatory: true
@@ -2005,40 +2543,287 @@
                 ]
             }
             ],
-            table_predefined_annotations: [
+            type_table_predefined_annotations: [
             {
                 name: "primaryKey",
-                values: [{
-                    value: ""
-                }],
-                isChecked: false
+                optional: true
             },
             {
                 name: "index",
-                values: [{
-                    value: ""
-                }],
-                isChecked: false
+                optional: true
             }
             ],
+            type_aggregation_predefined_annotations: [
+                {
+                    name: "purge",
+                    optional: true,
+                    parameters: [
+                        {
+                            name: "enable",
+                            defaultValue: "true",
+                            description: "Data purging can be enabled or disabled using this option.",
+                            optional: true,
+                            type: ["BOOL"]
+                        },
+                        {
+                            name: "interval",
+                            defaultValue: "10 sec",
+                            description: "The interval to purge data can be mentioned using this option.",
+                            optional: true,
+                            type: ["INT", "LONG", "TIME"]
+                        }
+                    ],
+                    annotations: [{
+                        name: "retentionPeriod",
+                        optional: true,
+                        parameters: [
+                            {
+                                name: "sec",
+                                defaultValue: "120 sec",
+                                description: "The amount of data to be kept in the database in seconds.",
+                                optional: true,
+                                type: ["INT", "LONG", "TIME"]
+                            },
+                            {
+                                name: "min",
+                                defaultValue: "24 hours",
+                                description: "The amount of data to be kept in the database in minutes.",
+                                optional: true,
+                                type: ["INT", "LONG", "TIME"]
+                            },
+                            {
+                                name: "hours",
+                                defaultValue: "30 days",
+                                description: "The amount of data to be kept in the database in hours.",
+                                optional: true,
+                                type: ["INT", "LONG", "TIME"]
+                            },
+                            {
+                                name: "days",
+                                defaultValue: "1 year",
+                                description: "The amount of data to be kept in the database in days.",
+                                optional: true,
+                                type: ["INT", "LONG", "TIME"]
+                            },
+                            {
+                                name: "months",
+                                defaultValue: "all",
+                                description: "The amount of data to be kept in the database in months.",
+                                optional: true,
+                                type: ["INT", "LONG", "TIME"]
+                            },
+                            {
+                                name: "years",
+                                defaultValue: "all",
+                                description: "The amount of data to be kept in the database in years.",
+                                optional: true,
+                                type: ["INT", "LONG", "TIME"]
+                            }
+                        ]
+                    }
+                    ]
+                },
+                {
+                    name: "partitionById",
+                    optional: true,
+                    parameters: [
+                        {
+                            name: "enable",
+                            defaultValue: "true",
+                            description: "The distributed aggregation can be enabled or disabled using this option.",
+                            optional: true,
+                            type: ["BOOL"]
+                        }
+                    ]
+                },
+                {
+                    name: "index",
+                    optional: true
+                }
+            ],
+            type_query_predefined_annotations: [
+                {
+                    name: "dist",
+                    optional: true,
+                    parameters: [
+                        {
+                            name: "execGroup",
+                            defaultValue: "group-1",
+                            description: "The name of the execution group. Elements with the same execution group are " +
+                                "executed in the same siddhi application. Elements with different execution group are executed " +
+                                "in separate siddhi Application per execution group",
+                            optional: true,
+                            type: ["STRING"]
+                        },
+                        {
+                            name: "parallel",
+                            defaultValue: "1",
+                            description: "The number of instances in which the execution element must be executed in parallel." +
+                                "If there is a mismatch in the parallel instances specified for an execution group, an exception occurs.",
+                            optional: true,
+                            type: ["INT"]
+
+                        }
+                    ]
+
+                }
+            ],
+            query_condition_syntax: ["==", ">=", ">", "<=", "<", "&&", "||", "AND", "OR"],
+            other_query_syntax: ["snapshot", "every", "within"],
+            incremental_aggregator: ["sum", "min", "max", "avg", "count", "distinctCount"],
+            join_types: ["join", "left_outer_join", "right_outer_join", "full_outer_join"],
+            stream_handler_types: ["filter", "function","window"],
+            stream_handler_types_without_window: ["filter","function"],
             trigger: [
             {
                 name: "start",
                 description: "An event is triggered when Siddhi is started.",
                 defaultValue: ""
-
             },
             {
                 name: "cron-expression",
                 description: "An event is triggered periodically based on the given cron expression",
                 defaultValue: "0 15 10 ? * MON-FRI"
-
             },
             {
                 name: "every",
                 description: "An event is triggered periodically at the given time interval",
                 defaultValue: "5 min"
             }
+            ],
+            rdbms_types: [
+                {
+                    name: "inline-config",
+                    parameters: [
+                        {
+                            name: "jdbc.url",
+                            optional: false,
+                            description: "The JDBC URL via which the RDBMS data store is accessed.",
+                            defaultValue: ""
+                        },
+                        {
+                            name: "username",
+                            optional: false,
+                            description: "The username to be used to access the RDBMS data store.",
+                            defaultValue: ""
+                        },
+                        {
+                            name: "password",
+                            optional: false,
+                            description: "The password to be used to access the RDBMS data store.",
+                            defaultValue: ""
+                        },
+                        {
+                            name: "jdbc.driver.name",
+                            optional: false,
+                            description: "The driver class name for connecting the RDBMS data store.",
+                            defaultValue: ""
+                        },
+                        {
+                            name: "pool.properties",
+                            optional: true,
+                            description: "Any pool parameters for the database connection must be specified as " +
+                                "key-value pairs.",
+                            defaultValue: "null"
+                        },
+                        {
+                            name: "table.name",
+                            optional: true,
+                            description: "The name with which the event table should be persisted in the store." +
+                                " If no name is specified via this parameter, the event table is persisted with " +
+                                "the same name as the Siddhi table.",
+                            defaultValue: "The table name defined in the Siddhi App query."
+                        },
+                        {
+                            name: "field.length",
+                            optional: true,
+                            description: "The number of characters that the values for fields of the 'STRING' type in" +
+                                " the table definition must contain. Each required field must be provided as a " +
+                                "comma-separated list of key-value pairs in the [field.name:length] format." +
+                                "If this is not specified, the default number of characters specific to the database type is considered.",
+                            defaultValue: "The table name defined in the Siddhi App query."
+                        }
+
+                    ]
+
+                },
+                {
+                    name: "datasource",
+                    parameters: [
+                        {
+                            name: "datasource",
+                            optional: false,
+                            description: "The name of the Carbon datasource that should be used for creating the " +
+                                "connection with the database. If this is found, neither the pool properties nor the " +
+                                "JNDI resource name described above are taken into account and the connection is " +
+                                "attempted via Carbon datasources instead. ",
+                            defaultValue: ""
+                        },
+                        {
+                            name: "pool.properties",
+                            optional: true,
+                            description: "Any pool parameters for the database connection must be specified as " +
+                                "key-value pairs.",
+                            defaultValue: "null"
+                        },
+                        {
+                            name: "table.name",
+                            optional: true,
+                            description: "The name with which the event table should be persisted in the store." +
+                                " If no name is specified via this parameter, the event table is persisted with " +
+                                "the same name as the Siddhi table.",
+                            defaultValue: "The table name defined in the Siddhi App query."
+                        },
+                        {
+                            name: "field.length",
+                            optional: true,
+                            description: "The number of characters that the values for fields of the 'STRING' type in" +
+                                " the table definition must contain. Each required field must be provided as a " +
+                                "comma-separated list of key-value pairs in the [field.name:length] format." +
+                                "If this is not specified, the default number of characters specific to the database type is considered.",
+                            defaultValue: "The table name defined in the Siddhi App query."
+                        }
+                    ]
+                },
+                {
+                    name: "jndi-resource",
+                    parameters: [
+                        {
+                            name: "jndi.resource",
+                            optional: false,
+                            description: "The name of the JNDI resource through which the connection is attempted. " +
+                                "If this is found, the pool properties described above are not taken into account and " +
+                                "the connection is attempted via JNDI lookup instead.",
+                            defaultValue: ""
+                        },
+                        {
+                            name: "pool.properties",
+                            optional: true,
+                            description: "Any pool parameters for the database connection must be specified as " +
+                                "key-value pairs.",
+                            defaultValue: "null"
+                        },
+                        {
+                            name: "table.name",
+                            optional: true,
+                            description: "The name with which the event table should be persisted in the store." +
+                                " If no name is specified via this parameter, the event table is persisted with " +
+                                "the same name as the Siddhi table.",
+                            defaultValue: "The table name defined in the Siddhi App query."
+                        },
+                        {
+                            name: "field.length",
+                            optional: true,
+                            description: "The number of characters that the values for fields of the 'STRING' type in" +
+                                " the table definition must contain. Each required field must be provided as a " +
+                                "comma-separated list of key-value pairs in the [field.name:length] format." +
+                                "If this is not specified, the default number of characters specific to the database type is considered.",
+                            defaultValue: "The table name defined in the Siddhi App query."
+                        }
+
+                    ]
+
+                }
             ],
             services:   {
                 workspace:  {
@@ -2204,6 +2989,8 @@
             output_controller: {
                 container: "#console-container",
                 activateBtn: '.output-console-activate-btn',
+                openConsoleBtn: '.open-console-btn',
+                closeConsoleBtn: '.close-console-btn',
                 cleanConsoleBtn: '.clear-console-btn',
                 headers: {
                     // relative selector within container for tab controller

@@ -41,7 +41,7 @@ define(['require', 'log', 'jquery', 'lodash', 'constants'],
          * @param {Object} triggerObject array of trigger criteria
          */
         var renderTriggerCriteria = function (triggerObject) {
-            var triggerCriteriaDiv = '<h4> Trigger Criteria </h4> <select id = "trigger-criteria-type">';
+            var triggerCriteriaDiv = '<label class="clearfix"> Trigger Criteria </label> <select id = "trigger-criteria-type">';
             _.forEach(triggerObject, function (triggerCriteria) {
                 triggerCriteriaDiv += '<option value = "' + triggerCriteria.name + '">' + triggerCriteria.name + '</option>';
             });
@@ -122,23 +122,24 @@ define(['require', 'log', 'jquery', 'lodash', 'constants'],
         TriggerForm.prototype.generatePropertiesForm = function (element, formConsole, formContainer) {
             var self = this;
             var id = $(element).parent().attr('id');
-            var clickedElement = self.configurationData.getSiddhiAppConfig().getTrigger(id);
+            var triggerObject = self.configurationData.getSiddhiAppConfig().getTrigger(id);
 
-            var propertyDiv = $('<div id="property-header"><h3>Trigger Configuration</h3></div>' +
-                '<div class ="trigger-form-container"> <div id="define-trigger-name"> <h4>Name: </h4>' +
-                '<input type="text" id="triggerName" class="clearfix"> <label class="error-message" ' +
-                'id = "triggerNameErrorMessage"> </label> </div>' + self.formUtils.buildFormButtons() + '</div>' +
-                '<div class = "trigger-form-container"> <div id= "define-trigger-criteria"> </div>' +
-                '<div id = "trigger-criteria-content" ></div> </div>');
+            var propertyDiv = $('<div class ="trigger-form-container"> <div id="define-trigger-name"> <label>Name </label>' +
+                '<input type="text" id="triggerName" class="clearfix name"> <label class="error-message" ' +
+                'id = "triggerNameErrorMessage"> </label> </div> <div id= "define-trigger-criteria"> </div>' +
+                '<div id = "trigger-criteria-content"></div> </div>' +
+                self.formUtils.buildFormButtons());
 
             formContainer.append(propertyDiv);
             self.formUtils.popUpSelectedElement(id);
             self.designViewContainer.addClass('disableContainer');
             self.toggleViewButton.addClass('disableContainer');
 
-            var name = clickedElement.getName();
-            var triggerObject = self.configurationData.application.config.trigger;
-            renderTriggerCriteria(triggerObject);
+            var name = triggerObject.getName();
+            var triggerCriteriaObject = self.configurationData.application.config.trigger;
+            renderTriggerCriteria(triggerCriteriaObject);
+
+            self.formUtils.addEventListenerToRemoveRequiredClass();
 
             //Event listener to show the criteria description
             $('#define-trigger-criteria').on('mouseover', '.fw-info', function () {
@@ -153,8 +154,8 @@ define(['require', 'log', 'jquery', 'lodash', 'constants'],
             if (name) {
                 //if the trigger object is already edited
                 $('#triggerName').val(name.trim());
-                var triggerCriteriaType = clickedElement.getCriteriaType().trim();
-                var triggerCriteria = clickedElement.getCriteria().trim();
+                var triggerCriteriaType = triggerObject.getCriteriaType().trim();
+                var triggerCriteria = triggerObject.getCriteria().trim();
                 if (triggerCriteriaType === Constants.AT) {
                     if (triggerCriteria.indexOf("'") >= 0 || triggerCriteria.indexOf('"') >= 0) {
                         //to remove the string quote from the start and cron expression
@@ -172,32 +173,29 @@ define(['require', 'log', 'jquery', 'lodash', 'constants'],
                 }).prop('selected', true);
 
                 $('#trigger-criteria-content input[type="text"]').val(triggerCriteria);
-                showTriggerCriteriaDescription(triggerObject, selectedCriteria)
+                showTriggerCriteriaDescription(triggerCriteriaObject, selectedCriteria)
             }
 
             //onchange of the triggerCriteria-type selection
             $('#trigger-criteria-type').change(function () {
                 renderTriggerCriteriaContent(this.value);
-                showTriggerCriteriaDescription(triggerObject, this.value)
+                showTriggerCriteriaDescription(triggerCriteriaObject, this.value)
                 if (triggerCriteria && this.value === selectedCriteria) {
                     if (this.value !== Constants.START) {
                         $('#trigger-criteria-content input[type="text"]').val(triggerCriteria);
                     }
                 } else {
                     if (this.value !== Constants.START) {
-                        var triggerCriteriaObject = getTriggerCriteria(triggerObject, this.value);
-                        $('#trigger-criteria-content input[type="text"]').val(triggerCriteriaObject.defaultValue);
+                        var triggerCriteriaType = getTriggerCriteria(triggerCriteriaObject, this.value);
+                        $('#trigger-criteria-content input[type="text"]').val(triggerCriteriaType.defaultValue);
                     }
                 }
             });
 
             // 'Submit' button action
-            var submitButtonElement = $(formContainer).find('#btn-submit')[0];
-            submitButtonElement.addEventListener('click', function () {
+            $(formContainer).on('click', '#btn-submit', function () {
 
-                //clear the error classes
-                $('.error-message').text("");
-                $('.required-input-field').removeClass('required-input-field');
+                self.formUtils.removeErrorClass();
                 var isErrorOccurred = false;
 
                 var triggerName = $('#triggerName').val().trim();
@@ -208,7 +206,7 @@ define(['require', 'log', 'jquery', 'lodash', 'constants'],
                     isErrorOccurred = true;
                     return;
                 }
-                var previouslySavedName = clickedElement.getName();
+                var previouslySavedName = triggerObject.getName();
                 if (!previouslySavedName) {
                     previouslySavedName = "";
                 }
@@ -216,7 +214,7 @@ define(['require', 'log', 'jquery', 'lodash', 'constants'],
                 if (previouslySavedName !== triggerName) {
                     //check if name is already used
                     var isTriggerNameUsed = self.formUtils.isDefinitionElementNameUsed(triggerName,
-                        clickedElement.getId());
+                        triggerObject.getId());
                     if (isTriggerNameUsed) {
                         self.formUtils.addErrorClass('#triggerName');
                         $('#triggerNameErrorMessage').text("Trigger name is already used.");
@@ -245,7 +243,7 @@ define(['require', 'log', 'jquery', 'lodash', 'constants'],
                 if (!isErrorOccurred) {
                     if (previouslySavedName !== triggerName) {
                         // update selected trigger model
-                        clickedElement.setName(triggerName);
+                        triggerObject.setName(triggerName);
                         self.formUtils.updateConnectionsAfterDefinitionElementNameChange(id);
 
                         var textNode = $(element).parent().find('.triggerNameNode');
@@ -263,18 +261,16 @@ define(['require', 'log', 'jquery', 'lodash', 'constants'],
                         triggerCriteria = Constants.EVERY + " " + triggerCriteria;
                         triggerCriteriaType = Constants.EVERY;
                     }
-                    clickedElement.setCriteria(triggerCriteria);
-                    clickedElement.setCriteriaType(triggerCriteriaType);
+                    triggerObject.setCriteria(triggerCriteria);
+                    triggerObject.setCriteriaType(triggerCriteriaType);
 
                     $('#' + id).removeClass('incomplete-element');
                     //Send trigger element to the backend and generate tooltip
-                    var triggerToolTip = self.formUtils.getTooltip(clickedElement, Constants.TRIGGER);
+                    var triggerToolTip = self.formUtils.getTooltip(triggerObject, Constants.TRIGGER);
                     $('#' + id).prop('title', triggerToolTip);
 
                     // set the isDesignViewContentChanged to true
                     self.configurationData.setIsDesignViewContentChanged(true);
-                    self.designViewContainer.removeClass('disableContainer');
-                    self.toggleViewButton.removeClass('disableContainer');
                     // close the form window
                     self.consoleListManager.removeFormConsole(formConsole);
                 }
@@ -283,8 +279,6 @@ define(['require', 'log', 'jquery', 'lodash', 'constants'],
             // 'Cancel' button action
             var cancelButtonElement = $(formContainer).find('#btn-cancel')[0];
             cancelButtonElement.addEventListener('click', function () {
-                self.designViewContainer.removeClass('disableContainer');
-                self.toggleViewButton.removeClass('disableContainer');
                 // close the form window
                 self.consoleListManager.removeFormConsole(formConsole);
             });

@@ -202,3 +202,7 @@ a.clear-console-btn:hover {
 .output-console-activate-btn.close:focus {
     opacity: 1;
 }
+
+.nano > .nano-pane > .nano-slider {
+    background: #8a8a8a
+}

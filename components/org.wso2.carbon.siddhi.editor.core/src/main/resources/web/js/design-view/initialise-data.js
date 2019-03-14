@@ -17,19 +17,19 @@
  */
 
 define(['require', 'log', 'lodash', 'jquery', 'configurationData', 'appData', 'partition', 'query', 'stream', 'table',
-        'window', 'trigger', 'aggregation', 'aggregateByTimePeriod', 'windowFilterProjectionQueryInput',
-        'queryWindowOrFunction', 'edge', 'querySelect', 'queryOrderByValue', 'queryOutput', 'queryOutputInsert',
-        'queryOutputDelete', 'queryOutputUpdate', 'queryOutputUpdateOrInsertInto', 'attribute', 'annotationObject',
-        'joinQueryInput', 'joinQuerySource', 'patternOrSequenceQueryInput', 'patternOrSequenceQueryCondition',
-        'sourceOrSinkAnnotation', 'mapAnnotation', 'functionDefinition', 'streamHandler', 'storeAnnotation',
-        'partitionWith', 'designViewUtils', 'payloadOrAttribute'],
+    'window', 'trigger', 'aggregation', 'aggregateByTimePeriod', 'windowFilterProjectionQueryInput',
+    'queryWindowOrFunction', 'edge', 'querySelect', 'queryOrderByValue', 'queryOutput', 'queryOutputInsert',
+    'queryOutputDelete', 'queryOutputUpdate', 'queryOutputUpdateOrInsertInto', 'attribute', 'annotationObject',
+    'joinQueryInput', 'joinQuerySource', 'patternOrSequenceQueryInput', 'patternOrSequenceQueryCondition',
+    'sourceOrSinkAnnotation', 'mapAnnotation', 'functionDefinition', 'streamHandler', 'storeAnnotation',
+    'partitionWith', 'designViewUtils', 'payloadOrAttribute'],
     function (require, log, _, $, ConfigurationData, AppData, Partition, Query, Stream, Table, Window, Trigger,
-              Aggregation, AggregateByTimePeriod, WindowFilterProjectionQueryInput, QueryWindowOrFunction, Edge,
-              QuerySelect, QueryOrderByValue, QueryOutput, QueryOutputInsert, QueryOutputDelete, QueryOutputUpdate,
-              QueryOutputUpdateOrInsertInto, Attribute, AnnotationObject, JoinQueryInput, JoinQuerySource,
-              PatternOrSequenceQueryInput,
-              PatternOrSequenceQueryCondition, SourceOrSinkAnnotation, MapAnnotation, FunctionDefinition, StreamHandler,
-              StoreAnnotation, PartitionWith, DesignViewUtils, PayloadOrAttribute) {
+        Aggregation, AggregateByTimePeriod, WindowFilterProjectionQueryInput, QueryWindowOrFunction, Edge,
+        QuerySelect, QueryOrderByValue, QueryOutput, QueryOutputInsert, QueryOutputDelete, QueryOutputUpdate,
+        QueryOutputUpdateOrInsertInto, Attribute, AnnotationObject, JoinQueryInput, JoinQuerySource,
+        PatternOrSequenceQueryInput,
+        PatternOrSequenceQueryCondition, SourceOrSinkAnnotation, MapAnnotation, FunctionDefinition, StreamHandler,
+        StoreAnnotation, PartitionWith, DesignViewUtils, PayloadOrAttribute) {
 
         /**
          * @class InitialiseDataStructure
@@ -68,6 +68,7 @@ define(['require', 'log', 'lodash', 'jquery', 'configurationData', 'appData', 'p
 
             // add app annotations
             self.appData.setAppAnnotationList(configurationJSON.siddhiAppConfig.appAnnotationList);
+            self.appData.setAppAnnotationListObjects(configurationJSON.siddhiAppConfig.appAnnotationListObjects);
             // add definitions to the data storing structure
             addSourceDefinitions(self.appData, configurationJSON.siddhiAppConfig.sourceList, self.newIdBeginningPhrase);
             addSinkDefinitions(self.appData, configurationJSON.siddhiAppConfig.sinkList, self.newIdBeginningPhrase);
@@ -238,6 +239,7 @@ define(['require', 'log', 'lodash', 'jquery', 'configurationData', 'appData', 'p
                     var storeAnnotation = new StoreAnnotation(aggregation.store);
                     aggregationObject.setStore(storeAnnotation);
                 }
+                addAnnotationObjectForElement(aggregation, aggregationObject);
                 addAnnotationsForElement(aggregation, aggregationObject);
                 // select section in the aggregation definition is compulsory. If that is not found there is a error in
                 // backend.
@@ -271,6 +273,7 @@ define(['require', 'log', 'lodash', 'jquery', 'configurationData', 'appData', 'p
         function addWindowFilterProjectionQueries(mainObject, windowFilterProjectionQueryList, newIdBeginningPhrase) {
             _.forEach(windowFilterProjectionQueryList, function (windowFilterProjectionQuery) {
                 var queryObject = new Query(windowFilterProjectionQuery);
+                addAnnotationObjectForElement(windowFilterProjectionQuery, queryObject);
                 addAnnotationsForElement(windowFilterProjectionQuery, queryObject);
                 queryObject.addQueryName(windowFilterProjectionQuery.queryName);
 
@@ -300,6 +303,7 @@ define(['require', 'log', 'lodash', 'jquery', 'configurationData', 'appData', 'p
             _.forEach(patternQueryList, function (patternQuery) {
                 var patternQueryObject = new Query(patternQuery);
                 addAnnotationsForElement(patternQuery, patternQueryObject);
+                addAnnotationObjectForElement(patternQuery, patternQueryObject);
 
                 // queryInput section in the query is compulsory. If that is not found there is a error in backend.
                 if (!patternQuery.queryInput) {
@@ -356,6 +360,7 @@ define(['require', 'log', 'lodash', 'jquery', 'configurationData', 'appData', 'p
             _.forEach(joinQueryList, function (joinQuery) {
                 var queryObject = new Query(joinQuery);
                 addAnnotationsForElement(joinQuery, queryObject);
+                addAnnotationObjectForElement(joinQuery, queryObject);
 
                 var errMsg;
                 // queryInput section in the query is compulsory. If that is not found there is a error in backend.

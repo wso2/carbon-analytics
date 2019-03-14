@@ -22,6 +22,7 @@ import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhiel
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.query.input.QueryInputConfig;
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.attributesselection.AttributesSelectionConfig;
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.query.output.QueryOutputConfig;
+import org.wso2.siddhi.query.api.annotation.Annotation;
 
 import java.util.List;
 import java.util.Map;
@@ -36,10 +37,12 @@ public class QueryConfig extends SiddhiElementConfig {
     private List<String> groupBy;
     private List<QueryOrderByConfig> orderBy;
     private long limit;
+    private long offset;
     private String having;
     private String outputRateLimit;
     private QueryOutputConfig queryOutput;
     private List<String> annotationList;
+    private List<Annotation> annotationListObjects;
     private String partitionId;
     private Map<String, String> connectorsAndStreams;
 
@@ -79,6 +82,14 @@ public class QueryConfig extends SiddhiElementConfig {
         this.orderBy = orderBy;
     }
 
+    public long getOffset() {
+        return offset;
+    }
+
+    public void setOffset(long offset) {
+        this.offset = offset;
+    }
+
     public long getLimit() {
         return limit;
     }
@@ -115,8 +126,16 @@ public class QueryConfig extends SiddhiElementConfig {
         return annotationList;
     }
 
+    public List<Annotation> getAnnotationListObjects() {
+        return annotationListObjects;
+    }
+
     public void setAnnotationList(List<String> annotationList) {
         this.annotationList = annotationList;
+    }
+
+    public void setAnnotationListObjects(List<Annotation> annotationListObjects) {
+        this.annotationListObjects = annotationListObjects;
     }
 
     public String getPartitionId() {

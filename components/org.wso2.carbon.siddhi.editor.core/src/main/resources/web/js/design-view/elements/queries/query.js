@@ -55,16 +55,18 @@ define(['require', 'elementUtils'],
                 this.select = options.select;
                 this.groupBy = options.groupBy;
                 this.limit = options.limit;
+                this.offset = options.offset;
                 this.having = options.having;
                 this.outputRateLimit = options.outputRateLimit;
                 this.queryOutput = options.queryOutput;
             }
             this.orderBy = [];
             this.annotationList = [];
+            this.annotationListObjects = [];
         };
 
         Query.prototype.addQueryName = function (queryName) {
-            this.queryName =  queryName ;
+            this.queryName = queryName;
         };
 
         Query.prototype.getQueryName = function () {
@@ -75,12 +77,20 @@ define(['require', 'elementUtils'],
             this.annotationList.push(annotation);
         };
 
+        Query.prototype.addAnnotationObject = function (annotationObject) {
+            this.annotationListObjects.push(annotationObject);
+        };
+
         Query.prototype.addOrderByValue = function (orderByValue) {
             this.orderBy.push(orderByValue);
         };
 
         Query.prototype.clearAnnotationList = function () {
             ElementUtils.prototype.removeAllElements(this.annotationList);
+        };
+
+        Query.prototype.clearAnnotationListObjects = function () {
+            ElementUtils.prototype.removeAllElements(this.annotationListObjects);
         };
 
         Query.prototype.clearOrderByValueList = function () {
@@ -111,6 +121,10 @@ define(['require', 'elementUtils'],
             return this.limit;
         };
 
+        Query.prototype.getOffset = function () {
+          return this.offset;
+        };
+
         Query.prototype.getHaving = function () {
             return this.having;
         };
@@ -125,6 +139,10 @@ define(['require', 'elementUtils'],
 
         Query.prototype.getAnnotationList = function () {
             return this.annotationList;
+        };
+
+        Query.prototype.getAnnotationListObjects = function () {
+            return this.annotationListObjects;
         };
 
         Query.prototype.setId = function (id) {
@@ -153,6 +171,10 @@ define(['require', 'elementUtils'],
 
         Query.prototype.setHaving = function (having) {
             this.having = having;
+        };
+
+        Query.prototype.setOffset = function (offset) {
+            this.offset = offset;
         };
 
         Query.prototype.setOutputRateLimit = function (outputRateLimit) {

@@ -14,8 +14,8 @@
  * limitations under the License.
  */
 
-define(["ace/ace", "jquery", "./constants", "./utils", "ace/snippets", "ace/range", "ace/lib/lang",'lodash'],
-    function (ace, $, constants, utils, aceSnippetManager, aceRange, aceLang,_) {
+define(["ace/ace", "jquery", "./constants", "./utils", "ace/snippets", "ace/range", "ace/lib/lang", 'lodash'],
+    function (ace, $, constants, utils, aceSnippetManager, aceRange, aceLang, _) {
 
         "use strict";   // JS strict mode
 
@@ -48,15 +48,15 @@ define(["ace/ace", "jquery", "./constants", "./utils", "ace/snippets", "ace/rang
                 }),
             outputEventTypes: ["current", "all", "expired"]
                 .map(function (eventType) {
-                    return {value: eventType};
+                    return { value: eventType };
                 }),
             timeValueTypes: ["years", "months", "weeks", "days", "hours", "minutes", "seconds", "milliseconds"]
                 .map(function (timeValueType) {
-                    return {value: timeValueType};
+                    return { value: timeValueType };
                 }),
             aggregationTimeValueTypes: ["years", "months", "weeks", "days", "hours", "minutes", "seconds"]
                 .map(function (timeValueType) {
-                    return {value: timeValueType};
+                    return { value: timeValueType };
                 })
         };
 
@@ -69,7 +69,7 @@ define(["ace/ace", "jquery", "./constants", "./utils", "ace/snippets", "ace/rang
         regex.namespace = "(" + regex.identifier + ")\\s*:\\s*";
         regex.hash = "#\\s*";
         regex.comma = ",\\s*";
-        regex.tripleDot="\\.\\.\\.";
+        regex.tripleDot = "\\.\\.\\.";
         regex.functionOperation = regex.identifier + "\\s*\\((?:(?:.(?!\\)))*.)?\\)";
         regex.dataTypes = suggestions.dataTypes.map(function (dataType) {
             return dataType.value;
@@ -150,11 +150,11 @@ define(["ace/ace", "jquery", "./constants", "./utils", "ace/snippets", "ace/rang
             "\tdefine trigger ${1:trigger_name} at ${2:time};\n" +
             "snippet define-Aggregation\n" +
             "\tdefine aggregation ${1:aggregator_name}\n" +
-            "\tfrom ${2:input_stream}\n"+
+            "\tfrom ${2:input_stream}\n" +
             "\tselect ${3:attribute1}, ${4:aggregate_function}(${5:attribute2}) as ${6:attribute3}," +
-            "${7:aggregate_function}(${8:attribute4}) as ${9:attribute5}\n"+
-            "\t\tgroup by ${10:attribute6}\n"+
-            "\t\taggregate by ${11:timestamp_attribute} every ${12:time_periods};\n"+
+            "${7:aggregate_function}(${8:attribute4}) as ${9:attribute5}\n" +
+            "\t\tgroup by ${10:attribute6}\n" +
+            "\t\taggregate by ${11:timestamp_attribute} every ${12:time_periods};\n" +
             "snippet define-Function\n" +
             "\tdefine function ${1:function_name}[${2:lang_name}] return ${3:return_type} { \n" +
             "\t\t${4:function_body} \n" +
@@ -346,39 +346,39 @@ define(["ace/ace", "jquery", "./constants", "./utils", "ace/snippets", "ace/rang
             },
             {
                 regex: "(define\\s+aggregation)\\s+([a-zA-Z_][a-zA-Z_0-9]*)\\s+$",
-                handler:["from"]
+                handler: ["from"]
             },
             {
-                regex:"(define\\s+aggregation)\\s+([a-zA-Z_][a-zA-Z_0-9]*)" +
+                regex: "(define\\s+aggregation)\\s+([a-zA-Z_][a-zA-Z_0-9]*)" +
                     "(?:\\s+(from)\\s+((?:.(?!select|group\\s+by|aggregate\\s+by|aggregate|every))*))" +
                     "(?:\\s+(select)\\s+((?:.(?!group\\s+by|aggregate\\s+by|aggregate|every))*))" +
                     "(?:\\s+(group\\s+by)\\s+((?:.(?!aggregate\\s+by|aggregate|every))*))?" +
                     "(?:\\s+(aggregate)\\s+)$",
-                handler:["by","every"]
+                handler: ["by", "every"]
             },
             {
-                regex:"(define\\s+aggregation)\\s+([a-zA-Z_][a-zA-Z_0-9]*)" +
+                regex: "(define\\s+aggregation)\\s+([a-zA-Z_][a-zA-Z_0-9]*)" +
                     "(?:\\s+(from)\\s+((?:.(?!select|group\\s+by|aggregate\\s+by|aggregate|every))*))" +
                     "(?:\\s+(select)\\s+((?:.(?!group\\s+by|aggregate\\s+by|aggregate|every))*))" +
                     "(?:\\s+(group\\s+by)\\s+((?:.(?!aggregate\\s+by|aggregate|every))*))?" +
                     "(?:\\s+(aggregate)\\s+)" +
                     "(?:(by)((?:.(?!every))*)\\s+)?" +
                     "(?:(every)\\s+)$",
-                handler:suggestions.aggregationTimeValueTypes.map(function (type) {
+                handler: suggestions.aggregationTimeValueTypes.map(function (type) {
                     return Object.assign({}, type, {
                         value: type.value + " "
                     });
                 })
             },
             {
-                regex:"(define\\s+aggregation)\\s+([a-zA-Z_][a-zA-Z_0-9]*)" +
+                regex: "(define\\s+aggregation)\\s+([a-zA-Z_][a-zA-Z_0-9]*)" +
                     "(?:\\s+(from)\\s+((?:.(?!select|group\\s+by|aggregate\\s+by|aggregate|every))*))?" +
                     "(?:\\s+(select)\\s+((?:.(?!group\\s+by|aggregate\\s+by|aggregate|every))*))?" +
                     "(?:\\s+(group\\s+by)\\s+((?:.(?!aggregate\\s+by|aggregate|every))*))?" +
                     "(?:\\s+(aggregate)\\s+)?" +
                     "(?:(by)((?:.(?!every))*)\\s+)?" +
                     "(?:(every)\\s+((?:.(?!;))*.?))?$",
-                handler:"$aggregationDefinition"
+                handler: "$aggregationDefinition"
             },
             /*
              * Define statement rules ends here
@@ -798,7 +798,7 @@ define(["ace/ace", "jquery", "./constants", "./utils", "ace/snippets", "ace/rang
                     // the position is inside the partition by using that last rule in mainRuleBase. If more rules are
                     // added after partition rules the (mainRuleBase.length -1) should be replaced with the correct
                     // partition rule number
-                    var partitionRuleRegex = new RegExp(mainRuleBase[mainRuleBase.length -1].regex, "i");
+                    var partitionRuleRegex = new RegExp(mainRuleBase[mainRuleBase.length - 1].regex, "i");
                     if (!(partitionRuleRegex.test(editorText))) {
                         self.$startOfStatement();
                         aceModules.snippetManager.register(
@@ -821,8 +821,8 @@ define(["ace/ace", "jquery", "./constants", "./utils", "ace/snippets", "ace/rang
                     );
                 }
 
-                var dynamicCompletionTypes = ["store","source","sink"];
-                generateDynamicCompletionsForExtensionTypes(dynamicCompletionTypes,mainRuleBase);
+                var dynamicCompletionTypes = ["store", "source", "sink"];
+                generateDynamicCompletionsForExtensionTypes(dynamicCompletionTypes, mainRuleBase);
 
                 // Finding the relevant rule from the main rule base
                 for (i = 0; i < mainRuleBase.length; i++) {
@@ -837,7 +837,7 @@ define(["ace/ace", "jquery", "./constants", "./utils", "ace/snippets", "ace/rang
                         if (mainRuleBase[i].handler.__proto__.constructor === Array) {
                             addCompletions(mainRuleBase[i].handler.map(function (completion) {
                                 if (typeof completion == "string") {
-                                    completion = {value: completion + " "};
+                                    completion = { value: completion + " " };
                                 }
                                 return completion;
                             }));
@@ -867,7 +867,7 @@ define(["ace/ace", "jquery", "./constants", "./utils", "ace/snippets", "ace/rang
              */
             self.$startOfStatement = function () {
                 addCompletions(["define", "from", "partition"].map(function (completion) {
-                    return {value: completion + " "};
+                    return { value: completion + " " };
                 }));
             };
 
@@ -877,12 +877,12 @@ define(["ace/ace", "jquery", "./constants", "./utils", "ace/snippets", "ace/rang
             self.$defineStream = function () {
                 addCompletions(Object.keys(self.streamsList).map(function (stream) {
                     var attributesDefinition = "";
-                    for ( var attribute in self.streamsList[stream].attributes) {
+                    for (var attribute in self.streamsList[stream].attributes) {
                         attributesDefinition += attribute + " ";
                         attributesDefinition += self.streamsList[stream].attributes[attribute].toLowerCase() + ", ";
                     }
 
-                    attributesDefinition = "(" + attributesDefinition.slice(0,attributesDefinition.length - 2) + ");";
+                    attributesDefinition = "(" + attributesDefinition.slice(0, attributesDefinition.length - 2) + ");";
                     return {
                         value: stream + attributesDefinition,
                         type: constants.typeToDisplayNameMap[constants.STREAMS],
@@ -1005,11 +1005,11 @@ define(["ace/ace", "jquery", "./constants", "./utils", "ace/snippets", "ace/rang
                     addSnippets(getInBuiltWindowProcessors());
                     addSnippets(getExtensionNamesSpaces([constants.WINDOW_PROCESSORS])
                         .map(function (windowProcessor) {
-                                return Object.assign({}, windowProcessor, {
-                                    caption: windowProcessor.value,
-                                    value: windowProcessor.value + ":"
-                                });
-                            }
+                            return Object.assign({}, windowProcessor, {
+                                caption: windowProcessor.value,
+                                value: windowProcessor.value + ":"
+                            });
+                        }
                         ));
                 } else if (windowExtensionSuggestionsRegex.test(aggregationInput)) {
                     // Add extension namespace names after hash + window + dot + namespace + colon
@@ -1023,12 +1023,12 @@ define(["ace/ace", "jquery", "./constants", "./utils", "ace/snippets", "ace/rang
                     }, [constants.STREAMS, constants.WINDOWS]));
                 } else if (afterStreamSuggestionsRegex.test(aggregationInput)) {
                     // Add suggestions after typing a source name
-                    var completions = [{value: "#"}];
+                    var completions = [{ value: "#" }];
                     if (/\s+[^\[#]*$/i.test(aggregationInput)) {
                         completions = completions.concat(
                             ["select"]
                                 .map(function (completion) {
-                                    return {value: completion + " "};
+                                    return { value: completion + " " };
                                 })
                         );
                     }
@@ -1060,7 +1060,7 @@ define(["ace/ace", "jquery", "./constants", "./utils", "ace/snippets", "ace/rang
                         regex.hash + "[^\\(\\.:]*$", "i").test(aggregationInput)) {
                         // Add window keyword suggestion
                         // Only one window can be applied for a stream
-                        addCompletions({caption: "window", value: "window.", priority: 2});
+                        addCompletions({ caption: "window", value: "window.", priority: 2 });
                     }
                 }
             }
@@ -1093,8 +1093,8 @@ define(["ace/ace", "jquery", "./constants", "./utils", "ace/snippets", "ace/rang
                     // Add keyword suggestions after a list attributes without a comma at the end
                     addCompletions(["as", "group by", "aggregate"]
                         .map(function (completion) {
-                                return {value: completion + " "};
-                            }
+                            return { value: completion + " " };
+                        }
                         ));
                 } else if (attributeAndInBuiltFunctionSuggestionsRegex.test(aggregationSelectionClause)) {
                     // Add attributes list suggestions : attributes, eval scripts, inbuilt and extension functions
@@ -1155,8 +1155,8 @@ define(["ace/ace", "jquery", "./constants", "./utils", "ace/snippets", "ace/rang
                     // Add keyword suggestions after the group by attribute list without a comma at the end
                     addCompletions(["aggregate"]
                         .map(function (completion) {
-                                return {value: completion + " ", priority: 2};
-                            }
+                            return { value: completion + " ", priority: 2 };
+                        }
                         ));
                 } else if (generalSuggestionsRegex.test(groupByClause)) {
                     // Add attributes of the sources for the group by clause
@@ -1189,8 +1189,8 @@ define(["ace/ace", "jquery", "./constants", "./utils", "ace/snippets", "ace/rang
                     // Add keyword suggestions after the by attribute without a comma at the end
                     addCompletions(["every"]
                         .map(function (completion) {
-                                return {value: completion + " ", priority: 2};
-                            }
+                            return { value: completion + " ", priority: 2 };
+                        }
                         ));
                 } else if (generalSuggestionsRegex.test(byClause)) {
                     // Add attributes of the sources for the group by clause
@@ -1270,7 +1270,7 @@ define(["ace/ace", "jquery", "./constants", "./utils", "ace/snippets", "ace/rang
                     case "update or insert into":
                     case "delete":
                     case "update":
-                        handleQueryUpdateOrInsertIntoDeleteUpdateSuggestions(regexResults,fullEditorText);
+                        handleQueryUpdateOrInsertIntoDeleteUpdateSuggestions(regexResults, fullEditorText);
                         break;
                     default:
                 }
@@ -1344,13 +1344,13 @@ define(["ace/ace", "jquery", "./constants", "./utils", "ace/snippets", "ace/rang
                             // Adding inner stream completions relevant to the correct partition
                             addCompletions(Object.keys(self.partitionsList[partitionNumber])
                                 .map(function (innerStream) {
-                                        return {
-                                            value: (isInner ? innerStream.substring(1) : innerStream),
-                                            type: constants.typeToDisplayNameMap[constants.INNER_STREAMS],
-                                            description: self.partitionsList[partitionNumber][innerStream].description,
-                                            priority: 6
-                                        }
+                                    return {
+                                        value: (isInner ? innerStream.substring(1) : innerStream),
+                                        type: constants.typeToDisplayNameMap[constants.INNER_STREAMS],
+                                        description: self.partitionsList[partitionNumber][innerStream].description,
+                                        priority: 6
                                     }
+                                }
                                 ));
                         }
                     }
@@ -1386,7 +1386,7 @@ define(["ace/ace", "jquery", "./constants", "./utils", "ace/snippets", "ace/rang
                             priority: 3
                         }
                     }));
-                    addCompletions({value: "every ", priority: 2});     // every keyword for patterns
+                    addCompletions({ value: "every ", priority: 2 });     // every keyword for patterns
                 } else if (streamProcessorExtensionSuggestionsRegex.test(queryInput)) {
                     // stream processor extension suggestions after a namespace and colon
                     var namespace = streamProcessorExtensionSuggestionsRegex.exec(queryInput)[5].trim();
@@ -1396,11 +1396,11 @@ define(["ace/ace", "jquery", "./constants", "./utils", "ace/snippets", "ace/rang
                     addSnippets(getInBuiltWindowProcessors());
                     addSnippets(getExtensionNamesSpaces([constants.WINDOW_PROCESSORS])
                         .map(function (windowProcessor) {
-                                return Object.assign({}, windowProcessor, {
-                                    caption: windowProcessor.value,
-                                    value: windowProcessor.value + ":"
-                                });
-                            }
+                            return Object.assign({}, windowProcessor, {
+                                caption: windowProcessor.value,
+                                value: windowProcessor.value + ":"
+                            });
+                        }
                         ));
                 } else if (windowExtensionSuggestionsRegex.test(queryInput)) {
                     // Add extension namespace names after hash + window + dot + namespace + colon
@@ -1424,19 +1424,19 @@ define(["ace/ace", "jquery", "./constants", "./utils", "ace/snippets", "ace/rang
                     addAttributesOfSourcesAsCompletionsFromQueryIn(
                         regexResults, fullEditorText, 4, 3,
                         [constants.STREAMS, constants.EVENT_TABLES, constants.WINDOWS, constants.TRIGGERS,
-                            constants.AGGREGATIONS]
+                        constants.AGGREGATIONS]
                     );
                     addCompletions(suggestions.logicalOperatorList.map(function (operator) {
                         return Object.assign({}, operator, {
                             value: operator.value + " ", priority: 2
                         });
                     }));
-                    addCompletions({value: "within ", priority: 3});
+                    addCompletions({ value: "within ", priority: 3 });
                 } else if (patternQueryFilterSuggestionsRegex.test(queryInput)) {
                     // Add suggestions inside filters in pattern queries
                     var patternMatch = patternQueryFilterSuggestionsRegex.exec(queryInput);
                     addCompletions(getAttributesFromSourcesWithPrefixedDuplicates(
-                        regexResults, fullEditorText, {name: patternMatch[2]},
+                        regexResults, fullEditorText, { name: patternMatch[2] },
                         [constants.STREAMS, constants.WINDOWS]
                     ));
                     addAttributesOfStandardStatefulSourcesAsCompletionsFromQueryIn(
@@ -1446,7 +1446,7 @@ define(["ace/ace", "jquery", "./constants", "./utils", "ace/snippets", "ace/rang
                     // Add suggestions inside filters in queries without patterns
                     addCompletions(getAttributesFromSourcesWithPrefixedDuplicates(
                         regexResults, fullEditorText,
-                        {name: nonPatternQueryFilterSuggestionsRegex.exec(queryInput)[1].trim()},
+                        { name: nonPatternQueryFilterSuggestionsRegex.exec(queryInput)[1].trim() },
                         [constants.STREAMS, constants.WINDOWS]
                     ).map(function (suggestion) {
                         return Object.assign({}, suggestion, {
@@ -1466,16 +1466,15 @@ define(["ace/ace", "jquery", "./constants", "./utils", "ace/snippets", "ace/rang
                         });
                     }));
                     addCompletions(["select", "output", "insert", "delete", "update", "update or insert into"].map
-                    (function (completion)
-                    {
-                        return {value: completion + " ", priority: 2};
-                    }));
+                        (function (completion) {
+                            return { value: completion + " ", priority: 2 };
+                        }));
                 } else if (everyKeywordSuggestionsRegex.test(queryInput)) {
                     // Add every keyword suggestion after "->" in patterns
-                    addCompletions({value: "every ", priority: 2});
+                    addCompletions({ value: "every ", priority: 2 });
                 } else if (afterStreamSuggestionsRegex.test(queryInput)) {
                     // Add suggestions after typing a source name
-                    var completions = [{value: "#"}];
+                    var completions = [{ value: "#" }];
                     if (/\s+[^\[#]*$/i.test(queryInput)) {
                         completions = completions.concat(
                             [
@@ -1483,7 +1482,7 @@ define(["ace/ace", "jquery", "./constants", "./utils", "ace/snippets", "ace/rang
                                 "unidirectional", "within", "select", "output", "insert", "delete", "update",
                                 "update or insert into"
                             ].map(function (completion) {
-                                return {value: completion + " "};
+                                return { value: completion + " " };
                             })
                         );
                     }
@@ -1515,7 +1514,7 @@ define(["ace/ace", "jquery", "./constants", "./utils", "ace/snippets", "ace/rang
                         regex.hash + "[^\\(\\.:]*$", "i").test(queryInput)) {
                         // Add window keyword suggestion
                         // Only one window can be applied for a stream
-                        addCompletions({caption: "window", value: "window.", priority: 2});
+                        addCompletions({ caption: "window", value: "window.", priority: 2 });
                     }
                 }
             }
@@ -1549,8 +1548,8 @@ define(["ace/ace", "jquery", "./constants", "./utils", "ace/snippets", "ace/rang
                     addCompletions(["as", "group by", "having", "order by", "limit", "output", "insert", "delete",
                         "update", "update or insert into"]
                         .map(function (completion) {
-                                return {value: completion + " "};
-                            }
+                            return { value: completion + " " };
+                        }
                         ));
                 } else if (attributeAndInBuiltFunctionSuggestionsRegex.test(querySelectionClause)) {
                     // Add attributes list suggestions : attributes, eval scripts, inbuilt and extension functions
@@ -1615,8 +1614,8 @@ define(["ace/ace", "jquery", "./constants", "./utils", "ace/snippets", "ace/rang
                     addCompletions(["having", "order by", "limit", "output", "insert", "delete", "update",
                         "update or insert into"]
                         .map(function (completion) {
-                                return {value: completion + " ", priority: 2};
-                            }
+                            return { value: completion + " ", priority: 2 };
+                        }
                         ));
                 } else if (generalSuggestionsRegex.test(groupByClause)) {
                     // Add attributes of the sources for the group by clause
@@ -1651,8 +1650,8 @@ define(["ace/ace", "jquery", "./constants", "./utils", "ace/snippets", "ace/rang
                     addCompletions(["order by", "limit", "output", "insert", "delete", "update",
                         "update or insert into"]
                         .map(function (completion) {
-                                return {value: completion + " ", priority: 2};
-                            }
+                            return { value: completion + " ", priority: 2 };
+                        }
                         ));
                 }
                 addAttributesOfSourcesAsCompletionsFromQueryIn(
@@ -1693,8 +1692,8 @@ define(["ace/ace", "jquery", "./constants", "./utils", "ace/snippets", "ace/rang
                     // Add keyword suggestions after the order by attribute list without a comma at the end
                     addCompletions(["limit", "output", "insert", "delete", "update", "update or insert into"]
                         .map(function (completion) {
-                                return {value: completion + " ", priority: 2};
-                            }
+                            return { value: completion + " ", priority: 2 };
+                        }
                         ));
                 } else if (generalSuggestionsRegex.test(orderByClause)) {
                     // Add attributes of the sources for the order by clause
@@ -1728,8 +1727,8 @@ define(["ace/ace", "jquery", "./constants", "./utils", "ace/snippets", "ace/rang
                 if (afterLimitClauseRegex.test(limitClause)) {
                     addCompletions(["output", "insert", "delete", "update", "update or insert into"]
                         .map(function (completion) {
-                                return {value: completion + " ", priority: 2};
-                            }
+                            return { value: completion + " ", priority: 2 };
+                        }
                         ));
                 }
                 // TODO: uncomment these lines when the backend supports constant int and long attribute values(of definitions) for limit
@@ -1779,16 +1778,16 @@ define(["ace/ace", "jquery", "./constants", "./utils", "ace/snippets", "ace/rang
                     // Output rate type suggestions
                     addCompletions(["snapshot every", "all every", "last every", "first every", "every"]
                         .map(function (completion) {
-                            return {value: completion + " "};
+                            return { value: completion + " " };
                         })
                     );
                 } else if (everyKeywordSuggestionsRegex.test(outputRateClause)) {
                     // Add every keyword suggestion after snapshot, all, last, first keywords
-                    addCompletions({value: "every "});
+                    addCompletions({ value: "every " });
                 } else if (afterOutputRateClauseSuggestionsRegex.test(outputRateClause)) {
                     // Add keywords after the output rate clause
                     addCompletions(["insert", "delete", "update", "update or insert into"].map(function (completion) {
-                        return {value: completion + " "};
+                        return { value: completion + " " };
                     }));
                 } else {
                     if (timeValueSuggestionsRegex.test(outputRateClause)) {
@@ -1797,7 +1796,7 @@ define(["ace/ace", "jquery", "./constants", "./utils", "ace/snippets", "ace/rang
                     }
                     if (eventKeywordSuggestionRegex.test(outputRateClause)) {
                         // Add events keyword after the event count
-                        addCompletions({value: "events"});
+                        addCompletions({ value: "events" });
                     }
                 }
             }
@@ -1832,11 +1831,11 @@ define(["ace/ace", "jquery", "./constants", "./utils", "ace/snippets", "ace/rang
                         });
                     }));
                     addCompletions(["into"].map(function (completion) {
-                        return {value: completion + " "};
+                        return { value: completion + " " };
                     }));
                 } else if (afterOutputEventTypesSuggestionRegex.test(streamOutputClause)) {
                     // Add into keyword after output event types
-                    addCompletions({value: "into "});
+                    addCompletions({ value: "into " });
                 } else if (afterIntoKeywordSuggestionsRegex.test(streamOutputClause)) {
                     // Add source suggestions to insert into
                     var isInner = streamFinderRegex.exec(regexResults.input)[1] == "#";
@@ -1859,15 +1858,15 @@ define(["ace/ace", "jquery", "./constants", "./utils", "ace/snippets", "ace/rang
                             // Adding inner stream completions relevant to the correct partition
                             addCompletions(Object.keys(self.partitionsList[partitionNumber])
                                 .map(function (innerStream) {
-                                        innerStream = (isInner ? innerStream.substring(1) : innerStream);
-                                        return {
-                                            caption: innerStream,
-                                            value: innerStream + ";",
-                                            type: constants.typeToDisplayNameMap[constants.INNER_STREAMS],
-                                            description: self.partitionsList[partitionNumber][innerStream].description,
-                                            priority: 6
-                                        };
-                                    }
+                                    innerStream = (isInner ? innerStream.substring(1) : innerStream);
+                                    return {
+                                        caption: innerStream,
+                                        value: innerStream + ";",
+                                        type: constants.typeToDisplayNameMap[constants.INNER_STREAMS],
+                                        description: self.partitionsList[partitionNumber][innerStream].description,
+                                        priority: 6
+                                    };
+                                }
                                 ));
                         }
                     }
@@ -1950,7 +1949,7 @@ define(["ace/ace", "jquery", "./constants", "./utils", "ace/snippets", "ace/rang
                     }));
                 } else if (eventsKeywordSuggestionsRegex.test(tableOutputClause)) {
                     // Add the events keyword suggestion after the event type
-                    addCompletions({value: "events "});
+                    addCompletions({ value: "events " });
                 } else if (afterOnKeywordSuggestionsRegex.test(tableOutputClause)
                     || afterSetKeywordSuggestionsRegex.test(tableOutputClause)) {
                     // Add suggestions after the on keyword for specifying the rows to update in tables
@@ -1980,11 +1979,11 @@ define(["ace/ace", "jquery", "./constants", "./utils", "ace/snippets", "ace/rang
                 }
                 if (setKeywordSuggestionsRegex.test(tableOutputClause)) {
                     // Add on and set keyword suggestions
-                    addCompletions({value: "set "});
+                    addCompletions({ value: "set " });
                 }
                 if (onKeywordSuggestionsRegex.test(tableOutputClause)) {
                     // Add on keyword suggestion
-                    addCompletions({value: "on "});
+                    addCompletions({ value: "on " });
                 }
             }
 
@@ -1996,7 +1995,7 @@ define(["ace/ace", "jquery", "./constants", "./utils", "ace/snippets", "ace/rang
              */
             function handleEndOfPartitionCheck(regexResults) {
                 if (isInsidePartition(regexResults.input)) {
-                    addCompletions({caption: "end", value: "\nend;"});
+                    addCompletions({ caption: "end", value: "\nend;" });
                 }
             }
 
@@ -2047,12 +2046,12 @@ define(["ace/ace", "jquery", "./constants", "./utils", "ace/snippets", "ace/rang
                     var isCursorAfterSemicolon = false;
                     if (/;\s*$/.test(partitionBody)) {
                         // Add end of partition keyword: "end;"
-                        addCompletions({caption: "end", value: "\nend;"});
+                        addCompletions({ caption: "end", value: "\nend;" });
                         isCursorAfterSemicolon = true;
                     }
                     if (isCursorAfterSemicolon || /^[a-zA-Z_0-9]*$/i.test(partitionBody)) {
                         // Add from keyword and query snippets
-                        addCompletions({value: "from "});
+                        addCompletions({ value: "from " });
                         aceModules.snippetManager.register(
                             queryInitialSnippets, constants.SNIPPET_SIDDHI_CONTEXT
                         );
@@ -2063,7 +2062,7 @@ define(["ace/ace", "jquery", "./constants", "./utils", "ace/snippets", "ace/rang
                     if (partitionConditionStatement.charAt(partitionConditionStatement.length - 1) == ")") {
                         completionPrefix = "\n";
                     }
-                    addCompletions({value: completionPrefix + "begin\n\t", caption: "begin"});
+                    addCompletions({ value: completionPrefix + "begin\n\t", caption: "begin" });
                 } else if (unclosedBracketsCount == 1) {
                     // Add completions inside partition with statement
 
@@ -2106,7 +2105,7 @@ define(["ace/ace", "jquery", "./constants", "./utils", "ace/snippets", "ace/rang
 
                         if (new RegExp("\s+$", "i")) {
                             // Add keywords inside the partition with condition
-                            addCompletions([{value: "of "}, {value: "as "}, {
+                            addCompletions([{ value: "of " }, { value: "as " }, {
                                 value: "or ",
                                 type: constants.typeToDisplayNameMap[constants.LOGICAL_OPERATORS]
                             }]);
@@ -2183,9 +2182,9 @@ define(["ace/ace", "jquery", "./constants", "./utils", "ace/snippets", "ace/rang
              * @param {int} streamPriority priority to be set as stream priority
              */
             function addAttributesOfStreamReferencesAsCompletionsFromAggregationDefinition(regexResults,
-                                                                                           fullEditorText,
-                                                                                           attributePriority,
-                                                                                           streamPriority) {
+                fullEditorText,
+                attributePriority,
+                streamPriority) {
                 var aggregationInput = regexResults[4];
                 var sourceReferenceSearchRegex = new RegExp(regex.aggregation.input.streamReference, "ig");
                 var referenceToSourceMap = [];
@@ -2218,8 +2217,8 @@ define(["ace/ace", "jquery", "./constants", "./utils", "ace/snippets", "ace/rang
              * constants.EVAL_SCRIPTS]
              */
             function addAttributesOfSourcesAsCompletionsFromAggregationInput(regexResults, fullEditorText,
-                                                                             attributePriority, streamPriority,
-                                                                             sourceTypes) {
+                attributePriority, streamPriority,
+                sourceTypes) {
                 var aggregationInput = regexResults[4];
                 var aggregationInSources = [];
                 var streamFinderRegex = new RegExp(regex.aggregation.input.standardStreamRegex, "ig");
@@ -2248,7 +2247,7 @@ define(["ace/ace", "jquery", "./constants", "./utils", "ace/snippets", "ace/rang
              * @param {int} streamPriority priority to be set as stream priority
              */
             function addAttributesOfStreamOrTableReferencesAsCompletionsFromQueryIn(regexResults, fullEditorText,
-                                                                                    attributePriority, streamPriority) {
+                attributePriority, streamPriority) {
                 var queryInput = regexResults[4];
                 var sourceReferenceSearchRegex = new RegExp(regex.query.input.streamReference, "ig");
                 var referenceToSourceMap = [];
@@ -2279,7 +2278,7 @@ define(["ace/ace", "jquery", "./constants", "./utils", "ace/snippets", "ace/rang
              * @param {int} streamPriority priority to be set as stream priority
              */
             function addAttributesOfStandardStatefulSourcesAsCompletionsFromQueryIn(regexResults, fullEditorText,
-                                                                                    attributePriority, streamPriority) {
+                attributePriority, streamPriority) {
                 var queryInput = regexResults[4];
                 var standardStatefulSourceSearchRegex = new RegExp(regex.query.input.patternStreamRegex, "ig");
                 var eventToStreamMap = [];
@@ -2311,7 +2310,7 @@ define(["ace/ace", "jquery", "./constants", "./utils", "ace/snippets", "ace/rang
              * constants.TRIGGERS]
              */
             function addAttributesOfSourcesAsCompletionsFromQueryIn(regexResults, fullEditorText, attributePriority,
-                                                                    streamPriority, sourceTypes) {
+                streamPriority, sourceTypes) {
                 var queryInput = regexResults[4];
                 var queryInSources = [];
                 var streamFinderRegex = new RegExp(regex.query.input.standardStreamRegex, "ig");
@@ -2344,7 +2343,7 @@ define(["ace/ace", "jquery", "./constants", "./utils", "ace/snippets", "ace/rang
              * constants.TRIGGERS]
              */
             function addAttributesOfSourcesAsCompletions(regexResults, fullEditorText, sources,
-                                                         attributePriority, sourcePriority, sourceTypes) {
+                attributePriority, sourcePriority, sourceTypes) {
                 var afterSourceAndDotSuggestionsRegex =
                     new RegExp("((?:#)?" + regex.identifier + ")\\s*\\.\\s*[a-zA-Z_0-9]*$", "i");
 
@@ -2353,7 +2352,7 @@ define(["ace/ace", "jquery", "./constants", "./utils", "ace/snippets", "ace/rang
                     // Add suggestions after the source name + dot
                     if (sources.indexOf(sourceBeforeDotMatch[1]) != -1) {
                         addCompletions(getAttributesFromSourcesWithPrefixedDuplicates(
-                            regexResults, fullEditorText, {name: sourceBeforeDotMatch[1]}, sourceTypes
+                            regexResults, fullEditorText, { name: sourceBeforeDotMatch[1] }, sourceTypes
                         ).map(function (attribute) {
                             return Object.assign({}, attribute, {
                                 priority: attributePriority
@@ -2365,7 +2364,7 @@ define(["ace/ace", "jquery", "./constants", "./utils", "ace/snippets", "ace/rang
                     addCompletions(getAttributesFromSourcesWithPrefixedDuplicates(
                         regexResults, fullEditorText,
                         sources.map(function (source) {
-                            return {name: source};
+                            return { name: source };
                         }),
                         sourceTypes
                     ).map(function (attribute) {
@@ -2404,8 +2403,8 @@ define(["ace/ace", "jquery", "./constants", "./utils", "ace/snippets", "ace/rang
              * constants.TRIGGERS]
              */
             function addAttributesOfSourceReferencesAsCompletions(regexResults, fullEditorText,
-                                                                  sourceToStreamMap, attributePriority,
-                                                                  sourcePriority, sourceTypes) {
+                sourceToStreamMap, attributePriority,
+                sourcePriority, sourceTypes) {
                 var afterSourceAndDotSuggestionsRegex = new RegExp("(" + regex.identifier + ")\\s*" +
                     "(?:\\[\\s*[0-9]*\\s*\\])?\\s*\\.\\s*[a-zA-Z_0-9]*$", "i");
 
@@ -2432,7 +2431,7 @@ define(["ace/ace", "jquery", "./constants", "./utils", "ace/snippets", "ace/rang
                         if (sourceToStreamMap.hasOwnProperty(reference)) {
                             addCompletions(getAttributesFromSourcesWithPrefixedDuplicates(
                                 regexResults, fullEditorText,
-                                {name: sourceToStreamMap[reference], reference: reference},
+                                { name: sourceToStreamMap[reference], reference: reference },
                                 sourceTypes
                             ).map(function (attribute) {
                                 return Object.assign({}, attribute, {
@@ -2544,15 +2543,15 @@ define(["ace/ace", "jquery", "./constants", "./utils", "ace/snippets", "ace/rang
                 }
             }
 
-            function generateDynamicCompletionsForExtensionTypes(typeArray,ruleBase){
-                if(!CompletionEngine.isDynamicExtensionsLoaded){
+            function generateDynamicCompletionsForExtensionTypes(typeArray, ruleBase) {
+                if (!CompletionEngine.isDynamicExtensionsLoaded) {
                     CompletionEngine.isDynamicExtensionsLoaded = true;
                     var completions = "";
-                    var rules = _.find(ruleBase, function(rule) {
+                    var rules = _.find(ruleBase, function (rule) {
                         return rule.regex == "@[^\\(]*$";
                     });
-                    _.each(typeArray, function(type){
-                        generateCompletionsForExtensions(CompletionEngine.rawExtensions[type],rules);
+                    _.each(typeArray, function (type) {
+                        generateCompletionsForExtensions(CompletionEngine.rawExtensions[type], rules);
                     });
                 }
             }
@@ -2581,13 +2580,13 @@ define(["ace/ace", "jquery", "./constants", "./utils", "ace/snippets", "ace/rang
             //     return dynamicStreams;
             // }
 
-            function generateCompletionsForExtensions(extensionArray,rules){
-                _.each(extensionArray, function(extension){
+            function generateCompletionsForExtensions(extensionArray, rules) {
+                _.each(extensionArray, function (extension) {
                     var completionString = extension.namespace + "(type=\'" + extension.name + "\' ";
                     var isMandatoryParametersExist = false;
-                    _.each(extension.parameters, function(parameter){
-                        if(!parameter.optional){
-                            if(!isMandatoryParametersExist){
+                    _.each(extension.parameters, function (parameter) {
+                        if (!parameter.optional) {
+                            if (!isMandatoryParametersExist) {
                                 completionString += ", ";
                                 isMandatoryParametersExist = true;
                             }
@@ -2668,7 +2667,7 @@ define(["ace/ace", "jquery", "./constants", "./utils", "ace/snippets", "ace/rang
              * @return {Object[]} arrays of attribute names of the stream or table
              */
             function getAttributesFromSourcesWithPrefixedDuplicates(regexResults, fullEditorText,
-                                                                    sourceName, sourceTypes) {
+                sourceName, sourceTypes) {
                 var attributes = [];
                 if (sourceName.constructor === Array) {
                     // Get the attributes list with the relevant source
@@ -2743,7 +2742,7 @@ define(["ace/ace", "jquery", "./constants", "./utils", "ace/snippets", "ace/rang
                     attributes = Object.keys(source.attributes);
                 }
                 return attributes.map(function (attribute) {
-                    return {value: attribute, source: (reference ? reference : sourceName)};
+                    return { value: attribute, source: (reference ? reference : sourceName) };
                 });
             }
 
@@ -2914,7 +2913,8 @@ define(["ace/ace", "jquery", "./constants", "./utils", "ace/snippets", "ace/rang
             source: {},
             sourceMaps: {},
             sinkMaps: {},
-            windowFunctionNames: {}
+            windowFunctionNames: {},
+            streamFunctions: {}
         };
 
         CompletionEngine.isDynamicExtensionsLoaded = false;
@@ -2983,6 +2983,10 @@ define(["ace/ace", "jquery", "./constants", "./utils", "ace/snippets", "ace/rang
                                 .extensions["sourceMapper"]["sourceMaps"];
                             CompletionEngine.rawExtensions.sinkMaps = response.extensions["sinkMapper"]["sinkMaps"];
                             CompletionEngine.rawExtensions.windowFunctionNames = response.inBuilt["windowProcessors"];
+                            var streamFunctions = [];
+                            obtainStreamFunctionsFromResponse(response.extensions, streamFunctions);
+                            obtainStreamFunctionsFromResponse(response.inBuilt, streamFunctions);
+                            CompletionEngine.rawExtensions.streamFunctions = streamFunctions;
                             for (var namespace in response.extensions) {
                                 if (response.extensions.hasOwnProperty(namespace)) {
                                     var processors = {};
@@ -2990,7 +2994,7 @@ define(["ace/ace", "jquery", "./constants", "./utils", "ace/snippets", "ace/rang
                                         if (response.extensions[namespace].hasOwnProperty(processorType)) {
                                             var snippet = {};
                                             for (var i = 0; i < response.extensions[namespace][processorType].length;
-                                                 i++) {
+                                                i++) {
                                                 snippet[response.extensions[namespace][processorType][i].name] =
                                                     generateSnippetFromProcessorMetaData(
                                                         response.extensions[namespace][processorType][i]
@@ -3074,6 +3078,26 @@ define(["ace/ace", "jquery", "./constants", "./utils", "ace/snippets", "ace/rang
                 snippet.description = utils.generateDescriptionForProcessor(processorMetaData);
             }
             return snippet;
+        }
+
+        /**
+         * @function to obtain the stream function from the given extensions
+         * @param {Object} extensions extensions
+         * @param {Object} streamFunctions array to hold the stream functions
+         */
+        function obtainStreamFunctionsFromResponse(extensions, streamFunctions) {
+            _.forEach(extensions, function (extension) {
+                _.forEach(extension.streamProcessors, function (streamFunction) {
+                    var streamProcessorFunction = {
+                        description: streamFunction.description,
+                        examples: streamFunction.examples,
+                        name: streamFunction.namespace + ':' + streamFunction.name,
+                        parameters: streamFunction.parameters,
+                        returnAttributes: streamFunction.returnAttributes
+                    }
+                    streamFunctions.push(streamProcessorFunction);
+                });
+            });
         }
 
         return CompletionEngine;

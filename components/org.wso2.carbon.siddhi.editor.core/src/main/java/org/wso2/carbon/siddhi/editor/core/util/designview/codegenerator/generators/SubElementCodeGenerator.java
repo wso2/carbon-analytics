@@ -30,7 +30,6 @@ import org.wso2.carbon.siddhi.editor.core.util.designview.exceptions.CodeGenerat
 import org.wso2.carbon.siddhi.editor.core.util.designview.utilities.CodeGeneratorUtils;
 
 import java.util.List;
-import java.util.Map;
 
 /**
  * Generates the code for a sub-element of a Siddhi element
@@ -139,23 +138,9 @@ public class SubElementCodeGenerator {
         storeStringBuilder.append(SiddhiCodeBuilderConstants.STORE_ANNOTATION)
                 .append(store.getType())
                 .append(SiddhiCodeBuilderConstants.SINGLE_QUOTE);
-        Map<String, String> options = store.getOptions();
-
-        if (options != null && options.size() !=0) {
-            storeStringBuilder.append(SiddhiCodeBuilderConstants.COMMA);
-            int optionsLeft = options.size();
-            for (Map.Entry<String, String> entry : options.entrySet()) {
-                storeStringBuilder.append(entry.getKey())
-                        .append(SiddhiCodeBuilderConstants.EQUAL)
-                        .append(SiddhiCodeBuilderConstants.SINGLE_QUOTE)
-                        .append(entry.getValue())
-                        .append(SiddhiCodeBuilderConstants.SINGLE_QUOTE);
-                if (optionsLeft != 1) {
-                    storeStringBuilder.append(SiddhiCodeBuilderConstants.COMMA);
-                }
-                optionsLeft--;
-            }
-        }
+        List<String> options = store.getOptions();
+        storeStringBuilder.append(SiddhiCodeBuilderConstants.COMMA);
+        storeStringBuilder.append(generateParameterList(options));
         storeStringBuilder.append(SiddhiCodeBuilderConstants.CLOSE_BRACKET);
 
         return storeStringBuilder.toString();
@@ -176,30 +161,6 @@ public class SubElementCodeGenerator {
         int parametersLeft = parameters.size();
         for (String parameter : parameters) {
             parametersStringBuilder.append(parameter);
-            if (parametersLeft != 1) {
-                parametersStringBuilder.append(SiddhiCodeBuilderConstants.COMMA);
-            }
-            parametersLeft--;
-        }
-
-        return parametersStringBuilder.toString();
-    }
-
-    /**
-     * Generates the Siddhi code representation of a element list
-     *
-     * @param elements The elements list
-     * @return The Siddhi code representation of the given elements list
-     */
-    public static String generateElementList(List<String> elements) {
-        if (elements == null || elements.isEmpty()) {
-            return SiddhiCodeBuilderConstants.EMPTY_STRING;
-        }
-
-        StringBuilder parametersStringBuilder = new StringBuilder();
-        int parametersLeft = elements.size();
-        for (String parameter : elements) {
-            parametersStringBuilder.append(toStringWithEscapeChars(parameter));
             if (parametersLeft != 1) {
                 parametersStringBuilder.append(SiddhiCodeBuilderConstants.COMMA);
             }

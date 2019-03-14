@@ -29,6 +29,7 @@ import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhiel
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.query.QueryConfig;
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.sourcesink.SourceSinkConfig;
 import org.wso2.carbon.siddhi.editor.core.util.designview.constants.query.QueryListType;
+import org.wso2.siddhi.query.api.annotation.Annotation;
 
 import java.util.ArrayList;
 import java.util.EnumMap;
@@ -47,6 +48,7 @@ public class SiddhiAppConfig {
     private String siddhiAppDescription = "";
     private String siddhiAppName = "";
     private List<String> appAnnotationList = new ArrayList<>();
+    private List<Annotation> appAnnotationListObjects = new ArrayList<>();
     private List<SourceSinkConfig> sourceList = new ArrayList<>();
     private List<SourceSinkConfig> sinkList = new ArrayList<>();
     private List<StreamConfig> streamList = new ArrayList<>();
@@ -212,6 +214,10 @@ public class SiddhiAppConfig {
         this.appAnnotationList = appAnnotationList;
     }
 
+    public void setAppAnnotationListObjects(List<Annotation> appAnnotationListObjects) {
+        this.appAnnotationListObjects = appAnnotationListObjects;
+    }
+
     public void setSiddhiAppDescription(String siddhiAppDescription) { this.siddhiAppDescription = siddhiAppDescription; }
 
     public String getSiddhiAppDescription() { return siddhiAppDescription; }
@@ -226,6 +232,10 @@ public class SiddhiAppConfig {
 
     public List<String> getAppAnnotationList() {
         return appAnnotationList;
+    }
+
+    public List<Annotation> getAppAnnotationListObjects() {
+        return appAnnotationListObjects;
     }
 
     public List<SourceSinkConfig> getSourceList() {

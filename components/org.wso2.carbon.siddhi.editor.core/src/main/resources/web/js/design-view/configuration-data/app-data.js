@@ -37,6 +37,7 @@ define(['require', 'elementUtils', 'lodash'],
                 this.commentCodeSegments = options.commentCodeSegments;
             }
             this.appAnnotationList = [];
+            this.appAnnotationListObjects = [];
             this.streamList = [];
             this.tableList = [];
             this.windowList = [];
@@ -59,6 +60,10 @@ define(['require', 'elementUtils', 'lodash'],
 
         AppData.prototype.addAppAnnotation = function (annotation) {
             this.appAnnotationList.push(annotation);
+        };
+
+        AppData.prototype.addAppAnnotationObject = function (annotation) {
+            this.appAnnotationListObjects.push(annotation);
         };
 
         AppData.prototype.addStream = function (stream) {
@@ -115,6 +120,10 @@ define(['require', 'elementUtils', 'lodash'],
 
         AppData.prototype.clearAppAnnotationList = function () {
             ElementUtils.prototype.removeAllElements(this.appAnnotationList);
+        };
+
+        AppData.prototype.clearAppAnnotationListObjects = function () {
+            ElementUtils.prototype.removeAllElements(this.appAnnotationListObjects);
         };
 
         AppData.prototype.removeStream = function (streamId) {
@@ -200,9 +209,9 @@ define(['require', 'elementUtils', 'lodash'],
             return this.siddhiAppName;
         };
 
-         AppData.prototype.getSiddhiAppDescription = function () {
-                    return this.siddhiAppDescription;
-         };
+        AppData.prototype.getSiddhiAppDescription = function () {
+            return this.siddhiAppDescription;
+        };
 
         AppData.prototype.getStream = function (streamId) {
             var returnedElement = ElementUtils.prototype.getElement(this.streamList, streamId);
@@ -282,6 +291,10 @@ define(['require', 'elementUtils', 'lodash'],
             return this.appAnnotationList;
         };
 
+        AppData.prototype.getAppAnnotationListObjects = function () {
+            return this.appAnnotationListObjects;
+        };
+
         AppData.prototype.getStreamList = function () {
             return this.streamList;
         };
@@ -343,12 +356,17 @@ define(['require', 'elementUtils', 'lodash'],
         };
 
         AppData.prototype.setSiddhiAppDescription = function (siddhiAppDescription) {
-                    this.siddhiAppDescription = siddhiAppDescription;
-         };
+            this.siddhiAppDescription = siddhiAppDescription;
+        };
 
         AppData.prototype.setAppAnnotationList = function (appAnnotationList) {
             this.appAnnotationList = appAnnotationList;
         };
+
+        AppData.prototype.setAppAnnotationListObjects = function (appAnnotationListObjects) {
+            this.appAnnotationListObjects = appAnnotationListObjects;
+        };
+
 
         /**
          * @function Get the element by providing the element id
@@ -359,7 +377,7 @@ define(['require', 'elementUtils', 'lodash'],
          * @return requestedElement returns undefined if the requested element is not found
          */
         AppData.prototype.getDefinitionElementById = function (elementId, includeQueryTypes, includeSourceAndSink,
-                                                               includePartitions) {
+            includePartitions) {
             var self = this;
             var requestedElement;
             var streamList = self.streamList;

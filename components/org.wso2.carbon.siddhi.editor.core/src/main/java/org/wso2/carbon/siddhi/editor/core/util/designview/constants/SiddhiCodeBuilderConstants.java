@@ -96,6 +96,7 @@ public class SiddhiCodeBuilderConstants {
     public static final String EVERY = "every";
     public static final String RETURN = "return";
     public static final String LIMIT = "limit";
+    public static final String OFFSET = "offset";
     public static final String WINDOW = "window";
     public static final String HAVING = "having";
     public static final String OUTPUT = "output";
