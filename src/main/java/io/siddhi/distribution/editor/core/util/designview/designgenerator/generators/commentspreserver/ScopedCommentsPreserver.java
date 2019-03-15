@@ -44,7 +44,7 @@ public abstract class ScopedCommentsPreserver {
     }
 
     /**
-     * Generates a list of CommentCodeSegments
+     * Generates a list of CommentCodeSegments.
      *
      * @return List of CommentCodeSegments
      * @throws DesignGenerationException Error while getting code segments between two ElementCodeSegments
@@ -63,7 +63,7 @@ public abstract class ScopedCommentsPreserver {
                                                            SiddhiAppConfig siddhiAppConfigReference);
 
     /**
-     * Returns detected Comment segments in between the given list of ElementCodeSegment objects
+     * Returns detected Comment segments in between the given list of ElementCodeSegment objects.
      *
      * @param elementCodeSegments List of ElementCodeSegment objects, each representing a Code segment
      * @return List of detected CommentCodeSegment objects
@@ -85,7 +85,7 @@ public abstract class ScopedCommentsPreserver {
     }
 
     /**
-     * Assigns the previous CommentCodeSegment from the given list, to the SiddhiElementConfig object
+     * Assigns the previous CommentCodeSegment from the given list, to the SiddhiElementConfig object.
      *
      * @param siddhiElementConfigReference SiddhiElementConfig object
      * @param commentCodeSegments          List of CommentCodeSegment objects
@@ -99,7 +99,7 @@ public abstract class ScopedCommentsPreserver {
     /**
      * Finds and returns the previous CommentCodeSegment object for the given SiddhiElementConfig object,
      * from the given list of CommentCodeSegments when exists,
-     * otherwise returns null
+     * otherwise returns null.
      *
      * @param siddhiElementConfig SiddhiElementConfig object
      * @param commentCodeSegments List of CommentCodeSegment objects
@@ -121,7 +121,7 @@ public abstract class ScopedCommentsPreserver {
     }
 
     /**
-     * Returns whether the given ElementCodeSegments have a Code segment in between
+     * Returns whether the given ElementCodeSegments have a Code segment in between.
      *
      * @param previousSegment First ElementCodeSegment
      * @param currentSegment  Second ElementCodeSegment
@@ -138,7 +138,7 @@ public abstract class ScopedCommentsPreserver {
     }
 
     /**
-     * Returns whether the given CommentCodeSegment is valid as a Siddhi comment or not
+     * Returns whether the given CommentCodeSegment is valid as a Siddhi comment or not.
      *
      * @param commentCodeSegment CommentCodeSegment object
      * @return Whether the CommentCodeSegment is valid or not
@@ -157,7 +157,7 @@ public abstract class ScopedCommentsPreserver {
     }
 
     /**
-     * Gets the comment segment in between the given ElementCodeSegment objects
+     * Gets the comment segment in between the given ElementCodeSegment objects.
      *
      * @param previous First ElementCodeSegment object
      * @param current  Second ElementCodeSegment object
@@ -186,7 +186,7 @@ public abstract class ScopedCommentsPreserver {
     }
 
     /**
-     * Returns filtered code segments, that is only the major elements of the Siddhi app
+     * Returns filtered code segments, that is only the major elements of the Siddhi app.
      *
      * @param elementCodeSegments Unfiltered list of ElementCodeSegments
      * @return Filtered list of ElementCodeSegments
@@ -203,7 +203,7 @@ public abstract class ScopedCommentsPreserver {
     }
 
     /**
-     * Returns whether the given ElementCodeSegment is contained within any other ElementCodeSegment in the given list
+     * Returns whether the given ElementCodeSegment is contained within any other ElementCodeSegment in the given list.
      *
      * @param elementCodeSegment  ElementCodeSegment object to perform the check
      * @param elementCodeSegments List of ElementCodeSegments, that might contain the elementCodeSegment
@@ -224,7 +224,7 @@ public abstract class ScopedCommentsPreserver {
     }
 
     /**
-     * Returns the comment segment, which exists before the first even element's code
+     * Returns the comment segment, which exists before the first even element's code.
      *
      * @return CommentCodeSegment object, representing the first comment segment
      * @throws DesignGenerationException Error while getting the first comment segment
@@ -234,7 +234,7 @@ public abstract class ScopedCommentsPreserver {
     }
 
     /**
-     * Returns the comment segment before the given code segment
+     * Returns the comment segment before the given code segment.
      *
      * @param firstElementCodeSegment Code segment of the first ever element from the Siddhi app
      * @return CommentCodeSegment object
@@ -260,7 +260,7 @@ public abstract class ScopedCommentsPreserver {
     }
 
     /**
-     * Returns whether the given container ElementCodeSegment contains the contained ElementCodeSegment or not
+     * Returns whether the given container ElementCodeSegment contains the contained ElementCodeSegment or not.
      *
      * @param containedElement ElementCodeSegment object that can be contained
      * @param containerElement ElementCodeSegment object that can contain
@@ -287,7 +287,7 @@ public abstract class ScopedCommentsPreserver {
     }
 
     /**
-     * Gets query indexes, in between the given query indexes
+     * Gets query indexes, in between the given query indexes.
      *
      * @param prevIndex Query indexes of the first element
      * @param current   Query indexes of the second element
@@ -300,7 +300,7 @@ public abstract class ScopedCommentsPreserver {
     }
 
     /**
-     * Gets the previous query indexes for the given query indexes, in the given Siddhi app string
+     * Gets the previous query indexes for the given query indexes, in the given Siddhi app string.
      *
      * @param queryIndexes    Query indexes depicting the current line and column
      * @param siddhiAppString Complete Siddhi app string
@@ -321,7 +321,7 @@ public abstract class ScopedCommentsPreserver {
     }
 
     /**
-     * Gets the next query indexes for the given query indexes, in the given Siddhi app string
+     * Gets the next query indexes for the given query indexes, in the given Siddhi app string.
      *
      * @param queryIndexes    Query indexes depicting the current line and column
      * @param siddhiAppString Complete Siddhi app string
@@ -342,7 +342,7 @@ public abstract class ScopedCommentsPreserver {
     }
 
     /**
-     * Gets content of the line that has the given number, in the given Siddhi app string
+     * Gets content of the line that has the given number, in the given Siddhi app string.
      *
      * @param lineNo          Line number
      * @param siddhiAppString Complete Siddhi app string
@@ -366,7 +366,7 @@ public abstract class ScopedCommentsPreserver {
     }
 
     /**
-     * Gets the indexes of the previous CommentCodeSegment, from the given start indexes
+     * Gets the indexes of the previous CommentCodeSegment, from the given start indexes.
      *
      * @param currentStartIndexes Starting indexes after a CommentCodeSegment
      * @return Ending indexes of the CommentCodeSegment
@@ -380,7 +380,7 @@ public abstract class ScopedCommentsPreserver {
 
     /**
      * Returns the CommentCodeSegment which is ending with the given indexes,
-     * from the given list of CommentCodeSegments
+     * from the given list of CommentCodeSegments.
      *
      * @param endIndexes          Ending query indexes of the CommentCodeSegment
      * @param commentCodeSegments List of CommentCodeSegments
@@ -401,7 +401,7 @@ public abstract class ScopedCommentsPreserver {
     }
 
     /**
-     * Gets the character count until the given line and column, in the given Siddhi app string
+     * Gets the character count until the given line and column, in the given Siddhi app string.
      *
      * @param line            Line number
      * @param column          Column number

@@ -56,7 +56,7 @@ public class EdgesGenerator {
     }
 
     /**
-     * Generates Edge ID using the parent ID and the child ID, that are connected to this edge
+     * Generates Edge ID using the parent ID and the child ID, that are connected to this edge.
      *
      * @param parentID ID of the parent node
      * @param childID  ID of the child node
@@ -67,7 +67,7 @@ public class EdgesGenerator {
     }
 
     /**
-     * Generates Edges for the elements in the SiddhiAppConfig
+     * Generates Edges for the elements in the SiddhiAppConfig.
      *
      * @return Set of all the Edges
      * @throws DesignGenerationException Error while generating config
@@ -95,7 +95,7 @@ public class EdgesGenerator {
 
     /**
      * Gets complete query list of the given queryListType,
-     * from SiddhiAppConfig's outer level and Partitions
+     * from SiddhiAppConfig's outer level and Partitions.
      *
      * @param queryListType Type of the QueryList
      * @return List of QueryConfigs
@@ -109,7 +109,7 @@ public class EdgesGenerator {
     }
 
     /**
-     * Generates Edges related to Sources
+     * Generates Edges related to Sources.
      *
      * @param sourceList List of Source configs
      * @return Set of Edges
@@ -124,7 +124,7 @@ public class EdgesGenerator {
     }
 
     /**
-     * Generates Edges related to Sinks
+     * Generates Edges related to Sinks.
      *
      * @param sinkList List of Sink configs
      * @return Set of Edges
@@ -145,7 +145,7 @@ public class EdgesGenerator {
     }
 
     /**
-     * Generates Edges related to WindowFilterProjection Queries
+     * Generates Edges related to WindowFilterProjection Queries.
      *
      * @param windowFilterProjectionQueryList List of WindowFilterProjection QueryConfigs
      * @return Set of Edges
@@ -188,7 +188,7 @@ public class EdgesGenerator {
     }
 
     /**
-     * Generates Edges related to Join Queries
+     * Generates Edges related to Join Queries.
      *
      * @param joinQueryList List of Join QueryConfigs
      * @return Set of Edges
@@ -251,7 +251,7 @@ public class EdgesGenerator {
     }
 
     /**
-     * Generates Edges related to Pattern/Sequence Queries
+     * Generates Edges related to Pattern/Sequence Queries.
      *
      * @param patternSequenceQueryList List of Pattern/Sequence QueryConfigs
      * @return Set of Edges
@@ -299,7 +299,7 @@ public class EdgesGenerator {
     }
 
     /**
-     * Generates Edges related to Aggregations
+     * Generates Edges related to Aggregations.
      *
      * @param aggregationConfigList List of AggregationConfigs
      * @return Set of Edges
@@ -318,7 +318,7 @@ public class EdgesGenerator {
     }
 
     /**
-     * Generates Edges related to Partitions
+     * Generates Edges related to Partitions.
      *
      * @param partitionConfigList List of PartitionConfigs
      * @return Set of Edges
@@ -340,7 +340,7 @@ public class EdgesGenerator {
     }
 
     /**
-     * Generates an Edge between a SiddhiElementConfig parent and PartitionConnector child
+     * Generates an Edge between a SiddhiElementConfig parent and PartitionConnector child.
      *
      * @param parentElement        Parent SiddhiElementConfig
      * @param partitionConnectorId Id of the PartitionConnector
@@ -358,7 +358,7 @@ public class EdgesGenerator {
     }
 
     /**
-     * Generates an Edge between a PartitionConnector parent and SiddhiElementConfig child
+     * Generates an Edge between a PartitionConnector parent and SiddhiElementConfig child.
      *
      * @param partitionConnectorId Id of the PartitionConnector
      * @param childElement         Child SiddhiElementConfig
@@ -410,7 +410,7 @@ public class EdgesGenerator {
     }
 
     /**
-     * Generates an edge between the given parent and child SiddhiElements
+     * Generates an edge between the given parent and child SiddhiElements.
      *
      * @param parentElement SiddhiElement object, where the Edge starts from
      * @param childElement  SiddhiElement object, where the Edge ends at
@@ -426,7 +426,7 @@ public class EdgesGenerator {
     }
 
     /**
-     * Gets SiddhiElementConfig object from the SiddhiAppConfig, which has a related stream with the given name
+     * Gets SiddhiElementConfig object from the SiddhiAppConfig, which has a related stream with the given name.
      *
      * @param streamName        Name of the SiddhiElementConfig's related stream
      * @param scopedPartitionId Id of the Partition, which is the scope for finding streams
@@ -476,7 +476,7 @@ public class EdgesGenerator {
     }
 
     /**
-     * Gets SiddhiElementConfig object from the SiddhiAppConfig, which has the given Id
+     * Gets SiddhiElementConfig object from the SiddhiAppConfig, which has the given Id.
      *
      * @param id Id of the SiddhiElementConfig
      * @return SiddhiElementConfig object
@@ -517,7 +517,7 @@ public class EdgesGenerator {
     }
 
     /**
-     * Gets Node Type of the given SiddhiElementConfig object
+     * Gets Node Type of the given SiddhiElementConfig object.
      *
      * @param siddhiElementConfig SiddhiElementConfig object, which is represented as a Node
      * @return Node type

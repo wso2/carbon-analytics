@@ -34,7 +34,7 @@ public class HTTPSClientUtil {
     }
 
     /**
-     * Generates an HTTPS URL with the given hostAndPort
+     * Generates an HTTPS URL with the given hostAndPort.
      *
      * @param hostAndPort Host and Port of the Worker node in {Host}:{Port} format
      * @return HTTPS URL
@@ -44,7 +44,7 @@ public class HTTPSClientUtil {
     }
 
     /**
-     * Produces a Response after doing a PUT request
+     * Produces a Response after doing a PUT request.
      *
      * @param hostAndPort Host and Port of the Worker node in {Host}:{Port} format
      * @param username    Username

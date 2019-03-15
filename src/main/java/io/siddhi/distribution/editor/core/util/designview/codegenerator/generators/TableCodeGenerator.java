@@ -29,7 +29,7 @@ import io.siddhi.distribution.editor.core.util.designview.utilities.CodeGenerato
 public class TableCodeGenerator {
 
     /**
-     * Generates the Siddhi code representation of a TableConfig object
+     * Generates the Siddhi code representation of a TableConfig object.
      *
      * @param table               The TableConfig object
      * @param isGeneratingToolTip If it is generating a tooltip or not

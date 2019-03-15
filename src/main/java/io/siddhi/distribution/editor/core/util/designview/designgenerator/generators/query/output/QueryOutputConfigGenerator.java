@@ -47,7 +47,7 @@ public class QueryOutputConfigGenerator {
     }
 
     /**
-     * Generates Config for a Siddhi Query's output part
+     * Generates Config for a Siddhi Query's output part.
      *
      * @param queryOutputStream Siddhi QueryOutputStream
      * @return QueryOutputConfig
@@ -68,7 +68,7 @@ public class QueryOutputConfigGenerator {
     }
 
     /**
-     * Generates a QueryOutputConfig of type 'insert into'
+     * Generates a QueryOutputConfig of type 'insert into'.
      *
      * @param insertIntoStream Siddhi InsertIntoStream
      * @return QueryOutputConfig
@@ -81,7 +81,7 @@ public class QueryOutputConfigGenerator {
     }
 
     /**
-     * Generates a QueryOutputConfig of type 'delete'
+     * Generates a QueryOutputConfig of type 'delete'.
      *
      * @param deleteStream Siddhi DeleteStream
      * @return QueryOutputConfig
@@ -97,7 +97,7 @@ public class QueryOutputConfigGenerator {
     }
 
     /**
-     * Generates a QueryOutputConfig of type 'update'
+     * Generates a QueryOutputConfig of type 'update'.
      *
      * @param updateStream Siddhi UpdateStream
      * @return QueryOutputConfig
@@ -118,7 +118,7 @@ public class QueryOutputConfigGenerator {
     }
 
     /**
-     * Generates a QueryOutputConfig of type 'update or insert into'
+     * Generates a QueryOutputConfig of type 'update or insert into'.
      *
      * @param updateOrInsertStream Siddhi UpdateOrInsertStream
      * @return QueryOutputConfig
@@ -142,7 +142,7 @@ public class QueryOutputConfigGenerator {
     }
 
     /**
-     * Generates config of attributes, set in 'update' or 'update or insert into' queries
+     * Generates config of attributes, set in 'update' or 'update or insert into' queries.
      *
      * @param setAttributes List of Siddhi SetAttributes
      * @return List of SetAttributeConfigs

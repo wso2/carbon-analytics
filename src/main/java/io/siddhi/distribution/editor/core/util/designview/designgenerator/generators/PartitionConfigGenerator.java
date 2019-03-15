@@ -62,7 +62,7 @@ public class PartitionConfigGenerator extends CodeSegmentsPreserver {
     }
 
     /**
-     * Generates PartitionConfig object from the given Siddhi Partition
+     * Generates PartitionConfig object from the given Siddhi Partition.
      *
      * @param partition   Siddhi Partition
      * @param partitionId Id of the Partition against which,
@@ -86,7 +86,7 @@ public class PartitionConfigGenerator extends CodeSegmentsPreserver {
     }
 
     /**
-     * Generates QueryList from the given list of Siddhi Queries
+     * Generates QueryList from the given list of Siddhi Queries.
      *
      * @param queryList List of Siddhi Queries
      * @return QueryConfig lists
@@ -106,7 +106,7 @@ public class PartitionConfigGenerator extends CodeSegmentsPreserver {
     }
 
     /**
-     * Populates an empty map of QueryConfig lists
+     * Populates an empty map of QueryConfig lists.
      *
      * @return Map of QueryConfig lists
      */
@@ -120,7 +120,7 @@ public class PartitionConfigGenerator extends CodeSegmentsPreserver {
     }
 
     /**
-     * Generates a list of StreamConfigs from the given map of Inner Stream definition
+     * Generates a list of StreamConfigs from the given map of Inner Stream definition.
      *
      * @param innerStreamDefinitions Map of Inner Stream definitions
      * @return List of StreamConfigs
@@ -139,7 +139,7 @@ public class PartitionConfigGenerator extends CodeSegmentsPreserver {
     }
 
     /**
-     * Generates a list of PartitionWithElements, with the given map of Siddhi PartitionType
+     * Generates a list of PartitionWithElements, with the given map of Siddhi PartitionType.
      *
      * @param partitionTypeMap Map of Siddhi PartitionType
      * @return List of PartitionWithElements
@@ -160,7 +160,7 @@ public class PartitionConfigGenerator extends CodeSegmentsPreserver {
     }
 
     /**
-     * Generates PartitionWithElement, with the given map entry of PartitionType
+     * Generates PartitionWithElement, with the given map entry of PartitionType.
      *
      * @param partitionWithEntry PartitionType map entry
      * @return PartitionWithElement
@@ -177,7 +177,7 @@ public class PartitionConfigGenerator extends CodeSegmentsPreserver {
     }
 
     /**
-     * Generates a string denoting PartitionElementExpression, with the given Siddhi PartitionType
+     * Generates a string denoting PartitionElementExpression, with the given Siddhi PartitionType.
      *
      * @param partitionType Siddhi PartitionType
      * @return String denoting PartitionElementExpression
@@ -193,7 +193,7 @@ public class PartitionConfigGenerator extends CodeSegmentsPreserver {
     }
 
     /**
-     * Generates a string denoting RangePartitionExpression, with the given Siddhi RangePartitionProperty array
+     * Generates a string denoting RangePartitionExpression, with the given Siddhi RangePartitionProperty array.
      *
      * @param rangePartitionProperties Array of Siddhi RangePartitionProperty
      * @return String denoting RangePartitionExpression
@@ -209,7 +209,7 @@ public class PartitionConfigGenerator extends CodeSegmentsPreserver {
     }
 
     /**
-     * Generates a string denoting ValuePartitionExpression, with the given Siddhi Expression
+     * Generates a string denoting ValuePartitionExpression, with the given Siddhi Expression.
      *
      * @param valuePartitionExpression Siddhi Expression
      * @return String denoting ValuePartitionExpression
@@ -221,7 +221,7 @@ public class PartitionConfigGenerator extends CodeSegmentsPreserver {
     }
 
     /**
-     * Generates list of strings, denoting annotations
+     * Generates list of strings, denoting annotations.
      *
      * @param annotations List of Siddhi Annotations
      * @return List of strings, denoting annotations

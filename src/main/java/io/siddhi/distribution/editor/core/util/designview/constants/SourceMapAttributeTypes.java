@@ -26,7 +26,7 @@ public class SourceMapAttributeTypes {
     public static final String LIST = "list";
 
     /**
-     * Avoids instantiation
+     * Avoids instantiation.
      */
     private SourceMapAttributeTypes() {
     }

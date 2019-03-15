@@ -27,7 +27,7 @@ public class CodeToDesignRegexPatterns {
     public static final String MAP_TYPE = "type\\s*=\\'\\s*(.+)\\s*\\'\\s*[,)]";
 
     /**
-     * Avoids Instantiation
+     * Avoids Instantiation.
      */
     private CodeToDesignRegexPatterns() {
     }

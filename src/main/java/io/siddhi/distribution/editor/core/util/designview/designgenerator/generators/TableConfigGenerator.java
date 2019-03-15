@@ -32,7 +32,7 @@ import java.util.List;
  */
 public class TableConfigGenerator extends CodeSegmentsPreserver {
     /**
-     * Generates TableConfig object from the given Siddhi TableDefinition
+     * Generates TableConfig object from the given Siddhi TableDefinition.
      *
      * @param tableDefinition Siddhi TableDefinition
      * @return TableConfig object

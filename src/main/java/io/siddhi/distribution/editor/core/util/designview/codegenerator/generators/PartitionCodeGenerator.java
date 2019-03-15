@@ -35,7 +35,7 @@ import java.util.List;
 public class PartitionCodeGenerator {
 
     /**
-     * Generates the Siddhi code representation of a PartitionConfig object
+     * Generates the Siddhi code representation of a PartitionConfig object.
      *
      * @param partition           The PartitionConfig object
      * @param definitionNames     The names of all the Siddhi definition objects (including inner streams)
@@ -91,7 +91,7 @@ public class PartitionCodeGenerator {
     }
 
     /**
-     * Generates the Siddhi code representation of a partition's PartitionWithElement list
+     * Generates the Siddhi code representation of a partition's PartitionWithElement list.
      *
      * @param partitionWith The PartitionWithElement list
      * @return The Siddhi code representation of the given PartitionWithElement list
@@ -114,7 +114,7 @@ public class PartitionCodeGenerator {
     }
 
     /**
-     * Generates the Siddhi code representation of a PartitionWithElement object
+     * Generates the Siddhi code representation of a PartitionWithElement object.
      *
      * @param partitionWithElement The PartitionWithElement object
      * @return The Siddhi code representation of the given PartitionWithElement object

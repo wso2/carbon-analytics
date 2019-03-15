@@ -32,7 +32,7 @@ public class ConfigBuildingUtilities {
     }
 
     /**
-     * Gets the piece of the code for the given SiddhiElement, from the siddhiAppString
+     * Gets the piece of the code for the given SiddhiElement, from the siddhiAppString.
      *
      * @param siddhiElement   SiddhiElement object, whose code definition is to be extracted
      * @param siddhiAppString Complete Siddhi app string
@@ -49,7 +49,7 @@ public class ConfigBuildingUtilities {
 
     /**
      * Gets the code segment starting from the given startIndex and ending at the given endIndex,
-     * from the given Siddhi app string
+     * from the given Siddhi app string.
      *
      * @param startIndex      Query context start index
      * @param endIndex        Query context end index

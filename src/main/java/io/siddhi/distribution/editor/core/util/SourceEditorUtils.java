@@ -57,7 +57,7 @@ public class SourceEditorUtils {
     }
 
     /**
-     * Validate the siddhi app string using the Siddhi Manager
+     * Validate the siddhi app string using the Siddhi Manager.
      * Will return a valid siddhiAppRuntime
      *
      * @param siddhiApp Siddhi app string
@@ -78,7 +78,7 @@ public class SourceEditorUtils {
     }
 
     /**
-     * Get the definition of the inner streams in the partitions
+     * Get the definition of the inner streams in the partitions.
      * Inner streams will be separated based on the partition
      *
      * @param siddhiAppRuntime                  Siddhi app runtime created after validating
@@ -139,7 +139,7 @@ public class SourceEditorUtils {
     }
 
     /**
-     * Get the definitions of the streams that are requested
+     * Get the definitions of the streams that are requested.
      * used for fetching the definitions of streams that queries output into without defining them first
      *
      * @param siddhiAppRuntime Siddhi app runtime created after validating
@@ -160,7 +160,7 @@ public class SourceEditorUtils {
     }
 
     /**
-     * Get the definitions of the aggregations that are requested
+     * Get the definitions of the aggregations that are requested.
      * used for fetching the definitions of aggregations
      *
      * @param siddhiAppRuntime              Siddhi app runtime created after validating
@@ -181,7 +181,7 @@ public class SourceEditorUtils {
     }
 
     /**
-     * Returns the in built processor meta data
+     * Returns the in built processor meta data.
      * Scans for all classes in all jars in the classpath
      *
      * @return In-built processor meta data
@@ -192,7 +192,7 @@ public class SourceEditorUtils {
     }
 
     /**
-     * Returns the extension processor meta data
+     * Returns the extension processor meta data.
      * Gets the meta data from the siddhi manager
      *
      * @return Extension processor meta data
@@ -203,7 +203,7 @@ public class SourceEditorUtils {
     }
 
     /**
-     * Returns processor types to Classes map with classes in the packages in processor type to package name map
+     * Returns processor types to Classes map with classes in the packages in processor type to package name map.
      *
      * @return Processor types to Classes map
      */
@@ -261,7 +261,7 @@ public class SourceEditorUtils {
     }
 
     /**
-     * Generate a MetaData object using the class map provided for inbuilt processors
+     * Generate a MetaData object using the class map provided for inbuilt processors.
      *
      * @param classMap processor types to class map
      */
@@ -290,7 +290,7 @@ public class SourceEditorUtils {
 
     /**
      * populate the targetProcessorMetaDataList with the annotated data in the classes in
-     * the class map for the specified processor type
+     * the class map for the specified processor type.
      *
      * @param targetProcessorMetaDataList List of processor meta data objects to populate
      * @param classMap                    processor types to set of class map from which
@@ -390,7 +390,7 @@ public class SourceEditorUtils {
     }
 
     /**
-     * Generate processor meta data from the annotated data in the class
+     * Generate processor meta data from the annotated data in the class.
      * This generates a processor name using the class name
      *
      * @param processorClass Class from which meta data should be extracted from
@@ -416,7 +416,7 @@ public class SourceEditorUtils {
     }
 
     /**
-     * Generate processor meta data from the annotated data in the class
+     * Generate processor meta data from the annotated data in the class.
      *
      * @param processorClass Class from which meta data should be extracted from
      * @param processorType  The processor type of the class

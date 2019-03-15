@@ -46,7 +46,7 @@ public class PatternSequenceConfigTreeInfoGenerator {
     }
 
     /**
-     * Generates PatternSequenceConfigTreeInfo object, with the given Siddhi StateElement
+     * Generates PatternSequenceConfigTreeInfo object, with the given Siddhi StateElement.
      *
      * @param stateElement Siddhi StateElement
      * @return PatternSequenceConfigTreeInfo object
@@ -59,7 +59,7 @@ public class PatternSequenceConfigTreeInfoGenerator {
     }
 
     /**
-     * Adds the given stream reference to the list of available stream references
+     * Adds the given stream reference to the list of available stream references.
      *
      * @param streamReference Stream reference of a Siddhi InputStream when available, or null
      */
@@ -70,7 +70,7 @@ public class PatternSequenceConfigTreeInfoGenerator {
     }
 
     /**
-     * Creates a StateElementConfig object from the given Siddhi StateElement object
+     * Creates a StateElementConfig object from the given Siddhi StateElement object.
      *
      * @param stateElement Siddhi StateElement object
      * @return StateElementConfig object
@@ -111,7 +111,7 @@ public class PatternSequenceConfigTreeInfoGenerator {
     }
 
     /**
-     * Generates config for the given Siddhi StreamStateElement object
+     * Generates config for the given Siddhi StreamStateElement object.
      *
      * @param streamStateElement Siddhi StreamStateElement object
      * @return StreamStateElement config
@@ -140,7 +140,7 @@ public class PatternSequenceConfigTreeInfoGenerator {
     }
 
     /**
-     * Generates config for the given Siddhi CountStateElement object
+     * Generates config for the given Siddhi CountStateElement object.
      *
      * @param countStateElement Siddhi CountStateElement object
      * @return CountStateElementConfig object
@@ -159,7 +159,7 @@ public class PatternSequenceConfigTreeInfoGenerator {
     }
 
     /**
-     * Generates config for the given Siddhi LogicalStateElement object
+     * Generates config for the given Siddhi LogicalStateElement object.
      *
      * @param logicalStateElement Siddhi LogicalStateElement object
      * @return LogicalStateElementConfig object
@@ -179,7 +179,7 @@ public class PatternSequenceConfigTreeInfoGenerator {
     }
 
     /**
-     * Generates config for the given Siddhi EveryStateElement object
+     * Generates config for the given Siddhi EveryStateElement object.
      *
      * @param everyStateElement Siddhi EveryStateElement object
      * @return EveryStateElementConfig object
@@ -195,7 +195,7 @@ public class PatternSequenceConfigTreeInfoGenerator {
     }
 
     /**
-     * Generates config for the given Siddhi NextStateElement object
+     * Generates config for the given Siddhi NextStateElement object.
      *
      * @param nextStateElement Siddhi NextStateElement object
      * @return NextStateElementConfig object
@@ -213,7 +213,7 @@ public class PatternSequenceConfigTreeInfoGenerator {
     }
 
     /**
-     * Generates config for the given Siddhi AbsentStreamStateElement object
+     * Generates config for the given Siddhi AbsentStreamStateElement object.
      *
      * @param absentStreamStateElement Siddhi AbsentStreamStateElement object
      * @return AbsentStreamStateElementConfig object

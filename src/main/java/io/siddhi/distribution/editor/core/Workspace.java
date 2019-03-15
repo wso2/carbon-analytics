@@ -112,7 +112,7 @@ public interface Workspace {
             throws IOException;
 
     /**
-     * List the samples in the given path with descriptions
+     * List the samples in the given path with descriptions.
      *
      * @param sampleMap provided sample map
      * @return samples with descriptions

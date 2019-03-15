@@ -26,7 +26,7 @@ import org.wso2.siddhi.query.api.definition.FunctionDefinition;
  */
 public class FunctionConfigGenerator extends CodeSegmentsPreserver {
     /**
-     * Generates FunctionConfig from the given Siddhi FunctionDefinition
+     * Generates FunctionConfig from the given Siddhi FunctionDefinition.
      *
      * @param functionDefinition Siddhi FunctionDefinition
      * @return FunctionConfig object

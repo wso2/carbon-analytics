@@ -66,7 +66,7 @@ public class PartitionScopeCommentsPreserver extends ScopedCommentsPreserver {
 
     /**
      * Returns the filtered list of Code segments that only belong to the current Partition,
-     * from the given list of ElementCodeSegments
+     * from the given list of ElementCodeSegments.
      *
      * @param elementCodeSegments Unfiltered list of ElementCodeSegment objects
      * @return Filtered list of ElementCodeSegment objects
@@ -87,7 +87,7 @@ public class PartitionScopeCommentsPreserver extends ScopedCommentsPreserver {
     }
 
     /**
-     * Returns only the Comment segments, existing after 'partition with' elements
+     * Returns only the Comment segments, existing after 'partition with' elements.
      *
      * @param commentCodeSegments List of CommentCodeSegment objects
      * @return List of filtered CommentCodeSegment objects
@@ -127,7 +127,7 @@ public class PartitionScopeCommentsPreserver extends ScopedCommentsPreserver {
     }
 
     /**
-     * Gets the ending index of the very last 'partition with' element
+     * Gets the ending index of the very last 'partition with' element.
      *
      * @param partitionWithElements List of 'partition with' elements
      * @return Query context end index of the very last 'partition with' element
@@ -176,7 +176,7 @@ public class PartitionScopeCommentsPreserver extends ScopedCommentsPreserver {
     /**
      * Finds and returns the reference of the PartitionConfig object,
      * for the Partition whose comments are about to be preserved with this Preserver,
-     * from the given SiddhiAppConfig reference
+     * from the given SiddhiAppConfig reference.
      *
      * @param siddhiAppConfigReference SiddhiAppConfig object reference
      * @return PartitionConfig object reference
@@ -195,7 +195,7 @@ public class PartitionScopeCommentsPreserver extends ScopedCommentsPreserver {
     }
 
     /**
-     * Returns whether the given code segment belongs to the current Partition or not
+     * Returns whether the given code segment belongs to the current Partition or not.
      *
      * @param elementCodeSegment ElementCodeSegment object
      * @return Whether the code segment belongs to the current Partition or not

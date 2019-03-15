@@ -29,7 +29,7 @@ import java.util.List;
  */
 public class AttributeConfigListGenerator extends CodeSegmentsPreserver {
     /**
-     * Generates list of AttributeConfigs, with given List of Siddhi Attributes
+     * Generates list of AttributeConfigs, with given List of Siddhi Attributes.
      *
      * @param attributes List of Siddhi Attribute objects
      * @return List of AttributeConfig objects

@@ -59,7 +59,7 @@ public class ExecutionElementConfig {
     }
 
     /**
-     * Identifies the names of the input streams of a query
+     * Identifies the names of the input streams of a query.
      *
      * @param query The query object to be used
      * @return The list of names of the given query's input streams
@@ -101,7 +101,7 @@ public class ExecutionElementConfig {
     }
 
     /**
-     * Identifies the names of the input streams of a partition
+     * Identifies the names of the input streams of a partition.
      *
      * @param partition The partition object to be used
      * @return The list of names of the given partition's input streams
@@ -124,7 +124,7 @@ public class ExecutionElementConfig {
     }
 
     /**
-     * Identifies the name of the output stream of a query
+     * Identifies the name of the output stream of a query.
      *
      * @param query The query object to be used
      * @return The name of the given query's output stream
@@ -138,7 +138,7 @@ public class ExecutionElementConfig {
     }
 
     /**
-     * Identifies the names of the output streams of a partition
+     * Identifies the names of the output streams of a partition.
      *
      * @param partition The partition object to be used
      * @return The list of names of the given partition's output streams

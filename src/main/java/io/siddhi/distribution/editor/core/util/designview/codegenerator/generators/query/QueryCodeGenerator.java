@@ -34,7 +34,7 @@ import io.siddhi.distribution.editor.core.util.designview.utilities.CodeGenerato
 public class QueryCodeGenerator {
 
     /**
-     * Generates the Siddhi code representation of a QueryConfig object
+     * Generates the Siddhi code representation of a QueryConfig object.
      *
      * @param query               The QueryConfig object
      * @param isGeneratingToolTip If it is generating a tooltip or not

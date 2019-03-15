@@ -27,7 +27,7 @@ public class AttributeSelection {
     public static final String VALUE_ALL = "*";
 
     /**
-     * Avoids instantiation
+     * Avoids instantiation.
      */
     private AttributeSelection() {
     }

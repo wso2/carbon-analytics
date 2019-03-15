@@ -45,7 +45,7 @@ public class StreamHandlerConfigGenerator {
     }
 
     /**
-     * Generates a list of StreamHandlerConfigs, from the given list of Siddhi StreamHandlers
+     * Generates a list of StreamHandlerConfigs, from the given list of Siddhi StreamHandlers.
      *
      * @param streamHandlers List of Siddhi StreamHandler objects
      * @return List of StreamHandlerConfig objects
@@ -61,7 +61,7 @@ public class StreamHandlerConfigGenerator {
     }
 
     /**
-     * Generates StreamHandlerConfig from the given Siddhi StreamHandler
+     * Generates StreamHandlerConfig from the given Siddhi StreamHandler.
      *
      * @param streamHandler Siddhi StreamHandler object
      * @return StreamHandlerConfig object
@@ -80,7 +80,7 @@ public class StreamHandlerConfigGenerator {
     }
 
     /**
-     * Generates FilterConfig from the given Siddhi Filter
+     * Generates FilterConfig from the given Siddhi Filter.
      *
      * @param filter Siddhi Filter object
      * @return FilterConfig object
@@ -92,7 +92,7 @@ public class StreamHandlerConfigGenerator {
     }
 
     /**
-     * Generates Function config from the given Siddhi StreamFunction
+     * Generates Function config from the given Siddhi StreamFunction.
      *
      * @param streamFunction Siddhi StreamFunction object
      * @return FunctionWindowConfig object
@@ -114,7 +114,7 @@ public class StreamHandlerConfigGenerator {
     }
 
     /**
-     * Generates Window config from the given Siddhi Window
+     * Generates Window config from the given Siddhi Window.
      *
      * @param window Siddhi Window object
      * @return FunctionWindowConfig object
@@ -136,7 +136,7 @@ public class StreamHandlerConfigGenerator {
     }
 
     /**
-     * Generates a string list of parameters, from the given list of Siddhi Expressions
+     * Generates a string list of parameters, from the given list of Siddhi Expressions.
      *
      * @param parameters Siddhi Expressions
      * @return String list of parameters

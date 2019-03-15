@@ -42,7 +42,7 @@ public class TriggerConfigGenerator extends CodeSegmentsPreserver {
     }
 
     /**
-     * Generates TriggerConfig for the given Siddhi TriggerDefinition
+     * Generates TriggerConfig for the given Siddhi TriggerDefinition.
      *
      * @param triggerDefinition Siddhi TriggerDefinition object
      * @return TriggerConfig object
@@ -77,7 +77,7 @@ public class TriggerConfigGenerator extends CodeSegmentsPreserver {
     }
 
     /**
-     * Gets the stream, which is defined for the Trigger with the given name
+     * Gets the stream, which is defined for the Trigger with the given name.
      *
      * @param triggerName Name of the Trigger
      * @return Stream Definition object

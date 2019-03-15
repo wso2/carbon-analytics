@@ -73,7 +73,7 @@ public class CodeGeneratorUtils {
 
     /**
      * Reorders a list of QueryConfig objects to the right order that it should be in displayed in
-     * when converting to a Siddhi app partition
+     * when converting to a Siddhi app partition.
      *
      * @param queries         The list of queries to be ordered
      * @param definitionNames The names of all the definition elements (streams, tables, windows etc) of the Siddhi app
@@ -105,7 +105,7 @@ public class CodeGeneratorUtils {
     }
 
     /**
-     * Identifies the names of the input streams of a given QueryConfig object
+     * Identifies the names of the input streams of a given QueryConfig object.
      *
      * @param query The QueryConfig object
      * @return The list of names of the input streams of the given QueryConfig object
@@ -150,7 +150,7 @@ public class CodeGeneratorUtils {
     }
 
     /**
-     * Identifies that streams that need to be generated and displayed when generating the Siddhi app code
+     * Identifies that streams that need to be generated and displayed when generating the Siddhi app code.
      *
      * @param streamList The list of streams in a Siddhi app
      * @param sourceList The list of source annotations in a Siddhi app
@@ -208,7 +208,7 @@ public class CodeGeneratorUtils {
     }
 
     /**
-     * Identifies the names of all the definition elements in a Siddhi application
+     * Identifies the names of all the definition elements in a Siddhi application.
      *
      * @param streams      The list of streams in a Siddhi app
      * @param tables       The list of tables in a Siddhi app
@@ -248,7 +248,7 @@ public class CodeGeneratorUtils {
     }
 
     /**
-     * Converts a list of queries and partitions to ExecutionElementConfig objects
+     * Converts a list of queries and partitions to ExecutionElementConfig objects.
      *
      * @param queries    The list of queries in a Siddhi app
      * @param partitions The list of partitions in a Siddhi app
@@ -272,7 +272,7 @@ public class CodeGeneratorUtils {
 
     /**
      * Reorders a list of ExecutionElementConfig objects to the right order that it should
-     * be in displayed in when converting to a Siddhi app partition
+     * be in displayed in when converting to a Siddhi app partition.
      *
      * @param executionElements The ExecutionElements (queries and partitions) of a Siddhi app
      * @param definitionNames   The names of all the definition elements in a Siddhi app (excluding inner streams
@@ -306,7 +306,7 @@ public class CodeGeneratorUtils {
     }
 
     /**
-     * Static inner class that is used to validate any incoming *Config objects for null pointers
+     * Static inner class that is used to validate any incoming *Config objects for null pointers.
      */
     public static class NullValidator {
 

@@ -29,7 +29,7 @@ import java.util.List;
  */
 public class AnnotationConfigGenerator extends CodeSegmentsPreserver {
     /**
-     * Generates AnnotationConfig String for the given Siddhi Annotation
+     * Generates AnnotationConfig String for the given Siddhi Annotation.
      *
      * @param annotation Siddhi Annotation
      * @return String representing the Annotation
@@ -55,7 +55,7 @@ public class AnnotationConfigGenerator extends CodeSegmentsPreserver {
     }
 
     /**
-     * Generates a string list of annotations, from the given list of Siddhi Annotations
+     * Generates a string list of annotations, from the given list of Siddhi Annotations.
      *
      * @param annotations List of Siddhi Annotation objects
      * @return List of strings, each representing an Annotation

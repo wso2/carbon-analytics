@@ -29,7 +29,7 @@ import io.siddhi.distribution.editor.core.util.designview.utilities.CodeGenerato
 public class FunctionCodeGenerator {
 
     /**
-     * Generates the Siddhi code representation of a FunctionConfig object
+     * Generates the Siddhi code representation of a FunctionConfig object.
      *
      * @param function            The FunctionConfig object
      * @param isGeneratingToolTip If it is generating a tooltip or not

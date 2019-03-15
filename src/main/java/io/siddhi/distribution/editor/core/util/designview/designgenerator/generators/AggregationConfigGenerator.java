@@ -46,7 +46,7 @@ public class AggregationConfigGenerator extends CodeSegmentsPreserver {
     }
 
     /**
-     * Generates AggregationConfig from the given Siddhi AggregationDefinition
+     * Generates AggregationConfig from the given Siddhi AggregationDefinition.
      *
      * @param aggregationDefinition Siddhi AggregationDefinition object
      * @return AggregationConfig object
@@ -99,7 +99,7 @@ public class AggregationConfigGenerator extends CodeSegmentsPreserver {
     }
 
     /**
-     * Generates list of groupBy variables, from the given list of Siddhi Variables
+     * Generates list of groupBy variables, from the given list of Siddhi Variables.
      *
      * @param groupByVariables Siddhi Variables list
      * @return String list of variables
@@ -115,7 +115,7 @@ public class AggregationConfigGenerator extends CodeSegmentsPreserver {
     }
 
     /**
-     * Generates AggregateByTimePeriod object with the given Siddhi TimePeriod
+     * Generates AggregateByTimePeriod object with the given Siddhi TimePeriod.
      *
      * @param timePeriod Siddhi TimePeriod object
      * @return AggregateByTimePeriod object
@@ -132,7 +132,7 @@ public class AggregationConfigGenerator extends CodeSegmentsPreserver {
     }
 
     /**
-     * Generates AggregateByTimeInterval object with the given list of Siddhi TimePeriod.Durations
+     * Generates AggregateByTimeInterval object with the given list of Siddhi TimePeriod.Durations.
      *
      * @param durations List of Siddhi TimePeriod.Durations
      * @return AggregateByTimeInterval object
@@ -146,7 +146,7 @@ public class AggregationConfigGenerator extends CodeSegmentsPreserver {
     }
 
     /**
-     * Generates AggregateByTimeRange object with the given list of Siddhi TimePeriod.Durations
+     * Generates AggregateByTimeRange object with the given list of Siddhi TimePeriod.Durations.
      *
      * @param durations List of Siddhi TimePeriod.Durations
      * @return AggregateByTimeRange object
@@ -159,7 +159,7 @@ public class AggregationConfigGenerator extends CodeSegmentsPreserver {
     }
 
     /**
-     * Generates string for aggregateBy attribute, with the given Siddhi Variable
+     * Generates string for aggregateBy attribute, with the given Siddhi Variable.
      *
      * @param aggregateAttribute Siddhi Variable
      * @return String representing the aggregateAttribute

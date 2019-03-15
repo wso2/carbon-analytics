@@ -35,7 +35,7 @@ public class QuerySelectCodeGenerator {
     }
 
     /**
-     * Generates the Siddhi code representation of a AttributesSelectionConfig object
+     * Generates the Siddhi code representation of a AttributesSelectionConfig object.
      *
      * @param attributesSelection The AttributesSelectionConfig object
      * @return The Siddhi code representation of the given AttributesSelectionConfig object
@@ -66,7 +66,7 @@ public class QuerySelectCodeGenerator {
     }
 
     /**
-     * Generates the Siddhi code representation of a UserDefinedSelectionConfig object
+     * Generates the Siddhi code representation of a UserDefinedSelectionConfig object.
      *
      * @param userDefinedSelection The UserDefinedSelectionConfig object
      * @return The Siddhi code representation of the given UserDefinedSelectionConfig object

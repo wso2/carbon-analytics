@@ -43,7 +43,7 @@ public class QueryInputConfigGenerator {
     }
 
     /**
-     * Generates Config for Query Input, from given Siddhi Query object and the complete Siddhi app string
+     * Generates Config for Query Input, from given Siddhi Query object and the complete Siddhi app string.
      *
      * @param queryInputStream Siddhi Query InputStream object
      * @return QueryInputConfig object
@@ -64,7 +64,7 @@ public class QueryInputConfigGenerator {
     }
 
     /**
-     * Gets the type of the Query's Input, with the given Siddhi InputStream object
+     * Gets the type of the Query's Input, with the given Siddhi InputStream object.
      *
      * @param queryInputStream Siddhi InputStream object, which contains data about the Query's input part
      * @return QueryInputType

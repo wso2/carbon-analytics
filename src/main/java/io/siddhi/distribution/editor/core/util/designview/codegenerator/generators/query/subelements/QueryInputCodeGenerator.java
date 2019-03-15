@@ -42,7 +42,7 @@ public class QueryInputCodeGenerator {
     }
 
     /**
-     * Generates the Siddhi code representation of a QueryInputConfig object
+     * Generates the Siddhi code representation of a QueryInputConfig object.
      *
      * @param queryInput The QueryInputConfig object
      * @return The Siddhi code representation of the given QueryInputConfig object
@@ -77,7 +77,7 @@ public class QueryInputCodeGenerator {
     }
 
     /**
-     * Generates the Siddhi code representation of a WindowFilterProjectionConfig object
+     * Generates the Siddhi code representation of a WindowFilterProjectionConfig object.
      *
      * @param windowFilterProjection The WindowFilterProjectionConfig object
      * @return The Siddhi code representation of the given WindowFilterProjectionConfig object
@@ -95,7 +95,7 @@ public class QueryInputCodeGenerator {
     }
 
     /**
-     * Generates the Siddhi code representation of a JoinConfig object
+     * Generates the Siddhi code representation of a JoinConfig object.
      *
      * @param join The JoinConfig object
      * @return The Siddhi code representation of the given JoinConfig object
@@ -144,7 +144,7 @@ public class QueryInputCodeGenerator {
     }
 
     /**
-     * Generates the Siddhi code representation of a JoinElementConfig object
+     * Generates the Siddhi code representation of a JoinElementConfig object.
      *
      * @param joinElement The JoinElementConfig object
      * @return The Siddhi code representation of the given JoinElementConfig object
@@ -174,7 +174,7 @@ public class QueryInputCodeGenerator {
     }
 
     /**
-     * Generates the Siddhi code representation of a join type
+     * Generates the Siddhi code representation of a join type.
      *
      * @param joinType The join type
      * @return The Siddhi code representation of the given join type
@@ -200,7 +200,7 @@ public class QueryInputCodeGenerator {
     }
 
     /**
-     * Generates the Siddhi code representation of a PatternSequenceConfig object
+     * Generates the Siddhi code representation of a PatternSequenceConfig object.
      *
      * @param patternSequence The PatternSequenceConfig object
      * @return The Siddhi code representation of the given PatternSequenceConfig object
@@ -235,7 +235,7 @@ public class QueryInputCodeGenerator {
     }
 
     /**
-     * Generates the Siddhi code representation of a PatternSequenceConditionConfig object
+     * Generates the Siddhi code representation of a PatternSequenceConditionConfig object.
      *
      * @param condition The PatternSequenceConditionConfig objecy
      * @param hasNot    Flag to show whether the given PatternSequenceConditionConfig has a 'not' keyword

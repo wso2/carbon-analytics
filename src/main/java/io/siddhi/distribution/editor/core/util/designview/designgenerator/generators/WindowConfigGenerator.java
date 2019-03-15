@@ -39,7 +39,7 @@ public class WindowConfigGenerator extends CodeSegmentsPreserver {
     }
 
     /**
-     * Generates WindowConfig from the given Siddhi WindowDefinition
+     * Generates WindowConfig from the given Siddhi WindowDefinition.
      *
      * @param windowDefinition Siddhi WindowDefinition
      * @return WindowConfig object

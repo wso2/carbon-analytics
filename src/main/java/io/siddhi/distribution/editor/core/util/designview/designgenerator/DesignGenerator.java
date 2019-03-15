@@ -38,7 +38,7 @@ public class DesignGenerator {
     }
 
     /**
-     * Gets EventFlow configuration for a given Siddhi app code string
+     * Gets EventFlow configuration for a given Siddhi app code string.
      *
      * @param siddhiAppString Code representation of the Siddhi app
      * @return Event flow representation of the Siddhi app

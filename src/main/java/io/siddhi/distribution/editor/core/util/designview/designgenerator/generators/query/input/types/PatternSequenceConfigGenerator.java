@@ -71,7 +71,7 @@ public class PatternSequenceConfigGenerator {
     }
 
     /**
-     * Returns the delimiter for the given mode
+     * Returns the delimiter for the given mode.
      *
      * @param mode QueryInputType
      * @return Delimiter for the Pattern/Sequence query
@@ -87,7 +87,7 @@ public class PatternSequenceConfigGenerator {
     }
 
     /**
-     * Returns the 'min:max' expression with the given parameters
+     * Returns the 'min:max' expression with the given parameters.
      *
      * @param min  Min value of a CountStateElement
      * @param max  Max value of a CountStateElement
@@ -134,7 +134,7 @@ public class PatternSequenceConfigGenerator {
     }
 
     /**
-     * Generates config for a Siddhi Pattern/Sequence Query Input, from the given Siddhi InputStream object
+     * Generates config for a Siddhi Pattern/Sequence Query Input, from the given Siddhi InputStream object.
      *
      * @param inputStream Siddhi InputStream object
      * @return PatternSequenceConfig object
@@ -158,7 +158,7 @@ public class PatternSequenceConfigGenerator {
     /**
      * Performs an In-order Traversal through the tree of StateElementConfig objects recursively
      * starting from the given StateElementConfig,
-     * while acquires necessary details of the StateElements
+     * while acquires necessary details of the StateElements.
      *
      * @param currentElement Root of the tree during the first call of the method,
      *                       and the current traversal element during next calls of the method
@@ -175,7 +175,7 @@ public class PatternSequenceConfigGenerator {
     }
 
     /**
-     * Generates PatternSequenceConditionConfig for the given StateElementConfig object
+     * Generates PatternSequenceConditionConfig for the given StateElementConfig object.
      *
      * @param element StateElementConfig object
      * @return PatternSequenceConditionConfig object
@@ -236,7 +236,7 @@ public class PatternSequenceConfigGenerator {
 
     /**
      * Accepts the given stream reference when not null,
-     * otherwise generates the next un-available stream reference
+     * otherwise generates the next un-available stream reference.
      *
      * @param nullableStreamReference Stream Reference String when available, or null
      * @return Accepted/Generated stream reference
@@ -249,7 +249,7 @@ public class PatternSequenceConfigGenerator {
     }
 
     /**
-     * Generates and returns the next stream reference - that is not already taken by any streams in this query
+     * Generates and returns the next stream reference - that is not already taken by any streams in this query.
      *
      * @return Next unavailable stream reference
      */
@@ -263,7 +263,7 @@ public class PatternSequenceConfigGenerator {
     }
 
     /**
-     * Generates the next stream reference in a pre-defined format
+     * Generates the next stream reference in a pre-defined format.
      *
      * @return Next stream reference
      */
@@ -273,7 +273,7 @@ public class PatternSequenceConfigGenerator {
 
     /**
      * Add components of the given StateElementConfig to the relevant lists from which,
-     * the Pattern/Sequence query's events are represented
+     * the Pattern/Sequence query's events are represented.
      *
      * @param element Element of the Pattern/Sequence query
      * @throws DesignGenerationException Error while generating ElementComponent object
@@ -286,7 +286,7 @@ public class PatternSequenceConfigGenerator {
 
     /**
      * Generates ElementComponent object - from which, an event of a Pattern/Sequence query is represented,
-     * for the given StateElementConfig object
+     * for the given StateElementConfig object.
      *
      * @param element StateElementConfig object
      * @return ElementComponent object
@@ -309,7 +309,7 @@ public class PatternSequenceConfigGenerator {
     }
 
     /**
-     * Generates ElementComponent object for the given CountStateElementConfig object
+     * Generates ElementComponent object for the given CountStateElementConfig object.
      *
      * @param element CountStateElement object
      * @return ElementComponent object
@@ -329,7 +329,7 @@ public class PatternSequenceConfigGenerator {
     }
 
     /**
-     * Generates ElementComponent object for the given EveryStateElementConfig object
+     * Generates ElementComponent object for the given EveryStateElementConfig object.
      *
      * @param element EveryStateElementConfig object
      * @return ElementComponent object
@@ -349,7 +349,7 @@ public class PatternSequenceConfigGenerator {
     }
 
     /**
-     * Generates ElementComponent object for the given NextStateElementConfig object
+     * Generates ElementComponent object for the given NextStateElementConfig object.
      *
      * @param element NextStateElementConfig object
      * @return ElementComponent object
@@ -368,7 +368,7 @@ public class PatternSequenceConfigGenerator {
     }
 
     /**
-     * Generates ElementComponent object for the given LogicalStateElementConfig object
+     * Generates ElementComponent object for the given LogicalStateElementConfig object.
      *
      * @param element LogicalStateElementConfig object
      * @return ElementComponent object
@@ -393,7 +393,7 @@ public class PatternSequenceConfigGenerator {
     }
 
     /**
-     * Generates ElementComponent object for the given StreamStateElementConfig object
+     * Generates ElementComponent object for the given StreamStateElementConfig object.
      *
      * @param element StreamStateElementConfig object
      * @return ElementComponent object
@@ -424,7 +424,7 @@ public class PatternSequenceConfigGenerator {
 
     /**
      * Represents a State Element component,
-     * which consists of conditions and logic components belonging to a State Element
+     * which consists of conditions and logic components belonging to a State Element.
      */
     private static class ElementComponent {
         List<PatternSequenceConditionConfig> conditions;

@@ -28,7 +28,7 @@ public class SiddhiAppDeployerFactory {
     private static final int CLIENT_READ_TIMEOUT = 5000;
 
     /**
-     * Returns an HTTPS client for deploying Siddhi apps to the Worker
+     * Returns an HTTPS client for deploying Siddhi apps to the Worker.
      *
      * @param httpsUrl HTTPS URL of the Worker
      * @param username Username

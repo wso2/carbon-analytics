@@ -45,7 +45,7 @@ public class SourceSinkConfigsGenerator extends CodeSegmentsPreserver {
     private static final String MAP = "MAP";
 
     /**
-     * Generates a list of Source configs
+     * Generates a list of Source configs.
      *
      * @param sourceList List of Siddhi Sources
      * @return List of SourceSinkConfigs
@@ -56,7 +56,7 @@ public class SourceSinkConfigsGenerator extends CodeSegmentsPreserver {
     }
 
     /**
-     * Generates a list of Sink configs
+     * Generates a list of Sink configs.
      *
      * @param sinkList List of Siddhi Sinks
      * @return List of SourceSinkConfigs
@@ -68,7 +68,7 @@ public class SourceSinkConfigsGenerator extends CodeSegmentsPreserver {
 
     /**
      * Generates a list of Source/Sink configs based on the given sourceOrSinkAnnotation,
-     * and the given list of Siddhi Sources/Sinks
+     * and the given list of Siddhi Sources/Sinks.
      *
      * @param sourceOrSinkAnnotation The annotation, whether 'source' or 'sink'
      * @param sourceOrSinkList       List of Siddhi Sources/Sinks
@@ -88,7 +88,7 @@ public class SourceSinkConfigsGenerator extends CodeSegmentsPreserver {
     }
 
     /**
-     * Generates config for a Siddhi Source/Sink
+     * Generates config for a Siddhi Source/Sink.
      *
      * @param annotationType                  The annotation, whether 'source' or 'sink'
      * @param sourceOrSinkAndConnectedElement Object which contains the complete details of the Source/Sink,
@@ -138,7 +138,7 @@ public class SourceSinkConfigsGenerator extends CodeSegmentsPreserver {
     }
 
     /**
-     * Generates config for a Mapper
+     * Generates config for a Mapper.
      *
      * @param mapAnnotation Siddhi annotation that contains details of a Siddhi Mapper
      * @return MapperConfig object
@@ -167,7 +167,7 @@ public class SourceSinkConfigsGenerator extends CodeSegmentsPreserver {
     }
 
     /**
-     * Generates MapperPayloadOrAttribute object, with the given Siddhi Annotation
+     * Generates MapperPayloadOrAttribute object, with the given Siddhi Annotation.
      *
      * @param attributesOrPayloadAnnotation Siddhi Annotation, denoting @attribute or @payload
      * @return MapperPayloadOrAttribute object
@@ -185,7 +185,7 @@ public class SourceSinkConfigsGenerator extends CodeSegmentsPreserver {
     }
 
     /**
-     * Generates a PayloadOrAttributeElement object from the given Siddhi Element object
+     * Generates a PayloadOrAttributeElement object from the given Siddhi Element object.
      *
      * @param element Siddhi Element object
      * @return PayloadOrAttributeElement object
@@ -198,7 +198,7 @@ public class SourceSinkConfigsGenerator extends CodeSegmentsPreserver {
     }
 
     /**
-     * Gets type of the MapperPayloadOrAttribute
+     * Gets type of the MapperPayloadOrAttribute.
      *
      * @param elements List of PayloadOrAttributeElements
      * @return MapperPayloadOrAttributeType
@@ -214,7 +214,7 @@ public class SourceSinkConfigsGenerator extends CodeSegmentsPreserver {
     }
 
     /**
-     * Generates a MapperListPayloadOrAttribute object with the given annotation type and list of elements
+     * Generates a MapperListPayloadOrAttribute object with the given annotation type and list of elements.
      *
      * @param annotationType Type of the Siddhi annotation, whether 'attributes' or 'payload'
      * @param elements       List of PayloadOrAttributeElements
@@ -230,7 +230,7 @@ public class SourceSinkConfigsGenerator extends CodeSegmentsPreserver {
     }
 
     /**
-     * Generates a MapperMapPayloadOrAttribute object with the given annotation type and list of elements
+     * Generates a MapperMapPayloadOrAttribute object with the given annotation type and list of elements.
      *
      * @param annotationType Type of the Siddhi annotation, whether 'attributes' or 'payload'
      * @param elements       List of PayloadOrAttributeElements
@@ -246,7 +246,7 @@ public class SourceSinkConfigsGenerator extends CodeSegmentsPreserver {
     }
 
     /**
-     * Generates a map that contains Siddhi Annotation for Source/Sink, and their respective connected element names
+     * Generates a map that contains Siddhi Annotation for Source/Sink, and their respective connected element names.
      *
      * @param sourceOrSinkAnnotation Annotation, that is either 'Source' or 'Sink'
      * @param sourceOrSinkList       List of Siddhi Sources/Sinks
@@ -283,7 +283,7 @@ public class SourceSinkConfigsGenerator extends CodeSegmentsPreserver {
     }
 
     /**
-     * Type of the SourceSinkConfig
+     * Type of the SourceSinkConfig.
      */
     private enum SourceOrSinkAnnotation {
         SOURCE,
@@ -291,7 +291,7 @@ public class SourceSinkConfigsGenerator extends CodeSegmentsPreserver {
     }
 
     /**
-     * Represents a PayloadOrAttribute element
+     * Represents a PayloadOrAttribute element.
      */
     private static class PayloadOrAttributeElement {
         private String key;

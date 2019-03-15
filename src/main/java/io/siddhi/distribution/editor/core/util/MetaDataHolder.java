@@ -31,7 +31,7 @@ public class MetaDataHolder {
     }
 
     /**
-     * Returns the in built processor meta data
+     * Returns the in built processor meta data.
      *
      * @return In-built processor meta data
      */

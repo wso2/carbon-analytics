@@ -41,7 +41,7 @@ public class SubElementCodeGenerator {
     }
 
     /**
-     * Generates the Siddhi code representation of a CommentCodeSegment object
+     * Generates the Siddhi code representation of a CommentCodeSegment object.
      *
      * @param comment The CommentCodeSegment object
      * @return The Siddhi code representation of the given CommentCodeSegment object
@@ -57,7 +57,7 @@ public class SubElementCodeGenerator {
     }
 
     /**
-     * Generates the Siddhi code representation of the query's name
+     * Generates the Siddhi code representation of the query's name.
      *
      * @param queryName The Siddhi query's name
      * @return The Siddhi code representation of a Siddhi query name annotation
@@ -77,7 +77,7 @@ public class SubElementCodeGenerator {
     }
 
     /**
-     * Generates the Siddhi code representation of a AttributeConfig list
+     * Generates the Siddhi code representation of a AttributeConfig list.
      *
      * @param attributes The AttributeConfig list
      * @return The Siddhi code representation of the given AttributeConfig list
@@ -105,7 +105,7 @@ public class SubElementCodeGenerator {
     }
 
     /**
-     * Generates the Siddhi code representation of a annotations list
+     * Generates the Siddhi code representation of a annotations list.
      *
      * @param annotations The annotations list
      * @return The Siddhi code representation of the given annotations list
@@ -124,7 +124,7 @@ public class SubElementCodeGenerator {
     }
 
     /**
-     * Generates the Siddhi code representation of a StoreConfig object
+     * Generates the Siddhi code representation of a StoreConfig object.
      *
      * @param store The StoreConfig object
      * @return The Siddhi code representation of the given StoreConfig object
@@ -164,7 +164,7 @@ public class SubElementCodeGenerator {
     }
 
     /**
-     * Generates the Siddhi code representation of a parameters list
+     * Generates the Siddhi code representation of a parameters list.
      *
      * @param parameters The parameters list
      * @return The Siddhi code representation of the given parameters list
@@ -188,7 +188,7 @@ public class SubElementCodeGenerator {
     }
 
     /**
-     * Generates the Siddhi code representation of a element list
+     * Generates the Siddhi code representation of a element list.
      *
      * @param elements The elements list
      * @return The Siddhi code representation of the given elements list
@@ -212,7 +212,7 @@ public class SubElementCodeGenerator {
     }
 
     /**
-     * Generates the Siddhi code representation of a StreamHandlerConfig list
+     * Generates the Siddhi code representation of a StreamHandlerConfig list.
      *
      * @param streamHandlerList The StreamHandlerConfig list
      * @return The Siddhi code representation of the given StreamHandlerConfig list
@@ -233,7 +233,7 @@ public class SubElementCodeGenerator {
     }
 
     /**
-     * Generates the Siddhi code representation of a StreamHandlerConfig object
+     * Generates the Siddhi code representation of a StreamHandlerConfig object.
      *
      * @param streamHandler The StreamHandlerConfig object
      * @return The Siddhi code representation of the given StreamHandlerConfig object
@@ -277,7 +277,7 @@ public class SubElementCodeGenerator {
     }
 
     /**
-     * Generates the Siddhi code representation of a output event type
+     * Generates the Siddhi code representation of a output event type.
      *
      * @param eventType The output event type
      * @return The Siddhi code representation of the given output event type

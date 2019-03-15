@@ -38,7 +38,7 @@ public class QueryOutputCodeGenerator {
     }
 
     /**
-     * Generates the Siddhi code representation of a QueryOutputConfig object
+     * Generates the Siddhi code representation of a QueryOutputConfig object.
      *
      * @param queryOutput The QueryOutputConfig object
      * @return The Siddhi code representation of the given QueryOutputConfig object
@@ -72,7 +72,7 @@ public class QueryOutputCodeGenerator {
     }
 
     /**
-     * Generates the Siddhi code representation of a InsertOutputConfig object
+     * Generates the Siddhi code representation of a InsertOutputConfig object.
      *
      * @param insertOutput The InsertOutputConfig object
      * @param target       The name of the output stream
@@ -119,7 +119,7 @@ public class QueryOutputCodeGenerator {
     }
 
     /**
-     * Generates the Siddhi code representation of a DeleteOutputConfig object
+     * Generates the Siddhi code representation of a DeleteOutputConfig object.
      *
      * @param deleteOutput The DeleteOutputConfig object
      * @param target       The name of the output stream
@@ -145,7 +145,7 @@ public class QueryOutputCodeGenerator {
     }
 
     /**
-     * Generates the Siddhi code representation of a UpdateInsertIntoOutputConfig object
+     * Generates the Siddhi code representation of a UpdateInsertIntoOutputConfig object.
      *
      * @param type                   The type of output (i.e Either 'update' or 'update-or-insert-into')
      * @param updateInsertIntoOutput The UpdateInsertIntoOutputConfig object
@@ -197,7 +197,7 @@ public class QueryOutputCodeGenerator {
     }
 
     /**
-     * Generates the Siddhi code representation of a SetAttributeConfig object
+     * Generates the Siddhi code representation of a SetAttributeConfig object.
      *
      * @param setAttribute The SetAttributeConfig object
      * @return The Siddhi code representation of the given SetAttributeConfig object

@@ -43,7 +43,7 @@ public class JoinConfigGenerator {
     private List<String> windowIDs = new ArrayList<>();
 
     /**
-     * Gets a JoinQueryConfig object, from the given Siddhi Query InputStream object
+     * Gets a JoinQueryConfig object, from the given Siddhi Query InputStream object.
      *
      * @param queryInputStream Siddhi Query InputStream object, which contains data regarding Siddhi Query input
      * @param siddhiApp        Compiled Siddhi app
@@ -57,7 +57,7 @@ public class JoinConfigGenerator {
     }
 
     /**
-     * Gets the JoinWithType for the JoinQueryConfig
+     * Gets the JoinWithType for the JoinQueryConfig.
      *
      * @return JoinWithType object
      * @throws DesignGenerationException Error while generating config
@@ -77,7 +77,7 @@ public class JoinConfigGenerator {
     }
 
     /**
-     * Gets the JoinElementType with the given streamId, which is an element of the join
+     * Gets the JoinElementType with the given streamId, which is an element of the join.
      *
      * @param streamId ID of the stream, defined for a window|table|aggregation|stream
      * @return JoinElementType
@@ -97,7 +97,7 @@ public class JoinConfigGenerator {
     /**
      * Distinguishes elements that are represented with each Stream ID in the given list of streamIds,
      * and adds the streamId to the relevant list,
-     * since Streams are manually defined in the Siddhi run time for Tables, Aggregations and Windows
+     * since Streams are manually defined in the Siddhi run time for Tables, Aggregations and Windows.
      *
      * @param streamIds IDs of Streams, inclusive of the Streams defined for Tables, Aggregations and Windows,
      *                  by the Siddhi run time
@@ -121,7 +121,7 @@ public class JoinConfigGenerator {
     }
 
     /**
-     * Generates Config for a Join Element of a Join QueryInput, with the given Siddhi SingleInputStream
+     * Generates Config for a Join Element of a Join QueryInput, with the given Siddhi SingleInputStream.
      *
      * @param singleInputStream Siddhi SingleInputStream object
      * @param siddhiAppString   Complete Siddhi app string
@@ -140,7 +140,7 @@ public class JoinConfigGenerator {
     }
 
     /**
-     * Generates a JoinConfig, which represents a Join Input of a Siddhi Query
+     * Generates a JoinConfig, which represents a Join Input of a Siddhi Query.
      *
      * @param queryInputStream Siddhi Query InputStream object
      * @param siddhiAppString  Complete Siddhi app string
@@ -190,7 +190,7 @@ public class JoinConfigGenerator {
     }
 
     /**
-     * Join Element Type
+     * Join Element Type.
      */
     private enum JoinElementType {
         STREAM,
@@ -200,7 +200,7 @@ public class JoinConfigGenerator {
     }
 
     /**
-     * Directions of a Join
+     * Directions of a Join.
      */
     private enum JoinDirection {
         LEFT,
