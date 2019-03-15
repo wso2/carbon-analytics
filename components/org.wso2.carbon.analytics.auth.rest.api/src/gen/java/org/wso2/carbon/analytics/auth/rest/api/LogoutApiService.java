@@ -27,4 +27,6 @@ import javax.ws.rs.core.Response;
 public abstract class LogoutApiService {
     public abstract Response logoutAppNamePost(String appName
             , Request request) throws NotFoundException;
+
+    public abstract Response ssoLogout() throws NotFoundException;
 }

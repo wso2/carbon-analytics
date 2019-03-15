@@ -152,8 +152,9 @@ public class UserDTO {
         StringBuilder sb = new StringBuilder();
         sb.append("{");
         sb.append("\"username\":\"").append(authUser).append("\",");
-        sb.append("\"SDID\":\"").append(pID).append("\",");
-        sb.append("\"validity\":\"").append(validityPeriod).append("\",");
+        sb.append("\"PID\":\"").append(pID).append("\",");
+        sb.append("\"LID\":\"").append(lID).append("\",");
+        sb.append("\"validity\":").append(validityPeriod).append(",");
         sb.append("\"expires\":\"").append(System.currentTimeMillis() % 1000 + validityPeriod).append("\"");
         sb.append("}");
         return sb.toString();

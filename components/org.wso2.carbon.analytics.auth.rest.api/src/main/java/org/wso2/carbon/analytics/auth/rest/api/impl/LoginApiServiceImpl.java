@@ -99,7 +99,7 @@ public class LoginApiServiceImpl extends LoginApiService {
             RedirectionDTO redirectionDTO;
 
             String trimmedAppName = appName.split("/\\|?")[0];
-            String appContext = "/" + trimmedAppName;
+            String appContext = trimmedAppName;
             idPClientProperties.put(IdPClientConstants.APP_NAME, trimmedAppName);
             idPClientProperties.put(IdPClientConstants.GRANT_TYPE, grantType);
             idPClientProperties.put(IdPClientConstants.REMEMBER_ME, rememberMe.toString());
@@ -247,7 +247,7 @@ public class LoginApiServiceImpl extends LoginApiService {
             String requestCode = requestUrl.substring(requestUrl.lastIndexOf("?code=") + 6);
             try {
                 ExternalIdPClient oAuth2IdPClient = (ExternalIdPClient) idPClient;
-                Map<String, String> authCodeloginResponse = oAuth2IdPClient.authCodeLogin(trimmedAppName, requestCode);
+                Map<String, String> authCodeloginResponse = oAuth2IdPClient.authCodeLogin(appName, requestCode);
                 String loginStatus = authCodeloginResponse.get(IdPClientConstants.LOGIN_STATUS);
                 if (loginStatus.equals(IdPClientConstants.LoginStatus.LOGIN_SUCCESS)) {
                     UserDTO userDTO = new UserDTO();
@@ -290,17 +290,14 @@ public class LoginApiServiceImpl extends LoginApiService {
                     NewCookie logoutContextAccessToken = AuthUtil
                             .cookieBuilder(AuthRESTAPIConstants.WSO2_SP_TOKEN, accessTokenSecondHalf,
                                     AuthRESTAPIConstants.LOGOUT_CONTEXT + appContext, true, true, -1);
-
-                    NewCookie userAuthenticate = AuthUtil.cookieBuilder("DASHBOARD_USER", userDTO.toStringify(),
-                            appContext, true, true, -1);
-
-                    NewCookie refreshTokenCookie = AuthUtil.cookieBuilder("PRT", accessTokenSecondHalf, appContext,
-                            true, true, validityPeriod);
                     if (refreshToken != null) {
                         NewCookie loginContextRefreshTokenCookie;
                         String refTokenPart1 = refreshToken.substring(0, refreshToken.length() / 2);
                         String refTokenPart2 = refreshToken.substring(refreshToken.length() / 2);
                         userDTO.setlID(refTokenPart1);
+                        NewCookie userAuthenticate = AuthUtil.cookieBuilder(AuthRESTAPIConstants.WSO2_SP_USER_DTO,
+                                userDTO.toStringify(),
+                                appContext, true, false, -1);
                         loginContextRefreshTokenCookie = AuthUtil
                                 .cookieBuilder(AuthRESTAPIConstants.WSO2_SP_REFRESH_TOKEN, refTokenPart2,
                                         AuthRESTAPIConstants.LOGIN_CONTEXT + appContext, true, true,
@@ -309,14 +306,13 @@ public class LoginApiServiceImpl extends LoginApiService {
                                 .header(HttpHeaders.LOCATION, targetURIForRedirection)
                                 .entity(userDTO)
                                 .cookie(accessTokenhttpOnlyCookie, logoutContextAccessToken,
-                                        loginContextRefreshTokenCookie, userAuthenticate, refreshTokenCookie)
+                                        loginContextRefreshTokenCookie, userAuthenticate)
                                 .build();
                     }
                     return Response.status(Response.Status.FOUND)
                             .header(HttpHeaders.LOCATION, targetURIForRedirection)
                             .entity(userDTO)
-                            .cookie(accessTokenhttpOnlyCookie, logoutContextAccessToken, userAuthenticate,
-                                    refreshTokenCookie)
+                            .cookie(accessTokenhttpOnlyCookie, logoutContextAccessToken)
                             .build();
                 } else {
                     if (LOG.isDebugEnabled()) {
