@@ -53,7 +53,7 @@ public abstract class ScopedCommentsPreserver {
 
     /**
      * Binds CommentCodeSegments from the given list,
-     * to their relevant Siddhi Element Config objects from the given SiddhiAppConfig reference object
+     * to their relevant Siddhi Element Config objects from the given SiddhiAppConfig reference object.
      *
      * @param commentCodeSegments      List of CommentCodeSegments of a Siddhi app
      * @param siddhiAppConfigReference SiddhiAppConfig object reference

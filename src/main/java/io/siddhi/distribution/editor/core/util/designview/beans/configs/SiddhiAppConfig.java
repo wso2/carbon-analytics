@@ -39,7 +39,7 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * Contains elements of a Siddhi app,
+ * Contains elements of a Siddhi app.
  */
 public class SiddhiAppConfig {
     private int finalElementCount = 0;
@@ -102,7 +102,7 @@ public class SiddhiAppConfig {
     }
 
     /**
-     * Adds the given list of ElementCodeSegment objects representing code segments of Siddhi elements,
+     * Adds the given list of ElementCodeSegment objects representing code segments of Siddhi elements.
      * to the existing list
      *
      * @param elementCodeSegments List of ElementCodeSegment objects

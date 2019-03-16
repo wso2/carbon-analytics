@@ -26,7 +26,7 @@ import org.wso2.siddhi.query.api.SiddhiElement;
  */
 public class ConfigBuildingUtilities {
     /**
-     * Avoids Instantiation
+     * Avoids Instantiation.
      */
     private ConfigBuildingUtilities() {
     }

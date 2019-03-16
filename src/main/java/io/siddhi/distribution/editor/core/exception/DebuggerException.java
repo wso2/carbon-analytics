@@ -24,7 +24,7 @@ package io.siddhi.distribution.editor.core.exception;
 public class DebuggerException extends Exception {
 
     /**
-     * Throws customize DebuggerException
+     * Throws customize DebuggerException.
      *
      * @param message Error Message
      */

@@ -28,7 +28,7 @@ public class HTTPSClientUtil {
     private static final String PROTOCOL = "https";
 
     /**
-     * Avoids Instantiation
+     * Avoids Instantiation.
      */
     private HTTPSClientUtil() {
     }
