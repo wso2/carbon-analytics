@@ -37,7 +37,7 @@ public abstract class CodeSegmentsPreserver {
     }
 
     /**
-     * Preserves code segment of the given SiddhiElement object
+     * Preserves code segment of the given SiddhiElement object.
      *
      * @param siddhiElement SiddhiElement object which represents a parsed Siddhi element.
      */
