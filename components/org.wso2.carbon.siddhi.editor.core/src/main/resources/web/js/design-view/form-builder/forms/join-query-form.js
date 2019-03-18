@@ -142,9 +142,10 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
             var isErrorOccurred = false;
             var sourceDiv = $('.define-' + type + '-source');
             if (self.formUtils.validateStreamHandlers(sourceDiv)) {
+                self.formUtils.expandCollapsedDiv(sourceDiv);
                 isErrorOccurred = true;
             }
-            return isErrorOccurred
+            return isErrorOccurred;
         };
 
 		/**

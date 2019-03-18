@@ -88,6 +88,7 @@ define(function () {
         JOIN: "join",
         LEFT: "left",
         RIGHT: "right",
+        QUERY: "query",
         OPERATION: "operation",
         INSERT: "insert",
         CUSTOM: "custom",
