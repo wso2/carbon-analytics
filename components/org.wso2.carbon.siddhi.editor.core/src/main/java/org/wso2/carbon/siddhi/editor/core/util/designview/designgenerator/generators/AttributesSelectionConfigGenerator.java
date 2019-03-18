@@ -60,7 +60,9 @@ public class AttributesSelectionConfigGenerator extends CodeSegmentsPreserver {
                 try {
                     selectedAttributes.add(generateSelectedAttribute(outputAttribute));
                 } catch (DesignGenerationException e) {
-                    log.error("Definition of the attribute selection is not found " + e.getMessage(), e);
+                    AllSelectionConfig allSelectionConfig = new AllSelectionConfig();
+                    preserveAndBindCodeSegment(selector, allSelectionConfig);
+                    return new AllSelectionConfig();
                 }
             }
         }
