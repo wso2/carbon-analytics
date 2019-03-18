@@ -37,6 +37,7 @@ public class StoreQueryHTTPClient {
      *
      * @param host    Host and the port of the worker node in {host}:{port} format
      * @param payload Payload
+     * @return HTTP response
      */
     public static Response executeStoreQuery(String host, String payload) {
         return SiddhiStoreQueryClientFactory

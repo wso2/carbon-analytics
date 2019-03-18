@@ -30,6 +30,7 @@ public class SecurityUtil {
      *
      * @param baseDirPath the absolute path of the base directory that all user-specified paths should be within.
      * @param userPath    the untrusted path provided by the API user, expected to be relative to {@code baseDirPath}
+     * @return resolved path
      */
     public static Path resolvePath(final Path baseDirPath, final Path userPath) {
         final Path resolvedPath = baseDirPath.resolve(userPath).normalize();

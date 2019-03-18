@@ -47,6 +47,7 @@ public class StoreQueryAPIHelper {
      *
      * @param query Query to be executed
      * @return HTTP Response
+     * @throws SiddhiStoreQueryHelperException when executing store queries
      */
     public Response executeStoreQuery(String query) throws SiddhiStoreQueryHelperException {
         return StoreQueryHTTPClient.executeStoreQuery(getStoreAPIHost(), query);
@@ -56,7 +57,7 @@ public class StoreQueryAPIHelper {
      * Get store API host with the port from the deployment.yaml.
      *
      * @return Host with the port
-     * @throws SiddhiStoreQueryHelperException
+     * @throws SiddhiStoreQueryHelperException when executing store queries
      */
     private String getStoreAPIHost() throws SiddhiStoreQueryHelperException {
         try {

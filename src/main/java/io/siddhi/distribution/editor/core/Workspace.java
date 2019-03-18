@@ -33,7 +33,7 @@ public interface Workspace {
      * List the roots of the system.
      *
      * @return array of directories
-     * @throws IOException
+     * @throws IOException when IO operation fails
      */
     JsonArray listRoots() throws IOException;
 
@@ -41,7 +41,7 @@ public interface Workspace {
      * List the files of a given directory path of the system.
      *
      * @return array of files
-     * @throws IOException
+     * @throws IOException when IO operation fails
      */
     JsonArray listDirectoryFiles(String path) throws IOException;
 
@@ -50,7 +50,7 @@ public interface Workspace {
      *
      * @param path provided path
      * @return array of directories
-     * @throws IOException
+     * @throws IOException when IO operation fails
      */
     JsonArray listDirectoriesInPath(String path) throws IOException;
 
@@ -59,7 +59,7 @@ public interface Workspace {
      *
      * @param path provided path
      * @return array of files
-     * @throws IOException
+     * @throws IOException when IO operation fails
      */
     JsonArray listFilesInPath(Path path) throws IOException;
 
@@ -68,7 +68,7 @@ public interface Workspace {
      *
      * @param path provided path
      * @return json object
-     * @throws IOException
+     * @throws IOException when IO operation fails
      */
     JsonObject exists(Path path) throws IOException;
 
@@ -77,7 +77,7 @@ public interface Workspace {
      *
      * @param path provided path
      * @param type type of artifact eg:folder
-     * @throws IOException
+     * @throws IOException when IO operation fails
      */
     void create(String path, String type) throws IOException;
 
@@ -86,7 +86,7 @@ public interface Workspace {
      *
      * @param path provided path
      * @param type type of artifact eg:folder
-     * @throws IOException
+     * @throws IOException when IO operation fails
      */
     void delete(String path, String type) throws IOException;
 
@@ -95,18 +95,18 @@ public interface Workspace {
      *
      * @param path provided path
      * @return content read
-     * @throws IOException
+     * @throws IOException when IO operation fails
      */
     JsonObject read(Path path) throws IOException;
 
     /**
-     * @param logger
-     * @param timestamp
-     * @param level
-     * @param url
-     * @param message
-     * @param layout
-     * @throws IOException
+     * @param logger logger ID
+     * @param timestamp time stamp
+     * @param level log level
+     * @param url editor url
+     * @param message log message
+     * @param layout log layout
+     * @throws IOException when IO operation fails
      */
     void log(String logger, String timestamp, String level, String url, String message, String layout)
             throws IOException;

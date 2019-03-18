@@ -85,6 +85,7 @@ public class QueryConfigGenerator extends CodeSegmentsPreserver {
      *
      * @param query Siddhi Query object
      * @return QueryConfig object
+     * @throws DesignGenerationException Error while generating QueryInputConfig
      */
     public QueryConfig generateQueryConfig(Query query)
             throws DesignGenerationException {

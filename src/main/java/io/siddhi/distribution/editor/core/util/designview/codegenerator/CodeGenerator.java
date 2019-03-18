@@ -101,9 +101,9 @@ public class CodeGenerator {
     /**
      * Generates list of tooltips for a given SiddhiAppconfig object.
      *
-     * @param siddhiAppConfig
-     * @return
-     * @throws CodeGenerationException
+     * @param siddhiAppConfig Siddhi APP configuration
+     * @return list of tooltips
+     * @throws CodeGenerationException Error while generating the code
      */
     public List<ToolTip> generateSiddhiAppToolTips(SiddhiAppConfig siddhiAppConfig) throws CodeGenerationException {
         SiddhiAppConfig siddhiApp = siddhiAppConfig;

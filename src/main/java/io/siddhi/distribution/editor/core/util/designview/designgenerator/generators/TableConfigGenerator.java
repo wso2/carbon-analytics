@@ -36,6 +36,7 @@ public class TableConfigGenerator extends CodeSegmentsPreserver {
      *
      * @param tableDefinition Siddhi TableDefinition
      * @return TableConfig object
+     * @throws DesignGenerationException when Siddhi editor designer fails     *
      */
     public TableConfig generateTableConfig(TableDefinition tableDefinition) throws DesignGenerationException {
         // 'store' and annotations

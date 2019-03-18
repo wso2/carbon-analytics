@@ -168,6 +168,7 @@ public class EventFlowBuilder {
      * Loads Sources from the SiddhiAppRuntime.
      *
      * @return A reference to this object
+     * @throws DesignGenerationException when Siddhi editor designer fails
      */
     public EventFlowBuilder loadSources() throws DesignGenerationException {
         SourceSinkConfigsGenerator sourceConfigsGenerator = new SourceSinkConfigsGenerator();
@@ -184,6 +185,7 @@ public class EventFlowBuilder {
      * Loads Sinks from the SiddhiAppRuntime.
      *
      * @return A reference to this object
+     * @throws DesignGenerationException when Siddhi editor designer fails
      */
     public EventFlowBuilder loadSinks() throws DesignGenerationException {
         SourceSinkConfigsGenerator sinkConfigsGenerator = new SourceSinkConfigsGenerator();

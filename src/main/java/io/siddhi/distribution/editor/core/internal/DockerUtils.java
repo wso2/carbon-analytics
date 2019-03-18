@@ -62,8 +62,10 @@ public class DockerUtils {
     /**
      * Create a zip archive.
      *
+     * @param profile Siddhi profile name
      * @param siddhiFiles List of Siddhi siddhiFiles
      * @return Zip archive file
+     * @throws DockerGenerationException if docker generation fails
      */
     public File createArchive(String profile, List<String> siddhiFiles) throws DockerGenerationException {
         // Create <CARBON_HOME>/tmp/docker-export directory.

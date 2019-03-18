@@ -49,6 +49,7 @@ public class JoinConfigGenerator {
      * @param siddhiApp        Compiled Siddhi app
      * @param siddhiAppString  Complete Siddhi app string
      * @return JoinQueryConfig object
+     * @throws DesignGenerationException Error while generating config
      */
     public JoinConfig getJoinQueryConfig(InputStream queryInputStream, SiddhiApp siddhiApp, String siddhiAppString)
             throws DesignGenerationException {

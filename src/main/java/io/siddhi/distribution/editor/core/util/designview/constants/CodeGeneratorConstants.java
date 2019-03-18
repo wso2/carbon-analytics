@@ -20,7 +20,7 @@ package io.siddhi.distribution.editor.core.util.designview.constants;
 
 /**
  * Contains generic String constants that are used by the
- * CodeGenerator & CodeGeneratorUtils class.
+ * CodeGenerator &amp; CodeGeneratorUtils class.
  */
 public class CodeGeneratorConstants {
 
