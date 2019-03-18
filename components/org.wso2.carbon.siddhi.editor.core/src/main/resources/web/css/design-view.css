@@ -635,26 +635,20 @@ a.list-group-item, button.list-group-item {
 	margin-left: 75px;
 }
 
-
-.design-view-form-content .partition-form-container input[type="text"].partition-by-stream-name {
-	margin-left: 38px;
+.partition-form-container .partition-by-expression-selection {
+    width: 80%
 }
 
 .partition-form-container .partition-by-label {
-    width: 29%;
+    width: 30%;
     margin: 5px;
     text-align: left;
 }
 
-.partition-form-container .partition-by-expression-selection {
-    width: 29%;
-}
-
-.partition-form-container .partition-stream-name {
-    min-height: 25px;
-    width: 50%;
-    margin-top: -22px;
-    margin-left: 175px;
+.partition-form-container .partition-stream-name,
+.partition-form-container .partition-expression {
+    width: 32.5%;
+    float: left;
 }
 
 .source-sink-form-container .source-sink-map-options .error-message,
@@ -866,10 +860,10 @@ a.list-group-item, button.list-group-item {
 	display: none;
 }
 
-.design-view-form-content .mandatory-annotation > a.jstree-hovered,
-.design-view-form-content .optional-key > a.jstree-hovered,
-.design-view-form-content .annotation-value > a.jstree-hovered {
-	cursor: context;
+.design-view-form-content #annotation-div a.annotation.jstree-hovered,
+.design-view-form-content #annotation-div a.annotation-key.jstree-hovered,
+.design-view-form-content #annotation-div a.annotation-value.jstree-hovered {
+    cursor: text;
 	color: #ccc;
 	background: transparent;
 	border-radius: 0px;
@@ -1263,10 +1257,6 @@ label.option-name {
     margin-bottom: 2px;
 }
 
-.define-user-defined-annotations a.jstree-anchor {
-    cursor: text;
-}
-
 .design-view-form-content .define-user-defined-attributes .attribute,
 .design-view-form-content #mapper-attributes .attribute,
 .design-view-form-content #partition-by-content .partition-key,
@@ -1367,7 +1357,8 @@ label.option-name {
 
 .design-view-form-content .define-user-defined-annotations,
 .design-view-form-content .join-source-content,
-.siddhi-app-form-container #define-app-description {
+.siddhi-app-form-container #define-app-description,
+.query-form-container .query-from-div {
     margin-top: 10px;
 }
 
@@ -1415,8 +1406,4 @@ label.option-name {
     min-height: 25px;
     background-color: #282929;
     padding: 3px 7px;
-}
-
-.design-view-form-content input[type=checkbox][disabled] {
-    background-color: #1d1d1d;
 }
