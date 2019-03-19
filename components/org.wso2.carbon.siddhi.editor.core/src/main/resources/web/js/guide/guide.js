@@ -195,8 +195,8 @@ define(['jquery', 'lodash', 'log', 'enjoyhint', 'designViewUtils', 'workspace', 
                     }
                 },
                 {
-                    'next .attr-name': 'We have set the attribute name as <b class="lime-text"> ' +
-                        'TotalProduction</b>. Click<b class="lime-text"> Next</b> to continue',
+                    'next .attr-name': 'We have set the attribute name as <b class="lime-text"> TotalProduction</b>. ' +
+                        'Click<b class="lime-text"> Next</b> to continue',
                     'showSkip': false,
                     'showNext': true,
                     onBeforeStart: function () {
@@ -315,7 +315,7 @@ define(['jquery', 'lodash', 'log', 'enjoyhint', 'designViewUtils', 'workspace', 
                     }
                 },
                 {
-                    'next .query-name': 'We have changed the query name to <b class="lime-text">SweetTotalQuery</b>',
+                    'next .query-name': 'We have changed the query name to <b class="lime-text">SweetTotalQuery</b> click Next',
                     'showSkip': false,
                     onBeforeStart: function () {
                         $('.query-name').val('SweetTotalQuery').focus();
@@ -324,7 +324,7 @@ define(['jquery', 'lodash', 'log', 'enjoyhint', 'designViewUtils', 'workspace', 
                     }
                 },
                 {
-                    'next .attribute-expression': 'We have set the expression as <b class="lime-text">count()</b>',
+                    'next .attribute-expression': 'We have set the expression as <b class="lime-text">count()</b> click Next',
                     'showSkip': false,
                     'shape': 'rect',
                     onBeforeStart: function () {
@@ -402,8 +402,8 @@ define(['jquery', 'lodash', 'log', 'enjoyhint', 'designViewUtils', 'workspace', 
                     }
                 },
                 {
-                    'click .sinkDrop': 'Move the mouse over the dropped component and click' +
-                        ' <b class="lime-text">settings</b> icon to open the <b class="lime-text">Sink configuration</b>',
+                    'click .sinkDrop': 'Move the mouse over the dropped component and click <b class="lime-text">settings</b> ' +
+                        'icon to open the <b class="lime-text">Sink configuration</b>',
                     'showSkip': false,
                     'showNext': false,
                     'shape': "rect",
@@ -578,7 +578,7 @@ define(['jquery', 'lodash', 'log', 'enjoyhint', 'designViewUtils', 'workspace', 
                         tempFile = "SweetFactory__" + fileIncrement;
                         var payload = "configName=" + btoa(tempFile + '.siddhi') + "&config="
                             + (btoa(Constants.CONTENT));
-                        var fileToBeChecked = "configName="+btoa(tempFile + '.siddhi');
+                        var fileToBeChecked = "configName=" + btoa(tempFile + '.siddhi');
                         $.ajax({
                             url: checkFileURL,
                             type: "POST",
