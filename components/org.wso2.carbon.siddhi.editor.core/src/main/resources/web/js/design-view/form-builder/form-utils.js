@@ -3800,7 +3800,7 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
             $.ajax({
                 type: "POST",
                 url: self.tooltipsURL,
-                data: window.btoa(JSON.stringify(appData)),
+                data: self.configurationData.application.utils.base64EncodeUnicode(JSON.stringify(appData)),
                 async: false,
                 success: function (response) {
                     var toolTipObject = _.find(response, function (toolTip) {

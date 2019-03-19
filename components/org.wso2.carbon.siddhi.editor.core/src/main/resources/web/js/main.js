@@ -18,10 +18,10 @@
 
 define(['require', 'log', 'jquery', 'lodash', 'backbone', 'menu_bar', 'tool_bar', 'command', 'workspace',
         'app/tab/service-tab-list', 'event_simulator', 'app/output-console/service-console-list-manager',
-        'nano_scroller','guide','workspace/file', 'operator_finder'],
+        'nano_scroller','guide','workspace/file', 'operator_finder', 'utils'],
 
     function (require, log, $, _, Backbone, MenuBar, ToolBar, CommandManager, Workspace, TabController,
-              EventSimulator, OutputController,NanoScroller, Guide, File, OperatorFinder) {
+              EventSimulator, OutputController,NanoScroller, Guide, File, OperatorFinder,Utils) {
 
         var Application = Backbone.View.extend(
             /** @lends Application.prototype */
@@ -51,6 +51,8 @@ define(['require', 'log', 'jquery', 'lodash', 'backbone', 'menu_bar', 'tool_bar'
 
                     // init command manager
                     this.commandManager = new CommandManager(this);
+
+                    this.utils = new Utils();
 
                     //init menu bar
                     var menuBarOpts = _.get(this.config, "menu_bar");
