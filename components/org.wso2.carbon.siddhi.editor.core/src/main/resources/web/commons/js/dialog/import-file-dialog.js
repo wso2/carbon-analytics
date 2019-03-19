@@ -91,7 +91,7 @@ define(['require', 'lodash', 'jquery', 'log', 'backbone', 'file_browser', 'works
                         var data = {};
                         var workspaceServiceURL = app.config.services.workspace.endpoint;
                         var saveServiceURL = workspaceServiceURL + "/exists/workspace";
-                        var payload = "configName=" + btoa(options.configName);
+                        var payload = "configName=" + self.app.utils.base64EncodeUnicode(options.configName);
 
                         $.ajax({
                             type: "POST",
@@ -125,7 +125,8 @@ define(['require', 'lodash', 'jquery', 'log', 'backbone', 'file_browser', 'works
                         var config = fileContent;
                         var configName = fileName;
 
-                        var payload = "configName=" + btoa(configName) + "&config=" + (btoa(config));
+                        var payload = "configName=" + self.app.utils.base64EncodeUnicode(configName) + "&config=" +
+                            self.app.utils.base64EncodeUnicode(config);
 
                         $.ajax({
                             url: importServiceURL,

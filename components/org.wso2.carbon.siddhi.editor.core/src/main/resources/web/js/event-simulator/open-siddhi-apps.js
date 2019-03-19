@@ -25,7 +25,7 @@ define(['require', 'lodash','jquery', 'log', 'backbone', 'file_browser', 'worksp
             self.workspaceServiceURL = self.app.config.services.workspace.endpoint;
             log.info(self.app.config.services.workspace.endpoint);
             $.ajax({
-                url: self.workspaceServiceURL + "/listFilesInPath?path=" + btoa(""),
+                url: self.workspaceServiceURL + "/listFilesInPath?path=" + self.app.utils.base64EncodeUnicode(""),
                 type: "GET",
                 contentType: "text/plain; charset=utf-8",
                 async: false,
