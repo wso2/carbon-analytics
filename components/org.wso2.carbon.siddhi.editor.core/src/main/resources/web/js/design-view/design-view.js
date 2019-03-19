@@ -212,7 +212,7 @@ define(['require', 'log', 'lodash', 'jquery', 'tool_palette/tool-palette', 'desi
                 $.ajax({
                     type: "POST",
                     url: self.codeToDesignURL,
-                    data: window.btoa(code),
+                    data: self.options.application.utils.base64EncodeUnicode(code),
                     async: false,
                     success: function (response) {
                         result = {status: "success", responseString: window.atob(response)};
@@ -236,7 +236,7 @@ define(['require', 'log', 'lodash', 'jquery', 'tool_palette/tool-palette', 'desi
             $.ajax({
                 type: "POST",
                 url: self.designToCodeURL,
-                data: window.btoa(designViewJSON),
+                data: self.options.application.utils.base64EncodeUnicode(designViewJSON),
                 async: false,
                 success: function (response) {
                     result = {status: "success", responseString: window.atob(response)};

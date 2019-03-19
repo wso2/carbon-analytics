@@ -150,6 +150,7 @@ define(['ace/ace', 'jquery', 'lodash', 'log','dialogs','./service-client','welco
                         }
                     } else {
                         options.tabInstance = saveFileTab;
+                        options.utils = self.utils;
                         app.commandManager.dispatch('open-file-save-dialog', options);
                     }
                 }

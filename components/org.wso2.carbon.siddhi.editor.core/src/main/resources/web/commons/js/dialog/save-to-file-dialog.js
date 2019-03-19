@@ -50,7 +50,6 @@ define(['require', 'lodash', 'jquery', 'log', 'backbone', 'file_browser', 'boots
                         this._configNameInput.val(fileName);
                     }
                 },
-
                 render: function (tabInstance) {
                     var self = this;
                     var fileBrowser;
@@ -241,7 +240,7 @@ define(['require', 'lodash', 'jquery', 'log', 'backbone', 'file_browser', 'boots
                         var data = {};
                         var workspaceServiceURL = app.config.services.workspace.endpoint;
                         var saveServiceURL = workspaceServiceURL + "/exists/workspace";
-                        var payload = "configName=" + btoa(options.configName);
+                        var payload = "configName=" + self.app.utils.base64EncodeUnicode(options.configName);
 
                         $.ajax({
                             type: "POST",
@@ -290,7 +289,8 @@ define(['require', 'lodash', 'jquery', 'log', 'backbone', 'file_browser', 'boots
                             config = appNameToAdd + config;
                         }
 
-                        var payload = "configName=" + btoa(options.configName) + "&config=" + (btoa(config));
+                        var payload = "configName=" + self.app.utils.base64EncodeUnicode(options.configName) +
+                            "&config=" + self.app.utils.base64EncodeUnicode(config);
 
                         $.ajax({
                             url: saveServiceURL,
