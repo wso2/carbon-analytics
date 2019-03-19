@@ -1016,11 +1016,11 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
         FormUtils.prototype.expandCollapsedDiv = function (divToBeExpanded) {
             var collapseHeader = $(divToBeExpanded).find('.collapsed:first');
             var collapseBody = $(divToBeExpanded).find('.collapse:first');
-            collapseHeader.attr("aria-expanded","true");
+            collapseHeader.attr("aria-expanded", "true");
             collapseHeader.removeClass("collapsed");
-            collapseBody.attr("aria-expanded","true");
+            collapseBody.attr("aria-expanded", "true");
             collapseBody.addClass("collapse in");
-            collapseBody.css("height","auto");
+            collapseBody.css("height", "auto");
             $('.collapse .error-input-field')[0].scrollIntoView();
         };
 
