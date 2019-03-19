@@ -718,8 +718,12 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
             var i = 0;
             var connectedElement = self.configurationData.getSiddhiAppConfig().getDefinitionElementByName(outputElementName);
             _.forEach(connectedElement.element.getAttributeList(), function (attribute) {
+                var expression = "";
+                if(projectionValues[i]) {
+                    expression = projectionValues[i].expression;
+                }
                 attributes.push({
-                    expression: projectionValues[i].expression,
+                    expression: expression,
                     as: attribute.getName()
                 });
                 i++;
