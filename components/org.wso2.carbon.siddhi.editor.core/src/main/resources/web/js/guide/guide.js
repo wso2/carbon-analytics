@@ -141,12 +141,11 @@ define(['jquery', 'lodash', 'log', 'enjoyhint', 'designViewUtils', 'workspace', 
                     }
                 },
                 {
-                    'custom .design-view-container': 'Drag a <b class="lime-text">Stream </b>component and place' +
-                        ' it to the right of SweetProduction component.',
+                    'custom .design-view-container': 'Drag a <b class="lime-text">Stream </b>and drop it on the design view',
                     'showSkip': false,
                     'showNext': false,
                     'shape': 'rect',
-                    'bottom': 300,
+                    'bottom': 250,
                     onBeforeStart: function () {
                         $('#tool-group-Collections').find('.tool-group-body').css('display', 'none');
                         $('#tool-group-Queries').find('.tool-group-body').css('display', 'none');
@@ -175,7 +174,7 @@ define(['jquery', 'lodash', 'log', 'enjoyhint', 'designViewUtils', 'workspace', 
                     'showSkip': false,
                     'showNext': false,
                     'shape': "rect",
-                    'margin': 35,
+                    'margin': 45,
                     onBeforeStart: function () {
                         $('#tool-group-Collections').find('.tool-group-body').css('display', 'block');
                         $('#tool-group-Queries').find('.tool-group-body').css('display', 'block');
@@ -187,12 +186,8 @@ define(['jquery', 'lodash', 'log', 'enjoyhint', 'designViewUtils', 'workspace', 
                     }
                 },
                 {
-                    'keyCode': Constants.TAB_KEYCODE,
-                    'selector': '#streamName',
-                    'event': 'key',
-                    'description': 'We have set the stream name as <b class="lime-text"> TotalProductionStream.</b> ' +
-                        'Press<b class="lime-text"> Tab</b> to continue.',
-                    'showNext': false,
+                    'next #streamName': 'We have set the stream name as <b class="lime-text"> TotalProductionStream.</b> ' +
+                        'Press<b class="lime-text"> Next</b> to continue.',
                     'showSkip': false,
                     onBeforeStart: function () {
                         $('.fw-delete').addClass('fw-delete');
@@ -201,7 +196,7 @@ define(['jquery', 'lodash', 'log', 'enjoyhint', 'designViewUtils', 'workspace', 
                 },
                 {
                     'next .attr-name': 'We have set the attribute name as <b class="lime-text"> ' +
-                        'TotalProduction. Click</b><b class="lime-text"> Next</b> to continue',
+                        'TotalProduction</b>. Click<b class="lime-text"> Next</b> to continue',
                     'showSkip': false,
                     'showNext': true,
                     onBeforeStart: function () {
@@ -210,7 +205,7 @@ define(['jquery', 'lodash', 'log', 'enjoyhint', 'designViewUtils', 'workspace', 
                 },
                 {
                     'next .attr-type': 'We have set the attribute type as <b class="lime-text"> ' +
-                        'long. Click</b><b class="lime-text"> Next</b> to continue.',
+                        'long</b>. Click<b class="lime-text"> Next</b> to continue.',
                     'showSkip': false,
                     'showNext': true,
                     onBeforeStart: function () {
@@ -231,8 +226,8 @@ define(['jquery', 'lodash', 'log', 'enjoyhint', 'designViewUtils', 'workspace', 
                 },
                 {
                     'next #projection-query': 'This is a <b class="lime-text">Projection component</b> that allows' +
-                        ' you to select some or all of the attributes from the input stream to be inserted into the ' +
-                        'output stream. Click <b class="lime-text"> Next</b> ',
+                        ' you to select some or all of the attributes from the input stream (Sweet Production Stream) <br>' +
+                        'to be inserted into the output stream (Total Production Stream). Click <b class="lime-text"> Next</b> ',
                     'showSkip': false,
                     'showNext': true,
                     onBeforeStart: function () {
@@ -242,11 +237,11 @@ define(['jquery', 'lodash', 'log', 'enjoyhint', 'designViewUtils', 'workspace', 
                 },
                 {
                     'custom .design-view-container': 'Drag a <b class="lime-text">Projection component </b> and place' +
-                        ' it between your input and output stream components.',
+                        ' it between your input (Sweet Production Stream) and output stream (Total Production Stream) components.',
                     'showSkip': false,
                     'showNext': false,
                     'shape': 'rect',
-                    'bottom': 300,
+                    'bottom': 250,
                     onBeforeStart: function () {
                         $('#tool-group-Collections').find('.tool-group-body').css('display', 'none');
                         $("div[id='tool-group-Flow Constructs']").find('.tool-group-body').css('display', 'none');
@@ -274,13 +269,13 @@ define(['jquery', 'lodash', 'log', 'enjoyhint', 'designViewUtils', 'workspace', 
                     }
                 },
                 {
-                    'custom .design-view-container': 'Connect the input stream to the projection component, ' +
-                        'Then connect the Projection component to the output stream using nodes.<br> To do this you can ' +
+                    'custom .design-view-container': 'Connect the input stream (Sweet Production Stream) to the projection component, ' +
+                        'Then connect the Projection component to the output stream (Total Production Stream) using nodes.<br> To do this you can ' +
                         '<b class="lime-text">draw a connecting arrow by dragging the cursor from one node to another</b>',
                     'showSkip': false,
                     'showNext': false,
                     'shape': 'rect',
-                    'bottom': 300,
+                    'bottom': 250,
                     onBeforeStart: function () {
                         $('#filter-query').addClass('filter-query-drag');
                         $('#window-query').addClass('window-query-drag');
@@ -310,7 +305,7 @@ define(['jquery', 'lodash', 'log', 'enjoyhint', 'designViewUtils', 'workspace', 
                     'showSkip': false,
                     'showNext': false,
                     'shape': "rect",
-                    'margin': 35,
+                    'margin': 45,
                     onBeforeStart: function () {
                         $('#tool-group-Collections').find('.tool-group-body').css('display', 'block');
                         $("div[id='tool-group-Flow Constructs']").find('.tool-group-body').css('display', 'block');
@@ -320,39 +315,20 @@ define(['jquery', 'lodash', 'log', 'enjoyhint', 'designViewUtils', 'workspace', 
                     }
                 },
                 {
-                    'selector': '#form-query-name',
-                    'event': 'custom',
-                    'description': 'Change the query name to <b class="lime-text">SweetTotalQuery</b>',
-                    'showNext': false,
+                    'next .query-name': 'We have changed the query name to <b class="lime-text">SweetTotalQuery</b>',
                     'showSkip': false,
                     onBeforeStart: function () {
-                        setTimeout(function () {
-                            var interval = null;
-                            interval = window.setInterval(function () {
-                                if ($('#form-query-name').find('.form-control').val() === 'SweetTotalQuery') {
-                                    instance.trigger('next');
-                                    clearInterval(interval);
-                                }
-                            }, 1000);
-                        }, 4000)
+                        $('.query-name').val('SweetTotalQuery').focus();
+                        $('.define-user-defined-attributes').show();
+                        $('.attribute-selection-type').val('user_defined');
                     }
                 },
                 {
-                    'custom .has-error': 'Enter <b class="lime-text">count()</b> as the expression',
+                    'next .attribute-expression': 'We have set the expression as <b class="lime-text">count()</b>',
                     'showSkip': false,
-                    'showNext': false,
                     'shape': 'rect',
-                    'bottom': 20,
                     onBeforeStart: function () {
-                        setTimeout(function () {
-                            var interval = null;
-                            interval = window.setInterval(function () {
-                                if ($('.has-error').find('.form-control').val() === 'count()') {
-                                    instance.trigger('next');
-                                    clearInterval(interval);
-                                }
-                            }, 1000);
-                        }, 3000)
+                        $('.attribute-expression').val('count()');
                     }
                 },
                 {
@@ -383,7 +359,7 @@ define(['jquery', 'lodash', 'log', 'enjoyhint', 'designViewUtils', 'workspace', 
                     'showSkip': false,
                     'showNext': false,
                     'shape': 'rect',
-                    'bottom': 300,
+                    'bottom': 250,
                     onBeforeStart: function () {
                         $('#tool-group-Collections').find('.tool-group-body').css('display', 'none');
                         $("div[id='tool-group-Flow Constructs']").find('.tool-group-body').css('display', 'none');
@@ -410,7 +386,7 @@ define(['jquery', 'lodash', 'log', 'enjoyhint', 'designViewUtils', 'workspace', 
                     'showSkip': false,
                     'showNext': false,
                     'shape': 'rect',
-                    'bottom': 300,
+                    'bottom': 250,
                     onBeforeStart: function () {
                         setTimeout(function () {
                             var interval = null;
@@ -431,7 +407,7 @@ define(['jquery', 'lodash', 'log', 'enjoyhint', 'designViewUtils', 'workspace', 
                     'showSkip': false,
                     'showNext': false,
                     'shape': "rect",
-                    'margin': 35,
+                    'margin': 45,
                     onBeforeStart: function () {
                         $('.fw-delete').removeClass('fw-delete');
                     }
