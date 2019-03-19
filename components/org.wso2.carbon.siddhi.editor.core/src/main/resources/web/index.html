@@ -1413,7 +1413,7 @@
         <div class="partition-key">
             <div class="clearfix">
                 <div class="partition-expression"> {{> renderDropDown streamAttributes}} </div>
-                <div class="partition-stream-name"> <input type="text" class="partition-by-stream-name" value="{{streamName}}" readonly> <div>
+                <div class="partition-stream-name"> <input type="text" class="partition-by-stream-name" value="{{streamName}}" readonly> </div>
             </div>
             <label class="error-message"></label>
         </div>
@@ -1809,13 +1809,20 @@
         {{#each streamHandlerList}}
         <li class="define-stream-handler-content">
             <div>
-                <label class="clearfix"> <span class="mandatory-symbol"> * </span> Type </label>
-                <div class = "define-stream-handler-type"> {{> renderDropDown ../types}} </div>
-                <div class="clearfix">
-                    <div class = "define-stream-handler-type-content"> </div>
-                    <div class = "attr-nav"> </div>
+                <div class="collapse-div" href="#{{@index}}-{{../className}}-stream-handler-content"
+                 data-toggle="collapse" aria-expanded="false">
+                    <label class="clearfix">
+                        <span class="mandatory-symbol"> * </span> Type <a class="collapse-icon"> </a>
+                    </label>
+                    <div class = "define-stream-handler-type"> {{> renderDropDown ../types}} </div>
                 </div>
-                <label class = "error-message"> </label>
+                <div class="collapse" id="{{@index}}-{{../className}}-stream-handler-content">
+                    <div class="clearfix">
+                        <div class = "define-stream-handler-type-content"> </div>
+                        <div class = "attr-nav"> </div>
+                    </div>
+                    <label class = "error-message"> </label>
+                </div>
             </div>
         </li>
         {{/each}}
