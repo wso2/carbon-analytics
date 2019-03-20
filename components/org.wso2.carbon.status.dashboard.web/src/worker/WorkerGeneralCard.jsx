@@ -26,6 +26,7 @@ import CircleBorder from 'material-ui/svg-icons/av/fiber-manual-record';
 import StatusDashboardOverViewAPI from '../utils/apis/StatusDashboardOverViewAPI';
 //Localization
 import { FormattedMessage } from 'react-intl';
+import StatusDashboardAPIS from "../utils/apis/StatusDashboardAPIs";
 
 const styles = {
     borderBottom: {borderBottomColor: 'rgba(215,215,215,0.05)'},
@@ -42,7 +43,8 @@ export default class WorkerGeneralCard extends React.Component {
             generalDetails: [],
             haDetails: [],
             workerID: this.props.id,
-            isApiCalled: false
+            isApiCalled: false,
+            cardHeight: 660
         };
         this.getSnapshotTime = this.getSnapshotTime.bind(this);
         this.getSyncTime = this.getSyncTime.bind(this);
@@ -51,6 +53,16 @@ export default class WorkerGeneralCard extends React.Component {
 
     componentWillMount() {
         let that = this;
+
+        StatusDashboardAPIS.getHAWorkerDetailsByID(this.state.workerID, null)
+            .then((response) => {
+                if (response.data.haStatus) {
+                    that.setState({
+                        cardHeight: 1000
+                    });
+                }
+            });
+
         StatusDashboardOverViewAPI.postWorkerGeneralByID(this.state.workerID)
             .then(function (response) {
                 that.setState({
@@ -143,12 +155,11 @@ export default class WorkerGeneralCard extends React.Component {
         }
         return (
             <div style={{paddingLeft: 24, width: '30%', float: 'left', boxSizing: 'border-box'}}>
-                <Card style={{height: 660}}>
+                <Card style={{height: this.state.cardHeight, backgroundColor: '#131313'}}>
                     <CardTitle titleStyle={{ fontSize: 16, lineHeight: '48px', color: '#fff' }}
                         style={{ padding: '0 16px' }} title={<FormattedMessage id='workerGeneral.serverDetails' defaultMessage='Server General Details' />} />
                     <CardText style={{textAlign: 'left', padding: 0}}>
                         <Table
-                            height={612}
                             fixedHeader={false}
                             fixedFooter={false}
                             selectable={false}

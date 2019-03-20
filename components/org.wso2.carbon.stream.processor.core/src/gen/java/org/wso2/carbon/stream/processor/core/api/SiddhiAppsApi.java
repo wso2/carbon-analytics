@@ -17,17 +17,18 @@
 package org.wso2.carbon.stream.processor.core.api;
 
 import io.swagger.annotations.ApiParam;
+import org.json.JSONObject;
 import org.osgi.service.component.annotations.Component;
 import org.wso2.carbon.analytics.msf4j.interceptor.common.AuthenticationInterceptor;
-import org.wso2.carbon.analytics.msf4j.interceptor.common.util.InterceptorConstants;
 import org.wso2.carbon.stream.processor.core.factories.SiddhiAppsApiServiceFactory;
 import org.wso2.carbon.stream.processor.core.model.InlineResponse200;
 import org.wso2.carbon.stream.processor.core.model.InlineResponse400;
 import org.wso2.carbon.stream.processor.core.model.SiddhiAppMetrics;
-import org.wso2.carbon.stream.processor.core.model.StatsEnable;
+import org.wso2.carbon.stream.processor.core.util.StatsEnable;
 import org.wso2.msf4j.Microservice;
 import org.wso2.msf4j.Request;
 import org.wso2.msf4j.interceptor.annotation.RequestInterceptor;
+import org.wso2.siddhi.core.util.statistics.metrics.Level;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
@@ -303,7 +304,7 @@ public class SiddhiAppsApi implements Microservice {
                     String appName,
             @ApiParam(value = "statsEnable", required = true) StatsEnable statsEnable)
             throws NotFoundException {
-        return delegate.siddhiAppStatsEnable(appName, statsEnable.getStatsEnable(), request);
+        return delegate.siddhiAppStatsEnable(appName, statsEnable, request);
     }
 
     @PUT
@@ -321,6 +322,6 @@ public class SiddhiAppsApi implements Microservice {
             @Context Request request,
             @ApiParam(value = "statsEnable", required = true) StatsEnable statsEnable)
             throws NotFoundException {
-        return delegate.siddhiAppsStatsEnable(statsEnable.getStatsEnable(), request);
+        return delegate.siddhiAppsStatsEnable(statsEnable.getEnabledSiddhiStatLevel(), request);
     }
 }

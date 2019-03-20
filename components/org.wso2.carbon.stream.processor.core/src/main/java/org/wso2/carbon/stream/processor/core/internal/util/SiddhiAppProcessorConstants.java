@@ -52,6 +52,10 @@ public class SiddhiAppProcessorConstants {
     public static final String PERSISTENCE_STORE_CLEAR_ENABLED = "persistenceStoreClearEnabled";
     public static final String SIDDHI_APP = "siddhiApp";
 
+    public static final String HA_METRICS_PREFIX = "org.wso2.ha";
+    public static final String HA_METRICS_SENDING_THROUGHPUT = "sending.throughput";
+    public static final String HA_METRICS_RECEIVING_THROUGHPUT = "receiving.throughput";
+
     /**
      * Runtime modes of Stream Processor engine
      */

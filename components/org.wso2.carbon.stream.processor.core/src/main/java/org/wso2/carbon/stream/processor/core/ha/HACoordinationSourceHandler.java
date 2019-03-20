@@ -25,12 +25,15 @@ import org.wso2.carbon.stream.processor.core.ha.transport.EventSyncConnection;
 import org.wso2.carbon.stream.processor.core.ha.transport.EventSyncConnectionPoolManager;
 import org.wso2.carbon.stream.processor.core.ha.util.CoordinationConstants;
 import org.wso2.carbon.stream.processor.core.ha.util.HAConstants;
+import org.wso2.carbon.stream.processor.core.internal.StreamProcessorDataHolder;
 import org.wso2.carbon.stream.processor.core.util.BinaryEventConverter;
 import org.wso2.siddhi.core.event.Event;
 import org.wso2.siddhi.core.exception.ConnectionUnavailableException;
 import org.wso2.siddhi.core.stream.input.InputHandler;
 import org.wso2.siddhi.core.stream.input.source.SourceHandler;
 import org.wso2.siddhi.core.stream.input.source.SourceSyncCallback;
+import org.wso2.siddhi.core.util.statistics.ThroughputTracker;
+import org.wso2.siddhi.core.util.statistics.metrics.Level;
 import org.wso2.siddhi.query.api.definition.StreamDefinition;
 
 import java.io.IOException;
@@ -52,11 +55,13 @@ public class HACoordinationSourceHandler extends SourceHandler {
     private AtomicLong sequenceIDGenerator;
     private volatile boolean passiveNodeAdded;
     private SourceSyncCallback sourceSyncCallback;
+    private ThroughputTracker throughputTracker;
 
     private static final Logger log = Logger.getLogger(HACoordinationSourceHandler.class);
 
-    public HACoordinationSourceHandler() {
+    public HACoordinationSourceHandler(ThroughputTracker throughputTracker) {
         this.sequenceIDGenerator = EventSyncConnectionPoolManager.getSequenceID();
+        this.throughputTracker = throughputTracker;
     }
 
     @Override
@@ -160,6 +165,9 @@ public class HACoordinationSourceHandler extends SourceHandler {
             if (messageBuffer != null) {
                 try {
                     eventSyncConnection.send(HAConstants.CHANNEL_ID_MESSAGE, messageBuffer.array());
+                    if (throughputTracker != null && StreamProcessorDataHolder.isStatisticsEnabled()) {
+                        throughputTracker.eventIn();
+                    }
                 } catch (ConnectionUnavailableException e) {
                     log.error("Error in sending events to the passive node. " + e.getMessage());
                 }
@@ -198,6 +206,9 @@ public class HACoordinationSourceHandler extends SourceHandler {
             if (messageBuffer != null) {
                 try {
                     eventSyncConnection.send(HAConstants.CHANNEL_ID_MESSAGE, messageBuffer.array());
+                    if (throughputTracker != null && StreamProcessorDataHolder.isStatisticsEnabled()) {
+                        throughputTracker.eventsIn(events.length);
+                    }
                 } catch (ConnectionUnavailableException e) {
                     log.error("Error in sending events to the passive node. " + e.getMessage());
                 }

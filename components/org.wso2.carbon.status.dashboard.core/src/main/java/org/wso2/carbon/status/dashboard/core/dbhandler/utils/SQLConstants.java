@@ -29,6 +29,7 @@ public class SQLConstants {
     
     public static final String SELECT_QUERY = "recordSelectQuery";
     public static final String SELECT_APP_METRICS_QUERY = "recordSelectAppMetricsQuery";
+    public static final String SELECT_HA_WORKER_METRICS_QUERY = "recordSelectHAMetricsQuery";
     public static final String SELECT_WORKER_METRICS_QUERY = "recordSelectWorkerMetricsQuery";
     public static final String SELECT_WORKER_THROUGHPUT_QUERY = "recordSelectWorkerThroughputQuery";
     public static final String SELECT_WORKER_AGGREGATE_METRICS_QUERY = "recordSelectWorkerAggregateMetricsQuery";
@@ -36,6 +37,7 @@ public class SQLConstants {
     public static final String SELECT_COMPONENT_LIST = "selectAppComponentList";
     public static final String SELECT_COMPONENT_METRICS_HISTORY = "selectAppComponentHistory";
     public static final String SELECT_APP_AGG_METRICS_HISTORY = "recordSelectAgregatedAppMetricsQuery";
+    public static final String SELECT_HA_WORKER_AGGREGATE_METRICS_QUERY = "recordSelectHAAgregatedMetricsQuery";
     public static final String SELECT_COMPONENT_AGG_METRICS_HISTORY = "selectAppComponentAggregatedHistory";
     public static final String SELECT_COMPONENT_METRICS = "selectAppComponentMetrics";
     public static final String CREATE_TABLE = "tableCreateQuery";

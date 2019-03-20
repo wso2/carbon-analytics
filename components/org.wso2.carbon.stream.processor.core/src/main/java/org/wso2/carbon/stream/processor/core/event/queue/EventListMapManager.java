@@ -19,15 +19,19 @@
 package org.wso2.carbon.stream.processor.core.event.queue;
 
 import org.apache.log4j.Logger;
+import org.wso2.carbon.sp.metrics.core.SPThroughputMetric;
 import org.wso2.carbon.stream.processor.core.ha.HACoordinationSourceHandler;
 import org.wso2.carbon.stream.processor.core.ha.exception.InvalidByteMessageException;
 import org.wso2.carbon.stream.processor.core.ha.tcp.SiddhiEventConverter;
 import org.wso2.carbon.stream.processor.core.ha.util.HAConstants;
 import org.wso2.carbon.stream.processor.core.internal.SiddhiAppData;
 import org.wso2.carbon.stream.processor.core.internal.StreamProcessorDataHolder;
+import org.wso2.carbon.stream.processor.core.internal.util.SiddhiAppProcessorConstants;
 import org.wso2.carbon.stream.processor.core.util.BinaryMessageConverterUtil;
 import org.wso2.siddhi.core.event.Event;
 import org.wso2.siddhi.core.stream.input.source.Source;
+import org.wso2.siddhi.core.util.SiddhiConstants;
+import org.wso2.siddhi.core.util.statistics.metrics.Level;
 
 import java.io.UnsupportedEncodingException;
 import java.nio.ByteBuffer;
@@ -47,8 +51,17 @@ public class EventListMapManager {
     private static long endTime;
     private static int count = 0;
     private static final int TPS_EVENT_THRESHOLD = 100000;
+    private SPThroughputMetric throughputTracker = null;
 
     public EventListMapManager() {
+        if (throughputTracker == null) {
+            throughputTracker =
+                    (SPThroughputMetric) StreamProcessorDataHolder.getStatisticsConfiguration().getFactory().
+                            createThroughputTracker(SiddhiAppProcessorConstants.HA_METRICS_PREFIX +
+                                            SiddhiConstants.METRIC_DELIMITER +
+                                            SiddhiAppProcessorConstants.HA_METRICS_RECEIVING_THROUGHPUT,
+                                    StreamProcessorDataHolder.getStatisticsManager());
+        }
     }
 
     public static void initializeEventListMap() {
@@ -72,6 +85,9 @@ public class EventListMapManager {
         try {
             ByteBuffer eventContent = ByteBuffer.wrap(eventContentByteArray);
             int noOfEvents = eventContent.getInt();
+            if (throughputTracker != null && StreamProcessorDataHolder.isStatisticsEnabled()) {
+                throughputTracker.eventsIn(noOfEvents);
+            }
             QueuedEvent queuedEvent;
             Event[] events = new Event[noOfEvents];
             for (int i = 0; i < noOfEvents; i++) {

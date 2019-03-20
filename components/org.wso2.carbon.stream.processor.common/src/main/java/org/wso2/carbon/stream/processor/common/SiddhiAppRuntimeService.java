@@ -20,6 +20,7 @@
 package org.wso2.carbon.stream.processor.common;
 
 import org.wso2.siddhi.core.SiddhiAppRuntime;
+import org.wso2.siddhi.core.util.statistics.metrics.Level;
 
 import java.util.Map;
 
@@ -28,5 +29,5 @@ import java.util.Map;
  */
 public interface SiddhiAppRuntimeService {
     Map<String, SiddhiAppRuntime> getActiveSiddhiAppRuntimes();
-    void enableSiddhiAppStatistics(boolean statsEnabled);
+    void enableSiddhiAppStatistics(Level enabledStatsLevel);
 }

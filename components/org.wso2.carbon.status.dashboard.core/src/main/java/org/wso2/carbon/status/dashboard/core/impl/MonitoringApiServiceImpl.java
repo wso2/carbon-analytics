@@ -36,6 +36,7 @@ import org.wso2.carbon.status.dashboard.core.api.ApiResponseMessage;
 import org.wso2.carbon.status.dashboard.core.api.MonitoringApiService;
 import org.wso2.carbon.status.dashboard.core.api.NotFoundException;
 import org.wso2.carbon.status.dashboard.core.api.WorkerServiceFactory;
+import org.wso2.carbon.status.dashboard.core.bean.HAWorkerMetricsHistory;
 import org.wso2.carbon.status.dashboard.core.bean.ManagerClusterInfo;
 import org.wso2.carbon.status.dashboard.core.bean.ManagerMetricsSnapshot;
 import org.wso2.carbon.status.dashboard.core.bean.ManagerSiddhiApps;
@@ -70,8 +71,10 @@ import org.wso2.carbon.status.dashboard.core.model.ManagerOverView;
 import org.wso2.carbon.status.dashboard.core.model.Node;
 import org.wso2.carbon.status.dashboard.core.model.ServerDetails;
 import org.wso2.carbon.status.dashboard.core.model.ServerHADetails;
-import org.wso2.carbon.status.dashboard.core.model.StatsEnable;
+//import org.wso2.carbon.status.dashboard.core.model.StatsEnable;
 import org.wso2.carbon.status.dashboard.core.model.WorkerOverview;
+import org.wso2.carbon.stream.processor.core.util.StatsEnable;
+import org.wso2.siddhi.core.util.statistics.metrics.Level;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -743,7 +746,8 @@ public class MonitoringApiServiceImpl extends MonitoringApiService {
                                 app.populateAgetime();
                                 String appName = app.getAppName();
                                 siddhiAppMetricsHistory = new SiddhiAppMetricsHistory(appName);
-                                if ((app.getStatus().equalsIgnoreCase("active")) && (app.isStatEnabled())) {
+                                if ((app.getStatus().equalsIgnoreCase("active")) &&
+                                        (app.getSiddhiStatEnabledLevel().compareTo(Level.OFF) != 0)) {
                                     if (type == null) {
                                         List<List<Object>> memory = metricsDBHandler.selectAppOverallMetrics
                                                 ("memory", carbonId, timeInterval, appName,
@@ -891,6 +895,51 @@ public class MonitoringApiServiceImpl extends MonitoringApiService {
     }
 
     /**
+     * Get HA worker metrics histrory such as memory,throughput and latency.
+     *
+     * @param id      the worker id.
+     * @param period  time interval that metrics dataneeded to be get.
+     * @param type    type of metrics which is needed to be taken.
+     * @return response with metrics data.
+     * @throws NotFoundException
+     */
+    @Override
+    public Response getHAWorkeristory(String workerId, String period, String type, String username)
+            throws NotFoundException {
+        boolean isAuthorized = permissionProvider.hasPermission(username, new Permission(Constants.PERMISSION_APP_NAME,
+                VIWER_PERMISSION_STRING));
+        if (isAuthorized) {
+            String[] hostPort = workerId.split(Constants.WORKER_KEY_GENERATOR);
+            if (hostPort.length == 2) {
+                String carbonId = workerIDCarbonIDMap.get(workerId);
+                if (carbonId == null) {
+                    carbonId = getCarbonID(workerId);
+                }
+                long timeInterval = period != null ? parsePeriod(period) : Constants.DEFAULT_TIME_INTERVAL_MILLIS;
+                HAWorkerMetricsHistory haWorkerMetricsHistory = new HAWorkerMetricsHistory(workerId);
+                if (timeInterval <= HOUR) {
+                    List<List<Object>> throughput = metricStore.
+                            selectHAOverallMetrics(carbonId, timeInterval, System.currentTimeMillis());
+                    haWorkerMetricsHistory.setThroughput(throughput);
+                } else {
+                    List<List<Object>> throughput = metricStore.selectHAAggOverallMetrics(carbonId, timeInterval,
+                            System.currentTimeMillis());
+                    haWorkerMetricsHistory.setThroughput(throughput);
+                }
+                String jsonString = new Gson().toJson(haWorkerMetricsHistory);
+                return Response.ok().entity(jsonString).build();
+            } else {
+                logger.error("Inproper format of worker ID:" + workerId);
+                return Response.status(Response.Status.BAD_REQUEST).entity("Inproper format of worker ID:" + workerId)
+                        .build();
+            }
+        } else {
+            logger.error("Unauthorized to perform get siddhi app history for user : " + username);
+            return Response.status(Response.Status.FORBIDDEN).entity("Unauthorized for user : " + username).build();
+        }
+    }
+
+    /**
      * This method return the both siddi apptext view
      *
      * @param id      workerid of the siddhi app
@@ -1021,11 +1070,9 @@ public class MonitoringApiServiceImpl extends MonitoringApiService {
      */
     @Override
     public Response getSiddhiAppComponents(String workerId, String appName, String username) throws NotFoundException {
-
         boolean isAuthorized = permissionProvider.hasPermission(username, new Permission(Constants.PERMISSION_APP_NAME,
                 VIWER_PERMISSION_STRING));
         if (isAuthorized) {
-
             String[] hostPort = workerId.split(Constants.WORKER_KEY_GENERATOR);
             if (hostPort.length == 2) {
                 String carbonId = workerIDCarbonIDMap.get(workerId);
@@ -2223,7 +2270,7 @@ public class MonitoringApiServiceImpl extends MonitoringApiService {
                                         siddhiAppSummaryInfo.setAppName(siddhiapp.getAppName());
                                         siddhiAppSummaryInfo.setStatus(siddhiapp.getStatus());
                                         siddhiAppSummaryInfo.setLastUpdate(siddhiapp.getTimeAgo());
-                                        siddhiAppSummaryInfo.setStatEnabled(siddhiapp.isStatEnabled());
+                                        siddhiAppSummaryInfo.setStatEnabled(siddhiapp.getSiddhiStatEnabledLevel());
                                         siddhiAppSummaryInfo.setDeployedNodeType("Worker");
                                         siddhiAppSummaryInfo.setDeployedNodeHost(worker.getHost());
                                         siddhiAppSummaryInfo.setDeployedNodePort(String.valueOf(worker.getPort()));
@@ -2330,7 +2377,7 @@ public class MonitoringApiServiceImpl extends MonitoringApiService {
                                         siddhiAppSummaryInfo.setAppName(siddhiapp.getAppName());
                                         siddhiAppSummaryInfo.setStatus(siddhiapp.getStatus());
                                         siddhiAppSummaryInfo.setLastUpdate(siddhiapp.getTimeAgo());
-                                        siddhiAppSummaryInfo.setStatEnabled(siddhiapp.isStatEnabled());
+                                        siddhiAppSummaryInfo.setStatEnabled(siddhiapp.getSiddhiStatEnabledLevel());
                                         siddhiAppSummaryInfo.setDeployedNodeType("Worker");
                                         siddhiAppSummaryInfo.setDeployedNodeHost(worker.getHost());
                                         siddhiAppSummaryInfo.setDeployedNodePort(String.valueOf(worker.getPort()));

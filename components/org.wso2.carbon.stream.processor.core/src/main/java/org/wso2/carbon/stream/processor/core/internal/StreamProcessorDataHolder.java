@@ -25,6 +25,7 @@ import org.wso2.carbon.config.provider.ConfigProvider;
 import org.wso2.carbon.databridge.commons.ServerEventListener;
 import org.wso2.carbon.datasource.core.api.DataSourceService;
 import org.wso2.carbon.kernel.CarbonRuntime;
+import org.wso2.carbon.sp.metrics.core.internal.service.MetricsServiceComponent;
 import org.wso2.carbon.stream.processor.common.HAStateChangeListener;
 import org.wso2.carbon.stream.processor.core.NodeInfo;
 import org.wso2.carbon.stream.processor.core.distribution.DistributionService;
@@ -32,9 +33,12 @@ import org.wso2.carbon.stream.processor.core.ha.HAManager;
 import org.wso2.carbon.stream.processor.core.internal.beans.DeploymentConfig;
 import org.wso2.carbon.stream.processor.core.internal.util.SiddhiAppProcessorConstants;
 import org.wso2.siddhi.core.SiddhiManager;
+import org.wso2.siddhi.core.config.StatisticsConfiguration;
 import org.wso2.siddhi.core.stream.input.source.SourceHandlerManager;
 import org.wso2.siddhi.core.stream.output.sink.SinkHandlerManager;
 import org.wso2.siddhi.core.table.record.RecordTableHandlerManager;
+import org.wso2.siddhi.core.util.statistics.StatisticsManager;
+import org.wso2.siddhi.core.util.statistics.metrics.Level;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -62,6 +66,9 @@ public class StreamProcessorDataHolder {
     private SiddhiAppProcessorConstants.RuntimeMode runtimeMode = SiddhiAppProcessorConstants.RuntimeMode.ERROR;
     private BundleContext bundleContext;
     private ConfigProvider configProvider;
+    private static StatisticsConfiguration statisticsConfiguration;
+    private static StatisticsManager statisticsManager;
+    private static boolean isStatisticsEnabled;
     /**
      * List used to hold all the registered hs state change listeners.
      */
@@ -205,6 +212,22 @@ public class StreamProcessorDataHolder {
         return serverListeners;
     }
 
+    public static StatisticsConfiguration getStatisticsConfiguration() {
+        return statisticsConfiguration;
+    }
+
+    public static void setStatisticsConfiguration(StatisticsConfiguration statisticsConfiguration) {
+        StreamProcessorDataHolder.statisticsConfiguration = statisticsConfiguration;
+    }
+
+    public static StatisticsManager getStatisticsManager() {
+        return statisticsManager;
+    }
+
+    public static void setStatisticsManager(StatisticsManager statisticsManager) {
+        StreamProcessorDataHolder.statisticsManager = statisticsManager;
+    }
+
     /**
      * Returns the CarbonRuntime service which gets set through a service component.
      *
@@ -254,5 +277,13 @@ public class StreamProcessorDataHolder {
 
     public static void setPermissionProvider(PermissionProvider permissionProvider) {
         StreamProcessorDataHolder.permissionProvider = permissionProvider;
+    }
+
+    public static boolean isStatisticsEnabled() {
+        return isStatisticsEnabled;
+    }
+
+    public static void setIsStatisticsEnabled(boolean isStatisticsEnabled) {
+        StreamProcessorDataHolder.isStatisticsEnabled = isStatisticsEnabled;
     }
 }

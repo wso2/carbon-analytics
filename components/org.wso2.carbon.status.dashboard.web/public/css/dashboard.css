@@ -458,3 +458,7 @@ p.node-last-update {
     color: #eee !important;
     font-weight: 400;
 }
+
+.metricsRadio span {
+    color: #dedede;
+}

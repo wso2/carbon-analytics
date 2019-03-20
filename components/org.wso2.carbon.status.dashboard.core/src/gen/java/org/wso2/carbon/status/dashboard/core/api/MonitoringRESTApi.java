@@ -25,7 +25,7 @@ import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.analytics.msf4j.interceptor.common.AuthenticationInterceptor;
 import org.wso2.carbon.analytics.msf4j.interceptor.common.util.InterceptorConstants;
 import org.wso2.carbon.status.dashboard.core.model.Node;
-import org.wso2.carbon.status.dashboard.core.model.StatsEnable;
+import org.wso2.carbon.stream.processor.core.util.StatsEnable;
 import org.wso2.msf4j.Microservice;
 import org.wso2.msf4j.Request;
 import org.wso2.msf4j.interceptor.annotation.RequestInterceptor;
@@ -563,6 +563,37 @@ public class MonitoringRESTApi implements Microservice {
     )
             throws NotFoundException {
         return workersApi.getAppHistory(id, appName, period, type, getUserName(request));
+    }
+
+    /**
+     * Get the HA worker metrics history on a specify time interval or by defalt 5 min
+     *
+     * @param id
+     * @param period
+     * @param type
+     * @return
+     * @throws NotFoundException
+     */
+    @GET
+    @Path("/{id}/ha/history")
+    @Produces({"application/json"})
+    @io.swagger.annotations.ApiOperation(value = "Get history statistics details of a ha worker.",
+            notes = "Retrieves the history statistics details of worker with the "
+                    + "specified id.",
+            response = void.class, tags = {"Workers",})
+    @io.swagger.annotations.ApiResponses(value = {
+            @io.swagger.annotations.ApiResponse(code = 200, message = "History successfully retrieved.",
+                    response = void.class),
+            @io.swagger.annotations.ApiResponse(code = 404, message = "The worker history is not found.",
+                    response = void.class)})
+    public Response getHAWorkeristory(
+            @Context Request request,
+            @ApiParam(value = "ID of the worker.", required = true) @PathParam("id") String id
+            , @ApiParam(value = "Time period to get history.") @QueryParam("period") String period
+            , @ApiParam(value = "Required types to get statistics .") @QueryParam("type") String type
+    )
+            throws NotFoundException {
+        return workersApi.getHAWorkeristory(id, period, type, getUserName(request));
     }
 
     /**

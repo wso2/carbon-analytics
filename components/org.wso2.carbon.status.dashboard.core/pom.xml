@@ -208,7 +208,8 @@
             org.wso2.carbon.status.dashboard.core.internal,
             org.wso2.carbon.status.dashboard.core.internal.*,
             org.wso2.carbon.database.query.manager.*,
-            org.wso2.carbon.database.query.manager.exception.*
+            org.wso2.carbon.database.query.manager.exception.*,
+            org.wso2.carbon.stream.processor.core.util.*
         </private.package>
         <carbon.component>
             osgi.service; objectClass="org.wso2.carbon.uiserver.spi.RestApiProvider"

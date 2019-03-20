@@ -19,6 +19,7 @@
 package org.wso2.carbon.stream.processor.statistics.api;
 
 import org.wso2.msf4j.Request;
+import org.wso2.siddhi.core.util.statistics.metrics.Level;
 
 import javax.ws.rs.core.Response;
 
@@ -27,5 +28,5 @@ public abstract class StatisticsApiService {
 
     public abstract Response statisticsGet(Request request) throws NotFoundException;
 
-    public abstract Response enableStats(boolean statsEnable,Request request) throws NotFoundException;
+    public abstract Response enableStats(Level enabledStatLevel,Request request) throws NotFoundException;
 }

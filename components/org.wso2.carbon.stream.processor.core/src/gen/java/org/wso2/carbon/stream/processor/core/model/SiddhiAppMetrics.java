@@ -2,6 +2,7 @@ package org.wso2.carbon.stream.processor.core.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.annotations.ApiModelProperty;
+import org.wso2.siddhi.core.util.statistics.metrics.Level;
 
 import java.util.Objects;
 
@@ -20,7 +21,9 @@ public class SiddhiAppMetrics {
   private long age = 0;
 
   @JsonProperty("isStatEnabled")
-  private boolean isStatEnabled = false;
+  private String isStatEnabled = Level.OFF.toString();
+
+  private Level siddhiStatEnabledLevel = Level.OFF;
 
   public SiddhiAppMetrics appName(String appName) {
     this.appName = appName;
@@ -76,8 +79,9 @@ public class SiddhiAppMetrics {
     this.age = age;
   }
 
-  public SiddhiAppMetrics isStatEnabled(boolean isStatEnabled) {
-    this.isStatEnabled = isStatEnabled;
+  public SiddhiAppMetrics isStatEnabled(Level isStatEnabled) {
+    this.siddhiStatEnabledLevel = isStatEnabled;
+    this.isStatEnabled = isStatEnabled.toString();
     return this;
   }
 
@@ -86,12 +90,16 @@ public class SiddhiAppMetrics {
    * @return isStatEnabled
   **/
   @ApiModelProperty(value = "is statistics enabled for this app")
-  public boolean getIsStatEnabled() {
+  public String getIsStatEnabled() {
     return isStatEnabled;
   }
 
-  public void setIsStatEnabled(boolean isStatEnabled) {
-    this.isStatEnabled = isStatEnabled;
+  public Level getSiddhiStatEnabledLevel() {
+      return siddhiStatEnabledLevel;
+  }
+
+  public void setIsStatEnabled(Level isStatEnabled) {
+    this.isStatEnabled = isStatEnabled.toString();
   }
 
 
@@ -123,7 +131,7 @@ public class SiddhiAppMetrics {
     sb.append("    appName: ").append(toIndentedString(appName)).append("\n");
     sb.append("    status: ").append(toIndentedString(status)).append("\n");
     sb.append("    age: ").append(toIndentedString(age)).append("\n");
-    sb.append("    isStatEnabled: ").append(toIndentedString(isStatEnabled)).append("\n");
+    sb.append("    enabledSiddhiStatLevel: ").append(toIndentedString(isStatEnabled.toString())).append("\n");
     sb.append("}");
     return sb.toString();
   }
