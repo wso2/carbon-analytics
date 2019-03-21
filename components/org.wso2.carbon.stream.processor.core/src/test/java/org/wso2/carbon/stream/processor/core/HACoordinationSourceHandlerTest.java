@@ -23,12 +23,25 @@ import org.apache.log4j.Logger;
 import org.mockito.Mockito;
 import org.powermock.modules.testng.PowerMockTestCase;
 import org.testng.Assert;
+import org.testng.annotations.AfterSuite;
+import org.testng.annotations.BeforeMethod;
+import org.testng.annotations.BeforeSuite;
 import org.testng.annotations.BeforeTest;
 import org.testng.annotations.Test;
+import org.wso2.carbon.metrics.core.MetricManagementService;
+import org.wso2.carbon.metrics.core.MetricService;
+import org.wso2.carbon.metrics.core.Metrics;
+import org.wso2.carbon.sp.metrics.core.SPMetricsFactory;
+import org.wso2.carbon.sp.metrics.core.SPThroughputMetric;
+import org.wso2.carbon.sp.metrics.core.internal.SPMetricsDataHolder;
+import org.wso2.carbon.sp.metrics.core.internal.SPStatisticsManager;
 import org.wso2.carbon.stream.processor.core.ha.HACoordinationSourceHandler;
 import org.wso2.carbon.stream.processor.core.ha.util.CoordinationConstants;
+import org.wso2.carbon.stream.processor.core.internal.util.SiddhiAppProcessorConstants;
+import org.wso2.siddhi.core.config.StatisticsConfiguration;
 import org.wso2.siddhi.core.event.Event;
 import org.wso2.siddhi.core.stream.input.InputHandler;
+import org.wso2.siddhi.core.util.SiddhiConstants;
 import org.wso2.siddhi.query.api.definition.StreamDefinition;
 
 import java.util.Map;
@@ -39,7 +52,33 @@ import static org.powermock.api.mockito.PowerMockito.doNothing;
 import static org.powermock.api.mockito.PowerMockito.mock;
 
 public class HACoordinationSourceHandlerTest extends PowerMockTestCase {
+    protected static Metrics metrics;
+    protected static MetricService metricService;
+    protected static MetricManagementService metricManagementService;
 
+    @BeforeSuite
+    protected void initMetrics() throws Exception {
+        // Initialize the Metrics
+        System.setProperty("metrics.target", "target");
+        metrics = new Metrics(TestUtils.getConfigProvider("metrics.yaml"));
+        metrics.activate();
+        metricService = metrics.getMetricService();
+        metricManagementService = metrics.getMetricManagementService();
+    }
+
+    @BeforeMethod
+    public void init() {
+        metricManagementService.setRootLevel(org.wso2.carbon.metrics.core.Level.ALL);
+        metricManagementService.stopReporters();
+        SPMetricsDataHolder.getInstance().setMetricService(metricService);
+        SPMetricsDataHolder.getInstance().setMetricManagementService(metricManagementService);
+        metricManagementService.startReporter("Console");
+    }
+
+    @AfterSuite
+    protected static void destroy() throws Exception {
+        metrics.deactivate();
+    }
     @BeforeTest
     public void setDebugLogLevel() {
         Logger.getLogger(HACoordinationSourceHandler.class.getName()).setLevel(Level.DEBUG);
@@ -49,8 +88,13 @@ public class HACoordinationSourceHandlerTest extends PowerMockTestCase {
 
     @Test
     public void testActiveNodeProcessing() throws InterruptedException {
-
-        HACoordinationSourceHandler haCoordinationSourceHandler = spy(new HACoordinationSourceHandler());
+        StatisticsConfiguration statisticsConfiguration = new StatisticsConfiguration(new SPMetricsFactory());
+        SPThroughputMetric throughputTracker = (SPThroughputMetric) statisticsConfiguration
+                .getFactory().createThroughputTracker(SiddhiAppProcessorConstants.HA_METRICS_PREFIX +
+                        SiddhiConstants.METRIC_DELIMITER + SiddhiAppProcessorConstants.HA_METRICS_SENDING_THROUGHPUT,
+                        new SPStatisticsManager("MetricsTest"));
+        HACoordinationSourceHandler haCoordinationSourceHandler = spy(new HACoordinationSourceHandler(
+                throughputTracker));
         doNothing().when(haCoordinationSourceHandler).sendEvent(Mockito.any(Event.class), Mockito.any());
 
         InputHandler inputHandler = mock(InputHandler.class);
@@ -86,8 +130,13 @@ public class HACoordinationSourceHandlerTest extends PowerMockTestCase {
 
     @Test
     public void testActiveNodeArrayOfEventsProcessing() throws InterruptedException {
-
-        HACoordinationSourceHandler haCoordinationSourceHandler = spy(new HACoordinationSourceHandler());
+        StatisticsConfiguration statisticsConfiguration = new StatisticsConfiguration(new SPMetricsFactory());
+        SPThroughputMetric throughputTracker = (SPThroughputMetric) statisticsConfiguration
+                .getFactory().createThroughputTracker(SiddhiAppProcessorConstants.HA_METRICS_PREFIX +
+                                SiddhiConstants.METRIC_DELIMITER + SiddhiAppProcessorConstants.HA_METRICS_SENDING_THROUGHPUT,
+                        new SPStatisticsManager("MetricsTest"));
+        HACoordinationSourceHandler haCoordinationSourceHandler = spy(new HACoordinationSourceHandler(
+                throughputTracker));
         doNothing().when(haCoordinationSourceHandler).sendEvent(Mockito.any(Event.class), Mockito.any());
 
         InputHandler inputHandler = mock(InputHandler.class);

@@ -88,25 +88,21 @@ public class StatisticsTestCase {
         StatisticsConfiguration statisticsConfiguration = new StatisticsConfiguration(new SPMetricsFactory());
         SPLatencyMetric latencyTracker = (SPLatencyMetric) statisticsConfiguration
                 .getFactory().createLatencyTracker("test.latency", new SPStatisticsManager(
-                        "MetricsTest",
-                        true));
+                        "MetricsTest"));
         AssertJUnit.assertEquals("test.latency", latencyTracker.getName());
         SPThroughputMetric throughputTracker = (SPThroughputMetric) statisticsConfiguration
                 .getFactory().createThroughputTracker("test.throughput", new SPStatisticsManager(
-                        "MetricsTest",
-                        true));
+                        "MetricsTest"));
         AssertJUnit.assertEquals("test.throughput", throughputTracker.getName());
         
         SPMemoryUsageMetric memoryUsageTracker = (SPMemoryUsageMetric) statisticsConfiguration
                 .getFactory()
-                .createMemoryUsageTracker(new SPStatisticsManager("MetricsTest",
-                        true));
+                .createMemoryUsageTracker(new SPStatisticsManager("MetricsTest"));
         mockmoryObject mockmoryObject = new mockmoryObject("test.memory");
         memoryUsageTracker.registerObject(mockmoryObject, "test.memory");
         AssertJUnit.assertEquals("test.memory", memoryUsageTracker.getName(mockmoryObject));
         SPBufferedEventsMetric bufferedEventsTracker = (SPBufferedEventsMetric) statisticsConfiguration
-                .getFactory().createBufferSizeTracker(new SPStatisticsManager("MetricsTest",
-                        true));
+                .getFactory().createBufferSizeTracker(new SPStatisticsManager("MetricsTest"));
         EventBufferHolder eventBufferHolder = new EventBufferHolder() {
             @Override
             public long getBufferedEvents() {
