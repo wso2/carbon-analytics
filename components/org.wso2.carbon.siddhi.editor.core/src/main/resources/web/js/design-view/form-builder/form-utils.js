@@ -524,7 +524,8 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
             }
             var streamHandlers = {
                 streamHandlerList: streamHandlerList,
-                types: types
+                types: types,
+                className: className
             }
             self.registerDropDownPartial();
             var streamHandlerTemplate = Handlebars.compile($('#stream-handler-form-template').html())(streamHandlers);
@@ -717,8 +718,12 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
             var i = 0;
             var connectedElement = self.configurationData.getSiddhiAppConfig().getDefinitionElementByName(outputElementName);
             _.forEach(connectedElement.element.getAttributeList(), function (attribute) {
+                var expression = "";
+                if(projectionValues[i]) {
+                    expression = projectionValues[i].expression;
+                }
                 attributes.push({
-                    expression: projectionValues[i].expression,
+                    expression: expression,
                     as: attribute.getName()
                 });
                 i++;
@@ -1006,6 +1011,20 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
         };
 
         /**
+         * @function to expand the collapsed div if any error occurs inside the collapsed div
+         */
+        FormUtils.prototype.expandCollapsedDiv = function (divToBeExpanded) {
+            var collapseHeader = $(divToBeExpanded).find('.collapsed:first');
+            var collapseBody = $(divToBeExpanded).find('.collapse:first');
+            collapseHeader.attr("aria-expanded", "true");
+            collapseHeader.removeClass("collapsed");
+            collapseBody.attr("aria-expanded", "true");
+            collapseBody.addClass("collapse in");
+            collapseBody.css("height", "auto");
+            $('.collapse .error-input-field')[0].scrollIntoView();
+        };
+
+        /**
          * @function to validate stream handlers
          * @param {String} div identify the div of stream-handler
          */
@@ -1019,10 +1038,11 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
                     if (streamHandlerContent.hasClass('define-filter-stream-handler')) {
                         var filterCondition = streamHandlerContent.find('.filter-condition-content')
                         if (filterCondition.val().trim() == "") {
-                            streamHandlerContent.find('.error-message').text('Filter value is required')
+                            streamHandlerContent.find('.error-message').text('Filter value is required');
                             self.addErrorClass(filterCondition);
+                            self.expandCollapsedDiv($(this));
                             isErrorOccurred = true;
-                            return isErrorOccurred;
+                            return false;
                         }
                     } else if (streamHandlerContent.hasClass('define-window-stream-handler') ||
                         streamHandlerContent.hasClass('define-function-stream-handler')) {
@@ -1035,8 +1055,9 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
                                 self.configurationData.rawExtensions["streamFunctions"])
                         }
                         if (self.validateParameters(streamHandlerContent, predefinedParameters)) {
+                            self.expandCollapsedDiv($(this));
                             isErrorOccurred = true;
-                            return isErrorOccurred
+                            return false;
                         }
                     }
                 });
@@ -3240,6 +3261,21 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
         };
 
         /**
+         * @function to get id of the div so that each stream handler content will be added an id for the div to
+         * collapse in and out. This is required because in join query there are two stream handler sections [left &
+         * right source]
+         */
+        FormUtils.prototype.getIdOfDiv = function (div) {
+            if (div.hasClass('define-left-source')) {
+                return Constants.LEFT;
+            } else if (div.hasClass('define-right-source')) {
+                return Constants.RIGHT;
+            } else {
+                return Constants.QUERY;
+            }
+        };
+
+        /**
          * @function to add a new stream handler
          * @param {String} div where the stream handler section is present
          * @param {String} type type of the stream handler
@@ -3247,14 +3283,18 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
         FormUtils.prototype.addNewStreamHandler = function (sourceDiv, type) {
             var self = this;
             var streamHandlerTypes = self.configurationData.application.config.stream_handler_types;
-            var handlerList = '<li class="define-stream-handler-content"> <div> ' +
-                '<label class="clearfix"> <label class="mandatory-symbol"> * </label> Type </label>' +
-                '<div class = "define-stream-handler-type"> </div>' +
-                '<div class="clearfix"> <div class = "define-stream-handler-type-content"> </div> ' +
-                '<div class = "attr-nav"> </div> </div> <label class = "error-message"> </label> </div> </li>';
+            var id = self.getIdOfDiv(sourceDiv);
             var streamHandlerList = $(sourceDiv).find('.stream-handler-list');
             var streamHandlerListLength = $(streamHandlerList).find('li').length
             var appendedIndex;
+            var handlerList = '<li class="define-stream-handler-content"> <div> ' +
+                '<div class="collapse-div" href="#' + streamHandlerListLength + '-' + id +'-stream-handler-content" ' +
+                'data-toggle="collapse" aria-expanded="true"> <label class="clearfix"> ' +
+                '<span class="mandatory-symbol"> * </span> Type <a class="collapse-icon"> </a> </label> ' +
+                '<div class = "define-stream-handler-type"> </div> </div> <div id="' +
+                streamHandlerListLength + '-' + id +'-stream-handler-content" class="collapse in"> <div class="clearfix">' +
+                '<div class = "define-stream-handler-type-content"> </div> <div class = "attr-nav"> </div> ' +
+                '</div> <label class = "error-message"> </label> </div> </div> </li>';
             if (type === Constants.WINDOW || streamHandlerListLength == 0 ||
                 $(sourceDiv).find('.define-window-stream-handler').length == 0) {
                 $(streamHandlerList).append(handlerList);
@@ -3800,7 +3840,7 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
             $.ajax({
                 type: "POST",
                 url: self.tooltipsURL,
-                data: window.btoa(JSON.stringify(appData)),
+                data: self.configurationData.application.utils.base64EncodeUnicode(JSON.stringify(appData)),
                 async: false,
                 success: function (response) {
                     var toolTipObject = _.find(response, function (toolTip) {

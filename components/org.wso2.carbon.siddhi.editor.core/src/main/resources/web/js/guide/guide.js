@@ -90,7 +90,7 @@ define(['jquery', 'lodash', 'log', 'enjoyhint', 'designViewUtils', 'workspace', 
                     onBeforeStart: function () {
                         fileIncrement = browserStorage.get('guideFileNameIncrement');
                         tempFile = "SweetFactory__" + fileIncrement;
-                        var fileToBeChecked = "configName=" + btoa(tempFile + '.siddhi');
+                        var fileToBeChecked = "configName=" + self.app.utils.base64EncodeUnicode(tempFile + '.siddhi');
                         $.ajax({
                             url: checkFileURL,
                             type: "POST",
@@ -576,9 +576,10 @@ define(['jquery', 'lodash', 'log', 'enjoyhint', 'designViewUtils', 'workspace', 
                     onBeforeStart: function () {
                         fileIncrement = browserStorage.get('guideFileNameIncrement');
                         tempFile = "SweetFactory__" + fileIncrement;
-                        var encodedContent = (btoa(Constants.CONTENT));
-                        var payload = "configName=" + btoa(tempFile + '.siddhi') + "&config=" + encodedContent;
-                        var fileToBeChecked = "configName=" + btoa(tempFile + '.siddhi');
+                        var encodedContent = self.app.utils.base64EncodeUnicode(Constants.CONTENT);
+                        var payload = "configName=" + self.app.utils.base64EncodeUnicode(tempFile + '.siddhi') +
+                            "&config=" + encodedContent;
+                        var fileToBeChecked = "configName="+self.app.utils.base64EncodeUnicode(tempFile + '.siddhi');
                         $.ajax({
                             url: checkFileURL,
                             type: "POST",
@@ -590,7 +591,8 @@ define(['jquery', 'lodash', 'log', 'enjoyhint', 'designViewUtils', 'workspace', 
                                     tempFile = tempFile.slice(0, 14);
                                     fileIncrement++;
                                     tempFile = tempFile + fileIncrement;
-                                    payload = "configName=" + btoa(tempFile + '.siddhi') + "&config=" + encodedContent;
+                                    payload = "configName=" + self.app.utils.base64EncodeUnicode(tempFile + '.siddhi')
+                                        + "&config=" + encodedContent;
                                 }
                             }
                         });

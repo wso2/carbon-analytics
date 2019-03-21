@@ -364,7 +364,7 @@ define(['require', 'log', 'jquery', 'lodash', 'designViewUtils'],
                 return false;
             } else if (!query.queryInput.right) {
                 errorMessage = 'Right source of Join query is not defined';
-                highlightIncompleteElement(query.i, errorMessage);
+                highlightIncompleteElement(query.id, errorMessage);
                 if (!doNotShowErrorMessages) {
                     DesignViewUtils.prototype.errorAlert(errorMessage);
                 }
