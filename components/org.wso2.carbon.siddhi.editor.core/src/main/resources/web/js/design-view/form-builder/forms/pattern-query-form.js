@@ -429,13 +429,6 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
                         queryOutput.setTarget(outputTarget);
                         queryOutput.setType(Constants.INSERT);
 
-                        var isValid = JSONValidator.prototype.validatePatternOrSequenceQuery(patternQueryObject,
-                            Constants.PATTERN_QUERY, false);
-                        if (!isValid) {
-                            isErrorOccurred = true;
-                            return;
-                        }
-
                         $('#' + id).removeClass('incomplete-element');
                         self.configurationData.setIsDesignViewContentChanged(true);
 

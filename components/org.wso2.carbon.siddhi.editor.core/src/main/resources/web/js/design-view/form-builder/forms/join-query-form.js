@@ -685,11 +685,6 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
                         queryOutput.setTarget(outputTarget);
                         queryOutput.setType(Constants.INSERT);
 
-                        var isValid = JSONValidator.prototype.validateJoinQuery(joinQueryObject, false);
-                        if (!isValid) {
-                            return;
-                        }
-
                         $('#' + id).removeClass('incomplete-element');
                         self.configurationData.setIsDesignViewContentChanged(true);
 

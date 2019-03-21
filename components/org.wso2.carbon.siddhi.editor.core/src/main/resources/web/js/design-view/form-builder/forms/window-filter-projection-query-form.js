@@ -365,12 +365,6 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
                         queryOutput.setTarget(outputTarget);
                         queryOutput.setType(Constants.INSERT);
 
-                        var isValid = JSONValidator.prototype.validateWindowFilterProjectionQuery(queryObject, false);
-                        if (!isValid) {
-                            isErrorOccurred = true;
-                            return;
-                        }
-
                         /**
                          * This is to change the icon of the query depending on the selected stream handlers
                          */

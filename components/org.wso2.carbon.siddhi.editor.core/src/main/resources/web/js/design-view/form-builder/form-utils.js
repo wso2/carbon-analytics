@@ -721,7 +721,7 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
             var connectedElement = self.configurationData.getSiddhiAppConfig().getDefinitionElementByName(outputElementName);
             _.forEach(connectedElement.element.getAttributeList(), function (attribute) {
                 var expression = "";
-                if(projectionValues[i]) {
+                if (projectionValues[i]) {
                     expression = projectionValues[i].expression;
                 }
                 attributes.push({
@@ -3290,11 +3290,11 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
             var streamHandlerListLength = $(streamHandlerList).find('li').length
             var appendedIndex;
             var handlerList = '<li class="define-stream-handler-content"> <div> ' +
-                '<div class="collapse-div" href="#' + streamHandlerListLength + '-' + id +'-stream-handler-content" ' +
+                '<div class="collapse-div" href="#' + streamHandlerListLength + '-' + id + '-stream-handler-content" ' +
                 'data-toggle="collapse" aria-expanded="true"> <label class="clearfix"> ' +
                 '<span class="mandatory-symbol"> * </span> Type <a class="collapse-icon"> </a> </label> ' +
                 '<div class = "define-stream-handler-type"> </div> </div> <div id="' +
-                streamHandlerListLength + '-' + id +'-stream-handler-content" class="collapse in"> <div class="clearfix">' +
+                streamHandlerListLength + '-' + id + '-stream-handler-content" class="collapse in"> <div class="clearfix">' +
                 '<div class = "define-stream-handler-type-content"> </div> <div class = "attr-nav"> </div> ' +
                 '</div> <label class = "error-message"> </label> </div> </div> </li>';
             if (type === Constants.WINDOW || streamHandlerListLength == 0 ||
