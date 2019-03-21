@@ -576,8 +576,8 @@ define(['jquery', 'lodash', 'log', 'enjoyhint', 'designViewUtils', 'workspace', 
                     onBeforeStart: function () {
                         fileIncrement = browserStorage.get('guideFileNameIncrement');
                         tempFile = "SweetFactory__" + fileIncrement;
-                        var payload = "configName=" + btoa(tempFile + '.siddhi') + "&config="
-                            + (btoa(Constants.CONTENT));
+                        var encodedContent = (btoa(Constants.CONTENT));
+                        var payload = "configName=" + btoa(tempFile + '.siddhi') + "&config=" + encodedContent;
                         var fileToBeChecked = "configName=" + btoa(tempFile + '.siddhi');
                         $.ajax({
                             url: checkFileURL,
@@ -590,8 +590,7 @@ define(['jquery', 'lodash', 'log', 'enjoyhint', 'designViewUtils', 'workspace', 
                                     tempFile = tempFile.slice(0, 14);
                                     fileIncrement++;
                                     tempFile = tempFile + fileIncrement;
-                                    payload = "configName=" + btoa(tempFile + '.siddhi')
-                                        + "&config=" + (btoa(content));
+                                    payload = "configName=" + btoa(tempFile + '.siddhi') + "&config=" + encodedContent;
                                 }
                             }
                         });
