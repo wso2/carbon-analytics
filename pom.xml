@@ -1559,8 +1559,8 @@
 
     <properties>
         <carbon.analytics.version>2.0.496-SNAPSHOT</carbon.analytics.version>
-        <siddhi.version>4.4.10-SNAPSHOT</siddhi.version>
-        <siddhi.bundle.version>4.4.10-SNAPSHOT</siddhi.bundle.version>
+        <siddhi.version>4.4.10</siddhi.version>
+        <siddhi.bundle.version>4.4.10</siddhi.bundle.version>
         <siddhi.version.range>[4.0.0, 5.0.0)</siddhi.version.range>
         <carbon.analytics-common.version>6.1.1</carbon.analytics-common.version>
         <carbon.analytics-common.version.range>[6.0.66, 6.2.0)</carbon.analytics-common.version.range>
