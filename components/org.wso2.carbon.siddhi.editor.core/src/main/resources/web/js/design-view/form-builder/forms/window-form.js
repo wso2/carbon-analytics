@@ -29,6 +29,7 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'constants'],
                 this.configurationData = options.configurationData;
                 this.application = options.application;
                 this.formUtils = options.formUtils;
+                this.jsPlumbInstance = options.jsPlumbInstance;
                 this.consoleListManager = options.application.outputController;
                 var currentTabId = this.application.tabController.activeTab.cid;
                 this.designViewContainer = $('#design-container-' + currentTabId);
@@ -182,14 +183,16 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'constants'],
                 }
 
                 if (!isErrorOccurred) {
-                    if (previouslySavedName !== windowName) {
-                        // update connection related to the element if the name is changed
-                        windowObject.setName(windowName);
-                        self.formUtils.updateConnectionsAfterDefinitionElementNameChange(id);
-
-                        var textNode = $(element).parent().find('.windowNameNode');
-                        textNode.html(windowName);
-                    }
+                    var outConnections = self.jsPlumbInstance.getConnections({ source: id + '-out' });
+                    var inConnections = self.jsPlumbInstance.getConnections({ target: id + '-in' });
+                    // delete connections related to the element if the name is changed
+                    self.formUtils.deleteConnectionsAfterDefinitionElementNameChange(outConnections, inConnections);
+                    // update selected window model
+                    windowObject.setName(windowName);
+                    // establish connections related to the element if the name is changed
+                    self.formUtils.establishConnectionsAfterDefinitionElementNameChange(outConnections, inConnections);
+                    var textNode = $(element).parent().find('.windowNameNode');
+                    textNode.html(windowName);
 
                     var parameters = self.formUtils.buildWindowParameters('.window-form-container', windowType,
                         predefinedWindowFunctionNames)

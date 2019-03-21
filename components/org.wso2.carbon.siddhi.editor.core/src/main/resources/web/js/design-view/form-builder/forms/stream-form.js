@@ -220,15 +220,16 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'jsonValidator', 'con
                 }
 
                 if (!isErrorOccurred) {
-                    if (previouslySavedName !== streamName) {
-                        // update selected stream model
-                        streamObject.setName(streamName);
-                        // update connection related to the element if the name is changed
-                        self.formUtils.updateConnectionsAfterDefinitionElementNameChange(id);
-
-                        var textNode = $('#' + id).find('.streamNameNode');
-                        textNode.html(streamName);
-                    }
+                    var outConnections = self.jsPlumbInstance.getConnections({ source: id + '-out' });
+                    var inConnections = self.jsPlumbInstance.getConnections({ target: id + '-in' });
+                    // delete connections related to the element if the name is changed
+                    self.formUtils.deleteConnectionsAfterDefinitionElementNameChange(outConnections, inConnections);
+                    // update selected stream model
+                    streamObject.setName(streamName);
+                    // establish connections related to the element if the name is changed
+                    self.formUtils.establishConnectionsAfterDefinitionElementNameChange(outConnections, inConnections);
+                    var textNode = $('#' + id).find('.streamNameNode');
+                    textNode.html(streamName);
 
                     //clear the previously saved attribute list
                     streamObject.clearAttributeList();

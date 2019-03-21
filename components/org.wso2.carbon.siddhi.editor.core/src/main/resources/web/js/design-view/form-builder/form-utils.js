@@ -165,14 +165,10 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
         };
 
         /**
-        * @function Updates connections of a definition element after the element name is changed.
-        * @param elementId id of the element
-        */
-        FormUtils.prototype.updateConnectionsAfterDefinitionElementNameChange = function (elementId) {
+         * @function to delete the connections
+         */
+        FormUtils.prototype.deleteConnectionsAfterDefinitionElementNameChange = function (outConnections, inConnections) {
             var self = this;
-
-            var outConnections = self.jsPlumbInstance.getConnections({ source: elementId + '-out' });
-            var inConnections = self.jsPlumbInstance.getConnections({ target: elementId + '-in' });
 
             _.forEach(outConnections, function (connection) {
                 self.jsPlumbInstance.deleteConnection(connection);
@@ -180,7 +176,13 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
             _.forEach(inConnections, function (connection) {
                 self.jsPlumbInstance.deleteConnection(connection);
             });
+        };
 
+        /**
+         * @function to establish the connections
+         */
+        FormUtils.prototype.establishConnectionsAfterDefinitionElementNameChange = function (outConnections, inConnections) {
+            var self = this;
             _.forEach(inConnections, function (inConnection) {
                 self.jsPlumbInstance.connect({
                     source: inConnection.sourceId,

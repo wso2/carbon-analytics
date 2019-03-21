@@ -31,6 +31,7 @@ define(['require', 'log', 'jquery', 'lodash', 'aggregateByTimePeriod', 'querySel
                 this.configurationData = options.configurationData;
                 this.application = options.application;
                 this.formUtils = options.formUtils;
+                this.jsPlumbInstance = options.jsPlumbInstance;
                 this.consoleListManager = options.application.outputController;
                 var currentTabId = this.application.tabController.activeTab.cid;
                 this.designViewContainer = $('#design-container-' + currentTabId);
@@ -470,15 +471,17 @@ define(['require', 'log', 'jquery', 'lodash', 'aggregateByTimePeriod', 'querySel
 
                         aggregationObject.setConnectedSource($('#aggregation-from').val().trim());
 
-                        if (previouslySavedName !== aggregationName) {
-                            // update selected aggregation model
-                            aggregationObject.setName(aggregationName);
-                            // update connection related to the element if the name is changed
-                            self.formUtils.updateConnectionsAfterDefinitionElementNameChange(id);
+                        var outConnections = self.jsPlumbInstance.getConnections({ source: id + '-out' });
+                        var inConnections = self.jsPlumbInstance.getConnections({ target: id + '-in' });
+                        // delete connections related to the element if the name is changed
+                        self.formUtils.deleteConnectionsAfterDefinitionElementNameChange(outConnections, inConnections);
+                        // update selected aggregation model
+                        aggregationObject.setName(aggregationName);
+                        // establish connections related to the element if the name is changed
+                        self.formUtils.establishConnectionsAfterDefinitionElementNameChange(outConnections, inConnections);
 
-                            var textNode = $('#' + id).find('.aggregationNameNode');
-                            textNode.html(aggregationName);
-                        }
+                        var textNode = $('#' + id).find('.aggregationNameNode');
+                        textNode.html(aggregationName);
 
                         var annotationStringList = [];
                         var annotationObjectList = [];

@@ -69,7 +69,7 @@ define(
          * @param array Given array.
          */
         ElementUtils.prototype.removeAllElements = function (array) {
-            array.length = 0;
+            array = [];
         };
 
         return ElementUtils;

@@ -30,6 +30,7 @@ define(['log', 'jquery', 'lodash', 'attribute', 'storeAnnotation', 'handlebar', 
                 this.configurationData = options.configurationData;
                 this.application = options.application;
                 this.formUtils = options.formUtils;
+                this.jsPlumbInstance = options.jsPlumbInstance;
                 this.consoleListManager = options.application.outputController;
                 var currentTabId = this.application.tabController.activeTab.cid;
                 this.designViewContainer = $('#design-container-' + currentTabId);
@@ -213,15 +214,16 @@ define(['log', 'jquery', 'lodash', 'attribute', 'storeAnnotation', 'handlebar', 
                     tableObject.clearAnnotationList();
                     tableObject.clearAnnotationListObjects();
 
-                    if (previouslySavedName !== tableName) {
-                        // update selected table model
-                        tableObject.setName(tableName);
-                        // update connection related to the element if the name is changed
-                        self.formUtils.updateConnectionsAfterDefinitionElementNameChange(id);
-
-                        var textNode = $('#' + id).find('.tableNameNode');
-                        textNode.html(tableName);
-                    }
+                    var outConnections = self.jsPlumbInstance.getConnections({ source: id + '-out' });
+                    var inConnections = self.jsPlumbInstance.getConnections({ target: id + '-in' });
+                    // delete connections related to the element if the name is changed
+                    self.formUtils.deleteConnectionsAfterDefinitionElementNameChange(outConnections, inConnections);
+                    // update selected table model
+                    tableObject.setName(tableName);
+                    // establish connections related to the element if the name is changed
+                    self.formUtils.establishConnectionsAfterDefinitionElementNameChange(outConnections, inConnections);
+                    var textNode = $('#' + id).find('.tableNameNode');
+                    textNode.html(tableName);
 
                     if (selectedStoreType !== Constants.DEFAULT_STORE_TYPE) {
                         var storeOptions = [];
