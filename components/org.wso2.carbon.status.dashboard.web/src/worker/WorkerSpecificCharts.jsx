@@ -90,6 +90,32 @@ const memoryLineChartConfig = {
         axisLabelColor: '#9c9898'
     }
 };
+const loadHASendingMetadata = {names: ['Time', 'throughput'], types: ['time', 'linear']};
+const loadHASendingChartConfig = {
+    x: 'Time',
+    charts: [{type: 'line', y: 'throughput', style: {markRadius: 2}}],
+    gridColor: '#f2f2f2',
+    tipTimeFormat: "%M:%S %Z",
+    style: {
+        axisLabelColor: '#9c9898',
+        legendTitleColor: '#9c9898',
+        legendTextColor: '#9c9898',
+        tickLabelColor: '#f2f2f2',
+    }
+};
+const loadHAReceivingMetadata = {names: ['Time', 'throughput'], types: ['time', 'linear']};
+const loadHAReceivingChartConfig = {
+    x: 'Time',
+    charts: [{type: 'line', y: 'throughput', style: {markRadius: 2}}],
+    gridColor: '#f2f2f2',
+    tipTimeFormat: "%M:%S %Z",
+    style: {
+        axisLabelColor: '#9c9898',
+        legendTitleColor: '#9c9898',
+        legendTextColor: '#9c9898',
+        tickLabelColor: '#f2f2f2',
+    }
+};
 const styles = {
     root: {display: 'flex', flexWrap: 'wrap', justifyContent: 'space-around'},
     gridList: {height: '50%', overflowY: 'auto', padding: '0 10px', margin: '-10px 0'}
@@ -108,21 +134,38 @@ export default class WorkerSpecificCharts extends React.Component {
             usedMem: [],
             loadAvg: [],
             throughputAll: [],
+            receivingThroughput: [],
+            sendingThroughput: [],
             workerId: this.props.id,
             sysCpuChecked: true,
             processCpuChecked: true,
             totalMemoryChecked: true,
-            usedMemoryChecked: true
+            usedMemoryChecked: true,
+            isHADeployment: false,
+            haStatus: true
         }
     }
 
     componentWillMount() {
+        console.log("componentWillMount(_)");
         let queryParams = {
             params: {
                 period: '5min'
             }
         };
         let that = this;
+
+        StatusDashboardAPIS.getHAWorkerDetailsByID(this.state.workerId, queryParams)
+            .then((response) => {
+                if (response.data.haStatus) {
+                    console.log(response.data);
+                    that.setState({
+                        isHADeployment: true,
+                        haStatus: response.data.haStatus
+                    });
+                }
+            });
+
         StatusDashboardAPIS.getWorkerHistoryByID(this.state.workerId, queryParams)
             .then((response) => {
                 that.setState({
@@ -132,6 +175,15 @@ export default class WorkerSpecificCharts extends React.Component {
                     usedMem: response.data.usedMemory.data,
                     loadAvg: response.data.loadAverage.data,
                     throughputAll: response.data.throughput.data
+                });
+            });
+
+        StatusDashboardAPIS.getHAWorkerHistoryByID(this.state.workerId, queryParams)
+            .then((response) => {
+                console.log("Publishing throughput data: " + response.data.sendingThroughput.data);
+                that.setState({
+                    receivingThroughput: response.data.receivingThroughput.data,
+                    sendingThroughput: response.data.sendingThroughput.data
                 });
             });
     }
@@ -461,17 +513,122 @@ export default class WorkerSpecificCharts extends React.Component {
         );
     }
 
+    renderHASyncingReceivingThroughputChart() {
+        if (this.state.isHADeployment) {
+            let yLimit;
+            if (this.state.receivingThroughput.length === 0) {
+                return (
+                    <GridTile title={<FormattedMessage id='workerSpecific.haSyncingReceivingThroughput' defaultMessage='HA Event Syncing Receiving TPS' />} titlePosition="top" titleBackground='#303030'>
+                        <div style={{
+                            marginTop: 50,
+                            color: '#303030',
+                            backgroundColor: '#131313',
+                            padding: 30,
+                            textAlign: 'center',
+                            height: 370
+                        }}><h2><FormattedMessage id='noData' defaultMessage='No Data Available' /></h2></div>
+                    </GridTile>
+                );
+            }
+            else {
+                yLimit = DashboardUtils.getYDomain(this.state.receivingThroughput);
+            }
+            return (
+                <GridTile className="container" title={<FormattedMessage id='workerSpecific.haSyncingReceivingThroughput' defaultMessage='HA Event Syncing Receiving TPS' />} titlePosition="top" titleBackground='#303030'>
+                    <div style={{backgroundColor: '#131313', paddingTop: 10, height: '370px'}}>
+                        <div style={{backgroundColor: '#131313', paddingTop: 60, height: 255, width: '100%'}}>
+                            <VizG data={this.state.receivingThroughput}
+                                  metadata={loadHAReceivingMetadata}
+                                  config={loadHAReceivingChartConfig}
+                                  yDomain={[yLimit[0], yLimit[1]]}
+                                  width={550}
+                                  height={255}
+                            />
+                        </div>
+                    </div>
+                </GridTile>
+            );
+        }
+    }
+
+    renderHASyncingSendingThroughputChart() {
+        if (this.state.isHADeployment) {
+            let yLimit;
+            if (this.state.sendingThroughput.length === 0) {
+                return (
+                    <GridTile title={<FormattedMessage id='workerSpecific.haSyncingSendingThroughput' defaultMessage='HA Event Syncing Publishing TPS' />} titlePosition="top" titleBackground='#303030'>
+                        <div style={{
+                            marginTop: 50,
+                            color: '#303030',
+                            backgroundColor: '#131313',
+                            padding: 30,
+                            textAlign: 'center',
+                            height: 370
+                        }}><h2><FormattedMessage id='noData' defaultMessage='No Data Available' /></h2></div>
+                    </GridTile>
+                );
+            }
+            else {
+                yLimit = DashboardUtils.getYDomain(this.state.sendingThroughput);
+            }
+            return (
+                <GridTile className="container" title={<FormattedMessage id='workerSpecific.haSyncingSendingThroughput' defaultMessage='HA Event Syncing Publishing TPS' />} titlePosition="top" titleBackground='#303030'>
+                    <div className="overlay" style={{ color: '#303030', paddingTop: 20, textAlign: 'right' }}>
+                        <h3><FormattedMessage id='clickForMore' defaultMessage='Click for more details' /></h3>
+                    </div>
+                    <div style={{backgroundColor: '#131313', paddingTop: 10, height: '370px'}}>
+                        <div style={{backgroundColor: '#131313', paddingTop: 60, height: 255, width: '100%'}}>
+                            <VizG data={this.state.sendingThroughput}
+                                  metadata={loadHASendingMetadata}
+                                  config={loadHASendingChartConfig}
+                                  yDomain={[yLimit[0], yLimit[1]]}
+                                  width={550}
+                                  height={255}
+                            />
+                        </div>
+                    </div>
+                </GridTile>
+            );
+        }
+    }
+
     render() {
-        return (
-            <div style={{width: '70%', float: 'right', boxSizing: 'border-box'}}>
-                <GridList cols={2} padding={20} cellHeight={320} style={styles.gridList}>
-                    {this.renderCpuChart()}
-                    {this.renderMemoryChart()}
-                    {this.renderLoadAverageChart()}
-                    {this.renderThroughputChart()}
-                </GridList>
-            </div>
-        );
+        if (!this.state.isHADeployment) {
+            return (
+                <div style={{width: '70%', float: 'right', boxSizing: 'border-box'}}>
+                    <GridList cols={2} padding={20} cellHeight={320} style={styles.gridList} deployment={this.state.isHADeployment}>
+                        {this.renderCpuChart()}
+                        {this.renderMemoryChart()}
+                        {this.renderLoadAverageChart()}
+                        {this.renderThroughputChart()}
+                    </GridList>
+                </div>
+            );
+        } else if (this.state.haStatus === 'Active'){
+            return (
+                <div style={{width: '70%', float: 'right', boxSizing: 'border-box'}}>
+                    <GridList cols={2} padding={20} cellHeight={320} style={styles.gridList} deployment={this.state.isHADeployment}>
+                        {this.renderCpuChart()}
+                        {this.renderMemoryChart()}
+                        {this.renderLoadAverageChart()}
+                        {this.renderThroughputChart()}
+                        {this.renderHASyncingSendingThroughputChart()}
+                    </GridList>
+                </div>
+            );
+        } else {
+            return (
+                <div style={{width: '70%', float: 'right', boxSizing: 'border-box'}}>
+                    <GridList cols={2} padding={20} cellHeight={320} style={styles.gridList} deployment={this.state.isHADeployment}>
+                        {this.renderCpuChart()}
+                        {this.renderMemoryChart()}
+                        {this.renderLoadAverageChart()}
+                        {this.renderThroughputChart()}
+                        {this.renderHASyncingReceivingThroughputChart()}
+                    </GridList>
+                </div>
+            );
+        }
     }
 }
 

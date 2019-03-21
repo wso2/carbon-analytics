@@ -40,7 +40,7 @@
         <module>components/org.wso2.carbon.business.rules.templates.editor.core</module>
         <module>components/org.wso2.carbon.business.rules.core</module>
         <module>components/org.wso2.carbon.business.rules.web</module>
-        <module>components/org.wso2.carbon.siddhi.metrics.core</module>
+        <module>components/org.wso2.carbon.sp.metrics.core</module>
         <module>components/org.wso2.carbon.stream.processor.statistics</module>
         <module>components/org.wso2.carbon.status.dashboard.core</module>
         <module>components/org.wso2.carbon.status.dashboard.web</module>
@@ -60,7 +60,7 @@
         <module>features/org.wso2.carbon.business.rules.core.feature</module>
         <module>features/org.wso2.carbon.business.rules.web.feature</module>
         <module>features/org.wso2.siddhi.feature</module>
-        <module>features/org.wso2.carbon.siddhi.metrics.core.feature</module>
+        <module>features/org.wso2.carbon.sp.metrics.core.feature</module>
         <module>features/org.wso2.carbon.stream.processor.statistics.feature</module>
         <module>features/org.wso2.carbon.status.dashboard.core.feature</module>
         <module>features/org.wso2.carbon.status.dashboard.web.feature</module>
@@ -1341,12 +1341,12 @@
             </dependency>
             <dependency>
                 <groupId>org.wso2.carbon.analytics</groupId>
-                <artifactId>org.wso2.carbon.siddhi.metrics.core</artifactId>
+                <artifactId>org.wso2.carbon.sp.metrics.core</artifactId>
                 <version>${carbon.analytics.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.wso2.carbon.analytics</groupId>
-                <artifactId>org.wso2.carbon.siddhi.metrics.core.feature</artifactId>
+                <artifactId>org.wso2.carbon.sp.metrics.core.feature</artifactId>
                 <version>${carbon.analytics.version}</version>
                 <type>zip</type>
             </dependency>
@@ -1559,8 +1559,8 @@
 
     <properties>
         <carbon.analytics.version>2.0.496-SNAPSHOT</carbon.analytics.version>
-        <siddhi.version>4.4.9</siddhi.version>
-        <siddhi.bundle.version>4.4.9</siddhi.bundle.version>
+        <siddhi.version>4.4.10</siddhi.version>
+        <siddhi.bundle.version>4.4.10</siddhi.bundle.version>
         <siddhi.version.range>[4.0.0, 5.0.0)</siddhi.version.range>
         <carbon.analytics-common.version>6.1.1</carbon.analytics-common.version>
         <carbon.analytics-common.version.range>[6.0.66, 6.2.0)</carbon.analytics-common.version.range>

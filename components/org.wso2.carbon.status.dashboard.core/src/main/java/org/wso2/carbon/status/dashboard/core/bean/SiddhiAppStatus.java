@@ -19,6 +19,8 @@
 
 package org.wso2.carbon.status.dashboard.core.bean;
 
+import org.wso2.siddhi.core.util.statistics.metrics.Level;
+
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -29,7 +31,8 @@ public class SiddhiAppStatus {
     private String status;
     private long age;
     private String agetime;
-    private boolean isStatEnabled;
+    private Level siddhiStatEnabledLevel;
+    private String isStatEnabled;
     private SiddhiAppMetricsHistory appMetricsHistory;
     
     public SiddhiAppStatus() {
@@ -66,13 +69,22 @@ public class SiddhiAppStatus {
     public void populateAgetime() {
         this.agetime = getTimeAgo();
     }
-    
-    public boolean isStatEnabled() {
+
+    public String isStatEnabled() {
+        return siddhiStatEnabledLevel.toString();
+    }
+
+    public Level getSiddhiStatEnabledLevel() {
+        return siddhiStatEnabledLevel;
+    }
+
+    public String getEnabledStatLevelAsString() {
         return isStatEnabled;
     }
-    
-    public void setStatEnabled(boolean statEnabled) {
-        isStatEnabled = statEnabled;
+
+    public void setStatEnabled(Level statEnabled) {
+        siddhiStatEnabledLevel = statEnabled;
+        isStatEnabled = statEnabled.toString();
     }
     
     public SiddhiAppMetricsHistory getAppMetricsHistory() {

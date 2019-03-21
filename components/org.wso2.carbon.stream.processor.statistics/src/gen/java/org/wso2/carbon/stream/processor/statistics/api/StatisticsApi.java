@@ -29,9 +29,9 @@ import org.osgi.service.component.annotations.Reference;
 import org.osgi.service.component.annotations.ReferenceCardinality;
 import org.osgi.service.component.annotations.ReferencePolicy;
 import org.wso2.carbon.analytics.msf4j.interceptor.common.AuthenticationInterceptor;
+import org.wso2.carbon.stream.processor.core.util.StatsEnable;
 import org.wso2.carbon.stream.processor.statistics.factories.StatisticsApiServiceFactory;
 import org.wso2.carbon.stream.processor.statistics.internal.OperatingSystemMetricSet;
-import org.wso2.carbon.stream.processor.statistics.model.StatsEnable;
 import org.wso2.msf4j.Microservice;
 import org.wso2.msf4j.Request;
 import org.wso2.msf4j.interceptor.annotation.RequestInterceptor;
@@ -109,7 +109,7 @@ public class StatisticsApi implements Microservice   {
      */
     @PUT
     @Consumes({"application/json"})
-    @Produces({ "application/json" })
+    @Produces({"application/json"})
     @io.swagger.annotations.ApiOperation(value = "Enable/disable worker statistics",
             notes = "Enable/disable worker statistics", response = ApiResponseMessage.class, tags={ "Workers", })
     @io.swagger.annotations.ApiResponses(value = {
@@ -118,9 +118,9 @@ public class StatisticsApi implements Microservice   {
             @io.swagger.annotations.ApiResponse(code = 404, message = "Worker not found.", response = ApiResponseMessage.class),
 
             @io.swagger.annotations.ApiResponse(code = 500, message = "An unexpected error occured.", response = ApiResponseMessage.class) })
-    public Response enableStats(@Context Request request,@ApiParam(value = "statsEnable", required = true) StatsEnable statsEnable)
+    public Response enableStats(@Context Request request, @ApiParam(value = "statsEnable", required = true) StatsEnable statsEnable)
             throws NotFoundException, org.wso2.carbon.stream.processor.statistics.api.NotFoundException {
-        return delegate.enableStats(statsEnable.getStatsEnable(),request);
+        return delegate.enableStats(statsEnable.getEnabledSiddhiStatLevel(),request);
     }
 
     @Reference(

@@ -22,11 +22,14 @@
  */
 package org.wso2.carbon.status.dashboard.core.bean;
 
+import org.wso2.siddhi.core.util.statistics.metrics.Level;
+
 public class SiddhiAppSummaryInfo {
     private String appName;
     private String status;
     private String lastUpdate;
-    private boolean isStatEnabled;
+    private Level siddhiStatEnableLevel;
+    private String isStatEnabled;
     private String deployedNodeType;
     private String deployedNodeHost;
     private String deployedNodePort;
@@ -88,11 +91,16 @@ public class SiddhiAppSummaryInfo {
         this.lastUpdate = lastUpdate;
     }
 
-    public boolean isStatEnabled() {
+    public String isStatEnabled() {
         return isStatEnabled;
     }
 
-    public void setStatEnabled(boolean statEnabled) {
-        isStatEnabled = statEnabled;
+    public Level getSiddhiStatEnableLevel() {
+        return siddhiStatEnableLevel;
+    }
+
+    public void setStatEnabled(Level statEnabled) {
+        isStatEnabled = siddhiStatEnableLevel.toString();
+        siddhiStatEnableLevel = statEnabled;
     }
 }

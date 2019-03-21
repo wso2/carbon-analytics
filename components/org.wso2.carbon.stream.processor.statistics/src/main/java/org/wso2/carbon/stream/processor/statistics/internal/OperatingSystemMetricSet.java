@@ -23,6 +23,7 @@ import org.wso2.carbon.stream.processor.core.NodeInfo;
 import org.wso2.carbon.stream.processor.statistics.bean.WorkerMetrics;
 import org.wso2.carbon.stream.processor.statistics.bean.WorkerStatistics;
 import org.wso2.carbon.stream.processor.statistics.internal.exception.MetricsConfigException;
+import org.wso2.siddhi.core.util.statistics.metrics.Level;
 
 import java.lang.management.ManagementFactory;
 import java.text.SimpleDateFormat;
@@ -213,7 +214,7 @@ public class OperatingSystemMetricSet {
         if (metricManagementService.isEnabled()) {
             metricManagementService.disable();
             StreamProcessorStatisticDataHolder.getInstance().getSiddhiAppRuntimeService()
-                    .enableSiddhiAppStatistics(false);
+                    .enableSiddhiAppStatistics(Level.OFF);
         } else {
             LOGGER.warn("Wso2 metrics is already disabled.");
         }
@@ -231,13 +232,13 @@ public class OperatingSystemMetricSet {
     /**
      * Method to disable the metrics of a worker.
      */
-    public void enableWorkerMetrics() {
+    public void enableWorkerMetrics(Level level) {
         if (!metricManagementService.isEnabled()) {
             metricManagementService.enable();
-            StreamProcessorStatisticDataHolder.getInstance().getSiddhiAppRuntimeService()
-                    .enableSiddhiAppStatistics(true);
         } else {
             LOGGER.warn("Wso2 metrics is already enabled.");
         }
+        StreamProcessorStatisticDataHolder.getInstance().getSiddhiAppRuntimeService()
+                .enableSiddhiAppStatistics(level);
     }
 }
