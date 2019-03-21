@@ -66,7 +66,15 @@ public class StatsEnable {
     @ApiModelProperty(required = true, value = "")
     public Level getEnabledSiddhiStatLevel() {
         if (enabledSiddhiStatLevel == null) {
-            enabledSiddhiStatLevel = Level.valueOf(enabledStatLevel);
+            if (enabledStatLevel == null) {
+                if (statsEnable) {
+                    enabledSiddhiStatLevel = Level.DETAIL;
+                } else {
+                    enabledSiddhiStatLevel = Level.OFF;
+                }
+            } else {
+                enabledSiddhiStatLevel = Level.valueOf(enabledStatLevel);
+            }
         }
         return enabledSiddhiStatLevel;
     }

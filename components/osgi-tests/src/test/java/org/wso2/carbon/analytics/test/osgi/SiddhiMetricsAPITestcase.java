@@ -143,6 +143,26 @@ public class SiddhiMetricsAPITestcase {
         Assert.assertEquals(msg.getMessage(), "Successfully enabled the metrics.");
     }
 
+    @Test(dependsOnMethods = "testEnableMetrics")
+    public void testDisableMetricsByBoolean() throws Exception {
+        HTTPResponseMessage httpResponseMessage = switchMetricsViaBooleanAndGetResponse(false);
+        Assert.assertEquals(httpResponseMessage.getResponseCode(), 200);
+        Assert.assertEquals(httpResponseMessage.getContentType(), "application/json");
+        ApiResponseMessage msg = gson.fromJson((String) httpResponseMessage.getSuccessContent(), ApiResponseMessage
+                .class);
+        Assert.assertEquals(msg.getMessage(), "Successfully disabled the metrics.");
+    }
+
+    @Test(dependsOnMethods = "testDisableMetricsByBoolean")
+    public void testEnableMetricsByBoolean() throws Exception {
+        HTTPResponseMessage httpResponseMessage = switchMetricsViaBooleanAndGetResponse(true);
+        Assert.assertEquals(httpResponseMessage.getResponseCode(), 200);
+        Assert.assertEquals(httpResponseMessage.getContentType(), "application/json");
+        ApiResponseMessage msg = gson.fromJson((String) httpResponseMessage.getSuccessContent(), ApiResponseMessage
+                .class);
+        Assert.assertEquals(msg.getMessage(), "Successfully enabled the metrics.");
+    }
+
     private HTTPResponseMessage switchMetricsAndGetResponse(Level level) {
         URI baseURI = URI.create(String.format("http://%s:%d", "localhost", 9090));
         String path = "/statistics";
@@ -155,7 +175,19 @@ public class SiddhiMetricsAPITestcase {
                 true, DEFAULT_USER_NAME, DEFAULT_PASSWORD);
     }
 
-    @Test(dependsOnMethods = "testEnableMetrics")
+    private HTTPResponseMessage switchMetricsViaBooleanAndGetResponse(boolean level) {
+        URI baseURI = URI.create(String.format("http://%s:%d", "localhost", 9090));
+        String path = "/statistics";
+        String contentType = "application/json";
+        String method = "PUT";
+        TestUtil.waitForAppDeployment(siddhiAppRuntimeService, eventStreamService, APP_NAME, Duration.TEN_SECONDS);
+        TestUtil.waitForMicroServiceDeployment(microservicesRegistry, path, Duration.TEN_SECONDS);
+        return sendHRequest("{ statsEnable: " + level + "}",
+                baseURI, path, contentType, method,
+                true, DEFAULT_USER_NAME, DEFAULT_PASSWORD);
+    }
+
+    @Test(dependsOnMethods = "testEnableMetricsByBoolean")
     public void testGetRealTimeStatistics() throws Exception {
         HTTPResponseMessage httpResponseMessage = getRealTimeStatsAndReturnResponse();
         Assert.assertEquals(httpResponseMessage.getResponseCode(), 200);
@@ -212,7 +244,7 @@ public class SiddhiMetricsAPITestcase {
         Assert.assertEquals(httpResponseMessage.getContentType(), "application/json");
         ApiResponseMessage msg = gson.fromJson((String) httpResponseMessage.getSuccessContent(), ApiResponseMessage
                 .class);
-        Assert.assertEquals(msg.getMessage(), "Sucessfully disabled the metrics.");
+        Assert.assertEquals(msg.getMessage(), "Successfully disabled the metrics.");
     }
 
     @Test(dependsOnMethods = "testDisableMetrics")

@@ -98,7 +98,7 @@ public class StatisticsApiServiceImpl extends StatisticsApiService {
             if (operatingSystemMetricSet.isEnableWorkerMetrics()) {
                 operatingSystemMetricSet.disableWorkerMetrics();
                 return Response.ok().entity(new ApiResponseMessage(ApiResponseMessage.OK,
-                        "Sucessfully disabled the metrics.")).build();
+                        "Successfully disabled the metrics.")).build();
             } else {
                 return Response.ok().entity(new ApiResponseMessage(ApiResponseMessage.OK,
                         "Metrics are disabled already.")).build();
