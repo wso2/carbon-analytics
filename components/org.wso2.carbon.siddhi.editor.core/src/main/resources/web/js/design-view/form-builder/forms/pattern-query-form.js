@@ -47,14 +47,16 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
             $('.condition-content').each(function () {
                 var conditionId = $(this).find('.condition-id').val().trim();
                 var connectedStreamName = $(this).find('.condition-stream-name-selection').val();
-                var inputElement = self.configurationData.getSiddhiAppConfig()
-                    .getDefinitionElementByName(connectedStreamName, partitionId);
-                if (inputElement.type.toLowerCase() === Constants.TRIGGER) {
-                    possibleAttributes.push(conditionId + "." + Constants.TRIGGERED_TIME);
-                } else {
-                    _.forEach(inputElement.element.getAttributeList(), function (attribute) {
-                        possibleAttributes.push(conditionId + "." + attribute.getName());
-                    });
+                if (connectedStreamName) {
+                    var inputElement = self.configurationData.getSiddhiAppConfig()
+                        .getDefinitionElementByName(connectedStreamName, partitionId);
+                    if (inputElement.type.toLowerCase() === Constants.TRIGGER) {
+                        possibleAttributes.push(conditionId + "." + Constants.TRIGGERED_TIME);
+                    } else {
+                        _.forEach(inputElement.element.getAttributeList(), function (attribute) {
+                            possibleAttributes.push(conditionId + "." + attribute.getName());
+                        });
+                    }
                 }
             });
             return possibleAttributes;
@@ -99,7 +101,30 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
         var generateDivRequiringPossibleAttributes = function (self, partitionId, groupBy) {
             var possibleAttributes = getPossibleAttributes(self, partitionId);
             self.formUtils.generateGroupByDiv(groupBy, possibleAttributes);
-            self.formUtils.generateOrderByDiv(orderBy, possibleAttributes);
+        };
+
+        /**
+         * @function to validate on load of the form
+         */
+        var validateSectionsOnLoadOfForm = function (self) {
+            var isErrorOccurred = false;
+            if ($('.group-by-checkbox').is(':checked')) {
+                if (self.formUtils.validateGroupOrderBy(Constants.GROUP_BY)) {
+                    isErrorOccurred = true;
+                }
+            }
+            if ($('.order-by-checkbox').is(':checked')) {
+                if (self.formUtils.validateGroupOrderBy(Constants.ORDER_BY)) {
+                    isErrorOccurred = true;
+                }
+            }
+            if (self.formUtils.validateQueryProjection()) {
+                isErrorOccurred = true;
+            }
+            if (self.formUtils.validateRequiredFields('.define-content')) {
+                isErrorOccurred = true;
+            }
+            return isErrorOccurred;
         };
 
         /**
@@ -266,6 +291,14 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
                     $('.logic-statement').val(logic)
                 }
 
+                /**
+                 * to show user the lost saved data when the connection is deleted/ when the connected stream is modified
+                 * only if the form is an already edited form
+                 */
+                if (queryOutput && queryOutput.type) {
+                    validateSectionsOnLoadOfForm(self);
+                }
+
                 addAutoCompletion(self, partitionId, QUERY_CONDITION_SYNTAX, QUERY_SYNTAX, incrementalAggregator,
                     streamFunctions, outputAttributes);
 
@@ -325,31 +358,12 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
                         return;
                     }
 
-                    if ($('.group-by-checkbox').is(':checked')) {
-                        if (self.formUtils.validateGroupOrderBy(Constants.GROUP_BY)) {
-                            isErrorOccurred = true;
-                            return;
-                        }
-                    }
-
-                    if ($('.order-by-checkbox').is(':checked')) {
-                        if (self.formUtils.validateGroupOrderBy(Constants.ORDER_BY)) {
-                            isErrorOccurred = true;
-                            return;
-                        }
-                    }
-
-                    if (self.formUtils.validateRequiredFields('.define-content')) {
-                        isErrorOccurred = true;
-                        return;
-                    }
-
                     if (self.formUtils.validatePredefinedAnnotations(predefinedAnnotations)) {
                         isErrorOccurred = true;
                         return;
                     }
 
-                    if (self.formUtils.validateQueryProjection()) {
+                    if (validateSectionsOnLoadOfForm(self)) {
                         isErrorOccurred = true;
                         return;
                     }

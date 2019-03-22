@@ -255,6 +255,34 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
         };
 
         /**
+         * @function to validate on load of the form
+         */
+        var validateSectionsOnLoadOfForm = function (self) {
+            var isErrorOccurred = false;
+            if ($('.group-by-checkbox').is(':checked')) {
+                if (self.formUtils.validateGroupOrderBy(Constants.GROUP_BY)) {
+                    isErrorOccurred = true;
+                }
+            }
+            if ($('.order-by-checkbox').is(':checked')) {
+                if (self.formUtils.validateGroupOrderBy(Constants.ORDER_BY)) {
+                    isErrorOccurred = true;
+                }
+            }
+            if (self.formUtils.validateQueryProjection()) {
+                isErrorOccurred = true;
+            }
+            if (self.formUtils.validateRequiredFields('.define-content')) {
+                isErrorOccurred = true;
+            }
+            if (!$('.join-selection').val()) {
+                self.formUtils.addErrorClass('.define-join-type-selection')
+                isErrorOccurred = true;
+            }
+            return isErrorOccurred;
+        };
+
+        /**
          * @function generate the form for the join query
          * @param element selected element(query)
          * @param formConsole Console which holds the form
@@ -437,23 +465,16 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
                 self.formUtils.selectQueryProjection(select, outputElementName);
                 self.formUtils.addEventListenersForSelectionDiv();
 
-                if (leftSourceData && rightSourceData) {
-                    if (having) {
-                        $('.having-value').val(having);
-                        $(".having-checkbox").prop("checked", true);
-                    } else {
-                        $('.having-condition-content').hide();
-                    }
-                    if (on) {
-                        $('.on-condition-value').val(on);
-                        $(".on-condition-checkbox").prop("checked", true);
-                    } else {
-                        $('.on-condition-content').hide();
-                    }
+                if (having) {
+                    $('.having-value').val(having);
+                    $(".having-checkbox").prop("checked", true);
                 } else {
                     $('.having-condition-content').hide();
-                    groupBy = [];
-                    orderBy = [];
+                }
+                if (on) {
+                    $('.on-condition-value').val(on);
+                    $(".on-condition-checkbox").prop("checked", true);
+                } else {
                     $('.on-condition-content').hide();
                 }
 
@@ -502,6 +523,15 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
                         $('.within-condition-value').val(within)
                     }
                 }
+                
+                /**
+                 * to show user the lost saved data when the connection is deleted/ when the connected stream is modified
+                 * only if the form is an already edited form
+                 */
+                if (queryOutput && queryOutput.type) {
+                    validateSectionsOnLoadOfForm(self);
+                }
+
                 //autocompletion
                 addAutoCompletion(self, QUERY_CONDITION_SYNTAX, incrementalAggregator, streamFunctions, outputAttributes);
 
@@ -535,32 +565,12 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
                         return;
                     }
 
-                    if ($('.group-by-checkbox').is(':checked')) {
-                        if (self.formUtils.validateGroupOrderBy(Constants.GROUP_BY)) {
-                            isErrorOccurred = true;
-                            return;
-                        }
-                    }
-
-                    if ($('.order-by-checkbox').is(':checked')) {
-                        if (self.formUtils.validateGroupOrderBy(Constants.ORDER_BY)) {
-                            isErrorOccurred = true;
-                            return;
-                        }
-                    }
-
-                    if (self.formUtils.validateRequiredFields('.define-content')) {
+                    if (validateSectionsOnLoadOfForm(self)) {
                         isErrorOccurred = true;
                         return;
                     }
 
                     if (self.formUtils.validatePredefinedAnnotations(predefinedAnnotations)) {
-                        isErrorOccurred = true;
-                        return;
-                    }
-
-
-                    if (self.formUtils.validateQueryProjection()) {
                         isErrorOccurred = true;
                         return;
                     }

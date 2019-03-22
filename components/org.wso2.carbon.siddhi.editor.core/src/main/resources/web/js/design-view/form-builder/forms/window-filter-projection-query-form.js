@@ -51,6 +51,30 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
         };
 
         /**
+         * @function to validate on load of the form
+         */
+        var validateSectionsOnLoadOfForm = function (self) {
+            var isErrorOccurred = false;
+            if ($('.group-by-checkbox').is(':checked')) {
+                if (self.formUtils.validateGroupOrderBy(Constants.GROUP_BY)) {
+                    isErrorOccurred = true;
+                }
+            }
+            if ($('.order-by-checkbox').is(':checked')) {
+                if (self.formUtils.validateGroupOrderBy(Constants.ORDER_BY)) {
+                    isErrorOccurred = true;
+                }
+            }
+            if (self.formUtils.validateQueryProjection()) {
+                isErrorOccurred = true;
+            }
+            if (self.formUtils.validateRequiredFields('.define-content')) {
+                isErrorOccurred = true;
+            }
+            return isErrorOccurred;
+        };
+
+        /**
          * @function generate the form for the simple queries (projection, filter and window)
          * @param element selected element(query)
          * @param formConsole Console which holds the form
@@ -228,6 +252,14 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
                 self.formUtils.mapStreamHandler(queryInput, "query");
                 self.formUtils.addEventListenersForStreamHandlersDiv(streamHandlerList);
 
+                /**
+                  * to show user the lost saved data when the connection is deleted/ when the connected stream is modified
+                  * only if the form is an already edited form
+                  */
+                if (queryOutput && queryOutput.type) {
+                    validateSectionsOnLoadOfForm(self);
+                }
+
                 //autocompletion
                 var streamFunctions = self.formUtils.getStreamFunctionNames();
                 var selectExpressionMatches = JSON.parse(JSON.stringify(possibleAttributes));
@@ -262,31 +294,12 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
                         return;
                     }
 
-                    if ($('.group-by-checkbox').is(':checked')) {
-                        if (self.formUtils.validateGroupOrderBy(Constants.GROUP_BY)) {
-                            isErrorOccurred = true;
-                            return;
-                        }
-                    }
-
-                    if ($('.order-by-checkbox').is(':checked')) {
-                        if (self.formUtils.validateGroupOrderBy(Constants.ORDER_BY)) {
-                            isErrorOccurred = true;
-                            return;
-                        }
-                    }
-
-                    if (self.formUtils.validateRequiredFields('.define-content')) {
+                    if (validateSectionsOnLoadOfForm(self)) {
                         isErrorOccurred = true;
                         return;
                     }
 
                     if (self.formUtils.validatePredefinedAnnotations(predefinedAnnotations)) {
-                        isErrorOccurred = true;
-                        return;
-                    }
-
-                    if (self.formUtils.validateQueryProjection()) {
                         isErrorOccurred = true;
                         return;
                     }
