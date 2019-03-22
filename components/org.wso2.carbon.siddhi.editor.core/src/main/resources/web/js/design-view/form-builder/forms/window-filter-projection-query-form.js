@@ -199,7 +199,7 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
                 self.formUtils.addEventListenersForSelectionDiv();
 
                 if (having) {
-                    $('.having-condition-value').val(having);
+                    $('.having-value').val(having);
                     $(".having-checkbox").prop("checked", true);
                 } else {
                     $('.having-condition-content').hide();
@@ -333,7 +333,7 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
                         }
 
                         if ($('.having-checkbox').is(':checked')) {
-                            queryObject.setHaving($('.having-condition-value').val().trim());
+                            queryObject.setHaving($('.having-value').val().trim());
                         } else {
                             queryObject.setHaving(undefined)
                         }
