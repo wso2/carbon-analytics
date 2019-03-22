@@ -144,7 +144,11 @@ public class QueryConfigGenerator extends CodeSegmentsPreserver {
     private List<QueryOrderByConfig> generateOrderBy(List<OrderByAttribute> orderByAttributeList) {
         List<QueryOrderByConfig> orderBy = new ArrayList<>();
         for (OrderByAttribute orderByAttribute : orderByAttributeList) {
-            String value = orderByAttribute.getVariable().getStreamId() + "." + orderByAttribute.getVariable()
+            String value = "";
+            if(orderByAttribute.getVariable().getStreamId() != null) {
+                value = orderByAttribute.getVariable().getStreamId() + ".";
+            }
+            value += orderByAttribute.getVariable()
                     .getAttributeName();
             orderBy.add(new QueryOrderByConfig(
                     value,
