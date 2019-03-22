@@ -627,7 +627,11 @@ a.list-group-item, button.list-group-item {
 .design-view-form-content .error-message {
 	display: none;
 	color: red;
-	padding-top: 3px;
+	padding-top: 4px;
+}
+
+.aggregation-form-container .aggregate-by-content .error-message {
+    margin-left: 20px;
 }
 
 .design-view-form-content .customized-options .error-message,

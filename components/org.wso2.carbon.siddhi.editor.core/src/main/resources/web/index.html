@@ -1167,11 +1167,11 @@
 </script>
 
 <script id="type-selection-form-template" type="text/template">
-    {{#ifSourceOrSinkOrStore id}}
+    {{#ifSourceOrSinkOrStoreOrWindow id}}
         <label class="clearfix"> <span class="mandatory-symbol"> * </span> {{addTitle id}} Type </label>
     {{else}}
         <label class="clearfix"> {{addTitle id}} Type </label>
-    {{/ifSourceOrSinkOrStore}}
+    {{/ifSourceOrSinkOrStoreOrWindow}}
 
     {{#ifSourceOrSink id}}
         <select id="{{id}}-type">
@@ -1421,13 +1421,14 @@
     </div>
 </script>
 
-
 <script id="aggregate-projection-template" type = "text/template">
     <label class="clearfix"> <span class="mandatory-symbol"> * </span> Select </label>
-    <select class="attribute-selection-type" class="clearfix">
+    <select class="attribute-selection-type clearfix">
+        <option style = "display:none" disabled selected value> -- select a value --</option>
         <option value="all"> All Attributes </option>
         <option value="user_defined"> User Defined Attributes </option>
     </select>
+    <label class="error-message"> Value is required </label>
     <div class="define-user-defined-attributes">
         <ul class="user-defined-attributes">
             {{#each this}}
@@ -1448,10 +1449,12 @@
 
 <script id="query-projection-template" type = "text/template">
     <label class="clearfix"> <span class="mandatory-symbol"> * </span> Select </label>
-    <select class="attribute-selection-type" class="clearfix">
+    <select class="attribute-selection-type clearfix">
+        <option style = "display:none" disabled selected value> ---- select a value ----</option>
         <option value="all"> All Attributes </option>
         <option value="user_defined"> User Defined Attributes </option>
     </select>
+    <label class="error-message"> Value is required </label>
     <div class="define-user-defined-attributes">
         <div class="clearfix">
             <label class="projection-expression-label"> Expression </label>
@@ -1475,9 +1478,7 @@
 
 <script id = "drop-down-template" type="text/template">
     <select class="{{id}}-selection">
-        {{#ifGroupOrOrderBy id}}
-            <option style = "display:none" disabled selected value> -- select a value --</option>
-        {{/ifGroupOrOrderBy}}
+        <option style = "display:none" disabled selected value> -- select a value --</option>
         {{#each options}}
             <option value="{{this}}"> {{this}} </option>
         {{/each}}
@@ -1555,7 +1556,7 @@
     <div class = "aggregation-form-container">
         <h3> Aggregation Meta Information </h3>
             <div id="aggregation-name-div" class="aggregation-info">
-                <label> Name </label>
+                <label> <span class="mandatory-symbol"> * </span> Name </label>
                 <input type="text" id="aggregationName" class="clearfix name" value="{{name}}">
                 <label class="error-message" id="aggregationNameErrorMessage"> </label>
             </div>
@@ -1595,21 +1596,20 @@
             </div>
             <div class="aggregate-by-time-period-content"> </div>
             <div id="aggregate-by-attribute" class="aggregate-by-content">
-                <h4>
-                    <div class="clearfix">
-                        <label>
-                            <input type = "checkbox" id="aggregate-by-attribute-checkbox"> By Attribute
-                        </label>
-                        <i class = "fw fw-info attribute-by-desc">
-                        <span style = "display:none" class="attribute-by-desc-content">
-                            Attribute of timestamp is required
-                        </span>
-                        </i>
-                    </div>
-                </h4>
+                <div class="clearfix">
+                    <label>
+                        <input type = "checkbox" id="aggregate-by-attribute-checkbox"> By Attribute
+                    </label>
+                    <i class = "fw fw-info attribute-by-desc">
+                    <span style = "display:none" class="attribute-by-desc-content">
+                        Attribute of timestamp is required
+                    </span>
+                    </i>
+                </div>
                 <div class="aggregate-by-attribute-content clearfix">
                     <label class="clearfix"> Attribute Name </label>
                 </div>
+                <label class="error-message"> </label>
             </div>
         </div>
     </div>
@@ -1636,7 +1636,8 @@
             <div class="define-join-type">
                 <div class="join-type-div">
                     <label class="clearfix"> Join Type </label>
-                    <div class="define-join-type-selection"> </div>
+                    <div class="define-join-type-selection clearfix"> </div>
+                    <label class="error-message"> Value is required </label>
                 </div>
             </div>
             <div class="define-right-source define-source"></div>
@@ -1847,7 +1848,8 @@
             <label class="error-message"></label>
             <div class="define-stream">
                 <label class="clearfix"> Stream </label>
-                <div>{{> renderDropDown inputStreamNames}}</div>
+                <div class="clearfix">{{> renderDropDown inputStreamNames}}</div>
+                <label class="error-message"></label>
             </div>
             <div class="define-stream-handler">
                 <label> <input type="checkbox" class="stream-handler-checkbox"> Stream Handler </label>
