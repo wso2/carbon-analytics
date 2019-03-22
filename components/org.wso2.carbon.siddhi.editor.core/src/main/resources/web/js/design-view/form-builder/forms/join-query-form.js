@@ -238,18 +238,48 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
         /**
          * @function to add autocompletion
          */
-        var addAutoCompletion = function (self, QUERY_CONDITION_SYNTAX, incrementalAggregator, streamFunctions) {
+        var addAutoCompletion = function (self, QUERY_CONDITION_SYNTAX, incrementalAggregator, streamFunctions, outputAttributes) {
             var possibleAttributesWithSourceAs = getPossibleAttributesWithSourceAs(self);
-            var selectExpressionMatches = JSON.parse(JSON.stringify(possibleAttributesWithSourceAs));
+            var selectExpressionMatches = _.cloneDeep(possibleAttributesWithSourceAs);
             selectExpressionMatches = selectExpressionMatches.concat(incrementalAggregator);
             selectExpressionMatches = selectExpressionMatches.concat(streamFunctions);
-            var onFilterHavingConditionMatches = JSON.parse(JSON.stringify(possibleAttributesWithSourceAs));
+            var onFilterHavingConditionMatches = _.cloneDeep(possibleAttributesWithSourceAs);
             onFilterHavingConditionMatches = onFilterHavingConditionMatches.concat(QUERY_CONDITION_SYNTAX);
-            var perWithinMatches = JSON.parse(JSON.stringify(possibleAttributesWithSourceAs));
+            onFilterHavingConditionMatches = onFilterHavingConditionMatches.concat(outputAttributes);
+            var perWithinMatches = _.cloneDeep(possibleAttributesWithSourceAs);
             perWithinMatches = perWithinMatches.concat(Constants.SIDDHI_TIME);
+            perWithinMatches = perWithinMatches.concat(outputAttributes);
             self.formUtils.createAutocomplete($('.attribute-expression'), selectExpressionMatches);
             self.formUtils.createAutocomplete($('.symbol-syntax-required-value'), onFilterHavingConditionMatches);
             self.formUtils.createAutocomplete($('.per-within'), perWithinMatches);
+        };
+
+        /**
+         * @function to validate on load of the form
+         */
+        var validateSectionsOnLoadOfForm = function (self) {
+            var isErrorOccurred = false;
+            if ($('.group-by-checkbox').is(':checked')) {
+                if (self.formUtils.validateGroupOrderBy(Constants.GROUP_BY)) {
+                    isErrorOccurred = true;
+                }
+            }
+            if ($('.order-by-checkbox').is(':checked')) {
+                if (self.formUtils.validateGroupOrderBy(Constants.ORDER_BY)) {
+                    isErrorOccurred = true;
+                }
+            }
+            if (self.formUtils.validateQueryProjection()) {
+                isErrorOccurred = true;
+            }
+            if (self.formUtils.validateRequiredFields('.define-content')) {
+                isErrorOccurred = true;
+            }
+            if (!$('.join-selection').val()) {
+                self.formUtils.addErrorClass('.define-join-type-selection')
+                isErrorOccurred = true;
+            }
+            return isErrorOccurred;
         };
 
         /**
@@ -367,6 +397,10 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
                     }
                 });
 
+                $('.join-query-form-container').on('change', '.join-selection', function () {
+                    $('.join-type-div').find('.error-message').hide();
+                });
+
                 //join-type
                 self.formUtils.renderDropDown('.define-join-type-selection', possibleJoinTypes, Constants.JOIN);
                 if (joinType) {
@@ -431,29 +465,31 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
                 self.formUtils.selectQueryProjection(select, outputElementName);
                 self.formUtils.addEventListenersForSelectionDiv();
 
-                if (leftSourceData && rightSourceData) {
-                    if (having) {
-                        $('.having-value').val(having);
-                        $(".having-checkbox").prop("checked", true);
-                    } else {
-                        $('.having-condition-content').hide();
-                    }
-                    if (on) {
-                        $('.on-condition-value').val(on);
-                        $(".on-condition-checkbox").prop("checked", true);
-                    } else {
-                        $('.on-condition-content').hide();
-                    }
+                if (having) {
+                    $('.having-value').val(having);
+                    $(".having-checkbox").prop("checked", true);
                 } else {
                     $('.having-condition-content').hide();
-                    groupBy = [];
-                    orderBy = [];
+                }
+                if (on) {
+                    $('.on-condition-value').val(on);
+                    $(".on-condition-checkbox").prop("checked", true);
+                } else {
                     $('.on-condition-content').hide();
                 }
 
                 var possibleAttributesWithSourceAs = getPossibleAttributesWithSourceAs(self);
+                var outputElement = self.configurationData.getSiddhiAppConfig()
+                    .getDefinitionElementByName(outputElementName);
+                var outputAttributes = [];
+                if (outputElement.type.toLowerCase() === Constants.STREAM) {
+                    var streamAttributes = outputElement.element.getAttributeList();
+                    _.forEach(streamAttributes, function (attribute) {
+                        outputAttributes.push(attribute.getName());
+                    });
+                }
                 self.formUtils.generateGroupByDiv(groupBy, possibleAttributesWithSourceAs);
-                self.formUtils.generateOrderByDiv(orderBy, possibleAttributesWithSourceAs);
+                self.formUtils.generateOrderByDiv(orderBy, outputAttributes);
 
                 if (limit) {
                     $('.limit-value').val(limit);
@@ -487,20 +523,28 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
                         $('.within-condition-value').val(within)
                     }
                 }
+                
+                /**
+                 * to show user the lost saved data when the connection is deleted/ when the connected stream is modified
+                 * only if the form is an already edited form
+                 */
+                if (queryOutput && queryOutput.type) {
+                    validateSectionsOnLoadOfForm(self);
+                }
+
                 //autocompletion
-                addAutoCompletion(self, QUERY_CONDITION_SYNTAX, incrementalAggregator, streamFunctions);
+                addAutoCompletion(self, QUERY_CONDITION_SYNTAX, incrementalAggregator, streamFunctions, outputAttributes);
 
                 $('.join-query-form-container').on('blur', '.as-content-value', function () {
-                    addAutoCompletion(self, QUERY_CONDITION_SYNTAX, incrementalAggregator, streamFunctions);
+                    addAutoCompletion(self, QUERY_CONDITION_SYNTAX, incrementalAggregator, streamFunctions, outputAttributes);
                     self.formUtils.generateGroupByDiv(groupBy, possibleAttributesWithSourceAs);
-                    self.formUtils.generateOrderByDiv(orderBy, possibleAttributesWithSourceAs);
                 });
 
                 //to add filter
                 $('.define-stream-handler').on('click', '.btn-add-filter', function () {
                     var sourceDiv = self.formUtils.getSourceDiv($(this));
                     self.formUtils.addNewStreamHandler(sourceDiv, Constants.FILTER);
-                    addAutoCompletion(self, QUERY_CONDITION_SYNTAX, incrementalAggregator, streamFunctions);
+                    addAutoCompletion(self, QUERY_CONDITION_SYNTAX, incrementalAggregator, streamFunctions, outputAttributes);
                 });
 
                 var rateLimitingMatches = RATE_LIMITING_SYNTAX.concat(Constants.SIDDHI_TIME);
@@ -521,32 +565,12 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
                         return;
                     }
 
-                    if ($('.group-by-checkbox').is(':checked')) {
-                        if (self.formUtils.validateGroupOrderBy(Constants.GROUP_BY)) {
-                            isErrorOccurred = true;
-                            return;
-                        }
-                    }
-
-                    if ($('.order-by-checkbox').is(':checked')) {
-                        if (self.formUtils.validateGroupOrderBy(Constants.ORDER_BY)) {
-                            isErrorOccurred = true;
-                            return;
-                        }
-                    }
-
-                    if (self.formUtils.validateRequiredFields('.define-content')) {
+                    if (validateSectionsOnLoadOfForm(self)) {
                         isErrorOccurred = true;
                         return;
                     }
 
                     if (self.formUtils.validatePredefinedAnnotations(predefinedAnnotations)) {
-                        isErrorOccurred = true;
-                        return;
-                    }
-
-
-                    if (self.formUtils.validateQueryProjection()) {
                         isErrorOccurred = true;
                         return;
                     }
@@ -684,11 +708,6 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
                         queryOutput.setOutput(outputObject);
                         queryOutput.setTarget(outputTarget);
                         queryOutput.setType(Constants.INSERT);
-
-                        var isValid = JSONValidator.prototype.validateJoinQuery(joinQueryObject, false);
-                        if (!isValid) {
-                            return;
-                        }
 
                         $('#' + id).removeClass('incomplete-element');
                         self.configurationData.setIsDesignViewContentChanged(true);

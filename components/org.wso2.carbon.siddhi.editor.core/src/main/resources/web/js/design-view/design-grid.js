@@ -1201,8 +1201,11 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
 
                     } else if (targetElement.hasClass(constants.AGGREGATION)
                         && (sourceElement.hasClass(constants.STREAM) || sourceElement.hasClass(constants.TRIGGER))) {
-                        self.configurationData.getSiddhiAppConfig().getAggregation(targetId).setConnectedSource(undefined);
-
+                        model = self.configurationData.getSiddhiAppConfig().getAggregation(targetId)
+                        model.setConnectedSource(undefined);
+                        if(sourceElement.hasClass(constants.STREAM)) {
+                            model.resetModel(model);
+                        }
                     } else if (sourceElement.hasClass(constants.STREAM) || sourceElement.hasClass(constants.TABLE)
                         || sourceElement.hasClass(constants.AGGREGATION) || sourceElement.hasClass(constants.WINDOW)
                         || sourceElement.hasClass(constants.TRIGGER)
@@ -1226,7 +1229,7 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
                                 || targetElement.hasClass(constants.FUNCTION_QUERY))) {
                             model = self.configurationData.getSiddhiAppConfig()
                                 .getWindowFilterProjectionQuery(targetId);
-                            model.getQueryInput().setConnectedSource(undefined);
+                            model.resetModel(model);
 
                         } else if (targetElement.hasClass(constants.JOIN)) {
                             model = self.configurationData.getSiddhiAppConfig().getJoinQuery(targetId);
@@ -1264,6 +1267,7 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
                                     && queryInput.getRight().getConnectedSource() === disconnectedElementSourceName) {
                                     queryInput.setRight(undefined);
                                 }
+                                model.resetModel(model);
                             }
 
                         } else if (sourceElement.hasClass(constants.STREAM)
@@ -1280,12 +1284,10 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
 
                             if (targetElement.hasClass(constants.PATTERN)) {
                                 model = self.configurationData.getSiddhiAppConfig().getPatternQuery(targetId);
-                                model.getQueryInput().removeConnectedElementName(disconnectedElementName);
-                                model.getQueryInput().removeConditionsWhereStreamNameIsUsed(disconnectedElementName);
+                                model.resetModel(model, disconnectedElementName);
                             } else if (targetElement.hasClass(constants.SEQUENCE)) {
                                 model = self.configurationData.getSiddhiAppConfig().getSequenceQuery(targetId);
-                                model.getQueryInput().removeConnectedElementName(disconnectedElementName);
-                                model.getQueryInput().removeConditionsWhereStreamNameIsUsed(disconnectedElementName);
+                                model.resetModel(model, disconnectedElementName);
                             }
                         }
 
@@ -1311,6 +1313,7 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
                                 model = self.configurationData.getSiddhiAppConfig().getSequenceQuery(sourceId);
                             }
                             model.getQueryOutput().setTarget(undefined);
+                            model.setSelect(undefined);
                         }
                     }
 

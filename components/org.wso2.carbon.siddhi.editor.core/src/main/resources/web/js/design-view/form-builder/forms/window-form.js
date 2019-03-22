@@ -29,6 +29,7 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'constants'],
                 this.configurationData = options.configurationData;
                 this.application = options.application;
                 this.formUtils = options.formUtils;
+                this.jsPlumbInstance = options.jsPlumbInstance;
                 this.consoleListManager = options.application.outputController;
                 var currentTabId = this.application.tabController.activeTab.cid;
                 this.designViewContainer = $('#design-container-' + currentTabId);
@@ -47,8 +48,8 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'constants'],
             var id = $(element).parent().attr('id');
             var windowObject = self.configurationData.getSiddhiAppConfig().getWindow(id);
 
-            var propertyDiv = $('<div class = "window-form-container"> <label>Name </label> ' +
-                '<input type="text" id="windowName" class="clearfix name">' +
+            var propertyDiv = $('<div class = "window-form-container"> <label> <span class="mandatory-symbol"> * ' +
+                '</span>Name </label> <input type="text" id="windowName" class="clearfix name">' +
                 '<label class="error-message" id="windowNameErrorMessage"></label> <div id="define-attribute"></div>' +
                 self.formUtils.buildFormButtons() + '</div> <div class= "window-form-container"> ' +
                 '<div class = "defineFunctionName"> </div> <div class ="defineFunctionParameters"> </div>' +
@@ -182,14 +183,16 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'constants'],
                 }
 
                 if (!isErrorOccurred) {
-                    if (previouslySavedName !== windowName) {
-                        // update connection related to the element if the name is changed
-                        windowObject.setName(windowName);
-                        self.formUtils.updateConnectionsAfterDefinitionElementNameChange(id);
-
-                        var textNode = $(element).parent().find('.windowNameNode');
-                        textNode.html(windowName);
-                    }
+                    var outConnections = self.jsPlumbInstance.getConnections({ source: id + '-out' });
+                    var inConnections = self.jsPlumbInstance.getConnections({ target: id + '-in' });
+                    // delete connections related to the element if the name is changed
+                    self.formUtils.deleteConnectionsAfterDefinitionElementNameChange(outConnections, inConnections);
+                    // update selected window model
+                    windowObject.setName(windowName);
+                    // establish connections related to the element if the name is changed
+                    self.formUtils.establishConnectionsAfterDefinitionElementNameChange(outConnections, inConnections);
+                    var textNode = $(element).parent().find('.windowNameNode');
+                    textNode.html(windowName);
 
                     var parameters = self.formUtils.buildWindowParameters('.window-form-container', windowType,
                         predefinedWindowFunctionNames)

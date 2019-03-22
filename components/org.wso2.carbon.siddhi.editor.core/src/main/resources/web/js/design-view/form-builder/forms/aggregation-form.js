@@ -31,6 +31,7 @@ define(['require', 'log', 'jquery', 'lodash', 'aggregateByTimePeriod', 'querySel
                 this.configurationData = options.configurationData;
                 this.application = options.application;
                 this.formUtils = options.formUtils;
+                this.jsPlumbInstance = options.jsPlumbInstance;
                 this.consoleListManager = options.application.outputController;
                 var currentTabId = this.application.tabController.activeTab.cid;
                 this.designViewContainer = $('#design-container-' + currentTabId);
@@ -188,6 +189,44 @@ define(['require', 'log', 'jquery', 'lodash', 'aggregateByTimePeriod', 'querySel
         };
 
         /**
+         * @function to validate on load of the form
+         */
+        var validateSectionsOnLoadOfForm = function (self, possibleAttributes) {
+            var isErrorOccurred = false;
+            if ($('#aggregationName').val().trim() == "") {
+                self.formUtils.addErrorClass("#aggregationName");
+                $('#aggregationNameErrorMessage').text("Aggregation name is required.")
+                isErrorOccurred = true;
+            }
+            if (self.formUtils.validateAggregateProjection(possibleAttributes)) {
+                isErrorOccurred = true;
+            }
+            if ($('.group-by-checkbox').is(':checked')) {
+                if (self.formUtils.validateGroupOrderBy(Constants.GROUP_BY)) {
+                    isErrorOccurred = true;
+                }
+            }
+            if ($('#aggregate-by-attribute-checkbox').is(':checked')) {
+                var aggregateByAttribute = $('.aggregate-by-attribute-content .attribute-selection');
+                if (!aggregateByAttribute.val()) {
+                    $('.aggregate-by-content .error-message').text('Value is required');
+                    self.formUtils.addErrorClass(aggregateByAttribute);
+                    isErrorOccurred = true;
+                }
+            }
+            if ($('.aggregate-by-time-period-selection').val() === Constants.INTERVAL) {
+                if (validateAggregateInterval(self)) {
+                    isErrorOccurred = true;
+                }
+            } else {
+                if (validateAggregateRange()) {
+                    isErrorOccurred = true;
+                }
+            }
+            return isErrorOccurred;
+        };
+
+        /**
          * @function generate properties form for a aggregation
          * @param element selected element(aggregation)
          * @param formConsole Console which holds the form
@@ -272,6 +311,12 @@ define(['require', 'log', 'jquery', 'lodash', 'aggregateByTimePeriod', 'querySel
                         enableIndexAndPartitionById();
                     } else {
                         disableIndexAndPartitionById();
+                    }
+                });
+
+                $('.interval-content').on('change', '.interval-checkbox', function () {
+                    if ($(this).is(':checked')) {
+                        $('.aggregate-by-time-period-content .error-message').hide();
                     }
                 });
 
@@ -378,6 +423,14 @@ define(['require', 'log', 'jquery', 'lodash', 'aggregateByTimePeriod', 'querySel
                 renderAggregateByTimePeriod(self, aggregateByTimePeriodType, aggregateByTimePeriod);
                 self.formUtils.preventMultipleSelection(Constants.RANGE);
 
+                /**
+                 * to show user the lost saved data when the connection is deleted/ when the connected stream is modified
+                 * only if the form is an already edited form
+                 */
+                if (name) {
+                    validateSectionsOnLoadOfForm(self, possibleAttributes);
+                }
+
                 //create autocompletion
                 var selectExpressionMatches = JSON.parse(JSON.stringify(possibleAttributes));
                 selectExpressionMatches = selectExpressionMatches.concat(incrementalAggregator);
@@ -394,14 +447,12 @@ define(['require', 'log', 'jquery', 'lodash', 'aggregateByTimePeriod', 'querySel
                     self.formUtils.removeErrorClass();
                     var isErrorOccurred = false;
 
-                    var aggregationName = $('#aggregationName').val().trim();
-                    //check if aggregation name is empty
-                    if (aggregationName == "") {
-                        self.formUtils.addErrorClass("#aggregationName");
-                        $('#aggregationNameErrorMessage').text("Aggregation name is required.")
+                    if (validateSectionsOnLoadOfForm(self, possibleAttributes)) {
                         isErrorOccurred = true;
                         return;
                     }
+
+                    var aggregationName = $('#aggregationName').val().trim();
                     var previouslySavedName = aggregationObject.getName();
                     if (previouslySavedName === undefined) {
                         previouslySavedName = "";
@@ -442,43 +493,21 @@ define(['require', 'log', 'jquery', 'lodash', 'aggregateByTimePeriod', 'querySel
                         return;
                     }
 
-                    if (self.formUtils.validateAggregateProjection(possibleAttributes)) {
-                        isErrorOccurred = true;
-                        return;
-                    }
-
-                    if ($('.group-by-checkbox').is(':checked')) {
-                        if (self.formUtils.validateGroupOrderBy(Constants.GROUP_BY)) {
-                            isErrorOccurred = true;
-                            return;
-                        }
-                    }
-
-                    if ($('.aggregate-by-time-period-selection').val() === Constants.INTERVAL) {
-                        if (validateAggregateInterval(self)) {
-                            isErrorOccurred = true;
-                            return;
-                        }
-                    } else {
-                        if (validateAggregateRange()) {
-                            isErrorOccurred = true;
-                            return;
-                        }
-                    }
-
                     if (!isErrorOccurred) {
 
                         aggregationObject.setConnectedSource($('#aggregation-from').val().trim());
 
-                        if (previouslySavedName !== aggregationName) {
-                            // update selected aggregation model
-                            aggregationObject.setName(aggregationName);
-                            // update connection related to the element if the name is changed
-                            self.formUtils.updateConnectionsAfterDefinitionElementNameChange(id);
+                        var outConnections = self.jsPlumbInstance.getConnections({ source: id + '-out' });
+                        var inConnections = self.jsPlumbInstance.getConnections({ target: id + '-in' });
+                        // delete connections related to the element if the name is changed
+                        self.formUtils.deleteConnectionsAfterDefinitionElementNameChange(outConnections, inConnections);
+                        // update selected aggregation model
+                        aggregationObject.setName(aggregationName);
+                        // establish connections related to the element if the name is changed
+                        self.formUtils.establishConnectionsAfterDefinitionElementNameChange(outConnections, inConnections);
 
-                            var textNode = $('#' + id).find('.aggregationNameNode');
-                            textNode.html(aggregationName);
-                        }
+                        var textNode = $('#' + id).find('.aggregationNameNode');
+                        textNode.html(aggregationName);
 
                         var annotationStringList = [];
                         var annotationObjectList = [];

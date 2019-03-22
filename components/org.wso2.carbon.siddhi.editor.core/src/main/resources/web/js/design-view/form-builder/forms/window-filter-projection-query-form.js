@@ -43,10 +43,35 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
 		/**
 		 * @function to add autocompletion for filter value
 		 */
-        var addAutoCompletionForFilter = function (self, QUERY_CONDITION_SYNTAX, possibleAttributes) {
-            var filterMatches = JSON.parse(JSON.stringify(possibleAttributes));
+        var addAutoCompletionForFilter = function (self, QUERY_CONDITION_SYNTAX, possibleAttributes, outputAttributes) {
+            var filterMatches = _.cloneDeep((possibleAttributes));
+            filterMatches = filterMatches.concat(outputAttributes);
             filterMatches = filterMatches.concat(QUERY_CONDITION_SYNTAX);
             self.formUtils.createAutocomplete($('.symbol-syntax-required-value'), filterMatches);
+        };
+
+        /**
+         * @function to validate on load of the form
+         */
+        var validateSectionsOnLoadOfForm = function (self) {
+            var isErrorOccurred = false;
+            if ($('.group-by-checkbox').is(':checked')) {
+                if (self.formUtils.validateGroupOrderBy(Constants.GROUP_BY)) {
+                    isErrorOccurred = true;
+                }
+            }
+            if ($('.order-by-checkbox').is(':checked')) {
+                if (self.formUtils.validateGroupOrderBy(Constants.ORDER_BY)) {
+                    isErrorOccurred = true;
+                }
+            }
+            if (self.formUtils.validateQueryProjection()) {
+                isErrorOccurred = true;
+            }
+            if (self.formUtils.validateRequiredFields('.define-content')) {
+                isErrorOccurred = true;
+            }
+            return isErrorOccurred;
         };
 
         /**
@@ -156,15 +181,25 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
                     possibleAttributes.push(Constants.TRIGGERED_TIME);
                 }
 
+                var outputElement = self.configurationData.getSiddhiAppConfig()
+                    .getDefinitionElementByName(outputElementName, partitionId);
+                var outputAttributes = [];
+                if (outputElement.type.toLowerCase() === Constants.STREAM) {
+                    var streamAttributes = outputElement.element.getAttributeList();
+                    _.forEach(streamAttributes, function (attribute) {
+                        outputAttributes.push(attribute.getName());
+                    });
+                }
+
                 self.formUtils.generateGroupByDiv(groupBy, possibleAttributes);
-                self.formUtils.generateOrderByDiv(orderBy, possibleAttributes);
+                self.formUtils.generateOrderByDiv(orderBy, outputAttributes);
 
                 //projection
                 self.formUtils.selectQueryProjection(select, outputElementName);
                 self.formUtils.addEventListenersForSelectionDiv();
 
                 if (having) {
-                    $('.having-condition-value').val(having);
+                    $('.having-value').val(having);
                     $(".having-checkbox").prop("checked", true);
                 } else {
                     $('.having-condition-content').hide();
@@ -217,6 +252,14 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
                 self.formUtils.mapStreamHandler(queryInput, "query");
                 self.formUtils.addEventListenersForStreamHandlersDiv(streamHandlerList);
 
+                /**
+                  * to show user the lost saved data when the connection is deleted/ when the connected stream is modified
+                  * only if the form is an already edited form
+                  */
+                if (queryOutput && queryOutput.type) {
+                    validateSectionsOnLoadOfForm(self);
+                }
+
                 //autocompletion
                 var streamFunctions = self.formUtils.getStreamFunctionNames();
                 var selectExpressionMatches = JSON.parse(JSON.stringify(possibleAttributes));
@@ -224,7 +267,7 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
                 selectExpressionMatches = selectExpressionMatches.concat(streamFunctions);
                 self.formUtils.createAutocomplete($('.attribute-expression'), selectExpressionMatches);
 
-                addAutoCompletionForFilter(self, QUERY_CONDITION_SYNTAX, possibleAttributes);
+                addAutoCompletionForFilter(self, QUERY_CONDITION_SYNTAX, possibleAttributes, outputAttributes);
 
                 //to add filter
                 $('.define-stream-handler').on('click', '.btn-add-filter', function () {
@@ -251,31 +294,12 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
                         return;
                     }
 
-                    if ($('.group-by-checkbox').is(':checked')) {
-                        if (self.formUtils.validateGroupOrderBy(Constants.GROUP_BY)) {
-                            isErrorOccurred = true;
-                            return;
-                        }
-                    }
-
-                    if ($('.order-by-checkbox').is(':checked')) {
-                        if (self.formUtils.validateGroupOrderBy(Constants.ORDER_BY)) {
-                            isErrorOccurred = true;
-                            return;
-                        }
-                    }
-
-                    if (self.formUtils.validateRequiredFields('.define-content')) {
+                    if (validateSectionsOnLoadOfForm(self)) {
                         isErrorOccurred = true;
                         return;
                     }
 
                     if (self.formUtils.validatePredefinedAnnotations(predefinedAnnotations)) {
-                        isErrorOccurred = true;
-                        return;
-                    }
-
-                    if (self.formUtils.validateQueryProjection()) {
                         isErrorOccurred = true;
                         return;
                     }
@@ -308,8 +332,8 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
                             });
                         }
 
-                        if ($('.having-filter-checkbox').is(':checked')) {
-                            queryObject.setHaving($('.having-condition-value').val().trim());
+                        if ($('.having-checkbox').is(':checked')) {
+                            queryObject.setHaving($('.having-value').val().trim());
                         } else {
                             queryObject.setHaving(undefined)
                         }
@@ -364,12 +388,6 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
                         queryOutput.setOutput(outputObject);
                         queryOutput.setTarget(outputTarget);
                         queryOutput.setType(Constants.INSERT);
-
-                        var isValid = JSONValidator.prototype.validateWindowFilterProjectionQuery(queryObject, false);
-                        if (!isValid) {
-                            isErrorOccurred = true;
-                            return;
-                        }
 
                         /**
                          * This is to change the icon of the query depending on the selected stream handlers

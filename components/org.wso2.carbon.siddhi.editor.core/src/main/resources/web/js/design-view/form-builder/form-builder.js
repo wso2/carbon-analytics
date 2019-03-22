@@ -202,6 +202,7 @@ define(['require', 'log', 'jquery', 'lodash', 'formUtils', 'streamForm', 'tableF
             _.set(formOptions, 'configurationData', self.configurationData);
             _.set(formOptions, 'application', self.application);
             _.set(formOptions, 'formUtils', self.formUtils);
+            _.set(formOptions, 'jsPlumbInstance', self.jsPlumbInstance);
             var tableForm = new TableForm(formOptions);
             tableForm.generatePropertiesForm(element, formConsole, formContainer);
         };
@@ -219,6 +220,7 @@ define(['require', 'log', 'jquery', 'lodash', 'formUtils', 'streamForm', 'tableF
             _.set(formOptions, 'configurationData', self.configurationData);
             _.set(formOptions, 'application', self.application);
             _.set(formOptions, 'formUtils', self.formUtils);
+            _.set(formOptions, 'jsPlumbInstance', self.jsPlumbInstance);
             var windowForm = new WindowForm(formOptions);
             windowForm.generatePropertiesForm(element, formConsole, formContainer);
         };
@@ -236,6 +238,7 @@ define(['require', 'log', 'jquery', 'lodash', 'formUtils', 'streamForm', 'tableF
             _.set(formOptions, 'configurationData', self.configurationData);
             _.set(formOptions, 'application', self.application);
             _.set(formOptions, 'formUtils', self.formUtils);
+            _.set(formOptions, 'jsPlumbInstance', self.jsPlumbInstance);
             var triggerForm = new TriggerForm(formOptions);
             triggerForm.generatePropertiesForm(element, formConsole, formContainer);
         };
@@ -253,6 +256,7 @@ define(['require', 'log', 'jquery', 'lodash', 'formUtils', 'streamForm', 'tableF
             _.set(formOptions, 'configurationData', self.configurationData);
             _.set(formOptions, 'application', self.application);
             _.set(formOptions, 'formUtils', self.formUtils);
+            _.set(formOptions, 'jsPlumbInstance', self.jsPlumbInstance);
             var aggregationForm = new AggregationForm(formOptions);
             aggregationForm.generatePropertiesForm(element, formConsole, formContainer);
         };
@@ -270,6 +274,7 @@ define(['require', 'log', 'jquery', 'lodash', 'formUtils', 'streamForm', 'tableF
             _.set(formOptions, 'configurationData', self.configurationData);
             _.set(formOptions, 'application', self.application);
             _.set(formOptions, 'formUtils', self.formUtils);
+            _.set(formOptions, 'jsPlumbInstance', self.jsPlumbInstance);
             var functionForm = new FunctionForm(formOptions);
             functionForm.generatePropertiesForm(element, formConsole, formContainer);
         };

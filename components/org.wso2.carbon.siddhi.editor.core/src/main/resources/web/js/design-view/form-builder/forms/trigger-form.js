@@ -29,6 +29,7 @@ define(['require', 'log', 'jquery', 'lodash', 'constants'],
                 this.configurationData = options.configurationData;
                 this.application = options.application;
                 this.formUtils = options.formUtils;
+                this.jsPlumbInstance = options.jsPlumbInstance;
                 this.consoleListManager = options.application.outputController;
                 var currentTabId = this.application.tabController.activeTab.cid;
                 this.designViewContainer = $('#design-container-' + currentTabId);
@@ -124,7 +125,8 @@ define(['require', 'log', 'jquery', 'lodash', 'constants'],
             var id = $(element).parent().attr('id');
             var triggerObject = self.configurationData.getSiddhiAppConfig().getTrigger(id);
 
-            var propertyDiv = $('<div class ="trigger-form-container"> <div id="define-trigger-name"> <label>Name </label>' +
+            var propertyDiv = $('<div class ="trigger-form-container"> <div id="define-trigger-name"> <label>' +
+                ' <span class="mandatory-symbol"> * </span>Name </label>' +
                 '<input type="text" id="triggerName" class="clearfix name"> <label class="error-message" ' +
                 'id = "triggerNameErrorMessage"> </label> </div> <div id= "define-trigger-criteria"> </div>' +
                 '<div id = "trigger-criteria-content"></div> </div>' +
@@ -242,10 +244,14 @@ define(['require', 'log', 'jquery', 'lodash', 'constants'],
 
                 if (!isErrorOccurred) {
                     if (previouslySavedName !== triggerName) {
+                        var outConnections = self.jsPlumbInstance.getConnections({ source: id + '-out' });
+                        var inConnections = self.jsPlumbInstance.getConnections({ target: id + '-in' });
+                        // delete connections related to the element if the name is changed
+                        self.formUtils.deleteConnectionsAfterDefinitionElementNameChange(outConnections, inConnections);
                         // update selected trigger model
                         triggerObject.setName(triggerName);
-                        self.formUtils.updateConnectionsAfterDefinitionElementNameChange(id);
-
+                        // establish connections related to the element if the name is changed
+                        self.formUtils.establishConnectionsAfterDefinitionElementNameChange(outConnections, inConnections);
                         var textNode = $(element).parent().find('.triggerNameNode');
                         textNode.html(triggerName);
                     }
