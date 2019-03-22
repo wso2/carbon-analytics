@@ -122,7 +122,7 @@ define(['require', 'elementUtils'],
         };
 
         Query.prototype.getOffset = function () {
-          return this.offset;
+            return this.offset;
         };
 
         Query.prototype.getHaving = function () {
@@ -187,6 +187,23 @@ define(['require', 'elementUtils'],
 
         Query.prototype.setAnnotationList = function (annotationList) {
             this.annotationList = annotationList;
+        };
+
+        Query.prototype.resetModel = function (model, disconnectedElementName) {
+            model.setSelect(undefined);
+            var groupBy = model.getGroupBy();
+            var orderBy = model.getOrderBy();
+            var having = model.getHaving();
+            if (groupBy && groupBy.length > 0) {
+                model.setGroupBy([" "]);
+            }
+            if (orderBy && orderBy.length > 0) {
+                model.setOrderBy([{ value: "", order: "" }]);
+            }
+            if (having && having != "") {
+                model.setHaving(" ");
+            }
+            model.getQueryInput().resetModel(model.queryInput, disconnectedElementName);
         };
 
         return Query;

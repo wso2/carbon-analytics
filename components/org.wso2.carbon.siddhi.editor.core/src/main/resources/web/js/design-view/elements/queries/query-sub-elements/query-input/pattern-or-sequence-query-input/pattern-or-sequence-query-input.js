@@ -112,6 +112,15 @@ define(['require', 'elementUtils'],
             this.logic = logic;
         };
 
+        PatternOrSequenceQueryInput.prototype.resetModel = function (queryInput, disconnectedElementName) {
+            var logic = queryInput.getLogic();
+            queryInput.removeConnectedElementName(disconnectedElementName);
+            queryInput.removeConditionsWhereStreamNameIsUsed(disconnectedElementName);
+            if (logic && logic != "") {
+                queryInput.setLogic(" ");
+            }
+        };
+
         return PatternOrSequenceQueryInput;
 
     });

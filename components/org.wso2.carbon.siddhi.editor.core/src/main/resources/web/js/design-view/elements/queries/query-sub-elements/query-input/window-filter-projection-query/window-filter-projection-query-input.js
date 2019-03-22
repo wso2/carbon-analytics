@@ -85,6 +85,10 @@ define(['require', 'elementUtils'],
             this.streamHandlerList = streamHandlerList;
         };
 
+        WindowFilterProjectionQueryInput.prototype.resetModel = function (queryInput) {
+            queryInput.setConnectedSource(undefined);
+        };
+
         return WindowFilterProjectionQueryInput;
 
     });
