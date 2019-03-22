@@ -2692,7 +2692,7 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
             $.ajax({
                 type: "POST",
                 url: self.tooltipsURL,
-                data: window.btoa(designViewJSON),
+                data: self.options.application.utils.base64EncodeUnicode(designViewJSON),
                 async: false,
                 success: function (response) {
                     result = {status: "success", tooltipList: response};

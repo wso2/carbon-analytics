@@ -96,6 +96,22 @@ export default class StatusDashboardAPIS {
     }
 
     /**
+     * This method will return the Worker history details types given by queryParams and with given Worker ID.
+     * @param workerID
+     * @param appName
+     * @param queryParams - json object with required statistics types
+     */
+    static getHAWorkerHistoryByID(workerID, queryParams) {
+        return StatusDashboardAPIS.getHTTPClient().get('/' + workerID + '/ha/history'
+            , queryParams);
+    }
+
+    static getHAWorkerDetailsByID(workerID, queryParams) {
+        return StatusDashboardAPIS.getHTTPClient().get('/' + workerID + '/ha-status'
+            , queryParams);
+    }
+
+    /**
      * This method will return a list of Siddhi Apps of worker given by ID.
      */
     static getSiddhiApps(workerID) {

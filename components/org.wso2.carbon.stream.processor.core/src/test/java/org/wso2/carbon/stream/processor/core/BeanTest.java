@@ -45,6 +45,8 @@ public class BeanTest {
         deploymentConfig.setTcpClientPoolConfig(eventSyncClientPoolConfig);
         deploymentConfig.setEventByteBufferQueueCapacity(50000);
         deploymentConfig.setByteBufferExtractorThreadPoolSize(15);
+        deploymentConfig.setPassiveNodeDetailsWaitTimeOutMillis(450000);
+        deploymentConfig.setPassiveNodeDetailsRetrySleepTimeMillis(1000);
 
         Assert.assertEquals(deploymentConfig.getType(), "ha");
         Assert.assertEquals(deploymentConfig.getEventByteBufferQueueCapacity(), 50000);
@@ -60,6 +62,8 @@ public class BeanTest {
         Assert.assertEquals(deploymentConfig.getTcpClientPoolConfig().getMaxIdle(), 13);
         Assert.assertEquals(deploymentConfig.getTcpClientPoolConfig().getMaxWait(), 15);
         Assert.assertEquals(deploymentConfig.getTcpClientPoolConfig().getMinEvictableIdleTimeMillis(), 60000);
+        Assert.assertEquals(deploymentConfig.getPassiveNodeDetailsWaitTimeOutMillis(), 450000);
+        Assert.assertEquals(deploymentConfig.getPassiveNodeDetailsRetrySleepTimeMillis(), 1000);
     }
 
     @Test
@@ -85,5 +89,7 @@ public class BeanTest {
         Assert.assertEquals(deploymentConfig.getTcpClientPoolConfig().getMaxIdle(), 10);
         Assert.assertEquals(deploymentConfig.getTcpClientPoolConfig().getMaxWait(), 60000);
         Assert.assertEquals(deploymentConfig.getTcpClientPoolConfig().getMinEvictableIdleTimeMillis(), 120000);
+        Assert.assertEquals(deploymentConfig.getPassiveNodeDetailsWaitTimeOutMillis(), 300000);
+        Assert.assertEquals(deploymentConfig.getPassiveNodeDetailsRetrySleepTimeMillis(), 500);
     }
 }

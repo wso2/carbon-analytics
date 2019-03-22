@@ -53,7 +53,9 @@ public class TCPServer {
     }
 
     public void clearResources() {
-        eventSyncServer.clearResources();
+        if (started) {
+            eventSyncServer.clearResources();
+        }
     }
 
     public EventSyncServer getEventSyncServer() {

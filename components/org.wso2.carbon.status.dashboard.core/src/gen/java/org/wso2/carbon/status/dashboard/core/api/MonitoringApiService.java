@@ -20,7 +20,7 @@
 package org.wso2.carbon.status.dashboard.core.api;
 
 import org.wso2.carbon.status.dashboard.core.model.Node;
-import org.wso2.carbon.status.dashboard.core.model.StatsEnable;
+import org.wso2.carbon.stream.processor.core.util.StatsEnable;
 
 import java.io.IOException;
 import java.sql.SQLException;
@@ -48,6 +48,9 @@ public abstract class MonitoringApiService {
     public abstract Response getAllWorkers(String username) throws NotFoundException, SQLException;
 
     public abstract Response getAppHistory(String id, String appName, String period, String type,
+                                           String username) throws NotFoundException;
+
+    public abstract Response getHAWorkeristory(String id, String period, String type,
                                            String username) throws NotFoundException;
 
     public abstract Response getComponentHistory(String id, String appName, String componentType, String componentId,

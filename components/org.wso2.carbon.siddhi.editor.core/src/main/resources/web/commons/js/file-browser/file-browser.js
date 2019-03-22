@@ -103,22 +103,27 @@ define(['jquery', 'backbone', 'lodash', 'log', /** void module - jquery plugin *
             var self = this;
             return function (node) {
                 if(self._showWorkspace && node.id === '#'){
-                    return self._workspaceServiceURL + "/listFilesInPath?path=" + btoa("");
+                    return self._workspaceServiceURL + "/listFilesInPath?path=" + self.application.utils.
+                    base64EncodeUnicode("");
                 } else if(self._showSamples && node.id === '#'){
                     var samplesRelativeUrl = "";
-                    return self._workspaceServiceURL + "/listFiles/samples?path=" + btoa(samplesRelativeUrl);
+                    return self._workspaceServiceURL + "/listFiles/samples?path=" + self.application.utils.
+                    base64EncodeUnicode(samplesRelativeUrl);
                 } else if (node.id === '#') {
                     if(!_.isNil(self._root)){
                         if (self._fetchFiles) {
-                            return self._workspaceServiceURL + "/listFiles/workspace?path=" + btoa(self._root);
+                            return self._workspaceServiceURL + "/listFiles/workspace?path=" + self.application.utils.
+                            base64EncodeUnicode(self._root);
                         }
                     }
                     return self._workspaceServiceURL + "/root";
                 } else {
                     if (self._fetchFiles) {
-                        return self._workspaceServiceURL + "/listFiles?path=" + btoa(node.id);
+                        return self._workspaceServiceURL + "/listFiles?path=" + self.application.utils.
+                        base64EncodeUnicode(node.id);
                     } else {
-                        return self._workspaceServiceURL + "/list?path=" + btoa(node.id);
+                        return self._workspaceServiceURL + "/list?path=" + self.application.utils.
+                        base64EncodeUnicode(node.id);
                     }
                 }
             }

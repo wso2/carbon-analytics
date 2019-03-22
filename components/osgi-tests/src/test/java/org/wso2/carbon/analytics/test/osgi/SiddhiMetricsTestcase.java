@@ -39,6 +39,7 @@ import org.wso2.siddhi.core.stream.input.InputHandler;
 import org.wso2.siddhi.core.stream.output.StreamCallback;
 import org.wso2.siddhi.core.util.EventPrinter;
 import org.wso2.siddhi.core.util.SiddhiTestHelper;
+import org.wso2.siddhi.core.util.statistics.metrics.Level;
 
 import javax.inject.Inject;
 import javax.management.JMX;
@@ -203,7 +204,7 @@ public class SiddhiMetricsTestcase {
     private void testMBean(String MBeanName) throws Exception {
 
         SiddhiAppRuntime siddhiAppRuntime = siddhiAppRuntimeService.getActiveSiddhiAppRuntimes().get("MetricsTestApp2");
-        siddhiAppRuntime.enableStats(true);
+        siddhiAppRuntime.enableStats(Level.DETAIL);
 
         siddhiAppRuntime.addCallback("outputStream", new StreamCallback() {
             @Override

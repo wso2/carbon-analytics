@@ -44,6 +44,9 @@ const sparkLineConfig = {
     strokeWidth: 1,
     fillOpacity: 0.1
 };
+const detailComponentTypes = ['Queries', 'Streams', 'SourceMappers', 'SinkMappers', 'Aggregations', 'Trigger',
+    'StoreQueries', 'Streams', 'Windows'];
+const basicComponentTypes = ['Tables', 'Sinks', 'Sources'];
 
 /**
  * class which displays Siddhi App component metrics.
@@ -55,7 +58,7 @@ export default class ComponentTable extends React.Component {
             componentData: [],
             workerID: this.props.id,
             appName: this.props.appName,
-            statsEnable: this.props.statsEnabled
+            statsEnable: this.props.enabledStatLevel
         }
     }
 
@@ -126,25 +129,206 @@ export default class ComponentTable extends React.Component {
                 </TableHeader>
                 <TableBody displayRowCheckbox={false} style={{backgroundColor: '#131313'}}>
                     {this.state.componentData.map((component) => {
-                        return (
-                            <TableRow style={{
-                                borderBottom: '2px solid rgb(200, 200, 200)',
-                            }}>
-                                <TableRowColumn
-                                    style={{width: '25%'}}>{component.type}</TableRowColumn>
-                                <TableRowColumn style={{paddingLeft: 0, paddingRight: 0, width: '75%'}}>
-                                    {component.data.map((components, index) => {
-                                        if (index + 1 === component.data.length) {
+                        console.log(this.state.statsEnable);
+                        console.log(component);
+                        var isSkip = false;
+                        if (this.state.statsEnable === 'BASIC') {
+                            if (basicComponentTypes.includes(component.type)) {
+                                isSkip = true;
+                            }
+                        } else {
+                            if (detailComponentTypes.includes(component.type)) {
+                                isSkip = true;
+                            }
+                        }
+                        if (isSkip) {
+                            return (
+                                <TableRow style={{
+                                    borderBottom: '2px solid rgb(200, 200, 200)',
+                                }}>
+                                    <TableRowColumn
+                                        style={{width: '25%'}}>{component.type}</TableRowColumn>
+                                    <TableRowColumn style={{paddingLeft: 0, paddingRight: 0, width: '75%'}}>
+                                        {component.data.map((components, index) => {
+                                            if (index + 1 === component.data.length) {
+                                                return (
+                                                    <Table selectable>
+                                                        <TableBody showRowHover onRowSelection={() =>
+                                                            window.location.href = window.contextPath + '/worker/' +
+                                                                this.state.workerID + "/siddhi-apps/" + this.state.appName
+                                                                + "/components/" + component.type + '/'
+                                                                + components.name + '/history/' + this.state.statsEnable}
+                                                                   displayRowCheckbox={false}
+                                                                   style={{backgroundColor: '#131313', cursor: 'pointer'}}>
+                                                            <TableRow style={styles.tableRow}>
+                                                                <TableRowColumn
+                                                                    style={{
+                                                                        width: '33.33%',
+                                                                        borderLeft: '1px solid white'
+                                                                    }}>{components.name}</TableRowColumn>
+                                                                <TableRowColumn
+                                                                    style={{
+                                                                        width: '15%',
+                                                                        borderLeft: '1px solid white'
+                                                                    }}>{components.totalEvents}</TableRowColumn>
+                                                                <TableRowColumn style={{paddingLeft: 0, paddingRight: 0}}>
+                                                                    {components.metrics.map((metric, index) => {
+                                                                        if (index + 1 === components.metrics.length) {
+                                                                            return (
+                                                                                <Table selectable={false}>
+                                                                                    <TableBody displayRowCheckbox={false}
+                                                                                               style={
+                                                                                                   {backgroundColor: '#131313'}}>
+                                                                                        <TableRow style={styles.tableRow}>
+                                                                                            <TableRowColumn>
+                                                                                                {metric.type}
+                                                                                            </TableRowColumn>
+                                                                                            <TableRowColumn
+                                                                                                style={{
+                                                                                                    paddingLeft: 0,
+                                                                                                    paddingRight: 0
+                                                                                                }}>
+                                                                                                {<Table selectable={false}>
+                                                                                                    <TableBody
+                                                                                                        displayRowCheckbox={false}
+                                                                                                        style={
+                                                                                                            {backgroundColor: '#131313'}
+                                                                                                        }>
+                                                                                                        <TableRow
+                                                                                                            style={styles.tableRow}>
+                                                                                                            <TableRowColumn>
+                                                                                                                <div>
+                                                                                                                    <div
+                                                                                                                        style={{
+                                                                                                                            width: '50%',
+                                                                                                                            float: 'left',
+                                                                                                                            lineHeight: 4
+                                                                                                                        }}>
+                                                                                                                        {metric.attribute.value}
+                                                                                                                    </div>
+                                                                                                                    <Link
+                                                                                                                        style={{textDecoration: 'none'}}
+                                                                                                                        to={window.contextPath + '/worker/'
+                                                                                                                        + this.state.workerID + "/siddhi-apps/"
+                                                                                                                        + this.state.appName
+                                                                                                                        + "/components/" + component.type + '/'
+                                                                                                                        + components.name + '/history/'
+                                                                                                                        + this.state.statsEnable}>
+                                                                                                                        <div
+                                                                                                                            style={{
+                                                                                                                                width: '50%',
+                                                                                                                                float: 'right'
+                                                                                                                            }}>
+                                                                                                                            <div
+                                                                                                                                style={{
+                                                                                                                                    width: '100px',
+                                                                                                                                    height: '48px'
+                                                                                                                                }}>
+                                                                                                                                <VizG
+                                                                                                                                    data={metric.attribute.recentValues}
+                                                                                                                                    metadata={metadata}
+                                                                                                                                    config={sparkLineConfig}
+                                                                                                                                    yDomain={DashboardUtils.getYDomain(metric.attribute.recentValues)}
+                                                                                                                                    width={100}
+                                                                                                                                    height={50}
+                                                                                                                                />
+                                                                                                                            </div>
+                                                                                                                        </div>
+                                                                                                                    </Link>
+                                                                                                                </div>
+                                                                                                            </TableRowColumn>
+                                                                                                        </TableRow>
+                                                                                                    </TableBody>
+                                                                                                </Table>}
+                                                                                            </TableRowColumn>
+                                                                                        </TableRow>
+                                                                                    </TableBody>
+                                                                                </Table>
+                                                                            )
+                                                                        }
+                                                                        return (
+                                                                            <Table selectable={false}><TableBody
+                                                                                displayRowCheckbox={false}
+                                                                                style={{backgroundColor: '#131313'}}>
+                                                                                <TableRow
+                                                                                    style={styles.rowColumn}>
+                                                                                    <TableRowColumn>
+                                                                                        {metric.type}
+                                                                                    </TableRowColumn>
+                                                                                    <TableRowColumn
+                                                                                        style={{
+                                                                                            paddingLeft: 0,
+                                                                                            paddingRight: 0
+                                                                                        }}>
+                                                                                        {<Table
+                                                                                            selectable={false}><TableBody
+                                                                                            displayRowCheckbox={false}
+                                                                                            style={{backgroundColor: '#131313'}}>
+                                                                                            <TableRow
+                                                                                                style={styles.tableRow}>
+                                                                                                <TableRowColumn
+                                                                                                    style={styles.tableRow}>
+                                                                                                    <div>
+                                                                                                        <div style={{
+                                                                                                            width: '50%',
+                                                                                                            float: 'left',
+                                                                                                            lineHeight: 4
+                                                                                                        }}>
+                                                                                                            {metric.attribute.value}
+                                                                                                        </div>
+                                                                                                        <Link
+                                                                                                            style={{textDecoration: 'none'}}
+                                                                                                            to={window.contextPath + '/worker/'
+                                                                                                            + this.state.workerID + "/siddhi-apps/" + this.state.appName
+                                                                                                            + "/components/" + component.type + '/'
+                                                                                                            + components.name + '/history/' + this.state.statsEnable}>
+                                                                                                            <div style={{
+                                                                                                                width: '50%',
+                                                                                                                float: 'right'
+                                                                                                            }}>
+                                                                                                                <div
+                                                                                                                    style={{
+                                                                                                                        width: '100px',
+                                                                                                                        height: '48px'
+                                                                                                                    }}>
+                                                                                                                    <VizG
+                                                                                                                        data={metric.attribute.recentValues}
+                                                                                                                        metadata={metadata}
+                                                                                                                        config={sparkLineConfig}
+                                                                                                                        yDomain={DashboardUtils.getYDomain(metric.attribute.recentValues)}
+                                                                                                                        width={100}
+                                                                                                                        height={50}
+                                                                                                                    />
+                                                                                                                </div>
+                                                                                                            </div>
+                                                                                                        </Link>
+                                                                                                    </div>
+                                                                                                </TableRowColumn>
+                                                                                            </TableRow>
+                                                                                        </TableBody>
+                                                                                        </Table>}
+                                                                                    </TableRowColumn>
+                                                                                </TableRow>
+                                                                            </TableBody>
+                                                                            </Table>
+                                                                        )
+                                                                    })}
+                                                                </TableRowColumn>
+                                                            </TableRow>
+                                                        </TableBody>
+                                                    </Table>
+                                                )
+                                            }
                                             return (
                                                 <Table selectable>
                                                     <TableBody showRowHover onRowSelection={() =>
-                                                        window.location.href = window.contextPath + '/worker/' +
-                                                            this.state.workerID + "/siddhi-apps/" + this.state.appName
+                                                        window.location.href = window.contextPath + '/worker/'
+                                                            + this.state.workerID + "/siddhi-apps/" + this.state.appName
                                                             + "/components/" + component.type + '/'
                                                             + components.name + '/history/' + this.state.statsEnable}
                                                                displayRowCheckbox={false}
                                                                style={{backgroundColor: '#131313', cursor: 'pointer'}}>
-                                                        <TableRow style={styles.tableRow}>
+                                                        <TableRow style={styles.rowColumn}>
                                                             <TableRowColumn
                                                                 style={{
                                                                     width: '33.33%',
@@ -159,74 +343,69 @@ export default class ComponentTable extends React.Component {
                                                                 {components.metrics.map((metric, index) => {
                                                                     if (index + 1 === components.metrics.length) {
                                                                         return (
-                                                                            <Table selectable={false}>
-                                                                                <TableBody displayRowCheckbox={false}
-                                                                                           style={
-                                                                                               {backgroundColor: '#131313'}}>
-                                                                                    <TableRow style={styles.tableRow}>
-                                                                                        <TableRowColumn>
-                                                                                            {metric.type}
-                                                                                        </TableRowColumn>
-                                                                                        <TableRowColumn
-                                                                                            style={{
-                                                                                                paddingLeft: 0,
-                                                                                                paddingRight: 0
-                                                                                            }}>
-                                                                                            {<Table selectable={false}>
-                                                                                                <TableBody
-                                                                                                    displayRowCheckbox={false}
-                                                                                                    style={
-                                                                                                        {backgroundColor: '#131313'}
-                                                                                                    }>
-                                                                                                    <TableRow
-                                                                                                        style={styles.tableRow}>
-                                                                                                        <TableRowColumn>
-                                                                                                            <div>
+                                                                            <Table selectable={false}><TableBody
+                                                                                displayRowCheckbox={false}
+                                                                                style={{backgroundColor: '#131313'}}>
+                                                                                <TableRow style={styles.tableRow}>
+                                                                                    <TableRowColumn>
+                                                                                        {metric.type}
+                                                                                    </TableRowColumn>
+                                                                                    <TableRowColumn
+                                                                                        style={{
+                                                                                            paddingLeft: 0,
+                                                                                            paddingRight: 0
+                                                                                        }}>
+                                                                                        {<Table
+                                                                                            selectable={false}><TableBody
+                                                                                            displayRowCheckbox={false}
+                                                                                            style={{backgroundColor: '#131313'}}>
+                                                                                            <TableRow
+                                                                                                style={styles.tableRow}>
+                                                                                                <TableRowColumn
+                                                                                                    style={styles.tableRow}>
+                                                                                                    <div>
+                                                                                                        <div style={{
+                                                                                                            width: '50%',
+                                                                                                            float: 'left',
+                                                                                                            lineHeight: 4
+                                                                                                        }}>
+                                                                                                            {metric.attribute.value}
+                                                                                                        </div>
+                                                                                                        <Link
+                                                                                                            style={{textDecoration: 'none'}}
+                                                                                                            to={window.contextPath + '/worker/'
+                                                                                                            + this.state.workerID + "/siddhi-apps/" + this.state.appName
+                                                                                                            + "/components/" + component.type + '/'
+                                                                                                            + components.name + '/history/' + this.state.statsEnable}>
+                                                                                                            <div style={{
+                                                                                                                width: '50%',
+                                                                                                                float: 'right'
+                                                                                                            }}>
                                                                                                                 <div
                                                                                                                     style={{
-                                                                                                                        width: '50%',
-                                                                                                                        float: 'left',
-                                                                                                                        lineHeight: 4
+                                                                                                                        width: '100px',
+                                                                                                                        height: '48px'
                                                                                                                     }}>
-                                                                                                                    {metric.attribute.value}
+                                                                                                                    <VizG
+                                                                                                                        data={metric.attribute.recentValues}
+                                                                                                                        metadata={metadata}
+                                                                                                                        config={sparkLineConfig}
+                                                                                                                        yDomain={DashboardUtils.getYDomain(metric.attribute.recentValues)}
+                                                                                                                        width={100}
+                                                                                                                        height={50}
+                                                                                                                    />
                                                                                                                 </div>
-                                                                                                                <Link
-                                                                                                                    style={{textDecoration: 'none'}}
-                                                                                                                    to={window.contextPath + '/worker/'
-                                                                                                                    + this.state.workerID + "/siddhi-apps/"
-                                                                                                                    + this.state.appName
-                                                                                                                    + "/components/" + component.type + '/'
-                                                                                                                    + components.name + '/history/'
-                                                                                                                    + this.state.statsEnable}>
-                                                                                                                    <div
-                                                                                                                        style={{
-                                                                                                                            width: '50%',
-                                                                                                                            float: 'right'
-                                                                                                                        }}>
-                                                                                                                        <div
-                                                                                                                            style={{
-                                                                                                                                width: '100px',
-                                                                                                                                height: '48px'
-                                                                                                                            }}>
-                                                                                                                            <VizG
-                                                                                                                                data={metric.attribute.recentValues}
-                                                                                                                                metadata={metadata}
-                                                                                                                                config={sparkLineConfig}
-                                                                                                                                yDomain={DashboardUtils.getYDomain(metric.attribute.recentValues)}
-                                                                                                                                width={100}
-                                                                                                                                height={50}
-                                                                                                                            />
-                                                                                                                        </div>
-                                                                                                                    </div>
-                                                                                                                </Link>
                                                                                                             </div>
-                                                                                                        </TableRowColumn>
-                                                                                                    </TableRow>
-                                                                                                </TableBody>
-                                                                                            </Table>}
-                                                                                        </TableRowColumn>
-                                                                                    </TableRow>
-                                                                                </TableBody>
+                                                                                                        </Link>
+                                                                                                    </div>
+
+                                                                                                </TableRowColumn>
+                                                                                            </TableRow>
+                                                                                        </TableBody>
+                                                                                        </Table>}
+                                                                                    </TableRowColumn>
+                                                                                </TableRow>
+                                                                            </TableBody>
                                                                             </Table>
                                                                         )
                                                                     }
@@ -236,65 +415,61 @@ export default class ComponentTable extends React.Component {
                                                                             style={{backgroundColor: '#131313'}}>
                                                                             <TableRow
                                                                                 style={styles.rowColumn}>
-                                                                                <TableRowColumn>
-                                                                                    {metric.type}
-                                                                                </TableRowColumn>
+                                                                                <TableRowColumn>{metric.type}</TableRowColumn>
                                                                                 <TableRowColumn
                                                                                     style={{
                                                                                         paddingLeft: 0,
                                                                                         paddingRight: 0
                                                                                     }}>
-                                                                                    {<Table
-                                                                                        selectable={false}><TableBody
+                                                                                    {<Table selectable={false}><TableBody
                                                                                         displayRowCheckbox={false}
-                                                                                        style={{backgroundColor: '#131313'}}>
-                                                                                        <TableRow
+                                                                                        style={{backgroundColor: '#131313'}}><TableRow
+                                                                                        style={styles.tableRow}>
+                                                                                        <TableRowColumn
                                                                                             style={styles.tableRow}>
-                                                                                            <TableRowColumn
-                                                                                                style={styles.tableRow}>
-                                                                                                <div>
+                                                                                            <div>
+                                                                                                <div style={{
+                                                                                                    width: '50%',
+                                                                                                    float: 'left',
+                                                                                                    lineHeight: 4
+                                                                                                }}>
+                                                                                                    {metric.attribute.value}
+                                                                                                </div>
+                                                                                                <Link
+                                                                                                    style={{textDecoration: 'none'}}
+                                                                                                    to={window.contextPath + '/worker/'
+                                                                                                    + this.state.workerID + "/siddhi-apps/"
+                                                                                                    + this.state.appName
+                                                                                                    + "/components/" + component.type + '/'
+                                                                                                    + components.name + '/history/'
+                                                                                                    + this.state.statsEnable}>
                                                                                                     <div style={{
                                                                                                         width: '50%',
-                                                                                                        float: 'left',
-                                                                                                        lineHeight: 4
+                                                                                                        float: 'right'
                                                                                                     }}>
-                                                                                                        {metric.attribute.value}
-                                                                                                    </div>
-                                                                                                    <Link
-                                                                                                        style={{textDecoration: 'none'}}
-                                                                                                        to={window.contextPath + '/worker/'
-                                                                                                        + this.state.workerID + "/siddhi-apps/" + this.state.appName
-                                                                                                        + "/components/" + component.type + '/'
-                                                                                                        + components.name + '/history/' + this.state.statsEnable}>
                                                                                                         <div style={{
-                                                                                                            width: '50%',
-                                                                                                            float: 'right'
+                                                                                                            width: '100px',
+                                                                                                            height: '48px'
                                                                                                         }}>
-                                                                                                            <div
-                                                                                                                style={{
-                                                                                                                    width: '100px',
-                                                                                                                    height: '48px'
-                                                                                                                }}>
-                                                                                                                <VizG
-                                                                                                                    data={metric.attribute.recentValues}
-                                                                                                                    metadata={metadata}
-                                                                                                                    config={sparkLineConfig}
-                                                                                                                    yDomain={DashboardUtils.getYDomain(metric.attribute.recentValues)}
-                                                                                                                    width={100}
-                                                                                                                    height={50}
-                                                                                                                />
-                                                                                                            </div>
+                                                                                                            <VizG
+                                                                                                                data={metric.attribute.recentValues}
+                                                                                                                metadata={metadata}
+                                                                                                                config={sparkLineConfig}
+                                                                                                                yDomain={DashboardUtils.getYDomain(metric.attribute.recentValues)}
+                                                                                                                width={100}
+                                                                                                                height={50}
+                                                                                                            />
                                                                                                         </div>
-                                                                                                    </Link>
-                                                                                                </div>
-                                                                                            </TableRowColumn>
-                                                                                        </TableRow>
+                                                                                                    </div>
+                                                                                                </Link>
+                                                                                            </div>
+                                                                                        </TableRowColumn>
+                                                                                    </TableRow>
                                                                                     </TableBody>
                                                                                     </Table>}
                                                                                 </TableRowColumn>
                                                                             </TableRow>
-                                                                        </TableBody>
-                                                                        </Table>
+                                                                        </TableBody></Table>
                                                                     )
                                                                 })}
                                                             </TableRowColumn>
@@ -302,169 +477,11 @@ export default class ComponentTable extends React.Component {
                                                     </TableBody>
                                                 </Table>
                                             )
-                                        }
-                                        return (
-                                            <Table selectable>
-                                                <TableBody showRowHover onRowSelection={() =>
-                                                    window.location.href = window.contextPath + '/worker/'
-                                                        + this.state.workerID + "/siddhi-apps/" + this.state.appName
-                                                        + "/components/" + component.type + '/'
-                                                        + components.name + '/history/' + this.state.statsEnable}
-                                                           displayRowCheckbox={false}
-                                                           style={{backgroundColor: '#131313', cursor: 'pointer'}}>
-                                                    <TableRow style={styles.rowColumn}>
-                                                        <TableRowColumn
-                                                            style={{
-                                                                width: '33.33%',
-                                                                borderLeft: '1px solid white'
-                                                            }}>{components.name}</TableRowColumn>
-                                                        <TableRowColumn
-                                                            style={{
-                                                                width: '15%',
-                                                                borderLeft: '1px solid white'
-                                                            }}>{components.totalEvents}</TableRowColumn>
-                                                        <TableRowColumn style={{paddingLeft: 0, paddingRight: 0}}>
-                                                            {components.metrics.map((metric, index) => {
-                                                                if (index + 1 === components.metrics.length) {
-                                                                    return (
-                                                                        <Table selectable={false}><TableBody
-                                                                            displayRowCheckbox={false}
-                                                                            style={{backgroundColor: '#131313'}}>
-                                                                            <TableRow style={styles.tableRow}>
-                                                                                <TableRowColumn>
-                                                                                    {metric.type}
-                                                                                </TableRowColumn>
-                                                                                <TableRowColumn
-                                                                                    style={{
-                                                                                        paddingLeft: 0,
-                                                                                        paddingRight: 0
-                                                                                    }}>
-                                                                                    {<Table
-                                                                                        selectable={false}><TableBody
-                                                                                        displayRowCheckbox={false}
-                                                                                        style={{backgroundColor: '#131313'}}>
-                                                                                        <TableRow
-                                                                                            style={styles.tableRow}>
-                                                                                            <TableRowColumn
-                                                                                                style={styles.tableRow}>
-                                                                                                <div>
-                                                                                                    <div style={{
-                                                                                                        width: '50%',
-                                                                                                        float: 'left',
-                                                                                                        lineHeight: 4
-                                                                                                    }}>
-                                                                                                        {metric.attribute.value}
-                                                                                                    </div>
-                                                                                                    <Link
-                                                                                                        style={{textDecoration: 'none'}}
-                                                                                                        to={window.contextPath + '/worker/'
-                                                                                                        + this.state.workerID + "/siddhi-apps/" + this.state.appName
-                                                                                                        + "/components/" + component.type + '/'
-                                                                                                        + components.name + '/history/' + this.state.statsEnable}>
-                                                                                                        <div style={{
-                                                                                                            width: '50%',
-                                                                                                            float: 'right'
-                                                                                                        }}>
-                                                                                                            <div
-                                                                                                                style={{
-                                                                                                                    width: '100px',
-                                                                                                                    height: '48px'
-                                                                                                                }}>
-                                                                                                                <VizG
-                                                                                                                    data={metric.attribute.recentValues}
-                                                                                                                    metadata={metadata}
-                                                                                                                    config={sparkLineConfig}
-                                                                                                                    yDomain={DashboardUtils.getYDomain(metric.attribute.recentValues)}
-                                                                                                                    width={100}
-                                                                                                                    height={50}
-                                                                                                                />
-                                                                                                            </div>
-                                                                                                        </div>
-                                                                                                    </Link>
-                                                                                                </div>
-
-                                                                                            </TableRowColumn>
-                                                                                        </TableRow>
-                                                                                    </TableBody>
-                                                                                    </Table>}
-                                                                                </TableRowColumn>
-                                                                            </TableRow>
-                                                                        </TableBody>
-                                                                        </Table>
-                                                                    )
-                                                                }
-                                                                return (
-                                                                    <Table selectable={false}><TableBody
-                                                                        displayRowCheckbox={false}
-                                                                        style={{backgroundColor: '#131313'}}>
-                                                                        <TableRow
-                                                                            style={styles.rowColumn}>
-                                                                            <TableRowColumn>{metric.type}</TableRowColumn>
-                                                                            <TableRowColumn
-                                                                                style={{
-                                                                                    paddingLeft: 0,
-                                                                                    paddingRight: 0
-                                                                                }}>
-                                                                                {<Table selectable={false}><TableBody
-                                                                                    displayRowCheckbox={false}
-                                                                                    style={{backgroundColor: '#131313'}}><TableRow
-                                                                                    style={styles.tableRow}>
-                                                                                    <TableRowColumn
-                                                                                        style={styles.tableRow}>
-                                                                                        <div>
-                                                                                            <div style={{
-                                                                                                width: '50%',
-                                                                                                float: 'left',
-                                                                                                lineHeight: 4
-                                                                                            }}>
-                                                                                                {metric.attribute.value}
-                                                                                            </div>
-                                                                                            <Link
-                                                                                                style={{textDecoration: 'none'}}
-                                                                                                to={window.contextPath + '/worker/'
-                                                                                                + this.state.workerID + "/siddhi-apps/"
-                                                                                                + this.state.appName
-                                                                                                + "/components/" + component.type + '/'
-                                                                                                + components.name + '/history/'
-                                                                                                + this.state.statsEnable}>
-                                                                                                <div style={{
-                                                                                                    width: '50%',
-                                                                                                    float: 'right'
-                                                                                                }}>
-                                                                                                    <div style={{
-                                                                                                        width: '100px',
-                                                                                                        height: '48px'
-                                                                                                    }}>
-                                                                                                        <VizG
-                                                                                                            data={metric.attribute.recentValues}
-                                                                                                            metadata={metadata}
-                                                                                                            config={sparkLineConfig}
-                                                                                                            yDomain={DashboardUtils.getYDomain(metric.attribute.recentValues)}
-                                                                                                            width={100}
-                                                                                                            height={50}
-                                                                                                        />
-                                                                                                    </div>
-                                                                                                </div>
-                                                                                            </Link>
-                                                                                        </div>
-                                                                                    </TableRowColumn>
-                                                                                </TableRow>
-                                                                                </TableBody>
-                                                                                </Table>}
-                                                                            </TableRowColumn>
-                                                                        </TableRow>
-                                                                    </TableBody></Table>
-                                                                )
-                                                            })}
-                                                        </TableRowColumn>
-                                                    </TableRow>
-                                                </TableBody>
-                                            </Table>
-                                        )
-                                    })}
-                                </TableRowColumn>
-                            </TableRow>
-                        )
+                                        })}
+                                    </TableRowColumn>
+                                </TableRow>
+                            )
+                        }
                     })}
                 </TableBody>
                 <TableFooter adjustForCheckbox={false}>

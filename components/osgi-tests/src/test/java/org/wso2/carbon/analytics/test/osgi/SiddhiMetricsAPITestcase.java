@@ -37,6 +37,7 @@ import org.wso2.carbon.stream.processor.common.SiddhiAppRuntimeService;
 import org.wso2.carbon.stream.processor.statistics.bean.WorkerMetrics;
 import org.wso2.carbon.stream.processor.statistics.bean.WorkerStatistics;
 import org.wso2.msf4j.MicroservicesRegistry;
+import org.wso2.siddhi.core.util.statistics.metrics.Level;
 
 import javax.inject.Inject;
 import java.net.URI;
@@ -134,7 +135,7 @@ public class SiddhiMetricsAPITestcase {
 
     @Test(dependsOnMethods = "testDisableMetricsForFirstTime")
     public void testEnableMetrics() throws Exception {
-        HTTPResponseMessage httpResponseMessage = switchMetricsAndGetResponse(true);
+        HTTPResponseMessage httpResponseMessage = switchMetricsAndGetResponse(Level.DETAIL);
         Assert.assertEquals(httpResponseMessage.getResponseCode(), 200);
         Assert.assertEquals(httpResponseMessage.getContentType(), "application/json");
         ApiResponseMessage msg = gson.fromJson((String) httpResponseMessage.getSuccessContent(), ApiResponseMessage
@@ -142,18 +143,51 @@ public class SiddhiMetricsAPITestcase {
         Assert.assertEquals(msg.getMessage(), "Successfully enabled the metrics.");
     }
 
-    private HTTPResponseMessage switchMetricsAndGetResponse(boolean enableStats) {
+    @Test(dependsOnMethods = "testEnableMetrics")
+    public void testDisableMetricsByBoolean() throws Exception {
+        HTTPResponseMessage httpResponseMessage = switchMetricsViaBooleanAndGetResponse(false);
+        Assert.assertEquals(httpResponseMessage.getResponseCode(), 200);
+        Assert.assertEquals(httpResponseMessage.getContentType(), "application/json");
+        ApiResponseMessage msg = gson.fromJson((String) httpResponseMessage.getSuccessContent(), ApiResponseMessage
+                .class);
+        Assert.assertEquals(msg.getMessage(), "Successfully disabled the metrics.");
+    }
+
+    @Test(dependsOnMethods = "testDisableMetricsByBoolean")
+    public void testEnableMetricsByBoolean() throws Exception {
+        HTTPResponseMessage httpResponseMessage = switchMetricsViaBooleanAndGetResponse(true);
+        Assert.assertEquals(httpResponseMessage.getResponseCode(), 200);
+        Assert.assertEquals(httpResponseMessage.getContentType(), "application/json");
+        ApiResponseMessage msg = gson.fromJson((String) httpResponseMessage.getSuccessContent(), ApiResponseMessage
+                .class);
+        Assert.assertEquals(msg.getMessage(), "Successfully enabled the metrics.");
+    }
+
+    private HTTPResponseMessage switchMetricsAndGetResponse(Level level) {
         URI baseURI = URI.create(String.format("http://%s:%d", "localhost", 9090));
         String path = "/statistics";
         String contentType = "application/json";
         String method = "PUT";
         TestUtil.waitForAppDeployment(siddhiAppRuntimeService, eventStreamService, APP_NAME, Duration.TEN_SECONDS);
         TestUtil.waitForMicroServiceDeployment(microservicesRegistry, path, Duration.TEN_SECONDS);
-        return sendHRequest("{\"statsEnable\":" + enableStats + "}", baseURI, path, contentType, method,
+        return sendHRequest("{enabledStatLevel: " + level.toString()+", statsEnable: true}",
+                baseURI, path, contentType, method,
                 true, DEFAULT_USER_NAME, DEFAULT_PASSWORD);
     }
 
-    @Test(dependsOnMethods = "testEnableMetrics")
+    private HTTPResponseMessage switchMetricsViaBooleanAndGetResponse(boolean level) {
+        URI baseURI = URI.create(String.format("http://%s:%d", "localhost", 9090));
+        String path = "/statistics";
+        String contentType = "application/json";
+        String method = "PUT";
+        TestUtil.waitForAppDeployment(siddhiAppRuntimeService, eventStreamService, APP_NAME, Duration.TEN_SECONDS);
+        TestUtil.waitForMicroServiceDeployment(microservicesRegistry, path, Duration.TEN_SECONDS);
+        return sendHRequest("{ statsEnable: " + level + "}",
+                baseURI, path, contentType, method,
+                true, DEFAULT_USER_NAME, DEFAULT_PASSWORD);
+    }
+
+    @Test(dependsOnMethods = "testEnableMetricsByBoolean")
     public void testGetRealTimeStatistics() throws Exception {
         HTTPResponseMessage httpResponseMessage = getRealTimeStatsAndReturnResponse();
         Assert.assertEquals(httpResponseMessage.getResponseCode(), 200);
@@ -179,7 +213,7 @@ public class SiddhiMetricsAPITestcase {
     }
 
     private void enableMetrics() throws InterruptedException {
-        HTTPResponseMessage httpResponseMessage = switchMetricsAndGetResponse(true);
+        HTTPResponseMessage httpResponseMessage = switchMetricsAndGetResponse(Level.DETAIL);
         Thread.sleep(100);
         Assert.assertEquals(httpResponseMessage.getResponseCode(), 200);
         Assert.assertEquals(httpResponseMessage.getContentType(), "application/json");
@@ -205,17 +239,17 @@ public class SiddhiMetricsAPITestcase {
     }
 
     private void disableMetrics() {
-        HTTPResponseMessage httpResponseMessage = switchMetricsAndGetResponse(false);
+        HTTPResponseMessage httpResponseMessage = switchMetricsAndGetResponse(Level.OFF);
         Assert.assertEquals(httpResponseMessage.getResponseCode(), 200);
         Assert.assertEquals(httpResponseMessage.getContentType(), "application/json");
         ApiResponseMessage msg = gson.fromJson((String) httpResponseMessage.getSuccessContent(), ApiResponseMessage
                 .class);
-        Assert.assertEquals(msg.getMessage(), "Sucessfully disabled the metrics.");
+        Assert.assertEquals(msg.getMessage(), "Successfully disabled the metrics.");
     }
 
     @Test(dependsOnMethods = "testDisableMetrics")
     public void testReDisableMetrics() throws Exception {
-        HTTPResponseMessage httpResponseMessage = switchMetricsAndGetResponse(false);
+        HTTPResponseMessage httpResponseMessage = switchMetricsAndGetResponse(Level.OFF);
         Assert.assertEquals(httpResponseMessage.getResponseCode(), 200);
         Assert.assertEquals(httpResponseMessage.getContentType(), "application/json");
         ApiResponseMessage msg = gson.fromJson((String) httpResponseMessage.getSuccessContent(), ApiResponseMessage
