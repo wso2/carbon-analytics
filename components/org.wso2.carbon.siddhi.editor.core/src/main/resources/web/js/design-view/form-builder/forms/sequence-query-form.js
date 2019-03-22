@@ -77,13 +77,14 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
          * @function to add autocompletion for input fields
          */
         var addAutoCompletion = function (self, partitionId, QUERY_CONDITION_SYNTAX, QUERY_SYNTAX,
-            incrementalAggregator, streamFunctions) {
+            incrementalAggregator, streamFunctions, outputAttributes) {
             var possibleAttributes = getPossibleAttributes(self, partitionId);
-            var selectExpressionMatches = JSON.parse(JSON.stringify(possibleAttributes));
+            var selectExpressionMatches = _.cloneDeep(possibleAttributes);
             selectExpressionMatches = selectExpressionMatches.concat(incrementalAggregator);
             selectExpressionMatches = selectExpressionMatches.concat(streamFunctions);
-            var filterMatches = JSON.parse(JSON.stringify(possibleAttributes));
+            var filterMatches = _.cloneDeep(possibleAttributes);
             filterMatches = filterMatches.concat(QUERY_CONDITION_SYNTAX);
+            filterMatches = filterMatches.concat(outputAttributes);
             var logicMatches = filterMatches.concat(QUERY_SYNTAX);
             logicMatches = logicMatches.concat(Constants.SIDDHI_TIME);
             self.formUtils.createAutocomplete($('.attribute-expression'), selectExpressionMatches);
@@ -95,7 +96,7 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
          * @function to generate the group-by and order-by div when the condition id or the the
          * condition's connected stream is changed
          */
-        var generateDivRequiringPossibleAttributes = function (self, partitionId, groupBy, orderBy) {
+        var generateDivRequiringPossibleAttributes = function (self, partitionId, groupBy) {
             var possibleAttributes = getPossibleAttributes(self, partitionId);
             self.formUtils.generateGroupByDiv(groupBy, possibleAttributes);
             self.formUtils.generateOrderByDiv(orderBy, possibleAttributes);
@@ -217,8 +218,17 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
                 if (partitionElementWhereQueryIsSaved !== undefined) {
                     partitionId = partitionElementWhereQueryIsSaved.getId();
                 }
-
-                generateDivRequiringPossibleAttributes(self, partitionId, groupBy, orderBy);
+                var outputElement = self.configurationData.getSiddhiAppConfig()
+                    .getDefinitionElementByName(outputElementName);
+                var outputAttributes = [];
+                if (outputElement.type.toLowerCase() === Constants.STREAM) {
+                    var streamAttributes = outputElement.element.getAttributeList();
+                    _.forEach(streamAttributes, function (attribute) {
+                        outputAttributes.push(attribute.getName());
+                    });
+                }
+                self.formUtils.generateOrderByDiv(orderBy, outputAttributes);
+                generateDivRequiringPossibleAttributes(self, partitionId, groupBy);
 
                 //projection
                 self.formUtils.selectQueryProjection(select, outputElementName);
@@ -228,7 +238,7 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
                     $('.having-condition-value').val(having);
                     $(".having-checkbox").prop("checked", true);
                 } else {
-                    $('.having-filter-condition-content').hide();
+                    $('.having-condition-content').hide();
                 }
 
                 if (limit) {
@@ -257,22 +267,22 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
                 }
 
                 addAutoCompletion(self, partitionId, QUERY_CONDITION_SYNTAX, QUERY_SYNTAX, incrementalAggregator,
-                    streamFunctions);
+                    streamFunctions, outputAttributes);
 
                 $('.define-stream-handler').on('click', '.btn-add-filter', function () {
                     var sourceDiv = self.formUtils.getSourceDiv($(this));
                     self.formUtils.addNewStreamHandler(sourceDiv, Constants.FILTER);
                     addAutoCompletion(self, partitionId, QUERY_CONDITION_SYNTAX, QUERY_SYNTAX, incrementalAggregator,
-                        streamFunctions);
+                        streamFunctions, outputAttributes);
                 });
 
                 $('.define-conditions').on('click', '.btn-del-condition', function () {
                     var conditionIndex = $(this).closest('li').index();
                     $('.define-conditions .tab-pane:eq(' + conditionIndex + ')').remove();
                     $(this).closest('li').remove();
-                    generateDivRequiringPossibleAttributes(self, partitionId, groupBy, orderBy);
+                    generateDivRequiringPossibleAttributes(self, partitionId, groupBy);
                     addAutoCompletion(self, partitionId, QUERY_CONDITION_SYNTAX, QUERY_SYNTAX, incrementalAggregator,
-                        streamFunctions);
+                        streamFunctions, outputAttributes);
                 });
 
                 $('.define-conditions').on('click', '.btn-add-condition', function () {
@@ -280,21 +290,21 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
                     var conditionName = 'e' + conditionLength;
                     var conditionList = [{ conditionId: conditionName, streamHandlerList: [], streamName: "" }]
                     self.formUtils.renderConditions(conditionList, inputStreamNames)
-                    generateDivRequiringPossibleAttributes(self, partitionId, groupBy, orderBy);
+                    generateDivRequiringPossibleAttributes(self, partitionId, groupBy);
                     addAutoCompletion(self, partitionId, QUERY_CONDITION_SYNTAX, QUERY_SYNTAX, incrementalAggregator,
-                        streamFunctions);
+                        streamFunctions, outputAttributes);
                 });
 
                 $('.define-conditions').on('blur', '.condition-id', function () {
-                    generateDivRequiringPossibleAttributes(self, partitionId, groupBy, orderBy);
+                    generateDivRequiringPossibleAttributes(self, partitionId, groupBy);
                     addAutoCompletion(self, partitionId, QUERY_CONDITION_SYNTAX, QUERY_SYNTAX, incrementalAggregator,
-                        streamFunctions);
+                        streamFunctions, outputAttributes);
                 });
 
                 $('.define-conditions').on('change', '.condition-stream-name-selection', function () {
-                    generateDivRequiringPossibleAttributes(self, partitionId, groupBy, orderBy);
+                    generateDivRequiringPossibleAttributes(self, partitionId, groupBy);
                     addAutoCompletion(self, partitionId, QUERY_CONDITION_SYNTAX, QUERY_SYNTAX, incrementalAggregator,
-                        streamFunctions);
+                        streamFunctions, outputAttributes);
                 });
 
                 var rateLimitingMatches = QUERY_SYNTAX.concat(Constants.SIDDHI_TIME);

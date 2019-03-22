@@ -238,15 +238,17 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
         /**
          * @function to add autocompletion
          */
-        var addAutoCompletion = function (self, QUERY_CONDITION_SYNTAX, incrementalAggregator, streamFunctions) {
+        var addAutoCompletion = function (self, QUERY_CONDITION_SYNTAX, incrementalAggregator, streamFunctions, outputAttributes) {
             var possibleAttributesWithSourceAs = getPossibleAttributesWithSourceAs(self);
-            var selectExpressionMatches = JSON.parse(JSON.stringify(possibleAttributesWithSourceAs));
+            var selectExpressionMatches = _.cloneDeep(possibleAttributesWithSourceAs);
             selectExpressionMatches = selectExpressionMatches.concat(incrementalAggregator);
             selectExpressionMatches = selectExpressionMatches.concat(streamFunctions);
-            var onFilterHavingConditionMatches = JSON.parse(JSON.stringify(possibleAttributesWithSourceAs));
+            var onFilterHavingConditionMatches = _.cloneDeep(possibleAttributesWithSourceAs);
             onFilterHavingConditionMatches = onFilterHavingConditionMatches.concat(QUERY_CONDITION_SYNTAX);
-            var perWithinMatches = JSON.parse(JSON.stringify(possibleAttributesWithSourceAs));
+            onFilterHavingConditionMatches = onFilterHavingConditionMatches.concat(outputAttributes);
+            var perWithinMatches = _.cloneDeep(possibleAttributesWithSourceAs);
             perWithinMatches = perWithinMatches.concat(Constants.SIDDHI_TIME);
+            perWithinMatches = perWithinMatches.concat(outputAttributes);
             self.formUtils.createAutocomplete($('.attribute-expression'), selectExpressionMatches);
             self.formUtils.createAutocomplete($('.symbol-syntax-required-value'), onFilterHavingConditionMatches);
             self.formUtils.createAutocomplete($('.per-within'), perWithinMatches);
@@ -367,6 +369,10 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
                     }
                 });
 
+                $('.join-query-form-container').on('change', '.join-selection', function () {
+                    $('.join-type-div').find('.error-message').hide();
+                });
+
                 //join-type
                 self.formUtils.renderDropDown('.define-join-type-selection', possibleJoinTypes, Constants.JOIN);
                 if (joinType) {
@@ -452,8 +458,17 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
                 }
 
                 var possibleAttributesWithSourceAs = getPossibleAttributesWithSourceAs(self);
+                var outputElement = self.configurationData.getSiddhiAppConfig()
+                    .getDefinitionElementByName(outputElementName);
+                var outputAttributes = [];
+                if (outputElement.type.toLowerCase() === Constants.STREAM) {
+                    var streamAttributes = outputElement.element.getAttributeList();
+                    _.forEach(streamAttributes, function (attribute) {
+                        outputAttributes.push(attribute.getName());
+                    });
+                }
                 self.formUtils.generateGroupByDiv(groupBy, possibleAttributesWithSourceAs);
-                self.formUtils.generateOrderByDiv(orderBy, possibleAttributesWithSourceAs);
+                self.formUtils.generateOrderByDiv(orderBy, outputAttributes);
 
                 if (limit) {
                     $('.limit-value').val(limit);
@@ -488,19 +503,18 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
                     }
                 }
                 //autocompletion
-                addAutoCompletion(self, QUERY_CONDITION_SYNTAX, incrementalAggregator, streamFunctions);
+                addAutoCompletion(self, QUERY_CONDITION_SYNTAX, incrementalAggregator, streamFunctions, outputAttributes);
 
                 $('.join-query-form-container').on('blur', '.as-content-value', function () {
-                    addAutoCompletion(self, QUERY_CONDITION_SYNTAX, incrementalAggregator, streamFunctions);
+                    addAutoCompletion(self, QUERY_CONDITION_SYNTAX, incrementalAggregator, streamFunctions, outputAttributes);
                     self.formUtils.generateGroupByDiv(groupBy, possibleAttributesWithSourceAs);
-                    self.formUtils.generateOrderByDiv(orderBy, possibleAttributesWithSourceAs);
                 });
 
                 //to add filter
                 $('.define-stream-handler').on('click', '.btn-add-filter', function () {
                     var sourceDiv = self.formUtils.getSourceDiv($(this));
                     self.formUtils.addNewStreamHandler(sourceDiv, Constants.FILTER);
-                    addAutoCompletion(self, QUERY_CONDITION_SYNTAX, incrementalAggregator, streamFunctions);
+                    addAutoCompletion(self, QUERY_CONDITION_SYNTAX, incrementalAggregator, streamFunctions, outputAttributes);
                 });
 
                 var rateLimitingMatches = RATE_LIMITING_SYNTAX.concat(Constants.SIDDHI_TIME);

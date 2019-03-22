@@ -43,8 +43,9 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
 		/**
 		 * @function to add autocompletion for filter value
 		 */
-        var addAutoCompletionForFilter = function (self, QUERY_CONDITION_SYNTAX, possibleAttributes) {
-            var filterMatches = JSON.parse(JSON.stringify(possibleAttributes));
+        var addAutoCompletionForFilter = function (self, QUERY_CONDITION_SYNTAX, possibleAttributes, outputAttributes) {
+            var filterMatches = _.cloneDeep((possibleAttributes));
+            filterMatches = filterMatches.concat(outputAttributes);
             filterMatches = filterMatches.concat(QUERY_CONDITION_SYNTAX);
             self.formUtils.createAutocomplete($('.symbol-syntax-required-value'), filterMatches);
         };
@@ -156,8 +157,18 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
                     possibleAttributes.push(Constants.TRIGGERED_TIME);
                 }
 
+                var outputElement = self.configurationData.getSiddhiAppConfig()
+                    .getDefinitionElementByName(outputElementName, partitionId);
+                var outputAttributes = [];
+                if (outputElement.type.toLowerCase() === Constants.STREAM) {
+                    var streamAttributes = outputElement.element.getAttributeList();
+                    _.forEach(streamAttributes, function (attribute) {
+                        outputAttributes.push(attribute.getName());
+                    });
+                }
+
                 self.formUtils.generateGroupByDiv(groupBy, possibleAttributes);
-                self.formUtils.generateOrderByDiv(orderBy, possibleAttributes);
+                self.formUtils.generateOrderByDiv(orderBy, outputAttributes);
 
                 //projection
                 self.formUtils.selectQueryProjection(select, outputElementName);
@@ -224,7 +235,7 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
                 selectExpressionMatches = selectExpressionMatches.concat(streamFunctions);
                 self.formUtils.createAutocomplete($('.attribute-expression'), selectExpressionMatches);
 
-                addAutoCompletionForFilter(self, QUERY_CONDITION_SYNTAX, possibleAttributes);
+                addAutoCompletionForFilter(self, QUERY_CONDITION_SYNTAX, possibleAttributes, outputAttributes);
 
                 //to add filter
                 $('.define-stream-handler').on('click', '.btn-add-filter', function () {
@@ -308,7 +319,7 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
                             });
                         }
 
-                        if ($('.having-filter-checkbox').is(':checked')) {
+                        if ($('.having-checkbox').is(':checked')) {
                             queryObject.setHaving($('.having-condition-value').val().trim());
                         } else {
                             queryObject.setHaving(undefined)
