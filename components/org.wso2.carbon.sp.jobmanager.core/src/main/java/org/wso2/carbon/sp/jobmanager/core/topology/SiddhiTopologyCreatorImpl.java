@@ -494,8 +494,7 @@ public class SiddhiTopologyCreatorImpl implements SiddhiTopologyCreator {
                 break;
             }
         }
-
-        if (isQuery || !partitionStreamExist) {
+        if (isQuery && !partitionStreamExist) {
             if (inputStream instanceof JoinInputStream && !isAggregationJoin(inputStream)) {
                 throw new SiddhiAppValidationException(execGroup
                         + "Join queries used with parallel greater than 1 outside partitioned stream");
