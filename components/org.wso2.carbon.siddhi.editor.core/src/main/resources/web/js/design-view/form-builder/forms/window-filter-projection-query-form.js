@@ -426,7 +426,7 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
                         }
                         queryInput.setType(queryType.toUpperCase());
 
-                        $('#' + id).removeClass('incomplete-element');
+                        JSONValidator.prototype.validateWindowFilterProjectionQuery(queryObject);
                         self.configurationData.setIsDesignViewContentChanged(true);
 
                         //Send query element to the backend and generate tooltip

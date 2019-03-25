@@ -576,8 +576,7 @@ define(['require', 'log', 'jquery', 'lodash', 'aggregateByTimePeriod', 'querySel
                         var aggregateByTimePeriod = new AggregateByTimePeriod(aggregateByTimePeriodOptions);
                         aggregationObject.setAggregateByTimePeriod(aggregateByTimePeriod);
 
-                        $('#' + id).removeClass('incomplete-element');
-                        $('#' + id).removeClass('error-element');
+                        JSONValidator.prototype.validateAggregation(aggregationObject);
                         //Send aggregation element to the backend and generate tooltip
                         var aggregationToolTip = self.formUtils.getTooltip(aggregationObject, Constants.AGGREGATION);
                         $('#' + id).prop('title', aggregationToolTip);

@@ -256,6 +256,7 @@ define(['require', 'log', 'jquery', 'lodash', 'designViewUtils', 'constants'],
             }
             if (isValid) {
                 removeErrorHighlighter(aggregation.id);
+                removeIncompleteElement(aggregation.id);
                 removeTooltipErrorMessage(aggregation.id);
             } else {
                 if(aggregation.name) {
@@ -293,6 +294,7 @@ define(['require', 'log', 'jquery', 'lodash', 'designViewUtils', 'constants'],
                 DesignViewUtils.prototype.errorAlert(errorMessage);
             }
             if (isValid) {
+                removeIncompleteElement(query.id);
                 removeErrorHighlighter(query.id);
                 removeTooltipErrorMessage(query.id);
             } else {
@@ -336,6 +338,7 @@ define(['require', 'log', 'jquery', 'lodash', 'designViewUtils', 'constants'],
             }
             if (isValid) {
                 removeErrorHighlighter(query.id);
+                removeIncompleteElement(query.id);
                 removeTooltipErrorMessage(query.id);
             } else {
                 if (self.isQueryFreshlyDropped(query.queryOutput)) {
@@ -375,6 +378,7 @@ define(['require', 'log', 'jquery', 'lodash', 'designViewUtils', 'constants'],
                 DesignViewUtils.prototype.errorAlert(errorMessage);
             }
             if (isValid) {
+                removeIncompleteElement(query.id);
                 removeErrorHighlighter(query.id);
                 removeTooltipErrorMessage(query.id);
             } else {
@@ -553,6 +557,13 @@ define(['require', 'log', 'jquery', 'lodash', 'designViewUtils', 'constants'],
             element.addClass('incomplete-element');
             // set error message as the tooltip message
             element.prop('title', errorMessage);
+        }
+
+        function removeIncompleteElement(incompleteElementId) {
+            var element = $('#' + incompleteElementId);
+            if (element.hasClass('incomplete-element')) {
+                element.removeClass('incomplete-element');
+            }
         }
 
         function removeErrorHighlighter(errorElementId) {

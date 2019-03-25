@@ -453,7 +453,7 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
                         queryOutput.setTarget(outputTarget);
                         queryOutput.setType(Constants.INSERT);
 
-                        $('#' + id).removeClass('incomplete-element');
+                        JSONValidator.prototype.validatePatternOrSequenceQuery(patternQueryObject, Constants.PATTERN_QUERY);
                         self.configurationData.setIsDesignViewContentChanged(true);
 
                         //Send pattern-query element to the backend and generate tooltip

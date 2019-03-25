@@ -709,7 +709,7 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
                         queryOutput.setTarget(outputTarget);
                         queryOutput.setType(Constants.INSERT);
 
-                        $('#' + id).removeClass('incomplete-element');
+                        JSONValidator.prototype.validateJoinQuery(joinQueryObject);
                         self.configurationData.setIsDesignViewContentChanged(true);
 
                         //Send join-query element to the backend and generate tooltip
