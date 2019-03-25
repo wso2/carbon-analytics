@@ -51,6 +51,7 @@
 .grid-container {
     /* Temp */
     width: calc(100% - 67px);
+    overflow: auto;
     position: relative;
     background: linear-gradient(-90deg, rgba(0, 0, 0, .001) 1px, transparent 1px),
     linear-gradient(rgba(0, 0, 0, .03) 1px, transparent 1px),
