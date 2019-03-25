@@ -454,14 +454,7 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
                         queryOutput.setTarget(outputTarget);
                         queryOutput.setType(Constants.INSERT);
 
-                        var isValid = JSONValidator.prototype.validatePatternOrSequenceQuery(sequenceQueryObject,
-                            Constants.SEQUENCE_QUERY, false);
-                        if (!isValid) {
-                            isErrorOccurred = true;
-                            return;
-                        }
-
-                        $('#' + id).removeClass('incomplete-element');
+                        JSONValidator.prototype.validatePatternOrSequenceQuery(sequenceQueryObject, Constants.SEQUENCE_QUERY);
                         self.configurationData.setIsDesignViewContentChanged(true);
 
                         //Send sequence-query element to the backend and generate tooltip

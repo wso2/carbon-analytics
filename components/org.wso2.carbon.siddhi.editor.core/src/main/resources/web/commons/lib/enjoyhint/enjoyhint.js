@@ -751,7 +751,6 @@ var EnjoyHint = function (_options) {
                                 y1 = labelRect.top;
                                 bezX = x1;
                                 bezY = y1;
-                                console.log("ok");
                             }
 
                             if (window.innerWidth < 900) {
