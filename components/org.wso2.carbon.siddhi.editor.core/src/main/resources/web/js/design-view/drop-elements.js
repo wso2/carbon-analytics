@@ -1405,8 +1405,9 @@ define(['require', 'log', 'lodash', 'jquery', 'partition', 'stream', 'query', 'f
                 // Add the fault stream to the stream list
                 this.configurationData.getSiddhiAppConfig().addStream(new Stream({
                     id: stream.getId(),
-                    name: '!' + stream.getName()
+                    name: Constants.FAULT_STREAM_PREFIX + stream.getName()
                 }));
+
             } else {
                 $('#' + stream.getId() + '-err-out').remove();
             }

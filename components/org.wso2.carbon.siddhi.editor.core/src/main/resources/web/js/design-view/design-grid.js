@@ -17,11 +17,11 @@
  */
 define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dropElements', 'dagre', 'edge',
         'windowFilterProjectionQueryInput', 'joinQueryInput', 'patternOrSequenceQueryInput', 'queryOutput',
-        'partitionWith', 'jsonValidator', 'dragSelect'],
+        'partitionWith', 'jsonValidator', 'constants', 'dragSelect'],
 
     function (require, log, $, Backbone, _, DesignViewUtils, DropElements, dagre, Edge,
               WindowFilterProjectionQueryInput, JoinQueryInput, PatternOrSequenceQueryInput, QueryOutput,
-              PartitionWith, JSONValidator) {
+              PartitionWith, JSONValidator, Constants) {
 
         const TAB_INDEX = 10;
         const ENTER_KEY = 13;
@@ -671,7 +671,7 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
                                     eventStreamName = s.getName();
                                 }
                             });
-                            sourceId = streamMap['!' + eventStreamName].getId();
+                            sourceId = streamMap[Constants.FAULT_STREAM_PREFIX + eventStreamName].getId();
                         }
                         if (self.configurationData.getSiddhiAppConfig().getDefinitionElementById(sourceId, true, true)
                             !== undefined) {

@@ -16,8 +16,8 @@
  * under the License.
  */
 
-define(['require', 'elementUtils'],
-    function (require, ElementUtils) {
+define(['require', 'elementUtils', 'constants'],
+    function (require, ElementUtils, Constants) {
 
         /**
          * @class Stream
@@ -126,7 +126,7 @@ define(['require', 'elementUtils'],
         };
 
         Stream.prototype.isFaultStream = function() {
-            return this.name && this.name.startsWith('!');
+            return this.name && this.name.startsWith(Constants.FAULT_STREAM_PREFIX);
         };
 
         return Stream;
