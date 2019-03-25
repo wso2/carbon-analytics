@@ -1415,12 +1415,14 @@ define(['require', 'log', 'lodash', 'jquery', 'partition', 'stream', 'query', 'f
                     }
                 });
                 $(dataObj).popover("show");
+                $('.grid-container').addClass('removeOverflow');
                 $('.btn_no').focus();
                 $(".overlayed-container ").fadeTo(200, 1);
                 element.on("click", ".popover-footer .btn_no", function () {
                     $(".overlayed-container ").fadeOut(200);
                     $(this).parents(".popover").popover('hide');
                     $('#' + newElement[0].id).removeClass("selected-element");
+                    $('.grid-container').removeClass('removeOverflow');
                 });
 
                 element.off('click', '.popover-footer .btn_yes');
@@ -1442,6 +1444,7 @@ define(['require', 'log', 'lodash', 'jquery', 'partition', 'stream', 'query', 'f
                             $(".overlayed-container ").fadeOut(200);
                             $('#' + newElement[0].id).removeClass("selected-element");
                             $('#' + newElement[0].id).children().removeClass("selected-element");
+                            $('.grid-container').removeClass('removeOverflow');
                         }
                     });
                 });
@@ -1451,7 +1454,8 @@ define(['require', 'log', 'lodash', 'jquery', 'partition', 'stream', 'query', 'f
                             $(dataObj).popover('hide');
                             $(".overlayed-container ").fadeOut(200);
                             $('#' + newElement[0].id).removeClass("selected-element");
-                            $('#' + newElement[0].id).children().removeClass("selected-element");
+                            $('#' + newElement[0].id).children().removeClass("selected-element")
+                            $('.grid-container').removeClass('removeOverflow');
                         }
                     });
                     //Popver navigation using arrow keys
