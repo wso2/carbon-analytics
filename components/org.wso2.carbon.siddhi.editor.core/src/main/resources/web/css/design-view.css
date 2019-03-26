@@ -1206,10 +1206,17 @@ a.list-group-item, button.list-group-item {
 	margin-top: 3px;
 }
 
-.design-view-form-content .group-by-content .btn-del-option,
-.design-view-form-content .order-by-attributes .define-order-del {
+.design-view-form-content .group-by-content .btn-del-option {
 	margin-left: 10px;
-    margin-top: 2px;
+    margin-top: 1px;
+}
+
+.design-view-form-content .order-group-by-content .define-order-del {
+    margin-left: 10px;
+}
+
+.design-view-form-content .order-by-attribute-content .btn-del-option {
+    margin-top: 0px;
 }
 
 .join-query-form-container .define-source input[type="text"].as-content-value {
