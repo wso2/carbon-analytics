@@ -2511,7 +2511,7 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
         FormUtils.prototype.createObjectsForAnnotationsWithKeys = function (predefinedAnnotations) {
             var self = this;
             var annotationsWithKeys = [];
-            var subAnnotations;
+            var subAnnotations = [];
             _.forEach(predefinedAnnotations, function (predefinedAnnotation) {
                 if (predefinedAnnotation.name.toLowerCase() != Constants.PRIMARY_KEY &&
                     predefinedAnnotation.name.toLowerCase() != Constants.INDEX) {
@@ -2530,6 +2530,8 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
                         optional: predefinedAnnotation.optional, isChecked: false
                     }
                     annotationsWithKeys.push(annotationObject);
+                    //clear the sub annotations
+                    subAnnotations.length = 0;
                 }
             });
             return annotationsWithKeys;
