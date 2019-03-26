@@ -1055,10 +1055,7 @@ a.list-group-item, button.list-group-item {
 	margin-top: 10px;
 }
 
-.design-view-form-content .option .option-desc-content,
-.design-view-form-content .parameter .parameter-desc-content,
-.aggregation-form-container .attribute-by-desc-content,
-.trigger-form-container #define-trigger-criteria .criteria-description {
+.design-view-form-content .fw-info > span {
 	 font-family: Arial;
 	 background: #252525;
 	 width: 250px;

@@ -3020,16 +3020,6 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
          * @function to add event listeners for parameter division
          */
         FormUtils.prototype.addEventListenersForParameterDiv = function () {
-            //event listener to show parameter description
-            $('.defineFunctionParameters').on('mouseover', '.parameter-desc', function () {
-                $(this).find('.parameter-desc-content').show();
-            });
-
-            //event listener to hide parameter description
-            $('.defineFunctionParameters').on('mouseout', '.parameter-desc', function () {
-                $(this).find('.parameter-desc-content').hide();
-            });
-
             //event listener when the parameter checkbox is changed
             $('.defineFunctionParameters').on('change', '.parameter-checkbox', function () {
                 var parameterParent = $(this).parents(".parameter");
@@ -3462,20 +3452,23 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
         };
 
         /**
+         * @function to hide and show the description of the info icon
+         */
+        FormUtils.prototype.addEventListenerToShowAndHideInfo = function () {
+            $('.design-view-form-content').on('mouseover', '.fw-info', function () {
+                $(this).find('span').show();
+            });
+
+            $('.design-view-form-content').on('mouseout', '.fw-info', function () {
+                $(this).find('span').hide();
+            });
+        };
+
+        /**
          * @function to add event listeners of the annotation options
          */
         FormUtils.prototype.addEventListenersForGenericOptionsDiv = function (id) {
             var self = this;
-            //To show option description
-            $('#' + id + '-options-div').on('mouseover', '.option-desc', function () {
-                $(this).find('.option-desc-content').show();
-            });
-
-            //To hide option description
-            $('#' + id + '-options-div').on('mouseout', '.option-desc', function () {
-                $(this).find('.option-desc-content').hide();
-            });
-
             //To hide and show the option content of the optional options
             $('#' + id + '-options-div').on('change', '.option-checkbox', function () {
                 var optionParent = $(this).parents(".option");

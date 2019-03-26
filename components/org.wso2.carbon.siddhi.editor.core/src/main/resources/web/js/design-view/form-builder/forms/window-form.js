@@ -62,6 +62,7 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'constants'],
             self.toggleViewButton.addClass('disableContainer');
 
             self.formUtils.addEventListenerToRemoveRequiredClass();
+            self.formUtils.addEventListenerToShowAndHideInfo();
 
             //declaration and initialization of variables
             var predefinedWindowFunctionNames = _.orderBy(this.configurationData.rawExtensions["windowFunctionNames"],

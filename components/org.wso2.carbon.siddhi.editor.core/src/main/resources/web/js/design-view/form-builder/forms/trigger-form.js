@@ -47,7 +47,7 @@ define(['require', 'log', 'jquery', 'lodash', 'constants'],
                 triggerCriteriaDiv += '<option value = "' + triggerCriteria.name + '">' + triggerCriteria.name + '</option>';
             });
             triggerCriteriaDiv += '</select> <i class = "fw fw-info"> ' +
-                '<span style = "display:none" class = "criteria-description"> </span> </i>';
+                '<span style = "display:none"> </span> </i>';
             $('#define-trigger-criteria').html(triggerCriteriaDiv);
         };
 
@@ -142,16 +142,7 @@ define(['require', 'log', 'jquery', 'lodash', 'constants'],
             renderTriggerCriteria(triggerCriteriaObject);
 
             self.formUtils.addEventListenerToRemoveRequiredClass();
-
-            //Event listener to show the criteria description
-            $('#define-trigger-criteria').on('mouseover', '.fw-info', function () {
-                $(this).find('.criteria-description').show();
-            });
-
-            //Event listener to hide the criteria description
-            $('#define-trigger-criteria').on('mouseout', '.fw-info', function () {
-                $(this).find('.criteria-description').hide();
-            });
+            self.formUtils.addEventListenerToShowAndHideInfo();
 
             if (name) {
                 //if the trigger object is already edited

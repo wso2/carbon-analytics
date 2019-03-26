@@ -277,6 +277,7 @@ define(['require', 'log', 'jquery', 'lodash', 'aggregateByTimePeriod', 'querySel
                 $('#define-aggregation').html(aggregationFormTemplate);
 
                 self.formUtils.addEventListenerToRemoveRequiredClass();
+                self.formUtils.addEventListenerToShowAndHideInfo();
 
                 //createAnnotationObjects
                 annotationsWithKeys = self.formUtils.createObjectsForAnnotationsWithKeys(predefinedAggregationAnnotations);
@@ -349,14 +350,6 @@ define(['require', 'log', 'jquery', 'lodash', 'aggregateByTimePeriod', 'querySel
                     } else {
                         $('.aggregate-by-attribute-content').hide();
                     }
-                });
-
-                $('#aggregate-by-attribute').on('mouseover', '.attribute-by-desc', function () {
-                    $(this).find('.attribute-by-desc-content').show();
-                });
-
-                $('#aggregate-by-attribute').on('mouseout', '.attribute-by-desc', function () {
-                    $(this).find('.attribute-by-desc-content').hide();
                 });
 
                 $('#define-aggregate-by').on('change', '.aggregate-by-time-period-selection', function () {

@@ -187,6 +187,7 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
                 self.formUtils.renderOutputEventTypes();
 
                 self.formUtils.addEventListenerToRemoveRequiredClass();
+                self.formUtils.addEventListenerToShowAndHideInfo();
 
                 $('.pattern-sequence-query-form-container').on('change', '.query-checkbox', function () {
                     var parent = $(this).parents(".define-content")
