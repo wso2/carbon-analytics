@@ -302,8 +302,10 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
          * @function to render the html for query output
          */
         FormUtils.prototype.renderQueryOutput = function (outputElementName) {
+            var self = this;
+            var outputConfig = self.configurationData.application.config.query_output_options;
             var queryOutputTemplate = Handlebars.compile($('#query-output-template').html())
-                ({ into: outputElementName, operation: Constants.INSERT });
+                ({ into: outputElementName, operation: Constants.INSERT, outputConfig: outputConfig });
             $('.define-query-output').html(queryOutputTemplate);
         };
 
