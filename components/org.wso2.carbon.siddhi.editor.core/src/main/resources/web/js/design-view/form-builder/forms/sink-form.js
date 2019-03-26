@@ -159,6 +159,7 @@ define(['log', 'jquery', 'lodash', 'mapAnnotation', 'payloadOrAttribute', 'jsonV
                 self.toggleViewButton.addClass('disableContainer');
 
                 self.formUtils.addEventListenerToRemoveRequiredClass();
+                self.formUtils.addEventListenerToShowAndHideInfo();
 
                 //declaration of variables
                 var currentSinkOptions = [];

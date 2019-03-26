@@ -64,6 +64,7 @@ define(['log', 'jquery', 'lodash', 'attribute', 'storeAnnotation', 'handlebar', 
             self.toggleViewButton.addClass('disableContainer');
 
             self.formUtils.addEventListenerToRemoveRequiredClass();
+            self.formUtils.addEventListenerToShowAndHideInfo();
 
             var predefinedStores = _.orderBy(_.cloneDeep(this.configurationData.rawExtensions["store"]),
                 ['name'], ['asc']);

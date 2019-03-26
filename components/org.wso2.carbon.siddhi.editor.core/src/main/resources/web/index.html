@@ -1201,8 +1201,8 @@
                             <label class = "option-name optional-option">
                                 <input type = "checkbox" class = "option-checkbox" checked> {{name}}
                             </label>
-                            <i class = "fw fw-info option-desc">
-                                <span style = "display:none" class = "option-desc-content"> {{description}} </span>
+                            <i class = "fw fw-info">
+                                <span style = "display:none"> {{description}} </span>
                             </i>
                         </div>
                         <div class = "clearfix">
@@ -1213,8 +1213,8 @@
                             <label class = "option-name optional-option">
                                 <input type = "checkbox" class = "option-checkbox"> {{name}}
                             </label>
-                            <i class = "fw fw-info option-desc">
-                                <span style = "display:none" class="option-desc-content"> {{description}} </span>
+                            <i class = "fw fw-info">
+                                <span style = "display:none"> {{description}} </span>
                             </i>
                         </div>
                         <div class="clearfix">
@@ -1228,8 +1228,8 @@
                         <label class = "option-name mandatory-option">
                             {{name}}
                         </label>
-                        <i class="fw fw-info option-desc">
-                            <span style="display:none" class="option-desc-content"> {{description}} </span>
+                        <i class="fw fw-info">
+                            <span style="display:none"> {{description}} </span>
                         </i>
                     </div>
                     <div class = "clearfix">
@@ -1355,8 +1355,8 @@
                     <label class = "parameter-name optional-parameter">
                         <input type = "checkbox" class = "parameter-checkbox" checked> {{name}}
                     </label>
-                    <i class = "fw fw-info parameter-desc">
-                        <span style = "display:none" class = "parameter-desc-content"> {{description}} </span>
+                    <i class = "fw fw-info">
+                        <span style = "display:none"> {{description}} </span>
                     </i>
                 </div>
                 <div class = "clearfix optional-param-content">
@@ -1367,8 +1367,8 @@
                     <label class = "parameter-name optional-parameter">
                         <input type = "checkbox" class = "parameter-checkbox"> {{name}}
                     </label>
-                    <i class = "fw fw-info parameter-desc">
-                        <span style = "display:none" class="parameter-desc-content"> {{description}} </span>
+                    <i class = "fw fw-info">
+                        <span style = "display:none"> {{description}} </span>
                     </i>
                 </div>
                 <div class="clearfix optional-param-content" style ="display:none">
@@ -1382,8 +1382,8 @@
                 <label class = "parameter-name mandatory-parameter">
                     {{name}}
                 </label>
-                <i class="fw fw-info parameter-desc">
-                    <span style="display:none" class="parameter-desc-content"> {{description}} </span>
+                <i class="fw fw-info">
+                    <span style="display:none"> {{description}} </span>
                 </i>
             </div>
             <div class = "clearfix">
@@ -1600,10 +1600,8 @@
                     <label>
                         <input type = "checkbox" id="aggregate-by-attribute-checkbox"> By Attribute
                     </label>
-                    <i class = "fw fw-info attribute-by-desc">
-                    <span style = "display:none" class="attribute-by-desc-content">
-                        Attribute of timestamp is required
-                    </span>
+                    <i class = "fw fw-info">
+                        <span style = "display:none"> Attribute of timestamp is required </span>
                     </i>
                 </div>
                 <div class="aggregate-by-attribute-content clearfix">
@@ -1676,33 +1674,22 @@
 <script id="query-output-template" type = "text/template">
     <h3> Output </h3>
     <div class="define-order-by-attributes"> </div>
-    <div class = "define-limit define-content">
-        <label>
-            <input type="checkbox" class="limit-checkbox query-checkbox"> Limit
-        </label>
-        <div class="limit-content query-content">
-            <input type="text"  class="clearfix limit-value query-content-value">
-            <label class="error-message"> </label>
+    {{#each outputConfig}}
+        <div class = "define-{{name}} define-content">
+            <div class="clearfix">
+                <label>
+                    <input type="checkbox" class="{{name}}-checkbox query-checkbox"> {{addTitle name}}
+                </label>
+                <i class = "fw fw-info">
+                    <span style = "display:none"> {{description}} </span>
+                </i>
+            </div>
+            <div class="{{name}}-content query-content">
+                <input type="text"  class="clearfix {{name}}-value query-content-value">
+                <label class="error-message"> </label>
+            </div>
         </div>
-    </div>
-    <div class = "define-offset define-content">
-        <label>
-            <input type="checkbox" class="offset-checkbox query-checkbox"> Offset
-        </label>
-        <div class="offset-content query-content">
-            <input type="text"  class="clearfix offset-value query-content-value">
-            <label class="error-message"> </label>
-        </div>
-    </div>
-    <div class = "define-rate-limiting define-content">
-        <label>
-            <input type="checkbox" class="rate-limiting-checkbox query-checkbox"> Rate limiting
-        </label>
-        <div class="rate-limiting-content query-content">
-            <input type="text"  class="clearfix rate-limiting-value query-content-value">
-            <label class="error-message"> </label>
-        </div>
-    </div>
+    {{/each}}
     <div class="define-output-content">
         <label> Operation </label>
         <input type="text" class="clearfix name query-operation" value="{{operation}}" readonly>
@@ -2676,6 +2663,23 @@
                         }
                     ]
 
+                }
+            ],
+            query_output_options: [
+                {
+                    name: "limit",
+                    description: "When events are emitted as a batch, limit allows to limit the number\n" +
+                        " of events in the batch from the defined offset."
+                },
+                {
+                    name: "offset",
+                    description: "When events are emitted as a batch, offset allows to offset beginning\n" +
+                        " of the output event batch."
+                },
+                {
+                    name: "rate-limiting",
+                    description: "It allows queries to output events periodically based on a specified\n" +
+                        "condition."
                 }
             ],
             query_condition_syntax: ["==", ">=", ">", "<=", "<", "&&", "||", "AND", "OR"],

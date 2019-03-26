@@ -359,6 +359,7 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
                 self.formUtils.renderOutputEventTypes();
 
                 self.formUtils.addEventListenerToRemoveRequiredClass();
+                self.formUtils.addEventListenerToShowAndHideInfo();
 
                 //annotations
                 predefinedAnnotations = self.formUtils.createObjectsForAnnotationsWithKeys(predefinedAnnotations);

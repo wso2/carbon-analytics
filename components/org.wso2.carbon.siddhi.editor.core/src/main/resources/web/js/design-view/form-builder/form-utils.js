@@ -302,8 +302,10 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
          * @function to render the html for query output
          */
         FormUtils.prototype.renderQueryOutput = function (outputElementName) {
+            var self = this;
+            var outputConfig = self.configurationData.application.config.query_output_options;
             var queryOutputTemplate = Handlebars.compile($('#query-output-template').html())
-                ({ into: outputElementName, operation: Constants.INSERT });
+                ({ into: outputElementName, operation: Constants.INSERT, outputConfig: outputConfig });
             $('.define-query-output').html(queryOutputTemplate);
         };
 
@@ -2511,7 +2513,7 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
         FormUtils.prototype.createObjectsForAnnotationsWithKeys = function (predefinedAnnotations) {
             var self = this;
             var annotationsWithKeys = [];
-            var subAnnotations;
+            var subAnnotations = [];
             _.forEach(predefinedAnnotations, function (predefinedAnnotation) {
                 if (predefinedAnnotation.name.toLowerCase() != Constants.PRIMARY_KEY &&
                     predefinedAnnotation.name.toLowerCase() != Constants.INDEX) {
@@ -2530,6 +2532,8 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
                         optional: predefinedAnnotation.optional, isChecked: false
                     }
                     annotationsWithKeys.push(annotationObject);
+                    //clear the sub annotations
+                    subAnnotations.length = 0;
                 }
             });
             return annotationsWithKeys;
@@ -3020,16 +3024,6 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
          * @function to add event listeners for parameter division
          */
         FormUtils.prototype.addEventListenersForParameterDiv = function () {
-            //event listener to show parameter description
-            $('.defineFunctionParameters').on('mouseover', '.parameter-desc', function () {
-                $(this).find('.parameter-desc-content').show();
-            });
-
-            //event listener to hide parameter description
-            $('.defineFunctionParameters').on('mouseout', '.parameter-desc', function () {
-                $(this).find('.parameter-desc-content').hide();
-            });
-
             //event listener when the parameter checkbox is changed
             $('.defineFunctionParameters').on('change', '.parameter-checkbox', function () {
                 var parameterParent = $(this).parents(".parameter");
@@ -3462,20 +3456,23 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
         };
 
         /**
+         * @function to hide and show the description of the info icon
+         */
+        FormUtils.prototype.addEventListenerToShowAndHideInfo = function () {
+            $('.design-view-form-content').on('mouseover', '.fw-info', function () {
+                $(this).find('span').show();
+            });
+
+            $('.design-view-form-content').on('mouseout', '.fw-info', function () {
+                $(this).find('span').hide();
+            });
+        };
+
+        /**
          * @function to add event listeners of the annotation options
          */
         FormUtils.prototype.addEventListenersForGenericOptionsDiv = function (id) {
             var self = this;
-            //To show option description
-            $('#' + id + '-options-div').on('mouseover', '.option-desc', function () {
-                $(this).find('.option-desc-content').show();
-            });
-
-            //To hide option description
-            $('#' + id + '-options-div').on('mouseout', '.option-desc', function () {
-                $(this).find('.option-desc-content').hide();
-            });
-
             //To hide and show the option content of the optional options
             $('#' + id + '-options-div').on('change', '.option-checkbox', function () {
                 var optionParent = $(this).parents(".option");
