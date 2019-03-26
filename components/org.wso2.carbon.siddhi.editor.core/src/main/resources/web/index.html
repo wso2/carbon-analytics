@@ -1677,27 +1677,42 @@
     <h3> Output </h3>
     <div class="define-order-by-attributes"> </div>
     <div class = "define-limit define-content">
-        <label>
-            <input type="checkbox" class="limit-checkbox query-checkbox"> Limit
-        </label>
+        <div class="clearfix">
+            <label>
+                <input type="checkbox" class="limit-checkbox query-checkbox"> Limit
+            </label>
+            <i class = "fw fw-info">
+                <span style = "display:none"> When events are emitted as a batch, limit allows to limit the number
+                    of events in the batch from the defined offset. </span>
+            </i>
+        </div>
         <div class="limit-content query-content">
             <input type="text"  class="clearfix limit-value query-content-value">
             <label class="error-message"> </label>
         </div>
     </div>
     <div class = "define-offset define-content">
-        <label>
-            <input type="checkbox" class="offset-checkbox query-checkbox"> Offset
-        </label>
+        <div class="clearfix">
+            <label> <input type="checkbox" class="offset-checkbox query-checkbox"> Offset </label>
+            <i class = "fw fw-info">
+                <span style = "display:none"> When events are emitted as a batch, offset allows to offset beginning
+                    of the output event batch. </span>
+            </i>
+        </div>
         <div class="offset-content query-content">
             <input type="text"  class="clearfix offset-value query-content-value">
             <label class="error-message"> </label>
         </div>
     </div>
     <div class = "define-rate-limiting define-content">
-        <label>
-            <input type="checkbox" class="rate-limiting-checkbox query-checkbox"> Rate limiting
-        </label>
+        <div class="clearfix">
+            <label> <input type="checkbox" class="rate-limiting-checkbox query-checkbox"> Rate limiting </label>
+            <i class = "fw fw-info">
+                <span style = "display:none"> It allows queries to output events periodically based on a specified
+                    condition.</span>
+            </i>
+        </div>
+
         <div class="rate-limiting-content query-content">
             <input type="text"  class="clearfix rate-limiting-value query-content-value">
             <label class="error-message"> </label>
