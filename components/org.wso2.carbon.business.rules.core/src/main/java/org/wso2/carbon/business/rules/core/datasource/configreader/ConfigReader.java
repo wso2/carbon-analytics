@@ -25,6 +25,7 @@ import org.wso2.carbon.analytics.permissions.bean.Permission;
 import org.wso2.carbon.analytics.permissions.bean.Role;
 import org.wso2.carbon.business.rules.core.datasource.DatasourceConstants;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -47,12 +48,17 @@ public class ConfigReader {
     private static final String CARBON_NAMESPACE = "wso2.carbon";
     private static final String ADMIN = "admin";
     private static final String CARBON_CONFIGS_TYPE = "type";
+    private static final String ANALYTICS_SOLUTIONS_NAMESPACE = "analytics.solutions";
+    private static final String IS_ANALYTICS_ENABLED = "IS-analytics.enabled";
+    private static final String APIM_ANALYTICS_ENABLED = "APIM-analytics.enabled";
+    private static final String EI_ANALYTICS_ENABLED = "EI-analytics.enabled";
 
     private static final Permission managerPermission = new Permission("BRM", "businessrules.manager");
     private static final Permission viewerPermission = new Permission("BRM", "businessrules.viewer");
 
     private static Map<String, Object> configs = readConfigs();
     private static Map<String, Object> carbonConfigs = readCarbonConfigs();
+    private static Map<String, Object> analyticsSolutionsConfig = readAnalyticsSolutionsConfig();
 
     static {
         registerRoles();
@@ -81,9 +87,38 @@ public class ConfigReader {
         return new HashMap<>();
     }
 
+    private static Map<String, Object> readAnalyticsSolutionsConfig() {
+        try {
+            return (Map<String, Object>) DataHolder.getInstance().getConfigProvider()
+                    .getConfigurationObject(ANALYTICS_SOLUTIONS_NAMESPACE);
+        } catch (Exception e) {
+            log.error("Failed to read analytics solutions namespace from deployment.yml ", e);
+        }
+        return new HashMap<>();
+    }
+
     public String getSolutionType() {
         Object solutionType = carbonConfigs.get(CARBON_CONFIGS_TYPE);
         return solutionType != null ? solutionType.toString() : DatasourceConstants.SP;
+    }
+
+    public List<String> getSolutionTypesEnabled() {
+        List<String> solutionsList = new ArrayList();
+        if (analyticsSolutionsConfig != null) {
+            analyticsSolutionsConfig.forEach((k, v) -> {
+                        if ((Boolean) v) {
+                            if (k.equalsIgnoreCase(IS_ANALYTICS_ENABLED)) {
+                                solutionsList.add(DatasourceConstants.IS_SOLUTION);
+                            } else if (k.equalsIgnoreCase(APIM_ANALYTICS_ENABLED)) {
+                                solutionsList.add(DatasourceConstants.APIM_SOLUTION);
+                            } else if (k.equalsIgnoreCase(EI_ANALYTICS_ENABLED)) {
+                                solutionsList.add(DatasourceConstants.EI_SOLUTION);
+                            }
+                        }
+                    }
+            );
+        }
+        return solutionsList;
     }
 
     public String getUserName() {

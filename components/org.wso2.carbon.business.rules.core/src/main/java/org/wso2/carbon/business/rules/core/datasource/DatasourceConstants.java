@@ -21,7 +21,11 @@ package org.wso2.carbon.business.rules.core.datasource;
  * Constants related to business rules datasources
  */
 public class DatasourceConstants {
-    public static final String SP = "SP";
+    public static final String SP = "wso2-sp";
+    public static final String APIM_SOLUTION = "wso2-apim-analytics";
+    public static final String EI_SOLUTION = "wso2-ei-analytics";
+    public static final String IS_SOLUTION = "wso2-is-analytics";
+
 
     static final String COMPONENT_NAMESPACE = "business.rules";
     static final String ADD_BUSINESS_RULE = "ADD_BUSINESS_RULE";

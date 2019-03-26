@@ -79,6 +79,12 @@ public class TemplateManagerService implements BusinessRulesService {
         this.availableTemplateGroups = loadTemplateGroups();
         if (!configReader.getSolutionType().equalsIgnoreCase(DatasourceConstants.SP)) {
             loadAndSaveAnalyticsSolutions(configReader.getSolutionType());
+        } else if (configReader.getSolutionType().equalsIgnoreCase(DatasourceConstants.SP) && configReader
+                .getSolutionTypesEnabled().size() > 0) {
+            List<String> solutionTypesEnabled = configReader.getSolutionTypesEnabled();
+            for (String solutionType : solutionTypesEnabled) {
+                loadAndSaveAnalyticsSolutions(solutionType);
+            }
         }
         loadBusinessRules();
     }
@@ -403,8 +409,8 @@ public class TemplateManagerService implements BusinessRulesService {
             }
             return TemplateManagerConstants.SIDDHI_APP_NOT_DEPLOYED;
         } catch (SiddhiAppsApiHelperException e) {
-           if ( e.getStatus() == 404) {
-             return TemplateManagerConstants.SIDDHI_APP_NOT_DEPLOYED;
+            if (e.getStatus() == 404) {
+                return TemplateManagerConstants.SIDDHI_APP_NOT_DEPLOYED;
             }
             return TemplateManagerConstants.SIDDHI_APP_UNREACHABLE;
         }
