@@ -23,7 +23,7 @@ import org.slf4j.LoggerFactory;
 import org.wso2.carbon.analytics.permissions.PermissionProvider;
 import org.wso2.carbon.analytics.permissions.bean.Permission;
 import org.wso2.carbon.analytics.permissions.bean.Role;
-import org.wso2.carbon.business.rules.core.datasource.DatasourceConstants;
+import org.wso2.carbon.stream.processor.core.internal.util.SiddhiAppProcessorConstants;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -49,9 +49,6 @@ public class ConfigReader {
     private static final String ADMIN = "admin";
     private static final String CARBON_CONFIGS_TYPE = "type";
     private static final String ANALYTICS_SOLUTIONS_NAMESPACE = "analytics.solutions";
-    private static final String IS_ANALYTICS_ENABLED = "IS-analytics.enabled";
-    private static final String APIM_ANALYTICS_ENABLED = "APIM-analytics.enabled";
-    private static final String EI_ANALYTICS_ENABLED = "EI-analytics.enabled";
 
     private static final Permission managerPermission = new Permission("BRM", "businessrules.manager");
     private static final Permission viewerPermission = new Permission("BRM", "businessrules.viewer");
@@ -99,24 +96,23 @@ public class ConfigReader {
 
     public String getSolutionType() {
         Object solutionType = carbonConfigs.get(CARBON_CONFIGS_TYPE);
-        return solutionType != null ? solutionType.toString() : DatasourceConstants.SP;
+        return solutionType != null ? solutionType.toString() : SiddhiAppProcessorConstants.WSO2_SERVER_TYPE_SP;
     }
 
     public List<String> getSolutionTypesEnabled() {
         List<String> solutionsList = new ArrayList();
         if (analyticsSolutionsConfig != null) {
-            analyticsSolutionsConfig.forEach((k, v) -> {
-                        if ((Boolean) v) {
-                            if (k.equalsIgnoreCase(IS_ANALYTICS_ENABLED)) {
-                                solutionsList.add(DatasourceConstants.IS_SOLUTION);
-                            } else if (k.equalsIgnoreCase(APIM_ANALYTICS_ENABLED)) {
-                                solutionsList.add(DatasourceConstants.APIM_SOLUTION);
-                            } else if (k.equalsIgnoreCase(EI_ANALYTICS_ENABLED)) {
-                                solutionsList.add(DatasourceConstants.EI_SOLUTION);
-                            }
-                        }
-                    }
-            );
+            if (Boolean.parseBoolean(analyticsSolutionsConfig.get(SiddhiAppProcessorConstants.
+                    APIM_ANALYTICS_ENABLED).toString())) {
+                solutionsList.add(SiddhiAppProcessorConstants.WSO2_SERVER_TYPE_IS_ANALYTICS);
+            } else if (Boolean.parseBoolean(analyticsSolutionsConfig.get(SiddhiAppProcessorConstants
+                    .EI_ANALYTICS_ENABLED).toString())) {
+                solutionsList.add(SiddhiAppProcessorConstants.WSO2_SERVER_TYPE_IS_ANALYTICS);
+
+            } else if (Boolean.parseBoolean(analyticsSolutionsConfig.get(SiddhiAppProcessorConstants
+                    .WSO2_SERVER_TYPE_IS_ANALYTICS).toString())) {
+                solutionsList.add(SiddhiAppProcessorConstants.WSO2_SERVER_TYPE_EI_ANALYTICS);
+            }
         }
         return solutionsList;
     }

@@ -44,6 +44,7 @@ import org.wso2.carbon.business.rules.core.exceptions.TemplateManagerServiceExce
 import org.wso2.carbon.business.rules.core.util.LogEncoder;
 import org.wso2.carbon.business.rules.core.util.TemplateManagerConstants;
 import org.wso2.carbon.business.rules.core.util.TemplateManagerHelper;
+import org.wso2.carbon.stream.processor.core.internal.util.SiddhiAppProcessorConstants;
 
 import java.io.File;
 import java.io.UnsupportedEncodingException;
@@ -77,10 +78,9 @@ public class TemplateManagerService implements BusinessRulesService {
         this.nodes = configReader.getNodes();
         // Load & store available Template Groups & Business Rules at the time of instantiation
         this.availableTemplateGroups = loadTemplateGroups();
-        if (!configReader.getSolutionType().equalsIgnoreCase(DatasourceConstants.SP)) {
+        if (!configReader.getSolutionType().equalsIgnoreCase(SiddhiAppProcessorConstants.WSO2_SERVER_TYPE_SP)) {
             loadAndSaveAnalyticsSolutions(configReader.getSolutionType());
-        } else if (configReader.getSolutionType().equalsIgnoreCase(DatasourceConstants.SP) && configReader
-                .getSolutionTypesEnabled().size() > 0) {
+        } else if (configReader.getSolutionTypesEnabled().size() > 0) {
             List<String> solutionTypesEnabled = configReader.getSolutionTypesEnabled();
             for (String solutionType : solutionTypesEnabled) {
                 loadAndSaveAnalyticsSolutions(solutionType);

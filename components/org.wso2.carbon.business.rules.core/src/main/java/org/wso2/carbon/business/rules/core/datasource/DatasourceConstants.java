@@ -22,9 +22,7 @@ package org.wso2.carbon.business.rules.core.datasource;
  */
 public class DatasourceConstants {
     public static final String SP = "wso2-sp";
-    public static final String APIM_SOLUTION = "wso2-apim-analytics";
-    public static final String EI_SOLUTION = "wso2-ei-analytics";
-    public static final String IS_SOLUTION = "wso2-is-analytics";
+
 
 
     static final String COMPONENT_NAMESPACE = "business.rules";
