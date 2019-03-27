@@ -30,7 +30,6 @@ import org.wso2.carbon.business.rules.core.bean.TemplateGroup;
 import org.wso2.carbon.business.rules.core.bean.scratch.BusinessRuleFromScratch;
 import org.wso2.carbon.business.rules.core.bean.scratch.BusinessRuleFromScratchProperty;
 import org.wso2.carbon.business.rules.core.bean.template.BusinessRuleFromTemplate;
-import org.wso2.carbon.business.rules.core.datasource.DatasourceConstants;
 import org.wso2.carbon.business.rules.core.datasource.QueryExecutor;
 import org.wso2.carbon.business.rules.core.datasource.configreader.ConfigReader;
 import org.wso2.carbon.business.rules.core.deployer.SiddhiAppApiHelper;
@@ -80,7 +79,7 @@ public class TemplateManagerService implements BusinessRulesService {
         this.availableTemplateGroups = loadTemplateGroups();
         if (!configReader.getSolutionType().equalsIgnoreCase(SiddhiAppProcessorConstants.WSO2_SERVER_TYPE_SP)) {
             loadAndSaveAnalyticsSolutions(configReader.getSolutionType());
-        } else if (configReader.getSolutionTypesEnabled().size() > 0) {
+        } else {
             List<String> solutionTypesEnabled = configReader.getSolutionTypesEnabled();
             for (String solutionType : solutionTypesEnabled) {
                 loadAndSaveAnalyticsSolutions(solutionType);
