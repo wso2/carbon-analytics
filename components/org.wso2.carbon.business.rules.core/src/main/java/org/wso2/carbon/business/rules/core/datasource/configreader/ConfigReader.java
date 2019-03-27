@@ -23,8 +23,9 @@ import org.slf4j.LoggerFactory;
 import org.wso2.carbon.analytics.permissions.PermissionProvider;
 import org.wso2.carbon.analytics.permissions.bean.Permission;
 import org.wso2.carbon.analytics.permissions.bean.Role;
-import org.wso2.carbon.business.rules.core.datasource.DatasourceConstants;
+import org.wso2.carbon.stream.processor.core.internal.util.SiddhiAppProcessorConstants;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -47,12 +48,14 @@ public class ConfigReader {
     private static final String CARBON_NAMESPACE = "wso2.carbon";
     private static final String ADMIN = "admin";
     private static final String CARBON_CONFIGS_TYPE = "type";
+    private static final String ANALYTICS_SOLUTIONS_NAMESPACE = "analytics.solutions";
 
     private static final Permission managerPermission = new Permission("BRM", "businessrules.manager");
     private static final Permission viewerPermission = new Permission("BRM", "businessrules.viewer");
 
     private static Map<String, Object> configs = readConfigs();
     private static Map<String, Object> carbonConfigs = readCarbonConfigs();
+    private static Map<String, Object> analyticsSolutionsConfig = readAnalyticsSolutionsConfig();
 
     static {
         registerRoles();
@@ -81,9 +84,37 @@ public class ConfigReader {
         return new HashMap<>();
     }
 
+    private static Map<String, Object> readAnalyticsSolutionsConfig() {
+        try {
+            return (Map<String, Object>) DataHolder.getInstance().getConfigProvider()
+                    .getConfigurationObject(ANALYTICS_SOLUTIONS_NAMESPACE);
+        } catch (Exception e) {
+            log.error("Failed to read analytics solutions namespace from deployment.yml ", e);
+        }
+        return new HashMap<>();
+    }
+
     public String getSolutionType() {
         Object solutionType = carbonConfigs.get(CARBON_CONFIGS_TYPE);
-        return solutionType != null ? solutionType.toString() : DatasourceConstants.SP;
+        return solutionType != null ? solutionType.toString() : SiddhiAppProcessorConstants.WSO2_SERVER_TYPE_SP;
+    }
+
+    public List<String> getSolutionTypesEnabled() {
+        List<String> solutionsList = new ArrayList();
+        if (analyticsSolutionsConfig != null) {
+            if (Boolean.parseBoolean(analyticsSolutionsConfig.get(SiddhiAppProcessorConstants.
+                    APIM_ANALYTICS_ENABLED).toString())) {
+                solutionsList.add(SiddhiAppProcessorConstants.WSO2_SERVER_TYPE_APIM_ANALYTICS);
+            } else if (Boolean.parseBoolean(analyticsSolutionsConfig.get(SiddhiAppProcessorConstants
+                    .EI_ANALYTICS_ENABLED).toString())) {
+                solutionsList.add(SiddhiAppProcessorConstants.WSO2_SERVER_TYPE_IS_ANALYTICS);
+
+            } else if (Boolean.parseBoolean(analyticsSolutionsConfig.get(SiddhiAppProcessorConstants
+                    .WSO2_SERVER_TYPE_IS_ANALYTICS).toString())) {
+                solutionsList.add(SiddhiAppProcessorConstants.WSO2_SERVER_TYPE_EI_ANALYTICS);
+            }
+        }
+        return solutionsList;
     }
 
     public String getUserName() {
