@@ -104,7 +104,7 @@ public class ConfigReader {
         if (analyticsSolutionsConfig != null) {
             if (Boolean.parseBoolean(analyticsSolutionsConfig.get(SiddhiAppProcessorConstants.
                     APIM_ANALYTICS_ENABLED).toString())) {
-                solutionsList.add(SiddhiAppProcessorConstants.WSO2_SERVER_TYPE_IS_ANALYTICS);
+                solutionsList.add(SiddhiAppProcessorConstants.WSO2_SERVER_TYPE_APIM_ANALYTICS);
             } else if (Boolean.parseBoolean(analyticsSolutionsConfig.get(SiddhiAppProcessorConstants
                     .EI_ANALYTICS_ENABLED).toString())) {
                 solutionsList.add(SiddhiAppProcessorConstants.WSO2_SERVER_TYPE_IS_ANALYTICS);
