@@ -34,9 +34,9 @@ public class CoordinationListenerDataHolder {
     }
     
     /**
-     * This returns the StreamProcessorDataHolder instance.
+     * This returns the CoordinationListenerDataHolder instance.
      *
-     * @return The StreamProcessorDataHolder instance of this singleton class
+     * @return The CoordinationListenerDataHolder instance of this singleton class
      */
     public static CoordinationListenerDataHolder getInstance() {
         return instance;

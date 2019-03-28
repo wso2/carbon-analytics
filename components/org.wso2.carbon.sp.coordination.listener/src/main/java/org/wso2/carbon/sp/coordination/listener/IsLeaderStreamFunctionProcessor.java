@@ -32,25 +32,28 @@ import org.wso2.siddhi.query.api.definition.Attribute;
 import java.util.Map;
 
 /**
- * This drops the incoming event if the node itself is not the leader.
- * If it is the leader, the message wil be passed through.
+ * This Siddhi extension returns true if this node is the leader node in the cluster.
+ * False otherwise.
+ * In case the leader in the cluster could not be determined (e.g. due to cluster-DB connection issue)
+ * false is returned.
  *
  */
 @Extension(
-        name = "dropIfNotLeader",
-        namespace = "coord",
-        description = "This drops the incoming event if the node itself is not the leader. " +
-                "If it is the leader, the message wil be passed through.",
+        name = "isLeader",
+        namespace = "coordination",
+        description = "This extension returns true if this node is the leader node in the cluster. False otherwise.",
         returnAttributes = @ReturnAttribute(
                 description = "This returns true if this node is the leader node in the cluster. False otherwise.",
                 type = {DataType.BOOL}),
         examples = @Example(
-                syntax = "coord:dropIfNotLeader()",
-                description = "This query drops the incoming event if the node itself is not the leader. " +
-                        "If it is the leader, the message wil be passed through."
+                syntax = "from inputStream \n" +
+                        "select attribute1, attribute2, coordination:isLeader() as isLeader\n" +
+                        "insert into leaderAwareStream;",
+                description = "In this query, the third attribute of the leaderAwareStream 'isLeader' will be a " +
+                        "boolean, which will have the values either 'true' or 'false'."
         )
 )
-public class LeaderFriendlyStreamFunctionProcessor extends FunctionExecutor {
+public class IsLeaderStreamFunctionProcessor extends FunctionExecutor {
 
     Attribute.Type returnType = Attribute.Type.BOOL;
 

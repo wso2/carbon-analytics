@@ -32,7 +32,7 @@ import org.wso2.carbon.sp.coordination.listener.CoordinationEventListener;
 import org.wso2.carbon.sp.coordination.listener.internal.CoordinationListenerDataHolder;
 
 /**
- * Service component for getting the wso2 carbon metrics service.
+ * Service component for Coordination Listener.
  */
 @Component(
         name = "org.wso2.carbon.sp.coordination.listener.internal.service.CoordinationListenerServiceComponent",
@@ -42,18 +42,15 @@ import org.wso2.carbon.sp.coordination.listener.internal.CoordinationListenerDat
 public class CoordinationListenerServiceComponent {
     private static final Logger log = LoggerFactory.getLogger(CoordinationListenerServiceComponent.class);
 
-    private boolean clusterComponentActivated;
-    
     public CoordinationListenerServiceComponent() {
     }
-    
+
     @Activate
     protected void start(BundleContext bundleContext) {
-//        bundleContext.registerService(SPMetricsManagement.class.getName(), SPMetricsManagement.getInstance(),null);
         log.debug("CoordinationListenerServiceComponent has been activated.");
     }
-    
-    
+
+
     @Deactivate
     protected void stop() throws Exception {
         log.debug("CoordinationListenerServiceComponent has been stopped.");
@@ -69,7 +66,6 @@ public class CoordinationListenerServiceComponent {
     )
     protected void registerClusterCoordinator(ClusterCoordinator clusterCoordinator) throws ConfigurationException {
         if (clusterCoordinator != null) {
-            clusterComponentActivated = true;
             CoordinationListenerDataHolder.setClusterCoordinator(clusterCoordinator);
             CoordinationListenerDataHolder.setIsLeader(clusterCoordinator.isLeaderNode());
             clusterCoordinator.registerEventListener(new CoordinationEventListener());

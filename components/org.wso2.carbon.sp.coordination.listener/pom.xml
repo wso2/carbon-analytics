@@ -31,11 +31,11 @@
     <packaging>bundle</packaging>
 
     <dependencies>
-        <!--<dependency>-->
-            <!--<groupId>org.testng</groupId>-->
-            <!--<artifactId>testng</artifactId>-->
-            <!--<scope>test</scope>-->
-        <!--</dependency>-->
+        <dependency>
+            <groupId>org.testng</groupId>
+            <artifactId>testng</artifactId>
+            <scope>test</scope>
+        </dependency>
         <dependency>
             <groupId>org.wso2.siddhi</groupId>
             <artifactId>siddhi-core</artifactId>
@@ -70,6 +70,9 @@
                         <Import-Package>
                             *;resolution:=optional,
                         </Import-Package>
+                        <Include-Resource>
+                            META-INF=target/classes/META-INF
+                        </Include-Resource>
                         <DynamicImport-Package>*</DynamicImport-Package>
                     </instructions>
                 </configuration>

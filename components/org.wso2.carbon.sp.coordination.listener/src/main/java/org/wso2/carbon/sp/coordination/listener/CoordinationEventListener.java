@@ -18,12 +18,15 @@
 
 package org.wso2.carbon.sp.coordination.listener;
 
+import org.apache.log4j.Logger;
 import org.wso2.carbon.cluster.coordinator.commons.MemberEventListener;
 import org.wso2.carbon.cluster.coordinator.commons.node.NodeDetail;
 import org.wso2.carbon.cluster.coordinator.service.ClusterCoordinator;
 import org.wso2.carbon.sp.coordination.listener.internal.CoordinationListenerDataHolder;
 
 public class CoordinationEventListener extends MemberEventListener {
+    private static final Logger log = Logger.getLogger(CoordinationEventListener.class);
+
     @Override
     public void memberAdded(NodeDetail nodeDetail) {
         //No action needed.
@@ -40,10 +43,16 @@ public class CoordinationEventListener extends MemberEventListener {
         if (clusterCoordinator != null) {
             CoordinationListenerDataHolder.setIsLeader(clusterCoordinator.isLeaderNode());
         }
+        if (log.isDebugEnabled()) {
+            log.debug("Coordinator changed. IsLeader set to: " + CoordinationListenerDataHolder.isLeader());
+        }
     }
 
     @Override
-    public void becameUnresponsive(String s) {
-        //// TODO: 3/26/19  
+    public void becameUnresponsive(String nodeId) {
+        CoordinationListenerDataHolder.setIsLeader(false);
+        if (log.isDebugEnabled()) {
+            log.debug("Coordinator changed. IsLeader set to false.");
+        }
     }
 }
