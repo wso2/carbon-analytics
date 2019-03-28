@@ -112,7 +112,8 @@ define(function () {
         WINDOW_TITLE: "Window Configuration",
         DATASOURCE: "datasource",
         INLINE_CONFIG: "inline-config",
-        JNDI_RESOURCE: "jndi-resource"
+        JNDI_RESOURCE: "jndi-resource",
+        FAULT_STREAM_PREFIX: "!"
     };
 
     return constants;
