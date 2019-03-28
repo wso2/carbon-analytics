@@ -131,12 +131,12 @@ public class HAManager {
 
             if (null != passiveNodePropertyMap) {
                 setPassiveNodeAdded(true);
-                for (SourceHandler sourceHandler : sourceHandlerManager.getRegsiteredSourceHandlers().values()) {
-                    ((HACoordinationSourceHandler) sourceHandler).setPassiveNodeAdded(true);
-                }
                 setPassiveNodeHostPort(getHost(passiveNodePropertyMap),
                         getPort(passiveNodePropertyMap));
                 initializeEventSyncConnectionPool();
+                for (SourceHandler sourceHandler : sourceHandlerManager.getRegsiteredSourceHandlers().values()) {
+                    ((HACoordinationSourceHandler) sourceHandler).setPassiveNodeAdded(true);
+                }
                 new PersistenceManager().run();
             }
         } else {
