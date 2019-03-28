@@ -76,6 +76,7 @@ public class Constants {
     public static final String ATTR_TYPE_STRING = "string";
     public static final String ATTR_TYPE_BOOL = "bool";
     public static final String EVENT_ATTRIBUTE_VALUE_SEPARATOR = ":";
+    public static final String FAULT_STREAM_PREFIX = "!";
 
     static {
         // Populating the processor super class map
