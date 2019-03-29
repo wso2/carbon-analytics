@@ -112,7 +112,9 @@ define(function () {
         WINDOW_TITLE: "Window Configuration",
         DATASOURCE: "datasource",
         INLINE_CONFIG: "inline-config",
-        JNDI_RESOURCE: "jndi-resource"
+        JNDI_RESOURCE: "jndi-resource",
+        PURGING: "purging",
+        PURGE: "purge"
     };
 
     return constants;

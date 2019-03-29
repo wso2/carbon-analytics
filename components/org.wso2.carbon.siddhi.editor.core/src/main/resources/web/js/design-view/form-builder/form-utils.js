@@ -850,7 +850,7 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
             _.forEach(savedAnnotationObjects, function (savedAnnotation) {
                 var isPredefined = false;
                 _.forEach(predefinedAnnotations, function (annotation) {
-                    if (savedAnnotation.name.toLowerCase() === annotation.name.toLowerCase()) {
+                    if (annotation.possibleNames.includes(savedAnnotation.name.toLowerCase())) {
                         isPredefined = true;
                         return false;
                     }
@@ -2437,7 +2437,7 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
             var self = this;
             _.forEach(savedAnnotations, function (savedAnnotation) {
                 _.forEach(predefinedAnnotations, function (predefinedAnnotation) {
-                    if (savedAnnotation.name.toLowerCase() === predefinedAnnotation.name.toLowerCase()) {
+                    if (predefinedAnnotation.possibleNames.includes(savedAnnotation.name.toLowerCase())) {
                         predefinedAnnotation.isChecked = true;
                         if (savedAnnotation.elements) {
                             self.mapPredefinedAnnotationElements(savedAnnotation, predefinedAnnotation);
@@ -2492,17 +2492,32 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
          * @returns {Array}
          */
         FormUtils.prototype.createObjectsForAnnotationsWithoutKeys = function (predefinedAnnotations) {
+            var self = this;
             var annotationsWithoutKeys = [];
             _.forEach(predefinedAnnotations, function (predefinedAnnotation) {
                 if (predefinedAnnotation.name.toLowerCase() == Constants.PRIMARY_KEY ||
                     predefinedAnnotation.name.toLowerCase() == Constants.INDEX) {
+                    var possibleNames = self.includePossibleNamesForAnnotations(predefinedAnnotation.name);
                     var annotationObject = {
-                        name: predefinedAnnotation.name, values: [{ value: "" }], isChecked: false
+                        name: predefinedAnnotation.name, values: [{ value: "" }], isChecked: false, possibleNames: possibleNames
                     }
                     annotationsWithoutKeys.push(annotationObject);
                 }
             });
             return annotationsWithoutKeys;
+        };
+
+        /**
+         * @function to include possible names for annotations
+         */
+        FormUtils.prototype.includePossibleNamesForAnnotations = function (predefinedAnnotationName) {
+            var possibleNames = [];
+            if (predefinedAnnotationName == Constants.PURGE) {
+                possibleNames = [Constants.PURGE, Constants.PURGING];
+            } else {
+                possibleNames = [predefinedAnnotationName.toLowerCase()];
+            }
+            return possibleNames;
         };
 
         /**
@@ -2517,6 +2532,7 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
             _.forEach(predefinedAnnotations, function (predefinedAnnotation) {
                 if (predefinedAnnotation.name.toLowerCase() != Constants.PRIMARY_KEY &&
                     predefinedAnnotation.name.toLowerCase() != Constants.INDEX) {
+                    var possibleNames = self.includePossibleNamesForAnnotations(predefinedAnnotation.name);
                     var parameters;
                     if (predefinedAnnotation.annotations) {
                         subAnnotations = self.createObjectsForAnnotationsWithKeys(predefinedAnnotation.annotations);
@@ -2527,7 +2543,7 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
                         parameters = self.createObjectWithValues(predefinedAnnotation.parameters);
                     }
                     var annotationObject = {
-                        name: predefinedAnnotation.name, parameters: parameters,
+                        name: predefinedAnnotation.name, parameters: parameters, possibleNames: possibleNames,
                         annotations: subAnnotations,
                         optional: predefinedAnnotation.optional, isChecked: false
                     }
