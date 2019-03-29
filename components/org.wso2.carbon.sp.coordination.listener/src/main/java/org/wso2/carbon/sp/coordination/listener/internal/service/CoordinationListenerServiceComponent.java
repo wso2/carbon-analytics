@@ -28,8 +28,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.wso2.carbon.cluster.coordinator.service.ClusterCoordinator;
 import org.wso2.carbon.config.ConfigurationException;
+import org.wso2.carbon.config.provider.ConfigProvider;
 import org.wso2.carbon.sp.coordination.listener.CoordinationEventListener;
 import org.wso2.carbon.sp.coordination.listener.internal.CoordinationListenerDataHolder;
+
+import java.util.Map;
 
 /**
  * Service component for Coordination Listener.
@@ -74,5 +77,21 @@ public class CoordinationListenerServiceComponent {
 
     protected void unregisterClusterCoordinator(ClusterCoordinator clusterCoordinator) {
         CoordinationListenerDataHolder.setClusterCoordinator(null);
+    }
+
+    @Reference(
+            name = "carbon.config.provider",
+            service = ConfigProvider.class,
+            cardinality = ReferenceCardinality.MANDATORY,
+            policy = ReferencePolicy.DYNAMIC,
+            unbind = "unregisterConfigProvider"
+    )
+    protected void registerConfigProvider(ConfigProvider configProvider) throws ConfigurationException {
+        Map clusterConfiguration = (Map) configProvider.getConfigurationObject("cluster.config");
+        CoordinationListenerDataHolder.setIsClusteringEnabled((Boolean) clusterConfiguration.get("enabled"));
+    }
+
+    protected void unregisterConfigProvider(ConfigProvider configProvider) {
+        CoordinationListenerDataHolder.setIsClusteringEnabled(false);
     }
 }
