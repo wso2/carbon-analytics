@@ -160,6 +160,10 @@
     border: 1px solid #ccc;
 }
 
+.faultStreamDrop {
+    background-image: url("../images/error-stream.svg");
+}
+
 .partitionDrop {
     border: 1px solid #346789;
     width: 250px;
@@ -286,6 +290,12 @@ td {
 .connectorOutSink {
     float: right;
     margin-top: -53px;
+    margin-right: -5px;
+}
+
+.connectorErrOutStream {
+    float: right;
+    margin-top: -30px;
     margin-right: -5px;
 }
 

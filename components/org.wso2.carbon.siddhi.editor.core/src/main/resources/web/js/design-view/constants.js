@@ -113,6 +113,7 @@ define(function () {
         DATASOURCE: "datasource",
         INLINE_CONFIG: "inline-config",
         JNDI_RESOURCE: "jndi-resource",
+        FAULT_STREAM_PREFIX: "!",
         PURGING: "purging",
         PURGE: "purge"
     };

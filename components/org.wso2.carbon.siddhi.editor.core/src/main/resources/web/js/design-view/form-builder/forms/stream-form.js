@@ -29,6 +29,7 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'jsonValidator', 'con
                 this.configurationData = options.configurationData;
                 this.application = options.application;
                 this.formUtils = options.formUtils;
+                this.dropElementInstance = options.dropElementInstance;
                 this.jsPlumbInstance = options.jsPlumbInstance;
                 this.consoleListManager = options.application.outputController;
                 var currentTabId = this.application.tabController.activeTab.cid;

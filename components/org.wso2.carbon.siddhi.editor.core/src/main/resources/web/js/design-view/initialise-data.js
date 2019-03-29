@@ -438,10 +438,41 @@ define(['require', 'log', 'lodash', 'jquery', 'configurationData', 'appData', 'p
                     parentId: newParentId,
                     parentType: edge.parentType,
                     childId: newChildId,
-                    childType: edge.childType
+                    childType: edge.childType,
                 };
+
+                if (edge.parentType === 'STREAM') {
+                    // check if this is originating from the fault stream and get the correct parent id and set
+                    var stream = getStreambyId(mainObject.siddhiAppConfig.getStreamList(), newParentId);
+                    if (stream.isFaultStream()) {
+                        var correspondingStream = getStreamByName(mainObject.siddhiAppConfig.getStreamList(),
+                            stream.getName().substr(1));
+                        edgeOptions.parentId = correspondingStream.getId();
+                        edgeOptions.fromFaultStream = true;
+                    }
+                }
                 mainObject.addEdge(new Edge(edgeOptions));
             });
+        }
+
+        function getStreambyId(streamList, streamId) {
+            var stream = undefined;
+            streamList.forEach(function(s) {
+                if (s.getId() === streamId) {
+                    stream = s;
+                }
+            });
+            return stream;
+        }
+
+        function getStreamByName(streamList, streamName) {
+            var result;
+            streamList.forEach(function(stream) {
+                if (stream.getName() === streamName) {
+                    result = stream;
+                }
+            });
+            return result;
         }
 
         //adds annotation object from a json object for an element object
