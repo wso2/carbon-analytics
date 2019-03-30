@@ -27,8 +27,9 @@ public class CoordinationListenerDataHolder {
     private static CoordinationListenerDataHolder instance = new CoordinationListenerDataHolder();
 
     private static ClusterCoordinator clusterCoordinator;
-    private static boolean isLeader;
-    
+    private static boolean isLeader = false;
+    private static boolean isClusteringEnabled;
+
     private CoordinationListenerDataHolder() {
     
     }
@@ -56,5 +57,13 @@ public class CoordinationListenerDataHolder {
 
     public static void setIsLeader(boolean isLeader) {
         CoordinationListenerDataHolder.isLeader = isLeader;
+    }
+
+    public static boolean isClusteringEnabled() {
+        return isClusteringEnabled;
+    }
+
+    public static void setIsClusteringEnabled(boolean isClusteringEnabled) {
+        CoordinationListenerDataHolder.isClusteringEnabled = isClusteringEnabled;
     }
 }
