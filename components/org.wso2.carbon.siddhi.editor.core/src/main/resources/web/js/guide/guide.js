@@ -740,7 +740,10 @@ define(['jquery', 'lodash', 'log', 'enjoyhint', 'designViewUtils', 'workspace', 
                     'shape': 'rect',
                     'right': 500,
                     onBeforeStart: function () {
-                        self.app.commandManager.dispatch("toggle-output-console");
+                        if(self.app.outputController.isActive()){
+                            self.app.commandManager.dispatch("toggle-output-console");
+                        }
+
                     }
                 },
                 {
