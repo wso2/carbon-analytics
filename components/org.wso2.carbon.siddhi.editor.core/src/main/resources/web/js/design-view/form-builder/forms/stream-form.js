@@ -258,6 +258,8 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'jsonValidator', 'con
                         streamObject.addAnnotationObject(annotation);
                     });
 
+                    self.dropElementInstance.toggleFaultStreamConnector(streamObject, self.jsPlumbInstance, id, streamName);
+
                     $('#' + id).removeClass('incomplete-element');
                     //Send stream element to the backend and generate tooltip
                     var streamToolTip = self.formUtils.getTooltip(streamObject, Constants.STREAM);
