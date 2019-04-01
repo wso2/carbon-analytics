@@ -32,16 +32,21 @@ import org.wso2.siddhi.query.api.definition.Attribute;
 import java.util.Map;
 
 /**
- * This Siddhi extension returns true if this node is the leader node in the cluster.
+ * In a clustered environment, this Siddhi extension returns true if this node is the leader node in the cluster.
  * False otherwise.
  * In case the leader in the cluster could not be determined (e.g. due to cluster-DB connection issue)
  * false is returned.
+ *
+ * In a non-clustered environment, this extension always returns true.
  *
  */
 @Extension(
         name = "isLeader",
         namespace = "coordination",
-        description = "This extension returns true if this node is the leader node in the cluster. False otherwise.",
+        description = "This extension returns true if this node is the leader node in the cluster. " +
+                "False otherwise. \nIn case the leader in the cluster could not be determined (e.g. due to " +
+                "cluster-DB connection issue), false is returned.\nIn a non-clustered environment, " +
+                "this extension always returns true",
         returnAttributes = @ReturnAttribute(
                 description = "This returns true if this node is the leader node in the cluster. False otherwise.",
                 type = {DataType.BOOL}),
@@ -71,7 +76,11 @@ public class IsLeaderStreamFunctionProcessor extends FunctionExecutor {
 
     @Override
     protected Object execute(Object data) {
-        return CoordinationListenerDataHolder.isLeader();
+        if (CoordinationListenerDataHolder.isClusteringEnabled() && !CoordinationListenerDataHolder.isLeader()) {
+            return false;
+        } else {
+            return true;
+        }
     }
 
     @Override

@@ -135,6 +135,9 @@ define(['jquery', 'lodash', 'log', 'enjoyhint', 'designViewUtils', 'workspace', 
                     'showSkip': false,
                     'showNext': true,
                     onBeforeStart: function () {
+                        if(self.app.workspaceExplorer.isActive()){
+                            self.app.commandManager.dispatch("toggle-file-explorer");
+                        }
                         $('#stream').removeClass('stream-drag');
                         currentStep = instance.getCurrentStep();
 
@@ -145,7 +148,7 @@ define(['jquery', 'lodash', 'log', 'enjoyhint', 'designViewUtils', 'workspace', 
                     'showSkip': false,
                     'showNext': false,
                     'shape': 'rect',
-                    'bottom': 250,
+                    'bottom': 300,
                     onBeforeStart: function () {
                         $('#tool-group-Collections').find('.tool-group-body').css('display', 'none');
                         $('#tool-group-Queries').find('.tool-group-body').css('display', 'none');
@@ -241,7 +244,7 @@ define(['jquery', 'lodash', 'log', 'enjoyhint', 'designViewUtils', 'workspace', 
                     'showSkip': false,
                     'showNext': false,
                     'shape': 'rect',
-                    'bottom': 250,
+                    'bottom': 300,
                     onBeforeStart: function () {
                         $('#tool-group-Collections').find('.tool-group-body').css('display', 'none');
                         $("div[id='tool-group-Flow Constructs']").find('.tool-group-body').css('display', 'none');
@@ -275,7 +278,7 @@ define(['jquery', 'lodash', 'log', 'enjoyhint', 'designViewUtils', 'workspace', 
                     'showSkip': false,
                     'showNext': false,
                     'shape': 'rect',
-                    'bottom': 250,
+                    'bottom': 300,
                     onBeforeStart: function () {
                         $('#filter-query').addClass('filter-query-drag');
                         $('#window-query').addClass('window-query-drag');
@@ -359,7 +362,7 @@ define(['jquery', 'lodash', 'log', 'enjoyhint', 'designViewUtils', 'workspace', 
                     'showSkip': false,
                     'showNext': false,
                     'shape': 'rect',
-                    'bottom': 250,
+                    'bottom': 300,
                     onBeforeStart: function () {
                         $('#tool-group-Collections').find('.tool-group-body').css('display', 'none');
                         $("div[id='tool-group-Flow Constructs']").find('.tool-group-body').css('display', 'none');
@@ -386,7 +389,7 @@ define(['jquery', 'lodash', 'log', 'enjoyhint', 'designViewUtils', 'workspace', 
                     'showSkip': false,
                     'showNext': false,
                     'shape': 'rect',
-                    'bottom': 250,
+                    'bottom': 300,
                     onBeforeStart: function () {
                         setTimeout(function () {
                             var interval = null;
@@ -547,7 +550,10 @@ define(['jquery', 'lodash', 'log', 'enjoyhint', 'designViewUtils', 'workspace', 
                     'showSkip': false,
                     'showFalse': false,
                     'shape': 'rect',
-                    'right': 500
+                    'right': 500,
+                    onBeforeStart: function () {
+                        self.app.commandManager.dispatch("toggle-output-console");
+                    }
                 },
                 {
                     'next #sampleDialog': 'You can try out more samples from here. click <b class="lime-text">Next</b>',
@@ -698,7 +704,10 @@ define(['jquery', 'lodash', 'log', 'enjoyhint', 'designViewUtils', 'workspace', 
                     'showSkip': false,
                     'showFalse': false,
                     'shape': 'rect',
-                    'right': 500
+                    'right': 500,
+                    onBeforeStart: function () {
+                        self.app.commandManager.dispatch("toggle-output-console");
+                    }
                 },
                 {
                     'next #sampleDialog' : 'You can try out more samples from here. click <b class="lime-text">Next</b>',
@@ -729,7 +738,13 @@ define(['jquery', 'lodash', 'log', 'enjoyhint', 'designViewUtils', 'workspace', 
                     'showSkip': false,
                     'showFalse': false,
                     'shape': 'rect',
-                    'right': 500
+                    'right': 500,
+                    onBeforeStart: function () {
+                        if(self.app.outputController.isActive()){
+                            self.app.commandManager.dispatch("toggle-output-console");
+                        }
+
+                    }
                 },
                 {
                     'next #sampleDialog' : 'You can try out more samples from here. click <b class="lime-text">Next</b>',
