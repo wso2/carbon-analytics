@@ -411,11 +411,13 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
                     }).prop('selected', true);
                 }
 
-                if (queryOutput.eventType) {
-                    $('.define-output-events').find('#event-type option').filter(function () {
-                        return ($(this).val() == eventType.toLowerCase());
-                    }).prop('selected', true);
+                var eventType = Constants.CURRENT_EVENTS;
+                if (queryOutput.output.eventType) {
+                    eventType = queryOutput.output.eventType.toLowerCase();
                 }
+                $('.define-output-events').find('#event-type option').filter(function () {
+                    return ($(this).val() == eventType);
+                }).prop('selected', true);
 
                 var possibleSources = [];
                 possibleSources.push(firstConnectedElement.name);
