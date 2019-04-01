@@ -91,6 +91,7 @@ define(['require', 'log', 'jquery', 'lodash', 'constants'],
             self.toggleViewButton.addClass('disableContainer');
 
             self.formUtils.addEventListenerToRemoveRequiredClass();
+            self.formUtils.addEventListenerToShowInputContentOnHover();
 
             var name = functionObject.getName();
             renderScriptType();

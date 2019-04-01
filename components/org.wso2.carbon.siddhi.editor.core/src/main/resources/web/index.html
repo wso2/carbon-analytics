@@ -1290,7 +1290,7 @@
                             {{#ifId ../id "sink"}}
                                 <input type = "text" value = "{{key}}" class = "attr-key"/>
                             {{else}}
-                                <input type = "text" value = "{{key}}" class = "readonly-attr attr-key" readonly/>
+                                <input value = "{{key}}" class = "attr-key" readonly/>
                             {{/ifId}}
                             <input type = "text" value = "{{value}}" class = "attr-value"/>
                         {{else}}
@@ -1413,7 +1413,7 @@
         <div class="partition-key">
             <div class="clearfix">
                 <div class="partition-expression"> {{> renderDropDown streamAttributes}} </div>
-                <div class="partition-stream-name"> <input type="text" class="partition-by-stream-name" value="{{streamName}}" readonly> </div>
+                <div class="partition-stream-name"> <input class="partition-by-stream-name" value="{{streamName}}" readonly> </div>
             </div>
             <label class="error-message"></label>
         </div>
@@ -1466,7 +1466,7 @@
                 <div class="clearfix">
                     <div class="clearfix">
                         <input type="text" class = "attribute-expression" value="{{expression}}">
-                        <input type="text" class = "attribute-as" value="{{as}}" readonly>
+                        <input class = "attribute-as" value="{{as}}" readonly>
                     </div>
                     <label class = "error-message"></label>
                 </div>
@@ -1562,7 +1562,7 @@
             </div>
             <div id="aggregation-from-div" class="aggregation-info">
                 <label> From </label>
-                <input type="text" id="aggregation-from" class="clearfix name" value="{{from}}" readonly>
+                <input id="aggregation-from" class="clearfix name" value="{{from}}" readonly>
             </div>
             <div id="define-aggregate-annotations">
                 <h4> Annotations </h4>
@@ -1690,15 +1690,49 @@
             </div>
         </div>
     {{/each}}
-    <div class="define-output-content">
-        <label> Operation </label>
-        <input type="text" class="clearfix name query-operation" value="{{operation}}" readonly>
+    <div class="define-query-operation define-output-content">
+        <label class="clearfix"> Operation </label>
     </div>
     <div class="define-query-into define-output-content">
         <label> Into </label>
-        <input type="text" class="clearfix name query-into" value="{{into}}" readonly>
+        <input class="clearfix name query-into" value="{{into}}" readonly>
     </div>
     <div class="define-output-events define-output-content"> </div>
+</script>
+
+<script id="store-query-output-template" type = "text/template">
+    <div class="define-query-operation-types">
+        {{> renderDropDown possibleOperations}}
+    </div>
+
+    <div class="define-operation-set-condition define-output-content">
+        <label> <input type="checkbox" class="set-checkbox"> Set </label>
+        <div class="set-content">
+            <div class="clearfix">
+                <label class = "set-attribute-label"> Attribute </label>
+                <label class = "set-attribute-label"> Value </label>
+            </div>
+            <ul class="set-condition">
+                {{#each set}}
+                    <li class="setAttributeValue">
+                        <div class="clearfix">
+                            <input type="text" class="setAttribute" value="{{attribute}}">
+                            <input type="text" class="setValue" value="{{value}}">
+                            <a class = "btn-del-option"> <i class = "fw fw-delete"> </i></a>
+                        </div>
+                        <label class="error-message"> </label>
+                    </li>
+                {{/each}}
+            </ul>
+            <button class="btn btn-default btn-add-set"> + Set </button>
+        </div>
+    </div>
+
+    <div class="define-operation-on-condition define-content">
+        <label> On </label>
+        <input type="text" class="clearfix name query-content-value symbol-syntax-required-value" value="{{on}}">
+        <label class="error-message"> </label>
+    </div>
 </script>
 
 <script id="query-source-form-template" type = "text/template">
@@ -1860,7 +1894,7 @@
         </div>
         <div class="query-from-div">
             <label> From </label>
-            <input type="text" class="clearfix name query-from" value="{{from}}" readonly>
+            <input class="clearfix name query-from" value="{{from}}" readonly>
         </div>
         <div class="define-query-source define-source">
             <div class="define-stream-handler">
@@ -2688,6 +2722,7 @@
             incremental_aggregator: ["sum", "min", "max", "avg", "count", "distinctCount"],
             join_types: ["join", "left_outer_join", "right_outer_join", "full_outer_join"],
             stream_handler_types: ["filter", "function","window"],
+            query_output_operations: ["insert", "delete", "update", "update_or_insert_into"],
             stream_handler_types_without_window: ["filter","function"],
             trigger: [
             {

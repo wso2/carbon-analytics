@@ -60,6 +60,7 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'jsonValidator', 'con
             self.toggleViewButton.addClass('disableContainer');
 
             self.formUtils.addEventListenerToRemoveRequiredClass();
+            self.formUtils.addEventListenerToShowInputContentOnHover();
 
             var annotations = [];
             var predefinedAnnotationList = _.cloneDeep(self.configurationData.application.config.
@@ -257,8 +258,7 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'jsonValidator', 'con
                         streamObject.addAnnotationObject(annotation);
                     });
 
-                    self.dropElementInstance.toggleFaultStreamConnector(streamObject,
-                        self.jsPlumbInstance, id, streamName);
+                    self.dropElementInstance.toggleFaultStreamConnector(streamObject, self.jsPlumbInstance, id, streamName);
 
                     $('#' + id).removeClass('incomplete-element');
                     //Send stream element to the backend and generate tooltip

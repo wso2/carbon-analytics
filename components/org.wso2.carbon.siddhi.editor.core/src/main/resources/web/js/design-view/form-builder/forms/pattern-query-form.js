@@ -16,9 +16,9 @@
  * under the License.
  */
 
-define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert', 'queryOrderByValue', 'designViewUtils',
+define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOrderByValue', 'designViewUtils',
     'jsonValidator', 'constants', 'handlebar'],
-    function (require, log, $, _, QuerySelect, QueryOutputInsert, QueryOrderByValue, DesignViewUtils,
+    function (require, log, $, _, QuerySelect, QueryOrderByValue, DesignViewUtils,
         JSONValidator, Constants, Handlebars) {
 
         /**
@@ -124,6 +124,9 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
             if (self.formUtils.validateRequiredFields('.define-content')) {
                 isErrorOccurred = true;
             }
+            if (self.formUtils.validateQueryOutputSet()) {
+                isErrorOccurred = true;
+            }
             return isErrorOccurred;
         };
 
@@ -175,6 +178,15 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
                 var queryInput = patternQueryObject.getQueryInput();
                 var queryOutput = patternQueryObject.getQueryOutput();
 
+                var partitionId;
+                var partitionElementWhereQueryIsSaved
+                    = self.configurationData.getSiddhiAppConfig().getPartitionWhereQueryIsSaved(id);
+                if (partitionElementWhereQueryIsSaved !== undefined) {
+                    partitionId = partitionElementWhereQueryIsSaved.getId();
+                }
+                var outputElement = self.configurationData.getSiddhiAppConfig()
+                    .getDefinitionElementByName(outputElementName, partitionId);
+
                 var predefinedAnnotations = _.cloneDeep(self.configurationData.application.config.
                     type_query_predefined_annotations);
                 var streamFunctions = self.formUtils.getStreamFunctionNames();
@@ -183,11 +195,13 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
                 var patternFormTemplate = Handlebars.compile($('#pattern-sequence-query-form-template').html())
                     ({ name: queryName });
                 $('#define-pattern-query').html(patternFormTemplate);
-                self.formUtils.renderQueryOutput(outputElementName);
+                self.formUtils.renderQueryOutput(outputElement, queryOutput);
                 self.formUtils.renderOutputEventTypes();
 
+                self.formUtils.addEventListenerForQueryOutputDiv();
                 self.formUtils.addEventListenerToRemoveRequiredClass();
                 self.formUtils.addEventListenerToShowAndHideInfo();
+                self.formUtils.addEventListenerToShowInputContentOnHover();
 
                 $('.pattern-sequence-query-form-container').on('change', '.query-checkbox', function () {
                     var parent = $(this).parents(".define-content")
@@ -200,11 +214,13 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
                     }
                 });
 
-                if (queryOutput.eventType) {
-                    $('.define-output-events').find('#event-type option').filter(function () {
-                        return ($(this).val() == eventType.toLowerCase());
-                    }).prop('selected', true);
+                var eventType = Constants.CURRENT_EVENTS;
+                if (queryOutput.output.eventType) {
+                    eventType = queryOutput.output.eventType.toLowerCase();
                 }
+                $('.define-output-events').find('#event-type option').filter(function () {
+                    return ($(this).val() == eventType);
+                }).prop('selected', true);
 
                 //annotations
                 predefinedAnnotations = self.formUtils.createObjectsForAnnotationsWithKeys(predefinedAnnotations);
@@ -238,16 +254,9 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
                 self.formUtils.addEventListenersForStreamHandlersDiv(streamHandlerList);
                 self.formUtils.addEventListenersForConditionDiv(inputStreamNames);
 
-                var partitionId;
-                var partitionElementWhereQueryIsSaved
-                    = self.configurationData.getSiddhiAppConfig().getPartitionWhereQueryIsSaved(id);
-                if (partitionElementWhereQueryIsSaved !== undefined) {
-                    partitionId = partitionElementWhereQueryIsSaved.getId();
-                }
-                var outputElement = self.configurationData.getSiddhiAppConfig()
-                    .getDefinitionElementByName(outputElementName);
                 var outputAttributes = [];
-                if (outputElement.type.toLowerCase() === Constants.STREAM) {
+                if (outputElement.type.toLowerCase() === Constants.STREAM ||
+                    outputElement.type.toLowerCase() === Constants.TABLE) {
                     var streamAttributes = outputElement.element.getAttributeList();
                     _.forEach(streamAttributes, function (attribute) {
                         outputAttributes.push(attribute.getName());
@@ -303,6 +312,10 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
                 addAutoCompletion(self, partitionId, QUERY_CONDITION_SYNTAX, QUERY_SYNTAX, incrementalAggregator,
                     streamFunctions, outputAttributes);
 
+                var inputAttributes = self.formUtils.getInputAttributes(inputStreamNames);
+                var outputAttributesWithElementName = self.formUtils.constructOutputAttributes(outputAttributes);
+                self.formUtils.addAutoCompleteForOutputOperation(outputAttributesWithElementName, inputAttributes);
+
                 $('.define-stream-handler').on('click', '.btn-add-filter', function () {
                     var sourceDiv = self.formUtils.getSourceDiv($(this));
                     self.formUtils.addNewStreamHandler(sourceDiv, Constants.FILTER);
@@ -339,6 +352,17 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
                     generateDivRequiringPossibleAttributes(self, partitionId, groupBy);
                     addAutoCompletion(self, partitionId, QUERY_CONDITION_SYNTAX, QUERY_SYNTAX, incrementalAggregator,
                         streamFunctions, outputAttributes);
+                });
+
+                //to add query operation set
+                var setDiv = '<li class="setAttribute">' +
+                    '<div class="clearfix">' +
+                    '<input type="text" class="setAttribute"> <input type="text" class="setValue"> ' +
+                    '<a class = "btn-del-option"> <i class = "fw fw-delete"> </i> </a>' +
+                    '</div> <label class="error-message"> </label> </li>'
+                $('.define-operation-set-condition').on('click', '.btn-add-set', function () {
+                    $('.define-operation-set-condition .set-condition').append(setDiv);
+                    self.formUtils.addAutoCompleteForOutputOperation(outputAttributesWithElementName, inputAttributes);
                 });
 
                 var rateLimitingMatches = QUERY_SYNTAX.concat(Constants.SIDDHI_TIME);
@@ -446,13 +470,7 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
                             patternQueryObject.addAnnotationObject(annotation);
                         });
 
-                        var outputTarget = $('.query-into').val().trim()
-                        var outputConfig = {};
-                        _.set(outputConfig, 'eventType', $('#event-type').val());
-                        var outputObject = new QueryOutputInsert(outputConfig);
-                        queryOutput.setOutput(outputObject);
-                        queryOutput.setTarget(outputTarget);
-                        queryOutput.setType(Constants.INSERT);
+                        self.formUtils.buildQueryOutput(outputElement, queryOutput);
 
                         JSONValidator.prototype.validatePatternOrSequenceQuery(patternQueryObject, Constants.PATTERN_QUERY);
                         self.configurationData.setIsDesignViewContentChanged(true);

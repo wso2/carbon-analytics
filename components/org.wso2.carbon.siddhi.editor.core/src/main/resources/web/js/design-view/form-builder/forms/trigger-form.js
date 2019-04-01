@@ -143,6 +143,7 @@ define(['require', 'log', 'jquery', 'lodash', 'constants'],
 
             self.formUtils.addEventListenerToRemoveRequiredClass();
             self.formUtils.addEventListenerToShowAndHideInfo();
+            self.formUtils.addEventListenerToShowInputContentOnHover();
 
             if (name) {
                 //if the trigger object is already edited

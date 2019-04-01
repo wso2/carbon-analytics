@@ -68,6 +68,7 @@ define(['require', 'log', 'jquery', 'lodash'],
             self.formUtils.renderAnnotationTemplate("define-annotation", appAnnotationObjects);
 
             self.formUtils.addEventListenerToRemoveRequiredClass();
+            self.formUtils.addEventListenerToShowInputContentOnHover();
 
             // 'Submit' button action
             $(formContainer).on('click', '#btn-submit', function () {

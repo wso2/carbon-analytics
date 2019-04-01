@@ -18,7 +18,7 @@
 
 package org.wso2.carbon.siddhi.editor.core.util.designview.utilities;
 
-import org.wso2.carbon.siddhi.editor.core.util.designview.exceptions.DesignGenerationException;
+import org.apache.log4j.Logger;
 import org.wso2.siddhi.query.api.SiddhiElement;
 
 /**
@@ -30,20 +30,23 @@ public class ConfigBuildingUtilities {
      */
     private ConfigBuildingUtilities() {
     }
+    private static final Logger log = Logger.getLogger(ConfigBuildingUtilities.class);
 
     /**
      * Gets the piece of the code for the given SiddhiElement, from the siddhiAppString
      * @param siddhiElement                     SiddhiElement object, whose code definition is to be extracted
      * @param siddhiAppString                   Complete Siddhi app string
      * @return                                  Code definition of the given SiddhiElement object
-     * @throws DesignGenerationException        Error on getting query start/end index of the element
      */
-    public static String getDefinition(SiddhiElement siddhiElement, String siddhiAppString)
-            throws DesignGenerationException {
+    public static String getDefinition(SiddhiElement siddhiElement, String siddhiAppString) {
         int[] startIndex = siddhiElement.getQueryContextStartIndex();
         int[] endIndex = siddhiElement.getQueryContextEndIndex();
-        return getStringWithQueryContextIndexes(startIndex, endIndex, siddhiAppString);
-
+        if (startIndex == null || endIndex == null) {
+            log.error("Failed to get the string since Start index and/or End index of the SiddhiElement are/is null");
+            return null;
+        } else {
+            return getStringWithQueryContextIndexes(startIndex, endIndex, siddhiAppString);
+        }
     }
 
     /**
@@ -53,18 +56,10 @@ public class ConfigBuildingUtilities {
      * @param endIndex                          Query context end index
      * @param siddhiAppString                   Complete Siddhi app string
      * @return                                  Extracted code segment
-     * @throws DesignGenerationException        At least one of given startIndex and endIndex is null
      */
-    public static String getStringWithQueryContextIndexes(int[] startIndex, int[] endIndex, String siddhiAppString)
-            throws DesignGenerationException {
-        if (startIndex == null || endIndex == null) {
-            throw new DesignGenerationException(
-                    "Failed to get the string since Start index and/or End index of the SiddhiElement are/is null");
-        }
-
+    public static String getStringWithQueryContextIndexes(int[] startIndex, int[] endIndex, String siddhiAppString) {
         int startLinePosition = ordinalIndexOf(startIndex[0], siddhiAppString);
         int endLinePosition = ordinalIndexOf(endIndex[0], siddhiAppString);
-
         return siddhiAppString.substring(startLinePosition + startIndex[1], endLinePosition + endIndex[1]);
     }
 

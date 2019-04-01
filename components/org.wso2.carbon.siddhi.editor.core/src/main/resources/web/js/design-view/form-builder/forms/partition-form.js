@@ -132,6 +132,7 @@ define(['require', 'log', 'jquery', 'lodash', 'partitionWith', 'jsonValidator', 
                     });
 
                     self.formUtils.addEventListenerToRemoveRequiredClass();
+                    self.formUtils.addEventListenerToShowInputContentOnHover();
 
                     // 'Submit' button action
                     $(formContainer).on('click', '#btn-submit', function () {

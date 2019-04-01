@@ -63,6 +63,7 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'constants'],
 
             self.formUtils.addEventListenerToRemoveRequiredClass();
             self.formUtils.addEventListenerToShowAndHideInfo();
+            self.formUtils.addEventListenerToShowInputContentOnHover();
 
             //declaration and initialization of variables
             var predefinedWindowFunctionNames = _.orderBy(this.configurationData.rawExtensions["windowFunctionNames"],
