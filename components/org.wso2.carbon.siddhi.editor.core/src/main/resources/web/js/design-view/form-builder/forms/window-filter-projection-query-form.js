@@ -190,7 +190,8 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryWindowOrFunct
                 }
 
                 var outputAttributes = [];
-                if (outputElement.type.toLowerCase() === Constants.STREAM) {
+                if (outputElement.type.toLowerCase() === Constants.STREAM ||
+                    outputElement.type.toLowerCase() === Constants.TABLE) {
                     var streamAttributes = outputElement.element.getAttributeList();
                     _.forEach(streamAttributes, function (attribute) {
                         outputAttributes.push(attribute.getName());
@@ -275,11 +276,26 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryWindowOrFunct
 
                 addAutoCompletionForFilter(self, QUERY_CONDITION_SYNTAX, possibleAttributes, outputAttributes);
 
+                var inputAttributes = self.formUtils.getInputAttributes([inputElementName])
+                var outputAttributesWithElementName = self.formUtils.constructOutputAttributes(outputAttributes);
+                self.formUtils.addAutoCompleteForOutputOperation(outputAttributesWithElementName, inputAttributes);
+
                 //to add filter
                 $('.define-stream-handler').on('click', '.btn-add-filter', function () {
                     var sourceDiv = self.formUtils.getSourceDiv($(this));
                     self.formUtils.addNewStreamHandler(sourceDiv, Constants.FILTER);
                     addAutoCompletionForFilter(self, QUERY_CONDITION_SYNTAX, possibleAttributes);
+                });
+
+                //to add query operation set
+                var setDiv = '<li class="setAttribute">' +
+                    '<div class="clearfix">' +
+                    '<input type="text" class="setAttribute"> <input type="text" class="setValue"> ' +
+                    '<a class = "btn-del-option"> <i class = "fw fw-delete"> </i> </a>' +
+                    '</div> <label class="error-message"> </label> </li>'
+                $('.define-operation-set-condition').on('click', '.btn-add-set', function () {
+                    $('.define-operation-set-condition .set-condition').append(setDiv);
+                    self.formUtils.addAutoCompleteForOutputOperation(outputAttributesWithElementName, inputAttributes);
                 });
 
                 var rateLimitingMatches = RATE_LIMITING_SYNTAX.concat(Constants.SIDDHI_TIME);

@@ -3078,15 +3078,6 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
                 $(this).closest('li').remove();
             });
 
-            var setDiv = '<li class="setAttribute">' +
-                '<div class="clearfix">' +
-                '<input type="text" class="setAttribute"> <input type="text" class="setValue"> ' +
-                '<a class = "btn-del-option"> <i class = "fw fw-delete"> </i> </a>' +
-                '</div> <label class="error-message"> </label> </li>'
-            $('.define-operation-set-condition').on('click', '.btn-add-set', function () {
-                $('.define-operation-set-condition .set-condition').append(setDiv);
-            });
-
             $('.define-query-operation').on('change', '.operation-type-selection', function () {
                 self.changeQueryOperationContent($(this).val());
             });
@@ -3255,6 +3246,52 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
         };
 
         /**
+         * @function to construct the attributes of output element as <outputElementName>.<outputAttribute>
+         * @param outputAttributes
+         */
+        FormUtils.prototype.constructOutputAttributes = function (outputAttributes) {
+            var attributes = [];
+            var outputElementName = $('.define-query-output .query-into').val().trim();
+            _.forEach(outputAttributes, function (outputAttribute) {
+                attributes.push(outputElementName + "." + outputAttribute);
+            });
+            return attributes;
+        };
+
+        /**
+         * @function to get the attributes of the streams connected to pattern/sequence query
+         */
+        FormUtils.prototype.getInputAttributes = function (inputStreams) {
+            var self = this;
+            var attributes = [];
+            _.forEach(inputStreams, function (stream) {
+                if (stream) {
+                    var inputElement = self.configurationData.getSiddhiAppConfig()
+                        .getDefinitionElementByName(stream);
+                    if (inputElement.type.toLowerCase() === Constants.TRIGGER) {
+                        attributes.push(Constants.TRIGGERED_TIME);
+                    } else {
+                        attributes.concat()
+                        _.forEach(inputElement.element.getAttributeList(), function (attribute) {
+                            attributes.push(attribute.getName());
+                        });
+                    }
+                }
+            })
+            return attributes;
+        };
+
+        /**
+         * @function to add auto completion for query output operation section
+         */
+        FormUtils.prototype.addAutoCompleteForOutputOperation = function (outputAttributesWithStreamName, inputAttributes) {
+            var self = this;
+            var outputOperationMatches = outputAttributesWithStreamName.concat(inputAttributes);
+            console.log(outputOperationMatches)
+            self.createAutocomplete($('.define-query-operation input[type="text"]'), outputOperationMatches);
+        };
+
+        /**
          * @function to show the input field content on hover
          */
         FormUtils.prototype.addEventListenerToShowInputContentOnHover = function () {
@@ -3297,10 +3334,10 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
                 var input = $(this).val().trim();
                 if (input != "") {
                     $(this).removeClass('required-input-field');
-                    $(this).closest('.clearfix').next('label.error-message').hide();
+                    $(this).closest('.clearfix').siblings('label.error-message').hide();
                 } else {
                     $(this).addClass('required-input-field');
-                    $(this).closest('.clearfix').next('label.error-message').show();
+                    $(this).closest('.clearfix').siblings('label.error-message').show();
                 }
             });
         };
@@ -3931,7 +3968,7 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
             $(id)[0].scrollIntoView();
             $(id).addClass('required-input-field');
             $(id).addClass('error-input-field');
-            $(id).closest('.clearfix').next('label.error-message').show();
+            $(id).closest('.clearfix').siblings('label.error-message').show();
         };
 
         /**

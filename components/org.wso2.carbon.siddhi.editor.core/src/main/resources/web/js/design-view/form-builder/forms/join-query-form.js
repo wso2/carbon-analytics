@@ -495,7 +495,8 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryWindowOrFunct
 
                 var possibleAttributesWithSourceAs = getPossibleAttributesWithSourceAs(self);
                 var outputAttributes = [];
-                if (outputElement.type.toLowerCase() === Constants.STREAM) {
+                if (outputElement.type.toLowerCase() === Constants.STREAM ||
+                    outputElement.type.toLowerCase() === Constants.TABLE) {
                     var streamAttributes = outputElement.element.getAttributeList();
                     _.forEach(streamAttributes, function (attribute) {
                         outputAttributes.push(attribute.getName());
@@ -536,7 +537,7 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryWindowOrFunct
                         $('.within-condition-value').val(within)
                     }
                 }
-                
+
                 /**
                  * to show user the lost saved data when the connection is deleted/ when the connected stream is modified
                  * only if the form is an already edited form
@@ -548,6 +549,10 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryWindowOrFunct
                 //autocompletion
                 addAutoCompletion(self, QUERY_CONDITION_SYNTAX, incrementalAggregator, streamFunctions, outputAttributes);
 
+                var inputAttributes = self.formUtils.getInputAttributes(possibleSources);
+                var outputAttributesWithElementName = self.formUtils.constructOutputAttributes(outputAttributes);
+                self.formUtils.addAutoCompleteForOutputOperation(outputAttributesWithElementName, inputAttributes);
+
                 $('.join-query-form-container').on('blur', '.as-content-value', function () {
                     addAutoCompletion(self, QUERY_CONDITION_SYNTAX, incrementalAggregator, streamFunctions, outputAttributes);
                     self.formUtils.generateGroupByDiv(groupBy, possibleAttributesWithSourceAs);
@@ -558,6 +563,17 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryWindowOrFunct
                     var sourceDiv = self.formUtils.getSourceDiv($(this));
                     self.formUtils.addNewStreamHandler(sourceDiv, Constants.FILTER);
                     addAutoCompletion(self, QUERY_CONDITION_SYNTAX, incrementalAggregator, streamFunctions, outputAttributes);
+                });
+
+                //to add query operation set
+                var setDiv = '<li class="setAttribute">' +
+                    '<div class="clearfix">' +
+                    '<input type="text" class="setAttribute"> <input type="text" class="setValue"> ' +
+                    '<a class = "btn-del-option"> <i class = "fw fw-delete"> </i> </a>' +
+                    '</div> <label class="error-message"> </label> </li>'
+                $('.define-operation-set-condition').on('click', '.btn-add-set', function () {
+                    $('.define-operation-set-condition .set-condition').append(setDiv);
+                    self.formUtils.addAutoCompleteForOutputOperation(outputAttributesWithElementName, inputAttributes);
                 });
 
                 var rateLimitingMatches = RATE_LIMITING_SYNTAX.concat(Constants.SIDDHI_TIME);
