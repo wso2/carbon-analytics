@@ -707,7 +707,7 @@ a.list-group-item, button.list-group-item {
 	margin-right: 5px;
 }
 
-.design-view-form-content .define-select input[type="text"].attribute-as {
+.design-view-form-content .define-select input:read-only.attribute-as {
     width: 35%;
 }
 
@@ -964,7 +964,7 @@ a.list-group-item, button.list-group-item {
 
 .aggregation-form-container,
 .query-form-container {
-	width: 30%;
+	width: 32%;
 }
 
 .aggregation-form-container #primary-index-annotations {
@@ -1086,7 +1086,7 @@ a.list-group-item, button.list-group-item {
 
 .design-view-form-content .hovered-content {
     font-family: Arial;
-    background: rgb(37, 36, 36);
+    background: rgb(23, 22, 22);
     color: #eee;
     text-align: left;
     border-radius: 6px;
@@ -1095,6 +1095,7 @@ a.list-group-item, button.list-group-item {
     position: absolute;
     min-width: 250px;
     max-width: 500px;
+    border: 1px solid #716e6e;
 }
 
 .design-view-form-content .btn-default {
@@ -1445,3 +1446,17 @@ label.option-name {
     background-color: #282929;
     padding: 3px 7px;
 }
+
+.design-view-form-content .define-query-output .set-condition li {
+    margin: 5px;
+}
+
+.design-view-form-content .define-query-output .set-condition li input[type="text"] {
+    width: 31%;
+}
+
+.design-view-form-content .define-query-output .define-operation-set-condition .set-attribute-label {
+    margin: 5px;
+    width: 31%;
+}
+

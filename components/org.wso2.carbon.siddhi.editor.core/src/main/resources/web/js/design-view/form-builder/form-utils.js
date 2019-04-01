@@ -17,9 +17,11 @@
  */
 
 define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annotationObject', 'annotationElement',
-    'designViewUtils', 'queryWindowOrFunction', 'streamHandler', 'patternOrSequenceQueryCondition'],
+    'designViewUtils', 'queryWindowOrFunction', 'streamHandler', 'patternOrSequenceQueryCondition', 'queryOutputInsert',
+    'queryOutputDelete', 'queryOutputUpdate', 'queryOutputUpdateOrInsertInto'],
     function (require, _, AppData, log, Constants, Handlebars, AnnotationObject, AnnotationElement, DesignViewUtils,
-        QueryWindowOrFunction, StreamHandler, PatternOrSequenceQueryCondition) {
+        QueryWindowOrFunction, StreamHandler, PatternOrSequenceQueryCondition, QueryOutputInsert, QueryOutputDelete,
+        QueryOutputUpdate, QueryOutputUpdateOrInsertInto) {
 
         /**
          * @class FormUtils Contains utility methods for forms
@@ -301,12 +303,71 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
         /**
          * @function to render the html for query output
          */
-        FormUtils.prototype.renderQueryOutput = function (outputElementName) {
+        FormUtils.prototype.renderQueryOutput = function (outputElement, queryOutput) {
             var self = this;
             var outputConfig = self.configurationData.application.config.query_output_options;
             var queryOutputTemplate = Handlebars.compile($('#query-output-template').html())
-                ({ into: outputElementName, operation: Constants.INSERT, outputConfig: outputConfig });
+                ({ into: outputElement.element.name, outputConfig: outputConfig });
             $('.define-query-output').html(queryOutputTemplate);
+            self.renderQueryOperation(outputElement, queryOutput);
+        };
+
+        /**
+         * @function to render the query output operation section
+         */
+        FormUtils.prototype.renderQueryOperation = function (outputElement, queryOutput) {
+            var self = this;
+            if (outputElement.type.toLowerCase() == Constants.TABLE) {
+                var operationTypes = self.configurationData.application.config.query_output_operations;
+                var setAttributes = [{ attribute: "", value: "" }];
+                if (queryOutput.output) {
+                    if (queryOutput.output.on) {
+                        var on = queryOutput.output.on;
+                    }
+                    if (queryOutput.output.set && queryOutput.output.set.length != 0) {
+                        setAttributes = queryOutput.output.set;
+                    }
+                }
+                self.registerDropDownPartial();
+                var queryOutputDiv = Handlebars.compile($('#store-query-output-template').html())({
+                    possibleOperations: {
+                        id: "operation-type",
+                        options: operationTypes
+                    },
+                    on: on,
+                    set: setAttributes
+                });
+                $('.define-query-output .define-query-operation').append(queryOutputDiv);
+                //remove the first del button of the set attribute
+                $('.define-operation-set-condition .set-condition li:eq(0) .btn-del-option').remove();
+                self.mapQueryOperation(queryOutput);
+            } else {
+                var operationInsertDiv = '<input class="clearfix name query-operation" value="insert" readonly>';
+                $('.define-query-output .define-query-operation').append(operationInsertDiv);
+            }
+        };
+
+        /**
+         * @function to map the query output operation
+         */
+        FormUtils.prototype.mapQueryOperation = function (queryOutput) {
+            var self = this;
+            //to select the operation type
+            var operationType = Constants.INSERT;
+            if (queryOutput.type) {
+                operationType = queryOutput.type.toLowerCase();
+            }
+            $('.define-query-output .operation-type-selection option').filter(function () {
+                return ($(this).val() == (operationType))
+            }).prop('selected', true);
+
+            self.changeQueryOperationContent(operationType);
+
+            if (queryOutput.output && queryOutput.output.set && queryOutput.output.set.length != 0) {
+                $('.define-query-operation .set-checkbox').prop('checked', true);
+            } else {
+                $('.define-query-operation .set-content').hide();
+            }
         };
 
         /**
@@ -930,6 +991,53 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
 
             }
             return rdbmsOptions;
+        };
+
+        /**
+         * @function to validate the query output section
+         * @returns {boolean}
+         */
+        FormUtils.prototype.validateQueryOutputSet = function () {
+            var self = this;
+            var isErrorOccurred = false;
+            var noOfSet = 0;
+            var operationType = $('.define-query-operation .operation-type-selection').val();
+            if (operationType == Constants.UPDATE_OR_INSERT_INTO || operationType == Constants.UPDATE) {
+                if ($('.define-query-operation .set-checkbox').is(':checked')) {
+                    $('.define-operation-set-condition .set-condition li').each(function () {
+                        var setAttribute = $(this).find('.setAttribute');
+                        var setValue = $(this).find('.setValue');
+                        if ((setAttribute.val().trim() != "") || (setValue.val().trim() != "")) {
+                            if (setAttribute.val().trim() == "") {
+                                self.addErrorClass(setAttribute);
+                                $(this).find('.error-message').text('Attribute is required');
+                                isErrorOccurred = true;
+                                return false;
+                            }
+                            if (setValue.val().trim() == "") {
+                                self.addErrorClass(setValue);
+                                $(this).find('.error-message').text('Value is required');
+                                isErrorOccurred = true;
+                                return false;
+                            }
+                        }
+
+                        if ((setAttribute.val().trim() != "") && (setValue.val().trim() != "")) {
+                            noOfSet++;
+                        }
+                    });
+
+                    if (!isErrorOccurred && noOfSet == 0) {
+                        var firstSet = $('.define-operation-set-condition .set-condition li:eq(0)')
+                        self.addErrorClass(firstSet.find('.setAttribute'));
+                        self.addErrorClass(firstSet.find('.setValue'));
+                        firstSet.find('.error-message').text("Minimum one set is required");
+                        isErrorOccurred = true;
+
+                    }
+                }
+            }
+            return isErrorOccurred;
         };
 
         /**
@@ -1696,6 +1804,51 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
                     }
                 }
             });
+        };
+
+        /**
+         * @function to build the query output section
+         */
+        FormUtils.prototype.buildQueryOutput = function (outputElement, queryOutput) {
+            var outputTarget = $('.define-query-output .query-into').val().trim();
+            var outputObject;
+            var outputConfig = {};
+            _.set(outputConfig, 'eventType', $('#event-type').val());
+            if (outputElement.type.toLowerCase() == Constants.TABLE) {
+                var operationType = $('.define-query-operation .operation-type-selection').val();
+                _.set(outputConfig, 'on', $('.define-operation-on-condition input[type="text"]').val().trim());
+                var setCheckbox = $('.define-query-operation .set-checkbox');
+                if (setCheckbox.length != 0 && setCheckbox.is(":checked")) {
+                    var sets = [];
+                    $('.define-operation-set-condition .set-condition li').each(function () {
+                        var setAttribute = $(this).find('.setAttribute').val().trim();
+                        var setValue = $(this).find('.setValue').val().trim();
+                        if ((setAttribute != "") && (setValue != "")) {
+                            sets.push({ attribute: setAttribute, value: setValue });
+                        }
+                    });
+                    _.set(outputConfig, 'set', sets);
+                }
+                if (operationType == Constants.INSERT) {
+                    outputObject = new QueryOutputInsert(outputConfig);
+                    queryOutput.setType(Constants.INSERT);
+                } else if (operationType == Constants.DELETE) {
+                    outputObject = new QueryOutputDelete(outputConfig);
+                    queryOutput.setType(Constants.DELETE);
+                } else if (operationType == Constants.UPDATE) {
+                    outputObject = new QueryOutputUpdate(outputConfig);
+                    queryOutput.setType(Constants.UPDATE);
+                } else if (operationType == Constants.UPDATE_OR_INSERT_INTO) {
+                    outputObject = new QueryOutputUpdateOrInsertInto(outputConfig);
+                    queryOutput.setType(Constants.UPDATE_OR_INSERT_INTO);
+                }
+
+            } else {
+                outputObject = new QueryOutputInsert(outputConfig);
+                queryOutput.setType(Constants.INSERT);
+            }
+            queryOutput.setOutput(outputObject);
+            queryOutput.setTarget(outputTarget);
         };
 
         /**
@@ -2914,6 +3067,54 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
 
             var tree = $('#annotation-div').jstree(true);
             self.addEventListenersForJstree(tree);
+        };
+
+        /**
+         * @function to add event listeners for the query output div
+         */
+        FormUtils.prototype.addEventListenerForQueryOutputDiv = function () {
+            var self = this;
+            $('.define-operation-set-condition ').on('click', '.btn-del-option', function () {
+                $(this).closest('li').remove();
+            });
+
+            var setDiv = '<li class="setAttribute">' +
+                '<div class="clearfix">' +
+                '<input type="text" class="setAttribute"> <input type="text" class="setValue"> ' +
+                '<a class = "btn-del-option"> <i class = "fw fw-delete"> </i> </a>' +
+                '</div> <label class="error-message"> </label> </li>'
+            $('.define-operation-set-condition').on('click', '.btn-add-set', function () {
+                $('.define-operation-set-condition .set-condition').append(setDiv);
+            });
+
+            $('.define-query-operation').on('change', '.operation-type-selection', function () {
+                self.changeQueryOperationContent($(this).val());
+            });
+
+            $('.define-query-operation').on('change', '.set-checkbox', function () {
+                if ($(this).is(':checked')) {
+                    $('.define-query-operation .set-content').show();
+                } else {
+                    $('.define-query-operation .set-content').hide();
+                }
+            });
+        };
+
+        /**
+         * @function to change the operation content depending on the operation type
+         * @param operationType
+         */
+        FormUtils.prototype.changeQueryOperationContent = function (operationType) {
+            if (operationType == Constants.INSERT) {
+                $('.define-query-operation .define-operation-set-condition').hide();
+                $('.define-query-operation .define-operation-on-condition').hide();
+            } else if (operationType == Constants.DELETE) {
+                $('.define-query-operation .define-operation-set-condition').hide();
+                $('.define-query-operation .define-operation-on-condition').show();
+            } else if (operationType == Constants.UPDATE || operationType == Constants.UPDATE_OR_INSERT_INTO) {
+                $('.define-query-operation .define-operation-set-condition').show();
+                $('.define-query-operation .define-operation-on-condition').show();
+            }
         };
 
         /**

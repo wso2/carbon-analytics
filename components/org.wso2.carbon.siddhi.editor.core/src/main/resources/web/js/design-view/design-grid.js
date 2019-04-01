@@ -1217,7 +1217,7 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
                         model = self.configurationData.getSiddhiAppConfig().getAggregation(targetId)
                         model.setConnectedSource(undefined);
                         if(sourceElement.hasClass(constants.STREAM)) {
-                            model.resetModel(model);
+                            model.resetInputModel(model);
                         }
                     } else if (sourceElement.hasClass(constants.STREAM) || sourceElement.hasClass(constants.TABLE)
                         || sourceElement.hasClass(constants.AGGREGATION) || sourceElement.hasClass(constants.WINDOW)
@@ -1242,7 +1242,7 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
                                 || targetElement.hasClass(constants.FUNCTION_QUERY))) {
                             model = self.configurationData.getSiddhiAppConfig()
                                 .getWindowFilterProjectionQuery(targetId);
-                            model.resetModel(model);
+                            model.resetInputModel(model);
 
                         } else if (targetElement.hasClass(constants.JOIN)) {
                             model = self.configurationData.getSiddhiAppConfig().getJoinQuery(targetId);
@@ -1280,7 +1280,7 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
                                     && queryInput.getRight().getConnectedSource() === disconnectedElementSourceName) {
                                     queryInput.setRight(undefined);
                                 }
-                                model.resetModel(model);
+                                model.resetInputModel(model);
                             }
 
                         } else if (sourceElement.hasClass(constants.STREAM)
@@ -1297,10 +1297,10 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
 
                             if (targetElement.hasClass(constants.PATTERN)) {
                                 model = self.configurationData.getSiddhiAppConfig().getPatternQuery(targetId);
-                                model.resetModel(model, disconnectedElementName);
+                                model.resetInputModel(model, disconnectedElementName);
                             } else if (targetElement.hasClass(constants.SEQUENCE)) {
                                 model = self.configurationData.getSiddhiAppConfig().getSequenceQuery(targetId);
-                                model.resetModel(model, disconnectedElementName);
+                                model.resetInputModel(model, disconnectedElementName);
                             }
                         }
 
@@ -1325,8 +1325,7 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
                             } else if (sourceElement.hasClass(constants.SEQUENCE)) {
                                 model = self.configurationData.getSiddhiAppConfig().getSequenceQuery(sourceId);
                             }
-                            model.getQueryOutput().setTarget(undefined);
-                            model.setSelect(undefined);
+                            model.resetOutputModel(model);
                         }
                     }
 

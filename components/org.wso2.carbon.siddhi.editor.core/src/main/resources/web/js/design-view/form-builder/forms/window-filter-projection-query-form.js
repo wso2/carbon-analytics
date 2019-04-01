@@ -16,11 +16,9 @@
  * under the License.
  */
 
-define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert', 'queryOutputDelete',
-    'queryOutputUpdate', 'queryOutputUpdateOrInsertInto', 'queryWindowOrFunction', 'queryOrderByValue',
+define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryWindowOrFunction', 'queryOrderByValue',
     'streamHandler', 'designViewUtils', 'jsonValidator', 'constants', 'handlebar'],
-    function (require, log, $, _, QuerySelect, QueryOutputInsert, QueryOutputDelete, QueryOutputUpdate,
-        QueryOutputUpdateOrInsertInto, QueryWindowOrFunction, QueryOrderByValue, StreamHandler, DesignViewUtils,
+    function (require, log, $, _, QuerySelect, QueryWindowOrFunction, QueryOrderByValue, StreamHandler, DesignViewUtils,
         JSONValidator, Constants, Handlebars) {
 
         /**
@@ -71,6 +69,10 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
             if (self.formUtils.validateRequiredFields('.define-content')) {
                 isErrorOccurred = true;
             }
+
+            if (self.formUtils.validateQueryOutputSet()) {
+                isErrorOccurred = true;
+            }
             return isErrorOccurred;
         };
 
@@ -119,6 +121,15 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
                 var streamHandlerList = queryInput.getStreamHandlerList();
                 var annotationListObjects = queryObject.getAnnotationListObjects();
 
+                var partitionId;
+                var partitionElementWhereQueryIsSaved
+                    = self.configurationData.getSiddhiAppConfig().getPartitionWhereQueryIsSaved(id);
+                if (partitionElementWhereQueryIsSaved !== undefined) {
+                    partitionId = partitionElementWhereQueryIsSaved.getId();
+                }
+                var outputElement = self.configurationData.getSiddhiAppConfig()
+                    .getDefinitionElementByName(outputElementName, partitionId);
+
                 var predefinedAnnotations = _.cloneDeep(self.configurationData.application.config.
                     type_query_predefined_annotations);
                 var streamHandlerTypes = self.configurationData.application.config.stream_handler_types;
@@ -128,9 +139,9 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
                 var queryFormTemplate = Handlebars.compile($('#window-filter-projection-query-form-template').html())
                     ({ name: queryName, from: inputElementName });
                 $('#define-windowFilterProjection-query').html(queryFormTemplate);
-                self.formUtils.renderQueryOutput(outputElementName);
+                self.formUtils.renderQueryOutput(outputElement, queryOutput);
                 self.formUtils.renderOutputEventTypes();
-
+                self.formUtils.addEventListenerForQueryOutputDiv();
                 self.formUtils.addEventListenerToRemoveRequiredClass();
                 self.formUtils.addEventListenerToShowAndHideInfo();
                 self.formUtils.addEventListenerToShowInputContentOnHover();
@@ -166,13 +177,6 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
                 self.formUtils.renderOptionsForPredefinedAnnotations(predefinedAnnotations);
                 self.formUtils.addEventListenersForPredefinedAnnotations();
 
-                var partitionId;
-                var partitionElementWhereQueryIsSaved
-                    = self.configurationData.getSiddhiAppConfig().getPartitionWhereQueryIsSaved(id);
-                if (partitionElementWhereQueryIsSaved !== undefined) {
-                    partitionId = partitionElementWhereQueryIsSaved.getId();
-                }
-
                 var possibleAttributes = [];
                 var inputElement = self.configurationData.getSiddhiAppConfig()
                     .getDefinitionElementByName(inputElementName, partitionId);
@@ -185,8 +189,6 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
                     possibleAttributes.push(Constants.TRIGGERED_TIME);
                 }
 
-                var outputElement = self.configurationData.getSiddhiAppConfig()
-                    .getDefinitionElementByName(outputElementName, partitionId);
                 var outputAttributes = [];
                 if (outputElement.type.toLowerCase() === Constants.STREAM) {
                     var streamAttributes = outputElement.element.getAttributeList();
@@ -385,13 +387,7 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
                             queryInput.addStreamHandler(streamHandlerOption);
                         });
 
-                        var outputTarget = $('.query-into').val().trim()
-                        var outputConfig = {};
-                        _.set(outputConfig, 'eventType', $('#event-type').val());
-                        var outputObject = new QueryOutputInsert(outputConfig);
-                        queryOutput.setOutput(outputObject);
-                        queryOutput.setTarget(outputTarget);
-                        queryOutput.setType(Constants.INSERT);
+                        self.formUtils.buildQueryOutput(outputElement, queryOutput);
 
                         /**
                          * This is to change the icon of the query depending on the selected stream handlers
