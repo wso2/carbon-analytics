@@ -2790,6 +2790,7 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
          * @return {boolean} isErrorOccurred
          */
         FormUtils.prototype.validatePrimaryIndexAnnotations = function () {
+            var self = this;
             var isErrorOccurred = false;
             $('#primary-index-annotations .annotation').each(function () {
                 var annotationValues = [];
@@ -2800,7 +2801,7 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
                         }
                     });
                     if (annotationValues.length == 0) {
-                        $(this).find('.annotation-value:eq(0)').addClass('required-input-field');
+                        self.addErrorClass($(this).find('.annotation-value:eq(0)'));
                         $(this).find('.error-message:eq(0)').text("Minimum one value is required");
                         isErrorOccurred = true;
                         return false;
