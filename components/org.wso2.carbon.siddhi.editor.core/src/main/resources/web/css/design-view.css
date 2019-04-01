@@ -682,11 +682,17 @@ a.list-group-item, button.list-group-item {
 	background: #424242;
 }
 
+.design-view-form-content input:read-only {
+    line-height: 20px;
+    padding: 0 5px;
+}
+
 .design-view-form-content textarea {
 	min-height: 65px;
 }
 
 .design-view-form-content input[type="text"].name,
+.design-view-form-content input:read-only.name,
 .design-view-form-content textarea {
 	width: 85%
 }
@@ -768,7 +774,7 @@ a.list-group-item, button.list-group-item {
     background: #424242;
 }
 
-.design-view-form-content input[type="text"]:read-only,
+.design-view-form-content input:read-only,
 .design-view-form-content select:disabled {
 	cursor: not-allowed;
 	background: #1d1d1d;
@@ -1067,7 +1073,7 @@ a.list-group-item, button.list-group-item {
 
 .design-view-form-content .fw-info > span {
 	 font-family: Arial;
-	 background: #252525;
+	 background: rgb(37, 36, 36);
 	 width: 250px;
 	 color: #eee;
 	 text-align: left;
@@ -1076,6 +1082,19 @@ a.list-group-item, button.list-group-item {
 	 /* Position the tooltip */
 	 position: absolute;
 	 z-index: 1;
+}
+
+.design-view-form-content .hovered-content {
+    font-family: Arial;
+    background: rgb(37, 36, 36);
+    color: #eee;
+    text-align: left;
+    border-radius: 6px;
+    padding: 3px;
+    word-break: break-all;
+    position: absolute;
+    min-width: 250px;
+    max-width: 500px;
 }
 
 .design-view-form-content .btn-default {

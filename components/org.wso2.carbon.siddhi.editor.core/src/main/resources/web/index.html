@@ -1290,7 +1290,7 @@
                             {{#ifId ../id "sink"}}
                                 <input type = "text" value = "{{key}}" class = "attr-key"/>
                             {{else}}
-                                <input type = "text" value = "{{key}}" class = "readonly-attr attr-key" readonly/>
+                                <input value = "{{key}}" class = "attr-key" readonly/>
                             {{/ifId}}
                             <input type = "text" value = "{{value}}" class = "attr-value"/>
                         {{else}}
@@ -1413,7 +1413,7 @@
         <div class="partition-key">
             <div class="clearfix">
                 <div class="partition-expression"> {{> renderDropDown streamAttributes}} </div>
-                <div class="partition-stream-name"> <input type="text" class="partition-by-stream-name" value="{{streamName}}" readonly> </div>
+                <div class="partition-stream-name"> <input class="partition-by-stream-name" value="{{streamName}}" readonly> </div>
             </div>
             <label class="error-message"></label>
         </div>
@@ -1466,7 +1466,7 @@
                 <div class="clearfix">
                     <div class="clearfix">
                         <input type="text" class = "attribute-expression" value="{{expression}}">
-                        <input type="text" class = "attribute-as" value="{{as}}" readonly>
+                        <input class = "attribute-as" value="{{as}}" readonly>
                     </div>
                     <label class = "error-message"></label>
                 </div>
@@ -1562,7 +1562,7 @@
             </div>
             <div id="aggregation-from-div" class="aggregation-info">
                 <label> From </label>
-                <input type="text" id="aggregation-from" class="clearfix name" value="{{from}}" readonly>
+                <input id="aggregation-from" class="clearfix name" value="{{from}}" readonly>
             </div>
             <div id="define-aggregate-annotations">
                 <h4> Annotations </h4>
@@ -1696,7 +1696,7 @@
     </div>
     <div class="define-query-into define-output-content">
         <label> Into </label>
-        <input type="text" class="clearfix name query-into" value="{{into}}" readonly>
+        <input class="clearfix name query-into" value="{{into}}" readonly>
     </div>
     <div class="define-output-events define-output-content"> </div>
 </script>
@@ -1860,7 +1860,7 @@
         </div>
         <div class="query-from-div">
             <label> From </label>
-            <input type="text" class="clearfix name query-from" value="{{from}}" readonly>
+            <input class="clearfix name query-from" value="{{from}}" readonly>
         </div>
         <div class="define-query-source define-source">
             <div class="define-stream-handler">

@@ -278,6 +278,7 @@ define(['require', 'log', 'jquery', 'lodash', 'aggregateByTimePeriod', 'querySel
 
                 self.formUtils.addEventListenerToRemoveRequiredClass();
                 self.formUtils.addEventListenerToShowAndHideInfo();
+                self.formUtils.addEventListenerToShowInputContentOnHover();
 
                 //createAnnotationObjects
                 annotationsWithKeys = self.formUtils.createObjectsForAnnotationsWithKeys(predefinedAggregationAnnotations);

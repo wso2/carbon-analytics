@@ -65,6 +65,7 @@ define(['log', 'jquery', 'lodash', 'attribute', 'storeAnnotation', 'handlebar', 
 
             self.formUtils.addEventListenerToRemoveRequiredClass();
             self.formUtils.addEventListenerToShowAndHideInfo();
+            self.formUtils.addEventListenerToShowInputContentOnHover();
 
             var predefinedStores = _.orderBy(_.cloneDeep(this.configurationData.rawExtensions["store"]),
                 ['name'], ['asc']);

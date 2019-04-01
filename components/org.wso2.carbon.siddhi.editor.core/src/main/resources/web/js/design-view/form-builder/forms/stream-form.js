@@ -60,6 +60,7 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'jsonValidator', 'con
             self.toggleViewButton.addClass('disableContainer');
 
             self.formUtils.addEventListenerToRemoveRequiredClass();
+            self.formUtils.addEventListenerToShowInputContentOnHover();
 
             var annotations = [];
             var predefinedAnnotationList = _.cloneDeep(self.configurationData.application.config.

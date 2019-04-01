@@ -3054,6 +3054,28 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
         };
 
         /**
+         * @function to show the input field content on hover
+         */
+        FormUtils.prototype.addEventListenerToShowInputContentOnHover = function () {
+            var divToShowInputContent = '<div class="hovered-content" style="display: none"> </div>';
+            $('.design-view-form-content').on('mouseover', 'input[type="text"]', function () {
+                if (!$(this).next().hasClass('hovered-content')) {
+                    $(this).after(divToShowInputContent);
+                }
+                if ($(this).val().trim() != "") {
+                    $(this).next('.hovered-content').html($(this).val());
+                    $(this).next('.hovered-content').show();
+                }
+            });
+            $('.design-view-form-content').on('mouseout', 'input[type="text"]', function () {
+                $(this).next('.hovered-content').hide();
+            });
+            $('.design-view-form-content').on('focus', 'input[type="text"]', function () {
+                $(this).next('.hovered-content').hide();
+            });
+        };
+
+        /**
          * @function to add event listeners for sort window type parameters
          */
         FormUtils.prototype.addEventListenerForSortWindow = function (selectedType) {
