@@ -43,7 +43,10 @@ import java.util.Map;
 @Extension(
         name = "isLeader",
         namespace = "coordination",
-        description = "This extension returns true if this node is the leader node in the cluster. False otherwise.",
+        description = "This extension returns true if this node is the leader node in the cluster. " +
+                "False otherwise. \nIn case the leader in the cluster could not be determined (e.g. due to " +
+                "cluster-DB connection issue), false is returned.\nIn a non-clustered environment, " +
+                "this extension always returns true",
         returnAttributes = @ReturnAttribute(
                 description = "This returns true if this node is the leader node in the cluster. False otherwise.",
                 type = {DataType.BOOL}),
