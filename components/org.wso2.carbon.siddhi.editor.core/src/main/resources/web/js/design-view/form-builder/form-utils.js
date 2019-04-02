@@ -2523,10 +2523,21 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
          */
         FormUtils.prototype.mapUserGroupBy = function (attributes) {
             var i = 0;
+            var found;
             $('.group-by-attributes li').each(function () {
+                found = false;
                 $(this).find('.group-by-selection option').filter(function () {
-                    return ($(this).val() == (attributes[i]));
+                    var currentOption = $(this).val();
+                    if (currentOption == attributes[i]) {
+                        found = true;
+                        return ($(this).val() == (attributes[i]));
+                    }
                 }).prop('selected', true);
+                if (!found) {
+                    $(this).find('.group-by-selection option').filter(function () {
+                        return ($(this).val().includes(attributes[i]));
+                    }).prop('selected', true);;
+                }
                 i++;
             });
         };
