@@ -62,7 +62,7 @@ define(['require', 'lodash','jquery', 'log', 'backbone', 'file_browser', 'worksp
                         "<div class='modal-content'>" +
                         "<div class='modal-header'>" +
                         "<button type='button' class='close' data-dismiss='modal' aria-label='Close'>" +
-                        "<span aria-hidden='true'>&times;</span>" +
+                        "<i class='fw fw-cancel  about-dialog-close'> </i>" +
                         "</button>" +
                         "<h4 class='modal-title file-dialog-title'>Open File</h4>" +
                         "<hr class='style1'>"+

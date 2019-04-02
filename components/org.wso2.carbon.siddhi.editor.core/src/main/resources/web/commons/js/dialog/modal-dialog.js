@@ -99,8 +99,9 @@ define(['require', 'jquery', 'event_channel', 'bootstrap'], function (require, $
         var modalContent = $("<div class='modal-content'></div>");
         var modalHeader = $("<div class='modal-header'></div>");
         var modalCloseBtnTop = $("<button type='button' class='close' data-dismiss='modal' aria-label='Close'>" +
-            "<span aria-hidden='true'>&times;</span></button>");
-        var modalTitle = $("<h4 class='modal-title '></h4>");
+            "<i class='fw fw-cancel  about-dialog-close'> </i></button>");
+        var modalTitle = $("<h4 class='modal-title file-dialog-title'></h4>");
+        var modalSeparator = $("<hr class='style1'>");
         var modalBody = $("<div class='modal-body'></div>");
         var modalFooter = $("<div class='modal-footer'></div>");
         var modalCloseBtnBottom = $("<button type='button' class='btn btn-default btn-file-dialog'" +
@@ -122,6 +123,7 @@ define(['require', 'jquery', 'event_channel', 'bootstrap'], function (require, $
         modalContent.append(modalHeader);
         modalHeader.append(modalCloseBtnTop);
         modalHeader.append(modalTitle);
+        modalHeader.append(modalSeparator);
         modalContent.append(modalBody);
         modalContent.append(errorContainer);
         errorContainer.hide();
