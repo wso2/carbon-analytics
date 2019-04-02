@@ -1115,12 +1115,14 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
             var isErrorOccurred = false;
             $(className).each(function () {
                 var checkBox = $(this).find('input:checkbox');
-                if (checkBox.length == 0 || (checkBox.length > 0 && checkBox.is(":checked"))) {
+                if ((checkBox.length == 0 || (checkBox.length > 0 && checkBox.is(":checked")))) {
                     var inputValue = $(this).find('input:text');
-                    if (inputValue.val().trim() == "") {
-                        self.addErrorClass(inputValue);
-                        $(className).find('.error-message').text('Value is required');
-                        isErrorOccurred = true;
+                    if (inputValue.is("visible")) {
+                        if (inputValue.val().trim() == "") {
+                            self.addErrorClass(inputValue);
+                            $(className).find('.error-message').text('Value is required');
+                            isErrorOccurred = true;
+                        }
                     }
                 }
             });
@@ -3288,7 +3290,6 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
         FormUtils.prototype.addAutoCompleteForOutputOperation = function (outputAttributesWithStreamName, inputAttributes) {
             var self = this;
             var outputOperationMatches = outputAttributesWithStreamName.concat(inputAttributes);
-            console.log(outputOperationMatches)
             self.createAutocomplete($('.define-query-operation input[type="text"]'), outputOperationMatches);
         };
 
