@@ -17,6 +17,7 @@
  */
 package org.wso2.carbon.analytics.auth.rest.api.impl;
 
+import com.google.gson.Gson;
 import org.osgi.framework.BundleContext;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Deactivate;
@@ -85,8 +86,13 @@ public class LoginApiServiceImpl extends LoginApiService {
     }
 
     @Override
-    public Response loginAppNamePost(String appName, String username, String password, String grantType,
-                                     Boolean rememberMe, String appId, Request request) throws NotFoundException {
+    public Response loginAppNamePost(String appName
+            , String username
+            , String password
+            , String grantType
+            , Boolean rememberMe
+            , String appId
+            , Request request) throws NotFoundException {
         try {
             if (rememberMe == null) {
                 rememberMe = false;
@@ -99,7 +105,7 @@ public class LoginApiServiceImpl extends LoginApiService {
             RedirectionDTO redirectionDTO;
 
             String trimmedAppName = appName.split("/\\|?")[0];
-            String appContext = trimmedAppName;
+            String appContext = "/" + trimmedAppName;
             idPClientProperties.put(IdPClientConstants.APP_NAME, trimmedAppName);
             idPClientProperties.put(IdPClientConstants.GRANT_TYPE, grantType);
             idPClientProperties.put(IdPClientConstants.REMEMBER_ME, rememberMe.toString());
@@ -213,9 +219,7 @@ public class LoginApiServiceImpl extends LoginApiService {
                     redirectionDTO.setClientId(loginResponse.get(ExternalIdPClientConstants.CLIENT_ID));
                     redirectionDTO.setCallbackUrl(loginResponse.get(ExternalIdPClientConstants.CALLBACK_URL_NAME));
                     redirectionDTO.setRedirectUrl(loginResponse.get(ExternalIdPClientConstants.REDIRECT_URL));
-                    return Response.status(Response.Status.FOUND)
-
-                            .entity(redirectionDTO).build();
+                    return Response.status(Response.Status.FOUND).entity(redirectionDTO).build();
                 default:
                     if (LOG.isDebugEnabled()) {
                         LOG.debug("Error in login to the uri '{}'.", removeCRLFCharacters(appName));
@@ -296,8 +300,7 @@ public class LoginApiServiceImpl extends LoginApiService {
                         String refTokenPart2 = refreshToken.substring(refreshToken.length() / 2);
                         userDTO.setlID(refTokenPart1);
                         NewCookie userAuthenticate = AuthUtil.cookieBuilder(AuthRESTAPIConstants.WSO2_SP_USER_DTO,
-                                userDTO.toStringify(),
-                                appContext, true, false, -1);
+                                new Gson().toJson(userDTO), appContext, true, false, -1);
                         loginContextRefreshTokenCookie = AuthUtil
                                 .cookieBuilder(AuthRESTAPIConstants.WSO2_SP_REFRESH_TOKEN, refTokenPart2,
                                         AuthRESTAPIConstants.LOGIN_CONTEXT + appContext, true, true,
@@ -365,21 +368,23 @@ public class LoginApiServiceImpl extends LoginApiService {
     }
 
     @Override
-    public Response isSSOEnabled() {
+    public Response getAuthType() {
         try {
-            AuthConfigurations authConfigurations = DataHolder.getInstance().getConfigProvider().getConfigurationObject
-                    (AuthConfigurations.class);
-            return Response.status(Response.Status.OK).entity(authConfigurations.isSsoEnabled()).build();
-        } catch (ConfigurationException errorMsg) {
-            String error = "Error occurred while reading configs from deployment.yaml. " + errorMsg.getMessage();
+            AuthConfigurations authConfigurations = DataHolder.getInstance()
+                    .getConfigProvider()
+                    .getConfigurationObject(AuthConfigurations.class);
+            Map<String, String> responseMap = new HashMap<>();
+            responseMap.put("authType", authConfigurations.isSsoEnabled() ? "sso" : "default");
+            return Response.ok().entity(responseMap).build();
+        } catch (ConfigurationException e) {
             ErrorDTO errorDTO = new ErrorDTO();
             errorDTO.setError(IdPClientConstants.Error.INTERNAL_SERVER_ERROR);
-            errorDTO.setDescription(error);
-            return Response.status(Response.Status.BAD_REQUEST).entity(errorDTO).build();
+            errorDTO.setDescription("Error occurred while reading configs from deployment.yaml. " + e.getMessage());
+            return Response.status(Response.Status.BAD_REQUEST)
+                    .entity(errorDTO)
+                    .build();
         }
-
-    }
-
+     }
 
     private static String removeCRLFCharacters(String str) {
         if (str != null) {

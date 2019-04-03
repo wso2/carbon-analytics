@@ -148,18 +148,6 @@ public class UserDTO {
         return sb.toString();
     }
 
-    public String toStringify() {
-        StringBuilder sb = new StringBuilder();
-        sb.append("{");
-        sb.append("\"username\":\"").append(authUser).append("\",");
-        sb.append("\"PID\":\"").append(pID).append("\",");
-        sb.append("\"LID\":\"").append(lID).append("\",");
-        sb.append("\"validity\":").append(validityPeriod).append(",");
-        sb.append("\"expires\":\"").append(System.currentTimeMillis() % 1000 + validityPeriod).append("\"");
-        sb.append("}");
-        return sb.toString();
-    }
-
     /**
      * Convert the given object to string with each line indented by 4 spaces (except the first line).
      */
@@ -170,4 +158,3 @@ public class UserDTO {
         return o.toString().replace("\n", "\n    ");
     }
 }
-

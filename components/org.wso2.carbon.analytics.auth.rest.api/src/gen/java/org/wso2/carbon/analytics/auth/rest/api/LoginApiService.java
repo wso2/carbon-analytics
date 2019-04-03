@@ -36,5 +36,5 @@ public abstract class LoginApiService {
     public abstract Response loginCallbackAppNameGet(String appName, String authentication
             , Request request) throws NotFoundException;
 
-    public abstract Response isSSOEnabled();
+    public abstract Response getAuthType();
 }

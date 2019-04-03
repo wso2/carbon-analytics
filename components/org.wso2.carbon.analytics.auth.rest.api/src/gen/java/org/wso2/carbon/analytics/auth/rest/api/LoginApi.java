@@ -119,7 +119,7 @@ public class LoginApi implements Microservice {
 
             @io.swagger.annotations.ApiResponse(code = 500, message = "An unexpected error occurred.",
                     response = UserDTO.class)})
-    public Response loginAppNamePost() {
-        return delegate.isSSOEnabled();
+    public Response getAuthType() {
+        return delegate.getAuthType();
     }
 }
