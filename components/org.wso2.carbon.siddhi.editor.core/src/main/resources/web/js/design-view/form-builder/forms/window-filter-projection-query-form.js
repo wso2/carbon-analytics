@@ -284,7 +284,7 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryWindowOrFunct
                 $('.define-stream-handler').on('click', '.btn-add-filter', function () {
                     var sourceDiv = self.formUtils.getSourceDiv($(this));
                     self.formUtils.addNewStreamHandler(sourceDiv, Constants.FILTER);
-                    addAutoCompletionForFilter(self, QUERY_CONDITION_SYNTAX, possibleAttributes);
+                    addAutoCompletionForFilter(self, QUERY_CONDITION_SYNTAX, possibleAttributes, outputAttributes);
                 });
 
                 //to add query operation set
