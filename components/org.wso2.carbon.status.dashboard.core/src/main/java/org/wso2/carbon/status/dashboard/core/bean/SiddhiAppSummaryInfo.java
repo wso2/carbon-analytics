@@ -100,7 +100,7 @@ public class SiddhiAppSummaryInfo {
     }
 
     public void setStatEnabled(Level statEnabled) {
-        isStatEnabled = siddhiStatEnableLevel.toString();
         siddhiStatEnableLevel = statEnabled;
+        isStatEnabled = siddhiStatEnableLevel.toString();
     }
 }
