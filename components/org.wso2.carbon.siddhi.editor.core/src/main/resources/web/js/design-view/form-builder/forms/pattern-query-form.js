@@ -215,7 +215,7 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOrderByValue'
                 });
 
                 var eventType = Constants.CURRENT_EVENTS;
-                if (queryOutput.output.eventType) {
+                if (queryOutput.output && queryOutput.output.eventType) {
                     eventType = queryOutput.output.eventType.toLowerCase();
                 }
                 $('.define-output-events').find('#event-type option').filter(function () {
