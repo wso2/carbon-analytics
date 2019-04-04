@@ -49,12 +49,12 @@ define(['log', 'jquery', 'lodash', 'output_console_list', 'workspace', 'service_
                         self.application.commandManager.dispatch(_.get(self._options, 'commandClearConsole.id'));
                     });
                     if (this.application.isRunningOnMacOS()) {
-                        this._closeConsoleBtn.attr("title", "Close Console (" + _.get(self._options,
+                        this._closeConsoleBtn.attr("title", "Close (" + _.get(self._options,
                             'command.shortcuts.mac.label') + ") ").tooltip();
                         this._openConsoleBtn.attr("title", "Open Console (" + _.get(self._options,
                             'command.shortcuts.mac.label') + ") ").tooltip();
                     } else {
-                        this._closeConsoleBtn.attr("title", "Close Console  (" + _.get(self._options,
+                        this._closeConsoleBtn.attr("title", "Close  (" + _.get(self._options,
                             'command.shortcuts.other.label') + ") ").tooltip();
                         this._openConsoleBtn.attr("title", "Open Console  (" + _.get(self._options,
                             'command.shortcuts.other.label') + ") ").tooltip();
