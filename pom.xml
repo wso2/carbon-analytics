@@ -1781,7 +1781,6 @@
         <common.collections4.version>4.1</common.collections4.version>
 
         <!--MSF4J related-->
-
         <msf4j.version>2.7.2</msf4j.version>
         <msf4j.import.version.range>[2.7.0, 3.0.0)</msf4j.import.version.range>
         <com.fasterxml.jackson.core.version>2.9.8</com.fasterxml.jackson.core.version>
