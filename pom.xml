@@ -27,7 +27,7 @@
     <groupId>org.wso2.carbon.analytics</groupId>
     <artifactId>org.wso2.carbon.analytics.parent</artifactId>
     <packaging>pom</packaging>
-    <version>2.0.504-SNAPSHOT</version>
+    <version>2.0.507-SNAPSHOT</version>
     <name>WSO2 Carbon Analytics - Parent</name>
     <modules>
         <module>components/org.wso2.carbon.stream.processor.common</module>
@@ -40,6 +40,7 @@
         <module>components/org.wso2.carbon.business.rules.templates.editor.core</module>
         <module>components/org.wso2.carbon.business.rules.core</module>
         <module>components/org.wso2.carbon.business.rules.web</module>
+        <module>components/org.wso2.carbon.sp.coordination.listener</module>
         <module>components/org.wso2.carbon.sp.metrics.core</module>
         <module>components/org.wso2.carbon.stream.processor.statistics</module>
         <module>components/org.wso2.carbon.status.dashboard.core</module>
@@ -61,6 +62,7 @@
         <module>features/org.wso2.carbon.business.rules.web.feature</module>
         <module>features/org.wso2.siddhi.feature</module>
         <module>features/org.wso2.carbon.sp.metrics.core.feature</module>
+        <module>features/org.wso2.carbon.sp.coordination.listener.feature</module>
         <module>features/org.wso2.carbon.stream.processor.statistics.feature</module>
         <module>features/org.wso2.carbon.status.dashboard.core.feature</module>
         <module>features/org.wso2.carbon.status.dashboard.web.feature</module>
@@ -1393,6 +1395,19 @@
                 <version>${carbon.analytics.version}</version>
                 <type>zip</type>
             </dependency>
+
+            <dependency>
+                <groupId>org.wso2.carbon.analytics</groupId>
+                <artifactId>org.wso2.carbon.sp.coordination.listener</artifactId>
+                <version>${carbon.analytics.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.wso2.carbon.analytics</groupId>
+                <artifactId>org.wso2.carbon.sp.coordination.listener.feature</artifactId>
+                <version>${carbon.analytics.version}</version>
+                <type>zip</type>
+            </dependency>
+
             <dependency>
                 <groupId>org.wso2.carbon.analytics</groupId>
                 <artifactId>org.wso2.carbon.status.dashboard.web.feature</artifactId>
@@ -1601,9 +1616,9 @@
     </dependencyManagement>
 
     <properties>
-        <carbon.analytics.version>2.0.504-SNAPSHOT</carbon.analytics.version>
-        <siddhi.version>4.4.10</siddhi.version>
-        <siddhi.bundle.version>4.4.10</siddhi.bundle.version>
+        <carbon.analytics.version>2.0.507-SNAPSHOT</carbon.analytics.version>
+        <siddhi.version>4.5.0</siddhi.version>
+        <siddhi.bundle.version>4.5.0</siddhi.bundle.version>
         <siddhi.version.range>[4.0.0, 5.0.0)</siddhi.version.range>
         <carbon.analytics-common.version>6.1.4</carbon.analytics-common.version>
         <carbon.analytics-common.version.range>[6.0.66, 6.2.0)</carbon.analytics-common.version.range>
@@ -1650,7 +1665,7 @@
         </equinox.simpleconfigurator.manipulator.version>
         <equinox.util.version>1.0.500.v20130404-1337</equinox.util.version>
         <org.eclipse.equinox.cm.version>1.1.0.v20131021-1936</org.eclipse.equinox.cm.version>
-        <org.snakeyaml.version>1.17</org.snakeyaml.version>
+        <org.snakeyaml.version>1.23</org.snakeyaml.version>
         <org.wso2.eclipse.osgi.version>3.4.0.v20140312-2051</org.wso2.eclipse.osgi.version>
         <junit.version>4.10</junit.version>
         <apache.commons.text.version>1.1</apache.commons.text.version>
@@ -1766,7 +1781,8 @@
         <common.collections4.version>4.1</common.collections4.version>
 
         <!--MSF4J related-->
-        <msf4j.version>2.7.1</msf4j.version>
+
+        <msf4j.version>2.7.2</msf4j.version>
         <msf4j.import.version.range>[2.7.0, 3.0.0)</msf4j.import.version.range>
         <com.fasterxml.jackson.core.version>2.9.8</com.fasterxml.jackson.core.version>
         <com.fasterxml.jackson.core.version.range>[2.9.0, 2.10.0)</com.fasterxml.jackson.core.version.range>

@@ -31,13 +31,20 @@ public class Edge {
     private NodeType parentType;
     private String childId;
     private NodeType childType;
+    private boolean fromFaultStream;
 
     public Edge(String id, String parentId, NodeType parentType, String childId, NodeType childType) {
+        this(id, parentId, parentType, childId, childType, false);
+    }
+
+    public Edge(String id, String parentId, NodeType parentType, String childId, NodeType childType,
+                boolean fromFaultStream) {
         this.id = id;
         this.parentId = parentId;
         this.parentType = parentType;
         this.childId = childId;
         this.childType = childType;
+        this.fromFaultStream = fromFaultStream;
     }
 
     public String getId() {
@@ -60,6 +67,14 @@ public class Edge {
         return childType;
     }
 
+    public boolean isFromFaultStream() {
+        return fromFaultStream;
+    }
+
+    public void setFromFaultStream(boolean fromFaultStream) {
+        this.fromFaultStream = fromFaultStream;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) {
@@ -69,7 +84,7 @@ public class Edge {
             return false;
         }
         Edge edge = (Edge) o;
-        return Objects.equals(id, edge.id);
+        return Objects.equals(id, edge.id) && Objects.equals(fromFaultStream, edge.fromFaultStream);
     }
 
     @Override

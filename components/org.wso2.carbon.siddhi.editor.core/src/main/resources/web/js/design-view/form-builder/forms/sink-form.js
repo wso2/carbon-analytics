@@ -160,6 +160,7 @@ define(['log', 'jquery', 'lodash', 'mapAnnotation', 'payloadOrAttribute', 'jsonV
 
                 self.formUtils.addEventListenerToRemoveRequiredClass();
                 self.formUtils.addEventListenerToShowAndHideInfo();
+                self.formUtils.addEventListenerToShowInputContentOnHover();
 
                 //declaration of variables
                 var currentSinkOptions = [];

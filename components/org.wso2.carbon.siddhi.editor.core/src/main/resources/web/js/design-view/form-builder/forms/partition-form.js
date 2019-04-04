@@ -132,6 +132,7 @@ define(['require', 'log', 'jquery', 'lodash', 'partitionWith', 'jsonValidator', 
                     });
 
                     self.formUtils.addEventListenerToRemoveRequiredClass();
+                    self.formUtils.addEventListenerToShowInputContentOnHover();
 
                     // 'Submit' button action
                     $(formContainer).on('click', '#btn-submit', function () {
@@ -141,14 +142,20 @@ define(['require', 'log', 'jquery', 'lodash', 'partitionWith', 'jsonValidator', 
 
                         var partitionKeys = [];
                         $('#partition-by-content .partition-key').each(function () {
-                            var expression = $(this).find('.partition-by-expression-selection').val();
-                            var streamName = $(this).find('.partition-by-stream-name').val().trim();
-                            var partitionKey = {
-                                expression: expression,
-                                streamName: streamName
-                            };
-                            partitionKeys.push(partitionKey);
-
+                            var expression = $(this).find('.partition-by-expression-selection');
+                            if (!expression.val()) {
+                                $(this).find('.error-message').text("Expression is required");
+                                self.formUtils.addErrorClass(expression);
+                                isErrorOccurred = true;
+                                return false;
+                            } else {
+                                var streamName = $(this).find('.partition-by-stream-name').val().trim();
+                                var partitionKey = {
+                                    expression: expression.val(),
+                                    streamName: streamName
+                                };
+                                partitionKeys.push(partitionKey);
+                            }
                         });
 
                         if (!isErrorOccurred) {

@@ -40,6 +40,7 @@ define(
                 this.parentType = options.parentType;
                 this.childId = options.childId;
                 this.childType = options.childType;
+                this.fromFaultStream = options.fromFaultStream;
             }
         };
 
@@ -63,6 +64,10 @@ define(
             return this.childType;
         };
 
+        Edge.prototype.isFromFaultStream = function() {
+            return this.fromFaultStream;
+        };
+
         Edge.prototype.setId = function (id) {
             this.id = id;
         };
@@ -81,6 +86,10 @@ define(
 
         Edge.prototype.setChildType = function (childType) {
             this.childType = childType;
+        };
+
+        Edge.prototype.setFromFaultStream = function(fromFaultStream) {
+            this.fromFaultStream = fromFaultStream;
         };
 
         return Edge;

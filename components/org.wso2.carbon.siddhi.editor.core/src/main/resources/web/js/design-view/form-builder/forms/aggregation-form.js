@@ -278,6 +278,7 @@ define(['require', 'log', 'jquery', 'lodash', 'aggregateByTimePeriod', 'querySel
 
                 self.formUtils.addEventListenerToRemoveRequiredClass();
                 self.formUtils.addEventListenerToShowAndHideInfo();
+                self.formUtils.addEventListenerToShowInputContentOnHover();
 
                 //createAnnotationObjects
                 annotationsWithKeys = self.formUtils.createObjectsForAnnotationsWithKeys(predefinedAggregationAnnotations);
@@ -287,7 +288,7 @@ define(['require', 'log', 'jquery', 'lodash', 'aggregateByTimePeriod', 'querySel
                 self.formUtils.mapPrimaryIndexAnnotationValues(annotationsWithoutKeys, annotationListObjects);
                 self.formUtils.mapPredefinedAnnotations(annotationListObjects, annotationsWithKeys);
                 var userDefinedAnnotations = self.formUtils.getUserAnnotations(annotationListObjects,
-                    predefinedAggregationAnnotations);
+                    annotationsWithKeys.concat(annotationsWithoutKeys));
 
                 self.formUtils.renderAnnotationTemplate("define-user-defined-annotations", userDefinedAnnotations);
                 $('.define-user-defined-annotations').find('label:first-child').html('Customized Annotations');

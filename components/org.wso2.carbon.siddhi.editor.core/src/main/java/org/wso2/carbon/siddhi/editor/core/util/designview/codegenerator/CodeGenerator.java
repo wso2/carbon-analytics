@@ -178,6 +178,10 @@ public class CodeGenerator {
         SourceSinkCodeGenerator sourceSinkCodeGenerator = new SourceSinkCodeGenerator();
         StreamCodeGenerator streamCodeGenerator = new StreamCodeGenerator();
         for (StreamConfig stream : streamList) {
+            // If the stream is a fault stream, do not generate the stream definition.
+            if (stream.isFaultStream()) {
+                continue;
+            }
             CodeGeneratorUtils.NullValidator.validateConfigObject(stream);
             if (stream.getPartitionId() != null && !stream.getPartitionId().isEmpty()) {
                 continue;

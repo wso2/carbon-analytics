@@ -189,7 +189,7 @@ define(['require', 'elementUtils'],
             this.annotationList = annotationList;
         };
 
-        Query.prototype.resetModel = function (model, disconnectedElementName) {
+        Query.prototype.resetInputModel = function (model, disconnectedElementName) {
             model.setSelect(undefined);
             var groupBy = model.getGroupBy();
             var orderBy = model.getOrderBy();
@@ -204,6 +204,20 @@ define(['require', 'elementUtils'],
                 model.setHaving(" ");
             }
             model.getQueryInput().resetModel(model.queryInput, disconnectedElementName);
+        };
+
+        Query.prototype.resetOutputModel = function (model) {
+            var queryOutput = model.getQueryOutput();
+            model.setSelect(undefined);
+            queryOutput.setTarget(undefined);
+            if (queryOutput.output) {
+                if (queryOutput.output.on) {
+                    queryOutput.getOutput().setOn("");
+                }
+                if (queryOutput.output.set && queryOutput.output.set.length != 0) {
+                    queryOutput.getOutput().setSet([{attribute: "", value: ""}]);
+                }
+            }
         };
 
         return Query;
