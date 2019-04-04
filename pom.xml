@@ -50,6 +50,7 @@
         <module>components/org.wso2.carbon.permissions.rest.api</module>
         <module>components/org.wso2.carbon.data.provider</module>
         <module>components/org.wso2.carbon.analytics.msf4j.interceptor.common</module>
+        <module>components/org.wso2.carbon.health.check.core</module>
 
         <module>features/org.wso2.carbon.stream.processor.core.feature</module>
         <module>features/org.wso2.carbon.stream.processor.common.feature</module>
@@ -71,6 +72,7 @@
         <module>features/org.wso2.carbon.permissions.rest.api.feature</module>
         <module>features/org.wso2.carbon.data.provider.feature</module>
         <module>features/org.wso2.carbon.analytics.msf4j.interceptor.common.feature</module>
+        <module>features/org.wso2.carbon.health.check.core.feature</module>
 
         <module>components/distribution</module>
         <module>components/osgi-tests</module>
@@ -902,6 +904,17 @@
                 <version>${carbon.analytics.version}</version>
                 <type>zip</type>
             </dependency>
+            <dependency>
+                <groupId>org.wso2.carbon.analytics</groupId>
+                <artifactId>org.wso2.carbon.health.check.core</artifactId>
+                <version>${carbon.analytics.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.wso2.carbon.analytics</groupId>
+                <artifactId>org.wso2.carbon.health.check.core.feature</artifactId>
+                <version>${carbon.analytics.version}</version>
+                <type>zip</type>
+            </dependency>
 
             <!-- Siddhi Editor related -->
             <dependency>
@@ -1638,7 +1651,7 @@
         <maven.bundle.plugin.version>2.5.4</maven.bundle.plugin.version>
         <build.helper.maven.plugin.version>1.9.1</build.helper.maven.plugin.version>
         <maven.findbugsplugin.version.exclude>findbugs-exclude.xml</maven.findbugsplugin.version.exclude>
-
+        <maven.build.helper.plugin.version>1.9.1</maven.build.helper.plugin.version>
         <carbon.p2.plugin.version>1.5.4</carbon.p2.plugin.version>
         <carbon.feature.plugin.version>3.1.3</carbon.feature.plugin.version>
 
