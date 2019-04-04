@@ -297,6 +297,14 @@
             <artifactId>org.wso2.carbon.data.provider.feature</artifactId>
             <type>zip</type>
         </dependency>
+
+        <!-- Heakth Check API -->
+        <dependency>
+            <groupId>org.wso2.carbon.analytics</groupId>
+            <artifactId>org.wso2.carbon.health.check.core.feature</artifactId>
+            <type>zip</type>
+        </dependency>
+
     </dependencies>
 
     <build>
@@ -612,6 +620,12 @@
                                     <id>org.wso2.carbon.data.provider.feature</id>
                                     <version>${carbon.analytics.version}</version>
                                 </feature>
+
+                                <!-- Heath Check API -->
+                                <feature>
+                                    <id>org.wso2.carbon.health.check.core.feature</id>
+                                    <version>${carbon.analytics.version}</version>
+                                </feature>
                             </features>
                         </configuration>
                     </execution>
@@ -852,6 +866,12 @@
                                     <id>org.wso2.carbon.sp.distributed.resource.core.feature.group</id>
                                     <version>${carbon.analytics.version}</version>
                                 </feature>
+
+                                <!-- Heath Check API -->
+                                <feature>
+                                    <id>org.wso2.carbon.health.check.core.feature</id>
+                                    <version>${carbon.analytics.version}</version>
+                                </feature>
                             </features>
                         </configuration>
                     </execution>
@@ -1009,6 +1029,12 @@
                                 <feature>
                                     <id>org.wso2.carbon.cluster.coordinator.rdbms.feature.group</id>
                                     <version>${carbon.coordination.version}</version>
+                                </feature>
+
+                                <!-- Heath Check API -->
+                                <feature>
+                                    <id>org.wso2.carbon.health.check.core.feature</id>
+                                    <version>${carbon.analytics.version}</version>
                                 </feature>
                             </features>
                         </configuration>
@@ -1351,6 +1377,12 @@
                                 <!-- Data Provider feature -->
                                 <feature>
                                     <id>org.wso2.carbon.data.provider.feature</id>
+                                    <version>${carbon.analytics.version}</version>
+                                </feature>
+
+                                <!-- Heath Check API -->
+                                <feature>
+                                    <id>org.wso2.carbon.health.check.core.feature</id>
                                     <version>${carbon.analytics.version}</version>
                                 </feature>
                             </features>
