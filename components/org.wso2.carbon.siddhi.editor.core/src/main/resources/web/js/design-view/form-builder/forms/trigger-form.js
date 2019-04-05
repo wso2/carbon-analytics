@@ -111,7 +111,7 @@ define(['require', 'log', 'jquery', 'lodash', 'constants'],
          */
         var showTriggerCriteriaDescription = function (triggerObject, selectedCriteria) {
             var triggerCriteriaObject = getTriggerCriteria(triggerObject, selectedCriteria);
-            $('#define-trigger-criteria .criteria-description').text(triggerCriteriaObject.description);
+            $('#define-trigger-criteria .fw-info span').text(triggerCriteriaObject.description);
         };
 
         /**
