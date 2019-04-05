@@ -92,17 +92,17 @@ define(['require', 'lodash', 'jquery', 'log', 'file_browser'],
                 "</div>" +
                 "<div class='form-group'>" +
                 "<div class='file-dialog-form-new-sever-container'>" +
-                "<input class='add-new-server-input' id='new_host' placeholder='Host'>" +
-                "<div class='file-dialog-form-new-sever-container-toggle-divider'/>" +
-                "<input class='add-new-server-input' id='new_port' placeholder='Port'>" +
-                "<div class='file-dialog-form-new-sever-container-toggle-divider'/>" +
-                "<input class='add-new-server-input' id='new_user_name' placeholder='User Name'>" +
-                "<div class='file-dialog-form-new-sever-container-toggle-divider'/>" +
-                "<input class='file-dialog-form-toggle-password' id='new_password' placeholder='Password' " +
-                "type='password'>" +
-                "<div class='file-dialog-form-new-sever-container-toggle-divider'/>" +
-                "<button id='addNew' type='button' class='add-new-button'>Add" +
-                "</button>" +
+                "<div class='clearfix'>" +
+                "<div class='server-property'> <label class='clearfix'> Host </label> <input class='add-new-server-input'" +
+                " id='new_host' placeholder='localhost'> </div>" +
+                "<div class='server-property'> <label class='clearfix'> Port </label> <input class='add-new-server-input'" +
+                " id='new_port' placeholder='9390'> </div>" +
+                "<div class='server-property'> <label class='clearfix'> User Name </label> <input " +
+                "class='add-new-server-input' id='new_user_name' placeholder='admin'> </div>" +
+                "<div class='server-property'> <label class='clearfix'> Password </label> <input " +
+                "class='file-dialog-form-toggle-password' id='new_password' placeholder='admin' type='password'> </div>" +
+                "</div>" +
+                "<button id='addNew' type='button' class='add-new-button'>Add </button>" +
                 "<div class='alert-container' id='alert-container'>" +
                 "</div>" +
                 "</div>" +
