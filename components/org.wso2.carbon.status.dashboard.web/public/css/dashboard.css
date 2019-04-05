@@ -124,6 +124,11 @@ body {
     opacity: 1;
 }
 
+.container:hover .overlay h3 span,
+.container:hover .overlay h4 span{
+    color: #696969;
+}
+
 .info-card {
     background-color: #2f96b4 !important;
     width: 40%;

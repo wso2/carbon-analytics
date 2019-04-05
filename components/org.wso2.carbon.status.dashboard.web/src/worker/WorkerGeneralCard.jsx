@@ -44,7 +44,7 @@ export default class WorkerGeneralCard extends React.Component {
             haDetails: [],
             workerID: this.props.id,
             isApiCalled: false,
-            cardHeight: 660
+            cardHeight: 720
         };
         this.getSnapshotTime = this.getSnapshotTime.bind(this);
         this.getSyncTime = this.getSyncTime.bind(this);
@@ -138,7 +138,7 @@ export default class WorkerGeneralCard extends React.Component {
         if (!this.state.isApiCalled) {
             return (
                 <div style={{paddingLeft: 24, width: '30%', float: 'left', boxSizing: 'border-box'}}>
-                    <Card style={{height: 660}}>
+                    <Card style={{height: 720}}>
                         <CardTitle title={<FormattedMessage id='workerGeneral.serverDetails' defaultMessage='Server General Details' />} />
                         <Divider/>
                         <CardText style={{textAlign: 'left'}}>

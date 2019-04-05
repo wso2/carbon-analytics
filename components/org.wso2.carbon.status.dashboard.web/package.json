@@ -45,7 +45,7 @@
     "react-table": "^6.6.0",
     "react-tippy": "^1.2.2",
     "react-tooltip": "^3.3.0",
-    "react-vizgrammar": "^0.6.20",
+    "react-vizgrammar": "^0.8.6",
     "rimraf": "^2.6.3",
     "style-loader": "^0.18.2",
     "topojson-client": "^3.0.0",

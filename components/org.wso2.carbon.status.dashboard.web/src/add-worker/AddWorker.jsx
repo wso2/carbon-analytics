@@ -449,7 +449,8 @@ class AddWorker extends React.Component {
                                 <FormattedMessage id='overview' defaultMessage='Overview >' />
                             </Button>
                         </Link>
-                        <Typography style={styles.navBtnActive}><FormattedMessage id='addworker.addNew' defaultMessage='Add New' />/></Typography>
+                        <Typography style={styles.navBtnActive}>
+                            <FormattedMessage id='addworker.addNew' defaultMessage='Add New' /></Typography>
                     </div>
                     <MuiThemeProvider muiTheme={muiTheme}>
                         <div className="addWorker-container">
