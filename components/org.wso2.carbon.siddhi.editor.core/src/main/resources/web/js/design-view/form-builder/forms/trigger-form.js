@@ -61,7 +61,7 @@ define(['require', 'log', 'jquery', 'lodash', 'constants'],
                 $('#trigger-criteria-content').html('');
             } else {
                 //render a text-box to put the atEvery or cron-expression value
-                $('#trigger-criteria-content').html('<input type="text" class="clearfix"> ' +
+                $('#trigger-criteria-content').html('<input type="text" class="clearfix name"> ' +
                     '<label class="error-message" > </label>');
             }
         };
