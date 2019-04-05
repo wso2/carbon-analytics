@@ -426,7 +426,7 @@ define(['require', 'log', 'jquery', 'lodash', 'aggregateByTimePeriod', 'querySel
                 }
 
                 //create autocompletion
-                var selectExpressionMatches = JSON.parse(JSON.stringify(possibleAttributes));
+                var selectExpressionMatches = _.cloneDeep(possibleAttributes);
                 selectExpressionMatches = selectExpressionMatches.concat(incrementalAggregator);
                 selectExpressionMatches = selectExpressionMatches.concat(streamFunctions)
                 selectExpressionMatches.push(Constants.AS);
