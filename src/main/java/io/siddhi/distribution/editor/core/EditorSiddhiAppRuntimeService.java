@@ -19,10 +19,10 @@
 
 package io.siddhi.distribution.editor.core;
 
+import io.siddhi.core.SiddhiAppRuntime;
 import io.siddhi.distribution.common.common.SiddhiAppRuntimeService;
 import io.siddhi.distribution.editor.core.internal.DebugRuntime;
 import io.siddhi.distribution.editor.core.internal.EditorDataHolder;
-import org.wso2.siddhi.core.SiddhiAppRuntime;
 
 import java.util.HashMap;
 import java.util.Map;

@@ -22,8 +22,8 @@ import io.siddhi.distribution.editor.core.util.designview.beans.configs.siddhiel
 import io.siddhi.distribution.editor.core.util.designview.constants.SiddhiCodeBuilderConstants;
 import io.siddhi.distribution.editor.core.util.designview.exceptions.DesignGenerationException;
 import io.siddhi.distribution.editor.core.util.designview.utilities.ConfigBuildingUtilities;
-import org.wso2.siddhi.query.api.definition.StreamDefinition;
-import org.wso2.siddhi.query.api.definition.TriggerDefinition;
+import io.siddhi.query.api.definition.StreamDefinition;
+import io.siddhi.query.api.definition.TriggerDefinition;
 
 import java.util.Map;
 

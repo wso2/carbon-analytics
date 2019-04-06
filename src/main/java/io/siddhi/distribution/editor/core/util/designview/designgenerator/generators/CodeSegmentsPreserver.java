@@ -20,7 +20,7 @@ package io.siddhi.distribution.editor.core.util.designview.designgenerator.gener
 
 import io.siddhi.distribution.editor.core.util.designview.beans.configs.ElementCodeSegment;
 import io.siddhi.distribution.editor.core.util.designview.beans.configs.siddhielements.SiddhiElementConfig;
-import org.wso2.siddhi.query.api.SiddhiElement;
+import io.siddhi.query.api.SiddhiElement;
 
 import java.util.HashSet;
 import java.util.Set;

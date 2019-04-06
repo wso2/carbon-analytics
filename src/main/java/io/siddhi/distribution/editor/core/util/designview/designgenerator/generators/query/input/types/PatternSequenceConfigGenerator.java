@@ -31,8 +31,8 @@ import io.siddhi.distribution.editor.core.util.designview.designgenerator.genera
 import io.siddhi.distribution.editor.core.util.designview.designgenerator.generators.query.input.types.patternsequencesupporters.StateElementConfig;
 import io.siddhi.distribution.editor.core.util.designview.designgenerator.generators.query.input.types.patternsequencesupporters.StreamStateElementConfig;
 import io.siddhi.distribution.editor.core.util.designview.exceptions.DesignGenerationException;
-import org.wso2.siddhi.query.api.execution.query.input.stream.InputStream;
-import org.wso2.siddhi.query.api.execution.query.input.stream.StateInputStream;
+import io.siddhi.query.api.execution.query.input.stream.InputStream;
+import io.siddhi.query.api.execution.query.input.stream.StateInputStream;
 
 import java.util.ArrayList;
 import java.util.Arrays;

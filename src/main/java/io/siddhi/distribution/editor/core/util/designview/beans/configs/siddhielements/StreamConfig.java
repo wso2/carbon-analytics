@@ -18,7 +18,7 @@
 
 package io.siddhi.distribution.editor.core.util.designview.beans.configs.siddhielements;
 
-import org.wso2.siddhi.query.api.annotation.Annotation;
+import io.siddhi.query.api.annotation.Annotation;
 
 import java.util.List;
 import java.util.Map;

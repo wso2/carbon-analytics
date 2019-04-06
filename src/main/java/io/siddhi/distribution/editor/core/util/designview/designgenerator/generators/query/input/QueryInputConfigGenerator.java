@@ -24,11 +24,11 @@ import io.siddhi.distribution.editor.core.util.designview.designgenerator.genera
 import io.siddhi.distribution.editor.core.util.designview.designgenerator.generators.query.input.types.PatternSequenceConfigGenerator;
 import io.siddhi.distribution.editor.core.util.designview.designgenerator.generators.query.input.types.WindowFilterProjectionConfigGenerator;
 import io.siddhi.distribution.editor.core.util.designview.exceptions.DesignGenerationException;
-import org.wso2.siddhi.query.api.SiddhiApp;
-import org.wso2.siddhi.query.api.execution.query.input.stream.InputStream;
-import org.wso2.siddhi.query.api.execution.query.input.stream.JoinInputStream;
-import org.wso2.siddhi.query.api.execution.query.input.stream.SingleInputStream;
-import org.wso2.siddhi.query.api.execution.query.input.stream.StateInputStream;
+import io.siddhi.query.api.SiddhiApp;
+import io.siddhi.query.api.execution.query.input.stream.InputStream;
+import io.siddhi.query.api.execution.query.input.stream.JoinInputStream;
+import io.siddhi.query.api.execution.query.input.stream.SingleInputStream;
+import io.siddhi.query.api.execution.query.input.stream.StateInputStream;
 
 /**
  * Generator to create QueryInputConfig from Siddhi elements.

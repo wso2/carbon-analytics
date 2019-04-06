@@ -4,7 +4,7 @@ var antlr4 = require('../../antlr4-js-runtime/index');
 
 var SiddhiQLListener = require('./SiddhiQLListener').SiddhiQLListener;
 
-//import org.wso2.siddhi.query.compiler.exception.SiddhiParserException;
+//import io.siddhi.query.compiler.exception.SiddhiParserException;
 
 var grammarFileName = "SiddhiQL.g4";
 

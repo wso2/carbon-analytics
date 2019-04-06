@@ -26,12 +26,12 @@ import io.siddhi.distribution.editor.core.util.designview.beans.configs.siddhiel
 import io.siddhi.distribution.editor.core.util.designview.constants.query.QueryOutputType;
 import io.siddhi.distribution.editor.core.util.designview.exceptions.DesignGenerationException;
 import io.siddhi.distribution.editor.core.util.designview.utilities.ConfigBuildingUtilities;
-import org.wso2.siddhi.query.api.execution.query.output.stream.DeleteStream;
-import org.wso2.siddhi.query.api.execution.query.output.stream.InsertIntoStream;
-import org.wso2.siddhi.query.api.execution.query.output.stream.OutputStream;
-import org.wso2.siddhi.query.api.execution.query.output.stream.UpdateOrInsertStream;
-import org.wso2.siddhi.query.api.execution.query.output.stream.UpdateSet;
-import org.wso2.siddhi.query.api.execution.query.output.stream.UpdateStream;
+import io.siddhi.query.api.execution.query.output.stream.DeleteStream;
+import io.siddhi.query.api.execution.query.output.stream.InsertIntoStream;
+import io.siddhi.query.api.execution.query.output.stream.OutputStream;
+import io.siddhi.query.api.execution.query.output.stream.UpdateOrInsertStream;
+import io.siddhi.query.api.execution.query.output.stream.UpdateSet;
+import io.siddhi.query.api.execution.query.output.stream.UpdateStream;
 
 import java.util.ArrayList;
 import java.util.List;

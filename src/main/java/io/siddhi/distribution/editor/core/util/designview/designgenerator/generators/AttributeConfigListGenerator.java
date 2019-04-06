@@ -19,7 +19,7 @@
 package io.siddhi.distribution.editor.core.util.designview.designgenerator.generators;
 
 import io.siddhi.distribution.editor.core.util.designview.beans.configs.siddhielements.AttributeConfig;
-import org.wso2.siddhi.query.api.definition.Attribute;
+import io.siddhi.query.api.definition.Attribute;
 
 import java.util.ArrayList;
 import java.util.List;

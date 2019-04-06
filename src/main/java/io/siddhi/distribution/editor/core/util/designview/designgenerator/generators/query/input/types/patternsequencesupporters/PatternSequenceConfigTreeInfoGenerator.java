@@ -21,15 +21,15 @@ package io.siddhi.distribution.editor.core.util.designview.designgenerator.gener
 import io.siddhi.distribution.editor.core.util.designview.designgenerator.generators.query.streamhandler.StreamHandlerConfigGenerator;
 import io.siddhi.distribution.editor.core.util.designview.exceptions.DesignGenerationException;
 import io.siddhi.distribution.editor.core.util.designview.utilities.ConfigBuildingUtilities;
-import org.wso2.siddhi.query.api.SiddhiElement;
-import org.wso2.siddhi.query.api.execution.query.input.state.AbsentStreamStateElement;
-import org.wso2.siddhi.query.api.execution.query.input.state.CountStateElement;
-import org.wso2.siddhi.query.api.execution.query.input.state.EveryStateElement;
-import org.wso2.siddhi.query.api.execution.query.input.state.LogicalStateElement;
-import org.wso2.siddhi.query.api.execution.query.input.state.NextStateElement;
-import org.wso2.siddhi.query.api.execution.query.input.state.StateElement;
-import org.wso2.siddhi.query.api.execution.query.input.state.StreamStateElement;
-import org.wso2.siddhi.query.api.execution.query.input.stream.BasicSingleInputStream;
+import io.siddhi.query.api.SiddhiElement;
+import io.siddhi.query.api.execution.query.input.state.AbsentStreamStateElement;
+import io.siddhi.query.api.execution.query.input.state.CountStateElement;
+import io.siddhi.query.api.execution.query.input.state.EveryStateElement;
+import io.siddhi.query.api.execution.query.input.state.LogicalStateElement;
+import io.siddhi.query.api.execution.query.input.state.NextStateElement;
+import io.siddhi.query.api.execution.query.input.state.StateElement;
+import io.siddhi.query.api.execution.query.input.state.StreamStateElement;
+import io.siddhi.query.api.execution.query.input.stream.BasicSingleInputStream;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -132,7 +132,8 @@ public class PatternSequenceConfigTreeInfoGenerator {
                 .setStreamHandlerList(
                         new StreamHandlerConfigGenerator(siddhiAppString)
                                 .generateStreamHandlerConfigList(basicSingleInputStream.getStreamHandlers()));
-        streamStateElementConfig.setWithin(generateNullableElementDefinition(streamStateElement.getWithin()));
+        //TODO mohan FIX Pattern
+        //streamStateElementConfig.setWithin(generateNullableElementDefinition(streamStateElement.getWithin()));
 
         addToAvailableStreamReferences(streamStateElement.getBasicSingleInputStream().getStreamReferenceId());
 
@@ -151,7 +152,8 @@ public class PatternSequenceConfigTreeInfoGenerator {
         CountStateElementConfig countStateElementConfig = new CountStateElementConfig();
         countStateElementConfig
                 .setStreamStateElement(generateStreamStateElementConfig(countStateElement.getStreamStateElement()));
-        countStateElementConfig.setWithin(generateNullableElementDefinition(countStateElement.getWithin()));
+        //TODO mohan FIX Pattern
+        //countStateElementConfig.setWithin(generateNullableElementDefinition(countStateElement.getWithin()));
         countStateElementConfig.setMin(countStateElement.getMinCount());
         countStateElementConfig.setMax(countStateElement.getMaxCount());
 
@@ -173,7 +175,8 @@ public class PatternSequenceConfigTreeInfoGenerator {
         logicalStateElementConfig.setType(logicalStateElement.getType().toString().toLowerCase());
         logicalStateElementConfig
                 .setStreamStateElement2(generateStreamStateElementConfig(logicalStateElement.getStreamStateElement2()));
-        logicalStateElementConfig.setWithin(generateNullableElementDefinition(logicalStateElement.getWithin()));
+        //TODO mohan FIX Pattern
+        //logicalStateElementConfig.setWithin(generateNullableElementDefinition(logicalStateElement.getWithin()));
 
         return logicalStateElementConfig;
     }
@@ -189,7 +192,8 @@ public class PatternSequenceConfigTreeInfoGenerator {
             throws DesignGenerationException {
         EveryStateElementConfig everyStateElementConfig = new EveryStateElementConfig();
         everyStateElementConfig.setStateElement(generateStateElementConfigTree(everyStateElement.getStateElement()));
-        everyStateElementConfig.setWithin(generateNullableElementDefinition(everyStateElement.getWithin()));
+        //TODO mohan FIX Pattern
+        //everyStateElementConfig.setWithin(generateNullableElementDefinition(everyStateElement.getWithin()));
 
         return everyStateElementConfig;
     }
@@ -207,7 +211,8 @@ public class PatternSequenceConfigTreeInfoGenerator {
         nextStateElementConfig.setStateElement(generateStateElementConfigTree(nextStateElement.getStateElement()));
         nextStateElementConfig.
                 setNextStateElement(generateStateElementConfigTree(nextStateElement.getNextStateElement()));
-        nextStateElementConfig.setWithin(generateNullableElementDefinition(nextStateElement.getWithin()));
+        //TODO FIX Pattern
+        //nextStateElementConfig.setWithin(generateNullableElementDefinition(nextStateElement.getWithin()));
 
         return nextStateElementConfig;
     }
@@ -230,8 +235,9 @@ public class PatternSequenceConfigTreeInfoGenerator {
                 .setStreamHandlerList(
                         new StreamHandlerConfigGenerator(siddhiAppString)
                                 .generateStreamHandlerConfigList(basicSingleInputStream.getStreamHandlers()));
-        absentStreamStateElementConfig.setWithin(
-                generateNullableElementDefinition(absentStreamStateElement.getWithin()));
+        //TODO mohan FIX Pattern
+//        absentStreamStateElementConfig.setWithin(
+//                generateNullableElementDefinition(absentStreamStateElement.getWithin()));
         absentStreamStateElementConfig
                 .setWaitingTime(generateNullableElementDefinition(absentStreamStateElement.getWaitingTime()));
 

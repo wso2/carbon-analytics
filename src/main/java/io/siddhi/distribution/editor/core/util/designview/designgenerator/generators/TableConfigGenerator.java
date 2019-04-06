@@ -21,8 +21,8 @@ package io.siddhi.distribution.editor.core.util.designview.designgenerator.gener
 import io.siddhi.distribution.editor.core.util.designview.beans.configs.siddhielements.StoreConfig;
 import io.siddhi.distribution.editor.core.util.designview.beans.configs.siddhielements.TableConfig;
 import io.siddhi.distribution.editor.core.util.designview.exceptions.DesignGenerationException;
-import org.wso2.siddhi.query.api.annotation.Annotation;
-import org.wso2.siddhi.query.api.definition.TableDefinition;
+import io.siddhi.query.api.annotation.Annotation;
+import io.siddhi.query.api.definition.TableDefinition;
 
 import java.util.ArrayList;
 import java.util.List;

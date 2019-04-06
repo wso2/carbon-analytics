@@ -22,7 +22,7 @@ import io.siddhi.distribution.editor.core.util.designview.beans.configs.siddhiel
 import io.siddhi.distribution.editor.core.util.designview.beans.configs.siddhielements.StreamConfig;
 import io.siddhi.distribution.editor.core.util.designview.beans.configs.siddhielements.query.QueryConfig;
 import io.siddhi.distribution.editor.core.util.designview.constants.query.QueryListType;
-import org.wso2.siddhi.query.api.annotation.Annotation;
+import io.siddhi.query.api.annotation.Annotation;
 
 import java.util.HashMap;
 import java.util.List;

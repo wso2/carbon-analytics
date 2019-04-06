@@ -18,8 +18,8 @@
 
 package io.siddhi.distribution.editor.core.util.designview.designgenerator.generators;
 
-import org.wso2.siddhi.query.api.annotation.Annotation;
-import org.wso2.siddhi.query.api.annotation.Element;
+import io.siddhi.query.api.annotation.Annotation;
+import io.siddhi.query.api.annotation.Element;
 
 import java.util.ArrayList;
 import java.util.List;

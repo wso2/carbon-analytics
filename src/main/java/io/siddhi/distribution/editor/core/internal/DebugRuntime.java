@@ -18,13 +18,13 @@
 
 package io.siddhi.distribution.editor.core.internal;
 
+import io.siddhi.core.SiddhiAppRuntime;
+import io.siddhi.core.debugger.SiddhiDebugger;
+import io.siddhi.core.stream.input.InputHandler;
 import io.siddhi.distribution.editor.core.exception.InvalidExecutionStateException;
 import io.siddhi.distribution.editor.core.exception.NoSuchStreamException;
 import io.siddhi.distribution.editor.core.util.DebugCallbackEvent;
-import org.wso2.siddhi.core.SiddhiAppRuntime;
-import org.wso2.siddhi.core.debugger.SiddhiDebugger;
-import org.wso2.siddhi.core.stream.input.InputHandler;
-import org.wso2.siddhi.query.api.definition.Attribute;
+import io.siddhi.query.api.definition.Attribute;
 
 import java.util.ArrayList;
 import java.util.Arrays;

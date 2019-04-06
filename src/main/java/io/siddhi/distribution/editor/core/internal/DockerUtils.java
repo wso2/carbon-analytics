@@ -62,7 +62,7 @@ public class DockerUtils {
     /**
      * Create a zip archive.
      *
-     * @param profile Siddhi profile name
+     * @param profile     Siddhi profile name
      * @param siddhiFiles List of Siddhi siddhiFiles
      * @return Zip archive file
      * @throws DockerGenerationException if docker generation fails

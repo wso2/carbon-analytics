@@ -19,8 +19,8 @@
 package io.siddhi.distribution.editor.core.util.designview.designgenerator.generators;
 
 import io.siddhi.distribution.editor.core.util.designview.beans.configs.siddhielements.StreamConfig;
-import org.wso2.siddhi.query.api.annotation.Annotation;
-import org.wso2.siddhi.query.api.definition.StreamDefinition;
+import io.siddhi.query.api.annotation.Annotation;
+import io.siddhi.query.api.definition.StreamDefinition;
 
 import java.util.ArrayList;
 import java.util.Arrays;

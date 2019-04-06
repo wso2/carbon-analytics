@@ -19,7 +19,7 @@
 package io.siddhi.distribution.editor.core.util.designview.designgenerator.generators;
 
 import io.siddhi.distribution.editor.core.util.designview.beans.configs.siddhielements.FunctionConfig;
-import org.wso2.siddhi.query.api.definition.FunctionDefinition;
+import io.siddhi.query.api.definition.FunctionDefinition;
 
 /**
  * Generator to create FunctionConfig.

@@ -24,10 +24,10 @@ import io.siddhi.distribution.editor.core.util.designview.constants.query.input.
 import io.siddhi.distribution.editor.core.util.designview.designgenerator.generators.query.streamhandler.StreamHandlerConfigGenerator;
 import io.siddhi.distribution.editor.core.util.designview.exceptions.DesignGenerationException;
 import io.siddhi.distribution.editor.core.util.designview.utilities.ConfigBuildingUtilities;
-import org.wso2.siddhi.query.api.SiddhiApp;
-import org.wso2.siddhi.query.api.execution.query.input.stream.InputStream;
-import org.wso2.siddhi.query.api.execution.query.input.stream.JoinInputStream;
-import org.wso2.siddhi.query.api.execution.query.input.stream.SingleInputStream;
+import io.siddhi.query.api.SiddhiApp;
+import io.siddhi.query.api.execution.query.input.stream.InputStream;
+import io.siddhi.query.api.execution.query.input.stream.JoinInputStream;
+import io.siddhi.query.api.execution.query.input.stream.SingleInputStream;
 
 import java.util.ArrayList;
 import java.util.List;

@@ -19,7 +19,7 @@
 package io.siddhi.distribution.editor.core.util.designview.utilities;
 
 import io.siddhi.distribution.editor.core.util.designview.exceptions.DesignGenerationException;
-import org.wso2.siddhi.query.api.SiddhiElement;
+import io.siddhi.query.api.SiddhiElement;
 
 /**
  * Has methods involved in converting Siddhi elements to Design view Config objects.

@@ -100,12 +100,12 @@ public interface Workspace {
     JsonObject read(Path path) throws IOException;
 
     /**
-     * @param logger logger ID
+     * @param logger    logger ID
      * @param timestamp time stamp
-     * @param level log level
-     * @param url editor url
-     * @param message log message
-     * @param layout log layout
+     * @param level     log level
+     * @param url       editor url
+     * @param message   log message
+     * @param layout    log layout
      * @throws IOException when IO operation fails
      */
     void log(String logger, String timestamp, String level, String url, String message, String layout)

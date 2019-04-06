@@ -24,8 +24,8 @@ import io.siddhi.distribution.editor.core.util.designview.beans.configs.siddhiel
 import io.siddhi.distribution.editor.core.util.designview.beans.configs.siddhielements.attributesselection.UserDefinedSelectionConfig;
 import io.siddhi.distribution.editor.core.util.designview.exceptions.DesignGenerationException;
 import io.siddhi.distribution.editor.core.util.designview.utilities.ConfigBuildingUtilities;
-import org.wso2.siddhi.query.api.execution.query.selection.OutputAttribute;
-import org.wso2.siddhi.query.api.execution.query.selection.Selector;
+import io.siddhi.query.api.execution.query.selection.OutputAttribute;
+import io.siddhi.query.api.execution.query.selection.Selector;
 
 import java.util.ArrayList;
 import java.util.List;

@@ -2,7 +2,7 @@
 // jshint ignore: start
 var antlr4 = require('../../antlr4-js-runtime/index');
 
-//import org.wso2.siddhi.query.compiler.exception.SiddhiParserException;
+//import io.siddhi.query.compiler.exception.SiddhiParserException;
 
 
 var serializedATN = ["\3\u0430\ud6d1\u8206\uad2d\u4417\uaef1\u8d80\uaadd",

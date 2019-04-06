@@ -18,6 +18,9 @@
 
 package io.siddhi.distribution.editor.core.util.designview.designgenerator.builders;
 
+import io.siddhi.core.SiddhiAppRuntime;
+import io.siddhi.core.stream.input.source.Source;
+import io.siddhi.core.stream.output.sink.Sink;
 import io.siddhi.distribution.editor.core.util.designview.beans.EventFlow;
 import io.siddhi.distribution.editor.core.util.designview.beans.configs.Edge;
 import io.siddhi.distribution.editor.core.util.designview.beans.configs.SiddhiAppConfig;
@@ -38,21 +41,18 @@ import io.siddhi.distribution.editor.core.util.designview.designgenerator.genera
 import io.siddhi.distribution.editor.core.util.designview.designgenerator.generators.commentspreserver.PartitionScopeCommentsPreserver;
 import io.siddhi.distribution.editor.core.util.designview.designgenerator.generators.query.QueryConfigGenerator;
 import io.siddhi.distribution.editor.core.util.designview.exceptions.DesignGenerationException;
-import org.wso2.siddhi.core.SiddhiAppRuntime;
-import org.wso2.siddhi.core.stream.input.source.Source;
-import org.wso2.siddhi.core.stream.output.sink.Sink;
-import org.wso2.siddhi.query.api.SiddhiApp;
-import org.wso2.siddhi.query.api.annotation.Annotation;
-import org.wso2.siddhi.query.api.definition.AbstractDefinition;
-import org.wso2.siddhi.query.api.definition.AggregationDefinition;
-import org.wso2.siddhi.query.api.definition.FunctionDefinition;
-import org.wso2.siddhi.query.api.definition.StreamDefinition;
-import org.wso2.siddhi.query.api.definition.TableDefinition;
-import org.wso2.siddhi.query.api.definition.TriggerDefinition;
-import org.wso2.siddhi.query.api.definition.WindowDefinition;
-import org.wso2.siddhi.query.api.execution.ExecutionElement;
-import org.wso2.siddhi.query.api.execution.partition.Partition;
-import org.wso2.siddhi.query.api.execution.query.Query;
+import io.siddhi.query.api.SiddhiApp;
+import io.siddhi.query.api.annotation.Annotation;
+import io.siddhi.query.api.definition.AbstractDefinition;
+import io.siddhi.query.api.definition.AggregationDefinition;
+import io.siddhi.query.api.definition.FunctionDefinition;
+import io.siddhi.query.api.definition.StreamDefinition;
+import io.siddhi.query.api.definition.TableDefinition;
+import io.siddhi.query.api.definition.TriggerDefinition;
+import io.siddhi.query.api.definition.WindowDefinition;
+import io.siddhi.query.api.execution.ExecutionElement;
+import io.siddhi.query.api.execution.partition.Partition;
+import io.siddhi.query.api.execution.query.Query;
 
 import java.util.ArrayList;
 import java.util.HashSet;

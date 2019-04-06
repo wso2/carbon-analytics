@@ -26,6 +26,11 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.google.gson.JsonPrimitive;
+import io.siddhi.core.SiddhiAppRuntime;
+import io.siddhi.core.SiddhiManager;
+import io.siddhi.core.debugger.SiddhiDebugger;
+import io.siddhi.core.exception.SiddhiAppCreationException;
+import io.siddhi.core.util.SiddhiComponentActivator;
 import io.siddhi.distribution.common.common.EventStreamService;
 import io.siddhi.distribution.common.common.SiddhiAppRuntimeService;
 import io.siddhi.distribution.common.common.utils.config.FileConfigManager;
@@ -61,6 +66,8 @@ import io.siddhi.distribution.editor.core.util.designview.exceptions.CodeGenerat
 import io.siddhi.distribution.editor.core.util.designview.exceptions.DesignGenerationException;
 import io.siddhi.distribution.editor.core.util.restclients.storequery.StoreQueryAPIHelper;
 import io.siddhi.distribution.editor.core.util.siddhiappdeployer.SiddhiAppDeployerApiHelper;
+import io.siddhi.query.api.definition.StreamDefinition;
+import io.siddhi.query.api.exception.SiddhiAppContextException;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
@@ -79,13 +86,6 @@ import org.wso2.carbon.analytics.idp.client.core.api.AnalyticsHttpClientBuilderS
 import org.wso2.carbon.config.provider.ConfigProvider;
 import org.wso2.msf4j.Microservice;
 import org.wso2.msf4j.Request;
-import org.wso2.siddhi.core.SiddhiAppRuntime;
-import org.wso2.siddhi.core.SiddhiManager;
-import org.wso2.siddhi.core.debugger.SiddhiDebugger;
-import org.wso2.siddhi.core.exception.SiddhiAppCreationException;
-import org.wso2.siddhi.core.util.SiddhiComponentActivator;
-import org.wso2.siddhi.query.api.definition.StreamDefinition;
-import org.wso2.siddhi.query.api.exception.SiddhiAppContextException;
 
 import java.io.File;
 import java.io.FileInputStream;

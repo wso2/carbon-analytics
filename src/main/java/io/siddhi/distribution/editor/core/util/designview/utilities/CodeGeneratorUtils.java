@@ -254,7 +254,7 @@ public class CodeGeneratorUtils {
      * @param partitions The list of partitions in a Siddhi app
      * @return The list of ExecutionElementConfig objects of a Siddhi app
      * @throws CodeGenerationException Error when trying to convert a query/partition to an ExecutionElementConfig
-     * object
+     *                                 object
      */
     public static List<ExecutionElementConfig> convertToExecutionElements(List<QueryConfig> queries,
                                                                           List<PartitionConfig> partitions)
