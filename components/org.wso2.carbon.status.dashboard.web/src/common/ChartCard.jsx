@@ -59,9 +59,9 @@ export default class ChartCard extends Component {
                 <CardMedia
                     expandable={true}
                 >
-                    <div style={{backgroundColor: '#131313'}}>
+                    <div style={{backgroundColor: '#131313', padding: 10}}>
                         <VizG data={this.props.data} metadata={this.props.metadata} config={this.props.config}
-                              yDomain={yLimit} width={800} height={250}/>
+                              yDomain={yLimit} width={1600} height={500}/>
                     </div>
                 </CardMedia>
             </Card>

@@ -53,7 +53,7 @@ public class IsLeaderStreamFunctionProcessorTestCase {
                 boolean result;
                 for (Event event : inEvents) {
                     result = (Boolean) event.getData(0);
-                    AssertJUnit.assertEquals(false, result);
+                    AssertJUnit.assertEquals(true, result);
                 }
             }
         });
