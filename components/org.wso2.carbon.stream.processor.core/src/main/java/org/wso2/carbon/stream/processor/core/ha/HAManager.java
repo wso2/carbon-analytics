@@ -41,6 +41,7 @@ import org.wso2.siddhi.core.stream.input.source.SourceHandler;
 import org.wso2.siddhi.core.stream.output.sink.SinkHandler;
 import org.wso2.siddhi.core.table.record.RecordTableHandler;
 import org.wso2.siddhi.core.util.transport.BackoffRetryCounter;
+import org.wso2.siddhi.core.util.statistics.metrics.Level;
 
 import java.util.HashMap;
 import java.util.List;
@@ -93,7 +94,6 @@ public class HAManager {
         StreamProcessorDataHolder.setSourceHandlerManager(sourceHandlerManager);
         StreamProcessorDataHolder.setRecordTableHandlerManager(recordTableHandlerManager);
         SiddhiManager siddhiManager = StreamProcessorDataHolder.getSiddhiManager();
-
         siddhiManager.setSourceHandlerManager(StreamProcessorDataHolder.getSourceHandlerManager());
         siddhiManager.setSinkHandlerManager(StreamProcessorDataHolder.getSinkHandlerManager());
         siddhiManager.setRecordTableHandlerManager(StreamProcessorDataHolder.getRecordTableHandlerManager());
@@ -131,12 +131,12 @@ public class HAManager {
 
             if (null != passiveNodePropertyMap) {
                 setPassiveNodeAdded(true);
-                for (SourceHandler sourceHandler : sourceHandlerManager.getRegsiteredSourceHandlers().values()) {
-                    ((HACoordinationSourceHandler) sourceHandler).setPassiveNodeAdded(true);
-                }
                 setPassiveNodeHostPort(getHost(passiveNodePropertyMap),
                         getPort(passiveNodePropertyMap));
                 initializeEventSyncConnectionPool();
+                for (SourceHandler sourceHandler : sourceHandlerManager.getRegsiteredSourceHandlers().values()) {
+                    ((HACoordinationSourceHandler) sourceHandler).setPassiveNodeAdded(true);
+                }
                 new PersistenceManager().run();
             }
         } else {
@@ -166,6 +166,9 @@ public class HAManager {
         nodeInfo.setNodeId(nodeId);
         nodeInfo.setGroupId(clusterId);
         nodeInfo.setActiveNode(isActiveNode);
+        if (StreamProcessorDataHolder.isStatisticsEnabled()) {
+            StreamProcessorDataHolder.getStatisticsManager().startReporting();
+        }
     }
 
     /**

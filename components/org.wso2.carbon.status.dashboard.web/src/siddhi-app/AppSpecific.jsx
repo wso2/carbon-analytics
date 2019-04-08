@@ -30,14 +30,15 @@ import Header from '../common/Header';
 //Material UI
 import {GridList, GridTile} from 'material-ui/GridList';
 import HomeButton from 'material-ui/svg-icons/action/home';
-import {Card, CardHeader, CardText, Dialog, Divider, FlatButton, RaisedButton, Snackbar, Toggle} from 'material-ui';
-import {Button, Typography} from 'material-ui-next';
+import {Card, CardHeader, CardText, Dialog, Divider, FlatButton, Snackbar} from 'material-ui';
+import {Button, Typography, Radio, RadioGroup, FormControlLabel, FormControl, FormLabel} from 'material-ui-next';
 import DashboardUtils from '../utils/DashboardUtils';
 import AuthenticationAPI from '../utils/apis/AuthenticationAPI';
 import AuthManager from '../auth/utils/AuthManager';
 import Error403 from '../error-pages/Error403';
 import StatusDashboardOverViewAPI from '../utils/apis/StatusDashboardOverViewAPI';
 import AppEventFlow from "./AppEventFlow";
+import '../../public/css/dashboard.css';
 // Localization
 import { FormattedMessage } from 'react-intl';
 
@@ -146,7 +147,7 @@ export default class WorkerSpecific extends React.Component {
             workerID: this.props.match.params.id.split("_")[0] + ":" + this.props.match.params.id.split("_")[1],
             appName: this.props.match.params.appName,
             id: this.props.match.params.id,
-            statsEnabled: (this.props.match.params.isStatsEnabled === 'true'),
+            enabledStatLevel: this.props.match.params.isStatsEnabled,
             appText: '',
             open: false,
             messageStyle: '',
@@ -155,11 +156,14 @@ export default class WorkerSpecific extends React.Component {
             confirmMessage: '',
             hasManagerPermission: false,
             hasViewerPermission: true,
-            sessionInvalid: false
+            sessionInvalid: false,
+            radioValue: window.location.href.substr(window.location.href.lastIndexOf('/') + 1),
+            expanded: true
         };
-        this.handleToggle = this.handleToggle.bind(this);
         this.showMessage = this.showMessage.bind(this);
         this.showError = this.showError.bind(this);
+        this.handleChange = this.handleChange.bind(this);
+        this.getDetailedTable = this.getDetailedTable.bind(this);
     }
 
     componentWillMount() {
@@ -257,6 +261,34 @@ export default class WorkerSpecific extends React.Component {
         });
     }
 
+    handleChange(event) {
+        this.setState({ radioValue: event.target.value });
+        let statEnable = JSON.stringify({
+            enabledStatLevel: event.target.value,
+            statsEnable: true
+        });
+        let that = this;
+        StatusDashboardOverViewAPI.enableSiddhiAppStats(this.state.id, this.state.appName, statEnable)
+            .then((response) => {
+                if (response.status === HttpStatus.OK) {
+                    that.showMessage(this.context.intl.formatMessage({ id: 'appSpecific.statisticsStateChanged', defaultMessage: 'Successfully Changed statistics state of Sidhhi App!' }));
+                    var enabledStatLevel = this.state.radioValue;
+
+                    if (enabledStatLevel !== this.state.enabledStatLevel) {
+                        that.setState({ enabledStatLevel: enabledStatLevel });
+                    }
+                    that.setState({ open: false });
+                    setTimeout(function () {
+                        window.location.href = window.contextPath + '/worker/' + that.state.id
+                            + "/siddhi-apps/" + that.state.appName + "/" + that.state.enabledStatLevel;
+                    }, 1000);
+                }
+            }).catch((error) => {
+            that.setState({open: false});
+            that.showError(this.context.intl.formatMessage({ id: 'appSpecific.error.changingStatistics', defaultMessage: 'Error while changing statistics configuration!!' }));
+        });
+    };
+
     renderLatencyChart() {
         if (this.state.latency.length === 0) {
             return (
@@ -273,7 +305,8 @@ export default class WorkerSpecific extends React.Component {
             );
         }
         return (
-            <GridTile className="container" title={<FormattedMessage id='appSpecific.latencyMiliseconds' defaultMessage='Latency (milliseconds)' />} titlePosition="top" titleBackground='#303030'>
+            <GridTile className="container" title={<FormattedMessage id='appSpecific.latencyMiliseconds'
+                         defaultMessage='Latency (milliseconds)' />} titlePosition="top" titleBackground='#303030'>
                 <div className="overlay"
                      style={{color: 'rgba(255, 255, 255, 0.2)', paddingTop: 20, textAlign: 'right'}}>
                     <h4><FormattedMessage id='appSpecific.clickForMore' defaultMessage='Click for more details' /></h4>
@@ -281,12 +314,12 @@ export default class WorkerSpecific extends React.Component {
                 <div style={{marginTop: 30, backgroundColor: '#131313', padding: 20}}>
                     <Link
                         to={window.contextPath + '/worker/' + this.props.match.params.id + '/siddhi-apps/' +
-                        this.props.match.params.appName + '/app/history/' + this.state.statsEnabled}>
+                        this.props.match.params.appName + '/app/history/' + this.state.enabledStatLevel}>
                         <VizG data={this.state.latency} metadata={latencyMetadata}
                               config={latencyLineChartConfig}
                               yDomain={DashboardUtils.getYDomain(this.state.latency)}
-                              width={700}
-                              height={300}
+                              width={500}
+                              height={180}
                         />
                     </Link>
                 </div>
@@ -319,12 +352,12 @@ export default class WorkerSpecific extends React.Component {
                 <div style={{marginTop: 30, backgroundColor: '#131313', padding: 20}}>
                     <Link
                         to={window.contextPath + '/worker/' + this.props.match.params.id + '/siddhi-apps/' +
-                        this.props.match.params.appName + '/app/history/' + this.state.statsEnabled}>
+                        this.props.match.params.appName + '/app/history/' + this.state.enabledStatLevel}>
                         <VizG data={this.state.throughputAll} metadata={tpMetadata}
                               config={tpLineChartConfig}
                               yDomain={DashboardUtils.getYDomain(this.state.throughputAll)}
-                              width={700}
-                              height={300}
+                              width={500}
+                              height={180}
                         />
                     </Link>
                 </div>
@@ -335,7 +368,8 @@ export default class WorkerSpecific extends React.Component {
     renderMemoryChart() {
         if (this.state.totalMem.length === 0) {
             return (
-                <GridTile title={<FormattedMessage id='appSpecific.memoryUsed' defaultMessage='Memory Used (bytes)' />} titlePosition="top" titleBackground='#303030'>
+                <GridTile title={<FormattedMessage id='appSpecific.memoryUsed' defaultMessage='Memory Used (bytes)' />}
+                          titlePosition="top" titleBackground='#303030'>
                     <div style={{
                         marginTop: 50,
                         backgroundColor: '#131313',
@@ -348,8 +382,8 @@ export default class WorkerSpecific extends React.Component {
             );
         }
         return (
-            <GridTile className="container" title={<FormattedMessage id='appSpecific.memoryUsed' defaultMessage='Memory Used (bytes)' />} titlePosition="top"
-                titleBackground='#303030'>
+            <GridTile className="container" title={<FormattedMessage id='appSpecific.memoryUsed'
+                    defaultMessage='Memory Used (bytes)' />} titlePosition="top" titleBackground='#303030'>
                 <div className="overlay"
                      style={{color: 'rgba(255, 255, 255, 0.2)', paddingTop: 20, textAlign: 'right'}}>
                     <h4><FormattedMessage id='appSpecific.clickForMore' defaultMessage='Click for more details' /></h4>
@@ -357,12 +391,12 @@ export default class WorkerSpecific extends React.Component {
                 <div style={{marginTop: 30, backgroundColor: '#131313', padding: 20}}>
                     <Link
                         to={window.contextPath + '/worker/' + this.props.match.params.id + '/siddhi-apps/' +
-                        this.props.match.params.appName + '/app/history/' + this.state.statsEnabled}>
+                        this.props.match.params.appName + '/app/history/' + this.state.enabledStatLevel}>
                         <VizG data={this.state.totalMem} metadata={memoryMetadata}
                               config={memoryLineChartConfig}
                               yDomain={DashboardUtils.getYDomain(this.state.totalMem)}
-                              width={700}
-                              height={300}
+                              width={550}
+                              height={200}
                         />
 
                     </Link>
@@ -387,72 +421,29 @@ export default class WorkerSpecific extends React.Component {
             defaultMessage: 'Disabling metrics of a SiddhiApp will cause a data loss.{br} Are you sure you want to disable metrics?',
             values: { br: (<br />) }
         })
-
         if (this.state.hasManagerPermission) {
             return (
-                <div style={{position: 'absolute', right: 24, top: 100}}>
-                    <Toggle labelPosition="left"
-                            label={<FormattedMessage id='metrics' defaultMessage='Metrics' />}
-                            labelStyle={{color: 'white'}}
-                            thumbStyle={{backgroundColor: 'grey'}}
-                            thumbSwitchedStyle={{backgroundColor: '#f17b31'}}
-                            trackSwitchedStyle={{backgroundColor: '#f17b31'}}
-                            toggled={this.state.statsEnabled}
-                            onToggle={() => {
-                                this.setState({
-                                    open: true,
-                                    confirmMessage: this.state.statsEnabled ? disableMessage : enableMessage
-                                })
-                            }}
-                    >
-                    </Toggle>
-
-                </div>
-            )
-        } else {
-            return (
-                <div style={{float: 'right', padding: 20, paddingRight: 20, display: 'none'}}>
-                    <Toggle labelPosition="left"
-                            label={<FormattedMessage id='metrics' defaultMessage='Metrics' />}
-                            labelStyle={{color: 'white'}}
-                            thumbStyle={{backgroundColor: 'grey'}}
-                            thumbSwitchedStyle={{backgroundColor: '#f17b31'}}
-                            trackSwitchedStyle={{backgroundColor: '#f17b31'}}
-                            toggled={this.state.statsEnabled}
-                            onToggle={() => {
-                                this.setState({
-                                    open: true,
-                                    confirmMessage: this.state.statsEnabled ? disableMessage : enableMessage
-                                })
-                            }}
-                    >
-                    </Toggle>
+                <div style={{position: 'absolute', right: 15, top: 110}}>
+                    <FormControl component="fieldset">
+                        <FormLabel style={{color: '#dedede'}} component="legend">Metrics:</FormLabel>
+                        <RadioGroup
+                            aria-label="metrics"
+                            name="metrics"
+                            value={this.state.radioValue}
+                            onChange={this.handleChange}
+                            style={{flexDirection: 'row', marginTop: '-30px', paddingLeft: 70}}
+                            className={'metricsRadio'}
+                        >
+                            <FormControlLabel value="OFF" control={<Radio />} label="Off" />
+                            <FormControlLabel value="BASIC" control={<Radio />} label="Basic" />
+                            <FormControlLabel value="DETAIL" control={<Radio />} label="Detail" />
+                        </RadioGroup>
+                    </FormControl>
                 </div>
             )
         }
     }
 
-
-    handleToggle() {
-        let statEnable = JSON.stringify({
-            statsEnable: !this.state.statsEnabled
-        });
-        let that = this;
-        StatusDashboardOverViewAPI.enableSiddhiAppStats(this.state.id, this.state.appName, statEnable)
-            .then((response) => {
-                if (response.status === HttpStatus.OK) {
-                    that.showMessage(this.context.intl.formatMessage({ id: 'appSpecific.statisticsStateChanged', defaultMessage: 'Successfully Changed statistics state of Sidhhi App!' }));
-                    that.setState({ statsEnabled: !this.state.statsEnabled, open: false });
-                    setTimeout(function () {
-                        window.location.href = window.contextPath + '/worker/' + that.state.id
-                            + "/siddhi-apps/" + that.state.appName + "/" + that.state.statsEnabled;
-                    }, 1000);
-                }
-            }).catch((error) => {
-            that.setState({open: false});
-                that.showError(this.context.intl.formatMessage({ id: 'appSpecific.error.changingStatistics', defaultMessage: 'Error while changing statistics configuration!!' }));
-            });
-    }
 
     showError(message) {
         this.setState({
@@ -479,24 +470,8 @@ export default class WorkerSpecific extends React.Component {
         if (!this.state.hasViewerPermission) {
             return <Error403/>;
         }
-        //when state changes the width changes
-        let actionsButtons = [
-            <FlatButton
-                label={<FormattedMessage id='yes' defaultMessage='Yes' />}
-                backgroundColor='#f17b31'
-                onClick={this.handleToggle}
-                //disabled={!this.state.hasManagerPermission}
-            />,
-            <FlatButton
-                label={<FormattedMessage id='no' defaultMessage='No' />}
-                //disabled={!this.state.hasManagerPermission}
-                onClick={() => {
-                    this.setState({open: false})
-                }}
-            />,
-        ];
         let warningMessage;
-        if (!this.state.statsEnabled) {
+        if (this.state.enabledStatLevel === "OFF") {
             warningMessage = <div>
                 <FormattedMessage id='appSpecific.metricsDisabled' defaultMessage='Metrics are disabled!' />
             </div>
@@ -505,14 +480,6 @@ export default class WorkerSpecific extends React.Component {
         }
         return (
             <div>
-                <Dialog
-                    actions={actionsButtons}
-                    modal
-                    open={this.state.open}
-                    onRequestClose={() => this.setState({open: false})}>
-                    {this.state.confirmMessage}
-                </Dialog>
-
                 <div>
                     <Header/>
                     <div style={styles.navBar} className="navigation-bar">
@@ -546,13 +513,17 @@ export default class WorkerSpecific extends React.Component {
                 </div>
 
                 <div style={{padding: 24, height: '50%', backgroundColor: "#222222"}}>
-                    <Card style={{backgroundColor: "#282828", height: '50%'}}>
-                        <CardHeader title={<FormattedMessage id='appSpecific.codeView' defaultMessage='Code View' />}
+                    <Card expanded={this.state.expanded} onExpandChange={(expanded) => {
+                        this.setState({expanded: expanded}) }} style={{backgroundColor: "#282828", height: '50%'}}>
+                        <CardHeader
+                            title={<FormattedMessage id='appSpecific.codeView' defaultMessage='Code View' />}
                             titleStyle={{ fontSize: 24, backgroundColor: "#282828" }}
+                            actAsExpander={true}
+                            showExpandableButton={true}
                         />
                         <Divider/>
 
-                        <CardText>
+                        <CardText expandable={true}>
                             <SyntaxHighlighter language='sql'
                                                style={codeViewStyle}>{this.state.appText}</SyntaxHighlighter>
                         </CardText>
@@ -624,8 +595,13 @@ export default class WorkerSpecific extends React.Component {
                     <h3 style={{ color: 'white' }}>
                         <FormattedMessage id='appSpecific.siddhiAppComponent' defaultMessage='Siddhi App Component Statistics' />
                     </h3>
-                    <ComponentTable id={this.props.match.params.id} appName={this.props.match.params.appName}
-                                    statsEnabled={this.state.statsEnabled}/>
+                    <h4 style={{ color: 'white' }}>
+                        <FormattedMessage id='appSpecific.siddhiAppComponent.basic' defaultMessage='Basic Statistics' />
+                    </h4>
+                    <ComponentTable id={this.props.match.params.id}
+                                    appName={this.props.match.params.appName}
+                                    enabledStatLevel={'BASIC'}/>
+                    {this.getDetailedTable()}
                 </div>
 
                 <Snackbar contentStyle={messageBoxStyle} bodyStyle={this.state.messageStyle}
@@ -642,6 +618,20 @@ export default class WorkerSpecific extends React.Component {
         );
     }
 
+    getDetailedTable() {
+        if (this.state.enabledStatLevel === 'DETAIL') {
+            return (
+                <div style={{ display: this.state.enabledStatLevel === 'DETAIL' ? 'block' : 'none' }}>
+                    <h4 style={{ color: 'white' }}>
+                        <FormattedMessage id='appSpecific.siddhiAppComponent.detail' defaultMessage='Detail Statistics' />
+                    </h4>
+                    <ComponentTable id={this.props.match.params.id}
+                                    appName={this.props.match.params.appName}
+                                    enabledStatLevel={'DETAIL'}/>
+                </div>
+            );
+        }
+    }
 }
 
 

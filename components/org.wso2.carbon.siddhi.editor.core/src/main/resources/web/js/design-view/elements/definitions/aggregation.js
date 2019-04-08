@@ -173,6 +173,18 @@ define(['require', 'elementUtils'],
 			this.annotationListObjects = annotationListObjects;
 		};
 
+        Aggregation.prototype.resetModel = function (model) {
+            model.setSelect(undefined);
+            var groupBy = model.getGroupBy();
+            var aggregateByAttribute = model.getAggregateByAttribute();
+            if(groupBy && groupBy.length > 0) {
+                model.setGroupBy([" "]);
+            }
+            if(aggregateByAttribute && aggregateByAttribute != "") {
+                model.setAggregateByAttribute(" ");
+            }
+        };
+
         return Aggregation;
 
     });

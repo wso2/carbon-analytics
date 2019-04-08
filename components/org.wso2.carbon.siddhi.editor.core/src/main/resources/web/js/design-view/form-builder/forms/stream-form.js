@@ -29,6 +29,7 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'jsonValidator', 'con
                 this.configurationData = options.configurationData;
                 this.application = options.application;
                 this.formUtils = options.formUtils;
+                this.dropElementInstance = options.dropElementInstance;
                 this.jsPlumbInstance = options.jsPlumbInstance;
                 this.consoleListManager = options.application.outputController;
                 var currentTabId = this.application.tabController.activeTab.cid;
@@ -47,8 +48,8 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'jsonValidator', 'con
             var self = this;
             var id = $(element).parent().attr('id');
             var streamObject = self.configurationData.getSiddhiAppConfig().getStream(id);
-            var propertyDiv = $('<div class = "stream-form-container"> <label>Name </label>' +
-                '<input type="text" id="streamName" class="clearfix name">' +
+            var propertyDiv = $('<div class = "stream-form-container"> <label> <span class="mandatory-symbol"> *</span> ' +
+                'Name </label> <input type="text" id="streamName" class="clearfix name">' +
                 '<label class="error-message" id="streamNameErrorMessage"> </label>' +
                 '<div id="define-attribute"></div>' + self.formUtils.buildFormButtons() +
                 '</div> <div class= "stream-form-container"> <div class ="define-annotation"> </div> </div>');
@@ -59,6 +60,7 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'jsonValidator', 'con
             self.toggleViewButton.addClass('disableContainer');
 
             self.formUtils.addEventListenerToRemoveRequiredClass();
+            self.formUtils.addEventListenerToShowInputContentOnHover();
 
             var annotations = [];
             var predefinedAnnotationList = _.cloneDeep(self.configurationData.application.config.
@@ -220,15 +222,16 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'jsonValidator', 'con
                 }
 
                 if (!isErrorOccurred) {
-                    if (previouslySavedName !== streamName) {
-                        // update selected stream model
-                        streamObject.setName(streamName);
-                        // update connection related to the element if the name is changed
-                        self.formUtils.updateConnectionsAfterDefinitionElementNameChange(id);
-
-                        var textNode = $('#' + id).find('.streamNameNode');
-                        textNode.html(streamName);
-                    }
+                    var outConnections = self.jsPlumbInstance.getConnections({ source: id + '-out' });
+                    var inConnections = self.jsPlumbInstance.getConnections({ target: id + '-in' });
+                    // delete connections related to the element if the name is changed
+                    self.formUtils.deleteConnectionsAfterDefinitionElementNameChange(outConnections, inConnections);
+                    // update selected stream model
+                    streamObject.setName(streamName);
+                    // establish connections related to the element if the name is changed
+                    self.formUtils.establishConnectionsAfterDefinitionElementNameChange(outConnections, inConnections);
+                    var textNode = $('#' + id).find('.streamNameNode');
+                    textNode.html(streamName);
 
                     //clear the previously saved attribute list
                     streamObject.clearAttributeList();
@@ -254,6 +257,8 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'jsonValidator', 'con
                     _.forEach(annotationObjectList, function (annotation) {
                         streamObject.addAnnotationObject(annotation);
                     });
+
+                    self.dropElementInstance.toggleFaultStreamConnector(streamObject, self.jsPlumbInstance, id, streamName);
 
                     $('#' + id).removeClass('incomplete-element');
                     //Send stream element to the backend and generate tooltip

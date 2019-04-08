@@ -30,6 +30,7 @@ define(['log', 'jquery', 'lodash', 'attribute', 'storeAnnotation', 'handlebar', 
                 this.configurationData = options.configurationData;
                 this.application = options.application;
                 this.formUtils = options.formUtils;
+                this.jsPlumbInstance = options.jsPlumbInstance;
                 this.consoleListManager = options.application.outputController;
                 var currentTabId = this.application.tabController.activeTab.cid;
                 this.designViewContainer = $('#design-container-' + currentTabId);
@@ -48,7 +49,8 @@ define(['log', 'jquery', 'lodash', 'attribute', 'storeAnnotation', 'handlebar', 
             var id = $(element).parent().attr('id');
             var tableObject = self.configurationData.getSiddhiAppConfig().getTable(id);
 
-            var propertyDiv = $('<div class = "table-form-container table-div"> <label> Name </label> <input type="text" id="tableName" ' +
+            var propertyDiv = $('<div class = "table-form-container table-div"> ' +
+                '<label> <span class="mandatory-symbol"> *</span>Name </label> <input type="text" id="tableName" ' +
                 'class = "clearfix name"> <label class="error-message" id="tableNameErrorMessage"> </label>' +
                 '<div id = "define-attribute"> </div>' + self.formUtils.buildFormButtons() + '</div> ' +
                 '<div class = "table-form-container store-div"> <div id = "define-store"> </div>  ' +
@@ -62,6 +64,8 @@ define(['log', 'jquery', 'lodash', 'attribute', 'storeAnnotation', 'handlebar', 
             self.toggleViewButton.addClass('disableContainer');
 
             self.formUtils.addEventListenerToRemoveRequiredClass();
+            self.formUtils.addEventListenerToShowAndHideInfo();
+            self.formUtils.addEventListenerToShowInputContentOnHover();
 
             var predefinedStores = _.orderBy(_.cloneDeep(this.configurationData.rawExtensions["store"]),
                 ['name'], ['asc']);
@@ -213,15 +217,16 @@ define(['log', 'jquery', 'lodash', 'attribute', 'storeAnnotation', 'handlebar', 
                     tableObject.clearAnnotationList();
                     tableObject.clearAnnotationListObjects();
 
-                    if (previouslySavedName !== tableName) {
-                        // update selected table model
-                        tableObject.setName(tableName);
-                        // update connection related to the element if the name is changed
-                        self.formUtils.updateConnectionsAfterDefinitionElementNameChange(id);
-
-                        var textNode = $('#' + id).find('.tableNameNode');
-                        textNode.html(tableName);
-                    }
+                    var outConnections = self.jsPlumbInstance.getConnections({ source: id + '-out' });
+                    var inConnections = self.jsPlumbInstance.getConnections({ target: id + '-in' });
+                    // delete connections related to the element if the name is changed
+                    self.formUtils.deleteConnectionsAfterDefinitionElementNameChange(outConnections, inConnections);
+                    // update selected table model
+                    tableObject.setName(tableName);
+                    // establish connections related to the element if the name is changed
+                    self.formUtils.establishConnectionsAfterDefinitionElementNameChange(outConnections, inConnections);
+                    var textNode = $('#' + id).find('.tableNameNode');
+                    textNode.html(tableName);
 
                     if (selectedStoreType !== Constants.DEFAULT_STORE_TYPE) {
                         var storeOptions = [];

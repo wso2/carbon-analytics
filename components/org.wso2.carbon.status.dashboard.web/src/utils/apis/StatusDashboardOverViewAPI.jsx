@@ -20,6 +20,7 @@
 import Axios from 'axios';
 import {MediaType} from '../Constants';
 import AuthManager from '../../auth/utils/AuthManager';
+import StatusDashboardAPIS from "./StatusDashboardAPIs";
 
 /**
  * This should remove after fixing app by paralleling call workers
@@ -33,7 +34,7 @@ export default class StatusDashboardOverViewAPI {
     static getHTTPClient() {
         let httpClient = Axios.create({
             baseURL: window.location.origin + "/" + window.contextPath.substr(1) + '/apis/workers',
-            timeout: 15000,
+            timeout: 300000,
             headers: {"Authorization": "Bearer " + AuthManager.getUser().SDID, "Content-Type": "application/json"}
         });
         httpClient.defaults.headers.post['Content-Type'] = MediaType.APPLICATION_JSON;

@@ -30,7 +30,6 @@ import org.wso2.carbon.business.rules.core.bean.TemplateGroup;
 import org.wso2.carbon.business.rules.core.bean.scratch.BusinessRuleFromScratch;
 import org.wso2.carbon.business.rules.core.bean.scratch.BusinessRuleFromScratchProperty;
 import org.wso2.carbon.business.rules.core.bean.template.BusinessRuleFromTemplate;
-import org.wso2.carbon.business.rules.core.datasource.DatasourceConstants;
 import org.wso2.carbon.business.rules.core.datasource.QueryExecutor;
 import org.wso2.carbon.business.rules.core.datasource.configreader.ConfigReader;
 import org.wso2.carbon.business.rules.core.deployer.SiddhiAppApiHelper;
@@ -44,6 +43,7 @@ import org.wso2.carbon.business.rules.core.exceptions.TemplateManagerServiceExce
 import org.wso2.carbon.business.rules.core.util.LogEncoder;
 import org.wso2.carbon.business.rules.core.util.TemplateManagerConstants;
 import org.wso2.carbon.business.rules.core.util.TemplateManagerHelper;
+import org.wso2.carbon.stream.processor.core.internal.util.SiddhiAppProcessorConstants;
 
 import java.io.File;
 import java.io.UnsupportedEncodingException;
@@ -77,8 +77,13 @@ public class TemplateManagerService implements BusinessRulesService {
         this.nodes = configReader.getNodes();
         // Load & store available Template Groups & Business Rules at the time of instantiation
         this.availableTemplateGroups = loadTemplateGroups();
-        if (!configReader.getSolutionType().equalsIgnoreCase(DatasourceConstants.SP)) {
+        if (!configReader.getSolutionType().equalsIgnoreCase(SiddhiAppProcessorConstants.WSO2_SERVER_TYPE_SP)) {
             loadAndSaveAnalyticsSolutions(configReader.getSolutionType());
+        } else {
+            List<String> solutionTypesEnabled = configReader.getSolutionTypesEnabled();
+            for (String solutionType : solutionTypesEnabled) {
+                loadAndSaveAnalyticsSolutions(solutionType);
+            }
         }
         loadBusinessRules();
     }
@@ -403,8 +408,8 @@ public class TemplateManagerService implements BusinessRulesService {
             }
             return TemplateManagerConstants.SIDDHI_APP_NOT_DEPLOYED;
         } catch (SiddhiAppsApiHelperException e) {
-           if ( e.getStatus() == 404) {
-             return TemplateManagerConstants.SIDDHI_APP_NOT_DEPLOYED;
+            if (e.getStatus() == 404) {
+                return TemplateManagerConstants.SIDDHI_APP_NOT_DEPLOYED;
             }
             return TemplateManagerConstants.SIDDHI_APP_UNREACHABLE;
         }

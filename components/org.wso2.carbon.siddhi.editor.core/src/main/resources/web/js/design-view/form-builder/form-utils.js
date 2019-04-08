@@ -17,9 +17,11 @@
  */
 
 define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annotationObject', 'annotationElement',
-    'designViewUtils', 'queryWindowOrFunction', 'streamHandler', 'patternOrSequenceQueryCondition'],
+    'designViewUtils', 'queryWindowOrFunction', 'streamHandler', 'patternOrSequenceQueryCondition', 'queryOutputInsert',
+    'queryOutputDelete', 'queryOutputUpdate', 'queryOutputUpdateOrInsertInto'],
     function (require, _, AppData, log, Constants, Handlebars, AnnotationObject, AnnotationElement, DesignViewUtils,
-        QueryWindowOrFunction, StreamHandler, PatternOrSequenceQueryCondition) {
+        QueryWindowOrFunction, StreamHandler, PatternOrSequenceQueryCondition, QueryOutputInsert, QueryOutputDelete,
+        QueryOutputUpdate, QueryOutputUpdateOrInsertInto) {
 
         /**
          * @class FormUtils Contains utility methods for forms
@@ -165,14 +167,10 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
         };
 
         /**
-        * @function Updates connections of a definition element after the element name is changed.
-        * @param elementId id of the element
-        */
-        FormUtils.prototype.updateConnectionsAfterDefinitionElementNameChange = function (elementId) {
+         * @function to delete the connections
+         */
+        FormUtils.prototype.deleteConnectionsAfterDefinitionElementNameChange = function (outConnections, inConnections) {
             var self = this;
-
-            var outConnections = self.jsPlumbInstance.getConnections({ source: elementId + '-out' });
-            var inConnections = self.jsPlumbInstance.getConnections({ target: elementId + '-in' });
 
             _.forEach(outConnections, function (connection) {
                 self.jsPlumbInstance.deleteConnection(connection);
@@ -180,7 +178,13 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
             _.forEach(inConnections, function (connection) {
                 self.jsPlumbInstance.deleteConnection(connection);
             });
+        };
 
+        /**
+         * @function to establish the connections
+         */
+        FormUtils.prototype.establishConnectionsAfterDefinitionElementNameChange = function (outConnections, inConnections) {
+            var self = this;
             _.forEach(inConnections, function (inConnection) {
                 self.jsPlumbInstance.connect({
                     source: inConnection.sourceId,
@@ -299,10 +303,71 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
         /**
          * @function to render the html for query output
          */
-        FormUtils.prototype.renderQueryOutput = function (outputElementName) {
+        FormUtils.prototype.renderQueryOutput = function (outputElement, queryOutput) {
+            var self = this;
+            var outputConfig = self.configurationData.application.config.query_output_options;
             var queryOutputTemplate = Handlebars.compile($('#query-output-template').html())
-                ({ into: outputElementName, operation: Constants.INSERT });
+                ({ into: outputElement.element.name, outputConfig: outputConfig });
             $('.define-query-output').html(queryOutputTemplate);
+            self.renderQueryOperation(outputElement, queryOutput);
+        };
+
+        /**
+         * @function to render the query output operation section
+         */
+        FormUtils.prototype.renderQueryOperation = function (outputElement, queryOutput) {
+            var self = this;
+            if (outputElement.type.toLowerCase() == Constants.TABLE) {
+                var operationTypes = self.configurationData.application.config.query_output_operations;
+                var setAttributes = [{ attribute: "", value: "" }];
+                if (queryOutput.output) {
+                    if (queryOutput.output.on) {
+                        var on = queryOutput.output.on;
+                    }
+                    if (queryOutput.output.set && queryOutput.output.set.length != 0) {
+                        setAttributes = queryOutput.output.set;
+                    }
+                }
+                self.registerDropDownPartial();
+                var queryOutputDiv = Handlebars.compile($('#store-query-output-template').html())({
+                    possibleOperations: {
+                        id: "operation-type",
+                        options: operationTypes
+                    },
+                    on: on,
+                    set: setAttributes
+                });
+                $('.define-query-output .define-query-operation').append(queryOutputDiv);
+                //remove the first del button of the set attribute
+                $('.define-operation-set-condition .set-condition li:eq(0) .btn-del-option').remove();
+                self.mapQueryOperation(queryOutput);
+            } else {
+                var operationInsertDiv = '<input class="clearfix name query-operation" value="insert" readonly>';
+                $('.define-query-output .define-query-operation').append(operationInsertDiv);
+            }
+        };
+
+        /**
+         * @function to map the query output operation
+         */
+        FormUtils.prototype.mapQueryOperation = function (queryOutput) {
+            var self = this;
+            //to select the operation type
+            var operationType = Constants.INSERT;
+            if (queryOutput.type) {
+                operationType = queryOutput.type.toLowerCase();
+            }
+            $('.define-query-output .operation-type-selection option').filter(function () {
+                return ($(this).val() == (operationType))
+            }).prop('selected', true);
+
+            self.changeQueryOperationContent(operationType);
+
+            if (queryOutput.output && queryOutput.output.set && queryOutput.output.set.length != 0) {
+                $('.define-query-operation .set-checkbox').prop('checked', true);
+            } else {
+                $('.define-query-operation .set-content').hide();
+            }
         };
 
         /**
@@ -599,7 +664,7 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
          * @param {Object} orderBy user defined order by
          * @param {String} className of the division
          */
-        FormUtils.prototype.renderOrderBy = function (possibleOrderByAttributes, orderBy, className) {
+        FormUtils.prototype.renderOrderBy = function (possibleOrderByAttributes, orderBy) {
             var self = this;
             var possibleOrderByAttributes = {
                 options: possibleOrderByAttributes,
@@ -649,11 +714,11 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
         FormUtils.prototype.selectAggregateProjection = function (select) {
             var self = this;
             var attributes;
-            var selectedType = (select) ? (select.getType().toLowerCase()) : Constants.TYPE_ALL;
-            if (selectedType === Constants.TYPE_ALL) {
-                attributes = [""]
-            } else {
+            var selectedType = (select) ? (select.getType().toLowerCase()) : undefined;
+            if (selectedType === Constants.TYPE_USER_DEFINED) {
                 attributes = self.getAttributeExpressions(select.getValue())
+            } else {
+                attributes = [""];
             }
             self.renderUserDefinedAttributeSelection(attributes, "aggregate-projection");
             //removes the first delete button
@@ -668,10 +733,10 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
             $('.define-select').find('.attribute-selection-type option').filter(function () {
                 return ($(this).val() === selectedType);
             }).prop('selected', true);
-            if (selectedType === Constants.TYPE_ALL) {
-                $('.define-user-defined-attributes').hide();
-            } else {
+            if (selectedType === Constants.TYPE_USER_DEFINED) {
                 $('.define-user-defined-attributes').show();
+            } else {
+                $('.define-user-defined-attributes').hide();
             }
         };
 
@@ -681,11 +746,11 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
         FormUtils.prototype.selectQueryProjection = function (select, outputElementName) {
             var self = this;
             var attributes;
-            var selectedType = (select) ? (select.getType().toLowerCase()) : Constants.TYPE_ALL;
-            if (selectedType === Constants.TYPE_ALL) {
-                attributes = self.createEmptyAttributesForQueryProjection(outputElementName);
-            } else {
+            var selectedType = (select) ? (select.getType().toLowerCase()) : undefined;
+            if (selectedType === Constants.TYPE_USER_DEFINED) {
                 attributes = self.createAttributesForQueryProjection(select.getValue(), outputElementName);
+            } else {
+                attributes = self.createEmptyAttributesForQueryProjection(outputElementName);
             }
             self.renderUserDefinedAttributeSelection(attributes, "query-projection");
             self.selectAttributeSelection(selectedType);
@@ -718,8 +783,12 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
             var i = 0;
             var connectedElement = self.configurationData.getSiddhiAppConfig().getDefinitionElementByName(outputElementName);
             _.forEach(connectedElement.element.getAttributeList(), function (attribute) {
+                var expression = "";
+                if (projectionValues[i]) {
+                    expression = projectionValues[i].expression;
+                }
                 attributes.push({
-                    expression: projectionValues[i].expression,
+                    expression: expression,
                     as: attribute.getName()
                 });
                 i++;
@@ -842,7 +911,7 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
             _.forEach(savedAnnotationObjects, function (savedAnnotation) {
                 var isPredefined = false;
                 _.forEach(predefinedAnnotations, function (annotation) {
-                    if (savedAnnotation.name.toLowerCase() === annotation.name.toLowerCase()) {
+                    if (annotation.possibleNames.includes(savedAnnotation.name.toLowerCase())) {
                         isPredefined = true;
                         return false;
                     }
@@ -925,6 +994,53 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
         };
 
         /**
+         * @function to validate the query output section
+         * @returns {boolean}
+         */
+        FormUtils.prototype.validateQueryOutputSet = function () {
+            var self = this;
+            var isErrorOccurred = false;
+            var noOfSet = 0;
+            var operationType = $('.define-query-operation .operation-type-selection').val();
+            if (operationType == Constants.UPDATE_OR_INSERT_INTO || operationType == Constants.UPDATE) {
+                if ($('.define-query-operation .set-checkbox').is(':checked')) {
+                    $('.define-operation-set-condition .set-condition li').each(function () {
+                        var setAttribute = $(this).find('.setAttribute');
+                        var setValue = $(this).find('.setValue');
+                        if ((setAttribute.val().trim() != "") || (setValue.val().trim() != "")) {
+                            if (setAttribute.val().trim() == "") {
+                                self.addErrorClass(setAttribute);
+                                $(this).find('.error-message').text('Attribute is required');
+                                isErrorOccurred = true;
+                                return false;
+                            }
+                            if (setValue.val().trim() == "") {
+                                self.addErrorClass(setValue);
+                                $(this).find('.error-message').text('Value is required');
+                                isErrorOccurred = true;
+                                return false;
+                            }
+                        }
+
+                        if ((setAttribute.val().trim() != "") && (setValue.val().trim() != "")) {
+                            noOfSet++;
+                        }
+                    });
+
+                    if (!isErrorOccurred && noOfSet == 0) {
+                        var firstSet = $('.define-operation-set-condition .set-condition li:eq(0)')
+                        self.addErrorClass(firstSet.find('.setAttribute'));
+                        self.addErrorClass(firstSet.find('.setValue'));
+                        firstSet.find('.error-message').text("Minimum one set is required");
+                        isErrorOccurred = true;
+
+                    }
+                }
+            }
+            return isErrorOccurred;
+        };
+
+        /**
          * @function to validate the predefined options
          * @param {Object} predefinedOptions
          * @param {String} id to identify the div in the html to traverse
@@ -962,9 +1078,14 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
             var isErrorOccurred = false;
             $('.define-conditions .condition-content').each(function () {
                 var conditionId = $(this).find('.condition-id');
+                var conditionStream = $(this).find('.condition-stream-name-selection');
                 if (conditionId.val().trim() == "") {
                     $(conditionId).next('.error-message').text('Condition ID is required');
                     self.addErrorClass(conditionId);
+                    isErrorOccurred = true;
+                } else if (!conditionStream.val()) {
+                    $(conditionStream).closest('.clearfix').next('.error-message').text('Condition stream is required');
+                    self.addErrorClass(conditionStream);
                     isErrorOccurred = true;
                 }
                 if (!isErrorOccurred) {
@@ -994,12 +1115,14 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
             var isErrorOccurred = false;
             $(className).each(function () {
                 var checkBox = $(this).find('input:checkbox');
-                if (checkBox.length == 0 || (checkBox.length > 0 && checkBox.is(":checked"))) {
+                if ((checkBox.length == 0 || (checkBox.length > 0 && checkBox.is(":checked")))) {
                     var inputValue = $(this).find('input:text');
-                    if (inputValue.val().trim() == "") {
-                        self.addErrorClass(inputValue);
-                        $(className).find('.error-message').text('Value is required');
-                        isErrorOccurred = true;
+                    if (inputValue.is("visible")) {
+                        if (inputValue.val().trim() == "") {
+                            self.addErrorClass(inputValue);
+                            $(className).find('.error-message').text('Value is required');
+                            isErrorOccurred = true;
+                        }
                     }
                 }
             });
@@ -1012,11 +1135,11 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
         FormUtils.prototype.expandCollapsedDiv = function (divToBeExpanded) {
             var collapseHeader = $(divToBeExpanded).find('.collapsed:first');
             var collapseBody = $(divToBeExpanded).find('.collapse:first');
-            collapseHeader.attr("aria-expanded","true");
+            collapseHeader.attr("aria-expanded", "true");
             collapseHeader.removeClass("collapsed");
-            collapseBody.attr("aria-expanded","true");
+            collapseBody.attr("aria-expanded", "true");
             collapseBody.addClass("collapse in");
-            collapseBody.css("height","auto");
+            collapseBody.css("height", "auto");
             $('.collapse .error-input-field')[0].scrollIntoView();
         };
 
@@ -1432,7 +1555,8 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
             var isErrorOccurred = false;
             var errorMessage = ""
             var attributes = 0;
-            if ($('.define-select .attribute-selection-type').val() == Constants.TYPE_USER_DEFINED) {
+            var projectionType = $('.define-select .attribute-selection-type');
+            if (projectionType.val() == Constants.TYPE_USER_DEFINED) {
                 $('.define-select .user-defined-attributes li').each(function () {
                     var expressionAs = $(this).find('.attribute-expression-as');
                     var expressionAsValue = expressionAs.val().trim();
@@ -1463,6 +1587,9 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
                     $(firstAttributeList).find('.error-message').text("Minimum one attribute is required.")
                     self.addErrorClass($(firstAttributeList).find('.attribute-expression-as'));
                 }
+            } else if (!projectionType.val()) {
+                isErrorOccurred = true;
+                self.addErrorClass(projectionType);
             }
             return isErrorOccurred;
         };
@@ -1473,7 +1600,8 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
         FormUtils.prototype.validateQueryProjection = function () {
             var self = this;
             var isErrorOccurred = false;
-            if ($('.define-select .attribute-selection-type').val() == Constants.TYPE_USER_DEFINED) {
+            var projectionType = $('.define-select .attribute-selection-type');
+            if (projectionType.val() == Constants.TYPE_USER_DEFINED) {
                 $('.define-select .user-defined-attributes li').each(function () {
                     var expression = $(this).find('.attribute-expression').val().trim();
                     if (expression == "") {
@@ -1483,6 +1611,9 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
                         return false;
                     }
                 });
+            } else if (!projectionType.val()) {
+                isErrorOccurred = true;
+                self.addErrorClass(projectionType);
             }
             return isErrorOccurred;
         };
@@ -1568,7 +1699,7 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
          */
         FormUtils.prototype.generateOrderByDiv = function (savedOrderBy, possibleAttributes) {
             var self = this;
-            var orderByAttributes = [""];
+            var orderByAttributes = [{ value: "", order: "" }];
             if ((savedOrderBy && savedOrderBy.length != 0)) {
                 orderByAttributes = savedOrderBy.slice();
             }
@@ -1675,6 +1806,51 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
                     }
                 }
             });
+        };
+
+        /**
+         * @function to build the query output section
+         */
+        FormUtils.prototype.buildQueryOutput = function (outputElement, queryOutput) {
+            var outputTarget = $('.define-query-output .query-into').val().trim();
+            var outputObject;
+            var outputConfig = {};
+            _.set(outputConfig, 'eventType', $('#event-type').val());
+            if (outputElement.type.toLowerCase() == Constants.TABLE) {
+                var operationType = $('.define-query-operation .operation-type-selection').val();
+                _.set(outputConfig, 'on', $('.define-operation-on-condition input[type="text"]').val().trim());
+                var setCheckbox = $('.define-query-operation .set-checkbox');
+                if (setCheckbox.length != 0 && setCheckbox.is(":checked")) {
+                    var sets = [];
+                    $('.define-operation-set-condition .set-condition li').each(function () {
+                        var setAttribute = $(this).find('.setAttribute').val().trim();
+                        var setValue = $(this).find('.setValue').val().trim();
+                        if ((setAttribute != "") && (setValue != "")) {
+                            sets.push({ attribute: setAttribute, value: setValue });
+                        }
+                    });
+                    _.set(outputConfig, 'set', sets);
+                }
+                if (operationType == Constants.INSERT) {
+                    outputObject = new QueryOutputInsert(outputConfig);
+                    queryOutput.setType(Constants.INSERT);
+                } else if (operationType == Constants.DELETE) {
+                    outputObject = new QueryOutputDelete(outputConfig);
+                    queryOutput.setType(Constants.DELETE);
+                } else if (operationType == Constants.UPDATE) {
+                    outputObject = new QueryOutputUpdate(outputConfig);
+                    queryOutput.setType(Constants.UPDATE);
+                } else if (operationType == Constants.UPDATE_OR_INSERT_INTO) {
+                    outputObject = new QueryOutputUpdateOrInsertInto(outputConfig);
+                    queryOutput.setType(Constants.UPDATE_OR_INSERT_INTO);
+                }
+
+            } else {
+                outputObject = new QueryOutputInsert(outputConfig);
+                queryOutput.setType(Constants.INSERT);
+            }
+            queryOutput.setOutput(outputObject);
+            queryOutput.setTarget(outputTarget);
         };
 
         /**
@@ -2347,10 +2523,21 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
          */
         FormUtils.prototype.mapUserGroupBy = function (attributes) {
             var i = 0;
+            var found;
             $('.group-by-attributes li').each(function () {
+                found = false;
                 $(this).find('.group-by-selection option').filter(function () {
-                    return ($(this).val() == (attributes[i]));
+                    var currentOption = $(this).val();
+                    if (currentOption == attributes[i]) {
+                        found = true;
+                        return ($(this).val() == (attributes[i]));
+                    }
                 }).prop('selected', true);
+                if (!found) {
+                    $(this).find('.group-by-selection option').filter(function () {
+                        return ($(this).val().includes(attributes[i]));
+                    }).prop('selected', true);;
+                }
                 i++;
             });
         };
@@ -2360,16 +2547,16 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
          * @param {String} replacedAttributes attribute names which were replaced (only for join-query as because
          *  there are two source the attribute names were changed to <sourceName>.<attributeName>).
          *  It would be the same for the other forms
-         * @param {orderByAttributes} orderByAttributes saved order by attributes
+         * @param {Object} orderByAttributes saved order by attributes
          */
         FormUtils.prototype.mapUserOrderBy = function (orderByAttributes) {
             var i = 0;
             $('.order-by-attributes li').each(function () {
                 $(this).find('.order-by-selection option').filter(function () {
-                    return ($(this).val() == (orderByAttributes[i].getValue()));
+                    return ($(this).val() == (orderByAttributes[i].value));
                 }).prop('selected', true);
                 $(this).find('.order-selection option').filter(function () {
-                    return ($(this).val() == (orderByAttributes[i].getOrder().toLowerCase()));
+                    return ($(this).val() == (orderByAttributes[i].order.toLowerCase()));
                 }).prop('selected', true);
                 i++;
             });
@@ -2416,7 +2603,7 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
             var self = this;
             _.forEach(savedAnnotations, function (savedAnnotation) {
                 _.forEach(predefinedAnnotations, function (predefinedAnnotation) {
-                    if (savedAnnotation.name.toLowerCase() === predefinedAnnotation.name.toLowerCase()) {
+                    if (predefinedAnnotation.possibleNames.includes(savedAnnotation.name.toLowerCase())) {
                         predefinedAnnotation.isChecked = true;
                         if (savedAnnotation.elements) {
                             self.mapPredefinedAnnotationElements(savedAnnotation, predefinedAnnotation);
@@ -2471,17 +2658,32 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
          * @returns {Array}
          */
         FormUtils.prototype.createObjectsForAnnotationsWithoutKeys = function (predefinedAnnotations) {
+            var self = this;
             var annotationsWithoutKeys = [];
             _.forEach(predefinedAnnotations, function (predefinedAnnotation) {
                 if (predefinedAnnotation.name.toLowerCase() == Constants.PRIMARY_KEY ||
                     predefinedAnnotation.name.toLowerCase() == Constants.INDEX) {
+                    var possibleNames = self.includePossibleNamesForAnnotations(predefinedAnnotation.name);
                     var annotationObject = {
-                        name: predefinedAnnotation.name, values: [{ value: "" }], isChecked: false
+                        name: predefinedAnnotation.name, values: [{ value: "" }], isChecked: false, possibleNames: possibleNames
                     }
                     annotationsWithoutKeys.push(annotationObject);
                 }
             });
             return annotationsWithoutKeys;
+        };
+
+        /**
+         * @function to include possible names for annotations
+         */
+        FormUtils.prototype.includePossibleNamesForAnnotations = function (predefinedAnnotationName) {
+            var possibleNames = [];
+            if (predefinedAnnotationName == Constants.PURGE) {
+                possibleNames = [Constants.PURGE, Constants.PURGING];
+            } else {
+                possibleNames = [predefinedAnnotationName.toLowerCase()];
+            }
+            return possibleNames;
         };
 
         /**
@@ -2492,10 +2694,11 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
         FormUtils.prototype.createObjectsForAnnotationsWithKeys = function (predefinedAnnotations) {
             var self = this;
             var annotationsWithKeys = [];
-            var subAnnotations;
+            var subAnnotations = [];
             _.forEach(predefinedAnnotations, function (predefinedAnnotation) {
                 if (predefinedAnnotation.name.toLowerCase() != Constants.PRIMARY_KEY &&
                     predefinedAnnotation.name.toLowerCase() != Constants.INDEX) {
+                    var possibleNames = self.includePossibleNamesForAnnotations(predefinedAnnotation.name);
                     var parameters;
                     if (predefinedAnnotation.annotations) {
                         subAnnotations = self.createObjectsForAnnotationsWithKeys(predefinedAnnotation.annotations);
@@ -2506,11 +2709,13 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
                         parameters = self.createObjectWithValues(predefinedAnnotation.parameters);
                     }
                     var annotationObject = {
-                        name: predefinedAnnotation.name, parameters: parameters,
+                        name: predefinedAnnotation.name, parameters: parameters, possibleNames: possibleNames,
                         annotations: subAnnotations,
                         optional: predefinedAnnotation.optional, isChecked: false
                     }
                     annotationsWithKeys.push(annotationObject);
+                    //clear the sub annotations
+                    subAnnotations.length = 0;
                 }
             });
             return annotationsWithKeys;
@@ -2598,6 +2803,7 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
          * @return {boolean} isErrorOccurred
          */
         FormUtils.prototype.validatePrimaryIndexAnnotations = function () {
+            var self = this;
             var isErrorOccurred = false;
             $('#primary-index-annotations .annotation').each(function () {
                 var annotationValues = [];
@@ -2608,7 +2814,7 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
                         }
                     });
                     if (annotationValues.length == 0) {
-                        $(this).find('.annotation-value:eq(0)').addClass('required-input-field');
+                        self.addErrorClass($(this).find('.annotation-value:eq(0)'));
                         $(this).find('.error-message:eq(0)').text("Minimum one value is required");
                         isErrorOccurred = true;
                         return false;
@@ -2878,6 +3084,45 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
         };
 
         /**
+         * @function to add event listeners for the query output div
+         */
+        FormUtils.prototype.addEventListenerForQueryOutputDiv = function () {
+            var self = this;
+            $('.define-operation-set-condition ').on('click', '.btn-del-option', function () {
+                $(this).closest('li').remove();
+            });
+
+            $('.define-query-operation').on('change', '.operation-type-selection', function () {
+                self.changeQueryOperationContent($(this).val());
+            });
+
+            $('.define-query-operation').on('change', '.set-checkbox', function () {
+                if ($(this).is(':checked')) {
+                    $('.define-query-operation .set-content').show();
+                } else {
+                    $('.define-query-operation .set-content').hide();
+                }
+            });
+        };
+
+        /**
+         * @function to change the operation content depending on the operation type
+         * @param operationType
+         */
+        FormUtils.prototype.changeQueryOperationContent = function (operationType) {
+            if (operationType == Constants.INSERT) {
+                $('.define-query-operation .define-operation-set-condition').hide();
+                $('.define-query-operation .define-operation-on-condition').hide();
+            } else if (operationType == Constants.DELETE) {
+                $('.define-query-operation .define-operation-set-condition').hide();
+                $('.define-query-operation .define-operation-on-condition').show();
+            } else if (operationType == Constants.UPDATE || operationType == Constants.UPDATE_OR_INSERT_INTO) {
+                $('.define-query-operation .define-operation-set-condition').show();
+                $('.define-query-operation .define-operation-on-condition').show();
+            }
+        };
+
+        /**
          * @function to add event listeners for jstree annotations
          */
         FormUtils.prototype.addEventListenersForJstree = function (tree) {
@@ -2987,7 +3232,7 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
 
             $('.define-group-by-attributes').on('change', '.group-by-selection', function () {
                 self.preventMultipleSelection(Constants.GROUP_BY);
-                self.removeErrorClass();
+                $('.group-by-attributes').find('.error-message').hide();
             });
 
             $('.define-group-by-attributes').on('click', '.btn-del-option', function () {
@@ -3001,16 +3246,6 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
          * @function to add event listeners for parameter division
          */
         FormUtils.prototype.addEventListenersForParameterDiv = function () {
-            //event listener to show parameter description
-            $('.defineFunctionParameters').on('mouseover', '.parameter-desc', function () {
-                $(this).find('.parameter-desc-content').show();
-            });
-
-            //event listener to hide parameter description
-            $('.defineFunctionParameters').on('mouseout', '.parameter-desc', function () {
-                $(this).find('.parameter-desc-content').hide();
-            });
-
             //event listener when the parameter checkbox is changed
             $('.defineFunctionParameters').on('change', '.parameter-checkbox', function () {
                 var parameterParent = $(this).parents(".parameter");
@@ -3022,6 +3257,81 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
                     parameterParent.find(".error-message").text("");
                 }
             });
+        };
+
+        /**
+         * @function to construct the attributes of output element as <outputElementName>.<outputAttribute>
+         * @param outputAttributes
+         */
+        FormUtils.prototype.constructOutputAttributes = function (outputAttributes) {
+            var attributes = [];
+            var outputElementName = $('.define-query-output .query-into').val().trim();
+            _.forEach(outputAttributes, function (outputAttribute) {
+                attributes.push(outputElementName + "." + outputAttribute);
+            });
+            return attributes;
+        };
+
+        /**
+         * @function to get the attributes of the streams connected to pattern/sequence query
+         */
+        FormUtils.prototype.getInputAttributes = function (inputStreams) {
+            var self = this;
+            var attributes = [];
+            _.forEach(inputStreams, function (stream) {
+                if (stream) {
+                    var inputElement = self.configurationData.getSiddhiAppConfig()
+                        .getDefinitionElementByName(stream);
+                    if (inputElement.type.toLowerCase() === Constants.TRIGGER) {
+                        attributes.push(Constants.TRIGGERED_TIME);
+                    } else {
+                        _.forEach(inputElement.element.getAttributeList(), function (attribute) {
+                            attributes.push(attribute.getName());
+                        });
+                    }
+                }
+            })
+            return attributes;
+        };
+
+        /**
+         * @function to add auto completion for query output operation section
+         */
+        FormUtils.prototype.addAutoCompleteForOutputOperation = function (outputAttributesWithStreamName, inputAttributes) {
+            var self = this;
+            var outputOperationMatches = outputAttributesWithStreamName.concat(inputAttributes);
+            self.createAutocomplete($('.define-query-operation input[type="text"]'), outputOperationMatches);
+        };
+
+        /**
+         * @function to show the input field content on hover
+         */
+        FormUtils.prototype.addEventListenerToShowInputContentOnHover = function () {
+            var self = this;
+            var divToShowInputContent = '<div class="hovered-content" style="display: none"> </div>';
+            $('.design-view-form-content').on('mouseover', 'input[type="text"]', function () {
+                var inputField = $(this);
+                if (!inputField.next().hasClass('hovered-content')) {
+                    inputField.after(divToShowInputContent);
+                }
+                if (inputField.val().trim() != "" && self.isElementContentOverflown(inputField)) {
+                    inputField.next('.hovered-content').html(inputField.val().trim());
+                    inputField.next('.hovered-content').show();
+                }
+            });
+            $('.design-view-form-content').on('mouseout', 'input[type="text"]', function () {
+                $(this).next('.hovered-content').hide();
+            });
+            $('.design-view-form-content').on('focus', 'input[type="text"]', function () {
+                $(this).next('.hovered-content').hide();
+            });
+        };
+
+        /**
+         * @function to determine if input content is longer than the width of the input
+         */
+        FormUtils.prototype.isElementContentOverflown = function (element) {
+            return element[0].scrollWidth > element[0].clientWidth;
         };
 
         /**
@@ -3042,13 +3352,13 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
          */
         FormUtils.prototype.addEventListenerToRemoveRequiredClass = function () {
             $('.design-view-form-content').on('input', '.error-input-field', function () {
-                var input = $(this).val().trim();
+                var input = encodeURI($(this).val().trim());
                 if (input != "") {
                     $(this).removeClass('required-input-field');
-                    $(this).closest('.clearfix').next('label.error-message').hide();
+                    $(this).closest('.clearfix').siblings('label.error-message').hide();
                 } else {
                     $(this).addClass('required-input-field');
-                    $(this).closest('.clearfix').next('label.error-message').show();
+                    $(this).closest('.clearfix').siblings('label.error-message').show();
                 }
             });
         };
@@ -3058,10 +3368,11 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
          */
         FormUtils.prototype.addEventListenersForSelectionDiv = function () {
             $('.define-select').on('change', '.attribute-selection-type', function () {
-                if ($(this).val() === Constants.TYPE_ALL) {
-                    $('.define-user-defined-attributes').hide();
-                } else {
+                $('.attribute-selection-type').next('.error-message').hide();
+                if ($(this).val() === Constants.TYPE_USER_DEFINED) {
                     $('.define-user-defined-attributes').show();
+                } else {
+                    $('.define-user-defined-attributes').hide();
                 }
             });
 
@@ -3086,7 +3397,7 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
 
             $('.define-order-by-attributes').on('change', '.order-by-selection', function () {
                 self.preventMultipleSelection(Constants.ORDER_BY);
-                self.removeErrorClass();
+                $('.order-by-attributes').find('.error-message').hide();
             });
 
             $('.define-order-by-attributes').on('click', '.btn-del-option', function () {
@@ -3284,11 +3595,11 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
             var streamHandlerListLength = $(streamHandlerList).find('li').length
             var appendedIndex;
             var handlerList = '<li class="define-stream-handler-content"> <div> ' +
-                '<div class="collapse-div" href="#' + streamHandlerListLength + '-' + id +'-stream-handler-content" ' +
+                '<div class="collapse-div" href="#' + streamHandlerListLength + '-' + id + '-stream-handler-content" ' +
                 'data-toggle="collapse" aria-expanded="true"> <label class="clearfix"> ' +
                 '<span class="mandatory-symbol"> * </span> Type <a class="collapse-icon"> </a> </label> ' +
                 '<div class = "define-stream-handler-type"> </div> </div> <div id="' +
-                streamHandlerListLength + '-' + id +'-stream-handler-content" class="collapse in"> <div class="clearfix">' +
+                streamHandlerListLength + '-' + id + '-stream-handler-content" class="collapse in"> <div class="clearfix">' +
                 '<div class = "define-stream-handler-type-content"> </div> <div class = "attr-nav"> </div> ' +
                 '</div> <label class = "error-message"> </label> </div> </div> </li>';
             if (type === Constants.WINDOW || streamHandlerListLength == 0 ||
@@ -3442,20 +3753,23 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
         };
 
         /**
+         * @function to hide and show the description of the info icon
+         */
+        FormUtils.prototype.addEventListenerToShowAndHideInfo = function () {
+            $('.design-view-form-content').on('mouseover', '.fw-info', function () {
+                $(this).find('span').show();
+            });
+
+            $('.design-view-form-content').on('mouseout', '.fw-info', function () {
+                $(this).find('span').hide();
+            });
+        };
+
+        /**
          * @function to add event listeners of the annotation options
          */
         FormUtils.prototype.addEventListenersForGenericOptionsDiv = function (id) {
             var self = this;
-            //To show option description
-            $('#' + id + '-options-div').on('mouseover', '.option-desc', function () {
-                $(this).find('.option-desc-content').show();
-            });
-
-            //To hide option description
-            $('#' + id + '-options-div').on('mouseout', '.option-desc', function () {
-                $(this).find('.option-desc-content').hide();
-            });
-
             //To hide and show the option content of the optional options
             $('#' + id + '-options-div').on('change', '.option-checkbox', function () {
                 var optionParent = $(this).parents(".option");
@@ -3675,7 +3989,7 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
             $(id)[0].scrollIntoView();
             $(id).addClass('required-input-field');
             $(id).addClass('error-input-field');
-            $(id).closest('.clearfix').next('label.error-message').show();
+            $(id).closest('.clearfix').siblings('label.error-message').show();
         };
 
         /**
@@ -3836,7 +4150,7 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
             $.ajax({
                 type: "POST",
                 url: self.tooltipsURL,
-                data: window.btoa(JSON.stringify(appData)),
+                data: self.configurationData.application.utils.base64EncodeUnicode(JSON.stringify(appData)),
                 async: false,
                 success: function (response) {
                     var toolTipObject = _.find(response, function (toolTip) {
@@ -3894,6 +4208,14 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
         /** Handlebar helper to compare if the id is "source" or "sink" or "store" */
         Handlebars.registerHelper('ifSourceOrSinkOrStore', function (id, div) {
             if (id === Constants.SOURCE || id === Constants.SINK || id === Constants.STORE) {
+                return div.fn(this);
+            }
+            return div.inverse(this);
+        });
+
+        /** Handlebar helper to compare if the id is "source" or "sink" or "store" or "window" */
+        Handlebars.registerHelper('ifSourceOrSinkOrStoreOrWindow', function (id, div) {
+            if (id === Constants.SOURCE || id === Constants.SINK || id === Constants.STORE || id === Constants.WINDOW) {
                 return div.fn(this);
             }
             return div.inverse(this);

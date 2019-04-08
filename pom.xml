@@ -27,7 +27,7 @@
     <groupId>org.wso2.carbon.analytics</groupId>
     <artifactId>org.wso2.carbon.analytics.parent</artifactId>
     <packaging>pom</packaging>
-    <version>2.0.495-SNAPSHOT</version>
+    <version>2.0.511-SNAPSHOT</version>
     <name>WSO2 Carbon Analytics - Parent</name>
     <modules>
         <module>components/org.wso2.carbon.stream.processor.common</module>
@@ -40,7 +40,8 @@
         <module>components/org.wso2.carbon.business.rules.templates.editor.core</module>
         <module>components/org.wso2.carbon.business.rules.core</module>
         <module>components/org.wso2.carbon.business.rules.web</module>
-        <module>components/org.wso2.carbon.siddhi.metrics.core</module>
+        <module>components/org.wso2.carbon.sp.coordination.listener</module>
+        <module>components/org.wso2.carbon.sp.metrics.core</module>
         <module>components/org.wso2.carbon.stream.processor.statistics</module>
         <module>components/org.wso2.carbon.status.dashboard.core</module>
         <module>components/org.wso2.carbon.status.dashboard.web</module>
@@ -49,6 +50,7 @@
         <module>components/org.wso2.carbon.permissions.rest.api</module>
         <module>components/org.wso2.carbon.data.provider</module>
         <module>components/org.wso2.carbon.analytics.msf4j.interceptor.common</module>
+        <module>components/org.wso2.carbon.health.check.core</module>
 
         <module>features/org.wso2.carbon.stream.processor.core.feature</module>
         <module>features/org.wso2.carbon.stream.processor.common.feature</module>
@@ -60,7 +62,8 @@
         <module>features/org.wso2.carbon.business.rules.core.feature</module>
         <module>features/org.wso2.carbon.business.rules.web.feature</module>
         <module>features/org.wso2.siddhi.feature</module>
-        <module>features/org.wso2.carbon.siddhi.metrics.core.feature</module>
+        <module>features/org.wso2.carbon.sp.metrics.core.feature</module>
+        <module>features/org.wso2.carbon.sp.coordination.listener.feature</module>
         <module>features/org.wso2.carbon.stream.processor.statistics.feature</module>
         <module>features/org.wso2.carbon.status.dashboard.core.feature</module>
         <module>features/org.wso2.carbon.status.dashboard.web.feature</module>
@@ -69,6 +72,7 @@
         <module>features/org.wso2.carbon.permissions.rest.api.feature</module>
         <module>features/org.wso2.carbon.data.provider.feature</module>
         <module>features/org.wso2.carbon.analytics.msf4j.interceptor.common.feature</module>
+        <module>features/org.wso2.carbon.health.check.core.feature</module>
 
         <module>components/distribution</module>
         <module>components/osgi-tests</module>
@@ -127,10 +131,10 @@
                             <phase>validate</phase>
                             <configuration>
                                 <configLocation>
-                                    https://raw.githubusercontent.com/wso2/code-quality-tools/master/checkstyle/checkstyle.xml
+                                    https://raw.githubusercontent.com/wso2/code-quality-tools/v1.2/checkstyle/checkstyle.xml
                                 </configLocation>
                                 <suppressionsLocation>
-                                    https://raw.githubusercontent.com/wso2/code-quality-tools/master/checkstyle/suppressions.xml
+                                    https://raw.githubusercontent.com/wso2/code-quality-tools/v1.2/checkstyle/suppressions.xml
                                 </suppressionsLocation>
                                 <encoding>UTF-8</encoding>
                                 <consoleOutput>true</consoleOutput>
@@ -900,6 +904,17 @@
                 <version>${carbon.analytics.version}</version>
                 <type>zip</type>
             </dependency>
+            <dependency>
+                <groupId>org.wso2.carbon.analytics</groupId>
+                <artifactId>org.wso2.carbon.health.check.core</artifactId>
+                <version>${carbon.analytics.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.wso2.carbon.analytics</groupId>
+                <artifactId>org.wso2.carbon.health.check.core.feature</artifactId>
+                <version>${carbon.analytics.version}</version>
+                <type>zip</type>
+            </dependency>
 
             <!-- Siddhi Editor related -->
             <dependency>
@@ -1341,15 +1356,28 @@
             </dependency>
             <dependency>
                 <groupId>org.wso2.carbon.analytics</groupId>
-                <artifactId>org.wso2.carbon.siddhi.metrics.core</artifactId>
+                <artifactId>org.wso2.carbon.sp.metrics.core</artifactId>
                 <version>${carbon.analytics.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.wso2.carbon.analytics</groupId>
-                <artifactId>org.wso2.carbon.siddhi.metrics.core.feature</artifactId>
+                <artifactId>org.wso2.carbon.sp.metrics.core.feature</artifactId>
                 <version>${carbon.analytics.version}</version>
                 <type>zip</type>
             </dependency>
+
+            <dependency>
+                <groupId>org.wso2.carbon.analytics</groupId>
+                <artifactId>org.wso2.carbon.sp.coordination.listener</artifactId>
+                <version>${carbon.analytics.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.wso2.carbon.analytics</groupId>
+                <artifactId>org.wso2.carbon.sp.coordination.listener.feature</artifactId>
+                <version>${carbon.analytics.version}</version>
+                <type>zip</type>
+            </dependency>
+
             <dependency>
                 <groupId>org.wso2.carbon.analytics</groupId>
                 <artifactId>org.wso2.carbon.status.dashboard.web.feature</artifactId>
@@ -1558,9 +1586,9 @@
     </dependencyManagement>
 
     <properties>
-        <carbon.analytics.version>2.0.495-SNAPSHOT</carbon.analytics.version>
-        <siddhi.version>4.4.9</siddhi.version>
-        <siddhi.bundle.version>4.4.9</siddhi.bundle.version>
+        <carbon.analytics.version>2.0.511-SNAPSHOT</carbon.analytics.version>
+        <siddhi.version>4.5.0</siddhi.version>
+        <siddhi.bundle.version>4.5.0</siddhi.bundle.version>
         <siddhi.version.range>[4.0.0, 5.0.0)</siddhi.version.range>
         <carbon.analytics-common.version>6.1.8</carbon.analytics-common.version>
         <carbon.analytics-common.version.range>[6.0.66, 6.2.0)</carbon.analytics-common.version.range>
@@ -1607,7 +1635,7 @@
         </equinox.simpleconfigurator.manipulator.version>
         <equinox.util.version>1.0.500.v20130404-1337</equinox.util.version>
         <org.eclipse.equinox.cm.version>1.1.0.v20131021-1936</org.eclipse.equinox.cm.version>
-        <org.snakeyaml.version>1.17</org.snakeyaml.version>
+        <org.snakeyaml.version>1.23</org.snakeyaml.version>
         <org.wso2.eclipse.osgi.version>3.4.0.v20140312-2051</org.wso2.eclipse.osgi.version>
         <junit.version>4.10</junit.version>
         <apache.commons.text.version>1.1</apache.commons.text.version>
@@ -1623,7 +1651,7 @@
         <maven.bundle.plugin.version>2.5.4</maven.bundle.plugin.version>
         <build.helper.maven.plugin.version>1.9.1</build.helper.maven.plugin.version>
         <maven.findbugsplugin.version.exclude>findbugs-exclude.xml</maven.findbugsplugin.version.exclude>
-
+        <maven.build.helper.plugin.version>1.9.1</maven.build.helper.plugin.version>
         <carbon.p2.plugin.version>1.5.4</carbon.p2.plugin.version>
         <carbon.feature.plugin.version>3.1.3</carbon.feature.plugin.version>
 
@@ -1662,15 +1690,15 @@
         <carbon.deployment.export.version>5.2.0</carbon.deployment.export.version>
 
         <carbon.datasources.version>1.1.4</carbon.datasources.version>
-        <carbon.metrics.version>2.3.7</carbon.metrics.version>
+        <carbon.metrics.version>2.3.8</carbon.metrics.version>
         <carbon.jndi.version>1.0.5</carbon.jndi.version>
 
         <carbon.cache.version>1.1.3</carbon.cache.version>
         <carbon.touchpoint.version>1.1.1</carbon.touchpoint.version>
         <carbon.utils.version>2.0.8</carbon.utils.version>
-        <carbon.config.version>2.1.5</carbon.config.version>
+        <carbon.config.version>2.1.10</carbon.config.version>
         <carbon.config.version.range>[2.1.5, 3.0.0)</carbon.config.version.range>
-        <carbon.securevault.version>5.0.11</carbon.securevault.version>
+        <carbon.securevault.version>5.0.13</carbon.securevault.version>
 
         <!-- Clustering Dependencies -->
         <carbon.coordination.version>2.1.1</carbon.coordination.version>
@@ -1723,9 +1751,9 @@
         <common.collections4.version>4.1</common.collections4.version>
 
         <!--MSF4J related-->
-        <msf4j.version>2.7.0</msf4j.version>
+        <msf4j.version>2.7.2</msf4j.version>
         <msf4j.import.version.range>[2.7.0, 3.0.0)</msf4j.import.version.range>
-        <com.fasterxml.jackson.core.version>2.9.6</com.fasterxml.jackson.core.version>
+        <com.fasterxml.jackson.core.version>2.9.8</com.fasterxml.jackson.core.version>
         <com.fasterxml.jackson.core.version.range>[2.9.0, 2.10.0)</com.fasterxml.jackson.core.version.range>
         <io.swagger.version>1.5.16</io.swagger.version>
         <javax.ws.rs-api.version>2.0</javax.ws.rs-api.version>

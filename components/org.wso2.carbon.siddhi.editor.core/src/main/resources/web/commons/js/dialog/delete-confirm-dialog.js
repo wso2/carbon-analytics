@@ -78,7 +78,7 @@ define(['require', 'lodash', 'jquery', 'log', 'backbone', 'file_browser',
                         "<div class='modal-content'>" +
                         "<div class='modal-header'>" +
                         "<button type='button' class='close' data-dismiss='modal' aria-label='Close'>" +
-                        "<span aria-hidden='true'>&times;</span>" +
+                        "<i class='fw fw-cancel about-dialog-close'> </i> " +
                         "</button>" +
                         "<h4 class='modal-title file-dialog-title' id='newConfigModalLabel'>Delete from Workspace<" +
                         "/h4>" +
@@ -278,7 +278,7 @@ define(['require', 'lodash', 'jquery', 'log', 'backbone', 'file_browser',
                         var data = {};
                         var workspaceServiceURL = app.config.services.workspace.endpoint;
                         var saveServiceURL = workspaceServiceURL + "/exists/workspace";
-                        var payload = "configName=" + btoa(options.configName);
+                        var payload = "configName=" + self.app.utils.base64EncodeUnicode(options.configName);
 
                         $.ajax({
                             type: "POST",

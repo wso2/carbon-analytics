@@ -137,6 +137,21 @@ define(
             this.per = per;
         };
 
+        JoinQueryInput.prototype.resetModel = function (queryInput) {
+            var on = queryInput.getOn();
+            var per = queryInput.getPer();
+            var within = queryInput.getWithin();
+            if (on && on != "") {
+                queryInput.setOn(" ");
+            }
+            if (per && per != "") {
+                queryInput.setPer(" ");
+            }
+            if (within && within != "") {
+                queryInput.setWithin(" ");
+            }
+        };
+
         return JoinQueryInput;
 
     });

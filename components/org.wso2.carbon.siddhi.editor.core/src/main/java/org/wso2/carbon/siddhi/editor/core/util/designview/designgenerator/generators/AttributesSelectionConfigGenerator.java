@@ -18,12 +18,11 @@
 
 package org.wso2.carbon.siddhi.editor.core.util.designview.designgenerator.generators;
 
-import org.apache.log4j.Logger;
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.attributesselection.AllSelectionConfig;
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.attributesselection.AttributesSelectionConfig;
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.attributesselection.SelectedAttribute;
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.attributesselection.UserDefinedSelectionConfig;
-import org.wso2.carbon.siddhi.editor.core.util.designview.exceptions.DesignGenerationException;
+import org.wso2.carbon.siddhi.editor.core.util.designview.constants.SiddhiCodeBuilderConstants;
 import org.wso2.carbon.siddhi.editor.core.util.designview.utilities.ConfigBuildingUtilities;
 import org.wso2.siddhi.query.api.execution.query.selection.OutputAttribute;
 import org.wso2.siddhi.query.api.execution.query.selection.Selector;
@@ -36,7 +35,6 @@ import java.util.List;
  */
 public class AttributesSelectionConfigGenerator extends CodeSegmentsPreserver {
     private String siddhiAppString;
-    private static final Logger log = Logger.getLogger(AttributesSelectionConfigGenerator.class);
 
     public AttributesSelectionConfigGenerator(String siddhiAppString) {
         this.siddhiAppString = siddhiAppString;
@@ -51,18 +49,16 @@ public class AttributesSelectionConfigGenerator extends CodeSegmentsPreserver {
         List<SelectedAttribute> selectedAttributes = new ArrayList<>();
         List<OutputAttribute> selectionList = selector.getSelectionList();
 
-        if(selectionList.isEmpty()) {
+        if(ConfigBuildingUtilities.getDefinition(selectionList.get(0).getExpression(), siddhiAppString).
+                equals(SiddhiCodeBuilderConstants.SELECT_ALL)) {
             AllSelectionConfig allSelectionConfig = new AllSelectionConfig();
             preserveAndBindCodeSegment(selector, allSelectionConfig);
             return new AllSelectionConfig();
         } else {
             for (OutputAttribute outputAttribute : selector.getSelectionList()) {
-                try {
-                    selectedAttributes.add(generateSelectedAttribute(outputAttribute));
-                } catch (DesignGenerationException e) {
-                    AllSelectionConfig allSelectionConfig = new AllSelectionConfig();
-                    preserveAndBindCodeSegment(selector, allSelectionConfig);
-                    return new AllSelectionConfig();
+                SelectedAttribute userDefinedAttribute = generateSelectedAttribute(outputAttribute);
+                if(userDefinedAttribute != null) {
+                    selectedAttributes.add(userDefinedAttribute);
                 }
             }
         }
@@ -76,16 +72,15 @@ public class AttributesSelectionConfigGenerator extends CodeSegmentsPreserver {
      * Generates a SelectedAttribute object from the given Siddhi OutputAttribute
      * @param outputAttribute                   Siddhi OutputAttribute object
      * @return                                  SelectedAttribute object
-     * @throws DesignGenerationException        Error while getting the definition of the OutputAttribute
      */
-    private SelectedAttribute generateSelectedAttribute(OutputAttribute outputAttribute)
-            throws DesignGenerationException {
-        SelectedAttribute selectedAttribute =
-                new SelectedAttribute(
-                        ConfigBuildingUtilities.getDefinition(outputAttribute.getExpression(), siddhiAppString),
-                        outputAttribute.getRename());
-        preserveAndBindCodeSegment(outputAttribute, selectedAttribute);
-        return selectedAttribute;
-
+    private SelectedAttribute generateSelectedAttribute(OutputAttribute outputAttribute) {
+        String expression = ConfigBuildingUtilities.getDefinition(outputAttribute.getExpression(), siddhiAppString);
+        if(expression != null) {
+            SelectedAttribute selectedAttribute = new SelectedAttribute(expression, outputAttribute.getRename());
+            preserveAndBindCodeSegment(outputAttribute, selectedAttribute);
+            return selectedAttribute;
+        } else {
+            return null;
+        }
     }
 }

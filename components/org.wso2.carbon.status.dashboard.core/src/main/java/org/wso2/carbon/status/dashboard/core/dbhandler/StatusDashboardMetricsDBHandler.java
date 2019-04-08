@@ -33,6 +33,10 @@ import org.wso2.carbon.status.dashboard.core.dbhandler.utils.SQLConstants;
 import org.wso2.carbon.status.dashboard.core.exception.RDBMSTableException;
 import org.wso2.carbon.status.dashboard.core.exception.StatusDashboardRuntimeException;
 import org.wso2.carbon.status.dashboard.core.internal.MonitoringDataHolder;
+import org.wso2.carbon.stream.processor.core.internal.util.SiddhiAppProcessorConstants;
+import org.wso2.siddhi.core.config.StatisticsConfiguration;
+import org.wso2.siddhi.core.util.SiddhiConstants;
+import org.wso2.siddhi.core.util.statistics.metrics.SiddhiMetricsFactory;
 
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
@@ -88,7 +92,9 @@ public class StatusDashboardMetricsDBHandler {
             METRICS_TABLE_METRIC_HISTOGRAM, METRICS_TABLE_METRIC_METER, METRICS_TABLE_METRIC_TIMER};
     private static final String APP_NAME_PREFIX = "org.wso2.siddhi.SiddhiApps.";
     private String selectAppMetricsQuery;
+    private String recordSelectHAMetricsQuery;
     private String recordSelectAggregatedAppMetricsQuery;
+    private String recordSelectAggregatedHAMetricsQuery;
     private String selectWorkerMetricsQuery;
     private String selectWorkerAggregatedMetricsQuery;
     private String selectAppComponentList;
@@ -111,6 +117,7 @@ public class StatusDashboardMetricsDBHandler {
                         databaseMetaData.getDatabaseProductVersion());
                 workerAttributeTypeMap = DBTableUtils.getInstance().loadMetricsAttributeTypeMap(metricsQueryManager);
                 selectAppMetricsQuery = metricsQueryManager.getQuery(SQLConstants.SELECT_APP_METRICS_QUERY);
+                recordSelectHAMetricsQuery = metricsQueryManager.getQuery(SQLConstants.SELECT_HA_WORKER_METRICS_QUERY);
                 selectWorkerMetricsQuery = metricsQueryManager.getQuery(SQLConstants.SELECT_WORKER_METRICS_QUERY);
                 selectWorkerThroughputQuery = metricsQueryManager.getQuery(SQLConstants.
                         SELECT_WORKER_THROUGHPUT_QUERY);
@@ -124,6 +131,8 @@ public class StatusDashboardMetricsDBHandler {
                         SELECT_COMPONENT_METRICS_HISTORY);
                 recordSelectAggregatedAppMetricsQuery = metricsQueryManager.getQuery(SQLConstants.
                         SELECT_APP_AGG_METRICS_HISTORY);
+                recordSelectAggregatedHAMetricsQuery = metricsQueryManager.getQuery(SQLConstants.
+                        SELECT_HA_WORKER_AGGREGATE_METRICS_QUERY);
                 selectAppComponentAggregatedHistory = metricsQueryManager.getQuery(SQLConstants.
                         SELECT_COMPONENT_AGG_METRICS_HISTORY);
             } catch (SQLException | ConfigurationException | QueryMappingNotAvailableException e) {
@@ -528,7 +537,30 @@ public class StatusDashboardMetricsDBHandler {
             }
         }
     }
-    
+
+    /**
+     * This method resolves the MetricElement query by replacing the values if the timeInterval is larger than an hour.
+     *
+     * @param workerId     workerID
+     * @param timeInterval timeInterval
+     * @param currentTime  current time expression.
+     * @return selected list of metrics.
+     */
+    public List selectHAOverallMetrics(String workerId, long timeInterval, long currentTime) {
+        String resolvedQueryTable = recordSelectHAMetricsQuery
+                .replace(SQLConstants.PLACEHOLDER_COLUMNS, EXPR_SUM_FROM_M1_RATE)
+                .replace(SQLConstants.PLACEHOLDER_BEGIN_TIME, QUESTION_MARK)
+                .replace(PLACEHOLDER_NAME, QUESTION_MARK)
+                .replace(PLACEHOLDER_WORKER_ID, QUESTION_MARK)
+                .replace(SQLConstants.PLACEHOLDER_CURRENT_TIME, QUESTION_MARK)
+                .replace(PLACEHOLDER_RESULT, COLUMN_M1_RATE)
+                .replace(PLACEHOLDER_TABLE_NAME, METRICS_TABLE_METRIC_METER);
+        Object[] parameters = new Object[] {workerId, SiddhiAppProcessorConstants.HA_METRICS_PREFIX +
+                SiddhiConstants.METRIC_DELIMITER + PERCENTAGE_MARK, currentTime - timeInterval, currentTime};
+        return select(resolvedQueryTable, COLUMN_TIMESTAMP + SEPARATOR + COLUMN_M1_RATE + SEPARATOR +
+                        COLUMN_NAME, METRICS_TABLE_METRIC_METER, parameters);
+    }
+
     /**
      * This method resold the MetricElement query by replacing the values.
      *
@@ -592,7 +624,32 @@ public class StatusDashboardMetricsDBHandler {
             }
         }
     }
-    
+
+    /**
+     * This method resolves the MetricElement query by replacing the values if the timeInterval is less than an hour.
+     *
+     * @param workerId     workerID
+     * @param timeInterval timeInterval
+     * @param currentTime  current time expression.
+     * @return selected list of metrics.
+     */
+    public List selectHAAggOverallMetrics(String workerId, long timeInterval, long currentTime) {
+        long aggregationTime = DBTableUtils.getAggregation(timeInterval);
+        String resolvedQueryTable = recordSelectAggregatedHAMetricsQuery.
+                replace(SQLConstants.PLACEHOLDER_COLUMNS, EXPR_SUM_FROM_M1_RATE).
+                replace(SQLConstants.PLACEHOLDER_BEGIN_TIME, QUESTION_MARK).
+                replace(PLACEHOLDER_NAME, QUESTION_MARK).
+                replace(PLACEHOLDER_WORKER_ID, QUESTION_MARK).
+                replace(SQLConstants.PLACEHOLDER_CURRENT_TIME,QUESTION_MARK).
+                replace(PLACEHOLDER_RESULT, COLUMN_M1_RATE).
+                replace(PLACEHOLDER_TABLE_NAME, METRICS_TABLE_METRIC_METER).
+                replace(PLACEHOLDER_AGGREGATION_TIME, Long.toString(aggregationTime));
+        Object[] parameters = new Object[] {workerId, SiddhiAppProcessorConstants.HA_METRICS_PREFIX +
+                SiddhiConstants.METRIC_DELIMITER + PERCENTAGE_MARK, currentTime - timeInterval, currentTime};
+        return select(resolvedQueryTable, COLUMN_AGG_TIMESTAMP + SEPARATOR + COLUMN_M1_RATE + SEPARATOR +
+                        COLUMN_NAME, METRICS_TABLE_METRIC_METER, parameters);
+    }
+
     /**
      * Used to get the metrics gauges of jvm metrics.
      *
@@ -628,11 +685,12 @@ public class StatusDashboardMetricsDBHandler {
         long aggregationTime = DBTableUtils.getAggregation(timeInterval);
         String resolvedSelectWorkerMetricsQuery = resolveTableName(
                 selectWorkerAggregatedMetricsQuery, METRICS_TABLE_METRIC_GAUGE);
-        String resolvedQuery = resolvedSelectWorkerMetricsQuery.replace(SQLConstants.PLACEHOLDER_BEGIN_TIME,
-                QUESTION_MARK).replace(PLACEHOLDER_NAME, QUESTION_MARK)
-                .replace(PLACEHOLDER_WORKER_ID, QUESTION_MARK)
-                .replace(SQLConstants.PLACEHOLDER_CURRENT_TIME, QUESTION_MARK)
-                .replace(PLACEHOLDER_AGGREGATION_TIME, Long.toString(aggregationTime));
+        String resolvedQuery = resolvedSelectWorkerMetricsQuery.
+                replace(SQLConstants.PLACEHOLDER_BEGIN_TIME, QUESTION_MARK).
+                replace(PLACEHOLDER_NAME, QUESTION_MARK).
+                replace(PLACEHOLDER_WORKER_ID, QUESTION_MARK).
+                replace(SQLConstants.PLACEHOLDER_CURRENT_TIME, QUESTION_MARK).
+                replace(PLACEHOLDER_AGGREGATION_TIME, Long.toString(aggregationTime));
         Object[] parameters = new Object[] {workerId, metricTypeName, currentTime - timeInterval, currentTime};
         return selectGauge(resolvedQuery, true, parameters);
     }

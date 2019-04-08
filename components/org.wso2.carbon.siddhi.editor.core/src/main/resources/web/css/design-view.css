@@ -51,6 +51,7 @@
 .grid-container {
     /* Temp */
     width: calc(100% - 67px);
+    overflow: auto;
     position: relative;
     background: linear-gradient(-90deg, rgba(0, 0, 0, .001) 1px, transparent 1px),
     linear-gradient(rgba(0, 0, 0, .03) 1px, transparent 1px),
@@ -157,6 +158,10 @@
     -o-transition: -o-box-shadow 0.15s ease-in;
     transition: box-shadow 0.15s ease-in;
     border: 1px solid #ccc;
+}
+
+.faultStreamDrop {
+    background-image: url("../images/error-stream.svg");
 }
 
 .partitionDrop {
@@ -285,6 +290,12 @@ td {
 .connectorOutSink {
     float: right;
     margin-top: -53px;
+    margin-right: -5px;
+}
+
+.connectorErrOutStream {
+    float: right;
+    margin-top: -30px;
     margin-right: -5px;
 }
 
@@ -627,7 +638,11 @@ a.list-group-item, button.list-group-item {
 .design-view-form-content .error-message {
 	display: none;
 	color: red;
-	padding-top: 3px;
+	padding-top: 4px;
+}
+
+.aggregation-form-container .aggregate-by-content .error-message {
+    margin-left: 20px;
 }
 
 .design-view-form-content .customized-options .error-message,
@@ -636,19 +651,23 @@ a.list-group-item, button.list-group-item {
 }
 
 .partition-form-container .partition-by-expression-selection {
-    width: 80%
+    width: 90%
 }
 
 .partition-form-container .partition-by-label {
-    width: 30%;
+    width: 43%;
     margin: 5px;
     text-align: left;
 }
 
 .partition-form-container .partition-stream-name,
 .partition-form-container .partition-expression {
-    width: 32.5%;
+    width: 45%;
     float: left;
+}
+
+.partition-form-container input[type="text"].partition-by-stream-name {
+    width: 90%;
 }
 
 .source-sink-form-container .source-sink-map-options .error-message,
@@ -667,13 +686,30 @@ a.list-group-item, button.list-group-item {
 	background: #424242;
 }
 
+.design-view-form-content input:read-only {
+    line-height: 20px;
+    padding: 0 5px;
+}
+
 .design-view-form-content textarea {
 	min-height: 65px;
 }
 
 .design-view-form-content input[type="text"].name,
+.design-view-form-content input:read-only.name,
 .design-view-form-content textarea {
-	width: 85%
+	width: 80%
+}
+
+.table-form-container input[type="text"].name,
+.window-form-container input[type="text"].name {
+  width: 82%;
+}
+
+.source-sink-form-container #mapper-attributes input[type="text"].attr-value,
+.source-sink-form-container #mapper-attributes input:read-only.attr-key,
+.source-sink-form-container #mapper-attributes input[type="text"].attr-key {
+    width: 40%;
 }
 
 .design-view-form-content .pattern-query-form-container input.name,
@@ -686,7 +722,7 @@ a.list-group-item, button.list-group-item {
 	margin-right: 5px;
 }
 
-.design-view-form-content .define-select input[type="text"].attribute-as {
+.design-view-form-content .define-select input:read-only.attribute-as {
     width: 35%;
 }
 
@@ -702,9 +738,8 @@ a.list-group-item, button.list-group-item {
 }
 
 .design-view-form-content input[type="text"].option-value,
-.window-form-container input[type="text"].parameter-value,
-.design-view-form-content input[type="text"].expression-value {
-	width: 50%;
+.window-form-container input[type="text"].parameter-value {
+	width: 85%;
 	margin-bottom: 2px;
 	margin-left: 20px;
 }
@@ -718,10 +753,15 @@ a.list-group-item, button.list-group-item {
 .design-view-form-content #primary-index-annotations input[type="text"].annotation-value {
  	margin-bottom: 2px;
 	margin-left: 20px;
+    width: 50%;
  }
 
 .design-view-form-content .attr-nav {
-	margin-left: 10px;
+	margin-top: -1px;
+}
+
+.stream-form-container .attr-nav {
+    margin-left: -15px;
 }
 
 .design-view-form-content .attr-nav  a {
@@ -753,7 +793,7 @@ a.list-group-item, button.list-group-item {
     background: #424242;
 }
 
-.design-view-form-content input[type="text"]:read-only,
+.design-view-form-content input:read-only,
 .design-view-form-content select:disabled {
 	cursor: not-allowed;
 	background: #1d1d1d;
@@ -788,6 +828,14 @@ a.list-group-item, button.list-group-item {
 .design-view-form-content .attr-content {
 	display: inline-block;
 	float: left;
+}
+
+.design-view-form-content .attr-content {
+    width: 85%;
+}
+
+.design-view-form-content #attribute-div input[type="text"] {
+    width: 85%;
 }
 
 .design-view-form-content .define-stream-handler .attr-nav {
@@ -931,10 +979,8 @@ a.list-group-item, button.list-group-item {
 
 .trigger-form-container,
 .function-form-container {
-	width: 25%;
+	width: 40%;
 }
-
-.window-form-container { width: 24% }
 
 .pattern-sequence-query-form-container,
 .join-query-form-container {
@@ -943,7 +989,7 @@ a.list-group-item, button.list-group-item {
 
 .aggregation-form-container,
 .query-form-container {
-	width: 30%;
+	width: 32%;
 }
 
 .aggregation-form-container #primary-index-annotations {
@@ -953,8 +999,6 @@ a.list-group-item, button.list-group-item {
 .aggregation-form-container .define-predefined-annotations {
 	margin-top: -10px;
 }
-
-
 
 .trigger-form-container #define-trigger-criteria {
 	margin-top: -3px;
@@ -967,11 +1011,11 @@ a.list-group-item, button.list-group-item {
 }
 
 .design-view-form-content .table-div{
-	width: 25%;
+	width: 33%;
 }
 
 .design-view-form-content .mapper-div {
-    width: 22%;
+    width: 28%;
 }
 
 .design-view-form-content .customized-options{
@@ -983,12 +1027,12 @@ a.list-group-item, button.list-group-item {
 }
 
 .design-view-form-content .store-div {
-	width: 40%;
+	width: 33%;
 }
 
-.design-view-form-content .define-table-annotation {
-	width: 30%;
-	margin-left: 20px;
+.design-view-form-content .define-table-annotation,
+.design-view-form-content .window-form-container {
+	width: 32%;
 }
 
 .design-view-form-content #primary-index-annotations .annotation {
@@ -1050,12 +1094,9 @@ a.list-group-item, button.list-group-item {
 	margin-top: 10px;
 }
 
-.design-view-form-content .option .option-desc-content,
-.design-view-form-content .parameter .parameter-desc-content,
-.aggregation-form-container .attribute-by-desc-content,
-.trigger-form-container #define-trigger-criteria .criteria-description {
+.design-view-form-content .fw-info > span {
 	 font-family: Arial;
-	 background: #252525;
+	 background: rgb(37, 36, 36);
 	 width: 250px;
 	 color: #eee;
 	 text-align: left;
@@ -1066,6 +1107,21 @@ a.list-group-item, button.list-group-item {
 	 z-index: 1;
 }
 
+.design-view-form-content .hovered-content {
+    font-family: Arial;
+    background: rgb(51, 50, 50);
+    color: #eee;
+    text-align: left;
+    border-radius: 4px;
+    padding: 5px;
+    word-break: break-all;
+    position: absolute;
+    margin-top: 2px;
+    min-width: 250px;
+    max-width: 500px;
+    border: 1px solid #afadad;
+}
+
 .design-view-form-content .btn-default {
     margin-top: 15px;
 }
@@ -1073,7 +1129,7 @@ a.list-group-item, button.list-group-item {
 .design-view-form-content #primary-index-annotations .btn-add-annot-value {
 	margin-top: 5px;
 	margin-bottom: 10px;
-	margin-left: 125px;
+	margin-left: 20px;
 }
 
 .design-view-form-content .option .mandatory-symbol,
@@ -1093,6 +1149,10 @@ a.list-group-item, button.list-group-item {
 	border: 1px solid #716e6e;
 	height: 22px;
 	border-radius: 0px;
+}
+
+.design-view-form-content input.custom-combobox-input {
+    padding: 5px;
 }
 
 .design-view-form-content .custom-combobox-toggle {
@@ -1201,10 +1261,17 @@ a.list-group-item, button.list-group-item {
 	margin-top: 3px;
 }
 
-.design-view-form-content .group-by-content .btn-del-option,
-.design-view-form-content .order-by-attributes .define-order-del {
+.design-view-form-content .group-by-content .btn-del-option {
 	margin-left: 10px;
-    margin-top: 2px;
+    margin-top: 1px;
+}
+
+.design-view-form-content .order-group-by-content .define-order-del {
+    margin-left: 10px;
+}
+
+.design-view-form-content .order-by-attribute-content .btn-del-option {
+    margin-top: 0px;
 }
 
 .join-query-form-container .define-source input[type="text"].as-content-value {
@@ -1351,8 +1418,12 @@ label.option-name {
 }
 
 .aggregation-form-container #define-aggregate-annotations,
-.trigger-form-container #define-trigger-criteria{
+.trigger-form-container #define-trigger-criteria {
     margin-top: 20px;
+}
+
+.window-form-container .define-output-events {
+    margin-bottom: 20px;
 }
 
 .design-view-form-content .define-user-defined-annotations,
@@ -1370,8 +1441,9 @@ label.option-name {
     margin-bottom: 2px;
 }
 
-.output-console-content-wrapper {
-    min-width: 1300px;
+.design-view-form-content {
+    min-width: 1920px;
+    overflow-x: unset;
 }
 
 .btn-default:active,
@@ -1381,9 +1453,13 @@ label.option-name {
 }
 
 .design-view-form-content .attribute-mapping-label {
-    width: 30%;
+    width: 37%;
     text-align: left;
     margin: 6px;
+}
+
+.design-view-form-content .customized-options input[type="text"] {
+    width: 50%;
 }
 
 .design-view-form-content .collapse-div[aria-expanded=false] .collapse-icon::after {
@@ -1407,3 +1483,21 @@ label.option-name {
     background-color: #282929;
     padding: 3px 7px;
 }
+
+.design-view-form-content .define-query-output .set-condition li {
+    margin: 5px;
+}
+
+.design-view-form-content .define-query-output .set-condition li input[type="text"] {
+    width: 40%;
+}
+
+.design-view-form-content .define-query-output .define-operation-set-condition .set-attribute-label {
+    margin: 5px;
+    width: 38%;
+}
+
+.design-view-form-content h3 {
+    margin-top: 1px;
+}
+

@@ -30,7 +30,7 @@ export default class StatusDashboardAPIS {
     static getHTTPClient() {
         let httpClient = Axios.create({
             baseURL: window.location.origin + "/" + window.contextPath.substr(1) + '/apis/workers',
-            timeout: 12000,
+            timeout: 300000,
             headers: {"Authorization": "Bearer " + AuthManager.getUser().SDID}
         });
         httpClient.defaults.headers.post['Content-Type'] = MediaType.APPLICATION_JSON;
@@ -93,6 +93,22 @@ export default class StatusDashboardAPIS {
      */
     static getWorkerHistoryByID(workerID, queryParams) {
         return StatusDashboardAPIS.getHTTPClient().get('/' + workerID + '/history', queryParams);
+    }
+
+    /**
+     * This method will return the Worker history details types given by queryParams and with given Worker ID.
+     * @param workerID
+     * @param appName
+     * @param queryParams - json object with required statistics types
+     */
+    static getHAWorkerHistoryByID(workerID, queryParams) {
+        return StatusDashboardAPIS.getHTTPClient().get('/' + workerID + '/ha/history'
+            , queryParams);
+    }
+
+    static getHAWorkerDetailsByID(workerID, queryParams) {
+        return StatusDashboardAPIS.getHTTPClient().get('/' + workerID + '/ha-status'
+            , queryParams);
     }
 
     /**

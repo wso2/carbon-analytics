@@ -17,11 +17,11 @@
  */
 define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dropElements', 'dagre', 'edge',
         'windowFilterProjectionQueryInput', 'joinQueryInput', 'patternOrSequenceQueryInput', 'queryOutput',
-        'partitionWith', 'jsonValidator', 'dragSelect'],
+        'partitionWith', 'jsonValidator', 'constants', 'dragSelect'],
 
     function (require, log, $, Backbone, _, DesignViewUtils, DropElements, dagre, Edge,
               WindowFilterProjectionQueryInput, JoinQueryInput, PatternOrSequenceQueryInput, QueryOutput,
-              PartitionWith, JSONValidator) {
+              PartitionWith, JSONValidator, Constants) {
 
         const TAB_INDEX = 10;
         const ENTER_KEY = 13;
@@ -656,10 +656,23 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
                     * explicitly set the sourceId.  Simply if sourceId is '' that means this connection is related to a
                     * partition.
                     * */
+                    var isFromFaultStream = connection.sourceId.substr(connection.sourceId.indexOf('-')) === '-err-out';
                     if (sourceId === '') {
                         sourceId = source;
                         sourceType = 'PARTITION';
                     } else {
+                        if (isFromFaultStream) {
+                            // Change the source id to the respective source id of the fault stream
+                            var streamMap = {};
+                            var eventStreamName = '';
+                            self.configurationData.getSiddhiAppConfig().getStreamList().forEach(function(s) {
+                                streamMap[s.getName()] = s;
+                                if (s.getId() === sourceId) {
+                                    eventStreamName = s.getName();
+                                }
+                            });
+                            sourceId = streamMap[Constants.FAULT_STREAM_PREFIX + eventStreamName].getId();
+                        }
                         if (self.configurationData.getSiddhiAppConfig().getDefinitionElementById(sourceId, true, true)
                             !== undefined) {
                             sourceType
@@ -1201,8 +1214,11 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
 
                     } else if (targetElement.hasClass(constants.AGGREGATION)
                         && (sourceElement.hasClass(constants.STREAM) || sourceElement.hasClass(constants.TRIGGER))) {
-                        self.configurationData.getSiddhiAppConfig().getAggregation(targetId).setConnectedSource(undefined);
-
+                        model = self.configurationData.getSiddhiAppConfig().getAggregation(targetId)
+                        model.setConnectedSource(undefined);
+                        if(sourceElement.hasClass(constants.STREAM)) {
+                            model.resetInputModel(model);
+                        }
                     } else if (sourceElement.hasClass(constants.STREAM) || sourceElement.hasClass(constants.TABLE)
                         || sourceElement.hasClass(constants.AGGREGATION) || sourceElement.hasClass(constants.WINDOW)
                         || sourceElement.hasClass(constants.TRIGGER)
@@ -1226,7 +1242,7 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
                                 || targetElement.hasClass(constants.FUNCTION_QUERY))) {
                             model = self.configurationData.getSiddhiAppConfig()
                                 .getWindowFilterProjectionQuery(targetId);
-                            model.getQueryInput().setConnectedSource(undefined);
+                            model.resetInputModel(model);
 
                         } else if (targetElement.hasClass(constants.JOIN)) {
                             model = self.configurationData.getSiddhiAppConfig().getJoinQuery(targetId);
@@ -1264,6 +1280,7 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
                                     && queryInput.getRight().getConnectedSource() === disconnectedElementSourceName) {
                                     queryInput.setRight(undefined);
                                 }
+                                model.resetInputModel(model);
                             }
 
                         } else if (sourceElement.hasClass(constants.STREAM)
@@ -1280,12 +1297,10 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
 
                             if (targetElement.hasClass(constants.PATTERN)) {
                                 model = self.configurationData.getSiddhiAppConfig().getPatternQuery(targetId);
-                                model.getQueryInput().removeConnectedElementName(disconnectedElementName);
-                                model.getQueryInput().removeConditionsWhereStreamNameIsUsed(disconnectedElementName);
+                                model.resetInputModel(model, disconnectedElementName);
                             } else if (targetElement.hasClass(constants.SEQUENCE)) {
                                 model = self.configurationData.getSiddhiAppConfig().getSequenceQuery(targetId);
-                                model.getQueryInput().removeConnectedElementName(disconnectedElementName);
-                                model.getQueryInput().removeConditionsWhereStreamNameIsUsed(disconnectedElementName);
+                                model.resetInputModel(model, disconnectedElementName);
                             }
                         }
 
@@ -1310,7 +1325,7 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
                             } else if (sourceElement.hasClass(constants.SEQUENCE)) {
                                 model = self.configurationData.getSiddhiAppConfig().getSequenceQuery(sourceId);
                             }
-                            model.getQueryOutput().setTarget(undefined);
+                            model.resetOutputModel(model);
                         }
                     }
 
@@ -1577,7 +1592,7 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
                 if (toolTipObject !== undefined) {
                     streamToolTip = toolTipObject.text;
                 }
-                self.handleStream(mouseTop, mouseLeft, true, streamId, streamName, streamToolTip);
+                self.handleStream(mouseTop, mouseLeft, true, streamId, streamName, streamToolTip, stream);
             });
 
             _.forEach(self.configurationData.getSiddhiAppConfig().getTableList(), function (table) {
@@ -1790,7 +1805,7 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
                     if (toolTipObject !== undefined) {
                         streamToolTip = toolTipObject.text;
                     }
-                    self.handleStream(mouseTop, mouseLeft, true, streamId, streamName, streamToolTip);
+                    self.handleStream(mouseTop, mouseLeft, true, streamId, streamName, streamToolTip, stream);
 
                     var streamElement = $('#' + streamId)[0];
                     self.jsPlumbInstance.addToGroup(jsPlumbPartitionGroup, streamElement);
@@ -1918,11 +1933,23 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
                 } else if (edge.getParentType() === 'SINK' && edge.getChildType() === 'SOURCE') {
                     targetId = edge.getChildId() + '-in';
                     sourceId = edge.getParentId() + '-out';
-                    paintStyle = { strokeWidth: 2, stroke: "#424242", dashstyle: "2 3", outlineStroke: "transparent",
-                        outlineWidth: "3" }
+                    paintStyle = {
+                        strokeWidth: 2, stroke: "#424242", dashstyle: "2 3", outlineStroke: "transparent",
+                        outlineWidth: "3"
+                    }
                 } else {
+                    // check if the edge is originating from a fault stream. if so get the corresponding event stream
+                    // and draw the edge from the -err-out connector.
+                    if (edge.isFromFaultStream()) {
+                        sourceId = edge.getParentId() + '-err-out';
+                        paintStyle = {
+                            strokeWidth: 2, stroke: "#FF0000", dashstyle: "2 3", outlineStroke: "transparent",
+                            outlineWidth: "3"
+                        };
+                    } else {
+                        sourceId = edge.getParentId() + '-out';
+                    }
                     targetId = edge.getChildId() + '-in';
-                    sourceId = edge.getParentId() + '-out';
                 }
 
                 self.jsPlumbInstance.connect({
@@ -2261,7 +2288,7 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
         };
 
         DesignGrid.prototype.handleStream = function (mouseTop, mouseLeft, isCodeToDesignMode, streamId, streamName,
-                                                      streamToolTip) {
+                                                      streamToolTip, stream) {
             var self = this;
             var elementId;
             if (isCodeToDesignMode !== undefined && !isCodeToDesignMode) {
@@ -2276,17 +2303,24 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
             } else {
                 console.log("isCodeToDesignMode parameter is undefined");
             }
+
             var newAgent = $('<div>').attr({
                 'id': elementId,
                 'tabindex': TAB_INDEX
             }).addClass(constants.STREAM);
+
+            // If this is a fault stream, hide it
+            if (stream && stream.isFaultStream()) {
+                newAgent.hide();
+            }
+
             if (isCodeToDesignMode) {
                 newAgent.attr('title', streamToolTip);
             }
             self.canvas.append(newAgent);
             // Drop the stream element. Inside this a it generates the stream definition form.
             self.dropElements.dropStream(newAgent, elementId, mouseTop, mouseLeft, isCodeToDesignMode,
-                false, streamName);
+                false, streamName, stream && stream.hasFaultStream());
             self.configurationData.getSiddhiAppConfig()
                 .setFinalElementCount(self.configurationData.getSiddhiAppConfig().getFinalElementCount() + 1);
             self.dropElements.registerElementEventListeners(newAgent);
@@ -2689,7 +2723,7 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
             $.ajax({
                 type: "POST",
                 url: self.tooltipsURL,
-                data: window.btoa(designViewJSON),
+                data: self.options.application.utils.base64EncodeUnicode(designViewJSON),
                 async: false,
                 success: function (response) {
                     result = {status: "success", tooltipList: response};

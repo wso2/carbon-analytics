@@ -29,6 +29,7 @@ define(['require', 'log', 'jquery', 'lodash', 'constants'],
                 this.configurationData = options.configurationData;
                 this.application = options.application;
                 this.formUtils = options.formUtils;
+                this.jsPlumbInstance = options.jsPlumbInstance;
                 this.consoleListManager = options.application.outputController;
                 var currentTabId = this.application.tabController.activeTab.cid;
                 this.designViewContainer = $('#design-container-' + currentTabId);
@@ -46,7 +47,7 @@ define(['require', 'log', 'jquery', 'lodash', 'constants'],
                 triggerCriteriaDiv += '<option value = "' + triggerCriteria.name + '">' + triggerCriteria.name + '</option>';
             });
             triggerCriteriaDiv += '</select> <i class = "fw fw-info"> ' +
-                '<span style = "display:none" class = "criteria-description"> </span> </i>';
+                '<span style = "display:none"> </span> </i>';
             $('#define-trigger-criteria').html(triggerCriteriaDiv);
         };
 
@@ -60,7 +61,7 @@ define(['require', 'log', 'jquery', 'lodash', 'constants'],
                 $('#trigger-criteria-content').html('');
             } else {
                 //render a text-box to put the atEvery or cron-expression value
-                $('#trigger-criteria-content').html('<input type="text" class="clearfix"> ' +
+                $('#trigger-criteria-content').html('<input type="text" class="clearfix name"> ' +
                     '<label class="error-message" > </label>');
             }
         };
@@ -110,7 +111,7 @@ define(['require', 'log', 'jquery', 'lodash', 'constants'],
          */
         var showTriggerCriteriaDescription = function (triggerObject, selectedCriteria) {
             var triggerCriteriaObject = getTriggerCriteria(triggerObject, selectedCriteria);
-            $('#define-trigger-criteria .criteria-description').text(triggerCriteriaObject.description);
+            $('#define-trigger-criteria .fw-info span').text(triggerCriteriaObject.description);
         };
 
         /**
@@ -124,7 +125,8 @@ define(['require', 'log', 'jquery', 'lodash', 'constants'],
             var id = $(element).parent().attr('id');
             var triggerObject = self.configurationData.getSiddhiAppConfig().getTrigger(id);
 
-            var propertyDiv = $('<div class ="trigger-form-container"> <div id="define-trigger-name"> <label>Name </label>' +
+            var propertyDiv = $('<div class ="trigger-form-container"> <div id="define-trigger-name"> <label>' +
+                ' <span class="mandatory-symbol"> * </span>Name </label>' +
                 '<input type="text" id="triggerName" class="clearfix name"> <label class="error-message" ' +
                 'id = "triggerNameErrorMessage"> </label> </div> <div id= "define-trigger-criteria"> </div>' +
                 '<div id = "trigger-criteria-content"></div> </div>' +
@@ -140,16 +142,8 @@ define(['require', 'log', 'jquery', 'lodash', 'constants'],
             renderTriggerCriteria(triggerCriteriaObject);
 
             self.formUtils.addEventListenerToRemoveRequiredClass();
-
-            //Event listener to show the criteria description
-            $('#define-trigger-criteria').on('mouseover', '.fw-info', function () {
-                $(this).find('.criteria-description').show();
-            });
-
-            //Event listener to hide the criteria description
-            $('#define-trigger-criteria').on('mouseout', '.fw-info', function () {
-                $(this).find('.criteria-description').hide();
-            });
+            self.formUtils.addEventListenerToShowAndHideInfo();
+            self.formUtils.addEventListenerToShowInputContentOnHover();
 
             if (name) {
                 //if the trigger object is already edited
@@ -242,10 +236,14 @@ define(['require', 'log', 'jquery', 'lodash', 'constants'],
 
                 if (!isErrorOccurred) {
                     if (previouslySavedName !== triggerName) {
+                        var outConnections = self.jsPlumbInstance.getConnections({ source: id + '-out' });
+                        var inConnections = self.jsPlumbInstance.getConnections({ target: id + '-in' });
+                        // delete connections related to the element if the name is changed
+                        self.formUtils.deleteConnectionsAfterDefinitionElementNameChange(outConnections, inConnections);
                         // update selected trigger model
                         triggerObject.setName(triggerName);
-                        self.formUtils.updateConnectionsAfterDefinitionElementNameChange(id);
-
+                        // establish connections related to the element if the name is changed
+                        self.formUtils.establishConnectionsAfterDefinitionElementNameChange(outConnections, inConnections);
                         var textNode = $(element).parent().find('.triggerNameNode');
                         textNode.html(triggerName);
                     }

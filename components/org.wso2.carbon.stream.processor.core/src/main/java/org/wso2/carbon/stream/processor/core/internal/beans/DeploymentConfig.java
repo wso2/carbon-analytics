@@ -47,17 +47,14 @@ public class DeploymentConfig {
     }
 
     public EventSyncServerConfig eventSyncServerConfigs() {
-
         return eventSyncServer;
     }
 
     public void setEventSyncServer(EventSyncServerConfig eventSyncServer) {
-
         this.eventSyncServer = eventSyncServer;
     }
 
     public int getEventByteBufferQueueCapacity() {
-
         return eventByteBufferQueueCapacity;
     }
 
@@ -74,12 +71,10 @@ public class DeploymentConfig {
     }
 
     public int getByteBufferExtractorThreadPoolSize() {
-
         return byteBufferExtractorThreadPoolSize;
     }
 
     public void setByteBufferExtractorThreadPoolSize(int byteBufferExtractorThreadPoolSize) {
-
         this.byteBufferExtractorThreadPoolSize = byteBufferExtractorThreadPoolSize;
     }
 

@@ -28,6 +28,7 @@ import org.wso2.carbon.stream.processor.statistics.bean.WorkerStatistics;
 import org.wso2.carbon.stream.processor.statistics.internal.OperatingSystemMetricSet;
 import org.wso2.carbon.stream.processor.statistics.internal.exception.MetricsConfigException;
 import org.wso2.msf4j.Request;
+import org.wso2.siddhi.core.util.statistics.metrics.Level;
 
 import javax.ws.rs.core.Response;
 
@@ -83,21 +84,21 @@ public class StatisticsApiServiceImpl extends StatisticsApiService {
     /**
      * Enable and disable the worker metrics remotely.
      *
-     * @param statsEnable Boolean value needed to disable or enable metrics.
+     * @param enabledStatLevel Boolean value needed to disable or enable metrics.
      * @return Statistics state of the worker.
      * @throws NotFoundException API may not be found.
      */
-    public Response enableStats(boolean statsEnable, Request request) throws NotFoundException {
+    public Response enableStats(Level enabledStatLevel, Request request) throws NotFoundException {
         if (getUserName(request) != null && !getPermissionProvider().hasPermission(getUserName(request), new
                 Permission(PERMISSION_APP_NAME, MANAGE_SIDDHI_APP_PERMISSION_STRING))) {
             return Response.status(Response.Status.UNAUTHORIZED).entity("Insufficient permissions to enable/disable " +
                     "stats for all node").build();
         }
-        if (!statsEnable) {
+        if (enabledStatLevel.compareTo(Level.OFF) == 0) {
             if (operatingSystemMetricSet.isEnableWorkerMetrics()) {
                 operatingSystemMetricSet.disableWorkerMetrics();
                 return Response.ok().entity(new ApiResponseMessage(ApiResponseMessage.OK,
-                        "Sucessfully disabled the metrics.")).build();
+                        "Successfully disabled the metrics.")).build();
             } else {
                 return Response.ok().entity(new ApiResponseMessage(ApiResponseMessage.OK,
                         "Metrics are disabled already.")).build();
@@ -107,7 +108,7 @@ public class StatisticsApiServiceImpl extends StatisticsApiService {
                 return Response.ok().entity(new ApiResponseMessage(ApiResponseMessage.OK,
                         "Metrics are enabled already.")).build();
             } else {
-                operatingSystemMetricSet.enableWorkerMetrics();
+                operatingSystemMetricSet.enableWorkerMetrics(enabledStatLevel);
                 return Response.ok().entity(new ApiResponseMessage(ApiResponseMessage.OK,
                         "Successfully enabled the metrics.")).build();
             }

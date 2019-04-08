@@ -16,11 +16,9 @@
  * under the License.
  */
 
-define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert', 'queryOutputDelete',
-    'queryOutputUpdate', 'queryOutputUpdateOrInsertInto', 'queryWindowOrFunction', 'queryOrderByValue',
+define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryWindowOrFunction', 'queryOrderByValue',
     'streamHandler', 'designViewUtils', 'jsonValidator', 'constants', 'handlebar'],
-    function (require, log, $, _, QuerySelect, QueryOutputInsert, QueryOutputDelete, QueryOutputUpdate,
-        QueryOutputUpdateOrInsertInto, QueryWindowOrFunction, QueryOrderByValue, StreamHandler, DesignViewUtils,
+    function (require, log, $, _, QuerySelect, QueryWindowOrFunction, QueryOrderByValue, StreamHandler, DesignViewUtils,
         JSONValidator, Constants, Handlebars) {
 
         /**
@@ -43,10 +41,39 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
 		/**
 		 * @function to add autocompletion for filter value
 		 */
-        var addAutoCompletionForFilter = function (self, QUERY_CONDITION_SYNTAX, possibleAttributes) {
-            var filterMatches = JSON.parse(JSON.stringify(possibleAttributes));
+        var addAutoCompletionForFilter = function (self, QUERY_CONDITION_SYNTAX, possibleAttributes, outputAttributes) {
+            var filterMatches = _.cloneDeep((possibleAttributes));
+            filterMatches = filterMatches.concat(outputAttributes);
             filterMatches = filterMatches.concat(QUERY_CONDITION_SYNTAX);
             self.formUtils.createAutocomplete($('.symbol-syntax-required-value'), filterMatches);
+        };
+
+        /**
+         * @function to validate on load of the form
+         */
+        var validateSectionsOnLoadOfForm = function (self) {
+            var isErrorOccurred = false;
+            if ($('.group-by-checkbox').is(':checked')) {
+                if (self.formUtils.validateGroupOrderBy(Constants.GROUP_BY)) {
+                    isErrorOccurred = true;
+                }
+            }
+            if ($('.order-by-checkbox').is(':checked')) {
+                if (self.formUtils.validateGroupOrderBy(Constants.ORDER_BY)) {
+                    isErrorOccurred = true;
+                }
+            }
+            if (self.formUtils.validateQueryProjection()) {
+                isErrorOccurred = true;
+            }
+            if (self.formUtils.validateRequiredFields('.define-content')) {
+                isErrorOccurred = true;
+            }
+
+            if (self.formUtils.validateQueryOutputSet()) {
+                isErrorOccurred = true;
+            }
+            return isErrorOccurred;
         };
 
         /**
@@ -94,6 +121,15 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
                 var streamHandlerList = queryInput.getStreamHandlerList();
                 var annotationListObjects = queryObject.getAnnotationListObjects();
 
+                var partitionId;
+                var partitionElementWhereQueryIsSaved
+                    = self.configurationData.getSiddhiAppConfig().getPartitionWhereQueryIsSaved(id);
+                if (partitionElementWhereQueryIsSaved !== undefined) {
+                    partitionId = partitionElementWhereQueryIsSaved.getId();
+                }
+                var outputElement = self.configurationData.getSiddhiAppConfig()
+                    .getDefinitionElementByName(outputElementName, partitionId);
+
                 var predefinedAnnotations = _.cloneDeep(self.configurationData.application.config.
                     type_query_predefined_annotations);
                 var streamHandlerTypes = self.configurationData.application.config.stream_handler_types;
@@ -103,10 +139,12 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
                 var queryFormTemplate = Handlebars.compile($('#window-filter-projection-query-form-template').html())
                     ({ name: queryName, from: inputElementName });
                 $('#define-windowFilterProjection-query').html(queryFormTemplate);
-                self.formUtils.renderQueryOutput(outputElementName);
+                self.formUtils.renderQueryOutput(outputElement, queryOutput);
                 self.formUtils.renderOutputEventTypes();
-
+                self.formUtils.addEventListenerForQueryOutputDiv();
                 self.formUtils.addEventListenerToRemoveRequiredClass();
+                self.formUtils.addEventListenerToShowAndHideInfo();
+                self.formUtils.addEventListenerToShowInputContentOnHover();
 
                 $('.query-form-container').on('change', '.query-checkbox', function () {
                     var parent = $(this).parents(".define-content")
@@ -119,11 +157,13 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
                     }
                 });
 
-                if (queryOutput.eventType) {
-                    $('.define-output-events').find('#event-type option').filter(function () {
-                        return ($(this).val() == eventType.toLowerCase());
-                    }).prop('selected', true);
+                var eventType = Constants.CURRENT_EVENTS;
+                if (queryOutput.output && queryOutput.output.eventType) {
+                    eventType = queryOutput.output.eventType.toLowerCase();
                 }
+                $('.define-output-events').find('#event-type option').filter(function () {
+                    return ($(this).val() == eventType);
+                }).prop('selected', true);
 
                 //annotations
                 predefinedAnnotations = self.formUtils.createObjectsForAnnotationsWithKeys(predefinedAnnotations);
@@ -137,13 +177,6 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
                 self.formUtils.renderOptionsForPredefinedAnnotations(predefinedAnnotations);
                 self.formUtils.addEventListenersForPredefinedAnnotations();
 
-                var partitionId;
-                var partitionElementWhereQueryIsSaved
-                    = self.configurationData.getSiddhiAppConfig().getPartitionWhereQueryIsSaved(id);
-                if (partitionElementWhereQueryIsSaved !== undefined) {
-                    partitionId = partitionElementWhereQueryIsSaved.getId();
-                }
-
                 var possibleAttributes = [];
                 var inputElement = self.configurationData.getSiddhiAppConfig()
                     .getDefinitionElementByName(inputElementName, partitionId);
@@ -156,15 +189,24 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
                     possibleAttributes.push(Constants.TRIGGERED_TIME);
                 }
 
+                var outputAttributes = [];
+                if (outputElement.type.toLowerCase() === Constants.STREAM ||
+                    outputElement.type.toLowerCase() === Constants.TABLE) {
+                    var streamAttributes = outputElement.element.getAttributeList();
+                    _.forEach(streamAttributes, function (attribute) {
+                        outputAttributes.push(attribute.getName());
+                    });
+                }
+
                 self.formUtils.generateGroupByDiv(groupBy, possibleAttributes);
-                self.formUtils.generateOrderByDiv(orderBy, possibleAttributes);
+                self.formUtils.generateOrderByDiv(orderBy, outputAttributes);
 
                 //projection
                 self.formUtils.selectQueryProjection(select, outputElementName);
                 self.formUtils.addEventListenersForSelectionDiv();
 
                 if (having) {
-                    $('.having-condition-value').val(having);
+                    $('.having-value').val(having);
                     $(".having-checkbox").prop("checked", true);
                 } else {
                     $('.having-condition-content').hide();
@@ -217,6 +259,14 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
                 self.formUtils.mapStreamHandler(queryInput, "query");
                 self.formUtils.addEventListenersForStreamHandlersDiv(streamHandlerList);
 
+                /**
+                  * to show user the lost saved data when the connection is deleted/ when the connected stream is modified
+                  * only if the form is an already edited form
+                  */
+                if (queryOutput && queryOutput.type) {
+                    validateSectionsOnLoadOfForm(self);
+                }
+
                 //autocompletion
                 var streamFunctions = self.formUtils.getStreamFunctionNames();
                 var selectExpressionMatches = JSON.parse(JSON.stringify(possibleAttributes));
@@ -224,13 +274,28 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
                 selectExpressionMatches = selectExpressionMatches.concat(streamFunctions);
                 self.formUtils.createAutocomplete($('.attribute-expression'), selectExpressionMatches);
 
-                addAutoCompletionForFilter(self, QUERY_CONDITION_SYNTAX, possibleAttributes);
+                addAutoCompletionForFilter(self, QUERY_CONDITION_SYNTAX, possibleAttributes, outputAttributes);
+
+                var inputAttributes = self.formUtils.getInputAttributes([inputElementName])
+                var outputAttributesWithElementName = self.formUtils.constructOutputAttributes(outputAttributes);
+                self.formUtils.addAutoCompleteForOutputOperation(outputAttributesWithElementName, inputAttributes);
 
                 //to add filter
                 $('.define-stream-handler').on('click', '.btn-add-filter', function () {
                     var sourceDiv = self.formUtils.getSourceDiv($(this));
                     self.formUtils.addNewStreamHandler(sourceDiv, Constants.FILTER);
-                    addAutoCompletionForFilter(self, QUERY_CONDITION_SYNTAX, possibleAttributes);
+                    addAutoCompletionForFilter(self, QUERY_CONDITION_SYNTAX, possibleAttributes, outputAttributes);
+                });
+
+                //to add query operation set
+                var setDiv = '<li class="setAttribute">' +
+                    '<div class="clearfix">' +
+                    '<input type="text" class="setAttribute"> <input type="text" class="setValue"> ' +
+                    '<a class = "btn-del-option"> <i class = "fw fw-delete"> </i> </a>' +
+                    '</div> <label class="error-message"> </label> </li>'
+                $('.define-operation-set-condition').on('click', '.btn-add-set', function () {
+                    $('.define-operation-set-condition .set-condition').append(setDiv);
+                    self.formUtils.addAutoCompleteForOutputOperation(outputAttributesWithElementName, inputAttributes);
                 });
 
                 var rateLimitingMatches = RATE_LIMITING_SYNTAX.concat(Constants.SIDDHI_TIME);
@@ -251,31 +316,12 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
                         return;
                     }
 
-                    if ($('.group-by-checkbox').is(':checked')) {
-                        if (self.formUtils.validateGroupOrderBy(Constants.GROUP_BY)) {
-                            isErrorOccurred = true;
-                            return;
-                        }
-                    }
-
-                    if ($('.order-by-checkbox').is(':checked')) {
-                        if (self.formUtils.validateGroupOrderBy(Constants.ORDER_BY)) {
-                            isErrorOccurred = true;
-                            return;
-                        }
-                    }
-
-                    if (self.formUtils.validateRequiredFields('.define-content')) {
+                    if (validateSectionsOnLoadOfForm(self)) {
                         isErrorOccurred = true;
                         return;
                     }
 
                     if (self.formUtils.validatePredefinedAnnotations(predefinedAnnotations)) {
-                        isErrorOccurred = true;
-                        return;
-                    }
-
-                    if (self.formUtils.validateQueryProjection()) {
                         isErrorOccurred = true;
                         return;
                     }
@@ -308,8 +354,8 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
                             });
                         }
 
-                        if ($('.having-filter-checkbox').is(':checked')) {
-                            queryObject.setHaving($('.having-condition-value').val().trim());
+                        if ($('.having-checkbox').is(':checked')) {
+                            queryObject.setHaving($('.having-value').val().trim());
                         } else {
                             queryObject.setHaving(undefined)
                         }
@@ -357,19 +403,7 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
                             queryInput.addStreamHandler(streamHandlerOption);
                         });
 
-                        var outputTarget = $('.query-into').val().trim()
-                        var outputConfig = {};
-                        _.set(outputConfig, 'eventType', $('#event-type').val());
-                        var outputObject = new QueryOutputInsert(outputConfig);
-                        queryOutput.setOutput(outputObject);
-                        queryOutput.setTarget(outputTarget);
-                        queryOutput.setType(Constants.INSERT);
-
-                        var isValid = JSONValidator.prototype.validateWindowFilterProjectionQuery(queryObject, false);
-                        if (!isValid) {
-                            isErrorOccurred = true;
-                            return;
-                        }
+                        self.formUtils.buildQueryOutput(outputElement, queryOutput);
 
                         /**
                          * This is to change the icon of the query depending on the selected stream handlers
@@ -408,7 +442,7 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOutputInsert'
                         }
                         queryInput.setType(queryType.toUpperCase());
 
-                        $('#' + id).removeClass('incomplete-element');
+                        JSONValidator.prototype.validateWindowFilterProjectionQuery(queryObject);
                         self.configurationData.setIsDesignViewContentChanged(true);
 
                         //Send query element to the backend and generate tooltip

@@ -91,6 +91,9 @@ define(function () {
         QUERY: "query",
         OPERATION: "operation",
         INSERT: "insert",
+        UPDATE: "update",
+        DELETE: "delete",
+        UPDATE_OR_INSERT_INTO: "update_or_insert_into",
         CUSTOM: "custom",
         STREAM_HANDLER: "stream-handler",
         STREAM_FUNCTION: "stream-function",
@@ -112,7 +115,11 @@ define(function () {
         WINDOW_TITLE: "Window Configuration",
         DATASOURCE: "datasource",
         INLINE_CONFIG: "inline-config",
-        JNDI_RESOURCE: "jndi-resource"
+        JNDI_RESOURCE: "jndi-resource",
+        FAULT_STREAM_PREFIX: "!",
+        PURGING: "purging",
+        PURGE: "purge",
+        CURRENT_EVENTS: "current_events"
     };
 
     return constants;

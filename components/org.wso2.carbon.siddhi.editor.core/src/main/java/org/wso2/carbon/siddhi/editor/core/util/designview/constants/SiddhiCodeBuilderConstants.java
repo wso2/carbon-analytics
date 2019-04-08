@@ -87,6 +87,7 @@ public class SiddhiCodeBuilderConstants {
     // Other Strings
     public static final String FROM = "from";
     public static final String SELECT = "select";
+    public static final String SELECT_ALL = "select *";
     public static final String GROUP = "group";
     public static final String ORDER = "order";
     public static final String BY = "by";

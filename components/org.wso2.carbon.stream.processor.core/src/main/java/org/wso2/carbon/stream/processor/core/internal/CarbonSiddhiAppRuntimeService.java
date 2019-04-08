@@ -23,6 +23,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.wso2.carbon.stream.processor.common.SiddhiAppRuntimeService;
 import org.wso2.siddhi.core.SiddhiAppRuntime;
+import org.wso2.siddhi.core.util.statistics.metrics.Level;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -47,14 +48,13 @@ public class CarbonSiddhiAppRuntimeService implements SiddhiAppRuntimeService {
     }
 
     @Override
-    public void enableSiddhiAppStatistics(boolean statsEnabled) {
+    public void enableSiddhiAppStatistics(Level enabledStatsLevel) {
         Map<String, SiddhiAppRuntime> siddhiAppRuntimes = getActiveSiddhiAppRuntimes();
         for (Map.Entry<String, SiddhiAppRuntime> siddhiRuntimeEntry: siddhiAppRuntimes.entrySet()) {
-            if ((statsEnabled && !siddhiRuntimeEntry.getValue().isStatsEnabled()) || (!statsEnabled &&
-                    siddhiRuntimeEntry.getValue().isStatsEnabled())) {
-                siddhiRuntimeEntry.getValue().enableStats(statsEnabled);
+            if (enabledStatsLevel.compareTo(siddhiRuntimeEntry.getValue().getRootMetricsLevel()) != 0) {
+                siddhiRuntimeEntry.getValue().enableStats(enabledStatsLevel);
                 if (log.isDebugEnabled()) {
-                    log.debug("Stats has been sucessfull updated for siddhi app :" + siddhiRuntimeEntry.getKey());
+                    log.debug("Stats has been successful updated for siddhi app :" + siddhiRuntimeEntry.getKey());
                 }
             }
         }

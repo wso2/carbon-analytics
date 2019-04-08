@@ -56,7 +56,7 @@ export default class OverviewChart extends Component {
         };
 
         return (
-            <VizG config={configT} metadata={metadata} data={[[this.state.data]]} width={600} height={600}/>
+            <VizG config={configT} metadata={metadata} data={[[this.state.data]]} width={500} height={500}/>
         );
     }
 }

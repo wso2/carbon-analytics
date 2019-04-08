@@ -139,10 +139,12 @@ define(['log', 'lodash', 'jquery', 'event_channel', './file'],
 
         ServiceClient.prototype.exists = function (path) {
             var data = {};
+
             $.ajax({
                 type: "GET",
                 context: this,
-                url: _.get(this.application, 'config.services.workspace.endpoint') + "/exists?" + "path=" + btoa(path),
+                url: _.get(this.application, 'config.services.workspace.endpoint') + "/exists?" + "path=" +
+                this.application.utils.base64EncodeUnicode(path),
                 contentType: "text/plain; charset=utf-8",
                 async: false,
                 success: function (response) {
@@ -180,8 +182,9 @@ define(['log', 'lodash', 'jquery', 'event_channel', './file'],
             $.ajax({
                 type: "GET",
                 context: this,
-                url: _.get(this.application, 'config.services.workspace.endpoint') + "/create?" + "path=" + btoa(path)
-                    + "&type=" + btoa(type),
+                url: _.get(this.application, 'config.services.workspace.endpoint') + "/create?" + "path=" +
+                this.application.utils.base64EncodeUnicode(path)
+                    + "&type=" + this.application.utils.base64EncodeUnicode(type),
                 contentType: "text/plain; charset=utf-8",
                 async: false,
                 success: function (response) {
@@ -200,8 +203,9 @@ define(['log', 'lodash', 'jquery', 'event_channel', './file'],
             $.ajax({
                 type: "GET",
                 context: this,
-                url: _.get(this.application, 'config.services.workspace.endpoint') + "/delete?" + "path=" + btoa(path)
-                    + "&type=" + btoa(type),
+                url: _.get(this.application, 'config.services.workspace.endpoint') + "/delete?" + "path=" +
+                this.application.utils.base64EncodeUnicode(path)
+                    + "&type=" + this.application.utils.base64EncodeUnicode(type),
                 contentType: "text/plain; charset=utf-8",
                 async: false,
                 success: function (response) {
@@ -222,8 +226,9 @@ define(['log', 'lodash', 'jquery', 'event_channel', './file'],
                 type: "POST",
                 context: this,
                 url: _.get(this.application, 'config.services.workspace.endpoint') + "/write",
-                data: "location=" + btoa(file.getPath()) + "&configName=" +
-                    btoa(file.getName()) + "&config=" + (btoa(content)),
+                data: "location=" + this.application.utils.base64EncodeUnicode(file.getPath()) + "&configName=" +
+                this.application.utils.base64EncodeUnicode(file.getName()) + "&config=" +
+                this.application.utils.base64EncodeUnicode(content),
                 contentType: "text/plain; charset=utf-8",
                 async: false,
                 success: function (response) {
