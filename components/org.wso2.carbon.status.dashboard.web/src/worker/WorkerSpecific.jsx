@@ -286,7 +286,7 @@ export default class WorkerSpecific extends React.Component {
                         <h3> Siddhi Applications </h3>
                     </div>
                     <div style={{padding: 20, paddingTop: 10, float: 'left', boxSizing: 'border-box'}}>
-                        <Card style={{height: 400}}>
+                        <Card style={{height: 600}}>
                             <AppTable id={this.props.match.params.id}/>
                         </Card>
                     </div>

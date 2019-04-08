@@ -157,7 +157,8 @@ export default class WorkerSpecific extends React.Component {
             hasManagerPermission: false,
             hasViewerPermission: true,
             sessionInvalid: false,
-            radioValue: window.location.href.substr(window.location.href.lastIndexOf('/') + 1)
+            radioValue: window.location.href.substr(window.location.href.lastIndexOf('/') + 1),
+            expanded: true
         };
         this.showMessage = this.showMessage.bind(this);
         this.showError = this.showError.bind(this);
@@ -304,7 +305,8 @@ export default class WorkerSpecific extends React.Component {
             );
         }
         return (
-            <GridTile className="container" title={<FormattedMessage id='appSpecific.latencyMiliseconds' defaultMessage='Latency (milliseconds)' />} titlePosition="top" titleBackground='#303030'>
+            <GridTile className="container" title={<FormattedMessage id='appSpecific.latencyMiliseconds'
+                         defaultMessage='Latency (milliseconds)' />} titlePosition="top" titleBackground='#303030'>
                 <div className="overlay"
                      style={{color: 'rgba(255, 255, 255, 0.2)', paddingTop: 20, textAlign: 'right'}}>
                     <h4><FormattedMessage id='appSpecific.clickForMore' defaultMessage='Click for more details' /></h4>
@@ -316,8 +318,8 @@ export default class WorkerSpecific extends React.Component {
                         <VizG data={this.state.latency} metadata={latencyMetadata}
                               config={latencyLineChartConfig}
                               yDomain={DashboardUtils.getYDomain(this.state.latency)}
-                              width={700}
-                              height={300}
+                              width={500}
+                              height={180}
                         />
                     </Link>
                 </div>
@@ -354,8 +356,8 @@ export default class WorkerSpecific extends React.Component {
                         <VizG data={this.state.throughputAll} metadata={tpMetadata}
                               config={tpLineChartConfig}
                               yDomain={DashboardUtils.getYDomain(this.state.throughputAll)}
-                              width={700}
-                              height={300}
+                              width={500}
+                              height={180}
                         />
                     </Link>
                 </div>
@@ -366,7 +368,8 @@ export default class WorkerSpecific extends React.Component {
     renderMemoryChart() {
         if (this.state.totalMem.length === 0) {
             return (
-                <GridTile title={<FormattedMessage id='appSpecific.memoryUsed' defaultMessage='Memory Used (bytes)' />} titlePosition="top" titleBackground='#303030'>
+                <GridTile title={<FormattedMessage id='appSpecific.memoryUsed' defaultMessage='Memory Used (bytes)' />}
+                          titlePosition="top" titleBackground='#303030'>
                     <div style={{
                         marginTop: 50,
                         backgroundColor: '#131313',
@@ -379,8 +382,8 @@ export default class WorkerSpecific extends React.Component {
             );
         }
         return (
-            <GridTile className="container" title={<FormattedMessage id='appSpecific.memoryUsed' defaultMessage='Memory Used (bytes)' />} titlePosition="top"
-                titleBackground='#303030'>
+            <GridTile className="container" title={<FormattedMessage id='appSpecific.memoryUsed'
+                    defaultMessage='Memory Used (bytes)' />} titlePosition="top" titleBackground='#303030'>
                 <div className="overlay"
                      style={{color: 'rgba(255, 255, 255, 0.2)', paddingTop: 20, textAlign: 'right'}}>
                     <h4><FormattedMessage id='appSpecific.clickForMore' defaultMessage='Click for more details' /></h4>
@@ -392,8 +395,8 @@ export default class WorkerSpecific extends React.Component {
                         <VizG data={this.state.totalMem} metadata={memoryMetadata}
                               config={memoryLineChartConfig}
                               yDomain={DashboardUtils.getYDomain(this.state.totalMem)}
-                              width={700}
-                              height={300}
+                              width={550}
+                              height={200}
                         />
 
                     </Link>
@@ -510,13 +513,17 @@ export default class WorkerSpecific extends React.Component {
                 </div>
 
                 <div style={{padding: 24, height: '50%', backgroundColor: "#222222"}}>
-                    <Card style={{backgroundColor: "#282828", height: '50%'}}>
-                        <CardHeader title={<FormattedMessage id='appSpecific.codeView' defaultMessage='Code View' />}
+                    <Card expanded={this.state.expanded} onExpandChange={(expanded) => {
+                        this.setState({expanded: expanded}) }} style={{backgroundColor: "#282828", height: '50%'}}>
+                        <CardHeader
+                            title={<FormattedMessage id='appSpecific.codeView' defaultMessage='Code View' />}
                             titleStyle={{ fontSize: 24, backgroundColor: "#282828" }}
+                            actAsExpander={true}
+                            showExpandableButton={true}
                         />
                         <Divider/>
 
-                        <CardText>
+                        <CardText expandable={true}>
                             <SyntaxHighlighter language='sql'
                                                style={codeViewStyle}>{this.state.appText}</SyntaxHighlighter>
                         </CardText>
