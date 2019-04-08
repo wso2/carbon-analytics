@@ -2292,7 +2292,11 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
             var self = this;
             var elementId;
             if (isCodeToDesignMode !== undefined && !isCodeToDesignMode) {
-                elementId = self.getNewAgentId();
+                if (stream !== undefined && stream.getId() !== undefined) {
+                    elementId = stream.getId();
+                } else {
+                    elementId = self.getNewAgentId();
+                }
             } else if (isCodeToDesignMode !== undefined && isCodeToDesignMode) {
                 if (streamId !== undefined) {
                     elementId = streamId;
@@ -2309,9 +2313,12 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
                 'tabindex': TAB_INDEX
             }).addClass(constants.STREAM);
 
+            var inFaultStreamCreationPath = false;
+
             // If this is a fault stream, hide it
             if (stream && stream.isFaultStream()) {
                 newAgent.hide();
+                inFaultStreamCreationPath = true;
             }
 
             if (isCodeToDesignMode) {
@@ -2320,7 +2327,7 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
             self.canvas.append(newAgent);
             // Drop the stream element. Inside this a it generates the stream definition form.
             self.dropElements.dropStream(newAgent, elementId, mouseTop, mouseLeft, isCodeToDesignMode,
-                false, streamName, stream && stream.hasFaultStream());
+                false, streamName, stream && stream.hasFaultStream(), inFaultStreamCreationPath);
             self.configurationData.getSiddhiAppConfig()
                 .setFinalElementCount(self.configurationData.getSiddhiAppConfig().getFinalElementCount() + 1);
             self.dropElements.registerElementEventListeners(newAgent);

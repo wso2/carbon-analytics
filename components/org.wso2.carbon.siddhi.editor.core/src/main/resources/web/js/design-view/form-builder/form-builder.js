@@ -61,6 +61,7 @@ define(['require', 'log', 'jquery', 'lodash', 'formUtils', 'streamForm', 'tableF
             this.consoleListManager = options.application.outputController;
             this.jsPlumbInstance = options.jsPlumbInstance;
             this.dropElementInstance = options.dropElementInstance;
+            this.designGrid = options.dropElementInstance;
             this.formUtils = new FormUtils(this.configurationData, this.jsPlumbInstance);
             var currentTabId = this.application.tabController.activeTab.cid;
             this.designViewContainer = $('#design-container-' + currentTabId);
@@ -186,6 +187,7 @@ define(['require', 'log', 'jquery', 'lodash', 'formUtils', 'streamForm', 'tableF
             _.set(formOptions, 'formUtils', self.formUtils);
             _.set(formOptions, 'dropElementInstance', self.dropElementInstance);
             _.set(formOptions, 'jsPlumbInstance', self.jsPlumbInstance);
+            _.set(formOptions, 'designGrid', self.designGrid);
             var streamForm = new StreamForm(formOptions);
             streamForm.generatePropertiesForm(element, formConsole, formContainer);
         };

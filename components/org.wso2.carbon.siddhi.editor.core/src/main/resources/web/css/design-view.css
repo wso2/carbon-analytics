@@ -84,6 +84,10 @@
     background-image: url("../images/streams.svg");
 }
 
+.errorStreamDrop {
+    background-image: url("../images/error-stream.svg");
+}
+
 .tableDrop {
     background-image: url("../images/table.svg");
 }
@@ -205,6 +209,20 @@
     margin-left: -10px;
     border: 1px solid #000;
     background-color: #424242;
+}
+
+.error-connection {
+    -moz-border-radius: 5px;
+    -webkit-border-radius: 5px;
+    border-radius: 5px;
+    font-size: 10px;
+    text-align: center;
+    cursor: pointer;
+    width: 10px;
+    height: 10px;
+    margin-left: -10px;
+    border: 1px solid #FF0000;
+    background-color: #FF0000;
 }
 
 .property {

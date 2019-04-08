@@ -18,9 +18,9 @@
 
 define(['require', 'log', 'lodash', 'jquery', 'partition', 'stream', 'query', 'formBuilder', 'aggregation',
     'jsonValidator', 'sourceOrSinkAnnotation', 'stream', 'table', 'window', 'trigger', 'functionDefinition',
-        'constants'],
+        'constants', 'attribute'],
     function (require, log, _, $, Partition, Stream, Query, FormBuilder, Aggregation, JSONValidator,
-        SourceOrSinkAnnotation, Stream, Table, Window, Trigger, FunctionDefinition,Constants) {
+        SourceOrSinkAnnotation, Stream, Table, Window, Trigger, FunctionDefinition,Constants,Attribute) {
 
         /**
          * @class DesignView
@@ -63,6 +63,7 @@ define(['require', 'log', 'lodash', 'jquery', 'partition', 'stream', 'query', 'f
             _.set(formBuilderOptions, 'configurationData', this.configurationData);
             _.set(formBuilderOptions, 'jsPlumbInstance', this.jsPlumbInstance);
             _.set(formBuilderOptions, 'dropElementInstance', this);
+            _.set(formBuilderOptions, 'designGrid', this.designGrid);
             this.formBuilder = new FormBuilder(formBuilderOptions);
         };
 
@@ -251,7 +252,7 @@ define(['require', 'log', 'lodash', 'jquery', 'partition', 'stream', 'query', 'f
          * @param streamName name of the stream
          */
         DropElements.prototype.dropStream = function (newAgent, i, top, left, isCodeToDesignMode,
-            isGenerateStreamFromQueryOutput, streamName, hasFaultStream) {
+            isGenerateStreamFromQueryOutput, streamName, hasFaultStream, inFaultStreamCreationPath) {
             /*
              The node hosts a text node where the Stream's name input by the user will be held.
              Rather than simply having a `newAgent.text(streamName)` statement, as the text function tends to
@@ -259,12 +260,12 @@ define(['require', 'log', 'lodash', 'jquery', 'partition', 'stream', 'query', 'f
             */
             var self = this;
             var name;
-            if (isCodeToDesignMode) {
+            if (isCodeToDesignMode || inFaultStreamCreationPath) {
                 name = streamName;
             } else {
                 if (isGenerateStreamFromQueryOutput) {
                     name = streamName;
-                } else {
+                } else if (!hasFaultStream) {
                     var streamOptions = {};
                     _.set(streamOptions, 'id', i);
                     _.set(streamOptions, 'name', undefined);
@@ -320,8 +321,9 @@ define(['require', 'log', 'lodash', 'jquery', 'partition', 'stream', 'query', 'f
 
             var connectionErrOut;
             if (hasFaultStream) {
-                connectionErrOut = $('<div class="connection connectorErrOutStream">').attr('id', i + "-err-out");
+                connectionErrOut = $('<div class="error-connection connectorErrOutStream">').attr('id', i + "-err-out");
                 finalElement.append(connectionErrOut);
+                $("#"+finalElement[0].id).addClass('errorStreamDrop');
             }
 
             finalElement.css({
@@ -1391,25 +1393,62 @@ define(['require', 'log', 'lodash', 'jquery', 'partition', 'stream', 'query', 'f
 
         };
 
-        DropElements.prototype.toggleFaultStreamConnector = function(stream, jsPlumbInstance) {
+        DropElements.prototype.toggleFaultStreamConnector = function(stream, jsPlumbInstance,
+                                                                     previouslySavedStreamName) {
+            var self = this;
+            var oldFaultStreamName = Constants.FAULT_STREAM_PREFIX + previouslySavedStreamName;
+            var oldFaultStreamElementId = "";
+            self.configurationData.getSiddhiAppConfig().getStreamList().forEach(function(s) {
+                if (oldFaultStreamName === s.getName()) {
+                    oldFaultStreamElementId = s.getId();
+                }
+            });
+
+            if (oldFaultStreamElementId != "") {
+                self.configurationData.getSiddhiAppConfig().removeStream(oldFaultStreamElementId);
+                $( "#" + oldFaultStreamElementId ).remove();
+            }
             if (stream.hasFaultStream()) {
-                var connectionErrOut = $('<div class="connection connectorErrOutStream">')
+                var faultStreamName = Constants.FAULT_STREAM_PREFIX + stream.getName();
+                var connectionErrOut = $('<div class="error-connection connectorErrOutStream">')
                     .attr('id', stream.getId() + "-err-out");
                 $('#' + stream.getId()).append(connectionErrOut);
                 jsPlumbInstance.makeSource(connectionErrOut, {
                     deleteEndpointsOnDetach: true,
                     anchor: 'Right',
-                    connectorStyle: { strokeWidth: 2, stroke: '#FF0000', dashstyle: '2 3', outlineStroke: 'transparent',
+                    connectorStyle: { strokeWidth: 2, stroke: '#FF0000', dashstyle: '2 3',
+                        outlineStroke: 'transparent',
                         outlineWidth: '3' }
                 });
-                // Add the fault stream to the stream list
-                this.configurationData.getSiddhiAppConfig().addStream(new Stream({
-                    id: stream.getId(),
-                    name: Constants.FAULT_STREAM_PREFIX + stream.getName()
-                }));
 
+                $('#' + stream.getId()).addClass('errorStreamDrop');
+
+                //create error object for faults stream
+                var id = self.designGrid.generateNextNewAgentId();
+
+                //add error object
+                var attributeObject = new Attribute({ name: "_error", type: "OBJECT" });
+                var attributeList = stream.getAttributeList();
+                // Add the fault stream to the stream list
+                var faultStream = new Stream({
+                    id: id,
+                    name: faultStreamName
+                });
+                for(var i = 0; i < attributeList.length; i++) {
+                    var obj = attributeList[i];
+                    faultStream.addAttribute(obj);
+                }
+                faultStream.addAttribute(attributeObject);
+                this.configurationData.getSiddhiAppConfig().addStream(faultStream);
+
+                self.designGrid.handleStream(0, 0, false, id, faultStreamName, undefined, faultStream);
             } else {
+                var connections = self.jsPlumbInstance.getConnections({source: stream.getId() + '-err-out'});
+                _.forEach(connections, function (connection) {
+                    self.jsPlumbInstance.deleteConnection(connection);
+                });
                 $('#' + stream.getId() + '-err-out').remove();
+                $('#' + stream.getId()).removeClass('errorStreamDrop');
             }
         };
 
