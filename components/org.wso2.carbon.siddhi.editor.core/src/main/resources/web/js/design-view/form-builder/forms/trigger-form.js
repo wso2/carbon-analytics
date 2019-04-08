@@ -61,7 +61,7 @@ define(['require', 'log', 'jquery', 'lodash', 'constants'],
                 $('#trigger-criteria-content').html('');
             } else {
                 //render a text-box to put the atEvery or cron-expression value
-                $('#trigger-criteria-content').html('<input type="text" class="clearfix"> ' +
+                $('#trigger-criteria-content').html('<input type="text" class="clearfix name"> ' +
                     '<label class="error-message" > </label>');
             }
         };
@@ -111,7 +111,7 @@ define(['require', 'log', 'jquery', 'lodash', 'constants'],
          */
         var showTriggerCriteriaDescription = function (triggerObject, selectedCriteria) {
             var triggerCriteriaObject = getTriggerCriteria(triggerObject, selectedCriteria);
-            $('#define-trigger-criteria .criteria-description').text(triggerCriteriaObject.description);
+            $('#define-trigger-criteria .fw-info span').text(triggerCriteriaObject.description);
         };
 
         /**

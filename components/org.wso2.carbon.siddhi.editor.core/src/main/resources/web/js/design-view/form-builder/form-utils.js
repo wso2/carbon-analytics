@@ -3352,7 +3352,7 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
          */
         FormUtils.prototype.addEventListenerToRemoveRequiredClass = function () {
             $('.design-view-form-content').on('input', '.error-input-field', function () {
-                var input = $(this).val().trim();
+                var input = encodeURI($(this).val().trim());
                 if (input != "") {
                     $(this).removeClass('required-input-field');
                     $(this).closest('.clearfix').siblings('label.error-message').hide();

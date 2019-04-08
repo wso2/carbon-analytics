@@ -53,8 +53,8 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'constants'],
                 '<label class="error-message" id="windowNameErrorMessage"></label> <div id="define-attribute"></div>' +
                 self.formUtils.buildFormButtons() + '</div> <div class= "window-form-container"> ' +
                 '<div class = "defineFunctionName"> </div> <div class ="defineFunctionParameters"> </div>' +
-                '</div> <div class = "window-form-container"> <div class="define-output-events"> </div> </div>' +
-                '<div class = "window-form-container"> <div class="define-annotation"> </div> </div>');
+                '</div> <div class = "window-form-container"> <div class="define-output-events"> </div>' +
+                '<div class="define-annotation"></div> </div>');
 
             formContainer.append(propertyDiv);
             self.formUtils.popUpSelectedElement(id);
