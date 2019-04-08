@@ -31,7 +31,6 @@ import org.wso2.carbon.analytics.auth.rest.api.NotFoundException;
 import org.wso2.carbon.analytics.auth.rest.api.dto.ErrorDTO;
 import org.wso2.carbon.analytics.auth.rest.api.dto.RedirectionDTO;
 import org.wso2.carbon.analytics.auth.rest.api.dto.UserDTO;
-import org.wso2.carbon.analytics.auth.rest.api.internal.AuthConfigurations;
 import org.wso2.carbon.analytics.auth.rest.api.internal.DataHolder;
 import org.wso2.carbon.analytics.auth.rest.api.internal.ServiceComponent;
 import org.wso2.carbon.analytics.auth.rest.api.util.AuthRESTAPIConstants;
@@ -39,6 +38,7 @@ import org.wso2.carbon.analytics.auth.rest.api.util.AuthUtil;
 import org.wso2.carbon.analytics.idp.client.core.api.IdPClient;
 import org.wso2.carbon.analytics.idp.client.core.exception.IdPClientException;
 import org.wso2.carbon.analytics.idp.client.core.utils.IdPClientConstants;
+import org.wso2.carbon.analytics.idp.client.core.utils.config.IdPClientConfiguration;
 import org.wso2.carbon.analytics.idp.client.external.ExternalIdPClient;
 import org.wso2.carbon.analytics.idp.client.external.ExternalIdPClientConstants;
 import org.wso2.carbon.config.ConfigurationException;
@@ -370,9 +370,9 @@ public class LoginApiServiceImpl extends LoginApiService {
     @Override
     public Response getAuthType() {
         try {
-            AuthConfigurations authConfigurations = DataHolder.getInstance()
+            IdPClientConfiguration authConfigurations = DataHolder.getInstance()
                     .getConfigProvider()
-                    .getConfigurationObject(AuthConfigurations.class);
+                    .getConfigurationObject(IdPClientConfiguration.class);
             Map<String, String> responseMap = new HashMap<>();
             responseMap.put("authType", authConfigurations.isSsoEnabled() ? "sso" : "default");
             return Response.ok().entity(responseMap).build();

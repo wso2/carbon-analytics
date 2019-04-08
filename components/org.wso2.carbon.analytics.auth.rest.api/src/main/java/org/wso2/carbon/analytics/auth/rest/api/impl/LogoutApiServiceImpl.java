@@ -28,14 +28,13 @@ import org.slf4j.LoggerFactory;
 import org.wso2.carbon.analytics.auth.rest.api.LogoutApiService;
 import org.wso2.carbon.analytics.auth.rest.api.NotFoundException;
 import org.wso2.carbon.analytics.auth.rest.api.dto.ErrorDTO;
-import org.wso2.carbon.analytics.auth.rest.api.internal.AuthConfigurations;
 import org.wso2.carbon.analytics.auth.rest.api.internal.DataHolder;
 import org.wso2.carbon.analytics.auth.rest.api.internal.ServiceComponent;
-import org.wso2.carbon.analytics.auth.rest.api.util.AuthConstants;
 import org.wso2.carbon.analytics.auth.rest.api.util.AuthRESTAPIConstants;
 import org.wso2.carbon.analytics.auth.rest.api.util.AuthUtil;
 import org.wso2.carbon.analytics.idp.client.core.exception.IdPClientException;
 import org.wso2.carbon.analytics.idp.client.core.utils.IdPClientConstants;
+import org.wso2.carbon.analytics.idp.client.core.utils.config.IdPClientConfiguration;
 import org.wso2.carbon.analytics.idp.client.external.ExternalIdPClientConstants;
 import org.wso2.carbon.config.ConfigurationException;
 import org.wso2.carbon.stream.processor.common.utils.SPConstants;
@@ -127,14 +126,14 @@ public class LogoutApiServiceImpl extends LogoutApiService {
     @Override
     public Response ssoLogout() throws NotFoundException {
         try {
-            AuthConfigurations authConfigurations = DataHolder.getInstance().getConfigProvider().getConfigurationObject
-                    (AuthConfigurations.class);
+            IdPClientConfiguration authConfigurations = DataHolder.getInstance().getConfigProvider()
+                    .getConfigurationObject(IdPClientConfiguration.class);
 
             String targetURIForRedirection = authConfigurations.getProperties().getOrDefault(ExternalIdPClientConstants
                             .EXTERNAL_SSO_LOGOUT_URL,
                     ExternalIdPClientConstants.DEFAULT_EXTERNAL_SSO_LOGOUT_URL);
 
-            targetURIForRedirection = targetURIForRedirection.concat(AuthConstants.SSO_LOGING_TAIL);
+            targetURIForRedirection = targetURIForRedirection.concat(AuthRESTAPIConstants.SSO_LOGING_TAIL);
             Map<String, String> response = new HashMap<>();
             response.put(ExternalIdPClientConstants.EXTERNAL_SSO_LOGOUT_URL, targetURIForRedirection);
             return Response.status(Response.Status.OK).entity(response).build();
