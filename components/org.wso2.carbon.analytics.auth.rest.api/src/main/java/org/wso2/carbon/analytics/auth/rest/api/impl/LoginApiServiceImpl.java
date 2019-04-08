@@ -17,8 +17,13 @@
  */
 package org.wso2.carbon.analytics.auth.rest.api.impl;
 
+import com.google.gson.Gson;
 import org.osgi.framework.BundleContext;
-import org.osgi.service.component.annotations.*;
+import org.osgi.service.component.annotations.Activate;
+import org.osgi.service.component.annotations.Deactivate;
+import org.osgi.service.component.annotations.Reference;
+import org.osgi.service.component.annotations.ReferenceCardinality;
+import org.osgi.service.component.annotations.ReferencePolicy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.wso2.carbon.analytics.auth.rest.api.LoginApiService;
@@ -33,8 +38,10 @@ import org.wso2.carbon.analytics.auth.rest.api.util.AuthUtil;
 import org.wso2.carbon.analytics.idp.client.core.api.IdPClient;
 import org.wso2.carbon.analytics.idp.client.core.exception.IdPClientException;
 import org.wso2.carbon.analytics.idp.client.core.utils.IdPClientConstants;
+import org.wso2.carbon.analytics.idp.client.core.utils.config.IdPClientConfiguration;
 import org.wso2.carbon.analytics.idp.client.external.ExternalIdPClient;
 import org.wso2.carbon.analytics.idp.client.external.ExternalIdPClientConstants;
+import org.wso2.carbon.config.ConfigurationException;
 import org.wso2.carbon.stream.processor.common.utils.SPConstants;
 import org.wso2.msf4j.Request;
 
@@ -99,7 +106,6 @@ public class LoginApiServiceImpl extends LoginApiService {
 
             String trimmedAppName = appName.split("/\\|?")[0];
             String appContext = "/" + trimmedAppName;
-
             idPClientProperties.put(IdPClientConstants.APP_NAME, trimmedAppName);
             idPClientProperties.put(IdPClientConstants.GRANT_TYPE, grantType);
             idPClientProperties.put(IdPClientConstants.REMEMBER_ME, rememberMe.toString());
@@ -124,6 +130,9 @@ public class LoginApiServiceImpl extends LoginApiService {
                 idPClientProperties.put(IdPClientConstants.APP_ID, appId);
                 idPClientProperties.put(IdPClientConstants.USERNAME, username);
                 idPClientProperties.put(IdPClientConstants.PASSWORD, password);
+            } else if (IdPClientConstants.AUTHORIZATION_CODE_GRANT_TYPE.equalsIgnoreCase(grantType)) {
+                idPClientProperties.put(IdPClientConstants.GRANT_TYPE, IdPClientConstants.AUTHORIZATION_CODE_GRANT_TYPE);
+                idPClientProperties.put(IdPClientConstants.CALLBACK_URL, appName);
             } else {
                 if (LOG.isDebugEnabled()) {
                     LOG.debug("Grant type '{}' is not supported.", removeCRLFCharacters(grantType));
@@ -231,7 +240,8 @@ public class LoginApiServiceImpl extends LoginApiService {
     }
 
     @Override
-    public Response loginCallbackAppNameGet(String appName, Request request) throws NotFoundException {
+    public Response loginCallbackAppNameGet(String appName, String authentication, Request request) throws
+            NotFoundException {
         IdPClient idPClient = DataHolder.getInstance().getIdPClient();
         if (idPClient instanceof ExternalIdPClient) {
             String trimmedAppName = appName.split("/\\|?")[0];
@@ -241,7 +251,7 @@ public class LoginApiServiceImpl extends LoginApiService {
             String requestCode = requestUrl.substring(requestUrl.lastIndexOf("?code=") + 6);
             try {
                 ExternalIdPClient oAuth2IdPClient = (ExternalIdPClient) idPClient;
-                Map<String, String> authCodeloginResponse = oAuth2IdPClient.authCodeLogin(trimmedAppName, requestCode);
+                Map<String, String> authCodeloginResponse = oAuth2IdPClient.authCodeLogin(appName, requestCode);
                 String loginStatus = authCodeloginResponse.get(IdPClientConstants.LOGIN_STATUS);
                 if (loginStatus.equals(IdPClientConstants.LoginStatus.LOGIN_SUCCESS)) {
                     UserDTO userDTO = new UserDTO();
@@ -284,12 +294,13 @@ public class LoginApiServiceImpl extends LoginApiService {
                     NewCookie logoutContextAccessToken = AuthUtil
                             .cookieBuilder(AuthRESTAPIConstants.WSO2_SP_TOKEN, accessTokenSecondHalf,
                                     AuthRESTAPIConstants.LOGOUT_CONTEXT + appContext, true, true, -1);
-
                     if (refreshToken != null) {
                         NewCookie loginContextRefreshTokenCookie;
                         String refTokenPart1 = refreshToken.substring(0, refreshToken.length() / 2);
                         String refTokenPart2 = refreshToken.substring(refreshToken.length() / 2);
                         userDTO.setlID(refTokenPart1);
+                        NewCookie userAuthenticate = AuthUtil.cookieBuilder(AuthRESTAPIConstants.WSO2_SP_USER_DTO,
+                                new Gson().toJson(userDTO), appContext, true, false, -1);
                         loginContextRefreshTokenCookie = AuthUtil
                                 .cookieBuilder(AuthRESTAPIConstants.WSO2_SP_REFRESH_TOKEN, refTokenPart2,
                                         AuthRESTAPIConstants.LOGIN_CONTEXT + appContext, true, true,
@@ -298,7 +309,7 @@ public class LoginApiServiceImpl extends LoginApiService {
                                 .header(HttpHeaders.LOCATION, targetURIForRedirection)
                                 .entity(userDTO)
                                 .cookie(accessTokenhttpOnlyCookie, logoutContextAccessToken,
-                                        loginContextRefreshTokenCookie)
+                                        loginContextRefreshTokenCookie, userAuthenticate)
                                 .build();
                     }
                     return Response.status(Response.Status.FOUND)
@@ -337,6 +348,13 @@ public class LoginApiServiceImpl extends LoginApiService {
                 errorDTO.setDescription("Error in accessing token from the code for uri '" + appName + "'. Error : '"
                         + e.getMessage() + "'");
                 return Response.serverError().entity(errorDTO).build();
+            } catch (Throwable t) {
+                LOG.error("Error occurred: " + t.getMessage(), t);
+                ErrorDTO errorDTO = new ErrorDTO();
+                errorDTO.setError(IdPClientConstants.Error.INTERNAL_SERVER_ERROR);
+                errorDTO.setDescription("Error occurred '" + appName + "'. Error : '"
+                        + t.getMessage() + "'");
+                return Response.serverError().entity(errorDTO).build();
             }
         } else {
             String errorMsg = "This API is only supported for External IS integration with OAuth2 support. " +
@@ -348,6 +366,25 @@ public class LoginApiServiceImpl extends LoginApiService {
             return Response.status(Response.Status.BAD_REQUEST).entity(errorDTO).build();
         }
     }
+
+    @Override
+    public Response getAuthType() {
+        try {
+            IdPClientConfiguration authConfigurations = DataHolder.getInstance()
+                    .getConfigProvider()
+                    .getConfigurationObject(IdPClientConfiguration.class);
+            Map<String, String> responseMap = new HashMap<>();
+            responseMap.put("authType", authConfigurations.isSsoEnabled() ? "sso" : "default");
+            return Response.ok().entity(responseMap).build();
+        } catch (ConfigurationException e) {
+            ErrorDTO errorDTO = new ErrorDTO();
+            errorDTO.setError(IdPClientConstants.Error.INTERNAL_SERVER_ERROR);
+            errorDTO.setDescription("Error occurred while reading configs from deployment.yaml. " + e.getMessage());
+            return Response.status(Response.Status.BAD_REQUEST)
+                    .entity(errorDTO)
+                    .build();
+        }
+     }
 
     private static String removeCRLFCharacters(String str) {
         if (str != null) {

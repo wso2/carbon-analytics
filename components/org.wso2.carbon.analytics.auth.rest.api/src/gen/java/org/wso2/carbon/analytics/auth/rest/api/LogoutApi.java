@@ -19,12 +19,15 @@ package org.wso2.carbon.analytics.auth.rest.api;
 
 import io.swagger.annotations.ApiParam;
 import org.osgi.service.component.annotations.Component;
+import org.wso2.carbon.analytics.auth.rest.api.dto.ErrorDTO;
 import org.wso2.carbon.analytics.auth.rest.api.factories.LogoutApiServiceFactory;
 import org.wso2.msf4j.Microservice;
 import org.wso2.msf4j.Request;
 
+import java.util.HashMap;
 import javax.ws.rs.ApplicationPath;
 import javax.ws.rs.Consumes;
+import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
@@ -64,5 +67,23 @@ public class LogoutApi implements Microservice {
             , @Context Request request)
             throws NotFoundException {
         return delegate.logoutAppNamePost(appName, request);
+    }
+
+    @GET
+    @Path("/slo")
+    @Produces({"application/json"})
+    @io.swagger.annotations.ApiOperation(value = "", notes = "Login type check Request to Stream Processor.",
+            response = HashMap.class, tags = {})
+    @io.swagger.annotations.ApiResponses(value = {
+            @io.swagger.annotations.ApiResponse(code = 200, message = "SSO logout Request to Stream processor",
+                    response = HashMap.class),
+
+            @io.swagger.annotations.ApiResponse(code = 401, message = "Invalid Authorization Header",
+                    response = ErrorDTO.class),
+
+            @io.swagger.annotations.ApiResponse(code = 500, message = "An unexpected error occurred.",
+                    response = ErrorDTO.class)})
+    public Response loginAppNamePost() throws NotFoundException {
+        return delegate.ssoLogout();
     }
 }

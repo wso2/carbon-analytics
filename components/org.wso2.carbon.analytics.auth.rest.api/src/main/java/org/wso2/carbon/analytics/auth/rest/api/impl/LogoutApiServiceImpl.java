@@ -18,7 +18,11 @@
 package org.wso2.carbon.analytics.auth.rest.api.impl;
 
 import org.osgi.framework.BundleContext;
-import org.osgi.service.component.annotations.*;
+import org.osgi.service.component.annotations.Activate;
+import org.osgi.service.component.annotations.Deactivate;
+import org.osgi.service.component.annotations.Reference;
+import org.osgi.service.component.annotations.ReferenceCardinality;
+import org.osgi.service.component.annotations.ReferencePolicy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.wso2.carbon.analytics.auth.rest.api.LogoutApiService;
@@ -30,6 +34,9 @@ import org.wso2.carbon.analytics.auth.rest.api.util.AuthRESTAPIConstants;
 import org.wso2.carbon.analytics.auth.rest.api.util.AuthUtil;
 import org.wso2.carbon.analytics.idp.client.core.exception.IdPClientException;
 import org.wso2.carbon.analytics.idp.client.core.utils.IdPClientConstants;
+import org.wso2.carbon.analytics.idp.client.core.utils.config.IdPClientConfiguration;
+import org.wso2.carbon.analytics.idp.client.external.ExternalIdPClientConstants;
+import org.wso2.carbon.config.ConfigurationException;
 import org.wso2.carbon.stream.processor.common.utils.SPConstants;
 import org.wso2.msf4j.Request;
 
@@ -70,8 +77,7 @@ public class LogoutApiServiceImpl extends LogoutApiService {
     }
 
     @Override
-    public Response logoutAppNamePost(String appName
-            , Request request) throws NotFoundException {
+    public Response logoutAppNamePost(String appName, Request request) throws NotFoundException {
 
         String trimmedAppName = appName.split("/\\|?")[0];
         String appContext = "/" + trimmedAppName;
@@ -115,5 +121,28 @@ public class LogoutApiServiceImpl extends LogoutApiService {
         errorDTO.setError(IdPClientConstants.Error.INTERNAL_SERVER_ERROR);
         errorDTO.setDescription("Invalid Authorization header. Please provide the Authorization header to proceed.");
         return Response.status(Response.Status.BAD_REQUEST).entity(errorDTO).build();
+    }
+
+    @Override
+    public Response ssoLogout() throws NotFoundException {
+        try {
+            IdPClientConfiguration authConfigurations = DataHolder.getInstance().getConfigProvider()
+                    .getConfigurationObject(IdPClientConfiguration.class);
+
+            String targetURIForRedirection = authConfigurations.getProperties().getOrDefault(ExternalIdPClientConstants
+                            .EXTERNAL_SSO_LOGOUT_URL,
+                    ExternalIdPClientConstants.DEFAULT_EXTERNAL_SSO_LOGOUT_URL);
+
+            targetURIForRedirection = targetURIForRedirection.concat(AuthRESTAPIConstants.SSO_LOGING_TAIL);
+            Map<String, String> response = new HashMap<>();
+            response.put(ExternalIdPClientConstants.EXTERNAL_SSO_LOGOUT_URL, targetURIForRedirection);
+            return Response.status(Response.Status.OK).entity(response).build();
+
+        } catch (ConfigurationException e) {
+            ErrorDTO errorDTO = new ErrorDTO();
+            errorDTO.setError(IdPClientConstants.Error.INTERNAL_SERVER_ERROR);
+            errorDTO.setDescription("Error occurred while logging out the sso session due to " + e.getMessage());
+            return Response.status(Response.Status.BAD_REQUEST).entity(errorDTO).build();
+        }
     }
 }

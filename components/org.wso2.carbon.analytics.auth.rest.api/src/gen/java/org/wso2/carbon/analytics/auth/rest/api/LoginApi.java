@@ -32,6 +32,7 @@ import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
 
@@ -98,9 +99,27 @@ public class LoginApi implements Microservice {
             @io.swagger.annotations.ApiResponse(code = 500, message = "An unexpected error occurred.",
                     response = UserDTO.class)})
     public Response loginCallbackAppNameGet(@ApiParam(value = "AppName", required = true)
-                                            @PathParam("appName") String appName
-            , @Context Request request)
+                                            @PathParam("appName") String appName,
+                                            @QueryParam("code") String authorizationCode, @Context Request request)
             throws NotFoundException {
-        return delegate.loginCallbackAppNameGet(appName, request);
+        Response response = delegate.loginCallbackAppNameGet(appName, authorizationCode, request);
+        return response;
+    }
+
+    @GET
+    @Path("/auth-type")
+    @io.swagger.annotations.ApiOperation(value = "", notes = "Login type check Request to Stream Processor.",
+            response = UserDTO.class, tags = {})
+    @io.swagger.annotations.ApiResponses(value = {
+            @io.swagger.annotations.ApiResponse(code = 200, message = "Type Check Request Successful.",
+                    response = UserDTO.class),
+
+            @io.swagger.annotations.ApiResponse(code = 401, message = "Invalid Authorization Header",
+                    response = UserDTO.class),
+
+            @io.swagger.annotations.ApiResponse(code = 500, message = "An unexpected error occurred.",
+                    response = UserDTO.class)})
+    public Response getAuthType() {
+        return delegate.getAuthType();
     }
 }

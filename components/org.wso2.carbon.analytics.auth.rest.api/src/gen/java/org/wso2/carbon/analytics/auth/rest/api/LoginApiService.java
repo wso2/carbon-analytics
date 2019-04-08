@@ -33,6 +33,8 @@ public abstract class LoginApiService {
             , String appId
             , Request request) throws NotFoundException;
 
-    public abstract Response loginCallbackAppNameGet(String appName
+    public abstract Response loginCallbackAppNameGet(String appName, String authentication
             , Request request) throws NotFoundException;
+
+    public abstract Response getAuthType();
 }

@@ -158,4 +158,3 @@ public class UserDTO {
         return o.toString().replace("\n", "\n    ");
     }
 }
-
