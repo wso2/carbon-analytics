@@ -141,6 +141,7 @@ public class ResourceManagerApiServiceImpl extends ResourceManagerApiService {
                     boolean redeploy = false;
                     if (ResourceManagerConstants.STATE_NEW.equalsIgnoreCase(existingResourceNode.getState())) {
                         joinedState = HeartbeatResponse.JoinedStateEnum.NEW;
+                        resourcePool.notifyResourceNode(nodeConfig.getId(), redeploy, isReceiverNode);
                     } else {
                         // Existing state is STATE_EXISTS. then;
                         if (ResourceManagerConstants.STATE_NEW.equalsIgnoreCase(nodeConfig.getState().toString())) {
@@ -149,11 +150,12 @@ public class ResourceManagerApiServiceImpl extends ResourceManagerApiService {
                             joinedState = HeartbeatResponse.JoinedStateEnum.EXISTS;
                             // Here, we need to redeploy apps
                             redeploy = true;
+                            resourcePool.notifyResourceNode(nodeConfig.getId(), redeploy, isReceiverNode);
                         } else {
                             joinedState = HeartbeatResponse.JoinedStateEnum.EXISTS;
                         }
                     }
-                    resourcePool.notifyResourceNode(nodeConfig.getId(), redeploy, isReceiverNode);
+
                 } else {
                     // If existing node and the current node have the same nodeId, but different interfaces,
                     // Then reject new node from joining the resource pool.

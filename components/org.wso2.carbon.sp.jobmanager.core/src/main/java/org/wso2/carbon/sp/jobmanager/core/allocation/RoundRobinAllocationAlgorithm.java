@@ -49,7 +49,17 @@ public class RoundRobinAllocationAlgorithm implements ResourceAllocationAlgorith
                     }
                 }
             } else {
-                logger.error("Minimum resource requirement did not match, hence not deploying the partial siddhi app ");
+                if (resourceNodeMap.values().iterator().next().isReceiverNode()) {
+                    logger.error("Minimum resource requirement did not match. " + minResourceCount + " receiver nodes "
+                                         + "are required to fulfill the deployment. But only " + resourceNodeMap.size()
+                                         + " nodes are available. Add more receiver nodes by setting "
+                                         + "'isReceiverNode : true' property under deployment.config");
+                } else {
+                    logger.error("Minimum resource requirement did not match. " + minResourceCount + " is specified "
+                                         + "as the number of minimum nodes required under deployment.config"
+                                         + ". But only " + resourceNodeMap.size()
+                                         + " nodes are available. Add more resource nodes to continue deployment.");
+                }
             }
         }
         return null;
