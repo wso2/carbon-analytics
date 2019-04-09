@@ -182,7 +182,9 @@ public class HAEventListener extends MemberEventListener {
                         StreamProcessorDataHolder.getHAManager().changeToPassive();
                         for (Map.Entry<String, SinkHandler> entry : registeredSinkHandlers.entrySet()) {
                             HACoordinationSinkHandler handler = (HACoordinationSinkHandler) entry.getValue();
-                            handler.setAsPassive();
+                            if (handler != null) {
+                                handler.setAsPassive();
+                            }
                         }
                         for (SourceHandler sourceHandler : registeredSourceHandlers.values()) {
                             ((HACoordinationSourceHandler) sourceHandler).setAsPassive();
@@ -214,7 +216,9 @@ public class HAEventListener extends MemberEventListener {
             StreamProcessorDataHolder.getHAManager().changeToPassive();
             for (Map.Entry<String, SinkHandler> entry : registeredSinkHandlers.entrySet()) {
                 HACoordinationSinkHandler handler = (HACoordinationSinkHandler) entry.getValue();
-                handler.setAsPassive();
+                if (handler != null) {
+                    handler.setAsPassive();
+                }
             }
             for (SourceHandler sourceHandler : registeredSourceHandlers.values()) {
                 ((HACoordinationSourceHandler) sourceHandler).setAsPassive();

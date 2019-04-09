@@ -216,7 +216,10 @@ public class HAManager {
             // so that new events will process accordingly
             for (SinkHandler sinkHandler : sinkHandlerManager.getRegisteredSinkHandlers().values()) {
                 try {
-                    ((HACoordinationSinkHandler) sinkHandler).setAsActive();
+                    HACoordinationSinkHandler handler = (HACoordinationSinkHandler) sinkHandler;
+                    if (handler != null) {
+                        handler.setAsActive();
+                    }
                 } catch (Throwable t) {
                     log.error("HA Deployment: Error when connecting to sink " + sinkHandler.getElementId() +
                             " while changing from passive state to active, skipping the sink. ", t);
