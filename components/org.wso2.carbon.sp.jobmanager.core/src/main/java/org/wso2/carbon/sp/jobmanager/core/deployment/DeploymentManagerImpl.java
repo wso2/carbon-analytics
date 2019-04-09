@@ -344,15 +344,21 @@ public class DeploymentManagerImpl implements DeploymentManager, ResourcePoolCha
         if (resourceNode != null) {
             String appName = SiddhiAppDeployer.deploy(resourceNode, siddhiQuery);
             if (appName == null || appName.isEmpty()) {
-                log.warn(String.format("Couldn't deploy partial Siddhi app %s in %s", siddhiQuery.getAppName(),
-                        resourceNode));
-                if (retry < nodeMap.size()) {
+                int retryCount = ServiceDataHolder.getDeploymentConfig().getHeartbeatMaxRetry();
+                int retryInterval = ServiceDataHolder.getDeploymentConfig().getHeartbeatInterval();
+                if (retry < retryCount) {
+                    log.warn(String.format("Couldn't deploy partial Siddhi app %s in %s. Will retry in %d "
+                                                   + "milliseconds.", siddhiQuery.getAppName(), resourceNode,
+                                           retryInterval));
+                    try {
+                        Thread.sleep(retryInterval);
+                    } catch (InterruptedException e) {
+                        Thread.currentThread().interrupt();
+                    }
                     deployedNode = deploy(siddhiQuery, retry + 1, parallelism);
                 } else {
-                    if (log.isDebugEnabled()) {
-                        log.warn(String.format("Couldn't deploy partial Siddhi app %s even after %s attempts.",
-                                siddhiQuery.getAppName(), retry));
-                    }
+                    log.warn(String.format("Couldn't deploy partial Siddhi app %s even after %s attempts.",
+                                           siddhiQuery.getAppName(), retry));
                 }
             } else {
                 if (log.isDebugEnabled()) {
