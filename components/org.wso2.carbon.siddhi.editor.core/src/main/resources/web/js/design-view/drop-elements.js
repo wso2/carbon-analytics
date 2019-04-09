@@ -313,18 +313,24 @@ define(['require', 'log', 'lodash', 'jquery', 'partition', 'stream', 'query', 'f
             /*
              connection --> The connection anchor point is appended to the element
              */
+
             var connection1 = $('<div class="connectorInStream">').attr('id', i + "-in").addClass('connection');
             var connection2 = $('<div class="connectorOutStream">').attr('id', i + "-out").addClass('connection');
-
-            finalElement.append(connection1);
-            finalElement.append(connection2);
 
             var connectionErrOut;
             if (hasFaultStream) {
                 connectionErrOut = $('<div class="error-connection connectorErrOutStream">').attr('id', i + "-err-out");
                 finalElement.append(connectionErrOut);
                 $("#"+finalElement[0].id).addClass('errorStreamDrop');
+
+                connection1 = $('<div class="connectorInStreamForErrorStream">').attr('id', i + "-in").
+                addClass('connection');
+                connection2 = $('<div class="connectorOutForErrorStream">').attr('id', i + "-out").
+                addClass('connection');
             }
+
+            finalElement.append(connection1);
+            finalElement.append(connection2);
 
             finalElement.css({
                 'top': top,
@@ -355,7 +361,7 @@ define(['require', 'log', 'lodash', 'jquery', 'partition', 'stream', 'query', 'f
                 self.jsPlumbInstance.makeSource(connectionErrOut, {
                     deleteEndpointsOnDetach: true,
                     anchor: 'Right',
-                    connectorStyle: { strokeWidth: 2, stroke: '#FF0000', dashstyle: '2 3', outlineStroke: 'transparent',
+                    connectorStyle: { strokeWidth: 2, stroke: '#FF0000', outlineStroke: 'transparent',
                         outlineWidth: '3' }
                 });
             }
@@ -1409,6 +1415,27 @@ define(['require', 'log', 'lodash', 'jquery', 'partition', 'stream', 'query', 'f
                 $( "#" + oldFaultStreamElementId ).remove();
             }
             if (stream.hasFaultStream()) {
+                //remove existing connectionDots
+                $('#' + stream.getId() + '-in').remove();
+                $('#' + stream.getId() + '-out').remove();
+
+                var connection1 = $('<div class="connectorInStreamForErrorStream">').attr('id', stream.getId() + "-in").
+                    addClass('connection');
+                var connection2 = $('<div class="connectorOutForErrorStream">').attr('id', stream.getId() + "-out").
+                    addClass('connection');
+                $('#' + stream.getId()).append(connection1);
+                $('#' + stream.getId()).append(connection2);
+
+                jsPlumbInstance.makeTarget(connection1, {
+                    deleteEndpointsOnDetach: true,
+                    anchor: 'Left'
+                });
+
+                jsPlumbInstance.makeSource(connection2, {
+                    deleteEndpointsOnDetach: true,
+                    anchor: 'Right'
+                });
+
                 var faultStreamName = Constants.FAULT_STREAM_PREFIX + stream.getName();
                 var connectionErrOut = $('<div class="error-connection connectorErrOutStream">')
                     .attr('id', stream.getId() + "-err-out");
@@ -1416,7 +1443,7 @@ define(['require', 'log', 'lodash', 'jquery', 'partition', 'stream', 'query', 'f
                 jsPlumbInstance.makeSource(connectionErrOut, {
                     deleteEndpointsOnDetach: true,
                     anchor: 'Right',
-                    connectorStyle: { strokeWidth: 2, stroke: '#FF0000', dashstyle: '2 3',
+                    connectorStyle: { strokeWidth: 2, stroke: '#FF0000',
                         outlineStroke: 'transparent',
                         outlineWidth: '3' }
                 });
@@ -1449,6 +1476,25 @@ define(['require', 'log', 'lodash', 'jquery', 'partition', 'stream', 'query', 'f
                 });
                 $('#' + stream.getId() + '-err-out').remove();
                 $('#' + stream.getId()).removeClass('errorStreamDrop');
+                $('#' + stream.getId() + '-in').remove();
+                $('#' + stream.getId() + '-out').remove();
+
+                var connection1 = $('<div class="connectorInStream">').attr('id', stream.getId() + "-in").
+                    addClass('connection');
+                var connection2 = $('<div class="connectorOutStream">').attr('id', stream.getId() + "-out").
+                    addClass('connection');
+                $('#' + stream.getId()).append(connection1);
+                $('#' + stream.getId()).append(connection2);
+
+                jsPlumbInstance.makeTarget(connection1, {
+                    deleteEndpointsOnDetach: true,
+                    anchor: 'Left'
+                });
+
+                jsPlumbInstance.makeSource(connection2, {
+                    deleteEndpointsOnDetach: true,
+                    anchor: 'Right'
+                });
             }
         };
 

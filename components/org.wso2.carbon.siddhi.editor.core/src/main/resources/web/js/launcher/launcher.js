@@ -56,20 +56,26 @@ define(['log', 'jquery', 'backbone', 'lodash', 'context_menu', 'launch_manager',
 
             stopApplication: function(workspace,initialLoad){
                 var activeTab = this.application.tabController.getActiveTab();
-                var siddhiAppName = "";
-                if(activeTab.getTitle().lastIndexOf(".siddhi") != -1){
-                    siddhiAppName = activeTab.getTitle().substring(0, activeTab.getTitle().lastIndexOf(".siddhi"));
-                } else{
-                    siddhiAppName = activeTab.getTitle();
+
+                if (undefined == activeTab.getFile().isStopProcessRunning() ||
+                    !activeTab.getFile().isStopProcessRunning()) {
+                    activeTab.getFile().setStopProcessRunning(true);
+                    var siddhiAppName = "";
+                    if(activeTab.getTitle().lastIndexOf(".siddhi") != -1){
+                        siddhiAppName = activeTab.getTitle().substring(0, activeTab.getTitle().lastIndexOf(".siddhi"));
+                    } else{
+                        siddhiAppName = activeTab.getTitle();
+                    }
+                    this.application.commandManager.dispatch('stop-running-simulation-on-app-stop', siddhiAppName);
+                    LaunchManager.stopApplication(siddhiAppName,this.application.outputController,activeTab,
+                        workspace,initialLoad);
+                    var options = {
+                        siddhiAppName: siddhiAppName,
+                        status: "STOP"
+                    };
+                    this.application.commandManager.dispatch('change-app-status-single-simulation', options);
                 }
-                this.application.commandManager.dispatch('stop-running-simulation-on-app-stop', siddhiAppName);
-                LaunchManager.stopApplication(siddhiAppName,this.application.outputController,activeTab,
-                    workspace,initialLoad);
-                var options = {
-                    siddhiAppName: siddhiAppName,
-                    status: "STOP"
-                };
-                this.application.commandManager.dispatch('change-app-status-single-simulation', options);
+
             },
 
             runApplication: function (workspace, async) {

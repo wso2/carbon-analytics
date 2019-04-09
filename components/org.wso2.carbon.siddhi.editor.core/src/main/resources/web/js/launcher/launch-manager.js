@@ -76,12 +76,14 @@ define(['require', 'jquery', 'backbone', 'lodash', 'event_channel', 'console' ],
             if (null == async) {
                 async = true;
             }
+            consoleListManager.application.toolBar.enableStopButtonLoading();
             $.ajax({
                 async: async,
                 url: this.baseurl + siddhiAppName + "/stop",
                 type: "GET",
                 success: function (data) {
                     if(console != undefined){
+                        activeTab.getFile().setStopProcessRunning(false);
                         var msg = "";
                         activeTab.getFile().setRunStatus(false);
                         activeTab.getFile().save();
@@ -93,10 +95,13 @@ define(['require', 'jquery', 'backbone', 'lodash', 'event_channel', 'console' ],
                         console.println(message);
                         workspace.updateRunMenuItem();
                         activeTab.setNonRunningMode();
+                        consoleListManager.application.toolBar.disableStopButtonLoading();
                     }else if(initialLoad){
                         activeTab.getFile().setRunStatus(false);
+                        activeTab.getFile().setStopProcessRunning(false);
                         activeTab.getFile().setDebugStatus(false);
                         activeTab.getFile().save();
+                        consoleListManager.application.toolBar.disableStopButtonLoading();
                     }
 
                 },
@@ -109,6 +114,7 @@ define(['require', 'jquery', 'backbone', 'lodash', 'event_channel', 'console' ],
                         }
                         console.println(message);
                         workspace.updateRunMenuItem();
+                        consoleListManager.application.toolBar.disableStopButtonLoading();
                     }
 
                 }

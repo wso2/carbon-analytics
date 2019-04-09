@@ -2292,11 +2292,7 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
             var self = this;
             var elementId;
             if (isCodeToDesignMode !== undefined && !isCodeToDesignMode) {
-                if (stream !== undefined && stream.getId() !== undefined) {
-                    elementId = stream.getId();
-                } else {
-                    elementId = self.getNewAgentId();
-                }
+                elementId = stream && stream.getId() ? stream.getId() : self.getNewAgentId();
             } else if (isCodeToDesignMode !== undefined && isCodeToDesignMode) {
                 if (streamId !== undefined) {
                     elementId = streamId;

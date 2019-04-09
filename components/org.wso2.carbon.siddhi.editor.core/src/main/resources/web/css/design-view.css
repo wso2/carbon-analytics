@@ -311,9 +311,21 @@ td {
     margin-right: -5px;
 }
 
+.connectorOutForErrorStream {
+    float: right;
+    margin-top: -58px;
+    margin-right: -5px;
+}
+
+.connectorInStreamForErrorStream {
+    float: left;
+    margin-top: -57px;
+    margin-left: -5px;
+}
+
 .connectorErrOutStream {
     float: right;
-    margin-top: -30px;
+    margin-top: -40px;
     margin-right: -5px;
 }
 
