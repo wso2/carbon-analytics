@@ -178,7 +178,7 @@ public class DeploymentManagerImpl implements DeploymentManager, ResourcePoolCha
                 waitingAppList.remove(siddhiAppName);
                 unDeployed = true;
 
-                log.info("Siddhi app " + siddhiAppName + "un-deployed successfully");
+                log.info("Siddhi app " + siddhiAppName + " un-deployed successfully");
             } else {
                 log.warn("Siddhi app " + siddhiAppName + " is not deployed. Therefore, cannot un-deploy.");
             }
