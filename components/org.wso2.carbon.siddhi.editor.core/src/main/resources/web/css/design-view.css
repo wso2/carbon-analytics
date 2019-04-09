@@ -84,6 +84,10 @@
     background-image: url("../images/streams.svg");
 }
 
+.errorStreamDrop {
+    background-image: url("../images/error-stream.svg");
+}
+
 .tableDrop {
     background-image: url("../images/table.svg");
 }
@@ -207,6 +211,20 @@
     background-color: #424242;
 }
 
+.error-connection {
+    -moz-border-radius: 5px;
+    -webkit-border-radius: 5px;
+    border-radius: 5px;
+    font-size: 10px;
+    text-align: center;
+    cursor: pointer;
+    width: 10px;
+    height: 10px;
+    margin-left: -10px;
+    border: 1px solid #FF0000;
+    background-color: #FF0000;
+}
+
 .property {
     float: left;
     margin-top: 10px;
@@ -293,9 +311,21 @@ td {
     margin-right: -5px;
 }
 
+.connectorOutForErrorStream {
+    float: right;
+    margin-top: -58px;
+    margin-right: -5px;
+}
+
+.connectorInStreamForErrorStream {
+    float: left;
+    margin-top: -57px;
+    margin-left: -5px;
+}
+
 .connectorErrOutStream {
     float: right;
-    margin-top: -30px;
+    margin-top: -40px;
     margin-right: -5px;
 }
 

@@ -19,7 +19,7 @@
 grammar SiddhiQL;
 
 @header {
-	//import org.wso2.siddhi.query.compiler.exception.SiddhiParserException;
+	//import io.siddhi.query.compiler.exception.SiddhiParserException;
 }
 
 parse
@@ -198,33 +198,33 @@ join_source
     ;
 
 pattern_stream
-    : every_pattern_source_chain
-    | absent_pattern_source_chain
+    : every_pattern_source_chain within_time?
+    | absent_pattern_source_chain within_time?
     ;
 
 every_pattern_source_chain
-    : '('every_pattern_source_chain')' within_time? 
-    | EVERY '('pattern_source_chain ')' within_time?   
+    : '('every_pattern_source_chain')' 
+    | EVERY '('pattern_source_chain ')'   
     | every_pattern_source_chain  '->' every_pattern_source_chain
     | pattern_source_chain
-    | EVERY pattern_source within_time? 
+    | EVERY pattern_source 
     ;
 
 pattern_source_chain
-    : '('pattern_source_chain')' within_time?
+    : '('pattern_source_chain')'
     | pattern_source_chain  '->' pattern_source_chain
-    | pattern_source within_time?
+    | pattern_source
     ;
 
 absent_pattern_source_chain
-    : EVERY? '('absent_pattern_source_chain')' within_time?
+    : EVERY? '('absent_pattern_source_chain')'
     | every_absent_pattern_source
     | left_absent_pattern_source
     | right_absent_pattern_source
     ;
 
 left_absent_pattern_source
-    : EVERY? '('left_absent_pattern_source')' within_time?
+    : EVERY? '('left_absent_pattern_source')'
     | every_absent_pattern_source '->' every_pattern_source_chain
     | left_absent_pattern_source '->' left_absent_pattern_source
     | left_absent_pattern_source '->' every_absent_pattern_source
@@ -232,7 +232,7 @@ left_absent_pattern_source
     ;
 
 right_absent_pattern_source
-    : EVERY? '('right_absent_pattern_source')' within_time?
+    : EVERY? '('right_absent_pattern_source')'
     | every_pattern_source_chain '->' every_absent_pattern_source
     | right_absent_pattern_source '->' right_absent_pattern_source
     | every_absent_pattern_source '->' right_absent_pattern_source
@@ -289,28 +289,28 @@ basic_source_stream_handler
     ;
 
 sequence_stream
-    :every_sequence_source_chain
-    |every_absent_sequence_source_chain
+    :every_sequence_source_chain within_time?
+    |every_absent_sequence_source_chain within_time?
     ;
 
 every_sequence_source_chain
-    : EVERY? sequence_source  within_time?  ',' sequence_source_chain
+    : EVERY? sequence_source ',' sequence_source_chain
     ;
 
 every_absent_sequence_source_chain
-    : EVERY? absent_sequence_source_chain  within_time? ',' sequence_source_chain
-    | EVERY? sequence_source  within_time? ',' absent_sequence_source_chain
+    : EVERY? absent_sequence_source_chain  ',' sequence_source_chain
+    | EVERY? sequence_source ',' absent_sequence_source_chain
     ;
 
 absent_sequence_source_chain
-    : '('absent_sequence_source_chain')' within_time?
+    : '('absent_sequence_source_chain')'
     | basic_absent_pattern_source
     | left_absent_sequence_source
     | right_absent_sequence_source
     ;
 
 left_absent_sequence_source
-    : '('left_absent_sequence_source')' within_time?
+    : '('left_absent_sequence_source')'
     | basic_absent_pattern_source ',' sequence_source_chain
     | left_absent_sequence_source ',' left_absent_sequence_source
     | left_absent_sequence_source ',' basic_absent_pattern_source
@@ -318,7 +318,7 @@ left_absent_sequence_source
     ;
 
 right_absent_sequence_source
-    : '('right_absent_sequence_source')' within_time?
+    : '('right_absent_sequence_source')'
     | sequence_source_chain ',' basic_absent_pattern_source
     | right_absent_sequence_source ',' right_absent_sequence_source
     | basic_absent_pattern_source ',' right_absent_sequence_source
@@ -326,9 +326,9 @@ right_absent_sequence_source
     ;
 
 sequence_source_chain
-    :'('sequence_source_chain ')' within_time? 
+    :'('sequence_source_chain ')' 
     | sequence_source_chain ',' sequence_source_chain
-    | sequence_source  within_time? 
+    | sequence_source  
     ;
 
 sequence_source
@@ -486,11 +486,11 @@ null_check
     ;
 
 stream_reference
-    :hash='#'? name ('['attribute_index']')?
+    :(hash='#'|not='!')? name ('['attribute_index']')?
     ;
 
 attribute_reference
-    : hash1='#'? name1=name ('['attribute_index1=attribute_index']')? (hash2='#' name2=name ('['attribute_index2=attribute_index']')?)? '.'  attribute_name
+    : (hash1='#'|not='!')? name1=name ('['attribute_index1=attribute_index']')? (hash2='#' name2=name ('['attribute_index2=attribute_index']')?)? '.'  attribute_name
     | attribute_name
     ;
 
@@ -519,7 +519,7 @@ alias
     ;
 
 property_name
-    : name (property_separator name )*
+    : name (property_separator name )* | string_value
     ;
 
 attribute_name
@@ -539,7 +539,7 @@ property_separator
     ;
 
 source
-    :inner='#'? stream_id
+    :(inner='#' | fault='!')? stream_id
     ;
 
 target
@@ -847,7 +847,7 @@ AGGREGATION: A G G R E G A T I O N;
 AGGREGATE: A G G R E G A T E;
 PER:      P E R;
 
-ID_QUOTES : '`'[a-zA-Z_] [a-zA-Z_0-9]*'`' {setText(getText().substring(1, getText().length()-1));};
+ID_QUOTES : '`'(.*?)'`' {setText(getText().substring(1, getText().length()-1));};
 
 ID : [a-zA-Z_] [a-zA-Z_0-9]* ;
 

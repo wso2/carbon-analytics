@@ -111,6 +111,23 @@ define(['log', 'jquery', 'lodash', 'workspace', 'backbone'],
                 enableRevertButton: function(){
                     this._revertBtn.removeClass("disabled");
                     this._revertBtn.addClass("active");
+                },
+                enableStopButtonLoading: function(){
+                    var stopElement = this._stopBtn.find('.fw-stop');
+                    stopElement.addClass('fw-loader5');
+                    stopElement.addClass('fw-spin');
+                    stopElement.removeClass('fw-stop');
+                    this._stopBtn.css('cursor', 'not-allowed');
+                    stopElement.attr('title', 'stopping');
+                    this._stopBtn.attr('title', 'stopping');
+                },
+                disableStopButtonLoading: function(){
+                    var stopElement = this._stopBtn.find('.fw-loader5');
+                    stopElement.removeClass('fw-loader5');
+                    stopElement.removeClass('fw-spin');
+                    stopElement.addClass('fw-stop');
+                    stopElement.attr('title', 'stop');
+                    this._stopBtn.attr('title', 'stop');
                 }
             });
         return ToolBar;

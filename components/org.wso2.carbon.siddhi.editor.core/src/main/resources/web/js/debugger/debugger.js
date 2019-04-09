@@ -301,6 +301,7 @@ define(['jquery', 'backbone', 'log', 'lodash', 'ace/range', 'render_json'], func
                 siddhiAppName = activeTab.getTitle();
             }
             this.unHighlightDebugLine();
+            this.application.toolBar.enableStopButtonLoading();
             this._debugger.stop(
                 function (data) {
                     var msg = "";
@@ -321,6 +322,8 @@ define(['jquery', 'backbone', 'log', 'lodash', 'ace/range', 'render_json'], func
                     console.println(message);
                     workspace.updateRunMenuItem();
                     this._debugStarted = false;
+                    activeTab.getFile().setStopProcessRunning(false);
+                    activeTab.app.toolBar.disableStopButtonLoading();
                 },
                 function (error) {
                     if (activeTab.getFile().getDebugStatus()) {
@@ -334,6 +337,8 @@ define(['jquery', 'backbone', 'log', 'lodash', 'ace/range', 'render_json'], func
                     }
                     console.println(message);
                     workspace.updateRunMenuItem();
+                    activeTab.getFile().setStopProcessRunning(false);
+                    activeTab.app.toolBar.disableStopButtonLoading();
                 });
         }
     });

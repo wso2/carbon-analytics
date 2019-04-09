@@ -154,7 +154,16 @@ define(['jquery', 'lodash', 'backbone', 'log'], function ($, _, Backbone, log) {
 
             isDirty: function(){
                 return this.get('isDirty')
-            }
+            },
+
+            isStopProcessRunning: function () {
+                return this.get('stopProcessRunning');
+            },
+
+            setStopProcessRunning: function(stopTriggered){
+                this.set('stopProcessRunning', stopTriggered);
+                return this;
+            },
 
         });
 
