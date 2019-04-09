@@ -26,6 +26,7 @@ import org.osgi.service.component.annotations.Component;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.wso2.msf4j.websocket.WebSocketEndpoint;
+import org.wso2.transport.http.netty.contract.websocket.WebSocketConnection;
 
 import java.io.IOException;
 import java.text.SimpleDateFormat;
@@ -36,7 +37,6 @@ import java.util.concurrent.TimeUnit;
 import javax.websocket.OnClose;
 import javax.websocket.OnMessage;
 import javax.websocket.OnOpen;
-import javax.websocket.Session;
 import javax.websocket.server.ServerEndpoint;
 
 /**
@@ -53,35 +53,33 @@ public class EditorConsoleService implements WebSocketEndpoint {
     private static final int SCHEDULER_INITIAL_DELAY = 1000;
     private static final int SCHEDULER_TERMINATION_DELAY = 50;
     private SimpleDateFormat timeFormatter = new SimpleDateFormat("yyyy-MM-dd_HH-mm-ss_SSS");
-    private Session session;
+    private WebSocketConnection webSocketConnection;
     private ScheduledExecutorService scheduler;
     private CircularBuffer<ConsoleLogEvent> circularBuffer = DataHolder.getBuffer();
 
 
     @OnOpen
-    public void onOpen(Session session) {
-        if (this.session != null) {
-            onClose(this.session);
+    public void onOpen(WebSocketConnection webSocketConnection) {
+        if (this.webSocketConnection != null) {
+            onClose(this.webSocketConnection);
         }
-        this.session = session;
+        this.webSocketConnection = webSocketConnection;
         this.scheduler = Executors.newScheduledThreadPool(1);
         scheduler.scheduleWithFixedDelay(new LogPublisherTask(), SCHEDULER_INITIAL_DELAY, SCHEDULER_TERMINATION_DELAY,
                 TimeUnit.MILLISECONDS);
-        LOGGER.info("Connected with user : " + session.getId());
+        LOGGER.info("Connected with user : " + webSocketConnection.getChannelId());
     }
 
     @OnMessage
-    public void onMessage(String text, Session session) {
-        try {
-            session.getBasicRemote().sendText("Welcome to Stream Processor Studio");
+    public void onMessage(String text, WebSocketConnection webSocketConnection) {
+        if (webSocketConnection.isOpen()) {
+            webSocketConnection.pushText("Welcome to Stream Processor Studio");
             LOGGER.info("Received message : " + text);
-        } catch (IOException e) {
-            LOGGER.error(e.getMessage());
         }
     }
 
     @OnClose
-    public void onClose(Session session) {
+    public void onClose(WebSocketConnection webSocketConnection) {
         if (scheduler != null) {
             try {
                 scheduler.shutdown();
@@ -94,7 +92,7 @@ public class EditorConsoleService implements WebSocketEndpoint {
                 LOGGER.error("Interrupted while awaiting for Schedule Executor termination" + e.getMessage(), e);
             }
         }
-        if (session.isOpen()) {
+        if (webSocketConnection.isOpen()) {
             try {
                 ConsoleLogEvent clientCloseEvent = new ConsoleLogEvent();
                 clientCloseEvent.setMessage("Connection closed (Possibly due to opening the editor in a "
@@ -104,8 +102,8 @@ public class EditorConsoleService implements WebSocketEndpoint {
                 String timeString = timeFormatter.format(System.currentTimeMillis());
                 clientCloseEvent.setTimeStamp(timeString);
                 String jsonString = getJsonString(clientCloseEvent);
-                session.getBasicRemote().sendText(jsonString);
-                session.close();
+                webSocketConnection.pushText(jsonString);
+                webSocketConnection.terminateConnection();
             } catch (IOException e) {
                 LOGGER.error("Inturrupted while awaiting for Session termination" + e.getMessage(), e);
             }
@@ -114,10 +112,10 @@ public class EditorConsoleService implements WebSocketEndpoint {
 
     private void broadcastConsoleOutput(List<ConsoleLogEvent> event) {
         for (ConsoleLogEvent logEvent : event) {
-            if (session.isOpen()) {
+            if (webSocketConnection.isOpen()) {
                 try {
                     String jsonString = getJsonString(logEvent);
-                    session.getBasicRemote().sendText(jsonString);
+                    webSocketConnection.pushText(jsonString);
                 } catch (IOException e) {
                     LogLog.error("Editor Console Appender cannot publish log event, " + e.getMessage(), e);
                 }
