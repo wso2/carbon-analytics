@@ -158,7 +158,10 @@ public class StreamProcessorService {
                     log.info("Setting SinksHandlers of " + siddhiAppName + " to Active");
                     for (List<Sink> sinks : sinkCollection) {
                         for (Sink sink : sinks) {
-                            ((HACoordinationSinkHandler) sink.getHandler()).setAsActive();
+                            HACoordinationSinkHandler handler = (HACoordinationSinkHandler) sink.getHandler();
+                            if (handler != null) {
+                                handler.setAsActive();
+                            }
                         }
                     }
 
@@ -195,7 +198,10 @@ public class StreamProcessorService {
                     log.info("Setting SinksHandlers of " + siddhiAppName + " to Passive");
                     for (List<Sink> sinks : sinkCollection) {
                         for (Sink sink : sinks) {
-                            ((HACoordinationSinkHandler) sink.getHandler()).setAsPassive();
+                            HACoordinationSinkHandler handler = (HACoordinationSinkHandler) sink.getHandler();
+                            if (handler != null) {
+                                handler.setAsPassive();
+                            }
                         }
                     }
 
