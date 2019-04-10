@@ -1798,7 +1798,7 @@
         <siddhi.io.kafka.version>4.2.1</siddhi.io.kafka.version>
         <siddhi.io.http.version>1.1.5</siddhi.io.http.version>
 
-        <siddhi.map.json.version>4.1.1</siddhi.map.json.version>
+        <siddhi.map.json.version>4.1.2</siddhi.map.json.version>
         <siddhi.map.binary.version>1.1.1</siddhi.map.binary.version>
         <siddhi.map.xml.version>4.1.2</siddhi.map.xml.version>
 
