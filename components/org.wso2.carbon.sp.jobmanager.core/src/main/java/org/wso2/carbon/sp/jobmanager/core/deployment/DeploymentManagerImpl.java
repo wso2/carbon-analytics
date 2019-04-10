@@ -212,6 +212,10 @@ public class DeploymentManagerImpl implements DeploymentManager, ResourcePoolCha
         try {
             for (String parentSiddhiAppName : waitingParentAppNames) {
                 partialAppHoldersOfSiddhiApp = waitingList.getOrDefault(parentSiddhiAppName, Collections.emptyList());
+                if (partialAppHoldersOfSiddhiApp.size() == 0) {
+                    //continue to next parent app if all partial apps are deployed
+                    continue;
+                }
                 deployedCompletely = true;
                 currentDeployedPartialApps = new ArrayList<>();
 
