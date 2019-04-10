@@ -68,8 +68,6 @@ const latencyLineChartConfig = {
         {type: 'area', y: '5 Minutes Rate', fill: '#aea2e0', style: {markRadius: 2}},
         {type: 'area', y: '15 Minutes Rate', fill: '#FFEB3B', style: {markRadius: 2}}
     ],
-    width: 800,
-    height: 250,
     style: {
         tickLabelColor: '#f2f2f2',
         legendTextColor: '#9c9898',
@@ -88,8 +86,6 @@ const memoryMetadata = {names: ['Time', 'Memory'], types: ['time', 'linear']};
 const memoryLineChartConfig = {
     x: 'Time',
     charts: [{type: 'area', y: 'Memory', fill: '#f17b31', style: {markRadius: 2}}],
-    width: 800,
-    height: 250,
     style: {
         tickLabelColor: '#f2f2f2',
         legendTextColor: '#9c9898',
@@ -117,8 +113,6 @@ const tpLineChartConfig = {
         {type: 'area', y: '5 Minutes', fill: '#8c51a5', style: {markRadius: 2}},
         {type: 'area', y: '15 Minutes', fill: '#FFEB3B', style: {markRadius: 2}}
     ],
-    width: 800,
-    height: 250,
     style: {
         tickLabelColor: '#f2f2f2',
         legendTextColor: '#9c9898',
