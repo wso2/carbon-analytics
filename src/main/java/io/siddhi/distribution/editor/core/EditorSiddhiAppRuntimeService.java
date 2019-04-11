@@ -20,6 +20,7 @@
 package io.siddhi.distribution.editor.core;
 
 import io.siddhi.core.SiddhiAppRuntime;
+import io.siddhi.core.util.statistics.metrics.Level;
 import io.siddhi.distribution.common.common.SiddhiAppRuntimeService;
 import io.siddhi.distribution.editor.core.internal.DebugRuntime;
 import io.siddhi.distribution.editor.core.internal.EditorDataHolder;
@@ -46,7 +47,7 @@ public class EditorSiddhiAppRuntimeService implements SiddhiAppRuntimeService {
     }
 
     @Override
-    public void enableSiddhiAppStatistics(boolean statsEnabled) {
+    public void enableSiddhiAppStatistics(Level enabledStatsLevel) {
         //ignore the editor runtime statistics
     }
 }
