@@ -23,21 +23,21 @@ import io.siddhi.distribution.editor.core.util.designview.exceptions.DesignGener
 import io.siddhi.query.api.annotation.Annotation;
 import io.siddhi.query.api.annotation.Element;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
- * Generator to create Store config.
+ * Generator to create Store config
  */
 public class StoreConfigGenerator extends CodeSegmentsPreserver {
     public StoreConfig generateStoreConfig(Annotation storeAnnotation) throws DesignGenerationException {
         String type = null;
-        Map<String, String> options = new HashMap<>();
+        List<String> options = new ArrayList<>();
         for (Element element : storeAnnotation.getElements()) {
             if (element.getKey().equalsIgnoreCase("TYPE")) {
                 type = element.getValue();
             } else {
-                options.put(element.getKey(), element.getValue());
+                options.add(element.toString());
             }
         }
         if (type == null) {

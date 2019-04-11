@@ -29,6 +29,7 @@ import io.siddhi.distribution.editor.core.util.designview.beans.configs.siddhiel
 import io.siddhi.distribution.editor.core.util.designview.beans.configs.siddhielements.query.QueryConfig;
 import io.siddhi.distribution.editor.core.util.designview.beans.configs.siddhielements.sourcesink.SourceSinkConfig;
 import io.siddhi.distribution.editor.core.util.designview.constants.query.QueryListType;
+import io.siddhi.query.api.annotation.Annotation;
 
 import java.util.ArrayList;
 import java.util.EnumMap;
@@ -39,7 +40,7 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * Contains elements of a Siddhi app.
+ * Contains elements of a Siddhi app
  */
 public class SiddhiAppConfig {
     private int finalElementCount = 0;
@@ -47,6 +48,7 @@ public class SiddhiAppConfig {
     private String siddhiAppDescription = "";
     private String siddhiAppName = "";
     private List<String> appAnnotationList = new ArrayList<>();
+    private List<Annotation> appAnnotationListObjects = new ArrayList<>();
     private List<SourceSinkConfig> sourceList = new ArrayList<>();
     private List<SourceSinkConfig> sinkList = new ArrayList<>();
     private List<StreamConfig> streamList = new ArrayList<>();
@@ -69,7 +71,7 @@ public class SiddhiAppConfig {
     }
 
     /**
-     * Returns Id for the next element id, after incrementing the final element count.
+     * Returns Id for the next element id, after incrementing the final element count
      *
      * @return Id for the element
      */
@@ -78,7 +80,7 @@ public class SiddhiAppConfig {
     }
 
     /**
-     * Returns PartitionConnector id, with the given partition id and connector id.
+     * Returns PartitionConnector id, with the given partition id and connector id
      *
      * @param partitionId Id of the PartitionConfig
      * @param connectorId Id of the PartitionConnector, within the Partition
@@ -89,7 +91,7 @@ public class SiddhiAppConfig {
     }
 
     /**
-     * Adds a given generic type Siddhi ElementConfig, to the given list of the same generic type.
+     * Adds a given generic type Siddhi ElementConfig, to the given list of the same generic type
      *
      * @param elementList   List to which, the given element config should be added
      * @param elementConfig Siddhi ElementConfig object
@@ -102,7 +104,7 @@ public class SiddhiAppConfig {
     }
 
     /**
-     * Adds the given list of ElementCodeSegment objects representing code segments of Siddhi elements.
+     * Adds the given list of ElementCodeSegment objects representing code segments of Siddhi elements,
      * to the existing list
      *
      * @param elementCodeSegments List of ElementCodeSegment objects
@@ -112,7 +114,7 @@ public class SiddhiAppConfig {
     }
 
     /**
-     * Adds the code segment of the given SiddhiElementConfig object, to the existing list of code segments.
+     * Adds the code segment of the given SiddhiElementConfig object, to the existing list of code segments
      *
      * @param siddhiElementConfig SiddhiElementConfig object
      */
@@ -127,7 +129,7 @@ public class SiddhiAppConfig {
     }
 
     /**
-     * Adds a given QueryConfig object to its specific query list, denoted by the given QueryInputType.
+     * Adds a given QueryConfig object to its specific query list, denoted by the given QueryInputType
      *
      * @param queryListType Key with which, the specific query list is denoted
      * @param queryConfig   QueryConfig object
@@ -139,7 +141,7 @@ public class SiddhiAppConfig {
     }
 
     /**
-     * Adds a given PartitionConfig object to the partitionList.
+     * Adds a given PartitionConfig object to the partitionList
      *
      * @param partitionConfig PartitionConfig object
      */
@@ -208,28 +210,36 @@ public class SiddhiAppConfig {
         addElement(partitionList, partitionConfig);
     }
 
-    public String getSiddhiAppDescription() {
-        return siddhiAppDescription;
+    public void setAppAnnotationList(List<String> appAnnotationList) {
+        this.appAnnotationList = appAnnotationList;
+    }
+
+    public void setAppAnnotationListObjects(List<Annotation> appAnnotationListObjects) {
+        this.appAnnotationListObjects = appAnnotationListObjects;
     }
 
     public void setSiddhiAppDescription(String siddhiAppDescription) {
         this.siddhiAppDescription = siddhiAppDescription;
     }
 
-    public String getSiddhiAppName() {
-        return siddhiAppName;
+    public String getSiddhiAppDescription() {
+        return siddhiAppDescription;
     }
 
     public void setSiddhiAppName(String siddhiAppName) {
         this.siddhiAppName = siddhiAppName;
     }
 
+    public String getSiddhiAppName() {
+        return siddhiAppName;
+    }
+
     public List<String> getAppAnnotationList() {
         return appAnnotationList;
     }
 
-    public void setAppAnnotationList(List<String> appAnnotationList) {
-        this.appAnnotationList = appAnnotationList;
+    public List<Annotation> getAppAnnotationListObjects() {
+        return appAnnotationListObjects;
     }
 
     public List<SourceSinkConfig> getSourceList() {
@@ -285,7 +295,7 @@ public class SiddhiAppConfig {
     }
 
     /**
-     * Removes unnecessarily remaining comments.
+     * Removes unnecessarily remaining comments
      */
     public void clearCommentCodeSegments() {
         commentCodeSegments = new HashSet<>();

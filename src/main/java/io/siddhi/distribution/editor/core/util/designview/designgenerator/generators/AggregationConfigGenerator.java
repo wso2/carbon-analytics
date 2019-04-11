@@ -36,7 +36,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Generator to create AggregationConfig.
+ * Generator to create AggregationConfig
  */
 public class AggregationConfigGenerator extends CodeSegmentsPreserver {
     private String siddhiAppString;
@@ -46,11 +46,10 @@ public class AggregationConfigGenerator extends CodeSegmentsPreserver {
     }
 
     /**
-     * Generates AggregationConfig from the given Siddhi AggregationDefinition.
-     *
-     * @param aggregationDefinition Siddhi AggregationDefinition object
-     * @return AggregationConfig object
-     * @throws DesignGenerationException Error while generating AggregationConfig
+     * Generates AggregationConfig from the given Siddhi AggregationDefinition
+     * @param aggregationDefinition             Siddhi AggregationDefinition object
+     * @return                                  AggregationConfig object
+     * @throws DesignGenerationException        Error while generating AggregationConfig
      */
     public AggregationConfig generateAggregationConfig(AggregationDefinition aggregationDefinition)
             throws DesignGenerationException {
@@ -83,15 +82,18 @@ public class AggregationConfigGenerator extends CodeSegmentsPreserver {
         AnnotationConfigGenerator annotationConfigGenerator = new AnnotationConfigGenerator();
         StoreConfig storeConfig = null;
         List<String> annotationList = new ArrayList<>();
+        List<Annotation> annotationListObjects = new ArrayList<>();
         for (Annotation annotation : aggregationDefinition.getAnnotations()) {
             if (annotation.getName().equalsIgnoreCase("STORE")) {
                 storeConfig = storeConfigGenerator.generateStoreConfig(annotation);
             } else {
+                annotationListObjects.add(annotation);
                 annotationList.add(annotationConfigGenerator.generateAnnotationConfig(annotation));
             }
         }
         aggregationConfig.setStore(storeConfig);
         aggregationConfig.setAnnotationList(annotationList);
+        aggregationConfig.setAnnotationListObjects(annotationListObjects);
 
         preserveCodeSegmentsOf(annotationConfigGenerator, storeConfigGenerator, attributesSelectionConfigGenerator);
         preserveAndBindCodeSegment(aggregationDefinition, aggregationConfig);
@@ -99,11 +101,10 @@ public class AggregationConfigGenerator extends CodeSegmentsPreserver {
     }
 
     /**
-     * Generates list of groupBy variables, from the given list of Siddhi Variables.
-     *
-     * @param groupByVariables Siddhi Variables list
-     * @return String list of variables
-     * @throws DesignGenerationException Error while generating groupBy variables
+     * Generates list of groupBy variables, from the given list of Siddhi Variables
+     * @param groupByVariables                  Siddhi Variables list
+     * @return                                  String list of variables
+     * @throws DesignGenerationException        Error while generating groupBy variables
      */
     private List<String> generateGroupBy(List<Variable> groupByVariables) throws DesignGenerationException {
         List<String> groupByList = new ArrayList<>();
@@ -115,11 +116,10 @@ public class AggregationConfigGenerator extends CodeSegmentsPreserver {
     }
 
     /**
-     * Generates AggregateByTimePeriod object with the given Siddhi TimePeriod.
-     *
-     * @param timePeriod Siddhi TimePeriod object
-     * @return AggregateByTimePeriod object
-     * @throws DesignGenerationException Unknown type of TimePeriod operator
+     * Generates AggregateByTimePeriod object with the given Siddhi TimePeriod
+     * @param timePeriod                        Siddhi TimePeriod object
+     * @return                                  AggregateByTimePeriod object
+     * @throws DesignGenerationException        Unknown type of TimePeriod operator
      */
     private AggregateByTimePeriod generateAggregateByTime(TimePeriod timePeriod) throws DesignGenerationException {
         preserveCodeSegment(timePeriod);
@@ -132,10 +132,9 @@ public class AggregationConfigGenerator extends CodeSegmentsPreserver {
     }
 
     /**
-     * Generates AggregateByTimeInterval object with the given list of Siddhi TimePeriod.Durations.
-     *
-     * @param durations List of Siddhi TimePeriod.Durations
-     * @return AggregateByTimeInterval object
+     * Generates AggregateByTimeInterval object with the given list of Siddhi TimePeriod.Durations
+     * @param durations         List of Siddhi TimePeriod.Durations
+     * @return                  AggregateByTimeInterval object
      */
     private AggregateByTimeInterval generateAggregateByTimeInterval(List<TimePeriod.Duration> durations) {
         List<String> intervals = new ArrayList<>();
@@ -146,10 +145,9 @@ public class AggregationConfigGenerator extends CodeSegmentsPreserver {
     }
 
     /**
-     * Generates AggregateByTimeRange object with the given list of Siddhi TimePeriod.Durations.
-     *
-     * @param durations List of Siddhi TimePeriod.Durations
-     * @return AggregateByTimeRange object
+     * Generates AggregateByTimeRange object with the given list of Siddhi TimePeriod.Durations
+     * @param durations         List of Siddhi TimePeriod.Durations
+     * @return                  AggregateByTimeRange object
      */
     private AggregateByTimeRange generateAggregateByTimeRange(List<TimePeriod.Duration> durations) {
         return new AggregateByTimeRange(
@@ -159,10 +157,9 @@ public class AggregationConfigGenerator extends CodeSegmentsPreserver {
     }
 
     /**
-     * Generates string for aggregateBy attribute, with the given Siddhi Variable.
-     *
-     * @param aggregateAttribute Siddhi Variable
-     * @return String representing the aggregateAttribute
+     * Generates string for aggregateBy attribute, with the given Siddhi Variable
+     * @param aggregateAttribute        Siddhi Variable
+     * @return                          String representing the aggregateAttribute
      */
     private String generateAggregateByAttribute(Variable aggregateAttribute) {
         if (aggregateAttribute != null) {

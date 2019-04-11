@@ -181,7 +181,7 @@ define(['jquery', 'backbone', 'log', 'lodash', 'ace/range', 'render_json'], func
 
         },
 
-        getWarningNotification: function (warningMessage) {
+        getWarningNotification: function(warningMessage) {
             return $(
                 "<div style='z-index: 9999;' style='line-height: 20%;' class='alert alert-warning' id='error-alert'>" +
                 "<span class='notification'>" +
@@ -262,7 +262,7 @@ define(['jquery', 'backbone', 'log', 'lodash', 'ace/range', 'render_json'], func
             var debuggerModalName = debuggerModel.find(".appName");
             self._debugStarted = true;
 
-            debuggerModel.find(".fw-resume").click(function (e) {
+            debuggerModel.find(".fw-resume").click(function(e) {
                 e.preventDefault();
                 self._debugger.play();
             });
@@ -295,12 +295,13 @@ define(['jquery', 'backbone', 'log', 'lodash', 'ace/range', 'render_json'], func
             var activeTab = this.application.tabController.getActiveTab();
             var workspace = this.application.workspaceManager;
             var siddhiAppName = "";
-            if (activeTab.getTitle().lastIndexOf(".siddhi") != -1) {
+            if(activeTab.getTitle().lastIndexOf(".siddhi") != -1){
                 siddhiAppName = activeTab.getTitle().substring(0, activeTab.getTitle().lastIndexOf(".siddhi"));
-            } else {
+            } else{
                 siddhiAppName = activeTab.getTitle();
             }
             this.unHighlightDebugLine();
+            this.application.toolBar.enableStopButtonLoading();
             this._debugger.stop(
                 function (data) {
                     var msg = "";
@@ -321,6 +322,8 @@ define(['jquery', 'backbone', 'log', 'lodash', 'ace/range', 'render_json'], func
                     console.println(message);
                     workspace.updateRunMenuItem();
                     this._debugStarted = false;
+                    activeTab.getFile().setStopProcessRunning(false);
+                    activeTab.app.toolBar.disableStopButtonLoading();
                 },
                 function (error) {
                     if (activeTab.getFile().getDebugStatus()) {
@@ -334,6 +337,8 @@ define(['jquery', 'backbone', 'log', 'lodash', 'ace/range', 'render_json'], func
                     }
                     console.println(message);
                     workspace.updateRunMenuItem();
+                    activeTab.getFile().setStopProcessRunning(false);
+                    activeTab.app.toolBar.disableStopButtonLoading();
                 });
         }
     });

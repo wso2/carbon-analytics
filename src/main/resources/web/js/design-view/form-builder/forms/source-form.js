@@ -57,9 +57,9 @@ define(['log', 'jquery', 'lodash', 'sourceOrSinkAnnotation', 'mapAnnotation', 'p
          * @param {Object} attributes which needs to be mapped on to the template
          */
         var renderAttributeMappingContent = function (id, attributes) {
-            var attributeMapFormTemplate = Handlebars.compile($('#source-sink-map-attribute-template').html());
-            var wrappedHtml = attributeMapFormTemplate({id: id, attributes: attributes});
-            $('#attribute-map-content').html(wrappedHtml);
+            var attributeMapFormTemplate = Handlebars.compile($('#source-sink-map-attribute-template').html())
+            ({ id: id, attributes: attributes });
+            $('#attribute-map-content').html(attributeMapFormTemplate);
         };
 
         /**
@@ -78,32 +78,32 @@ define(['log', 'jquery', 'lodash', 'sourceOrSinkAnnotation', 'mapAnnotation', 'p
                 var attributeValues = savedMapperAttributes.getValue();
             }
             if (attributeType === Constants.LIST) {
-                for (streamAttribute of streamAttributes) {
-                    attributes.push({key: streamAttribute.key, value: ""});
-                }
+                _.forEach(streamAttributes, function (streamAttribute) {
+                    attributes.push({ key: streamAttribute.key, value: "" });
+                })
                 var i = 0;
-                for (var attribute in attributeValues) {
+                _.forEach(attributeValues, function (attribute) {
                     if (i < streamAttributes.length) {
                         attributes[i].value = attributeValues[attribute];
                         i++;
                     }
-                }
+                });
             } else if (attributeType === Constants.MAP) {
-                for (streamAttribute of streamAttributes) {
-                    attributes.push({key: streamAttribute.key, value: ""});
-                }
-                for (var mappedAttribute of attributes) {
+                _.forEach(streamAttributes, function (streamAttribute) {
+                    attributes.push({ key: streamAttribute.key, value: "" });
+                })
+                _.forEach(attributes, function (mappedAttribute) {
                     for (var attribute in attributeValues) {
                         if (mappedAttribute.key === attribute) {
                             mappedAttribute.value = attributeValues[attribute]
                             break;
                         }
                     }
-                }
+                })
             } else {
-                for (var streamAttribute of streamAttributes) {
-                    attributes.push({key: streamAttribute.key, value: ""});
-                }
+                _.forEach(streamAttributes, function (streamAttribute) {
+                    attributes.push({ key: streamAttribute.key, value: "" });
+                });
             }
             return attributes;
         };
@@ -117,27 +117,27 @@ define(['log', 'jquery', 'lodash', 'sourceOrSinkAnnotation', 'mapAnnotation', 'p
         SourceForm.prototype.generatePropertiesForm = function (element, formConsole, formContainer) {
             var self = this;
             var id = $(element).parent().attr('id');
-            var clickedElement = self.configurationData.getSiddhiAppConfig().getSource(id);
+            var sourceObject = self.configurationData.getSiddhiAppConfig().getSource(id);
             var isSourceConnected = true;
 
             if ($('#' + id).hasClass('error-element')) {
                 isSourceConnected = false;
                 DesignViewUtils.prototype.errorAlert("Please connect to a stream");
-            } else if (!JSONValidator.prototype.validateSourceOrSinkAnnotation(clickedElement, Constants.SOURCE, true)) {
+            } else if (!JSONValidator.prototype.validateSourceOrSinkAnnotation(sourceObject, Constants.SOURCE, true)) {
                 // perform JSON validation to check if source contains a connectedElement.
                 isSourceConnected = false;
             }
             if (!isSourceConnected) {
                 // close the form window
                 self.consoleListManager.removeFormConsole(formConsole);
-                self.designViewContainer.removeClass('disableContainer');
-                self.toggleViewButton.removeClass('disableContainer');
             } else {
-                var streamList = self.configurationData.getSiddhiAppConfig().getStreamList();
-                var connectedElement = clickedElement.connectedElementName;
+                var connectedElement = sourceObject.connectedElementName;
                 var predefinedSources = _.orderBy(this.configurationData.rawExtensions["source"], ['name'], ['asc']);
                 var predefinedSourceMaps = _.orderBy(this.configurationData.rawExtensions["sourceMaps"], ['name'], ['asc']);
-                var streamAttributes = self.formUtils.getConnectedStreamAttributes(streamList, connectedElement);
+                var connectedStream = self.configurationData.getSiddhiAppConfig().getDefinitionElementByName
+                (connectedElement);
+                var streamAttributes = self.formUtils.createStreamAttributesObject
+                (connectedStream.element.getAttributeList());
 
                 var propertyDiv = $('<div class="source-sink-form-container source-div"><div id="define-source"></div>' +
                     '<div class = "source-sink-map-options" id="source-options-div"></div>' +
@@ -152,24 +152,28 @@ define(['log', 'jquery', 'lodash', 'sourceOrSinkAnnotation', 'mapAnnotation', 'p
                 self.designViewContainer.addClass('disableContainer');
                 self.toggleViewButton.addClass('disableContainer');
 
+                self.formUtils.addEventListenerToRemoveRequiredClass();
+                self.formUtils.addEventListenerToShowAndHideInfo();
+                self.formUtils.addEventListenerToShowInputContentOnHover();
+
                 //declaration of variables
-                var sourceOptions = [];
+                var currentSourceOptions = [];
                 var sourceOptionsWithValues = [];
                 var customizedSourceOptions = [];
-                var mapperOptions = [];
+                var currentMapperOptions = [];
                 var mapperOptionsWithValues = [];
                 var customizedMapperOptions = [];
                 var attributes = [];
 
-                self.formUtils.addEventListenersForOptionsDiv(Constants.SOURCE);
-                self.formUtils.addEventListenersForOptionsDiv(Constants.MAPPER);
+                self.formUtils.addEventListenersForGenericOptionsDiv(Constants.SOURCE);
+                self.formUtils.addEventListenersForGenericOptionsDiv(Constants.MAPPER);
 
-                self.formUtils.renderTypeSelectionTemplate(Constants.SOURCE, predefinedSources);
+                self.formUtils.renderSourceSinkStoreTypeDropDown(Constants.SOURCE, predefinedSources);
 
                 //event listener for attribute-map checkbox
                 $('#define-attribute').on('change', '#attributeMap-checkBox', function () {
                     if ($(this).is(':checked')) {
-                        var attributes = createAttributeObjectList(savedMapperAttributes, streamAttributes);
+                        var attributes = createAttributeObjectList(mapperAttributes, streamAttributes);
                         $('#attribute-map-content').show();
                         renderAttributeMappingContent(Constants.SOURCE, attributes)
                     } else {
@@ -178,19 +182,19 @@ define(['log', 'jquery', 'lodash', 'sourceOrSinkAnnotation', 'mapAnnotation', 'p
                 });
 
                 //get the clicked element's information
-                var type = clickedElement.getType();
-                var savedSourceOptions = clickedElement.getOptions();
-                var map = clickedElement.getMap();
+                var type = sourceObject.getType();
+                var sourceOptions = sourceObject.getOptions();
+                var map = sourceObject.getMap();
 
                 //onchange of the source-type selection
                 $('#source-type').change(function () {
-                    sourceOptions = self.formUtils.getSelectedTypeParameters(this.value, predefinedSources);
-                    if (type && (type.toLowerCase() == this.value.toLowerCase()) && savedSourceOptions) {
+                    currentSourceOptions = self.formUtils.getSelectedTypeParameters(this.value, predefinedSources);
+                    if (type && (type.toLowerCase() == this.value.toLowerCase()) && sourceOptions) {
                         //if the selected type is same as the saved source-type
-                        sourceOptionsWithValues = self.formUtils.mapUserOptionValues(sourceOptions, savedSourceOptions);
-                        customizedSourceOptions = self.formUtils.getCustomizedOptions(sourceOptions, savedSourceOptions);
+                        sourceOptionsWithValues = self.formUtils.mapUserOptionValues(currentSourceOptions, sourceOptions);
+                        customizedSourceOptions = self.formUtils.getCustomizedOptions(currentSourceOptions, sourceOptions);
                     } else {
-                        sourceOptionsWithValues = self.formUtils.createObjectWithValues(sourceOptions);
+                        sourceOptionsWithValues = self.formUtils.createObjectWithValues(currentSourceOptions);
                         customizedSourceOptions = [];
                     }
                     self.formUtils.renderOptions(sourceOptionsWithValues, customizedSourceOptions, Constants.SOURCE);
@@ -202,14 +206,14 @@ define(['log', 'jquery', 'lodash', 'sourceOrSinkAnnotation', 'mapAnnotation', 'p
 
                 //onchange of map type selection
                 $('#define-map').on('change', '#map-type', function () {
-                    mapperOptions = self.formUtils.getSelectedTypeParameters(this.value, predefinedSourceMaps);
+                    currentMapperOptions = self.formUtils.getSelectedTypeParameters(this.value, predefinedSourceMaps);
                     if ((map) && (mapperType) && (mapperType.toLowerCase() == this
-                            .value.toLowerCase()) && savedMapperOptions) {
+                            .value.toLowerCase()) && mapperOptions) {
                         //if the selected type is same as the saved map type
-                        mapperOptionsWithValues = self.formUtils.mapUserOptionValues(mapperOptions, savedMapperOptions);
-                        customizedMapperOptions = self.formUtils.getCustomizedOptions(mapperOptions, savedMapperOptions);
+                        mapperOptionsWithValues = self.formUtils.mapUserOptionValues(currentMapperOptions, mapperOptions);
+                        customizedMapperOptions = self.formUtils.getCustomizedOptions(currentMapperOptions, mapperOptions);
                     } else {
-                        mapperOptionsWithValues = self.formUtils.createObjectWithValues(mapperOptions);
+                        mapperOptionsWithValues = self.formUtils.createObjectWithValues(currentMapperOptions);
                         customizedMapperOptions = [];
                     }
                     self.formUtils.renderOptions(mapperOptionsWithValues, customizedMapperOptions, Constants.MAPPER)
@@ -220,14 +224,14 @@ define(['log', 'jquery', 'lodash', 'sourceOrSinkAnnotation', 'mapAnnotation', 'p
                     $('#define-source').find('#source-type option').filter(function () {
                         return ($(this).val().toLowerCase() == (type.toLowerCase()));
                     }).prop('selected', true);
-                    sourceOptions = self.formUtils.getSelectedTypeParameters(type, predefinedSources);
-                    if (savedSourceOptions) {
-                        //get the savedSourceoptions values and map it
-                        sourceOptionsWithValues = self.formUtils.mapUserOptionValues(sourceOptions, savedSourceOptions);
-                        customizedSourceOptions = self.formUtils.getCustomizedOptions(sourceOptions, savedSourceOptions);
+                    currentSourceOptions = self.formUtils.getSelectedTypeParameters(type, predefinedSources);
+                    if (sourceOptions) {
+                        //get the saved Source options values and map it
+                        sourceOptionsWithValues = self.formUtils.mapUserOptionValues(currentSourceOptions, sourceOptions);
+                        customizedSourceOptions = self.formUtils.getCustomizedOptions(currentSourceOptions, sourceOptions);
                     } else {
                         //create option object with empty values
-                        sourceOptionsWithValues = self.formUtils.createObjectWithValues(sourceOptions);
+                        sourceOptionsWithValues = self.formUtils.createObjectWithValues(currentSourceOptions);
                         customizedSourceOptions = [];
                     }
                     self.formUtils.renderOptions(sourceOptionsWithValues, customizedSourceOptions, Constants.SOURCE);
@@ -242,38 +246,35 @@ define(['log', 'jquery', 'lodash', 'sourceOrSinkAnnotation', 'mapAnnotation', 'p
                     self.formUtils.renderMap(predefinedSourceMaps);
                     renderAttributeMapping();
                     var mapperType = map.getType();
-                    var savedMapperOptions = map.getOptions();
-                    var savedMapperAttributes = map.getPayloadOrAttribute();
+                    var mapperOptions = map.getOptions();
+                    var mapperAttributes = map.getPayloadOrAttribute();
                     if (mapperType) {
                         $('#define-map').find('#map-type option').filter(function () {
                             return ($(this).val().toLowerCase() == (mapperType.toLowerCase()));
                         }).prop('selected', true);
-                        mapperOptions = self.formUtils.getSelectedTypeParameters(mapperType, predefinedSourceMaps);
-                        if (savedMapperOptions) {
-                            //get the savedMapoptions values and map it
-                            mapperOptionsWithValues = self.formUtils.mapUserOptionValues(mapperOptions, savedMapperOptions);
-                            customizedMapperOptions = self.formUtils.getCustomizedOptions(mapperOptions, savedMapperOptions);
+                        currentMapperOptions = self.formUtils.getSelectedTypeParameters(mapperType, predefinedSourceMaps);
+                        if (mapperOptions) {
+                            //get the saved Map options values and map it
+                            mapperOptionsWithValues = self.formUtils.mapUserOptionValues(currentMapperOptions, mapperOptions);
+                            customizedMapperOptions = self.formUtils.getCustomizedOptions(currentMapperOptions, mapperOptions);
                         } else {
                             //create option object with empty values
-                            mapperOptionsWithValues = self.formUtils.createObjectWithValues(mapperOptions);
+                            mapperOptionsWithValues = self.formUtils.createObjectWithValues(currentMapperOptions);
                             customizedMapperOptions = [];
                         }
                         self.formUtils.renderOptions(mapperOptionsWithValues, customizedMapperOptions, Constants.MAPPER);
                     }
-                    if (savedMapperAttributes) {
+                    if (mapperAttributes) {
                         $('#define-attribute #attributeMap-checkBox').prop('checked', true);
-                        attributes = createAttributeObjectList(savedMapperAttributes, streamAttributes);
+                        attributes = createAttributeObjectList(mapperAttributes, streamAttributes);
                         renderAttributeMappingContent(Constants.SOURCE, attributes);
                     }
                 }
 
                 //onclick of submit
-                var submitButtonElement = $(formContainer).find('#btn-submit')[0];
-                submitButtonElement.addEventListener('click', function () {
+                $(formContainer).on('click', '#btn-submit', function () {
 
-                    //clear the errors
-                    $('.error-message').text("")
-                    $('.required-input-field').removeClass('required-input-field');
+                    self.formUtils.removeErrorClass();
                     var isErrorOccurred = false;
 
                     var selectedSourceType = $('#define-source #source-type').val();
@@ -282,7 +283,7 @@ define(['log', 'jquery', 'lodash', 'sourceOrSinkAnnotation', 'mapAnnotation', 'p
                         isErrorOccurred = true;
                         return;
                     } else {
-                        if (self.formUtils.validateOptions(sourceOptions, Constants.SOURCE)) {
+                        if (self.formUtils.validateOptions(currentSourceOptions, Constants.SOURCE)) {
                             isErrorOccurred = true;
                             return;
                         }
@@ -291,8 +292,7 @@ define(['log', 'jquery', 'lodash', 'sourceOrSinkAnnotation', 'mapAnnotation', 'p
                             return;
                         }
                         var selectedMapType = $('#define-map #map-type').val();
-                        var mapperAnnotationOptions = [];
-                        if (self.formUtils.validateOptions(mapperOptions, Constants.MAPPER)) {
+                        if (self.formUtils.validateOptions(currentMapperOptions, Constants.MAPPER)) {
                             isErrorOccurred = true;
                             return;
                         }
@@ -321,7 +321,7 @@ define(['log', 'jquery', 'lodash', 'sourceOrSinkAnnotation', 'mapAnnotation', 'p
                     }
 
                     if (!isErrorOccurred) {
-                        clickedElement.setType(selectedSourceType);
+                        sourceObject.setType(selectedSourceType);
                         var textNode = $('#' + id).find('.sourceNameNode');
                         textNode.html(selectedSourceType);
 
@@ -329,9 +329,9 @@ define(['log', 'jquery', 'lodash', 'sourceOrSinkAnnotation', 'mapAnnotation', 'p
                         self.formUtils.buildOptions(annotationOptions, Constants.SOURCE);
                         self.formUtils.buildCustomizedOption(annotationOptions, Constants.SOURCE);
                         if (annotationOptions.length == 0) {
-                            clickedElement.setOptions(undefined);
+                            sourceObject.setOptions(undefined);
                         } else {
-                            clickedElement.setOptions(annotationOptions);
+                            sourceObject.setOptions(annotationOptions);
                         }
 
                         var mapper = {};
@@ -356,11 +356,11 @@ define(['log', 'jquery', 'lodash', 'sourceOrSinkAnnotation', 'mapAnnotation', 'p
                             _.set(mapper, 'payloadOrAttribute', undefined);
                         }
                         var mapperObject = new MapAnnotation(mapper);
-                        clickedElement.setMap(mapperObject);
+                        sourceObject.setMap(mapperObject);
 
                         $('#' + id).removeClass('incomplete-element');
                         //Send source element to the backend and generate tooltip
-                        var sourceToolTip = self.formUtils.getTooltip(clickedElement, Constants.SOURCE);
+                        var sourceToolTip = self.formUtils.getTooltip(sourceObject, Constants.SOURCE);
                         $('#' + id).prop('title', sourceToolTip);
 
                         self.dropElementInstance.generateSpecificSourceConnectionElements(selectedSourceType,
@@ -368,8 +368,6 @@ define(['log', 'jquery', 'lodash', 'sourceOrSinkAnnotation', 'mapAnnotation', 'p
 
                         // set the isDesignViewContentChanged to true
                         self.configurationData.setIsDesignViewContentChanged(true);
-                        self.designViewContainer.removeClass('disableContainer');
-                        self.toggleViewButton.removeClass('disableContainer');
                         // close the form window
                         self.consoleListManager.removeFormConsole(formConsole);
                     }
@@ -378,8 +376,6 @@ define(['log', 'jquery', 'lodash', 'sourceOrSinkAnnotation', 'mapAnnotation', 'p
                 // 'Cancel' button action
                 var cancelButtonElement = $(formContainer).find('#btn-cancel')[0];
                 cancelButtonElement.addEventListener('click', function () {
-                    self.designViewContainer.removeClass('disableContainer');
-                    self.toggleViewButton.removeClass('disableContainer');
                     // close the form window
                     self.consoleListManager.removeFormConsole(formConsole);
                 });
@@ -387,4 +383,3 @@ define(['log', 'jquery', 'lodash', 'sourceOrSinkAnnotation', 'mapAnnotation', 'p
         };
         return SourceForm;
     });
-

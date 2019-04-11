@@ -44,13 +44,25 @@ define(['require', 'log', 'jquery', 'lodash', 'partitionWith', 'jsonValidator', 
          */
         var ifStreamsAreFilled = function (partitionWithList) {
             var isFilled = false;
-            for (var partitionKey of partitionWithList) {
+            _.forEach(partitionWithList, function (partitionKey) {
                 if (partitionKey.getStreamName()) {
                     isFilled = true;
-                    break;
+                    return false;
                 }
-            }
+            });
             return isFilled;
+        };
+
+        /**
+         * @function to get the attribute names of the connected stream
+         */
+        var getAttributeNames = function (streamName, self) {
+            var connectedElement = self.configurationData.getSiddhiAppConfig().getDefinitionElementByName(streamName);
+            var attributes = [];
+            _.forEach(connectedElement.element.getAttributeList(), function (attribute) {
+                attributes.push(attribute.getName());
+            });
+            return attributes;
         };
 
         /**
@@ -62,16 +74,13 @@ define(['require', 'log', 'jquery', 'lodash', 'partitionWith', 'jsonValidator', 
         PartitionForm.prototype.generatePropertiesForm = function (element, formConsole, formContainer) {
             var self = this;
             var id = $(element).parent().attr('id');
-            var clickedElement = self.configurationData.getSiddhiAppConfig().getPartition(id);
-            var partitionWithList = clickedElement.getPartitionWith();
+            var partitionObject = self.configurationData.getSiddhiAppConfig().getPartition(id);
+            var partitionWithList = partitionObject.getPartitionWith();
 
             if (!partitionWithList || partitionWithList.length === 0) {
                 $("#" + id).addClass('incomplete-element');
                 $('#' + id).prop('title', 'Connect a stream for partitioning');
 
-                // design view container and toggle view button are enabled
-                self.designViewContainer.removeClass('disableContainer');
-                self.toggleViewButton.removeClass('disableContainer');
                 // close the form window
                 self.consoleListManager.removeFormConsole(formConsole);
             } else {
@@ -79,16 +88,12 @@ define(['require', 'log', 'jquery', 'lodash', 'partitionWith', 'jsonValidator', 
                     $("#" + id).addClass('incomplete-element');
                     $('#' + id).prop('title', 'To edit partition configuration, fill the connected stream.');
 
-                    // design view container and toggle view button are enabled
-                    self.designViewContainer.removeClass('disableContainer');
-                    self.toggleViewButton.removeClass('disableContainer');
                     // close the form window
                     self.consoleListManager.removeFormConsole(formConsole);
                 } else {
-                    var propertyDiv = $('<div id="property-header"><h3>Partition Configuration</h3></div>' +
-                        '<div class = "partition-form-container"> <div id = "define-partition-keys"> </div> ' +
+                    var propertyDiv = $('<div class = "partition-form-container"> <div id = "define-partition-keys"> </div> ' +
                         self.formUtils.buildFormButtons() + '</div>' +
-                        '<div class = "partition-form-container"> <div id = "define-annotation"> </div> </div>');
+                        '<div class = "partition-form-container"> <div class = "define-annotation"> </div> </div>');
 
                     formContainer.append(propertyDiv);
                     self.formUtils.popUpSelectedElement(id);
@@ -96,45 +101,57 @@ define(['require', 'log', 'jquery', 'lodash', 'partitionWith', 'jsonValidator', 
                     self.designViewContainer.addClass('disableContainer');
                     self.toggleViewButton.addClass('disableContainer');
 
-                    var savedAnnotations = [];
-                    savedAnnotations = clickedElement.getAnnotationListObjects();
-                    self.formUtils.renderAnnotationTemplate("define-annotation", savedAnnotations);
+                    var annotationListObjects = partitionObject.getAnnotationListObjects();
+                    self.formUtils.renderAnnotationTemplate("define-annotation", annotationListObjects);
 
                     var partitionKeys = [];
                     for (var i = 0; i < partitionWithList.length; i++) {
                         if (partitionWithList[i].getStreamName()) {
                             var partitionKey = {
                                 expression: partitionWithList[i].getExpression(),
-                                streamName: partitionWithList[i].getStreamName()
+                                streamName: partitionWithList[i].getStreamName(),
+                                streamAttributes: {
+                                    id: "partition-by-expression",
+                                    options: getAttributeNames(partitionWithList[i].getStreamName(), self)
+                                }
                             };
                             partitionKeys.push(partitionKey);
                         }
                     }
-                    var partitionFormTemplate = Handlebars.compile($('#partition-by-template').html());
-                    var wrappedHtml = partitionFormTemplate(partitionKeys);
-                    $('#define-partition-keys').html(wrappedHtml);
+                    self.formUtils.registerDropDownPartial();
+                    var partitionFormTemplate = Handlebars.compile($('#partition-by-template').html())(partitionKeys);
+                    $('#define-partition-keys').html(partitionFormTemplate);
+
+                    //to map partition expressions
+                    var i = 0;
+                    $('.partition-key').each(function () {
+                        $(this).find('.partition-by-expression-selection option').filter(function () {
+                            return ($(this).val() == (partitionKeys[i].expression));
+                        }).prop('selected', true);
+                        i++;
+                    });
+
+                    self.formUtils.addEventListenerToRemoveRequiredClass();
+                    self.formUtils.addEventListenerToShowInputContentOnHover();
 
                     // 'Submit' button action
-                    var submitButtonElement = $(formContainer).find('#btn-submit')[0];
-                    submitButtonElement.addEventListener('click', function () {
+                    $(formContainer).on('click', '#btn-submit', function () {
 
-                        //clear the error classes
-                        $('.error-message').text("")
-                        $('.required-input-field').removeClass('required-input-field');
+                        self.formUtils.removeErrorClass();
                         var isErrorOccurred = false;
 
                         var partitionKeys = [];
                         $('#partition-by-content .partition-key').each(function () {
-                            var expression = $(this).find('.partition-by-expression').val().trim();
-                            if (expression === "") {
-                                self.formUtils.addErrorClass($(this).find('.partition-by-expression'));
-                                $(this).find('.error-message').text("Expression value is required.")
+                            var expression = $(this).find('.partition-by-expression-selection');
+                            if (!expression.val()) {
+                                $(this).find('.error-message').text("Expression is required");
+                                self.formUtils.addErrorClass(expression);
                                 isErrorOccurred = true;
                                 return false;
                             } else {
                                 var streamName = $(this).find('.partition-by-stream-name').val().trim();
                                 var partitionKey = {
-                                    expression: expression,
+                                    expression: expression.val(),
                                     streamName: streamName
                                 };
                                 partitionKeys.push(partitionKey);
@@ -142,42 +159,39 @@ define(['require', 'log', 'jquery', 'lodash', 'partitionWith', 'jsonValidator', 
                         });
 
                         if (!isErrorOccurred) {
-                            clickedElement.clearPartitionWith();
+                            partitionObject.clearPartitionWith();
                             _.forEach(partitionKeys, function (partitionKey) {
                                 var partitionWithObject = new PartitionWith(partitionKey);
-                                clickedElement.addPartitionWith(partitionWithObject);
+                                partitionObject.addPartitionWith(partitionWithObject);
                             });
 
-                            var isValid = JSONValidator.prototype.validatePartition(clickedElement, self.jsPlumbInstance,
+                            var isValid = JSONValidator.prototype.validatePartition(partitionObject, self.jsPlumbInstance,
                                 false);
                             if (!isValid) {
                                 return;
                             }
 
-                            clickedElement.clearAnnotationList();
-                            clickedElement.clearAnnotationListObjects();
+                            partitionObject.clearAnnotationList();
+                            partitionObject.clearAnnotationListObjects();
                             var annotationStringList = [];
                             var annotationObjectList = [];
                             var annotationNodes = $('#annotation-div').jstree(true)._model.data['#'].children;
                             self.formUtils.buildAnnotation(annotationNodes, annotationStringList, annotationObjectList);
                             _.forEach(annotationStringList, function (annotation) {
-                                clickedElement.addAnnotation(annotation);
+                                partitionObject.addAnnotation(annotation);
                             });
                             _.forEach(annotationObjectList, function (annotation) {
-                                clickedElement.addAnnotationObject(annotation);
+                                partitionObject.addAnnotationObject(annotation);
                             });
 
 
                             $('#' + id).removeClass('incomplete-element');
                             //Send partition element to the backend and generate tooltip
-                            var partitionToolTip = self.formUtils.getTooltip(clickedElement, Constants.PARTITION);
+                            var partitionToolTip = self.formUtils.getTooltip(partitionObject, Constants.PARTITION);
                             $('#' + id).prop('title', partitionToolTip);
 
                             // set the isDesignViewContentChanged to true
                             self.configurationData.setIsDesignViewContentChanged(true);
-                            // design view container and toggle view button are enabled
-                            self.designViewContainer.removeClass('disableContainer');
-                            self.toggleViewButton.removeClass('disableContainer');
                             // close the form window
                             self.consoleListManager.removeFormConsole(formConsole);
                         }
@@ -186,8 +200,6 @@ define(['require', 'log', 'jquery', 'lodash', 'partitionWith', 'jsonValidator', 
                     // 'Cancel' button action
                     var cancelButtonElement = $(formContainer).find('#btn-cancel')[0];
                     cancelButtonElement.addEventListener('click', function () {
-                        self.designViewContainer.removeClass('disableContainer');
-                        self.toggleViewButton.removeClass('disableContainer');
                         // close the form window
                         self.consoleListManager.removeFormConsole(formConsole);
                     });

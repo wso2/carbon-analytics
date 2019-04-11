@@ -66,11 +66,11 @@ define(['log', 'jquery', 'lodash', 'mapAnnotation', 'payloadOrAttribute', 'jsonV
             var attributes = [];
             if (attributeType === Constants.LIST) {
                 $('#define-attribute #attributeMap-type').val('payloadList');
-                attributes.push({value: attributeValues[0]});
+                attributes.push({ value: attributeValues[0] });
             } else {
                 $('#define-attribute #attributeMap-type').val('payloadMap');
                 for (var attribute in attributeValues) {
-                    attributes.push({key: attribute, value: attributeValues[attribute]});
+                    attributes.push({ key: attribute, value: attributeValues[attribute] });
                 }
             }
             return attributes;
@@ -84,9 +84,9 @@ define(['log', 'jquery', 'lodash', 'mapAnnotation', 'payloadOrAttribute', 'jsonV
             var selectedAttributeType = $('#define-attribute #attributeMap-type').val();
             var attributes = [];
             if (selectedAttributeType === "payloadList") {
-                attributes.push({value: ""});
+                attributes.push({ value: "" });
             } else {
-                attributes.push({key: " ", value: ""});
+                attributes.push({ key: " ", value: "" });
             }
             return attributes;
         };
@@ -97,9 +97,9 @@ define(['log', 'jquery', 'lodash', 'mapAnnotation', 'payloadOrAttribute', 'jsonV
          * @param {Object} streamAttributes to display the stream attributes
          */
         var renderAttributeMappingContent = function (attributes, streamAttributes) {
-            var attributeMapFormTemplate = Handlebars.compile($('#source-sink-map-attribute-template').html());
-            var wrappedHtml = attributeMapFormTemplate({id: Constants.SINK, attributes: attributes});
-            $('#attribute-map-content').html(wrappedHtml);
+            var attributeMapFormTemplate = Handlebars.compile($('#source-sink-map-attribute-template').html())
+            ({ id: Constants.SINK, attributes: attributes });
+            $('#attribute-map-content').html(attributeMapFormTemplate);
 
             var streamAttributeMessage = "Stream Attributes are: ";
             _.forEach(streamAttributes, function (attribute) {
@@ -123,27 +123,28 @@ define(['log', 'jquery', 'lodash', 'mapAnnotation', 'payloadOrAttribute', 'jsonV
         SinkForm.prototype.generatePropertiesForm = function (element, formConsole, formContainer) {
             var self = this;
             var id = $(element).parent().attr('id');
-            var clickedElement = self.configurationData.getSiddhiAppConfig().getSink(id);
+            var sinkObject = self.configurationData.getSiddhiAppConfig().getSink(id);
 
             var isSinkConnected = true;
             if ($('#' + id).hasClass('error-element')) {
                 isSinkConnected = false;
                 DesignViewUtils.prototype.errorAlert("Please connect to a stream");
-            } else if (!JSONValidator.prototype.validateSourceOrSinkAnnotation(clickedElement, Constants.SINK, true)) {
+            } else if (!JSONValidator.prototype.validateSourceOrSinkAnnotation(sinkObject, Constants.SINK, true)) {
                 // perform JSON validation to check if sink contains a connectedElement.
                 isSinkConnected = false;
             }
             if (!isSinkConnected) {
                 // close the form window
                 self.consoleListManager.removeFormConsole(formConsole);
-                self.designViewContainer.removeClass('disableContainer');
-                self.toggleViewButton.removeClass('disableContainer');
             } else {
-                var streamList = self.configurationData.getSiddhiAppConfig().getStreamList();
-                var connectedElement = clickedElement.connectedElementName;
+                var connectedElement = sinkObject.connectedElementName;
                 var predefinedSinks = _.orderBy(this.configurationData.rawExtensions["sink"], ['name'], ['asc']);
                 var predefinedSinkMaps = _.orderBy(this.configurationData.rawExtensions["sinkMaps"], ['name'], ['asc']);
-                var streamAttributes = self.formUtils.getConnectedStreamAttributes(streamList, connectedElement);
+                var connectedStream = self.configurationData.getSiddhiAppConfig().getDefinitionElementByName
+                (connectedElement);
+                var streamAttributes = self.formUtils.createStreamAttributesObject
+                (connectedStream.element.getAttributeList());
+
                 var propertyDiv = $('<div class="source-sink-form-container sink-div"><div id="define-sink"></div>' +
                     '<div class = "source-sink-map-options" id="sink-options-div"></div>' +
                     self.formUtils.buildFormButtons() + '</div>' +
@@ -157,26 +158,30 @@ define(['log', 'jquery', 'lodash', 'mapAnnotation', 'payloadOrAttribute', 'jsonV
                 self.designViewContainer.addClass('disableContainer');
                 self.toggleViewButton.addClass('disableContainer');
 
+                self.formUtils.addEventListenerToRemoveRequiredClass();
+                self.formUtils.addEventListenerToShowAndHideInfo();
+                self.formUtils.addEventListenerToShowInputContentOnHover();
+
                 //declaration of variables
-                var sinkOptions = [];
+                var currentSinkOptions = [];
                 var sinkOptionsWithValues = [];
                 var customizedSinkOptions = [];
-                var mapperOptions = [];
+                var currentMapperOptions = [];
                 var mapperOptionsWithValues = [];
                 var customizedMapperOptions = [];
                 var attributes = [];
 
-                self.formUtils.addEventListenersForOptionsDiv(Constants.SINK);
-                self.formUtils.addEventListenersForOptionsDiv(Constants.MAPPER);
+                self.formUtils.addEventListenersForGenericOptionsDiv(Constants.SINK);
+                self.formUtils.addEventListenersForGenericOptionsDiv(Constants.MAPPER);
 
-                self.formUtils.renderTypeSelectionTemplate(Constants.SINK, predefinedSinks);
+                self.formUtils.renderSourceSinkStoreTypeDropDown(Constants.SINK, predefinedSinks);
 
                 //event listener for attribute-map checkbox
                 $('#define-attribute').on('change', '#attributeMap-checkBox', function () {
                     if ($(this).is(':checked')) {
                         var attributes = [];
                         if (map && map.getPayloadOrAttribute()) {
-                            attributes = createAttributeObjectList(savedMapperAttributes);
+                            attributes = createAttributeObjectList(mapperAttributes);
                         } else {
                             attributes = initialiseAttributeContent();
                         }
@@ -191,13 +196,13 @@ define(['log', 'jquery', 'lodash', 'mapAnnotation', 'payloadOrAttribute', 'jsonV
 
                 //onchange of the sink-type selection
                 $('#sink-type').change(function () {
-                    sinkOptions = self.formUtils.getSelectedTypeParameters(this.value, predefinedSinks);
-                    if (type && (type.toLowerCase() == this.value.toLowerCase()) && savedSinkOptions) {
+                    currentSinkOptions = self.formUtils.getSelectedTypeParameters(this.value, predefinedSinks);
+                    if (type && (type.toLowerCase() == this.value.toLowerCase()) && sinkOptions) {
                         //if the selected type is same as the saved sink-type
-                        sinkOptionsWithValues = self.formUtils.mapUserOptionValues(sinkOptions, savedSinkOptions);
-                        customizedSinkOptions = self.formUtils.getCustomizedOptions(sinkOptions, savedSinkOptions);
+                        sinkOptionsWithValues = self.formUtils.mapUserOptionValues(currentSinkOptions, sinkOptions);
+                        customizedSinkOptions = self.formUtils.getCustomizedOptions(currentSinkOptions, sinkOptions);
                     } else {
-                        sinkOptionsWithValues = self.formUtils.createObjectWithValues(sinkOptions);
+                        sinkOptionsWithValues = self.formUtils.createObjectWithValues(currentSinkOptions);
                         customizedSinkOptions = [];
                     }
                     self.formUtils.renderOptions(sinkOptionsWithValues, customizedSinkOptions, Constants.SINK);
@@ -209,13 +214,13 @@ define(['log', 'jquery', 'lodash', 'mapAnnotation', 'payloadOrAttribute', 'jsonV
 
                 //onchange of map type selection
                 $('#define-map').on('change', '#map-type', function () {
-                    mapperOptions = self.formUtils.getSelectedTypeParameters(this.value, predefinedSinkMaps);
-                    if (map && mapperType && (mapperType.toLowerCase() == this.value.toLowerCase()) && savedMapperOptions) {
+                    currentMapperOptions = self.formUtils.getSelectedTypeParameters(this.value, predefinedSinkMaps);
+                    if (map && mapperType && (mapperType.toLowerCase() == this.value.toLowerCase()) && mapperOptions) {
                         //if the selected type is same as the saved map type
-                        mapperOptionsWithValues = self.formUtils.mapUserOptionValues(mapperOptions, savedMapperOptions);
-                        customizedMapperOptions = self.formUtils.getCustomizedOptions(mapperOptions, savedMapperOptions);
+                        mapperOptionsWithValues = self.formUtils.mapUserOptionValues(currentMapperOptions, mapperOptions);
+                        customizedMapperOptions = self.formUtils.getCustomizedOptions(currentMapperOptions, mapperOptions);
                     } else {
-                        mapperOptionsWithValues = self.formUtils.createObjectWithValues(mapperOptions);
+                        mapperOptionsWithValues = self.formUtils.createObjectWithValues(currentMapperOptions);
                         customizedMapperOptions = [];
                     }
                     self.formUtils.renderOptions(mapperOptionsWithValues, customizedMapperOptions, Constants.MAPPER);
@@ -224,8 +229,8 @@ define(['log', 'jquery', 'lodash', 'mapAnnotation', 'payloadOrAttribute', 'jsonV
                 //onchange of attribute type selection
                 $('#define-attribute').on('change', '#attributeMap-type', function () {
                     var attributes = [];
-                    if (map && savedMapperAttributes) {
-                        var attributeType = savedMapperAttributes.getType().toLowerCase();
+                    if (map && mapperAttributes) {
+                        var attributeType = mapperAttributes.getType().toLowerCase();
                         var selAttributeType = "";
                         if (attributeType === Constants.LIST) {
                             selAttributeType = "payloadList"
@@ -233,8 +238,8 @@ define(['log', 'jquery', 'lodash', 'mapAnnotation', 'payloadOrAttribute', 'jsonV
                             selAttributeType = "payloadMap"
                         }
                     }
-                    if (map && savedMapperAttributes && selAttributeType === this.value) {
-                        attributes = createAttributeObjectList(savedMapperAttributes);
+                    if (map && mapperAttributes && selAttributeType === this.value) {
+                        attributes = createAttributeObjectList(mapperAttributes);
                     } else {
                         attributes = initialiseAttributeContent(streamAttributes);
                     }
@@ -251,23 +256,23 @@ define(['log', 'jquery', 'lodash', 'mapAnnotation', 'payloadOrAttribute', 'jsonV
                 });
 
                 //get the clicked element's information
-                var type = clickedElement.getType();
-                var savedSinkOptions = clickedElement.getOptions();
-                var map = clickedElement.getMap();
+                var type = sinkObject.getType();
+                var sinkOptions = sinkObject.getOptions();
+                var map = sinkObject.getMap();
 
                 if (type) {
                     //if sink object is already edited
                     $('#define-sink').find('#sink-type option').filter(function () {
                         return ($(this).val().toLowerCase() == (type.toLowerCase()));
                     }).prop('selected', true);
-                    sinkOptions = self.formUtils.getSelectedTypeParameters(type, predefinedSinks);
-                    if (savedSinkOptions) {
+                    currentSinkOptions = self.formUtils.getSelectedTypeParameters(type, predefinedSinks);
+                    if (sinkOptions) {
                         //get the saved sink options values and map it
-                        sinkOptionsWithValues = self.formUtils.mapUserOptionValues(sinkOptions, savedSinkOptions);
-                        customizedSinkOptions = self.formUtils.getCustomizedOptions(sinkOptions, savedSinkOptions);
+                        sinkOptionsWithValues = self.formUtils.mapUserOptionValues(currentSinkOptions, sinkOptions);
+                        customizedSinkOptions = self.formUtils.getCustomizedOptions(currentSinkOptions, sinkOptions);
                     } else {
                         //create option object with empty values
-                        sinkOptionsWithValues = self.formUtils.createObjectWithValues(sinkOptions);
+                        sinkOptionsWithValues = self.formUtils.createObjectWithValues(currentSinkOptions);
                         customizedSinkOptions = [];
                     }
                     self.formUtils.renderOptions(sinkOptionsWithValues, customizedSinkOptions, Constants.SINK);
@@ -282,38 +287,36 @@ define(['log', 'jquery', 'lodash', 'mapAnnotation', 'payloadOrAttribute', 'jsonV
                     self.formUtils.renderMap(predefinedSinkMaps);
                     renderAttributeMapping();
                     var mapperType = map.getType();
-                    var savedMapperOptions = map.getOptions();
-                    var savedMapperAttributes = map.getPayloadOrAttribute();
+                    var mapperOptions = map.getOptions();
+                    var mapperAttributes = map.getPayloadOrAttribute();
                     if (mapperType) {
                         $('#define-map').find('#map-type option').filter(function () {
                             return ($(this).val().toLowerCase() == (mapperType.toLowerCase()));
                         }).prop('selected', true);
-                        mapperOptions = self.formUtils.getSelectedTypeParameters(mapperType, predefinedSinkMaps);
-                        if (savedMapperOptions) {
-                            //get the savedMapoptions values and map it
-                            mapperOptionsWithValues = self.formUtils.mapUserOptionValues(mapperOptions, savedMapperOptions);
-                            customizedMapperOptions = self.formUtils.getCustomizedOptions(mapperOptions, savedMapperOptions);
+                        currentMapperOptions = self.formUtils.getSelectedTypeParameters(mapperType, predefinedSinkMaps);
+                        if (mapperOptions) {
+                            //get the saved Map options values and map it
+                            mapperOptionsWithValues = self.formUtils.mapUserOptionValues(currentMapperOptions, mapperOptions);
+                            customizedMapperOptions = self.formUtils.getCustomizedOptions(currentMapperOptions, mapperOptions);
                         } else {
                             //create option object with empty values
-                            mapperOptionsWithValues = self.formUtils.createObjectWithValues(mapperOptions);
+                            mapperOptionsWithValues = self.formUtils.createObjectWithValues(currentMapperOptions);
                             customizedMapperOptions = [];
                         }
                         self.formUtils.renderOptions(mapperOptionsWithValues, customizedMapperOptions, Constants.MAPPER);
                     }
-                    if (savedMapperAttributes) {
+                    if (mapperAttributes) {
                         $('#define-attribute #attributeMap-checkBox').prop('checked', true);
                         $('#define-attribute #attributeMap-type').prop('disabled', false);
-                        attributes = createAttributeObjectList(savedMapperAttributes);
+                        attributes = createAttributeObjectList(mapperAttributes);
                         renderAttributeMappingContent(attributes, streamAttributes);
                     }
                 }
 
                 //onclick of submit
-                var submitButtonElement = $(formContainer).find('#btn-submit')[0];
-                submitButtonElement.addEventListener('click', function () {
-                    //clear the error classes
-                    $('.error-message').text("")
-                    $('.required-input-field').removeClass('required-input-field');
+                $(formContainer).on('click', '#btn-submit', function () {
+
+                    self.formUtils.removeErrorClass();
                     var isErrorOccurred = false;
 
                     var selectedSinkType = $('#define-sink #sink-type').val();
@@ -322,7 +325,7 @@ define(['log', 'jquery', 'lodash', 'mapAnnotation', 'payloadOrAttribute', 'jsonV
                         isErrorOccurred = true;
                         return;
                     } else {
-                        if (self.formUtils.validateOptions(sinkOptions, Constants.SINK)) {
+                        if (self.formUtils.validateOptions(currentSinkOptions, Constants.SINK)) {
                             isErrorOccurred = true;
                             return;
                         }
@@ -333,7 +336,7 @@ define(['log', 'jquery', 'lodash', 'mapAnnotation', 'payloadOrAttribute', 'jsonV
 
                         var selectedMapType = $('#define-map #map-type').val();
 
-                        if (self.formUtils.validateOptions(mapperOptions, Constants.MAPPER)) {
+                        if (self.formUtils.validateOptions(currentMapperOptions, Constants.MAPPER)) {
                             isErrorOccurred = true;
                             return;
                         }
@@ -392,14 +395,14 @@ define(['log', 'jquery', 'lodash', 'mapAnnotation', 'payloadOrAttribute', 'jsonV
                     }
 
                     if (!isErrorOccurred) {
-                        clickedElement.setType(selectedSinkType);
+                        sinkObject.setType(selectedSinkType);
                         var annotationOptions = [];
                         self.formUtils.buildOptions(annotationOptions, Constants.SINK);
                         self.formUtils.buildCustomizedOption(annotationOptions, Constants.SINK);
                         if (annotationOptions.length == 0) {
-                            clickedElement.setOptions(undefined);
+                            sinkObject.setOptions(undefined);
                         } else {
-                            clickedElement.setOptions(annotationOptions);
+                            sinkObject.setOptions(annotationOptions);
                         }
 
                         var mapper = {};
@@ -424,14 +427,14 @@ define(['log', 'jquery', 'lodash', 'mapAnnotation', 'payloadOrAttribute', 'jsonV
                             _.set(mapper, 'payloadOrAttribute', undefined);
                         }
                         var mapperObject = new MapAnnotation(mapper);
-                        clickedElement.setMap(mapperObject);
+                        sinkObject.setMap(mapperObject);
 
                         var textNode = $('#' + id).find('.sinkNameNode');
                         textNode.html(selectedSinkType);
 
                         $('#' + id).removeClass('incomplete-element');
                         //Send sink element to the backend and generate tooltip
-                        var sinkToolTip = self.formUtils.getTooltip(clickedElement, Constants.SINK);
+                        var sinkToolTip = self.formUtils.getTooltip(sinkObject, Constants.SINK);
                         $('#' + id).prop('title', sinkToolTip);
 
                         self.dropElementInstance.generateSpecificSinkConnectionElements(selectedSinkType,
@@ -439,8 +442,6 @@ define(['log', 'jquery', 'lodash', 'mapAnnotation', 'payloadOrAttribute', 'jsonV
 
                         // set the isDesignViewContentChanged to true
                         self.configurationData.setIsDesignViewContentChanged(true);
-                        self.designViewContainer.removeClass('disableContainer');
-                        self.toggleViewButton.removeClass('disableContainer');
                         // close the form window
                         self.consoleListManager.removeFormConsole(formConsole);
                     }
@@ -449,8 +450,6 @@ define(['log', 'jquery', 'lodash', 'mapAnnotation', 'payloadOrAttribute', 'jsonV
                 // 'Cancel' button action
                 var cancelButtonElement = $(formContainer).find('#btn-cancel')[0];
                 cancelButtonElement.addEventListener('click', function () {
-                    self.designViewContainer.removeClass('disableContainer');
-                    self.toggleViewButton.removeClass('disableContainer');
                     // close the form window
                     self.consoleListManager.removeFormConsole(formConsole);
                 });

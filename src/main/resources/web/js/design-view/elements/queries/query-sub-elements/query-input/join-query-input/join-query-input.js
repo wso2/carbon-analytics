@@ -28,25 +28,25 @@ define(
         var JoinQueryInput = function (options) {
             /*
              Data storing structure as follows.
-             type*: 'JOIN',
-             joinWith*: 'STREAM|TABLE|WINDOW|AGGREGATION|TRIGGER',
-             left*: {Join Element JSON},
-             joinType*: 'JOIN|LEFT_OUTER|RIGHT_OUTER|FULL_OUTER',
-             right*: {Join Element JSON},
-             on: '',
-             within: '', // If joinWith == aggregation
-             per: '' // If joinWith == aggregation
-             */
+                type*: 'JOIN',
+                joinWith*: 'STREAM|TABLE|WINDOW|AGGREGATION|TRIGGER',
+                left*: {Join Element JSON},
+                joinType*: 'JOIN|LEFT_OUTER|RIGHT_OUTER|FULL_OUTER',
+                right*: {Join Element JSON},
+                on: '',
+                within: '', // If joinWith == aggregation
+                per: '' // If joinWith == aggregation
+            */
             /*
-             *  firstConnectedElement and secondConnectedElement stores data as follows.
-             *  These will hold a connected element to the join query(front end use only).
-             *  {
-             *       name: '',
-             *       type: ''
-             *  }
-             *
-             *  This attributes will be deleted from the json when sending to backend.
-             * */
+            *  firstConnectedElement and secondConnectedElement stores data as follows.
+            *  These will hold a connected element to the join query(front end use only).
+            *  {
+            *       name: '',
+            *       type: ''
+            *  }
+            *
+            *  This attributes will be deleted from the json when sending to backend.
+            * */
             this.type = 'JOIN';
             if (options !== undefined) {
                 this.firstConnectedElement = options.firstConnectedElement;
@@ -135,6 +135,21 @@ define(
 
         JoinQueryInput.prototype.setPer = function (per) {
             this.per = per;
+        };
+
+        JoinQueryInput.prototype.resetModel = function (queryInput) {
+            var on = queryInput.getOn();
+            var per = queryInput.getPer();
+            var within = queryInput.getWithin();
+            if (on && on != "") {
+                queryInput.setOn(" ");
+            }
+            if (per && per != "") {
+                queryInput.setPer(" ");
+            }
+            if (within && within != "") {
+                queryInput.setWithin(" ");
+            }
         };
 
         return JoinQueryInput;

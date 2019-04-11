@@ -21,7 +21,7 @@ package io.siddhi.distribution.editor.core.util.designview.beans.configs.siddhie
 import io.siddhi.distribution.editor.core.util.designview.beans.configs.siddhielements.SiddhiElementConfig;
 
 /**
- * Represents a selected Siddhi Attribute.
+ * Represents a selected Siddhi Attribute
  */
 public class SelectedAttribute extends SiddhiElementConfig {
     private String expression;
@@ -29,7 +29,7 @@ public class SelectedAttribute extends SiddhiElementConfig {
 
     public SelectedAttribute(String expression, String as) {
         this.expression = expression;
-        this.as = as;
+        setASKeywordValue(as);
     }
 
     public String getExpression() {
@@ -39,4 +39,13 @@ public class SelectedAttribute extends SiddhiElementConfig {
     public String getAs() {
         return as;
     }
+
+    public void setASKeywordValue(String as) {
+        if (as.equals(this.expression)) {
+            this.as = "";
+        } else {
+            this.as = as;
+        }
+    }
 }
+

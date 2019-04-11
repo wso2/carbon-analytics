@@ -18,7 +18,7 @@
 
 define(['jquery', 'log', './constants', './simulator-rest-client', 'lodash', './open-siddhi-apps',
         /* void libs */'bootstrap', 'theme_wso2', 'jquery_ui', 'jquery_validate', 'jquery_timepicker', './templates'],
-    function ($, log, constants, Simulator, _, OpenSiddhiApps) {
+    function ($, log, constants,Simulator, _, OpenSiddhiApps) {
 
         "use strict";   // JS strict mode
 
@@ -48,12 +48,12 @@ define(['jquery', 'log', './constants', './simulator-rest-client', 'lodash', './
             // add methods to validate int/long and double/float
             $.validator.addMethod("validateIntOrLong", function (value, element) {
                 return this
-                        .optional(element) || /^[-+]?[0-9]+$/.test(value);
+                    .optional(element) || /^[-+]?[0-9]+$/.test(value);
             }, "Please provide a valid numerical value.");
 
             $.validator.addMethod("validateFloatOrDouble", function (value, element) {
                 return this
-                        .optional(element) || /^[-+]?[0-9]*\.?[0-9]+([eE][-+]?[0-9]+)?$/.test(value);
+                    .optional(element) || /^[-+]?[0-9]*\.?[0-9]+([eE][-+]?[0-9]+)?$/.test(value);
             }, "Please provide a valid numerical value.");
 
             // add the first single event form and disable the delete button
@@ -130,7 +130,7 @@ define(['jquery', 'log', './constants', './simulator-rest-client', 'lodash', './
                     },
                     function (data) {
                         var message = {
-                            "type": "ERROR",
+                            "type" : "ERROR",
                             "message": data,
                         };
                         self.console.println(message);
@@ -320,12 +320,12 @@ define(['jquery', 'log', './constants', './simulator-rest-client', 'lodash', './
             if (self.siddhiAppDetailsMap[$form.find('select[name="single-event-siddhi-app-name"]').val()] !== self.FAULTY) {
                 var date = $element.val();
                 var patt = new RegExp("^((\\d)+||NaN)$");
-                if (patt.test(date)) {
+                if(patt.test(date)){
                     return;
                 }
                 var dateParts = date.split(/[^0-9]/);
-                var time = new Date(dateParts[0], dateParts[1] - 1, dateParts[2], dateParts[3], dateParts[4], dateParts[5]).getTime()
-                    + parseInt(dateParts[6]);
+                var time=new Date(dateParts[0],dateParts[1]-1,dateParts[2],dateParts[3],dateParts[4],dateParts[5]).getTime()
+                    + parseInt(dateParts[6]) ;
                 $element.val(time);
             } else {
                 $element.val('');
@@ -348,7 +348,7 @@ define(['jquery', 'log', './constants', './simulator-rest-client', 'lodash', './
                     }
                     var dateParts = date.split(/[^0-9]/);
                     var time = new Date(dateParts[0], dateParts[1] - 1, dateParts[2], dateParts[3],
-                            dateParts[4], dateParts[5]).getTime()
+                        dateParts[4], dateParts[5]).getTime()
                         + parseInt(dateParts[6]);
                     $element.val(time);
                 }
@@ -444,12 +444,12 @@ define(['jquery', 'log', './constants', './simulator-rest-client', 'lodash', './
                 '<div class="col-md-12 row">' +
                 '<label data-name="siddhi-app-start-msg">' +
                 '</label>' +
-                '</div>' +
+                '</div>'+
                 '<div class="switch-toggle switch-ios col-md-6">' +
-                '<input id="run" name="run-debug" checked type="radio" value="run">' +
-                '<label for="run" onclick="">Run</label>' +
-                '<input id="debug" name="run-debug" type="radio" value="debug">' +
-                '<label for="debug" onclick="">Debug</label>' +
+                '<input id="btnRadioRun" name="run-debug" checked type="radio" value="run">' +
+                '<label for="btnRadioRun" onclick="">Run</label>' +
+                '<input id="btnRadioDebug" name="run-debug" type="radio" value="debug">' +
+                '<label for="btnRadioDebug" onclick="">Debug</label>' +
                 '<a></a>' +
                 '</div>';
             return runDebugButtons;
@@ -584,15 +584,15 @@ define(['jquery', 'log', './constants', './simulator-rest-client', 'lodash', './
 // create the siddhi app name drop down
         self.refreshSiddhiAppList = function ($siddhiAppSelect, siddhiAppNames) {
             var initialOptionValue = "";
-            if (siddhiAppNames.length == 0) {
+            if(siddhiAppNames.length == 0){
                 initialOptionValue += '<option value = "-1" disabled>-- No saved Siddhi Apps available. --</option>';
-            } else {
+            } else{
                 initialOptionValue = '<option value = "-1" disabled>-- Please Select a Siddhi App --</option>';
             }
 
-            var newSiddhiApps = self.generateOptions(siddhiAppNames, initialOptionValue);
+            var newSiddhiApps = self.generateOptions(siddhiAppNames,initialOptionValue);
             $siddhiAppSelect.html(newSiddhiApps);
-            $siddhiAppSelect.find('option[value="-1"]').attr("selected", true);
+            $siddhiAppSelect.find('option[value="-1"]').attr("selected",true);
         };
 
 // select an option from the siddhi app name drop down
@@ -634,13 +634,13 @@ define(['jquery', 'log', './constants', './simulator-rest-client', 'lodash', './
         self.refreshStreamList = function ($streamNameSelect, streamNames) {
             $streamNameSelect.children().first().remove();
             var initialOptionValue = '<option value = "-1" disabled>-- Please Select a Stream Name --</option>';
-            var newStreamOptions = self.generateOptions(streamNames, initialOptionValue);
+            var newStreamOptions = self.generateOptions(streamNames,initialOptionValue);
             $streamNameSelect.html(newStreamOptions);
-            $streamNameSelect.find('option[value="-1"]').attr("selected", true);
+            $streamNameSelect.find('option[value="-1"]').attr("selected",true);
         };
 
 //    used to create options for available siddhi apps and streams
-        self.generateOptions = function (dataArray, initialOptionValue) {
+        self.generateOptions = function (dataArray,initialOptionValue) {
             dataArray.sort();
             var dataOption =
                 '<option value = "{{dataName}}">' +
@@ -648,7 +648,7 @@ define(['jquery', 'log', './constants', './simulator-rest-client', 'lodash', './
                 '</option>';
             var result = '';
 
-            if (initialOptionValue !== undefined) {
+            if(initialOptionValue !== undefined){
                 result += initialOptionValue;
             }
 
@@ -695,14 +695,14 @@ define(['jquery', 'log', './constants', './simulator-rest-client', 'lodash', './
             $form.removeData('validate');
             for (var i = 0; i < streamAttributes.length; i++) {
                 if (streamAttributes[i]['type'] === 'BOOL') {
-                    $form.find('select[name="' + streamAttributes[i]['name'] + '-attr"]').rules('add', {
+                    $form.find('select[name="'+streamAttributes[i]['name']+'-attr"]').rules('add', {
                         required: true,
                         messages: {
                             required: "Please select a value."
                         }
                     });
                 } else {
-                    $form.find('input[name="' + streamAttributes[i]['name'] + '-attr"]').rules('add', {
+                    $form.find('input[name="'+streamAttributes[i]['name']+'-attr"]').rules('add', {
                         required: true,
                         messages: {
                             digits: "Please enter a value."
@@ -719,11 +719,11 @@ define(['jquery', 'log', './constants', './simulator-rest-client', 'lodash', './
         };
 
 //add an eventlistener to parent checkbox for disabling all the attributes
-        var parentCheckboxEventListener = function () {
-            $(".form-group").on("click", ".parent-checkbox", function () {
+        var parentCheckboxEventListener = function() {
+            $(".form-group").on("click", ".parent-checkbox", function() {
                 var checkStatus = $(this).is(":checked");
                 var parent = $(this).parents(".form-group");
-                parent.find(".attribtes-checkbox" && ".form-control").each(function () {
+                parent.find(".attribtes-checkbox" && ".form-control").each(function() {
                     parent.find(".attributes-checkbox").prop("checked", checkStatus);
                     parent.find(".form-control").val("").prop("disabled", checkStatus);
                 });
@@ -786,7 +786,7 @@ define(['jquery', 'log', './constants', './simulator-rest-client', 'lodash', './
                 function () {
                     self.addRuleForAttribute(this);
                     var dataType = $(this).attr("data-type");
-                    $(this).keypress(function (e) {
+                    $(this).keypress(function(e) {
                         var userInput = e.key;
                         if (!constants.ALLOWED_KEYS.includes(userInput)) {
                             var valid = self.onKeyPressValidate(dataType, userInput);
@@ -801,7 +801,7 @@ define(['jquery', 'log', './constants', './simulator-rest-client', 'lodash', './
 
 
 //add onKeyPressValidate for an attribute based on the attribute type
-        self.onKeyPressValidate = function (dataType, userInput) {
+        self.onKeyPressValidate = function(dataType, userInput) {
             var validDataType = true;
             if (constants.INT_LONG.includes(dataType)) {
                 if (!userInput.match(constants.INT_LONG_REGEX_MATCH)) {
@@ -879,7 +879,7 @@ define(['jquery', 'log', './constants', './simulator-rest-client', 'lodash', './
             tabController.setActiveTab(activeTab);
             var tab = self.app.tabController.getTabFromTitle(siddhiAppName);
             var launcher = tab.getSiddhiFileEditor().getLauncher();
-            if (tab !== undefined) {
+            if(tab !== undefined){
                 var started = false;
                 if (mode === 'run') {
                     started = launcher.runApplication(self.workspace, false);
@@ -955,7 +955,7 @@ define(['jquery', 'log', './constants', './simulator-rest-client', 'lodash', './
                                     });
                                 }
                                 if (self.FAULTY === data[i]['mode']) {
-                                    setTimeout(function () {
+                                    setTimeout(function(){
                                         self.changeSiddhiAppsAndStreamOptionsInSingleSimulationOnSave(
                                             changedSiddhiAppName, noOfIterations);
                                     }, 1000);
@@ -964,7 +964,7 @@ define(['jquery', 'log', './constants', './simulator-rest-client', 'lodash', './
                         }
                         //this means the saved app is not yet deployed
                         if (!valueFound) {
-                            setTimeout(function () {
+                            setTimeout(function(){
                                 self.changeSiddhiAppsAndStreamOptionsInSingleSimulationOnSave(
                                     changedSiddhiAppName, noOfIterations);
                             }, 1000);
@@ -991,7 +991,7 @@ define(['jquery', 'log', './constants', './simulator-rest-client', 'lodash', './
         self.addSiddhiAppsOnAppSave = function ($singleEventConfig, changedSiddhiAppName) {
             var siddhiAppNames = $singleEventConfig.find("select[name='single-event-siddhi-app-name']");
             var valueFound = false;
-            siddhiAppNames.find("option").each(function () {
+            siddhiAppNames.find("option").each(function() {
                 if ("-1" !== $(this).val()) {
                     var option = $(this);
                     if (changedSiddhiAppName === option.val()) {
@@ -1003,7 +1003,7 @@ define(['jquery', 'log', './constants', './simulator-rest-client', 'lodash', './
                 if (1 === siddhiAppNames.find("option").length) {
                     siddhiAppNames.find("option").remove();
                     siddhiAppNames.append($("<option value = \"-1\" disabled></option>").text("-- Please Select a Siddhi App --"));
-                    siddhiAppNames.find('option[value="-1"]').attr("selected", true);
+                    siddhiAppNames.find('option[value="-1"]').attr("selected",true);
                 }
                 siddhiAppNames.append($("<option></option>").attr("value", changedSiddhiAppName).text(changedSiddhiAppName));
             }
@@ -1027,7 +1027,7 @@ define(['jquery', 'log', './constants', './simulator-rest-client', 'lodash', './
                         }
                         //this means the saved app is not yet deleted
                         if (valueFound) {
-                            setTimeout(function () {
+                            setTimeout(function(){
                                 self.changeSiddhiAppsAndStreamOptionsInSingleSimulationOnSave(
                                     changedSiddhiAppName, noOfIterations);
                             }, 1000);
@@ -1053,7 +1053,7 @@ define(['jquery', 'log', './constants', './simulator-rest-client', 'lodash', './
 
         self.removeSiddhiAppsOnAppDelete = function ($singleEventConfig, deletedSiddhiAppName) {
             var siddhiAppNames = $singleEventConfig.find("select[name='single-event-siddhi-app-name']");
-            siddhiAppNames.find("option").each(function () {
+            siddhiAppNames.find("option").each(function() {
                 if ("-1" !== $(this).val()) {
                     var option = $(this);
                     if (deletedSiddhiAppName === option.val()) {
@@ -1067,7 +1067,7 @@ define(['jquery', 'log', './constants', './simulator-rest-client', 'lodash', './
                         if (1 === siddhiAppNames.find("option").length) {
                             siddhiAppNames.find("option").remove();
                             siddhiAppNames.append($("<option value = \"-1\" disabled></option>").text("-- No saved Siddhi Apps available. --"));
-                            siddhiAppNames.find('option[value="-1"]').attr("selected", true);
+                            siddhiAppNames.find('option[value="-1"]').attr("selected",true);
                         }
                     }
                 }
@@ -1081,7 +1081,7 @@ define(['jquery', 'log', './constants', './simulator-rest-client', 'lodash', './
                 Simulator.retrieveStreamNames(
                     siddhiAppName,
                     function (data) {
-                        siddhiStreams.find("option").each(function () {
+                        siddhiStreams.find("option").each(function() {
                             if ("-1" !== $(this).val()) {
                                 var valueFound = false;
                                 var option = $(this);
@@ -1103,7 +1103,7 @@ define(['jquery', 'log', './constants', './simulator-rest-client', 'lodash', './
                         });
                         for (var i = 0; i < data.length; i++) {
                             var valueFound = false;
-                            siddhiStreams.find("option").each(function () {
+                            siddhiStreams.find("option").each(function() {
                                 if (data[i] === $(this).val()) {
                                     valueFound = true;
                                 }

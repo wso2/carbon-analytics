@@ -16,7 +16,7 @@
  * under the License.
  */
 
-define(['require', 'lodash', 'jquery', 'log', 'backbone', 'file_browser', 'workspace/file', 'sample_view'],
+define(['require', 'lodash','jquery', 'log', 'backbone', 'file_browser', 'workspace/file', 'sample_view'],
     function (require, _, $, log, Backbone, FileBrowser, File, SampleView) {
         var OpenSampleFileDialog = Backbone.View.extend(
             /** @lends SaveToFileDialog.prototype */
@@ -37,11 +37,11 @@ define(['require', 'lodash', 'jquery', 'log', 'backbone', 'file_browser', 'works
                         'source_view.container');
                 },
 
-                show: function () {
+                show: function(){
                     this._sampleFileOpenModal.modal('show');
                 },
 
-                select: function (path) {
+                select: function(path){
                     this._fileBrowser.select('path');
                 },
 
@@ -52,17 +52,17 @@ define(['require', 'lodash', 'jquery', 'log', 'backbone', 'file_browser', 'works
                     var app = this.app;
                     var notification_container = this.notification_container;
 
-                    if (!_.isNil(this._sampleFileOpenModal)) {
+                    if(!_.isNil(this._sampleFileOpenModal)){
                         this._sampleFileOpenModal.remove();
                     }
 
                     var sampleFileOpen = $(
                         "<div class='modal fade' id='openSampleConfigModal' tabindex='-1' role='dialog' " +
                         "aria-tydden='true'>" + "<div class='modal-dialog file-dialog' role='document'>" +
-                        "<div class='modal-content'>" +
+                        "<div class='modal-content' id='sampleDialog'>" +
                         "<div class='modal-header'>" +
                         "<button type='button' class='close' data-dismiss='modal' aria-label='Close'>" +
-                        "<span aria-hidden='true'>&times;</span>" +
+                        "<i class=\"fw fw-cancel  about-dialog-close\"></i>" +
                         "</button>" +
                         "<h4 class='modal-title file-dialog-title'>Import Sample</h4>" +
                         "<hr class='style1'>" +
@@ -109,7 +109,7 @@ define(['require', 'lodash', 'jquery', 'log', 'backbone', 'file_browser', 'works
 
                     function getErrorNotification(detailedErrorMsg) {
                         var errorMsg = "Error while opening configuration";
-                        if (!_.isEmpty(detailedErrorMsg)) {
+                        if (!_.isEmpty(detailedErrorMsg)){
                             errorMsg += (" : " + detailedErrorMsg);
                         }
                         return $(
@@ -221,7 +221,7 @@ define(['require', 'lodash', 'jquery', 'log', 'backbone', 'file_browser', 'works
                                 if (xhr.status == 200) {
                                     var file = new File({
                                         content: data.content
-                                    }, {
+                                    },{
                                         storage: browserStorage
                                     });
                                     openSampleConfigModal.modal('hide');
@@ -233,9 +233,9 @@ define(['require', 'lodash', 'jquery', 'log', 'backbone', 'file_browser', 'works
                             },
                             error: function (res, errorCode, error) {
                                 var msg = _.isString(error) ? error : res.statusText;
-                                if (isJsonString(res.responseText)) {
+                                if(isJsonString(res.responseText)){
                                     var resObj = JSON.parse(res.responseText);
-                                    if (_.has(resObj, 'Error')) {
+                                    if(_.has(resObj, 'Error')){
                                         msg = _.get(resObj, 'Error');
                                     }
                                 }

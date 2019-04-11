@@ -91,7 +91,7 @@ define(['jquery', 'backbone', 'lodash', 'log', /** void module - jquery plugin *
                 this._plugins.push('checkbox');
             }
             this._contextMenuProvider = _.get(config, 'contextMenuProvider');
-            if (!_.isNil(this._contextMenuProvider)) {
+            if(!_.isNil(this._contextMenuProvider)){
                 this._plugins.push('contextmenu');
                 _.set(this._treeConfig, 'contextmenu.items', this._contextMenuProvider);
                 _.set(this._treeConfig, 'contextmenu.show_at_node', false);
@@ -99,26 +99,31 @@ define(['jquery', 'backbone', 'lodash', 'log', /** void module - jquery plugin *
             _.set(this._treeConfig, 'plugins', this._plugins);
         },
 
-        getURLProvider: function () {
+        getURLProvider: function(){
             var self = this;
             return function (node) {
-                if (self._showWorkspace && node.id === '#') {
-                    return self._workspaceServiceURL + "/listFilesInPath?path=" + btoa("");
-                } else if (self._showSamples && node.id === '#') {
+                if(self._showWorkspace && node.id === '#'){
+                    return self._workspaceServiceURL + "/listFilesInPath?path=" + self.application.utils.
+                    base64EncodeUnicode("");
+                } else if(self._showSamples && node.id === '#'){
                     var samplesRelativeUrl = "";
-                    return self._workspaceServiceURL + "/listFiles/samples?path=" + btoa(samplesRelativeUrl);
+                    return self._workspaceServiceURL + "/listFiles/samples?path=" + self.application.utils.
+                    base64EncodeUnicode(samplesRelativeUrl);
                 } else if (node.id === '#') {
-                    if (!_.isNil(self._root)) {
+                    if(!_.isNil(self._root)){
                         if (self._fetchFiles) {
-                            return self._workspaceServiceURL + "/listFiles/workspace?path=" + btoa(self._root);
+                            return self._workspaceServiceURL + "/listFiles/workspace?path=" + self.application.utils.
+                            base64EncodeUnicode(self._root);
                         }
                     }
                     return self._workspaceServiceURL + "/root";
                 } else {
                     if (self._fetchFiles) {
-                        return self._workspaceServiceURL + "/listFiles?path=" + btoa(node.id);
+                        return self._workspaceServiceURL + "/listFiles?path=" + self.application.utils.
+                        base64EncodeUnicode(node.id);
                     } else {
-                        return self._workspaceServiceURL + "/list?path=" + btoa(node.id);
+                        return self._workspaceServiceURL + "/list?path=" + self.application.utils.
+                        base64EncodeUnicode(node.id);
                     }
                 }
             }
@@ -127,13 +132,13 @@ define(['jquery', 'backbone', 'lodash', 'log', /** void module - jquery plugin *
         /**
          * @param path a single path or an array of folder paths to select
          */
-        select: function (path) {
+        select: function(path){
             this._$parent_el.jstree(true).deselect_all();
             var pathSeparator = this.application.getPathSeperator(),
                 pathParts = _.split(path, pathSeparator),
                 currentPart = "/",
                 self = this;
-            pathParts.forEach(function (part) {
+            pathParts.forEach(function(part){
                 currentPart += part;
                 self._$parent_el.jstree(true).open_node(currentPart);
                 currentPart += pathSeparator;
@@ -142,15 +147,15 @@ define(['jquery', 'backbone', 'lodash', 'log', /** void module - jquery plugin *
             this._$parent_el.jstree(true).select_node(path);
         },
 
-        refresh: function (node) {
+        refresh: function(node){
             this._$parent_el.jstree(true).load_node(node);
         },
 
-        getNode: function (id) {
+        getNode: function(id){
             return this._$parent_el.jstree(true).get_node(id);
         },
 
-        getSelected: function () {
+        getSelected: function() {
             return this._$parent_el.jstree(true).get_selected(true);
         },
 
@@ -174,16 +179,16 @@ define(['jquery', 'backbone', 'lodash', 'log', /** void module - jquery plugin *
                 data.instance.set_icon(data.node, "fw fw-folder");
             }).on('close_node.jstree', function (e, data) {
                 data.instance.set_icon(data.node, "fw fw-folder");
-            }).on('ready', function () {
+            }).on('ready', function(){
                 self.trigger("ready");
             }).on('hover_node.jstree', function (e, data) {
                 var linkId = data.node.a_attr.id;
                 var fileName = data.node.text;
-                $("a[id='" + linkId + "']").attr('title', fileName);
+                $("a[id='"+linkId+"']").attr('title', fileName);
             }).on('select_node.jstree', function (e, data) {
                 data.instance.toggle_node(data.node);
             }).on("dblclick.jstree", function (event) {
-                if ("folder-tree_-1" !== event.currentTarget.id) {
+                if("folder-tree_-1" !== event.currentTarget.id){
                     return;
                 }
                 var item = $(event.target).closest("li");

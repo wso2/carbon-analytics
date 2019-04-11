@@ -20,7 +20,7 @@ package io.siddhi.distribution.editor.core.util.designview.constants;
 
 /**
  * Contains all the generic String/char values that are needed by
- * the CodeGenerator class to build the entire Siddhi app string.
+ * the CodeGenerator class to build the entire Siddhi app string
  */
 public class SiddhiCodeBuilderConstants {
     // General chars
@@ -87,6 +87,7 @@ public class SiddhiCodeBuilderConstants {
     // Other Strings
     public static final String FROM = "from";
     public static final String SELECT = "select";
+    public static final String SELECT_ALL = "select *";
     public static final String GROUP = "group";
     public static final String ORDER = "order";
     public static final String BY = "by";
@@ -96,6 +97,7 @@ public class SiddhiCodeBuilderConstants {
     public static final String EVERY = "every";
     public static final String RETURN = "return";
     public static final String LIMIT = "limit";
+    public static final String OFFSET = "offset";
     public static final String WINDOW = "window";
     public static final String HAVING = "having";
     public static final String OUTPUT = "output";

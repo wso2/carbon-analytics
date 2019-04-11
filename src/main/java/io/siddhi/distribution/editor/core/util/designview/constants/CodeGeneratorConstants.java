@@ -20,7 +20,7 @@ package io.siddhi.distribution.editor.core.util.designview.constants;
 
 /**
  * Contains generic String constants that are used by the
- * CodeGenerator &amp; CodeGeneratorUtils class.
+ * CodeGenerator & CodeGeneratorUtils class
  */
 public class CodeGeneratorConstants {
 
@@ -36,9 +36,9 @@ public class CodeGeneratorConstants {
     public static final String AGGREGATION = "AGGREGATION";
 
     public static final String JOIN = "JOIN";
-    public static final String LEFT_OUTER = "LEFT_OUTER";
-    public static final String RIGHT_OUTER = "RIGHT_OUTER";
-    public static final String FULL_OUTER = "FULL_OUTER";
+    public static final String LEFT_OUTER = "LEFT_OUTER_JOIN";
+    public static final String RIGHT_OUTER = "RIGHT_OUTER_JOIN";
+    public static final String FULL_OUTER = "FULL_OUTER_JOIN";
 
     public static final String INSERT = "INSERT";
     public static final String DELETE = "DELETE";

@@ -28,18 +28,18 @@ define(['require', 'elementUtils'],
         var PatternOrSequenceQueryInput = function (options) {
             /*
              Data storing structure as follows.
-             type*: 'PATTERN|SEQUENCE',
-             connectedElementList: [],
-             conditionList*: [
-             {
-             conditionId*: '',
-             streamName*: '',
-             filter: ''
-             },
-             ...
-             ],
-             logic*: ''
-             */
+                type*: 'PATTERN|SEQUENCE',
+                connectedElementList: [],
+                conditionList*: [
+                    {
+                        conditionId*: '',
+                        streamName*: '',
+                        filter: ''
+                    },
+                    ...
+                ],
+                logic*: ''
+            */
             if (options !== undefined) {
                 this.type = (options.type !== undefined) ? (options.type).toUpperCase() : undefined;
                 this.logic = options.logic;
@@ -110,6 +110,15 @@ define(['require', 'elementUtils'],
 
         PatternOrSequenceQueryInput.prototype.setLogic = function (logic) {
             this.logic = logic;
+        };
+
+        PatternOrSequenceQueryInput.prototype.resetModel = function (queryInput, disconnectedElementName) {
+            var logic = queryInput.getLogic();
+            queryInput.removeConnectedElementName(disconnectedElementName);
+            queryInput.removeConditionsWhereStreamNameIsUsed(disconnectedElementName);
+            if (logic && logic != "") {
+                queryInput.setLogic(" ");
+            }
         };
 
         return PatternOrSequenceQueryInput;

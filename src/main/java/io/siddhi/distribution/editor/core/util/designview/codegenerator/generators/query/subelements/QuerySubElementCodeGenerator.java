@@ -27,15 +27,12 @@ import io.siddhi.distribution.editor.core.util.designview.utilities.CodeGenerato
 import java.util.List;
 
 /**
- * Generates the code for sub-elements of a Siddhi query.
+ * Generates the code for sub-elements of a Siddhi query
  */
 public class QuerySubElementCodeGenerator {
 
-    private QuerySubElementCodeGenerator() {
-    }
-
     /**
-     * Generates the Siddhi code representation of a query's group by list.
+     * Generates the Siddhi code representation of a query's group by list
      *
      * @param groupByList The group by list given
      * @return The Siddhi code representation of the given query's group by list
@@ -45,16 +42,13 @@ public class QuerySubElementCodeGenerator {
             return SiddhiCodeBuilderConstants.EMPTY_STRING;
         }
 
-        return SiddhiCodeBuilderConstants.NEW_LINE +
-                SiddhiCodeBuilderConstants.GROUP +
-                SiddhiCodeBuilderConstants.SPACE +
-                SiddhiCodeBuilderConstants.BY +
-                SiddhiCodeBuilderConstants.SPACE +
+        return SiddhiCodeBuilderConstants.NEW_LINE + SiddhiCodeBuilderConstants.GROUP +
+                SiddhiCodeBuilderConstants.SPACE + SiddhiCodeBuilderConstants.BY + SiddhiCodeBuilderConstants.SPACE +
                 SubElementCodeGenerator.generateParameterList(groupByList);
     }
 
     /**
-     * Generates the Siddhi code representation of a query's order by list.
+     * Generates the Siddhi code representation of a query's order by list
      *
      * @param orderByList The order by list given
      * @return The Siddhi code representation of the given query's order by list
@@ -92,23 +86,36 @@ public class QuerySubElementCodeGenerator {
     }
 
     /**
-     * Generates the Siddhi code representation of a query's limit.
+     * Generates the Siddhi code representation of a query's limit
      *
      * @param limit The limit value given
      * @return The Siddhi code representation of the given query's limit value
      */
     public static String generateQueryLimit(long limit) {
         if (limit != 0) {
-            return SiddhiCodeBuilderConstants.NEW_LINE +
-                    SiddhiCodeBuilderConstants.LIMIT +
-                    SiddhiCodeBuilderConstants.SPACE +
-                    limit;
+            return SiddhiCodeBuilderConstants.NEW_LINE + SiddhiCodeBuilderConstants.LIMIT +
+                    SiddhiCodeBuilderConstants.SPACE + limit;
         }
         return SiddhiCodeBuilderConstants.EMPTY_STRING;
     }
 
     /**
-     * Generates the Siddhi code representation of a query's having.
+     * Generates the Siddhi code representation of a query's offset
+     *
+     * @param offset The offset value given
+     * @return The Siddhi code representation of the given query's offset value
+     */
+    public static String generateQueryOffset(long offset) {
+        if (offset != 0) {
+            return SiddhiCodeBuilderConstants.NEW_LINE + SiddhiCodeBuilderConstants.OFFSET +
+                    SiddhiCodeBuilderConstants.SPACE + offset;
+        }
+        return SiddhiCodeBuilderConstants.EMPTY_STRING;
+    }
+
+
+    /**
+     * Generates the Siddhi code representation of a query's having
      *
      * @param having The having value given
      * @return The Siddhi code representation of the given query's having value
@@ -118,14 +125,12 @@ public class QuerySubElementCodeGenerator {
             return SiddhiCodeBuilderConstants.EMPTY_STRING;
         }
 
-        return SiddhiCodeBuilderConstants.NEW_LINE +
-                SiddhiCodeBuilderConstants.HAVING +
-                SiddhiCodeBuilderConstants.SPACE +
-                having;
+        return SiddhiCodeBuilderConstants.NEW_LINE + SiddhiCodeBuilderConstants.HAVING +
+                SiddhiCodeBuilderConstants.SPACE + having;
     }
 
     /**
-     * Generates the Siddhi code representation of a query's output rate limit.
+     * Generates the Siddhi code representation of a query's output rate limit
      *
      * @param outputRateLimit The output rate limit value given
      * @return The Siddhi code representation of the given query's output rate limit
@@ -135,10 +140,10 @@ public class QuerySubElementCodeGenerator {
             return SiddhiCodeBuilderConstants.EMPTY_STRING;
         }
 
-        return SiddhiCodeBuilderConstants.NEW_LINE +
-                SiddhiCodeBuilderConstants.OUTPUT +
-                SiddhiCodeBuilderConstants.SPACE +
-                outputRateLimit;
+        return SiddhiCodeBuilderConstants.NEW_LINE + SiddhiCodeBuilderConstants.OUTPUT +
+                SiddhiCodeBuilderConstants.SPACE + outputRateLimit;
     }
 
+    private QuerySubElementCodeGenerator() {
+    }
 }

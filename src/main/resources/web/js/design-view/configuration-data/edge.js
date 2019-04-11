@@ -28,18 +28,19 @@ define(
         var Edge = function (options) {
             /*
              Data storing structure as follows
-             id: '',  ex: 'parentId_childId'
-             parentId: '',
-             parentType: '',
-             childId: '',
-             childType: '',
-             */
+                id: '',  ex: 'parentId_childId'
+                parentId: '',
+                parentType: '',
+                childId: '',
+                childType: '',
+            */
             if (options !== undefined) {
                 this.id = options.id;
                 this.parentId = options.parentId;
                 this.parentType = options.parentType;
                 this.childId = options.childId;
                 this.childType = options.childType;
+                this.fromFaultStream = options.fromFaultStream;
             }
         };
 
@@ -63,6 +64,10 @@ define(
             return this.childType;
         };
 
+        Edge.prototype.isFromFaultStream = function() {
+            return this.fromFaultStream;
+        };
+
         Edge.prototype.setId = function (id) {
             this.id = id;
         };
@@ -81,6 +86,10 @@ define(
 
         Edge.prototype.setChildType = function (childType) {
             this.childType = childType;
+        };
+
+        Edge.prototype.setFromFaultStream = function(fromFaultStream) {
+            this.fromFaultStream = fromFaultStream;
         };
 
         return Edge;

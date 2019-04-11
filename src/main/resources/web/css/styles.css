@@ -15,7 +15,7 @@ h3,
     font-size: 2rem;
 }
 
-.canvas-container {
+.canvas-container{
     background-color: #fff;
     height: 100%;
 }
@@ -143,7 +143,6 @@ a {
     color: #f47a1e;
     text-decoration: none;
 }
-
 a:hover,
 a:focus {
     color: #bc5609;
@@ -175,7 +174,7 @@ ul {
 
 /* single simulator fixes */
 
-.single_configs button.close {
+.single_configs button.close  {
     position: static;
     line-height: 20px;
     font-size: 21px;
@@ -223,7 +222,7 @@ html .ui-button.ui-state-disabled:active {
 .ui-state-highlight,
 .ui-widget-content .ui-state-highlight,
 .ui-widget-header .ui-state-highlight {
-    background: #fffa90;
+    background: #fffa90 ;
     border: 1px solid #dad55e;
     color: #777620;
 }
@@ -265,7 +264,7 @@ a.ui-button:active, .ui-button:active,
     box-sizing: border-box;
     color: #fefefe;
     padding: 10px;
-    white-space: normal;
+    white-space:normal;
 }
 
 .btn {
@@ -279,7 +278,6 @@ a.ui-button:active, .ui-button:active,
         font-size: 8px;
     }
 }
-
 @media (min-width: 1680px) and (max-width: 1919px) {
     html {
         font-size: 9px;
@@ -331,17 +329,14 @@ a.ui-button:active, .ui-button:active,
     padding-top: 0 !important;
     position: relative;
 }
-
 .switch-toggle::after {
     clear: both;
     content: "";
     display: table;
 }
-
 .switch-toggle *, .switch-toggle *::before, .switch-toggle *::after {
     box-sizing: border-box;
 }
-
 .switch-toggle a {
     display: block;
     transition-delay: 0s;
@@ -349,11 +344,9 @@ a.ui-button:active, .ui-button:active,
     transition-property: all;
     transition-timing-function: ease-out;
 }
-
 .switch-toggle label, .switch-toggle > span {
     line-height: 2em;
 }
-
 .switch-toggle input:focus ~ span a, .switch-toggle input:focus + label {
     outline-color: highlight;
     outline-style: solid;
@@ -365,7 +358,6 @@ a.ui-button:active, .ui-button:active,
     opacity: 0;
     position: absolute;
 }
-
 .switch-toggle input + label {
     display: block;
     float: left;
@@ -381,7 +373,6 @@ a.ui-button:active, .ui-button:active,
     text-align: center;
     z-index: 2;
 }
-
 .switch-toggle a {
     height: 100%;
     left: 0;
@@ -394,83 +385,63 @@ a.ui-button:active, .ui-button:active,
     width: 10px;
     z-index: 1;
 }
-
 .switch-toggle label:nth-child(2):nth-last-child(4), .switch-toggle label:nth-child(2):nth-last-child(4) ~ label, .switch-toggle label:nth-child(2):nth-last-child(4) ~ a {
     width: 50%;
 }
-
 .switch-toggle label:nth-child(2):nth-last-child(4) ~ input:checked:nth-child(3) + label ~ a {
     left: 50%;
 }
-
 .switch-toggle label:nth-child(2):nth-last-child(6), .switch-toggle label:nth-child(2):nth-last-child(6) ~ label, .switch-toggle label:nth-child(2):nth-last-child(6) ~ a {
     width: 33.33%;
 }
-
 .switch-toggle label:nth-child(2):nth-last-child(6) ~ input:checked:nth-child(3) + label ~ a {
     left: 33.33%;
 }
-
 .switch-toggle label:nth-child(2):nth-last-child(6) ~ input:checked:nth-child(5) + label ~ a {
     left: 66.66%;
 }
-
 .switch-toggle label:nth-child(2):nth-last-child(8), .switch-toggle label:nth-child(2):nth-last-child(8) ~ label, .switch-toggle label:nth-child(2):nth-last-child(8) ~ a {
     width: 25%;
 }
-
 .switch-toggle label:nth-child(2):nth-last-child(8) ~ input:checked:nth-child(3) + label ~ a {
     left: 25%;
 }
-
 .switch-toggle label:nth-child(2):nth-last-child(8) ~ input:checked:nth-child(5) + label ~ a {
     left: 50%;
 }
-
 .switch-toggle label:nth-child(2):nth-last-child(8) ~ input:checked:nth-child(7) + label ~ a {
     left: 75%;
 }
-
 .switch-toggle label:nth-child(2):nth-last-child(10), .switch-toggle label:nth-child(2):nth-last-child(10) ~ label, .switch-toggle label:nth-child(2):nth-last-child(10) ~ a {
     width: 20%;
 }
-
 .switch-toggle label:nth-child(2):nth-last-child(10) ~ input:checked:nth-child(3) + label ~ a {
     left: 20%;
 }
-
 .switch-toggle label:nth-child(2):nth-last-child(10) ~ input:checked:nth-child(5) + label ~ a {
     left: 40%;
 }
-
 .switch-toggle label:nth-child(2):nth-last-child(10) ~ input:checked:nth-child(7) + label ~ a {
     left: 60%;
 }
-
 .switch-toggle label:nth-child(2):nth-last-child(10) ~ input:checked:nth-child(9) + label ~ a {
     left: 80%;
 }
-
 .switch-toggle label:nth-child(2):nth-last-child(12), .switch-toggle label:nth-child(2):nth-last-child(12) ~ label, .switch-toggle label:nth-child(2):nth-last-child(12) ~ a {
     width: 16.6%;
 }
-
 .switch-toggle label:nth-child(2):nth-last-child(12) ~ input:checked:nth-child(3) + label ~ a {
     left: 16.6%;
 }
-
 .switch-toggle label:nth-child(2):nth-last-child(12) ~ input:checked:nth-child(5) + label ~ a {
     left: 33.2%;
 }
-
 .switch-toggle label:nth-child(2):nth-last-child(12) ~ input:checked:nth-child(7) + label ~ a {
     left: 49.8%;
 }
-
 .switch-toggle label:nth-child(2):nth-last-child(12) ~ input:checked:nth-child(9) + label ~ a {
     left: 66.4%;
 }
-
 .switch-toggle label:nth-child(2):nth-last-child(12) ~ input:checked:nth-child(11) + label ~ a {
     left: 83%;
 }
@@ -491,7 +462,6 @@ a.ui-button:active, .ui-button:active,
     transition-property: all;
     transition-timing-function: ease-out;
 }
-
 .switch-ios.switch-toggle label {
     color: #253841;
     height: 1.6em;
@@ -499,7 +469,6 @@ a.ui-button:active, .ui-button:active,
     vertical-align: middle;
     cursor: pointer;
 }
-
 .switch-ios input:checked + label {
     color: #fff;
     cursor: default;
@@ -523,21 +492,13 @@ a.ui-button:active, .ui-button:active,
 }
 
 @-webkit-keyframes spin {
-    0% {
-        -webkit-transform: rotate(0deg);
-    }
-    100% {
-        -webkit-transform: rotate(360deg);
-    }
+    0% { -webkit-transform: rotate(0deg); }
+    100% { -webkit-transform: rotate(360deg); }
 }
 
 @keyframes spin {
-    0% {
-        transform: rotate(0deg);
-    }
-    100% {
-        transform: rotate(360deg);
-    }
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
 }
 
 .ace_search.right {
@@ -597,7 +558,7 @@ body.sticky-footer {
 }
 
 .selected-element {
-    z-index: 500 !important;
+    z-index:500 !important;
 }
 
 .overlayed-container {
@@ -611,6 +572,10 @@ body.sticky-footer {
     background: rgba(90, 90, 90, 0.5);
 }
 
+.removeOverflow {
+    overflow: unset !important;
+}
+
 .docker-export-file-tree {
     border: 1px solid #444;
     padding: 5px;
@@ -622,12 +587,31 @@ body.sticky-footer {
 
 /*Popover element changes*/
 .popOver {
-    width: 235px;
-    max-width: 235px;
+    width: 400px;
+    max-width: 450px;
     top: -54.5px;
     left: 53px;
     display: block;
     z-index: 300;
+    padding: 1px 1px;
+}
+.popover-footer {
+    margin: 3px -9px 1px 0px;
+    padding: 2px 12px 32px;;
+}
+
+.popover-body-message {
+    text-align: justify;
+    margin: -46px 0px 0px 55px;
+    padding: 5px 1px 0px 1px;
+}
+
+.popover-alert-icon {
+    text-align: left;
+    margin: -7px 327px 1px 1px;
+    padding: 1px 0px 1px 3px;
+    font-size: 44px;
+    color: red;
 }
 
 h3.popover-title {
@@ -635,24 +619,37 @@ h3.popover-title {
     font-weight: 400;
 }
 
-.btn.no {
+.btn.btn_no {
     background-color: #f57e30;
-    color: black;
+    color: #000000;
+    border: 1px solid;
+    border-color: #f57e30;
+
+}
+.btn.btn_yes {
+    background-color: #b3b2b2;
+    color: #000000;
+    border: 1px solid #b3b2b2;
+    border-color: #b3b2b2;
 
 }
 
-.btn.no:hover {
-    color: white;
-}
-
-.btn.yes {
-    background-color: white;
+.btn.btn_no:hover {
+    background-color: #e7620b;
     color: #000000;
 }
 
-.btn.yes:hover {
-    background-color: #f57e30;
-    color: white;
+.btn.btn_yes:hover {
+    background-color: #a4a0a0;
+    color: #000000;
+}
+
+.btn.btn_no:focus {
+    border: 2px solid #ff9f60;
+}
+
+.btn.btn_yes:focus {
+    border: 2px solid #9e9a9a;
 }
 
 .btn-xs {

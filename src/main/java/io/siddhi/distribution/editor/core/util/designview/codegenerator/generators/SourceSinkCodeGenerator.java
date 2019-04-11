@@ -31,14 +31,14 @@ import io.siddhi.distribution.editor.core.util.designview.utilities.CodeGenerato
 import java.util.Map;
 
 /**
- * Generates the code for a Siddhi source/sink element.
+ * Generates the code for a Siddhi source/sink element
  */
 public class SourceSinkCodeGenerator {
 
     /**
-     * Generates the Siddhi code representation of a SourceSinkConfig object.
+     * Generates the Siddhi code representation of a SourceSinkConfig object
      *
-     * @param sourceSink          The SourceSinkConfig object
+     * @param sourceSink The SourceSinkConfig object
      * @param isGeneratingToolTip If it is generating a tooltip or not
      * @return The Siddhi code representation of the given SourceSinkConfig object
      * @throws CodeGenerationException Error when generating the code
@@ -66,7 +66,7 @@ public class SourceSinkCodeGenerator {
 
         if (sourceSink.getOptions() != null && !sourceSink.getOptions().isEmpty()) {
             sourceSinkStringBuilder.append(SiddhiCodeBuilderConstants.COMMA)
-                    .append(SubElementCodeGenerator.generateElementList(sourceSink.getOptions()));
+                    .append(SubElementCodeGenerator.generateParameterList(sourceSink.getOptions()));
         }
 
         if (sourceSink.getMap() != null) {
@@ -80,7 +80,7 @@ public class SourceSinkCodeGenerator {
     }
 
     /**
-     * Generates the Siddhi code representation of a MapperConfig object.
+     * Generates the Siddhi code representation of a MapperConfig object
      *
      * @param mapper The MapperConfig object
      * @return The Siddhi code representation of the given MapperConfig object
@@ -97,7 +97,7 @@ public class SourceSinkCodeGenerator {
 
         if (mapper.getOptions() != null && !mapper.getOptions().isEmpty()) {
             mapperStringBuilder.append(SiddhiCodeBuilderConstants.COMMA)
-                    .append(SubElementCodeGenerator.generateElementList(mapper.getOptions()));
+                    .append(SubElementCodeGenerator.generateParameterList(mapper.getOptions()));
         }
 
         if (mapper.getPayloadOrAttribute() != null) {
@@ -118,7 +118,7 @@ public class SourceSinkCodeGenerator {
     }
 
     /**
-     * Generates the Siddhi code representation of a MapperPayloadOrAttribute object.
+     * Generates the Siddhi code representation of a MapperPayloadOrAttribute object
      *
      * @param payloadOrAttribute The MapperPayloadOrAttribute object
      * @return The Siddhi code representation of the given MapperConfig object
@@ -147,7 +147,7 @@ public class SourceSinkCodeGenerator {
     }
 
     /**
-     * Generates the Siddhi code representation of a MapperListPayloadOrAttribute object.
+     * Generates the Siddhi code representation of a MapperListPayloadOrAttribute object
      *
      * @param mapperListAttribute The MapperListPayloadOrAttribute object
      * @return The Siddhi code representation of the given MapperListPayloadOrAttribute object
@@ -179,7 +179,7 @@ public class SourceSinkCodeGenerator {
     }
 
     /**
-     * Generates the Siddhi code representation of a MapperMapPayloadOrAttribute object.
+     * Generates the Siddhi code representation of a MapperMapPayloadOrAttribute object
      *
      * @param mapperMapAttribute The MapperMapPayloadOrAttribute object
      * @return The Siddhi code representation of the given MapperMapPayloadOrAttribute object

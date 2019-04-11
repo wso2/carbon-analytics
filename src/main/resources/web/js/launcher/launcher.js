@@ -32,9 +32,9 @@ define(['log', 'jquery', 'backbone', 'lodash', 'context_menu', 'launch_manager',
                 var activeTab = this.application.tabController.getActiveTab();
                 if (this.isReadyToRun(activeTab)) {
                     var siddhiAppName = "";
-                    if (activeTab.getTitle().lastIndexOf(".siddhi") != -1) {
+                    if(activeTab.getTitle().lastIndexOf(".siddhi") != -1){
                         siddhiAppName = activeTab.getTitle().substring(0, activeTab.getTitle().lastIndexOf(".siddhi"));
-                    } else {
+                    } else{
                         siddhiAppName = activeTab.getTitle();
                     }
 
@@ -54,22 +54,28 @@ define(['log', 'jquery', 'backbone', 'lodash', 'context_menu', 'launch_manager',
                 }
             },
 
-            stopApplication: function (workspace, initialLoad) {
+            stopApplication: function(workspace,initialLoad){
                 var activeTab = this.application.tabController.getActiveTab();
-                var siddhiAppName = "";
-                if (activeTab.getTitle().lastIndexOf(".siddhi") != -1) {
-                    siddhiAppName = activeTab.getTitle().substring(0, activeTab.getTitle().lastIndexOf(".siddhi"));
-                } else {
-                    siddhiAppName = activeTab.getTitle();
+
+                if (undefined == activeTab.getFile().isStopProcessRunning() ||
+                    !activeTab.getFile().isStopProcessRunning()) {
+                    activeTab.getFile().setStopProcessRunning(true);
+                    var siddhiAppName = "";
+                    if(activeTab.getTitle().lastIndexOf(".siddhi") != -1){
+                        siddhiAppName = activeTab.getTitle().substring(0, activeTab.getTitle().lastIndexOf(".siddhi"));
+                    } else{
+                        siddhiAppName = activeTab.getTitle();
+                    }
+                    this.application.commandManager.dispatch('stop-running-simulation-on-app-stop', siddhiAppName);
+                    LaunchManager.stopApplication(siddhiAppName,this.application.outputController,activeTab,
+                        workspace,initialLoad);
+                    var options = {
+                        siddhiAppName: siddhiAppName,
+                        status: "STOP"
+                    };
+                    this.application.commandManager.dispatch('change-app-status-single-simulation', options);
                 }
-                this.application.commandManager.dispatch('stop-running-simulation-on-app-stop', siddhiAppName);
-                LaunchManager.stopApplication(siddhiAppName, this.application.outputController, activeTab,
-                    workspace, initialLoad);
-                var options = {
-                    siddhiAppName: siddhiAppName,
-                    status: "STOP"
-                };
-                this.application.commandManager.dispatch('change-app-status-single-simulation', options);
+
             },
 
             runApplication: function (workspace, async) {
@@ -77,9 +83,9 @@ define(['log', 'jquery', 'backbone', 'lodash', 'context_menu', 'launch_manager',
                 // only saved files can be run as application
                 if (this.isReadyToRun(activeTab)) {
                     var siddhiAppName = "";
-                    if (activeTab.getTitle().lastIndexOf(".siddhi") != -1) {
+                    if(activeTab.getTitle().lastIndexOf(".siddhi") != -1){
                         siddhiAppName = activeTab.getTitle().substring(0, activeTab.getTitle().lastIndexOf(".siddhi"));
-                    } else {
+                    } else{
                         siddhiAppName = activeTab.getTitle();
                     }
                     LaunchManager.runApplication(siddhiAppName, this.application.outputController, activeTab, workspace,
@@ -96,25 +102,25 @@ define(['log', 'jquery', 'backbone', 'lodash', 'context_menu', 'launch_manager',
                 }
             },
 
-            isReadyToRun: function (tab) {
+            isReadyToRun: function(tab) {
                 if (!typeof tab.getFile === "function") {
                     return false;
                 }
 
                 var file = tab.getFile();
                 // file is not saved give an error and avoid running
-                if (file.isDirty()) {
+                if(file.isDirty()) {
                     return false;
                 }
 
                 return true;
             },
 
-            stopProgram: function () {
+            stopProgram: function(){
                 LaunchManager.stopProgram();
             },
 
-            isActive: function () {
+            isActive: function(){
                 return this._activateBtn.parent('li').hasClass('active');
             },
 
@@ -128,7 +134,7 @@ define(['log', 'jquery', 'backbone', 'lodash', 'context_menu', 'launch_manager',
                 launcherContainer.attr('id', _.get(this._options, ('containerId')));
                 this._$parent_el.append(launcherContainer);
 
-                activateBtn.on('click', function (e) {
+                activateBtn.on('click', function(e){
                     $(this).tooltip('hide');
                     e.preventDefault();
                     e.stopPropagation();
@@ -143,9 +149,9 @@ define(['log', 'jquery', 'backbone', 'lodash', 'context_menu', 'launch_manager',
                     activateBtn.attr("title", "Run  (" + _.get(self._options, 'command.shortcuts.other.label') + ") ").tooltip();
                 }
 
-                this._verticalSeparator.on('drag', function (event) {
-                    if (event.originalEvent.clientX >= _.get(self._options, 'resizeLimits.minX')
-                        && event.originalEvent.clientX <= _.get(self._options, 'resizeLimits.maxX')) {
+                this._verticalSeparator.on('drag', function(event){
+                    if( event.originalEvent.clientX >= _.get(self._options, 'resizeLimits.minX')
+                        && event.originalEvent.clientX <= _.get(self._options, 'resizeLimits.maxX')){
                         self._verticalSeparator.css('left', event.originalEvent.clientX);
                         self._verticalSeparator.css('cursor', 'ew-resize');
                         var newWidth = event.originalEvent.clientX;
@@ -159,8 +165,8 @@ define(['log', 'jquery', 'backbone', 'lodash', 'context_menu', 'launch_manager',
                 });
                 this._launcherContainer = launcherContainer;
 
-                if (!_.isEmpty(this._openedFolders)) {
-                    this._openedFolders.forEach(function (folder) {
+                if(!_.isEmpty(this._openedFolders)){
+                    this._openedFolders.forEach(function(folder){
                         self.createExplorerItem(folder);
                     });
                 }
@@ -169,11 +175,11 @@ define(['log', 'jquery', 'backbone', 'lodash', 'context_menu', 'launch_manager',
             },
 
 
-            renderBody: function () {
+            renderBody : function(){
                 this._launcherContainer.html(this.compiled(LaunchManager));
             },
 
-            showConsole: function () {
+            showConsole : function(){
                 $("#tab-content-wrapper").css("height:70%");
                 $("#console-container").css("height:30%");
             }

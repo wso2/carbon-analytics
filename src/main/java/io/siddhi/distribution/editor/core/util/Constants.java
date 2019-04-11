@@ -51,18 +51,6 @@ public class Constants {
     public static final String DEPLOYMENT_PASSWORD = "password";
     public static final String SIDDHI_FILE_LIST = "siddhiFileList";
     public static final String SERVER_LIST = "serverList";
-    public static final String XML_EVENT = "xml";
-    public static final String JSON_EVENT = "json";
-    public static final String TEXT_EVENT = "text";
-    public static final String SAMPLE_EVENTS_PARENT_TAG = "events";
-    public static final String SAMPLE_EVENT_PARENT_TAG = "event";
-    public static final String ATTR_TYPE_FLOAT = "float";
-    public static final String ATTR_TYPE_DOUBLE = "double";
-    public static final String ATTR_TYPE_INTEGER = "int";
-    public static final String ATTR_TYPE_LONG = "long";
-    public static final String ATTR_TYPE_STRING = "string";
-    public static final String ATTR_TYPE_BOOL = "bool";
-    public static final String EVENT_ATTRIBUTE_VALUE_SEPARATOR = ":";
     static final String FUNCTION_EXECUTOR = "FunctionExecutor";
     static final String ATTRIBUTE_AGGREGATOR = "AttributeAggregator";
     static final String WINDOW_PROCESSOR = "WindowProcessor";
@@ -75,6 +63,20 @@ public class Constants {
     static final String STORE = "Store";
     static final Map<String, Class<?>> SUPER_CLASS_MAP;
     static final Map<String, String> PACKAGE_NAME_MAP;
+
+    public static final String XML_EVENT = "xml";
+    public static final String JSON_EVENT = "json";
+    public static final String TEXT_EVENT = "text";
+    public static final String SAMPLE_EVENTS_PARENT_TAG = "events";
+    public static final String SAMPLE_EVENT_PARENT_TAG = "event";
+    public static final String ATTR_TYPE_FLOAT = "float";
+    public static final String ATTR_TYPE_DOUBLE = "double";
+    public static final String ATTR_TYPE_INTEGER = "int";
+    public static final String ATTR_TYPE_LONG = "long";
+    public static final String ATTR_TYPE_STRING = "string";
+    public static final String ATTR_TYPE_BOOL = "bool";
+    public static final String EVENT_ATTRIBUTE_VALUE_SEPARATOR = ":";
+    public static final String FAULT_STREAM_PREFIX = "!";
 
     static {
         // Populating the processor super class map
@@ -92,9 +94,9 @@ public class Constants {
 
         // Populating the package name map
         PACKAGE_NAME_MAP = new HashMap<>();
-        PACKAGE_NAME_MAP.put(FUNCTION_EXECUTOR, "io.siddhi.core.executor.function");
+        PACKAGE_NAME_MAP.put(FUNCTION_EXECUTOR, "org.wso2.siddhi.core.executor.function");
         PACKAGE_NAME_MAP.put(ATTRIBUTE_AGGREGATOR,
-                "io.siddhi.core.query.selector.attribute.aggregator");
-        PACKAGE_NAME_MAP.put(WINDOW_PROCESSOR, "io.siddhi.core.query.processor.stream.window");
+                "org.wso2.siddhi.core.query.selector.attribute.aggregator");
+        PACKAGE_NAME_MAP.put(WINDOW_PROCESSOR, "org.wso2.siddhi.core.query.processor.stream.window");
     }
 }

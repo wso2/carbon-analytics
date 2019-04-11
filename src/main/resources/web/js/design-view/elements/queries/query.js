@@ -29,24 +29,24 @@ define(['require', 'elementUtils'],
             /*
              Data storing structure as follows.
 
-             id*: '',
-             previousCommentSegment:'',
-             queryInput*: {Query Input JSON},
-             select*: {Query Select JSON},
-             groupBy: ['value1',...],
-             orderBy: [
-             {
-             value*: '',
-             order: 'ASC|DESC'
-             },
-             ...
-             ],
-             limit: <long>,
-             having: '',
-             outputRateLimit: ''
-             queryOutput*: {Query Output JSON},
-             annotationList: [annotation1, annotation2, ...]
-             */
+                id*: '',
+                previousCommentSegment:'',
+                queryInput*: {Query Input JSON},
+                select*: {Query Select JSON},
+                groupBy: ['value1',...],
+                orderBy: [
+                    {
+                        value*: '',
+                        order: 'ASC|DESC'
+                    },
+                    ...
+                ],
+                limit: <long>,
+                having: '',
+                outputRateLimit: ''
+                queryOutput*: {Query Output JSON},
+                annotationList: [annotation1, annotation2, ...]
+            */
             if (options !== undefined) {
                 this.queryName = options.queryName;
                 this.id = options.id;
@@ -55,12 +55,14 @@ define(['require', 'elementUtils'],
                 this.select = options.select;
                 this.groupBy = options.groupBy;
                 this.limit = options.limit;
+                this.offset = options.offset;
                 this.having = options.having;
                 this.outputRateLimit = options.outputRateLimit;
                 this.queryOutput = options.queryOutput;
             }
             this.orderBy = [];
             this.annotationList = [];
+            this.annotationListObjects = [];
         };
 
         Query.prototype.addQueryName = function (queryName) {
@@ -75,12 +77,20 @@ define(['require', 'elementUtils'],
             this.annotationList.push(annotation);
         };
 
+        Query.prototype.addAnnotationObject = function (annotationObject) {
+            this.annotationListObjects.push(annotationObject);
+        };
+
         Query.prototype.addOrderByValue = function (orderByValue) {
             this.orderBy.push(orderByValue);
         };
 
         Query.prototype.clearAnnotationList = function () {
             ElementUtils.prototype.removeAllElements(this.annotationList);
+        };
+
+        Query.prototype.clearAnnotationListObjects = function () {
+            ElementUtils.prototype.removeAllElements(this.annotationListObjects);
         };
 
         Query.prototype.clearOrderByValueList = function () {
@@ -111,6 +121,10 @@ define(['require', 'elementUtils'],
             return this.limit;
         };
 
+        Query.prototype.getOffset = function () {
+            return this.offset;
+        };
+
         Query.prototype.getHaving = function () {
             return this.having;
         };
@@ -125,6 +139,10 @@ define(['require', 'elementUtils'],
 
         Query.prototype.getAnnotationList = function () {
             return this.annotationList;
+        };
+
+        Query.prototype.getAnnotationListObjects = function () {
+            return this.annotationListObjects;
         };
 
         Query.prototype.setId = function (id) {
@@ -155,6 +173,10 @@ define(['require', 'elementUtils'],
             this.having = having;
         };
 
+        Query.prototype.setOffset = function (offset) {
+            this.offset = offset;
+        };
+
         Query.prototype.setOutputRateLimit = function (outputRateLimit) {
             this.outputRateLimit = outputRateLimit;
         };
@@ -165,6 +187,37 @@ define(['require', 'elementUtils'],
 
         Query.prototype.setAnnotationList = function (annotationList) {
             this.annotationList = annotationList;
+        };
+
+        Query.prototype.resetInputModel = function (model, disconnectedElementName) {
+            model.setSelect(undefined);
+            var groupBy = model.getGroupBy();
+            var orderBy = model.getOrderBy();
+            var having = model.getHaving();
+            if (groupBy && groupBy.length > 0) {
+                model.setGroupBy([" "]);
+            }
+            if (orderBy && orderBy.length > 0) {
+                model.setOrderBy([{ value: "", order: "" }]);
+            }
+            if (having && having != "") {
+                model.setHaving(" ");
+            }
+            model.getQueryInput().resetModel(model.queryInput, disconnectedElementName);
+        };
+
+        Query.prototype.resetOutputModel = function (model) {
+            var queryOutput = model.getQueryOutput();
+            model.setSelect(undefined);
+            queryOutput.setTarget(undefined);
+            if (queryOutput.output) {
+                if (queryOutput.output.on) {
+                    queryOutput.getOutput().setOn("");
+                }
+                if (queryOutput.output.set && queryOutput.output.set.length != 0) {
+                    queryOutput.getOutput().setSet([{attribute: "", value: ""}]);
+                }
+            }
         };
 
         return Query;

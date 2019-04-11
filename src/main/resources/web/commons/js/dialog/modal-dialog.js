@@ -66,7 +66,7 @@ define(['require', 'jquery', 'event_channel', 'bootstrap'], function (require, $
 
     ModalDialog.prototype.show = function () {
         var self = this;
-        this._$modalContainer.modal('show').on('shown.bs.modal', function () {
+        this._$modalContainer.modal('show').on('shown.bs.modal', function(){
             self.trigger('loaded');
         });
     };
@@ -83,14 +83,14 @@ define(['require', 'jquery', 'event_channel', 'bootstrap'], function (require, $
 
     ModalDialog.prototype.hide = function () {
         var self = this;
-        this._$modalContainer.modal('hide').on('hidden.bs.modal', function () {
+        this._$modalContainer.modal('hide').on('hidden.bs.modal', function(){
             self.trigger('unloaded');
         });
     };
 
 
     ModalDialog.prototype.render = function () {
-        if (!_.isNil(this._$modalContainer)) {
+        if(!_.isNil(this._$modalContainer)){
             this._$modalContainer.remove();
         }
         var modalContainer = $("<div class='modal fade " + _.get(this._options, 'class') +
@@ -99,8 +99,9 @@ define(['require', 'jquery', 'event_channel', 'bootstrap'], function (require, $
         var modalContent = $("<div class='modal-content'></div>");
         var modalHeader = $("<div class='modal-header'></div>");
         var modalCloseBtnTop = $("<button type='button' class='close' data-dismiss='modal' aria-label='Close'>" +
-            "<span aria-hidden='true'>&times;</span></button>");
-        var modalTitle = $("<h4 class='modal-title '></h4>");
+            "<i class='fw fw-cancel  about-dialog-close'> </i></button>");
+        var modalTitle = $("<h4 class='modal-title file-dialog-title'></h4>");
+        var modalSeparator = $("<hr class='style1'>");
         var modalBody = $("<div class='modal-body'></div>");
         var modalFooter = $("<div class='modal-footer'></div>");
         var modalCloseBtnBottom = $("<button type='button' class='btn btn-default btn-file-dialog'" +
@@ -122,6 +123,7 @@ define(['require', 'jquery', 'event_channel', 'bootstrap'], function (require, $
         modalContent.append(modalHeader);
         modalHeader.append(modalCloseBtnTop);
         modalHeader.append(modalTitle);
+        modalHeader.append(modalSeparator);
         modalContent.append(modalBody);
         modalContent.append(errorContainer);
         errorContainer.hide();
@@ -130,10 +132,10 @@ define(['require', 'jquery', 'event_channel', 'bootstrap'], function (require, $
         modalFooter.append(modalCloseBtnBottom);
         this._$container.append(modalContainer);
 
-        if (_.has(this._options, 'title')) {
+        if(_.has(this._options, 'title')){
             modalTitle.text(_.get(this._options, 'title'));
         }
-        if (_.has(this._options, 'submitBtnText')) {
+        if(_.has(this._options, 'submitBtnText')){
             modalSubmitBtn.text(_.get(this._options, 'submitBtnText'));
         }
         return modalContainer;

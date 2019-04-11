@@ -68,6 +68,7 @@ define(['require', 'log', 'lodash', 'jquery', 'configurationData', 'appData', 'p
 
             // add app annotations
             self.appData.setAppAnnotationList(configurationJSON.siddhiAppConfig.appAnnotationList);
+            self.appData.setAppAnnotationListObjects(configurationJSON.siddhiAppConfig.appAnnotationListObjects);
             // add definitions to the data storing structure
             addSourceDefinitions(self.appData, configurationJSON.siddhiAppConfig.sourceList, self.newIdBeginningPhrase);
             addSinkDefinitions(self.appData, configurationJSON.siddhiAppConfig.sinkList, self.newIdBeginningPhrase);
@@ -97,14 +98,14 @@ define(['require', 'log', 'lodash', 'jquery', 'configurationData', 'appData', 'p
             addEdges(self.configurationData, configurationJSON.edgeList, self.newIdBeginningPhrase);
 
             /*
-             * This sort method brings up the connections which has the 'PARTITION' type as the children type.
-             * This was done because when a connection is made from partition connection point to the inner query,
-             * it is necessary to have a connection from an outer stream to the partition connection point.
-             * Because there can't be a partition connection point without a outer stream connection.(besides the default
-             * partition connection point) Once this sort method is done all connection which have 'STREAM' as the
-             * 'parent' and 'PARTITION'(partition connection point) as the child will come to hte front and when
-             * connections are made these connections will be rendered first.
-             * */
+            * This sort method brings up the connections which has the 'PARTITION' type as the children type.
+            * This was done because when a connection is made from partition connection point to the inner query,
+            * it is necessary to have a connection from an outer stream to the partition connection point.
+            * Because there can't be a partition connection point without a outer stream connection.(besides the default
+            * partition connection point) Once this sort method is done all connection which have 'STREAM' as the
+            * 'parent' and 'PARTITION'(partition connection point) as the child will come to hte front and when
+            * connections are made these connections will be rendered first.
+            * */
             self.configurationData.getEdgeList().sort(function (a, b) {
                 if (a.getChildType() === 'PARTITION' && b.getChildType() !== 'PARTITION') {
                     return -1;
@@ -238,6 +239,7 @@ define(['require', 'log', 'lodash', 'jquery', 'configurationData', 'appData', 'p
                     var storeAnnotation = new StoreAnnotation(aggregation.store);
                     aggregationObject.setStore(storeAnnotation);
                 }
+                addAnnotationObjectForElement(aggregation, aggregationObject);
                 addAnnotationsForElement(aggregation, aggregationObject);
                 // select section in the aggregation definition is compulsory. If that is not found there is a error in
                 // backend.
@@ -271,6 +273,7 @@ define(['require', 'log', 'lodash', 'jquery', 'configurationData', 'appData', 'p
         function addWindowFilterProjectionQueries(mainObject, windowFilterProjectionQueryList, newIdBeginningPhrase) {
             _.forEach(windowFilterProjectionQueryList, function (windowFilterProjectionQuery) {
                 var queryObject = new Query(windowFilterProjectionQuery);
+                addAnnotationObjectForElement(windowFilterProjectionQuery, queryObject);
                 addAnnotationsForElement(windowFilterProjectionQuery, queryObject);
                 queryObject.addQueryName(windowFilterProjectionQuery.queryName);
 
@@ -300,6 +303,7 @@ define(['require', 'log', 'lodash', 'jquery', 'configurationData', 'appData', 'p
             _.forEach(patternQueryList, function (patternQuery) {
                 var patternQueryObject = new Query(patternQuery);
                 addAnnotationsForElement(patternQuery, patternQueryObject);
+                addAnnotationObjectForElement(patternQuery, patternQueryObject);
 
                 // queryInput section in the query is compulsory. If that is not found there is a error in backend.
                 if (!patternQuery.queryInput) {
@@ -356,6 +360,7 @@ define(['require', 'log', 'lodash', 'jquery', 'configurationData', 'appData', 'p
             _.forEach(joinQueryList, function (joinQuery) {
                 var queryObject = new Query(joinQuery);
                 addAnnotationsForElement(joinQuery, queryObject);
+                addAnnotationObjectForElement(joinQuery, queryObject);
 
                 var errMsg;
                 // queryInput section in the query is compulsory. If that is not found there is a error in backend.
@@ -433,10 +438,41 @@ define(['require', 'log', 'lodash', 'jquery', 'configurationData', 'appData', 'p
                     parentId: newParentId,
                     parentType: edge.parentType,
                     childId: newChildId,
-                    childType: edge.childType
+                    childType: edge.childType,
                 };
+
+                if (edge.parentType === 'STREAM') {
+                    // check if this is originating from the fault stream and get the correct parent id and set
+                    var stream = getStreambyId(mainObject.siddhiAppConfig.getStreamList(), newParentId);
+                    if (stream.isFaultStream()) {
+                        var correspondingStream = getStreamByName(mainObject.siddhiAppConfig.getStreamList(),
+                            stream.getName().substr(1));
+                        edgeOptions.parentId = correspondingStream.getId();
+                        edgeOptions.fromFaultStream = true;
+                    }
+                }
                 mainObject.addEdge(new Edge(edgeOptions));
             });
+        }
+
+        function getStreambyId(streamList, streamId) {
+            var stream = undefined;
+            streamList.forEach(function(s) {
+                if (s.getId() === streamId) {
+                    stream = s;
+                }
+            });
+            return stream;
+        }
+
+        function getStreamByName(streamList, streamName) {
+            var result;
+            streamList.forEach(function(stream) {
+                if (stream.getName() === streamName) {
+                    result = stream;
+                }
+            });
+            return result;
         }
 
         //adds annotation object from a json object for an element object

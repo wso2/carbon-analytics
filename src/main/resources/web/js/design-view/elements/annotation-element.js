@@ -35,7 +35,7 @@ define(
             return this.key;
         };
 
-        AnnotationElement.prototype.setKey = function (key) {
+        AnnotationElement.prototype.setKey= function (key) {
             this.key = key;
         };
 

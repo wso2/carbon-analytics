@@ -151,8 +151,8 @@ a:focus {
 .ui-datepicker-trigger {
     position: relative;
     color: #999;
-    border: none;
-    background: none;
+    border:none;
+    background:none;
 }
 
 .hasDatepicker {
@@ -160,7 +160,7 @@ a:focus {
     display: inline;
 }
 
-#single-event-config-tab-content > .tab-pane > .content {
+#single-event-config-tab-content>.tab-pane>.content {
     position: relative;
     height: 84%;
 }
@@ -195,7 +195,7 @@ form[data-form-type="single"] table th label {
     padding: 0;
     position: absolute;
     right: 12px;
-    top: 5px;
+    top:5px;
     width: 20px;
     z-index: 1000;
 }
@@ -209,7 +209,7 @@ form[data-form-type="single"] table th label {
     height: 0;
     margin-top: 20px;
     position: absolute;
-    top: 126px;
+    top:126px;
     width: 0;
     left: -20px;
 }
@@ -231,7 +231,7 @@ form[data-form-type="single"] table th label {
 }
 
 .sidebar-nav li {
-    border-bottom: none;
+    border-bottom:none;
 }
 
 .sidebar-wrapper.sidebar-nav-sub {
@@ -264,8 +264,8 @@ form[data-form-type="single"] table th label {
     color: #fff;
 }
 
-.simulation-list .inactive-simulation-list .form-control,
-.simulation-list .inactive-simulation-list .btn-default {
+.simulation-list .inactive-simulation-list  .form-control,
+.simulation-list .inactive-simulation-list  .btn-default {
     color: #757575;
 }
 
@@ -472,7 +472,7 @@ hr {
 }
 
 .sidebar-nav {
-    text-transform: none;
+    text-transform : none;
 }
 
 .attributes-section div[class^="attributes_"], div[class*="attributes_"] {
@@ -488,7 +488,7 @@ hr {
 }
 
 .sidebar-left .alert {
-    background-color: #2f2f2f;
+    background-color:#2f2f2f;
     border-style: dotted;
     margin-right: 10px;
 }
@@ -522,5 +522,5 @@ hr {
 }
 
 .notification-container {
-    z-index: 100000002 !important;
+    z-index: 100000003 !important;
 }

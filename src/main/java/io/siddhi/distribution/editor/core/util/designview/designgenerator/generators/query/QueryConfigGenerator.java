@@ -50,7 +50,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Generator to create QueryConfig from Siddhi elements.
+ * Generator to create QueryConfig from Siddhi elements
  */
 public class QueryConfigGenerator extends CodeSegmentsPreserver {
     private static final String DEFAULT_QUERY_NAME = "query";
@@ -63,29 +63,9 @@ public class QueryConfigGenerator extends CodeSegmentsPreserver {
     }
 
     /**
-     * Gets the category of the query, for adding and maintaining in relevant lists.
-     *
-     * @param queryConfig QueryConfig object
-     * @return QueryListType
-     */
-    public static QueryListType getQueryListType(QueryConfig queryConfig) {
-        QueryInputConfig queryInputConfig = queryConfig.getQueryInput();
-        if (queryInputConfig instanceof WindowFilterProjectionConfig) {
-            return QueryListType.WINDOW_FILTER_PROJECTION;
-        } else if (queryInputConfig instanceof JoinConfig) {
-            return QueryListType.JOIN;
-        } else if (queryInputConfig instanceof PatternSequenceConfig) {
-            return QueryListType.valueOf(queryInputConfig.getType());
-        }
-        throw new IllegalArgumentException("Type of Query Input is unknown, for adding the Query");
-    }
-
-    /**
-     * Generates a QueryConfig object with the given Siddhi Query object.
-     *
-     * @param query Siddhi Query object
-     * @return QueryConfig object
-     * @throws DesignGenerationException Error while generating QueryInputConfig
+     * Generates a QueryConfig object with the given Siddhi Query object
+     * @param query                 Siddhi Query object
+     * @return                      QueryConfig object
      */
     public QueryConfig generateQueryConfig(Query query)
             throws DesignGenerationException {
@@ -99,9 +79,11 @@ public class QueryConfigGenerator extends CodeSegmentsPreserver {
         queryConfig.setOrderBy(generateOrderBy(selector.getOrderByList()));
         queryConfig.setHaving(generateHaving(selector.getHavingExpression()));
         queryConfig.setLimit(generateLimit(selector.getLimit()));
+        queryConfig.setOffset(generateOffset(selector.getOffset()));
 
         queryConfig.setQueryOutput(generateOutput(query.getOutputStream()));
         queryConfig.setOutputRateLimit(generateOutputRateLimit(query.getOutputRate()));
+        queryConfig.setAnnotationListObjects(removeInfoAnnotation(query.getAnnotations()));
         queryConfig.setAnnotationList(generateAnnotationList(query.getAnnotations()));
         queryConfig.setQueryName(generateQueryName(query.getAnnotations()));
         preserveAndBindCodeSegment(query, queryConfig);
@@ -109,21 +91,19 @@ public class QueryConfigGenerator extends CodeSegmentsPreserver {
     }
 
     /**
-     * Generates QueryInputConfig object from the given Siddhi InputStream.
-     *
-     * @param inputStream Siddhi InputStream
-     * @return QueryInputConfig
-     * @throws DesignGenerationException Error while generating QueryInputConfig
+     * Generates QueryInputConfig object from the given Siddhi InputStream
+     * @param inputStream                       Siddhi InputStream
+     * @return                                  QueryInputConfig
+     * @throws DesignGenerationException        Error while generating QueryInputConfig
      */
     private QueryInputConfig generateInput(InputStream inputStream) throws DesignGenerationException {
         return new QueryInputConfigGenerator(siddhiAppString, siddhiApp).generateQueryInputConfig(inputStream);
     }
 
     /**
-     * Generates AttributesSelectionConfig from the given Siddhi Selector.
-     *
-     * @param selector Siddhi Selector
-     * @return AttributesSelectionConfig
+     * Generates AttributesSelectionConfig from the given Siddhi Selector
+     * @param selector      Siddhi Selector
+     * @return              AttributesSelectionConfig
      */
     private AttributesSelectionConfig generateSelect(Selector selector) {
         AttributesSelectionConfigGenerator attributesSelectionConfigGenerator =
@@ -133,22 +113,20 @@ public class QueryConfigGenerator extends CodeSegmentsPreserver {
     }
 
     /**
-     * Generates QueryOutputConfig from the given Siddhi OutputStream.
-     *
-     * @param outputStream Siddhi OutputStream
-     * @return QueryOutputConfig
-     * @throws DesignGenerationException Error while generating QueryOutputConfig
+     * Generates QueryOutputConfig from the given Siddhi OutputStream
+     * @param outputStream                      Siddhi OutputStream
+     * @return                                  QueryOutputConfig
+     * @throws DesignGenerationException        Error while generating QueryOutputConfig
      */
     private QueryOutputConfig generateOutput(OutputStream outputStream) throws DesignGenerationException {
         return new QueryOutputConfigGenerator(siddhiAppString).generateQueryOutputConfig(outputStream);
     }
 
     /**
-     * Generates 'groupBy' string list from the given Siddhi Variables list.
-     *
-     * @param groupByList List of Siddhi Variables
-     * @return List of strings, representing the groupBy list
-     * @throws DesignGenerationException Error while generating groupBy list
+     * Generates 'groupBy' string list from the given Siddhi Variables list
+     * @param groupByList                       List of Siddhi Variables
+     * @return                                  List of strings, representing the groupBy list
+     * @throws DesignGenerationException        Error while generating groupBy list
      */
     private List<String> generateGroupBy(List<Variable> groupByList) throws DesignGenerationException {
         List<String> groupBy = new ArrayList<>();
@@ -159,27 +137,31 @@ public class QueryConfigGenerator extends CodeSegmentsPreserver {
     }
 
     /**
-     * Generates QueryOrderByConfig list from the given Siddhi OrderByAttribute list.
-     *
-     * @param orderByAttributeList Siddhi OrderByAttribute list
-     * @return QueryOrderByConfig list
+     * Generates QueryOrderByConfig list from the given Siddhi OrderByAttribute list
+     * @param orderByAttributeList      Siddhi OrderByAttribute list
+     * @return                          QueryOrderByConfig list
      */
     private List<QueryOrderByConfig> generateOrderBy(List<OrderByAttribute> orderByAttributeList) {
         List<QueryOrderByConfig> orderBy = new ArrayList<>();
         for (OrderByAttribute orderByAttribute : orderByAttributeList) {
+            String value = "";
+            if (orderByAttribute.getVariable().getStreamId() != null) {
+                value = orderByAttribute.getVariable().getStreamId() + ".";
+            }
+            value += orderByAttribute.getVariable()
+                    .getAttributeName();
             orderBy.add(new QueryOrderByConfig(
-                    orderByAttribute.getVariable().getAttributeName(),
+                    value,
                     orderByAttribute.getOrder().name()));
         }
         return orderBy;
     }
 
     /**
-     * Generates 'having' expression as a string, from the given Siddhi Expression.
-     *
-     * @param havingExpression Siddhi Expression
-     * @return 'having' expression string
-     * @throws DesignGenerationException Error while generating 'having' expression string
+     * Generates 'having' expression as a string, from the given Siddhi Expression
+     * @param havingExpression                  Siddhi Expression
+     * @return                                  'having' expression string
+     * @throws DesignGenerationException        Error while generating 'having' expression string
      */
     private String generateHaving(Expression havingExpression) throws DesignGenerationException {
         if (havingExpression != null) {
@@ -189,11 +171,10 @@ public class QueryConfigGenerator extends CodeSegmentsPreserver {
     }
 
     /**
-     * Generates string for the given Siddhi OutputRate.
-     *
-     * @param outputRate Siddhi OutputRate
-     * @return 'outputRateLimit' string
-     * @throws DesignGenerationException Error while generating 'outputRateLimit' string
+     * Generates string for the given Siddhi OutputRate
+     * @param outputRate                        Siddhi OutputRate
+     * @return                                  'outputRateLimit' string
+     * @throws DesignGenerationException        Error while generating 'outputRateLimit' string
      */
     private String generateOutputRateLimit(OutputRate outputRate) throws DesignGenerationException {
         final String output = "output";
@@ -204,11 +185,10 @@ public class QueryConfigGenerator extends CodeSegmentsPreserver {
     }
 
     /**
-     * Generates the long value for the given 'limit' Siddhi Constant.
-     *
-     * @param limit Siddhi Constant
-     * @return Long value
-     * @throws DesignGenerationException Error while generating value of 'limit'
+     * Generates the long value for the given 'limit' Siddhi Constant
+     * @param limit                             Siddhi Constant
+     * @return                                  Long value
+     * @throws DesignGenerationException        Error while generating value of 'limit'
      */
     private long generateLimit(Constant limit) throws DesignGenerationException {
         if (limit != null) {
@@ -218,11 +198,24 @@ public class QueryConfigGenerator extends CodeSegmentsPreserver {
     }
 
     /**
+     * Generates the long value for the given 'offset' Siddhi Constant
+     * @param offset                             Siddhi Constant
+     * @return                                  Long value
+     * @throws DesignGenerationException        Error while generating value of 'offset'
+     */
+    private long generateOffset(Constant offset) throws DesignGenerationException {
+        if (offset != null) {
+            return Long.parseLong(ConfigBuildingUtilities.getDefinition(offset, siddhiAppString));
+        }
+        return 0;
+    }
+
+
+    /**
      * Generates a string list of Siddhi Annotations, from the given list of Siddhi Annotations.
      * Ignores the 'info' annotation
-     *
-     * @param queryAnnotations List of Siddhi Annotations of a query
-     * @return List of strings, each representing a Siddhi Query Annotation
+     * @param queryAnnotations      List of Siddhi Annotations of a query
+     * @return                      List of strings, each representing a Siddhi Query Annotation
      */
     private List<String> generateAnnotationList(List<Annotation> queryAnnotations) {
         List<String> annotationList = new ArrayList<>();
@@ -237,9 +230,23 @@ public class QueryConfigGenerator extends CodeSegmentsPreserver {
     }
 
     /**
-     * Extracts the query name from the annotation list, or returns the default query name.
-     *
-     * @param annotations Query annotation list
+     * Removes the @info from the query annotations
+     * @param queryAnnotations List of Siddhi Annotations of query
+     * @return annotationList  List of Siddhi Annotation of query without @info
+     */
+    private List<Annotation> removeInfoAnnotation(List<Annotation> queryAnnotations) {
+        List<Annotation> annotationList = new ArrayList<>();
+        for (Annotation queryAnnotation : queryAnnotations) {
+            if (!queryAnnotation.getName().equalsIgnoreCase("info")) {
+                annotationList.add(queryAnnotation);
+            }
+        }
+        return annotationList;
+    }
+
+    /**
+     * Extracts the query name from the annotation list, or returns the default query name
+     * @param annotations           Query annotation list
      * @return query name           name of the query
      */
     private String generateQueryName(List<Annotation> annotations) {
@@ -250,5 +257,22 @@ public class QueryConfigGenerator extends CodeSegmentsPreserver {
             }
         }
         return DEFAULT_QUERY_NAME;
+    }
+
+    /**
+     * Gets the category of the query, for adding and maintaining in relevant lists
+     * @param queryConfig       QueryConfig object
+     * @return                  QueryListType
+     */
+    public static QueryListType getQueryListType(QueryConfig queryConfig) {
+        QueryInputConfig queryInputConfig = queryConfig.getQueryInput();
+        if (queryInputConfig instanceof WindowFilterProjectionConfig) {
+            return QueryListType.WINDOW_FILTER_PROJECTION;
+        } else if (queryInputConfig instanceof JoinConfig) {
+            return QueryListType.JOIN;
+        } else if (queryInputConfig instanceof PatternSequenceConfig) {
+            return QueryListType.valueOf(queryInputConfig.getType());
+        }
+        throw new IllegalArgumentException("Type of Query Input is unknown, for adding the Query");
     }
 }

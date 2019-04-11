@@ -78,7 +78,7 @@ define(['require', 'lodash', 'jquery', 'log', 'backbone', 'file_browser',
                         "<div class='modal-content'>" +
                         "<div class='modal-header'>" +
                         "<button type='button' class='close' data-dismiss='modal' aria-label='Close'>" +
-                        "<span aria-hidden='true'>&times;</span>" +
+                        "<i class='fw fw-cancel about-dialog-close'> </i> " +
                         "</button>" +
                         "<h4 class='modal-title file-dialog-title' id='newConfigModalLabel'>Delete from Workspace<" +
                         "/h4>" +
@@ -156,7 +156,7 @@ define(['require', 'lodash', 'jquery', 'log', 'backbone', 'file_browser',
                             SimulatorClient.getFeedSimulations(
                                 function (data) {
                                     var simulations = JSON.parse(data.message).activeSimulations;
-                                    if (1 > simulations.length) {
+                                    if ( 1 > simulations.length) {
                                         deleteSiddhiAppAndCloseSingleSimulations(callback, this.application);
                                     } else {
                                         var simulationsExists = false;
@@ -175,7 +175,7 @@ define(['require', 'lodash', 'jquery', 'log', 'backbone', 'file_browser',
                                                         },
                                                         function (data) {
                                                             var message = {
-                                                                "type": "ERROR",
+                                                                "type" : "ERROR",
                                                                 "message": "Cannot Simulate Siddhi App \"" + appName + "\" as its in Faulty state."
                                                             };
 
@@ -278,7 +278,7 @@ define(['require', 'lodash', 'jquery', 'log', 'backbone', 'file_browser',
                         var data = {};
                         var workspaceServiceURL = app.config.services.workspace.endpoint;
                         var saveServiceURL = workspaceServiceURL + "/exists/workspace";
-                        var payload = "configName=" + btoa(options.configName);
+                        var payload = "configName=" + self.app.utils.base64EncodeUnicode(options.configName);
 
                         $.ajax({
                             type: "POST",
@@ -302,7 +302,7 @@ define(['require', 'lodash', 'jquery', 'log', 'backbone', 'file_browser',
                         var relativePath = options.oldAppName;
                         var workspaceServiceURL = app.config.services.workspace.endpoint;
                         $.ajax({
-                            url: workspaceServiceURL + "/delete?siddhiAppName=" + options.oldAppName,
+                            url: workspaceServiceURL + "/delete?siddhiAppName=" + options.oldAppName ,
                             type: "DELETE",
                             contentType: "text/plain; charset=utf-8",
                             async: false,

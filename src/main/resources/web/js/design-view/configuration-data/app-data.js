@@ -37,6 +37,7 @@ define(['require', 'elementUtils', 'lodash'],
                 this.commentCodeSegments = options.commentCodeSegments;
             }
             this.appAnnotationList = [];
+            this.appAnnotationListObjects = [];
             this.streamList = [];
             this.tableList = [];
             this.windowList = [];
@@ -59,6 +60,10 @@ define(['require', 'elementUtils', 'lodash'],
 
         AppData.prototype.addAppAnnotation = function (annotation) {
             this.appAnnotationList.push(annotation);
+        };
+
+        AppData.prototype.addAppAnnotationObject = function (annotation) {
+            this.appAnnotationListObjects.push(annotation);
         };
 
         AppData.prototype.addStream = function (stream) {
@@ -115,6 +120,10 @@ define(['require', 'elementUtils', 'lodash'],
 
         AppData.prototype.clearAppAnnotationList = function () {
             ElementUtils.prototype.removeAllElements(this.appAnnotationList);
+        };
+
+        AppData.prototype.clearAppAnnotationListObjects = function () {
+            ElementUtils.prototype.removeAllElements(this.appAnnotationListObjects);
         };
 
         AppData.prototype.removeStream = function (streamId) {
@@ -282,6 +291,10 @@ define(['require', 'elementUtils', 'lodash'],
             return this.appAnnotationList;
         };
 
+        AppData.prototype.getAppAnnotationListObjects = function () {
+            return this.appAnnotationListObjects;
+        };
+
         AppData.prototype.getStreamList = function () {
             return this.streamList;
         };
@@ -349,6 +362,11 @@ define(['require', 'elementUtils', 'lodash'],
         AppData.prototype.setAppAnnotationList = function (appAnnotationList) {
             this.appAnnotationList = appAnnotationList;
         };
+
+        AppData.prototype.setAppAnnotationListObjects = function (appAnnotationListObjects) {
+            this.appAnnotationListObjects = appAnnotationListObjects;
+        };
+
 
         /**
          * @function Get the element by providing the element id

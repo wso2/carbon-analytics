@@ -28,26 +28,26 @@ define(['require', 'elementUtils'],
         var JoinSource = function (options) {
             /*
              Data storing structure as follows.
-             type*: 'STREAM|TABLE|WINDOW|AGGREGATION|TRIGGER',
-             from*: '',
-             streamHandlerList: [
-             {
-             type*: 'FILTER',
-             value*: ''
-             },
-             << and|or >>
-             {
-             type*: 'FUNCTION|WINDOW',
-             value*: {
-             function*: '',
-             parameters*: ['value1',...],
-             }
-             },
-             ...
-             ] // If there is a filter, there must be a window for joins (the only exception is when type = window).
-             as: '',
-             isUnidirectional: true|false // Only one 'isUnidirectional' value can be true at a time (either left definition|right definition|none)
-             */
+                type*: 'STREAM|TABLE|WINDOW|AGGREGATION|TRIGGER',
+                from*: '',
+                streamHandlerList: [
+                    {
+                        type*: 'FILTER',
+                        value*: ''
+                    },
+                    << and|or >>
+                    {
+                        type*: 'FUNCTION|WINDOW',
+                        value*: {
+                            function*: '',
+                            parameters*: ['value1',...],
+                        }
+                    },
+                    ...
+                ] // If there is a filter, there must be a window for joins (the only exception is when type = window).
+                as: '',
+                isUnidirectional: true|false // Only one 'isUnidirectional' value can be true at a time (either left definition|right definition|none)
+            */
             if (options !== undefined) {
                 this.type
                     = (options.type !== undefined) ? (options.type).toUpperCase() : undefined;
@@ -70,7 +70,7 @@ define(['require', 'elementUtils'],
             return this.type;
         };
 
-        JoinSource.prototype.getFrom = function () {
+        JoinSource.prototype.getConnectedSource = function () {
             return this.from;
         };
 
@@ -90,7 +90,7 @@ define(['require', 'elementUtils'],
             this.type = type.toUpperCase();
         };
 
-        JoinSource.prototype.setFrom = function (from) {
+        JoinSource.prototype.setConnectedSource = function (from) {
             this.from = from;
         };
 

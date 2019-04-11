@@ -18,13 +18,14 @@
 
 package io.siddhi.distribution.editor.core.util.designview.beans.configs.siddhielements;
 
+import io.siddhi.distribution.editor.core.util.Constants;
 import io.siddhi.query.api.annotation.Annotation;
 
 import java.util.List;
 import java.util.Map;
 
 /**
- * Represents configuration of a Siddhi Stream.
+ * Represents configuration of a Siddhi Stream
  */
 public class StreamConfig extends SiddhiElementConfig {
     private String name;
@@ -50,20 +51,12 @@ public class StreamConfig extends SiddhiElementConfig {
         return name;
     }
 
-    public void setName(String name) {
-        this.name = name;
-    }
-
     public List<AttributeConfig> getAttributeList() {
         return attributeList;
     }
 
-    public void setAttributeList(List<AttributeConfig> attributeList) {
-        this.attributeList = attributeList;
-    }
-
     public List<Annotation> getAnnotationListObjects() {
-        return annotationListObjects;
+        return  annotationListObjects;
     }
 
     public void setAnnotationListObjects(List<Annotation> annotationListObjects) {
@@ -74,20 +67,32 @@ public class StreamConfig extends SiddhiElementConfig {
         return annotationList;
     }
 
-    public void setAnnotationList(List<String> annotationList) {
-        this.annotationList = annotationList;
-    }
-
     public String getPartitionId() {
         return partitionId;
     }
 
-    public void setPartitionId(String partitionId) {
-        this.partitionId = partitionId;
-    }
-
     public Map<String, String> getConnectorsAndStreams() {
         return connectorsAndStreams;
+    }
+
+    public boolean isFaultStream() {
+        return name.startsWith(Constants.FAULT_STREAM_PREFIX);
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public void setAttributeList(List<AttributeConfig> attributeList) {
+        this.attributeList = attributeList;
+    }
+
+    public void setAnnotationList(List<String> annotationList) {
+        this.annotationList = annotationList;
+    }
+
+    public void setPartitionId(String partitionId) {
+        this.partitionId = partitionId;
     }
 
     public void setConnectorsAndStreams(Map<String, String> connectorsAndStreams) {

@@ -31,6 +31,12 @@
     color: #fff;
 }
 
+.server-property {
+    float: left;
+    display: inline-block;
+    margin-right: 35px;
+}
+
 .file-dialog-form-scrollable-block {
     padding: 20px 20px;
     overflow: auto;
@@ -72,8 +78,8 @@ hr.style1 {
     width: 745px;
 }
 
-.file-dialog-title {
-    padding: 0 0 10px 20px;
+.file-dialog-title{
+    padding:0 0 10px 20px;
 }
 
 .file-dialog-label {
@@ -165,6 +171,7 @@ hr.file-dialog-hr {
 }
 
 .add-new-button {
+    margin-top: 10px;
     height: 35px;
     width: 55px;
     color: white;

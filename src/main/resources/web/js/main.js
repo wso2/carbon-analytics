@@ -18,10 +18,10 @@
 
 define(['require', 'log', 'jquery', 'lodash', 'backbone', 'menu_bar', 'tool_bar', 'command', 'workspace',
         'app/tab/service-tab-list', 'event_simulator', 'app/output-console/service-console-list-manager',
-        'nano_scroller'],
+        'nano_scroller','guide','workspace/file', 'operator_finder', 'utils'],
 
     function (require, log, $, _, Backbone, MenuBar, ToolBar, CommandManager, Workspace, TabController,
-              EventSimulator, OutputController) {
+              EventSimulator, OutputController,NanoScroller, Guide, File, OperatorFinder,Utils) {
 
         var Application = Backbone.View.extend(
             /** @lends Application.prototype */
@@ -38,19 +38,21 @@ define(['require', 'log', 'jquery', 'lodash', 'backbone', 'menu_bar', 'tool_bar'
                     var pathSeparator;
                     this.initComponents();
                     $(".nano").nanoScroller();
-                    $("#service-tabs-wrapper").on("resize", function (event, ui) {
-                        if (self.tabController.activeTab._title != "welcome-page") {
+                    $( "#service-tabs-wrapper" ).on( "resize", function( event, ui ) {
+                        if(self.tabController.activeTab._title != "welcome-page"){
                             if (self.tabController.activeTab.getSiddhiFileEditor().isInSourceView()) {
                                 self.tabController.activeTab.getSiddhiFileEditor().getSourceView().editorResize();
                             }
                         }
-                    });
+                    } );
                 },
 
-                initComponents: function () {
+                initComponents: function(){
 
                     // init command manager
                     this.commandManager = new CommandManager(this);
+
+                    this.utils = new Utils();
 
                     //init menu bar
                     var menuBarOpts = _.get(this.config, "menu_bar");
@@ -87,6 +89,14 @@ define(['require', 'log', 'jquery', 'lodash', 'backbone', 'menu_bar', 'tool_bar'
                     _.set(eventSimulatorOpts, 'application', this);
                     this.eventSimulator = new EventSimulator(eventSimulatorOpts);
                     this.eventSimulator.stopRunningSimulations();
+
+                    //init Hint Guide
+                    this.guide = new Guide(this);
+
+                    // Initialize operator finder.
+                    var operatorFinderOpts = _.get(this.config, 'operator_finder');
+                    _.set(operatorFinderOpts, 'application', this);
+                    this.operatorFinder = new OperatorFinder.OperatorFinder(operatorFinderOpts);
                 },
 
                 render: function () {
@@ -109,9 +119,13 @@ define(['require', 'log', 'jquery', 'lodash', 'backbone', 'menu_bar', 'tool_bar'
                     log.debug("start: rendering event simulator control");
                     this.eventSimulator.render();
                     log.debug("end: rendering event simulator control");
+
+                    log.debug("start: rendering operator finder");
+                    this.operatorFinder.render();
+                    log.debug("end: rendering operator finder");
                 },
 
-                getOperatingSystem: function () {
+                getOperatingSystem: function(){
                     var operatingSystem = "Unknown OS";
                     if (navigator.appVersion.indexOf("Win") != -1) {
                         operatingSystem = "Windows";
@@ -132,12 +146,20 @@ define(['require', 'log', 'jquery', 'lodash', 'backbone', 'menu_bar', 'tool_bar'
                     this.workspaceManager.displayInitialTab();
                 },
 
-                isRunningOnMacOS: function () {
+                runInitialGuide: function (){
+                    var isFreshUser = (this.browserStorage.get('guideFileNameIncrement') === null);
+                    if(isFreshUser) {
+                        this.guide.startGuide();
+                        this.browserStorage.put("guideFileNameIncrement", 1);
+                    }
+                },
+
+                isRunningOnMacOS: function(){
                     return _.isEqual(this.getOperatingSystem(), 'MacOS');
                 },
 
-                getPathSeperator: function () {
-                    if (this.pathSeparator != undefined) {
+                getPathSeperator: function(){
+                    if(this.pathSeparator != undefined) {
                         return this.pathSeparator;
                     } else {
                         this.pathSeparator = this.workspaceExplorer._serviceClient.readPathSeparator();
@@ -145,11 +167,11 @@ define(['require', 'log', 'jquery', 'lodash', 'backbone', 'menu_bar', 'tool_bar'
                     }
                 },
 
-                applicationConstants: function () {
+                applicationConstants: function() {
                     var constants = {
                         messageLinkType: {
-                            OutOnly: 1,
-                            InOut: 2
+                            OutOnly : 1,
+                            InOut : 2
                         }
                     };
 

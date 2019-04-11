@@ -17,22 +17,23 @@
  */
 
 define(['lodash', 'event_channel', 'menu_item'],
-    function (_, EventChannel, MenuItem) {
+    function (_, EventChannel, MenuItem){
 
-        var MenuGroup = function (args) {
+        var MenuGroup = function(args){
             _.assign(this, args);
         };
 
         MenuGroup.prototype = Object.create(EventChannel.prototype);
         MenuGroup.prototype.constructor = MenuGroup;
 
-        MenuGroup.prototype.render = function () {
+        MenuGroup.prototype.render = function(){
 
             var menuItemDefinitions = _.get(this, 'definition.items');
             var parent = _.get(this, 'options.parent');
             var menuItemOpts = _.cloneDeep(_.get(this, 'options.menu_item'));
 
             var toolBarDiv = $('<div></div>');
+            toolBarDiv.attr('id', _.get(this, 'definition.label'));
             toolBarDiv.addClass(_.get(this, 'options.cssClass.group'));
             parent.append(toolBarDiv);
 
@@ -40,11 +41,11 @@ define(['lodash', 'event_channel', 'menu_item'],
             title.text(_.get(this, 'definition.label'));
             title.addClass(_.get(this, 'options.cssClass.toggle'));
             title.attr("data-toggle", "dropdown");
-            title.on('mouseover', function (e) {
+            title.on('mouseover', function(e){
                 var thisElem = $(e.target).parent();
                 var toggleClass = 'open';
                 _.some(thisElem.siblings(), function (el) {
-                    if ($(el).hasClass(toggleClass)) {
+                    if($(el).hasClass(toggleClass)){
                         thisElem.addClass(toggleClass);
                         $(el).removeClass(toggleClass);
                         return;
@@ -72,7 +73,7 @@ define(['lodash', 'event_channel', 'menu_item'],
             });
         };
 
-        MenuGroup.prototype.getID = function () {
+        MenuGroup.prototype.getID = function(){
             return _.get(this, 'definition.id');
         };
 

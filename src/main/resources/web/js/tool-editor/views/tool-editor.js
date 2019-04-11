@@ -77,12 +77,12 @@ define(['require', 'jquery', 'backbone', 'lodash', 'log', 'design_view', "./sour
                     designContainer.attr('id', designViewDynamicId);
 
                     /*
-                     * Use the below line to assign dynamic id for design grid container and pass the id to initialize
-                     * jsPlumb.
-                     *
-                     * NOTE: jsPlumb is loaded via the index.html as a common script for the entire program. When a new
-                     * tab is created, that tab is initialised with a dedicated jsPlumb instance.
-                     * */
+                    * Use the below line to assign dynamic id for design grid container and pass the id to initialize
+                    * jsPlumb.
+                    *
+                    * NOTE: jsPlumb is loaded via the index.html as a common script for the entire program. When a new
+                    * tab is created, that tab is initialised with a dedicated jsPlumb instance.
+                    * */
                     var designGridDynamicId = "design-grid-container-" + this._$parent_el.attr('id');
                     var designViewGridContainer =
                         this._$parent_el.find(_.get(this.options, 'design_view.grid_container'));
@@ -170,35 +170,39 @@ define(['require', 'jquery', 'backbone', 'lodash', 'log', 'design_view', "./sour
                                 DesignViewUtils.prototype.warnAlert("Please save the file before switching to the Design View");
                                 return;
                             }
-                            var response = self._designView.getDesign(self.getContent());
-                            if (response.status === "success") {
-                                self.JSONObject = JSON.parse(response.responseString);
-                                sourceContainer.hide();
-                                loadingScreen.show();
-                                // The following code has been added to the setTimeout() method because
-                                // the code needs to run asynchronously for the loading screen
-                                setTimeout(function () {
-                                    var fileHashCode = application.tabController.getActiveTab().getFile().attributes.hashCode;
-                                    var renderedAppContentHashCode = designView.getHashCode();
-                                    if (fileHashCode != renderedAppContentHashCode || fileHashCode == undefined &&
-                                        renderedAppContentHashCode == undefined) {
-                                        designView.setHashCode(fileHashCode);
-                                        designView.emptyDesignViewGridContainer();
-                                        designContainer.show();
-                                        designView.renderDesignGrid(self.JSONObject);
-                                        loadingScreen.hide();
-                                    } else {
-                                        designContainer.show();
-                                        loadingScreen.hide();
-                                    }
-                                    // NOTE - This trigger should be always handled at the end of setTimeout()
-                                    self.trigger("view-switch");
-                                }, 100);
-                                toggleViewButton.html("<i class=\"fw fw-code\"></i>" +
-                                    "<span class=\"toggle-button-text\">Source View</span>");
-                            } else if (response.status === "fail") {
-                                DesignViewUtils.prototype.errorAlert(response.errorMessage);
-                            }
+
+                            loadingScreen.show();
+                            setTimeout(function(){
+                                var response = self._designView.getDesign(self.getContent());
+                                if (response.status === "success") {
+                                    self.JSONObject = JSON.parse(response.responseString);
+                                    sourceContainer.hide();
+                                    // The following code has been added to the setTimeout() method because
+                                    // the code needs to run asynchronously for the loading screen
+                                    setTimeout(function () {
+                                        var fileHashCode = application.tabController.getActiveTab().getFile().attributes.hashCode;
+                                        var renderedAppContentHashCode = designView.getHashCode();
+                                        if (fileHashCode != renderedAppContentHashCode || fileHashCode == undefined &&
+                                            renderedAppContentHashCode == undefined) {
+                                            designView.setHashCode(fileHashCode);
+                                            designView.emptyDesignViewGridContainer();
+                                            designContainer.show();
+                                            designView.renderDesignGrid(self.JSONObject);
+                                            loadingScreen.hide();
+                                        } else {
+                                            designContainer.show();
+                                            loadingScreen.hide();
+                                        }
+                                        // NOTE - This trigger should be always handled at the end of setTimeout()
+                                        self.trigger("view-switch", { view: 'design' });
+                                    }, 100);
+                                    toggleViewButton.html("<i class=\"fw fw-code\"></i>" +
+                                        "<span class=\"toggle-button-text\">Source View</span>");
+                                } else if (response.status === "fail") {
+                                    loadingScreen.hide();
+                                    DesignViewUtils.prototype.errorAlert(response.errorMessage);
+                                }
+                            }, 100);
                         } else if (designContainer.is(':visible')) {
 
                             /**
@@ -250,7 +254,7 @@ define(['require', 'jquery', 'backbone', 'lodash', 'log', 'design_view', "./sour
                             if (!isDesignViewContentChanged) {
                                 designContainer.hide();
                                 sourceContainer.show();
-                                self.trigger("view-switch");
+                                self.trigger("view-switch", { view: 'source' });
                                 toggleViewButton.html("<i class=\"fw fw-design-view fw-rotate-90\"></i>" +
                                     "<span class=\"toggle-button-text\">Design View</span>");
                                 return;
@@ -281,7 +285,7 @@ define(['require', 'jquery', 'backbone', 'lodash', 'log', 'design_view', "./sour
                                     self._sourceView.format();
                                     loadingScreen.hide();
                                     // NOTE - This trigger should be always handled at the end of setTimeout()
-                                    self.trigger("view-switch");
+                                    self.trigger("view-switch", { view: 'source' });
                                 }, 100);
                                 toggleViewButton.html("<i class=\"fw fw-design-view fw-rotate-90\"></i>" +
                                     "<span class=\"toggle-button-text\">Design View</span>");

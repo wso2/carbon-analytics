@@ -65,52 +65,68 @@ define(['log', 'jquery', 'lodash', 'workspace', 'backbone'],
                     ConsoleList.prototype.render.call(this);
                     this.initiateLogReader(this._options);
                 },
-                runApp: function () {
+                runApp: function(){
                     var launcher = this.application.tabController.getActiveTab().getSiddhiFileEditor().getLauncher();
                     launcher.runApplication(this.application.workspaceManager, false);
                 },
-                debugApp: function () {
+                debugApp: function(){
                     var launcher = this.application.tabController.getActiveTab().getSiddhiFileEditor().getLauncher();
                     launcher.debugApplication(this.application.workspaceManager, false);
                 },
-                stopApp: function () {
+                stopApp: function(){
                     var launcher = this.application.tabController.getActiveTab().getSiddhiFileEditor().getLauncher();
                     launcher.stopApplication(this.application.workspaceManager, false);
                 },
-                revertAppContent: function () {
+                revertAppContent: function(){
                     this.application.workspaceManager.revertAppContent();
                 },
-                disableRunButton: function () {
+                disableRunButton: function(){
                     this._runButn.addClass("disabled");
                     this._runButn.removeClass("active");
                 },
-                disableDebugButton: function () {
+                disableDebugButton: function(){
                     this._debugBtn.addClass("disabled");
                     this._debugBtn.removeClass("active");
                 },
-                disableStopButton: function () {
+                disableStopButton: function(){
                     this._stopBtn.addClass("disabled");
                     this._stopBtn.removeClass("active");
                 },
-                disableRevertButton: function () {
+                disableRevertButton: function(){
                     this._revertBtn.addClass("disabled");
                     this._revertBtn.removeClass("active");
                 },
-                enableRunButton: function () {
+                enableRunButton: function(){
                     this._runButn.removeClass("disabled");
                     this._runButn.addClass("active");
                 },
-                enableDebugButton: function () {
+                enableDebugButton: function(){
                     this._debugBtn.removeClass("disabled");
                     this._debugBtn.addClass("active");
                 },
-                enableStopButton: function () {
+                enableStopButton: function(){
                     this._stopBtn.removeClass("disabled");
                     this._stopBtn.addClass("active");
                 },
-                enableRevertButton: function () {
+                enableRevertButton: function(){
                     this._revertBtn.removeClass("disabled");
                     this._revertBtn.addClass("active");
+                },
+                enableStopButtonLoading: function(){
+                    var stopElement = this._stopBtn.find('.fw-stop');
+                    stopElement.addClass('fw-loader5');
+                    stopElement.addClass('fw-spin');
+                    stopElement.removeClass('fw-stop');
+                    this._stopBtn.css('cursor', 'not-allowed');
+                    this._stopBtn.attr('title', 'Stopping');
+                },
+                disableStopButtonLoading: function(){
+                    var stopElement = this._stopBtn.find('.fw-loader5');
+                    stopElement.removeClass('fw-loader5');
+                    stopElement.removeClass('fw-spin');
+                    stopElement.addClass('fw-stop');
+                    this._stopBtn.attr('title', 'Stop');
+                    this._stopBtn.removeAttr('style');
                 }
             });
         return ToolBar;

@@ -32,14 +32,14 @@ define(['jquery', 'lodash', 'backbone', 'log'], function ($, _, Backbone, log) {
             },
             initialize: function (attrs, options) {
                 var errMsg;
-                if (!this.get('isPersisted')) {
-                    if (!_.has(options, 'storage')) {
+                if (!this.get('isPersisted')){
+                    if(!_.has(options, 'storage')){
                         errMsg = 'unable to find storage' + _.toString(attrs);
                         log.error(errMsg);
                         throw errMsg;
                     }
                     this._storage = _.get(options, 'storage');
-                    this._storage.create(this);
+                    this._storage .create(this);
                 } else {
                     this.setHash(this.generateHash(this.getContent().trim()));
                 }
@@ -56,8 +56,8 @@ define(['jquery', 'lodash', 'backbone', 'log'], function ($, _, Backbone, log) {
                 return newHash;
             },
 
-            save: function (isTriggeredBySaveFlow) {
-                if (!_.isNil(this._storage.get(this.id))) {
+            save: function(isTriggeredBySaveFlow){
+                if(!_.isNil(this._storage.get(this.id))){
                     if (isTriggeredBySaveFlow == true) {
                         this.setHash(this.generateHash(this.getContent().trim()));
                     }
@@ -73,48 +73,48 @@ define(['jquery', 'lodash', 'backbone', 'log'], function ($, _, Backbone, log) {
                 return this;
             },
 
-            setPath: function (path) {
+            setPath: function(path){
                 this.set('path', path);
                 return this;
             },
 
-            setStorage: function (storage) {
+            setStorage: function(storage){
                 this._storage = storage;
                 return this;
             },
 
-            setPersisted: function (isPersisted) {
+            setPersisted: function(isPersisted){
                 this.set('isPersisted', isPersisted);
                 return this;
             },
 
-            setLastPersisted: function (lsatPersisted) {
+            setLastPersisted: function(lsatPersisted){
                 this.set('lastPersisted', lsatPersisted);
                 return this;
             },
 
-            setDirty: function (isDirty) {
+            setDirty: function(isDirty){
                 this.set('isDirty', isDirty);
                 this.trigger('dirty-state-change', isDirty);
                 return this;
             },
 
-            setName: function (name) {
+            setName: function(name){
                 this.set('name', name);
                 return this;
             },
 
-            setRunStatus: function (status) {
+            setRunStatus: function(status){
                 this.set('runStatus', status);
                 return this;
             },
 
-            setDebugStatus: function (status) {
+            setDebugStatus: function(status){
                 this.set('debugStatus', status);
                 return this;
             },
 
-            setContent: function (name) {
+            setContent: function(name){
                 this.set('content', name);
                 return this;
             },
@@ -123,38 +123,47 @@ define(['jquery', 'lodash', 'backbone', 'log'], function ($, _, Backbone, log) {
                 return this.get('hashCode');
             },
 
-            getPath: function () {
+            getPath: function(){
                 return this.get('path')
             },
 
-            getName: function () {
+            getName: function(){
                 return this.get('name')
             },
 
-            getRunStatus: function () {
+            getRunStatus: function(){
                 return this.get('runStatus')
             },
 
-            getDebugStatus: function () {
+            getDebugStatus: function(){
                 return this.get('debugStatus')
             },
 
-            getContent: function () {
+            getContent: function(){
                 return this.get('content')
             },
 
-            getLastPersisted: function () {
+            getLastPersisted: function(){
                 return this.get('lastPersisted');
             },
 
 
-            isPersisted: function () {
+            isPersisted: function(){
                 return this.get('isPersisted')
             },
 
-            isDirty: function () {
+            isDirty: function(){
                 return this.get('isDirty')
-            }
+            },
+
+            isStopProcessRunning: function () {
+                return this.get('stopProcessRunning');
+            },
+
+            setStopProcessRunning: function(stopTriggered){
+                this.set('stopProcessRunning', stopTriggered);
+                return this;
+            },
 
         });
 

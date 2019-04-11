@@ -18,9 +18,9 @@
 
 define(['require', 'log', 'lodash', 'jquery', 'partition', 'stream', 'query', 'formBuilder', 'aggregation',
         'jsonValidator', 'sourceOrSinkAnnotation', 'stream', 'table', 'window', 'trigger', 'functionDefinition',
-        'constants'],
+        'constants', 'attribute'],
     function (require, log, _, $, Partition, Stream, Query, FormBuilder, Aggregation, JSONValidator,
-              SourceOrSinkAnnotation, Stream, Table, Window, Trigger, FunctionDefinition, Constants) {
+              SourceOrSinkAnnotation, Stream, Table, Window, Trigger, FunctionDefinition,Constants,Attribute) {
 
         /**
          * @class DesignView
@@ -33,6 +33,10 @@ define(['require', 'log', 'lodash', 'jquery', 'partition', 'stream', 'query', 'f
         const DELETE_KEY = 46;
         const MAC_COMMAND_KEY = 91;
         const MAC_DELETE_KEY = 8;
+        const LEFT_ARROW_KEY = 37;
+        const RIGHT_ARROW_KEY = 39;
+        const ESCAPE_KEY = 27;
+        const TAB_KEY = 9;
 
         var DropElements = function (options) {
             var errorMessage = 'unable to find design view container';
@@ -59,6 +63,7 @@ define(['require', 'log', 'lodash', 'jquery', 'partition', 'stream', 'query', 'f
             _.set(formBuilderOptions, 'configurationData', this.configurationData);
             _.set(formBuilderOptions, 'jsPlumbInstance', this.jsPlumbInstance);
             _.set(formBuilderOptions, 'dropElementInstance', this);
+            _.set(formBuilderOptions, 'designGrid', this.designGrid);
             this.formBuilder = new FormBuilder(formBuilderOptions);
         };
 
@@ -74,6 +79,7 @@ define(['require', 'log', 'lodash', 'jquery', 'partition', 'stream', 'query', 'f
         DropElements.prototype.dropSource = function (newAgent, i, top, left, isCodeToDesignMode, sourceName) {
 
             var self = this;
+            var name;
             if (isCodeToDesignMode) {
                 name = sourceName;
             } else {
@@ -104,7 +110,7 @@ define(['require', 'log', 'lodash', 'jquery', 'partition', 'stream', 'query', 'f
             /*
              prop --> When clicked on this icon, a definition and related information of the Source Element will
              be displayed in a form
-             */
+            */
             var settingsIconId = "" + i + "-dropSourceSettingsId";
             var prop = $('<i id="' + settingsIconId + '" ' +
                 'class="fw fw-settings element-prop-icon collapse"></i>');
@@ -121,7 +127,7 @@ define(['require', 'log', 'lodash', 'jquery', 'partition', 'stream', 'query', 'f
             /*
              connection --> The connection anchor point is appended to the element
              */
-            self.generateSpecificSourceConnectionElements(name, self.jsPlumbInstance, i, finalElement);
+            self.generateSpecificSourceConnectionElements(name,self.jsPlumbInstance, i, finalElement);
             var connection = $('<div class="connectorOutSource">').attr('id', i + "-out").addClass('connection');
 
             finalElement.append(connection);
@@ -191,7 +197,7 @@ define(['require', 'log', 'lodash', 'jquery', 'partition', 'stream', 'query', 'f
             /*
              prop --> When clicked on this icon, a definition and related information of the Sink Element will
              be displayed in a form
-             */
+            */
             var settingsIconId = "" + i + "-dropSinkSettingsId";
             var prop = $('<i id="' + settingsIconId + '" ' +
                 'class="fw fw-settings element-prop-icon collapse"></i>');
@@ -208,7 +214,7 @@ define(['require', 'log', 'lodash', 'jquery', 'partition', 'stream', 'query', 'f
             /*
              connection --> The connection anchor point is appended to the element
              */
-            self.generateSpecificSinkConnectionElements(name, self.jsPlumbInstance, i, finalElement);
+            self.generateSpecificSinkConnectionElements(name,self.jsPlumbInstance, i, finalElement);
             var connection = $('<div class="connectorInSink">').attr('id', i + "-in").addClass('connection');
 
             finalElement.append(connection);
@@ -246,21 +252,20 @@ define(['require', 'log', 'lodash', 'jquery', 'partition', 'stream', 'query', 'f
          * @param streamName name of the stream
          */
         DropElements.prototype.dropStream = function (newAgent, i, top, left, isCodeToDesignMode,
-                                                      isGenerateStreamFromQueryOutput, streamName) {
+                                                      isGenerateStreamFromQueryOutput, streamName, hasFaultStream, inFaultStreamCreationPath) {
             /*
              The node hosts a text node where the Stream's name input by the user will be held.
              Rather than simply having a `newAgent.text(streamName)` statement, as the text function tends to
              reposition the other appended elements with the length of the Stream name input by the user.
-             */
-
+            */
             var self = this;
             var name;
-            if (isCodeToDesignMode) {
+            if (isCodeToDesignMode || inFaultStreamCreationPath) {
                 name = streamName;
             } else {
                 if (isGenerateStreamFromQueryOutput) {
                     name = streamName;
-                } else {
+                } else if (!hasFaultStream) {
                     var streamOptions = {};
                     _.set(streamOptions, 'id', i);
                     _.set(streamOptions, 'name', undefined);
@@ -291,7 +296,7 @@ define(['require', 'log', 'lodash', 'jquery', 'partition', 'stream', 'query', 'f
              be displayed in a form
              showIcon --> An icon that elucidates whether the dropped stream element is an Import/Export/Defined
              stream (In this case: an Import arrow icon)
-             */
+            */
             var settingsIconId = "" + i + "-dropStreamSettingsId";
             var prop = $('<i id="' + settingsIconId + '" ' +
                 'class="fw fw-settings element-prop-icon collapse"></i>');
@@ -308,9 +313,21 @@ define(['require', 'log', 'lodash', 'jquery', 'partition', 'stream', 'query', 'f
             /*
              connection --> The connection anchor point is appended to the element
              */
+
             var connection1 = $('<div class="connectorInStream">').attr('id', i + "-in").addClass('connection');
             var connection2 = $('<div class="connectorOutStream">').attr('id', i + "-out").addClass('connection');
 
+            var connectionErrOut;
+            if (hasFaultStream) {
+                connectionErrOut = $('<div class="error-connection connectorErrOutStream">').attr('id', i + "-err-out");
+                finalElement.append(connectionErrOut);
+                $("#"+finalElement[0].id).addClass('errorStreamDrop');
+
+                connection1 = $('<div class="connectorInStreamForErrorStream">').attr('id', i + "-in").
+                addClass('connection');
+                connection2 = $('<div class="connectorOutForErrorStream">').attr('id', i + "-out").
+                addClass('connection');
+            }
 
             finalElement.append(connection1);
             finalElement.append(connection2);
@@ -339,6 +356,15 @@ define(['require', 'log', 'lodash', 'jquery', 'partition', 'stream', 'query', 'f
                 deleteEndpointsOnDetach: true,
                 anchor: 'Right'
             });
+
+            if (hasFaultStream) {
+                self.jsPlumbInstance.makeSource(connectionErrOut, {
+                    deleteEndpointsOnDetach: true,
+                    anchor: 'Right',
+                    connectorStyle: { strokeWidth: 2, stroke: '#FF0000', outlineStroke: 'transparent',
+                        outlineWidth: '3' }
+                });
+            }
         };
 
         /**
@@ -411,7 +437,7 @@ define(['require', 'log', 'lodash', 'jquery', 'partition', 'stream', 'query', 'f
              The node hosts a text node where the Table's name input by the user will be held.
              Rather than simply having a `newAgent.text(tableName)` statement, as the text function tends to
              reposition the other appended elements with the length of the Table name input by the user.
-             */
+            */
 
             var self = this;
             var name;
@@ -444,7 +470,7 @@ define(['require', 'log', 'lodash', 'jquery', 'partition', 'stream', 'query', 'f
             /*
              prop --> When clicked on this icon, a definition and related information of the Table Element will
              be displayed in a form
-             */
+            */
             var settingsIconId = "" + i + "-dropTableSettingsId";
             var prop = $('<i id="' + settingsIconId + '" ' +
                 'class="fw fw-settings element-prop-icon collapse"></i>');
@@ -508,7 +534,7 @@ define(['require', 'log', 'lodash', 'jquery', 'partition', 'stream', 'query', 'f
              The node hosts a text node where the Window's name input by the user will be held.
              Rather than simply having a `newAgent.text(windowName)` statement, as the text function tends to
              reposition the other appended elements with the length of the Window name input by the user.
-             */
+            */
 
             var self = this;
             var name;
@@ -541,7 +567,7 @@ define(['require', 'log', 'lodash', 'jquery', 'partition', 'stream', 'query', 'f
             /*
              prop --> When clicked on this icon, a definition and related information of the Window Element will
              be displayed as an DesignViewUtils.prototype.warnAlert message
-             */
+            */
             var settingsIconId = "" + i + "-dropWindowSettingsId";
             var prop = $('<i id="' + settingsIconId + '" ' +
                 'class="fw fw-settings element-prop-icon collapse"></i>');
@@ -605,7 +631,7 @@ define(['require', 'log', 'lodash', 'jquery', 'partition', 'stream', 'query', 'f
              The node hosts a text node where the Trigger's name input by the user will be held.
              Rather than simply having a `newAgent.text(triggerName)` statement, as the text function tends to
              reposition the other appended elements with the length of the Trigger name input by the user.
-             */
+            */
 
             var self = this;
             var name;
@@ -638,7 +664,7 @@ define(['require', 'log', 'lodash', 'jquery', 'partition', 'stream', 'query', 'f
             /*
              prop --> When clicked on this icon, a definition and related information of the Trigger Element will
              be displayed as an DesignViewUtils.prototype.warnAlert message
-             */
+            */
             var settingsIconId = "" + i + "-dropTriggerSettingsId";
             var prop = $('<i id="' + settingsIconId + '" ' +
                 'class="fw fw-settings element-prop-icon collapse"></i>');
@@ -703,7 +729,7 @@ define(['require', 'log', 'lodash', 'jquery', 'partition', 'stream', 'query', 'f
              The node hosts a text node where the Aggregation's name input by the user will be held.
              Rather than simply having a `newAgent.text(aggregationName)` statement, as the text function tends to
              reposition the other appended elements with the length of the Aggregation name input by the user.
-             */
+            */
 
             var self = this;
             var name;
@@ -739,7 +765,7 @@ define(['require', 'log', 'lodash', 'jquery', 'partition', 'stream', 'query', 'f
             /*
              prop --> When clicked on this icon, a definition and related information of the Aggregation Element will
              be displayed as an DesignViewUtils.prototype.warnAlert message
-             */
+            */
             var settingsIconId = "" + i + "-dropAggregationSettingsId";
             var prop = $('<i id="' + settingsIconId + '" ' +
                 'class="fw fw-settings element-prop-icon collapse"></i>');
@@ -804,7 +830,7 @@ define(['require', 'log', 'lodash', 'jquery', 'partition', 'stream', 'query', 'f
              The node hosts a text node where the Function's name input by the user will be held.
              Rather than simply having a `newAgent.text(functionName)` statement, as the text function tends to
              reposition the other appended elements with the length of the Function name input by the user.
-             */
+            */
 
             var self = this;
             var name;
@@ -840,7 +866,7 @@ define(['require', 'log', 'lodash', 'jquery', 'partition', 'stream', 'query', 'f
             /*
              prop --> When clicked on this icon, a definition and related information of the Function Element will
              be displayed as an DesignViewUtils.prototype.warnAlert message
-             */
+            */
             var settingsIconId = "" + i + "-dropFunctionSettingsId";
             var prop = $('<i id="' + settingsIconId + '" ' +
                 'class="fw fw-settings element-prop-icon collapse"></i>');
@@ -885,7 +911,7 @@ define(['require', 'log', 'lodash', 'jquery', 'partition', 'stream', 'query', 'f
             /*
              A text node division will be appended to the newAgent element so that the element name can be changed in
              the text node and doesn't need to be appended to the newAgent Element every time the user changes it
-             */
+            */
             var self = this;
             var node = $('<div>' + text + '</div>');
             newAgent.append(node);
@@ -974,7 +1000,7 @@ define(['require', 'log', 'lodash', 'jquery', 'partition', 'stream', 'query', 'f
             /*
              A text node division will be appended to the newAgent element so that the element name can be changed in
              the text node and doesn't need to be appended to the newAgent Element every time the user changes it
-             */
+            */
             var self = this;
             var node = $('<div>' + patternQueryName + '</div>');
             newAgent.append(node);
@@ -1006,7 +1032,7 @@ define(['require', 'log', 'lodash', 'jquery', 'partition', 'stream', 'query', 'f
             /*
              prop --> When clicked on this icon, a definition and related information of the PatternQuery Element will
              be displayed as an DesignViewUtils.prototype.warnAlert message
-             */
+            */
             var settingsIconId = "" + i + "-dropPatternQuerySettingsId";
             var prop = $('<i id="' + settingsIconId + '" ' +
                 'class="fw fw-settings element-prop-icon collapse"></i>');
@@ -1072,7 +1098,7 @@ define(['require', 'log', 'lodash', 'jquery', 'partition', 'stream', 'query', 'f
             /*
              A text node division will be appended to the newAgent element so that the element name can be changed in
              the text node and doesn't need to be appended to the newAgent Element every time the user changes it
-             */
+            */
             var self = this;
             var node = $('<div>' + sequenceQueryName + '</div>');
             newAgent.append(node);
@@ -1105,7 +1131,7 @@ define(['require', 'log', 'lodash', 'jquery', 'partition', 'stream', 'query', 'f
             /*
              prop --> When clicked on this icon, a definition and related information of the SequenceQuery Element will
              be displayed in a form
-             */
+            */
             var settingsIconId = "" + i + "-dropSequenceQuerySettingsId";
             var prop = $('<i id="' + settingsIconId + '" ' +
                 'class="fw fw-settings element-prop-icon collapse"></i>');
@@ -1171,7 +1197,7 @@ define(['require', 'log', 'lodash', 'jquery', 'partition', 'stream', 'query', 'f
             /*
              A text node division will be appended to the newAgent element so that the element name can be changed in
              the text node and doesn't need to be appended to the newAgent Element every time the user changes it
-             */
+            */
             var self = this;
             var node = $('<div>' + text + '</div>');
             newAgent.append(node);
@@ -1348,8 +1374,8 @@ define(['require', 'log', 'lodash', 'jquery', 'partition', 'stream', 'query', 'f
                     maxConnections: 1
                 });
             } else {
-                if ($("#" + i + "-in").length) {
-                    $("#" + i + "-in").remove();
+                if ($( "#" + i + "-in" ).length) {
+                    $( "#" + i + "-in" ).remove();
                 }
             }
 
@@ -1362,17 +1388,114 @@ define(['require', 'log', 'lodash', 'jquery', 'partition', 'stream', 'query', 'f
                 jsPlumbInstance.makeSource(connectionOut, {
                     deleteEndpointsOnDetach: true,
                     anchor: 'Right',
-                    connectorStyle: {
-                        strokeWidth: 2, stroke: "#424242", dashstyle: "2 3", outlineStroke: "transparent",
-                        outlineWidth: "3"
-                    }
+                    connectorStyle: { strokeWidth: 2, stroke: "#424242", dashstyle: "2 3", outlineStroke: "transparent",
+                        outlineWidth: "3" }
                 });
             } else {
-                if ($("#" + i + "-out").length) {
-                    $("#" + i + "-out").remove();
+                if ($( "#" + i + "-out" ).length) {
+                    $( "#" + i + "-out" ).remove();
                 }
             }
 
+        };
+
+        DropElements.prototype.toggleFaultStreamConnector = function(stream, jsPlumbInstance,
+                                                                     previouslySavedStreamName) {
+            var self = this;
+            var oldFaultStreamName = Constants.FAULT_STREAM_PREFIX + previouslySavedStreamName;
+            var oldFaultStreamElementId = "";
+            self.configurationData.getSiddhiAppConfig().getStreamList().forEach(function(s) {
+                if (oldFaultStreamName === s.getName()) {
+                    oldFaultStreamElementId = s.getId();
+                }
+            });
+
+            if (oldFaultStreamElementId != "") {
+                self.configurationData.getSiddhiAppConfig().removeStream(oldFaultStreamElementId);
+                $( "#" + oldFaultStreamElementId ).remove();
+            }
+            if (stream.hasFaultStream()) {
+                //remove existing connectionDots
+                $('#' + stream.getId() + '-in').remove();
+                $('#' + stream.getId() + '-out').remove();
+
+                var connection1 = $('<div class="connectorInStreamForErrorStream">').attr('id', stream.getId() + "-in").
+                addClass('connection');
+                var connection2 = $('<div class="connectorOutForErrorStream">').attr('id', stream.getId() + "-out").
+                addClass('connection');
+                $('#' + stream.getId()).append(connection1);
+                $('#' + stream.getId()).append(connection2);
+
+                jsPlumbInstance.makeTarget(connection1, {
+                    deleteEndpointsOnDetach: true,
+                    anchor: 'Left'
+                });
+
+                jsPlumbInstance.makeSource(connection2, {
+                    deleteEndpointsOnDetach: true,
+                    anchor: 'Right'
+                });
+
+                var faultStreamName = Constants.FAULT_STREAM_PREFIX + stream.getName();
+                var connectionErrOut = $('<div class="error-connection connectorErrOutStream">')
+                    .attr('id', stream.getId() + "-err-out");
+                $('#' + stream.getId()).append(connectionErrOut);
+                jsPlumbInstance.makeSource(connectionErrOut, {
+                    deleteEndpointsOnDetach: true,
+                    anchor: 'Right',
+                    connectorStyle: { strokeWidth: 2, stroke: '#FF0000',
+                        outlineStroke: 'transparent',
+                        outlineWidth: '3' }
+                });
+
+                $('#' + stream.getId()).addClass('errorStreamDrop');
+
+                //create error object for faults stream
+                var id = self.designGrid.generateNextNewAgentId();
+
+                //add error object
+                var attributeObject = new Attribute({ name: "_error", type: "OBJECT" });
+                var attributeList = stream.getAttributeList();
+                // Add the fault stream to the stream list
+                var faultStream = new Stream({
+                    id: id,
+                    name: faultStreamName
+                });
+                for(var i = 0; i < attributeList.length; i++) {
+                    var obj = attributeList[i];
+                    faultStream.addAttribute(obj);
+                }
+                faultStream.addAttribute(attributeObject);
+                this.configurationData.getSiddhiAppConfig().addStream(faultStream);
+
+                self.designGrid.handleStream(0, 0, false, id, faultStreamName, undefined, faultStream);
+            } else {
+                var connections = self.jsPlumbInstance.getConnections({source: stream.getId() + '-err-out'});
+                _.forEach(connections, function (connection) {
+                    self.jsPlumbInstance.deleteConnection(connection);
+                });
+                $('#' + stream.getId() + '-err-out').remove();
+                $('#' + stream.getId()).removeClass('errorStreamDrop');
+                $('#' + stream.getId() + '-in').remove();
+                $('#' + stream.getId() + '-out').remove();
+
+                var connection1 = $('<div class="connectorInStream">').attr('id', stream.getId() + "-in").
+                addClass('connection');
+                var connection2 = $('<div class="connectorOutStream">').attr('id', stream.getId() + "-out").
+                addClass('connection');
+                $('#' + stream.getId()).append(connection1);
+                $('#' + stream.getId()).append(connection2);
+
+                jsPlumbInstance.makeTarget(connection1, {
+                    deleteEndpointsOnDetach: true,
+                    anchor: 'Left'
+                });
+
+                jsPlumbInstance.makeSource(connection2, {
+                    deleteEndpointsOnDetach: true,
+                    anchor: 'Right'
+                });
+            }
         };
 
         /**
@@ -1405,22 +1528,25 @@ define(['require', 'log', 'lodash', 'jquery', 'partition', 'stream', 'query', 'f
                 $(dataObj).popover({
                     trigger: 'focus',
                     placement: 'auto',
-                    title: 'Are you sure you want to delete?',
+                    title: 'Confirmation',
                     html: true,
                     content: function () {
                         return $('.pop-over').html();
                     }
                 });
                 $(dataObj).popover("show");
+                $('.grid-container').addClass('removeOverflow');
+                $('.btn_no').focus();
                 $(".overlayed-container ").fadeTo(200, 1);
-                element.on("click", ".popover-footer .btn.no", function () {
+                element.on("click", ".popover-footer .btn_no", function () {
                     $(".overlayed-container ").fadeOut(200);
                     $(this).parents(".popover").popover('hide');
                     $('#' + newElement[0].id).removeClass("selected-element");
+                    $('.grid-container').removeClass('removeOverflow');
                 });
 
-                element.off('click', '.popover-footer .btn.yes');
-                element.on("click", ".popover-footer .btn.yes", function () {
+                element.off('click', '.popover-footer .btn_yes');
+                element.on("click", ".popover-footer .btn_yes", function () {
                     if ('partition' === $(dataObj).data('type')) {
                         deletePartition();
                     } else {
@@ -1430,7 +1556,6 @@ define(['require', 'log', 'lodash', 'jquery', 'partition', 'stream', 'query', 'f
                     $(".overlayed-container ").fadeOut(200);
                 });
                 // Dismiss the pop-over by clicking outside
-                $('.overlayed-container ').off('click');
                 $('.overlayed-container ').on('click', function (e) {
                     $('[data-toggle="popover"]').each(function () {
                         if (!$(this).is(e.target) && $(this).has(e.target).length === 0 && $('.popover').has(
@@ -1439,8 +1564,47 @@ define(['require', 'log', 'lodash', 'jquery', 'partition', 'stream', 'query', 'f
                             $(".overlayed-container ").fadeOut(200);
                             $('#' + newElement[0].id).removeClass("selected-element");
                             $('#' + newElement[0].id).children().removeClass("selected-element");
+                            $('.grid-container').removeClass('removeOverflow');
                         }
                     });
+                });
+                //Dismiss the pop-over on Esc button
+                $(".btn_no").keyup(function (e) {
+                    if (e.which === ESCAPE_KEY) {
+                        $(dataObj).popover('hide');
+                        $(".overlayed-container ").fadeOut(200);
+                        $('#' + newElement[0].id).removeClass("selected-element");
+                        $('#' + newElement[0].id).children().removeClass("selected-element")
+                        $('.grid-container').removeClass('removeOverflow');
+                    }
+                });
+                //Popver navigation using arrow keys
+                $(".btn_no").on('keydown', function (e) {
+                    if (e.keyCode == RIGHT_ARROW_KEY) {
+                        $('.btn_yes').focus();
+                    }
+                });
+                $(".btn_yes").on('keydown', function (e) {
+                    if (e.keyCode == LEFT_ARROW_KEY) {
+                        $('.btn_no').focus();
+                    }
+                });
+                $(".btn_no").on('keydown', function (e) {
+                    if (e.keyCode == TAB_KEY) {
+                        e.preventDefault();
+                    }
+                    if (e.keyCode == ENTER_KEY) {
+                        e.stopPropagation();
+                    }
+                });
+                //Stop tab propagation and enter propagation when popover showed
+                $(".btn_yes").on('keydown', function (e) {
+                    if (e.keyCode == TAB_KEY) {
+                        e.preventDefault();
+                    }
+                    if (e.keyCode == ENTER_KEY) {
+                        e.stopPropagation();
+                    }
                 });
             }
 
@@ -1468,7 +1632,7 @@ define(['require', 'log', 'lodash', 'jquery', 'partition', 'stream', 'query', 'f
             });
 
             newElement.on('keydown', function (key) {
-                if ((key.keyCode = MAC_COMMAND_KEY && key.keyCode == MAC_DELETE_KEY) || key.keyCode == DELETE_KEY) {
+                if ((key.keyCode == DELETE_KEY) || (key.keyCode == MAC_COMMAND_KEY && key.keyCode == MAC_DELETE_KEY)) {
                     $('#' + newElement[0].id).addClass('selected-element');
                     showPopOver(this.children.item(1), newElement);
                 }
@@ -1477,7 +1641,7 @@ define(['require', 'log', 'lodash', 'jquery', 'partition', 'stream', 'query', 'f
             // Check whether clicked element is there in the selected element list and if not clear the selected
             // element list and cleanDragSelection object
             newElement.on('mousedown', function () {
-                if (!self.designGrid.isSelectedElements(newElement[0])) {
+                if (!self.designGrid.isSelectedElements(newElement[0])){
                     // if (!window.selectedElements.includes(newElement[0], 0)) {
                     self.jsPlumbInstance.clearDragSelection();
                     var selectedElements = self.designGrid.getSelectedElement();
@@ -1494,11 +1658,11 @@ define(['require', 'log', 'lodash', 'jquery', 'partition', 'stream', 'query', 'f
                 self.configurationData.setIsDesignViewContentChanged(true);
                 var elementId = newElement[0].id;
                 /*
-                 * before deleting the element data from the data store structure, it is mandatory to delete the element
-                 * from jsPlumb because it will fire the 'beforeDetach' and 'connectionDetached' events and it will
-                 * update the other elements data connected to current element. ex: when a stream is deleted from a
-                 * query, from clause in the query will be updated as undefined.
-                 * */
+                * before deleting the element data from the data store structure, it is mandatory to delete the element
+                * from jsPlumb because it will fire the 'beforeDetach' and 'connectionDetached' events and it will
+                * update the other elements data connected to current element. ex: when a stream is deleted from a
+                * query, from clause in the query will be updated as undefined.
+                * */
                 setTimeout(function () {
                     var outConnections = self.jsPlumbInstance.getConnections({source: elementId + '-out'});
                     var inConnections = self.jsPlumbInstance.getConnections({target: elementId + '-in'});
@@ -1574,9 +1738,9 @@ define(['require', 'log', 'lodash', 'jquery', 'partition', 'stream', 'query', 'f
                     });
                 });
                 /*
-                 * before deleting the element data from the data store structure, it is mandatory to delete the element
-                 * from jsPlumb.
-                 * */
+                * before deleting the element data from the data store structure, it is mandatory to delete the element
+                * from jsPlumb.
+                * */
                 self.jsPlumbInstance.remove(newElement);
                 if (self.jsPlumbInstance.getGroupFor(newElement)) {
                     self.jsPlumbInstance.removeFromGroup(newElement);

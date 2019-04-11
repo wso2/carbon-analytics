@@ -16,7 +16,7 @@
  * under the License.
  */
 
-define(['require', 'lodash', 'jquery', 'log', 'backbone', 'file_browser', 'workspace/file'],
+define(['require', 'lodash','jquery', 'log', 'backbone', 'file_browser', 'workspace/file'],
     function (require, _, $, log, Backbone, FileBrowser, File) {
 
         var self = {};
@@ -25,7 +25,7 @@ define(['require', 'lodash', 'jquery', 'log', 'backbone', 'file_browser', 'works
             self.workspaceServiceURL = self.app.config.services.workspace.endpoint;
             log.info(self.app.config.services.workspace.endpoint);
             $.ajax({
-                url: self.workspaceServiceURL + "/listFilesInPath?path=" + btoa(""),
+                url: self.workspaceServiceURL + "/listFilesInPath?path=" + self.app.utils.base64EncodeUnicode(""),
                 type: "GET",
                 contentType: "text/plain; charset=utf-8",
                 async: false,
@@ -53,7 +53,7 @@ define(['require', 'lodash', 'jquery', 'log', 'backbone', 'file_browser', 'works
                     if (xhr.status == 200) {
                         var pathArray = _.split(path, self.app.getPathSeperator()),
                             fileName = _.last(pathArray),
-                            folderPath = _.join(_.take(pathArray, pathArray.length - 1), self.app.getPathSeperator());
+                            folderPath = _.join(_.take(pathArray, pathArray.length -1), self.app.getPathSeperator());
 
                         var file = new File({
                             name: fileName,

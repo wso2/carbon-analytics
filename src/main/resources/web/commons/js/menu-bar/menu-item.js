@@ -17,9 +17,9 @@
  */
 
 define(['lodash', 'event_channel'],
-    function (_, EventChannel) {
+    function (_, EventChannel){
 
-        var MenuItem = function (args) {
+        var MenuItem = function(args){
             _.assign(this, args);
             this._application = _.get(this, 'options.application');
         };
@@ -27,10 +27,14 @@ define(['lodash', 'event_channel'],
         MenuItem.prototype = Object.create(EventChannel.prototype);
         MenuItem.prototype.constructor = MenuItem;
 
-        MenuItem.prototype.render = function () {
+        MenuItem.prototype.render = function(){
             var parent = _.get(this, 'options.parent');
 
             var item = $('<li></li>');
+
+            //adding an id attr to the dropdown menu items
+            item.attr('id', _.get(this, 'definition.id'));
+
             var title = $('<span class="pull-left"></span>');
             var link = $('<a></a>');
             parent.append(item);
@@ -63,11 +67,11 @@ define(['lodash', 'event_channel'],
 
         };
 
-        MenuItem.prototype.getID = function () {
+        MenuItem.prototype.getID = function(){
             return _.get(this, 'definition.id');
         };
 
-        MenuItem.prototype.renderShortcutLabel = function () {
+        MenuItem.prototype.renderShortcutLabel = function(){
             var shortcuts = _.get(this, 'definition.command.shortcuts'),
                 shortcutLabel = $('<span></span>'),
                 shortcut = this._application.isRunningOnMacOS() ? shortcuts.mac.label : shortcuts.other.label;
@@ -76,7 +80,7 @@ define(['lodash', 'event_channel'],
             this._linkElement.append(shortcutLabel);
         };
 
-        MenuItem.prototype.renderCommandLabel = function () {
+        MenuItem.prototype.renderCommandLabel = function(){
             var labels = _.get(this, 'definition.command.labels'),
                 shortcutLabel = $('<span></span>'),
                 shortcut = this._application.isRunningOnMacOS() ? labels.mac.label : labels.other.label;
@@ -85,13 +89,13 @@ define(['lodash', 'event_channel'],
             this._linkElement.append(shortcutLabel);
         };
 
-        MenuItem.prototype.disable = function () {
+        MenuItem.prototype.disable = function(){
             this._listItemElement.addClass(_.get(this, 'options.cssClass.inactive'));
             this._listItemElement.removeClass(_.get(this, 'options.cssClass.active'));
             this._linkElement.off("click");
         };
 
-        MenuItem.prototype.enable = function () {
+        MenuItem.prototype.enable = function(){
             this._listItemElement.addClass(_.get(this, 'options.cssClass.active'));
             this._listItemElement.removeClass(_.get(this, 'options.cssClass.inactive'));
             var self = this;
@@ -101,8 +105,8 @@ define(['lodash', 'event_channel'],
             });
         };
 
-        MenuItem.prototype.addLabelSuffix = function (labelSuffix) {
-            if (!_.isNil(labelSuffix)) {
+        MenuItem.prototype.addLabelSuffix = function(labelSuffix){
+            if(!_.isNil(labelSuffix)){
                 this._title.text(_.get(this, 'definition.label') + ' ' + labelSuffix);
             }
         };
@@ -111,7 +115,7 @@ define(['lodash', 'event_channel'],
             this._title.text(_.get(this, 'definition.label'));
         };
 
-        MenuItem.prototype.updateLabel = function (labelText) {
+        MenuItem.prototype.updateLabel = function(labelText) {
             if (!_.isNil(labelText)) {
                 this._title.text(labelText);
             }

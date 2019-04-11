@@ -16,8 +16,8 @@
  * under the License.
  */
 
-define(['require', 'log', 'jquery', 'lodash', 'designViewUtils'],
-    function (require, log, $, _, DesignViewUtils) {
+define(['require', 'log', 'jquery', 'lodash', 'designViewUtils', 'constants'],
+    function (require, log, $, _, DesignViewUtils, Constants) {
 
         /**
          * @class JSONValidator
@@ -163,7 +163,7 @@ define(['require', 'log', 'jquery', 'lodash', 'designViewUtils'],
             var errorMessage;
             removeTooltipErrorMessage(innerStream.id);
             // check whether it has a connection in because there cannot be a inner stream without a 'connection-in'
-            var inConnections = jsPlumbInstance.getConnections({target: innerStream.id + '-in'});
+            var inConnections = jsPlumbInstance.getConnections({ target: innerStream.id + '-in' });
             if (inConnections.length === 0) {
                 errorMessage = 'Inner stream does not contain a connection input from an inner query';
                 highlightErrorElement(innerStream.id, errorMessage);
@@ -239,33 +239,31 @@ define(['require', 'log', 'jquery', 'lodash', 'designViewUtils'],
         JSONValidator.prototype.validateAggregation = function (aggregation, doNotShowErrorMessages) {
             var self = this;
             var errorMessage;
-            var isValid;
+            var isValid = true;
             removeTooltipErrorMessage(aggregation.id);
             if (!aggregation.from) {
                 errorMessage = 'Aggregation element does not contain a connected input';
-                if (aggregation.name) {
+                isValid = false;
+            } else if (!aggregation.name) {
+                errorMessage = 'Aggregation form is incomplete';
+                isValid = false;
+            } else if (!self.validateQuerySelectSection(aggregation.select)) {
+                isValid = false;
+                errorMessage = 'Aggregation form is incomplete';
+            }
+            if (!isValid && !doNotShowErrorMessages) {
+                DesignViewUtils.prototype.errorAlert(errorMessage);
+            }
+            if (isValid) {
+                removeErrorHighlighter(aggregation.id);
+                removeIncompleteElement(aggregation.id);
+                removeTooltipErrorMessage(aggregation.id);
+            } else {
+                if(aggregation.name) {
                     highlightErrorElement(aggregation.id, errorMessage);
                 } else {
                     highlightIncompleteElement(aggregation.id, errorMessage);
                 }
-                if (!doNotShowErrorMessages) {
-                    DesignViewUtils.prototype.errorAlert(errorMessage);
-                }
-                return false;
-
-            } else if (!aggregation.name) {
-                errorMessage = 'Aggregation form is incomplete';
-                highlightIncompleteElement(aggregation.id, errorMessage);
-                if (!doNotShowErrorMessages) {
-                    DesignViewUtils.prototype.errorAlert(errorMessage);
-                }
-                return false;
-            }
-
-            isValid = self.validateQuerySelectSection(aggregation.select, 'Aggregation', aggregation.id,
-                doNotShowErrorMessages);
-            if (isValid) {
-                removeErrorHighlighter(aggregation.id);
             }
 
             return isValid;
@@ -280,31 +278,31 @@ define(['require', 'log', 'jquery', 'lodash', 'designViewUtils'],
          */
         JSONValidator.prototype.validateWindowFilterProjectionQuery = function (query, doNotShowErrorMessages) {
             var self = this;
-            var isValid;
+            var isValid = true;
             var errorMessage;
-            removeTooltipErrorMessage(query.id);
             if ((!query.queryInput) || (query.queryInput && !query.queryInput.from)) {
-                errorMessage = 'Query does not contain a connected input';
-                if (query.select) {
-                    highlightErrorElement(query.id, errorMessage);
-                } else {
-                    highlightIncompleteElement(query.id, errorMessage);
-                }
-                if (!doNotShowErrorMessages) {
-                    DesignViewUtils.prototype.errorAlert(errorMessage);
-                }
-                return false;
-
+                errorMessage = 'Query does not contain a connected input element';
+                isValid = false;
+            } else if (!self.validateQueryOutputSection(query)) {
+                errorMessage = "Query does not contain a connected output element";
+                isValid = false;
+            } else if (!self.validateQuerySelectSection(query.select)) {
+                isValid = false;
+                errorMessage = 'Query form is incomplete';
             }
-            isValid = self.validateQueryOutputSection(query, 'Query', query.id, doNotShowErrorMessages);
-            if (!isValid) {
-                return isValid;
+            if (!isValid && !doNotShowErrorMessages) {
+                DesignViewUtils.prototype.errorAlert(errorMessage);
             }
-
-            isValid = self.validateQuerySelectSection(query.select, 'Query', query.id, doNotShowErrorMessages);
-
             if (isValid) {
+                removeIncompleteElement(query.id);
                 removeErrorHighlighter(query.id);
+                removeTooltipErrorMessage(query.id);
+            } else {
+                if (self.isQueryFreshlyDropped(query.queryOutput)) {
+                    highlightIncompleteElement(query.id, errorMessage);
+                } else {
+                    highlightErrorElement(query.id, errorMessage);
+                }
             }
 
             return isValid;
@@ -319,66 +317,36 @@ define(['require', 'log', 'jquery', 'lodash', 'designViewUtils'],
          */
         JSONValidator.prototype.validateJoinQuery = function (query, doNotShowErrorMessages) {
             var self = this;
-            var isValid;
+            var isValid = true;
             var errorMessage;
-            removeTooltipErrorMessage(query.id);
             if (!query.queryInput || (query.queryInput && !query.queryInput.firstConnectedElement &&
-                !query.queryInput.secondConnectedElement)) {
+                    !query.queryInput.secondConnectedElement)) {
                 errorMessage = 'Join query does not contain two connected inputs';
-                if (query.select) {
-                    highlightErrorElement(query.id, errorMessage);
-                } else {
-                    highlightIncompleteElement(query.id, errorMessage);
-                }
-                if (!doNotShowErrorMessages) {
-                    DesignViewUtils.prototype.errorAlert(errorMessage);
-                }
-                return false;
+                isValid = false
             } else if (!query.queryInput.firstConnectedElement || !query.queryInput.secondConnectedElement) {
                 errorMessage = 'Only one element is connected to Join query';
-                if (query.select) {
-                    highlightErrorElement(query.id, errorMessage);
-                } else {
-                    highlightIncompleteElement(query.id, errorMessage);
-                }
-                if (!doNotShowErrorMessages) {
-                    DesignViewUtils.prototype.errorAlert(errorMessage);
-                }
-                return false;
+                isValid = false;
+            } else if (!self.validateQueryOutputSection(query)) {
+                errorMessage = "Join query does not contain a connected output element";
+                isValid = false;
+            } else if (!self.validateQuerySelectSection(query.select)) {
+                isValid = false;
+                errorMessage = 'Join query form is incomplete';
             }
-
-            isValid = self.validateQueryOutputSection(query, 'Join query', query.id,
-                doNotShowErrorMessages);
-            if (!isValid) {
-                return isValid;
-            } else {
+            if (!isValid && !doNotShowErrorMessages) {
+                DesignViewUtils.prototype.errorAlert(errorMessage);
+            }
+            if (isValid) {
                 removeErrorHighlighter(query.id);
+                removeIncompleteElement(query.id);
+                removeTooltipErrorMessage(query.id);
+            } else {
+                if (self.isQueryFreshlyDropped(query.queryOutput)) {
+                    highlightIncompleteElement(query.id, errorMessage);
+                } else {
+                    highlightErrorElement(query.id, errorMessage);
+                }
             }
-
-            if (!query.queryInput.left) {
-                errorMessage = 'Left source of Join query is not defined';
-                highlightIncompleteElement(query.id, errorMessage);
-                if (!doNotShowErrorMessages) {
-                    DesignViewUtils.prototype.errorAlert(errorMessage);
-                }
-                return false;
-            } else if (!query.queryInput.right) {
-                errorMessage = 'Right source of Join query is not defined';
-                highlightIncompleteElement(query.i, errorMessage);
-                if (!doNotShowErrorMessages) {
-                    DesignViewUtils.prototype.errorAlert(errorMessage);
-                }
-                return false;
-            } else if (!query.queryInput.joinWith || !query.queryInput.joinType) {
-                errorMessage = 'Join query form is not filled';
-                highlightIncompleteElement(query.id, errorMessage);
-                if (!doNotShowErrorMessages) {
-                    DesignViewUtils.prototype.errorAlert(errorMessage);
-                }
-                return false;
-            }
-
-            isValid = self.validateQuerySelectSection(query.select, 'Join query', query.id, doNotShowErrorMessages);
 
             return isValid;
         };
@@ -393,59 +361,33 @@ define(['require', 'log', 'jquery', 'lodash', 'designViewUtils'],
          */
         JSONValidator.prototype.validatePatternOrSequenceQuery = function (query, type, doNotShowErrorMessages) {
             var self = this;
-            var isValid;
+            var isValid = true;
             var errorMessage;
-            removeTooltipErrorMessage(query.id);
-            if (!query.queryInput) {
-                errorMessage = type + ' does not contain a input';
-                if (!query.select) {
-                    highlightIncompleteElement(query.id, errorMessage);
-                } else {
-                    highlightErrorElement(query.id, errorMessage);
-                }
-                if (!doNotShowErrorMessages) {
-                    DesignViewUtils.prototype.errorAlert(errorMessage);
-                }
-                return false;
-
-            } else if (query.queryInput.connectedElementNameList !== undefined
-                && query.queryInput.connectedElementNameList.length === 0) {
-                errorMessage = type + ' does not contain a input';
-                if (!query.select) {
-                    highlightIncompleteElement(query.id, errorMessage);
-                } else {
-                    highlightErrorElement(query.id, errorMessage);
-                }
-                if (!doNotShowErrorMessages) {
-                    DesignViewUtils.prototype.errorAlert(errorMessage);
-                }
-                return false;
+            if (!query.queryInput || (query.queryInput && query.queryInput.connectedElementNameList &&
+                    query.queryInput.connectedElementNameList.length === 0)) {
+                errorMessage = type + ' does not contain a connected input element';
+                isValid = false;
+            } else if (!self.validateQueryOutputSection(query)) {
+                errorMessage = type + ' query does not contain a connected output element';
+                isValid = false;
+            } else if (!self.validateQuerySelectSection(query.select)) {
+                errorMessage = type + ' form is incomplete';
+                isValid = false;
             }
-
-            isValid = self.validateQueryOutputSection(query, type, query.id, doNotShowErrorMessages);
-            if (!isValid) {
-                return isValid;
+            if (!isValid && !doNotShowErrorMessages) {
+                DesignViewUtils.prototype.errorAlert(errorMessage);
+            }
+            if (isValid) {
+                removeIncompleteElement(query.id);
+                removeErrorHighlighter(query.id);
+                removeTooltipErrorMessage(query.id);
             } else {
-                removeErrorHighlighter(query.id)
-            }
-
-            if (!query.queryInput.logic) {
-                errorMessage = 'Logic section in query input of ' + type + ' form cannot be blank';
-                highlightIncompleteElement(query.id, errorMessage);
-                if (!doNotShowErrorMessages) {
-                    DesignViewUtils.prototype.errorAlert(errorMessage);
+                if (self.isQueryFreshlyDropped(query.queryOutput)) {
+                    highlightIncompleteElement(query.id, errorMessage);
+                } else {
+                    highlightErrorElement(query.id, errorMessage);
                 }
-                return false;
-            } else if (query.queryInput.conditionList.length === 0) {
-                errorMessage = 'Condition list in query input of ' + type + ' form cannot be blank';
-                highlightIncompleteElement(query.id, errorMessage);
-                if (!doNotShowErrorMessages) {
-                    DesignViewUtils.prototype.errorAlert(errorMessage);
-                }
-                return false;
             }
-
-            isValid = self.validateQuerySelectSection(query.select, type, query.id, doNotShowErrorMessages);
 
             return isValid;
         };
@@ -453,32 +395,16 @@ define(['require', 'log', 'jquery', 'lodash', 'designViewUtils'],
         /**
          * @function Validates a select section of a given query json
          * @param select select section json
-         * @param type query type
-         * @param elementId id of the query
-         * @param doNotShowErrorMessages If true error messages will not be shown as alerts. Only the validity will be
-         * returned
          * @returns {boolean} validity of the json
          */
-        JSONValidator.prototype.validateQuerySelectSection = function (select, type, elementId, doNotShowErrorMessages) {
+        JSONValidator.prototype.validateQuerySelectSection = function (select) {
             var isValid = true;
-            var errorMessage;
             if (!select) {
                 isValid = false;
-                errorMessage = 'Select section of ' + type + ' form cannot be blank';
-                highlightIncompleteElement(elementId, errorMessage);
-                if (!doNotShowErrorMessages) {
-                    DesignViewUtils.prototype.errorAlert(errorMessage);
-                }
-            } else if (select.type === 'USER_DEFINED') {
+            } else if (select.type.toLowerCase() === Constants.TYPE_USER_DEFINED) {
                 _.forEach(select.value, function (value) {
                     if (!value.expression || value.expression === '') {
                         isValid = false;
-                        errorMessage = 'Select section of ' + type + ' form cannot be blank';
-                        highlightIncompleteElement(elementId, errorMessage);
-                        if (!doNotShowErrorMessages) {
-                            DesignViewUtils.prototype.errorAlert(errorMessage);
-                        }
-                        // break the for each loop
                         return false;
                     }
                 });
@@ -488,36 +414,31 @@ define(['require', 'log', 'jquery', 'lodash', 'designViewUtils'],
 
         /**
          * @function Validates a output section of a given query json
-         * @param output output section json
+         * @param query object of the query
          * @param type query type
-         * @param elementId id of the query
          * @param doNotShowErrorMessages If true error messages will not be shown as alerts. Only the validity will be
          * returned
          * @returns {boolean} validity of the json
          */
-        JSONValidator.prototype.validateQueryOutputSection = function (query, type, elementId, doNotShowErrorMessages) {
+        JSONValidator.prototype.validateQueryOutputSection = function (query) {
             var isValid = true;
-            var errorMessage;
             if ((!query.queryOutput) || (query.queryOutput && !query.queryOutput.target)) {
                 isValid = false;
-                errorMessage = type + ' does not contain a connected output element';
-                if (query.select) {
-                    highlightErrorElement(elementId, errorMessage);
-                } else {
-                    highlightIncompleteElement(elementId, errorMessage);
-                }
-                if (!doNotShowErrorMessages) {
-                    DesignViewUtils.prototype.errorAlert(errorMessage);
-                }
-            } else if (!query.queryOutput.type || !query.queryOutput.output) {
-                isValid = false;
-                errorMessage = 'Output section of ' + type + ' form is not filled';
-                highlightIncompleteElement(elementId, errorMessage);
-                if (!doNotShowErrorMessages) {
-                    DesignViewUtils.prototype.errorAlert(errorMessage);
-                }
             }
             return isValid;
+        };
+
+        /**
+         * @function to identify if it is a freshly dropped query
+         * @param queryOutput output section of the query
+         * @returns {boolean}
+         */
+        JSONValidator.prototype.isQueryFreshlyDropped = function (queryOutput) {
+            var isFresh = true;
+            if (queryOutput && queryOutput.type) {
+                isFresh = false;
+            }
+            return isFresh;
         };
 
         /**
@@ -631,10 +552,18 @@ define(['require', 'log', 'jquery', 'lodash', 'designViewUtils'],
         }
 
         function highlightIncompleteElement(errorElementId, errorMessage) {
+            removeErrorHighlighter(errorElementId);
             var element = $('#' + errorElementId);
             element.addClass('incomplete-element');
             // set error message as the tooltip message
             element.prop('title', errorMessage);
+        }
+
+        function removeIncompleteElement(incompleteElementId) {
+            var element = $('#' + incompleteElementId);
+            if (element.hasClass('incomplete-element')) {
+                element.removeClass('incomplete-element');
+            }
         }
 
         function removeErrorHighlighter(errorElementId) {

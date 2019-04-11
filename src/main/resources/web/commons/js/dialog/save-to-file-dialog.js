@@ -16,8 +16,8 @@
  * under the License.
  */
 
-define(['require', 'lodash', 'jquery', 'log', 'backbone', 'file_browser', 'bootstrap', 'ace/ace'],
-    function (require, _, $, log, Backbone, FileBrowser, ace) {
+define(['require', 'lodash', 'jquery', 'log', 'backbone', 'file_browser', 'bootstrap','ace/ace'],
+    function (require, _, $, log, Backbone, FileBrowser,ace) {
         var SaveToFileDialog = Backbone.View.extend(
             /** @lends SaveToFileDialog.prototype */
             {
@@ -34,23 +34,22 @@ define(['require', 'lodash', 'jquery', 'log', 'backbone', 'file_browser', 'boots
                         'container');
                 },
 
-                show: function () {
+                show: function(){
                     var self = this;
-                    this._fileSaveModal.modal('show').on('shown.bs.modal', function () {
+                    this._fileSaveModal.modal('show').on('shown.bs.modal', function(){
                         self.trigger('loaded');
                     });
-                    this._fileSaveModal.on('hidden.bs.modal', function () {
+                    this._fileSaveModal.on('hidden.bs.modal', function(){
                         self.trigger('unloaded');
                     })
                 },
 
-                setSelectedFile: function (path, fileName) {
+                setSelectedFile: function(path, fileName){
                     this._fileBrowser.select(path);
-                    if (!_.isNil(this._configNameInput)) {
+                    if(!_.isNil(this._configNameInput)){
                         this._configNameInput.val(fileName);
                     }
                 },
-
                 render: function (tabInstance) {
                     var self = this;
                     var fileBrowser;
@@ -58,13 +57,13 @@ define(['require', 'lodash', 'jquery', 'log', 'backbone', 'file_browser', 'boots
                     var notification_container = this.notification_container;
                     var workspaceServiceURL = app.config.services.workspace.endpoint;
                     var activeTab;
-                    if (tabInstance !== undefined) {
+                    if(tabInstance !== undefined) {
                         activeTab = tabInstance;
                     } else {
                         activeTab = app.tabController.activeTab;
                     }
 
-                    var siddhiFileEditor = activeTab.getSiddhiFileEditor();
+                    var siddhiFileEditor= activeTab.getSiddhiFileEditor();
                     var content = siddhiFileEditor.getContent();
                     var plan_regex = /@[Aa][Pp][Pp]:[Nn][Aa][Mm][Ee]\(['|"](.*?)['|"]\)/g;
                     var providedAppContent = plan_regex.exec(content);
@@ -73,9 +72,9 @@ define(['require', 'lodash', 'jquery', 'log', 'backbone', 'file_browser', 'boots
                     if (providedAppContent && providedAppContent[1]) {
                         providedFileName = providedAppContent[1].replace(/ /g, "_");
                     }
-                    providedFileName = providedFileName.replace("\"", "");
+                    providedFileName = providedFileName.replace("\"","");
 
-                    if (!_.isNil(this._fileSaveModal)) {
+                    if(!_.isNil(this._fileSaveModal)){
                         this._fileSaveModal.remove();
                     }
 
@@ -88,15 +87,15 @@ define(['require', 'lodash', 'jquery', 'log', 'backbone', 'file_browser', 'boots
                         "<span aria-hidden='true'>&times;</span>" +
                         "</button>" +
                         "<h4 class='modal-title file-dialog-title' id='newConfigModalLabel'>Save To Workspace</h4>" +
-                        "<hr class='style1'>" +
+                        "<hr class='style1'>"+
                         "</div>" +
                         "<div class='modal-body'>" +
                         "<div class='container-fluid'>" +
                         "<form class='form-horizontal' onsubmit='return false'>" +
                         "<div class='form-group'>" +
                         "<label for='configName' class='col-sm-2 file-dialog-label'>File Name :</label>" +
-                        "<div class='col-sm-9'>" +
-                        "<input class='file-dialog-form-control' id='configName' placeholder='" + providedFileName + "'>" +
+                        "<div class='col-sm-9' id='saveName'>" +
+                        "<input class='file-dialog-form-control' id='configName' name='siddhiAppName' placeholder='"+ providedFileName +"'>" +
                         "</div>" +
                         "</div>" +
                         "<div class='form-group'>" +
@@ -118,15 +117,15 @@ define(['require', 'lodash', 'jquery', 'log', 'backbone', 'file_browser', 'boots
                     );
 
                     var successNotification = $(
-                        "<div style='z-index: 9999;' style='line-height: 20%;' class='alert alert-success' id='success-alert'>" +
-                        "<span class='notification'>" +
-                        "Configuration saved successfully !" +
-                        "</span>" +
+                        "<div style='z-index: 9999;' style='line-height: 20%;' class='alert alert-success' id='success-alert'>"+
+                        "<span class='notification'>"+
+                        "Configuration saved successfully !"+
+                        "</span>"+
                         "</div>");
 
                     function getErrorNotification(detailedErrorMsg) {
                         var errorMsg = "Error while saving configuration";
-                        if (!_.isEmpty(detailedErrorMsg)) {
+                        if (!_.isEmpty(detailedErrorMsg)){
                             errorMsg += (" : " + detailedErrorMsg);
                         }
                         return $(
@@ -145,31 +144,31 @@ define(['require', 'lodash', 'jquery', 'log', 'backbone', 'file_browser', 'boots
 
                     //Gets the selected location from tree and sets the value as location
                     this.listenTo(fileBrowser, 'selected', function (selectedLocation) {
-                        if (selectedLocation) {
+                        if(selectedLocation){
                             location.val(selectedLocation);
                         }
                     });
 
-                    fileSave.find("button").filter("#saveButton").click(function () {
+                    fileSave.find("button").filter("#saveButton").click(function() {
                         var _location = location.val();
                         var _configName = configName.val();
                         var replaceContent = false;
 
                         if (_.isEmpty(_configName)) {
                             _configName = providedFileName;
-                        } else {
+                        }else{
                             _configName = _configName.trim();
                         }
 
-                        if (!_configName.endsWith(".siddhi")) {
+                        if(!_configName.endsWith(".siddhi")){
                             _configName = _configName + ".siddhi";
                         }
 
-                        if (_configName != providedFileName) {
+                        if(_configName != providedFileName){
                             replaceContent = true;
                         }
 
-                        var callback = function (isSaved) {
+                        var callback = function(isSaved) {
                             self.trigger('save-completed', isSaved);
                             if (isSaved) {
                                 saveConfigModal.modal('hide');
@@ -178,15 +177,13 @@ define(['require', 'lodash', 'jquery', 'log', 'backbone', 'file_browser', 'boots
 
                         var existsResponse = existFileInPath({configName: _configName});
 
-                        if (existsResponse.error == undefined) {
-                            if (existsResponse.exists) {
+                        if(existsResponse.error == undefined){
+                            if(existsResponse.exists) {
                                 // File with this name already exists. Need confirmation from user to replace
-                                var replaceConfirmCb = function (confirmed) {
-                                    if (confirmed) {
-                                        saveConfiguration({
-                                                location: _location, configName: _configName,
-                                                replaceContent: replaceContent, oldAppName: providedFileName
-                                            },
+                                var replaceConfirmCb = function(confirmed) {
+                                    if(confirmed) {
+                                        saveConfiguration({location: _location, configName: _configName,
+                                                replaceContent: replaceContent, oldAppName: providedFileName},
                                             callback, tabInstance);
                                     } else {
                                         callback(false);
@@ -200,15 +197,11 @@ define(['require', 'lodash', 'jquery', 'log', 'backbone', 'file_browser', 'boots
 
                                 self.app.commandManager.dispatch('open-replace-file-confirm-dialog', options);
                             } else {
-                                saveConfiguration({
-                                    location: _location,
-                                    configName: _configName,
-                                    replaceContent: replaceContent,
-                                    oldAppName: providedFileName
-                                }, callback, tabInstance);
+                                saveConfiguration({location: _location, configName: _configName, replaceContent:
+                                    replaceContent, oldAppName: providedFileName}, callback, tabInstance);
                             }
-                        } else {
-                            saveWizardError.text("Error in reading the file location " + _location);
+                        }else {
+                            saveWizardError.text("Error in reading the file location "+_location);
                             saveWizardError.show();
                         }
 
@@ -218,9 +211,9 @@ define(['require', 'lodash', 'jquery', 'log', 'backbone', 'file_browser', 'boots
                     saveWizardError.hide();
                     this._fileSaveModal = fileSave;
 
-                    function alertSuccess() {
+                    function alertSuccess(){
                         $(notification_container).append(successNotification);
-                        successNotification.fadeTo(2000, 200).slideUp(1000, function () {
+                        successNotification.fadeTo(2000, 200).slideUp(1000, function(){
                             successNotification.slideUp(1000);
                         });
                     }
@@ -242,12 +235,12 @@ define(['require', 'lodash', 'jquery', 'log', 'backbone', 'file_browser', 'boots
                         return true;
                     }
 
-                    function existFileInPath(options) {
+                    function existFileInPath(options){
                         var client = self.app.workspaceManager.getServiceClient();
                         var data = {};
                         var workspaceServiceURL = app.config.services.workspace.endpoint;
                         var saveServiceURL = workspaceServiceURL + "/exists/workspace";
-                        var payload = "configName=" + btoa(options.configName);
+                        var payload = "configName=" + self.app.utils.base64EncodeUnicode(options.configName);
 
                         $.ajax({
                             type: "POST",
@@ -258,7 +251,7 @@ define(['require', 'lodash', 'jquery', 'log', 'backbone', 'file_browser', 'boots
                             success: function (response) {
                                 data = response;
                             },
-                            error: function (xhr, textStatus, errorThrown) {
+                            error: function(xhr, textStatus, errorThrown){
                                 data = client.getErrorFromResponse(xhr, textStatus, errorThrown);
                                 log.error(data.message);
                             }
@@ -270,33 +263,34 @@ define(['require', 'lodash', 'jquery', 'log', 'backbone', 'file_browser', 'boots
                         var workspaceServiceURL = app.config.services.workspace.endpoint;
                         var saveServiceURL = workspaceServiceURL + "/write";
                         var activeTab;
-                        if (tabInstance !== undefined) {
+                        if(tabInstance !== undefined) {
                             activeTab = tabInstance;
                         } else {
                             activeTab = app.tabController.activeTab;
                         }
-                        var siddhiFileEditor = activeTab.getSiddhiFileEditor();
+                        var siddhiFileEditor= activeTab.getSiddhiFileEditor();
                         var config = siddhiFileEditor.getContent();
                         var regexToExtractAppNameAnnotation = /@[Aa][Pp][Pp]:[Nn][Aa][Mm][Ee]\(['|"]/g;
                         var appNameAnnotation = regexToExtractAppNameAnnotation.exec(config)[0];
                         var unicodeOfLastCharacter =
-                            appNameAnnotation.charCodeAt(appNameAnnotation.length - 1);
+                            appNameAnnotation.charCodeAt(appNameAnnotation.length-1);
                         var wrappingCodeTobeUsed = "";
-                        if (unicodeOfLastCharacter == 39) {
+                        if(unicodeOfLastCharacter == 39){
                             wrappingCodeTobeUsed = "\'";
-                        } else if (unicodeOfLastCharacter == 34) {
+                        }else if(unicodeOfLastCharacter == 34){
                             wrappingCodeTobeUsed = "\"";
                         }
 
                         var appNameToAdd = appNameAnnotation + options.configName.substring
-                            (0, options.configName.lastIndexOf(".siddhi")) + wrappingCodeTobeUsed + ")";
+                        (0, options.configName.lastIndexOf(".siddhi")) + wrappingCodeTobeUsed + ")";
                         var appNameToRemove = appNameAnnotation + options.oldAppName + wrappingCodeTobeUsed + ")";
-                        if (options.replaceContent) {
-                            config = config.replace(appNameToRemove, '');
+                        if(options.replaceContent){
+                            config = config.replace(appNameToRemove,'');
                             config = appNameToAdd + config;
                         }
 
-                        var payload = "configName=" + btoa(options.configName) + "&config=" + (btoa(config));
+                        var payload = "configName=" + self.app.utils.base64EncodeUnicode(options.configName) +
+                            "&config=" + self.app.utils.base64EncodeUnicode(config);
 
                         $.ajax({
                             url: saveServiceURL,
@@ -316,7 +310,7 @@ define(['require', 'lodash', 'jquery', 'log', 'backbone', 'file_browser', 'boots
                                         .setDirty(false)
                                         .save();
                                     app.commandManager.dispatch("open-folder", data.path);
-                                    if (!app.workspaceExplorer.isActive()) {
+                                    if(!app.workspaceExplorer.isActive()){
                                         app.commandManager.dispatch("toggle-file-explorer");
                                     }
                                     //app.breadcrumbController.setPath(options.location, options.configName);
@@ -337,11 +331,11 @@ define(['require', 'lodash', 'jquery', 'log', 'backbone', 'file_browser', 'boots
                                     callback(false);
                                 }
                             },
-                            error: function (res, errorCode, error) {
+                            error: function(res, errorCode, error){
                                 var msg = _.isString(error) ? error : res.statusText;
-                                if (isJsonString(res.responseText)) {
+                                if(isJsonString(res.responseText)){
                                     var resObj = JSON.parse(res.responseText);
-                                    if (_.has(resObj, 'Error')) {
+                                    if(_.has(resObj, 'Error')){
                                         msg = _.get(resObj, 'Error');
                                     }
                                 }

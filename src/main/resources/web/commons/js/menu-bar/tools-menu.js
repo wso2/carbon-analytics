@@ -16,7 +16,7 @@
  * under the License.
  */
 
-define(([], function () {
+define(([],function (){
     var ToolsMenu = {
         id: "tools",
         label: "Tools",
@@ -98,7 +98,7 @@ define(([], function () {
                 label: "Siddhi Store Query",
                 command: {
                     id: "query-store",
-                    labels: {
+                    labels:{
                         mac: {
                             key: "command+shift+q",
                             label: "\u2318\u21E7Q"
@@ -106,6 +106,24 @@ define(([], function () {
                         other: {
                             key: "ctrl+shift+q",
                             label: "Ctrl+Shift+Q"
+                        }
+                    }
+                },
+                disabled: false
+            },
+            {
+                id: 'tour-guide',
+                label: 'Tour guide',
+                command: {
+                    id: 'tour-guide',
+                    shortcuts: {
+                        mac: {
+                            key: "command+shift+h",
+                            label: "\u2318\u21E7H"
+                        },
+                        other: {
+                            key: "ctrl+shift+h",
+                            label: "Ctrl+Shift+H"
                         }
                     }
                 },

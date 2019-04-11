@@ -15,32 +15,29 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-define(['require', 'log', 'jquery', 'lodash', './tab', 'workspace', 'toolEditor', 'workspace/file'],
-    function (require, log, jquery, _, Tab, Workspace, ToolEditor, File) {
-        var ServiceTab;
+define(['require', 'log', 'jquery', 'lodash', './tab','workspace','toolEditor','workspace/file', 'operator_finder'],
+    function (require, log, jquery, _, Tab, Workspace, ToolEditor, File, OperatorFinder) {
+        var  ServiceTab;
 
         ServiceTab = Tab.extend({
             initialize: function (options) {
                 Tab.prototype.initialize.call(this, options);
-                if (!_.has(options, 'file')) {
-                    this._file = new File({
-                        isTemp: true,
-                        isDirty: false
-                    }, {storage: this.getParent().getBrowserStorage()});
+                if(!_.has(options, 'file')){
+                    this._file = new File({isTemp: true, isDirty: false}, {storage: this.getParent().getBrowserStorage()});
                 } else {
                     this._file = _.get(options, 'file');
                 }
                 this.app = options.application;
             },
-            getFile: function () {
+            getFile: function(){
                 return this._file;
             },
 
-            getTitle: function () {
-                return _.isNil(this._file) ? "untitled" : this._file.getName();
+            getTitle: function(){
+                return _.isNil(this._file) ? "untitled" :  this._file.getName();
             },
 
-            updateHeader: function () {
+            updateHeader: function(){
                 if (this._file.isDirty()) {
                     this.getHeader().setText('* ' + this.getTitle());
                 } else {
@@ -60,7 +57,7 @@ define(['require', 'log', 'jquery', 'lodash', './tab', 'workspace', 'toolEditor'
                 this._fileEditor = toolEditor;
                 this.getHeader().addClass('inverse');
 
-                toolEditor.on("content-modified", function () {
+                toolEditor.on("content-modified", function(){
                     var updatedContent = toolEditor.getContent();
                     this._file.setContent(updatedContent);
                     this._file.setDirty(true);
@@ -68,7 +65,7 @@ define(['require', 'log', 'jquery', 'lodash', './tab', 'workspace', 'toolEditor'
                     this.app.workspaceManager.updateMenuItems();
                     var activeTab = this.app.tabController.getActiveTab();
                     var file = activeTab.getFile();
-                    if (file.getRunStatus() || file.getDebugStatus()) {
+                    if(file.getRunStatus() || file.getDebugStatus()){
                         var launcher = activeTab.getSiddhiFileEditor().getLauncher();
                         launcher.stopApplication(this.app.workspaceManager, false);
                     }
@@ -79,8 +76,9 @@ define(['require', 'log', 'jquery', 'lodash', './tab', 'workspace', 'toolEditor'
                     this.app.commandManager.dispatch(id);
                 }, this);
 
-                toolEditor.on("view-switch", function () {
+                toolEditor.on("view-switch", function (e) {
                     this.app.workspaceManager.updateMenuItems();
+                    OperatorFinder.Utils.toggleAddToSource(e.view === 'design');
                 }, this);
 
                 this._file.on("dirty-state-change", function () {
@@ -93,7 +91,7 @@ define(['require', 'log', 'jquery', 'lodash', './tab', 'workspace', 'toolEditor'
                 this.app.workspaceManager.updateUndoRedoMenus();
 
                 // bind app commands to source editor commands
-                this.app.commandManager.getCommands().forEach(function (command) {
+                this.app.commandManager.getCommands().forEach(function(command){
                     toolEditor.getSourceView().bindCommand(command);
                 });
             },

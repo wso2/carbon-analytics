@@ -15,8 +15,8 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-define(['require', 'lodash', 'log', 'jquery', 'backbone', 'command', 'sample_preview', 'workspace/file'],
-    function (require, _, log, $, Backbone, CommandManager, SamplePreviewView, File) {
+define(['require', 'lodash', 'log', 'jquery', 'backbone', 'command', 'sample_preview', 'workspace/file', 'enjoyhint', 'guide'],
+    function (require, _, log, $, Backbone, CommandManager, SamplePreviewView, File, EnjoyHint, Guide) {
 
         var FirstLaunchWelcomePage = Backbone.View.extend({
             initialize: function (options) {
@@ -42,13 +42,13 @@ define(['require', 'lodash', 'log', 'jquery', 'backbone', 'command', 'sample_pre
                 this._options = options;
             },
 
-            hide: function () {
+            hide: function(){
                 //Hiding menu bar
                 this._options.application.menuBar.show();
                 this.$el.hide();
             },
 
-            show: function () {
+            show: function(){
                 //Hiding menu bar
                 this._options.application.menuBar.hide();
                 this.$el.show();
@@ -61,7 +61,7 @@ define(['require', 'lodash', 'log', 'jquery', 'backbone', 'command', 'sample_pre
                 var leftPane = $('<div></div>');
                 var buttonWrap = $('<div></div>');
                 var productNameWrap = $('<div></div>');
-                var newButton = $('<button></button>');
+                var newButton = $('<button id="newButton"></button>');
                 var openButton = $('<button></button>');
 
                 var contentPane = $('<div></div>');
@@ -111,7 +111,7 @@ define(['require', 'lodash', 'log', 'jquery', 'backbone', 'command', 'sample_pre
                 samplesPane.append(moreSampleLink);
 
                 // Show the import file dialog when "More Samples" is clicked.
-                $(moreSampleLink).click(function () {
+                $(moreSampleLink).click(function(){
                     command.dispatch("open-sample-file-open-dialog");
                 });
 
@@ -166,18 +166,18 @@ define(['require', 'lodash', 'log', 'jquery', 'backbone', 'command', 'sample_pre
                         url: sampleServiceURL,
                         data: payload,
                         async: false,
-                        success: function (data, textStatus, xhr) {
+                        success: function(data, textStatus, xhr) {
                             var config =
                                 {
                                     "sampleName": samples[i].replace(/^.*[\\\/]/, '').match(/[^.]*/i)[0],
-                                    "content": data.content,
+                                    "content":data.content,
                                     "parentContainer": "#sampleContent",
                                     "firstItem": i === 0,
                                     "clickEventCallback": function (event) {
                                         event.preventDefault();
                                         var file = new File({
                                             content: data.content
-                                        }, {
+                                        },{
                                             storage: browserStorage
                                         });
                                         self.app.commandManager.dispatch("create-new-tab", {tabOptions: {file: file}});
@@ -187,7 +187,7 @@ define(['require', 'lodash', 'log', 'jquery', 'backbone', 'command', 'sample_pre
                             samplePreview = new SamplePreviewView(config);
                             samplePreview.render();
                         },
-                        error: function () {
+                        error: function() {
                             alertError("Unable to read a sample file.");
                             throw "Unable to read a sample file.";
                         }
@@ -207,13 +207,13 @@ define(['require', 'lodash', 'log', 'jquery', 'backbone', 'command', 'sample_pre
                 });
 
                 // Show the open file dialog when "open" is clicked.
-                $(openButton).click(function () {
+                $(openButton).click(function(){
                     command.dispatch("open-file-open-dialog");
                     browserStorage.put("pref:passedFirstLaunch", true);
                 });
 
                 // upon welcome tab remove, set flag to indicate first launch pass
-                this._tab.on('removed', function () {
+                this._tab.on('removed', function(){
                     browserStorage.put("pref:passedFirstLaunch", true);
                 });
 

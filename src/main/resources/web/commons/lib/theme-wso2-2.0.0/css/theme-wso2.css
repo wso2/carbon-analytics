@@ -4000,7 +4000,11 @@ footer a, footer a:hover {
 
 body.sticky-footer {
     padding-bottom: 40px;
-}
+    overflow: hidden !important;}
+body.sticky-footer footer {
+    position: absolute;
+    bottom: 0;
+    z-index: 1000; }
 
 body.sticky-footer footer {
     position: absolute;

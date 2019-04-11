@@ -16,8 +16,8 @@
  * under the License.
  */
 
-define(['require', 'elementUtils'],
-    function (require, ElementUtils) {
+define(['require', 'elementUtils', 'constants'],
+    function (require, ElementUtils, Constants) {
 
         /**
          * @class Stream
@@ -28,17 +28,17 @@ define(['require', 'elementUtils'],
         var Stream = function (options) {
             /*
              Data storing structure as follows
-             id: '',
-             previousCommentSegment:'',
-             name: '',
-             attributeList: [
-             {
-             name: ‘’,
-             type: ‘’
-             }
-             ],
-             annotationList: [annotation1, annotation2, ...]
-             */
+                id: '',
+                previousCommentSegment:'',
+                name: '',
+                attributeList: [
+                    {
+                        name: ‘’,
+                        type: ‘’
+                    }
+                ],
+                annotationList: [annotation1, annotation2, ...]
+            */
             if (options !== undefined) {
                 this.id = options.id;
                 this.previousCommentSegment = options.previousCommentSegment;
@@ -108,6 +108,25 @@ define(['require', 'elementUtils'],
 
         Stream.prototype.setAnnotationList = function (annotationList) {
             this.annotationList = annotationList;
+        };
+
+        Stream.prototype.hasFaultStream = function() {
+            // Check if the OnError(action='STREAM') annotation is set. If so enable the fault connector.
+            var faultStream = false;
+            this.annotationListObjects.forEach(function(annotation) {
+                if (annotation.name === 'OnError') {
+                    annotation.elements.forEach(function(p) {
+                        if (p.key.toLowerCase() === 'action' && p.value.toLowerCase() === 'stream') {
+                            faultStream = true;
+                        }
+                    });
+                }
+            });
+            return faultStream;
+        };
+
+        Stream.prototype.isFaultStream = function() {
+            return this.name && this.name.startsWith(Constants.FAULT_STREAM_PREFIX);
         };
 
         return Stream;

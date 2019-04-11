@@ -29,6 +29,8 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'jsonValidator', 'con
                 this.configurationData = options.configurationData;
                 this.application = options.application;
                 this.formUtils = options.formUtils;
+                this.dropElementInstance = options.dropElementInstance;
+                this.designGrid = options.designGrid;
                 this.jsPlumbInstance = options.jsPlumbInstance;
                 this.consoleListManager = options.application.outputController;
                 var currentTabId = this.application.tabController.activeTab.cid;
@@ -46,44 +48,46 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'jsonValidator', 'con
         StreamForm.prototype.generatePropertiesForm = function (element, formConsole, formContainer) {
             var self = this;
             var id = $(element).parent().attr('id');
-            var clickedElement = self.configurationData.getSiddhiAppConfig().getStream(id);
-            var propertyDiv = $('<div class = "stream-form-container"><div id="property-header"><h3>Stream' +
-                ' Configuration</h3></div> <h4>Name: </h4> <input type="text" id="streamName" class="clearfix">' +
+            var streamObject = self.configurationData.getSiddhiAppConfig().getStream(id);
+            var propertyDiv = $('<div class = "stream-form-container"> <label> <span class="mandatory-symbol"> *</span> ' +
+                'Name </label> <input type="text" id="streamName" class="clearfix name">' +
                 '<label class="error-message" id="streamNameErrorMessage"> </label>' +
                 '<div id="define-attribute"></div>' + self.formUtils.buildFormButtons() +
-                '</div> <div class= "stream-form-container"> <div id="define-annotation"> </div> </div>');
+                '</div> <div class= "stream-form-container"> <div class ="define-annotation"> </div> </div>');
 
             formContainer.append(propertyDiv);
             self.formUtils.popUpSelectedElement(id);
             self.designViewContainer.addClass('disableContainer');
             self.toggleViewButton.addClass('disableContainer');
 
+            self.formUtils.addEventListenerToRemoveRequiredClass();
+            self.formUtils.addEventListenerToShowInputContentOnHover();
+
             var annotations = [];
-            var predefinedAnnotationList = JSON.parse(JSON.stringify(self.configurationData.application.config.stream_predefined_annotations));
+            var predefinedAnnotationList = _.cloneDeep(self.configurationData.application.config.
+                stream_predefined_annotations);
             var checkedAnnotations = [];
 
-            self.formUtils.addEventListenersForAttributeDiv();
-
-            var name = clickedElement.getName();
+            var name = streamObject.getName();
             if (!name) {
                 //if stream form is freshly opened [new object]
                 annotations = predefinedAnnotationList;
-                var attributes = [{name: ""}];
+                var attributes = [{ name: "" }];
                 self.formUtils.renderAttributeTemplate(attributes)
             } else {
                 //if the stream object is already edited
                 $('#streamName').val(name);
 
                 //load the saved attributes
-                var savedAttributes = clickedElement.getAttributeList();
-                self.formUtils.renderAttributeTemplate(savedAttributes)
-                self.formUtils.selectTypesOfSavedAttributes(savedAttributes);
+                var attributeList = streamObject.getAttributeList();
+                self.formUtils.renderAttributeTemplate(attributeList)
+                self.formUtils.selectTypesOfSavedAttributes(attributeList);
 
                 //load the saved annotations
-                var savedAnnotations = clickedElement.getAnnotationListObjects();
+                var annotationListObjects = streamObject.getAnnotationListObjects();
                 _.forEach(predefinedAnnotationList, function (predefinedAnnotation) {
                     var foundPredefined = false;
-                    _.forEach(savedAnnotations, function (savedAnnotation) {
+                    _.forEach(annotationListObjects, function (savedAnnotation) {
                         if (savedAnnotation.name.toLowerCase() == predefinedAnnotation.name.toLowerCase()) {
                             //if an optional annotation is found push it to the checkedAnnotations[]
                             if (!predefinedAnnotation.isMandatory) {
@@ -92,11 +96,11 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'jsonValidator', 'con
                             foundPredefined = true;
                             _.forEach(predefinedAnnotation.elements, function (predefinedAnnotationElement) {
                                 _.forEach(savedAnnotation.elements, function (savedAnnotationElement) {
-                                    if (predefinedAnnotationElement.key.toLowerCase() == savedAnnotationElement.key
+                                    if (predefinedAnnotationElement.name.toLowerCase() == savedAnnotationElement.key
                                             .toLowerCase()) {
                                         //if an optional property is found push it to the checkedAnnotations[]
                                         if (!predefinedAnnotationElement.isMandatory) {
-                                            checkedAnnotations.push(savedAnnotationElement.key);
+                                            checkedAnnotations.push(savedAnnotationElement.name);
                                         }
                                         predefinedAnnotationElement.defaultValue = savedAnnotationElement.value;
                                     }
@@ -117,11 +121,10 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'jsonValidator', 'con
             self.formUtils.checkPredefinedAnnotations(checkedAnnotations);
 
             //submit button action
-            var submitButtonElement = $(formContainer).find('#btn-submit')[0];
-            submitButtonElement.addEventListener('click', function () {
-                $('.error-message').text("")
-                $('.required-input-field').removeClass('required-input-field');
-                $('#streamNameErrorMessage').text("")
+            $(formContainer).on('click', '#btn-submit', function () {
+
+                self.formUtils.removeErrorClass();
+                var previouslySavedStreamName = streamObject.getName();
 
                 var configName = $('#streamName').val().trim();
                 var streamName;
@@ -129,9 +132,9 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'jsonValidator', 'con
                 var isStreamNameUsed;
                 var isErrorOccurred = false;
                 /*
-                 * check whether the stream is inside a partition and if yes check whether it begins with '#'.
-                 *  If not add '#' to the beginning of the stream name.
-                 * */
+                * check whether the stream is inside a partition and if yes check whether it begins with '#'.
+                *  If not add '#' to the beginning of the stream name.
+                * */
                 var isStreamSavedInsideAPartition
                     = self.configurationData.getSiddhiAppConfig().getStreamSavedInsideAPartition(id);
                 if (!isStreamSavedInsideAPartition) {
@@ -178,7 +181,7 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'jsonValidator', 'con
                     isErrorOccurred = true;
                     return;
                 }
-                var previouslySavedName = clickedElement.getName();
+                var previouslySavedName = streamObject.getName();
                 if (previouslySavedName === undefined) {
                     previouslySavedName = "";
                 }
@@ -212,7 +215,7 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'jsonValidator', 'con
                     = self.configurationData.getSiddhiAppConfig().getStreamSavedInsideAPartition(id);
                 // if streamSavedInsideAPartition is undefined then the stream is not inside a partition
                 if (streamSavedInsideAPartition !== undefined) {
-                    var isValid = JSONValidator.prototype.validateInnerStream(clickedElement, self.jsPlumbInstance,
+                    var isValid = JSONValidator.prototype.validateInnerStream(streamObject, self.jsPlumbInstance,
                         false);
                     if (!isValid) {
                         isErrorOccurred = true;
@@ -221,50 +224,52 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'jsonValidator', 'con
                 }
 
                 if (!isErrorOccurred) {
-                    if (previouslySavedName !== streamName) {
-                        // update selected stream model
-                        clickedElement.setName(streamName);
-                        // update connection related to the element if the name is changed
-                        self.formUtils.updateConnectionsAfterDefinitionElementNameChange(id);
-
-                        var textNode = $('#' + id).find('.streamNameNode');
-                        textNode.html(streamName);
-                    }
+                    var outConnections = self.jsPlumbInstance.getConnections({ source: id + '-out' });
+                    var inConnections = self.jsPlumbInstance.getConnections({ target: id + '-in' });
+                    // delete connections related to the element if the name is changed
+                    self.formUtils.deleteConnectionsAfterDefinitionElementNameChange(outConnections, inConnections);
+                    // update selected stream model
+                    streamObject.setName(streamName);
+                    // establish connections related to the element if the name is changed
+                    self.formUtils.establishConnectionsAfterDefinitionElementNameChange(outConnections, inConnections);
+                    var textNode = $('#' + id).find('.streamNameNode');
+                    textNode.html(streamName);
 
                     //clear the previously saved attribute list
-                    clickedElement.clearAttributeList();
+                    streamObject.clearAttributeList();
                     //add the attributes to the attribute list
                     $('.attribute .attr-content').each(function () {
                         var nameValue = $(this).find('.attr-name').val().trim();
                         var typeValue = $(this).find('.attr-type').val();
                         if (nameValue != "") {
-                            var attributeObject = new Attribute({name: nameValue, type: typeValue});
-                            clickedElement.addAttribute(attributeObject)
+                            var attributeObject = new Attribute({ name: nameValue, type: typeValue });
+                            streamObject.addAttribute(attributeObject)
                         }
                     });
 
                     var annotationStringList = [];
                     var annotationObjectList = [];
                     //clear the saved annotations
-                    clickedElement.clearAnnotationList();
-                    clickedElement.clearAnnotationListObjects();
+                    streamObject.clearAnnotationList();
+                    streamObject.clearAnnotationListObjects();
                     self.formUtils.buildAnnotation(annotationNodes, annotationStringList, annotationObjectList);
                     _.forEach(annotationStringList, function (annotation) {
-                        clickedElement.addAnnotation(annotation);
+                        streamObject.addAnnotation(annotation);
                     });
                     _.forEach(annotationObjectList, function (annotation) {
-                        clickedElement.addAnnotationObject(annotation);
+                        streamObject.addAnnotationObject(annotation);
                     });
+
+                    self.dropElementInstance.toggleFaultStreamConnector(streamObject, self.jsPlumbInstance,
+                        previouslySavedStreamName);
 
                     $('#' + id).removeClass('incomplete-element');
                     //Send stream element to the backend and generate tooltip
-                    var streamToolTip = self.formUtils.getTooltip(clickedElement, Constants.STREAM);
+                    var streamToolTip = self.formUtils.getTooltip(streamObject, Constants.STREAM);
                     $('#' + id).prop('title', streamToolTip);
 
                     // set the isDesignViewContentChanged to true
                     self.configurationData.setIsDesignViewContentChanged(true);
-                    self.designViewContainer.removeClass('disableContainer');
-                    self.toggleViewButton.removeClass('disableContainer');
                     // close the form window
                     self.consoleListManager.removeFormConsole(formConsole);
                 }
@@ -273,8 +278,6 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'jsonValidator', 'con
             // 'Cancel' button action
             var cancelButtonElement = $(formContainer).find('#btn-cancel')[0];
             cancelButtonElement.addEventListener('click', function () {
-                self.designViewContainer.removeClass('disableContainer');
-                self.toggleViewButton.removeClass('disableContainer');
                 // close the form window
                 self.consoleListManager.removeFormConsole(formConsole);
             });
