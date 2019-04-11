@@ -28,12 +28,12 @@ define(([], function () {
                     id: "deploy-to-server",
                     shortcuts: {
                         mac: {
-                            key: "command+shift+d",
-                            label: "\u2318\u21E7D"
+                            key: "command+shift+p",
+                            label: "\u2318\u21E7P"
                         },
                         other: {
-                            key: "ctrl+shift+d",
-                            label: "Ctrl+Shift+D"
+                            key: "ctrl+shift+p",
+                            label: "Ctrl+Shift+P"
                         }
                     }
                 },
