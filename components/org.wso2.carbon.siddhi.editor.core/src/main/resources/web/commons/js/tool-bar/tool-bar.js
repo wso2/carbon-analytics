@@ -118,16 +118,15 @@ define(['log', 'jquery', 'lodash', 'workspace', 'backbone'],
                     stopElement.addClass('fw-spin');
                     stopElement.removeClass('fw-stop');
                     this._stopBtn.css('cursor', 'not-allowed');
-                    stopElement.attr('title', 'stopping');
-                    this._stopBtn.attr('title', 'stopping');
+                    this._stopBtn.attr('title', 'Stopping');
                 },
                 disableStopButtonLoading: function(){
                     var stopElement = this._stopBtn.find('.fw-loader5');
                     stopElement.removeClass('fw-loader5');
                     stopElement.removeClass('fw-spin');
                     stopElement.addClass('fw-stop');
-                    stopElement.attr('title', 'stop');
-                    this._stopBtn.attr('title', 'stop');
+                    this._stopBtn.attr('title', 'Stop');
+                    this._stopBtn.removeAttr('style');
                 }
             });
         return ToolBar;
