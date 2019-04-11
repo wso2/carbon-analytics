@@ -129,8 +129,6 @@ export default class ComponentTable extends React.Component {
                 </TableHeader>
                 <TableBody displayRowCheckbox={false} style={{backgroundColor: '#131313'}}>
                     {this.state.componentData.map((component) => {
-                        console.log(this.state.statsEnable);
-                        console.log(component);
                         var isSkip = false;
                         if (this.state.statsEnable === 'BASIC') {
                             if (basicComponentTypes.includes(component.type)) {

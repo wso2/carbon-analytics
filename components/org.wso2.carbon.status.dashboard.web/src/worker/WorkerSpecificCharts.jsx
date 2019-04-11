@@ -148,7 +148,6 @@ export default class WorkerSpecificCharts extends React.Component {
     }
 
     componentWillMount() {
-        console.log("componentWillMount(_)");
         let queryParams = {
             params: {
                 period: '5min'
@@ -159,7 +158,6 @@ export default class WorkerSpecificCharts extends React.Component {
         StatusDashboardAPIS.getHAWorkerDetailsByID(this.state.workerId, queryParams)
             .then((response) => {
                 if (response.data.haStatus) {
-                    console.log(response.data);
                     that.setState({
                         isHADeployment: true,
                         haStatus: response.data.haStatus
@@ -181,7 +179,6 @@ export default class WorkerSpecificCharts extends React.Component {
 
         StatusDashboardAPIS.getHAWorkerHistoryByID(this.state.workerId, queryParams)
             .then((response) => {
-                console.log("Publishing throughput data: " + response.data.sendingThroughput.data);
                 that.setState({
                     receivingThroughput: response.data.receivingThroughput.data,
                     sendingThroughput: response.data.sendingThroughput.data
