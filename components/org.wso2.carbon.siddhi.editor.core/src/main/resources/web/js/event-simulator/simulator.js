@@ -446,10 +446,10 @@ define(['jquery', 'log', './constants', './simulator-rest-client', 'lodash', './
             '</label>' +
             '</div>'+
             '<div class="switch-toggle switch-ios col-md-6">' +
-                '<input id="run" name="run-debug" checked type="radio" value="run">' +
-                '<label for="run" onclick="">Run</label>' +
-                '<input id="debug" name="run-debug" type="radio" value="debug">' +
-                '<label for="debug" onclick="">Debug</label>' +
+                '<input id="btnRadioRun" name="run-debug" checked type="radio" value="run">' +
+                '<label for="btnRadioRun" onclick="">Run</label>' +
+                '<input id="btnRadioDebug" name="run-debug" type="radio" value="debug">' +
+                '<label for="btnRadioDebug" onclick="">Debug</label>' +
                 '<a></a>' +
             '</div>';
         return runDebugButtons;
