@@ -24,30 +24,37 @@ import io.siddhi.distribution.editor.core.util.designview.beans.configs.siddhiel
  * Represents Siddhi Partition with element.
  */
 public class PartitionWithElement extends SiddhiElementConfig {
+
     private String expression;
     private String streamName;
 
     public PartitionWithElement() {
+
     }
 
     public PartitionWithElement(String expression, String streamName) {
+
         this.expression = expression;
         this.streamName = streamName;
     }
 
     public String getExpression() {
+
         return expression;
     }
 
     public void setExpression(String expression) {
+
         this.expression = expression;
     }
 
     public String getStreamName() {
+
         return streamName;
     }
 
     public void setStreamName(String streamName) {
+
         this.streamName = streamName;
     }
 }

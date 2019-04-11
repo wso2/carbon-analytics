@@ -22,40 +22,49 @@ package io.siddhi.distribution.editor.core.util.designview.designgenerator.gener
  * Configuration class for logical statement element.
  */
 public class LogicalStateElementConfig implements StateElementConfig {
+
     private StreamStateElementConfig streamStateElement1;
     private String type;
     private StreamStateElementConfig streamStateElement2;
     private String within;
 
     public StreamStateElementConfig getStreamStateElement1() {
+
         return streamStateElement1;
     }
 
     public void setStreamStateElement1(StreamStateElementConfig streamStateElement1) {
+
         this.streamStateElement1 = streamStateElement1;
     }
 
     public String getType() {
+
         return type;
     }
 
     public void setType(String type) {
+
         this.type = type;
     }
 
     public StreamStateElementConfig getStreamStateElement2() {
+
         return streamStateElement2;
     }
 
     public void setStreamStateElement2(StreamStateElementConfig streamStateElement2) {
+
         this.streamStateElement2 = streamStateElement2;
     }
 
     public String getWithin() {
+
         return within;
     }
 
     public void setWithin(String within) {
+
         this.within = within;
     }
 }

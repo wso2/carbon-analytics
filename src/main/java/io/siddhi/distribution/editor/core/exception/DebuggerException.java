@@ -29,6 +29,7 @@ public class DebuggerException extends Exception {
      * @param message Error Message
      */
     public DebuggerException(String message) {
+
         super(message);
     }
 }

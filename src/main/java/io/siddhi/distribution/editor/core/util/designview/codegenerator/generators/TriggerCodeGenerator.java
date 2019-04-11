@@ -37,6 +37,7 @@ public class TriggerCodeGenerator {
      * @throws CodeGenerationException Error when generating the code
      */
     public String generateTrigger(TriggerConfig trigger, boolean isGeneratingToolTip) throws CodeGenerationException {
+
         CodeGeneratorUtils.NullValidator.validateConfigObject(trigger);
         StringBuilder triggerStringBuilder = new StringBuilder();
 

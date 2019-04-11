@@ -24,6 +24,7 @@ import io.siddhi.distribution.editor.core.internal.EditorDataHolder;
  * Factory that is used to produce a HTTPS client for calling a Worker.
  */
 public class SiddhiAppDeployerFactory {
+
     private static final int CLIENT_CONNECTION_TIMEOUT = 5000;
     private static final int CLIENT_READ_TIMEOUT = 5000;
 
@@ -37,6 +38,7 @@ public class SiddhiAppDeployerFactory {
      */
     public static SiddhiAppDeployerServiceStub getSiddhiAppDeployerHttpsClient(String httpsUrl, String username,
                                                                                String password) {
+
         return EditorDataHolder.getInstance().getClientBuilderService().build(username, password,
                 CLIENT_CONNECTION_TIMEOUT, CLIENT_READ_TIMEOUT, SiddhiAppDeployerServiceStub.class, httpsUrl);
     }

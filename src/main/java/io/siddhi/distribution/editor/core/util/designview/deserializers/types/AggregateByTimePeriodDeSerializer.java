@@ -34,11 +34,13 @@ import java.lang.reflect.Type;
  * De-serializer for AggregateByTimePeriod class.
  */
 public class AggregateByTimePeriodDeSerializer implements JsonDeserializer {
+
     private static final String TYPE = "type";
 
     @Override
     public Object deserialize(
             JsonElement jsonElement, Type type, JsonDeserializationContext jsonDeserializationContext) {
+
         JsonObject jsonObject = jsonElement.getAsJsonObject();
         JsonPrimitive jsonPrimitive = (JsonPrimitive) jsonObject.get(TYPE);
         String attributesSelectionType = jsonPrimitive.getAsString();

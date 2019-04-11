@@ -35,6 +35,7 @@ import java.util.concurrent.LinkedBlockingQueue;
  * Class for debugger runtime implementation.
  */
 public class DebugRuntime {
+
     private String siddhiAppName;
     private Mode mode = Mode.STOP;
     private transient String siddhiApp;
@@ -43,6 +44,7 @@ public class DebugRuntime {
     private transient LinkedBlockingQueue<DebugCallbackEvent> callbackEventsQueue;
 
     public DebugRuntime(String siddhiAppName, String siddhiApp) {
+
         this.siddhiAppName = siddhiAppName;
         this.siddhiApp = siddhiApp;
         callbackEventsQueue = new LinkedBlockingQueue<>(10);
@@ -50,22 +52,27 @@ public class DebugRuntime {
     }
 
     public String getSiddhiAppName() {
+
         return siddhiAppName;
     }
 
     public Mode getMode() {
+
         return mode;
     }
 
     public void setMode(Mode mode) {
+
         this.mode = mode;
     }
 
     public SiddhiDebugger getDebugger() {
+
         return debugger;
     }
 
     public void start() {
+
         if (Mode.STOP.equals(mode)) {
             try {
                 siddhiAppRuntime.start();
@@ -80,6 +87,7 @@ public class DebugRuntime {
     }
 
     public void debug() {
+
         if (Mode.STOP.equals(mode)) {
             try {
                 debugger = siddhiAppRuntime.debug();
@@ -99,6 +107,7 @@ public class DebugRuntime {
     }
 
     public void stop() {
+
         if (debugger != null) {
             debugger.releaseAllBreakPoints();
             debugger.play();
@@ -113,11 +122,13 @@ public class DebugRuntime {
     }
 
     public void reload(String siddhiApp) {
+
         this.siddhiApp = siddhiApp;
         stop();
     }
 
     public List<String> getStreams() {
+
         if (!Mode.FAULTY.equals(mode)) {
             return new ArrayList<>(siddhiAppRuntime.getStreamDefinitionMap().keySet());
         } else {
@@ -126,6 +137,7 @@ public class DebugRuntime {
     }
 
     public List<String> getQueries() {
+
         if (!Mode.FAULTY.equals(mode)) {
             return new ArrayList<>(siddhiAppRuntime.getQueryNames());
         } else {
@@ -134,6 +146,7 @@ public class DebugRuntime {
     }
 
     public InputHandler getInputHandler(String streamName) {
+
         if (!Mode.FAULTY.equals(mode)) {
             return siddhiAppRuntime.getInputHandler(streamName);
         } else {
@@ -142,6 +155,7 @@ public class DebugRuntime {
     }
 
     public List<Attribute> getStreamAttributes(String streamName) {
+
         if (!Mode.FAULTY.equals(mode)) {
             if (siddhiAppRuntime.getStreamDefinitionMap().containsKey(streamName)) {
                 return siddhiAppRuntime.getStreamDefinitionMap().get(streamName).getAttributeList();
@@ -155,10 +169,12 @@ public class DebugRuntime {
     }
 
     public LinkedBlockingQueue<DebugCallbackEvent> getCallbackEventsQueue() {
+
         return callbackEventsQueue;
     }
 
     private void createRuntime() {
+
         try {
             if (siddhiApp != null && !siddhiApp.isEmpty()) {
                 siddhiAppRuntime = EditorDataHolder.getSiddhiManager()
@@ -173,6 +189,7 @@ public class DebugRuntime {
     }
 
     public SiddhiAppRuntime getSiddhiAppRuntime() {
+
         return siddhiAppRuntime;
     }
 

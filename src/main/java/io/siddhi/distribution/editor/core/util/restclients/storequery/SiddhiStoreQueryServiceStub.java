@@ -29,6 +29,7 @@ import javax.ws.rs.core.MediaType;
  * Feign client to access the Siddhi store query APIs.
  */
 public interface SiddhiStoreQueryServiceStub {
+
     @RequestLine("POST /stores/query")
     @Headers("Content-Type: " + MediaType.APPLICATION_JSON)
     Response executeStoreQuery(String payload);

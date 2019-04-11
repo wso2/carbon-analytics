@@ -46,11 +46,13 @@ import java.util.Set;
 public class OuterScopeCommentsPreserver extends ScopedCommentsPreserver {
 
     public OuterScopeCommentsPreserver(String siddhiAppString, Set<ElementCodeSegment> elementCodeSegments) {
+
         super(siddhiAppString, new ArrayList<>(elementCodeSegments));
     }
 
     @Override
     public List<CommentCodeSegment> generateCommentCodeSegments() throws DesignGenerationException {
+
         Collections.sort(elementCodeSegments);
         elementCodeSegments = filterMajorElementCodeSegments(elementCodeSegments);
         commentCodeSegments = detectCommentCodeSegments(elementCodeSegments);
@@ -60,6 +62,7 @@ public class OuterScopeCommentsPreserver extends ScopedCommentsPreserver {
     @Override
     public SiddhiAppConfig bindCommentsToElements(Collection<CommentCodeSegment> commentCodeSegments,
                                                   SiddhiAppConfig siddhiAppConfigReference) {
+
         for (SourceSinkConfig sourceConfig : siddhiAppConfigReference.getSourceList()) {
             assignPreviousCommentSegment(sourceConfig, commentCodeSegments);
         }

@@ -22,6 +22,7 @@ package io.siddhi.distribution.editor.core.util.designview.constants.regexpatter
  * Has Regex pattern string constants, related to Code to Design.
  */
 public class CodeToDesignRegexPatterns {
+
     public static final String SOURCE_ANNOTATION_CONTENT = "@source\\s*\\(\\s*(.+)\\s*\\)[^.]";
     public static final String SOURCE_SINK_MAP_ANNOTATION_CONTENT = "@map\\s*\\(\\s*(.+)\\s*\\)";
     public static final String MAP_TYPE = "type\\s*=\\'\\s*(.+)\\s*\\'\\s*[,)]";
@@ -30,5 +31,6 @@ public class CodeToDesignRegexPatterns {
      * Avoids Instantiation.
      */
     private CodeToDesignRegexPatterns() {
+
     }
 }

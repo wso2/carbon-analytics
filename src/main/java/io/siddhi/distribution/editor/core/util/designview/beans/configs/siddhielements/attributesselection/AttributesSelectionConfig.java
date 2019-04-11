@@ -24,13 +24,16 @@ import io.siddhi.distribution.editor.core.util.designview.beans.configs.siddhiel
  * Represents selection of Siddhi attributes.
  */
 public abstract class AttributesSelectionConfig extends SiddhiElementConfig {
+
     private String type;
 
     public AttributesSelectionConfig(String type) {
+
         this.type = type;
     }
 
     public String getType() {
+
         return type;
     }
 }

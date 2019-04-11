@@ -26,35 +26,43 @@ import java.util.List;
  * Represents Siddhi Update Or Insert Into Query's output.
  */
 public class UpdateInsertIntoOutputConfig extends OutputConfig {
+
     private List<SetAttributeConfig> set;
     private String on;
 
     public UpdateInsertIntoOutputConfig() {
+
     }
 
     public UpdateInsertIntoOutputConfig(String eventType) {
+
         super(eventType);
     }
 
     public UpdateInsertIntoOutputConfig(String eventType, List<SetAttributeConfig> set, String on) {
+
         super(eventType);
         this.set = set;
         this.on = on;
     }
 
     public List<SetAttributeConfig> getSet() {
+
         return set;
     }
 
     public void setSet(List<SetAttributeConfig> set) {
+
         this.set = set;
     }
 
     public String getOn() {
+
         return on;
     }
 
     public void setOn(String on) {
+
         this.on = on;
     }
 }

@@ -27,18 +27,22 @@ import java.util.List;
  * Represents an 'aggregateByTimePeriod' element by a list of time intervals.
  */
 public class AggregateByTimeInterval extends AggregateByTimePeriod {
+
     private List<String> value;
 
     public AggregateByTimeInterval(List<String> value) {
+
         super(AggregationByTimeType.INTERVAL.toString());
         this.value = value;
     }
 
     public List<String> getValue() {
+
         return value;
     }
 
     public void setValue(List<String> value) {
+
         this.value = value;
     }
 }

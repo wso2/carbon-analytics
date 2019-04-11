@@ -24,14 +24,17 @@ package io.siddhi.distribution.editor.core.exception;
 public class NoSuchStreamException extends RuntimeException {
 
     public NoSuchStreamException(String msg) {
+
         super(msg);
     }
 
     public NoSuchStreamException(Exception cause) {
+
         super(cause);
     }
 
     public NoSuchStreamException(String msg, Exception cause) {
+
         super(msg, cause);
     }
 

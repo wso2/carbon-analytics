@@ -38,9 +38,11 @@ import java.util.List;
  * Generator to create StreamHandlerConfig from Siddhi elements.
  */
 public class StreamHandlerConfigGenerator {
+
     private String siddhiAppString;
 
     public StreamHandlerConfigGenerator(String siddhiAppString) {
+
         this.siddhiAppString = siddhiAppString;
     }
 
@@ -53,6 +55,7 @@ public class StreamHandlerConfigGenerator {
      */
     public List<StreamHandlerConfig> generateStreamHandlerConfigList(List<StreamHandler> streamHandlers)
             throws DesignGenerationException {
+
         List<StreamHandlerConfig> streamHandlerConfigList = new ArrayList<>();
         for (StreamHandler streamHandler : streamHandlers) {
             streamHandlerConfigList.add(generateStreamHandlerConfig(streamHandler));
@@ -69,6 +72,7 @@ public class StreamHandlerConfigGenerator {
      */
     private StreamHandlerConfig generateStreamHandlerConfig(StreamHandler streamHandler)
             throws DesignGenerationException {
+
         if (streamHandler instanceof Filter) {
             return generateFilterConfig((Filter) streamHandler);
         } else if (streamHandler instanceof StreamFunction) {
@@ -87,6 +91,7 @@ public class StreamHandlerConfigGenerator {
      * @throws DesignGenerationException Error while generating filter
      */
     private FilterConfig generateFilterConfig(Filter filter) throws DesignGenerationException {
+
         String filterDefinition = ConfigBuildingUtilities.getDefinition(filter, siddhiAppString);
         return new FilterConfig(filterDefinition.substring(1, filterDefinition.length() - 1).trim());
     }
@@ -99,6 +104,7 @@ public class StreamHandlerConfigGenerator {
      * @throws DesignGenerationException Error while generating function
      */
     private FunctionWindowConfig generateFunction(StreamFunction streamFunction) throws DesignGenerationException {
+
         StringBuilder function = new StringBuilder();
         if (streamFunction.getNamespace() != null && !streamFunction.getNamespace().isEmpty()) {
             function.append(streamFunction.getNamespace());
@@ -121,6 +127,7 @@ public class StreamHandlerConfigGenerator {
      * @throws DesignGenerationException Error while generating window
      */
     private FunctionWindowConfig generateWindow(Window window) throws DesignGenerationException {
+
         StringBuilder function = new StringBuilder();
         if (window.getNamespace() != null && !window.getNamespace().isEmpty()) {
             function.append(window.getNamespace());
@@ -143,6 +150,7 @@ public class StreamHandlerConfigGenerator {
      * @throws DesignGenerationException Error while generating parameters
      */
     private List<String> generateParameters(Expression[] parameters) throws DesignGenerationException {
+
         List<String> parameterStrings = new ArrayList<>();
         if (parameters == null) {
             return null;

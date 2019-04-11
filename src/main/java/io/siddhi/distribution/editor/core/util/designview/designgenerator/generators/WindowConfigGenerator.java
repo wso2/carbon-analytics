@@ -32,9 +32,11 @@ import java.util.List;
  * Generator to create WindowConfig.
  */
 public class WindowConfigGenerator extends CodeSegmentsPreserver {
+
     private String siddhiAppString;
 
     public WindowConfigGenerator(String siddhiAppString) {
+
         this.siddhiAppString = siddhiAppString;
     }
 
@@ -46,6 +48,7 @@ public class WindowConfigGenerator extends CodeSegmentsPreserver {
      * @throws DesignGenerationException Error while generating WindowConfig
      */
     public WindowConfig generateWindowConfig(WindowDefinition windowDefinition) throws DesignGenerationException {
+
         List<String> parameters = new ArrayList<>();
         for (Expression expression : windowDefinition.getWindow().getParameters()) {
             parameters.add(ConfigBuildingUtilities.getDefinition(expression, siddhiAppString));

@@ -42,6 +42,7 @@ import java.util.List;
  * Generates Pattern/Sequence Query Input Config with given Siddhi elements.
  */
 public class PatternSequenceConfigGenerator {
+
     private static final String PATTERN_DELIMITER = " -> ";
     private static final String SEQUENCE_DELIMITER = " , ";
 
@@ -66,6 +67,7 @@ public class PatternSequenceConfigGenerator {
     private int eventReferenceCounter = 0;
 
     public PatternSequenceConfigGenerator(String siddhiAppString, QueryInputType mode) {
+
         this.siddhiAppString = siddhiAppString;
         this.mode = mode;
     }
@@ -78,6 +80,7 @@ public class PatternSequenceConfigGenerator {
      * @throws DesignGenerationException QueryInputType if not one of Pattern and Sequence
      */
     private static String getDelimiter(QueryInputType mode) throws DesignGenerationException {
+
         if (mode == QueryInputType.PATTERN) {
             return PATTERN_DELIMITER;
         } else if (mode == QueryInputType.SEQUENCE) {
@@ -95,6 +98,7 @@ public class PatternSequenceConfigGenerator {
      * @return MinMax expression
      */
     private static String buildMinMax(int min, int max, QueryInputType mode) {
+
         String acceptedMin = String.valueOf(min);
         String acceptedMax = String.valueOf(max);
         if (mode == QueryInputType.PATTERN) {
@@ -127,6 +131,7 @@ public class PatternSequenceConfigGenerator {
      * @return Within expression
      */
     private static String buildWithin(String nullableWithin) {
+
         if (nullableWithin == null) {
             return "";
         }
@@ -142,6 +147,7 @@ public class PatternSequenceConfigGenerator {
      */
     public PatternSequenceConfig generatePatternSequenceConfig(InputStream inputStream)
             throws DesignGenerationException {
+
         String delimiter = getDelimiter(mode);
         PatternSequenceConfigTreeInfo patternSequenceConfigTreeInfo =
                 new PatternSequenceConfigTreeInfoGenerator(siddhiAppString)
@@ -166,6 +172,7 @@ public class PatternSequenceConfigGenerator {
      *                                   and acquiring necessary elements
      */
     private void traverseInOrder(StateElementConfig currentElement) throws DesignGenerationException {
+
         if (currentElement instanceof NextStateElementConfig) {
             traverseInOrder(((NextStateElementConfig) currentElement).getStateElement());
             traverseInOrder(((NextStateElementConfig) currentElement).getNextStateElement());
@@ -183,6 +190,7 @@ public class PatternSequenceConfigGenerator {
      */
     private PatternSequenceConditionConfig generateConditionConfig(StateElementConfig element)
             throws DesignGenerationException {
+
         PatternSequenceConditionConfig conditionConfig = new PatternSequenceConditionConfig();
         if (element instanceof AbsentStreamStateElementConfig) {
             conditionConfig
@@ -242,6 +250,7 @@ public class PatternSequenceConfigGenerator {
      * @return Accepted/Generated stream reference
      */
     private String acceptOrGenerateNextStreamReference(String nullableStreamReference) {
+
         if (nullableStreamReference != null) {
             return nullableStreamReference;
         }
@@ -254,6 +263,7 @@ public class PatternSequenceConfigGenerator {
      * @return Next unavailable stream reference
      */
     private String generateNextUnavailableStreamReference() {
+
         String eventReference;
         do {
             eventReference = generateNextStreamReference();
@@ -268,6 +278,7 @@ public class PatternSequenceConfigGenerator {
      * @return Next stream reference
      */
     private String generateNextStreamReference() {
+
         return "e" + (++eventReferenceCounter);
     }
 
@@ -279,6 +290,7 @@ public class PatternSequenceConfigGenerator {
      * @throws DesignGenerationException Error while generating ElementComponent object
      */
     private void addElementComponent(StateElementConfig element) throws DesignGenerationException {
+
         ElementComponent elementComponent = generateElementComponent(element);
         conditionList.addAll(elementComponent.conditions);
         logicComponentList.addAll(elementComponent.logicComponents);
@@ -293,6 +305,7 @@ public class PatternSequenceConfigGenerator {
      * @throws DesignGenerationException Error while generating ElementComponent
      */
     private ElementComponent generateElementComponent(StateElementConfig element) throws DesignGenerationException {
+
         if (element instanceof CountStateElementConfig) {
             return generateCountStateElementComponent((CountStateElementConfig) element);
         } else if (element instanceof EveryStateElementConfig) {
@@ -317,6 +330,7 @@ public class PatternSequenceConfigGenerator {
      */
     private ElementComponent generateCountStateElementComponent(CountStateElementConfig element)
             throws DesignGenerationException {
+
         PatternSequenceConditionConfig conditionConfig = generateConditionConfig(element);
         // Add condition
         List<PatternSequenceConditionConfig> conditions = new ArrayList<>();
@@ -337,6 +351,7 @@ public class PatternSequenceConfigGenerator {
      */
     private ElementComponent generateEveryStateElementComponent(EveryStateElementConfig element)
             throws DesignGenerationException {
+
         ElementComponent containedElement = generateElementComponent(element.getStateElement());
         // Add conditions
         List<PatternSequenceConditionConfig> conditions = new ArrayList<>(containedElement.conditions);
@@ -357,6 +372,7 @@ public class PatternSequenceConfigGenerator {
      */
     private ElementComponent generateNextStateElementComponent(NextStateElementConfig element)
             throws DesignGenerationException {
+
         ElementComponent stateElement = generateElementComponent(element.getStateElement());
         ElementComponent nextStateElement = generateElementComponent(element.getNextStateElement());
         List<PatternSequenceConditionConfig> conditions = new ArrayList<>(stateElement.conditions);
@@ -376,6 +392,7 @@ public class PatternSequenceConfigGenerator {
      */
     private ElementComponent generateLogicalStateElementComponent(LogicalStateElementConfig element)
             throws DesignGenerationException {
+
         ElementComponent condition1Component = generateStreamStateElementComponent(element.getStreamStateElement1());
         ElementComponent condition2Component = generateStreamStateElementComponent(element.getStreamStateElement2());
         String logicComponent =
@@ -401,6 +418,7 @@ public class PatternSequenceConfigGenerator {
      */
     private ElementComponent generateStreamStateElementComponent(StreamStateElementConfig element)
             throws DesignGenerationException {
+
         PatternSequenceConditionConfig conditionConfig = generateConditionConfig(element);
         StringBuilder logicComponent = new StringBuilder();
         if (element instanceof AbsentStreamStateElementConfig) {
@@ -427,15 +445,18 @@ public class PatternSequenceConfigGenerator {
      * which consists of conditions and logic components belonging to a State Element.
      */
     private static class ElementComponent {
+
         List<PatternSequenceConditionConfig> conditions;
         List<String> logicComponents;
 
         private ElementComponent(List<PatternSequenceConditionConfig> conditions, List<String> logicComponents) {
+
             this.conditions = conditions;
             this.logicComponents = logicComponents;
         }
 
         private String getLogicComponentsString(QueryInputType mode) throws DesignGenerationException {
+
             return String.join(getDelimiter(mode), logicComponents);
         }
     }

@@ -28,6 +28,7 @@ import java.util.List;
  * Generator to create a list of AttributeConfigs, for a list of Siddhi Attributes.
  */
 public class AttributeConfigListGenerator extends CodeSegmentsPreserver {
+
     /**
      * Generates list of AttributeConfigs, with given List of Siddhi Attributes.
      *
@@ -35,6 +36,7 @@ public class AttributeConfigListGenerator extends CodeSegmentsPreserver {
      * @return List of AttributeConfig objects
      */
     public List<AttributeConfig> generateAttributeConfigList(List<Attribute> attributes) {
+
         List<AttributeConfig> attributeConfigs = new ArrayList<>();
         for (Attribute attribute : attributes) {
             AttributeConfig attributeConfig =

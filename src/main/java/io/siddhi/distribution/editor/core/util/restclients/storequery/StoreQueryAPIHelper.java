@@ -29,6 +29,7 @@ import org.wso2.transport.http.netty.contract.config.TransportsConfiguration;
  * Utility class to access the Siddhi Store API.
  */
 public class StoreQueryAPIHelper {
+
     private static final Logger logger = Logger.getLogger(StoreQueryAPIHelper.class);
     private static final String STORE_QUERY_API_CONFIG_NAMESPACE = "siddhi.stores.query.api";
     private ConfigProvider configProvider;
@@ -39,6 +40,7 @@ public class StoreQueryAPIHelper {
      * @param configProvider ConfigProvider object
      */
     public StoreQueryAPIHelper(ConfigProvider configProvider) {
+
         this.configProvider = configProvider;
     }
 
@@ -50,6 +52,7 @@ public class StoreQueryAPIHelper {
      * @throws SiddhiStoreQueryHelperException when executing store queries
      */
     public Response executeStoreQuery(String query) throws SiddhiStoreQueryHelperException {
+
         return StoreQueryHTTPClient.executeStoreQuery(getStoreAPIHost(), query);
     }
 
@@ -60,6 +63,7 @@ public class StoreQueryAPIHelper {
      * @throws SiddhiStoreQueryHelperException when executing store queries
      */
     private String getStoreAPIHost() throws SiddhiStoreQueryHelperException {
+
         try {
             TransportsConfiguration transportsConfiguration = this.configProvider.getConfigurationObject
                     (STORE_QUERY_API_CONFIG_NAMESPACE, TransportsConfiguration.class);

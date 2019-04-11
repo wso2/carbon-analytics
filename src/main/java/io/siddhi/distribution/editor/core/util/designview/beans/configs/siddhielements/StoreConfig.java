@@ -24,20 +24,24 @@ import java.util.List;
  * Represents configuration of 'Store' annotation in a Siddhi Table
  */
 public class StoreConfig extends SiddhiElementConfig {
+
     private String type;
     private List<String> options;
 
     public StoreConfig(String type, List<String> options) {
+
         super();
         this.type = type;
         this.options = options;
     }
 
     public String getType() {
+
         return type;
     }
 
     public List<String> getOptions() {
+
         return options;
     }
 }

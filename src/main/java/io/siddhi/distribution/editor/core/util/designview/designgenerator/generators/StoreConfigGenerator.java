@@ -30,7 +30,9 @@ import java.util.List;
  * Generator to create Store config
  */
 public class StoreConfigGenerator extends CodeSegmentsPreserver {
+
     public StoreConfig generateStoreConfig(Annotation storeAnnotation) throws DesignGenerationException {
+
         String type = null;
         List<String> options = new ArrayList<>();
         for (Element element : storeAnnotation.getElements()) {

@@ -26,6 +26,7 @@ import java.util.List;
  * Used in JSON responses.
  */
 public class ParameterMetaData {
+
     private String name;
     private List<DataType> type;
     private Boolean optional;
@@ -33,42 +34,52 @@ public class ParameterMetaData {
     private String defaultValue;
 
     public String getName() {
+
         return name;
     }
 
     public void setName(String name) {
+
         this.name = name;
     }
 
     public List<DataType> getType() {
+
         return type;
     }
 
     public void setType(List<DataType> type) {
+
         this.type = type;
     }
 
     public Boolean getOptional() {
+
         return optional;
     }
 
     public void setOptional(Boolean optional) {
+
         this.optional = optional;
     }
 
     public String getDescription() {
+
         return description;
     }
 
     public void setDescription(String description) {
+
         this.description = description;
     }
 
     public String getDefaultValue() {
+
         return this.defaultValue;
     }
 
     public void setDefaultValue(String defaultValue) {
+
         this.defaultValue = defaultValue;
     }
 }

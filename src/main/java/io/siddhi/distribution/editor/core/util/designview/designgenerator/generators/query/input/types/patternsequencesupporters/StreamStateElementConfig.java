@@ -26,40 +26,49 @@ import java.util.List;
  * Stream state element configuration class.
  */
 public class StreamStateElementConfig implements StateElementConfig {
+
     private String streamReference;
     private String streamName;
     private List<StreamHandlerConfig> streamHandlerList;
     private String within;
 
     public String getStreamReference() {
+
         return streamReference;
     }
 
     public void setStreamReference(String streamReference) {
+
         this.streamReference = streamReference;
     }
 
     public String getStreamName() {
+
         return streamName;
     }
 
     public void setStreamName(String streamName) {
+
         this.streamName = streamName;
     }
 
     public List<StreamHandlerConfig> getStreamHandlerList() {
+
         return streamHandlerList;
     }
 
     public void setStreamHandlerList(List<StreamHandlerConfig> streamHandlerList) {
+
         this.streamHandlerList = streamHandlerList;
     }
 
     public String getWithin() {
+
         return within;
     }
 
     public void setWithin(String within) {
+
         this.within = within;
     }
 }

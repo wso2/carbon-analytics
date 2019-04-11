@@ -26,20 +26,24 @@ import java.util.List;
  * Represents a Pattern | Sequence QueryInputConfig, for Siddhi Query.
  */
 public class PatternSequenceConfig extends QueryInputConfig {
+
     private List<PatternSequenceConditionConfig> conditionList;
     private String logic;
 
     public PatternSequenceConfig(String type, List<PatternSequenceConditionConfig> conditionList, String logic) {
+
         super(type);
         this.conditionList = conditionList;
         this.logic = logic;
     }
 
     public List<PatternSequenceConditionConfig> getConditionList() {
+
         return conditionList;
     }
 
     public String getLogic() {
+
         return logic;
     }
 }

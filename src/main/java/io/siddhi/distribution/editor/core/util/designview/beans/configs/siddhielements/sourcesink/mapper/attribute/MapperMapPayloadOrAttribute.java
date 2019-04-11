@@ -26,18 +26,22 @@ import java.util.Map;
  * Represents a map of values in the Mapper.
  */
 public class MapperMapPayloadOrAttribute extends MapperPayloadOrAttribute {
+
     private Map<String, String> value;
 
     public MapperMapPayloadOrAttribute(String payloadOrAttribute, Map<String, String> value) {
+
         super(payloadOrAttribute, MapperPayloadOrAttributeType.MAP.toString());
         this.value = value;
     }
 
     public Map<String, String> getValue() {
+
         return value;
     }
 
     public void setValue(Map<String, String> value) {
+
         this.value = value;
     }
 }

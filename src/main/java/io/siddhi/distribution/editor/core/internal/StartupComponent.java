@@ -45,11 +45,13 @@ public class StartupComponent {
 
     @Activate
     protected void start(BundleContext bundleContext) {
+
         logger.debug("Editor Core Startup Listener Service Component is Activated");
     }
 
     @Deactivate
     protected void stop() {
+
         logger.debug("Editor Core Startup Listener Service Component is Deactivated");
     }
 
@@ -58,6 +60,7 @@ public class StartupComponent {
             policy = ReferencePolicy.DYNAMIC,
             unbind = "unsetMicroservicesServer")
     protected void setMicroservicesServer(MicroservicesServer microservicesServer) {
+
         microservicesServer.getListenerConfigurations().entrySet().stream().forEach(entry -> {
             if (("http").equals(entry.getValue().getScheme())) {
                 String hostname;
@@ -77,6 +80,7 @@ public class StartupComponent {
     }
 
     protected void unsetMicroservicesServer(MicroservicesServer microservicesServer) {
+
         logger.debug("Microservices server unregistered from startup component of editor");
     }
 }

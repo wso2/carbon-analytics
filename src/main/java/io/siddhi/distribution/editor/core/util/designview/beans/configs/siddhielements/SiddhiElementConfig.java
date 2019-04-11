@@ -24,47 +24,58 @@ import io.siddhi.distribution.editor.core.util.designview.beans.configs.CommentC
  * Represents a Siddhi Element.
  */
 public abstract class SiddhiElementConfig {
+
     private String id;
     private int[] queryContextStartIndex;
     private int[] queryContextEndIndex;
     private CommentCodeSegment previousCommentSegment;
 
     public SiddhiElementConfig() {
+
     }
 
     public SiddhiElementConfig(String id) {
+
         this.id = id;
     }
 
     public String getId() {
+
         return id;
     }
 
     public void setId(String id) {
+
         this.id = id;
     }
 
     public int[] getQueryContextStartIndex() {
+
         return new int[]{queryContextStartIndex[0], queryContextStartIndex[1]};
     }
 
     public void setQueryContextStartIndex(int[] queryContextStartIndex) {
+
         this.queryContextStartIndex = new int[]{queryContextStartIndex[0], queryContextStartIndex[1]};
     }
 
     public int[] getQueryContextEndIndex() {
+
         return new int[]{queryContextEndIndex[0], queryContextEndIndex[1]};
     }
 
     public void setQueryContextEndIndex(int[] queryContextEndIndex) {
+
         this.queryContextEndIndex = new int[]{queryContextEndIndex[0], queryContextEndIndex[1]};
     }
 
     public CommentCodeSegment getPreviousCommentSegment() {
+
         return previousCommentSegment;
     }
 
     public void setPreviousCommentSegment(CommentCodeSegment previousCommentSegment) {
+
         this.previousCommentSegment = previousCommentSegment;
     }
 }

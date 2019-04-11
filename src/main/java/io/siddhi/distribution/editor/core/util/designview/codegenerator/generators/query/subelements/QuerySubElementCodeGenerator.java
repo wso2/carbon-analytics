@@ -31,6 +31,10 @@ import java.util.List;
  */
 public class QuerySubElementCodeGenerator {
 
+    private QuerySubElementCodeGenerator() {
+
+    }
+
     /**
      * Generates the Siddhi code representation of a query's group by list
      *
@@ -38,6 +42,7 @@ public class QuerySubElementCodeGenerator {
      * @return The Siddhi code representation of the given query's group by list
      */
     public static String generateQueryGroupBy(List<String> groupByList) {
+
         if (groupByList == null || groupByList.isEmpty()) {
             return SiddhiCodeBuilderConstants.EMPTY_STRING;
         }
@@ -55,6 +60,7 @@ public class QuerySubElementCodeGenerator {
      * @throws CodeGenerationException Error when generating the code
      */
     public static String generateQueryOrderBy(List<QueryOrderByConfig> orderByList) throws CodeGenerationException {
+
         if (orderByList == null || orderByList.isEmpty()) {
             return SiddhiCodeBuilderConstants.EMPTY_STRING;
         }
@@ -92,6 +98,7 @@ public class QuerySubElementCodeGenerator {
      * @return The Siddhi code representation of the given query's limit value
      */
     public static String generateQueryLimit(long limit) {
+
         if (limit != 0) {
             return SiddhiCodeBuilderConstants.NEW_LINE + SiddhiCodeBuilderConstants.LIMIT +
                     SiddhiCodeBuilderConstants.SPACE + limit;
@@ -106,13 +113,13 @@ public class QuerySubElementCodeGenerator {
      * @return The Siddhi code representation of the given query's offset value
      */
     public static String generateQueryOffset(long offset) {
+
         if (offset != 0) {
             return SiddhiCodeBuilderConstants.NEW_LINE + SiddhiCodeBuilderConstants.OFFSET +
                     SiddhiCodeBuilderConstants.SPACE + offset;
         }
         return SiddhiCodeBuilderConstants.EMPTY_STRING;
     }
-
 
     /**
      * Generates the Siddhi code representation of a query's having
@@ -121,6 +128,7 @@ public class QuerySubElementCodeGenerator {
      * @return The Siddhi code representation of the given query's having value
      */
     public static String generateQueryHaving(String having) {
+
         if (having == null || having.isEmpty()) {
             return SiddhiCodeBuilderConstants.EMPTY_STRING;
         }
@@ -136,14 +144,12 @@ public class QuerySubElementCodeGenerator {
      * @return The Siddhi code representation of the given query's output rate limit
      */
     public static String generateQueryOutputRateLimit(String outputRateLimit) {
+
         if (outputRateLimit == null || outputRateLimit.isEmpty()) {
             return SiddhiCodeBuilderConstants.EMPTY_STRING;
         }
 
         return SiddhiCodeBuilderConstants.NEW_LINE + SiddhiCodeBuilderConstants.OUTPUT +
                 SiddhiCodeBuilderConstants.SPACE + outputRateLimit;
-    }
-
-    private QuerySubElementCodeGenerator() {
     }
 }

@@ -24,14 +24,17 @@ import io.siddhi.distribution.editor.core.util.designview.constants.AttributeSel
  * Represents complete selection of Siddhi Attributes.
  */
 public class AllSelectionConfig extends AttributesSelectionConfig {
+
     private String value;
 
     public AllSelectionConfig() {
+
         super(AttributeSelection.TYPE_ALL);
         this.value = AttributeSelection.VALUE_ALL;
     }
 
     public String getValue() {
+
         return value;
     }
 }

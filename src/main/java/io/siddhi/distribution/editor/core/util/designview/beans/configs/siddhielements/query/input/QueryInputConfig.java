@@ -22,13 +22,16 @@ package io.siddhi.distribution.editor.core.util.designview.beans.configs.siddhie
  * Represents the 'input' part of a Siddhi Query.
  */
 public abstract class QueryInputConfig {
+
     private String type;
 
     public QueryInputConfig(String type) {
+
         this.type = type;
     }
 
     public String getType() {
+
         return type;
     }
 }

@@ -44,6 +44,7 @@ import java.util.zip.ZipOutputStream;
  * This class creates Docker artifacts with given Siddhi files.
  */
 public class DockerUtils {
+
     private static final Logger log = LoggerFactory.getLogger(DockerUtils.class);
     private static final String RESOURCES_DIR = "resources/docker-export";
     private static final String SIDDHI_FILES_DIR = "siddhi-files";
@@ -56,6 +57,7 @@ public class DockerUtils {
     private DockerConfigs dockerConfigs;
 
     public DockerUtils(ConfigProvider configProvider) {
+
         this.configProvider = configProvider;
     }
 
@@ -117,6 +119,7 @@ public class DockerUtils {
      * @return File map
      */
     private Map<String, Path> getFileMap(String profile, List<String> siddhiFiles) {
+
         Map<String, Path> files = new HashMap<>();
 
         // Add readme.md and the respective docker-compose.yml files.
@@ -143,6 +146,7 @@ public class DockerUtils {
      * @throws ConfigurationException
      */
     private byte[] readDockerComposeFile(Path path) throws IOException, ConfigurationException {
+
         String productVersion = this.getConfigrations().getProductVersion();
 
         byte[] data = Files.readAllBytes(path);
@@ -159,6 +163,7 @@ public class DockerUtils {
      * @throws ConfigurationException
      */
     private DockerConfigs getConfigrations() throws ConfigurationException {
+
         if (this.dockerConfigs == null) {
             this.dockerConfigs = configProvider.getConfigurationObject(DockerConfigs.class);
         }

@@ -32,6 +32,7 @@ import java.util.Map;
  * Represents Siddhi Partition.
  */
 public class PartitionConfig extends SiddhiElementConfig {
+
     private Map<QueryListType, List<QueryConfig>> queryLists;
     private List<StreamConfig> streamList;
     private List<PartitionWithElement> partitionWith;
@@ -40,50 +41,62 @@ public class PartitionConfig extends SiddhiElementConfig {
     private Map<String, String> connectorsAndStreams = new HashMap<>();
 
     public Map<QueryListType, List<QueryConfig>> getQueryLists() {
+
         return queryLists;
     }
 
     public void setQueryLists(Map<QueryListType, List<QueryConfig>> queryLists) {
+
         this.queryLists = queryLists;
     }
 
     public List<StreamConfig> getStreamList() {
+
         return streamList;
     }
 
     public void setStreamList(List<StreamConfig> streamList) {
+
         this.streamList = streamList;
     }
 
     public List<PartitionWithElement> getPartitionWith() {
+
         return partitionWith;
     }
 
     public void setPartitionWith(List<PartitionWithElement> partitionWith) {
+
         this.partitionWith = partitionWith;
     }
 
     public List<String> getAnnotationList() {
+
         return annotationList;
     }
 
     public void setAnnotationList(List<String> annotationList) {
+
         this.annotationList = annotationList;
     }
 
     public List<Annotation> getAnnotationListObjects() {
+
         return annotationListObjects;
     }
 
     public void setAnnotationListObjects(List<Annotation> annotationListObjects) {
+
         this.annotationListObjects = annotationListObjects;
     }
 
     public Map<String, String> getConnectorsAndStreams() {
+
         return connectorsAndStreams;
     }
 
     public void setConnectorsAndStreams(Map<String, String> connectorsAndStreams) {
+
         this.connectorsAndStreams = connectorsAndStreams;
     }
 

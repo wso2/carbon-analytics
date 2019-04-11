@@ -30,9 +30,11 @@ import java.util.Set;
  * in order to help preserving comments.
  */
 public abstract class CodeSegmentsPreserver {
+
     private Set<ElementCodeSegment> preservedCodeSegments = new HashSet<>();
 
     public Set<ElementCodeSegment> getPreservedCodeSegments() {
+
         return preservedCodeSegments;
     }
 
@@ -42,6 +44,7 @@ public abstract class CodeSegmentsPreserver {
      * @param siddhiElement SiddhiElement object which represents a parsed Siddhi element.
      */
     public void preserveCodeSegment(SiddhiElement siddhiElement) {
+
         if (isCodeSegmentValid(siddhiElement)) {
             preservedCodeSegments.add(
                     new ElementCodeSegment(
@@ -58,6 +61,7 @@ public abstract class CodeSegmentsPreserver {
      * @param bindToElementConfig SiddhiElementConfig object to which, the acquired indexes should be bound
      */
     protected void preserveAndBindCodeSegment(SiddhiElement bindFromElement, SiddhiElementConfig bindToElementConfig) {
+
         preserveCodeSegment(bindFromElement);
         bindCodeSegmentIndexes(bindFromElement, bindToElementConfig);
     }
@@ -71,6 +75,7 @@ public abstract class CodeSegmentsPreserver {
      */
     protected void bindCodeSegmentIndexes(SiddhiElement bindFromElement,
                                           SiddhiElementConfig bindToElementConfig) {
+
         if (isCodeSegmentValid(bindFromElement)) {
             bindToElementConfig.setQueryContextStartIndex(bindFromElement.getQueryContextStartIndex());
             bindToElementConfig.setQueryContextEndIndex(bindFromElement.getQueryContextEndIndex());
@@ -84,6 +89,7 @@ public abstract class CodeSegmentsPreserver {
      *                               whose preserved code segments are accessed for preserving
      */
     protected void preserveCodeSegmentsOf(CodeSegmentsPreserver... codeSegmentsPreservers) {
+
         for (CodeSegmentsPreserver codeSegmentsPreserver : codeSegmentsPreservers) {
             preservedCodeSegments.addAll(codeSegmentsPreserver.getPreservedCodeSegments());
         }
@@ -96,6 +102,7 @@ public abstract class CodeSegmentsPreserver {
      * @return true if the code segment is valid, otherwise false
      */
     private boolean isCodeSegmentValid(SiddhiElement siddhiElement) {
+
         return siddhiElement != null &&
                 siddhiElement.getQueryContextStartIndex() != null &&
                 siddhiElement.getQueryContextEndIndex() != null;

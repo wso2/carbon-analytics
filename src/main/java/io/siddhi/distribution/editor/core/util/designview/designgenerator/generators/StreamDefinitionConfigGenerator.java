@@ -30,6 +30,7 @@ import java.util.List;
  * Generator to create Stream definition config.
  */
 public class StreamDefinitionConfigGenerator extends CodeSegmentsPreserver {
+
     /**
      * Generates StreamConfig object, with given Siddhi StreamDefinition.
      *
@@ -37,6 +38,7 @@ public class StreamDefinitionConfigGenerator extends CodeSegmentsPreserver {
      * @return StreamConfig object
      */
     public StreamConfig generateStreamConfig(StreamDefinition streamDefinition) {
+
         List<String> annotationConfigs = new ArrayList<>();
         List<Annotation> annotationListObjects = new ArrayList<>();
         List<String> streamElementAnnotationNames = new ArrayList<>(Arrays.asList("SOURCE", "SINK", "STORE"));

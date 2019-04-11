@@ -42,9 +42,11 @@ public class SampleEventGenerator {
     private static String[] stringValues = {"data1", "data2", "data3", "data4", "data5"};
 
     private SampleEventGenerator() {
+
     }
 
     public static String generateXMLEvent(StreamDefinition streamDefinition) {
+
         OMFactory factory = OMAbstractFactory.getOMFactory();
         OMElement sampleEventsElement = factory.createOMElement(new QName(
                 Constants.SAMPLE_EVENTS_PARENT_TAG));
@@ -63,6 +65,7 @@ public class SampleEventGenerator {
     }
 
     public static String generateJSONEvent(StreamDefinition streamDefinition) {
+
         JsonObject jsonEventObject = new JsonObject();
         JsonObject innerParentObject = new JsonObject();
         List<Attribute> attributeList = streamDefinition.getAttributeList();
@@ -86,6 +89,7 @@ public class SampleEventGenerator {
     }
 
     public static String generateTextEvent(StreamDefinition streamDefinition) {
+
         StringBuilder sampleEvent = new StringBuilder();
         List<Attribute> attributeList = streamDefinition.getAttributeList();
         if (attributeList != null && attributeList.size() > 0) {
@@ -108,6 +112,7 @@ public class SampleEventGenerator {
     }
 
     private static String getSampleValue(Attribute.Type attributeType) {
+
         Random rand = new Random();
         switch (attributeType.name().toLowerCase()) {
             case Constants.ATTR_TYPE_FLOAT: {

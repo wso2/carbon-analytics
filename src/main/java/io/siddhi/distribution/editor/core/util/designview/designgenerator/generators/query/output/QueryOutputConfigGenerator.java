@@ -40,9 +40,11 @@ import java.util.List;
  * Generator to create QueryOutputConfig from Siddhi elements.
  */
 public class QueryOutputConfigGenerator {
+
     private String siddhiAppString;
 
     public QueryOutputConfigGenerator(String siddhiAppString) {
+
         this.siddhiAppString = siddhiAppString;
     }
 
@@ -55,6 +57,7 @@ public class QueryOutputConfigGenerator {
      */
     public QueryOutputConfig generateQueryOutputConfig(OutputStream queryOutputStream)
             throws DesignGenerationException {
+
         if (queryOutputStream instanceof InsertIntoStream) {
             return generateInsertOutputConfig((InsertIntoStream) queryOutputStream);
         } else if (queryOutputStream instanceof DeleteStream) {
@@ -74,6 +77,7 @@ public class QueryOutputConfigGenerator {
      * @return QueryOutputConfig
      */
     private QueryOutputConfig generateInsertOutputConfig(InsertIntoStream insertIntoStream) {
+
         return new QueryOutputConfig(
                 QueryOutputType.INSERT.toString(),
                 new InsertOutputConfig(insertIntoStream.getOutputEventType().name()),
@@ -88,6 +92,7 @@ public class QueryOutputConfigGenerator {
      * @throws DesignGenerationException Error while generating QueryOutputConfig
      */
     private QueryOutputConfig generateDeleteOutputConfig(DeleteStream deleteStream) throws DesignGenerationException {
+
         return new QueryOutputConfig(
                 QueryOutputType.DELETE.toString(),
                 new DeleteOutputConfig(
@@ -104,6 +109,7 @@ public class QueryOutputConfigGenerator {
      * @throws DesignGenerationException Error while generating QueryOutputConfig
      */
     private QueryOutputConfig generateUpdateOutputConfig(UpdateStream updateStream) throws DesignGenerationException {
+
         List<SetAttributeConfig> setAttributeConfigList = null;
         if (updateStream.getUpdateSet() != null) {
             setAttributeConfigList = generateSetAttributeConfigsList(updateStream.getUpdateSet().getSetAttributeList());
@@ -126,6 +132,7 @@ public class QueryOutputConfigGenerator {
      */
     private QueryOutputConfig generateUpdateOrInsertIntoOutputConfig(UpdateOrInsertStream updateOrInsertStream)
             throws DesignGenerationException {
+
         List<SetAttributeConfig> setAttributeConfigList = null;
         if (updateOrInsertStream.getUpdateSet() != null) {
             setAttributeConfigList =
@@ -150,6 +157,7 @@ public class QueryOutputConfigGenerator {
      */
     private List<SetAttributeConfig> generateSetAttributeConfigsList(List<UpdateSet.SetAttribute> setAttributes)
             throws DesignGenerationException {
+
         List<SetAttributeConfig> setAttributeConfigs = new ArrayList<>();
         for (UpdateSet.SetAttribute setAttribute : setAttributes) {
             // Attribute name and value

@@ -31,6 +31,7 @@ import java.util.List;
  * Generator to create TableConfig.
  */
 public class TableConfigGenerator extends CodeSegmentsPreserver {
+
     /**
      * Generates TableConfig object from the given Siddhi TableDefinition.
      *

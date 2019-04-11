@@ -22,21 +22,26 @@ package io.siddhi.distribution.editor.core.util.designview.beans.configs.siddhie
  * Represents Siddhi Delete Query's output.
  */
 public class DeleteOutputConfig extends OutputConfig {
+
     private String on;
 
     public DeleteOutputConfig() {
+
     }
 
     public DeleteOutputConfig(String eventType, String on) {
+
         super(eventType);
         this.on = on;
     }
 
     public String getOn() {
+
         return on;
     }
 
     public void setOn(String on) {
+
         this.on = on;
     }
 }

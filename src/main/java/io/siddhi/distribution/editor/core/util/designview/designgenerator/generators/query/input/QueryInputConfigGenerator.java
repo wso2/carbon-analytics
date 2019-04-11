@@ -34,10 +34,12 @@ import io.siddhi.query.api.execution.query.input.stream.StateInputStream;
  * Generator to create QueryInputConfig from Siddhi elements.
  */
 public class QueryInputConfigGenerator {
+
     private String siddhiAppString;
     private SiddhiApp siddhiApp;
 
     public QueryInputConfigGenerator(String siddhiAppString, SiddhiApp siddhiApp) {
+
         this.siddhiAppString = siddhiAppString;
         this.siddhiApp = siddhiApp;
     }
@@ -50,6 +52,7 @@ public class QueryInputConfigGenerator {
      * @throws DesignGenerationException Error while generating config
      */
     public QueryInputConfig generateQueryInputConfig(InputStream queryInputStream) throws DesignGenerationException {
+
         QueryInputType queryInputType = getQueryInputType(queryInputStream);
         if (queryInputType == QueryInputType.WINDOW_FILTER_PROJECTION) {
             return new WindowFilterProjectionConfigGenerator(siddhiAppString)
@@ -70,6 +73,7 @@ public class QueryInputConfigGenerator {
      * @return QueryInputType
      */
     private QueryInputType getQueryInputType(InputStream queryInputStream) {
+
         if (queryInputStream instanceof SingleInputStream) {
             return QueryInputType.WINDOW_FILTER_PROJECTION;
         } else if (queryInputStream instanceof JoinInputStream) {

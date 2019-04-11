@@ -33,9 +33,11 @@ import java.util.List;
  * Generates WindowFilterProjection Query Input Config with given Siddhi elements.
  */
 public class WindowFilterProjectionConfigGenerator {
+
     private String siddhiAppString;
 
     public WindowFilterProjectionConfigGenerator(String siddhiAppString) {
+
         this.siddhiAppString = siddhiAppString;
     }
 
@@ -48,6 +50,7 @@ public class WindowFilterProjectionConfigGenerator {
      */
     public WindowFilterProjectionConfig generateWindowFilterProjectionConfig(InputStream queryInputStream)
             throws DesignGenerationException {
+
         return new WindowFilterProjectionConfig(
                 getType(queryInputStream).toString(),
                 queryInputStream.getUniqueStreamIds().get(0),
@@ -62,6 +65,7 @@ public class WindowFilterProjectionConfigGenerator {
      * @return Type of WindowFilterProjection Query to generate
      */
     private WindowFilterProjectionQueryType getType(InputStream queryInputStream) {
+
         List<StreamHandler> streamHandlers = ((SingleInputStream) queryInputStream).getStreamHandlers();
         if (streamHandlers.isEmpty()) {
             return WindowFilterProjectionQueryType.PROJECTION;

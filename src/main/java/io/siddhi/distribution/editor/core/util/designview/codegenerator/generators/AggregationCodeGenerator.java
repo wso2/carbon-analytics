@@ -46,6 +46,7 @@ public class AggregationCodeGenerator {
      */
     public String generateAggregation(AggregationConfig aggregation, boolean isGeneratingToolTip)
             throws CodeGenerationException {
+
         CodeGeneratorUtils.NullValidator.validateConfigObject(aggregation);
 
         StringBuilder aggregationStringBuilder = new StringBuilder();
@@ -93,6 +94,7 @@ public class AggregationCodeGenerator {
      * @return The Siddhi code representation of the given annotation list
      */
     private String generateAggregationAnnotations(List<String> annotations) {
+
         if (annotations == null || annotations.isEmpty()) {
             return SiddhiCodeBuilderConstants.EMPTY_STRING;
         }
@@ -120,6 +122,7 @@ public class AggregationCodeGenerator {
      */
     private String generateAggregateByTimePeriod(AggregateByTimePeriod aggregateByTimePeriod)
             throws CodeGenerationException {
+
         CodeGeneratorUtils.NullValidator.validateConfigObject(aggregateByTimePeriod);
 
         StringBuilder aggregateByTimePeriodStringBuilder = new StringBuilder();
@@ -149,6 +152,7 @@ public class AggregationCodeGenerator {
      */
     private String generateAggregateByTimeInterval(AggregateByTimeInterval aggregateByTimeInterval)
             throws CodeGenerationException {
+
         CodeGeneratorUtils.NullValidator.validateConfigObject(aggregateByTimeInterval);
 
         StringBuilder aggregateByTimeIntervalStringBuilder = new StringBuilder();
@@ -172,6 +176,7 @@ public class AggregationCodeGenerator {
      */
     private String generateAggregateByTimeRange(AggregateByTimeRange aggregateByTimeRange)
             throws CodeGenerationException {
+
         CodeGeneratorUtils.NullValidator.validateConfigObject(aggregateByTimeRange);
 
         return aggregateByTimeRange.getValue().getMin().toLowerCase() +

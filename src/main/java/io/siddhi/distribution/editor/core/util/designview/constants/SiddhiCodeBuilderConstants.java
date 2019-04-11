@@ -23,6 +23,7 @@ package io.siddhi.distribution.editor.core.util.designview.constants;
  * the CodeGenerator class to build the entire Siddhi app string
  */
 public class SiddhiCodeBuilderConstants {
+
     // General chars
     public static final char ALL = '*';
     public static final char FULL_STOP = '.';
@@ -116,6 +117,7 @@ public class SiddhiCodeBuilderConstants {
     public static final String ELEMENT_KEY_VALUE_SEPARATOR = " = ";
 
     private SiddhiCodeBuilderConstants() {
+
     }
 
 }

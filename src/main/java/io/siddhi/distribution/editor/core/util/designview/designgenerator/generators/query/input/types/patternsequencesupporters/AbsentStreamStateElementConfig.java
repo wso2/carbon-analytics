@@ -22,13 +22,16 @@ package io.siddhi.distribution.editor.core.util.designview.designgenerator.gener
  * Absent stream state element configuration class.
  */
 public class AbsentStreamStateElementConfig extends StreamStateElementConfig {
+
     private String waitingTime;
 
     public String getWaitingTime() {
+
         return waitingTime;
     }
 
     public void setWaitingTime(String waitingTime) {
+
         this.waitingTime = waitingTime;
     }
 }

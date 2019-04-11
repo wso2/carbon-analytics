@@ -26,10 +26,12 @@ import org.wso2.carbon.config.annotation.Element;
  */
 @Configuration(namespace = "docker.configs", description = "Docker configurations in Editor")
 public class DockerConfigs {
+
     @Element(description = "Version of the product and the Docker image")
     private String productVersion = "latest";
 
     public String getProductVersion() {
+
         return productVersion;
     }
 }

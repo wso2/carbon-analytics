@@ -25,6 +25,7 @@ import io.siddhi.core.event.ComplexEvent;
  * Event to be send in within the Debug callback.
  */
 public class DebugCallbackEvent {
+
     private ComplexEvent event;
     private String queryName;
     private int queryIndex;
@@ -33,6 +34,7 @@ public class DebugCallbackEvent {
     public DebugCallbackEvent(String queryName, int queryIndex,
                               SiddhiDebugger.QueryTerminal queryTerminal,
                               ComplexEvent event) {
+
         this.queryName = queryName;
         this.queryIndex = queryIndex;
         this.queryTerminal = queryTerminal;
@@ -40,18 +42,22 @@ public class DebugCallbackEvent {
     }
 
     public String getQueryName() {
+
         return queryName;
     }
 
     public int getQueryIndex() {
+
         return queryIndex;
     }
 
     public ComplexEvent getEvent() {
+
         return event;
     }
 
     public SiddhiDebugger.QueryTerminal getQueryTerminal() {
+
         return queryTerminal;
     }
 }

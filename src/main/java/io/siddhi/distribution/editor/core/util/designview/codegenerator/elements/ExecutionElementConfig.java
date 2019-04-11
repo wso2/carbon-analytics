@@ -43,6 +43,7 @@ public class ExecutionElementConfig {
     private List<String> outputStreams;
 
     public ExecutionElementConfig(QueryConfig query) throws CodeGenerationException {
+
         CodeGeneratorUtils.NullValidator.validateConfigObject(query);
         this.type = CodeGeneratorConstants.QUERY;
         this.value = query;
@@ -51,6 +52,7 @@ public class ExecutionElementConfig {
     }
 
     public ExecutionElementConfig(PartitionConfig partition) throws CodeGenerationException {
+
         CodeGeneratorUtils.NullValidator.validateConfigObject(partition);
         this.type = CodeGeneratorConstants.PARTITION;
         this.value = partition;
@@ -66,6 +68,7 @@ public class ExecutionElementConfig {
      * @throws CodeGenerationException Error when identifying input streams
      */
     private List<String> extractInputStreams(QueryConfig query) throws CodeGenerationException {
+
         List<String> inputStreamList = new LinkedList<>();
         switch (query.getQueryInput().getType().toUpperCase()) {
             case CodeGeneratorConstants.WINDOW:
@@ -108,6 +111,7 @@ public class ExecutionElementConfig {
      * @throws CodeGenerationException Error when identifying input streams
      */
     private List<String> extractInputStreams(PartitionConfig partition) throws CodeGenerationException {
+
         List<String> inputStreamList = new LinkedList<>();
         for (List<QueryConfig> queryList : partition.getQueryLists().values()) {
             for (QueryConfig query : queryList) {
@@ -131,6 +135,7 @@ public class ExecutionElementConfig {
      * @throws CodeGenerationException Error when identifying the output stream
      */
     private List<String> extractOutputStreams(QueryConfig query) throws CodeGenerationException {
+
         CodeGeneratorUtils.NullValidator.validateConfigObject(query.getQueryOutput());
         List<String> outputStreamList = new LinkedList<>();
         outputStreamList.add(query.getQueryOutput().getTarget());
@@ -145,6 +150,7 @@ public class ExecutionElementConfig {
      * @throws CodeGenerationException Error when identifying the output streams
      */
     private List<String> extractOutputStreams(PartitionConfig partition) throws CodeGenerationException {
+
         List<String> outputStreamList = new LinkedList<>();
         for (List<QueryConfig> queryList : partition.getQueryLists().values()) {
             for (QueryConfig query : queryList) {
@@ -158,18 +164,22 @@ public class ExecutionElementConfig {
     }
 
     public String getType() {
+
         return type;
     }
 
     public Object getValue() {
+
         return value;
     }
 
     public List<String> getInputStreams() {
+
         return inputStreams;
     }
 
     public List<String> getOutputStreams() {
+
         return outputStreams;
     }
 

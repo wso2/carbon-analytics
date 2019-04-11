@@ -22,19 +22,23 @@ package io.siddhi.distribution.editor.core.util.designview.beans.configs.siddhie
  * Represents Attribute to set in Siddhi Query Output.
  */
 public class SetAttributeConfig {
+
     private String attribute;
     private String value;
 
     public SetAttributeConfig(String attribute, String value) {
+
         this.attribute = attribute;
         this.value = value;
     }
 
     public String getAttribute() {
+
         return attribute;
     }
 
     public String getValue() {
+
         return value;
     }
 }

@@ -24,14 +24,17 @@ import io.siddhi.distribution.editor.core.util.designview.constants.query.Stream
  * Represents a Filter.
  */
 public class FilterConfig extends StreamHandlerConfig {
+
     String value;
 
     public FilterConfig(String value) {
+
         super(StreamHandlerType.FILTER.toString());
         this.value = value;
     }
 
     public String getValue() {
+
         return value;
     }
 }

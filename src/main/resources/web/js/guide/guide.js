@@ -43,7 +43,7 @@ define(['jquery', 'lodash', 'log', 'enjoyhint', 'designViewUtils', 'workspace', 
             //Script array for the complete guide
             this.completeGuide = [
                 {
-                    'click #newButton': '<b>Welcome to WSO2 Stream Processor Studio!</b> Click <b class="lime-text">New</b> to get started.',
+                    'click #newButton': '<b>Welcome to WSO2 Siddhi Editor!</b> Click <b class="lime-text">New</b> to get started.',
                     'showNext' : false
                 },
                 {

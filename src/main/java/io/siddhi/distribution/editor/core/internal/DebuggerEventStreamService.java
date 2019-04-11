@@ -18,7 +18,6 @@
 
 package io.siddhi.distribution.editor.core.internal;
 
-
 import io.siddhi.core.event.Event;
 import io.siddhi.distribution.common.common.EventStreamService;
 import io.siddhi.distribution.common.common.exception.ResourceNotFoundException;
@@ -33,10 +32,12 @@ import java.util.List;
  * Class which provides necessary apis for event stream related operations.
  */
 public class DebuggerEventStreamService implements EventStreamService {
+
     private static Logger log = LoggerFactory.getLogger(DebuggerEventStreamService.class);
 
     @Override
     public List<String> getStreamNames(String siddhiAppName) {
+
         DebugRuntime runtimeHolder = EditorDataHolder.getSiddhiAppMap().get(siddhiAppName);
         if (runtimeHolder != null) {
             return runtimeHolder.getStreams();
@@ -49,6 +50,7 @@ public class DebuggerEventStreamService implements EventStreamService {
     @Override
     public List<Attribute> getStreamAttributes(String siddhiAppName, String streamName)
             throws ResourceNotFoundException {
+
         DebugRuntime runtimeHolder = EditorDataHolder.getSiddhiAppMap().get(siddhiAppName);
         if (runtimeHolder != null) {
             try {
@@ -65,6 +67,7 @@ public class DebuggerEventStreamService implements EventStreamService {
 
     @Override
     public void pushEvent(String siddhiAppName, String streamName, Event event) {
+
         DebugRuntime runtimeHolder = EditorDataHolder.getSiddhiAppMap().get(siddhiAppName);
         if (runtimeHolder != null) {
             try {

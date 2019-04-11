@@ -24,14 +24,17 @@ package io.siddhi.distribution.editor.core.exception;
 public class NoSuchSiddhiAppException extends RuntimeException {
 
     public NoSuchSiddhiAppException(String msg) {
+
         super(msg);
     }
 
     public NoSuchSiddhiAppException(Exception cause) {
+
         super(cause);
     }
 
     public NoSuchSiddhiAppException(String msg, Exception cause) {
+
         super(msg, cause);
     }
 

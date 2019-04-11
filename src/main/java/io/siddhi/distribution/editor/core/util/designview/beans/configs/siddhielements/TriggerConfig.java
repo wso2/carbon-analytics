@@ -24,6 +24,7 @@ import java.util.List;
  * Represents configuration of a Siddhi Trigger.
  */
 public class TriggerConfig extends SiddhiElementConfig {
+
     private String name;
     private String criteria;
     private String criteriaType;
@@ -31,6 +32,7 @@ public class TriggerConfig extends SiddhiElementConfig {
 
     public TriggerConfig(String id, String name, String criteria, String criteriaType,
                          List<String> annotationList) {
+
         super(id);
         this.name = name;
         this.criteria = criteria;
@@ -39,22 +41,27 @@ public class TriggerConfig extends SiddhiElementConfig {
     }
 
     public String getName() {
+
         return name;
     }
 
     public String getCriteria() {
+
         return criteria;
     }
 
     public List<String> getAnnotationList() {
+
         return annotationList;
     }
 
     public String getCriteriaType() {
+
         return criteriaType;
     }
 
     public void setTriggerCriteria(String criteria) {
+
         this.criteria = criteria;
     }
 }

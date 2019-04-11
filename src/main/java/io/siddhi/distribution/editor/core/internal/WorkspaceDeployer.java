@@ -53,6 +53,7 @@ import java.nio.charset.Charset;
         service = Deployer.class
 )
 public class WorkspaceDeployer implements Deployer {
+
     private static final String WORKSPACE_DIRECTORY = "workspace";
     private static final Logger log = LoggerFactory.getLogger(WorkspaceDeployer.class);
     private static final String FILE_EXTENSION = "siddhi";
@@ -60,6 +61,7 @@ public class WorkspaceDeployer implements Deployer {
     private URL directoryLocation;
 
     private static String getStringFromInputStream(InputStream is) throws SiddhiAppDeploymentException {
+
         BufferedReader br = null;
         StringBuilder sb = new StringBuilder();
         String line;
@@ -83,6 +85,7 @@ public class WorkspaceDeployer implements Deployer {
     }
 
     private void deployConfigFile(File file) throws Exception {
+
         if (!file.getName().startsWith(".")) {
             InputStream inputStream = null;
             try {
@@ -116,6 +119,7 @@ public class WorkspaceDeployer implements Deployer {
 
     @Override
     public void init() {
+
         try {
             directoryLocation = new URL("file:" + WORKSPACE_DIRECTORY);
             log.info("Workspace artifact deployer initiated.");
@@ -127,6 +131,7 @@ public class WorkspaceDeployer implements Deployer {
 
     @Override
     public Object deploy(Artifact artifact) throws CarbonDeploymentException {
+
         try {
             deployConfigFile(artifact.getFile());
         } catch (Exception e) {
@@ -137,6 +142,7 @@ public class WorkspaceDeployer implements Deployer {
 
     @Override
     public void undeploy(Object key) throws CarbonDeploymentException {
+
         try {
             String siddhiAppName = FilenameUtils.getBaseName((String) key);
             if (EditorDataHolder.getSiddhiAppMap().containsKey(siddhiAppName)) {
@@ -149,6 +155,7 @@ public class WorkspaceDeployer implements Deployer {
 
     @Override
     public Object update(Artifact artifact) throws CarbonDeploymentException {
+
         try {
             deployConfigFile(artifact.getFile());
         } catch (Exception e) {
@@ -159,11 +166,13 @@ public class WorkspaceDeployer implements Deployer {
 
     @Override
     public URL getLocation() {
+
         return directoryLocation;
     }
 
     @Override
     public ArtifactType getArtifactType() {
+
         return artifactType;
     }
 
@@ -175,12 +184,14 @@ public class WorkspaceDeployer implements Deployer {
             unbind = "unsetEventStreamService"
     )
     protected void setEventStreamService(EventStreamService eventStreamService) {
+
         if (log.isDebugEnabled()) {
             log.info("@Reference(bind) EventStreamService");
         }
     }
 
     protected void unsetEventStreamService(EventStreamService eventStreamService) {
+
         if (log.isDebugEnabled()) {
             log.info("@Reference(unbind) EventStreamService");
         }

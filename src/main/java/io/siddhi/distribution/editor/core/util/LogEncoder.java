@@ -22,9 +22,11 @@ package io.siddhi.distribution.editor.core.util;
 public class LogEncoder {
 
     private LogEncoder() {
+
     }
 
     public static String removeCRLFCharacters(String str) {
+
         if (str != null) {
             str = str.replace('\n', '_').replace('\r', '_');
         }

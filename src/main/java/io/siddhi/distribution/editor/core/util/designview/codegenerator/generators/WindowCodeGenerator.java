@@ -38,6 +38,7 @@ public class WindowCodeGenerator {
      * @throws CodeGenerationException Error when generating the code
      */
     public String generateWindow(WindowConfig window, boolean isGeneratingToolTip) throws CodeGenerationException {
+
         CodeGeneratorUtils.NullValidator.validateConfigObject(window);
 
         StringBuilder windowStringBuilder = new StringBuilder();

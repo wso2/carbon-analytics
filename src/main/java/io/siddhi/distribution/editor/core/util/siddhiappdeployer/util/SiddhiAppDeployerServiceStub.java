@@ -27,6 +27,7 @@ import io.siddhi.distribution.editor.core.exception.SiddhiAppDeployerServiceStub
  * Feign client for sending requests.
  */
 public interface SiddhiAppDeployerServiceStub {
+
     @RequestLine("PUT /siddhi-apps")
     @Headers("Content-Type: text/plain; charset=utf-8")
     Response doPutRequest(String payload) throws SiddhiAppDeployerServiceStubException;

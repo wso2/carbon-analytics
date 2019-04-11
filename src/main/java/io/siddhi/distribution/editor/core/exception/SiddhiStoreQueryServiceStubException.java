@@ -22,6 +22,7 @@ package io.siddhi.distribution.editor.core.exception;
  * Exceptions related to SiddhiAppDeployerServiceStub.
  */
 public class SiddhiStoreQueryServiceStubException extends Exception {
+
     /**
      * Constructs a new exception with the specified detail message.  The
      * cause is not initialized, and may subsequently be initialized by
@@ -31,6 +32,7 @@ public class SiddhiStoreQueryServiceStubException extends Exception {
      *                later retrieval by the {@link #getMessage()} method.
      */
     public SiddhiStoreQueryServiceStubException(String message) {
+
         super(message);
     }
 
@@ -49,6 +51,7 @@ public class SiddhiStoreQueryServiceStubException extends Exception {
      * @since 1.4
      */
     public SiddhiStoreQueryServiceStubException(String message, Throwable cause) {
+
         super(message, cause);
     }
 }

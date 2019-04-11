@@ -36,6 +36,7 @@ import java.util.List;
  * Generator to create Join Query Input Config with Siddhi elements.
  */
 public class JoinConfigGenerator {
+
     // Elements of the Join Input Stream
     private List<String> streamIDs = new ArrayList<>();
     private List<String> tableIDs = new ArrayList<>();
@@ -53,6 +54,7 @@ public class JoinConfigGenerator {
      */
     public JoinConfig getJoinQueryConfig(InputStream queryInputStream, SiddhiApp siddhiApp, String siddhiAppString)
             throws DesignGenerationException {
+
         distinguishElements(queryInputStream.getUniqueStreamIds(), siddhiApp);
         return generateJoinConfig(queryInputStream, siddhiAppString);
     }
@@ -64,6 +66,7 @@ public class JoinConfigGenerator {
      * @throws DesignGenerationException Error while generating config
      */
     private JoinWithType getJoinWithType() throws DesignGenerationException {
+
         if (tableIDs.size() == 1) {
             return JoinWithType.TABLE;
         } else if (aggregationIDs.size() == 1) {
@@ -84,6 +87,7 @@ public class JoinConfigGenerator {
      * @return JoinElementType
      */
     private JoinElementType getJoinElementType(String streamId) {
+
         if (tableIDs.contains(streamId)) {
             return JoinElementType.TABLE;
         } else if (aggregationIDs.contains(streamId)) {
@@ -105,6 +109,7 @@ public class JoinConfigGenerator {
      * @param siddhiApp Compiled SiddhiApp
      */
     private void distinguishElements(List<String> streamIds, SiddhiApp siddhiApp) {
+
         for (String streamId : streamIds) {
             if (siddhiApp.getTableDefinitionMap().containsKey(streamId)) {
                 tableIDs.add(streamId);
@@ -130,6 +135,7 @@ public class JoinConfigGenerator {
      */
     private JoinElementConfig generateJoinElementConfig(SingleInputStream singleInputStream, String siddhiAppString)
             throws DesignGenerationException {
+
         JoinElementType joinElementType = getJoinElementType(singleInputStream.getStreamId());
         return new JoinElementConfig(
                 joinElementType.toString(),
@@ -150,6 +156,7 @@ public class JoinConfigGenerator {
      */
     private JoinConfig generateJoinConfig(InputStream queryInputStream, String siddhiAppString)
             throws DesignGenerationException {
+
         JoinInputStream joinInputStream = (JoinInputStream) queryInputStream;
         // Left element of the join
         JoinElementConfig leftElement =

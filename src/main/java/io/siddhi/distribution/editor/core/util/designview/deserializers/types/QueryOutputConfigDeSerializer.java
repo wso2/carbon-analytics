@@ -36,6 +36,7 @@ import java.lang.reflect.Type;
  * De-serializer for QueryOutputConfig class.
  */
 public class QueryOutputConfigDeSerializer implements JsonDeserializer {
+
     private static final String TYPE = "type";
     private static final String OUTPUT = "output";
     private static final String TARGET = "target";
@@ -43,6 +44,7 @@ public class QueryOutputConfigDeSerializer implements JsonDeserializer {
     @Override
     public Object deserialize(
             JsonElement jsonElement, Type type, JsonDeserializationContext jsonDeserializationContext) {
+
         JsonObject jsonObject = jsonElement.getAsJsonObject();
         JsonPrimitive jsonPrimitive = (JsonPrimitive) jsonObject.get(TYPE);
         if (jsonPrimitive == null) {

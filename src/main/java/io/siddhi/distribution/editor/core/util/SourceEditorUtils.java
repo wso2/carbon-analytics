@@ -50,6 +50,7 @@ import java.util.jar.JarInputStream;
  * Utility class for getting the meta data for the in built and extension processors in Siddhi.
  */
 public class SourceEditorUtils {
+
     static final Logger LOGGER = Logger.getLogger(SourceEditorUtils.class);
 
     private SourceEditorUtils() {
@@ -65,6 +66,7 @@ public class SourceEditorUtils {
      */
     //this method need to be added if we need exceptions which are thrown from siddhiAppRuntime.start()
     public static SiddhiAppRuntime validateSiddhiApp(String siddhiApp) {
+
         SiddhiAppRuntime siddhiAppRuntime = null;
         try {
             siddhiAppRuntime = EditorDataHolder.getSiddhiManager().createSiddhiAppRuntime(siddhiApp);
@@ -88,6 +90,7 @@ public class SourceEditorUtils {
     public static List<List<AbstractDefinition>> getInnerStreamDefinitions(SiddhiAppRuntime siddhiAppRuntime,
                                                                            List<List<String>>
                                                                                    partitionsWithMissingInnerStreams) {
+
         List<List<AbstractDefinition>> innerStreamDefinitions = new ArrayList<>();
 
         // Transforming the element ID to partition inner streams map to element ID no to partition inner streams map
@@ -148,6 +151,7 @@ public class SourceEditorUtils {
      */
     public static List<AbstractDefinition> getStreamDefinitions(SiddhiAppRuntime siddhiAppRuntime,
                                                                 List<String> missingStreams) {
+
         List<AbstractDefinition> streamDefinitions = new ArrayList<>();
         Map<String, StreamDefinition> streamDefinitionMap = siddhiAppRuntime.getStreamDefinitionMap();
         for (String stream : missingStreams) {
@@ -169,6 +173,7 @@ public class SourceEditorUtils {
      */
     public static List<AbstractDefinition> getAggregationDefinitions(SiddhiAppRuntime siddhiAppRuntime,
                                                                      List<String> missingAggregationDefinitions) {
+
         List<AbstractDefinition> aggregationDefinitions = new ArrayList<>();
         Map<String, AggregationDefinition> aggregationDefinitionMap = siddhiAppRuntime.getAggregationDefinitionMap();
         for (String aggregation : missingAggregationDefinitions) {
@@ -187,6 +192,7 @@ public class SourceEditorUtils {
      * @return In-built processor meta data
      */
     public static MetaData getInBuiltProcessorMetaData() {
+
         Map<String, Set<Class<?>>> processorClassMap = getClassesInClassPathFromPackages();
         return generateInBuiltMetaData(processorClassMap);
     }
@@ -198,6 +204,7 @@ public class SourceEditorUtils {
      * @return Extension processor meta data
      */
     public static Map<String, MetaData> getExtensionProcessorMetaData() {
+
         Map<String, Class> extensionsMap = EditorDataHolder.getSiddhiManager().getExtensions();
         return generateExtensionsMetaData(extensionsMap);
     }
@@ -208,6 +215,7 @@ public class SourceEditorUtils {
      * @return Processor types to Classes map
      */
     private static Map<String, Set<Class<?>>> getClassesInClassPathFromPackages() {
+
         String[] classPathNames = System.getProperty("java.class.path").split(File.pathSeparator);
         Map<String, Set<Class<?>>> classSetMap = new HashMap<>();
         // Looping the jars
@@ -266,6 +274,7 @@ public class SourceEditorUtils {
      * @param classMap processor types to class map
      */
     private static MetaData generateInBuiltMetaData(Map<String, Set<Class<?>>> classMap) {
+
         MetaData metaData = new MetaData();
 
         // Generating the function meta data list containing function executors and attribute aggregators
@@ -300,6 +309,7 @@ public class SourceEditorUtils {
     private static void populateInBuiltProcessorMetaDataList(List<ProcessorMetaData> targetProcessorMetaDataList,
                                                              Map<String, Set<Class<?>>> classMap,
                                                              String processorType) {
+
         Set<Class<?>> classSet = classMap.get(processorType);
         if (classSet != null) {
             for (Class<?> processorClass : classSet) {
@@ -318,6 +328,7 @@ public class SourceEditorUtils {
      * @param extensionsMap Map from which the meta data needs to be extracted
      */
     private static Map<String, MetaData> generateExtensionsMetaData(Map<String, Class> extensionsMap) {
+
         Map<String, MetaData> metaDataMap = new HashMap<>();
         for (Map.Entry<String, Class> entry : extensionsMap.entrySet()) {
             String namespace = "";
@@ -399,6 +410,7 @@ public class SourceEditorUtils {
      */
     private static ProcessorMetaData generateProcessorMetaData(Class<?> processorClass,
                                                                String processorType) {
+
         String processorName = processorClass.getName();
         // Getting the class name
         processorName = processorName.substring(processorName.lastIndexOf('.') + 1);
@@ -425,6 +437,7 @@ public class SourceEditorUtils {
      */
     private static ProcessorMetaData generateProcessorMetaData(Class<?> processorClass, String processorType,
                                                                String processorName) {
+
         ProcessorMetaData processorMetaData = null;
 
         Extension extensionAnnotation = processorClass.getAnnotation(Extension.class);

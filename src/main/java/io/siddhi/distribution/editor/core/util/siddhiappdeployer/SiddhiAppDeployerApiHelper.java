@@ -28,9 +28,11 @@ import io.siddhi.distribution.editor.core.util.siddhiappdeployer.util.HTTPSClien
  * Consists of a method for the deployment feature for the exposed Siddhi App Api.
  */
 public class SiddhiAppDeployerApiHelper implements SiddhiAppApiHelperService {
+
     @Override
     public boolean deploySiddhiApp(String hostAndPort, String username, String password, String siddhiApp,
                                    String fileName) throws SiddhiAppDeployerServiceStubException {
+
         Response response = null;
         try {
             response = HTTPSClientUtil.doPutRequest(hostAndPort, username, password, siddhiApp);
@@ -66,6 +68,7 @@ public class SiddhiAppDeployerApiHelper implements SiddhiAppApiHelperService {
     }
 
     private void closeResponse(Response response) {
+
         if (response != null) {
             response.close();
         }

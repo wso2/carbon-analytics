@@ -49,9 +49,11 @@ import java.util.Set;
  * Generator to create Edges, that connect Siddhi Elements - considered as Nodes.
  */
 public class EdgesGenerator {
+
     private SiddhiAppConfig siddhiAppConfig;
 
     public EdgesGenerator(SiddhiAppConfig siddhiAppConfig) {
+
         this.siddhiAppConfig = siddhiAppConfig;
     }
 
@@ -63,6 +65,7 @@ public class EdgesGenerator {
      * @return ID of the edge
      */
     private static String generateEdgeId(String parentID, String childID) {
+
         return String.format("%s_%s", parentID, childID);
     }
 
@@ -73,6 +76,7 @@ public class EdgesGenerator {
      * @throws DesignGenerationException Error while generating config
      */
     public Set<Edge> generateEdges() throws DesignGenerationException {
+
         Set<Edge> edges = new HashSet<>();
         edges.addAll(generateSourceEdges(siddhiAppConfig.getSourceList()));
         edges.addAll(generateSinkEdges(siddhiAppConfig.getSinkList()));
@@ -101,6 +105,7 @@ public class EdgesGenerator {
      * @return List of QueryConfigs
      */
     private List<QueryConfig> getCompleteQueryTypeList(QueryListType queryListType) {
+
         List<QueryConfig> queryList = new ArrayList<>(siddhiAppConfig.getQueryLists().get(queryListType));
         for (PartitionConfig partitionConfig : siddhiAppConfig.getPartitionList()) {
             queryList.addAll(partitionConfig.getQueryLists().get(queryListType));
@@ -116,6 +121,7 @@ public class EdgesGenerator {
      * @throws DesignGenerationException Error while generating edges
      */
     private Set<Edge> generateSourceEdges(List<SourceSinkConfig> sourceList) throws DesignGenerationException {
+
         Set<Edge> edges = new HashSet<>();
         for (SourceSinkConfig source : sourceList) {
             edges.add(generateEdge(source, getElementWithStreamName(source.getConnectedElementName(), null)));
@@ -131,6 +137,7 @@ public class EdgesGenerator {
      * @throws DesignGenerationException Error while generating edges
      */
     private Set<Edge> generateSinkEdges(List<SourceSinkConfig> sinkList) throws DesignGenerationException {
+
         Set<Edge> edges = new HashSet<>();
         for (SourceSinkConfig sink : sinkList) {
             if (sink.isCorrelationIdExist()) {
@@ -153,6 +160,7 @@ public class EdgesGenerator {
      */
     private Set<Edge> generateWindowFilterProjectionQueryEdges(List<QueryConfig> windowFilterProjectionQueryList)
             throws DesignGenerationException {
+
         Set<Edge> edges = new HashSet<>();
         for (QueryConfig query : windowFilterProjectionQueryList) {
             // Edge towards Query
@@ -195,6 +203,7 @@ public class EdgesGenerator {
      * @throws DesignGenerationException Error while generating edges
      */
     private Set<Edge> generateJoinQueryEdges(List<QueryConfig> joinQueryList) throws DesignGenerationException {
+
         Set<Edge> edges = new HashSet<>();
         for (QueryConfig query : joinQueryList) {
             // Edge towards Query (From Left)
@@ -259,6 +268,7 @@ public class EdgesGenerator {
      */
     private Set<Edge> generatePatternSequenceQueryEdges(List<QueryConfig> patternSequenceQueryList)
             throws DesignGenerationException {
+
         Set<Edge> edges = new HashSet<>();
         for (QueryConfig query : patternSequenceQueryList) {
             // Edges towards Query
@@ -307,6 +317,7 @@ public class EdgesGenerator {
      */
     private Set<Edge> generateAggregationEdges(List<AggregationConfig> aggregationConfigList)
             throws DesignGenerationException {
+
         Set<Edge> edges = new HashSet<>();
         for (AggregationConfig aggregation : aggregationConfigList) {
             edges.add(
@@ -326,6 +337,7 @@ public class EdgesGenerator {
      */
     private Set<Edge> generatePartitionEdges(List<PartitionConfig> partitionConfigList)
             throws DesignGenerationException {
+
         Set<Edge> edges = new HashSet<>();
         for (PartitionConfig partitionConfig : partitionConfigList) {
             for (Map.Entry<String, String> connectorsAndStreamsEntry :
@@ -349,6 +361,7 @@ public class EdgesGenerator {
      */
     private Edge generateEdgeToPartitionConnector(SiddhiElementConfig parentElement,
                                                   String partitionConnectorId) throws DesignGenerationException {
+
         return new Edge(
                 generateEdgeId(parentElement.getId(), partitionConnectorId),
                 parentElement.getId(),
@@ -367,6 +380,7 @@ public class EdgesGenerator {
      */
     private Edge generateEdgeFromPartitionConnector(String partitionConnectorId,
                                                     SiddhiElementConfig childElement) throws DesignGenerationException {
+
         return new Edge(
                 generateEdgeId(partitionConnectorId, childElement.getId()),
                 partitionConnectorId,
@@ -386,6 +400,7 @@ public class EdgesGenerator {
      * @throws DesignGenerationException Error while generating config
      */
     private Edge generateEdge(Object parentElementOrId, Object childElementOrId) throws DesignGenerationException {
+
         SiddhiElementConfig parentElement = getOrAcceptSiddhiElement(parentElementOrId);
         SiddhiElementConfig childElement = getOrAcceptSiddhiElement(childElementOrId);
         return generateEdgeForElements(parentElement, childElement);
@@ -400,6 +415,7 @@ public class EdgesGenerator {
      * @throws DesignGenerationException Error while generating config
      */
     private SiddhiElementConfig getOrAcceptSiddhiElement(Object elementOrId) throws DesignGenerationException {
+
         if (elementOrId instanceof SiddhiElementConfig) {
             return (SiddhiElementConfig) elementOrId;
         } else if (elementOrId instanceof String) {
@@ -419,6 +435,7 @@ public class EdgesGenerator {
      */
     private Edge generateEdgeForElements(SiddhiElementConfig parentElement, SiddhiElementConfig childElement)
             throws DesignGenerationException {
+
         NodeType parentType = getSiddhiElementType(parentElement);
         NodeType childType = getSiddhiElementType(childElement);
         String edgeId = generateEdgeId(parentElement.getId(), childElement.getId());
@@ -435,6 +452,7 @@ public class EdgesGenerator {
      */
     private SiddhiElementConfig getElementWithStreamName(String streamName, String scopedPartitionId)
             throws DesignGenerationException {
+
         for (StreamConfig streamConfig : siddhiAppConfig.getStreamList()) {
             if (streamConfig.getName().equals(streamName)) {
                 return streamConfig;
@@ -483,6 +501,7 @@ public class EdgesGenerator {
      * @throws DesignGenerationException No element found with the given Id
      */
     private SiddhiElementConfig getElementWithId(String id) throws DesignGenerationException {
+
         for (QueryListType queryListType : siddhiAppConfig.getQueryLists().keySet()) {
             for (SiddhiElementConfig siddhiElementConfig : siddhiAppConfig.getQueryLists().get(queryListType)) {
                 if (siddhiElementConfig.getId().equals(id)) {
@@ -524,6 +543,7 @@ public class EdgesGenerator {
      * @throws DesignGenerationException Error while generating config
      */
     private NodeType getSiddhiElementType(SiddhiElementConfig siddhiElementConfig) throws DesignGenerationException {
+
         if (siddhiElementConfig instanceof StreamConfig) {
             return NodeType.STREAM;
         }
@@ -563,6 +583,7 @@ public class EdgesGenerator {
     }
 
     private SiddhiElementConfig getElementWithSinkCorrelationId(String correlateId) {
+
         for (SourceSinkConfig sourceConfig : siddhiAppConfig.getSourceList()) {
             if (sourceConfig.getCorrelationId() != null && sourceConfig.getCorrelationId().equals(correlateId)) {
                 return sourceConfig;

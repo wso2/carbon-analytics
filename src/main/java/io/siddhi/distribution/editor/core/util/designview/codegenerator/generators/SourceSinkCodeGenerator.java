@@ -38,13 +38,14 @@ public class SourceSinkCodeGenerator {
     /**
      * Generates the Siddhi code representation of a SourceSinkConfig object
      *
-     * @param sourceSink The SourceSinkConfig object
+     * @param sourceSink          The SourceSinkConfig object
      * @param isGeneratingToolTip If it is generating a tooltip or not
      * @return The Siddhi code representation of the given SourceSinkConfig object
      * @throws CodeGenerationException Error when generating the code
      */
     public String generateSourceSink(SourceSinkConfig sourceSink, boolean isGeneratingToolTip)
             throws CodeGenerationException {
+
         CodeGeneratorUtils.NullValidator.validateConfigObject(sourceSink);
 
         StringBuilder sourceSinkStringBuilder = new StringBuilder();
@@ -87,6 +88,7 @@ public class SourceSinkCodeGenerator {
      * @throws CodeGenerationException Error when generating the code
      */
     private String generateMapper(MapperConfig mapper) throws CodeGenerationException {
+
         CodeGeneratorUtils.NullValidator.validateConfigObject(mapper);
 
         StringBuilder mapperStringBuilder = new StringBuilder();
@@ -126,6 +128,7 @@ public class SourceSinkCodeGenerator {
      */
     private String generateMapperPayloadOrAttribute(MapperPayloadOrAttribute payloadOrAttribute)
             throws CodeGenerationException {
+
         CodeGeneratorUtils.NullValidator.validateConfigObject(payloadOrAttribute);
 
         StringBuilder mapperAttributeStringBuilder = new StringBuilder();
@@ -155,6 +158,7 @@ public class SourceSinkCodeGenerator {
      */
     private String generateListPayloadOrAttribute(MapperListPayloadOrAttribute mapperListAttribute)
             throws CodeGenerationException {
+
         CodeGeneratorUtils.NullValidator.validateConfigObject(mapperListAttribute);
 
         StringBuilder mapperListAttributeStringBuilder = new StringBuilder();
@@ -187,6 +191,7 @@ public class SourceSinkCodeGenerator {
      */
     private String generateMapPayloadOrAttribute(MapperMapPayloadOrAttribute mapperMapAttribute)
             throws CodeGenerationException {
+
         CodeGeneratorUtils.NullValidator.validateConfigObject(mapperMapAttribute);
 
         StringBuilder mapperMapAttributeStringBuilder = new StringBuilder();

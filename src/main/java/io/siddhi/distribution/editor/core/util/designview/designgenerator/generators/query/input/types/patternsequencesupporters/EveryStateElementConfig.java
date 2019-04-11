@@ -22,22 +22,27 @@ package io.siddhi.distribution.editor.core.util.designview.designgenerator.gener
  * Class for event state element configuration.
  */
 public class EveryStateElementConfig implements StateElementConfig {
+
     private StateElementConfig stateElement;
     private String within;
 
     public StateElementConfig getStateElement() {
+
         return stateElement;
     }
 
     public void setStateElement(StateElementConfig stateElement) {
+
         this.stateElement = stateElement;
     }
 
     public String getWithin() {
+
         return within;
     }
 
     public void setWithin(String within) {
+
         this.within = within;
     }
 }

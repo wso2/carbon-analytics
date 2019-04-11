@@ -25,35 +25,43 @@ import java.util.List;
  * Response wrapper for Validation Success.
  */
 public class ValidationSuccessResponse extends GeneralResponse {
+
     private List<AbstractDefinition> streams;
     private List<AbstractDefinition> aggregationDefinitions;
     private List<List<AbstractDefinition>> innerStreams;
 
     public ValidationSuccessResponse(Status status) {
+
         super(status, null);
     }
 
     public List<AbstractDefinition> getStreams() {
+
         return streams;
     }
 
     public void setStreams(List<AbstractDefinition> streams) {
+
         this.streams = streams;
     }
 
     public List<AbstractDefinition> getAggregationDefinitions() {
+
         return aggregationDefinitions;
     }
 
     public void setAggregationDefinitions(List<AbstractDefinition> aggregationDefinitions) {
+
         this.aggregationDefinitions = aggregationDefinitions;
     }
 
     public List<List<AbstractDefinition>> getInnerStreams() {
+
         return innerStreams;
     }
 
     public void setInnerStreams(List<List<AbstractDefinition>> innerStreams) {
+
         this.innerStreams = innerStreams;
     }
 }

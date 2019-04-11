@@ -37,6 +37,7 @@ public class TableCodeGenerator {
      * @throws CodeGenerationException Error when generating the code
      */
     public String generateTable(TableConfig table, boolean isGeneratingToolTip) throws CodeGenerationException {
+
         CodeGeneratorUtils.NullValidator.validateConfigObject(table);
         StringBuilder tableStringBuilder = new StringBuilder();
         if (!isGeneratingToolTip) {

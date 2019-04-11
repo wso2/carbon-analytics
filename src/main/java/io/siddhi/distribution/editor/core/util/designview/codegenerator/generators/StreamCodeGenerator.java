@@ -37,6 +37,7 @@ public class StreamCodeGenerator {
      * @throws CodeGenerationException Error when generating the code
      */
     public String generateStream(StreamConfig stream, boolean isGeneratingToolTip) throws CodeGenerationException {
+
         CodeGeneratorUtils.NullValidator.validateConfigObject(stream);
         StringBuilder streamStringBuilder = new StringBuilder();
         if (!isGeneratingToolTip) {

@@ -38,10 +38,12 @@ import java.util.List;
  * Generates PatternSequenceConfig tree, along with event references that are already present.
  */
 public class PatternSequenceConfigTreeInfoGenerator {
+
     private String siddhiAppString;
     private List<String> availableEventReferences = new ArrayList<>();
 
     public PatternSequenceConfigTreeInfoGenerator(String siddhiAppString) {
+
         this.siddhiAppString = siddhiAppString;
     }
 
@@ -54,6 +56,7 @@ public class PatternSequenceConfigTreeInfoGenerator {
      */
     public PatternSequenceConfigTreeInfo generatePatternSequenceConfigTreeInfo(StateElement stateElement)
             throws DesignGenerationException {
+
         StateElementConfig patternSequenceConfigTree = generateStateElementConfigTree(stateElement);
         return new PatternSequenceConfigTreeInfo(patternSequenceConfigTree, availableEventReferences);
     }
@@ -64,6 +67,7 @@ public class PatternSequenceConfigTreeInfoGenerator {
      * @param streamReference Stream reference of a Siddhi InputStream when available, or null
      */
     private void addToAvailableStreamReferences(String streamReference) {
+
         if (streamReference != null) {
             availableEventReferences.add(streamReference);
         }
@@ -78,6 +82,7 @@ public class PatternSequenceConfigTreeInfoGenerator {
      */
     private StateElementConfig generateStateElementConfigTree(StateElement stateElement)
             throws DesignGenerationException {
+
         if (stateElement instanceof StreamStateElement) {
             return generateStreamStateElementConfig((StreamStateElement) stateElement);
         } else if (stateElement instanceof CountStateElement) {
@@ -104,6 +109,7 @@ public class PatternSequenceConfigTreeInfoGenerator {
      * @throws DesignGenerationException Error while getting definition for the non-null SiddhiElement object
      */
     private String generateNullableElementDefinition(SiddhiElement siddhiElement) throws DesignGenerationException {
+
         if (siddhiElement == null) {
             return null;
         }
@@ -119,6 +125,7 @@ public class PatternSequenceConfigTreeInfoGenerator {
      */
     private StreamStateElementConfig generateStreamStateElementConfig(StreamStateElement streamStateElement)
             throws DesignGenerationException {
+
         if (streamStateElement instanceof AbsentStreamStateElement) {
             return generateAbsentStreamStateElementConfig((AbsentStreamStateElement) streamStateElement);
         }
@@ -149,6 +156,7 @@ public class PatternSequenceConfigTreeInfoGenerator {
      */
     private CountStateElementConfig generateCountStateElementConfig(CountStateElement countStateElement)
             throws DesignGenerationException {
+
         CountStateElementConfig countStateElementConfig = new CountStateElementConfig();
         countStateElementConfig
                 .setStreamStateElement(generateStreamStateElementConfig(countStateElement.getStreamStateElement()));
@@ -169,6 +177,7 @@ public class PatternSequenceConfigTreeInfoGenerator {
      */
     private LogicalStateElementConfig generateLogicalStateElementConfig(LogicalStateElement logicalStateElement)
             throws DesignGenerationException {
+
         LogicalStateElementConfig logicalStateElementConfig = new LogicalStateElementConfig();
         logicalStateElementConfig
                 .setStreamStateElement1(generateStreamStateElementConfig(logicalStateElement.getStreamStateElement1()));
@@ -190,6 +199,7 @@ public class PatternSequenceConfigTreeInfoGenerator {
      */
     private EveryStateElementConfig generateEveryStateElementConfig(EveryStateElement everyStateElement)
             throws DesignGenerationException {
+
         EveryStateElementConfig everyStateElementConfig = new EveryStateElementConfig();
         everyStateElementConfig.setStateElement(generateStateElementConfigTree(everyStateElement.getStateElement()));
         //TODO mohan FIX Pattern
@@ -207,6 +217,7 @@ public class PatternSequenceConfigTreeInfoGenerator {
      */
     private NextStateElementConfig generateNextStateElementConfig(NextStateElement nextStateElement)
             throws DesignGenerationException {
+
         NextStateElementConfig nextStateElementConfig = new NextStateElementConfig();
         nextStateElementConfig.setStateElement(generateStateElementConfigTree(nextStateElement.getStateElement()));
         nextStateElementConfig.
@@ -226,6 +237,7 @@ public class PatternSequenceConfigTreeInfoGenerator {
      */
     private AbsentStreamStateElementConfig generateAbsentStreamStateElementConfig(
             AbsentStreamStateElement absentStreamStateElement) throws DesignGenerationException {
+
         BasicSingleInputStream basicSingleInputStream = absentStreamStateElement.getBasicSingleInputStream();
         AbsentStreamStateElementConfig absentStreamStateElementConfig = new AbsentStreamStateElementConfig();
         absentStreamStateElementConfig

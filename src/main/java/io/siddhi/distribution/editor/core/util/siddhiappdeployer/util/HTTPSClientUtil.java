@@ -25,12 +25,14 @@ import io.siddhi.distribution.editor.core.exception.SiddhiAppDeployerServiceStub
  * Contains HTTPS client related methods.
  */
 public class HTTPSClientUtil {
+
     private static final String PROTOCOL = "https";
 
     /**
      * Avoids Instantiation.
      */
     private HTTPSClientUtil() {
+
     }
 
     /**
@@ -40,6 +42,7 @@ public class HTTPSClientUtil {
      * @return HTTPS URL
      */
     private static String generateURL(String hostAndPort) {
+
         return PROTOCOL + "://" + hostAndPort;
     }
 
@@ -55,6 +58,7 @@ public class HTTPSClientUtil {
      */
     public static Response doPutRequest(String hostAndPort, String username, String password, String payload)
             throws SiddhiAppDeployerServiceStubException {
+
         return SiddhiAppDeployerFactory.getSiddhiAppDeployerHttpsClient(generateURL(hostAndPort), username, password)
                 .doPutRequest(payload);
     }

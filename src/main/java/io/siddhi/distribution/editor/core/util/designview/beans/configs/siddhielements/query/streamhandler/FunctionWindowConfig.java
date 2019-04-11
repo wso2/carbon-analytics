@@ -22,14 +22,17 @@ package io.siddhi.distribution.editor.core.util.designview.beans.configs.siddhie
  * Represents a Function|Window.
  */
 public class FunctionWindowConfig extends StreamHandlerConfig {
+
     private FunctionWindowValue value;
 
     public FunctionWindowConfig(String type, FunctionWindowValue value) {
+
         super(type);
         this.value = value;
     }
 
     public FunctionWindowValue getValue() {
+
         return value;
     }
 }

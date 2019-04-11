@@ -24,20 +24,24 @@ import java.util.List;
  * Holds information about the PatternSequenceConfig tree.
  */
 public class PatternSequenceConfigTreeInfo {
+
     StateElementConfig patternSequenceConfigTree;
     List<String> availableEventReferences;
 
     public PatternSequenceConfigTreeInfo(StateElementConfig patternSequenceConfigTree,
                                          List<String> availableEventReferences) {
+
         this.patternSequenceConfigTree = patternSequenceConfigTree;
         this.availableEventReferences = availableEventReferences;
     }
 
     public StateElementConfig getPatternSequenceConfigTree() {
+
         return patternSequenceConfigTree;
     }
 
     public List<String> getAvailableEventReferences() {
+
         return availableEventReferences;
     }
 }

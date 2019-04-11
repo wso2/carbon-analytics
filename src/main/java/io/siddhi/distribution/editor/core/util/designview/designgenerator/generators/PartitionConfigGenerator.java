@@ -48,6 +48,7 @@ import java.util.Map;
  * Generator to create PartitionConfig.
  */
 public class PartitionConfigGenerator extends CodeSegmentsPreserver {
+
     private String siddhiAppString;
     private SiddhiApp siddhiApp;
     private Map<String, Map<String, AbstractDefinition>> partitionedInnerStreamDefinitions;
@@ -56,6 +57,7 @@ public class PartitionConfigGenerator extends CodeSegmentsPreserver {
     public PartitionConfigGenerator(String siddhiAppString,
                                     SiddhiApp siddhiApp,
                                     Map<String, Map<String, AbstractDefinition>> partitionedInnerStreamDefinitions) {
+
         this.siddhiAppString = siddhiAppString;
         this.siddhiApp = siddhiApp;
         this.partitionedInnerStreamDefinitions = partitionedInnerStreamDefinitions;
@@ -72,6 +74,7 @@ public class PartitionConfigGenerator extends CodeSegmentsPreserver {
      */
     public PartitionConfig generatePartitionConfig(Partition partition, String partitionId)
             throws DesignGenerationException {
+
         PartitionConfig partitionConfig = new PartitionConfig();
         partitionConfig.setQueryLists(generateQueryList(partition.getQueryList()));
         partitionConfig.setStreamList(
@@ -94,6 +97,7 @@ public class PartitionConfigGenerator extends CodeSegmentsPreserver {
      */
     private Map<QueryListType, List<QueryConfig>> generateQueryList(List<Query> queryList)
             throws DesignGenerationException {
+
         Map<QueryListType, List<QueryConfig>> queryLists = populateEmptyQueryLists();
         QueryConfigGenerator queryConfigGenerator = new QueryConfigGenerator(siddhiAppString, siddhiApp);
         for (Query query : queryList) {
@@ -111,6 +115,7 @@ public class PartitionConfigGenerator extends CodeSegmentsPreserver {
      * @return Map of QueryConfig lists
      */
     private Map<QueryListType, List<QueryConfig>> populateEmptyQueryLists() {
+
         Map<QueryListType, List<QueryConfig>> queryLists = new EnumMap<>(QueryListType.class);
         queryLists.put(QueryListType.WINDOW_FILTER_PROJECTION, new ArrayList<>());
         queryLists.put(QueryListType.JOIN, new ArrayList<>());
@@ -126,6 +131,7 @@ public class PartitionConfigGenerator extends CodeSegmentsPreserver {
      * @return List of StreamConfigs
      */
     private List<StreamConfig> generateInnerStreams(Collection<AbstractDefinition> innerStreamDefinitions) {
+
         StreamDefinitionConfigGenerator streamDefinitionConfigGenerator = new StreamDefinitionConfigGenerator();
         List<StreamConfig> innerStreams = new ArrayList<>();
         for (AbstractDefinition innerStreamDefinition : innerStreamDefinitions) {
@@ -147,6 +153,7 @@ public class PartitionConfigGenerator extends CodeSegmentsPreserver {
      */
     private List<PartitionWithElement> generatePartitionWith(Map<String, PartitionType> partitionTypeMap)
             throws DesignGenerationException {
+
         List<PartitionWithElement> partitionWithElements = new ArrayList<>();
         int partitionConnectorIdCounter = 0;
         for (Map.Entry<String, PartitionType> partitionWithEntry : partitionTypeMap.entrySet()) {
@@ -168,6 +175,7 @@ public class PartitionConfigGenerator extends CodeSegmentsPreserver {
      */
     private PartitionWithElement generatePartitionWithElement(Map.Entry<String, PartitionType> partitionWithEntry)
             throws DesignGenerationException {
+
         PartitionWithElement partitionWithElement =
                 new PartitionWithElement(
                         generatePartitionElementExpression(partitionWithEntry.getValue()),
@@ -184,6 +192,7 @@ public class PartitionConfigGenerator extends CodeSegmentsPreserver {
      * @throws DesignGenerationException Error when generating PartitionExpression
      */
     private String generatePartitionElementExpression(PartitionType partitionType) throws DesignGenerationException {
+
         if (partitionType instanceof RangePartitionType) {
             return generateRangePartitionExpression(((RangePartitionType) partitionType).getRangePartitionProperties());
         } else if (partitionType instanceof ValuePartitionType) {
@@ -201,6 +210,7 @@ public class PartitionConfigGenerator extends CodeSegmentsPreserver {
      */
     private String generateRangePartitionExpression(
             RangePartitionType.RangePartitionProperty[] rangePartitionProperties) throws DesignGenerationException {
+
         List<String> expression = new ArrayList<>();
         for (RangePartitionType.RangePartitionProperty rangePartitionProperty : rangePartitionProperties) {
             expression.add(ConfigBuildingUtilities.getDefinition(rangePartitionProperty, siddhiAppString));
@@ -217,6 +227,7 @@ public class PartitionConfigGenerator extends CodeSegmentsPreserver {
      */
     private String generateValuePartitionExpression(Expression valuePartitionExpression)
             throws DesignGenerationException {
+
         return ConfigBuildingUtilities.getDefinition(valuePartitionExpression, siddhiAppString);
     }
 
@@ -227,6 +238,7 @@ public class PartitionConfigGenerator extends CodeSegmentsPreserver {
      * @return List of strings, denoting annotations
      */
     private List<String> generateAnnotations(List<Annotation> annotations) {
+
         AnnotationConfigGenerator annotationConfigGenerator = new AnnotationConfigGenerator();
         List<String> annotationConfigs = annotationConfigGenerator.generateAnnotationConfigList(annotations);
         preserveCodeSegmentsOf(annotationConfigGenerator);

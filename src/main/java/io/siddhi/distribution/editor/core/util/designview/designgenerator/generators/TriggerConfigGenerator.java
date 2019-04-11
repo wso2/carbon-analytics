@@ -31,12 +31,14 @@ import java.util.Map;
  * Generator to create config for a Siddhi Trigger.
  */
 public class TriggerConfigGenerator extends CodeSegmentsPreserver {
+
     private static final String EVERY_SPLIT_KEYWORD = " every ";
 
     private String siddhiAppString;
     private Map<String, StreamDefinition> streamDefinitions;
 
     public TriggerConfigGenerator(String siddhiAppString, Map<String, StreamDefinition> streamDefinitions) {
+
         this.siddhiAppString = siddhiAppString;
         this.streamDefinitions = streamDefinitions;
     }
@@ -49,6 +51,7 @@ public class TriggerConfigGenerator extends CodeSegmentsPreserver {
      * @throws DesignGenerationException Error while getting the definition of the trigger definition
      */
     public TriggerConfig generateTriggerConfig(TriggerDefinition triggerDefinition) throws DesignGenerationException {
+
         String criteria = "";
         String criteriaType = "";
         if (triggerDefinition.getAtEvery() != null) {
@@ -84,6 +87,7 @@ public class TriggerConfigGenerator extends CodeSegmentsPreserver {
      * @throws DesignGenerationException No stream is found with the Trigger's name
      */
     private StreamDefinition getTriggerStream(String triggerName) throws DesignGenerationException {
+
         for (Map.Entry<String, StreamDefinition> streamDefinitionEntry : streamDefinitions.entrySet()) {
             if (streamDefinitionEntry.getKey().equals(triggerName)) {
                 return streamDefinitionEntry.getValue();

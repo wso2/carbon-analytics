@@ -35,6 +35,7 @@ public class EditorSiddhiAppRuntimeService implements SiddhiAppRuntimeService {
 
     @Override
     public Map<String, SiddhiAppRuntime> getActiveSiddhiAppRuntimes() {
+
         Map<String, DebugRuntime> siddhiApps = EditorDataHolder.getSiddhiAppMap();
         Map<String, SiddhiAppRuntime> siddhiAppRuntimes = new HashMap<>();
         for (Map.Entry<String, DebugRuntime> entry : siddhiApps.entrySet()) {

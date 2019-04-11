@@ -22,19 +22,23 @@ package io.siddhi.distribution.editor.core.util.designview.beans.configs.siddhie
  * Represents a Siddhi Attribute.
  */
 public class AttributeConfig extends SiddhiElementConfig {
+
     private String name;
     private String type;
 
     public AttributeConfig(String name, String type) {
+
         this.name = name;
         this.type = type;
     }
 
     public String getName() {
+
         return name;
     }
 
     public String getType() {
+
         return type;
     }
 }

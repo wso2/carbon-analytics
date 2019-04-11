@@ -30,6 +30,7 @@ import java.util.concurrent.ConcurrentHashMap;
  * EditorDataHolder referenced through org.wso2.carbon.siddhi.debugger.core.internal.ServiceComponent.
  */
 public class EditorDataHolder {
+
     private static EditorDataHolder instance = new EditorDataHolder();
     private static SiddhiManager siddhiManager;
     private static BundleContext bundleContext;
@@ -43,42 +44,52 @@ public class EditorDataHolder {
     }
 
     public static EditorDataHolder getInstance() {
+
         return instance;
     }
 
     public static SiddhiManager getSiddhiManager() {
+
         return siddhiManager;
     }
 
     public static void setSiddhiManager(SiddhiManager siddhiManager) {
+
         EditorDataHolder.siddhiManager = siddhiManager;
     }
 
     public static DebugProcessorService getDebugProcessorService() {
+
         return debugProcessorService;
     }
 
     public static void setDebugProcessorService(DebugProcessorService debugProcessorService) {
+
         EditorDataHolder.debugProcessorService = debugProcessorService;
     }
 
     public static Map<String, DebugRuntime> getSiddhiAppMap() {
+
         return siddhiAppMap;
     }
 
     public static BundleContext getBundleContext() {
+
         return bundleContext;
     }
 
     public static void setBundleContext(BundleContext bundleContext) {
+
         EditorDataHolder.bundleContext = bundleContext;
     }
 
     public static Map<String, String> getSiddhiSampleMap() {
+
         return siddhiSampleMap;
     }
 
     public static void setSiddhiSampleMap(Map<String, String> siddhiSampleMap) {
+
         EditorDataHolder.siddhiSampleMap = siddhiSampleMap;
     }
 
@@ -88,6 +99,7 @@ public class EditorDataHolder {
      * @return An instance of AnalyticsHttpClientBuilderService
      */
     public AnalyticsHttpClientBuilderService getClientBuilderService() {
+
         return clientBuilderService;
     }
 
@@ -97,6 +109,7 @@ public class EditorDataHolder {
      * @param clientBuilderService An object of AnalyticsHttpClientBuilderService
      */
     public void setClientBuilderService(AnalyticsHttpClientBuilderService clientBuilderService) {
+
         this.clientBuilderService = clientBuilderService;
     }
 }

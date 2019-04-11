@@ -26,31 +26,38 @@ import java.util.List;
  * Used in JSON responses.
  */
 public class AttributeMetaData {
+
     private String name;
     private List<DataType> type;
     private String description;
 
     public String getName() {
+
         return name;
     }
 
     public void setName(String name) {
+
         this.name = name;
     }
 
     public List<DataType> getType() {
+
         return type;
     }
 
     public void setType(List<DataType> type) {
+
         this.type = type;
     }
 
     public String getDescription() {
+
         return description;
     }
 
     public void setDescription(String description) {
+
         this.description = description;
     }
 }

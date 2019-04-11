@@ -22,15 +22,18 @@ package io.siddhi.distribution.editor.core.util.designview.beans.configs.siddhie
  * Represents a Siddhi Script Function.
  */
 public class FunctionConfig extends SiddhiElementConfig {
+
     private String name;
     private String scriptType;
     private String returnType;
     private String body;
 
     public FunctionConfig() {
+
     }
 
     public FunctionConfig(String name, String scriptType, String returnType, String body) {
+
         this.name = name;
         this.scriptType = scriptType;
         this.returnType = returnType;
@@ -38,18 +41,22 @@ public class FunctionConfig extends SiddhiElementConfig {
     }
 
     public String getName() {
+
         return name;
     }
 
     public String getScriptType() {
+
         return scriptType;
     }
 
     public String getReturnType() {
+
         return returnType;
     }
 
     public String getBody() {
+
         return body;
     }
 }

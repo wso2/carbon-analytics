@@ -38,6 +38,7 @@ public class FunctionCodeGenerator {
      */
     public String generateFunction(FunctionConfig function, boolean isGeneratingToolTip)
             throws CodeGenerationException {
+
         CodeGeneratorUtils.NullValidator.validateConfigObject(function);
         StringBuilder functionStringBuilder = new StringBuilder();
         if (!isGeneratingToolTip) {

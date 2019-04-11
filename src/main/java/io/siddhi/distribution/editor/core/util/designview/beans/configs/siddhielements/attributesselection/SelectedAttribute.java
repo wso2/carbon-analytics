@@ -24,23 +24,28 @@ import io.siddhi.distribution.editor.core.util.designview.beans.configs.siddhiel
  * Represents a selected Siddhi Attribute
  */
 public class SelectedAttribute extends SiddhiElementConfig {
+
     private String expression;
     private String as;
 
     public SelectedAttribute(String expression, String as) {
+
         this.expression = expression;
         setASKeywordValue(as);
     }
 
     public String getExpression() {
+
         return expression;
     }
 
     public String getAs() {
+
         return as;
     }
 
     public void setASKeywordValue(String as) {
+
         if (as.equals(this.expression)) {
             this.as = "";
         } else {

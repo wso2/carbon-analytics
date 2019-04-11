@@ -63,6 +63,7 @@ public class CodeGeneratorConstants {
     public static final String PRIMARY_KEY_ANNOTATION = "@PRIMARYKEY";
 
     private CodeGeneratorConstants() {
+
     }
 
 }

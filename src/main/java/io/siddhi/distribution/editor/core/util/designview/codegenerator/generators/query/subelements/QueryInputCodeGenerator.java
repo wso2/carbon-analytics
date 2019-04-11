@@ -39,6 +39,7 @@ import java.util.regex.Pattern;
 public class QueryInputCodeGenerator {
 
     private QueryInputCodeGenerator() {
+
     }
 
     /**
@@ -49,6 +50,7 @@ public class QueryInputCodeGenerator {
      * @throws CodeGenerationException Error when generating code
      */
     public static String generateQueryInput(QueryInputConfig queryInput) throws CodeGenerationException {
+
         CodeGeneratorUtils.NullValidator.validateConfigObject(queryInput);
 
         StringBuilder queryInputStringBuilder = new StringBuilder();
@@ -85,6 +87,7 @@ public class QueryInputCodeGenerator {
      */
     private static String generateWindowFilterProjectionQueryInput(WindowFilterProjectionConfig windowFilterProjection)
             throws CodeGenerationException {
+
         CodeGeneratorUtils.NullValidator.validateConfigObject(windowFilterProjection);
 
         return SiddhiCodeBuilderConstants.NEW_LINE +
@@ -102,6 +105,7 @@ public class QueryInputCodeGenerator {
      * @throws CodeGenerationException Error when generating code
      */
     private static String generateJoinQueryInput(JoinConfig join) throws CodeGenerationException {
+
         CodeGeneratorUtils.NullValidator.validateConfigObject(join);
 
         StringBuilder joinStringBuilder = new StringBuilder();
@@ -151,6 +155,7 @@ public class QueryInputCodeGenerator {
      * @throws CodeGenerationException Error when generating code
      */
     private static String generateJoinElement(JoinElementConfig joinElement) throws CodeGenerationException {
+
         CodeGeneratorUtils.NullValidator.validateConfigObject(joinElement);
 
         StringBuilder joinElementStringBuilder = new StringBuilder();
@@ -181,6 +186,7 @@ public class QueryInputCodeGenerator {
      * @throws CodeGenerationException Error when generating code
      */
     private static String generateJoinType(String joinType) throws CodeGenerationException {
+
         if (joinType == null || joinType.isEmpty()) {
             throw new CodeGenerationException("The 'joinType' value of a given join query is empty");
         }
@@ -208,6 +214,7 @@ public class QueryInputCodeGenerator {
      */
     private static String generatePatternSequenceInput(PatternSequenceConfig patternSequence)
             throws CodeGenerationException {
+
         CodeGeneratorUtils.NullValidator.validateConfigObject(patternSequence);
 
         StringBuilder patternSequenceInputStringBuilder = new StringBuilder();
@@ -245,6 +252,7 @@ public class QueryInputCodeGenerator {
     private static String generatePatternSequenceConditionLogic(PatternSequenceConditionConfig condition,
                                                                 boolean hasNot)
             throws CodeGenerationException {
+
         CodeGeneratorUtils.NullValidator.validateConfigObject(condition);
 
         StringBuilder patternSequenceConditionStringBuilder = new StringBuilder();

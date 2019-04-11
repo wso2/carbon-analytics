@@ -27,6 +27,7 @@ import java.util.List;
  * Represents Siddhi Source/Sink.
  */
 public class SourceSinkConfig extends SiddhiElementConfig {
+
     private String annotationType;
     private String connectedElementName;
     private String type;
@@ -38,6 +39,7 @@ public class SourceSinkConfig extends SiddhiElementConfig {
     public SourceSinkConfig(String annotationType, String connectedElementName, String type,
                             List<String> options, MapperConfig map, boolean isCorrelationIdExist,
                             String correlationId) {
+
         this.annotationType = annotationType;
         this.connectedElementName = connectedElementName;
         this.type = type;
@@ -48,30 +50,37 @@ public class SourceSinkConfig extends SiddhiElementConfig {
     }
 
     public String getAnnotationType() {
+
         return annotationType;
     }
 
     public String getConnectedElementName() {
+
         return connectedElementName;
     }
 
     public String getType() {
+
         return type;
     }
 
     public List<String> getOptions() {
+
         return options;
     }
 
     public MapperConfig getMap() {
+
         return map;
     }
 
     public boolean isCorrelationIdExist() {
+
         return isCorrelationIdExist;
     }
 
     public String getCorrelationId() {
+
         return correlationId;
     }
 }

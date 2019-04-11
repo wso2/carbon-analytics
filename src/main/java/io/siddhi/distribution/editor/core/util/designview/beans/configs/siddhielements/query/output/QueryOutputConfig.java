@@ -24,25 +24,30 @@ import io.siddhi.distribution.editor.core.util.designview.beans.configs.siddhiel
  * Represents Output part of a Siddhi Query.
  */
 public class QueryOutputConfig {
+
     private String type;
     private OutputConfig output;
     private String target;
 
     public QueryOutputConfig(String type, OutputConfig output, String target) {
+
         this.type = type;
         this.output = output;
         this.target = target;
     }
 
     public String getType() {
+
         return type;
     }
 
     public OutputConfig getOutput() {
+
         return output;
     }
 
     public String getTarget() {
+
         return target;
     }
 }

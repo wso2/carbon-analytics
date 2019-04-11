@@ -31,9 +31,11 @@ import io.siddhi.query.compiler.SiddhiCompiler;
  * Generator to create Config objects from Siddhi Code.
  */
 public class DesignGenerator {
+
     private SiddhiManager siddhiManager;
 
     public void setSiddhiManager(SiddhiManager siddhiManager) {
+
         this.siddhiManager = siddhiManager;
     }
 
@@ -45,6 +47,7 @@ public class DesignGenerator {
      * @throws DesignGenerationException Error while generating config
      */
     public EventFlow getEventFlow(String siddhiAppString) throws DesignGenerationException {
+
         SiddhiApp siddhiApp;
         SiddhiAppRuntime siddhiAppRuntime;
         try {

@@ -36,6 +36,10 @@ import java.util.List;
  */
 public class SubElementCodeGenerator {
 
+    private SubElementCodeGenerator() {
+
+    }
+
     /**
      * Generates the Siddhi code representation of a CommentCodeSegment object
      *
@@ -44,6 +48,7 @@ public class SubElementCodeGenerator {
      * @throws CodeGenerationException Error when generating the code
      */
     public static String generateComment(CommentCodeSegment comment) throws CodeGenerationException {
+
         if (comment == null) {
             return SiddhiCodeBuilderConstants.EMPTY_STRING;
         } else if (comment.getContent() == null || comment.getContent().isEmpty()) {
@@ -59,6 +64,7 @@ public class SubElementCodeGenerator {
      * @return The Siddhi code representation of a Siddhi query name annotation
      */
     public static String generateQueryName(String queryName) {
+
         StringBuilder queryNameStringBuilder = new StringBuilder();
         if (queryName != null && !queryName.isEmpty()) {
             queryNameStringBuilder.append(SiddhiCodeBuilderConstants.QUERY_NAME_ANNOTATION)
@@ -80,6 +86,7 @@ public class SubElementCodeGenerator {
      * @throws CodeGenerationException Error when generating the code
      */
     static String generateAttributes(List<AttributeConfig> attributes) throws CodeGenerationException {
+
         if (attributes == null || attributes.isEmpty()) {
             throw new CodeGenerationException("A given attribute list is empty");
         }
@@ -107,6 +114,7 @@ public class SubElementCodeGenerator {
      * @return The Siddhi code representation of the given annotations list
      */
     public static String generateAnnotations(List<String> annotations) {
+
         if (annotations == null || annotations.isEmpty()) {
             return SiddhiCodeBuilderConstants.EMPTY_STRING;
         }
@@ -127,6 +135,7 @@ public class SubElementCodeGenerator {
      * @throws CodeGenerationException Error when generating the code
      */
     static String generateStore(StoreConfig store) throws CodeGenerationException {
+
         if (store == null) {
             return SiddhiCodeBuilderConstants.EMPTY_STRING;
         }
@@ -152,6 +161,7 @@ public class SubElementCodeGenerator {
      * @return The Siddhi code representation of the given parameters list
      */
     public static String generateParameterList(List<String> parameters) {
+
         if (parameters == null || parameters.isEmpty()) {
             return SiddhiCodeBuilderConstants.EMPTY_STRING;
         }
@@ -178,6 +188,7 @@ public class SubElementCodeGenerator {
      */
     public static String generateStreamHandlerList(List<StreamHandlerConfig> streamHandlerList)
             throws CodeGenerationException {
+
         if (streamHandlerList == null || streamHandlerList.isEmpty()) {
             return SiddhiCodeBuilderConstants.EMPTY_STRING;
         }
@@ -198,6 +209,7 @@ public class SubElementCodeGenerator {
      * @throws CodeGenerationException Error when generating the code
      */
     private static String generateStreamHandler(StreamHandlerConfig streamHandler) throws CodeGenerationException {
+
         CodeGeneratorUtils.NullValidator.validateConfigObject(streamHandler);
 
         StringBuilder streamHandlerStringBuilder = new StringBuilder();
@@ -242,6 +254,7 @@ public class SubElementCodeGenerator {
      * @throws CodeGenerationException Error when generating the code
      */
     public static String generateForEventType(String eventType) throws CodeGenerationException {
+
         if (eventType == null || eventType.isEmpty()) {
             return SiddhiCodeBuilderConstants.EMPTY_STRING;
         }
@@ -268,16 +281,16 @@ public class SubElementCodeGenerator {
         return forEventTypeStringBuilder.toString();
     }
 
-    private SubElementCodeGenerator() {
-    }
-
     /**
-     *Converts an org.wso2.siddhi.query.api.annotation.Element in string format to another string with escape characters
+     * Converts an org.wso2.siddhi.query.api.annotation.Element in string format to another string with escape
+     * characters
      * which is the siddhi app code representation of the Element.
+     *
      * @param elementStr The Element in String format. E.g. title = "The wonder of "foo""
      * @return The code representation of the Element. E.g. title = """The wonder of "foo""""
      */
     private static String toStringWithEscapeChars(String elementStr) {
+
         String key = null, value;
         if (elementStr == null || elementStr.isEmpty()) {
             throw new IllegalArgumentException("Input string is either null or empty.");

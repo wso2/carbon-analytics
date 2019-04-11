@@ -25,18 +25,22 @@ import io.siddhi.distribution.editor.core.util.designview.constants.AggregationB
  * Represents an 'aggregateByTimePeriod' element by time range.
  */
 public class AggregateByTimeRange extends AggregateByTimePeriod {
+
     private AggregationByTimeRangeValue value;
 
     public AggregateByTimeRange(AggregationByTimeRangeValue value) {
+
         super(AggregationByTimeType.RANGE.toString());
         this.value = value;
     }
 
     public AggregationByTimeRangeValue getValue() {
+
         return value;
     }
 
     public void setValue(AggregationByTimeRangeValue value) {
+
         this.value = value;
     }
 }

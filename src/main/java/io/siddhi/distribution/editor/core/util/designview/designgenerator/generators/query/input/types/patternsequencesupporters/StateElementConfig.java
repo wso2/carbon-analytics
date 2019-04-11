@@ -22,4 +22,5 @@ package io.siddhi.distribution.editor.core.util.designview.designgenerator.gener
  * Interface for state element configuration.
  */
 public interface StateElementConfig {
+
 }

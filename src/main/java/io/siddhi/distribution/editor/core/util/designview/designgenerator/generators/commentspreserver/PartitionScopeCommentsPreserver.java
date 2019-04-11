@@ -40,12 +40,14 @@ import java.util.Set;
  * Preserves Comments of major elements, that reside in a Partition scope.
  */
 public class PartitionScopeCommentsPreserver extends ScopedCommentsPreserver {
+
     private PartitionConfig partitionConfig;
     private ElementCodeSegment partitionCodeSegment;
 
     public PartitionScopeCommentsPreserver(String siddhiAppString,
                                            PartitionConfig partitionConfig,
                                            Set<ElementCodeSegment> elementCodeSegments) {
+
         super(siddhiAppString, new ArrayList<>(elementCodeSegments));
         this.partitionConfig = partitionConfig;
         partitionCodeSegment =
@@ -56,6 +58,7 @@ public class PartitionScopeCommentsPreserver extends ScopedCommentsPreserver {
 
     @Override
     public List<CommentCodeSegment> generateCommentCodeSegments() throws DesignGenerationException {
+
         Collections.sort(elementCodeSegments);
         elementCodeSegments = filterCurrentPartitionContainedCodeSegments(elementCodeSegments);
         elementCodeSegments = filterMajorElementCodeSegments(elementCodeSegments);
@@ -73,6 +76,7 @@ public class PartitionScopeCommentsPreserver extends ScopedCommentsPreserver {
      */
     private List<ElementCodeSegment> filterCurrentPartitionContainedCodeSegments(
             List<ElementCodeSegment> elementCodeSegments) {
+
         List<ElementCodeSegment> filteredElementCodeSegments = new ArrayList<>();
         ElementCodeSegment partitionElementCodeSegment =
                 new ElementCodeSegment(
@@ -94,6 +98,7 @@ public class PartitionScopeCommentsPreserver extends ScopedCommentsPreserver {
      */
     private List<CommentCodeSegment> filterCommentsAfterPartitionWithKeyword(
             List<CommentCodeSegment> commentCodeSegments) {
+
         List<CommentCodeSegment> filteredCommentCodeSegments = new ArrayList<>();
         int[] partitionWithLastIndex = getLastPartitionWithElementEndIndex(partitionConfig.getPartitionWith());
         for (CommentCodeSegment commentCodeSegment : commentCodeSegments) {
@@ -111,6 +116,7 @@ public class PartitionScopeCommentsPreserver extends ScopedCommentsPreserver {
     @Override
     public SiddhiAppConfig bindCommentsToElements(Collection<CommentCodeSegment> commentCodeSegments,
                                                   SiddhiAppConfig siddhiAppConfigReference) {
+
         PartitionConfig currentPartitionConfigReference = getCurrentPartitionConfigReference(siddhiAppConfigReference);
         if (currentPartitionConfigReference != null) {
             for (StreamConfig streamConfig : currentPartitionConfigReference.getStreamList()) {
@@ -133,6 +139,7 @@ public class PartitionScopeCommentsPreserver extends ScopedCommentsPreserver {
      * @return Query context end index of the very last 'partition with' element
      */
     private int[] getLastPartitionWithElementEndIndex(List<PartitionWithElement> partitionWithElements) {
+
         List<ElementCodeSegment> partitionWithCodeSegments = new ArrayList<>();
         for (PartitionWithElement partitionWithElement : partitionWithElements) {
             partitionWithCodeSegments.add(
@@ -153,6 +160,7 @@ public class PartitionScopeCommentsPreserver extends ScopedCommentsPreserver {
      * @return Comment segment trimmed out of the 'begin' keyword
      */
     private CommentCodeSegment getTrimmedFirstInnerPartitionCommentSegment(CommentCodeSegment firstCommentCodeSegment) {
+
         final String begin = "begin";
         String[] splitArray = firstCommentCodeSegment.getContent().split(begin);
         String newContent = String.join(begin, Arrays.copyOfRange(splitArray, 1, splitArray.length));
@@ -182,6 +190,7 @@ public class PartitionScopeCommentsPreserver extends ScopedCommentsPreserver {
      * @return PartitionConfig object reference
      */
     private PartitionConfig getCurrentPartitionConfigReference(SiddhiAppConfig siddhiAppConfigReference) {
+
         for (PartitionConfig partitionConfigReference : siddhiAppConfigReference.getPartitionList()) {
             ElementCodeSegment codeSegment =
                     new ElementCodeSegment(
@@ -201,6 +210,7 @@ public class PartitionScopeCommentsPreserver extends ScopedCommentsPreserver {
      * @return Whether the code segment belongs to the current Partition or not
      */
     private boolean doesSegmentBelongToCurrentPartition(ElementCodeSegment elementCodeSegment) {
+
         ElementCodeSegment partitionElementCodeSegment =
                 new ElementCodeSegment(
                         partitionConfig.getQueryContextStartIndex(),

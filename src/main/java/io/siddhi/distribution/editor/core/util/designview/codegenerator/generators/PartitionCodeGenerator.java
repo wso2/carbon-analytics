@@ -45,6 +45,7 @@ public class PartitionCodeGenerator {
      */
     public String generatePartition(PartitionConfig partition, List<String> definitionNames,
                                     boolean isGeneratingToolTip) throws CodeGenerationException {
+
         CodeGeneratorUtils.NullValidator.validateConfigObject(partition);
 
         StringBuilder partitionStringBuilder = new StringBuilder();
@@ -98,6 +99,7 @@ public class PartitionCodeGenerator {
      * @throws CodeGenerationException Error when generating the code
      */
     private String generatePartitionWith(List<PartitionWithElement> partitionWith) throws CodeGenerationException {
+
         CodeGeneratorUtils.NullValidator.validateConfigObject(partitionWith);
 
         StringBuilder partitionWithStringBuilder = new StringBuilder();
@@ -122,6 +124,7 @@ public class PartitionCodeGenerator {
      */
     private String generatePartitionWithElement(PartitionWithElement partitionWithElement)
             throws CodeGenerationException {
+
         CodeGeneratorUtils.NullValidator.validateConfigObject(partitionWithElement);
 
         return partitionWithElement.getExpression() +

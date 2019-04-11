@@ -35,11 +35,13 @@ import java.lang.reflect.Type;
  * De-serializer for QueryInputConfig class.
  */
 public class QueryInputConfigDeSerializer implements JsonDeserializer {
+
     private static final String TYPE = "type";
 
     @Override
     public Object deserialize(
             JsonElement jsonElement, Type type, JsonDeserializationContext jsonDeserializationContext) {
+
         JsonObject jsonObject = jsonElement.getAsJsonObject();
         JsonPrimitive jsonPrimitive = (JsonPrimitive) jsonObject.get(TYPE);
         String queryInputType = jsonPrimitive.getAsString();

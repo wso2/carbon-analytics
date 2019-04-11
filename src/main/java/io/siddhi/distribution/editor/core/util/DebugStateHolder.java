@@ -25,22 +25,27 @@ import java.util.Map;
  * Used in JSON responses.
  */
 public class DebugStateHolder {
+
     private Map<String, Map<String, Object>> queryState;
     private DebugCallbackEvent eventState;
 
     private DebugStateHolder() {
+
     }
 
     public DebugStateHolder(DebugCallbackEvent eventState, Map<String, Map<String, Object>> queryState) {
+
         this.eventState = eventState;
         this.queryState = queryState;
     }
 
     public Map<String, Map<String, Object>> getQueryState() {
+
         return queryState;
     }
 
     public DebugCallbackEvent getEventState() {
+
         return eventState;
     }
 }

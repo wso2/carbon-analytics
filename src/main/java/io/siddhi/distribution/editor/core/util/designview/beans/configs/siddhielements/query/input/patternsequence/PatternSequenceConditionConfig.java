@@ -26,41 +26,50 @@ import java.util.List;
  * Represents a Condition element of Pattern | Sequence QueryInputConfig.
  */
 public class PatternSequenceConditionConfig {
+
     private String conditionId;
     private String streamName;
     private List<StreamHandlerConfig> streamHandlerList;
 
     public PatternSequenceConditionConfig() {
+
     }
 
     public PatternSequenceConditionConfig(String conditionId, String streamName,
                                           List<StreamHandlerConfig> streamHandlerList) {
+
         this.conditionId = conditionId;
         this.streamName = streamName;
         this.streamHandlerList = streamHandlerList;
     }
 
     public String getConditionId() {
+
         return conditionId;
     }
 
     public void setConditionId(String conditionId) {
+
         this.conditionId = conditionId;
     }
 
     public String getStreamName() {
+
         return streamName;
     }
 
     public void setStreamName(String streamName) {
+
         this.streamName = streamName;
     }
 
     public List<StreamHandlerConfig> getStreamHandlerList() {
+
         return streamHandlerList;
     }
 
     public void setStreamHandlerList(List<StreamHandlerConfig> streamHandlerList) {
+
         this.streamHandlerList = streamHandlerList;
     }
 }

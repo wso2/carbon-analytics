@@ -36,6 +36,7 @@ public class MimeMapper {
     private static Properties mimeMap = null;
 
     private static void loadMimeMap() throws IOException {
+
         mimeMap = new Properties();
         InputStream inputStream = MimeMapper.class.getClassLoader()
                 .getResourceAsStream("mime-map.properties");
@@ -50,6 +51,7 @@ public class MimeMapper {
     }
 
     public static String getMimeType(String extension) throws MimeMappingException {
+
         try {
             if (mimeMap == null) {
                 loadMimeMap();

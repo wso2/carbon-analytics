@@ -22,20 +22,25 @@ package io.siddhi.distribution.editor.core.util.designview.beans.configs.siddhie
  * Represents Siddhi Query's output.
  */
 public abstract class OutputConfig {
+
     private String eventType;
 
     public OutputConfig() {
+
     }
 
     public OutputConfig(String eventType) {
+
         this.eventType = eventType;
     }
 
     public String getEventType() {
+
         return eventType;
     }
 
     public void setEventType(String eventType) {
+
         this.eventType = eventType;
     }
 }

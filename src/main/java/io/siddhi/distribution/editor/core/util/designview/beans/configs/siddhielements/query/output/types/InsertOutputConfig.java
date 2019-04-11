@@ -22,10 +22,13 @@ package io.siddhi.distribution.editor.core.util.designview.beans.configs.siddhie
  * Represents Siddhi Insert Query's output.
  */
 public class InsertOutputConfig extends OutputConfig {
+
     public InsertOutputConfig() {
+
     }
 
     public InsertOutputConfig(String eventType) {
+
         super(eventType);
     }
 }

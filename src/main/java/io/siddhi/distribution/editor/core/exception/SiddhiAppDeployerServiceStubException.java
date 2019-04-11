@@ -32,6 +32,7 @@ public class SiddhiAppDeployerServiceStubException extends Exception {
      *                later retrieval by the {@link #getMessage()} method.
      */
     public SiddhiAppDeployerServiceStubException(String message) {
+
         super(message);
     }
 
@@ -50,6 +51,7 @@ public class SiddhiAppDeployerServiceStubException extends Exception {
      * @since 1.4
      */
     public SiddhiAppDeployerServiceStubException(String message, Throwable cause) {
+
         super(message, cause);
     }
 }

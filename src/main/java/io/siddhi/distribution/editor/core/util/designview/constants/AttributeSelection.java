@@ -22,6 +22,7 @@ package io.siddhi.distribution.editor.core.util.designview.constants;
  * Attribute Selection.
  */
 public class AttributeSelection {
+
     public static final String TYPE_USER_DEFINED = "USER_DEFINED";
     public static final String TYPE_ALL = "ALL";
     public static final String VALUE_ALL = "*";
@@ -30,5 +31,6 @@ public class AttributeSelection {
      * Avoids instantiation.
      */
     private AttributeSelection() {
+
     }
 }

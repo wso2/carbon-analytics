@@ -24,14 +24,17 @@ package io.siddhi.distribution.editor.core.exception;
 public class InvalidExecutionStateException extends RuntimeException {
 
     public InvalidExecutionStateException(String msg) {
+
         super(msg);
     }
 
     public InvalidExecutionStateException(Exception cause) {
+
         super(cause);
     }
 
     public InvalidExecutionStateException(String msg, Throwable cause) {
+
         super(msg, cause);
     }
 

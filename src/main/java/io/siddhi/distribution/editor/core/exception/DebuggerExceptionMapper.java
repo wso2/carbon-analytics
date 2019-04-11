@@ -25,8 +25,10 @@ import javax.ws.rs.ext.ExceptionMapper;
  * Exception mapper that maps customized DebuggerException to customized HTTP responses.
  */
 public class DebuggerExceptionMapper implements ExceptionMapper<DebuggerException> {
+
     @Override
     public Response toResponse(DebuggerException e) {
+
         return Response.status(Response.Status.INTERNAL_SERVER_ERROR).
                 entity(e.getMessage()).
                 build();

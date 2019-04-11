@@ -34,18 +34,22 @@ import java.util.List;
  * Generates to create AttributesSelectionConfig with given Siddhi elements
  */
 public class AttributesSelectionConfigGenerator extends CodeSegmentsPreserver {
+
     private String siddhiAppString;
 
     public AttributesSelectionConfigGenerator(String siddhiAppString) {
+
         this.siddhiAppString = siddhiAppString;
     }
 
     /**
      * Generates an AttributesSelectionConfig from the given Siddhi Selector
-     * @param selector      Siddhi Selector object
-     * @return              AttributesSelectionConfig object
+     *
+     * @param selector Siddhi Selector object
+     * @return AttributesSelectionConfig object
      */
     public AttributesSelectionConfig generateAttributesSelectionConfig(Selector selector) {
+
         List<SelectedAttribute> selectedAttributes = new ArrayList<>();
         List<OutputAttribute> selectionList = selector.getSelectionList();
 
@@ -70,10 +74,12 @@ public class AttributesSelectionConfigGenerator extends CodeSegmentsPreserver {
 
     /**
      * Generates a SelectedAttribute object from the given Siddhi OutputAttribute
-     * @param outputAttribute                   Siddhi OutputAttribute object
-     * @return                                  SelectedAttribute object
+     *
+     * @param outputAttribute Siddhi OutputAttribute object
+     * @return SelectedAttribute object
      */
     private SelectedAttribute generateSelectedAttribute(OutputAttribute outputAttribute) {
+
         String expression = ConfigBuildingUtilities.getDefinition(outputAttribute.getExpression(), siddhiAppString);
         if (expression != null) {
             SelectedAttribute selectedAttribute = new SelectedAttribute(expression, outputAttribute.getRename());

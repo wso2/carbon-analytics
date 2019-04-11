@@ -27,40 +27,49 @@ import java.util.List;
  * Represents Siddhi Source/Sink Mapper.
  */
 public class MapperConfig extends SiddhiElementConfig {
+
     private String type;
     private List<String> options;
     private MapperPayloadOrAttribute payloadOrAttribute;
 
     public MapperConfig() {
+
     }
 
     public MapperConfig(String type, List<String> options, MapperPayloadOrAttribute payloadOrAttribute) {
+
         this.type = type;
         this.options = options;
         this.payloadOrAttribute = payloadOrAttribute;
     }
 
     public String getType() {
+
         return type;
     }
 
     public void setType(String type) {
+
         this.type = type;
     }
 
     public List<String> getOptions() {
+
         return options;
     }
 
     public void setOptions(List<String> options) {
+
         this.options = options;
     }
 
     public MapperPayloadOrAttribute getPayloadOrAttribute() {
+
         return payloadOrAttribute;
     }
 
     public void setPayloadOrAttribute(MapperPayloadOrAttribute payloadOrAttribute) {
+
         this.payloadOrAttribute = payloadOrAttribute;
     }
 }

@@ -35,6 +35,7 @@ import io.siddhi.distribution.editor.core.util.designview.utilities.CodeGenerato
 public class QueryOutputCodeGenerator {
 
     private QueryOutputCodeGenerator() {
+
     }
 
     /**
@@ -45,6 +46,7 @@ public class QueryOutputCodeGenerator {
      * @throws CodeGenerationException Error when generating the code
      */
     public static String generateQueryOutput(QueryOutputConfig queryOutput) throws CodeGenerationException {
+
         CodeGeneratorUtils.NullValidator.validateConfigObject(queryOutput);
 
         StringBuilder queryOutputStringBuilder = new StringBuilder();
@@ -81,6 +83,7 @@ public class QueryOutputCodeGenerator {
      */
     private static String generateInsertOutput(InsertOutputConfig insertOutput, String target)
             throws CodeGenerationException {
+
         CodeGeneratorUtils.NullValidator.validateConfigObject(insertOutput);
         if (target == null || target.isEmpty()) {
             throw new CodeGenerationException("The 'target' value of a given query output element is empty");
@@ -128,6 +131,7 @@ public class QueryOutputCodeGenerator {
      */
     private static String generateDeleteOutput(DeleteOutputConfig deleteOutput, String target)
             throws CodeGenerationException {
+
         CodeGeneratorUtils.NullValidator.validateConfigObject(deleteOutput);
         if (target == null || target.isEmpty()) {
             throw new CodeGenerationException("The 'target' value of a given delete query output is empty");
@@ -155,6 +159,7 @@ public class QueryOutputCodeGenerator {
      */
     private static String generateUpdateOutput(String type, UpdateInsertIntoOutputConfig updateInsertIntoOutput,
                                                String target) throws CodeGenerationException {
+
         CodeGeneratorUtils.NullValidator.validateConfigObject(updateInsertIntoOutput);
         if (target == null || target.isEmpty()) {
             throw new CodeGenerationException("The 'target' value of a given update/insert" +
@@ -204,6 +209,7 @@ public class QueryOutputCodeGenerator {
      * @throws CodeGenerationException Error when generating the code
      */
     private static String generateSetAttribute(SetAttributeConfig setAttribute) throws CodeGenerationException {
+
         CodeGeneratorUtils.NullValidator.validateConfigObject(setAttribute);
 
         return setAttribute.getAttribute() +

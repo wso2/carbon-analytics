@@ -131,6 +131,7 @@ import javax.ws.rs.core.Response;
 )
 @Path("/editor")
 public class EditorMicroservice implements Microservice {
+
     private static final Logger log = LoggerFactory.getLogger(EditorMicroservice.class);
     private static final String FILE_SEPARATOR = "file.separator";
     private static final String STATUS = "status";
@@ -147,10 +148,12 @@ public class EditorMicroservice implements Microservice {
     private StoreQueryAPIHelper storeQueryAPIHelper;
 
     public EditorMicroservice() {
+
         workspace = new LocalFSWorkspace();
     }
 
     private File getResourceAsFile(String resourcePath) {
+
         try {
             InputStream in = this.getClass().getResource(resourcePath).openStream();
             if (in == null) {
@@ -169,12 +172,14 @@ public class EditorMicroservice implements Microservice {
 
     @GET
     public Response handleRoot(@Context Request request) throws FileNotFoundException {
+
         return handleGet(request);
     }
 
     @GET
     @Path("/**")
     public Response handleGet(@Context Request request) throws FileNotFoundException {
+
         String rawUri = request.getUri().replaceFirst("^/editor", "");
         String rawUriPath, mimeType;
         if (rawUri == null || rawUri.trim().length() == 0 || "/".equals(rawUri)) {
@@ -204,6 +209,7 @@ public class EditorMicroservice implements Microservice {
     @POST
     @Path("/validator")
     public Response validateSiddhiApp(String validationRequestString) {
+
         ValidationRequest validationRequest = new Gson().fromJson(validationRequestString, ValidationRequest.class);
         String jsonString;
         try {
@@ -248,6 +254,7 @@ public class EditorMicroservice implements Microservice {
     @Path("/workspace/root")
     @Produces(MediaType.APPLICATION_JSON)
     public Response root() {
+
         try {
             return Response.status(Response.Status.OK)
                     .entity(workspace.listRoots())
@@ -267,6 +274,7 @@ public class EditorMicroservice implements Microservice {
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     public Response executeStoreQuery(JsonElement element) {
+
         if (storeQueryAPIHelper == null) {
             storeQueryAPIHelper = new StoreQueryAPIHelper(configProvider);
         }
@@ -295,6 +303,7 @@ public class EditorMicroservice implements Microservice {
     @Path("/workspace/listFilesInPath")
     @Produces(MediaType.APPLICATION_JSON)
     public Response listFilesInPath(@QueryParam("path") String path) {
+
         try {
             return Response.status(Response.Status.OK)
                     .entity(workspace.listDirectoryFiles(
@@ -315,6 +324,7 @@ public class EditorMicroservice implements Microservice {
     @Path("/workspace/exists")
     @Produces(MediaType.APPLICATION_JSON)
     public Response fileExists(@QueryParam("path") String path) {
+
         try {
             return Response.status(Response.Status.OK)
                     .entity(workspace.exists(
@@ -335,6 +345,7 @@ public class EditorMicroservice implements Microservice {
     @Path("/workspace/exists/workspace")
     @Produces(MediaType.APPLICATION_JSON)
     public Response fileExistsAtWorkspace(String payload) {
+
         try {
             String configName = "";
             String[] splitConfigContent = payload.split("configName=");
@@ -365,6 +376,7 @@ public class EditorMicroservice implements Microservice {
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     public JsonObject deploy(JsonElement element) {
+
         JsonArray success = new JsonArray();
         JsonArray failure = new JsonArray();
         JsonObject deploymentStatus = new JsonObject();
@@ -422,6 +434,7 @@ public class EditorMicroservice implements Microservice {
     @Path("/workspace/listFiles/workspace")
     @Produces(MediaType.APPLICATION_JSON)
     public Response filesInWorkspacePath(@QueryParam("path") String relativePath) {
+
         try {
             String location = (Paths.get(Constants.RUNTIME_PATH,
                     Constants.DIRECTORY_DEPLOYMENT)).toString();
@@ -444,6 +457,7 @@ public class EditorMicroservice implements Microservice {
     @Path("/workspace/listFiles/samples")
     @Produces(MediaType.APPLICATION_JSON)
     public Response filesInSamplePath(@QueryParam("path") String relativePath) {
+
         try {
             String location = (Paths.get(Constants.CARBON_HOME, Constants.DIRECTORY_SAMPLE,
                     Constants.DIRECTORY_ARTIFACTS)).toString();
@@ -466,6 +480,7 @@ public class EditorMicroservice implements Microservice {
     @Path("/workspace/listFiles/samples/descriptions")
     @Produces(MediaType.APPLICATION_JSON)
     public Response filesInSamplePathWithDescription() {
+
         try {
             Map<String, String> siddhiSampleMap = EditorDataHolder.getSiddhiSampleMap();
             return Response.status(Response.Status.OK)
@@ -481,6 +496,7 @@ public class EditorMicroservice implements Microservice {
     @Path("/workspace/config")
     @Produces(MediaType.APPLICATION_JSON)
     public Response getConfigs() {
+
         JsonObject config = new JsonObject();
         config.addProperty("fileSeparator", System.getProperty(FILE_SEPARATOR));
         return Response.status(Response.Status.OK)
@@ -492,6 +508,7 @@ public class EditorMicroservice implements Microservice {
     @Path("/workspace/listFiles")
     @Produces(MediaType.APPLICATION_JSON)
     public Response filesInPath(@QueryParam("path") String path) {
+
         try {
             String location = (Paths.get(Constants.CARBON_HOME)).toString();
             java.nio.file.Path pathLocation = SecurityUtil.resolvePath(Paths.get(location).toAbsolutePath(),
@@ -512,6 +529,7 @@ public class EditorMicroservice implements Microservice {
     @Path("/workspace/write")
     @Produces(MediaType.APPLICATION_JSON)
     public Response write(String payload) {
+
         try {
             String location = (Paths.get(Constants.RUNTIME_PATH,
                     Constants.DIRECTORY_DEPLOYMENT)).toString();
@@ -559,6 +577,7 @@ public class EditorMicroservice implements Microservice {
     @Path("/workspace/read")
     @Produces(MediaType.APPLICATION_JSON)
     public Response read(String relativePath) {
+
         try {
             String location = (Paths.get(Constants.RUNTIME_PATH,
                     Constants.DIRECTORY_DEPLOYMENT)).toString();
@@ -579,6 +598,7 @@ public class EditorMicroservice implements Microservice {
     @Path("/workspace/read/sample")
     @Produces(MediaType.APPLICATION_JSON)
     public Response readSample(String relativePath) {
+
         try {
             String location = (Paths.get(Constants.CARBON_HOME, Constants.DIRECTORY_SAMPLE)).toString();
             return Response.status(Response.Status.OK)
@@ -598,6 +618,7 @@ public class EditorMicroservice implements Microservice {
     @Path("/workspace/delete")
     @Produces(MediaType.APPLICATION_JSON)
     public Response deleteFile(@QueryParam("siddhiAppName") String siddhiAppName) {
+
         try {
             java.nio.file.Path location = SecurityUtil.
                     resolvePath(Paths.get(Constants.RUNTIME_PATH,
@@ -627,6 +648,7 @@ public class EditorMicroservice implements Microservice {
     @GET
     @Path("/metadata")
     public Response getMetaData() {
+
         MetaDataResponse response = new MetaDataResponse(Status.SUCCESS);
         Map<String, MetaData> extensions = SourceEditorUtils.getExtensionProcessorMetaData();
         response.setInBuilt(extensions.remove(""));
@@ -640,6 +662,7 @@ public class EditorMicroservice implements Microservice {
     @Produces(MediaType.APPLICATION_JSON)
     @Path("/{siddhiAppName}/start")
     public Response start(@PathParam("siddhiAppName") String siddhiAppName) {
+
         List<String> streams = EditorDataHolder
                 .getDebugProcessorService()
                 .getSiddhiAppRuntimeHolder(siddhiAppName)
@@ -661,6 +684,7 @@ public class EditorMicroservice implements Microservice {
     @Produces(MediaType.APPLICATION_JSON)
     @Path("/{siddhiAppName}/debug")
     public Response debug(@PathParam("siddhiAppName") String siddhiAppName) {
+
         List<String> streams = EditorDataHolder
                 .getDebugProcessorService()
                 .getSiddhiAppRuntimeHolder(siddhiAppName)
@@ -682,6 +706,7 @@ public class EditorMicroservice implements Microservice {
     @Produces(MediaType.APPLICATION_JSON)
     @Path("/{siddhiAppName}/stop")
     public Response stopDebug(@PathParam("siddhiAppName") String siddhiAppName) {
+
         EditorDataHolder
                 .getDebugProcessorService()
                 .stop(siddhiAppName);
@@ -699,6 +724,7 @@ public class EditorMicroservice implements Microservice {
     public Response acquireBreakPoint(@PathParam("siddhiAppName") String siddhiAppName,
                                       @QueryParam("queryIndex") Integer queryIndex,
                                       @QueryParam("queryTerminal") String queryTerminal) {
+
         if (queryIndex != null && queryTerminal != null && !queryTerminal.isEmpty()) {
             // acquire only specified break point
             SiddhiDebugger.QueryTerminal terminal = ("in".equalsIgnoreCase(queryTerminal)) ?
@@ -732,6 +758,7 @@ public class EditorMicroservice implements Microservice {
     public Response releaseBreakPoint(@PathParam("siddhiAppName") String siddhiAppName,
                                       @QueryParam("queryIndex") Integer queryIndex,
                                       @QueryParam("queryTerminal") String queryTerminal) {
+
         if (queryIndex == null || queryTerminal == null || queryTerminal.isEmpty()) {
             // release all break points
             EditorDataHolder
@@ -770,6 +797,7 @@ public class EditorMicroservice implements Microservice {
     @Produces(MediaType.APPLICATION_JSON)
     @Path("/{siddhiAppName}/next")
     public Response next(@PathParam("siddhiAppName") String siddhiAppName) {
+
         EditorDataHolder
                 .getDebugProcessorService()
                 .getSiddhiAppRuntimeHolder(siddhiAppName)
@@ -785,6 +813,7 @@ public class EditorMicroservice implements Microservice {
     @Produces(MediaType.APPLICATION_JSON)
     @Path("/{siddhiAppName}/play")
     public Response play(@PathParam("siddhiAppName") String siddhiAppName) {
+
         EditorDataHolder
                 .getDebugProcessorService()
                 .getSiddhiAppRuntimeHolder(siddhiAppName)
@@ -800,6 +829,7 @@ public class EditorMicroservice implements Microservice {
     @Produces(MediaType.APPLICATION_JSON)
     @Path("/{siddhiAppName}/state")
     public Response getQueryState(@PathParam("siddhiAppName") String siddhiAppName) throws InterruptedException {
+
         DebugCallbackEvent event = EditorDataHolder
                 .getDebugProcessorService()
                 .getSiddhiAppRuntimeHolder(siddhiAppName)
@@ -830,6 +860,7 @@ public class EditorMicroservice implements Microservice {
     @Path("/{siddhiAppName}/{queryName}/state")
     public Response getQueryState(@PathParam("siddhiAppName") String siddhiAppName,
                                   @PathParam("queryName") String queryName) {
+
         return Response
                 .status(Response.Status.OK)
                 .entity(
@@ -847,6 +878,7 @@ public class EditorMicroservice implements Microservice {
     public Response mock(String data,
                          @PathParam("siddhiAppName") String siddhiAppName,
                          @PathParam("streamId") String streamId) {
+
         Gson gson = new Gson();
         Object[] event = gson.fromJson(data, Object[].class);
         executorService.execute(() -> {
@@ -868,11 +900,11 @@ public class EditorMicroservice implements Microservice {
                 .build();
     }
 
-
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     @Path("/artifact/listSiddhiApps")
     public Response getSiddhiApps() {
+
         return Response
                 .status(Response.Status.OK)
                 .header("Access-Control-Allow-Origin", "*")
@@ -885,6 +917,7 @@ public class EditorMicroservice implements Microservice {
     @Produces(MediaType.APPLICATION_JSON)
     @Path("/artifact/listStreams/{siddhiAppName}")
     public Response getStreams(@PathParam("siddhiAppName") String siddhiAppName) {
+
         return Response
                 .status(Response.Status.OK)
                 .header("Access-Control-Allow-Origin", "*")
@@ -901,6 +934,7 @@ public class EditorMicroservice implements Microservice {
     @Path("/artifact/listAttributes/{siddhiAppName}/{streamName}")
     public Response getAttributes(@PathParam("siddhiAppName") String siddhiAppName,
                                   @PathParam("streamName") String streamName) {
+
         return Response
                 .status(Response.Status.OK)
                 .header("Access-Control-Allow-Origin", "*")
@@ -917,6 +951,7 @@ public class EditorMicroservice implements Microservice {
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     @Produces(MediaType.APPLICATION_FORM_URLENCODED)
     public Response getDesignView(String siddhiAppBase64) {
+
         try {
             FileConfigManager fileConfigManager = new FileConfigManager(configProvider);
             SiddhiManager siddhiManager = new SiddhiManager();
@@ -955,6 +990,7 @@ public class EditorMicroservice implements Microservice {
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     @Produces(MediaType.APPLICATION_FORM_URLENCODED)
     public Response getCodeView(String encodedEventFlowJson) {
+
         try {
             String eventFlowJson =
                     new String(Base64.getDecoder().decode(encodedEventFlowJson), StandardCharsets.UTF_8);
@@ -984,6 +1020,7 @@ public class EditorMicroservice implements Microservice {
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     @Produces(MediaType.APPLICATION_JSON)
     public Response getToolTips(String encodedSiddhiAppConfigJson) {
+
         try {
             String siddhiAppConfigJson =
                     new String(Base64.getDecoder().decode(encodedSiddhiAppConfigJson), StandardCharsets.UTF_8);
@@ -1014,6 +1051,7 @@ public class EditorMicroservice implements Microservice {
     @GET
     @Path("/docker/download")
     public Response downloadAsDocker(@QueryParam("q") String query) {
+
         Gson gson = new Gson();
         DockerDownloadRequest request = gson.fromJson(query, DockerDownloadRequest.class);
 
@@ -1050,6 +1088,7 @@ public class EditorMicroservice implements Microservice {
                                                 @PathParam("streamName") String streamName,
                                                 @PathParam("type") String eventType)
             throws NotFoundException {
+
         SiddhiAppRuntime siddhiAppRuntime = EditorDataHolder.getSiddhiManager().getSiddhiAppRuntime(appName);
         JSONObject errorResponse = new JSONObject();
         if (siddhiAppRuntime == null) {
@@ -1108,6 +1147,7 @@ public class EditorMicroservice implements Microservice {
      */
     @Deactivate
     protected void stop() throws Exception {
+
         log.info("Service Component is deactivated");
         EditorDataHolder.getSiddhiAppMap().values().forEach(DebugRuntime::stop);
         EditorDataHolder.setBundleContext(null);
@@ -1147,14 +1187,17 @@ public class EditorMicroservice implements Microservice {
             unbind = "unregisterConfigProvider"
     )
     protected void registerConfigProvider(ConfigProvider configProvider) {
+
         this.configProvider = configProvider;
     }
 
     protected void unregisterConfigProvider(ConfigProvider configProvider) {
+
         this.configProvider = null;
     }
 
     protected void loadSampleFiles() {
+
         String location = (Paths.get(Constants.CARBON_HOME, Constants.DIRECTORY_SAMPLE,
                 Constants.DIRECTORY_ARTIFACTS)).toString();
         String relativePath = "";
@@ -1195,10 +1238,12 @@ public class EditorMicroservice implements Microservice {
             unbind = "unregisterAnalyticsHttpClient"
     )
     protected void registerAnalyticsHttpClient(AnalyticsHttpClientBuilderService service) {
+
         EditorDataHolder.getInstance().setClientBuilderService(service);
     }
 
     protected void unregisterAnalyticsHttpClient(AnalyticsHttpClientBuilderService service) {
+
         EditorDataHolder.getInstance().setClientBuilderService(null);
     }
 }

@@ -49,6 +49,7 @@ import javax.websocket.server.ServerEndpoint;
 )
 @ServerEndpoint(value = "/console")
 public class EditorConsoleService implements WebSocketEndpoint {
+
     private static final Logger LOGGER = LoggerFactory.getLogger(EditorConsoleService.class);
     private static final int SCHEDULER_INITIAL_DELAY = 1000;
     private static final int SCHEDULER_TERMINATION_DELAY = 50;
@@ -57,9 +58,9 @@ public class EditorConsoleService implements WebSocketEndpoint {
     private ScheduledExecutorService scheduler;
     private CircularBuffer<ConsoleLogEvent> circularBuffer = DataHolder.getBuffer();
 
-
     @OnOpen
     public void onOpen(WebSocketConnection webSocketConnection) {
+
         if (this.webSocketConnection != null) {
             onClose(this.webSocketConnection);
         }
@@ -72,14 +73,16 @@ public class EditorConsoleService implements WebSocketEndpoint {
 
     @OnMessage
     public void onMessage(String text, WebSocketConnection webSocketConnection) {
+
         if (webSocketConnection.isOpen()) {
-            webSocketConnection.pushText("Welcome to Stream Processor Studio");
+            webSocketConnection.pushText("Welcome to Siddhi Editor");
             LOGGER.info("Received message : " + text);
         }
     }
 
     @OnClose
     public void onClose(WebSocketConnection webSocketConnection) {
+
         if (scheduler != null) {
             try {
                 scheduler.shutdown();
@@ -111,6 +114,7 @@ public class EditorConsoleService implements WebSocketEndpoint {
     }
 
     private void broadcastConsoleOutput(List<ConsoleLogEvent> event) {
+
         for (ConsoleLogEvent logEvent : event) {
             if (webSocketConnection.isOpen()) {
                 try {
@@ -124,12 +128,15 @@ public class EditorConsoleService implements WebSocketEndpoint {
     }
 
     private String getJsonString(ConsoleLogEvent logEvent) throws JsonProcessingException {
+
         ObjectMapper mapper = new ObjectMapper();
         return mapper.writeValueAsString(logEvent);
     }
 
     private final class LogPublisherTask implements Runnable {
+
         public void run() {
+
             try {
                 List<ConsoleLogEvent> logEvents = circularBuffer.get(circularBuffer.getAmount());
                 if (!logEvents.isEmpty()) {

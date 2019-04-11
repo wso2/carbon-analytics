@@ -22,27 +22,33 @@ package io.siddhi.distribution.editor.core.util.designview.beans.configs.siddhie
  * Represents @attribute or @payload of a Siddhi Source/Sink mapper.
  */
 public abstract class MapperPayloadOrAttribute {
+
     private String annotationType;
     private String type;
 
     public MapperPayloadOrAttribute(String annotationType, String type) {
+
         this.annotationType = annotationType;
         this.type = type;
     }
 
     public String getAnnotationType() {
+
         return annotationType;
     }
 
     public void setAnnotationType(String annotationType) {
+
         this.annotationType = annotationType;
     }
 
     public String getType() {
+
         return type;
     }
 
     public void setType(String type) {
+
         this.type = type;
     }
 }

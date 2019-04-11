@@ -24,12 +24,14 @@ import feign.Response;
  * HTTP client to access the Siddhi store query REST API.
  */
 public class StoreQueryHTTPClient {
+
     private static final String PROTOCOL = "http://";
 
     /**
      * Avoids Instantiation of the default constructor.
      */
     private StoreQueryHTTPClient() {
+
     }
 
     /**
@@ -40,6 +42,7 @@ public class StoreQueryHTTPClient {
      * @return HTTP response
      */
     public static Response executeStoreQuery(String host, String payload) {
+
         return SiddhiStoreQueryClientFactory
                 .getStoreQueryHTTPClient(PROTOCOL + host)
                 .executeStoreQuery(payload);

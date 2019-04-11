@@ -27,22 +27,26 @@ import java.util.List;
  * Represents a Window | Filter | Projection QueryInputConfig, for Siddhi Query.
  */
 public class WindowFilterProjectionConfig extends QueryInputConfig {
+
     private String from;
     private List<StreamHandlerConfig> streamHandlerList;
 
     public WindowFilterProjectionConfig(String type,
                                         String from,
                                         List<StreamHandlerConfig> streamHandlerList) {
+
         super(type);
         this.from = from;
         this.streamHandlerList = streamHandlerList;
     }
 
     public String getFrom() {
+
         return from;
     }
 
     public List<StreamHandlerConfig> getStreamHandlerList() {
+
         return streamHandlerList;
     }
 }

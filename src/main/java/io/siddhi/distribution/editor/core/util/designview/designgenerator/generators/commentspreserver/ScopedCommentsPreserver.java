@@ -34,11 +34,13 @@ import java.util.List;
  * Scopes are defined by classes that extend this abstract class.
  */
 public abstract class ScopedCommentsPreserver {
+
     protected String siddhiAppString;
     protected List<ElementCodeSegment> elementCodeSegments;
     protected List<CommentCodeSegment> commentCodeSegments = new ArrayList<>();
 
     public ScopedCommentsPreserver(String siddhiAppString, List<ElementCodeSegment> elementCodeSegments) {
+
         this.siddhiAppString = siddhiAppString;
         this.elementCodeSegments = elementCodeSegments;
     }
@@ -71,6 +73,7 @@ public abstract class ScopedCommentsPreserver {
      */
     protected List<CommentCodeSegment> detectCommentCodeSegments(List<ElementCodeSegment> elementCodeSegments)
             throws DesignGenerationException {
+
         List<CommentCodeSegment> detectedCommentCodeSegments = new ArrayList<>();
         for (int i = 1; i < elementCodeSegments.size(); i++) {
             if (hasCodeSegmentInBetween(elementCodeSegments.get(i - 1), elementCodeSegments.get(i))) {
@@ -92,6 +95,7 @@ public abstract class ScopedCommentsPreserver {
      */
     protected void assignPreviousCommentSegment(SiddhiElementConfig siddhiElementConfigReference,
                                                 Collection<CommentCodeSegment> commentCodeSegments) {
+
         siddhiElementConfigReference.setPreviousCommentSegment(
                 findPreviousCommentCodeSegment(siddhiElementConfigReference, commentCodeSegments));
     }
@@ -107,6 +111,7 @@ public abstract class ScopedCommentsPreserver {
      */
     protected CommentCodeSegment findPreviousCommentCodeSegment(SiddhiElementConfig siddhiElementConfig,
                                                                 Collection<CommentCodeSegment> commentCodeSegments) {
+
         int[] previousCommentCodeSegmentEndIndex =
                 getPreviousCommentCodeSegmentEndIndexes(siddhiElementConfig.getQueryContextStartIndex());
         if (previousCommentCodeSegmentEndIndex == null) {
@@ -128,6 +133,7 @@ public abstract class ScopedCommentsPreserver {
      * @return Whether previousSegment and currentSegment objects have a code segment in between
      */
     protected boolean hasCodeSegmentInBetween(ElementCodeSegment previousSegment, ElementCodeSegment currentSegment) {
+
         return (getCharCountFromLineAndColumn(
                 currentSegment.getStartLine(),
                 currentSegment.getStartColumn(),
@@ -144,6 +150,7 @@ public abstract class ScopedCommentsPreserver {
      * @return Whether the CommentCodeSegment is valid or not
      */
     protected boolean isCommentValid(CommentCodeSegment commentCodeSegment) {
+
         if (commentCodeSegment == null) {
             return false;
         }
@@ -166,6 +173,7 @@ public abstract class ScopedCommentsPreserver {
      */
     protected CommentCodeSegment getCodeSegmentInBetween(ElementCodeSegment previous, ElementCodeSegment current)
             throws DesignGenerationException {
+
         int[][] inBetweenIndexes =
                 getIndexesInBetween(previous.getQueryContextEndIndex(), current.getQueryContextStartIndex());
         if (inBetweenIndexes[0] == null || inBetweenIndexes[1] == null) {
@@ -212,6 +220,7 @@ public abstract class ScopedCommentsPreserver {
      */
     private boolean isContainedInAnySegment(ElementCodeSegment elementCodeSegment,
                                             List<ElementCodeSegment> elementCodeSegments) {
+
         boolean isContainedInAnySegment = false;
         for (ElementCodeSegment comparedSegment : elementCodeSegments) {
             if (!elementCodeSegment.equals(comparedSegment) &&
@@ -230,6 +239,7 @@ public abstract class ScopedCommentsPreserver {
      * @throws DesignGenerationException Error while getting the first comment segment
      */
     public CommentCodeSegment getCommentSegmentBeforeContent() throws DesignGenerationException {
+
         return getCommentSegmentBeforeContent(elementCodeSegments.get(0));
     }
 
@@ -242,6 +252,7 @@ public abstract class ScopedCommentsPreserver {
      */
     private CommentCodeSegment getCommentSegmentBeforeContent(ElementCodeSegment firstElementCodeSegment)
             throws DesignGenerationException {
+
         if (!(firstElementCodeSegment.getStartLine() == 1 && firstElementCodeSegment.getStartColumn() == 0)) {
             // There are comments in between the first ever code segment
             int[] firstCommentEndingLineAndColumn =
@@ -267,6 +278,7 @@ public abstract class ScopedCommentsPreserver {
      * @return Whether the containerElement contains the containedElement or not
      */
     protected boolean isSegmentContainedIn(ElementCodeSegment containedElement, ElementCodeSegment containerElement) {
+
         int containedStart =
                 getCharCountFromLineAndColumn(
                         containedElement.getStartLine(), containedElement.getStartColumn(), siddhiAppString);
@@ -294,6 +306,7 @@ public abstract class ScopedCommentsPreserver {
      * @return Query indexes in between the given first and the second elements
      */
     protected int[][] getIndexesInBetween(int[] prevIndex, int[] current) {
+
         return new int[][]{
                 getNextQueryIndexes(prevIndex, siddhiAppString),
                 getPreviousQueryIndexes(current, siddhiAppString)};
@@ -307,6 +320,7 @@ public abstract class ScopedCommentsPreserver {
      * @return Previous query indexes
      */
     protected int[] getPreviousQueryIndexes(int[] queryIndexes, String siddhiAppString) {
+
         if (queryIndexes[1] == 0) {
             // Last column of the previous line is the end
             String previousLineContent = getLineContent(queryIndexes[0] - 1, siddhiAppString);
@@ -328,6 +342,7 @@ public abstract class ScopedCommentsPreserver {
      * @return Next query indexes
      */
     protected int[] getNextQueryIndexes(int[] queryIndexes, String siddhiAppString) {
+
         String lineContent = getLineContent(queryIndexes[0], siddhiAppString);
         if (lineContent != null) {
             if (lineContent.length() == queryIndexes[1]) {
@@ -349,6 +364,7 @@ public abstract class ScopedCommentsPreserver {
      * @return Content of the line
      */
     protected String getLineContent(int lineNo, String siddhiAppString) {
+
         int lineCounter = 1;
         int charCounter = 0;
         for (char character : siddhiAppString.toCharArray()) {
@@ -372,6 +388,7 @@ public abstract class ScopedCommentsPreserver {
      * @return Ending indexes of the CommentCodeSegment
      */
     protected int[] getPreviousCommentCodeSegmentEndIndexes(int[] currentStartIndexes) {
+
         if (!(currentStartIndexes[0] == 0 && currentStartIndexes[1] == 0)) {
             return getPreviousQueryIndexes(currentStartIndexes, siddhiAppString);
         }
@@ -388,6 +405,7 @@ public abstract class ScopedCommentsPreserver {
      */
     protected CommentCodeSegment findCommentCodeSegmentEndingWith(int[] endIndexes,
                                                                   Collection<CommentCodeSegment> commentCodeSegments) {
+
         for (CommentCodeSegment commentCodeSegment : commentCodeSegments) {
             if (commentCodeSegment != null) {
                 int[] commentSegmentEndIndex = commentCodeSegment.getQueryContextEndIndex();
@@ -409,6 +427,7 @@ public abstract class ScopedCommentsPreserver {
      * @return Character count
      */
     protected int getCharCountFromLineAndColumn(int line, int column, String siddhiAppString) {
+
         int characterCounter = 0;
         for (int l = 1; l < line; l++) {
             String lineContent = getLineContent(l, siddhiAppString);

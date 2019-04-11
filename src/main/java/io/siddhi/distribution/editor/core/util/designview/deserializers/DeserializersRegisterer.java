@@ -36,10 +36,12 @@ import io.siddhi.distribution.editor.core.util.designview.deserializers.types.St
  * Handles De-serializer registrations with GsonBuilder, for required classes.
  */
 public class DeserializersRegisterer {
+
     /**
      * Prevents Instantiation.
      */
     private DeserializersRegisterer() {
+
     }
 
     /**
@@ -49,6 +51,7 @@ public class DeserializersRegisterer {
      * @return GsonBuilder object with registered TypeAdapters
      */
     public static GsonBuilder getGsonBuilder() {
+
         GsonBuilder gsonBuilder = new GsonBuilder();
         // Register de-serializers for required classes
         gsonBuilder.registerTypeAdapter(AttributesSelectionConfig.class, new AttributesSelectionConfigDeSerializer());

@@ -25,6 +25,7 @@ package io.siddhi.distribution.editor.core.util.designview.exceptions;
 public class CodeGenerationException extends Exception {
 
     public CodeGenerationException(String message) {
+
         super(message);
     }
 

@@ -25,6 +25,7 @@ import io.siddhi.query.api.definition.FunctionDefinition;
  * Generator to create FunctionConfig.
  */
 public class FunctionConfigGenerator extends CodeSegmentsPreserver {
+
     /**
      * Generates FunctionConfig from the given Siddhi FunctionDefinition.
      *
@@ -32,6 +33,7 @@ public class FunctionConfigGenerator extends CodeSegmentsPreserver {
      * @return FunctionConfig object
      */
     public FunctionConfig generateFunctionConfig(FunctionDefinition functionDefinition) {
+
         FunctionConfig functionConfig = new FunctionConfig(functionDefinition.getId(), functionDefinition.getLanguage(),
                 functionDefinition.getReturnType().toString(), functionDefinition.getBody());
         preserveAndBindCodeSegment(functionDefinition, functionConfig);

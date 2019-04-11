@@ -22,13 +22,16 @@ package io.siddhi.distribution.editor.core.util.designview.beans.configs.siddhie
  * Represents a Siddhi Stream Handler.
  */
 public abstract class StreamHandlerConfig {
+
     private String type;
 
     public StreamHandlerConfig(String type) {
+
         this.type = type;
     }
 
     public String getType() {
+
         return type;
     }
 }
