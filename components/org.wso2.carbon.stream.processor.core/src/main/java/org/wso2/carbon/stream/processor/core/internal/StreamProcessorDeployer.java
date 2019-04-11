@@ -68,6 +68,7 @@ public class StreamProcessorDeployer implements Deployer {
     private SimulationDependencyListener simulationDependencyListener;
     private URL directoryLocation;
     private static ServerType serverType = ServerType.SP; // Default server type
+    private static boolean isAPIMAlertsEnabled = false;
     private static boolean isAnalyticsEnabledOnSP = false;
     private static boolean apimAnalyticsEnabledOnSP = false;
     private static boolean eiAnalyticsEnabledOnSP = false;
@@ -159,7 +160,9 @@ public class StreamProcessorDeployer implements Deployer {
 
     private static SiddhiAppType getArtifactType(String fileName) {
         fileName = fileName.toUpperCase();
-        if (fileName.startsWith(SiddhiAppProcessorConstants.APIM_SIDDHI_APP_PREFIX)) {
+        if (fileName.startsWith(SiddhiAppProcessorConstants.APIM_ALERT_SIDDHI_APP_PREFIX)) {
+            return SiddhiAppType.APIMALERT;
+        } else if (fileName.startsWith(SiddhiAppProcessorConstants.APIM_SIDDHI_APP_PREFIX)) {
             return SiddhiAppType.APIM;
         } else if (fileName.startsWith(SiddhiAppProcessorConstants.EI_SIDDHI_APP_PREFIX)) {
             return SiddhiAppType.EI;
@@ -176,6 +179,11 @@ public class StreamProcessorDeployer implements Deployer {
                 switch (siddhiAppType) {
                     case OTHER:
                         return true;
+                    case APIMALERT:
+                        if (apimAnalyticsEnabledOnSP && isAPIMAlertsEnabled) {
+                            return true;
+                        }
+                        break;
                     case APIM:
                         if (apimAnalyticsEnabledOnSP) {
                             return true;
@@ -196,6 +204,9 @@ public class StreamProcessorDeployer implements Deployer {
             case APIM:
                 if (siddhiAppType.name().equals(SiddhiAppType.APIM.name())) {
                     return true;
+                }
+                if (siddhiAppType.name().equals(SiddhiAppType.APIMALERT.name())) {
+                    return isAPIMAlertsEnabled;
                 }
                 break;
             case IS:
@@ -237,17 +248,23 @@ public class StreamProcessorDeployer implements Deployer {
                             break;
                     }
                     try {
-                        if (serverType.name().equals(ServerType.SP.name())) {
-                            LinkedHashMap analyticsSolutionsMap = (LinkedHashMap) configProvider.
-                                    getConfigurationObject(SiddhiAppProcessorConstants.ANALYTICS_SOLUTIONS);
-                            if (analyticsSolutionsMap != null) {
-                                Object directoryPathObject = analyticsSolutionsMap.get(
+                        LinkedHashMap analyticsSolutionsMap = (LinkedHashMap) configProvider.
+                                getConfigurationObject(SiddhiAppProcessorConstants.ANALYTICS_SOLUTIONS);
+                        Object directoryPathObject ;
+                        if (analyticsSolutionsMap != null) {
+                            if (serverType.name().equals(ServerType.SP.name())) {
+                                directoryPathObject = analyticsSolutionsMap.get(
                                         SiddhiAppProcessorConstants.IS_ANALYTICS_ENABLED);
                                 if (directoryPathObject != null) {
                                     isAnalyticsEnabledOnSP = Boolean.parseBoolean(directoryPathObject.toString());
                                 }
                                 directoryPathObject = analyticsSolutionsMap.get(
-                                        SiddhiAppProcessorConstants.APIM_ANALYTICS_ENABLED);
+                                        SiddhiAppProcessorConstants.APIM_ALETRS_ENABLED);
+                                if (directoryPathObject != null) {
+                                    isAPIMAlertsEnabled = Boolean.parseBoolean(directoryPathObject.toString());
+                                }
+                                directoryPathObject = analyticsSolutionsMap.get(
+                                        SiddhiAppProcessorConstants.    APIM_ANALYTICS_ENABLED);
                                 if (directoryPathObject != null) {
                                     apimAnalyticsEnabledOnSP = Boolean.parseBoolean(directoryPathObject.toString());
                                 }
@@ -255,6 +272,13 @@ public class StreamProcessorDeployer implements Deployer {
                                         SiddhiAppProcessorConstants.EI_ANALYTICS_ENABLED);
                                 if (directoryPathObject != null) {
                                     eiAnalyticsEnabledOnSP = Boolean.parseBoolean(directoryPathObject.toString());
+                                }
+                            }
+                            if (serverType.name().equals(ServerType.APIM.name())) {
+                                directoryPathObject = analyticsSolutionsMap.get(
+                                        SiddhiAppProcessorConstants.APIM_ALETRS_ENABLED);
+                                if (directoryPathObject != null) {
+                                    isAPIMAlertsEnabled = Boolean.parseBoolean(directoryPathObject.toString());
                                 }
                             }
                         }
@@ -273,7 +297,7 @@ public class StreamProcessorDeployer implements Deployer {
     }
 
     public enum SiddhiAppType {
-        EI, IS, APIM, OTHER
+        EI, IS, APIM, APIMALERT, OTHER
     }
 
     public enum ServerType {

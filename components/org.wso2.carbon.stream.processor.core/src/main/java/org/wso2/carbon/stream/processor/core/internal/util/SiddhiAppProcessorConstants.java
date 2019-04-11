@@ -42,9 +42,11 @@ public class SiddhiAppProcessorConstants {
     public static final String WSO2_SERVER_TYPE_EI_ANALYTICS = "wso2-ei-analytics";
 
     public static final String APIM_ANALYTICS_ENABLED = "APIM-analytics.enabled";
+    public static final String APIM_ALETRS_ENABLED = "APIM-alerts.enabled";
     public static final String IS_ANALYTICS_ENABLED = "IS-analytics.enabled";
     public static final String EI_ANALYTICS_ENABLED = "EI-analytics.enabled";
 
+    public static final String APIM_ALERT_SIDDHI_APP_PREFIX = "APIM_ALERT";
     public static final String APIM_SIDDHI_APP_PREFIX = "APIM_";
     public static final String IS_SIDDHI_APP_PREFIX = "IS_";
     public static final String EI_SIDDHI_APP_PREFIX = "EI_";
