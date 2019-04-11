@@ -66,7 +66,7 @@ public class Constants {
     public static final String EVENT_ATTRIBUTE_VALUE_SEPARATOR = ":";
     public static final String FAULT_STREAM_PREFIX = "!";
     static final String FUNCTION_EXECUTOR = "FunctionExecutor";
-    static final String ATTRIBUTE_AGGREGATOR = "AttributeAggregator";
+    static final String ATTRIBUTE_AGGREGATOR = "AttributeAggregatorExecutor";
     static final String WINDOW_PROCESSOR = "WindowProcessor";
     static final String STREAM_FUNCTION_PROCESSOR = "StreamFunctionProcessor";
     static final String STREAM_PROCESSOR = "StreamProcessor";
@@ -94,9 +94,9 @@ public class Constants {
 
         // Populating the package name map
         PACKAGE_NAME_MAP = new HashMap<>();
-        PACKAGE_NAME_MAP.put(FUNCTION_EXECUTOR, "org.wso2.siddhi.core.executor.function");
+        PACKAGE_NAME_MAP.put(FUNCTION_EXECUTOR, "io.siddhi.core.executor.function");
         PACKAGE_NAME_MAP.put(ATTRIBUTE_AGGREGATOR,
-                "org.wso2.siddhi.core.query.selector.attribute.aggregator");
-        PACKAGE_NAME_MAP.put(WINDOW_PROCESSOR, "org.wso2.siddhi.core.query.processor.stream.window");
+                "io.siddhi.core.query.selector.attribute.aggregator");
+        PACKAGE_NAME_MAP.put(WINDOW_PROCESSOR, "io.siddhi.core.query.processor.stream.window");
     }
 }
