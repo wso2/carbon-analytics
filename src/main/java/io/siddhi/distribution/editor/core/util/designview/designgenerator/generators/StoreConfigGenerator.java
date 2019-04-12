@@ -27,7 +27,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Generator to create Store config
+ * Generator to create Store config.
  */
 public class StoreConfigGenerator extends CodeSegmentsPreserver {
 

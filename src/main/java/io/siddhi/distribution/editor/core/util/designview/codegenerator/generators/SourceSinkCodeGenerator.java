@@ -31,12 +31,12 @@ import io.siddhi.distribution.editor.core.util.designview.utilities.CodeGenerato
 import java.util.Map;
 
 /**
- * Generates the code for a Siddhi source/sink element
+ * Generates the code for a Siddhi source/sink element.
  */
 public class SourceSinkCodeGenerator {
 
     /**
-     * Generates the Siddhi code representation of a SourceSinkConfig object
+     * Generates the Siddhi code representation of a SourceSinkConfig object.
      *
      * @param sourceSink          The SourceSinkConfig object
      * @param isGeneratingToolTip If it is generating a tooltip or not
@@ -81,7 +81,7 @@ public class SourceSinkCodeGenerator {
     }
 
     /**
-     * Generates the Siddhi code representation of a MapperConfig object
+     * Generates the Siddhi code representation of a MapperConfig object.
      *
      * @param mapper The MapperConfig object
      * @return The Siddhi code representation of the given MapperConfig object
@@ -120,7 +120,7 @@ public class SourceSinkCodeGenerator {
     }
 
     /**
-     * Generates the Siddhi code representation of a MapperPayloadOrAttribute object
+     * Generates the Siddhi code representation of a MapperPayloadOrAttribute object.
      *
      * @param payloadOrAttribute The MapperPayloadOrAttribute object
      * @return The Siddhi code representation of the given MapperConfig object
@@ -150,7 +150,7 @@ public class SourceSinkCodeGenerator {
     }
 
     /**
-     * Generates the Siddhi code representation of a MapperListPayloadOrAttribute object
+     * Generates the Siddhi code representation of a MapperListPayloadOrAttribute object.
      *
      * @param mapperListAttribute The MapperListPayloadOrAttribute object
      * @return The Siddhi code representation of the given MapperListPayloadOrAttribute object
@@ -183,7 +183,7 @@ public class SourceSinkCodeGenerator {
     }
 
     /**
-     * Generates the Siddhi code representation of a MapperMapPayloadOrAttribute object
+     * Generates the Siddhi code representation of a MapperMapPayloadOrAttribute object.
      *
      * @param mapperMapAttribute The MapperMapPayloadOrAttribute object
      * @return The Siddhi code representation of the given MapperMapPayloadOrAttribute object

@@ -50,7 +50,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Generator to create QueryConfig from Siddhi elements
+ * Generator to create QueryConfig from Siddhi elements.
  */
 public class QueryConfigGenerator extends CodeSegmentsPreserver {
 
@@ -65,7 +65,7 @@ public class QueryConfigGenerator extends CodeSegmentsPreserver {
     }
 
     /**
-     * Gets the category of the query, for adding and maintaining in relevant lists
+     * Gets the category of the query, for adding and maintaining in relevant lists.
      *
      * @param queryConfig QueryConfig object
      * @return QueryListType
@@ -84,7 +84,7 @@ public class QueryConfigGenerator extends CodeSegmentsPreserver {
     }
 
     /**
-     * Generates a QueryConfig object with the given Siddhi Query object
+     * Generates a QueryConfig object with the given Siddhi Query object.
      *
      * @param query Siddhi Query object
      * @return QueryConfig object
@@ -114,7 +114,7 @@ public class QueryConfigGenerator extends CodeSegmentsPreserver {
     }
 
     /**
-     * Generates QueryInputConfig object from the given Siddhi InputStream
+     * Generates QueryInputConfig object from the given Siddhi InputStream.
      *
      * @param inputStream Siddhi InputStream
      * @return QueryInputConfig
@@ -126,7 +126,7 @@ public class QueryConfigGenerator extends CodeSegmentsPreserver {
     }
 
     /**
-     * Generates AttributesSelectionConfig from the given Siddhi Selector
+     * Generates AttributesSelectionConfig from the given Siddhi Selector.
      *
      * @param selector Siddhi Selector
      * @return AttributesSelectionConfig
@@ -140,7 +140,7 @@ public class QueryConfigGenerator extends CodeSegmentsPreserver {
     }
 
     /**
-     * Generates QueryOutputConfig from the given Siddhi OutputStream
+     * Generates QueryOutputConfig from the given Siddhi OutputStream.
      *
      * @param outputStream Siddhi OutputStream
      * @return QueryOutputConfig
@@ -152,7 +152,7 @@ public class QueryConfigGenerator extends CodeSegmentsPreserver {
     }
 
     /**
-     * Generates 'groupBy' string list from the given Siddhi Variables list
+     * Generates 'groupBy' string list from the given Siddhi Variables list.
      *
      * @param groupByList List of Siddhi Variables
      * @return List of strings, representing the groupBy list
@@ -168,7 +168,7 @@ public class QueryConfigGenerator extends CodeSegmentsPreserver {
     }
 
     /**
-     * Generates QueryOrderByConfig list from the given Siddhi OrderByAttribute list
+     * Generates QueryOrderByConfig list from the given Siddhi OrderByAttribute list.
      *
      * @param orderByAttributeList Siddhi OrderByAttribute list
      * @return QueryOrderByConfig list
@@ -191,7 +191,7 @@ public class QueryConfigGenerator extends CodeSegmentsPreserver {
     }
 
     /**
-     * Generates 'having' expression as a string, from the given Siddhi Expression
+     * Generates 'having' expression as a string, from the given Siddhi Expression.
      *
      * @param havingExpression Siddhi Expression
      * @return 'having' expression string
@@ -206,7 +206,7 @@ public class QueryConfigGenerator extends CodeSegmentsPreserver {
     }
 
     /**
-     * Generates string for the given Siddhi OutputRate
+     * Generates string for the given Siddhi OutputRate.
      *
      * @param outputRate Siddhi OutputRate
      * @return 'outputRateLimit' string
@@ -222,7 +222,7 @@ public class QueryConfigGenerator extends CodeSegmentsPreserver {
     }
 
     /**
-     * Generates the long value for the given 'limit' Siddhi Constant
+     * Generates the long value for the given 'limit' Siddhi Constant.
      *
      * @param limit Siddhi Constant
      * @return Long value
@@ -237,7 +237,7 @@ public class QueryConfigGenerator extends CodeSegmentsPreserver {
     }
 
     /**
-     * Generates the long value for the given 'offset' Siddhi Constant
+     * Generates the long value for the given 'offset' Siddhi Constant.
      *
      * @param offset Siddhi Constant
      * @return Long value
@@ -272,7 +272,7 @@ public class QueryConfigGenerator extends CodeSegmentsPreserver {
     }
 
     /**
-     * Removes the @info from the query annotations
+     * Removes the @info from the query annotations.
      *
      * @param queryAnnotations List of Siddhi Annotations of query
      * @return annotationList  List of Siddhi Annotation of query without @info
@@ -289,7 +289,7 @@ public class QueryConfigGenerator extends CodeSegmentsPreserver {
     }
 
     /**
-     * Extracts the query name from the annotation list, or returns the default query name
+     * Extracts the query name from the annotation list, or returns the default query name.
      *
      * @param annotations Query annotation list
      * @return query name           name of the query

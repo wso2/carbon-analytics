@@ -40,7 +40,7 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * Contains elements of a Siddhi app
+ * Contains elements of a Siddhi app.
  */
 public class SiddhiAppConfig {
 
@@ -73,7 +73,7 @@ public class SiddhiAppConfig {
     }
 
     /**
-     * Returns Id for the next element id, after incrementing the final element count
+     * Returns Id for the next element id, after incrementing the final element count.
      *
      * @return Id for the element
      */
@@ -83,7 +83,7 @@ public class SiddhiAppConfig {
     }
 
     /**
-     * Returns PartitionConnector id, with the given partition id and connector id
+     * Returns PartitionConnector id, with the given partition id and connector id.
      *
      * @param partitionId Id of the PartitionConfig
      * @param connectorId Id of the PartitionConnector, within the Partition
@@ -95,7 +95,7 @@ public class SiddhiAppConfig {
     }
 
     /**
-     * Adds a given generic type Siddhi ElementConfig, to the given list of the same generic type
+     * Adds a given generic type Siddhi ElementConfig, to the given list of the same generic type.
      *
      * @param elementList   List to which, the given element config should be added
      * @param elementConfig Siddhi ElementConfig object
@@ -110,7 +110,7 @@ public class SiddhiAppConfig {
 
     /**
      * Adds the given list of ElementCodeSegment objects representing code segments of Siddhi elements,
-     * to the existing list
+     * to the existing list.
      *
      * @param elementCodeSegments List of ElementCodeSegment objects
      */
@@ -120,7 +120,7 @@ public class SiddhiAppConfig {
     }
 
     /**
-     * Adds the code segment of the given SiddhiElementConfig object, to the existing list of code segments
+     * Adds the code segment of the given SiddhiElementConfig object, to the existing list of code segments.
      *
      * @param siddhiElementConfig SiddhiElementConfig object
      */
@@ -136,7 +136,7 @@ public class SiddhiAppConfig {
     }
 
     /**
-     * Adds a given QueryConfig object to its specific query list, denoted by the given QueryInputType
+     * Adds a given QueryConfig object to its specific query list, denoted by the given QueryInputType.
      *
      * @param queryListType Key with which, the specific query list is denoted
      * @param queryConfig   QueryConfig object
@@ -149,7 +149,7 @@ public class SiddhiAppConfig {
     }
 
     /**
-     * Adds a given PartitionConfig object to the partitionList
+     * Adds a given PartitionConfig object to the partitionList.
      *
      * @param partitionConfig PartitionConfig object
      */
@@ -334,7 +334,7 @@ public class SiddhiAppConfig {
     }
 
     /**
-     * Removes unnecessarily remaining comments
+     * Removes unnecessarily remaining comments.
      */
     public void clearCommentCodeSegments() {
 

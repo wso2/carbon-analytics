@@ -28,7 +28,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Represents a Siddhi Query
+ * Represents a Siddhi Query.
  */
 public class QueryConfig extends SiddhiElementConfig {
 

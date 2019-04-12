@@ -27,7 +27,7 @@ import io.siddhi.query.api.annotation.Annotation;
 import java.util.List;
 
 /**
- * Represents a Siddhi Aggregation
+ * Represents a Siddhi Aggregation.
  */
 public class AggregationConfig extends SiddhiElementConfig {
 

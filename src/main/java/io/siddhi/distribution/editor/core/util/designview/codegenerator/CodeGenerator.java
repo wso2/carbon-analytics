@@ -53,12 +53,12 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Generates the code for a Siddhi application
+ * Generates the code for a Siddhi application.
  */
 public class CodeGenerator {
 
     /**
-     * Generates the Siddhi app code as a string of a given EventFlow object
+     * Generates the Siddhi app code as a string of a given EventFlow object.
      *
      * @param eventFlow The EventFlow object
      * @return The Siddhi application code as a string of the given EventFlow object
@@ -100,7 +100,7 @@ public class CodeGenerator {
     }
 
     /**
-     * Generates list of tooltips for a given SiddhiAppconfig object
+     * Generates list of tooltips for a given SiddhiAppconfig object.
      *
      * @param siddhiAppConfig
      * @return
@@ -124,7 +124,7 @@ public class CodeGenerator {
     }
 
     /**
-     * Generates the Siddhi code representation of a Siddhi app's app name
+     * Generates the Siddhi code representation of a Siddhi app's app name.
      *
      * @param appName The Siddhi app's app name
      * @return The Siddhi code representation of a Siddhi app name annotation
@@ -146,7 +146,7 @@ public class CodeGenerator {
     }
 
     /**
-     * Generates the Siddhi code representation of a Siddhi app's app description
+     * Generates the Siddhi code representation of a Siddhi app's app description.
      *
      * @param appDescription The Siddhi app's app description
      * @return The Siddhi code representation of a Siddhi app description annotation
@@ -168,7 +168,7 @@ public class CodeGenerator {
     }
 
     /**
-     * Generates the Siddhi code representation of a Siddhi app's stream definitions
+     * Generates the Siddhi code representation of a Siddhi app's stream definitions.
      *
      * @param streamList The list of streams to be defined in a Siddhi app
      * @param sourceList The list of source annotations in a Siddhi app
@@ -218,7 +218,7 @@ public class CodeGenerator {
     }
 
     /**
-     * Generates tooltips for sources, sinks, streams in a siddhi app
+     * Generates tooltips for sources, sinks, streams in a siddhi app.
      *
      * @param streamList The list of streams in a Siddhi app
      * @param sourceList The list of source annotations in a Siddhi app
@@ -254,7 +254,7 @@ public class CodeGenerator {
     }
 
     /**
-     * Generates the Siddhi code representation of a Siddhi app's table definitions
+     * Generates the Siddhi code representation of a Siddhi app's table definitions.
      *
      * @param tableList The list of tables defined in a Siddhi app
      * @return The Siddhi code representation of all the tables in a Siddhi app
@@ -280,7 +280,7 @@ public class CodeGenerator {
     }
 
     /**
-     * Generates tooltips for tables in a siddhi app
+     * Generates tooltips for tables in a siddhi app.
      *
      * @param tableList The list of tables to be defined in a Siddhi app
      * @return List of tooltips for tables
@@ -302,7 +302,7 @@ public class CodeGenerator {
     }
 
     /**
-     * Generates the Siddhi code representation of a Siddhi app's window definitions
+     * Generates the Siddhi code representation of a Siddhi app's window definitions.
      *
      * @param windowList The list of windows to be defined in a Siddhi app
      * @return The Siddhi code representation of all the windows in a Siddhi app
@@ -328,7 +328,7 @@ public class CodeGenerator {
     }
 
     /**
-     * Generates tooltips for windows in a siddhi app
+     * Generates tooltips for windows in a siddhi app.
      *
      * @param windowList The list of windows defined in a Siddhi app
      * @return List of tooltips for windows
@@ -351,7 +351,7 @@ public class CodeGenerator {
     }
 
     /**
-     * Generates the Siddhi code representation of a Siddhi app's trigger definitions
+     * Generates the Siddhi code representation of a Siddhi app's trigger definitions.
      *
      * @param triggerList The list of triggers to be defined in a Siddhi app
      * @return The Siddhi code representation of all the triggers in a Siddhi app
@@ -377,7 +377,7 @@ public class CodeGenerator {
     }
 
     /**
-     * Generates list of tooltips for triggers
+     * Generates list of tooltips for triggers.
      *
      * @param triggerList The list of triggers defined in a Siddhi app
      * @return List of tooltips for triggers
@@ -400,7 +400,7 @@ public class CodeGenerator {
     }
 
     /**
-     * Generates the Siddhi code representation of a Siddhi app's aggregation definitions
+     * Generates the Siddhi code representation of a Siddhi app's aggregation definitions.
      *
      * @param aggregationList The list of aggregations to be defined in a Siddhi app
      * @return The Siddhi code representation of all the aggregations in a Siddhi app
@@ -426,7 +426,7 @@ public class CodeGenerator {
     }
 
     /**
-     * Generates list of tooltips for aggregations
+     * Generates list of tooltips for aggregations.
      *
      * @param aggregationList The list of aggregations defined in a Siddhi app
      * @return List of tooltips for aggregations
@@ -450,7 +450,7 @@ public class CodeGenerator {
     }
 
     /**
-     * Generates the Siddhi code representation of a Siddhi app's function definitions
+     * Generates the Siddhi code representation of a Siddhi app's function definitions.
      *
      * @param functionList The list of functions to be defined in a Siddhi app
      * @return The Siddhi code representation of all the functions in a Siddhi app
@@ -476,7 +476,7 @@ public class CodeGenerator {
     }
 
     /**
-     * Generates list of tooltips for functions
+     * Generates list of tooltips for functions.
      *
      * @param functionList The list of functions defined in a Siddhi app
      * @return List of tooltips for functions
@@ -500,7 +500,7 @@ public class CodeGenerator {
     }
 
     /**
-     * Generates the Siddhi code representation of a Siddhi app's execution elements (queries and partitions)
+     * Generates the Siddhi code representation of a Siddhi app's execution elements (queries and partitions).
      *
      * @param queryLists               The list of queries in a Siddhi app
      * @param partitions               The list of partitions in a Siddhi app
@@ -544,7 +544,7 @@ public class CodeGenerator {
     }
 
     /**
-     * Generates list of tooltips for execution elements (queries and partitions)
+     * Generates list of tooltips for execution elements (queries and partitions).
      *
      * @param queryLists The list of queries in a Siddhi app
      * @param partitions The list of partitions in a Siddhi app

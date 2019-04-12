@@ -25,7 +25,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Represents configuration of a Siddhi Stream
+ * Represents configuration of a Siddhi Stream.
  */
 public class StreamConfig extends SiddhiElementConfig {
 

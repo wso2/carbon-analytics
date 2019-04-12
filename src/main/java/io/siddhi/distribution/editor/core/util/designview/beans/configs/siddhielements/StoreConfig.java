@@ -21,7 +21,7 @@ package io.siddhi.distribution.editor.core.util.designview.beans.configs.siddhie
 import java.util.List;
 
 /**
- * Represents configuration of 'Store' annotation in a Siddhi Table
+ * Represents configuration of 'Store' annotation in a Siddhi Table.
  */
 public class StoreConfig extends SiddhiElementConfig {
 

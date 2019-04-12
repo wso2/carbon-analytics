@@ -31,7 +31,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Generates to create AttributesSelectionConfig with given Siddhi elements
+ * Generates to create AttributesSelectionConfig with given Siddhi elements.
  */
 public class AttributesSelectionConfigGenerator extends CodeSegmentsPreserver {
 
@@ -43,7 +43,7 @@ public class AttributesSelectionConfigGenerator extends CodeSegmentsPreserver {
     }
 
     /**
-     * Generates an AttributesSelectionConfig from the given Siddhi Selector
+     * Generates an AttributesSelectionConfig from the given Siddhi Selector.
      *
      * @param selector Siddhi Selector object
      * @return AttributesSelectionConfig object
@@ -73,7 +73,7 @@ public class AttributesSelectionConfigGenerator extends CodeSegmentsPreserver {
     }
 
     /**
-     * Generates a SelectedAttribute object from the given Siddhi OutputAttribute
+     * Generates a SelectedAttribute object from the given Siddhi OutputAttribute.
      *
      * @param outputAttribute Siddhi OutputAttribute object
      * @return SelectedAttribute object

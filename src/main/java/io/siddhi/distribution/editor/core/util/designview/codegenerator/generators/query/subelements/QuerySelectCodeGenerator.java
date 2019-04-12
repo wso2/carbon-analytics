@@ -27,7 +27,7 @@ import io.siddhi.distribution.editor.core.util.designview.exceptions.CodeGenerat
 import io.siddhi.distribution.editor.core.util.designview.utilities.CodeGeneratorUtils;
 
 /**
- * Generates the code for a select element of a Siddhi query
+ * Generates the code for a select element of a Siddhi query.
  */
 public class QuerySelectCodeGenerator {
 
@@ -36,7 +36,7 @@ public class QuerySelectCodeGenerator {
     }
 
     /**
-     * Generates the Siddhi code representation of a AttributesSelectionConfig object
+     * Generates the Siddhi code representation of a AttributesSelectionConfig object.
      *
      * @param attributesSelection The AttributesSelectionConfig object
      * @return The Siddhi code representation of the given AttributesSelectionConfig object
@@ -68,7 +68,7 @@ public class QuerySelectCodeGenerator {
     }
 
     /**
-     * Generates the Siddhi code representation of a UserDefinedSelectionConfig object
+     * Generates the Siddhi code representation of a UserDefinedSelectionConfig object.
      *
      * @param userDefinedSelection The UserDefinedSelectionConfig object
      * @return The Siddhi code representation of the given UserDefinedSelectionConfig object

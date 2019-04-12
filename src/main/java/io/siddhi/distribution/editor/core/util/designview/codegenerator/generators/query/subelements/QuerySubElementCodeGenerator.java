@@ -27,7 +27,7 @@ import io.siddhi.distribution.editor.core.util.designview.utilities.CodeGenerato
 import java.util.List;
 
 /**
- * Generates the code for sub-elements of a Siddhi query
+ * Generates the code for sub-elements of a Siddhi query.
  */
 public class QuerySubElementCodeGenerator {
 
@@ -36,7 +36,7 @@ public class QuerySubElementCodeGenerator {
     }
 
     /**
-     * Generates the Siddhi code representation of a query's group by list
+     * Generates the Siddhi code representation of a query's group by list.
      *
      * @param groupByList The group by list given
      * @return The Siddhi code representation of the given query's group by list
@@ -53,7 +53,7 @@ public class QuerySubElementCodeGenerator {
     }
 
     /**
-     * Generates the Siddhi code representation of a query's order by list
+     * Generates the Siddhi code representation of a query's order by list.
      *
      * @param orderByList The order by list given
      * @return The Siddhi code representation of the given query's order by list
@@ -92,7 +92,7 @@ public class QuerySubElementCodeGenerator {
     }
 
     /**
-     * Generates the Siddhi code representation of a query's limit
+     * Generates the Siddhi code representation of a query's limit.
      *
      * @param limit The limit value given
      * @return The Siddhi code representation of the given query's limit value
@@ -107,7 +107,7 @@ public class QuerySubElementCodeGenerator {
     }
 
     /**
-     * Generates the Siddhi code representation of a query's offset
+     * Generates the Siddhi code representation of a query's offset.
      *
      * @param offset The offset value given
      * @return The Siddhi code representation of the given query's offset value
@@ -122,7 +122,7 @@ public class QuerySubElementCodeGenerator {
     }
 
     /**
-     * Generates the Siddhi code representation of a query's having
+     * Generates the Siddhi code representation of a query's having.
      *
      * @param having The having value given
      * @return The Siddhi code representation of the given query's having value
@@ -138,7 +138,7 @@ public class QuerySubElementCodeGenerator {
     }
 
     /**
-     * Generates the Siddhi code representation of a query's output rate limit
+     * Generates the Siddhi code representation of a query's output rate limit.
      *
      * @param outputRateLimit The output rate limit value given
      * @return The Siddhi code representation of the given query's output rate limit

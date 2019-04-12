@@ -23,7 +23,7 @@ import io.siddhi.distribution.editor.core.util.designview.constants.NodeType;
 import java.util.Objects;
 
 /**
- * Represents a connection between two Siddhi app design view elements
+ * Represents a connection between two Siddhi app design view elements.
  */
 public class Edge {
 

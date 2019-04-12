@@ -61,7 +61,7 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * Builder to create EventFlow
+ * Builder to create EventFlow.
  */
 public class EventFlowBuilder {
 
@@ -82,7 +82,7 @@ public class EventFlowBuilder {
     }
 
     /**
-     * Creates an EventFlow object with loaded elements
+     * Creates an EventFlow object with loaded elements.
      *
      * @return EventFlow object
      */
@@ -92,7 +92,7 @@ public class EventFlowBuilder {
     }
 
     /**
-     * Loads App level Annotations from the Siddhi app
+     * Loads App level Annotations from the Siddhi app.
      *
      * @return A reference to this object
      */
@@ -125,7 +125,7 @@ public class EventFlowBuilder {
     }
 
     /**
-     * Loads Triggers from the SiddhiApp
+     * Loads Triggers from the SiddhiApp.
      *
      * @return A reference to this object
      * @throws DesignGenerationException Error while loading elements
@@ -142,7 +142,7 @@ public class EventFlowBuilder {
     }
 
     /**
-     * Returns the availability of a Trigger with the given name, in the given Siddhi app
+     * Returns the availability of a Trigger with the given name, in the given Siddhi app.
      *
      * @param streamName Name of the Stream
      * @param siddhiApp  Siddhi app in which, availability of Trigger is searched
@@ -155,7 +155,7 @@ public class EventFlowBuilder {
     }
 
     /**
-     * Loads Streams from the SiddhiAppRuntime
+     * Loads Streams from the SiddhiAppRuntime.
      *
      * @return A reference to this object
      */
@@ -175,7 +175,7 @@ public class EventFlowBuilder {
     }
 
     /**
-     * Loads Sources from the SiddhiAppRuntime
+     * Loads Sources from the SiddhiAppRuntime.
      *
      * @return A reference to this object
      */
@@ -192,7 +192,7 @@ public class EventFlowBuilder {
     }
 
     /**
-     * Loads Sinks from the SiddhiAppRuntime
+     * Loads Sinks from the SiddhiAppRuntime.
      *
      * @return A reference to this object
      */
@@ -209,7 +209,7 @@ public class EventFlowBuilder {
     }
 
     /**
-     * Loads Tables from the Siddhi App
+     * Loads Tables from the Siddhi App.
      *
      * @return A reference to this object
      * @throws DesignGenerationException Error while loading elements
@@ -225,7 +225,7 @@ public class EventFlowBuilder {
     }
 
     /**
-     * Loads Defined Windows from the SiddhiAppRuntime
+     * Loads Defined Windows from the SiddhiAppRuntime.
      *
      * @return A reference to this object
      * @throws DesignGenerationException Error while loading elements
@@ -241,7 +241,7 @@ public class EventFlowBuilder {
     }
 
     /**
-     * Loads Aggregations from the SiddhiApp
+     * Loads Aggregations from the SiddhiApp.
      *
      * @return A reference to this object
      * @throws DesignGenerationException Error while loading elements
@@ -257,7 +257,7 @@ public class EventFlowBuilder {
     }
 
     /**
-     * Loads Functions from the siddhi app
+     * Loads Functions from the siddhi app.
      *
      * @return A reference to this object
      */
@@ -272,7 +272,7 @@ public class EventFlowBuilder {
     }
 
     /**
-     * Loads Execution Elements from the Siddhi App
+     * Loads Execution Elements from the Siddhi App.
      *
      * @return A reference to this object
      * @throws DesignGenerationException Error while loading elements
@@ -307,7 +307,7 @@ public class EventFlowBuilder {
     }
 
     /**
-     * Loads generated Edges that represent connections between SiddhiElementConfigs, into SiddhiAppConfig object
+     * Loads generated Edges that represent connections between SiddhiElementConfigs, into SiddhiAppConfig object.
      *
      * @return A reference to this object
      * @throws DesignGenerationException Error while loading edges
@@ -320,7 +320,7 @@ public class EventFlowBuilder {
     }
 
     /**
-     * Loads Comments, that were preserved by each Siddhi Element Config generator
+     * Loads Comments, that were preserved by each Siddhi Element Config generator.
      *
      * @return A reference to this object
      * @throws DesignGenerationException Error while generating Comment Code Segments
