@@ -1587,8 +1587,8 @@
 
     <properties>
         <carbon.analytics.version>2.0.519-SNAPSHOT</carbon.analytics.version>
-        <siddhi.version>4.5.3</siddhi.version>
-        <siddhi.bundle.version>4.5.3</siddhi.bundle.version>
+        <siddhi.version>4.5.4</siddhi.version>
+        <siddhi.bundle.version>4.5.4</siddhi.bundle.version>
         <siddhi.version.range>[4.0.0, 5.0.0)</siddhi.version.range>
         <carbon.analytics-common.version>6.1.15</carbon.analytics-common.version>
         <carbon.analytics-common.version.range>[6.0.66, 6.2.0)</carbon.analytics-common.version.range>
@@ -1696,7 +1696,7 @@
         <carbon.cache.version>1.1.3</carbon.cache.version>
         <carbon.touchpoint.version>1.1.1</carbon.touchpoint.version>
         <carbon.utils.version>2.0.8</carbon.utils.version>
-        <carbon.config.version>2.1.10</carbon.config.version>
+        <carbon.config.version>2.1.12</carbon.config.version>
         <carbon.config.version.range>[2.1.5, 3.0.0)</carbon.config.version.range>
         <carbon.securevault.version>5.0.13</carbon.securevault.version>
 
@@ -1735,7 +1735,7 @@
         <pax.exam.testng.version>4.6.0</pax.exam.testng.version>
         <pax.exam.link.mvn.version>4.6.0</pax.exam.link.mvn.version>
         <ow2.jta.spec.version>1.0.12</ow2.jta.spec.version>
-        <jacoco.version>0.7.5.201505241946</jacoco.version>
+        <jacoco.version>0.8.3</jacoco.version>
         <maven.paxexam.plugin.version>1.2.4</maven.paxexam.plugin.version>
         <mockito.version>1.9.0</mockito.version>
 
@@ -1756,7 +1756,7 @@
         <com.fasterxml.jackson.core.version.range>[2.9.0, 2.10.0)</com.fasterxml.jackson.core.version.range>
         <io.swagger.version>1.5.22</io.swagger.version>
         <javax.ws.rs-api.version>2.1.1</javax.ws.rs-api.version>
-        <pax.logging.api.version>1.10.0</pax.logging.api.version>
+        <pax.logging.api.version>1.10.1</pax.logging.api.version>
         <javax.servlet.version>3.1.0</javax.servlet.version>
         <javax.websocket.api.version>1.1</javax.websocket.api.version>
 
@@ -1780,7 +1780,7 @@
 
         <swagger.codegen.maven.plugin.version>2.1.6</swagger.codegen.maven.plugin.version>
         <swagger.codegen.version>2.2.0.wso2v2</swagger.codegen.version>
-        <swagger.models.version>1.5.10</swagger.models.version>
+        <swagger.models.version>1.5.22</swagger.models.version>
 
         <mockito.version>1.10.19</mockito.version>
         <powermock.version>1.6.2</powermock.version>
@@ -1795,7 +1795,7 @@
         <siddhi.io.tcp.version>2.1.2</siddhi.io.tcp.version>
         <siddhi.io.email.version>1.1.0</siddhi.io.email.version>
         <siddhi.io.kafka.version>4.2.1</siddhi.io.kafka.version>
-        <siddhi.io.http.version>1.1.5</siddhi.io.http.version>
+        <siddhi.io.http.version>1.1.6</siddhi.io.http.version>
 
         <siddhi.map.json.version>4.1.2</siddhi.map.json.version>
         <siddhi.map.binary.version>1.1.1</siddhi.map.binary.version>
