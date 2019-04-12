@@ -1745,7 +1745,7 @@
         <guava.bundle.version>23.0.0</guava.bundle.version>
         <quartz.version>2.1.1.wso2v1</quartz.version>
         <metrics.version>3.2.5</metrics.version>
-        <commons-lang3.version>3.8.1</commons-lang3.version>
+        <commons-lang3.version>3.3.2</commons-lang3.version>
         <kafka-2.11.version>0.10.0.0</kafka-2.11.version>
         <common.collections4.version>4.1</common.collections4.version>
 
