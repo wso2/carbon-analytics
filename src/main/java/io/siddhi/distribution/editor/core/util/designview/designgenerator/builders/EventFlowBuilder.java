@@ -178,6 +178,7 @@ public class EventFlowBuilder {
      * Loads Sources from the SiddhiAppRuntime.
      *
      * @return A reference to this object
+     * @throws DesignGenerationException Error when loading designer view
      */
     public EventFlowBuilder loadSources() throws DesignGenerationException {
 
@@ -195,6 +196,7 @@ public class EventFlowBuilder {
      * Loads Sinks from the SiddhiAppRuntime.
      *
      * @return A reference to this object
+     * @throws DesignGenerationException Error when loading designer view
      */
     public EventFlowBuilder loadSinks() throws DesignGenerationException {
 

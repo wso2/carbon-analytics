@@ -40,6 +40,7 @@ public interface Workspace {
     /**
      * List the files of a given directory path of the system.
      *
+     * @param path directory path
      * @return array of files
      * @throws IOException when IO operation fails
      */
