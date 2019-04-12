@@ -141,7 +141,7 @@
             org.wso2.carbon.stream.processor.common.*;version="${carbon.analytics.version.range}",
             org.wso2.msf4j.*;version="${msf4j.import.version.range}",
             javax.management.*,
-            javax.ws.rs.*;version="0.0.0",
+            javax.ws.rs.*;version="${javax.ws.rs.version.range}",
             *;resolution:=optional
         </import.package>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
