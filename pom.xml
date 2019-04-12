@@ -1612,10 +1612,10 @@
         <apache.commons.io.version>2.4</apache.commons.io.version>
         <wso2.slf4j.version>1.5.10.wso2v1</wso2.slf4j.version>
         <equinox.osgi.services.version>3.4.0.v20140312-2051</equinox.osgi.services.version>
-        <pax.logging.log4j2.version>1.10.0</pax.logging.log4j2.version>
+        <pax.logging.log4j2.version>1.10.1</pax.logging.log4j2.version>
         <pax.exam.container.native.version>4.6.0</pax.exam.container.native.version>
         <pax.url.aether.version>1.6.0</pax.url.aether.version>
-        <org.jacoco.ant.version>0.7.5.201505241946</org.jacoco.ant.version>
+        <org.jacoco.ant.version>0.8.3</org.jacoco.ant.version>
         <equinox.simpleconfigurator.version>1.1.0.v20131217-1203</equinox.simpleconfigurator.version>
         <apache.felix.gogo.command.version>0.10.0.v201209301215</apache.felix.gogo.command.version>
         <apache.felix.gogo.runtime.version>0.10.0.v201209301036</apache.felix.gogo.runtime.version>
@@ -1664,7 +1664,7 @@
         <mssql-jdbc.version>6.2.1.jre8</mssql-jdbc.version>
         <io.fabric8.version>0.20.0</io.fabric8.version>
         <maven.failsafe.plugin.version>2.18.1</maven.failsafe.plugin.version>
-        <awaitility.version>3.0.0</awaitility.version>
+        <awaitility.version>3.1.6</awaitility.version>
 
         <!-- OSGI -->
         <osgi.api.version>6.0.0</osgi.api.version>
@@ -1680,7 +1680,7 @@
         <carbon.kernel.pax.version>5.2.8</carbon.kernel.pax.version>
 
         <netty.version>4.1.19.Final</netty.version>
-        <org.wso2.transport.http.netty.version>6.0.272</org.wso2.transport.http.netty.version>
+        <org.wso2.transport.http.netty.version>6.0.289</org.wso2.transport.http.netty.version>
         <carbon.transport.package.import.version.range>[6.0.0, 7.0.0)</carbon.transport.package.import.version.range>
 
         <carbon.messaging.version>3.0.3</carbon.messaging.version>
@@ -1827,7 +1827,7 @@
         <org.fusesource.hawtbuf.version>1.11</org.fusesource.hawtbuf.version>
         <!-- nats test dependencies -->
         <io.nats.version>2.1.2</io.nats.version>
-        <siddhi.io.nats.version>1.0.3</siddhi.io.nats.version>
+        <siddhi.io.nats.version>1.0.5</siddhi.io.nats.version>
         <org.testcontainers.version>1.8.0</org.testcontainers.version>
     </properties>
 </project>
