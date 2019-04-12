@@ -118,7 +118,7 @@
             org.wso2.carbon.messaging.*;version="${carbon.messaging.package.import.version.range}",
             org.osgi.framework.*;version="${osgi.framework.import.version.range}",
             org.wso2.msf4j.*;version="${msf4j.import.version.range}",
-            javax.ws.rs.*,
+            javax.ws.rs.*;version="${javax.ws.rs.version.range}",
             org.slf4j.*,
             *;resolution:=optional
         </import.package>

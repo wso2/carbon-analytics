@@ -75,9 +75,9 @@
             org.wso2.carbon.stream.processor.common.*
         </export.package>
         <import.package>
-            *;resolution:=optional
             javax.management.*,
-            javax.ws.rs.*;version="0.0.0",
+            javax.ws.rs.*;version="${javax.ws.rs.version.range}",
+            *;resolution:=optional
         </import.package>
         <carbon.component>
             osgi.service; objectClass="javax.ws.rs.ext.ExceptionMapper";serviceCount="1"
