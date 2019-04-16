@@ -33,22 +33,30 @@ define(['log', 'jquery', 'lodash', 'workspace', 'backbone'],
                     this._runButn.on('click', function (e) {
                         e.preventDefault();
                         e.stopPropagation();
-                        self.application.commandManager.dispatch(_.get(self._options, 'commandRun.id'));
+                        if(!$(this).hasClass('disabled')) {
+                            self.application.commandManager.dispatch(_.get(self._options, 'commandRun.id'));
+                        }
                     });
                     this._debugBtn.on('click', function (e) {
                         e.preventDefault();
                         e.stopPropagation();
-                        self.application.commandManager.dispatch(_.get(self._options, 'commandDebug.id'));
+                        if(!$(this).hasClass('disabled')) {
+                            self.application.commandManager.dispatch(_.get(self._options, 'commandDebug.id'));
+                        }
                     });
                     this._stopBtn.on('click', function (e) {
                         e.preventDefault();
                         e.stopPropagation();
-                        self.application.commandManager.dispatch(_.get(self._options, 'commandStop.id'));
+                        if(!$(this).hasClass('disabled')) {
+                            self.application.commandManager.dispatch(_.get(self._options, 'commandStop.id'));
+                        }
                     });
                     this._revertBtn.on('click', function (e) {
                         e.preventDefault();
                         e.stopPropagation();
-                        self.application.commandManager.dispatch(_.get(self._options, 'commandRevert.id'));
+                        if(!$(this).hasClass('disabled')) {
+                            self.application.commandManager.dispatch(_.get(self._options, 'commandRevert.id'));
+                        }
                     });
 
                     // register command
