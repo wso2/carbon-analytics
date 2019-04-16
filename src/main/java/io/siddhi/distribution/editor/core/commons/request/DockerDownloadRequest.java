@@ -25,19 +25,7 @@ import java.util.List;
  * Bean class to represent the docker download request payload.
  */
 public class DockerDownloadRequest {
-
-    private String profile;
     private List<String> files = new ArrayList<>();
-
-    public String getProfile() {
-
-        return profile;
-    }
-
-    public void setProfile(String profile) {
-
-        this.profile = profile;
-    }
 
     public List<String> getFiles() {
 
