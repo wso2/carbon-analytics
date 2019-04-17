@@ -69,7 +69,7 @@ define(['require', 'jquery', 'log', 'backbone', 'file_browser'],
 
                     exportButton.on('click', function () {
                         var payload = {
-                            profile: exportModal.find('#dockerProfile').val(),
+                            profile: 'runner',
                             files: []
                         };
 

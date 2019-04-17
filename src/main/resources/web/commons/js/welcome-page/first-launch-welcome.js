@@ -123,7 +123,7 @@ define(['require', 'lodash', 'log', 'jquery', 'backbone', 'command', 'sample_pre
                     'target="_blank"><i class="fw fw-list"></i>Quick Start Guide</a></li>' +
                     '<li class="col-md-4"><a href="https://siddhi-io.github.io/siddhi/documentation/siddhi-5.x/query-guide-5.x/"' +
                     'target="_blank"><i class="fw fw-carbon"></i>Siddhi Grammar</a></li>' +
-                    '<li class="col-md-4"><a href="https://stackoverflow.com/questions/tagged/wso2sp"' +
+                    '<li class="col-md-4"><a href="https://stackoverflow.com/questions/tagged/siddhi"' +
                     'target="_blank"><i class="fw fw-info"></i>Q&A</a></li>' +
                     '<li class="col-md-4"><a href="https://siddhi-io.github.io/siddhi/"' +
                     'target="_blank"><i class="fw fw-google-docs"></i>Documentation</a></li>');

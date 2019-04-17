@@ -1058,7 +1058,7 @@ public class EditorMicroservice implements Microservice {
         // Create zip archive and download
         DockerUtils dockerUtils = new DockerUtils(configProvider);
         try {
-            File zipFile = dockerUtils.createArchive(request.getProfile(), request.getFiles());
+            File zipFile = dockerUtils.createArchive(request.getFiles());
             return Response
                     .status(Response.Status.OK)
                     .entity(zipFile)

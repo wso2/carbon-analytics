@@ -30,7 +30,7 @@ define(function () {
         CONTENT: '@App:name(\'SweetFactory\')\n' +
             '@App:description(\'Description of the plan\')\n' +
             '\n' +
-            '-- Please refer to https://docs.wso2.com/display/SP430/Quick+Start+Guide on getting started with SP editor. \n' +
+            '-- Please refer to https://siddhi-io.github.io/siddhi/documentation/siddhi-5.x/quckstart-5.x/ on getting started with Siddhi editor. \n' +
             '\n' +
             'define stream SweetProductionStream (name string, amount long);\n' +
             '@sink(type = \'log\', \n' +
