@@ -99,6 +99,10 @@
             <artifactId>org.wso2.carbon.analytics.msf4j.interceptor.common</artifactId>
         </dependency>
         <dependency>
+            <groupId>xerces</groupId>
+            <artifactId>xercesImpl</artifactId>
+        </dependency>
+        <dependency>
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-lang3</artifactId>
             <scope>test</scope>
@@ -146,7 +150,8 @@
         <private.package>
             org.wso2.carbon.database.query.manager.*,
             org.wso2.carbon.database.query.manager.config.*,
-            org.wso2.carbon.database.query.manager.exception.*
+            org.wso2.carbon.database.query.manager.exception.*,
+            org.apache.xerces.util.*
         </private.package>
         <export.package>
             org.wso2.carbon.data.provider.*,
