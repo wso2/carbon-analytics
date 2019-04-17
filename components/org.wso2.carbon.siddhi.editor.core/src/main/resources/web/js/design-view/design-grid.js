@@ -979,7 +979,7 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
                         "Custom", {
                             create: function () {
                                 return $(
-                                    '<span><i class="fw fw-delete" id="' + connectionObject.id +
+                                    '<span><i class="fw fw-delete" id="' + self.currentTabId + connectionObject.id +
                                     '"data-toggle="popover"></i></span>');
                             },
                             location: 0.60,
@@ -993,21 +993,20 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
                     ]);
 
                     function popOverForConnector() {
-                        $('#' + connectionObject.id).popover({
+                        $('#' + self.currentTabId + connectionObject.id).popover({
                             trigger: 'focus',
                             title: 'Confirmation',
                             html: true,
                             content: function () {
                                 return $('.pop-over').html();
-
                             }
                         });
-                        $('#' + connectionObject.id).off();
-                        $('#' + connectionObject.id).popover("show");
+                        $('#' + self.currentTabId + connectionObject.id).off();
+                        $('#' + self.currentTabId + connectionObject.id).popover("show");
                         $('.btn_no').focus();
                         $(".overlayed-container ").fadeTo(200, 1);
                         // Custom jQuery to hide popover on click of the close button
-                        $("#" + connectionObject.id).siblings(".popover").on("click", ".popover-footer .btn_yes",
+                        $("#" + self.currentTabId + connectionObject.id).siblings(".popover").on("click", ".popover-footer .btn_yes",
                             function () {
                                 if (connectionObject.connector !== null) {
                                     self.jsPlumbInstance.deleteConnection(connectionObject);
@@ -1015,7 +1014,7 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
                                 $(".overlayed-container ").fadeOut(200);
                                 $(this).parents(".popover").popover('hide');
                             });
-                        $("#" + connectionObject.id).siblings(".popover").on("click", ".popover-footer .btn_no",
+                        $("#" + self.currentTabId + connectionObject.id).siblings(".popover").on("click", ".popover-footer .btn_no",
                             function () {
                                 $(".overlayed-container ").fadeOut(200);
                                 $(this).parents(".popover").popover('hide');
@@ -1034,8 +1033,8 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
                             });
                         });
                         $(".btn_no").on("keyup", function (e) {
-                            if (e.which === ESCAPE_KEY && $("#" + connectionObject.id).popover()) {
-                                $("#" + connectionObject.id).popover('hide');
+                            if (e.which === ESCAPE_KEY && $("#" + self.currentTabId + connectionObject.id).popover()) {
+                                $("#" + self.currentTabId + connectionObject.id).popover('hide');
                                 $(".overlayed-container ").fadeOut(200);
                                 close_icon_overlay.setVisible(false);
                             }
@@ -1078,7 +1077,7 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
                         });
                         // hide the close icon when the mouse is not on the connection path
                         connectionObject.bind('mouseleave', function () {
-                            if ($("#" + connectionObject.id).siblings(".popover").length == 0) {
+                            if ($("#" + self.currentTabId + connectionObject.id).siblings(".popover").length == 0) {
                                 close_icon_overlay.setVisible(false);
                             }
                         });
@@ -1090,7 +1089,7 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
                         });
                         // hide the close icon when the mouse is not on the connection path
                         connectionObject.bind('mouseout', function () {
-                            if ($("#" + connectionObject.id).siblings(".popover").length == 0) {
+                            if ($("#" + self.currentTabId + connectionObject.id).siblings(".popover").length == 0) {
                                 close_icon_overlay.setVisible(false);
                             }
                         });
