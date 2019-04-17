@@ -1582,6 +1582,11 @@
                 <version>${netty.version}</version>
                 <scope>test</scope>
             </dependency>
+            <dependency>
+                <groupId>xerces</groupId>
+                <artifactId>xercesImpl</artifactId>
+                <version>${xerces.version}</version>
+            </dependency>
         </dependencies>
     </dependencyManagement>
 
@@ -1795,7 +1800,7 @@
         <siddhi.io.tcp.version>2.1.2</siddhi.io.tcp.version>
         <siddhi.io.email.version>1.1.0</siddhi.io.email.version>
         <siddhi.io.kafka.version>4.2.1</siddhi.io.kafka.version>
-        <siddhi.io.http.version>1.1.6</siddhi.io.http.version>
+        <siddhi.io.http.version>1.2.0</siddhi.io.http.version>
 
         <siddhi.map.json.version>4.1.2</siddhi.map.json.version>
         <siddhi.map.binary.version>1.1.1</siddhi.map.binary.version>
@@ -1829,5 +1834,7 @@
         <io.nats.version>2.1.2</io.nats.version>
         <siddhi.io.nats.version>1.0.5</siddhi.io.nats.version>
         <org.testcontainers.version>1.8.0</org.testcontainers.version>
+
+        <xerces.version>2.12.0</xerces.version>
     </properties>
 </project>

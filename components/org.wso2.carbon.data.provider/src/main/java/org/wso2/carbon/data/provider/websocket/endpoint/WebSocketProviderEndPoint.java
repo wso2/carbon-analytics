@@ -20,6 +20,8 @@ package org.wso2.carbon.data.provider.websocket.endpoint;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
+import com.sun.org.apache.xerces.internal.impl.Constants;
+
 import org.osgi.service.component.annotations.Component;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -33,6 +35,7 @@ import org.wso2.msf4j.websocket.WebSocketEndpoint;
 import org.wso2.transport.http.netty.contract.websocket.WebSocketConnection;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
+import org.apache.xerces.util.SecurityManager;
 
 import javax.websocket.OnClose;
 import javax.websocket.OnError;
@@ -67,6 +70,39 @@ public class WebSocketProviderEndPoint implements WebSocketEndpoint {
     private static final Map<String, ArrayList<WebSocketChannel>> providerMap = new HashMap<>();
     private static final String JSON_REGEX_PATTERN = "\\{\"event\":\\{(.*?)}}";
     private static final String XML_PATTERN_PATH = "//events/event/*";
+    private static final int ENTITY_EXPANSION_LIMIT = 0;
+
+    private static final DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();
+
+    static {
+        documentBuilderFactory.setNamespaceAware(true);
+        documentBuilderFactory.setXIncludeAware(false);
+        documentBuilderFactory.setExpandEntityReferences(false);
+
+        try {
+            documentBuilderFactory.setFeature(Constants.SAX_FEATURE_PREFIX +
+                    Constants.EXTERNAL_GENERAL_ENTITIES_FEATURE, false);
+        } catch (ParserConfigurationException e) {
+            log.error("Failed to load XML Processor Feature " + Constants.EXTERNAL_GENERAL_ENTITIES_FEATURE);
+        }
+        try {
+            documentBuilderFactory.setFeature(Constants.SAX_FEATURE_PREFIX +
+                    Constants.EXTERNAL_PARAMETER_ENTITIES_FEATURE, false);
+        } catch (ParserConfigurationException e) {
+            log.error("Failed to load XML Processor Feature " + Constants.EXTERNAL_PARAMETER_ENTITIES_FEATURE);
+        }
+        try {
+            documentBuilderFactory.setFeature(Constants.XERCES_FEATURE_PREFIX +
+                    Constants.LOAD_EXTERNAL_DTD_FEATURE, false);
+        } catch (ParserConfigurationException e) {
+            log.error("Failed to load XML Processor Feature " + Constants.LOAD_EXTERNAL_DTD_FEATURE);
+        }
+
+        SecurityManager securityManager = new SecurityManager();
+        securityManager.setEntityExpansionLimit(ENTITY_EXPANSION_LIMIT);
+        documentBuilderFactory.setAttribute(Constants.XERCES_PROPERTY_PREFIX +
+                Constants.SECURITY_MANAGER_PROPERTY, securityManager);
+    }
 
     @OnOpen
     public static void onOpen(WebSocketConnection webSocketConnection, @PathParam("topic") String topic) {
@@ -129,7 +165,7 @@ public class WebSocketProviderEndPoint implements WebSocketEndpoint {
                 break;
             case "xml":
                 try {
-                    DocumentBuilder documentBuilder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
+                    DocumentBuilder documentBuilder = getSecuredDocumentBuilderFactory().newDocumentBuilder();
                     Document document = documentBuilder.parse(new InputSource(new StringReader(message)));
                     XPath xPath = XPathFactory.newInstance().newXPath();
                     XPathExpression expression = xPath.compile(XML_PATTERN_PATH);
@@ -162,5 +198,9 @@ public class WebSocketProviderEndPoint implements WebSocketEndpoint {
                 .forEach(keyValuePair -> builder.append(keyValuePair.split(":")[1]).append(","));
         builder.deleteCharAt(builder.length() - 1).append("]],topic:").append(topic).append("}");
         return builder.toString();
+    }
+
+    private DocumentBuilderFactory getSecuredDocumentBuilderFactory() {
+        return documentBuilderFactory;
     }
 }
