@@ -95,8 +95,8 @@ define(['require', 'lodash', 'jquery', 'log', 'file_browser'],
                 "<div class='clearfix'>" +
                 "<div class='server-property'> <label class='clearfix'> Host </label> <input class='add-new-server-input'" +
                 " id='new_host' placeholder='localhost'> </div>" +
-                "<div class='server-property'> <label class='clearfix'> Port </label> <input class='add-new-server-input'" +
-                " id='new_port' placeholder='9390'> </div>" +
+                "<div class='server-property'> <label class='clearfix'> HTTPS Port </label> <input class='add-new-server-input'" +
+                " id='new_port' placeholder='9443'> </div>" +
                 "<div class='server-property'> <label class='clearfix'> User Name </label> <input " +
                 "class='add-new-server-input' id='new_user_name' placeholder='admin'> </div>" +
                 "<div class='server-property'> <label class='clearfix'> Password </label> <input " +
