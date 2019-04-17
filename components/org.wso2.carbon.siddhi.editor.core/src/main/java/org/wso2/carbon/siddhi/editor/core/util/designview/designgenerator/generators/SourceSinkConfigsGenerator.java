@@ -106,7 +106,7 @@ public class SourceSinkConfigsGenerator extends CodeSegmentsPreserver {
             } else {
                 options.add(element.toString());
             }
-            if (element.getKey().equalsIgnoreCase(SINK_ID) || element.getKey().equalsIgnoreCase(SOURCE_ID)) {
+            if (element.getKey().equalsIgnoreCase(SINK_ID)) {
                 correlationId = element.getValue();
             }
         }
