@@ -1422,7 +1422,7 @@
         <netty-all.version>4.0.23.wso2v1</netty-all.version>
         <scala.version>2.10.4</scala.version>
         <commons-math3.version>3.1.1</commons-math3.version>
-        <commons-lang3.version>3.3.2</commons-lang3.version>
+        <commons-lang3.version>3.8.1</commons-lang3.version>
         <compress.lzf.version>1.0.0</compress.lzf.version>
         <jetty.version>8.1.14.v20131031</jetty.version>
         <netty.version>3.9.5.Final</netty.version>
@@ -1430,7 +1430,7 @@
         <uncommons.math.orbit.version>1.2.2.wso2v1</uncommons.math.orbit.version>
         <chill.orbit.version>0.5.0.wso2v1</chill.orbit.version>
         <stream.orbit.version>2.9.5.wso2v1</stream.orbit.version>
-        <guava.version>19.0</guava.version>
+        <guava.version>27.0-jre</guava.version>
         <servelet.api.version>7.0.52.wso2v1</servelet.api.version>
         <servelet.jsp.version>2.2.1</servelet.jsp.version>
         <com.datastax.cassandra.driver.orbit.verison>2.1.10.2.wso2v2</com.datastax.cassandra.driver.orbit.verison>
