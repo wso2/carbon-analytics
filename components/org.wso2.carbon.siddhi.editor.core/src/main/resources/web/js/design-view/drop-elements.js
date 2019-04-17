@@ -1365,7 +1365,7 @@ define(['require', 'log', 'lodash', 'jquery', 'partition', 'stream', 'query', 'f
         };
 
         DropElements.prototype.generateSpecificSourceConnectionElements = function (type, jsPlumbInstance, i, element) {
-            if (type == Constants.TYPE_HTTP_RESPONSE || type == Constants.TYPE_HTTP_REQUEST) {
+            if (type == Constants.TYPE_HTTP_RESPONSE) {
                 var connectionIn = $('<div class="connectorInSource">').attr('id', i + "-in").addClass('connection');
                 element.append(connectionIn);
                 jsPlumbInstance.makeTarget(connectionIn, {
@@ -1382,7 +1382,7 @@ define(['require', 'log', 'lodash', 'jquery', 'partition', 'stream', 'query', 'f
         };
 
         DropElements.prototype.generateSpecificSinkConnectionElements = function (type, jsPlumbInstance, i, element) {
-            if (type == Constants.TYPE_HTTP_REQUEST || type == Constants.TYPE_HTTP_RESPONSE) {
+            if (type == Constants.TYPE_HTTP_REQUEST) {
                 var connectionOut = $('<div class="connectorOutSink">').attr('id', i + "-out").addClass('connection');
                 element.append(connectionOut);
                 jsPlumbInstance.makeSource(connectionOut, {
