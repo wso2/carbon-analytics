@@ -485,8 +485,7 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
                         }
                         DesignViewUtils.prototype
                             .errorAlert("Invalid Connection: http-request sink input source should be a " +
-                                "http-response source or http-response sink input source should be a " +
-                                "http-request source");
+                                "http-response source ");
                         return connectionValidity;
                     }
 

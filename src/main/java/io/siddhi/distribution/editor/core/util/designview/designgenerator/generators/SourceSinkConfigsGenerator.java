@@ -42,7 +42,6 @@ public class SourceSinkConfigsGenerator extends CodeSegmentsPreserver {
 
     private static final String TYPE = "TYPE";
     private static final String SINK_ID = "SINK.ID";
-    private static final String SOURCE_ID = "SOURCE.ID";
     private static final String MAP = "MAP";
 
     /**
@@ -115,7 +114,7 @@ public class SourceSinkConfigsGenerator extends CodeSegmentsPreserver {
             } else {
                 options.add(element.toString());
             }
-            if (element.getKey().equalsIgnoreCase(SINK_ID) || element.getKey().equalsIgnoreCase(SOURCE_ID)) {
+            if (element.getKey().equalsIgnoreCase(SINK_ID)) {
                 correlationId = element.getValue();
             }
         }

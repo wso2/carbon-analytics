@@ -26,9 +26,9 @@
 }
 
 .toggle-controls-container {
-    position: absolute;
-    bottom: 2%;
-    right: 2%;
+    position: fixed;
+    bottom: 35px;
+    right: 10px;
     z-index: 23;
 }
 
