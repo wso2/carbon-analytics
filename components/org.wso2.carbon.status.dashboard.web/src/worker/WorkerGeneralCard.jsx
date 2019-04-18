@@ -58,7 +58,7 @@ export default class WorkerGeneralCard extends React.Component {
             .then((response) => {
                 if (response.data.haStatus) {
                     that.setState({
-                        cardHeight: 1000
+                        cardHeight: 1033
                     });
                 }
             });
