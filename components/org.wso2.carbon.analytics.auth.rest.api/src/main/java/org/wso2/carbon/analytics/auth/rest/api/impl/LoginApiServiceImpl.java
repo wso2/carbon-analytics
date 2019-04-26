@@ -284,6 +284,18 @@ public class LoginApiServiceImpl extends LoginApiService {
                     // is a http only cookie. Hence we need to split the access token
                     String accessToken = authCodeloginResponse.get(IdPClientConstants.ACCESS_TOKEN);
                     String refreshToken = authCodeloginResponse.get(IdPClientConstants.REFRESH_TOKEN);
+                    String idToken = authCodeloginResponse.get("ID_Token");
+
+                    String idTokenFirstHalf = idToken.substring(0, idToken.length()/2);
+                    String idTokenSecondHalf = idToken.substring(idToken.length()/2);
+                    userDTO.setiID(idTokenFirstHalf);
+                    NewCookie idTokenhttpOnlyCookie = AuthUtil
+                            .cookieBuilder(SPConstants.WSO2_SP_ID_TOKEN_2, idTokenFirstHalf, appContext, true, true,
+                                    -1);
+                    NewCookie logoutContextIdToken = AuthUtil
+                            .cookieBuilder(AuthRESTAPIConstants.WSO2_SP_ID_TOKEN, idTokenSecondHalf,
+                                    AuthRESTAPIConstants.LOGOUT_CONTEXT + AuthRESTAPIConstants.LOGOUT_SSO_CONTEXT +  appContext,
+                                    true, true, -1);
 
                     String accessTokenFirstHalf = accessToken.substring(0, accessToken.length() / 2);
                     String accessTokenSecondHalf = accessToken.substring(accessToken.length() / 2);
@@ -293,7 +305,8 @@ public class LoginApiServiceImpl extends LoginApiService {
                                     -1);
                     NewCookie logoutContextAccessToken = AuthUtil
                             .cookieBuilder(AuthRESTAPIConstants.WSO2_SP_TOKEN, accessTokenSecondHalf,
-                                    AuthRESTAPIConstants.LOGOUT_CONTEXT + appContext, true, true, -1);
+                                    AuthRESTAPIConstants.LOGOUT_CONTEXT + AuthRESTAPIConstants.LOGOUT_SSO_CONTEXT +
+                                    appContext , true, true, -1);
                     if (refreshToken != null) {
                         NewCookie loginContextRefreshTokenCookie;
                         String refTokenPart1 = refreshToken.substring(0, refreshToken.length() / 2);
@@ -309,13 +322,15 @@ public class LoginApiServiceImpl extends LoginApiService {
                                 .header(HttpHeaders.LOCATION, targetURIForRedirection)
                                 .entity(userDTO)
                                 .cookie(accessTokenhttpOnlyCookie, logoutContextAccessToken,
-                                        loginContextRefreshTokenCookie, userAuthenticate)
+                                        loginContextRefreshTokenCookie, userAuthenticate,
+                                        idTokenhttpOnlyCookie, logoutContextIdToken)
                                 .build();
                     }
                     return Response.status(Response.Status.FOUND)
                             .header(HttpHeaders.LOCATION, targetURIForRedirection)
                             .entity(userDTO)
-                            .cookie(accessTokenhttpOnlyCookie, logoutContextAccessToken)
+                            .cookie(accessTokenhttpOnlyCookie, logoutContextAccessToken,
+                                    idTokenhttpOnlyCookie, logoutContextIdToken)
                             .build();
                 } else {
                     if (LOG.isDebugEnabled()) {

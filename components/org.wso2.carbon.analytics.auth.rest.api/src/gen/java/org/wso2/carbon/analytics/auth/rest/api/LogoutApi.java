@@ -70,7 +70,7 @@ public class LogoutApi implements Microservice {
     }
 
     @GET
-    @Path("/slo")
+    @Path("/slo/{appName}")
     @Produces({"application/json"})
     @io.swagger.annotations.ApiOperation(value = "", notes = "Login type check Request to Stream Processor.",
             response = HashMap.class, tags = {})
@@ -83,7 +83,8 @@ public class LogoutApi implements Microservice {
 
             @io.swagger.annotations.ApiResponse(code = 500, message = "An unexpected error occurred.",
                     response = ErrorDTO.class)})
-    public Response loginAppNamePost() throws NotFoundException {
-        return delegate.ssoLogout();
+    public Response singleLogoutAppNamePost(@ApiParam(value = "AppName", required = true) @PathParam("appName")
+                                                String appName, @Context Request request) throws NotFoundException {
+        return delegate.ssoLogout(appName, request);
     }
 }
