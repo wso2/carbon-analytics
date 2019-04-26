@@ -23,7 +23,8 @@ h3,
 header .brand h1 {
     font-size: 1.5rem;
     text-transform: inherit;
-    display: inline;
+    display: inline-block;
+    margin: 13px 0;
     font-weight: 400;
 }
 
@@ -35,7 +36,7 @@ header .brand {
     line-height: 40px;
     padding: 0 10px;
     vertical-align: middle;
-    margin-right: 25px;
+    margin-right: 5px;
 }
 
 .menu-bar {
