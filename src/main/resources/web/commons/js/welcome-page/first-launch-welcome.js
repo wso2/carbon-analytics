@@ -88,8 +88,7 @@ define(['require', 'lodash', 'log', 'jquery', 'backbone', 'command', 'sample_pre
                 buttonWrap.append(newButton);
                 buttonWrap.append(openButton);
 
-                var productNameWrapHeader = $('<h2><img src="/editor/commons/images/wso2-logo.svg">' +
-                    '<h1>Siddhi Editor</h1></h2>');
+                var productNameWrapHeader = $('<h1>Siddhi Editor</h1>');
                 productNameWrap.append(productNameWrapHeader);
 
 
