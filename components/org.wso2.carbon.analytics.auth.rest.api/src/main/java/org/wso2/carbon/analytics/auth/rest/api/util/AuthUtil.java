@@ -59,7 +59,7 @@ public class AuthUtil {
 
     public static String extractIdTokenFromHeaders(HttpHeaders headers, String cookieHeader) {
         String token;
-        String authHeader = headers.getHeaderString(SPConstants.ID_TOKEN_HEADER);
+        String authHeader = headers.getHeaderString(AuthRESTAPIConstants.ID_TOKEN_HEADER);
         if (authHeader == null) {
             return null;
         }
