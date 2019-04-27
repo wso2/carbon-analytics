@@ -40,6 +40,17 @@ const appContext = window.contextPath;
  * Represents the App's router, which is accessible after a successful login
  */
 export default class SecuredRouter extends Component {
+
+    constructor() {
+        super();
+        this.handleSessionInvalid = this.handleSessionInvalid.bind(this);
+        window.handleSessionInvalid = this.handleSessionInvalid;
+    }
+
+    handleSessionInvalid() {
+        this.forceUpdate();
+    }
+
     componentWillMount() {
         setInterval(() => {
             if (AuthManager.getUser()) {

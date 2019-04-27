@@ -34,7 +34,8 @@ const basePath = window.location.origin;
 /**
  * Password grant type
  */
-const passwordGrantType = 'password';
+const GRANT_TYPE_PASSWORD = 'password';
+const GRANT_TYPE_REFRESH = 'refresh_token';
 
 /**
  * App context starting from forward slash
@@ -66,13 +67,13 @@ export default class AuthenticationAPI {
         return AuthenticationAPI
             .getHttpClient()
             .post(`/login/${appContext}`, Qs.stringify({
-                grantType: 'refresh_token',
+                grantType: GRANT_TYPE_REFRESH,
                 rememberMe: true,
             }), {
                 headers: {
                     'Content-Type': MediaType.APPLICATION_WWW_FORM_URLENCODED,
                     Authorization: 'Bearer ' + AuthManager.getCookie('RTK'),
-                    Accept: MediaType.APPLICATION_JSON,
+                    'Accept': MediaType.APPLICATION_JSON
                 },
             });
     }
@@ -84,13 +85,13 @@ export default class AuthenticationAPI {
      * @param {boolean} rememberMe      Remember me flag
      * @returns {AxiosPromise}          Response after the login
      */
-    static login(username, password, rememberMe = false) {
+    static login(username, password, rememberMe = false, grantType = GRANT_TYPE_PASSWORD) {
         return AuthenticationAPI
             .getHttpClient()
             .post(`/login/${appContext}`, Qs.stringify({
                 username,
                 password,
-                grantType: passwordGrantType,
+                grantType,
                 rememberMe,
                 appId: 'br_' + BusinessRulesUtilityFunctions.generateGUID(),
             }), {
@@ -114,4 +115,20 @@ export default class AuthenticationAPI {
                 },
             });
     }
+
+    static ssoLogout(token1, token2) {
+        return AuthenticationAPI.getHttpClient()
+            .get(`/logout/slo/${appContext}`, {
+                headers: {
+                    Authorization: `Bearer ${token2}`,
+                    Fid: token1,
+                },
+            });
+    }
+
+    static getAuthType() {
+        return AuthenticationAPI.getHttpClient()
+            .get('/login/auth-type');
+    }
+
 }
