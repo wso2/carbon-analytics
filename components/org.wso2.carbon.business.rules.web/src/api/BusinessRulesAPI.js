@@ -38,11 +38,21 @@ export default class BusinessRulesAPI {
      * @returns {AxiosInstance}     Axios HTTP Client
      */
     getHTTPClient() {
-        return axios.create({
+        const httpClient = axios.create({
             baseURL: this.url + appContext,
             timeout: 30000,
             headers: { Authorization: 'Bearer ' + AuthManager.getUser().SDID },
         });
+        httpClient.interceptors.response.use(function (response) {
+            return response;
+        }, function (error) {
+            if (401 === error.response.status) {
+                AuthManager.discardSession();
+                window.handleSessionInvalid();
+            }
+            return Promise.reject(error);
+        });
+        return httpClient;
     }
 
     /**
