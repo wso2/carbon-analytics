@@ -34,16 +34,13 @@ import org.wso2.carbon.analytics.auth.rest.api.util.AuthRESTAPIConstants;
 import org.wso2.carbon.analytics.auth.rest.api.util.AuthUtil;
 import org.wso2.carbon.analytics.idp.client.core.exception.IdPClientException;
 import org.wso2.carbon.analytics.idp.client.core.utils.IdPClientConstants;
-import org.wso2.carbon.analytics.idp.client.core.utils.config.IdPClientConfiguration;
-import org.wso2.carbon.analytics.idp.client.external.ExternalIdPClientConstants;
-import org.wso2.carbon.config.ConfigurationException;
 import org.wso2.carbon.stream.processor.common.utils.SPConstants;
 import org.wso2.msf4j.Request;
 
-import java.util.HashMap;
-import java.util.Map;
 import javax.ws.rs.core.NewCookie;
 import javax.ws.rs.core.Response;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Implementation for Logout API.
@@ -124,25 +121,43 @@ public class LogoutApiServiceImpl extends LogoutApiService {
     }
 
     @Override
-    public Response ssoLogout() throws NotFoundException {
-        try {
-            IdPClientConfiguration authConfigurations = DataHolder.getInstance().getConfigProvider()
-                    .getConfigurationObject(IdPClientConfiguration.class);
+    public Response ssoLogout(String appName, Request request) throws NotFoundException {
 
-            String targetURIForRedirection = authConfigurations.getProperties().getOrDefault(ExternalIdPClientConstants
-                            .EXTERNAL_SSO_LOGOUT_URL,
-                    ExternalIdPClientConstants.DEFAULT_EXTERNAL_SSO_LOGOUT_URL);
+        String accessToken = AuthUtil
+                .extractTokenFromHeaders(request.getHeaders(), AuthRESTAPIConstants.WSO2_SP_TOKEN);
+        String idToken = AuthUtil
+                .extractIdTokenFromHeaders(request.getHeaders(), AuthRESTAPIConstants.WSO2_SP_ID_TOKEN);
 
-            targetURIForRedirection = targetURIForRedirection.concat(AuthRESTAPIConstants.SSO_LOGING_TAIL);
-            Map<String, String> response = new HashMap<>();
-            response.put(ExternalIdPClientConstants.EXTERNAL_SSO_LOGOUT_URL, targetURIForRedirection);
-            return Response.status(Response.Status.OK).entity(response).build();
+        if (idToken != null || accessToken != null) {
+            try {
+                Map<String, String> logoutProperties = new HashMap<>();
+                logoutProperties.put(IdPClientConstants.APP_NAME, appName);
+                logoutProperties.put(IdPClientConstants.ACCESS_TOKEN, accessToken);
+                logoutProperties.put(IdPClientConstants.ID_TOKEN_KEY, idToken);
+                Map<String, String> returnProperties = DataHolder.getInstance().getIdPClient().logout(logoutProperties);
 
-        } catch (ConfigurationException e) {
-            ErrorDTO errorDTO = new ErrorDTO();
-            errorDTO.setError(IdPClientConstants.Error.INTERNAL_SERVER_ERROR);
-            errorDTO.setDescription("Error occurred while logging out the sso session due to " + e.getMessage());
-            return Response.status(Response.Status.BAD_REQUEST).entity(errorDTO).build();
+                boolean doReturnProperties = Boolean.
+                        parseBoolean(returnProperties.get(IdPClientConstants.RETURN_LOGOUT_PROPERTIES));
+                if (!doReturnProperties) {
+                    return Response.status(Response.Status.OK).build();
+                } else {
+                    returnProperties.remove(IdPClientConstants.RETURN_LOGOUT_PROPERTIES);
+                    return Response.status(Response.Status.OK).entity(returnProperties).build();
+                }
+            } catch (IdPClientException e) {
+                LOG.debug("Error in logout for uri '{}', with access token, '{}', id_token, '{}'.", "/slo" ,
+                        accessToken, idToken, e);
+                ErrorDTO errorDTO = new ErrorDTO();
+                errorDTO.setError(IdPClientConstants.Error.INTERNAL_SERVER_ERROR);
+                errorDTO.setDescription("Error in logout for uri 'sso', with token, '" + accessToken +
+                        "'. Error : '" + e.getMessage() + "'");
+                return Response.serverError().entity(errorDTO).build();
+            }
         }
+        LOG.debug("Unable to extract the id/access token from the request uri '{}'.", request.getUri());
+        ErrorDTO errorDTO = new ErrorDTO();
+        errorDTO.setError(IdPClientConstants.Error.INTERNAL_SERVER_ERROR);
+        errorDTO.setDescription("Invalid Authorization header. Please provide the Authorization header to proceed.");
+        return Response.status(Response.Status.BAD_REQUEST).entity(errorDTO).build();
     }
 }

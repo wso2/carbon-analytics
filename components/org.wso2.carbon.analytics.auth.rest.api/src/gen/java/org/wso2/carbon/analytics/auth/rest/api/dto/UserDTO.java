@@ -35,6 +35,9 @@ public class UserDTO {
     @JsonProperty("LID")
     private String lID = null;
 
+    @JsonProperty("IID")
+    private String iID = null;
+
     @JsonProperty("validityPeriod")
     private Integer validityPeriod = null;
 
@@ -95,6 +98,21 @@ public class UserDTO {
         this.lID = lID;
     }
 
+    /**
+     * Get iID.
+     *
+     * @return iID
+     **/
+    @ApiModelProperty(value = "")
+    public String getiID() {
+        return iID;
+    }
+
+    public void setiID(String iID) {
+        this.iID = iID;
+    }
+
+
     public UserDTO validityPeriod(Integer validityPeriod) {
         this.validityPeriod = validityPeriod;
         return this;
@@ -127,6 +145,7 @@ public class UserDTO {
         return Objects.equals(this.authUser, user.authUser) &&
                 Objects.equals(this.pID, user.pID) &&
                 Objects.equals(this.lID, user.lID) &&
+                Objects.equals(this.iID, user.iID) &&
                 Objects.equals(this.validityPeriod, user.validityPeriod);
     }
 
@@ -143,6 +162,7 @@ public class UserDTO {
         sb.append("    authUser: ").append(toIndentedString(authUser)).append("\n");
         sb.append("    PID: ").append(toIndentedString(pID)).append("\n");
         sb.append("    LID: ").append(toIndentedString(lID)).append("\n");
+        sb.append("    IID: ").append(toIndentedString(iID)).append("\n");
         sb.append("    validityPeriod: ").append(toIndentedString(validityPeriod)).append("\n");
         sb.append("}");
         return sb.toString();

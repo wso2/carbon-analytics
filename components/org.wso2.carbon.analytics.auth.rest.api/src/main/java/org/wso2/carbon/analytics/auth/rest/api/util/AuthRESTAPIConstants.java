@@ -24,6 +24,7 @@ public class AuthRESTAPIConstants {
 
     public static final String WSO2_SP_TOKEN = "JID";
     public static final String WSO2_SP_REFRESH_TOKEN = "ASID";
+    public static final String WSO2_SP_ID_TOKEN = "FID";
     public static final String WSO2_SP_USER_DTO = "USER_DTO";
 
     public static final String HTTP_ONLY_COOKIE = "HttpOnly";
@@ -33,7 +34,7 @@ public class AuthRESTAPIConstants {
 
     public static final String LOGIN_CONTEXT = "/login";
     public static final String LOGOUT_CONTEXT = "/logout";
-    public static final String SSO_LOGING_TAIL = "?slo=true";
+    public static final String LOGOUT_SSO_CONTEXT = "/slo";
 
     public static final int REFRESH_TOKEN_VALIDITY_PERIOD = 604800;
 

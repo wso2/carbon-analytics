@@ -22,6 +22,8 @@ package org.wso2.carbon.stream.processor.common.utils;
  */
 public class SPConstants {
     public static final String WSO2_SP_TOKEN_2 = "HID";
+    public static final String WSO2_SP_ID_TOKEN_2 = "TID";
+    public static final String ID_TOKEN_HEADER = "Fid";
     public static final String AUTHORIZATION_HEADER = "Authorization";
     public static final String COOKIE_HEADER = "Cookie";
 

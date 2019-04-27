@@ -47,6 +47,32 @@ public class AuthUtil {
         } else {
             return null;
         }
+        String httpONLYCookieValue = getHttpONLYCookieValue(headers, cookieHeader);
+        if (httpONLYCookieValue == null) {
+            return null;
+        } else {
+            token += httpONLYCookieValue;
+        }
+        return token;
+    }
+
+
+    public static String extractIdTokenFromHeaders(HttpHeaders headers, String cookieHeader) {
+        String token;
+        String authHeader = headers.getHeaderString(SPConstants.ID_TOKEN_HEADER);
+        if (authHeader == null) {
+            return null;
+        }
+        String httpONLYCookieValue = getHttpONLYCookieValue(headers, cookieHeader);
+        if (httpONLYCookieValue == null) {
+            return null;
+        } else {
+            token = authHeader + httpONLYCookieValue;
+        }
+        return token;
+    }
+
+    private static String getHttpONLYCookieValue(HttpHeaders headers, String cookieHeader) {
         String cookie = headers.getHeaderString(SPConstants.COOKIE_HEADER);
         if (cookie != null) {
             cookie = cookie.trim();
@@ -55,10 +81,10 @@ public class AuthUtil {
                     .orElse("");
             String[] tokenParts = tokenFromCookie.split("=");
             if (tokenParts.length == 2) {
-                token += tokenParts[1];
+                return tokenParts[1];
             }
         }
-        return token;
+        return null;
     }
 
     public static NewCookie cookieBuilder(String name, String value, String path, boolean isSecure,
