@@ -21,6 +21,7 @@ import React, { Component } from 'react';
 import { Redirect } from 'react-router-dom';
 // Auth Utils
 import AuthManager from '../../utils/AuthManager';
+import { Constants } from "../../utils/Constants";
 
 /**
  * App context.
@@ -34,19 +35,27 @@ export default class Logout extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      redirectToLogin: false,
+      redirectUrl :''
     };
   }
 
   componentDidMount() {
-    AuthManager.logout()
-      .then(() => this.setState({ redirectToLogin: true }));
+    AuthManager.getAuthType()
+        .then((response) => {
+          if (response.data.authType === Constants.AUTH_TYPE_SSO) {
+            AuthManager.ssoLogout().then((redirectUrl) => {
+              location.href = redirectUrl;
+            });
+          } else {
+            AuthManager.logout()
+                .then(() => {
+                  this.setState({ redirectUrl: '/login' });
+                });
+          }
+        });
   }
 
   render() {
-    if (this.state.redirectToLogin) {
-      return <Redirect to={{ pathname: '/login' }} />;
-    }
-    return null;
+    return <Redirect to={{ pathname: this.state.redirectUrl }} />;
   }
 }
