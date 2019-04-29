@@ -289,9 +289,6 @@ public class LoginApiServiceImpl extends LoginApiService {
                     String idTokenFirstHalf = idToken.substring(0, idToken.length()/2);
                     String idTokenSecondHalf = idToken.substring(idToken.length()/2);
                     userDTO.setiID(idTokenFirstHalf);
-                    NewCookie idTokenhttpOnlyCookie = AuthUtil
-                            .cookieBuilder(SPConstants.WSO2_SP_ID_TOKEN_2, idTokenFirstHalf, appContext, true, true,
-                                    -1);
                     NewCookie logoutContextIdToken = AuthUtil
                             .cookieBuilder(AuthRESTAPIConstants.WSO2_SP_ID_TOKEN, idTokenSecondHalf,
                                     AuthRESTAPIConstants.LOGOUT_CONTEXT + AuthRESTAPIConstants.LOGOUT_SSO_CONTEXT +  appContext,
@@ -312,25 +309,24 @@ public class LoginApiServiceImpl extends LoginApiService {
                         String refTokenPart1 = refreshToken.substring(0, refreshToken.length() / 2);
                         String refTokenPart2 = refreshToken.substring(refreshToken.length() / 2);
                         userDTO.setlID(refTokenPart1);
-                        NewCookie userAuthenticate = AuthUtil.cookieBuilder(AuthRESTAPIConstants.WSO2_SP_USER_DTO,
-                                new Gson().toJson(userDTO), appContext, true, false, -1);
                         loginContextRefreshTokenCookie = AuthUtil
                                 .cookieBuilder(AuthRESTAPIConstants.WSO2_SP_REFRESH_TOKEN, refTokenPart2,
                                         AuthRESTAPIConstants.LOGIN_CONTEXT + appContext, true, true,
                                         AuthRESTAPIConstants.REFRESH_TOKEN_VALIDITY_PERIOD);
+                        NewCookie userAuthenticate = AuthUtil.cookieBuilder(AuthRESTAPIConstants.WSO2_SP_USER_DTO,
+                                new Gson().toJson(userDTO), appContext, true, false, -1);
                         return Response.status(Response.Status.FOUND)
                                 .header(HttpHeaders.LOCATION, targetURIForRedirection)
                                 .entity(userDTO)
                                 .cookie(accessTokenhttpOnlyCookie, logoutContextAccessToken,
                                         loginContextRefreshTokenCookie, userAuthenticate,
-                                        idTokenhttpOnlyCookie, logoutContextIdToken)
+                                        logoutContextIdToken)
                                 .build();
                     }
                     return Response.status(Response.Status.FOUND)
                             .header(HttpHeaders.LOCATION, targetURIForRedirection)
                             .entity(userDTO)
-                            .cookie(accessTokenhttpOnlyCookie, logoutContextAccessToken,
-                                    idTokenhttpOnlyCookie, logoutContextIdToken)
+                            .cookie(accessTokenhttpOnlyCookie, logoutContextAccessToken, logoutContextIdToken)
                             .build();
                 } else {
                     if (LOG.isDebugEnabled()) {
