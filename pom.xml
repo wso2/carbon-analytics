@@ -1595,7 +1595,7 @@
         <siddhi.version>4.5.5</siddhi.version>
         <siddhi.bundle.version>4.5.5</siddhi.bundle.version>
         <siddhi.version.range>[4.0.0, 5.0.0)</siddhi.version.range>
-        <carbon.analytics-common.version>6.1.22</carbon.analytics-common.version>
+        <carbon.analytics-common.version>6.1.23</carbon.analytics-common.version>
         <carbon.analytics-common.version.range>[6.0.66, 6.2.0)</carbon.analytics-common.version.range>
         <carbon.analytics.version.range>[2.0.0, 3.0.0)</carbon.analytics.version.range>
 
