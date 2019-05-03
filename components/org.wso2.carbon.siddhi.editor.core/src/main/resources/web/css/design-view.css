@@ -791,6 +791,11 @@ a.list-group-item, button.list-group-item {
 }
 
 .stream-form-container .attr-nav {
+    margin-left: -18px;
+}
+
+.window-form-container .attr-nav,
+.table-form-container .attr-nav {
     margin-left: -15px;
 }
 
@@ -984,12 +989,6 @@ a.list-group-item, button.list-group-item {
 }
 
 .stream-form-container,
-.partition-form-container,
-.siddhi-app-form-container {
-	width: 40%;
-}
-
-.stream-form-container,
 .source-sink-form-container,
 .table-form-container,
 .window-form-container,
@@ -1004,22 +1003,9 @@ a.list-group-item, button.list-group-item {
 	float: left;
 	display: inline-block;
 	padding: 5px;
-    margin-right: 10px;
-}
-
-.trigger-form-container,
-.function-form-container {
-	width: 40%;
-}
-
-.pattern-sequence-query-form-container,
-.join-query-form-container {
-    width: 23%;
-}
-
-.aggregation-form-container,
-.query-form-container {
-	width: 32%;
+    margin-right: 15px;
+    margin-bottom: 10px;
+    width: 40%;
 }
 
 .aggregation-form-container #primary-index-annotations {
@@ -1035,42 +1021,8 @@ a.list-group-item, button.list-group-item {
 	margin-bottom: 10px;
 }
 
-.design-view-form-content .source-div,
-.design-view-form-content .sink-div {
-	width: 40%;
-}
-
-.design-view-form-content .table-div{
-	width: 33%;
-}
-
-.design-view-form-content .mapper-div {
-    width: 28%;
-}
-
-.design-view-form-content .customized-options{
-    min-width: 330px;
-}
-
-.design-view-form-content .define-select {
-   min-width: 300px;
-}
-
-.design-view-form-content .store-div {
-	width: 33%;
-}
-
-.design-view-form-content .define-table-annotation,
-.design-view-form-content .window-form-container {
-	width: 32%;
-}
-
 .design-view-form-content #primary-index-annotations .annotation {
 	margin-bottom: 10px;
-}
-
-.design-view-form-content .attribute-map-div {
-	width: 30%;
 }
 
 .design-view-form-content #store-options,
@@ -1472,11 +1424,7 @@ label.option-name {
 }
 
 .design-view-form-content {
-    min-width: 1920px;
-}
-
-.nano > .nano-content {
-    overflow-x: unset;
+    min-width: 1000px;
 }
 
 .btn-default:active,
@@ -1486,7 +1434,7 @@ label.option-name {
 }
 
 .design-view-form-content .attribute-mapping-label {
-    width: 37%;
+    width: 38%;
     text-align: left;
     margin: 6px;
 }

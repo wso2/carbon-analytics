@@ -211,6 +211,7 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOrderByValue'
                     } else {
                         parent.find('.query-content').hide();
                     }
+                    self.formUtils.initializeNanoScroller();
                 });
 
                 var eventType = Constants.CURRENT_EVENTS;
@@ -366,6 +367,8 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOrderByValue'
 
                 var rateLimitingMatches = QUERY_SYNTAX.concat(Constants.SIDDHI_TIME);
                 self.formUtils.createAutocomplete($('.rate-limiting-value'), rateLimitingMatches);
+
+                self.formUtils.initializeNanoScroller();
 
                 $(formContainer).on('click', '#btn-submit', function () {
 

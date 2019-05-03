@@ -120,6 +120,8 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'jsonValidator', 'con
             self.formUtils.renderAnnotationTemplate("define-annotation", annotations);
             self.formUtils.checkPredefinedAnnotations(checkedAnnotations);
 
+            self.formUtils.initializeNanoScroller();
+
             //submit button action
             $(formContainer).on('click', '#btn-submit', function () {
 
