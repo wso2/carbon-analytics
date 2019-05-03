@@ -53,8 +53,9 @@ define(['jquery', 'lodash', 'log', 'handlebar', 'designViewUtils', 'app/source-e
         var buildSyntax = function (entry) {
             var params = '';
             var isStoreSinkSourceGeneration = false;
-            if (entry.namespace.toLowerCase() === constants.STORE || entry.namespace.toLowerCase() === constants.SINK ||
-                entry.namespace.toLowerCase() === constants.SOURCE) {
+            var namespaceValue = entry.namespace.toLowerCase();
+            if (namespaceValue === constants.STORE || namespaceValue === constants.SINK ||
+                namespaceValue === constants.SOURCE) {
                 isStoreSinkSourceGeneration = true;
             }
             if (entry.parameters) {
@@ -69,10 +70,10 @@ define(['jquery', 'lodash', 'log', 'handlebar', 'designViewUtils', 'app/source-e
                 });
             }
             if (isStoreSinkSourceGeneration) {
-                return (entry.namespace.length > 0 ? "@" + entry.namespace + "(type=" + "\'" + entry.name + "\'" +
+                return (entry.namespace.length > 0 ? "@" + namespaceValue + "(type=" + "\'" + entry.name + "\'" +
                     params + ")" : "")
             } else {
-                return (entry.namespace.length > 0 ? entry.namespace + ':' : '') + entry.name
+                return (entry.namespace.length > 0 ? namespaceValue + ':' : '') + entry.name
                     + '(' + params.substr(2) + ')';
             }
 
