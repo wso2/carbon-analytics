@@ -2686,7 +2686,7 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
             self.canvas.append(selector);
             new DragSelect({
                 selectables: document.querySelectorAll('.jtk-draggable'),
-                selector: document.getElementById(constants.MULTI_SELECTOR),
+                selector: document.getElementById(constants.MULTI_SELECTOR + self.currentTabId),
                 area: document.getElementById('design-grid-container-' + self.currentTabId),
                 multiSelectKeys: ['ctrlKey', 'shiftKey'],
                 onElementSelect: function (element) {
