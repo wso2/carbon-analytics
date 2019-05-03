@@ -48,12 +48,12 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'constants'],
             var id = $(element).parent().attr('id');
             var windowObject = self.configurationData.getSiddhiAppConfig().getWindow(id);
 
-            var propertyDiv = $('<div class = "window-form-container"> <label> <span class="mandatory-symbol"> * ' +
-                '</span>Name </label> <input type="text" id="windowName" class="clearfix name">' +
+            var propertyDiv = $('<div class="clearfix"><div class = "window-form-container"> <label> ' +
+                '<span class="mandatory-symbol"> * </span> Name </label> <input type="text" id="windowName" class="clearfix name">' +
                 '<label class="error-message" id="windowNameErrorMessage"></label> <div id="define-attribute"></div>' +
                 self.formUtils.buildFormButtons() + '</div> <div class= "window-form-container"> ' +
                 '<div class = "defineFunctionName"> </div> <div class ="defineFunctionParameters"> </div>' +
-                '</div> <div class = "window-form-container"> <div class="define-output-events"> </div>' +
+                '</div> </div> <div class = "window-form-container"> <div class="define-output-events"> </div>' +
                 '<div class="define-annotation"></div> </div>');
 
             formContainer.append(propertyDiv);

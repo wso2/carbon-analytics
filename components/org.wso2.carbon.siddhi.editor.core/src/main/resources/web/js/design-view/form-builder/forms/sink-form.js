@@ -145,12 +145,12 @@ define(['log', 'jquery', 'lodash', 'mapAnnotation', 'payloadOrAttribute', 'jsonV
                 var streamAttributes = self.formUtils.createStreamAttributesObject
                     (connectedStream.element.getAttributeList());
 
-                var propertyDiv = $('<div class="source-sink-form-container sink-div"><div id="define-sink"></div>' +
-                    '<div class = "source-sink-map-options" id="sink-options-div"></div>' +
+                var propertyDiv = $('<div class="clearfix"> <div class="source-sink-form-container sink-div">' +
+                    '<div id="define-sink"></div> <div class = "source-sink-map-options" id="sink-options-div"></div>' +
                     self.formUtils.buildFormButtons() + '</div>' +
                     '<div class="source-sink-form-container mapper-div"> <div id="define-map"> </div>' +
                     '<div class="source-sink-map-options" id="mapper-options-div"></div>' +
-                    '</div> <div class= "source-sink-form-container attribute-map-div"><div id="define-attribute">' +
+                    '</div></div> <div class= "source-sink-form-container attribute-map-div"><div id="define-attribute">' +
                     '</div> <div id="attribute-map-content"></div> </div>');
 
                 formContainer.append(propertyDiv);
