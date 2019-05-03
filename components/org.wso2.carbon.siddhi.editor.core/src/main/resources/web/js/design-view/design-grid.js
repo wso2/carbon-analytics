@@ -2682,7 +2682,7 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
 
         DesignGrid.prototype.enableMultipleSelection = function () {
             var self = this;
-            var selector = $('<div>').attr('id', constants.MULTI_SELECTOR).addClass(constants.SELECTOR);
+            var selector = $('<div>').attr('id', constants.MULTI_SELECTOR + self.currentTabId).addClass(constants.SELECTOR);
             self.canvas.append(selector);
             new DragSelect({
                 selectables: document.querySelectorAll('.jtk-draggable'),
