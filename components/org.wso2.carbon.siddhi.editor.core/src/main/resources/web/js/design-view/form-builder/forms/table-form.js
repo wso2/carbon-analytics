@@ -149,6 +149,8 @@ define(['log', 'jquery', 'lodash', 'attribute', 'storeAnnotation', 'handlebar', 
                 $('.define-predefined-annotations').hide();
             }
 
+            self.formUtils.initializeNanoScroller();
+
             // 'Submit' button action
             $(formContainer).on('click', '#btn-submit', function () {
 

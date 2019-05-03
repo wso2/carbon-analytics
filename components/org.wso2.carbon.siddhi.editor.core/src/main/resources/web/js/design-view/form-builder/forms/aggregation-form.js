@@ -351,6 +351,7 @@ define(['require', 'log', 'jquery', 'lodash', 'aggregateByTimePeriod', 'querySel
                     } else {
                         $('.aggregate-by-attribute-content').hide();
                     }
+                    self.formUtils.initializeNanoScroller();
                 });
 
                 $('#define-aggregate-by').on('change', '.aggregate-by-time-period-selection', function () {
@@ -434,7 +435,10 @@ define(['require', 'log', 'jquery', 'lodash', 'aggregateByTimePeriod', 'querySel
                 $('.define-select').on('click', '.btn-add-user-defined-attribute', function () {
                     self.formUtils.appendUserSelectAttribute();
                     self.formUtils.createAutocomplete($('.attribute-expression-as:last'), selectExpressionMatches);
+                    self.formUtils.initializeNanoScroller();
                 });
+
+                self.formUtils.initializeNanoScroller();
 
                 $(formContainer).on('click', '#btn-submit', function () {
 

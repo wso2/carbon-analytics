@@ -459,7 +459,8 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
                 customizedOptions: customizedOptions
             });
             $('#' + id + '-options-div').html(optionsTemplate);
-            self.changeCustomizedOptDiv(id);;
+            self.changeCustomizedOptDiv(id);
+            self.initializeNanoScroller();
         };
 
         /**
@@ -524,6 +525,7 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
          * @param {String} parameterDiv div to embed the parameters
          */
         FormUtils.prototype.renderParameters = function (parameterArray, id, parameterDiv) {
+            var self = this;
             parameterArray.sort(function (val1, val2) {
                 if (val1.optional && !val2.optional) return 1;
                 else if (!val1.optional && val2.optional) return -1;
@@ -534,6 +536,7 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
                 parameters: parameterArray
             });
             $(parameterDiv).find('.defineFunctionParameters').html(parameterTemplate);
+            self.initializeNanoScroller();
         };
 
         /**
@@ -3126,6 +3129,7 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
          * @function to add event listeners for jstree annotations
          */
         FormUtils.prototype.addEventListenersForJstree = function (tree) {
+            var self = this;
             //to add key-value for annotation node
             $("#btn-add-key-val").on("click", function () {
                 var selectedNode = $("#annotation-div").jstree("get_selected");
@@ -3141,6 +3145,7 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
                 );
                 tree.open_node(selectedNode);
                 tree.deselect_all();
+                self.initializeNanoScroller();
             });
 
             //to add annotation node
@@ -3164,6 +3169,7 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
                 });
                 tree.open_node(selectedNode);
                 tree.deselect_all();
+                self.initializeNanoScroller();
             });
 
             //to delete an annotation or a key-value node
@@ -3171,6 +3177,7 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
                 var selectedNode = $("#annotation-div").jstree("get_selected");
                 tree.delete_node([selectedNode]);
                 tree.deselect_all();
+                self.initializeNanoScroller();
             })
 
             //to edit the selected node
@@ -3222,12 +3229,14 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
                 } else {
                     $('.group-by-content').hide();
                 }
+                self.initializeNanoScroller();
             });
 
             $('.btn-add-group-by-attribute').on('click', function () {
                 self.appendGroupBy(possibleAttributes);
                 self.preventMultipleSelection(Constants.GROUP_BY);
                 self.checkForAttributeLength(possibleAttributes.length, Constants.GROUP_BY);
+                self.initializeNanoScroller();
             });
 
             $('.define-group-by-attributes').on('change', '.group-by-selection', function () {
@@ -3239,6 +3248,7 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
                 $(this).closest('li').remove();
                 self.preventMultipleSelection(Constants.GROUP_BY);
                 self.checkForAttributeLength(possibleAttributes.length, Constants.GROUP_BY);
+                self.initializeNanoScroller();
             });
         };
 
@@ -3246,6 +3256,7 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
          * @function to add event listeners for parameter division
          */
         FormUtils.prototype.addEventListenersForParameterDiv = function () {
+            var self = this;
             //event listener when the parameter checkbox is changed
             $('.defineFunctionParameters').on('change', '.parameter-checkbox', function () {
                 var parameterParent = $(this).parents(".parameter");
@@ -3256,6 +3267,7 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
                     parameterParent.find(".parameter-value").removeClass("required-input-field");
                     parameterParent.find(".error-message").text("");
                 }
+                self.initializeNanoScroller();
             });
         };
 
@@ -3344,6 +3356,7 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
                 if (selectedType === Constants.SORT) {
                     self.showHideOrderForSort();
                 }
+                self.initializeNanoScroller();
             });
         };
 
@@ -3367,6 +3380,7 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
          * @function to add event listeners for the attribute selection(projection) division
          */
         FormUtils.prototype.addEventListenersForSelectionDiv = function () {
+            var self = this;
             $('.define-select').on('change', '.attribute-selection-type', function () {
                 $('.attribute-selection-type').next('.error-message').hide();
                 if ($(this).val() === Constants.TYPE_USER_DEFINED) {
@@ -3374,10 +3388,12 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
                 } else {
                     $('.define-user-defined-attributes').hide();
                 }
+                self.initializeNanoScroller();
             });
 
             $('.define-select').on('click', '.btn-del-option', function () {
                 $(this).closest('li').remove();
+                self.initializeNanoScroller();
             });
         };
 
@@ -3393,6 +3409,7 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
                 } else {
                     $('.order-by-content').hide();
                 }
+                self.initializeNanoScroller();
             });
 
             $('.define-order-by-attributes').on('change', '.order-by-selection', function () {
@@ -3404,12 +3421,14 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
                 $(this).closest('li').remove();
                 self.preventMultipleSelection(Constants.ORDER_BY);
                 self.checkForAttributeLength(possibleAttributes.length, Constants.ORDER_BY);
+                self.initializeNanoScroller();
             });
 
             $('.btn-add-order-by-attribute').on('click', function () {
                 self.appendOrderBy(possibleAttributes);
                 self.preventMultipleSelection(Constants.ORDER_BY);
                 self.checkForAttributeLength(possibleAttributes.length, Constants.ORDER_BY);
+                self.initializeNanoScroller();
             });
         };
 
@@ -3430,6 +3449,7 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
                     $(sourceDiv).find('.define-stream-handler-section').hide();
                     $(sourceDiv).find('.define-stream-handler-buttons').hide();
                 }
+                self.initializeNanoScroller();
             });
 
             //on change of window type
@@ -3531,6 +3551,7 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
                 self.changeAttributeNavigation($(sourceDiv).find('.stream-handler-list'));
                 self.removeNavigationForWindow(sourceDiv)
                 self.showHideStreamHandlerWindowButton(sourceDiv)
+                self.initializeNanoScroller();
             });
 
             //To reorder up the stream-handler
@@ -3624,6 +3645,7 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
             self.removeNavigationForWindow(sourceDiv)
             self.showHideStreamHandlerWindowButton(sourceDiv)
             streamHandlerType[0].scrollIntoView();
+            self.initializeNanoScroller();
         };
 
         /**
@@ -3722,12 +3744,14 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
             $("#define-attribute").on('click', '#btn-add-attribute', function () {
                 $("#attribute-div").append(self.addAttribute());
                 self.changeAttributeNavigation('#attribute-div');
+                self.initializeNanoScroller();
             });
 
             //To delete attribute
             $("#define-attribute").on('click', '#attribute-div .btn-del-attr', function () {
                 $(this).closest('li').remove();
                 self.changeAttributeNavigation('#attribute-div');
+                self.initializeNanoScroller();
             });
 
             //To reorder up the attribute
@@ -3780,6 +3804,7 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
                     optionParent.find(".option-value").removeClass("required-input-field");
                     optionParent.find(".error-message").text("");
                 }
+                self.initializeNanoScroller();
             });
 
             //To add customized option
@@ -3793,12 +3818,14 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
                     '<label class = "error-message"></label></li>';
                 $('#customized-' + id + '-options .cust-options').append(custOptDiv);
                 self.changeCustomizedOptDiv(id);
+                self.initializeNanoScroller();
             });
 
             //To delete customized option
             $('#' + id + '-options-div').on('click', '.btn-del-option', function () {
                 $(this).closest('li').remove();
                 self.changeCustomizedOptDiv(id);
+                self.initializeNanoScroller();
             });
         };
 
@@ -3806,7 +3833,7 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
          * @function to add event listeners for the primary index annotation div
          */
         FormUtils.prototype.addEventListenerForPrimaryIndexAnnotationDiv = function () {
-
+            var self = this;
             //To add annotation value
             $('#primary-index-annotations').on('click', '.btn-add-annot-value', function () {
                 $(this).parents(".annotation").find("ul").append
@@ -3814,11 +3841,13 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
                         '<input type = "text" value = "" class = "annotation-value"/> ' +
                         '<a class = "btn-del-annot-value"> <i class = "fw fw-delete"> </i> </a> </div> ' +
                         '<label class="error-message"></label> </li>');
+                self.initializeNanoScroller();
             });
 
             //To delete annotation value
             $('#primary-index-annotations').on('click', '.btn-del-annot-value', function () {
                 $(this).closest('li').remove();
+                self.initializeNanoScroller();
             });
 
             // To show the values of the primaryKey and index annotations on change of the checkbox
@@ -3831,6 +3860,7 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
                     parent.find('.error-message').text("");
                     parent.find('.annotation-value').removeClass('required-input-field')
                 }
+                self.initializeNanoScroller();
             });
         };
 
@@ -3838,6 +3868,7 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
          * @function to add event listeners for the predefined annotations
          */
         FormUtils.prototype.addEventListenersForPredefinedAnnotations = function () {
+            var self = this;
             $('.define-predefined-annotations').on('change', '.annotation-checkbox', function () {
                 var parent = $(this).closest(".predefined-annotation");
                 if ($(this).is(':checked')) {
@@ -3847,6 +3878,7 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
                     parent.find('.error-message').text("");
                     parent.find('.option-value').removeClass('required-input-field')
                 }
+                self.initializeNanoScroller();
             });
         };
 
@@ -3979,6 +4011,10 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
         FormUtils.prototype.popUpSelectedElement = function (id) {
             $('#' + id).addClass('selected-element');
             $(".overlayed-container").fadeTo(200, 1);
+        };
+
+        FormUtils.prototype.initializeNanoScroller = function () {
+            $('.nano').nanoScroller();
         };
 
         /**

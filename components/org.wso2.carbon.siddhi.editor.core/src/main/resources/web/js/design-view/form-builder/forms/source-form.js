@@ -271,6 +271,8 @@ define(['log', 'jquery', 'lodash', 'sourceOrSinkAnnotation', 'mapAnnotation', 'p
                     }
                 }
 
+                self.formUtils.initializeNanoScroller();
+
                 //onclick of submit
                 $(formContainer).on('click', '#btn-submit', function () {
 

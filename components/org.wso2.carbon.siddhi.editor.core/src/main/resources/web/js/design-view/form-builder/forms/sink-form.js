@@ -313,6 +313,8 @@ define(['log', 'jquery', 'lodash', 'mapAnnotation', 'payloadOrAttribute', 'jsonV
                     }
                 }
 
+                self.formUtils.initializeNanoScroller();
+
                 //onclick of submit
                 $(formContainer).on('click', '#btn-submit', function () {
 
