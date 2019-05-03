@@ -179,6 +179,7 @@ define(['log', 'jquery', 'lodash', 'sourceOrSinkAnnotation', 'mapAnnotation', 'p
                     } else {
                         $('#attribute-map-content').hide();
                     }
+                    self.formUtils.initializeNanoScroller();
                 });
 
                 //get the clicked element's information

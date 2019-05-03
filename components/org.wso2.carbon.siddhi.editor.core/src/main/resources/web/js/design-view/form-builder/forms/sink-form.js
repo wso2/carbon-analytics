@@ -192,6 +192,7 @@ define(['log', 'jquery', 'lodash', 'mapAnnotation', 'payloadOrAttribute', 'jsonV
                         $('#attribute-map-content').hide();
                         $("#define-attribute #attributeMap-type").prop('disabled', 'disabled');
                     }
+                    self.formUtils.initializeNanoScroller();
                 });
 
                 //onchange of the sink-type selection
@@ -253,6 +254,7 @@ define(['log', 'jquery', 'lodash', 'mapAnnotation', 'payloadOrAttribute', 'jsonV
                         ' <input type = "text" value = "" class = "attr-value"/>' +
                         '</div> <label class = "error-message"></label> </div>';
                     $('#attribute-map-content').find('#attributes').append(payloadMapDiv);
+                    self.formUtils.initializeNanoScroller();
                 });
 
                 //get the clicked element's information
