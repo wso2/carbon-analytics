@@ -23,6 +23,13 @@ define(['jquery', 'lodash', 'log', 'handlebar', 'designViewUtils', 'app/source-e
          *
          * @param callback Callback function
          */
+
+        var constants = {
+            STORE: 'store',
+            SINK: 'sink',
+            SOURCE : 'source'
+        };
+
         var loadOperators = function(callback) {
             var data = CompletionEngine.getRawMetadata();
             // Flatten operator metadata into an array.
@@ -45,15 +52,30 @@ define(['jquery', 'lodash', 'log', 'handlebar', 'designViewUtils', 'app/source-e
          */
         var buildSyntax = function (entry) {
             var params = '';
+            var isStoreSinkSourceGeneration = false;
+            if (entry.namespace.toLowerCase() === constants.STORE || entry.namespace.toLowerCase() === constants.SINK ||
+                entry.namespace.toLowerCase() === constants.SOURCE) {
+                isStoreSinkSourceGeneration = true;
+            }
             if (entry.parameters) {
                 entry.parameters.forEach(function (p) {
                     if (!p.optional) {
-                        params += ', ' + p.name;
+                        if (isStoreSinkSourceGeneration) {
+                            params += ", " + p.name + "=" + "\'option_value\'";
+                        } else {
+                            params += ', ' + p.name;
+                        }
                     }
                 });
             }
-            return (entry.namespace.length > 0 ? entry.namespace + ':' : '') + entry.name
-                + '(' + params.substr(2) + ')';
+            if (isStoreSinkSourceGeneration) {
+                return (entry.namespace.length > 0 ? "@" + entry.namespace + "(type=" + "\'" + entry.name + "\'" +
+                    params + ")" : "")
+            } else {
+                return (entry.namespace.length > 0 ? entry.namespace + ':' : '') + entry.name
+                    + '(' + params.substr(2) + ')';
+            }
+
         };
 
         /**
