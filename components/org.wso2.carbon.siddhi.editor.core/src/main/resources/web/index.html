@@ -1553,129 +1553,121 @@
 </script>
 
 <script id="aggregation-form-template" type = "text/template">
-    <div class="clearfix">
-        <div class = "aggregation-form-container">
-            <h3> Aggregation Meta Information </h3>
-                <div id="aggregation-name-div" class="aggregation-info">
-                    <label> <span class="mandatory-symbol"> * </span> Name </label>
-                    <input type="text" id="aggregationName" class="clearfix name" value="{{name}}">
-                    <label class="error-message" id="aggregationNameErrorMessage"> </label>
-                </div>
-                <div id="aggregation-from-div" class="aggregation-info">
-                    <label> From </label>
-                    <input id="aggregation-from" class="clearfix name" value="{{from}}" readonly>
-                </div>
-                <div id="define-aggregate-annotations">
-                    <h4> Annotations </h4>
-                    <div class="define-store-annotation">
-                        <label><input type = "checkbox" class="store-annotation-checkbox"> @store </label>
-                        <div class = "store-content">
-                            <div id="define-store"> </div>
-                            <div id = "define-rdbms-type"> </div>
-                            <div id ="store-options-div"> </div>
-                        </div>
+    <div class = "aggregation-form-container">
+        <h3> Aggregation Meta Information </h3>
+            <div id="aggregation-name-div" class="aggregation-info">
+                <label> <span class="mandatory-symbol"> * </span> Name </label>
+                <input type="text" id="aggregationName" class="clearfix name" value="{{name}}">
+                <label class="error-message" id="aggregationNameErrorMessage"> </label>
+            </div>
+            <div id="aggregation-from-div" class="aggregation-info">
+                <label> From </label>
+                <input id="aggregation-from" class="clearfix name" value="{{from}}" readonly>
+            </div>
+            <div id="define-aggregate-annotations">
+                <h4> Annotations </h4>
+                <div class="define-store-annotation">
+                    <label><input type = "checkbox" class="store-annotation-checkbox"> @store </label>
+                    <div class = "store-content">
+                        <div id="define-store"> </div>
+                        <div id = "define-rdbms-type"> </div>
+                        <div id ="store-options-div"> </div>
                     </div>
-                    <div class="define-index-annotation"> </div>
-                    <div class ="define-predefined-aggregation-annotation"> </div>
-                    <div class="define-user-defined-annotations"> </div>
                 </div>
-        </div>
-        <div class = "aggregation-form-container">
-            <h3> Projection </h3>
-            <div class = "define-select"> </div>
-            <div class="define-group-by-attributes"> </div>
-        </div>
+                <div class="define-index-annotation"> </div>
+                <div class ="define-predefined-aggregation-annotation"> </div>
+                <div class="define-user-defined-annotations"> </div>
+            </div>
     </div>
-    <div class="clearfix">
-        <div class = "aggregation-form-container">
-            <div id = "define-aggregate-by">
-                <h3> Aggregation Criteria </h3>
-                <div id ="aggregate-by-time-period" class="aggregate-by-content">
-                    <h4> <span class="mandatory-symbol"> * </span> By Time Period </h4>
-                    <select class="aggregate-by-time-period-selection">
-                        <option value="interval"> Interval </option>
-                        <option value="range"> Range </option>
-                    </select>
+    <div class = "aggregation-form-container">
+        <h3> Projection </h3>
+        <div class = "define-select"> </div>
+        <div class="define-group-by-attributes"> </div>
+    </div>
+    <div class = "aggregation-form-container">
+        <div id = "define-aggregate-by">
+            <h3> Aggregation Criteria </h3>
+            <div id ="aggregate-by-time-period" class="aggregate-by-content">
+                <h4> <span class="mandatory-symbol"> * </span> By Time Period </h4>
+                <select class="aggregate-by-time-period-selection">
+                    <option value="interval"> Interval </option>
+                    <option value="range"> Range </option>
+                </select>
+            </div>
+            <div class="aggregate-by-time-period-content"> </div>
+            <div id="aggregate-by-attribute" class="aggregate-by-content">
+                <div class="clearfix">
+                    <label>
+                        <input type = "checkbox" id="aggregate-by-attribute-checkbox"> By Attribute
+                    </label>
+                    <i class = "fw fw-info">
+                        <span style = "display:none"> Attribute of timestamp is required </span>
+                    </i>
                 </div>
-                <div class="aggregate-by-time-period-content"> </div>
-                <div id="aggregate-by-attribute" class="aggregate-by-content">
-                    <div class="clearfix">
-                        <label>
-                            <input type = "checkbox" id="aggregate-by-attribute-checkbox"> By Attribute
-                        </label>
-                        <i class = "fw fw-info">
-                            <span style = "display:none"> Attribute of timestamp is required </span>
-                        </i>
-                    </div>
-                    <div class="aggregate-by-attribute-content clearfix">
-                        <label class="clearfix"> Attribute Name </label>
-                    </div>
-                    <label class="error-message"> </label>
+                <div class="aggregate-by-attribute-content clearfix">
+                    <label class="clearfix"> Attribute Name </label>
                 </div>
+                <label class="error-message"> </label>
             </div>
         </div>
     </div>
 </script>
 
 <script id="join-query-form-template" type = "text/template">
-    <div class="clearfix">
-        <div class = "join-query-form-container">
-            <h3> Query Meta Information </h3>
-            <div class="query-name-div">
-                <label> Name </label>
-                <input type="text"  class="clearfix query-name name" value="{{name}}">
-                <label class="error-message"> </label>
-            </div>
-            <div class ="define-annotations">
-                <h4> Annotations </h4>
-                <div class ="define-predefined-annotations"> </div>
-                <div class="define-user-defined-annotations"></div>
-            </div>
+    <div class = "join-query-form-container">
+        <h3> Query Meta Information </h3>
+        <div class="query-name-div">
+            <label> Name </label>
+            <input type="text"  class="clearfix query-name name" value="{{name}}">
+            <label class="error-message"> </label>
         </div>
-        <div class = "join-query-form-container">
-            <h3> Input </h3>
-            <div class="query-input-container">
-                <div class="define-left-source define-source"></div>
-                <div class="define-join-type">
-                    <div class="join-type-div">
-                        <label class="clearfix"> Join Type </label>
-                        <div class="define-join-type-selection clearfix"> </div>
-                        <label class="error-message"> Value is required </label>
-                    </div>
-                </div>
-                <div class="define-right-source define-source"></div>
-                <div class="define-on-condition define-content">
-                    <label>
-                        <input type="checkbox" class="on-condition-checkbox query-checkbox"> On Condition
-                    </label>
-                    <div class="on-condition-content query-content">
-                        <input type="text"  class="clearfix name on-condition-value query-content-value symbol-syntax-required-value">
-                        <label class="error-message"> </label>
-                    </div>
-                </div>
-                <div class="define-aggregate-per-within-condition"> </div>
-            </div>
+        <div class ="define-annotations">
+            <h4> Annotations </h4>
+            <div class ="define-predefined-annotations"> </div>
+            <div class="define-user-defined-annotations"></div>
         </div>
     </div>
-    <div class="clearfix">
-        <div class = "join-query-form-container">
-            <h3> Projection </h3>
-            <div class = "define-select"> </div>
-            <div class="define-group-by-attributes"> </div>
-            <div class="define-having-condition define-content">
+    <div class = "join-query-form-container">
+        <h3> Input </h3>
+        <div class="query-input-container">
+            <div class="define-left-source define-source"></div>
+            <div class="define-join-type">
+                <div class="join-type-div">
+                    <label class="clearfix"> Join Type </label>
+                    <div class="define-join-type-selection clearfix"> </div>
+                    <label class="error-message"> Value is required </label>
+                </div>
+            </div>
+            <div class="define-right-source define-source"></div>
+            <div class="define-on-condition define-content">
                 <label>
-                    <input type="checkbox" class="having-checkbox query-checkbox"> Having condition
+                    <input type="checkbox" class="on-condition-checkbox query-checkbox"> On Condition
                 </label>
-                <div class="having-condition-content query-content">
-                    <input type="text"
-                           class="clearfix having-value query-content-value name symbol-syntax-required-value">
+                <div class="on-condition-content query-content">
+                    <input type="text"  class="clearfix name on-condition-value query-content-value symbol-syntax-required-value">
                     <label class="error-message"> </label>
                 </div>
             </div>
+            <div class="define-aggregate-per-within-condition"> </div>
         </div>
-        <div class="join-query-form-container">
-            <div class="define-query-output"> </div>
+    </div>
+    <div class = "join-query-form-container">
+        <h3> Projection </h3>
+        <div class = "define-select"> </div>
+        <div class="define-group-by-attributes"> </div>
+        <div class="define-having-condition define-content">
+            <label>
+                <input type="checkbox" class="having-checkbox query-checkbox"> Having condition
+            </label>
+            <div class="having-condition-content query-content">
+                <input type="text"
+                       class="clearfix having-value query-content-value name symbol-syntax-required-value">
+                <label class="error-message"> </label>
+            </div>
         </div>
+    </div>
+    <div class="join-query-form-container">
+        <div class="define-query-output"> </div>
     </div>
 </script>
 
@@ -1782,59 +1774,55 @@
 </script>
 
 <script id="pattern-sequence-query-form-template" type = "text/template">
-    <div class="clearfix">
-        <div class="pattern-sequence-query-form-container">
-            <h3> Query Meta Information</h3>
-            <div class="query-name-div">
-                <label> Name </label>
-                <input type="text"  class="clearfix query-name name" value="{{name}}">
-                <label class="error-message"> </label>
-            </div>
-            <div class ="define-annotations">
-                <h4> Annotations </h4>
-                <div class ="define-predefined-annotations"> </div>
-                <div class="define-user-defined-annotations"></div>
-            </div>
+    <div class="pattern-sequence-query-form-container">
+        <h3> Query Meta Information</h3>
+        <div class="query-name-div">
+            <label> Name </label>
+            <input type="text"  class="clearfix query-name name" value="{{name}}">
+            <label class="error-message"> </label>
         </div>
-        <div class="pattern-sequence-query-form-container">
-            <h3> Input </h3>
-            <div class="input-container">
-                <div class="define-conditions">
-                    <label class="clearfix"> <span class="mandatory-symbol"> * </span> Conditions </label>
-                    <div class="condition-container">
-                        <ul class="nav nav-tabs"> </ul>
-                        <div class="tab-content"> </div>
-                    </div>
+        <div class ="define-annotations">
+            <h4> Annotations </h4>
+            <div class ="define-predefined-annotations"> </div>
+            <div class="define-user-defined-annotations"></div>
+        </div>
+    </div>
+    <div class="pattern-sequence-query-form-container">
+        <h3> Input </h3>
+        <div class="input-container">
+            <div class="define-conditions">
+                <label class="clearfix"> <span class="mandatory-symbol"> * </span> Conditions </label>
+                <div class="condition-container">
+                    <ul class="nav nav-tabs"> </ul>
+                    <div class="tab-content"> </div>
                 </div>
-                <div class="define-logic-statement define-content">
-                    <label class="clearfix"> <span class="mandatory-symbol"> * </span> Logic Statement </label>
-                    <div class="query-content">
-                        <input type="text" class="clearfix logic-statement name">
-                        <label class="error-message"> </label>
-                    </div>
+            </div>
+            <div class="define-logic-statement define-content">
+                <label class="clearfix"> <span class="mandatory-symbol"> * </span> Logic Statement </label>
+                <div class="query-content">
+                    <input type="text" class="clearfix logic-statement name">
+                    <label class="error-message"> </label>
                 </div>
             </div>
         </div>
     </div>
-    <div class="clearfix">
-        <div class = "pattern-sequence-query-form-container">
-            <h3> Projection </h3>
-                <div class = "define-select"> </div>
-                <div class="define-group-by-attributes"> </div>
-                <div class="define-having-condition define-content">
-                    <label>
-                        <input type="checkbox" class="having-checkbox query-checkbox"> Having condition
-                    </label>
-                    <div class="having-condition-content query-content">
-                        <input type="text"
-                               class="clearfix having-value query-content-value name symbol-syntax-required-value">
-                        <label class="error-message"> </label>
-                    </div>
+    <div class = "pattern-sequence-query-form-container">
+        <h3> Projection </h3>
+            <div class = "define-select"> </div>
+            <div class="define-group-by-attributes"> </div>
+            <div class="define-having-condition define-content">
+                <label>
+                    <input type="checkbox" class="having-checkbox query-checkbox"> Having condition
+                </label>
+                <div class="having-condition-content query-content">
+                    <input type="text"
+                           class="clearfix having-value query-content-value name symbol-syntax-required-value">
+                    <label class="error-message"> </label>
                 </div>
-        </div>
-        <div class="pattern-sequence-query-form-container">
-            <div class="define-query-output"> </div>
-        </div>
+            </div>
+    </div>
+    <div class="pattern-sequence-query-form-container">
+        <div class="define-query-output"> </div>
     </div>
 </script>
 
@@ -1897,55 +1885,51 @@
 </script>
 
 <script id = "window-filter-projection-query-form-template" type="text/template">
-    <div class="clearfix">
-        <div class="query-form-container">
-            <h3> Query Meta Information </h3>
-            <div class="query-name-div">
-                <label> Name </label>
-                <input type="text"  class="clearfix query-name name" value="{{name}}">
-                <label class="error-message"> </label>
-            </div>
-            <div class="query-from-div">
-                <label> From </label>
-                <input class="clearfix name query-from" value="{{from}}" readonly>
-            </div>
-            <div class="define-query-source define-source">
-                <div class="define-stream-handler">
-                    <label> <input type="checkbox" class="stream-handler-checkbox"> Stream Handler </label>
-                    <div class="define-stream-handler-section"> </div>
-                    <div class = "define-stream-handler-buttons">
-                        <button class="btn btn-default btn-add-filter"> + Filter </button>
-                        <button class="btn btn-default btn-add-function"> + Function </button>
-                        <button class="btn btn-default btn-add-window"> + Window </button>
-                    </div>
+    <div class="query-form-container">
+        <h3> Query Meta Information </h3>
+        <div class="query-name-div">
+            <label> Name </label>
+            <input type="text"  class="clearfix query-name name" value="{{name}}">
+            <label class="error-message"> </label>
+        </div>
+        <div class="query-from-div">
+            <label> From </label>
+            <input class="clearfix name query-from" value="{{from}}" readonly>
+        </div>
+        <div class="define-query-source define-source">
+            <div class="define-stream-handler">
+                <label> <input type="checkbox" class="stream-handler-checkbox"> Stream Handler </label>
+                <div class="define-stream-handler-section"> </div>
+                <div class = "define-stream-handler-buttons">
+                    <button class="btn btn-default btn-add-filter"> + Filter </button>
+                    <button class="btn btn-default btn-add-function"> + Function </button>
+                    <button class="btn btn-default btn-add-window"> + Window </button>
                 </div>
-            </div>
-            <div class ="define-annotations">
-                <h4> Annotations </h4>
-                <div class ="define-predefined-annotations"> </div>
-                <div class="define-user-defined-annotations"></div>
             </div>
         </div>
-        <div class="query-form-container">
-            <h3> Projection </h3>
-            <div class = "define-select"> </div>
-            <div class="define-group-by-attributes"> </div>
-            <div class="define-having-condition define-content">
-                <label>
-                    <input type="checkbox" class="having-checkbox query-checkbox"> Having condition
-                </label>
-                <div class="having-condition-content query-content">
-                    <input type="text"
-                           class="clearfix having-value query-content-value name symbol-syntax-required-value">
-                    <label class="error-message"> </label>
-                </div>
+        <div class ="define-annotations">
+            <h4> Annotations </h4>
+            <div class ="define-predefined-annotations"> </div>
+            <div class="define-user-defined-annotations"></div>
+        </div>
+    </div>
+    <div class="query-form-container">
+        <h3> Projection </h3>
+        <div class = "define-select"> </div>
+        <div class="define-group-by-attributes"> </div>
+        <div class="define-having-condition define-content">
+            <label>
+                <input type="checkbox" class="having-checkbox query-checkbox"> Having condition
+            </label>
+            <div class="having-condition-content query-content">
+                <input type="text"
+                       class="clearfix having-value query-content-value name symbol-syntax-required-value">
+                <label class="error-message"> </label>
             </div>
         </div>
     </div>
-    <div class="clearfix">
-        <div class="query-form-container">
-            <div class="define-query-output"> </div>
-        </div>
+    <div class="query-form-container">
+        <div class="define-query-output"> </div>
     </div>
 </script>
 
