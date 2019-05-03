@@ -17,9 +17,9 @@
  */
 
 define(['require', 'log', 'jquery', 'lodash', 'aggregateByTimePeriod', 'querySelect',
-    'elementUtils', 'storeAnnotation', 'designViewUtils', 'jsonValidator', 'constants', 'handlebar'],
+        'elementUtils', 'storeAnnotation', 'designViewUtils', 'jsonValidator', 'constants', 'handlebar'],
     function (require, log, $, _, AggregateByTimePeriod, QuerySelect, ElementUtils,
-        StoreAnnotation, DesignViewUtils, JSONValidator, Constants, Handlebars) {
+              StoreAnnotation, DesignViewUtils, JSONValidator, Constants, Handlebars) {
 
         /**
          * @class AggregationForm Creates a forms to collect data from a aggregation
@@ -273,7 +273,7 @@ define(['require', 'log', 'jquery', 'lodash', 'aggregateByTimePeriod', 'querySel
 
                 //render the aggregation form template
                 var aggregationFormTemplate = Handlebars.compile($('#aggregation-form-template').html())
-                    ({ name: name, from: connectedSource });
+                ({ name: name, from: connectedSource });
                 $('#define-aggregation').html(aggregationFormTemplate);
 
                 self.formUtils.addEventListenerToRemoveRequiredClass();
@@ -351,6 +351,7 @@ define(['require', 'log', 'jquery', 'lodash', 'aggregateByTimePeriod', 'querySel
                     } else {
                         $('.aggregate-by-attribute-content').hide();
                     }
+                    self.formUtils.initializeNanoScroller();
                 });
 
                 $('#define-aggregate-by').on('change', '.aggregate-by-time-period-selection', function () {
@@ -434,7 +435,10 @@ define(['require', 'log', 'jquery', 'lodash', 'aggregateByTimePeriod', 'querySel
                 $('.define-select').on('click', '.btn-add-user-defined-attribute', function () {
                     self.formUtils.appendUserSelectAttribute();
                     self.formUtils.createAutocomplete($('.attribute-expression-as:last'), selectExpressionMatches);
+                    self.formUtils.initializeNanoScroller();
                 });
+
+                self.formUtils.initializeNanoScroller();
 
                 $(formContainer).on('click', '#btn-submit', function () {
 

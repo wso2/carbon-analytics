@@ -17,7 +17,7 @@
  */
 
 define(['log', 'jquery', 'lodash', 'attribute', 'storeAnnotation', 'handlebar', 'annotationObject', 'annotationElement',
-    'constants'],
+        'constants'],
     function (log, $, _, Attribute, StoreAnnotation, Handlebars, AnnotationObject, AnnotationElement, Constants) {
 
         /**
@@ -148,6 +148,8 @@ define(['log', 'jquery', 'lodash', 'attribute', 'storeAnnotation', 'handlebar', 
                 $('#define-store #store-type').val(Constants.DEFAULT_STORE_TYPE);
                 $('.define-predefined-annotations').hide();
             }
+
+            self.formUtils.initializeNanoScroller();
 
             // 'Submit' button action
             $(formContainer).on('click', '#btn-submit', function () {

@@ -134,6 +134,8 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'constants'],
                 }
             });
 
+            self.formUtils.initializeNanoScroller();
+
             // 'Submit' button action
             $(formContainer).on('click', '#btn-submit', function () {
 

@@ -17,11 +17,11 @@
  */
 
 define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annotationObject', 'annotationElement',
-    'designViewUtils', 'queryWindowOrFunction', 'streamHandler', 'patternOrSequenceQueryCondition', 'queryOutputInsert',
-    'queryOutputDelete', 'queryOutputUpdate', 'queryOutputUpdateOrInsertInto'],
+        'designViewUtils', 'queryWindowOrFunction', 'streamHandler', 'patternOrSequenceQueryCondition', 'queryOutputInsert',
+        'queryOutputDelete', 'queryOutputUpdate', 'queryOutputUpdateOrInsertInto'],
     function (require, _, AppData, log, Constants, Handlebars, AnnotationObject, AnnotationElement, DesignViewUtils,
-        QueryWindowOrFunction, StreamHandler, PatternOrSequenceQueryCondition, QueryOutputInsert, QueryOutputDelete,
-        QueryOutputUpdate, QueryOutputUpdateOrInsertInto) {
+              QueryWindowOrFunction, StreamHandler, PatternOrSequenceQueryCondition, QueryOutputInsert, QueryOutputDelete,
+              QueryOutputUpdate, QueryOutputUpdateOrInsertInto) {
 
         /**
          * @class FormUtils Contains utility methods for forms
@@ -95,7 +95,7 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
          * @return {boolean}
          */
         FormUtils.prototype.isStreamDefinitionNameUsedInPartition = function (partitionId, elementName,
-            skipElementID) {
+                                                                              skipElementID) {
             var self = this;
             var isNameUsed = false;
             var partition = self.configurationData.getSiddhiAppConfig().getPartition(partitionId);
@@ -234,8 +234,8 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
         };
 
         /**
-		 * @function to add a default type to the predefined array
-		 */
+         * @function to add a default type to the predefined array
+         */
         FormUtils.prototype.addCustomizedType = function (predefinedFunctions, typeToBeAdded) {
             var customizedType = {
                 name: typeToBeAdded,
@@ -307,7 +307,7 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
             var self = this;
             var outputConfig = self.configurationData.application.config.query_output_options;
             var queryOutputTemplate = Handlebars.compile($('#query-output-template').html())
-                ({ into: outputElement.element.name, outputConfig: outputConfig });
+            ({ into: outputElement.element.name, outputConfig: outputConfig });
             $('.define-query-output').html(queryOutputTemplate);
             self.renderQueryOperation(outputElement, queryOutput);
         };
@@ -377,7 +377,7 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
          */
         FormUtils.prototype.renderSourceSinkStoreTypeDropDown = function (id, predefinedTypes) {
             var selectionFormTemplate = Handlebars.compile($('#type-selection-form-template').html())
-                ({ id: id, types: predefinedTypes });
+            ({ id: id, types: predefinedTypes });
             $('#define-' + id).html(selectionFormTemplate);
         };
 
@@ -432,11 +432,11 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
         FormUtils.prototype.renderMap = function (predefinedMaps) {
             if (!$.trim($('#define-map').html()).length) {
                 var mapFormTemplate = Handlebars.compile($('#type-selection-form-template').html())
-                    ({ id: "map", types: predefinedMaps });
+                ({ id: "map", types: predefinedMaps });
                 $('#define-map').html(mapFormTemplate);
                 $('#define-map #map-type').val('passThrough');
                 $('#define-map #map-type option:contains("' + Constants.DEFAULT_MAPPER_TYPE + '")').
-                    text('passThrough (default)');
+                text('passThrough (default)');
             }
         };
 
@@ -459,7 +459,8 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
                 customizedOptions: customizedOptions
             });
             $('#' + id + '-options-div').html(optionsTemplate);
-            self.changeCustomizedOptDiv(id);;
+            self.changeCustomizedOptDiv(id);
+            self.initializeNanoScroller();
         };
 
         /**
@@ -513,7 +514,7 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
          */
         FormUtils.prototype.renderFunctions = function (predefinedFunctions, className, id) {
             var windowFunctionNameTemplate = Handlebars.compile($('#type-selection-form-template').html())
-                ({ id: id, types: predefinedFunctions });
+            ({ id: id, types: predefinedFunctions });
             $(className).find('.defineFunctionName').html(windowFunctionNameTemplate);
         };
 
@@ -524,6 +525,7 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
          * @param {String} parameterDiv div to embed the parameters
          */
         FormUtils.prototype.renderParameters = function (parameterArray, id, parameterDiv) {
+            var self = this;
             parameterArray.sort(function (val1, val2) {
                 if (val1.optional && !val2.optional) return 1;
                 else if (!val1.optional && val2.optional) return -1;
@@ -534,6 +536,7 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
                 parameters: parameterArray
             });
             $(parameterDiv).find('.defineFunctionParameters').html(parameterTemplate);
+            self.initializeNanoScroller();
         };
 
         /**
@@ -620,7 +623,7 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
         FormUtils.prototype.renderPrimaryIndexAnnotations = function (primaryIndexAnnotations, className) {
             var self = this;
             var annotationFormTemplate = Handlebars.compile($('#primary-index-annotation-template').html())
-                (primaryIndexAnnotations);
+            (primaryIndexAnnotations);
             $('.' + className).html(annotationFormTemplate);
             self.removeDeleteButtonOfPrimaryIndexAnnotationValue();
             self.addEventListenerForPrimaryIndexAnnotationDiv();
@@ -633,7 +636,7 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
             var raw_partial = document.getElementById('recursive-predefined-annotation-partial').innerHTML;
             Handlebars.registerPartial('recursive-predefined-annotation', raw_partial);
             var annotationFormTemplate = Handlebars.compile($('#predefined-annotation-form-template').html())
-                (predefinedAnnotations);
+            (predefinedAnnotations);
             $('.' + className).html(annotationFormTemplate);
         };
 
@@ -972,7 +975,7 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
                     rdbmsOptions.push({
                         name: inlineConfigOption.name, value: savedOption.value, description: inlineConfigOption
                             .description, optional: inlineConfigOption.optional, defaultValue: inlineConfigOption
-                                .defaultValue
+                            .defaultValue
                     });
                 });
             } else {
@@ -1430,7 +1433,7 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
                 if (annotation.parameters) {
                     if (annotation.optional) {
                         annotationCheckbox = $('#' + annotation.name + '-annotation').find('.annotation-checkbox').
-                            first();
+                        first();
                         if (annotationCheckbox.is(':checked') && !annotationCheckbox.is(':disabled')) {
                             isCheckOptions = true;
                         }
@@ -1641,7 +1644,7 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
             }
             if (!Constants.ALPHABETIC_VALIDATOR_REGEX.test(name.charAt(0))) {
                 errorMessageLabel.text
-                    (self.capitalizeFirstLetter(type) + " name must start with an alphabetical character.");
+                (self.capitalizeFirstLetter(type) + " name must start with an alphabetical character.");
                 self.addErrorClass(id);
                 return true;
             }
@@ -1979,7 +1982,7 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
                     }
                 } else {
                     if (($('#attribute-parameter').find('.parameter-checkbox').is(":checked")) && ($
-                        ('#order-parameter').find('.parameter-checkbox').is(":checked"))) {
+                    ('#order-parameter').find('.parameter-checkbox').is(":checked"))) {
                         parameterValue = "'" + parameterValue + "'";
                         parameterValues.push(parameterValue)
                     }
@@ -2107,7 +2110,7 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
             var isBuildAnnotation = false;
             if (annotation.optional) {
                 annotationCheckbox = $('#' + annotation.name + '-annotation').find('.annotation-checkbox').
-                    first();
+                first();
                 if (annotationCheckbox.is(':checked') && !annotationCheckbox.is(':disabled')) {
                     isBuildAnnotation = true;
                 }
@@ -2122,7 +2125,7 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
          */
         var predefinedAnnotationString = "";
         FormUtils.prototype.buildPredefinedAnnotations = function (predefinedAnnotations, annotationStringList,
-            annotationObjectList) {
+                                                                   annotationObjectList) {
             var self = this;
             _.forEach(predefinedAnnotations, function (annotation) {
                 if (self.isBuildAnnotation(annotation)) {
@@ -2222,9 +2225,9 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
                 _.forEach(conditionList, function (condition) {
                     //select the stream name
                     $('.define-' + condition.conditionId + '-source').find('.define-stream select option').filter
-                        (function () {
-                            return ($(this).val() == condition.streamName);
-                        }).prop('selected', true);
+                    (function () {
+                        return ($(this).val() == condition.streamName);
+                    }).prop('selected', true);
 
                     //render and map stream handler
                     self.renderStreamHandler(condition.conditionId, condition, streamHandlerTypes)
@@ -2284,12 +2287,12 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
                 $(div).find('.filter-condition-content').val(streamHandler.value)
             } else if (type === Constants.WINDOW) {
                 var predefinedWindowFunctions = _.orderBy(JSON.parse(JSON.stringify
-                    (self.configurationData.rawExtensions["windowFunctionNames"]), ['name'], ['asc']));
+                (self.configurationData.rawExtensions["windowFunctionNames"]), ['name'], ['asc']));
                 self.renderFunctions(predefinedWindowFunctions, div, Constants.WINDOW);
                 self.mapStreamHandlerWindow(div, predefinedWindowFunctions, streamHandler);
             } else if (type === Constants.FUNCTION) {
                 var predefinedStreamFunctions = _.orderBy(JSON.parse(JSON.stringify
-                    (self.configurationData.rawExtensions["streamFunctions"]), ['name'], ['asc']));
+                (self.configurationData.rawExtensions["streamFunctions"]), ['name'], ['asc']));
                 self.renderFunctions(predefinedStreamFunctions, div, Constants.STREAM_FUNCTION);
                 self.mapStreamHandlerStreamFunction(div, predefinedStreamFunctions, streamHandler)
             }
@@ -2349,11 +2352,11 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
         };
 
         /**
-        * @function to map the saved parameter values to the parameter object
-        * @param {Object} predefinedParameters Predefined parameters of a particular window type
-        * @param {Object} savedParameterValues Saved parameter values
-        * @return {Object} parameters
-        */
+         * @function to map the saved parameter values to the parameter object
+         * @param {Object} predefinedParameters Predefined parameters of a particular window type
+         * @param {Object} savedParameterValues Saved parameter values
+         * @return {Object} parameters
+         */
         FormUtils.prototype.mapUserParameterValues = function (predefinedParameters, savedParameterValues) {
             var parameters = [];
             for (var i = 0; i < predefinedParameters.length; i++) {
@@ -2365,7 +2368,7 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
                     }
                     parameters.push({
                         name: predefinedParameters[i].name, value: parameterValue, description:
-                            predefinedParameters[i].description, optional: predefinedParameters[i].optional,
+                        predefinedParameters[i].description, optional: predefinedParameters[i].optional,
                         defaultValue: predefinedParameters[i].defaultValue, timeStamp: timeStamp
                     });
                 } else {
@@ -2393,7 +2396,7 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
             for (var i = 0; i <= 1; i++) {
                 parameters.push({
                     name: predefinedParameters[i].name, value: savedParameterValues[i], description:
-                        predefinedParameters[i].description, optional: predefinedParameters[i].optional,
+                    predefinedParameters[i].description, optional: predefinedParameters[i].optional,
                     defaultValue: predefinedParameters[i].defaultValue
                 });
             }
@@ -2406,7 +2409,7 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
             //add the attributes to the third obj of the predefined parameter
             parameters.push({
                 name: predefinedParameters[2].name, value: attributes, description:
-                    predefinedParameters[2].description, optional: predefinedParameters[2].optional,
+                predefinedParameters[2].description, optional: predefinedParameters[2].optional,
                 defaultValue: predefinedParameters[2].defaultValue
             });
             return parameters;
@@ -2424,7 +2427,7 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
             //add the first saved param to predefined param's first index (event.count)
             parameters.push({
                 name: predefinedParameters[0].name, value: savedParameterValues[0], description:
-                    predefinedParameters[0].description, optional: predefinedParameters[0].optional,
+                predefinedParameters[0].description, optional: predefinedParameters[0].optional,
                 defaultValue: predefinedParameters[0].defaultValue
             });
             // add the attributes
@@ -2436,7 +2439,7 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
             //add the attributes to second obj of the predefined parameter
             parameters.push({
                 name: predefinedParameters[1].name, value: attributes, description:
-                    predefinedParameters[1].description, optional: predefinedParameters[1].optional,
+                predefinedParameters[1].description, optional: predefinedParameters[1].optional,
                 defaultValue: predefinedParameters[1].defaultValue
             });
             return parameters;
@@ -2459,7 +2462,7 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
             //add the first saved param to predefined param's first index (window.length)
             parameters.push({
                 name: predefinedParameters[0].name, value: length, description:
-                    predefinedParameters[0].description, optional: predefinedParameters[0].optional,
+                predefinedParameters[0].description, optional: predefinedParameters[0].optional,
                 defaultValue: predefinedParameters[0].defaultValue
             });
             // to determine the attributes and order
@@ -2480,13 +2483,13 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
             //add the attributes to second obj of the predefined parameter
             parameters.push({
                 name: predefinedParameters[1].name, value: attributes, description:
-                    predefinedParameters[1].description, optional: predefinedParameters[1].optional,
+                predefinedParameters[1].description, optional: predefinedParameters[1].optional,
                 defaultValue: predefinedParameters[1].defaultValue
             });
             //add the order to the third obj of the predefined parameter
             parameters.push({
                 name: predefinedParameters[2].name, value: order, description:
-                    predefinedParameters[2].description, optional: predefinedParameters[2].optional,
+                predefinedParameters[2].description, optional: predefinedParameters[2].optional,
                 defaultValue: predefinedParameters[2].defaultValue
             });
             return parameters;
@@ -2500,7 +2503,7 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
          * @param {Object} functionParametersWithValues array to hold the parameter of the mapped value
          */
         FormUtils.prototype.callToMapParameters = function (selectedType, functionParameters, savedParameterValues,
-            parameterDiv) {
+                                                            parameterDiv) {
             var self = this;
             var functionParametersWithValues;
             if (selectedType === Constants.SORT) {
@@ -2863,7 +2866,7 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
          * @return {Boolean} isErrorOccurred
          */
         FormUtils.prototype.validateMandatoryElementsOfPredefinedObjects = function (annotationKey, annotationValue,
-            predefinedAnnotationObject) {
+                                                                                     predefinedAnnotationObject) {
             var isErrorOccurred = false;
             _.forEach(predefinedAnnotationObject.elements, function (predefinedObjectElement) {
                 if (annotationKey.text.trim().toLowerCase() == predefinedObjectElement.name
@@ -3041,8 +3044,8 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
         };
 
         /**
-		 * @function to build the join-query order by section
-		 */
+         * @function to build the join-query order by section
+         */
         FormUtils.prototype.buildOrderBy = function () {
             var orderByAttributes = [];
             $('.order-by-attributes li').each(function () {
@@ -3126,6 +3129,7 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
          * @function to add event listeners for jstree annotations
          */
         FormUtils.prototype.addEventListenersForJstree = function (tree) {
+            var self = this;
             //to add key-value for annotation node
             $("#btn-add-key-val").on("click", function () {
                 var selectedNode = $("#annotation-div").jstree("get_selected");
@@ -3141,6 +3145,7 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
                 );
                 tree.open_node(selectedNode);
                 tree.deselect_all();
+                self.initializeNanoScroller();
             });
 
             //to add annotation node
@@ -3164,6 +3169,7 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
                 });
                 tree.open_node(selectedNode);
                 tree.deselect_all();
+                self.initializeNanoScroller();
             });
 
             //to delete an annotation or a key-value node
@@ -3171,6 +3177,7 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
                 var selectedNode = $("#annotation-div").jstree("get_selected");
                 tree.delete_node([selectedNode]);
                 tree.deselect_all();
+                self.initializeNanoScroller();
             })
 
             //to edit the selected node
@@ -3222,12 +3229,14 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
                 } else {
                     $('.group-by-content').hide();
                 }
+                self.initializeNanoScroller();
             });
 
             $('.btn-add-group-by-attribute').on('click', function () {
                 self.appendGroupBy(possibleAttributes);
                 self.preventMultipleSelection(Constants.GROUP_BY);
                 self.checkForAttributeLength(possibleAttributes.length, Constants.GROUP_BY);
+                self.initializeNanoScroller();
             });
 
             $('.define-group-by-attributes').on('change', '.group-by-selection', function () {
@@ -3239,6 +3248,7 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
                 $(this).closest('li').remove();
                 self.preventMultipleSelection(Constants.GROUP_BY);
                 self.checkForAttributeLength(possibleAttributes.length, Constants.GROUP_BY);
+                self.initializeNanoScroller();
             });
         };
 
@@ -3246,6 +3256,7 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
          * @function to add event listeners for parameter division
          */
         FormUtils.prototype.addEventListenersForParameterDiv = function () {
+            var self = this;
             //event listener when the parameter checkbox is changed
             $('.defineFunctionParameters').on('change', '.parameter-checkbox', function () {
                 var parameterParent = $(this).parents(".parameter");
@@ -3256,6 +3267,7 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
                     parameterParent.find(".parameter-value").removeClass("required-input-field");
                     parameterParent.find(".error-message").text("");
                 }
+                self.initializeNanoScroller();
             });
         };
 
@@ -3344,6 +3356,7 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
                 if (selectedType === Constants.SORT) {
                     self.showHideOrderForSort();
                 }
+                self.initializeNanoScroller();
             });
         };
 
@@ -3367,6 +3380,7 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
          * @function to add event listeners for the attribute selection(projection) division
          */
         FormUtils.prototype.addEventListenersForSelectionDiv = function () {
+            var self = this;
             $('.define-select').on('change', '.attribute-selection-type', function () {
                 $('.attribute-selection-type').next('.error-message').hide();
                 if ($(this).val() === Constants.TYPE_USER_DEFINED) {
@@ -3374,10 +3388,12 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
                 } else {
                     $('.define-user-defined-attributes').hide();
                 }
+                self.initializeNanoScroller();
             });
 
             $('.define-select').on('click', '.btn-del-option', function () {
                 $(this).closest('li').remove();
+                self.initializeNanoScroller();
             });
         };
 
@@ -3393,6 +3409,7 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
                 } else {
                     $('.order-by-content').hide();
                 }
+                self.initializeNanoScroller();
             });
 
             $('.define-order-by-attributes').on('change', '.order-by-selection', function () {
@@ -3404,12 +3421,14 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
                 $(this).closest('li').remove();
                 self.preventMultipleSelection(Constants.ORDER_BY);
                 self.checkForAttributeLength(possibleAttributes.length, Constants.ORDER_BY);
+                self.initializeNanoScroller();
             });
 
             $('.btn-add-order-by-attribute').on('click', function () {
                 self.appendOrderBy(possibleAttributes);
                 self.preventMultipleSelection(Constants.ORDER_BY);
                 self.checkForAttributeLength(possibleAttributes.length, Constants.ORDER_BY);
+                self.initializeNanoScroller();
             });
         };
 
@@ -3430,11 +3449,12 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
                     $(sourceDiv).find('.define-stream-handler-section').hide();
                     $(sourceDiv).find('.define-stream-handler-buttons').hide();
                 }
+                self.initializeNanoScroller();
             });
 
             //on change of window type
             var predefinedWindowFunctions = _.orderBy(JSON.parse(JSON.stringify
-                (self.configurationData.rawExtensions["windowFunctionNames"]), ['name'], ['asc']));
+            (self.configurationData.rawExtensions["windowFunctionNames"]), ['name'], ['asc']));
             $('.define-stream-handler').on('change', '#window-type', function () {
                 var sourceDiv = self.getSourceDiv($(this))
                 if ($(sourceDiv).hasClass('define-left-source')) {
@@ -3466,7 +3486,7 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
 
             //on change of stream-function type
             var predefinedStreamFunctions = _.orderBy(JSON.parse(JSON.stringify
-                (self.configurationData.rawExtensions["streamFunctions"]), ['name'], ['asc']));
+            (self.configurationData.rawExtensions["streamFunctions"]), ['name'], ['asc']));
             $(".define-stream-handler").on("autocompleteselect", '.custom-combobox-input', function (event, ui) {
                 var selectedType = ui.item.value.toLowerCase();
                 var functionType;
@@ -3505,18 +3525,18 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
             $('.define-stream-handler').on('focus', '.stream-handler-selection', function () {
                 previousValue = this.value;
                 previousContent = $(this).closest('.define-stream-handler-type').next().
-                    find('.define-stream-handler-type-content').contents();
+                find('.define-stream-handler-type-content').contents();
 
             }).on('change', '.stream-handler-selection', function () {
                 var currentValue = this.value; // New Value
                 var currentContentDiv = $(this).closest('.define-stream-handler-type').next().
-                    find('.define-stream-handler-type-content');
+                find('.define-stream-handler-type-content');
                 if (currentValue == previousValue) {
                     currentContentDiv.html(previousContent)
                 } else {
                     var sourceDiv = self.getSourceDiv($(this));
                     var streamHandlerContent = $(this).closest('.define-stream-handler-type').next().
-                        find('.define-stream-handler-type-content');
+                    find('.define-stream-handler-type-content');
                     self.renderStreamHandlerContentDiv(currentValue, streamHandlerContent)
                     self.mapStreamHandlerContent(streamHandlerContent, self.createEmptyStreamHandler(currentValue));
                 }
@@ -3531,6 +3551,7 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
                 self.changeAttributeNavigation($(sourceDiv).find('.stream-handler-list'));
                 self.removeNavigationForWindow(sourceDiv)
                 self.showHideStreamHandlerWindowButton(sourceDiv)
+                self.initializeNanoScroller();
             });
 
             //To reorder up the stream-handler
@@ -3624,6 +3645,7 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
             self.removeNavigationForWindow(sourceDiv)
             self.showHideStreamHandlerWindowButton(sourceDiv)
             streamHandlerType[0].scrollIntoView();
+            self.initializeNanoScroller();
         };
 
         /**
@@ -3722,12 +3744,14 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
             $("#define-attribute").on('click', '#btn-add-attribute', function () {
                 $("#attribute-div").append(self.addAttribute());
                 self.changeAttributeNavigation('#attribute-div');
+                self.initializeNanoScroller();
             });
 
             //To delete attribute
             $("#define-attribute").on('click', '#attribute-div .btn-del-attr', function () {
                 $(this).closest('li').remove();
                 self.changeAttributeNavigation('#attribute-div');
+                self.initializeNanoScroller();
             });
 
             //To reorder up the attribute
@@ -3780,6 +3804,7 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
                     optionParent.find(".option-value").removeClass("required-input-field");
                     optionParent.find(".error-message").text("");
                 }
+                self.initializeNanoScroller();
             });
 
             //To add customized option
@@ -3793,12 +3818,14 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
                     '<label class = "error-message"></label></li>';
                 $('#customized-' + id + '-options .cust-options').append(custOptDiv);
                 self.changeCustomizedOptDiv(id);
+                self.initializeNanoScroller();
             });
 
             //To delete customized option
             $('#' + id + '-options-div').on('click', '.btn-del-option', function () {
                 $(this).closest('li').remove();
                 self.changeCustomizedOptDiv(id);
+                self.initializeNanoScroller();
             });
         };
 
@@ -3806,19 +3833,21 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
          * @function to add event listeners for the primary index annotation div
          */
         FormUtils.prototype.addEventListenerForPrimaryIndexAnnotationDiv = function () {
-
+            var self = this;
             //To add annotation value
             $('#primary-index-annotations').on('click', '.btn-add-annot-value', function () {
                 $(this).parents(".annotation").find("ul").append
-                    ('<li class = "clearfix primary-index-annotation-value"> <div class="clearfix"> ' +
-                        '<input type = "text" value = "" class = "annotation-value"/> ' +
-                        '<a class = "btn-del-annot-value"> <i class = "fw fw-delete"> </i> </a> </div> ' +
-                        '<label class="error-message"></label> </li>');
+                ('<li class = "clearfix primary-index-annotation-value"> <div class="clearfix"> ' +
+                    '<input type = "text" value = "" class = "annotation-value"/> ' +
+                    '<a class = "btn-del-annot-value"> <i class = "fw fw-delete"> </i> </a> </div> ' +
+                    '<label class="error-message"></label> </li>');
+                self.initializeNanoScroller();
             });
 
             //To delete annotation value
             $('#primary-index-annotations').on('click', '.btn-del-annot-value', function () {
                 $(this).closest('li').remove();
+                self.initializeNanoScroller();
             });
 
             // To show the values of the primaryKey and index annotations on change of the checkbox
@@ -3831,6 +3860,7 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
                     parent.find('.error-message').text("");
                     parent.find('.annotation-value').removeClass('required-input-field')
                 }
+                self.initializeNanoScroller();
             });
         };
 
@@ -3838,6 +3868,7 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
          * @function to add event listeners for the predefined annotations
          */
         FormUtils.prototype.addEventListenersForPredefinedAnnotations = function () {
+            var self = this;
             $('.define-predefined-annotations').on('change', '.annotation-checkbox', function () {
                 var parent = $(this).closest(".predefined-annotation");
                 if ($(this).is(':checked')) {
@@ -3847,6 +3878,7 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
                     parent.find('.error-message').text("");
                     parent.find('.option-value').removeClass('required-input-field')
                 }
+                self.initializeNanoScroller();
             });
         };
 
@@ -3855,7 +3887,7 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
          */
         FormUtils.prototype.changeCustomizedOptDiv = function (id) {
             var customizedOptionList = $('#customized-' + id + '-options').
-                find('.cust-options li');
+            find('.cust-options li');
             var parent = $('#customized-' + id + '-options');
             if (customizedOptionList.length > 0) {
                 parent.find('h4').show();
@@ -3981,6 +4013,10 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
             $(".overlayed-container").fadeTo(200, 1);
         };
 
+        FormUtils.prototype.initializeNanoScroller = function () {
+            $('.nano').nanoScroller();
+        };
+
         /**
          * @function to add the error class
          * @param {Object} id object where the error needs to be added
@@ -4048,7 +4084,7 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
         FormUtils.prototype.createAutocomplete = function (element, possibleOptions) {
             var self = this;
             $(element)
-                // don't navigate away from the field on tab when selecting an item
+            // don't navigate away from the field on tab when selecting an item
                 .on("keydown", function (event) {
                     if (event.keyCode === $.ui.keyCode.TAB &&
                         $(this).autocomplete("instance").menu.active) {
@@ -4082,11 +4118,11 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
         };
 
         /**
-        * @function generate tooltip for siddhi app elements
-        * @param element JSON object of the element
-        * @param type type of the element
-        * @returns {string} tooltip
-        */
+         * @function generate tooltip for siddhi app elements
+         * @param element JSON object of the element
+         * @param type type of the element
+         * @returns {string} tooltip
+         */
         FormUtils.prototype.getTooltip = function (element, type) {
             var appData = new AppData();
 

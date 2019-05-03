@@ -17,9 +17,9 @@
  */
 
 define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOrderByValue', 'designViewUtils',
-    'jsonValidator', 'constants', 'handlebar'],
+        'jsonValidator', 'constants', 'handlebar'],
     function (require, log, $, _, QuerySelect, QueryOrderByValue, DesignViewUtils,
-        JSONValidator, Constants, Handlebars) {
+              JSONValidator, Constants, Handlebars) {
 
         /**
          * @class PatternQueryForm Creates a forms to collect data from a pattern query
@@ -79,7 +79,7 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOrderByValue'
          * @function to add autocompletion for input fields
          */
         var addAutoCompletion = function (self, partitionId, QUERY_CONDITION_SYNTAX, QUERY_SYNTAX,
-            incrementalAggregator, streamFunctions, outputAttributes) {
+                                          incrementalAggregator, streamFunctions, outputAttributes) {
             var possibleAttributes = getPossibleAttributes(self, partitionId);
             var selectExpressionMatches = _.cloneDeep(possibleAttributes);
             selectExpressionMatches = selectExpressionMatches.concat(incrementalAggregator);
@@ -193,7 +193,7 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOrderByValue'
 
                 //render the pattern-query form template
                 var patternFormTemplate = Handlebars.compile($('#pattern-sequence-query-form-template').html())
-                    ({ name: queryName });
+                ({ name: queryName });
                 $('#define-pattern-query').html(patternFormTemplate);
                 self.formUtils.renderQueryOutput(outputElement, queryOutput);
                 self.formUtils.renderOutputEventTypes();
@@ -212,6 +212,7 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOrderByValue'
                     } else {
                         parent.find('.query-content').hide();
                     }
+                    self.formUtils.initializeNanoScroller();
                 });
 
                 var eventType = Constants.CURRENT_EVENTS;
@@ -363,10 +364,13 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOrderByValue'
                 $('.define-operation-set-condition').on('click', '.btn-add-set', function () {
                     $('.define-operation-set-condition .set-condition').append(setDiv);
                     self.formUtils.addAutoCompleteForOutputOperation(outputAttributesWithElementName, inputAttributes);
+                    self.formUtils.initializeNanoScroller();
                 });
 
                 var rateLimitingMatches = QUERY_SYNTAX.concat(Constants.SIDDHI_TIME);
                 self.formUtils.createAutocomplete($('.rate-limiting-value'), rateLimitingMatches);
+
+                self.formUtils.initializeNanoScroller();
 
                 $(formContainer).on('click', '#btn-submit', function () {
 
