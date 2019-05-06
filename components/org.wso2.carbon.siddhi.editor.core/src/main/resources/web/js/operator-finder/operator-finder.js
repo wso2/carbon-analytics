@@ -52,8 +52,17 @@ define(['jquery', 'lodash', 'log', 'handlebar', 'designViewUtils', 'app/source-e
                     }
                 });
             }
-            return (entry.namespace.length > 0 ? entry.namespace + ':' : '') + entry.name
-                + '(' + params.substr(2) + ')';
+            if (entry.namespace === 'sink' || entry.namespace === 'source' ||
+                entry.namespace === 'sinkMapper' || entry.namespace === 'sourceMapper') {
+                if (entry.namespace === 'sinkMapper' || entry.namespace === 'sourceMapper') {
+                    entry.namespace = "map";
+                }
+                return '@' + entry.namespace + '(type=\'' + entry.name + '\'' +
+                    (params.substr(2).length > 0 ? ', ' : '') + params.substr(2) + ')';
+            } else {
+                return (entry.namespace.length > 0 ? entry.namespace + ':' : '') + entry.name
+                    + '(' + params.substr(2) + ')';
+            }
         };
 
         /**
