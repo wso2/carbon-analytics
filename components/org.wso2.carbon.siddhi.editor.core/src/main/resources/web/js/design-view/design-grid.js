@@ -2682,11 +2682,11 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
 
         DesignGrid.prototype.enableMultipleSelection = function () {
             var self = this;
-            var selector = $('<div>').attr('id', constants.MULTI_SELECTOR).addClass(constants.SELECTOR);
+            var selector = $('<div>').attr('id', constants.MULTI_SELECTOR + self.currentTabId).addClass(constants.SELECTOR);
             self.canvas.append(selector);
             new DragSelect({
                 selectables: document.querySelectorAll('.jtk-draggable'),
-                selector: document.getElementById(constants.MULTI_SELECTOR),
+                selector: document.getElementById(constants.MULTI_SELECTOR + self.currentTabId),
                 area: document.getElementById('design-grid-container-' + self.currentTabId),
                 multiSelectKeys: ['ctrlKey', 'shiftKey'],
                 onElementSelect: function (element) {

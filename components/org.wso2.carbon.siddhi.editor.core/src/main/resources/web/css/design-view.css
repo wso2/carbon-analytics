@@ -1473,6 +1473,9 @@ label.option-name {
 
 .design-view-form-content {
     min-width: 1920px;
+}
+
+.nano > .nano-content {
     overflow-x: unset;
 }
 

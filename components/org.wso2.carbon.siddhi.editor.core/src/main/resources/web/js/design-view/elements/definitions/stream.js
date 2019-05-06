@@ -114,7 +114,7 @@ define(['require', 'elementUtils', 'constants'],
             // Check if the OnError(action='STREAM') annotation is set. If so enable the fault connector.
             var faultStream = false;
             this.annotationListObjects.forEach(function(annotation) {
-                if (annotation.name === 'OnError') {
+                if (annotation.name.toLowerCase() === 'onerror') {
                     annotation.elements.forEach(function(p) {
                         if (p.key.toLowerCase() === 'action' && p.value.toLowerCase() === 'stream') {
                             faultStream = true;
