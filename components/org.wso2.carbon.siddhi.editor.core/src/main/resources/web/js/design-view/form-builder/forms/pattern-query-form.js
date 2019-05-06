@@ -152,7 +152,8 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOrderByValue'
                 DesignViewUtils.prototype.warnAlert('Connect an output element');
                 self.consoleListManager.removeFormConsole(formConsole);
             } else {
-                var propertyDiv = $('<div id="define-pattern-query"></div>' + self.formUtils.buildFormButtons());
+                var propertyDiv = $('<div id="define-pattern-query" class="clearfix"></div>'
+                    + self.formUtils.buildFormButtons());
                 formContainer.append(propertyDiv);
 
                 self.designViewContainer.addClass('disableContainer');
@@ -212,7 +213,7 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOrderByValue'
                     } else {
                         parent.find('.query-content').hide();
                     }
-                    self.formUtils.initializeNanoScroller();
+                    self.formUtils.updatePerfectScroller();
                 });
 
                 var eventType = Constants.CURRENT_EVENTS;
@@ -364,13 +365,13 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOrderByValue'
                 $('.define-operation-set-condition').on('click', '.btn-add-set', function () {
                     $('.define-operation-set-condition .set-condition').append(setDiv);
                     self.formUtils.addAutoCompleteForOutputOperation(outputAttributesWithElementName, inputAttributes);
-                    self.formUtils.initializeNanoScroller();
+                    self.formUtils.updatePerfectScroller();
                 });
 
                 var rateLimitingMatches = QUERY_SYNTAX.concat(Constants.SIDDHI_TIME);
                 self.formUtils.createAutocomplete($('.rate-limiting-value'), rateLimitingMatches);
 
-                self.formUtils.initializeNanoScroller();
+                self.formUtils.updatePerfectScroller();
 
                 $(formContainer).on('click', '#btn-submit', function () {
 

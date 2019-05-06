@@ -139,13 +139,13 @@ define(['log', 'jquery', 'lodash', 'sourceOrSinkAnnotation', 'mapAnnotation', 'p
                 var streamAttributes = self.formUtils.createStreamAttributesObject
                 (connectedStream.element.getAttributeList());
 
-                var propertyDiv = $('<div class="source-sink-form-container source-div"><div id="define-source"></div>' +
-                    '<div class = "source-sink-map-options" id="source-options-div"></div>' +
-                    self.formUtils.buildFormButtons() + '</div>' +
-                    '<div class="source-sink-form-container mapper-div"> <div id="define-map"> </div> ' +
+                var propertyDiv = $('<div class="clearfix"><div class="source-sink-form-container source-div">' +
+                    '<div id="define-source"></div> <div class = "source-sink-map-options" id="source-options-div"></div>' +
+                    '</div> <div class="source-sink-form-container mapper-div"> <div id="define-map"> </div> ' +
                     '<div class="source-sink-map-options" id="mapper-options-div">' +
                     '</div> </div> <div class= "source-sink-form-container attribute-map-div">' +
-                    '<div id="define-attribute"> </div> <div id="attribute-map-content"></div> </div>');
+                    '<div id="define-attribute"> </div> <div id="attribute-map-content"></div> </div> </div>' +
+                    self.formUtils.buildFormButtons());
 
                 formContainer.append(propertyDiv);
                 self.formUtils.popUpSelectedElement(id);
@@ -179,7 +179,7 @@ define(['log', 'jquery', 'lodash', 'sourceOrSinkAnnotation', 'mapAnnotation', 'p
                     } else {
                         $('#attribute-map-content').hide();
                     }
-                    self.formUtils.initializeNanoScroller();
+                    self.formUtils.updatePerfectScroller();
                 });
 
                 //get the clicked element's information
@@ -272,7 +272,7 @@ define(['log', 'jquery', 'lodash', 'sourceOrSinkAnnotation', 'mapAnnotation', 'p
                     }
                 }
 
-                self.formUtils.initializeNanoScroller();
+                self.formUtils.updatePerfectScroller();
 
                 //onclick of submit
                 $(formContainer).on('click', '#btn-submit', function () {

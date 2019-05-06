@@ -75,7 +75,8 @@ define(['require', 'log', 'jquery', 'lodash', 'constants'],
             var self = this;
             var id = $(element).parent().attr('id');
             var functionObject = self.configurationData.getSiddhiAppConfig().getFunction(id);
-            var propertyDiv = $('<div class = "function-form-container"> <div id = "define-function-name"> <label>' +
+            var propertyDiv = $('<div class="clearfix"> <div class = "function-form-container"> ' +
+                '<div id = "define-function-name"> <label>' +
                 ' <span class="mandatory-symbol"> * </span> Name </label> ' +
                 '<input type="text" id="functionName" class="clearfix name"><label class = "error-message" ' +
                 'id = "functionNameErrorMessage"> </label></div>' +
@@ -83,7 +84,7 @@ define(['require', 'log', 'jquery', 'lodash', 'constants'],
                 self.formUtils.buildFormButtons() + '</div> <div class = "function-form-container"> ' +
                 '<div id="define-script-body"> <label> <span class="mandatory-symbol"> * </span> Script Body </label> ' +
                 '<textarea id= "script-body-content" class="clearfix" rows="5" cols="50"> </textarea> ' +
-                '<label class = "error-message"></label> </div> </div>');
+                '<label class = "error-message"></label> </div> </div> </div>' + self.formUtils.buildFormButtons());
 
             formContainer.append(propertyDiv);
             self.formUtils.popUpSelectedElement(id);
@@ -114,7 +115,7 @@ define(['require', 'log', 'jquery', 'lodash', 'constants'],
 
             }
 
-            self.formUtils.initializeNanoScroller();
+            self.formUtils.updatePerfectScroller();
 
             // 'Submit' button action
             $(formContainer).on('click', '#btn-submit', function () {

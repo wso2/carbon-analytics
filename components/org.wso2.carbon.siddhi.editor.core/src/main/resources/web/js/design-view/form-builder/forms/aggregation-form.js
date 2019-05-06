@@ -242,7 +242,8 @@ define(['require', 'log', 'jquery', 'lodash', 'aggregateByTimePeriod', 'querySel
                 DesignViewUtils.prototype.warnAlert('Connect an input stream element');
                 self.consoleListManager.removeFormConsole(formConsole);
             } else {
-                var propertyDiv = $('<div id = "define-aggregation"> </div>' + self.formUtils.buildFormButtons());
+                var propertyDiv = $('<div id = "define-aggregation" class="clearfix"> </div>' +
+                    self.formUtils.buildFormButtons());
 
                 formContainer.append(propertyDiv);
                 self.designViewContainer.addClass('disableContainer');
@@ -351,7 +352,7 @@ define(['require', 'log', 'jquery', 'lodash', 'aggregateByTimePeriod', 'querySel
                     } else {
                         $('.aggregate-by-attribute-content').hide();
                     }
-                    self.formUtils.initializeNanoScroller();
+                    self.formUtils.updatePerfectScroller();
                 });
 
                 $('#define-aggregate-by').on('change', '.aggregate-by-time-period-selection', function () {
@@ -435,10 +436,10 @@ define(['require', 'log', 'jquery', 'lodash', 'aggregateByTimePeriod', 'querySel
                 $('.define-select').on('click', '.btn-add-user-defined-attribute', function () {
                     self.formUtils.appendUserSelectAttribute();
                     self.formUtils.createAutocomplete($('.attribute-expression-as:last'), selectExpressionMatches);
-                    self.formUtils.initializeNanoScroller();
+                    self.formUtils.updatePerfectScroller();
                 });
 
-                self.formUtils.initializeNanoScroller();
+                self.formUtils.updatePerfectScroller();
 
                 $(formContainer).on('click', '#btn-submit', function () {
 

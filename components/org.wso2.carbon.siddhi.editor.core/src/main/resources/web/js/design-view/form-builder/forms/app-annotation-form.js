@@ -44,19 +44,21 @@ define(['require', 'log', 'jquery', 'lodash'],
          */
         AppAnnotationForm.prototype.generatePropertiesForm = function (element, formConsole, formContainer) {
             var self = this;
-            var propertyDiv = $('<div class= "siddhi-app-form-container"> <div id = "define-app-name"> ' +
+            var propertyDiv = $('<div class="clearfix"> <div class= "siddhi-app-form-container"> <div id = "define-app-name"> ' +
                 '<label> <span class="mandatory-symbol"> * </span>Name </label> ' +
                 '<input type="text" id="app-name" class="clearfix name"><label class = "error-message"> </label></div>' +
                 '<div id = "define-app-description"> <label> <span class="mandatory-symbol"> * </span>Description ' +
                 '</label> <textarea id="app-description" class="clearfix"> </textarea> <label class = "error-message"> ' +
-                '</label> </div>' + self.formUtils.buildFormButtons() + '</div>' +
-                '<div class = "siddhi-app-form-container"> <div class = "define-annotation" </div> </div>');
+                '</label> </div> </div>' +
+                '<div class = "siddhi-app-form-container"> <div class = "define-annotation" </div> </div> </div> '
+                + self.formUtils.buildFormButtons());
 
             formContainer.append(propertyDiv);
             $(".overlayed-container").fadeTo(200, 1);
             // design view container and toggle view button are enabled
             self.designViewContainer.addClass('disableContainer');
             self.toggleViewButton.addClass('disableContainer');
+            self.formUtils.changeHeightOfPerfectScroller();
 
             var siddhiAppConfig = self.configurationData.getSiddhiAppConfig();
             var siddhiAppName = siddhiAppConfig.getSiddhiAppName();
@@ -70,7 +72,7 @@ define(['require', 'log', 'jquery', 'lodash'],
             self.formUtils.addEventListenerToRemoveRequiredClass();
             self.formUtils.addEventListenerToShowInputContentOnHover();
 
-            self.formUtils.initializeNanoScroller();
+            self.formUtils.updatePerfectScroller();
 
             // 'Submit' button action
             $(formContainer).on('click', '#btn-submit', function () {

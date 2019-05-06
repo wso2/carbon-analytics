@@ -315,7 +315,8 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryWindowOrFunct
             if (inValid) {
                 self.consoleListManager.removeFormConsole(formConsole);
             } else {
-                var propertyDiv = $('<div id="define-join-query"></div>' + self.formUtils.buildFormButtons());
+                var propertyDiv = $('<div id="define-join-query" class="clearfix"></div>'
+                    + self.formUtils.buildFormButtons());
                 formContainer.append(propertyDiv);
 
                 self.designViewContainer.addClass('disableContainer');
@@ -408,7 +409,7 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryWindowOrFunct
                     } else {
                         parent.find('.query-content').hide();
                     }
-                    self.formUtils.initializeNanoScroller();
+                    self.formUtils.updatePerfectScroller();
                 });
 
                 $('.join-query-form-container').on('change', '.join-selection', function () {
@@ -580,7 +581,7 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryWindowOrFunct
                 var rateLimitingMatches = RATE_LIMITING_SYNTAX.concat(Constants.SIDDHI_TIME);
                 self.formUtils.createAutocomplete($('.rate-limiting-value'), rateLimitingMatches);
 
-                self.formUtils.initializeNanoScroller();
+                self.formUtils.updatePerfectScroller();
 
                 $(formContainer).on('click', '#btn-submit', function () {
 
