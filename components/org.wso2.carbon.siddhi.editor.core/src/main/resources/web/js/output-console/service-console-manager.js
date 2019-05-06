@@ -49,7 +49,7 @@ define(['require', 'log', 'jquery', 'lodash', 'console','workspace','toolEditor'
                 this.$el.append('<span class="' + message.type + '">' + message.message + '<span>');
                 this.$el.append("<br />");
                 this.$el.scrollTop(100000);
-                $(".nano").nanoScroller();
+                this.app.perfectScroller.update();
                 var parentDiv = this.$el.parent()[0];
                 parentDiv.scrollTop = parentDiv.scrollHeight;
                 var childLength = this.$el.children().size();

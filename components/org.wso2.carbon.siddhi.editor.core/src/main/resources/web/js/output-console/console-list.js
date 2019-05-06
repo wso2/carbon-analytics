@@ -270,6 +270,7 @@ define(['log', 'jquery', 'lodash', 'backbone', 'console'], function (log, $, _, 
                 $(".selected-element").removeClass("selected-element");
                 $(".overlayed-container").fadeOut(200);
                 $(".disableContainer").removeClass("disableContainer");
+                $(".console-wrap").removeClass('form-height');
             },
             /**
              * set selected console
