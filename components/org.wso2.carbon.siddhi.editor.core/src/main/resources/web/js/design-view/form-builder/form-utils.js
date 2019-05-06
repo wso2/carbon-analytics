@@ -1120,7 +1120,7 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
                 var checkBox = $(this).find('input:checkbox');
                 if ((checkBox.length == 0 || (checkBox.length > 0 && checkBox.is(":checked")))) {
                     var inputValue = $(this).find('input:text');
-                    if (inputValue.is("visible")) {
+                    if (inputValue.is(":visible")) {
                         if (inputValue.val().trim() == "") {
                             self.addErrorClass(inputValue);
                             $(className).find('.error-message').text('Value is required');
