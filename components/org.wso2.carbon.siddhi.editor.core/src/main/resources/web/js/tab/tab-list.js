@@ -191,6 +191,7 @@ define(['log', 'jquery', 'lodash', 'backbone', './tab', 'bootstrap'],
                  * @fires TabList#tab-removed
                  */
                 removeTab: function (tab) {
+                    var self = this;
                     if (!_.includes(this._tabs, tab)) {
                         var errMsg = 'tab : ' + tab.id + 'is not part of this tab list.';
                         log.error(errMsg);
@@ -218,6 +219,8 @@ define(['log', 'jquery', 'lodash', 'backbone', './tab', 'bootstrap'],
                         }
                         var nextTab = this._tabs[nextTabIndex];
                         this.setActiveTab(nextTab);
+                    } else {
+                        self.options.application.workspaceManager.updateMenuItems();
                     }
                 },
                 /**
