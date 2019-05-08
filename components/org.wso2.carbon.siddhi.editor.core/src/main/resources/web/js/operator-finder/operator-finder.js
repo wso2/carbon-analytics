@@ -27,7 +27,10 @@ define(['jquery', 'lodash', 'log', 'handlebar', 'designViewUtils', 'app/source-e
         var constants = {
             STORE: 'store',
             SINK: 'sink',
-            SOURCE : 'source'
+            SOURCE : 'source',
+            MAP: 'map',
+            SINK_MAPPER: 'sinkMapper',
+            SOURCE_MAPPER: 'sourceMapper'
         };
 
         var loadOperators = function(callback) {
@@ -55,7 +58,8 @@ define(['jquery', 'lodash', 'log', 'handlebar', 'designViewUtils', 'app/source-e
             var isStoreSinkSourceGeneration = false;
             var namespaceValue = entry.namespace.toLowerCase();
             if (namespaceValue === constants.STORE || namespaceValue === constants.SINK ||
-                namespaceValue === constants.SOURCE) {
+                namespaceValue === constants.SOURCE || namespaceValue === constants.SOURCE_MAPPER ||
+                namespaceValue === constants.SINK_MAPPER) {
                 isStoreSinkSourceGeneration = true;
             }
             if (entry.parameters) {
@@ -69,9 +73,12 @@ define(['jquery', 'lodash', 'log', 'handlebar', 'designViewUtils', 'app/source-e
                     }
                 });
             }
+            if (entry.namespace === constants.SINK_MAPPER || entry.namespace === constants.SOURCE_MAPPER) {
+                entry.namespace = constants.MAP;
+            }
             if (isStoreSinkSourceGeneration) {
                 return (entry.namespace.length > 0 ? "@" + namespaceValue + "(type=" + "\'" + entry.name + "\'" +
-                    params + ")" : "")
+                    params + ")" : "");
             } else {
                 return (entry.namespace.length > 0 ? namespaceValue + ':' : '') + entry.name
                     + '(' + params.substr(2) + ')';
