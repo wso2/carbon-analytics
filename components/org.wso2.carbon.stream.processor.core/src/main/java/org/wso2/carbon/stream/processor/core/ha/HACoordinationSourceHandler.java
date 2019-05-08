@@ -87,7 +87,7 @@ public class HACoordinationSourceHandler extends SourceHandler {
             throws InterruptedException {
         if (isActiveNode) {
             lastProcessedEventTimestamp = event.getTimestamp();
-            if (passiveNodeAdded && !IGNORING_SOURCE_TYPE.equals(sourceType)) {
+            if (passiveNodeAdded && !IGNORING_SOURCE_TYPE.equalsIgnoreCase(sourceType)) {
                 sendEventsToPassiveNode(event, transportSyncProperties);
             }
             inputHandler.send(event);
@@ -107,7 +107,7 @@ public class HACoordinationSourceHandler extends SourceHandler {
             throws InterruptedException {
         if (isActiveNode) {
             lastProcessedEventTimestamp = events[events.length - 1].getTimestamp();
-            if (passiveNodeAdded && !IGNORING_SOURCE_TYPE.equals(sourceType)) {
+            if (passiveNodeAdded && !IGNORING_SOURCE_TYPE.equalsIgnoreCase(sourceType)) {
                 sendEventsToPassiveNode(events, transportSyncProperties);
             }
             inputHandler.send(events);
