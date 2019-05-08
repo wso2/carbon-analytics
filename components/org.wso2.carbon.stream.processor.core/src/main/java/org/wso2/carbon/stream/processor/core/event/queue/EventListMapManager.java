@@ -47,7 +47,7 @@ public class EventListMapManager {
     private static ConcurrentSkipListMap<Long,QueuedEvent> eventListMap;
     private static Map<String,Long> perAppLastControlMessageSequenceNumberList = new HashMap<>();
     private static final Logger log = Logger.getLogger(EventListMapManager.class);
-    private static long startTime;
+    private static long startTime = new Date().getTime();;
     private static long endTime;
     private static int count = 0;
     private static final int TPS_EVENT_THRESHOLD = 100000;
@@ -69,10 +69,8 @@ public class EventListMapManager {
     }
 
     public void parseControlMessage(byte[] controlMessageContentByteArray) throws UnsupportedEncodingException {
-
         String message = null;
         message = new String(controlMessageContentByteArray, HAConstants.DEFAULT_CHARSET);
-
         if (!message.isEmpty()) {
             message = message.replace ("[", "");
             message = message.replace ("]", "");
@@ -148,15 +146,11 @@ public class EventListMapManager {
                                 transportSyncProperties);
                         this.addToEventListMap(sequenceID, queuedEvent);
                     }
-
                     if (log.isDebugEnabled()) {
-                        if (startTime == 0L) {
-                            startTime = new Date().getTime();
-                        }
                         count++;
                         if (count % TPS_EVENT_THRESHOLD == 0) {
                             endTime = new Date().getTime();
-                            log.debug("# of events batch : " + count + " start timestamp : " + startTime +
+                            log.debug("# of events batch : " + TPS_EVENT_THRESHOLD + " start timestamp : " + startTime +
                                     " end time stamp : " + endTime + " Throughput is (events / sec) : " +
                                     (((TPS_EVENT_THRESHOLD * 1000) / (endTime - startTime))) +
                                     " Total Event Count : " + count);
@@ -228,13 +222,12 @@ public class EventListMapManager {
                     } else {
                         perAppLastControlMessageSequenceNumberList.put(appName, seqId);
                     }
-
-                    for (Iterator<Map.Entry<Long, QueuedEvent>> iterator = eventListMap.entrySet().iterator();
-                         iterator.hasNext();) {
+                    Iterator<Map.Entry<Long, QueuedEvent>> iterator = eventListMap.entrySet().iterator();
+                    while (iterator.hasNext()) {
                         Map.Entry<Long, QueuedEvent> listMapValue = iterator.next();
                         long key = listMapValue.getKey();
                         if (appName.equals(listMapValue.getValue().getSiddhiAppName()) && seqId > key) {
-                            eventListMap.remove(key);
+                            iterator.remove();
                         }
                     }
                 }

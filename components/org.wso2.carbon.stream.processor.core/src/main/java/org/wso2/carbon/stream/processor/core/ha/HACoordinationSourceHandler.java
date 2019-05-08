@@ -56,12 +56,15 @@ public class HACoordinationSourceHandler extends SourceHandler {
     private volatile boolean passiveNodeAdded;
     private SourceSyncCallback sourceSyncCallback;
     private ThroughputTracker throughputTracker;
+    private static final String IGNORING_SOURCE_TYPE = "inMemory";
+    private String sourceType;
 
     private static final Logger log = Logger.getLogger(HACoordinationSourceHandler.class);
 
-    public HACoordinationSourceHandler(ThroughputTracker throughputTracker) {
+    public HACoordinationSourceHandler(ThroughputTracker throughputTracker, String sourceType) {
         this.sequenceIDGenerator = EventSyncConnectionPoolManager.getSequenceID();
         this.throughputTracker = throughputTracker;
+        this.sourceType = sourceType;
     }
 
     @Override
@@ -84,7 +87,7 @@ public class HACoordinationSourceHandler extends SourceHandler {
             throws InterruptedException {
         if (isActiveNode) {
             lastProcessedEventTimestamp = event.getTimestamp();
-            if (passiveNodeAdded) {
+            if (passiveNodeAdded && !IGNORING_SOURCE_TYPE.equalsIgnoreCase(sourceType)) {
                 sendEventsToPassiveNode(event, transportSyncProperties);
             }
             inputHandler.send(event);
@@ -104,7 +107,7 @@ public class HACoordinationSourceHandler extends SourceHandler {
             throws InterruptedException {
         if (isActiveNode) {
             lastProcessedEventTimestamp = events[events.length - 1].getTimestamp();
-            if (passiveNodeAdded) {
+            if (passiveNodeAdded && !IGNORING_SOURCE_TYPE.equalsIgnoreCase(sourceType)) {
                 sendEventsToPassiveNode(events, transportSyncProperties);
             }
             inputHandler.send(events);
