@@ -18,10 +18,10 @@
 
 define(['require', 'log', 'jquery', 'lodash', 'backbone', 'menu_bar', 'tool_bar', 'command', 'workspace',
         'app/tab/service-tab-list', 'event_simulator', 'app/output-console/service-console-list-manager',
-        'nano_scroller','guide','workspace/file', 'operator_finder', 'utils'],
+        'nano_scroller','guide','workspace/file', 'operator_finder', 'utils', 'perfect_scrollbar'],
 
     function (require, log, $, _, Backbone, MenuBar, ToolBar, CommandManager, Workspace, TabController,
-              EventSimulator, OutputController,NanoScroller, Guide, File, OperatorFinder,Utils) {
+              EventSimulator, OutputController,NanoScroller, Guide, File, OperatorFinder,Utils, PerfectScrollbar) {
 
         var Application = Backbone.View.extend(
             /** @lends Application.prototype */
@@ -37,7 +37,6 @@ define(['require', 'log', 'jquery', 'lodash', 'backbone', 'menu_bar', 'tool_bar'
                     var self = this;
                     var pathSeparator;
                     this.initComponents();
-                    $(".nano").nanoScroller();
                     $( "#service-tabs-wrapper" ).on( "resize", function( event, ui ) {
                         if(self.tabController.activeTab._title != "welcome-page"){
                             if (self.tabController.activeTab.getSiddhiFileEditor().isInSourceView()) {
@@ -97,6 +96,9 @@ define(['require', 'log', 'jquery', 'lodash', 'backbone', 'menu_bar', 'tool_bar'
                     var operatorFinderOpts = _.get(this.config, 'operator_finder');
                     _.set(operatorFinderOpts, 'application', this);
                     this.operatorFinder = new OperatorFinder.OperatorFinder(operatorFinderOpts);
+
+                    //initialize the perfect scroller
+                    this.perfectScroller = new PerfectScrollbar('.perfect-scroller');
                 },
 
                 render: function () {

@@ -28,6 +28,7 @@
     <link href="/editor/commons/css/jquery-ui-timepicker-addon.css" rel="stylesheet" type="text/css"/>
     <link href="/editor/commons/css/simulator.css" rel="stylesheet" type="text/css"/>
     <link rel="stylesheet" type="text/css" href="/editor/commons/css/notification.css"/>
+    <link rel="stylesheet" type="text/css" href="/editor/commons/lib/perfect-scrollbar-1.4.0/css/perfect-scrollbar.css"/>
 
     <!--Enjoy Hint CSS-->
 
@@ -165,8 +166,8 @@
                         <button type="button" class="close pull-right output-console-activate-btn close-console-btn"><i
                                 class="fw fw-cancel"></i></button>
                     </div>
-                    <div class="nano console-wrap">
-                        <div class="output-console-content-wrapper nano-content">
+                    <div class="console-wrap perfect-scroller">
+                        <div class="output-console-content-wrapper">
                             <div class="consoleToolbar">
                                 <a href="#" class="clear-console-btn" data-placement="right" data-toggle="tooltip"
                                    title="Clear">
@@ -1938,8 +1939,6 @@
     <div class="modal-dialog" role="document">
         <div class="modal-content clearfix">
             <div class="modal-header">
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <i class="fw fw-cancel  about-dialog-close"></i></button>
                 <h3 class="modal-title file-dialog-title" id="aboutSettingsLabel">Settings - Source View</h3>
                 <hr class="style1"/>
             </div>
@@ -2011,7 +2010,7 @@
                 </form>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-default" data-dismiss="modal" id="saveSettingsButton">OK</button>
+                <button type="button" class="btn btn-default" data-dismiss="modal" id="saveSettingsButton">Close</button>
             </div>
         </div>
     </div>
@@ -2362,6 +2361,7 @@
             js_tree: "commons/lib/js-tree-v3.3.2/jstree",
             render_json: "commons/lib/renderjson/renderjson",
             nano_scroller: "commons/lib/nanoscroller_0.8.7/jquery.nanoscroller.min",
+            perfect_scrollbar: "commons/lib/perfect-scrollbar-1.4.0/perfect-scrollbar",
             theme_wso2: "commons/lib/theme-wso2-2.0.0/js/theme-wso2.min",
             ace: "commons/lib/ace-editor",
             overlay_scroller: "commons/lib/overlay_scroll/js/jquery.overlayScrollbars.min",

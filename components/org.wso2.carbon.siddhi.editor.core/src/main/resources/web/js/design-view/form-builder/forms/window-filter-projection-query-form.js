@@ -17,9 +17,9 @@
  */
 
 define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryWindowOrFunction', 'queryOrderByValue',
-    'streamHandler', 'designViewUtils', 'jsonValidator', 'constants', 'handlebar'],
+        'streamHandler', 'designViewUtils', 'jsonValidator', 'constants', 'handlebar'],
     function (require, log, $, _, QuerySelect, QueryWindowOrFunction, QueryOrderByValue, StreamHandler, DesignViewUtils,
-        JSONValidator, Constants, Handlebars) {
+              JSONValidator, Constants, Handlebars) {
 
         /**
          * @class WindowFilterProjectionQueryForm Creates a forms to collect data from a window/filter/projection query
@@ -38,9 +38,9 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryWindowOrFunct
             }
         };
 
-		/**
-		 * @function to add autocompletion for filter value
-		 */
+        /**
+         * @function to add autocompletion for filter value
+         */
         var addAutoCompletionForFilter = function (self, QUERY_CONDITION_SYNTAX, possibleAttributes, outputAttributes) {
             var filterMatches = _.cloneDeep((possibleAttributes));
             filterMatches = filterMatches.concat(outputAttributes);
@@ -83,7 +83,7 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryWindowOrFunct
          * @param formContainer Container which holds the form
          */
         WindowFilterProjectionQueryForm.prototype.generatePropertiesForm = function (element, formConsole,
-            formContainer) {
+                                                                                     formContainer) {
             var self = this;
             var id = $(element).parent().attr('id');
             var queryObject = self.configurationData.getSiddhiAppConfig().getWindowFilterProjectionQuery(id);
@@ -95,7 +95,7 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryWindowOrFunct
                 DesignViewUtils.prototype.warnAlert('Connect an output stream');
                 self.consoleListManager.removeFormConsole(formConsole);
             } else {
-                var propertyDiv = $('<div id="define-windowFilterProjection-query"></div>' +
+                var propertyDiv = $('<div id="define-windowFilterProjection-query" class="clearfix"></div>' +
                     self.formUtils.buildFormButtons());
                 formContainer.append(propertyDiv);
 
@@ -137,7 +137,7 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryWindowOrFunct
 
                 //render the query form template
                 var queryFormTemplate = Handlebars.compile($('#window-filter-projection-query-form-template').html())
-                    ({ name: queryName, from: inputElementName });
+                ({ name: queryName, from: inputElementName });
                 $('#define-windowFilterProjection-query').html(queryFormTemplate);
                 self.formUtils.renderQueryOutput(outputElement, queryOutput);
                 self.formUtils.renderOutputEventTypes();
@@ -155,6 +155,7 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryWindowOrFunct
                     } else {
                         parent.find('.query-content').hide();
                     }
+                    self.formUtils.updatePerfectScroller();
                 });
 
                 var eventType = Constants.CURRENT_EVENTS;
@@ -260,9 +261,9 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryWindowOrFunct
                 self.formUtils.addEventListenersForStreamHandlersDiv(streamHandlerList);
 
                 /**
-                  * to show user the lost saved data when the connection is deleted/ when the connected stream is modified
-                  * only if the form is an already edited form
-                  */
+                 * to show user the lost saved data when the connection is deleted/ when the connected stream is modified
+                 * only if the form is an already edited form
+                 */
                 if (queryOutput && queryOutput.type) {
                     validateSectionsOnLoadOfForm(self);
                 }
@@ -300,6 +301,8 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryWindowOrFunct
 
                 var rateLimitingMatches = RATE_LIMITING_SYNTAX.concat(Constants.SIDDHI_TIME);
                 self.formUtils.createAutocomplete($('.rate-limiting-value'), rateLimitingMatches);
+
+                self.formUtils.updatePerfectScroller();
 
                 $(formContainer).on('click', '#btn-submit', function () {
 

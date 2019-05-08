@@ -17,9 +17,9 @@
  */
 
 define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryWindowOrFunction', 'queryOrderByValue',
-    'joinQuerySource', 'streamHandler', 'designViewUtils', 'jsonValidator', 'constants', 'handlebar'],
+        'joinQuerySource', 'streamHandler', 'designViewUtils', 'jsonValidator', 'constants', 'handlebar'],
     function (require, log, $, _, QuerySelect, QueryWindowOrFunction, QueryOrderByValue, joinQuerySource, StreamHandler,
-        DesignViewUtils, JSONValidator, Constants, Handlebars) {
+              DesignViewUtils, JSONValidator, Constants, Handlebars) {
 
         /**
          * @class JoinQueryForm Creates a forms to collect data from a join query
@@ -43,7 +43,7 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryWindowOrFunct
          */
         var getPossibleAttributes = function (self, connectedElementName) {
             var connectedElement = self.configurationData.getSiddhiAppConfig().
-                getDefinitionElementByName(connectedElementName);
+            getDefinitionElementByName(connectedElementName);
             var attributes = [];
             if (connectedElement.type.toLowerCase() === Constants.TRIGGER) {
                 attributes.push(connectedElementName + '.' + Constants.TRIGGERED_TIME);
@@ -74,7 +74,7 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryWindowOrFunct
             var selectType = aggregationElement.getSelect().getType().toLowerCase();
             if (selectType === Constants.TYPE_ALL) {
                 var elementConnectedToAggregation = self.configurationData.getSiddhiAppConfig().
-                    getDefinitionElementByName(aggregationElement.getConnectedSource());
+                getDefinitionElementByName(aggregationElement.getConnectedSource());
                 attributes = elementConnectedToAggregation.element.getAttributeList();
             } else {
                 _.forEach(aggregationElement.getSelect().getValue(), function (selectAttribute) {
@@ -146,10 +146,10 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryWindowOrFunct
             return isErrorOccurred;
         };
 
-		/**
-		 * @function to get the defined source-as in a join query
-		 * @param {String} type left or right source
-		 */
+        /**
+         * @function to get the defined source-as in a join query
+         * @param {String} type left or right source
+         */
         var getSourceAs = function (type) {
             if ($('.define-' + type + '-source').find('.source-as-checkbox').is(':checked')) {
                 return $('.define-' + type + '-source').find('.as-content-value').val().trim();
@@ -166,7 +166,7 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryWindowOrFunct
             var sourceDiv = $('.define-' + type + '-source');
             var sourceFrom = sourceDiv.find('.source-selection').val();
             var sourceElementType = self.configurationData.getSiddhiAppConfig().
-                getDefinitionElementByName(sourceFrom).type;
+            getDefinitionElementByName(sourceFrom).type;
             _.set(sourceOptions, 'type', sourceElementType);
             _.set(sourceOptions, 'from', sourceFrom);
             if (sourceDiv.find('.source-as-checkbox').is(':checked')) {
@@ -302,7 +302,7 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryWindowOrFunct
                 inValid = true;
 
             } else if ((joinQueryObject.getQueryInput().getFirstConnectedElement() && !joinQueryObject.getQueryInput()
-                .getFirstConnectedElement().name)
+                    .getFirstConnectedElement().name)
                 || (joinQueryObject.getQueryInput().getSecondConnectedElement() && !joinQueryObject.getQueryInput()
                     .getSecondConnectedElement().name)) {
                 DesignViewUtils.prototype.warnAlert('Fill the connected element to join query');
@@ -315,7 +315,8 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryWindowOrFunct
             if (inValid) {
                 self.consoleListManager.removeFormConsole(formConsole);
             } else {
-                var propertyDiv = $('<div id="define-join-query"></div>' + self.formUtils.buildFormButtons());
+                var propertyDiv = $('<div id="define-join-query" class="clearfix"></div>'
+                    + self.formUtils.buildFormButtons());
                 formContainer.append(propertyDiv);
 
                 self.designViewContainer.addClass('disableContainer');
@@ -408,6 +409,7 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryWindowOrFunct
                     } else {
                         parent.find('.query-content').hide();
                     }
+                    self.formUtils.updatePerfectScroller();
                 });
 
                 $('.join-query-form-container').on('change', '.join-selection', function () {
@@ -578,6 +580,8 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryWindowOrFunct
 
                 var rateLimitingMatches = RATE_LIMITING_SYNTAX.concat(Constants.SIDDHI_TIME);
                 self.formUtils.createAutocomplete($('.rate-limiting-value'), rateLimitingMatches);
+
+                self.formUtils.updatePerfectScroller();
 
                 $(formContainer).on('click', '#btn-submit', function () {
 

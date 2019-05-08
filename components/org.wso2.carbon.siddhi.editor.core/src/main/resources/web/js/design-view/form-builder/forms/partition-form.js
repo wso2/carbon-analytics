@@ -91,9 +91,10 @@ define(['require', 'log', 'jquery', 'lodash', 'partitionWith', 'jsonValidator', 
                     // close the form window
                     self.consoleListManager.removeFormConsole(formConsole);
                 } else {
-                    var propertyDiv = $('<div class = "partition-form-container"> <div id = "define-partition-keys"> </div> ' +
-                        self.formUtils.buildFormButtons() + '</div>' +
-                        '<div class = "partition-form-container"> <div class = "define-annotation"> </div> </div>');
+                    var propertyDiv = $('<div class="clearfix"> <div class = "partition-form-container"> ' +
+                        '<div id = "define-partition-keys"> </div> </div>' +
+                        '<div class = "partition-form-container"> <div class = "define-annotation"> </div> </div> </div>'
+                        + self.formUtils.buildFormButtons());
 
                     formContainer.append(propertyDiv);
                     self.formUtils.popUpSelectedElement(id);
@@ -133,6 +134,8 @@ define(['require', 'log', 'jquery', 'lodash', 'partitionWith', 'jsonValidator', 
 
                     self.formUtils.addEventListenerToRemoveRequiredClass();
                     self.formUtils.addEventListenerToShowInputContentOnHover();
+
+                    self.formUtils.updatePerfectScroller();
 
                     // 'Submit' button action
                     $(formContainer).on('click', '#btn-submit', function () {

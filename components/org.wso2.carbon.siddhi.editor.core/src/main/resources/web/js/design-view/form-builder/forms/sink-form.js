@@ -17,9 +17,9 @@
  */
 
 define(['log', 'jquery', 'lodash', 'mapAnnotation', 'payloadOrAttribute', 'jsonValidator',
-    'handlebar', 'designViewUtils', 'constants'],
+        'handlebar', 'designViewUtils', 'constants'],
     function (log, $, _, MapAnnotation, PayloadOrAttribute, JSONValidator, Handlebars, DesignViewUtils,
-        Constants) {
+              Constants) {
 
         /**
          * @class SinkForm Creates a forms to collect data from a sink
@@ -98,7 +98,7 @@ define(['log', 'jquery', 'lodash', 'mapAnnotation', 'payloadOrAttribute', 'jsonV
          */
         var renderAttributeMappingContent = function (attributes, streamAttributes) {
             var attributeMapFormTemplate = Handlebars.compile($('#source-sink-map-attribute-template').html())
-                ({ id: Constants.SINK, attributes: attributes });
+            ({ id: Constants.SINK, attributes: attributes });
             $('#attribute-map-content').html(attributeMapFormTemplate);
 
             var streamAttributeMessage = "Stream Attributes are: ";
@@ -141,17 +141,17 @@ define(['log', 'jquery', 'lodash', 'mapAnnotation', 'payloadOrAttribute', 'jsonV
                 var predefinedSinks = _.orderBy(this.configurationData.rawExtensions["sink"], ['name'], ['asc']);
                 var predefinedSinkMaps = _.orderBy(this.configurationData.rawExtensions["sinkMaps"], ['name'], ['asc']);
                 var connectedStream = self.configurationData.getSiddhiAppConfig().getDefinitionElementByName
-                    (connectedElement);
+                (connectedElement);
                 var streamAttributes = self.formUtils.createStreamAttributesObject
-                    (connectedStream.element.getAttributeList());
+                (connectedStream.element.getAttributeList());
 
-                var propertyDiv = $('<div class="source-sink-form-container sink-div"><div id="define-sink"></div>' +
-                    '<div class = "source-sink-map-options" id="sink-options-div"></div>' +
-                    self.formUtils.buildFormButtons() + '</div>' +
+                var propertyDiv = $('<div class="clearfix"><div class="source-sink-form-container sink-div">' +
+                    '<div id="define-sink"></div>' +
+                    '<div class = "source-sink-map-options" id="sink-options-div"></div></div>' +
                     '<div class="source-sink-form-container mapper-div"> <div id="define-map"> </div>' +
                     '<div class="source-sink-map-options" id="mapper-options-div"></div>' +
                     '</div> <div class= "source-sink-form-container attribute-map-div"><div id="define-attribute">' +
-                    '</div> <div id="attribute-map-content"></div> </div>');
+                    '</div> <div id="attribute-map-content"></div> </div> </div>' + self.formUtils.buildFormButtons());
 
                 formContainer.append(propertyDiv);
                 self.formUtils.popUpSelectedElement(id);
@@ -192,6 +192,7 @@ define(['log', 'jquery', 'lodash', 'mapAnnotation', 'payloadOrAttribute', 'jsonV
                         $('#attribute-map-content').hide();
                         $("#define-attribute #attributeMap-type").prop('disabled', 'disabled');
                     }
+                    self.formUtils.updatePerfectScroller();
                 });
 
                 //onchange of the sink-type selection
@@ -253,6 +254,7 @@ define(['log', 'jquery', 'lodash', 'mapAnnotation', 'payloadOrAttribute', 'jsonV
                         ' <input type = "text" value = "" class = "attr-value"/>' +
                         '</div> <label class = "error-message"></label> </div>';
                     $('#attribute-map-content').find('#attributes').append(payloadMapDiv);
+                    self.formUtils.updatePerfectScroller();
                 });
 
                 //get the clicked element's information
@@ -312,6 +314,8 @@ define(['log', 'jquery', 'lodash', 'mapAnnotation', 'payloadOrAttribute', 'jsonV
                         renderAttributeMappingContent(attributes, streamAttributes);
                     }
                 }
+
+                self.formUtils.updatePerfectScroller();
 
                 //onclick of submit
                 $(formContainer).on('click', '#btn-submit', function () {

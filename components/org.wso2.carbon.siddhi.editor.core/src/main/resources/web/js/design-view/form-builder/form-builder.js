@@ -62,7 +62,7 @@ define(['require', 'log', 'jquery', 'lodash', 'formUtils', 'streamForm', 'tableF
             this.jsPlumbInstance = options.jsPlumbInstance;
             this.dropElementInstance = options.dropElementInstance;
             this.designGrid = options.dropElementInstance;
-            this.formUtils = new FormUtils(this.configurationData, this.jsPlumbInstance);
+            this.formUtils = new FormUtils(this.application, this.configurationData, this.jsPlumbInstance);
             var currentTabId = this.application.tabController.activeTab.cid;
             this.designViewContainer = $('#design-container-' + currentTabId);
             this.toggleViewButton = $('#toggle-view-button-' + currentTabId);
