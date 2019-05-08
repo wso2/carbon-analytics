@@ -85,6 +85,7 @@ public class HACoordinationSourceHandlerTest extends PowerMockTestCase {
     }
 
     private static final String SOURCE_1 = "source-1";
+    private static final String SOURCE_TYPE = "source-test";
 
     @Test
     public void testActiveNodeProcessing() throws InterruptedException {
@@ -94,7 +95,7 @@ public class HACoordinationSourceHandlerTest extends PowerMockTestCase {
                         SiddhiConstants.METRIC_DELIMITER + SiddhiAppProcessorConstants.HA_METRICS_SENDING_THROUGHPUT,
                         new SPStatisticsManager("MetricsTest"));
         HACoordinationSourceHandler haCoordinationSourceHandler = spy(new HACoordinationSourceHandler(
-                throughputTracker));
+                throughputTracker, SOURCE_TYPE));
         doNothing().when(haCoordinationSourceHandler).sendEvent(Mockito.any(Event.class), Mockito.any());
 
         InputHandler inputHandler = mock(InputHandler.class);
@@ -136,7 +137,7 @@ public class HACoordinationSourceHandlerTest extends PowerMockTestCase {
                                 SiddhiConstants.METRIC_DELIMITER + SiddhiAppProcessorConstants.HA_METRICS_SENDING_THROUGHPUT,
                         new SPStatisticsManager("MetricsTest"));
         HACoordinationSourceHandler haCoordinationSourceHandler = spy(new HACoordinationSourceHandler(
-                throughputTracker));
+                throughputTracker, SOURCE_TYPE));
         doNothing().when(haCoordinationSourceHandler).sendEvent(Mockito.any(Event.class), Mockito.any());
 
         InputHandler inputHandler = mock(InputHandler.class);
