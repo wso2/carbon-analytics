@@ -37,6 +37,7 @@ define(['require', 'log', 'jquery', 'lodash', 'backbone', 'menu_bar', 'tool_bar'
                     var self = this;
                     var pathSeparator;
                     this.initComponents();
+                    $(".nano").nanoScroller();
                     $( "#service-tabs-wrapper" ).on( "resize", function( event, ui ) {
                         if(self.tabController.activeTab._title != "welcome-page"){
                             if (self.tabController.activeTab.getSiddhiFileEditor().isInSourceView()) {
