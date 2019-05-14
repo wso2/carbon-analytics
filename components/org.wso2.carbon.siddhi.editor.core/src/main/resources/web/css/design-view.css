@@ -1137,19 +1137,25 @@ a.list-group-item, button.list-group-item {
 	 z-index: 1;
 }
 
-.design-view-form-content .hovered-content {
+.design-view-form-content .popover-content {
+    padding: .5rem .75rem;
     font-family: Arial;
     background: rgb(51, 50, 50);
     color: #eee;
     text-align: left;
-    border-radius: 4px;
-    padding: 5px;
     word-break: break-all;
-    position: absolute;
-    margin-top: 2px;
-    min-width: 250px;
-    max-width: 500px;
-    border: 1px solid #afadad;
+}
+
+.design-view-form-content .popover {
+    background: rgb(51, 50, 50);
+    border: 1px solid #655e5e;
+    width: unset;
+    min-width: 200px;
+    max-width: 400px;
+}
+
+.design-view-form-content .popover .arrow:after {
+    border-bottom-color: rgb(51, 50, 50);
 }
 
 .design-view-form-content .btn-default {

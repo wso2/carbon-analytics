@@ -3321,22 +3321,20 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
          */
         FormUtils.prototype.addEventListenerToShowInputContentOnHover = function () {
             var self = this;
-            var divToShowInputContent = '<div class="hovered-content" style="display: none"> </div>';
             $('.design-view-form-content').on('mouseover', 'input[type="text"]', function () {
                 var inputField = $(this);
-                if (!inputField.next().hasClass('hovered-content')) {
-                    inputField.after(divToShowInputContent);
+                if (!inputField.is("[data-toggle]")) {
+                    inputField.attr('data-toggle', 'popover');
+                    inputField.attr('data-placement', 'bottom');
                 }
+                inputField.popover({trigger: "hover"});
+
                 if (inputField.val().trim() != "" && self.isElementContentOverflown(inputField)) {
-                    inputField.next('.hovered-content').html(inputField.val().trim());
-                    inputField.next('.hovered-content').show();
+                    inputField.attr('data-content', inputField.val());
+                    inputField.popover('show');
+                } else {
+                    inputField.popover('hide');
                 }
-            });
-            $('.design-view-form-content').on('mouseout', 'input[type="text"]', function () {
-                $(this).next('.hovered-content').hide();
-            });
-            $('.design-view-form-content').on('focus', 'input[type="text"]', function () {
-                $(this).next('.hovered-content').hide();
             });
         };
 
