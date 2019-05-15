@@ -3327,7 +3327,8 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
                     inputField.attr('data-toggle', 'popover');
                     inputField.attr('data-placement', 'bottom');
                 }
-                inputField.popover({trigger: "hover"});
+                inputField.popover({trigger: "hover", container: 'body'}).data('bs.popover').tip()
+                    .addClass('design-view-popover');
 
                 if (inputField.val().trim() != "" && self.isElementContentOverflown(inputField)) {
                     inputField.attr('data-content', inputField.val());

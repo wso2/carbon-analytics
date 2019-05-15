@@ -1137,7 +1137,7 @@ a.list-group-item, button.list-group-item {
 	 z-index: 1;
 }
 
-.design-view-form-content .popover-content {
+.design-view-popover .popover-content {
     padding: .5rem .75rem;
     font-family: Arial;
     background: rgb(51, 50, 50);
@@ -1146,7 +1146,7 @@ a.list-group-item, button.list-group-item {
     word-break: break-all;
 }
 
-.design-view-form-content .popover {
+.design-view-popover.popover {
     background: rgb(51, 50, 50);
     border: 1px solid #655e5e;
     width: unset;
@@ -1154,7 +1154,7 @@ a.list-group-item, button.list-group-item {
     max-width: 400px;
 }
 
-.design-view-form-content .popover .arrow:after {
+.design-view-popover.popover .arrow:after {
     border-bottom-color: rgb(51, 50, 50);
 }
 
