@@ -18,10 +18,10 @@
 
 define(['require', 'log', 'jquery', 'lodash', 'backbone', 'menu_bar', 'tool_bar', 'command', 'workspace',
         'app/tab/service-tab-list', 'event_simulator', 'app/output-console/service-console-list-manager',
-        'nano_scroller','guide','workspace/file', 'operator_finder', 'utils', 'perfect_scrollbar'],
+        'nano_scroller','guide','workspace/file', 'operator_finder', 'utils'],
 
     function (require, log, $, _, Backbone, MenuBar, ToolBar, CommandManager, Workspace, TabController,
-              EventSimulator, OutputController,NanoScroller, Guide, File, OperatorFinder,Utils, PerfectScrollbar) {
+              EventSimulator, OutputController,NanoScroller, Guide, File, OperatorFinder,Utils) {
 
         var Application = Backbone.View.extend(
             /** @lends Application.prototype */
@@ -98,8 +98,6 @@ define(['require', 'log', 'jquery', 'lodash', 'backbone', 'menu_bar', 'tool_bar'
                     _.set(operatorFinderOpts, 'application', this);
                     this.operatorFinder = new OperatorFinder.OperatorFinder(operatorFinderOpts);
 
-                    //initialize the perfect scroller
-                    this.perfectScroller = new PerfectScrollbar('.perfect-scroller');
                 },
 
                 render: function () {
