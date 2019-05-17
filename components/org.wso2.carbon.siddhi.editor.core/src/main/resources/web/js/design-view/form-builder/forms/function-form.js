@@ -75,18 +75,18 @@ define(['require', 'log', 'jquery', 'lodash', 'constants'],
             var self = this;
             var id = $(element).parent().attr('id');
             var functionObject = self.configurationData.getSiddhiAppConfig().getFunction(id);
-            var propertyDiv = $('<div class="clearfix"> <div class = "function-form-container"> ' +
+            var propertyDiv = $('<div class="clearfix form-min-width"> <div class = "function-form-container"> ' +
                 '<div id = "define-function-name"> <label>' +
                 ' <span class="mandatory-symbol"> * </span> Name </label> ' +
                 '<input type="text" id="functionName" class="clearfix name"><label class = "error-message" ' +
-                'id = "functionNameErrorMessage"> </label></div>' +
-                '<div id = "function-script-type"> </div> <div id= "function-return-type"> </div>' +
-                self.formUtils.buildFormButtons() + '</div> <div class = "function-form-container"> ' +
+                'id = "functionNameErrorMessage"> </label></div> <div id = "function-script-type"> '+
+                '</div> <div id= "function-return-type"> </div> </div> <div class = "function-form-container"> ' +
                 '<div id="define-script-body"> <label> <span class="mandatory-symbol"> * </span> Script Body </label> ' +
                 '<textarea id= "script-body-content" class="clearfix" rows="5" cols="50"> </textarea> ' +
-                '<label class = "error-message"></label> </div> </div> </div>' + self.formUtils.buildFormButtons());
+                '<label class = "error-message"></label> </div> </div> </div>');
 
             formContainer.append(propertyDiv);
+            self.formUtils.buildFormButtons(formConsole.cid);
             self.formUtils.popUpSelectedElement(id);
             self.designViewContainer.addClass('disableContainer');
             self.toggleViewButton.addClass('disableContainer');
@@ -115,10 +115,10 @@ define(['require', 'log', 'jquery', 'lodash', 'constants'],
 
             }
 
-            self.formUtils.updatePerfectScroller();
+            self.formUtils.initPerfectScroller(formConsole.cid);
 
             // 'Submit' button action
-            $(formContainer).on('click', '#btn-submit', function () {
+            $('#' + formConsole.cid).on('click', '#btn-submit', function () {
 
                 self.formUtils.removeErrorClass();
                 var isErrorOccurred = false;
@@ -188,8 +188,7 @@ define(['require', 'log', 'jquery', 'lodash', 'constants'],
             });
 
             // 'Cancel' button action
-            var cancelButtonElement = $(formContainer).find('#btn-cancel')[0];
-            cancelButtonElement.addEventListener('click', function () {
+            $('#' + formConsole.cid).on('click', '#btn-cancel', function () {
                 // close the form window
                 self.consoleListManager.removeFormConsole(formConsole);
             });

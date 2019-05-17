@@ -48,15 +48,15 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'constants'],
             var id = $(element).parent().attr('id');
             var windowObject = self.configurationData.getSiddhiAppConfig().getWindow(id);
 
-            var propertyDiv = $('<div class="clearfix"><div class = "window-form-container"> <label> ' +
+            var propertyDiv = $('<div class="clearfix form-min-width"><div class = "window-form-container"> <label> ' +
                 '<span class="mandatory-symbol"> * </span>Name </label> <input type="text" id="windowName" class="clearfix name">' +
                 '<label class="error-message" id="windowNameErrorMessage"></label> <div id="define-attribute"></div>' +
                 '</div> <div class= "window-form-container"> <div class = "defineFunctionName"> </div> ' +
                 '<div class ="defineFunctionParameters"> </div> </div> <div class = "window-form-container"> ' +
-                '<div class="define-output-events"> </div><div class="define-annotation"></div> </div> </div>' +
-                self.formUtils.buildFormButtons());
+                '<div class="define-output-events"> </div><div class="define-annotation"></div> </div> </div>');
 
             formContainer.append(propertyDiv);
+            self.formUtils.buildFormButtons(formConsole.cid);
             self.formUtils.popUpSelectedElement(id);
             self.designViewContainer.addClass('disableContainer');
             self.toggleViewButton.addClass('disableContainer');
@@ -134,10 +134,10 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'constants'],
                 }
             });
 
-            self.formUtils.updatePerfectScroller();
+            self.formUtils.initPerfectScroller(formConsole.cid);
 
             // 'Submit' button action
-            $(formContainer).on('click', '#btn-submit', function () {
+            $('#' + formConsole.cid).on('click', '#btn-submit', function () {
 
                 self.formUtils.removeErrorClass();
                 var isErrorOccurred = false;
@@ -244,8 +244,7 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'constants'],
             });
 
             // 'Cancel' button action
-            var cancelButtonElement = $(formContainer).find('#btn-cancel')[0];
-            cancelButtonElement.addEventListener('click', function () {
+            $('#' + formConsole.cid).on('click', '#btn-cancel', function () {
                 // close the form window
                 self.consoleListManager.removeFormConsole(formConsole);
             });

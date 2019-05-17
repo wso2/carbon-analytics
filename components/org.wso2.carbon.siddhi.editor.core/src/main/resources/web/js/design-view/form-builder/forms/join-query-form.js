@@ -315,9 +315,9 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryWindowOrFunct
             if (inValid) {
                 self.consoleListManager.removeFormConsole(formConsole);
             } else {
-                var propertyDiv = $('<div id="define-join-query" class="clearfix"></div>'
-                    + self.formUtils.buildFormButtons());
+                var propertyDiv = $('<div id="define-join-query" class="clearfix form-min-width"></div>');
                 formContainer.append(propertyDiv);
+                self.formUtils.buildFormButtons(formConsole.cid);
 
                 self.designViewContainer.addClass('disableContainer');
                 self.toggleViewButton.addClass('disableContainer');
@@ -581,9 +581,9 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryWindowOrFunct
                 var rateLimitingMatches = RATE_LIMITING_SYNTAX.concat(Constants.SIDDHI_TIME);
                 self.formUtils.createAutocomplete($('.rate-limiting-value'), rateLimitingMatches);
 
-                self.formUtils.updatePerfectScroller();
+                self.formUtils.initPerfectScroller(formConsole.cid);
 
-                $(formContainer).on('click', '#btn-submit', function () {
+                $('#' + formConsole.cid).on('click', '#btn-submit', function () {
 
                     self.formUtils.removeErrorClass();
                     var isErrorOccurred = false;
@@ -751,8 +751,7 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryWindowOrFunct
                 });
 
                 // 'Cancel' button action
-                var cancelButtonElement = $(formContainer).find('#btn-cancel')[0];
-                cancelButtonElement.addEventListener('click', function () {
+                $('#' + formConsole.cid).on('click', '#btn-cancel', function () {
                     // close the form
                     self.consoleListManager.removeFormConsole(formConsole);
                 });

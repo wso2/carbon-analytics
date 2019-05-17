@@ -151,9 +151,9 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOrderByValue'
                 DesignViewUtils.prototype.warnAlert('Connect an output element');
                 self.consoleListManager.removeFormConsole(formConsole);
             } else {
-                var propertyDiv = $('<div id="define-sequence-query" class="clearfix"></div>'
-                    + self.formUtils.buildFormButtons());
+                var propertyDiv = $('<div id="define-sequence-query" class="clearfix form-min-width"></div>');
                 formContainer.append(propertyDiv);
+                self.formUtils.buildFormButtons(formConsole.cid);
 
                 self.designViewContainer.addClass('disableContainer');
                 self.toggleViewButton.addClass('disableContainer');
@@ -370,9 +370,9 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOrderByValue'
                 var rateLimitingMatches = QUERY_SYNTAX.concat(Constants.SIDDHI_TIME);
                 self.formUtils.createAutocomplete($('.rate-limiting-value'), rateLimitingMatches);
 
-                self.formUtils.updatePerfectScroller();
+                self.formUtils.initPerfectScroller(formConsole.cid);
 
-                $(formContainer).on('click', '#btn-submit', function () {
+                $('#' + formConsole.cid).on('click', '#btn-submit', function () {
 
                     self.formUtils.removeErrorClass();
                     var isErrorOccurred = false;
@@ -491,9 +491,7 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOrderByValue'
                     }
                 })
 
-                // 'Cancel' button action
-                var cancelButtonElement = $(formContainer).find('#btn-cancel')[0];
-                cancelButtonElement.addEventListener('click', function () {
+                $('#' + formConsole.cid).on('click', '#btn-cancel', function () {
                     // close the form window
                     self.consoleListManager.removeFormConsole(formConsole);
                 });

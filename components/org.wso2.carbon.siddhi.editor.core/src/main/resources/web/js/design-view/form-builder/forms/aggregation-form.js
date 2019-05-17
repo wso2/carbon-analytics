@@ -242,10 +242,10 @@ define(['require', 'log', 'jquery', 'lodash', 'aggregateByTimePeriod', 'querySel
                 DesignViewUtils.prototype.warnAlert('Connect an input stream element');
                 self.consoleListManager.removeFormConsole(formConsole);
             } else {
-                var propertyDiv = $('<div id = "define-aggregation" class="clearfix"> </div>' +
-                    self.formUtils.buildFormButtons());
+                var propertyDiv = $('<div id = "define-aggregation" class="clearfix form-min-width"> </div>');
 
                 formContainer.append(propertyDiv);
+                self.formUtils.buildFormButtons(formConsole.cid);
                 self.designViewContainer.addClass('disableContainer');
                 self.toggleViewButton.addClass('disableContainer');
                 self.formUtils.popUpSelectedElement(id);
@@ -439,9 +439,9 @@ define(['require', 'log', 'jquery', 'lodash', 'aggregateByTimePeriod', 'querySel
                     self.formUtils.updatePerfectScroller();
                 });
 
-                self.formUtils.updatePerfectScroller();
+                self.formUtils.initPerfectScroller(formConsole.cid);
 
-                $(formContainer).on('click', '#btn-submit', function () {
+                $('#' + formConsole.cid).on('click', '#btn-submit', function () {
 
                     self.formUtils.removeErrorClass();
                     var isErrorOccurred = false;
@@ -587,8 +587,7 @@ define(['require', 'log', 'jquery', 'lodash', 'aggregateByTimePeriod', 'querySel
                 });
 
                 // 'Cancel' button action
-                var cancelButtonElement = $(formContainer).find('#btn-cancel')[0];
-                cancelButtonElement.addEventListener('click', function () {
+                $('#' + formConsole.cid).on('click', '#btn-cancel', function () {
                     // close the form aggregation
                     self.consoleListManager.removeFormConsole(formConsole);
                 });

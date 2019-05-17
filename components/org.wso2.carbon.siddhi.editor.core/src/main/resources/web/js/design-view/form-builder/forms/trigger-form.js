@@ -125,14 +125,14 @@ define(['require', 'log', 'jquery', 'lodash', 'constants'],
             var id = $(element).parent().attr('id');
             var triggerObject = self.configurationData.getSiddhiAppConfig().getTrigger(id);
 
-            var propertyDiv = $('<div class="clearfix"> <div class ="trigger-form-container"> ' +
+            var propertyDiv = $('<div class="clearfix form-min-width"> <div class ="trigger-form-container"> ' +
                 '<div id="define-trigger-name"> <label><span class="mandatory-symbol"> * </span>Name </label>' +
                 '<input type="text" id="triggerName" class="clearfix name"> <label class="error-message" ' +
                 'id = "triggerNameErrorMessage"> </label> </div> <div id= "define-trigger-criteria"> </div>' +
-                '<div id = "trigger-criteria-content"></div> </div> </div>' +
-                self.formUtils.buildFormButtons());
+                '<div id = "trigger-criteria-content"></div> </div> </div>');
 
             formContainer.append(propertyDiv);
+            self.formUtils.buildFormButtons(formConsole.cid);
             self.formUtils.popUpSelectedElement(id);
             self.designViewContainer.addClass('disableContainer');
             self.toggleViewButton.addClass('disableContainer');
@@ -186,10 +186,10 @@ define(['require', 'log', 'jquery', 'lodash', 'constants'],
                 }
             });
 
-            self.formUtils.updatePerfectScroller();
+            self.formUtils.initPerfectScroller(formConsole.cid);
 
             // 'Submit' button action
-            $(formContainer).on('click', '#btn-submit', function () {
+            $('#' + formConsole.cid).on('click', '#btn-submit', function () {
 
                 self.formUtils.removeErrorClass();
                 var isErrorOccurred = false;
@@ -277,8 +277,7 @@ define(['require', 'log', 'jquery', 'lodash', 'constants'],
             });
 
             // 'Cancel' button action
-            var cancelButtonElement = $(formContainer).find('#btn-cancel')[0];
-            cancelButtonElement.addEventListener('click', function () {
+            $('#' + formConsole.cid).on('click', '#btn-cancel', function () {
                 // close the form window
                 self.consoleListManager.removeFormConsole(formConsole);
             });

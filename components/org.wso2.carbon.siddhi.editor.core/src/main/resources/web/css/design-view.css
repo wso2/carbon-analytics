@@ -417,6 +417,7 @@ td {
 
 .design-view-form-content {
     padding: 10px;
+    height: calc(100% - 53px) !important;
 }
 
 select.form-control,
@@ -438,10 +439,6 @@ select.form-control,
 
 .section-seperator {
     border-bottom: 1px solid #424242;
-}
-
-.query-form-actions {
-    margin-top: 10px;
 }
 
 .design-view-form-content .table-bordered > tbody > tr > td,
@@ -783,7 +780,7 @@ a.list-group-item, button.list-group-item {
 .design-view-form-content #primary-index-annotations input[type="text"].annotation-value {
  	margin-bottom: 2px;
 	margin-left: 20px;
-    width: 50%;
+    width: 70%;
  }
 
 .design-view-form-content .attr-nav {
@@ -1227,15 +1224,18 @@ a.list-group-item, button.list-group-item {
     top: 0px;
 }
 
-.design-view-form-content .query-form-actions {
-	position: fixed;
-	bottom: 22px;
-	background: #0e0e0e;
-	width: 100%;
-	margin-left: -20px;
-	height: 53px;
+.form-wrapper .query-form-actions {
+    position: fixed;
+    bottom: 22px;
+    background: #0e0e0e;
+    width: 100%;
+    height: 53px;
+    padding: 10px;
 }
 
+.form-wrapper {
+    height: 100%;
+}
 
 .define-predefined-annotations .sub-annotation  {
 	margin-left: 20px;
@@ -1481,12 +1481,8 @@ label.option-name {
     overflow: auto;
 }
 
-.design-view-form-content {
+.form-min-width {
     min-width: 1750px;
-}
-
-.form-height {
-    height: calc(100% - 75px);
 }
 
 .btn-default:active,

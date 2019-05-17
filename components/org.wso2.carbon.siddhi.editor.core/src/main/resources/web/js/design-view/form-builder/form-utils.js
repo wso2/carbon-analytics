@@ -18,10 +18,10 @@
 
 define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annotationObject', 'annotationElement',
         'designViewUtils', 'queryWindowOrFunction', 'streamHandler', 'patternOrSequenceQueryCondition', 'queryOutputInsert',
-        'queryOutputDelete', 'queryOutputUpdate', 'queryOutputUpdateOrInsertInto'],
+        'queryOutputDelete', 'queryOutputUpdate', 'queryOutputUpdateOrInsertInto', 'perfect_scrollbar'],
     function (require, _, AppData, log, Constants, Handlebars, AnnotationObject, AnnotationElement, DesignViewUtils,
               QueryWindowOrFunction, StreamHandler, PatternOrSequenceQueryCondition, QueryOutputInsert, QueryOutputDelete,
-              QueryOutputUpdate, QueryOutputUpdateOrInsertInto) {
+              QueryOutputUpdate, QueryOutputUpdateOrInsertInto, PerfectScrollbar) {
 
         /**
          * @class FormUtils Contains utility methods for forms
@@ -205,11 +205,10 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
          * @function Builds HTML for form buttons.
          * @returns {string} HTML string
          */
-        FormUtils.prototype.buildFormButtons = function () {
-            var html = '<div class="query-form-actions">' +
-                '<button type="button" id="btn-submit" class="btn btn-primary">Submit</button>' +
-                '<button type="button" id="btn-cancel" class="btn btn-default">Cancel</button> </div>';
-            return html;
+        FormUtils.prototype.buildFormButtons = function (formConsoleId) {
+            var buttonHtml = '<button type="button" id="btn-submit" class="btn btn-primary">Submit</button>' +
+                '<button type="button" id="btn-cancel" class="btn btn-default">Cancel</button>';
+            $('#' + formConsoleId).find('.query-form-actions').html(buttonHtml);
         };
 
         /**
@@ -4012,7 +4011,6 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
             var self = this;
             $('#' + id).addClass('selected-element');
             $(".overlayed-container").fadeTo(200, 1);
-            self.changeHeightOfPerfectScroller();
         };
 
         /**
@@ -4023,10 +4021,24 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
         };
 
         /**
+         * @function to initialize the perfect scroller
+         * @param formConsole
+         */
+        FormUtils.prototype.initPerfectScroller = function (formConsoleId) {
+            this.designViewPerfectScroller = (function() {
+                if (!$('#' + formConsoleId+' .design-view-form-content').hasClass('ps')) {
+                    return new PerfectScrollbar('#' + formConsoleId +' .design-view-form-content');
+                }
+            })();
+        };
+
+        /**
          * @function to update the scroller when the form resizes
          */
         FormUtils.prototype.updatePerfectScroller = function () {
-            this.application.perfectScroller.update();
+            if(this.designViewPerfectScroller) {
+                this.designViewPerfectScroller.update();
+            }
         };
 
         /**

@@ -49,13 +49,14 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'jsonValidator', 'con
             var self = this;
             var id = $(element).parent().attr('id');
             var streamObject = self.configurationData.getSiddhiAppConfig().getStream(id);
-            var propertyDiv = $('<div class="clearfix"><div class = "stream-form-container"> <label> ' +
+            var propertyDiv = $('<div class="clearfix form-min-width"><div class = "stream-form-container"> <label> ' +
                 '<span class="mandatory-symbol"> *</span> Name </label> <input type="text" id="streamName" ' +
                 'class="clearfix name"> <label class="error-message" id="streamNameErrorMessage"> </label>' +
                 '<div id="define-attribute"></div> </div> <div class= "stream-form-container"> ' +
-                '<div class ="define-annotation"> </div> </div> </div>' + self.formUtils.buildFormButtons());
+                '<div class ="define-annotation"> </div> </div>');
 
             formContainer.append(propertyDiv);
+            self.formUtils.buildFormButtons(formConsole.cid);
             self.formUtils.popUpSelectedElement(id);
             self.designViewContainer.addClass('disableContainer');
             self.toggleViewButton.addClass('disableContainer');
@@ -120,10 +121,10 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'jsonValidator', 'con
             self.formUtils.renderAnnotationTemplate("define-annotation", annotations);
             self.formUtils.checkPredefinedAnnotations(checkedAnnotations);
 
-            self.formUtils.updatePerfectScroller();
+            self.formUtils.initPerfectScroller(formConsole.cid);
 
             //submit button action
-            $(formContainer).on('click', '#btn-submit', function () {
+            $('#' + formConsole.cid).on('click', '#btn-submit', function () {
 
                 self.formUtils.removeErrorClass();
                 var previouslySavedStreamName = streamObject.getName();
@@ -278,8 +279,7 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'jsonValidator', 'con
             });
 
             // 'Cancel' button action
-            var cancelButtonElement = $(formContainer).find('#btn-cancel')[0];
-            cancelButtonElement.addEventListener('click', function () {
+            $('#' + formConsole.cid).on('click', '#btn-cancel', function () {
                 // close the form window
                 self.consoleListManager.removeFormConsole(formConsole);
             });
