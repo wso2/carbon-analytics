@@ -22,7 +22,11 @@ define(['require', 'log', 'jquery', 'lodash', 'console','workspace','toolEditor'
         ServiceConsole = Console.extend({
             initialize: function (options) {
                 Console.prototype.initialize.call(this, options);
-                this.consolePerfectScroller = new PerfectScrollbar('.output-console-content.perfect-scroller');
+                this.consolePerfectScroller = (function() {
+                    if (!$('#' + options.cid + '.output-console-content').hasClass('ps')) {
+                        return new PerfectScrollbar('#' + options.cid + '.output-console-content');
+                    }
+                })();
                 this.app = options.application;
             },
             getFile: function(){
