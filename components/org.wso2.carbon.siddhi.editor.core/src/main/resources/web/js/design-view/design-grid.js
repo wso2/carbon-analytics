@@ -1215,7 +1215,7 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
                         model = self.configurationData.getSiddhiAppConfig().getAggregation(targetId)
                         model.setConnectedSource(undefined);
                         if(sourceElement.hasClass(constants.STREAM)) {
-                            model.resetInputModel(model);
+                            model.resetModel(model);
                         }
                     } else if (sourceElement.hasClass(constants.STREAM) || sourceElement.hasClass(constants.TABLE)
                         || sourceElement.hasClass(constants.AGGREGATION) || sourceElement.hasClass(constants.WINDOW)
