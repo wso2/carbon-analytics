@@ -39,53 +39,12 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryWindowOrFunct
         };
 
         /**
-         * @function to obtain the attributes of the coonected element
-         */
-        var getPossibleAttributes = function (self, connectedElementName) {
-            var connectedElement = self.configurationData.getSiddhiAppConfig().
-            getDefinitionElementByName(connectedElementName);
-            var attributes = [];
-            if (connectedElement.type.toLowerCase() === Constants.TRIGGER) {
-                attributes.push(connectedElementName + '.' + Constants.TRIGGERED_TIME);
-            } else {
-                if (connectedElement.type.toLowerCase() === Constants.AGGREGATION) {
-                    attributes = getAggregationAttributes(connectedElement.element, self)
-                } else {
-                    attributes = connectedElement.element.getAttributeList()
-                }
-            }
-            return attributes
-        };
-
-        /**
          * @function to construct the possible attributes with defined as of the source
          */
         var constructPossibleAttributes = function (attributeList, connectedElementName, possibleAttributes) {
             _.forEach(attributeList, function (attribute) {
                 possibleAttributes.push(connectedElementName + "." + attribute.name);
             });
-        };
-
-        /**
-         * @function to obtain the possible attributes of the connected aggregation element
-         */
-        var getAggregationAttributes = function (aggregationElement, self) {
-            var attributes = [];
-            var selectType = aggregationElement.getSelect().getType().toLowerCase();
-            if (selectType === Constants.TYPE_ALL) {
-                var elementConnectedToAggregation = self.configurationData.getSiddhiAppConfig().
-                getDefinitionElementByName(aggregationElement.getConnectedSource());
-                attributes = elementConnectedToAggregation.element.getAttributeList();
-            } else {
-                _.forEach(aggregationElement.getSelect().getValue(), function (selectAttribute) {
-                    if (selectAttribute.as.trim() === "") {
-                        attributes.push({ name: selectAttribute.expression })
-                    } else {
-                        attributes.push({ name: selectAttribute.as })
-                    }
-                });
-            }
-            return attributes;
         };
 
         /**
@@ -165,8 +124,7 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryWindowOrFunct
             var sourceOptions = {};
             var sourceDiv = $('.define-' + type + '-source');
             var sourceFrom = sourceDiv.find('.source-selection').val();
-            var sourceElementType = self.configurationData.getSiddhiAppConfig().
-            getDefinitionElementByName(sourceFrom).type;
+            var sourceElementType = self.configurationData.getSiddhiAppConfig().getDefinitionElementByName(sourceFrom).type;
             _.set(sourceOptions, 'type', sourceElementType);
             _.set(sourceOptions, 'from', sourceFrom);
             if (sourceDiv.find('.source-as-checkbox').is(':checked')) {
@@ -222,10 +180,10 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryWindowOrFunct
          */
         var getPossibleAttributesWithSourceAs = function (self) {
             var possibleAttributesWithSourceAs = [];
-            var firstElementAttributes = getPossibleAttributes(self,
-                $('.define-left-source').find('.source-selection').val());
-            var secondElementAttributes = getPossibleAttributes(self,
-                $('.define-right-source').find('.source-selection').val());
+            var firstElementAttributes = self.formUtils.getInputAttributes
+            ([$('.define-left-source').find('.source-selection').val()])
+            var secondElementAttributes = self.formUtils.getInputAttributes
+            ([$('.define-right-source').find('.source-selection').val()]);
             constructPossibleAttributes(firstElementAttributes,
                 getSourceAs(Constants.LEFT), possibleAttributesWithSourceAs)
             constructPossibleAttributes(secondElementAttributes,
@@ -357,14 +315,13 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryWindowOrFunct
                     .getDefinitionElementByName(outputElementName, partitionId);
 
                 var possibleJoinTypes = self.configurationData.application.config.join_types;
-                var predefinedAnnotations = _.cloneDeep(self.configurationData.application.config.
-                    type_query_predefined_annotations);
+                var predefinedAnnotations = _.cloneDeep(self.configurationData.application.config.type_query_predefined_annotations);
                 var incrementalAggregator = self.configurationData.application.config.incremental_aggregator;
                 var streamHandlerTypes = self.configurationData.application.config.stream_handler_types;
                 var streamFunctions = self.formUtils.getStreamFunctionNames();
 
                 //render the join-query form template
-                var joinFormTemplate = Handlebars.compile($('#join-query-form-template').html())({ name: queryName });
+                var joinFormTemplate = Handlebars.compile($('#join-query-form-template').html())({name: queryName});
                 $('#define-join-query').html(joinFormTemplate);
                 self.formUtils.renderQueryOutput(outputElement, queryOutput);
                 self.formUtils.renderOutputEventTypes();
@@ -473,8 +430,8 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryWindowOrFunct
                 mapUnidirectionalCheckbox(rightSourceData, Constants.RIGHT);
 
                 var possibleAttributes = [];
-                var firstElementAttributes = getPossibleAttributes(self, firstConnectedElement.name);
-                var secondElementAttributes = getPossibleAttributes(self, secondConnectedElement.name);
+                var firstElementAttributes = self.formUtils.getInputAttributes([firstConnectedElement.name]);
+                var secondElementAttributes = self.formUtils.getInputAttributes([secondConnectedElement.name]);
                 constructPossibleAttributes(firstElementAttributes, firstConnectedElement.name, possibleAttributes)
                 constructPossibleAttributes(secondElementAttributes, secondConnectedElement.name, possibleAttributes)
 
