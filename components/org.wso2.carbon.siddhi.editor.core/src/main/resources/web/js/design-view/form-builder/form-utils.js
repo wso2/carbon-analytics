@@ -168,6 +168,42 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
         };
 
         /**
+         * @function to determine if the other connection needs to be updated on click of submit
+         * @param previousObject object with the previous changes
+         * @param currentObject object with the new changes
+         * @param elementType
+         * @returns {boolean}
+         */
+        FormUtils.prototype.isUpdatingOtherElementsRequired = function (previousObject, currentObject, elementType) {
+            var isObjectChanged = false;
+            if (previousObject.getName()) {
+                if (previousObject.getName() !== currentObject.getName()) {
+                    isObjectChanged = true;
+                } else if (elementType === Constants.STREAM || elementType === Constants.TABLE ||
+                    elementType === Constants.WINDOW) {
+                    if (_.differenceWith(previousObject.getAttributeList(), currentObject.getAttributeList(),
+                        _.isEqual).length !== 0) {
+                        isObjectChanged = true;
+                    }
+                } else if (elementType === Constants.AGGREGATION) {
+                    if (previousObject.getSelect().getType() != currentObject.getSelect().getType()) {
+                        isObjectChanged = true;
+                    } else if (previousObject.getSelect().getType().toLowerCase() == Constants.TYPE_USER_DEFINED) {
+                        if (_(previousObject.getSelect().getValue())
+                            .differenceBy(currentObject.getSelect().getValue(), 'expression', 'as')
+                            .map(_.partial(_.pick, _, 'expression', 'as'))
+                            .value().length !== 0) {
+                            isObjectChanged = true;
+                        }
+                    }
+                }
+            } else {
+                isObjectChanged = true;
+            }
+            return isObjectChanged;
+        };
+
+        /**
          * @function to delete the connections
          */
         FormUtils.prototype.deleteConnectionsAfterDefinitionElementNameChange = function (outConnections, inConnections) {
@@ -4269,9 +4305,7 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
 
         /** Generates the current index of the option being rendered */
         Handlebars.registerHelper('sum', function () {
-            return Array.prototype.slice.call(arguments, 0, -1).reduce((acc, num) = > acc += num
-        )
-            ;
+            return Array.prototype.slice.call(arguments, 0, -1).reduce((acc, num) => acc += num);
         });
 
         /** Handlebar helper to check if the index is equivalent to half the length of the option's array */

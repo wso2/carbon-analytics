@@ -236,6 +236,7 @@ define(['require', 'log', 'jquery', 'lodash', 'aggregateByTimePeriod', 'querySel
             var self = this;
             var id = $(element).parent().attr('id');
             var aggregationObject = self.configurationData.getSiddhiAppConfig().getAggregation(id);
+            var previousAggregationObject = _.cloneDeep(aggregationObject);
 
             if (!aggregationObject.getConnectedSource()) {
                 $('#' + id).addClass('incomplete-element');
@@ -496,15 +497,7 @@ define(['require', 'log', 'jquery', 'lodash', 'aggregateByTimePeriod', 'querySel
 
                         aggregationObject.setConnectedSource($('#aggregation-from').val().trim());
 
-                        var outConnections = self.jsPlumbInstance.getConnections({ source: id + '-out' });
-                        var inConnections = self.jsPlumbInstance.getConnections({ target: id + '-in' });
-                        // delete connections related to the element if the name is changed
-                        self.formUtils.deleteConnectionsAfterDefinitionElementNameChange(outConnections, inConnections);
-                        // update selected aggregation model
                         aggregationObject.setName(aggregationName);
-                        // establish connections related to the element if the name is changed
-                        self.formUtils.establishConnectionsAfterDefinitionElementNameChange(outConnections, inConnections);
-
                         var textNode = $('#' + id).find('.aggregationNameNode');
                         textNode.html(aggregationName);
 
@@ -574,6 +567,22 @@ define(['require', 'log', 'jquery', 'lodash', 'aggregateByTimePeriod', 'querySel
                         _.set(aggregateByTimePeriodOptions, 'value', value);
                         var aggregateByTimePeriod = new AggregateByTimePeriod(aggregateByTimePeriodOptions);
                         aggregationObject.setAggregateByTimePeriod(aggregateByTimePeriod);
+
+                        if (self.formUtils.isUpdatingOtherElementsRequired(previousAggregationObject, aggregationObject,
+                            Constants.AGGREGATION)) {
+                            var outConnections = self.jsPlumbInstance.getConnections({source: id + '-out'});
+                            var inConnections = [];
+
+                            //to delete the connection, it requires the previous object name
+                            aggregationObject.setName(previousAggregationObject.getName())
+                            // delete connections related to the element if the name is changed
+                            self.formUtils.deleteConnectionsAfterDefinitionElementNameChange(outConnections, inConnections);
+                            //reset the name to new name
+                            aggregationObject.setName(aggregationName);
+
+                            // establish connections related to the element if the name is changed
+                            self.formUtils.establishConnectionsAfterDefinitionElementNameChange(outConnections, inConnections);
+                        }
 
                         JSONValidator.prototype.validateAggregation(aggregationObject);
                         //Send aggregation element to the backend and generate tooltip

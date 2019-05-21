@@ -49,6 +49,7 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'jsonValidator', 'con
             var self = this;
             var id = $(element).parent().attr('id');
             var streamObject = self.configurationData.getSiddhiAppConfig().getStream(id);
+            var previousStreamObject = _.cloneDeep(streamObject);
             var propertyDiv = $('<div class="clearfix form-min-width"><div class = "stream-form-container"> <label> ' +
                 '<span class="mandatory-symbol"> *</span> Name </label> <input type="text" id="streamName" ' +
                 'class="clearfix name"> <label class="error-message" id="streamNameErrorMessage"> </label>' +
@@ -65,15 +66,14 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'jsonValidator', 'con
             self.formUtils.addEventListenerToShowInputContentOnHover();
 
             var annotations = [];
-            var predefinedAnnotationList = _.cloneDeep(self.configurationData.application.config.
-                stream_predefined_annotations);
+            var predefinedAnnotationList = _.cloneDeep(self.configurationData.application.config.stream_predefined_annotations);
             var checkedAnnotations = [];
 
             var name = streamObject.getName();
             if (!name) {
                 //if stream form is freshly opened [new object]
                 annotations = predefinedAnnotationList;
-                var attributes = [{ name: "" }];
+                var attributes = [{name: ""}];
                 self.formUtils.renderAttributeTemplate(attributes)
             } else {
                 //if the stream object is already edited
@@ -89,7 +89,7 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'jsonValidator', 'con
                 _.forEach(predefinedAnnotationList, function (predefinedAnnotation) {
                     var foundPredefined = false;
                     _.forEach(annotationListObjects, function (savedAnnotation) {
-                        if (savedAnnotation.name.toLowerCase() == predefinedAnnotation.name.toLowerCase()) {
+                        if (savedAnnotation.name.toLowerCase() === predefinedAnnotation.name.toLowerCase()) {
                             //if an optional annotation is found push it to the checkedAnnotations[]
                             if (!predefinedAnnotation.isMandatory) {
                                 checkedAnnotations.push(savedAnnotation.name);
@@ -97,7 +97,7 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'jsonValidator', 'con
                             foundPredefined = true;
                             _.forEach(predefinedAnnotation.elements, function (predefinedAnnotationElement) {
                                 _.forEach(savedAnnotation.elements, function (savedAnnotationElement) {
-                                    if (predefinedAnnotationElement.name.toLowerCase() == savedAnnotationElement.key
+                                    if (predefinedAnnotationElement.name.toLowerCase() === savedAnnotationElement.key
                                         .toLowerCase()) {
                                         //if an optional property is found push it to the checkedAnnotations[]
                                         if (!predefinedAnnotationElement.isMandatory) {
@@ -227,14 +227,8 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'jsonValidator', 'con
                 }
 
                 if (!isErrorOccurred) {
-                    var outConnections = self.jsPlumbInstance.getConnections({ source: id + '-out' });
-                    var inConnections = self.jsPlumbInstance.getConnections({ target: id + '-in' });
-                    // delete connections related to the element if the name is changed
-                    self.formUtils.deleteConnectionsAfterDefinitionElementNameChange(outConnections, inConnections);
                     // update selected stream model
                     streamObject.setName(streamName);
-                    // establish connections related to the element if the name is changed
-                    self.formUtils.establishConnectionsAfterDefinitionElementNameChange(outConnections, inConnections);
                     var textNode = $('#' + id).find('.streamNameNode');
                     textNode.html(streamName);
 
@@ -245,7 +239,7 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'jsonValidator', 'con
                         var nameValue = $(this).find('.attr-name').val().trim();
                         var typeValue = $(this).find('.attr-type').val();
                         if (nameValue != "") {
-                            var attributeObject = new Attribute({ name: nameValue, type: typeValue });
+                            var attributeObject = new Attribute({name: nameValue, type: typeValue});
                             streamObject.addAttribute(attributeObject)
                         }
                     });
@@ -262,6 +256,22 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'jsonValidator', 'con
                     _.forEach(annotationObjectList, function (annotation) {
                         streamObject.addAnnotationObject(annotation);
                     });
+
+                    if (self.formUtils.isUpdatingOtherElementsRequired(previousStreamObject, streamObject,
+                        Constants.STREAM)) {
+                        var outConnections = self.jsPlumbInstance.getConnections({source: id + '-out'});
+                        var inConnections = self.jsPlumbInstance.getConnections({target: id + '-in'});
+
+                        //to delete the connection, it requires the previous object name
+                        streamObject.setName(previousStreamObject.getName())
+                        // delete connections related to the element if the name is changed
+                        self.formUtils.deleteConnectionsAfterDefinitionElementNameChange(outConnections, inConnections);
+                        //reset the name to new name
+                        streamObject.setName(streamName);
+
+                        // establish connections related to the element if the name is changed
+                        self.formUtils.establishConnectionsAfterDefinitionElementNameChange(outConnections, inConnections);
+                    }
 
                     self.dropElementInstance.toggleFaultStreamConnector(streamObject, self.jsPlumbInstance,
                         previouslySavedStreamName);

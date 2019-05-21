@@ -47,6 +47,7 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'constants'],
             var self = this;
             var id = $(element).parent().attr('id');
             var windowObject = self.configurationData.getSiddhiAppConfig().getWindow(id);
+            var previousWindowObject = _.cloneDeep(windowObject);
 
             var propertyDiv = $('<div class="clearfix form-min-width"><div class = "window-form-container"> <label> ' +
                 '<span class="mandatory-symbol"> * </span>Name </label> <input type="text" id="windowName" class="clearfix name">' +
@@ -187,14 +188,7 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'constants'],
                 }
 
                 if (!isErrorOccurred) {
-                    var outConnections = self.jsPlumbInstance.getConnections({ source: id + '-out' });
-                    var inConnections = self.jsPlumbInstance.getConnections({ target: id + '-in' });
-                    // delete connections related to the element if the name is changed
-                    self.formUtils.deleteConnectionsAfterDefinitionElementNameChange(outConnections, inConnections);
-                    // update selected window model
                     windowObject.setName(windowName);
-                    // establish connections related to the element if the name is changed
-                    self.formUtils.establishConnectionsAfterDefinitionElementNameChange(outConnections, inConnections);
                     var textNode = $(element).parent().find('.windowNameNode');
                     textNode.html(windowName);
 
@@ -230,6 +224,22 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'constants'],
                     _.forEach(annotationObjectList, function (annotation) {
                         windowObject.addAnnotationObject(annotation);
                     });
+
+                    if (self.formUtils.isUpdatingOtherElementsRequired(previousWindowObject, windowObject,
+                        Constants.WINDOW)) {
+                        var outConnections = self.jsPlumbInstance.getConnections({source: id + '-out'});
+                        var inConnections = self.jsPlumbInstance.getConnections({target: id + '-in'});
+
+                        //to delete the connection, it requires the previous object name
+                        windowObject.setName(previousWindowObject.getName())
+                        // delete connections related to the element if the name is changed
+                        self.formUtils.deleteConnectionsAfterDefinitionElementNameChange(outConnections, inConnections);
+                        //reset the name to new name
+                        windowObject.setName(windowName);
+
+                        // establish connections related to the element if the name is changed
+                        self.formUtils.establishConnectionsAfterDefinitionElementNameChange(outConnections, inConnections);
+                    }
 
                     $('#' + id).removeClass('incomplete-element');
                     //Send window element to the backend and generate tooltip

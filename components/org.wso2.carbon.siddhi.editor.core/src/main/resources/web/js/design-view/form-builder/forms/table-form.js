@@ -48,6 +48,7 @@ define(['log', 'jquery', 'lodash', 'attribute', 'storeAnnotation', 'handlebar', 
             var self = this;
             var id = $(element).parent().attr('id');
             var tableObject = self.configurationData.getSiddhiAppConfig().getTable(id);
+            var previousTableObject = _.cloneDeep(tableObject);
 
             var propertyDiv = $('<div class="clearfix form-min-width"> <div class = "table-form-container table-div"> ' +
                 '<label> <span class="mandatory-symbol"> *</span>Name </label> <input type="text" id="tableName" ' +
@@ -220,14 +221,7 @@ define(['log', 'jquery', 'lodash', 'attribute', 'storeAnnotation', 'handlebar', 
                     tableObject.clearAnnotationList();
                     tableObject.clearAnnotationListObjects();
 
-                    var outConnections = self.jsPlumbInstance.getConnections({ source: id + '-out' });
-                    var inConnections = self.jsPlumbInstance.getConnections({ target: id + '-in' });
-                    // delete connections related to the element if the name is changed
-                    self.formUtils.deleteConnectionsAfterDefinitionElementNameChange(outConnections, inConnections);
-                    // update selected table model
                     tableObject.setName(tableName);
-                    // establish connections related to the element if the name is changed
-                    self.formUtils.establishConnectionsAfterDefinitionElementNameChange(outConnections, inConnections);
                     var textNode = $('#' + id).find('.tableNameNode');
                     textNode.html(tableName);
 
@@ -267,6 +261,22 @@ define(['log', 'jquery', 'lodash', 'attribute', 'storeAnnotation', 'handlebar', 
                             tableObject.addAttribute(attributeObject);
                         }
                     });
+
+                    if (self.formUtils.isUpdatingOtherElementsRequired(previousTableObject, tableObject,
+                        Constants.TABLE)) {
+                        var outConnections = self.jsPlumbInstance.getConnections({source: id + '-out'});
+                        var inConnections = self.jsPlumbInstance.getConnections({target: id + '-in'});
+
+                        //to delete the connection, it requires the previous object name
+                        tableObject.setName(previousTableObject.getName())
+                        // delete connections related to the element if the name is changed
+                        self.formUtils.deleteConnectionsAfterDefinitionElementNameChange(outConnections, inConnections);
+                        //reset the name to new name
+                        tableObject.setName(tableName);
+
+                        // establish connections related to the element if the name is changed
+                        self.formUtils.establishConnectionsAfterDefinitionElementNameChange(outConnections, inConnections);
+                    }
 
                     $('#' + id).removeClass('incomplete-element');
                     //Send table element to the backend and generate tooltip
