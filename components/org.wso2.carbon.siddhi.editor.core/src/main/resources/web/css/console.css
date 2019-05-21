@@ -173,7 +173,6 @@
 }
 
 .output-console-content-wrapper {
-    margin-bottom: 10px;
     height: calc(100% - 20px);
     border-top: 3px solid #424242;
 }

@@ -23,8 +23,8 @@ define(['require', 'log', 'jquery', 'lodash', 'console','workspace','toolEditor'
             initialize: function (options) {
                 Console.prototype.initialize.call(this, options);
                 this.consolePerfectScroller = (function() {
-                    if (!$('#' + options.cid + '.output-console-content').hasClass('ps')) {
-                        return new PerfectScrollbar('#' + options.cid + '.output-console-content');
+                    if (!$('.output-console-content').hasClass('ps')) {
+                        return new PerfectScrollbar('.output-console-content');
                     }
                 })();
                 this.app = options.application;
