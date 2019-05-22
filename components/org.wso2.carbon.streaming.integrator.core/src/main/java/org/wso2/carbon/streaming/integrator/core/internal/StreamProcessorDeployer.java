@@ -76,7 +76,6 @@ public class StreamProcessorDeployer implements Deployer {
     public static void deploySiddhiQLFile(File file) throws Exception {
         InputStream inputStream = null;
         String siddhiAppName;
-
         try {
             if (file.isFile()) {
                 inputStream = new FileInputStream(file);
