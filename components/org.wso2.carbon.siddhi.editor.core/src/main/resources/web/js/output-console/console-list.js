@@ -84,7 +84,7 @@ define(['log', 'jquery', 'lodash', 'backbone', 'console'], function (log, $, _, 
                 consoleHeaderContainer.addClass('hide');
                 serviceWrapper.css('height', '100%');
                 if (serviceWrapper.is('.ui-resizable')){
-                    serviceWrapper.resizable( "destroy" );
+                    serviceWrapper.resizable( 'destroy' );
                     /*
                     * when resizable method in #service-tabs-wrapper's resizable method is destroyed
                     * it affects to it's child elements as well. So partitions in the design view also gets affected by
@@ -96,7 +96,7 @@ define(['log', 'jquery', 'lodash', 'backbone', 'console'], function (log, $, _, 
                     partitions.resizable();
                 }
                 var activeTab = self.options.application.tabController.activeTab;
-                if (activeTab !== undefined && activeTab.getTitle() != "welcome-page") {
+                if (activeTab !== undefined && activeTab.getTitle() != 'welcome-page') {
                     if (activeTab.getSiddhiFileEditor().isInSourceView()) {
                         activeTab.getSiddhiFileEditor().getSourceView().editorResize();
                     }
@@ -110,7 +110,7 @@ define(['log', 'jquery', 'lodash', 'backbone', 'console'], function (log, $, _, 
                 serviceWrapper.css('height', '65%');
                 consoleHeaderContainer.removeClass('hide');
                 serviceWrapper.resizable({
-                    handleSelector: ".splitter-horizontal",
+                    handleSelector: '.splitter-horizontal',
                     handles: "s",
                     resize: function( event, ui ) {
                     }
