@@ -24,7 +24,7 @@ define(['require', 'lodash', 'jquery', 'log', 'backbone', 'file_browser', 'works
                 /**
                  * @augments Backbone.View
                  * @constructs
-                 * @class SaveToFileDialog
+                 * @class ImportFileDialog
                  * @param {Object} config configuration options for the SaveToFileDialog
                  */
                 initialize: function (options) {
@@ -60,24 +60,21 @@ define(['require', 'lodash', 'jquery', 'log', 'backbone', 'file_browser', 'works
                         var files = event.target.files;
                         var file = files[0];
                         var reader = new FileReader();
-
                         fileName = file.name;
-
                         var existsResponse = existFileInPath({
                             configName: fileName
                         });
-
                         if (existsResponse.error === undefined) {
                             if (existsResponse.exists) {
-                                alertError("A file already exist in workspace with selected name.");
+                                alertError("A file already exist in workspace with the name - " +
+                                    fileName);
                                 return;
                             } else {
                                 reader.readAsText(file);
                             }
                         } else {
-                            alertError("Error in reading the file.");
+                            alertError("Error in reading the file - " + fileName);
                         }
-
                         reader.onload = (function (reader) {
                             return function () {
                                 var fileContent = reader.result;
@@ -92,7 +89,6 @@ define(['require', 'lodash', 'jquery', 'log', 'backbone', 'file_browser', 'works
                         var workspaceServiceURL = app.config.services.workspace.endpoint;
                         var saveServiceURL = workspaceServiceURL + "/exists/workspace";
                         var payload = "configName=" + self.app.utils.base64EncodeUnicode(options.configName);
-
                         $.ajax({
                             type: "POST",
                             contentType: "text/plain; charset=utf-8",
@@ -124,10 +120,8 @@ define(['require', 'lodash', 'jquery', 'log', 'backbone', 'file_browser', 'works
                         var importServiceURL = workspaceServiceURL + "/write";
                         var config = fileContent;
                         var configName = fileName;
-
                         var payload = "configName=" + self.app.utils.base64EncodeUnicode(configName) + "&config=" +
                             self.app.utils.base64EncodeUnicode(config);
-
                         $.ajax({
                             url: importServiceURL,
                             type: "POST",
@@ -164,7 +158,6 @@ define(['require', 'lodash', 'jquery', 'log', 'backbone', 'file_browser', 'works
                             }
                         });
                     }
-
                     var successNotification = $(
                         "<div style='z-index: 9999;' style='line-height: 20%;' class='alert alert-success' " +
                         "id='success-alert'><span class='notification'>" +
@@ -194,14 +187,13 @@ define(['require', 'lodash', 'jquery', 'log', 'backbone', 'file_browser', 'works
                         }
                         return $(
                             "<div style='z-index: 9999;' style='line-height: 20%;' class='alert alert-danger'" +
-                            " id='error-alert'>" + "<span class='notification'>" +
-                            errorMsg +
-                            "</span>" +
-                            "</div>");
+                            " id='error-alert'>" +
+                                "<span class='notification'>" + errorMsg +
+                                "</span>" +
+                            "</div>"
+                        );
                     }
-
-                },
+                }
             });
-
         return ImportFileDialog;
     });
