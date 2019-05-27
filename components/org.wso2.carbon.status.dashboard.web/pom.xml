@@ -53,34 +53,6 @@
                         </configuration>
                     </execution>
                     <execution>
-                        <id>npm install rimraf (clean)</id>
-                        <goals>
-                            <goal>exec</goal>
-                        </goals>
-                        <phase>pre-clean</phase>
-                        <configuration>
-                            <executable>${npm.executable}</executable>
-                            <arguments>
-                                <argument>install</argument>
-                                <argument>rimraf</argument>
-                            </arguments>
-                        </configuration>
-                    </execution>
-                    <execution>
-                        <id>npm run clean (clean)</id>
-                        <goals>
-                            <goal>exec</goal>
-                        </goals>
-                        <phase>clean</phase>
-                        <configuration>
-                            <executable>${npm.executable}</executable>
-                            <arguments>
-                                <argument>run</argument>
-                                <argument>clean</argument>
-                            </arguments>
-                        </configuration>
-                    </execution>
-                    <execution>
                         <id>npm run dev (compile)</id>
                         <goals>
                             <goal>exec</goal>
@@ -95,6 +67,9 @@
                         </configuration>
                     </execution>
                 </executions>
+            </plugin>
+            <plugin>
+                <artifactId>maven-clean-plugin</artifactId>
             </plugin>
         </plugins>
         <resources>

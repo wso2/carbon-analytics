@@ -178,6 +178,20 @@
                     <artifactId>maven-failsafe-plugin</artifactId>
                     <version>${maven.failsafe.plugin.version}</version>
                 </plugin>
+                <plugin>
+                    <artifactId>maven-clean-plugin</artifactId>
+                    <version>${maven.clean.plugin.version}</version>
+                    <configuration>
+                        <filesets>
+                            <fileset>
+                                <directory>${project.basedir}/node_modules</directory>
+                            </fileset>
+                            <fileset>
+                                <directory>${project.basedir}/dist</directory>
+                            </fileset>
+                        </filesets>
+                    </configuration>
+                </plugin>
             </plugins>
         </pluginManagement>
 
@@ -1659,6 +1673,7 @@
         <maven.build.helper.plugin.version>1.9.1</maven.build.helper.plugin.version>
         <carbon.p2.plugin.version>1.5.4</carbon.p2.plugin.version>
         <carbon.feature.plugin.version>3.1.3</carbon.feature.plugin.version>
+        <maven.clean.plugin.version>3.0.0</maven.clean.plugin.version>
 
         <testng.version>6.9.4</testng.version>
         <plugin.version.antlr>4.5.1</plugin.version.antlr>
