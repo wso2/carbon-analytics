@@ -317,7 +317,7 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
          */
         FormUtils.prototype.appendUserSelectAttribute = function () {
             var userSelectDiv = '<li class="attribute"> <div class="clearfix"> <div class="clearfix"> ' +
-                '<input type="text" class = "attribute-expression-as name" value=""><a class = "btn-del-option"> ' +
+                '<input type="text" class = "attribute-expression name" value=""><a class = "btn-del-option"> ' +
                 '<i class = "fw fw-delete"> </i></a> </div> <label class = "error-message"></label> ' +
                 '</div> </li>';
             $('.user-defined-attributes').append(userSelectDiv);
@@ -1255,7 +1255,6 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
             $(parameterDiv).find('.parameter').each(function () {
                 var parameterValue = $(this).find('.parameter-value').val().trim();
                 var parameterName = $(this).find('.parameter-name').text().trim();
-                ;
                 var predefinedParameter = self.getObject(parameterName, predefinedParameters);
                 if (!predefinedParameter.optional) {
                     if (!self.checkParameterValue(parameterValue, predefinedParameter, this)) {
@@ -1603,7 +1602,7 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
             var projectionType = $('.define-select .attribute-selection-type');
             if (projectionType.val() == Constants.TYPE_USER_DEFINED) {
                 $('.define-select .user-defined-attributes li').each(function () {
-                    var expressionAs = $(this).find('.attribute-expression-as');
+                    var expressionAs = $(this).find('.attribute-expression');
                     var expressionAsValue = expressionAs.val().trim();
                     var separateExpression = expressionAsValue.split(/as/i);
                     if (expressionAsValue != "") {
@@ -1630,7 +1629,7 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
                     isErrorOccurred = true;
                     var firstAttributeList = '.user-defined-attributes li:first';
                     $(firstAttributeList).find('.error-message').text("Minimum one attribute is required.")
-                    self.addErrorClass($(firstAttributeList).find('.attribute-expression-as'));
+                    self.addErrorClass($(firstAttributeList).find('.attribute-expression'));
                 }
             } else if (!projectionType.val()) {
                 isErrorOccurred = true;
@@ -1807,17 +1806,17 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
         FormUtils.prototype.buildAggregateExpressions = function () {
             var attributes = [];
             $('.define-select .user-defined-attributes li').each(function () {
-                var expressionAsValue = $(this).find('.attribute-expression-as').val().trim();
-                if (expressionAsValue != "") {
+                var expressionAsValue = $(this).find('.attribute-expression').val().trim();
+                if (expressionAsValue !== "") {
                     var separateExpression = expressionAsValue.split(/as/i);
-                    if (separateExpression.length == 1) {
+                    if (separateExpression.length === 1) {
                         var expressionAs = {
                             expression: separateExpression[0].trim(),
                             as: ""
                         }
-                    } else if (separateExpression.length = 2) {
+                    } else if (separateExpression.length === 2) {
                         var asValue = "";
-                        if (separateExpression[0].trim() != separateExpression[1].trim()) {
+                        if (separateExpression[0].trim() !== separateExpression[1].trim()) {
                             asValue = separateExpression[1].trim();
                         }
                         var expressionAs = {
@@ -4271,8 +4270,7 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
                 case Constants.WINDOW_FILTER_PROJECTION_QUERY:
                     appData.addWindowFilterProjectionQuery(element);
                     break;
-            }
-            ;
+            };
 
             var self = this;
             var result = '';
