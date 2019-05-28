@@ -37,6 +37,7 @@ import org.wso2.carbon.stream.processor.core.persistence.PersistenceManager;
 import org.wso2.siddhi.core.SiddhiAppRuntime;
 import org.wso2.siddhi.core.SiddhiManager;
 import org.wso2.siddhi.core.exception.CannotRestoreSiddhiAppStateException;
+import org.wso2.siddhi.core.stream.input.InputHandler;
 import org.wso2.siddhi.core.stream.input.source.SourceHandler;
 import org.wso2.siddhi.core.stream.output.sink.SinkHandler;
 import org.wso2.siddhi.core.table.record.RecordTableHandler;
@@ -46,6 +47,8 @@ import org.wso2.siddhi.core.util.statistics.metrics.Level;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -151,15 +154,15 @@ public class HAManager {
             clusterCoordinator.setPropertiesMap(passiveNodeDetailsPropertiesMap);
             EventListMapManager.initializeEventListMap();
 
-            //start tcp server
-            tcpServerInstance.start(deploymentConfig);
-
             //notify the HAStateChangeListener as becamePassive
             List<HAStateChangeListener> listeners = StreamProcessorDataHolder.getHaStateChangeListenerList();
             for (HAStateChangeListener listener : listeners) {
                 listener.becamePassive();
             }
         }
+
+        //start tcp server
+        tcpServerInstance.start(deploymentConfig);
 
         NodeInfo nodeInfo = StreamProcessorDataHolder.getNodeInfo();
         nodeInfo.setMode(DeploymentMode.MINIMUM_HA);
@@ -172,7 +175,6 @@ public class HAManager {
     }
 
     /**
-     * Stops TCP server and other resources
      * Sync state from persisted information
      * Playback events
      * Start siddhi app runtimes
@@ -182,10 +184,19 @@ public class HAManager {
         if (!isActiveNode) {
             log.info("HA Deployment: This Node is now becoming the Active Node");
             isActiveNode = true;
+            createSiddhiAppRuntimes();
+            for (SourceHandler sourceHandler : sourceHandlerManager.getRegsiteredSourceHandlers().values()) {
+                try {
+                    ((HACoordinationSourceHandler) sourceHandler).setAsActive();
+                } catch (Throwable t) {
+                    log.error("HA Deployment: Error when connecting to source " + sourceHandler.getElementId() +
+                            " while changing from passive state to active, skipping the source. ", t);
+                    continue;
+                }
+            }
             changeSiddhiAppState(true);
             NodeInfo nodeInfo = StreamProcessorDataHolder.getNodeInfo();
             nodeInfo.setActiveNode(isActiveNode);
-            tcpServerInstance.stop();
             syncState();
 
             //Give time for byte buffer queue to be empty
@@ -199,7 +210,6 @@ public class HAManager {
                 }
             }
 
-            tcpServerInstance.clearResources();
             //change the system clock to work with event time
             enableEventTimeClock(true);
             startSiddhiAppRuntimeWithoutSources();
@@ -263,7 +273,8 @@ public class HAManager {
     }
 
     /**
-     * Start TCP server
+     * Stop thrift/binary servers
+     * Stop siddhi app runtimes
      * Initialize eventEventListMap
      */
     void changeToPassive() {
@@ -273,17 +284,17 @@ public class HAManager {
         for (ServerEventListener listener : listeners) {
             listener.stop();
         }
+        sourceHandlerManager.getRegsiteredSourceHandlers().clear();
         stopSiddhiAppRuntimes();
         isActiveNode = false;
         changeSiddhiAppState(false);
+        setPassiveNodeAdded(false);
 
         //initialize event list map
         EventListMapManager.initializeEventListMap();
 
         NodeInfo nodeInfo = StreamProcessorDataHolder.getNodeInfo();
         nodeInfo.setActiveNode(isActiveNode);
-        //start tcp server
-        tcpServerInstance.start(deploymentConfig);
 
         //notify the HAStateChangeListener as becamePassive
         List<HAStateChangeListener> haStateChangeListeners = StreamProcessorDataHolder.
@@ -291,7 +302,36 @@ public class HAManager {
         for (HAStateChangeListener listener : haStateChangeListeners) {
             listener.becamePassive();
         }
+
+        try {
+            EventSyncConnectionPoolManager.getConnectionPool().close();
+        } catch (Exception e) {
+            log.error("Error closing tcp client connection pool. " + e.getMessage(), e);
+        } finally {
+            EventSyncConnectionPoolManager.uninitializeConnectionPool();
+        }
+
         log.info("Successfully Changed to Passive Mode ");
+    }
+
+    public void createSiddhiAppRuntimes() {
+        Map<String, SiddhiAppData> siddhiAppDataMap
+                = StreamProcessorDataHolder.getStreamProcessorService().getSiddhiAppMap();
+        SiddhiManager siddhiManager = StreamProcessorDataHolder.getSiddhiManager();
+
+        siddhiAppDataMap.forEach((siddhiAppName, siddhiAppData) -> {
+
+            SiddhiAppRuntime siddhiAppRuntime = siddhiManager.createSiddhiAppRuntime(siddhiAppData.getSiddhiApp());
+            Set<String> streamNames = siddhiAppRuntime.getStreamDefinitionMap().keySet();
+            Map<String, InputHandler> inputHandlerMap =
+                    new ConcurrentHashMap<String, InputHandler>(streamNames.size());
+            for (String streamName : streamNames) {
+                inputHandlerMap.put(streamName, siddhiAppRuntime.getInputHandler(streamName));
+            }
+            siddhiAppData.setInputHandlerMap(inputHandlerMap);
+            siddhiAppData.setActive(true);
+            siddhiAppData.setSiddhiAppRuntime(siddhiAppRuntime);
+        });
     }
 
     private void syncState() {

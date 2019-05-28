@@ -124,16 +124,22 @@ public class PersistenceManager implements Runnable {
         log.info("siddhi Apps are persisted successfully");
     }
 
-
     private EventSyncConnection getTCPConnection() {
         deploymentConfig = StreamProcessorDataHolder.getDeploymentConfig();
         GenericKeyedObjectPool tcpConnectionPool = EventSyncConnectionPoolManager.getConnectionPool();
         EventSyncConnection eventSyncConnection = null;
-        try {
-            eventSyncConnection = (EventSyncConnection) tcpConnectionPool.borrowObject(HAConstants.ACTIVE_NODE_CONNECTION_POOL_ID);
-            tcpConnectionPool.returnObject(HAConstants.ACTIVE_NODE_CONNECTION_POOL_ID, eventSyncConnection);
-        } catch (Exception e) {
-            log.error("Error in getting a connection to the Passive node. " + e.getMessage());
+        if (null != tcpConnectionPool) {
+            try {
+                eventSyncConnection = (EventSyncConnection)
+                        tcpConnectionPool.borrowObject(HAConstants.ACTIVE_NODE_CONNECTION_POOL_ID);
+                if (null != eventSyncConnection) {
+                    tcpConnectionPool.returnObject(HAConstants.ACTIVE_NODE_CONNECTION_POOL_ID, eventSyncConnection);
+                }
+            } catch (Exception e) {
+                log.error("Error in getting a connection to the Passive node. " + e.getMessage(), e);
+            }
+        } else {
+            log.warn("Error in getting a connection to the Passive node.");
         }
         return eventSyncConnection;
     }
