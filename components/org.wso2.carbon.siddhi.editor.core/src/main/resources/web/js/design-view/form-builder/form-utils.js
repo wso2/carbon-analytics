@@ -3361,11 +3361,17 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
          * @param aggregationElement
          */
         FormUtils.prototype.getInputAttributesForAggregation = function (aggregationElement) {
+            var self = this;
             var attributes = [];
             var selectType = aggregationElement.element.getSelect().getType().toLowerCase();
             if (selectType === Constants.TYPE_ALL) {
-                var elementConnectedToAggregation = self.configurationData.getSiddhiAppConfig().getDefinitionElementByName(aggregationElement.getConnectedSource());
-                attributes = elementConnectedToAggregation.element.getAttributeList();
+                var elementConnectedToAggregation = self.configurationData.getSiddhiAppConfig().
+                getDefinitionElementByName(aggregationElement.element.getConnectedSource());
+                if (elementConnectedToAggregation.type === Constants.STREAM) {
+                    attributes = elementConnectedToAggregation.element.getAttributeList();
+                } else {
+                    attributes.push({name: Constants.TRIGGERED_TIME});
+                }
             } else {
                 _.forEach(aggregationElement.element.getSelect().getValue(), function (selectAttribute) {
                     if (selectAttribute.as.trim() === "") {
