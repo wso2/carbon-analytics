@@ -88,40 +88,42 @@ public class PersistenceManager implements Runnable {
     private void persistAndSendControlMessage() {
         ConcurrentMap<String, SiddhiAppRuntime> siddhiAppRuntimeMap = StreamProcessorDataHolder.
                 getSiddhiManager().getSiddhiAppRuntimeMap();
-        String[] siddhiRevisionArray = new String[siddhiAppRuntimeMap.size()];
-        int siddhiAppCount = 0;
-        for (SiddhiAppRuntime siddhiAppRuntime : siddhiAppRuntimeMap.values()) {
-            PersistenceReference persistenceReference = siddhiAppRuntime.persist();
-            Future fullStateFuture = persistenceReference.getFullStateFuture();
-            try {
-                if (fullStateFuture != null) {
-                    fullStateFuture.get(60000, TimeUnit.MILLISECONDS);
-                } else {
-                    for (Future future : persistenceReference.getIncrementalStateFuture()) {
-                        future.get(60000, TimeUnit.MILLISECONDS);
+        if (null != siddhiAppRuntimeMap && siddhiAppRuntimeMap.size() != 0) {
+            String[] siddhiRevisionArray = new String[siddhiAppRuntimeMap.size()];
+            int siddhiAppCount = 0;
+            for (SiddhiAppRuntime siddhiAppRuntime : siddhiAppRuntimeMap.values()) {
+                PersistenceReference persistenceReference = siddhiAppRuntime.persist();
+                Future fullStateFuture = persistenceReference.getFullStateFuture();
+                try {
+                    if (fullStateFuture != null) {
+                        fullStateFuture.get(60000, TimeUnit.MILLISECONDS);
+                    } else {
+                        for (Future future : persistenceReference.getIncrementalStateFuture()) {
+                            future.get(60000, TimeUnit.MILLISECONDS);
+                        }
                     }
+                } catch (Throwable e) {
+                    log.error("Active Node: Persisting of Siddhi app is not successful. Check if app deployed properly");
                 }
-            } catch (Throwable e) {
-                log.error("Active Node: Persisting of Siddhi app is not successful. Check if app deployed properly");
+                siddhiRevisionArray[siddhiAppCount] = sequenceIDGenerator.incrementAndGet() + HAConstants
+                        .PERSISTED_APP_SPLIT_DELIMITER + persistenceReference.getRevision();
+                siddhiAppCount++;
+                if (log.isDebugEnabled()) {
+                    log.debug("Revision " + persistenceReference.getRevision() +
+                            " of siddhi App " + siddhiAppRuntime.getName() + " persisted successfully");
+                }
             }
-            siddhiRevisionArray[siddhiAppCount] = sequenceIDGenerator.incrementAndGet() + HAConstants
-                    .PERSISTED_APP_SPLIT_DELIMITER + persistenceReference.getRevision();
-            siddhiAppCount++;
-            if (log.isDebugEnabled()) {
-                log.debug("Revision " + persistenceReference.getRevision() +
-                        " of siddhi App " + siddhiAppRuntime.getName() + " persisted successfully");
+            if (StreamProcessorDataHolder.getNodeInfo() != null) {
+                StreamProcessorDataHolder.getNodeInfo().setLastPersistedTimestamp(System.currentTimeMillis());
+            }
+            log.info("Siddhi apps persisted successfully");
+            if (haManager != null && haManager.isActiveNode() && haManager.isPassiveNodeAdded()) {
+                if (log.isDebugEnabled()) {
+                    log.debug("Control Message is sent to the passive node - " + Arrays.toString(siddhiRevisionArray));
+                }
+                sendControlMessageToPassiveNode(siddhiRevisionArray);
             }
         }
-        if (haManager != null && haManager.isActiveNode() && haManager.isPassiveNodeAdded()) {
-            if (log.isDebugEnabled()) {
-                log.debug("Control Message is sent to the passive node - " + Arrays.toString(siddhiRevisionArray));
-            }
-            sendControlMessageToPassiveNode(siddhiRevisionArray);
-        }
-        if (StreamProcessorDataHolder.getNodeInfo() != null) {
-            StreamProcessorDataHolder.getNodeInfo().setLastPersistedTimestamp(System.currentTimeMillis());
-        }
-        log.info("siddhi Apps are persisted successfully");
     }
 
     private EventSyncConnection getTCPConnection() {

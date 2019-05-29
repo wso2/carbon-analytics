@@ -23,6 +23,7 @@ import org.slf4j.LoggerFactory;
 import org.wso2.carbon.cluster.coordinator.commons.MemberEventListener;
 import org.wso2.carbon.cluster.coordinator.commons.node.NodeDetail;
 import org.wso2.carbon.cluster.coordinator.service.ClusterCoordinator;
+import org.wso2.carbon.stream.processor.core.ha.transport.EventSyncConnectionPoolManager;
 import org.wso2.carbon.stream.processor.core.ha.util.HAConstants;
 import org.wso2.carbon.stream.processor.core.internal.StreamProcessorDataHolder;
 import org.wso2.carbon.stream.processor.core.persistence.PersistenceManager;
@@ -144,6 +145,15 @@ public class HAEventListener extends MemberEventListener {
                 StreamProcessorDataHolder.getHAManager().setPassiveNodeAdded(false);
                 for (SourceHandler sourceHandler : registeredSourceHandlers.values()) {
                     ((HACoordinationSourceHandler) sourceHandler).setPassiveNodeAdded(false);
+                }
+                try {
+                    if (null != EventSyncConnectionPoolManager.getConnectionPool()) {
+                        EventSyncConnectionPoolManager.getConnectionPool().close();
+                    }
+                } catch (Exception e) {
+                    log.error("Error closing tcp client connection pool. " + e.getMessage(), e);
+                } finally {
+                    EventSyncConnectionPoolManager.uninitializeConnectionPool();
                 }
             }
         }

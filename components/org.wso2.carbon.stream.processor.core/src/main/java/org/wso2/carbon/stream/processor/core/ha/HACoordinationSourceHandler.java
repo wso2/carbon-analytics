@@ -154,85 +154,95 @@ public class HACoordinationSourceHandler extends SourceHandler {
     }
 
     private void sendEventsToPassiveNode(Event event, String[] transportSyncProperties) {
-        EventSyncConnection eventSyncConnection = getTCPNettyClient();
-        ByteBuffer messageBuffer = null;
-        if (eventSyncConnection != null) {
-            QueuedEvent queuedEvent = new QueuedEvent(siddhiAppName, sourceHandlerElementId, sequenceIDGenerator
-                    .incrementAndGet(), event, transportSyncProperties);
-            try {
-                messageBuffer = BinaryEventConverter.convertToBinaryMessage(new QueuedEvent[]{queuedEvent});
-            } catch (IOException e) {
-                log.error("Error in converting events to binary message.Hence not sending message to the passive node");
-                return;
-            }
-            if (messageBuffer != null) {
+        EventSyncConnection eventSyncConnection = null;
+        try {
+            eventSyncConnection = getTCPNettyClient();
+            ByteBuffer messageBuffer = null;
+            if (eventSyncConnection != null) {
+                QueuedEvent queuedEvent = new QueuedEvent(siddhiAppName, sourceHandlerElementId, sequenceIDGenerator
+                        .incrementAndGet(), event, transportSyncProperties);
                 try {
-                    eventSyncConnection.send(HAConstants.CHANNEL_ID_MESSAGE, messageBuffer.array());
-                    if (throughputTracker != null && StreamProcessorDataHolder.isStatisticsEnabled()) {
-                        throughputTracker.eventIn();
+                    messageBuffer = BinaryEventConverter.convertToBinaryMessage(new QueuedEvent[]{queuedEvent});
+                } catch (IOException e) {
+                    log.error("Error in converting events to binary message.Hence not sending message to the passive node");
+                    return;
+                }
+                if (messageBuffer != null) {
+                    try {
+                        eventSyncConnection.send(HAConstants.CHANNEL_ID_MESSAGE, messageBuffer.array());
+                        if (throughputTracker != null && StreamProcessorDataHolder.isStatisticsEnabled()) {
+                            throughputTracker.eventIn();
+                        }
+                    } catch (ConnectionUnavailableException e) {
+                        log.error("Error in sending events to the passive node. " + e.getMessage());
                     }
-                } catch (ConnectionUnavailableException e) {
-                    log.error("Error in sending events to the passive node. " + e.getMessage());
+                }
+                try {
+                    eventSyncConnectionPoolFactory.returnObject(HAConstants.ACTIVE_NODE_CONNECTION_POOL_ID, eventSyncConnection);
+                } catch (Exception e) {
+                    log.error("Error in returning the tcpClient connection object to the pool. ", e);
                 }
             }
-            try {
-                eventSyncConnectionPoolFactory.returnObject(HAConstants.ACTIVE_NODE_CONNECTION_POOL_ID, eventSyncConnection);
-            } catch (Exception e) {
-                log.error("Error in returning the tcpClient connection object to the pool. ", e);
-            }
+        } catch (ConnectionUnavailableException e) {
+            log.warn(e.getMessage());
         }
     }
 
     private void sendEventsToPassiveNode(Event[] events, String[] transportSyncProperties) {
-        EventSyncConnection eventSyncConnection = getTCPNettyClient();
-        ByteBuffer messageBuffer = null;
-        if (eventSyncConnection != null) {
-            QueuedEvent[] queuedEvents = new QueuedEvent[events.length];
-            int i = 0;
-            for (Event event : events) {
-                QueuedEvent queuedEvent;
-                if (i == 0) {
-                    queuedEvent = new QueuedEvent(siddhiAppName, sourceHandlerElementId, sequenceIDGenerator
-                            .incrementAndGet(), event, transportSyncProperties);
-                } else {
-                    queuedEvent = new QueuedEvent(siddhiAppName, sourceHandlerElementId, sequenceIDGenerator
-                            .incrementAndGet(), event, null);
-                }
-                queuedEvents[i] = queuedEvent;
-                i++;
-            }
-            try {
-                messageBuffer = BinaryEventConverter.convertToBinaryMessage(queuedEvents);
-            } catch (IOException e) {
-                log.error("Error in converting events to binary message.Hence not sending message to the passive node");
-            }
-            if (messageBuffer != null) {
-                try {
-                    eventSyncConnection.send(HAConstants.CHANNEL_ID_MESSAGE, messageBuffer.array());
-                    if (throughputTracker != null && StreamProcessorDataHolder.isStatisticsEnabled()) {
-                        throughputTracker.eventsIn(events.length);
+        EventSyncConnection eventSyncConnection = null;
+        try {
+            eventSyncConnection = getTCPNettyClient();
+            ByteBuffer messageBuffer = null;
+            if (eventSyncConnection != null) {
+                QueuedEvent[] queuedEvents = new QueuedEvent[events.length];
+                int i = 0;
+                for (Event event : events) {
+                    QueuedEvent queuedEvent;
+                    if (i == 0) {
+                        queuedEvent = new QueuedEvent(siddhiAppName, sourceHandlerElementId, sequenceIDGenerator
+                                .incrementAndGet(), event, transportSyncProperties);
+                    } else {
+                        queuedEvent = new QueuedEvent(siddhiAppName, sourceHandlerElementId, sequenceIDGenerator
+                                .incrementAndGet(), event, null);
                     }
-                } catch (ConnectionUnavailableException e) {
-                    log.error("Error in sending events to the passive node. " + e.getMessage());
+                    queuedEvents[i] = queuedEvent;
+                    i++;
+                }
+                try {
+                    messageBuffer = BinaryEventConverter.convertToBinaryMessage(queuedEvents);
+                } catch (IOException e) {
+                    log.error("Error in converting events to binary message.Hence not sending message to the passive node");
+                }
+                if (messageBuffer != null) {
+                    try {
+                        eventSyncConnection.send(HAConstants.CHANNEL_ID_MESSAGE, messageBuffer.array());
+                        if (throughputTracker != null && StreamProcessorDataHolder.isStatisticsEnabled()) {
+                            throughputTracker.eventsIn(events.length);
+                        }
+                    } catch (ConnectionUnavailableException e) {
+                        log.error("Error in sending events to the passive node. " + e.getMessage());
+                    }
+                }
+                try {
+                    eventSyncConnectionPoolFactory.returnObject(HAConstants.ACTIVE_NODE_CONNECTION_POOL_ID, eventSyncConnection);
+                } catch (Exception e) {
+                    log.error("Error in returning the tcpClient connection object to the pool. ", e);
                 }
             }
-            try {
-                eventSyncConnectionPoolFactory.returnObject(HAConstants.ACTIVE_NODE_CONNECTION_POOL_ID, eventSyncConnection);
-            } catch (Exception e) {
-                log.error("Error in returning the tcpClient connection object to the pool. ", e);
-            }
+        } catch (ConnectionUnavailableException e) {
+            log.warn(e.getMessage());
         }
     }
 
-    private EventSyncConnection getTCPNettyClient() {
+    private EventSyncConnection getTCPNettyClient() throws ConnectionUnavailableException {
         eventSyncConnectionPoolFactory = EventSyncConnectionPoolManager.getConnectionPool();
         EventSyncConnection eventSyncConnection = null;
         try {
             eventSyncConnection = (EventSyncConnection) eventSyncConnectionPoolFactory.borrowObject(HAConstants.
                     ACTIVE_NODE_CONNECTION_POOL_ID);
         } catch (Exception e) {
-            log.warn("Error in obtaining a tcp connection to the passive node. Hence not sending events to the " +
-                    "passive node. " + e.getMessage());
+            throw new ConnectionUnavailableException("Error in obtaining a tcp connection to the passive node. " +
+                    "Hence not sending events to the passive node. " + e.getMessage());
         }
         return eventSyncConnection;
     }
