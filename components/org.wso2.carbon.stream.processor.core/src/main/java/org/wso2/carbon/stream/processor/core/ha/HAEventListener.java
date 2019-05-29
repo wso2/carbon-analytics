@@ -104,13 +104,13 @@ public class HAEventListener extends MemberEventListener {
                 } while (propertiesMap == null);
 
                 if (null != propertiesMap) {
-                    haManager.setPassiveNodeAdded(true);
                     haManager.setPassiveNodeHostPort(getHost(propertiesMap),
                             getPort(propertiesMap));
                     haManager.initializeEventSyncConnectionPool();
                     for (SourceHandler sourceHandler : registeredSourceHandlers.values()) {
                         ((HACoordinationSourceHandler) sourceHandler).setPassiveNodeAdded(true);
                     }
+                    haManager.setPassiveNodeAdded(true);
                     new PersistenceManager().run();
                 }
             }
