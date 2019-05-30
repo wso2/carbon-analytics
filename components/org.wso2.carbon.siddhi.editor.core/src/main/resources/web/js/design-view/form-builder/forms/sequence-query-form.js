@@ -75,22 +75,17 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOrderByValue'
         };
 
         /**
-         * @function to add autocompletion for input fields
+         * @function add autocomplete for fields with changing attributes
          */
-        var addAutoCompletion = function (self, partitionId, QUERY_CONDITION_SYNTAX, QUERY_SYNTAX,
-                                          incrementalAggregator, streamFunctions, outputAttributes) {
+        var autoCompleteFieldsWithChangingAttributes = function (self, partitionId, outputAttributes) {
             var possibleAttributes = getPossibleAttributes(self, partitionId);
-            var selectExpressionMatches = _.cloneDeep(possibleAttributes);
-            selectExpressionMatches = selectExpressionMatches.concat(incrementalAggregator);
-            selectExpressionMatches = selectExpressionMatches.concat(streamFunctions);
-            var filterMatches = _.cloneDeep(possibleAttributes);
-            filterMatches = filterMatches.concat(QUERY_CONDITION_SYNTAX);
-            filterMatches = filterMatches.concat(outputAttributes);
-            var logicMatches = filterMatches.concat(QUERY_SYNTAX);
-            logicMatches = logicMatches.concat(Constants.SIDDHI_TIME);
-            self.formUtils.createAutocomplete($('.attribute-expression'), selectExpressionMatches);
-            self.formUtils.createAutocomplete($('.logic-statement'), logicMatches);
-            self.formUtils.createAutocomplete($('.symbol-syntax-required-value'), filterMatches);
+            self.formUtils.addAutoCompleteForSelectExpressions(possibleAttributes);
+            self.formUtils.addAutoCompleteForFilterConditions(possibleAttributes.concat(outputAttributes));
+            self.formUtils.addAutoCompleteForLogicStatements();
+            self.formUtils.addAutoCompleteForHavingCondition(possibleAttributes.concat(outputAttributes));
+            self.formUtils.addAutoCompleteForOnCondition(possibleAttributes.concat(outputAttributes),
+                self.formUtils.getPatternSequenceInputs());
+            self.formUtils.addAutoCompleteForOutputOperation(outputAttributes, possibleAttributes);
         };
 
         /**
@@ -159,10 +154,6 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOrderByValue'
                 self.toggleViewButton.addClass('disableContainer');
                 self.formUtils.popUpSelectedElement(id);
 
-                var QUERY_CONDITION_SYNTAX = self.configurationData.application.config.query_condition_syntax;
-                var QUERY_SYNTAX = self.configurationData.application.config.other_query_syntax;
-
-                var incrementalAggregator = self.configurationData.application.config.incremental_aggregator;
                 var queryName = sequenceQueryObject.getQueryName();
                 var conditionList = sequenceQueryObject.getQueryInput().getConditionList();
                 var logic = sequenceQueryObject.getQueryInput().getLogic();
@@ -187,9 +178,7 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOrderByValue'
                 var outputElement = self.configurationData.getSiddhiAppConfig()
                     .getDefinitionElementByName(outputElementName, partitionId);
 
-                var predefinedAnnotations = _.cloneDeep(self.configurationData.application.config.
-                    type_query_predefined_annotations);
-                var streamFunctions = self.formUtils.getStreamFunctionNames();
+                var predefinedAnnotations = _.cloneDeep(self.configurationData.application.config.type_query_predefined_annotations);
 
                 //render the sequence-query form template
                 var sequenceFormTemplate = Handlebars.compile($('#pattern-sequence-query-form-template').html())
@@ -310,12 +299,13 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOrderByValue'
                     validateSectionsOnLoadOfForm(self);
                 }
 
-                addAutoCompletion(self, partitionId, QUERY_CONDITION_SYNTAX, QUERY_SYNTAX, incrementalAggregator,
-                    streamFunctions, outputAttributes);
-
-                var inputAttributes = self.formUtils.getInputAttributes(inputStreamNames);
+                var inputAttributes = [];
+                _.forEach(self.formUtils.getInputAttributes(inputStreamNames), function (attribute) {
+                    inputAttributes.push(attribute.name);
+                });
                 var outputAttributesWithElementName = self.formUtils.constructOutputAttributes(outputAttributes);
-                self.formUtils.addAutoCompleteForOutputOperation(outputAttributesWithElementName, inputAttributes);
+                self.formUtils.addAutoCompleteForRateLimits();
+                autoCompleteFieldsWithChangingAttributes(self, partitionId, outputAttributesWithElementName);
 
                 $('.define-stream-handler').on('click', '.btn-add-filter', function () {
                     var sourceDiv = self.formUtils.getSourceDiv($(this));
@@ -329,8 +319,7 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOrderByValue'
                     $('.define-conditions .tab-pane:eq(' + conditionIndex + ')').remove();
                     $(this).closest('li').remove();
                     generateDivRequiringPossibleAttributes(self, partitionId, groupBy);
-                    addAutoCompletion(self, partitionId, QUERY_CONDITION_SYNTAX, QUERY_SYNTAX, incrementalAggregator,
-                        streamFunctions, outputAttributes);
+                    autoCompleteFieldsWithChangingAttributes(self, partitionId, outputAttributesWithElementName);
                 });
 
                 $('.define-conditions').on('click', '.btn-add-condition', function () {
@@ -339,36 +328,30 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOrderByValue'
                     var conditionList = [{ conditionId: conditionName, streamHandlerList: [], streamName: "" }]
                     self.formUtils.renderConditions(conditionList, inputStreamNames)
                     generateDivRequiringPossibleAttributes(self, partitionId, groupBy);
-                    addAutoCompletion(self, partitionId, QUERY_CONDITION_SYNTAX, QUERY_SYNTAX, incrementalAggregator,
-                        streamFunctions, outputAttributes);
+                    autoCompleteFieldsWithChangingAttributes(self, partitionId, outputAttributesWithElementName);
                 });
 
                 $('.define-conditions').on('blur', '.condition-id', function () {
                     generateDivRequiringPossibleAttributes(self, partitionId, groupBy);
-                    addAutoCompletion(self, partitionId, QUERY_CONDITION_SYNTAX, QUERY_SYNTAX, incrementalAggregator,
-                        streamFunctions, outputAttributes);
+                    autoCompleteFieldsWithChangingAttributes(self, partitionId, outputAttributes);
                 });
 
                 $('.define-conditions').on('change', '.condition-stream-name-selection', function () {
                     generateDivRequiringPossibleAttributes(self, partitionId, groupBy);
-                    addAutoCompletion(self, partitionId, QUERY_CONDITION_SYNTAX, QUERY_SYNTAX, incrementalAggregator,
-                        streamFunctions, outputAttributes);
+                    autoCompleteFieldsWithChangingAttributes(self, partitionId, outputAttributesWithElementName);
                 });
 
                 //to add query operation set
-                var setDiv = '<li class="setAttribute">' +
+                var setDiv = '<li class="setAttributeValue">' +
                     '<div class="clearfix">' +
                     '<input type="text" class="setAttribute"> <input type="text" class="setValue"> ' +
                     '<a class = "btn-del-option"> <i class = "fw fw-delete"> </i> </a>' +
                     '</div> <label class="error-message"> </label> </li>'
                 $('.define-operation-set-condition').on('click', '.btn-add-set', function () {
                     $('.define-operation-set-condition .set-condition').append(setDiv);
-                    self.formUtils.addAutoCompleteForOutputOperation(outputAttributesWithElementName, inputAttributes);
+                    autoCompleteFieldsWithChangingAttributes(self, partitionId, outputAttributesWithElementName);
                     self.formUtils.updatePerfectScroller();
                 });
-
-                var rateLimitingMatches = QUERY_SYNTAX.concat(Constants.SIDDHI_TIME);
-                self.formUtils.createAutocomplete($('.rate-limiting-value'), rateLimitingMatches);
 
                 self.formUtils.initPerfectScroller(formConsole.cid);
 

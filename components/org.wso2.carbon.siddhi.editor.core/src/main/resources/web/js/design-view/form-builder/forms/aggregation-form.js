@@ -429,14 +429,11 @@ define(['require', 'log', 'jquery', 'lodash', 'aggregateByTimePeriod', 'querySel
                 }
 
                 //create autocompletion
-                var selectExpressionMatches = _.cloneDeep(possibleAttributes);
-                selectExpressionMatches = selectExpressionMatches.concat(incrementalAggregator);
-                selectExpressionMatches = selectExpressionMatches.concat(streamFunctions)
-                selectExpressionMatches.push(Constants.AS);
-                self.formUtils.createAutocomplete($('.attribute-expression-as'), selectExpressionMatches);
+                self.formUtils.addAutoCompleteForSelectExpressions(possibleAttributes, Constants.AGGREGATION);
+
                 $('.define-select').on('click', '.btn-add-user-defined-attribute', function () {
                     self.formUtils.appendUserSelectAttribute();
-                    self.formUtils.createAutocomplete($('.attribute-expression-as:last'), selectExpressionMatches);
+                    self.formUtils.addAutoCompleteForSelectExpressions(possibleAttributes, Constants.AGGREGATION);
                     self.formUtils.updatePerfectScroller();
                 });
 

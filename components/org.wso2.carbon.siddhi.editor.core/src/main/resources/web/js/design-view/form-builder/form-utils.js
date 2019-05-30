@@ -3387,11 +3387,145 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
         /**
          * @function to add auto completion for query output operation section
          */
-        FormUtils.prototype.addAutoCompleteForOutputOperation = function (outputAttributesWithStreamName, inputAttributes) {
+        FormUtils.prototype.addAutoCompleteForOutputOperation = function (outputAttributes, inputAttributes) {
             var self = this;
-            var outputOperationMatches = outputAttributesWithStreamName.concat(inputAttributes);
-            self.createAutocomplete($('.define-query-operation input[type="text"]'), outputOperationMatches);
+            self.createAutocomplete($('.setAttribute'),
+                self.addLabelsForAutocompleteDropDowns(outputAttributes, Constants.ATTRIBUTE));
+            self.createAutocomplete($('.setValue'),
+                self.addLabelsForAutocompleteDropDowns(inputAttributes, Constants.ATTRIBUTE));
         };
+
+        /**
+         * @function to add auto-complete for select expression
+         */
+        FormUtils.prototype.addAutoCompleteForSelectExpressions = function (attributes, elementType) {
+            var self = this;
+            var incrementalAggregator = self.addLabelsForAutocompleteDropDowns
+            (self.configurationData.application.config.incremental_aggregator, Constants.AGGREGATE_FUNCTION);
+            var streamFunctions = self.addLabelsForAutocompleteDropDowns
+            (self.getStreamFunctionNames(), Constants.STREAM_FUNCTION);
+            var selectExpressionMatches = self.addLabelsForAutocompleteDropDowns
+            (attributes, Constants.ATTRIBUTE);
+            selectExpressionMatches = selectExpressionMatches.concat(incrementalAggregator);
+            selectExpressionMatches = selectExpressionMatches.concat(streamFunctions);
+            if (elementType === Constants.AGGREGATION) {
+                selectExpressionMatches = selectExpressionMatches.concat(self.addLabelsForAutocompleteDropDowns
+                ([Constants.AS], Constants.KEYWORD));
+            }
+            self.createAutocomplete($('.attribute-expression'), selectExpressionMatches);
+        };
+
+        /**
+         * @function to add auto-complete for filter conditions
+         */
+        FormUtils.prototype.addAutoCompleteForFilterConditions = function (attributes) {
+            var self = this;
+            var queryOperators = self.addLabelsForAutocompleteDropDowns
+            (self.configurationData.application.config.query_operators, Constants.OPERATOR)
+            var incrementalAggregator = self.addLabelsForAutocompleteDropDowns
+            (self.configurationData.application.config.incremental_aggregator, Constants.AGGREGATE_FUNCTION);
+            var streamFunctions = self.addLabelsForAutocompleteDropDowns
+            (self.getStreamFunctionNames(), Constants.STREAM_FUNCTION);
+            var filterMatches = self.addLabelsForAutocompleteDropDowns
+            (attributes, Constants.ATTRIBUTE).concat(incrementalAggregator);
+            filterMatches = filterMatches.concat(streamFunctions);
+            filterMatches = filterMatches.concat(queryOperators);
+            self.createAutocomplete($('.filter-condition-content '), filterMatches);
+        };
+
+        /**
+         * @function to add auto-complete for rate limits[query output]
+         */
+        FormUtils.prototype.addAutoCompleteForRateLimits = function () {
+            var self = this;
+            var keywords = self.addLabelsForAutocompleteDropDowns
+            (self.configurationData.application.config.output_rate_limit_keywords, Constants.KEYWORD)
+            var rateLimitingMatches = keywords.concat(self.addLabelsForAutocompleteDropDowns
+            (Constants.SIDDHI_TIME, Constants.TIME));
+            self.createAutocomplete($('.rate-limiting-value'), rateLimitingMatches);
+        };
+
+        /**
+         * @function to add auto-complete for logic statements in pattern and sequence queries
+         */
+        FormUtils.prototype.addAutoCompleteForLogicStatements = function () {
+            var self = this;
+            var conditionNames = self.addLabelsForAutocompleteDropDowns(self.getPatternSequenceInputs(), Constants.INPUT);
+            var keywords = self.addLabelsForAutocompleteDropDowns
+            (self.configurationData.application.config.logic_statement_keywords, Constants.KEYWORD);
+            var queryOperators = self.addLabelsForAutocompleteDropDowns
+            (self.configurationData.application.config.query_operators, Constants.OPERATOR);
+            var logicMatches = conditionNames.concat(keywords);
+            logicMatches = logicMatches.concat(queryOperators);
+            self.createAutocomplete($('.logic-statement'), logicMatches);
+        };
+
+        /**
+         * @function to get the condition id of pattern and sequence queries
+         * @returns {Array}
+         */
+        FormUtils.prototype.getPatternSequenceInputs = function () {
+            var conditionNames = [];
+            $('.condition-container .condition-id').each(function () {
+                var conditionName = $(this).val().trim();
+                if (conditionName !== "") {
+                    conditionNames.push(conditionName);
+                }
+            });
+            return conditionNames;
+        };
+
+        /**
+         * @function to add auto-complete for on condition in join and store queries
+         */
+        FormUtils.prototype.addAutoCompleteForOnCondition = function (attributes, inputSources) {
+            var self = this;
+            var queryOperators = self.addLabelsForAutocompleteDropDowns
+            (self.configurationData.application.config.query_operators, Constants.OPERATOR);
+            var incrementalAggregator = self.addLabelsForAutocompleteDropDowns
+            (self.configurationData.application.config.incremental_aggregator, Constants.AGGREGATE_FUNCTION);
+            var streamFunctions = self.addLabelsForAutocompleteDropDowns
+            (self.getStreamFunctionNames(), Constants.STREAM_FUNCTION);
+            var onConditionMatches = self.addLabelsForAutocompleteDropDowns(attributes, Constants.ATTRIBUTE);
+            onConditionMatches = onConditionMatches.concat(self.addLabelsForAutocompleteDropDowns
+            (inputSources, Constants.INPUT));
+            onConditionMatches = onConditionMatches.concat(incrementalAggregator);
+            onConditionMatches = onConditionMatches.concat(streamFunctions);
+            onConditionMatches = onConditionMatches.concat(queryOperators);
+            self.createAutocomplete($('.on-condition-value'), onConditionMatches);
+            self.createAutocomplete($('.define-operation-on-condition .query-content-value'), onConditionMatches)
+        };
+
+        /**
+         * @function to add auto-complete for per and within conditions in join query
+         */
+        FormUtils.prototype.addAutoCompleteForPerWithinConditions = function (attributes) {
+            var self = this;
+            var perWithinMatches = self.addLabelsForAutocompleteDropDowns(attributes, Constants.ATTRIBUTE);
+            perWithinMatches = perWithinMatches.concat(self.addLabelsForAutocompleteDropDowns
+            (Constants.SIDDHI_TIME, Constants.TIME));
+            self.createAutocomplete($('.per-within'), perWithinMatches);
+        };
+
+        /**
+         * @function to add auto-complete for having conditions in queries
+         */
+        FormUtils.prototype.addAutoCompleteForHavingCondition = function (attributes) {
+            var self = this;
+            var queryOperators = self.addLabelsForAutocompleteDropDowns
+            (self.configurationData.application.config.query_operators, Constants.OPERATOR);
+            var incrementalAggregator = self.addLabelsForAutocompleteDropDowns
+            (self.configurationData.application.config.incremental_aggregator, Constants.AGGREGATE_FUNCTION);
+            var streamFunctions = self.addLabelsForAutocompleteDropDowns
+            (self.getStreamFunctionNames(), Constants.STREAM_FUNCTION);
+            var havingMatches = self.addLabelsForAutocompleteDropDowns(attributes, Constants.ATTRIBUTE);
+            havingMatches = havingMatches.concat(incrementalAggregator);
+            havingMatches = havingMatches.concat(streamFunctions);
+            havingMatches = havingMatches.concat(queryOperators);
+            self.createAutocomplete($('.having-value'), havingMatches);
+        };
+
+
 
         /**
          * @function to show the input field content on hover
@@ -4142,31 +4276,6 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
             return text[0].toUpperCase() + text.slice(1);
         };
 
-        /**
-         * @function to find matches and drops down as user types in
-         */
-        FormUtils.prototype.substringMatcher = function (text) {
-            return function findMatches(q, cb) {
-                var matches, substringRegex;
-
-                // an array that will be populated with substring matches
-                matches = [];
-
-                // regex used to determine if a string contains the substring `q`
-                substringRegex = new RegExp(q, 'i');
-
-                // iterate through the pool of strings and for any string that
-                // contains the substring `q`, add it to the `matches` array
-                $.each(text, function (i, str) {
-                    if (substringRegex.test(str)) {
-                        matches.push(str);
-                    }
-                });
-
-                cb(matches);
-            };
-        };
-
         //split the given val for space
         FormUtils.prototype.splitForAutocomplete = function (val) {
             return val.split(/\s/g);
@@ -4178,41 +4287,82 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
             return self.splitForAutocomplete(term).pop();
         };
 
+        //to add labels for autocomplete options
+        FormUtils.prototype.addLabelsForAutocompleteDropDowns = function (dropDownOptions, labelName) {
+            var optionsWithLabels = [];
+            _.forEach(dropDownOptions, function (option) {
+                optionsWithLabels.push({label: option, helper: labelName});
+            });
+            return optionsWithLabels;
+        };
+
         //create autocomplete for forms
         FormUtils.prototype.createAutocomplete = function (element, possibleOptions) {
             var self = this;
-            $(element)
-            // don't navigate away from the field on tab when selecting an item
-                .on("keydown", function (event) {
-                    if (event.keyCode === $.ui.keyCode.TAB &&
-                        $(this).autocomplete("instance").menu.active) {
-                        event.preventDefault();
-                    }
-                })
-                .autocomplete({
-                    minLength: 0,
-                    source: function (request, response) {
-                        // delegate back to autocomplete, but extract the last term
-                        response($.ui.autocomplete.filter(
-                            possibleOptions, self.extractLast(request.term)));
-                    },
-                    focus: function () {
-                        // prevent value inserted on focus
-                        return false;
-                    },
-                    select: function (event, ui) {
-                        var terms = self.splitForAutocomplete(this.value);
-                        // remove the current input
-                        terms.pop();
-                        // add the selected item
-                        terms.push(ui.item.value);
-                        // add placeholder to get the comma-and-space at the end
-                        terms.push("");
-                        this.value = terms.join(" ");
-                        return false;
-                    }
+            $(element).each(function () {
+                $(this)
+                // don't navigate away from the field on tab when selecting an item
+                    .on("keydown", function (event) {
+                        if (event.keyCode === $.ui.keyCode.TAB &&
+                            $(this).autocomplete("instance").menu.active) {
+                            event.preventDefault();
+                        }
+                    })
+                    .on("click", function () {
+                        if ($(this).val().trim() === "") {
+                            $(this).autocomplete('search', '')
+                        }
+                    })
+                    .autocomplete({
+                        minLength: 0,
+                        classes: {
+                            "ui-autocomplete": "design-view-form-auto-complete",
+                        },
+                        source: function (request, response) {
+                            // delegate back to autocomplete, but extract the last term\
+                            var matcher = new RegExp($.ui.autocomplete.escapeRegex(request.term), "i");
+                            response($.grep(possibleOptions, function (item) {
+                                return matcher.test(item.label);
+                            }), self.extractLast(request.term));
 
-                });
+                            response($.ui.autocomplete.filter(
+                                possibleOptions, self.extractLast(request.term)));
+                        },
+                        focus: function () {
+                            // prevent value inserted on focus
+                            return false;
+                        },
+                        select: function (event, ui) {
+                            var terms = self.splitForAutocomplete(this.value);
+                            // remove the current input
+                            terms.pop();
+                            // add the selected item
+                            terms.push(ui.item.value);
+                            // add placeholder to get the comma-and-space at the end
+                            terms.push("");
+                            this.value = terms.join(" ");
+                            return false;
+                        },
+                        open: function (event) {
+                            var currentAutocomplete = $(event.target).parent().find('.ui-autocomplete');
+                            currentAutocomplete.css('height', 'auto');
+                            var $input = $(event.target),
+                                inputTop = $input.offset().top,
+                                inputHeight = $input.height(),
+                                autocompleteHeight = currentAutocomplete.height(),
+                                windowHeight = $(window).height();
+
+                            if ((inputHeight + inputTop + autocompleteHeight) > windowHeight) {
+                                currentAutocomplete.css('height', (windowHeight - inputHeight - inputTop - 15) + 'px');
+                            }
+                        },
+                        appendTo: $(this).parent()
+                    }).data("ui-autocomplete")._renderItem = function (ul, item) {
+                    return $("<li class='autocomplete-option'>")
+                        .append("<a> <span class='option-label'>" + item.label + "</span> <span class='option-helperText'> " + item.helper + "</span> </a>")
+                        .appendTo(ul)
+                };
+            })
         };
 
         /**

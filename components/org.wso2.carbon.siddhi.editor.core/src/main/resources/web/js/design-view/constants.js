@@ -119,7 +119,12 @@ define(function () {
         FAULT_STREAM_PREFIX: "!",
         PURGING: "purging",
         PURGE: "purge",
-        CURRENT_EVENTS: "current_events"
+        CURRENT_EVENTS: "current_events",
+        AGGREGATE_FUNCTION: "aggregate-function",
+        KEYWORD: "keyword",
+        OPERATOR: "operator",
+        INPUT: "input",
+        FOR: "for"
     };
 
     return constants;

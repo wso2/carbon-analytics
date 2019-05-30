@@ -1567,3 +1567,49 @@ label.option-name {
 .ps__rail-x:hover > .ps__thumb-x {
     height: 6px;
 }
+
+.design-view-form-auto-complete.ui-widget.ui-widget-content {
+    background: #1f1e1e;
+    border: 1px solid grey !important;
+    overflow-y: auto;
+    overflow-x: hidden;
+}
+
+.design-view-form-auto-complete .ui-menu-item {
+    font-family: Arial;
+}
+
+.design-view-form-auto-complete .ui-menu-item .option-helperText {
+    float: right;
+    color: #7b7977;
+    width: 101px;
+    text-align: right;
+    font-style: italic;
+}
+
+.design-view-form-auto-complete .ui-menu-item .option-label {
+    width: calc(100% - 105px);
+    overflow-wrap: break-word;
+    display: inline-block;
+}
+
+.design-view-form-auto-complete .ui-menu-item:hover,
+.design-view-form-auto-complete .ui-state-active {
+    background: #0d1113 !important;
+    color: #ccc !important;
+    border: 1px solid #222222;
+}
+
+.design-view-form-auto-complete.ui-widget-content .ui-menu-item-wrapper {
+    color: #ccc !important;
+    text-decoration: none;
+    display: block;
+    padding: .2em .4em;
+    line-height: 1.5;
+    zoom: 1;
+}
+
+.design-view-form-auto-complete .auto-option {
+    float: left;
+    display: inline-block;
+}

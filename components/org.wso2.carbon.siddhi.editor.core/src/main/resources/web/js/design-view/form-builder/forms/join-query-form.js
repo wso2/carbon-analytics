@@ -192,22 +192,34 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryWindowOrFunct
         };
 
         /**
-         * @function to add autocompletion
+         * @function add autocomplete for fields with changing attributes
          */
-        var addAutoCompletion = function (self, QUERY_CONDITION_SYNTAX, incrementalAggregator, streamFunctions, outputAttributes) {
+        var autoCompleteFieldsWithChangingAttributes = function (self, outputAttributes) {
+            var inputSources = getLeftRightSourceNames();
             var possibleAttributesWithSourceAs = getPossibleAttributesWithSourceAs(self);
-            var selectExpressionMatches = _.cloneDeep(possibleAttributesWithSourceAs);
-            selectExpressionMatches = selectExpressionMatches.concat(incrementalAggregator);
-            selectExpressionMatches = selectExpressionMatches.concat(streamFunctions);
-            var onFilterHavingConditionMatches = _.cloneDeep(possibleAttributesWithSourceAs);
-            onFilterHavingConditionMatches = onFilterHavingConditionMatches.concat(QUERY_CONDITION_SYNTAX);
-            onFilterHavingConditionMatches = onFilterHavingConditionMatches.concat(outputAttributes);
-            var perWithinMatches = _.cloneDeep(possibleAttributesWithSourceAs);
-            perWithinMatches = perWithinMatches.concat(Constants.SIDDHI_TIME);
-            perWithinMatches = perWithinMatches.concat(outputAttributes);
-            self.formUtils.createAutocomplete($('.attribute-expression'), selectExpressionMatches);
-            self.formUtils.createAutocomplete($('.symbol-syntax-required-value'), onFilterHavingConditionMatches);
-            self.formUtils.createAutocomplete($('.per-within'), perWithinMatches);
+            self.formUtils.addAutoCompleteForFilterConditions(possibleAttributesWithSourceAs.concat(outputAttributes));
+            self.formUtils.addAutoCompleteForSelectExpressions(possibleAttributesWithSourceAs);
+            self.formUtils.addAutoCompleteForOnCondition(possibleAttributesWithSourceAs.concat(outputAttributes), inputSources);
+            self.formUtils.addAutoCompleteForPerWithinConditions(possibleAttributesWithSourceAs.concat(outputAttributes));
+            self.formUtils.addAutoCompleteForHavingCondition(possibleAttributesWithSourceAs.concat(outputAttributes));
+            self.formUtils.addAutoCompleteForOutputOperation(outputAttributes, possibleAttributesWithSourceAs);
+        };
+
+        /**
+         * @function get the names of the connected source
+         */
+        var getLeftRightSourceNames = function () {
+            var inputNames = [];
+            $('.define-source').each(function () {
+                var checkbox = $(this).find('.source-as-checkbox');
+                var asValue = $(this).find('.as-content-value').val().trim();
+                if (checkbox.is(':checked') && asValue !== "") {
+                    inputNames.push(asValue)
+                } else {
+                    inputNames.push($(this).find('.source-selection').val())
+                }
+            });
+            return inputNames;
         };
 
         /**
@@ -281,9 +293,6 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryWindowOrFunct
                 self.toggleViewButton.addClass('disableContainer');
                 self.formUtils.popUpSelectedElement(id);
 
-                var QUERY_CONDITION_SYNTAX = self.configurationData.application.config.query_condition_syntax;
-                var RATE_LIMITING_SYNTAX = self.configurationData.application.config.other_query_syntax;
-
                 var firstConnectedElement = joinQueryObject.getQueryInput().getFirstConnectedElement();
                 var secondConnectedElement = joinQueryObject.getQueryInput().getSecondConnectedElement();
                 var leftSourceData = joinQueryObject.getQueryInput().getLeft();
@@ -316,9 +325,7 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryWindowOrFunct
 
                 var possibleJoinTypes = self.configurationData.application.config.join_types;
                 var predefinedAnnotations = _.cloneDeep(self.configurationData.application.config.type_query_predefined_annotations);
-                var incrementalAggregator = self.configurationData.application.config.incremental_aggregator;
                 var streamHandlerTypes = self.configurationData.application.config.stream_handler_types;
-                var streamFunctions = self.formUtils.getStreamFunctionNames();
 
                 //render the join-query form template
                 var joinFormTemplate = Handlebars.compile($('#join-query-form-template').html())({name: queryName});
@@ -429,12 +436,6 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryWindowOrFunct
                 mapUnidirectionalCheckbox(leftSourceData, Constants.LEFT);
                 mapUnidirectionalCheckbox(rightSourceData, Constants.RIGHT);
 
-                var possibleAttributes = [];
-                var firstElementAttributes = self.formUtils.getInputAttributes([firstConnectedElement.name]);
-                var secondElementAttributes = self.formUtils.getInputAttributes([secondConnectedElement.name]);
-                constructPossibleAttributes(firstElementAttributes, firstConnectedElement.name, possibleAttributes)
-                constructPossibleAttributes(secondElementAttributes, secondConnectedElement.name, possibleAttributes)
-
                 //projection
                 self.formUtils.selectQueryProjection(select, outputElementName);
                 self.formUtils.addEventListenersForSelectionDiv();
@@ -506,14 +507,17 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryWindowOrFunct
                 }
 
                 //autocompletion
-                addAutoCompletion(self, QUERY_CONDITION_SYNTAX, incrementalAggregator, streamFunctions, outputAttributes);
-
-                var inputAttributes = self.formUtils.getInputAttributes(possibleSources);
+                var inputAttributes = [];
+                _.forEach(self.formUtils.getInputAttributes(possibleSources), function (attribute) {
+                    inputAttributes.push(attribute.name);
+                });
                 var outputAttributesWithElementName = self.formUtils.constructOutputAttributes(outputAttributes);
-                self.formUtils.addAutoCompleteForOutputOperation(outputAttributesWithElementName, inputAttributes);
+                self.formUtils.addAutoCompleteForRateLimits();
+                autoCompleteFieldsWithChangingAttributes(self, outputAttributesWithElementName);
 
                 $('.join-query-form-container').on('blur', '.as-content-value', function () {
-                    addAutoCompletion(self, QUERY_CONDITION_SYNTAX, incrementalAggregator, streamFunctions, outputAttributes);
+                    autoCompleteFieldsWithChangingAttributes(self, outputAttributesWithElementName);
+                    var possibleAttributesWithSourceAs = getPossibleAttributesWithSourceAs(self);
                     self.formUtils.generateGroupByDiv(groupBy, possibleAttributesWithSourceAs);
                 });
 
@@ -521,22 +525,19 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryWindowOrFunct
                 $('.define-stream-handler').on('click', '.btn-add-filter', function () {
                     var sourceDiv = self.formUtils.getSourceDiv($(this));
                     self.formUtils.addNewStreamHandler(sourceDiv, Constants.FILTER);
-                    addAutoCompletion(self, QUERY_CONDITION_SYNTAX, incrementalAggregator, streamFunctions, outputAttributes);
+                    autoCompleteFieldsWithChangingAttributes(self, outputAttributesWithElementName);
                 });
 
                 //to add query operation set
-                var setDiv = '<li class="setAttribute">' +
+                var setDiv = '<li class="setAttributeValue">' +
                     '<div class="clearfix">' +
                     '<input type="text" class="setAttribute"> <input type="text" class="setValue"> ' +
                     '<a class = "btn-del-option"> <i class = "fw fw-delete"> </i> </a>' +
                     '</div> <label class="error-message"> </label> </li>'
                 $('.define-operation-set-condition').on('click', '.btn-add-set', function () {
                     $('.define-operation-set-condition .set-condition').append(setDiv);
-                    self.formUtils.addAutoCompleteForOutputOperation(outputAttributesWithElementName, inputAttributes);
+                    autoCompleteFieldsWithChangingAttributes(self, outputAttributesWithElementName);
                 });
-
-                var rateLimitingMatches = RATE_LIMITING_SYNTAX.concat(Constants.SIDDHI_TIME);
-                self.formUtils.createAutocomplete($('.rate-limiting-value'), rateLimitingMatches);
 
                 self.formUtils.initPerfectScroller(formConsole.cid);
 
