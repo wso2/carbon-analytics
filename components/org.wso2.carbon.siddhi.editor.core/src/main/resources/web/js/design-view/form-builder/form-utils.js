@@ -3551,6 +3551,45 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
         };
 
         /**
+         * @function to return unique condition names
+         */
+        FormUtils.prototype.getUniqueConditionName = function () {
+            var conditionName;
+            var i = 1;
+            var isUnique = false;
+            while (!isUnique) {
+                conditionName = 'e' + i;
+                $('.condition-container .nav-tabs .condition-navigation').each(function () {
+                    var name = $(this).find('a').text().trim();
+                    if (name === conditionName) {
+                        isUnique = false;
+                        return false;
+                    } else {
+                        isUnique = true;
+                    }
+                });
+                i++;
+            }
+            return conditionName;
+        };
+
+        /**
+         * @function to add new pattern or sequence condition
+         * @param inputStreamNames
+         */
+        FormUtils.prototype.addNewCondition = function (inputStreamNames) {
+            var self = this;
+            var conditionName = self.getUniqueConditionName();
+            var conditionList = [{conditionId: conditionName, streamHandlerList: [], streamName: ""}];
+            self.renderConditions(conditionList, inputStreamNames);
+            self.mapConditions(conditionList);
+            self.addEventListenersForStreamHandlersDiv([]);
+            $('.define-conditions .active').removeClass('active');
+            $('.define-conditions .nav-tabs .condition-navigation:last').addClass('active');
+            $('.define-conditions .tab-pane:last').addClass('active');
+        };
+
+        /**
          * @function to determine if input content is longer than the width of the input
          */
         FormUtils.prototype.isElementContentOverflown = function (element) {

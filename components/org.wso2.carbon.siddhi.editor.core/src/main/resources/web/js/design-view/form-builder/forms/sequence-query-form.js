@@ -125,6 +125,17 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOrderByValue'
         };
 
         /**
+         * @function to add new filter stream handler
+         */
+        var addEventListenerToAddNewFilter = function (self, partitionId, outputAttributes) {
+            $('.define-stream-handler').on('click', '.btn-add-filter', function () {
+                var sourceDiv = self.formUtils.getSourceDiv($(this));
+                self.formUtils.addNewStreamHandler(sourceDiv, Constants.FILTER);
+                autoCompleteFieldsWithChangingAttributes(self, partitionId, outputAttributes);
+            });
+        };
+
+        /**
          * @function generate the form for the sequence query
          * @param element selected element(query)
          * @param formConsole Console which holds the form
@@ -307,15 +318,13 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOrderByValue'
                 self.formUtils.addAutoCompleteForRateLimits();
                 autoCompleteFieldsWithChangingAttributes(self, partitionId, outputAttributesWithElementName);
 
-                $('.define-stream-handler').on('click', '.btn-add-filter', function () {
-                    var sourceDiv = self.formUtils.getSourceDiv($(this));
-                    self.formUtils.addNewStreamHandler(sourceDiv, Constants.FILTER);
-                    addAutoCompletion(self, partitionId, QUERY_CONDITION_SYNTAX, QUERY_SYNTAX, incrementalAggregator,
-                        streamFunctions, outputAttributes);
-                });
+                addEventListenerToAddNewFilter(self, partitionId, outputAttributesWithElementName);
 
                 $('.define-conditions').on('click', '.btn-del-condition', function () {
-                    var conditionIndex = $(this).closest('li').index();
+                    var conditionIndex = $(this).closest('.condition-navigation').index();
+                    var prevCondition = conditionIndex - 1;
+                    $('.define-conditions .nav-tabs .condition-navigation:eq(' + prevCondition + ')').addClass('active');
+                    $('.define-conditions .tab-pane:eq(' + prevCondition + ')').addClass('active');
                     $('.define-conditions .tab-pane:eq(' + conditionIndex + ')').remove();
                     $(this).closest('li').remove();
                     generateDivRequiringPossibleAttributes(self, partitionId, groupBy);
@@ -323,12 +332,10 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOrderByValue'
                 });
 
                 $('.define-conditions').on('click', '.btn-add-condition', function () {
-                    var conditionLength = $('.condition-navigation').length + 1;
-                    var conditionName = 'e' + conditionLength;
-                    var conditionList = [{ conditionId: conditionName, streamHandlerList: [], streamName: "" }]
-                    self.formUtils.renderConditions(conditionList, inputStreamNames)
+                    self.formUtils.addNewCondition(inputStreamNames);
                     generateDivRequiringPossibleAttributes(self, partitionId, groupBy);
                     autoCompleteFieldsWithChangingAttributes(self, partitionId, outputAttributesWithElementName);
+                    addEventListenerToAddNewFilter(self, partitionId, outputAttributesWithElementName);
                 });
 
                 $('.define-conditions').on('blur', '.condition-id', function () {
