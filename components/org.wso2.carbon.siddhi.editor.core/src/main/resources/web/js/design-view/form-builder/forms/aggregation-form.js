@@ -267,15 +267,13 @@ define(['require', 'log', 'jquery', 'lodash', 'aggregateByTimePeriod', 'querySel
                 var aggregateByTimePeriod = aggregationObject.getAggregateByTimePeriod();
 
                 var predefinedStores = _.orderBy(this.configurationData.rawExtensions["store"], ['name'], ['asc']);
-                var predefinedAggregationAnnotations = _.cloneDeep(self.configurationData.application.config.
-                    type_aggregation_predefined_annotations);
+                var predefinedAggregationAnnotations = _.cloneDeep
+                (self.configurationData.application.config.type_aggregation_predefined_annotations);
                 var connectedElement = self.configurationData.getSiddhiAppConfig().getDefinitionElementByName(connectedSource);
-                var incrementalAggregator = self.configurationData.application.config.incremental_aggregator;
-                var streamFunctions = self.formUtils.getStreamFunctionNames();
 
                 //render the aggregation form template
                 var aggregationFormTemplate = Handlebars.compile($('#aggregation-form-template').html())
-                ({ name: name, from: connectedSource });
+                ({name: name, from: connectedSource});
                 $('#define-aggregation').html(aggregationFormTemplate);
 
                 self.formUtils.addEventListenerToRemoveRequiredClass();

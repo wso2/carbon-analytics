@@ -186,7 +186,9 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
                         isObjectChanged = true;
                     }
                 } else if (elementType === Constants.AGGREGATION) {
-                    if (previousObject.getSelect().getType() != currentObject.getSelect().getType()) {
+                    if (!previousObject.getSelect()) {
+                        isObjectChanged = true;
+                    } else if (previousObject.getSelect().getType() != currentObject.getSelect().getType()) {
                         isObjectChanged = true;
                     } else if (previousObject.getSelect().getType().toLowerCase() == Constants.TYPE_USER_DEFINED) {
                         if (_(previousObject.getSelect().getValue())
@@ -375,7 +377,7 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
                 });
                 $('.define-query-output .define-query-operation').append(queryOutputDiv);
                 //remove the first del button of the set attribute
-                $('.define-operation-set-condition .set-condition li:eq(0) .btn-del-option').remove();
+                $('.define-operation-set-condition .set-condition .setAttributeValue:eq(0) .btn-del-option').remove();
                 self.mapQueryOperation(queryOutput);
             } else {
                 var operationInsertDiv = '<input class="clearfix name query-operation" value="insert" readonly>';
@@ -528,7 +530,7 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
                 $('.define-conditions .tab-content').append(wrappedHtml);
             });
             //removes the first delete button
-            $('.define-conditions').find('.nav-tabs li:eq(0) .btn-del-condition').remove();
+            $('.define-conditions').find('.nav-tabs .condition-navigation :eq(0) .btn-del-condition').remove();
         };
 
         /**
@@ -760,7 +762,7 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
             }
             self.renderUserDefinedAttributeSelection(attributes, "aggregate-projection");
             //removes the first delete button
-            $('.define-select').find('.user-defined-attributes li:eq(0) .btn-del-option').remove();
+            $('.define-select').find('.user-defined-attributes .attribute:eq(0) .btn-del-option').remove();
             self.selectAttributeSelection(selectedType);
         };
 
@@ -1049,7 +1051,7 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
             var operationType = $('.define-query-operation .operation-type-selection').val();
             if (operationType == Constants.UPDATE_OR_INSERT_INTO || operationType == Constants.UPDATE) {
                 if ($('.define-query-operation .set-checkbox').is(':checked')) {
-                    $('.define-operation-set-condition .set-condition li').each(function () {
+                    $('.define-operation-set-condition .set-condition .setAttributeValue').each(function () {
                         var setAttribute = $(this).find('.setAttribute');
                         var setValue = $(this).find('.setValue');
                         if ((setAttribute.val().trim() != "") || (setValue.val().trim() != "")) {
@@ -1073,7 +1075,7 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
                     });
 
                     if (!isErrorOccurred && noOfSet == 0) {
-                        var firstSet = $('.define-operation-set-condition .set-condition li:eq(0)')
+                        var firstSet = $('.define-operation-set-condition .set-condition .setAttributeValue:eq(0)')
                         self.addErrorClass(firstSet.find('.setAttribute'));
                         self.addErrorClass(firstSet.find('.setValue'));
                         firstSet.find('.error-message').text("Minimum one set is required");
@@ -1140,9 +1142,9 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
                     }
                 }
                 if (isErrorOccurred) {
-                    $(this).addClass('active');
                     var conditionIndex = $(this).index();
-                    $('.define-conditions .nav-tabs .active').removeClass('active');
+                    $('.define-conditions .active').removeClass('active')
+                    $(this).addClass('active');
                     $('.define-conditions .condition-navigation:eq(' + conditionIndex + ')').addClass('active');
                     return false;
                 }
@@ -1197,7 +1199,7 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
             var isErrorOccurred = false;
             var streamHandlerDiv = $(div).find('.define-stream-handler');
             if ($(streamHandlerDiv).find('.stream-handler-checkbox').is(':checked')) {
-                $(streamHandlerDiv).find('.stream-handler-list li').each(function () {
+                $(streamHandlerDiv).find('.stream-handler-list .define-stream-handler-content').each(function () {
                     var streamHandlerContent = $(this).find('.define-stream-handler-type-content');
                     if (streamHandlerContent.hasClass('define-filter-stream-handler')) {
                         var filterCondition = streamHandlerContent.find('.filter-condition-content')
@@ -1300,12 +1302,16 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
                         .autocomplete({
                             delay: 0,
                             minLength: 0,
-                            source: $.proxy(this, "_source")
+                            classes: {
+                                "ui-autocomplete": "design-view-form-auto-complete"
+                            },
+                            source: $.proxy(this, "_source"),
+                            appendTo: this.wrapper
                         })
                         .tooltip({
-                            classes: {
-                                "ui-tooltip": "ui-state-highlight"
-                            }
+                            // classes: {
+                            //     "ui-tooltip": "ui-state-highlight"
+                            // }
                         });
 
                     this._on(this.input, {
@@ -1601,7 +1607,7 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
             var attributes = 0;
             var projectionType = $('.define-select .attribute-selection-type');
             if (projectionType.val() == Constants.TYPE_USER_DEFINED) {
-                $('.define-select .user-defined-attributes li').each(function () {
+                $('.define-select .user-defined-attributes .attribute').each(function () {
                     var expressionAs = $(this).find('.attribute-expression');
                     var expressionAsValue = expressionAs.val().trim();
                     var separateExpression = expressionAsValue.split(/as/i);
@@ -1627,7 +1633,7 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
 
                 if (attributes == 0) {
                     isErrorOccurred = true;
-                    var firstAttributeList = '.user-defined-attributes li:first';
+                    var firstAttributeList = '.user-defined-attributes .attribute:first';
                     $(firstAttributeList).find('.error-message').text("Minimum one attribute is required.")
                     self.addErrorClass($(firstAttributeList).find('.attribute-expression'));
                 }
@@ -1646,7 +1652,7 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
             var isErrorOccurred = false;
             var projectionType = $('.define-select .attribute-selection-type');
             if (projectionType.val() == Constants.TYPE_USER_DEFINED) {
-                $('.define-select .user-defined-attributes li').each(function () {
+                $('.define-select .user-defined-attributes .attribute').each(function () {
                     var expression = $(this).find('.attribute-expression').val().trim();
                     if (expression == "") {
                         isErrorOccurred = true;
@@ -1788,7 +1794,7 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
          */
         FormUtils.prototype.buildQueryExpressions = function () {
             var attributes = [];
-            $('.define-select .user-defined-attributes li').each(function () {
+            $('.define-select .user-defined-attributes .attribute').each(function () {
                 var expressionValue = $(this).find('.attribute-expression').val().trim();
                 var asValue = $(this).find('.attribute-as').val().trim();
                 var expressionObject = {
@@ -1805,7 +1811,7 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
          */
         FormUtils.prototype.buildAggregateExpressions = function () {
             var attributes = [];
-            $('.define-select .user-defined-attributes li').each(function () {
+            $('.define-select .user-defined-attributes .attribute').each(function () {
                 var expressionAsValue = $(this).find('.attribute-expression').val().trim();
                 if (expressionAsValue !== "") {
                     var separateExpression = expressionAsValue.split(/as/i);
@@ -1866,7 +1872,7 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
                 var setCheckbox = $('.define-query-operation .set-checkbox');
                 if (setCheckbox.length != 0 && setCheckbox.is(":checked")) {
                     var sets = [];
-                    $('.define-operation-set-condition .set-condition li').each(function () {
+                    $('.define-operation-set-condition .set-condition .setAttributeValue').each(function () {
                         var setAttribute = $(this).find('.setAttribute').val().trim();
                         var setValue = $(this).find('.setValue').val().trim();
                         if ((setAttribute != "") && (setValue != "")) {
@@ -1924,7 +1930,7 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
             var self = this;
             var streamHandlers = [];
             if (sourceDiv.find('.stream-handler-checkbox').is(':checked')) {
-                sourceDiv.find('.stream-handler-list li').each(function () {
+                sourceDiv.find('.stream-handler-list .define-stream-handler-content').each(function () {
                     var streamHandlerOptions = {};
                     var streamHandlerContent = $(this).find('.define-stream-handler-type-content');
                     if (streamHandlerContent.hasClass('define-filter-stream-handler')) {
@@ -2315,7 +2321,7 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
          * @function to select the first condition as default
          */
         FormUtils.prototype.selectFirstConditionByDefault = function () {
-            $('.define-conditions .nav-tabs').find('li:first-child').addClass('active');
+            $('.define-conditions .nav-tabs').find('.condition-navigation:first-child').addClass('active');
             $('.define-conditions .tab-content').find('.tab-pane:first-child').addClass('active');
         };
 
@@ -3347,9 +3353,9 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
                     if (inputElement.type.toLowerCase() === Constants.TRIGGER) {
                         attributes.push({name: Constants.TRIGGERED_TIME});
                     } else if (inputElement.type.toLowerCase() === Constants.AGGREGATION) {
-                        attributes = self.getInputAttributesForAggregation(inputElement);
+                        attributes = attributes.concat(self.getInputAttributesForAggregation(inputElement))
                     } else {
-                        attributes = inputElement.element.getAttributeList();
+                        attributes = attributes.concat(inputElement.element.getAttributeList());
                     }
                 }
             });
@@ -3365,8 +3371,7 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
             var attributes = [];
             var selectType = aggregationElement.element.getSelect().getType().toLowerCase();
             if (selectType === Constants.TYPE_ALL) {
-                var elementConnectedToAggregation = self.configurationData.getSiddhiAppConfig().
-                getDefinitionElementByName(aggregationElement.element.getConnectedSource());
+                var elementConnectedToAggregation = self.configurationData.getSiddhiAppConfig().getDefinitionElementByName(aggregationElement.element.getConnectedSource());
                 if (elementConnectedToAggregation.type === Constants.STREAM) {
                     attributes = elementConnectedToAggregation.element.getAttributeList();
                 } else {
@@ -3860,7 +3865,7 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
             var streamHandlerTypes = self.configurationData.application.config.stream_handler_types;
             var id = self.getIdOfDiv(sourceDiv);
             var streamHandlerList = $(sourceDiv).find('.stream-handler-list');
-            var streamHandlerListLength = $(streamHandlerList).find('li').length
+            var streamHandlerListLength = $(streamHandlerList).find('.define-stream-handler-content').length
             var appendedIndex;
             var handlerList = '<li class="define-stream-handler-content"> <div> ' +
                 '<div class="collapse-div" href="#' + streamHandlerListLength + '-' + id + '-stream-handler-content" ' +
@@ -3898,9 +3903,7 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
         /**
          * @function to add event listeners for condition div
          */
-        FormUtils.prototype.addEventListenersForConditionDiv = function (inputStreamNames) {
-            var self = this;
-
+        FormUtils.prototype.addEventListenersForConditionDiv = function () {
             $('.define-conditions').on('input', '.condition-id', function () {
                 var conditionIndex = $(this).closest('.condition-content').index();
                 $('.define-conditions .condition-navigation:eq(' + conditionIndex + ') a:eq(0)').html($(this).val());
@@ -3911,15 +3914,15 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
          * @function to remove the up and down navigation for swindow stream handler
          */
         FormUtils.prototype.removeNavigationForWindow = function (sourceDiv) {
-            var streamHandlerListLength = $(sourceDiv).find('.stream-handler-list li').length
+            var streamHandlerListLength = $(sourceDiv).find('.stream-handler-list .define-stream-handler-content').length
             var lastIndex = streamHandlerListLength - 1;
-            var lastList = $(sourceDiv).find(' .stream-handler-list li:eq(' + lastIndex + ')');
+            var lastList = $(sourceDiv).find(' .stream-handler-list .define-stream-handler-content:eq(' + lastIndex + ')');
             if (lastList.find('.define-stream-handler-type-content').hasClass('define-window-stream-handler')) {
                 lastList.find('.attr-nav a:eq(0)').remove();
                 if (streamHandlerListLength == 2) {
-                    lastList.prev('li').find('.attr-nav a:eq(0)').remove();
+                    lastList.prev('.define-stream-handler-content').find('.attr-nav a:eq(0)').remove();
                 } else {
-                    lastList.prev('li').find('.attr-nav a:eq(1)').remove();
+                    lastList.prev('.define-stream-handler-content').find('.attr-nav a:eq(1)').remove();
                 }
             }
         };
@@ -4133,7 +4136,7 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
          * @function to change the heading and the button text of the customized options div
          */
         FormUtils.prototype.changeCustomizedOptDiv = function (id) {
-            var customizedOptionList = $('#customized-' + id + '-options').find('.cust-options li');
+            var customizedOptionList = $('#customized-' + id + '-options').find('.cust-options .option');
             var parent = $('#customized-' + id + '-options');
             if (customizedOptionList.length > 0) {
                 parent.find('h4').show();

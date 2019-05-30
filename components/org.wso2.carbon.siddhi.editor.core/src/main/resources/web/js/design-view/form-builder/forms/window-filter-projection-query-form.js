@@ -117,14 +117,12 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryWindowOrFunct
                 var outputElement = self.configurationData.getSiddhiAppConfig()
                     .getDefinitionElementByName(outputElementName, partitionId);
 
-                var predefinedAnnotations = _.cloneDeep(self.configurationData.application.config.
-                    type_query_predefined_annotations);
+                var predefinedAnnotations = _.cloneDeep(self.configurationData.application.config.type_query_predefined_annotations);
                 var streamHandlerTypes = self.configurationData.application.config.stream_handler_types;
-                var incrementalAggregator = self.configurationData.application.config.incremental_aggregator;
 
                 //render the query form template
                 var queryFormTemplate = Handlebars.compile($('#window-filter-projection-query-form-template').html())
-                ({ name: queryName, from: inputElementName });
+                ({name: queryName, from: inputElementName});
                 $('#define-windowFilterProjection-query').html(queryFormTemplate);
                 self.formUtils.renderQueryOutput(outputElement, queryOutput);
                 self.formUtils.renderOutputEventTypes();

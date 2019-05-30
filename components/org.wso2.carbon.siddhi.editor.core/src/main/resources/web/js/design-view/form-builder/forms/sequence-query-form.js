@@ -193,7 +193,7 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOrderByValue'
 
                 //render the sequence-query form template
                 var sequenceFormTemplate = Handlebars.compile($('#pattern-sequence-query-form-template').html())
-                ({ name: queryName });
+                ({name: queryName});
                 $('#define-sequence-query').html(sequenceFormTemplate);
                 self.formUtils.renderQueryOutput(outputElement, queryOutput);
                 self.formUtils.renderOutputEventTypes();
@@ -245,7 +245,7 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOrderByValue'
 
                 //conditions
                 if (!conditionList || (conditionList && conditionList.length == 0)) {
-                    conditionList = [{ conditionId: "e1", streamHandlerList: [], streamName: "" }];
+                    conditionList = [{conditionId: "e1", streamHandlerList: [], streamName: ""}];
                     queryInput.setConditionList(conditionList);
                 }
                 self.formUtils.renderConditions(conditionList, inputStreamNames);
@@ -253,7 +253,7 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOrderByValue'
                 self.formUtils.selectFirstConditionByDefault();
                 var streamHandlerList = getStreamHandlers(conditionList);
                 self.formUtils.addEventListenersForStreamHandlersDiv(streamHandlerList);
-                self.formUtils.addEventListenersForConditionDiv(inputStreamNames);
+                self.formUtils.addEventListenersForConditionDiv();
 
                 var outputAttributes = [];
                 if (outputElement.type.toLowerCase() === Constants.STREAM ||
