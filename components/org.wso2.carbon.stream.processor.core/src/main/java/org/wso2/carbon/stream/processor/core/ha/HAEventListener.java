@@ -51,6 +51,7 @@ public class HAEventListener extends MemberEventListener {
 
     @Override
     public void memberAdded(NodeDetail nodeDetail) {
+        log.info("memberAdded event received for node id : " + nodeDetail.getNodeId());
         ClusterCoordinator clusterCoordinator = StreamProcessorDataHolder.getClusterCoordinator();
         HAManager haManager = StreamProcessorDataHolder.getHAManager();
 
@@ -90,6 +91,8 @@ public class HAEventListener extends MemberEventListener {
                                     log.error("Error occurred while waiting for passive node property map to " +
                                             "available. " + e.getMessage(),e);
                                 }
+                            } else {
+                                log.info("Active node retrieved node details of passive node");
                             }
                             break;
                         }
@@ -130,6 +133,7 @@ public class HAEventListener extends MemberEventListener {
 
     @Override
     public void memberRemoved(NodeDetail nodeDetail) {
+        log.info("memberRemoved event received for node id : " + nodeDetail.getNodeId());
         ClusterCoordinator clusterCoordinator = StreamProcessorDataHolder.getClusterCoordinator();
         HAManager haManager = StreamProcessorDataHolder.getHAManager();
         if (clusterCoordinator.isLeaderNode()) {
@@ -147,6 +151,7 @@ public class HAEventListener extends MemberEventListener {
 
     @Override
     public void coordinatorChanged(NodeDetail nodeDetail) {
+        log.info("coordinatorChanged event received for node id : " + nodeDetail.getNodeId());
         ClusterCoordinator clusterCoordinator = StreamProcessorDataHolder.getClusterCoordinator();
         if (clusterCoordinator != null) {
 
@@ -200,6 +205,7 @@ public class HAEventListener extends MemberEventListener {
 
     @Override
     public void becameUnresponsive(String nodeId) {
+        log.info("becameUnresponsive event received for node id : " + nodeId);
         if (StreamProcessorDataHolder.getHAManager().isActiveNode()) {
             SinkHandlerManager sinkHandlerManager = StreamProcessorDataHolder.getSinkHandlerManager();
             Map<String, SinkHandler> registeredSinkHandlers = sinkHandlerManager.getRegisteredSinkHandlers();

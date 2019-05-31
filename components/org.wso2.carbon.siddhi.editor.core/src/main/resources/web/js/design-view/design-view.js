@@ -215,7 +215,8 @@ define(['require', 'log', 'lodash', 'jquery', 'tool_palette/tool-palette', 'desi
                     data: self.options.application.utils.base64EncodeUnicode(code),
                     async: false,
                     success: function (response) {
-                        result = {status: "success", responseString: window.atob(response)};
+                        result = {status: "success", responseString: self.options.application.utils.
+                            b64DecodeUnicode(response)};
                     },
                     error: function (error) {
                         if (error.responseText) {
@@ -239,7 +240,8 @@ define(['require', 'log', 'lodash', 'jquery', 'tool_palette/tool-palette', 'desi
                 data: self.options.application.utils.base64EncodeUnicode(designViewJSON),
                 async: false,
                 success: function (response) {
-                    result = {status: "success", responseString: window.atob(response)};
+                    result = {status: "success", responseString: self.options.application.utils.
+                        b64DecodeUnicode(response)};
                 },
                 error: function (error) {
                     if (error.responseText) {

@@ -40,7 +40,6 @@ define(['require', 'lodash', 'jquery', 'log', 'backbone', 'file_browser', 'boots
                 var payload = new Blob([config], {type: "text/plain; charset=utf-8"});
                 var downloadLink = document.createElement("a");
                 downloadLink.download = title;
-                downloadLink.innerHTML = "export File";
                 downloadLink.href = window.URL.createObjectURL(payload);
                 downloadLink.onclick = destroyClickedElement;
                 downloadLink.style.display = "none";

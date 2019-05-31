@@ -1,18 +1,20 @@
-/*
- ~   Copyright (c) WSO2 Inc. (http://wso2.com) All Rights Reserved.
- ~
- ~   Licensed under the Apache License, Version 2.0 (the "License");
- ~   you may not use this file except in compliance with the License.
- ~   You may obtain a copy of the License at
- ~
- ~        http://www.apache.org/licenses/LICENSE-2.0
- ~
- ~   Unless required by applicable law or agreed to in writing, software
- ~   distributed under the License is distributed on an "AS IS" BASIS,
- ~   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- ~   See the License for the specific language governing permissions and
- ~   limitations under the License.
-*/
+/**
+ * Copyright (c) 2017, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+ *
+ * WSO2 Inc. licenses this file to you under the Apache License,
+ * Version 2.0 (the "License"); you may not use this file except
+ * in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied. See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+ */
 
 /*
  ~   DataTables WSO2 Integration
@@ -45,9 +47,7 @@
                 search: ''
             }
         });
-        
         var wso2Extend = function(settings, opts) {
-
             // Sanity check that we are using DataTables 1.10 or newer
             if (!DataTable.versionCheck || !DataTable.versionCheck('1.10.12')) {
                 throw 'DataTables Responsive requires DataTables 1.10.12 or newer';
@@ -67,7 +67,6 @@
             if (opts && typeof opts.details === 'string') {
                 opts.details = { type: opts.details };
             }
-            
             this.c = $.extend( true, {}, wso2Extend.defaults, DataTable.defaults.wso2, opts );
             settings.wso2 = this;
             this._constructor();
@@ -75,12 +74,9 @@
         };
         
         wso2Extend.prototype = {
-            
-            _constructor: function(){
-                
+            _constructor: function() {
 		        var dt = this.s.dt;
                 var elem = $('table', dt.table().container());
-
                 var ROW_SELECTED_CLASS = 'DTTT_selected';
 
                 dt.table().columns().every(function() {
@@ -138,10 +134,12 @@
                 search_input.before('<i class="fw fw-search search-icon"></i>').removeClass('input-sm');
 
                 // Create sorting dropdown menu for list table advance operations
-                var dropdownmenu = $('<ul class="dropdown-menu arrow arrow-top-right dark sort-list add-margin-top-2x"><li class="dropdown-header">Sort by</li></ul>');
+                var dropdownmenu = $('<ul class="dropdown-menu arrow arrow-top-right dark sort-list add-margin-top-2x">' +
+                    '<li class="dropdown-header">Sort by</li></ul>');
                 $('.sort-row th', elem).each(function () {
                     if (!$(this).hasClass('no-sort')) {
-                        dropdownmenu.append('<li><a href="#' + $(this).html() + '" data-column="' + $(this).index() + '">' + $(this).html() + '</a></li>');
+                        dropdownmenu.append('<li><a href="#' + $(this).html() + '" data-column="' + $(this).index() +
+                            '">' + $(this).html() + '</a></li>');
                     }
                 });
 
@@ -149,11 +147,14 @@
                 $('.dataTable.list-table').closest('.dataTables_wrapper').find('.dataTablesTop .dataTables_toolbar').html('' +
                     '<ul class="nav nav-pills navbar-right remove-margin" role="tablist">' +
                     '<li><button data-click-event="toggle-select" class="btn btn-default btn-primary">Select</li>' +
-                    '<li class="select-all-btn" style="display:none;"><button data-click-event="toggle-select-all" class="btn btn-default btn-primary">Select All</li>' +
-                    '<li><button data-click-event="toggle-list-view" data-view="grid" class="btn btn-default"><i class="fw fw-grid"></i></button></li>' +
-                    '<li><button data-click-event="toggle-list-view" data-view="list" class="btn btn-default"><i class="fw fw-list"></i></button></li>' +
-                    '<li><button class="btn btn-default" data-toggle="dropdown"><i class="fw fw-sort"></i></button>' + dropdownmenu[0].outerHTML + '</li>' +
-                    '</ul>'
+                    '<li class="select-all-btn" style="display:none;"><button data-click-event="toggle-select-all" ' +
+                    'class="btn btn-default btn-primary">Select All</li>' +
+                    '<li><button data-click-event="toggle-list-view" data-view="grid" class="btn btn-default">' +
+                    '<i class="fw fw-grid"></i></button></li>' +
+                    '<li><button data-click-event="toggle-list-view" data-view="list" class="btn btn-default">' +
+                    '<i class="fw fw-list"></i></button></li>' +
+                    '<li><button class="btn btn-default" data-toggle="dropdown"><i class="fw fw-sort"></i></button>' +
+                    dropdownmenu[0].outerHTML + '</li>' + '</ul>'
                 );
 
                 //Sorting dropdown menu select function
@@ -240,12 +241,8 @@
                 toggleButton.click(function () {
                     if ($(this).attr('data-view') == 'grid') {
                         $(this).closest('.dataTables_wrapper').find('.dataTable').addClass('grid-view');
-                        //$(this).closest('li').hide();
-                        //$(this).closest('li').siblings().show();
                     } else {
                         $(this).closest('.dataTables_wrapper').find('.dataTable').removeClass('grid-view');
-                        //$(this).closest('li').hide();
-                        //$(this).closest('li').siblings().show();
                     }
                 });
 
@@ -293,22 +290,12 @@
             if (e.namespace !== 'dt') {
                 return;
             }
-
-//            if ( $(settings.nTable).hasClass('dte') ||
-//                 $(settings.nTable).hasClass('dt-extended') ||
-//                 settings.oInit.wso2 ||
-//                 DataTable.defaults.wso2 ||
-//            ) {
-                var init = settings.oInit.wso2;
-
-                if (init !== false) {
-                    new wso2Extend (settings, $.isPlainObject(init) ? init : {});
-                }
-            //}
+            var init = settings.oInit.wso2;
+            if (init !== false) {
+                new wso2Extend (settings, $.isPlainObject(init) ? init : {});
+            }
         });
-        
         return wso2Extend;
-
     };
 
     // Define as an AMD module if possible
