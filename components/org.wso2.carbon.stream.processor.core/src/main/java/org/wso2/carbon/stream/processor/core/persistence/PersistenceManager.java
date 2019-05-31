@@ -98,7 +98,7 @@ public class PersistenceManager implements Runnable {
                     }
                 } catch (Throwable e) {
                     log.error("Active Node: Persisting of Siddhi app is not successful. " +
-                            "Check if app deployed properly");
+                            "Check if app deployed properly", e);
                 }
                 siddhiRevisionArray[siddhiAppCount] = sequenceIDGenerator.incrementAndGet() + HAConstants
                         .PERSISTED_APP_SPLIT_DELIMITER + persistenceReference.getRevision();
