@@ -195,34 +195,9 @@ public class StreamProcessorService {
                     log.info("Siddhi App " + siddhiAppName + " deployed successfully");
 
                 } else {
-                    log.info("Setting SinksHandlers of " + siddhiAppName + " to Passive");
-                    for (List<Sink> sinks : sinkCollection) {
-                        for (Sink sink : sinks) {
-                            HACoordinationSinkHandler handler = (HACoordinationSinkHandler) sink.getHandler();
-                            if (handler != null) {
-                                handler.setAsPassive();
-                            }
-                        }
-                    }
-
-                    log.info("Setting SourceHandlers of " + siddhiAppName + " to Passive");
-                    for (List<Source> sources : sourceCollection) {
-                        for (Source source : sources) {
-                            ((HACoordinationSourceHandler) source.getMapper().getHandler()).setAsPassive();
-                        }
-                    }
-
-                    log.info("Setting RecordTableHandlers of " + siddhiAppName + " to Passive");
-                    for (Table table : tables) {
-                        HACoordinationRecordTableHandler recordTableHandler = (HACoordinationRecordTableHandler)
-                                table.getHandler();
-                        if (recordTableHandler != null) {
-                            recordTableHandler.setAsPassive();
-                        }
-                    }
                     //Passive Node
                     siddhiAppData.setActive(false);
-                    siddhiAppData.setSiddhiAppRuntime(siddhiAppRuntime);
+                    siddhiAppRuntime.shutdown();
                     siddhiAppData.setInputHandlerMap(inputHandlerMap);
                     siddhiAppData.setDeploymentTime(System.currentTimeMillis());
                     siddhiAppMap.put(siddhiAppName, siddhiAppData);
