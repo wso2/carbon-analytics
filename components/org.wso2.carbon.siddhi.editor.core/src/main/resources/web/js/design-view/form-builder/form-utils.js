@@ -1303,15 +1303,15 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
                             delay: 0,
                             minLength: 0,
                             classes: {
-                                "ui-autocomplete": "design-view-form-auto-complete"
+                                "ui-autocomplete": "design-view-form-auto-complete design-view-combobox"
                             },
                             source: $.proxy(this, "_source"),
                             appendTo: this.wrapper
                         })
                         .tooltip({
-                            // classes: {
-                            //     "ui-tooltip": "ui-state-highlight"
-                            // }
+                            classes: {
+                                "ui-tooltip": "ui-state-highlight"
+                            }
                         });
 
                     this._on(this.input, {

@@ -1613,3 +1613,8 @@ label.option-name {
     float: left;
     display: inline-block;
 }
+
+.design-view-form-content .design-view-combobox {
+    max-height: 150px;
+    z-index:1000 !important;
+}
