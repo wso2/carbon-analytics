@@ -304,7 +304,9 @@ public class HAManager {
         }
 
         try {
-            EventSyncConnectionPoolManager.getConnectionPool().close();
+            if (EventSyncConnectionPoolManager.getConnectionPool() != null) {
+                EventSyncConnectionPoolManager.getConnectionPool().close();
+            }
         } catch (Exception e) {
             log.error("Error closing tcp client connection pool. " + e.getMessage(), e);
         } finally {
