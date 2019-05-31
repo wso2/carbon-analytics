@@ -117,8 +117,9 @@ public class EventSyncConnection {
                 } catch (InterruptedException e) {
                     log.error("Error closing connection to '" + hostAndPort + "' from client '" + sessionId +
                             "', " + e);
+                } finally {
+                    channel.disconnect();
                 }
-                channel.disconnect();
                 if (log.isDebugEnabled()) {
                     log.debug("Disconnecting client to '" + hostAndPort + "' with sessionId:" + sessionId);
                 }
