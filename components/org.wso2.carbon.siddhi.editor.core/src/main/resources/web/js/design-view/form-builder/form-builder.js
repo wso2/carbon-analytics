@@ -112,7 +112,7 @@ define(['require', 'log', 'jquery', 'lodash', 'formUtils', 'streamForm', 'tableF
             var formConsole = this.consoleListManager.newFormConsole(consoleOptions);
             $(formConsole).on("close-button-in-form-clicked", function () {
                 // close the form window
-                self.consoleListManager.removeFormConsole(formConsole);
+                self.consoleListManager.removeAllConsoles();
             });
             return formConsole;
         };
