@@ -291,10 +291,8 @@ define(['require', 'log', 'jquery', 'lodash', 'constants'],
                 // close the form window
                 self.consoleListManager.removeFormConsole(formConsole);
             });
-        }
-        ;
+        };
 
         return TriggerForm;
-    })
-;
+    });
 
