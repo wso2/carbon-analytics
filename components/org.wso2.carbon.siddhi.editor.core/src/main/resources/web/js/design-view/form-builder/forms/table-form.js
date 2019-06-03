@@ -48,17 +48,19 @@ define(['log', 'jquery', 'lodash', 'attribute', 'storeAnnotation', 'handlebar', 
             var self = this;
             var id = $(element).parent().attr('id');
             var tableObject = self.configurationData.getSiddhiAppConfig().getTable(id);
+            var previousTableObject = _.cloneDeep(tableObject);
 
-            var propertyDiv = $('<div class="clearfix"> <div class = "table-form-container table-div"> ' +
+            var propertyDiv = $('<div class="clearfix form-min-width"> <div class = "table-form-container table-div"> ' +
                 '<label> <span class="mandatory-symbol"> *</span>Name </label> <input type="text" id="tableName" ' +
                 'class = "clearfix name"> <label class="error-message" id="tableNameErrorMessage"> </label>' +
                 '<div id = "define-attribute"> </div></div> <div class = "table-form-container store-div"> ' +
                 '<div id = "define-store"> </div> <div id="define-rdbms-type"> </div> <div id="store-options-div"> ' +
                 '</div> </div> <div class = "table-form-container define-table-annotation">' +
                 '<div class = "define-predefined-annotations"> </div> <div class="define-user-defined-annotations"> ' +
-                '</div> </div> </div>' + self.formUtils.buildFormButtons());
+                '</div> </div> </div>');
 
             formContainer.append(propertyDiv);
+            self.formUtils.buildFormButtons(formConsole.cid);
             self.formUtils.popUpSelectedElement(id);
             self.designViewContainer.addClass('disableContainer');
             self.toggleViewButton.addClass('disableContainer');
@@ -149,10 +151,10 @@ define(['log', 'jquery', 'lodash', 'attribute', 'storeAnnotation', 'handlebar', 
                 $('.define-predefined-annotations').hide();
             }
 
-            self.formUtils.updatePerfectScroller();
+            self.formUtils.initPerfectScroller(formConsole.cid);
 
             // 'Submit' button action
-            $(formContainer).on('click', '#btn-submit', function () {
+            $('#' + formConsole.cid).on('click', '#btn-submit', function () {
 
                 self.formUtils.removeErrorClass();
                 var isErrorOccurred = false;
@@ -219,14 +221,7 @@ define(['log', 'jquery', 'lodash', 'attribute', 'storeAnnotation', 'handlebar', 
                     tableObject.clearAnnotationList();
                     tableObject.clearAnnotationListObjects();
 
-                    var outConnections = self.jsPlumbInstance.getConnections({ source: id + '-out' });
-                    var inConnections = self.jsPlumbInstance.getConnections({ target: id + '-in' });
-                    // delete connections related to the element if the name is changed
-                    self.formUtils.deleteConnectionsAfterDefinitionElementNameChange(outConnections, inConnections);
-                    // update selected table model
                     tableObject.setName(tableName);
-                    // establish connections related to the element if the name is changed
-                    self.formUtils.establishConnectionsAfterDefinitionElementNameChange(outConnections, inConnections);
                     var textNode = $('#' + id).find('.tableNameNode');
                     textNode.html(tableName);
 
@@ -267,6 +262,22 @@ define(['log', 'jquery', 'lodash', 'attribute', 'storeAnnotation', 'handlebar', 
                         }
                     });
 
+                    if (self.formUtils.isUpdatingOtherElementsRequired(previousTableObject, tableObject,
+                        Constants.TABLE)) {
+                        var outConnections = self.jsPlumbInstance.getConnections({source: id + '-out'});
+                        var inConnections = self.jsPlumbInstance.getConnections({target: id + '-in'});
+
+                        //to delete the connection, it requires the previous object name
+                        tableObject.setName(previousTableObject.getName())
+                        // delete connections related to the element if the name is changed
+                        self.formUtils.deleteConnectionsAfterDefinitionElementNameChange(outConnections, inConnections);
+                        //reset the name to new name
+                        tableObject.setName(tableName);
+
+                        // establish connections related to the element if the name is changed
+                        self.formUtils.establishConnectionsAfterDefinitionElementNameChange(outConnections, inConnections);
+                    }
+
                     $('#' + id).removeClass('incomplete-element');
                     //Send table element to the backend and generate tooltip
                     var tableToolTip = self.formUtils.getTooltip(tableObject, Constants.TABLE);
@@ -280,8 +291,7 @@ define(['log', 'jquery', 'lodash', 'attribute', 'storeAnnotation', 'handlebar', 
             });
 
             // 'Cancel' button action
-            var cancelButtonElement = $(formContainer).find('#btn-cancel')[0];
-            cancelButtonElement.addEventListener('click', function () {
+            $('#' + formConsole.cid).on('click', '#btn-cancel', function () {
                 // close the form window
                 self.consoleListManager.removeFormConsole(formConsole);
             });
