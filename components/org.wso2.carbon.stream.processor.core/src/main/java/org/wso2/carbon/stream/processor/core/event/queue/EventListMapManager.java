@@ -69,6 +69,9 @@ public class EventListMapManager {
     }
 
     public void parseControlMessage(byte[] controlMessageContentByteArray) throws UnsupportedEncodingException {
+        if (log.isDebugEnabled()) {
+            log.debug("Received a control message");
+        }
         String message = null;
         message = new String(controlMessageContentByteArray, HAConstants.DEFAULT_CHARSET);
         if (!message.isEmpty()) {

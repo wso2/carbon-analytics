@@ -118,7 +118,7 @@ public class HACoordinationSourceHandler extends SourceHandler {
 
     public void setPassiveNodeAdded(boolean passiveNodeAdded) {
         this.passiveNodeAdded = passiveNodeAdded;
-        setIsWaitingForPassiveNode(!passiveNodeAdded);
+        setIsWaitingForPassiveNode(passiveNodeAdded);
     }
 
     /**
@@ -158,7 +158,6 @@ public class HACoordinationSourceHandler extends SourceHandler {
 
     private void sendEventsToPassiveNode(Event event, String[] transportSyncProperties) {
         if (!isWaitingForPassiveNode.get() || lastConnRefusedTimestamp.get() + 5000 < System.currentTimeMillis()) {
-            isWaitingForPassiveNode.set(false);
             GenericKeyedObjectPool objectPool = EventSyncConnectionPoolManager.getConnectionPool();
             if (objectPool != null) {
                 EventSyncConnection.Connection connection = null;
@@ -192,7 +191,7 @@ public class HACoordinationSourceHandler extends SourceHandler {
                     synchronized (this) {
                         log.warn("Error in sending events to the passive node." +
                                 " Event syncing will start to retry again in 5 seconds. " + e.getMessage(), e);
-                        if (!isWaitingForPassiveNode.get() && e.getMessage().contains("Connection refused")) {
+                        if (e.getMessage().contains("Connection refused")) {
                             lastConnRefusedTimestamp.set(System.currentTimeMillis());
                             isWaitingForPassiveNode.set(true);
                         }
@@ -215,6 +214,7 @@ public class HACoordinationSourceHandler extends SourceHandler {
     }
 
     private void sendEventsToPassiveNode(Event[] events, String[] transportSyncProperties) {
+        log.error("isWaitingForPassiveNode? " + isWaitingForPassiveNode.get());
         if (!isWaitingForPassiveNode.get() || lastConnRefusedTimestamp.get() + 5000 < System.currentTimeMillis()) {
             GenericKeyedObjectPool objectPool = EventSyncConnectionPoolManager.getConnectionPool();
             if (objectPool != null) {
@@ -261,7 +261,7 @@ public class HACoordinationSourceHandler extends SourceHandler {
                     synchronized (this) {
                         log.warn("Error in sending events to the passive node." +
                                 " Event syncing will start to retry again in 5 seconds. " + e.getMessage(), e);
-                        if (!isWaitingForPassiveNode.get() && e.getMessage().contains("Connection refused")) {
+                        if (e.getMessage().contains("Connection refused")) {
                             lastConnRefusedTimestamp.set(System.currentTimeMillis());
                             isWaitingForPassiveNode.set(true);
                         }
@@ -289,7 +289,7 @@ public class HACoordinationSourceHandler extends SourceHandler {
         }
     }
 
-    public void setIsWaitingForPassiveNode(boolean isWaitingForPassiveNode) {
-        this.isWaitingForPassiveNode.set(isWaitingForPassiveNode);
+    public void setIsWaitingForPassiveNode(boolean passiveNodeAdded) {
+        this.isWaitingForPassiveNode.set(!passiveNodeAdded);
     }
 }
