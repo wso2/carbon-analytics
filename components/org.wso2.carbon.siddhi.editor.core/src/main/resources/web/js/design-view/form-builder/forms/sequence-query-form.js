@@ -150,12 +150,15 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOrderByValue'
                 || sequenceQueryObject.getQueryInput().getConnectedElementNameList().length === 0) {
                 DesignViewUtils.prototype.warnAlert('Connect input streams');
                 self.consoleListManager.removeFormConsole(formConsole);
+                self.consoleListManager.removeAllConsoles();
             } else if (!self.formUtils.isOneElementFilled(sequenceQueryObject.getQueryInput().getConnectedElementNameList())) {
                 DesignViewUtils.prototype.warnAlert('Fill the incomplete input stream');
                 self.consoleListManager.removeFormConsole(formConsole);
+                self.consoleListManager.removeAllConsoles();
             } else if (!sequenceQueryObject.getQueryOutput() || !sequenceQueryObject.getQueryOutput().getTarget()) {
                 DesignViewUtils.prototype.warnAlert('Connect an output element');
                 self.consoleListManager.removeFormConsole(formConsole);
+                self.consoleListManager.removeAllConsoles();
             } else {
                 var propertyDiv = $('<div id="define-sequence-query" class="clearfix form-min-width"></div>');
                 formContainer.html(propertyDiv);

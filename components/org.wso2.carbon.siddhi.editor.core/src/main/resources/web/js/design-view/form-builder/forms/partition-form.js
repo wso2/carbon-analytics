@@ -90,6 +90,7 @@ define(['require', 'log', 'jquery', 'lodash', 'partitionWith', 'jsonValidator', 
 
                     // close the form window
                     self.consoleListManager.removeFormConsole(formConsole);
+                    self.consoleListManager.removeAllConsoles();
                 } else {
                     var propertyDiv = $('<div class="clearfix form-min-width"> <div class = "partition-form-container"> ' +
                         '<div id = "define-partition-keys"> </div> </div>' +

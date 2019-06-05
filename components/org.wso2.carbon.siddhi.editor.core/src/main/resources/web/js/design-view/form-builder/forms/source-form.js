@@ -130,6 +130,7 @@ define(['log', 'jquery', 'lodash', 'sourceOrSinkAnnotation', 'mapAnnotation', 'p
             if (!isSourceConnected) {
                 // close the form window
                 self.consoleListManager.removeFormConsole(formConsole);
+                self.consoleListManager.removeAllConsoles();
             } else {
                 var connectedElement = sourceObject.connectedElementName;
                 var predefinedSources = _.orderBy(this.configurationData.rawExtensions["source"], ['name'], ['asc']);

@@ -151,12 +151,15 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOrderByValue'
                 || patternQueryObject.getQueryInput().getConnectedElementNameList().length === 0) {
                 DesignViewUtils.prototype.warnAlert('Connect input streams');
                 self.consoleListManager.removeFormConsole(formConsole);
+                self.consoleListManager.removeAllConsoles();
             } else if (!self.formUtils.isOneElementFilled(patternQueryObject.getQueryInput().getConnectedElementNameList())) {
                 DesignViewUtils.prototype.warnAlert('Fill the incomplete input stream');
                 self.consoleListManager.removeFormConsole(formConsole);
+                self.consoleListManager.removeAllConsoles();
             } else if (!patternQueryObject.getQueryOutput() || !patternQueryObject.getQueryOutput().getTarget()) {
                 DesignViewUtils.prototype.warnAlert('Connect an output element');
                 self.consoleListManager.removeFormConsole(formConsole);
+                self.consoleListManager.removeAllConsoles();
             } else {
                 var propertyDiv = $('<div id="define-pattern-query" class="clearfix form-min-width"></div>');
                 formContainer.html(propertyDiv);
