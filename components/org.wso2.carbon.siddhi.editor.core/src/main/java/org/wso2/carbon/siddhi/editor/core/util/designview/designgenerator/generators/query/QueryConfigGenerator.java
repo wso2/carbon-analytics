@@ -67,7 +67,7 @@ public class QueryConfigGenerator extends CodeSegmentsPreserver {
      * @param query                 Siddhi Query object
      * @return                      QueryConfig object
      */
-    public QueryConfig generateQueryConfig(Query query)
+    public QueryConfig generateQueryConfig(Query query, int queryCounter)
             throws DesignGenerationException {
         QueryConfig queryConfig = new QueryConfig();
 
@@ -85,7 +85,7 @@ public class QueryConfigGenerator extends CodeSegmentsPreserver {
         queryConfig.setOutputRateLimit(generateOutputRateLimit(query.getOutputRate()));
         queryConfig.setAnnotationListObjects(removeInfoAnnotation(query.getAnnotations()));
         queryConfig.setAnnotationList(generateAnnotationList(query.getAnnotations()));
-        queryConfig.setQueryName(generateQueryName(query.getAnnotations()));
+        queryConfig.setQueryName(generateQueryName(query.getAnnotations(), queryCounter));
         preserveAndBindCodeSegment(query, queryConfig);
         return queryConfig;
     }
@@ -249,14 +249,20 @@ public class QueryConfigGenerator extends CodeSegmentsPreserver {
      * @param annotations           Query annotation list
      * @return query name           name of the query
      */
-    private String generateQueryName(List<Annotation> annotations) {
+    private String generateQueryName(List<Annotation> annotations , int queryNumber) {
+        String queryName = "";
+        boolean isQueryName = false;
         for (Annotation annotation : annotations) {
             if (annotation.getName().equalsIgnoreCase("info")) {
                 preserveCodeSegment(annotation);
-                return annotation.getElement("name");
+                 queryName = annotation.getElement("name");
+                 isQueryName = true;
             }
         }
-        return DEFAULT_QUERY_NAME;
+        if (!isQueryName) {
+            queryName = DEFAULT_QUERY_NAME + queryNumber;
+        }
+        return queryName;
     }
 
     /**
