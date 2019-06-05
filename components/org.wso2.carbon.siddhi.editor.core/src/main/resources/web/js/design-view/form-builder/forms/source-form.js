@@ -146,7 +146,7 @@ define(['log', 'jquery', 'lodash', 'sourceOrSinkAnnotation', 'mapAnnotation', 'p
                     '</div> </div> <div class= "source-sink-form-container attribute-map-div">' +
                     '<div id="define-attribute"> </div> <div id="attribute-map-content"></div> </div> </div>');
 
-                formContainer.append(propertyDiv);
+                formContainer.html(propertyDiv);
                 self.formUtils.buildFormButtons(formConsole.cid);
                 self.formUtils.popUpSelectedElement(id);
                 self.designViewContainer.addClass('disableContainer');

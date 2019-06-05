@@ -56,7 +56,7 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'jsonValidator', 'con
                 '<div id="define-attribute"></div> </div> <div class= "stream-form-container"> ' +
                 '<div class ="define-annotation"> </div> </div>');
 
-            formContainer.append(propertyDiv);
+            formContainer.html(propertyDiv);
             self.formUtils.buildFormButtons(formConsole.cid);
             self.formUtils.popUpSelectedElement(id);
             self.designViewContainer.addClass('disableContainer');

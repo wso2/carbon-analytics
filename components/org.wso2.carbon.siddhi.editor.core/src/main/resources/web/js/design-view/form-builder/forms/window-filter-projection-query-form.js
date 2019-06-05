@@ -86,7 +86,7 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryWindowOrFunct
                 self.consoleListManager.removeFormConsole(formConsole);
             } else {
                 var propertyDiv = $('<div id="define-windowFilterProjection-query" class="clearfix form-min-width"></div>');
-                formContainer.append(propertyDiv);
+                formContainer.html(propertyDiv);
                 self.formUtils.buildFormButtons(formConsole.cid);
 
                 self.designViewContainer.addClass('disableContainer');

@@ -95,7 +95,7 @@ define(['require', 'log', 'jquery', 'lodash', 'partitionWith', 'jsonValidator', 
                         '<div id = "define-partition-keys"> </div> </div>' +
                         '<div class = "partition-form-container"> <div class = "define-annotation"> </div> </div> </div>');
 
-                    formContainer.append(propertyDiv);
+                    formContainer.html(propertyDiv);
                     self.formUtils.buildFormButtons(formConsole.cid);
                     self.formUtils.popUpSelectedElement(id);
                     // design view container and toggle view button are enabled

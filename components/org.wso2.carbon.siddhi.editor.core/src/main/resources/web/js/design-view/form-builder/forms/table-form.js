@@ -59,7 +59,7 @@ define(['log', 'jquery', 'lodash', 'attribute', 'storeAnnotation', 'handlebar', 
                 '<div class = "define-predefined-annotations"> </div> <div class="define-user-defined-annotations"> ' +
                 '</div> </div> </div>');
 
-            formContainer.append(propertyDiv);
+            formContainer.html(propertyDiv);
             self.formUtils.buildFormButtons(formConsole.cid);
             self.formUtils.popUpSelectedElement(id);
             self.designViewContainer.addClass('disableContainer');

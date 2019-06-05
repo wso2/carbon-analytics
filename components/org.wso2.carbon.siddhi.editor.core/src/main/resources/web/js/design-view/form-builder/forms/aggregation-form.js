@@ -245,7 +245,7 @@ define(['require', 'log', 'jquery', 'lodash', 'aggregateByTimePeriod', 'querySel
             } else {
                 var propertyDiv = $('<div id = "define-aggregation" class="clearfix form-min-width"> </div>');
 
-                formContainer.append(propertyDiv);
+                formContainer.html(propertyDiv);
                 self.formUtils.buildFormButtons(formConsole.cid);
                 self.designViewContainer.addClass('disableContainer');
                 self.toggleViewButton.addClass('disableContainer');
