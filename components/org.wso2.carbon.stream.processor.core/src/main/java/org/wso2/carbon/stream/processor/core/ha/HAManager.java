@@ -39,8 +39,11 @@ import org.wso2.siddhi.core.SiddhiManager;
 import org.wso2.siddhi.core.exception.CannotRestoreSiddhiAppStateException;
 import org.wso2.siddhi.core.stream.input.InputHandler;
 import org.wso2.siddhi.core.stream.input.source.SourceHandler;
+import org.wso2.siddhi.core.stream.input.source.SourceHandlerManager;
 import org.wso2.siddhi.core.stream.output.sink.SinkHandler;
+import org.wso2.siddhi.core.stream.output.sink.SinkHandlerManager;
 import org.wso2.siddhi.core.table.record.RecordTableHandler;
+import org.wso2.siddhi.core.table.record.RecordTableHandlerManager;
 import org.wso2.siddhi.core.util.transport.BackoffRetryCounter;
 import org.wso2.siddhi.core.util.statistics.metrics.Level;
 
@@ -187,6 +190,7 @@ public class HAManager {
             createSiddhiAppRuntimes();
             for (SourceHandler sourceHandler : sourceHandlerManager.getRegsiteredSourceHandlers().values()) {
                 try {
+                    ((HACoordinationSourceHandler) sourceHandler).setPlayBack(true);
                     ((HACoordinationSourceHandler) sourceHandler).setAsActive();
                 } catch (Throwable t) {
                     log.error("HA Deployment: Error when connecting to source " + sourceHandler.getElementId() +
@@ -198,7 +202,6 @@ public class HAManager {
             NodeInfo nodeInfo = StreamProcessorDataHolder.getNodeInfo();
             nodeInfo.setActiveNode(isActiveNode);
             syncState();
-
             //Give time for byte buffer queue to be empty
             if (null != tcpServerInstance.getEventSyncServer().getEventByteBufferQueue()) {
                 while (tcpServerInstance.getEventSyncServer().getEventByteBufferQueue().peek() != null) {
@@ -209,7 +212,6 @@ public class HAManager {
                     }
                 }
             }
-
             //change the system clock to work with event time
             enableEventTimeClock(true);
             startSiddhiAppRuntimeWithoutSources();
@@ -218,10 +220,17 @@ public class HAManager {
             } catch (InterruptedException e) {
                 log.warn("Error in sending events to input handler." + e.getMessage());
             }
-
+            for (SourceHandler sourceHandler : sourceHandlerManager.getRegsiteredSourceHandlers().values()) {
+                try {
+                    ((HACoordinationSourceHandler) sourceHandler).setPlayBack(false);
+                } catch (Throwable t) {
+                    log.error("HA Deployment: Error when connecting to source " + sourceHandler.getElementId() +
+                            " while changing from passive state to active, skipping the source. ", t);
+                    continue;
+                }
+            }
             //change the system clock to work with current time
             enableEventTimeClock(false);
-
             //here before starting the sources need to enable sinks and record table handlers
             // so that new events will process accordingly
             for (SinkHandler sinkHandler : sinkHandlerManager.getRegisteredSinkHandlers().values()) {
@@ -236,7 +245,6 @@ public class HAManager {
                     continue;
                 }
             }
-
             for (RecordTableHandler recordTableHandler : recordTableHandlerManager.getRegisteredRecordTableHandlers().
                     values()) {
                 try {
@@ -253,15 +261,12 @@ public class HAManager {
                             backoffRetryCounter.getTimeIntervalMillis(), TimeUnit.MILLISECONDS);
                 }
             }
-
             startSiddhiAppRuntimeSources();
-
             //start the databridge servers
             List<ServerEventListener> listeners = StreamProcessorDataHolder.getServerListeners();
             for (ServerEventListener listener : listeners) {
                 listener.start();
             }
-
             //notify the HAStateChangeListener as becameActive
             List<HAStateChangeListener> haStateChangeListeners = StreamProcessorDataHolder.
                     getHaStateChangeListenerList();
@@ -279,30 +284,46 @@ public class HAManager {
      */
     void changeToPassive() {
         log.info("HA Deployment: This Node is now becoming the Passive Node");
+        SinkHandlerManager sinkHandlerManager = StreamProcessorDataHolder.getSinkHandlerManager();
+        Map<String, SinkHandler> registeredSinkHandlers = sinkHandlerManager.getRegisteredSinkHandlers();
+        SourceHandlerManager sourceHandlerManager = StreamProcessorDataHolder.getSourceHandlerManager();
+        Map<String, SourceHandler> registeredSourceHandlers = sourceHandlerManager.
+                getRegsiteredSourceHandlers();
+        RecordTableHandlerManager recordTableHandlerManager = StreamProcessorDataHolder.
+                getRecordTableHandlerManager();
+        Map<String, RecordTableHandler> registeredRecordTableHandlers = recordTableHandlerManager.
+                getRegisteredRecordTableHandlers();
+        for (Map.Entry<String, SinkHandler> entry : registeredSinkHandlers.entrySet()) {
+            HACoordinationSinkHandler handler = (HACoordinationSinkHandler) entry.getValue();
+            if (handler != null) {
+                handler.setAsPassive();
+            }
+        }
+        for (SourceHandler sourceHandler : registeredSourceHandlers.values()) {
+            ((HACoordinationSourceHandler) sourceHandler).setAsPassive();
+        }
+        for (RecordTableHandler recordTableHandler : registeredRecordTableHandlers.values()) {
+            ((HACoordinationRecordTableHandler) recordTableHandler).setAsPassive();
+        }
         //stop the databridge servers
         List<ServerEventListener> listeners = StreamProcessorDataHolder.getServerListeners();
         for (ServerEventListener listener : listeners) {
             listener.stop();
         }
-        sourceHandlerManager.getRegsiteredSourceHandlers().clear();
         stopSiddhiAppRuntimes();
         isActiveNode = false;
         changeSiddhiAppState(false);
         setPassiveNodeAdded(false);
-
         //initialize event list map
         EventListMapManager.initializeEventListMap();
-
         NodeInfo nodeInfo = StreamProcessorDataHolder.getNodeInfo();
         nodeInfo.setActiveNode(isActiveNode);
-
         //notify the HAStateChangeListener as becamePassive
         List<HAStateChangeListener> haStateChangeListeners = StreamProcessorDataHolder.
                 getHaStateChangeListenerList();
         for (HAStateChangeListener listener : haStateChangeListeners) {
             listener.becamePassive();
         }
-
         try {
             if (EventSyncConnectionPoolManager.getConnectionPool() != null) {
                 EventSyncConnectionPoolManager.getConnectionPool().close();
@@ -312,7 +333,9 @@ public class HAManager {
         } finally {
             EventSyncConnectionPoolManager.uninitializeConnectionPool();
         }
-
+        registeredSinkHandlers.clear();
+        registeredRecordTableHandlers.clear();
+        registeredSourceHandlers.clear();
         log.info("Successfully Changed to Passive Mode ");
     }
 
@@ -464,7 +487,7 @@ public class HAManager {
         this.passiveNodeAdded = passiveNodeAdded;
     }
 
-    public String getNodeId () {
+    public String getNodeId() {
         return nodeId;
     }
 

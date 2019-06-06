@@ -17,6 +17,7 @@
  */
 package org.wso2.carbon.stream.processor.core.internal;
 
+import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceRegistration;
 import org.osgi.service.component.annotations.Activate;
@@ -140,11 +141,9 @@ public class ServiceComponent {
                 throw new PersistenceStoreConfigurationException("Persistence Store class with name "
                         + persistenceStoreClassName + " is invalid. ", e);
             }
-
-
             int persistenceInterval = persistenceConfigurations.getIntervalInMin();
-            scheduledExecutorService = Executors.newScheduledThreadPool(1);
-
+            scheduledExecutorService = Executors.newScheduledThreadPool(1,
+                    new ThreadFactoryBuilder().setPriority(7).setNameFormat("SchedulePersistence-%d").build());
             if (persistenceInterval > 0) {
                 scheduledFuture = scheduledExecutorService.scheduleAtFixedRate(new PersistenceManager(),
                         persistenceInterval, persistenceInterval, TimeUnit.MINUTES);

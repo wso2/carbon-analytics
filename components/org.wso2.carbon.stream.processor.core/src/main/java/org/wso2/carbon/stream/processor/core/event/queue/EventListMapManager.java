@@ -156,7 +156,8 @@ public class EventListMapManager {
                             log.debug("# of events batch : " + TPS_EVENT_THRESHOLD + " start timestamp : " + startTime +
                                     " end time stamp : " + endTime + " Throughput is (events / sec) : " +
                                     (((TPS_EVENT_THRESHOLD * 1000) / (endTime - startTime))) +
-                                    " Total Event Count : " + count);
+                                    " Total Event Count : " + count +
+                                    ". current eventListMap size: " + eventListMap.size());
                             startTime = new Date().getTime();
                         }
                     }
@@ -212,7 +213,11 @@ public class EventListMapManager {
         synchronized (this) {
             //need to synchronize to make sure to finish remembering last control message seq id for siddhi app and
             // trim accordingly
-            if (eventListMap.size() != 0){
+            if (eventListMap.size() != 0 && persistedAppDetails.length != 0){
+                long eventListMapSize = eventListMap.size();
+                if (log.isDebugEnabled()) {
+                    log.debug("eventListMapSize before trimming:  " + eventListMapSize);
+                }
                 for(String appDetail : persistedAppDetails) {
                     String[] details = appDetail.split(HAConstants.PERSISTED_APP_SPLIT_DELIMITER);
                     long seqId = Long.parseLong(details[0].trim());
@@ -233,6 +238,10 @@ public class EventListMapManager {
                             iterator.remove();
                         }
                     }
+                }
+                if (log.isDebugEnabled()) {
+                    log.debug("Trimmed " + (eventListMapSize - eventListMap.size()) +
+                            " messages from eventListMap. Current eventListMap:" + eventListMap.size());
                 }
             }
         }

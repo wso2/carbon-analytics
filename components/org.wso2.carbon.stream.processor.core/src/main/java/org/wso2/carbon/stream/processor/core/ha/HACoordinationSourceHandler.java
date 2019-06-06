@@ -49,6 +49,7 @@ import java.util.concurrent.atomic.AtomicLong;
 public class HACoordinationSourceHandler extends SourceHandler {
 
     private boolean isActiveNode;
+    private boolean playBack;
     private long lastProcessedEventTimestamp = 0L;
     private String sourceHandlerElementId;
     private String siddhiAppName;
@@ -59,7 +60,7 @@ public class HACoordinationSourceHandler extends SourceHandler {
     private static final String IGNORING_SOURCE_TYPE = "inMemory";
     private String sourceType;
     private AtomicBoolean isWaitingForPassiveNode = new AtomicBoolean(false);
-    private AtomicLong lastConnRefusedTimestamp = new AtomicLong(-1);;
+    private AtomicLong lastConnRefusedTimestamp = new AtomicLong(-1);
 
     private static final Logger log = Logger.getLogger(HACoordinationSourceHandler.class);
 
@@ -89,7 +90,7 @@ public class HACoordinationSourceHandler extends SourceHandler {
             throws InterruptedException {
         if (isActiveNode) {
             lastProcessedEventTimestamp = event.getTimestamp();
-            if (passiveNodeAdded && !IGNORING_SOURCE_TYPE.equalsIgnoreCase(sourceType)) {
+            if (!playBack && passiveNodeAdded && !IGNORING_SOURCE_TYPE.equalsIgnoreCase(sourceType)) {
                 sendEventsToPassiveNode(event, transportSyncProperties);
             }
             inputHandler.send(event);
@@ -119,6 +120,10 @@ public class HACoordinationSourceHandler extends SourceHandler {
     public void setPassiveNodeAdded(boolean passiveNodeAdded) {
         this.passiveNodeAdded = passiveNodeAdded;
         setIsWaitingForPassiveNode(passiveNodeAdded);
+    }
+
+    public void setPlayBack(boolean playBack) {
+        this.playBack = playBack;
     }
 
     /**
