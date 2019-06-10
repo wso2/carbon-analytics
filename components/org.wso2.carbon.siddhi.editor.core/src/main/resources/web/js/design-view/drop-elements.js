@@ -1404,7 +1404,7 @@ define(['require', 'log', 'lodash', 'jquery', 'partition', 'stream', 'query', 'f
             var self = this;
             var oldFaultStreamName = Constants.FAULT_STREAM_PREFIX + previouslySavedStreamName;
             var oldFaultStreamElementId = "";
-            self.configurationData.getSiddhiAppConfig().getStreamList().forEach(function(s) {
+            self.configurationData.getSiddhiAppConfig().getStreamList().forEach(function (s) {
                 if (oldFaultStreamName === s.getName()) {
                     oldFaultStreamElementId = s.getId();
                 }
@@ -1412,29 +1412,10 @@ define(['require', 'log', 'lodash', 'jquery', 'partition', 'stream', 'query', 'f
 
             if (oldFaultStreamElementId != "") {
                 self.configurationData.getSiddhiAppConfig().removeStream(oldFaultStreamElementId);
-                $( "#" + oldFaultStreamElementId ).remove();
+                $("#" + oldFaultStreamElementId).remove();
             }
             if (stream.hasFaultStream()) {
-                //remove existing connectionDots
-                $('#' + stream.getId() + '-in').remove();
-                $('#' + stream.getId() + '-out').remove();
-
-                var connection1 = $('<div class="connectorInStreamForErrorStream">').attr('id', stream.getId() + "-in").
-                    addClass('connection');
-                var connection2 = $('<div class="connectorOutForErrorStream">').attr('id', stream.getId() + "-out").
-                    addClass('connection');
-                $('#' + stream.getId()).append(connection1);
-                $('#' + stream.getId()).append(connection2);
-
-                jsPlumbInstance.makeTarget(connection1, {
-                    deleteEndpointsOnDetach: true,
-                    anchor: 'Left'
-                });
-
-                jsPlumbInstance.makeSource(connection2, {
-                    deleteEndpointsOnDetach: true,
-                    anchor: 'Right'
-                });
+                self.deleteAndConnectConnection(stream.getId());
 
                 var faultStreamName = Constants.FAULT_STREAM_PREFIX + stream.getName();
                 var connectionErrOut = $('<div class="error-connection connectorErrOutStream">')
@@ -1443,9 +1424,11 @@ define(['require', 'log', 'lodash', 'jquery', 'partition', 'stream', 'query', 'f
                 jsPlumbInstance.makeSource(connectionErrOut, {
                     deleteEndpointsOnDetach: true,
                     anchor: 'Right',
-                    connectorStyle: { strokeWidth: 2, stroke: '#FF0000',
+                    connectorStyle: {
+                        strokeWidth: 2, stroke: '#FF0000',
                         outlineStroke: 'transparent',
-                        outlineWidth: '3' }
+                        outlineWidth: '3'
+                    }
                 });
 
                 $('#' + stream.getId()).addClass('errorStreamDrop');
@@ -1454,14 +1437,14 @@ define(['require', 'log', 'lodash', 'jquery', 'partition', 'stream', 'query', 'f
                 var id = self.designGrid.generateNextNewAgentId();
 
                 //add error object
-                var attributeObject = new Attribute({ name: "_error", type: "OBJECT" });
+                var attributeObject = new Attribute({name: "_error", type: "OBJECT"});
                 var attributeList = stream.getAttributeList();
                 // Add the fault stream to the stream list
                 var faultStream = new Stream({
                     id: id,
                     name: faultStreamName
                 });
-                for(var i = 0; i < attributeList.length; i++) {
+                for (var i = 0; i < attributeList.length; i++) {
                     var obj = attributeList[i];
                     faultStream.addAttribute(obj);
                 }
@@ -1474,24 +1457,44 @@ define(['require', 'log', 'lodash', 'jquery', 'partition', 'stream', 'query', 'f
                 _.forEach(connections, function (connection) {
                     self.jsPlumbInstance.deleteConnection(connection);
                 });
+
                 $('#' + stream.getId() + '-err-out').remove();
                 $('#' + stream.getId()).removeClass('errorStreamDrop');
-                $('#' + stream.getId() + '-in').remove();
-                $('#' + stream.getId() + '-out').remove();
 
-                var connection1 = $('<div class="connectorInStream">').attr('id', stream.getId() + "-in").
-                    addClass('connection');
-                var connection2 = $('<div class="connectorOutStream">').attr('id', stream.getId() + "-out").
-                    addClass('connection');
-                $('#' + stream.getId()).append(connection1);
-                $('#' + stream.getId()).append(connection2);
+                self.deleteAndConnectConnection(stream.getId());
+            }
+        };
 
-                jsPlumbInstance.makeTarget(connection1, {
+        DropElements.prototype.deleteAndConnectConnection = function (elementId) {
+            var self = this;
+
+            var inConnection = self.jsPlumbInstance.getConnections({target: elementId + '-in'})[0];
+            var outConnection = self.jsPlumbInstance.getConnections({source: elementId + '-out'})[0];
+
+            if (inConnection) {
+                self.jsPlumbInstance.deleteConnection(inConnection, {
+                    fireEvent: false, //prevents firing a connection detached event
+                    forceDetach: false //override any beforeDetach listeners
+                });
+                self.jsPlumbInstance.connect({
+                    source: inConnection.sourceId,
+                    target: inConnection.targetId
+                });
+                self.jsPlumbInstance.makeTarget(inConnection.targetId, {
                     deleteEndpointsOnDetach: true,
                     anchor: 'Left'
                 });
-
-                jsPlumbInstance.makeSource(connection2, {
+            }
+            if (outConnection) {
+                self.jsPlumbInstance.deleteConnection(outConnection, {
+                    fireEvent: false, //prevents firing a connection detached event
+                    forceDetach: false //override any beforeDetach listeners
+                });
+                self.jsPlumbInstance.connect({
+                    source: outConnection.sourceId,
+                    target: outConnection.targetId
+                });
+                self.jsPlumbInstance.makeSource(outConnection.sourceId, {
                     deleteEndpointsOnDetach: true,
                     anchor: 'Right'
                 });
@@ -1663,17 +1666,17 @@ define(['require', 'log', 'lodash', 'jquery', 'partition', 'stream', 'query', 'f
                 * update the other elements data connected to current element. ex: when a stream is deleted from a
                 * query, from clause in the query will be updated as undefined.
                 * */
-                setTimeout(function () {
-                    var outConnections = self.jsPlumbInstance.getConnections({source: elementId + '-out'});
-                    var inConnections = self.jsPlumbInstance.getConnections({target: elementId + '-in'});
-
-                    _.forEach(outConnections, function (connection) {
-                        self.jsPlumbInstance.deleteConnection(connection);
-                    });
-                    _.forEach(inConnections, function (connection) {
-                        self.jsPlumbInstance.deleteConnection(connection);
-                    });
-                }, 100);
+                // setTimeout(function () {
+                //     var outConnections = self.jsPlumbInstance.getConnections({source: elementId + '-out'});
+                //     var inConnections = self.jsPlumbInstance.getConnections({target: elementId + '-in'});
+                //
+                //     _.forEach(outConnections, function (connection) {
+                //         self.jsPlumbInstance.deleteConnection(connection);
+                //     });
+                //     _.forEach(inConnections, function (connection) {
+                //         self.jsPlumbInstance.deleteConnection(connection);
+                //     });
+                // }, 100);
 
                 self.jsPlumbInstance.remove(newElement, true);
                 if (self.jsPlumbInstance.getGroupFor(newElement)) {
