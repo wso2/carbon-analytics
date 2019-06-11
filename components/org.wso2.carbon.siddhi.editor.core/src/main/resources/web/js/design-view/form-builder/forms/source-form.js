@@ -139,15 +139,15 @@ define(['log', 'jquery', 'lodash', 'sourceOrSinkAnnotation', 'mapAnnotation', 'p
                 var streamAttributes = self.formUtils.createStreamAttributesObject
                 (connectedStream.element.getAttributeList());
 
-                var propertyDiv = $('<div class="clearfix"><div class="source-sink-form-container source-div">' +
+                var propertyDiv = $('<div class="clearfix form-min-width"><div class="source-sink-form-container source-div">' +
                     '<div id="define-source"></div> <div class = "source-sink-map-options" id="source-options-div"></div>' +
                     '</div> <div class="source-sink-form-container mapper-div"> <div id="define-map"> </div> ' +
                     '<div class="source-sink-map-options" id="mapper-options-div">' +
                     '</div> </div> <div class= "source-sink-form-container attribute-map-div">' +
-                    '<div id="define-attribute"> </div> <div id="attribute-map-content"></div> </div> </div>' +
-                    self.formUtils.buildFormButtons());
+                    '<div id="define-attribute"> </div> <div id="attribute-map-content"></div> </div> </div>');
 
                 formContainer.append(propertyDiv);
+                self.formUtils.buildFormButtons(formConsole.cid);
                 self.formUtils.popUpSelectedElement(id);
                 self.designViewContainer.addClass('disableContainer');
                 self.toggleViewButton.addClass('disableContainer');
@@ -272,10 +272,10 @@ define(['log', 'jquery', 'lodash', 'sourceOrSinkAnnotation', 'mapAnnotation', 'p
                     }
                 }
 
-                self.formUtils.updatePerfectScroller();
+                self.formUtils.initPerfectScroller(formConsole.cid);
 
                 //onclick of submit
-                $(formContainer).on('click', '#btn-submit', function () {
+                $('#' + formConsole.cid).on('click', '#btn-submit', function () {
 
                     self.formUtils.removeErrorClass();
                     var isErrorOccurred = false;
@@ -377,8 +377,7 @@ define(['log', 'jquery', 'lodash', 'sourceOrSinkAnnotation', 'mapAnnotation', 'p
                 });
 
                 // 'Cancel' button action
-                var cancelButtonElement = $(formContainer).find('#btn-cancel')[0];
-                cancelButtonElement.addEventListener('click', function () {
+                $('#' + formConsole.cid).on('click', '#btn-cancel', function () {
                     // close the form window
                     self.consoleListManager.removeFormConsole(formConsole);
                 });

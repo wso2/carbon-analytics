@@ -34,7 +34,6 @@ import org.wso2.carbon.stream.processor.core.ha.transport.handlers.MessageEncode
 import org.wso2.siddhi.core.exception.ConnectionUnavailableException;
 
 import java.util.UUID;
-import java.util.concurrent.atomic.AtomicLong;
 
 /**
  * Tcp Netty Client.
@@ -43,9 +42,6 @@ public class EventSyncConnection {
     private static final Logger log = Logger.getLogger(EventSyncConnection.class);
     private EventLoopGroup group;
     private Bootstrap bootstrap;
-    private Channel channel;
-    private String sessionId;
-    private String hostAndPort;
 
     public EventSyncConnection() {
         this(0, true, true);
@@ -67,63 +63,73 @@ public class EventSyncConnection {
                 });
     }
 
-    public void connect(String host, int port) throws ConnectionUnavailableException {
+    public Connection connect(String host, int port) throws ConnectionUnavailableException {
         // Start the connection attempt.
+        String hostAndPort = host + ":" + port;
         try {
-            hostAndPort = host + ":" + port;
-            channel = bootstrap.connect(host, port).sync().channel();
-            sessionId = UUID.randomUUID() + "-" + hostAndPort;
+            return new Connection(hostAndPort, bootstrap.connect(host, port).sync().channel(),
+                    UUID.randomUUID() + "-" + hostAndPort);
         } catch (Throwable e) {
             throw new ConnectionUnavailableException("Error connecting to '" + hostAndPort + "', " + e.getMessage(), e);
         }
     }
 
-    public ChannelFuture send(final String channelId, final byte[] message) throws ConnectionUnavailableException {
-        EventComposite eventComposite = new EventComposite(sessionId, channelId, message);
-        ChannelFuture future = channel.writeAndFlush(eventComposite);
-        future.addListener(new ChannelFutureListener() {
-            @Override
-            public void operationComplete(ChannelFuture future) throws Exception {
-                if (!future.isSuccess()) {
-                    log.error("Error sending events to '" + hostAndPort + "' on channel '" +
-                            channelId + "', " + future.cause() + ", dropping events ", future.cause());
+    public static class Connection {
+        private String hostAndPort;
+        private Channel channel;
+        private String sessionId;
+
+        public Connection (String hostAndPort, Channel channel, String sessionId) {
+            this.hostAndPort = hostAndPort;
+            this.channel = channel;
+            this.sessionId = sessionId;
+        }
+
+        public ChannelFuture send(final String channelId, final byte[] message) throws ConnectionUnavailableException {
+            EventComposite eventComposite = new EventComposite(sessionId, channelId, message);
+            ChannelFuture future = channel.writeAndFlush(eventComposite);
+            future.addListener(new ChannelFutureListener() {
+                @Override
+                public void operationComplete(ChannelFuture future) throws Exception {
+                    if (!future.isSuccess()) {
+                        log.error("Error sending events to '" + hostAndPort + "' on channel '" +
+                                channelId + "', " + future.cause() + ", dropping events ", future.cause());
+                    }
+                }
+            });
+            if (future.isDone() && !future.isSuccess()) {
+                throw new ConnectionUnavailableException("Error sending events to '" + hostAndPort +
+                        "' on channel '" + channelId + "', " + hostAndPort + ", " + future.cause().getMessage(),
+                        future.cause());
+            }
+            return future;
+        }
+
+        public boolean isActive() {
+            return channel != null && channel.isActive();
+        }
+
+        public void shutdown() {
+            if (channel != null && channel.isOpen()) {
+                try {
+                    channel.close();
+                    channel.closeFuture().sync();
+                } catch (InterruptedException e) {
+                    log.error("Error closing connection to '" + hostAndPort + "' from client '" + sessionId +
+                            "', " + e);
+                } finally {
+                    channel.disconnect();
+                }
+                if (log.isDebugEnabled()) {
+                    log.debug("Disconnecting client to '" + hostAndPort + "' with sessionId:" + sessionId);
                 }
             }
-        });
-        if (future.isDone() && !future.isSuccess()) {
-            throw new ConnectionUnavailableException("Error sending events to '" + hostAndPort +
-                    "' on channel '" + channelId + "', " + hostAndPort + ", " + future.cause().getMessage(),
-                    future.cause());
-        }
-        return future;
-    }
-
-    public void disconnect() {
-        if (channel != null && channel.isOpen()) {
-            try {
-                channel.close();
-                channel.closeFuture().sync();
-            } catch (InterruptedException e) {
-                log.error("Error closing connection to '" + hostAndPort + "' from client '" + sessionId +
-                        "', " + e);
+            if (log.isDebugEnabled()) {
+                log.debug("Stopping client to '" + hostAndPort + "' with sessionId:" + sessionId);
             }
-            channel.disconnect();
-            log.info("Disconnecting client to '" + hostAndPort + "' with sessionId:" + sessionId);
+            hostAndPort = null;
+            sessionId = null;
         }
-    }
-
-    public void shutdown() {
-        disconnect();
-        if (group != null) {
-            group.shutdownGracefully();
-        }
-        log.info("Stopping client to '" + hostAndPort + "' with sessionId:" + sessionId);
-        hostAndPort = null;
-        sessionId = null;
-    }
-
-    public boolean isActive() {
-        return channel != null && channel.isActive();
     }
 
 }

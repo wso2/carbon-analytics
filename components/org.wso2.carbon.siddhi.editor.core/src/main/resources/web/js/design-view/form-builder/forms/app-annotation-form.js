@@ -44,16 +44,16 @@ define(['require', 'log', 'jquery', 'lodash'],
          */
         AppAnnotationForm.prototype.generatePropertiesForm = function (element, formConsole, formContainer) {
             var self = this;
-            var propertyDiv = $('<div class="clearfix"> <div class= "siddhi-app-form-container"> <div id = "define-app-name"> ' +
-                '<label> <span class="mandatory-symbol"> * </span>Name </label> ' +
+            var propertyDiv = $('<div class="clearfix form-min-width"> <div class= "siddhi-app-form-container"> ' +
+                '<div id = "define-app-name"> <label> <span class="mandatory-symbol"> * </span> Name </label> ' +
                 '<input type="text" id="app-name" class="clearfix name"><label class = "error-message"> </label></div>' +
                 '<div id = "define-app-description"> <label> <span class="mandatory-symbol"> * </span>Description ' +
                 '</label> <textarea id="app-description" class="clearfix"> </textarea> <label class = "error-message"> ' +
                 '</label> </div> </div>' +
-                '<div class = "siddhi-app-form-container"> <div class = "define-annotation" </div> </div> </div> '
-                + self.formUtils.buildFormButtons());
+                '<div class = "siddhi-app-form-container"> <div class = "define-annotation" </div> </div> </div> ');
 
             formContainer.append(propertyDiv);
+            self.formUtils.buildFormButtons(formConsole.cid);
             $(".overlayed-container").fadeTo(200, 1);
             // design view container and toggle view button are enabled
             self.designViewContainer.addClass('disableContainer');
@@ -72,10 +72,10 @@ define(['require', 'log', 'jquery', 'lodash'],
             self.formUtils.addEventListenerToRemoveRequiredClass();
             self.formUtils.addEventListenerToShowInputContentOnHover();
 
-            self.formUtils.updatePerfectScroller();
+            self.formUtils.initPerfectScroller(formConsole.cid);
 
             // 'Submit' button action
-            $(formContainer).on('click', '#btn-submit', function () {
+            $('#' + formConsole.cid).on('click', '#btn-submit', function () {
 
                 self.formUtils.removeErrorClass();
 
@@ -130,8 +130,7 @@ define(['require', 'log', 'jquery', 'lodash'],
 
             });
             // 'Cancel' button action
-            var cancelButtonElement = $(formContainer).find('#btn-cancel')[0];
-            cancelButtonElement.addEventListener('click', function () {
+            $('#' + formConsole.cid).on('click', '#btn-cancel', function () {
                 // close the form window
                 self.consoleListManager.removeFormConsole(formConsole);
             });

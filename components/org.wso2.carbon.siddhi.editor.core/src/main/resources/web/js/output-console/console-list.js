@@ -261,7 +261,6 @@ define(['log', 'jquery', 'lodash', 'backbone', 'console'], function (log, $, _, 
                 // setting the global console as the next active console
                 var nextConsole = this.getGlobalConsole();
                 this.setActiveConsole(nextConsole);
-                this.hideAllConsoles();
             },
             /**
              * removes the classes added to pop-up the element
@@ -270,7 +269,6 @@ define(['log', 'jquery', 'lodash', 'backbone', 'console'], function (log, $, _, 
                 $(".selected-element").removeClass("selected-element");
                 $(".overlayed-container").fadeOut(200);
                 $(".disableContainer").removeClass("disableContainer");
-                $(".console-wrap").removeClass('form-height');
             },
             /**
              * set selected console

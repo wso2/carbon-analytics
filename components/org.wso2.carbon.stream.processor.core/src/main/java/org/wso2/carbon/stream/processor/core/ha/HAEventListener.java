@@ -23,6 +23,7 @@ import org.slf4j.LoggerFactory;
 import org.wso2.carbon.cluster.coordinator.commons.MemberEventListener;
 import org.wso2.carbon.cluster.coordinator.commons.node.NodeDetail;
 import org.wso2.carbon.cluster.coordinator.service.ClusterCoordinator;
+import org.wso2.carbon.stream.processor.core.ha.transport.EventSyncConnectionPoolManager;
 import org.wso2.carbon.stream.processor.core.ha.util.HAConstants;
 import org.wso2.carbon.stream.processor.core.internal.StreamProcessorDataHolder;
 import org.wso2.carbon.stream.processor.core.persistence.PersistenceManager;
@@ -103,13 +104,13 @@ public class HAEventListener extends MemberEventListener {
                 } while (propertiesMap == null);
 
                 if (null != propertiesMap) {
-                    haManager.setPassiveNodeAdded(true);
                     haManager.setPassiveNodeHostPort(getHost(propertiesMap),
                             getPort(propertiesMap));
                     haManager.initializeEventSyncConnectionPool();
                     for (SourceHandler sourceHandler : registeredSourceHandlers.values()) {
                         ((HACoordinationSourceHandler) sourceHandler).setPassiveNodeAdded(true);
                     }
+                    haManager.setPassiveNodeAdded(true);
                     new PersistenceManager().run();
                 }
             }
@@ -145,6 +146,15 @@ public class HAEventListener extends MemberEventListener {
                 for (SourceHandler sourceHandler : registeredSourceHandlers.values()) {
                     ((HACoordinationSourceHandler) sourceHandler).setPassiveNodeAdded(false);
                 }
+                try {
+                    if (null != EventSyncConnectionPoolManager.getConnectionPool()) {
+                        EventSyncConnectionPoolManager.getConnectionPool().close();
+                    }
+                } catch (Exception e) {
+                    log.error("Error closing tcp client connection pool. " + e.getMessage(), e);
+                } finally {
+                    EventSyncConnectionPoolManager.uninitializeConnectionPool();
+                }
             }
         }
     }
@@ -158,10 +168,6 @@ public class HAEventListener extends MemberEventListener {
             SinkHandlerManager sinkHandlerManager = StreamProcessorDataHolder.getSinkHandlerManager();
             Map<String, SinkHandler> registeredSinkHandlers = sinkHandlerManager.getRegisteredSinkHandlers();
 
-            SourceHandlerManager sourceHandlerManager = StreamProcessorDataHolder.getSourceHandlerManager();
-            Map<String, SourceHandler> registeredSourceHandlers = sourceHandlerManager.
-                    getRegsiteredSourceHandlers();
-
             RecordTableHandlerManager recordTableHandlerManager = StreamProcessorDataHolder.
                     getRecordTableHandlerManager();
             Map<String, RecordTableHandler> registeredRecordTableHandlers = recordTableHandlerManager.
@@ -170,33 +176,14 @@ public class HAEventListener extends MemberEventListener {
             //synchronizing this inorder to prevent quick changes of active passive states in same node if occurred
             synchronized (this) {
                 if (clusterCoordinator.isLeaderNode()) {
-                    for (SourceHandler sourceHandler : registeredSourceHandlers.values()) {
-                        try {
-                            ((HACoordinationSourceHandler) sourceHandler).setAsActive();
-                        } catch (Throwable t) {
-                            log.error("HA Deployment: Error when connecting to source " + sourceHandler.getElementId() +
-                                    " while changing from passive state to active, skipping the source. ", t);
-                            continue;
-                        }
-                    }
                     StreamProcessorDataHolder.getHAManager().changeToActive();
                 } else {
                     //Allow only to become passive if and only if node was active before - this could happen if both
                     // nodes become unresponsive and already passive node could become passive again
                     if (StreamProcessorDataHolder.getHAManager().isActiveNode()) {
                         StreamProcessorDataHolder.getHAManager().changeToPassive();
-                        for (Map.Entry<String, SinkHandler> entry : registeredSinkHandlers.entrySet()) {
-                            HACoordinationSinkHandler handler = (HACoordinationSinkHandler) entry.getValue();
-                            if (handler != null) {
-                                handler.setAsPassive();
-                            }
-                        }
-                        for (SourceHandler sourceHandler : registeredSourceHandlers.values()) {
-                            ((HACoordinationSourceHandler) sourceHandler).setAsPassive();
-                        }
-                        for (RecordTableHandler recordTableHandler : registeredRecordTableHandlers.values()) {
-                            ((HACoordinationRecordTableHandler) recordTableHandler).setAsPassive();
-                        }
+                        registeredSinkHandlers.clear();
+                        registeredRecordTableHandlers.clear();
                     }
                 }
             }

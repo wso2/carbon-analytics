@@ -61,7 +61,7 @@ define(['require', 'log', 'jquery', 'lodash', 'formUtils', 'streamForm', 'tableF
             this.consoleListManager = options.application.outputController;
             this.jsPlumbInstance = options.jsPlumbInstance;
             this.dropElementInstance = options.dropElementInstance;
-            this.designGrid = options.dropElementInstance;
+            this.designGrid = options.designGrid;
             this.formUtils = new FormUtils(this.application, this.configurationData, this.jsPlumbInstance);
             var currentTabId = this.application.tabController.activeTab.cid;
             this.designViewContainer = $('#design-container-' + currentTabId);
@@ -124,7 +124,7 @@ define(['require', 'log', 'jquery', 'lodash', 'formUtils', 'streamForm', 'tableF
         FormBuilder.prototype.DefineFormForAppAnnotations = function (element) {
             var self = this;
             var formConsole = this.createTabForForm(Constants.APP_ANNOTATION_TITLE);
-            var formContainer = formConsole.getContentContainer();
+            var formContainer = formConsole.getContentContainer().find('.design-view-form-content');
 
             var formOptions = {};
             _.set(formOptions, 'configurationData', self.configurationData);
@@ -141,7 +141,7 @@ define(['require', 'log', 'jquery', 'lodash', 'formUtils', 'streamForm', 'tableF
         FormBuilder.prototype.GeneratePropertiesFormForSources = function (element) {
             var self = this;
             var formConsole = this.createTabForForm(Constants.SOURCE_TITLE);
-            var formContainer = formConsole.getContentContainer();
+            var formContainer = formConsole.getContentContainer().find('.design-view-form-content');;
 
             var formOptions = {};
             _.set(formOptions, 'configurationData', self.configurationData);
@@ -160,7 +160,7 @@ define(['require', 'log', 'jquery', 'lodash', 'formUtils', 'streamForm', 'tableF
         FormBuilder.prototype.GeneratePropertiesFormForSinks = function (element) {
             var self = this;
             var formConsole = this.createTabForForm(Constants.SINK_TITLE);
-            var formContainer = formConsole.getContentContainer();
+            var formContainer = formConsole.getContentContainer().find('.design-view-form-content');;
 
             var formOptions = {};
             _.set(formOptions, 'configurationData', self.configurationData);
@@ -179,7 +179,7 @@ define(['require', 'log', 'jquery', 'lodash', 'formUtils', 'streamForm', 'tableF
         FormBuilder.prototype.GeneratePropertiesFormForStreams = function (element) {
             var self = this;
             var formConsole = this.createTabForForm(Constants.STREAM_TITLE);
-            var formContainer = formConsole.getContentContainer();
+            var formContainer = formConsole.getContentContainer().find('.design-view-form-content');;
 
             var formOptions = {};
             _.set(formOptions, 'configurationData', self.configurationData);
@@ -199,7 +199,7 @@ define(['require', 'log', 'jquery', 'lodash', 'formUtils', 'streamForm', 'tableF
         FormBuilder.prototype.GeneratePropertiesFormForTables = function (element) {
             var self = this;
             var formConsole = this.createTabForForm(Constants.TABLE_TITLE);
-            var formContainer = formConsole.getContentContainer();
+            var formContainer = formConsole.getContentContainer().find('.design-view-form-content');;
 
             var formOptions = {};
             _.set(formOptions, 'configurationData', self.configurationData);
@@ -217,7 +217,7 @@ define(['require', 'log', 'jquery', 'lodash', 'formUtils', 'streamForm', 'tableF
         FormBuilder.prototype.GeneratePropertiesFormForWindows = function (element) {
             var self = this;
             var formConsole = this.createTabForForm(Constants.WINDOW_TITLE);
-            var formContainer = formConsole.getContentContainer();
+            var formContainer = formConsole.getContentContainer().find('.design-view-form-content');;
 
             var formOptions = {};
             _.set(formOptions, 'configurationData', self.configurationData);
@@ -235,7 +235,7 @@ define(['require', 'log', 'jquery', 'lodash', 'formUtils', 'streamForm', 'tableF
         FormBuilder.prototype.GeneratePropertiesFormForTriggers = function (element) {
             var self = this;
             var formConsole = this.createTabForForm(Constants.TRIGGER_TITLE);
-            var formContainer = formConsole.getContentContainer();
+            var formContainer = formConsole.getContentContainer().find('.design-view-form-content');;
 
             var formOptions = {};
             _.set(formOptions, 'configurationData', self.configurationData);
@@ -253,7 +253,7 @@ define(['require', 'log', 'jquery', 'lodash', 'formUtils', 'streamForm', 'tableF
         FormBuilder.prototype.GeneratePropertiesFormForAggregations = function (element) {
             var self = this;
             var formConsole = this.createTabForForm(Constants.AGGREGATION_TITLE);
-            var formContainer = formConsole.getContentContainer();
+            var formContainer = formConsole.getContentContainer().find('.design-view-form-content');;
 
             var formOptions = {};
             _.set(formOptions, 'configurationData', self.configurationData);
@@ -271,7 +271,7 @@ define(['require', 'log', 'jquery', 'lodash', 'formUtils', 'streamForm', 'tableF
         FormBuilder.prototype.GeneratePropertiesFormForFunctions = function (element) {
             var self = this;
             var formConsole = this.createTabForForm(Constants.FUNCTION_TITLE);
-            var formContainer = formConsole.getContentContainer();
+            var formContainer = formConsole.getContentContainer().find('.design-view-form-content');;
 
             var formOptions = {};
             _.set(formOptions, 'configurationData', self.configurationData);
@@ -289,7 +289,7 @@ define(['require', 'log', 'jquery', 'lodash', 'formUtils', 'streamForm', 'tableF
         FormBuilder.prototype.GeneratePropertiesFormForWindowFilterProjectionQueries = function (element) {
             var self = this;
             var formConsole = this.createTabForForm(Constants.QUERY_TITLE);
-            var formContainer = formConsole.getContentContainer();
+            var formContainer = formConsole.getContentContainer().find('.design-view-form-content');;
 
             var formOptions = {};
             _.set(formOptions, 'configurationData', self.configurationData);
@@ -306,7 +306,7 @@ define(['require', 'log', 'jquery', 'lodash', 'formUtils', 'streamForm', 'tableF
         FormBuilder.prototype.GeneratePropertiesFormForPatternQueries = function (element) {
             var self = this;
             var formConsole = this.createTabForForm(Constants.PATTERN_QUERY_TITLE);
-            var formContainer = formConsole.getContentContainer();
+            var formContainer = formConsole.getContentContainer().find('.design-view-form-content');;
 
             var formOptions = {};
             _.set(formOptions, 'configurationData', self.configurationData);
@@ -323,7 +323,7 @@ define(['require', 'log', 'jquery', 'lodash', 'formUtils', 'streamForm', 'tableF
         FormBuilder.prototype.GeneratePropertiesFormForSequenceQueries = function (element) {
             var self = this;
             var formConsole = this.createTabForForm(Constants.SEQUENCE_QUERY_TITLE);
-            var formContainer = formConsole.getContentContainer();
+            var formContainer = formConsole.getContentContainer().find('.design-view-form-content');;
 
             var formOptions = {};
             _.set(formOptions, 'configurationData', self.configurationData);
@@ -340,7 +340,7 @@ define(['require', 'log', 'jquery', 'lodash', 'formUtils', 'streamForm', 'tableF
         FormBuilder.prototype.GeneratePropertiesFormForJoinQuery = function (element) {
             var self = this;
             var formConsole = this.createTabForForm(Constants.JOIN_QUERY_TITLE);
-            var formContainer = formConsole.getContentContainer();
+            var formContainer = formConsole.getContentContainer().find('.design-view-form-content');;
 
             var formOptions = {};
             _.set(formOptions, 'configurationData', self.configurationData);
@@ -357,7 +357,7 @@ define(['require', 'log', 'jquery', 'lodash', 'formUtils', 'streamForm', 'tableF
         FormBuilder.prototype.GeneratePartitionKeyForm = function (element) {
             var self = this;
             var formConsole = this.createTabForForm(Constants.PARTITION_TITLE);
-            var formContainer = formConsole.getContentContainer();
+            var formContainer = formConsole.getContentContainer().find('.design-view-form-content');;
 
             var formOptions = {};
             _.set(formOptions, 'configurationData', self.configurationData);

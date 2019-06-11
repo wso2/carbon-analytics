@@ -124,15 +124,16 @@ define(['require', 'log', 'jquery', 'lodash', 'constants'],
             var self = this;
             var id = $(element).parent().attr('id');
             var triggerObject = self.configurationData.getSiddhiAppConfig().getTrigger(id);
+            var previousTriggerObject = _.cloneDeep(triggerObject);
 
-            var propertyDiv = $('<div class="clearfix"> <div class ="trigger-form-container"> ' +
+            var propertyDiv = $('<div class="clearfix form-min-width"> <div class ="trigger-form-container"> ' +
                 '<div id="define-trigger-name"> <label><span class="mandatory-symbol"> * </span>Name </label>' +
                 '<input type="text" id="triggerName" class="clearfix name"> <label class="error-message" ' +
                 'id = "triggerNameErrorMessage"> </label> </div> <div id= "define-trigger-criteria"> </div>' +
-                '<div id = "trigger-criteria-content"></div> </div> </div>' +
-                self.formUtils.buildFormButtons());
+                '<div id = "trigger-criteria-content"></div> </div> </div>');
 
             formContainer.append(propertyDiv);
+            self.formUtils.buildFormButtons(formConsole.cid);
             self.formUtils.popUpSelectedElement(id);
             self.designViewContainer.addClass('disableContainer');
             self.toggleViewButton.addClass('disableContainer');
@@ -186,99 +187,107 @@ define(['require', 'log', 'jquery', 'lodash', 'constants'],
                 }
             });
 
-            self.formUtils.updatePerfectScroller();
+            self.formUtils.initPerfectScroller(formConsole.cid);
 
             // 'Submit' button action
-            $(formContainer).on('click', '#btn-submit', function () {
+            $('#' + formConsole.cid).on('click', '#btn-submit', function () {
 
-                self.formUtils.removeErrorClass();
-                var isErrorOccurred = false;
+                    self.formUtils.removeErrorClass();
+                    var isErrorOccurred = false;
 
-                var triggerName = $('#triggerName').val().trim();
-                // to check if trigger name is empty
-                if (triggerName == "") {
-                    self.formUtils.addErrorClass('#triggerName');
-                    $('#triggerNameErrorMessage').text("Trigger name is required.");
-                    isErrorOccurred = true;
-                    return;
-                }
-                var previouslySavedName = triggerObject.getName();
-                if (!previouslySavedName) {
-                    previouslySavedName = "";
-                }
-                // update connection related to the element if the name is changed
-                if (previouslySavedName !== triggerName) {
-                    //check if name is already used
-                    var isTriggerNameUsed = self.formUtils.isDefinitionElementNameUsed(triggerName,
-                        triggerObject.getId());
-                    if (isTriggerNameUsed) {
+                    var triggerName = $('#triggerName').val().trim();
+                    // to check if trigger name is empty
+                    if (triggerName == "") {
                         self.formUtils.addErrorClass('#triggerName');
-                        $('#triggerNameErrorMessage').text("Trigger name is already used.");
+                        $('#triggerNameErrorMessage').text("Trigger name is required.");
                         isErrorOccurred = true;
                         return;
                     }
-                    if (self.formUtils.validateAttributeOrElementName("#triggerName", Constants.TRIGGER, triggerName)) {
-                        isErrorOccurred = true;
-                        return;
+                    var previouslySavedName = triggerObject.getName();
+                    if (!previouslySavedName) {
+                        previouslySavedName = "";
                     }
-                }
-
-                var selectedCriteriaType = $('#trigger-criteria-type').val();
-                var triggerCriteria;
-                if (selectedCriteriaType !== Constants.START) {
-                    triggerCriteria = $('#trigger-criteria-content input[type="text"]').val().trim();
-                    if (triggerCriteria === "") {
-                        self.formUtils.addErrorClass($('#trigger-criteria-content input[type="text"]'));
-                        $('#trigger-criteria-content').find('.error-message').text("Trigger criteria value is " +
-                            "required");
-                        isErrorOccurred = true;
-                        return;
-                    }
-                }
-
-                if (!isErrorOccurred) {
+                    // update connection related to the element if the name is changed
                     if (previouslySavedName !== triggerName) {
-                        var outConnections = self.jsPlumbInstance.getConnections({ source: id + '-out' });
-                        var inConnections = self.jsPlumbInstance.getConnections({ target: id + '-in' });
-                        // delete connections related to the element if the name is changed
-                        self.formUtils.deleteConnectionsAfterDefinitionElementNameChange(outConnections, inConnections);
-                        // update selected trigger model
+                        //check if name is already used
+                        var isTriggerNameUsed = self.formUtils.isDefinitionElementNameUsed(triggerName,
+                            triggerObject.getId());
+                        if (isTriggerNameUsed) {
+                            self.formUtils.addErrorClass('#triggerName');
+                            $('#triggerNameErrorMessage').text("Trigger name is already used.");
+                            isErrorOccurred = true;
+                            return;
+                        }
+                        if (self.formUtils.validateAttributeOrElementName("#triggerName", Constants.TRIGGER, triggerName)) {
+                            isErrorOccurred = true;
+                            return;
+                        }
+                    }
+
+                    var selectedCriteriaType = $('#trigger-criteria-type').val();
+                    var triggerCriteria;
+                    if (selectedCriteriaType !== Constants.START) {
+                        triggerCriteria = $('#trigger-criteria-content input[type="text"]').val().trim();
+                        if (triggerCriteria === "") {
+                            self.formUtils.addErrorClass($('#trigger-criteria-content input[type="text"]'));
+                            $('#trigger-criteria-content').find('.error-message').text("Trigger criteria value is " +
+                                "required");
+                            isErrorOccurred = true;
+                            return;
+                        }
+                    }
+
+                    if (!isErrorOccurred) {
                         triggerObject.setName(triggerName);
-                        // establish connections related to the element if the name is changed
-                        self.formUtils.establishConnectionsAfterDefinitionElementNameChange(outConnections, inConnections);
                         var textNode = $(element).parent().find('.triggerNameNode');
                         textNode.html(triggerName);
+
+
+                        var triggerCriteriaType;
+                        if (selectedCriteriaType === Constants.START) {
+                            triggerCriteria = Constants.START
+                            triggerCriteriaType = Constants.AT
+                        } else if (selectedCriteriaType === Constants.CRON_EXPRESSION) {
+                            triggerCriteria = triggerCriteria;
+                            triggerCriteriaType = Constants.AT;
+                        } else {
+                            triggerCriteria = Constants.EVERY + " " + triggerCriteria;
+                            triggerCriteriaType = Constants.EVERY;
+                        }
+                        triggerObject.setCriteria(triggerCriteria);
+                        triggerObject.setCriteriaType(triggerCriteriaType);
+
+                        if (self.formUtils.isUpdatingOtherElementsRequired(previousTriggerObject, triggerObject,
+                            Constants.TRIGGER)) {
+                            var outConnections = self.jsPlumbInstance.getConnections({source: id + '-out'});
+                            var inConnections = self.jsPlumbInstance.getConnections({target: id + '-in'});
+
+                            //to delete the connection, it requires the previous object name
+                            triggerObject.setName(previousTriggerObject.getName())
+                            // delete connections related to the element if the name is changed
+                            self.formUtils.deleteConnectionsAfterDefinitionElementNameChange(outConnections, inConnections);
+                            //reset the name to new name
+                            triggerObject.setName(triggerName);
+
+                            // establish connections related to the element if the name is changed
+                            self.formUtils.establishConnectionsAfterDefinitionElementNameChange(outConnections, inConnections);
+                        }
+
+                        $('#' + id).removeClass('incomplete-element');
+                        //Send trigger element to the backend and generate tooltip
+                        var triggerToolTip = self.formUtils.getTooltip(triggerObject, Constants.TRIGGER);
+                        $('#' + id).prop('title', triggerToolTip);
+
+                        // set the isDesignViewContentChanged to true
+                        self.configurationData.setIsDesignViewContentChanged(true);
+                        // close the form window
+                        self.consoleListManager.removeFormConsole(formConsole);
                     }
-
-                    var triggerCriteriaType;
-                    if (selectedCriteriaType === Constants.START) {
-                        triggerCriteria = Constants.START
-                        triggerCriteriaType = Constants.AT
-                    } else if (selectedCriteriaType === Constants.CRON_EXPRESSION) {
-                        triggerCriteria = triggerCriteria;
-                        triggerCriteriaType = Constants.AT;
-                    } else {
-                        triggerCriteria = Constants.EVERY + " " + triggerCriteria;
-                        triggerCriteriaType = Constants.EVERY;
-                    }
-                    triggerObject.setCriteria(triggerCriteria);
-                    triggerObject.setCriteriaType(triggerCriteriaType);
-
-                    $('#' + id).removeClass('incomplete-element');
-                    //Send trigger element to the backend and generate tooltip
-                    var triggerToolTip = self.formUtils.getTooltip(triggerObject, Constants.TRIGGER);
-                    $('#' + id).prop('title', triggerToolTip);
-
-                    // set the isDesignViewContentChanged to true
-                    self.configurationData.setIsDesignViewContentChanged(true);
-                    // close the form window
-                    self.consoleListManager.removeFormConsole(formConsole);
                 }
-            });
+            );
 
             // 'Cancel' button action
-            var cancelButtonElement = $(formContainer).find('#btn-cancel')[0];
-            cancelButtonElement.addEventListener('click', function () {
+            $('#' + formConsole.cid).on('click', '#btn-cancel', function () {
                 // close the form window
                 self.consoleListManager.removeFormConsole(formConsole);
             });

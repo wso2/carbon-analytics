@@ -876,6 +876,13 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
                                         console.log("Error: First and second input elements are already filled in " +
                                             "join query!");
                                     }
+                                    if (queryInput.getLeft() && queryInput.getRight()) {
+                                        if (queryInput.getLeft().getConnectedSource() === queryInput.getRight()
+                                            .getConnectedSource()) {
+                                            queryInput.setFirstConnectedElement(connectedElement);
+                                            queryInput.setSecondConnectedElement(connectedElement);
+                                        }
+                                    }
                                 }
                             }
                         } else if (sourceElement.hasClass(constants.STREAM)
@@ -1215,7 +1222,7 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
                         model = self.configurationData.getSiddhiAppConfig().getAggregation(targetId)
                         model.setConnectedSource(undefined);
                         if(sourceElement.hasClass(constants.STREAM)) {
-                            model.resetInputModel(model);
+                            model.resetModel(model);
                         }
                     } else if (sourceElement.hasClass(constants.STREAM) || sourceElement.hasClass(constants.TABLE)
                         || sourceElement.hasClass(constants.AGGREGATION) || sourceElement.hasClass(constants.WINDOW)

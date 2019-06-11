@@ -65,6 +65,10 @@ public class EventSyncConnectionPoolManager {
         return connectionPool;
     }
 
+    public static void uninitializeConnectionPool() {
+        connectionPool = null;
+    }
+
     public static AtomicLong getSequenceID() {
         return sequenceID;
     }

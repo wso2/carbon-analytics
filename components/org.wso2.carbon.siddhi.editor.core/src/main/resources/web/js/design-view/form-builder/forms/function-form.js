@@ -75,18 +75,19 @@ define(['require', 'log', 'jquery', 'lodash', 'constants'],
             var self = this;
             var id = $(element).parent().attr('id');
             var functionObject = self.configurationData.getSiddhiAppConfig().getFunction(id);
-            var propertyDiv = $('<div class="clearfix"> <div class = "function-form-container"> ' +
+            var previouseFunctionObject = _.cloneDeep(functionObject);
+            var propertyDiv = $('<div class="clearfix form-min-width"> <div class = "function-form-container"> ' +
                 '<div id = "define-function-name"> <label>' +
                 ' <span class="mandatory-symbol"> * </span> Name </label> ' +
                 '<input type="text" id="functionName" class="clearfix name"><label class = "error-message" ' +
-                'id = "functionNameErrorMessage"> </label></div>' +
-                '<div id = "function-script-type"> </div> <div id= "function-return-type"> </div>' +
-                self.formUtils.buildFormButtons() + '</div> <div class = "function-form-container"> ' +
+                'id = "functionNameErrorMessage"> </label></div> <div id = "function-script-type"> ' +
+                '</div> <div id= "function-return-type"> </div> </div> <div class = "function-form-container"> ' +
                 '<div id="define-script-body"> <label> <span class="mandatory-symbol"> * </span> Script Body </label> ' +
                 '<textarea id= "script-body-content" class="clearfix" rows="5" cols="50"> </textarea> ' +
-                '<label class = "error-message"></label> </div> </div> </div>' + self.formUtils.buildFormButtons());
+                '<label class = "error-message"></label> </div> </div> </div>');
 
             formContainer.append(propertyDiv);
+            self.formUtils.buildFormButtons(formConsole.cid);
             self.formUtils.popUpSelectedElement(id);
             self.designViewContainer.addClass('disableContainer');
             self.toggleViewButton.addClass('disableContainer');
@@ -115,10 +116,10 @@ define(['require', 'log', 'jquery', 'lodash', 'constants'],
 
             }
 
-            self.formUtils.updatePerfectScroller();
+            self.formUtils.initPerfectScroller(formConsole.cid);
 
             // 'Submit' button action
-            $(formContainer).on('click', '#btn-submit', function () {
+            $('#' + formConsole.cid).on('click', '#btn-submit', function () {
 
                 self.formUtils.removeErrorClass();
                 var isErrorOccurred = false;
@@ -157,23 +158,31 @@ define(['require', 'log', 'jquery', 'lodash', 'constants'],
                 }
 
                 if (!isErrorOccurred) {
-                    if (previouslySavedName !== functionName) {
-                        var outConnections = self.jsPlumbInstance.getConnections({ source: id + '-out' });
-                        var inConnections = self.jsPlumbInstance.getConnections({ target: id + '-in' });
-                        // delete connections related to the element if the name is changed
-                        self.formUtils.deleteConnectionsAfterDefinitionElementNameChange(outConnections, inConnections);
-                        // update selected function model
-                        functionObject.setName(functionName);
-                        // establish connections related to the element if the name is changed
-                        self.formUtils.establishConnectionsAfterDefinitionElementNameChange(outConnections, inConnections);
-                        var textNode = $(element).parent().find('.functionNameNode');
-                        textNode.html(functionName);
-                    }
+                    functionObject.setName(functionName);
+                    var textNode = $(element).parent().find('.functionNameNode');
+                    textNode.html(functionName);
+                    
                     var scriptType = $('#script-type').val();
                     var returnType = $('#return-type').val();
                     functionObject.setScriptType(scriptType.toUpperCase());
                     functionObject.setReturnType(returnType.toUpperCase());
                     functionObject.setBody(scriptBody);
+
+                    if (self.formUtils.isUpdatingOtherElementsRequired(previouseFunctionObject, functionObject,
+                        Constants.FUNCTION)) {
+                        var outConnections = self.jsPlumbInstance.getConnections({source: id + '-out'});
+                        var inConnections = self.jsPlumbInstance.getConnections({target: id + '-in'});
+
+                        //to delete the connection, it requires the previous object name
+                        functionObject.setName(previouseFunctionObject.getName())
+                        // delete connections related to the element if the name is changed
+                        self.formUtils.deleteConnectionsAfterDefinitionElementNameChange(outConnections, inConnections);
+                        //reset the name to new name
+                        functionObject.setName(functionName);
+
+                        // establish connections related to the element if the name is changed
+                        self.formUtils.establishConnectionsAfterDefinitionElementNameChange(outConnections, inConnections);
+                    }
 
                     $('#' + id).removeClass('incomplete-element');
                     //Send function element to the backend and generate tooltip
@@ -188,8 +197,7 @@ define(['require', 'log', 'jquery', 'lodash', 'constants'],
             });
 
             // 'Cancel' button action
-            var cancelButtonElement = $(formContainer).find('#btn-cancel')[0];
-            cancelButtonElement.addEventListener('click', function () {
+            $('#' + formConsole.cid).on('click', '#btn-cancel', function () {
                 // close the form window
                 self.consoleListManager.removeFormConsole(formConsole);
             });
