@@ -271,9 +271,11 @@ public class EventFlowBuilder {
         PartitionConfigGenerator partitionConfigGenerator =
                 new PartitionConfigGenerator(siddhiAppString, siddhiApp, partitionedInnerStreamDefinitions);
         int partitionCounter = 0;
+        int queryCounter = 0;
         for (ExecutionElement executionElement : siddhiApp.getExecutionElementList()) {
             if (executionElement instanceof Query) {
-                QueryConfig queryConfig = queryConfigGenerator.generateQueryConfig((Query) executionElement);
+                queryCounter++;
+                QueryConfig queryConfig = queryConfigGenerator.generateQueryConfig((Query) executionElement, queryCounter);
                 siddhiAppConfig.addQuery(QueryConfigGenerator.getQueryListType(queryConfig), queryConfig);
             } else if (executionElement instanceof Partition) {
                 String partitionId = (String) partitionedInnerStreamDefinitions.keySet().toArray()[partitionCounter];

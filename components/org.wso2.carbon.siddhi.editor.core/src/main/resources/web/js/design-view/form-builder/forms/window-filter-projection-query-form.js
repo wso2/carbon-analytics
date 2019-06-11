@@ -81,12 +81,14 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryWindowOrFunct
             if (!queryObject.getQueryInput() || !queryObject.getQueryInput().getConnectedSource()) {
                 DesignViewUtils.prototype.warnAlert('Connect an input element');
                 self.consoleListManager.removeFormConsole(formConsole);
+                self.consoleListManager.hideAllConsoles();
             } else if (!queryObject.getQueryOutput() || !queryObject.getQueryOutput().getTarget()) {
                 DesignViewUtils.prototype.warnAlert('Connect an output stream');
                 self.consoleListManager.removeFormConsole(formConsole);
+                self.consoleListManager.hideAllConsoles();
             } else {
                 var propertyDiv = $('<div id="define-windowFilterProjection-query" class="clearfix form-min-width"></div>');
-                formContainer.append(propertyDiv);
+                formContainer.html(propertyDiv);
                 self.formUtils.buildFormButtons(formConsole.cid);
 
                 self.designViewContainer.addClass('disableContainer');

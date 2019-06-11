@@ -52,7 +52,7 @@ define(['require', 'log', 'jquery', 'lodash'],
                 '</label> </div> </div>' +
                 '<div class = "siddhi-app-form-container"> <div class = "define-annotation" </div> </div> </div> ');
 
-            formContainer.append(propertyDiv);
+            formContainer.html(propertyDiv);
             self.formUtils.buildFormButtons(formConsole.cid);
             $(".overlayed-container").fadeTo(200, 1);
             // design view container and toggle view button are enabled

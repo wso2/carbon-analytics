@@ -284,9 +284,10 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryWindowOrFunct
             }
             if (inValid) {
                 self.consoleListManager.removeFormConsole(formConsole);
+                self.consoleListManager.removeAllConsoles();
             } else {
                 var propertyDiv = $('<div id="define-join-query" class="clearfix form-min-width"></div>');
-                formContainer.append(propertyDiv);
+                formContainer.html(propertyDiv);
                 self.formUtils.buildFormButtons(formConsole.cid);
 
                 self.designViewContainer.addClass('disableContainer');
