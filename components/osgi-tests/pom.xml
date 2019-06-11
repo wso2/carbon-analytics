@@ -1040,9 +1040,11 @@
         <profile>
             <id>with-tests</id>
             <activation>
-                <property>
-                    <name>!maven.test.skip</name>
-                </property>
+                <file>
+                    <exists>
+                        ../org.wso2.carbon.stream.processor.core/target/coverage-reports/jacoco.exec
+                    </exists>
+                </file>
             </activation>
             <build>
                 <plugins>
