@@ -1660,23 +1660,6 @@ define(['require', 'log', 'lodash', 'jquery', 'partition', 'stream', 'query', 'f
                 // set the isDesignViewContentChanged to true
                 self.configurationData.setIsDesignViewContentChanged(true);
                 var elementId = newElement[0].id;
-                /*
-                * before deleting the element data from the data store structure, it is mandatory to delete the element
-                * from jsPlumb because it will fire the 'beforeDetach' and 'connectionDetached' events and it will
-                * update the other elements data connected to current element. ex: when a stream is deleted from a
-                * query, from clause in the query will be updated as undefined.
-                * */
-                // setTimeout(function () {
-                //     var outConnections = self.jsPlumbInstance.getConnections({source: elementId + '-out'});
-                //     var inConnections = self.jsPlumbInstance.getConnections({target: elementId + '-in'});
-                //
-                //     _.forEach(outConnections, function (connection) {
-                //         self.jsPlumbInstance.deleteConnection(connection);
-                //     });
-                //     _.forEach(inConnections, function (connection) {
-                //         self.jsPlumbInstance.deleteConnection(connection);
-                //     });
-                // }, 100);
 
                 self.jsPlumbInstance.remove(newElement, true);
                 if (self.jsPlumbInstance.getGroupFor(newElement)) {
