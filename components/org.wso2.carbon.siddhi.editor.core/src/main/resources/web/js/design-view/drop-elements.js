@@ -1415,7 +1415,7 @@ define(['require', 'log', 'lodash', 'jquery', 'partition', 'stream', 'query', 'f
                 $("#" + oldFaultStreamElementId).remove();
             }
             if (stream.hasFaultStream()) {
-                self.deleteAndConnectConnection(stream.getId());
+                self.removeAndRecreateConnection(stream.getId());
 
                 var faultStreamName = Constants.FAULT_STREAM_PREFIX + stream.getName();
                 var connectionErrOut = $('<div class="error-connection connectorErrOutStream">')
@@ -1461,11 +1461,11 @@ define(['require', 'log', 'lodash', 'jquery', 'partition', 'stream', 'query', 'f
                 $('#' + stream.getId() + '-err-out').remove();
                 $('#' + stream.getId()).removeClass('errorStreamDrop');
 
-                self.deleteAndConnectConnection(stream.getId());
+                self.removeAndRecreateConnection(stream.getId());
             }
         };
 
-        DropElements.prototype.deleteAndConnectConnection = function (elementId) {
+        DropElements.prototype.removeAndRecreateConnection = function (elementId) {
             var self = this;
 
             var inConnection = self.jsPlumbInstance.getConnections({target: elementId + '-in'})[0];
