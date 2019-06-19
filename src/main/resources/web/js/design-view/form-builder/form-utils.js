@@ -307,7 +307,7 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
             var self = this;
             var outputConfig = self.configurationData.application.config.query_output_options;
             var queryOutputTemplate = Handlebars.compile($('#query-output-template').html())
-            ({ into: outputElement.element.name, outputConfig: outputConfig });
+            ({into: outputElement.element.name, outputConfig: outputConfig});
             $('.define-query-output').html(queryOutputTemplate);
             self.renderQueryOperation(outputElement, queryOutput);
         };
@@ -319,7 +319,7 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
             var self = this;
             if (outputElement.type.toLowerCase() == Constants.TABLE) {
                 var operationTypes = self.configurationData.application.config.query_output_operations;
-                var setAttributes = [{ attribute: "", value: "" }];
+                var setAttributes = [{attribute: "", value: ""}];
                 if (queryOutput.output) {
                     if (queryOutput.output.on) {
                         var on = queryOutput.output.on;
@@ -377,7 +377,7 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
          */
         FormUtils.prototype.renderSourceSinkStoreTypeDropDown = function (id, predefinedTypes) {
             var selectionFormTemplate = Handlebars.compile($('#type-selection-form-template').html())
-            ({ id: id, types: predefinedTypes });
+            ({id: id, types: predefinedTypes});
             $('#define-' + id).html(selectionFormTemplate);
         };
 
@@ -432,7 +432,7 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
         FormUtils.prototype.renderMap = function (predefinedMaps) {
             if (!$.trim($('#define-map').html()).length) {
                 var mapFormTemplate = Handlebars.compile($('#type-selection-form-template').html())
-                ({ id: "map", types: predefinedMaps });
+                ({id: "map", types: predefinedMaps});
                 $('#define-map').html(mapFormTemplate);
                 $('#define-map #map-type').val('passThrough');
                 $('#define-map #map-type option:contains("' + Constants.DEFAULT_MAPPER_TYPE + '")').
@@ -459,7 +459,7 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
                 customizedOptions: customizedOptions
             });
             $('#' + id + '-options-div').html(optionsTemplate);
-            self.changeCustomizedOptDiv(id);;
+            self.changeCustomizedOptDiv(id);
         };
 
         /**
@@ -512,9 +512,42 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
          * @param {String} id window or stream-function
          */
         FormUtils.prototype.renderFunctions = function (predefinedFunctions, className, id) {
+            var self = this;
+            var overloadParameters = self.getParameterOverloadNames(predefinedFunctions);
             var windowFunctionNameTemplate = Handlebars.compile($('#type-selection-form-template').html())
-            ({ id: id, types: predefinedFunctions });
+            ({id: id, types: overloadParameters});
             $(className).find('.defineFunctionName').html(windowFunctionNameTemplate);
+        };
+
+        /**
+         * @function to construct the stream function or window name with overload parameters
+         * @param predefinedFunctions
+         * @returns {Array}
+         */
+        FormUtils.prototype.getParameterOverloadNames = function (predefinedFunctions) {
+            var overloadParameters = [];
+            _.forEach(predefinedFunctions, function (predefinedFunction) {
+                if (predefinedFunction.parameterOverloads) {
+                    _.forEach(predefinedFunction.parameterOverloads, function (overloads) {
+                        var possibleParamNames = predefinedFunction.name + "(";
+                        _.forEach(overloads, function (overload) {
+                            possibleParamNames = possibleParamNames + overload + ","
+                        });
+                        possibleParamNames = possibleParamNames.slice(0, -1);
+                        possibleParamNames = possibleParamNames + ")";
+                        overloadParameters.push({name: possibleParamNames});
+                    })
+                } else {
+                    var possibleParamNames = predefinedFunction.name + "(";
+                    _.forEach(predefinedFunction.parameters, function (parameter) {
+                        possibleParamNames = possibleParamNames + parameter.name + ","
+                    });
+                    possibleParamNames = possibleParamNames.slice(0, -1);
+                    possibleParamNames = possibleParamNames + ")";
+                    overloadParameters.push({name: possibleParamNames});
+                }
+            });
+            return overloadParameters;
         };
 
         /**
@@ -537,11 +570,27 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
         };
 
         /**
+         * @function to render parameters if a particular function has same no of parameters in 2 or more overloads
+         * @param {Object} parameters saved parameters
+         * @param {Object} supportedParameters
+         * @param {String} id window or stream-function
+         * @param {String} parameterDiv div to embed the parameters
+         */
+        FormUtils.prototype.renderUnknownParameters = function (parameters, supportedParameters, id, parameterDiv) {
+            var parameterTemplate = Handlebars.compile($('#window-function-unknown-parameters-template').html())({
+                id: id,
+                parameters: parameters,
+                predefinedParameters: supportedParameters
+            });
+            $(parameterDiv).find('.defineFunctionParameters').html(parameterTemplate);
+        };
+
+        /**
          * @function to render the left and right source for join-query
          * @param {String} type left or right
          */
         FormUtils.prototype.renderLeftRightSource = function (type) {
-            var sourceTemplate = Handlebars.compile($('#query-source-form-template').html())({ type: type });
+            var sourceTemplate = Handlebars.compile($('#query-source-form-template').html())({type: type});
             $('.define-' + type + '-source').html(sourceTemplate);
         };
 
@@ -818,7 +867,9 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
          * @return {object} parameters
          */
         FormUtils.prototype.getSelectedTypeParameters = function (selectedType, predefinedTypes) {
+            var self = this;
             var parameters = [];
+            selectedType = self.getFunctionNameWithoutParameterOverload(selectedType);
             _.forEach(predefinedTypes, function (type) {
                 if (type.name.toLowerCase() == selectedType.toLowerCase()) {
                     if (type.parameters) {
@@ -828,6 +879,43 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
                 }
             });
             return parameters;
+        };
+
+        /**
+         * @function to return the function name if it is concated with the parameter overloads
+         * @param functionName
+         * @returns {String}
+         */
+        FormUtils.prototype.getFunctionNameWithoutParameterOverload = function (functionName) {
+            if (functionName.includes("(")) {
+                return functionName.split("(")[0].trim();
+            }
+            return functionName;
+        };
+
+        /**
+         * @function to get only the parameters which are included in the overload
+         * @returns {Array}
+         */
+        FormUtils.prototype.getParameterOverloads = function (functionName, predefinedParameters) {
+            var parameterOverloads = [];
+            if (functionName.includes("(")) {
+                var regexToGetTextInsideBrackets = /\(([^)]+)\)/;
+                var overloads = regexToGetTextInsideBrackets.exec(functionName)[1].trim();
+                var listOfOverloads = overloads.split(",");
+                _.forEach(listOfOverloads, function (overload) {
+                    overload = overload.trim();
+                    _.forEach(predefinedParameters, function (parameter) {
+                        if (overload === parameter.name) {
+                            parameterOverloads.push(parameter);
+                            return false;
+                        }
+                    });
+                });
+            } else {
+                parameterOverloads = predefinedParameters;
+            }
+            return parameterOverloads;
         };
 
         /**
@@ -894,7 +982,7 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
                     }
                 })
                 if (!foundSavedOption) {
-                    customizedOptions.push({ name: optionName, value: optionValue });
+                    customizedOptions.push({name: optionName, value: optionValue});
                 }
             });
             return customizedOptions;
@@ -932,7 +1020,7 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
             var streamAttributesObject = [];
 
             _.forEach(streamAttributes, function (attribute) {
-                streamAttributesObject.push({ key: attribute.getName(), value: "" });
+                streamAttributesObject.push({key: attribute.getName(), value: ""});
             })
             return streamAttributesObject;
         };
@@ -1173,10 +1261,18 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
                             predefinedParameters = self.getPredefinedParameters(streamHandlerContent,
                                 self.configurationData.rawExtensions["streamFunctions"])
                         }
-                        if (self.validateParameters(streamHandlerContent, predefinedParameters)) {
-                            self.expandCollapsedDiv($(this));
-                            isErrorOccurred = true;
-                            return false;
+                        if (streamHandlerContent.find('.display-predefined-parameters').length === 0) {
+                            if (self.validateParameters(streamHandlerContent, predefinedParameters)) {
+                                self.expandCollapsedDiv($(this));
+                                isErrorOccurred = true;
+                                return false;
+                            }
+                        } else {
+                            if (self.validateUnknownParameters(streamHandlerContent)) {
+                                self.expandCollapsedDiv($(this));
+                                isErrorOccurred = true;
+                                return false;
+                            }
                         }
                     }
                 });
@@ -1188,8 +1284,10 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
          * @function to obtain the predefined parameters of particular window or stream-function type
          */
         FormUtils.prototype.getPredefinedParameters = function (div, predefinedFunctions) {
+            var self = this;
             var predefinedParameters = [];
-            var functionName = $(div).find('.defineFunctionName select').val().toLowerCase()
+            var functionName = self.getFunctionNameWithoutParameterOverload
+            ($(div).find('.defineFunctionName .custom-combobox-input').val().toLowerCase());
             _.forEach(predefinedFunctions, function (predefinedFunction) {
                 if (functionName == predefinedFunction.name.toLowerCase()) {
                     predefinedParameters = predefinedFunction.parameters;
@@ -1201,6 +1299,7 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
 
         /**
          * @function for generic validation of parameter values
+         * @param parameterDiv the div where the parameters are embedded
          * @param {Object} predefinedParameters predefined parameters of the selected window type
          * @return {boolean} isError
          */
@@ -1209,19 +1308,47 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
             var isError = false;
             $(parameterDiv).find('.parameter').each(function () {
                 var parameterValue = $(this).find('.parameter-value').val().trim();
-                var parameterName = $(this).find('.parameter-name').text().trim();;
+                var parameterName = $(this).find('.parameter-name').text().trim();
                 var predefinedParameter = self.getObject(parameterName, predefinedParameters);
                 if (!predefinedParameter.optional) {
-                    if (!self.checkParameterValue(parameterValue, predefinedParameter, this)) {
+                    if (!self.checkParameterValue(parameterValue, predefinedParameter, this, true)) {
                         isError = true;
                         return false;
                     }
                 } else {
-                    if ($(this).find('.parameter-checkbox').is(":checked")) {
-                        if (!self.checkParameterValue(parameterValue, predefinedParameter, this)) {
+                    if ($(this).find('.param-content').hasClass('attribute-param')) {
+                        $(this).find('.parameter-value').each(function (attribute) {
+                            if (!self.checkParameterValue(attribute, predefinedParameter, this, false)) {
+                                isError = true;
+                                return false;
+                            }
+                        });
+                    } else {
+                        if (!self.checkParameterValue(parameterValue, predefinedParameter, this, false)) {
                             isError = true;
                             return false;
                         }
+                    }
+                }
+            });
+            return isError;
+        };
+
+        /**
+         * @function to validate the parameters which are unknown
+         * @param parameterDiv the div where the parameters are embedded
+         * @returns {boolean}
+         */
+        FormUtils.prototype.validateUnknownParameters = function (parameterDiv) {
+            var self = this;
+            var isError = false;
+            $(parameterDiv).find('.parameter').each(function () {
+                if($(this).find('.mandatory-symbol').length !== 0) {
+                    var parameterValue = $(this).find('.parameter-value');
+                    if(parameterValue.val().trim() === "") {
+                        isError = true;
+                        $(this).find('.error-message').text('Parameter Value is required.');
+                        self.addErrorClass(parameterValue);
                     }
                 }
             });
@@ -1362,7 +1489,9 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
                 }
             });
 
-            $("#stream-function-type").combobox();
+            $(".define-function-stream-handler select").combobox();
+            $(".define-window-stream-handler select").combobox();
+            $("#window-type").combobox();
             $("#toggle").on("click", function () {
                 $("#combobox").toggle();
             });
@@ -1373,26 +1502,29 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
          * @param {String} parameterValue value which needs to be validated
          * @param {Object} predefinedParameter predefined parameter object
          * @param {Object} parent div of the html to locate the parameter
+         * @param {boolean} checkForEmpty to enable empty check or not
          * @return {boolean}
          */
-        FormUtils.prototype.checkParameterValue = function (parameterValue, predefinedParameter, parent) {
+        FormUtils.prototype.checkParameterValue = function (parameterValue, predefinedParameter, parent, checkForEmpty) {
             var self = this;
-            if (parameterValue === "") {
+            if (parameterValue === "" && checkForEmpty) {
                 $(parent).find('.error-message').text('Parameter Value is required.');
                 self.addErrorClass($(parent).find('.parameter-value'));
                 return false;
             } else {
-                var dataType = predefinedParameter.type;
-                if (self.validateDataType(dataType, parameterValue)) {
-                    var errorMessage = "Invalid data-type. ";
-                    _.forEach(dataType, function (type) {
-                        errorMessage += type + " or ";
-                    });
-                    errorMessage = errorMessage.substring(0, errorMessage.length - 4);
-                    errorMessage += " is required";
-                    $(parent).find('.error-message').text(errorMessage);
-                    self.addErrorClass($(parent).find('.parameter-value'));
-                    return false;
+                if (parameterValue !== "") {
+                    var dataType = predefinedParameter.type;
+                    if (self.validateDataType(dataType, parameterValue)) {
+                        var errorMessage = "Invalid data-type. ";
+                        _.forEach(dataType, function (type) {
+                            errorMessage += type + " or ";
+                        });
+                        errorMessage = errorMessage.substring(0, errorMessage.length - 4);
+                        errorMessage += " is required";
+                        $(parent).find('.error-message').text(errorMessage);
+                        self.addErrorClass($(parent).find('.parameter-value'));
+                        return false;
+                    }
                 }
             }
             return true;
@@ -1699,7 +1831,7 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
          */
         FormUtils.prototype.generateOrderByDiv = function (savedOrderBy, possibleAttributes) {
             var self = this;
-            var orderByAttributes = [{ value: "", order: "" }];
+            var orderByAttributes = [{value: "", order: ""}];
             if ((savedOrderBy && savedOrderBy.length != 0)) {
                 orderByAttributes = savedOrderBy.slice();
             }
@@ -1826,7 +1958,7 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
                         var setAttribute = $(this).find('.setAttribute').val().trim();
                         var setValue = $(this).find('.setValue').val().trim();
                         if ((setAttribute != "") && (setValue != "")) {
-                            sets.push({ attribute: setAttribute, value: setValue });
+                            sets.push({attribute: setAttribute, value: setValue});
                         }
                     });
                     _.set(outputConfig, 'set', sets);
@@ -1889,19 +2021,15 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
                         _.set(streamHandlerOptions, 'value', filterCondition);
                     } else if (streamHandlerContent.hasClass('define-window-stream-handler') ||
                         streamHandlerContent.hasClass('define-function-stream-handler')) {
-                        var functionName = streamHandlerContent.find('.defineFunctionName select').val();
+                        var functionName = self.getFunctionNameWithoutParameterOverload(streamHandlerContent.find
+                        ('.defineFunctionName .custom-combobox-input').val());
                         var parameters;
-                        var predefinedFunctions;
                         var handlerType;
-                        var predefinedParameters;
                         if (streamHandlerContent.hasClass('define-window-stream-handler')) {
-                            predefinedFunctions = self.configurationData.rawExtensions["windowFunctionNames"]
-                            parameters = self.buildWindowParameters(streamHandlerContent, functionName, predefinedFunctions)
+                            parameters = self.buildParameterValues(streamHandlerContent);
                             handlerType = Constants.WINDOW.toUpperCase()
                         } else {
-                            predefinedFunctions = self.configurationData.rawExtensions["streamFunctions"]
-                            predefinedParameters = self.getPredefinedParameters(streamHandlerContent, predefinedFunctions);
-                            parameters = self.buildParameterValues(streamHandlerContent, predefinedParameters)
+                            parameters = self.buildParameterValues(streamHandlerContent);
                             handlerType = Constants.FUNCTION.toUpperCase()
                         }
                         var windowFunctionOptions = {};
@@ -1919,97 +2047,20 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
         };
 
         /**
-         * @function to build the parameters of window
-         */
-        FormUtils.prototype.buildWindowParameters = function (div, selectedType, predefinedFunctions) {
-            var self = this;
-            var parameters = [];
-            var predefinedParameters = self.getPredefinedParameters(div, predefinedFunctions)
-            if (selectedType.toLowerCase() === Constants.SORT) {
-                parameters = self.buildParameterValuesSort(div)
-            } else if (selectedType.toLowerCase() === Constants.FREQUENT ||
-                selectedType.toLowerCase() === Constants.LOSSY_FREQUENT) {
-                parameters = self.buildParameterValuesFrequentOrLossyFrequent(div,
-                    predefinedParameters)
-            } else {
-                parameters = self.buildParameterValues(div, predefinedParameters);
-            }
-            return parameters;
-        };
-
-        /**
          * @function to build the parameter values
          * @param {Object} div division where the parameters are in html
          * @param {Object} predefinedParameters predefined parameters
          */
-        FormUtils.prototype.buildParameterValues = function (div, predefinedParameters) {
+        FormUtils.prototype.buildParameterValues = function (div) {
             var self = this;
             var parameterValues = [];
-            $(div).find('.parameter').each(function () {
-                if ($(this).find('.parameter-name').hasClass('mandatory-parameter') || ($(this).find('.parameter-name')
-                        .hasClass('optional-parameter') && $(this).find('.parameter-checkbox').is(":checked"))) {
-                    var parameterValue = $(this).find('.parameter-value').val().trim();
-                    var parameterName = $(this).find('.parameter-name').text().trim();;
-                    var predefinedParameter = self.getObject(parameterName, predefinedParameters);
-                    if (predefinedParameter.type.includes("STRING")) {
-                        parameterValue = "'" + parameterValue + "'";
-                    }
-                    parameterValues.push(parameterValue);
-                }
-            });
-            return parameterValues;
-        };
-
-        /**
-         * @function to build parameters for sort type
-         * @param {Object} div where the parameters are in html
-         * @returns {Object} parameterValues
-         */
-        FormUtils.prototype.buildParameterValuesSort = function (div) {
-            var self = this;
-            var parameterValues = [];
-            $(div).find('.parameter').each(function () {
-                var parameterValue = $(this).find('.parameter-value').val().trim();
-                var parameterName = $(this).find('.parameter-name').text().trim();;
-                if (parameterName === "window.length") {
-                    parameterValues.push(parameterValue)
-                } else if (parameterName === "attribute") {
-                    if ($('#attribute-parameter').find('.parameter-checkbox').is(":checked")) {
-                        self.buildAttributes(parameterValue, parameterValues);
-                    }
+            $(div).find('.parameter .param-content').each(function () {
+                if ($(this).hasClass('attribute-param')) {
+                    self.buildAttributesParameters($(this), parameterValues);
                 } else {
-                    if (($('#attribute-parameter').find('.parameter-checkbox').is(":checked")) && ($
-                        ('#order-parameter').find('.parameter-checkbox').is(":checked"))) {
-                        parameterValue = "'" + parameterValue + "'";
-                        parameterValues.push(parameterValue)
-                    }
-                }
-            });
-            return parameterValues;
-        };
-
-        /**
-         * @function to build parameters for frequent and lossyFrequent type
-         * @param {Object} div where the parameters are in html
-         * @param {Object} predefinedParameters predefined parameters
-         * @returns {Object} parameterValues
-         */
-        FormUtils.prototype.buildParameterValuesFrequentOrLossyFrequent = function (div, predefinedParameters) {
-            var self = this;
-            var parameterValues = [];
-            $(div).find('.parameter').each(function () {
-                if ($(this).find('.parameter-name').hasClass('mandatory-parameter') || ($(this).find('.parameter-name')
-                        .hasClass('optional-parameter') && $(this).find('.parameter-checkbox').is(":checked"))) {
                     var parameterValue = $(this).find('.parameter-value').val().trim();
-                    var parameterName = $(this).find('.parameter-name').text().trim();
-                    var predefinedParameter = self.getObject(parameterName, predefinedParameters);
-                    if (parameterName === "attribute") {
-                        self.buildAttributes(parameterValue, parameterValues);
-                    } else {
-                        if (predefinedParameter.type.includes("STRING")) {
-                            parameterValue = "'" + parameterValue + "'";
-                        }
-                        parameterValues.push(parameterValue)
+                    if (parameterValue !== "") {
+                        parameterValues.push(parameterValue);
                     }
                 }
             });
@@ -2021,12 +2072,11 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
          * @param {String} parameterValue the attribute value
          * @param {Object} parameterValues array to add the parameters
          */
-        FormUtils.prototype.buildAttributes = function (parameterValue, parameterValues) {
-            var attributeArray = parameterValue.split(',');
-            _.forEach(attributeArray, function (attribute) {
-                attribute = attribute.trim();
-                if (attribute !== "") {
-                    parameterValues.push(attribute);
+        FormUtils.prototype.buildAttributesParameters = function (attributeContent, parameterValues) {
+            $(attributeContent).find('.parameter-value').each(function () {
+                var parameterValue = $(this).val().trim();
+                if (parameterValue !== "") {
+                    parameterValues.push(parameterValue);
                 }
             });
         };
@@ -2042,10 +2092,10 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
                 var optionName = option.text().trim();
                 var optionValue = $(this).find('.option-value').val().trim();
                 if (option.hasClass('mandatory-option')) {
-                    elements.push({ key: optionName, value: optionValue });
+                    elements.push({key: optionName, value: optionValue});
                 } else {
                     if ($(this).find('.option-checkbox').is(":checked")) {
-                        elements.push({ key: optionName, value: optionValue });
+                        elements.push({key: optionName, value: optionValue});
                     }
                 }
             });
@@ -2262,8 +2312,6 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
             self.removeNavigationForWindow(sourceDiv)
             self.showHideStreamHandlerWindowButton(sourceDiv)
             self.preventMultipleSelectionOfWindowStreamHandler(sourceDiv)
-            self.addEventListenersForParameterDiv();
-            self.showDropDown();
         };
 
         /**
@@ -2286,46 +2334,214 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
                 var predefinedWindowFunctions = _.orderBy(JSON.parse(JSON.stringify
                 (self.configurationData.rawExtensions["windowFunctionNames"]), ['name'], ['asc']));
                 self.renderFunctions(predefinedWindowFunctions, div, Constants.WINDOW);
-                self.mapStreamHandlerWindow(div, predefinedWindowFunctions, streamHandler);
+                self.showDropDown();
+                self.mapParameterValues(streamHandler, div, false);
             } else if (type === Constants.FUNCTION) {
                 var predefinedStreamFunctions = _.orderBy(JSON.parse(JSON.stringify
                 (self.configurationData.rawExtensions["streamFunctions"]), ['name'], ['asc']));
                 self.renderFunctions(predefinedStreamFunctions, div, Constants.STREAM_FUNCTION);
-                self.mapStreamHandlerStreamFunction(div, predefinedStreamFunctions, streamHandler)
+                self.showDropDown();
+                self.mapParameterValues(streamHandler, div, false);
             }
         };
 
         /**
-         * @function to map the window stream handler
+         * @function to map the parameters of the stream function/window
+         * @param streamHandler object which has the stream handler to be mapped
+         * @param div the div to embed the parameters
+         * @param onChange to check if the method is called on change of the drop-down or on load of the form
          */
-        FormUtils.prototype.mapStreamHandlerWindow = function (div, predefinedFunctions, streamHandler) {
+        FormUtils.prototype.mapParameterValues = function (streamHandler, div, onChange) {
             var self = this;
-            var windowType = streamHandler.value.function.toLowerCase();
-            $(div).find('#window-type option').filter(function () {
-                return ($(this).val().toLowerCase() == (windowType));
-            }).prop('selected', true);
-            var savedParameterValues = streamHandler.value.parameters;
-            var functionParameters = self.getSelectedTypeParameters(windowType, predefinedFunctions);
-            self.callToMapParameters(windowType, functionParameters, savedParameterValues, div)
-            if (windowType === Constants.SORT) {
-                self.showHideOrderForSort();
-                self.addEventListenerForSortWindow(selectedType)
+            var predefinedFunctions;
+            var functionName;
+            var parameters;
+            var savedType = streamHandler.value.function.toLowerCase();
+            var savedParameters = streamHandler.value.parameters;
+            var streamHandlerType = streamHandler.type.toLowerCase();
+            var parameterLength = {sameLength: 0};
+            if (streamHandlerType === Constants.WINDOW) {
+                predefinedFunctions = _.orderBy(_.cloneDeep
+                (self.configurationData.rawExtensions["windowFunctionNames"]), ['name'], ['asc']);
+            } else {
+                predefinedFunctions = _.orderBy(_.cloneDeep
+                (self.configurationData.rawExtensions["streamFunctions"]), ['name'], ['asc']);
             }
+            var functionParameters = self.getSelectedTypeParameters(savedType, predefinedFunctions);
+            if (!onChange) {
+                functionName = self.getFunctionNameWithParameterOverloads(predefinedFunctions, savedType,
+                    savedParameters, parameterLength)
+            } else {
+                functionName = savedType;
+            }
+            var overloadParameters = self.getParameterOverloads(functionName, functionParameters);
+            if (parameterLength.sameLength > 1 && !onChange) {
+                $(div).find('.custom-combobox-input').val(self.getFunctionNameWithoutParameterOverload(functionName));
+                parameters = self.createObjectsForUnknownParameters(functionParameters, savedParameters);
+                self.renderUnknownParameters(parameters, functionParameters, streamHandlerType, div);
+            } else {
+                $(div).find('.custom-combobox-input').val(functionName);
+                parameters = self.createObjectsForKnownParameters(overloadParameters, savedParameters);
+                self.renderParameters(parameters, streamHandlerType, div);
+            }
+            $('.attribute-param .attribute-param-value:first .btn-del-option').remove();
+            $('.attribute-param .attribute-param-value:first')
+                .append('<button class="btn btn-default btn-add-param-attribute"> + </button>');
+
+            self.addEventListenersForParameterDiv();
         };
 
         /**
-         * @function to map the stream function stream handler
+         * @function to construct the function name with corresponding parameter overload when the form is opened
          */
-        FormUtils.prototype.mapStreamHandlerStreamFunction = function (div, predefinedFunctions, streamHandler) {
-            var self = this;
-            var functionType = streamHandler.value.function.toLowerCase();
-            $(div).find('#stream-function-type option').filter(function () {
-                return ($(this).val().toLowerCase() == (functionType));
-            }).prop('selected', true);
-            var savedParameterValues = streamHandler.value.parameters;
-            var functionParameters = self.getSelectedTypeParameters(functionType, predefinedFunctions);
-            var functionParametersWithValues = self.mapUserParameterValues(functionParameters, savedParameterValues);
-            self.renderParameters(functionParametersWithValues, Constants.STREAM_FUNCTION, div);
+        FormUtils.prototype.getFunctionNameWithParameterOverloads = function (predefinedFunctions, savedType,
+                                                                              savedParameters, sameParameterLengths) {
+            var functionName = "";
+            _.forEach(predefinedFunctions, function (predefinedFunction) {
+                if (predefinedFunction.name.toLowerCase() === savedType) {
+                    if (predefinedFunction.parameterOverloads) {
+                        var nameWithUniqueOverload = predefinedFunction.name + "(";
+                        for (var i=0; i < predefinedFunction.parameterOverloads.length; i++) {
+                            var overload = predefinedFunction.parameterOverloads[i];
+                            var lengthOfSavedParameters = savedParameters.length;
+                            if (overload.includes(Constants.ATTRIBUTE)) {
+                                var attributeIndex = overload.indexOf(Constants.ATTRIBUTE);
+                                var attributes = [];
+                                for (var j=attributeIndex; j < savedParameters.length; j++) {
+                                    var parameter = savedParameters[j].substring(1, savedParameters[j].length-1)
+                                        .toLowerCase();
+                                    if (parameter === Constants.ASC || parameter === Constants.DESC) {
+                                        break;
+                                    } else {
+                                        attributes.push(savedParameters[j])
+                                    }
+                                }
+                                lengthOfSavedParameters = lengthOfSavedParameters-(attributes.length-1);
+                            }
+                            if (overload.length === lengthOfSavedParameters) {
+                                sameParameterLengths.sameLength = sameParameterLengths.sameLength + 1;
+                                nameWithUniqueOverload += overload + ",";
+                            }
+                        };
+                        nameWithUniqueOverload = nameWithUniqueOverload.slice(0, -1);
+                        nameWithUniqueOverload += ")";
+                        functionName = nameWithUniqueOverload;
+                    } else {
+                        var nameWithAllParameters = predefinedFunction.name + "(";
+                        _.forEach(predefinedFunction.parameters, function (parameter) {
+                            nameWithAllParameters += parameter.name + ",";
+                        });
+                        nameWithAllParameters = nameWithAllParameters.slice(0, -1);
+                        nameWithAllParameters += ")";
+                        functionName = nameWithAllParameters
+                    }
+                }
+            });
+            return functionName;
+        };
+
+        /**
+         * @function to create parameter objects for unknown parameters
+         */
+        FormUtils.prototype.createObjectsForUnknownParameters = function (predefinedParameters, savedParameters) {
+            var parameters = [];
+            var lengthOfSavedParameters = savedParameters.length;
+            var savedParamIndex = 0;
+            for (var i = 0; i < predefinedParameters.length; i++) {
+                var name = "Parameter "+(i+1);
+                //Temporarily this variable is required until this property is added in the siddhi level
+                var isAttribute = false;
+                if (i < lengthOfSavedParameters) {
+                    var savedValue = savedParameters[savedParamIndex];
+                    if (predefinedParameters[i].name === Constants.ATTRIBUTE) {
+                        isAttribute = true;
+                        var parameterValue = [];
+                        for (var j = i; j < savedParameters.length; j++) {
+                            var parameter = savedParameters[j].substring(1, savedParameters[j].length-1)
+                                .toLowerCase();
+                            if (parameter === Constants.ASC || parameter === Constants.DESC) {
+                                parameterValue.push(parameter);
+                                break;
+                            } else {
+                                parameterValue.push(savedParameters[j]);
+                            }
+                        }
+                        savedValue = parameterValue;
+                        lengthOfSavedParameters = lengthOfSavedParameters-(parameterValue.length-1);
+                        savedParamIndex = savedParamIndex+(parameterValue.length-1);
+                    }
+                    parameters.push({
+                        name: name, value: savedValue, optional: predefinedParameters[i].optional,
+                        isAttribute: isAttribute
+                    });
+                } else {
+                    var value;
+                    if(name === Constants.ATTRIBUTE) {
+                        value = [""];
+                        isAttribute = true;
+                    } else {
+                        value = ""
+                    }
+                    parameters.push({
+                        name: name, value: value, optional: predefinedParameters[i].optional
+                    });
+                }
+                savedParamIndex++;
+            }
+            return parameters;
+        };
+
+        /**
+         * @function to create parameter objects for known parameters
+         */
+        FormUtils.prototype.createObjectsForKnownParameters = function (predefinedParameters, savedParameters) {
+            var parameters = [];
+            var lengthOfSavedParameters = savedParameters.length;
+            var savedParamIndex = 0;
+            for (var i = 0; i < predefinedParameters.length; i++) {
+                var isAttribute = false;
+                if (i < lengthOfSavedParameters) {
+                    var savedValue = savedParameters[savedParamIndex];
+                    if (predefinedParameters[i].name === Constants.ATTRIBUTE) {
+                        //Temporarily this variable is required until this property is added in the siddhi level
+                        isAttribute = true;
+                        var parameterValue = [];
+                        for (var j = i; j < savedParameters.length; j++) {
+                            var parameter = savedParameters[j].substring(1, savedParameters[j].length-1)
+                                .toLowerCase();
+                            if (parameter === Constants.ASC || parameter === Constants.DESC) {
+                                parameterValue.push(parameter);
+                                break;
+                            } else {
+                                parameterValue.push(savedParameters[j]);
+                            }
+                        }
+                        savedValue = parameterValue;
+                        lengthOfSavedParameters = lengthOfSavedParameters-(parameterValue.length-1);
+                        savedParamIndex = savedParamIndex+(parameterValue.length-1);
+                    }
+                    parameters.push({
+                        name: predefinedParameters[i].name, value: savedValue, description:
+                        predefinedParameters[i].description, optional: predefinedParameters[i].optional,
+                        defaultValue: predefinedParameters[i].defaultValue, isAttribute: isAttribute
+                    });
+                } else {
+                    var value;
+                    if(predefinedParameters[i].name === Constants.ATTRIBUTE) {
+                        value = [""];
+                        isAttribute = true;
+                    } else {
+                        value = ""
+                    }
+                    parameters.push({
+                        name: predefinedParameters[i].name, value: value, description: predefinedParameters[i]
+                            .description, optional: predefinedParameters[i].optional,
+                        defaultValue: predefinedParameters[i].defaultValue, isAttribute: isAttribute
+                    });
+                }
+                savedParamIndex++;
+            }
+            return parameters;
         };
 
         /**
@@ -2340,181 +2556,12 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
                         predefinedAnnotation.isChecked = true;
                         predefinedAnnotation.values = [];
                         _.forEach(savedAnnotation.elements, function (element) {
-                            predefinedAnnotation.values.push({ value: element.value });
-                        })
+                            predefinedAnnotation.values.push({value: element.value});
+                        });
                         return false;
                     }
                 })
             });
-        };
-
-        /**
-         * @function to map the saved parameter values to the parameter object
-         * @param {Object} predefinedParameters Predefined parameters of a particular window type
-         * @param {Object} savedParameterValues Saved parameter values
-         * @return {Object} parameters
-         */
-        FormUtils.prototype.mapUserParameterValues = function (predefinedParameters, savedParameterValues) {
-            var parameters = [];
-            for (var i = 0; i < predefinedParameters.length; i++) {
-                var timeStamp = "";
-                if (i < savedParameterValues.length) {
-                    var parameterValue = savedParameterValues[i];
-                    if (predefinedParameters[i].type.includes("STRING")) {
-                        parameterValue = parameterValue.slice(1, parameterValue.length - 1)
-                    }
-                    parameters.push({
-                        name: predefinedParameters[i].name, value: parameterValue, description:
-                        predefinedParameters[i].description, optional: predefinedParameters[i].optional,
-                        defaultValue: predefinedParameters[i].defaultValue, timeStamp: timeStamp
-                    });
-                } else {
-                    parameters.push({
-                        name: predefinedParameters[i].name, value: "", description: predefinedParameters[i]
-                            .description, optional: predefinedParameters[i].optional,
-                        defaultValue: predefinedParameters[i].defaultValue, timeStamp: timeStamp
-                    });
-                }
-            }
-            return parameters;
-        };
-
-        /**
-         * @function to map the user saved parameters of lossyFrequent
-         * @param {Object} predefinedParameters predefined parameters
-         * @param {Object} savedParameterValues user saved parameters
-         * @return {Object} parameters
-         *
-         */
-        FormUtils.prototype.mapParameterValuesLossyFrequent = function (predefinedParameters, savedParameterValues) {
-            var parameters = [];
-            var attributes = "";
-            //add the two mandatory params of the saved values to the predefined param objects
-            for (var i = 0; i <= 1; i++) {
-                parameters.push({
-                    name: predefinedParameters[i].name, value: savedParameterValues[i], description:
-                    predefinedParameters[i].description, optional: predefinedParameters[i].optional,
-                    defaultValue: predefinedParameters[i].defaultValue
-                });
-            }
-            // add the attributes
-            for (var i = 2; i < savedParameterValues.length; i++) {
-                attributes += savedParameterValues[i] + ", "
-            }
-            //cutting off the last white space and the comma
-            attributes = attributes.substring(0, attributes.length - 2);
-            //add the attributes to the third obj of the predefined parameter
-            parameters.push({
-                name: predefinedParameters[2].name, value: attributes, description:
-                predefinedParameters[2].description, optional: predefinedParameters[2].optional,
-                defaultValue: predefinedParameters[2].defaultValue
-            });
-            return parameters;
-        };
-
-        /**
-         * @function to map the user saved parameters of frequent
-         * @param {Object} predefinedParameters predefined parameters
-         * @param {Object} savedParameterValues user saved parameters
-         * @return {Object} parameters
-         */
-        FormUtils.prototype.mapParameterValuesFrequent = function (predefinedParameters, savedParameterValues) {
-            var parameters = [];
-            var attributes = "";
-            //add the first saved param to predefined param's first index (event.count)
-            parameters.push({
-                name: predefinedParameters[0].name, value: savedParameterValues[0], description:
-                predefinedParameters[0].description, optional: predefinedParameters[0].optional,
-                defaultValue: predefinedParameters[0].defaultValue
-            });
-            // add the attributes
-            for (var i = 1; i < savedParameterValues.length; i++) {
-                attributes += savedParameterValues[i] + ", "
-            }
-            //cutting off the last white space and the comma
-            attributes = attributes.substring(0, attributes.length - 2);
-            //add the attributes to second obj of the predefined parameter
-            parameters.push({
-                name: predefinedParameters[1].name, value: attributes, description:
-                predefinedParameters[1].description, optional: predefinedParameters[1].optional,
-                defaultValue: predefinedParameters[1].defaultValue
-            });
-            return parameters;
-        };
-
-        /**
-         * @function to map the user saved parameters of sort
-         * @param {Object} predefinedParameters predefined parameters
-         * @param {Object} savedParameterValues user saved parameters
-         * @return {Object} parameters
-         */
-        FormUtils.prototype.mapParameterValuesSort = function (predefinedParameters, savedParameterValues) {
-            var parameters = [];
-            var attributes = "";
-            var order = "";
-            var length = "";
-            if (savedParameterValues.length != 0) {
-                length = savedParameterValues[0];
-            }
-            //add the first saved param to predefined param's first index (window.length)
-            parameters.push({
-                name: predefinedParameters[0].name, value: length, description:
-                predefinedParameters[0].description, optional: predefinedParameters[0].optional,
-                defaultValue: predefinedParameters[0].defaultValue
-            });
-            // to determine the attributes and order
-            if (savedParameterValues.length > 1) {
-                for (var i = 1; i < savedParameterValues.length; i++) {
-                    if (savedParameterValues[i].indexOf("'") >= 0 || savedParameterValues[i].indexOf('"') >= 0) {
-                        order = savedParameterValues[i];
-                        order = order.slice(1, order.length - 1)
-                    } else {
-                        //attributes
-                        attributes += savedParameterValues[i] + ", ";
-
-                    }
-                }
-                //cutting off the last white space and the comma
-                attributes = attributes.substring(0, attributes.length - 2);
-            }
-            //add the attributes to second obj of the predefined parameter
-            parameters.push({
-                name: predefinedParameters[1].name, value: attributes, description:
-                predefinedParameters[1].description, optional: predefinedParameters[1].optional,
-                defaultValue: predefinedParameters[1].defaultValue
-            });
-            //add the order to the third obj of the predefined parameter
-            parameters.push({
-                name: predefinedParameters[2].name, value: order, description:
-                predefinedParameters[2].description, optional: predefinedParameters[2].optional,
-                defaultValue: predefinedParameters[2].defaultValue
-            });
-            return parameters;
-        };
-
-        /**
-         * Function to select the parameter mapping method
-         * @param {String} selectedType selected window type
-         * @param {Object} functionParameters parameters of the selected window type
-         * @param {Object} savedParameterValues saved parameter values
-         * @param {Object} functionParametersWithValues array to hold the parameter of the mapped value
-         */
-        FormUtils.prototype.callToMapParameters = function (selectedType, functionParameters, savedParameterValues,
-                                                            parameterDiv) {
-            var self = this;
-            var functionParametersWithValues;
-            if (selectedType === Constants.SORT) {
-                functionParametersWithValues = self.mapParameterValuesSort(functionParameters, savedParameterValues);
-            } else if (selectedType === Constants.FREQUENT) {
-                functionParametersWithValues = self.mapParameterValuesFrequent(functionParameters,
-                    savedParameterValues);
-            } else if (selectedType === Constants.LOSSY_FREQUENT) {
-                functionParametersWithValues = self.mapParameterValuesLossyFrequent(functionParameters,
-                    savedParameterValues);
-            } else {
-                functionParametersWithValues = self.mapUserParameterValues(functionParameters, savedParameterValues);
-            }
-            self.renderParameters(functionParametersWithValues, Constants.WINDOW, parameterDiv);
         };
 
         /**
@@ -2536,7 +2583,7 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
                 if (!found) {
                     $(this).find('.group-by-selection option').filter(function () {
                         return ($(this).val().includes(attributes[i]));
-                    }).prop('selected', true);;
+                    }).prop('selected', true);
                 }
                 i++;
             });
@@ -2847,7 +2894,7 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
                     return false;
                 }
                 if (self.validateMandatoryElementsOfPredefinedObjects(annotation_key_info,
-                        annotation_value_info, predefinedAnnotationObject)) {
+                    annotation_value_info, predefinedAnnotationObject)) {
                     isErrorOccurred = true;
                     return false;
                 }
@@ -2867,7 +2914,7 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
             var isErrorOccurred = false;
             _.forEach(predefinedAnnotationObject.elements, function (predefinedObjectElement) {
                 if (annotationKey.text.trim().toLowerCase() == predefinedObjectElement.name
-                        .toLowerCase()) {
+                    .toLowerCase()) {
                     if (predefinedObjectElement.isMandatory) {
                         if (annotationValue.text.trim() == "") {
                             DesignViewUtils.prototype.errorAlert("Property '" + predefinedObjectElement
@@ -2886,7 +2933,7 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
          * @param {Object} checkedBoxes array of saved annotation names
          */
         FormUtils.prototype.checkPredefinedAnnotations = function (checkedBoxes) {
-            var jsTreeNodes = $('#annotation-div').jstree(true).get_json('#', { 'flat': true });
+            var jsTreeNodes = $('#annotation-div').jstree(true).get_json('#', {'flat': true});
             _.forEach(checkedBoxes, function (checkedBoxName) {
                 _.forEach(jsTreeNodes, function (node) {
                     if (node.text.trim().toLowerCase() == checkedBoxName.toLowerCase()) {
@@ -3131,10 +3178,10 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
                 var selectedNode = $("#annotation-div").jstree("get_selected");
                 tree.create_node(selectedNode,
                     {
-                        text: "property", class: "annotation-key", state: { "opened": true },
-                        "a_attr": { "class": "annotation-key" }, icon: "/editor/commons/images/properties.png",
+                        text: "property", class: "annotation-key", state: {"opened": true},
+                        "a_attr": {"class": "annotation-key"}, icon: "/editor/commons/images/properties.png",
                         children: [{
-                            text: "value", class: "annotation-value", "a_attr": { "class": "annotation-value" },
+                            text: "value", class: "annotation-value", "a_attr": {"class": "annotation-value"},
                             icon: "/editor/commons/images/value.png"
                         }]
                     }
@@ -3150,13 +3197,13 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
                     selectedNode = "#"
                 }
                 tree.create_node(selectedNode, {
-                    text: "Annotation", class: "annotation", state: { "opened": true },
-                    "a_attr": { "class": "annotation" }, icon: "/editor/commons/images/annotation.png",
+                    text: "Annotation", class: "annotation", state: {"opened": true},
+                    "a_attr": {"class": "annotation"}, icon: "/editor/commons/images/annotation.png",
                     children: [{
                         text: "property", class: "annotation-key", icon: "/editor/commons/images/properties.png",
-                        "a_attr": { "class": "annotation-key" },
+                        "a_attr": {"class": "annotation-key"},
                         children: [{
-                            text: "value", class: "annotation-value", "a_attr": { "class": "annotation-value" },
+                            text: "value", class: "annotation-value", "a_attr": {"class": "annotation-value"},
                             icon: "/editor/commons/images/value.png"
                         }]
                     }]
@@ -3257,6 +3304,19 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
                     parameterParent.find(".error-message").text("");
                 }
             });
+
+            //event listener to delete an attribute of the attribute parameters
+            $('.defineFunctionParameters').on('click', '.btn-del-option', function () {
+                $(this).parents('.attribute-param-value').remove();
+            });
+
+            var attributeParam =  '<div class="attribute-param-value">' +
+                '<input class = "parameter-value" type = "text" value = ""> ' +
+                '<a class = "btn-del-option"> <i class = "fw fw-delete"> </i></a> </div>';
+            //event listener to add an attribute of the attribute parameter
+            $('.btn-add-param-attribute').on('click', function () {
+                $(this).parents('.attribute-param').append(attributeParam)
+            });
         };
 
         /**
@@ -3332,19 +3392,6 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
          */
         FormUtils.prototype.isElementContentOverflown = function (element) {
             return element[0].scrollWidth > element[0].clientWidth;
-        };
-
-        /**
-         * @function to add event listeners for sort window type parameters
-         */
-        FormUtils.prototype.addEventListenerForSortWindow = function (selectedType) {
-            var self = this;
-            $('.defineFunctionParameters').on('change', '.parameter-checkbox', function () {
-                //check for sort type's parameter (order & attribute params)
-                if (selectedType === Constants.SORT) {
-                    self.showHideOrderForSort();
-                }
-            });
         };
 
         /**
@@ -3433,63 +3480,52 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
             });
 
             //on change of window type
-            var predefinedWindowFunctions = _.orderBy(JSON.parse(JSON.stringify
-            (self.configurationData.rawExtensions["windowFunctionNames"]), ['name'], ['asc']));
-            $('.define-stream-handler').on('change', '#window-type', function () {
-                var sourceDiv = self.getSourceDiv($(this))
-                if ($(sourceDiv).hasClass('define-left-source')) {
-                    var source = Constants.LEFT
-                } else {
-                    var source = Constants.RIGHT
-                }
-                var windowType;
-                var savedParameterValues;
-                var selectedType = this.value.toLowerCase();
-                var streamHandlerWindow = self.getStreamHandler(streamHandlerList, Constants.WINDOW, selectedType);
-                if (streamHandlerWindow) {
-                    windowType = streamHandlerWindow.value.function.toLowerCase();
-                    savedParameterValues = streamHandlerWindow.value.parameters;
-                }
-                var functionParameters = self.getSelectedTypeParameters(selectedType, predefinedWindowFunctions);
-                var parameterDiv = $(this).closest('.defineFunctionName').parents('.define-stream-handler-type-content');
-                if (savedParameterValues && selectedType == windowType) {
-                    self.callToMapParameters(selectedType, functionParameters, savedParameterValues, parameterDiv)
-                } else {
-                    var functionParametersWithValues = self.createObjectWithValues(functionParameters);
-                    self.renderParameters(functionParametersWithValues, Constants.WINDOW, parameterDiv);
-                }
-                if (selectedType === Constants.SORT) {
-                    self.showHideOrderForSort();
-                    self.addEventListenerForSortWindow(selectedType)
-                }
-            });
+            $(".define-stream-handler").on("autocompleteselect",
+                '.define-window-stream-handler .custom-combobox-input', function (event, ui) {
+                    var savedParameterValues = [];
+                    var selectedType = ui.item.value.toLowerCase();
+                    var streamHandlerWindow = self.getStreamHandler(streamHandlerList, Constants.WINDOW,
+                        self.getFunctionNameWithoutParameterOverload(selectedType));
+                    if (streamHandlerWindow) {
+                        savedParameterValues = streamHandlerWindow.value.parameters;
+                    }
+                    var streamHandler = {
+                        type: Constants.WINDOW,
+                        value: {
+                            function: selectedType,
+                            parameters: savedParameterValues
+                        }
+                    };
+                    var parameterDiv = $(this).closest('.defineFunctionName').parents('.define-stream-handler-type-content');
+                    self.mapParameterValues(streamHandler, parameterDiv, true);
+                });
 
             //on change of stream-function type
-            var predefinedStreamFunctions = _.orderBy(JSON.parse(JSON.stringify
-            (self.configurationData.rawExtensions["streamFunctions"]), ['name'], ['asc']));
-            $(".define-stream-handler").on("autocompleteselect", '.custom-combobox-input', function (event, ui) {
-                var selectedType = ui.item.value.toLowerCase();
-                var functionType;
-                var savedParameterValues;
-                var streamHandlerFunction = self.getStreamHandler(streamHandlerList, Constants.FUNCTION, selectedType);
-                if (streamHandlerFunction) {
-                    functionType = streamHandlerFunction.value.function.toLowerCase();
-                    savedParameterValues = streamHandlerFunction.value.parameters;
-                }
-                var functionParameters = self.getSelectedTypeParameters(selectedType, predefinedStreamFunctions);
-                var parameterDiv = $(this).closest('.defineFunctionName').parents('.define-stream-handler-type-content');
-                if (savedParameterValues && selectedType == functionType) {
-                    self.callToMapParameters(selectedType, functionParameters, savedParameterValues, parameterDiv)
-                } else {
-                    functionParametersWithValues = self.createObjectWithValues(functionParameters);
-                }
-                self.renderParameters(functionParametersWithValues, Constants.STREAM_FUNCTION, parameterDiv);
-            });
+            $(".define-stream-handler").on("autocompleteselect",
+                '.define-function-stream-handler .custom-combobox-input', function (event, ui) {
+                    var selectedType = ui.item.value.toLowerCase();
+                    var savedParameterValues = [];
+                    var streamHandlerFunction = self.getStreamHandler(streamHandlerList, Constants.FUNCTION,
+                        self.getFunctionNameWithoutParameterOverload(selectedType));
+                    if (streamHandlerFunction) {
+                        savedParameterValues = streamHandlerFunction.value.parameters;
+                    }
+                    var streamHandler = {
+                        type: Constants.STREAM_FUNCTION,
+                        value: {
+                            function: selectedType,
+                            parameters: savedParameterValues
+                        }
+                    };
+                    var parameterDiv = $(this).closest('.defineFunctionName').parents('.define-stream-handler-type-content');
+                    self.mapParameterValues(streamHandler, parameterDiv, true);
+                });
 
             //to add window
             $('.define-stream-handler').on('click', ".btn-add-window", function () {
                 var sourceDiv = self.getSourceDiv($(this));
                 self.addNewStreamHandler(sourceDiv, Constants.WINDOW);
+                self.showDropDown();
             });
 
             //to add stream-function
@@ -3504,21 +3540,24 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
             var previousContent;
             $('.define-stream-handler').on('focus', '.stream-handler-selection', function () {
                 previousValue = this.value;
-                previousContent = $(this).closest('.define-stream-handler-type').next().
-                find('.define-stream-handler-type-content').contents();
+                previousContent = $(this).closest('.define-stream-handler-type').
+                parents('.define-stream-handler-content').find('.define-stream-handler-type-content').contents();
 
             }).on('change', '.stream-handler-selection', function () {
                 var currentValue = this.value; // New Value
-                var currentContentDiv = $(this).closest('.define-stream-handler-type').next().
-                find('.define-stream-handler-type-content');
+                var currentContentDiv = $(this).closest('.define-stream-handler-type').
+                parents('.define-stream-handler-content').find('.define-stream-handler-type-content');
                 if (currentValue == previousValue) {
                     currentContentDiv.html(previousContent)
                 } else {
                     var sourceDiv = self.getSourceDiv($(this));
-                    var streamHandlerContent = $(this).closest('.define-stream-handler-type').next().
-                    find('.define-stream-handler-type-content');
+                    var streamHandlerContent = $(this).closest('.define-stream-handler-type').
+                    parents('.define-stream-handler-content').find('.define-stream-handler-type-content');
+                    streamHandlerContent.removeClass();
+                    streamHandlerContent.addClass('define-stream-handler-type-content');
+                    streamHandlerContent.addClass('define-' + currentValue +'-stream-handler');
                     self.renderStreamHandlerContentDiv(currentValue, streamHandlerContent)
-                    self.mapStreamHandlerContent(streamHandlerContent, self.createEmptyStreamHandler(currentValue));
+                    self.mapStreamHandlerContent(streamHandlerContent, self.createEmptyStreamHandler(currentValue))
                 }
                 self.preventMultipleSelectionOfWindowStreamHandler(sourceDiv);
             });
@@ -3705,7 +3744,7 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
                 streamHandlerObject = {
                     type: Constants.FUNCTION,
                     value: {
-                        function: "approximate:count", //as default
+                        function: "rdbms:query", //as default
                         parameters: []
                     }
                 }
@@ -3854,8 +3893,7 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
          * @function to change the heading and the button text of the customized options div
          */
         FormUtils.prototype.changeCustomizedOptDiv = function (id) {
-            var customizedOptionList = $('#customized-' + id + '-options').
-            find('.cust-options li');
+            var customizedOptionList = $('#customized-' + id + '-options').find('.cust-options li');
             var parent = $('#customized-' + id + '-options');
             if (customizedOptionList.length > 0) {
                 parent.find('h4').show();
@@ -3922,17 +3960,6 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
                 if (val === Constants.WINDOW)
                     dropDown.not(this).children('[value="' + Constants.WINDOW + '"]').prop('disabled', true);
             });
-        };
-
-        /**
-         * @function to show and hide the order parameter of sort type
-         */
-        FormUtils.prototype.showHideOrderForSort = function () {
-            if ($('#window-parameters #attribute-parameter').find('.parameter-checkbox').is(":checked")) {
-                $('#window-parameters #order-parameter').show();
-            } else {
-                $('#window-parameters #order-parameter').hide();
-            }
         };
 
         /**

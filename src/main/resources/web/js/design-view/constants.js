@@ -119,7 +119,11 @@ define(function () {
         FAULT_STREAM_PREFIX: "!",
         PURGING: "purging",
         PURGE: "purge",
-        CURRENT_EVENTS: "current_events"
+        CURRENT_EVENTS: "current_events",
+        ASC:"asc",
+        DESC: "desc",
+        ORDER: "order",
+        BATCH_WINDOW_PROCESSOR: "batch"
     };
 
     return constants;
