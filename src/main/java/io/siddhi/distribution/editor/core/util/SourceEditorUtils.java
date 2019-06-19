@@ -19,6 +19,7 @@ package io.siddhi.distribution.editor.core.util;
 
 import io.siddhi.annotation.Extension;
 import io.siddhi.annotation.Parameter;
+import io.siddhi.annotation.ParameterOverload;
 import io.siddhi.annotation.ReturnAttribute;
 import io.siddhi.core.SiddhiAppRuntime;
 import io.siddhi.distribution.editor.core.commons.metadata.AttributeMetaData;
@@ -353,6 +354,10 @@ public class SourceEditorUtils {
                     .isAssignableFrom(extensionClass)) {
                 processorType = Constants.ATTRIBUTE_AGGREGATOR;
                 processorMetaDataList = metaData.getFunctions();
+            } else if (Constants.SUPER_CLASS_MAP.get(Constants.INCREMENTAL_AGGREGATOR)
+                    .isAssignableFrom(extensionClass)) {
+                processorType = Constants.INCREMENTAL_AGGREGATOR;
+                processorMetaDataList = metaData.getFunctions();
             } else if (Constants.SUPER_CLASS_MAP.get(Constants.STREAM_FUNCTION_PROCESSOR)
                     .isAssignableFrom(extensionClass)) {
                 processorType = Constants.STREAM_FUNCTION_PROCESSOR;
@@ -495,6 +500,15 @@ public class SourceEditorUtils {
                             "description: " + extensionAnnotation.examples()[i].description();
                 }
                 processorMetaData.setExamples(examples);
+            }
+
+            //Adding parameter overloads data
+            if (extensionAnnotation.parameterOverloads().length > 0) {
+                List<String[]> parameterOverloads = new ArrayList<>();
+                for (ParameterOverload parameterOverload : extensionAnnotation.parameterOverloads()) {
+                    parameterOverloads.add(parameterOverload.parameterNames());
+                }
+                processorMetaData.setParameterOverloads(parameterOverloads);
             }
         }
         return processorMetaData;

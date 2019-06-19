@@ -2914,7 +2914,8 @@ define(["ace/ace", "jquery", "./constants", "./utils", "ace/snippets", "ace/rang
             sourceMaps: {},
             sinkMaps: {},
             windowFunctionNames: {},
-            streamFunctions: {}
+            streamFunctions: {},
+            incrementalAggregators: {}
         };
 
         CompletionEngine.isDynamicExtensionsLoaded = false;
@@ -2983,6 +2984,8 @@ define(["ace/ace", "jquery", "./constants", "./utils", "ace/snippets", "ace/rang
                                 .extensions["sourceMapper"]["sourceMaps"];
                             CompletionEngine.rawExtensions.sinkMaps = response.extensions["sinkMapper"]["sinkMaps"];
                             CompletionEngine.rawExtensions.windowFunctionNames = response.inBuilt["windowProcessors"];
+                            CompletionEngine.rawExtensions.incrementalAggregators = response.extensions
+                                ["incrementalAggregator"]["functions"];
                             var streamFunctions = [];
                             obtainStreamFunctionsFromResponse(response.extensions, streamFunctions);
                             obtainStreamFunctionsFromResponse(response.inBuilt, streamFunctions);
@@ -3088,11 +3091,16 @@ define(["ace/ace", "jquery", "./constants", "./utils", "ace/snippets", "ace/rang
         function obtainStreamFunctionsFromResponse(extensions, streamFunctions) {
             _.forEach(extensions, function (extension) {
                 _.forEach(extension.streamProcessors, function (streamFunction) {
+                    var parameterOverloads;
+                    if (streamFunction.parameterOverloads) {
+                        parameterOverloads = streamFunction.parameterOverloads;
+                    }
                     var streamProcessorFunction = {
                         description: streamFunction.description,
                         examples: streamFunction.examples,
                         name: streamFunction.namespace + ':' + streamFunction.name,
                         parameters: streamFunction.parameters,
+                        parameterOverloads: parameterOverloads,
                         returnAttributes: streamFunction.returnAttributes
                     }
                     streamFunctions.push(streamProcessorFunction);

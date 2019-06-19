@@ -30,6 +30,7 @@ public class ProcessorMetaData {
     private String namespace;
     private String description;
     private List<ParameterMetaData> parameters;
+    private List<String[]> parameterOverloads;
     private List<AttributeMetaData> returnAttributes;
     private String[] examples;
 

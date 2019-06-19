@@ -23,6 +23,7 @@ import io.siddhi.core.query.processor.stream.StreamProcessor;
 import io.siddhi.core.query.processor.stream.function.StreamFunctionProcessor;
 import io.siddhi.core.query.processor.stream.window.WindowProcessor;
 import io.siddhi.core.query.selector.attribute.aggregator.AttributeAggregatorExecutor;
+import io.siddhi.core.query.selector.attribute.aggregator.incremental.IncrementalAttributeAggregator;
 import io.siddhi.core.stream.input.source.Source;
 import io.siddhi.core.stream.input.source.SourceMapper;
 import io.siddhi.core.stream.output.sink.Sink;
@@ -67,6 +68,7 @@ public class Constants {
     public static final String FAULT_STREAM_PREFIX = "!";
     static final String FUNCTION_EXECUTOR = "FunctionExecutor";
     static final String ATTRIBUTE_AGGREGATOR = "AttributeAggregatorExecutor";
+    static final String INCREMENTAL_AGGREGATOR = "IncrementalAggregator";
     static final String WINDOW_PROCESSOR = "WindowProcessor";
     static final String STREAM_FUNCTION_PROCESSOR = "StreamFunctionProcessor";
     static final String STREAM_PROCESSOR = "StreamProcessor";
@@ -82,6 +84,7 @@ public class Constants {
         // Populating the processor super class map
         SUPER_CLASS_MAP = new HashMap<>();
         SUPER_CLASS_MAP.put(FUNCTION_EXECUTOR, FunctionExecutor.class);
+        SUPER_CLASS_MAP.put(INCREMENTAL_AGGREGATOR, IncrementalAttributeAggregator.class);
         SUPER_CLASS_MAP.put(ATTRIBUTE_AGGREGATOR, AttributeAggregatorExecutor.class);
         SUPER_CLASS_MAP.put(WINDOW_PROCESSOR, WindowProcessor.class);
         SUPER_CLASS_MAP.put(STREAM_FUNCTION_PROCESSOR, StreamFunctionProcessor.class);
