@@ -94,4 +94,14 @@ public class ProcessorMetaData {
         this.returnAttributes = returnAttributes;
     }
 
+    public void setParameterOverloads(List<String[]> parameterOverloads) {
+
+        this.parameterOverloads = parameterOverloads;
+    }
+
+    public List<String[]> getParameterOverloads() {
+
+        return parameterOverloads;
+    }
+
 }
