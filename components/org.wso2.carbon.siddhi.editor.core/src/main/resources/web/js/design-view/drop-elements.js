@@ -1478,7 +1478,8 @@ define(['require', 'log', 'lodash', 'jquery', 'partition', 'stream', 'query', 'f
                 });
                 self.jsPlumbInstance.connect({
                     source: inConnection.sourceId,
-                    target: inConnection.targetId
+                    target: inConnection.targetId,
+                    fireEvent: false
                 });
                 self.jsPlumbInstance.makeTarget(inConnection.targetId, {
                     deleteEndpointsOnDetach: true,
@@ -1492,7 +1493,8 @@ define(['require', 'log', 'lodash', 'jquery', 'partition', 'stream', 'query', 'f
                 });
                 self.jsPlumbInstance.connect({
                     source: outConnection.sourceId,
-                    target: outConnection.targetId
+                    target: outConnection.targetId,
+                    fireEvent: false
                 });
                 self.jsPlumbInstance.makeSource(outConnection.sourceId, {
                     deleteEndpointsOnDetach: true,
