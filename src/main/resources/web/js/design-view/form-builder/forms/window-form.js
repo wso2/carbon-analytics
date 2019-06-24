@@ -47,16 +47,17 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'constants'],
             var self = this;
             var id = $(element).parent().attr('id');
             var windowObject = self.configurationData.getSiddhiAppConfig().getWindow(id);
+            var previousWindowObject = _.cloneDeep(windowObject);
 
-            var propertyDiv = $('<div class = "window-form-container"> <label> <span class="mandatory-symbol"> * ' +
-                '</span>Name </label> <input type="text" id="windowName" class="clearfix name">' +
+            var propertyDiv = $('<div class="clearfix form-min-width"><div class = "window-form-container"> <label> ' +
+                '<span class="mandatory-symbol"> * </span>Name </label> <input type="text" id="windowName" class="clearfix name">' +
                 '<label class="error-message" id="windowNameErrorMessage"></label> <div id="define-attribute"></div>' +
-                self.formUtils.buildFormButtons() + '</div> <div class= "window-form-container"> ' +
-                '<div class = "defineFunctionName"> </div> <div class ="defineFunctionParameters"> </div>' +
-                '</div> <div class = "window-form-container"> <div class="define-output-events"> </div>' +
-                '<div class="define-annotation"></div> </div>');
+                '</div> <div class= "window-form-container"> <div class = "defineFunctionName"> </div> ' +
+                '<div class ="defineFunctionParameters"> </div> </div> <div class = "window-form-container"> ' +
+                '<div class="define-output-events"> </div><div class="define-annotation"></div> </div> </div>');
 
-            formContainer.append(propertyDiv);
+            formContainer.html(propertyDiv);
+            self.formUtils.buildFormButtons(formConsole.cid);
             self.formUtils.popUpSelectedElement(id);
             self.designViewContainer.addClass('disableContainer');
             self.toggleViewButton.addClass('disableContainer');
@@ -128,8 +129,10 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'constants'],
                 self.formUtils.mapParameterValues(currentlySelectedWindow, windowFormContainer, true);
             });
 
+            self.formUtils.initPerfectScroller(formConsole.cid);
+
             // 'Submit' button action
-            $(formContainer).on('click', '#btn-submit', function () {
+            $('#' + formConsole.cid).on('click', '#btn-submit', function () {
 
                 self.formUtils.removeErrorClass();
                 var isErrorOccurred = false;
@@ -187,14 +190,7 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'constants'],
                 }
 
                 if (!isErrorOccurred) {
-                    var outConnections = self.jsPlumbInstance.getConnections({source: id + '-out'});
-                    var inConnections = self.jsPlumbInstance.getConnections({target: id + '-in'});
-                    // delete connections related to the element if the name is changed
-                    self.formUtils.deleteConnectionsAfterDefinitionElementNameChange(outConnections, inConnections);
-                    // update selected window model
                     windowObject.setName(windowName);
-                    // establish connections related to the element if the name is changed
-                    self.formUtils.establishConnectionsAfterDefinitionElementNameChange(outConnections, inConnections);
                     var textNode = $(element).parent().find('.windowNameNode');
                     textNode.html(windowName);
 
@@ -230,6 +226,22 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'constants'],
                         windowObject.addAnnotationObject(annotation);
                     });
 
+                    if (self.formUtils.isUpdatingOtherElementsRequired(previousWindowObject, windowObject,
+                        Constants.WINDOW)) {
+                        var outConnections = self.jsPlumbInstance.getConnections({source: id + '-out'});
+                        var inConnections = self.jsPlumbInstance.getConnections({target: id + '-in'});
+
+                        //to delete the connection, it requires the previous object name
+                        windowObject.setName(previousWindowObject.getName())
+                        // delete connections related to the element if the name is changed
+                        self.formUtils.deleteConnectionsAfterDefinitionElementNameChange(outConnections, inConnections);
+                        //reset the name to new name
+                        windowObject.setName(windowName);
+
+                        // establish connections related to the element if the name is changed
+                        self.formUtils.establishConnectionsAfterDefinitionElementNameChange(outConnections, inConnections);
+                    }
+
                     $('#' + id).removeClass('incomplete-element');
                     //Send window element to the backend and generate tooltip
                     var windowToolTip = self.formUtils.getTooltip(windowObject, Constants.WINDOW);
@@ -243,8 +255,7 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'constants'],
             });
 
             // 'Cancel' button action
-            var cancelButtonElement = $(formContainer).find('#btn-cancel')[0];
-            cancelButtonElement.addEventListener('click', function () {
+            $('#' + formConsole.cid).on('click', '#btn-cancel', function () {
                 // close the form window
                 self.consoleListManager.removeFormConsole(formConsole);
             });

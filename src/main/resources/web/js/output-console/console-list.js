@@ -261,7 +261,13 @@ define(['log', 'jquery', 'lodash', 'backbone', 'console'], function (log, $, _, 
                 // setting the global console as the next active console
                 var nextConsole = this.getGlobalConsole();
                 this.setActiveConsole(nextConsole);
+            },
+            /**
+             * removes all the console instances
+             */
+            removeAllConsoles: function () {
                 this.hideAllConsoles();
+                this.removePoppedUpElement();
             },
             /**
              * removes the classes added to pop-up the element

@@ -876,6 +876,13 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
                                         console.log("Error: First and second input elements are already filled in " +
                                             "join query!");
                                     }
+                                    if (queryInput.getLeft() && queryInput.getRight()) {
+                                        if (queryInput.getLeft().getConnectedSource() === queryInput.getRight()
+                                            .getConnectedSource()) {
+                                            queryInput.setFirstConnectedElement(connectedElement);
+                                            queryInput.setSecondConnectedElement(connectedElement);
+                                        }
+                                    }
                                 }
                             }
                         } else if (sourceElement.hasClass(constants.STREAM)
@@ -979,7 +986,7 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
                         "Custom", {
                             create: function () {
                                 return $(
-                                    '<span><i class="fw fw-delete" id="' + connectionObject.id +
+                                    '<span><i class="fw fw-delete" id="' + self.currentTabId + connectionObject.id +
                                     '"data-toggle="popover"></i></span>');
                             },
                             location: 0.60,
@@ -993,7 +1000,7 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
                     ]);
 
                     function popOverForConnector() {
-                        $('#' + connectionObject.id).popover({
+                        $('#' + self.currentTabId + connectionObject.id).popover({
                             trigger: 'focus',
                             title: 'Confirmation',
                             html: true,
@@ -1002,12 +1009,12 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
 
                             }
                         });
-                        $('#' + connectionObject.id).off();
-                        $('#' + connectionObject.id).popover("show");
+                        $('#' + self.currentTabId + connectionObject.id).off();
+                        $('#' + self.currentTabId + connectionObject.id).popover("show");
                         $('.btn_no').focus();
                         $(".overlayed-container ").fadeTo(200, 1);
                         // Custom jQuery to hide popover on click of the close button
-                        $("#" + connectionObject.id).siblings(".popover").on("click", ".popover-footer .btn_yes",
+                        $("#" + self.currentTabId + connectionObject.id).siblings(".popover").on("click", ".popover-footer .btn_yes",
                             function () {
                                 if (connectionObject.connector !== null) {
                                     self.jsPlumbInstance.deleteConnection(connectionObject);
@@ -1015,7 +1022,7 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
                                 $(".overlayed-container ").fadeOut(200);
                                 $(this).parents(".popover").popover('hide');
                             });
-                        $("#" + connectionObject.id).siblings(".popover").on("click", ".popover-footer .btn_no",
+                        $("#" + self.currentTabId + connectionObject.id).siblings(".popover").on("click", ".popover-footer .btn_no",
                             function () {
                                 $(".overlayed-container ").fadeOut(200);
                                 $(this).parents(".popover").popover('hide');
@@ -1034,8 +1041,8 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
                             });
                         });
                         $(".btn_no").on("keyup", function (e) {
-                            if (e.which === ESCAPE_KEY && $("#" + connectionObject.id).popover()) {
-                                $("#" + connectionObject.id).popover('hide');
+                            if (e.which === ESCAPE_KEY && $("#" + self.currentTabId + connectionObject.id).popover()) {
+                                $("#" + self.currentTabId + connectionObject.id).popover('hide');
                                 $(".overlayed-container ").fadeOut(200);
                                 close_icon_overlay.setVisible(false);
                             }
@@ -1078,7 +1085,7 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
                         });
                         // hide the close icon when the mouse is not on the connection path
                         connectionObject.bind('mouseleave', function () {
-                            if ($("#" + connectionObject.id).siblings(".popover").length == 0) {
+                            if ($("#" + self.currentTabId + connectionObject.id).siblings(".popover").length == 0) {
                                 close_icon_overlay.setVisible(false);
                             }
                         });
@@ -1090,7 +1097,7 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
                         });
                         // hide the close icon when the mouse is not on the connection path
                         connectionObject.bind('mouseout', function () {
-                            if ($("#" + connectionObject.id).siblings(".popover").length == 0) {
+                            if ($("#" + self.currentTabId + connectionObject.id).siblings(".popover").length == 0) {
                                 close_icon_overlay.setVisible(false);
                             }
                         });
@@ -1216,7 +1223,7 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
                         model = self.configurationData.getSiddhiAppConfig().getAggregation(targetId)
                         model.setConnectedSource(undefined);
                         if(sourceElement.hasClass(constants.STREAM)) {
-                            model.resetInputModel(model);
+                            model.resetModel(model);
                         }
                     } else if (sourceElement.hasClass(constants.STREAM) || sourceElement.hasClass(constants.TABLE)
                         || sourceElement.hasClass(constants.AGGREGATION) || sourceElement.hasClass(constants.WINDOW)
@@ -2683,11 +2690,11 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
 
         DesignGrid.prototype.enableMultipleSelection = function () {
             var self = this;
-            var selector = $('<div>').attr('id', constants.MULTI_SELECTOR).addClass(constants.SELECTOR);
+            var selector = $('<div>').attr('id', constants.MULTI_SELECTOR + self.currentTabId).addClass(constants.SELECTOR);
             self.canvas.append(selector);
             new DragSelect({
                 selectables: document.querySelectorAll('.jtk-draggable'),
-                selector: document.getElementById(constants.MULTI_SELECTOR),
+                selector: document.getElementById(constants.MULTI_SELECTOR + self.currentTabId),
                 area: document.getElementById('design-grid-container-' + self.currentTabId),
                 multiSelectKeys: ['ctrlKey', 'shiftKey'],
                 onElementSelect: function (element) {

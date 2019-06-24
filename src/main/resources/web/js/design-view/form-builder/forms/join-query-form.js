@@ -39,53 +39,12 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryWindowOrFunct
         };
 
         /**
-         * @function to obtain the attributes of the coonected element
-         */
-        var getPossibleAttributes = function (self, connectedElementName) {
-            var connectedElement = self.configurationData.getSiddhiAppConfig().
-            getDefinitionElementByName(connectedElementName);
-            var attributes = [];
-            if (connectedElement.type.toLowerCase() === Constants.TRIGGER) {
-                attributes.push(connectedElementName + '.' + Constants.TRIGGERED_TIME);
-            } else {
-                if (connectedElement.type.toLowerCase() === Constants.AGGREGATION) {
-                    attributes = getAggregationAttributes(connectedElement.element, self)
-                } else {
-                    attributes = connectedElement.element.getAttributeList()
-                }
-            }
-            return attributes
-        };
-
-        /**
          * @function to construct the possible attributes with defined as of the source
          */
         var constructPossibleAttributes = function (attributeList, connectedElementName, possibleAttributes) {
             _.forEach(attributeList, function (attribute) {
                 possibleAttributes.push(connectedElementName + "." + attribute.name);
             });
-        };
-
-        /**
-         * @function to obtain the possible attributes of the connected aggregation element
-         */
-        var getAggregationAttributes = function (aggregationElement, self) {
-            var attributes = [];
-            var selectType = aggregationElement.getSelect().getType().toLowerCase();
-            if (selectType === Constants.TYPE_ALL) {
-                var elementConnectedToAggregation = self.configurationData.getSiddhiAppConfig().
-                getDefinitionElementByName(aggregationElement.getConnectedSource());
-                attributes = elementConnectedToAggregation.element.getAttributeList();
-            } else {
-                _.forEach(aggregationElement.getSelect().getValue(), function (selectAttribute) {
-                    if (selectAttribute.as.trim() === "") {
-                        attributes.push({ name: selectAttribute.expression })
-                    } else {
-                        attributes.push({ name: selectAttribute.as })
-                    }
-                });
-            }
-            return attributes;
         };
 
         /**
@@ -165,8 +124,7 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryWindowOrFunct
             var sourceOptions = {};
             var sourceDiv = $('.define-' + type + '-source');
             var sourceFrom = sourceDiv.find('.source-selection').val();
-            var sourceElementType = self.configurationData.getSiddhiAppConfig().
-            getDefinitionElementByName(sourceFrom).type;
+            var sourceElementType = self.configurationData.getSiddhiAppConfig().getDefinitionElementByName(sourceFrom).type;
             _.set(sourceOptions, 'type', sourceElementType);
             _.set(sourceOptions, 'from', sourceFrom);
             if (sourceDiv.find('.source-as-checkbox').is(':checked')) {
@@ -222,10 +180,10 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryWindowOrFunct
          */
         var getPossibleAttributesWithSourceAs = function (self) {
             var possibleAttributesWithSourceAs = [];
-            var firstElementAttributes = getPossibleAttributes(self,
-                $('.define-left-source').find('.source-selection').val());
-            var secondElementAttributes = getPossibleAttributes(self,
-                $('.define-right-source').find('.source-selection').val());
+            var firstElementAttributes = self.formUtils.getInputAttributes
+            ([$('.define-left-source').find('.source-selection').val()])
+            var secondElementAttributes = self.formUtils.getInputAttributes
+            ([$('.define-right-source').find('.source-selection').val()]);
             constructPossibleAttributes(firstElementAttributes,
                 getSourceAs(Constants.LEFT), possibleAttributesWithSourceAs)
             constructPossibleAttributes(secondElementAttributes,
@@ -234,22 +192,34 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryWindowOrFunct
         };
 
         /**
-         * @function to add autocompletion
+         * @function add autocomplete for fields with changing attributes
          */
-        var addAutoCompletion = function (self, QUERY_CONDITION_SYNTAX, incrementalAggregator, streamFunctions, outputAttributes) {
+        var autoCompleteFieldsWithChangingAttributes = function (self, outputAttributes) {
+            var inputSources = getLeftRightSourceNames();
             var possibleAttributesWithSourceAs = getPossibleAttributesWithSourceAs(self);
-            var selectExpressionMatches = _.cloneDeep(possibleAttributesWithSourceAs);
-            selectExpressionMatches = selectExpressionMatches.concat(incrementalAggregator);
-            selectExpressionMatches = selectExpressionMatches.concat(streamFunctions);
-            var onFilterHavingConditionMatches = _.cloneDeep(possibleAttributesWithSourceAs);
-            onFilterHavingConditionMatches = onFilterHavingConditionMatches.concat(QUERY_CONDITION_SYNTAX);
-            onFilterHavingConditionMatches = onFilterHavingConditionMatches.concat(outputAttributes);
-            var perWithinMatches = _.cloneDeep(possibleAttributesWithSourceAs);
-            perWithinMatches = perWithinMatches.concat(Constants.SIDDHI_TIME);
-            perWithinMatches = perWithinMatches.concat(outputAttributes);
-            self.formUtils.createAutocomplete($('.attribute-expression'), selectExpressionMatches);
-            self.formUtils.createAutocomplete($('.symbol-syntax-required-value'), onFilterHavingConditionMatches);
-            self.formUtils.createAutocomplete($('.per-within'), perWithinMatches);
+            self.formUtils.addAutoCompleteForFilterConditions(possibleAttributesWithSourceAs.concat(outputAttributes));
+            self.formUtils.addAutoCompleteForSelectExpressions(possibleAttributesWithSourceAs);
+            self.formUtils.addAutoCompleteForOnCondition(possibleAttributesWithSourceAs.concat(outputAttributes), inputSources);
+            self.formUtils.addAutoCompleteForPerWithinConditions(possibleAttributesWithSourceAs.concat(outputAttributes));
+            self.formUtils.addAutoCompleteForHavingCondition(possibleAttributesWithSourceAs.concat(outputAttributes));
+            self.formUtils.addAutoCompleteForOutputOperation(outputAttributes, possibleAttributesWithSourceAs);
+        };
+
+        /**
+         * @function get the names of the connected source
+         */
+        var getLeftRightSourceNames = function () {
+            var inputNames = [];
+            $('.define-source').each(function () {
+                var checkbox = $(this).find('.source-as-checkbox');
+                var asValue = $(this).find('.as-content-value').val().trim();
+                if (checkbox.is(':checked') && asValue !== "") {
+                    inputNames.push(asValue)
+                } else {
+                    inputNames.push($(this).find('.source-selection').val())
+                }
+            });
+            return inputNames;
         };
 
         /**
@@ -314,16 +284,15 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryWindowOrFunct
             }
             if (inValid) {
                 self.consoleListManager.removeFormConsole(formConsole);
+                self.consoleListManager.removeAllConsoles();
             } else {
-                var propertyDiv = $('<div id="define-join-query"></div>' + self.formUtils.buildFormButtons());
-                formContainer.append(propertyDiv);
+                var propertyDiv = $('<div id="define-join-query" class="clearfix form-min-width"></div>');
+                formContainer.html(propertyDiv);
+                self.formUtils.buildFormButtons(formConsole.cid);
 
                 self.designViewContainer.addClass('disableContainer');
                 self.toggleViewButton.addClass('disableContainer');
                 self.formUtils.popUpSelectedElement(id);
-
-                var QUERY_CONDITION_SYNTAX = self.configurationData.application.config.query_condition_syntax;
-                var RATE_LIMITING_SYNTAX = self.configurationData.application.config.other_query_syntax;
 
                 var firstConnectedElement = joinQueryObject.getQueryInput().getFirstConnectedElement();
                 var secondConnectedElement = joinQueryObject.getQueryInput().getSecondConnectedElement();
@@ -356,14 +325,11 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryWindowOrFunct
                     .getDefinitionElementByName(outputElementName, partitionId);
 
                 var possibleJoinTypes = self.configurationData.application.config.join_types;
-                var predefinedAnnotations = _.cloneDeep(self.configurationData.application.config.
-                    type_query_predefined_annotations);
-                var incrementalAggregator = self.configurationData.application.config.incremental_aggregator;
+                var predefinedAnnotations = _.cloneDeep(self.configurationData.application.config.type_query_predefined_annotations);
                 var streamHandlerTypes = self.configurationData.application.config.stream_handler_types;
-                var streamFunctions = self.formUtils.getStreamFunctionNames();
 
                 //render the join-query form template
-                var joinFormTemplate = Handlebars.compile($('#join-query-form-template').html())({ name: queryName });
+                var joinFormTemplate = Handlebars.compile($('#join-query-form-template').html())({name: queryName});
                 $('#define-join-query').html(joinFormTemplate);
                 self.formUtils.renderQueryOutput(outputElement, queryOutput);
                 self.formUtils.renderOutputEventTypes();
@@ -408,6 +374,7 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryWindowOrFunct
                     } else {
                         parent.find('.query-content').hide();
                     }
+                    self.formUtils.updatePerfectScroller();
                 });
 
                 $('.join-query-form-container').on('change', '.join-selection', function () {
@@ -469,12 +436,6 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryWindowOrFunct
                 //is unidirectional
                 mapUnidirectionalCheckbox(leftSourceData, Constants.LEFT);
                 mapUnidirectionalCheckbox(rightSourceData, Constants.RIGHT);
-
-                var possibleAttributes = [];
-                var firstElementAttributes = getPossibleAttributes(self, firstConnectedElement.name);
-                var secondElementAttributes = getPossibleAttributes(self, secondConnectedElement.name);
-                constructPossibleAttributes(firstElementAttributes, firstConnectedElement.name, possibleAttributes)
-                constructPossibleAttributes(secondElementAttributes, secondConnectedElement.name, possibleAttributes)
 
                 //projection
                 self.formUtils.selectQueryProjection(select, outputElementName);
@@ -547,14 +508,17 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryWindowOrFunct
                 }
 
                 //autocompletion
-                addAutoCompletion(self, QUERY_CONDITION_SYNTAX, incrementalAggregator, streamFunctions, outputAttributes);
-
-                var inputAttributes = self.formUtils.getInputAttributes(possibleSources);
+                var inputAttributes = [];
+                _.forEach(self.formUtils.getInputAttributes(possibleSources), function (attribute) {
+                    inputAttributes.push(attribute.name);
+                });
                 var outputAttributesWithElementName = self.formUtils.constructOutputAttributes(outputAttributes);
-                self.formUtils.addAutoCompleteForOutputOperation(outputAttributesWithElementName, inputAttributes);
+                self.formUtils.addAutoCompleteForRateLimits();
+                autoCompleteFieldsWithChangingAttributes(self, outputAttributesWithElementName);
 
                 $('.join-query-form-container').on('blur', '.as-content-value', function () {
-                    addAutoCompletion(self, QUERY_CONDITION_SYNTAX, incrementalAggregator, streamFunctions, outputAttributes);
+                    autoCompleteFieldsWithChangingAttributes(self, outputAttributesWithElementName);
+                    var possibleAttributesWithSourceAs = getPossibleAttributesWithSourceAs(self);
                     self.formUtils.generateGroupByDiv(groupBy, possibleAttributesWithSourceAs);
                 });
 
@@ -562,24 +526,23 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryWindowOrFunct
                 $('.define-stream-handler').on('click', '.btn-add-filter', function () {
                     var sourceDiv = self.formUtils.getSourceDiv($(this));
                     self.formUtils.addNewStreamHandler(sourceDiv, Constants.FILTER);
-                    addAutoCompletion(self, QUERY_CONDITION_SYNTAX, incrementalAggregator, streamFunctions, outputAttributes);
+                    autoCompleteFieldsWithChangingAttributes(self, outputAttributesWithElementName);
                 });
 
                 //to add query operation set
-                var setDiv = '<li class="setAttribute">' +
+                var setDiv = '<li class="setAttributeValue">' +
                     '<div class="clearfix">' +
                     '<input type="text" class="setAttribute"> <input type="text" class="setValue"> ' +
                     '<a class = "btn-del-option"> <i class = "fw fw-delete"> </i> </a>' +
                     '</div> <label class="error-message"> </label> </li>'
                 $('.define-operation-set-condition').on('click', '.btn-add-set', function () {
                     $('.define-operation-set-condition .set-condition').append(setDiv);
-                    self.formUtils.addAutoCompleteForOutputOperation(outputAttributesWithElementName, inputAttributes);
+                    autoCompleteFieldsWithChangingAttributes(self, outputAttributesWithElementName);
                 });
 
-                var rateLimitingMatches = RATE_LIMITING_SYNTAX.concat(Constants.SIDDHI_TIME);
-                self.formUtils.createAutocomplete($('.rate-limiting-value'), rateLimitingMatches);
+                self.formUtils.initPerfectScroller(formConsole.cid);
 
-                $(formContainer).on('click', '#btn-submit', function () {
+                $('#' + formConsole.cid).on('click', '#btn-submit', function () {
 
                     self.formUtils.removeErrorClass();
                     var isErrorOccurred = false;
@@ -747,8 +710,7 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryWindowOrFunct
                 });
 
                 // 'Cancel' button action
-                var cancelButtonElement = $(formContainer).find('#btn-cancel')[0];
-                cancelButtonElement.addEventListener('click', function () {
+                $('#' + formConsole.cid).on('click', '#btn-cancel', function () {
                     // close the form
                     self.consoleListManager.removeFormConsole(formConsole);
                 });

@@ -130,6 +130,7 @@ define(['log', 'jquery', 'lodash', 'sourceOrSinkAnnotation', 'mapAnnotation', 'p
             if (!isSourceConnected) {
                 // close the form window
                 self.consoleListManager.removeFormConsole(formConsole);
+                self.consoleListManager.removeAllConsoles();
             } else {
                 var connectedElement = sourceObject.connectedElementName;
                 var predefinedSources = _.orderBy(this.configurationData.rawExtensions["source"], ['name'], ['asc']);
@@ -139,15 +140,15 @@ define(['log', 'jquery', 'lodash', 'sourceOrSinkAnnotation', 'mapAnnotation', 'p
                 var streamAttributes = self.formUtils.createStreamAttributesObject
                 (connectedStream.element.getAttributeList());
 
-                var propertyDiv = $('<div class="source-sink-form-container source-div"><div id="define-source"></div>' +
-                    '<div class = "source-sink-map-options" id="source-options-div"></div>' +
-                    self.formUtils.buildFormButtons() + '</div>' +
-                    '<div class="source-sink-form-container mapper-div"> <div id="define-map"> </div> ' +
+                var propertyDiv = $('<div class="clearfix form-min-width"><div class="source-sink-form-container source-div">' +
+                    '<div id="define-source"></div> <div class = "source-sink-map-options" id="source-options-div"></div>' +
+                    '</div> <div class="source-sink-form-container mapper-div"> <div id="define-map"> </div> ' +
                     '<div class="source-sink-map-options" id="mapper-options-div">' +
                     '</div> </div> <div class= "source-sink-form-container attribute-map-div">' +
-                    '<div id="define-attribute"> </div> <div id="attribute-map-content"></div> </div>');
+                    '<div id="define-attribute"> </div> <div id="attribute-map-content"></div> </div> </div>');
 
-                formContainer.append(propertyDiv);
+                formContainer.html(propertyDiv);
+                self.formUtils.buildFormButtons(formConsole.cid);
                 self.formUtils.popUpSelectedElement(id);
                 self.designViewContainer.addClass('disableContainer');
                 self.toggleViewButton.addClass('disableContainer');
@@ -179,6 +180,7 @@ define(['log', 'jquery', 'lodash', 'sourceOrSinkAnnotation', 'mapAnnotation', 'p
                     } else {
                         $('#attribute-map-content').hide();
                     }
+                    self.formUtils.updatePerfectScroller();
                 });
 
                 //get the clicked element's information
@@ -208,7 +210,7 @@ define(['log', 'jquery', 'lodash', 'sourceOrSinkAnnotation', 'mapAnnotation', 'p
                 $('#define-map').on('change', '#map-type', function () {
                     currentMapperOptions = self.formUtils.getSelectedTypeParameters(this.value, predefinedSourceMaps);
                     if ((map) && (mapperType) && (mapperType.toLowerCase() == this
-                            .value.toLowerCase()) && mapperOptions) {
+                        .value.toLowerCase()) && mapperOptions) {
                         //if the selected type is same as the saved map type
                         mapperOptionsWithValues = self.formUtils.mapUserOptionValues(currentMapperOptions, mapperOptions);
                         customizedMapperOptions = self.formUtils.getCustomizedOptions(currentMapperOptions, mapperOptions);
@@ -271,8 +273,10 @@ define(['log', 'jquery', 'lodash', 'sourceOrSinkAnnotation', 'mapAnnotation', 'p
                     }
                 }
 
+                self.formUtils.initPerfectScroller(formConsole.cid);
+
                 //onclick of submit
-                $(formContainer).on('click', '#btn-submit', function () {
+                $('#' + formConsole.cid).on('click', '#btn-submit', function () {
 
                     self.formUtils.removeErrorClass();
                     var isErrorOccurred = false;
@@ -374,8 +378,7 @@ define(['log', 'jquery', 'lodash', 'sourceOrSinkAnnotation', 'mapAnnotation', 'p
                 });
 
                 // 'Cancel' button action
-                var cancelButtonElement = $(formContainer).find('#btn-cancel')[0];
-                cancelButtonElement.addEventListener('click', function () {
+                $('#' + formConsole.cid).on('click', '#btn-cancel', function () {
                     // close the form window
                     self.consoleListManager.removeFormConsole(formConsole);
                 });

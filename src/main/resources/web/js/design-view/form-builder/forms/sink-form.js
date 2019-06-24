@@ -136,6 +136,7 @@ define(['log', 'jquery', 'lodash', 'mapAnnotation', 'payloadOrAttribute', 'jsonV
             if (!isSinkConnected) {
                 // close the form window
                 self.consoleListManager.removeFormConsole(formConsole);
+                self.consoleListManager.removeAllConsoles();
             } else {
                 var connectedElement = sinkObject.connectedElementName;
                 var predefinedSinks = _.orderBy(this.configurationData.rawExtensions["sink"], ['name'], ['asc']);
@@ -145,15 +146,16 @@ define(['log', 'jquery', 'lodash', 'mapAnnotation', 'payloadOrAttribute', 'jsonV
                 var streamAttributes = self.formUtils.createStreamAttributesObject
                 (connectedStream.element.getAttributeList());
 
-                var propertyDiv = $('<div class="source-sink-form-container sink-div"><div id="define-sink"></div>' +
-                    '<div class = "source-sink-map-options" id="sink-options-div"></div>' +
-                    self.formUtils.buildFormButtons() + '</div>' +
+                var propertyDiv = $('<div class="clearfix form-min-width"><div class="source-sink-form-container sink-div">' +
+                    '<div id="define-sink"></div>' +
+                    '<div class = "source-sink-map-options" id="sink-options-div"></div></div>' +
                     '<div class="source-sink-form-container mapper-div"> <div id="define-map"> </div>' +
                     '<div class="source-sink-map-options" id="mapper-options-div"></div>' +
                     '</div> <div class= "source-sink-form-container attribute-map-div"><div id="define-attribute">' +
-                    '</div> <div id="attribute-map-content"></div> </div>');
+                    '</div> <div id="attribute-map-content"></div> </div> </div>');
 
-                formContainer.append(propertyDiv);
+                formContainer.html(propertyDiv);
+                self.formUtils.buildFormButtons(formConsole.cid);
                 self.formUtils.popUpSelectedElement(id);
                 self.designViewContainer.addClass('disableContainer');
                 self.toggleViewButton.addClass('disableContainer');
@@ -192,6 +194,7 @@ define(['log', 'jquery', 'lodash', 'mapAnnotation', 'payloadOrAttribute', 'jsonV
                         $('#attribute-map-content').hide();
                         $("#define-attribute #attributeMap-type").prop('disabled', 'disabled');
                     }
+                    self.formUtils.updatePerfectScroller();
                 });
 
                 //onchange of the sink-type selection
@@ -253,6 +256,7 @@ define(['log', 'jquery', 'lodash', 'mapAnnotation', 'payloadOrAttribute', 'jsonV
                         ' <input type = "text" value = "" class = "attr-value"/>' +
                         '</div> <label class = "error-message"></label> </div>';
                     $('#attribute-map-content').find('#attributes').append(payloadMapDiv);
+                    self.formUtils.updatePerfectScroller();
                 });
 
                 //get the clicked element's information
@@ -313,8 +317,10 @@ define(['log', 'jquery', 'lodash', 'mapAnnotation', 'payloadOrAttribute', 'jsonV
                     }
                 }
 
+                self.formUtils.initPerfectScroller(formConsole.cid);
+
                 //onclick of submit
-                $(formContainer).on('click', '#btn-submit', function () {
+                $('#' + formConsole.cid).on('click', '#btn-submit', function () {
 
                     self.formUtils.removeErrorClass();
                     var isErrorOccurred = false;
@@ -447,9 +453,7 @@ define(['log', 'jquery', 'lodash', 'mapAnnotation', 'payloadOrAttribute', 'jsonV
                     }
                 });
 
-                // 'Cancel' button action
-                var cancelButtonElement = $(formContainer).find('#btn-cancel')[0];
-                cancelButtonElement.addEventListener('click', function () {
+                $('#' + formConsole.cid).on('click', '#btn-cancel', function () {
                     // close the form window
                     self.consoleListManager.removeFormConsole(formConsole);
                 });

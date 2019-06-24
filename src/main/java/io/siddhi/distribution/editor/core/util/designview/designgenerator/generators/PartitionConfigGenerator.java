@@ -100,8 +100,10 @@ public class PartitionConfigGenerator extends CodeSegmentsPreserver {
 
         Map<QueryListType, List<QueryConfig>> queryLists = populateEmptyQueryLists();
         QueryConfigGenerator queryConfigGenerator = new QueryConfigGenerator(siddhiAppString, siddhiApp);
+        int queryCounter = 0;
         for (Query query : queryList) {
-            QueryConfig queryConfig = queryConfigGenerator.generateQueryConfig(query);
+            queryCounter++;
+            QueryConfig queryConfig = queryConfigGenerator.generateQueryConfig(query, queryCounter);
             QueryListType queryListType = QueryConfigGenerator.getQueryListType(queryConfig);
             queryLists.get(queryListType).add(queryConfig);
         }

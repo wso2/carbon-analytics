@@ -28,6 +28,7 @@
     <link href="/editor/commons/css/jquery-ui-timepicker-addon.css" rel="stylesheet" type="text/css"/>
     <link href="/editor/commons/css/simulator.css" rel="stylesheet" type="text/css"/>
     <link rel="stylesheet" type="text/css" href="/editor/commons/css/notification.css"/>
+    <link rel="stylesheet" type="text/css" href="/editor/commons/lib/perfect-scrollbar-1.4.0/css/perfect-scrollbar.css"/>
 
     <!--Enjoy Hint CSS-->
 
@@ -163,8 +164,8 @@
                         <button type="button" class="close pull-right output-console-activate-btn close-console-btn"><i
                                 class="fw fw-cancel"></i></button>
                     </div>
-                    <div class="nano console-wrap">
-                        <div class="output-console-content-wrapper nano-content">
+                    <div class="console-wrap">
+                        <div class="output-console-content-wrapper">
                             <div class="consoleToolbar">
                                 <a href="#" class="clear-console-btn" data-placement="right" data-toggle="tooltip"
                                    title="Clear">
@@ -193,13 +194,15 @@
 
 <!-- Start: Template for a console -->
 <div id="console-template">
-    <div class="output-console-content output-console-content-default">
+    <div class="output-console-content output-console-content-default perfect-scroller">
     </div>
 </div>
 <!-- End: Template for console -->
 <div class="hidden">
     <div id="form-template">
-        <div class="design-view-form-content">
+        <div class="form-wrapper">
+            <div class="design-view-form-content perfect-scroller"></div>
+            <div class="query-form-actions"></div>
         </div>
     </div>
 </div>
@@ -1288,7 +1291,7 @@
                     {{#ifId ../id "sink"}}
                     <input type = "text" value = "{{key}}" class = "attr-key"/>
                     {{else}}
-                    <input value = "{{key}}" class = "attr-key" readonly/>
+                    <input type = "text" value = "{{key}}" class = "attr-key" readonly/>
                     {{/ifId}}
                     <input type = "text" value = "{{value}}" class = "attr-value"/>
                     {{else}}
@@ -1472,7 +1475,9 @@
         <div class="partition-key">
             <div class="clearfix">
                 <div class="partition-expression"> {{> renderDropDown streamAttributes}} </div>
-                <div class="partition-stream-name"> <input class="partition-by-stream-name" value="{{streamName}}" readonly> </div>
+                <div class="partition-stream-name">
+                    <input type = "text" class="partition-by-stream-name" value="{{streamName}}" readonly>
+                </div>
             </div>
             <label class="error-message"></label>
         </div>
@@ -1494,7 +1499,7 @@
             <li class="attribute">
                 <div class="clearfix">
                     <div class="clearfix">
-                        <input type="text" class = "attribute-expression-as name" value="{{this}}">
+                        <input type="text" class = "attribute-expression name" value="{{this}}">
                         <a class = "btn-del-option"> <i class = "fw fw-delete"> </i></a>
                     </div>
                     <label class = "error-message"></label>
@@ -1525,7 +1530,7 @@
                 <div class="clearfix">
                     <div class="clearfix">
                         <input type="text" class = "attribute-expression" value="{{expression}}">
-                        <input class = "attribute-as" value="{{as}}" readonly>
+                        <input type = "text" class = "attribute-as" value="{{as}}" readonly>
                     </div>
                     <label class = "error-message"></label>
                 </div>
@@ -1621,7 +1626,7 @@
         </div>
         <div id="aggregation-from-div" class="aggregation-info">
             <label> From </label>
-            <input id="aggregation-from" class="clearfix name" value="{{from}}" readonly>
+            <input type = "text" id="aggregation-from" class="clearfix name" value="{{from}}" readonly>
         </div>
         <div id="define-aggregate-annotations">
             <h4> Annotations </h4>
@@ -1754,7 +1759,7 @@
     </div>
     <div class="define-query-into define-output-content">
         <label> Into </label>
-        <input class="clearfix name query-into" value="{{into}}" readonly>
+        <input type = "text" class="clearfix name query-into" value="{{into}}" readonly>
     </div>
     <div class="define-output-events define-output-content"> </div>
 </script>
@@ -1953,7 +1958,7 @@
         </div>
         <div class="query-from-div">
             <label> From </label>
-            <input class="clearfix name query-from" value="{{from}}" readonly>
+            <input type = "text" class="clearfix name query-from" value="{{from}}" readonly>
         </div>
         <div class="define-query-source define-source">
             <div class="define-stream-handler">
@@ -2414,6 +2419,7 @@
             js_tree: "commons/lib/js-tree-v3.3.2/jstree",
             render_json: "commons/lib/renderjson/renderjson",
             nano_scroller: "commons/lib/nanoscroller_0.8.7/jquery.nanoscroller.min",
+            perfect_scrollbar: "commons/lib/perfect-scrollbar-1.4.0/perfect-scrollbar",
             theme_wso2: "commons/lib/theme-wso2-2.0.0/js/theme-wso2.min",
             ace: "commons/lib/ace-editor",
             overlay_scroller: "commons/lib/overlay_scroll/js/jquery.overlayScrollbars.min",
@@ -2769,8 +2775,9 @@
                     "condition."
                 }
             ],
-            query_condition_syntax: ["==", ">=", ">", "<=", "<", "&&", "||", "AND", "OR"],
-            other_query_syntax: ["snapshot", "every", "within"],
+            query_operators: ["==", ">=", ">", "<=", "<", "AND", "OR", "NOT", "IN", "IS NULL"],
+            output_rate_limit_keywords: ["snapshot", "every", "within", "events", "ALL", "LAST", "FIRST"],
+            logic_statement_keywords: ["for", "every", "within"],
             incremental_aggregator: ["sum", "min", "max", "avg", "count", "distinctCount"],
             join_types: ["join", "left_outer_join", "right_outer_join", "full_outer_join"],
             stream_handler_types: ["filter", "function","window"],

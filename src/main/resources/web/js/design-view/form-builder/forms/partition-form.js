@@ -90,12 +90,14 @@ define(['require', 'log', 'jquery', 'lodash', 'partitionWith', 'jsonValidator', 
 
                     // close the form window
                     self.consoleListManager.removeFormConsole(formConsole);
+                    self.consoleListManager.removeAllConsoles();
                 } else {
-                    var propertyDiv = $('<div class = "partition-form-container"> <div id = "define-partition-keys"> </div> ' +
-                        self.formUtils.buildFormButtons() + '</div>' +
-                        '<div class = "partition-form-container"> <div class = "define-annotation"> </div> </div>');
+                    var propertyDiv = $('<div class="clearfix form-min-width"> <div class = "partition-form-container"> ' +
+                        '<div id = "define-partition-keys"> </div> </div>' +
+                        '<div class = "partition-form-container"> <div class = "define-annotation"> </div> </div> </div>');
 
-                    formContainer.append(propertyDiv);
+                    formContainer.html(propertyDiv);
+                    self.formUtils.buildFormButtons(formConsole.cid);
                     self.formUtils.popUpSelectedElement(id);
                     // design view container and toggle view button are enabled
                     self.designViewContainer.addClass('disableContainer');
@@ -134,8 +136,10 @@ define(['require', 'log', 'jquery', 'lodash', 'partitionWith', 'jsonValidator', 
                     self.formUtils.addEventListenerToRemoveRequiredClass();
                     self.formUtils.addEventListenerToShowInputContentOnHover();
 
+                    self.formUtils.initPerfectScroller(formConsole.cid);
+
                     // 'Submit' button action
-                    $(formContainer).on('click', '#btn-submit', function () {
+                    $('#' + formConsole.cid).on('click', '#btn-submit', function () {
 
                         self.formUtils.removeErrorClass();
                         var isErrorOccurred = false;
@@ -198,8 +202,7 @@ define(['require', 'log', 'jquery', 'lodash', 'partitionWith', 'jsonValidator', 
                     });
 
                     // 'Cancel' button action
-                    var cancelButtonElement = $(formContainer).find('#btn-cancel')[0];
-                    cancelButtonElement.addEventListener('click', function () {
+                    $('#' + formConsole.cid).on('click', '#btn-cancel', function () {
                         // close the form window
                         self.consoleListManager.removeFormConsole(formConsole);
                     });

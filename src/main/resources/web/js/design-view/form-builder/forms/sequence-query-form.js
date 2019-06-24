@@ -75,22 +75,17 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOrderByValue'
         };
 
         /**
-         * @function to add autocompletion for input fields
+         * @function add autocomplete for fields with changing attributes
          */
-        var addAutoCompletion = function (self, partitionId, QUERY_CONDITION_SYNTAX, QUERY_SYNTAX,
-                                          incrementalAggregator, streamFunctions, outputAttributes) {
+        var autoCompleteFieldsWithChangingAttributes = function (self, partitionId, outputAttributes) {
             var possibleAttributes = getPossibleAttributes(self, partitionId);
-            var selectExpressionMatches = _.cloneDeep(possibleAttributes);
-            selectExpressionMatches = selectExpressionMatches.concat(incrementalAggregator);
-            selectExpressionMatches = selectExpressionMatches.concat(streamFunctions);
-            var filterMatches = _.cloneDeep(possibleAttributes);
-            filterMatches = filterMatches.concat(QUERY_CONDITION_SYNTAX);
-            filterMatches = filterMatches.concat(outputAttributes);
-            var logicMatches = filterMatches.concat(QUERY_SYNTAX);
-            logicMatches = logicMatches.concat(Constants.SIDDHI_TIME);
-            self.formUtils.createAutocomplete($('.attribute-expression'), selectExpressionMatches);
-            self.formUtils.createAutocomplete($('.logic-statement'), logicMatches);
-            self.formUtils.createAutocomplete($('.symbol-syntax-required-value'), filterMatches);
+            self.formUtils.addAutoCompleteForSelectExpressions(possibleAttributes);
+            self.formUtils.addAutoCompleteForFilterConditions(possibleAttributes.concat(outputAttributes));
+            self.formUtils.addAutoCompleteForLogicStatements();
+            self.formUtils.addAutoCompleteForHavingCondition(possibleAttributes.concat(outputAttributes));
+            self.formUtils.addAutoCompleteForOnCondition(possibleAttributes.concat(outputAttributes),
+                self.formUtils.getPatternSequenceInputs());
+            self.formUtils.addAutoCompleteForOutputOperation(outputAttributes, possibleAttributes);
         };
 
         /**
@@ -130,6 +125,17 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOrderByValue'
         };
 
         /**
+         * @function to add new filter stream handler
+         */
+        var addEventListenerToAddNewFilter = function (self, partitionId, outputAttributes) {
+            $('.define-stream-handler').on('click', '.btn-add-filter', function () {
+                var sourceDiv = self.formUtils.getSourceDiv($(this));
+                self.formUtils.addNewStreamHandler(sourceDiv, Constants.FILTER);
+                autoCompleteFieldsWithChangingAttributes(self, partitionId, outputAttributes);
+            });
+        };
+
+        /**
          * @function generate the form for the sequence query
          * @param element selected element(query)
          * @param formConsole Console which holds the form
@@ -144,24 +150,24 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOrderByValue'
                 || sequenceQueryObject.getQueryInput().getConnectedElementNameList().length === 0) {
                 DesignViewUtils.prototype.warnAlert('Connect input streams');
                 self.consoleListManager.removeFormConsole(formConsole);
+                self.consoleListManager.removeAllConsoles();
             } else if (!self.formUtils.isOneElementFilled(sequenceQueryObject.getQueryInput().getConnectedElementNameList())) {
                 DesignViewUtils.prototype.warnAlert('Fill the incomplete input stream');
                 self.consoleListManager.removeFormConsole(formConsole);
+                self.consoleListManager.removeAllConsoles();
             } else if (!sequenceQueryObject.getQueryOutput() || !sequenceQueryObject.getQueryOutput().getTarget()) {
                 DesignViewUtils.prototype.warnAlert('Connect an output element');
                 self.consoleListManager.removeFormConsole(formConsole);
+                self.consoleListManager.removeAllConsoles();
             } else {
-                var propertyDiv = $('<div id="define-sequence-query"></div>' + self.formUtils.buildFormButtons());
-                formContainer.append(propertyDiv);
+                var propertyDiv = $('<div id="define-sequence-query" class="clearfix form-min-width"></div>');
+                formContainer.html(propertyDiv);
+                self.formUtils.buildFormButtons(formConsole.cid);
 
                 self.designViewContainer.addClass('disableContainer');
                 self.toggleViewButton.addClass('disableContainer');
                 self.formUtils.popUpSelectedElement(id);
 
-                var QUERY_CONDITION_SYNTAX = self.configurationData.application.config.query_condition_syntax;
-                var QUERY_SYNTAX = self.configurationData.application.config.other_query_syntax;
-
-                var incrementalAggregator = self.configurationData.application.config.incremental_aggregator;
                 var queryName = sequenceQueryObject.getQueryName();
                 var conditionList = sequenceQueryObject.getQueryInput().getConditionList();
                 var logic = sequenceQueryObject.getQueryInput().getLogic();
@@ -186,13 +192,11 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOrderByValue'
                 var outputElement = self.configurationData.getSiddhiAppConfig()
                     .getDefinitionElementByName(outputElementName, partitionId);
 
-                var predefinedAnnotations = _.cloneDeep(self.configurationData.application.config.
-                    type_query_predefined_annotations);
-                var streamFunctions = self.formUtils.getStreamFunctionNames();
+                var predefinedAnnotations = _.cloneDeep(self.configurationData.application.config.type_query_predefined_annotations);
 
                 //render the sequence-query form template
                 var sequenceFormTemplate = Handlebars.compile($('#pattern-sequence-query-form-template').html())
-                ({ name: queryName });
+                ({name: queryName});
                 $('#define-sequence-query').html(sequenceFormTemplate);
                 self.formUtils.renderQueryOutput(outputElement, queryOutput);
                 self.formUtils.renderOutputEventTypes();
@@ -211,6 +215,7 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOrderByValue'
                     } else {
                         parent.find('.query-content').hide();
                     }
+                    self.formUtils.updatePerfectScroller();
                 });
 
                 var eventType = Constants.CURRENT_EVENTS;
@@ -243,7 +248,7 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOrderByValue'
 
                 //conditions
                 if (!conditionList || (conditionList && conditionList.length == 0)) {
-                    conditionList = [{ conditionId: "e1", streamHandlerList: [], streamName: "" }];
+                    conditionList = [{conditionId: "e1", streamHandlerList: [], streamName: ""}];
                     queryInput.setConditionList(conditionList);
                 }
                 self.formUtils.renderConditions(conditionList, inputStreamNames);
@@ -251,7 +256,7 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOrderByValue'
                 self.formUtils.selectFirstConditionByDefault();
                 var streamHandlerList = getStreamHandlers(conditionList);
                 self.formUtils.addEventListenersForStreamHandlersDiv(streamHandlerList);
-                self.formUtils.addEventListenersForConditionDiv(inputStreamNames);
+                self.formUtils.addEventListenersForConditionDiv();
 
                 var outputAttributes = [];
                 if (outputElement.type.toLowerCase() === Constants.STREAM ||
@@ -308,66 +313,59 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOrderByValue'
                     validateSectionsOnLoadOfForm(self);
                 }
 
-                addAutoCompletion(self, partitionId, QUERY_CONDITION_SYNTAX, QUERY_SYNTAX, incrementalAggregator,
-                    streamFunctions, outputAttributes);
-
-                var inputAttributes = self.formUtils.getInputAttributes(inputStreamNames);
-                var outputAttributesWithElementName = self.formUtils.constructOutputAttributes(outputAttributes);
-                self.formUtils.addAutoCompleteForOutputOperation(outputAttributesWithElementName, inputAttributes);
-
-                $('.define-stream-handler').on('click', '.btn-add-filter', function () {
-                    var sourceDiv = self.formUtils.getSourceDiv($(this));
-                    self.formUtils.addNewStreamHandler(sourceDiv, Constants.FILTER);
-                    addAutoCompletion(self, partitionId, QUERY_CONDITION_SYNTAX, QUERY_SYNTAX, incrementalAggregator,
-                        streamFunctions, outputAttributes);
+                var inputAttributes = [];
+                _.forEach(self.formUtils.getInputAttributes(inputStreamNames), function (attribute) {
+                    inputAttributes.push(attribute.name);
                 });
+                var outputAttributesWithElementName = self.formUtils.constructOutputAttributes(outputAttributes);
+                self.formUtils.addAutoCompleteForRateLimits();
+                autoCompleteFieldsWithChangingAttributes(self, partitionId, outputAttributesWithElementName);
+
+                addEventListenerToAddNewFilter(self, partitionId, outputAttributesWithElementName);
 
                 $('.define-conditions').on('click', '.btn-del-condition', function () {
-                    var conditionIndex = $(this).closest('li').index();
+                    var conditionIndex = $(this).closest('.condition-navigation').index();
+                    var prevCondition = conditionIndex - 1;
+                    $('.define-conditions .nav-tabs .condition-navigation:eq(' + prevCondition + ')').addClass('active');
+                    $('.define-conditions .tab-pane:eq(' + prevCondition + ')').addClass('active');
                     $('.define-conditions .tab-pane:eq(' + conditionIndex + ')').remove();
                     $(this).closest('li').remove();
                     generateDivRequiringPossibleAttributes(self, partitionId, groupBy);
-                    addAutoCompletion(self, partitionId, QUERY_CONDITION_SYNTAX, QUERY_SYNTAX, incrementalAggregator,
-                        streamFunctions, outputAttributes);
+                    autoCompleteFieldsWithChangingAttributes(self, partitionId, outputAttributesWithElementName);
                 });
 
                 $('.define-conditions').on('click', '.btn-add-condition', function () {
-                    var conditionLength = $('.condition-navigation').length + 1;
-                    var conditionName = 'e' + conditionLength;
-                    var conditionList = [{ conditionId: conditionName, streamHandlerList: [], streamName: "" }]
-                    self.formUtils.renderConditions(conditionList, inputStreamNames)
+                    self.formUtils.addNewCondition(inputStreamNames);
                     generateDivRequiringPossibleAttributes(self, partitionId, groupBy);
-                    addAutoCompletion(self, partitionId, QUERY_CONDITION_SYNTAX, QUERY_SYNTAX, incrementalAggregator,
-                        streamFunctions, outputAttributes);
+                    autoCompleteFieldsWithChangingAttributes(self, partitionId, outputAttributesWithElementName);
+                    addEventListenerToAddNewFilter(self, partitionId, outputAttributesWithElementName);
                 });
 
                 $('.define-conditions').on('blur', '.condition-id', function () {
                     generateDivRequiringPossibleAttributes(self, partitionId, groupBy);
-                    addAutoCompletion(self, partitionId, QUERY_CONDITION_SYNTAX, QUERY_SYNTAX, incrementalAggregator,
-                        streamFunctions, outputAttributes);
+                    autoCompleteFieldsWithChangingAttributes(self, partitionId, outputAttributes);
                 });
 
                 $('.define-conditions').on('change', '.condition-stream-name-selection', function () {
                     generateDivRequiringPossibleAttributes(self, partitionId, groupBy);
-                    addAutoCompletion(self, partitionId, QUERY_CONDITION_SYNTAX, QUERY_SYNTAX, incrementalAggregator,
-                        streamFunctions, outputAttributes);
+                    autoCompleteFieldsWithChangingAttributes(self, partitionId, outputAttributesWithElementName);
                 });
 
                 //to add query operation set
-                var setDiv = '<li class="setAttribute">' +
+                var setDiv = '<li class="setAttributeValue">' +
                     '<div class="clearfix">' +
                     '<input type="text" class="setAttribute"> <input type="text" class="setValue"> ' +
                     '<a class = "btn-del-option"> <i class = "fw fw-delete"> </i> </a>' +
                     '</div> <label class="error-message"> </label> </li>'
                 $('.define-operation-set-condition').on('click', '.btn-add-set', function () {
                     $('.define-operation-set-condition .set-condition').append(setDiv);
-                    self.formUtils.addAutoCompleteForOutputOperation(outputAttributesWithElementName, inputAttributes);
+                    autoCompleteFieldsWithChangingAttributes(self, partitionId, outputAttributesWithElementName);
+                    self.formUtils.updatePerfectScroller();
                 });
 
-                var rateLimitingMatches = QUERY_SYNTAX.concat(Constants.SIDDHI_TIME);
-                self.formUtils.createAutocomplete($('.rate-limiting-value'), rateLimitingMatches);
+                self.formUtils.initPerfectScroller(formConsole.cid);
 
-                $(formContainer).on('click', '#btn-submit', function () {
+                $('#' + formConsole.cid).on('click', '#btn-submit', function () {
 
                     self.formUtils.removeErrorClass();
                     var isErrorOccurred = false;
@@ -486,9 +484,7 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOrderByValue'
                     }
                 })
 
-                // 'Cancel' button action
-                var cancelButtonElement = $(formContainer).find('#btn-cancel')[0];
-                cancelButtonElement.addEventListener('click', function () {
+                $('#' + formConsole.cid).on('click', '#btn-cancel', function () {
                     // close the form window
                     self.consoleListManager.removeFormConsole(formConsole);
                 });

@@ -236,15 +236,18 @@ define(['require', 'log', 'jquery', 'lodash', 'aggregateByTimePeriod', 'querySel
             var self = this;
             var id = $(element).parent().attr('id');
             var aggregationObject = self.configurationData.getSiddhiAppConfig().getAggregation(id);
+            var previousAggregationObject = _.cloneDeep(aggregationObject);
 
             if (!aggregationObject.getConnectedSource()) {
                 $('#' + id).addClass('incomplete-element');
                 DesignViewUtils.prototype.warnAlert('Connect an input stream element');
                 self.consoleListManager.removeFormConsole(formConsole);
+                self.consoleListManager.removeAllConsoles();
             } else {
-                var propertyDiv = $('<div id = "define-aggregation"> </div>' + self.formUtils.buildFormButtons());
+                var propertyDiv = $('<div id = "define-aggregation" class="clearfix form-min-width"> </div>');
 
-                formContainer.append(propertyDiv);
+                formContainer.html(propertyDiv);
+                self.formUtils.buildFormButtons(formConsole.cid);
                 self.designViewContainer.addClass('disableContainer');
                 self.toggleViewButton.addClass('disableContainer');
                 self.formUtils.popUpSelectedElement(id);
@@ -265,15 +268,13 @@ define(['require', 'log', 'jquery', 'lodash', 'aggregateByTimePeriod', 'querySel
                 var aggregateByTimePeriod = aggregationObject.getAggregateByTimePeriod();
 
                 var predefinedStores = _.orderBy(this.configurationData.rawExtensions["store"], ['name'], ['asc']);
-                var predefinedAggregationAnnotations = _.cloneDeep(self.configurationData.application.config.
-                    type_aggregation_predefined_annotations);
+                var predefinedAggregationAnnotations = _.cloneDeep
+                (self.configurationData.application.config.type_aggregation_predefined_annotations);
                 var connectedElement = self.configurationData.getSiddhiAppConfig().getDefinitionElementByName(connectedSource);
-                var incrementalAggregator = self.configurationData.application.config.incremental_aggregator;
-                var streamFunctions = self.formUtils.getStreamFunctionNames();
 
                 //render the aggregation form template
                 var aggregationFormTemplate = Handlebars.compile($('#aggregation-form-template').html())
-                ({ name: name, from: connectedSource });
+                ({name: name, from: connectedSource});
                 $('#define-aggregation').html(aggregationFormTemplate);
 
                 self.formUtils.addEventListenerToRemoveRequiredClass();
@@ -351,6 +352,7 @@ define(['require', 'log', 'jquery', 'lodash', 'aggregateByTimePeriod', 'querySel
                     } else {
                         $('.aggregate-by-attribute-content').hide();
                     }
+                    self.formUtils.updatePerfectScroller();
                 });
 
                 $('#define-aggregate-by').on('change', '.aggregate-by-time-period-selection', function () {
@@ -426,17 +428,17 @@ define(['require', 'log', 'jquery', 'lodash', 'aggregateByTimePeriod', 'querySel
                 }
 
                 //create autocompletion
-                var selectExpressionMatches = _.cloneDeep(possibleAttributes);
-                selectExpressionMatches = selectExpressionMatches.concat(incrementalAggregator);
-                selectExpressionMatches = selectExpressionMatches.concat(streamFunctions)
-                selectExpressionMatches.push(Constants.AS);
-                self.formUtils.createAutocomplete($('.attribute-expression-as'), selectExpressionMatches);
+                self.formUtils.addAutoCompleteForSelectExpressions(possibleAttributes, Constants.AGGREGATION);
+
                 $('.define-select').on('click', '.btn-add-user-defined-attribute', function () {
                     self.formUtils.appendUserSelectAttribute();
-                    self.formUtils.createAutocomplete($('.attribute-expression-as:last'), selectExpressionMatches);
+                    self.formUtils.addAutoCompleteForSelectExpressions(possibleAttributes, Constants.AGGREGATION);
+                    self.formUtils.updatePerfectScroller();
                 });
 
-                $(formContainer).on('click', '#btn-submit', function () {
+                self.formUtils.initPerfectScroller(formConsole.cid);
+
+                $('#' + formConsole.cid).on('click', '#btn-submit', function () {
 
                     self.formUtils.removeErrorClass();
                     var isErrorOccurred = false;
@@ -460,7 +462,7 @@ define(['require', 'log', 'jquery', 'lodash', 'aggregateByTimePeriod', 'querySel
                             return;
                         }
                         if (self.formUtils.validateAttributeOrElementName("#aggregationName", Constants.AGGREGATION,
-                                aggregationName)) {
+                            aggregationName)) {
                             isErrorOccurred = true;
                             return;
                         }
@@ -491,15 +493,7 @@ define(['require', 'log', 'jquery', 'lodash', 'aggregateByTimePeriod', 'querySel
 
                         aggregationObject.setConnectedSource($('#aggregation-from').val().trim());
 
-                        var outConnections = self.jsPlumbInstance.getConnections({ source: id + '-out' });
-                        var inConnections = self.jsPlumbInstance.getConnections({ target: id + '-in' });
-                        // delete connections related to the element if the name is changed
-                        self.formUtils.deleteConnectionsAfterDefinitionElementNameChange(outConnections, inConnections);
-                        // update selected aggregation model
                         aggregationObject.setName(aggregationName);
-                        // establish connections related to the element if the name is changed
-                        self.formUtils.establishConnectionsAfterDefinitionElementNameChange(outConnections, inConnections);
-
                         var textNode = $('#' + id).find('.aggregationNameNode');
                         textNode.html(aggregationName);
 
@@ -570,6 +564,22 @@ define(['require', 'log', 'jquery', 'lodash', 'aggregateByTimePeriod', 'querySel
                         var aggregateByTimePeriod = new AggregateByTimePeriod(aggregateByTimePeriodOptions);
                         aggregationObject.setAggregateByTimePeriod(aggregateByTimePeriod);
 
+                        if (self.formUtils.isUpdatingOtherElementsRequired(previousAggregationObject, aggregationObject,
+                            Constants.AGGREGATION)) {
+                            var outConnections = self.jsPlumbInstance.getConnections({source: id + '-out'});
+                            var inConnections = [];
+
+                            //to delete the connection, it requires the previous object name
+                            aggregationObject.setName(previousAggregationObject.getName())
+                            // delete connections related to the element if the name is changed
+                            self.formUtils.deleteConnectionsAfterDefinitionElementNameChange(outConnections, inConnections);
+                            //reset the name to new name
+                            aggregationObject.setName(aggregationName);
+
+                            // establish connections related to the element if the name is changed
+                            self.formUtils.establishConnectionsAfterDefinitionElementNameChange(outConnections, inConnections);
+                        }
+
                         JSONValidator.prototype.validateAggregation(aggregationObject);
                         //Send aggregation element to the backend and generate tooltip
                         var aggregationToolTip = self.formUtils.getTooltip(aggregationObject, Constants.AGGREGATION);
@@ -582,8 +592,7 @@ define(['require', 'log', 'jquery', 'lodash', 'aggregateByTimePeriod', 'querySel
                 });
 
                 // 'Cancel' button action
-                var cancelButtonElement = $(formContainer).find('#btn-cancel')[0];
-                cancelButtonElement.addEventListener('click', function () {
+                $('#' + formConsole.cid).on('click', '#btn-cancel', function () {
                     // close the form aggregation
                     self.consoleListManager.removeFormConsole(formConsole);
                 });

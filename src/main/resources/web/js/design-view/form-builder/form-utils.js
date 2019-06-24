@@ -18,10 +18,10 @@
 
 define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annotationObject', 'annotationElement',
         'designViewUtils', 'queryWindowOrFunction', 'streamHandler', 'patternOrSequenceQueryCondition', 'queryOutputInsert',
-        'queryOutputDelete', 'queryOutputUpdate', 'queryOutputUpdateOrInsertInto'],
+        'queryOutputDelete', 'queryOutputUpdate', 'queryOutputUpdateOrInsertInto', 'perfect_scrollbar'],
     function (require, _, AppData, log, Constants, Handlebars, AnnotationObject, AnnotationElement, DesignViewUtils,
               QueryWindowOrFunction, StreamHandler, PatternOrSequenceQueryCondition, QueryOutputInsert, QueryOutputDelete,
-              QueryOutputUpdate, QueryOutputUpdateOrInsertInto) {
+              QueryOutputUpdate, QueryOutputUpdateOrInsertInto, PerfectScrollbar) {
 
         /**
          * @class FormUtils Contains utility methods for forms
@@ -29,7 +29,8 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
          * @param {Object} configurationData Siddhi app data
          * @param {Object} jsPlumbInstance JsPlumb instance of the current tab
          */
-        var FormUtils = function (configurationData, jsPlumbInstance) {
+        var FormUtils = function (application, configurationData, jsPlumbInstance) {
+            this.application = application;
             this.configurationData = configurationData;
             this.jsPlumbInstance = jsPlumbInstance;
         };
@@ -167,6 +168,44 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
         };
 
         /**
+         * @function to determine if the other connection needs to be updated on click of submit
+         * @param previousObject object with the previous changes
+         * @param currentObject object with the new changes
+         * @param elementType
+         * @returns {boolean}
+         */
+        FormUtils.prototype.isUpdatingOtherElementsRequired = function (previousObject, currentObject, elementType) {
+            var isObjectChanged = false;
+            if (previousObject.getName()) {
+                if (previousObject.getName() !== currentObject.getName()) {
+                    isObjectChanged = true;
+                } else if (elementType === Constants.STREAM || elementType === Constants.TABLE ||
+                    elementType === Constants.WINDOW) {
+                    if (_.differenceWith(previousObject.getAttributeList(), currentObject.getAttributeList(),
+                        _.isEqual).length !== 0) {
+                        isObjectChanged = true;
+                    }
+                } else if (elementType === Constants.AGGREGATION) {
+                    if (!previousObject.getSelect()) {
+                        isObjectChanged = true;
+                    } else if (previousObject.getSelect().getType() != currentObject.getSelect().getType()) {
+                        isObjectChanged = true;
+                    } else if (previousObject.getSelect().getType().toLowerCase() == Constants.TYPE_USER_DEFINED) {
+                        if (_(previousObject.getSelect().getValue())
+                            .differenceBy(currentObject.getSelect().getValue(), 'expression', 'as')
+                            .map(_.partial(_.pick, _, 'expression', 'as'))
+                            .value().length !== 0) {
+                            isObjectChanged = true;
+                        }
+                    }
+                }
+            } else {
+                isObjectChanged = true;
+            }
+            return isObjectChanged;
+        };
+
+        /**
          * @function to delete the connections
          */
         FormUtils.prototype.deleteConnectionsAfterDefinitionElementNameChange = function (outConnections, inConnections) {
@@ -204,11 +243,10 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
          * @function Builds HTML for form buttons.
          * @returns {string} HTML string
          */
-        FormUtils.prototype.buildFormButtons = function () {
-            var html = '<div class="query-form-actions">' +
-                '<button type="button" id="btn-submit" class="btn btn-primary">Submit</button>' +
-                '<button type="button" id="btn-cancel" class="btn btn-default">Cancel</button> </div>';
-            return html;
+        FormUtils.prototype.buildFormButtons = function (formConsoleId) {
+            var buttonHtml = '<button type="button" id="btn-submit" class="btn btn-primary">Submit</button>' +
+                '<button type="button" id="btn-cancel" class="btn btn-default">Cancel</button>';
+            $('#' + formConsoleId).find('.query-form-actions').html(buttonHtml);
         };
 
         /**
@@ -281,7 +319,7 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
          */
         FormUtils.prototype.appendUserSelectAttribute = function () {
             var userSelectDiv = '<li class="attribute"> <div class="clearfix"> <div class="clearfix"> ' +
-                '<input type="text" class = "attribute-expression-as name" value=""><a class = "btn-del-option"> ' +
+                '<input type="text" class = "attribute-expression name" value=""><a class = "btn-del-option"> ' +
                 '<i class = "fw fw-delete"> </i></a> </div> <label class = "error-message"></label> ' +
                 '</div> </li>';
             $('.user-defined-attributes').append(userSelectDiv);
@@ -339,7 +377,7 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
                 });
                 $('.define-query-output .define-query-operation').append(queryOutputDiv);
                 //remove the first del button of the set attribute
-                $('.define-operation-set-condition .set-condition li:eq(0) .btn-del-option').remove();
+                $('.define-operation-set-condition .set-condition .setAttributeValue:eq(0) .btn-del-option').remove();
                 self.mapQueryOperation(queryOutput);
             } else {
                 var operationInsertDiv = '<input class="clearfix name query-operation" value="insert" readonly>';
@@ -460,6 +498,7 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
             });
             $('#' + id + '-options-div').html(optionsTemplate);
             self.changeCustomizedOptDiv(id);
+            self.updatePerfectScroller();
         };
 
         /**
@@ -492,7 +531,7 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
                 $('.define-conditions .tab-content').append(wrappedHtml);
             });
             //removes the first delete button
-            $('.define-conditions').find('.nav-tabs li:eq(0) .btn-del-condition').remove();
+            $('.define-conditions').find('.nav-tabs .condition-navigation :eq(0) .btn-del-condition').remove();
         };
 
         /**
@@ -557,6 +596,7 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
          * @param {String} parameterDiv div to embed the parameters
          */
         FormUtils.prototype.renderParameters = function (parameterArray, id, parameterDiv) {
+            var self = this;
             parameterArray.sort(function (val1, val2) {
                 if (val1.optional && !val2.optional) return 1;
                 else if (!val1.optional && val2.optional) return -1;
@@ -567,6 +607,7 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
                 parameters: parameterArray
             });
             $(parameterDiv).find('.defineFunctionParameters').html(parameterTemplate);
+            self.updatePerfectScroller();
         };
 
         /**
@@ -577,12 +618,14 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
          * @param {String} parameterDiv div to embed the parameters
          */
         FormUtils.prototype.renderUnknownParameters = function (parameters, supportedParameters, id, parameterDiv) {
+            var self = this;
             var parameterTemplate = Handlebars.compile($('#window-function-unknown-parameters-template').html())({
                 id: id,
                 parameters: parameters,
                 predefinedParameters: supportedParameters
             });
             $(parameterDiv).find('.defineFunctionParameters').html(parameterTemplate);
+            self.updatePerfectScroller();
         };
 
         /**
@@ -771,7 +814,7 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
             }
             self.renderUserDefinedAttributeSelection(attributes, "aggregate-projection");
             //removes the first delete button
-            $('.define-select').find('.user-defined-attributes li:eq(0) .btn-del-option').remove();
+            $('.define-select').find('.user-defined-attributes .attribute:eq(0) .btn-del-option').remove();
             self.selectAttributeSelection(selectedType);
         };
 
@@ -1092,7 +1135,7 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
             var operationType = $('.define-query-operation .operation-type-selection').val();
             if (operationType == Constants.UPDATE_OR_INSERT_INTO || operationType == Constants.UPDATE) {
                 if ($('.define-query-operation .set-checkbox').is(':checked')) {
-                    $('.define-operation-set-condition .set-condition li').each(function () {
+                    $('.define-operation-set-condition .set-condition .setAttributeValue').each(function () {
                         var setAttribute = $(this).find('.setAttribute');
                         var setValue = $(this).find('.setValue');
                         if ((setAttribute.val().trim() != "") || (setValue.val().trim() != "")) {
@@ -1116,7 +1159,7 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
                     });
 
                     if (!isErrorOccurred && noOfSet == 0) {
-                        var firstSet = $('.define-operation-set-condition .set-condition li:eq(0)')
+                        var firstSet = $('.define-operation-set-condition .set-condition .setAttributeValue:eq(0)')
                         self.addErrorClass(firstSet.find('.setAttribute'));
                         self.addErrorClass(firstSet.find('.setValue'));
                         firstSet.find('.error-message').text("Minimum one set is required");
@@ -1183,9 +1226,9 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
                     }
                 }
                 if (isErrorOccurred) {
-                    $(this).addClass('active');
                     var conditionIndex = $(this).index();
-                    $('.define-conditions .nav-tabs .active').removeClass('active');
+                    $('.define-conditions .active').removeClass('active')
+                    $(this).addClass('active');
                     $('.define-conditions .condition-navigation:eq(' + conditionIndex + ')').addClass('active');
                     return false;
                 }
@@ -1205,7 +1248,7 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
                 var checkBox = $(this).find('input:checkbox');
                 if ((checkBox.length == 0 || (checkBox.length > 0 && checkBox.is(":checked")))) {
                     var inputValue = $(this).find('input:text');
-                    if (inputValue.is("visible")) {
+                    if (inputValue.is(":visible")) {
                         if (inputValue.val().trim() == "") {
                             self.addErrorClass(inputValue);
                             $(className).find('.error-message').text('Value is required');
@@ -1240,7 +1283,7 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
             var isErrorOccurred = false;
             var streamHandlerDiv = $(div).find('.define-stream-handler');
             if ($(streamHandlerDiv).find('.stream-handler-checkbox').is(':checked')) {
-                $(streamHandlerDiv).find('.stream-handler-list li').each(function () {
+                $(streamHandlerDiv).find('.stream-handler-list .define-stream-handler-content').each(function () {
                     var streamHandlerContent = $(this).find('.define-stream-handler-type-content');
                     if (streamHandlerContent.hasClass('define-filter-stream-handler')) {
                         var filterCondition = streamHandlerContent.find('.filter-condition-content')
@@ -1382,7 +1425,11 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
                         .autocomplete({
                             delay: 0,
                             minLength: 0,
-                            source: $.proxy(this, "_source")
+                            classes: {
+                                "ui-autocomplete": "design-view-form-auto-complete design-view-combobox"
+                            },
+                            source: $.proxy(this, "_source"),
+                            appendTo: this.wrapper
                         })
                         .tooltip({
                             classes: {
@@ -1689,8 +1736,8 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
             var attributes = 0;
             var projectionType = $('.define-select .attribute-selection-type');
             if (projectionType.val() == Constants.TYPE_USER_DEFINED) {
-                $('.define-select .user-defined-attributes li').each(function () {
-                    var expressionAs = $(this).find('.attribute-expression-as');
+                $('.define-select .user-defined-attributes .attribute').each(function () {
+                    var expressionAs = $(this).find('.attribute-expression');
                     var expressionAsValue = expressionAs.val().trim();
                     var separateExpression = expressionAsValue.split(/as/i);
                     if (expressionAsValue != "") {
@@ -1715,9 +1762,9 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
 
                 if (attributes == 0) {
                     isErrorOccurred = true;
-                    var firstAttributeList = '.user-defined-attributes li:first';
+                    var firstAttributeList = '.user-defined-attributes .attribute:first';
                     $(firstAttributeList).find('.error-message').text("Minimum one attribute is required.")
-                    self.addErrorClass($(firstAttributeList).find('.attribute-expression-as'));
+                    self.addErrorClass($(firstAttributeList).find('.attribute-expression'));
                 }
             } else if (!projectionType.val()) {
                 isErrorOccurred = true;
@@ -1734,7 +1781,7 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
             var isErrorOccurred = false;
             var projectionType = $('.define-select .attribute-selection-type');
             if (projectionType.val() == Constants.TYPE_USER_DEFINED) {
-                $('.define-select .user-defined-attributes li').each(function () {
+                $('.define-select .user-defined-attributes .attribute').each(function () {
                     var expression = $(this).find('.attribute-expression').val().trim();
                     if (expression == "") {
                         isErrorOccurred = true;
@@ -1876,7 +1923,7 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
          */
         FormUtils.prototype.buildQueryExpressions = function () {
             var attributes = [];
-            $('.define-select .user-defined-attributes li').each(function () {
+            $('.define-select .user-defined-attributes .attribute').each(function () {
                 var expressionValue = $(this).find('.attribute-expression').val().trim();
                 var asValue = $(this).find('.attribute-as').val().trim();
                 var expressionObject = {
@@ -1893,18 +1940,18 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
          */
         FormUtils.prototype.buildAggregateExpressions = function () {
             var attributes = [];
-            $('.define-select .user-defined-attributes li').each(function () {
-                var expressionAsValue = $(this).find('.attribute-expression-as').val().trim();
-                if (expressionAsValue != "") {
+            $('.define-select .user-defined-attributes .attribute').each(function () {
+                var expressionAsValue = $(this).find('.attribute-expression').val().trim();
+                if (expressionAsValue !== "") {
                     var separateExpression = expressionAsValue.split(/as/i);
-                    if (separateExpression.length == 1) {
+                    if (separateExpression.length === 1) {
                         var expressionAs = {
                             expression: separateExpression[0].trim(),
                             as: ""
                         }
-                    } else if (separateExpression.length = 2) {
+                    } else if (separateExpression.length === 2) {
                         var asValue = "";
-                        if (separateExpression[0].trim() != separateExpression[1].trim()) {
+                        if (separateExpression[0].trim() !== separateExpression[1].trim()) {
                             asValue = separateExpression[1].trim();
                         }
                         var expressionAs = {
@@ -1954,7 +2001,7 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
                 var setCheckbox = $('.define-query-operation .set-checkbox');
                 if (setCheckbox.length != 0 && setCheckbox.is(":checked")) {
                     var sets = [];
-                    $('.define-operation-set-condition .set-condition li').each(function () {
+                    $('.define-operation-set-condition .set-condition .setAttributeValue').each(function () {
                         var setAttribute = $(this).find('.setAttribute').val().trim();
                         var setValue = $(this).find('.setValue').val().trim();
                         if ((setAttribute != "") && (setValue != "")) {
@@ -2012,7 +2059,7 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
             var self = this;
             var streamHandlers = [];
             if (sourceDiv.find('.stream-handler-checkbox').is(':checked')) {
-                sourceDiv.find('.stream-handler-list li').each(function () {
+                sourceDiv.find('.stream-handler-list .define-stream-handler-content').each(function () {
                     var streamHandlerOptions = {};
                     var streamHandlerContent = $(this).find('.define-stream-handler-type-content');
                     if (streamHandlerContent.hasClass('define-filter-stream-handler')) {
@@ -2318,7 +2365,7 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
          * @function to select the first condition as default
          */
         FormUtils.prototype.selectFirstConditionByDefault = function () {
-            $('.define-conditions .nav-tabs').find('li:first-child').addClass('active');
+            $('.define-conditions .nav-tabs').find('.condition-navigation:first-child').addClass('active');
             $('.define-conditions .tab-content').find('.tab-pane:first-child').addClass('active');
         };
 
@@ -3173,6 +3220,7 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
          * @function to add event listeners for jstree annotations
          */
         FormUtils.prototype.addEventListenersForJstree = function (tree) {
+            var self = this;
             //to add key-value for annotation node
             $("#btn-add-key-val").on("click", function () {
                 var selectedNode = $("#annotation-div").jstree("get_selected");
@@ -3188,6 +3236,7 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
                 );
                 tree.open_node(selectedNode);
                 tree.deselect_all();
+                self.updatePerfectScroller();
             });
 
             //to add annotation node
@@ -3211,6 +3260,7 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
                 });
                 tree.open_node(selectedNode);
                 tree.deselect_all();
+                self.updatePerfectScroller();
             });
 
             //to delete an annotation or a key-value node
@@ -3218,6 +3268,7 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
                 var selectedNode = $("#annotation-div").jstree("get_selected");
                 tree.delete_node([selectedNode]);
                 tree.deselect_all();
+                self.updatePerfectScroller();
             })
 
             //to edit the selected node
@@ -3269,12 +3320,14 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
                 } else {
                     $('.group-by-content').hide();
                 }
+                self.updatePerfectScroller();
             });
 
             $('.btn-add-group-by-attribute').on('click', function () {
                 self.appendGroupBy(possibleAttributes);
                 self.preventMultipleSelection(Constants.GROUP_BY);
                 self.checkForAttributeLength(possibleAttributes.length, Constants.GROUP_BY);
+                self.updatePerfectScroller();
             });
 
             $('.define-group-by-attributes').on('change', '.group-by-selection', function () {
@@ -3286,6 +3339,7 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
                 $(this).closest('li').remove();
                 self.preventMultipleSelection(Constants.GROUP_BY);
                 self.checkForAttributeLength(possibleAttributes.length, Constants.GROUP_BY);
+                self.updatePerfectScroller();
             });
         };
 
@@ -3293,6 +3347,7 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
          * @function to add event listeners for parameter division
          */
         FormUtils.prototype.addEventListenersForParameterDiv = function () {
+            var self = this;
             //event listener when the parameter checkbox is changed
             $('.defineFunctionParameters').on('change', '.parameter-checkbox', function () {
                 var parameterParent = $(this).parents(".parameter");
@@ -3303,11 +3358,13 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
                     parameterParent.find(".parameter-value").removeClass("required-input-field");
                     parameterParent.find(".error-message").text("");
                 }
+                self.updatePerfectScroller();
             });
 
             //event listener to delete an attribute of the attribute parameters
             $('.defineFunctionParameters').on('click', '.btn-del-option', function () {
                 $(this).parents('.attribute-param-value').remove();
+                self.updatePerfectScroller();
             });
 
             var attributeParam =  '<div class="attribute-param-value">' +
@@ -3315,7 +3372,8 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
                 '<a class = "btn-del-option"> <i class = "fw fw-delete"> </i></a> </div>';
             //event listener to add an attribute of the attribute parameter
             $('.btn-add-param-attribute').on('click', function () {
-                $(this).parents('.attribute-param').append(attributeParam)
+                $(this).parents('.attribute-param').append(attributeParam);
+                self.updatePerfectScroller();
             });
         };
 
@@ -3335,56 +3393,255 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
         /**
          * @function to get the attributes of the streams connected to pattern/sequence query
          */
-        FormUtils.prototype.getInputAttributes = function (inputStreams) {
+        FormUtils.prototype.getInputAttributes = function (inputElementNames) {
             var self = this;
             var attributes = [];
-            _.forEach(inputStreams, function (stream) {
-                if (stream) {
+            _.forEach(inputElementNames, function (inputElementName) {
+                if (inputElementName) {
                     var inputElement = self.configurationData.getSiddhiAppConfig()
-                        .getDefinitionElementByName(stream);
+                        .getDefinitionElementByName(inputElementName);
                     if (inputElement.type.toLowerCase() === Constants.TRIGGER) {
-                        attributes.push(Constants.TRIGGERED_TIME);
+                        attributes.push({name: Constants.TRIGGERED_TIME});
+                    } else if (inputElement.type.toLowerCase() === Constants.AGGREGATION) {
+                        attributes = attributes.concat(self.getInputAttributesForAggregation(inputElement))
                     } else {
-                        _.forEach(inputElement.element.getAttributeList(), function (attribute) {
-                            attributes.push(attribute.getName());
-                        });
+                        attributes = attributes.concat(inputElement.element.getAttributeList());
                     }
                 }
-            })
+            });
+            return attributes;
+        };
+
+        /**
+         * @function to get the attributes of the connected aggregation element
+         * @param aggregationElement
+         */
+        FormUtils.prototype.getInputAttributesForAggregation = function (aggregationElement) {
+            var self = this;
+            var attributes = [];
+            var selectType = aggregationElement.element.getSelect().getType().toLowerCase();
+            if (selectType === Constants.TYPE_ALL) {
+                var elementConnectedToAggregation = self.configurationData.getSiddhiAppConfig().getDefinitionElementByName(aggregationElement.element.getConnectedSource());
+                if (elementConnectedToAggregation.type === Constants.STREAM) {
+                    attributes = elementConnectedToAggregation.element.getAttributeList();
+                } else {
+                    attributes.push({name: Constants.TRIGGERED_TIME});
+                }
+            } else {
+                _.forEach(aggregationElement.element.getSelect().getValue(), function (selectAttribute) {
+                    if (selectAttribute.as.trim() === "") {
+                        attributes.push({name: selectAttribute.expression})
+                    } else {
+                        attributes.push({name: selectAttribute.as})
+                    }
+                });
+            }
             return attributes;
         };
 
         /**
          * @function to add auto completion for query output operation section
          */
-        FormUtils.prototype.addAutoCompleteForOutputOperation = function (outputAttributesWithStreamName, inputAttributes) {
+        FormUtils.prototype.addAutoCompleteForOutputOperation = function (outputAttributes, inputAttributes) {
             var self = this;
-            var outputOperationMatches = outputAttributesWithStreamName.concat(inputAttributes);
-            self.createAutocomplete($('.define-query-operation input[type="text"]'), outputOperationMatches);
+            self.createAutocomplete($('.setAttribute'),
+                self.addLabelsForAutocompleteDropDowns(outputAttributes, Constants.ATTRIBUTE));
+            self.createAutocomplete($('.setValue'),
+                self.addLabelsForAutocompleteDropDowns(inputAttributes, Constants.ATTRIBUTE));
         };
+
+        /**
+         * @function to add auto-complete for select expression
+         */
+        FormUtils.prototype.addAutoCompleteForSelectExpressions = function (attributes, elementType) {
+            var self = this;
+            var incrementalAggregator = self.addLabelsForAutocompleteDropDowns
+            (self.configurationData.application.config.incremental_aggregator, Constants.AGGREGATE_FUNCTION);
+            var streamFunctions = self.addLabelsForAutocompleteDropDowns
+            (self.getStreamFunctionNames(), Constants.STREAM_FUNCTION);
+            var selectExpressionMatches = self.addLabelsForAutocompleteDropDowns
+            (attributes, Constants.ATTRIBUTE);
+            selectExpressionMatches = selectExpressionMatches.concat(incrementalAggregator);
+            selectExpressionMatches = selectExpressionMatches.concat(streamFunctions);
+            if (elementType === Constants.AGGREGATION) {
+                selectExpressionMatches = selectExpressionMatches.concat(self.addLabelsForAutocompleteDropDowns
+                ([Constants.AS], Constants.KEYWORD));
+            }
+            self.createAutocomplete($('.attribute-expression'), selectExpressionMatches);
+        };
+
+        /**
+         * @function to add auto-complete for filter conditions
+         */
+        FormUtils.prototype.addAutoCompleteForFilterConditions = function (attributes) {
+            var self = this;
+            var queryOperators = self.addLabelsForAutocompleteDropDowns
+            (self.configurationData.application.config.query_operators, Constants.OPERATOR)
+            var incrementalAggregator = self.addLabelsForAutocompleteDropDowns
+            (self.configurationData.application.config.incremental_aggregator, Constants.AGGREGATE_FUNCTION);
+            var streamFunctions = self.addLabelsForAutocompleteDropDowns
+            (self.getStreamFunctionNames(), Constants.STREAM_FUNCTION);
+            var filterMatches = self.addLabelsForAutocompleteDropDowns
+            (attributes, Constants.ATTRIBUTE).concat(incrementalAggregator);
+            filterMatches = filterMatches.concat(streamFunctions);
+            filterMatches = filterMatches.concat(queryOperators);
+            self.createAutocomplete($('.filter-condition-content '), filterMatches);
+        };
+
+        /**
+         * @function to add auto-complete for rate limits[query output]
+         */
+        FormUtils.prototype.addAutoCompleteForRateLimits = function () {
+            var self = this;
+            var keywords = self.addLabelsForAutocompleteDropDowns
+            (self.configurationData.application.config.output_rate_limit_keywords, Constants.KEYWORD)
+            var rateLimitingMatches = keywords.concat(self.addLabelsForAutocompleteDropDowns
+            (Constants.SIDDHI_TIME, Constants.TIME));
+            self.createAutocomplete($('.rate-limiting-value'), rateLimitingMatches);
+        };
+
+        /**
+         * @function to add auto-complete for logic statements in pattern and sequence queries
+         */
+        FormUtils.prototype.addAutoCompleteForLogicStatements = function () {
+            var self = this;
+            var conditionNames = self.addLabelsForAutocompleteDropDowns(self.getPatternSequenceInputs(), Constants.INPUT);
+            var keywords = self.addLabelsForAutocompleteDropDowns
+            (self.configurationData.application.config.logic_statement_keywords, Constants.KEYWORD);
+            var queryOperators = self.addLabelsForAutocompleteDropDowns
+            (self.configurationData.application.config.query_operators, Constants.OPERATOR);
+            var logicMatches = conditionNames.concat(keywords);
+            logicMatches = logicMatches.concat(queryOperators);
+            self.createAutocomplete($('.logic-statement'), logicMatches);
+        };
+
+        /**
+         * @function to get the condition id of pattern and sequence queries
+         * @returns {Array}
+         */
+        FormUtils.prototype.getPatternSequenceInputs = function () {
+            var conditionNames = [];
+            $('.condition-container .condition-id').each(function () {
+                var conditionName = $(this).val().trim();
+                if (conditionName !== "") {
+                    conditionNames.push(conditionName);
+                }
+            });
+            return conditionNames;
+        };
+
+        /**
+         * @function to add auto-complete for on condition in join and store queries
+         */
+        FormUtils.prototype.addAutoCompleteForOnCondition = function (attributes, inputSources) {
+            var self = this;
+            var queryOperators = self.addLabelsForAutocompleteDropDowns
+            (self.configurationData.application.config.query_operators, Constants.OPERATOR);
+            var incrementalAggregator = self.addLabelsForAutocompleteDropDowns
+            (self.configurationData.application.config.incremental_aggregator, Constants.AGGREGATE_FUNCTION);
+            var streamFunctions = self.addLabelsForAutocompleteDropDowns
+            (self.getStreamFunctionNames(), Constants.STREAM_FUNCTION);
+            var onConditionMatches = self.addLabelsForAutocompleteDropDowns(attributes, Constants.ATTRIBUTE);
+            onConditionMatches = onConditionMatches.concat(self.addLabelsForAutocompleteDropDowns
+            (inputSources, Constants.INPUT));
+            onConditionMatches = onConditionMatches.concat(incrementalAggregator);
+            onConditionMatches = onConditionMatches.concat(streamFunctions);
+            onConditionMatches = onConditionMatches.concat(queryOperators);
+            self.createAutocomplete($('.on-condition-value'), onConditionMatches);
+            self.createAutocomplete($('.define-operation-on-condition .query-content-value'), onConditionMatches)
+        };
+
+        /**
+         * @function to add auto-complete for per and within conditions in join query
+         */
+        FormUtils.prototype.addAutoCompleteForPerWithinConditions = function (attributes) {
+            var self = this;
+            var perWithinMatches = self.addLabelsForAutocompleteDropDowns(attributes, Constants.ATTRIBUTE);
+            perWithinMatches = perWithinMatches.concat(self.addLabelsForAutocompleteDropDowns
+            (Constants.SIDDHI_TIME, Constants.TIME));
+            self.createAutocomplete($('.per-within'), perWithinMatches);
+        };
+
+        /**
+         * @function to add auto-complete for having conditions in queries
+         */
+        FormUtils.prototype.addAutoCompleteForHavingCondition = function (attributes) {
+            var self = this;
+            var queryOperators = self.addLabelsForAutocompleteDropDowns
+            (self.configurationData.application.config.query_operators, Constants.OPERATOR);
+            var incrementalAggregator = self.addLabelsForAutocompleteDropDowns
+            (self.configurationData.application.config.incremental_aggregator, Constants.AGGREGATE_FUNCTION);
+            var streamFunctions = self.addLabelsForAutocompleteDropDowns
+            (self.getStreamFunctionNames(), Constants.STREAM_FUNCTION);
+            var havingMatches = self.addLabelsForAutocompleteDropDowns(attributes, Constants.ATTRIBUTE);
+            havingMatches = havingMatches.concat(incrementalAggregator);
+            havingMatches = havingMatches.concat(streamFunctions);
+            havingMatches = havingMatches.concat(queryOperators);
+            self.createAutocomplete($('.having-value'), havingMatches);
+        };
+
+
 
         /**
          * @function to show the input field content on hover
          */
         FormUtils.prototype.addEventListenerToShowInputContentOnHover = function () {
             var self = this;
-            var divToShowInputContent = '<div class="hovered-content" style="display: none"> </div>';
             $('.design-view-form-content').on('mouseover', 'input[type="text"]', function () {
                 var inputField = $(this);
-                if (!inputField.next().hasClass('hovered-content')) {
-                    inputField.after(divToShowInputContent);
+                if (!inputField.is("[data-toggle]")) {
+                    inputField.attr('data-toggle', 'popover');
+                    inputField.attr('data-placement', 'bottom');
                 }
+                inputField.popover({trigger: "hover", container: 'body'}).data('bs.popover').tip()
+                    .addClass('design-view-popover');
+
                 if (inputField.val().trim() != "" && self.isElementContentOverflown(inputField)) {
-                    inputField.next('.hovered-content').html(inputField.val().trim());
-                    inputField.next('.hovered-content').show();
+                    inputField.attr('data-content', inputField.val());
+                    inputField.popover('show');
+                } else {
+                    inputField.popover('hide');
                 }
             });
-            $('.design-view-form-content').on('mouseout', 'input[type="text"]', function () {
-                $(this).next('.hovered-content').hide();
-            });
-            $('.design-view-form-content').on('focus', 'input[type="text"]', function () {
-                $(this).next('.hovered-content').hide();
-            });
+        };
+
+        /**
+         * @function to return unique condition names
+         */
+        FormUtils.prototype.getUniqueConditionName = function () {
+            var conditionName;
+            var i = 1;
+            var isUnique = false;
+            while (!isUnique) {
+                conditionName = 'e' + i;
+                $('.condition-container .nav-tabs .condition-navigation').each(function () {
+                    var name = $(this).find('a').text().trim();
+                    if (name === conditionName) {
+                        isUnique = false;
+                        return false;
+                    } else {
+                        isUnique = true;
+                    }
+                });
+                i++;
+            }
+            return conditionName;
+        };
+
+        /**
+         * @function to add new pattern or sequence condition
+         * @param inputStreamNames
+         */
+        FormUtils.prototype.addNewCondition = function (inputStreamNames) {
+            var self = this;
+            var conditionName = self.getUniqueConditionName();
+            var conditionList = [{conditionId: conditionName, streamHandlerList: [], streamName: ""}];
+            self.renderConditions(conditionList, inputStreamNames);
+            self.mapConditions(conditionList);
+            self.addEventListenersForStreamHandlersDiv([]);
+            $('.define-conditions .active').removeClass('active');
+            $('.define-conditions .nav-tabs .condition-navigation:last').addClass('active');
+            $('.define-conditions .tab-pane:last').addClass('active');
         };
 
         /**
@@ -3414,6 +3671,7 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
          * @function to add event listeners for the attribute selection(projection) division
          */
         FormUtils.prototype.addEventListenersForSelectionDiv = function () {
+            var self = this;
             $('.define-select').on('change', '.attribute-selection-type', function () {
                 $('.attribute-selection-type').next('.error-message').hide();
                 if ($(this).val() === Constants.TYPE_USER_DEFINED) {
@@ -3421,10 +3679,12 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
                 } else {
                     $('.define-user-defined-attributes').hide();
                 }
+                self.updatePerfectScroller();
             });
 
             $('.define-select').on('click', '.btn-del-option', function () {
                 $(this).closest('li').remove();
+                self.updatePerfectScroller();
             });
         };
 
@@ -3440,6 +3700,7 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
                 } else {
                     $('.order-by-content').hide();
                 }
+                self.updatePerfectScroller();
             });
 
             $('.define-order-by-attributes').on('change', '.order-by-selection', function () {
@@ -3451,12 +3712,14 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
                 $(this).closest('li').remove();
                 self.preventMultipleSelection(Constants.ORDER_BY);
                 self.checkForAttributeLength(possibleAttributes.length, Constants.ORDER_BY);
+                self.updatePerfectScroller();
             });
 
             $('.btn-add-order-by-attribute').on('click', function () {
                 self.appendOrderBy(possibleAttributes);
                 self.preventMultipleSelection(Constants.ORDER_BY);
                 self.checkForAttributeLength(possibleAttributes.length, Constants.ORDER_BY);
+                self.updatePerfectScroller();
             });
         };
 
@@ -3477,6 +3740,7 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
                     $(sourceDiv).find('.define-stream-handler-section').hide();
                     $(sourceDiv).find('.define-stream-handler-buttons').hide();
                 }
+                self.updatePerfectScroller();
             });
 
             //on change of window type
@@ -3570,6 +3834,7 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
                 self.changeAttributeNavigation($(sourceDiv).find('.stream-handler-list'));
                 self.removeNavigationForWindow(sourceDiv)
                 self.showHideStreamHandlerWindowButton(sourceDiv)
+                self.updatePerfectScroller();
             });
 
             //To reorder up the stream-handler
@@ -3631,7 +3896,7 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
             var streamHandlerTypes = self.configurationData.application.config.stream_handler_types;
             var id = self.getIdOfDiv(sourceDiv);
             var streamHandlerList = $(sourceDiv).find('.stream-handler-list');
-            var streamHandlerListLength = $(streamHandlerList).find('li').length
+            var streamHandlerListLength = $(streamHandlerList).find('.define-stream-handler-content').length
             var appendedIndex;
             var handlerList = '<li class="define-stream-handler-content"> <div> ' +
                 '<div class="collapse-div" href="#' + streamHandlerListLength + '-' + id + '-stream-handler-content" ' +
@@ -3663,14 +3928,13 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
             self.removeNavigationForWindow(sourceDiv)
             self.showHideStreamHandlerWindowButton(sourceDiv)
             streamHandlerType[0].scrollIntoView();
+            self.updatePerfectScroller();
         };
 
         /**
          * @function to add event listeners for condition div
          */
-        FormUtils.prototype.addEventListenersForConditionDiv = function (inputStreamNames) {
-            var self = this;
-
+        FormUtils.prototype.addEventListenersForConditionDiv = function () {
             $('.define-conditions').on('input', '.condition-id', function () {
                 var conditionIndex = $(this).closest('.condition-content').index();
                 $('.define-conditions .condition-navigation:eq(' + conditionIndex + ') a:eq(0)').html($(this).val());
@@ -3681,15 +3945,15 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
          * @function to remove the up and down navigation for swindow stream handler
          */
         FormUtils.prototype.removeNavigationForWindow = function (sourceDiv) {
-            var streamHandlerListLength = $(sourceDiv).find('.stream-handler-list li').length
+            var streamHandlerListLength = $(sourceDiv).find('.stream-handler-list .define-stream-handler-content').length
             var lastIndex = streamHandlerListLength - 1;
-            var lastList = $(sourceDiv).find(' .stream-handler-list li:eq(' + lastIndex + ')');
+            var lastList = $(sourceDiv).find(' .stream-handler-list .define-stream-handler-content:eq(' + lastIndex + ')');
             if (lastList.find('.define-stream-handler-type-content').hasClass('define-window-stream-handler')) {
                 lastList.find('.attr-nav a:eq(0)').remove();
                 if (streamHandlerListLength == 2) {
-                    lastList.prev('li').find('.attr-nav a:eq(0)').remove();
+                    lastList.prev('.define-stream-handler-content').find('.attr-nav a:eq(0)').remove();
                 } else {
-                    lastList.prev('li').find('.attr-nav a:eq(1)').remove();
+                    lastList.prev('.define-stream-handler-content').find('.attr-nav a:eq(1)').remove();
                 }
             }
         };
@@ -3761,12 +4025,14 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
             $("#define-attribute").on('click', '#btn-add-attribute', function () {
                 $("#attribute-div").append(self.addAttribute());
                 self.changeAttributeNavigation('#attribute-div');
+                self.updatePerfectScroller();
             });
 
             //To delete attribute
             $("#define-attribute").on('click', '#attribute-div .btn-del-attr', function () {
                 $(this).closest('li').remove();
                 self.changeAttributeNavigation('#attribute-div');
+                self.updatePerfectScroller();
             });
 
             //To reorder up the attribute
@@ -3819,6 +4085,7 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
                     optionParent.find(".option-value").removeClass("required-input-field");
                     optionParent.find(".error-message").text("");
                 }
+                self.updatePerfectScroller();
             });
 
             //To add customized option
@@ -3832,12 +4099,14 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
                     '<label class = "error-message"></label></li>';
                 $('#customized-' + id + '-options .cust-options').append(custOptDiv);
                 self.changeCustomizedOptDiv(id);
+                self.updatePerfectScroller();
             });
 
             //To delete customized option
             $('#' + id + '-options-div').on('click', '.btn-del-option', function () {
                 $(this).closest('li').remove();
                 self.changeCustomizedOptDiv(id);
+                self.updatePerfectScroller();
             });
         };
 
@@ -3845,7 +4114,7 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
          * @function to add event listeners for the primary index annotation div
          */
         FormUtils.prototype.addEventListenerForPrimaryIndexAnnotationDiv = function () {
-
+            var self = this;
             //To add annotation value
             $('#primary-index-annotations').on('click', '.btn-add-annot-value', function () {
                 $(this).parents(".annotation").find("ul").append
@@ -3853,11 +4122,13 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
                     '<input type = "text" value = "" class = "annotation-value"/> ' +
                     '<a class = "btn-del-annot-value"> <i class = "fw fw-delete"> </i> </a> </div> ' +
                     '<label class="error-message"></label> </li>');
+                self.updatePerfectScroller();
             });
 
             //To delete annotation value
             $('#primary-index-annotations').on('click', '.btn-del-annot-value', function () {
                 $(this).closest('li').remove();
+                self.updatePerfectScroller();
             });
 
             // To show the values of the primaryKey and index annotations on change of the checkbox
@@ -3870,6 +4141,7 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
                     parent.find('.error-message').text("");
                     parent.find('.annotation-value').removeClass('required-input-field')
                 }
+                self.updatePerfectScroller();
             });
         };
 
@@ -3877,6 +4149,7 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
          * @function to add event listeners for the predefined annotations
          */
         FormUtils.prototype.addEventListenersForPredefinedAnnotations = function () {
+            var self = this;
             $('.define-predefined-annotations').on('change', '.annotation-checkbox', function () {
                 var parent = $(this).closest(".predefined-annotation");
                 if ($(this).is(':checked')) {
@@ -3886,6 +4159,7 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
                     parent.find('.error-message').text("");
                     parent.find('.option-value').removeClass('required-input-field')
                 }
+                self.updatePerfectScroller();
             });
         };
 
@@ -3893,7 +4167,7 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
          * @function to change the heading and the button text of the customized options div
          */
         FormUtils.prototype.changeCustomizedOptDiv = function (id) {
-            var customizedOptionList = $('#customized-' + id + '-options').find('.cust-options li');
+            var customizedOptionList = $('#customized-' + id + '-options').find('.cust-options .option');
             var parent = $('#customized-' + id + '-options');
             if (customizedOptionList.length > 0) {
                 parent.find('h4').show();
@@ -4009,6 +4283,27 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
         };
 
         /**
+         * @function to initialize the perfect scroller
+         * @param formConsole
+         */
+        FormUtils.prototype.initPerfectScroller = function (formConsoleId) {
+            this.designViewPerfectScroller = (function () {
+                if (!$('#' + formConsoleId + ' .design-view-form-content').hasClass('ps')) {
+                    return new PerfectScrollbar('#' + formConsoleId + ' .design-view-form-content');
+                }
+            })();
+        };
+
+        /**
+         * @function to update the scroller when the form resizes
+         */
+        FormUtils.prototype.updatePerfectScroller = function () {
+            if (this.designViewPerfectScroller) {
+                this.designViewPerfectScroller.update();
+            }
+        };
+
+        /**
          * @function to add the error class
          * @param {Object} id object where the error needs to be added
          */
@@ -4035,31 +4330,6 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
             return text[0].toUpperCase() + text.slice(1);
         };
 
-        /**
-         * @function to find matches and drops down as user types in
-         */
-        FormUtils.prototype.substringMatcher = function (text) {
-            return function findMatches(q, cb) {
-                var matches, substringRegex;
-
-                // an array that will be populated with substring matches
-                matches = [];
-
-                // regex used to determine if a string contains the substring `q`
-                substringRegex = new RegExp(q, 'i');
-
-                // iterate through the pool of strings and for any string that
-                // contains the substring `q`, add it to the `matches` array
-                $.each(text, function (i, str) {
-                    if (substringRegex.test(str)) {
-                        matches.push(str);
-                    }
-                });
-
-                cb(matches);
-            };
-        };
-
         //split the given val for space
         FormUtils.prototype.splitForAutocomplete = function (val) {
             return val.split(/\s/g);
@@ -4071,41 +4341,82 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
             return self.splitForAutocomplete(term).pop();
         };
 
+        //to add labels for autocomplete options
+        FormUtils.prototype.addLabelsForAutocompleteDropDowns = function (dropDownOptions, labelName) {
+            var optionsWithLabels = [];
+            _.forEach(dropDownOptions, function (option) {
+                optionsWithLabels.push({label: option, helper: labelName});
+            });
+            return optionsWithLabels;
+        };
+
         //create autocomplete for forms
         FormUtils.prototype.createAutocomplete = function (element, possibleOptions) {
             var self = this;
-            $(element)
-            // don't navigate away from the field on tab when selecting an item
-                .on("keydown", function (event) {
-                    if (event.keyCode === $.ui.keyCode.TAB &&
-                        $(this).autocomplete("instance").menu.active) {
-                        event.preventDefault();
-                    }
-                })
-                .autocomplete({
-                    minLength: 0,
-                    source: function (request, response) {
-                        // delegate back to autocomplete, but extract the last term
-                        response($.ui.autocomplete.filter(
-                            possibleOptions, self.extractLast(request.term)));
-                    },
-                    focus: function () {
-                        // prevent value inserted on focus
-                        return false;
-                    },
-                    select: function (event, ui) {
-                        var terms = self.splitForAutocomplete(this.value);
-                        // remove the current input
-                        terms.pop();
-                        // add the selected item
-                        terms.push(ui.item.value);
-                        // add placeholder to get the comma-and-space at the end
-                        terms.push("");
-                        this.value = terms.join(" ");
-                        return false;
-                    }
+            $(element).each(function () {
+                $(this)
+                // don't navigate away from the field on tab when selecting an item
+                    .on("keydown", function (event) {
+                        if (event.keyCode === $.ui.keyCode.TAB &&
+                            $(this).autocomplete("instance").menu.active) {
+                            event.preventDefault();
+                        }
+                    })
+                    .on("click", function () {
+                        if ($(this).val().trim() === "") {
+                            $(this).autocomplete('search', '')
+                        }
+                    })
+                    .autocomplete({
+                        minLength: 0,
+                        classes: {
+                            "ui-autocomplete": "design-view-form-auto-complete",
+                        },
+                        source: function (request, response) {
+                            // delegate back to autocomplete, but extract the last term\
+                            var matcher = new RegExp($.ui.autocomplete.escapeRegex(request.term), "i");
+                            response($.grep(possibleOptions, function (item) {
+                                return matcher.test(item.label);
+                            }), self.extractLast(request.term));
 
-                });
+                            response($.ui.autocomplete.filter(
+                                possibleOptions, self.extractLast(request.term)));
+                        },
+                        focus: function () {
+                            // prevent value inserted on focus
+                            return false;
+                        },
+                        select: function (event, ui) {
+                            var terms = self.splitForAutocomplete(this.value);
+                            // remove the current input
+                            terms.pop();
+                            // add the selected item
+                            terms.push(ui.item.value);
+                            // add placeholder to get the comma-and-space at the end
+                            terms.push("");
+                            this.value = terms.join(" ");
+                            return false;
+                        },
+                        open: function (event) {
+                            var currentAutocomplete = $(event.target).parent().find('.ui-autocomplete');
+                            currentAutocomplete.css('height', 'auto');
+                            var $input = $(event.target),
+                                inputTop = $input.offset().top,
+                                inputHeight = $input.height(),
+                                autocompleteHeight = currentAutocomplete.height(),
+                                windowHeight = $(window).height();
+
+                            if ((inputHeight + inputTop + autocompleteHeight) > windowHeight) {
+                                currentAutocomplete.css('height', (windowHeight - inputHeight - inputTop - 15) + 'px');
+                            }
+                        },
+                        appendTo: $(this).parent()
+                    }).data("ui-autocomplete")._renderItem = function (ul, item) {
+                    return $("<li class='autocomplete-option'>")
+                        .append("<a> <span class='option-label'>" + item.label + "</span> <span class='option-helperText'> " + item.helper + "</span> </a>")
+                        .appendTo(ul)
+                };
+            })
         };
 
         /**
