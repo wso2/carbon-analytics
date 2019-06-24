@@ -247,6 +247,7 @@ public class QueryConfigGenerator extends CodeSegmentsPreserver {
     /**
      * Extracts the query name from the annotation list, or returns the default query name
      * @param annotations           Query annotation list
+     * @param queryNumber           to generate unique query names
      * @return query name           name of the query
      */
     private String generateQueryName(List<Annotation> annotations , int queryNumber) {
