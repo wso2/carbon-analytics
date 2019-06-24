@@ -15,28 +15,32 @@
 * specific language governing permissions and limitations
 * under the License.
 */
-
 package org.wso2.carbon.analytics.stream.persistence.internal;
 
 import org.wso2.carbon.analytics.dataservice.core.AnalyticsDataService;
 import org.wso2.carbon.analytics.eventsink.AnalyticsEventSinkService;
 import org.wso2.carbon.event.stream.core.EventStreamService;
+import org.osgi.service.component.annotations.Activate;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Deactivate;
+import org.osgi.service.component.annotations.Reference;
+import org.osgi.service.component.annotations.ReferenceCardinality;
+import org.osgi.service.component.annotations.ReferencePolicy;
 
 /**
  * This class represents the analytics stream persistence service declarative services component.
- *
- * @scr.component name="analytics.stream.persistence.component" immediate="true"
- * @scr.reference name="analytics.component" interface="AnalyticsDataService"
- * cardinality="1..1" policy="dynamic" bind="setAnalyticsDataService" unbind="unsetAnalyticsDataService"
- * @scr.reference name="eventStreamManager.component"
- * interface="org.wso2.carbon.event.stream.core.EventStreamService" cardinality="1..1"
- * policy="dynamic" bind="setEventStreamService" unbind="unsetEventStreamService"
- * @scr.reference name="eventSink.component"
- * interface="org.wso2.carbon.analytics.eventsink.AnalyticsEventSinkService" cardinality="1..1"
- * policy="dynamic" bind="setEventSinkService" unbind="unsetEventSinkService"
  */
+@Component(
+         name = "analytics.stream.persistence.component", 
+         immediate = true)
 public class AnalyticsStreamPersistenceComponent {
 
+    @Reference(
+             name = "analytics.component", 
+             service = AnalyticsDataService.class, 
+             cardinality = ReferenceCardinality.MANDATORY, 
+             policy = ReferencePolicy.DYNAMIC, 
+             unbind = "unsetAnalyticsDataService")
     protected void setAnalyticsDataService(AnalyticsDataService analyticsDataService) {
         ServiceHolder.setAnalyticsDataService(analyticsDataService);
     }
@@ -45,6 +49,12 @@ public class AnalyticsStreamPersistenceComponent {
         ServiceHolder.setAnalyticsDataService(null);
     }
 
+    @Reference(
+             name = "eventStreamManager.component", 
+             service = org.wso2.carbon.event.stream.core.EventStreamService.class, 
+             cardinality = ReferenceCardinality.MANDATORY, 
+             policy = ReferencePolicy.DYNAMIC, 
+             unbind = "unsetEventStreamService")
     protected void setEventStreamService(EventStreamService eventStreamService) {
         ServiceHolder.setEventStreamService(eventStreamService);
     }
@@ -53,6 +63,12 @@ public class AnalyticsStreamPersistenceComponent {
         ServiceHolder.setEventStreamService(null);
     }
 
+    @Reference(
+             name = "eventSink.component", 
+             service = org.wso2.carbon.analytics.eventsink.AnalyticsEventSinkService.class, 
+             cardinality = ReferenceCardinality.MANDATORY, 
+             policy = ReferencePolicy.DYNAMIC, 
+             unbind = "unsetEventSinkService")
     protected void setEventSinkService(AnalyticsEventSinkService analyticsEventSinkService) {
         ServiceHolder.setAnalyticsEventSinkService(analyticsEventSinkService);
     }
@@ -61,3 +77,4 @@ public class AnalyticsStreamPersistenceComponent {
         ServiceHolder.setAnalyticsEventSinkService(null);
     }
 }
+

@@ -51,7 +51,12 @@
             <groupId>org.wso2.carbon.analytics</groupId>
             <artifactId>org.wso2.carbon.analytics.eventsink</artifactId>
         </dependency>
-      </dependencies>
+      <dependency>
+            <groupId>org.apache.felix</groupId>
+            <artifactId>org.apache.felix.scr.ds-annotations</artifactId>
+            <scope>provided</scope>
+        </dependency>
+    </dependencies>
 
       <build>
           <plugins>

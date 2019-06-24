@@ -36,7 +36,6 @@ import org.wso2.carbon.event.processor.manager.core.EventManagementService;
 import org.wso2.carbon.event.stream.core.EventStreamListener;
 import org.wso2.carbon.event.stream.core.EventStreamService;
 import org.wso2.carbon.utils.CarbonUtils;
-
 import javax.management.MBeanServer;
 import javax.management.ObjectName;
 import javax.xml.bind.JAXBContext;
@@ -44,26 +43,25 @@ import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
 import java.io.File;
 import java.lang.management.ManagementFactory;
+import org.osgi.service.component.annotations.Activate;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Deactivate;
+import org.osgi.service.component.annotations.Reference;
+import org.osgi.service.component.annotations.ReferenceCardinality;
+import org.osgi.service.component.annotations.ReferencePolicy;
 
 /**
  * This is the declarative service component which registers the required OSGi
  * services for this component's operation.
- * 
- * @scr.component name="analytics.eventsink.comp" immediate="true"
- * @scr.reference name="registry.streamdefn.comp"
- * interface="org.wso2.carbon.databridge.core.definitionstore.AbstractStreamDefinitionStore"
- * cardinality="1..1" policy="dynamic" bind="setStreamDefinitionStoreService" unbind="unsetStreamDefinitionStoreService"
- * @scr.reference name="event.stream.service" interface="org.wso2.carbon.event.stream.core.EventStreamService"
- * cardinality="1..1" policy="dynamic" bind="setEventStreamService" unbind="unsetEventStreamService"
- * @scr.reference name="analytics.component" interface="org.wso2.carbon.analytics.api.AnalyticsDataAPI"
- * cardinality="1..1" policy="dynamic" bind="setAnalyticsDataAPI" unbind="unsetAnalyticsDataAPI"
- * @scr.reference name="eventManagement.service"
- * interface="org.wso2.carbon.event.processor.manager.core.EventManagementService" cardinality="1..1"
- * policy="dynamic" bind="setEventManagementService" unbind="unsetEventManagementService"
  */
+@Component(
+         name = "analytics.eventsink.comp", 
+         immediate = true)
 public class AnalyticsEventSinkComponent {
+
     private static Log log = LogFactory.getLog(AnalyticsEventSinkComponent.class);
 
+    @Activate
     protected void activate(ComponentContext componentContext) {
         try {
             if (log.isDebugEnabled()) {
@@ -71,14 +69,10 @@ public class AnalyticsEventSinkComponent {
             }
             ServiceHolder.setAnalyticsEventSinkService(new AnalyticsEventSinkServiceImpl());
             ServiceHolder.setEventPublisherManagementService(new CarbonEventSinkManagementService());
-            componentContext.getBundleContext().registerService(EventStreamListener.class.getName(),
-                    ServiceHolder.getAnalyticsEventStreamListener(), null);
-            componentContext.getBundleContext().registerService(AnalyticsEventSinkService.class.getName(),
-                    ServiceHolder.getAnalyticsEventSinkService(), null);
-            componentContext.getBundleContext().registerService(ServerStartupObserver.class.getName(),
-                    AnalyticsEventSinkServerStartupObserver.getInstance(), null);
-            componentContext.getBundleContext().registerService(
-                    AppDeploymentHandler.class.getName(), new AnalyticsEventStoreCAppDeployer(), null);
+            componentContext.getBundleContext().registerService(EventStreamListener.class.getName(), ServiceHolder.getAnalyticsEventStreamListener(), null);
+            componentContext.getBundleContext().registerService(AnalyticsEventSinkService.class.getName(), ServiceHolder.getAnalyticsEventSinkService(), null);
+            componentContext.getBundleContext().registerService(ServerStartupObserver.class.getName(), AnalyticsEventSinkServerStartupObserver.getInstance(), null);
+            componentContext.getBundleContext().registerService(AppDeploymentHandler.class.getName(), new AnalyticsEventStoreCAppDeployer(), null);
             ServiceHolder.getEventManagementService().subscribe(ServiceHolder.getEventPublisherManagementService());
             this.loadAnalyticsEventSinkConfiguration();
             ServiceHolder.setAnalyticsDSConnector(new AnalyticsDSConnector());
@@ -105,18 +99,14 @@ public class AnalyticsEventSinkComponent {
     }
 
     private void loadAnalyticsEventSinkConfiguration() {
-        File analyticsConfFile = new File(CarbonUtils.getCarbonConfigDirPath() + File.separator +
-                AnalyticsEventSinkConstants.ANALYTICS_CONF_DIR + File.separator +
-                AnalyticsEventSinkConstants.EVENT_SINK_CONFIGURATION_FILE_NAME);
+        File analyticsConfFile = new File(CarbonUtils.getCarbonConfigDirPath() + File.separator + AnalyticsEventSinkConstants.ANALYTICS_CONF_DIR + File.separator + AnalyticsEventSinkConstants.EVENT_SINK_CONFIGURATION_FILE_NAME);
         if (analyticsConfFile.exists()) {
             try {
                 JAXBContext context = JAXBContext.newInstance(AnalyticsEventSinkConfiguration.class);
                 Unmarshaller un = context.createUnmarshaller();
-                ServiceHolder.setAnalyticsEventSinkConfiguration((AnalyticsEventSinkConfiguration)
-                        un.unmarshal(analyticsConfFile));
+                ServiceHolder.setAnalyticsEventSinkConfiguration((AnalyticsEventSinkConfiguration) un.unmarshal(analyticsConfFile));
             } catch (JAXBException e) {
-                log.error("Error while unmarshalling the file : " + analyticsConfFile.getName() + ". Therefore getting the " +
-                        "default configuration.", e);
+                log.error("Error while unmarshalling the file : " + analyticsConfFile.getName() + ". Therefore getting the " + "default configuration.", e);
                 ServiceHolder.setAnalyticsEventSinkConfiguration(new AnalyticsEventSinkConfiguration());
             }
         } else {
@@ -124,12 +114,19 @@ public class AnalyticsEventSinkComponent {
         }
     }
 
+    @Deactivate
     protected void deactivate(ComponentContext componentContext) {
         if (log.isDebugEnabled()) {
             log.debug("Stopped AnalyticsEventSink component");
         }
     }
 
+    @Reference(
+             name = "registry.streamdefn.comp", 
+             service = org.wso2.carbon.databridge.core.definitionstore.AbstractStreamDefinitionStore.class, 
+             cardinality = ReferenceCardinality.MANDATORY, 
+             policy = ReferencePolicy.DYNAMIC, 
+             unbind = "unsetStreamDefinitionStoreService")
     protected void setStreamDefinitionStoreService(AbstractStreamDefinitionStore abstractStreamDefinitionStore) {
         ServiceHolder.setStreamDefinitionStoreService(abstractStreamDefinitionStore);
     }
@@ -138,6 +135,12 @@ public class AnalyticsEventSinkComponent {
         ServiceHolder.setStreamDefinitionStoreService(null);
     }
 
+    @Reference(
+             name = "event.stream.service", 
+             service = org.wso2.carbon.event.stream.core.EventStreamService.class, 
+             cardinality = ReferenceCardinality.MANDATORY, 
+             policy = ReferencePolicy.DYNAMIC, 
+             unbind = "unsetEventStreamService")
     protected void setEventStreamService(EventStreamService eventStreamService) {
         ServiceHolder.setAnalyticsEventStreamListener(new AnalyticsEventStreamListener());
         ServiceHolder.setEventStreamService(eventStreamService);
@@ -147,6 +150,12 @@ public class AnalyticsEventSinkComponent {
         ServiceHolder.setEventStreamService(null);
     }
 
+    @Reference(
+             name = "analytics.component", 
+             service = org.wso2.carbon.analytics.api.AnalyticsDataAPI.class, 
+             cardinality = ReferenceCardinality.MANDATORY, 
+             policy = ReferencePolicy.DYNAMIC, 
+             unbind = "unsetAnalyticsDataAPI")
     protected void setAnalyticsDataAPI(AnalyticsDataAPI analyticsDataAPI) {
         ServiceHolder.setAnalyticsDataAPI(analyticsDataAPI);
     }
@@ -155,6 +164,12 @@ public class AnalyticsEventSinkComponent {
         ServiceHolder.setAnalyticsDataAPI(null);
     }
 
+    @Reference(
+             name = "eventManagement.service", 
+             service = org.wso2.carbon.event.processor.manager.core.EventManagementService.class, 
+             cardinality = ReferenceCardinality.MANDATORY, 
+             policy = ReferencePolicy.DYNAMIC, 
+             unbind = "unsetEventManagementService")
     protected void setEventManagementService(EventManagementService eventManagementService) {
         ServiceHolder.setEventManagementService(eventManagementService);
     }
@@ -163,3 +178,4 @@ public class AnalyticsEventSinkComponent {
         ServiceHolder.setEventManagementService(null);
     }
 }
+

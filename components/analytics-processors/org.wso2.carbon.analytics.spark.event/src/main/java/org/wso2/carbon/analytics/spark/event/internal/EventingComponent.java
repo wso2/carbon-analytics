@@ -29,23 +29,24 @@ import org.wso2.carbon.event.stream.core.EventStreamService;
 import org.wso2.carbon.ntask.core.TaskInfo;
 import org.wso2.carbon.ntask.core.TaskManager;
 import org.wso2.carbon.ntask.core.service.TaskService;
+import org.osgi.service.component.annotations.Activate;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Deactivate;
+import org.osgi.service.component.annotations.Reference;
+import org.osgi.service.component.annotations.ReferenceCardinality;
+import org.osgi.service.component.annotations.ReferencePolicy;
 
 /**
  * Declarative service component for spark evening.
- *
- * @scr.component name="spark.eventing" immediate="true"
- * @scr.reference name="event.streamService" interface="org.wso2.carbon.event.stream.core.EventStreamService"
- * cardinality="1..1" policy="dynamic" bind="setEventStreamService" unbind="unsetEventStreamService"
- * @scr.reference name="ntask.component" interface="org.wso2.carbon.ntask.core.service.TaskService"
- * cardinality="1..1" policy="dynamic" bind="setTaskService" unbind="unsetTaskService"
- * @scr.reference name="eventManagement.service"
- * interface="org.wso2.carbon.event.processor.manager.core.EventManagementService" cardinality="1..1"
- * policy="dynamic" bind="setEventManagementService" unbind="unsetEventManagementService"
  */
+@Component(
+         name = "spark.eventing", 
+         immediate = true)
 public class EventingComponent {
 
     private static final Log log = LogFactory.getLog(EventingComponent.class);
 
+    @Activate
     protected void activate(ComponentContext ctx) {
         if (log.isDebugEnabled()) {
             log.debug("Activating Spark Eventing");
@@ -57,17 +58,15 @@ public class EventingComponent {
             log.debug("Spark Eventing Activated");
         }
     }
-    
+
     private void initializeSparkEventingTask() {
         try {
             if (this.isReceiverNode() && !this.isSparkEventingTaskDisabled()) {
                 EventStreamDataStore.initStore();
                 ServiceHolder.getTaskService().registerTaskType(EventingConstants.ANALYTICS_SPARK_EVENTING_TASK_TYPE);
-                TaskInfo.TriggerInfo triggerInfo = new TaskInfo.TriggerInfo(null, null, 
-                        EventingConstants.SPARK_EVENTING_TASK_RUN_INTERVAL_MS, -1);
+                TaskInfo.TriggerInfo triggerInfo = new TaskInfo.TriggerInfo(null, null, EventingConstants.SPARK_EVENTING_TASK_RUN_INTERVAL_MS, -1);
                 triggerInfo.setDisallowConcurrentExecution(true);
-                TaskInfo taskInfo = new TaskInfo(EventingConstants.ANALYTICS_SPARK_EVENTING_TASK_NAME, 
-                        EventingTask.class.getCanonicalName(), null, triggerInfo);
+                TaskInfo taskInfo = new TaskInfo(EventingConstants.ANALYTICS_SPARK_EVENTING_TASK_NAME, EventingTask.class.getCanonicalName(), null, triggerInfo);
                 taskInfo.setLocationResolverClass(SparkEventingTaskLocationResolver.class.getCanonicalName());
                 TaskManager tm = ServiceHolder.getTaskService().getTaskManager(EventingConstants.ANALYTICS_SPARK_EVENTING_TASK_TYPE);
                 tm.registerTask(taskInfo);
@@ -78,12 +77,19 @@ public class EventingComponent {
         }
     }
 
+    @Deactivate
     protected void deactivate(ComponentContext ctx) {
         if (log.isDebugEnabled()) {
             log.debug("Deactivating Spark Eventing");
         }
     }
 
+    @Reference(
+             name = "event.streamService", 
+             service = org.wso2.carbon.event.stream.core.EventStreamService.class, 
+             cardinality = ReferenceCardinality.MANDATORY, 
+             policy = ReferencePolicy.DYNAMIC, 
+             unbind = "unsetEventStreamService")
     protected void setEventStreamService(EventStreamService eventStreamService) {
         ServiceHolder.setEventStreamService(eventStreamService);
     }
@@ -91,7 +97,7 @@ public class EventingComponent {
     protected void unsetEventStreamService(EventStreamService eventStreamService) {
         ServiceHolder.setEventStreamService(null);
     }
-    
+
     private boolean isReceiverNode() {
         String propVal = System.getProperty(EventingConstants.DISABLE_EVENT_SINK_SYS_PROP);
         if (propVal == null) {
@@ -100,7 +106,7 @@ public class EventingComponent {
             return !Boolean.parseBoolean(propVal);
         }
     }
-    
+
     private boolean isSparkEventingTaskDisabled() {
         String propVal = System.getProperty(EventingConstants.DISABLE_SPARK_EVENTING_TASK_SYS_PROP);
         if (propVal == null) {
@@ -109,7 +115,13 @@ public class EventingComponent {
             return Boolean.parseBoolean(propVal);
         }
     }
-    
+
+    @Reference(
+             name = "ntask.component", 
+             service = org.wso2.carbon.ntask.core.service.TaskService.class, 
+             cardinality = ReferenceCardinality.MANDATORY, 
+             policy = ReferencePolicy.DYNAMIC, 
+             unbind = "unsetTaskService")
     protected void setTaskService(TaskService taskService) {
         ServiceHolder.setTaskService(taskService);
     }
@@ -117,7 +129,13 @@ public class EventingComponent {
     protected void unsetTaskService(TaskService taskService) {
         ServiceHolder.setTaskService(null);
     }
-    
+
+    @Reference(
+             name = "eventManagement.service", 
+             service = org.wso2.carbon.event.processor.manager.core.EventManagementService.class, 
+             cardinality = ReferenceCardinality.MANDATORY, 
+             policy = ReferencePolicy.DYNAMIC, 
+             unbind = "unsetEventManagementService")
     protected void setEventManagementService(EventManagementService eventManagementService) {
         ServiceHolder.setEventManagementService(eventManagementService);
     }
@@ -125,5 +143,5 @@ public class EventingComponent {
     protected void unsetEventManagementService(EventManagementService eventManagementService) {
         ServiceHolder.setEventManagementService(null);
     }
-
 }
+

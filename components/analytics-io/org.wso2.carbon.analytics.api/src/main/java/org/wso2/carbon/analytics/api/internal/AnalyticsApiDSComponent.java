@@ -23,17 +23,26 @@ import org.osgi.framework.BundleContext;
 import org.osgi.service.component.ComponentContext;
 import org.wso2.carbon.analytics.api.AnalyticsDataAPI;
 import org.wso2.carbon.analytics.api.CarbonAnalyticsAPI;
+import org.osgi.service.component.annotations.Activate;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Deactivate;
+import org.osgi.service.component.annotations.Reference;
+import org.osgi.service.component.annotations.ReferenceCardinality;
+import org.osgi.service.component.annotations.ReferencePolicy;
+
 /**
  * This class represents the analytics api declarative services component.
- *
- * @scr.component name="analytics.api.component" immediate="true"
  */
+@Component(
+         name = "analytics.api.component", 
+         immediate = true)
 public class AnalyticsApiDSComponent {
-    
+
     private static final Log log = LogFactory.getLog(AnalyticsApiDSComponent.class);
 
+    @Activate
     protected void activate(ComponentContext ctx) {
-        if (log.isDebugEnabled()) { 
+        if (log.isDebugEnabled()) {
             log.debug("Starting Analytics API component");
         }
         BundleContext bundleContext = ctx.getBundleContext();
@@ -43,5 +52,5 @@ public class AnalyticsApiDSComponent {
             log.error("Error while starting the Analytics API component: " + e.getMessage(), e);
         }
     }
-    
 }
+

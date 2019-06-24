@@ -41,32 +41,24 @@ import org.wso2.carbon.ntask.core.service.TaskService;
 import org.wso2.carbon.registry.core.service.RegistryService;
 import org.wso2.carbon.registry.core.service.TenantRegistryLoader;
 import org.wso2.carbon.utils.CarbonUtils;
-
 import javax.management.MBeanServer;
 import javax.management.ObjectName;
 import java.io.File;
 import java.lang.management.ManagementFactory;
 import java.net.SocketException;
+import org.osgi.service.component.annotations.Activate;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Deactivate;
+import org.osgi.service.component.annotations.Reference;
+import org.osgi.service.component.annotations.ReferenceCardinality;
+import org.osgi.service.component.annotations.ReferencePolicy;
 
 /**
  * Declarative service component for spark analytics.
- *
- * @scr.component name="analytics.core" immediate="true"
- * @scr.reference name="ntask.component" interface="org.wso2.carbon.ntask.core.service.TaskService"
- * cardinality="1..1" policy="dynamic" bind="setTaskService" unbind="unsetTaskService"
- * @scr.reference name="analytics.dataservice" interface="AnalyticsDataService"
- * cardinality="1..1" policy="dynamic"  bind="setAnalyticsDataService" unbind="unsetAnalyticsDataService"
- * @scr.reference name="server.config.service" interface="org.wso2.carbon.base.api.ServerConfigurationService"
- * cardinality="1..1" policy="dynamic" bind="setServerConfigService" unbind="unsetServerConfigService"
- * @scr.reference name="registry.service" interface="org.wso2.carbon.registry.core.service.RegistryService"
- * cardinality="1..1" policy="dynamic" bind="setRegistryService" unbind="unsetRegistryService"
- * @scr.reference name="tenant.registryloader" interface="org.wso2.carbon.registry.core.service.TenantRegistryLoader"
- * cardinality="1..1" policy="dynamic" bind="setTenantRegistryLoader" unbind="unsetTenantRegistryLoader"
- * @scr.reference name="carbon.udf" interface="org.wso2.carbon.analytics.spark.core.udf.CarbonUDF"
- * cardinality="0..n" policy="dynamic" bind="addCarbonUDF" unbind="removeCarbonUDFs"
- * @scr.reference name="carbon.udaf" interface="org.wso2.carbon.analytics.spark.core.udf.CarbonUDAF"
- * cardinality="0..n" policy="dynamic" bind="addCarbonUDAF" unbind="removeCarbonUDAF"
  */
+@Component(
+         name = "analytics.core", 
+         immediate = true)
 public class AnalyticsComponent {
 
     private static final String PORT_OFFSET_SERVER_PROP = "Ports.Offset";
@@ -75,6 +67,7 @@ public class AnalyticsComponent {
 
     private static boolean initialized;
 
+    @Activate
     protected void activate(ComponentContext ctx) {
         if (log.isDebugEnabled()) {
             log.debug("Activating Analytics Spark Core");
@@ -86,8 +79,7 @@ public class AnalyticsComponent {
             if (ServiceHolder.isAnalyticsEngineEnabled()) {
                 try {
                     int portOffset = CarbonUtils.getPortFromServerConfig(PORT_OFFSET_SERVER_PROP) + 1;
-                    ServiceHolder.setAnalyticskExecutor(new SparkAnalyticsExecutor(
-                            this.getLocalHostname(), portOffset));
+                    ServiceHolder.setAnalyticskExecutor(new SparkAnalyticsExecutor(this.getLocalHostname(), portOffset));
                     ServiceHolder.getAnalyticskExecutor().initializeSparkServer();
                 } catch (Throwable e) {
                     String msg = "Error initializing analytics executor: " + e.getMessage();
@@ -99,12 +91,10 @@ public class AnalyticsComponent {
             ServiceHolder.setAnalyticsProcessorService(analyticsProcessorService);
             // Registering server startup observer
             SparkScriptCAppDeployer sparkScriptCAppDeployer = new SparkScriptCAppDeployer();
-            bundleContext.registerService(
-                    AppDeploymentHandler.class.getName(), sparkScriptCAppDeployer, null);
+            bundleContext.registerService(AppDeploymentHandler.class.getName(), sparkScriptCAppDeployer, null);
             // registering spark context service
             SparkContextService scs = new SparkContextServiceImpl();
             bundleContext.registerService(SparkContextService.class, scs, null);
-
             if (log.isDebugEnabled()) {
                 log.debug("Finished activating Analytics Spark Core");
             }
@@ -130,15 +120,22 @@ public class AnalyticsComponent {
         }
     }
 
+    @Deactivate
     protected void deactivate(ComponentContext ctx) {
         ServiceHolder.getAnalyticskExecutor().stop();
     }
 
+    @Reference(
+             name = "ntask.component", 
+             service = org.wso2.carbon.ntask.core.service.TaskService.class, 
+             cardinality = ReferenceCardinality.MANDATORY, 
+             policy = ReferencePolicy.DYNAMIC, 
+             unbind = "unsetTaskService")
     protected void setTaskService(TaskService taskService) {
         checkAnalyticsEnabled();
         ServiceHolder.setTaskService(taskService);
         if (ServiceHolder.isAnalyticsExecutionEnabled()) {
-            //Analytics execution is disabled, therefore not joining the task cluster for the execution.
+            // Analytics execution is disabled, therefore not joining the task cluster for the execution.
             try {
                 ServiceHolder.getTaskService().registerTaskType(AnalyticsConstants.SCRIPT_TASK_TYPE);
             } catch (TaskException e) {
@@ -151,6 +148,12 @@ public class AnalyticsComponent {
         ServiceHolder.setTaskService(null);
     }
 
+    @Reference(
+             name = "analytics.dataservice", 
+             service = AnalyticsDataService.class, 
+             cardinality = ReferenceCardinality.MANDATORY, 
+             policy = ReferencePolicy.DYNAMIC, 
+             unbind = "unsetAnalyticsDataService")
     protected void setAnalyticsDataService(AnalyticsDataService analyticsDataService) {
         ServiceHolder.setAnalyticsDataService(analyticsDataService);
     }
@@ -159,6 +162,12 @@ public class AnalyticsComponent {
         ServiceHolder.setAnalyticsDataService(null);
     }
 
+    @Reference(
+             name = "registry.service", 
+             service = org.wso2.carbon.registry.core.service.RegistryService.class, 
+             cardinality = ReferenceCardinality.MANDATORY, 
+             policy = ReferencePolicy.DYNAMIC, 
+             unbind = "unsetRegistryService")
     protected void setRegistryService(RegistryService registryService) {
         ServiceHolder.setRegistryService(registryService);
     }
@@ -167,6 +176,12 @@ public class AnalyticsComponent {
         ServiceHolder.setRegistryService(null);
     }
 
+    @Reference(
+             name = "server.config.service", 
+             service = org.wso2.carbon.base.api.ServerConfigurationService.class, 
+             cardinality = ReferenceCardinality.MANDATORY, 
+             policy = ReferencePolicy.DYNAMIC, 
+             unbind = "unsetServerConfigService")
     protected void setServerConfigService(ServerConfigurationService serverConfigService) {
         ServiceHolder.setServerConfigService(serverConfigService);
     }
@@ -175,6 +190,12 @@ public class AnalyticsComponent {
         ServiceHolder.setServerConfigService(null);
     }
 
+    @Reference(
+             name = "tenant.registryloader", 
+             service = org.wso2.carbon.registry.core.service.TenantRegistryLoader.class, 
+             cardinality = ReferenceCardinality.MANDATORY, 
+             policy = ReferencePolicy.DYNAMIC, 
+             unbind = "unsetTenantRegistryLoader")
     protected void setTenantRegistryLoader(TenantRegistryLoader tenantRegistryLoader) {
         ServiceHolder.setTenantRegistryLoader(tenantRegistryLoader);
     }
@@ -183,6 +204,12 @@ public class AnalyticsComponent {
         ServiceHolder.setTenantRegistryLoader(null);
     }
 
+    @Reference(
+             name = "carbon.udf", 
+             service = org.wso2.carbon.analytics.spark.core.udf.CarbonUDF.class, 
+             cardinality = ReferenceCardinality.MULTIPLE, 
+             policy = ReferencePolicy.DYNAMIC, 
+             unbind = "removeCarbonUDFs")
     protected void addCarbonUDF(CarbonUDF carbonUDF) {
         try {
             if (ServiceHolder.getAnalyticskExecutor() != null) {
@@ -190,13 +217,18 @@ public class AnalyticsComponent {
             } else {
                 ServiceHolder.addCarbonUDFs(carbonUDF);
             }
-
             addCarbonUDFJarToSparkClasspath(carbonUDF.getClass());
         } catch (AnalyticsUDFException e) {
             log.error("Error while registering UDFs from OSGI components: " + e.getMessage(), e);
         }
     }
 
+    @Reference(
+             name = "carbon.udaf", 
+             service = org.wso2.carbon.analytics.spark.core.udf.CarbonUDAF.class, 
+             cardinality = ReferenceCardinality.MULTIPLE, 
+             policy = ReferencePolicy.DYNAMIC, 
+             unbind = "removeCarbonUDAF")
     protected void addCarbonUDAF(CarbonUDAF carbonUDAF) {
         try {
             if (ServiceHolder.getAnalyticskExecutor() != null) {
@@ -216,9 +248,8 @@ public class AnalyticsComponent {
 
     @SuppressWarnings("rawtypes")
     private void addCarbonUDFJarToSparkClasspath(Class carbonUDFClass) {
-        String[] jarPath = carbonUDFClass.getProtectionDomain().getCodeSource().getLocation().getPath()
-                .split(File.separatorChar=='\\' ? "\\\\" : File.separator);
-        String jarName = jarPath[jarPath.length-1].split("_")[0];
+        String[] jarPath = carbonUDFClass.getProtectionDomain().getCodeSource().getLocation().getPath().split(File.separatorChar == '\\' ? "\\\\" : File.separator);
+        String jarName = jarPath[jarPath.length - 1].split("_")[0];
         ComputeClasspath.addAdditionalJarToClasspath(jarName);
     }
 
@@ -235,11 +266,10 @@ public class AnalyticsComponent {
                         ServiceHolder.setAnalyticsEngineEnabled(false);
                         ServiceHolder.setAnalyticsExecutionEnabled(false);
                         ServiceHolder.setAnalyticsSparkContextEnabled(false);
-                        //if analytics engine is disabled, execution is also disabled by default
+                    // if analytics engine is disabled, execution is also disabled by default
                     }
                 }
             }
-
             if (ServiceHolder.isAnalyticsExecutionEnabled()) {
                 if (System.getProperty(AnalyticsConstants.DISABLE_ANALYTICS_EXECUTION_JVM_OPTION) != null) {
                     if (Boolean.parseBoolean(System.getProperty(AnalyticsConstants.DISABLE_ANALYTICS_EXECUTION_JVM_OPTION))) {
@@ -247,9 +277,8 @@ public class AnalyticsComponent {
                     }
                 }
             }
-
-            if (ServiceHolder.isAnalyticsSparkContextEnabled()){
-                if (System.getProperty(AnalyticsConstants.DISABLE_ANALYTICS_SPARK_CTX_JVM_OPTION) != null){
+            if (ServiceHolder.isAnalyticsSparkContextEnabled()) {
+                if (System.getProperty(AnalyticsConstants.DISABLE_ANALYTICS_SPARK_CTX_JVM_OPTION) != null) {
                     if (Boolean.parseBoolean(System.getProperty(AnalyticsConstants.DISABLE_ANALYTICS_SPARK_CTX_JVM_OPTION))) {
                         ServiceHolder.setAnalyticsSparkContextEnabled(false);
                     }
@@ -258,10 +287,10 @@ public class AnalyticsComponent {
         }
     }
 
-    private void checkAnalyticsStatsEnabled(){
+    private void checkAnalyticsStatsEnabled() {
         if (initialized) {
-            if (!ServiceHolder.isAnalyticsStatsEnabled()){
-                if (System.getProperty(AnalyticsConstants.ENABLE_ANALYTICS_STATS_OPTION) != null){
+            if (!ServiceHolder.isAnalyticsStatsEnabled()) {
+                if (System.getProperty(AnalyticsConstants.ENABLE_ANALYTICS_STATS_OPTION) != null) {
                     if (Boolean.parseBoolean(System.getProperty(AnalyticsConstants.ENABLE_ANALYTICS_STATS_OPTION))) {
                         ServiceHolder.setAnalyticsStatsEnabled(true);
                     }
@@ -271,9 +300,9 @@ public class AnalyticsComponent {
     }
 
     private String getLocalHostname() throws SocketException {
-//        this is removed because, NetworkUtils.getLocalHostname() would return the carbon.xml
-//        hostname if provided. but in the spark environment, it would need a unique hostname DAS-171
-//        return NetworkUtils.getLocalHostname();
+        // this is removed because, NetworkUtils.getLocalHostname() would return the carbon.xml
+        // hostname if provided. but in the spark environment, it would need a unique hostname DAS-171
+        // return NetworkUtils.getLocalHostname();
         String localIP = System.getenv(AnalyticsConstants.SPARK_LOCAL_IP_PROP);
         if (localIP != null) {
             if (log.isDebugEnabled()) {
@@ -288,3 +317,4 @@ public class AnalyticsComponent {
         }
     }
 }
+
