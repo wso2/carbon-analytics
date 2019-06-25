@@ -3952,7 +3952,11 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
          */
         FormUtils.prototype.addNewStreamHandler = function (sourceDiv, type) {
             var self = this;
-            var streamHandlerTypes = self.configurationData.application.config.stream_handler_types;
+            if ($(sourceDiv).parents('.pattern-sequence-query-form-container').length !== 0 ) {
+                var streamHandlerTypes = self.configurationData.application.config.stream_handler_types_without_window;
+            } else {
+                var streamHandlerTypes = self.configurationData.application.config.stream_handler_types;
+            }
             var id = self.getIdOfDiv(sourceDiv);
             var streamHandlerList = $(sourceDiv).find('.stream-handler-list');
             var streamHandlerListLength = $(streamHandlerList).find('.define-stream-handler-content').length
