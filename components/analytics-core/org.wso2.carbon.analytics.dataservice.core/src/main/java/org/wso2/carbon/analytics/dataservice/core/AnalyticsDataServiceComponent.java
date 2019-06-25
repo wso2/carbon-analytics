@@ -34,28 +34,24 @@ import org.wso2.carbon.application.deployer.handler.AppDeploymentHandler;
 import org.wso2.carbon.ndatasource.core.DataSourceService;
 import org.wso2.carbon.ntask.core.service.TaskService;
 import org.wso2.carbon.user.core.service.RealmService;
+import org.osgi.service.component.annotations.Activate;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Deactivate;
+import org.osgi.service.component.annotations.Reference;
+import org.osgi.service.component.annotations.ReferenceCardinality;
+import org.osgi.service.component.annotations.ReferencePolicy;
 
 /**
  * This class represents the analytics data service declarative services component.
- *
- * @scr.component name="analytics.component" immediate="true"
- * @scr.reference name="listener.manager.service" interface="org.apache.axis2.engine.ListenerManager"
- * cardinality="1..1" policy="dynamic"  bind="setListenerManager" unbind="unsetListenerManager"
- * @scr.reference name="user.realmservice.default" interface="org.wso2.carbon.user.core.service.RealmService"
- * cardinality="1..1" policy="dynamic" bind="setRealmService" unbind="unsetRealmService"
- * @scr.reference name="analytics.datasource.service" interface="org.wso2.carbon.analytics.datasource.core.AnalyticsDataSourceService"
- * cardinality="1..1" policy="dynamic" bind="setAnalyticsDataSourceService" unbind="unsetAnalyticsDataSourceService"
- * @scr.reference name="ntask.component" interface="org.wso2.carbon.ntask.core.service.TaskService"
- * cardinality="1..1" policy="dynamic" bind="setTaskService" unbind="unsetTaskService"
- * @scr.reference name="analytics.aggregates" interface="org.wso2.carbon.analytics.dataservice.core.indexing.aggregates.AggregateFunction"
- * cardinality="0..n" policy="dynamic" bind="addAggregateFunction" unbind="removeAggregateFunctions"
- * @scr.reference name="datasource.service" interface="org.wso2.carbon.ndatasource.core.DataSourceService"
- * cardinality="1..1" policy="dynamic"  bind="setDataSourceService" unbind="unsetDataSourceService"
  */
+@Component(
+         name = "analytics.component", 
+         immediate = true)
 public class AnalyticsDataServiceComponent {
 
     private static final Log log = LogFactory.getLog(AnalyticsDataServiceComponent.class);
 
+    @Activate
     protected void activate(ComponentContext ctx) {
         if (log.isDebugEnabled()) {
             log.debug("Starting AnalyticsDataServiceComponent#activate");
@@ -80,6 +76,7 @@ public class AnalyticsDataServiceComponent {
         }
     }
 
+    @Deactivate
     protected void deactivate(ComponentContext ctx) {
         try {
             AnalyticsDataService service = AnalyticsServiceHolder.getAnalyticsDataService();
@@ -91,7 +88,7 @@ public class AnalyticsDataServiceComponent {
         }
     }
 
-    @SuppressWarnings({"rawtypes", "unchecked"})
+    @SuppressWarnings({ "rawtypes", "unchecked" })
     private void loadHazelcast() {
         BundleContext ctx = FrameworkUtil.getBundle(AnalyticsServiceHolder.class).getBundleContext();
         ServiceReference ref = ctx.getServiceReference(HazelcastInstance.class);
@@ -100,24 +97,42 @@ public class AnalyticsDataServiceComponent {
         }
     }
 
+    @Reference(
+             name = "listener.manager.service", 
+             service = org.apache.axis2.engine.ListenerManager.class, 
+             cardinality = ReferenceCardinality.MANDATORY, 
+             policy = ReferencePolicy.DYNAMIC, 
+             unbind = "unsetListenerManager")
     protected void setListenerManager(ListenerManager lm) {
-        /* we don't really need this, the listener manager service is acquired
+    /* we don't really need this, the listener manager service is acquired
          * to make sure, as a workaround, that the task component is initialized 
          * after the axis2 clustering agent is initialized */
     }
 
     protected void unsetListenerManager(ListenerManager lm) {
-        /* empty */
+    /* empty */
     }
 
+    @Reference(
+             name = "analytics.datasource.service", 
+             service = org.wso2.carbon.analytics.datasource.core.AnalyticsDataSourceService.class, 
+             cardinality = ReferenceCardinality.MANDATORY, 
+             policy = ReferencePolicy.DYNAMIC, 
+             unbind = "unsetAnalyticsDataSourceService")
     protected void setAnalyticsDataSourceService(AnalyticsDataSourceService service) {
-        /* just to make sure analytics data source component is initialized first */
+    /* just to make sure analytics data source component is initialized first */
     }
 
     protected void unsetAnalyticsDataSourceService(AnalyticsDataSourceService service) {
-        /* empty */
+    /* empty */
     }
 
+    @Reference(
+             name = "user.realmservice.default", 
+             service = org.wso2.carbon.user.core.service.RealmService.class, 
+             cardinality = ReferenceCardinality.MANDATORY, 
+             policy = ReferencePolicy.DYNAMIC, 
+             unbind = "unsetRealmService")
     protected void setRealmService(RealmService realmService) {
         if (log.isDebugEnabled()) {
             log.info("Setting the Realm Service");
@@ -131,6 +146,12 @@ public class AnalyticsDataServiceComponent {
         }
     }
 
+    @Reference(
+             name = "ntask.component", 
+             service = org.wso2.carbon.ntask.core.service.TaskService.class, 
+             cardinality = ReferenceCardinality.MANDATORY, 
+             policy = ReferencePolicy.DYNAMIC, 
+             unbind = "unsetTaskService")
     protected void setTaskService(TaskService taskService) {
         if (log.isDebugEnabled()) {
             log.debug("Setting the Task Service");
@@ -144,6 +165,12 @@ public class AnalyticsDataServiceComponent {
         }
     }
 
+    @Reference(
+             name = "datasource.service", 
+             service = org.wso2.carbon.ndatasource.core.DataSourceService.class, 
+             cardinality = ReferenceCardinality.MANDATORY, 
+             policy = ReferencePolicy.DYNAMIC, 
+             unbind = "unsetDataSourceService")
     protected void setDataSourceService(DataSourceService dataSourceService) {
         if (log.isDebugEnabled()) {
             log.debug("Setting the Datasource Service");
@@ -157,6 +184,12 @@ public class AnalyticsDataServiceComponent {
         }
     }
 
+    @Reference(
+             name = "analytics.aggregates", 
+             service = org.wso2.carbon.analytics.dataservice.core.indexing.aggregates.AggregateFunction.class, 
+             cardinality = ReferenceCardinality.MULTIPLE, 
+             policy = ReferencePolicy.DYNAMIC, 
+             unbind = "removeAggregateFunctions")
     protected void addAggregateFunction(AggregateFunction aggregateFunction) {
         if (log.isDebugEnabled()) {
             log.debug("Setting the Aggregate Function: " + aggregateFunction.getAggregateName());
@@ -171,3 +204,4 @@ public class AnalyticsDataServiceComponent {
         AnalyticsServiceHolder.removeAggregateFunctions();
     }
 }
+

@@ -25,28 +25,38 @@ import org.wso2.carbon.analytics.api.AnalyticsDataAPI;
 import org.wso2.carbon.analytics.api.CarbonAnalyticsAPI;
 import org.wso2.carbon.analytics.dataservice.core.AnalyticsDataService;
 import org.wso2.carbon.analytics.dataservice.core.SecureAnalyticsDataService;
+import org.osgi.service.component.annotations.Activate;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Deactivate;
+import org.osgi.service.component.annotations.Reference;
+import org.osgi.service.component.annotations.ReferenceCardinality;
+import org.osgi.service.component.annotations.ReferencePolicy;
 
 /**
  * This class represents declarative services registration for analytics data service.
  * There could be cases the OSGI service analytics data service is not available
  * in the JVM, and in that cases this service component will not be activated.
- *
- * @scr.component name="analytics.api.dataservice.component" immediate="true"
- * @scr.reference name="analytics.component" interface="AnalyticsDataService"
- * cardinality="0..1" policy="dynamic"  bind="setAnalyticsDataService" unbind="unsetAnalyticsDataService"
- * @scr.reference name="analytics.secure.component" interface="SecureAnalyticsDataService"
- * cardinality="0..1" policy="dynamic"  bind="setSecureAnalyticsDataService" unbind="unsetSecureAnalyticsDataService"
  */
-
+@Component(
+         name = "analytics.api.dataservice.component", 
+         immediate = true)
 public class AnalyticsDataserviceDSComponent {
+
     private static final Log log = LogFactory.getLog(AnalyticsDataserviceDSComponent.class);
 
+    @Activate
     protected void activate(ComponentContext ctx) {
         if (log.isDebugEnabled()) {
             log.debug("Starting Analytics API - Data service component");
         }
     }
 
+    @Reference(
+             name = "analytics.component", 
+             service = AnalyticsDataService.class, 
+             cardinality = ReferenceCardinality.OPTIONAL, 
+             policy = ReferencePolicy.DYNAMIC, 
+             unbind = "unsetAnalyticsDataService")
     protected void setAnalyticsDataService(AnalyticsDataService analyticsDataService) {
         ServiceHolder.setAnalyticsDataService(analyticsDataService);
     }
@@ -55,6 +65,12 @@ public class AnalyticsDataserviceDSComponent {
         ServiceHolder.setAnalyticsDataService(null);
     }
 
+    @Reference(
+             name = "analytics.secure.component", 
+             service = SecureAnalyticsDataService.class, 
+             cardinality = ReferenceCardinality.OPTIONAL, 
+             policy = ReferencePolicy.DYNAMIC, 
+             unbind = "unsetSecureAnalyticsDataService")
     protected void setSecureAnalyticsDataService(SecureAnalyticsDataService secureAnalyticsDataService) {
         ServiceHolder.setSecureAnalyticsDataService(secureAnalyticsDataService);
     }
@@ -63,3 +79,4 @@ public class AnalyticsDataserviceDSComponent {
         ServiceHolder.setSecureAnalyticsDataService(null);
     }
 }
+

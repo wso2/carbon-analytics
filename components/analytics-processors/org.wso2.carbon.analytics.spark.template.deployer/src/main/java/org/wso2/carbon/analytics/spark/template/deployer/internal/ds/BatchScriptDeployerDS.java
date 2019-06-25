@@ -23,21 +23,21 @@ import org.wso2.carbon.analytics.spark.template.deployer.BatchScriptTemplateDepl
 import org.wso2.carbon.event.template.manager.core.TemplateDeployer;
 import org.wso2.carbon.analytics.spark.template.deployer.internal.BatchScriptDeployerValueHolder;
 import org.wso2.carbon.event.stream.core.EventStreamService;
+import org.osgi.service.component.annotations.Activate;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Deactivate;
+import org.osgi.service.component.annotations.Reference;
+import org.osgi.service.component.annotations.ReferenceCardinality;
+import org.osgi.service.component.annotations.ReferencePolicy;
 
-/**
- * @scr.component name="TemplateDeployer.batch.component" immediate="true"
- * @scr.reference name="analyticsProcessorService.service"
- * interface="org.wso2.carbon.analytics.spark.core.AnalyticsProcessorService" cardinality="1..1"
- * policy="dynamic" bind="setAnalyticsProcessorService" unbind="unsetAnalyticsProcessorService"
- * @scr.reference name="eventStreamService.service"
- * interface="org.wso2.carbon.event.stream.core.EventStreamService" cardinality="1..1"
- * policy="dynamic" bind="setEventStreamService" unbind="unsetEventStreamService"
-
- */
+@Component(
+         name = "TemplateDeployer.batch.component", 
+         immediate = true)
 public class BatchScriptDeployerDS {
 
     private static final Log log = LogFactory.getLog(BatchScriptDeployerDS.class);
 
+    @Activate
     protected void activate(ComponentContext context) {
         try {
             BatchScriptTemplateDeployer templateDeployer = new BatchScriptTemplateDeployer();
@@ -47,6 +47,12 @@ public class BatchScriptDeployerDS {
         }
     }
 
+    @Reference(
+             name = "analyticsProcessorService.service", 
+             service = org.wso2.carbon.analytics.spark.core.AnalyticsProcessorService.class, 
+             cardinality = ReferenceCardinality.MANDATORY, 
+             policy = ReferencePolicy.DYNAMIC, 
+             unbind = "unsetAnalyticsProcessorService")
     protected void setAnalyticsProcessorService(AnalyticsProcessorService analyticsProcessorService) {
         BatchScriptDeployerValueHolder.setAnalyticsProcessorService(analyticsProcessorService);
     }
@@ -55,6 +61,12 @@ public class BatchScriptDeployerDS {
         BatchScriptDeployerValueHolder.setAnalyticsProcessorService(null);
     }
 
+    @Reference(
+             name = "eventStreamService.service", 
+             service = org.wso2.carbon.event.stream.core.EventStreamService.class, 
+             cardinality = ReferenceCardinality.MANDATORY, 
+             policy = ReferencePolicy.DYNAMIC, 
+             unbind = "unsetEventStreamService")
     protected void setEventStreamService(EventStreamService eventStreamService) {
         BatchScriptDeployerValueHolder.setEventStreamService(eventStreamService);
     }
@@ -62,6 +74,5 @@ public class BatchScriptDeployerDS {
     protected void unsetEventStreamService(EventStreamService eventStreamService) {
         BatchScriptDeployerValueHolder.setEventStreamService(null);
     }
-
-
 }
+

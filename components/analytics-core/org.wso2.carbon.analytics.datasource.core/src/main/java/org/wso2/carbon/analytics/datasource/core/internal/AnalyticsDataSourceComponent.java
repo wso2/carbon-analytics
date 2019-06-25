@@ -24,34 +24,48 @@ import org.osgi.framework.BundleContext;
 import org.osgi.service.component.ComponentContext;
 import org.wso2.carbon.analytics.datasource.core.AnalyticsDataSourceService;
 import org.wso2.carbon.ndatasource.core.DataSourceService;
+import org.osgi.service.component.annotations.Activate;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Deactivate;
+import org.osgi.service.component.annotations.Reference;
+import org.osgi.service.component.annotations.ReferenceCardinality;
+import org.osgi.service.component.annotations.ReferencePolicy;
 
 /**
  * Service component implementation for analytics data sources.
- * @scr.component name="analytics.ds.component" immediate="true"
- * @scr.reference name="datasource.service" interface="org.wso2.carbon.ndatasource.core.DataSourceService"
- * cardinality="1..1" policy="dynamic"  bind="setDataSourceService" unbind="unsetDataSourceService"
  */
+@Component(
+         name = "analytics.ds.component", 
+         immediate = true)
 public class AnalyticsDataSourceComponent {
-    
+
     private static final Log log = LogFactory.getLog(AnalyticsDataSourceComponent.class);
-    
+
+    @Activate
     protected void activate(ComponentContext ctx) {
         if (log.isDebugEnabled()) {
             log.debug("Starting AnalyticsDataSourceComponent#activate");
         }
         BundleContext bundleContext = ctx.getBundleContext();
-        bundleContext.registerService(AnalyticsDataSourceService.class, new AnalyticsDataSourceService() { }, null);
+        bundleContext.registerService(AnalyticsDataSourceService.class, new AnalyticsDataSourceService() {
+        }, null);
         if (log.isDebugEnabled()) {
             log.debug("Finished AnalyticsDataSourceComponent#activate");
         }
     }
-    
+
+    @Reference(
+             name = "datasource.service", 
+             service = org.wso2.carbon.ndatasource.core.DataSourceService.class, 
+             cardinality = ReferenceCardinality.MANDATORY, 
+             policy = ReferencePolicy.DYNAMIC, 
+             unbind = "unsetDataSourceService")
     protected void setDataSourceService(DataSourceService service) {
         ServiceHolder.setDataSourceService(service);
     }
-    
+
     protected void unsetDataSourceService(DataSourceService service) {
         ServiceHolder.setDataSourceService(null);
     }
-    
 }
+

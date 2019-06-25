@@ -17,28 +17,38 @@ package org.wso2.carbon.analytics.messageconsole.internal;
 * specific language governing permissions and limitations
 * under the License.
 */
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.osgi.service.component.ComponentContext;
 import org.wso2.carbon.analytics.dataservice.core.AnalyticsDataService;
 import org.wso2.carbon.ntask.core.service.TaskService;
+import org.osgi.service.component.annotations.Activate;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Deactivate;
+import org.osgi.service.component.annotations.Reference;
+import org.osgi.service.component.annotations.ReferenceCardinality;
+import org.osgi.service.component.annotations.ReferencePolicy;
 
 /**
  * This class represents the analytics message console service declarative services component.
- *
- * @scr.component name="messageconsole.component" immediate="true"
- * @scr.reference name="analytics.component" interface="AnalyticsDataService"
- * cardinality="1..1" policy="dynamic" bind="setAnalyticsDataService" unbind="unsetAnalyticsDataService"
- * @scr.reference name="ntask.component" interface="org.wso2.carbon.ntask.core.service.TaskService"
- * cardinality="1..1" policy="dynamic" bind="setTaskService" unbind="unsetTaskService"
  */
+@Component(
+         name = "messageconsole.component", 
+         immediate = true)
 public class MessageConsoleServiceComponent {
+
     private static final Log log = LogFactory.getLog(MessageConsoleServiceComponent.class);
 
+    @Activate
     protected void activate(ComponentContext ctx) {
     }
 
+    @Reference(
+             name = "analytics.component", 
+             service = AnalyticsDataService.class, 
+             cardinality = ReferenceCardinality.MANDATORY, 
+             policy = ReferencePolicy.DYNAMIC, 
+             unbind = "unsetAnalyticsDataService")
     protected void setAnalyticsDataService(AnalyticsDataService analyticsDataService) {
         ServiceHolder.setAnalyticsDataService(analyticsDataService);
     }
@@ -47,6 +57,12 @@ public class MessageConsoleServiceComponent {
         ServiceHolder.setAnalyticsDataService(null);
     }
 
+    @Reference(
+             name = "ntask.component", 
+             service = org.wso2.carbon.ntask.core.service.TaskService.class, 
+             cardinality = ReferenceCardinality.MANDATORY, 
+             policy = ReferencePolicy.DYNAMIC, 
+             unbind = "unsetTaskService")
     protected void setTaskService(TaskService taskService) {
         ServiceHolder.setTaskService(taskService);
     }
@@ -55,3 +71,4 @@ public class MessageConsoleServiceComponent {
         ServiceHolder.setTaskService(null);
     }
 }
+

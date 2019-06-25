@@ -15,37 +15,51 @@
 * specific language governing permissions and limitations
 * under the License.
 */
-
 package org.wso2.carbon.analytics.jsservice.internal;
 
 import org.wso2.carbon.analytics.api.AnalyticsDataAPI;
 import org.wso2.carbon.event.stream.core.EventStreamService;
+import org.osgi.service.component.annotations.Activate;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Deactivate;
+import org.osgi.service.component.annotations.Reference;
+import org.osgi.service.component.annotations.ReferenceCardinality;
+import org.osgi.service.component.annotations.ReferencePolicy;
 
 /**
  * This class represents the analytics data service web service declarative services component.
- *
- * @scr.component name="analytics.jsservice.component" immediate="true"
- * @scr.reference name="analytics.api.component" interface="org.wso2.carbon.analytics.api.AnalyticsDataAPI"
- * cardinality="1..1" policy="dynamic" bind="setAnalyticsDataAPIService" unbind="unsetAnalyticsDataAPIService"
- * @scr.reference name="org.wso2.carbon.event.stream.core.EventStreamService"
- * interface="org.wso2.carbon.event.stream.core.EventStreamService"
- * cardinality="1..1" policy="dynamic" bind="setEventStreamService" unbind="unsetEventStreamService"
  */
+@Component(
+         name = "analytics.jsservice.component", 
+         immediate = true)
 public class AnalyticsJSServiceComponent {
 
+    @Reference(
+             name = "analytics.api.component", 
+             service = org.wso2.carbon.analytics.api.AnalyticsDataAPI.class, 
+             cardinality = ReferenceCardinality.MANDATORY, 
+             policy = ReferencePolicy.DYNAMIC, 
+             unbind = "unsetAnalyticsDataAPIService")
     protected void setAnalyticsDataAPIService(AnalyticsDataAPI analyticsDataAPI) {
         ServiceHolder.setAnalyticsDataAPIService(analyticsDataAPI);
     }
 
     protected void unsetAnalyticsDataAPIService(AnalyticsDataAPI analyticsDataAPI) {
-        // Nothing to do in unset
+    // Nothing to do in unset
     }
 
+    @Reference(
+             name = "org.wso2.carbon.event.stream.core.EventStreamService", 
+             service = org.wso2.carbon.event.stream.core.EventStreamService.class, 
+             cardinality = ReferenceCardinality.MANDATORY, 
+             policy = ReferencePolicy.DYNAMIC, 
+             unbind = "unsetEventStreamService")
     protected void setEventStreamService(EventStreamService eventStreamService) {
         ServiceHolder.setEventStreamService(eventStreamService);
     }
 
     protected void unsetEventStreamService(EventStreamService eventStreamService) {
-        // Nothing to do in unset
+    // Nothing to do in unset
     }
 }
+

@@ -21,29 +21,43 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.osgi.service.component.ComponentContext;
 import org.wso2.carbon.analytics.dataservice.core.AnalyticsDataService;
+import org.osgi.service.component.annotations.Activate;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Deactivate;
+import org.osgi.service.component.annotations.Reference;
+import org.osgi.service.component.annotations.ReferenceCardinality;
+import org.osgi.service.component.annotations.ReferencePolicy;
 
 /**
  * This class represents the analytics event table component class.
- * @scr.component name="analytics.eventstable.comp" immediate="true"
- * @scr.reference name="analytics.component" interface="AnalyticsDataService"
- * cardinality="1..1" policy="dynamic" bind="setAnalyticsDataservice" unbind="unsetAnalyticsDataservice"
  */
+@Component(
+         name = "analytics.eventstable.comp", 
+         immediate = true)
 public class AnalyticsEventTableComponent {
-    
+
     private static Log log = LogFactory.getLog(AnalyticsEventTableComponent.class);
 
+    @Activate
     protected void activate(ComponentContext componentContext) {
         if (log.isDebugEnabled()) {
             log.debug("Started the Analytics Event Table component");
         }
     }
 
+    @Deactivate
     protected void deactivate(ComponentContext componentContext) {
         if (log.isDebugEnabled()) {
             log.debug("Stopped Analytics Event Table component");
         }
     }
 
+    @Reference(
+             name = "analytics.component", 
+             service = AnalyticsDataService.class, 
+             cardinality = ReferenceCardinality.MANDATORY, 
+             policy = ReferencePolicy.DYNAMIC, 
+             unbind = "unsetAnalyticsDataservice")
     protected void setAnalyticsDataservice(AnalyticsDataService analyticsDataservice) {
         ServiceHolder.setAnalyticsDataService(analyticsDataservice);
     }
@@ -51,5 +65,5 @@ public class AnalyticsEventTableComponent {
     protected void unsetAnalyticsDataservice(AnalyticsDataService analyticsDataservice) {
         ServiceHolder.setAnalyticsDataService(null);
     }
-    
 }
+

@@ -20,19 +20,28 @@ package org.wso2.carbon.analytics.spark.admin.internal;
 import com.hazelcast.core.HazelcastInstance;
 import org.osgi.service.component.ComponentContext;
 import org.wso2.carbon.analytics.spark.core.AnalyticsProcessorService;
+import org.osgi.service.component.annotations.Activate;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Deactivate;
+import org.osgi.service.component.annotations.Reference;
+import org.osgi.service.component.annotations.ReferenceCardinality;
+import org.osgi.service.component.annotations.ReferencePolicy;
 
-/**
- * @scr.component name="analytics.admin" immediate="true"
- * @scr.reference name="analytics.core" interface="org.wso2.carbon.analytics.spark.core.AnalyticsProcessorService"
- * cardinality="1..1" policy="dynamic" bind="setAnalyticsProcessorService" unbind="unsetAnalyticsProcessorService"
- * @scr.reference name="hazelcast.instance.service" interface="com.hazelcast.core.HazelcastInstance"
- * cardinality="0..1" policy="dynamic" bind="setHazelcastInstance" unbind="unsetHazelcastInstance"
- */
+@Component(
+         name = "analytics.admin", 
+         immediate = true)
 public class AnalyticsAdminComponent {
 
+    @Activate
     protected void activate(ComponentContext ctx) {
     }
 
+    @Reference(
+             name = "analytics.core", 
+             service = org.wso2.carbon.analytics.spark.core.AnalyticsProcessorService.class, 
+             cardinality = ReferenceCardinality.MANDATORY, 
+             policy = ReferencePolicy.DYNAMIC, 
+             unbind = "unsetAnalyticsProcessorService")
     protected void setAnalyticsProcessorService(AnalyticsProcessorService analyticsService) {
         ServiceHolder.setAnalyticsProcessorService(analyticsService);
     }
@@ -41,6 +50,12 @@ public class AnalyticsAdminComponent {
         ServiceHolder.setAnalyticsProcessorService(null);
     }
 
+    @Reference(
+             name = "hazelcast.instance.service", 
+             service = com.hazelcast.core.HazelcastInstance.class, 
+             cardinality = ReferenceCardinality.OPTIONAL, 
+             policy = ReferencePolicy.DYNAMIC, 
+             unbind = "unsetHazelcastInstance")
     protected void setHazelcastInstance(HazelcastInstance hazelcastInstance) {
         ServiceHolder.setHazelcastInstance(hazelcastInstance);
     }
@@ -49,3 +64,4 @@ public class AnalyticsAdminComponent {
         ServiceHolder.setHazelcastInstance(null);
     }
 }
+

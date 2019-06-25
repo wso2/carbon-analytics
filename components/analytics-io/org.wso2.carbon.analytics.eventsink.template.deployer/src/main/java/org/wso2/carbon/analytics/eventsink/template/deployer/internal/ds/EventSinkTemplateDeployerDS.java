@@ -24,20 +24,21 @@ import org.wso2.carbon.analytics.eventsink.template.deployer.internal.EventSinkT
 import org.wso2.carbon.event.template.manager.core.TemplateDeployer;
 import org.wso2.carbon.registry.core.exceptions.RegistryException;
 import org.wso2.carbon.registry.core.service.RegistryService;
+import org.osgi.service.component.annotations.Activate;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Deactivate;
+import org.osgi.service.component.annotations.Reference;
+import org.osgi.service.component.annotations.ReferenceCardinality;
+import org.osgi.service.component.annotations.ReferencePolicy;
 
-/**
- * @scr.component name="TemplateDeployer.eventSink.component" immediate="true"
- * @scr.reference name="analyticsEventSinkService.service"
- * interface="org.wso2.carbon.analytics.eventsink.AnalyticsEventSinkService" cardinality="1..1"
- * policy="dynamic" bind="setAnalyticsEventSinkService" unbind="unsetAnalyticsEventSinkService"
- * @scr.reference name="registry.service"
- * interface="org.wso2.carbon.registry.core.service.RegistryService"
- * cardinality="1..1" policy="dynamic" bind="setRegistryService" unbind="unsetRegistryService"
- */
+@Component(
+         name = "TemplateDeployer.eventSink.component", 
+         immediate = true)
 public class EventSinkTemplateDeployerDS {
 
     private static final Log log = LogFactory.getLog(EventSinkTemplateDeployerDS.class);
 
+    @Activate
     protected void activate(ComponentContext context) {
         try {
             EventSinkTemplateDeployer templateDeployer = new EventSinkTemplateDeployer();
@@ -47,6 +48,12 @@ public class EventSinkTemplateDeployerDS {
         }
     }
 
+    @Reference(
+             name = "analyticsEventSinkService.service", 
+             service = org.wso2.carbon.analytics.eventsink.AnalyticsEventSinkService.class, 
+             cardinality = ReferenceCardinality.MANDATORY, 
+             policy = ReferencePolicy.DYNAMIC, 
+             unbind = "unsetAnalyticsEventSinkService")
     protected void setAnalyticsEventSinkService(AnalyticsEventSinkService analyticsEventSinkService) {
         EventSinkTemplateDeployerValueHolder.setAnalyticsEventSinkService(analyticsEventSinkService);
     }
@@ -55,8 +62,13 @@ public class EventSinkTemplateDeployerDS {
         EventSinkTemplateDeployerValueHolder.setAnalyticsEventSinkService(null);
     }
 
-    protected void setRegistryService(RegistryService registryService) throws
-                                                                       RegistryException {
+    @Reference(
+             name = "registry.service", 
+             service = org.wso2.carbon.registry.core.service.RegistryService.class, 
+             cardinality = ReferenceCardinality.MANDATORY, 
+             policy = ReferencePolicy.DYNAMIC, 
+             unbind = "unsetRegistryService")
+    protected void setRegistryService(RegistryService registryService) throws RegistryException {
         EventSinkTemplateDeployerValueHolder.setRegistryService(registryService);
     }
 
@@ -64,3 +76,4 @@ public class EventSinkTemplateDeployerDS {
         EventSinkTemplateDeployerValueHolder.setRegistryService(null);
     }
 }
+
