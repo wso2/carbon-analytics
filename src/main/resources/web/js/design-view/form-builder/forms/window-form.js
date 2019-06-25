@@ -37,6 +37,18 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'constants'],
             }
         };
 
+        //function to get the attributes
+        var getAttributes = function () {
+            var attributes = [];
+            $('.attr-name').each(function () {
+                var value = $(this).val().trim();
+                if (value !== "") {
+                    attributes.push(value)
+                }
+            });
+            return attributes;
+        };
+
         /**
          * @function generate properties form for a window
          * @param element selected element(window)
@@ -127,9 +139,15 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'constants'],
                     }
                 };
                 self.formUtils.mapParameterValues(currentlySelectedWindow, windowFormContainer, true);
+                self.formUtils.addAutoCompleteForStreamWindowFunctionAttributes(getAttributes());
+            });
+
+            $(windowFormContainer).on("blur", ".attr-name", function () {
+                self.formUtils.addAutoCompleteForStreamWindowFunctionAttributes(getAttributes());
             });
 
             self.formUtils.initPerfectScroller(formConsole.cid);
+            self.formUtils.addAutoCompleteForStreamWindowFunctionAttributes(getAttributes());
 
             // 'Submit' button action
             $('#' + formConsole.cid).on('click', '#btn-submit', function () {

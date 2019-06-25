@@ -572,7 +572,9 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
                         _.forEach(overloads, function (overload) {
                             possibleParamNames = possibleParamNames + overload + ","
                         });
-                        possibleParamNames = possibleParamNames.slice(0, -1);
+                        if (overloads.length !== 0) {
+                            possibleParamNames = possibleParamNames.slice(0, -1);
+                        }
                         possibleParamNames = possibleParamNames + ")";
                         overloadParameters.push({name: possibleParamNames});
                     })
@@ -581,7 +583,9 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
                     _.forEach(predefinedFunction.parameters, function (parameter) {
                         possibleParamNames = possibleParamNames + parameter.name + ","
                     });
-                    possibleParamNames = possibleParamNames.slice(0, -1);
+                    if (predefinedFunction.parameters && predefinedFunction.parameters.length !== 0) {
+                        possibleParamNames = possibleParamNames.slice(0, -1);
+                    }
                     possibleParamNames = possibleParamNames + ")";
                     overloadParameters.push({name: possibleParamNames});
                 }
@@ -995,14 +999,37 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
         /**
          * @function to obtain only the stream function names
          */
-        FormUtils.prototype.getStreamFunctionNames = function () {
+        FormUtils.prototype.getFunctionNames = function (functionType) {
             var self = this;
-            var streamFunctions = self.configurationData.rawExtensions["streamFunctions"];
-            var streamFunctionNames = [];
-            _.forEach(streamFunctions, function (streamFunction) {
-                streamFunctionNames.push(streamFunction.name);
+            var functions = [];
+            var functionNames = [];
+            if (functionType === Constants.STREAM_FUNCTION) {
+                functions = self.getParameterOverloadNames(self.configurationData.rawExtensions["streamFunctions"]);
+            } else if (functionType === Constants.AGGREGATE_FUNCTION) {
+                functions = self.getParameterOverloadNames(self.configurationData.rawExtensions["incrementalAggregators"]);
+            } else if (functionType === Constants.FUNCTION) {
+                functions = self.getParameterOverloadNames(self.configurationData.rawExtensions["functions"]);
+            }
+            _.forEach(functions, function (functionObject) {
+                functionNames.push(self.replaceDotsInParameterNamesWithUnderscore(functionObject.name));
             });
-            return streamFunctionNames;
+            return functionNames;
+        };
+
+        /**
+         * @function to replace the dots in the parameter names with underscores so that it will be easy for the user
+         * to edit the name
+         * @param parameterName
+         * @returns {String}
+         */
+        FormUtils.prototype.replaceDotsInParameterNamesWithUnderscore = function (parameterName) {
+            var name;
+            if (parameterName.includes(".")) {
+                name = parameterName.replace(/\./g, '_');
+            } else {
+                name = parameterName;
+            }
+            return name;
         };
 
         /**
@@ -2448,14 +2475,14 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
                 if (predefinedFunction.name.toLowerCase() === savedType) {
                     if (predefinedFunction.parameterOverloads) {
                         var nameWithUniqueOverload = predefinedFunction.name + "(";
-                        for (var i=0; i < predefinedFunction.parameterOverloads.length; i++) {
+                        for (var i = 0; i < predefinedFunction.parameterOverloads.length; i++) {
                             var overload = predefinedFunction.parameterOverloads[i];
                             var lengthOfSavedParameters = savedParameters.length;
                             if (overload.includes(Constants.ATTRIBUTE)) {
                                 var attributeIndex = overload.indexOf(Constants.ATTRIBUTE);
                                 var attributes = [];
-                                for (var j=attributeIndex; j < savedParameters.length; j++) {
-                                    var parameter = savedParameters[j].substring(1, savedParameters[j].length-1)
+                                for (var j = attributeIndex; j < savedParameters.length; j++) {
+                                    var parameter = savedParameters[j].substring(1, savedParameters[j].length - 1)
                                         .toLowerCase();
                                     if (parameter === Constants.ASC || parameter === Constants.DESC) {
                                         break;
@@ -2463,14 +2490,16 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
                                         attributes.push(savedParameters[j])
                                     }
                                 }
-                                lengthOfSavedParameters = lengthOfSavedParameters-(attributes.length-1);
+                                lengthOfSavedParameters = lengthOfSavedParameters - (attributes.length - 1);
                             }
                             if (overload.length === lengthOfSavedParameters) {
                                 sameParameterLengths.sameLength = sameParameterLengths.sameLength + 1;
                                 nameWithUniqueOverload += overload + ",";
                             }
-                        };
-                        nameWithUniqueOverload = nameWithUniqueOverload.slice(0, -1);
+                        }
+                        if (overload.length !== 0) {
+                            nameWithUniqueOverload = nameWithUniqueOverload.slice(0, -1);
+                        }
                         nameWithUniqueOverload += ")";
                         functionName = nameWithUniqueOverload;
                     } else {
@@ -2478,7 +2507,9 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
                         _.forEach(predefinedFunction.parameters, function (parameter) {
                             nameWithAllParameters += parameter.name + ",";
                         });
-                        nameWithAllParameters = nameWithAllParameters.slice(0, -1);
+                        if (predefinedFunction.parameters && predefinedFunction.parameters.length !== 0) {
+                            nameWithAllParameters = nameWithAllParameters.slice(0, -1);
+                        }
                         nameWithAllParameters += ")";
                         functionName = nameWithAllParameters
                     }
@@ -2495,7 +2526,7 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
             var lengthOfSavedParameters = savedParameters.length;
             var savedParamIndex = 0;
             for (var i = 0; i < predefinedParameters.length; i++) {
-                var name = "Parameter "+(i+1);
+                var name = "Parameter " + (i + 1);
                 //Temporarily this variable is required until this property is added in the siddhi level
                 var isAttribute = false;
                 if (i < lengthOfSavedParameters) {
@@ -2504,7 +2535,7 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
                         isAttribute = true;
                         var parameterValue = [];
                         for (var j = i; j < savedParameters.length; j++) {
-                            var parameter = savedParameters[j].substring(1, savedParameters[j].length-1)
+                            var parameter = savedParameters[j].substring(1, savedParameters[j].length - 1)
                                 .toLowerCase();
                             if (parameter === Constants.ASC || parameter === Constants.DESC) {
                                 parameterValue.push(parameter);
@@ -2514,8 +2545,8 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
                             }
                         }
                         savedValue = parameterValue;
-                        lengthOfSavedParameters = lengthOfSavedParameters-(parameterValue.length-1);
-                        savedParamIndex = savedParamIndex+(parameterValue.length-1);
+                        lengthOfSavedParameters = lengthOfSavedParameters - (parameterValue.length - 1);
+                        savedParamIndex = savedParamIndex + (parameterValue.length - 1);
                     }
                     parameters.push({
                         name: name, value: savedValue, optional: predefinedParameters[i].optional,
@@ -2523,7 +2554,7 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
                     });
                 } else {
                     var value;
-                    if(name === Constants.ATTRIBUTE) {
+                    if (name === Constants.ATTRIBUTE) {
                         value = [""];
                         isAttribute = true;
                     } else {
@@ -2554,7 +2585,7 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
                         isAttribute = true;
                         var parameterValue = [];
                         for (var j = i; j < savedParameters.length; j++) {
-                            var parameter = savedParameters[j].substring(1, savedParameters[j].length-1)
+                            var parameter = savedParameters[j].substring(1, savedParameters[j].length - 1)
                                 .toLowerCase();
                             if (parameter === Constants.ASC || parameter === Constants.DESC) {
                                 parameterValue.push(parameter);
@@ -2564,8 +2595,8 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
                             }
                         }
                         savedValue = parameterValue;
-                        lengthOfSavedParameters = lengthOfSavedParameters-(parameterValue.length-1);
-                        savedParamIndex = savedParamIndex+(parameterValue.length-1);
+                        lengthOfSavedParameters = lengthOfSavedParameters - (parameterValue.length - 1);
+                        savedParamIndex = savedParamIndex + (parameterValue.length - 1);
                     }
                     parameters.push({
                         name: predefinedParameters[i].name, value: savedValue, description:
@@ -2574,7 +2605,7 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
                     });
                 } else {
                     var value;
-                    if(predefinedParameters[i].name === Constants.ATTRIBUTE) {
+                    if (predefinedParameters[i].name === Constants.ATTRIBUTE) {
                         value = [""];
                         isAttribute = true;
                     } else {
@@ -3456,18 +3487,31 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
         FormUtils.prototype.addAutoCompleteForSelectExpressions = function (attributes, elementType) {
             var self = this;
             var incrementalAggregator = self.addLabelsForAutocompleteDropDowns
-            (self.configurationData.application.config.incremental_aggregator, Constants.AGGREGATE_FUNCTION);
-            var streamFunctions = self.addLabelsForAutocompleteDropDowns
-            (self.getStreamFunctionNames(), Constants.STREAM_FUNCTION);
+            (self.getFunctionNames(Constants.AGGREGATE_FUNCTION), Constants.AGGREGATE_FUNCTION);
+            var functions = self.addLabelsForAutocompleteDropDowns
+            (self.getFunctionNames(Constants.FUNCTION), Constants.FUNCTION);
             var selectExpressionMatches = self.addLabelsForAutocompleteDropDowns
             (attributes, Constants.ATTRIBUTE);
             selectExpressionMatches = selectExpressionMatches.concat(incrementalAggregator);
-            selectExpressionMatches = selectExpressionMatches.concat(streamFunctions);
+            selectExpressionMatches = selectExpressionMatches.concat(functions);
             if (elementType === Constants.AGGREGATION) {
                 selectExpressionMatches = selectExpressionMatches.concat(self.addLabelsForAutocompleteDropDowns
                 ([Constants.AS], Constants.KEYWORD));
             }
             self.createAutocomplete($('.attribute-expression'), selectExpressionMatches);
+        };
+
+        /**
+         * @function to add auto-complete for attributes of stream and window functions
+         */
+        FormUtils.prototype.addAutoCompleteForStreamWindowFunctionAttributes = function (attributes) {
+            var self = this;
+            var matches = self.addLabelsForAutocompleteDropDowns
+            (attributes, Constants.ATTRIBUTE);
+            var functions = self.addLabelsForAutocompleteDropDowns
+            (self.getFunctionNames(Constants.FUNCTION), Constants.FUNCTION);
+            matches = matches.concat(functions);
+            self.createAutocomplete($('.parameter-value'), matches);
         };
 
         /**
@@ -3478,12 +3522,12 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
             var queryOperators = self.addLabelsForAutocompleteDropDowns
             (self.configurationData.application.config.query_operators, Constants.OPERATOR)
             var incrementalAggregator = self.addLabelsForAutocompleteDropDowns
-            (self.configurationData.application.config.incremental_aggregator, Constants.AGGREGATE_FUNCTION);
-            var streamFunctions = self.addLabelsForAutocompleteDropDowns
-            (self.getStreamFunctionNames(), Constants.STREAM_FUNCTION);
+            (self.getFunctionNames(Constants.AGGREGATE_FUNCTION), Constants.AGGREGATE_FUNCTION);
+            var functions = self.addLabelsForAutocompleteDropDowns
+            (self.getFunctionNames(Constants.FUNCTION), Constants.FUNCTION);
             var filterMatches = self.addLabelsForAutocompleteDropDowns
             (attributes, Constants.ATTRIBUTE).concat(incrementalAggregator);
-            filterMatches = filterMatches.concat(streamFunctions);
+            filterMatches = filterMatches.concat(functions);
             filterMatches = filterMatches.concat(queryOperators);
             self.createAutocomplete($('.filter-condition-content '), filterMatches);
         };
@@ -3538,14 +3582,14 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
             var queryOperators = self.addLabelsForAutocompleteDropDowns
             (self.configurationData.application.config.query_operators, Constants.OPERATOR);
             var incrementalAggregator = self.addLabelsForAutocompleteDropDowns
-            (self.configurationData.application.config.incremental_aggregator, Constants.AGGREGATE_FUNCTION);
-            var streamFunctions = self.addLabelsForAutocompleteDropDowns
-            (self.getStreamFunctionNames(), Constants.STREAM_FUNCTION);
+            (self.getFunctionNames(Constants.AGGREGATE_FUNCTION), Constants.AGGREGATE_FUNCTION);
+            var functions = self.addLabelsForAutocompleteDropDowns
+            (self.getFunctionNames(Constants.FUNCTION), Constants.FUNCTION);
             var onConditionMatches = self.addLabelsForAutocompleteDropDowns(attributes, Constants.ATTRIBUTE);
             onConditionMatches = onConditionMatches.concat(self.addLabelsForAutocompleteDropDowns
             (inputSources, Constants.INPUT));
             onConditionMatches = onConditionMatches.concat(incrementalAggregator);
-            onConditionMatches = onConditionMatches.concat(streamFunctions);
+            onConditionMatches = onConditionMatches.concat(functions);
             onConditionMatches = onConditionMatches.concat(queryOperators);
             self.createAutocomplete($('.on-condition-value'), onConditionMatches);
             self.createAutocomplete($('.define-operation-on-condition .query-content-value'), onConditionMatches)
@@ -3570,16 +3614,15 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
             var queryOperators = self.addLabelsForAutocompleteDropDowns
             (self.configurationData.application.config.query_operators, Constants.OPERATOR);
             var incrementalAggregator = self.addLabelsForAutocompleteDropDowns
-            (self.configurationData.application.config.incremental_aggregator, Constants.AGGREGATE_FUNCTION);
-            var streamFunctions = self.addLabelsForAutocompleteDropDowns
-            (self.getStreamFunctionNames(), Constants.STREAM_FUNCTION);
+            (self.getFunctionNames(Constants.AGGREGATE_FUNCTION), Constants.AGGREGATE_FUNCTION);
+            var functions = self.addLabelsForAutocompleteDropDowns
+            (self.getFunctionNames(Constants.FUNCTION), Constants.FUNCTION);
             var havingMatches = self.addLabelsForAutocompleteDropDowns(attributes, Constants.ATTRIBUTE);
             havingMatches = havingMatches.concat(incrementalAggregator);
-            havingMatches = havingMatches.concat(streamFunctions);
+            havingMatches = havingMatches.concat(functions);
             havingMatches = havingMatches.concat(queryOperators);
             self.createAutocomplete($('.having-value'), havingMatches);
         };
-
 
 
         /**
@@ -3727,7 +3770,7 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
          * @function to add event listeners for stream handler section
          * @param {Object} streamHandlerList list of stream handlers
          */
-        FormUtils.prototype.addEventListenersForStreamHandlersDiv = function (streamHandlerList) {
+        FormUtils.prototype.addEventListenersForStreamHandlersDiv = function (streamHandlerList, attributes) {
             var self = this;
 
             //on change of stream handler checkbox
@@ -3762,6 +3805,7 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
                     };
                     var parameterDiv = $(this).closest('.defineFunctionName').parents('.define-stream-handler-type-content');
                     self.mapParameterValues(streamHandler, parameterDiv, true);
+                    self.addAutoCompleteForStreamWindowFunctionAttributes(attributes);
                 });
 
             //on change of stream-function type
@@ -3783,6 +3827,7 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
                     };
                     var parameterDiv = $(this).closest('.defineFunctionName').parents('.define-stream-handler-type-content');
                     self.mapParameterValues(streamHandler, parameterDiv, true);
+                    self.addAutoCompleteForStreamWindowFunctionAttributes(attributes);
                 });
 
             //to add window
@@ -3790,6 +3835,7 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
                 var sourceDiv = self.getSourceDiv($(this));
                 self.addNewStreamHandler(sourceDiv, Constants.WINDOW);
                 self.showDropDown();
+                self.addAutoCompleteForStreamWindowFunctionAttributes(attributes);
             });
 
             //to add stream-function
@@ -3797,6 +3843,14 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
                 var sourceDiv = self.getSourceDiv($(this));
                 self.addNewStreamHandler(sourceDiv, Constants.FUNCTION);
                 self.showDropDown();
+                self.addAutoCompleteForStreamWindowFunctionAttributes(attributes);
+            });
+
+            //to add filter
+            $('.define-stream-handler').on('click', '.btn-add-filter', function () {
+                var sourceDiv = self.getSourceDiv($(this));
+                self.addNewStreamHandler(sourceDiv, Constants.FILTER);
+                self.addAutoCompleteForFilterConditions(attributes);
             });
 
             //on change of stream-handler type
@@ -3819,11 +3873,13 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
                     parents('.define-stream-handler-content').find('.define-stream-handler-type-content');
                     streamHandlerContent.removeClass();
                     streamHandlerContent.addClass('define-stream-handler-type-content');
-                    streamHandlerContent.addClass('define-' + currentValue +'-stream-handler');
+                    streamHandlerContent.addClass('define-' + currentValue + '-stream-handler');
                     self.renderStreamHandlerContentDiv(currentValue, streamHandlerContent)
                     self.mapStreamHandlerContent(streamHandlerContent, self.createEmptyStreamHandler(currentValue))
                 }
                 self.preventMultipleSelectionOfWindowStreamHandler(sourceDiv);
+                self.addAutoCompleteForStreamWindowFunctionAttributes(attributes);
+                self.addAutoCompleteForFilterConditions(attributes);
             });
 
             //To delete stream-handler
@@ -4480,7 +4536,8 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
                 case Constants.WINDOW_FILTER_PROJECTION_QUERY:
                     appData.addWindowFilterProjectionQuery(element);
                     break;
-            };
+            }
+            ;
 
             var self = this;
             var result = '';

@@ -238,7 +238,7 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryWindowOrFunct
                 }
                 self.formUtils.renderStreamHandler("query", queryInput, streamHandlerTypes);
                 self.formUtils.mapStreamHandler(queryInput, "query");
-                self.formUtils.addEventListenersForStreamHandlersDiv(streamHandlerList);
+                self.formUtils.addEventListenersForStreamHandlersDiv(streamHandlerList, possibleAttributes);
 
                 /**
                  * to show user the lost saved data when the connection is deleted/ when the connected stream is modified
@@ -251,19 +251,13 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryWindowOrFunct
                 //autocompletion
                 var outputAttributesWithElementName = self.formUtils.constructOutputAttributes(outputAttributes);
                 self.formUtils.addAutoCompleteForSelectExpressions(possibleAttributes);
-                self.formUtils.addAutoCompleteForFilterConditions(possibleAttributes.concat(outputAttributes));
+                self.formUtils.addAutoCompleteForFilterConditions(possibleAttributes);
+                self.formUtils.addAutoCompleteForStreamWindowFunctionAttributes(possibleAttributes);
                 self.formUtils.addAutoCompleteForOutputOperation(outputAttributesWithElementName, possibleAttributes);
                 self.formUtils.addAutoCompleteForHavingCondition(possibleAttributes.concat(outputAttributes));
                 self.formUtils.addAutoCompleteForOnCondition(possibleAttributes.concat(outputAttributes),
                     [inputElementName]);
                 self.formUtils.addAutoCompleteForRateLimits();
-
-                //to add filter
-                $('.define-stream-handler').on('click', '.btn-add-filter', function () {
-                    var sourceDiv = self.formUtils.getSourceDiv($(this));
-                    self.formUtils.addNewStreamHandler(sourceDiv, Constants.FILTER);
-                    self.formUtils.addAutoCompleteForFilterConditions(possibleAttributes.concat(outputAttributes));
-                });
 
                 //to add query operation set
                 var setDiv = '<li class="setAttributeValue">' +
