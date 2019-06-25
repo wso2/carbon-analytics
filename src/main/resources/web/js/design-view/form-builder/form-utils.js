@@ -3508,8 +3508,11 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
             var self = this;
             var matches = self.addLabelsForAutocompleteDropDowns
             (attributes, Constants.ATTRIBUTE);
+            var incrementalAggregator = self.addLabelsForAutocompleteDropDowns
+            (self.getFunctionNames(Constants.AGGREGATE_FUNCTION), Constants.AGGREGATE_FUNCTION);
             var functions = self.addLabelsForAutocompleteDropDowns
             (self.getFunctionNames(Constants.FUNCTION), Constants.FUNCTION);
+            matches = matches.concat(incrementalAggregator);
             matches = matches.concat(functions);
             self.createAutocomplete($('.parameter-value'), matches);
         };
