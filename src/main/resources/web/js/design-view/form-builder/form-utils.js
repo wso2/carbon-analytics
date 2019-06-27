@@ -2432,9 +2432,9 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
             var parameters;
             var savedType = streamHandler.value.function.toLowerCase();
             var savedParameters = streamHandler.value.parameters;
-            var streamHandlerType = streamHandler.type.toLowerCase();
+            var windowFunctionType = streamHandler.type.toLowerCase();
             var parameterLength = {sameLength: 0};
-            if (streamHandlerType === Constants.WINDOW) {
+            if (windowFunctionType === Constants.WINDOW) {
                 predefinedFunctions = _.orderBy(_.cloneDeep
                 (self.configurationData.rawExtensions["windowFunctionNames"]), ['name'], ['asc']);
             } else {
@@ -2452,11 +2452,11 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
             if (parameterLength.sameLength > 1 && !onChange) {
                 $(div).find('.custom-combobox-input').val(self.getFunctionNameWithoutParameterOverload(functionName));
                 parameters = self.createObjectsForUnknownParameters(functionParameters, savedParameters);
-                self.renderUnknownParameters(parameters, functionParameters, streamHandlerType, div);
+                self.renderUnknownParameters(parameters, functionParameters, windowFunctionType, div);
             } else {
                 $(div).find('.custom-combobox-input').val(functionName);
                 parameters = self.createObjectsForKnownParameters(overloadParameters, savedParameters);
-                self.renderParameters(parameters, streamHandlerType, div);
+                self.renderParameters(parameters, windowFunctionType, div);
             }
             $('.attribute-param .attribute-param-value:first .btn-del-option').remove();
             $('.attribute-param .attribute-param-value:first')
@@ -2535,10 +2535,8 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
                         isAttribute = true;
                         var parameterValue = [];
                         for (var j = i; j < savedParameters.length; j++) {
-                            var parameter = savedParameters[j].substring(1, savedParameters[j].length - 1)
-                                .toLowerCase();
+                            var parameter = savedParameters[j].toLowerCase();
                             if (parameter === Constants.ASC || parameter === Constants.DESC) {
-                                parameterValue.push(parameter);
                                 break;
                             } else {
                                 parameterValue.push(savedParameters[j]);
@@ -2585,10 +2583,8 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
                         isAttribute = true;
                         var parameterValue = [];
                         for (var j = i; j < savedParameters.length; j++) {
-                            var parameter = savedParameters[j].substring(1, savedParameters[j].length - 1)
-                                .toLowerCase();
+                            var parameter = savedParameters[j].toLowerCase();
                             if (parameter === Constants.ASC || parameter === Constants.DESC) {
-                                parameterValue.push(parameter);
                                 break;
                             } else {
                                 parameterValue.push(savedParameters[j]);

@@ -127,7 +127,6 @@ define(function () {
         FOR: "for",
         ASC:"asc",
         DESC: "desc",
-        ORDER: "order",
         BATCH_WINDOW_PROCESSOR: "batch"
     };
 
