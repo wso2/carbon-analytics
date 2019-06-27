@@ -124,7 +124,10 @@ define(function () {
         KEYWORD: "keyword",
         OPERATOR: "operator",
         INPUT: "input",
-        FOR: "for"
+        FOR: "for",
+        ASC:"asc",
+        DESC: "desc",
+        BATCH_WINDOW_PROCESSOR: "batch"
     };
 
     return constants;
