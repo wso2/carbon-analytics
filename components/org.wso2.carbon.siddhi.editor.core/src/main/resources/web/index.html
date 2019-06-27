@@ -1389,7 +1389,7 @@
                     <label class = "parameter-name mandatory-parameter"> {{name}} </label>
                 </div>
                 {{/if}}
-                {{#if isAttribute}}
+                {{#if isMultiValue}}
                 <div class = "clearfix param-content attribute-param">
                     {{#each value}}
                     <div class="attribute-param-value">
@@ -1440,7 +1440,7 @@
                     </i>
                 </div>
                 {{/if}}
-                {{#if isAttribute}}
+                {{#if isMultiValue}}
                 <div class = "param-content attribute-param clearfix">
                     {{#each value}}
                     <div class="attribute-param-value">

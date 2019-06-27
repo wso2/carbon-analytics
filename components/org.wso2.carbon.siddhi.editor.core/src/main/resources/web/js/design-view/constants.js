@@ -127,7 +127,8 @@ define(function () {
         FOR: "for",
         ASC:"asc",
         DESC: "desc",
-        BATCH_WINDOW_PROCESSOR: "batch"
+        BATCH_WINDOW_PROCESSOR: "batch",
+        MULTI_VALUE: "..."
     };
 
     return constants;
