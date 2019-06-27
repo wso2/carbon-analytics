@@ -946,15 +946,26 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
          */
         FormUtils.prototype.getParameterOverloads = function (functionName, predefinedParameters) {
             var parameterOverloads = [];
+            var multiValue;
             if (functionName.includes("(")) {
                 var regexToGetTextInsideBrackets = /\(([^)]+)\)/;
                 var overloads = regexToGetTextInsideBrackets.exec(functionName)[1].trim();
                 var listOfOverloads = overloads.split(",");
-                _.forEach(listOfOverloads, function (overload) {
+                _.forEach(listOfOverloads, function (overload, index) {
+                    multiValue = false;
                     overload = overload.trim();
                     _.forEach(predefinedParameters, function (parameter) {
+                        if (listOfOverloads[index+1] === Constants.MULTI_VALUE) {
+                            multiValue = true;
+                        }
                         if (overload === parameter.name) {
-                            parameterOverloads.push(parameter);
+                            parameterOverloads.push({
+                                name: parameter.name,
+                                description: parameter.description,
+                                optional: parameter.optional,
+                                defaultValue: parameter.defaultValue,
+                                isMultiValue: multiValue
+                            });
                             return false;
                         }
                     });
@@ -2478,27 +2489,21 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
                         for (var i = 0; i < predefinedFunction.parameterOverloads.length; i++) {
                             var overload = predefinedFunction.parameterOverloads[i];
                             var lengthOfSavedParameters = savedParameters.length;
-                            if (overload.includes(Constants.ATTRIBUTE)) {
-                                var attributeIndex = overload.indexOf(Constants.ATTRIBUTE);
-                                var attributes = [];
-                                for (var j = attributeIndex; j < savedParameters.length; j++) {
-                                    var parameter = savedParameters[j].substring(1, savedParameters[j].length - 1)
-                                        .toLowerCase();
-                                    if (parameter === Constants.ASC || parameter === Constants.DESC) {
-                                        break;
-                                    } else {
-                                        attributes.push(savedParameters[j])
+                            var noOfOverloadParameters = overload.length;
+                            for (var k = 0; k < overload.length; k++) {
+                                if (overload[k + 1] === Constants.MULTI_VALUE) {
+                                    var multiValues = [];
+                                    for (var j = k; j < savedParameters.length; j++) {
+                                        multiValues.push(savedParameters[j])
                                     }
+                                    lengthOfSavedParameters = lengthOfSavedParameters - (multiValues.length - 1);
+                                    noOfOverloadParameters = noOfOverloadParameters - 1;
                                 }
-                                lengthOfSavedParameters = lengthOfSavedParameters - (attributes.length - 1);
                             }
-                            if (overload.length === lengthOfSavedParameters) {
+                            if (noOfOverloadParameters === lengthOfSavedParameters) {
                                 sameParameterLengths.sameLength = sameParameterLengths.sameLength + 1;
-                                nameWithUniqueOverload += overload + ",";
+                                nameWithUniqueOverload += overload;
                             }
-                        }
-                        if (overload.length !== 0) {
-                            nameWithUniqueOverload = nameWithUniqueOverload.slice(0, -1);
                         }
                         nameWithUniqueOverload += ")";
                         functionName = nameWithUniqueOverload;
@@ -2527,20 +2532,12 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
             var savedParamIndex = 0;
             for (var i = 0; i < predefinedParameters.length; i++) {
                 var name = "Parameter " + (i + 1);
-                //Temporarily this variable is required until this property is added in the siddhi level
-                var isAttribute = false;
                 if (i < lengthOfSavedParameters) {
                     var savedValue = savedParameters[savedParamIndex];
-                    if (predefinedParameters[i].name === Constants.ATTRIBUTE) {
-                        isAttribute = true;
+                    if (predefinedParameters[i].isMultiValue) {
                         var parameterValue = [];
                         for (var j = i; j < savedParameters.length; j++) {
-                            var parameter = savedParameters[j].toLowerCase();
-                            if (parameter === Constants.ASC || parameter === Constants.DESC) {
-                                break;
-                            } else {
-                                parameterValue.push(savedParameters[j]);
-                            }
+                            parameterValue.push(savedParameters[j]);
                         }
                         savedValue = parameterValue;
                         lengthOfSavedParameters = lengthOfSavedParameters - (parameterValue.length - 1);
@@ -2548,18 +2545,18 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
                     }
                     parameters.push({
                         name: name, value: savedValue, optional: predefinedParameters[i].optional,
-                        isAttribute: isAttribute
+                        isMultiValue: predefinedParameters[i].isMultiValue
                     });
                 } else {
                     var value;
-                    if (name === Constants.ATTRIBUTE) {
+                    if (predefinedParameters[i].isMultiValue) {
                         value = [""];
-                        isAttribute = true;
                     } else {
                         value = ""
                     }
                     parameters.push({
-                        name: name, value: value, optional: predefinedParameters[i].optional
+                        name: name, value: value, optional: predefinedParameters[i].optional,
+                        isMultiValue: predefinedParameters[i].isMultiValue
                     });
                 }
                 savedParamIndex++;
@@ -2575,20 +2572,12 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
             var lengthOfSavedParameters = savedParameters.length;
             var savedParamIndex = 0;
             for (var i = 0; i < predefinedParameters.length; i++) {
-                var isAttribute = false;
                 if (i < lengthOfSavedParameters) {
                     var savedValue = savedParameters[savedParamIndex];
-                    if (predefinedParameters[i].name === Constants.ATTRIBUTE) {
-                        //Temporarily this variable is required until this property is added in the siddhi level
-                        isAttribute = true;
+                    if (predefinedParameters[i].isMultiValue) {
                         var parameterValue = [];
                         for (var j = i; j < savedParameters.length; j++) {
-                            var parameter = savedParameters[j].toLowerCase();
-                            if (parameter === Constants.ASC || parameter === Constants.DESC) {
-                                break;
-                            } else {
-                                parameterValue.push(savedParameters[j]);
-                            }
+                            parameterValue.push(savedParameters[j]);
                         }
                         savedValue = parameterValue;
                         lengthOfSavedParameters = lengthOfSavedParameters - (parameterValue.length - 1);
@@ -2597,20 +2586,21 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
                     parameters.push({
                         name: predefinedParameters[i].name, value: savedValue, description:
                         predefinedParameters[i].description, optional: predefinedParameters[i].optional,
-                        defaultValue: predefinedParameters[i].defaultValue, isAttribute: isAttribute
+                        defaultValue: predefinedParameters[i].defaultValue,
+                        isMultiValue: predefinedParameters[i].isMultiValue
                     });
                 } else {
                     var value;
-                    if (predefinedParameters[i].name === Constants.ATTRIBUTE) {
+                    if (predefinedParameters[i].isMultiValue) {
                         value = [""];
-                        isAttribute = true;
                     } else {
                         value = ""
                     }
                     parameters.push({
                         name: predefinedParameters[i].name, value: value, description: predefinedParameters[i]
                             .description, optional: predefinedParameters[i].optional,
-                        defaultValue: predefinedParameters[i].defaultValue, isAttribute: isAttribute
+                        defaultValue: predefinedParameters[i].defaultValue,
+                        isMultiValue: predefinedParameters[i].isMultiValue
                     });
                 }
                 savedParamIndex++;
