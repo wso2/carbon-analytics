@@ -197,7 +197,6 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryWindowOrFunct
         var autoCompleteFieldsWithChangingAttributes = function (self, outputAttributes) {
             var inputSources = getLeftRightSourceNames();
             var possibleAttributesWithSourceAs = getPossibleAttributesWithSourceAs(self);
-            self.formUtils.addAutoCompleteForFilterConditions(possibleAttributesWithSourceAs.concat(outputAttributes));
             self.formUtils.addAutoCompleteForSelectExpressions(possibleAttributesWithSourceAs);
             self.formUtils.addAutoCompleteForOnCondition(possibleAttributesWithSourceAs.concat(outputAttributes), inputSources);
             self.formUtils.addAutoCompleteForPerWithinConditions(possibleAttributesWithSourceAs.concat(outputAttributes));
@@ -406,6 +405,11 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryWindowOrFunct
                 self.formUtils.renderStreamHandler(Constants.RIGHT, rightSourceData, streamHandlerTypes);
                 self.formUtils.renderDropDown('.input-from-drop-down', possibleSources, Constants.SOURCE);
 
+                var inputAttributes = [];
+                _.forEach(self.formUtils.getInputAttributes(possibleSources), function (attribute) {
+                    inputAttributes.push(attribute.name);
+                });
+
                 if (leftSourceData && !rightSourceData) {
                     mapSourceType(Constants.LEFT, leftSourceData.getConnectedSource(), true);
                     mapSourceType(Constants.RIGHT, leftSourceData.getConnectedSource(), false);
@@ -428,7 +432,7 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryWindowOrFunct
                 var streamHandlerList = [];
                 getStreamHandlers(leftSourceData, streamHandlerList, Constants.LEFT);
                 getStreamHandlers(rightSourceData, streamHandlerList, Constants.RIGHT);
-                self.formUtils.addEventListenersForStreamHandlersDiv(streamHandlerList);
+                self.formUtils.addEventListenersForStreamHandlersDiv(streamHandlerList, inputAttributes);
 
                 self.formUtils.mapStreamHandler(leftSourceData, Constants.LEFT)
                 self.formUtils.mapStreamHandler(rightSourceData, Constants.RIGHT)
@@ -508,25 +512,16 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryWindowOrFunct
                 }
 
                 //autocompletion
-                var inputAttributes = [];
-                _.forEach(self.formUtils.getInputAttributes(possibleSources), function (attribute) {
-                    inputAttributes.push(attribute.name);
-                });
                 var outputAttributesWithElementName = self.formUtils.constructOutputAttributes(outputAttributes);
                 self.formUtils.addAutoCompleteForRateLimits();
+                self.formUtils.addAutoCompleteForFilterConditions(inputAttributes);
+                self.formUtils.addAutoCompleteForStreamWindowFunctionAttributes(inputAttributes);
                 autoCompleteFieldsWithChangingAttributes(self, outputAttributesWithElementName);
 
                 $('.join-query-form-container').on('blur', '.as-content-value', function () {
                     autoCompleteFieldsWithChangingAttributes(self, outputAttributesWithElementName);
                     var possibleAttributesWithSourceAs = getPossibleAttributesWithSourceAs(self);
                     self.formUtils.generateGroupByDiv(groupBy, possibleAttributesWithSourceAs);
-                });
-
-                //to add filter
-                $('.define-stream-handler').on('click', '.btn-add-filter', function () {
-                    var sourceDiv = self.formUtils.getSourceDiv($(this));
-                    self.formUtils.addNewStreamHandler(sourceDiv, Constants.FILTER);
-                    autoCompleteFieldsWithChangingAttributes(self, outputAttributesWithElementName);
                 });
 
                 //to add query operation set

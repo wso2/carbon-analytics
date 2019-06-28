@@ -1342,7 +1342,77 @@
                     </div>
                 </div>
             {{/each}}
+        </div>
     </div>
+</script>
+
+<script id="window-function-unknown-parameters-template" type = "text/template">
+    {{#if predefinedParameters}}
+    <div class="display-predefined-parameters">
+        <div class="clearfix collapse-div" data-toggle="collapse" href="#predefined-param-content"
+             aria-controls="join-{{type}}-content" aria-expanded="false">
+            <label class="parameter-label"> Supported Parameters </label>
+            <a class="collapse-icon"> </a>
+        </div>
+        <div class = "collapse" id ="predefined-param-content">
+            {{#each predefinedParameters}}
+            <div class="predefined-param">
+                {{#if optional}}
+                <label class = "predefined-param-name clearfix"> {{name}}
+                    <span class="optional-label"> (optional) </span>
+                </label>
+                {{else}}
+                <label class = "clearfix predefined-param-name"> {{name}}
+                    <span class = "optional-label"> (mandatory)</span>
+                </label>
+                {{/if}}
+                <label class="clearfix predefined-param-desc"> {{description}} </label>
+            </div>
+            {{/each}}
+        </div>
+    </div>
+    {{/if}}
+
+    {{#if parameters}}
+    <h4> Parameters </h4>
+    <div id = "{{id}}-unknown-parameters">
+        <div class = "sub-{{id}}-parameter-div">
+            {{#each parameters}}
+            <div class = "parameter" id="{{name}}">
+                {{#if optional}}
+                <div class = "clearfix">
+                    <label class = "parameter-name optional-parameter"> {{name}} </label>
+                </div>
+                {{else}}
+                <div class="clearfix">
+                    <span class = "mandatory-symbol"> * </span>
+                    <label class = "parameter-name mandatory-parameter"> {{name}} </label>
+                </div>
+                {{/if}}
+                {{#if isMultiValue}}
+                <div class = "clearfix param-content attribute-param">
+                    {{#each value}}
+                    <div class="attribute-param-value">
+                        <input class = "parameter-value" type = "text" value = "{{this}}">
+                        <a class = "btn-del-option"> <i class = "fw fw-delete"> </i></a>
+                    </div>
+                    {{/each}}
+                </div>
+                {{else}}
+                <div class = "clearfix param-content">
+                    <input class = "parameter-value" type = "text" value = "{{value}}">
+                </div>
+                {{/if}}
+                <label class = "error-message"></label>
+            </div>
+            {{#if (isDivisor (sum @index 1) ../parameters)}}
+        </div>
+        <div class = "sub-{{../id}}-parameter-div">
+            {{/if}}
+            {{/each}}
+        </div>
+    </div>
+    {{/if}}
 </script>
 
 <script id="window-function-parameters-template" type = "text/template">
@@ -1350,56 +1420,47 @@
     <h4> Parameters </h4>
     <div id = "{{id}}-parameters">
         <div class = "sub-{{id}}-parameter-div">
-    {{#each parameters}}
-        <div class = "parameter" id="{{name}}-parameter">
-        {{#if optional}}
-            {{#if value}}
+            {{#each parameters}}
+            <div class = "parameter" id="{{name}}-parameter">
+                {{#if optional}}
                 <div class = "clearfix">
-                    <label class = "parameter-name optional-parameter">
-                        <input type = "checkbox" class = "parameter-checkbox" checked> {{name}}
-                    </label>
+                    <label class = "parameter-name optional-parameter">{{name}} </label>
                     <i class = "fw fw-info">
                         <span style = "display:none"> {{description}} </span>
                     </i>
                 </div>
-                <div class = "clearfix optional-param-content">
+                {{else}}
+                <div class="clearfix">
+                    <span class = "mandatory-symbol"> * </span>
+                    <label class = "parameter-name mandatory-parameter">
+                        {{name}}
+                    </label>
+                    <i class="fw fw-info">
+                        <span style="display:none"> {{description}} </span>
+                    </i>
+                </div>
+                {{/if}}
+                {{#if isMultiValue}}
+                <div class = "param-content attribute-param clearfix">
+                    {{#each value}}
+                    <div class="attribute-param-value">
+                        <input class = "parameter-value" type = "text" value = "{{this}}">
+                        <a class = "btn-del-option"> <i class = "fw fw-delete"> </i></a>
+                    </div>
+                    {{/each}}
+                </div>
+                {{else}}
+                <div class = "param-content clearfix">
                     <input class = "parameter-value" type = "text" value = "{{value}}">
                 </div>
-            {{else}}
-                <div class="clearfix">
-                    <label class = "parameter-name optional-parameter">
-                        <input type = "checkbox" class = "parameter-checkbox"> {{name}}
-                    </label>
-                    <i class = "fw fw-info">
-                        <span style = "display:none"> {{description}} </span>
-                    </i>
-                </div>
-                <div class="clearfix optional-param-content" style ="display:none">
-                    <input class = "parameter-value" type = "text" value="{{defaultValue}}">
-                </div>
-            {{/if}}
+                {{/if}}
                 <label class = "error-message"></label>
-        {{else}}
-            <div class="clearfix">
-                <span class = "mandatory-symbol"> * </span>
-                <label class = "parameter-name mandatory-parameter">
-                    {{name}}
-                </label>
-                <i class="fw fw-info">
-                    <span style="display:none"> {{description}} </span>
-                </i>
             </div>
-            <div class = "clearfix">
-                <input class = "parameter-value" type = "text" value = "{{value}}">
-            </div>
-            <label class = "error-message"></label>
-        {{/if}}
+            {{#if (isDivisor (sum @index 1) ../parameters)}}
         </div>
-        {{#if (isDivisor (sum @index 1) ../parameters)}}
-            </div>
-            <div class = "sub-{{../id}}-parameter-div">
-        {{/if}}
-    {{/each}}
+        <div class = "sub-{{../id}}-parameter-div">
+            {{/if}}
+            {{/each}}
         </div>
     </div>
     {{/if}}
@@ -2724,7 +2785,6 @@
             query_operators: ["==", ">=", ">", "<=", "<", "AND", "OR", "NOT", "IN", "IS NULL"],
             output_rate_limit_keywords: ["snapshot", "every", "within", "events", "ALL", "LAST", "FIRST"],
             logic_statement_keywords: ["for", "every", "within"],
-            incremental_aggregator: ["sum", "min", "max", "avg", "count", "distinctCount"],
             join_types: ["join", "left_outer_join", "right_outer_join", "full_outer_join"],
             stream_handler_types: ["filter", "function","window"],
             query_output_operations: ["insert", "delete", "update", "update_or_insert_into"],

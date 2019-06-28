@@ -342,6 +342,10 @@ public class SourceEditorUtils {
                     .isAssignableFrom(extensionClass)) {
                 processorType = Constants.ATTRIBUTE_AGGREGATOR;
                 processorMetaDataList = metaData.getFunctions();
+            } else if (Constants.SUPER_CLASS_MAP.get(Constants.INCREMENTAL_AGGREGATOR)
+                        .isAssignableFrom(extensionClass)) {
+                    processorType = Constants.INCREMENTAL_AGGREGATOR;
+                    processorMetaDataList = metaData.getFunctions();
             } else if (Constants.SUPER_CLASS_MAP.get(Constants.STREAM_FUNCTION_PROCESSOR)
                     .isAssignableFrom(extensionClass)) {
                 processorType = Constants.STREAM_FUNCTION_PROCESSOR;

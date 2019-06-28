@@ -2914,7 +2914,9 @@ define(["ace/ace", "jquery", "./constants", "./utils", "ace/snippets", "ace/rang
             sourceMaps: {},
             sinkMaps: {},
             windowFunctionNames: {},
-            streamFunctions: {}
+            streamFunctions: {},
+            incrementalAggregators: {},
+            functions: {}
         };
 
         CompletionEngine.isDynamicExtensionsLoaded = false;
@@ -2976,6 +2978,8 @@ define(["ace/ace", "jquery", "./constants", "./utils", "ace/snippets", "ace/rang
                         })();
                         (function () {
                             var snippets = {};
+                            var streamFunctions = [];
+                            var functions = [];
                             CompletionEngine.rawExtensions.store = response.extensions["store"]["stores"];
                             CompletionEngine.rawExtensions.sink = response.extensions["sink"]["sinks"];
                             CompletionEngine.rawExtensions.source = response.extensions["source"]["sources"];
@@ -2983,10 +2987,16 @@ define(["ace/ace", "jquery", "./constants", "./utils", "ace/snippets", "ace/rang
                                 .extensions["sourceMapper"]["sourceMaps"];
                             CompletionEngine.rawExtensions.sinkMaps = response.extensions["sinkMapper"]["sinkMaps"];
                             CompletionEngine.rawExtensions.windowFunctionNames = response.inBuilt["windowProcessors"];
-                            var streamFunctions = [];
+                            CompletionEngine.rawExtensions.incrementalAggregators = response.extensions
+                                ["incrementalAggregator"]["functions"];
                             obtainStreamFunctionsFromResponse(response.extensions, streamFunctions);
                             obtainStreamFunctionsFromResponse(response.inBuilt, streamFunctions);
+                            obtainFunctionFromResponse(response.extensions, functions,
+                                CompletionEngine.rawExtensions.incrementalAggregators);
+                            obtainFunctionFromResponse(response.inBuilt, functions,
+                                CompletionEngine.rawExtensions.incrementalAggregators);
                             CompletionEngine.rawExtensions.streamFunctions = streamFunctions;
+                            CompletionEngine.rawExtensions.functions = functions;
                             for (var namespace in response.extensions) {
                                 if (response.extensions.hasOwnProperty(namespace)) {
                                     var processors = {};
@@ -3088,14 +3098,47 @@ define(["ace/ace", "jquery", "./constants", "./utils", "ace/snippets", "ace/rang
         function obtainStreamFunctionsFromResponse(extensions, streamFunctions) {
             _.forEach(extensions, function (extension) {
                 _.forEach(extension.streamProcessors, function (streamFunction) {
+                    var parameterOverloads;
+                    if (streamFunction.parameterOverloads) {
+                        parameterOverloads = streamFunction.parameterOverloads;
+                    }
                     var streamProcessorFunction = {
                         description: streamFunction.description,
                         examples: streamFunction.examples,
                         name: streamFunction.namespace + ':' + streamFunction.name,
                         parameters: streamFunction.parameters,
+                        parameterOverloads: parameterOverloads,
                         returnAttributes: streamFunction.returnAttributes
-                    }
+                    };
                     streamFunctions.push(streamProcessorFunction);
+                });
+            });
+        }
+
+        /**
+         * @function to obtain the functions from the given extensions
+         * @param {Object} extensions extensions
+         * @param {Object} functions array to hold the stream functions
+         * @param {Object} aggregateFunctions
+         */
+        function obtainFunctionFromResponse(extensions, functions, aggregateFunctions) {
+            _.forEach(extensions, function (extension) {
+                _.forEach(extension.functions, function (normalFunction) {
+                    if (!_.some(aggregateFunctions, normalFunction)){
+                        var parameterOverloads;
+                        if (normalFunction.parameterOverloads) {
+                            parameterOverloads = normalFunction.parameterOverloads;
+                        }
+                        var functionObject = {
+                            description: normalFunction.description,
+                            examples: normalFunction.examples,
+                            name: normalFunction.namespace + ':' + normalFunction.name,
+                            parameters: normalFunction.parameters,
+                            parameterOverloads: parameterOverloads,
+                            returnAttributes: normalFunction.returnAttributes
+                        };
+                        functions.push(functionObject);
+                    }
                 });
             });
         }

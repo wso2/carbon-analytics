@@ -81,7 +81,6 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOrderByValue'
         var autoCompleteFieldsWithChangingAttributes = function (self, partitionId, outputAttributes) {
             var possibleAttributes = getPossibleAttributes(self, partitionId);
             self.formUtils.addAutoCompleteForSelectExpressions(possibleAttributes);
-            self.formUtils.addAutoCompleteForFilterConditions(possibleAttributes.concat(outputAttributes));
             self.formUtils.addAutoCompleteForLogicStatements();
             self.formUtils.addAutoCompleteForHavingCondition(possibleAttributes.concat(outputAttributes));
             self.formUtils.addAutoCompleteForOnCondition(possibleAttributes.concat(outputAttributes),
@@ -123,17 +122,6 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOrderByValue'
                 isErrorOccurred = true;
             }
             return isErrorOccurred;
-        };
-
-        /**
-         * @function to add new filter stream handler
-         */
-        var addEventListenerToAddNewFilter = function (self, partitionId, outputAttributes) {
-            $('.define-stream-handler').on('click', '.btn-add-filter', function () {
-                var sourceDiv = self.formUtils.getSourceDiv($(this));
-                self.formUtils.addNewStreamHandler(sourceDiv, Constants.FILTER);
-                autoCompleteFieldsWithChangingAttributes(self, partitionId, outputAttributes);
-            });
         };
 
         /**
@@ -246,6 +234,10 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOrderByValue'
                         inputStreamNames.push(streamName)
                     }
                 });
+                var inputAttributes = [];
+                _.forEach(self.formUtils.getInputAttributes(inputStreamNames), function (attribute) {
+                    inputAttributes.push(attribute.name);
+                });
 
                 //conditions
                 if (!conditionList || (conditionList && conditionList.length == 0)) {
@@ -256,7 +248,7 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOrderByValue'
                 self.formUtils.mapConditions(conditionList);
                 self.formUtils.selectFirstConditionByDefault();
                 var streamHandlerList = getStreamHandlers(conditionList);
-                self.formUtils.addEventListenersForStreamHandlersDiv(streamHandlerList);
+                self.formUtils.addEventListenersForStreamHandlersDiv(streamHandlerList, inputAttributes);
                 self.formUtils.addEventListenersForConditionDiv();
 
                 var outputAttributes = [];
@@ -314,15 +306,11 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOrderByValue'
                     validateSectionsOnLoadOfForm(self);
                 }
 
-                var inputAttributes = [];
-                _.forEach(self.formUtils.getInputAttributes(inputStreamNames), function (attribute) {
-                    inputAttributes.push(attribute.name);
-                });
                 var outputAttributesWithElementName = self.formUtils.constructOutputAttributes(outputAttributes);
+                self.formUtils.addAutoCompleteForFilterConditions(inputAttributes);
+                self.formUtils.addAutoCompleteForStreamWindowFunctionAttributes(inputAttributes);
                 self.formUtils.addAutoCompleteForRateLimits();
                 autoCompleteFieldsWithChangingAttributes(self, partitionId, outputAttributesWithElementName);
-
-                addEventListenerToAddNewFilter(self, partitionId, outputAttributesWithElementName);
 
                 $('.define-conditions').on('click', '.btn-del-condition', function () {
                     var conditionIndex = $(this).closest('.condition-navigation').index();
@@ -339,7 +327,6 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOrderByValue'
                     self.formUtils.addNewCondition(inputStreamNames);
                     generateDivRequiringPossibleAttributes(self, partitionId, groupBy);
                     autoCompleteFieldsWithChangingAttributes(self, partitionId, outputAttributesWithElementName);
-                    addEventListenerToAddNewFilter(self, partitionId, outputAttributesWithElementName);
                 });
 
                 $('.define-conditions').on('blur', '.condition-id', function () {
