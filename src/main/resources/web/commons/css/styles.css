@@ -153,8 +153,10 @@ ol#breadcrumbList {
 }
 
 header .brand img.logo {
-    height: 17px;
-    padding: 0 7px;
+    height: 13px;
+    padding: 0 0px;
+    vertical-align: middle;
+    padding-bottom: 1px;
 }
 
 header .brand h1 {

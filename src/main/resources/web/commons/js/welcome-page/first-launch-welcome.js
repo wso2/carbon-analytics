@@ -88,7 +88,8 @@ define(['require', 'lodash', 'log', 'jquery', 'backbone', 'command', 'sample_pre
                 buttonWrap.append(newButton);
                 buttonWrap.append(openButton);
 
-                var productNameWrapHeader = $('<h1>Siddhi Editor</h1>');
+                var productNameWrapHeader = $('<img src="/editor/commons/images/siddhi-logo.svg">' +
+                    '<h5 class="icontagline">Cloud Native Stream Processor</h5>');
                 productNameWrap.append(productNameWrapHeader);
 
 

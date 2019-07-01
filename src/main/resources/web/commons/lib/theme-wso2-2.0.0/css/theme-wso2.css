@@ -6456,6 +6456,13 @@ a.thumbnail.active {
     background: #220807;
 }
 
+.icontagline{
+    margin-top: 10px;
+    margin-bottom: 10px;
+    color: dimgrey;
+    font-weight: 400;
+}
+
 @-webkit-keyframes progress-bar-stripes {
     from {
         background-position: 40px 0;

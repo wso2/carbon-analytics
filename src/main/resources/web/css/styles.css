@@ -23,9 +23,9 @@ h3,
 header .brand h1 {
     font-size: 1.5rem;
     text-transform: inherit;
-    display: inline-block;
-    margin: 13px 0;
-    font-weight: 400;
+    display: inline;
+    font-weight: 450;
+    vertical-align: middle;
 }
 
 .header {
@@ -36,7 +36,7 @@ header .brand {
     line-height: 40px;
     padding: 0 10px;
     vertical-align: middle;
-    margin-right: 5px;
+    margin-right: 25px;
 }
 
 .menu-bar {
