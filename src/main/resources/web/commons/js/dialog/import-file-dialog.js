@@ -24,7 +24,7 @@ define(['require', 'lodash', 'jquery', 'log', 'backbone', 'file_browser', 'works
                 /**
                  * @augments Backbone.View
                  * @constructs
-                 * @class SaveToFileDialog
+                 * @class ImportFileDialog
                  * @param {Object} config configuration options for the SaveToFileDialog
                  */
                 initialize: function (options) {
@@ -69,13 +69,14 @@ define(['require', 'lodash', 'jquery', 'log', 'backbone', 'file_browser', 'works
 
                         if (existsResponse.error === undefined) {
                             if (existsResponse.exists) {
-                                alertError("A file already exist in workspace with selected name.");
+                                alertError("A file already exist in workspace with the name - " +
+                                    fileName);
                                 return;
                             } else {
                                 reader.readAsText(file);
                             }
                         } else {
-                            alertError("Error in reading the file.");
+                            alertError("Error in reading the file - " + fileName);
                         }
 
                         reader.onload = (function (reader) {
@@ -192,15 +193,13 @@ define(['require', 'lodash', 'jquery', 'log', 'backbone', 'file_browser', 'works
                         if (!_.isEmpty(detailedErrorMsg)) {
                             errorMsg = (detailedErrorMsg);
                         }
-                        return $(
-                            "<div style='z-index: 9999;' style='line-height: 20%;' class='alert alert-danger'" +
-                            " id='error-alert'>" + "<span class='notification'>" +
-                            errorMsg +
+                        return $(" id='error-alert'>" +
+                            "<span class='notification'>" + errorMsg +
                             "</span>" +
-                            "</div>");
+                            "</div>"
+                        );
                     }
-
-                },
+                }
             });
 
         return ImportFileDialog;

@@ -81,7 +81,7 @@ define(['log', 'jquery', 'lodash', 'output_console_list', 'workspace', 'service_
                             this._activateBtn.parent('li').removeClass('active');
                             this.hideAllConsoles();
                             if (serviceWrapper.is('.ui-resizable')) {
-                                serviceWrapper.resizable("destroy");
+                                serviceWrapper.resizable('destroy');
                             }
                             if (activeTab._title != "welcome-page") {
                                 if (activeTab.getSiddhiFileEditor().isInSourceView()) {
