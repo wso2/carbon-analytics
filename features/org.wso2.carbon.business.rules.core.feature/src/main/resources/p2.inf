@@ -1,5 +1,5 @@
 instructions.configure = \
-org.eclipse.equinox.p2.touchpoint.natives.mkdir(path:${installFolder}/resources/);\
-org.eclipse.equinox.p2.touchpoint.natives.mkdir(path:${installFolder}/resources/businessRules/);\
-org.eclipse.equinox.p2.touchpoint.natives.mkdir(path:${installFolder}/resources/businessRules/templates/);\
-org.eclipse.equinox.p2.touchpoint.natives.copy(source:${installFolder}/../lib/features/org.wso2.carbon.business.rules.core_${feature.version}/templates/,target:${installFolder}/resources/businessRules/templates/,overwrite:true);\
+org.wso2.carbon.extensions.touchpoint.mkdir(path:${installFolder}/resources/);\
+org.wso2.carbon.extensions.touchpoint.mkdir(path:${installFolder}/resources/businessRules/);\
+org.wso2.carbon.extensions.touchpoint.mkdir(path:${installFolder}/resources/businessRules/templates/);\
+org.wso2.carbon.extensions.touchpoint.copy(source:${installFolder}/../lib/features/org.wso2.carbon.business.rules.core_${feature.version}/templates/,target:${installFolder}/resources/businessRules/templates/,overwrite:true);\

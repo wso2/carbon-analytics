@@ -1,8 +1,12 @@
+metaRequirements.0.namespace = org.eclipse.equinox.p2.iu
+metaRequirements.0.name = org.wso2.carbon.extensions.touchpoint
+metaRequirements.0.optional = true
+
 instructions.configure = \
-org.eclipse.equinox.p2.touchpoint.natives.mkdir(path:${installFolder}/../../conf/);\
-org.eclipse.equinox.p2.touchpoint.natives.mkdir(path:${installFolder}/../../conf/editor/);\
-org.eclipse.equinox.p2.touchpoint.natives.mkdir(path:${installFolder}/../../conf/editor/osgi);\
-org.eclipse.equinox.p2.touchpoint.natives.copy(source:${installFolder}/../lib/features/org.wso2.carbon.siddhi.editor.core_${feature.version}/resources/launch.properties/,target:${installFolder}/../../conf/editor/osgi/launch.properties,overwrite:true);\
-org.eclipse.equinox.p2.touchpoint.natives.mkdir(path:${installFolder}/../editor/);\
-org.eclipse.equinox.p2.touchpoint.natives.mkdir(path:${installFolder}/../editor/resources/);\
-org.eclipse.equinox.p2.touchpoint.natives.copy(source:${installFolder}/../lib/features/org.wso2.carbon.siddhi.editor.core_${feature.version}/docker-export,target:${installFolder}/../editor/resources/docker-export,overwrite:true);\
+org.wso2.carbon.extensions.touchpoint.mkdir(path:${installFolder}/../../conf/);\
+org.wso2.carbon.extensions.touchpoint.mkdir(path:${installFolder}/../../conf/{runtime}/);\
+org.wso2.carbon.extensions.touchpoint.mkdir(path:${installFolder}/../../conf/{runtime}/osgi);\
+org.wso2.carbon.extensions.touchpoint.copy(source:${installFolder}/../lib/features/org.wso2.carbon.siddhi.editor.core_${feature.version}/resources/launch.properties/,target:${installFolder}/../../conf/{runtime}/osgi/launch.properties,overwrite:true);\
+org.wso2.carbon.extensions.touchpoint.mkdir(path:${installFolder}/../{runtime}/);\
+org.wso2.carbon.extensions.touchpoint.mkdir(path:${installFolder}/../{runtime}/resources/);\
+org.wso2.carbon.extensions.touchpoint.copy(source:${installFolder}/../lib/features/org.wso2.carbon.siddhi.editor.core_${feature.version}/docker-export,target:${installFolder}/../{runtime}/resources/docker-export,overwrite:true);\
