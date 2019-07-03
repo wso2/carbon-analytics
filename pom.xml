@@ -15,7 +15,8 @@
   ~ limitations under the License.
   -->
 
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 
     <parent>
         <groupId>org.wso2</groupId>
@@ -27,7 +28,7 @@
     <groupId>org.wso2.carbon.analytics</groupId>
     <artifactId>org.wso2.carbon.analytics.parent</artifactId>
     <packaging>pom</packaging>
-    <version>2.1.29-SNAPSHOT</version>
+    <version>3.0.0-SNAPSHOT</version>
     <name>WSO2 Carbon Analytics - Parent</name>
     <modules>
         <module>components/org.wso2.carbon.stream.processor.common</module>
@@ -43,8 +44,6 @@
         <module>components/org.wso2.carbon.sp.coordination.listener</module>
         <module>components/org.wso2.carbon.sp.metrics.core</module>
         <module>components/org.wso2.carbon.stream.processor.statistics</module>
-        <module>components/org.wso2.carbon.status.dashboard.core</module>
-        <module>components/org.wso2.carbon.status.dashboard.web</module>
         <module>components/org.wso2.carbon.siddhi.store.api.rest</module>
         <module>components/org.wso2.carbon.analytics.auth.rest.api</module>
         <module>components/org.wso2.carbon.permissions.rest.api</module>
@@ -65,8 +64,6 @@
         <module>features/org.wso2.carbon.sp.metrics.core.feature</module>
         <module>features/org.wso2.carbon.sp.coordination.listener.feature</module>
         <module>features/org.wso2.carbon.stream.processor.statistics.feature</module>
-        <module>features/org.wso2.carbon.status.dashboard.core.feature</module>
-        <module>features/org.wso2.carbon.status.dashboard.web.feature</module>
         <module>features/org.wso2.carbon.siddhi.store.api.rest.feature</module>
         <module>features/org.wso2.carbon.analytics.auth.rest.api.feature</module>
         <module>features/org.wso2.carbon.permissions.rest.api.feature</module>
@@ -74,7 +71,8 @@
         <module>features/org.wso2.carbon.analytics.msf4j.interceptor.common.feature</module>
         <module>features/org.wso2.carbon.health.check.core.feature</module>
 
-        <module>components/distribution</module>
+        <module>components/si-tooling-distribution</module>
+        <module>components/si-distribution</module>
         <module>components/osgi-tests</module>
 
         <module>coverage-reports</module>
@@ -1379,28 +1377,6 @@
             </dependency>
 
             <dependency>
-                <groupId>org.wso2.carbon.analytics</groupId>
-                <artifactId>org.wso2.carbon.status.dashboard.web.feature</artifactId>
-                <version>${carbon.analytics.version}</version>
-                <type>zip</type>
-            </dependency>
-            <dependency>
-                <groupId>org.wso2.carbon.analytics</groupId>
-                <artifactId>org.wso2.carbon.status.dashboard.web</artifactId>
-                <version>${carbon.analytics.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.wso2.carbon.analytics</groupId>
-                <artifactId>org.wso2.carbon.status.dashboard.core.feature</artifactId>
-                <version>${carbon.analytics.version}</version>
-                <type>zip</type>
-            </dependency>
-            <dependency>
-                <groupId>org.wso2.carbon.analytics</groupId>
-                <artifactId>org.wso2.carbon.status.dashboard.core</artifactId>
-                <version>${carbon.analytics.version}</version>
-            </dependency>
-            <dependency>
                 <groupId>org.apache.felix</groupId>
                 <artifactId>org.apache.felix.scr.annotations</artifactId>
                 <version>${apache.felix.verstion}</version>
@@ -1591,13 +1567,13 @@
     </dependencyManagement>
 
     <properties>
-        <carbon.analytics.version>2.1.29-SNAPSHOT</carbon.analytics.version>
+        <carbon.analytics.version>3.0.0-SNAPSHOT</carbon.analytics.version>
         <siddhi.version>4.5.9</siddhi.version>
         <siddhi.bundle.version>4.5.9</siddhi.bundle.version>
         <siddhi.version.range>[4.0.0, 5.0.0)</siddhi.version.range>
         <carbon.analytics-common.version>6.1.26</carbon.analytics-common.version>
         <carbon.analytics-common.version.range>[6.0.66, 6.2.0)</carbon.analytics-common.version.range>
-        <carbon.analytics.version.range>[2.0.0, 3.0.0)</carbon.analytics.version.range>
+        <carbon.analytics.version.range>[3.0.0, 4.0.0)</carbon.analytics.version.range>
 
         <geronimo.jms.spec.version>1.1.1</geronimo.jms.spec.version>
         <apache.activemq.version>5.7.0</apache.activemq.version>

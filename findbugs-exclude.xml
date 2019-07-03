@@ -44,10 +44,6 @@
         <Bug pattern="OBL_UNSATISFIED_OBLIGATION_EXCEPTION_EDGE"/>
     </Match>
     <Match>
-        <Class name="org.wso2.carbon.status.dashboard.core.bean.MetricsLineCharts"/>
-        <Bug pattern="EI_EXPOSE_REP, EI_EXPOSE_REP2"/>
-    </Match>
-    <Match>
         <Class name="org.wso2.carbon.data.provider.bean.DataSetMetadata"/>
         <Bug pattern="EI_EXPOSE_REP, EI_EXPOSE_REP2"/>
     </Match>
