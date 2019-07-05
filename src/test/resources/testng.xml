@@ -20,5 +20,7 @@
 <!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd" >
 
 <suite name="siddhi-distribution-test-suite">
+    <test name="Editor core tests">
 
+    </test>
 </suite>
