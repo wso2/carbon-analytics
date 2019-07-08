@@ -21,12 +21,12 @@ define(function() {
     "use strict";   // JS strict mode
 
     /**
-     * Constants used by the tool - editor
+     * Constants used by the tool - server
      */
     var constants = {
         INITIAL_SOURCE_INSTRUCTIONS: "@App:name(\"SiddhiApp\")\n@App:description(\"Description of the plan\")\n\n" +
             "-- Please refer to https://docs.wso2.com/display/SP400/Quick+Start+Guide " +
-            "on getting started with SP editor. \n\n"
+            "on getting started with SP server. \n\n"
     };
 
     return constants;

@@ -31,19 +31,17 @@
     <version>3.0.0-SNAPSHOT</version>
     <name>WSO2 Carbon Analytics - Parent</name>
     <modules>
-        <module>components/org.wso2.carbon.stream.processor.common</module>
-        <module>components/org.wso2.carbon.stream.processor.core</module>
+        <module>components/org.wso2.carbon.streaming.integrator.common</module>
+        <module>components/org.wso2.carbon.streaming.integrator.core</module>
         <module>components/org.wso2.carbon.event.simulator.core</module>
         <module>components/org.wso2.carbon.editor.log.appender</module>
-        <module>components/org.wso2.carbon.sp.jobmanager.core</module>
-        <module>components/org.wso2.carbon.sp.distributed.resource.core</module>
         <module>components/org.wso2.carbon.siddhi.editor.core</module>
         <module>components/org.wso2.carbon.business.rules.templates.editor.core</module>
         <module>components/org.wso2.carbon.business.rules.core</module>
         <module>components/org.wso2.carbon.business.rules.web</module>
-        <module>components/org.wso2.carbon.sp.coordination.listener</module>
-        <module>components/org.wso2.carbon.sp.metrics.core</module>
-        <module>components/org.wso2.carbon.stream.processor.statistics</module>
+        <module>components/org.wso2.carbon.si.coordination.listener</module>
+        <module>components/org.wso2.carbon.si.metrics.core</module>
+        <module>components/org.wso2.carbon.streaming.integrator.statistics</module>
         <module>components/org.wso2.carbon.siddhi.store.api.rest</module>
         <module>components/org.wso2.carbon.analytics.auth.rest.api</module>
         <module>components/org.wso2.carbon.permissions.rest.api</module>
@@ -51,19 +49,17 @@
         <module>components/org.wso2.carbon.analytics.msf4j.interceptor.common</module>
         <module>components/org.wso2.carbon.health.check.core</module>
 
-        <module>features/org.wso2.carbon.stream.processor.core.feature</module>
-        <module>features/org.wso2.carbon.stream.processor.common.feature</module>
+        <module>features/org.wso2.carbon.streaming.integrator.core.feature</module>
+        <module>features/org.wso2.carbon.streaming.integrator.common.feature</module>
         <module>features/org.wso2.carbon.event.simulator.core.feature</module>
-        <module>features/org.wso2.carbon.sp.jobmanager.core.feature</module>
-        <module>features/org.wso2.carbon.sp.distributed.resource.core.feature</module>
         <module>features/org.wso2.carbon.siddhi.editor.core.feature</module>
         <module>features/org.wso2.carbon.business.rules.templates.editor.core.feature</module>
         <module>features/org.wso2.carbon.business.rules.core.feature</module>
         <module>features/org.wso2.carbon.business.rules.web.feature</module>
         <module>features/org.wso2.siddhi.feature</module>
-        <module>features/org.wso2.carbon.sp.metrics.core.feature</module>
-        <module>features/org.wso2.carbon.sp.coordination.listener.feature</module>
-        <module>features/org.wso2.carbon.stream.processor.statistics.feature</module>
+        <module>features/org.wso2.carbon.si.metrics.core.feature</module>
+        <module>features/org.wso2.carbon.si.coordination.listener.feature</module>
+        <module>features/org.wso2.carbon.streaming.integrator.statistics.feature</module>
         <module>features/org.wso2.carbon.siddhi.store.api.rest.feature</module>
         <module>features/org.wso2.carbon.analytics.auth.rest.api.feature</module>
         <module>features/org.wso2.carbon.permissions.rest.api.feature</module>
@@ -73,7 +69,8 @@
 
         <module>components/si-tooling-distribution</module>
         <module>components/si-distribution</module>
-        <module>components/osgi-tests</module>
+        <module>components/streaming-integrator-osgi-tests</module>
+        <!--<module>components/tooling-osgi-tests</module>-->
 
         <module>coverage-reports</module>
     </modules>
@@ -877,17 +874,17 @@
             <!-- Stream Processor related-->
             <dependency>
                 <groupId>org.wso2.carbon.analytics</groupId>
-                <artifactId>org.wso2.carbon.stream.processor.core</artifactId>
+                <artifactId>org.wso2.carbon.streaming.integrator.core</artifactId>
                 <version>${carbon.analytics.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.wso2.carbon.analytics</groupId>
-                <artifactId>org.wso2.carbon.stream.processor.common</artifactId>
+                <artifactId>org.wso2.carbon.streaming.integrator.common</artifactId>
                 <version>${carbon.analytics.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.wso2.carbon.analytics</groupId>
-                <artifactId>org.wso2.carbon.stream.processor.core.feature</artifactId>
+                <artifactId>org.wso2.carbon.streaming.integrator.core.feature</artifactId>
                 <version>${carbon.analytics.version}</version>
                 <type>zip</type>
             </dependency>
@@ -928,7 +925,7 @@
             </dependency>
             <dependency>
                 <groupId>org.wso2.carbon.analytics</groupId>
-                <artifactId>org.wso2.carbon.stream.processor.common.feature</artifactId>
+                <artifactId>org.wso2.carbon.streaming.integrator.common.feature</artifactId>
                 <version>${carbon.analytics.version}</version>
                 <type>zip</type>
             </dependency>
@@ -1204,28 +1201,6 @@
             <!-- Distributed deployment features -->
             <dependency>
                 <groupId>org.wso2.carbon.analytics</groupId>
-                <artifactId>org.wso2.carbon.sp.jobmanager.core</artifactId>
-                <version>${carbon.analytics.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.wso2.carbon.analytics</groupId>
-                <artifactId>org.wso2.carbon.sp.jobmanager.core.feature</artifactId>
-                <version>${carbon.analytics.version}</version>
-                <type>zip</type>
-            </dependency>
-            <dependency>
-                <groupId>org.wso2.carbon.analytics</groupId>
-                <artifactId>org.wso2.carbon.sp.distributed.resource.core</artifactId>
-                <version>${carbon.analytics.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.wso2.carbon.analytics</groupId>
-                <artifactId>org.wso2.carbon.sp.distributed.resource.core.feature</artifactId>
-                <version>${carbon.analytics.version}</version>
-                <type>zip</type>
-            </dependency>
-            <dependency>
-                <groupId>org.wso2.carbon.analytics</groupId>
                 <artifactId>org.wso2.siddhi.feature</artifactId>
                 <version>${carbon.analytics.version}</version>
                 <type>zip</type>
@@ -1257,7 +1232,14 @@
             </dependency>
             <dependency>
                 <groupId>org.wso2.carbon.analytics</groupId>
-                <artifactId>org.wso2.carbon.analytics.test.distribution</artifactId>
+                <artifactId>org.wso2.carbon.analytics.test.si.distribution</artifactId>
+                <version>${carbon.analytics.version}</version>
+                <type>zip</type>
+                <scope>test</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.wso2.carbon.analytics</groupId>
+                <artifactId>org.wso2.carbon.analytics.test.si.tooling.distribution</artifactId>
                 <version>${carbon.analytics.version}</version>
                 <type>zip</type>
                 <scope>test</scope>
@@ -1343,35 +1325,35 @@
             <!-- Siddhi Metrics related -->
             <dependency>
                 <groupId>org.wso2.carbon.analytics</groupId>
-                <artifactId>org.wso2.carbon.stream.processor.statistics.feature</artifactId>
+                <artifactId>org.wso2.carbon.streaming.integrator.statistics.feature</artifactId>
                 <version>${carbon.analytics.version}</version>
                 <type>zip</type>
             </dependency>
             <dependency>
                 <groupId>org.wso2.carbon.analytics</groupId>
-                <artifactId>org.wso2.carbon.stream.processor.statistics</artifactId>
+                <artifactId>org.wso2.carbon.streaming.integrator.statistics</artifactId>
                 <version>${carbon.analytics.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.wso2.carbon.analytics</groupId>
-                <artifactId>org.wso2.carbon.sp.metrics.core</artifactId>
+                <artifactId>org.wso2.carbon.si.metrics.core</artifactId>
                 <version>${carbon.analytics.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.wso2.carbon.analytics</groupId>
-                <artifactId>org.wso2.carbon.sp.metrics.core.feature</artifactId>
+                <artifactId>org.wso2.carbon.si.metrics.core.feature</artifactId>
                 <version>${carbon.analytics.version}</version>
                 <type>zip</type>
             </dependency>
 
             <dependency>
                 <groupId>org.wso2.carbon.analytics</groupId>
-                <artifactId>org.wso2.carbon.sp.coordination.listener</artifactId>
+                <artifactId>org.wso2.carbon.si.coordination.listener</artifactId>
                 <version>${carbon.analytics.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.wso2.carbon.analytics</groupId>
-                <artifactId>org.wso2.carbon.sp.coordination.listener.feature</artifactId>
+                <artifactId>org.wso2.carbon.si.coordination.listener.feature</artifactId>
                 <version>${carbon.analytics.version}</version>
                 <type>zip</type>
             </dependency>
@@ -1731,7 +1713,7 @@
         <common.collections4.version>4.1</common.collections4.version>
 
         <!--MSF4J related-->
-        <msf4j.version>2.7.2</msf4j.version>
+        <msf4j.version>2.7.3</msf4j.version>
         <msf4j.import.version.range>[2.7.0, 3.0.0)</msf4j.import.version.range>
         <com.fasterxml.jackson.core.version>2.9.8</com.fasterxml.jackson.core.version>
         <com.fasterxml.jackson.core.version.range>[2.9.0, 2.10.0)</com.fasterxml.jackson.core.version.range>

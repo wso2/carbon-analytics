@@ -25,7 +25,7 @@ import org.wso2.carbon.event.simulator.core.internal.generator.random.util.Custo
 import org.wso2.carbon.event.simulator.core.internal.generator.random.util.PrimitiveBasedAttrGenerator;
 import org.wso2.carbon.event.simulator.core.internal.generator.random.util.PropertyBasedAttrGenerator;
 import org.wso2.carbon.event.simulator.core.internal.generator.random.util.RegexBasedAttrGenerator;
-import org.wso2.carbon.stream.processor.common.exception.ResourceNotFoundException;
+import org.wso2.carbon.streaming.integrator.common.exception.ResourceNotFoundException;
 import org.wso2.siddhi.query.api.definition.Attribute;
 
 import static org.wso2.carbon.event.simulator.core.internal.util.CommonOperations.checkAvailability;

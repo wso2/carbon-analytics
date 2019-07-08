@@ -16,7 +16,7 @@
  * under the License.
  */
 
-define(['jquery', 'lodash', 'log', 'handlebar', 'designViewUtils', 'app/source-editor/completion-engine'],
+define(['jquery', 'lodash', 'log', 'handlebar', 'designViewUtils', 'app/source-server/completion-engine'],
     function ($, _, log, Handlebars, DesignViewUtils, CompletionEngine) {
         /**
          * Load operators from the Completion engine.

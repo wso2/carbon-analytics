@@ -39,7 +39,7 @@ var lang = require("./lib/lang");
 var commands = require("./commands/multi_select_commands");
 exports.commands = commands.defaultCommands.concat(commands.multiSelectCommands);
 
-// Todo: session.find or editor.findVolatile that returns range
+// Todo: session.find or server.findVolatile that returns range
 var Search = require("./search").Search;
 var search = new Search();
 
@@ -898,9 +898,9 @@ exports.onSessionChange = function(e) {
     }
 };
 
-// MultiSelect(editor)
-// adds multiple selection support to the editor
-// (note: should be called only once for each editor instance)
+// MultiSelect(server)
+// adds multiple selection support to the server
+// (note: should be called only once for each server instance)
 function MultiSelect(editor) {
     if (editor.$multiselectOnSessionChange)
         return;

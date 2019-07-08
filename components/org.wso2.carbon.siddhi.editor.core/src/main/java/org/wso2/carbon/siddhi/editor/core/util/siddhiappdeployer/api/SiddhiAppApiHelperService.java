@@ -21,7 +21,7 @@ package org.wso2.carbon.siddhi.editor.core.util.siddhiappdeployer.api;
 import org.wso2.carbon.siddhi.editor.core.exception.SiddhiAppDeployerServiceStubException;
 
 /**
- * Interface for services related to deploying siddhi apps of editor.
+ * Interface for services related to deploying siddhi apps of server.
  */
 public interface SiddhiAppApiHelperService {
 

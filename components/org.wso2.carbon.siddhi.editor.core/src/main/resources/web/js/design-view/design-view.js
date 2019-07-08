@@ -23,7 +23,7 @@ define(['require', 'log', 'lodash', 'jquery', 'tool_palette/tool-palette', 'desi
         /**
          * @class DesignView
          * @constructor
-         * @class DesignView  Wraps the Ace editor for design view
+         * @class DesignView  Wraps the Ace server for design view
          * @param {Object} options Rendering options for the view
          * @param application Application data
          * @param jsPlumbInstance js plumb instance for the design grid
@@ -208,7 +208,7 @@ define(['require', 'log', 'lodash', 'jquery', 'tool_palette/tool-palette', 'desi
                     responseString: defaultString
                 };
             } else {
-                self.codeToDesignURL = window.location.protocol + "//" + window.location.host + "/editor/design-view";
+                self.codeToDesignURL = window.location.protocol + "//" + window.location.host + "/server/design-view";
                 $.ajax({
                     type: "POST",
                     url: self.codeToDesignURL,
@@ -233,7 +233,7 @@ define(['require', 'log', 'lodash', 'jquery', 'tool_palette/tool-palette', 'desi
         DesignView.prototype.getCode = function (designViewJSON) {
             var self = this;
             var result = {};
-            self.designToCodeURL = window.location.protocol + "//" + window.location.host + "/editor/code-view";
+            self.designToCodeURL = window.location.protocol + "//" + window.location.host + "/server/code-view";
             $.ajax({
                 type: "POST",
                 url: self.designToCodeURL,

@@ -258,7 +258,7 @@ JSONEditor.prototype = {
       }
       self.validator = new JSONEditor.Validator(self,null,validator_options);
       
-      // Create the root editor
+      // Create the root server
       var editor_class = self.getEditorClass(self.schema);
       self.root = self.createEditor(editor_class, {
         jsoneditor: self,
@@ -398,8 +398,8 @@ JSONEditor.prototype = {
       }
     });
 
-    if(!classname) throw "Unknown editor for schema "+JSON.stringify(schema);
-    if(!JSONEditor.defaults.editors[classname]) throw "Unknown editor "+classname;
+    if(!classname) throw "Unknown server for schema "+JSON.stringify(schema);
+    if(!JSONEditor.defaults.editors[classname]) throw "Unknown server "+classname;
 
     return JSONEditor.defaults.editors[classname];
   },
@@ -1528,7 +1528,7 @@ JSONEditor.AbstractEditor = Class.extend({
   
   
   getButton: function(text, icon, title) {
-    var btnClass = 'json-editor-btn-'+icon;
+    var btnClass = 'json-server-btn-'+icon;
     if(!this.iconlib) icon = null;
     else icon = this.iconlib.getIcon(icon);
     
@@ -2127,7 +2127,7 @@ JSONEditor.defaults.editors.string = JSONEditor.AbstractEditor.extend({
 
     // Any special formatting that needs to happen after the input is added to the dom
     window.requestAnimationFrame(function() {
-      // Skip in case the input is only a temporary editor,
+      // Skip in case the input is only a temporary server,
       // otherwise, in the case of an ace_editor creation,
       // it will generate an error trying to append it to the missing parentNode
       if(self.input.parentNode) self.afterInputReady();
@@ -2158,9 +2158,9 @@ JSONEditor.defaults.editors.string = JSONEditor.AbstractEditor.extend({
   afterInputReady: function() {
     var self = this, options;
     
-    // Code editor
+    // Code server
     if(this.source_code) {      
-      // WYSIWYG html and bbcode editor
+      // WYSIWYG html and bbcode server
       if(this.options.wysiwyg && 
         ['html','bbcode'].indexOf(this.input_type) >= 0 && 
         window.jQuery && window.jQuery.fn && window.jQuery.fn.sceditor
@@ -2177,7 +2177,7 @@ JSONEditor.defaults.editors.string = JSONEditor.AbstractEditor.extend({
         self.sceditor_instance = window.jQuery(self.input).sceditor('instance');
         
         self.sceditor_instance.blur(function() {
-          // Get editor's value
+          // Get server's value
           var val = window.jQuery("<div>"+self.sceditor_instance.val()+"</div>");
           // Remove sceditor spans/divs
           window.jQuery('#sceditor-start-marker,#sceditor-end-marker,.sceditor-nlf',val).remove();
@@ -2211,7 +2211,7 @@ JSONEditor.defaults.editors.string = JSONEditor.AbstractEditor.extend({
           self.onChange(true);
         });
       }
-      // ACE editor for everything else
+      // ACE server for everything else
       else if(window.ace) {
         var mode = this.input_type;
         // aliases for c/cpp
@@ -2254,7 +2254,7 @@ JSONEditor.defaults.editors.string = JSONEditor.AbstractEditor.extend({
     this.serialized = this.value;
   },
   destroy: function() {
-    // If using SCEditor, destroy the editor instance
+    // If using SCEditor, destroy the server instance
     if(this.sceditor_instance) {
       this.sceditor_instance.destroy();
     }
@@ -2285,7 +2285,7 @@ JSONEditor.defaults.editors.string = JSONEditor.AbstractEditor.extend({
   onWatchedFieldChange: function() {    
     var self = this, vars, j;
     
-    // If this editor needs to be rendered by a macro template
+    // If this server needs to be rendered by a macro template
     if(this.template) {
       vars = this.getWatchedFieldValues();
       this.setValue(this.template(vars),false,true);
@@ -2418,12 +2418,12 @@ JSONEditor.defaults.editors.object = JSONEditor.AbstractEditor.extend({
         var found = false;
         var width = editor.options.hidden? 0 : (editor.options.grid_columns || editor.getNumColumns());
         var height = editor.options.hidden? 0 : editor.container.offsetHeight;
-        // See if the editor will fit in any of the existing rows first
+        // See if the server will fit in any of the existing rows first
         for(var i=0; i<rows.length; i++) {
-          // If the editor will fit in the row horizontally
+          // If the server will fit in the row horizontally
           if(rows[i].width + width <= 12) {
-            // If the editor is close to the other elements in height
-            // i.e. Don't put a really tall editor in an otherwise short row or vice versa
+            // If the server is close to the other elements in height
+            // i.e. Don't put a really tall server in an otherwise short row or vice versa
             if(!height || (rows[i].minh*0.5 < height && rows[i].maxh*2 > height)) {
               found = i;
             }
@@ -2443,7 +2443,7 @@ JSONEditor.defaults.editors.object = JSONEditor.AbstractEditor.extend({
 
         rows[found].editors.push({
           key: key,
-          //editor: editor,
+          //server: server,
           width: width,
           height: height
         });
@@ -2454,7 +2454,7 @@ JSONEditor.defaults.editors.object = JSONEditor.AbstractEditor.extend({
 
       // Make almost full rows width 12
       // Do this by increasing all editors' sizes proprotionately
-      // Any left over space goes to the biggest editor
+      // Any left over space goes to the biggest server
       // Don't touch rows with a width of 6 or less
       for(i=0; i<rows.length; i++) {
         if(rows[i].width < 12) {
@@ -2721,7 +2721,7 @@ JSONEditor.defaults.editors.object = JSONEditor.AbstractEditor.extend({
       this.error_holder = document.createElement('div');
       this.container.appendChild(this.error_holder);
 
-      // Container for child editor area
+      // Container for child server area
       this.editor_holder = this.theme.getIndentedPanel();
       this.container.appendChild(this.editor_holder);
 
@@ -3111,7 +3111,7 @@ JSONEditor.defaults.editors.object = JSONEditor.AbstractEditor.extend({
       show_modal = true;
     }
 
-    // Additional addproperty checkboxes not tied to a current editor
+    // Additional addproperty checkboxes not tied to a current server
     for(i in this.schema.properties) {
       if(!this.schema.properties.hasOwnProperty(i)) continue;
       if(this.cached_editors[i]) continue;
@@ -3181,7 +3181,7 @@ JSONEditor.defaults.editors.object = JSONEditor.AbstractEditor.extend({
   showValidationErrors: function(errors) {
     var self = this;
 
-    // Get all the errors that pertain to this editor
+    // Get all the errors that pertain to this server
     var my_errors = [];
     var other_errors = [];
     $each(errors, function(i,error) {
@@ -3193,7 +3193,7 @@ JSONEditor.defaults.editors.object = JSONEditor.AbstractEditor.extend({
       }
     });
 
-    // Show errors for this editor
+    // Show errors for this server
     if(this.error_holder) {
       if(my_errors.length) {
         var message = [];
@@ -3581,7 +3581,7 @@ JSONEditor.defaults.editors.array = JSONEditor.AbstractEditor.extend({
     this.value = [];
 
     $each(this.rows,function(i,editor) {
-      // Get the value for this editor
+      // Get the value for this server
       self.value[i] = editor.getValue();
     });
     
@@ -3610,7 +3610,7 @@ JSONEditor.defaults.editors.array = JSONEditor.AbstractEditor.extend({
           }
         }
 
-        // Get the value for this editor
+        // Get the value for this server
         self.value[i] = editor.getValue();
       });
       
@@ -3831,7 +3831,7 @@ JSONEditor.defaults.editors.array = JSONEditor.AbstractEditor.extend({
       this.toggle_button.style.display = 'none';
     }
     
-    // Add "new row" and "delete last" buttons below editor
+    // Add "new row" and "delete last" buttons below server
     this.add_row_button = this.getButton(this.getItemTitle(),'add',this.translate('button_add_row_title',[this.getItemTitle()]));
     
     this.add_row_button.addEventListener('click',function(e) {
@@ -3900,7 +3900,7 @@ JSONEditor.defaults.editors.array = JSONEditor.AbstractEditor.extend({
   showValidationErrors: function(errors) {
     var self = this;
 
-    // Get all the errors that pertain to this editor
+    // Get all the errors that pertain to this server
     var my_errors = [];
     var other_errors = [];
     $each(errors, function(i,error) {
@@ -3912,7 +3912,7 @@ JSONEditor.defaults.editors.array = JSONEditor.AbstractEditor.extend({
       }
     });
 
-    // Show errors for this editor
+    // Show errors for this server
     if(this.error_holder) {
       if(my_errors.length) {
         var message = [];
@@ -4245,7 +4245,7 @@ JSONEditor.defaults.editors.table = JSONEditor.defaults.editors.array.extend({
     this.value = [];
 
     $each(this.rows,function(i,editor) {
-      // Get the value for this editor
+      // Get the value for this server
       self.value[i] = editor.getValue();
     });
     this.serialized = JSON.stringify(this.value);
@@ -4362,7 +4362,7 @@ JSONEditor.defaults.editors.table = JSONEditor.defaults.editors.array.extend({
       }
     }
 
-    // Add "new row" and "delete last" buttons below editor
+    // Add "new row" and "delete last" buttons below server
     this.add_row_button = this.getButton(this.getItemTitle(),'add',this.translate('button_add_row_title',[this.getItemTitle()]));
     this.add_row_button.addEventListener('click',function(e) {
       e.preventDefault();
@@ -4967,7 +4967,7 @@ JSONEditor.defaults.editors.select = JSONEditor.AbstractEditor.extend({
     }
     // Other, not supported
     else {
-      throw "'select' editor requires the enum property to be set.";
+      throw "'select' server requires the enum property to be set.";
     }
   },
   build: function() {
@@ -5043,7 +5043,7 @@ JSONEditor.defaults.editors.select = JSONEditor.AbstractEditor.extend({
   onWatchedFieldChange: function() {
     var self = this, vars, j;
     
-    // If this editor uses a dynamic select box
+    // If this server uses a dynamic select box
     if(this.enumSource) {
       vars = this.getWatchedFieldValues();
       var select_options = [];
@@ -5313,7 +5313,7 @@ JSONEditor.defaults.editors.selectize = JSONEditor.AbstractEditor.extend({
     }
     // Other, not supported
     else {
-      throw "'select' editor requires the enum property to be set.";
+      throw "'select' server requires the enum property to be set.";
     }
   },
   build: function() {
@@ -5379,7 +5379,7 @@ JSONEditor.defaults.editors.selectize = JSONEditor.AbstractEditor.extend({
   onWatchedFieldChange: function() {
     var self = this, vars, j;
 
-    // If this editor uses a dynamic select box
+    // If this server uses a dynamic select box
     if(this.enumSource) {
       vars = this.getWatchedFieldValues();
       var select_options = [];
@@ -5737,7 +5737,7 @@ JSONEditor.defaults.editors.base64 = JSONEditor.AbstractEditor.extend({
     
     // Don't show uploader if this is readonly
     if(!this.schema.readOnly && !this.schema.readonly) {
-      if(!window.FileReader) throw "FileReader required for base64 editor";
+      if(!window.FileReader) throw "FileReader required for base64 server";
       
       // File uploader
       this.uploader = this.theme.getFormInputField('file');
@@ -5832,7 +5832,7 @@ JSONEditor.defaults.editors.upload = JSONEditor.AbstractEditor.extend({
     // Don't show uploader if this is readonly
     if(!this.schema.readOnly && !this.schema.readonly) {
 
-      if(!this.jsoneditor.options.upload) throw "Upload handler required for upload editor";
+      if(!this.jsoneditor.options.upload) throw "Upload handler required for upload server";
 
       // File uploader
       this.uploader = this.theme.getFormInputField('file');
@@ -6078,7 +6078,7 @@ JSONEditor.defaults.editors.arraySelectize = JSONEditor.AbstractEditor.extend({
   showValidationErrors: function(errors) {
     var self = this;
 
-    // Get all the errors that pertain to this editor
+    // Get all the errors that pertain to this server
     var my_errors = [];
     var other_errors = [];
     $each(errors, function(i,error) {
@@ -6090,7 +6090,7 @@ JSONEditor.defaults.editors.arraySelectize = JSONEditor.AbstractEditor.extend({
       }
     });
 
-    // Show errors for this editor
+    // Show errors for this server
     if(this.error_holder) {
 
       if(my_errors.length) {
@@ -7887,7 +7887,7 @@ JSONEditor.plugins = {
   }
 };
 
-// Default per-editor options
+// Default per-server options
 $each(JSONEditor.defaults.editors, function(i,editor) {
   JSONEditor.defaults.editors[i].options = editor.options || {};
 });
@@ -7902,7 +7902,7 @@ JSONEditor.defaults.resolvers.unshift(function(schema) {
   // If the schema is a simple type
   if(!schema.type && schema.properties ) return "object";
 });
-// If the type is set and it's a basic type, use the primitive editor
+// If the type is set and it's a basic type, use the primitive server
 JSONEditor.defaults.resolvers.unshift(function(schema) {
   // If the schema is a simple type
   if(typeof schema.type === "string") return schema.type;
@@ -7918,7 +7918,7 @@ JSONEditor.defaults.resolvers.unshift(function(schema) {
     return (JSONEditor.plugins.selectize.enable) ? 'selectize' : 'select';
   }
 });
-// Use the multiple editor for schemas where the `type` is set to "any"
+// Use the multiple server for schemas where the `type` is set to "any"
 JSONEditor.defaults.resolvers.unshift(function(schema) {
   // If the schema can be of any type
   if(schema.type === "any") return "multiple";
@@ -7936,14 +7936,14 @@ JSONEditor.defaults.resolvers.unshift(function(schema) {
     if(window.FileReader) return "upload";
   }
 });
-// Use the table editor for arrays with the format set to `table`
+// Use the table server for arrays with the format set to `table`
 JSONEditor.defaults.resolvers.unshift(function(schema) {
   // Type `array` with format set to `table`
   if(schema.type == "array" && schema.format == "table") {
     return "table";
   }
 });
-// Use the `select` editor for dynamic enumSource enums
+// Use the `select` server for dynamic enumSource enums
 JSONEditor.defaults.resolvers.unshift(function(schema) {
   if(schema.enumSource) return (JSONEditor.plugins.selectize.enable) ? 'selectize' : 'select';
 });
@@ -7965,13 +7965,13 @@ JSONEditor.defaults.resolvers.unshift(function(schema) {
     if(schema.items.enum) {
       return 'multiselect';
     }
-    // For non-enumerated strings (tag editor)
+    // For non-enumerated strings (tag server)
     else if(JSONEditor.plugins.selectize.enable && schema.items.type === "string") {
       return 'arraySelectize';
     }
   }
 });
-// Use the multiple editor for schemas with `oneOf` set
+// Use the multiple server for schemas with `oneOf` set
 JSONEditor.defaults.resolvers.unshift(function(schema) {
   // If this schema uses `oneOf` or `anyOf`
   if(schema.oneOf || schema.anyOf) return "multiple";
@@ -8024,7 +8024,7 @@ JSONEditor.defaults.resolvers.unshift(function(schema) {
           editor.destroy();
         }
         
-        // Create editor
+        // Create server
         editor = new JSONEditor(this.get(0),options);
         this.data('jsoneditor',editor);
         

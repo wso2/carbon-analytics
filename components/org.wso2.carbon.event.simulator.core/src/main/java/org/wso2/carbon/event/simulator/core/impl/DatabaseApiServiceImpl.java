@@ -27,7 +27,7 @@ import org.wso2.carbon.event.simulator.core.api.NotFoundException;
 import org.wso2.carbon.event.simulator.core.internal.generator.database.util.DatabaseConnector;
 import org.wso2.carbon.event.simulator.core.model.DBConnectionModel;
 import org.wso2.carbon.event.simulator.core.service.EventSimulatorDataHolder;
-import org.wso2.carbon.stream.processor.common.exception.ResponseMapper;
+import org.wso2.carbon.streaming.integrator.common.exception.ResponseMapper;
 import org.wso2.msf4j.Request;
 
 import java.sql.Connection;

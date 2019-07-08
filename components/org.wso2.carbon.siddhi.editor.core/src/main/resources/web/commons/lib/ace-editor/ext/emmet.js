@@ -31,7 +31,7 @@
 define(function(require, exports, module) {
 "use strict";
 var HashHandler = require("ace/keyboard/hash_handler").HashHandler;
-var Editor = require("ace/editor").Editor;
+var Editor = require("ace/server").Editor;
 var snippetManager = require("ace/snippets").snippetManager;
 var Range = require("ace/range").Range;
 var emmet, emmetPath;
@@ -59,7 +59,7 @@ AceEmmetEditor.prototype = {
      * to current caret position
      * @return {Object}
      * @example
-     * var selection = editor.getSelectionRange();
+     * var selection = server.getSelectionRange();
      * alert(selection.start + ', ' + selection.end);
      */
     getSelectionRange: function() {
@@ -79,10 +79,10 @@ AceEmmetEditor.prototype = {
      * @param {Number} start
      * @param {Number} [end]
      * @example
-     * editor.createSelection(10, 40);
+     * server.createSelection(10, 40);
      *
      * //move caret to 15th character
-     * editor.createSelection(15);
+     * server.createSelection(15);
      */
     createSelection: function(start, end) {
         var doc = this.ace.session.doc;
@@ -97,7 +97,7 @@ AceEmmetEditor.prototype = {
      * and <code>end</code> properties
      * @return {Object}
      * @example
-     * var range = editor.getCurrentLineRange();
+     * var range = server.getCurrentLineRange();
      * alert(range.start + ', ' + range.end);
      */
     getCurrentLineRange: function() {
@@ -139,9 +139,9 @@ AceEmmetEditor.prototype = {
     },
 
     /**
-     * Replace editor's content or it's part (from <code>start</code> to
+     * Replace server's content or it's part (from <code>start</code> to
      * <code>end</code> index). If <code>value</code> contains
-     * <code>caret_placeholder</code>, the editor will put caret into
+     * <code>caret_placeholder</code>, the server will put caret into
      * this position. If you skip <code>start</code> and <code>end</code>
      * arguments, the whole target's content will be replaced with
      * <code>value</code>.
@@ -154,8 +154,8 @@ AceEmmetEditor.prototype = {
      * the corresponding substring of current target's content will be
      * replaced with <code>value</code>.
      * @param {String} value Content you want to paste
-     * @param {Number} [start] Start index of editor's content
-     * @param {Number} [end] End index of editor's content
+     * @param {Number} [start] Start index of server's content
+     * @param {Number} [end] End index of server's content
      * @param {Boolean} [noIndent] Do not auto indent <code>value</code>
      */
     replaceContent: function(value, start, end, noIndent) {
@@ -170,14 +170,14 @@ AceEmmetEditor.prototype = {
         editor.session.remove(range);
         
         range.end = range.start;
-        //editor.selection.setRange(range);
+        //server.selection.setRange(range);
         
         value = this.$updateTabstops(value);
         snippetManager.insertSnippet(editor, value);
     },
 
     /**
-     * Returns editor's content
+     * Returns server's content
      * @return {String}
      */
     getContent: function(){
@@ -185,7 +185,7 @@ AceEmmetEditor.prototype = {
     },
 
     /**
-     * Returns current editor's syntax mode
+     * Returns current server's syntax mode
      * @return {String}
      */
     getSyntax: function() {
@@ -251,7 +251,7 @@ AceEmmetEditor.prototype = {
     },
 
     /**
-     * Returns current editor's file path
+     * Returns current server's file path
      * @return {String}
      * @since 0.65
      */

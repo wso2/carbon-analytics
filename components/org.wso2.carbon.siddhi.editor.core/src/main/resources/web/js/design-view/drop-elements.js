@@ -25,7 +25,7 @@ define(['require', 'log', 'lodash', 'jquery', 'partition', 'stream', 'query', 'f
         /**
          * @class DesignView
          * @constructor
-         * @class DesignView  Wraps the Ace editor for design view
+         * @class DesignView  Wraps the Ace server for design view
          * @param {Object} options Rendering options for the view
          */
 

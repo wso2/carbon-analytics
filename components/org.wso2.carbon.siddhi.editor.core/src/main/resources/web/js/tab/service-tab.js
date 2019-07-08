@@ -90,7 +90,7 @@ define(['require', 'log', 'jquery', 'lodash', './tab','workspace','toolEditor','
                 toolEditor.render();
                 this.app.workspaceManager.updateUndoRedoMenus();
 
-                // bind app commands to source editor commands
+                // bind app commands to source server commands
                 this.app.commandManager.getCommands().forEach(function(command){
                     toolEditor.getSourceView().bindCommand(command);
                 });

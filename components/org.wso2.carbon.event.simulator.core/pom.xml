@@ -59,7 +59,7 @@
         </dependency>
         <dependency>
             <groupId>org.wso2.carbon.analytics</groupId>
-            <artifactId>org.wso2.carbon.stream.processor.common</artifactId>
+            <artifactId>org.wso2.carbon.streaming.integrator.common</artifactId>
         </dependency>
         <dependency>
             <groupId>org.wso2.carbon.utils</groupId>

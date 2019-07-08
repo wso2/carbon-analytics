@@ -18,7 +18,7 @@
 
 package org.wso2.carbon.event.simulator.core.exception;
 
-import org.wso2.carbon.stream.processor.common.exception.ResourceNotFoundException;
+import org.wso2.carbon.streaming.integrator.common.exception.ResourceNotFoundException;
 
 /**
  * customized exception class for validation whethere the number of attributes generated is equal to the number of

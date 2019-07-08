@@ -105,7 +105,7 @@ function DragdropHandler(mouseHandler) {
         if (!editor.getReadOnly()) {
             var dropEffect = e.dataTransfer.dropEffect;
             if (!dragOperation && dropEffect == "move")
-                // text was dragged outside the editor
+                // text was dragged outside the server
                 editor.session.remove(editor.getSelectionRange());
             editor.renderer.$cursorLayer.setBlinking(true);
         }
@@ -290,7 +290,7 @@ function DragdropHandler(mouseHandler) {
         event.removeListener(document, "mousemove", onMouseMove);
     }
 
-    // sometimes other code on the page can stop dragleave event leaving editor stuck in the drag state
+    // sometimes other code on the page can stop dragleave event leaving server stuck in the drag state
     var onMouseMoveTimer = null;
     function onMouseMove() {
         if (onMouseMoveTimer == null) {

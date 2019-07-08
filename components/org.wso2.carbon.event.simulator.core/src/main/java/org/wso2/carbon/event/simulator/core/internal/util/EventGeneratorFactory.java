@@ -23,7 +23,7 @@ import org.wso2.carbon.event.simulator.core.exception.InsufficientAttributesExce
 import org.wso2.carbon.event.simulator.core.exception.InvalidConfigException;
 import org.wso2.carbon.event.simulator.core.exception.SimulationValidationException;
 import org.wso2.carbon.event.simulator.core.internal.generator.EventGenerator;
-import org.wso2.carbon.stream.processor.common.exception.ResourceNotFoundException;
+import org.wso2.carbon.streaming.integrator.common.exception.ResourceNotFoundException;
 
 /**
  * Factory class used to create event generators

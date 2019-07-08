@@ -17,20 +17,20 @@
  */
 
 /**
- * Constants to be used by the siddhi editor tour guide
+ * Constants to be used by the siddhi server tour guide
  */
 define(function () {
 
     "use strict";   // JS strict mode
 
     /**
-     * Constants used by the siddhi editor tour guide
+     * Constants used by the siddhi server tour guide
      */
     var constants = {
         CONTENT: '@App:name(\'SweetFactory\')\n' +
             '@App:description(\'Description of the plan\')\n' +
             '\n' +
-            '-- Please refer to https://docs.wso2.com/display/SP430/Quick+Start+Guide on getting started with SP editor. \n' +
+            '-- Please refer to https://docs.wso2.com/display/SP430/Quick+Start+Guide on getting started with SP server. \n' +
             '\n' +
             'define stream SweetProductionStream (name string, amount long);\n' +
             '@sink(type = \'log\', \n' +

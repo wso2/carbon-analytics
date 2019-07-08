@@ -42,7 +42,7 @@ var ISearchKbd = iSearchCommandModule.IncrementalSearchKeyboardHandler;
  * @class IncrementalSearch
  *
  * Implements immediate searching while the user is typing. When incremental
- * search is activated, keystrokes into the editor will be used for composing
+ * search is activated, keystrokes into the server will be used for composing
  * a search term. Immediately after every keystroke the search is updated:
  * - so-far-matching characters are highlighted
  * - the cursor is moved to the next match
@@ -120,8 +120,8 @@ function objectToRegExp(obj) {
     };
 
     this.selectionFix = function(editor) {
-        // Fix selection bug: When clicked inside the editor
-        // editor.selection.$isEmpty is false even if the mouse click did not
+        // Fix selection bug: When clicked inside the server
+        // server.selection.$isEmpty is false even if the mouse click did not
         // open a selection. This is interpreted by the move commands to
         // extend the selection. To only extend the selection when there is
         // one, we clear it here

@@ -26,7 +26,7 @@ import org.testng.annotations.Test;
 import org.wso2.carbon.event.simulator.core.exception.InsufficientAttributesException;
 import org.wso2.carbon.event.simulator.core.exception.InvalidConfigException;
 import org.wso2.carbon.event.simulator.core.service.EventSimulatorDataHolder;
-import org.wso2.carbon.stream.processor.common.exception.ResourceNotFoundException;
+import org.wso2.carbon.streaming.integrator.common.exception.ResourceNotFoundException;
 import org.wso2.siddhi.query.api.definition.Attribute;
 
 import java.util.ArrayList;

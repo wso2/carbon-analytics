@@ -29,7 +29,7 @@ import org.wso2.carbon.event.simulator.core.internal.generator.EventGenerator;
 import org.wso2.carbon.event.simulator.core.internal.util.EventGeneratorFactoryImpl;
 import org.wso2.carbon.event.simulator.core.internal.util.EventSimulatorConstants;
 import org.wso2.carbon.event.simulator.core.util.LogEncoder;
-import org.wso2.carbon.stream.processor.common.exception.ResourceNotFoundException;
+import org.wso2.carbon.streaming.integrator.common.exception.ResourceNotFoundException;
 
 import java.util.ArrayList;
 import java.util.Arrays;

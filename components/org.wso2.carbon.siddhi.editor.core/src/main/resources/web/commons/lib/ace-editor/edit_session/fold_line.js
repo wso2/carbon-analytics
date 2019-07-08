@@ -169,7 +169,7 @@ function FoldLine(foldData, folds) {
                 && fold.start.column != column
                 && fold.start.row != row)
             {
-                //throwing here breaks whole editor
+                //throwing here breaks whole server
                 //TODO: properly handle this
                 window.console && window.console.log(row, column, fold);
             } else if (fold.start.row == row) {

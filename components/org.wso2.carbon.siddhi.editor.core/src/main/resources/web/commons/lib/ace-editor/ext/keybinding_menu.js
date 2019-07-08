@@ -44,13 +44,13 @@
 
 define(function(require, exports, module) {
     "use strict";
-    var Editor = require("ace/editor").Editor;
+    var Editor = require("ace/server").Editor;
     /**
      * Generates a menu which displays the keyboard shortcuts.
      * @author <a href="mailto:matthewkastor@gmail.com">
      *  Matthew Christopher Kastor-Inare III </a><br />
      *  ☭ Hial Atropa!! ☭
-     * @param {ace.Editor} editor An instance of the ace editor.
+     * @param {ace.Editor} editor An instance of the ace server.
      */
     function showKeyboardShortcuts (editor) {
         // make sure the menu isn't open already.

@@ -25,7 +25,7 @@ import org.wso2.carbon.analytics.idp.client.core.exception.AuthenticationExcepti
 import org.wso2.carbon.analytics.idp.client.core.utils.IdPClientConstants;
 import org.wso2.carbon.analytics.msf4j.interceptor.common.internal.DataHolder;
 import org.wso2.carbon.analytics.msf4j.interceptor.common.util.InterceptorConstants;
-import org.wso2.carbon.stream.processor.common.utils.SPConstants;
+import org.wso2.carbon.streaming.integrator.common.utils.SPConstants;
 import org.wso2.msf4j.Request;
 import org.wso2.msf4j.Response;
 import org.wso2.msf4j.interceptor.RequestInterceptor;
@@ -41,7 +41,7 @@ import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
 
 /**
- * Interceptor to check authentication into sp.
+ * Interceptor to check authentication into si.
  */
 @Component(
         service = AuthenticationInterceptor.class,

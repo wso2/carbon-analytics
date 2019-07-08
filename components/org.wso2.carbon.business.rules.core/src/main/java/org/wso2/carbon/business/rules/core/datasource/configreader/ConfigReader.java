@@ -23,7 +23,7 @@ import org.slf4j.LoggerFactory;
 import org.wso2.carbon.analytics.permissions.PermissionProvider;
 import org.wso2.carbon.analytics.permissions.bean.Permission;
 import org.wso2.carbon.analytics.permissions.bean.Role;
-import org.wso2.carbon.stream.processor.core.internal.util.SiddhiAppProcessorConstants;
+import org.wso2.carbon.streaming.integrator.core.internal.util.SiddhiAppProcessorConstants;
 
 import java.util.ArrayList;
 import java.util.HashMap;

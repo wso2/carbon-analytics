@@ -3191,7 +3191,7 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
                 },
                 "themes": {
                     "theme": "default",
-                    "url": "editor/commons/lib/js-tree-v3.3.2/themes/default/style.css"
+                    "url": "server/commons/lib/js-tree-v3.3.2/themes/default/style.css"
                 },
                 "checkbox": {
                     "three_state": false,
@@ -3255,10 +3255,10 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
                 tree.create_node(selectedNode,
                     {
                         text: "property", class: "annotation-key", state: {"opened": true},
-                        "a_attr": {"class": "annotation-key"}, icon: "/editor/commons/images/properties.png",
+                        "a_attr": {"class": "annotation-key"}, icon: "/server/commons/images/properties.png",
                         children: [{
                             text: "value", class: "annotation-value", "a_attr": {"class": "annotation-value"},
-                            icon: "/editor/commons/images/value.png"
+                            icon: "/server/commons/images/value.png"
                         }]
                     }
                 );
@@ -3275,13 +3275,13 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
                 }
                 tree.create_node(selectedNode, {
                     text: "Annotation", class: "annotation", state: {"opened": true},
-                    "a_attr": {"class": "annotation"}, icon: "/editor/commons/images/annotation.png",
+                    "a_attr": {"class": "annotation"}, icon: "/server/commons/images/annotation.png",
                     children: [{
-                        text: "property", class: "annotation-key", icon: "/editor/commons/images/properties.png",
+                        text: "property", class: "annotation-key", icon: "/server/commons/images/properties.png",
                         "a_attr": {"class": "annotation-key"},
                         children: [{
                             text: "value", class: "annotation-value", "a_attr": {"class": "annotation-value"},
-                            icon: "/editor/commons/images/value.png"
+                            icon: "/server/commons/images/value.png"
                         }]
                     }]
 
@@ -4544,7 +4544,7 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
 
             var self = this;
             var result = '';
-            self.tooltipsURL = window.location.protocol + "//" + window.location.host + "/editor/tooltips";
+            self.tooltipsURL = window.location.protocol + "//" + window.location.host + "/server/tooltips";
             $.ajax({
                 type: "POST",
                 url: self.tooltipsURL,
