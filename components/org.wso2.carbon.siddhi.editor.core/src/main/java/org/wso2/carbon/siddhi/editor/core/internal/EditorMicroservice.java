@@ -74,9 +74,9 @@ import org.wso2.carbon.siddhi.editor.core.util.designview.designgenerator.Design
 import org.wso2.carbon.siddhi.editor.core.util.designview.exceptions.CodeGenerationException;
 import org.wso2.carbon.siddhi.editor.core.util.designview.exceptions.DesignGenerationException;
 import org.wso2.carbon.siddhi.editor.core.util.siddhiappdeployer.SiddhiAppDeployerApiHelper;
-import org.wso2.carbon.stream.processor.common.EventStreamService;
-import org.wso2.carbon.stream.processor.common.SiddhiAppRuntimeService;
-import org.wso2.carbon.stream.processor.common.utils.config.FileConfigManager;
+import org.wso2.carbon.streaming.integrator.common.EventStreamService;
+import org.wso2.carbon.streaming.integrator.common.SiddhiAppRuntimeService;
+import org.wso2.carbon.streaming.integrator.common.utils.config.FileConfigManager;
 import org.wso2.msf4j.Microservice;
 import org.wso2.msf4j.Request;
 import org.wso2.siddhi.core.SiddhiAppRuntime;
@@ -533,7 +533,7 @@ public class EditorMicroservice implements Microservice {
             if (null != fileNamePath) {
                 String siddhiAppName = fileNamePath.toString().replace(Constants.SIDDHI_APP_FILE_EXTENSION, "");
                 if (null != EditorDataHolder.getDebugProcessorService().getSiddhiAppRuntimeHolder(siddhiAppName)) {
-                    //making the app faulty until the file gets deployed again for editor usage purposes
+                    //making the app faulty until the file gets deployed again for server usage purposes
                     EditorDataHolder.getDebugProcessorService().getSiddhiAppRuntimeHolder(siddhiAppName).setMode(
                             DebugRuntime.Mode.FAULTY);
                 }

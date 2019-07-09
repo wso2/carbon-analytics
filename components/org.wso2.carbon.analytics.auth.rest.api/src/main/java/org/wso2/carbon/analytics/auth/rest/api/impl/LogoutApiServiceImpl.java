@@ -34,7 +34,7 @@ import org.wso2.carbon.analytics.auth.rest.api.util.AuthRESTAPIConstants;
 import org.wso2.carbon.analytics.auth.rest.api.util.AuthUtil;
 import org.wso2.carbon.analytics.idp.client.core.exception.IdPClientException;
 import org.wso2.carbon.analytics.idp.client.core.utils.IdPClientConstants;
-import org.wso2.carbon.stream.processor.common.utils.SPConstants;
+import org.wso2.carbon.streaming.integrator.common.utils.SPConstants;
 import org.wso2.msf4j.Request;
 
 import javax.ws.rs.core.NewCookie;

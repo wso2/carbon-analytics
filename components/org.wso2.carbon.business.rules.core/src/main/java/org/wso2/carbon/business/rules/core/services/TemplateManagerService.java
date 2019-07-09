@@ -43,7 +43,7 @@ import org.wso2.carbon.business.rules.core.exceptions.TemplateManagerServiceExce
 import org.wso2.carbon.business.rules.core.util.LogEncoder;
 import org.wso2.carbon.business.rules.core.util.TemplateManagerConstants;
 import org.wso2.carbon.business.rules.core.util.TemplateManagerHelper;
-import org.wso2.carbon.stream.processor.core.internal.util.SiddhiAppProcessorConstants;
+import org.wso2.carbon.streaming.integrator.core.internal.util.SiddhiAppProcessorConstants;
 
 import java.io.File;
 import java.io.UnsupportedEncodingException;

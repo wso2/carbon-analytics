@@ -69,7 +69,7 @@ var SiddhiEditor = {};
         }
 
         /**
-         * Run on editor change tasks
+         * Run on server change tasks
          *
          * @param {object} data Editor change data received
          */
@@ -223,12 +223,12 @@ var SiddhiEditor = {};
         var TokenTooltipPointRecognitionListener = require(SiddhiEditor.constants.antlr.ROOT + SiddhiEditor.constants.antlr.SIDDHI_TOKEN_TOOL_TIP_UPDATE_LISTENER).TokenTooltipPointRecognitionListener;
 
         /**
-         * Run on editor change tasks
+         * Run on server change tasks
          * Creates the parse tree and walks it for recognizing syntax errors and completion engine's data
          * Syntax errors list will be passed to the main js after finding them
          * Completion Engine's data will be passed to the main js after finding them
          *
-         * @param {string} editorText Text in the editor for which the parse tree will be generated
+         * @param {string} editorText Text in the server for which the parse tree will be generated
          */
         walker.onEditorChange = function (editorText) {
             // Following code segment parse the input query using antlr4's parser and lexer
@@ -243,10 +243,10 @@ var SiddhiEditor = {};
             parser._listeners.push(errorListener);
             parser.buildParseTrees = true;
 
-            // Syntax errors in parsing are stored in  editor.state.syntaxErrorList
+            // Syntax errors in parsing are stored in  server.state.syntaxErrorList
             lastParseTree = parser.parse();
 
-            // Adding the syntax errors identified into the editor gutter
+            // Adding the syntax errors identified into the server gutter
             renderer.notifyParseTreeWalkingCompletion(walker.syntaxErrorList);
 
             // If there are no syntax errors, walk the parse tree to generate completion data

@@ -131,7 +131,7 @@ const editorThemes = [
 const editorFontSizes = [11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24];
 
 /**
- * Represents the template editor
+ * Represents the template server
  */
 class TemplateEditor extends React.Component {
     constructor(props) {
@@ -306,7 +306,7 @@ class TemplateEditor extends React.Component {
     }
 
     /**
-     * Updates the given element of editor appearance settings, with the given value
+     * Updates the given element of server appearance settings, with the given value
      * @param element
      * @param value
      */

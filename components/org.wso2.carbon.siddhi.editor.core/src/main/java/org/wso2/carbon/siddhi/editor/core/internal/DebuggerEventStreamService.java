@@ -22,8 +22,8 @@ package org.wso2.carbon.siddhi.editor.core.internal;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.wso2.carbon.siddhi.editor.core.exception.NoSuchStreamException;
-import org.wso2.carbon.stream.processor.common.EventStreamService;
-import org.wso2.carbon.stream.processor.common.exception.ResourceNotFoundException;
+import org.wso2.carbon.streaming.integrator.common.EventStreamService;
+import org.wso2.carbon.streaming.integrator.common.exception.ResourceNotFoundException;
 import org.wso2.siddhi.core.event.Event;
 import org.wso2.siddhi.query.api.definition.Attribute;
 

@@ -21,7 +21,7 @@ package org.wso2.carbon.siddhi.editor.core;
 
 import org.wso2.carbon.siddhi.editor.core.internal.DebugRuntime;
 import org.wso2.carbon.siddhi.editor.core.internal.EditorDataHolder;
-import org.wso2.carbon.stream.processor.common.SiddhiAppRuntimeService;
+import org.wso2.carbon.streaming.integrator.common.SiddhiAppRuntimeService;
 import org.wso2.siddhi.core.SiddhiAppRuntime;
 import org.wso2.siddhi.core.util.statistics.metrics.Level;
 
@@ -48,6 +48,6 @@ public class EditorSiddhiAppRuntimeService implements SiddhiAppRuntimeService {
 
     @Override
     public void enableSiddhiAppStatistics(Level statsEnabled) {
-        //ignore the editor runtime statistics
+        //ignore the server runtime statistics
     }
 }

@@ -33,7 +33,7 @@ import org.wso2.carbon.event.simulator.core.internal.util.EventSimulatorConstant
 import org.wso2.carbon.event.simulator.core.model.DBConnectionModel;
 import org.wso2.carbon.event.simulator.core.service.EventSimulatorDataHolder;
 import org.wso2.carbon.event.simulator.core.util.SourceConfigLogger;
-import org.wso2.carbon.stream.processor.common.exception.ResourceNotFoundException;
+import org.wso2.carbon.streaming.integrator.common.exception.ResourceNotFoundException;
 import org.wso2.siddhi.core.event.Event;
 import org.wso2.siddhi.query.api.definition.Attribute;
 

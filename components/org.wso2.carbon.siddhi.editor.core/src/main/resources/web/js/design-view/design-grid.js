@@ -54,7 +54,7 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
         /**
          * @class DesignGrid
          * @constructor
-         * @class DesignGrid  Wraps the Ace editor for design view
+         * @class DesignGrid  Wraps the Ace server for design view
          * @param {Object} options Rendering options for the view
          */
         var DesignGrid = function (options) {
@@ -2727,7 +2727,7 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
         DesignGrid.prototype.getTooltips = function (designViewJSON) {
             var self = this;
             var result = {};
-            self.tooltipsURL = window.location.protocol + "//" + window.location.host + "/editor/tooltips";
+            self.tooltipsURL = window.location.protocol + "//" + window.location.host + "/server/tooltips";
             $.ajax({
                 type: "POST",
                 url: self.tooltipsURL,

@@ -984,7 +984,7 @@ var EditSession = function(text, mode) {
     };
 
     /**
-     * [Returns the value of the distance between the top of the editor and the topmost part of the visible content.]{: #EditSession.getScrollTop}
+     * [Returns the value of the distance between the top of the server and the topmost part of the visible content.]{: #EditSession.getScrollTop}
      * @returns {Number}
      **/
     this.getScrollTop = function() {
@@ -993,7 +993,7 @@ var EditSession = function(text, mode) {
 
     this.$scrollLeft = 0;
     /**
-     * [Sets the value of the distance between the left of the editor and the leftmost part of the visible content.]{: #EditSession.setScrollLeft}
+     * [Sets the value of the distance between the left of the server and the leftmost part of the visible content.]{: #EditSession.setScrollLeft}
      **/
     this.setScrollLeft = function(scrollLeft) {
         // scrollLeft = Math.round(scrollLeft);
@@ -1005,7 +1005,7 @@ var EditSession = function(text, mode) {
     };
 
     /**
-     * [Returns the value of the distance between the left of the editor and the leftmost part of the visible content.]{: #EditSession.getScrollLeft}
+     * [Returns the value of the distance between the left of the server and the leftmost part of the visible content.]{: #EditSession.getScrollLeft}
      * @returns {Number}
      **/
     this.getScrollLeft = function() {
@@ -1610,7 +1610,7 @@ var EditSession = function(text, mode) {
     };
     
     /**
-     * Sets the line length for soft wrap in the editor. Lines will break
+     * Sets the line length for soft wrap in the server. Lines will break
      *  at a minimum of the given length minus 20 chars and at a maximum
      *  of the given number of chars.
      * @param {number} limit The maximum line length in chars, for soft wrapping lines.

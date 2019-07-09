@@ -25,7 +25,7 @@ import org.wso2.carbon.event.simulator.core.exception.FileAlreadyExistsException
 import org.wso2.carbon.event.simulator.core.exception.FileOperationsException;
 import org.wso2.carbon.event.simulator.core.exception.InvalidConfigException;
 import org.wso2.carbon.event.simulator.core.util.LogEncoder;
-import org.wso2.carbon.stream.processor.common.exception.ResourceNotFoundException;
+import org.wso2.carbon.streaming.integrator.common.exception.ResourceNotFoundException;
 
 import java.io.BufferedWriter;
 import java.io.File;

@@ -28,7 +28,7 @@ import org.wso2.carbon.event.simulator.core.exception.SimulatorInitializationExc
 import org.wso2.carbon.event.simulator.core.internal.bean.CSVSimulationDTO;
 import org.wso2.carbon.event.simulator.core.internal.util.EventConverter;
 import org.wso2.carbon.event.simulator.core.service.EventSimulatorDataHolder;
-import org.wso2.carbon.stream.processor.common.exception.ResourceNotFoundException;
+import org.wso2.carbon.streaming.integrator.common.exception.ResourceNotFoundException;
 import org.wso2.siddhi.core.event.Event;
 import org.wso2.siddhi.query.api.definition.Attribute;
 

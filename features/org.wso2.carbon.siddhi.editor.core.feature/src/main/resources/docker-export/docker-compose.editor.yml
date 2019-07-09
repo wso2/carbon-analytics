@@ -15,8 +15,8 @@
 version: '2.3'
 services:
   editor:
-    image: docker.wso2.com/wso2sp-editor:{{PRODUCT_VERSION}}
-    container_name: wso2sp-editor
+    image: docker.wso2.com/wso2sp-server:{{PRODUCT_VERSION}}
+    container_name: wso2sp-server
     ports:
       - "9390:9390"
     healthcheck:
@@ -25,4 +25,4 @@ services:
       timeout: 120s
       retries: 5
     volumes:
-      - ./siddhi-files:/home/wso2carbon/wso2-artifact-volume/wso2/editor/deployment/workspace
+      - ./siddhi-files:/home/wso2carbon/wso2-artifact-volume/wso2/server/deployment/workspace

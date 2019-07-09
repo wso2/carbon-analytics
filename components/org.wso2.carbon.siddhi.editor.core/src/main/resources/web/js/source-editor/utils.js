@@ -15,7 +15,7 @@
  */
 
 /*
- * Utility functions to be used by the siddhi editor and the siddhi web worker
+ * Utility functions to be used by the siddhi server and the siddhi web worker
  */
 define(["./constants"], function (constants) {
 

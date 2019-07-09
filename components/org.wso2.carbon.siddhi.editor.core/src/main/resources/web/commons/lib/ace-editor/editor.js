@@ -485,7 +485,7 @@ var Editor = function(renderer, session) {
     };
 
     /**
-     * Gets the current font size of the editor text.
+     * Gets the current font size of the server text.
      */
     this.getFontSize = function () {
         return this.getOption("fontSize") ||
@@ -493,7 +493,7 @@ var Editor = function(renderer, session) {
     };
 
     /**
-     * Set a new font size (in pixels) for the editor text.
+     * Set a new font size (in pixels) for the server text.
      * @param {String} size A font size ( _e.g._ "12px")
      *
      *
@@ -652,7 +652,7 @@ var Editor = function(renderer, session) {
     };
 
     /**
-     * Emitted once the editor comes into focus.
+     * Emitted once the server comes into focus.
      * @event focus
      *
      *
@@ -667,7 +667,7 @@ var Editor = function(renderer, session) {
     };
 
     /**
-     * Emitted once the editor has been blurred.
+     * Emitted once the server has been blurred.
      * @event blur
      *
      *
@@ -730,7 +730,7 @@ var Editor = function(renderer, session) {
         if (!this.$blockScrolling) {
             config.warn("Automatically scrolling cursor into view after selection change",
                 "this will be disabled in the next version",
-                "set editor.$blockScrolling = Infinity to disable this message"
+                "set server.$blockScrolling = Infinity to disable this message"
             );
             this.renderer.scrollCursorIntoView();
         }
@@ -1163,7 +1163,7 @@ var Editor = function(renderer, session) {
     };
 
     /**
-     * If `showInvisibles` is set to `true`, invisible characters&mdash;like spaces or new lines&mdash;are show in the editor.
+     * If `showInvisibles` is set to `true`, invisible characters&mdash;like spaces or new lines&mdash;are show in the server.
      * @param {Boolean} showInvisibles Specifies whether or not to show invisible characters
      *
      **/
@@ -1188,7 +1188,7 @@ var Editor = function(renderer, session) {
     };
 
     /**
-     * If `showPrintMargin` is set to `true`, the print margin is shown in the editor.
+     * If `showPrintMargin` is set to `true`, the print margin is shown in the server.
      * @param {Boolean} showPrintMargin Specifies whether or not to show the print margin
      *
      **/
@@ -1222,8 +1222,8 @@ var Editor = function(renderer, session) {
     };
 
     /**
-     * If `readOnly` is true, then the editor is set to read-only mode, and none of the content can change.
-     * @param {Boolean} readOnly Specifies whether the editor can be modified or not
+     * If `readOnly` is true, then the server is set to read-only mode, and none of the content can change.
+     * @param {Boolean} readOnly Specifies whether the server can be modified or not
      *
      **/
     this.setReadOnly = function(readOnly) {
@@ -1231,7 +1231,7 @@ var Editor = function(renderer, session) {
     };
 
     /**
-     * Returns `true` if the editor is set to read-only mode.
+     * Returns `true` if the server is set to read-only mode.
      * @returns {Boolean}
      **/
     this.getReadOnly = function() {
@@ -1907,7 +1907,7 @@ var Editor = function(renderer, session) {
     };
 
     /**
-     * Moves the editor to the specified row.
+     * Moves the server to the specified row.
      * @related VirtualRenderer.scrollToRow
      **/
     this.scrollToRow = function(row) {
@@ -1974,7 +1974,7 @@ var Editor = function(renderer, session) {
 
 
     /**
-     * Selects all the text in editor.
+     * Selects all the text in server.
      * @related Selection.selectAll
      **/
     this.selectAll = function() {
@@ -2527,7 +2527,7 @@ var Editor = function(renderer, session) {
 
     /**
      *
-     * Cleans up the entire editor.
+     * Cleans up the entire server.
      **/
     this.destroy = function() {
         this.renderer.destroy();
@@ -2538,7 +2538,7 @@ var Editor = function(renderer, session) {
     };
 
     /**
-     * Enables automatic scrolling of the cursor into view when editor itself is inside scrollable element
+     * Enables automatic scrolling of the cursor into view when server itself is inside scrollable element
      * @param {Boolean} enable default true
      **/
     this.setAutoScrollEditorIntoView = function(enable) {

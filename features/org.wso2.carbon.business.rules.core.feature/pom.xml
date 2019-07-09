@@ -21,7 +21,7 @@
     <parent>
         <groupId>org.wso2.carbon.analytics</groupId>
         <artifactId>org.wso2.carbon.analytics.parent</artifactId>
-        <version>2.1.30-SNAPSHOT</version>
+        <version>3.0.0-SNAPSHOT</version>
         <relativePath>../../pom.xml</relativePath>
     </parent>
     <modelVersion>4.0.0</modelVersion>
@@ -55,7 +55,7 @@
         </dependency>
         <dependency>
             <groupId>org.wso2.carbon.analytics</groupId>
-            <artifactId>org.wso2.carbon.stream.processor.core</artifactId>
+            <artifactId>org.wso2.carbon.streaming.integrator.core</artifactId>
         </dependency>
         <dependency>
             <groupId>org.wso2.orbit.com.squareup.okhttp</groupId>

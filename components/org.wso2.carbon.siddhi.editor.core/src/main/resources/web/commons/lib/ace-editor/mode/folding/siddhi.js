@@ -114,7 +114,7 @@ define(["require","exports","module","ace/lib/oop","ace/range","ace/mode/folding
      * Return the range from the start position to the position at which the first string matching the endTokenRegex is found
      * Search is started at start position and traveled forward
      *
-     * @param session Ace editor session
+     * @param session Ace server session
      * @param startRow Start row of the range
      * @param startColumn Start column of the range
      * @param endTokenRegex Regex of the end token
@@ -155,7 +155,7 @@ define(["require","exports","module","ace/lib/oop","ace/range","ace/mode/folding
      * Return the range from the end position to the position at which the last string matching the startTokenRegex is found
      * Search is started at end position and traveled backward
      *
-     * @param session Ace editor session
+     * @param session Ace server session
      * @param endRow End row of the range
      * @param endColumn End column of the range
      * @param startTokenRegex Regex of the end token

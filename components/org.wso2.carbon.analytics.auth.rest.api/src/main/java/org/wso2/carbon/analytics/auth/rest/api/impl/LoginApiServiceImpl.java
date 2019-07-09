@@ -42,7 +42,7 @@ import org.wso2.carbon.analytics.idp.client.core.utils.config.IdPClientConfigura
 import org.wso2.carbon.analytics.idp.client.external.ExternalIdPClient;
 import org.wso2.carbon.analytics.idp.client.external.ExternalIdPClientConstants;
 import org.wso2.carbon.config.ConfigurationException;
-import org.wso2.carbon.stream.processor.common.utils.SPConstants;
+import org.wso2.carbon.streaming.integrator.common.utils.SPConstants;
 import org.wso2.msf4j.Request;
 
 import java.net.URI;

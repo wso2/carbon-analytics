@@ -26,7 +26,7 @@ var SiddhiQLListener = require('./gen/SiddhiQLListener').SiddhiQLListener;
  * THe data is stored in the main js
  *
  * @constructor
- * @param walker The editor for which this listener is populating data
+ * @param walker The server for which this listener is populating data
  */
 function DataPopulationListener(walker) {
     SiddhiQLListener.call(this);     // inherit default listener
@@ -248,12 +248,12 @@ DataPopulationListener.prototype.exitExecution_element = function (ctx) {
 };
 
 /**
- * Add a statement to the editor.completionEngine.statementsList array
+ * Add a statement to the server.completionEngine.statementsList array
  * endOfStatementToken is added at the end of the statement if provided
  * Statements list is used in sending statement by statement for validation
  * Also the statements list is used for getting the last statement for completions
  *
- * @param {object} walker The editor which holds the statements list to which the statement is added
+ * @param {object} walker The server which holds the statements list to which the statement is added
  * @param {object} ctx The ANTLR context which will be used in getting the statement
  * @param [endOfStatementToken] The token to be appended at the end of the statement
  */

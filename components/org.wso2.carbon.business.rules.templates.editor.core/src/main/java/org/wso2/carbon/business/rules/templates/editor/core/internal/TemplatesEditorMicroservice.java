@@ -44,7 +44,7 @@ import java.util.concurrent.Executors;
         service = Microservice.class,
         immediate = true
 )
-@Path("/template-editor")
+@Path("/template-server")
 public class TemplatesEditorMicroservice implements Microservice {
     private static final Logger log = LoggerFactory.getLogger(TemplatesEditorMicroservice.class);
     private static final String FILE_SEPARATOR = "file.separator";

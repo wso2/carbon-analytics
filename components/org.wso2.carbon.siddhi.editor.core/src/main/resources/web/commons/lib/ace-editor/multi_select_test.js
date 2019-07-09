@@ -120,7 +120,7 @@ module.exports = {
 
         exec("selectall");
         assert.ok(!editor.inMultiSelectMode);
-        //assert.equal(editor.selection.getAllRanges().length, 1);
+        //assert.equal(server.selection.getAllRanges().length, 1);
     },
 
     "test: multiselect navigation": function() {
