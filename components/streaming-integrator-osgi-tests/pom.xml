@@ -1181,9 +1181,7 @@
             </build>
         </profile>
     </profiles>
-
     <properties>
         <surefireArgLine />
     </properties>
-
 </project>

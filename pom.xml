@@ -31,47 +31,46 @@
     <version>3.0.0-SNAPSHOT</version>
     <name>WSO2 Carbon Analytics - Parent</name>
     <modules>
-        <!--<module>components/org.wso2.carbon.streaming.integrator.common</module>-->
-        <!--<module>components/org.wso2.carbon.streaming.integrator.core</module>-->
-        <!--<module>components/org.wso2.carbon.event.simulator.core</module>-->
-        <!--<module>components/org.wso2.carbon.editor.log.appender</module>-->
-        <!--<module>components/org.wso2.carbon.siddhi.editor.core</module>-->
-        <!--<module>components/org.wso2.carbon.business.rules.templates.editor.core</module>-->
-        <!--<module>components/org.wso2.carbon.business.rules.core</module>-->
-        <!--<module>components/org.wso2.carbon.business.rules.web</module>-->
-        <!--<module>components/org.wso2.carbon.si.coordination.listener</module>-->
-        <!--<module>components/org.wso2.carbon.si.metrics.core</module>-->
-        <!--<module>components/org.wso2.carbon.streaming.integrator.statistics</module>-->
-        <!--<module>components/org.wso2.carbon.siddhi.store.api.rest</module>-->
-        <!--<module>components/org.wso2.carbon.analytics.auth.rest.api</module>-->
-        <!--<module>components/org.wso2.carbon.permissions.rest.api</module>-->
-        <!--<module>components/org.wso2.carbon.data.provider</module>-->
-        <!--<module>components/org.wso2.carbon.analytics.msf4j.interceptor.common</module>-->
-        <!--<module>components/org.wso2.carbon.health.check.core</module>-->
+        <module>components/org.wso2.carbon.streaming.integrator.common</module>
+        <module>components/org.wso2.carbon.streaming.integrator.core</module>
+        <module>components/org.wso2.carbon.event.simulator.core</module>
+        <module>components/org.wso2.carbon.editor.log.appender</module>
+        <module>components/org.wso2.carbon.siddhi.editor.core</module>
+        <module>components/org.wso2.carbon.business.rules.templates.editor.core</module>
+        <module>components/org.wso2.carbon.business.rules.core</module>
+        <module>components/org.wso2.carbon.business.rules.web</module>
+        <module>components/org.wso2.carbon.si.coordination.listener</module>
+        <module>components/org.wso2.carbon.si.metrics.core</module>
+        <module>components/org.wso2.carbon.streaming.integrator.statistics</module>
+        <module>components/org.wso2.carbon.siddhi.store.api.rest</module>
+        <module>components/org.wso2.carbon.analytics.auth.rest.api</module>
+        <module>components/org.wso2.carbon.permissions.rest.api</module>
+        <module>components/org.wso2.carbon.data.provider</module>
+        <module>components/org.wso2.carbon.analytics.msf4j.interceptor.common</module>
+        <module>components/org.wso2.carbon.health.check.core</module>
 
-        <!--<module>features/org.wso2.carbon.streaming.integrator.core.feature</module>-->
-        <!--<module>features/org.wso2.carbon.streaming.integrator.common.feature</module>-->
-        <!--<module>features/org.wso2.carbon.event.simulator.core.feature</module>-->
-        <!--<module>features/org.wso2.carbon.siddhi.editor.core.feature</module>-->
-        <!--<module>features/org.wso2.carbon.business.rules.templates.editor.core.feature</module>-->
-        <!--<module>features/org.wso2.carbon.business.rules.core.feature</module>-->
-        <!--<module>features/org.wso2.carbon.business.rules.web.feature</module>-->
-        <!--<module>features/org.wso2.siddhi.feature</module>-->
-        <!--<module>features/org.wso2.carbon.si.metrics.core.feature</module>-->
-        <!--<module>features/org.wso2.carbon.si.coordination.listener.feature</module>-->
-        <!--<module>features/org.wso2.carbon.streaming.integrator.statistics.feature</module>-->
-        <!--<module>features/org.wso2.carbon.siddhi.store.api.rest.feature</module>-->
-        <!--<module>features/org.wso2.carbon.analytics.auth.rest.api.feature</module>-->
-        <!--<module>features/org.wso2.carbon.permissions.rest.api.feature</module>-->
-        <!--<module>features/org.wso2.carbon.data.provider.feature</module>-->
-        <!--<module>features/org.wso2.carbon.analytics.msf4j.interceptor.common.feature</module>-->
-        <!--<module>features/org.wso2.carbon.health.check.core.feature</module>-->
+        <module>features/org.wso2.carbon.streaming.integrator.core.feature</module>
+        <module>features/org.wso2.carbon.streaming.integrator.common.feature</module>
+        <module>features/org.wso2.carbon.event.simulator.core.feature</module>
+        <module>features/org.wso2.carbon.siddhi.editor.core.feature</module>
+        <module>features/org.wso2.carbon.business.rules.templates.editor.core.feature</module>
+        <module>features/org.wso2.carbon.business.rules.core.feature</module>
+        <module>features/org.wso2.carbon.business.rules.web.feature</module>
+        <module>features/org.wso2.siddhi.feature</module>
+        <module>features/org.wso2.carbon.si.metrics.core.feature</module>
+        <module>features/org.wso2.carbon.si.coordination.listener.feature</module>
+        <module>features/org.wso2.carbon.streaming.integrator.statistics.feature</module>
+        <module>features/org.wso2.carbon.siddhi.store.api.rest.feature</module>
+        <module>features/org.wso2.carbon.analytics.auth.rest.api.feature</module>
+        <module>features/org.wso2.carbon.permissions.rest.api.feature</module>
+        <module>features/org.wso2.carbon.data.provider.feature</module>
+        <module>features/org.wso2.carbon.analytics.msf4j.interceptor.common.feature</module>
+        <module>features/org.wso2.carbon.health.check.core.feature</module>
 
         <module>components/si-tooling-distribution</module>
-        <!--<module>components/si-distribution</module>-->
-        <!--<module>components/streaming-integrator-osgi-tests</module>-->
+        <module>components/si-distribution</module>
+        <module>components/streaming-integrator-osgi-tests</module>
         <module>components/tooling-osgi-tests</module>
-
         <module>coverage-reports</module>
     </modules>
 
@@ -871,7 +870,7 @@
                 <type>zip</type>
             </dependency>
 
-            <!-- Stream Processor related-->
+            <!-- Streaming Integrator related-->
             <dependency>
                 <groupId>org.wso2.carbon.analytics</groupId>
                 <artifactId>org.wso2.carbon.streaming.integrator.core</artifactId>
@@ -1702,7 +1701,7 @@
         <maven.paxexam.plugin.version>1.2.4</maven.paxexam.plugin.version>
         <mockito.version>1.9.0</mockito.version>
 
-        <!-- Stream Processor Dependencies -->
+        <!-- Streaming Integrator Dependencies -->
         <disruptor.version>3.4.2.wso2v1</disruptor.version>
         <guava.version>23.0</guava.version>
         <guava.bundle.version>23.0.0</guava.bundle.version>

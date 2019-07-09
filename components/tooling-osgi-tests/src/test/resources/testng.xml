@@ -19,7 +19,7 @@ limitations under the License.
         <classes>
             <class name="org.wso2.carbon.analytics.test.osgi.SiddhiEditorTestCase"/>
             <class name="org.wso2.carbon.analytics.test.osgi.SimulatorAPITestcase"/>
-            <class name="org.wso2.carbon.analytics.test.osgi.BusinessRulesManagerTestCase"/>
+            <!--<class name="org.wso2.carbon.analytics.test.osgi.BusinessRulesManagerTestCase"/>-->
         </classes>
     </test>
 </suite>
