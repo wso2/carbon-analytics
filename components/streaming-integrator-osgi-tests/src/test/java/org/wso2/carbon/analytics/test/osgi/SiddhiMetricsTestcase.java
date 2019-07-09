@@ -204,7 +204,7 @@ public class SiddhiMetricsTestcase {
     private void testMBean(String MBeanName) throws Exception {
 
         SiddhiAppRuntime siddhiAppRuntime = siddhiAppRuntimeService.getActiveSiddhiAppRuntimes().get("MetricsTestApp2");
-        siddhiAppRuntime.enableStats(Level.DETAIL);
+        siddhiAppRuntime.setStatisticsLevel(Level.DETAIL);
 
         siddhiAppRuntime.addCallback("outputStream", new StreamCallback() {
             @Override
