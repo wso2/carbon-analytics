@@ -23,7 +23,7 @@ import org.wso2.carbon.metrics.core.Level;
 import org.wso2.carbon.metrics.core.MetricService;
 import org.wso2.carbon.metrics.core.Timer;
 import org.wso2.carbon.si.metrics.core.internal.SPMetricsDataHolder;
-import org.wso2.siddhi.core.util.statistics.LatencyTracker;
+import io.siddhi.core.util.statistics.LatencyTracker;
 
 import static org.wso2.carbon.metrics.core.Level.INFO;
 import static org.wso2.carbon.metrics.core.Level.OFF;

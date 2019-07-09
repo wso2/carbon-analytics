@@ -170,7 +170,7 @@
             org.wso2.msf4j.*;version="${msf4j.import.version.range}",
             javax.management.*,
             javax.ws.rs.*;version="${javax.ws.rs.version.range}",
-            org.wso2.siddhi.*;version="${siddhi.version.range}",
+            io.siddhi.*;version="${siddhi.version.range}",
             org.wso2.carbon.analytics.permissions.*; version="${carbon.analytics-common.version.range}",
             org.wso2.carbon.database.query.manager.*; version="${carbon.analytics-common.version.range}",
             *;resolution:=optional

@@ -28,9 +28,9 @@ import org.testng.annotations.BeforeTest;
 import org.testng.annotations.Test;
 import org.wso2.carbon.streaming.integrator.core.ha.HACoordinationSinkHandler;
 import org.wso2.carbon.streaming.integrator.core.ha.HACoordinationSinkHandlerManager;
-import org.wso2.siddhi.core.event.Event;
-import org.wso2.siddhi.core.stream.output.sink.SinkHandlerCallback;
-import org.wso2.siddhi.query.api.definition.StreamDefinition;
+import io.siddhi.core.event.Event;
+import io.siddhi.core.stream.output.sink.SinkHandlerCallback;
+import io.siddhi.query.api.definition.StreamDefinition;
 
 import static org.powermock.api.mockito.PowerMockito.doNothing;
 import static org.powermock.api.mockito.PowerMockito.mock;

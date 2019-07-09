@@ -18,7 +18,7 @@
 
 package org.wso2.carbon.event.simulator.core.internal.bean;
 
-import org.wso2.siddhi.query.api.definition.Attribute;
+import io.siddhi.query.api.definition.Attribute;
 
 /**
  * PrimitiveBasedAttributeDTO represents configuration for  the Random data generator based on primitive data types

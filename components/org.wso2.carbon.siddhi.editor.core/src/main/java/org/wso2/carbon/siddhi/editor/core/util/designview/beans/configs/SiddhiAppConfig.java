@@ -29,7 +29,7 @@ import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhiel
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.query.QueryConfig;
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.sourcesink.SourceSinkConfig;
 import org.wso2.carbon.siddhi.editor.core.util.designview.constants.query.QueryListType;
-import org.wso2.siddhi.query.api.annotation.Annotation;
+import io.siddhi.query.api.annotation.Annotation;
 
 import java.util.ArrayList;
 import java.util.EnumMap;

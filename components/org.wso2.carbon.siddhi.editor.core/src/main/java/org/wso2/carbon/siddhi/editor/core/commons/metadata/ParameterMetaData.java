@@ -17,7 +17,7 @@
  */
 package org.wso2.carbon.siddhi.editor.core.commons.metadata;
 
-import org.wso2.siddhi.annotation.util.DataType;
+import io.siddhi.annotation.util.DataType;
 
 import java.util.List;
 

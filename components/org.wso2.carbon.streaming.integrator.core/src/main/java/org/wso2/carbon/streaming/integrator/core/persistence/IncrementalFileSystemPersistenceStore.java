@@ -22,10 +22,10 @@ import com.google.common.io.Files;
 import org.apache.log4j.Logger;
 import org.wso2.carbon.streaming.integrator.core.ha.util.CompressionUtil;
 import org.wso2.carbon.streaming.integrator.core.persistence.util.PersistenceConstants;
-import org.wso2.siddhi.core.exception.CannotClearSiddhiAppStateException;
-import org.wso2.siddhi.core.util.persistence.IncrementalPersistenceStore;
-import org.wso2.siddhi.core.util.persistence.util.IncrementalSnapshotInfo;
-import org.wso2.siddhi.core.util.persistence.util.PersistenceHelper;
+import io.siddhi.core.exception.CannotClearSiddhiAppStateException;
+import io.siddhi.core.util.persistence.IncrementalPersistenceStore;
+import io.siddhi.core.util.persistence.util.IncrementalSnapshotInfo;
+import io.siddhi.core.util.persistence.util.PersistenceHelper;
 
 import java.io.File;
 import java.io.IOException;

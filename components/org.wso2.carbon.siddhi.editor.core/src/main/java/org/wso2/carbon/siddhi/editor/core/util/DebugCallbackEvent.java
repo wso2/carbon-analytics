@@ -18,8 +18,8 @@
 
 package org.wso2.carbon.siddhi.editor.core.util;
 
-import org.wso2.siddhi.core.debugger.SiddhiDebugger;
-import org.wso2.siddhi.core.event.ComplexEvent;
+import io.siddhi.core.debugger.SiddhiDebugger;
+import io.siddhi.core.event.ComplexEvent;
 
 /**
  * Event to be send in within the Debug callback

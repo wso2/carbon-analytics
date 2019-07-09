@@ -26,7 +26,7 @@ import org.wso2.carbon.event.simulator.core.internal.generator.random.RandomAttr
 import org.wso2.carbon.event.simulator.core.internal.generator.random.RandomAttributeGenerator;
 import org.wso2.carbon.event.simulator.core.internal.util.EventSimulatorConstants;
 import org.wso2.carbon.streaming.integrator.common.exception.ResourceNotFoundException;
-import org.wso2.siddhi.query.api.definition.Attribute;
+import io.siddhi.query.api.definition.Attribute;
 
 import fabricator.Calendar;
 import fabricator.Contact;

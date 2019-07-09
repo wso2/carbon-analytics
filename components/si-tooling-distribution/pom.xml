@@ -336,37 +336,37 @@
                             <artifactItems>
                                 <!--IO Extensions-->
                                 <artifactItem>
-                                    <groupId>org.wso2.extension.siddhi.io.jms</groupId>
+                                    <groupId>io.siddhi.extension.io.jms</groupId>
                                     <artifactId>siddhi-io-jms</artifactId>
                                     <version>${siddhi.io.jms.version}</version>
                                     <type>jar</type>
                                 </artifactItem>
                                 <artifactItem>
-                                    <groupId>org.wso2.extension.siddhi.io.email</groupId>
+                                    <groupId>io.siddhi.extension.io.email</groupId>
                                     <artifactId>siddhi-io-email</artifactId>
                                     <version>${siddhi.io.email.version}</version>
                                     <type>jar</type>
                                 </artifactItem>
                                 <artifactItem>
-                                    <groupId>org.wso2.extension.siddhi.io.tcp</groupId>
+                                    <groupId>io.siddhi.extension.io.tcp</groupId>
                                     <artifactId>siddhi-io-tcp</artifactId>
                                     <version>${siddhi.io.tcp.version}</version>
                                     <type>jar</type>
                                 </artifactItem>
                                 <artifactItem>
-                                    <groupId>org.wso2.extension.siddhi.io.kafka</groupId>
+                                    <groupId>io.siddhi.extension.io.kafka</groupId>
                                     <artifactId>siddhi-io-kafka</artifactId>
                                     <version>${siddhi.io.kafka.version}</version>
                                     <type>jar</type>
                                 </artifactItem>
                                 <artifactItem>
-                                    <groupId>org.wso2.extension.siddhi.io.http</groupId>
+                                    <groupId>io.siddhi.extension.io.http</groupId>
                                     <artifactId>siddhi-io-http</artifactId>
                                     <version>${siddhi.io.http.version}</version>
                                     <type>jar</type>
                                 </artifactItem>
                                 <artifactItem>
-                                    <groupId>org.wso2.extension.siddhi.io.nats</groupId>
+                                    <groupId>io.siddhi.extension.io.nats</groupId>
                                     <artifactId>siddhi-io-nats</artifactId>
                                     <version>${siddhi.io.nats.version}</version>
                                     <type>jar</type>
@@ -374,19 +374,19 @@
                                 <!--Map Extensions-->
                                 <!--Mapper Extensions-->
                                 <artifactItem>
-                                    <groupId>org.wso2.extension.siddhi.map.xml</groupId>
+                                    <groupId>io.siddhi.extension.map.xml</groupId>
                                     <artifactId>siddhi-map-xml</artifactId>
                                     <version>${siddhi.map.xml.version}</version>
                                     <type>jar</type>
                                 </artifactItem>
                                 <artifactItem>
-                                    <groupId>org.wso2.extension.siddhi.map.json</groupId>
+                                    <groupId>io.siddhi.extension.map.json</groupId>
                                     <artifactId>siddhi-map-json</artifactId>
                                     <version>${siddhi.map.json.version}</version>
                                     <type>jar</type>
                                 </artifactItem>
                                 <artifactItem>
-                                    <groupId>org.wso2.extension.siddhi.map.binary</groupId>
+                                    <groupId>io.siddhi.extension.map.binary</groupId>
                                     <artifactId>siddhi-map-binary</artifactId>
                                     <version>${siddhi.map.binary.version}</version>
                                     <type>jar</type>
@@ -399,7 +399,7 @@
                                     <type>jar</type>
                                 </artifactItem>
                                 <artifactItem>
-                                    <groupId>org.wso2.extension.siddhi.store.rdbms</groupId>
+                                    <groupId>io.siddhi.extension.store.rdbms</groupId>
                                     <artifactId>siddhi-store-rdbms</artifactId>
                                     <version>${siddhi.store.rdbms.version}</version>
                                     <type>jar</type>

@@ -18,8 +18,8 @@
 
 package org.wso2.carbon.streaming.integrator.core.ha;
 
-import org.wso2.siddhi.core.stream.output.sink.SinkHandler;
-import org.wso2.siddhi.core.stream.output.sink.SinkHandlerManager;
+import io.siddhi.core.stream.output.sink.SinkHandler;
+import io.siddhi.core.stream.output.sink.SinkHandlerManager;
 
 /**
  * Implementation of {@link SinkHandlerManager} used for 2 node minimum HA

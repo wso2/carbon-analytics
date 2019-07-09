@@ -43,7 +43,7 @@ import org.wso2.carbon.siddhi.store.api.rest.model.Query;
 import org.wso2.carbon.streaming.integrator.common.EventStreamService;
 import org.wso2.carbon.streaming.integrator.common.SiddhiAppRuntimeService;
 import org.wso2.msf4j.MicroservicesRegistry;
-import org.wso2.siddhi.core.event.Event;
+import io.siddhi.core.event.Event;
 
 import java.net.URI;
 import java.nio.file.Path;

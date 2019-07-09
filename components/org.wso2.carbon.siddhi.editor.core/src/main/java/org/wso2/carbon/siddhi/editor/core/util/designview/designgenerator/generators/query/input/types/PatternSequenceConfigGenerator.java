@@ -23,8 +23,8 @@ import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhiel
 import org.wso2.carbon.siddhi.editor.core.util.designview.constants.query.QueryInputType;
 import org.wso2.carbon.siddhi.editor.core.util.designview.designgenerator.generators.query.input.types.patternsequencesupporters.*;
 import org.wso2.carbon.siddhi.editor.core.util.designview.exceptions.DesignGenerationException;
-import org.wso2.siddhi.query.api.execution.query.input.stream.InputStream;
-import org.wso2.siddhi.query.api.execution.query.input.stream.StateInputStream;
+import io.siddhi.query.api.execution.query.input.stream.InputStream;
+import io.siddhi.query.api.execution.query.input.stream.StateInputStream;
 
 import java.util.ArrayList;
 import java.util.Arrays;

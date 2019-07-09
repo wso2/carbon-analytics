@@ -23,8 +23,8 @@ import org.wso2.carbon.metrics.core.Level;
 import org.wso2.carbon.metrics.core.MetricService;
 import org.wso2.carbon.si.metrics.core.internal.SPMetricsDataHolder;
 import org.wso2.carbon.si.metrics.core.internal.SPMetricsManagement;
-import org.wso2.siddhi.core.util.statistics.MemoryUsageTracker;
-import org.wso2.siddhi.core.util.statistics.memory.ObjectSizeCalculator;
+import io.siddhi.core.util.statistics.MemoryUsageTracker;
+import io.siddhi.core.util.statistics.memory.ObjectSizeCalculator;
 
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;

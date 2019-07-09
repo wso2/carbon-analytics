@@ -38,11 +38,11 @@ import org.wso2.carbon.si.metrics.core.internal.SPStatisticsManager;
 import org.wso2.carbon.streaming.integrator.core.ha.HACoordinationSourceHandler;
 import org.wso2.carbon.streaming.integrator.core.ha.util.CoordinationConstants;
 import org.wso2.carbon.streaming.integrator.core.internal.util.SiddhiAppProcessorConstants;
-import org.wso2.siddhi.core.config.StatisticsConfiguration;
-import org.wso2.siddhi.core.event.Event;
-import org.wso2.siddhi.core.stream.input.InputHandler;
-import org.wso2.siddhi.core.util.SiddhiConstants;
-import org.wso2.siddhi.query.api.definition.StreamDefinition;
+import io.siddhi.core.config.StatisticsConfiguration;
+import io.siddhi.core.event.Event;
+import io.siddhi.core.stream.input.InputHandler;
+import io.siddhi.core.util.SiddhiConstants;
+import io.siddhi.query.api.definition.StreamDefinition;
 
 import java.util.Map;
 

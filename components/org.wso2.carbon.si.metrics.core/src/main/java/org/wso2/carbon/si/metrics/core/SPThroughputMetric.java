@@ -21,7 +21,7 @@ package org.wso2.carbon.si.metrics.core;
 import org.wso2.carbon.metrics.core.Level;
 import org.wso2.carbon.metrics.core.Meter;
 import org.wso2.carbon.metrics.core.MetricService;
-import org.wso2.siddhi.core.util.statistics.ThroughputTracker;
+import io.siddhi.core.util.statistics.ThroughputTracker;
 
 
 /**

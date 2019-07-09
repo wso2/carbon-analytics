@@ -26,9 +26,9 @@ import org.wso2.carbon.streaming.integrator.core.ha.transport.EventSyncConnectio
 import org.wso2.carbon.streaming.integrator.core.ha.transport.EventSyncConnection;
 import org.wso2.carbon.streaming.integrator.core.ha.util.HAConstants;
 import org.wso2.carbon.streaming.integrator.core.internal.StreamProcessorDataHolder;
-import org.wso2.siddhi.core.SiddhiAppRuntime;
-import org.wso2.siddhi.core.exception.ConnectionUnavailableException;
-import org.wso2.siddhi.core.util.snapshot.PersistenceReference;
+import io.siddhi.core.SiddhiAppRuntime;
+import io.siddhi.core.exception.ConnectionUnavailableException;
+import io.siddhi.core.util.snapshot.PersistenceReference;
 
 import java.io.UnsupportedEncodingException;
 import java.util.Arrays;
