@@ -1,0 +1,93 @@
+/*
+ *  Copyright (c) 2017, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+ *
+ *  WSO2 Inc. licenses this file to you under the Apache License,
+ *  Version 2.0 (the "License"); you may not use this file except
+ *  in compliance with the License.
+ *  You may obtain a copy of the License at
+ *
+ *  http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *  Unless required by applicable law or agreed to in writing,
+ *  software distributed under the License is distributed on an
+ *  "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ *  KIND, either express or implied.  See the License for the
+ *  specific language governing permissions and limitations
+ *  under the License.
+ *
+ */
+
+swagger: '2.0'
+info:
+  version: 1.0.0
+  title: Stream Processor Status Dashboard Service
+  description: >-
+    This provides information about the REST APIs available for WSO2 Steam
+    Processor Status Dashboard from SP worker.
+  contact:
+    name: WSO2
+    url: 'http://wso2.com/analytics'
+    email: architecture@wso2.org
+  license:
+    name: Apache 2.0
+    url: 'http://www.apache.org/licenses/LICENSE-2.0.html'
+schemes:
+  - http
+host: analytics.wso2.com
+paths:
+  /statistics:
+    get:
+      x-wso2-curl: 'curl -k -X GET http://localhost:9090/statistics'
+      x-wso2-request: 'GET http://localhost:9090/statistics'
+      x-wso2-response: |-
+        HTTP/1.1 200 OK Content-Type: application/json
+        {"workerMetrics":{"processCPU":0.0,"systemCPU":0.0,"loadAverage":0.49,"memoryUsage":0.13305895332449547},
+        "siddhiApps":{"active":2,"inactive":0},"haStatus":"Active","isStatsEnabled":false,
+        "clusterID":"Cluster A","lastSyncTime":"2017-10-02T18:21:06+00:00"}
+      tags:
+        - Workers
+      summary: Get realtime details of a worker.
+      description: Get realtime detials of a worker.
+      responses:
+        '200':
+          description: OK.
+        '500':
+          description: An unexpected error occured.
+          schema:
+            $ref: '#/definitions/ApiResponseMessage'
+    put:
+      x-wso2-curl: >-
+        curl -k -H "Content-Type: application/json -X PUT -d @data.json
+        http://localhost:9090/statistics
+      x-wso2-request: |-
+        PUT http://localhost:9090/statistics?statsEnable=false
+      x-wso2-response: >-
+        HTTP/1.1 200 OK Content-Type: application/json {
+        "Successfully disabled the metrics."}
+      tags:
+        - Workers
+      summary: Enable/disable statistics of a worker.
+      description: |
+        Enable/disable statistics of a worker.
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      responses:
+        '200':
+          description: Successfully enabled/disabled worker statistics.
+          schema:
+            $ref: '#/definitions/ApiResponseMessage'
+        '404':
+          description: Worker not found.
+        '500':
+          description: An unexpected error occured.
+          schema:
+            $ref: '#/definitions/ApiResponseMessage'
+definitions:
+  ApiResponseMessage:
+    type: object
+    properties:
+      message:
+        type: string
+        description: message
