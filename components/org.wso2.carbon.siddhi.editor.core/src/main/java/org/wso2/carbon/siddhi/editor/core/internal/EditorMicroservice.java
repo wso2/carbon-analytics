@@ -126,7 +126,7 @@ import javax.ws.rs.core.Response;
         service = Microservice.class,
         immediate = true
 )
-@Path("/server")
+@Path("/editor")
 public class EditorMicroservice implements Microservice {
     private static final Logger log = LoggerFactory.getLogger(EditorMicroservice.class);
     private static final String FILE_SEPARATOR = "file.separator";
