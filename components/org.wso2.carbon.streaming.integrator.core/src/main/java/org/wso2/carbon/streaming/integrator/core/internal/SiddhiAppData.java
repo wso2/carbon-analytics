@@ -18,8 +18,8 @@
 
 package org.wso2.carbon.streaming.integrator.core.internal;
 
-import org.wso2.siddhi.core.SiddhiAppRuntime;
-import org.wso2.siddhi.core.stream.input.InputHandler;
+import io.siddhi.core.SiddhiAppRuntime;
+import io.siddhi.core.stream.input.InputHandler;
 
 import java.util.Map;
 

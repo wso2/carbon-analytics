@@ -21,9 +21,9 @@ package org.wso2.carbon.siddhi.editor.core.util.designview.designgenerator.gener
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.WindowConfig;
 import org.wso2.carbon.siddhi.editor.core.util.designview.exceptions.DesignGenerationException;
 import org.wso2.carbon.siddhi.editor.core.util.designview.utilities.ConfigBuildingUtilities;
-import org.wso2.siddhi.query.api.annotation.Annotation;
-import org.wso2.siddhi.query.api.definition.WindowDefinition;
-import org.wso2.siddhi.query.api.expression.Expression;
+import io.siddhi.query.api.annotation.Annotation;
+import io.siddhi.query.api.definition.WindowDefinition;
+import io.siddhi.query.api.expression.Expression;
 
 import java.util.ArrayList;
 import java.util.List;

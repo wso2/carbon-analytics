@@ -25,11 +25,11 @@ import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhiel
 import org.wso2.carbon.siddhi.editor.core.util.designview.constants.query.StreamHandlerType;
 import org.wso2.carbon.siddhi.editor.core.util.designview.exceptions.DesignGenerationException;
 import org.wso2.carbon.siddhi.editor.core.util.designview.utilities.ConfigBuildingUtilities;
-import org.wso2.siddhi.query.api.execution.query.input.handler.Filter;
-import org.wso2.siddhi.query.api.execution.query.input.handler.StreamFunction;
-import org.wso2.siddhi.query.api.execution.query.input.handler.StreamHandler;
-import org.wso2.siddhi.query.api.execution.query.input.handler.Window;
-import org.wso2.siddhi.query.api.expression.Expression;
+import io.siddhi.query.api.execution.query.input.handler.Filter;
+import io.siddhi.query.api.execution.query.input.handler.StreamFunction;
+import io.siddhi.query.api.execution.query.input.handler.StreamHandler;
+import io.siddhi.query.api.execution.query.input.handler.Window;
+import io.siddhi.query.api.expression.Expression;
 
 import java.util.ArrayList;
 import java.util.List;

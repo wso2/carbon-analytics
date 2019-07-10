@@ -21,7 +21,7 @@ import org.awaitility.Duration;
 import org.wso2.carbon.streaming.integrator.common.EventStreamService;
 import org.wso2.carbon.streaming.integrator.common.SiddhiAppRuntimeService;
 import org.wso2.msf4j.MicroservicesRegistry;
-import org.wso2.siddhi.core.SiddhiAppRuntime;
+import io.siddhi.core.SiddhiAppRuntime;
 
 import java.io.BufferedReader;
 import java.io.File;

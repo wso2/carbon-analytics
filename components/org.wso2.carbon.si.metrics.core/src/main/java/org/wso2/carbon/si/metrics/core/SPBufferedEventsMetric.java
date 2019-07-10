@@ -22,8 +22,8 @@ import org.wso2.carbon.metrics.core.Gauge;
 import org.wso2.carbon.metrics.core.Level;
 import org.wso2.carbon.metrics.core.MetricService;
 import org.wso2.carbon.si.metrics.core.internal.SPMetricsManagement;
-import org.wso2.siddhi.core.util.statistics.BufferedEventsTracker;
-import org.wso2.siddhi.core.util.statistics.EventBufferHolder;
+import io.siddhi.core.util.statistics.BufferedEventsTracker;
+import io.siddhi.core.util.statistics.EventBufferHolder;
 
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;

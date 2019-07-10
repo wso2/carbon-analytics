@@ -53,12 +53,12 @@ import org.wso2.carbon.streaming.integrator.core.persistence.PersistenceManager;
 import org.wso2.carbon.streaming.integrator.core.persistence.beans.PersistenceConfigurations;
 import org.wso2.carbon.streaming.integrator.core.persistence.exception.PersistenceStoreConfigurationException;
 import org.wso2.carbon.streaming.integrator.core.persistence.util.PersistenceConstants;
-import org.wso2.siddhi.core.SiddhiManager;
-import org.wso2.siddhi.core.config.StatisticsConfiguration;
-import org.wso2.siddhi.core.util.SiddhiComponentActivator;
-import org.wso2.siddhi.core.util.persistence.IncrementalPersistenceStore;
-import org.wso2.siddhi.core.util.persistence.PersistenceStore;
-import org.wso2.siddhi.core.util.statistics.StatisticsManager;
+import io.siddhi.core.SiddhiManager;
+import io.siddhi.core.config.StatisticsConfiguration;
+import io.siddhi.core.util.SiddhiComponentActivator;
+import io.siddhi.core.util.persistence.IncrementalPersistenceStore;
+import io.siddhi.core.util.persistence.PersistenceStore;
+import io.siddhi.core.util.statistics.StatisticsManager;
 
 import java.io.File;
 import java.util.Map;
@@ -129,8 +129,8 @@ public class ServiceComponent {
                 } else {
                     throw new PersistenceStoreConfigurationException("Persistence Store class with name "
                             + persistenceStoreClassName + " is invalid. The given class has to implement either " +
-                            "org.wso2.siddhi.core.util.persistence.PersistenceStore or " +
-                            "org.wso2.siddhi.core.util.persistence.IncrementalPersistenceStore.");
+                            "io.siddhi.core.util.persistence.PersistenceStore or " +
+                            "io.siddhi.core.util.persistence.IncrementalPersistenceStore.");
                 }
                 if (log.isDebugEnabled()) {
                     log.debug(persistenceStoreClassName + " chosen as persistence store");

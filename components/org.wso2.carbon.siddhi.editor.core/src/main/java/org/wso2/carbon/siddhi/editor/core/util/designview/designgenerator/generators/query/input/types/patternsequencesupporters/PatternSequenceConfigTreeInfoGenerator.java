@@ -21,9 +21,9 @@ package org.wso2.carbon.siddhi.editor.core.util.designview.designgenerator.gener
 import org.wso2.carbon.siddhi.editor.core.util.designview.designgenerator.generators.query.streamhandler.StreamHandlerConfigGenerator;
 import org.wso2.carbon.siddhi.editor.core.util.designview.exceptions.DesignGenerationException;
 import org.wso2.carbon.siddhi.editor.core.util.designview.utilities.ConfigBuildingUtilities;
-import org.wso2.siddhi.query.api.SiddhiElement;
-import org.wso2.siddhi.query.api.execution.query.input.state.*;
-import org.wso2.siddhi.query.api.execution.query.input.stream.BasicSingleInputStream;
+import io.siddhi.query.api.SiddhiElement;
+import io.siddhi.query.api.execution.query.input.state.*;
+import io.siddhi.query.api.execution.query.input.stream.BasicSingleInputStream;
 
 import java.util.ArrayList;
 import java.util.List;

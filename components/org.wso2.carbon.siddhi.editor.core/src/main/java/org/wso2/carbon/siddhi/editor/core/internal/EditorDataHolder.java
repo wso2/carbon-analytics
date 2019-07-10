@@ -20,7 +20,7 @@ package org.wso2.carbon.siddhi.editor.core.internal;
 
 import org.osgi.framework.BundleContext;
 import org.wso2.carbon.analytics.idp.client.core.api.AnalyticsHttpClientBuilderService;
-import org.wso2.siddhi.core.SiddhiManager;
+import io.siddhi.core.SiddhiManager;
 
 import java.util.Collections;
 import java.util.Map;

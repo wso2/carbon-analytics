@@ -20,7 +20,7 @@ package org.wso2.carbon.streaming.integrator.core.util;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.annotations.ApiModelProperty;
-import org.wso2.siddhi.core.util.statistics.metrics.Level;
+import io.siddhi.core.util.statistics.metrics.Level;
 
 import java.util.Objects;
 

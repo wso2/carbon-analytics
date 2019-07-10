@@ -22,13 +22,13 @@ import org.wso2.carbon.metrics.core.MetricService;
 import org.wso2.carbon.si.metrics.core.internal.SPMetricsDataHolder;
 import org.wso2.carbon.si.metrics.core.internal.SPMetricsManagement;
 import org.wso2.carbon.si.metrics.core.internal.SPStatisticsManager;
-import org.wso2.siddhi.core.util.statistics.BufferedEventsTracker;
-import org.wso2.siddhi.core.util.statistics.LatencyTracker;
-import org.wso2.siddhi.core.util.statistics.MemoryUsageTracker;
-import org.wso2.siddhi.core.util.statistics.StatisticsManager;
-import org.wso2.siddhi.core.util.statistics.StatisticsTrackerFactory;
-import org.wso2.siddhi.core.util.statistics.ThroughputTracker;
-import org.wso2.siddhi.query.api.annotation.Element;
+import io.siddhi.core.util.statistics.BufferedEventsTracker;
+import io.siddhi.core.util.statistics.LatencyTracker;
+import io.siddhi.core.util.statistics.MemoryUsageTracker;
+import io.siddhi.core.util.statistics.StatisticsManager;
+import io.siddhi.core.util.statistics.StatisticsTrackerFactory;
+import io.siddhi.core.util.statistics.ThroughputTracker;
+import io.siddhi.query.api.annotation.Element;
 
 import java.util.List;
 

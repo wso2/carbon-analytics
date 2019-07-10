@@ -37,7 +37,7 @@ import org.wso2.carbon.streaming.integrator.common.SiddhiAppRuntimeService;
 import org.wso2.carbon.streaming.integrator.statistics.bean.WorkerMetrics;
 import org.wso2.carbon.streaming.integrator.statistics.bean.WorkerStatistics;
 import org.wso2.msf4j.MicroservicesRegistry;
-import org.wso2.siddhi.core.util.statistics.metrics.Level;
+import io.siddhi.core.util.statistics.metrics.Level;
 
 import javax.inject.Inject;
 import java.net.URI;

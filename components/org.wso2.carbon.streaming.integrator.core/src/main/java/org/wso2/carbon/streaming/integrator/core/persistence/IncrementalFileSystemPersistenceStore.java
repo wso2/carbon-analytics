@@ -19,13 +19,13 @@
 package org.wso2.carbon.streaming.integrator.core.persistence;
 
 import com.google.common.io.Files;
+import io.siddhi.core.exception.CannotClearSiddhiAppStateException;
+import io.siddhi.core.util.persistence.IncrementalPersistenceStore;
+import io.siddhi.core.util.persistence.util.IncrementalSnapshotInfo;
+import io.siddhi.core.util.persistence.util.PersistenceHelper;
 import org.apache.log4j.Logger;
 import org.wso2.carbon.streaming.integrator.core.ha.util.CompressionUtil;
 import org.wso2.carbon.streaming.integrator.core.persistence.util.PersistenceConstants;
-import org.wso2.siddhi.core.exception.CannotClearSiddhiAppStateException;
-import org.wso2.siddhi.core.util.persistence.IncrementalPersistenceStore;
-import org.wso2.siddhi.core.util.persistence.util.IncrementalSnapshotInfo;
-import org.wso2.siddhi.core.util.persistence.util.PersistenceHelper;
 
 import java.io.File;
 import java.io.IOException;
@@ -118,7 +118,8 @@ public class IncrementalFileSystemPersistenceStore implements IncrementalPersist
             decompressedSnapshot = CompressionUtil.decompressGZIP(bytes);
         } catch (IOException e) {
             throw new RuntimeException("Error occurred while trying to decompress the snapshot. Failed to " +
-                    "load revision: " + snapshotInfo.getRevision() + " of Siddhi app: " + snapshotInfo.getSiddhiAppId(), e);
+                    "load revision: " + snapshotInfo.getRevision() + " of Siddhi app: " +
+                    snapshotInfo.getSiddhiAppId(), e);
         }
         return decompressedSnapshot;
     }

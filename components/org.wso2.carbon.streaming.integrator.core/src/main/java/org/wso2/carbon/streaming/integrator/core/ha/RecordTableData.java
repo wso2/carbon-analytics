@@ -16,9 +16,9 @@
 
 package org.wso2.carbon.streaming.integrator.core.ha;
 
-import org.wso2.siddhi.core.table.record.RecordTableHandlerCallback;
-import org.wso2.siddhi.core.util.collection.operator.CompiledCondition;
-import org.wso2.siddhi.core.util.collection.operator.CompiledExpression;
+import io.siddhi.core.table.record.RecordTableHandlerCallback;
+import io.siddhi.core.util.collection.operator.CompiledCondition;
+import io.siddhi.core.util.collection.operator.CompiledExpression;
 
 import java.util.LinkedHashMap;
 import java.util.List;

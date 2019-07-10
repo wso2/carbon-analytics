@@ -18,7 +18,7 @@
  */
 package org.wso2.carbon.si.metrics.core.internal;
 
-import org.wso2.siddhi.core.util.statistics.StatisticsManager;
+import io.siddhi.core.util.statistics.StatisticsManager;
 
 /**
  * Functionality of SPStatisticsManager is not required to be implemented,

@@ -20,7 +20,7 @@ package org.wso2.carbon.streaming.integrator.core.ha.tcp;
 
 import org.apache.log4j.Logger;
 import org.wso2.carbon.streaming.integrator.core.util.BinaryMessageConverterUtil;
-import org.wso2.siddhi.core.event.Event;
+import io.siddhi.core.event.Event;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;

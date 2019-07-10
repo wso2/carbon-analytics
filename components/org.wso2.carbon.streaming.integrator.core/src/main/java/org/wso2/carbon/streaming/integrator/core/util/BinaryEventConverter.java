@@ -21,8 +21,8 @@ package org.wso2.carbon.streaming.integrator.core.util;
 import org.wso2.carbon.streaming.integrator.core.event.queue.EventDataMetaInfo;
 import org.wso2.carbon.streaming.integrator.core.event.queue.EventMetaInfo;
 import org.wso2.carbon.streaming.integrator.core.event.queue.QueuedEvent;
-import org.wso2.siddhi.core.event.Event;
-import org.wso2.siddhi.query.api.definition.Attribute;
+import io.siddhi.core.event.Event;
+import io.siddhi.query.api.definition.Attribute;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;

@@ -28,10 +28,10 @@ import org.wso2.carbon.streaming.integrator.core.internal.SiddhiAppData;
 import org.wso2.carbon.streaming.integrator.core.internal.StreamProcessorDataHolder;
 import org.wso2.carbon.streaming.integrator.core.internal.util.SiddhiAppProcessorConstants;
 import org.wso2.carbon.streaming.integrator.core.util.BinaryMessageConverterUtil;
-import org.wso2.siddhi.core.event.Event;
-import org.wso2.siddhi.core.stream.input.source.Source;
-import org.wso2.siddhi.core.util.SiddhiConstants;
-import org.wso2.siddhi.core.util.statistics.metrics.Level;
+import io.siddhi.core.event.Event;
+import io.siddhi.core.stream.input.source.Source;
+import io.siddhi.core.util.SiddhiConstants;
+import io.siddhi.core.util.statistics.metrics.Level;
 
 import java.io.UnsupportedEncodingException;
 import java.nio.ByteBuffer;
@@ -180,7 +180,7 @@ public class EventListMapManager {
                     boolean isFound = false;
                     for (Source source : sources) {
                         if(queuedEvent.getSourceHandlerElementId().equals(source.getMapper().
-                                getHandler().getElementId())){
+                                getHandler().getId())){
                             source.getMapper().getHandler().sendEvent(queuedEvent.getEvent(),
                                     queuedEvent.getTransportSyncProperties());
                             if (null != queuedEvent.getTransportSyncProperties() &&

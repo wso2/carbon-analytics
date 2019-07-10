@@ -21,10 +21,10 @@ package org.wso2.carbon.siddhi.editor.core.internal;
 import org.wso2.carbon.siddhi.editor.core.exception.InvalidExecutionStateException;
 import org.wso2.carbon.siddhi.editor.core.exception.NoSuchStreamException;
 import org.wso2.carbon.siddhi.editor.core.util.DebugCallbackEvent;
-import org.wso2.siddhi.core.SiddhiAppRuntime;
-import org.wso2.siddhi.core.debugger.SiddhiDebugger;
-import org.wso2.siddhi.core.stream.input.InputHandler;
-import org.wso2.siddhi.query.api.definition.Attribute;
+import io.siddhi.core.SiddhiAppRuntime;
+import io.siddhi.core.debugger.SiddhiDebugger;
+import io.siddhi.core.stream.input.InputHandler;
+import io.siddhi.query.api.definition.Attribute;
 
 import java.util.ArrayList;
 import java.util.Arrays;

@@ -17,9 +17,9 @@
 package org.wso2.carbon.streaming.integrator.core.ha;
 
 import org.apache.log4j.Logger;
-import org.wso2.siddhi.core.exception.ConnectionUnavailableException;
-import org.wso2.siddhi.core.table.record.RecordTableHandler;
-import org.wso2.siddhi.core.util.transport.BackoffRetryCounter;
+import io.siddhi.core.exception.ConnectionUnavailableException;
+import io.siddhi.core.table.record.RecordTableHandler;
+import io.siddhi.core.util.transport.BackoffRetryCounter;
 
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;

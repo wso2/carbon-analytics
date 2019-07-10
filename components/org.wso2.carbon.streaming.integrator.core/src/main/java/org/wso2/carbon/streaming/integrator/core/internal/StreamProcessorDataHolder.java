@@ -32,13 +32,13 @@ import org.wso2.carbon.streaming.integrator.core.distribution.DistributionServic
 import org.wso2.carbon.streaming.integrator.core.ha.HAManager;
 import org.wso2.carbon.streaming.integrator.core.internal.beans.DeploymentConfig;
 import org.wso2.carbon.streaming.integrator.core.internal.util.SiddhiAppProcessorConstants;
-import org.wso2.siddhi.core.SiddhiManager;
-import org.wso2.siddhi.core.config.StatisticsConfiguration;
-import org.wso2.siddhi.core.stream.input.source.SourceHandlerManager;
-import org.wso2.siddhi.core.stream.output.sink.SinkHandlerManager;
-import org.wso2.siddhi.core.table.record.RecordTableHandlerManager;
-import org.wso2.siddhi.core.util.statistics.StatisticsManager;
-import org.wso2.siddhi.core.util.statistics.metrics.Level;
+import io.siddhi.core.SiddhiManager;
+import io.siddhi.core.config.StatisticsConfiguration;
+import io.siddhi.core.stream.input.source.SourceHandlerManager;
+import io.siddhi.core.stream.output.sink.SinkHandlerManager;
+import io.siddhi.core.table.record.RecordTableHandlerManager;
+import io.siddhi.core.util.statistics.StatisticsManager;
+import io.siddhi.core.util.statistics.metrics.Level;
 
 import java.util.ArrayList;
 import java.util.List;

@@ -18,6 +18,8 @@
  */
 package org.wso2.carbon.si.metrics.core.internal;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.wso2.carbon.metrics.core.MetricManagementService;
 import org.wso2.carbon.metrics.core.MetricService;
 
@@ -33,6 +35,8 @@ import static org.wso2.carbon.metrics.core.Level.OFF;
  * Manages the statistics management functions.
  */
 public class SPMetricsManagement {
+    private static final Logger log = LoggerFactory.getLogger(SPMetricsManagement.class);
+
     private Map<String, List<String>> componentMap;
     private MetricManagementService metricManagementService;
     private MetricService metricService;
@@ -63,7 +67,12 @@ public class SPMetricsManagement {
         List<String> registeredComponent = componentMap.get(siddhiAppName);
         if (registeredComponent != null) {
             for (String component : registeredComponent) {
-                this.metricManagementService.setMetricLevel(component, INFO);
+                try {
+                    this.metricManagementService.setMetricLevel(component, INFO);
+                } catch (IllegalArgumentException e) {
+                    // Error: given metric is not available. Do nothing!
+                    log.debug("Invalid metric name: " + component, e);
+                }
             }
         }
     }

@@ -18,6 +18,16 @@
 
 package org.wso2.carbon.streaming.integrator.core.ha;
 
+import io.siddhi.core.config.SiddhiAppContext;
+import io.siddhi.core.event.Event;
+import io.siddhi.core.exception.ConnectionUnavailableException;
+import io.siddhi.core.stream.input.InputHandler;
+import io.siddhi.core.stream.input.source.SourceHandler;
+import io.siddhi.core.stream.input.source.SourceSyncCallback;
+import io.siddhi.core.util.snapshot.state.State;
+import io.siddhi.core.util.snapshot.state.StateFactory;
+import io.siddhi.core.util.statistics.ThroughputTracker;
+import io.siddhi.query.api.definition.StreamDefinition;
 import org.apache.commons.pool.impl.GenericKeyedObjectPool;
 import org.apache.log4j.Logger;
 import org.wso2.carbon.streaming.integrator.core.event.queue.QueuedEvent;
@@ -27,14 +37,6 @@ import org.wso2.carbon.streaming.integrator.core.ha.util.CoordinationConstants;
 import org.wso2.carbon.streaming.integrator.core.ha.util.HAConstants;
 import org.wso2.carbon.streaming.integrator.core.internal.StreamProcessorDataHolder;
 import org.wso2.carbon.streaming.integrator.core.util.BinaryEventConverter;
-import org.wso2.siddhi.core.event.Event;
-import org.wso2.siddhi.core.exception.ConnectionUnavailableException;
-import org.wso2.siddhi.core.stream.input.InputHandler;
-import org.wso2.siddhi.core.stream.input.source.SourceHandler;
-import org.wso2.siddhi.core.stream.input.source.SourceSyncCallback;
-import org.wso2.siddhi.core.util.statistics.ThroughputTracker;
-import org.wso2.siddhi.core.util.statistics.metrics.Level;
-import org.wso2.siddhi.query.api.definition.StreamDefinition;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
@@ -46,11 +48,9 @@ import java.util.concurrent.atomic.AtomicLong;
 /**
  * Implementation of {@link SourceHandler} used for 2 node minimum HA
  */
-public class HACoordinationSourceHandler extends SourceHandler {
+public class HACoordinationSourceHandler extends SourceHandler<HACoordinationSourceHandler.SourceState> {
 
     private boolean isActiveNode;
-    private long lastProcessedEventTimestamp = 0L;
-    private String sourceHandlerElementId;
     private String siddhiAppName;
     private AtomicLong sequenceIDGenerator;
     private volatile boolean passiveNodeAdded;
@@ -70,11 +70,11 @@ public class HACoordinationSourceHandler extends SourceHandler {
     }
 
     @Override
-    public void init(String siddhiAppName, SourceSyncCallback sourceSyncCallback, String sourceElementId,
-                     StreamDefinition streamDefinition) {
-        this.sourceHandlerElementId = sourceElementId;
+    public StateFactory<SourceState> init(String siddhiAppName, SourceSyncCallback sourceSyncCallback,
+                                          StreamDefinition streamDefinition, SiddhiAppContext siddhiAppContext) {
         this.siddhiAppName = siddhiAppName;
         this.sourceSyncCallback = sourceSyncCallback;
+        return SourceState::new;
     }
 
     /**
@@ -82,13 +82,14 @@ public class HACoordinationSourceHandler extends SourceHandler {
      *
      * @param event                   the event being sent to processing.
      * @param transportSyncProperties transport sync properties which used to sync passive source state
+     * @param state                   state object
      * @param inputHandler            callback that would send events for processing.
      */
     @Override
-    public void sendEvent(Event event, String[] transportSyncProperties, InputHandler inputHandler)
+    public void sendEvent(Event event, String[] transportSyncProperties, SourceState state, InputHandler inputHandler)
             throws InterruptedException {
         if (isActiveNode) {
-            lastProcessedEventTimestamp = event.getTimestamp();
+            state.lastProcessedEventTimestamp = event.getTimestamp();
             if (passiveNodeAdded && !IGNORING_SOURCE_TYPE.equalsIgnoreCase(sourceType)) {
                 sendEventsToPassiveNode(event, transportSyncProperties);
             }
@@ -102,13 +103,14 @@ public class HACoordinationSourceHandler extends SourceHandler {
      *
      * @param events                  the event array being sent to processing.
      * @param transportSyncProperties transport sync properties which used to sync passive source state
+     * @param state                   state object
      * @param inputHandler            callback that would send events for processing.
      */
     @Override
-    public void sendEvent(Event[] events, String[] transportSyncProperties, InputHandler inputHandler)
-            throws InterruptedException {
+    public void sendEvent(Event[] events, String[] transportSyncProperties, SourceState state,
+                          InputHandler inputHandler) throws InterruptedException {
         if (isActiveNode) {
-            lastProcessedEventTimestamp = events[events.length - 1].getTimestamp();
+            state.lastProcessedEventTimestamp = events[events.length - 1].getTimestamp();
             if (passiveNodeAdded && !IGNORING_SOURCE_TYPE.equalsIgnoreCase(sourceType)) {
                 sendEventsToPassiveNode(events, transportSyncProperties);
             }
@@ -134,27 +136,6 @@ public class HACoordinationSourceHandler extends SourceHandler {
         isActiveNode = false;
     }
 
-    @Override
-    public Map<String, Object> currentState() {
-        Map<String, Object> currentState = new HashMap<>();
-        currentState.put(CoordinationConstants.ACTIVE_PROCESSED_LAST_TIMESTAMP, lastProcessedEventTimestamp);
-        if (log.isDebugEnabled()) {
-            log.debug("Active Node: Saving state of Source Handler with Id " + getElementId() + " with timestamp "
-                    + lastProcessedEventTimestamp);
-        }
-        return currentState;
-    }
-
-    @Override
-    public void restoreState(Map<String, Object> map) {
-        //do nothing
-    }
-
-    @Override
-    public String getElementId() {
-        return sourceHandlerElementId;
-    }
-
     private void sendEventsToPassiveNode(Event event, String[] transportSyncProperties) {
         if (!isWaiting.get() || lastConnRefusedTimestamp.get() + 5000 < System.currentTimeMillis()) {
             isWaiting.set(false);
@@ -165,7 +146,7 @@ public class HACoordinationSourceHandler extends SourceHandler {
                     connection = (EventSyncConnection.Connection)
                             objectPool.borrowObject(HAConstants.ACTIVE_NODE_CONNECTION_POOL_ID);
                     if (connection != null) {
-                        QueuedEvent queuedEvent = new QueuedEvent(siddhiAppName, sourceHandlerElementId,
+                        QueuedEvent queuedEvent = new QueuedEvent(siddhiAppName, getId(),
                                 sequenceIDGenerator.incrementAndGet(), event, transportSyncProperties);
                         ByteBuffer messageBuffer = null;
                         try {
@@ -228,10 +209,10 @@ public class HACoordinationSourceHandler extends SourceHandler {
                         for (Event event : events) {
                             QueuedEvent queuedEvent;
                             if (i == 0) {
-                                queuedEvent = new QueuedEvent(siddhiAppName, sourceHandlerElementId, sequenceIDGenerator
+                                queuedEvent = new QueuedEvent(siddhiAppName, getId(), sequenceIDGenerator
                                         .incrementAndGet(), event, transportSyncProperties);
                             } else {
-                                queuedEvent = new QueuedEvent(siddhiAppName, sourceHandlerElementId, sequenceIDGenerator
+                                queuedEvent = new QueuedEvent(siddhiAppName, getId(), sequenceIDGenerator
                                         .incrementAndGet(), event, null);
                             }
                             queuedEvents[i] = queuedEvent;
@@ -289,4 +270,28 @@ public class HACoordinationSourceHandler extends SourceHandler {
         }
     }
 
+    class SourceState extends State {
+        private long lastProcessedEventTimestamp = 0L;
+
+        @Override
+        public boolean canDestroy() {
+            return false;
+        }
+
+        @Override
+        public Map<String, Object> snapshot() {
+            Map<String, Object> state = new HashMap<>();
+            state.put(CoordinationConstants.ACTIVE_PROCESSED_LAST_TIMESTAMP, lastProcessedEventTimestamp);
+            if (log.isDebugEnabled()) {
+                log.debug("Active Node: Saving state of Source Handler with Id " + getId() + " with timestamp "
+                        + lastProcessedEventTimestamp);
+            }
+            return state;
+        }
+
+        @Override
+        public void restore(Map<String, Object> state) {
+            // Do nothing
+        }
+    }
 }

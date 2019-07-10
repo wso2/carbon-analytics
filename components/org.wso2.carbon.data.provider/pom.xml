@@ -169,9 +169,9 @@
             org.wso2.carbon.uiserver.spi.*; version="${carbon.uiserver.version.range}",
             org.slf4j.*;version="${slf4j.version.range}",
             com.google.gson.*; version="${gson.version.range}",
-            org.wso2.siddhi.*;version="${siddhi.version.range}",
-            org.wso2.siddhi.annotation.*;version="${siddhi.version.range}",
-            org.wso2.siddhi.query.*;version="${siddhi.version.range}",
+            io.siddhi.*;version="${siddhi.version.range}",
+            io.siddhi.annotation.*;version="${siddhi.version.range}",
+            io.siddhi.query.*;version="${siddhi.version.range}",
             *;resolution:=optional
         </import.package>
         <carbon.component>

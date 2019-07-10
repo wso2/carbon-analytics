@@ -26,11 +26,11 @@ import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhiel
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.aggregation.aggregationbytimeperiod.aggregationbytimerange.AggregationByTimeRangeValue;
 import org.wso2.carbon.siddhi.editor.core.util.designview.exceptions.DesignGenerationException;
 import org.wso2.carbon.siddhi.editor.core.util.designview.utilities.ConfigBuildingUtilities;
-import org.wso2.siddhi.query.api.aggregation.TimePeriod;
-import org.wso2.siddhi.query.api.annotation.Annotation;
-import org.wso2.siddhi.query.api.definition.AggregationDefinition;
-import org.wso2.siddhi.query.api.execution.query.selection.BasicSelector;
-import org.wso2.siddhi.query.api.expression.Variable;
+import io.siddhi.query.api.aggregation.TimePeriod;
+import io.siddhi.query.api.annotation.Annotation;
+import io.siddhi.query.api.definition.AggregationDefinition;
+import io.siddhi.query.api.execution.query.selection.BasicSelector;
+import io.siddhi.query.api.expression.Variable;
 
 import java.util.ArrayList;
 import java.util.List;

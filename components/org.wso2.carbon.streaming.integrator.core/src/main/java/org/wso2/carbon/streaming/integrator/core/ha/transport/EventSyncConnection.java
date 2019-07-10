@@ -31,7 +31,7 @@ import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioSocketChannel;
 import org.apache.log4j.Logger;
 import org.wso2.carbon.streaming.integrator.core.ha.transport.handlers.MessageEncoder;
-import org.wso2.siddhi.core.exception.ConnectionUnavailableException;
+import io.siddhi.core.exception.ConnectionUnavailableException;
 
 import java.util.UUID;
 
