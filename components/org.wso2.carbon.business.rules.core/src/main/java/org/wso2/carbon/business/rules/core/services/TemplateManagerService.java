@@ -243,7 +243,7 @@ public class TemplateManagerService implements BusinessRulesService {
                 int deployedArtifactCount = 0;
                 for (Map.Entry<String, Artifact> artifact : derivedArtifacts.entrySet()) {
                     try {
-                        updateDeployedArtifact(nodeURL, artifact.getValue());
+                        updateDeployedArtifact(nodeURL, artifact.getValue(), artifact.getKey());
                         deployedArtifactCount += 1;
                     } catch (SiddhiAppsApiHelperException e) {
                         log.error(String.format("Deploying artifact with uuid %s is" + " failed. ",
@@ -300,7 +300,7 @@ public class TemplateManagerService implements BusinessRulesService {
             int deployedNodesCount = 0;
             for (String nodeURL : nodeList) {
                 try {
-                    updateDeployedArtifact(nodeURL, deployableSiddhiApp);
+                    updateDeployedArtifact(nodeURL, deployableSiddhiApp, businessRuleFromScratch.getUuid());
                     deployedNodesCount += 1;
                 } catch (SiddhiAppsApiHelperException e) {
                     log.error(String.format("Deploying siddhi app for the business rule %s on node %s is failed." +
@@ -614,7 +614,7 @@ public class TemplateManagerService implements BusinessRulesService {
             int deployedNodesCount = 0;
             for (String nodeURL : nodeList) {
                 try {
-                    updateDeployedArtifact(nodeURL, deployableSiddhiApp);
+                    updateDeployedArtifact(nodeURL, deployableSiddhiApp, businessRuleFromScratch.getUuid());
                     deployedNodesCount += 1;
                 } catch (SiddhiAppsApiHelperException e) {
                     log.error(String.format("Failed to update the deployed artifact for business rule %s ",
@@ -1389,7 +1389,7 @@ public class TemplateManagerService implements BusinessRulesService {
         } else {
             deployableSiddhiApp = siddhiApp.getContent();
         }
-        siddhiAppApiHelper.deploySiddhiApp(nodeURL, deployableSiddhiApp);
+        siddhiAppApiHelper.deploySiddhiApp(nodeURL, deployableSiddhiApp, siddhiAppName);
     }
 
     /**
@@ -1422,10 +1422,10 @@ public class TemplateManagerService implements BusinessRulesService {
      * @param artifact : Artifact to be updated
      * @throws SiddhiAppsApiHelperException : occurs when dealing with SiddhiAppsApi
      */
-    private void updateDeployedArtifact(String nodeURL, Artifact artifact) throws
+    private void updateDeployedArtifact(String nodeURL, Artifact artifact, String siddhiAppName) throws
             SiddhiAppsApiHelperException {
         if (artifact.getType().equals(TemplateManagerConstants.TEMPLATE_TYPE_SIDDHI_APP)) {
-            updateDeployedSiddhiApp(nodeURL, artifact);
+            updateDeployedSiddhiApp(nodeURL, artifact, siddhiAppName);
         }
     }
 
@@ -1439,7 +1439,7 @@ public class TemplateManagerService implements BusinessRulesService {
         for (Map.Entry entry : artifacts.entrySet()) {
             Artifact artifact = (Artifact) entry.getValue();
             if (artifact.getType().equals(TemplateManagerConstants.TEMPLATE_TYPE_SIDDHI_APP)) {
-                updateDeployedSiddhiApp(nodeURL, artifact);
+                updateDeployedSiddhiApp(nodeURL, artifact, (String) entry.getKey());
             }
         }
     }
@@ -1449,8 +1449,9 @@ public class TemplateManagerService implements BusinessRulesService {
      * @param siddhiApp : siddhiApp to be updated.
      * @throws SiddhiAppsApiHelperException : occurs when dealing with SiddhiAppsApi
      */
-    private void updateDeployedSiddhiApp(String nodeURL, Artifact siddhiApp) throws SiddhiAppsApiHelperException {
-        siddhiAppApiHelper.update(nodeURL, siddhiApp.getContent());
+    private void updateDeployedSiddhiApp(String nodeURL, Artifact siddhiApp, String siddhiAppName) throws
+            SiddhiAppsApiHelperException {
+        siddhiAppApiHelper.update(nodeURL, siddhiApp.getContent(), siddhiAppName);
 
     }
 
