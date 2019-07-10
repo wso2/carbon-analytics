@@ -118,6 +118,7 @@
         <dependency>
             <groupId>io.siddhi.distribution</groupId>
             <artifactId>io.siddhi.distribution.editor.log.appender</artifactId>
+            <version>${io.siddhi.distribution.version}</version>
         </dependency>
         <dependency>
             <groupId>org.apache.commons</groupId>
