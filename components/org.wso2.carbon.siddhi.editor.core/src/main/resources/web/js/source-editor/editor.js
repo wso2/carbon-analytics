@@ -15,8 +15,8 @@
  */
 
 /*
- * This module contains the integration code segment of Siddhi editor.
- * This will set the options of ACE editor, attach client side parser and attach SiddhiCompletion Engine with the editor
+ * This module contains the integration code segment of Siddhi server.
+ * This will set the options of ACE server, attach client side parser and attach SiddhiCompletion Engine with the server
  */
 define(["ace/ace", "jquery", "./constants", "./utils", "./completion-engine", "./token-tooltip",
         "ace/ext/language_tools", "./debug-rest-client", "log", 'ace/range'],
@@ -64,14 +64,14 @@ define(["ace/ace", "jquery", "./constants", "./utils", "./completion-engine", ".
             /*
              * Setting the language mode to siddhi
              *
-             * Language mode is located at ace-editor/mode/siddhi.js
-             * Highlight style is located at ace-editor/mode/siddhi_highlight_rules.js.js
-             * Folding is located at ace-editor/mode/folding/siddhi.js
-             * Snippets are located at ace-editor/snippets/siddhi.js
+             * Language mode is located at ace-server/mode/siddhi.js
+             * Highlight style is located at ace-server/mode/siddhi_highlight_rules.js.js
+             * Folding is located at ace-server/mode/folding/siddhi.js
+             * Snippets are located at ace-server/snippets/siddhi.js
              */
             aceEditor.session.setMode(constants.ace.SIDDHI_MODE);
 
-            // Setting the editor options
+            // Setting the server options
             aceEditor.setReadOnly(config.readOnly);
             aceEditor.setTheme(config.theme ? "ace/theme/" + config.theme : constants.ace.DEFAULT_THEME);
             aceEditor.getSession().setUseWrapMode(true);
@@ -100,7 +100,7 @@ define(["ace/ace", "jquery", "./constants", "./utils", "./completion-engine", ".
             self.completionEngine = new CompletionEngine();
             self.rawExtensions = CompletionEngine.rawExtensions;
 
-            // Attaching editor's onChange event handler
+            // Attaching server's onChange event handler
             aceEditor.getSession().on('change', editorChangeHandler);
 
             // For adjusting the completer list as required
@@ -112,7 +112,7 @@ define(["ace/ace", "jquery", "./constants", "./utils", "./completion-engine", ".
             // Adding events for adjusting the completions list styles
             // This is used for showing different styles for different types of completions
             aceEditor.renderer.on("afterRender", function () {
-                // Checking if a popup is open when the editor is re-rendered
+                // Checking if a popup is open when the server is re-rendered
                 if (aceEditor.completer && aceEditor.completer.popup) {
                     // Adding a on after render event for updating the popup styles
                     aceEditor.completer.popup.renderer.on("afterRender", function () {
@@ -151,26 +151,26 @@ define(["ace/ace", "jquery", "./constants", "./utils", "./completion-engine", ".
             };
 
             /**
-             * Returns the ace editor object
-             * Can be used for getting the ace editor object and making custom changes
+             * Returns the ace server object
+             * Can be used for getting the ace server object and making custom changes
              */
             self.getAceEditorObject = function () {
                 return aceEditor;
             };
 
             /**
-             * Returns the content in the ace editor when the method is invoked
+             * Returns the content in the ace server when the method is invoked
              *
-             * @return {string} Content in the editor when the method is invoked
+             * @return {string} Content in the server when the method is invoked
              */
             self.getContent = function () {
                 return aceEditor.getValue();
             };
 
             /**
-             * Sets the content in the ace editor
+             * Sets the content in the ace server
              *
-             * @param {string} content Content to set into the ace editor
+             * @param {string} content Content to set into the ace server
              */
             self.setContent = function (content) {
                 aceEditor.setValue((content ? content : ""), 1);
@@ -309,7 +309,7 @@ define(["ace/ace", "jquery", "./constants", "./utils", "./completion-engine", ".
                                     type: "error"
                                 })];
 
-                                // Show the errors in the ace editor gutter
+                                // Show the errors in the ace server gutter
                                 aceEditor.session.setAnnotations(
                                     self.state.semanticErrorList
                                         .concat(self.state.syntaxErrorList)
@@ -323,7 +323,7 @@ define(["ace/ace", "jquery", "./constants", "./utils", "./completion-engine", ".
                                     type: "error"
                                 })];
 
-                                // Show the errors in the ace editor gutter
+                                // Show the errors in the ace server gutter
                                 aceEditor.session.setAnnotations(
                                     self.state.semanticErrorList
                                         .concat(self.state.syntaxErrorList)
@@ -466,7 +466,7 @@ define(["ace/ace", "jquery", "./constants", "./utils", "./completion-engine", ".
                 if (worker) {
                     worker.terminate();
                 }
-                worker = new Worker("/editor/js/source-editor/antlr-worker.js");
+                worker = new Worker("/server/js/source-server/antlr-worker.js");
                 self.init();
             };
 
@@ -488,10 +488,10 @@ define(["ace/ace", "jquery", "./constants", "./utils", "./completion-engine", ".
             };
 
             /**
-             * Run on editor's change
+             * Run on server's change
              * Send message to the worker to create the parse tree and generate completion engine data
              *
-             * @param {string} editorText Text in the editor after the change
+             * @param {string} editorText Text in the server after the change
              */
             var editorChangeDelayTimer;
             self.onEditorChange = function (editorText) {
@@ -520,7 +520,7 @@ define(["ace/ace", "jquery", "./constants", "./utils", "./completion-engine", ".
 
         /**
          * Siddhi Debugger prototype
-         * Siddhi Debugger is used to debug current query in the editor
+         * Siddhi Debugger is used to debug current query in the server
          *
          * @param {object} aceEditor The Ace Editor object
          * @return {Debugger} Siddhi Debugger instance
@@ -809,7 +809,7 @@ define(["ace/ace", "jquery", "./constants", "./utils", "./completion-engine", ".
          * Message handler prototype
          * Message handler is used by the siddhi worker
          *
-         * @param {object} editor The editor object
+         * @param {object} editor The server object
          * @return {MessageHandler} Message handler instance
          * @constructor
          */
@@ -907,7 +907,7 @@ define(["ace/ace", "jquery", "./constants", "./utils", "./completion-engine", ".
         /**
          * Token tooltips generator prototype
          *
-         * @param {object} editor The editor object
+         * @param {object} editor The server object
          * @return {TokenTooltipUpdater} Token tooltip generator instance
          * @constructor
          */
@@ -1155,7 +1155,7 @@ define(["ace/ace", "jquery", "./constants", "./utils", "./completion-engine", ".
                 var aggregationName = tooltipData.aggregationName;
 
                 var aggregation = editor.completionEngine.aggregationsList[aggregationName];
-                //var details = editor.incompleteData.aggregationsList;
+                //var details = server.incompleteData.aggregationsList;
                 if (aggregation && aggregation.description) {
                     updateTokenTooltip(row, column, aggregation.description);
                 }

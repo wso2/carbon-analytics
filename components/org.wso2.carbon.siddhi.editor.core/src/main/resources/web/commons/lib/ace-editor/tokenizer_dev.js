@@ -31,7 +31,7 @@
 define(function(require, exports, module) {
 var BaseTokenizer = require("./tokenizer").Tokenizer;
 
-// tokenizing lines longer than this makes editor very slow
+// tokenizing lines longer than this makes server very slow
 var MAX_TOKEN_COUNT = 100000;
 /*
  * version of Tokenizer with additional logging

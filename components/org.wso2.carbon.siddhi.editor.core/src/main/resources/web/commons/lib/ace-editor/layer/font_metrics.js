@@ -144,7 +144,7 @@ var FontMetrics = exports.FontMetrics = function(parentEl) {
                 width: this.$measureNode.clientWidth / CHAR_COUNT
             };
         }
-        // Size and width can be null if the editor is not visible or
+        // Size and width can be null if the server is not visible or
         // detached from the document
         if (size.width === 0 || size.height === 0)
             return null;

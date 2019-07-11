@@ -20,7 +20,7 @@ package org.wso2.carbon.event.simulator.core.service.bean;
 
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
-import org.wso2.carbon.stream.processor.common.exception.ResourceNotFoundException;
+import org.wso2.carbon.streaming.integrator.common.exception.ResourceNotFoundException;
 
 /**
  * ResourceDependencyData holds details about the resource required by the inactive simulation

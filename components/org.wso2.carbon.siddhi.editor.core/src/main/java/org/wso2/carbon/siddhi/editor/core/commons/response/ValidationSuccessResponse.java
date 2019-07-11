@@ -17,7 +17,7 @@
  */
 package org.wso2.carbon.siddhi.editor.core.commons.response;
 
-import org.wso2.siddhi.query.api.definition.AbstractDefinition;
+import io.siddhi.query.api.definition.AbstractDefinition;
 
 import java.util.List;
 

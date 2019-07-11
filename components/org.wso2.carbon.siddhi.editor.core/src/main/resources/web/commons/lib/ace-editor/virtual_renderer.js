@@ -50,13 +50,13 @@ dom.importCssString(editorCss, "ace_editor.css");
 
 /**
  * The class that is responsible for drawing everything you see on the screen!
- * @related editor.renderer 
+ * @related server.renderer
  * @class VirtualRenderer
  **/
 
 /**
  * Constructs a new `VirtualRenderer` within the `container` specified, applying the given `theme`.
- * @param {DOMElement} container The root element of the editor
+ * @param {DOMElement} container The root element of the server
  * @param {String} theme The starting theme
  *
  * @constructor
@@ -335,11 +335,11 @@ var VirtualRenderer = function(container, theme) {
             this.onResize();
     };
     /**
-     * [Triggers a resize of the editor.]{: #VirtualRenderer.onResize}
+     * [Triggers a resize of the server.]{: #VirtualRenderer.onResize}
      * @param {Boolean} force If `true`, recomputes the size, even if the height and width haven't changed
      * @param {Number} gutterWidth The width of the gutter in pixels
-     * @param {Number} width The width of the editor in pixels
-     * @param {Number} height The hiehgt of the editor, in pixels
+     * @param {Number} width The width of the server in pixels
+     * @param {Number} height The hiehgt of the server, in pixels
      *
      **/
     this.onResize = function(force, gutterWidth, width, height) {
@@ -1158,10 +1158,10 @@ var VirtualRenderer = function(container, theme) {
 
     /**
      *
-     * Scrolls the cursor into the first visibile area of the editor
+     * Scrolls the cursor into the first visibile area of the server
      **/
     this.scrollCursorIntoView = function(cursor, offset, $viewMargin) {
-        // the editor is not visible
+        // the server is not visible
         if (this.$size.scrollerHeight === 0)
             return;
 
@@ -1235,7 +1235,7 @@ var VirtualRenderer = function(container, theme) {
     };
 
     /**
-     * Gracefully scrolls from the top of the editor to the row indicated.
+     * Gracefully scrolls from the top of the server to the row indicated.
      * @param {Number} row A row id
      *
      * @related EditSession.setScrollTop
@@ -1273,9 +1273,9 @@ var VirtualRenderer = function(container, theme) {
     };
 
     /**
-     * Gracefully scrolls the editor to the row indicated.
+     * Gracefully scrolls the server to the row indicated.
      * @param {Number} line A line number
-     * @param {Boolean} center If `true`, centers the editor the to indicated line
+     * @param {Boolean} center If `true`, centers the server the to indicated line
      * @param {Boolean} animate If `true` animates scrolling
      * @param {Function} callback Function to be called after the animation has finished
      *
@@ -1336,7 +1336,7 @@ var VirtualRenderer = function(container, theme) {
     };
 
     /**
-     * Scrolls the editor to the y pixel indicated.
+     * Scrolls the server to the y pixel indicated.
      * @param {Number} scrollTop The position to scroll to
      *
      * @returns {Number}
@@ -1351,7 +1351,7 @@ var VirtualRenderer = function(container, theme) {
     };
 
     /**
-     * Scrolls the editor across the x-axis to the pixel indicated.
+     * Scrolls the server across the x-axis to the pixel indicated.
      * @param {Number} scrollLeft The position to scroll to
      *
      * @returns {Number}
@@ -1363,7 +1363,7 @@ var VirtualRenderer = function(container, theme) {
     };
 
     /**
-     * Scrolls the editor across both x- and y-axes.
+     * Scrolls the server across both x- and y-axes.
      * @param {Number} x The x value to scroll to
      * @param {Number} y The y value to scroll to
      **/
@@ -1373,7 +1373,7 @@ var VirtualRenderer = function(container, theme) {
     };
     
     /**
-     * Scrolls the editor across both x- and y-axes.
+     * Scrolls the server across both x- and y-axes.
      * @param {Number} deltaX The x value to scroll by
      * @param {Number} deltaY The y value to scroll by
      **/
@@ -1502,7 +1502,7 @@ var VirtualRenderer = function(container, theme) {
     };
 
     /**
-     * [Sets a new theme for the editor. `theme` should exist, and be a directory path, like `ace/theme/textmate`.]{: #VirtualRenderer.setTheme}
+     * [Sets a new theme for the server. `theme` should exist, and be a directory path, like `ace/theme/textmate`.]{: #VirtualRenderer.setTheme}
      * @param {String} theme The path to a theme
      * @param {Function} cb optional callback
      *
@@ -1564,12 +1564,12 @@ var VirtualRenderer = function(container, theme) {
         return this.$themeId;
     };
 
-    // Methods allows to add / remove CSS classnames to the editor element.
+    // Methods allows to add / remove CSS classnames to the server element.
     // This feature can be used by plug-ins to provide a visual indication of
-    // a certain mode that editor is in.
+    // a certain mode that server is in.
 
     /**
-     * [Adds a new class, `style`, to the editor.]{: #VirtualRenderer.setStyle}
+     * [Adds a new class, `style`, to the server.]{: #VirtualRenderer.setStyle}
      * @param {String} style A class name
      *
      **/
@@ -1578,7 +1578,7 @@ var VirtualRenderer = function(container, theme) {
     };
 
     /**
-     * [Removes the class `style` from the editor.]{: #VirtualRenderer.unsetStyle}
+     * [Removes the class `style` from the server.]{: #VirtualRenderer.unsetStyle}
      * @param {String} style A class name
      *
      **/

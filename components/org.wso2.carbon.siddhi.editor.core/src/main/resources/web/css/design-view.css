@@ -26,7 +26,7 @@
 }
 
 .toggle-controls-container {
-    position: fixed;
+    position: absolute;
     bottom: 35px;
     right: 10px;
     z-index: 23;
@@ -693,8 +693,7 @@ a.list-group-item, button.list-group-item {
 
 .source-sink-form-container .source-sink-map-options .error-message,
 .design-view-form-content #store-options .error-message,
-.design-view-form-content #primary-index-annotations .error-message,
-.window-form-container .defineFunctionParameters .error-message {
+.design-view-form-content #primary-index-annotations .error-message {
     margin-left: 20px;
 }
 
@@ -758,11 +757,15 @@ a.list-group-item, button.list-group-item {
     text-align: left;
 }
 
-.design-view-form-content input[type="text"].option-value,
-.window-form-container input[type="text"].parameter-value {
+.design-view-form-content input[type="text"].option-value {
     width: 85%;
     margin-bottom: 2px;
     margin-left: 20px;
+}
+
+.defineFunctionParameters input[type="text"].parameter-value {
+    width: 85%;
+    margin-bottom: 2px;
 }
 
 .trigger-form-container #trigger-criteria-content .description {
@@ -1159,13 +1162,13 @@ a.list-group-item, button.list-group-item {
     margin-left: 20px;
 }
 
-.design-view-form-content .option .mandatory-symbol,
-.design-view-form-content .parameter .mandatory-symbol {
+.design-view-form-content .option .mandatory-symbol {
     margin-right: 12px;
 }
 
-.design-view-form-content .mandatory-symbol {
-    margin-right: 8px;
+.design-view-form-content .mandatory-symbol,
+.design-view-form-content .parameter .mandatory-symbol {
+    margin-right: 7px;
 }
 
 .design-view-form-content select,
@@ -1611,4 +1614,43 @@ label.option-name {
 .design-view-form-content .design-view-combobox {
     max-height: 150px;
     z-index: 1000 !important;
+}
+
+.design-view-form-content .display-predefined-parameters {
+    margin-top: 10px;
+    background: rgb(40, 41, 41);
+}
+
+.design-view-form-content .predefined-param {
+    margin: 5px;
+}
+
+.design-view-form-content .predefined-param .predefined-param-name {
+    font-weight: normal;
+}
+
+.design-view-form-content .predefined-param .optional-label {
+    font-weight: 300;
+    font-style: italic;
+}
+
+.design-view-form-content .predefined-param .predefined-param-desc {
+    margin-left: 5px;
+    word-break: break-word;
+}
+
+.design-view-form-content .display-predefined-parameters .parameter-label {
+    font-weight: bold;
+}
+
+.design-view-form-content .defineFunctionParameters .btn-add-param-attribute {
+    margin-top: -1px;
+    height: 21px;
+    padding: 0 10px;
+    margin-left: 3px;
+    border: 1px solid #716e6e;
+}
+
+.design-view-form-content .defineFunctionParameters .attribute-param-value {
+    margin-top: 5px;
 }

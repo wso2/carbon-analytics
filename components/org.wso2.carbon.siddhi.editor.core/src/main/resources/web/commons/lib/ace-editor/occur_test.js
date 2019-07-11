@@ -89,7 +89,7 @@ module.exports = {
         editor.execCommand('occur', {needle: 'o'});
         assert.equal(editor.getValue(), 'lo\nwo');
         // command install OK?
-        // assert.ok(editor.getReadOnly(), 'occur doc not marked as read only');
+        // assert.ok(server.getReadOnly(), 'occur doc not marked as read only');
         assert.ok(editor.getKeyboardHandler().isOccurHandler, 'no occur handler installed');
         assert.ok(editor.commands.byName.occurexit, 'no exitoccur command installed');
 
@@ -97,8 +97,8 @@ module.exports = {
         editor.execCommand('occurexit');
         assert.equal(editor.getValue(), text);
 
-        // editor state cleaned up?
-        // assert.ok(!editor.getReadOnly(), 'original doc is marked as read only');
+        // server state cleaned up?
+        // assert.ok(!server.getReadOnly(), 'original doc is marked as read only');
         assert.ok(!editor.getKeyboardHandler().isOccurHandler, 'occur handler installed after detach');
         assert.ok(!editor.commands.byName.occurexit, 'exitoccur installed after exiting occur');
     },

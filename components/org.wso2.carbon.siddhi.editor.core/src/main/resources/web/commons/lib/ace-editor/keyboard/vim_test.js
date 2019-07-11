@@ -83,7 +83,7 @@ vim.CodeMirror.Vim.defineEx('write', 'w', function(cm) {
 
 // cm.setBookmark({ch: 5, line: 0})
 // cm.setBookmark({ch: 4, line: 0})
-// cm.replaceRange("x-", {ch: 4, line: 0}, {ch: 5, line: 0}); [editor.$vimModeHandler.cm.marks[0].find(),editor.$vimModeHandler.cm.marks[1].find()]
+// cm.replaceRange("x-", {ch: 4, line: 0}, {ch: 5, line: 0}); [server.$vimModeHandler.cm.marks[0].find(),server.$vimModeHandler.cm.marks[1].find()]
 
 var lineText, verbose, phantom;
 var Pos = CodeMirror.Pos;

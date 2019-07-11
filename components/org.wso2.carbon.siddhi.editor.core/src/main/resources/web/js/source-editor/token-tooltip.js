@@ -15,13 +15,13 @@
  */
 
 /*
- * Taken from ace editor demos and updated to suit the siddhi editor
+ * Taken from ace server demos and updated to suit the siddhi server
  * Generates the token tool tips on mouse over
  */
 
 /*
  * Generating tooltips when user hovers over a token
- * The tooltip content is set in siddhi-editor.js
+ * The tooltip content is set in siddhi-server.js
  */
 define(["ace/lib/dom", "ace/lib/oop", "ace/lib/event", "ace/range", "ace/tooltip", "./constants", "exports"],
     function (dom, oop, event, range, tooltip, constants, exports) {
@@ -84,7 +84,7 @@ define(["ace/lib/dom", "ace/lib/oop", "ace/lib/event", "ace/range", "ace/tooltip
                 }
 
                 /*
-                 * This had been added to suit the siddhi editor implementation of token tool tips
+                 * This had been added to suit the siddhi server implementation of token tool tips
                  */
                 var tokenText = token.tooltip;
                 if (tokenText) {

@@ -263,6 +263,13 @@ define(['log', 'jquery', 'lodash', 'backbone', 'console'], function (log, $, _, 
                 this.setActiveConsole(nextConsole);
             },
             /**
+             * removes all the console instances
+             */
+            removeAllConsoles: function () {
+                this.hideAllConsoles();
+                this.removePoppedUpElement();
+            },
+            /**
              * removes the classes added to pop-up the element
              */
             removePoppedUpElement: function () {

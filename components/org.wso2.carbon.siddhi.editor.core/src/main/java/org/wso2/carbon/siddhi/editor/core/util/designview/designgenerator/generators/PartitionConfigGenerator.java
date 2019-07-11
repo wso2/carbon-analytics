@@ -26,16 +26,16 @@ import org.wso2.carbon.siddhi.editor.core.util.designview.constants.query.QueryL
 import org.wso2.carbon.siddhi.editor.core.util.designview.designgenerator.generators.query.QueryConfigGenerator;
 import org.wso2.carbon.siddhi.editor.core.util.designview.exceptions.DesignGenerationException;
 import org.wso2.carbon.siddhi.editor.core.util.designview.utilities.ConfigBuildingUtilities;
-import org.wso2.siddhi.query.api.SiddhiApp;
-import org.wso2.siddhi.query.api.annotation.Annotation;
-import org.wso2.siddhi.query.api.definition.AbstractDefinition;
-import org.wso2.siddhi.query.api.definition.StreamDefinition;
-import org.wso2.siddhi.query.api.execution.partition.Partition;
-import org.wso2.siddhi.query.api.execution.partition.PartitionType;
-import org.wso2.siddhi.query.api.execution.partition.RangePartitionType;
-import org.wso2.siddhi.query.api.execution.partition.ValuePartitionType;
-import org.wso2.siddhi.query.api.execution.query.Query;
-import org.wso2.siddhi.query.api.expression.Expression;
+import io.siddhi.query.api.SiddhiApp;
+import io.siddhi.query.api.annotation.Annotation;
+import io.siddhi.query.api.definition.AbstractDefinition;
+import io.siddhi.query.api.definition.StreamDefinition;
+import io.siddhi.query.api.execution.partition.Partition;
+import io.siddhi.query.api.execution.partition.PartitionType;
+import io.siddhi.query.api.execution.partition.RangePartitionType;
+import io.siddhi.query.api.execution.partition.ValuePartitionType;
+import io.siddhi.query.api.execution.query.Query;
+import io.siddhi.query.api.expression.Expression;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -94,8 +94,10 @@ public class PartitionConfigGenerator extends CodeSegmentsPreserver {
             throws DesignGenerationException {
         Map<QueryListType, List<QueryConfig>> queryLists = populateEmptyQueryLists();
         QueryConfigGenerator queryConfigGenerator = new QueryConfigGenerator(siddhiAppString, siddhiApp);
+        int queryCounter = 0;
         for (Query query : queryList) {
-            QueryConfig queryConfig = queryConfigGenerator.generateQueryConfig(query);
+            queryCounter++;
+            QueryConfig queryConfig = queryConfigGenerator.generateQueryConfig(query, queryCounter);
             QueryListType queryListType = QueryConfigGenerator.getQueryListType(queryConfig);
             queryLists.get(queryListType).add(queryConfig);
         }

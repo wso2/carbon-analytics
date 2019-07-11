@@ -17,7 +17,7 @@
  */
 package org.wso2.carbon.analytics.auth.rest.api.util;
 
-import org.wso2.carbon.stream.processor.common.utils.SPConstants;
+import org.wso2.carbon.streaming.integrator.common.utils.SPConstants;
 
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;

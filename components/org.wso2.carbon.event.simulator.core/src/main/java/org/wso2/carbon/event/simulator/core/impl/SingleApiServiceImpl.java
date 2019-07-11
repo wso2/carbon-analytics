@@ -3,8 +3,8 @@ package org.wso2.carbon.event.simulator.core.impl;
 import org.wso2.carbon.event.simulator.core.api.SingleApiService;
 import org.wso2.carbon.event.simulator.core.exception.SimulationValidationException;
 import org.wso2.carbon.event.simulator.core.internal.generator.SingleEventGenerator;
-import org.wso2.carbon.stream.processor.common.exception.ResourceNotFoundException;
-import org.wso2.carbon.stream.processor.common.exception.ResponseMapper;
+import org.wso2.carbon.streaming.integrator.common.exception.ResourceNotFoundException;
+import org.wso2.carbon.streaming.integrator.common.exception.ResponseMapper;
 
 import javax.ws.rs.core.Response;
 

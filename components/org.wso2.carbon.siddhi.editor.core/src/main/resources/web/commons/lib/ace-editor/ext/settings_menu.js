@@ -37,7 +37,7 @@
  * Show Settings Menu
  * @fileOverview Show Settings Menu <br />
  * Displays an interactive settings menu mostly generated on the fly based on
- *  the current state of the editor.
+ *  the current state of the server.
  * @author <a href="mailto:matthewkastor@gmail.com">
  *  Matthew Christopher Kastor-Inare III </a><br />
  *  ☭ Hial Atropa!! ☭
@@ -52,7 +52,7 @@ var overlayPage = require('./menu_tools/overlay_page').overlayPage;
  * @author <a href="mailto:matthewkastor@gmail.com">
  *  Matthew Christopher Kastor-Inare III </a><br />
  *  ☭ Hial Atropa!! ☭
- * @param {ace.Editor} editor An instance of the ace editor.
+ * @param {ace.Editor} editor An instance of the ace server.
  */
 function showSettingsMenu(editor) {
     // make sure the menu isn't open already.
@@ -63,12 +63,12 @@ function showSettingsMenu(editor) {
 
 /**
  * Initializes the settings menu extension. It adds the showSettingsMenu
- *  method to the given editor object and adds the showSettingsMenu command
- *  to the editor with appropriate keyboard shortcuts.
+ *  method to the given server object and adds the showSettingsMenu command
+ *  to the server with appropriate keyboard shortcuts.
  * @param {ace.Editor} editor An instance of the Editor.
  */
 module.exports.init = function(editor) {
-    var Editor = require("ace/editor").Editor;
+    var Editor = require("ace/server").Editor;
     Editor.prototype.showSettingsMenu = function() {
         showSettingsMenu(this);
     };

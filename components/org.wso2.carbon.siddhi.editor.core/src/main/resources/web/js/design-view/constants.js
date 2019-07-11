@@ -17,14 +17,14 @@
  */
 
 /**
- * Constants to be used by the siddhi editor  design view
+ * Constants to be used by the siddhi server  design view
  */
 define(function () {
 
     "use strict";   // JS strict mode
 
     /**
-     * Constants used by the siddhi editor design-view
+     * Constants used by the siddhi server design-view
      */
     var constants = {
         ALPHABETIC_VALIDATOR_REGEX: /^([a-zA-Z])$/,
@@ -124,7 +124,11 @@ define(function () {
         KEYWORD: "keyword",
         OPERATOR: "operator",
         INPUT: "input",
-        FOR: "for"
+        FOR: "for",
+        ASC:"asc",
+        DESC: "desc",
+        BATCH_WINDOW_PROCESSOR: "batch",
+        MULTI_VALUE: "..."
     };
 
     return constants;

@@ -19,7 +19,7 @@
 package org.wso2.carbon.event.simulator.core.internal.generator.random;
 
 import org.json.JSONObject;
-import org.wso2.siddhi.query.api.definition.Attribute;
+import io.siddhi.query.api.definition.Attribute;
 
 /**
  * RandomAttrGenAbstractImpl class overloads the createRandomAttributeDTO() of RandomAttributeGenerator

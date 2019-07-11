@@ -33,8 +33,8 @@ import org.wso2.carbon.deployment.engine.Deployer;
 import org.wso2.carbon.deployment.engine.exception.CarbonDeploymentException;
 import org.wso2.carbon.event.simulator.core.internal.generator.csv.util.FileStore;
 import org.wso2.carbon.event.simulator.core.internal.util.EventSimulatorConstants;
-import org.wso2.carbon.stream.processor.common.EventStreamService;
-import org.wso2.carbon.stream.processor.common.SimulationDependencyListener;
+import org.wso2.carbon.streaming.integrator.common.EventStreamService;
+import org.wso2.carbon.streaming.integrator.common.SimulationDependencyListener;
 
 import java.io.File;
 import java.net.MalformedURLException;

@@ -12,7 +12,7 @@ import org.wso2.carbon.event.simulator.core.internal.generator.csv.util.FileUplo
 import org.wso2.carbon.event.simulator.core.internal.util.CommonOperations;
 import org.wso2.carbon.event.simulator.core.internal.util.EventSimulatorConstants;
 import org.wso2.carbon.event.simulator.core.service.EventSimulatorDataHolder;
-import org.wso2.carbon.stream.processor.common.exception.ResponseMapper;
+import org.wso2.carbon.streaming.integrator.common.exception.ResponseMapper;
 import org.wso2.carbon.utils.Utils;
 import org.wso2.msf4j.Request;
 import org.wso2.msf4j.formparam.FileInfo;

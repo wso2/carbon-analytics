@@ -27,7 +27,7 @@ import org.wso2.carbon.event.simulator.core.internal.generator.csv.core.CSVEvent
 import org.wso2.carbon.event.simulator.core.internal.generator.database.core.DatabaseEventGenerator;
 import org.wso2.carbon.event.simulator.core.internal.generator.random.core.RandomEventGenerator;
 import org.wso2.carbon.event.simulator.core.util.SourceConfigLogger;
-import org.wso2.carbon.stream.processor.common.exception.ResourceNotFoundException;
+import org.wso2.carbon.streaming.integrator.common.exception.ResourceNotFoundException;
 
 import static org.wso2.carbon.event.simulator.core.internal.util.CommonOperations.checkAvailability;
 

@@ -23,7 +23,7 @@ define(['require', 'log', 'jquery', 'lodash', 'formUtils', 'streamForm', 'tableF
         WindowFilterProjectionQueryForm, PatternQueryForm, JoinQueryForm, PartitionForm, SequenceQueryForm,
         SourceForm, SinkForm, FunctionForm, AppAnnotationForm, Constants) {
 
-        // common properties for the JSON editor
+        // common properties for the JSON server
         JSONEditor.defaults.options.theme = 'bootstrap3';
         JSONEditor.defaults.options.iconlib = 'bootstrap3';
         JSONEditor.defaults.options.disable_edit_json = true;
@@ -113,6 +113,7 @@ define(['require', 'log', 'jquery', 'lodash', 'formUtils', 'streamForm', 'tableF
             $(formConsole).on("close-button-in-form-clicked", function () {
                 // close the form window
                 self.consoleListManager.removeFormConsole(formConsole);
+                self.consoleListManager.removeAllConsoles();
             });
             return formConsole;
         };

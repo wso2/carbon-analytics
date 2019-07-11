@@ -24,8 +24,8 @@ import org.wso2.carbon.event.simulator.core.exception.InvalidConfigException;
 import org.wso2.carbon.event.simulator.core.internal.bean.CustomBasedAttributeDTO;
 import org.wso2.carbon.event.simulator.core.internal.generator.random.RandomAttrGenAbstractImpl;
 import org.wso2.carbon.event.simulator.core.internal.util.EventSimulatorConstants;
-import org.wso2.carbon.stream.processor.common.exception.ResourceNotFoundException;
-import org.wso2.siddhi.query.api.definition.Attribute;
+import org.wso2.carbon.streaming.integrator.common.exception.ResourceNotFoundException;
+import io.siddhi.query.api.definition.Attribute;
 
 import java.security.SecureRandom;
 import java.util.ArrayList;

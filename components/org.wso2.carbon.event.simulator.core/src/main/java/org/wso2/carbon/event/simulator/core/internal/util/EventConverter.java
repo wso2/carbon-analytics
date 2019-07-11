@@ -18,8 +18,8 @@
 package org.wso2.carbon.event.simulator.core.internal.util;
 
 import org.wso2.carbon.event.simulator.core.exception.EventGenerationException;
-import org.wso2.siddhi.core.event.Event;
-import org.wso2.siddhi.query.api.definition.Attribute;
+import io.siddhi.core.event.Event;
+import io.siddhi.query.api.definition.Attribute;
 
 import java.util.List;
 
