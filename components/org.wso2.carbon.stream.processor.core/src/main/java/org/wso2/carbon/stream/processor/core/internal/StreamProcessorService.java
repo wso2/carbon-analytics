@@ -200,7 +200,6 @@ public class StreamProcessorService {
                     siddhiAppData.setActive(false);
                     siddhiAppRuntime.shutdown();
                     siddhiAppData.setPassive(true);
-                    siddhiAppData.setSiddhiAppRuntime(siddhiAppRuntime);
                     siddhiAppData.setInputHandlerMap(inputHandlerMap);
                     siddhiAppData.setDeploymentTime(System.currentTimeMillis());
                     siddhiAppMap.put(siddhiAppName, siddhiAppData);
