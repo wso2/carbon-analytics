@@ -30,6 +30,7 @@ public class SiddhiAppData {
 
     private String SiddhiApp;
     private boolean isActive;
+    private boolean isPassive;
     private Map<String, InputHandler> inputHandlerMap;
     private SiddhiAppRuntime siddhiAppRuntime;
     private long deploymentTimeInMillis;
@@ -89,5 +90,13 @@ public class SiddhiAppData {
 
     public void setDeploymentTime(long deploymentTimeInMillis) {
         this.deploymentTimeInMillis = deploymentTimeInMillis;
+    }
+
+    public boolean isPassive() {
+        return isPassive;
+    }
+
+    public void setPassive(boolean isPassive) {
+        this.isPassive = isPassive;
     }
 }

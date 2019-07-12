@@ -408,6 +408,14 @@ public class HAManager {
         });
     }
 
+    private String getHost(Map nodePropertiesMap) {
+        Object host = nodePropertiesMap.get(HAConstants.ADVERTISED_HOST);
+        if (host == null) {
+            host = nodePropertiesMap.get(HAConstants.HOST);
+        }
+        return (String) host;
+    }
+
     private void changeSiddhiAppState(boolean state) {
         Map<String, SiddhiAppData> siddhiAppMap = StreamProcessorDataHolder.getStreamProcessorService().
                 getSiddhiAppMap();
@@ -417,16 +425,8 @@ public class HAManager {
                 log.debug("Changed Siddhi Application " + siddhiAppName + " state to " +
                         state);
             }
-            siddhiAppData.setActive(state);
+            siddhiAppData.setPassive(!state);
         });
-    }
-
-    private String getHost(Map nodePropertiesMap) {
-        Object host = nodePropertiesMap.get(HAConstants.ADVERTISED_HOST);
-        if (host == null) {
-            host = nodePropertiesMap.get(HAConstants.HOST);
-        }
-        return (String) host;
     }
 
     private int getPort(Map nodePropertiesMap) {

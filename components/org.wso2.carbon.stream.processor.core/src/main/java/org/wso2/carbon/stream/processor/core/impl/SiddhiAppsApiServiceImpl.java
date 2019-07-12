@@ -25,6 +25,7 @@ import org.wso2.carbon.stream.processor.core.api.ApiResponseMessage;
 import org.wso2.carbon.stream.processor.core.api.ApiResponseMessageWithCode;
 import org.wso2.carbon.stream.processor.core.api.NotFoundException;
 import org.wso2.carbon.stream.processor.core.api.SiddhiAppsApiService;
+import org.wso2.carbon.stream.processor.core.ha.HAManager;
 import org.wso2.carbon.stream.processor.core.impl.utils.Constants;
 import org.wso2.carbon.stream.processor.core.internal.SiddhiAppData;
 import org.wso2.carbon.stream.processor.core.internal.StreamProcessorDataHolder;
@@ -232,9 +233,14 @@ public class SiddhiAppsApiServiceImpl extends SiddhiAppsApiService {
         if (siddhiAppMap.containsKey(appFileName)) {
             SiddhiAppData siddhiAppData = siddhiAppMap.get(appFileName);
             SiddhiAppStatus siddhiAppStatus = new SiddhiAppStatus();
-            siddhiAppStatus.setStatus(siddhiAppData.isActive() ?
-                    SiddhiAppProcessorConstants.SIDDHI_APP_STATUS_ACTIVE :
-                    SiddhiAppProcessorConstants.SIDDHI_APP_STATUS_INACTIVE);
+
+            if (siddhiAppData.isActive()) {
+                siddhiAppStatus.setStatus(SiddhiAppProcessorConstants.SIDDHI_APP_STATUS_ACTIVE);
+            } else if (siddhiAppData.isPassive()) {
+                siddhiAppStatus.setStatus(SiddhiAppProcessorConstants.SIDDHI_APP_STATUS_PASSIVE);
+            } else {
+                siddhiAppStatus.setStatus(SiddhiAppProcessorConstants.SIDDHI_APP_STATUS_INACTIVE);
+            }
             return Response.ok().entity(siddhiAppStatus).build();
         }
 
