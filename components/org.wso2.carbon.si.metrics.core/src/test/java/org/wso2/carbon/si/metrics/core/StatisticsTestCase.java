@@ -118,10 +118,8 @@ public class StatisticsTestCase {
         AssertJUnit.assertEquals("test.size", bufferedEventsTracker.getName(eventBufferHolder));
     }
     
-    @Test (enabled = false)
+    @Test
     public void statisticsTest1() throws InterruptedException {
-        // This test case has been disabled since it has a issue on enabling/disabling metrics at the Siddhi side.
-        // Issue: https://github.com/wso2/carbon-analytics/issues/1709
         log.info("statistics test 1");
         SiddhiManager siddhiManager = new SiddhiManager();
         StatisticsConfiguration statisticsConfiguration = new StatisticsConfiguration(new SPMetricsFactory());
@@ -162,29 +160,28 @@ public class StatisticsTestCase {
             inputHandler.send(new Object[] {"WSO2", 55.6f, 100});
             inputHandler.send(new Object[] {"IBM", 75.6f, 100});
         }
-        
+
+        // Following memory metrics were removed from here since they are no longer enabled by default.
+        // - io.siddhi.SiddhiApps.MetricsTest.Siddhi.Queries.query1.memory
+        // - io.siddhi.SiddhiApps.MetricsTest.Siddhi.Queries.query2.memory
+
         String name1 = MetricService.name("io.siddhi.SiddhiApps.MetricsTest",
-                "Siddhi.Queries.query1.memory");
-        String name2 = MetricService.name("io.siddhi.SiddhiApps.MetricsTest",
-                "Siddhi.Queries.query2.memory");
-        String name3 = MetricService.name("io.siddhi.SiddhiApps.MetricsTest",
                 "Siddhi.Streams.cseEventStream.throughput");
-        String name4 = MetricService.name("io.siddhi.SiddhiApps.MetricsTest",
+        String name2 = MetricService.name("io.siddhi.SiddhiApps.MetricsTest",
                 "Siddhi.Streams.cseEventStream2.throughput");
-        String name5 = MetricService.name("io.siddhi.SiddhiApps.MetricsTest",
+        String name3 = MetricService.name("io.siddhi.SiddhiApps.MetricsTest",
                 "Siddhi.Streams.outputStream.throughput");
-        String name6 = MetricService.name("io.siddhi.SiddhiApps.MetricsTest",
+        String name4 = MetricService.name("io.siddhi.SiddhiApps.MetricsTest",
                 "Siddhi.Queries.query1.latency");
-        String name7 = MetricService.name("io.siddhi.SiddhiApps.MetricsTest",
+        String name5 = MetricService.name("io.siddhi.SiddhiApps.MetricsTest",
                 "Siddhi.Queries.query2.latency");
         Awaitility.await().atMost(5, TimeUnit.SECONDS).until(() -> {
-            boolean condition = metricManagementService.getMetricLevel(name1).name() != null &&
+            boolean condition =
+                    metricManagementService.getMetricLevel(name1).name() != null &&
                     metricManagementService.getMetricLevel(name2).name() != null &&
                     metricManagementService.getMetricLevel(name3).name() != null &&
                     metricManagementService.getMetricLevel(name4).name() != null &&
-                    metricManagementService.getMetricLevel(name5).name() != null &&
-                    metricManagementService.getMetricLevel(name6).name() != null &&
-                    metricManagementService.getMetricLevel(name7).name() != null;
+                    metricManagementService.getMetricLevel(name5).name() != null;
             return condition;
         });
         Assert.assertTrue(metricManagementService.isReporterRunning("Console"));
@@ -193,8 +190,6 @@ public class StatisticsTestCase {
         AssertJUnit.assertEquals("INFO", metricManagementService.getMetricLevel(name3).name());
         AssertJUnit.assertEquals("INFO", metricManagementService.getMetricLevel(name4).name());
         AssertJUnit.assertEquals("INFO", metricManagementService.getMetricLevel(name5).name());
-        AssertJUnit.assertEquals("INFO", metricManagementService.getMetricLevel(name6).name());
-        AssertJUnit.assertEquals("INFO", metricManagementService.getMetricLevel(name7).name());
         
         AssertJUnit.assertTrue(eventArrived);
         AssertJUnit.assertEquals(3, count);

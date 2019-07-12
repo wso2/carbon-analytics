@@ -80,7 +80,12 @@ public class SPMetricsManagement {
     public void stopMetrics(String siddhiAppName) {
         List<String> registeredComponents = componentMap.get(siddhiAppName);
         for (String component : registeredComponents) {
-            this.metricManagementService.setMetricLevel(component, OFF);
+            try {
+                this.metricManagementService.setMetricLevel(component, OFF);
+            } catch (IllegalArgumentException e) {
+                // Error: given metric is not available. Do nothing!
+                log.debug("Invalid metric name: " + component, e);
+            }
         }
     }
 
