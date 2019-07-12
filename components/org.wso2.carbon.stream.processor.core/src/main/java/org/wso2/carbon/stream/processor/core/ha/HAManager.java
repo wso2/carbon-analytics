@@ -425,9 +425,7 @@ public class HAManager {
                 log.debug("Changed Siddhi Application " + siddhiAppName + " state to " +
                         state);
             }
-            if (!state) {
-                siddhiAppData.setPassive(true);
-            }
+            siddhiAppData.setPassive(!state);
         });
     }
 
