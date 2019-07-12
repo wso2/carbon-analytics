@@ -42,7 +42,7 @@ public class HACoordinationSourceHandlerManager extends SourceHandlerManager {
     }
 
     @Override
-    public SourceHandler generateSourceHandler(String sourceType) {
-        return new HACoordinationSourceHandler(throughputTracker, sourceType);
+    public SourceHandler generateSourceHandler() {
+        return new HACoordinationSourceHandler(throughputTracker, this.getSourceType());
     }
 }
