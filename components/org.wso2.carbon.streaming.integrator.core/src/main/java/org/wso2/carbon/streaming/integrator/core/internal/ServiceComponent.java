@@ -189,7 +189,7 @@ public class ServiceComponent {
                     try {
                         StreamProcessorDeployer.deploySiddhiQLFile(siddhiAppFileReference);
                     } catch (Exception e) {
-                        log.error("Exception occurred when deploying the Siddhi App" +
+                        log.error("Exception occurred when deploying the Siddhi App: " +
                                 siddhiAppFileReference.getName(), e);
                     }
                 }
