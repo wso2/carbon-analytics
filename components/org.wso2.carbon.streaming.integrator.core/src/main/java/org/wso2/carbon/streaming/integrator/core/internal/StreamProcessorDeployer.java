@@ -78,45 +78,47 @@ public class StreamProcessorDeployer implements Deployer {
         String siddhiAppName;
 
         try {
-            inputStream = new FileInputStream(file);
-            String siddhiAppFileName = file.getName();
-            if (siddhiAppFileName.endsWith(SiddhiAppProcessorConstants.SIDDHI_APP_FILE_EXTENSION)) {
-                String siddhiAppFileNameWithoutExtension = getFileNameWithoutExtenson(siddhiAppFileName);
-                SiddhiAppType siddhiAppType = getArtifactType(siddhiAppFileNameWithoutExtension);
-                if (!isDeploymentAllowed(siddhiAppType)) {
-                    return;
-                }
-                String siddhiApp = getStringFromInputStream(inputStream);
-                try {
-                    siddhiAppName = StreamProcessorDataHolder.getStreamProcessorService().
-                            getSiddhiAppName(siddhiApp);
-                    if (siddhiAppFileNameWithoutExtension.equals(siddhiAppName)) {
-                        StreamProcessorDataHolder.getStreamProcessorService().deploySiddhiApp(siddhiApp,
-                                siddhiAppName);
-                    } else {
-                        throw new SiddhiAppDeploymentException("Siddhi App file name needs be identical with the " +
-                                "name defined in the Siddhi App content");
+            if (file.isFile()) {
+                inputStream = new FileInputStream(file);
+                String siddhiAppFileName = file.getName();
+                if (siddhiAppFileName.endsWith(SiddhiAppProcessorConstants.SIDDHI_APP_FILE_EXTENSION)) {
+                    String siddhiAppFileNameWithoutExtension = getFileNameWithoutExtenson(siddhiAppFileName);
+                    SiddhiAppType siddhiAppType = getArtifactType(siddhiAppFileNameWithoutExtension);
+                    if (!isDeploymentAllowed(siddhiAppType)) {
+                        return;
                     }
-                } catch (SiddhiAppAlreadyExistException e) {
-                    throw e;
-                } catch (Exception e) {
-                    SiddhiAppData siddhiAppData = new SiddhiAppData(siddhiApp, false);
-                    StreamProcessorDataHolder.getStreamProcessorService().
-                            addSiddhiAppFile(siddhiAppFileNameWithoutExtension, siddhiAppData);
-                    throw new SiddhiAppDeploymentException(e);
+                    String siddhiApp = getStringFromInputStream(inputStream);
+                    try {
+                        siddhiAppName = StreamProcessorDataHolder.getStreamProcessorService().
+                                getSiddhiAppName(siddhiApp);
+                        if (siddhiAppFileNameWithoutExtension.equals(siddhiAppName)) {
+                            StreamProcessorDataHolder.getStreamProcessorService().deploySiddhiApp(siddhiApp,
+                                    siddhiAppName);
+                        } else {
+                            throw new SiddhiAppDeploymentException("Siddhi App file name needs be identical with the " +
+                                    "name defined in the Siddhi App content");
+                        }
+                    } catch (SiddhiAppAlreadyExistException e) {
+                        throw e;
+                    } catch (Exception e) {
+                        SiddhiAppData siddhiAppData = new SiddhiAppData(siddhiApp, false);
+                        StreamProcessorDataHolder.getStreamProcessorService().
+                                addSiddhiAppFile(siddhiAppFileNameWithoutExtension, siddhiAppData);
+                        throw new SiddhiAppDeploymentException(e);
+                    }
+                } else {
+                    log.error(("Error: File extension of file name "
+                            + siddhiAppFileName + " is not supported. Siddhi App only supports '"
+                            + SiddhiAppProcessorConstants.SIDDHI_APP_FILE_EXTENSION + "' ."));
                 }
             } else {
-                log.error(("Error: File extension of file name "
-                        + siddhiAppFileName + " is not supported. Siddhi App only supports '"
-                        + SiddhiAppProcessorConstants.SIDDHI_APP_FILE_EXTENSION + "' ."));
+                log.error("Error: '" + file.getName() + "' is a sub-directory; hence, ignored.");
             }
         } finally {
             if (inputStream != null) {
                 try {
                     inputStream.close();
                 } catch (IOException e) {
-                    StreamProcessorDataHolder.getInstance().setRuntimeMode(
-                            SiddhiAppProcessorConstants.RuntimeMode.ERROR);
                     throw new SiddhiAppDeploymentException("Error when closing the Siddhi QL file stream", e);
                 }
             }
@@ -250,7 +252,7 @@ public class StreamProcessorDeployer implements Deployer {
                     try {
                         LinkedHashMap analyticsSolutionsMap = (LinkedHashMap) configProvider.
                                 getConfigurationObject(SiddhiAppProcessorConstants.ANALYTICS_SOLUTIONS);
-                        Object directoryPathObject ;
+                        Object directoryPathObject;
                         if (analyticsSolutionsMap != null) {
                             if (serverType.name().equals(ServerType.SP.name())) {
                                 directoryPathObject = analyticsSolutionsMap.get(
@@ -264,7 +266,7 @@ public class StreamProcessorDeployer implements Deployer {
                                     isAPIMAlertsEnabled = Boolean.parseBoolean(directoryPathObject.toString());
                                 }
                                 directoryPathObject = analyticsSolutionsMap.get(
-                                        SiddhiAppProcessorConstants.    APIM_ANALYTICS_ENABLED);
+                                        SiddhiAppProcessorConstants.APIM_ANALYTICS_ENABLED);
                                 if (directoryPathObject != null) {
                                     apimAnalyticsEnabledOnSP = Boolean.parseBoolean(directoryPathObject.toString());
                                 }
@@ -324,14 +326,11 @@ public class StreamProcessorDeployer implements Deployer {
     @Override
     public Object deploy(Artifact artifact) throws CarbonDeploymentException {
 
-        if (StreamProcessorDataHolder.getInstance().getRuntimeMode().equals(SiddhiAppProcessorConstants.
-                RuntimeMode.SERVER)) {
-            try {
-                deploySiddhiQLFile(artifact.getFile());
-            } catch (Throwable e) {
-                log.error(e.getMessage(), e);
-                //throw new CarbonDeploymentException(e.getMessage(), e);
-            }
+        try {
+            deploySiddhiQLFile(artifact.getFile());
+        } catch (Throwable e) {
+            log.error(e.getMessage(), e);
+            //throw new CarbonDeploymentException(e.getMessage(), e);
         }
         broadcastDeploy();
         return artifact.getFile().getName();
@@ -339,27 +338,21 @@ public class StreamProcessorDeployer implements Deployer {
 
     @Override
     public void undeploy(Object key) throws CarbonDeploymentException {
-        if (StreamProcessorDataHolder.getInstance().getRuntimeMode().equals(SiddhiAppProcessorConstants.
-                RuntimeMode.SERVER)) {
-            StreamProcessorDataHolder.getStreamProcessorService().
-                    undeploySiddhiApp(getFileNameWithoutExtenson((String) key));
-        }
+        StreamProcessorDataHolder.getStreamProcessorService().
+                undeploySiddhiApp(getFileNameWithoutExtenson((String) key));
         broadcastDelete();
     }
 
     @Override
     public Object update(Artifact artifact) throws CarbonDeploymentException {
 
-        if (StreamProcessorDataHolder.getInstance().getRuntimeMode().equals(SiddhiAppProcessorConstants.
-                RuntimeMode.SERVER)) {
-            StreamProcessorDataHolder.getStreamProcessorService().
-                    undeploySiddhiApp(getFileNameWithoutExtenson(artifact.getName()));
-            try {
-                deploySiddhiQLFile(artifact.getFile());
-            } catch (Exception e) {
-                log.error(e.getMessage(), e);
-                //throw new CarbonDeploymentException(e.getMessage(), e);
-            }
+        StreamProcessorDataHolder.getStreamProcessorService().
+                undeploySiddhiApp(getFileNameWithoutExtenson(artifact.getName()));
+        try {
+            deploySiddhiQLFile(artifact.getFile());
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
+            //throw new CarbonDeploymentException(e.getMessage(), e);
         }
         broadcastUpdate();
         return artifact.getName();
@@ -446,12 +439,13 @@ public class StreamProcessorDeployer implements Deployer {
             policy = ReferencePolicy.DYNAMIC,
             unbind = "unsetMicroservicesServer")
     protected void setMicroservicesServer(MicroservicesServer microservicesServer) {
-        if(log.isDebugEnabled()) {
+        if (log.isDebugEnabled()) {
             log.debug("@(bind) MicroservicesServer ");
         }
     }
+
     protected void unsetMicroservicesServer(MicroservicesServer microservicesServer) {
-        if(log.isDebugEnabled()) {
+        if (log.isDebugEnabled()) {
             log.debug(" @(unbind) MicroservicesServer ");
         }
     }
