@@ -352,7 +352,6 @@ public class StreamProcessorDeployer implements Deployer {
             deploySiddhiQLFile(artifact.getFile());
         } catch (Exception e) {
             log.error(e.getMessage(), e);
-            //throw new CarbonDeploymentException(e.getMessage(), e);
         }
         broadcastUpdate();
         return artifact.getName();
