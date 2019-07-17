@@ -171,7 +171,8 @@ public class ServiceComponent {
                 siddhiAppFileReference = new File(siddhiAppsReference);
 
                 if (!siddhiAppFileReference.exists()) {
-                    log.error("Error: File " + siddhiAppFileReference.getName() + " not found in the given location.");
+                    log.error("Error: File " + siddhiAppFileReference.getName() + " not found in the given location " +
+                            "\"" + siddhiAppFileReference.getPath() + "\" ");
                 }
 
                 if (siddhiAppFileReference.isDirectory()) {
