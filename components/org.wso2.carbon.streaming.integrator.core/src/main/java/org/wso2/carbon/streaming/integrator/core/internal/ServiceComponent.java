@@ -361,7 +361,6 @@ public class ServiceComponent {
                             "Use another clustering mode, change the groupId or disable clustering.");
                 }
                 log.info("WSO2 Stream Processor Starting in Two Node Minimum HA Deployment");
-                ;
                 StreamProcessorDataHolder.setIsStatisticsEnabled(
                         SPMetricsDataHolder.getInstance().getMetricManagementService().isEnabled());
                 StatisticsManager statisticsManager = StreamProcessorDataHolder.getStatisticsConfiguration().
