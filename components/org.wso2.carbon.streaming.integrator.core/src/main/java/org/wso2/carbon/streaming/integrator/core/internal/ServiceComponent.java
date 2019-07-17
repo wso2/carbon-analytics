@@ -182,7 +182,7 @@ public class ServiceComponent {
                             try {
                                 StreamProcessorDeployer.deploySiddhiQLFile(siddhiApp);
                             } catch (Exception e) {
-                                log.error("Exception occurred when deploying the Siddhi App" + siddhiApp.getName(), e);
+                                log.error("Exception occurred when deploying the Siddhi App: " + siddhiApp.getName(), e);
                             }
                         }
                     }
@@ -190,7 +190,7 @@ public class ServiceComponent {
                     try {
                         StreamProcessorDeployer.deploySiddhiQLFile(siddhiAppFileReference);
                     } catch (Exception e) {
-                        log.error("Exception occurred when deploying the Siddhi App" +
+                        log.error("Exception occurred when deploying the Siddhi App: " +
                                 siddhiAppFileReference.getName(), e);
                     }
                 }
@@ -362,7 +362,6 @@ public class ServiceComponent {
                             "Use another clustering mode, change the groupId or disable clustering.");
                 }
                 log.info("WSO2 Stream Processor Starting in Two Node Minimum HA Deployment");
-                ;
                 StreamProcessorDataHolder.setIsStatisticsEnabled(
                         SPMetricsDataHolder.getInstance().getMetricManagementService().isEnabled());
                 StatisticsManager statisticsManager = StreamProcessorDataHolder.getStatisticsConfiguration().
