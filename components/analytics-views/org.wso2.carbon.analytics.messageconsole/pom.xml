@@ -54,7 +54,7 @@
                             org.wso2.carbon.analytics.messageconsole.*;version="${carbon.analytics.version}"
                         </Export-Package>
                         <Import-Package>
-                            org.apache.commons.logging.*,
+                            org.apache.commons.logging.*; version="${import.package.version.commons.logging}",
                             org.wso2.carbon.ntask.core.*;version="${carbon.commons.imp.pkg.version}",
                             *;resolution:=optional
                         </Import-Package>
