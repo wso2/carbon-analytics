@@ -48,6 +48,6 @@ public class EditorSiddhiAppRuntimeService implements SiddhiAppRuntimeService {
 
     @Override
     public void enableSiddhiAppStatistics(Level statsEnabled) {
-        //ignore the server runtime statistics
+        //ignore the editor runtime statistics
     }
 }

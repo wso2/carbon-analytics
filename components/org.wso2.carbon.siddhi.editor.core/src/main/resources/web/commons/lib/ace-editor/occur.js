@@ -62,7 +62,7 @@ oop.inherits(Occur, Search);
      * Enables occur mode. expects that `options.needle` is a search term.
      * This search term is used to filter out all the lines that include it
      * and these are then used as the content of a new [[Document
-     * `Document`]]. The current cursor position of server will be translated
+     * `Document`]]. The current cursor position of editor will be translated
      * so that the cursor is on the matching row/column as it was before.
      * @param {Editor} editor
      * @param {Object} options options.needle should be a String

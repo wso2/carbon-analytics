@@ -48,13 +48,13 @@ define(function(require, exports, module) {
 'use strict';
 
 /**
- * The menu options property needs to be added to the server
+ * The menu options property needs to be added to the editor
  *  so that the settings menu can know about options for
  *  selection elements and track which option is selected.
  * @author <a href="mailto:matthewkastor@gmail.com">
  *  Matthew Christopher Kastor-Inare III </a><br />
  *  ☭ Hial Atropa!! ☭
- * @param {ace.Editor} editor An instance of the ace server.
+ * @param {ace.Editor} editor An instance of the ace editor.
  */
 module.exports.addEditorMenuOptions = function addEditorMenuOptions (editor) {
     var modelist = require('../modelist');

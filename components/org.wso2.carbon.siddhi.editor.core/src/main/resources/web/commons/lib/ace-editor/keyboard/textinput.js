@@ -199,7 +199,7 @@ var TextInput = function(parentNode, host) {
             }
             inComposition ? onCompositionUpdate() : onCompositionStart();
         });
-        // when user presses backspace after focusing the server
+        // when user presses backspace after focusing the editor
         // propertychange isn't called for the next character
         event.addListener(text, "keydown", function (e) {
             syncProperty.schedule(50);

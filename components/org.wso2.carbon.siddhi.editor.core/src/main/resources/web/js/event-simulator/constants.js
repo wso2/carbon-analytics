@@ -20,7 +20,7 @@ define(function() {
     "use strict"; // JS strict mode
 
     /**
-     * Constants used by the tool - server
+     * Constants used by the tool - editor
      */
     var constants = {
         ALLOWED_KEYS: ["Delete", "ArrowRight", "ArrowLeft", "Backspace"],

@@ -86,7 +86,7 @@ var ScrollBar = function(parent) {
 /**
  * Creates a new `VScrollBar`. `parent` is the owner of the scroll bar.
  * @param {DOMElement} parent A DOM element
- * @param {Object} renderer An server renderer
+ * @param {Object} renderer An editor renderer
  *
  * @constructor
  **/
@@ -190,7 +190,7 @@ oop.inherits(VScrollBar, ScrollBar);
 /**
  * Creates a new `HScrollBar`. `parent` is the owner of the scroll bar.
  * @param {DOMElement} parent A DOM element
- * @param {Object} renderer An server renderer
+ * @param {Object} renderer An editor renderer
  *
  * @constructor
  **/

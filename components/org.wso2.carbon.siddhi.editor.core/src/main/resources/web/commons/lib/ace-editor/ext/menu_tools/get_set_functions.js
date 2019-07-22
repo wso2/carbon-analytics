@@ -49,14 +49,14 @@ define(function(require, exports, module) {
  * @author <a href="mailto:matthewkastor@gmail.com">
  *  Matthew Christopher Kastor-Inare III </a><br />
  *  ☭ Hial Atropa!! ☭
- * @param {object} editor The server instance
+ * @param {object} editor The editor instance
  * @return {array} Returns an array of objects. Each object contains the
  *  following properties: functionName, parentObj, and parentName. The
  *  function name will be the name of a method beginning with the string
  *  `set` which was found. The parent object will be a reference to the
  *  object having the method matching the function name. The parent name
  *  will be a string representing the identifier of the parent object e.g.
- *  `server`, `session`, or `renderer`.
+ *  `editor`, `session`, or `renderer`.
  */
 module.exports.getSetFunctions = function getSetFunctions (editor) {
     /**

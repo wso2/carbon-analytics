@@ -79,7 +79,7 @@ define(['require', 'jquery', 'log', 'backbone', 'file_browser'],
                             }
                         }
                         var downloadURL = window.location.protocol + "//" + window.location.host +
-                            "/server/docker/download?q=" + encodeURIComponent(JSON.stringify(payload));
+                            "/editor/docker/download?q=" + encodeURIComponent(JSON.stringify(payload));
                         $('#frm-download').attr('src', downloadURL);
                     });
 

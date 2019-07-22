@@ -53,7 +53,7 @@ public class DockerUtils {
     private static final String SIDDHI_FILES_DIR = "siddhi-files";
     private static final String README_FILE = "README.md";
     private static final String DOCKER_COMPOSE_FILE = "docker-compose.yml";
-    private static final String DOCKER_COMPOSE_EDITOR_FILE = "docker-compose.server.yml";
+    private static final String DOCKER_COMPOSE_EDITOR_FILE = "docker-compose.editor.yml";
     private static final String DOCKER_COMPOSE_WORKER_FILE = "docker-compose.worker.yml";
     private static final String PRODUCT_VERSION_TOKEN = "\\{\\{PRODUCT_VERSION}}";
     private final ConfigProvider configProvider;
@@ -124,7 +124,7 @@ public class DockerUtils {
         // Add readme.md and the respective docker-compose.yml files.
         files.put(README_FILE, Paths.get(RUNTIME_PATH, RESOURCES_DIR, README_FILE));
         files.put(DOCKER_COMPOSE_FILE, Paths.get(RUNTIME_PATH, RESOURCES_DIR,
-                "server".equals(profile) ? DOCKER_COMPOSE_EDITOR_FILE : DOCKER_COMPOSE_WORKER_FILE));
+                "editor".equals(profile) ? DOCKER_COMPOSE_EDITOR_FILE : DOCKER_COMPOSE_WORKER_FILE));
 
         // Add selected Siddhi files.
         for (String siddhiFile : siddhiFiles) {

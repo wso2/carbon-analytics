@@ -18,7 +18,7 @@
  */
 define(["jquery"], function (jQuery) {
     var self = {};
-    self.siddhiStoreUrl = window.location.protocol + "//" + window.location.host + "/server/stores/query";
+    self.siddhiStoreUrl = window.location.protocol + "//" + window.location.host + "/editor/stores/query";
     self.retrieveStoresQuery = function (appName, query, successCallback, errorCallback) {
         jQuery.ajax({
             async: true,

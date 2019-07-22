@@ -137,7 +137,7 @@ define(["ace/ace", "jquery", "./constants", "./utils", "ace/snippets", "ace/rang
          */
 
         /*
-         * Snippets to be used in the ace server at the start of a statement
+         * Snippets to be used in the ace editor at the start of a statement
          */
         var generalInitialSnippets = aceModules.snippetManager.parseSnippetFile("#Define Statements\n" +
             "snippet define-Stream\n" +
@@ -195,7 +195,7 @@ define(["ace/ace", "jquery", "./constants", "./utils", "ace/snippets", "ace/rang
         );
 
         /*
-         * Snippets to be used in the ace server at the start of a statement and at the start of a query inside partitions
+         * Snippets to be used in the ace editor at the start of a statement and at the start of a query inside partitions
          */
         var queryInitialSnippets = aceModules.snippetManager.parseSnippetFile(
             "snippet query-Filter\n" +
@@ -923,7 +923,7 @@ define(["ace/ace", "jquery", "./constants", "./utils", "ace/snippets", "ace/rang
              * The relevant part of the query the user is in will be tested again using regexps
              *
              * @param {string[]} regexResults Regex results from the regex test in the main rule base matching
-             * @param {string} fullEditorText Complete server text before the cursor
+             * @param {string} fullEditorText Complete editor text before the cursor
              */
             self.$aggregationDefinition = function (regexResults, fullEditorText) {
                 // Find the part of the query in which the cursor is at
@@ -956,7 +956,7 @@ define(["ace/ace", "jquery", "./constants", "./utils", "ace/snippets", "ace/rang
              * Handle the standard stream suggestions for aggregation definitions
              * @private
              * @param {string[]} regexResults Array of groups from the regex execution of the aggregation definition
-             * @param {string} fullEditorText Complete server text before the cursor
+             * @param {string} fullEditorText Complete editor text before the cursor
              */
             function handleAggregationDefinitionStandardStreamSuggestions(regexResults, fullEditorText) {
                 var aggregationInput = regexResults[4];
@@ -1070,7 +1070,7 @@ define(["ace/ace", "jquery", "./constants", "./utils", "ace/snippets", "ace/rang
              *
              * @private
              * @param {string[]} regexResults Array of groups from the regex execution of the aggregation definition
-             * @param {string} fullEditorText Complete server text before the cursor
+             * @param {string} fullEditorText Complete editor text before the cursor
              */
             function handleAggregationDefinitionSelectionSuggestions(regexResults, fullEditorText) {
                 var aggregationSelectionClause = regexResults[6];
@@ -1139,7 +1139,7 @@ define(["ace/ace", "jquery", "./constants", "./utils", "ace/snippets", "ace/rang
              *
              * @private
              * @param {string[]} regexResults Array of groups from the regex execution of the aggregation definition
-             * @param {string} fullEditorText Complete server text before the cursor
+             * @param {string} fullEditorText Complete editor text before the cursor
              */
             function handleAggregationDefinitionGroupBySuggestions(regexResults, fullEditorText) {
                 var groupByClause = regexResults[8];
@@ -1175,7 +1175,7 @@ define(["ace/ace", "jquery", "./constants", "./utils", "ace/snippets", "ace/rang
              *
              * @private
              * @param {string[]} regexResults Array of groups from the regex execution of the aggregation definition
-             * @param {string} fullEditorText Complete server text before the cursor
+             * @param {string} fullEditorText Complete editor text before the cursor
              */
             function handleAggregationDefinitionBySuggestions(regexResults, fullEditorText) {
                 var byClause = regexResults[11];
@@ -1233,7 +1233,7 @@ define(["ace/ace", "jquery", "./constants", "./utils", "ace/snippets", "ace/rang
              * The relevant part of the query the user is in will be tested again using regexps
              *
              * @param {string[]} regexResults Regex results from the regex test in the main rule base matching
-             * @param {string} fullEditorText Complete server text before the cursor
+             * @param {string} fullEditorText Complete editor text before the cursor
              */
             self.$query = function (regexResults, fullEditorText) {
                 // Find the part of the query in which the cursor is at
@@ -1281,7 +1281,7 @@ define(["ace/ace", "jquery", "./constants", "./utils", "ace/snippets", "ace/rang
              *
              * @private
              * @param {string[]} regexResults Array of groups from the regex execution of the query
-             * @param {string} fullEditorText Complete server text before the cursor
+             * @param {string} fullEditorText Complete editor text before the cursor
              */
             function handleQueryInputSuggestions(regexResults, fullEditorText) {
                 var queryInput = regexResults[4];
@@ -1524,7 +1524,7 @@ define(["ace/ace", "jquery", "./constants", "./utils", "ace/snippets", "ace/rang
              *
              * @private
              * @param {string[]} regexResults Array of groups from the regex execution of the query
-             * @param {string} fullEditorText Complete server text before the cursor
+             * @param {string} fullEditorText Complete editor text before the cursor
              */
             function handleQuerySelectionSuggestions(regexResults, fullEditorText) {
                 var querySelectionClause = regexResults[6];
@@ -1597,7 +1597,7 @@ define(["ace/ace", "jquery", "./constants", "./utils", "ace/snippets", "ace/rang
              *
              * @private
              * @param {string[]} regexResults Array of groups from the regex execution of the query
-             * @param {string} fullEditorText Complete server text before the cursor
+             * @param {string} fullEditorText Complete editor text before the cursor
              */
             function handleGroupBySuggestions(regexResults, fullEditorText) {
                 var groupByClause = regexResults[8];
@@ -1637,7 +1637,7 @@ define(["ace/ace", "jquery", "./constants", "./utils", "ace/snippets", "ace/rang
              *
              * @private
              * @param {string[]} regexResults Array of groups from the regex execution of the query
-             * @param {string} fullEditorText Complete server text before the cursor
+             * @param {string} fullEditorText Complete editor text before the cursor
              */
             function handleHavingSuggestions(regexResults, fullEditorText) {
                 var havingClause = regexResults[10];
@@ -1676,7 +1676,7 @@ define(["ace/ace", "jquery", "./constants", "./utils", "ace/snippets", "ace/rang
              *
              * @private
              * @param {string[]} regexResults Array of groups from the regex execution of the query
-             * @param {string} fullEditorText Complete server text before the cursor
+             * @param {string} fullEditorText Complete editor text before the cursor
              */
             function handleOrderBySuggestions(regexResults, fullEditorText) {
                 var orderByClause = regexResults[12];
@@ -1715,7 +1715,7 @@ define(["ace/ace", "jquery", "./constants", "./utils", "ace/snippets", "ace/rang
              *
              * @private
              * @param {string[]} regexResults Array of groups from the regex execution of the query
-             * @param {string} fullEditorText Complete server text before the cursor
+             * @param {string} fullEditorText Complete editor text before the cursor
              */
             function handleLimitSuggestions(regexResults, fullEditorText) {
                 var limitClause = regexResults[14];
@@ -1806,7 +1806,7 @@ define(["ace/ace", "jquery", "./constants", "./utils", "ace/snippets", "ace/rang
              *
              * @private
              * @param {string[]} regexResults Array of groups from the regex execution of the query
-             * @param {string} fullEditorText Complete server text before the cursor
+             * @param {string} fullEditorText Complete editor text before the cursor
              */
             function handleQueryInsertIntoSuggestions(regexResults, fullEditorText) {
                 var streamOutputClause = regexResults[18];
@@ -1898,7 +1898,7 @@ define(["ace/ace", "jquery", "./constants", "./utils", "ace/snippets", "ace/rang
              *
              * @private
              * @param {string[]} regexResults Array of groups from the regex execution of the query
-             * @param {string} fullEditorText Complete server text before the cursor
+             * @param {string} fullEditorText Complete editor text before the cursor
              */
             function handleQueryUpdateOrInsertIntoDeleteUpdateSuggestions(regexResults, fullEditorText) {
                 var tableOutputClause = regexResults[18];
@@ -2018,7 +2018,7 @@ define(["ace/ace", "jquery", "./constants", "./utils", "ace/snippets", "ace/rang
              * Get the current partition index
              * Partition index indicates the index in the order they are found in the siddhi App
              *
-             * @param {string} fullEditorText The full server text before the cursor
+             * @param {string} fullEditorText The full editor text before the cursor
              * @return {number}
              */
             function getTheCurrentPartitionIndex(fullEditorText) {
@@ -2177,7 +2177,7 @@ define(["ace/ace", "jquery", "./constants", "./utils", "ace/snippets", "ace/rang
              *
              * @private
              * @param {string[]} regexResults Array of groups from the regex execution of the query
-             * @param {string} fullEditorText Complete server text before the cursor
+             * @param {string} fullEditorText Complete editor text before the cursor
              * @param {int} attributePriority priority to be set as attribute priority
              * @param {int} streamPriority priority to be set as stream priority
              */
@@ -2210,7 +2210,7 @@ define(["ace/ace", "jquery", "./constants", "./utils", "ace/snippets", "ace/rang
              *
              * @private
              * @param {string[]} regexResults Array of groups from the regex execution of the query
-             * @param {string} fullEditorText Complete server text before the cursor
+             * @param {string} fullEditorText Complete editor text before the cursor
              * @param {int} attributePriority priority to be set as attribute priority
              * @param {int} streamPriority priority to be set as stream priority
              * @param {string[]} sourceTypes Source types to search for. Should be a subset of [constants.STREAMS,
@@ -2242,7 +2242,7 @@ define(["ace/ace", "jquery", "./constants", "./utils", "ace/snippets", "ace/rang
              *
              * @private
              * @param {string[]} regexResults Array of groups from the regex execution of the query
-             * @param {string} fullEditorText Complete server text before the cursor
+             * @param {string} fullEditorText Complete editor text before the cursor
              * @param {int} attributePriority priority to be set as attribute priority
              * @param {int} streamPriority priority to be set as stream priority
              */
@@ -2273,7 +2273,7 @@ define(["ace/ace", "jquery", "./constants", "./utils", "ace/snippets", "ace/rang
              *
              * @private
              * @param {string[]} regexResults Array of groups from the regex execution of the query
-             * @param {string} fullEditorText Complete server text before the cursor
+             * @param {string} fullEditorText Complete editor text before the cursor
              * @param {int} attributePriority priority to be set as attribute priority
              * @param {int} streamPriority priority to be set as stream priority
              */
@@ -2302,7 +2302,7 @@ define(["ace/ace", "jquery", "./constants", "./utils", "ace/snippets", "ace/rang
              *
              * @private
              * @param {string[]} regexResults Array of groups from the regex execution of the query
-             * @param {string} fullEditorText Complete server text before the cursor
+             * @param {string} fullEditorText Complete editor text before the cursor
              * @param {int} attributePriority priority to be set as attribute priority
              * @param {int} streamPriority priority to be set as stream priority
              * @param {string[]} sourceTypes Source types to search for. Should be a subset of
@@ -2334,7 +2334,7 @@ define(["ace/ace", "jquery", "./constants", "./utils", "ace/snippets", "ace/rang
              *
              * @private
              * @param {string[]} regexResults Array of groups from the regex execution of the query
-             * @param {string} fullEditorText Complete server text before the cursor
+             * @param {string} fullEditorText Complete editor text before the cursor
              * @param {string[]} sources Array of streams of which attributes will be added
              * @param {int} attributePriority priority to be set as attribute priority
              * @param {int} sourcePriority priority to be set as source priority
@@ -2394,7 +2394,7 @@ define(["ace/ace", "jquery", "./constants", "./utils", "ace/snippets", "ace/rang
              *
              * @private
              * @param {string[]} regexResults Array of groups from the regex execution of the query
-             * @param {string} fullEditorText Complete server text before the cursor
+             * @param {string} fullEditorText Complete editor text before the cursor
              * @param {string[]} sourceToStreamMap Array of streams of which attributes will be added
              * @param {int} attributePriority priority to be set as attribute priority
              * @param {int} sourcePriority priority to be set as source priority
@@ -2659,7 +2659,7 @@ define(["ace/ace", "jquery", "./constants", "./utils", "ace/snippets", "ace/rang
              *
              * @private
              * @param {string[]} regexResults Array of groups from the regex execution of the query
-             * @param {string} fullEditorText Complete server text before the cursor
+             * @param {string} fullEditorText Complete editor text before the cursor
              * @param {Object|Object[]} sourceName name of the source of which attributes are returned
              * @param {string[]} sourceTypes Source types to search for. Should be a subset of [constants.STREAMS,
              * constants.AGGREGATIONS, constants.EVENT_TABLES, constants.WINDOWS, constants.EVAL_SCRIPTS,
@@ -2727,7 +2727,7 @@ define(["ace/ace", "jquery", "./constants", "./utils", "ace/snippets", "ace/rang
              *
              * @private
              * @param {string[]} regexResults Array of groups from the regex execution of the query
-             * @param {string} fullEditorText Complete server text before the cursor
+             * @param {string} fullEditorText Complete editor text before the cursor
              * @param {string} sourceName name of the source of which attributes are returned
              * @param {string[]} sourceTypes Source types to search for. Should be a subset of
              * [constants.STREAMS, constants.EVENT_TABLES, constants.WINDOWS, constants.EVAL_SCRIPTS,
@@ -2752,7 +2752,7 @@ define(["ace/ace", "jquery", "./constants", "./utils", "ace/snippets", "ace/rang
              *
              * @private
              * @param {string[]} regexResults Array of groups from the regex execution of the query
-             * @param {string} fullEditorText Complete server text before the cursor
+             * @param {string} fullEditorText Complete editor text before the cursor
              * @param {string} sourceName Name of the source to fetch
              * @param {string[]} sourceTypes Source types to search for. Should be a subset of
              * [constants.STREAMS, constants.EVENT_TABLES, constants.WINDOWS, constants.EVAL_SCRIPTS,
@@ -3061,7 +3061,7 @@ define(["ace/ace", "jquery", "./constants", "./utils", "ace/snippets", "ace/rang
 
         /**
          * Prepare a snippet from the processor
-         * Snippets are objects that can be passed into the ace server to add snippets to the completions provided
+         * Snippets are objects that can be passed into the ace editor to add snippets to the completions provided
          *
          * @private
          * @param {Object} processorMetaData The processor object with relevant parameters

@@ -533,7 +533,7 @@ public class EditorMicroservice implements Microservice {
             if (null != fileNamePath) {
                 String siddhiAppName = fileNamePath.toString().replace(Constants.SIDDHI_APP_FILE_EXTENSION, "");
                 if (null != EditorDataHolder.getDebugProcessorService().getSiddhiAppRuntimeHolder(siddhiAppName)) {
-                    //making the app faulty until the file gets deployed again for server usage purposes
+                    //making the app faulty until the file gets deployed again for editor usage purposes
                     EditorDataHolder.getDebugProcessorService().getSiddhiAppRuntimeHolder(siddhiAppName).setMode(
                             DebugRuntime.Mode.FAULTY);
                 }

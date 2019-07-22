@@ -43,7 +43,7 @@ import javax.websocket.server.ServerEndpoint;
  * EditorConsoleService Websocket - Client connect to this
  */
 @Component(
-        name = "server-console-service",
+        name = "editor-console-service",
         service = WebSocketEndpoint.class,
         immediate = true
 )
@@ -93,7 +93,7 @@ public class EditorConsoleService implements WebSocketEndpoint {
         if (webSocketConnection.isOpen()) {
             try {
                 ConsoleLogEvent clientCloseEvent = new ConsoleLogEvent();
-                clientCloseEvent.setMessage("Connection closed (Possibly due to opening the server in a "
+                clientCloseEvent.setMessage("Connection closed (Possibly due to opening the editor in a "
                         + "new Tab/Window) ! Refresh to reconnect to the console.");
                 clientCloseEvent.setLevel("ERROR");
                 clientCloseEvent.setFqcn(EditorConsoleService.class.getCanonicalName());

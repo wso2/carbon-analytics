@@ -46,7 +46,7 @@ var EventEmitter = require("./lib/event_emitter").EventEmitter;
 /**
  * Creates a new `BackgroundTokenizer` object.
  * @param {Tokenizer} tokenizer The tokenizer to use
- * @param {Editor} editor The server to associate with
+ * @param {Editor} editor The editor to associate with
  *
  * @constructor
  **/

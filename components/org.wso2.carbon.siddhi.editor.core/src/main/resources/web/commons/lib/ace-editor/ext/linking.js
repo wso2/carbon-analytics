@@ -30,7 +30,7 @@
 
 define(function(require, exports, module) {
 
-var Editor = require("ace/server").Editor;
+var Editor = require("ace/editor").Editor;
 
 require("../config").defineOptions(Editor.prototype, "editor", {
     enableLinking: {

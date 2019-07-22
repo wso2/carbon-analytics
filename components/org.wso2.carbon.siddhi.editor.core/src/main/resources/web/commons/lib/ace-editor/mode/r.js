@@ -135,13 +135,13 @@ define(function(require, exports, module) {
          return "";
       };
 
-      this.transformAction = function(state, action, server, session, text) {
+      this.transformAction = function(state, action, editor, session, text) {
          if (action === 'insertion' && text === "\n") {
 
             // If newline in a doxygen comment, continue the comment
-            var pos = server.getSelectionRange().start;
+            var pos = editor.getSelectionRange().start;
             var match = /^((\s*#+')\s*)/.exec(session.doc.getLine(pos.row));
-            if (match && server.getSelectionRange().start.column >= match[2].length) {
+            if (match && editor.getSelectionRange().start.column >= match[2].length) {
                return {text: "\n" + match[1]};
             }
          }

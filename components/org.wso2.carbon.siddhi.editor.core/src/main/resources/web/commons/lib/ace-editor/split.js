@@ -126,9 +126,9 @@ var Split = function(container, theme, splits) {
     };
 
     /**
-     * @param {Number} idx The index of the server you want
+     * @param {Number} idx The index of the editor you want
      *
-     * Returns the server identified by the index `idx`.
+     * Returns the editor identified by the index `idx`.
      *
      **/
     this.getEditor = function(idx) {
@@ -137,7 +137,7 @@ var Split = function(container, theme, splits) {
 
     /**
      * 
-     * Returns the current server.
+     * Returns the current editor.
      * @returns {Editor}
      **/
     this.getCurrentEditor = function() {
@@ -145,7 +145,7 @@ var Split = function(container, theme, splits) {
     };
 
     /** 
-     * Focuses the current server.
+     * Focuses the current editor.
      * @related Editor.focus
      **/
     this.focus = function() {
@@ -153,7 +153,7 @@ var Split = function(container, theme, splits) {
     };
 
     /** 
-     * Blurs the current server.
+     * Blurs the current editor.
      * @related Editor.blur
      **/
     this.blur = function() {
@@ -177,8 +177,8 @@ var Split = function(container, theme, splits) {
      * 
      * @param {String} keybinding 
      * 
-     * Sets the keyboard handler for the server.
-     * @related server.setKeyboardHandler
+     * Sets the keyboard handler for the editor.
+     * @related editor.setKeyboardHandler
      **/
     this.setKeyboardHandler = function(keybinding) {
         this.$editors.forEach(function(editor) {
@@ -243,9 +243,9 @@ var Split = function(container, theme, splits) {
    /** 
      * 
      * @param {EditSession} session The new edit session
-     * @param {Number} idx The server's index you're interested in
+     * @param {Number} idx The editor's index you're interested in
      * 
-     * Sets a new [[EditSession `EditSession`]] for the indicated server.
+     * Sets a new [[EditSession `EditSession`]] for the indicated editor.
      * @related Editor.setSession
      **/
     this.setSession = function(session, idx) {
@@ -260,7 +260,7 @@ var Split = function(container, theme, splits) {
         // split. If it is, we have to clone the session as two editors using
         // the same session can cause terrible side effects (e.g. UndoQueue goes
         // wrong). This also gives the user of Split the possibility to treat
-        // each session on each split server different.
+        // each session on each split editor different.
         var isUsed = this.$editors.some(function(editor) {
            return editor.session === session;
         });
@@ -270,7 +270,7 @@ var Split = function(container, theme, splits) {
         }
         editor.setSession(session);
 
-        // Return the session set on the server. This might be a cloned one.
+        // Return the session set on the editor. This might be a cloned one.
         return session;
     };
 
@@ -299,7 +299,7 @@ var Split = function(container, theme, splits) {
     };
 
    /**  
-     * Resizes the server.
+     * Resizes the editor.
      **/
     this.resize = function() {
         var width = this.$container.clientWidth;

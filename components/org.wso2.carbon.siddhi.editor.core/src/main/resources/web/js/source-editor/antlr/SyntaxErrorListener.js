@@ -23,7 +23,7 @@ var ErrorListener = require("../antlr4-js-runtime/error/ErrorListener").ErrorLis
  * Inherits from ErrorListener in the antlr4 JS runtime
  *
  * Only recognizing syntax errors is done by this listener
- * Errors are added to the ace server gutter in the main js
+ * Errors are added to the ace editor gutter in the main js
  *
  * Semantic errors such as invalid extension names is not recognized by this listener
  * These errors are recognized using a server side ajax call to validate using the Siddhi engine

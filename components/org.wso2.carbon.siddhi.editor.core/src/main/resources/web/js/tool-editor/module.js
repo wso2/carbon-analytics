@@ -15,7 +15,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-define(['require', 'app/tool-server/views/module'],
+define(['require', 'app/tool-editor/views/module'],
     function (require,views) {
         return  {
             Views: views
