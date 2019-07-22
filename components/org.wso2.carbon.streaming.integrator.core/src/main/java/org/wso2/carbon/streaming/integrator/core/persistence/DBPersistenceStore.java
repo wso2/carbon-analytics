@@ -30,8 +30,8 @@ import org.wso2.carbon.streaming.integrator.core.persistence.util.DBPersistenceS
 import org.wso2.carbon.streaming.integrator.core.persistence.util.ExecutionInfo;
 import org.wso2.carbon.streaming.integrator.core.persistence.util.PersistenceConstants;
 import org.wso2.carbon.streaming.integrator.core.persistence.util.RDBMSConfiguration;
-import org.wso2.siddhi.core.exception.CannotClearSiddhiAppStateException;
-import org.wso2.siddhi.core.util.persistence.PersistenceStore;
+import io.siddhi.core.exception.CannotClearSiddhiAppStateException;
+import io.siddhi.core.util.persistence.PersistenceStore;
 
 import java.io.IOException;
 import java.sql.Blob;

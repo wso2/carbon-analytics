@@ -16,6 +16,9 @@
 
 package org.wso2.carbon.analytics.test.osgi;
 
+import io.siddhi.core.SiddhiAppRuntime;
+import io.siddhi.core.SiddhiManager;
+import io.siddhi.core.exception.CannotRestoreSiddhiAppStateException;
 import org.apache.log4j.Logger;
 import org.awaitility.Awaitility;
 import org.ops4j.pax.exam.Configuration;
@@ -31,16 +34,13 @@ import org.testng.annotations.Test;
 import org.wso2.carbon.analytics.test.osgi.util.SiddhiAppUtil;
 import org.wso2.carbon.container.CarbonContainerFactory;
 import org.wso2.carbon.streaming.integrator.core.internal.StreamProcessorDataHolder;
-import org.wso2.siddhi.core.SiddhiAppRuntime;
-import org.wso2.siddhi.core.SiddhiManager;
-import org.wso2.siddhi.core.exception.CannotRestoreSiddhiAppStateException;
 
-import javax.inject.Inject;
 import java.io.File;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.concurrent.TimeUnit;
+import javax.inject.Inject;
 
 import static org.wso2.carbon.container.options.CarbonDistributionOption.carbonDistribution;
 import static org.wso2.carbon.container.options.CarbonDistributionOption.copyFile;

@@ -17,6 +17,12 @@
  */
 package org.wso2.carbon.streaming.integrator.core.internal;
 
+import io.siddhi.core.SiddhiManager;
+import io.siddhi.core.config.StatisticsConfiguration;
+import io.siddhi.core.util.SiddhiComponentActivator;
+import io.siddhi.core.util.persistence.IncrementalPersistenceStore;
+import io.siddhi.core.util.persistence.PersistenceStore;
+import io.siddhi.core.util.statistics.StatisticsManager;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceRegistration;
 import org.osgi.service.component.annotations.Activate;
@@ -38,12 +44,11 @@ import org.wso2.carbon.kernel.config.model.CarbonConfiguration;
 import org.wso2.carbon.si.metrics.core.SPMetricsFactory;
 import org.wso2.carbon.si.metrics.core.internal.SPMetricsDataHolder;
 import org.wso2.carbon.streaming.integrator.common.EventStreamService;
+import org.wso2.carbon.streaming.integrator.common.HAStateChangeListener;
+import org.wso2.carbon.streaming.integrator.common.SiddhiAppRuntimeService;
 import org.wso2.carbon.streaming.integrator.common.utils.config.FileConfigManager;
 import org.wso2.carbon.streaming.integrator.core.DeploymentMode;
-import org.wso2.carbon.streaming.integrator.common.HAStateChangeListener;
 import org.wso2.carbon.streaming.integrator.core.NodeInfo;
-import org.wso2.carbon.streaming.integrator.common.SiddhiAppRuntimeService;
-import org.wso2.carbon.streaming.integrator.core.distribution.DistributionService;
 import org.wso2.carbon.streaming.integrator.core.ha.HAManager;
 import org.wso2.carbon.streaming.integrator.core.ha.exception.HAModeException;
 import org.wso2.carbon.streaming.integrator.core.ha.util.CoordinationConstants;
@@ -53,12 +58,6 @@ import org.wso2.carbon.streaming.integrator.core.persistence.PersistenceManager;
 import org.wso2.carbon.streaming.integrator.core.persistence.beans.PersistenceConfigurations;
 import org.wso2.carbon.streaming.integrator.core.persistence.exception.PersistenceStoreConfigurationException;
 import org.wso2.carbon.streaming.integrator.core.persistence.util.PersistenceConstants;
-import org.wso2.siddhi.core.SiddhiManager;
-import org.wso2.siddhi.core.config.StatisticsConfiguration;
-import org.wso2.siddhi.core.util.SiddhiComponentActivator;
-import org.wso2.siddhi.core.util.persistence.IncrementalPersistenceStore;
-import org.wso2.siddhi.core.util.persistence.PersistenceStore;
-import org.wso2.siddhi.core.util.statistics.StatisticsManager;
 
 import java.io.File;
 import java.util.Map;
@@ -71,8 +70,7 @@ import static org.wso2.carbon.streaming.integrator.core.impl.utils.Constants.HA;
 import static org.wso2.carbon.streaming.integrator.core.impl.utils.Constants.PERIOD;
 
 /**
- * Service component to consume CarbonRuntime instance which has been registered as an OSGi service
- * by Carbon Kernel.
+ * Service component to consume CarbonRuntime instance which has been registered as an OSGi service by Carbon Kernel.
  */
 @Component(
         name = "stream-processor-core-service",
@@ -90,8 +88,7 @@ public class ServiceComponent {
 
 
     /**
-     * This is the activation method of ServiceComponent. This will be called when its references are
-     * satisfied.
+     * This is the activation method of ServiceComponent. This will be called when its references are satisfied.
      *
      * @param bundleContext the bundle context instance of this bundle.
      * @throws Exception this will be thrown if an issue occurs while executing the activate method
@@ -100,7 +97,7 @@ public class ServiceComponent {
     protected void start(BundleContext bundleContext) throws Exception {
         log.debug("Service Component is activated");
 
-        String runningFileName = System.getProperty(SiddhiAppProcessorConstants.SYSTEM_PROP_RUN_FILE);
+        String siddhiAppsReference = System.getProperty(SiddhiAppProcessorConstants.SYSTEM_PROP_RUN_SIDDHI_APPS);
         ConfigProvider configProvider = StreamProcessorDataHolder.getInstance().getConfigProvider();
         // Create Stream Processor Service
         StreamProcessorDataHolder.setStreamProcessorService(new StreamProcessorService());
@@ -129,8 +126,8 @@ public class ServiceComponent {
                 } else {
                     throw new PersistenceStoreConfigurationException("Persistence Store class with name "
                             + persistenceStoreClassName + " is invalid. The given class has to implement either " +
-                            "org.wso2.siddhi.core.util.persistence.PersistenceStore or " +
-                            "org.wso2.siddhi.core.util.persistence.IncrementalPersistenceStore.");
+                            "io.siddhi.core.util.persistence.PersistenceStore or " +
+                            "io.siddhi.core.util.persistence.IncrementalPersistenceStore.");
                 }
                 if (log.isDebugEnabled()) {
                     log.debug(persistenceStoreClassName + " chosen as persistence store");
@@ -163,36 +160,41 @@ public class ServiceComponent {
         StreamProcessorDataHolder.setSiddhiManager(siddhiManager);
         StreamProcessorDataHolder.setStatisticsConfiguration(statisticsConfiguration);
 
-        File runningFile;
+        File siddhiAppFileReference;
 
-        if (runningFileName != null) {
-            StreamProcessorDataHolder.getInstance().setRuntimeMode(SiddhiAppProcessorConstants.RuntimeMode.RUN_FILE);
-            if (runningFileName.trim().equals("")) {
+        if (siddhiAppsReference != null) {
+            if (siddhiAppsReference.trim().equals("")) {
                 // Can't Continue. We shouldn't be here. that means there is a bug in the startup script.
                 log.error("Error: Can't get target file to run. System property {} is not set.",
-                        SiddhiAppProcessorConstants.SYSTEM_PROP_RUN_FILE);
-                StreamProcessorDataHolder.getInstance().setRuntimeMode(SiddhiAppProcessorConstants.RuntimeMode.ERROR);
-                return;
-            }
-            runningFile = new File(runningFileName);
-            if (!runningFile.exists()) {
-                log.error("Error: File " + runningFile.getName() + " not found in the given location.");
-                StreamProcessorDataHolder.getInstance().setRuntimeMode(SiddhiAppProcessorConstants.RuntimeMode.ERROR);
-                return;
-            }
-            try {
-                StreamProcessorDeployer.deploySiddhiQLFile(runningFile);
-            } catch (Exception e) {
-                StreamProcessorDataHolder.getInstance().setRuntimeMode(SiddhiAppProcessorConstants.RuntimeMode.ERROR);
-                log.error(e.getMessage(), e);
-                return;
-            }
-        } else {
-            StreamProcessorDataHolder.getInstance().setRuntimeMode(SiddhiAppProcessorConstants.RuntimeMode.SERVER);
-        }
+                        SiddhiAppProcessorConstants.SYSTEM_PROP_RUN_SIDDHI_APPS);
+            } else {
+                siddhiAppFileReference = new File(siddhiAppsReference);
 
-        if (log.isDebugEnabled()) {
-            log.debug("Runtime mode is set to : " + StreamProcessorDataHolder.getInstance().getRuntimeMode());
+                if (!siddhiAppFileReference.exists()) {
+                    log.error("Error: File " + siddhiAppFileReference.getName() + " not found in the given location " +
+                            "\"" + siddhiAppFileReference.getPath() + "\" ");
+                }
+
+                if (siddhiAppFileReference.isDirectory()) {
+                    File[] siddhiAppFileArray = siddhiAppFileReference.listFiles();
+                    if (siddhiAppFileArray != null) {
+                        for (File siddhiApp : siddhiAppFileArray) {
+                            try {
+                                StreamProcessorDeployer.deploySiddhiQLFile(siddhiApp);
+                            } catch (Exception e) {
+                                log.error("Exception occurred when deploying the Siddhi App: " + siddhiApp.getName(), e);
+                            }
+                        }
+                    }
+                } else {
+                    try {
+                        StreamProcessorDeployer.deploySiddhiQLFile(siddhiAppFileReference);
+                    } catch (Exception e) {
+                        log.error("Exception occurred when deploying the Siddhi App: " +
+                                siddhiAppFileReference.getName(), e);
+                    }
+                }
+            }
         }
 
         streamServiceRegistration = bundleContext.registerService(EventStreamService.class.getName(),
@@ -202,20 +204,20 @@ public class ServiceComponent {
 
         NodeInfo nodeInfo = new NodeInfo(DeploymentMode.SINGLE_NODE, configProvider.getConfigurationObject(
                 CarbonConfiguration.class).getId());
-        bundleContext.registerService(NodeInfo.class.getName(), nodeInfo,null);
+        bundleContext.registerService(NodeInfo.class.getName(), nodeInfo, null);
         StreamProcessorDataHolder.setNodeInfo(nodeInfo);
         StreamProcessorDataHolder.getInstance().setBundleContext(bundleContext);
 
-        serviceComponentActivated = true;
 
         if (clusterComponentActivated) {
             setUpClustering(StreamProcessorDataHolder.getClusterCoordinator());
         }
+
     }
 
     /**
-     * This is the deactivation method of ServiceComponent. This will be called when this component
-     * is being stopped or references are satisfied during runtime.
+     * This is the deactivation method of ServiceComponent. This will be called when this component is being stopped or
+     * references are satisfied during runtime.
      *
      * @throws Exception this will be thrown if an issue occurs while executing the de-activate method
      */
@@ -332,7 +334,8 @@ public class ServiceComponent {
             policy = ReferencePolicy.DYNAMIC,
             unbind = "unregisterClusterCoordinator"
     )
-    protected void registerClusterCoordinator(ClusterCoordinator clusterCoordinator) throws ConfigurationException {
+    protected void registerClusterCoordinator(ClusterCoordinator clusterCoordinator) throws
+            ConfigurationException {
         if (clusterCoordinator != null) {
             clusterComponentActivated = true;
             StreamProcessorDataHolder.setClusterCoordinator(clusterCoordinator);
@@ -358,7 +361,7 @@ public class ServiceComponent {
                     throw new HAModeException("More than two nodes can not be used in the minimum HA mode. " +
                             "Use another clustering mode, change the groupId or disable clustering.");
                 }
-                log.info("WSO2 Stream Processor Starting in Two Node Minimum HA Deployment");;
+                log.info("WSO2 Stream Processor Starting in Two Node Minimum HA Deployment");
                 StreamProcessorDataHolder.setIsStatisticsEnabled(
                         SPMetricsDataHolder.getInstance().getMetricManagementService().isEnabled());
                 StatisticsManager statisticsManager = StreamProcessorDataHolder.getStatisticsConfiguration().
@@ -394,8 +397,7 @@ public class ServiceComponent {
     }
 
     /**
-     * Get the ServerEventListener service.
-     * This is the bind method that gets called for ServerEventListener service
+     * Get the ServerEventListener service. This is the bind method that gets called for ServerEventListener service
      * registration that satisfy the policy.
      *
      * @param serverEventListener the server listeners that is registered as a service.
@@ -409,11 +411,11 @@ public class ServiceComponent {
     )
     protected void registerServerListener(ServerEventListener serverEventListener) {
         StreamProcessorDataHolder.setServerListener(serverEventListener);
-        if(StreamProcessorDataHolder.getHAManager() != null){
-            if(StreamProcessorDataHolder.getHAManager().isActiveNode()) {
+        if (StreamProcessorDataHolder.getHAManager() != null) {
+            if (StreamProcessorDataHolder.getHAManager().isActiveNode()) {
                 serverEventListener.start();
             }
-        }else {
+        } else {
             serverEventListener.start();
         }
 
@@ -424,8 +426,7 @@ public class ServiceComponent {
     }
 
     /**
-     * Get the HAStateChangeListener service.
-     * This is the bind method that gets called for HAStateChangeListener service
+     * Get the HAStateChangeListener service. This is the bind method that gets called for HAStateChangeListener service
      * registration that satisfy the policy.
      *
      * @param haStateChangeListener the ha state change server listeners that is registered as a service.

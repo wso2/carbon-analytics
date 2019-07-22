@@ -18,6 +18,12 @@
 
 package org.wso2.carbon.streaming.integrator.core.internal;
 
+import io.siddhi.core.SiddhiManager;
+import io.siddhi.core.config.StatisticsConfiguration;
+import io.siddhi.core.stream.input.source.SourceHandlerManager;
+import io.siddhi.core.stream.output.sink.SinkHandlerManager;
+import io.siddhi.core.table.record.RecordTableHandlerManager;
+import io.siddhi.core.util.statistics.StatisticsManager;
 import org.osgi.framework.BundleContext;
 import org.wso2.carbon.analytics.permissions.PermissionProvider;
 import org.wso2.carbon.cluster.coordinator.service.ClusterCoordinator;
@@ -25,20 +31,10 @@ import org.wso2.carbon.config.provider.ConfigProvider;
 import org.wso2.carbon.databridge.commons.ServerEventListener;
 import org.wso2.carbon.datasource.core.api.DataSourceService;
 import org.wso2.carbon.kernel.CarbonRuntime;
-import org.wso2.carbon.si.metrics.core.internal.service.MetricsServiceComponent;
 import org.wso2.carbon.streaming.integrator.common.HAStateChangeListener;
 import org.wso2.carbon.streaming.integrator.core.NodeInfo;
-import org.wso2.carbon.streaming.integrator.core.distribution.DistributionService;
 import org.wso2.carbon.streaming.integrator.core.ha.HAManager;
 import org.wso2.carbon.streaming.integrator.core.internal.beans.DeploymentConfig;
-import org.wso2.carbon.streaming.integrator.core.internal.util.SiddhiAppProcessorConstants;
-import org.wso2.siddhi.core.SiddhiManager;
-import org.wso2.siddhi.core.config.StatisticsConfiguration;
-import org.wso2.siddhi.core.stream.input.source.SourceHandlerManager;
-import org.wso2.siddhi.core.stream.output.sink.SinkHandlerManager;
-import org.wso2.siddhi.core.table.record.RecordTableHandlerManager;
-import org.wso2.siddhi.core.util.statistics.StatisticsManager;
-import org.wso2.siddhi.core.util.statistics.metrics.Level;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -62,7 +58,6 @@ public class StreamProcessorDataHolder {
     private static RecordTableHandlerManager recordTableHandlerManager;
     private static PermissionProvider permissionProvider;
     private CarbonRuntime carbonRuntime;
-    private SiddhiAppProcessorConstants.RuntimeMode runtimeMode = SiddhiAppProcessorConstants.RuntimeMode.ERROR;
     private BundleContext bundleContext;
     private ConfigProvider configProvider;
     private static StatisticsConfiguration statisticsConfiguration;
@@ -229,21 +224,12 @@ public class StreamProcessorDataHolder {
     }
 
     /**
-     * This method is for setting the CarbonRuntime service. This method is used by
-     * ServiceComponent.
+     * This method is for setting the CarbonRuntime service. This method is used by ServiceComponent.
      *
      * @param carbonRuntime The reference being passed through ServiceComponent
      */
     public void setCarbonRuntime(CarbonRuntime carbonRuntime) {
         this.carbonRuntime = carbonRuntime;
-    }
-
-    public SiddhiAppProcessorConstants.RuntimeMode getRuntimeMode() {
-        return runtimeMode;
-    }
-
-    public void setRuntimeMode(SiddhiAppProcessorConstants.RuntimeMode runtimeMode) {
-        this.runtimeMode = runtimeMode;
     }
 
     public BundleContext getBundleContext() {

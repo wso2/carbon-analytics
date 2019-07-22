@@ -19,7 +19,7 @@
 package org.wso2.carbon.siddhi.editor.core.util.designview.utilities;
 
 import org.apache.log4j.Logger;
-import org.wso2.siddhi.query.api.SiddhiElement;
+import io.siddhi.query.api.SiddhiElement;
 
 /**
  * Has methods involved in converting Siddhi elements to Design view Config objects

@@ -18,7 +18,7 @@
 package org.wso2.carbon.streaming.integrator.common.utils.config;
 
 import org.apache.log4j.Logger;
-import org.wso2.siddhi.core.util.config.ConfigReader;
+import io.siddhi.core.util.config.ConfigReader;
 
 import java.util.HashMap;
 import java.util.Map;

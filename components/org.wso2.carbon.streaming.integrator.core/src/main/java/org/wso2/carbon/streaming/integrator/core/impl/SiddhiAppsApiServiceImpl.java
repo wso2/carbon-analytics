@@ -38,26 +38,26 @@ import org.wso2.carbon.streaming.integrator.core.model.SiddhiAppRevision;
 import org.wso2.carbon.streaming.integrator.core.model.SiddhiAppStatus;
 import org.wso2.carbon.streaming.integrator.core.util.StatsEnable;
 import org.wso2.msf4j.Request;
-import org.wso2.siddhi.core.SiddhiAppRuntime;
-import org.wso2.siddhi.core.SiddhiManager;
-import org.wso2.siddhi.core.stream.input.source.Source;
-import org.wso2.siddhi.core.stream.output.sink.Sink;
-import org.wso2.siddhi.core.util.snapshot.PersistenceReference;
-import org.wso2.siddhi.core.util.statistics.metrics.Level;
-import org.wso2.siddhi.query.api.SiddhiApp;
-import org.wso2.siddhi.query.api.SiddhiElement;
-import org.wso2.siddhi.query.api.annotation.Annotation;
-import org.wso2.siddhi.query.api.annotation.Element;
-import org.wso2.siddhi.query.api.definition.*;
-import org.wso2.siddhi.query.api.execution.ExecutionElement;
-import org.wso2.siddhi.query.api.execution.partition.Partition;
-import org.wso2.siddhi.query.api.execution.partition.PartitionType;
-import org.wso2.siddhi.query.api.execution.partition.RangePartitionType;
-import org.wso2.siddhi.query.api.execution.partition.ValuePartitionType;
-import org.wso2.siddhi.query.api.execution.query.Query;
-import org.wso2.siddhi.query.api.execution.query.selection.OutputAttribute;
-import org.wso2.siddhi.query.api.expression.AttributeFunction;
-import org.wso2.siddhi.query.compiler.SiddhiCompiler;
+import io.siddhi.core.SiddhiAppRuntime;
+import io.siddhi.core.SiddhiManager;
+import io.siddhi.core.stream.input.source.Source;
+import io.siddhi.core.stream.output.sink.Sink;
+import io.siddhi.core.util.snapshot.PersistenceReference;
+import io.siddhi.core.util.statistics.metrics.Level;
+import io.siddhi.query.api.SiddhiApp;
+import io.siddhi.query.api.SiddhiElement;
+import io.siddhi.query.api.annotation.Annotation;
+import io.siddhi.query.api.annotation.Element;
+import io.siddhi.query.api.definition.*;
+import io.siddhi.query.api.execution.ExecutionElement;
+import io.siddhi.query.api.execution.partition.Partition;
+import io.siddhi.query.api.execution.partition.PartitionType;
+import io.siddhi.query.api.execution.partition.RangePartitionType;
+import io.siddhi.query.api.execution.partition.ValuePartitionType;
+import io.siddhi.query.api.execution.query.Query;
+import io.siddhi.query.api.execution.query.selection.OutputAttribute;
+import io.siddhi.query.api.expression.AttributeFunction;
+import io.siddhi.query.compiler.SiddhiCompiler;
 
 import java.io.File;
 import java.net.URI;
@@ -427,7 +427,7 @@ public class SiddhiAppsApiServiceImpl extends SiddhiAppsApiService {
                         SiddhiAppMetrics appMetrics = new SiddhiAppMetrics();
                         appMetrics.setAge(age);
                         appMetrics.appName(siddhiAppFileEntry.getKey());
-                        appMetrics.isStatEnabled(siddiAppData.getSiddhiAppRuntime().getRootMetricsLevel());
+                        appMetrics.isStatEnabled(siddiAppData.getSiddhiAppRuntime().getStatisticsLevel());
                         appMetrics.status(siddiAppData.isActive() ?
                                 SiddhiAppProcessorConstants.SIDDHI_APP_STATUS_ACTIVE :
                                 SiddhiAppProcessorConstants.SIDDHI_APP_STATUS_INACTIVE);
@@ -446,7 +446,7 @@ public class SiddhiAppsApiServiceImpl extends SiddhiAppsApiService {
                     }
                     appMetrics.appName(siddhiAppFileEntry.getKey());
                     if (siddiAppData.isActive()) {
-                        appMetrics.isStatEnabled(siddiAppData.getSiddhiAppRuntime().getRootMetricsLevel());
+                        appMetrics.isStatEnabled(siddiAppData.getSiddhiAppRuntime().getStatisticsLevel());
                     } else {
                         appMetrics.isStatEnabled(Level.OFF);
                     }
@@ -473,17 +473,17 @@ public class SiddhiAppsApiServiceImpl extends SiddhiAppsApiService {
             boolean appStatChanged = false;
             if (statsEnabled.getEnabledSiddhiStatLevel() != null) {
                 if (statsEnabled.getEnabledSiddhiStatLevel().compareTo(siddiAppData.getSiddhiAppRuntime().
-                        getRootMetricsLevel()) != 0) {
-                    siddiAppData.getSiddhiAppRuntime().enableStats(statsEnabled.getEnabledSiddhiStatLevel());
+                        getStatisticsLevel()) != 0) {
+                    siddiAppData.getSiddhiAppRuntime().setStatisticsLevel(statsEnabled.getEnabledSiddhiStatLevel());
                     appStatChanged = true;
                 }
             }
             if (statsEnabled.getStatsEnable() !=
-                    (siddiAppData.getSiddhiAppRuntime().getRootMetricsLevel().compareTo(Level.OFF) != 0)) {
+                    (siddiAppData.getSiddhiAppRuntime().getStatisticsLevel().compareTo(Level.OFF) != 0)) {
                 if (statsEnabled.getStatsEnable()) {
-                    siddiAppData.getSiddhiAppRuntime().enableStats(Level.DETAIL);
+                    siddiAppData.getSiddhiAppRuntime().setStatisticsLevel(Level.DETAIL);
                 } else {
-                    siddiAppData.getSiddhiAppRuntime().enableStats(Level.OFF);
+                    siddiAppData.getSiddhiAppRuntime().setStatisticsLevel(Level.OFF);
                 }
                 appStatChanged = true;
             }
@@ -510,8 +510,8 @@ public class SiddhiAppsApiServiceImpl extends SiddhiAppsApiService {
                 .getSiddhiAppMap();
         for (Map.Entry siddhiAppEntry : siddhiAppMap.entrySet()) {
             SiddhiAppData siddiAppData = (SiddhiAppData) siddhiAppEntry.getValue();
-            if (statsEnabled.compareTo(siddiAppData.getSiddhiAppRuntime().getRootMetricsLevel()) != 0) {
-                siddiAppData.getSiddhiAppRuntime().enableStats(statsEnabled);
+            if (statsEnabled.compareTo(siddiAppData.getSiddhiAppRuntime().getStatisticsLevel()) != 0) {
+                siddiAppData.getSiddhiAppRuntime().setStatisticsLevel(statsEnabled);
                 if (log.isDebugEnabled()) {
                     log.debug("Stats has been sucessfull updated for siddhi app :" + siddhiAppEntry.getKey());
                 }

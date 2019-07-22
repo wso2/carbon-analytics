@@ -18,36 +18,30 @@
 
 package org.wso2.carbon.streaming.integrator.core.ha;
 
+import io.siddhi.core.util.snapshot.state.State;
+import io.siddhi.core.util.snapshot.state.StateFactory;
 import org.apache.log4j.Logger;
-import org.wso2.siddhi.core.event.Event;
-import org.wso2.siddhi.core.stream.output.sink.SinkHandler;
-import org.wso2.siddhi.core.stream.output.sink.SinkHandlerCallback;
-import org.wso2.siddhi.query.api.definition.StreamDefinition;
+import io.siddhi.core.event.Event;
+import io.siddhi.core.stream.output.sink.SinkHandler;
+import io.siddhi.core.stream.output.sink.SinkHandlerCallback;
+import io.siddhi.query.api.definition.StreamDefinition;
 
 import java.util.Map;
 
 /**
  * Implementation of {@link SinkHandler} used for 2 node minimum HA
  */
-public class HACoordinationSinkHandler extends SinkHandler {
+public class HACoordinationSinkHandler extends SinkHandler<HACoordinationSinkHandler.SinkState> {
     private static final Logger log = Logger.getLogger(HACoordinationSinkHandler.class);
 
     private boolean isActiveNode;
     private long lastPublishedEventTimestamp = 0L;
-    private String sinkHandlerElementId;
-
-
-    /**
-     * Constructor.
-     *
-     */
-    public HACoordinationSinkHandler() {
-    }
+//    private String sinkHandlerElementId;
 
     @Override
-    public void init(String sinkHandlerElementId, StreamDefinition streamDefinition,
-                     SinkHandlerCallback sinkHandlerCallback) {
-        this.sinkHandlerElementId = sinkHandlerElementId;
+    public StateFactory<SinkState> init(StreamDefinition streamDefinition, SinkHandlerCallback sinkHandlerCallback) {
+//        this.sinkHandlerElementId = sinkHandlerElementId;
+        return SinkState::new;
     }
 
     /**
@@ -55,9 +49,10 @@ public class HACoordinationSinkHandler extends SinkHandler {
      *
      * @param event the event to be published.
      * @param sinkHandlerCallback callback that would publish events.
+     * @param state state object
      */
     @Override
-    public void handle(Event event, SinkHandlerCallback sinkHandlerCallback) {
+    public void handle(Event event, SinkHandlerCallback sinkHandlerCallback, SinkState state) {
         if (isActiveNode) {
             lastPublishedEventTimestamp = event.getTimestamp();
             sinkHandlerCallback.mapAndSend(event);
@@ -69,9 +64,10 @@ public class HACoordinationSinkHandler extends SinkHandler {
      *
      * @param events the event array to be published.
      * @param sinkHandlerCallback callback that would publish events.
+     * @param state state object
      */
     @Override
-    public void handle(Event[] events, SinkHandlerCallback sinkHandlerCallback) {
+    public void handle(Event[] events, SinkHandlerCallback sinkHandlerCallback, SinkState state) {
         if (isActiveNode) {
             lastPublishedEventTimestamp = events[events.length - 1].getTimestamp();
             sinkHandlerCallback.mapAndSend(events);
@@ -103,20 +99,25 @@ public class HACoordinationSinkHandler extends SinkHandler {
         return lastPublishedEventTimestamp;
     }
 
-    @Override
-    public Map<String, Object> currentState() {
-        // Do Nothing
-        return null;
-    }
+//    @Override
+//    public String getElementId() {
+//        return sinkHandlerElementId;
+//    }
 
-    @Override
-    public void restoreState(Map<String, Object> map) {
-        // Do Nothing
-    }
+    class SinkState extends State {
+        @Override
+        public boolean canDestroy() {
+            return false;
+        }
 
-    @Override
-    public String getElementId() {
-        return sinkHandlerElementId;
-    }
+        @Override
+        public Map<String, Object> snapshot() {
+            return null;
+        }
 
+        @Override
+        public void restore(Map<String, Object> state) {
+
+        }
+    }
 }

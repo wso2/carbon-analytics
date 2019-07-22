@@ -33,13 +33,13 @@ import org.wso2.carbon.metrics.core.MetricManagementService;
 import org.wso2.carbon.metrics.core.MetricService;
 import org.wso2.carbon.metrics.core.jmx.MetricsMXBean;
 import org.wso2.carbon.streaming.integrator.common.SiddhiAppRuntimeService;
-import org.wso2.siddhi.core.SiddhiAppRuntime;
-import org.wso2.siddhi.core.event.Event;
-import org.wso2.siddhi.core.stream.input.InputHandler;
-import org.wso2.siddhi.core.stream.output.StreamCallback;
-import org.wso2.siddhi.core.util.EventPrinter;
-import org.wso2.siddhi.core.util.SiddhiTestHelper;
-import org.wso2.siddhi.core.util.statistics.metrics.Level;
+import io.siddhi.core.SiddhiAppRuntime;
+import io.siddhi.core.event.Event;
+import io.siddhi.core.stream.input.InputHandler;
+import io.siddhi.core.stream.output.StreamCallback;
+import io.siddhi.core.util.EventPrinter;
+import io.siddhi.core.util.SiddhiTestHelper;
+import io.siddhi.core.util.statistics.metrics.Level;
 
 import javax.inject.Inject;
 import javax.management.JMX;
@@ -194,9 +194,9 @@ public class SiddhiMetricsTestcase {
 //        Assert.assertTrue(metricsMXBean.getMetricsCount() > 0);
 //        Assert.assertEquals(metricsMXBean.getRootLevel(), Level.INFO.name());
 //        Assert.assertEquals(metricsMXBean.getDefaultSource(), "wso2-si");
-//        Assert.assertEquals(metricsMXBean.getMetricLevel("org.wso2.siddhi.SiddhiApps.TestApp.Siddhi.Streams." +
+//        Assert.assertEquals(metricsMXBean.getMetricLevel("io.siddhi.SiddhiApps.TestApp.Siddhi.Streams." +
 //                "cseEventStream.throughput"), Level.INFO.name());
-//        Assert.assertEquals(metricsMXBean.getMetricLevel("org.wso2.siddhi.SiddhiApps.TestApp.Siddhi.Streams" +
+//        Assert.assertEquals(metricsMXBean.getMetricLevel("io.siddhi.SiddhiApps.TestApp.Siddhi.Streams" +
 //                ".cseEventStream2.throughput"), Level.INFO.name());
 //        siddhiAppRuntime.shutdown();
 //    }
@@ -204,7 +204,7 @@ public class SiddhiMetricsTestcase {
     private void testMBean(String MBeanName) throws Exception {
 
         SiddhiAppRuntime siddhiAppRuntime = siddhiAppRuntimeService.getActiveSiddhiAppRuntimes().get("MetricsTestApp2");
-        siddhiAppRuntime.enableStats(Level.DETAIL);
+        siddhiAppRuntime.setStatisticsLevel(Level.DETAIL);
 
         siddhiAppRuntime.addCallback("outputStream", new StreamCallback() {
             @Override

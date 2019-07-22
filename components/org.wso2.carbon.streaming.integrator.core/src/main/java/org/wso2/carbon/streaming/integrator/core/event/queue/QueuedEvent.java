@@ -18,7 +18,7 @@
 
 package org.wso2.carbon.streaming.integrator.core.event.queue;
 
-import org.wso2.siddhi.core.event.Event;
+import io.siddhi.core.event.Event;
 import edu.umd.cs.findbugs.annotations.SuppressWarnings;
 
 public class QueuedEvent {

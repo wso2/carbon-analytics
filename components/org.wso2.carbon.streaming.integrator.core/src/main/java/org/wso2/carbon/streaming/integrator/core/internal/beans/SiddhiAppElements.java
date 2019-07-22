@@ -18,7 +18,7 @@
  */
 package org.wso2.carbon.streaming.integrator.core.internal.beans;
 
-import org.wso2.siddhi.query.api.execution.partition.PartitionType;
+import io.siddhi.query.api.execution.partition.PartitionType;
 
 import java.util.Map;
 

@@ -19,7 +19,7 @@
 package org.wso2.carbon.streaming.integrator.core.ha.transport;
 
 import org.apache.commons.pool.BaseKeyedPoolableObjectFactory;
-import org.wso2.siddhi.core.exception.ConnectionUnavailableException;
+import io.siddhi.core.exception.ConnectionUnavailableException;
 
 /**
  * The abstract class that needs to be implemented when supporting a new non-secure transport

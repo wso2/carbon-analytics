@@ -18,18 +18,18 @@
 
 package org.wso2.carbon.siddhi.editor.core.util;
 
-import org.wso2.siddhi.core.executor.function.FunctionExecutor;
-import org.wso2.siddhi.core.query.processor.stream.StreamProcessor;
-import org.wso2.siddhi.core.query.processor.stream.function.StreamFunctionProcessor;
-import org.wso2.siddhi.core.query.processor.stream.window.WindowProcessor;
-import org.wso2.siddhi.core.query.selector.attribute.aggregator.AttributeAggregator;
-import org.wso2.siddhi.core.query.selector.attribute.aggregator.incremental.IncrementalAttributeAggregator;
+import io.siddhi.core.executor.function.FunctionExecutor;
+import io.siddhi.core.query.processor.stream.StreamProcessor;
+import io.siddhi.core.query.processor.stream.function.StreamFunctionProcessor;
+import io.siddhi.core.query.processor.stream.window.WindowProcessor;
+import io.siddhi.core.query.selector.attribute.aggregator.AttributeAggregatorExecutor;
+import io.siddhi.core.query.selector.attribute.aggregator.incremental.IncrementalAttributeAggregator;
+import io.siddhi.core.stream.input.source.Source;
+import io.siddhi.core.stream.input.source.SourceMapper;
+import io.siddhi.core.stream.output.sink.Sink;
+import io.siddhi.core.stream.output.sink.SinkMapper;
+import io.siddhi.core.table.record.AbstractRecordTable;
 import org.wso2.carbon.utils.Utils;
-import org.wso2.siddhi.core.stream.input.source.Source;
-import org.wso2.siddhi.core.stream.input.source.SourceMapper;
-import org.wso2.siddhi.core.stream.output.sink.Sink;
-import org.wso2.siddhi.core.stream.output.sink.SinkMapper;
-import org.wso2.siddhi.core.table.record.AbstractRecordTable;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -85,7 +85,7 @@ public class Constants {
         SUPER_CLASS_MAP = new HashMap<>();
         SUPER_CLASS_MAP.put(FUNCTION_EXECUTOR, FunctionExecutor.class);
         SUPER_CLASS_MAP.put(INCREMENTAL_AGGREGATOR, IncrementalAttributeAggregator.class);
-        SUPER_CLASS_MAP.put(ATTRIBUTE_AGGREGATOR, AttributeAggregator.class);
+        SUPER_CLASS_MAP.put(ATTRIBUTE_AGGREGATOR, AttributeAggregatorExecutor.class);
         SUPER_CLASS_MAP.put(WINDOW_PROCESSOR, WindowProcessor.class);
         SUPER_CLASS_MAP.put(STREAM_FUNCTION_PROCESSOR, StreamFunctionProcessor.class);
         SUPER_CLASS_MAP.put(STREAM_PROCESSOR, StreamProcessor.class);
@@ -97,9 +97,9 @@ public class Constants {
 
         // Populating the package name map
         PACKAGE_NAME_MAP = new HashMap<>();
-        PACKAGE_NAME_MAP.put(FUNCTION_EXECUTOR, "org.wso2.siddhi.core.executor.function");
+        PACKAGE_NAME_MAP.put(FUNCTION_EXECUTOR, "io.siddhi.core.executor.function");
         PACKAGE_NAME_MAP.put(ATTRIBUTE_AGGREGATOR,
-                "org.wso2.siddhi.core.query.selector.attribute.aggregator");
-        PACKAGE_NAME_MAP.put(WINDOW_PROCESSOR, "org.wso2.siddhi.core.query.processor.stream.window");
+                "io.siddhi.core.query.selector.attribute.aggregator");
+        PACKAGE_NAME_MAP.put(WINDOW_PROCESSOR, "io.siddhi.core.query.processor.stream.window");
     }
 }

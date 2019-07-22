@@ -26,9 +26,9 @@
 //import org.wso2.carbon.streaming.integrator.core.ha.HACoordinationRecordTableHandler;
 //import org.wso2.carbon.streaming.integrator.core.ha.HACoordinationRecordTableHandlerManager;
 //import org.wso2.carbon.streaming.integrator.core.ha.RecordTableData;
-//import org.wso2.siddhi.core.exception.ConnectionUnavailableException;
-//import org.wso2.siddhi.core.table.record.RecordTableHandlerCallback;
-//import org.wso2.siddhi.query.api.definition.TableDefinition;
+//import io.siddhi.core.exception.ConnectionUnavailableException;
+//import io.siddhi.core.table.record.RecordTableHandlerCallback;
+//import io.siddhi.query.api.definition.TableDefinition;
 //
 //import java.util.ArrayList;
 //import java.util.HashMap;

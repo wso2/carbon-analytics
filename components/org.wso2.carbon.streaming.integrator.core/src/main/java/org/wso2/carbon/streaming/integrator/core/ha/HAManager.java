@@ -34,15 +34,15 @@ import org.wso2.carbon.streaming.integrator.core.internal.StreamProcessorDataHol
 import org.wso2.carbon.streaming.integrator.core.internal.beans.DeploymentConfig;
 import org.wso2.carbon.streaming.integrator.core.internal.beans.EventSyncClientPoolConfig;
 import org.wso2.carbon.streaming.integrator.core.persistence.PersistenceManager;
-import org.wso2.siddhi.core.SiddhiAppRuntime;
-import org.wso2.siddhi.core.SiddhiManager;
-import org.wso2.siddhi.core.exception.CannotRestoreSiddhiAppStateException;
-import org.wso2.siddhi.core.stream.input.InputHandler;
-import org.wso2.siddhi.core.stream.input.source.SourceHandler;
-import org.wso2.siddhi.core.stream.output.sink.SinkHandler;
-import org.wso2.siddhi.core.table.record.RecordTableHandler;
-import org.wso2.siddhi.core.util.transport.BackoffRetryCounter;
-import org.wso2.siddhi.core.util.statistics.metrics.Level;
+import io.siddhi.core.SiddhiAppRuntime;
+import io.siddhi.core.SiddhiManager;
+import io.siddhi.core.exception.CannotRestoreSiddhiAppStateException;
+import io.siddhi.core.stream.input.InputHandler;
+import io.siddhi.core.stream.input.source.SourceHandler;
+import io.siddhi.core.stream.output.sink.SinkHandler;
+import io.siddhi.core.table.record.RecordTableHandler;
+import io.siddhi.core.util.transport.BackoffRetryCounter;
+import io.siddhi.core.util.statistics.metrics.Level;
 
 import java.util.HashMap;
 import java.util.List;
@@ -189,7 +189,7 @@ public class HAManager {
                 try {
                     ((HACoordinationSourceHandler) sourceHandler).setAsActive();
                 } catch (Throwable t) {
-                    log.error("HA Deployment: Error when connecting to source " + sourceHandler.getElementId() +
+                    log.error("HA Deployment: Error when connecting to source " + sourceHandler.getId() +
                             " while changing from passive state to active, skipping the source. ", t);
                     continue;
                 }
@@ -231,7 +231,7 @@ public class HAManager {
                         handler.setAsActive();
                     }
                 } catch (Throwable t) {
-                    log.error("HA Deployment: Error when connecting to sink " + sinkHandler.getElementId() +
+                    log.error("HA Deployment: Error when connecting to sink " + sinkHandler.getId() +
                             " while changing from passive state to active, skipping the sink. ", t);
                     continue;
                 }

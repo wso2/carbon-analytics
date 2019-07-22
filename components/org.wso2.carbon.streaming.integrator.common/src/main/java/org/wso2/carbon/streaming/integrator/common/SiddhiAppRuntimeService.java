@@ -19,8 +19,8 @@
 
 package org.wso2.carbon.streaming.integrator.common;
 
-import org.wso2.siddhi.core.SiddhiAppRuntime;
-import org.wso2.siddhi.core.util.statistics.metrics.Level;
+import io.siddhi.core.SiddhiAppRuntime;
+import io.siddhi.core.util.statistics.metrics.Level;
 
 import java.util.Map;
 
