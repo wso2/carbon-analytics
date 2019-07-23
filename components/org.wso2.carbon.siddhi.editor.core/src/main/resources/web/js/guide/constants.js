@@ -17,7 +17,7 @@
  */
 
 /**
- * Constants to be used by the siddhi server tour guide
+ * Constants to be used by the siddhi editor tour guide
  */
 define(function () {
 
@@ -30,7 +30,7 @@ define(function () {
         CONTENT: '@App:name(\'SweetFactory\')\n' +
             '@App:description(\'Description of the plan\')\n' +
             '\n' +
-            '-- Please refer to https://docs.wso2.com/display/SP430/Quick+Start+Guide on getting started with SP server. \n' +
+            '-- Please refer to https://docs.wso2.com/display/SP430/Quick+Start+Guide on getting started with SP editor. \n' +
             '\n' +
             'define stream SweetProductionStream (name string, amount long);\n' +
             '@sink(type = \'log\', \n' +

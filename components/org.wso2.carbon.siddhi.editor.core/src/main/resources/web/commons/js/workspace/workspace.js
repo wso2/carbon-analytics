@@ -64,7 +64,7 @@ define(['ace/ace', 'jquery', 'lodash', 'log','dialogs','./service-client','welco
             };
 
             this.saveFileBrowserBased = function saveFile() {
-                var editor = ace.edit('siddhi-server');
+                var editor = ace.edit('siddhi-editor');
                 var code = editor.getValue();
                 var filename = "untitled";
                 var match = plan_regex.exec(code);
@@ -76,7 +76,7 @@ define(['ace/ace', 'jquery', 'lodash', 'log','dialogs','./service-client','welco
             };
 
             this.saveFile = function saveFile() {
-                var editor = ace.edit('siddhi-server');
+                var editor = ace.edit('siddhi-editor');
                 var code = editor.getValue();
                 var filename = "untitled";
                 var match = plan_regex.exec(code);
@@ -87,7 +87,7 @@ define(['ace/ace', 'jquery', 'lodash', 'log','dialogs','./service-client','welco
                 filePath = (filePath.slice(-1) === '/') ? filePath + filename : filePath + '/' + filename;
                 $.ajax({
                     type: "POST",
-                    url: window.location.protocol + "//" + window.location.host + "/server/save",
+                    url: window.location.protocol + "//" + window.location.host + "/editor/save",
                     data: JSON.stringify({
                         siddhiApp: code,
                         filePath: filePath
@@ -762,7 +762,7 @@ define(['ace/ace', 'jquery', 'lodash', 'log','dialogs','./service-client','welco
             //Run hint tour
             app.commandManager.registerHandler('tour-guide', this.runGuide, this);
 
-            app.commandManager.registerHandler('deploy-to-server', this.handleDeploy, this);
+            app.commandManager.registerHandler('deploy-to-editor', this.handleDeploy, this);
         }
     });
 

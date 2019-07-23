@@ -69,14 +69,14 @@ public class StartupComponent {
                             e.getMessage(), e);
                 }
                 String startingURL = entry.getValue().getScheme() + "://" + hostname + ":" + entry.getValue()
-                        .getPort() + "/server";
+                        .getPort() + "/editor";
                 logger.info("Editor Started on : " + startingURL);
             }
         });
-        logger.debug("Microservices server registered to startup component of server");
+        logger.debug("Microservices server registered to startup component of editor");
     }
 
     protected void unsetMicroservicesServer(MicroservicesServer microservicesServer) {
-        logger.debug("Microservices server unregistered from startup component of server");
+        logger.debug("Microservices server unregistered from startup component of editor");
     }
 }

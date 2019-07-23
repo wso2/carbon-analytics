@@ -147,7 +147,7 @@ var MouseHandler = function(editor) {
         var self = this;
         var onMouseMove = function(e) {
             if (!e) return;
-            // if server is loaded inside iframe, and mouseup event is outside
+            // if editor is loaded inside iframe, and mouseup event is outside
             // we won't recieve it, so we cancel on first mousemove without button
             if (useragent.isWebKit && !e.which && self.releaseMouse)
                 return self.releaseMouse();

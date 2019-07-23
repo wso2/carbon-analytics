@@ -18,7 +18,7 @@
  *       behavior.
  *
  * Events:
- *  'vim-mode-change' - raised on the server anytime the current mode changes,
+ *  'vim-mode-change' - raised on the editor anytime the current mode changes,
  *                      Event object: {mode: "visual", subMode: "linewise"}
  *
  * Code structure:
@@ -4842,7 +4842,7 @@ dom.importCssString(".normal-mode .ace_cursor{\
           }
         }
         if (!commandName) {
-          showConfirm(cm, 'Not an server command ":' + input + '"');
+          showConfirm(cm, 'Not an editor command ":' + input + '"');
           return;
         }
         try {
@@ -6075,7 +6075,7 @@ dom.importCssString(".normal-mode .ace_cursor{\
       });
       cm.ace.renderer.setStyle("normal-mode", !getVim(cm).insertMode);
       editor.renderer.$cursorLayer.drawCursor = this.drawCursor.bind(cm);
-      // renderVirtualNumbers.attach(server);
+      // renderVirtualNumbers.attach(editor);
       this.updateMacCompositionHandlers(editor, true);
     },
     detach: function(editor) {
@@ -6086,7 +6086,7 @@ dom.importCssString(".normal-mode .ace_cursor{\
       editor.$vimModeHandler = null;
       editor.renderer.$cursorLayer.drawCursor = null;
       editor.renderer.setStyle("normal-mode", false);
-      // renderVirtualNumbers.detach(server);
+      // renderVirtualNumbers.detach(editor);
       this.updateMacCompositionHandlers(editor, false);
     },
     getStatusText: function(editor) {

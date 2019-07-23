@@ -24,7 +24,7 @@ define(["jquery"], function (jQuery) {
     self.HTTP_POST = "POST";
     self.HTTP_PUT = "PUT";
     self.HTTP_DELETE = "DELETE";
-    self.siddhiAppsUrl = window.location.protocol + "//" + window.location.host + "/server";
+    self.siddhiAppsUrl = window.location.protocol + "//" + window.location.host + "/editor";
 
     self.retrieveSampleEvent = function (appName, streamName, eventFormat, successCallback, errorCallback) {
         jQuery.ajax({

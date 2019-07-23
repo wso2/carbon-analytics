@@ -45,112 +45,112 @@ define(['require', 'log', 'jquery', 'backbone', 'tool_palette/tool', 'tool_palet
                         id: "stream",
                         className: "stream-drag",
                         title: "Stream",
-                        icon: "/server/images/streams.svg",
+                        icon: "/editor/images/streams.svg",
                         toolGroupName: "Flow Constructs"
                     },
                     {
                         id: "source",
                         className: "source-drag",
                         title: "Source",
-                        icon: "/server/images/source.svg",
+                        icon: "/editor/images/source.svg",
                         toolGroupName: "I/O"
                     },
                     {
                         id: "sink",
                         className: "sink-drag",
                         title: "Sink",
-                        icon: "/server/images/sink.svg",
+                        icon: "/editor/images/sink.svg",
                         toolGroupName: "I/O"
                     },
                     {
                         id: "table",
                         className: "table-drag",
                         title: "Table",
-                        icon: "/server/images/table.svg",
+                        icon: "/editor/images/table.svg",
                         toolGroupName: "Collections"
                     },
                     {
                         id: "window",
                         className: "window-drag",
                         title: "Window",
-                        icon: "/server/images/window.svg",
+                        icon: "/editor/images/window.svg",
                         toolGroupName: "Collections"
                     },
                     {
                         id: "trigger",
                         className: "trigger-drag",
                         title: "Trigger",
-                        icon: "/server/images/trigger.svg",
+                        icon: "/editor/images/trigger.svg",
                         toolGroupName: "Flow Constructs"
                     },
                     {
                         id: "aggregation",
                         className: "aggregation-drag",
                         title: "Aggregation",
-                        icon: "/server/images/aggregate.svg",
+                        icon: "/editor/images/aggregate.svg",
                         toolGroupName: "Collections"
                     },
                     {
                         id: "projection-query",
                         className: "projection-query-drag",
                         title: "Projection",
-                        icon: "/server/images/query.svg",
+                        icon: "/editor/images/query.svg",
                         toolGroupName: "Queries"
                     },
                     {
                         id: "filter-query",
                         className: "filter-query-drag",
                         title: "Filter",
-                        icon: "/server/images/filter-query.svg",
+                        icon: "/editor/images/filter-query.svg",
                         toolGroupName: "Queries"
                     },
                     {
                         id: "window-query",
                         className: "window-query-drag",
                         title: "Window",
-                        icon: "/server/images/window-query.svg",
+                        icon: "/editor/images/window-query.svg",
                         toolGroupName: "Queries"
                     },
                     {
                         id: "function-query",
                         className: "function-query-drag",
                         title: "Function",
-                        icon: "/server/images/function-query.svg",
+                        icon: "/editor/images/function-query.svg",
                         toolGroupName: "Queries"
                     },
                     {
                         id: "join-query",
                         className: "join-query-drag",
                         title: "Join",
-                        icon: "/server/images/join-query.svg",
+                        icon: "/editor/images/join-query.svg",
                         toolGroupName: "Queries"
                     },
                     {
                         id: "pattern-query",
                         className: "pattern-query-drag",
                         title: "Pattern",
-                        icon: "/server/images/pattern-query.svg",
+                        icon: "/editor/images/pattern-query.svg",
                         toolGroupName: "Queries"
                     },
                     {
                         id : "sequence-query",
                         className : "sequence-query-drag",
                         title : "Sequence",
-                        icon : "/server/images/sequence-query.svg",
+                        icon : "/editor/images/sequence-query.svg",
                         toolGroupName: "Queries"
                     },
                     {
                         id: "partition",
                         className: "partition-drag",
                         title: "Partition",
-                        icon: "/server/images/partition.svg",
+                        icon: "/editor/images/partition.svg",
                         toolGroupName: "Flow Constructs"
                     },
                     {
                         id: "function",
                         className: "function-drag",
                         title: "Function",
-                        icon: "/server/images/function.svg",
+                        icon: "/editor/images/function.svg",
                         toolGroupName: "Functions"
                     }
                 ];

@@ -82,7 +82,7 @@ function DefaultHandlers(mouseHandler) {
         }
 
         this.mousedownEvent.time = Date.now();
-        // if this click caused the server to be focused should not clear the
+        // if this click caused the editor to be focused should not clear the
         // selection
         if (inSelection && !editor.isFocused()) {
             editor.focus();

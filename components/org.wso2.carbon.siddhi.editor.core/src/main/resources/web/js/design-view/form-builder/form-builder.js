@@ -23,7 +23,7 @@ define(['require', 'log', 'jquery', 'lodash', 'formUtils', 'streamForm', 'tableF
         WindowFilterProjectionQueryForm, PatternQueryForm, JoinQueryForm, PartitionForm, SequenceQueryForm,
         SourceForm, SinkForm, FunctionForm, AppAnnotationForm, Constants) {
 
-        // common properties for the JSON server
+        // common properties for the JSON editor
         JSONEditor.defaults.options.theme = 'bootstrap3';
         JSONEditor.defaults.options.iconlib = 'bootstrap3';
         JSONEditor.defaults.options.disable_edit_json = true;

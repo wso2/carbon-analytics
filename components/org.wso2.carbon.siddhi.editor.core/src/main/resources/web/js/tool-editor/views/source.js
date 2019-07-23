@@ -15,17 +15,17 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-define(['require', 'log', 'lodash', 'jquery', 'event_channel', 'app/source-server/server', 'ace/ace',
+define(['require', 'log', 'lodash', 'jquery', 'event_channel', 'app/source-editor/editor', 'ace/ace',
         'ace/ext/beautify/siddhi_rules'],
     function (require, log, _, $, EventChannel, SiddhiEditor, ace, beautify) {
 
         /**
          * @class SourceView
          * @constructor
-         * @class SourceView  Wraps the Ace server for source view
+         * @class SourceView  Wraps the Ace editor for source view
          * @param {Object} args - Rendering args for the view
-         * @param {String} args.container - selector for div element to render ace server
-         * @param {String} [args.content] - initial content for the server
+         * @param {String} args.container - selector for div element to render ace editor
+         * @param {String} [args.content] - initial content for the editor
          */
         var SourceView = function (args) {
             this._options = args;
@@ -91,8 +91,8 @@ define(['require', 'log', 'lodash', 'jquery', 'event_channel', 'app/source-serve
 
 
         /**
-         * Set the content of text server.
-         * @param {String} content - content for the server.
+         * Set the content of text editor.
+         * @param {String} content - content for the editor.
          *
          */
         SourceView.prototype.setContent = function(content){
@@ -119,7 +119,7 @@ define(['require', 'log', 'lodash', 'jquery', 'event_channel', 'app/source-serve
         };
 
         /**
-         * Binds a shortcut to ace server so that it will trigger the command on source view upon key press.
+         * Binds a shortcut to ace editor so that it will trigger the command on source view upon key press.
          * All the commands registered app's command manager will be bound to source view upon render.
          *
          * @param command {Object}

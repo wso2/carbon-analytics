@@ -22,7 +22,7 @@ define(['require', 'lodash', 'log', 'jquery', 'backbone', 'command', 'sample_pre
             initialize: function (options) {
                 var errMsg;
                 if (!_.has(options, 'tab')) {
-                    errMsg = 'unable to find a reference for server tab';
+                    errMsg = 'unable to find a reference for editor tab';
                     log.error(errMsg);
                     throw errMsg;
                 }
@@ -88,7 +88,7 @@ define(['require', 'lodash', 'log', 'jquery', 'backbone', 'command', 'sample_pre
                 buttonWrap.append(newButton);
                 buttonWrap.append(openButton);
 
-                var productNameWrapHeader = $('<h2><img src="/server/commons/images/wso2-logo.svg">' +
+                var productNameWrapHeader = $('<h2><img src="/editor/commons/images/wso2-logo.svg">' +
                     '<h1>Streaming Integrator Tooling</h1></h2>');
                 productNameWrap.append(productNameWrapHeader);
 

@@ -51,12 +51,12 @@ var keys = require("../../lib/keys");
  * @author <a href="mailto:matthewkastor@gmail.com">
  *  Matthew Christopher Kastor-Inare III </a><br />
  *  ☭ Hial Atropa!! ☭
- * @param {ace.Editor} editor An server instance.
+ * @param {ace.Editor} editor An editor instance.
  * @returns {Array} Returns an array of objects representing the keyboard
- *  shortcuts for the given server.
+ *  shortcuts for the given editor.
  * @example
  * var getKbShortcuts = require('./get_keyboard_shortcuts');
- * console.log(getKbShortcuts(server));
+ * console.log(getKbShortcuts(editor));
  * // [
  * //     {'command' : aCommand, 'key' : 'Control-d'},
  * //     {'command' : aCommand, 'key' : 'Control-d'}

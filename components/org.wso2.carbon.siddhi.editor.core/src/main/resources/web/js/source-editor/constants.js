@@ -17,7 +17,7 @@
  */
 
 /**
- * Constants to be used by the siddhi server and the siddhi web worker
+ * Constants to be used by the siddhi editor and the siddhi web worker
  * This is not directly imported by the web worker since some of the constants are initiated using the window object
  * The SiddhiEditor.constants in passed into the web worker when the siddhi worker is initialized
  */
@@ -26,7 +26,7 @@ define(function() {
     "use strict";   // JS strict mode
 
     /**
-     * Constants used by the server
+     * Constants used by the editor
      */
     var constants = {
         SOURCE: "source",
@@ -53,7 +53,7 @@ define(function() {
 
 
     // Server side validation related constants
-    constants.SERVER_URL = window.location.protocol + "//" + window.location.host + "/server/";
+    constants.SERVER_URL = window.location.protocol + "//" + window.location.host + "/editor/";
     constants.SERVER_SIDE_VALIDATION_DELAY = 1000;      // Token tooltips are also updated after this delay
     constants.TOOLTIP_SHOW_DELAY = 1000;    // Time the user needs to hover the mouse to get the tooltip
 
@@ -63,7 +63,7 @@ define(function() {
     };
 
     /*
-     * Names displayed in the server
+     * Names displayed in the editor
      */
     constants.typeToDisplayNameMap = {};
     constants.typeToDisplayNameMap[constants.FUNCTIONS] = "Function";
@@ -82,7 +82,7 @@ define(function() {
     constants.typeToDisplayNameMap[constants.AGGREGATIONS] = "Aggregation";
 
     /*
-     * Ace server library related constants
+     * Ace editor library related constants
      */
     constants.ace = {
         SNIPPET_MANAGER: "ace/snippets",

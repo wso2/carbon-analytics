@@ -158,7 +158,7 @@ module.exports = {
     "test: should use stop worker of old document" : function(next) {
         var self = this;
         
-        // 1. Open an server and set the session to CssMode
+        // 1. Open an editor and set the session to CssMode
         self.editor.setSession(self.session1);
         self.session1.setMode(new CssMode());
         

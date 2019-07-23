@@ -79,7 +79,7 @@ function setupContainer(element, getValue) {
 
     var parentNode = element.parentNode;
 
-    // This will hold the server.
+    // This will hold the editor.
     var container = document.createElement('div');
 
     // To put Ace in the place of the textarea, we have to copy a few of the
@@ -223,7 +223,7 @@ exports.transformTextarea = function(element, options) {
     session.setValue(element.value || element.innerHTML);
     editor.focus();
 
-    // Add the settingPanel opener to the server's div.
+    // Add the settingPanel opener to the editor's div.
     container.appendChild(settingOpener);
 
     // Create the API.

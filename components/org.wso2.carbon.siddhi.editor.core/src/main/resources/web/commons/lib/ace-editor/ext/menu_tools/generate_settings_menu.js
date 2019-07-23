@@ -52,7 +52,7 @@ var getSetFunctions = require('./get_set_functions').getSetFunctions;
  * @author <a href="mailto:matthewkastor@gmail.com">
  *  Matthew Christopher Kastor-Inare III </a><br />
  *  ☭ Hial Atropa!! ☭
- * @param {ace.Editor} editor An instance of the ace server.
+ * @param {ace.Editor} editor An instance of the ace editor.
  */
 module.exports.generateSettingsMenu = function generateSettingsMenu (editor) {
     /**
@@ -108,7 +108,7 @@ module.exports.generateSettingsMenu = function generateSettingsMenu (editor) {
      *  set function. It is used to set up event listeners for when the
      *  menu options change.
      * @param {string} clss Maps to the class of the dom element. This is
-     *  the name of the object containing the set function e.g. `server`,
+     *  the name of the object containing the set function e.g. `editor`,
      *  `session`, `renderer`.
      * @param {string} item  This is the set function name. It maps to the
      *  id of the dom element (check, select, input) and to the "contains"
@@ -177,7 +177,7 @@ module.exports.generateSettingsMenu = function generateSettingsMenu (editor) {
     }
     /**
      * Generates selection fields for the menu and populates their options
-     *  using information from `server.menuOptions`
+     *  using information from `editor.menuOptions`
      * @author <a href="mailto:matthewkastor@gmail.com">
      *  Matthew Christopher Kastor-Inare III </a><br />
      *  ☭ Hial Atropa!! ☭
@@ -202,7 +202,7 @@ module.exports.generateSettingsMenu = function generateSettingsMenu (editor) {
     }
     /**
      * Processes the set functions returned from `getSetFunctions`. First it
-     *  checks for menu options defined in `server.menuOptions`. If no
+     *  checks for menu options defined in `editor.menuOptions`. If no
      *  options are specified then it checks whether there is a get function
      *  (replace set with get) for the setting. When either of those
      *  conditions are met it will attempt to create a new entry for the
