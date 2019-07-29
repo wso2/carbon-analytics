@@ -3299,6 +3299,19 @@
                         }
                     }
                 }
+            },
+            sample_categories: {
+                // Add all the samples and their categories
+                AggregateDataIncrementally: ["aggregate","transform","enrich"],
+                AggregateOverTime: ["cleanse"],
+                AlertsAndThresholds: ["correlate","aggregate"],
+                ReceiveAndCount: ["correlate","aggregate","insights"],
+                ReceiveTCPinJSONFormat: ["correlate","aggregate"],
+                PublishHttpOAuthRequest: ["correlate","aggregate","insights"],
+                PublishHttpOAuthRequestWithoutAccessToken: ["aggregate","insights"],
+                PublishTcpInTextFormat: ["aggregate","insights"],
+                ReceiveHl7InER7Format: ["aggregate","insights"],
+                PmmlModelProcessor: ["aggregate","insights"],
             }
         };
         app = new Application(config);
