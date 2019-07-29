@@ -25,8 +25,8 @@ define(function () {
      */
     var constants = {
         INITIAL_SOURCE_INSTRUCTIONS: "@App:name(\"SiddhiApp\")\n@App:description(\"Description of the plan\")\n\n" +
-        "-- Please refer to https://docs.wso2.com/display/SP400/Quick+Start+Guide " +
-        "on getting started with SP editor. \n\n"
+        "-- Please refer to https://siddhi.io/en/v5.0/docs/quick-start/ " +
+        "on getting started with Siddhi editor. \n\n"
     };
 
     return constants;
