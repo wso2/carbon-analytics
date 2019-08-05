@@ -954,6 +954,7 @@ public class EditorMicroservice implements Microservice {
 
         try {
             FileConfigManager fileConfigManager = new FileConfigManager(configProvider);
+            fileConfigManager.init();
             SiddhiManager siddhiManager = new SiddhiManager();
             siddhiManager.setConfigManager(fileConfigManager);
             DesignGenerator designGenerator = new DesignGenerator();
@@ -1129,6 +1130,7 @@ public class EditorMicroservice implements Microservice {
         EditorDataHolder.setDebugProcessorService(new DebugProcessorService());
         SiddhiManager siddhiManager = new SiddhiManager();
         FileConfigManager fileConfigManager = new FileConfigManager(configProvider);
+        fileConfigManager.init();
         siddhiManager.setConfigManager(fileConfigManager);
         EditorDataHolder.setSiddhiManager(siddhiManager);
         EditorDataHolder.setBundleContext(bundleContext);
