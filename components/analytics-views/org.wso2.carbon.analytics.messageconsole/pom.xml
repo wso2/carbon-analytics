@@ -43,10 +43,6 @@
         <plugins>
             <plugin>
                 <groupId>org.apache.felix</groupId>
-                <artifactId>maven-scr-plugin</artifactId>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.felix</groupId>
                 <artifactId>maven-bundle-plugin</artifactId>
                 <extensions>true</extensions>
                 <configuration>
@@ -58,7 +54,7 @@
                             org.wso2.carbon.analytics.messageconsole.*;version="${carbon.analytics.version}"
                         </Export-Package>
                         <Import-Package>
-                            org.apache.commons.logging.*,
+                            org.apache.commons.logging.*; version="${import.package.version.commons.logging}",
                             org.wso2.carbon.ntask.core.*;version="${carbon.commons.imp.pkg.version}",
                             *;resolution:=optional
                         </Import-Package>

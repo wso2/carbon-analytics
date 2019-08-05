@@ -5,7 +5,7 @@
     <parent>
         <groupId>org.wso2</groupId>
         <artifactId>wso2</artifactId>
-        <version>1</version>
+        <version>1.2</version>
     </parent>
 
     <modelVersion>4.0.0</modelVersion>
@@ -284,19 +284,14 @@
                 <version>${wsdl4j.wso2.version}</version>
             </dependency>
             <dependency>
-                <groupId>commons-logging</groupId>
-                <artifactId>commons-logging</artifactId>
-                <version>${commons-logging.version}</version>
-            </dependency>
-            <dependency>
                 <groupId>org.eclipse.osgi</groupId>
                 <artifactId>org.eclipse.osgi</artifactId>
                 <version>${version.equinox.osgi}</version>
             </dependency>
             <dependency>
-                <groupId>org.wso2.carbon</groupId>
-                <artifactId>org.wso2.carbon.logging</artifactId>
-                <version>${carbon.kernel.version}</version>
+                <groupId>org.ops4j.pax.logging</groupId>
+                <artifactId>pax-logging-api</artifactId>
+                <version>${pax.logging.api.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.wso2.carbon</groupId>
@@ -1137,19 +1132,6 @@
                 </plugin>
                 <plugin>
                     <groupId>org.apache.felix</groupId>
-                    <artifactId>maven-scr-plugin</artifactId>
-                    <version>1.7.2</version>
-                    <executions>
-                        <execution>
-                            <id>generate-scr-scrdescriptor</id>
-                            <goals>
-                                <goal>scr</goal>
-                            </goals>
-                        </execution>
-                    </executions>
-                </plugin>
-                <plugin>
-                    <groupId>org.apache.felix</groupId>
                     <artifactId>maven-bundle-plugin</artifactId>
                     <version>3.2.0</version>
                     <extensions>true</extensions>
@@ -1211,16 +1193,22 @@
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-deploy-plugin</artifactId>
                 </plugin>
-            <plugin>
-                    <groupId>org.apache.felix</groupId>
-                    <artifactId>maven-scr-plugin</artifactId>
-                    <version>${maven.scr.plugin.version}</version>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-javadoc-plugin</artifactId>
+                    <configuration>
+                        <source>1.8</source>
+                    </configuration>
                     <executions>
                         <execution>
-                            <id>generate-scr-scrdescriptor</id>
+                            <id>attach-javadocs</id>
                             <goals>
-                                <goal>scr</goal>
+                                <goal>jar</goal>
                             </goals>
+                            <configuration>
+                                <!--This parameter disables doclint-->
+                                <doclint>none</doclint>
+                            </configuration>
                         </execution>
                     </executions>
                 </plugin>
@@ -1408,7 +1396,6 @@
         <version.equinox.osgi>3.8.1.v20120830-144521</version.equinox.osgi>
 
         <!-- Commons -->
-        <commons-logging.version>1.1</commons-logging.version>
         <commons.pool.orbit.version>1.5.6.wso2v1</commons.pool.orbit.version>
         <httpcomponents-httpclient.version>4.3.6.wso2v2</httpcomponents-httpclient.version>
         <orbit.version.json>2.0.0.wso2v1</orbit.version.json>
@@ -1493,10 +1480,10 @@
         <spark.sql.version.range>[1.6.2,2.0.0)</spark.sql.version.range>
 
         <encoder.wso2.version>1.2.0.wso2v1</encoder.wso2.version>
-        <wso2.maven.compiler.source>1.8</wso2.maven.compiler.source>
-        <wso2.maven.compiler.target>1.8</wso2.maven.compiler.target>
     <apache.felix.scr.ds.annotations.version>1.2.4</apache.felix.scr.ds.annotations.version>
         <maven.scr.plugin.version>1.26.0</maven.scr.plugin.version>
+        <import.package.version.commons.logging>[1.2.0,2.0.0)</import.package.version.commons.logging>
+        <pax.logging.api.version>1.10.1</pax.logging.api.version>
     </properties>
 
     <pluginRepositories>

@@ -39,8 +39,8 @@
             <artifactId>org.wso2.carbon.event.template.manager.core</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.wso2.carbon</groupId>
-            <artifactId>org.wso2.carbon.logging</artifactId>
+            <groupId>org.ops4j.pax.logging</groupId>
+            <artifactId>pax-logging-api</artifactId>
         </dependency>
         <dependency>
             <groupId>org.wso2.carbon</groupId>
@@ -67,18 +67,6 @@
 
       <build>
           <plugins>
-              <plugin>
-                  <groupId>org.apache.felix</groupId>
-                  <artifactId>maven-scr-plugin</artifactId>
-                  <executions>
-                      <execution>
-                          <id>generate-scr-scrdescriptor</id>
-                          <goals>
-                              <goal>scr</goal>
-                          </goals>
-                      </execution>
-                  </executions>
-              </plugin>
               <plugin>
                   <groupId>org.apache.felix</groupId>
                   <artifactId>maven-bundle-plugin</artifactId>
