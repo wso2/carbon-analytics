@@ -52,15 +52,25 @@ public class PersistenceManager implements Runnable {
 
     @Override
     public void run() {
-        haManager = StreamProcessorDataHolder.getHAManager();
-        if (haManager != null) {
-            if (haManager.isActiveNode()) {
-                tcpConnectionPool = EventSyncConnectionPoolManager.getConnectionPool();
-                sequenceIDGenerator = EventSyncConnectionPoolManager.getSequenceID();
-                persistAndSendControlMessage();
-            } //Passive node will not persist the state
-        } else {
-            persist();
+        try {
+            log.debug("Persisting process started");
+            haManager = StreamProcessorDataHolder.getHAManager();
+            if (haManager != null) {
+                if (haManager.isActiveNode()) {
+                    tcpConnectionPool = EventSyncConnectionPoolManager.getConnectionPool();
+                    sequenceIDGenerator = EventSyncConnectionPoolManager.getSequenceID();
+                    persistAndSendControlMessage();
+                } else {
+                    log.debug("haManager.isActiveNode() is FALSE. Passive node will not persist the state");
+                    //Passive node will not persist the state
+                }
+            } else {
+                log.debug("StreamProcessorDataHolder.getHAManager() is NULL. Persisting the state without sending " +
+                        "the control message");
+                persist();
+            }
+        } catch (Throwable t) {
+            log.error("Exception occurred when running PersistenceManager. " + t.getMessage(), t);
         }
     }
 
