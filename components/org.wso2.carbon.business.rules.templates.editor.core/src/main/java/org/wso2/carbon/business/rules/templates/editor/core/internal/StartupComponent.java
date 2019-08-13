@@ -64,7 +64,7 @@ public class StartupComponent {
                             e.getMessage(), e);
                 }
                 String startingURL = entry.getValue().getScheme() + "://" + hostname + ":" + entry.getValue()
-                        .getPort() + "/template-server";
+                        .getPort() + "/template-editor";
                 logger.info("Template Editor Started on : " + startingURL);
             }
         });
