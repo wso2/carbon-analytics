@@ -89,7 +89,7 @@ define(['require', 'lodash', 'log', 'jquery', 'backbone', 'command', 'sample_pre
                 buttonWrap.append(openButton);
 
                 var productNameWrapHeader = $('<h2><img src="/editor/commons/images/wso2-logo.svg">' +
-                    '<h1>Stream Processor Studio</h1></h2>');
+                    '<h1>Streaming Integrator Tooling</h1></h2>');
                 productNameWrap.append(productNameWrapHeader);
 
 

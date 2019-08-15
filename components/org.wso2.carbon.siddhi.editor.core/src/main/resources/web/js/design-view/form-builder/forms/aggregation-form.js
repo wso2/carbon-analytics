@@ -242,10 +242,11 @@ define(['require', 'log', 'jquery', 'lodash', 'aggregateByTimePeriod', 'querySel
                 $('#' + id).addClass('incomplete-element');
                 DesignViewUtils.prototype.warnAlert('Connect an input stream element');
                 self.consoleListManager.removeFormConsole(formConsole);
+                self.consoleListManager.removeAllConsoles();
             } else {
                 var propertyDiv = $('<div id = "define-aggregation" class="clearfix form-min-width"> </div>');
 
-                formContainer.append(propertyDiv);
+                formContainer.html(propertyDiv);
                 self.formUtils.buildFormButtons(formConsole.cid);
                 self.designViewContainer.addClass('disableContainer');
                 self.toggleViewButton.addClass('disableContainer');

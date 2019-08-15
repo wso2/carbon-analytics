@@ -296,7 +296,7 @@
   ["constant.language.escape","${"],
   ["identifier","app"],
   ["constant.language.escape","}"],
-  ["string","/server.js\""],
+  ["string","/editor.js\""],
   ["text",";"]
 ],[
    "start",

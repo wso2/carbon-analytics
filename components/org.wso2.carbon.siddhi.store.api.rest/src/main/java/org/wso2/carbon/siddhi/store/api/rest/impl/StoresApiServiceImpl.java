@@ -29,10 +29,10 @@ import org.wso2.carbon.siddhi.store.api.rest.model.ModelApiResponse;
 import org.wso2.carbon.siddhi.store.api.rest.model.Query;
 import org.wso2.carbon.siddhi.store.api.rest.model.Record;
 import org.wso2.carbon.siddhi.store.api.rest.model.RecordDetail;
-import org.wso2.carbon.stream.processor.common.SiddhiAppRuntimeService;
-import org.wso2.siddhi.core.SiddhiAppRuntime;
-import org.wso2.siddhi.core.event.Event;
-import org.wso2.siddhi.query.api.definition.Attribute;
+import org.wso2.carbon.streaming.integrator.common.SiddhiAppRuntimeService;
+import io.siddhi.core.SiddhiAppRuntime;
+import io.siddhi.core.event.Event;
+import io.siddhi.query.api.definition.Attribute;
 
 import javax.ws.rs.core.Response;
 import java.util.ArrayList;

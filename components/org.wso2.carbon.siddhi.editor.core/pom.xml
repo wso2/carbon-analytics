@@ -21,7 +21,7 @@
     <parent>
         <groupId>org.wso2.carbon.analytics</groupId>
         <artifactId>org.wso2.carbon.analytics.parent</artifactId>
-        <version>2.1.26-SNAPSHOT</version>
+        <version>3.0.4-SNAPSHOT</version>
         <relativePath>../../pom.xml</relativePath>
     </parent>
 
@@ -63,7 +63,7 @@
         </dependency>
         <dependency>
             <groupId>org.wso2.carbon.analytics</groupId>
-            <artifactId>org.wso2.carbon.stream.processor.common</artifactId>
+            <artifactId>org.wso2.carbon.streaming.integrator.common</artifactId>
         </dependency>
 
         <!--Dependencies for Siddhi debugger begins here-->
@@ -76,19 +76,19 @@
             <artifactId>antlr4-runtime</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.wso2.siddhi</groupId>
+            <groupId>io.siddhi</groupId>
             <artifactId>siddhi-query-api</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.wso2.siddhi</groupId>
+            <groupId>io.siddhi</groupId>
             <artifactId>siddhi-core</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.wso2.siddhi</groupId>
+            <groupId>io.siddhi</groupId>
             <artifactId>siddhi-query-compiler</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.wso2.siddhi</groupId>
+            <groupId>io.siddhi</groupId>
             <artifactId>siddhi-annotations</artifactId>
         </dependency>
         <dependency>
@@ -145,8 +145,8 @@
         <import.package>
             org.osgi.framework.*;version="${osgi.framework.import.version.range}",
             org.wso2.carbon.kernel;version="${carbon.kernel.package.import.version.range}",
-            org.wso2.siddhi.*;version="${siddhi.version.range}",
-            org.wso2.carbon.stream.processor.common.*;version="${carbon.analytics.version.range}",
+            io.siddhi.*;version="${siddhi.version.range}",
+            org.wso2.carbon.streaming.integrator.common.*;version="${carbon.analytics.version.range}",
             org.wso2.carbon.editor.log.appender.*,
             org.wso2.msf4j.*;version="${msf4j.import.version.range}",
             javax.management.*,

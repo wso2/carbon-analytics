@@ -149,11 +149,14 @@ define(['require', 'lodash','jquery', 'log', 'backbone', 'file_browser', 'worksp
                     });
 
                     samplesWithDes.forEach(function (sample) {
-                        var sampleName = sample.path;
+                        var samplePath = sample.path;
+                        var sampleName = ((samplePath.substring(samplePath.lastIndexOf('/') + 1)).split(".siddhi"))[0];
+                        var sampleCategories = (app.config.sample_categories[sampleName] || []).join(', ');
                         var config =
                             {
-                                "sampleName": ((sampleName.substring(sampleName.lastIndexOf('/') + 1)).split(".siddhi"))[0],
+                                "sampleName": sampleName,
                                 "sampleDes": sample.description,
+                                "sampleCategories": sampleCategories,
                                 "parentContainer": bodyUlSampleContent,
                                 "firstItem": true,
                                 "clickEventCallback": function (event) {

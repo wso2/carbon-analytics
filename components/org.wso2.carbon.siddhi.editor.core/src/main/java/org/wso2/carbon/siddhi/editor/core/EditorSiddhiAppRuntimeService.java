@@ -21,9 +21,9 @@ package org.wso2.carbon.siddhi.editor.core;
 
 import org.wso2.carbon.siddhi.editor.core.internal.DebugRuntime;
 import org.wso2.carbon.siddhi.editor.core.internal.EditorDataHolder;
-import org.wso2.carbon.stream.processor.common.SiddhiAppRuntimeService;
-import org.wso2.siddhi.core.SiddhiAppRuntime;
-import org.wso2.siddhi.core.util.statistics.metrics.Level;
+import org.wso2.carbon.streaming.integrator.common.SiddhiAppRuntimeService;
+import io.siddhi.core.SiddhiAppRuntime;
+import io.siddhi.core.util.statistics.metrics.Level;
 
 import java.util.HashMap;
 import java.util.Map;

@@ -16,7 +16,7 @@
 
 /*
  * This module contains the integration code segment of Siddhi editor.
- * This will set the options of ACE editor, attach client side parser and attach SiddhiCompletion Engine with the editor
+ * This will set the options of ACE editor, attach client side parser and attach SiddhiCompletion Engine with the server
  */
 define(["ace/ace", "jquery", "./constants", "./utils", "./completion-engine", "./token-tooltip",
         "ace/ext/language_tools", "./debug-rest-client", "log", 'ace/range'],
@@ -1155,7 +1155,6 @@ define(["ace/ace", "jquery", "./constants", "./utils", "./completion-engine", ".
                 var aggregationName = tooltipData.aggregationName;
 
                 var aggregation = editor.completionEngine.aggregationsList[aggregationName];
-                //var details = editor.incompleteData.aggregationsList;
                 if (aggregation && aggregation.description) {
                     updateTokenTooltip(row, column, aggregation.description);
                 }

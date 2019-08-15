@@ -50,7 +50,7 @@ dom.importCssString(editorCss, "ace_editor.css");
 
 /**
  * The class that is responsible for drawing everything you see on the screen!
- * @related editor.renderer 
+ * @related editor.renderer
  * @class VirtualRenderer
  **/
 

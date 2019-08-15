@@ -22,7 +22,7 @@ import org.wso2.carbon.event.simulator.core.api.NotFoundException;
 import java.io.InputStream;
 
 import org.wso2.carbon.event.simulator.core.service.EventSimulatorDataHolder;
-import org.wso2.carbon.stream.processor.common.EventStreamService;
+import org.wso2.carbon.streaming.integrator.common.EventStreamService;
 import org.wso2.msf4j.Microservice;
 import org.wso2.msf4j.formparam.FormDataParam;
 import org.wso2.msf4j.formparam.FileInfo;

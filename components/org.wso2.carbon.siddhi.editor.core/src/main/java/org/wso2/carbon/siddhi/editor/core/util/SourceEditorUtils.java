@@ -23,13 +23,13 @@ import org.wso2.carbon.siddhi.editor.core.commons.metadata.MetaData;
 import org.wso2.carbon.siddhi.editor.core.commons.metadata.ParameterMetaData;
 import org.wso2.carbon.siddhi.editor.core.commons.metadata.ProcessorMetaData;
 import org.wso2.carbon.siddhi.editor.core.internal.EditorDataHolder;
-import org.wso2.siddhi.annotation.Extension;
-import org.wso2.siddhi.annotation.Parameter;
-import org.wso2.siddhi.annotation.ReturnAttribute;
-import org.wso2.siddhi.core.SiddhiAppRuntime;
-import org.wso2.siddhi.query.api.definition.AbstractDefinition;
-import org.wso2.siddhi.query.api.definition.AggregationDefinition;
-import org.wso2.siddhi.query.api.definition.StreamDefinition;
+import io.siddhi.annotation.Extension;
+import io.siddhi.annotation.Parameter;
+import io.siddhi.annotation.ReturnAttribute;
+import io.siddhi.core.SiddhiAppRuntime;
+import io.siddhi.query.api.definition.AbstractDefinition;
+import io.siddhi.query.api.definition.AggregationDefinition;
+import io.siddhi.query.api.definition.StreamDefinition;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -342,6 +342,10 @@ public class SourceEditorUtils {
                     .isAssignableFrom(extensionClass)) {
                 processorType = Constants.ATTRIBUTE_AGGREGATOR;
                 processorMetaDataList = metaData.getFunctions();
+            } else if (Constants.SUPER_CLASS_MAP.get(Constants.INCREMENTAL_AGGREGATOR)
+                        .isAssignableFrom(extensionClass)) {
+                    processorType = Constants.INCREMENTAL_AGGREGATOR;
+                    processorMetaDataList = metaData.getFunctions();
             } else if (Constants.SUPER_CLASS_MAP.get(Constants.STREAM_FUNCTION_PROCESSOR)
                     .isAssignableFrom(extensionClass)) {
                 processorType = Constants.STREAM_FUNCTION_PROCESSOR;

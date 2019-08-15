@@ -37,6 +37,18 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'constants'],
             }
         };
 
+        //function to get the attributes
+        var getAttributes = function () {
+            var attributes = [];
+            $('.attr-name').each(function () {
+                var value = $(this).val().trim();
+                if (value !== "") {
+                    attributes.push(value)
+                }
+            });
+            return attributes;
+        };
+
         /**
          * @function generate properties form for a window
          * @param element selected element(window)
@@ -56,7 +68,7 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'constants'],
                 '<div class ="defineFunctionParameters"> </div> </div> <div class = "window-form-container"> ' +
                 '<div class="define-output-events"> </div><div class="define-annotation"></div> </div> </div>');
 
-            formContainer.append(propertyDiv);
+            formContainer.html(propertyDiv);
             self.formUtils.buildFormButtons(formConsole.cid);
             self.formUtils.popUpSelectedElement(id);
             self.designViewContainer.addClass('disableContainer');
@@ -69,39 +81,28 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'constants'],
             //declaration and initialization of variables
             var predefinedWindowFunctionNames = _.orderBy(this.configurationData.rawExtensions["windowFunctionNames"],
                 ['name'], ['asc']);
-            var functionParameters = [];
-            var functionParametersWithValues = [];
+            var windowFormContainer = '.window-form-container';
+            var savedParameters = [];
             var selectedType;
             var annotations = [];
 
-            self.formUtils.renderFunctions(predefinedWindowFunctionNames, '.window-form-container', Constants.WINDOW);
+            self.formUtils.renderFunctions(predefinedWindowFunctionNames, windowFormContainer, Constants.WINDOW);
+            self.formUtils.showDropDown();
             var name = windowObject.getName();
             self.formUtils.renderOutputEventTypes();
             if (!name) {
                 //if window form is freshly opened[unedited window object]
-                var attributes = [{ name: "" }];
+                var attributes = [{name: ""}];
                 self.formUtils.renderAttributeTemplate(attributes)
-                selectedType = $('.defineFunctionName #window-type').val();
-                functionParameters = self.formUtils.getSelectedTypeParameters(selectedType,
-                    predefinedWindowFunctionNames);
-                functionParametersWithValues = self.formUtils.createObjectWithValues(functionParameters);
-                self.formUtils.renderParameters(functionParametersWithValues, selectedType, Constants.WINDOW)
+                selectedType = Constants.BATCH_WINDOW_PROCESSOR;
             } else {
                 //if window object is already edited
                 var windowType = windowObject.getType().toLowerCase();
-                var parameterValues = windowObject.getParameters();
+                savedParameters = windowObject.getParameters();
 
                 $('#windowName').val(name.trim());
                 selectedType = windowType;
-                $('.defineFunctionName').find('#window-type option').filter(function () {
-                    return ($(this).val().toLowerCase() == (windowType));
-                }).prop('selected', true);
-                functionParameters = self.formUtils.getSelectedTypeParameters(windowType, predefinedWindowFunctionNames);
-                self.formUtils.callToMapParameters(selectedType, functionParameters, parameterValues,
-                    '.window-form-container')
-                if (selectedType === Constants.SORT) {
-                    self.formUtils.showHideOrderForSort();
-                }
+
                 var attributeList = windowObject.getAttributeList();
                 self.formUtils.renderAttributeTemplate(attributeList)
                 self.formUtils.selectTypesOfSavedAttributes(attributeList);
@@ -114,28 +115,39 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'constants'],
                 var annotationListObjects = windowObject.getAnnotationListObjects();
                 annotations = annotationListObjects;
             }
+            var windowParameters = {
+                type: Constants.WINDOW,
+                value: {
+                    function: selectedType,
+                    parameters: savedParameters
+                }
+            };
+            self.formUtils.mapParameterValues(windowParameters, windowFormContainer, false);
             self.formUtils.renderAnnotationTemplate("define-annotation", annotations);
-            self.formUtils.addEventListenersForParameterDiv();
-            self.formUtils.addEventListenerForSortWindow(selectedType)
 
-            $('#window-type').change(function () {
-                functionParameters = self.formUtils.getSelectedTypeParameters(this.value, predefinedWindowFunctionNames);
-                selectedType = this.value.toLowerCase();
-                if (parameterValues && selectedType == windowType.toLowerCase()) {
-                    self.formUtils.callToMapParameters(selectedType, functionParameters, parameterValues,
-                        '.window-form-container')
-                } else {
-                    functionParametersWithValues = self.formUtils.createObjectWithValues(functionParameters);
-                    self.formUtils.renderParameters(functionParametersWithValues, Constants.WINDOW,
-                        '.window-form-container');
+            $(windowFormContainer).on("autocompleteselect", '.custom-combobox-input', function (event, ui) {
+                var savedParameterValues = [];
+                var selectedType = ui.item.value.toLowerCase();
+                if (name && self.formUtils.getFunctionNameWithoutParameterOverload(selectedType) === windowType) {
+                    savedParameterValues = savedParameters;
                 }
-                if (selectedType === Constants.SORT) {
-                    self.formUtils.showHideOrderForSort();
-                    self.formUtils.addEventListenerForSortWindow(selectedType)
-                }
+                var currentlySelectedWindow = {
+                    type: Constants.WINDOW,
+                    value: {
+                        function: selectedType,
+                        parameters: savedParameterValues
+                    }
+                };
+                self.formUtils.mapParameterValues(currentlySelectedWindow, windowFormContainer, true);
+                self.formUtils.addAutoCompleteForStreamWindowFunctionAttributes(getAttributes());
+            });
+
+            $(windowFormContainer).on("blur", ".attr-name", function () {
+                self.formUtils.addAutoCompleteForStreamWindowFunctionAttributes(getAttributes());
             });
 
             self.formUtils.initPerfectScroller(formConsole.cid);
+            self.formUtils.addAutoCompleteForStreamWindowFunctionAttributes(getAttributes());
 
             // 'Submit' button action
             $('#' + formConsole.cid).on('click', '#btn-submit', function () {
@@ -181,10 +193,18 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'constants'],
                     return;
                 }
 
-                var windowType = $('.defineFunctionName #window-type').val();
-                if (self.formUtils.validateParameters('.window-form-container', functionParameters)) {
-                    isErrorOccurred = true;
-                    return;
+                if ($(windowFormContainer).find('.display-predefined-parameters').length === 0) {
+                    var predefinedParameters = self.formUtils.getPredefinedParameters(windowFormContainer,
+                        predefinedWindowFunctionNames);
+                    if (self.formUtils.validateParameters(windowFormContainer, predefinedParameters)) {
+                        isErrorOccurred = true;
+                        return;
+                    }
+                } else {
+                    if (self.formUtils.validateUnknownParameters(windowFormContainer)) {
+                        isErrorOccurred = true;
+                        return;
+                    }
                 }
 
                 if (!isErrorOccurred) {
@@ -192,9 +212,8 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'constants'],
                     var textNode = $(element).parent().find('.windowNameNode');
                     textNode.html(windowName);
 
-                    var parameters = self.formUtils.buildWindowParameters('.window-form-container', windowType,
-                        predefinedWindowFunctionNames)
-                    windowObject.setType(windowType);
+                    var parameters = self.formUtils.buildParameterValues(windowFormContainer);
+                    windowObject.setType(self.formUtils.getFunctionNameWithoutParameterOverload($('.custom-combobox-input').val()));
                     windowObject.setParameters(parameters);
 
                     //clear the previously saved attribute list
@@ -204,7 +223,7 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'constants'],
                         var nameValue = $(this).find('.attr-name').val().trim();
                         var typeValue = $(this).find('.attr-type').val();
                         if (nameValue != "") {
-                            var attributeObject = new Attribute({ name: nameValue, type: typeValue });
+                            var attributeObject = new Attribute({name: nameValue, type: typeValue});
                             windowObject.addAttribute(attributeObject)
                         }
                     });

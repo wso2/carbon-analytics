@@ -19,7 +19,7 @@
 package org.wso2.carbon.event.simulator.core.service;
 
 import org.wso2.carbon.analytics.permissions.PermissionProvider;
-import org.wso2.carbon.stream.processor.common.EventStreamService;
+import org.wso2.carbon.streaming.integrator.common.EventStreamService;
 
 /**
  * EventSimulaorDataHolder referenced through ServiceComponent

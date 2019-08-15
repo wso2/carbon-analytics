@@ -132,7 +132,7 @@ define(['require', 'log', 'jquery', 'lodash', 'constants'],
                 'id = "triggerNameErrorMessage"> </label> </div> <div id= "define-trigger-criteria"> </div>' +
                 '<div id = "trigger-criteria-content"></div> </div> </div>');
 
-            formContainer.append(propertyDiv);
+            formContainer.html(propertyDiv);
             self.formUtils.buildFormButtons(formConsole.cid);
             self.formUtils.popUpSelectedElement(id);
             self.designViewContainer.addClass('disableContainer');

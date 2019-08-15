@@ -24,7 +24,7 @@ define(function () {
     "use strict";   // JS strict mode
 
     /**
-     * Constants used by the siddhi editor tour guide
+     * Constants used by the siddhi server tour guide
      */
     var constants = {
         CONTENT: '@App:name(\'SweetFactory\')\n' +

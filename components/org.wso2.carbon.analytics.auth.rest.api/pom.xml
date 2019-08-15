@@ -19,7 +19,7 @@
     <parent>
         <groupId>org.wso2.carbon.analytics</groupId>
         <artifactId>org.wso2.carbon.analytics.parent</artifactId>
-        <version>2.1.26-SNAPSHOT</version>
+        <version>3.0.4-SNAPSHOT</version>
         <relativePath>../../pom.xml</relativePath>
     </parent>
 
@@ -73,7 +73,7 @@
         </dependency>
         <dependency>
             <groupId>org.wso2.carbon.analytics</groupId>
-            <artifactId>org.wso2.carbon.stream.processor.common</artifactId>
+            <artifactId>org.wso2.carbon.streaming.integrator.common</artifactId>
         </dependency>
     </dependencies>
 
@@ -118,7 +118,7 @@
     <properties>
         <import.package>
             org.wso2.carbon.analytics.idp.client.*;version="${carbon.analytics-common.version.range}",
-            org.wso2.carbon.stream.processor.common.*;version="${carbon.analytics.version.range}",
+            org.wso2.carbon.streaming.integrator.common.*;version="${carbon.analytics.version.range}",
             org.wso2.carbon.messaging.*;version="${carbon.messaging.package.import.version.range}",
             org.osgi.framework.*;version="${osgi.framework.import.version.range}",
             org.wso2.msf4j.*;version="${msf4j.import.version.range}",

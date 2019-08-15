@@ -86,7 +86,7 @@ define(['require', 'log', 'jquery', 'lodash', 'constants'],
                 '<textarea id= "script-body-content" class="clearfix" rows="5" cols="50"> </textarea> ' +
                 '<label class = "error-message"></label> </div> </div> </div>');
 
-            formContainer.append(propertyDiv);
+            formContainer.html(propertyDiv);
             self.formUtils.buildFormButtons(formConsole.cid);
             self.formUtils.popUpSelectedElement(id);
             self.designViewContainer.addClass('disableContainer');

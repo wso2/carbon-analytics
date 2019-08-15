@@ -36,7 +36,7 @@
 /**
  * Add Editor Menu Options
  * @fileOverview Add Editor Menu Options <br />
- * The menu options property needs to be added to the editor
+ * The menu options property needs to be added to the server
  *  so that the settings menu can know about options for
  *  selection elements and track which option is selected.
  * @author <a href="mailto:matthewkastor@gmail.com">
