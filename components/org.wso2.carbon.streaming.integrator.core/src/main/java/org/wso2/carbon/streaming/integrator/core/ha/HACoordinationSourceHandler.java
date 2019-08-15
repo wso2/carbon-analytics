@@ -52,8 +52,6 @@ public class HACoordinationSourceHandler extends SourceHandler<HACoordinationSou
 
     private boolean isActiveNode;
     private boolean playBack;
-    private long lastProcessedEventTimestamp = 0L;
-    private String sourceHandlerElementId;
     private String siddhiAppName;
     private AtomicLong sequenceIDGenerator;
     private volatile boolean passiveNodeAdded;

@@ -18,6 +18,9 @@
 
 package org.wso2.carbon.streaming.integrator.core.ha;
 
+import io.siddhi.core.stream.input.source.SourceHandlerManager;
+import io.siddhi.core.stream.output.sink.SinkHandlerManager;
+import io.siddhi.core.table.record.RecordTableHandlerManager;
 import org.apache.log4j.Logger;
 import org.wso2.carbon.cluster.coordinator.commons.node.NodeDetail;
 import org.wso2.carbon.cluster.coordinator.service.ClusterCoordinator;
@@ -42,7 +45,6 @@ import io.siddhi.core.stream.input.source.SourceHandler;
 import io.siddhi.core.stream.output.sink.SinkHandler;
 import io.siddhi.core.table.record.RecordTableHandler;
 import io.siddhi.core.util.transport.BackoffRetryCounter;
-import io.siddhi.core.util.statistics.metrics.Level;
 
 import java.util.HashMap;
 import java.util.List;
@@ -223,7 +225,7 @@ public class HAManager {
                 try {
                     ((HACoordinationSourceHandler) sourceHandler).setPlayBack(false);
                 } catch (Throwable t) {
-                    log.error("HA Deployment: Error when connecting to source " + sourceHandler.getElementId() +
+                    log.error("HA Deployment: Error when connecting to source " + sourceHandler.getId() +
                             " while changing from passive state to active, skipping the source. ", t);
                     continue;
                 }

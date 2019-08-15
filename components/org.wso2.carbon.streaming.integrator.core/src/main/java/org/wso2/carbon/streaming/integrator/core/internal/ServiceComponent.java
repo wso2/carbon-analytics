@@ -207,7 +207,6 @@ public class ServiceComponent {
         StreamProcessorDataHolder.setNodeInfo(nodeInfo);
         StreamProcessorDataHolder.getInstance().setBundleContext(bundleContext);
 
-        // TODO: 8/15/19 @anusha check the removal of this code
         serviceComponentActivated = true;
 
         if (clusterComponentActivated) {
