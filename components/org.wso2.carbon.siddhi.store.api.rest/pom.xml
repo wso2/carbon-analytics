@@ -30,7 +30,7 @@
     <artifactId>org.wso2.carbon.siddhi.store.api.rest</artifactId>
     <packaging>bundle</packaging>
 
-    <name>WSO2 Stream Processor - Siddhi Store Query REST API</name>
+    <name>WSO2 Streaming Integrator - Siddhi Store Query REST API</name>
     <url>http://wso2.org</url>
 
     <dependencies>

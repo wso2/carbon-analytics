@@ -72,7 +72,7 @@ public class EditorConsoleService implements WebSocketEndpoint {
 
     @OnMessage
     public void onMessage(String text, WebSocketConnection webSocketConnection) {
-        webSocketConnection.pushText("Welcome to Stream Processor Studio");
+        webSocketConnection.pushText("Welcome to Streaming Integrator Tooling");
         LOGGER.info("Received message : " + text);
     }
 

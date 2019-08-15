@@ -1,7 +1,7 @@
 swagger: '2.0'
 info:
   version: 1.0.0
-  title: Exposing System Run Time of Stream Processor
+  title: Exposing System Run Time of Streaming Integrator
   description: >-
     This provides information about the runtime of the stream processor.
   contact:

@@ -27,7 +27,7 @@
     <modelVersion>4.0.0</modelVersion>
     <artifactId>org.wso2.carbon.business.rules.web.feature</artifactId>
     <packaging>pom</packaging>
-    <name>WSO2 Stream Processor Business Rule Web Component</name>
+    <name>WSO2 Streaming Integrator Business Rule Web Component</name>
     <url>http://wso2.org</url>
 
     <dependencies>

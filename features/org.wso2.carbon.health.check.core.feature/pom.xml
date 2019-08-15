@@ -28,7 +28,7 @@
 
     <artifactId>org.wso2.carbon.health.check.core.feature</artifactId>
     <packaging>carbon-feature</packaging>
-    <name>WSO2 Stream Processor - Heath Check Core API Feature</name>
+    <name>WSO2 Streaming Integrator - Heath Check Core API Feature</name>
     <url>http://wso2.org</url>
     <description>This feature contains the bundles related to Health Check API</description>
 

@@ -55,7 +55,7 @@ public class LogoutApi implements Microservice {
     @Path("/{appName:(.*)}")
     @Consumes({"application/json"})
     @Produces({"application/json"})
-    @io.swagger.annotations.ApiOperation(value = "", notes = "Logout Request to Stream Processor",
+    @io.swagger.annotations.ApiOperation(value = "", notes = "Logout Request to Streaming Integrator",
             response = void.class, tags = {})
     @io.swagger.annotations.ApiResponses(value = {
             @io.swagger.annotations.ApiResponse(code = 200, message = "Authorization Request Successful.",
@@ -72,7 +72,7 @@ public class LogoutApi implements Microservice {
     @GET
     @Path("/slo/{appName}")
     @Produces({"application/json"})
-    @io.swagger.annotations.ApiOperation(value = "", notes = "Login type check Request to Stream Processor.",
+    @io.swagger.annotations.ApiOperation(value = "", notes = "Login type check Request to Streaming Integrator.",
             response = HashMap.class, tags = {})
     @io.swagger.annotations.ApiResponses(value = {
             @io.swagger.annotations.ApiResponse(code = 200, message = "SSO logout Request to Stream processor",

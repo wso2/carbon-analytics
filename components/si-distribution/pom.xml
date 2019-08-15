@@ -137,7 +137,7 @@
             <type>zip</type>
         </dependency>
 
-        <!-- Stream Processor related Features-->
+        <!-- Streaming Integrator related Features-->
         <dependency>
             <groupId>org.wso2.carbon.analytics</groupId>
             <artifactId>org.wso2.carbon.streaming.integrator.core.feature</artifactId>
@@ -458,7 +458,7 @@
                                     <version>${carbon.deployment.version}</version>
                                 </feature>
 
-                                <!-- Stream Processor Features -->
+                                <!-- Streaming Integrator Features -->
                                 <feature>
                                     <id>org.wso2.carbon.streaming.integrator.core.feature</id>
                                     <version>${carbon.analytics.version}</version>
@@ -675,7 +675,7 @@
                                     <version>${msf4j.version}</version>
                                 </feature>
 
-                                <!-- Stream Processor Features -->
+                                <!-- Streaming Integrator Features -->
                                 <feature>
                                     <id>org.wso2.carbon.streaming.integrator.core.feature</id>
                                     <version>${carbon.analytics.version}</version>

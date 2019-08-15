@@ -18,7 +18,7 @@
 package org.wso2.carbon.streaming.integrator.common.utils;
 
 /**
- * Stream Processor Constants.
+ * Streaming Integrator Constants.
  */
 public class SPConstants {
     public static final String WSO2_SP_TOKEN_2 = "HID";

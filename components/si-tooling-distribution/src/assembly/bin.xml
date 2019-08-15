@@ -18,7 +18,7 @@
 <assembly>
     <includeBaseDirectory>true</includeBaseDirectory>
     <baseDirectory>wso2-streaming-integrator-tooling-${project.version}</baseDirectory>
-    <id>WSO2 Stream Processor Distribution</id>
+    <id>WSO2 Streaming Integrator Distribution</id>
     <formats>
         <format>zip</format>
     </formats>

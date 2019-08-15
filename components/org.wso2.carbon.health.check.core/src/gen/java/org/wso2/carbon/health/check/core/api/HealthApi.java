@@ -43,11 +43,11 @@ public class HealthApi implements Microservice {
 
     @GET
     @Produces({"application/json"})
-    @io.swagger.annotations.ApiOperation(value = "Fetches the status of the Stream Processor.",
-            notes = "Fetches the status of the Stream Processor. ", response = ServerStatus.class, tags = {"Artifact",})
+    @io.swagger.annotations.ApiOperation(value = "Fetches the status of the Streaming Integrator.",
+            notes = "Fetches the status of the Streaming Integrator. ", response = ServerStatus.class, tags = {"Artifact",})
     @io.swagger.annotations.ApiResponses(value = {
             @io.swagger.annotations.ApiResponse(code = 200,
-                    message = "The state of the Stream Processor is successfully retrieved.",
+                    message = "The state of the Streaming Integrator is successfully retrieved.",
                     response = ServerStatus.class)})
     public Response healthGet()
             throws NotFoundException {

@@ -9,7 +9,7 @@
 
 This project contains compontents which implements common functionalities used in WSO2 analytics platform.
 
-#### Carbon Analytics repo contains components realted to WSO2 Stream Processor such as:
+#### Carbon Analytics repo contains components realted to WSO2 Streaming Integrator such as:
 
 * stream-processing
 * editor      
