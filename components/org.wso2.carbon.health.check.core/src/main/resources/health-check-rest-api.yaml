@@ -3,7 +3,7 @@ info:
   description: >-
     This is the REST Micro Service for System Availability.
   version: 1.0.0
-  title: Stream Processor Health Check API
+  title: Streaming Integrator Health Check API
   termsOfService: 'http://wso2.com/terms'
   contact:
     email: dev@wso2.org
@@ -13,7 +13,7 @@ info:
 basePath: /v1.0
 tags:
   - name: health
-    description: Everything about Stream Processor health
+    description: Everything about Streaming Integrator health
     externalDocs:
       description: Find out more about server health
       url: 'https://docs.wso2.com/display/SP400/Key+Concepts'
@@ -27,14 +27,14 @@ paths:
       x-wso2-response: 'HTTP/1.1 200 OK Content-Type: application/json {"status":"active"}'
       tags:
         - Artifact
-      summary: Fetches the status of the Stream Processor.
+      summary: Fetches the status of the Streaming Integrator.
       description: |
-        Fetches the status of the Stream Processor.
+        Fetches the status of the Streaming Integrator.
       produces:
         - application/json
       responses:
         '200':
-          description: The state of the Stream Processor is successfully retrieved.
+          description: The state of the Streaming Integrator is successfully retrieved.
           schema:
             $ref: '#/definitions/ServerStatus'
 

@@ -28,9 +28,9 @@
 
     <artifactId>org.wso2.carbon.streaming.integrator.core.feature</artifactId>
     <packaging>carbon-feature</packaging>
-    <name>WSO2 Stream Processor - Core Feature</name>
+    <name>WSO2 Streaming Integrator - Core Feature</name>
     <url>http://wso2.org</url>
-    <description>This feature contains the bundles related to Stream Processor Core</description>
+    <description>This feature contains the bundles related to Streaming Integrator Core</description>
 
     <dependencies>
         <dependency>

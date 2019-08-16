@@ -67,7 +67,7 @@ define(function() {
      */
     constants.typeToDisplayNameMap = {};
     constants.typeToDisplayNameMap[constants.FUNCTIONS] = "Function";
-    constants.typeToDisplayNameMap[constants.STREAM_PROCESSORS] = "Stream Processor";
+    constants.typeToDisplayNameMap[constants.STREAM_PROCESSORS] = "Streaming Integrator";
     constants.typeToDisplayNameMap[constants.WINDOW_PROCESSORS] = "Window Processor";
     constants.typeToDisplayNameMap[constants.STREAMS] = "Stream";
     constants.typeToDisplayNameMap[constants.INNER_STREAMS] = "Inner Stream";

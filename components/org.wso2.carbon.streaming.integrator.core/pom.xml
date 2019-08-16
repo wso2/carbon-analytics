@@ -29,7 +29,7 @@
     <artifactId>org.wso2.carbon.streaming.integrator.core</artifactId>
     <packaging>bundle</packaging>
 
-    <name>WSO2 Stream Processor - Core</name>
+    <name>WSO2 Streaming Integrator - Core</name>
     <url>http://wso2.org</url>
 
     <dependencies>

@@ -26,7 +26,7 @@
     <artifactId>org.wso2.carbon.analytics.auth.rest.api</artifactId>
     <packaging>bundle</packaging>
 
-    <name>WSO2 Stream Processor - Authentication API</name>
+    <name>WSO2 Streaming Integrator - Authentication API</name>
     <url>http://maven.apache.org</url>
 
     <dependencies>

@@ -20,7 +20,7 @@
 swagger: '2.0'
 info:
   version: 1.0.0
-  title: Stream Processor Status Dashboard Service
+  title: Streaming Integrator Status Dashboard Service
   description: >-
     This provides information about the REST API available for getting general details of a SP node.
   contact:

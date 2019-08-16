@@ -28,9 +28,9 @@
     <modelVersion>4.0.0</modelVersion>
     <artifactId>org.wso2.carbon.streaming.integrator.common.feature</artifactId>
     <packaging>carbon-feature</packaging>
-    <name>WSO2 Stream Processor - Common Feature</name>
+    <name>WSO2 Streaming Integrator - Common Feature</name>
     <url>http://wso2.org</url>
-    <description>This feature contains the bundles related to Stream Processor Common</description>
+    <description>This feature contains the bundles related to Streaming Integrator Common</description>
 
     <dependencies>
         <dependency>

@@ -20,7 +20,7 @@
 swagger: '2.0'
 info:
   version: 1.0.0
-  title: Stream Processor Status Dashboard Service
+  title: Streaming Integrator Status Dashboard Service
   description: >-
     This provides information about the REST APIs available for WSO2 Steam
     Processor Status Dashboard from SP worker.

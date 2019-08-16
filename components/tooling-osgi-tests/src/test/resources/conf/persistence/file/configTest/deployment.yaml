@@ -17,9 +17,9 @@
   # Carbon Configuration Parameters
 wso2.carbon:
     # value to uniquely identify a server
-  id: wso2-sp
+  id: wso2-si
     # server name
-  name: WSO2 Stream Processor
+  name: WSO2 Streaming Integrator
     # ports used by this server
   ports:
       # port offset

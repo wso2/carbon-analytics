@@ -1082,7 +1082,7 @@ public class EditorMicroservice implements Microservice {
      */
     @Activate
     protected void start(BundleContext bundleContext) throws Exception {
-        // Create Stream Processor Service
+        // Create Streaming Integrator Service
         EditorDataHolder.setDebugProcessorService(new DebugProcessorService());
         SiddhiManager siddhiManager = new SiddhiManager();
         FileConfigManager fileConfigManager = new FileConfigManager(configProvider);

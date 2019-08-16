@@ -28,7 +28,7 @@
 
     <artifactId>org.wso2.carbon.analytics.auth.rest.api.feature</artifactId>
     <packaging>carbon-feature</packaging>
-    <name>WSO2 Stream Processor - Authentication API Feature</name>
+    <name>WSO2 Streaming Integrator - Authentication API Feature</name>
     <url>http://wso2.org</url>
 
     <dependencies>

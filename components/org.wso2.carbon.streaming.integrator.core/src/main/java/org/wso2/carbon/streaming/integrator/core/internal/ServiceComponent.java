@@ -100,7 +100,7 @@ public class ServiceComponent {
 
         String siddhiAppsReference = System.getProperty(SiddhiAppProcessorConstants.SYSTEM_PROP_RUN_SIDDHI_APPS);
         ConfigProvider configProvider = StreamProcessorDataHolder.getInstance().getConfigProvider();
-        // Create Stream Processor Service
+        // Create Streaming Integrator Service
         StreamProcessorDataHolder.setStreamProcessorService(new StreamProcessorService());
         SiddhiManager siddhiManager = new SiddhiManager();
         FileConfigManager fileConfigManager = new FileConfigManager(configProvider);
@@ -360,7 +360,7 @@ public class ServiceComponent {
                     throw new HAModeException("More than two nodes can not be used in the minimum HA mode. " +
                             "Use another clustering mode, change the groupId or disable clustering.");
                 }
-                log.info("WSO2 Stream Processor Starting in Two Node Minimum HA Deployment");
+                log.info("WSO2 Streaming Integrator Starting in Two Node Minimum HA Deployment");
                 StreamProcessorDataHolder.setIsStatisticsEnabled(
                         SPMetricsDataHolder.getInstance().getMetricManagementService().isEnabled());
                 StatisticsManager statisticsManager = StreamProcessorDataHolder.getStatisticsConfiguration().

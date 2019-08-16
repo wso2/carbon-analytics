@@ -1,8 +1,8 @@
 swagger: '2.0'
 info:
   version: 1.0.0
-  title: Stream Processor Authentication Service
-  description: This provides service to authenticate users in Stream Processor
+  title: Streaming Integrator Authentication Service
+  description: This provides service to authenticate users in Streaming Integrator
   contact:
     name: WSO2
     url: 'http://wso2.com/smart-analytics'
@@ -22,7 +22,7 @@ paths:
   /login/{appName}:
     post:
       description:
-        Login Request to Stream Processor.
+        Login Request to Streaming Integrator.
       consumes:
         - application/x-www-form-urlencoded
         - multipart/form-data
@@ -92,7 +92,7 @@ paths:
   /logout/{appName}:
     post:
       description:
-        Logout Request to Stream Processor
+        Logout Request to Streaming Integrator
       parameters:
         - name: appName
           in: path

@@ -30,7 +30,7 @@
     <artifactId>org.wso2.carbon.health.check.core</artifactId>
     <packaging>bundle</packaging>
 
-    <name>WSO2 Stream Processor - Health Check REST API</name>
+    <name>WSO2 Streaming Integrator - Health Check REST API</name>
     <url>http://wso2.org</url>
 
     <dependencies>

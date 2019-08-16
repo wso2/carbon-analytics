@@ -29,7 +29,7 @@
     <artifactId>org.wso2.carbon.business.rules.templates.editor.core</artifactId>
     <packaging>bundle</packaging>
 
-    <name>WSO2 Stream Processor - Business Rules Template Editor</name>
+    <name>WSO2 Streaming Integrator - Business Rules Template Editor</name>
     <url>http://wso2.org</url>
 
     <dependencies>

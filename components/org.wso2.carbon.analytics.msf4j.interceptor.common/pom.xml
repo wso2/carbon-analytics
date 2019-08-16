@@ -28,7 +28,7 @@
     <artifactId>org.wso2.carbon.analytics.msf4j.interceptor.common</artifactId>
     <packaging>bundle</packaging>
 
-    <name>WSO2 Stream Processor - Interceptors</name>
+    <name>WSO2 Streaming Integrator - Interceptors</name>
     <url>http://maven.apache.org</url>
 
     <dependencies>

@@ -56,7 +56,7 @@ public class LoginApi implements Microservice {
     @Path("/{appName:(.*)}")
     @Consumes({"application/x-www-form-urlencoded", "multipart/form-data"})
     @Produces({"application/json"})
-    @io.swagger.annotations.ApiOperation(value = "", notes = "Login Request to Stream Processor.",
+    @io.swagger.annotations.ApiOperation(value = "", notes = "Login Request to Streaming Integrator.",
             response = UserDTO.class, tags = {})
     @io.swagger.annotations.ApiResponses(value = {
             @io.swagger.annotations.ApiResponse(code = 200, message = "Authorization Request Successful.",
@@ -108,7 +108,7 @@ public class LoginApi implements Microservice {
 
     @GET
     @Path("/auth-type")
-    @io.swagger.annotations.ApiOperation(value = "", notes = "Login type check Request to Stream Processor.",
+    @io.swagger.annotations.ApiOperation(value = "", notes = "Login type check Request to Streaming Integrator.",
             response = UserDTO.class, tags = {})
     @io.swagger.annotations.ApiResponses(value = {
             @io.swagger.annotations.ApiResponse(code = 200, message = "Type Check Request Successful.",
