@@ -18,6 +18,9 @@
 
 package org.wso2.carbon.streaming.integrator.core.ha;
 
+import io.siddhi.core.stream.input.source.SourceHandlerManager;
+import io.siddhi.core.stream.output.sink.SinkHandlerManager;
+import io.siddhi.core.table.record.RecordTableHandlerManager;
 import org.apache.log4j.Logger;
 import org.wso2.carbon.cluster.coordinator.commons.node.NodeDetail;
 import org.wso2.carbon.cluster.coordinator.service.ClusterCoordinator;
@@ -42,7 +45,6 @@ import io.siddhi.core.stream.input.source.SourceHandler;
 import io.siddhi.core.stream.output.sink.SinkHandler;
 import io.siddhi.core.table.record.RecordTableHandler;
 import io.siddhi.core.util.transport.BackoffRetryCounter;
-import io.siddhi.core.util.statistics.metrics.Level;
 
 import java.util.HashMap;
 import java.util.List;
@@ -187,6 +189,7 @@ public class HAManager {
             createSiddhiAppRuntimes();
             for (SourceHandler sourceHandler : sourceHandlerManager.getRegsiteredSourceHandlers().values()) {
                 try {
+                    ((HACoordinationSourceHandler) sourceHandler).setPlayBack(true);
                     ((HACoordinationSourceHandler) sourceHandler).setAsActive();
                 } catch (Throwable t) {
                     log.error("HA Deployment: Error when connecting to source " + sourceHandler.getId() +
@@ -218,7 +221,15 @@ public class HAManager {
             } catch (InterruptedException e) {
                 log.warn("Error in sending events to input handler." + e.getMessage());
             }
-
+            for (SourceHandler sourceHandler : sourceHandlerManager.getRegsiteredSourceHandlers().values()) {
+                try {
+                    ((HACoordinationSourceHandler) sourceHandler).setPlayBack(false);
+                } catch (Throwable t) {
+                    log.error("HA Deployment: Error when connecting to source " + sourceHandler.getId() +
+                            " while changing from passive state to active, skipping the source. ", t);
+                    continue;
+                }
+            }
             //change the system clock to work with current time
             enableEventTimeClock(false);
 
@@ -279,6 +290,27 @@ public class HAManager {
      */
     void changeToPassive() {
         log.info("HA Deployment: This Node is now becoming the Passive Node");
+        SinkHandlerManager sinkHandlerManager = StreamProcessorDataHolder.getSinkHandlerManager();
+        Map<String, SinkHandler> registeredSinkHandlers = sinkHandlerManager.getRegisteredSinkHandlers();
+        SourceHandlerManager sourceHandlerManager = StreamProcessorDataHolder.getSourceHandlerManager();
+        Map<String, SourceHandler> registeredSourceHandlers = sourceHandlerManager.
+                getRegsiteredSourceHandlers();
+        RecordTableHandlerManager recordTableHandlerManager = StreamProcessorDataHolder.
+                getRecordTableHandlerManager();
+        Map<String, RecordTableHandler> registeredRecordTableHandlers = recordTableHandlerManager.
+                getRegisteredRecordTableHandlers();
+        for (Map.Entry<String, SinkHandler> entry : registeredSinkHandlers.entrySet()) {
+            HACoordinationSinkHandler handler = (HACoordinationSinkHandler) entry.getValue();
+            if (handler != null) {
+                handler.setAsPassive();
+            }
+        }
+        for (SourceHandler sourceHandler : registeredSourceHandlers.values()) {
+            ((HACoordinationSourceHandler) sourceHandler).setAsPassive();
+        }
+        for (RecordTableHandler recordTableHandler : registeredRecordTableHandlers.values()) {
+            ((HACoordinationRecordTableHandler) recordTableHandler).setAsPassive();
+        }
         //stop the databridge servers
         List<ServerEventListener> listeners = StreamProcessorDataHolder.getServerListeners();
         for (ServerEventListener listener : listeners) {
@@ -312,7 +344,9 @@ public class HAManager {
         } finally {
             EventSyncConnectionPoolManager.uninitializeConnectionPool();
         }
-
+        registeredSinkHandlers.clear();
+        registeredRecordTableHandlers.clear();
+        registeredSourceHandlers.clear();
         log.info("Successfully Changed to Passive Mode ");
     }
 

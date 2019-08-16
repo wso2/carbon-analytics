@@ -18,6 +18,7 @@
 
 package org.wso2.carbon.streaming.integrator.core.ha.tcp;
 
+import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
@@ -45,6 +46,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ThreadFactory;
 
 /**
  * Event Sync Server.
@@ -64,9 +66,11 @@ public class EventSyncServer {
     private EventBufferExtractor eventBufferExtractor = new EventBufferExtractor();
 
     public void start(DeploymentConfig deploymentConfig) {
+        ThreadFactory namedThreadFactory = new ThreadFactoryBuilder()
+                .setNameFormat("EventSyncServer-%d").build();
         eventBufferExtractorExecutorService = Executors.newFixedThreadPool(
-                HAConstants.EVENT_BUFFER_EXTRACTOR_THREAD_POOL_SIZE);
-        this.eventByteBufferQueue = new LinkedBlockingQueue<>(deploymentConfig.
+                HAConstants.EVENT_BUFFER_EXTRACTOR_THREAD_POOL_SIZE, namedThreadFactory);
+        eventByteBufferQueue = new LinkedBlockingQueue<>(deploymentConfig.
                 getEventByteBufferQueueCapacity());
         serverConfig = deploymentConfig.eventSyncServerConfigs();
         bossGroup = new NioEventLoopGroup(serverConfig.getBossThreads());
@@ -90,7 +94,7 @@ public class EventSyncServer {
         try {
             // Bind and start to accept incoming connections.
             channelFuture = bootstrap.bind(serverConfig.getHost(), serverConfig.getPort()).sync();
-            for(int i = 0; i < HAConstants.EVENT_BUFFER_EXTRACTOR_THREAD_POOL_SIZE; i++) {
+            for (int i = 0; i < HAConstants.EVENT_BUFFER_EXTRACTOR_THREAD_POOL_SIZE; i++) {
                 eventBufferExtractorExecutorService.submit(eventBufferExtractor);
             }
             log.info("EventSyncServer started in " + hostAndPort + "");
@@ -137,9 +141,6 @@ public class EventSyncServer {
                         byte[] bytes = new byte[dataLength];
                         in.get(bytes);
                         if (channelId.equals(HAConstants.CHANNEL_ID_CONTROL_MESSAGE)) {
-                            if (log.isDebugEnabled()) {
-                                log.debug("Received a control message");
-                            }
                             eventListMapManager.parseControlMessage(bytes);
                         } else if (channelId.equals(HAConstants.CHANNEL_ID_MESSAGE)) {
                             if (log.isDebugEnabled()) {

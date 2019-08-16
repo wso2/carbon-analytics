@@ -90,7 +90,7 @@ public class HAEventListener extends MemberEventListener {
                                     }
                                 } catch (InterruptedException e) {
                                     log.error("Error occurred while waiting for passive node property map to " +
-                                            "available. " + e.getMessage(),e);
+                                            "available. " + e.getMessage(), e);
                                 }
                             } else {
                                 log.info("Active node retrieved node details of passive node");
@@ -164,15 +164,6 @@ public class HAEventListener extends MemberEventListener {
         log.info("coordinatorChanged event received for node id : " + nodeDetail.getNodeId());
         ClusterCoordinator clusterCoordinator = StreamProcessorDataHolder.getClusterCoordinator();
         if (clusterCoordinator != null) {
-
-            SinkHandlerManager sinkHandlerManager = StreamProcessorDataHolder.getSinkHandlerManager();
-            Map<String, SinkHandler> registeredSinkHandlers = sinkHandlerManager.getRegisteredSinkHandlers();
-
-            RecordTableHandlerManager recordTableHandlerManager = StreamProcessorDataHolder.
-                    getRecordTableHandlerManager();
-            Map<String, RecordTableHandler> registeredRecordTableHandlers = recordTableHandlerManager.
-                    getRegisteredRecordTableHandlers();
-
             //synchronizing this inorder to prevent quick changes of active passive states in same node if occurred
             synchronized (this) {
                 if (clusterCoordinator.isLeaderNode()) {
@@ -182,8 +173,6 @@ public class HAEventListener extends MemberEventListener {
                     // nodes become unresponsive and already passive node could become passive again
                     if (StreamProcessorDataHolder.getHAManager().isActiveNode()) {
                         StreamProcessorDataHolder.getHAManager().changeToPassive();
-                        registeredSinkHandlers.clear();
-                        registeredRecordTableHandlers.clear();
                     }
                 }
             }
@@ -194,31 +183,7 @@ public class HAEventListener extends MemberEventListener {
     public void becameUnresponsive(String nodeId) {
         log.info("becameUnresponsive event received for node id : " + nodeId);
         if (StreamProcessorDataHolder.getHAManager().isActiveNode()) {
-            SinkHandlerManager sinkHandlerManager = StreamProcessorDataHolder.getSinkHandlerManager();
-            Map<String, SinkHandler> registeredSinkHandlers = sinkHandlerManager.getRegisteredSinkHandlers();
-
-            SourceHandlerManager sourceHandlerManager = StreamProcessorDataHolder.getSourceHandlerManager();
-            Map<String, SourceHandler> registeredSourceHandlers = sourceHandlerManager.
-                    getRegsiteredSourceHandlers();
-
-            RecordTableHandlerManager recordTableHandlerManager = StreamProcessorDataHolder.
-                    getRecordTableHandlerManager();
-            Map<String, RecordTableHandler> registeredRecordTableHandlers = recordTableHandlerManager.
-                    getRegisteredRecordTableHandlers();
-
             StreamProcessorDataHolder.getHAManager().changeToPassive();
-            for (Map.Entry<String, SinkHandler> entry : registeredSinkHandlers.entrySet()) {
-                HACoordinationSinkHandler handler = (HACoordinationSinkHandler) entry.getValue();
-                if (handler != null) {
-                    handler.setAsPassive();
-                }
-            }
-            for (SourceHandler sourceHandler : registeredSourceHandlers.values()) {
-                ((HACoordinationSourceHandler) sourceHandler).setAsPassive();
-            }
-            for (RecordTableHandler recordTableHandler : registeredRecordTableHandlers.values()) {
-                ((HACoordinationRecordTableHandler) recordTableHandler).setAsPassive();
-            }
         }
 
     }

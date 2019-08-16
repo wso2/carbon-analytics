@@ -17,6 +17,7 @@
  */
 package org.wso2.carbon.streaming.integrator.core.internal;
 
+import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import io.siddhi.core.SiddhiManager;
 import io.siddhi.core.config.StatisticsConfiguration;
 import io.siddhi.core.util.SiddhiComponentActivator;
@@ -137,11 +138,9 @@ public class ServiceComponent {
                 throw new PersistenceStoreConfigurationException("Persistence Store class with name "
                         + persistenceStoreClassName + " is invalid. ", e);
             }
-
-
             int persistenceInterval = persistenceConfigurations.getIntervalInMin();
-            scheduledExecutorService = Executors.newScheduledThreadPool(1);
-
+            scheduledExecutorService = Executors.newScheduledThreadPool(1,
+                    new ThreadFactoryBuilder().setPriority(7).setNameFormat("SchedulePersistence-%d").build());
             if (persistenceInterval > 0) {
                 scheduledFuture = scheduledExecutorService.scheduleAtFixedRate(new PersistenceManager(),
                         persistenceInterval, persistenceInterval, TimeUnit.MINUTES);
@@ -208,11 +207,11 @@ public class ServiceComponent {
         StreamProcessorDataHolder.setNodeInfo(nodeInfo);
         StreamProcessorDataHolder.getInstance().setBundleContext(bundleContext);
 
+        serviceComponentActivated = true;
 
         if (clusterComponentActivated) {
             setUpClustering(StreamProcessorDataHolder.getClusterCoordinator());
         }
-
     }
 
     /**
