@@ -78,6 +78,7 @@
                           </Export-Package>
                           <Import-Package>
                               org.wso2.carbon.event.template.manager.core,
+                              org.osgi.service.component.*;version="${imp.package.version.osgi.services}",
                               *;resolution:=optional,
                           </Import-Package>
 

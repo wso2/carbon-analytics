@@ -65,6 +65,7 @@
                             org.wso2.carbon.analytics.activitydashboard.admin.*
                         </Export-Package>
                         <Import-Package>
+                            org.osgi.service.component.*;version="${imp.package.version.osgi.services}",
                             *;resolution:=optional,
                         </Import-Package>
                     </instructions>

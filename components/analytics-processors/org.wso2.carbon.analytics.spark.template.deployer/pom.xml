@@ -87,6 +87,7 @@
                           <Import-Package>
                               org.wso2.carbon.event.template.manager.core,
                               org.wso2.carbon.analytics.spark.core.*;version="${carbon.analytics.version}",
+                              org.osgi.service.component.*;version="${imp.package.version.osgi.services}",
                               *;resolution:=optional,
                           </Import-Package>
 

@@ -77,7 +77,8 @@
                         <Export-Package>org.wso2.carbon.analytics.dataservice.core*</Export-Package>
                         <Import-Package>
                             org.apache.lucene.*;version="${lucene.imp.pkg.version}",
-                            org.wso2.carbon.ntask.core.*;version="${carbon.commons.imp.pkg.version}"
+                            org.wso2.carbon.ntask.core.*;version="${carbon.commons.imp.pkg.version}",
+                            org.osgi.service.component.*;version="${imp.package.version.osgi.services}"
                         </Import-Package>
                         <DynamicImport-Package>*</DynamicImport-Package>
                         <WSO2-Application-Deployer>Analytics Data Purging CApp Deployer</WSO2-Application-Deployer>

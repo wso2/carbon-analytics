@@ -87,7 +87,10 @@
 						<Export-Package>
 							org.wso2.carbon.analytics.datasource.core.*
 						</Export-Package>
-						<Import-Package>org.wso2.carbon.analytics.datasource.commons.*</Import-Package>
+						<Import-Package>
+							org.wso2.carbon.analytics.datasource.commons.*,
+							org.osgi.service.component.*;version="${imp.package.version.osgi.services}"
+						</Import-Package>
 						<DynamicImport-Package>*</DynamicImport-Package>
 					</instructions>
 				</configuration>
