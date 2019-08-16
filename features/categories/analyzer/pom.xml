@@ -71,9 +71,9 @@
                                 <importFeatureDef>org.wso2.carbon.analytics.activitydashboard:${carbon.analytics.version}</importFeatureDef>
                                 <importFeatureDef>org.wso2.carbon.analytics.webservice:${carbon.analytics.version}</importFeatureDef>
                                 <importFeatureDef>org.wso2.carbon.analytics.jsservice:${carbon.analytics.version}</importFeatureDef>
-                                <importFeatureDef>org.wso2.carbon.core:${carbon.kernel.version}</importFeatureDef>
-                                <importFeatureDef>org.wso2.carbon.core.runtime:${carbon.kernel.version}</importFeatureDef>
-                                <importFeatureDef>org.wso2.carbon.core.ui:${carbon.kernel.version}</importFeatureDef>
+                                <importFeatureDef>org.wso2.carbon.core:${carbon.kernel.feature.version}</importFeatureDef>
+                                <importFeatureDef>org.wso2.carbon.core.runtime:${carbon.kernel.feature.version}</importFeatureDef>
+                                <importFeatureDef>org.wso2.carbon.core.ui:${carbon.kernel.feature.version}</importFeatureDef>
                                 <importFeatureDef>org.wso2.das.styles:${das.release.version}</importFeatureDef>
 
                                 <!-- ********* START - Registry related  *********** -->

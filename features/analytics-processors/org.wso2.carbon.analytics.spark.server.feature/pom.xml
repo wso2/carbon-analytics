@@ -309,7 +309,7 @@
                                 <bundleDef>org.roaringbitmap:RoaringBitmap</bundleDef>
                             </bundles>
                             <importFeatures>
-                                <importFeatureDef>org.wso2.carbon.core:${carbon.kernel.version}
+                                <importFeatureDef>org.wso2.carbon.core:${carbon.kernel.feature.version}
                                 </importFeatureDef>
                                 <importFeatureDef>
                                     org.wso2.carbon.spark.commons:${carbon.analytics.common.version}

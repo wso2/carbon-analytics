@@ -61,7 +61,8 @@
                         <Import-Package>
                             org.wso2.carbon.analytics.dataservice.commons.*;version="${carbon.analytics.version}",
                             org.wso2.carbon.analytics.datasource.commons.*;version="${carbon.analytics.version}",
-                            org.wso2.carbon.analytics.io.commons.*;version="${carbon.analytics.version}"
+                            org.wso2.carbon.analytics.io.commons.*;version="${carbon.analytics.version}",
+                            org.osgi.service.component.*;version="${imp.package.version.osgi.services}"
                         </Import-Package>
                         <Private-Package>org.wso2.carbon.analytics.api.internal.*</Private-Package>
                         <DynamicImport-Package>*</DynamicImport-Package>

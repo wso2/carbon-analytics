@@ -74,7 +74,7 @@
                                 <bundleDef>org.wso2.carbon.analytics:org.wso2.carbon.analytics.datasource.rdbms</bundleDef>
                             </bundles>
                             <importFeatures>
-                                <importFeatureDef>org.wso2.carbon.core:${carbon.kernel.version}</importFeatureDef>
+                                <importFeatureDef>org.wso2.carbon.core:${carbon.kernel.feature.version}</importFeatureDef>
                                 <importFeatureDef>org.wso2.carbon.analytics.core.server:${carbon.analytics.version}</importFeatureDef>
                             </importFeatures>
                         </configuration>

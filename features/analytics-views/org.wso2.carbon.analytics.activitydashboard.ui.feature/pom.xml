@@ -87,7 +87,7 @@
                                 <bundleDef>org.wso2.orbit.org.owasp.encoder:encoder:${encoder.wso2.version}</bundleDef>
                             </bundles>
                             <importFeatures>
-                                <importFeatureDef>org.wso2.carbon.core.ui:${carbon.kernel.version}</importFeatureDef>
+                                <importFeatureDef>org.wso2.carbon.core.ui:${carbon.kernel.feature.version}</importFeatureDef>
                             </importFeatures>
                         </configuration>
                     </execution>
