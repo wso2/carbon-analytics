@@ -57,7 +57,7 @@
                                 <bundleDef>org.wso2.orbit.org.objenesis:objenesis</bundleDef>
                             </bundles>
                             <importFeatures>
-                                <importFeatureDef>org.wso2.carbon.core:${carbon.kernel.version}</importFeatureDef>
+                                <importFeatureDef>org.wso2.carbon.core:${carbon.kernel.feature.version}</importFeatureDef>
                             </importFeatures>
                         </configuration>
                     </execution>
