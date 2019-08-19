@@ -34,7 +34,7 @@ header .brand h1 {
 
 header .brand {
     line-height: 40px;
-    padding: 0 10px;
+    padding: 10px 10px 0 10px;
     vertical-align: middle;
     margin-right: 25px;
 }
@@ -67,7 +67,7 @@ header .brand {
 }
 
 .menu-group.open {
-    background-color: #f17b31;
+    background-color: #02aaad;
 }
 
 .menu-bar .menu-group.open a {
@@ -85,13 +85,13 @@ header .brand {
 }
 
 .menu-bar .menu-group.open a:hover {
-    background-color: #f17b31;
+    background-color: #02aaad;
 }
 
 .menu-bar .menu-group .dropdown-menu > li > a:hover,
 .menu-bar .menu-group .dropdown-menu > li > a:focus {
     text-decoration: none;
-    color: #f47b20;
+    color: #02aaad;
     background-color: #000000;
 }
 
@@ -141,12 +141,12 @@ header .brand {
 }
 
 a {
-    color: #f47a1e;
+    color: #02aaad;
     text-decoration: none;
 }
 a:hover,
 a:focus {
-    color: #bc5609;
+    color: #02979a;
     text-decoration: none;
     background-color: transparent;
 }
@@ -297,15 +297,15 @@ a.ui-button:active, .ui-button:active,
 }
 
 .btn-primary {
-    background-color: #f57e30;
-    border-color: #f57e30;
+    background-color: #02aaad;
+    border-color: #02aaad;
     color: #fff;
     text-transform: capitalize;
 }
 
 .btn-primary:hover {
-    background-color: #e7620b;
-    border-color: #e7620b;
+    background-color: #027f82;
+    border-color: #027f82;
     color: #fff;
 }
 
@@ -621,10 +621,10 @@ h3.popover-title {
 }
 
 .btn.btn_no {
-    background-color: #f57e30;
+    background-color: #02aaad;
     color: #000000;
     border: 1px solid;
-    border-color: #f57e30;
+    border-color: #02aaad;
 
 }
 .btn.btn_yes {
@@ -636,7 +636,7 @@ h3.popover-title {
 }
 
 .btn.btn_no:hover {
-    background-color: #e7620b;
+    background-color: #027f82;
     color: #000000;
 }
 
@@ -646,7 +646,7 @@ h3.popover-title {
 }
 
 .btn.btn_no:focus {
-    border: 2px solid #ff9f60;
+    border: 2px solid #02cacd;
 }
 
 .btn.btn_yes:focus {

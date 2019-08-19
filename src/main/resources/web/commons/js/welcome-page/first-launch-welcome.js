@@ -119,13 +119,13 @@ define(['require', 'lodash', 'log', 'jquery', 'backbone', 'command', 'sample_pre
                 quickLinksPane.append(quickLinkHeader);
 
                 var bodyUlQuickLinkContent = $('<ul class="quick-links col-md-12 col-lg-8">' +
-                    '<li class="col-md-4"><a href="https://siddhi-io.github.io/siddhi/documentation/siddhi-5.x/quckstart-5.x/"' +
+                    '<li class="col-md-3"><a href="https://siddhi.io/en/v5.1/docs/quick-start/"' +
                     'target="_blank"><i class="fw fw-list"></i>Quick Start Guide</a></li>' +
-                    '<li class="col-md-4"><a href="https://siddhi-io.github.io/siddhi/documentation/siddhi-5.x/query-guide-5.x/"' +
+                    '<li class="col-md-3"><a href="https://siddhi.io/en/v5.1/docs/query-guide/"' +
                     'target="_blank"><i class="fw fw-carbon"></i>Siddhi Grammar</a></li>' +
-                    '<li class="col-md-4"><a href="https://stackoverflow.com/questions/tagged/siddhi"' +
+                    '<li class="col-md-3"><a href="https://stackoverflow.com/questions/tagged/siddhi"' +
                     'target="_blank"><i class="fw fw-info"></i>Q&A</a></li>' +
-                    '<li class="col-md-4"><a href="https://siddhi-io.github.io/siddhi/"' +
+                    '<li class="col-md-3"><a href="https://siddhi.io/en/v5.1/docs/"' +
                     'target="_blank"><i class="fw fw-google-docs"></i>Documentation</a></li>');
 
                 quickLinksPane.append(bodyUlQuickLinkContent);
