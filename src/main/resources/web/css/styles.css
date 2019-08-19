@@ -519,11 +519,6 @@ a.ui-button:active, .ui-button:active,
     margin-bottom: 15px;
 }
 
-/* Export as docker modal */
-.modalDockerExport .modal-dialog {
-    width: 500px;
-}
-
 body.sticky-footer {
     padding-bottom: 20px;
 }

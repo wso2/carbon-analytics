@@ -523,6 +523,22 @@ define(['ace/ace', 'jquery', 'lodash', 'log','dialogs','./service-client','welco
                 this._handleDeploy.show();
             };
 
+            this.handleExportForDocker = function handleExportForDocker() {
+                if (_.isNil(this._handleExportForDocker)) {
+                    this._handleExportForDocker = new Dialogs.export_dialog(app, true);
+                }
+                this._handleExportForDocker.render();
+                this._handleExportForDocker.show();
+            };
+
+            this.handleExportForKubernetes = function handleExportForKubernetes() {
+                if (_.isNil(this._handleExportForKubernetes)) {
+                    this._handleExportForKubernetes = new Dialogs.export_dialog(app, false);
+                }
+                this._handleExportForKubernetes.render();
+                this._handleExportForKubernetes.show();
+            };
+
             this.openDeleteFileConfirmDialog = function openDeleteFileConfirmDialog(options) {
                 if(_.isNil(this._deleteFileDialog)){
                     this._deleteFileDialog = new Dialogs.DeleteConfirmDialog(app);
@@ -572,14 +588,6 @@ define(['ace/ace', 'jquery', 'lodash', 'log','dialogs','./service-client','welco
                     this._exportFileDialog = new Dialogs.export_file_dialog(app);
                 }
                 this._exportFileDialog.render();
-            };
-
-            this.exportAsDocker = function() {
-                if (_.isNil(this._dockerExportDialog)) {
-                    this._dockerExportDialog = new Dialogs.docker_export_dialog(app);
-                }
-                this._dockerExportDialog.render();
-                this._dockerExportDialog.show();
             };
 
             this.handleExport = function(options) {
@@ -715,8 +723,6 @@ define(['ace/ace', 'jquery', 'lodash', 'log','dialogs','./service-client','welco
             // Export file export dialog
             app.commandManager.registerHandler('export-file-export-dialog', this.exportFileExportDialog, this);
 
-            app.commandManager.registerHandler('export-docker', this.exportAsDocker, this);
-
             app.commandManager.registerHandler('open-replace-file-confirm-dialog', this.openReplaceFileConfirmDialog,
                 this);
 
@@ -763,6 +769,10 @@ define(['ace/ace', 'jquery', 'lodash', 'log','dialogs','./service-client','welco
             app.commandManager.registerHandler('tour-guide', this.runGuide, this);
 
             app.commandManager.registerHandler('deploy-to-server', this.handleDeploy, this);
+
+            //Export Menu
+            app.commandManager.registerHandler('export-for-docker', this.handleExportForDocker, this);
+            app.commandManager.registerHandler('export-for-kubernetes', this.handleExportForKubernetes, this);
         }
     });
 
