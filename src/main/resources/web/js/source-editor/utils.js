@@ -62,7 +62,7 @@ define(["./constants"], function (constants) {
      * @param {Object} paramOverloads Param overload array
      * @return {string} html string of the description generated from the meta data provided
      */
-    self.generateDescriptionForProcessor = function (metaData, processorName, paramOverloads) {
+    self.generateDescriptionForProcessor = function (metaData, processorTypeName, processorName, paramOverloads) {
         var description = "";
 
         if (processorName === undefined) {
@@ -83,14 +83,24 @@ define(["./constants"], function (constants) {
                     paramOverloads);
             }
         }
+
         if (metaData.returnAttributes) {
             description += "Return Attributes - " + generateAttributeListDescription(metaData.returnAttributes);
         }
+
         if (metaData.returnEvent) {
             description += (metaData.returnEvent.length > 0 ? "Additional Attributes in " : "") +
                 "Return Event" +
                 (metaData.returnEvent.length > 0 ? generateAttributeListDescription(metaData.returnEvent) : "");
         }
+
+        if (processorTypeName !== undefined) {
+            var processorTypeDisplayText = constants.typeToDisplayNameMap[processorTypeName];
+            if (processorTypeDisplayText !== undefined) {
+                description += "Type - " + processorTypeDisplayText;
+            }
+        }
+
         if (metaData.example) {
             description += "Example - <br><br>" +
                 "<span style='margin-left: 1em'>" + self.wordWrap(metaData.example) + "</span>";
@@ -247,16 +257,17 @@ define(["./constants"], function (constants) {
                     (attributeList[j].type.length > 0 ? " - " + attributeList[j].type.join(" | ").toUpperCase() : "") +
                     (attributeList[j].description ? " - " + attributeList[j].description : "") + "</li>";
             }
-            description += "</ul>";
+            description += "</ul><br>";
         } else {
             description += "none<br><br>";
         }
+
         return description;
     }
 
     function generateAttributeListDescriptionForParamOverloads(attributeList, paramOverloads) {
         var description = "";
-        if (attributeList.length > 0) {
+        if (attributeList.length > 0 && paramOverloads.length > 0) {
             description += "<ul>";
             for (var j = 0; j < attributeList.length; j++) {
                 var attributeName = attributeList[j].name;
@@ -268,10 +279,11 @@ define(["./constants"], function (constants) {
                         (attributeList[j].description ? " - " + attributeList[j].description : "") + "</li>";
                 }
             }
-            description += "</ul>";
+            description += "</ul><br>";
         } else {
             description += "none<br><br>";
         }
+
         return description;
     }
 

@@ -2936,10 +2936,12 @@ define(["ace/ace", "jquery", "./constants", "./utils", "ace/snippets", "ace/rang
                 type: "GET",
                 url: constants.SERVER_URL + "metadata",
                 success: function (response, textStatus, jqXHR) {
-                    if (response.status == "SUCCESS") {
+                    if (response.status === "SUCCESS") {
                         CompletionEngine.rawMetadata = response;
                         (function () {
                             var snippets = {};
+                            var processorTypes = Object.keys(response.inBuilt);
+                            var processorTypeCount = 0;
                             for (var processorType in response.inBuilt) {
                                 if (response.inBuilt.hasOwnProperty(processorType)) {
                                     var snippet = {};
@@ -2948,7 +2950,7 @@ define(["ace/ace", "jquery", "./constants", "./utils", "ace/snippets", "ace/rang
                                         if (parameterOverloads === undefined || parameterOverloads.length === 0) {
                                             snippet[response.inBuilt[processorType][i].name] =
                                                 generateSnippetFromProcessorMetaData(response.
-                                                    inBuilt[processorType][i]);
+                                                    inBuilt[processorType][i], processorTypes[processorTypeCount]);
                                          }
                                         else {
                                             for (var j = 0; j < parameterOverloads.length; j++) {
@@ -2960,12 +2962,13 @@ define(["ace/ace", "jquery", "./constants", "./utils", "ace/snippets", "ace/rang
                                                 snippet[updatedProcessorName] =
                                                     generateSnippetFromProcessorMetaDataForParamOverloads(response.
                                                         inBuilt[processorType][i], updatedProcessorName,
-                                                        overloadParamArray);
+                                                        overloadParamArray, processorTypes[processorTypeCount]);
                                             }
                                          }
                                     }
                                     snippets[processorType] = snippet;
                                 }
+                                processorTypeCount++;
                             }
                             CompletionEngine.functionOperationSnippets.inBuilt = snippets;
                         })();
@@ -2993,6 +2996,8 @@ define(["ace/ace", "jquery", "./constants", "./utils", "ace/snippets", "ace/rang
                             for (var namespace in response.extensions) {
                                 if (response.extensions.hasOwnProperty(namespace)) {
                                     var processors = {};
+                                    var processorTypes = Object.keys(response.extensions[namespace]);
+                                    var processorTypeCount = 0;
                                     for (var processorType in response.extensions[namespace]) {
                                         if (response.extensions[namespace].hasOwnProperty(processorType)) {
                                             var snippet = {};
@@ -3004,7 +3009,8 @@ define(["ace/ace", "jquery", "./constants", "./utils", "ace/snippets", "ace/rang
                                                     parameterOverloads.length === 0) {
                                                     snippet[response.extensions[namespace][processorType][i].name] =
                                                         generateSnippetFromProcessorMetaData(response.
-                                                            extensions[namespace][processorType][i]);
+                                                            extensions[namespace][processorType][i],
+                                                            processorTypes[processorTypeCount]);
                                                 }
                                                 else {
                                                     for (var j = 0; j < parameterOverloads.length; j++) {
@@ -3017,7 +3023,8 @@ define(["ace/ace", "jquery", "./constants", "./utils", "ace/snippets", "ace/rang
                                                         snippet[updatedProcessorName] =
                                                             generateSnippetFromProcessorMetaDataForParamOverloads
                                                             (response.extensions[namespace][processorType][i],
-                                                                updatedProcessorName, overloadParamArray);
+                                                                updatedProcessorName, overloadParamArray,
+                                                                processorTypes[processorTypeCount]);
                                                     }
                                                 }
                                             }
@@ -3025,6 +3032,7 @@ define(["ace/ace", "jquery", "./constants", "./utils", "ace/snippets", "ace/rang
                                                 processors[processorType] = snippet;
                                             }
                                         }
+                                        processorTypeCount++;
                                     }
                                     if (Object.keys(processors).length > 0) {
                                         snippets[namespace] = processors;
@@ -3076,16 +3084,17 @@ define(["ace/ace", "jquery", "./constants", "./utils", "ace/snippets", "ace/rang
          *
          * @private
          * @param {Object} processorMetaData The processor object with relevant parameters
+         * @param {string} processorTypeName Processor type name
          * @return {Object} snippet
          */
-        function generateSnippetFromProcessorMetaData(processorMetaData) {
+        function generateSnippetFromProcessorMetaData(processorMetaData, processorTypeName) {
             var snippetVariableCount = 0;
             var snippetText = "snippet " + processorMetaData.name + "\n\t" + processorMetaData.name;
             if (processorMetaData.parameters) {
                 snippetText += "(";
                 for (var i = 0; i < processorMetaData.parameters.length; i++) {
                     var parameter = processorMetaData.parameters[i];
-                    if (i != 0) {
+                    if (i !== 0) {
                         snippetText += ", ";
                     }
                     snippetText += "${" + (snippetVariableCount + 1) + ":" + parameter.name + "}";
@@ -3096,11 +3105,53 @@ define(["ace/ace", "jquery", "./constants", "./utils", "ace/snippets", "ace/rang
             var snippet = aceModules.snippetManager.parseSnippetFile(snippetText)[0];
 
             if (processorMetaData.description || processorMetaData.returnType || processorMetaData.parameters) {
-                snippet.description = utils.generateDescriptionForProcessor(processorMetaData, undefined, undefined);
+                snippet.description = utils.generateDescriptionForProcessor(processorMetaData, processorTypeName,
+                    undefined, undefined);
             }
             return snippet;
         }
 
+        /**
+         * Prepare a snippet from the processor
+         * Snippets are objects that can be passed into the ace editor to add snippets to the completions provided
+         *
+         * @private
+         * @param {Object} processorMetaData The processor object with relevant parameters
+         * @param {string} processorName Processor Name with overloadedParams
+         * @param {Object} parameterOverloads Overloaded parameters
+         * @param {string} processorTypeName Processor type name
+         * @return {Object} snippet
+         */
+        function generateSnippetFromProcessorMetaDataForParamOverloads(processorMetaData, processorName,
+                                                                       parameterOverloads, processorTypeName) {
+            var snippetVariableCount = 0;
+            var snippetText = "snippet " + processorName + "\n\t" + processorMetaData.name;
+            if (parameterOverloads) {
+                snippetText += "(";
+                for (var i = 0; i < parameterOverloads.length; i++) {
+                    var parameter = parameterOverloads[i];
+                    if (i !== 0) {
+                        snippetText += ", ";
+                    }
+                    snippetText += "${" + (snippetVariableCount + 1) + ":" + parameter + "}";
+                    snippetVariableCount++;
+                }
+                snippetText += ")\n";
+            }
+            var snippet = aceModules.snippetManager.parseSnippetFile(snippetText)[0];
+
+            if (processorMetaData.description || processorMetaData.returnType || processorMetaData.parameters) {
+                snippet.description = utils.generateDescriptionForProcessor(processorMetaData, processorTypeName,
+                    processorName, parameterOverloads);
+            }
+            return snippet;
+        }
+
+        /**
+         * Generate processor name with overload params
+         * @param overloadParamArray Overload params
+         * @returns {string} Processor name with overload params
+         */
         function generateSnippetFromProcessorName(overloadParamArray) {
             var overloadParamAsString = "";
             if (overloadParamArray !== undefined) {
@@ -3119,41 +3170,6 @@ define(["ace/ace", "jquery", "./constants", "./utils", "ace/snippets", "ace/rang
             }
 
             return overloadParamAsString;
-        }
-
-        /**
-         * Prepare a snippet from the processor
-         * Snippets are objects that can be passed into the ace editor to add snippets to the completions provided
-         *
-         * @private
-         * @param {Object} processorMetaData The processor object with relevant parameters
-         * @param {String} processorName Processor Name with overloadedParams
-         * @param {Object} parameterOverloads Overloaded parameters
-         * @return {Object} snippet
-         */
-        function generateSnippetFromProcessorMetaDataForParamOverloads(processorMetaData, processorName,
-                                                                       parameterOverloads) {
-            var snippetVariableCount = 0;
-            var snippetText = "snippet " + processorName + "\n\t" + processorMetaData.name;
-            if (parameterOverloads) {
-                snippetText += "(";
-                for (var i = 0; i < parameterOverloads.length; i++) {
-                    var parameter = parameterOverloads[i];
-                    if (i !== 0) {
-                        snippetText += ", ";
-                    }
-                    snippetText += "${" + (snippetVariableCount + 1) + ":" + parameter + "}";
-                    snippetVariableCount++;
-                }
-                snippetText += ")\n";
-            }
-            var snippet = aceModules.snippetManager.parseSnippetFile(snippetText)[0];
-
-            if (processorMetaData.description || processorMetaData.returnType || processorMetaData.parameters) {
-                snippet.description = utils.generateDescriptionForProcessor(processorMetaData, processorName,
-                    parameterOverloads);
-            }
-            return snippet;
         }
 
         /**
