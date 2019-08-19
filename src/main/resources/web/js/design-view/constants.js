@@ -99,6 +99,8 @@ define(function () {
         STREAM_FUNCTION: "stream-function",
         TYPE_HTTP_REQUEST: "http-request",
         TYPE_HTTP_RESPONSE: "http-response",
+        TYPE_CALL: "call",
+        TYPE_CALL_RESPONSE: "call-response",
         JOIN_QUERY_TITLE: "Join Query Configuration",
         AGGREGATION_TITLE: "Aggregation Configuration",
         APP_ANNOTATION_TITLE: "Siddhi App Configuration",

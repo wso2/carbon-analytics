@@ -48,7 +48,10 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
             PARTITION: 'partitionDrop',
             PARTITION_CONNECTION_POINT: 'partition-connector-in-part',
             SELECTOR: 'selector',
-            MULTI_SELECTOR: 'multi-selector'
+            MULTI_SELECTOR: 'multi-selector',
+            TYPE_CALL: "call",
+            TYPE_CALL_RESPONSE: "call-response",
+            TYPE_HTTP_RESPONSE: "http-response"
         };
 
         /**
@@ -483,9 +486,19 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
                         if (sourceElement.hasClass(constants.SINK)) {
                             return connectionValidity = true;
                         }
-                        DesignViewUtils.prototype
-                            .errorAlert("Invalid Connection: http-request sink input source should be a " +
-                                "http-response source ");
+
+                        var sourceType = targetElement[0].textContent;
+                        if (sourceType === constants.TYPE_HTTP_RESPONSE) {
+                            DesignViewUtils.prototype
+                                .errorAlert("Invalid Connection: Input for the http-response source should be a " +
+                                    "http-request sink ");
+                        } else if (sourceType.endsWith(constants.TYPE_CALL_RESPONSE)) {
+                            DesignViewUtils.prototype
+                                .errorAlert("Invalid Connection: Input for the " + sourceType +
+                                    " source should be a " + sourceType.slice(0, sourceType.indexOf("-")) +
+                                    "call-request sink ");
+                        }
+
                         return connectionValidity;
                     }
 
