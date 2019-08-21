@@ -2363,6 +2363,25 @@
     </div>
 </script>
 
+<!-- Export Dialog -->
+<div class='modal fade' id='openExportModal' tabindex='-1' role='dialog' >
+    <div class='modal-dialog file-dialog' role='document'>
+        <div class='modal-content'>
+            <div class='modal-header'>
+                <button type='button' class='close' data-dismiss='modal' aria-label='Close'>
+                    <i class='fw fw-cancel about-dialog-close'></i>
+                </button>
+                <h4 class='modal-title file-dialog-title' id='initialHeading'>Exporting Siddhi Apps For Docker</h4>
+                <hr class='style1'>
+            </div>
+            <div class='modal-body'>
+                <div class='container-fluid'></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
 <script src="/editor/commons/lib/requirejs-2.3.2/require.js"></script>
 <script type="text/javascript">
     requirejs.config({
@@ -3262,6 +3281,10 @@
                         }
                     }
                 }
+            },
+
+            export_dialog: {
+                selector: "#openExportModal"
             }
         };
         app = new Application(config);

@@ -25,36 +25,34 @@ define(['require', 'jquery', 'log', 'backbone'],
                  * @augments Backbone.View
                  * @constructs
                  * @class ExportDialog
-                 * @param {Object} options configuration options
+                 * @param {Object} options exportContainerModal
                  * @param {boolean} isDocker  is Docker File Export
                  */
                 initialize: function (options, isDocker) {
-                    this.app = options;
+                    this._options = options;
                     this.isDocker = isDocker;
                 },
 
                 show: function () {
-                    this.modalContainer.modal('show');
+                    this._exportContainer.modal('show');
                 },
 
                 render: function () {
-                    log.info("isDocker " + this.isDocker);
-                    this.modalContainer = $(
-                        "<div class='modal fade' id='openConfigModal' tabindex='-1' role='dialog' >" +
-                        "<div class='modal-dialog file-dialog' role='document'>" +
-                        "<div class='modal-content'>" +
-                        "<div class='modal-header'>" +
-                        "<button type='button' class='close' data-dismiss='modal' aria-label='Close'>" +
-                        "<i class='fw fw-cancel about-dialog-close'>" +
-                        "</i>" +
-                        "</button>" +
-                        "<h4 class='modal-title file-dialog-title'>Exporting Siddhi Apps For Docker</h4>" +
-                        "<hr class='style1'>" +
-                        "</div>" +
-                        "</div>" +
-                        "</div>" +
-                        "</div>"
-                    );
+                    var isDocker = this.isDocker;
+                    var options = this._options;
+
+                    if (!_.isNil(this._exportContainer)) {
+                        this._exportContainer.remove();
+                    }
+
+                    var exportContainer = $(_.get(options, 'selector')).clone();
+                    var heading = exportContainer.find('#initialHeading');
+                    if (isDocker) {
+                        heading.text('Exporting Siddhi Apps For Docker');
+                    } else {
+                        heading.text('Exporting Siddhi Apps For Kubernetes');
+                    }
+                    this._exportContainer = exportContainer;
                 }
             });
         return ExportDialog;
