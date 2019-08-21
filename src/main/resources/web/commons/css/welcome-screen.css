@@ -48,14 +48,14 @@
 }
 
 .new-welcome-button {
-    background-color: #f17b31;
+    background-color: #02aaad;
     margin-bottom: 25px;
     z-index: 1;
     position: relative;
 }
 
 .new-welcome-button:hover, .new-welcome-button:active {
-    background-color: #f17b31;
+    background-color: #02aaad;
     color: #333;
 }
 

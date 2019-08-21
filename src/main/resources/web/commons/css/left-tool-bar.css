@@ -42,7 +42,7 @@
 }
 
 .console-panel-activate-btn.active i {
-    color: #f17b31;
+    color: #02aaad;
     opacity: 1;
 }
 
@@ -57,7 +57,7 @@
 
 .left-tool-bar .nav-tabs li.active a.output-console-activate-btn i,
 .left-tool-bar .nav-tabs li.active a.output-console-activate-btn:hover i {
-    color: #f47a1e;
+    color: #02979a;
 }
 
 .left-tool-bar .nav-tabs li.disabled a.output-console-activate-btn i,

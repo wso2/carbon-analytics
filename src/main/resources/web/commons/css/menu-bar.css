@@ -43,7 +43,7 @@
 }
 
 .menu-bar .menu-group.open a:hover {
-    background-color: #f17b31;
+    background-color: #02aaad;
 }
 
 .dropdown-menu {
@@ -77,12 +77,12 @@
 }
 
 .file-menu-group.open {
-    background-color: #f17b31;
+    background-color: #02aaad;
 }
 
 .menu-bar .menu-group .file-dropdown-menu > li > a:hover, .menu-bar .menu-group .file-dropdown-menu > li > a:focus {
     text-decoration: none;
-    color: #f47b20;
+    color: #02979a;
     background-color: #000000;
 }
 
@@ -125,7 +125,7 @@
 
 .context-menu-list > .context-menu-item:hover {
     background-color: #333;
-    color: #f47b20;
+    color: #02979a;
     text-transform: capitalize;
 }
 

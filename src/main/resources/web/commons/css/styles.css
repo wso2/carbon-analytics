@@ -115,7 +115,7 @@ header .brand img.logo {
 }
 
 header .brand {
-    padding: 0 10px;
+    padding: 10px 10px 0 10px;
     margin-right: 25px;
     line-height: 35px;
 }
@@ -153,7 +153,7 @@ ol#breadcrumbList {
 }
 
 header .brand img.logo {
-    height: 13px;
+    height: 15px;
     padding: 0 0px;
     vertical-align: middle;
     padding-bottom: 1px;
@@ -1481,7 +1481,7 @@ span.fw-stack.fw-lg {
 }
 
 .orange {
-    color: #f17b31;
+    color: #02aaad;
 }
 
 .debug_line_highlight {
@@ -1577,7 +1577,7 @@ textarea.form-control.curl-editor {
 }
 
 .modal-header {
-    padding: 15px 0 5px;
+    padding: 15px 10px 5px;
 }
 
 .close:hover {
