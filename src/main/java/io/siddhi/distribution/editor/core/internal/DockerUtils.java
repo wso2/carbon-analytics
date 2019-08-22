@@ -18,11 +18,14 @@
 
 package io.siddhi.distribution.editor.core.internal;
 
+import io.siddhi.distribution.editor.core.commons.configs.DockerConfigs;
 import io.siddhi.distribution.editor.core.commons.request.ExportAppsRequest;
 import io.siddhi.distribution.editor.core.exception.DockerGenerationException;
 import io.siddhi.distribution.editor.core.util.Constants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.wso2.carbon.config.ConfigurationException;
+import org.wso2.carbon.config.provider.ConfigProvider;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -46,7 +49,7 @@ public class DockerUtils {
     private static final String JARS_BLOCK_TEMPLATE = "\\{\\{JARS_BLOCK}}";
     private static final String BUNDLES_BLOCK_TEMPLATE = "\\{\\{BUNDLES_BLOCK}}";
     private static final String ENV_BLOCK_TEMPLATE = "\\{\\{ENV_BLOCK}}";
-
+    private static final String PRODUCT_VERSION_TEMPLATE = "\\{\\{PRODUCT_VERSION}}";
     private static final String CONFIG_BLOCK_VALUE =
             "COPY --chown=siddhi_user:siddhi_io \\$\\{CONFIG_FILE}/ \\$\\{USER_HOME}";
     private static final String CONFIG_PARAMETER_VALUE =
@@ -55,20 +58,21 @@ public class DockerUtils {
             "COPY --chown=siddhi_user:siddhi_io \\$\\{HOST_JARS_DIR}/ \\$\\{JARS}";
     private static final String BUNDLES_BLOCK_VALUE =
             "COPY --chown=siddhi_user:siddhi_io \\$\\{HOST_BUNDLES_DIR}/ \\$\\{BUNDLES}";
-
     private static final String RESOURCES_DIR = "resources/docker-export";
     private static final String ZIP_FILE_NAME = "siddhi-docker.zip";
     private static final String ZIP_FILE_ROOT = "siddhi-docker/";
     private static final String DOCKER_FILE_NAME = "Dockerfile";
-
     private static final String JARS_DIR = "jars/";
     private static final String BUNDLE_DIR = "bundles/";
     private static final String APPS_DIR = "siddhi-files/";
     private static final String CONFIG_FILE = "configurations.yaml";
+    private final ConfigProvider configProvider;
+    private DockerConfigs dockerConfigs;
 
     private ExportAppsRequest exportAppsRequest;
 
-    DockerUtils(ExportAppsRequest exportAppsRequest) {
+    DockerUtils(ConfigProvider configProvider, ExportAppsRequest exportAppsRequest) {
+        this.configProvider = configProvider;
         this.exportAppsRequest = exportAppsRequest;
     }
 
@@ -91,7 +95,6 @@ public class DockerUtils {
         ZipEntry dockerFileEntry = new ZipEntry(
                 Paths.get(ZIP_FILE_ROOT, DOCKER_FILE_NAME).toString()
         );
-        ZipEntry configFileEntry = new ZipEntry(Paths.get(ZIP_FILE_ROOT, CONFIG_FILE).toString());
         try {
             zipOutputStream = new ZipOutputStream(new FileOutputStream(zipFile));
 
@@ -103,10 +106,14 @@ public class DockerUtils {
                 for (String jar : exportAppsRequest.getJars()) {
                     Path jarPath = Paths.get(jarRootDir, jar);
                     ZipEntry jarEntry = new ZipEntry(Paths.get(jarEntryRootDir, jar).toString());
-                    zipOutputStream.putNextEntry(jarEntry);
-                    byte[] jarData = Files.readAllBytes(jarPath);
-                    zipOutputStream.write(jarData, 0, jarData.length);
-                    zipOutputStream.closeEntry();
+                    if (Files.isReadable(jarPath)) {
+                        zipOutputStream.putNextEntry(jarEntry);
+                        byte[] jarData = Files.readAllBytes(jarPath);
+                        zipOutputStream.write(jarData, 0, jarData.length);
+                        zipOutputStream.closeEntry();
+                    } else {
+                        log.error("JAR file" + jarPath.toString() + " is not readable.");
+                    }
                 }
             }
 
@@ -122,10 +129,14 @@ public class DockerUtils {
                             Paths.get(bundleEntryRootDir,
                                     bundle).toString()
                     );
-                    zipOutputStream.putNextEntry(bundleEntry);
-                    byte[] bundleData = Files.readAllBytes(bundlePath);
-                    zipOutputStream.write(bundleData, 0, bundleData.length);
-                    zipOutputStream.closeEntry();
+                    if (Files.isReadable(bundlePath)) {
+                        zipOutputStream.putNextEntry(bundleEntry);
+                        byte[] bundleData = Files.readAllBytes(bundlePath);
+                        zipOutputStream.write(bundleData, 0, bundleData.length);
+                        zipOutputStream.closeEntry();
+                    } else {
+                        log.error("Bundle file" + bundlePath.toString() + " is not readable.");
+                    }
                 }
             }
 
@@ -148,6 +159,9 @@ public class DockerUtils {
             if (exportAppsRequest.getConfiguration() != null &&
                     !exportAppsRequest.getConfiguration().isEmpty()) {
                 configChanged = true;
+                ZipEntry configFileEntry = new ZipEntry(
+                        Paths.get(ZIP_FILE_ROOT, CONFIG_FILE).toString()
+                );
                 zipOutputStream.putNextEntry(configFileEntry);
                 byte[] configData = exportAppsRequest
                         .getConfiguration()
@@ -179,13 +193,19 @@ public class DockerUtils {
             zipOutputStream.write(data, 0, data.length);
             zipOutputStream.closeEntry();
         } catch (IOException e) {
-            throw new DockerGenerationException("Cannot write to the zip file.", e);
+            throw new DockerGenerationException(
+                    "Cannot write to the zip file " + dockerFilePath.toString(), e
+            );
+        } catch (ConfigurationException e) {
+            throw new DockerGenerationException(
+                    "Cannot read configurations from the deployment.yaml", e
+            );
         } finally {
             if (zipOutputStream != null) {
                 try {
                     zipOutputStream.close();
                 } catch (IOException e) {
-                    log.error("Cannot close the zip file.", e);
+                    log.error("Cannot close the zip file " + ZIP_FILE_NAME, e);
                 }
             }
         }
@@ -210,45 +230,56 @@ public class DockerUtils {
             boolean configChanged,
             boolean envChanged,
             String envList
-    ) throws IOException {
-
-        byte[] data = Files.readAllBytes(dockerFilePath);
+    ) throws IOException, DockerGenerationException, ConfigurationException {
+        byte[] data;
+        if (!Files.isReadable(dockerFilePath)) {
+            throw new DockerGenerationException(
+                    "Docker file " + dockerFilePath.toString() + " is not readable."
+            );
+        }
+        data = Files.readAllBytes(dockerFilePath);
         String content = new String(data, StandardCharsets.UTF_8);
+        String productVersion = this.getConfigurations().getProductVersion();
+        content = content.replaceAll(PRODUCT_VERSION_TEMPLATE, productVersion);
         if (jarsAdded) {
-            content = content
-                    .replaceAll(JARS_BLOCK_TEMPLATE, JARS_BLOCK_VALUE);
+            content = content.replaceAll(JARS_BLOCK_TEMPLATE, JARS_BLOCK_VALUE);
         } else {
-            content = content
-                    .replaceAll(JARS_BLOCK_TEMPLATE, "");
+            content = content.replaceAll(JARS_BLOCK_TEMPLATE, "");
         }
 
         if (bundlesAdded) {
-            content = content
-                    .replaceAll(BUNDLES_BLOCK_TEMPLATE, BUNDLES_BLOCK_VALUE);
+            content = content.replaceAll(BUNDLES_BLOCK_TEMPLATE, BUNDLES_BLOCK_VALUE);
         } else {
-            content = content
-                    .replaceAll(BUNDLES_BLOCK_TEMPLATE, "");
+            content = content.replaceAll(BUNDLES_BLOCK_TEMPLATE, "");
         }
 
         if (configChanged) {
-            content = content
-                    .replaceAll(CONFIG_BLOCK_TEMPLATE, CONFIG_BLOCK_VALUE);
-            content = content
-                    .replaceAll(CONFIG_PARAMETER_TEMPLATE, CONFIG_PARAMETER_VALUE);
+            content = content.replaceAll(CONFIG_BLOCK_TEMPLATE, CONFIG_BLOCK_VALUE);
+            content = content.replaceAll(CONFIG_PARAMETER_TEMPLATE, CONFIG_PARAMETER_VALUE);
         } else {
-            content = content
-                    .replaceAll(CONFIG_BLOCK_TEMPLATE, "");
-            content = content
-                    .replaceAll(CONFIG_PARAMETER_TEMPLATE, "");
+            content = content.replaceAll(CONFIG_BLOCK_TEMPLATE, "");
+            content = content.replaceAll(CONFIG_PARAMETER_TEMPLATE, "");
         }
 
         if (envChanged) {
-            content = content
-                    .replaceAll(ENV_BLOCK_TEMPLATE, envList);
+            content = content.replaceAll(ENV_BLOCK_TEMPLATE, envList);
         } else {
-            content = content
-                    .replaceAll(ENV_BLOCK_TEMPLATE, "");
+            content = content.replaceAll(ENV_BLOCK_TEMPLATE, "");
         }
         return content.getBytes(StandardCharsets.UTF_8);
+    }
+
+    /**
+     * Read configurations from the deployment.yaml.
+     *
+     * @return Configuration object
+     * @throws ConfigurationException
+     */
+    private DockerConfigs getConfigurations() throws ConfigurationException {
+
+        if (this.dockerConfigs == null) {
+            this.dockerConfigs = configProvider.getConfigurationObject(DockerConfigs.class);
+        }
+        return this.dockerConfigs;
     }
 }
