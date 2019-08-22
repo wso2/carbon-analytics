@@ -1,5 +1,5 @@
 /*
- * Copyright (c)  2017, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+ * Copyright (c)  2018, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
  *
  * WSO2 Inc. licenses this file to you under the Apache License,
  * Version 2.0 (the "License"); you may not use this file except
@@ -79,16 +79,14 @@ public class DockerUtils {
      * @throws DockerGenerationException if docker generation fails
      */
     public File createZipFile() throws DockerGenerationException {
-
-        boolean jarsChanged = false;
-        boolean bundlesChanged = false;
+        boolean jarsAdded = false;
+        boolean bundlesAdded = false;
         boolean configChanged = false;
         boolean envChanged = false;
 
         Path dockerFilePath = Paths.get(Constants.RUNTIME_PATH, RESOURCES_DIR, DOCKER_FILE_NAME);
         File zipFile = new File(ZIP_FILE_NAME);
         StringBuilder stringBuilder = new StringBuilder();
-
         ZipOutputStream zipOutputStream = null;
         ZipEntry dockerFileEntry = new ZipEntry(
                 Paths.get(ZIP_FILE_ROOT, DOCKER_FILE_NAME).toString()
@@ -98,8 +96,8 @@ public class DockerUtils {
             zipOutputStream = new ZipOutputStream(new FileOutputStream(zipFile));
 
             // Write JARs to the zip file
-            if (exportAppsRequest.getJars().size() > 0) {
-                jarsChanged = true;
+            if (exportAppsRequest.getJars() != null && exportAppsRequest.getJars().size() > 0) {
+                jarsAdded = true;
                 String jarRootDir = Paths.get(Constants.CARBON_HOME, JARS_DIR).toString();
                 String jarEntryRootDir = Paths.get(ZIP_FILE_ROOT, JARS_DIR).toString();
                 for (String jar : exportAppsRequest.getJars()) {
@@ -113,8 +111,9 @@ public class DockerUtils {
             }
 
             // Write bundles to the zip file
-            if (exportAppsRequest.getBundles().size() > 0) {
-                bundlesChanged = true;
+            if (exportAppsRequest.getBundles() != null &&
+                    exportAppsRequest.getBundles().size() > 0) {
+                bundlesAdded = true;
                 String bundleRootDir = Paths.get(Constants.CARBON_HOME, BUNDLE_DIR).toString();
                 String bundleEntryRootDir = Paths.get(ZIP_FILE_ROOT, BUNDLE_DIR).toString();
                 for (String bundle : exportAppsRequest.getBundles()) {
@@ -132,28 +131,37 @@ public class DockerUtils {
 
             // Write Siddhi apps to the zip file
             String appsEntryRootDir = Paths.get(ZIP_FILE_ROOT, APPS_DIR).toString();
-            for (Map.Entry<String, String> app : exportAppsRequest.getSiddhiApps().entrySet()) {
-                String appName = app.getKey() + ".siddhi";
-                ZipEntry appEntry = new ZipEntry(Paths.get(appsEntryRootDir, appName).toString());
-                zipOutputStream.putNextEntry(appEntry);
-                byte[] appData = app.getValue().getBytes(StandardCharsets.UTF_8);
-                zipOutputStream.write(appData, 0, appData.length);
-                zipOutputStream.closeEntry();
+            if (exportAppsRequest.getSiddhiApps() != null) {
+                for (Map.Entry<String, String> app : exportAppsRequest.getSiddhiApps().entrySet()) {
+                    String appName = app.getKey() + Constants.SIDDHI_APP_FILE_EXTENSION;
+                    ZipEntry appEntry = new ZipEntry(
+                            Paths.get(appsEntryRootDir, appName).toString()
+                    );
+                    zipOutputStream.putNextEntry(appEntry);
+                    byte[] appData = app.getValue().getBytes(StandardCharsets.UTF_8);
+                    zipOutputStream.write(appData, 0, appData.length);
+                    zipOutputStream.closeEntry();
+                }
             }
 
             // Write config file to the zip file
-            if (!exportAppsRequest.getConfiguration().isEmpty()) {
+            if (exportAppsRequest.getConfiguration() != null &&
+                    !exportAppsRequest.getConfiguration().isEmpty()) {
                 configChanged = true;
                 zipOutputStream.putNextEntry(configFileEntry);
-                byte[] configData = exportAppsRequest.getConfiguration().getBytes(StandardCharsets.UTF_8);
+                byte[] configData = exportAppsRequest
+                        .getConfiguration()
+                        .getBytes(StandardCharsets.UTF_8);
                 zipOutputStream.write(configData, 0, configData.length);
                 zipOutputStream.closeEntry();
             }
 
             // Write ENVs to the docker file
-            if (!exportAppsRequest.getVariables().isEmpty()) {
+            if (exportAppsRequest.getTemplatedVariables() != null &&
+                    !exportAppsRequest.getTemplatedVariables().isEmpty()) {
                 envChanged = true;
-                for (Map.Entry<String, String> env : exportAppsRequest.getVariables().entrySet()) {
+                for (Map.Entry<String, String> env :
+                        exportAppsRequest.getTemplatedVariables().entrySet()) {
                     stringBuilder.append("ENV " + env.getKey() + " " + env.getValue() + "\n");
                 }
             }
@@ -162,15 +170,14 @@ public class DockerUtils {
             zipOutputStream.putNextEntry(dockerFileEntry);
             byte[] data = this.getDockerFile(
                     dockerFilePath,
-                    jarsChanged,
-                    bundlesChanged,
+                    jarsAdded,
+                    bundlesAdded,
                     configChanged,
                     envChanged,
                     stringBuilder.toString()
             );
             zipOutputStream.write(data, 0, data.length);
             zipOutputStream.closeEntry();
-
         } catch (IOException e) {
             throw new DockerGenerationException("Cannot write to the zip file.", e);
         } finally {
@@ -183,15 +190,14 @@ public class DockerUtils {
             }
         }
         return zipFile;
-
     }
 
     /**
      * Read Dockerfile and replace the string tokens with valid values read from configurations.
      *
      * @param dockerFilePath Path to the Dockerfile
-     * @param jarChanged True if user specified custom JARs in the request
-     * @param bundlesChanged True if user specified custom JARs in the request
+     * @param jarsAdded True if user specified custom JARs in the request
+     * @param bundlesAdded True if user specified custom JARs in the request
      * @param configChanged True if user changed the existing deployment.yaml
      * @param envList String that contained environment variable list
      * @return Content
@@ -199,8 +205,8 @@ public class DockerUtils {
      */
     private byte[] getDockerFile(
             Path dockerFilePath,
-            boolean jarChanged,
-            boolean bundlesChanged,
+            boolean jarsAdded,
+            boolean bundlesAdded,
             boolean configChanged,
             boolean envChanged,
             String envList
@@ -208,7 +214,7 @@ public class DockerUtils {
 
         byte[] data = Files.readAllBytes(dockerFilePath);
         String content = new String(data, StandardCharsets.UTF_8);
-        if (jarChanged) {
+        if (jarsAdded) {
             content = content
                     .replaceAll(JARS_BLOCK_TEMPLATE, JARS_BLOCK_VALUE);
         } else {
@@ -216,7 +222,7 @@ public class DockerUtils {
                     .replaceAll(JARS_BLOCK_TEMPLATE, "");
         }
 
-        if (bundlesChanged) {
+        if (bundlesAdded) {
             content = content
                     .replaceAll(BUNDLES_BLOCK_TEMPLATE, BUNDLES_BLOCK_VALUE);
         } else {

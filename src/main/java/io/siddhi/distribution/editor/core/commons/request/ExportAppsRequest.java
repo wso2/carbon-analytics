@@ -1,5 +1,5 @@
 /*
- * Copyright (c)  2017, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+ * Copyright (c)  2019, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
  *
  * WSO2 Inc. licenses this file to you under the Apache License,
  * Version 2.0 (the "License"); you may not use this file except
@@ -25,11 +25,11 @@ import java.util.Map;
  * Bean class to represent the docker and K8s download request payload.
  */
 public class ExportAppsRequest {
-    Map<String, String> siddhiApps;
-    String configuration;
-    Map<String, String> variables;
-    List<String> bundles;
-    List<String> jars;
+    private Map<String, String> siddhiApps;
+    private String configuration;
+    private Map<String, String> templatedVariables;
+    private List<String> bundles;
+    private List<String> jars;
 
     public Map<String, String> getSiddhiApps() {
         return siddhiApps;
@@ -39,8 +39,8 @@ public class ExportAppsRequest {
         return configuration;
     }
 
-    public Map<String, String> getVariables() {
-        return variables;
+    public Map<String, String> getTemplatedVariables() {
+        return templatedVariables;
     }
 
     public List<String> getBundles() {
