@@ -1043,7 +1043,7 @@ public class EditorMicroservice implements Microservice {
     }
 
     /**
-     * Export given Siddhi apps and other configurations to docker or kubernetes artifacts
+     * Export given Siddhi apps and other configurations to docker or kubernetes artifacts.
      *
      * @param exportType Export type (docker or kubernetes
      * @return Docker or Kubernetes artifacts
