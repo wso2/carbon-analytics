@@ -37,7 +37,7 @@ import io.siddhi.distribution.common.common.utils.config.FileConfigManager;
 import io.siddhi.distribution.editor.core.EditorSiddhiAppRuntimeService;
 import io.siddhi.distribution.editor.core.Workspace;
 import io.siddhi.distribution.editor.core.commons.metadata.MetaData;
-import io.siddhi.distribution.editor.core.commons.request.DockerDownloadRequest;
+import io.siddhi.distribution.editor.core.commons.request.ExportAppsRequest;
 import io.siddhi.distribution.editor.core.commons.request.ValidationRequest;
 import io.siddhi.distribution.editor.core.commons.response.DebugRuntimeResponse;
 import io.siddhi.distribution.editor.core.commons.response.GeneralResponse;
@@ -1043,28 +1043,22 @@ public class EditorMicroservice implements Microservice {
     }
 
     /**
-     * Download set of Siddhi files as a docker-compose artifacts archive.
+     * Export given Siddhi apps and other configurations to docker or kubernetes artifacts
      *
-     * @param query JSON string with selected artifacts.
-     * @return Docker artifacts
+     * @param exportType Export type (docker or kubernetes
+     * @return Docker or Kubernetes artifacts
      */
-    @GET
-    @Path("/docker/download")
-    public Response downloadAsDocker(@QueryParam("q") String query) {
-
-        Gson gson = new Gson();
-        DockerDownloadRequest request = gson.fromJson(query, DockerDownloadRequest.class);
-
-        // Create zip archive and download
-        DockerUtils dockerUtils = new DockerUtils(configProvider);
+    @POST
+    @Path("/export")
+    public Response exportApps(@QueryParam("type") String exportType, ExportAppsRequest exportAppsRequest) {
+        DockerUtils dockerUtils = new DockerUtils(exportAppsRequest);
         try {
-            File zipFile = dockerUtils.createArchive(request.getFiles());
+            File zipFile = dockerUtils.createZipFile();
             return Response
                     .status(Response.Status.OK)
                     .entity(zipFile)
-                    .header("Content-Disposition", "attachment; filename=docker-artifacts.zip")
+                    .header("Content-Disposition", "attachment; filename=siddhi-docker.zip")
                     .build();
-
         } catch (DockerGenerationException e) {
             log.error("Cannot generate docker-artifacts archive.", e);
             return Response
