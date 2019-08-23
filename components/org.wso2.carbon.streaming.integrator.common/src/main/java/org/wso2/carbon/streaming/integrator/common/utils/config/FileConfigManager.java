@@ -17,17 +17,23 @@
  */
 package org.wso2.carbon.streaming.integrator.common.utils.config;
 
+import io.siddhi.core.util.SiddhiConstants;
+import io.siddhi.core.util.config.ConfigManager;
+import io.siddhi.core.util.config.ConfigReader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.wso2.carbon.config.ConfigurationException;
 import org.wso2.carbon.config.provider.ConfigProvider;
 import org.wso2.carbon.kernel.config.model.CarbonConfiguration;
-import io.siddhi.core.util.SiddhiConstants;
-import io.siddhi.core.util.config.ConfigManager;
-import io.siddhi.core.util.config.ConfigReader;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+
+import static org.wso2.carbon.streaming.integrator.common.utils.SPConstants.EXTENSIONS_NAMESPACE;
+import static org.wso2.carbon.streaming.integrator.common.utils.SPConstants.REFS_NAMESPACE;
+import static org.wso2.carbon.streaming.integrator.common.utils.SPConstants.SIDDHI_PROPERTIES_NAMESPACE;
 
 /**
  * Siddhi File Configuration Manager.
@@ -36,29 +42,103 @@ public class FileConfigManager implements ConfigManager {
     private static final Logger LOGGER = LoggerFactory.getLogger(FileConfigManager.class);
 
     private ConfigProvider configProvider;
+    private List<Extension> extensions = new ArrayList<>();
+    private List<Reference> references = new ArrayList<>();
+    private Map<String, String> properties = new HashMap<>();
+
+    private void init() {
+        if (configProvider != null) {
+            initialiseExtensions();
+            initialiseReferences();
+            initaliseProperties();
+        }
+    }
 
     public FileConfigManager(ConfigProvider configProvider) {
         this.configProvider = configProvider;
+        init();
+    }
+
+    private void initaliseProperties() {
+        // load siddhi properties
+        try {
+            Object siddhiPropertiesConf = configProvider.getConfigurationObject(SIDDHI_PROPERTIES_NAMESPACE);
+            HashMap propertiesMap;
+            if (siddhiPropertiesConf == null || siddhiPropertiesConf instanceof Map) {
+                propertiesMap = ((HashMap) siddhiPropertiesConf);
+                if (propertiesMap != null && propertiesMap.size() > 0) {
+                    this.properties = propertiesMap;
+                    if (LOGGER.isDebugEnabled()) {
+                        LOGGER.debug("Matching siddhi property is looked for under name space '" +
+                                SIDDHI_PROPERTIES_NAMESPACE + "'.");
+                    }
+                } else {
+                    RootConfiguration rootConfiguration =
+                            configProvider.getConfigurationObject(RootConfiguration.class);
+                    if (LOGGER.isDebugEnabled()) {
+                        LOGGER.debug("Matching siddhi property is looked for under name space " +
+                                "'siddhi.properties'.");
+                    }
+                    this.properties = rootConfiguration.getProperties();
+                }
+            } else {
+                throw new ConfigurationException("The first level under 'dataPartitioning' namespace should " +
+                        "be a map of type <sting, string>");
+            }
+        } catch (ConfigurationException e) {
+            LOGGER.error("Could not initiate the siddhi configuration object, " + e.getMessage(), e);
+        }
+    }
+
+    private void initialiseReferences() {
+        try {
+            ArrayList<Reference> references = configProvider
+                    .getConfigurationObjectList(REFS_NAMESPACE, Reference.class);
+            if (!references.isEmpty()) {
+                this.references = references;
+                if (LOGGER.isDebugEnabled()) {
+                    LOGGER.debug("Matching references is loaded from under name space 'refs'.");
+                }
+            } else {
+                RootConfiguration rootConfiguration = configProvider
+                        .getConfigurationObject(RootConfiguration.class);
+                this.references = rootConfiguration.getRefs();
+                LOGGER.debug("Matching references is loaded from under name space 'siddhi.extensions'.");
+            }
+        } catch (Exception e) {
+            LOGGER.error("Could not initiate the refs configuration object, " + e.getMessage(), e);
+        }
+    }
+
+    private void initialiseExtensions() {
+        try {
+            // Process system configs
+            ArrayList<Extension> extensions = configProvider
+                    .getConfigurationObjectList(EXTENSIONS_NAMESPACE, Extension.class);
+            if (!extensions.isEmpty()) {
+                this.extensions = extensions;
+                LOGGER.debug("Matching extensions system configurations is loaded from under name space " +
+                        "'extensions'.");
+            } else {
+                RootConfiguration rootConfiguration = configProvider.
+                        getConfigurationObject(RootConfiguration.class);
+                this.extensions = rootConfiguration.getExtensions();
+                LOGGER.debug("Matching extensions system configurations is loaded from under name space " +
+                        "'siddhi.extensions'.");
+            }
+        } catch (Exception e) {
+            LOGGER.error("Could not initiate the extensions configuration object, " + e.getMessage(), e);
+        }
     }
 
     @Override
     public ConfigReader generateConfigReader(String namespace, String name) {
-        if (configProvider != null) {
-            try {
-                RootConfiguration rootConfiguration = configProvider.getConfigurationObject(RootConfiguration.class);
-                if (null != rootConfiguration && null != rootConfiguration.getExtensions()) {
-                    for (Extension extension : rootConfiguration.getExtensions()) {
-                        ExtensionChildConfiguration childConfiguration = extension.getExtension();
-                        if (null != childConfiguration && null != childConfiguration.getName() && childConfiguration
-                                .getName().equals(name) && null != childConfiguration.getNamespace() &&
-                                childConfiguration.getNamespace().equals(namespace)
-                                && null != childConfiguration.getProperties()) {
-                            return new FileConfigReader(childConfiguration.getProperties());
-                        }
-                    }
-                }
-            } catch (ConfigurationException e) {
-                LOGGER.error("Could not initiate the siddhi configuration object, " + e.getMessage(), e);
+        for (Extension extension : this.extensions) {
+            ExtensionChildConfiguration childConfiguration = extension.getExtension();
+            if (childConfiguration.getNamespace().equals(namespace) &&
+                    childConfiguration.getName().equals(name) &&
+                    childConfiguration.getProperties() != null) {
+                return new FileConfigReader(childConfiguration.getProperties());
             }
         }
         if (LOGGER.isDebugEnabled()) {
@@ -70,66 +150,35 @@ public class FileConfigManager implements ConfigManager {
 
     @Override
     public Map<String, String> extractSystemConfigs(String name) {
-        if (configProvider != null) {
-            try {
-                RootConfiguration rootConfiguration = configProvider.getConfigurationObject(RootConfiguration.class);
-                if (null != rootConfiguration && null != rootConfiguration.getRefs()) {
-                    for (Reference ref : rootConfiguration.getRefs()) {
-                        ReferenceChildConfiguration childConfiguration = ref.getReference();
-                        if (null != childConfiguration && null != childConfiguration.getName()
-                                && childConfiguration.getName().equals(name)) {
-                            Map<String, String> referenceConfigs = new HashMap<>();
-                            referenceConfigs.put(SiddhiConstants.ANNOTATION_ELEMENT_TYPE, childConfiguration.getType());
-                            if (childConfiguration.getProperties() != null) {
-                                referenceConfigs.putAll(childConfiguration.getProperties());
-                            }
-                            return referenceConfigs;
-                        }
-                    }
+        for (Reference reference : references) {
+            ReferenceChildConfiguration childConf = reference.getReference();
+            if (childConf.getName().equals(name)) {
+                Map<String, String> referenceConfigs = new HashMap<>();
+                referenceConfigs.put(SiddhiConstants.ANNOTATION_ELEMENT_TYPE, childConf.getType());
+                if (childConf.getProperties() != null) {
+                    referenceConfigs.putAll(childConf.getProperties());
                 }
-            } catch (ConfigurationException e) {
-                LOGGER.error("Could not initiate the siddhi configuration object, " + e.getMessage(), e);
+                return referenceConfigs;
             }
+        }
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug("Could not find a matching reference for name: '" + name + "'!");
         }
         return new HashMap<>();
     }
 
     @Override
     public String extractProperty(String name) {
-        String property = null;
-        if (configProvider != null) {
+        String property = this.properties.get(name);
+        if (property == null && "shardId".equalsIgnoreCase(name)) {
             try {
-                RootConfiguration rootConfiguration =
-                        configProvider.getConfigurationObject(RootConfiguration.class);
-                if (null != rootConfiguration && null != rootConfiguration.getProperties()) {
-                    property =  rootConfiguration.getProperties().get(name);
+                CarbonConfiguration carbonConfiguration =
+                        configProvider.getConfigurationObject(CarbonConfiguration.class);
+                if (carbonConfiguration != null && carbonConfiguration.getId() != null) {
+                    return carbonConfiguration.getId();
                 }
             } catch (ConfigurationException e) {
-                LOGGER.error("Could not initiate the siddhi configuration object, " + e.getMessage(), e);
-            }
-
-            if (property == null && "shardId".equalsIgnoreCase(name)) {
-                try {
-                    ClusterConfig clusterConfig =
-                            configProvider.getConfigurationObject(ClusterConfig.class);
-                    if (clusterConfig != null) {
-                        if (clusterConfig.getGroupId() != null && clusterConfig.isEnabled()) {
-                            return clusterConfig.getGroupId();
-                        }
-                    }
-                } catch (ConfigurationException e) {
-                    LOGGER.error("Could not initiate the cluster.config configuration object, " + e.getMessage(), e);
-                }
-
-                try {
-                    CarbonConfiguration carbonConfiguration =
-                            configProvider.getConfigurationObject(CarbonConfiguration.class);
-                    if (carbonConfiguration != null && carbonConfiguration.getId() != null) {
-                        return carbonConfiguration.getId();
-                    }
-                } catch (ConfigurationException e) {
-                    LOGGER.error("Could not initiate the wso2.carbon configuration object, " + e.getMessage(), e);
-                }
+                LOGGER.error("Could not initiate the wso2.carbon configuration object, " + e.getMessage(), e);
             }
         }
         if (LOGGER.isDebugEnabled()) {
