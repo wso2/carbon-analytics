@@ -48,13 +48,13 @@
 
 .sw-theme-default .step-content {
     padding: 10px;
-    border: 0px solid #D4D4D4;
-    background-color: #FFF;
+    border: 0px solid #000000;
+    background-color: #000000;
     text-align: left;
 }
 
 .sw-theme-default .sw-toolbar {
-    background: #f9f9f9;
+    background: #000000;
     border-radius: 0 !important;
     padding-left: 10px;
     padding-right: 10px;
@@ -63,11 +63,11 @@
 }
 
 .sw-theme-default .sw-toolbar-top {
-    border-bottom-color: #ddd !important;
+    border-bottom-color: #000000 !important;
 }
 
 .sw-theme-default .sw-toolbar-bottom {
-    border-top-color: #ddd !important;
+    border-top-color: #000000 !important;
 }
 
 .sw-theme-default > ul.step-anchor > li {
@@ -142,14 +142,14 @@
 
 .sw-theme-default > ul.step-anchor > li.danger > a::after {
     background: #d9534f;
-    border-left-color: #f8d7da;
+    border-left-color: #000000;
     -webkit-transform: scale(1);
     -ms-transform: scale(1);
     transform: scale(1);
 }
 
 .sw-theme-default > ul.step-anchor > li.disabled > a, .sw-theme-default > ul.step-anchor > li.disabled > a:hover {
-    color: #eee !important;
+    color: #000000 !important;
     cursor: not-allowed;
 }
 
