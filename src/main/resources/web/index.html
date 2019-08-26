@@ -2388,9 +2388,16 @@
                         <li><a href="#step-5">Step 5<br/><small>Add additional JARS</small></a></li>
                     </ul>
                     <div id="form-containers">
-                        <div id="step-1" style="font-palette: dark">
-                            <label>Select Siddhi Apps</label>
+                        <div id="step-1" >
                             Select Siddhi Apps
+                            <div class='siddhi-app-list' id='siddhi-app-list' style='display: block'>
+                                <div class='form-group'>
+                                    <div class='file-dialog-form-scrollable-block-list'>
+                                        <div id='siddiAppsTree'></div>
+                                        <div id='select-siddhi-app-error' class='alert alert-danger' style='display: none;'></div>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                         <div id="step-2" >
                             <label>Template Siddhi Apps</label>

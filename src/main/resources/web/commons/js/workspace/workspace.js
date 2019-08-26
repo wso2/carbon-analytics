@@ -525,8 +525,7 @@ define(['ace/ace', 'jquery', 'lodash', 'log','dialogs','./service-client','welco
 
             this.handleExportForDocker = function handleExportForDocker() {
                 if (_.isNil(this._handleExportForDocker)) {
-                    var opts = _.cloneDeep(_.get(app.config, 'export_dialog'));
-                    this._handleExportForDocker = new Dialogs.export_dialog(opts, true);
+                    this._handleExportForDocker = new Dialogs.export_dialog(app, true);
                 }
                 this._handleExportForDocker.render();
                 this._handleExportForDocker.show();
@@ -534,8 +533,7 @@ define(['ace/ace', 'jquery', 'lodash', 'log','dialogs','./service-client','welco
 
             this.handleExportForKubernetes = function handleExportForKubernetes() {
                 if (_.isNil(this._handleExportForKubernetes)) {
-                    var opts = _.cloneDeep(_.get(app.config, 'export_dialog'));
-                    this._handleExportForKubernetes = new Dialogs.export_dialog(opts, false);
+                    this._handleExportForKubernetes = new Dialogs.export_dialog(app, false);
                 }
                 this._handleExportForKubernetes.render();
                 this._handleExportForKubernetes.show();
