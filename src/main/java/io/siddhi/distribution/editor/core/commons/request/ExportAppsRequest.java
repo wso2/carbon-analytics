@@ -18,6 +18,8 @@
 
 package io.siddhi.distribution.editor.core.commons.request;
 
+import io.siddhi.distribution.editor.core.commons.kubernetes.KubernetesConfig;
+
 import java.util.List;
 import java.util.Map;
 
@@ -30,6 +32,7 @@ public class ExportAppsRequest {
     private Map<String, String> templatedVariables;
     private List<String> bundles;
     private List<String> jars;
+    private KubernetesConfig kubernetesConfiguration;
 
     public Map<String, String> getSiddhiApps() {
         return siddhiApps;
@@ -49,5 +52,9 @@ public class ExportAppsRequest {
 
     public List<String> getJars() {
         return jars;
+    }
+
+    public KubernetesConfig getKubernetesConfiguration() {
+        return kubernetesConfiguration;
     }
 }

@@ -1051,9 +1051,15 @@ public class EditorMicroservice implements Microservice {
     @POST
     @Path("/export")
     public Response exportApps(@QueryParam("type") String exportType, ExportAppsRequest exportAppsRequest) {
-        DockerUtils dockerUtils = new DockerUtils(configProvider, exportAppsRequest);
+        ExportUtils exportUtils;
+        if (exportType != null) {
+            exportUtils = new ExportUtils(configProvider, exportAppsRequest, exportType);
+        } else {
+            exportUtils = new ExportUtils(configProvider, exportAppsRequest, "");
+        }
+
         try {
-            File zipFile = dockerUtils.createZipFile();
+            File zipFile = exportUtils.createZipFile();
             return Response
                     .status(Response.Status.OK)
                     .entity(zipFile)
