@@ -47,6 +47,7 @@
         <module>components/org.wso2.carbon.data.provider</module>
         <module>components/org.wso2.carbon.analytics.msf4j.interceptor.common</module>
         <module>components/org.wso2.carbon.health.check.core</module>
+        <module>components/org.wso2.siddhi.parser</module>
 
         <module>features/org.wso2.carbon.streaming.integrator.core.feature</module>
         <module>features/org.wso2.carbon.streaming.integrator.common.feature</module>
@@ -65,6 +66,7 @@
         <module>features/org.wso2.carbon.data.provider.feature</module>
         <module>features/org.wso2.carbon.analytics.msf4j.interceptor.common.feature</module>
         <module>features/org.wso2.carbon.health.check.core.feature</module>
+        <module>features/org.wso2.siddhi.parser.service.feature</module>
 
         <module>components/si-tooling-distribution</module>
         <module>components/si-distribution</module>
@@ -942,6 +944,18 @@
             <dependency>
                 <groupId>org.wso2.carbon.analytics</groupId>
                 <artifactId>org.wso2.carbon.business.rules.templates.editor.core.feature</artifactId>
+                <version>${carbon.analytics.version}</version>
+                <type>zip</type>
+            </dependency>
+
+            <dependency>
+                <groupId>org.wso2.carbon.analytics</groupId>
+                <artifactId>org.wso2.siddhi.parser</artifactId>
+                <version>${carbon.analytics.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.wso2.carbon.analytics</groupId>
+                <artifactId>org.wso2.siddhi.parser.service.feature</artifactId>
                 <version>${carbon.analytics.version}</version>
                 <type>zip</type>
             </dependency>

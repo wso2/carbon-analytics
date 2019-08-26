@@ -17,6 +17,7 @@
 package org.wso2.carbon.analytics.test.osgi;
 
 import com.google.gson.Gson;
+import io.siddhi.core.util.statistics.metrics.Level;
 import org.awaitility.Duration;
 import org.ops4j.pax.exam.Configuration;
 import org.ops4j.pax.exam.ExamFactory;
@@ -36,19 +37,14 @@ import org.wso2.carbon.streaming.integrator.common.EventStreamService;
 import org.wso2.carbon.streaming.integrator.common.SiddhiAppRuntimeService;
 import org.wso2.carbon.streaming.integrator.statistics.bean.WorkerMetrics;
 import org.wso2.carbon.streaming.integrator.statistics.bean.WorkerStatistics;
-import org.wso2.msf4j.MicroservicesRegistry;
-import io.siddhi.core.util.statistics.metrics.Level;
 
-import javax.inject.Inject;
 import java.net.URI;
-import java.nio.file.Paths;
-
-import static org.ops4j.pax.exam.CoreOptions.maven;
-import static org.wso2.carbon.container.options.CarbonDistributionOption.copyFile;
-
 import java.nio.file.Path;
+import java.nio.file.Paths;
+import javax.inject.Inject;
 
 import static org.wso2.carbon.container.options.CarbonDistributionOption.carbonDistribution;
+import static org.wso2.carbon.container.options.CarbonDistributionOption.copyFile;
 
 /**
  * SiddhiAsAPI OSGI Tests.
@@ -70,9 +66,6 @@ public class SiddhiMetricsAPITestcase {
     private Gson gson = new Gson();
 
     @Inject
-    private MicroservicesRegistry microservicesRegistry;
-
-    @Inject
     private SiddhiAppRuntimeService siddhiAppRuntimeService;
 
     @Inject
@@ -88,7 +81,8 @@ public class SiddhiMetricsAPITestcase {
                 copyCarbonYAMLOption(),
                 copySiddhiFileOption(),
                 carbonDistribution(Paths.get("target", "wso2-streaming-integrator-" + System.getProperty("carbon.analytic.version")),
-                        "server")
+                        "server"),
+//                CarbonDistributionOption.debug(5005)
         };
     }
 
@@ -169,8 +163,7 @@ public class SiddhiMetricsAPITestcase {
         String contentType = "application/json";
         String method = "PUT";
         TestUtil.waitForAppDeployment(siddhiAppRuntimeService, eventStreamService, APP_NAME, Duration.TEN_SECONDS);
-        TestUtil.waitForMicroServiceDeployment(microservicesRegistry, path, Duration.TEN_SECONDS);
-        return sendHRequest("{enabledStatLevel: " + level.toString()+", statsEnable: true}",
+        return sendHRequest("{enabledStatLevel: " + level.toString() + ", statsEnable: true}",
                 baseURI, path, contentType, method,
                 true, DEFAULT_USER_NAME, DEFAULT_PASSWORD);
     }
@@ -181,7 +174,6 @@ public class SiddhiMetricsAPITestcase {
         String contentType = "application/json";
         String method = "PUT";
         TestUtil.waitForAppDeployment(siddhiAppRuntimeService, eventStreamService, APP_NAME, Duration.TEN_SECONDS);
-        TestUtil.waitForMicroServiceDeployment(microservicesRegistry, path, Duration.TEN_SECONDS);
         return sendHRequest("{ statsEnable: " + level + "}",
                 baseURI, path, contentType, method,
                 true, DEFAULT_USER_NAME, DEFAULT_PASSWORD);
@@ -229,7 +221,7 @@ public class SiddhiMetricsAPITestcase {
         String method = "GET";
         String contentType = "application/json";
         HTTPResponseMessage httpResponseMessage = sendHRequest("", baseURI, path, contentType, method,
-                                                                        true, DEFAULT_USER_NAME, DEFAULT_PASSWORD);
+                true, DEFAULT_USER_NAME, DEFAULT_PASSWORD);
         Assert.assertEquals(httpResponseMessage.getResponseCode(), 200);
     }
 
@@ -273,7 +265,7 @@ public class SiddhiMetricsAPITestcase {
         String method = "GET";
         String contentType = "application/json";
         return sendHRequest("", baseURI, path, contentType, method,
-                                     true, DEFAULT_USER_NAME, DEFAULT_PASSWORD);
+                true, DEFAULT_USER_NAME, DEFAULT_PASSWORD);
     }
 
     private HTTPResponseMessage sendHRequest(String body, URI baseURI, String path, String contentType,
