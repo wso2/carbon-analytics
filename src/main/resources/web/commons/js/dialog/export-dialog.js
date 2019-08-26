@@ -47,22 +47,31 @@ define(['require', 'jquery', 'log', 'backbone', 'smart_wizard'],
 
                     var exportContainer = $(_.get(options, 'selector')).clone();
                     var heading = exportContainer.find('#initialHeading');
+                    var form = exportContainer.find('#export-form');
+
                     if (isDocker) {
                         heading.text('Export Siddhi Apps for Docker image');
                     } else {
                         heading.text('Export Siddhi Apps For Kubernetes CRD');
+                        form.find('#form-steps')
+                            .append('<li><a href="#step-6">Step 6<br/><small>Add Kubernetes Config</small></a></li>');
+
+                        form.find('')
+                            .append('<div id="step-6" >' +
+                                    '    <label>Kubernetes Config</label>' +
+                                    '</div>');
                     }
 
                     // Toolbar extra buttons
-                    var btnFinish = $('<button class="btn-info" id="finish-btn">Finish</button>')
-                                        .addClass('hidden')
-                                        .on('click', function(){ alert('Finish Clicked'); });
-                    var form = exportContainer.find('#export-form').smartWizard({
+                    var btnFinish = $('<button type="button" class="btn btn-default" hidden data-dismiss="modal" id="finish-btn">Finish</button>')
+                                        .on('click', function(){alert('Finish Clicked');});
+                    form.smartWizard({
                         selected: 0,
                         autoAdjustHeight: false,
                         theme: 'none',
-                        transitionEffect: 'slide',
-                        includeFinishButton : true,
+                        transitionEffect: 'fade',
+                        showStepURLhash: false,
+                        contentCache: false,
                         toolbarSettings: {
                             toolbarPosition: 'bottom',
                             toolbarExtraButtons: [btnFinish]
@@ -71,18 +80,19 @@ define(['require', 'jquery', 'log', 'backbone', 'smart_wizard'],
                     });
 
                     form.on("showStep", function(e, anchorObject, stepNumber, stepDirection, stepPosition) {
-                        log.info(anchorObject);
+                        log.info(stepNumber);
+                        log.info(stepDirection);
+
+                        // Finish button enable/disable
                         if (stepPosition === 'first') {
                             $("#prev-btn").addClass('disabled');
-                            $("#finish-btn").addClass('hidden');
                         } else if (stepPosition === 'final') {
                             $("#next-btn").addClass('disabled');
                             $("#finish-btn").removeClass('hidden');
-                            $("#finish-btn").removeClass('disabled')
+                            $("#finish-btn").removeClass('disabled');
                         } else {
                             $("#prev-btn").removeClass('disabled');
                             $("#next-btn").removeClass('disabled');
-                            $("#finish-btn").addClass('hidden');
                         }
                     });
                     this._exportContainer = exportContainer;
