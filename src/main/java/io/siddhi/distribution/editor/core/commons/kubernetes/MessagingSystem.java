@@ -31,6 +31,8 @@ public class MessagingSystem {
     @SerializedName("config")
     private MessagingConfig config;
 
+    public MessagingSystem(){}
+
     public String getType() {
         return type;
     }

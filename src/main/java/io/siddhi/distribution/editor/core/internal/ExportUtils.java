@@ -34,6 +34,7 @@ import org.wso2.carbon.config.ConfigurationException;
 import org.wso2.carbon.config.provider.ConfigProvider;
 import org.yaml.snakeyaml.DumperOptions;
 import org.yaml.snakeyaml.Yaml;
+import org.yaml.snakeyaml.constructor.CustomClassLoaderConstructor;
 import org.yaml.snakeyaml.introspector.Property;
 import org.yaml.snakeyaml.nodes.NodeTuple;
 import org.yaml.snakeyaml.nodes.Tag;
@@ -308,7 +309,14 @@ public class ExportUtils {
     private byte[] getKubernetesFile(Path kubernetesFilePath) throws IOException {
         byte[] data = Files.readAllBytes(kubernetesFilePath);
         String content = new String(data, StandardCharsets.UTF_8);
-        KubernetesConfig kubernetesConfig = this.exportAppsRequest.getKubernetesConfiguration();
+        String kubernetesConfigString = this.exportAppsRequest.getKubernetesConfiguration();
+        CustomClassLoaderConstructor customClassLoaderConstructor = new
+                CustomClassLoaderConstructor(this.getClass().getClassLoader());
+        Yaml kubernetesConfigYaml = new Yaml(customClassLoaderConstructor);
+        KubernetesConfig kubernetesConfig = kubernetesConfigYaml.loadAs(
+                kubernetesConfigString,
+                KubernetesConfig.class
+        );
         SiddhiProcessSpec siddhiProcessSpec = new SiddhiProcessSpec();
 
         if (kubernetesConfig.getMessagingSystem() != null) {

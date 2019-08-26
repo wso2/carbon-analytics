@@ -38,6 +38,8 @@ public class MessagingConfig {
         this.bootstrapServers = bootstrapServers;
     }
 
+    public MessagingConfig(){}
+
     public String getStreamingClusterId() {
         return streamingClusterId;
     }

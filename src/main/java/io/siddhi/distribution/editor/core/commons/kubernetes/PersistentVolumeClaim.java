@@ -29,6 +29,8 @@ public class PersistentVolumeClaim {
     private String volumeMode;
     private List<String> accessModes;
 
+    public PersistentVolumeClaim(){}
+
     public PersistentResources getResources() {
         return resources;
     }

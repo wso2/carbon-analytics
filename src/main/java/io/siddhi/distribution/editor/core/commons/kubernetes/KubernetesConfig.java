@@ -22,12 +22,11 @@ package io.siddhi.distribution.editor.core.commons.kubernetes;
  * Kubernetes configurations of the export apps request.
  */
 public class KubernetesConfig {
-
     private MessagingSystem messagingSystem;
     private PersistentVolumeClaim persistentVolumeClaim;
     private String siddhiProcessName;
 
-    KubernetesConfig(
+    public KubernetesConfig(
             MessagingSystem messagingSystem,
             PersistentVolumeClaim persistentVolumeClaim,
             String siddhiProcessName
@@ -36,6 +35,9 @@ public class KubernetesConfig {
         this.persistentVolumeClaim = persistentVolumeClaim;
         this.siddhiProcessName = siddhiProcessName;
     }
+
+    public KubernetesConfig(){}
+
     public MessagingSystem getMessagingSystem() {
         return messagingSystem;
     }
@@ -48,4 +50,15 @@ public class KubernetesConfig {
         return siddhiProcessName;
     }
 
+    public void setMessagingSystem(MessagingSystem messagingSystem) {
+        this.messagingSystem = messagingSystem;
+    }
+
+    public void setPersistentVolumeClaim(PersistentVolumeClaim persistentVolumeClaim) {
+        this.persistentVolumeClaim = persistentVolumeClaim;
+    }
+
+    public void setSiddhiProcessName(String siddhiProcessName) {
+        this.siddhiProcessName = siddhiProcessName;
+    }
 }

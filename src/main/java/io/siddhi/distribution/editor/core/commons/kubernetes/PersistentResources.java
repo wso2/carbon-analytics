@@ -24,6 +24,8 @@ package io.siddhi.distribution.editor.core.commons.kubernetes;
 public class PersistentResources {
     private PersistentResourceRequest requests;
 
+    public PersistentResources(){}
+
     public PersistentResourceRequest getRequests() {
         return requests;
     }
