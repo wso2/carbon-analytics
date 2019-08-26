@@ -16,8 +16,8 @@
  * under the License.
  */
 
-define(['require', 'jquery', 'log', 'backbone'],
-    function (require, $, log, Backbone) {
+define(['require', 'jquery', 'log', 'backbone', 'smart_wizard'],
+    function (require, $, log, Backbone, smartWizard) {
         var ExportDialog = Backbone.View.extend(
             /** @lends ExportDialog.prototype */
             {
@@ -48,10 +48,42 @@ define(['require', 'jquery', 'log', 'backbone'],
                     var exportContainer = $(_.get(options, 'selector')).clone();
                     var heading = exportContainer.find('#initialHeading');
                     if (isDocker) {
-                        heading.text('Exporting Siddhi Apps For Docker');
+                        heading.text('Export Siddhi Apps for Docker image');
                     } else {
-                        heading.text('Exporting Siddhi Apps For Kubernetes');
+                        heading.text('Export Siddhi Apps For Kubernetes CRD');
                     }
+
+                    // Toolbar extra buttons
+                    var btnFinish = $('<button class="btn-info" id="finish-btn" type="hidden" >Finish</button>')
+                                        .on('click', function(){ alert('Finish Clicked'); });
+                    var form = exportContainer.find('#export-form').smartWizard({
+                        selected: 0,
+                        autoAdjustHeight: false,
+                        theme: 'none',
+                        transitionEffect: 'slide',
+                        includeFinishButton : true,
+                        toolbarSettings: {
+                            toolbarPosition: 'bottom',
+                            toolbarExtraButtons: [btnFinish]
+                        }
+
+                    });
+
+                    form.on("showStep", function(e, anchorObject, stepNumber, stepDirection, stepPosition) {
+                        log.info(anchorObject);
+                        if (stepPosition === 'first') {
+                            $("#prev-btn").addClass('disabled');
+                            $("#finish-btn").addClass('hidden');
+                        } else if (stepPosition === 'final') {
+                            $("#next-btn").addClass('disabled');
+                            $("#finish-btn").removeClass('hidden');
+                            $("#finish-btn").removeClass('disabled')
+                        } else {
+                            $("#prev-btn").removeClass('disabled');
+                            $("#next-btn").removeClass('disabled');
+                            $("#finish-btn").addClass('hidden');
+                        }
+                    });
                     this._exportContainer = exportContainer;
                 }
             });

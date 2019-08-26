@@ -61,6 +61,10 @@
     <!-- CSS For The Design View -->
     <link rel="stylesheet" type="text/css" href="/editor/commons/lib/overlay_scroll/css/OverlayScrollbars.min.css"/>
 
+    <!-- SmartWizard CSS -->
+    <link rel="stylesheet" type="text/css" href="/editor/commons/lib/smartWizard/css/smart_wizard.css" />
+    <link rel="stylesheet" type="text/css" href="/editor/commons/lib/smartWizard/css/smart_wizard_theme_dots.css" />
+
     <title>Siddhi Editor</title>
 </head>
 
@@ -2364,7 +2368,7 @@
 </script>
 
 <!-- Export Dialog -->
-<div class='modal fade' id='openExportModal' tabindex='-1' role='dialog' >
+<div class='modal fade' id='openExportModal' tabindex='-1' role='dialog'>
     <div class='modal-dialog file-dialog' role='document'>
         <div class='modal-content'>
             <div class='modal-header'>
@@ -2375,7 +2379,33 @@
                 <hr class='style1'>
             </div>
             <div class='modal-body'>
-                <div class='container-fluid'></div>
+                <div id='export-form'>
+                    <ul>
+                        <li><a href="#step-1">Step 1<br/><small>Select Siddhi Apps</small></a></li>
+                        <li><a href="#step-2">Step 2<br/><small>Template Siddhi Apps</small></a></li>
+                        <li><a href="#step-3">Step 3<br/><small>Update Configurations</small></a></li>
+                        <li><a href="#step-4">Step 4<br/><small>Add values for templates</small></a></li>
+                        <li><a href="#step-5">Step 5<br/><small>Add additional JARS</small></a></li>
+                    </ul>
+                    <div>
+                        <div id="step-1" style="font-palette: dark">
+                            <label>Select Siddhi Apps</label>
+                            Select Siddhi Apps
+                        </div>
+                        <div id="step-2" >
+                            <label>Template Siddhi Apps</label>
+                        </div>
+                        <div id="step-3" >
+                            <label>Update Configurations</label>
+                        </div>
+                        <div id="step-4" >
+                            <label>Add values for templates</label>
+                        </div>
+                        <div id="step-5" >
+                            <label>Add additional JARS</label>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -2419,6 +2449,7 @@
             datatables_bootstrap: "commons/lib/data-table/dataTables.bootstrap.min",
             datatables_wso2: "commons/lib/theme-wso2-2.0.0/extensions/datatables/js/dataTables.wso2",
             enjoyhint: "commons/lib/enjoyhint/enjoyhint.min",
+            smart_wizard: "commons/lib/smartWizard/js/jquery.smartWizard.min",
             //beautify: "commons/lib/beautify",
             ///////////////////////
             // custom modules ////
