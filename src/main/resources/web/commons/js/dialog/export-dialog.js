@@ -54,7 +54,8 @@ define(['require', 'jquery', 'log', 'backbone', 'smart_wizard'],
                     }
 
                     // Toolbar extra buttons
-                    var btnFinish = $('<button class="btn-info" id="finish-btn" type="hidden" >Finish</button>')
+                    var btnFinish = $('<button class="btn-info" id="finish-btn">Finish</button>')
+                                        .addClass('hidden')
                                         .on('click', function(){ alert('Finish Clicked'); });
                     var form = exportContainer.find('#export-form').smartWizard({
                         selected: 0,
