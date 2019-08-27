@@ -128,8 +128,7 @@
             // Set content container
             this.container.addClass('sw-container tab-content');
             // Set content pages
-            // todo: Fix conflict in workspace
-            this.pages.addClass('tab-pane2 step-content');
+            this.pages.addClass('tab-pane step-content');
 
             // Disabled steps
             var mi = this;

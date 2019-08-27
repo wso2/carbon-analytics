@@ -237,16 +237,16 @@ div[class*="col-sm-12"] {
 .page-content-first-row,
 #tabs-container,
 .grid-background .tab-content,
-.grid-background .tab-pane,
+.grid-background .ws-tab-pane,
 .initial-welcome-container,
 #service-tabs-wrapper > .row,
 #service-tabs-wrapper > .row > #tabs-container,
 #service-tabs-wrapper > .row > #tabs-container > #tab-content-wrapper > .tab-content.tab-content-default,
-#service-tabs-wrapper > .row > #tabs-container > #tab-content-wrapper > .tab-content.tab-content-default > .tab-pane {
+#service-tabs-wrapper > .row > #tabs-container > #tab-content-wrapper > .tab-content.tab-content-default > .ws-tab-pane {
     height: 100%;
 }
 
-.tab-pane {
+.ws-tab-pane {
     /*padding-bottom: 130px;*/
 }
 

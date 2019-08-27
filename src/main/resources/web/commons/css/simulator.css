@@ -68,7 +68,7 @@ a:focus {
     border-top: 1px solid #4c4c4c;
 }
 
-.event-simulator-container .tab-content .nano .tab-pane.active {
+.event-simulator-container .tab-content .nano .ws-tab-pane.active {
     padding-top: 15px;
 }
 
@@ -160,7 +160,7 @@ a:focus {
     display: inline;
 }
 
-#single-event-config-tab-content>.tab-pane>.content {
+#single-event-config-tab-content>.ws-tab-pane>.content {
     position: relative;
     height: 84%;
 }

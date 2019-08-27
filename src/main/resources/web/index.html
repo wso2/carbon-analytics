@@ -504,7 +504,7 @@
         </ul>
         <!-- Tab panes -->
         <div class="tab-content">
-            <div role="tabpanel" class="tab-pane fade in active" id="single-event-configs">
+            <div role="tabpanel" class="ws-tab-pane fade in active" id="single-event-configs">
                 <div class="content">
                     <ul id="single-event-config-tab" class="nav nav-tabs configs" role="tablist">
                         <li id="add-single-event-form" role="presentation">
@@ -517,7 +517,7 @@
                     </div>
                 </div>
             </div>
-            <div role="tabpanel" class="tab-pane fade in active" id="event-feed-configs">
+            <div role="tabpanel" class="ws-tab-pane fade in active" id="event-feed-configs">
                 <div class="content">
                     <button type="button" class="btn btn-primary btn-stack btn-block sidebar" rel="createPage"
                             name="create-new-config">
@@ -1931,7 +1931,7 @@
 </script>
 
 <script id="pattern-sequence-condition-content-form-template" type = "text/template">
-    <div class="tab-pane condition-content define-source define-{{condition.conditionId}}-source">
+    <div class="ws-tab-pane condition-content define-source define-{{condition.conditionId}}-source">
         <div class="define-source">
             <label class="clearfix"> Condition ID </label>
             <input type="text" class="condition-id clearfix name" value="{{condition.conditionId}}" min="1">
@@ -2228,7 +2228,7 @@
 
 <!-- Handlebar template for operator finder side-panel content -->
 <script id="operators-side-panel-template" type="text/x-handlebars-template">
-    <div id="operator-finder" role="tabpanel" class="tab-pane operator-finder">
+    <div id="operator-finder" role="tabpanel" class="ws-tab-pane operator-finder">
         <div class="content">
             <h3>Operators</h3>
             <div class="form-group">
@@ -3033,7 +3033,7 @@
                 },
                 containerId: "event-simulator",
                 cssClass: {
-                    container: 'event-simulator-container tab-pane'
+                    container: 'event-simulator-container ws-tab-pane'
                 },
                 command: {
                     id: "toggle-event-simulator",
@@ -3106,7 +3106,7 @@
                 },
                 containerId: 'workspace-explorer',
                 cssClass: {
-                    container: 'workspace-explorer-container tab-pane',
+                    container: 'workspace-explorer-container ws-tab-pane',
                     openFolderButton: 'btn  btn-default open-folder-button'
                 }
             },
@@ -3225,7 +3225,7 @@
                     tab: {
                         template: "#tab-template",
                         cssClass: {
-                            tab: 'tab-pane',
+                            tab: 'ws-tab-pane',
                             tab_active: 'active',
                             run_state: 'run-state',
                             debug_state: 'debug-state',
