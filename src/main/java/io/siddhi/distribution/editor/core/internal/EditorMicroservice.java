@@ -1051,16 +1051,16 @@ public class EditorMicroservice implements Microservice {
     @POST
     @Path("/export")
     public Response exportApps(@QueryParam("type") String exportType, ExportAppsRequest exportAppsRequest) {
-        DockerUtils dockerUtils = new DockerUtils(configProvider, exportAppsRequest);
+        ExportUtils exportUtils = new ExportUtils(configProvider, exportAppsRequest, exportType);
         try {
-            File zipFile = dockerUtils.createZipFile();
+            File zipFile = exportUtils.createZipFile();
             return Response
                     .status(Response.Status.OK)
                     .entity(zipFile)
                     .header("Content-Disposition", "attachment; filename=siddhi-docker.zip")
                     .build();
         } catch (DockerGenerationException e) {
-            log.error("Cannot generate docker-artifacts archive.", e);
+            log.error("Cannot generate export-artifacts archive.", e);
             return Response
                     .status(Response.Status.INTERNAL_SERVER_ERROR)
                     .build();
