@@ -218,7 +218,7 @@ public class ExportUtils {
             zipOutputStream.closeEntry();
 
             // Write the kubernetes file to the zip file
-            if (this.exportType.equals(EXPORT_TYPE_KUBERNETES)) {
+            if (exportType != null && exportType.equals(EXPORT_TYPE_KUBERNETES)) {
                 ZipEntry kubernetesFileEntry = new ZipEntry(
                         Paths.get(ZIP_FILE_ROOT, KUBERNETES_FILE_NAME).toString()
                 );
@@ -309,92 +309,94 @@ public class ExportUtils {
     private byte[] getKubernetesFile(Path kubernetesFilePath) throws IOException {
         byte[] data = Files.readAllBytes(kubernetesFilePath);
         String content = new String(data, StandardCharsets.UTF_8);
-        String kubernetesConfigString = this.exportAppsRequest.getKubernetesConfiguration();
-        CustomClassLoaderConstructor customClassLoaderConstructor = new
-                CustomClassLoaderConstructor(this.getClass().getClassLoader());
-        Yaml kubernetesConfigYaml = new Yaml(customClassLoaderConstructor);
-        KubernetesConfig kubernetesConfig = kubernetesConfigYaml.loadAs(
-                kubernetesConfigString,
-                KubernetesConfig.class
-        );
-        SiddhiProcessSpec siddhiProcessSpec = new SiddhiProcessSpec();
-
-        if (kubernetesConfig.getMessagingSystem() != null) {
-            siddhiProcessSpec.setMessagingSystem(kubernetesConfig.getMessagingSystem());
-        }
-
-        if (kubernetesConfig.getPersistentVolumeClaim() != null) {
-            siddhiProcessSpec.setPersistentVolumeClaim(kubernetesConfig.getPersistentVolumeClaim());
-        }
-
-        if (this.exportAppsRequest.getTemplatedVariables() != null &&
-                this.exportAppsRequest.getTemplatedVariables().size() > 0) {
-            ArrayList<Env> envs = new ArrayList<Env>();
-            for (Map.Entry<String, String> templatedVariable :
-                    exportAppsRequest.getTemplatedVariables().entrySet()) {
-                Env env = new Env(templatedVariable.getKey(), templatedVariable.getValue());
-                envs.add(env);
-            }
-            SiddhiProcessContainer siddhiProcessContainer = new SiddhiProcessContainer();
-            siddhiProcessContainer.setEnv(envs);
-            siddhiProcessSpec.setContainer(siddhiProcessContainer);
-        }
-
-        if (this.exportAppsRequest.getSiddhiApps() != null &&
-                this.exportAppsRequest.getSiddhiApps().size() > 0) {
-            ArrayList<SiddhiProcessApp> siddhiProcessApps = new ArrayList<SiddhiProcessApp>();
-            for (Map.Entry<String, String> app : exportAppsRequest.getSiddhiApps().entrySet()) {
-                String escapedApp = app.getValue()
-                        .replaceAll("( |\\t)*\\n", "\n");
-                SiddhiProcessApp siddhiProcessApp = new SiddhiProcessApp(escapedApp);
-                siddhiProcessApps.add(siddhiProcessApp);
-            }
-            siddhiProcessSpec.setApps(siddhiProcessApps);
-        }
-
-        if (this.exportAppsRequest.getConfiguration() != null &&
-                !this.exportAppsRequest.getConfiguration().isEmpty()) {
-            String escapedConfig = this.exportAppsRequest
-                    .getConfiguration()
-                    .replaceAll("( |\\t)*\\n", "\n");
-            siddhiProcessSpec.setRunner(escapedConfig);
-        }
-
-        SiddhiProcess siddhiProcess = new SiddhiProcess(siddhiProcessSpec);
-
-        Representer representer = new Representer() {
-            @Override
-            protected NodeTuple representJavaBeanProperty(
-                    Object javaBean, Property property, Object propertyValue, Tag customTag) {
-                // if value of property is null, ignore it.
-                if (propertyValue == null) {
-                    return null;
-                } else {
-                    return super.representJavaBeanProperty(
-                            javaBean,
-                            property,
-                            propertyValue,
-                            customTag
-                    );
-                }
-            }
-        };
-        representer.addClassTag(SiddhiProcess.class, Tag.MAP);
-        DumperOptions options = new DumperOptions();
-        options.setDefaultFlowStyle(DumperOptions.FlowStyle.BLOCK);
-        Yaml yaml = new Yaml(representer, options);
-        String spec = yaml.dump(siddhiProcess);
-        spec = spec.replaceAll("\\$\\{", "\\\\\\$\\\\\\{");
-        content = content.replaceAll(SIDDHI_PROCESS_SPEC_TEMPLATE, spec);
-        if (kubernetesConfig.getSiddhiProcessName() != null) {
-            content = content.replaceAll(
-                    SIDDHI_PROCESS_NAME_TEMPLATE,
-                    kubernetesConfig.getSiddhiProcessName()
+        KubernetesConfig kubernetesConfig;
+        if (exportAppsRequest.getKubernetesConfiguration() != null) {
+            CustomClassLoaderConstructor customClassLoaderConstructor = new
+                    CustomClassLoaderConstructor(this.getClass().getClassLoader());
+            Yaml kubernetesConfigYaml = new Yaml(customClassLoaderConstructor);
+            String kubernetesConfigString = exportAppsRequest.getKubernetesConfiguration();
+            kubernetesConfig = kubernetesConfigYaml.loadAs(
+                    kubernetesConfigString,
+                    KubernetesConfig.class
             );
-        } else {
-            content = content.replaceAll(SIDDHI_PROCESS_NAME_TEMPLATE, SIDDHI_PROCESS_DEFAULT_NAME);
-        }
+            SiddhiProcessSpec siddhiProcessSpec = new SiddhiProcessSpec();
 
+            if (kubernetesConfig.getMessagingSystem() != null) {
+                siddhiProcessSpec.setMessagingSystem(kubernetesConfig.getMessagingSystem());
+            }
+
+            if (kubernetesConfig.getPersistentVolumeClaim() != null) {
+                siddhiProcessSpec.setPersistentVolumeClaim(kubernetesConfig.getPersistentVolumeClaim());
+            }
+
+            if (this.exportAppsRequest.getTemplatedVariables() != null &&
+                    this.exportAppsRequest.getTemplatedVariables().size() > 0) {
+                ArrayList<Env> envs = new ArrayList<Env>();
+                for (Map.Entry<String, String> templatedVariable :
+                        exportAppsRequest.getTemplatedVariables().entrySet()) {
+                    Env env = new Env(templatedVariable.getKey(), templatedVariable.getValue());
+                    envs.add(env);
+                }
+                SiddhiProcessContainer siddhiProcessContainer = new SiddhiProcessContainer();
+                siddhiProcessContainer.setEnv(envs);
+                siddhiProcessSpec.setContainer(siddhiProcessContainer);
+            }
+
+            if (this.exportAppsRequest.getSiddhiApps() != null &&
+                    this.exportAppsRequest.getSiddhiApps().size() > 0) {
+                ArrayList<SiddhiProcessApp> siddhiProcessApps = new ArrayList<SiddhiProcessApp>();
+                for (Map.Entry<String, String> app : exportAppsRequest.getSiddhiApps().entrySet()) {
+                    String escapedApp = app.getValue()
+                            .replaceAll("( |\\t)*\\n", "\n");
+                    SiddhiProcessApp siddhiProcessApp = new SiddhiProcessApp(escapedApp);
+                    siddhiProcessApps.add(siddhiProcessApp);
+                }
+                siddhiProcessSpec.setApps(siddhiProcessApps);
+            }
+
+            if (this.exportAppsRequest.getConfiguration() != null &&
+                    !this.exportAppsRequest.getConfiguration().isEmpty()) {
+                String escapedConfig = this.exportAppsRequest
+                        .getConfiguration()
+                        .replaceAll("( |\\t)*\\n", "\n");
+                siddhiProcessSpec.setRunner(escapedConfig);
+            }
+
+            SiddhiProcess siddhiProcess = new SiddhiProcess(siddhiProcessSpec);
+
+            Representer representer = new Representer() {
+                @Override
+                protected NodeTuple representJavaBeanProperty(
+                        Object javaBean, Property property, Object propertyValue, Tag customTag) {
+                    // if value of property is null, ignore it.
+                    if (propertyValue == null) {
+                        return null;
+                    } else {
+                        return super.representJavaBeanProperty(
+                                javaBean,
+                                property,
+                                propertyValue,
+                                customTag
+                        );
+                    }
+                }
+            };
+            representer.addClassTag(SiddhiProcess.class, Tag.MAP);
+            DumperOptions options = new DumperOptions();
+            options.setDefaultFlowStyle(DumperOptions.FlowStyle.BLOCK);
+            Yaml yaml = new Yaml(representer, options);
+            String spec = yaml.dump(siddhiProcess);
+            spec = spec.replaceAll("\\$\\{", "\\\\\\$\\\\\\{");
+            content = content.replaceAll(SIDDHI_PROCESS_SPEC_TEMPLATE, spec);
+            if (kubernetesConfig.getSiddhiProcessName() != null) {
+                content = content.replaceAll(
+                        SIDDHI_PROCESS_NAME_TEMPLATE,
+                        kubernetesConfig.getSiddhiProcessName()
+                );
+            } else {
+                content = content.replaceAll(SIDDHI_PROCESS_NAME_TEMPLATE, SIDDHI_PROCESS_DEFAULT_NAME);
+            }
+        }
         return content.getBytes(StandardCharsets.UTF_8);
     }
 
