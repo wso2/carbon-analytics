@@ -16,8 +16,8 @@
  * under the License.
  */
 
-define(['require', 'jquery', 'log', 'backbone', 'smart_wizard', 'siddhiAppSelectorStep'],
-    function (require, $, log, Backbone, smartWizard, SiddhiAppSelectorStep) {
+define(['require', 'jquery', 'log', 'backbone', 'smart_wizard', 'siddhiAppSelectorStep', 'templateFileDialog'],
+    function (require, $, log, Backbone, smartWizard, SiddhiAppSelectorStep, TemplateFileDialog) {
         var payload = {
             siddhiApps: []
         };
@@ -115,6 +115,7 @@ define(['require', 'jquery', 'log', 'backbone', 'smart_wizard', 'siddhiAppSelect
                         if (stepDirection === 'forward') {
                             if (stepNumber === 1) {
                                 payload.siddhiApps = siddhiAppSelector.getSiddhiApps();
+                                this._template_dialog = new TemplateFileDialog();
                             }
                         }
                     });
