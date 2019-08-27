@@ -16,9 +16,11 @@
  * under the License.
  */
 
-define(['require', 'jquery', 'log', 'backbone', 'smart_wizard', 'file_browser'],
-    function (require, $, log, Backbone, smartWizard, FileBrowser) {
-        var siddhiApps = [];
+define(['require', 'jquery', 'log', 'backbone', 'smart_wizard', 'siddhiAppSelectorStep'],
+    function (require, $, log, Backbone, smartWizard, SiddhiAppSelectorStep) {
+        var payload = {
+            siddhiApps: []
+        };
 
         var ExportDialog = Backbone.View.extend(
             /** @lends ExportDialog.prototype */
@@ -34,7 +36,6 @@ define(['require', 'jquery', 'log', 'backbone', 'smart_wizard', 'file_browser'],
                     this.app = options;
                     this.options = _.cloneDeep(_.get(options.config, 'export_dialog'));
                     this.isDocker = isDocker;
-                    this.pathSeparator = this.app.getPathSeperator();
                 },
 
                 show: function () {
@@ -42,15 +43,14 @@ define(['require', 'jquery', 'log', 'backbone', 'smart_wizard', 'file_browser'],
                 },
 
                 render: function () {
-                    var isDocker = this.isDocker;
-                    var options = this.options;
-                    var app = this.app;
-                    var pathSeparator = this.pathSeparator;
 
                     if (!_.isNil(this.exportContainer)) {
                         this.exportContainer.remove();
                     }
 
+                    var isDocker = this.isDocker;
+                    var options = this.options;
+                    var app = this.app;
                     var exportContainer = $(_.get(options, 'selector')).clone();
                     var heading = exportContainer.find('#initialHeading');
                     var form = exportContainer.find('#export-form');
@@ -85,28 +85,17 @@ define(['require', 'jquery', 'log', 'backbone', 'smart_wizard', 'file_browser'],
                         }
                     });
 
-                    var treeContainer = form.find("#siddiAppsTree");
-                    var openFileWizardError = form.find("#select-siddhi-app-error");
-                    openFileWizardError.hide();
-                    var fileBrowser = new FileBrowser({
-                        container: treeContainer,
-                        application: app,
-                        fetchFiles: true,
-                        showWorkspace: true,
-                        multiSelect: true
+                    var siddhiAppSelector = new SiddhiAppSelectorStep({
+                        form: form,
+                        application: app
                     });
-                    $(treeContainer).on('ready.jstree', function () {
-                        $(treeContainer).jstree("open_all");
-                    });
-                    fileBrowser.render();
-
-                    fileBrowser.on("selected", function () {openFileWizardError.hide();});
+                    siddhiAppSelector.render();
 
                     // Initialize the leaveStep event - validate before next
                     form.on("leaveStep", function(e, anchorObject, stepNumber, stepDirection) {
                         if (stepDirection === 'forward') {
                             if (stepNumber === 0) {
-                                return validateSiddhiApps();
+                                return siddhiAppSelector.validateSiddhiApps();
                             }
                         }
                     });
@@ -126,31 +115,10 @@ define(['require', 'jquery', 'log', 'backbone', 'smart_wizard', 'file_browser'],
 
                         if (stepDirection === 'forward') {
                             if (stepNumber === 1) {
-                                getSiddhiApps();
+                                payload.siddhiApps = siddhiAppSelector.getSiddhiApps();
                             }
                         }
                     });
-
-                    function validateSiddhiApps() {
-                        var files = fileBrowser.getSelected();
-                        if (files.length === 0) {
-                            openFileWizardError.text("Select Siddhi Apps To Export");
-                            openFileWizardError.show();
-                            return false;
-                        }
-                        return true;
-                    }
-
-                    function getSiddhiApps() {
-                        siddhiApps = [];
-                        var files = fileBrowser.getSelected();
-                        for (var i = 0; i < files.length; i++) {
-                            var fileName = _.last(files[i].id.split(pathSeparator));
-                            if (fileName.lastIndexOf(".siddhi") !== -1) {
-                                siddhiApps.push(fileName);
-                            }
-                        }
-                    }
 
                     this.exportContainer = exportContainer;
                 }
