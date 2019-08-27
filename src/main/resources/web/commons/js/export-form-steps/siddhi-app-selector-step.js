@@ -19,73 +19,73 @@
 define(['jquery', 'backbone', 'lodash', 'log', 'file_browser', /** void module - jquery plugin **/ 'js_tree'],
     function ($, Backbone, _, log, FileBrowser) {
 
-    return Backbone.View.extend({
+        return Backbone.View.extend({
 
-        initialize: function (config) {
-            var errMsg;
-            if (!_.has(config, 'form')) {
-                errMsg = 'unable to find configuration for form';
-                log.error(errMsg);
-                throw errMsg;
-            }
-            var form = $(_.get(config, 'form'));
-            // check whether form element exists in dom
-            if (!form.length > 0) {
-                errMsg = 'unable to find form for file browser with selector: ' + _.get(config, 'form');
-                log.error(errMsg);
-                throw errMsg;
-            }
-            this._$parent_el = form;
-
-            if (!_.has(config, 'application')) {
-                log.error('Cannot init file browser. config: application not found.')
-            }
-
-            this.application = _.get(config, 'application');
-            this.siddhiAppSelectorStep = form.find("#siddiAppsTree");
-            this.openFileWizardError = form.find("#select-siddhi-app-error");
-            this.fileBrowser = new FileBrowser({
-                container: this.siddhiAppSelectorStep,
-                application: this.application,
-                fetchFiles: true,
-                showWorkspace: true,
-                multiSelect: true
-            });
-            this.pathSeparator =  this.application.getPathSeperator();
-        },
-
-        validateSiddhiApps: function() {
-            var files = this.fileBrowser.getSelected();
-            if (files.length === 0) {
-                this.openFileWizardError.text("Select Siddhi Apps To Export");
-                this.openFileWizardError.show();
-                return false;
-            }
-            return true;
-        },
-
-        render: function() {
-            this.openFileWizardError.hide();
-            this.siddhiAppSelectorStep.on('ready.jstree', function () {
-                this.siddhiAppSelectorStep.jstree("open_all");
-            });
-            this.fileBrowser.render();
-            this.fileBrowser.on("selected", function () {
-                this.openFileWizardError.hide();
-            });
-        },
-
-        getSiddhiApps: function () {
-            var siddhiApps = [];
-            var files = this.fileBrowser.getSelected();
-            for (var i = 0; i < files.length; i++) {
-                var fileName = _.last(files[i].id.split(this.pathSeparator));
-                if (fileName.lastIndexOf(".siddhi") !== -1) {
-                    siddhiApps.push(fileName);
+            initialize: function (config) {
+                var errMsg;
+                if (!_.has(config, 'form')) {
+                    errMsg = 'unable to find configuration for form';
+                    log.error(errMsg);
+                    throw errMsg;
                 }
-            }
-            return siddhiApps;
-        }
-    });
+                var form = $(_.get(config, 'form'));
+                // check whether form element exists in dom
+                if (!form.length > 0) {
+                    errMsg = 'unable to find form for file browser with selector: ' + _.get(config, 'form');
+                    log.error(errMsg);
+                    throw errMsg;
+                }
 
-});
+                if (!_.has(config, 'application')) {
+                    log.error('Cannot init file browser. config: application not found.')
+                }
+
+                var application = _.get(config, 'application');
+                var siddhiAppSelectorStep = form.find("#siddiAppsTree");
+                var openFileWizardError = form.find("#select-siddhi-app-error");
+                var fileBrowser = new FileBrowser({
+                    container: siddhiAppSelectorStep,
+                    application: application,
+                    fetchFiles: true,
+                    showWorkspace: true,
+                    multiSelect: true
+                });
+                openFileWizardError.hide();
+
+                fileBrowser.render();
+                siddhiAppSelectorStep.on('ready.jstree', function () {
+                    siddhiAppSelectorStep.jstree("open_all");
+                });
+                fileBrowser.on("selected", function () {
+                    openFileWizardError.hide();
+                });
+
+                this.fileBrowser = fileBrowser;
+                this.openFileWizardError = openFileWizardError;
+                this.pathSeparator = application.getPathSeperator();
+            },
+
+            validateSiddhiApps: function () {
+                var files = this.fileBrowser.getSelected();
+                if (files.length === 0) {
+                    this.openFileWizardError.text("Select Siddhi Apps To Export");
+                    this.openFileWizardError.show();
+                    return false;
+                }
+                return true;
+            },
+
+            getSiddhiApps: function () {
+                var siddhiApps = [];
+                var files = this.fileBrowser.getSelected();
+                for (var i = 0; i < files.length; i++) {
+                    var fileName = _.last(files[i].id.split(this.pathSeparator));
+                    if (fileName.lastIndexOf(".siddhi") !== -1) {
+                        siddhiApps.push(fileName);
+                    }
+                }
+                return siddhiApps;
+            }
+        });
+
+    });

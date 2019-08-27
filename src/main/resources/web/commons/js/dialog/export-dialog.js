@@ -89,7 +89,6 @@ define(['require', 'jquery', 'log', 'backbone', 'smart_wizard', 'siddhiAppSelect
                         form: form,
                         application: app
                     });
-                    siddhiAppSelector.render();
 
                     // Initialize the leaveStep event - validate before next
                     form.on("leaveStep", function(e, anchorObject, stepNumber, stepDirection) {
