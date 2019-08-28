@@ -117,6 +117,11 @@ public class RDBMSQueriesIT {
                 public <T> T getConfigurationObject(String s, Class<T> aClass) throws ConfigurationException {
                     return (T) rdbmsDataProviderConfBean;
                 }
+
+                @Override
+                public <T> ArrayList<T> getConfigurationObjectList(String s, Class<T> aClass) throws ConfigurationException {
+                    return null;
+                }
             };
             DataProviderValueHolder.getDataProviderHelper().setDataSourceService(dataSourceService);
             DataProviderValueHolder.getDataProviderHelper().setConfigProvider(configProvider);

@@ -16,11 +16,9 @@
 
 package org.wso2.carbon.analytics.test.osgi;
 
-import static org.ops4j.pax.exam.CoreOptions.maven;
-import static org.wso2.carbon.container.options.CarbonDistributionOption.carbonDistribution;
-import static org.wso2.carbon.container.options.CarbonDistributionOption.copyFile;
-import static org.wso2.carbon.container.options.CarbonDistributionOption.copyOSGiLibBundle;
-
+import com.google.gson.Gson;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
 import org.apache.log4j.Logger;
 import org.ops4j.pax.exam.Configuration;
 import org.ops4j.pax.exam.ExamFactory;
@@ -34,18 +32,15 @@ import org.testng.annotations.Test;
 import org.wso2.carbon.analytics.test.osgi.util.HTTPResponseMessage;
 import org.wso2.carbon.analytics.test.osgi.util.TestUtil;
 import org.wso2.carbon.container.CarbonContainerFactory;
-import org.wso2.carbon.kernel.CarbonServerInfo;
-import org.wso2.msf4j.MicroservicesRegistry;
 
 import java.net.URI;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
-import javax.inject.Inject;
-
-import com.google.gson.Gson;
-import com.google.gson.JsonArray;
-import com.google.gson.JsonObject;
+import static org.ops4j.pax.exam.CoreOptions.maven;
+import static org.wso2.carbon.container.options.CarbonDistributionOption.carbonDistribution;
+import static org.wso2.carbon.container.options.CarbonDistributionOption.copyFile;
+import static org.wso2.carbon.container.options.CarbonDistributionOption.copyOSGiLibBundle;
 
 /**
  * OSGI Tests for Business Rules Manager.
@@ -61,12 +56,6 @@ public class BusinessRulesManagerTestCase {
     private static final String DEFAULT_PASSWORD = "admin";
     private URI baseURI = URI.create(String.format("https://%s:%d", "localhost", 9743));
 
-    @Inject
-    private CarbonServerInfo carbonServerInfo;
-
-    @Inject
-    private MicroservicesRegistry microservicesRegistry;
-
     private Option copyPermissionDB() {
         String basedir = System.getProperty("basedir");
         Path carbonYmlFilePath = Paths.get(basedir, "src", "test", "resources", "carbon-context", "carbon.yml");
@@ -77,7 +66,7 @@ public class BusinessRulesManagerTestCase {
 
     @Configuration
     public Option[] createConfiguration() {
-        logger.info("Running - "+ this.getClass().getName());
+        logger.info("Running - " + this.getClass().getName());
         return new Option[]{
                 copyPermissionDB(),
                 copyOSGiLibBundle(maven()
@@ -246,7 +235,7 @@ public class BusinessRulesManagerTestCase {
 
         HTTPResponseMessage httpResponseMessage = testUtil.getResponse();
         String successContent = httpResponseMessage.getSuccessContent().toString();
-        Gson gson= new Gson();
+        Gson gson = new Gson();
         JsonArray responseContent = gson.fromJson(successContent, JsonArray.class);
         Assert.assertEquals(httpResponseMessage.getResponseCode(), 200);
         Assert.assertEquals(httpResponseMessage.getContentType(), "application/json");
@@ -306,7 +295,7 @@ public class BusinessRulesManagerTestCase {
         testUtil.addFormField("businessRule", body);
         HTTPResponseMessage httpResponseMessage = testUtil.getResponse();
         String successContent = httpResponseMessage.getSuccessContent().toString();
-        Gson gson= new Gson();
+        Gson gson = new Gson();
         JsonArray responseContent = gson.fromJson(successContent, JsonArray.class);
         Assert.assertEquals(httpResponseMessage.getResponseCode(), 200);
         Assert.assertEquals(httpResponseMessage.getContentType(), "application/json");
@@ -376,7 +365,7 @@ public class BusinessRulesManagerTestCase {
         HTTPResponseMessage httpResponseMessage = sendHRequest(body, baseURI, path, contentType, method, true,
                 DEFAULT_USER_NAME, DEFAULT_PASSWORD);
         String successContent = httpResponseMessage.getSuccessContent().toString();
-        Gson gson= new Gson();
+        Gson gson = new Gson();
         JsonArray responseContent = gson.fromJson(successContent, JsonArray.class);
         Assert.assertEquals(httpResponseMessage.getResponseCode(), 200);
         Assert.assertEquals(httpResponseMessage.getContentType(), "application/json");
@@ -425,7 +414,7 @@ public class BusinessRulesManagerTestCase {
         HTTPResponseMessage httpResponseMessage = sendHRequest(body, baseURI, path, contentType, method, true,
                 DEFAULT_USER_NAME, DEFAULT_PASSWORD);
         String successContent = httpResponseMessage.getSuccessContent().toString();
-        Gson gson= new Gson();
+        Gson gson = new Gson();
         JsonArray responseContent = gson.fromJson(successContent, JsonArray.class);
         Assert.assertEquals(httpResponseMessage.getResponseCode(), 200);
         Assert.assertEquals(httpResponseMessage.getContentType(), "application/json");
@@ -477,7 +466,7 @@ public class BusinessRulesManagerTestCase {
         testUtil.addFormField("businessRule", body);
         HTTPResponseMessage httpResponseMessage = testUtil.getResponse();
         String errorContent = httpResponseMessage.getErrorContent().toString();
-        Gson gson= new Gson();
+        Gson gson = new Gson();
         JsonArray responseContent = gson.fromJson(errorContent, JsonArray.class);
         Assert.assertEquals(httpResponseMessage.getResponseCode(), 500);
         Assert.assertEquals(httpResponseMessage.getContentType(), "application/json");
@@ -509,7 +498,7 @@ public class BusinessRulesManagerTestCase {
         testUtil.addFormField("businessRule", body);
         HTTPResponseMessage httpResponseMessage = testUtil.getResponse();
         String errorContent = httpResponseMessage.getErrorContent().toString();
-        Gson gson= new Gson();
+        Gson gson = new Gson();
         JsonArray responseContent = gson.fromJson(errorContent, JsonArray.class);
         Assert.assertEquals(httpResponseMessage.getResponseCode(), 500);
         Assert.assertEquals(httpResponseMessage.getContentType(), "application/json");
@@ -560,7 +549,7 @@ public class BusinessRulesManagerTestCase {
         HTTPResponseMessage httpResponseMessage = sendHRequest(body, baseURI, path, contentType, method, true,
                 DEFAULT_USER_NAME, DEFAULT_PASSWORD);
         String errorContent = httpResponseMessage.getErrorContent().toString();
-        Gson gson= new Gson();
+        Gson gson = new Gson();
         JsonArray responseContent = gson.fromJson(errorContent, JsonArray.class);
         Assert.assertEquals(httpResponseMessage.getResponseCode(), 500);
         Assert.assertEquals(httpResponseMessage.getContentType(), "application/json");
