@@ -49,7 +49,6 @@ import io.siddhi.distribution.editor.core.exception.KubernetesGenerationExceptio
 import io.siddhi.distribution.editor.core.exception.SiddhiAppDeployerServiceStubException;
 import io.siddhi.distribution.editor.core.exception.SiddhiStoreQueryHelperException;
 import io.siddhi.distribution.editor.core.internal.local.LocalFSWorkspace;
-import io.siddhi.distribution.editor.core.util.ConfigReader;
 import io.siddhi.distribution.editor.core.util.Constants;
 import io.siddhi.distribution.editor.core.util.DebugCallbackEvent;
 import io.siddhi.distribution.editor.core.util.DebugStateHolder;
@@ -1078,10 +1077,10 @@ public class EditorMicroservice implements Microservice {
     @Path("/deploymentConfigs")
     @Produces(MediaType.APPLICATION_JSON)
     public Response getDeploymentConfigs() {
-        ConfigReader configReader = new ConfigReader();
+        ExportUtils exportUtils = new ExportUtils(configProvider);
         try {
             JsonObject deploymentHolder = new JsonObject();
-            deploymentHolder.addProperty("deploymentYaml", configReader.export());
+            deploymentHolder.addProperty("deploymentYaml", exportUtils.exportConfigs());
             return Response
                     .status(Response.Status.OK)
                     .entity(deploymentHolder)
