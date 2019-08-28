@@ -21,7 +21,7 @@ define(['require', 'lodash', 'jquery', 'log', 'ace/ace', 'app/source-editor/edit
 
         var TemplateFileDialog = function (options) {
             this.app = options.app;
-            this.appNames = options.payload.siddhiAppNames;
+            this.appNames = options.siddhiAppNames;
             this.templateContainer = options.templateHeader;
             this.appArr = this.readSiddhiApps(this.appNames);
             this.editorObjArr = [];

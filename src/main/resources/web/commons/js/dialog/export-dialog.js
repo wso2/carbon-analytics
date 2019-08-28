@@ -19,12 +19,6 @@
 define(['require', 'jquery', 'log', 'backbone', 'smart_wizard', 'siddhiAppSelectorDialog', 'jarsSelectorDialog', 'templateFileDialog'],
     function (require, $, log, Backbone, smartWizard, SiddhiAppSelectorDialog, JarsSelectorDialog, TemplateFileDialog) {
 
-        var payload = {
-            siddhiApps: [],
-            siddhiAppNames: [],
-            templatedSiddhiApps: []
-        };
-
         var ExportDialog = Backbone.View.extend(
             /** @lends ExportDialog.prototype */
             {
@@ -44,9 +38,10 @@ define(['require', 'jquery', 'log', 'backbone', 'smart_wizard', 'siddhiAppSelect
                         configuration: '',
                         bundles: [],
                         jars: [],
-                        kubernetesConfiguration: ''
+                        kubernetesConfiguration: '',
+                        templatedVariables: {}
                     };
-                    this.data = {};
+                    this.templatedSiddhiApps = [];
                     this.appTemplatingModel;
                 },
 
@@ -83,8 +78,10 @@ define(['require', 'jquery', 'log', 'backbone', 'smart_wizard', 'siddhiAppSelect
 
                     // Toolbar extra buttons
                     var btnExport = $('<button type="button" class="btn btn-default" data-dismiss="modal" id="finish-btn">Export</button>')
-                                        .addClass('hidden')
-                                        .on('click', function () {self.sendExportRequest()});
+                        .addClass('hidden')
+                        .on('click', function () {
+                            self.sendExportRequest()
+                        });
                     form.smartWizard({
                         selected: 0,
                         autoAdjustHeight: false,
@@ -102,19 +99,19 @@ define(['require', 'jquery', 'log', 'backbone', 'smart_wizard', 'siddhiAppSelect
                     self.siddhiAppSelector.render();
 
                     // Initialize the leaveStep event - validate before next
-                    form.on("leaveStep", function(e, anchorObject, stepNumber, stepDirection) {
+                    form.on("leaveStep", function (e, anchorObject, stepNumber, stepDirection) {
                         if (stepDirection === 'forward') {
                             if (stepNumber === 0) {
                                 return self.siddhiAppSelector.validateSiddhiApps();
                             }
                             if (stepNumber === 1) {
-                                this.templatedSiddhiApps = self.appTemplatingModel.getTemplatedApps();
+                                self.templatedSiddhiApps = self.appTemplatingModel.getTemplatedApps();
                             }
                         }
                     });
 
                     // Step is passed successfully
-                    form.on("showStep", function(e, anchorObject, stepNumber, stepDirection, stepPosition) {
+                    form.on("showStep", function (e, anchorObject, stepNumber, stepDirection, stepPosition) {
                         // Finish button enable/disable
                         if (stepPosition === 'first') {
                             $("#prev-btn").addClass('disabled');
@@ -132,10 +129,10 @@ define(['require', 'jquery', 'log', 'backbone', 'smart_wizard', 'siddhiAppSelect
                                 log.info(siddhiAppsNamesList);
                                 var templateOptions = {
                                     app: self.app,
-                                    payload: payload,
+                                    siddhiAppNames: siddhiAppsNamesList,
                                     templateHeader: exportContainer.find('#siddhiAppTemplateContainerId')
                                 };
-                                self._template_dialog = new TemplateFileDialog(templateOptions);
+                                self.appTemplatingModel = new TemplateFileDialog(templateOptions);
                                 self.appTemplatingModel.render();
                             } else if (stepNumber === 4) {
                                 self.jarsSelectorDialog = new JarsSelectorDialog(app, form);
