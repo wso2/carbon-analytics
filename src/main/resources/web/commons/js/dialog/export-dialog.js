@@ -33,7 +33,6 @@ define(['require', 'jquery', 'log', 'backbone', 'smart_wizard', 'siddhiAppSelect
                     this.app = options;
                     this.options = _.cloneDeep(_.get(options.config, 'export_dialog'));
                     this.isDocker = isDocker;
-                    this.jarsSelectorDialog;
                     this.payload = {
                         siddhiApps: {},
                         configuration: '',
@@ -77,7 +76,7 @@ define(['require', 'jquery', 'log', 'backbone', 'smart_wizard', 'siddhiAppSelect
                     // Toolbar extra buttons
                     var btnExport = $('<button type="button" class="btn btn-default" data-dismiss="modal" id="finish-btn">Export</button>')
                                         .addClass('hidden')
-                                        .on('click', self.sendExportRequest());
+                                        .on('click', function () {self.sendExportRequest()});
                     form.smartWizard({
                         selected: 0,
                         autoAdjustHeight: false,
@@ -132,10 +131,10 @@ define(['require', 'jquery', 'log', 'backbone', 'smart_wizard', 'siddhiAppSelect
                 },
 
                 sendExportRequest: function () {
-                    self.payload.bundles = self.jarsSelectorDialog.getSelected('bundles');
-                    self.payload.jars = self.jarsSelectorDialog.getSelected('jars');
+                    this.payload.bundles = this.jarsSelectorDialog.getSelected('bundles');
+                    this.payload.jars = this.jarsSelectorDialog.getSelected('jars');
 
-                    log.info(self.payload);
+                    log.info(this.payload);
 
                 }
             });
