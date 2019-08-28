@@ -69,14 +69,14 @@ public class FileConfigManager implements ConfigManager {
                 if (propertiesMap != null && propertiesMap.size() > 0) {
                     this.properties = propertiesMap;
                     if (LOGGER.isDebugEnabled()) {
-                        LOGGER.debug("Matching siddhi property is looked for under name space '" +
+                        LOGGER.debug("Matching siddhi property is looked for under namespace '" +
                                 SIDDHI_PROPERTIES_NAMESPACE + "'.");
                     }
                 } else {
                     RootConfiguration rootConfiguration =
                             configProvider.getConfigurationObject(RootConfiguration.class);
                     if (LOGGER.isDebugEnabled()) {
-                        LOGGER.debug("Matching siddhi property is looked for under name space " +
+                        LOGGER.debug("Matching siddhi property is looked for under namespace " +
                                 "'siddhi.properties'.");
                     }
                     this.properties = rootConfiguration.getProperties();
@@ -97,13 +97,13 @@ public class FileConfigManager implements ConfigManager {
             if (!references.isEmpty()) {
                 this.references = references;
                 if (LOGGER.isDebugEnabled()) {
-                    LOGGER.debug("Matching references is loaded from under name space 'refs'.");
+                    LOGGER.debug("Matching references is loaded from under namespace 'refs'.");
                 }
             } else {
                 RootConfiguration rootConfiguration = configProvider
                         .getConfigurationObject(RootConfiguration.class);
                 this.references = rootConfiguration.getRefs();
-                LOGGER.debug("Matching references is loaded from under name space 'siddhi.extensions'.");
+                LOGGER.debug("Matching references is loaded from under namespace 'siddhi.extensions'.");
             }
         } catch (Exception e) {
             LOGGER.error("Could not initiate the refs configuration object, " + e.getMessage(), e);
@@ -117,13 +117,13 @@ public class FileConfigManager implements ConfigManager {
                     .getConfigurationObjectList(EXTENSIONS_NAMESPACE, Extension.class);
             if (!extensions.isEmpty()) {
                 this.extensions = extensions;
-                LOGGER.debug("Matching extensions system configurations is loaded from under name space " +
+                LOGGER.debug("Matching extensions system configurations is loaded from under namespace " +
                         "'extensions'.");
             } else {
                 RootConfiguration rootConfiguration = configProvider.
                         getConfigurationObject(RootConfiguration.class);
                 this.extensions = rootConfiguration.getExtensions();
-                LOGGER.debug("Matching extensions system configurations is loaded from under name space " +
+                LOGGER.debug("Matching extensions system configurations is loaded from under namespace " +
                         "'siddhi.extensions'.");
             }
         } catch (Exception e) {
