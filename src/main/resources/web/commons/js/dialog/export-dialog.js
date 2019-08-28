@@ -16,10 +16,15 @@
  * under the License.
  */
 
-define(['require', 'jquery', 'log', 'backbone', 'smart_wizard', 'siddhiAppSelectorStep'],
-    function (require, $, log, Backbone, smartWizard, SiddhiAppSelectorStep) {
+define(['require', 'jquery', 'log', 'backbone', 'smart_wizard', 'siddhiAppSelectorStep', 'jarsSelectorStep'],
+    function (require, $, log, Backbone, smartWizard, SiddhiAppSelectorStep, JarsSelectorStep) {
+        var siddhiApps = [];
         var payload = {
-            siddhiApps: []
+            siddhiApps: {},
+            configuration: '',
+            bundles: [],
+            jars: [],
+            kubernetesConfiguration: ''
         };
 
         var ExportDialog = Backbone.View.extend(
@@ -71,7 +76,7 @@ define(['require', 'jquery', 'log', 'backbone', 'smart_wizard', 'siddhiAppSelect
                     // Toolbar extra buttons
                     var btnFinish = $('<button type="button" class="btn btn-default" data-dismiss="modal" id="finish-btn">Finish</button>')
                                         .addClass('hidden')
-                                        .on('click', function(){alert('Finish Clicked');});
+                                        .on('click', sendExportRequest);
                     form.smartWizard({
                         selected: 0,
                         autoAdjustHeight: false,
@@ -86,6 +91,11 @@ define(['require', 'jquery', 'log', 'backbone', 'smart_wizard', 'siddhiAppSelect
                     });
 
                     var siddhiAppSelector = new SiddhiAppSelectorStep({
+                        form: form,
+                        application: app
+                    });
+
+                    var jarsSelectorStep = new JarsSelectorStep({
                         form: form,
                         application: app
                     });
@@ -114,12 +124,21 @@ define(['require', 'jquery', 'log', 'backbone', 'smart_wizard', 'siddhiAppSelect
 
                         if (stepDirection === 'forward') {
                             if (stepNumber === 1) {
-                                payload.siddhiApps = siddhiAppSelector.getSiddhiApps();
+                                siddhiApps = siddhiAppSelector.getSiddhiApps();
                             }
                         }
                     });
 
                     this.exportContainer = exportContainer;
+
+                    function sendExportRequest() {
+                        payload.bundles = jarsSelectorStep.getSelected('bundles');
+                        payload.jars = jarsSelectorStep.getSelected('jars');
+
+                        log.info(siddhiApps);
+                        log.info(payload);
+
+                    }
                 }
             });
         return ExportDialog;

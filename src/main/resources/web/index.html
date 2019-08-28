@@ -2389,8 +2389,8 @@
                     </ul>
                     <div id="form-containers">
                         <div id="step-1" >
-                            Select Siddhi Apps
                             <div class='siddhi-app-list' id='siddhi-app-list' style='display: block'>
+                                Select Siddhi Apps
                                 <div class='form-group'>
                                     <div class='file-dialog-form-scrollable-block-list'>
                                         <div id='siddiAppsTree'></div>
@@ -2409,7 +2409,14 @@
                             <label>Add values for templates</label>
                         </div>
                         <div id="step-5" >
-                            <label>Add additional JARS</label>
+                            <div class='siddhi-app-list' id='additional-bundles-list' style='display: block'>
+                                Add additional JARS
+                                <div class='form-group'>
+                                    <div class='file-dialog-form-scrollable-block-list'>
+                                        <div id='bundlesTree'></div>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -2520,6 +2527,7 @@
             functionForm: "js/design-view/form-builder/forms/function-form",
             appAnnotationForm: "js/design-view/form-builder/forms/app-annotation-form",
             siddhiAppSelectorStep: "commons/js/export-form-steps/siddhi-app-selector-step",
+            jarsSelectorStep: "commons/js/export-form-steps/jars-selector-step",
             guide: "js/guide/guide",
             utils: "commons/js/utils/utils",
             // element data holding objects starts here
@@ -2968,6 +2976,9 @@
             services:   {
                 workspace:  {
                     endpoint: window.location.protocol + "//" + window.location.host + '/editor/workspace'
+                },
+                root:  {
+                    endpoint: window.location.protocol + "//" + window.location.host + '/editor'
                 }
             },
             alerts: {
