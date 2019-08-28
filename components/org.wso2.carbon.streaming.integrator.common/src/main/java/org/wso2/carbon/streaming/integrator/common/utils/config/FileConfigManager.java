@@ -50,7 +50,7 @@ public class FileConfigManager implements ConfigManager {
         if (configProvider != null) {
             initializeExtensions();
             initializeReferences();
-            initalizeProperties();
+            initializeProperties();
         }
     }
 
@@ -59,7 +59,7 @@ public class FileConfigManager implements ConfigManager {
         init();
     }
 
-    private void initalizeProperties() {
+    private void initializeProperties() {
         // load siddhi properties
         try {
             Object siddhiPropertiesConf = configProvider.getConfigurationObject(SIDDHI_PROPERTIES_NAMESPACE);
