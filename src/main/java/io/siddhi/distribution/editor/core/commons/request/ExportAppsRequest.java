@@ -30,6 +30,7 @@ public class ExportAppsRequest {
     private Map<String, String> templatedVariables;
     private List<String> bundles;
     private List<String> jars;
+    private String kubernetesConfiguration;
 
     public Map<String, String> getSiddhiApps() {
         return siddhiApps;
@@ -49,5 +50,9 @@ public class ExportAppsRequest {
 
     public List<String> getJars() {
         return jars;
+    }
+
+    public String getKubernetesConfiguration() {
+        return kubernetesConfiguration;
     }
 }

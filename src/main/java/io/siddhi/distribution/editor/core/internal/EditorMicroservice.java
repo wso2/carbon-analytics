@@ -45,6 +45,7 @@ import io.siddhi.distribution.editor.core.commons.response.MetaDataResponse;
 import io.siddhi.distribution.editor.core.commons.response.Status;
 import io.siddhi.distribution.editor.core.commons.response.ValidationSuccessResponse;
 import io.siddhi.distribution.editor.core.exception.DockerGenerationException;
+import io.siddhi.distribution.editor.core.exception.KubernetesGenerationException;
 import io.siddhi.distribution.editor.core.exception.SiddhiAppDeployerServiceStubException;
 import io.siddhi.distribution.editor.core.exception.SiddhiStoreQueryHelperException;
 import io.siddhi.distribution.editor.core.internal.local.LocalFSWorkspace;
@@ -1108,16 +1109,42 @@ public class EditorMicroservice implements Microservice {
     @POST
     @Path("/export")
     public Response exportApps(@QueryParam("type") String exportType, ExportAppsRequest exportAppsRequest) {
-        DockerUtils dockerUtils = new DockerUtils(configProvider, exportAppsRequest);
+        ExportUtils exportUtils = new ExportUtils(configProvider, exportAppsRequest, exportType);
         try {
-            File zipFile = dockerUtils.createZipFile();
+            File zipFile = exportUtils.createZipFile();
             return Response
                     .status(Response.Status.OK)
                     .entity(zipFile)
                     .header("Content-Disposition", "attachment; filename=siddhi-docker.zip")
                     .build();
-        } catch (DockerGenerationException e) {
-            log.error("Cannot generate docker-artifacts archive.", e);
+        } catch (DockerGenerationException | KubernetesGenerationException e) {
+            log.error("Cannot generate export-artifacts archive.", e);
+            return Response
+                    .status(Response.Status.INTERNAL_SERVER_ERROR)
+                    .build();
+        }
+    }
+
+    /**
+     * Export given Siddhi apps and other configurations to docker or kubernetes artifacts.
+     *
+     * @return Docker or Kubernetes artifacts
+     */
+    @GET
+    @Path("/deploymentConfigs")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response getDeploymentConfigs() {
+        ExportUtils exportUtils = new ExportUtils(configProvider);
+        try {
+            JsonObject deploymentHolder = new JsonObject();
+            deploymentHolder.addProperty("deploymentYaml", exportUtils.exportConfigs());
+            return Response
+                    .status(Response.Status.OK)
+                    .entity(deploymentHolder)
+                    .type(MediaType.APPLICATION_JSON)
+                    .build();
+        } catch (IOException e) {
+            log.error("Cannot read deployment.yaml file", e);
             return Response
                     .status(Response.Status.INTERNAL_SERVER_ERROR)
                     .build();
