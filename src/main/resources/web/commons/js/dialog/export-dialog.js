@@ -19,6 +19,12 @@
 define(['require', 'jquery', 'log', 'backbone', 'smart_wizard', 'siddhiAppSelectorDialog', 'jarsSelectorDialog', 'templateFileDialog'],
     function (require, $, log, Backbone, smartWizard, SiddhiAppSelectorDialog, JarsSelectorDialog, TemplateFileDialog) {
 
+        var payload = {
+            siddhiApps: [],
+            siddhiAppNames: [],
+            templatedSiddhiApps: []
+        };
+
         var ExportDialog = Backbone.View.extend(
             /** @lends ExportDialog.prototype */
             {
@@ -40,6 +46,8 @@ define(['require', 'jquery', 'log', 'backbone', 'smart_wizard', 'siddhiAppSelect
                         jars: [],
                         kubernetesConfiguration: ''
                     };
+                    this.data = {};
+                    this.appTemplatingModel;
                 },
 
                 show: function () {
@@ -69,8 +77,8 @@ define(['require', 'jquery', 'log', 'backbone', 'smart_wizard', 'siddhiAppSelect
 
                         form.find('#form-containers')
                             .append('<div id="step-6" >' +
-                                    '    <label>Kubernetes Config</label>' +
-                                    '</div>');
+                                '    <label>Kubernetes Config</label>' +
+                                '</div>');
                     }
 
                     // Toolbar extra buttons
@@ -99,6 +107,9 @@ define(['require', 'jquery', 'log', 'backbone', 'smart_wizard', 'siddhiAppSelect
                             if (stepNumber === 0) {
                                 return self.siddhiAppSelector.validateSiddhiApps();
                             }
+                            if (stepNumber === 1) {
+                                this.templatedSiddhiApps = self.appTemplatingModel.getTemplatedApps();
+                            }
                         }
                     });
 
@@ -119,7 +130,13 @@ define(['require', 'jquery', 'log', 'backbone', 'smart_wizard', 'siddhiAppSelect
                             if (stepNumber === 1) {
                                 var siddhiAppsNamesList = self.siddhiAppSelector.getSiddhiApps();
                                 log.info(siddhiAppsNamesList);
-                                self._template_dialog = new TemplateFileDialog(app);
+                                var templateOptions = {
+                                    app: self.app,
+                                    payload: payload,
+                                    templateHeader: exportContainer.find('#siddhiAppTemplateContainerId')
+                                };
+                                self._template_dialog = new TemplateFileDialog(templateOptions);
+                                self.appTemplatingModel.render();
                             } else if (stepNumber === 4) {
                                 self.jarsSelectorDialog = new JarsSelectorDialog(app, form);
                                 self.jarsSelectorDialog.render();
