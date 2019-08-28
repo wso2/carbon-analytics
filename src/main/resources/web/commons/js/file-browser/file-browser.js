@@ -43,11 +43,13 @@ define(['jquery', 'backbone', 'lodash', 'log', /** void module - jquery plugin *
             this.application = _.get(config, 'application');
             this._options = config;
             this._workspaceServiceURL = _.get(this._options, 'application.config.services.workspace.endpoint');
+            this._serviceURL = _.get(this._options, 'application.config.baseUrl');
             this._isActive = false;
             this._fetchFiles = _.get(config, 'fetchFiles', false);
             this._root = _.get(config, 'root');
             this._showWorkspace = _.get(config, 'showWorkspace');
             this._showSamples = _.get(config, 'showSamples');
+            this._showBundles = _.get(config, 'showBundles');
             this._multiSelect = _.get(config, 'multiSelect', false);
 
             this._treeConfig = {
@@ -102,7 +104,16 @@ define(['jquery', 'backbone', 'lodash', 'log', /** void module - jquery plugin *
         getURLProvider: function(){
             var self = this;
             return function (node) {
-                if(self._showWorkspace && node.id === '#'){
+
+                if (self._showBundles) {
+                    if (node.id === '#') {
+                        return self._serviceURL + "/filterDirectories?" +
+                            "directory=" + self.application.utils.base64EncodeUnicode("bundles,jars");
+                    } else {
+                        return self._serviceURL + "/listFilesInPath?path=" + self.application.utils.
+                        base64EncodeUnicode(node.id);
+                    }
+                } else if(self._showWorkspace && node.id === '#'){
                     return self._workspaceServiceURL + "/listFilesInPath?path=" + self.application.utils.
                     base64EncodeUnicode("");
                 } else if(self._showSamples && node.id === '#'){
@@ -157,6 +168,10 @@ define(['jquery', 'backbone', 'lodash', 'log', /** void module - jquery plugin *
 
         getSelected: function() {
             return this._$parent_el.jstree(true).get_selected(true);
+        },
+
+        getBottomSelected: function() {
+            return this._$parent_el.jstree(true).get_bottom_selected(true);
         },
 
         render: function () {

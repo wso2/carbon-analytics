@@ -16,13 +16,8 @@
  * under the License.
  */
 
-define(['require', 'jquery', 'log', 'backbone', 'smart_wizard', 'siddhiAppSelectorStep', 'templateFileDialog',
-        'fillTemplateValueDialog'],
-    function (require, $, log, Backbone, smartWizard, SiddhiAppSelectorStep, TemplateFileDialog,FillTemplateValueDialog)
-    {
-        var payload = {
-            siddhiApps: []
-        };
+define(['require', 'jquery', 'log', 'backbone', 'smart_wizard', 'siddhiAppSelectorDialog', 'jarsSelectorDialog', 'templateFileDialog','fillTemplateValueDialog'],
+    function (require, $, log, Backbone, smartWizard, SiddhiAppSelectorDialog, JarsSelectorDialog, TemplateFileDialog,FillTemplateValueDialog) {
 
         var ExportDialog = Backbone.View.extend(
             /** @lends ExportDialog.prototype */
@@ -38,6 +33,16 @@ define(['require', 'jquery', 'log', 'backbone', 'smart_wizard', 'siddhiAppSelect
                     this.app = options;
                     this.options = _.cloneDeep(_.get(options.config, 'export_dialog'));
                     this.isDocker = isDocker;
+                    this.payload = {
+                        siddhiApps: {},
+                        configuration: '',
+                        bundles: [],
+                        jars: [],
+                        kubernetesConfiguration: '',
+                        templatedVariables: {}
+                    };
+                    this.templatedSiddhiApps = [];
+                    this.appTemplatingModel;
                 },
 
                 show: function () {
@@ -46,6 +51,7 @@ define(['require', 'jquery', 'log', 'backbone', 'smart_wizard', 'siddhiAppSelect
 
                 render: function () {
 
+                    var self = this;
                     if (!_.isNil(this.exportContainer)) {
                         this.exportContainer.remove();
                     }
@@ -66,14 +72,16 @@ define(['require', 'jquery', 'log', 'backbone', 'smart_wizard', 'siddhiAppSelect
 
                         form.find('#form-containers')
                             .append('<div id="step-6" >' +
-                                    '    <label>Kubernetes Config</label>' +
-                                    '</div>');
+                                '    <label>Kubernetes Config</label>' +
+                                '</div>');
                     }
 
                     // Toolbar extra buttons
-                    var btnFinish = $('<button type="button" class="btn btn-default" data-dismiss="modal" id="finish-btn">Finish</button>')
-                                        .addClass('hidden')
-                                        .on('click', function(){alert('Finish Clicked');});
+                    var btnExport = $('<button type="button" class="btn btn-default" data-dismiss="modal" id="finish-btn">Export</button>')
+                        .addClass('hidden')
+                        .on('click', function () {
+                            self.sendExportRequest()
+                        });
                     form.smartWizard({
                         selected: 0,
                         autoAdjustHeight: false,
@@ -83,31 +91,32 @@ define(['require', 'jquery', 'log', 'backbone', 'smart_wizard', 'siddhiAppSelect
                         contentCache: false,
                         toolbarSettings: {
                             toolbarPosition: 'bottom',
-                            toolbarExtraButtons: [btnFinish]
+                            toolbarExtraButtons: [btnExport]
                         }
                     });
 
-                    var siddhiAppSelector = new SiddhiAppSelectorStep({
-                        form: form,
-                        application: app
-                    });
+                    self.siddhiAppSelector = new SiddhiAppSelectorDialog(app, form);
+                    self.siddhiAppSelector.render();
 
                     // Initialize the leaveStep event - validate before next
-                    form.on("leaveStep", function(e, anchorObject, stepNumber, stepDirection) {
+                    form.on("leaveStep", function (e, anchorObject, stepNumber, stepDirection) {
                         if (stepDirection === 'forward') {
                             if (stepNumber === 0) {
-                                return siddhiAppSelector.validateSiddhiApps();
+                                return self.siddhiAppSelector.validateSiddhiApps();
+                            }
+                            if (stepNumber === 1) {
+                                self.templatedSiddhiApps = self.appTemplatingModel.getTemplatedApps();
                             }
                         }
                     });
 
                     // Step is passed successfully
-                    form.on("showStep", function(e, anchorObject, stepNumber, stepDirection, stepPosition) {
+                    form.on("showStep", function (e, anchorObject, stepNumber, stepDirection, stepPosition) {
                         // Finish button enable/disable
                         if (stepPosition === 'first') {
                             $("#prev-btn").addClass('disabled');
                         } else if (stepPosition === 'final') {
-                            $("#next-btn").addClass('disabled');
+                            $("#next-btn").addClass('hidden disabled');
                             $("#finish-btn").removeClass('hidden disabled');
                         } else {
                             $("#prev-btn").removeClass('disabled');
@@ -116,8 +125,18 @@ define(['require', 'jquery', 'log', 'backbone', 'smart_wizard', 'siddhiAppSelect
 
                         if (stepDirection === 'forward') {
                             if (stepNumber === 1) {
-                                payload.siddhiApps = siddhiAppSelector.getSiddhiApps();
-                                this._template_dialog = new TemplateFileDialog();
+                                var siddhiAppsNamesList = self.siddhiAppSelector.getSiddhiApps();
+                                log.info(siddhiAppsNamesList);
+                                var templateOptions = {
+                                    app: self.app,
+                                    siddhiAppNames: siddhiAppsNamesList,
+                                    templateHeader: exportContainer.find('#siddhiAppTemplateContainerId')
+                                };
+                                self.appTemplatingModel = new TemplateFileDialog(templateOptions);
+                                self.appTemplatingModel.render();
+                            } else if (stepNumber === 4) {
+                                self.jarsSelectorDialog = new JarsSelectorDialog(app, form);
+                                self.jarsSelectorDialog.render();
                             } else if (stepNumber === 3) {
                                 var fillTemplateOptions = {
                                     container: exportContainer.find("#fill-template-container-id"),
@@ -133,6 +152,14 @@ define(['require', 'jquery', 'log', 'backbone', 'smart_wizard', 'siddhiAppSelect
                     });
 
                     this.exportContainer = exportContainer;
+                },
+
+                sendExportRequest: function () {
+                    this.payload.bundles = this.jarsSelectorDialog.getSelected('bundles');
+                    this.payload.jars = this.jarsSelectorDialog.getSelected('jars');
+
+                    log.info(this.payload);
+
                 }
             });
         return ExportDialog;

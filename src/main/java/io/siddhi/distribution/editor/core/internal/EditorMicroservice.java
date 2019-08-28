@@ -45,12 +45,14 @@ import io.siddhi.distribution.editor.core.commons.response.MetaDataResponse;
 import io.siddhi.distribution.editor.core.commons.response.Status;
 import io.siddhi.distribution.editor.core.commons.response.ValidationSuccessResponse;
 import io.siddhi.distribution.editor.core.exception.DockerGenerationException;
+import io.siddhi.distribution.editor.core.exception.KubernetesGenerationException;
 import io.siddhi.distribution.editor.core.exception.SiddhiAppDeployerServiceStubException;
 import io.siddhi.distribution.editor.core.exception.SiddhiStoreQueryHelperException;
 import io.siddhi.distribution.editor.core.internal.local.LocalFSWorkspace;
 import io.siddhi.distribution.editor.core.util.Constants;
 import io.siddhi.distribution.editor.core.util.DebugCallbackEvent;
 import io.siddhi.distribution.editor.core.util.DebugStateHolder;
+import io.siddhi.distribution.editor.core.util.FileJsonObjectReaderUtil;
 import io.siddhi.distribution.editor.core.util.LogEncoder;
 import io.siddhi.distribution.editor.core.util.MimeMapper;
 import io.siddhi.distribution.editor.core.util.SampleEventGenerator;
@@ -297,6 +299,62 @@ public class EditorMicroservice implements Microservice {
             log.error("Cannot execute the store query.", e);
             return Response.serverError().entity("Failed executing the Siddhi query.").build();
         }
+    }
+
+    @GET
+    @Path("/filterDirectories")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response filterDirectories(@QueryParam("directory") String directoryList) {
+        try {
+            List<String> directories = Arrays.stream(
+                    new String(Base64.getDecoder().decode(directoryList), Charset.defaultCharset())
+                            .split(","))
+                    .filter(directory-> directory != null && !directory.trim().isEmpty())
+                    .map(directory -> "\"" + directory + "\"")
+                    .collect(Collectors.toList());
+
+            String location = Paths.get(Constants.CARBON_HOME).toString();
+            JsonArray filteredDirectoryFiles = FileJsonObjectReaderUtil.listDirectoryInPath(location, directories);
+
+            JsonObject rootElement = FileJsonObjectReaderUtil.getJsonRootObject(filteredDirectoryFiles);
+
+            return Response.status(Response.Status.OK)
+                    .entity(rootElement)
+                    .type(MediaType.APPLICATION_JSON)
+                    .build();
+        } catch (IOException e) {
+            return Response.serverError().entity("failed." + e.getMessage())
+                    .build();
+        } catch (Throwable ignored) {
+            return Response.serverError().entity("failed")
+                    .build();
+        }
+
+    }
+
+
+    @GET
+    @Path("/listFilesInPath")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response listFilesInRootPath(@QueryParam("path") String path) {
+        try {
+            String location = Paths.get(Constants.CARBON_HOME).toString();
+            java.nio.file.Path pathLocation = SecurityUtil.resolvePath(
+                    Paths.get(location).toAbsolutePath(),
+                    Paths.get(new String(Base64.getDecoder().decode(path), Charset.defaultCharset())));
+
+            return Response.status(Response.Status.OK)
+                    .entity(FileJsonObjectReaderUtil.listFilesInPath(pathLocation, "jar"))
+                    .type(MediaType.APPLICATION_JSON)
+                    .build();
+        } catch (IOException e) {
+            return Response.serverError().entity("failed." + e.getMessage())
+                    .build();
+        } catch (Throwable ignored) {
+            return Response.serverError().entity("failed")
+                    .build();
+        }
+
     }
 
     @GET
@@ -1059,8 +1117,34 @@ public class EditorMicroservice implements Microservice {
                     .entity(zipFile)
                     .header("Content-Disposition", "attachment; filename=siddhi-docker.zip")
                     .build();
-        } catch (DockerGenerationException e) {
+        } catch (DockerGenerationException | KubernetesGenerationException e) {
             log.error("Cannot generate export-artifacts archive.", e);
+            return Response
+                    .status(Response.Status.INTERNAL_SERVER_ERROR)
+                    .build();
+        }
+    }
+
+    /**
+     * Export given Siddhi apps and other configurations to docker or kubernetes artifacts.
+     *
+     * @return Docker or Kubernetes artifacts
+     */
+    @GET
+    @Path("/deploymentConfigs")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response getDeploymentConfigs() {
+        ExportUtils exportUtils = new ExportUtils(configProvider);
+        try {
+            JsonObject deploymentHolder = new JsonObject();
+            deploymentHolder.addProperty("deploymentYaml", exportUtils.exportConfigs());
+            return Response
+                    .status(Response.Status.OK)
+                    .entity(deploymentHolder)
+                    .type(MediaType.APPLICATION_JSON)
+                    .build();
+        } catch (IOException e) {
+            log.error("Cannot read deployment.yaml file", e);
             return Response
                     .status(Response.Status.INTERNAL_SERVER_ERROR)
                     .build();

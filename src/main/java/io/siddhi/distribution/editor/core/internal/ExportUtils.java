@@ -27,6 +27,7 @@ import io.siddhi.distribution.editor.core.commons.kubernetes.SiddhiProcessContai
 import io.siddhi.distribution.editor.core.commons.kubernetes.SiddhiProcessSpec;
 import io.siddhi.distribution.editor.core.commons.request.ExportAppsRequest;
 import io.siddhi.distribution.editor.core.exception.DockerGenerationException;
+import io.siddhi.distribution.editor.core.exception.KubernetesGenerationException;
 import io.siddhi.distribution.editor.core.util.Constants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -85,6 +86,12 @@ public class ExportUtils {
     private static final String APPS_DIR = "siddhi-files/";
     private static final String CONFIG_FILE = "configurations.yaml";
     private static final String EXPORT_TYPE_KUBERNETES = "kubernetes";
+    private static final String RUNNER_DEPLOYMENT_YAML_FILE = "runner-deployment.yaml";
+    private static final String TOOLING_DEPLOYMENT_YAML_FILE = "deployment.yaml";
+    private static final String DIRECTORY_CONF = "conf";
+    private static final String DIRECTORY_PROFILE = "tooling";
+    private static final String SIDDHI_NAMESPACE = "siddhi";
+    private static final String DATA_SOURCES_NAMESPACE = "dataSources";
     private final ConfigProvider configProvider;
     private DockerConfigs dockerConfigs;
     private ExportAppsRequest exportAppsRequest;
@@ -100,13 +107,17 @@ public class ExportUtils {
         this.exportType = exportType;
     }
 
+    ExportUtils(ConfigProvider configProvider) {
+        this.configProvider = configProvider;
+    }
+
     /**
      * Create a zip archive.
      *
      * @return Zip archive file
      * @throws DockerGenerationException if docker generation fails
      */
-    public File createZipFile() throws DockerGenerationException {
+    public File createZipFile() throws DockerGenerationException, KubernetesGenerationException {
         boolean jarsAdded = false;
         boolean bundlesAdded = false;
         boolean configChanged = false;
@@ -306,7 +317,21 @@ public class ExportUtils {
         return content.getBytes(StandardCharsets.UTF_8);
     }
 
-    private byte[] getKubernetesFile(Path kubernetesFilePath) throws IOException {
+    /**
+     * Generate SiddhiProcess Kubernetes YAML file.
+     *
+     * @param kubernetesFilePath Path to the Kubernetes YAML file
+     * @return YAML content
+     * @throws IOException
+     * @throws KubernetesGenerationException
+     */
+    private byte[] getKubernetesFile(Path kubernetesFilePath)
+            throws KubernetesGenerationException, IOException {
+        if (!Files.isReadable(kubernetesFilePath)) {
+            throw new KubernetesGenerationException(
+                    "Kubernetes file " + kubernetesFilePath.toString() + " is not readable."
+            );
+        }
         byte[] data = Files.readAllBytes(kubernetesFilePath);
         String content = new String(data, StandardCharsets.UTF_8);
         KubernetesConfig kubernetesConfig;
@@ -326,7 +351,9 @@ public class ExportUtils {
             }
 
             if (kubernetesConfig.getPersistentVolumeClaim() != null) {
-                siddhiProcessSpec.setPersistentVolumeClaim(kubernetesConfig.getPersistentVolumeClaim());
+                siddhiProcessSpec.setPersistentVolumeClaim(
+                        kubernetesConfig.getPersistentVolumeClaim()
+                );
             }
 
             if (this.exportAppsRequest.getTemplatedVariables() != null &&
@@ -394,7 +421,10 @@ public class ExportUtils {
                         kubernetesConfig.getSiddhiProcessName()
                 );
             } else {
-                content = content.replaceAll(SIDDHI_PROCESS_NAME_TEMPLATE, SIDDHI_PROCESS_DEFAULT_NAME);
+                content = content.replaceAll(
+                        SIDDHI_PROCESS_NAME_TEMPLATE,
+                        SIDDHI_PROCESS_DEFAULT_NAME
+                );
             }
         }
         return content.getBytes(StandardCharsets.UTF_8);
@@ -412,5 +442,66 @@ public class ExportUtils {
             this.dockerConfigs = configProvider.getConfigurationObject(DockerConfigs.class);
         }
         return this.dockerConfigs;
+    }
+
+    /**
+     * Read configurations from the tooling configs and merge with default configs.
+     *
+     * @return YAML string of combined configurations
+     * @throws IOException
+     */
+    public String exportConfigs() throws IOException {
+        Path toolingConfigFile = Paths.get(
+                Constants.CARBON_HOME,
+                DIRECTORY_CONF,
+                DIRECTORY_PROFILE,
+                TOOLING_DEPLOYMENT_YAML_FILE
+        );
+        Path runnerConfigFile = Paths.get(
+                Constants.RUNTIME_PATH,
+                RESOURCES_DIR,
+                RUNNER_DEPLOYMENT_YAML_FILE
+        );
+        if (!Files.isReadable(toolingConfigFile)) {
+            throw new IOException(
+                    "Config file " + toolingConfigFile.toString() + " is not readable."
+            );
+        }
+
+        if (!Files.isReadable(runnerConfigFile)) {
+            throw new IOException(
+                    "Config file " + runnerConfigFile.toString() + " is not readable."
+            );
+        }
+        String toolingDeploymentYamlContent = new String(
+                Files.readAllBytes(
+                        toolingConfigFile
+                ),
+                StandardCharsets.UTF_8
+        );
+        String runnerDeploymentYamlContent = new String(
+                Files.readAllBytes(
+                        runnerConfigFile
+                ),
+                StandardCharsets.UTF_8
+        );
+        Yaml loadYaml = new Yaml();
+        Map<String, Object> runnerConfigMap = loadYaml.load(toolingDeploymentYamlContent);
+        Map<String, Object> toolingConfigMap = loadYaml.load(runnerDeploymentYamlContent);
+        if (runnerConfigMap != null) {
+            if (toolingConfigMap.get(DATA_SOURCES_NAMESPACE) != null) {
+                runnerConfigMap.put(DATA_SOURCES_NAMESPACE, toolingConfigMap.get(DATA_SOURCES_NAMESPACE));
+            }
+            if (toolingConfigMap.get(SIDDHI_NAMESPACE) != null) {
+                runnerConfigMap.put(SIDDHI_NAMESPACE, toolingConfigMap.get(SIDDHI_NAMESPACE));
+            }
+            Representer representer = new Representer();
+            representer.addClassTag(SiddhiProcess.class, Tag.MAP);
+            DumperOptions options = new DumperOptions();
+            options.setDefaultFlowStyle(DumperOptions.FlowStyle.BLOCK);
+            Yaml dumpYaml = new Yaml(representer, options);
+            return dumpYaml.dump(runnerConfigMap);
+        }
+        return "";
     }
 }

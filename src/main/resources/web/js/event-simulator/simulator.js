@@ -376,7 +376,7 @@ define(['jquery', 'log', './constants', './simulator-rest-client', 'lodash', './
             $(ctx).siblings().removeClass("active");
             // create the tab
             $(self.createListItem(nextTab, self.singleEventConfigCount)).insertBefore($(ctx));
-            $("#single-event-config-tab-content").find(".tab-pane").removeClass("active");
+            $("#single-event-config-tab-content").find(".ws-tab-pane").removeClass("active");
             var singleEvent = self.singleEventForm.clone();
             singleEvent.attr('data-uuid', self.singleEventConfigCount + '');
             // create the tab content
@@ -407,7 +407,7 @@ define(['jquery', 'log', './constants', './simulator-rest-client', 'lodash', './
         // create a div for the tab content of single
         self.createDivForSingleEventTabContent = function (singleEventConfigCount) {
             var div =
-                '<div role="tabpanel" class="tab-pane active" id="event-content-parent-{{dynamicId}}">' +
+                '<div role="tabpanel" class="ws-tab-pane active" id="event-content-parent-{{dynamicId}}">' +
                 '   <div class = "content" id="event-content-{{dynamicId}}">' +
                 '   </div>' +
                 '</div>';

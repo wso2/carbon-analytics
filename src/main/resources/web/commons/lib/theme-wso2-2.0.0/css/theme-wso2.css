@@ -4863,7 +4863,7 @@ tbody.collapse.in {
     }
 }
 
-.tab-content > .tab-pane {
+.tab-content > .ws-tab-pane {
     display: none;
 }
 
@@ -4882,7 +4882,7 @@ tbody.collapse.in {
 }
 
 @media (min-width: 768px) {
-    .tab-content > .tab-pane {
+    .tab-content > .ws-tab-pane {
         display: none !important;
     }
 
