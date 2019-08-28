@@ -16,19 +16,71 @@
  * under the License.
  */
 
-define(['require', 'lodash', 'jquery', 'log'],
-    function (require, _, $, log) {
+define(['require', 'lodash', 'jquery', 'log','ace/ace','app/source-editor/editor'],
+    function (require, _, $, log,ace,SiddhiEditor) {
 
-        var TemplateFileDialog = function (options) {
-            alert("init TemplateFileDialog ");
-            this.app = options;
+        var constants = {
+            TEMPLATED_ELEMENT_REGEX: /\${([^\\$\\s]+)}/g
+        };
+
+        var FillTemplateValueDialog = function (options) {
+            alert("init FillTemplateValueDialog ");
+            this.container = options.container;
+            this.templatedApps = options.apps;
+            this.templatedKeyList = [];
+
+            // this._mainEditor = new SiddhiEditor({
+            //     divID: "testContainer",
+            //     realTimeValidation: true,
+            //     autoCompletion: true
+            // });
+            // this._editor = ace.edit("testContainer");
+            // this._editor.getSession().setValue("Hello world");
+            // this._editor.resize(true);
+
 
         };
 
-        TemplateFileDialog.prototype.constructor = TemplateFileDialog;
+        FillTemplateValueDialog.prototype.constructor = FillTemplateValueDialog;
 
-        TemplateFileDialog.prototype.render = function () {
+        FillTemplateValueDialog.prototype.render = function () {
             var self = this;
+
+            _.forEach(self.templatedApps, function(element, i) {
+                console.log(element);
+                console.log(i);
+
+            });
+
+            this.templatedApps = [{"appName":"test1","content":"test"}];
+            this.getRegexMatches("abdc ${{name}} ansadasd ${{price}}");
+
+            var allTemplatedKeysHTMLContent = '<div class="clearfix form-min-width">' +
+                '<div class="source-sink-form-container source-div">' +
+                '<div id="define-source">Add values for templates</div>' +
+                '<div class = "source-sink-map-options" id="source-options-div">';
+            var dynamicKeyHTMLContent = "";
+
+            _.forEach(self.templatedKeyList, function(key) {
+                dynamicKeyHTMLContent = dynamicKeyHTMLContent + '<div id="source-options">' +
+                    '<div class="sub-source-options-div">' +
+                    '<div class="option">' +
+                    '<div class="clearfix">' + '<label class="option-name optional-option">' +
+                    key +
+                    '</label>' + '</div>' + '<div class="clearfix">' +
+                    '<input class="option-value" type="text" data-toggle="popover" data-placement="bottom" data-original-title="" title="">' +
+                    '</div>' + ' <label class="error-message"></label>' + '</div> </div> </div>'
+
+            });
+
+            allTemplatedKeysHTMLContent = allTemplatedKeysHTMLContent + dynamicKeyHTMLContent + '</div></div></div>';
+            self.container.append(allTemplatedKeysHTMLContent);
+
+
+
+
+
+
 
 
 
@@ -341,13 +393,43 @@ define(['require', 'lodash', 'jquery', 'log'],
         };
 
 
-        TemplateFileDialog.prototype.selectAll = function () {
+        FillTemplateValueDialog.prototype.selectAll = function () {
 
         };
 
-        TemplateFileDialog.prototype.show = function () {
+        FillTemplateValueDialog.prototype.getRegexMatches = function (text) {
+            var self = this;
+            var match = constants.TEMPLATED_ELEMENT_REGEX.exec(text);
+            while (match != null) {
+                // matched text: match[0]
+                // match start: match.index
+                // capturing group n: match[n]
+                self.templatedKeyList.push(match[0]);
+                match = constants.TEMPLATED_ELEMENT_REGEX.exec(text);
+            }
+
+        };
+
+        // static getRegexMatches(text, regex) {
+        //     const matches = [];
+        //     let matcher;
+        //     do {
+        //         matcher = regex.exec(text);
+        //         if (matcher) {
+        //             if (regex === TemplateEditorConstants.TEMPLATED_ELEMENT_REGEX) {
+        //                 matches.push(matcher[1]);
+        //             } else {
+        //                 matches.push(matcher[0]);
+        //             }
+        //         }
+        //
+        //     } while (matcher);
+        //     return matches;
+        // }
+
+        FillTemplateValueDialog.prototype.show = function () {
             this._fileOpenModal.modal('show');
         };
 
-        return TemplateFileDialog;
+        return FillTemplateValueDialog;
     });

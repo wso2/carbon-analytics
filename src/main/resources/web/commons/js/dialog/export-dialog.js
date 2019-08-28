@@ -16,8 +16,10 @@
  * under the License.
  */
 
-define(['require', 'jquery', 'log', 'backbone', 'smart_wizard', 'siddhiAppSelectorStep', 'templateFileDialog'],
-    function (require, $, log, Backbone, smartWizard, SiddhiAppSelectorStep, TemplateFileDialog) {
+define(['require', 'jquery', 'log', 'backbone', 'smart_wizard', 'siddhiAppSelectorStep', 'templateFileDialog',
+        'fillTemplateValueDialog'],
+    function (require, $, log, Backbone, smartWizard, SiddhiAppSelectorStep, TemplateFileDialog,FillTemplateValueDialog)
+    {
         var payload = {
             siddhiApps: []
         };
@@ -116,6 +118,16 @@ define(['require', 'jquery', 'log', 'backbone', 'smart_wizard', 'siddhiAppSelect
                             if (stepNumber === 1) {
                                 payload.siddhiApps = siddhiAppSelector.getSiddhiApps();
                                 this._template_dialog = new TemplateFileDialog();
+                            } else if (stepNumber === 3) {
+                                var fillTemplateOptions = {
+                                    container: exportContainer.find("#fill-template-container-id"),
+                                    apps: payload
+                                };
+                                // var stepDiv = exportContainer.find("#step-4");
+                                // var area = '<div id="testContainer" class="source-container" style="height: 100px; width: 400px"></div>';
+                                // stepDiv.append(area);
+                                this._fill_template_value_dialog = new FillTemplateValueDialog(fillTemplateOptions);
+                                this._fill_template_value_dialog.render();
                             }
                         }
                     });
