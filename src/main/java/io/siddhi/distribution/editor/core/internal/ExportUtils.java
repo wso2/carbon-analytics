@@ -27,6 +27,7 @@ import io.siddhi.distribution.editor.core.commons.kubernetes.SiddhiProcessContai
 import io.siddhi.distribution.editor.core.commons.kubernetes.SiddhiProcessSpec;
 import io.siddhi.distribution.editor.core.commons.request.ExportAppsRequest;
 import io.siddhi.distribution.editor.core.exception.DockerGenerationException;
+import io.siddhi.distribution.editor.core.exception.KubernetesGenerationException;
 import io.siddhi.distribution.editor.core.util.Constants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -106,7 +107,7 @@ public class ExportUtils {
      * @return Zip archive file
      * @throws DockerGenerationException if docker generation fails
      */
-    public File createZipFile() throws DockerGenerationException {
+    public File createZipFile() throws DockerGenerationException, KubernetesGenerationException {
         boolean jarsAdded = false;
         boolean bundlesAdded = false;
         boolean configChanged = false;
@@ -306,7 +307,13 @@ public class ExportUtils {
         return content.getBytes(StandardCharsets.UTF_8);
     }
 
-    private byte[] getKubernetesFile(Path kubernetesFilePath) throws IOException {
+    private byte[] getKubernetesFile(Path kubernetesFilePath)
+            throws KubernetesGenerationException, IOException {
+        if (!Files.isReadable(kubernetesFilePath)) {
+            throw new KubernetesGenerationException(
+                    "Kubernetes file " + kubernetesFilePath.toString() + " is not readable."
+            );
+        }
         byte[] data = Files.readAllBytes(kubernetesFilePath);
         String content = new String(data, StandardCharsets.UTF_8);
         KubernetesConfig kubernetesConfig;
@@ -326,7 +333,9 @@ public class ExportUtils {
             }
 
             if (kubernetesConfig.getPersistentVolumeClaim() != null) {
-                siddhiProcessSpec.setPersistentVolumeClaim(kubernetesConfig.getPersistentVolumeClaim());
+                siddhiProcessSpec.setPersistentVolumeClaim(
+                        kubernetesConfig.getPersistentVolumeClaim()
+                );
             }
 
             if (this.exportAppsRequest.getTemplatedVariables() != null &&
@@ -394,7 +403,10 @@ public class ExportUtils {
                         kubernetesConfig.getSiddhiProcessName()
                 );
             } else {
-                content = content.replaceAll(SIDDHI_PROCESS_NAME_TEMPLATE, SIDDHI_PROCESS_DEFAULT_NAME);
+                content = content.replaceAll(
+                        SIDDHI_PROCESS_NAME_TEMPLATE,
+                        SIDDHI_PROCESS_DEFAULT_NAME
+                );
             }
         }
         return content.getBytes(StandardCharsets.UTF_8);
