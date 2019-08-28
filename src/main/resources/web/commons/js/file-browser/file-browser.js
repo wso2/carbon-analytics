@@ -43,7 +43,7 @@ define(['jquery', 'backbone', 'lodash', 'log', /** void module - jquery plugin *
             this.application = _.get(config, 'application');
             this._options = config;
             this._workspaceServiceURL = _.get(this._options, 'application.config.services.workspace.endpoint');
-            this._serviceURL = _.get(this._options, 'application.config.services.root.endpoint');
+            this._serviceURL = _.get(this._options, 'application.config.baseUrl');
             this._isActive = false;
             this._fetchFiles = _.get(config, 'fetchFiles', false);
             this._root = _.get(config, 'root');
