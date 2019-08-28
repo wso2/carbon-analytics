@@ -16,16 +16,8 @@
  * under the License.
  */
 
-define(['require', 'jquery', 'log', 'backbone', 'smart_wizard', 'siddhiAppSelectorStep', 'jarsSelectorStep', 'templateFileDialog'],
-    function (require, $, log, Backbone, smartWizard, SiddhiAppSelectorStep, JarsSelectorStep, TemplateFileDialog) {
-        var siddhiApps = [];
-        var payload = {
-            siddhiApps: {},
-            configuration: '',
-            bundles: [],
-            jars: [],
-            kubernetesConfiguration: ''
-        };
+define(['require', 'jquery', 'log', 'backbone', 'smart_wizard', 'siddhiAppSelectorDialog', 'jarsSelectorDialog', 'templateFileDialog'],
+    function (require, $, log, Backbone, smartWizard, SiddhiAppSelectorDialog, JarsSelectorDialog, TemplateFileDialog) {
 
         var ExportDialog = Backbone.View.extend(
             /** @lends ExportDialog.prototype */
@@ -41,6 +33,14 @@ define(['require', 'jquery', 'log', 'backbone', 'smart_wizard', 'siddhiAppSelect
                     this.app = options;
                     this.options = _.cloneDeep(_.get(options.config, 'export_dialog'));
                     this.isDocker = isDocker;
+                    this.jarsSelectorDialog;
+                    this.payload = {
+                        siddhiApps: {},
+                        configuration: '',
+                        bundles: [],
+                        jars: [],
+                        kubernetesConfiguration: ''
+                    };
                 },
 
                 show: function () {
@@ -49,6 +49,7 @@ define(['require', 'jquery', 'log', 'backbone', 'smart_wizard', 'siddhiAppSelect
 
                 render: function () {
 
+                    var self = this;
                     if (!_.isNil(this.exportContainer)) {
                         this.exportContainer.remove();
                     }
@@ -74,9 +75,9 @@ define(['require', 'jquery', 'log', 'backbone', 'smart_wizard', 'siddhiAppSelect
                     }
 
                     // Toolbar extra buttons
-                    var btnFinish = $('<button type="button" class="btn btn-default" data-dismiss="modal" id="finish-btn">Finish</button>')
+                    var btnExport = $('<button type="button" class="btn btn-default" data-dismiss="modal" id="finish-btn">Export</button>')
                                         .addClass('hidden')
-                                        .on('click', sendExportRequest);
+                                        .on('click', self.sendExportRequest());
                     form.smartWizard({
                         selected: 0,
                         autoAdjustHeight: false,
@@ -86,25 +87,18 @@ define(['require', 'jquery', 'log', 'backbone', 'smart_wizard', 'siddhiAppSelect
                         contentCache: false,
                         toolbarSettings: {
                             toolbarPosition: 'bottom',
-                            toolbarExtraButtons: [btnFinish]
+                            toolbarExtraButtons: [btnExport]
                         }
                     });
 
-                    var siddhiAppSelector = new SiddhiAppSelectorStep({
-                        form: form,
-                        application: app
-                    });
-
-                    var jarsSelectorStep = new JarsSelectorStep({
-                        form: form,
-                        application: app
-                    });
+                    self.siddhiAppSelector = new SiddhiAppSelectorDialog(app, form);
+                    self.siddhiAppSelector.render();
 
                     // Initialize the leaveStep event - validate before next
                     form.on("leaveStep", function(e, anchorObject, stepNumber, stepDirection) {
                         if (stepDirection === 'forward') {
                             if (stepNumber === 0) {
-                                return siddhiAppSelector.validateSiddhiApps();
+                                return self.siddhiAppSelector.validateSiddhiApps();
                             }
                         }
                     });
@@ -115,7 +109,7 @@ define(['require', 'jquery', 'log', 'backbone', 'smart_wizard', 'siddhiAppSelect
                         if (stepPosition === 'first') {
                             $("#prev-btn").addClass('disabled');
                         } else if (stepPosition === 'final') {
-                            $("#next-btn").addClass('disabled');
+                            $("#next-btn").addClass('hidden disabled');
                             $("#finish-btn").removeClass('hidden disabled');
                         } else {
                             $("#prev-btn").removeClass('disabled');
@@ -124,22 +118,25 @@ define(['require', 'jquery', 'log', 'backbone', 'smart_wizard', 'siddhiAppSelect
 
                         if (stepDirection === 'forward') {
                             if (stepNumber === 1) {
-                                siddhiApps = siddhiAppSelector.getSiddhiApps();
-                                this._template_dialog = new TemplateFileDialog();
+                                var siddhiAppsNamesList = self.siddhiAppSelector.getSiddhiApps();
+                                log.info(siddhiAppsNamesList);
+                                self._template_dialog = new TemplateFileDialog(app);
+                            } else if (stepNumber === 4) {
+                                self.jarsSelectorDialog = new JarsSelectorDialog(app, form);
+                                self.jarsSelectorDialog.render();
                             }
                         }
                     });
 
                     this.exportContainer = exportContainer;
+                },
 
-                    function sendExportRequest() {
-                        payload.bundles = jarsSelectorStep.getSelected('bundles');
-                        payload.jars = jarsSelectorStep.getSelected('jars');
+                sendExportRequest: function () {
+                    self.payload.bundles = self.jarsSelectorDialog.getSelected('bundles');
+                    self.payload.jars = self.jarsSelectorDialog.getSelected('jars');
 
-                        log.info(siddhiApps);
-                        log.info(payload);
+                    log.info(self.payload);
 
-                    }
                 }
             });
         return ExportDialog;

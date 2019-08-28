@@ -16,31 +16,9 @@
  * under the License.
  */
 
-define(['jquery', 'backbone', 'lodash', 'log', 'file_browser', /** void module - jquery plugin **/ 'js_tree'],
-    function ($, Backbone, _, log, FileBrowser) {
-
-    return Backbone.View.extend({
-
-        initialize: function (config) {
-            var errMsg;
-            if (!_.has(config, 'form')) {
-                errMsg = 'unable to find configuration for form';
-                log.error(errMsg);
-                throw errMsg;
-            }
-            var form = $(_.get(config, 'form'));
-            // check whether form element exists in dom
-            if (!form.length > 0) {
-                errMsg = 'unable to find form for file browser with selector: ' + _.get(config, 'form');
-                log.error(errMsg);
-                throw errMsg;
-            }
-
-            if (!_.has(config, 'application')) {
-                log.error('Cannot init file browser. config: application not found.')
-            }
-
-            var application = _.get(config, 'application');
+define(['jquery', 'lodash', 'log', 'file_browser', /** void module - jquery plugin **/ 'js_tree'],
+    function ($, _, log, FileBrowser) {
+        var JarsSelectorDialog = function (application, form) {
             var bundlesSelector = form.find("#bundlesTree");
             var bundlesBrowser = new FileBrowser({
                 container: bundlesSelector,
@@ -49,17 +27,25 @@ define(['jquery', 'backbone', 'lodash', 'log', 'file_browser', /** void module -
                 showBundles: true,
                 multiSelect: true
             });
-            bundlesBrowser.render();
 
+            this.bundlesSelector = bundlesSelector;
+            this.bundlesBrowser = bundlesBrowser;
+            this.pathSeparator = application.getPathSeperator();
+
+        };
+
+        JarsSelectorDialog.prototype.constructor = JarsSelectorDialog;
+
+        JarsSelectorDialog.prototype.render = function () {
+            this.bundlesBrowser.render();
+
+            var bundlesSelector = this.bundlesSelector;
             bundlesSelector.on('ready.jstree', function () {
                 bundlesSelector.jstree("open_all");
             });
+        };
 
-            this.bundlesBrowser = bundlesBrowser;
-            this.pathSeparator = application.getPathSeperator();
-        },
-
-        getSelected: function (directoryName) {
+        JarsSelectorDialog.prototype.getSelected = function (directoryName) {
             var bundles = [];
             var files = this.bundlesBrowser.getBottomSelected();
             for (var i = 0; i < files.length; i++) {
@@ -70,7 +56,6 @@ define(['jquery', 'backbone', 'lodash', 'log', 'file_browser', /** void module -
                 }
             }
             return bundles;
-        }
+        };
+        return JarsSelectorDialog;
     });
-
-});
