@@ -48,9 +48,9 @@ public class FileConfigManager implements ConfigManager {
 
     private void init() {
         if (configProvider != null) {
-            initialiseExtensions();
-            initialiseReferences();
-            initaliseProperties();
+            initializeExtensions();
+            initializeReferences();
+            initalizeProperties();
         }
     }
 
@@ -59,7 +59,7 @@ public class FileConfigManager implements ConfigManager {
         init();
     }
 
-    private void initaliseProperties() {
+    private void initalizeProperties() {
         // load siddhi properties
         try {
             Object siddhiPropertiesConf = configProvider.getConfigurationObject(SIDDHI_PROPERTIES_NAMESPACE);
@@ -90,7 +90,7 @@ public class FileConfigManager implements ConfigManager {
         }
     }
 
-    private void initialiseReferences() {
+    private void initializeReferences() {
         try {
             ArrayList<Reference> references = configProvider
                     .getConfigurationObjectList(REFS_NAMESPACE, Reference.class);
@@ -110,7 +110,7 @@ public class FileConfigManager implements ConfigManager {
         }
     }
 
-    private void initialiseExtensions() {
+    private void initializeExtensions() {
         try {
             // Process system configs
             ArrayList<Extension> extensions = configProvider
