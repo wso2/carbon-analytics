@@ -161,7 +161,7 @@ define(['require', 'jquery', 'log', 'backbone', 'smart_wizard', 'siddhiAppSelect
                                 self.jarsSelectorDialog = new JarsSelectorDialog(app, form);
                                 self.jarsSelectorDialog.render();
                             } else if (stepNumber === 3) {
-                                self.payload.templatedSiddhiApps = [{"appName" : "test1", "appContent" : "abdc ${name} ansadasd ${price}"},{"appName" : "test2", "appContent" : "abdc ${symbol} ansadasd ${age}"}]
+                                //self.payload.templatedSiddhiApps = [{"appName" : "test1", "appContent" : "abdc ${name} ansadasd ${price}"},{"appName" : "test2", "appContent" : "abdc ${symbol} ansadasd ${age}"}]
                                 var fillTemplateOptions = {
                                     container: exportContainer.find("#fill-template-container-id"),
                                     payload: self.payload
@@ -203,6 +203,8 @@ define(['require', 'jquery', 'log', 'backbone', 'smart_wizard', 'siddhiAppSelect
 
                     $(document.body).append(this.btnExportForm);
                     this.btnExportForm.submit();
+                    self.exportContainer.remove();
+
                 }
             });
         return ExportDialog;
