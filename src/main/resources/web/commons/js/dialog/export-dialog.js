@@ -39,10 +39,11 @@ define(['require', 'jquery', 'log', 'backbone', 'smart_wizard', 'siddhiAppSelect
                         bundles: [],
                         jars: [],
                         kubernetesConfiguration: '',
-                        templatedVariables: {}
+                        templatedVariables: [],
+                        templatedSiddhiApps: []
                     };
-                    this.templatedSiddhiApps = [];
                     this.appTemplatingModel;
+                    this._fill_template_value_dialog;
                 },
 
                 show: function () {
@@ -105,8 +106,12 @@ define(['require', 'jquery', 'log', 'backbone', 'smart_wizard', 'siddhiAppSelect
                                 return self.siddhiAppSelector.validateSiddhiApps();
                             }
                             if (stepNumber === 1) {
-                                self.templatedSiddhiApps = self.appTemplatingModel.getTemplatedApps();
+                                self.payload.templatedSiddhiApps = self.appTemplatingModel.getTemplatedApps();
+                            } else if (stepNumber === 3) {
+                                self.payload.templatedVariables = self._fill_template_value_dialog.
+                                getTemplatedKeyValues();
                             }
+
                         }
                     });
 
@@ -138,15 +143,13 @@ define(['require', 'jquery', 'log', 'backbone', 'smart_wizard', 'siddhiAppSelect
                                 self.jarsSelectorDialog = new JarsSelectorDialog(app, form);
                                 self.jarsSelectorDialog.render();
                             } else if (stepNumber === 3) {
+                                self.payload.templatedSiddhiApps = [{"appName" : "test1", "appContent" : "abdc ${name} ansadasd ${price}"},{"appName" : "test2", "appContent" : "abdc ${symbol} ansadasd ${age}"}]
                                 var fillTemplateOptions = {
                                     container: exportContainer.find("#fill-template-container-id"),
-                                    apps: payload
+                                    payload: self.payload
                                 };
-                                // var stepDiv = exportContainer.find("#step-4");
-                                // var area = '<div id="testContainer" class="source-container" style="height: 100px; width: 400px"></div>';
-                                // stepDiv.append(area);
-                                this._fill_template_value_dialog = new FillTemplateValueDialog(fillTemplateOptions);
-                                this._fill_template_value_dialog.render();
+                                self._fill_template_value_dialog = new FillTemplateValueDialog(fillTemplateOptions);
+                                self._fill_template_value_dialog.render();
                             }
                         }
                     });
