@@ -526,6 +526,7 @@ define(['ace/ace', 'jquery', 'lodash', 'log','dialogs','./service-client','welco
             this.handleExportForDocker = function handleExportForDocker() {
                 if (!_.isNil(this._handleExport)) {
                     this._handleExport.exportContainer.remove();
+                    this._handleExport.btnExportForm.remove();
                 }
                 this._handleExport = new Dialogs.export_dialog(app, true);
                 this._handleExport.render();
@@ -535,6 +536,7 @@ define(['ace/ace', 'jquery', 'lodash', 'log','dialogs','./service-client','welco
             this.handleExportForKubernetes = function handleExportForKubernetes() {
                 if (!_.isNil(this._handleExport)) {
                     this._handleExport.exportContainer.remove();
+                    this._handleExport.btnExportForm.remove();
                 }
                 this._handleExport = new Dialogs.export_dialog(app, false);
                 this._handleExport.render();
