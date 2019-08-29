@@ -63,6 +63,7 @@
 
     <!-- SmartWizard CSS -->
     <link rel="stylesheet" type="text/css" href="/editor/commons/lib/smartWizard/css/smart_wizard.css" />
+    <link rel="stylesheet" type="text/css" href="/editor/css/export-docker-kubernetes.css" />
 
     <title>Siddhi Editor</title>
 </head>
@@ -2368,18 +2369,18 @@
 
 <!-- Export Dialog -->
 <div class='modal fade' id='openExportModal' tabindex='-1' role='dialog'>
-    <div class='modal-dialog export-dialog' role='document'>
+    <div class='modal-dialog' role='document'>
         <iframe name="export-download" style="display: none;"></iframe>
-        <div class='modal-content'>
+        <div class='modal-content export-dialog'>
             <div class='modal-header'>
                 <button type='button' class='close' data-dismiss='modal' aria-label='Close'>
                     <i class='fw fw-cancel about-dialog-close'></i>
                 </button>
                 <h4 class='modal-title export-dialog-title' id='initialHeading'>Exporting Siddhi Apps For Docker</h4>
-                <hr class='style1'>
+                <hr class='export-dialog-hr'>
             </div>
             <div class='modal-body'>
-                <div id='export-form' style="height: 500px;">
+                <div id='export-form' >
                     <ul id="form-steps">
                         <li><a href="#step-1">Step 1<br/><small>Select Siddhi Apps</small></a></li>
                         <li><a href="#step-2">Step 2<br/><small>Template Siddhi Apps</small></a></li>
@@ -2394,10 +2395,10 @@
                                 <div class='form-group'>
                                     <div class='file-dialog-form-scrollable-block-list'>
                                         <div id='siddiAppsTree'></div>
-                                        <div id='select-siddhi-app-error' class='alert alert-danger' style='display: none;'></div>
                                     </div>
                                 </div>
                             </div>
+                            <div id='select-siddhi-app-error' class='alert alert-danger' style='display: none;'></div>
                         </div>
                         <div id="step-2" >
                             <div class='siddhi-app-template-container' id='siddhiAppTemplateContainerId'

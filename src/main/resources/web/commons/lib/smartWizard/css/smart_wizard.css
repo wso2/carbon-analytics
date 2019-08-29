@@ -17,19 +17,26 @@
     margin: 0;
     padding: 0;
     border-radius: .25rem!important;
+    height: 98%;
+    width: 100%;
 }
 
 .sw-main .sw-container {
     display: block;
-    margin: 0;
-    padding: 0;
     position: relative;
+    height: 85%;
+    padding: 10px 10px 10px 10px;
+    overflow: auto;
+    width: 90.15%;
+    margin-left: 30px;
 }
 
 .sw-main .step-content {
     display: none;
     position: relative;
     margin: 0;
+    width: 100%;
+    height: 100%;
 }
 
 .sw-main .sw-toolbar {
@@ -54,7 +61,7 @@
 }
 
 .sw-theme-default .sw-toolbar {
-    background: #000000;
+    background: transparent;
     border-radius: 0 !important;
     padding-left: 10px;
     padding-right: 10px;
@@ -64,6 +71,7 @@
 
 .sw-theme-default .sw-toolbar-top {
     border-bottom-color: #000000 !important;
+    padding: 20px 20px 20px 20px;
 }
 
 .sw-theme-default .sw-toolbar-bottom {
@@ -93,6 +101,7 @@
 
 .sw-theme-default > ul.step-anchor > li > a::after {
     content: "";
+    color: #5cb85c;
     background: #4285F4;
     height: 2px;
     position: absolute;
@@ -108,7 +117,7 @@
 
 .sw-theme-default > ul.step-anchor > li.active > a {
     border: none !important;
-    color: #4285F4 !important;
+    color: #02aaad !important;
     background: transparent !important;
     cursor: pointer;
 }
@@ -127,6 +136,7 @@
 }
 
 .sw-theme-default > ul.step-anchor > li.done > a::after {
+    color: #5cb85c;
     background: #5cb85c;
     -webkit-transform: scale(1);
     -ms-transform: scale(1);
