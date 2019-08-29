@@ -34,6 +34,7 @@ define(['require', 'jquery', 'log', 'backbone', 'smart_wizard', 'siddhiAppSelect
                 initialize: function (options, isDocker) {
                     this.app = options;
                     this.options = _.cloneDeep(_.get(options.config, 'export_dialog'));
+                    this.exportContainer;
                     this.isDocker = isDocker;
                     this.payload = {
                         templatedSiddhiApps : [],

@@ -39,14 +39,13 @@ define(['require', 'lodash', 'jquery', 'log','ace/ace','app/source-editor/editor
             });
 
             var allTemplatedKeysHTMLContent = '<div class="clearfix form-min-width">' +
-                '<div class="source-sink-form-container source-div">' +
-                '<div id="define-source">Add values for templates</div>' +
-                '<div class = "source-sink-map-options" id="source-options-div">';
+                '<div class="fill-template-value-container template-values-div">' +
+                '<div class = "template-value-elements" id="template-value-elements-div">';
             var dynamicKeyHTMLContent = "";
 
             _.forEach(self.templatedKeyList, function(key) {
-                dynamicKeyHTMLContent = dynamicKeyHTMLContent + '<div id="source-options" class="template-element">' +
-                    '<div class="sub-source-options-div">' +
+                dynamicKeyHTMLContent = dynamicKeyHTMLContent + '<div id="template-value-element-id" class="template-element">' +
+                    '<div class="sub-template-value-element-div">' +
                     '<div class="option">' +
                     '<div class="clearfix">' + '<label class="option-name optional-option">' +
                     key +
@@ -56,7 +55,7 @@ define(['require', 'lodash', 'jquery', 'log','ace/ace','app/source-editor/editor
 
             });
 
-            allTemplatedKeysHTMLContent = allTemplatedKeysHTMLContent + dynamicKeyHTMLContent + '</div></div></div>';
+            allTemplatedKeysHTMLContent = allTemplatedKeysHTMLContent + dynamicKeyHTMLContent + '</div></div>';
             self.container.append(allTemplatedKeysHTMLContent);
         };
 
