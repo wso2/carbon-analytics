@@ -23,14 +23,13 @@ define(['require', 'lodash', 'jquery', 'log', 'ace/ace', 'app/source-editor/edit
             this.app = options.app;
             this.templateContainer = options.templateHeader;
             this.k8ConfigEditor;
-
         };
 
         KubernetesConfigDialog.prototype.constructor = KubernetesConfigDialog;
 
         KubernetesConfigDialog.prototype.render = function () {
             var self = this;
-            var divId = "k8ConfigEditorId";
+            var divId = "kubernetes-config-editor-id";
             var templateEntry = "<div id='".concat(divId).concat("' style='height: 100%;'></div>");
             self.templateContainer.append(templateEntry);
 

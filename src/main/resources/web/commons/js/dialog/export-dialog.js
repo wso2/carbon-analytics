@@ -37,7 +37,7 @@ define(['require', 'jquery', 'log', 'backbone', 'smart_wizard', 'siddhiAppSelect
                     this.exportContainer;
                     this.isDocker = isDocker;
                     this.payload = {
-                        templatedSiddhiApps : [],
+                        templatedSiddhiApps: [],
                         configuration: '',
                         templatedVariables: [],
                         bundles: [],
@@ -89,7 +89,9 @@ define(['require', 'jquery', 'log', 'backbone', 'smart_wizard', 'siddhiAppSelect
                         '<form id="submit-form"  method="post" enctype="application/x-www-form-urlencoded" target="export-download" >' +
                         '<button  type="button" class="btn btn-default hidden" id="export-btn" data-dismiss="modal" >Export</button>' +
                         '</form>');
-                    btnExportForm.find('#export-btn').on('click', function () { self.sendExportRequest()});
+                    btnExportForm.find('#export-btn').on('click', function () {
+                        self.sendExportRequest()
+                    });
                     self.btnExportForm = btnExportForm;
 
                     form.smartWizard({
@@ -122,8 +124,7 @@ define(['require', 'jquery', 'log', 'backbone', 'smart_wizard', 'siddhiAppSelect
                                 self.payload.configuration = self.configTemplateModel.getTemplatedConfig();
                                 self.payload.templatedSiddhiApps = self.appTemplatingModel.getTemplatedApps();
                             } else if (stepNumber === 3) {
-                                self.payload.templatedVariables = self._fill_template_value_dialog.
-                                getTemplatedKeyValues();
+                                self.payload.templatedVariables = self._fill_template_value_dialog.getTemplatedKeyValues();
                             }
                         }
                     });
@@ -143,7 +144,8 @@ define(['require', 'jquery', 'log', 'backbone', 'smart_wizard', 'siddhiAppSelect
 
                         if (stepDirection === 'forward') {
                             if (stepNumber === 1) {
-                                var siddhiAppTemplateContainer = exportContainer.find('#siddhiAppTemplateContainerId');
+                                var siddhiAppTemplateContainer
+                                    = exportContainer.find('#siddhi-app-template-container-id');
                                 if (siddhiAppTemplateContainer.children().length > 0) {
                                     siddhiAppTemplateContainer.empty();
                                     siddhiAppTemplateContainer.accordion("destroy");
@@ -159,14 +161,13 @@ define(['require', 'jquery', 'log', 'backbone', 'smart_wizard', 'siddhiAppSelect
                             } else if (stepNumber === 2) {
                                 self.configTemplateModel = new TemplateConfigDialog({
                                     app: self.app,
-                                    templateHeader: exportContainer.find('#configTemplateContainerId')
+                                    templateHeader: exportContainer.find('#config-template-container-id')
                                 });
                                 self.configTemplateModel.render();
-                            }else if (stepNumber === 4) {
+                            } else if (stepNumber === 4) {
                                 self.jarsSelectorDialog = new JarsSelectorDialog(app, form);
                                 self.jarsSelectorDialog.render();
                             } else if (stepNumber === 3) {
-                                //self.payload.templatedSiddhiApps = [{"appName" : "test1", "appContent" : "abdc ${name} ansadasd ${price}"},{"appName" : "test2", "appContent" : "abdc ${symbol} ansadasd ${age}"}]
                                 var fillTemplateOptions = {
                                     container: exportContainer.find("#fill-template-container-id"),
                                     payload: self.payload
