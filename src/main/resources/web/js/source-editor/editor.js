@@ -138,9 +138,11 @@ define(["ace/ace", "jquery", "./constants", "./utils", "./completion-engine", ".
              * This is done to isolate the antlr tasks form the main js to solve RequireJS conflicts
              * Also this will enable the antlr tasks to run without blocking the UI thread
              */
-            var siddhiWorker = new SiddhiWorker(new MessageHandler(self));
+            if (self.realTimeValidation) {
+                var siddhiWorker = new SiddhiWorker(new MessageHandler(self));
+                self.debugger = new Debugger(aceEditor);
+            }
 
-            self.debugger = new Debugger(aceEditor);
 
             self.getDebugger = function () {
                 return self.debugger;
@@ -210,11 +212,13 @@ define(["ace/ace", "jquery", "./constants", "./utils", "./completion-engine", ".
              * @private
              */
             function editorChangeHandler() {
-                // Clearing all errors before finding the errors again
-                self.state.semanticErrorList = [];
-                self.state.syntaxErrorList = [];
-                self.unMarkErrors();
-                siddhiWorker.onEditorChange(aceEditor.getValue().trim());
+                if (self.realTimeValidation) {
+                    // Clearing all errors before finding the errors again
+                    self.state.semanticErrorList = [];
+                    self.state.syntaxErrorList = [];
+                    self.unMarkErrors();
+                    siddhiWorker.onEditorChange(aceEditor.getValue().trim());
+                }
             }
 
             /**
@@ -814,6 +818,7 @@ define(["ace/ace", "jquery", "./constants", "./utils", "./completion-engine", ".
          * @constructor
          */
         function MessageHandler(editor) {
+
             var handler = this;
             var messageHandlerMap = {};
             var tokenTooltipUpdater = new TokenTooltipUpdater(editor);
