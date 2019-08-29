@@ -45,8 +45,6 @@ import io.siddhi.distribution.editor.core.commons.response.GeneralResponse;
 import io.siddhi.distribution.editor.core.commons.response.MetaDataResponse;
 import io.siddhi.distribution.editor.core.commons.response.Status;
 import io.siddhi.distribution.editor.core.commons.response.ValidationSuccessResponse;
-import io.siddhi.distribution.editor.core.exception.DockerGenerationException;
-import io.siddhi.distribution.editor.core.exception.KubernetesGenerationException;
 import io.siddhi.distribution.editor.core.exception.SiddhiAppDeployerServiceStubException;
 import io.siddhi.distribution.editor.core.exception.SiddhiStoreQueryHelperException;
 import io.siddhi.distribution.editor.core.internal.local.LocalFSWorkspace;
@@ -1127,7 +1125,7 @@ public class EditorMicroservice implements Microservice {
             return Response
                     .status(Response.Status.BAD_REQUEST)
                     .build();
-        } catch (DockerGenerationException | KubernetesGenerationException e) {
+        } catch (Exception e) {
             log.error("Cannot generate export-artifacts archive.", e);
             return Response
                     .status(Response.Status.INTERNAL_SERVER_ERROR)
