@@ -168,8 +168,13 @@ define(['require', 'jquery', 'log', 'backbone', 'smart_wizard', 'siddhiAppSelect
                                 self.jarsSelectorDialog = new JarsSelectorDialog(app, form);
                                 self.jarsSelectorDialog.render();
                             } else if (stepNumber === 3) {
+                                var fillTemplateContainer
+                                    = exportContainer.find('#fill-template-container-id');
+                                if (fillTemplateContainer.children().length > 0) {
+                                    fillTemplateContainer.empty();
+                                }
                                 var fillTemplateOptions = {
-                                    container: exportContainer.find("#fill-template-container-id"),
+                                    container: fillTemplateContainer,
                                     payload: self.payload
                                 };
                                 self._fill_template_value_dialog = new FillTemplateValueDialog(fillTemplateOptions);
