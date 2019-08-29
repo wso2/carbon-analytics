@@ -181,20 +181,19 @@ define(['require', 'jquery', 'log', 'backbone', 'smart_wizard', 'siddhiAppSelect
                 },
 
                 sendExportRequest: function () {
-                    var self = this;
-                    this.payload.kubernetesConfiguration = self.kubernetesConfigModel.getKubernetesConfigs();
+                    var type;
+                    if (this.isDocker) {
+                        type = 'docker';
+                    } else {
+                        type = 'kubernetes';
+                        this.payload.kubernetesConfiguration = this.kubernetesConfigModel.getKubernetesConfigs();
+                    }
                     this.payload.bundles = this.jarsSelectorDialog.getSelected('bundles');
                     this.payload.jars = this.jarsSelectorDialog.getSelected('jars');
 
                     var payload = $('<input id="payload" name="payload" type="text" style="display: none;"/>')
                         .attr('value', JSON.stringify(this.payload));
 
-                    var type;
-                    if (this.isDocker) {
-                        type = 'docker'
-                    } else {
-                        type = 'kubernetes'
-                    }
                     var exportUrl = this.app.config.baseUrl + "/export?type=" + type;
 
                     this.btnExportForm.append(payload);
