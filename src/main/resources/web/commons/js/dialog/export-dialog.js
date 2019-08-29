@@ -16,8 +16,10 @@
  * under the License.
  */
 
-define(['require', 'jquery', 'log', 'backbone', 'smart_wizard', 'siddhiAppSelectorDialog', 'jarsSelectorDialog', 'templateFileDialog','fillTemplateValueDialog'],
-    function (require, $, log, Backbone, smartWizard, SiddhiAppSelectorDialog, JarsSelectorDialog, TemplateFileDialog,FillTemplateValueDialog) {
+define(['require', 'jquery', 'log', 'backbone', 'smart_wizard', 'siddhiAppSelectorDialog', 'jarsSelectorDialog',
+        'templateFileDialog', 'templateConfigDialog', 'fillTemplateValueDialog', 'kubernetesConfigDialog'],
+    function (require, $, log, Backbone, smartWizard, SiddhiAppSelectorDialog, JarsSelectorDialog,
+              TemplateFileDialog, TemplateConfigDialog, FillTemplateValueDialog, KubernetesConfigDialog) {
 
         var ExportDialog = Backbone.View.extend(
             /** @lends ExportDialog.prototype */
@@ -34,15 +36,16 @@ define(['require', 'jquery', 'log', 'backbone', 'smart_wizard', 'siddhiAppSelect
                     this.options = _.cloneDeep(_.get(options.config, 'export_dialog'));
                     this.isDocker = isDocker;
                     this.payload = {
-                        siddhiApps: {},
+                        templatedSiddhiApps : [],
                         configuration: '',
+                        templatedVariables: [],
                         bundles: [],
                         jars: [],
-                        kubernetesConfiguration: '',
-                        templatedVariables: [],
-                        templatedSiddhiApps: []
+                        kubernetesConfiguration: ''
                     };
                     this.appTemplatingModel;
+                    this.configTemplateModel;
+                    this.kubernetesConfigModel;
                     this._fill_template_value_dialog;
                 },
 
@@ -72,27 +75,37 @@ define(['require', 'jquery', 'log', 'backbone', 'smart_wizard', 'siddhiAppSelect
                             .append('<li><a href="#step-6">Step 6<br/><small>Add Kubernetes Config</small></a></li>');
 
                         form.find('#form-containers')
-                            .append('<div id="step-6" >' +
-                                '    <label>Kubernetes Config</label>' +
-                                '</div>');
+                            .append("\n" +
+                                "<div id=\"step-6\" >\n" +
+                                "<div class='kubernetes-configuration-step' id='kubernetes-configuration-step-id' style='display: block'>\n" +
+                                "Configure Kubernetes for Siddhi\n" +
+                                "</div>\n" +
+                                "</div>");
                     }
 
                     // Toolbar extra buttons
-                    var btnExport = $('<button type="button" class="btn btn-default" data-dismiss="modal" id="finish-btn">Export</button>')
+                    var btnExportForm = $('' +
+                        '<form id="submit-form"  method="post" enctype="application/x-www-form-urlencoded" target="export-download" data-dismiss="modal">' +
+                        '<button  type="button" class="btn btn-default" id="export-btn">Export</button>' +
+                        '</form>');
+                    btnExportForm.find('#export-btn')
                         .addClass('hidden')
                         .on('click', function () {
                             self.sendExportRequest()
                         });
+                    self.btnExportForm = btnExportForm;
+
                     form.smartWizard({
                         selected: 0,
+                        keyNavigation: false,
                         autoAdjustHeight: false,
                         theme: 'none',
-                        transitionEffect: 'fade',
+                        transitionEffect: 'slideleft',
                         showStepURLhash: false,
                         contentCache: false,
                         toolbarSettings: {
                             toolbarPosition: 'bottom',
-                            toolbarExtraButtons: [btnExport]
+                            toolbarExtraButtons: [btnExportForm]
                         }
                     });
 
@@ -107,11 +120,14 @@ define(['require', 'jquery', 'log', 'backbone', 'smart_wizard', 'siddhiAppSelect
                             }
                             if (stepNumber === 1) {
                                 self.payload.templatedSiddhiApps = self.appTemplatingModel.getTemplatedApps();
+                            }
+                            if (stepNumber === 2) {
+                                self.payload.configuration = self.configTemplateModel.getTemplatedConfig();
+                                self.payload.templatedSiddhiApps = self.appTemplatingModel.getTemplatedApps();
                             } else if (stepNumber === 3) {
                                 self.payload.templatedVariables = self._fill_template_value_dialog.
                                 getTemplatedKeyValues();
                             }
-
                         }
                     });
 
@@ -122,7 +138,7 @@ define(['require', 'jquery', 'log', 'backbone', 'smart_wizard', 'siddhiAppSelect
                             $("#prev-btn").addClass('disabled');
                         } else if (stepPosition === 'final') {
                             $("#next-btn").addClass('hidden disabled');
-                            $("#finish-btn").removeClass('hidden disabled');
+                            $("#export-btn").removeClass('hidden disabled');
                         } else {
                             $("#prev-btn").removeClass('disabled');
                             $("#next-btn").removeClass('disabled');
@@ -131,7 +147,6 @@ define(['require', 'jquery', 'log', 'backbone', 'smart_wizard', 'siddhiAppSelect
                         if (stepDirection === 'forward') {
                             if (stepNumber === 1) {
                                 var siddhiAppsNamesList = self.siddhiAppSelector.getSiddhiApps();
-                                log.info(siddhiAppsNamesList);
                                 var templateOptions = {
                                     app: self.app,
                                     siddhiAppNames: siddhiAppsNamesList,
@@ -139,7 +154,13 @@ define(['require', 'jquery', 'log', 'backbone', 'smart_wizard', 'siddhiAppSelect
                                 };
                                 self.appTemplatingModel = new TemplateFileDialog(templateOptions);
                                 self.appTemplatingModel.render();
-                            } else if (stepNumber === 4) {
+                            } else if (stepNumber === 2) {
+                                self.configTemplateModel = new TemplateConfigDialog({
+                                    app: self.app,
+                                    templateHeader: exportContainer.find('#configTemplateContainerId')
+                                });
+                                self.configTemplateModel.render();
+                            }else if (stepNumber === 4) {
                                 self.jarsSelectorDialog = new JarsSelectorDialog(app, form);
                                 self.jarsSelectorDialog.render();
                             } else if (stepNumber === 3) {
@@ -150,6 +171,12 @@ define(['require', 'jquery', 'log', 'backbone', 'smart_wizard', 'siddhiAppSelect
                                 };
                                 self._fill_template_value_dialog = new FillTemplateValueDialog(fillTemplateOptions);
                                 self._fill_template_value_dialog.render();
+                            } else if (stepNumber === 5) {
+                                self.kubernetesConfigModel = new KubernetesConfigDialog({
+                                    app: self.app,
+                                    templateHeader: exportContainer.find('#kubernetes-configuration-step-id')
+                                });
+                                self.kubernetesConfigModel.render();
                             }
                         }
                     });
@@ -158,11 +185,27 @@ define(['require', 'jquery', 'log', 'backbone', 'smart_wizard', 'siddhiAppSelect
                 },
 
                 sendExportRequest: function () {
+                    var self = this;
+                    this.payload.kubernetesConfiguration = self.kubernetesConfigModel.getKubernetesConfigs();
                     this.payload.bundles = this.jarsSelectorDialog.getSelected('bundles');
                     this.payload.jars = this.jarsSelectorDialog.getSelected('jars');
 
-                    log.info(this.payload);
+                    var payload = $('<input id="payload" name="payload" type="text" style="display: none;"/>')
+                        .attr('value', JSON.stringify(this.payload));
 
+                    var type;
+                    if (this.isDocker) {
+                        type = 'docker'
+                    } else {
+                        type = 'kubernetes'
+                    }
+                    var exportUrl = this.app.config.baseUrl + "/export?type=" + type;
+
+                    this.btnExportForm.append(payload);
+                    this.btnExportForm.attr('action', exportUrl);
+
+                    $(document.body).append(this.btnExportForm);
+                    this.btnExportForm.submit();
                 }
             });
         return ExportDialog;
