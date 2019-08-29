@@ -524,19 +524,21 @@ define(['ace/ace', 'jquery', 'lodash', 'log','dialogs','./service-client','welco
             };
 
             this.handleExportForDocker = function handleExportForDocker() {
-                if (_.isNil(this._handleExportForDocker)) {
-                    this._handleExportForDocker = new Dialogs.export_dialog(app, true);
+                if (!_.isNil(this._handleExport)) {
+                    this._handleExport.exportContainer.remove();
                 }
-                this._handleExportForDocker.render();
-                this._handleExportForDocker.show();
+                this._handleExport = new Dialogs.export_dialog(app, true);
+                this._handleExport.render();
+                this._handleExport.show();
             };
 
             this.handleExportForKubernetes = function handleExportForKubernetes() {
-                if (_.isNil(this._handleExportForKubernetes)) {
-                    this._handleExportForKubernetes = new Dialogs.export_dialog(app, false);
+                if (!_.isNil(this._handleExport)) {
+                    this._handleExport.exportContainer.remove();
                 }
-                this._handleExportForKubernetes.render();
-                this._handleExportForKubernetes.show();
+                this._handleExport = new Dialogs.export_dialog(app, false);
+                this._handleExport.render();
+                this._handleExport.show();
             };
 
             this.openDeleteFileConfirmDialog = function openDeleteFileConfirmDialog(options) {

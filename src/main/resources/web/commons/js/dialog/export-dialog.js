@@ -209,7 +209,6 @@ define(['require', 'jquery', 'log', 'backbone', 'smart_wizard', 'siddhiAppSelect
 
                     $(document.body).append(this.btnExportForm);
                     this.btnExportForm.submit();
-                    self.exportContainer.remove();
 
                 }
             });
