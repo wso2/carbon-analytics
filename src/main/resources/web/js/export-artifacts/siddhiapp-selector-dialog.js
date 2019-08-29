@@ -21,7 +21,7 @@ define(['jquery', 'backbone', 'lodash', 'log', 'file_browser', /** void module -
 
         var SiddhiAppSelectorDialog = function (application, form) {
             var siddhiAppSelectorStep = form.find("#siddiAppsTree");
-            var openFileWizardError = form.find("#select-siddhi-app-error");
+            var openFileWizardError = form.find("#select-siddhi-app");
             var fileBrowser = new FileBrowser({
                 container: siddhiAppSelectorStep,
                 application: application,
@@ -44,13 +44,12 @@ define(['jquery', 'backbone', 'lodash', 'log', 'file_browser', /** void module -
             var fileBrowser = this.fileBrowser;
             var siddhiAppSelectorStep = this.siddhiAppSelectorStep;
 
-            openFileWizardError.hide();
             fileBrowser.render();
             siddhiAppSelectorStep.on('ready.jstree', function () {
                 siddhiAppSelectorStep.jstree("open_all");
             });
             fileBrowser.on("selected", function () {
-                openFileWizardError.hide();
+                openFileWizardError.css('background-color', 'transparent');
             });
 
         };
@@ -58,8 +57,7 @@ define(['jquery', 'backbone', 'lodash', 'log', 'file_browser', /** void module -
         SiddhiAppSelectorDialog.prototype.validateSiddhiApps = function () {
             var files = this.fileBrowser.getSelected();
             if (files.length === 0) {
-                this.openFileWizardError.text("Select Siddhi Apps To Export");
-                this.openFileWizardError.show();
+                this.openFileWizardError.css('background-color', '#d9534f !important');
                 return false;
             }
             return true;
