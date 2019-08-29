@@ -25,22 +25,22 @@ import java.util.Map;
  * Bean class to represent the docker and K8s download request payload.
  */
 public class ExportAppsRequest {
-    private Map<String, String> siddhiApps;
+    private List<Map<String, String>> templatedSiddhiApps;
     private String configuration;
-    private Map<String, String> templatedVariables;
+    private List<Map<String, String>> templatedVariables;
     private List<String> bundles;
     private List<String> jars;
     private String kubernetesConfiguration;
 
-    public Map<String, String> getSiddhiApps() {
-        return siddhiApps;
+    public List<Map<String, String>> getTemplatedSiddhiApps() {
+        return templatedSiddhiApps;
     }
 
     public String getConfiguration() {
         return configuration;
     }
 
-    public Map<String, String> getTemplatedVariables() {
+    public List<Map<String, String>> getTemplatedVariables() {
         return templatedVariables;
     }
 

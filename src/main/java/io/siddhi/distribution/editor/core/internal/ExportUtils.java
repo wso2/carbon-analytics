@@ -76,6 +76,10 @@ public class ExportUtils {
     private static final String SIDDHI_PROCESS_SPEC_TEMPLATE = "\\{\\{SIDDHI_PROCESS_SPEC}}";
     private static final String SIDDHI_PROCESS_NAME_TEMPLATE = "\\{\\{SIDDHI_PROCESS_NAME}}";
     private static final String SIDDHI_PROCESS_DEFAULT_NAME = "sample-siddhi-process";
+    private static final String SIDDHI_APP_NAME_ENTRY = "appName";
+    private static final String SIDDHI_APP_CONTENT_ENTRY = "appContent";
+    private static final String SIDDHI_TEMPLATED_VAR_KEY_ENTRY = "key";
+    private static final String SIDDHI_TEMPLATED_VAR_VALUE_ENTRY = "value";
     private static final String RESOURCES_DIR = "resources/docker-export";
     private static final String ZIP_FILE_NAME = "siddhi-docker.zip";
     private static final String ZIP_FILE_ROOT = "siddhi-docker/";
@@ -177,14 +181,14 @@ public class ExportUtils {
 
             // Write Siddhi apps to the zip file
             String appsEntryRootDir = Paths.get(ZIP_FILE_ROOT, APPS_DIR).toString();
-            if (exportAppsRequest.getSiddhiApps() != null) {
-                for (Map.Entry<String, String> app : exportAppsRequest.getSiddhiApps().entrySet()) {
-                    String appName = app.getKey() + Constants.SIDDHI_APP_FILE_EXTENSION;
+            if (exportAppsRequest.getTemplatedSiddhiApps() != null) {
+                for (Map<String, String> app : exportAppsRequest.getTemplatedSiddhiApps()) {
+                    String appName = app.get(SIDDHI_APP_NAME_ENTRY) + Constants.SIDDHI_APP_FILE_EXTENSION;
                     ZipEntry appEntry = new ZipEntry(
                             Paths.get(appsEntryRootDir, appName).toString()
                     );
                     zipOutputStream.putNextEntry(appEntry);
-                    byte[] appData = app.getValue().getBytes(StandardCharsets.UTF_8);
+                    byte[] appData = app.get(SIDDHI_APP_CONTENT_ENTRY).getBytes(StandardCharsets.UTF_8);
                     zipOutputStream.write(appData, 0, appData.length);
                     zipOutputStream.closeEntry();
                 }
@@ -209,9 +213,14 @@ public class ExportUtils {
             if (exportAppsRequest.getTemplatedVariables() != null &&
                     !exportAppsRequest.getTemplatedVariables().isEmpty()) {
                 envChanged = true;
-                for (Map.Entry<String, String> env :
-                        exportAppsRequest.getTemplatedVariables().entrySet()) {
-                    stringBuilder.append("ENV " + env.getKey() + " " + env.getValue() + "\n");
+                for (Map<String, String> env :
+                        exportAppsRequest.getTemplatedVariables()) {
+                    stringBuilder
+                            .append("ENV ")
+                            .append(env.get(SIDDHI_TEMPLATED_VAR_KEY_ENTRY))
+                            .append(" ")
+                            .append(env.get(SIDDHI_TEMPLATED_VAR_VALUE_ENTRY))
+                            .append("\n");
                 }
             }
 
@@ -346,22 +355,27 @@ public class ExportUtils {
             );
             SiddhiProcessSpec siddhiProcessSpec = new SiddhiProcessSpec();
 
-            if (kubernetesConfig.getMessagingSystem() != null) {
-                siddhiProcessSpec.setMessagingSystem(kubernetesConfig.getMessagingSystem());
-            }
+            if (kubernetesConfig  != null) {
+                if (kubernetesConfig.getMessagingSystem() != null) {
+                    siddhiProcessSpec.setMessagingSystem(kubernetesConfig.getMessagingSystem());
+                }
 
-            if (kubernetesConfig.getPersistentVolumeClaim() != null) {
-                siddhiProcessSpec.setPersistentVolumeClaim(
-                        kubernetesConfig.getPersistentVolumeClaim()
-                );
+                if (kubernetesConfig.getPersistentVolumeClaim() != null) {
+                    siddhiProcessSpec.setPersistentVolumeClaim(
+                            kubernetesConfig.getPersistentVolumeClaim()
+                    );
+                }
             }
 
             if (this.exportAppsRequest.getTemplatedVariables() != null &&
                     this.exportAppsRequest.getTemplatedVariables().size() > 0) {
                 ArrayList<Env> envs = new ArrayList<Env>();
-                for (Map.Entry<String, String> templatedVariable :
-                        exportAppsRequest.getTemplatedVariables().entrySet()) {
-                    Env env = new Env(templatedVariable.getKey(), templatedVariable.getValue());
+                for (Map<String, String> templatedVariable :
+                        exportAppsRequest.getTemplatedVariables()) {
+                    Env env = new Env(
+                            templatedVariable.get(SIDDHI_TEMPLATED_VAR_KEY_ENTRY),
+                            templatedVariable.get(SIDDHI_TEMPLATED_VAR_VALUE_ENTRY)
+                    );
                     envs.add(env);
                 }
                 SiddhiProcessContainer siddhiProcessContainer = new SiddhiProcessContainer();
@@ -369,11 +383,11 @@ public class ExportUtils {
                 siddhiProcessSpec.setContainer(siddhiProcessContainer);
             }
 
-            if (this.exportAppsRequest.getSiddhiApps() != null &&
-                    this.exportAppsRequest.getSiddhiApps().size() > 0) {
+            if (this.exportAppsRequest.getTemplatedSiddhiApps() != null &&
+                    this.exportAppsRequest.getTemplatedSiddhiApps().size() > 0) {
                 ArrayList<SiddhiProcessApp> siddhiProcessApps = new ArrayList<SiddhiProcessApp>();
-                for (Map.Entry<String, String> app : exportAppsRequest.getSiddhiApps().entrySet()) {
-                    String escapedApp = app.getValue()
+                for (Map<String, String> app : exportAppsRequest.getTemplatedSiddhiApps()) {
+                    String escapedApp = app.get(SIDDHI_APP_CONTENT_ENTRY)
                             .replaceAll("( |\\t)*\\n", "\n");
                     SiddhiProcessApp siddhiProcessApp = new SiddhiProcessApp(escapedApp);
                     siddhiProcessApps.add(siddhiProcessApp);
@@ -415,16 +429,18 @@ public class ExportUtils {
             String spec = yaml.dump(siddhiProcess);
             spec = spec.replaceAll("\\$\\{", "\\\\\\$\\\\\\{");
             content = content.replaceAll(SIDDHI_PROCESS_SPEC_TEMPLATE, spec);
-            if (kubernetesConfig.getSiddhiProcessName() != null) {
-                content = content.replaceAll(
-                        SIDDHI_PROCESS_NAME_TEMPLATE,
-                        kubernetesConfig.getSiddhiProcessName()
-                );
-            } else {
-                content = content.replaceAll(
-                        SIDDHI_PROCESS_NAME_TEMPLATE,
-                        SIDDHI_PROCESS_DEFAULT_NAME
-                );
+            if (kubernetesConfig !=  null) {
+                if (kubernetesConfig.getSiddhiProcessName() != null) {
+                    content = content.replaceAll(
+                            SIDDHI_PROCESS_NAME_TEMPLATE,
+                            kubernetesConfig.getSiddhiProcessName()
+                    );
+                } else {
+                    content = content.replaceAll(
+                            SIDDHI_PROCESS_NAME_TEMPLATE,
+                            SIDDHI_PROCESS_DEFAULT_NAME
+                    );
+                }
             }
         }
         return content.getBytes(StandardCharsets.UTF_8);
@@ -486,8 +502,8 @@ public class ExportUtils {
                 StandardCharsets.UTF_8
         );
         Yaml loadYaml = new Yaml();
-        Map<String, Object> runnerConfigMap = loadYaml.load(toolingDeploymentYamlContent);
-        Map<String, Object> toolingConfigMap = loadYaml.load(runnerDeploymentYamlContent);
+        Map<String, Object> runnerConfigMap = loadYaml.load(runnerDeploymentYamlContent);
+        Map<String, Object> toolingConfigMap = loadYaml.load(toolingDeploymentYamlContent);
         if (runnerConfigMap != null) {
             if (toolingConfigMap.get(DATA_SOURCES_NAMESPACE) != null) {
                 runnerConfigMap.put(DATA_SOURCES_NAMESPACE, toolingConfigMap.get(DATA_SOURCES_NAMESPACE));
