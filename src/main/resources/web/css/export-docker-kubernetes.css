@@ -1,0 +1,72 @@
+/** contains css for export save dialog **/
+.export-dialog-form-scrollable-block {
+    padding: 20px 20px;
+    overflow: auto;
+    height: 50%;
+    width: 90%;
+    background-color: #2C2C2C;
+    margin-left: 30px;
+}
+
+.errors-container {
+    margin: 50px 20px 20px 20px;
+}
+
+hr.style1 {
+    border-top: 1px solid #2C2C2C;
+    width: 100%;
+    padding: 0 0 5px;
+}
+
+.export-dialog {
+    width: 900px;
+}
+
+.export-dialog-title{
+    padding:0 0 10px 10px;
+}
+
+.export-dialog-label {
+    margin-top: 8px;
+    margin-left: 20px;
+    font-weight: 300;
+}
+
+.divider {
+    width: 5px;
+    height: auto;
+    display: inline-block;
+}
+
+hr.export-dialog-hr {
+    border-top: 1px solid #2C2C2C;
+    width: 100%;
+}
+
+.export-dialog-form-label {
+    margin-top: 8px;
+    font-weight: 300;
+}
+
+.export-dialog-form-divider {
+    height: 10px;
+}
+
+.siddhi-app-list {
+    display: block;
+    overflow: hidden;
+    width: 100%;
+}
+
+.openFileWizardError-container {
+    margin-right: -15px;
+}
+
+.export-dialog-form-scrollable-block-list {
+    padding: 20px 20px 20px 20px;
+    overflow: auto;
+    max-height: 200px;
+    width: 90.15%;
+    background-color: #2C2C2C;
+    margin-left: 30px;
+}
