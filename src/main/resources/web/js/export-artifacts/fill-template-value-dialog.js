@@ -26,6 +26,7 @@ define(['require', 'lodash', 'jquery', 'log','ace/ace','app/source-editor/editor
         var FillTemplateValueDialog = function (options) {
             this.container = options.container;
             this.templatedApps = options.payload.templatedSiddhiApps;
+            this.deploymentConfig = options.payload.configuration;
             this.templatedKeyList = [];
         };
 
@@ -35,8 +36,11 @@ define(['require', 'lodash', 'jquery', 'log','ace/ace','app/source-editor/editor
             var self = this;
 
             _.forEach(self.templatedApps, function(element, i) {
-                self.findTemplatedKeys(element.appContent)
+                self.findTemplatedKeys(element.appContent);
             });
+
+            //find templated content in deployment config
+            self.findTemplatedKeys(self.deploymentConfig);
 
             var allTemplatedKeysHTMLContent = '<div class="clearfix form-min-width">' +
                 '<div class="fill-template-value-container template-values-div">' +
@@ -71,7 +75,7 @@ define(['require', 'lodash', 'jquery', 'log','ace/ace','app/source-editor/editor
                 // matched text: match[0]
                 // match start: match.index
                 // capturing group n: match[n]
-                self.templatedKeyList.push(match[0].substring(1));
+                self.templatedKeyList.push(match[0].trim().substring(1).replace("{","").replace("}",""));
                 match = constants.TEMPLATED_ELEMENT_REGEX.exec(text);
             }
 

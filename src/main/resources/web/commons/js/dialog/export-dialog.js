@@ -187,6 +187,7 @@ define(['require', 'jquery', 'log', 'backbone', 'smart_wizard', 'siddhiAppSelect
                 },
 
                 sendExportRequest: function () {
+                    var self = this;
                     var type;
                     if (this.isDocker) {
                         type = 'docker';
