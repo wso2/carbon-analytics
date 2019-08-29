@@ -79,7 +79,7 @@ define(['require', 'jquery', 'log', 'backbone', 'smart_wizard', 'siddhiAppSelect
                             .append("\n" +
                                 "<div id=\"step-6\" >\n" +
                                 "<div class='kubernetes-configuration-step' id='kubernetes-configuration-step-id' style='display: block'>\n" +
-                                "Configure Kubernetes for Siddhi\n" +
+                                "<div class=\"step-description\">Configure Kubernetes for Siddhi</div>" +
                                 "</div>\n" +
                                 "</div>");
                     }
