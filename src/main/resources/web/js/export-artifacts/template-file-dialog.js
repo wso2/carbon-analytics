@@ -36,7 +36,7 @@ define(['require', 'lodash', 'jquery', 'log', 'ace/ace', 'app/source-editor/edit
                 var entry = self.appArr[i];
                 var divId = "siddhi-app-content-id".concat(i);
 
-                var heading = $('<h3 class="servers"></h3>').text(entry.name);
+                var heading = $('<h3 class="siddhi-app-template-header"></h3>').text(entry.name);
                 var div = $('<div class="siddhi-app-template-container"></div>').attr("id", divId);
 
                 self.templateContainer.append(heading);

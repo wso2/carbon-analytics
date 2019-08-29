@@ -76,8 +76,32 @@ hr.export-dialog-hr {
     margin-left: 30px;
 }
 
+.siddhi-app-template-header {
+    background-repeat: no-repeat;
+    background-position: 630px;
+    text-decoration-color: white;
+    background-color: #2C2C2C;
+    cursor: pointer;
+    width: 100%;
+    border: 2px double black;
+    text-align: left;
+    outline: none;
+    font-size: 15px;
+    height: 35px;
+    padding-top: 10px;
+    padding-bottom: 20px;
+    padding-left: 20px;
+    margin-left: 15px;
+    position: relative;
+}
+
+.siddhi-app-template-header:hover {
+    color: white;
+}
+
+
 .siddhi-app-template-container{
-    height: 90% !important;
+    height: 80% !important;
 }
 
 .config-template-container {
@@ -98,4 +122,6 @@ hr.export-dialog-hr {
 .sub-template-value-element-div .option input {
     color: #000 !important;
 }
+
+
 
