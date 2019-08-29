@@ -16,8 +16,8 @@
  * under the License.
  */
 
-define(['require', 'jquery', 'log', 'backbone', 'smart_wizard', 'siddhiAppSelectorDialog', 'jarsSelectorDialog', 'templateFileDialog','fillTemplateValueDialog'],
-    function (require, $, log, Backbone, smartWizard, SiddhiAppSelectorDialog, JarsSelectorDialog, TemplateFileDialog,FillTemplateValueDialog) {
+define(['require', 'jquery', 'log', 'backbone', 'smart_wizard', 'siddhiAppSelectorDialog', 'jarsSelectorDialog', 'templateFileDialog', 'fillTemplateValueDialog'],
+    function (require, $, log, Backbone, smartWizard, SiddhiAppSelectorDialog, JarsSelectorDialog, TemplateFileDialog, FillTemplateValueDialog) {
 
         var ExportDialog = Backbone.View.extend(
             /** @lends ExportDialog.prototype */
@@ -77,21 +77,28 @@ define(['require', 'jquery', 'log', 'backbone', 'smart_wizard', 'siddhiAppSelect
                     }
 
                     // Toolbar extra buttons
-                    var btnExport = $('<button type="button" class="btn btn-default" data-dismiss="modal" id="finish-btn">Export</button>')
+                    var btnExportForm = $('' +
+                        '<form id="submit-form"  method="post" enctype="application/x-www-form-urlencoded" target="export-download" data-dismiss="modal">' +
+                        '<button  type="button" class="btn btn-default" id="export-btn">Export</button>' +
+                        '</form>');
+                    btnExportForm.find('#export-btn')
                         .addClass('hidden')
                         .on('click', function () {
                             self.sendExportRequest()
                         });
+                    self.btnExportForm = btnExportForm;
+
                     form.smartWizard({
                         selected: 0,
+                        keyNavigation: false,
                         autoAdjustHeight: false,
                         theme: 'none',
-                        transitionEffect: 'fade',
+                        transitionEffect: 'slideleft',
                         showStepURLhash: false,
                         contentCache: false,
                         toolbarSettings: {
                             toolbarPosition: 'bottom',
-                            toolbarExtraButtons: [btnExport]
+                            toolbarExtraButtons: [btnExportForm]
                         }
                     });
 
@@ -117,7 +124,7 @@ define(['require', 'jquery', 'log', 'backbone', 'smart_wizard', 'siddhiAppSelect
                             $("#prev-btn").addClass('disabled');
                         } else if (stepPosition === 'final') {
                             $("#next-btn").addClass('hidden disabled');
-                            $("#finish-btn").removeClass('hidden disabled');
+                            $("#export-btn").removeClass('hidden disabled');
                         } else {
                             $("#prev-btn").removeClass('disabled');
                             $("#next-btn").removeClass('disabled');
@@ -140,7 +147,7 @@ define(['require', 'jquery', 'log', 'backbone', 'smart_wizard', 'siddhiAppSelect
                             } else if (stepNumber === 3) {
                                 var fillTemplateOptions = {
                                     container: exportContainer.find("#fill-template-container-id"),
-                                    apps: payload
+                                    apps: self.payload
                                 };
                                 // var stepDiv = exportContainer.find("#step-4");
                                 // var area = '<div id="testContainer" class="source-container" style="height: 100px; width: 400px"></div>';
@@ -157,9 +164,24 @@ define(['require', 'jquery', 'log', 'backbone', 'smart_wizard', 'siddhiAppSelect
                 sendExportRequest: function () {
                     this.payload.bundles = this.jarsSelectorDialog.getSelected('bundles');
                     this.payload.jars = this.jarsSelectorDialog.getSelected('jars');
-
                     log.info(this.payload);
 
+                    var payload = $('<input id="payload" name="payload" type="text" style="display: none;"/>')
+                        .attr('value', JSON.stringify(this.payload));
+
+                    var type;
+                    if (this.isDocker) {
+                        type = 'docker'
+                    } else {
+                        type = 'kubernetes'
+                    }
+                    var exportUrl = this.app.config.baseUrl + "/export?type=" + type;
+
+                    this.btnExportForm.append(payload);
+                    this.btnExportForm.attr('action', exportUrl);
+
+                    $(document.body).append(this.btnExportForm);
+                    this.btnExportForm.submit();
                 }
             });
         return ExportDialog;

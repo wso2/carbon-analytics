@@ -26,6 +26,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.google.gson.JsonPrimitive;
+import com.google.gson.JsonSyntaxException;
 import io.siddhi.core.SiddhiAppRuntime;
 import io.siddhi.core.SiddhiManager;
 import io.siddhi.core.debugger.SiddhiDebugger;
@@ -113,6 +114,7 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
+import javax.ws.rs.FormParam;
 import javax.ws.rs.GET;
 import javax.ws.rs.NotFoundException;
 import javax.ws.rs.POST;
@@ -309,7 +311,7 @@ public class EditorMicroservice implements Microservice {
             List<String> directories = Arrays.stream(
                     new String(Base64.getDecoder().decode(directoryList), Charset.defaultCharset())
                             .split(","))
-                    .filter(directory-> directory != null && !directory.trim().isEmpty())
+                    .filter(directory -> directory != null && !directory.trim().isEmpty())
                     .map(directory -> "\"" + directory + "\"")
                     .collect(Collectors.toList());
 
@@ -1108,14 +1110,22 @@ public class EditorMicroservice implements Microservice {
      */
     @POST
     @Path("/export")
-    public Response exportApps(@QueryParam("type") String exportType, ExportAppsRequest exportAppsRequest) {
-        ExportUtils exportUtils = new ExportUtils(configProvider, exportAppsRequest, exportType);
+    @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
+    public Response exportApps(@QueryParam("type") String exportType, @FormParam("payload") String payload) {
+
         try {
+            ExportAppsRequest exportAppsRequest = new Gson().fromJson(payload, ExportAppsRequest.class);
+            ExportUtils exportUtils = new ExportUtils(configProvider, exportAppsRequest, exportType);
             File zipFile = exportUtils.createZipFile();
             return Response
                     .status(Response.Status.OK)
                     .entity(zipFile)
                     .header("Content-Disposition", "attachment; filename=siddhi-docker.zip")
+                    .build();
+        } catch (JsonSyntaxException e) {
+            log.error("Incorrect configuration format.", e);
+            return Response
+                    .status(Response.Status.BAD_REQUEST)
                     .build();
         } catch (DockerGenerationException | KubernetesGenerationException e) {
             log.error("Cannot generate export-artifacts archive.", e);
