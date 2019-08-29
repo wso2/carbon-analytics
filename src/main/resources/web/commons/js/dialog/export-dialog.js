@@ -79,14 +79,10 @@ define(['require', 'jquery', 'log', 'backbone', 'smart_wizard', 'siddhiAppSelect
 
                     // Toolbar extra buttons
                     var btnExportForm = $('' +
-                        '<form id="submit-form"  method="post" enctype="application/x-www-form-urlencoded" target="export-download" data-dismiss="modal">' +
-                        '<button  type="button" class="btn btn-default" id="export-btn">Export</button>' +
+                        '<form id="submit-form"  method="post" enctype="application/x-www-form-urlencoded" target="export-download" >' +
+                        '<button  type="button" class="btn btn-default hidden" id="export-btn" data-dismiss="modal" >Export</button>' +
                         '</form>');
-                    btnExportForm.find('#export-btn')
-                        .addClass('hidden')
-                        .on('click', function () {
-                            self.sendExportRequest()
-                        });
+                    btnExportForm.find('#export-btn').on('click', function () { self.sendExportRequest()});
                     self.btnExportForm = btnExportForm;
 
                     form.smartWizard({
@@ -128,7 +124,7 @@ define(['require', 'jquery', 'log', 'backbone', 'smart_wizard', 'siddhiAppSelect
                             $("#prev-btn").addClass('disabled');
                         } else if (stepPosition === 'final') {
                             $("#next-btn").addClass('hidden disabled');
-                            $("#export-btn").removeClass('hidden disabled');
+                            $("#export-btn").removeClass('hidden');
                         } else {
                             $("#prev-btn").removeClass('disabled');
                             $("#next-btn").removeClass('disabled');
