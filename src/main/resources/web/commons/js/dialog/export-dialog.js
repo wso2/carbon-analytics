@@ -143,11 +143,16 @@ define(['require', 'jquery', 'log', 'backbone', 'smart_wizard', 'siddhiAppSelect
 
                         if (stepDirection === 'forward') {
                             if (stepNumber === 1) {
+                                var siddhiAppTemplateContainer = exportContainer.find('#siddhiAppTemplateContainerId');
+                                if (siddhiAppTemplateContainer.children().length > 0) {
+                                    siddhiAppTemplateContainer.empty();
+                                    siddhiAppTemplateContainer.accordion("destroy");
+                                }
                                 var siddhiAppsNamesList = self.siddhiAppSelector.getSiddhiApps();
                                 var templateOptions = {
                                     app: self.app,
                                     siddhiAppNames: siddhiAppsNamesList,
-                                    templateHeader: exportContainer.find('#siddhiAppTemplateContainerId')
+                                    templateHeader: siddhiAppTemplateContainer
                                 };
                                 self.appTemplatingModel = new TemplateFileDialog(templateOptions);
                                 self.appTemplatingModel.render();
