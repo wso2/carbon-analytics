@@ -38,7 +38,6 @@ public class FileJsonObjectReaderUtil {
     private static final Logger logger = LoggerFactory.getLogger(FileJsonObjectReaderUtil.class);
 
     public static  JsonArray listDirectoryInPath(String path, List<String> directories) throws IOException {
-
         Path ioPath = Paths.get(path);
         JsonArray dirs = new JsonArray();
         Iterator<Path> iterator = Files.list(ioPath).iterator();
@@ -55,7 +54,6 @@ public class FileJsonObjectReaderUtil {
     }
 
     public static JsonObject getJsonObjForFile(Path root, boolean checkChildren) {
-
         JsonObject rootObj = new JsonObject();
         Path path = root.getFileName();
         rootObj.addProperty("text", path != null ?

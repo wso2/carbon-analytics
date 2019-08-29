@@ -329,9 +329,7 @@ public class EditorMicroservice implements Microservice {
             return Response.serverError().entity("failed")
                     .build();
         }
-
     }
-
 
     @GET
     @Path("/listFilesInPath")
@@ -354,7 +352,6 @@ public class EditorMicroservice implements Microservice {
             return Response.serverError().entity("failed")
                     .build();
         }
-
     }
 
     @GET
@@ -1110,7 +1107,6 @@ public class EditorMicroservice implements Microservice {
     @Path("/export")
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     public Response exportApps(@QueryParam("type") String exportType, @FormParam("payload") String payload) {
-
         try {
             ExportAppsRequest exportAppsRequest = new Gson().fromJson(payload, ExportAppsRequest.class);
             ExportUtils exportUtils = new ExportUtils(configProvider, exportAppsRequest, exportType);
