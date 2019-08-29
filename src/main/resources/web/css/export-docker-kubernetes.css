@@ -87,3 +87,15 @@ hr.export-dialog-hr {
 .kubernetes-configuration-step {
 
 }
+.sub-template-value-element-div .option {
+    display: flex;
+    align-items: center;
+    padding: 5px;
+}
+.sub-template-value-element-div .option > div {
+    min-width: 100px;
+}
+.sub-template-value-element-div .option input {
+    color: #000 !important;
+}
+
