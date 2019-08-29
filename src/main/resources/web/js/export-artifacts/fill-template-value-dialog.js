@@ -20,7 +20,10 @@ define(['require', 'lodash', 'jquery', 'log','ace/ace','app/source-editor/editor
     function (require, _, $, log,ace,SiddhiEditor) {
 
         var constants = {
-            TEMPLATED_ELEMENT_REGEX: /\${([^\\$\\]+)}/g
+            TEMPLATED_ELEMENT_REGEX: /\${([^\\$\\]+)}/g,
+            KEY_SYS_CARBON_HOME: "${sys:carbon.home}",
+            KEY_RUNTIME: "${sys:wso2.runtime}",
+            KEY_CARBON_HOME: "${carbon.home}"
         };
 
         var FillTemplateValueDialog = function (options) {
@@ -72,10 +75,10 @@ define(['require', 'lodash', 'jquery', 'log','ace/ace','app/source-editor/editor
             var self = this;
             var match = constants.TEMPLATED_ELEMENT_REGEX.exec(text);
             while (match != null) {
-                // matched text: match[0]
-                // match start: match.index
-                // capturing group n: match[n]
-                self.templatedKeyList.push(match[0].trim().substring(1).replace("{","").replace("}",""));
+                if (match[0].trim() !== constants.KEY_CARBON_HOME && match[0].trim() !== constants.KEY_SYS_CARBON_HOME
+                    && match[0].trim() !== constants.KEY_RUNTIME) {
+                    self.templatedKeyList.push(match[0].trim().substring(1).replace("{","").replace("}",""));
+                }
                 match = constants.TEMPLATED_ELEMENT_REGEX.exec(text);
             }
 
