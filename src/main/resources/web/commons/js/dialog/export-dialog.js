@@ -159,9 +159,13 @@ define(['require', 'jquery', 'log', 'backbone', 'smart_wizard', 'siddhiAppSelect
                                 self.appTemplatingModel = new TemplateFileDialog(templateOptions);
                                 self.appTemplatingModel.render();
                             } else if (stepNumber === 2) {
+                                var templateStep = exportContainer.find('#config-template-container-id');
+                                if (templateStep.children().length > 0) {
+                                    templateStep.empty();
+                                }
                                 self.configTemplateModel = new TemplateConfigDialog({
                                     app: self.app,
-                                    templateHeader: exportContainer.find('#config-template-container-id')
+                                    templateHeader: templateStep
                                 });
                                 self.configTemplateModel.render();
                             } else if (stepNumber === 4) {
