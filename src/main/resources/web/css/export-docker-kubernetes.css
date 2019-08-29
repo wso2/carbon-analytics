@@ -19,10 +19,15 @@ hr.style1 {
 }
 
 .export-dialog {
-    width: 900px;
+    height: 80%;
+    width: 90%;
 }
 
-.export-dialog-title{
+.export-dialog .modal-body {
+    height: 90%;
+}
+
+.export-dialog-title {
     padding:0 0 10px 10px;
 }
 
