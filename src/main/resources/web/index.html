@@ -2389,8 +2389,8 @@
                         <li><a href="#step-5">Step 5<br/><small>Bundle additional <br/>dependencies</small></a></li>
                     </ul>
                     <div id="form-containers">
-                        <div id="step-1" >
-                            <div class='siddhi-app-list' id='siddhi-app-list' style='display: block'>
+                        <div id="step-1" class="export-selector">
+                            <div class='export-siddhi-app-list' id='siddhi-app-list' style='display: block'>
                                 Select Siddhi Apps
                                 <div class='form-group'>
                                     <div class='export-dialog-form-scrollable-block-list'>
@@ -2401,13 +2401,13 @@
                             <div id='select-siddhi-app-error' class='alert alert-danger openDockerWizardError-container' style='display: none;'></div>
                         </div>
                         <div id="step-2" >
-                            Use ${...} format to template siddhi apps
+                            <div class="step-description">Use ${...} format to template siddhi apps</div>
                             <div id='siddhi-app-template-container-id'
                                  style='display: block'>
                             </div>
                         </div>
                         <div id="step-3" >
-                            Use ${...} format to template the configurations
+                            <div class="step-description">Use ${...} format to template the configurations</div>
                             <div class='config-template-container' id='config-template-container-id'
                                  style='display: block'>
                             </div>
@@ -2416,8 +2416,8 @@
                             <div id="fill-template-container-id">
                             </div>
                         </div>
-                        <div id="step-5" >
-                            <div class='siddhi-app-list' id='additional-bundles-list' style='display: block'>
+                        <div id="step-5" class="export-selector">
+                            <div class='export-siddhi-app-list' id='additional-bundles-list' style='display: block'>
                                 Add additional JARS
                                 <div class='form-group'>
                                     <div class='export-dialog-form-scrollable-block-list'>

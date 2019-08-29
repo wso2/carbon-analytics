@@ -83,7 +83,7 @@ hr.export-dialog-hr {
     background-color: #2C2C2C;
     cursor: pointer;
     width: 100%;
-    border: 2px double black;
+    border: 1px solid black;
     text-align: left;
     outline: none;
     font-size: 15px;
@@ -123,5 +123,22 @@ hr.export-dialog-hr {
     color: #000 !important;
 }
 
+.step-description {
+    padding-top: 10px;
+    padding-bottom: 10px;
+    background-color: transparent;
+}
 
+.export-siddhi-app-list {
+    display: block;
+    overflow: hidden;
+    width: 100%;
+    height: 100%;
+    padding: 10px;
+}
+
+.export-selector {
+    background-color: #2C2C2C !important;
+    height: 98% !important;
+}
 
