@@ -20,7 +20,7 @@ hr.style1 {
 
 .export-dialog {
     height: 80%;
-    width: 90%;
+    width: 93%;
 }
 
 .export-dialog .modal-body {
@@ -63,8 +63,8 @@ hr.export-dialog-hr {
     width: 100%;
 }
 
-.openFileWizardError-container {
-    margin-right: -15px;
+.openDockerWizardError-container {
+    width: 100%;
 }
 
 .export-dialog-form-scrollable-block-list {
@@ -77,7 +77,7 @@ hr.export-dialog-hr {
 }
 
 .siddhi-app-template-container{
-
+    height: 80% !important;
 }
 
 .config-template-container {
