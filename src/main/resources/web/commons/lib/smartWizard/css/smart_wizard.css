@@ -47,9 +47,9 @@
 }
 
 .sw-theme-default .step-content {
-    padding: 10px;
+    padding: 0;
     border: 0px solid #000000;
-    background-color: #000000;
+    background-color: #2c2c2c;
     text-align: left;
 }
 
@@ -67,7 +67,7 @@
 }
 
 .sw-theme-default .sw-toolbar-bottom {
-    border-top-color: #000000 !important;
+    border-top: 1px solid #000000;
 }
 
 .sw-theme-default > ul.step-anchor > li {
@@ -77,7 +77,7 @@
 
 .sw-theme-default > ul.step-anchor > li > a, .sw-theme-default > ul.step-anchor > li > a:hover {
     border: none !important;
-    color: #bbb;
+    color: #fff;
     text-decoration: none;
     outline-style: none;
     background: transparent !important;
@@ -121,7 +121,7 @@
 
 .sw-theme-default > ul.step-anchor > li.done > a {
     border: none !important;
-    color: #000 !important;
+    color: #867B77 !important;
     background: transparent !important;
     cursor: pointer;
 }
@@ -216,4 +216,16 @@
         -webkit-transform: rotate(360deg);
         transform: rotate(360deg);
     }
+}
+
+.sw-main .nav-tabs {
+    background: #353535;
+}
+
+.step-content {
+    min-height: 300px;
+}
+
+.btn-toolbar .btn, .btn-toolbar .btn-group, .btn-toolbar .input-group {
+    float: left;
 }

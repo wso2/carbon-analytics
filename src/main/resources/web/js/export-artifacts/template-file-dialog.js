@@ -37,7 +37,7 @@ define(['require', 'lodash', 'jquery', 'log', 'ace/ace', 'app/source-editor/edit
                 var divId = "siddhiAppcontentId".concat(i);
 
                 var templateEntry = "<h3>".concat(entry.name).concat("</h3>").concat("<div id='")
-                    .concat(divId).concat("' style=\\\"height: 100%;\\\"></div>");
+                    .concat(divId).concat("' style=\\\"height: 200px;\\\"></div>");
                 self.templateContainer.append(templateEntry);
 
                 this._mainEditor = new SiddhiEditor({
