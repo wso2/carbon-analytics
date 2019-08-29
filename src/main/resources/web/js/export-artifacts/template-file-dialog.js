@@ -34,7 +34,7 @@ define(['require', 'lodash', 'jquery', 'log', 'ace/ace', 'app/source-editor/edit
             var i;
             for (i = 0; i < self.appArr.length; i++) {
                 var entry = self.appArr[i];
-                var divId = "siddhiAppcontentId".concat(i);
+                var divId = "siddhi-app-content-id".concat(i);
 
                 var heading = $('<h3 class="servers"></h3>').text(entry.name);
                 var div = $('<div class="siddhi-app-template-container"></div>').attr("id", divId);
@@ -91,8 +91,7 @@ define(['require', 'lodash', 'jquery', 'log', 'ace/ace', 'app/source-editor/edit
                             };
                             apps.push(siddhiApp);
                         } else {
-                            // openFileWizardError.text(data.Error);
-                            // openFileWizardError.show();
+                            console.error("Failed to read Siddhi Application" + data.error);
                         }
                     },
                     error: function (res, errorCode, error) {
@@ -103,8 +102,7 @@ define(['require', 'lodash', 'jquery', 'log', 'ace/ace', 'app/source-editor/edit
                                 msg = _.get(resObj, 'Error');
                             }
                         }
-                        // openFileWizardError.text(msg);
-                        // openFileWizardError.show();
+                        console.error(msg);
                     }
                 });
             }
