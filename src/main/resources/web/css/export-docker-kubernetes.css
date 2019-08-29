@@ -64,6 +64,7 @@ hr.export-dialog-hr {
 }
 
 .openDockerWizardError-container {
+    padding-top: 10px;
     width: 100%;
 }
 
