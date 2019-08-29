@@ -46,6 +46,7 @@ define(['require', 'jquery', 'log', 'backbone', 'smart_wizard', 'siddhiAppSelect
                     this.appTemplatingModel;
                     this.configTemplateModel;
                     this.kubernetesConfigModel;
+                    this._fill_template_value_dialog;
                 },
 
                 show: function () {
@@ -118,6 +119,10 @@ define(['require', 'jquery', 'log', 'backbone', 'smart_wizard', 'siddhiAppSelect
                             }
                             if (stepNumber === 2) {
                                 self.payload.configuration = self.configTemplateModel.getTemplatedConfig();
+                                self.payload.templatedSiddhiApps = self.appTemplatingModel.getTemplatedApps();
+                            } else if (stepNumber === 3) {
+                                self.payload.templatedVariables = self._fill_template_value_dialog.
+                                getTemplatedKeyValues();
                             }
                         }
                     });
@@ -155,12 +160,13 @@ define(['require', 'jquery', 'log', 'backbone', 'smart_wizard', 'siddhiAppSelect
                                 self.jarsSelectorDialog = new JarsSelectorDialog(app, form);
                                 self.jarsSelectorDialog.render();
                             } else if (stepNumber === 3) {
+                                self.payload.templatedSiddhiApps = [{"appName" : "test1", "appContent" : "abdc ${name} ansadasd ${price}"},{"appName" : "test2", "appContent" : "abdc ${symbol} ansadasd ${age}"}]
                                 var fillTemplateOptions = {
                                     container: exportContainer.find("#fill-template-container-id"),
-                                    apps: self.payload
+                                    payload: self.payload
                                 };
-                                this._fill_template_value_dialog = new FillTemplateValueDialog(fillTemplateOptions);
-                                this._fill_template_value_dialog.render();
+                                self._fill_template_value_dialog = new FillTemplateValueDialog(fillTemplateOptions);
+                                self._fill_template_value_dialog.render();
                             } else if (stepNumber === 5) {
                                 self.kubernetesConfigModel = new KubernetesConfigDialog({
                                     app: self.app,
