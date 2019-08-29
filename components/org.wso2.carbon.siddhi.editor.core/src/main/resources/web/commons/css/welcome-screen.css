@@ -134,16 +134,6 @@ ul.recent-files li span.description {
     padding-top: 2%;
 }
 
-ul.recent-files li span.category {
-    font-weight: 400;
-    font-size: 14px;
-    color: #c57334;
-    display: -webkit-box;
-    margin: 0 auto;
-    line-height: 20px;
-    padding-top: 3px;
-}
-
 ul.quick-links {
     margin-left: -15px;
     width: 100%;
