@@ -89,7 +89,7 @@ define(['require', 'jquery', 'log', 'backbone', 'smart_wizard', 'siddhiAppSelect
                         selected: 0,
                         keyNavigation: false,
                         autoAdjustHeight: false,
-                        theme: 'none',
+                        theme: 'default',
                         transitionEffect: 'slideleft',
                         showStepURLhash: false,
                         contentCache: false,

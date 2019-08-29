@@ -63,7 +63,6 @@
 
     <!-- SmartWizard CSS -->
     <link rel="stylesheet" type="text/css" href="/editor/commons/lib/smartWizard/css/smart_wizard.css" />
-    <link rel="stylesheet" type="text/css" href="/editor/commons/lib/smartWizard/css/smart_wizard_theme_dots.css" />
 
     <title>Siddhi Editor</title>
 </head>
@@ -2369,14 +2368,14 @@
 
 <!-- Export Dialog -->
 <div class='modal fade' id='openExportModal' tabindex='-1' role='dialog'>
-    <div class='modal-dialog file-dialog' role='document'>
+    <div class='modal-dialog export-dialog' role='document'>
         <iframe name="export-download" style="display: none;"></iframe>
         <div class='modal-content'>
             <div class='modal-header'>
                 <button type='button' class='close' data-dismiss='modal' aria-label='Close'>
                     <i class='fw fw-cancel about-dialog-close'></i>
                 </button>
-                <h4 class='modal-title file-dialog-title' id='initialHeading'>Exporting Siddhi Apps For Docker</h4>
+                <h4 class='modal-title export-dialog-title' id='initialHeading'>Exporting Siddhi Apps For Docker</h4>
                 <hr class='style1'>
             </div>
             <div class='modal-body'>
@@ -2440,7 +2439,7 @@
                             <div class='siddhi-app-list' id='additional-bundles-list' style='display: block'>
                                 Add additional JARS
                                 <div class='form-group'>
-                                    <div class='file-dialog-form-scrollable-block-list'>
+                                    <div class='export-dialog-form-scrollable-block-list'>
                                         <div id='bundlesTree'></div>
                                     </div>
                                 </div>
