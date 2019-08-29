@@ -16,8 +16,8 @@
  * under the License.
  */
 
-define(['require', 'jquery', 'log', 'backbone', 'smart_wizard', 'siddhiAppSelectorDialog', 'jarsSelectorDialog', 'templateFileDialog', 'fillTemplateValueDialog'],
-    function (require, $, log, Backbone, smartWizard, SiddhiAppSelectorDialog, JarsSelectorDialog, TemplateFileDialog, FillTemplateValueDialog) {
+define(['require', 'jquery', 'log', 'backbone', 'smart_wizard', 'siddhiAppSelectorDialog', 'jarsSelectorDialog', 'templateFileDialog', 'templateConfigDialog', 'fillTemplateValueDialog'],
+    function (require, $, log, Backbone, smartWizard, SiddhiAppSelectorDialog, JarsSelectorDialog, TemplateFileDialog, TemplateConfigDialog, FillTemplateValueDialog) {
 
         var ExportDialog = Backbone.View.extend(
             /** @lends ExportDialog.prototype */
@@ -39,10 +39,11 @@ define(['require', 'jquery', 'log', 'backbone', 'smart_wizard', 'siddhiAppSelect
                         bundles: [],
                         jars: [],
                         kubernetesConfiguration: '',
-                        templatedVariables: {}
+                        templatedVariables: {},
+                        templatedSiddhiApps : []
                     };
-                    this.templatedSiddhiApps = [];
                     this.appTemplatingModel;
+                    this.configTemplateModel;
                 },
 
                 show: function () {
@@ -112,7 +113,10 @@ define(['require', 'jquery', 'log', 'backbone', 'smart_wizard', 'siddhiAppSelect
                                 return self.siddhiAppSelector.validateSiddhiApps();
                             }
                             if (stepNumber === 1) {
-                                self.templatedSiddhiApps = self.appTemplatingModel.getTemplatedApps();
+                                self.payload.templatedSiddhiApps = self.appTemplatingModel.getTemplatedApps();
+                            }
+                            if (stepNumber === 2) {
+                                self.payload.configuration = self.configTemplateModel.getTemplatedConfig();
                             }
                         }
                     });
@@ -141,7 +145,13 @@ define(['require', 'jquery', 'log', 'backbone', 'smart_wizard', 'siddhiAppSelect
                                 };
                                 self.appTemplatingModel = new TemplateFileDialog(templateOptions);
                                 self.appTemplatingModel.render();
-                            } else if (stepNumber === 4) {
+                            } else if (stepNumber === 2) {
+                                self.configTemplateModel = new TemplateConfigDialog({
+                                    app: self.app,
+                                    templateHeader: exportContainer.find('#configTemplateContainerId')
+                                });
+                                self.configTemplateModel.render();
+                            }else if (stepNumber === 4) {
                                 self.jarsSelectorDialog = new JarsSelectorDialog(app, form);
                                 self.jarsSelectorDialog.render();
                             } else if (stepNumber === 3) {

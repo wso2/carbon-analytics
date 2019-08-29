@@ -2406,7 +2406,9 @@
                             </div>
                         </div>
                         <div id="step-3" >
-                            <label>Update Configurations</label>
+                            <div class='config-template-container' id='configTemplateContainerId'
+                                 style='display: block'>
+                            </div>
                         </div>
                         <div id="step-4" >
                             <div id="fill-template-container-id">
@@ -2599,6 +2601,7 @@
             templateFileDialog: "js/export-artifacts/template-file-dialog",
             jarsSelectorDialog: "js/export-artifacts/jars-selector-dialog",
             siddhiAppSelectorDialog: "js/export-artifacts/siddhiapp-selector-dialog",
+            templateConfigDialog: "js/export-artifacts/template-config-dialog",
             fillTemplateValueDialog: "js/export-artifacts/fill-template-value-dialog"
         },
         map: {
@@ -3004,6 +3007,9 @@
             services:   {
                 workspace:  {
                     endpoint: window.location.protocol + "//" + window.location.host + '/editor/workspace'
+                },
+                configurations: {
+                    endpoint: window.location.protocol + "//" + window.location.host + '/editor/deploymentConfigs'
                 }
             },
             alerts: {
