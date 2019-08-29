@@ -61,9 +61,7 @@ define(['require', 'lodash', 'jquery', 'log', 'ace/ace', 'app/source-editor/edit
                     if (xhr.status == 200) {
                         configContent = data.deploymentYaml;
                     } else {
-                        console.error(data);
-                        // openFileWizardError.text(data.Error);
-                        // openFileWizardError.show();
+                        console.error("Error occured while reading Siddhi Runner configurations." + data.Error);
                     }
                 },
                 error: function (res, errorCode, error) {
@@ -75,8 +73,6 @@ define(['require', 'lodash', 'jquery', 'log', 'ace/ace', 'app/source-editor/edit
                         }
                     }
                     console.error(msg);
-                    // openFileWizardError.text(msg);
-                    // openFileWizardError.show();
                 }
             });
             return configContent;

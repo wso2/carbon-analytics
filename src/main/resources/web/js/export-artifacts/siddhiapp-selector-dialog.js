@@ -40,7 +40,6 @@ define(['jquery', 'backbone', 'lodash', 'log', 'file_browser', /** void module -
         SiddhiAppSelectorDialog.prototype.constructor = SiddhiAppSelectorDialog;
 
         SiddhiAppSelectorDialog.prototype.render = function () {
-
             var openFileWizardError = this.openFileWizardError;
             var fileBrowser = this.fileBrowser;
             var siddhiAppSelectorStep = this.siddhiAppSelectorStep;
