@@ -34,13 +34,12 @@ define(['require', 'jquery', 'log', 'backbone', 'smart_wizard', 'siddhiAppSelect
                     this.options = _.cloneDeep(_.get(options.config, 'export_dialog'));
                     this.isDocker = isDocker;
                     this.payload = {
-                        siddhiApps: {},
+                        templatedSiddhiApps : [],
                         configuration: '',
+                        templatedVariables: [],
                         bundles: [],
                         jars: [],
-                        kubernetesConfiguration: '',
-                        templatedVariables: {},
-                        templatedSiddhiApps : []
+                        kubernetesConfiguration: ''
                     };
                     this.appTemplatingModel;
                     this.configTemplateModel;
@@ -174,7 +173,6 @@ define(['require', 'jquery', 'log', 'backbone', 'smart_wizard', 'siddhiAppSelect
                 sendExportRequest: function () {
                     this.payload.bundles = this.jarsSelectorDialog.getSelected('bundles');
                     this.payload.jars = this.jarsSelectorDialog.getSelected('jars');
-                    log.info(this.payload);
 
                     var payload = $('<input id="payload" name="payload" type="text" style="display: none;"/>')
                         .attr('value', JSON.stringify(this.payload));

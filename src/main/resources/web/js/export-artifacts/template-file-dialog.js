@@ -25,11 +25,6 @@ define(['require', 'lodash', 'jquery', 'log', 'ace/ace', 'app/source-editor/edit
             this.templateContainer = options.templateHeader;
             this.appArr = this.readSiddhiApps(this.appNames);
             this.editorObjArr = [];
-
-            // var editor = ace.edit("siddhi-app-templates");
-            // editor.setTheme("ace/theme/monokai");
-            // editor.getSession().setMode("ace/mode/javascript");
-
         };
 
         TemplateFileDialog.prototype.constructor = TemplateFileDialog;
@@ -54,7 +49,11 @@ define(['require', 'lodash', 'jquery', 'log', 'ace/ace', 'app/source-editor/edit
                 this._editor = ace.edit(divId);
                 this._editor.getSession().setValue(entry.content);
                 this._editor.resize(true);
-                self.editorObjArr.push(this._editor);
+                var obj = {
+                    name: entry.name,
+                    content: this._editor
+                };
+                self.editorObjArr.push(obj);
             }
             self.templateContainer.accordion();
         };
@@ -119,7 +118,11 @@ define(['require', 'lodash', 'jquery', 'log', 'ace/ace', 'app/source-editor/edit
             var templatedApps = [];
             var i;
             for (i = 0; i < self.editorObjArr.length; i++) {
-                templatedApps.push(self.editorObjArr[i].session.getValue());
+                var appEntry = {
+                    appName: self.editorObjArr[i].name,
+                    appContent: self.editorObjArr[i].content.session.getValue()
+                }
+                templatedApps.push(appEntry);
             }
             return templatedApps;
         };

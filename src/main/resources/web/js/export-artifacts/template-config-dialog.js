@@ -50,7 +50,7 @@ define(['require', 'lodash', 'jquery', 'log', 'ace/ace', 'app/source-editor/edit
         TemplateConfigDialog.prototype.getConfigurationContent = function () {
             var self = this;
             var configServiceURL = self.app.config.services.configurations.endpoint;
-            var configContent;
+            var configContent = "";
 
             $.ajax({
                 url: configServiceURL,
