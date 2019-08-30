@@ -169,7 +169,17 @@ public class SubElementCodeGenerator {
         StringBuilder parametersStringBuilder = new StringBuilder();
         int parametersLeft = parameters.size();
         for (String parameter : parameters) {
-            parametersStringBuilder.append(parameter);
+            String[] parameterArray = parameter.split(Character.toString(SiddhiCodeBuilderConstants.EQUAL));
+            if (parameterArray.length > 1) {
+                parametersStringBuilder.append(parameterArray[0]).append(SiddhiCodeBuilderConstants.EQUAL);
+                parameter = parameterArray[1];
+            }
+            if (parameter.matches(SiddhiCodeBuilderConstants.MULTI_DOUBLE_QUOTE_REGEX)) {
+                parametersStringBuilder.append(SiddhiCodeBuilderConstants.MULTI_DOUBLE_QUOTE).append(parameter
+                        .trim()).append(SiddhiCodeBuilderConstants.MULTI_DOUBLE_QUOTE);
+            } else {
+                parametersStringBuilder.append(parameter);
+            }
             if (parametersLeft != 1) {
                 parametersStringBuilder.append(SiddhiCodeBuilderConstants.COMMA);
             }
