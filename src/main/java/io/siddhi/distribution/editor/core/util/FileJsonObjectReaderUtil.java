@@ -31,7 +31,7 @@ import java.util.Iterator;
 import java.util.List;
 
 /**
- * Util class to et json object for files/directories for js-tree
+ * Util class to et json object for files/directories for js-tree.
  */
 public class FileJsonObjectReaderUtil {
 
