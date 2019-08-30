@@ -163,7 +163,7 @@ public class SubElementCodeGenerator {
         int parametersLeft = parameters.size();
         for (String parameter : parameters) {
             String[] parameterArray = parameter.split(Character.toString(SiddhiCodeBuilderConstants.EQUAL));
-            if (parameterArray.length >1) {
+            if (parameterArray.length > 1) {
                 parametersStringBuilder.append(parameterArray[0]).append(SiddhiCodeBuilderConstants.EQUAL);
                 parameter = parameterArray[1];
             }
