@@ -36,6 +36,9 @@ import java.util.List;
  */
 public class SubElementCodeGenerator {
 
+    private SubElementCodeGenerator() {
+    }
+
     /**
      * Generates the Siddhi code representation of a CommentCodeSegment object
      *
@@ -65,8 +68,7 @@ public class SubElementCodeGenerator {
                     .append(queryName)
                     .append(SiddhiCodeBuilderConstants.SINGLE_QUOTE)
                     .append(SiddhiCodeBuilderConstants.CLOSE_BRACKET);
-        }
-        else {
+        } else {
             queryNameStringBuilder.append(SiddhiCodeBuilderConstants.DEFAULT_QUERY_NAME_ANNOTATION);
         }
 
@@ -160,7 +162,17 @@ public class SubElementCodeGenerator {
         StringBuilder parametersStringBuilder = new StringBuilder();
         int parametersLeft = parameters.size();
         for (String parameter : parameters) {
-            parametersStringBuilder.append(parameter);
+            String[] parameterArray = parameter.split(Character.toString(SiddhiCodeBuilderConstants.EQUAL));
+            if (parameterArray.length > 1) {
+                parametersStringBuilder.append(parameterArray[0]).append(SiddhiCodeBuilderConstants.EQUAL);
+                parameter = parameterArray[1];
+            }
+            if (parameter.matches(SiddhiCodeBuilderConstants.MULTI_DOUBLE_QUOTE_REGEX)) {
+                parametersStringBuilder.append(SiddhiCodeBuilderConstants.MULTI_DOUBLE_QUOTE).append(parameter
+                        .trim()).append(SiddhiCodeBuilderConstants.MULTI_DOUBLE_QUOTE);
+            } else {
+                parametersStringBuilder.append(parameter);
+            }
             if (parametersLeft != 1) {
                 parametersStringBuilder.append(SiddhiCodeBuilderConstants.COMMA);
             }
@@ -269,12 +281,10 @@ public class SubElementCodeGenerator {
         return forEventTypeStringBuilder.toString();
     }
 
-    private SubElementCodeGenerator() {
-    }
-
     /**
-     *Converts an io.siddhi.query.api.annotation.Element in string format to another string with escape characters
+     * Converts an io.siddhi.query.api.annotation.Element in string format to another string with escape characters
      * which is the siddhi app code representation of the Element.
+     *
      * @param elementStr The Element in String format. E.g. title = "The wonder of "foo""
      * @return The code representation of the Element. E.g. title = """The wonder of "foo""""
      */

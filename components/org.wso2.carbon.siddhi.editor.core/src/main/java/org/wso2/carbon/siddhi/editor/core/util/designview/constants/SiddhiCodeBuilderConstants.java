@@ -33,8 +33,11 @@ public class SiddhiCodeBuilderConstants {
     public static final char SINGLE_QUOTE = '\'';
     public static final char DOUBLE_QUOTE = '\"';
     public static final String ESCAPE_SEQUENCE = "\"\"\"";
+    public static final String MULTI_DOUBLE_QUOTE = "\"\"";
     public static final char SPACE = ' ';
     public static final char HASH = '#';
+
+    public static final String MULTI_DOUBLE_QUOTE_REGEX = "(.*)\"(.*)\"(.*)\"";
     // Brackets
     public static final char OPEN_BRACKET = '(';
     public static final char CLOSE_BRACKET = ')';
