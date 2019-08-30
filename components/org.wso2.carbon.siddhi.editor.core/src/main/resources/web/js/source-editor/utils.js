@@ -58,25 +58,49 @@ define(["./constants"], function (constants) {
      * Descriptions are intended to be shown in the tooltips for completions
      *
      * @param {Object} metaData Meta data object containing parameters, return and description
+     * @param {string} processorName Processor Name with overload params
+     * @param {Object} paramOverloads Param overload array
      * @return {string} html string of the description generated from the meta data provided
      */
-    self.generateDescriptionForProcessor = function (metaData) {
-        var description = "<div>" + (metaData.name ? "<strong>" + metaData.name + "</strong><br>" : "");
+    self.generateDescriptionForProcessor = function (metaData, processorTypeName, processorName, paramOverloads) {
+        var description = "";
+
+        if (processorName === undefined) {
+            description = "<div>" + (metaData.name ? "<strong>" + metaData.name + "</strong><br>" : "");
+        } else {
+            description = "<div>" + (metaData.name ? "<strong>" + processorName + "</strong><br>" : "");
+        }
+
         if (metaData.description) {
             description +=
                 metaData.description ? "<p>" + metaData.description + "</p>" : "<br>";
         }
         if (metaData.parameters) {
-            description += "Parameters - " + generateAttributeListDescription(metaData.parameters);
+            if(paramOverloads === undefined) {
+                description += "Parameters - " + generateAttributeListDescription(metaData.parameters);
+            } else {
+                description += "Parameters - " + generateAttributeListDescriptionForParamOverloads(metaData.parameters,
+                    paramOverloads);
+            }
         }
+
         if (metaData.returnAttributes) {
             description += "Return Attributes - " + generateAttributeListDescription(metaData.returnAttributes);
         }
+
         if (metaData.returnEvent) {
             description += (metaData.returnEvent.length > 0 ? "Additional Attributes in " : "") +
                 "Return Event" +
                 (metaData.returnEvent.length > 0 ? generateAttributeListDescription(metaData.returnEvent) : "");
         }
+
+        if (processorTypeName !== undefined) {
+            var processorTypeDisplayText = constants.typeToDisplayNameMap[processorTypeName];
+            if (processorTypeDisplayText !== undefined) {
+                description += "Type - " + processorTypeDisplayText;
+            }
+        }
+
         if (metaData.example) {
             description += "Example - <br><br>" +
                 "<span style='margin-left: 1em'>" + self.wordWrap(metaData.example) + "</span>";
@@ -227,15 +251,39 @@ define(["./constants"], function (constants) {
         if (attributeList.length > 0) {
             description += "<ul>";
             for (var j = 0; j < attributeList.length; j++) {
-                description += "<li>" + (attributeList[j].name ? attributeList[j].name : "Attribute " + (j + 1)) +
+                description += "<li><b>" +
+                    (attributeList[j].name ? attributeList[j].name : "Attribute " + (j + 1)) + "</b>" +
                     (attributeList[j].optional ? " (optional)" : "") +
                     (attributeList[j].type.length > 0 ? " - " + attributeList[j].type.join(" | ").toUpperCase() : "") +
                     (attributeList[j].description ? " - " + attributeList[j].description : "") + "</li>";
             }
-            description += "</ul>";
+            description += "</ul><br>";
         } else {
             description += "none<br><br>";
         }
+
+        return description;
+    }
+
+    function generateAttributeListDescriptionForParamOverloads(attributeList, paramOverloads) {
+        var description = "";
+        if (attributeList.length > 0 && paramOverloads.length > 0) {
+            description += "<ul>";
+            for (var j = 0; j < attributeList.length; j++) {
+                var attributeName = attributeList[j].name;
+                if(paramOverloads.includes(attributeName)) {
+                    description += "<li><b>" + attributeName + "</b>" +
+                        (attributeList[j].optional ? " (optional)" : "") +
+                        (attributeList[j].type.length > 0 ? " - " + attributeList[j].type.join(" | ").
+                        toUpperCase() : "") +
+                        (attributeList[j].description ? " - " + attributeList[j].description : "") + "</li>";
+                }
+            }
+            description += "</ul><br>";
+        } else {
+            description += "none<br><br>";
+        }
+
         return description;
     }
 

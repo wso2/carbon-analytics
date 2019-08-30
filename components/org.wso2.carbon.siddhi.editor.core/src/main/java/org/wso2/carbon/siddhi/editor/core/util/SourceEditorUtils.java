@@ -25,6 +25,7 @@ import org.wso2.carbon.siddhi.editor.core.commons.metadata.ProcessorMetaData;
 import org.wso2.carbon.siddhi.editor.core.internal.EditorDataHolder;
 import io.siddhi.annotation.Extension;
 import io.siddhi.annotation.Parameter;
+import io.siddhi.annotation.ParameterOverload;
 import io.siddhi.annotation.ReturnAttribute;
 import io.siddhi.core.SiddhiAppRuntime;
 import io.siddhi.query.api.definition.AbstractDefinition;
@@ -486,6 +487,15 @@ public class SourceEditorUtils {
                             "description: " + extensionAnnotation.examples()[i].description();
                 }
                 processorMetaData.setExamples(examples);
+            }
+
+            //Adding parameter overloads data
+            if (extensionAnnotation.parameterOverloads().length > 0) {
+                List<String[]> parameterOverloads = new ArrayList<>();
+                for (ParameterOverload parameterOverload : extensionAnnotation.parameterOverloads()) {
+                    parameterOverloads.add(parameterOverload.parameterNames());
+                }
+                processorMetaData.setParameterOverloads(parameterOverloads);
             }
         }
         return processorMetaData;
