@@ -762,7 +762,7 @@ define(['ace/ace', 'jquery', 'lodash', 'log','dialogs','./service-client','welco
             //Run hint tour
             app.commandManager.registerHandler('tour-guide', this.runGuide, this);
 
-            app.commandManager.registerHandler('deploy-to-editor', this.handleDeploy, this);
+            app.commandManager.registerHandler('deploy-to-server', this.handleDeploy, this);
         }
     });
 
