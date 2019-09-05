@@ -124,7 +124,10 @@ define(['require', 'jquery', 'log', 'backbone', 'smart_wizard', 'siddhiAppSelect
                                 self.payload.configuration = self.configTemplateModel.getTemplatedConfig();
                                 self.payload.templatedSiddhiApps = self.appTemplatingModel.getTemplatedApps();
                             } else if (stepNumber === 3) {
-                                self.payload.templatedVariables = self._fill_template_value_dialog.getTemplatedKeyValues();
+                                self.payload.templatedVariables = self._fill_template_value_dialog.
+                                getTemplatedKeyValues();
+                                return self._fill_template_value_dialog.
+                                validateTemplatedValues(self.payload.templatedVariables)
                             }
                         }
                     });

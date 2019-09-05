@@ -27,6 +27,10 @@ hr.style1 {
     height: 90%;
 }
 
+.export-dialog .modal-body .sw-container{
+    margin-top: 12px;
+}
+
 .export-dialog-title {
     padding:0 0 10px 10px;
 }
@@ -115,7 +119,6 @@ hr.export-dialog-hr {
 
 }
 .sub-template-value-element-div .option {
-    display: flex;
     align-items: center;
     padding: 5px;
 }
@@ -124,6 +127,7 @@ hr.export-dialog-hr {
 }
 .sub-template-value-element-div .option input {
     color: #000 !important;
+    width: 75%;
 }
 
 .step-description {
