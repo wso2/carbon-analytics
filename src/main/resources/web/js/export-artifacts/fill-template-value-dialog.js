@@ -16,8 +16,8 @@
  * under the License.
  */
 
-define(['require', 'lodash', 'jquery', 'log','ace/ace','app/source-editor/editor'],
-    function (require, _, $, log,ace,SiddhiEditor) {
+define(['require', 'lodash', 'jquery'],
+    function (require, _, $) {
 
         var constants = {
             TEMPLATED_ELEMENT_REGEX: /\${([^\\$\\]+)}/g,
@@ -45,30 +45,49 @@ define(['require', 'lodash', 'jquery', 'log','ace/ace','app/source-editor/editor
             //find templated content in deployment config
             self.findTemplatedKeys(self.deploymentConfig);
 
-            var allTemplatedKeysHTMLContent = '<div class="clearfix form-min-width">' +
-                '<div class="fill-template-value-container template-values-div">' +
-                '<div class = "template-value-elements" id="template-value-elements-div">';
+            var allTemplatedKeysHTMLContent = '<div class="clearfix">' +
+                '<div class="fill-template-value-container template-values-div nano">' +
+                '<div class = "template-value-elements nano-content" id="template-value-elements-div">';
             var dynamicKeyHTMLContent = "";
 
-            _.forEach(self.templatedKeyList, function(key) {
-                dynamicKeyHTMLContent = dynamicKeyHTMLContent + '<div id="template-value-element-id" class="template-element">' +
-                    '<div class="sub-template-value-element-div">' +
-                    '<div class="option">' +
-                    '<div class="clearfix">' + '<label class="option-name optional-option">' +
-                    key +
-                    '</label>' + '</div>' + '<div class="clearfix">' +
-                    '<input class="option-value" type="text" data-toggle="popover" data-placement="bottom" data-original-title="" title="">' +
-                    '</div>' + ' <label class="error-message"></label>' + '</div> </div> </div>'
+            if (self.templatedKeyList.length == 0) {
+                dynamicKeyHTMLContent = dynamicKeyHTMLContent + '<div id="fillTemplateValueError" class="alert alert-danger">' +
+                    'No values are templated to fill.' +
+                    '</div>';
+            } else {
+                _.forEach(self.templatedKeyList, function(key) {
+                    dynamicKeyHTMLContent = dynamicKeyHTMLContent + '<div id="template-value-element-id" class="template-element" style="width: 50%;float: left">' +
+                        '<div class="sub-template-value-element-div">' +
+                        '<div class="option">' +
+                        '<div class="clearfix">' + '<label class="option-name optional-option">' +
+                        key +
+                        '</label>' + '</div>' + '<div class="clearfix">' +
+                        '<input class="option-value" type="text" data-toggle="popover" data-placement="bottom" data-original-title="" title="">' +
+                        '</div>' + ' <label class="error-message"></label>' + '</div> </div> </div>'
 
-            });
+                });
+            }
 
             allTemplatedKeysHTMLContent = allTemplatedKeysHTMLContent + dynamicKeyHTMLContent + '</div></div>';
-            self.container.append(allTemplatedKeysHTMLContent);
+            self.container.append(allTemplatedKeysHTMLContent).append('<div id="fillTemplateValueError" ' +
+                'class="alert alert-danger" style="display: none">' +
+                'Please provide values for all empty fields' +
+                '</div>');
+            $(".nano").nanoScroller();
         };
 
 
-        FillTemplateValueDialog.prototype.selectAll = function () {
-
+        FillTemplateValueDialog.prototype.validateTemplatedValues = function (keyValueList) {
+            var self = this;
+            var isValid = true;
+            _.forOwn(keyValueList, function(obj, i) {
+                if (obj.value.trim() == "") {
+                    isValid = false;
+                    self.container.find("#fillTemplateValueError").fadeIn( 300 ).delay( 1500 ).fadeOut( 400 );
+                    return false;
+                }
+            } );
+            return isValid;
         };
 
         FillTemplateValueDialog.prototype.findTemplatedKeys = function (text) {
