@@ -49,7 +49,7 @@ define(['jquery', 'lodash', 'log', 'file_browser', /** void module - jquery plug
             var bundles = [];
             var files = this.bundlesBrowser.getBottomSelected();
             for (var i = 0; i < files.length; i++) {
-                if (files[i].id.startsWith(directoryName)) {
+                if (files[i].id != directoryName && files[i].id.startsWith(directoryName)) {
                     var fileName = _.last(files[i].id.split(this.pathSeparator));
                     bundles.push(fileName);
 
