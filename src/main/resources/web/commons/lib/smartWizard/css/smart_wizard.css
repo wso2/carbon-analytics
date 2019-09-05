@@ -24,11 +24,11 @@
 .sw-main .sw-container {
     display: block;
     position: relative;
-    height: 85%;
+    height: 82%;
     padding: 10px 10px 10px 10px;
     overflow: auto;
-    width: 90.15%;
-    margin-left: 30px;
+    width: 100%;
+
 }
 
 .sw-main .step-content {
@@ -80,7 +80,12 @@
 
 .sw-theme-default > ul.step-anchor > li {
     position: relative;
-    margin-right: 2px;
+    width: 20%;
+}
+
+.sw-theme-default > ul.step-anchor > li > a > small {
+    font-size: 80%;
+    opacity: 0.6;
 }
 
 .sw-theme-default > ul.step-anchor > li > a, .sw-theme-default > ul.step-anchor > li > a:hover {
