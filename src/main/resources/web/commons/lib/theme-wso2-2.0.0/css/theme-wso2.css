@@ -3840,6 +3840,7 @@ input[type="button"].btn-block {
     color: #fff;
     background-color: #617d8b;
     border-color: #56707c;
+    margin-left: 10px !important;
 }
 
 .btn-secondary:focus, .btn-secondary.focus {

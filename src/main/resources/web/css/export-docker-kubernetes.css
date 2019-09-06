@@ -19,12 +19,10 @@ hr.style1 {
 }
 
 .export-dialog {
-    height: 80%;
     width: 93%;
 }
 
 .export-dialog .modal-body {
-    height: 90%;
 }
 
 .export-dialog-title {
@@ -143,3 +141,6 @@ hr.export-dialog-hr {
     height: 98% !important;
 }
 
+.sw-theme-default > ul.step-anchor.k8_export_header_item li {
+    width: 16%;
+}
