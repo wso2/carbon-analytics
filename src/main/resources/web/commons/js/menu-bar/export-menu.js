@@ -28,12 +28,12 @@ define(([], function () {
                     id: "export-for-docker",
                     shortcuts: {
                         mac: {
-                            key: "command+shift+e",
-                            label: "\u2318\u21E7E"
+                            key: "option+d",
+                            label: "\u2325D"
                         },
                         other: {
-                            key: "ctrl+shift+e",
-                            label: "Ctrl+Shift+E"
+                            key: "alt+d",
+                            label: "Alt+D"
                         }
                     }
                 },
@@ -46,12 +46,12 @@ define(([], function () {
                     id: "export-for-kubernetes",
                     shortcuts: {
                         mac: {
-                            key: "command+shift+k",
-                            label: "\u2318\u21E7K"
+                            key: "option+k",
+                            label: "\u2325K"
                         },
                         other: {
-                            key: "ctrl+shift+k",
-                            label: "Ctrl+Shift+K"
+                            key: "alt+k",
+                            label: "Alt+K"
                         }
                     }
                 },
