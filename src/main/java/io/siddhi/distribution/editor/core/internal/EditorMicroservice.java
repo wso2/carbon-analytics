@@ -302,9 +302,10 @@ public class EditorMicroservice implements Microservice {
     }
 
     @GET
-    @Path("/filterDirectories")
+    @Path("/listDirectoriesInPath")
     @Produces(MediaType.APPLICATION_JSON)
-    public Response filterDirectories(@QueryParam("directory") String directoryList) {
+    public Response filterDirectories(@QueryParam("path") String path,
+                                                            @QueryParam("directoryList") String directoryList) {
         try {
             List<String> directories = Arrays.stream(
                     new String(Base64.getDecoder().decode(directoryList), Charset.defaultCharset())
@@ -313,8 +314,13 @@ public class EditorMicroservice implements Microservice {
                     .map(directory -> "\"" + directory + "\"")
                     .collect(Collectors.toList());
 
-            String location = Paths.get(Constants.CARBON_HOME).toString();
-            JsonArray filteredDirectoryFiles = FileJsonObjectReaderUtil.listDirectoryInPath(location, directories);
+            String baseLocation = Paths.get(Constants.CARBON_HOME).toString();
+            java.nio.file.Path pathLocation = SecurityUtil.resolvePath(
+                    Paths.get(baseLocation).toAbsolutePath(),
+                    Paths.get(new String(Base64.getDecoder().decode(path), Charset.defaultCharset())));
+
+            JsonArray filteredDirectoryFiles = FileJsonObjectReaderUtil.listDirectoryInPath(
+                                                                                pathLocation.toString(), directories);
 
             JsonObject rootElement = FileJsonObjectReaderUtil.getJsonRootObject(filteredDirectoryFiles);
 
