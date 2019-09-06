@@ -149,3 +149,7 @@ hr.export-dialog-hr {
     height: 98% !important;
 }
 
+
+.link-disabled {
+    pointer-events: none;
+}
