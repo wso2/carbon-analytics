@@ -107,8 +107,9 @@ define(['jquery', 'backbone', 'lodash', 'log', /** void module - jquery plugin *
 
                 if (self._showBundles) {
                     if (node.id === '#') {
-                        return self._serviceURL + "/filterDirectories?" +
-                            "directory=" + self.application.utils.base64EncodeUnicode("bundles,jars");
+                        return self._serviceURL + "/listDirectoriesInPath" +
+                            "?path=" + self.application.utils.base64EncodeUnicode("") +
+                            "&directory=" + self.application.utils.base64EncodeUnicode("bundles,jars");
                     } else {
                         return self._serviceURL + "/listFilesInPath?path=" + self.application.utils.
                         base64EncodeUnicode(node.id);
