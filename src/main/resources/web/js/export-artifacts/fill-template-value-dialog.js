@@ -20,7 +20,7 @@ define(['require', 'lodash', 'jquery'],
     function (require, _, $) {
 
         var constants = {
-            TEMPLATED_ELEMENT_REGEX: /\${([^\\$\\]+)}/g,
+            TEMPLATED_ELEMENT_REGEX: /\${([^(\\$\\|\\{\\]+)}/g,
             KEY_SYS_CARBON_HOME: "${sys:carbon.home}",
             KEY_RUNTIME: "${sys:wso2.runtime}",
             KEY_CARBON_HOME: "${carbon.home}"
