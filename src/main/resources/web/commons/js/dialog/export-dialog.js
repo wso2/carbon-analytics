@@ -21,7 +21,6 @@ define(['require', 'jquery', 'log', 'backbone', 'smart_wizard', 'siddhiAppSelect
     function (require, $, log, Backbone, smartWizard, SiddhiAppSelectorDialog, JarsSelectorDialog,
               TemplateFileDialog, TemplateConfigDialog, FillTemplateValueDialog, KubernetesConfigDialog) {
 
-        //todo remove backbone
         var ExportDialog = Backbone.View.extend(
             /** @lends ExportDialog.prototype */
             {

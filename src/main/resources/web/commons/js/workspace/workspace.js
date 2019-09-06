@@ -250,6 +250,7 @@ define(['ace/ace', 'jquery', 'lodash', 'log','dialogs','./service-client','welco
                 this.updateExportMenuItem();
                 this.updateRunMenuItem();
                 this.updateDeleteMenuItem();
+                this.updateExportArtifactsItem()
             };
 
             this.manageConsoles = function(evt){
@@ -481,6 +482,34 @@ define(['ace/ace', 'jquery', 'lodash', 'log','dialogs','./service-client','welco
                     toolBar.disableDebugButton();
                     toolBar.disableStopButton();
                 }
+            };
+
+            this.updateExportArtifactsItem = function () {
+                var exportMenuItem = app.menuBar.getMenuItemByID('export.export-for-docker'),
+                    exportKubeMenuItem = app.menuBar.getMenuItemByID('export.export-for-kubernetes');
+
+                var listFilesEndpoint = app.config.services.workspace.endpoint + "/listFiles/workspace?path=" +
+                                                                        app.utils.base64EncodeUnicode("workspace");
+
+                jQuery.ajax({
+                    async: false,
+                    url: listFilesEndpoint,
+                    type: self.HTTP_GET,
+                    success: function (data) {
+                        if (data.length === 0) {
+                            exportMenuItem.disable();
+                            exportKubeMenuItem.disable();
+                        } else {
+                            exportMenuItem.enable();
+                            exportKubeMenuItem.enable();
+                        }
+                    },
+                    error: function (msg) {
+                        console.info("Error getting siddhi apps: " + msg);
+                        exportMenuItem.enable();
+                        exportKubeMenuItem.enable();
+                    }
+                });
             };
 
             this.openFileSaveDialog = function openFileSaveDialog(options) {
