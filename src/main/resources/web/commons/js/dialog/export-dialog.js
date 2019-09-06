@@ -21,6 +21,7 @@ define(['require', 'jquery', 'log', 'backbone', 'smart_wizard', 'siddhiAppSelect
     function (require, $, log, Backbone, smartWizard, SiddhiAppSelectorDialog, JarsSelectorDialog,
               TemplateFileDialog, TemplateConfigDialog, FillTemplateValueDialog, KubernetesConfigDialog) {
 
+    //todo remove backbone
         var ExportDialog = Backbone.View.extend(
             /** @lends ExportDialog.prototype */
             {
@@ -29,13 +30,14 @@ define(['require', 'jquery', 'log', 'backbone', 'smart_wizard', 'siddhiAppSelect
                  * @constructs
                  * @class ExportDialog
                  * @param {Object} options exportContainerModal
-                 * @param {boolean} isDocker  is Docker File Export
+                 * @param {boolean} isExportDockerFlow  is Docker File Export
                  */
-                initialize: function (options, isDocker) {
-                    this.app = options;
-                    this.options = _.cloneDeep(_.get(options.config, 'export_dialog'));
-                    this.exportContainer;
-                    this.isDocker = isDocker;
+                initialize: function (options, isExportDockerFlow) {
+                    this.options = options;
+                    var exportDialog = _.cloneDeep(_.get(options.config, 'export_dialog'));
+                    this.exportContainer = $(_.get(exportDialog, 'selector')).clone();
+
+                    this.isExportDockerFlow = isExportDockerFlow;
                     this.payload = {
                         templatedSiddhiApps: [],
                         configuration: '',
@@ -48,27 +50,37 @@ define(['require', 'jquery', 'log', 'backbone', 'smart_wizard', 'siddhiAppSelect
                     this.configTemplateModel;
                     this.kubernetesConfigModel;
                     this._fill_template_value_dialog;
+                    //todo refactor starts with _
+
+                    var type;
+                    if (isExportDockerFlow) {
+                        type = 'docker';
+                    } else {
+                        type = 'kubernetes';
+                    }
+                    var exportUrl = options.config.baseUrl + "/export?type=" + type;
+                    this.btnExportForm =  $('' +
+                        '<form id="submit-form" method="post" enctype="application/x-www-form-urlencoded" target="export-download" >' +
+                        '<button  type="button" class="btn btn-default hidden" id="export-btn" data-dismiss="modal" >Export</button>' +
+                        '</form>').attr('action', exportUrl);
+
                 },
 
                 show: function () {
+                    //todo stop form dismiss when clicked away
                     this.exportContainer.modal('show');
                 },
 
                 render: function () {
-
                     var self = this;
-                    if (!_.isNil(this.exportContainer)) {
-                        this.exportContainer.remove();
-                    }
-
-                    var isDocker = this.isDocker;
+                    var isExportDockerFlow = this.isExportDockerFlow;
                     var options = this.options;
-                    var app = this.app;
-                    var exportContainer = $(_.get(options, 'selector')).clone();
+
+                    var exportContainer = this.exportContainer;
                     var heading = exportContainer.find('#initialHeading');
                     var form = exportContainer.find('#export-form');
 
-                    if (isDocker) {
+                    if (isExportDockerFlow) {
                         heading.text('Export Siddhi Apps for Docker image');
                     } else {
                         heading.text('Export Siddhi Apps For Kubernetes CRD');
@@ -85,14 +97,10 @@ define(['require', 'jquery', 'log', 'backbone', 'smart_wizard', 'siddhiAppSelect
                     }
 
                     // Toolbar extra buttons
-                    var btnExportForm = $('' +
-                        '<form id="submit-form"  method="post" enctype="application/x-www-form-urlencoded" target="export-download" >' +
-                        '<button  type="button" class="btn btn-default hidden" id="export-btn" data-dismiss="modal" >Export</button>' +
-                        '</form>');
+                    var btnExportForm = this.btnExportForm;
                     btnExportForm.find('#export-btn').on('click', function () {
                         self.sendExportRequest()
                     });
-                    self.btnExportForm = btnExportForm;
 
                     form.smartWizard({
                         selected: 0,
@@ -108,14 +116,14 @@ define(['require', 'jquery', 'log', 'backbone', 'smart_wizard', 'siddhiAppSelect
                         }
                     });
 
-                    self.siddhiAppSelector = new SiddhiAppSelectorDialog(app, form);
+                    self.siddhiAppSelector = new SiddhiAppSelectorDialog(options, form);
                     self.siddhiAppSelector.render();
 
                     // Initialize the leaveStep event - validate before next
                     form.on("leaveStep", function (e, anchorObject, stepNumber, stepDirection) {
                         if (stepDirection === 'forward') {
                             if (stepNumber === 0) {
-                                return self.siddhiAppSelector.validateSiddhiApps();
+                                return self.siddhiAppSelector.validateSiddhiAppSelection();
                             }
                             if (stepNumber === 1) {
                                 self.payload.templatedSiddhiApps = self.appTemplatingModel.getTemplatedApps();
@@ -155,9 +163,9 @@ define(['require', 'jquery', 'log', 'backbone', 'smart_wizard', 'siddhiAppSelect
                                 }
                                 var siddhiAppsNamesList = self.siddhiAppSelector.getSiddhiApps();
                                 var templateOptions = {
-                                    app: self.app,
+                                    app: self.options,
                                     siddhiAppNames: siddhiAppsNamesList,
-                                    templateHeader: siddhiAppTemplateContainer
+                                    templateContainer: siddhiAppTemplateContainer
                                 };
                                 self.appTemplatingModel = new TemplateFileDialog(templateOptions);
                                 self.appTemplatingModel.render();
@@ -167,12 +175,12 @@ define(['require', 'jquery', 'log', 'backbone', 'smart_wizard', 'siddhiAppSelect
                                     templateStep.empty();
                                 }
                                 self.configTemplateModel = new TemplateConfigDialog({
-                                    app: self.app,
-                                    templateHeader: templateStep
+                                    app: self.options,
+                                    templateContainer: templateStep
                                 });
                                 self.configTemplateModel.render();
                             } else if (stepNumber === 4) {
-                                self.jarsSelectorDialog = new JarsSelectorDialog(app, form);
+                                self.jarsSelectorDialog = new JarsSelectorDialog(options, form);
                                 self.jarsSelectorDialog.render();
                             } else if (stepNumber === 3) {
                                 var fillTemplateContainer
@@ -188,7 +196,7 @@ define(['require', 'jquery', 'log', 'backbone', 'smart_wizard', 'siddhiAppSelect
                                 self._fill_template_value_dialog.render();
                             } else if (stepNumber === 5) {
                                 self.kubernetesConfigModel = new KubernetesConfigDialog({
-                                    app: self.app,
+                                    app: self.options,
                                     templateHeader: exportContainer.find('#kubernetes-configuration-step-id')
                                 });
                                 self.kubernetesConfigModel.render();
@@ -200,28 +208,28 @@ define(['require', 'jquery', 'log', 'backbone', 'smart_wizard', 'siddhiAppSelect
                 },
 
                 sendExportRequest: function () {
-                    var self = this;
-                    var type;
-                    if (this.isDocker) {
-                        type = 'docker';
-                    } else {
-                        type = 'kubernetes';
+                    if (!this.isExportDockerFlow) {
                         this.payload.kubernetesConfiguration = this.kubernetesConfigModel.getKubernetesConfigs();
                     }
                     this.payload.bundles = this.jarsSelectorDialog.getSelected('bundles');
                     this.payload.jars = this.jarsSelectorDialog.getSelected('jars');
 
-                    var payload = $('<input id="payload" name="payload" type="text" style="display: none;"/>')
+                    var payloadInputField = $('<input id="payload" name="payload" type="text" style="display: none;"/>')
                         .attr('value', JSON.stringify(this.payload));
-
-                    var exportUrl = this.app.config.baseUrl + "/export?type=" + type;
-
-                    this.btnExportForm.append(payload);
-                    this.btnExportForm.attr('action', exportUrl);
+                    this.btnExportForm.append(payloadInputField);
 
                     $(document.body).append(this.btnExportForm);
                     this.btnExportForm.submit();
 
+                },
+
+                clear: function () {
+                    if (!_.isNil(this.exportContainer)) {
+                        this.exportContainer.remove();
+                    }
+                    if (!_.isNil(this.btnExportForm)) {
+                        this.btnExportForm.remove();
+                    }
                 }
             });
         return ExportDialog;

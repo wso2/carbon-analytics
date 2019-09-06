@@ -21,7 +21,7 @@ define(['require', 'lodash', 'jquery', 'log', 'ace/ace', 'app/source-editor/edit
 
         var TemplateConfigDialog = function (options) {
             this.app = options.app;
-            this.templateContainer = options.templateHeader;
+            this.templateContainer = options.templateContainer;
             this.config = this.getConfigurationContent();
             this.configEditor;
 
@@ -76,10 +76,6 @@ define(['require', 'lodash', 'jquery', 'log', 'ace/ace', 'app/source-editor/edit
                 }
             });
             return configContent;
-        };
-
-        TemplateConfigDialog.prototype.show = function () {
-            this._fileOpenModal.modal('show');
         };
 
         TemplateConfigDialog.prototype.getTemplatedConfig = function () {

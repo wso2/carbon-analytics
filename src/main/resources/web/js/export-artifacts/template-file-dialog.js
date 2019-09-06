@@ -19,12 +19,13 @@
 define(['require', 'lodash', 'jquery', 'log', 'ace/ace', 'app/source-editor/editor'],
     function (require, _, $, log, ace, SiddhiEditor) {
 
+        // todo rename to template-app-dialog.js
         var TemplateFileDialog = function (options) {
             this.app = options.app;
             this.appNames = options.siddhiAppNames;
-            this.templateContainer = options.templateHeader;
-            this.appArr = this.readSiddhiApps(this.appNames);
-            this.editorObjArr = [];
+            this.templateContainer = options.templateContainer;
+            this.appObjectArrayList = this.readSiddhiApps(this.appNames);
+            this.editorObjectArrayList = [];
         };
 
         TemplateFileDialog.prototype.constructor = TemplateFileDialog;
@@ -32,8 +33,8 @@ define(['require', 'lodash', 'jquery', 'log', 'ace/ace', 'app/source-editor/edit
         TemplateFileDialog.prototype.render = function () {
             var self = this;
             var i;
-            for (i = 0; i < self.appArr.length; i++) {
-                var entry = self.appArr[i];
+            for (i = 0; i < self.appObjectArrayList.length; i++) {
+                var entry = self.appObjectArrayList[i];
                 var divId = "siddhi-app-content-id".concat(i);
 
                 var heading = $('<h3 class="siddhi-app-template-header"></h3>').text(entry.name);
@@ -42,12 +43,14 @@ define(['require', 'lodash', 'jquery', 'log', 'ace/ace', 'app/source-editor/edit
                 self.templateContainer.append(heading);
                 self.templateContainer.append(div);
 
+                // todo validation false
                 this._mainEditor = new SiddhiEditor({
                     divID: divId,
                     realTimeValidation: true,
                     autoCompletion: true
                 });
 
+                // todo call mainEditor instead of _editor
                 this._editor = ace.edit(divId);
                 this._editor.getSession().setValue(entry.content);
                 this._editor.resize(true);
@@ -55,7 +58,7 @@ define(['require', 'lodash', 'jquery', 'log', 'ace/ace', 'app/source-editor/edit
                     name: entry.name,
                     content: this._editor
                 };
-                self.editorObjArr.push(obj);
+                self.editorObjectArrayList.push(obj);
             }
             self.templateContainer.accordion();
         };
@@ -64,15 +67,15 @@ define(['require', 'lodash', 'jquery', 'log', 'ace/ace', 'app/source-editor/edit
             var self = this;
             var apps = [];
             var i;
+            // todo _.forEach()
             for (i = 0; i < appNames.length; i++) {
                 var fileName = appNames[i];
                 var fileRelativeLocation = "workspace" + self.app.getPathSeperator() +
                     fileName;
-                var defaultView = {configLocation: fileRelativeLocation};
-                var workspaceServiceURL = self.app.config.services.workspace.endpoint;
-                var openServiceURL = workspaceServiceURL + "/read";
+                // todo remove defaultView, endpoint var
+                var openServiceURL = self.app.config.services.workspace.endpoint + "/read";
 
-                var path = defaultView.configLocation;
+                var path = fileRelativeLocation;
                 $.ajax({
                     url: openServiceURL,
                     type: "POST",
@@ -91,10 +94,12 @@ define(['require', 'lodash', 'jquery', 'log', 'ace/ace', 'app/source-editor/edit
                             };
                             apps.push(siddhiApp);
                         } else {
+                            // todo Move to common error container refer open-file-dialog.js
                             console.error("Failed to read Siddhi Application" + data.error);
                         }
                     },
                     error: function (res, errorCode, error) {
+                        // api returns a string not JSON in error case
                         var msg = _.isString(error) ? error : res.statusText;
                         if (isJsonString(res.responseText)) {
                             var resObj = JSON.parse(res.responseText);
@@ -109,19 +114,16 @@ define(['require', 'lodash', 'jquery', 'log', 'ace/ace', 'app/source-editor/edit
             return apps;
         };
 
-        TemplateFileDialog.prototype.show = function () {
-            this._fileOpenModal.modal('show');
-        };
-
         TemplateFileDialog.prototype.getTemplatedApps = function () {
             var self = this;
             var templatedApps = [];
             var i;
-            for (i = 0; i < self.editorObjArr.length; i++) {
+            // todo for loop
+            for (i = 0; i < self.editorObjectArrayList.length; i++) {
                 var appEntry = {
-                    appName: self.editorObjArr[i].name,
-                    appContent: self.editorObjArr[i].content.session.getValue()
-                }
+                    appName: self.editorObjectArrayList[i].name,
+                    appContent: self.editorObjectArrayList[i].content.session.getValue()
+                };
                 templatedApps.push(appEntry);
             }
             return templatedApps;

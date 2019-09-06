@@ -30,7 +30,7 @@ define(['require', 'lodash', 'jquery', 'log', 'ace/ace', 'app/source-editor/edit
         KubernetesConfigDialog.prototype.render = function () {
             var self = this;
             var divId = "kubernetes-config-editor-id";
-            var templateEntry = "<div id='".concat(divId).concat("' style='height: 100%;'></div>");
+            var templateEntry = "<div id='".concat(divId).concat("></div>");
             self.templateContainer.append(templateEntry);
 
             this._mainEditor = new SiddhiEditor({
@@ -42,10 +42,6 @@ define(['require', 'lodash', 'jquery', 'log', 'ace/ace', 'app/source-editor/edit
             this._editor = ace.edit(divId);
             this._editor.resize(true);
             self.k8ConfigEditor = this._editor;
-        };
-
-        KubernetesConfigDialog.prototype.show = function () {
-            this._fileOpenModal.modal('show');
         };
 
         KubernetesConfigDialog.prototype.getKubernetesConfigs = function () {
