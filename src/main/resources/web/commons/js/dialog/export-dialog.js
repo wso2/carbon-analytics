@@ -45,6 +45,8 @@ define(['require', 'jquery', 'log', 'backbone', 'smart_wizard', 'siddhiAppSelect
                         jars: [],
                         kubernetesConfiguration: ''
                     };
+                    this._siddhiAppSelector;
+                    this._jarsSelectorDialog;
                     this._appTemplatingModel;
                     this._configTemplateModel;
                     this._kubernetesConfigModel;
@@ -114,17 +116,17 @@ define(['require', 'jquery', 'log', 'backbone', 'smart_wizard', 'siddhiAppSelect
                         }
                     });
 
-                    self.siddhiAppSelector = new SiddhiAppSelectorDialog(options, form);
-                    self.siddhiAppSelector.render();
+                    self._siddhiAppSelector = new SiddhiAppSelectorDialog(options, form);
+                    self._siddhiAppSelector.render();
 
                     // Initialize the leaveStep event - validate before next
                     form.on("leaveStep", function (e, anchorObject, stepNumber, stepDirection) {
                         if (stepDirection === 'forward') {
                             if (stepNumber === 0) {
-                                return self.siddhiAppSelector.validateSiddhiAppSelection();
+                                return self._siddhiAppSelector.validateSiddhiAppSelection();
                             }
                             if (stepNumber === 1) {
-                                self.payload.templatedSiddhiApps = self._appTemplatingModel.getTemplatedApps();
+                                self._payload.templatedSiddhiApps = self._appTemplatingModel.getTemplatedApps();
                             }
                             if (stepNumber === 2) {
                                 self._payload.configuration = self._configTemplateModel.getTemplatedConfig();
@@ -159,7 +161,7 @@ define(['require', 'jquery', 'log', 'backbone', 'smart_wizard', 'siddhiAppSelect
                                     siddhiAppTemplateContainer.empty();
                                     siddhiAppTemplateContainer.accordion("destroy");
                                 }
-                                var siddhiAppsNamesList = self.siddhiAppSelector.getSiddhiApps();
+                                var siddhiAppsNamesList = self._siddhiAppSelector.getSiddhiApps();
                                 var templateOptions = {
                                     app: self._options,
                                     siddhiAppNames: siddhiAppsNamesList,
@@ -178,8 +180,8 @@ define(['require', 'jquery', 'log', 'backbone', 'smart_wizard', 'siddhiAppSelect
                                 });
                                 self._configTemplateModel.render();
                             } else if (stepNumber === 4) {
-                                self.jarsSelectorDialog = new JarsSelectorDialog(options, form);
-                                self.jarsSelectorDialog.render();
+                                self._jarsSelectorDialog = new JarsSelectorDialog(options, form);
+                                self._jarsSelectorDialog.render();
                             } else if (stepNumber === 3) {
                                 var fillTemplateContainer
                                     = exportContainer.find('#fill-template-container-id');
@@ -209,8 +211,8 @@ define(['require', 'jquery', 'log', 'backbone', 'smart_wizard', 'siddhiAppSelect
                     if (!this._isExportDockerFlow) {
                         this._payload.kubernetesConfiguration = this._kubernetesConfigModel.getKubernetesConfigs();
                     }
-                    this._payload.bundles = this.jarsSelectorDialog.getSelected('bundles');
-                    this._payload.jars = this.jarsSelectorDialog.getSelected('jars');
+                    this._payload.bundles = this._jarsSelectorDialog.getSelected('bundles');
+                    this._payload.jars = this._jarsSelectorDialog.getSelected('jars');
 
                     var payloadInputField = $('<input id="payload" name="payload" type="text" style="display: none;"/>')
                         .attr('value', JSON.stringify(this._payload));
