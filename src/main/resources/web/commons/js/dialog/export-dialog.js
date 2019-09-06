@@ -21,7 +21,7 @@ define(['require', 'jquery', 'log', 'backbone', 'smart_wizard', 'siddhiAppSelect
     function (require, $, log, Backbone, smartWizard, SiddhiAppSelectorDialog, JarsSelectorDialog,
               TemplateFileDialog, TemplateConfigDialog, FillTemplateValueDialog, KubernetesConfigDialog) {
 
-    //todo remove backbone
+        //todo remove backbone
         var ExportDialog = Backbone.View.extend(
             /** @lends ExportDialog.prototype */
             {
@@ -33,12 +33,12 @@ define(['require', 'jquery', 'log', 'backbone', 'smart_wizard', 'siddhiAppSelect
                  * @param {boolean} isExportDockerFlow  is Docker File Export
                  */
                 initialize: function (options, isExportDockerFlow) {
-                    this.options = options;
+                    this._options = options;
                     var exportDialog = _.cloneDeep(_.get(options.config, 'export_dialog'));
-                    this.exportContainer = $(_.get(exportDialog, 'selector')).clone();
+                    this._exportContainer = $(_.get(exportDialog, 'selector')).clone();
 
-                    this.isExportDockerFlow = isExportDockerFlow;
-                    this.payload = {
+                    this._isExportDockerFlow = isExportDockerFlow;
+                    this._payload = {
                         templatedSiddhiApps: [],
                         configuration: '',
                         templatedVariables: [],
@@ -46,11 +46,10 @@ define(['require', 'jquery', 'log', 'backbone', 'smart_wizard', 'siddhiAppSelect
                         jars: [],
                         kubernetesConfiguration: ''
                     };
-                    this.appTemplatingModel;
-                    this.configTemplateModel;
-                    this.kubernetesConfigModel;
+                    this._appTemplatingModel;
+                    this._configTemplateModel;
+                    this._kubernetesConfigModel;
                     this._fill_template_value_dialog;
-                    //todo refactor starts with _
 
                     var type;
                     if (isExportDockerFlow) {
@@ -59,7 +58,7 @@ define(['require', 'jquery', 'log', 'backbone', 'smart_wizard', 'siddhiAppSelect
                         type = 'kubernetes';
                     }
                     var exportUrl = options.config.baseUrl + "/export?type=" + type;
-                    this.btnExportForm =  $('' +
+                    this._btnExportForm =  $('' +
                         '<form id="submit-form" method="post" enctype="application/x-www-form-urlencoded" target="export-download" >' +
                         '<button  type="button" class="btn btn-default hidden" id="export-btn" data-dismiss="modal" >Export</button>' +
                         '</form>').attr('action', exportUrl);
@@ -68,15 +67,15 @@ define(['require', 'jquery', 'log', 'backbone', 'smart_wizard', 'siddhiAppSelect
 
                 show: function () {
                     //todo stop form dismiss when clicked away
-                    this.exportContainer.modal('show');
+                    this._exportContainer.modal('show');
                 },
 
                 render: function () {
                     var self = this;
-                    var isExportDockerFlow = this.isExportDockerFlow;
-                    var options = this.options;
+                    var isExportDockerFlow = this._isExportDockerFlow;
+                    var options = this._options;
 
-                    var exportContainer = this.exportContainer;
+                    var exportContainer = this._exportContainer;
                     var heading = exportContainer.find('#initialHeading');
                     var form = exportContainer.find('#export-form');
 
@@ -97,7 +96,7 @@ define(['require', 'jquery', 'log', 'backbone', 'smart_wizard', 'siddhiAppSelect
                     }
 
                     // Toolbar extra buttons
-                    var btnExportForm = this.btnExportForm;
+                    var btnExportForm = this._btnExportForm;
                     btnExportForm.find('#export-btn').on('click', function () {
                         self.sendExportRequest()
                     });
@@ -126,16 +125,16 @@ define(['require', 'jquery', 'log', 'backbone', 'smart_wizard', 'siddhiAppSelect
                                 return self.siddhiAppSelector.validateSiddhiAppSelection();
                             }
                             if (stepNumber === 1) {
-                                self.payload.templatedSiddhiApps = self.appTemplatingModel.getTemplatedApps();
+                                self.payload.templatedSiddhiApps = self._appTemplatingModel.getTemplatedApps();
                             }
                             if (stepNumber === 2) {
-                                self.payload.configuration = self.configTemplateModel.getTemplatedConfig();
-                                self.payload.templatedSiddhiApps = self.appTemplatingModel.getTemplatedApps();
+                                self._payload.configuration = self._configTemplateModel.getTemplatedConfig();
+                                self._payload.templatedSiddhiApps = self._appTemplatingModel.getTemplatedApps();
                             } else if (stepNumber === 3) {
-                                self.payload.templatedVariables = self._fill_template_value_dialog.
+                                self._payload.templatedVariables = self._fill_template_value_dialog.
                                 getTemplatedKeyValues();
                                 return self._fill_template_value_dialog.
-                                validateTemplatedValues(self.payload.templatedVariables)
+                                validateTemplatedValues(self._payload.templatedVariables)
                             }
                         }
                     });
@@ -163,22 +162,22 @@ define(['require', 'jquery', 'log', 'backbone', 'smart_wizard', 'siddhiAppSelect
                                 }
                                 var siddhiAppsNamesList = self.siddhiAppSelector.getSiddhiApps();
                                 var templateOptions = {
-                                    app: self.options,
+                                    app: self._options,
                                     siddhiAppNames: siddhiAppsNamesList,
                                     templateContainer: siddhiAppTemplateContainer
                                 };
-                                self.appTemplatingModel = new TemplateFileDialog(templateOptions);
-                                self.appTemplatingModel.render();
+                                self._appTemplatingModel = new TemplateFileDialog(templateOptions);
+                                self._appTemplatingModel.render();
                             } else if (stepNumber === 2) {
                                 var templateStep = exportContainer.find('#config-template-container-id');
                                 if (templateStep.children().length > 0) {
                                     templateStep.empty();
                                 }
-                                self.configTemplateModel = new TemplateConfigDialog({
-                                    app: self.options,
+                                self._configTemplateModel = new TemplateConfigDialog({
+                                    app: self._options,
                                     templateContainer: templateStep
                                 });
-                                self.configTemplateModel.render();
+                                self._configTemplateModel.render();
                             } else if (stepNumber === 4) {
                                 self.jarsSelectorDialog = new JarsSelectorDialog(options, form);
                                 self.jarsSelectorDialog.render();
@@ -190,45 +189,45 @@ define(['require', 'jquery', 'log', 'backbone', 'smart_wizard', 'siddhiAppSelect
                                 }
                                 var fillTemplateOptions = {
                                     container: fillTemplateContainer,
-                                    payload: self.payload
+                                    payload: self._payload
                                 };
                                 self._fill_template_value_dialog = new FillTemplateValueDialog(fillTemplateOptions);
                                 self._fill_template_value_dialog.render();
                             } else if (stepNumber === 5) {
-                                self.kubernetesConfigModel = new KubernetesConfigDialog({
-                                    app: self.options,
+                                self._kubernetesConfigModel = new KubernetesConfigDialog({
+                                    app: self._options,
                                     templateHeader: exportContainer.find('#kubernetes-configuration-step-id')
                                 });
-                                self.kubernetesConfigModel.render();
+                                self._kubernetesConfigModel.render();
                             }
                         }
                     });
 
-                    this.exportContainer = exportContainer;
+                    this._exportContainer = exportContainer;
                 },
 
                 sendExportRequest: function () {
-                    if (!this.isExportDockerFlow) {
-                        this.payload.kubernetesConfiguration = this.kubernetesConfigModel.getKubernetesConfigs();
+                    if (!this._isExportDockerFlow) {
+                        this._payload.kubernetesConfiguration = this._kubernetesConfigModel.getKubernetesConfigs();
                     }
-                    this.payload.bundles = this.jarsSelectorDialog.getSelected('bundles');
-                    this.payload.jars = this.jarsSelectorDialog.getSelected('jars');
+                    this._payload.bundles = this.jarsSelectorDialog.getSelected('bundles');
+                    this._payload.jars = this.jarsSelectorDialog.getSelected('jars');
 
                     var payloadInputField = $('<input id="payload" name="payload" type="text" style="display: none;"/>')
-                        .attr('value', JSON.stringify(this.payload));
-                    this.btnExportForm.append(payloadInputField);
+                        .attr('value', JSON.stringify(this._payload));
+                    this._btnExportForm.append(payloadInputField);
 
-                    $(document.body).append(this.btnExportForm);
-                    this.btnExportForm.submit();
-
+                    $(document.body).append(this._btnExportForm);
+                    this._btnExportForm.submit();
+                    // todo handle error
                 },
 
                 clear: function () {
-                    if (!_.isNil(this.exportContainer)) {
-                        this.exportContainer.remove();
+                    if (!_.isNil(this._exportContainer)) {
+                        this._exportContainer.remove();
                     }
-                    if (!_.isNil(this.btnExportForm)) {
-                        this.btnExportForm.remove();
+                    if (!_.isNil(this._btnExportForm)) {
+                        this._btnExportForm.remove();
                     }
                 }
             });
