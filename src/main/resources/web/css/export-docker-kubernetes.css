@@ -19,12 +19,10 @@ hr.style1 {
 }
 
 .export-dialog {
-    height: 80%;
     width: 93%;
 }
 
 .export-dialog .modal-body {
-    height: 90%;
 }
 
 .export-dialog .modal-body .sw-container{
@@ -75,12 +73,11 @@ hr.export-dialog-hr {
 }
 
 .export-dialog-form-scrollable-block-list {
-    padding: 20px 20px 20px 20px;
+    padding: 20px;
     overflow: auto;
     max-height: 200px;
-    width: 90.15%;
+    width: 100%;
     background-color: #2C2C2C;
-    margin-left: 30px;
 }
 
 .siddhi-app-template-header {
@@ -131,8 +128,7 @@ hr.export-dialog-hr {
 }
 
 .step-description {
-    padding-top: 10px;
-    padding-bottom: 10px;
+    padding: 10px;
     background-color: transparent;
 }
 
@@ -149,3 +145,6 @@ hr.export-dialog-hr {
     height: 98% !important;
 }
 
+.sw-theme-default > ul.step-anchor.k8_export_header_item li {
+    width: 16%;
+}
