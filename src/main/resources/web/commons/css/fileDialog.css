@@ -420,3 +420,9 @@ hr.file-dialog-hr {
 .button-container {
     margin-right: 27px;
 }
+
+.clearfix {
+     display: block;
+     content: "";
+     clear: both;
+}

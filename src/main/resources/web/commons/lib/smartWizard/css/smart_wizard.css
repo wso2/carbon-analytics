@@ -17,18 +17,17 @@
     margin: 0;
     padding: 0;
     border-radius: .25rem!important;
-    height: 98%;
     width: 100%;
 }
 
 .sw-main .sw-container {
     display: block;
     position: relative;
-    height: 85%;
+    height: 50%;
     padding: 10px 10px 10px 10px;
     overflow: auto;
-    width: 90.15%;
-    margin-left: 30px;
+    width: 100%;
+
 }
 
 .sw-main .step-content {
@@ -58,6 +57,11 @@
     border: 0px solid #000000;
     background-color: transparent;
     text-align: left;
+
+}
+
+.sw-theme-default .step-content .step-description {
+    opacity: 0.6;
 }
 
 .sw-theme-default .sw-toolbar {
@@ -80,7 +84,12 @@
 
 .sw-theme-default > ul.step-anchor > li {
     position: relative;
-    margin-right: 2px;
+    width: 20%;
+}
+
+.sw-theme-default > ul.step-anchor > li > a > small {
+    font-size: 80%;
+    opacity: 0.6;
 }
 
 .sw-theme-default > ul.step-anchor > li > a, .sw-theme-default > ul.step-anchor > li > a:hover {
@@ -91,7 +100,7 @@
     background: transparent !important;
     border: none !important;
     cursor: not-allowed;
-    height: 10%;
+    height: 7%;
 }
 
 .sw-theme-default > ul.step-anchor > li.clickable > a:hover {
@@ -103,7 +112,7 @@
 .sw-theme-default > ul.step-anchor > li > a::after {
     content: "";
     color: #5cb85c;
-    background: #4285F4;
+    background: #02aaad;
     height: 2px;
     position: absolute;
     width: 100%;
@@ -137,8 +146,8 @@
 }
 
 .sw-theme-default > ul.step-anchor > li.done > a::after {
-    color: #5cb85c;
-    background: #5cb85c;
+    color: #617d8b;
+    background: #617d8b;
     -webkit-transform: scale(1);
     -ms-transform: scale(1);
     transform: scale(1);
@@ -237,6 +246,26 @@
     min-height: 300px;
 }
 
-.btn-toolbar .btn, .btn-toolbar .btn-group, .btn-toolbar .input-group {
+.sw-btn-group {
+    float: right !important;
+}
+
+.sw-btn-prev {
+    display: inline-block;
     float: left;
 }
+
+.sw-btn-next {
+    display: inline-block;
+    float: right;
+}
+
+.sw-btn-group_left {
+    float: left !important;
+}
+
+.sw-btn-group_right {
+    float: right !important;
+}
+
+
