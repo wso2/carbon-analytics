@@ -15,8 +15,8 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-define(['ace/ace', 'jquery', 'lodash', 'log','dialogs','./service-client','welcome-page'],
-    function (ace, $, _, log, Dialogs, ServiceClient, WelcomePages) {
+define(['ace/ace', 'jquery', 'lodash', 'log','dialogs','./service-client','welcome-page', 'alerts'],
+    function (ace, $, _, log, Dialogs, ServiceClient, WelcomePages, alerts) {
 
         // workspace manager constructor
         /**
@@ -505,7 +505,7 @@ define(['ace/ace', 'jquery', 'lodash', 'log','dialogs','./service-client','welco
                         }
                     },
                     error: function (msg) {
-                        console.info("Error getting siddhi apps: " + msg);
+                        alerts.error("Error getting siddhi apps: " + msg.statusText);
                         exportMenuItem.enable();
                         exportKubeMenuItem.enable();
                     }
