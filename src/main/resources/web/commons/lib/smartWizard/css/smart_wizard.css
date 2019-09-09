@@ -112,7 +112,7 @@
 .sw-theme-default > ul.step-anchor > li > a::after {
     content: "";
     color: #5cb85c;
-    background: #4285F4;
+    background: #02aaad;
     height: 2px;
     position: absolute;
     width: 100%;
@@ -146,8 +146,8 @@
 }
 
 .sw-theme-default > ul.step-anchor > li.done > a::after {
-    color: #5cb85c;
-    background: #5cb85c;
+    color: #617d8b;
+    background: #617d8b;
     -webkit-transform: scale(1);
     -ms-transform: scale(1);
     transform: scale(1);
