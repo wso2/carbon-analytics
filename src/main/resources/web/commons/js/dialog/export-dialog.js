@@ -67,7 +67,6 @@ define(['require', 'jquery', 'log', 'backbone', 'smart_wizard', 'siddhiAppSelect
                 },
 
                 show: function () {
-                    //todo stop form dismiss when clicked away
                     this._exportContainer.modal('show');
                 },
 
@@ -94,8 +93,6 @@ define(['require', 'jquery', 'log', 'backbone', 'smart_wizard', 'siddhiAppSelect
                                 "<div class=\"step-description\">Configure Kubernetes for Siddhi</div>" +
                                 "</div>\n" +
                                 "</div>");
-
-                        form.find('#form-steps').addClass('k8_export_header_item');
                     }
 
                     // Toolbar extra buttons
@@ -148,20 +145,18 @@ define(['require', 'jquery', 'log', 'backbone', 'smart_wizard', 'siddhiAppSelect
                         if (stepPosition === 'first') {
                             $(".sw-btn-prev").addClass('disabled');
                             $(".sw-btn-prev").addClass('hidden');
+                            $(".sw-btn-prev").parent().removeClass("sw-btn-group-final");
                         } else if (stepPosition === 'final') {
                             $(".sw-btn-next").addClass('hidden disabled');
-                            $(".sw-btn-next").parent().addClass('sw-btn-group_left');
-                            $(".sw-btn-next").parent().removeClass('sw-btn-group_right');
+                            $(".sw-btn-next").parent().addClass("sw-btn-group-final");
                             $("#export-btn").removeClass('hidden');
-                            $("#export-btn").parent().parent().addClass('sw-btn-group_right');
                         } else {
-                            $(".sw-btn-prev").removeClass('disabled');
                             $(".sw-btn-next").removeClass('disabled');
-                            $(".sw-btn-next").parent().addClass('sw-btn-group_right');
                             $(".sw-btn-next").removeClass('hidden');
+                            $(".sw-btn-prev").removeClass('disabled');
                             $(".sw-btn-prev").removeClass('hidden');
+                            $(".sw-btn-prev").parent().removeClass("sw-btn-group-final");
                             $("#export-btn").addClass('hidden');
-
                         }
 
                         if (stepDirection === 'forward') {
@@ -231,7 +226,6 @@ define(['require', 'jquery', 'log', 'backbone', 'smart_wizard', 'siddhiAppSelect
 
                     $(document.body).append(this._btnExportForm);
                     this._btnExportForm.submit();
-                    // todo handle error
                 },
 
                 clear: function () {

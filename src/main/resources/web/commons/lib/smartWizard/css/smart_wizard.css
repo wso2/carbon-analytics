@@ -247,25 +247,23 @@
 }
 
 .sw-btn-group {
-    float: right !important;
+    width: 98%;
+}
+
+.sw-btn-group-final {
+    width: 90% !important;
+    float: left !important;
 }
 
 .sw-btn-prev {
     display: inline-block;
-    float: left;
+    float: left !important;
 }
 
 .sw-btn-next {
     display: inline-block;
-    float: right;
-}
-
-.sw-btn-group_left {
-    float: left !important;
-}
-
-.sw-btn-group_right {
     float: right !important;
 }
+
 
 
