@@ -16,8 +16,8 @@
  * under the License.
  */
 
-define(['require', 'lodash', 'jquery', 'log', 'ace/ace', 'app/source-editor/editor'],
-    function (require, _, $, log, ace, SiddhiEditor) {
+define(['require', 'lodash', 'jquery', 'log', 'ace/ace', 'app/source-editor/editor', 'alerts'],
+    function (require, _, $, log, ace, SiddhiEditor, alerts) {
 
         var TemplateConfigDialog = function (options) {
             this.app = options.app;
@@ -32,7 +32,7 @@ define(['require', 'lodash', 'jquery', 'log', 'ace/ace', 'app/source-editor/edit
         TemplateConfigDialog.prototype.render = function () {
             var self = this;
             var divId = "configurationEditorId";
-            var templateEntry = "<div id='".concat(divId).concat("' style='height: 100%;'></div>");
+            var templateEntry = "<div class='config-template-container' id='".concat(divId).concat("'></div>");
             self.templateContainer.append(templateEntry);
 
             this._mainEditor = new SiddhiEditor({
@@ -49,7 +49,7 @@ define(['require', 'lodash', 'jquery', 'log', 'ace/ace', 'app/source-editor/edit
 
         TemplateConfigDialog.prototype.getConfigurationContent = function () {
             var self = this;
-            var configServiceURL = self.app.config.services.configurations.endpoint;
+            var configServiceURL = self.app.config.services.deploymentConfigs.endpoint;
             var configContent = "";
 
             $.ajax({
@@ -58,10 +58,10 @@ define(['require', 'lodash', 'jquery', 'log', 'ace/ace', 'app/source-editor/edit
                 contentType: "text/plain; charset=utf-8",
                 async: false,
                 success: function (data, textStatus, xhr) {
-                    if (xhr.status == 200) {
+                    if (xhr.status === 200) {
                         configContent = data.deploymentYaml;
                     } else {
-                        console.error("Error occured while reading Siddhi Runner configurations." + data.Error);
+                        alerts.error("Error occured while reading Siddhi Runner configurations." + data.Error);
                     }
                 },
                 error: function (res, errorCode, error) {
@@ -72,11 +72,20 @@ define(['require', 'lodash', 'jquery', 'log', 'ace/ace', 'app/source-editor/edit
                             msg = _.get(resObj, 'Error');
                         }
                     }
-                    console.error(msg);
+                    alerts.error(msg);
                 }
             });
             return configContent;
         };
+
+        function isJsonString(str) {
+            try {
+                JSON.parse(str);
+            } catch (e) {
+                return false;
+            }
+            return true;
+        }
 
         TemplateConfigDialog.prototype.getTemplatedConfig = function () {
             var self = this;
