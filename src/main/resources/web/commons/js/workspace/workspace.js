@@ -780,9 +780,6 @@ define(['ace/ace', 'jquery', 'lodash', 'log','dialogs','./service-client','welco
             // Open settings dialog
             app.commandManager.registerHandler('open-settings-dialog', this.openSettingsDialog, this);
 
-            // Open settings dialog
-            //app.commandManager.registerHandler('template-file-dialog', this.openSettingsDialog, this);
-
             // Delete file delete dialog
             app.commandManager.registerHandler('delete-file-delete-dialog', this.openDeleteFileConfirmDialog, this);
 

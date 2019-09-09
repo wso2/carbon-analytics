@@ -17,9 +17,9 @@
  */
 
 define(['require', 'jquery', 'log', 'backbone', 'smart_wizard', 'siddhiAppSelectorDialog', 'jarsSelectorDialog',
-        'templateFileDialog', 'templateConfigDialog', 'fillTemplateValueDialog', 'kubernetesConfigDialog'],
+        'templateAppDialog', 'templateConfigDialog', 'fillTemplateValueDialog', 'kubernetesConfigDialog'],
     function (require, $, log, Backbone, smartWizard, SiddhiAppSelectorDialog, JarsSelectorDialog,
-              TemplateFileDialog, TemplateConfigDialog, FillTemplateValueDialog, KubernetesConfigDialog) {
+              TemplateAppDialog, TemplateConfigDialog, FillTemplateValueDialog, KubernetesConfigDialog) {
 
         var ExportDialog = Backbone.View.extend(
             /** @lends ExportDialog.prototype */
@@ -173,7 +173,7 @@ define(['require', 'jquery', 'log', 'backbone', 'smart_wizard', 'siddhiAppSelect
                                     siddhiAppNames: siddhiAppsNamesList,
                                     templateContainer: siddhiAppTemplateContainer
                                 };
-                                self._appTemplatingModel = new TemplateFileDialog(templateOptions);
+                                self._appTemplatingModel = new TemplateAppDialog(templateOptions);
                                 self._appTemplatingModel.render();
                             } else if (stepNumber === 2) {
                                 var templateStep = exportContainer.find('#config-template-container-id');
