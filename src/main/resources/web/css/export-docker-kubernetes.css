@@ -109,7 +109,7 @@ hr.export-dialog-hr {
 }
 
 .config-template-container {
-
+    height: 98% !important
 }
 
 .kubernetes-configuration-step {

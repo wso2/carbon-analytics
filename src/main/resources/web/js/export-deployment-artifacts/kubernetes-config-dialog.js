@@ -30,7 +30,7 @@ define(['require', 'lodash', 'jquery', 'log', 'ace/ace', 'app/source-editor/edit
         KubernetesConfigDialog.prototype.render = function () {
             var self = this;
             var divId = "kubernetes-config-editor-id";
-            var templateEntry = "<div id='".concat(divId).concat("></div>");
+            var templateEntry = "<div class= 'config-template-container' id='".concat(divId).concat("'></div>");
             self.templateContainer.append(templateEntry);
 
             this._mainEditor = new SiddhiEditor({
