@@ -130,6 +130,7 @@ hr.export-dialog-hr {
 .step-description {
     padding: 10px;
     background-color: transparent;
+    transition: background-color 500ms linear;
 }
 
 .export-siddhi-app-list {

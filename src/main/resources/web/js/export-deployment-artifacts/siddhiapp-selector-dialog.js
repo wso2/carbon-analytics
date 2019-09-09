@@ -49,7 +49,6 @@ define(['jquery', 'lodash', 'log', 'file_browser', 'js_tree'],
                 siddhiAppSelectorStep.jstree("open_all");
             });
             fileBrowser.on("selected", function () {
-                // todo : transition fade out
                 openFileWizardError.css('background-color', 'transparent');
             });
 
