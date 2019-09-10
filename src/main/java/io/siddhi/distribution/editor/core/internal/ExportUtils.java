@@ -68,7 +68,7 @@ public class ExportUtils {
     private static final String CONFIG_BLOCK_VALUE =
             "COPY --chown=siddhi_user:siddhi_io \\$\\{CONFIG_FILE}/ \\$\\{USER_HOME}";
     private static final String CONFIG_PARAMETER_VALUE =
-            ", \"-Dconfig=\\$CONFIG_FILE_PATH\"";
+            ", \"-Dconfig=/home/siddhi_user/configurations.yaml\"";
     private static final String JARS_BLOCK_VALUE =
             "COPY --chown=siddhi_user:siddhi_io \\$\\{HOST_JARS_DIR}/ \\$\\{JARS}";
     private static final String BUNDLES_BLOCK_VALUE =
@@ -81,8 +81,6 @@ public class ExportUtils {
     private static final String SIDDHI_TEMPLATED_VAR_KEY_ENTRY = "key";
     private static final String SIDDHI_TEMPLATED_VAR_VALUE_ENTRY = "value";
     private static final String RESOURCES_DIR = "resources/docker-export";
-    private static final String ZIP_FILE_NAME = "siddhi-docker.zip";
-    private static final String ZIP_FILE_ROOT = "siddhi-docker/";
     private static final String DOCKER_FILE_NAME = "Dockerfile";
     private static final String KUBERNETES_FILE_NAME = "siddhi-process.yaml";
     private static final String JARS_DIR = "jars/";
@@ -126,13 +124,18 @@ public class ExportUtils {
         boolean bundlesAdded = false;
         boolean configChanged = false;
         boolean envChanged = false;
-
+        String zipFileName = "siddhi-docker.zip";
+        String zipFileRoot = "siddhi-docker/";
+        if (exportType != null && exportType.equals(EXPORT_TYPE_KUBERNETES)) {
+            zipFileName = "siddhi-kubernetes.zip";
+            zipFileRoot = "siddhi-kubernetes/";
+        }
         Path dockerFilePath = Paths.get(Constants.RUNTIME_PATH, RESOURCES_DIR, DOCKER_FILE_NAME);
-        File zipFile = new File(ZIP_FILE_NAME);
+        File zipFile = new File(zipFileName);
         StringBuilder stringBuilder = new StringBuilder();
         ZipOutputStream zipOutputStream = null;
         ZipEntry dockerFileEntry = new ZipEntry(
-                Paths.get(ZIP_FILE_ROOT, DOCKER_FILE_NAME).toString()
+                Paths.get(zipFileRoot, DOCKER_FILE_NAME).toString()
         );
         try {
             zipOutputStream = new ZipOutputStream(new FileOutputStream(zipFile));
@@ -141,7 +144,7 @@ public class ExportUtils {
             if (exportAppsRequest.getJars() != null && exportAppsRequest.getJars().size() > 0) {
                 jarsAdded = true;
                 String jarRootDir = Paths.get(Constants.CARBON_HOME, JARS_DIR).toString();
-                String jarEntryRootDir = Paths.get(ZIP_FILE_ROOT, JARS_DIR).toString();
+                String jarEntryRootDir = Paths.get(zipFileRoot, JARS_DIR).toString();
                 for (String jar : exportAppsRequest.getJars()) {
                     Path jarPath = Paths.get(jarRootDir, jar);
                     ZipEntry jarEntry = new ZipEntry(Paths.get(jarEntryRootDir, jar).toString());
@@ -161,7 +164,7 @@ public class ExportUtils {
                     exportAppsRequest.getBundles().size() > 0) {
                 bundlesAdded = true;
                 String bundleRootDir = Paths.get(Constants.CARBON_HOME, BUNDLE_DIR).toString();
-                String bundleEntryRootDir = Paths.get(ZIP_FILE_ROOT, BUNDLE_DIR).toString();
+                String bundleEntryRootDir = Paths.get(zipFileRoot, BUNDLE_DIR).toString();
                 for (String bundle : exportAppsRequest.getBundles()) {
                     Path bundlePath = Paths.get(bundleRootDir, bundle);
                     ZipEntry bundleEntry = new ZipEntry(
@@ -180,10 +183,10 @@ public class ExportUtils {
             }
 
             // Write Siddhi apps to the zip file
-            String appsEntryRootDir = Paths.get(ZIP_FILE_ROOT, APPS_DIR).toString();
+            String appsEntryRootDir = Paths.get(zipFileRoot, APPS_DIR).toString();
             if (exportAppsRequest.getTemplatedSiddhiApps() != null) {
                 for (Map<String, String> app : exportAppsRequest.getTemplatedSiddhiApps()) {
-                    String appName = app.get(SIDDHI_APP_NAME_ENTRY) + Constants.SIDDHI_APP_FILE_EXTENSION;
+                    String appName = app.get(SIDDHI_APP_NAME_ENTRY);
                     ZipEntry appEntry = new ZipEntry(
                             Paths.get(appsEntryRootDir, appName).toString()
                     );
@@ -199,7 +202,7 @@ public class ExportUtils {
                     !exportAppsRequest.getConfiguration().isEmpty()) {
                 configChanged = true;
                 ZipEntry configFileEntry = new ZipEntry(
-                        Paths.get(ZIP_FILE_ROOT, CONFIG_FILE).toString()
+                        Paths.get(zipFileRoot, CONFIG_FILE).toString()
                 );
                 zipOutputStream.putNextEntry(configFileEntry);
                 byte[] configData = exportAppsRequest
@@ -240,7 +243,7 @@ public class ExportUtils {
             // Write the kubernetes file to the zip file
             if (exportType != null && exportType.equals(EXPORT_TYPE_KUBERNETES)) {
                 ZipEntry kubernetesFileEntry = new ZipEntry(
-                        Paths.get(ZIP_FILE_ROOT, KUBERNETES_FILE_NAME).toString()
+                        Paths.get(zipFileRoot, KUBERNETES_FILE_NAME).toString()
                 );
                 zipOutputStream.putNextEntry(kubernetesFileEntry);
                 byte[] kubernetesFileData = this.getKubernetesFile(
@@ -262,7 +265,7 @@ public class ExportUtils {
                 try {
                     zipOutputStream.close();
                 } catch (IOException e) {
-                    log.error("Cannot close the zip file " + ZIP_FILE_NAME, e);
+                    log.error("Cannot close the zip file " + zipFileName, e);
                 }
             }
         }
@@ -427,7 +430,8 @@ public class ExportUtils {
             options.setDefaultFlowStyle(DumperOptions.FlowStyle.BLOCK);
             Yaml yaml = new Yaml(representer, options);
             String spec = yaml.dump(siddhiProcess);
-            spec = spec.replaceAll("\\$\\{", "\\\\\\$\\\\\\{");
+            spec = spec.replaceAll("\\$", "\\\\\\$");
+            spec = spec.replaceAll("\\{", "\\\\\\{");
             content = content.replaceAll(SIDDHI_PROCESS_SPEC_TEMPLATE, spec);
             if (kubernetesConfig !=  null) {
                 if (kubernetesConfig.getSiddhiProcessName() != null) {

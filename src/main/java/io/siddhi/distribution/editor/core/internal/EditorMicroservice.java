@@ -138,6 +138,7 @@ public class EditorMicroservice implements Microservice {
     private static final String FILE_SEPARATOR = "file.separator";
     private static final String STATUS = "status";
     private static final String SUCCESS = "success";
+    private static final String EXPORT_TYPE_KUBERNETES = "kubernetes";
     private ServiceRegistration serviceRegistration;
     private Workspace workspace;
     private ExecutorService executorService = Executors
@@ -1117,10 +1118,16 @@ public class EditorMicroservice implements Microservice {
             ExportAppsRequest exportAppsRequest = new Gson().fromJson(payload, ExportAppsRequest.class);
             ExportUtils exportUtils = new ExportUtils(configProvider, exportAppsRequest, exportType);
             File zipFile = exportUtils.createZipFile();
+            String fileName = "siddhi-docker.zip";
+            if (exportType != null) {
+                if (exportType.equals(EXPORT_TYPE_KUBERNETES)) {
+                    fileName = "siddhi-kubernetes.zip";
+                }
+            }
             return Response
                     .status(Response.Status.OK)
                     .entity(zipFile)
-                    .header("Content-Disposition", "attachment; filename=siddhi-docker.zip")
+                    .header("Content-Disposition", ("attachment; filename=" + fileName))
                     .build();
         } catch (JsonSyntaxException e) {
             log.error("Incorrect configuration format.", e);
