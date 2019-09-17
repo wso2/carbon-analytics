@@ -35,6 +35,9 @@ public class RedirectionDTO {
     @JsonProperty("callbackUrl")
     private String callbackUrl = null;
 
+    @JsonProperty("scope")
+    private String scope = null;
+
     public RedirectionDTO clientId(String clientId) {
         this.clientId = clientId;
         return this;
@@ -52,6 +55,25 @@ public class RedirectionDTO {
 
     public void setClientId(String clientId) {
         this.clientId = clientId;
+    }
+
+    public RedirectionDTO scope(String scope) {
+        this.scope = scope;
+        return this;
+    }
+
+    /**
+     * Get scope.
+     *
+     * @return scope
+     **/
+    @ApiModelProperty(value = "")
+    public String getScope() {
+        return scope;
+    }
+
+    public void setScope(String scope) {
+        this.scope = scope;
     }
 
     public RedirectionDTO redirectUrl(String redirectUrl) {
@@ -104,12 +126,13 @@ public class RedirectionDTO {
         RedirectionDTO redirection = (RedirectionDTO) o;
         return Objects.equals(this.clientId, redirection.clientId) &&
                 Objects.equals(this.redirectUrl, redirection.redirectUrl) &&
+                Objects.equals(this.scope, redirection.scope) &&
                 Objects.equals(this.callbackUrl, redirection.callbackUrl);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(clientId, redirectUrl, callbackUrl);
+        return Objects.hash(clientId, redirectUrl, callbackUrl, scope);
     }
 
     @Override
@@ -120,6 +143,7 @@ public class RedirectionDTO {
         sb.append("    clientId: ").append(toIndentedString(clientId)).append("\n");
         sb.append("    redirectUrl: ").append(toIndentedString(redirectUrl)).append("\n");
         sb.append("    callbackUrl: ").append(toIndentedString(callbackUrl)).append("\n");
+        sb.append("    scope: ").append(toIndentedString(scope)).append("\n");
         sb.append("}");
         return sb.toString();
     }

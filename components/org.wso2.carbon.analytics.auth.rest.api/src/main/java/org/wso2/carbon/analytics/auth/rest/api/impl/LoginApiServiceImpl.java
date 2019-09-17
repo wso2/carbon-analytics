@@ -219,6 +219,9 @@ public class LoginApiServiceImpl extends LoginApiService {
                     redirectionDTO.setClientId(loginResponse.get(ExternalIdPClientConstants.CLIENT_ID));
                     redirectionDTO.setCallbackUrl(loginResponse.get(ExternalIdPClientConstants.CALLBACK_URL_NAME));
                     redirectionDTO.setRedirectUrl(loginResponse.get(ExternalIdPClientConstants.REDIRECT_URL));
+                    if (loginResponse.get(ExternalIdPClientConstants.SCOPE) != null) {
+                        redirectionDTO.setScope(loginResponse.get(ExternalIdPClientConstants.SCOPE));
+                    }
                     return Response.status(Response.Status.FOUND).entity(redirectionDTO).build();
                 default:
                     if (LOG.isDebugEnabled()) {
