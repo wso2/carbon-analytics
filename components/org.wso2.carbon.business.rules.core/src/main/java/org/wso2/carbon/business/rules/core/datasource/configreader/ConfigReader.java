@@ -107,11 +107,10 @@ public class ConfigReader {
                 solutionsList.add(SiddhiAppProcessorConstants.WSO2_SERVER_TYPE_APIM_ANALYTICS);
             } else if (Boolean.parseBoolean(analyticsSolutionsConfig.get(SiddhiAppProcessorConstants
                     .EI_ANALYTICS_ENABLED).toString())) {
-                solutionsList.add(SiddhiAppProcessorConstants.WSO2_SERVER_TYPE_IS_ANALYTICS);
-
-            } else if (Boolean.parseBoolean(analyticsSolutionsConfig.get(SiddhiAppProcessorConstants
-                    .WSO2_SERVER_TYPE_IS_ANALYTICS).toString())) {
                 solutionsList.add(SiddhiAppProcessorConstants.WSO2_SERVER_TYPE_EI_ANALYTICS);
+            } else if (Boolean.parseBoolean(analyticsSolutionsConfig.get(SiddhiAppProcessorConstants
+                    .IS_ANALYTICS_ENABLED).toString())) {
+                solutionsList.add(SiddhiAppProcessorConstants.WSO2_SERVER_TYPE_IS_ANALYTICS);
             }
         }
         return solutionsList;
