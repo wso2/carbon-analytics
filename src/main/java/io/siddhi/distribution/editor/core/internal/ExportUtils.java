@@ -64,6 +64,7 @@ public class ExportUtils {
     private static final String JARS_BLOCK_TEMPLATE = "\\{\\{JARS_BLOCK}}";
     private static final String BUNDLES_BLOCK_TEMPLATE = "\\{\\{BUNDLES_BLOCK}}";
     private static final String ENV_BLOCK_TEMPLATE = "\\{\\{ENV_BLOCK}}";
+    private static final String APPS_BLOCK_TEMPLATE = "\\{\\{APPS_BLOCK}}";
     private static final String PRODUCT_VERSION_TEMPLATE = "\\{\\{PRODUCT_VERSION}}";
     private static final String CONFIG_BLOCK_VALUE =
             "COPY --chown=siddhi_user:siddhi_io \\$\\{CONFIG_FILE}/ \\$\\{USER_HOME}";
@@ -73,6 +74,8 @@ public class ExportUtils {
             "COPY --chown=siddhi_user:siddhi_io \\$\\{HOST_JARS_DIR}/ \\$\\{JARS}";
     private static final String BUNDLES_BLOCK_VALUE =
             "COPY --chown=siddhi_user:siddhi_io \\$\\{HOST_BUNDLES_DIR}/ \\$\\{BUNDLES}";
+    private static final String APPS_BLOCK_VALUE =
+            "COPY --chown=siddhi_user:siddhi_io \\$\\{HOST_APPS_DIR}/ \\$\\{APPS}";
     private static final String SIDDHI_PROCESS_SPEC_TEMPLATE = "\\{\\{SIDDHI_PROCESS_SPEC}}";
     private static final String SIDDHI_PROCESS_NAME_TEMPLATE = "\\{\\{SIDDHI_PROCESS_NAME}}";
     private static final String SIDDHI_PROCESS_DEFAULT_NAME = "sample-siddhi-process";
@@ -301,6 +304,13 @@ public class ExportUtils {
         String content = new String(data, StandardCharsets.UTF_8);
         String productVersion = this.getConfigurations().getProductVersion();
         content = content.replaceAll(PRODUCT_VERSION_TEMPLATE, productVersion);
+
+        if (exportType != null && exportType.equals(EXPORT_TYPE_KUBERNETES)) {
+            content = content.replaceAll(APPS_BLOCK_TEMPLATE, "");
+        } else {
+            content = content.replaceAll(APPS_BLOCK_TEMPLATE, APPS_BLOCK_VALUE);
+        }
+
         if (jarsAdded) {
             content = content.replaceAll(JARS_BLOCK_TEMPLATE, JARS_BLOCK_VALUE);
         } else {
