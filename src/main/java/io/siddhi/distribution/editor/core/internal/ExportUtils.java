@@ -445,6 +445,11 @@ public class ExportUtils {
                             SIDDHI_PROCESS_DEFAULT_NAME
                     );
                 }
+            } else {
+                content = content.replaceAll(
+                        SIDDHI_PROCESS_NAME_TEMPLATE,
+                        SIDDHI_PROCESS_DEFAULT_NAME
+                );
             }
         }
         return content.getBytes(StandardCharsets.UTF_8);
