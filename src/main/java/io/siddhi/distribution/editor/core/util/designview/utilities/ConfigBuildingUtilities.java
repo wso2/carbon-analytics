@@ -47,7 +47,7 @@ public class ConfigBuildingUtilities {
         int[] startIndex = siddhiElement.getQueryContextStartIndex();
         int[] endIndex = siddhiElement.getQueryContextEndIndex();
         if (startIndex == null || endIndex == null) {
-            log.error("Failed to get the string since Start index and/or End index of the SiddhiElement are/is null");
+            log.debug("Failed to get the string since Start index and/or End index of the SiddhiElement are/is null");
             return null;
         } else {
             return getStringWithQueryContextIndexes(startIndex, endIndex, siddhiAppString);

@@ -52,9 +52,10 @@ public class AttributesSelectionConfigGenerator extends CodeSegmentsPreserver {
 
         List<SelectedAttribute> selectedAttributes = new ArrayList<>();
         List<OutputAttribute> selectionList = selector.getSelectionList();
-
-        if (ConfigBuildingUtilities.getDefinition(selectionList.get(0).getExpression(), siddhiAppString).
-                equals(SiddhiCodeBuilderConstants.SELECT_ALL)) {
+        String streamName = ConfigBuildingUtilities.getDefinition(selectionList.get(0).getExpression(),
+                siddhiAppString);
+        if (SiddhiCodeBuilderConstants.SELECT_ALL.
+                equals(streamName) || streamName == null) {
             AllSelectionConfig allSelectionConfig = new AllSelectionConfig();
             preserveAndBindCodeSegment(selector, allSelectionConfig);
             return new AllSelectionConfig();
