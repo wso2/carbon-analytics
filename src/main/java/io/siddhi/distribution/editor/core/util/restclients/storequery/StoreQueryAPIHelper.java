@@ -31,7 +31,6 @@ import org.wso2.transport.http.netty.contract.config.TransportsConfiguration;
 public class StoreQueryAPIHelper {
 
     private static final Logger logger = Logger.getLogger(StoreQueryAPIHelper.class);
-    private static final String STORE_QUERY_API_CONFIG_NAMESPACE = "siddhi.stores.query.api";
     private ConfigProvider configProvider;
 
     /**
@@ -51,9 +50,10 @@ public class StoreQueryAPIHelper {
      * @return HTTP Response
      * @throws SiddhiStoreQueryHelperException when executing store queries
      */
-    public Response executeStoreQuery(String query) throws SiddhiStoreQueryHelperException {
+    public Response executeStoreQuery(String host, String query) throws SiddhiStoreQueryHelperException {
 
-        return StoreQueryHTTPClient.executeStoreQuery(getStoreAPIHost(), query);
+        // TODO: 9/23/19 Temporary fix till  https://github.com/siddhi-io/distribution/issues/426 is solved
+        return StoreQueryHTTPClient.executeStoreQuery(host, query);
     }
 
     /**
@@ -66,7 +66,7 @@ public class StoreQueryAPIHelper {
 
         try {
             TransportsConfiguration transportsConfiguration = this.configProvider.getConfigurationObject
-                    (STORE_QUERY_API_CONFIG_NAMESPACE, TransportsConfiguration.class);
+                    ("transports", TransportsConfiguration.class);
             for (ListenerConfiguration listenerConfiguration : transportsConfiguration.getListenerConfigurations()) {
                 if ("default".equals(listenerConfiguration.getId())) {
                     logger.debug("Default configurations found in listener configurations.");
