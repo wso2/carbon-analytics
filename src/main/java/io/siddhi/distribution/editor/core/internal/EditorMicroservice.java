@@ -276,14 +276,15 @@ public class EditorMicroservice implements Microservice {
     @Path("/stores/query")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public Response executeStoreQuery(JsonElement element) {
+    public Response executeStoreQuery(JsonElement element, @Context Request request) {
 
         if (storeQueryAPIHelper == null) {
             storeQueryAPIHelper = new StoreQueryAPIHelper(configProvider);
         }
 
         try {
-            feign.Response response = storeQueryAPIHelper.executeStoreQuery(element.toString());
+            feign.Response response = storeQueryAPIHelper
+                    .executeStoreQuery(request.getProperty("LOCAL_ADDRESS").toString(), element.toString());
             String payload = response.body().toString();
             // If the response HTTP status code is OK, return the response.
             if (response.status() == 200) {
