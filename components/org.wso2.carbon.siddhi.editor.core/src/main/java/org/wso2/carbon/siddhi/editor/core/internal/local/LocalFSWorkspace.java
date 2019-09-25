@@ -23,7 +23,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.wso2.carbon.siddhi.editor.core.Workspace;
 import org.wso2.carbon.siddhi.editor.core.util.Constants;
-import org.wso2.carbon.siddhi.editor.core.util.LogEncoder;
+import org.wso2.carbon.siddhi.editor.core.util.FileJsonObjectReaderUtil;
 
 import java.io.File;
 import java.io.IOException;
@@ -33,9 +33,13 @@ import java.nio.file.FileVisitOption;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
+
+import static org.wso2.carbon.siddhi.editor.core.util.FileJsonObjectReaderUtil.getJsonObjForFile;
 
 /**
  * Workspace implementation for local file system.
@@ -43,12 +47,13 @@ import java.util.Map;
 public class LocalFSWorkspace implements Workspace {
 
     private static final Logger logger = LoggerFactory.getLogger(LocalFSWorkspace.class);
-    private static final String FILE_EXTENSION = ".siddhi";
+    private static final String SIDDHI_FILE_EXTENSION = ".siddhi";
     private static final String FOLDER_TYPE = "folder";
     private static final String CONTENT = "content";
 
     @Override
     public JsonArray listRoots() throws IOException {
+
         final Iterable<Path> rootDirs = FileSystems.getDefault().getRootDirectories();
         JsonArray rootArray = new JsonArray();
         for (Path root : rootDirs) {
@@ -79,32 +84,21 @@ public class LocalFSWorkspace implements Workspace {
 
     @Override
     public JsonArray listDirectoryFiles(String path) throws IOException {
+
         String location = "";
         if (path.equals("")) {
-            location = (Paths.get(Constants.RUNTIME_PATH,
-                                  Constants.DIRECTORY_DEPLOYMENT)).toString();
+            location = (Paths.get(Constants.RUNTIME_PATH, Constants.DIRECTORY_DEPLOYMENT)).toString();
         }
-        return listWorkspaceDirectoryInPath(location);
-    }
 
-    public JsonArray listWorkspaceDirectoryInPath(String path) throws IOException {
-        Path ioPath = Paths.get(path);
-        JsonArray dirs = new JsonArray();
-        Iterator<Path> iterator = Files.list(ioPath).iterator();
-        while (iterator.hasNext()) {
-            Path next = iterator.next();
-            if (Files.isDirectory(next) && !Files.isHidden(next)) {
-                JsonObject jsnObj = getJsonObjForFile(next, true);
-                if (jsnObj.get("text").toString().equals("\"" + Constants.DIRECTORY_WORKSPACE + "\"")) {
-                    dirs.add(jsnObj);
-                }
-            }
-        }
-        return dirs;
+        List<String> directories = new ArrayList<>();
+        directories.add("\"" + Constants.DIRECTORY_WORKSPACE + "\"");
+
+        return FileJsonObjectReaderUtil.listDirectoryInPath(location, directories);
     }
 
     @Override
     public JsonArray listDirectoriesInPath(String path) throws IOException {
+
         Path ioPath = Paths.get(path);
         JsonArray dirs = new JsonArray();
         Iterator<Path> iterator = Files.list(ioPath).iterator();
@@ -120,6 +114,7 @@ public class LocalFSWorkspace implements Workspace {
 
     @Override
     public JsonObject read(Path path) throws IOException {
+
         byte[] fileContent = Files.readAllBytes(path);
         JsonObject content = new JsonObject();
         content.addProperty(CONTENT, new String(fileContent, Charset.defaultCharset()));
@@ -128,6 +123,7 @@ public class LocalFSWorkspace implements Workspace {
 
     @Override
     public void delete(String path, String type) throws IOException {
+
         Path ioPath = Paths.get(path);
         if (FOLDER_TYPE.equals(type)) {
             Files.walk(ioPath, FileVisitOption.FOLLOW_LINKS)
@@ -141,6 +137,7 @@ public class LocalFSWorkspace implements Workspace {
 
     @Override
     public void create(String path, String type) throws IOException {
+
         Path ioPath = Paths.get(path);
         if (FOLDER_TYPE.equals(type)) {
             Files.createDirectories(ioPath);
@@ -151,9 +148,10 @@ public class LocalFSWorkspace implements Workspace {
 
     @Override
     public void log(String loggerID, String timestamp, String level,
-                    String URL, String message, String layout) throws IOException {
+                    String url, String message, String layout) throws IOException {
+
         Logger frontEndLog = LoggerFactory.getLogger(loggerID);
-        String logMessage = "client-timestamp: " + timestamp + ", page: " + URL + ", message: " + message;
+        String logMessage = "client-timestamp: " + timestamp + ", page: " + url + ", message: " + message;
         switch (level) {
             case "TRACE":
                 frontEndLog.trace(logMessage);
@@ -179,55 +177,14 @@ public class LocalFSWorkspace implements Workspace {
 
     }
 
-    private JsonObject getJsonObjForFile(Path root, boolean checkChildren) {
-        JsonObject rootObj = new JsonObject();
-        Path path = root.getFileName();
-        rootObj.addProperty("text", path != null ?
-                                    path.toString() : root.toString());
-        rootObj.addProperty("id", Paths.get(Constants.CARBON_HOME).relativize(root).toString());
-        if (Files.isDirectory(root) && checkChildren) {
-            rootObj.addProperty("type", "folder");
-            try {
-                if (Files.list(root).count() > 0) {
-                    rootObj.addProperty("children", Boolean.TRUE);
-                } else {
-                    rootObj.addProperty("children", Boolean.FALSE);
-                }
-            } catch (IOException e) {
-                logger.debug("Error while fetching children of " + LogEncoder.removeCRLFCharacters(root.toString()), e);
-                rootObj.addProperty("error", e.toString());
-            }
-        } else if (Files.isRegularFile(root) && checkChildren) {
-            rootObj.addProperty("type", "file");
-            rootObj.addProperty("children", Boolean.FALSE);
-        }
-        return rootObj;
-    }
-
     @Override
     public JsonArray listFilesInPath(Path path) throws IOException {
-        JsonArray dirs = new JsonArray();
-        Iterator<Path> iterator = Files.list(path).iterator();
-        while (iterator.hasNext()) {
-            Path next = iterator.next();
-            if ((Files.isDirectory(next) || Files.isRegularFile(next)) && !Files.isHidden(next)) {
-                JsonObject jsnObj = getJsonObjForFile(next, true);
-                if (Files.isRegularFile(next)) {
-                    Path aPath = next.getFileName();
-                    if (aPath != null && aPath.toString().endsWith(FILE_EXTENSION)) {
-                        dirs.add(jsnObj);
-                    }
-                } else {
-                    dirs.add(jsnObj);
-                }
-
-            }
-        }
-        return dirs;
+        return FileJsonObjectReaderUtil.listFilesInPath(path, SIDDHI_FILE_EXTENSION);
     }
 
     @Override
     public JsonObject exists(Path path) throws IOException {
+
         JsonObject result = new JsonObject();
         boolean exists = Files.exists(path);
         result.addProperty("file", path.toString());
@@ -236,6 +193,7 @@ public class LocalFSWorkspace implements Workspace {
     }
 
     public JsonArray listSamplesInPath(Map<String, String> sampleMap) {
+
         JsonArray samples = new JsonArray();
         sampleMap.entrySet().stream().forEach(entry -> {
             JsonObject sampleObject = new JsonObject();

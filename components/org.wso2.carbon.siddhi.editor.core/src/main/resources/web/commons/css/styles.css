@@ -1389,6 +1389,10 @@ a:hover {
     margin: 100px auto 0;
 }
 
+.modal-dialog.export-dialog {
+    margin: 100px auto 0;
+}
+
 .delete-item-dialog .icon {
     float: left;
     margin-left: 25px;

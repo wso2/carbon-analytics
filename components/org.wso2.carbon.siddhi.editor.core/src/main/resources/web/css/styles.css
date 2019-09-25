@@ -104,38 +104,38 @@ header .brand {
 }
 
 /* Editor Custom Styles */
-.tab-pane .ace-twilight .ace_string {
+.ws-tab-pane .ace-twilight .ace_string {
   color: #629755;
 }
 
-.tab-pane .ace-twilight .ace_keyword,
-.tab-pane .ace-twilight .ace_meta {
+.ws-tab-pane .ace-twilight .ace_keyword,
+.ws-tab-pane .ace-twilight .ace_meta {
   color: #9876aa;
 }
 
-.tab-pane .ace-twilight .ace_support {
+.ws-tab-pane .ace-twilight .ace_support {
   color: #ffc66d;
 }
 
-.tab-pane .ace-twilight .ace_constant,
-.tab-pane .ace-twilight .ace_constant.ace_character,
-.tab-pane .ace-twilight .ace_constant.ace_character.ace_escape,
-.tab-pane .ace-twilight .ace_constant.ace_other,
-.tab-pane .ace-twilight .ace_heading,
-.tab-pane .ace-twilight .ace_markup.ace_heading,
-.tab-pane .ace-twilight .ace_support.ace_constant {
+.ws-tab-pane .ace-twilight .ace_constant,
+.ws-tab-pane .ace-twilight .ace_constant.ace_character,
+.ws-tab-pane .ace-twilight .ace_constant.ace_character.ace_escape,
+.ws-tab-pane .ace-twilight .ace_constant.ace_other,
+.ws-tab-pane .ace-twilight .ace_heading,
+.ws-tab-pane .ace-twilight .ace_markup.ace_heading,
+.ws-tab-pane .ace-twilight .ace_support.ace_constant {
   color: #cc7832;
 }
 
-.tab-pane .ace-twilight .ace_comment {
+.ws-tab-pane .ace-twilight .ace_comment {
   color: #808080;
 }
 
-.tab-pane .ace-twilight .ace_numeric {
+.ws-tab-pane .ace-twilight .ace_numeric {
   color: #6897BB;
 }
 
-.tab-pane .ace_annotation {
+.ws-tab-pane .ace_annotation {
   color: #BBB529;
 }
 
@@ -249,7 +249,6 @@ a.ui-button:active, .ui-button:active,
   border: 1px solid #cccccc;
   background: #ededed;
   font-weight: normal;
-  color: #2b2b2b;
 }
 
 .ui-datepicker .ui-icon {
@@ -518,11 +517,6 @@ a.ui-button:active, .ui-button:active,
   margin-bottom: 15px;
 }
 
-/* Export as docker modal */
-.modalDockerExport .modal-dialog {
-  width: 500px;
-}
-
 body.sticky-footer {
   padding-bottom: 20px;
 }
@@ -673,4 +667,13 @@ h3.popover-title {
 
 .selected-element .element-close-icon {
   display: inline !important;
+}
+
+.siddhi-app-templates {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  height: 100px;
 }

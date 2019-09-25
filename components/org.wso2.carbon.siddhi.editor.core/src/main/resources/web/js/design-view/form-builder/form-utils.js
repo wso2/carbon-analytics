@@ -2408,7 +2408,7 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
          */
         FormUtils.prototype.selectFirstConditionByDefault = function () {
             $('.define-conditions .nav-tabs').find('.condition-navigation:first-child').addClass('active');
-            $('.define-conditions .tab-content').find('.tab-pane:first-child').addClass('active');
+            $('.define-conditions .tab-content').find('.ws-tab-pane:first-child').addClass('active');
         };
 
         /**
@@ -3684,7 +3684,7 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
             self.addEventListenersForStreamHandlersDiv([]);
             $('.define-conditions .active').removeClass('active');
             $('.define-conditions .nav-tabs .condition-navigation:last').addClass('active');
-            $('.define-conditions .tab-pane:last').addClass('active');
+            $('.define-conditions .ws-tab-pane:last').addClass('active');
         };
 
         /**
