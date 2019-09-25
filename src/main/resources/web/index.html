@@ -25,6 +25,7 @@
     <link rel="stylesheet" type="text/css" href="/editor/commons/css/left-tool-bar.css"/>
     <link rel="stylesheet" type="text/css" href="/editor/commons/css/workspace-explorer.css"/>
     <link rel="stylesheet" type="text/css" href="/editor/commons/css/operator-finder.css"/>
+    <link rel="stylesheet" type="text/css" href="/editor/commons/css/template-deploy.css"/>
     <link href="/editor/commons/css/jquery-ui-timepicker-addon.css" rel="stylesheet" type="text/css"/>
     <link href="/editor/commons/css/simulator.css" rel="stylesheet" type="text/css"/>
     <link rel="stylesheet" type="text/css" href="/editor/commons/css/notification.css"/>
@@ -135,6 +136,12 @@
                             <a href="#operator-finder" class="operator-finder-activate-btn" role="tab"
                                data-toggle="tab" data-placement="right" data-container="body">
                                 <i class="fw fw-extensions fw-lg"></i>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="#template-deploy" class="template-deploy-activate-btn" role="tab"
+                               data-toggle="tab" data-placement="right" data-container="body">
+                                <i class="fw fw-variable fw-lg"></i>
                             </a>
                         </li>
                     </ul>
@@ -2243,6 +2250,15 @@
     </div>
 </script>
 
+<!-- Handlebar template for template deployer side-panel content -->
+<script id="template-deploy-side-panel-template" type="text/x-handlebars-template">
+    <div id="template-deploy" role="tabpanel" class="ws-tab-pane template-deploy">
+        <div class="content">
+            <h3>Template Stuff</h3>
+        </div>
+    </div>
+</script>
+
 <!-- Handlebar template for operator finder search results -->
 <script id="operators-search-results-template" type="text/x-handlebars-template">
     {{#if hasQuery}}
@@ -2621,6 +2637,11 @@
             {
                 name: 'operator_finder',
                 location: 'js/operator-finder',
+                main: 'module'
+            },
+            {
+                name: 'template_deploy',
+                location: 'js/template-deploy',
                 main: 'module'
             }
         ]
@@ -3097,6 +3118,33 @@
                         other: {
                             key: 'ctrl+shift+x',
                             label: 'Ctrl+Shift+X'
+                        }
+                    }
+                }
+            },
+            template_deploy : {
+                container: '.sidebar-left',
+                activateBtn: '.template-deploy-activate-btn',
+                separator: '.sidebar-left-separator',
+                containerToAdjust: '#right-container',
+                leftOffset: 40,
+                separatorOffset: 5,
+                defaultWidth: 380,
+                resizeLimits:{
+                    minX: 200,
+                    maxX: 800
+                },
+                containerId: 'template-deploy',
+                command: {
+                    id: 'toggle-template-deploy',
+                    shortcuts: {
+                        mac: {
+                            key: 'command+shift+t',
+                            label: '\u2318\u21E7T'
+                        },
+                        other: {
+                            key: 'ctrl+shift+t',
+                            label: 'Ctrl+Shift+T'
                         }
                     }
                 }
