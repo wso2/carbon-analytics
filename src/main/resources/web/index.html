@@ -2250,11 +2250,44 @@
     </div>
 </script>
 
-<!-- Handlebar template for template deployer side-panel content -->
+<!-- Handlebar template for template deploy side-panel content -->
 <script id="template-deploy-side-panel-template" type="text/x-handlebars-template">
     <div id="template-deploy" role="tabpanel" class="ws-tab-pane template-deploy">
         <div class="content">
-            <h3>Template Stuff</h3>
+            <h3>Deploy Siddhi App Template</h3>
+
+            <form role="form" class="single-event-form" data-form-type="single" data-toggle="loading"
+              data-loading-style="overlay" data-loading-text="Sending event">
+            <div class="form-group">
+                <label>
+                    Select Templated App Name
+                </label>
+                <select name="template-siddhi-app-name" class="form-control" id="template-app-name-select">
+
+                </select>
+
+                <div id="template-attr-container" class="form-group">
+                    <table class="table table-responsive" id="template-attr-table">
+                        <thead>
+                            <th width="100%">
+                                <label>Template Attributes</label>
+                            </th>
+                        </thead>
+                        <tbody id="template-attr-table-body">
+                            <tr>
+                                <td><label style="opacity: 0.6">Please select a Siddhi app with template place holders</label></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <button type="submit" class="btn btn-primary" name="send" id="fill-and-send">
+                    Set
+                </button>
+            </div>
+        </form>
         </div>
     </div>
 </script>

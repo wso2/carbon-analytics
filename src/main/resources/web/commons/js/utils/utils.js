@@ -15,9 +15,35 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-define(['require'],
-    function (require) {
+define(['require', 'jquery'],
+    function (require, $) {
         var Utils = function () {
+        };
+
+        var rest_client_constants = {
+            HTTP_GET: "GET",
+            HTTP_POST: "POST",
+            HTTP_PUT: "PUT",
+            HTTP_DELETE: "DELETE",
+            simulatorUrl: window.location.protocol + "//" + window.location.host + "/simulation",
+            editorUrl: window.location.protocol + "//" + window.location.host + '/editor'
+        };
+
+
+        Utils.prototype.retrieveSiddhiAppNames = function (successCallback, errorCallback) {
+            $.ajax({
+                async: true,
+                url: rest_client_constants.editorUrl + "/artifact/listSiddhiApps",
+                type: rest_client_constants.HTTP_GET,
+                success: function (data) {
+                    if (typeof successCallback === 'function')
+                        successCallback(data)
+                },
+                error: function (msg) {
+                    if (typeof errorCallback === 'function')
+                        errorCallback(msg)
+                }
+            });
         };
 
         /**
