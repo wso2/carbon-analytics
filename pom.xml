@@ -184,9 +184,42 @@
                                 <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
                                 <Bundle-Name>${project.artifactId}</Bundle-Name>
                                 <Include-Resource>
+                                    web=target/classes/web,
+                                    target/classes/mime-map.properties,
                                     META-INF=target/classes/META-INF,
                                     META-INF/services=${project.build.directory}/dependencies/docker-client/META-INF/services
                                 </Include-Resource>
+                                <Private-Package>
+                                    com.spotify.docker.*,
+                                    com.kenai.*,
+                                    org.apache.commons.*,
+                                    jni.*,
+                                    jersey.repackaged.com.*,
+                                    io.siddhi.distribution.editor.core.internal,
+                                    io.siddhi.distribution.editor.core.internal.*
+                                </Private-Package>
+                                <Export-Package>
+                                    io.siddhi.distribution.editor.core.*,
+                                    org.apache.commons.*
+<!--                                    ,-->
+<!--                                    com.kenai.*,-->
+<!--                                    org.apache.commons.*,-->
+<!--                                    jni.*-->
+                                </Export-Package>
+                                <Import-Package>
+                                    org.osgi.framework.*;version="${osgi.framework.import.version.range}",
+                                    org.wso2.carbon.kernel;version="${carbon.kernel.package.import.version.range}",
+                                    org.yaml.snakeyaml.*; version="${org.yaml.snakeyaml.version.range}",
+                                    io.siddhi.distribution.common.*;version="${io.siddhi.distribution.version.range}",
+                                    io.siddhi.distribution.editor.log.appender.*,
+                                    org.wso2.msf4j.*;version="${msf4j.import.version.range}",
+                                    javax.management.*,
+                                    javax.ws.rs.*;version="0.0.0",
+                                    com.fasterxml.jackson.core.*;version="${com.fasterxml.jackson.core.version.range}",
+                                    com.fasterxml.jackson.databind.*;version="${com.fasterxml.jackson.core.version.range}",
+                                    *;resolution:=optional
+                                </Import-Package>
+                                <DynamicImport-Package>*</DynamicImport-Package>
                             </instructions>
                         </configuration>
                     </plugin>
@@ -197,29 +230,6 @@
 
     <properties>
         <maven.findbugsplugin.version.exclude>findbugs-exclude.xml</maven.findbugsplugin.version.exclude>
-        <private.package>
-                com.spotify.docker.*,
-                com.kenai.*,
-                org.apache.commons.*,
-                jni.*,
-                jersey.repackaged.com.*
-        </private.package>
-        <export.package>
-            io.siddhi.distribution.editor.core.*,
-        </export.package>
-        <import.package>
-            org.osgi.framework.*;version="${osgi.framework.import.version.range}",
-            org.wso2.carbon.kernel;version="${carbon.kernel.package.import.version.range}",
-            org.yaml.snakeyaml.*; version="${org.yaml.snakeyaml.version.range}",
-            io.siddhi.distribution.common.*;version="${io.siddhi.distribution.version.range}",
-            io.siddhi.distribution.editor.log.appender.*,
-            org.wso2.msf4j.*;version="${msf4j.import.version.range}",
-            javax.management.*,
-            javax.ws.rs.*;version="0.0.0",
-            com.fasterxml.jackson.core.*;version="${com.fasterxml.jackson.core.version.range}",
-            com.fasterxml.jackson.databind.*;version="${com.fasterxml.jackson.core.version.range}",
-            *;resolution:=optional
-        </import.package>
         <carbon.component>
             osgi.service; objectClass="org.wso2.msf4j.Microservice"; serviceCount="1",
             osgi.service; objectClass="org.wso2.carbon.deployment.engine.Deployer";serviceCount="1"
