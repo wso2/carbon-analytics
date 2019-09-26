@@ -66,6 +66,9 @@ public class Constants {
     public static final String ATTR_TYPE_BOOL = "bool";
     public static final String EVENT_ATTRIBUTE_VALUE_SEPARATOR = ":";
     public static final String FAULT_STREAM_PREFIX = "!";
+    public static final String EXPORT_PROPERTIES_NAMESPACE = "export.properties";
+    public static final String DOCKER_BASE_IMAGE_PROPERTY = "dockerBaseImage";
+    public static final String DEFAULT_SI_DOCKER_BASE_IMAGE = "siddhiio/siddhi-runner-base-alpine:latest";
     static final String FUNCTION_EXECUTOR = "FunctionExecutor";
     static final String ATTRIBUTE_AGGREGATOR = "AttributeAggregatorExecutor";
     static final String INCREMENTAL_AGGREGATOR = "IncrementalAggregator";

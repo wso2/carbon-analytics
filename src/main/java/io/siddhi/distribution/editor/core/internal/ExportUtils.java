@@ -73,7 +73,7 @@ public class ExportUtils {
     private static final String ENV_BLOCK_TEMPLATE = "\\{\\{ENV_BLOCK}}";
     private static final String APPS_BLOCK_TEMPLATE = "\\{\\{APPS_BLOCK}}";
     private static final String EXPOSE_PORTS_BLOCK_TEMPLATE = "\\{\\{EXPORT_PORTS_BLOCK}}";
-    private static final String PRODUCT_VERSION_TEMPLATE = "\\{\\{PRODUCT_VERSION}}";
+    private static final String DOCKER_BASE_IMAGE_TEMPLATE = "\\{\\{SIDDHI_RUNNER_BASE_IMAGE}}";
     private static final String PORT_BIND_TEMPLATE = "\\{\\{BIND_PORTS}}";
     private static final String CONFIG_BLOCK_VALUE =
             "COPY --chown=siddhi_user:siddhi_io \\$\\{CONFIG_FILE}/ \\$\\{USER_HOME}";
@@ -400,8 +400,13 @@ public class ExportUtils {
         }
         data = Files.readAllBytes(dockerFilePath);
         String content = new String(data, StandardCharsets.UTF_8);
-        String productVersion = this.getConfigurations().getProductVersion();
-        content = content.replaceAll(PRODUCT_VERSION_TEMPLATE, productVersion);
+        String dockerBaseImgName = Constants.DEFAULT_SI_DOCKER_BASE_IMAGE;
+        if (configProvider.getConfigurationObject(Constants.EXPORT_PROPERTIES_NAMESPACE) != null) {
+            dockerBaseImgName = (String) ((Map) configProvider
+                    .getConfigurationObject(Constants.EXPORT_PROPERTIES_NAMESPACE))
+                    .get(Constants.DOCKER_BASE_IMAGE_PROPERTY);
+        }
+        content = content.replaceAll(DOCKER_BASE_IMAGE_TEMPLATE, dockerBaseImgName);
 
         if (exportType != null && exportType.equals(EXPORT_TYPE_KUBERNETES)) {
             content = content.replaceAll(APPS_BLOCK_TEMPLATE, "");
