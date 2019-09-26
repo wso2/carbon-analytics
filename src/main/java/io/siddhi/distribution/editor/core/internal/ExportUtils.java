@@ -356,6 +356,10 @@ public class ExportUtils {
             );
             zipOutputStream.write(dockerContent, 0, dockerContent.length);
             zipOutputStream.closeEntry();
+            if (buildDocker) {
+                Path tempDockerFilePath = Paths.get(tempDockerDirectoryPath.toString(), DOCKER_FILE_NAME);
+                Files.write(tempDockerFilePath, dockerContent);
+            }
 
             // Write the readme file to the zip file
             StringBuilder portBindingStr = new StringBuilder();
@@ -378,10 +382,6 @@ public class ExportUtils {
             byte[] readmeContent = content.getBytes(StandardCharsets.UTF_8);
             zipOutputStream.write(readmeContent, 0, readmeContent.length);
             zipOutputStream.closeEntry();
-            if (buildDocker) {
-                Path tempDockerFilePath = Paths.get(tempDockerDirectoryPath.toString(), DOCKER_FILE_NAME);
-                Files.write(tempDockerFilePath, data);
-            }
 
             // Write the kubernetes file to the zip file
             if (exportType != null && exportType.equals(EXPORT_TYPE_KUBERNETES)) {
