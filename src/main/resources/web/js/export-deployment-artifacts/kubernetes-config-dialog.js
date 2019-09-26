@@ -29,18 +29,36 @@ define(['require', 'lodash', 'jquery', 'log', 'ace/ace', 'app/source-editor/edit
 
         KubernetesConfigDialog.prototype.render = function () {
             var self = this;
-            var divId = "kubernetes-config-editor-id";
-            var templateEntry = "<div class= 'config-template-container' id='".concat(divId).concat("'></div>");
-            self.templateContainer.append(templateEntry);
 
-            this._mainEditor = new SiddhiEditor({
-                divID: divId,
-                realTimeValidation: false,
-                autoCompletion: false
-            });
+            var siddhiProcessName = '<div class="form-group">\n' +
+                '          <label>Docker Image Tag:</label>      <input type="text" class="form-control" id="sp-name-input-field" ' +
+                'placeholder="<DOCKER_REGISTRY_NAME>/<IMAGE_NAME>:<IMAGE_VERSION>">\n' +
+                '            </div>';
 
-            this._editor = ace.edit(divId);
-            this._editor.resize(true);
+            var checkboxs = '<div class="form-group">\n' +
+                '           <input type="checkbox" name="download-docker-artifacts" value="download"> Download artifacts<br>\n' +
+                ' <input type="checkbox" name="push-docker-image" id="docker-push-checkbox" value="push"> Push to docker registry<br>\n' +
+                '            </div>';
+
+            var dockerProperties = '<div id="properties-id" style="display:none"><form id="docker-properties-form">\n' +
+                '  Docker Username:  <input type="text" name="username" id="username"><br>\n' +
+                '  Docker Password:  <input type="text" name="password" id="password"><br>\n' +
+                '  Email:            <input type="text" name="email" id="email"><br>\n' +
+                '</form></div>';
+
+
+            // var divId = "kubernetes-config-editor-id";
+            // var templateEntry = "<div class= 'config-template-container' id='".concat(divId).concat("'></div>");
+            // self.templateContainer.append(templateEntry);
+            //
+            // this._mainEditor = new SiddhiEditor({
+            //     divID: divId,
+            //     realTimeValidation: false,
+            //     autoCompletion: false
+            // });
+            //
+            // this._editor = ace.edit(divId);
+            // this._editor.resize(true);
             self.k8ConfigEditor = this._editor;
         };
 

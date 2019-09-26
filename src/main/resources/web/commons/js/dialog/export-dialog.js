@@ -17,9 +17,10 @@
  */
 
 define(['require', 'jquery', 'log', 'backbone', 'smart_wizard', 'siddhiAppSelectorDialog', 'jarsSelectorDialog',
-        'templateAppDialog', 'templateConfigDialog', 'fillTemplateValueDialog', 'kubernetesConfigDialog'],
+        'templateAppDialog', 'templateConfigDialog', 'fillTemplateValueDialog', 'kubernetesConfigDialog',
+        'dockerConfigDialog'],
     function (require, $, log, Backbone, smartWizard, SiddhiAppSelectorDialog, JarsSelectorDialog,
-              TemplateAppDialog, TemplateConfigDialog, FillTemplateValueDialog, KubernetesConfigDialog) {
+              TemplateAppDialog, TemplateConfigDialog, FillTemplateValueDialog, KubernetesConfigDialog, DockerConfigDialog) {
 
         var ExportDialog = Backbone.View.extend(
             /** @lends ExportDialog.prototype */
@@ -51,6 +52,7 @@ define(['require', 'jquery', 'log', 'backbone', 'smart_wizard', 'siddhiAppSelect
                     this._configTemplateModel;
                     this._kubernetesConfigModel;
                     this._fill_template_value_dialog;
+                    this._dockerConfigModel;
 
                     var type;
                     if (isExportDockerFlow) {
@@ -84,11 +86,11 @@ define(['require', 'jquery', 'log', 'backbone', 'smart_wizard', 'siddhiAppSelect
                     } else {
                         heading.text('Export Siddhi Apps For Kubernetes CRD');
                         form.find('#form-steps')
-                            .append('<li><a href="#step-6">Step 6<br/><small>Add Kubernetes Config</small></a></li>');
+                            .append('<li><a href="#step-7">Step 7<br/><small>Add Kubernetes Config</small></a></li>');
 
                         form.find('#form-containers')
                             .append("\n" +
-                                "<div id=\"step-6\" >\n" +
+                                "<div id=\"step-7\" >\n" +
                                 "<div class='kubernetes-configuration-step' id='kubernetes-configuration-step-id' style='display: block'>\n" +
                                 "<div class=\"step-description\">Configure Kubernetes for Siddhi</div>" +
                                 "</div>\n" +
@@ -201,6 +203,13 @@ define(['require', 'jquery', 'log', 'backbone', 'smart_wizard', 'siddhiAppSelect
                                 self._fill_template_value_dialog = new FillTemplateValueDialog(fillTemplateOptions);
                                 self._fill_template_value_dialog.render();
                             } else if (stepNumber === 5) {
+                                self._dockerConfigModel = new DockerConfigDialog({
+                                    app: self._options,
+                                    templateHeader: exportContainer.find('#docker-config-container-id'),
+                                    payload: self._payload
+                                });
+                                self._dockerConfigModel.render();
+                            } else if (stepNumber === 6) {
                                 self._kubernetesConfigModel = new KubernetesConfigDialog({
                                     app: self._options,
                                     templateHeader: exportContainer.find('#kubernetes-configuration-step-id')
@@ -217,6 +226,7 @@ define(['require', 'jquery', 'log', 'backbone', 'smart_wizard', 'siddhiAppSelect
                     if (!this._isExportDockerFlow) {
                         this._payload.kubernetesConfiguration = this._kubernetesConfigModel.getKubernetesConfigs();
                     }
+                    this._dockerConfigModel.getDockerConfigs();
                     this._payload.bundles = this._jarsSelectorDialog.getSelected('bundles');
                     this._payload.jars = this._jarsSelectorDialog.getSelected('jars');
 
