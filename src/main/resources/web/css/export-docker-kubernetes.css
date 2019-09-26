@@ -123,8 +123,13 @@ hr.export-dialog-hr {
     min-width: 100px;
 }
 .sub-template-value-element-div .option input {
-    color: #000 !important;
+    color: #fff !important;
     width: 75%;
+    background-color: #2C2C2C;
+    border-style: none;
+    height: 35px;
+    padding-left: 10px;
+    margin-top: 1px;
 }
 
 .step-description {
